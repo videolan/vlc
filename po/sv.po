@@ -18409,6 +18409,1311 @@ msgstr "Visualiseringsfilter"
 msgid "Spectrum analyser"
 msgstr "Spektrumanalysator"
 
+#~ msgid "CDDB Artist"
+#~ msgstr "CDDB Artist"
+
+#~ msgid "CDDB Category"
+#~ msgstr "CDDB Kategori"
+
+#~ msgid "CDDB Genre"
+#~ msgstr "CDDB Genre"
+
+#~ msgid "CDDB Year"
+#~ msgstr "CDDB År"
+
+#~ msgid "CDDB Title"
+#~ msgstr "CDDB Titel"
+
+#~ msgid "CD-Text Message"
+#~ msgstr "CD-Text Meddelande"
+
+#~ msgid "CD-Text Title"
+#~ msgstr "CD-Text Titel"
+
+#~ msgid "ISO-9660 Application ID"
+#~ msgstr "ISO-9660 Applikations-id"
+
+#~ msgid "ISO-9660 Preparer"
+#~ msgstr "IS-9660 Förberedare"
+
+#~ msgid "ISO-9660 Publisher"
+#~ msgstr "ISO-9660 Utgivare"
+
+#~ msgid "Login"
+#~ msgstr "Inloggning"
+
+#~ msgid "Fixing AVI Index"
+#~ msgstr "Rättar till AVI-index"
+
+#~ msgid "Creating AVI Index ..."
+#~ msgstr "Skapar AVI-index ..."
+
+#~ msgid "Segment filename"
+#~ msgstr "Filnamn för segment"
+
+#~ msgid "Listeners"
+#~ msgstr "Lyssnare"
+
+#~ msgid "No"
+#~ msgstr "Nej"
+
+#~ msgid "Do not display further errors"
+#~ msgstr "Visa inte ytterligare fel"
+
+#~ msgid "%i items in playlist (%i not shown)"
+#~ msgstr "%i objekt i spellista (%i visas inte)"
+
+#~ msgid "M3U file"
+#~ msgstr "M3U-fil"
+
+#~ msgid "Sorted by Artist"
+#~ msgstr "Sorterad efter artist"
+
+#~ msgid "Sorted by Album"
+#~ msgstr "Sorterad efter album"
+
+#~ msgid "Session Announcements (SAP)"
+#~ msgstr "Sessionsannonseringar (SAP)"
+
+#~ msgid "General interface setttings"
+#~ msgstr "Allmänna gränssnittsinställningar"
+
+#~ msgid "CDDB Disc ID"
+#~ msgstr "CDDB Skiv-id"
+
+#~ msgid "CDDB Extended Data"
+#~ msgstr "CDDB Utökad data"
+
+#~ msgid "CD-Text Disc ID"
+#~ msgstr "CD-Text Skiv-id"
+
+#~ msgid "CD-Text Genre"
+#~ msgstr "CD-Text Genre"
+
+#~ msgid "ISO-9660 Volume"
+#~ msgstr "ISO-9660 Volym"
+
+#~ msgid "ISO-9660 Volume Set"
+#~ msgstr "ISO-9660 Volymgrupp"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Katalog för videoskärmbilder"
+
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr ""
+#~ "skriv ut hjälp för VLC och alla dess moduler (kan kombineras med --"
+#~ "advanced)"
+
+#~ msgid "By category"
+#~ msgstr "Efter kategori"
+
+#~ msgid "Manually added"
+#~ msgstr "Manuellt tillagd"
+
+#~ msgid "All items, unsorted"
+#~ msgstr "Alla objekt, osorterade"
+
+#~ msgid "DCA"
+#~ msgstr "DCA"
+
+#~ msgid "Sets a maximum local bitrate in kbits/s."
+#~ msgstr "Ställer en maximal lokal bithastighet i kbits/s."
+
+#, fuzzy
+#~ msgid "Direct MV prediction mode. "
+#~ msgstr "DirectMedia Object avkodare "
+
+#~ msgid ""
+#~ "An error has occurred which probably prevented the proper execution of "
+#~ "the program:"
+#~ msgstr ""
+#~ "Ett fel har inträffat som antagligen förhindrar en korrekt start av "
+#~ "programmet:"
+
+#~ msgid "If you believe that it is a bug, please follow the instructions at:"
+#~ msgstr "Om du tror att detta är ett fel, följ instruktionerna på:"
+
+#~ msgid "Open Messages Window"
+#~ msgstr "Öppna meddelandefönstret"
+
+#~ msgid "Dismiss"
+#~ msgstr "Stäng"
+
+#~ msgid "Image"
+#~ msgstr "Bild"
+
+#~ msgid "Timestamp"
+#~ msgstr "Tidsstämpel"
+
+#~ msgid "Center-Center"
+#~ msgstr "Center-Center"
+
+#~ msgid "Left-Center"
+#~ msgstr "Vänster-Center"
+
+#~ msgid "Right-Center"
+#~ msgstr "Höger-Center"
+
+#~ msgid "Center-Top"
+#~ msgstr "Center-Topp"
+
+#~ msgid "Left-Top"
+#~ msgstr "Vänster-Topp"
+
+#~ msgid "Right-Top"
+#~ msgstr "Höger-Topp"
+
+#~ msgid "Center-Bottom"
+#~ msgstr "Center-Botten"
+
+#~ msgid "Left-Bottom"
+#~ msgstr "Vänster-Botten"
+
+#~ msgid "Right-Bottom"
+#~ msgstr "Höger-Botten"
+
+#~ msgid "Number of streams"
+#~ msgstr "Antal strömmar"
+
+#~ msgid " to "
+#~ msgstr " till "
+
+#~ msgid "Adjust Image"
+#~ msgstr "Justera bild"
+
+#, fuzzy
+#~ msgid "Check for updates..."
+#~ msgstr "Kontrollerar efter uppdateringar ..."
+
+#~ msgid "delay"
+#~ msgstr "fördröjning"
+
+#~ msgid "fps"
+#~ msgstr "fps"
+
+#~ msgid "More info"
+#~ msgstr "Mer info"
+
+#~ msgid "Control interface settings"
+#~ msgstr "Inställningar för kontrollgränssnitt"
+
+#~ msgid "Text rendering"
+#~ msgstr "Textrenderering"
+
+#~ msgid ""
+#~ "Use the settings of the \"freetype\" module to choose the font you  want "
+#~ "VLC to use for text rendering (to display subtitles for example)."
+#~ msgstr ""
+#~ "Använd inställningen från \"freetype\" modulen för att ange på vilket "
+#~ "sätt du vill att VLC ska renderera text (tex. för att visa undertexter)"
+
+#~ msgid ""
+#~ "You can enforce the position of the top left corner of the video window "
+#~ "here (x coordinate)."
+#~ msgstr ""
+#~ "Du kan upprätthålla positionen av det övre vänstra hörnet av videorutan "
+#~ "här(x kordinater)."
+
+#~ msgid "You can specify a custom video window title here."
+#~ msgstr "Här kan du specifiera en egen videofönster titel."
+
+#, fuzzy
+#~ msgid "Program to select"
+#~ msgstr "Program"
+
+#, fuzzy
+#~ msgid "Programs to select"
+#~ msgstr "Program"
+
+#, fuzzy
+#~ msgid "Interfaces"
+#~ msgstr "Gränssnitt"
+
+#~ msgid "DTS"
+#~ msgstr "DTS"
+
+#~ msgid "By default the encoding is CBR."
+#~ msgstr "Som standard är kodning satt till CBR."
+
+#~ msgid "Default to 4212"
+#~ msgstr "Standard till 4212"
+
+#, fuzzy
+#~ msgid "Go To Position"
+#~ msgstr "Position"
+
+#~ msgid "Fill fullscreen"
+#~ msgstr "Fyll fullskärm"
+
+#~ msgid "VIDEO_TS folder"
+#~ msgstr "VIDEO_TS mapp"
+
+#~ msgid "Name of DVD device to read from."
+#~ msgstr "Namn på DVD-enheten att läsa från."
+
+#~ msgid "Name of CD-ROM device to read Video CD from."
+#~ msgstr "Namn på CD-ROM-enheten att läsa Video-CD från."
+
+#~ msgid "Name of CD-ROM device to read audio CD from."
+#~ msgstr "Namn på CD-ROM-enheten att läsa ljud-CD från."
+
+#~ msgid "&Shuffle Playlist"
+#~ msgstr "Blanda spellistan"
+
+#, fuzzy
+#~ msgid "VLC media player - Updates"
+#~ msgstr "VLC mediaspelare"
+
+#~ msgid "Check for updates now !"
+#~ msgstr "Kontrollera efter uppdateringar nu !"
+
+#, fuzzy
+#~ msgid "VLM configuration"
+#~ msgstr "VLM konfigurationsfil"
+
+#~ msgid "Font filename"
+#~ msgstr "Typsnitt filnamn"
+
+#, fuzzy
+#~ msgid "Podcast Service Discovery"
+#~ msgstr "Service upphittning"
+
+#~ msgid "IPv4-SAP listening"
+#~ msgstr "IPv4-SAP lyssning"
+
+#~ msgid "IPv6-SAP listening"
+#~ msgstr "IPv6-SAP lyssning"
+
+#~ msgid "Height in pixels"
+#~ msgstr "Höjd i pixlar"
+
+#~ msgid "Width in pixels"
+#~ msgstr "Bredd i pixlar"
+
+#~ msgid "Ascii Art"
+#~ msgstr "ASCII-grafik"
+
+#~ msgid "Select effect"
+#~ msgstr "Välj effekt"
+
+#, fuzzy
+#~ msgid "Small playlist"
+#~ msgstr "Spara spellista"
+
+#~ msgid "M3U file|*.m3u"
+#~ msgstr "M3U fil|*.m3u"
+
+#~ msgid "raw DV demuxer"
+#~ msgstr "raw DV demuxer"
+
+#~ msgid "Enable CABAC"
+#~ msgstr "Aktivera CABAC"
+
+#~ msgid "Enable loop filter"
+#~ msgstr "Aktivera loopfilter"
+
+#~ msgid "Analyse mode"
+#~ msgstr "Analysläge"
+
+#~ msgid "Properties"
+#~ msgstr "Egenskaper"
+
+#~ msgid "from "
+#~ msgstr "från "
+
+#~ msgid "Save As..."
+#~ msgstr "Spara som..."
+
+#~ msgid "type : "
+#~ msgstr "typ : "
+
+#~ msgid "URL : "
+#~ msgstr "URL : "
+
+#~ msgid "file size : "
+#~ msgstr "filstorlek : "
+
+#~ msgid "file md5 hash : "
+#~ msgstr "fil MD5 hash : "
+
+#~ msgid "Choose a mirror"
+#~ msgstr "Välj en spegel"
+
+#~ msgid "Downloading..."
+#~ msgstr "Laddar ner..."
+
+#~ msgid " "
+#~ msgstr " "
+
+#~ msgid ""
+#~ "VLC is an open-source and cross-platform multimedia player for various "
+#~ "audio and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, etc.) as "
+#~ "well as DVDs, VCDs, CD audio, and various streaming protocols.\n"
+#~ "\n"
+#~ "VLC is also a streaming server with transcoding capabilities (UDP unicast "
+#~ "and multicast, HTTP, etc.) mainly designed for high-bandwidth networks.\n"
+#~ "\n"
+#~ "For more information, have a look at the web site."
+#~ msgstr ""
+#~ "VLC är en öppen källkod och multi-plattformsmediaspelare för olika ljud "
+#~ "och videoformat (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, etc.) såväl som "
+#~ "DVD, VCD, CD-ljud och olika strömmande protokoll.\n"
+#~ "\n"
+#~ "VLC är också en strömmande server med möjlighet att koda om (UDP unicast "
+#~ "och multicast, HTTP, etc.) huvudsakligen designad för nätverk med hög "
+#~ "bandbredd.\n"
+#~ "\n"
+#~ "För mer information, ta en titt på webbplatsen."
+
+#~ msgid "Jump 3 seconds backwards"
+#~ msgstr "Hoppa 3 sekunder bakåt"
+
+#~ msgid "Jump 10 seconds backwards"
+#~ msgstr "Hoppa 10 sekunder bakåt"
+
+#~ msgid "Jump 1 minute backwards"
+#~ msgstr "Hoppa 1 minut bakåt"
+
+#~ msgid "Jump 5 minutes backwards"
+#~ msgstr "Hoppa 5 minuter bakåt"
+
+#~ msgid "Jump 3 seconds forward"
+#~ msgstr "Hoppa 3 sekunder framåt"
+
+#~ msgid "Jump 10 seconds forward"
+#~ msgstr "Hoppa 10 sekunder framåt"
+
+#~ msgid "Jump 1 minute forward"
+#~ msgstr "Hoppa 1 minut framåt"
+
+#~ msgid "Jump 5 minutes forward"
+#~ msgstr "Hoppa 5 minuter framåt"
+
+#~ msgid "HTTP/HTTPS"
+#~ msgstr "HTTP/HTTPS"
+
+#~ msgid "Settings related to the various access filter used by VLC.\n"
+#~ msgstr ""
+#~ "Inställningar relaterade till olika tillgångsfiler som används av VLC.\n"
+
+#~ msgid "Open MRL"
+#~ msgstr "Öppna MRL"
+
+#~ msgid "Channel mixer"
+#~ msgstr "Kanal mixer"
+
+#~ msgid "Choose program (SID)"
+#~ msgstr "Välj program (SID)"
+
+#~ msgid "Choose programs"
+#~ msgstr "Välj program"
+
+#~ msgid "Choose audio track"
+#~ msgstr "Välj audiospår"
+
+#~ msgid "Choose subtitles track"
+#~ msgstr "Välj undertextspår"
+
+#~ msgid "Shout"
+#~ msgstr "Shout"
+
+#~ msgid "Segment "
+#~ msgstr "Segment "
+
+#~ msgid "Track "
+#~ msgstr "Spår "
+
+#~ msgid "[0=stereo, 1=dual-mono, 2=joint-stereo]"
+#~ msgstr "[0=stereo, 1=dubbel-mono, 2=delad-stereo]"
+
+#~ msgid "Current version"
+#~ msgstr "Nuvarande version"
+
+#~ msgid "Released on"
+#~ msgstr "Utgiven den"
+
+#~ msgid "Your version"
+#~ msgstr "Din version"
+
+#~ msgid "Mirror"
+#~ msgstr "Spegel"
+
+#~ msgid "UPnP"
+#~ msgstr "UPnP"
+
+#~ msgid "Streamming"
+#~ msgstr "Strömmande"
+
+#~ msgid "RSS"
+#~ msgstr "RSS"
+
+#~ msgid "Windows GAPI"
+#~ msgstr "Windows GAPI"
+
+#~ msgid "Windows GDI"
+#~ msgstr "Windows GDI"
+
+#, fuzzy
+#~ msgid "Access modules settings"
+#~ msgstr "Markera allt"
+
+#, fuzzy
+#~ msgid "Audio output modules settings"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "Decoder modules settings"
+#~ msgstr "Markera allt"
+
+#, fuzzy
+#~ msgid "Demuxers settings"
+#~ msgstr "Markera allt"
+
+#, fuzzy
+#~ msgid "Stream output access modules settings"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "Text renderer settings"
+#~ msgstr "Markera allt"
+
+#~ msgid "Video track"
+#~ msgstr "Videospår"
+
+#~ msgid "Next Chapter"
+#~ msgstr "Nästa kapitel"
+
+#~ msgid "Previous Chapter"
+#~ msgstr "Föregående kapitel"
+
+#~ msgid ""
+#~ "Usage: %s [options] [items]...\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Användning: %s [flaggor] [poster]...\n"
+#~ "\n"
+
+#~ msgid "[module]              [description]\n"
+#~ msgstr "[modul]               [beskrivning]\n"
+
+#, fuzzy
+#~ msgid "Choose channel"
+#~ msgstr "Kanal:"
+
+#, fuzzy
+#~ msgid "Choose a stream output"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "Loop playlist on end"
+#~ msgstr "Öppna skiva"
+
+#, fuzzy
+#~ msgid "CD Audio demux"
+#~ msgstr "_Nästa objekt"
+
+#~ msgid "file"
+#~ msgstr "fil"
+
+#, fuzzy
+#~ msgid "Dummy stream ouput"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "File stream ouput"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "UDP stream ouput"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "udp stream output"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "Truncated stream"
+#~ msgstr "Spela upp"
+
+#, fuzzy
+#~ msgid "Stream "
+#~ msgstr "Stopp "
+
+#, fuzzy
+#~ msgid "Codec name"
+#~ msgstr "Radera"
+
+#, fuzzy
+#~ msgid "Planes"
+#~ msgstr "Spela upp"
+
+#, fuzzy
+#~ msgid "Number of Streams"
+#~ msgstr "Paus"
+
+#~ msgid "Flags"
+#~ msgstr "Flaggor"
+
+#, fuzzy
+#~ msgid "Audio Bitrate"
+#~ msgstr "_Nästa objekt"
+
+#, fuzzy
+#~ msgid "playlist metademux"
+#~ msgstr "Föregående fil"
+
+#, fuzzy
+#~ msgid "Segment Filename"
+#~ msgstr "Arkiv"
+
+#, fuzzy
+#~ msgid "Muxing Application"
+#~ msgstr "Om VLC"
+
+#, fuzzy
+#~ msgid "Writing Application"
+#~ msgstr "Om VLC"
+
+#, fuzzy
+#~ msgid "Codec Setting"
+#~ msgstr "Markera allt"
+
+#, fuzzy
+#~ msgid "Codec Info"
+#~ msgstr "Radera"
+
+#, fuzzy
+#~ msgid "Codec Download"
+#~ msgstr "Radera"
+
+#, fuzzy
+#~ msgid "Display Resolution"
+#~ msgstr "Markera allt"
+
+#~ msgid "Instrumental Pop"
+#~ msgstr "Instrumental Pop"
+
+#~ msgid "Instrumental Rock"
+#~ msgstr "Instrumental Rock"
+
+#~ msgid "Pop/Funk"
+#~ msgstr "Pop/Funk"
+
+#~ msgid "Psychadelic"
+#~ msgstr "Psykadelisk"
+
+#~ msgid "Acid Punk"
+#~ msgstr "Acid Punk"
+
+#~ msgid "Acid Jazz"
+#~ msgstr "Acid Jazz"
+
+#~ msgid "Rock & Roll"
+#~ msgstr "Rock & Roll"
+
+#~ msgid "Hard Rock"
+#~ msgstr "Hårdrock"
+
+#, fuzzy
+#~ msgid "Prev Chapter"
+#~ msgstr "Kapitel"
+
+#, fuzzy
+#~ msgid "Play List"
+#~ msgstr "Spola framåt"
+
+#, fuzzy
+#~ msgid "VideoLAN Client: Open Subtitle File"
+#~ msgstr "Markera allt"
+
+#~ msgid "<unknown>"
+#~ msgstr "<okänd>"
+
+#~ msgid "GNOME"
+#~ msgstr "GNOME"
+
+#, fuzzy
+#~ msgid "GNOME interface"
+#~ msgstr "Göm andra"
+
+#~ msgid "_Open File..."
+#~ msgstr "_Öppna fil..."
+
+#~ msgid "Open a file"
+#~ msgstr "Öppna en fil"
+
+#~ msgid "Open _Disc..."
+#~ msgstr "_Öppna skiva..."
+
+#~ msgid "Open a DVD or VCD"
+#~ msgstr "Öppna skiva"
+
+#~ msgid "_Network Stream..."
+#~ msgstr "_Öppna nätverk..."
+
+#, fuzzy
+#~ msgid "Select a network stream"
+#~ msgstr "_Öppna nätverk..."
+
+#~ msgid "_Eject Disc"
+#~ msgstr "_Mata ut skiva"
+
+#~ msgid "Eject disc"
+#~ msgstr "Mata ut skiva"
+
+#~ msgid "_Title"
+#~ msgstr "_Titel"
+
+#~ msgid "_Chapter"
+#~ msgstr "_Kapitel"
+
+#~ msgid "_Language"
+#~ msgstr "Språk"
+
+#~ msgid "_Subtitles"
+#~ msgstr "_Undertext"
+
+#~ msgid "_Fullscreen"
+#~ msgstr "_Helskärm"
+
+#~ msgid "_Audio"
+#~ msgstr "_Nästa objekt"
+
+#~ msgid "_Video"
+#~ msgstr "_Video"
+
+#~ msgid "Net"
+#~ msgstr "Nätverk"
+
+#~ msgid "Stop Stream"
+#~ msgstr "Stopp"
+
+#~ msgid "Play Stream"
+#~ msgstr "Spela upp"
+
+#~ msgid "Pause Stream"
+#~ msgstr "Paus"
+
+#~ msgid "Play Slower"
+#~ msgstr "Slow Motion"
+
+#~ msgid "Fast"
+#~ msgstr "Spola framåt"
+
+#~ msgid "Play Faster"
+#~ msgstr "Spola framåt"
+
+#~ msgid "Prev"
+#~ msgstr "Föregående objekt"
+
+#~ msgid "Previous file"
+#~ msgstr "Föregående fil"
+
+#~ msgid "Next File"
+#~ msgstr "Nästa file"
+
+#~ msgid "Title:"
+#~ msgstr "Titel:"
+
+#~ msgid "Chapter:"
+#~ msgstr "Kapitel:"
+
+#~ msgid "(c) 1996-2003 the VideoLAN team"
+#~ msgstr "(c) 1996-2003 the VideoLAN team"
+
+#~ msgid "HTTP/FTP/MMS"
+#~ msgstr "HTTP/FTP/MMS"
+
+#~ msgid "FEC"
+#~ msgstr "FEC"
+
+#~ msgid "Vertical"
+#~ msgstr "Vertikal"
+
+#~ msgid "Url"
+#~ msgstr "Url"
+
+#~ msgid "Path:"
+#~ msgstr "Sökväg:"
+
+#~ msgid "Gtk+"
+#~ msgstr "Gtk+"
+
+#, fuzzy
+#~ msgid "Gtk+ interface"
+#~ msgstr "Göm andra"
+
+#~ msgid "_File"
+#~ msgstr "_Fil"
+
+#~ msgid "_Close"
+#~ msgstr "_Stäng"
+
+#~ msgid "E_xit"
+#~ msgstr "_Avsluta"
+
+#~ msgid "Exit the program"
+#~ msgstr "Avsluta VLC"
+
+#~ msgid "_View"
+#~ msgstr "_Visa"
+
+#~ msgid "_Settings"
+#~ msgstr "_Inställningar"
+
+#~ msgid "_Help"
+#~ msgstr "_Hjälp"
+
+#~ msgid "_About..."
+#~ msgstr "_Om VLC..."
+
+#~ msgid "About this application"
+#~ msgstr "Om VLC"
+
+#~ msgid "_Play"
+#~ msgstr "S_pela upp"
+
+#~ msgid "Authors"
+#~ msgstr "Upphovsmän"
+
+#, fuzzy
+#~ msgid "Select a subtitles file"
+#~ msgstr "Markera allt"
+
+#~ msgid "Select File"
+#~ msgstr "Välj fil"
+
+#~ msgid "Go to:"
+#~ msgstr "Gå till:"
+
+#~ msgid "_Invert"
+#~ msgstr "_Invertera"
+
+#~ msgid "_Select"
+#~ msgstr "_Välj"
+
+#~ msgid "Title %d (%d)"
+#~ msgstr "Titel %d (%d)"
+
+#~ msgid "Chapter %d"
+#~ msgstr "Kapitel %d"
+
+#~ msgid "Selected:"
+#~ msgstr "Vald:"
+
+#, fuzzy
+#~ msgid "Gtk2 interface"
+#~ msgstr "Göm andra"
+
+#~ msgid "_New"
+#~ msgstr "_Ny"
+
+#~ msgid "window1"
+#~ msgstr "fönster1"
+
+#~ msgid "_Edit"
+#~ msgstr "Redigera"
+
+#~ msgid "_About"
+#~ msgstr "Om VLC"
+
+#~ msgid "Languages"
+#~ msgstr "Språk"
+
+#, fuzzy
+#~ msgid "KDE interface"
+#~ msgstr "Göm andra"
+
+#, fuzzy
+#~ msgid "Fit To Screen"
+#~ msgstr "Helskärm"
+
+#, fuzzy
+#~ msgid "Repeat Playlist"
+#~ msgstr "Öppna skiva"
+
+#~ msgid "Controls"
+#~ msgstr "Kontroller"
+
+#~ msgid "TTL"
+#~ msgstr "TTL"
+
+#~ msgid "Ogg"
+#~ msgstr "Ogg"
+
+#~ msgid "MPEG PS"
+#~ msgstr "MPEG PS"
+
+#~ msgid "MPEG 4"
+#~ msgstr "MPEG 4"
+
+#~ msgid "MPEG 1"
+#~ msgstr "MPEG 1"
+
+#, fuzzy
+#~ msgid "Quicktime"
+#~ msgstr "Avsluta VLC"
+
+#, fuzzy
+#~ msgid "ncurses interface"
+#~ msgstr "Göm andra"
+
+#, fuzzy
+#~ msgid "Pause stream"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "Play stream"
+#~ msgstr "Spela upp"
+
+#~ msgid "MRL :"
+#~ msgstr "MRL :"
+
+#~ msgid "FTP"
+#~ msgstr "FTP"
+
+#~ msgid "0:00:00"
+#~ msgstr "0:00:00"
+
+#, fuzzy
+#~ msgid "file://"
+#~ msgstr "Titel:"
+
+#, fuzzy
+#~ msgid "ftp://"
+#~ msgstr "Titel:"
+
+#~ msgid "http://"
+#~ msgstr "http://"
+
+#~ msgid "udp://@:1234"
+#~ msgstr "udp://@:1234"
+
+#~ msgid "udp6://@:1234"
+#~ msgstr "udp6://@:1234"
+
+#~ msgid "rtp://"
+#~ msgstr "rtp://"
+
+#~ msgid "rtp6://"
+#~ msgstr "rtp6://"
+
+#, fuzzy
+#~ msgid "Stream:"
+#~ msgstr "Stopp"
+
+#~ msgid "client"
+#~ msgstr "klient"
+
+#~ msgid "/dev/dsp"
+#~ msgstr "/dev/dsp"
+
+#~ msgid "/dev/video"
+#~ msgstr "/dev/video"
+
+#, fuzzy
+#~ msgid "Device :"
+#~ msgstr "_Nästa objekt"
+
+#, fuzzy
+#~ msgid "Codec :"
+#~ msgstr "Radera"
+
+#~ msgid "huff"
+#~ msgstr "huff"
+
+#, fuzzy
+#~ msgid "Server"
+#~ msgstr "Stopp"
+
+#~ msgid "http://www.videolan.org"
+#~ msgstr "http://www.videolan.org"
+
+#, fuzzy
+#~ msgid "FileInfo"
+#~ msgstr "_Öppna fil..."
+
+#, fuzzy
+#~ msgid "Open a DVD or (S)VCD"
+#~ msgstr "Öppna skiva"
+
+#, fuzzy
+#~ msgid "Open a network stream"
+#~ msgstr "_Öppna nätverk..."
+
+#~ msgid "Eject the DVD/CD"
+#~ msgstr "Mata ut DVD/CD"
+
+#~ msgid "Exit this program"
+#~ msgstr "Avsluta detta program"
+
+#, fuzzy
+#~ msgid "Show the program logs"
+#~ msgstr "Avsluta VLC"
+
+#, fuzzy
+#~ msgid "About this program"
+#~ msgstr "Avsluta VLC"
+
+#, fuzzy
+#~ msgid "Simple &Open ..."
+#~ msgstr "_Öppna fil..."
+
+#, fuzzy
+#~ msgid "Open &Satellite Stream..."
+#~ msgstr "_Öppna nätverk..."
+
+#~ msgid "&Eject Disc"
+#~ msgstr "Mata ut skiva"
+
+#~ msgid "E&xit"
+#~ msgstr "Avsluta"
+
+#~ msgid "&File info..."
+#~ msgstr "&Filinformation..."
+
+#~ msgid "&About..."
+#~ msgstr "Om VLC..."
+
+#, fuzzy
+#~ msgid ""
+#~ " (wxWindows interface)\n"
+#~ "\n"
+#~ msgstr ""
+#~ " Göm andra\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "(C) 1996-2003 - the VideoLAN Team\n"
+#~ "\n"
+#~ msgstr ""
+#~ "(C) 1996-2003 - the VideoLAN Team\n"
+#~ "\n"
+
+#, fuzzy
+#~ msgid "Playlist Item options"
+#~ msgstr "Föregående fil"
+
+#, fuzzy
+#~ msgid "Group Info"
+#~ msgstr "Radera"
+
+#, fuzzy
+#~ msgid "Audio menu"
+#~ msgstr "_Nästa objekt"
+
+#, fuzzy
+#~ msgid "Capture input stream"
+#~ msgstr "Paus"
+
+#~ msgid "Video For Linux"
+#~ msgstr "Video For Linux"
+
+#~ msgid "CD Audio"
+#~ msgstr "CD-ljud"
+
+#~ msgid "WebCam"
+#~ msgstr "Webbkamera"
+
+#~ msgid "TV Card"
+#~ msgstr "TV Kort"
+
+#~ msgid "Kfir"
+#~ msgstr "Kfir"
+
+#, fuzzy
+#~ msgid "&Simple Add..."
+#~ msgstr "_Öppna fil..."
+
+#, fuzzy
+#~ msgid "&Disable"
+#~ msgstr "Arkiv"
+
+#, fuzzy
+#~ msgid "&Select All"
+#~ msgstr "Markera allt"
+
+#, fuzzy
+#~ msgid "Item Infos"
+#~ msgstr "Radera"
+
+#~ msgid "no info"
+#~ msgstr "ingen info"
+
+#, fuzzy
+#~ msgid "General Settings"
+#~ msgstr "Markera allt"
+
+#, fuzzy
+#~ msgid "Delay subtitles (in 1/10s)"
+#~ msgstr "Markera allt"
+
+#, fuzzy
+#~ msgid "Video Device Advanced Options"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "Audio Options"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "Bitrate Options"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "Filename of Font"
+#~ msgstr "Arkiv"
+
+#~ msgid "Fonts"
+#~ msgstr "Typsnitt"
+
+#~ msgid "HTTP 1.0 daemon"
+#~ msgstr "HTTP 1.0 demon"
+
+#~ msgid "log filename"
+#~ msgstr "filnamn för logg"
+
+#, fuzzy
+#~ msgid "file logging interface"
+#~ msgstr "Göm andra"
+
+#, fuzzy
+#~ msgid "SAP interface"
+#~ msgstr "Göm andra"
+
+#, fuzzy
+#~ msgid "Dummy stream"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "Standard stream"
+#~ msgstr "Stopp"
+
+#, fuzzy
+#~ msgid "Transcode stream"
+#~ msgstr "Paus"
+
+#~ msgid "Adjust"
+#~ msgstr "Justera"
+
+#, fuzzy
+#~ msgid "List of vout modules"
+#~ msgstr "Paus"
+
+#~ msgid "logo"
+#~ msgstr "logotyp"
+
+#, fuzzy
+#~ msgid "logo video filter"
+#~ msgstr "Föregående fil"
+
+#~ msgid "X11"
+#~ msgstr "X11"
+
+#~ msgid "XOSD module"
+#~ msgstr "XOSD-modul"
+
+#, fuzzy
+#~ msgid "xosd interface"
+#~ msgstr "Göm andra"
+
+#, fuzzy
+#~ msgid "Close Menu"
+#~ msgstr "Radera"
+
+#, fuzzy
+#~ msgid "Advanced open options"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "subtitles"
+#~ msgstr "Undertext"
+
+#, fuzzy
+#~ msgid "SAP interface module"
+#~ msgstr "Göm andra"
+
+#, fuzzy
+#~ msgid "HTTP interface bind port"
+#~ msgstr "Göm andra"
+
+#, fuzzy
+#~ msgid "osd text filter"
+#~ msgstr "Nästa file"
+
+#, fuzzy
+#~ msgid "&Title:"
+#~ msgstr "Titel:"
+
+#, fuzzy
+#~ msgid "&Chapter:"
+#~ msgstr "Kapitel:"
+
+#, fuzzy
+#~ msgid "File read"
+#~ msgstr "Arkiv"
+
+#, fuzzy
+#~ msgid "Open &file..."
+#~ msgstr "_Öppna fil..."
+
+#, fuzzy
+#~ msgid "Open &disc..."
+#~ msgstr "_Öppna skiva..."
+
+#, fuzzy
+#~ msgid "&Network stream..."
+#~ msgstr "_Öppna nätverk..."
+
+#, fuzzy
+#~ msgid "&Hide interface"
+#~ msgstr "Göm andra"
+
+#, fuzzy
+#~ msgid "&Add interface"
+#~ msgstr "Göm andra"
+
+#, fuzzy
+#~ msgid "Spawn a new interface"
+#~ msgstr "Göm andra"
+
+#, fuzzy
+#~ msgid "&Controls"
+#~ msgstr "Kontroller"
+
+#, fuzzy
+#~ msgid "C&hannels"
+#~ msgstr "Kanal:"
+
+#, fuzzy
+#~ msgid "Sc&reen"
+#~ msgstr "Helskärm"
+
+#, fuzzy
+#~ msgid "&Title"
+#~ msgstr "Titel"
+
+#, fuzzy
+#~ msgid "&Chapter"
+#~ msgstr "Kapitel"
+
+#, fuzzy
+#~ msgid "Select angle"
+#~ msgstr "Markera allt"
+
+#, fuzzy
+#~ msgid "&Language"
+#~ msgstr "Språk"
+
+#, fuzzy
+#~ msgid "&Subtitles"
+#~ msgstr "Undertext"
+
+#, fuzzy
+#~ msgid "New stream"
+#~ msgstr "Paus"
+
+#, fuzzy
+#~ msgid "Network Stream..."
+#~ msgstr "_Öppna nätverk..."
+
+#, fuzzy
+#~ msgid "Next file"
+#~ msgstr "Nästa file"
+
+#, fuzzy
+#~ msgid "&Add subtitles..."
+#~ msgstr "Undertext"
+
+#, fuzzy
+#~ msgid "Exit"
+#~ msgstr "_Avsluta"
+
+#, fuzzy
+#~ msgid "&Fullscreen"
+#~ msgstr "Helskärm"
+
+#, fuzzy
+#~ msgid "Select next title"
+#~ msgstr "Markera allt"
+
+#, fuzzy
+#~ msgid "&Mute"
+#~ msgstr "Stäng av ljudet"
+
+#, fuzzy
+#~ msgid "Open network"
+#~ msgstr "Öppna nätverk"
+
+#, fuzzy
+#~ msgid "&Disc..."
+#~ msgstr "_Öppna skiva..."
+
+#, fuzzy
+#~ msgid "&Network..."
+#~ msgstr "Nätverk"
+
+#, fuzzy
+#~ msgid "Delete &all"
+#~ msgstr "Markera allt"
+
+#, fuzzy
+#~ msgid "Play the selected stream"
+#~ msgstr "Spela upp"
+
+#, fuzzy
+#~ msgid "Add subtitles"
+#~ msgstr "Undertext"
+
+#, fuzzy
+#~ msgid "Native Windows interface"
+#~ msgstr "Göm andra"
+
+#~ msgid "Language 0x%x"
+#~ msgstr "Språk 0x%x"
+
+#~ msgid "Screen %d"
+#~ msgstr "Helskärm %d"
+
+#, fuzzy
+#~ msgid "Open skin"
+#~ msgstr "Öppna skiva"
+
+#, fuzzy
+#~ msgid "Skin files"
+#~ msgstr "Öppna fil"
+
+#, fuzzy
+#~ msgid "All files"
+#~ msgstr "Arkiv"
+
+#, fuzzy
+#~ msgid "Add file"
+#~ msgstr "Undertext"
+
+#, fuzzy
+#~ msgid "Stream Output MRL"
+#~ msgstr "Paus"
+
+#~ msgid "A_udio"
+#~ msgstr "_Språk"
+
+#~ msgid "Open a File"
+#~ msgstr "Öppna fil"
+
+#, fuzzy
+#~ msgid "Open file..."
+#~ msgstr "_Öppna fil..."
+
+#, fuzzy
+#~ msgid "Open disc..."
+#~ msgstr "_Öppna skiva..."
+
+#, fuzzy
+#~ msgid "Network stream..."
+#~ msgstr "_Öppna nätverk..."
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Tarkin-avkodningsmodul"
@@ -18425,56 +19730,12 @@ msgstr "Spektrumanalysator"
 #~ msgstr "Inställningar för videofilter"
 
 #, fuzzy
-#~ msgid "CDDB Artist"
-#~ msgstr "Artist"
-
-#, fuzzy
-#~ msgid "CDDB Category"
-#~ msgstr "CDDB-port"
-
-#, fuzzy
-#~ msgid "CDDB Genre"
-#~ msgstr "CDDB-server"
-
-#, fuzzy
-#~ msgid "CDDB Year"
-#~ msgstr "CDDB-server"
-
-#, fuzzy
-#~ msgid "CDDB Title"
-#~ msgstr "Titel"
-
-#, fuzzy
 #~ msgid "CD-Text Composer"
 #~ msgstr "Gör uppslag för CD Text?"
 
 #, fuzzy
-#~ msgid "CD-Text Message"
-#~ msgstr "Meddelanden"
-
-#, fuzzy
-#~ msgid "CD-Text Title"
-#~ msgstr "Nästa titel"
-
-#, fuzzy
-#~ msgid "ISO-9660 Application ID"
-#~ msgstr "Program"
-
-#, fuzzy
-#~ msgid "ISO-9660 Preparer"
-#~ msgstr "Upphovsman"
-
-#, fuzzy
-#~ msgid "ISO-9660 Publisher"
-#~ msgstr "Utgivare"
-
-#, fuzzy
 #~ msgid "Errors"
 #~ msgstr "Fel"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "Inloggning:"
 
 #, fuzzy
 #~ msgid "Console"
@@ -18552,20 +19813,8 @@ msgstr "Spektrumanalysator"
 #~ msgstr "| time-size # . . . . . . . . typsnittsstorlek, i bildpunkter"
 
 #, fuzzy
-#~ msgid "Fixing AVI Index"
-#~ msgstr "Rättar till AVI-index..."
-
-#, fuzzy
-#~ msgid "Creating AVI Index ..."
-#~ msgstr "Rättar till AVI-index..."
-
-#, fuzzy
 #~ msgid "Playlist metademux"
 #~ msgstr "Spellistevy"
-
-#, fuzzy
-#~ msgid "Segment filename"
-#~ msgstr "Loggfilnamn"
 
 #, fuzzy
 #~ msgid "Muxing application"
@@ -18574,10 +19823,6 @@ msgstr "Spektrumanalysator"
 #, fuzzy
 #~ msgid "Writing application"
 #~ msgstr "Program"
-
-#, fuzzy
-#~ msgid "Listeners"
-#~ msgstr "Linjär"
 
 #, fuzzy
 #~ msgid "Native playlist import"
@@ -18631,36 +19876,12 @@ msgstr "Spektrumanalysator"
 #~ msgid "Yes"
 #~ msgstr "&Ja"
 
-#, fuzzy
-#~ msgid "No"
-#~ msgstr "&Nej"
-
-#, fuzzy
-#~ msgid "Do not display further errors"
-#~ msgstr "Visa inte ytterligare fel"
-
 #~ msgid "Crop borders in fullscreen"
 #~ msgstr "Beskär ramar i helskärm"
 
 #, fuzzy
 #~ msgid "Enable skinned playlist"
 #~ msgstr "%i objekt i spellistan"
-
-#, fuzzy
-#~ msgid "%i items in playlist (%i not shown)"
-#~ msgstr "%i objekt i spellistan"
-
-#, fuzzy
-#~ msgid "M3U file"
-#~ msgstr "CRL-fil"
-
-#, fuzzy
-#~ msgid "Sorted by Artist"
-#~ msgstr "Sortera efter &titel"
-
-#, fuzzy
-#~ msgid "Sorted by Album"
-#~ msgstr "Sortera efter namn"
 
 #, fuzzy
 #~ msgid "Playlist stress tests"
@@ -18671,10 +19892,6 @@ msgstr "Spektrumanalysator"
 
 #~ msgid "DAAP access"
 #~ msgstr "DAAP-åtkomst"
-
-#, fuzzy
-#~ msgid "Session Announcements (SAP)"
-#~ msgstr "SAP-annonseringar"
 
 #, fuzzy
 #~ msgid "This allows you to specify the Time-To-Live for the output stream."
@@ -18867,3 +20084,6 @@ msgstr "Spektrumanalysator"
 
 #~ msgid "Filters (v2)"
 #~ msgstr "Filter (v2)"
+
+#~ msgid "QT interface"
+#~ msgstr "QT-gränssnitt"

@@ -13093,7 +13093,6 @@ msgstr ""
 "alapértelmezett név kerül felhasználásra."
 
 #: modules/gui/macosx/wizard.m:1869
-#, fuzzy
 msgid ""
 "When this option is enabled, the stream will be both played and transcoded/"
 "streamed.\n"
@@ -17804,7 +17803,6 @@ msgid "Y offset, down from the top."
 msgstr ""
 
 #: modules/video_filter/marq.c:101
-#, fuzzy
 msgid "Timeout"
 msgstr "Időtúllépés"
 
@@ -19171,7 +19169,6 @@ msgstr ""
 
 #: modules/video_output/x11/x11.c:57 modules/video_output/x11/xvideo.c:68
 #: modules/video_output/x11/xvmc.c:118
-#, fuzzy
 msgid "Use shared memory"
 msgstr "Osztott memória használata"
 
@@ -19431,6 +19428,344 @@ msgstr "Kép menü"
 #: modules/visualization/visual/visual.c:120
 msgid "Spectrum analyser"
 msgstr ""
+
+#~ msgid "General interface setttings"
+#~ msgstr "Általános felületbeállítások"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Videó pillanatképek könyvtára"
+
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr ""
+#~ "A VLC súgójának és az összes moduljának kiírása (kombinálható az --"
+#~ "advanced kapcsolóval)"
+
+#~ msgid ""
+#~ "Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
+#~ "empty if you don't have one."
+#~ msgstr ""
+#~ "A HTTPS-hez használandó x509 PEM titkos kulcsfájl elérési útja. Hagyja "
+#~ "üresen, ha nincs."
+
+#~ msgid ""
+#~ "Path to the x509 PEM trusted root CA certificates (certificate authority) "
+#~ "file that will be used forHTTPS. Leave empty if you don't have one."
+#~ msgstr ""
+#~ "Az x509 PEM formátumú, fő hitelesítésszolgáltató által megbízhatónak "
+#~ "nyilvánított tanúsítványok útvonala, amelyet a HTTPS -hez használni fog. "
+#~ "Hagyja üresen, ha nem rendelkezik ilyen tanúsítvánnyal."
+
+#~ msgid "DCA"
+#~ msgstr "DCA"
+
+#~ msgid ""
+#~ "Sets minimum interval between IDR-frames. In H.264, I-frames do not "
+#~ "necessarily bound a closed GOP because it is allowable for a P-frame to "
+#~ "be predicted from more frames than just the one frame before it (also see "
+#~ "frameref). Therefore, I-frames are not necessarily seekable. IDR-Frames "
+#~ "restrict subsequent P-frames from referring to any frame prior to the IDR-"
+#~ "Frame. \n"
+#~ "If scenecuts appear within this interval, they are still encoded as I-"
+#~ "frames, but do not start a new GOP."
+#~ msgstr ""
+#~ "Beállítja az IDR képkockák közötti legkisebb időközt. A H.264-ben az I "
+#~ "képkockák nem kötődnek szükségszerűen egy zárt GOP-hez, mert egy P-"
+#~ "képkocka megjósolható az őt közvetlen megelőzőnél több képkockából is "
+#~ "(lásd még frameref). Ezért az I-képkockák nem feltétlenül kereshetők. Az "
+#~ "IDR-képkockák megakadályozzák a követő P-képkockákat abban, hogy bármely, "
+#~ "az IDR-képkockát megelőző képkockára hivatkozzanak. \n"
+#~ "Ha az ilyen szakaszokban vágások vannak, azok I-képkockákként kerülnek "
+#~ "kódolásra, de nem kezdenek új GOP-ot."
+
+#~ msgid "Extra I-Frames aggressivity"
+#~ msgstr "Extra I-képkockák agresszivitása"
+
+#~ msgid ""
+#~ "Scene-cut detection. Controls how aggressively to insert extra I-frames. "
+#~ "With small values of scenecut, the codec often has to force an I-frame "
+#~ "when it would exceed keyint. Good values of scenecut may find a better "
+#~ "location for the I-frame. Large values use more I-frames than necessary, "
+#~ "thus wasting bits. -1 disables scene-cut detection, so I-frames are be "
+#~ "inserted only every other keyint frames, which probably leads to ugly "
+#~ "encoding artifacts. (1-100)."
+#~ msgstr ""
+#~ "Jelenetváltás-felismerés. Meghatározza, milyen agresszíven kell "
+#~ "beilleszteni extra I-képkockákat. A jelenetváltás kis értékei esetén a "
+#~ "kódolónak gyakran kell I-képkockát beilleszteni, ha meghaladná a keyint "
+#~ "értékét. A jelenetváltás jól megválasztott értékei az I-képkocka jobb "
+#~ "elhelyzését eredményezhetik. Nagy értékek a szükségesnél több I-képkocka "
+#~ "használatát eredményezhetik, így pazarolva a biteket. A -1 kikapcsolja a "
+#~ "jelentváltás érzékelését, így az I-képkockák csak minden második keyint "
+#~ "képkockánál kerülnek beillesztésre, ami csúnya kódolási eredményt adhat. "
+#~ "(1-100)."
+
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "Az I és P képkockák közti egymást követő B-képkockák száma. (1-16)"
+
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr ""
+#~ "A megadott számú egymást követő B-képkocka használatának kényszerítése, "
+#~ "kivéve I-képkocka előtt. "
+
+#~ msgid "B-frames usage"
+#~ msgstr "B képkockák használata"
+
+#~ msgid ""
+#~ "Bias the choice to use B-frames. Positive values cause more B-frames, "
+#~ "negative values cause less B-frames. "
+#~ msgstr ""
+#~ "A B-képkockák használatára vonatkozó választás módosítása. A pozitív "
+#~ "értékek több B-képkockát eredményeznek, a negatívak kevebbet. "
+
+#~ msgid ""
+#~ "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
+#~ "encoding and decoding, but should save 10-15% bitrate."
+#~ msgstr ""
+#~ "A CABAC (Context-Adaptive Binary Arithmetic Coding). Csekély mértékben "
+#~ "lassítja a kódolást és a dekódolást, de megtakaríthat 10-15% "
+#~ "bitsebességet."
+
+#~ msgid ""
+#~ "Number of previous frames used as predictors. This is effective in Anime, "
+#~ "but seems to make little difference in live-action source material. Some "
+#~ "decoders are unable to deal with large frameref values. From 1 to 16"
+#~ msgstr ""
+#~ "Előjelzőként használt megelőző képkockák száma. Ez hatásos az "
+#~ "animációknál, de látszólag kevés különbség észlelhető élő forrásnál. "
+#~ "Néhány dekódoló nem tud nagy frameref értékeket kezelni. 1-16 között."
+
+#~ msgid ""
+#~ "This selects the quantizer to use. Lower values result in better "
+#~ "fidelity, but higher bitrates. 26 is a good default value. From 0 to 51. "
+#~ "0 means lossless"
+#~ msgstr ""
+#~ "Ez beállítja a használandó kvantálást. Alacsonyabb értékek esetén az "
+#~ "eredmény hangzása jobb lesz, de a bitsebesség is magasabb. A 26 egy jó "
+#~ "alapértelmezett érték. 0-51 között. A 0 veszteségmentest jelent."
+
+#~ msgid "1-pass Quality-based VBR. From 0 to 51"
+#~ msgstr "1 lépéses minőségalapú VBR. 0-51 között"
+
+#~ msgid "Minimum quantizer, 15/35 seems to be a useful range."
+#~ msgstr "Minimum kvantálás, a 15/35 használható tartománynak tűnik."
+
+#~ msgid "Allowed variance in average. bitrate (in kbits/s)."
+#~ msgstr "Engedélyezett eltérés az átlagos bitsebességben (kbit/mp)."
+
+#~ msgid "Sets a maximum local bitrate in kbits/s."
+#~ msgstr "Maximális helyi bitsebesség beállítása kbit/mp-ben."
+
+#~ msgid "Averaging period for the maximum local bitrate in kbits."
+#~ msgstr "A maximális helyi bitsebesség átlagolási periódusa kbit/mp-ben."
+
+#~ msgid "Sets the initial buffer occupancy as a fraction of the buffer size."
+#~ msgstr "Beállítja a kezdeti pufferfoglaltságot a pufferméret arányában."
+
+#~ msgid "Direct MV prediction mode. "
+#~ msgstr "Közvetlen MV előrejelzési mód. "
+
+#, fuzzy
+#~ msgid ""
+#~ "This parameter controls quality versus speed tradeoffs involved in the "
+#~ "motion estimation decision process (lower = quicker and higher = better "
+#~ "quality). From 1 to 6."
+#~ msgstr ""
+#~ "Ez a paraméter határozza meg a minőség - sebesség kompromisszumot a "
+#~ "mozbásbecslés döntési eljárásnál (alacsonyabb = gyorsabb, magasabb = jobb "
+#~ "minőség)."
+
+#, fuzzy
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "A mozgás előtti becslés engedélyezése"
+
+#, fuzzy
+#~ msgid "PSNR calculation"
+#~ msgstr "Telítettség"
+
+#, fuzzy
+#~ msgid "Image"
+#~ msgstr "Kép"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "Időeltolás"
+
+#~ msgid "Text rendering"
+#~ msgstr "Szövegmegjelenítés"
+
+#, fuzzy
+#~ msgid "Select effect"
+#~ msgstr "Fájl megadása"
+
+#~ msgid "Analyse mode"
+#~ msgstr "Analizáló mód"
+
+#~ msgid "Save As..."
+#~ msgstr "Mentés másként..."
+
+#, fuzzy
+#~ msgid "RSS"
+#~ msgstr "RSS"
+
+#~ msgid "Instrumental Rock"
+#~ msgstr "Instrumentális Rock"
+
+#~ msgid "Pop/Funk"
+#~ msgstr "Pop/Funk"
+
+#~ msgid "Acid Punk"
+#~ msgstr "Acid Punk"
+
+#~ msgid "Acid Jazz"
+#~ msgstr "Acid Jazz"
+
+#~ msgid "Rock & Roll"
+#~ msgstr "Rock & Roll"
+
+#~ msgid "Hard Rock"
+#~ msgstr "Hard Rock"
+
+#~ msgid "<unknown>"
+#~ msgstr "<ismeretlen>"
+
+#~ msgid "Open a file"
+#~ msgstr "Fájl megnyitása"
+
+#~ msgid "_About"
+#~ msgstr "_Névjegy"
+
+#~ msgid "TTL"
+#~ msgstr "TTL"
+
+#~ msgid "Ogg"
+#~ msgstr "Ogg"
+
+#~ msgid "MPEG PS"
+#~ msgstr "MPEG PS"
+
+#~ msgid "MPEG 4"
+#~ msgstr "MPEG 4"
+
+#~ msgid "MPEG 1"
+#~ msgstr "MPEG 1"
+
+#~ msgid "Quicktime"
+#~ msgstr "Quicktime"
+
+#~ msgid "FTP"
+#~ msgstr "FTP"
+
+#~ msgid "0:00:00"
+#~ msgstr "0:00:00"
+
+#~ msgid "ftp://"
+#~ msgstr "ftp://"
+
+#~ msgid "http://"
+#~ msgstr "http://"
+
+#~ msgid "udp://@:1234"
+#~ msgstr "udp://@:1234"
+
+#~ msgid "udp6://@:1234"
+#~ msgstr "udp6://@:1234"
+
+#~ msgid "rtp://"
+#~ msgstr "rtp://"
+
+#~ msgid "rtp6://"
+#~ msgstr "rtp6://"
+
+#~ msgid "client"
+#~ msgstr "kliens"
+
+#~ msgid "/dev/dsp"
+#~ msgstr "/dev/dsp"
+
+#~ msgid "/dev/video"
+#~ msgstr "/dev/video"
+
+#~ msgid "Device :"
+#~ msgstr "Eszköz :"
+
+#~ msgid "Server"
+#~ msgstr "Kiszolgáló"
+
+#~ msgid "http://www.videolan.org"
+#~ msgstr "http://www.videolan.org"
+
+#~ msgid "Exit this program"
+#~ msgstr "Kilépés"
+
+#~ msgid "About this program"
+#~ msgstr "A programról"
+
+#~ msgid "E&xit"
+#~ msgstr "&Kilépés"
+
+#~ msgid "&About..."
+#~ msgstr "&Névjegy..."
+
+#~ msgid ""
+#~ "(C) 1996-2003 - the VideoLAN Team\n"
+#~ "\n"
+#~ msgstr ""
+#~ "(C) 1996-2003 - the VideoLAN Team\n"
+#~ "\n"
+
+#~ msgid "WebCam"
+#~ msgstr "Webkamera"
+
+#~ msgid "TV Card"
+#~ msgstr "Tv-kártya"
+
+#~ msgid "&Simple Add..."
+#~ msgstr "&Egyszerű hozzáadás..."
+
+#~ msgid "no info"
+#~ msgstr "nincs adat"
+
+#~ msgid "General Settings"
+#~ msgstr "Általános beállítások"
+
+#~ msgid "Fonts"
+#~ msgstr "Betűkészletek"
+
+#~ msgid "Adjust"
+#~ msgstr "Igazítás"
+
+#~ msgid "X11"
+#~ msgstr "X11"
+
+#~ msgid "subtitles"
+#~ msgstr "feliratok"
+
+#~ msgid "Add subtitles"
+#~ msgstr "Felirat hozzáadása"
+
+#~ msgid "Language 0x%x"
+#~ msgstr "Nyelv 0x%x"
+
+#~ msgid "Screen %d"
+#~ msgstr "Képernyő %d"
+
+#~ msgid "All files"
+#~ msgstr "Összes fájl"
+
+#~ msgid "Add file"
+#~ msgstr "Fájl hozzáadása"
+
+#~ msgid "A_udio"
+#~ msgstr "A_udio"
+
+#~ msgid "Open a File"
+#~ msgstr "Fájl megnyitása"
+
+#~ msgid "Open file..."
+#~ msgstr "Fájl megnyitása..."
 
 #, fuzzy
 #~ msgid "VC-1 decoder module"
@@ -23215,3 +23550,53 @@ msgstr ""
 #~ "Allows you to specify the output destination used for the streaming "
 #~ "output."
 #~ msgstr "A hálózati csatoló MTU-ja"
+
+#~ msgid "Monitor aspect ratio"
+#~ msgstr "Monitor képaránya"
+
+#~ msgid "Network interface address"
+#~ msgstr "Hálózati csatoló címe"
+
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection."
+#~ msgstr "Módosíthatja a kapcsolódáshoz használt felhasználói nevet."
+
+#~ msgid "Set the Brightness of the video input"
+#~ msgstr "A videobemenet fényerejének beállítása"
+
+#~ msgid "audio filter for PCM format conversion"
+#~ msgstr "hangszűrő a PCM formátum átalakításhoz"
+
+#~ msgid "Enable interlaced motion estimation"
+#~ msgstr "A váltottsoros mozgásbecslés engedélyezése"
+
+#~ msgid "Height of the zone triggering the interface"
+#~ msgstr "A felületet aktiváló zóna magassága"
+
+#~ msgid "Telnet Interface host"
+#~ msgstr "Telnet felület kiszolgálója"
+
+#~ msgid "Crops the image"
+#~ msgstr "Kép nyírása"
+
+#~ msgid "Inverts the image colors"
+#~ msgstr "Negatívot készít a kép színeiről"
+
+#~ msgid "no items in playlist"
+#~ msgstr "nincsenek elemek a lejátszólistán"
+
+#, fuzzy
+#~ msgid "List of video output modules"
+#~ msgstr "Kép kimeneti modul"
+
+#, fuzzy
+#~ msgid "Time position"
+#~ msgstr "Függőleges"
+
+#, fuzzy
+#~ msgid "choose the screen to be used for fullscreen mode."
+#~ msgstr "Teljes képernyős mód"
+
+#, fuzzy
+#~ msgid "Output URL (deprecated)"
+#~ msgstr "Fájl megnyitása"

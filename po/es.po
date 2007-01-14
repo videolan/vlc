@@ -193,6 +193,9 @@ msgid ""
 "input side of VLC. You should not touch anything here unless you know what "
 "you are doing."
 msgstr ""
+"Los filtros de acceso son módulos especiales que permiten operaciones "
+"avanzadas en la \"entrada\" de VLC. Usted no deberia tocar nada aquí a menos "
+"que sepa lo que esta haciendo."
 
 #: include/vlc_config_cat.h:119
 msgid "Demuxers"
@@ -742,7 +745,7 @@ msgstr "Título de álbum/película/programa"
 
 #: include/vlc_meta.h:38
 msgid "Track number/position in set"
-msgstr ""
+msgstr "Número de pista/posición en el conjunto"
 
 #: include/vlc_meta.h:39 modules/gui/macosx/bookmarks.m:99
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:195
@@ -1227,7 +1230,7 @@ msgstr "Compilador: %s\n"
 #: src/libvlc-common.c:1599
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
-msgstr ""
+msgstr "Basado en los cambios del svn [%s]\n"
 
 #: src/libvlc-common.c:1631
 msgid ""
@@ -1637,6 +1640,11 @@ msgid ""
 "actually encoded with Dolby Surround, turning on this option might enhance "
 "your experience, especially when combined with the Headphone Channel Mixer."
 msgstr ""
+"Usa esto cuando sepas que tu stream está (o no) codificado con Dolby "
+"Surround, pero no se detecta correctamente. Incluso si el stream no está "
+"realmente codificado con Dolby Surround, activar esta opción podría mejorar "
+"la experiencia auditiva, especialmente si se combina con el Mezclador de "
+"Canales de Auriculares."
 
 #: src/libvlc-module.c:211
 msgid "On"
@@ -1759,6 +1767,8 @@ msgid ""
 "Custom title for the video window (in case the video is not embedded in the "
 "interface)."
 msgstr ""
+"Título personalizado para la ventana de vídeo (en caso de que el vídeo no "
+"esté incluido en el interfaz)"
 
 #: src/libvlc-module.c:270
 msgid "Video alignment"
@@ -3100,9 +3110,8 @@ msgid "Log to syslog"
 msgstr "Conectar a syslog"
 
 #: src/libvlc-module.c:885
-#, fuzzy
 msgid "Log all VLC messages to syslog (UNIX systems)."
-msgstr "Log todo mensaje de VLC a syslog (sistemas UNIX)."
+msgstr "Registrar todos los mensajes de VLC en syslog (sistemas UNIX)"
 
 #: src/libvlc-module.c:887
 msgid "Allow only one running instance"
@@ -5078,7 +5087,7 @@ msgstr "Disco Compacto de Audio"
 
 #: modules/access/cdda/cdda.c:124
 msgid "Additional debug"
-msgstr ""
+msgstr "Depuración adicional"
 
 #: modules/access/cdda/cdda.c:129
 msgid "Caching value in microseconds"
@@ -5944,6 +5953,8 @@ msgid ""
 "Duration of the fake streaming before faking an end-of-file (default is 0, "
 "meaning that the stream is unlimited)."
 msgstr ""
+"Duración de una falso streaming antes de fingir un fin de archivo (por "
+"defecto es 0, significa que el strem es ilimitado),"
 
 #: modules/access/fake.c:58 modules/codec/fake.c:75
 msgid "Fake"
@@ -6242,6 +6253,8 @@ msgid ""
 "MMS streams can contain several elementary streams, with different bitrates. "
 "You can choose to select all of them."
 msgstr ""
+"Los streams MMS pueden contener varios streams elementales, cada uno a tasas "
+"de bits distintas. Puedes elegir seleccionarlos todos."
 
 #: modules/access/mms/mms.c:56
 msgid "Maximum bitrate"
@@ -7195,6 +7208,8 @@ msgid ""
 "Dolby Surround encoded streams won't be decoded before being processed by "
 "this filter. Enabling this setting is not recommended."
 msgstr ""
+"Los streams codificados en Dolby Surround no serán descodificados antes de "
+"ser procesados por este filtro. No se recomienda activar esta opción."
 
 #: modules/audio_filter/channel_mixer/headphone.c:78
 #: modules/audio_filter/channel_mixer/headphone.c:97
@@ -7279,7 +7294,7 @@ msgstr "Habilitar mezcla interna"
 
 #: modules/audio_filter/converter/a52tofloat32.c:103
 msgid "Enable the internal upmixing algorithm (not recommended)."
-msgstr ""
+msgstr "Habilitar  el algoritmo interno de mezclado."
 
 #: modules/audio_filter/converter/a52tofloat32.c:107
 #: modules/audio_filter/converter/a52tofloat32.c:116
@@ -7324,7 +7339,7 @@ msgstr "Predefinición de ecualizador"
 
 #: modules/audio_filter/equalizer.c:52
 msgid "Preset to use for the equalizer."
-msgstr ""
+msgstr "Predefinición para el equalizador."
 
 #: modules/audio_filter/equalizer.c:54
 msgid "Bands gain"
@@ -7336,6 +7351,9 @@ msgid ""
 "values between -20dB and 20dB, separated by spaces, e.g. \"0 2 4 2 0 -2 -4 -"
 "2 0\""
 msgstr ""
+"No uses preconfiguraciones; especifica manualmente cada banda. Tienes que "
+"dar 10 valores de entre -20dB y 20dB, separados por espacios; p.e.: \"0 2 4 "
+"2 0 -2 -4 -2 0\""
 
 #: modules/audio_filter/equalizer.c:61
 msgid "Two pass"
@@ -8404,6 +8422,8 @@ msgid ""
 "Rate control buffer size (in kbytes). A bigger buffer will allow for better "
 "rate control, but will cause a delay in the stream."
 msgstr ""
+"Tamaño del buffer de control de tasa (en kilobytes). Un buffer más grande "
+"permitirá un mejor control de tasa, pero causará un retraso en el stream."
 
 #: modules/codec/ffmpeg/ffmpeg.h:219
 msgid "Rate control buffer aggressiveness"
@@ -8606,6 +8626,8 @@ msgid ""
 "Eliminates chrominance blocks when the PSNR isn't much changed (default: "
 "0.0). The H264 specification recommends 7."
 msgstr ""
+"Elimina los bloques de crominancia cuando el PSNR no cambia mucho (por "
+"defecto: 0.0). La especificación de H264 recomienda 7."
 
 #: modules/codec/ffmpeg/ffmpeg.h:297
 msgid "Scaling mode"
@@ -8853,6 +8875,8 @@ msgstr "Modo VBR"
 #: modules/codec/twolame.c:59
 msgid "Use Variable BitRate. Default is to use Constant BitRate (CBR)."
 msgstr ""
+"Usar tasa de bits variable (VBR). El valor por defecto es usar tasa de bits "
+"constante (CBR)."
 
 #: modules/codec/twolame.c:60
 msgid "Psycho-acoustic model"
@@ -8999,7 +9023,7 @@ msgstr "Nº de fotogramas-B consecutivos entre fotogramas-I y P,"
 
 #: modules/codec/x264.c:74
 msgid "Adaptive B-frame decision"
-msgstr ""
+msgstr "Decisión de B-frames adaptativa"
 
 #: modules/codec/x264.c:75
 msgid ""
@@ -9022,7 +9046,7 @@ msgstr ""
 
 #: modules/codec/x264.c:82
 msgid "Keep some B-frames as references"
-msgstr ""
+msgstr "Mantener algunos B-frames como referencia"
 
 #: modules/codec/x264.c:83
 msgid ""
@@ -9211,11 +9235,11 @@ msgstr "Factor QP entre I y P. Rango 1.0 a 2.0."
 
 #: modules/codec/x264.c:163
 msgid "QP difference between chroma and luma"
-msgstr ""
+msgstr "Diferencia de QP entre croma y luma"
 
 #: modules/codec/x264.c:164
 msgid "QP difference between chroma and luma."
-msgstr ""
+msgstr "Diferencia de QP entre croma y luma."
 
 #: modules/codec/x264.c:166
 #, fuzzy
@@ -9260,6 +9284,13 @@ msgid ""
 " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
 "(p4x4 requires p8x8. i8x8 requires 8x8dct)."
 msgstr ""
+"Particiones que considerar en modo análisis: \n"
+" -ninguna: \n"
+" -rápido: i4x4\n"
+" -normal: i4x4,p8x8,(i8x8)\n"
+" -lento: i4x4,p8x8,(i8x8),b8x8\n"
+" -todas: i4x4,p8x8,(i8x8),b8x8,p4x4\n"
+"(p4x4 requiere p8x8. i8x8 requiere 8x8dct)."
 
 #: modules/codec/x264.c:188
 #, fuzzy
@@ -9330,6 +9361,7 @@ msgstr ""
 #: modules/codec/x264.c:215
 msgid "Subpixel motion estimation and partition decision quality"
 msgstr ""
+"Estimación de movimiento de subpixel y calidad de la decisión de partición."
 
 #: modules/codec/x264.c:219
 #, fuzzy
@@ -9424,6 +9456,10 @@ msgid ""
 " - 2: enabled on all mode decisions\n"
 "This requires CABAC."
 msgstr ""
+"Cuantización Trellis RD: \n"
+" - 0: desactivada\n"
+" - 1: activada solo en la codificación final de un macrobloque\n"
+" - 2: activada en las decisiones en cualquier modo"
 
 #: modules/codec/x264.c:261
 msgid "Early SKIP detection on P-frames"
@@ -9474,7 +9510,7 @@ msgstr "Polarización"
 
 #: modules/codec/x264.c:286
 msgid "Use assembler CPU optimizations."
-msgstr ""
+msgstr "Usar optimizaciones en ensamblador."
 
 #: modules/codec/x264.c:288
 #, fuzzy
@@ -9724,7 +9760,7 @@ msgstr ""
 
 #: modules/control/http/http.c:45
 msgid "Handlers"
-msgstr ""
+msgstr "Manejadores"
 
 #: modules/control/http/http.c:47
 #, fuzzy
@@ -10129,6 +10165,7 @@ msgstr "| achan [X] . . . . . .  pon/obtén canales de audio"
 #: modules/control/rc.c:881
 msgid "| menu [on|off|up|down|left|right|select] use menu"
 msgstr ""
+"| menu [encendido|apagado|arriba|abajo|izquierda|derecha|seleción] use menu"
 
 #: modules/control/rc.c:886
 msgid "| marq-marquee STRING  . . overlay STRING in video"
@@ -10329,7 +10366,7 @@ msgstr "Puerto"
 msgid ""
 "This is the TCP port on which this interface will listen. It defaults to "
 "4212."
-msgstr ""
+msgstr "Éste es el puerto TCP que el interfaz escuchará. Por defecto, 4212."
 
 #: modules/control/telnet.c:80
 msgid ""
@@ -10692,6 +10729,9 @@ msgid ""
 "Megabass mode cutoff frequency, in Hz.This is the maximum frequency for "
 "which the megabass effect applies. Valid values are from 10 to 100 Hz"
 msgstr ""
+"Frecuencia de corte para el modo Megabass, en Hz. Ésta es la frecuencia "
+"máxima a la que el efecto megabass se aplica. Los valores válidos van de 10 "
+"a 100 Hz."
 
 #: modules/demux/mod.c:61
 #, fuzzy
@@ -11083,6 +11123,8 @@ msgid ""
 "Tweak the buffer size for reading and writing an integer number of packets."
 "Specify the size of the buffer here and not the number of packets."
 msgstr ""
+"Configurar el tamaño del buffer para que lea y escriba un número entero de "
+"paquetes. Especifica el tamaño del buffer aquí, y no el número de paquetes."
 
 #: modules/demux/ts.c:136
 msgid "MPEG Transport Stream demuxer"
@@ -11964,13 +12006,12 @@ msgid "Stretch video to fill window"
 msgstr "Estrechar el vídeo para llenar la ventana"
 
 #: modules/gui/macosx/macosx.m:65
-#, fuzzy
 msgid ""
 "Stretch the video to fill the entire window when resizing the video instead "
 "of keeping the aspect ratio and displaying black borders."
 msgstr ""
-"Achatar el vídeo para llenar toda la ventana al cambiar el tamaño del vídeo "
-"en vez de mantener la tasa de aspecto y mostrar bordes negros."
+"Estirar el vídeo para que llene la ventana entera al cambiar su tamaño, en "
+"vez de manter la proporción mostrando bordes negros."
 
 #: modules/gui/macosx/macosx.m:69
 msgid "Black screens in fullscreen"
@@ -15325,6 +15366,10 @@ msgid ""
 "with less features). You can select which one will be available on the "
 "toolbar (or both)."
 msgstr ""
+"Hay dos posibles formas de ver la lista de reproducción en el interfaz: la "
+"lista norma (en una ventana separada), o una lista incluida en el interfaz, "
+"pero con menos opciones. Puedes seleccionar cuál o cuáles estarán "
+"disponibles en la barra de herramientas."
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:114
 msgid "Embedded"
@@ -17948,6 +17993,8 @@ msgid ""
 "Gradient image type (0 or 1). 0 will turn the image to white while 1 will "
 "keep colors."
 msgstr ""
+"Tipo de imagen de degradado (0 o 1). 0 volverá la imagen blanca, mientras "
+"que 1 mantendrá los colores."
 
 #: modules/video_filter/gradient.c:63
 msgid "Apply cartoon effect"
@@ -19824,6 +19871,567 @@ msgstr "Filtro de visualizador"
 #: modules/visualization/visual/visual.c:120
 msgid "Spectrum analyser"
 msgstr "Espectrómetro"
+
+#~ msgid "General interface setttings"
+#~ msgstr "Opciones generales de interfaz"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Directorio de capturas de pantalla de vídeo"
+
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr ""
+#~ "imprime ayuda de VLC y sus módulos (puede combinarse con --advanced)"
+
+#, fuzzy
+#~ msgid ""
+#~ "Select the video input source, such as composite, s-video, or tuner. "
+#~ "Since these settings are hardware-specfic, you should find good settings "
+#~ "in the \"Device config\" area, and use those numbers here. -1 means that "
+#~ "settings will not be changed."
+#~ msgstr ""
+#~ "Seleccionar la fuente de vídeo, como composite, S-Video o sintonizador. "
+#~ "Como estos ajustes dependen del hardware, deberías poder encontrar la "
+#~ "configuración adecuada en el área de \"Configuración de dispositivo\", y "
+#~ "usar esos números aquí. -1 significa que el valor no será cambiado."
+
+#, fuzzy
+#~ msgid ""
+#~ "Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
+#~ "empty if you don't have one."
+#~ msgstr ""
+#~ "Ruta del archivo de clave privada x509 PEM a usar por la salida de "
+#~ "volcado HTTP/SSL. Dejar vacía si no tienes."
+
+#, fuzzy
+#~ msgid ""
+#~ "Path to the x509 PEM trusted root CA certificates (certificate authority) "
+#~ "file that will be used forHTTPS. Leave empty if you don't have one."
+#~ msgstr ""
+#~ "Ruta del archivo de certificados raíz confiables CA (autoridad de "
+#~ "certificado) x509 PEM a usar por la salida de volcado HTTP/SSL. Dejar "
+#~ "vacía si no tienes."
+
+#, fuzzy
+#~ msgid ""
+#~ "You normally have to feed the shoutcast module with Ogg streams. It is "
+#~ "also possible to stream MP3 instead, so you can forward MP3 streams to "
+#~ "the icecast server."
+#~ msgstr ""
+#~ "Normalmente se alimenta el módulo de shoutcast con streams Ogg. También "
+#~ "es posible usar streams MP3, así que puedes enviar estos streams al "
+#~ "servidor icecast."
+
+#~ msgid "DCA"
+#~ msgstr "DCA"
+
+#, fuzzy
+#~ msgid ""
+#~ "Sets minimum interval between IDR-frames. In H.264, I-frames do not "
+#~ "necessarily bound a closed GOP because it is allowable for a P-frame to "
+#~ "be predicted from more frames than just the one frame before it (also see "
+#~ "frameref). Therefore, I-frames are not necessarily seekable. IDR-Frames "
+#~ "restrict subsequent P-frames from referring to any frame prior to the IDR-"
+#~ "Frame. \n"
+#~ "If scenecuts appear within this interval, they are still encoded as I-"
+#~ "frames, but do not start a new GOP."
+#~ msgstr ""
+#~ "En H.264, los Fotogramas-I no se vinculan necesariamente a un GOP cerrado "
+#~ "porque se permite predecir un fotograma-P desde más de un fotograma "
+#~ "anterior (ver también frameref). Por eso, tener que buscar los fotogramas-"
+#~ "I no es necesario. Los fotogramas-IDR restringen a fotogramas-P "
+#~ "subsiguientes refiriéndose a cualquier fotograma anterior al Fotograma-"
+#~ "IDR. \n"
+#~ "Si aparecen cortes de escena dentro de este intervalo, siguen siendo "
+#~ "codificados como fotogramas-I, pero no inician un nuevo GOP. El valor por "
+#~ "defecto es keyint * 0.4."
+
+#~ msgid "Extra I-Frames aggressivity"
+#~ msgstr "Agresividad de I-Frames extra"
+
+#, fuzzy
+#~ msgid ""
+#~ "Scene-cut detection. Controls how aggressively to insert extra I-frames. "
+#~ "With small values of scenecut, the codec often has to force an I-frame "
+#~ "when it would exceed keyint. Good values of scenecut may find a better "
+#~ "location for the I-frame. Large values use more I-frames than necessary, "
+#~ "thus wasting bits. -1 disables scene-cut detection, so I-frames are be "
+#~ "inserted only every other keyint frames, which probably leads to ugly "
+#~ "encoding artifacts. (1-100)."
+#~ msgstr ""
+#~ "Controla cuán agresivamente insertar fotogramas-I extras. Con valores "
+#~ "pequeños de scenecut, el códec a menudo tiene que forzar un fotograma-I "
+#~ "cuando excedería keyint. Buenos valores de scenecut pueden hallar un "
+#~ "mejor lugar para el fotograma-I. Valores grandes usan más fotogramas-I de "
+#~ "los necesarios, y así gastando bits. -1 deshabilita la detección de "
+#~ "cortes de escena, por lo que los fotogramas-I se insertan sólo cada "
+#~ "fotograma keyint, lo cual probablemente lleva a feos artefactos "
+#~ "codificadores."
+
+#, fuzzy
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "Nº de fotogramas-B consecutivos entre fotogramas-I y P,"
+
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr ""
+#~ "Forzar el uso del número que se especifique de B-frames, excepto "
+#~ "posiblemente antes de un I-frame. "
+
+#, fuzzy
+#~ msgid "B-frames usage"
+#~ msgstr "Fotogramas B"
+
+#, fuzzy
+#~ msgid ""
+#~ "Bias the choice to use B-frames. Positive values cause more B-frames, "
+#~ "negative values cause less B-frames. "
+#~ msgstr ""
+#~ "Valores positivos provocan más fotogramas-B; los valores negativos, "
+#~ "menos. "
+
+#, fuzzy
+#~ msgid ""
+#~ "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
+#~ "encoding and decoding, but should save 10-15% bitrate."
+#~ msgstr ""
+#~ "Habilitar CABAC (Context-Adaptive Binary Arithmetic Coding - Codificación "
+#~ "Aritmética Binaria Adaptativa al Contexto). Reduce ligeramente la "
+#~ "codificación y decodificación, pero debería ahorrar un 10-15% de la tasa "
+#~ "de bits."
+
+#, fuzzy
+#~ msgid ""
+#~ "Number of previous frames used as predictors. This is effective in Anime, "
+#~ "but seems to make little difference in live-action source material. Some "
+#~ "decoders are unable to deal with large frameref values. From 1 to 16"
+#~ msgstr ""
+#~ "Esto es efectivo en Anime, pero parece tener poca diferencia en material "
+#~ "fuente de acción en vivo. Algunos decodificadores son incapaces de tratar "
+#~ "con grandes valores fameref."
+
+#, fuzzy
+#~ msgid ""
+#~ "This selects the quantizer to use. Lower values result in better "
+#~ "fidelity, but higher bitrates. 26 is a good default value. From 0 to 51. "
+#~ "0 means lossless"
+#~ msgstr ""
+#~ "Esto elige el cuantizador a usar (1 a 51). Valores menores dan mejor "
+#~ "fidelidad, pero también mayores tasas de bits. 26 es un buen valor por "
+#~ "defecto."
+
+#, fuzzy
+#~ msgid "1-pass Quality-based VBR. From 0 to 51"
+#~ msgstr ""
+#~ "VBR (tasa de bits variable) basada en el primer pase (1-pass). De 0 a 51."
+
+#~ msgid "Minimum quantizer, 15/35 seems to be a useful range."
+#~ msgstr "Cuantizador mínimo, 15/35 parece ser un rango útil."
+
+#, fuzzy
+#~ msgid "Allowed variance in average. bitrate (in kbits/s)."
+#~ msgstr "Pone la variación permitida en tasa de bits promedio."
+
+#~ msgid "Sets a maximum local bitrate in kbits/s."
+#~ msgstr "Pone una máxima tasa de bits local en kbits/s."
+
+#, fuzzy
+#~ msgid "Averaging period for the maximum local bitrate in kbits."
+#~ msgstr "Período promedio para la máxima tasa de bits local"
+
+#~ msgid "Sets the initial buffer occupancy as a fraction of the buffer size."
+#~ msgstr ""
+#~ "Indica la ocupación del búfer inicial como una fracción del tamaño del "
+#~ "búfer."
+
+#~ msgid "QP factor between I and P."
+#~ msgstr "Factor QP entre I y P."
+
+#~ msgid "QP factor between P and B."
+#~ msgstr "Factor QP entre P y B"
+
+#~ msgid "QP curve compression. (0.0=CBR to 1.0=QCP)"
+#~ msgstr "Curva de compresión de QP. (0.0=CBR a 1.0=QCP)"
+
+#, fuzzy
+#~ msgid "Direct MV prediction mode. "
+#~ msgstr "Codificador de Objeto DirectMedia "
+
+#, fuzzy
+#~ msgid ""
+#~ "Maximum distance to search for motion estimation, measured from predicted "
+#~ "position(s). Default of 16 is good for most footage, high motion "
+#~ "sequences may benefit from settings between 24-32. From 0 to 64."
+#~ msgstr ""
+#~ "Máxima distancia para buscar cálculo de movimiento, medida desde posicion"
+#~ "(es) predichas. 16 por defecto es bueno para la mayoría de metraje, "
+#~ "secuencias de mucho movimiento pueden beneficiarse de ajustes entre 24-32."
+
+#, fuzzy
+#~ msgid ""
+#~ "This parameter controls quality versus speed tradeoffs involved in the "
+#~ "motion estimation decision process (lower = quicker and higher = better "
+#~ "quality). From 1 to 6."
+#~ msgstr ""
+#~ "Este parámetro controla los intercambios de calidad versus velocidad "
+#~ "envueltos en el proceso de decisión en estimación de movimiento (más bajo "
+#~ "= más rápido y más alto = mejor calidad)."
+
+#, fuzzy
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "Habilitar estimación pre-movimiento"
+
+#, fuzzy
+#~ msgid "Dct-domain noise reduction. Adaptive pseudo-deadzone."
+#~ msgstr "Reducción de ruido dominio DCT. Pseudo zona muerta adaptativa."
+
+#, fuzzy
+#~ msgid "PSNR calculation"
+#~ msgstr "Deshabilitar cálculo de PSNR."
+
+#~ msgid ""
+#~ "Address and port the HTTP interface will listen on. It defaults to all "
+#~ "network interfaces (0.0.0.0). If you want the telnet interface to be "
+#~ "available only on the local machine, enter 127.0.0.1"
+#~ msgstr ""
+#~ "Dirección y puerto que serán escuchados por el interfaz HTTP (por "
+#~ "defecto, todos los interfaces de redes: 0.0.0.0). Si quieres que el "
+#~ "interfaz telnet esté disponible solo en la máquina local, introduce "
+#~ "127.0.0.1"
+
+#~ msgid "RTP/RTSP/SDP demuxer (using Live555.com)"
+#~ msgstr "demuxor RTP/RTSP/SDP (usando Live555.com)"
+
+#~ msgid "Port to use for tunneling the RTSP/RTP over HTTP"
+#~ msgstr "Puerto a usar para construir el RTSP/RTP sobre HTTP"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "Timestamp"
+
+#, fuzzy
+#~ msgid ""
+#~ "Pictures coming from the picture video outputs will be delayed accord to "
+#~ "thi value (in milliseconds, should be >= 100 ms). For high values, you "
+#~ "will need to raise caching values."
+#~ msgstr ""
+#~ "Imágenes provenientes de las salidas de imagen de vídeo se retrasarán "
+#~ "como corresponde (en milisegundos, >= 100 ms). Para valores altos "
+#~ "necesitarás aumentar caché de archivos y otros."
+
+#~ msgid "This is the subtitles coded that will be used."
+#~ msgstr "Este es el codec de subtítulos que será usado."
+
+#~ msgid "Text rendering"
+#~ msgstr "Renderizado de texto"
+
+#~ msgid "Save As..."
+#~ msgstr "Salvar Como..."
+
+#~ msgid "Downloading..."
+#~ msgstr "Descargando..."
+
+#~ msgid "UPnP"
+#~ msgstr "UPnP"
+
+#~ msgid "RSS"
+#~ msgstr "RSS"
+
+#~ msgid "Video track"
+#~ msgstr "Pista de vídeo"
+
+#~ msgid "Next Chapter"
+#~ msgstr "Siguiente título"
+
+#~ msgid "Previous Chapter"
+#~ msgstr "Título previo"
+
+#~ msgid "Writing Application"
+#~ msgstr "Escribiendo aplicación"
+
+#~ msgid "Codec Setting"
+#~ msgstr "Configurando códec"
+
+#~ msgid "Codec Info"
+#~ msgstr "Información de códec"
+
+#~ msgid "Codec Download"
+#~ msgstr "Descarga de códec"
+
+#~ msgid "Display Resolution"
+#~ msgstr "Mostrar resolución"
+
+#~ msgid "<unknown>"
+#~ msgstr "<desconocido>"
+
+#~ msgid "GNOME"
+#~ msgstr "GNOME"
+
+#~ msgid "Open a DVD or VCD"
+#~ msgstr "Abrir un DVD o VCD"
+
+#~ msgid "Stop Stream"
+#~ msgstr "Parar Volcado"
+
+#~ msgid "(c) 1996-2003 the VideoLAN team"
+#~ msgstr "(c) 1996-2006 el equipo de VideoLAN"
+
+#~ msgid "Url"
+#~ msgstr "Url"
+
+#~ msgid "Gtk+"
+#~ msgstr "Gtk+"
+
+#~ msgid "_About..."
+#~ msgstr "_Acerca de..."
+
+#~ msgid "Gtk2 interface"
+#~ msgstr "Interfaz Gtk2"
+
+#~ msgid "_New"
+#~ msgstr "_Nuevo"
+
+#~ msgid "window1"
+#~ msgstr "ventana1"
+
+#~ msgid "_Edit"
+#~ msgstr "_Editar"
+
+#~ msgid "_About"
+#~ msgstr "_Acerca de"
+
+#~ msgid "Fit To Screen"
+#~ msgstr "Ocupar la Pantalla"
+
+#~ msgid "Repeat Playlist"
+#~ msgstr "Repetir Lista de Reproducción"
+
+#~ msgid "TTL"
+#~ msgstr "TTL"
+
+#~ msgid "Ogg"
+#~ msgstr "Ogg"
+
+#~ msgid "MPEG PS"
+#~ msgstr "MPEG PS"
+
+#~ msgid "MPEG 4"
+#~ msgstr "MPEG 4"
+
+#~ msgid "Play stream"
+#~ msgstr "Reproducir volcado"
+
+#~ msgid "http://"
+#~ msgstr "http://"
+
+#~ msgid "udp://@:1234"
+#~ msgstr "udp://@:1234"
+
+#~ msgid "udp6://@:1234"
+#~ msgstr "udp6://@:1234"
+
+#~ msgid "rtp://"
+#~ msgstr "rtp://"
+
+#~ msgid "rtp6://"
+#~ msgstr "rtp6://"
+
+#~ msgid "client"
+#~ msgstr "cliente"
+
+#~ msgid "/dev/dsp"
+#~ msgstr "/dev/dsp"
+
+#~ msgid "/dev/video"
+#~ msgstr "/dev/video"
+
+#~ msgid "Device :"
+#~ msgstr "Dispositivo:"
+
+#~ msgid "Codec :"
+#~ msgstr "Códec:"
+
+#~ msgid "Server"
+#~ msgstr "Servidor"
+
+#~ msgid "http://www.videolan.org"
+#~ msgstr "http://www.videolan.org"
+
+#~ msgid "Open a DVD or (S)VCD"
+#~ msgstr "Abrir un DVD o (S)VCD"
+
+#~ msgid "Eject the DVD/CD"
+#~ msgstr "Expulsar el DVD/CD"
+
+#~ msgid "Exit this program"
+#~ msgstr "Salir de este programa"
+
+#~ msgid "Show the program logs"
+#~ msgstr "Mostrar los registros del programa"
+
+#~ msgid "About this program"
+#~ msgstr "Acerca de este programa"
+
+#~ msgid "&Eject Disc"
+#~ msgstr "&Expulsar Disco"
+
+#~ msgid "E&xit"
+#~ msgstr "&Salir"
+
+#~ msgid "&File info..."
+#~ msgstr "&Información de fichero..."
+
+#~ msgid "&About..."
+#~ msgstr "&Acerca de..."
+
+#~ msgid ""
+#~ "(C) 1996-2003 - the VideoLAN Team\n"
+#~ "\n"
+#~ msgstr ""
+#~ "(C) 1996-2003 - el equipo de VideoLAN\n"
+#~ "\n"
+
+#~ msgid "Video For Linux"
+#~ msgstr "Vídeo para linux"
+
+#~ msgid "CD Audio"
+#~ msgstr "CD audio"
+
+#~ msgid "WebCam"
+#~ msgstr "Cámara web"
+
+#~ msgid "TV Card"
+#~ msgstr "Tarjeta de TV"
+
+#~ msgid "General Settings"
+#~ msgstr "Ajustes generales"
+
+#~ msgid "Delay subtitles (in 1/10s)"
+#~ msgstr "Retraso en los subtítulos (en décimas de segundo)"
+
+#~ msgid "Video Device Advanced Options"
+#~ msgstr "Opciones Avanzadas de Dispositivo de Vídeo"
+
+#~ msgid "Audio Options"
+#~ msgstr "Opciones de Audio"
+
+#~ msgid "file logging interface"
+#~ msgstr "interfaz de registro de archivos"
+
+#~ msgid "Adjust"
+#~ msgstr "Ajustar"
+
+#~ msgid "logo"
+#~ msgstr "logo"
+
+#~ msgid "X11"
+#~ msgstr "X11"
+
+#~ msgid "XOSD module"
+#~ msgstr "Módulo XOSD"
+
+#~ msgid "Close Menu"
+#~ msgstr "Cerrar menú"
+
+#~ msgid "subtitles"
+#~ msgstr "subtítulos"
+
+#~ msgid "&Title:"
+#~ msgstr "&Título"
+
+#~ msgid "&Chapter:"
+#~ msgstr "&Capítulo"
+
+#~ msgid "File read"
+#~ msgstr "Leer archivo"
+
+#~ msgid "Open &file..."
+#~ msgstr "Abrir &fichero..."
+
+#~ msgid "Open &disc..."
+#~ msgstr "Abrir &disco..."
+
+#~ msgid "&Hide interface"
+#~ msgstr "&Esconder interfaz"
+
+#~ msgid "&Add interface"
+#~ msgstr "&Añadir interfaz"
+
+#~ msgid "Select angle"
+#~ msgstr "Seleccionar ángulo"
+
+#~ msgid "&Language"
+#~ msgstr "&Idioma"
+
+#~ msgid "&Subtitles"
+#~ msgstr "&Subtítulos"
+
+#~ msgid "&Add subtitles..."
+#~ msgstr "Añadir &subtítulos"
+
+#~ msgid "Exit"
+#~ msgstr "Salir"
+
+#~ msgid "&Fullscreen"
+#~ msgstr "&Pantalla completa"
+
+#~ msgid "Select next title"
+#~ msgstr "Seleccionar siguiente título"
+
+#~ msgid "&Mute"
+#~ msgstr "&Mudo"
+
+#~ msgid "Open network"
+#~ msgstr "Abrir red"
+
+#~ msgid "&Disc..."
+#~ msgstr "&Disco..."
+
+#~ msgid "&Network..."
+#~ msgstr "&Red..."
+
+#~ msgid "Delete &all"
+#~ msgstr "&Borrar todos"
+
+#~ msgid "Play the selected stream"
+#~ msgstr "Reproducir el stream seleccionado"
+
+#~ msgid "Add subtitles"
+#~ msgstr "Añadir subtítulos"
+
+#~ msgid "Native Windows interface"
+#~ msgstr "Interfaz nativo de Windows"
+
+#~ msgid "Language 0x%x"
+#~ msgstr "Idioma 0x%x"
+
+#~ msgid "Screen %d"
+#~ msgstr "Pantalla %d"
+
+#~ msgid "Open skin"
+#~ msgstr "Abrir skin"
+
+#~ msgid "Skin files"
+#~ msgstr "Ficheros de skin"
+
+#~ msgid "All files"
+#~ msgstr "Todos los ficheros"
+
+#~ msgid "Add file"
+#~ msgstr "Añadir fichero"
+
+#~ msgid "A_udio"
+#~ msgstr "A_udio"
+
+#~ msgid "Open a File"
+#~ msgstr "Abrir un Fichero"
+
+#~ msgid "Open file..."
+#~ msgstr "Abrir fichero..."
+
+#~ msgid "Open disc..."
+#~ msgstr "Abrir disco..."
 
 #, fuzzy
 #~ msgid "VC-1 decoder module"
@@ -22834,3 +23442,34 @@ msgstr "Espectrómetro"
 
 #~ msgid "Control"
 #~ msgstr "Control"
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "Sub filtro de logo"
+
+#, fuzzy
+#~ msgid "Deblocking loop filter (increases quality)."
+#~ msgstr "Usar filtro bucle desbloqueador (aumenta calidad)"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "Host Interfaz telnet"
+
+#~ msgid "You have to select two bookmarks."
+#~ msgstr "Debe elegir dos favoritos."
+
+#~ msgid "choose the screen to be used for fullscreen mode."
+#~ msgstr "elija la pantalla a usar para modo pantalla completa."
+
+#~ msgid "Jump"
+#~ msgstr "Saltar"
+
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection "
+#~ "(Basic authentication only)."
+#~ msgstr ""
+#~ "Te permite modificar el nombre de usuario a usar en la conexión (sólo "
+#~ "identificación básica)."
+
+#~ msgid "X11 OpenGL provider"
+#~ msgstr "Proveedor OpenGL X11"

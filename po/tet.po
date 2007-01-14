@@ -17871,6 +17871,16 @@ msgid "Spectrum analyser"
 msgstr ""
 
 #, fuzzy
+#~ msgid "Listeners"
+#~ msgstr "_Archivo"
+
+#~ msgid " "
+#~ msgstr " "
+
+#~ msgid "_About..."
+#~ msgstr "_Kona ba..."
+
+#, fuzzy
 #~ msgid "Line"
 #~ msgstr "_Archivo"
 
@@ -17951,3 +17961,11 @@ msgstr ""
 #, fuzzy
 #~ msgid "vlc preferences"
 #~ msgstr "_Preferações"
+
+#, fuzzy
+#~ msgid "Polarization"
+#~ msgstr "_Navigação"
+
+#, fuzzy
+#~ msgid "Configure the application"
+#~ msgstr "Kona ba applikação ida ne'e"

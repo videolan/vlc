@@ -19349,6 +19349,57 @@ msgid "Spectrum analyser"
 msgstr "스펙트럼"
 
 #, fuzzy
+#~ msgid "General interface setttings"
+#~ msgstr "일반 설정"
+
+#, fuzzy
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "자막·디코더·모듈"
+
+#, fuzzy
+#~ msgid "Playlist metademux"
+#~ msgstr "플레이 재생목록를 연다"
+
+#, fuzzy
+#~ msgid "Native playlist import"
+#~ msgstr "플레이 재생목록를 연다"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "수직 방향 위치"
+
+#, fuzzy
+#~ msgid "Sorted by Artist"
+#~ msgstr "작성자로 소트(&A)"
+
+#, fuzzy
+#~ msgid "Distort video filter"
+#~ msgstr "비디오 역전 모듈"
+
+#, fuzzy
+#~ msgid "Text rendering"
+#~ msgstr "다이렉트 렌더링"
+
+#~ msgid "&Shuffle Playlist"
+#~ msgstr "플레이 재생목록를 상훌(&S)"
+
+#~ msgid "Save As..."
+#~ msgstr "이름을 붙여 보존..."
+
+#~ msgid " "
+#~ msgstr " "
+
+#~ msgid "Stop Stream"
+#~ msgstr "스트림의 정지"
+
+#~ msgid "log filename"
+#~ msgstr "로그·파일명"
+
+#, fuzzy
+#~ msgid "Select angle"
+#~ msgstr "파일의 선택"
+
+#, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "자막·디코더·모듈"
 
@@ -22549,3 +22600,24 @@ msgstr "스펙트럼"
 
 #~ msgid "image wall video module"
 #~ msgstr "이미지·월·비디오·모듈"
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "로고 비디오 필터"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "Telnet 인터페이스 포토"
+
+#, fuzzy
+#~ msgid "choose the screen to be used for fullscreen mode."
+#~ msgstr "전화면 표시의 변환"
+
+#, fuzzy
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection "
+#~ "(Basic authentication only). "
+#~ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
+
+#~ msgid "Jump"
+#~ msgstr "점프"

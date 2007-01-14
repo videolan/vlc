@@ -22,9 +22,8 @@ msgid "VLC preferences"
 msgstr "Preferències del VLC"
 
 #: include/vlc_config_cat.h:38
-#, fuzzy
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "Fes un click a \"Opcions avançades\" per veure totes les opcions"
+msgstr "Sel·lecciona \"Opcions avançades\" per veure totes les opcions"
 
 #: include/vlc_config_cat.h:40 include/vlc_config_cat.h:131
 #: modules/gui/macosx/playlistinfo.m:62 modules/gui/wince/playlist.cpp:674
@@ -38,9 +37,8 @@ msgid "Interface"
 msgstr "Interfície"
 
 #: include/vlc_config_cat.h:44
-#, fuzzy
 msgid "Settings for VLC's interfaces"
-msgstr "Paràmetres per les interfícies del VLC"
+msgstr "Paràmetres per a les interfícies del VLC"
 
 #: include/vlc_config_cat.h:46
 #, fuzzy
@@ -48,23 +46,20 @@ msgid "General interface settings"
 msgstr "Paràmetres generals de la interfície"
 
 #: include/vlc_config_cat.h:48
-#, fuzzy
 msgid "Main interfaces"
 msgstr "Interfície d'aparença"
 
 #: include/vlc_config_cat.h:49
-#, fuzzy
 msgid "Settings for the main interface"
-msgstr "Paràmetres per les interfícies del VLC"
+msgstr "Paràmetres per a les interfícies del VLC"
 
 #: include/vlc_config_cat.h:51 src/libvlc-module.c:89
 msgid "Control interfaces"
 msgstr "Interfícies de control"
 
 #: include/vlc_config_cat.h:52
-#, fuzzy
 msgid "Settings for VLC's control interfaces"
-msgstr "Paràmetres per les interfícies del VLC"
+msgstr "Paràmetres per a les interfícies del VLC"
 
 #: include/vlc_config_cat.h:54 include/vlc_config_cat.h:55
 msgid "Hotkeys settings"
@@ -95,7 +90,6 @@ msgid "Filters"
 msgstr "Filtres"
 
 #: include/vlc_config_cat.h:66
-#, fuzzy
 msgid "Audio filters are used to postprocess the audio stream."
 msgstr ""
 "Els filtres d'àudio són utilitzats pel post-processament del flux d'àudio"
@@ -124,7 +118,6 @@ msgid "Miscellaneous"
 msgstr "Miscel·lània"
 
 #: include/vlc_config_cat.h:76
-#, fuzzy
 msgid "Miscellaneous audio settings and modules."
 msgstr "Paràmetres i mòduls varis de l'àudio"
 
@@ -153,7 +146,6 @@ msgid "Choose your preferred video output and configure it here."
 msgstr "Trieu la sortida d'àudio preferida i configureu-la aquí."
 
 #: include/vlc_config_cat.h:91
-#, fuzzy
 msgid "Video filters are used to postprocess the video stream."
 msgstr ""
 "Els filtres de vídeo s'utilitzen pel post-processament del flux de vídeo"
@@ -163,7 +155,6 @@ msgid "Subtitles/OSD"
 msgstr "Subtítols/OSD"
 
 #: include/vlc_config_cat.h:94
-#, fuzzy
 msgid ""
 "Miscellaneous settings related to On-Screen-Display, subtitles and \"overlay "
 "subpictures\"."
@@ -188,19 +179,17 @@ msgid "Access modules"
 msgstr "Mòduls d’accés"
 
 #: include/vlc_config_cat.h:109
-#, fuzzy
 msgid ""
 "Settings related to the various access methods used by VLC. Common settings "
 "you may want to alter are HTTP proxy or caching settings."
 msgstr ""
-"Paràmetres afins als diferents mètodes d'accés utilitzats pel VLC.\n"
+"Paràmetres afins als diferents mètodes d'accés utilitzats pel VLC.\r\n"
 "Els paràmetres comuns que voldreu alterar són proxy HTTP i paràmetres de "
-"captura. "
+"captura."
 
 #: include/vlc_config_cat.h:113
-#, fuzzy
 msgid "Access filters"
-msgstr "Mòduls d’accés"
+msgstr "Filtres d’accés"
 
 #: include/vlc_config_cat.h:115
 msgid ""
@@ -208,13 +197,15 @@ msgid ""
 "input side of VLC. You should not touch anything here unless you know what "
 "you are doing."
 msgstr ""
+"Els filtres d'accès són uns mòduls especials que permeten operacions "
+"avançades a la cara d'entrada del VLC. No hauries de tocar res aquí, si no "
+"saps que estàs fent."
 
 #: include/vlc_config_cat.h:119
 msgid "Demuxers"
 msgstr "Demultiplexors"
 
 #: include/vlc_config_cat.h:120
-#, fuzzy
 msgid "Demuxers are used to separate audio and video streams."
 msgstr "Els demultiplexors són utilitzats per separar el flux àudio i vídeo"
 
@@ -223,7 +214,6 @@ msgid "Video codecs"
 msgstr "Còdecs de vídeo"
 
 #: include/vlc_config_cat.h:123
-#, fuzzy
 msgid "Settings for the video-only decoders and encoders."
 msgstr "Paràmetres pels descodificadors i codificadors de vídeo."
 
@@ -232,7 +222,6 @@ msgid "Audio codecs"
 msgstr "Còdecs d'àudio"
 
 #: include/vlc_config_cat.h:126
-#, fuzzy
 msgid "Settings for the audio-only decoders and encoders."
 msgstr "Paràmetres pels descodificadors i codificadors d'àudio."
 
@@ -241,13 +230,11 @@ msgid "Other codecs"
 msgstr "Altres còdecs"
 
 #: include/vlc_config_cat.h:129
-#, fuzzy
 msgid "Settings for audio+video and miscellaneous decoders and encoders."
 msgstr ""
 "Paràmetres pels descodificadors i codificadors d'àudio i vídeo conjunts."
 
 #: include/vlc_config_cat.h:132
-#, fuzzy
 msgid "General input settings. Use with care."
 msgstr "Paràmetres avançats d'entrada. Utilitzeu-los amb atenció."
 
@@ -257,7 +244,6 @@ msgid "Stream output"
 msgstr "Flux de sortida"
 
 #: include/vlc_config_cat.h:137
-#, fuzzy
 msgid ""
 "Stream output is what allows VLC to act as a streaming server or to save "
 "incoming streams.\n"
@@ -284,7 +270,6 @@ msgid "Muxers"
 msgstr "Multiplexors"
 
 #: include/vlc_config_cat.h:149
-#, fuzzy
 msgid ""
 "Muxers create the encapsulation formats that are used to put all the "
 "elementary streams (video, audio, ...) together. This setting allows you to "
@@ -301,7 +286,6 @@ msgid "Access output"
 msgstr "Sortida d'accés"
 
 #: include/vlc_config_cat.h:157
-#, fuzzy
 msgid ""
 "Access output modules control the ways the muxed streams are sent. This "
 "setting allows you to always force a specific access output method. You "
@@ -319,7 +303,6 @@ msgid "Packetizers"
 msgstr "Empaquetadors"
 
 #: include/vlc_config_cat.h:164
-#, fuzzy
 msgid ""
 "Packetizers are used to \"preprocess\" the elementary streams before muxing. "
 "This setting allows you to always force a packetizer. You should probably "
@@ -379,7 +362,6 @@ msgid "Playlist"
 msgstr "LLista de reproducció"
 
 #: include/vlc_config_cat.h:187
-#, fuzzy
 msgid ""
 "Settings related to playlist behaviour (e.g. playback mode) and to modules "
 "that automatically add items to the playlist (\"service discovery\" modules)."
@@ -397,13 +379,12 @@ msgid "Services discovery"
 msgstr "Descobriment de serveis"
 
 #: include/vlc_config_cat.h:193
-#, fuzzy
 msgid ""
 "Services discovery modules are facilities that automatically add items to "
 "playlist."
 msgstr ""
 "Els mòduls de descobriment de serveis són mòduls que afegeixen "
-"automàticament elements a la llista de reproducció "
+"automàticament elements a la llista de reproducció"
 
 #: include/vlc_config_cat.h:197 src/libvlc-module.c:1491
 #: modules/gui/macosx/prefs.m:124
@@ -419,7 +400,6 @@ msgid "CPU features"
 msgstr "Característiques de la CPU"
 
 #: include/vlc_config_cat.h:201
-#, fuzzy
 msgid ""
 "You can choose to disable some CPU accelerations here. You should probably "
 "not change these settings."
@@ -428,7 +408,6 @@ msgstr ""
 "Probablement no ho hauríeu de tocar."
 
 #: include/vlc_config_cat.h:204
-#, fuzzy
 msgid "Advanced settings"
 msgstr "Opcions avançades..."
 
@@ -443,7 +422,6 @@ msgid "Network"
 msgstr "Xarxa"
 
 #: include/vlc_config_cat.h:208
-#, fuzzy
 msgid "These modules provide network functions to all other parts of VLC."
 msgstr ""
 "Aquests mòduls presten funcions de xarxa a totes les altres parts del VLC"
@@ -497,12 +475,10 @@ msgid "No help available"
 msgstr "No hi ha ajuda disponible"
 
 #: include/vlc_config_cat.h:239
-#, fuzzy
 msgid "There is no help available for these modules."
 msgstr "No està disponible l'ajuda per aquests mòduls."
 
 #: include/vlc_interface.h:146
-#, fuzzy
 msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a command-line window, go "
@@ -510,7 +486,7 @@ msgid ""
 msgstr ""
 "\n"
 "Avís: si no podeu accedir a la GUI, obriu una finestra d'ordres dos, aneu al "
-"directori on heu instal·lat VLC i executa \"vlc -I wxwin\"\n"
+"directori on heu instal·lat VLC i executa \"vlc -I wx\"\n"
 
 #: include/vlc_intf_strings.h:33 modules/gui/wxwidgets/menus.cpp:126
 msgid "Quick &Open File..."
@@ -601,9 +577,8 @@ msgid "Save..."
 msgstr "Anomena i desa"
 
 #: include/vlc_intf_strings.h:59 src/libvlc-module.c:982
-#, fuzzy
 msgid "Repeat all"
-msgstr "Repeteix tot"
+msgstr "Repeteix-ho tot"
 
 #: include/vlc_intf_strings.h:60
 #, fuzzy
@@ -863,9 +838,8 @@ msgid "Disable"
 msgstr "Inhabilita"
 
 #: src/audio_output/input.c:88 modules/visualization/visual/visual.c:129
-#, fuzzy
 msgid "Spectrometer"
-msgstr "Espectre "
+msgstr "Espectòmetre"
 
 #: src/audio_output/input.c:90
 msgid "Scope"
@@ -1250,9 +1224,9 @@ msgid " (default disabled)"
 msgstr "(per defecte és inhabilitat)"
 
 #: src/libvlc-common.c:1593
-#, fuzzy, c-format
+#, c-format
 msgid "VLC version %s\n"
-msgstr "Inversió dels colors"
+msgstr "versió VLC  %s\n"
 
 #: src/libvlc-common.c:1594
 #, c-format
@@ -1267,13 +1241,15 @@ msgstr "Compilador: %s\n"
 #: src/libvlc-common.c:1599
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
-msgstr ""
+msgstr "Basat en un canvi svn [%s]\n"
 
 #: src/libvlc-common.c:1631
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
+"\n"
+"contingut continuat de l¡arxiu vlc-help.txt\n"
 
 #: src/libvlc-common.c:1652
 msgid ""
@@ -1288,14 +1264,12 @@ msgid "Auto"
 msgstr "Auto"
 
 #: src/libvlc-module.c:47
-#, fuzzy
 msgid "American English"
-msgstr "Americà"
+msgstr "Anglès americà"
 
 #: src/libvlc-module.c:47
-#, fuzzy
 msgid "British English"
-msgstr "Britànic"
+msgstr "Anglès britànic"
 
 #: src/libvlc-module.c:48 src/text/iso-639_def.h:59
 msgid "Catalan"
@@ -1363,9 +1337,8 @@ msgid "Occitan"
 msgstr "Occità"
 
 #: src/libvlc-module.c:51
-#, fuzzy
 msgid "Brazilian Portuguese"
-msgstr "Portuguès"
+msgstr "Portuguès brasiler"
 
 #: src/libvlc-module.c:51 src/text/iso-639_def.h:153
 msgid "Romanian"
@@ -1400,28 +1373,26 @@ msgid "Chinese Traditional"
 msgstr "Xinès Tradicional"
 
 #: src/libvlc-module.c:72
-#, fuzzy
 msgid ""
 "These options allow you to configure the interfaces used by VLC. You can "
 "select the main interface, additional interface modules, and define various "
 "related options."
 msgstr ""
-"Aquestes opcions us permeten configurar les interfícies utilitzades pel "
-"VLC.\n"
+"Aquestes opcions us permeten configurar les interfícies utilitzades pel VLC."
+"\r\n"
 "Podeu seleccionar la interfície principal, mòduls d'interfície addicionals, "
-"i definir varies opcions relacionades. "
+"i definir varies opcions relacionades."
 
 #: src/libvlc-module.c:76
 msgid "Interface module"
 msgstr "Mòdul de la interfície"
 
 #: src/libvlc-module.c:78
-#, fuzzy
 msgid ""
 "This is the main interface used by VLC. The default behavior is to "
 "automatically select the best module available."
 msgstr ""
-"Aquesta opció us permet seleccionar la interfície utilitzada pel VLC.\n"
+"Aquesta opció us permet seleccionar la interfície utilitzada pel VLC.\r\n"
 "El comportament per defecte és seleccionar automàticament el millor mòdul "
 "possible."
 
@@ -1430,7 +1401,6 @@ msgid "Extra interface modules"
 msgstr "Mòduls extres de la interfície"
 
 #: src/libvlc-module.c:84
-#, fuzzy
 msgid ""
 "You can select \"additional interfaces\" for VLC. They will be launched in "
 "the background in addition to the default interface. Use a comma separated "
@@ -1439,20 +1409,18 @@ msgid ""
 msgstr ""
 "Aquesta opció us permet seleccionar interfícies addicionals utilitzats pel "
 "VLC. S'executen en segons pla, afegits a la interfície per defecte. Utilitza "
-"una llista de mòduls d'interfície separats per comes. (valors comuns són "
-"logger, gestures, sap, rc, http or screensaver)"
+"una llista de mòduls d'interfície separats per comes. (valors comuns són \"rc"
+"\" (control remot), \"http\" \"gestures\")"
 
 #: src/libvlc-module.c:91
-#, fuzzy
 msgid "You can select control interfaces for VLC."
-msgstr "Interfície de control dels moviment del ratolí"
+msgstr "Tu pots seleccionar el control de les interfícies per a VLC."
 
 #: src/libvlc-module.c:93
 msgid "Verbosity (0,1,2)"
 msgstr "Loquacitat (0,1,2)"
 
 #: src/libvlc-module.c:95
-#, fuzzy
 msgid ""
 "This is the verbosity level (0=only errors and standard messages, "
 "1=warnings, 2=debug)."
@@ -1465,47 +1433,42 @@ msgid "Be quiet"
 msgstr "Mode tranquil"
 
 #: src/libvlc-module.c:100
-#, fuzzy
 msgid "Turn off all warning and information messages."
 msgstr "Aquesta opció desactiva tots els missatges d'avís i informació."
 
 #: src/libvlc-module.c:102
-#, fuzzy
 msgid "Default stream"
-msgstr "Per defecte a l’Admin"
+msgstr "Flux Per defecte"
 
 #: src/libvlc-module.c:104
 msgid "This stream will always be opened at VLC startup."
 msgstr "Aquest flux sempre serà obert quan s'inicii VLC"
 
 #: src/libvlc-module.c:107
-#, fuzzy
 msgid ""
 "You can manually select a language for the interface. The system language is "
 "auto-detected if \"auto\" is specified here."
 msgstr ""
-"Aquesta opció us permet definir el llenguatge de la interfície. El llegutage "
-"del sistema s'autodetecta si s'especifica aquí \"auto\"."
+"Aquesta opció us permet definir l'idioma de la interfície. L'idioma del "
+"sistema s'autodetecta si s'especifica aquí \"auto\"."
 
 #: src/libvlc-module.c:111
 msgid "Color messages"
 msgstr "Missatges de color"
 
 #: src/libvlc-module.c:113
-#, fuzzy
 msgid ""
 "This enables colorization of the messages sent to the console Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
 "Quan s'activa aquesta opció, els missatges enviats a la consola estaran "
-"acolorits. El seu terminal necessita color Linux per que funcioni. "
+"acolorits. El seu terminal necessita color Linux per que funcioni."
 
 #: src/libvlc-module.c:116
 msgid "Show advanced options"
 msgstr "Mostra les opcions avançades"
 
 #: src/libvlc-module.c:118
-#, fuzzy
 msgid ""
 "When this is enabled, the preferences and/or interfaces will show all "
 "available options, including those that most users should never touch."
@@ -1515,9 +1478,8 @@ msgstr ""
 "no haurien de tocar."
 
 #: src/libvlc-module.c:122 modules/control/showintf.c:69
-#, fuzzy
 msgid "Show interface with mouse"
-msgstr "Mostra la interfície"
+msgstr "Mostra la interfície amb el ratolí"
 
 #: src/libvlc-module.c:124
 msgid ""
@@ -1537,7 +1499,6 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:139
-#, fuzzy
 msgid ""
 "These options allow you to modify the behavior of the audio subsystem, and "
 "to add audio filters which can be used for post processing or visual effects "
@@ -1546,7 +1507,7 @@ msgid ""
 msgstr ""
 "Aquestes opcions us permeten modificar el comportament del subsistema "
 "d'àudio, i afegir filtres d'àudio que poden utilitzar-se pel post-"
-"processament o pels efectes visuals (analitzador espectral, etc.).\n"
+"processament o pels efectes visuals (analitzador espectral, etc.).\r\n"
 "Habiliteu aquests filtres aquí i configureu-los a la secció de mòduls "
 "\"filtres d'àudio\"."
 
@@ -1555,7 +1516,6 @@ msgid "Audio output module"
 msgstr "Mòdul de sortida d’àudio"
 
 #: src/libvlc-module.c:147
-#, fuzzy
 msgid ""
 "This is the audio output method used by VLC. The default behavior is to "
 "automatically select the best method available."
@@ -1569,7 +1529,6 @@ msgid "Enable audio"
 msgstr "Habilita l'àudio"
 
 #: src/libvlc-module.c:153
-#, fuzzy
 msgid ""
 "You can completely disable the audio output. The audio decoding stage will "
 "not take place, thus saving some processing power."
@@ -1586,9 +1545,8 @@ msgid "This will force a mono audio output."
 msgstr "Imposarà una sortida d'àudio mono."
 
 #: src/libvlc-module.c:159
-#, fuzzy
 msgid "Default audio volume"
-msgstr "Dispositius predeterminats"
+msgstr "Volum d'àudio predeterminats"
 
 #: src/libvlc-module.c:161
 msgid ""
@@ -1602,19 +1560,18 @@ msgid "Audio output saved volume"
 msgstr "Volum memoritzat de la sortida d'àudio"
 
 #: src/libvlc-module.c:166
-#, fuzzy
 msgid ""
 "This saves the audio output volume when you use the mute function. You "
 "should not change this option manually."
-msgstr "Memoritza el volum de la sortida d'àudio al seleccionar mut. "
+msgstr ""
+"Memoritza el volum de la sortida d'àudio al seleccionar mut.No hauries de "
+"canviar aquesta funció manualment"
 
 #: src/libvlc-module.c:169
-#, fuzzy
 msgid "Audio output volume step"
 msgstr "Volum de la sortida d’àudio"
 
 #: src/libvlc-module.c:171
-#, fuzzy
 msgid ""
 "The step size of the volume is adjustable using this option, in a range from "
 "0 to 1024."
@@ -1653,7 +1610,6 @@ msgid "Audio desynchronization compensation"
 msgstr "Compensació de la desincronització de l'àudio"
 
 #: src/libvlc-module.c:189
-#, fuzzy
 msgid ""
 "This delays the audio output. The delay must be given in milliseconds.This "
 "can be handy if you notice a lag between the video and the audio."
@@ -1662,12 +1618,10 @@ msgstr ""
 "de mil·lisegons. Pot ser útil si noteu un retard entre el vídeo i l'àudio."
 
 #: src/libvlc-module.c:192
-#, fuzzy
 msgid "Audio output channels mode"
-msgstr "Mode de canals de sortida d'àudio preferit."
+msgstr "Mode de canals de sortida d'àudio"
 
 #: src/libvlc-module.c:194
-#, fuzzy
 msgid ""
 "This sets the audio output channels mode that will be used by default when "
 "possible (ie. if your hardware supports it as well as the audio stream being "
@@ -1675,26 +1629,23 @@ msgid ""
 msgstr ""
 "Aquesta opció us permet definir el mode de canals de sortida d'àudio que "
 "serà utilitzat per defecte quan sigui possible (ex. si el vostre maquinari "
-"ho suporta i el flux d'àudio s'està executant) . "
+"ho suporta i el flux d'àudio s'està executant) ."
 
 #: src/libvlc-module.c:198
-#, fuzzy
 msgid "Use S/PDIF when available"
 msgstr "Utilitza la sortida d'àudio S/PDIF quan és possible"
 
 #: src/libvlc-module.c:200
-#, fuzzy
 msgid ""
 "S/PDIF can be used by default when your hardware supports it as well as the "
 "audio stream being played."
 msgstr ""
 "Aquesta opció us permet utilitzar la sortida d'àudio S/PDIF per defecte quan "
-"el vostre maquinari ho suporta i el flux d'àudio s'està executant . "
+"el vostre maquinari ho suporta i el flux d'àudio s'està executant ."
 
 #: src/libvlc-module.c:203
-#, fuzzy
 msgid "Force detection of Dolby Surround"
-msgstr "Imposa la selecció de tots els corrents de dades"
+msgstr "Imposa la detecció de Dolby Surround"
 
 #: src/libvlc-module.c:205
 msgid ""
@@ -1705,25 +1656,24 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:211
-#, fuzzy
 msgid "On"
-msgstr "Obre"
+msgstr "Activat"
 
 #: src/libvlc-module.c:211
 msgid "Off"
 msgstr "Inactiu"
 
 #: src/libvlc-module.c:216
-#, fuzzy
 msgid "This adds audio post processing filters, to modify the sound rendering."
-msgstr "Us permet afegir filtres de post-processament, per modificar el so"
+msgstr ""
+"Us permet afegir filtres de post-processament, per modificar la "
+"renderització del so"
 
 #: src/libvlc-module.c:219
 msgid "Audio visualizations "
 msgstr "Visualitzacions de l'àudio"
 
 #: src/libvlc-module.c:221
-#, fuzzy
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
 msgstr ""
 "Us permet afegir mòduls de visualització (analitzador espectral, etc.)."
@@ -1746,7 +1696,6 @@ msgid "Video output module"
 msgstr "Mòdul de la sortida de vídeo"
 
 #: src/libvlc-module.c:237
-#, fuzzy
 msgid ""
 "This is the the video output method used by VLC. The default behavior is to "
 "automatically select the best method available."
@@ -1760,7 +1709,6 @@ msgid "Enable video"
 msgstr "Habilita el vídeo"
 
 #: src/libvlc-module.c:242
-#, fuzzy
 msgid ""
 "You can completely disable the video output. The video decoding stage will "
 "not take place, thus saving some processing power."
@@ -1776,7 +1724,6 @@ msgid "Video width"
 msgstr "Amplada del vídeo"
 
 #: src/libvlc-module.c:247
-#, fuzzy
 msgid ""
 "You can enforce the video width. By default (-1) VLC will adapt to the video "
 "characteristics."
@@ -1791,7 +1738,6 @@ msgid "Video height"
 msgstr "Alçada del vídeo"
 
 #: src/libvlc-module.c:252
-#, fuzzy
 msgid ""
 "You can enforce the video height. By default (-1) VLC will adapt to the "
 "video characteristics."
@@ -1800,26 +1746,22 @@ msgstr ""
 "les característiques del vídeo."
 
 #: src/libvlc-module.c:255
-#, fuzzy
 msgid "Video X coordinate"
-msgstr "Coordenada y del vídeo"
+msgstr "Coordenada X del vídeo"
 
 #: src/libvlc-module.c:257
-#, fuzzy
 msgid ""
 "You can enforce the position of the top left corner of the video window (X "
 "coordinate)."
 msgstr ""
 "Podeu modificar aquí la posició de la cantonada superior esquerra de la "
-"finestra de vídeo (coordenada y)"
+"finestra de vídeo (coordenada X)"
 
 #: src/libvlc-module.c:260
-#, fuzzy
 msgid "Video Y coordinate"
-msgstr "Coordenada y del vídeo"
+msgstr "Coordenada Y del vídeo"
 
 #: src/libvlc-module.c:262
-#, fuzzy
 msgid ""
 "You can enforce the position of the top left corner of the video window (Y "
 "coordinate)."
@@ -1836,13 +1778,14 @@ msgid ""
 "Custom title for the video window (in case the video is not embedded in the "
 "interface)."
 msgstr ""
+"Títol personalitzat per a la finestra de vídeo (en cas que el vídeo no "
+"estigui inclòs dins la interfície)"
 
 #: src/libvlc-module.c:270
 msgid "Video alignment"
 msgstr "Alineació del vídeo"
 
 #: src/libvlc-module.c:272
-#, fuzzy
 msgid ""
 "Enforce the alignment of the video in its window. By default (0) it will be "
 "centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can also use "
@@ -1915,7 +1858,6 @@ msgid "Grayscale video output"
 msgstr "Sortida de vídeo en escala de grisos"
 
 #: src/libvlc-module.c:286
-#, fuzzy
 msgid ""
 "Output video in grayscale. As the color information aren't decoded, this can "
 "save some processing power."
@@ -1938,9 +1880,8 @@ msgid "Fullscreen video output"
 msgstr "Sortida de vídeo en pantalla completa"
 
 #: src/libvlc-module.c:295
-#, fuzzy
 msgid "Start video in fullscreen mode"
-msgstr "Mètode de pantalla completa alternatiu"
+msgstr "Comença en Mode de pantalla completa"
 
 #: src/libvlc-module.c:297
 msgid "Overlay video output"
@@ -1988,7 +1929,6 @@ msgid "Video output filter module"
 msgstr "Mòdul de la sortida de vídeo"
 
 #: src/libvlc-module.c:316
-#, fuzzy
 msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or to clone or distort the video window."
@@ -2017,7 +1957,6 @@ msgid "Video snapshot directory (or filename)"
 msgstr "Directori de la instantània del vídeo"
 
 #: src/libvlc-module.c:328
-#, fuzzy
 msgid "Directory where the video snapshots will be stored."
 msgstr ""
 "Us permet especificar el directori on les instantànies del vídeo seran "
@@ -2035,15 +1974,18 @@ msgstr "Format de la instantània del vídeo"
 #: src/libvlc-module.c:336
 msgid "Image format which will be used to store the video snapshots"
 msgstr ""
+"El format d'imatge serà el que es faci servir per enregistrar les captures "
+"del vídeo"
 
 #: src/libvlc-module.c:338
-#, fuzzy
 msgid "Display video snapshot preview"
 msgstr "Pren una instantània del vídeo"
 
 #: src/libvlc-module.c:340
 msgid "Display the snapshot preview in the screen's top-left corner."
 msgstr ""
+"Mostra la vista prèvia de les captures a la cantonada superior esquerra de "
+"la pantalla."
 
 #: src/libvlc-module.c:342
 msgid "Use sequential numbers instead of timestamps"
@@ -2054,9 +1996,8 @@ msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr ""
 
 #: src/libvlc-module.c:346
-#, fuzzy
 msgid "Video cropping"
-msgstr "Retall dret del vídeo"
+msgstr "Retall de la imatge del vídeo"
 
 #: src/libvlc-module.c:348
 msgid ""
@@ -2069,7 +2010,6 @@ msgid "Source aspect ratio"
 msgstr "Relació d'aspecte de la font"
 
 #: src/libvlc-module.c:354
-#, fuzzy
 msgid ""
 "This forces the source aspect ratio. For instance, some DVDs claim to be "
 "16:9 while they are actually 4:3. This can also be used as a hint for VLC "
@@ -2117,7 +2057,6 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:378
-#, fuzzy
 msgid "Monitor pixel aspect ratio"
 msgstr "Relació d'aspecte de la font"
 
@@ -2139,9 +2078,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:390
-#, fuzzy
 msgid "Drop late frames"
-msgstr "Omet els fotogrames"
+msgstr "Omet els darrers fotogrames"
 
 #: src/libvlc-module.c:392
 msgid ""
@@ -2192,13 +2130,13 @@ msgid "Clock synchronisation"
 msgstr "Sincronització del rellotge"
 
 #: src/libvlc-module.c:421
-#, fuzzy
 msgid ""
 "It is possible to disable the input clock synchronisation for real-time "
 "sources. Use this if you experience jerky playback of network streams."
 msgstr ""
 "Us permet habilitar/inhabilitar la sincronització del rellotge d'entrada per "
-"fonts de temps real."
+"fonts de temps real.Fes-ho servir si tens experiència en manipulació "
+"d'aquestes coses."
 
 #: src/libvlc-module.c:425 modules/control/netsync.c:75
 msgid "Network synchronisation"
@@ -2236,7 +2174,6 @@ msgid "UDP port"
 msgstr "Port UDP"
 
 #: src/libvlc-module.c:436
-#, fuzzy
 msgid "This is the default port used for UDP streams. Default is 1234."
 msgstr "Port utilitzat per fluxos UDP. Per defecte, 1234."
 
@@ -2245,12 +2182,12 @@ msgid "MTU of the network interface"
 msgstr "MTU de la interfície de xarxa"
 
 #: src/libvlc-module.c:440
-#, fuzzy
 msgid ""
 "This is the maximum packet size that can be transmitted over the network "
 "interface. On Ethernet it is usually 1500 bytes."
 msgstr ""
-"Mida típica dels paquets UDP esperats. Per Ethernet normalment és 1500."
+"Aquesta és la mida màxima de paquet que es pot transmetre per la interfície "
+"de xarxa. Per Ethernet normalment és 1500 octets."
 
 #: src/libvlc-module.c:443 modules/stream_out/rtp.c:92
 msgid "Hop limit (TTL)"
@@ -2276,15 +2213,16 @@ msgid "Default multicast interface. This overrides the routing table."
 msgstr ""
 
 #: src/libvlc-module.c:453
-#, fuzzy
 msgid "IPv4 multicast output interface address"
-msgstr "Interfície de control del joystick"
+msgstr "Adreça de interfície de la sortida multicast d'IPv4"
 
 #: src/libvlc-module.c:455
 msgid ""
 "IPv4 adress for the default multicast interface. This overrides the routing "
 "table."
 msgstr ""
+"Interfície per defecte d'emissió múltiple IPv4.Això sobreescriurà la taula "
+"de ruta"
 
 #: src/libvlc-module.c:458
 msgid "DiffServ Code Point"
@@ -2297,34 +2235,30 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:465
-#, fuzzy
 msgid ""
 "Choose the program to select by giving its Service ID. Only use this option "
 "if you want to read a multi-program stream (like DVB streams for example)."
 msgstr ""
-"Trieu el programa a seleccionar proporcionant la seva ID de Servei.\n"
+"Trieu el programa a seleccionar proporcionant la seva ID de Servei.\r\n"
 "Utilitzeu aquesta opció només si voleu llegir un flux multiprograma (com per "
 "exemple fluxos DVB)"
 
 #: src/libvlc-module.c:471
-#, fuzzy
 msgid ""
 "Choose the programs to select by giving a comma-separated list of Service "
 "IDs (SIDs). Only use this option if you want to read a multi-program stream "
 "(like DVB streams for example)."
 msgstr ""
 "Trieu els programes a seleccionar proporcionant una llista de SIDs separats "
-"per comes.\n"
+"per comes.\r\n"
 "Utilitzar aquesta opció només si voleu llegir un flux multiprograma (com per "
 "exemple fluxos DVB)"
 
 #: src/libvlc-module.c:477 modules/gui/wxwidgets/dialogs/open.cpp:777
-#, fuzzy
 msgid "Audio track"
 msgstr "Pista d’àudio"
 
 #: src/libvlc-module.c:479
-#, fuzzy
 msgid "Stream number of the audio track to use (from 0 to n)."
 msgstr ""
 "Proporciona el nombre del flux del canal d'àudio que voleu utilitzar (de 0 a "
@@ -2335,33 +2269,28 @@ msgid "Subtitles track"
 msgstr "Pista de subtítols"
 
 #: src/libvlc-module.c:484
-#, fuzzy
 msgid "Stream number of the subtitle track to use (from 0 to n)."
 msgstr ""
 "Proporciona el nombre de flux del canal de subtítol que voleu utilitzar (de "
 "0 a n)."
 
 #: src/libvlc-module.c:487
-#, fuzzy
 msgid "Audio language"
 msgstr "Escull l'idioma de l'àudio"
 
 #: src/libvlc-module.c:489
-#, fuzzy
 msgid ""
 "Language of the audio track you want to use (comma separated, two or three "
 "letter country code)."
 msgstr ""
-"Proporciona el llenguatge del canal d'àudio que voleu utilitzar (codi de "
-"país de dos o tres lletres, separats per comes)"
+"Proporciona l'idioma del canal d'àudio que voleu utilitzar (codi de país de "
+"dos o tres lletres, separats per comes)"
 
 #: src/libvlc-module.c:492
-#, fuzzy
 msgid "Subtitle language"
-msgstr "Escull l'idioma de l'àudio"
+msgstr "Escull l'idioma dels subtítols"
 
 #: src/libvlc-module.c:494
-#, fuzzy
 msgid ""
 "Language of the subtitle track you want to use (comma separated, two or tree "
 "letter country code)."
@@ -2370,28 +2299,21 @@ msgstr ""
 "país de dos o tres lletres, separats per comes)"
 
 #: src/libvlc-module.c:498
-#, fuzzy
 msgid "Audio track ID"
-msgstr "Pista d’àudio"
+msgstr "ID de la Pista d’àudio"
 
 #: src/libvlc-module.c:500
-#, fuzzy
 msgid "Stream ID of the audio track to use."
-msgstr ""
-"Proporciona el nombre del flux del canal d'àudio que voleu utilitzar (de 0 a "
-"n)."
+msgstr "Proporciona la ID del flux del canal d'àudio que voleu utilitzar."
 
 #: src/libvlc-module.c:502
-#, fuzzy
 msgid "Subtitles track ID"
-msgstr "Pista de subtítols"
+msgstr "ID de la Pista de subtítols"
 
 #: src/libvlc-module.c:504
-#, fuzzy
 msgid "Stream ID of the subtitle track to use."
 msgstr ""
-"Proporciona el nombre de flux del canal de subtítol que voleu utilitzar (de "
-"0 a n)."
+"Proporciona el nombre de flux del canal de subtítol que voleu utilitzar."
 
 #: src/libvlc-module.c:506
 msgid "Input repetitions"
@@ -2402,29 +2324,26 @@ msgid "Number of time the same input will be repeated"
 msgstr "Nombre de vegades que es repetirà la mateixa entrada"
 
 #: src/libvlc-module.c:510
-#, fuzzy
 msgid "Start time"
-msgstr "Inicia directament el menú"
+msgstr "Hora d'inici"
 
 #: src/libvlc-module.c:512
 msgid "The stream will start at this position (in seconds)."
-msgstr ""
+msgstr "El flux començarà a partir d'aquesta posició (en segons)."
 
 #: src/libvlc-module.c:514
-#, fuzzy
 msgid "Stop time"
-msgstr "Atura el flux"
+msgstr "Hora de parada"
 
 #: src/libvlc-module.c:516
 msgid "The stream will stop at this position (in seconds)."
-msgstr ""
+msgstr "El flux s'aturarà en aquesta posició (en segons)."
 
 #: src/libvlc-module.c:518
 msgid "Input list"
 msgstr "Llista d'entrada"
 
 #: src/libvlc-module.c:520
-#, fuzzy
 msgid ""
 "You can give a comma-separated list of inputs that will be concatenated "
 "together after the normal one."
@@ -2437,21 +2356,20 @@ msgid "Input slave (experimental)"
 msgstr "Entrada esclava (experimental)"
 
 #: src/libvlc-module.c:525
-#, fuzzy
 msgid ""
 "This allows you to play from several inputs at the same time. This feature "
 "is experimental, not all formats are supported. Use a '#' separated list of "
 "inputs."
 msgstr ""
 "Us permet reproduir diferents fitxers al mateix temps. Experimental, no tots "
-"els formats ho permeten."
+"els formats ho permeten.Fes servir '#' per a separar la llista "
+"d'introduccions."
 
 #: src/libvlc-module.c:529
 msgid "Bookmarks list for a stream"
 msgstr "Llista de preferits per un flux"
 
 #: src/libvlc-module.c:531
-#, fuzzy
 msgid ""
 "You can manually give a list of bookmarks for a stream in the form "
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
@@ -2474,9 +2392,8 @@ msgstr ""
 "de subimatges\". També podeu definir vàries opcions de subimatges. "
 
 #: src/libvlc-module.c:543
-#, fuzzy
 msgid "Force subtitle position"
-msgstr "Imposa la posició SPU"
+msgstr "Força la posició dels subtítols"
 
 #: src/libvlc-module.c:545
 msgid ""
@@ -2487,13 +2404,12 @@ msgstr ""
 "enlloc de sobre. Proveu diferents posicions. "
 
 #: src/libvlc-module.c:548
-#, fuzzy
 msgid "Enable sub-pictures"
-msgstr "Filtre de subimatges"
+msgstr "Habilitar de subimatges"
 
 #: src/libvlc-module.c:550
 msgid "You can completely disable the sub-picture processing."
-msgstr ""
+msgstr "Pots desactivar completament el processament de sub-imatge."
 
 #: src/libvlc-module.c:552 src/libvlc-module.c:1371 src/text/iso-639_def.h:143
 #: modules/stream_out/transcode.c:286
@@ -2501,13 +2417,12 @@ msgid "On Screen Display"
 msgstr "En pantalla"
 
 #: src/libvlc-module.c:554
-#, fuzzy
 msgid ""
 "VLC can display messages on the video. This is called OSD (On Screen "
 "Display)."
 msgstr ""
 "VLC pot mostrar missatges sobre el vídeo. Això s'anomena OSD (On Screen "
-"Display – En Pantalla). Podeu inhabilitar-ho aquí. "
+"Display – En Pantalla)."
 
 #: src/libvlc-module.c:557
 #, fuzzy
@@ -2535,11 +2450,12 @@ msgid "Autodetect subtitle files"
 msgstr "Autodetecta els fitxers de subtítols"
 
 #: src/libvlc-module.c:569
-#, fuzzy
 msgid ""
 "Automatically detect a subtitle file, if no subtitle filename is specified "
 "(based on the filename of the movie)."
-msgstr "Detecta automàticament un arxiu de subtítols, si no s'especifica cap."
+msgstr ""
+"Detecta automàticament un arxiu de subtítols, si no s'especifica cap (basat "
+"en el nom de l'arxiu de la pel·lícula)."
 
 #: src/libvlc-module.c:572
 msgid "Subtitle autodetection fuzziness"
@@ -2641,39 +2557,32 @@ msgid "Force IPv6"
 msgstr "Imposa IPv6"
 
 #: src/libvlc-module.c:624
-#, fuzzy
 msgid "IPv6 will be used by default for all connections."
 msgstr ""
-"Si trieu aquesta opció, Ipv6 s'utilitzarà per defecte en totes les "
-"connexions UDP i HTTP."
+"El protocol IPv6 serà fet servir per defecte per a totes les connexions."
 
 #: src/libvlc-module.c:626
 msgid "Force IPv4"
 msgstr "Imposa IPv4"
 
 #: src/libvlc-module.c:628
-#, fuzzy
 msgid "IPv4 will be used by default for all connections."
 msgstr ""
-"Si trieu aquesta opció, Ipv4 s'utilitzarà per defecte en totes les "
-"connexions UDP i HTTP."
+"El protocol IPv4 serà fet servir per defecte per a totes les connexions."
 
 #: src/libvlc-module.c:630
-#, fuzzy
 msgid "TCP connection timeout"
 msgstr "Temps d'espera de la connexió TCP en ms."
 
 #: src/libvlc-module.c:632
-#, fuzzy
 msgid "Default TCP connection timeout (in milliseconds). "
-msgstr "Temps d'espera de la connexió TCP en ms."
+msgstr "Temps d'espera de la connexió TCP en ms. "
 
 #: src/libvlc-module.c:634
 msgid "SOCKS server"
 msgstr "Servidor SOCKS"
 
 #: src/libvlc-module.c:636
-#, fuzzy
 msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
@@ -2686,18 +2595,16 @@ msgid "SOCKS user name"
 msgstr "Nom de l’usuari del SOCKS"
 
 #: src/libvlc-module.c:641
-#, fuzzy
 msgid "User name to be used for connection to the SOCKS proxy."
 msgstr ""
 "Us permet modificar el nom de l'usuari que serà utilitzat per la connexió al "
-"servidor SOCKS. "
+"servidor SOCKS."
 
 #: src/libvlc-module.c:643
 msgid "SOCKS password"
 msgstr "Contrasenya del SOCKS"
 
 #: src/libvlc-module.c:645
-#, fuzzy
 msgid "Password to be used for connection to the SOCKS proxy."
 msgstr ""
 "Us permet modificar la contrasenya que serà utilitzada per la connexió al "
@@ -2779,12 +2686,10 @@ msgstr ""
 "aquesta opció, ja que pot interrompre el playback de tots els fluxos."
 
 #: src/libvlc-module.c:685
-#, fuzzy
 msgid "Preferred decoders list"
-msgstr "Llista dels codificadors preferits"
+msgstr "Llista dels decodificadors preferits"
 
 #: src/libvlc-module.c:687
-#, fuzzy
 msgid ""
 "List of codecs that VLC will use in priority. For instance, 'dummy,a52' will "
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
@@ -2799,7 +2704,6 @@ msgid "Preferred encoders list"
 msgstr "Llista dels codificadors preferits"
 
 #: src/libvlc-module.c:694
-#, fuzzy
 msgid ""
 "This allows you to select a list of encoders that VLC will use in priority."
 msgstr ""
@@ -2815,9 +2719,8 @@ msgstr ""
 "subsistema de flux de sortida."
 
 #: src/libvlc-module.c:706
-#, fuzzy
 msgid "Default stream output chain"
-msgstr "Duplica el flux de sortida"
+msgstr "Cadena de flux de sortida per defecte"
 
 #: src/libvlc-module.c:708
 msgid ""
@@ -2831,7 +2734,6 @@ msgid "Enable streaming of all ES"
 msgstr "Habilita el corrent de dades per tot el ES"
 
 #: src/libvlc-module.c:714
-#, fuzzy
 msgid "Stream all elementary streams (video, audio and subtitles)"
 msgstr "Us permet enviar tot el ES (vídeo, àudio i subtítols)"
 
@@ -2840,16 +2742,14 @@ msgid "Display while streaming"
 msgstr "Visualitza mentre es transmet"
 
 #: src/libvlc-module.c:718
-#, fuzzy
 msgid "Play locally the stream while streaming it."
-msgstr "Us permet reproduir el flux mentre ho envieu. "
+msgstr "Us permet reproduir el flux mentre ho envieu."
 
 #: src/libvlc-module.c:720
 msgid "Enable video stream output"
 msgstr "Habilita el flux de sortida de vídeo"
 
 #: src/libvlc-module.c:722
-#, fuzzy
 msgid ""
 "Choose whether the video stream should be redirected to the stream output "
 "facility when this last one is enabled."
@@ -2862,7 +2762,6 @@ msgid "Enable audio stream output"
 msgstr "Habilita el flux de sortida d'àudio"
 
 #: src/libvlc-module.c:727
-#, fuzzy
 msgid ""
 "Choose whether the audio stream should be redirected to the stream output "
 "facility when this last one is enabled."
@@ -2871,12 +2770,10 @@ msgstr ""
 "de sortida de flux quan aquest últim es permet."
 
 #: src/libvlc-module.c:730
-#, fuzzy
 msgid "Enable SPU stream output"
 msgstr "Habilita el flux de sortida d'àudio"
 
 #: src/libvlc-module.c:732
-#, fuzzy
 msgid ""
 "Choose whether the SPU streams should be redirected to the stream output "
 "facility when this last one is enabled."
@@ -2929,7 +2826,6 @@ msgid "Control SAP flow"
 msgstr "Control del flux SAP"
 
 #: src/libvlc-module.c:756
-#, fuzzy
 msgid ""
 "If this option is enabled, the flow on the SAP multicast address will be "
 "controlled. This is needed if you want to make announcements on the MBone."
@@ -2942,7 +2838,6 @@ msgid "SAP announcement interval"
 msgstr "Interval d'anunci de SAP"
 
 #: src/libvlc-module.c:762
-#, fuzzy
 msgid ""
 "When the SAP flow control is disabled, this lets you set the fixed interval "
 "between SAP announcements."
@@ -2951,21 +2846,19 @@ msgstr ""
 "entre anuncis de SAP"
 
 #: src/libvlc-module.c:771
-#, fuzzy
 msgid ""
 "These options allow you to enable special CPU optimizations. You should "
 "always leave all these enabled."
 msgstr ""
-"Aquestes opcions us permeten habilitar optimitzacions especials de la CPU.\n"
+"Aquestes opcions us permeten habilitar optimitzacions especials de la CPU."
+"\r\n"
 "Hauríeu de deixar-les habilitades."
 
 #: src/libvlc-module.c:774
-#, fuzzy
 msgid "Enable FPU support"
-msgstr "Habilita el suport CPU MMX"
+msgstr "Habilita el suport FPU"
 
 #: src/libvlc-module.c:776
-#, fuzzy
 msgid ""
 "If your processor has a floating point calculation unit, VLC can take "
 "advantage of it."
@@ -3077,9 +2970,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:825
-#, fuzzy
 msgid "Access filter module"
-msgstr "Mòdul d’accés"
+msgstr "Mòdul dels Filtres d’accés"
 
 #: src/libvlc-module.c:827
 msgid ""
@@ -3134,7 +3026,6 @@ msgid "Minimize number of threads"
 msgstr "Minimitza el nombre de cadenes"
 
 #: src/libvlc-module.c:853
-#, fuzzy
 msgid "This option minimizes the number of threads needed to run VLC."
 msgstr ""
 "Aquesta opció minimitza el nombre de cadenes necessitades per executar VLC"
@@ -3144,7 +3035,6 @@ msgid "Modules search path"
 msgstr "Camí de cerca dels mòduls"
 
 #: src/libvlc-module.c:857
-#, fuzzy
 msgid "Additional path for VLC to look for its modules."
 msgstr ""
 "Aquesta opció us permet especificar un camí addicional per VLC per buscar "
@@ -3156,14 +3046,13 @@ msgstr "Fitxer de configuració de VLM"
 
 #: src/libvlc-module.c:861
 msgid "Read a VLM configuration file as soon as VLM is started."
-msgstr ""
+msgstr "Llegeix un arxiu de configuracó VLM tan aviat com VLM comenci."
 
 #: src/libvlc-module.c:863
 msgid "Use a plugins cache"
 msgstr "Utilitza una memòria cau dels connectors"
 
 #: src/libvlc-module.c:865
-#, fuzzy
 msgid "Use a plugins cache which will greatly improve the startup time of VLC."
 msgstr ""
 "Aquesta opció us permet utilitzar una memòria de cau dels connectors que "
@@ -3174,9 +3063,8 @@ msgid "Collect statistics"
 msgstr "Recull Estadístiques"
 
 #: src/libvlc-module.c:869
-#, fuzzy
 msgid "Collect miscellaneous statistics."
-msgstr "Aquesta opció us permet seleccionar les interfícies de control."
+msgstr "Aquesta opció us permet seleccionar les diverses estadístiques"
 
 #: src/libvlc-module.c:871
 msgid "Run as daemon process"
@@ -3195,13 +3083,12 @@ msgid "Writes process id into specified file."
 msgstr ""
 
 #: src/libvlc-module.c:879
-#, fuzzy
 msgid "Log to file"
-msgstr "Nom del fitxer del logo"
+msgstr "Registra-ho a un arxiu"
 
 #: src/libvlc-module.c:881
 msgid "Log all VLC messages to a text file."
-msgstr ""
+msgstr "Registra tots els missatges de VLC en un arxiu de text."
 
 #: src/libvlc-module.c:883
 msgid "Log to syslog"
@@ -3209,14 +3096,13 @@ msgstr "Registra-ho a syslog"
 
 #: src/libvlc-module.c:885
 msgid "Log all VLC messages to syslog (UNIX systems)."
-msgstr ""
+msgstr "Registra tots els missatges de VLC al syslog (sistemes UNIX)"
 
 #: src/libvlc-module.c:887
 msgid "Allow only one running instance"
 msgstr "Permetre només un VLC executant-se."
 
 #: src/libvlc-module.c:889
-#, fuzzy
 msgid ""
 "Allowing only one running instance of VLC can sometimes be useful, for "
 "example if you associated VLC with some media types and you don't want a new "
@@ -3267,7 +3153,6 @@ msgid "Increase the priority of the process"
 msgstr "Incrementa la prioritat del procés"
 
 #: src/libvlc-module.c:916
-#, fuzzy
 msgid ""
 "Increasing the priority of the process will very likely improve your playing "
 "experience as it allows VLC not to be disturbed by other applications that "
@@ -3278,7 +3163,7 @@ msgid ""
 msgstr ""
 "Augmentar la prioritat del procés millorarà probablement la vostra "
 "experiència que permet que VLC no sigui alterat per altres aplicacions que "
-"podrien prendre massa temps de processador.\n"
+"podrien prendre massa temps de processador.\r\n"
 "Tingueu en compte que en certes circumstàncies (errors) el VLC podria "
 "prendre tot els temps de processador i convertir el sistema en insensible, "
 "el que podria requerir arrencar de nou la vostra màquina."
@@ -3320,6 +3205,8 @@ msgstr ""
 #: src/libvlc-module.c:942
 msgid "Enqueue items to playlist when in one instance mode"
 msgstr ""
+"Posa en cua de la llista de reproducció els ítems quan estigui en mode d'una "
+"sola instància"
 
 #: src/libvlc-module.c:944
 msgid ""
@@ -3371,7 +3258,6 @@ msgid "Services discovery modules"
 msgstr "Mòdul del descobriment de serveis"
 
 #: src/libvlc-module.c:975
-#, fuzzy
 msgid ""
 "Specifies the services discovery modules to load, separated by semi-colons. "
 "Typical values are sap, hal, ..."
@@ -3384,26 +3270,22 @@ msgid "Play files randomly forever"
 msgstr "Reprodueix sempre els arxius aleatòriament "
 
 #: src/libvlc-module.c:980
-#, fuzzy
 msgid "VLC will randomly play files in the playlist until interrupted."
 msgstr ""
 "Quan es selecciona, VLC reproduirà els arxius de la llista de reproducció "
-"aleatòriament fins a ser interromput. "
+"aleatòriament fins a ser interromput."
 
 #: src/libvlc-module.c:984
-#, fuzzy
 msgid "VLC will keep playing the playlist indefinitely."
 msgstr ""
 "Habiliteu aquesta opció si voleu que VLC segueixi executant la llista de "
 "reproducció indefinidament."
 
 #: src/libvlc-module.c:986
-#, fuzzy
 msgid "Repeat current item"
 msgstr "Repeteix l'element actual"
 
 #: src/libvlc-module.c:988
-#, fuzzy
 msgid "VLC will keep playing the current playlist item."
 msgstr ""
 "Quan està actiu, VLC seguirà executant l'actual element de la llista de "
@@ -3414,11 +3296,8 @@ msgid "Play and stop"
 msgstr "Reprodueix i atura"
 
 #: src/libvlc-module.c:992
-#, fuzzy
 msgid "Stop the playlist after each played playlist item."
-msgstr ""
-"Atura la llista de reproducció després de cada element reproduït. Avança "
-"l'index de la llista de reproducció."
+msgstr "Atura la llista de reproducció després de cada element reproduït."
 
 #: src/libvlc-module.c:994
 #, fuzzy
@@ -3576,7 +3455,6 @@ msgid "Stop"
 msgstr "Atura"
 
 #: src/libvlc-module.c:1038
-#, fuzzy
 msgid "Select the hotkey to stop playback."
 msgstr "Seleccioneu la tecla ràpida per aturar la llista de reproducció."
 
@@ -3593,82 +3471,72 @@ msgstr "Seleccioneu la tecla ràpida per mostrar la posició."
 
 #: src/libvlc-module.c:1042
 msgid "Very short backwards jump"
-msgstr ""
+msgstr "Passa un mica enrera"
 
 #: src/libvlc-module.c:1044
-#, fuzzy
 msgid "Select the hotkey to make a very short backwards jump."
-msgstr "Seleccioneu la tecla ràpida per saltar 5 minuts  enrere."
+msgstr "Seleccioneu la tecla ràpida per saltar molt poc  enrere."
 
 #: src/libvlc-module.c:1045
-#, fuzzy
 msgid "Short backwards jump"
-msgstr "Vés enrere"
+msgstr "Vés enrere una mica"
 
 #: src/libvlc-module.c:1047
-#, fuzzy
 msgid "Select the hotkey to make a short backwards jump."
-msgstr "Seleccioneu la tecla ràpida per saltar 10 segons enrere."
+msgstr "Seleccioneu la tecla ràpida per saltar molt poc enrere."
 
 #: src/libvlc-module.c:1048
 msgid "Medium backwards jump"
-msgstr ""
+msgstr "Passa una mica més enrera"
 
 #: src/libvlc-module.c:1050
-#, fuzzy
 msgid "Select the hotkey to make a medium backwards jump."
-msgstr "Seleccioneu la tecla ràpida per saltar 1 minut  enrere."
+msgstr "Seleccioneu la tecla ràpida per anar una mica més enrera."
 
 #: src/libvlc-module.c:1051
-#, fuzzy
 msgid "Long backwards jump"
-msgstr "Vés enrere"
+msgstr "Vés molt enrere"
 
 #: src/libvlc-module.c:1053
-#, fuzzy
 msgid "Select the hotkey to make a long backwards jump."
 msgstr "Seleccioneu la tecla ràpida per saltar 10 segons enrere."
 
 #: src/libvlc-module.c:1055
 msgid "Very short forward jump"
-msgstr ""
+msgstr "Passa una mica endavant"
 
 #: src/libvlc-module.c:1057
-#, fuzzy
 msgid "Select the hotkey to make a very short forward jump."
-msgstr "Seleccioneu la tecla ràpida a utilitzar per avançar ràpid el playback."
+msgstr ""
+"Seleccioneu la tecla ràpida a utilitzar per avançar ràpid la reproducció."
 
 #: src/libvlc-module.c:1058
-#, fuzzy
 msgid "Short forward jump"
 msgstr "Endavant un cop"
 
 #: src/libvlc-module.c:1060
-#, fuzzy
 msgid "Select the hotkey to make a short forward jump."
-msgstr "Seleccioneu la tecla ràpida per saltar 10 segons endavant."
+msgstr "Seleccioneu la tecla ràpida per saltar una mica endavant."
 
 #: src/libvlc-module.c:1061
 msgid "Medium forward jump"
-msgstr ""
+msgstr "Passa una mica més endavant"
 
 #: src/libvlc-module.c:1063
-#, fuzzy
 msgid "Select the hotkey to make a medium forward jump."
-msgstr "Seleccioneu la tecla ràpida per saltar 1 minut  endavant."
+msgstr "Seleccioneu la tecla ràpida per saltar una mica més endavant."
 
 #: src/libvlc-module.c:1064
 msgid "Long forward jump"
-msgstr ""
+msgstr "Passa molt endavant"
 
 #: src/libvlc-module.c:1066
-#, fuzzy
 msgid "Select the hotkey to make a long forward jump."
 msgstr "Seleccioneu la tecla ràpida per saltar 10 segons endavant."
 
 #: src/libvlc-module.c:1068
 msgid "Very short jump length"
-msgstr ""
+msgstr "Fes una passada molt curteta"
 
 #: src/libvlc-module.c:1069
 msgid "Very short jump length, in seconds."
@@ -3691,9 +3559,8 @@ msgid "Medium jump length, in seconds."
 msgstr "Llargada del salt mitjà, en segons."
 
 #: src/libvlc-module.c:1074
-#, fuzzy
 msgid "Long jump length"
-msgstr "Mida de la lletra"
+msgstr "Mida del salt"
 
 #: src/libvlc-module.c:1075
 msgid "Long jump length, in seconds."
@@ -3752,61 +3619,53 @@ msgstr ""
 "Seleccioneu la tecla per activar l'element seleccionat en els menús de DVD."
 
 #: src/libvlc-module.c:1089
-#, fuzzy
 msgid "Go to the DVD menu"
 msgstr "Utilitza els menús del DVD"
 
 #: src/libvlc-module.c:1090
-#, fuzzy
 msgid "Select the key to take you to the DVD menu"
 msgstr ""
 "Seleccioneu la tecla per activar l'element seleccionat en els menús de DVD."
 
 #: src/libvlc-module.c:1091
-#, fuzzy
 msgid "Select previous DVD title"
-msgstr "Selecciona el títol anterior"
+msgstr "Selecciona el títol anterior de DVD"
 
 #: src/libvlc-module.c:1092
-#, fuzzy
 msgid "Select the key to choose the previous title from the DVD"
 msgstr ""
-"Seleccioneu la tecla ràpida a utilitzar per passar a l'anterior element de "
-"la llista de reproducció."
+"Seleccioneu la tecla ràpida a utilitzar per passar a l'anterior element del "
+"DVD."
 
 #: src/libvlc-module.c:1093
-#, fuzzy
 msgid "Select next DVD title"
-msgstr "Selecciona el capítol següent"
+msgstr "Selecciona el capítol següent de DVD"
 
 #: src/libvlc-module.c:1094
-#, fuzzy
 msgid "Select the key to choose the next title from the DVD"
 msgstr ""
-"Seleccioneu la tecla per moure a l'esquerra el selector en els menús de DVD."
+"Seleccioneu la tecla ràpida a utilitzar per passar al següent element del "
+"DVD."
 
 #: src/libvlc-module.c:1095
-#, fuzzy
 msgid "Select prev DVD chapter"
 msgstr "Selecciona el capítol anterior"
 
 #: src/libvlc-module.c:1096
-#, fuzzy
 msgid "Select the key to choose the previous chapter from the DVD"
 msgstr ""
-"Seleccioneu la tecla ràpida a utilitzar per passar a l'anterior element de "
-"la llista de reproducció."
+"Seleccioneu la tecla ràpida a utilitzar per passar a l'anterior element del "
+"DVD"
 
 #: src/libvlc-module.c:1097
-#, fuzzy
 msgid "Select next DVD chapter"
 msgstr "Selecciona el capítol següent"
 
 #: src/libvlc-module.c:1098
-#, fuzzy
 msgid "Select the key to choose the next chapter from the DVD"
 msgstr ""
-"Seleccioneu la tecla per moure a l'esquerra el selector en els menús de DVD."
+"Seleccioneu la tecla ràpida a utilitzar per passar al següent capítol del "
+"DVD."
 
 #: src/libvlc-module.c:1099
 msgid "Volume up"
@@ -3831,9 +3690,8 @@ msgid "Mute"
 msgstr "Mut"
 
 #: src/libvlc-module.c:1104
-#, fuzzy
 msgid "Select the key to mute audio."
-msgstr "Seleccioneu la tecla ràpida a utilitzar per fer una pausa."
+msgstr "Seleccioneu la tecla ràpida a treure el so."
 
 #: src/libvlc-module.c:1105
 msgid "Subtitle delay up"
@@ -3997,7 +3855,6 @@ msgid "Playlist bookmark 10"
 msgstr "Preferit 10 de la llista de reproducció"
 
 #: src/libvlc-module.c:1147
-#, fuzzy
 msgid "This allows you to define playlist bookmarks."
 msgstr ""
 "Aquesta opció us permet definir els preferits de la llista de reproducció."
@@ -4031,65 +3888,54 @@ msgid "Cycle audio track"
 msgstr "Gira la pista d'àudio"
 
 #: src/libvlc-module.c:1155
-#, fuzzy
 msgid "Cycle through the available audio tracks(languages)."
-msgstr "Gira mitjançant les pistes d'àudio disponibles (llenguatges) "
+msgstr "Gira mitjançant les pistes d'àudio disponibles (idiomes)"
 
 #: src/libvlc-module.c:1156
 msgid "Cycle subtitle track"
 msgstr "Gira la pista de subtítols "
 
 #: src/libvlc-module.c:1157
-#, fuzzy
 msgid "Cycle through the available subtitle tracks."
 msgstr "Gira mitjançant les pistes de subtítols disponibles"
 
 #: src/libvlc-module.c:1158
-#, fuzzy
 msgid "Cycle source aspect ratio"
 msgstr "Relació d'aspecte de la font"
 
 #: src/libvlc-module.c:1159
-#, fuzzy
 msgid "Cycle through a predefined list of source aspect ratios."
 msgstr "Relació d'aspecte de la font"
 
 #: src/libvlc-module.c:1160
-#, fuzzy
 msgid "Cycle video crop"
-msgstr "Sortida de vídeo en escala de grisos"
+msgstr "Tall del cicle de vídeo"
 
 #: src/libvlc-module.c:1161
-#, fuzzy
 msgid "Cycle through a predefined list of crop formats."
-msgstr "Gira mitjançant les pistes de subtítols disponibles"
+msgstr "Fa un cicle entre talls predefinits de formats."
 
 #: src/libvlc-module.c:1162
-#, fuzzy
 msgid "Cycle deinterlace modes"
-msgstr "Mode desentrellaçat"
+msgstr "Cicle de Modes desentrellaçats"
 
 #: src/libvlc-module.c:1163
-#, fuzzy
 msgid "Cycle through deinterlace modes."
-msgstr "Gira mitjançant les pistes de subtítols disponibles"
+msgstr "Fa un cicle entre modes de desentrellaçat."
 
 #: src/libvlc-module.c:1164
 msgid "Show interface"
 msgstr "Mostra la interfície"
 
 #: src/libvlc-module.c:1165
-#, fuzzy
 msgid "Raise the interface above all other windows."
 msgstr "Superposa la interfície sobre totes les altres finestres"
 
 #: src/libvlc-module.c:1166
-#, fuzzy
 msgid "Hide interface"
-msgstr "_Oculta la interfície "
+msgstr "_Oculta la interfície"
 
 #: src/libvlc-module.c:1167
-#, fuzzy
 msgid "Lower the interface below all other windows."
 msgstr "Superposa la interfície sobre totes les altres finestres"
 
@@ -4108,7 +3954,7 @@ msgstr "Enregistra"
 
 #: src/libvlc-module.c:1172
 msgid "Record access filter start/stop."
-msgstr ""
+msgstr "Filtre inici/atura de l'accés d'enregistrament"
 
 #: src/libvlc-module.c:1173 modules/access_filter/dump.c:51
 #: modules/access_filter/dump.c:52
@@ -4226,14 +4072,12 @@ msgid "Snapshot"
 msgstr "Instantània"
 
 #: src/libvlc-module.c:1329
-#, fuzzy
 msgid "Window properties"
-msgstr "Propietats del sintonitzador"
+msgstr "Propietats de la finestra"
 
 #: src/libvlc-module.c:1372
-#, fuzzy
 msgid "Subpictures"
-msgstr "Filtre de subimatges"
+msgstr "Subimatges"
 
 #: src/libvlc-module.c:1379 modules/codec/subsdec.c:144
 #: modules/demux/subtitle.c:66 modules/gui/beos/InterfaceWindow.cpp:278
@@ -4250,7 +4094,6 @@ msgid "France"
 msgstr "Trance"
 
 #: src/libvlc-module.c:1406
-#, fuzzy
 msgid "Track settings"
 msgstr "Paràmetres de les pistes"
 
@@ -4283,9 +4126,8 @@ msgstr "Descodificadors"
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:265
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:378
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:106
-#, fuzzy
 msgid "Input"
-msgstr "Llista d'entrada"
+msgstr "Entrada"
 
 #: src/libvlc-module.c:1546
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:522
@@ -4293,21 +4135,18 @@ msgid "VLM"
 msgstr "VLM"
 
 #: src/libvlc-module.c:1579
-#, fuzzy
 msgid "CPU"
-msgstr "TCP"
+msgstr "CPU"
 
 #: src/libvlc-module.c:1601
-#, fuzzy
 msgid "Special modules"
-msgstr "Mode escalat"
+msgstr "Mòduls Especials"
 
 #: src/libvlc-module.c:1608
 msgid "Plugins"
 msgstr "Connectors"
 
 #: src/libvlc-module.c:1616
-#, fuzzy
 msgid "Performance options"
 msgstr "Opcions de transcodificació"
 
@@ -4316,18 +4155,16 @@ msgid "Hot keys"
 msgstr "Tecles ràpides"
 
 #: src/libvlc-module.c:2082
-#, fuzzy
 msgid "Jump sizes"
-msgstr "Mida de la lletra"
+msgstr "Mida del pas"
 
 #: src/libvlc-module.c:2161
 msgid "main program"
 msgstr "Programa principal"
 
 #: src/libvlc-module.c:2171
-#, fuzzy
 msgid "print help for VLC (can be combined with --advanced)"
-msgstr "Imprimeix l'ajuda (es pot combinar amb --advanced)"
+msgstr "Imprimeix l'ajuda (es pot combinar amb --avançat)"
 
 #: src/libvlc-module.c:2177
 #, fuzzy
@@ -4336,9 +4173,8 @@ msgid ""
 msgstr "Imprimeix l'ajuda dels mòduls (es pot combinar amb --advanced)"
 
 #: src/libvlc-module.c:2182
-#, fuzzy
 msgid "print help for the advanced options"
-msgstr "Mostra les opcions avançades"
+msgstr "Mostra l'ajuda per a les opcions avançades"
 
 #: src/libvlc-module.c:2187
 msgid "ask for extra verbosity when displaying help"
@@ -4349,7 +4185,6 @@ msgid "print a list of available modules"
 msgstr "Imprimeix una llista dels mòduls disponibles"
 
 #: src/libvlc-module.c:2199
-#, fuzzy
 msgid "print help on a specific module (can be combined with --advanced)"
 msgstr "Imprimeix l'ajuda dels mòduls (es pot combinar amb --advanced)"
 
@@ -5019,7 +4854,6 @@ msgstr "Retalla"
 
 #: src/video_output/vout_intf.c:348 modules/gui/macosx/intf.m:582
 #: modules/gui/macosx/intf.m:583
-#, fuzzy
 msgid "Aspect-ratio"
 msgstr "Ràtio de l'aspecte"
 
@@ -5045,7 +4879,6 @@ msgid "Caching value in ms"
 msgstr "Valor de captura en ms"
 
 #: modules/access/cdda.c:62
-#, fuzzy
 msgid ""
 "Default caching value for Audio CDs. This value should be set in "
 "milliseconds."
@@ -5068,34 +4901,29 @@ msgid "[cdda:][device][@[track]]"
 msgstr "[cdda:][dispositiu][@[pista]]"
 
 #: modules/access/cdda.c:85
-#, fuzzy
 msgid "CDDB Server"
 msgstr "Servidor CDDB"
 
 #: modules/access/cdda.c:85
-#, fuzzy
 msgid "Address of the CDDB server to use."
-msgstr "Adreça de correu notificada al servidor CDDB"
+msgstr "Adreça del servidor CDDB a fer servir."
 
 #: modules/access/cdda.c:88
-#, fuzzy
 msgid "CDDB port"
 msgstr "Port del servidor CDDB"
 
 #: modules/access/cdda.c:88
-#, fuzzy
 msgid "CDDB Server port to use."
-msgstr "Port del servidor CDDB"
+msgstr "Port del servidor CDDB a fer servir."
 
 #: modules/access/cdda.c:451
-#, fuzzy
 msgid "Audio CD - Track "
-msgstr "Pista d’àudio"
+msgstr "Àudio CD - Pista "
 
 #: modules/access/cdda.c:468
-#, fuzzy, c-format
+#, c-format
 msgid "Audio CD - Track %i"
-msgstr "Pista d’àudio"
+msgstr "CD d'Àudio - Pista %i"
 
 #: modules/access/cdda/cdda.c:42 modules/access/directory.c:80
 #: modules/codec/x264.c:321 modules/codec/x264.c:327 modules/codec/x264.c:332
@@ -5103,7 +4931,6 @@ msgid "none"
 msgstr "cap"
 
 #: modules/access/cdda/cdda.c:42
-#, fuzzy
 msgid "overlap"
 msgstr "Superposats"
 
@@ -5136,7 +4963,6 @@ msgstr ""
 "libcddb  (0x100) 256\n"
 
 #: modules/access/cdda/cdda.c:59
-#, fuzzy
 msgid ""
 "Caching value for CDDA streams. This value should be set in millisecond "
 "units."
@@ -5145,7 +4971,6 @@ msgstr ""
 "d'especificar en unitats de mil·lisegon."
 
 #: modules/access/cdda/cdda.c:63
-#, fuzzy
 msgid ""
 "How many CD blocks to get on a single CD read. Generally on newer/faster "
 "CDs, this increases throughput at the expense of a little more memory usage "
@@ -5244,13 +5069,12 @@ msgid "Compact Disc Digital Audio (CD-DA) input"
 msgstr "Entrada de Compact Disc Digital Àudio (CD-DA)"
 
 #: modules/access/cdda/cdda.c:115
-#, fuzzy
 msgid "Audio Compact Disc"
 msgstr "CD d'àudio"
 
 #: modules/access/cdda/cdda.c:124
 msgid "Additional debug"
-msgstr ""
+msgstr "Depuració adicional"
 
 #: modules/access/cdda/cdda.c:129
 msgid "Caching value in microseconds"
@@ -5267,13 +5091,12 @@ msgstr ""
 "utilitza CDDB"
 
 #: modules/access/cdda/cdda.c:144
-#, fuzzy
 msgid "Use CD audio controls and output?"
-msgstr "Habilita el flux de sortida d'àudio"
+msgstr "Habilita els controls i la sortida del CD d'àudio?"
 
 #: modules/access/cdda/cdda.c:145
 msgid "If set, audio controls and audio jack output are used"
-msgstr ""
+msgstr "Si està marcat, els controls d'àudio i la sortida de jack seran usats"
 
 #: modules/access/cdda/cdda.c:150
 msgid "Do CD-Text lookups?"
@@ -5288,16 +5111,14 @@ msgid "Use Navigation-style playback?"
 msgstr "Voleu utilitzar el playback Navigation-style?"
 
 #: modules/access/cdda/cdda.c:161
-#, fuzzy
 msgid "Tracks are navigated via Navagation rather than a playlist entries"
 msgstr ""
 "Si està seleccionat, les pistes exploraran mitjançant Navegació en comptes "
 "de les entrades de la llista de reproducció"
 
 #: modules/access/cdda/cdda.c:174
-#, fuzzy
 msgid "CDDB"
-msgstr "CDDB Any"
+msgstr "CDDB"
 
 #: modules/access/cdda/cdda.c:177
 msgid "Format to use in playlist \"title\" field when using CDDB"
@@ -5306,9 +5127,8 @@ msgstr ""
 "utilitza CDDB"
 
 #: modules/access/cdda/cdda.c:181
-#, fuzzy
 msgid "CDDB lookups"
-msgstr "Voleu fer cerques de CDDB?"
+msgstr "Cerques de CDDB"
 
 #: modules/access/cdda/cdda.c:182
 msgid "If set, lookup CD-DA track information using the CDDB protocol"
@@ -5445,7 +5265,7 @@ msgstr "Expandeix"
 
 #: modules/access/directory.c:83
 msgid "Ignored extensions"
-msgstr ""
+msgstr "Extensions ignorades"
 
 #: modules/access/directory.c:85
 msgid ""
@@ -5497,7 +5317,6 @@ msgid "DSS"
 msgstr "TS"
 
 #: modules/access/dshow/dshow.cpp:95
-#, fuzzy
 msgid ""
 "Caching value for DirectShow streams. This value should be set in "
 "millisecondss."
@@ -5510,7 +5329,6 @@ msgid "Video device name"
 msgstr "Nom del dispositiu de vídeo"
 
 #: modules/access/dshow/dshow.cpp:99
-#, fuzzy
 msgid ""
 "Name of the video device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
@@ -5524,7 +5342,6 @@ msgid "Audio device name"
 msgstr "Nom del dispositiu de àudio"
 
 #: modules/access/dshow/dshow.cpp:105
-#, fuzzy
 msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used. You can specify a "
@@ -5532,14 +5349,14 @@ msgid ""
 msgstr ""
 "Podeu especificar el nom del dispositiu d'àudio que s'utilitzarà pel "
 "connector DirectShow. Si no especifiqueu res, utilitzarà el dispositiu "
-"predeterminat."
+"predeterminat.Pots especificar un tamany estàndard (cif, d1, ...) o "
+"<width>x<height>"
 
 #: modules/access/dshow/dshow.cpp:108
 msgid "Video size"
 msgstr "Tamany del vídeo"
 
 #: modules/access/dshow/dshow.cpp:110
-#, fuzzy
 msgid ""
 "Size of the video that will be displayed by the DirectShow plugin. If you "
 "don't specify anything the default size for your device will be used."
@@ -5560,18 +5377,16 @@ msgstr ""
 "específic (ex. l420 (per defecte), RV24, etc.)"
 
 #: modules/access/dshow/dshow.cpp:117
-#, fuzzy
 msgid "Video input frame rate"
-msgstr "Velocitat de fotogrames del vídeo"
+msgstr "Velocitat de fotogrames del vídeo d'entrada"
 
 #: modules/access/dshow/dshow.cpp:119
-#, fuzzy
 msgid ""
 "Force the DirectShow video input to use a specific frame rate(eg. 0 means "
 "default, 25, 29.97, 50, 59.94, etc.)"
 msgstr ""
-"Imposa a l'entrada de vídeo DirectShow a utilitzar un format de croma "
-"específic (ex. l420 (per defecte), RV24, etc.)"
+"Imposa a l'entrada de vídeo DirectShow a utilitzar  una freqüència d'imatges "
+"per segon (ex. 0 significa per defecte, 25, 29.97, 50, 59.94, etc.)"
 
 #: modules/access/dshow/dshow.cpp:121
 msgid "Device properties"
@@ -5597,7 +5412,6 @@ msgid "Tuner TV Channel"
 msgstr "Sintonitza els canals de televisió"
 
 #: modules/access/dshow/dshow.cpp:130
-#, fuzzy
 msgid "Set the TV channel the tuner will set to (0 means default)."
 msgstr ""
 "Us permet especificar el canal de TV que el sintonitzador farà passar a "
@@ -5608,7 +5422,6 @@ msgid "Tuner country code"
 msgstr "Sintonitza el codi del país"
 
 #: modules/access/dshow/dshow.cpp:134
-#, fuzzy
 msgid ""
 "Set the tuner country code that establishes the current channel-to-frequency "
 "mapping (0 means default)."
@@ -5621,13 +5434,11 @@ msgid "Tuner input type"
 msgstr "Sintonitza el tipus d'entrada"
 
 #: modules/access/dshow/dshow.cpp:138
-#, fuzzy
 msgid "Select the tuner input type (Cable/Antenna)."
 msgstr ""
 "Us permet seleccionar el tipus d'entrada del sintonitzador (Cable/Antenna)"
 
 #: modules/access/dshow/dshow.cpp:139
-#, fuzzy
 msgid "Video input pin"
 msgstr "Opcions de vídeo"
 
@@ -5640,34 +5451,34 @@ msgid ""
 msgstr ""
 
 #: modules/access/dshow/dshow.cpp:145
-#, fuzzy
 msgid "Audio input pin"
-msgstr "Entrada de CD d'àudio"
+msgstr "Opcions d'Entrada d'd'àudio"
 
 #: modules/access/dshow/dshow.cpp:147
-#, fuzzy
 msgid "Select the audio input source. See the \"video input\" option."
-msgstr "Especifica el contrast de l'entrada de vídeo. "
+msgstr ""
+"Selecciona la font de l'entrada de l'àudio.Veure l'opció \"d'entrada de vídeo"
+"\"."
 
 #: modules/access/dshow/dshow.cpp:148
-#, fuzzy
 msgid "Video output pin"
-msgstr "URL per la sortida de vídeo"
+msgstr "Lloc per a la sortida de vídeo"
 
 #: modules/access/dshow/dshow.cpp:150
-#, fuzzy
 msgid "Select the video output type. See the \"video input\" option."
-msgstr "Especifica el matís de l'entrada de vídeo. "
+msgstr ""
+"Especifica el tipus de la sortida de vídeo.Veure l'opció \"d'entrada de vídeo"
+"\"."
 
 #: modules/access/dshow/dshow.cpp:151
-#, fuzzy
 msgid "Audio output pin"
-msgstr "URL per la sortida d'àudio"
+msgstr "Sortida d'àudio"
 
 #: modules/access/dshow/dshow.cpp:153
-#, fuzzy
 msgid "Select the audio output type. See the \"video input\" option."
-msgstr "Especifica el matís de l'entrada de vídeo. "
+msgstr ""
+"Selecciona la font de la sortida de l'àudio.Veure l'opció \"d'entrada de "
+"vídeo\"."
 
 #: modules/access/dshow/dshow.cpp:155
 #, fuzzy
@@ -5711,11 +5522,10 @@ msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
 
 #: modules/access/dvb/access.c:75
-#, fuzzy
 msgid ""
 "Caching value for DVB streams. This value should be set in milliseconds."
 msgstr ""
-"Us permet modificar el valor de captura predeterminat per fluxos UDP. "
+"Us permet modificar el valor de captura predeterminat per fluxos DVB. "
 "S'hauria d'especificar en unitats de mil·lisegon."
 
 #: modules/access/dvb/access.c:78
@@ -5755,19 +5565,18 @@ msgid "Probe DVB card for capabilities"
 msgstr "Explora les capacitats de la targeta DVB"
 
 #: modules/access/dvb/access.c:91
-#, fuzzy
 msgid ""
 "Some DVB cards do not like to be probed for their capabilities, you can "
 "disable this feature if you experience some trouble."
 msgstr ""
-"A algunes targetes DVB no els hi agrada que s'explorin les seves capacitats."
+"A algunes targetes DVB no els hi agrada que s'explorin les seves capacitats, "
+"pots deshabilitar aquesta capacitat si et dóna problemes."
 
 #: modules/access/dvb/access.c:93
 msgid "Budget mode"
 msgstr "Mode econòmic"
 
 #: modules/access/dvb/access.c:94
-#, fuzzy
 msgid "This allows you to stream an entire transponder with a \"budget\" card."
 msgstr "Us permet reproduir un transponedor amb una targeta econòmica."
 
@@ -5776,7 +5585,6 @@ msgid "Satellite number in the Diseqc system"
 msgstr "Nombre del satèl·lit en el sistema Diseqc"
 
 #: modules/access/dvb/access.c:98
-#, fuzzy
 msgid "[0=no diseqc, 1-4=satellite number]."
 msgstr "[0=no diseqc, 1-4=nombre del satèl·lit]"
 
@@ -5785,7 +5593,6 @@ msgid "LNB voltage"
 msgstr "Voltatge de LNB"
 
 #: modules/access/dvb/access.c:101
-#, fuzzy
 msgid "In Volts [0, 13=vertical, 18=horizontal]."
 msgstr "En Volts [0, 13=vertical, 18=horitzontal]"
 
@@ -5806,7 +5613,6 @@ msgid "22 kHz tone"
 msgstr "To de 22kHz"
 
 #: modules/access/dvb/access.c:108
-#, fuzzy
 msgid "[0=off, 1=on, -1=auto]."
 msgstr "[0=inactiu, 1=actiu, -1=auto]"
 
@@ -5815,7 +5621,6 @@ msgid "Transponder FEC"
 msgstr "Transponedor FEC"
 
 #: modules/access/dvb/access.c:111
-#, fuzzy
 msgid "FEC=Forward Error Correction mode [9=auto]."
 msgstr ""
 "FEC=Forward Error Correction, mode de Correcció d'Error Endavant [9=auto]"
@@ -5873,13 +5678,13 @@ msgid "Terrestrial hierarchy mode"
 msgstr "Mode de jerarquia terrestre "
 
 #: modules/access/dvb/access.c:148
-#, fuzzy
 msgid "HTTP Host address"
 msgstr "Adreça de l’ordinador"
 
 #: modules/access/dvb/access.c:150
 msgid "To enable the internal HTTP server, set its address and port here."
 msgstr ""
+"Per a habilitar el servidor intern d'HTTP, escriu la seva adreça i port aquí."
 
 #: modules/access/dvb/access.c:152
 msgid "HTTP user name"
@@ -5889,6 +5694,8 @@ msgstr "Nom d'usuari de l'HTTP"
 msgid ""
 "User name the administrator will use to log into the internal HTTP server."
 msgstr ""
+"L'usuari nomena l'administrador que es farà servir per registrar el servidor "
+"intern d'HTTP."
 
 #: modules/access/dvb/access.c:157
 msgid "HTTP password"
@@ -5898,11 +5705,12 @@ msgstr "Contrasenya HTTP"
 msgid ""
 "Password the administrator will use to log into the internal HTTP server."
 msgstr ""
+"Contrasenya que l'administrador/a farà servir per entrar al servidor HTTP "
+"intern."
 
 #: modules/access/dvb/access.c:162
-#, fuzzy
 msgid "HTTP ACL"
-msgstr "HTTP"
+msgstr "HTTP ACL"
 
 #: modules/access/dvb/access.c:164
 msgid ""
@@ -5944,7 +5752,6 @@ msgid "CRL file"
 msgstr "Fitxer de CRL"
 
 #: modules/access/dvb/access.c:180
-#, fuzzy
 msgid "HTTP interface Certificates Revocation List file"
 msgstr "Fitxer de la Llista de Revocació de Certificats de la interfície HTTP"
 
@@ -5957,9 +5764,8 @@ msgid "DVB input with v4l2 support"
 msgstr "Entrada DVB amb suport v4l2"
 
 #: modules/access/dvb/access.c:236
-#, fuzzy
 msgid "HTTP server"
-msgstr "Nom d'usuari de l'HTTP"
+msgstr "Servidor HTTP"
 
 #: modules/access/dvb/access.c:716
 #, fuzzy
@@ -5983,42 +5789,38 @@ msgid "The provided polarization \"%c\" is not valid."
 msgstr ""
 
 #: modules/access/dv.c:70
-#, fuzzy
 msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
 msgstr ""
-"Us permet modificar el valor de captura predeterminat per fluxos UDP. "
+"Us permet modificar el valor de captura predeterminat per fluxos DV. "
 "S'hauria d'especificar en unitats de mil·lisegon."
 
 #: modules/access/dv.c:74
 msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr ""
+msgstr "Entrada de Vídeo Digital  (Firewire/ieee1394)"
 
 #: modules/access/dv.c:75
 msgid "dv"
-msgstr ""
+msgstr "dv"
 
 #: modules/access/dvdnav.c:63 modules/access/dvdread.c:60
 msgid "DVD angle"
 msgstr "Angle del DVD"
 
 #: modules/access/dvdnav.c:65 modules/access/dvdread.c:62
-#, fuzzy
 msgid "Default DVD angle."
 msgstr "Angle del DVD"
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:66
-#, fuzzy
 msgid "Caching value for DVDs. This value should be set in milliseconds."
 msgstr ""
-"Us permet modificar el valor de captura predeterminat per fluxos DVDnav. "
-"S'hauria d'especificar en unitats de mil·lisegon."
+"Us permet modificar el valor de captura predeterminat per a DVDs. S'hauria "
+"d'especificar en unitats de mil·lisegon."
 
 #: modules/access/dvdnav.c:71
 msgid "Start directly in menu"
 msgstr "Inicia directament el menú"
 
 #: modules/access/dvdnav.c:73
-#, fuzzy
 msgid ""
 "Start the DVD directly in the main menu. This will try to skip all the "
 "useless warning introductions."
@@ -6110,7 +5912,6 @@ msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr ""
 
 #: modules/access/fake.c:43
-#, fuzzy
 msgid ""
 "Caching value for fake streams. This value should be set in milliseconds."
 msgstr ""
@@ -6122,15 +5923,13 @@ msgid "Framerate"
 msgstr "Velocitat de fotogrames"
 
 #: modules/access/fake.c:47
-#, fuzzy
 msgid "Number of frames per second (eg. 24, 25, 29.97, 30)."
-msgstr "Defineix el nombre de fotogrames per segon "
+msgstr "Defineix el nombre de fotogrames per segon (ex. 24, 25, 29.97, 30)."
 
 #: modules/access/fake.c:48 modules/stream_out/bridge.c:37
 #: modules/stream_out/mosaic_bridge.c:104
-#, fuzzy
 msgid "ID"
-msgstr "LID"
+msgstr "ID"
 
 #: modules/access/fake.c:50
 msgid ""
@@ -6139,9 +5938,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/fake.c:52
-#, fuzzy
 msgid "Duration in ms"
-msgstr "Duració"
+msgstr "Duració en ms"
 
 #: modules/access/fake.c:54
 msgid ""
@@ -6150,17 +5948,14 @@ msgid ""
 msgstr ""
 
 #: modules/access/fake.c:58 modules/codec/fake.c:75
-#, fuzzy
 msgid "Fake"
-msgstr "TTY fals"
+msgstr "Parany"
 
 #: modules/access/fake.c:59
-#, fuzzy
 msgid "Fake input"
-msgstr "Entrada de l'FTP"
+msgstr "Entrada Falsa"
 
 #: modules/access/file.c:81
-#, fuzzy
 msgid "Caching value for files. This value should be set in milliseconds."
 msgstr ""
 "Us permet modificar el valor de captura predeterminat per fluxos de fitxer. "
@@ -6171,7 +5966,6 @@ msgid "Concatenate with additional files"
 msgstr "Concatena amb fitxers addicionals"
 
 #: modules/access/file.c:85
-#, fuzzy
 msgid ""
 "Play split files as if they were part of a unique file. You need to specify "
 "a comma-separated list of files."
@@ -6180,9 +5974,8 @@ msgstr ""
 "Especifica una llista de fitxers separats per comes."
 
 #: modules/access/file.c:89
-#, fuzzy
 msgid "File input"
-msgstr "Entrada de l'FTP"
+msgstr "Entrada d'arxiu"
 
 #: modules/access/file.c:90 modules/access_output/file.c:69
 #: modules/audio_output/file.c:109 modules/gui/beos/InterfaceWindow.cpp:262
@@ -6237,12 +6030,10 @@ msgid ""
 msgstr ""
 
 #: modules/access_filter/record.c:45
-#, fuzzy
 msgid "Record directory"
-msgstr "Directori font"
+msgstr "Directori de Gravació"
 
 #: modules/access_filter/record.c:47
-#, fuzzy
 msgid "Directory where the record will be stored."
 msgstr ""
 "Us permet especificar el directori on les instantànies del vídeo seran "
@@ -6259,9 +6050,8 @@ msgid "Recording done"
 msgstr "Ràtio d'enregistrament"
 
 #: modules/access_filter/timeshift.c:46
-#, fuzzy
 msgid "Timeshift granularity"
-msgstr "Hora"
+msgstr "Granularitat de l'Hora"
 
 #: modules/access_filter/timeshift.c:48
 #, fuzzy
@@ -6272,13 +6062,13 @@ msgstr ""
 "Els filtres de vídeo s'utilitzen pel post-processament del flux de vídeo"
 
 #: modules/access_filter/timeshift.c:50
-#, fuzzy
 msgid "Timeshift directory"
 msgstr "Directori de la instantània del vídeo"
 
 #: modules/access_filter/timeshift.c:51
 msgid "Directory used to store the timeshift temporary files."
 msgstr ""
+"Directori utilitzat per guardar els arxius temporals de càlcul de temps."
 
 #: modules/access_filter/timeshift.c:53
 msgid "Force use of the timeshift module"
@@ -6291,12 +6081,10 @@ msgid ""
 msgstr ""
 
 #: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
-#, fuzzy
 msgid "Timeshift"
 msgstr "Hora"
 
 #: modules/access/ftp.c:56
-#, fuzzy
 msgid ""
 "Caching value for FTP streams. This value should be set in milliseconds."
 msgstr ""
@@ -6308,7 +6096,6 @@ msgid "FTP user name"
 msgstr "Nom d'usuari de l'FTP"
 
 #: modules/access/ftp.c:59 modules/access/smb.c:66
-#, fuzzy
 msgid "User name that will be used for the connection."
 msgstr ""
 "Us permet modificar el nom d'usuari que serà utilitzat per la connexió."
@@ -6318,7 +6105,6 @@ msgid "FTP password"
 msgstr "Contrasenya de l'FTP"
 
 #: modules/access/ftp.c:62 modules/access/smb.c:69
-#, fuzzy
 msgid "Password that will be used for the connection."
 msgstr ""
 "Us permet modificar la contrasenya que serà utilitzada per la connexió."
@@ -6328,7 +6114,6 @@ msgid "FTP account"
 msgstr "Compte de l'FTP"
 
 #: modules/access/ftp.c:65
-#, fuzzy
 msgid "Account that will be used for the connection."
 msgstr "Us permet modificar el compte que serà utilitzat per la connexió."
 
@@ -6368,24 +6153,21 @@ msgid "Your connection attemp to the server was rejected."
 msgstr ""
 
 #: modules/access/gnomevfs.c:47
-#, fuzzy
 msgid ""
 "Caching value for GnomeVFS streams.This value should be set in milliseconds."
 msgstr ""
-"Us permet modificar el valor de captura predeterminat per fluxos FTP. "
+"Us permet modificar el valor de captura predeterminat per fluxos GnomeVFS. "
 "S'hauria d'especificar en unitats de mil·lisegon."
 
 #: modules/access/gnomevfs.c:51
-#, fuzzy
 msgid "GnomeVFS input"
-msgstr "No hi ha cap entrada."
+msgstr "Entrada de GnomeVFS."
 
 #: modules/access/http.c:50
 msgid "HTTP proxy"
 msgstr "Proxy HTTP"
 
 #: modules/access/http.c:52
-#, fuzzy
 msgid ""
 "HTTP proxy to be usesd It must be of the form http://[user[:pass]@]myproxy."
 "mydomain:myport/ ; if empty, the http_proxy environment variable will be "
@@ -6396,11 +6178,10 @@ msgstr ""
 "d'entorn  HTTP_PROXY."
 
 #: modules/access/http.c:58
-#, fuzzy
 msgid ""
 "Caching value for HTTP streams. This value should be set in milliseconds."
 msgstr ""
-"Us permet modificar el valor de captura predeterminat per fluxos TCP. "
+"Us permet modificar el valor de captura predeterminat per fluxos HTTP. "
 "S'hauria d'especificar en unitats de mil·lisegon."
 
 #: modules/access/http.c:61
@@ -6408,7 +6189,6 @@ msgid "HTTP user agent"
 msgstr "Agent usuari de l'HTTP"
 
 #: modules/access/http.c:62
-#, fuzzy
 msgid "User agent that will be used for the connection."
 msgstr "Us permet modificar l'agent usuari que serà utilitzat per la connexió."
 
@@ -6417,7 +6197,6 @@ msgid "Auto re-connect"
 msgstr "Auto re-connexió"
 
 #: modules/access/http.c:67
-#, fuzzy
 msgid ""
 "Automatically try to reconnect to the stream in case of a sudden disconnect."
 msgstr ""
@@ -6442,9 +6221,8 @@ msgid "HTTP input"
 msgstr "Entrada de l'HTTP"
 
 #: modules/access/http.c:80
-#, fuzzy
 msgid "HTTP(S)"
-msgstr "HTTP"
+msgstr "HTTP(S)"
 
 #: modules/access/http.c:297
 msgid "HTTP authentication"
@@ -6455,7 +6233,6 @@ msgid "Please enter a valid login name and a password."
 msgstr ""
 
 #: modules/access/mms/mms.c:48
-#, fuzzy
 msgid ""
 "Caching value for MMS streams. This value should be set in milliseconds."
 msgstr ""
@@ -6473,14 +6250,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/mms/mms.c:56
-#, fuzzy
 msgid "Maximum bitrate"
-msgstr "Màxima velocitat de bit de la codificació "
+msgstr "Màxima taxa de bits (bitrate)"
 
 #: modules/access/mms/mms.c:58
-#, fuzzy
 msgid "Select the stream with the maximum bitrate under that limit."
-msgstr "Selecciona sempre el flux amb la màxima taxa de bits"
+msgstr "Selecciona sempre el flux amb la màxima taxa de bits permsa."
 
 #: modules/access/mms/mms.c:62
 msgid "Microsoft Media Server (MMS) input"
@@ -6511,9 +6286,9 @@ msgid "Username"
 msgstr "Nom d'usuari"
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "User name that will be requested to access the stream."
-msgstr "Us permet donar un nom d'usuari que serà preguntat al accedir al flux."
+msgstr ""
+"Us permet donar un nom d'usuari/a que serà preguntat al accedir al flux."
 
 #: modules/access_output/http.c:63 modules/control/telnet.c:79
 #: modules/control/telnet.c:270 modules/misc/audioscrobbler.c:120
@@ -6521,7 +6296,6 @@ msgid "Password"
 msgstr "Contrasenya"
 
 #: modules/access_output/http.c:64
-#, fuzzy
 msgid "Password that will be requested to access the stream."
 msgstr "Us permet donar una contrasenya que serà preguntat al accedir al flux."
 
@@ -6531,14 +6305,13 @@ msgstr "MIME"
 
 #: modules/access_output/http.c:69
 msgid "MIME returned by the server (autodetected if not specified."
-msgstr ""
+msgstr "MIME retornat pel servidor (autodetecció si no s'especifica res)"
 
 #: modules/access_output/http.c:73
-#, fuzzy
 msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
 msgstr ""
-"Camí al arxiu certificat x509 PEM que s'utilitzarà per la sortida de flux "
-"HTTP/SSL"
+"Ruta al arxiu certificat x509 PEM que s'utilitzarà per la sortida de flux "
+"HTTPS."
 
 #: modules/access_output/http.c:76
 #, fuzzy
@@ -6560,7 +6333,6 @@ msgstr ""
 "buit si no en teniu un."
 
 #: modules/access_output/http.c:85
-#, fuzzy
 msgid ""
 "Path to the x509 PEM Certificates Revocation List file that will be used for "
 "SSL. Leave empty if you don't have one."
@@ -6574,34 +6346,31 @@ msgstr "Anuncia't amb Bonjour"
 
 #: modules/access_output/http.c:89
 msgid "Advertise the stream with the Bonjour protocol."
-msgstr ""
+msgstr "Anuncia el flux amb el protocol Bonjour."
 
 #: modules/access_output/http.c:93
 msgid "HTTP stream output"
 msgstr "Sortida de flux de HTTP"
 
 #: modules/access_output/shout.c:59
-#, fuzzy
 msgid "Stream name"
-msgstr "Corrent de dades"
+msgstr "Nom del Flux"
 
 #: modules/access_output/shout.c:60
 msgid "Name to give to this stream/channel on the shoutcast/icecast server."
 msgstr ""
 
 #: modules/access_output/shout.c:63
-#, fuzzy
 msgid "Stream description"
-msgstr "Descripció de la sessió"
+msgstr "Descripció del flux"
 
 #: modules/access_output/shout.c:64
 msgid "Description of the stream content or information about your channel."
-msgstr ""
+msgstr "Descripció del contingut del flux o informació sobre el teu canal."
 
 #: modules/access_output/shout.c:67
-#, fuzzy
 msgid "Stream MP3"
-msgstr "Corrent de dades"
+msgstr "Flux MP3"
 
 #: modules/access_output/shout.c:68
 msgid ""
@@ -6674,9 +6443,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/shout.c:106
-#, fuzzy
 msgid "IceCAST output"
-msgstr "Sortida d'accés"
+msgstr "Sortida IceCAST"
 
 #: modules/access_output/udp.c:76 modules/access/rtsp/access.c:41
 #: modules/demux/live555.cpp:64
@@ -6684,7 +6452,6 @@ msgid "Caching value (ms)"
 msgstr "Valor de captura (ms)"
 
 #: modules/access_output/udp.c:78
-#, fuzzy
 msgid ""
 "Default caching value for outbound UDP streams. This value should be set in "
 "milliseconds."
@@ -6697,7 +6464,6 @@ msgid "Group packets"
 msgstr "Agrupa paquets"
 
 #: modules/access_output/udp.c:82
-#, fuzzy
 msgid ""
 "Packets can be sent one by one at the right time or by groups. You can "
 "choose the number of packets that will be sent at a time. It helps reducing "
@@ -6712,7 +6478,6 @@ msgid "Raw write"
 msgstr "Escriure en el format Raw"
 
 #: modules/access_output/udp.c:88
-#, fuzzy
 msgid ""
 "Packets will be sent directly, without trying to fill the MTU (ie, without "
 "trying to make the biggest possible packets in order to improve streaming)."
@@ -6726,12 +6491,11 @@ msgid "UDP stream output"
 msgstr "Flux de sortida UDP"
 
 #: modules/access/pvr.c:49
-#, fuzzy
 msgid ""
 "Default caching value for PVR streams. This value should be set in "
 "milliseconds."
 msgstr ""
-"Us permet modificar el valor de captura predeterminat per fluxos UDP. "
+"Us permet modificar el valor de captura predeterminat per fluxos PVR. "
 "S'hauria d'especificar en unitats de mil·lisegon."
 
 #: modules/access/pvr.c:52
@@ -6743,21 +6507,18 @@ msgid "PVR video device"
 msgstr "Dispositiu de vídeo PVR"
 
 #: modules/access/pvr.c:55
-#, fuzzy
 msgid "Radio device"
-msgstr "Dispositiu d'àudio"
+msgstr "Dispositiu de ràdio"
 
 #: modules/access/pvr.c:56
-#, fuzzy
 msgid "PVR radio device"
-msgstr "Dispositiu de vídeo PVR"
+msgstr "Dispositiu de ràdio PVR"
 
 #: modules/access/pvr.c:58 modules/access/v4l.c:99
 msgid "Norm"
 msgstr "Norma"
 
 #: modules/access/pvr.c:59 modules/access/v4l.c:101
-#, fuzzy
 msgid "Norm of the stream (Automatic, SECAM, PAL, or NTSC)."
 msgstr "Defineix la norma del flux (Automàtic, SECAM, PAL, or NTSC)"
 
@@ -6767,7 +6528,6 @@ msgid "Width"
 msgstr "Amplada"
 
 #: modules/access/pvr.c:63
-#, fuzzy
 msgid "Width of the stream to capture (-1 for autodetection)."
 msgstr "Amplada del flux de captura (-1 per autodetectar)"
 
@@ -6777,7 +6537,6 @@ msgid "Height"
 msgstr "Alçada"
 
 #: modules/access/pvr.c:67
-#, fuzzy
 msgid "Height of the stream to capture (-1 for autodetection)."
 msgstr "Alçada del flux de captura (-1 per autodetectar)"
 
@@ -6786,12 +6545,10 @@ msgid "Frequency"
 msgstr "Freqüència"
 
 #: modules/access/pvr.c:71 modules/access/v4l.c:94
-#, fuzzy
 msgid "Frequency to capture (in kHz), if applicable."
 msgstr "Freqüència a capturar (en kHz), si és aplicable"
 
 #: modules/access/pvr.c:74 modules/access/v4l.c:140
-#, fuzzy
 msgid "Framerate to capture, if applicable (-1 for autodetect)."
 msgstr "Velocitat de fotogrames a capturar, si és aplicable (-1 per automàtic)"
 
@@ -6800,7 +6557,6 @@ msgid "Key interval"
 msgstr "Interval de la tecla"
 
 #: modules/access/pvr.c:78
-#, fuzzy
 msgid "Interval between keyframes (-1 for autodetect)."
 msgstr "Interval entre fotogrames clau (-1 per automàtic)"
 
@@ -6817,35 +6573,30 @@ msgstr ""
 "per especificar el nombre de Fotogrames-B."
 
 #: modules/access/pvr.c:85
-#, fuzzy
 msgid "Bitrate to use (-1 for default)."
-msgstr "Velocitat de bit a utilitzar (Per defecte -1)"
+msgstr "Taxa de bits a utilitzar (Per defecte -1)"
 
 #: modules/access/pvr.c:87
 msgid "Bitrate peak"
 msgstr "Pic de la velocitat de bit"
 
 #: modules/access/pvr.c:88
-#, fuzzy
 msgid "Peak bitrate in VBR mode."
 msgstr "Pic de la taxa de bits en el mode VBR"
 
 #: modules/access/pvr.c:91
-#, fuzzy
 msgid "Bitrate mode)"
-msgstr "Mode de la velocitat de bit a utilitzar"
+msgstr "Mode de la taxa de bits)"
 
 #: modules/access/pvr.c:92
-#, fuzzy
 msgid "Bitrate mode to use (VBR or CBR)."
-msgstr "Mode de la velocitat de bit a utilitzar"
+msgstr "Mode de la taxa de bits a utilitzar (VBR o CBR)."
 
 #: modules/access/pvr.c:94
 msgid "Audio bitmask"
 msgstr "Màscara de bits de l’àudio"
 
 #: modules/access/pvr.c:95
-#, fuzzy
 msgid "Bitmask that will get used by the audio part of the card."
 msgstr ""
 "Aquesta opció permet indicar la màscara de bits que utilitzarà la part "
@@ -6900,12 +6651,10 @@ msgid "PVR"
 msgstr "PVR"
 
 #: modules/access/pvr.c:117
-#, fuzzy
 msgid "IVTV MPEG Encoding cards input"
-msgstr "Entrada de les targetes Codificadores MPEG (amb controladors ivtv)"
+msgstr "Entrada de les targetes Codificadores MPEG (amb controladors IVTV)"
 
 #: modules/access/rtsp/access.c:43
-#, fuzzy
 msgid ""
 "Caching value for RTSP streams. This value should be set in milliseconds."
 msgstr ""
@@ -6913,9 +6662,8 @@ msgstr ""
 "RTSP. Aquest valor ha d'estar en unitats de mil·lisegon."
 
 #: modules/access/rtsp/access.c:47 modules/access/rtsp/access.c:48
-#, fuzzy
 msgid "Real RTSP"
-msgstr "RTSP"
+msgstr "Real RTSP"
 
 #: modules/access/rtsp/access.c:93
 #, fuzzy
@@ -6937,7 +6685,6 @@ msgid "The requested RTSP session could not be established."
 msgstr ""
 
 #: modules/access/screen/screen.c:38
-#, fuzzy
 msgid ""
 "Caching value for screen capture. This value should be set in milliseconds."
 msgstr ""
@@ -6945,7 +6692,6 @@ msgstr ""
 "de pantalla. S'hauria d'especificar en unitats de mil·lisegon."
 
 #: modules/access/screen/screen.c:42
-#, fuzzy
 msgid "Desired frame rate for the capture."
 msgstr ""
 "Us permet especificar la velocitat de fotogrames desitjada per la captura."
@@ -6955,7 +6701,6 @@ msgid "Capture fragment size"
 msgstr "Captura la mida del fragment"
 
 #: modules/access/screen/screen.c:47
-#, fuzzy
 msgid ""
 "Optimize the capture by fragmenting the screen in chunks of predefined "
 "height (16 might be a good value, and 0 means disabled)."
@@ -6972,7 +6717,6 @@ msgid "Screen"
 msgstr "Pantalla"
 
 #: modules/access/smb.c:63
-#, fuzzy
 msgid ""
 "Caching value for SMB streams. This value should be set in milliseconds."
 msgstr ""
@@ -6992,7 +6736,6 @@ msgid "SMB domain"
 msgstr "Domini SMB"
 
 #: modules/access/smb.c:72
-#, fuzzy
 msgid "Domain/Workgroup that will be used for the connection."
 msgstr ""
 "Us permet modificar el domini/grup de treball que serà utilitzat per la "
@@ -7003,7 +6746,6 @@ msgid "SMB input"
 msgstr "Entrada de SMB"
 
 #: modules/access/tcp.c:39
-#, fuzzy
 msgid ""
 "Caching value for TCP streams. This value should be set in milliseconds."
 msgstr ""
@@ -7019,7 +6761,6 @@ msgid "TCP input"
 msgstr "Entrada del TCP"
 
 #: modules/access/udp.c:43
-#, fuzzy
 msgid ""
 "Caching value for UDP streams. This value should be set in milliseconds."
 msgstr ""
@@ -7037,9 +6778,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/udp.c:51
-#, fuzzy
 msgid "RTP reordering timeout in ms"
-msgstr "Temps d'espera de la connexió TCP en ms."
+msgstr "Temps d'espera de la reconnexió d'RTP en ms."
 
 #: modules/access/udp.c:53
 #, fuzzy
@@ -7092,7 +6832,6 @@ msgid "Video4Linux2 input"
 msgstr "Entrada Video4Linux"
 
 #: modules/access/v4l.c:78
-#, fuzzy
 msgid ""
 "Caching value for V4L captures. This value should be set in milliseconds."
 msgstr ""
@@ -7100,7 +6839,6 @@ msgstr ""
 "S'hauria d'especificar en unitats de mil·lisegon."
 
 #: modules/access/v4l.c:82
-#, fuzzy
 msgid ""
 "Name of the video device to use. If you don't specify anything, no video "
 "device will be used."
@@ -7109,7 +6847,6 @@ msgstr ""
 "especifiqueu res, utilitzarà el dispositiu per defecte."
 
 #: modules/access/v4l.c:86
-#, fuzzy
 msgid ""
 "Name of the audio device to use. If you don't specify anything, no audio "
 "device will be used."
@@ -7126,7 +6863,6 @@ msgstr ""
 "específic (ex. l420 (per defecte), RV24, etc.)"
 
 #: modules/access/v4l.c:97
-#, fuzzy
 msgid ""
 "Channel of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
 msgstr ""
@@ -7138,19 +6874,16 @@ msgid "Audio Channel"
 msgstr "Canal d'àudio"
 
 #: modules/access/v4l.c:104
-#, fuzzy
 msgid "Audio Channel to use, if there are several audio inputs."
-msgstr "Canal d'àudio a utilitzar, si hi ha vàries entrades d'àudio. "
+msgstr "Canal d'àudio a utilitzar, si hi ha vàries entrades d'àudio."
 
 #: modules/access/v4l.c:106
-#, fuzzy
 msgid "Width of the stream to capture (-1 for autodetect)."
 msgstr "Amplada del flux de captura (-1 per autodetectar)"
 
 #: modules/access/v4l.c:109
-#, fuzzy
 msgid "Height of the stream to capture (-1 for autodetect)."
-msgstr "Alçada del flux de captura (-1 per autodetectar)"
+msgstr "Alçada del flux a capturar (-1 per autodetectar)"
 
 #: modules/access/v4l.c:111 modules/gui/macosx/extended.m:113
 #: modules/gui/wxwidgets/extrapanel.cpp:234
@@ -7158,9 +6891,8 @@ msgid "Brightness"
 msgstr "Brillantor"
 
 #: modules/access/v4l.c:113
-#, fuzzy
 msgid "Brightness of the video input."
-msgstr "Especifica la brillantor de l'entrada de vídeo. "
+msgstr "Especifica la brillantor de l'entrada de vídeo."
 
 #: modules/access/v4l.c:114 modules/gui/macosx/extended.m:116
 #: modules/gui/wxwidgets/extrapanel.cpp:224
@@ -7168,21 +6900,18 @@ msgid "Hue"
 msgstr "Matís"
 
 #: modules/access/v4l.c:116
-#, fuzzy
 msgid "Hue of the video input."
-msgstr "Especifica el matís de l'entrada de vídeo. "
+msgstr "Especifica el matís de l'entrada de vídeo."
 
 #: modules/access/v4l.c:117 modules/misc/notify/xosd.c:80
 #: modules/video_filter/colorthres.c:49 modules/video_filter/marq.c:112
 #: modules/video_filter/rss.c:146
-#, fuzzy
 msgid "Color"
 msgstr "Color"
 
 #: modules/access/v4l.c:119
-#, fuzzy
 msgid "Color of the video input."
-msgstr "Especifica el color de l'entrada de vídeo. "
+msgstr "Especifica el color de l'entrada de vídeo."
 
 #: modules/access/v4l.c:120 modules/gui/macosx/extended.m:114
 #: modules/gui/wxwidgets/extrapanel.cpp:229
@@ -7190,29 +6919,27 @@ msgid "Contrast"
 msgstr "Contrast"
 
 #: modules/access/v4l.c:122
-#, fuzzy
 msgid "Contrast of the video input."
-msgstr "Especifica el contrast de l'entrada de vídeo. "
+msgstr "Especifica el contrast de l'entrada de vídeo."
 
 #: modules/access/v4l.c:123
 msgid "Tuner"
 msgstr "Sintonitzador"
 
 #: modules/access/v4l.c:124
-#, fuzzy
 msgid "Tuner to use, if there are several ones."
 msgstr "Sintonitzador a utilitzar, si hi ha varis."
 
 #: modules/access/v4l.c:127
-#, fuzzy
 msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100)"
-msgstr "Velocitat de mostra de les captures del flux d'àudio, en Hz"
+msgstr ""
+"Velocitat de mostra de les captures del flux d'àudio, en Hz (ex:11025, "
+"22050, 44100)"
 
 #: modules/access/v4l.c:130
-#, fuzzy
 msgid "Capture the audio stream in stereo."
-msgstr "Velocitat de mostra de les captures del flux d'àudio, en Hz"
+msgstr "Captura el flux de so en estèreo."
 
 #: modules/access/v4l.c:131
 msgid "MJPEG"
@@ -7228,18 +6955,16 @@ msgid "Decimation"
 msgstr "Delmat"
 
 #: modules/access/v4l.c:136
-#, fuzzy
 msgid "Decimation level for MJPEG streams"
-msgstr "Especifica el nivell de Delmat per fluxos MJPEG"
+msgstr "Especifica el nivell de Decimalització per fluxos MJPEG"
 
 #: modules/access/v4l.c:137
 msgid "Quality"
 msgstr "Qualitat"
 
 #: modules/access/v4l.c:138
-#, fuzzy
 msgid "Quality of the stream."
-msgstr "Defineix la qualitat del flux"
+msgstr "Defineix la qualitat del flux."
 
 #: modules/access/v4l.c:149
 msgid "Video4Linux"
@@ -7296,7 +7021,6 @@ msgid "Segment"
 msgstr "Segment"
 
 #: modules/access/vcdx/access.c:533
-#, fuzzy
 msgid "LID"
 msgstr "LID"
 
@@ -7425,35 +7149,30 @@ msgid "Show extended VCD info?"
 msgstr "Voleu mostrar la informació de VCD ampliada?"
 
 #: modules/access/vcdx/vcd.c:130
-#, fuzzy
 msgid ""
 "Show the maximum amount of information under Stream and Media Info. Shows "
 "for example playback control navigation."
 msgstr ""
 "Mostra el màxim sobre la informació del medi i el flux. Mostra per exemple "
-"la navegació del control de playback."
+"la navegació del control de reproducció."
 
 #: modules/access/vcdx/vcd.c:137
-#, fuzzy
 msgid "Format to use in the playlist's \"author\" field."
-msgstr "Format a utilitzar a la llista de reproducció \"autor\""
+msgstr "Format a utilitzar a la llista de reproducció al camp \"autor\""
 
 #: modules/access/vcdx/vcd.c:143
-#, fuzzy
 msgid "Format to use in the playlist's \"title\" field."
 msgstr "Format a utilitzar a la llista de reproducció del camp  \"títol\""
 
 #: modules/audio_filter/channel_mixer/dolby.c:46
 msgid "Simple decoder for Dolby Surround encoded streams"
-msgstr ""
+msgstr "El codificador simple per a dolby sorrund codificava fluxos"
 
 #: modules/audio_filter/channel_mixer/dolby.c:47
-#, fuzzy
 msgid "Dolby Surround decoder"
-msgstr "Dolby Surround"
+msgstr "Decodificador Dolby Surround"
 
 #: modules/audio_filter/channel_mixer/headphone.c:55
-#, fuzzy
 msgid ""
 "This effect gives you the feeling that you are standing in a room with a "
 "complete 7.1 speaker set when using only a headphone, providing a more "
@@ -7462,10 +7181,10 @@ msgid ""
 "It works with any source format from mono to 7.1."
 msgstr ""
 "Aquest efecte us dona la sensació que us trobeu en una habitació amb un "
-"complet conjunt d'altaveus 5.1 utilitzant només uns auriculars, produint una "
+"complet conjunt d'altaveus 7.1 utilitzant només uns auriculars, produint una "
 "experiència més real. Ha de ser més confortable i menys cansat quan "
 "s'escolta música durant un llarg període.\n"
-"Funciona amb qualsevol format de font, des de mono a 5.1."
+"Funciona amb qualsevol format de font, des de mono a 7.1."
 
 #: modules/audio_filter/channel_mixer/headphone.c:62
 msgid "Characteristic dimension"
@@ -7487,9 +7206,8 @@ msgid ""
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/headphone.c:72
-#, fuzzy
 msgid "No decoding of Dolby Surround"
-msgstr "Imposa la selecció de tots els corrents de dades"
+msgstr "No descodificació de Dolby Surround"
 
 #: modules/audio_filter/channel_mixer/headphone.c:74
 msgid ""
@@ -7499,7 +7217,6 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/headphone.c:78
 #: modules/audio_filter/channel_mixer/headphone.c:97
-#, fuzzy
 msgid "Headphone virtual spatialization effect"
 msgstr "Canal mesclador d'auriculars amb un efecte d'espai virtual."
 
@@ -7549,14 +7266,12 @@ msgid "Audio filter for stereo to mono conversion"
 msgstr "Filtre d’àudio per la conversió de format PCM"
 
 #: modules/audio_filter/channel_mixer/simple.c:45
-#, fuzzy
 msgid "Audio filter for simple channel mixing"
-msgstr "Filtre d'àudio per mescla de canal simple "
+msgstr "Filtre d'àudio per mescla de canal simple"
 
 #: modules/audio_filter/channel_mixer/trivial.c:45
-#, fuzzy
 msgid "Audio filter for trivial channel mixing"
-msgstr "Filtre de vídeo per mescla de canal trivial "
+msgstr "Filtre d'àudio per mescla de canal trivial"
 
 #: modules/audio_filter/converter/a52tofloat32.c:94
 msgid "A/52 dynamic range compression"
@@ -7576,9 +7291,8 @@ msgstr ""
 "adaptat a una sala cinematogràfica o una habitació acústica."
 
 #: modules/audio_filter/converter/a52tofloat32.c:101
-#, fuzzy
 msgid "Enable internal upmixing"
-msgstr "Habilita la codificació entrellaçada"
+msgstr "Habilita la codificació entrellaçada interna"
 
 #: modules/audio_filter/converter/a52tofloat32.c:103
 msgid "Enable the internal upmixing algorithm (not recommended)."
@@ -7655,12 +7369,10 @@ msgid "Global gain"
 msgstr "Guany global"
 
 #: modules/audio_filter/equalizer.c:66
-#, fuzzy
 msgid "Set the global gain in dB (-20 ... 20)."
 msgstr "Indica el guany global en dB (-20 ... 20)"
 
 #: modules/audio_filter/equalizer.c:69
-#, fuzzy
 msgid "Equalizer with 10 bands"
 msgstr "Equalitzador de 10 bandes"
 
@@ -7744,7 +7456,6 @@ msgid "Techno"
 msgstr "Techno"
 
 #: modules/audio_filter/format.c:202
-#, fuzzy
 msgid "Audio filter for PCM format conversion"
 msgstr "Filtre d’àudio per la conversió de format PCM"
 
@@ -7753,7 +7464,6 @@ msgid "Number of audio buffers"
 msgstr "Nombre de buffers d'àudio"
 
 #: modules/audio_filter/normvol.c:69
-#, fuzzy
 msgid ""
 "This is the number of audio buffers on which the power measurement is made. "
 "A higher number of buffers will increase the response time of the filter to "
@@ -7782,9 +7492,8 @@ msgid "Volume normalizer"
 msgstr "Normalitzador de volum"
 
 #: modules/audio_filter/param_eq.c:47 modules/audio_filter/param_eq.c:48
-#, fuzzy
 msgid "Parametric Equalizer"
-msgstr "Equalitzador"
+msgstr "Equalitzador Paramètric"
 
 #: modules/audio_filter/param_eq.c:53
 msgid "Low freq (Hz)"
@@ -7820,42 +7529,38 @@ msgstr ""
 
 #: modules/audio_filter/param_eq.c:70
 msgid "Freq 2 gain (Db)"
-msgstr ""
+msgstr "Freq 2 guany (Db)"
 
 #: modules/audio_filter/param_eq.c:72
 msgid "Freq 2 Q"
-msgstr ""
+msgstr "Freq 2 Q"
 
 #: modules/audio_filter/param_eq.c:73
 msgid "Freq 3 (Hz)"
-msgstr ""
+msgstr "Freq 3 (Hz)"
 
 #: modules/audio_filter/param_eq.c:76
 msgid "Freq 3 gain (Db)"
-msgstr ""
+msgstr "Freq 3 guany (Db)"
 
 #: modules/audio_filter/param_eq.c:78
 msgid "Freq 3 Q"
-msgstr ""
+msgstr "Freq 3 Q"
 
 #: modules/audio_filter/resampler/bandlimited.c:84
-#, fuzzy
 msgid "Audio filter for band-limited interpolation resampling"
 msgstr "Filtre d’àudio pel remostratge d’interpolació limitat per banda"
 
 #: modules/audio_filter/resampler/linear.c:64
 #: modules/audio_filter/resampler/linear.c:71
-#, fuzzy
 msgid "Audio filter for linear interpolation resampling"
 msgstr "Filtre d’àudio pel remostratge d’interpolació lineal"
 
 #: modules/audio_filter/resampler/trivial.c:45
-#, fuzzy
 msgid "Audio filter for trivial resampling"
 msgstr "Filtre d’àudio pel remostratge trivial"
 
 #: modules/audio_filter/resampler/ugly.c:45
-#, fuzzy
 msgid "Audio filter for ugly resampling"
 msgstr "Filtre d’àudio pel remostratge lleig"
 
@@ -7977,7 +7682,7 @@ msgstr ""
 #: modules/audio_output/auhal.c:1017
 #, c-format
 msgid "%s (Encoded Output)"
-msgstr ""
+msgstr "%s (sortida codificada)"
 
 #: modules/audio_output/directx.c:204 modules/audio_output/portaudio.c:107
 msgid "Output device"
@@ -8014,9 +7719,8 @@ msgid "EsounD audio output"
 msgstr "Sortida d'àudio EsounD"
 
 #: modules/audio_output/esd.c:70
-#, fuzzy
 msgid "Esound server"
-msgstr "Sense servidor"
+msgstr "Servidor Esound"
 
 #: modules/audio_output/file.c:78
 msgid "Output format"
@@ -8031,9 +7735,8 @@ msgstr ""
 "\"s16_be\", \"fixed32\", \"float32\" o \"spdif\""
 
 #: modules/audio_output/file.c:82
-#, fuzzy
 msgid "Number of output channels"
-msgstr "Nombre de clons"
+msgstr "Nombre de canals de sortida"
 
 #: modules/audio_output/file.c:83
 msgid ""
@@ -8044,25 +7747,21 @@ msgstr ""
 "nombre de canals aquí."
 
 #: modules/audio_output/file.c:86
-#, fuzzy
 msgid "Add WAVE header"
-msgstr "Afegeix una capçalera wav"
+msgstr "Afegeix una capçalera WAV"
 
 #: modules/audio_output/file.c:87
-#, fuzzy
 msgid "Instead of writing a raw file, you can add a WAV header to the file."
 msgstr ""
-"En comptes d’escriure un arxiu RAW, podeu afegir una capçalera WAV a "
-"l’arxiu. "
+"En comptes d’escriure un arxiu RAW, podeu afegir una capçalera WAV a l’arxiu."
 
 #: modules/audio_output/file.c:104
 msgid "Output file"
 msgstr "Fitxer de sortida"
 
 #: modules/audio_output/file.c:105
-#, fuzzy
 msgid "File to which the audio samples will be written to."
-msgstr "Arxiu on s'escriuran les mostres d'àudio "
+msgstr "Arxiu on s'escriuran les mostres d'àudio"
 
 #: modules/audio_output/file.c:108
 msgid "File audio output"
@@ -8073,9 +7772,8 @@ msgid "Roku HD1000 audio output"
 msgstr "Sortida d’àudio Roku HD1000"
 
 #: modules/audio_output/jack.c:62
-#, fuzzy
 msgid "JACK audio output"
-msgstr "Sortida d'àudio ALSA"
+msgstr "Sortida d'àudio JACK"
 
 #: modules/audio_output/oss.c:99
 msgid "Try to work around buggy OSS drivers"
@@ -8162,7 +7860,6 @@ msgid "Encoding quality"
 msgstr "Qualitat de la codificació"
 
 #: modules/codec/dirac.c:69
-#, fuzzy
 msgid "Quality of the encoding between 1.0 (low) and 10.0 (high)."
 msgstr "Us permet especificar la qualitat entre 1.0 (baixa) i 10.0 (alta)"
 
@@ -8191,32 +7888,26 @@ msgid "DTS audio packetizer"
 msgstr "Empaquetador d’àudio DTS"
 
 #: modules/codec/dvbsub.c:51
-#, fuzzy
 msgid "Decoding X coordinate"
-msgstr "Coordenada x del vídeo"
+msgstr "Descodificant Coordenada X"
 
 #: modules/codec/dvbsub.c:52
-#, fuzzy
 msgid "X coordinate of the rendered subtitle"
-msgstr "Coordenada X del logotip"
+msgstr "Coordenada X del subtítol renderitzat"
 
 #: modules/codec/dvbsub.c:54
-#, fuzzy
 msgid "Decoding Y coordinate"
-msgstr "Coordenada x del vídeo"
+msgstr "Descodificant Coordenada Y"
 
 #: modules/codec/dvbsub.c:55
-#, fuzzy
 msgid "Y coordinate of the rendered subtitle"
-msgstr "Coordenada X del logotip"
+msgstr "Coordenada Y del subtítol renderitzat"
 
 #: modules/codec/dvbsub.c:57
-#, fuzzy
 msgid "Subpicture position"
-msgstr "Filtre de subimatges"
+msgstr "Posició de Subimatges"
 
 #: modules/codec/dvbsub.c:59
-#, fuzzy
 msgid ""
 "You can enforce the subpicture position on the video (0=center, 1=left, "
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
@@ -8227,24 +7918,20 @@ msgstr ""
 "valors)."
 
 #: modules/codec/dvbsub.c:63
-#, fuzzy
 msgid "Encoding X coordinate"
-msgstr "Coordenada y del vídeo"
+msgstr "Codificant Coordenada X"
 
 #: modules/codec/dvbsub.c:64
-#, fuzzy
 msgid "X coordinate of the encoded subtitle"
-msgstr "Coordenada X del logotip"
+msgstr "Coordenada X del subtítol codificat"
 
 #: modules/codec/dvbsub.c:65
-#, fuzzy
 msgid "Encoding Y coordinate"
-msgstr "Coordenada y del vídeo"
+msgstr "Codificant Coordenada Y"
 
 #: modules/codec/dvbsub.c:66
-#, fuzzy
 msgid "Y coordinate of the encoded subtitle"
-msgstr "Coordenada X del logotip"
+msgstr "Coordenada Y del subtítol codificat"
 
 #: modules/codec/dvbsub.c:86
 msgid "DVB subtitles decoder"
@@ -8263,37 +7950,32 @@ msgid "AAC extension"
 msgstr ""
 
 #: modules/codec/fake.c:45 modules/video_output/image.c:80
-#, fuzzy
 msgid "Image file"
-msgstr "Clon de la imatge"
+msgstr "Arxiu d'imatge"
 
 #: modules/codec/fake.c:47
 msgid "Path of the image file for fake input."
-msgstr ""
+msgstr "Ruta de l'arxiu d'imatge per a l'entrada falsa."
 
 #: modules/codec/fake.c:50 modules/stream_out/mosaic_bridge.c:110
 #: modules/stream_out/transcode.c:75
-#, fuzzy
 msgid "Output video width."
-msgstr "Amplada del vídeo"
+msgstr "Amplada de sortida del vídeo"
 
 #: modules/codec/fake.c:53 modules/stream_out/mosaic_bridge.c:113
 #: modules/stream_out/transcode.c:78
-#, fuzzy
 msgid "Output video height."
-msgstr "Alçada del vídeo"
+msgstr "Alçada del vídeo de sortida."
 
 #: modules/codec/fake.c:54 modules/video_filter/mosaic.c:133
-#, fuzzy
 msgid "Keep aspect ratio"
-msgstr "Relació d'aspecte de la font"
+msgstr "Mantenir la relació d'aspecte"
 
 #: modules/codec/fake.c:56
 msgid "Consider width and height as maximum values."
-msgstr ""
+msgstr "Considera amplada i alçada com a valors màxims."
 
 #: modules/codec/fake.c:57
-#, fuzzy
 msgid "Background aspect ratio"
 msgstr "Relació d'aspecte de la font"
 
@@ -8306,24 +7988,20 @@ msgid "Deinterlace video"
 msgstr "Desentrellaça el vídeo"
 
 #: modules/codec/fake.c:62
-#, fuzzy
 msgid "Deinterlace the image after loading it."
-msgstr "Us permet desentrellaçar el vídeo abans de la codificació."
+msgstr "Us permet desentrellaçar el vídeo després de carregar-lo."
 
 #: modules/codec/fake.c:63 modules/stream_out/transcode.c:70
-#, fuzzy
 msgid "Deinterlace module"
 msgstr "Mode desentrellaçat"
 
 #: modules/codec/fake.c:65
-#, fuzzy
 msgid "Deinterlace module to use."
-msgstr "Mode desentrellaçat"
+msgstr "Mode desentrellaçat a usar."
 
 #: modules/codec/fake.c:76
-#, fuzzy
 msgid "Fake video decoder"
-msgstr "Decodificador de vídeo Cinepak"
+msgstr "Decodificador de vídeo Enganyós"
 
 #: modules/codec/ffmpeg/encoder.c:219
 #, fuzzy, c-format
@@ -8345,19 +8023,16 @@ msgid "VLC could not open the encoder."
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:73
-#, fuzzy
 msgid "Non-ref"
-msgstr "Cap"
+msgstr "Sense Referència"
 
 #: modules/codec/ffmpeg/ffmpeg.c:73
-#, fuzzy
 msgid "Bidir"
-msgstr "Bilineal"
+msgstr "Bidir"
 
 #: modules/codec/ffmpeg/ffmpeg.c:73
-#, fuzzy
 msgid "Non-key"
-msgstr "Cap"
+msgstr "Sense clau"
 
 #: modules/codec/ffmpeg/ffmpeg.c:73
 msgid "All"
@@ -8420,14 +8095,13 @@ msgid "Bicubic spline"
 msgstr "Spline bicúbic"
 
 #: modules/codec/ffmpeg/ffmpeg.c:95
-#, fuzzy
 msgid ""
 "AltiVec FFmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 msgstr ""
-"Descodificador d’àudio/vídeo ffmpeg AltiVec ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
+"Descodificador/Codificador d’àudio/vídeo ffmpeg AltiVec ((MS)MPEG4,SVQ1,H263,"
+"WMV,WMA)"
 
 #: modules/codec/ffmpeg/ffmpeg.c:99
-#, fuzzy
 msgid "FFmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 msgstr "Descodificador d’àudio/vídeo ffmpeg ((MS)MPEG4,SVQ1,H263,WMV,WMA)"
 
@@ -8441,12 +8115,10 @@ msgid "Encoding"
 msgstr "S’està codificant..."
 
 #: modules/codec/ffmpeg/ffmpeg.c:130
-#, fuzzy
 msgid "FFmpeg audio/video encoder"
 msgstr "Codificador d’àudio/vídeo ffmpeg"
 
 #: modules/codec/ffmpeg/ffmpeg.c:188
-#, fuzzy
 msgid "FFmpeg demuxer"
 msgstr "Demultiplexor ffmpeg"
 
@@ -8460,22 +8132,18 @@ msgid "Video scaling filter"
 msgstr "Filtre d'escalat de vídeo"
 
 #: modules/codec/ffmpeg/ffmpeg.c:213
-#, fuzzy
 msgid "FFmpeg chroma conversion"
 msgstr "Conversió d'intensitat cromàtica ffmpeg"
 
 #: modules/codec/ffmpeg/ffmpeg.c:219
-#, fuzzy
 msgid "FFmpeg video filter"
 msgstr "Filtre de vídeo ffmpeg"
 
 #: modules/codec/ffmpeg/ffmpeg.c:225
-#, fuzzy
 msgid "FFmpeg crop padd filter"
-msgstr "Filtre de vídeo ffmpeg"
+msgstr "Filtre de vídeo ffmpeg per a talls padd"
 
 #: modules/codec/ffmpeg/ffmpeg.c:231
-#, fuzzy
 msgid "FFmpeg deinterlace video filter"
 msgstr "Filtre de vídeo desentrellaçat ffmpeg"
 
@@ -8488,7 +8156,6 @@ msgid "Error resilience"
 msgstr "Error de resiliència"
 
 #: modules/codec/ffmpeg/ffmpeg.h:93
-#, fuzzy
 msgid ""
 "Ffmpeg can do error resilience.\n"
 "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) this "
@@ -8505,7 +8172,6 @@ msgid "Workaround bugs"
 msgstr "Solució temporal d’errors"
 
 #: modules/codec/ffmpeg/ffmpeg.h:100
-#, fuzzy
 msgid ""
 "Try to fix some bugs:\n"
 "1  autodetect\n"
@@ -8533,7 +8199,6 @@ msgid "Hurry up"
 msgstr "De pressa"
 
 #: modules/codec/ffmpeg/ffmpeg.h:113
-#, fuzzy
 msgid ""
 "The decoder can partially decode or skip frame(s) when there is not enough "
 "time. It's useful with low CPU power but it can produce distorted pictures."
@@ -8569,7 +8234,6 @@ msgid "Visualize motion vectors"
 msgstr "Visualitza els vectors de moviment"
 
 #: modules/codec/ffmpeg/ffmpeg.h:129
-#, fuzzy
 msgid ""
 "You can overlay the motion vectors (arrows showing how the images move) on "
 "the image. This value is a mask, based on these values:\n"
@@ -8581,18 +8245,20 @@ msgstr ""
 "Defineix la màscara de visualització de vectors de moviment.\n"
 "1 - visualitza els MVs pronosticats endavant de fotogrames-P\n"
 "2 – visualitza els MVs pronosticats endavant de fotogrames-B\n"
-"4 – visualitza els MVs pronosticats endarrere de fotogrames-B"
+"4 – visualitza els MVs pronosticats endarrere de fotogrames-B\n"
+"Per a veure tots els vectors, el valor seria 7."
 
 #: modules/codec/ffmpeg/ffmpeg.h:136
 msgid "Low resolution decoding"
 msgstr "Descodificació de resolució baixa"
 
 #: modules/codec/ffmpeg/ffmpeg.h:137
-#, fuzzy
 msgid ""
 "Only decode a low resolution version of the video. This requires less "
 "processing power"
-msgstr "Descodificarà només una versió del vídeo de resolució baixa ."
+msgstr ""
+"Descodificarà només una versió del vídeo de resolució baixa .Necessita menys "
+"poder de processament."
 
 #: modules/codec/ffmpeg/ffmpeg.h:140
 msgid "Skip the loop filter for H.264 decoding"
@@ -8605,7 +8271,6 @@ msgid ""
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:145
-#, fuzzy
 msgid "FFmpeg post processing filter chains"
 msgstr "Cadenes de filtre de post-processament de ffmpeg"
 
@@ -8659,7 +8324,6 @@ msgid "Ratio of key frames"
 msgstr "Ràtio de fotogrames claus"
 
 #: modules/codec/ffmpeg/ffmpeg.h:188
-#, fuzzy
 msgid "Number of frames that will be coded for one key frame."
 msgstr ""
 "Us permet especificar el nombre de fotogrames que seran codificats per un "
@@ -8670,58 +8334,49 @@ msgid "Ratio of B frames"
 msgstr "Ràtio de fotogrames B"
 
 #: modules/codec/ffmpeg/ffmpeg.h:192
-#, fuzzy
 msgid "Number of B frames that will be coded between two reference frames."
 msgstr ""
 "Us permet especificar el nombre de fotogrames-B que seran codificats entre "
-"dos fotogrames referència."
+"dos fotogrames de referència."
 
 #: modules/codec/ffmpeg/ffmpeg.h:195
 msgid "Video bitrate tolerance"
 msgstr "Tolerància de la velocitat de bit per vídeo "
 
 #: modules/codec/ffmpeg/ffmpeg.h:196
-#, fuzzy
 msgid "Video bitrate tolerance in kbit/s."
-msgstr "Tolerància de la velocitat de bit per vídeo "
+msgstr "Tolerància de la taxa de bit per vídeo en kbits/s."
 
 #: modules/codec/ffmpeg/ffmpeg.h:198
-#, fuzzy
 msgid "Interlaced encoding"
-msgstr "Habilita la codificació entrellaçada"
+msgstr "Codificació entrellaçada"
 
 #: modules/codec/ffmpeg/ffmpeg.h:199
-#, fuzzy
 msgid "Enable dedicated algorithms for interlaced frames."
-msgstr "Us permet habilitar algoritmes dedicats a fotogrames entrellaçats."
+msgstr "Habilita algoritmes dedicats a fotogrames entrellaçats."
 
 #: modules/codec/ffmpeg/ffmpeg.h:202
-#, fuzzy
 msgid "Interlaced motion estimation"
-msgstr "Habilita l’estimació de pre-moviment"
+msgstr "Habilita l’estimació de moviment entrellaçada"
 
 #: modules/codec/ffmpeg/ffmpeg.h:203
-#, fuzzy
 msgid "Enable interlaced motion estimation algorithms. This requires more CPU."
-msgstr "Us permet habilitar l’estimació de pre-moviment."
+msgstr ""
+"Us permet habilitar l’estimació de pre-moviment.Això requereix més CPU."
 
 #: modules/codec/ffmpeg/ffmpeg.h:206
-#, fuzzy
 msgid "Pre-motion estimation"
 msgstr "Habilita l’estimació de pre-moviment"
 
 #: modules/codec/ffmpeg/ffmpeg.h:207
-#, fuzzy
 msgid "Enable the pre-motion estimation algorithm."
-msgstr "Habilita l’estimació de pre-moviment"
+msgstr "Habilita l’algoritme d'estimació de pre-moviment"
 
 #: modules/codec/ffmpeg/ffmpeg.h:210
-#, fuzzy
 msgid "Strict rate control"
 msgstr "Habilita el control de taxa estricta"
 
 #: modules/codec/ffmpeg/ffmpeg.h:211
-#, fuzzy
 msgid "Enable the strict rate control algorithm."
 msgstr "Us permet habilitar l’algoritme de control de taxa estricta."
 
@@ -8740,7 +8395,6 @@ msgid "Rate control buffer aggressiveness"
 msgstr "Agressivitat de la memòria intermèdia de control de taxa"
 
 #: modules/codec/ffmpeg/ffmpeg.h:220
-#, fuzzy
 msgid "Rate control buffer aggressiveness."
 msgstr "Agressivitat de la memòria intermèdia de control de taxa"
 
@@ -8749,14 +8403,13 @@ msgid "I quantization factor"
 msgstr "Factor de quantificació I "
 
 #: modules/codec/ffmpeg/ffmpeg.h:225
-#, fuzzy
 msgid ""
 "Quantization factor of I frames, compared with P frames (for instance 1.0 => "
 "same qscale for I and P frames)."
 msgstr ""
 "Us permet especificar el factor de quantificació dels fotogrames-I, "
 "comparats amb els fotogrames-P (per exemple, 1.0 => la mateixa escala per "
-"fotogrames I i P) "
+"fotogrames I i P)"
 
 #: modules/codec/ffmpeg/ffmpeg.h:228 modules/codec/x264.c:269
 #: modules/demux/mod.c:73
@@ -8764,7 +8417,6 @@ msgid "Noise reduction"
 msgstr "Reducció del soroll"
 
 #: modules/codec/ffmpeg/ffmpeg.h:229
-#, fuzzy
 msgid ""
 "Enable a simple noise reduction algorithm to lower the encoding length and "
 "bitrate, at the expense of lower quality frames."
@@ -8774,12 +8426,10 @@ msgstr ""
 "de menor qualitat."
 
 #: modules/codec/ffmpeg/ffmpeg.h:233
-#, fuzzy
 msgid "MPEG4 quantization matrix"
 msgstr "Habilita matriu de quantificació MPEG4"
 
 #: modules/codec/ffmpeg/ffmpeg.h:234
-#, fuzzy
 msgid ""
 "Use the MPEG4 quantization matrix for MPEG2 encoding. This generally yields "
 "a better looking picture, while still retaining the compatibility with "
@@ -8788,14 +8438,13 @@ msgstr ""
 "Us permet utilitzar la matriu de quantificació MPEG4 per la codificació del "
 "mpeg2. Generalment, això aporta una imatge de millor aparença, mentre "
 "segueix mantenint la compatibilitat amb els descodificadors de MPEG-2 "
-"estàndards.  "
+"estàndards."
 
 #: modules/codec/ffmpeg/ffmpeg.h:239
 msgid "Quality level"
 msgstr "Nivell de qualitat"
 
 #: modules/codec/ffmpeg/ffmpeg.h:240
-#, fuzzy
 msgid ""
 "Quality level for the encoding of motions vectors (this can slow down the "
 "encoding very much)."
@@ -8804,7 +8453,6 @@ msgstr ""
 "de moviment (pot retardar molt la codificació)"
 
 #: modules/codec/ffmpeg/ffmpeg.h:245
-#, fuzzy
 msgid ""
 "The encoder can make on-the-fly quality tradeoffs if your CPU can't keep up "
 "with the encoding rate. It will disable trellis quantization, then the rate "
@@ -8815,45 +8463,39 @@ msgstr ""
 "moment, si la vostra CPU no pot mantenir la taxa de codificació. "
 "Inhabilitarà la quantificació trellis, la distorsió de la velocitat dels "
 "vectors de moviment (hq), i l'augment del llindar de reducció de soroll per "
-"facilitar les tasques del codificador. "
+"facilitar les tasques del codificador."
 
 #: modules/codec/ffmpeg/ffmpeg.h:251
 msgid "Minimum video quantizer scale"
 msgstr "Escala mínima de quantificació de vídeo "
 
 #: modules/codec/ffmpeg/ffmpeg.h:252
-#, fuzzy
 msgid "Minimum video quantizer scale."
-msgstr "Escala mínima de quantificació de vídeo "
+msgstr "Escala mínima de quantificació de vídeo"
 
 #: modules/codec/ffmpeg/ffmpeg.h:255
 msgid "Maximum video quantizer scale"
 msgstr "Escala màxima de quantificació de vídeo "
 
 #: modules/codec/ffmpeg/ffmpeg.h:256
-#, fuzzy
 msgid "Maximum video quantizer scale."
-msgstr "Escala màxima de quantificació de vídeo "
+msgstr "Escala màxima de quantificació de vídeo"
 
 #: modules/codec/ffmpeg/ffmpeg.h:259
-#, fuzzy
 msgid "Trellis quantization"
-msgstr "Habilita la quantificació trellis "
+msgstr "Habilita la quantificació Trellis"
 
 #: modules/codec/ffmpeg/ffmpeg.h:260
-#, fuzzy
 msgid "Enable trellis quantization (rate distortion for block coefficients)."
 msgstr ""
 "Us permet habilitar la quantificació trellis (taxa de distorsió per "
 "coeficients de bloc)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:263
-#, fuzzy
 msgid "Fixed quantizer scale"
 msgstr "Utilitza una escala fixa de quantificació de vídeo"
 
 #: modules/codec/ffmpeg/ffmpeg.h:264
-#, fuzzy
 msgid ""
 "A fixed video quantizer scale for VBR encoding (accepted values: 0.01 to "
 "255.0)."
@@ -8866,7 +8508,6 @@ msgid "Strict standard compliance"
 msgstr "Compliància estàndard estricta "
 
 #: modules/codec/ffmpeg/ffmpeg.h:268
-#, fuzzy
 msgid ""
 "Force a strict standard compliance when encoding (accepted values: -1, 0, 1)."
 msgstr ""
@@ -8892,9 +8533,8 @@ msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
 msgstr "Us permet reduir la velocitat de l’animació (per defecte 6, màxima 10)"
 
 #: modules/codec/ffmpeg/ffmpeg.h:279
-#, fuzzy
 msgid "Motion masking"
-msgstr "Mapatge d’acció "
+msgstr "Màscara de moviment"
 
 #: modules/codec/ffmpeg/ffmpeg.h:280
 #, fuzzy
@@ -8926,7 +8566,7 @@ msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:292
 msgid "Chrominance elimination"
-msgstr ""
+msgstr "Eliminació del Croma"
 
 #: modules/codec/ffmpeg/ffmpeg.h:293
 msgid ""
@@ -8985,9 +8625,8 @@ msgid "Video decoder using openmash"
 msgstr "Descodificador de vídeo utilitzant openmash"
 
 #: modules/codec/mpeg_audio.c:106
-#, fuzzy
 msgid "MPEG audio layer I/II/III decoder"
-msgstr "Analitzador de capa d'àudio MPEG I/II/III"
+msgstr "Descodificador de capa d'àudio MPEG I/II/III"
 
 #: modules/codec/mpeg_audio.c:117
 msgid "MPEG audio layer I/II/III packetizer"
@@ -9010,14 +8649,12 @@ msgid "Pseudo raw video packetizer"
 msgstr "Empaquetador d'àudio pseudo-raw"
 
 #: modules/codec/realaudio.c:60
-#, fuzzy
 msgid "RealAudio library decoder"
-msgstr "Descodificador de la biblioteca QuikTime"
+msgstr "Descodificador de la biblioteca RealAudio"
 
 #: modules/codec/sdl_image.c:55
-#, fuzzy
 msgid "SDL_image video decoder"
-msgstr "Decodificador de vídeo Dirac"
+msgstr "Descodificador de vídeo SDL_image"
 
 #: modules/codec/speex.c:106
 msgid "Speex audio decoder"
@@ -9064,19 +8701,19 @@ msgid "Set the justification of subtitles"
 msgstr "Defineix la justificació dels subtítols"
 
 #: modules/codec/subsdec.c:135
-#, fuzzy
 msgid "UTF-8 subtitles autodetection"
-msgstr "Camins per l'autodetecció dels subtítols"
+msgstr "Autodetecció dels subtítols UTF-8"
 
 #: modules/codec/subsdec.c:136
 msgid ""
 "This enables automatic detection of UTF-8 encoding within subtitles files."
 msgstr ""
+"Això permet la detecció automàtica de la codificació UTF-8 dins dels arxius "
+"de subtítols."
 
 #: modules/codec/subsdec.c:138
-#, fuzzy
 msgid "Formatted Subtitles"
-msgstr "Subtítol"
+msgstr "Subtítols formatejats"
 
 #: modules/codec/subsdec.c:139
 msgid ""
@@ -9085,7 +8722,6 @@ msgid ""
 msgstr ""
 
 #: modules/codec/subsdec.c:145
-#, fuzzy
 msgid "Text subtitles decoder"
 msgstr "Decodificador del text dels subtítols"
 
@@ -9124,7 +8760,6 @@ msgid "Tarkin decoder module"
 msgstr "Mòdul de descodificació Tarkin"
 
 #: modules/codec/theora.c:92 modules/codec/vorbis.c:158
-#, fuzzy
 msgid ""
 "Enforce a quality between 1 (low) and 10 (high), instead of specifying a "
 "particular bitrate. This will produce a VBR stream."
@@ -9149,7 +8784,6 @@ msgid "Theora comment"
 msgstr "Comentari de Theora"
 
 #: modules/codec/twolame.c:52
-#, fuzzy
 msgid ""
 "Force a specific encoding quality between 0.0 (high) and 50.0 (low), instead "
 "of specifying a particular bitrate. This will produce a VBR stream."
@@ -9163,7 +8797,7 @@ msgstr "Mode Estèreo"
 
 #: modules/codec/twolame.c:56
 msgid "Handling mode for stereo streams"
-msgstr ""
+msgstr "Mode d'agafada per a fluxos en estèreo"
 
 #: modules/codec/twolame.c:57
 msgid "VBR mode"
@@ -9171,53 +8805,48 @@ msgstr "Mode VBR"
 
 #: modules/codec/twolame.c:59
 msgid "Use Variable BitRate. Default is to use Constant BitRate (CBR)."
-msgstr ""
+msgstr "Usa taxa de bits variable.Per defecte s'usa  la constant (CBR)."
 
 #: modules/codec/twolame.c:60
 msgid "Psycho-acoustic model"
-msgstr ""
+msgstr "model psico-acústic"
 
 #: modules/codec/twolame.c:62
 msgid "Integer from -1 (no model) to 4."
-msgstr ""
+msgstr "integrador des de -1 (cap model) a 4."
 
 #: modules/codec/twolame.c:66
-#, fuzzy
 msgid "Dual mono"
-msgstr "mono"
+msgstr "mono Dual"
 
 #: modules/codec/twolame.c:66
-#, fuzzy
 msgid "Joint stereo"
-msgstr "stereo"
+msgstr "Estèreo conjunt"
 
 #: modules/codec/twolame.c:71
-#, fuzzy
 msgid "Libtwolame audio encoder"
-msgstr "Codificador d’àudio libtoolame"
+msgstr "Codificador d’àudio Libtwolame"
 
 #: modules/codec/vorbis.c:160
 msgid "Maximum encoding bitrate"
 msgstr "Màxima velocitat de bit de la codificació "
 
 #: modules/codec/vorbis.c:162
-#, fuzzy
 msgid "Maximum bitrate in kbps. This is useful for streaming applications."
 msgstr ""
-"Us permet especificar una velocitat de bits màxima en kbps. Útil per "
-"aplicacions de transmissió de dades."
+"Us permet especificar una taxade bits màxima en kocts. Útil per aplicacions "
+"de transmissió de dades."
 
 #: modules/codec/vorbis.c:163
 msgid "Minimum encoding bitrate"
 msgstr "Mínima velocitat de bit de la codificació"
 
 #: modules/codec/vorbis.c:165
-#, fuzzy
 msgid ""
 "Minimum bitrate in kbps. This is useful for encoding for a fixed-size "
 "channel."
 msgstr ""
-"Us permet especificar una velocitat de bits mínima en kbps. Útil per la "
+"Us permet especificar una velocitat de bits mínima en kocts. Útil per la "
 "codificació d'un canal de mida fixa."
 
 #: modules/codec/vorbis.c:166
@@ -9225,7 +8854,6 @@ msgid "CBR encoding"
 msgstr "Codificació CBR"
 
 #: modules/codec/vorbis.c:168
-#, fuzzy
 msgid "Force a constant bitrate encoding (CBR)."
 msgstr ""
 "Us permet imposar una codificació de velocitat de bits constant (CBR, "
@@ -9248,12 +8876,10 @@ msgid "Vorbis comment"
 msgstr "Comentari de Vorbis"
 
 #: modules/codec/x264.c:44
-#, fuzzy
 msgid "Maximum GOP size"
-msgstr "Màxima velocitat de bit de la codificació "
+msgstr "Màxim tamany GOP"
 
 #: modules/codec/x264.c:45
-#, fuzzy
 msgid ""
 "Sets maximum interval between IDR-frames.Larger values save bits, thus "
 "improving quality for a given bitrate at the cost of seeking precision."
@@ -9311,9 +8937,8 @@ msgstr ""
 "fotograma keyint, que probablement produirà efectes de codificació lletjos."
 
 #: modules/codec/x264.c:70
-#, fuzzy
 msgid "B-frames between I and P"
-msgstr "Nombre de fotogrames B consecutius entre fotogrames I i P"
+msgstr "Nombre de fotogrames B entre fotogrames I i P"
 
 #: modules/codec/x264.c:71
 #, fuzzy
@@ -9354,7 +8979,7 @@ msgstr ""
 
 #: modules/codec/x264.c:87
 msgid "CABAC"
-msgstr ""
+msgstr "CABAC"
 
 #: modules/codec/x264.c:88
 #, fuzzy
@@ -9367,9 +8992,8 @@ msgstr ""
 "15%."
 
 #: modules/codec/x264.c:92
-#, fuzzy
 msgid "Number of reference frames"
-msgstr "Nombre de fotogrames B consecutius entre fotogrames I i P"
+msgstr "Nombre de fotogrames de referència"
 
 #: modules/codec/x264.c:93
 #, fuzzy
@@ -9383,14 +9007,12 @@ msgstr ""
 "tractar amb grans valors de frameref"
 
 #: modules/codec/x264.c:98
-#, fuzzy
 msgid "Skip loop filter"
-msgstr "Subfiltre del logo"
+msgstr "El·ludeix el flitre de bucle"
 
 #: modules/codec/x264.c:99
-#, fuzzy
 msgid "Deactivate the deblocking loop filter (decreases quality)."
-msgstr "Utilitza el filtre en bucle de desblocatge (incrementa la qualitat). "
+msgstr "Desactiva el filtre de bucle (baixa la qualitat)."
 
 #: modules/codec/x264.c:101
 msgid "Loop filter AlphaC0 and Beta parameters alpha:beta"
@@ -9426,7 +9048,7 @@ msgstr "Mode desentrellaçat"
 
 #: modules/codec/x264.c:122
 msgid "Set QP"
-msgstr ""
+msgstr "Defineix QP"
 
 #: modules/codec/x264.c:123
 #, fuzzy
@@ -9440,7 +9062,7 @@ msgstr ""
 
 #: modules/codec/x264.c:127
 msgid "Quality-based VBR"
-msgstr ""
+msgstr "Qualitat del VBR"
 
 #: modules/codec/x264.c:128
 msgid "1-pass Quality-based VBR. Range 0 to 51."
@@ -9448,7 +9070,7 @@ msgstr ""
 
 #: modules/codec/x264.c:130
 msgid "Min QP"
-msgstr ""
+msgstr "Mínim QP"
 
 #: modules/codec/x264.c:131
 #, fuzzy
@@ -9457,7 +9079,7 @@ msgstr "Quantificador mínim, 15/35 pot ser un marge útil. "
 
 #: modules/codec/x264.c:134
 msgid "Max QP"
-msgstr ""
+msgstr "Màxim QP"
 
 #: modules/codec/x264.c:135
 msgid "Maximum quantizer parameter."
@@ -9465,16 +9087,15 @@ msgstr "Valor màxim del paràmetre de quantificació."
 
 #: modules/codec/x264.c:137
 msgid "Max QP step"
-msgstr ""
+msgstr "Màx ima etapa de QP"
 
 #: modules/codec/x264.c:138
 msgid "Max QP step between frames."
 msgstr ""
 
 #: modules/codec/x264.c:140
-#, fuzzy
 msgid "Average bitrate tolerance"
-msgstr "Tolerància de la velocitat de bit per vídeo "
+msgstr "Tolerància de la velocitat de bit per vídeo"
 
 #: modules/codec/x264.c:141
 #, fuzzy
@@ -9482,9 +9103,8 @@ msgid "Allowed variance in average bitrate (in kbits/s)."
 msgstr "Selecciona la màxima taxa de bits del flux"
 
 #: modules/codec/x264.c:144
-#, fuzzy
 msgid "Max local bitrate"
-msgstr "Màxima velocitat de bit de la codificació "
+msgstr "Màxima velocitat de bit de la codificació"
 
 #: modules/codec/x264.c:145
 #, fuzzy
@@ -9492,9 +9112,8 @@ msgid "Sets a maximum local bitrate (in kbits/s)."
 msgstr "Selecciona la màxima taxa de bits del flux"
 
 #: modules/codec/x264.c:147
-#, fuzzy
 msgid "VBV buffer"
-msgstr "Mida del desplaçament"
+msgstr "Búffer VBV"
 
 #: modules/codec/x264.c:148
 #, fuzzy
@@ -9536,9 +9155,8 @@ msgid "QP difference between chroma and luma."
 msgstr ""
 
 #: modules/codec/x264.c:166
-#, fuzzy
 msgid "QP curve compression"
-msgstr "Compressió de rang dinàmic DTS"
+msgstr "Compressió de corba QP"
 
 #: modules/codec/x264.c:167
 #, fuzzy
@@ -9547,7 +9165,7 @@ msgstr "Compressió de rang dinàmic DTS"
 
 #: modules/codec/x264.c:169 modules/codec/x264.c:173
 msgid "Reduce fluctuations in QP"
-msgstr ""
+msgstr "Redueix fluctuacions de QP"
 
 #: modules/codec/x264.c:170
 msgid ""
@@ -9563,7 +9181,7 @@ msgstr ""
 
 #: modules/codec/x264.c:179
 msgid "Partitions to consider"
-msgstr ""
+msgstr "Particions a considerar"
 
 #: modules/codec/x264.c:180
 msgid ""
@@ -9577,9 +9195,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/x264.c:188
-#, fuzzy
 msgid "Direct MV prediction mode"
-msgstr "Decodificador d’objecte DirectMedia"
+msgstr "Mode de predicció de Direct MV"
 
 #: modules/codec/x264.c:189
 #, fuzzy
@@ -9600,16 +9217,15 @@ msgstr ""
 
 #: modules/codec/x264.c:199
 msgid "Weighted prediction for B-frames"
-msgstr ""
+msgstr "Amplades previstes per a quadres-B"
 
 #: modules/codec/x264.c:200
 msgid "Weighted prediction for B-frames."
-msgstr ""
+msgstr "Amplades previstes per a quadres-B."
 
 #: modules/codec/x264.c:202
-#, fuzzy
 msgid "Integer pixel motion estimation method"
-msgstr "Habilita l’estimació de pre-moviment"
+msgstr "Integral del píxel per al mètode d’estimació de pre-moviment"
 
 #: modules/codec/x264.c:203
 msgid ""
@@ -9622,7 +9238,7 @@ msgstr ""
 
 #: modules/codec/x264.c:209
 msgid "Maximum motion vector search range"
-msgstr ""
+msgstr "Màxim moviment del rang del vector del motor"
 
 #: modules/codec/x264.c:210
 msgid ""
@@ -9700,9 +9316,8 @@ msgid "SATD-based decision for 8x8 transform in inter-MBs."
 msgstr ""
 
 #: modules/codec/x264.c:254
-#, fuzzy
 msgid "Trellis RD quantization"
-msgstr "Habilita la quantificació trellis "
+msgstr "Quantificació Trellis RD"
 
 #: modules/codec/x264.c:255
 msgid ""
@@ -9756,14 +9371,12 @@ msgid "Set the size of the intra luma quantization deadzone. Range 0 to 32."
 msgstr ""
 
 #: modules/codec/x264.c:285
-#, fuzzy
 msgid "CPU optimizations"
-msgstr "Polarització"
+msgstr "Optimitzacions de CPU"
 
 #: modules/codec/x264.c:286
-#, fuzzy
 msgid "Use assembler CPU optimizations."
-msgstr "Polarització"
+msgstr "Usa les Optimitzacions de CPU de l'assemblador."
 
 #: modules/codec/x264.c:288
 #, fuzzy
@@ -9838,9 +9451,8 @@ msgid "umh"
 msgstr ""
 
 #: modules/codec/x264.c:315
-#, fuzzy
 msgid "esa"
-msgstr "Bytes"
+msgstr "esa"
 
 #: modules/codec/x264.c:321
 msgid "fast"
@@ -9851,7 +9463,6 @@ msgid "normal"
 msgstr "Normal"
 
 #: modules/codec/x264.c:321
-#, fuzzy
 msgid "slow"
 msgstr "Lent"
 
@@ -9873,9 +9484,8 @@ msgid "auto"
 msgstr "Auto"
 
 #: modules/codec/x264.c:336
-#, fuzzy
 msgid "H.264/MPEG4 AVC encoder (using x264 library)"
-msgstr "Codificador de vídeo h264 utilitzant la biblioteca x264"
+msgstr "Codificador de vídeo h264 (utilitzant la biblioteca x264)"
 
 #: modules/codec/xvmc/xxmc.c:100
 #, fuzzy
@@ -9906,7 +9516,6 @@ msgid "Trigger button"
 msgstr "Botó d'activació"
 
 #: modules/control/gestures.c:84
-#, fuzzy
 msgid "Trigger button for mouse gestures."
 msgstr "Podeu definir aquí el botó d'activació pels moviments del ratolí."
 
@@ -9915,21 +9524,18 @@ msgid "Middle"
 msgstr "Mig"
 
 #: modules/control/gestures.c:91
-#, fuzzy
 msgid "Gestures"
-msgstr "Gènere"
+msgstr "Moviments"
 
 #: modules/control/gestures.c:99
 msgid "Mouse gestures control interface"
 msgstr "Interfície de control dels moviment del ratolí"
 
 #: modules/control/hotkeys.c:94
-#, fuzzy
 msgid "Define playlist bookmarks."
-msgstr "Defineix el preferit 9 de la llista de reproducció "
+msgstr "Defineix preferits de la llista de reproducció."
 
 #: modules/control/hotkeys.c:97
-#, fuzzy
 msgid "Hotkeys"
 msgstr "Tecles ràpides"
 
@@ -10002,9 +9608,8 @@ msgid "Source directory"
 msgstr "Directori font"
 
 #: modules/control/http/http.c:42
-#, fuzzy
 msgid "Charset"
-msgstr "Cabaret"
+msgstr "Joc de caràcters"
 
 #: modules/control/http/http.c:44
 msgid "Charset declared in Content-Type header (default UTF-8)."
@@ -10021,23 +9626,19 @@ msgid ""
 msgstr ""
 
 #: modules/control/http/http.c:50
-#, fuzzy
 msgid "HTTP interface x509 PEM certificate file (enables SSL)."
 msgstr "Fitxer del certificat x509 PEM de la interfície HTTP (habilita SSL)"
 
 #: modules/control/http/http.c:53
-#, fuzzy
 msgid "HTTP interface x509 PEM private key file."
 msgstr "Fitxer de clau privada x509 PEM de la interfície HTTP"
 
 #: modules/control/http/http.c:55
-#, fuzzy
 msgid "HTTP interface x509 PEM trusted root CA certificates file."
 msgstr ""
 "Fitxer de certificats de x509 PEM trusted root CA de la interfície HTTP"
 
 #: modules/control/http/http.c:58
-#, fuzzy
 msgid "HTTP interace Certificates Revocation List file."
 msgstr "Fitxer de la Llista de Revocació de Certificats de la interfície HTTP"
 
@@ -10094,36 +9695,32 @@ msgstr ""
 "sincronització de la xarxa"
 
 #: modules/control/netsync.c:74
-#, fuzzy
 msgid "Network Sync"
-msgstr "Xarxa:"
+msgstr "Sincronització de la Xarxa"
 
 #: modules/control/ntservice.c:39
 msgid "Install Windows Service"
 msgstr "Instal·la el Servei de Windows"
 
 #: modules/control/ntservice.c:41
-#, fuzzy
 msgid "Install the Service and exit."
-msgstr "Si habiliteu la interfície instal·larà el Servei i sortirà."
+msgstr "Instal·lar el Servei i sortir."
 
 #: modules/control/ntservice.c:42
 msgid "Uninstall Windows Service"
 msgstr "Desinstal·la el Servei de Windows"
 
 #: modules/control/ntservice.c:44
-#, fuzzy
 msgid "Uninstall the Service and exit."
-msgstr "Si habiliteu la interfície instal·larà el Servei i sortirà."
+msgstr "Desinstal·lar el Servei i sortir."
 
 #: modules/control/ntservice.c:45
 msgid "Display name of the Service"
 msgstr "Mostra el nom del servei"
 
 #: modules/control/ntservice.c:47
-#, fuzzy
 msgid "Change the display name of the Service."
-msgstr "Mostra el nom del servei"
+msgstr "Canvia el nom a mostrar del servei."
 
 #: modules/control/ntservice.c:48
 msgid "Configuration options"
@@ -10155,9 +9752,8 @@ msgstr ""
 "rc, http)"
 
 #: modules/control/ntservice.c:61
-#, fuzzy
 msgid "NT Service"
-msgstr "Serveis"
+msgstr "Servei NT"
 
 #: modules/control/ntservice.c:62
 msgid "Windows Service interface"
@@ -10216,33 +9812,30 @@ msgstr ""
 "de vídeo."
 
 #: modules/control/rc.c:183
-#, fuzzy
 msgid "RC"
-msgstr "C"
+msgstr "RC"
 
 #: modules/control/rc.c:186
 msgid "Remote control interface"
 msgstr "Interfície del control remot"
 
 #: modules/control/rc.c:334
-#, fuzzy
 msgid "Remote control interface initialized. Type `help' for help."
-msgstr "Interfície de control remot inicalitzada, 'h' per ajuda\n"
+msgstr "Interfície de control remot inicalitzada, 'h' per ajuda"
 
 #: modules/control/rc.c:802
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown command `%s'. Type `help' for help."
-msgstr "Ordre desconeguda '%s', escriu 'help' per ajuda\n"
+msgstr "Ordre desconeguda '%s', escriu 'help' per ajuda"
 
 #: modules/control/rc.c:835
-#, fuzzy
 msgid "+----[ Remote control commands ]"
-msgstr "+----[ Ordres del control remot ]\n"
+msgstr "+----[ Ordres del control remot ]"
 
 #: modules/control/rc.c:837
-#, fuzzy
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist"
-msgstr "| add XYZ . . . . . . . . . . afegeix XYZ a la llista de reproducció\n"
+msgstr ""
+"| afegeix XYZ . . . . . . . . . . afegeix XYZ a la llista de reproducció"
 
 #: modules/control/rc.c:838
 #, fuzzy
@@ -10250,37 +9843,33 @@ msgid "| enqueue XYZ  . . . . . . . queue XYZ to playlist"
 msgstr "| add XYZ . . . . . . . . . . afegeix XYZ a la llista de reproducció\n"
 
 #: modules/control/rc.c:839
-#, fuzzy
 msgid "| playlist . . .  show items currently in playlist"
 msgstr ""
-"| playlist . . .  mostra els elements actuals de la llista de reproducció\n"
+"| llista de reproducció . . .  mostra els elements actuals de la llista de "
+"reproducció"
 
 #: modules/control/rc.c:840
-#, fuzzy
 msgid "| play . . . . . . . . . . . . . . . . play stream"
-msgstr "| play. . . . . . . . . . . . . . . . reprodueix el flux\n"
+msgstr "| reproduir. . . . . . . . . . . . . . . . reprodueix el flux"
 
 #: modules/control/rc.c:841
-#, fuzzy
 msgid "| stop . . . . . . . . . . . . . . . . stop stream"
-msgstr "| stop . . . . . . . . . . . . . . . . atura el flux\n"
+msgstr "| atura . . . . . . . . . . . . . . . . atura el flux"
 
 #: modules/control/rc.c:842
-#, fuzzy
 msgid "| next . . . . . . . . . . . .  next playlist item"
 msgstr ""
-"| next . . . . . . . . . . . .  següent element de la llista de reproducció\n"
+"| següent . . . . . . . . . . . .  següent element de la llista de "
+"reproducció"
 
 #: modules/control/rc.c:843
-#, fuzzy
 msgid "| prev . . . . . . . . . .  previous playlist item"
 msgstr ""
-"| prev . . . . . . . . . .  element previ de la llista de la reproducció\n"
+"| anterior . . . . . . . . . .  element previ de la llista de la reproducció"
 
 #: modules/control/rc.c:844
-#, fuzzy
 msgid "| goto . . . . . . . . . . . .  goto item at index"
-msgstr "| goto . . . . . . . . . . . .  vés a l'element de l'índex\n"
+msgstr "| anar a . . . . . . . . . . . .  vés a l'element de l'índex"
 
 #: modules/control/rc.c:845
 #, fuzzy
@@ -10293,91 +9882,74 @@ msgid "| loop [on|off] . . . .  toggle playlist item loop"
 msgstr "| f  . . . . . . . . . . . . . . commuta a pantalla sencera\n"
 
 #: modules/control/rc.c:847
-#, fuzzy
 msgid "| clear . . . . . . . . . . .   clear the playlist"
-msgstr ""
-"| next . . . . . . . . . . . .  següent element de la llista de reproducció\n"
+msgstr "| neteja . . . . . . . . . . . .  neteja la llista de reproducció"
 
 #: modules/control/rc.c:848
-#, fuzzy
 msgid "| status . . . . . . . . . current playlist status"
 msgstr ""
-"| next . . . . . . . . . . . .  següent element de la llista de reproducció\n"
+"| estat . . . . . . . . . . . .  actual estat de la llista de reproducció"
 
 #: modules/control/rc.c:849
-#, fuzzy
 msgid "| title [X]  . . . . set/get title in current item"
-msgstr "| title [X]  . . . . defineix/reb el títol en l'element actual\n"
+msgstr "| títol [X]  . . . . defineix/rep el títol en l'element actual"
 
 #: modules/control/rc.c:850
-#, fuzzy
 msgid "| title_n  . . . . . .  next title in current item"
-msgstr "| title_n  . . . . . .  el títol següent en l'element actual\n"
+msgstr "| title_n  . . . . . .  el títol següent en l'element actual"
 
 #: modules/control/rc.c:851
-#, fuzzy
 msgid "| title_p  . . . .  previous title in current item"
-msgstr "| title_p  . . . .  el títol anterior en l'element actual\n"
+msgstr "| title_p  . . . .  el títol anterior en l'element actual"
 
 #: modules/control/rc.c:852
-#, fuzzy
 msgid "| chapter [X]  . . set/get chapter in current item"
-msgstr "| chapter [X]  . . defineix/reb el capítol en l'element actual\n"
+msgstr "| chapter [X]  . . defineix/obté el capítol en l'element actual"
 
 #: modules/control/rc.c:853
-#, fuzzy
 msgid "| chapter_n  . . . .  next chapter in current item"
-msgstr "| chapter_n  . . . .  el següent capítol en l'element actual\n"
+msgstr "| chapter_n  . . . .  el següent capítol en l'element actual"
 
 #: modules/control/rc.c:854
-#, fuzzy
 msgid "| chapter_p  . .  previous chapter in current item"
-msgstr "| chapter_p  . .  el capítol anterior en l'element actual\n"
+msgstr "| chapter_p  . .  el capítol anterior en l'element actual"
 
 #: modules/control/rc.c:856
-#, fuzzy
 msgid "| seek X . seek in seconds, for instance `seek 12'"
-msgstr "| seek X . cerca en segons, per exemple 'seek 12'\n"
+msgstr "| seek X . cerca en segons, per exemple 'seek 12'"
 
 #: modules/control/rc.c:857
-#, fuzzy
 msgid "| pause  . . . . . . . . . . . . . .  toggle pause"
-msgstr "| pause  . . . . . . . . . . . . . .  commuta a pausa\n"
+msgstr "| pausa  . . . . . . . . . . . . . .  commuta a pausa"
 
 #: modules/control/rc.c:858
-#, fuzzy
 msgid "| fastforward  . . . . . .  .  set to maximum rate"
-msgstr "| fastforward  . . . . . .  .  defineix la velocitat màxima\n"
+msgstr "| accelera  . . . . . .  .  defineix la velocitat màxima"
 
 #: modules/control/rc.c:859
-#, fuzzy
 msgid "| rewind  . . . . . . . . . .  set to minimum rate"
-msgstr "| rewind  . . . . . . . . . .  defineix la velocitat mínima\n"
+msgstr "| frena  . . . . . . . . . .  defineix la velocitat mínima"
 
 #: modules/control/rc.c:860
-#, fuzzy
 msgid "| faster . . . . . . . .  faster playing of stream"
-msgstr "| play. . . . . . . . . . . . . . . . reprodueix el flux\n"
+msgstr "| mésràpid. . . . . . . . . . . . . . . . reprodueix el flux més ràpid"
 
 #: modules/control/rc.c:861
-#, fuzzy
 msgid "| slower . . . . . . . .  slower playing of stream"
-msgstr "| play. . . . . . . . . . . . . . . . reprodueix el flux\n"
+msgstr "| méslent. . . . . . . . . . . . . . . . reprodueix el flux més lent"
 
 #: modules/control/rc.c:862
-#, fuzzy
 msgid "| normal . . . . . . . .  normal playing of stream"
-msgstr "| play. . . . . . . . . . . . . . . . reprodueix el flux\n"
+msgstr ""
+"| normal. . . . . . . . . . . . . . . . reprodueix el flux a velocitat normal"
 
 #: modules/control/rc.c:863
-#, fuzzy
 msgid "| f [on|off] . . . . . . . . . . toggle fullscreen"
-msgstr "| f  . . . . . . . . . . . . . . commuta a pantalla sencera\n"
+msgstr "| f  . . . . . . . . . . . . . . commuta a pantalla sencera"
 
 #: modules/control/rc.c:864
-#, fuzzy
 msgid "| info . . .  information about the current stream"
-msgstr "| info . . .  informació sobre el flux actual\n"
+msgstr "| info . . .  informació sobre el flux actual"
 
 #: modules/control/rc.c:865
 msgid "| get_time . . seconds elapsed since stream's beginning"
@@ -10398,29 +9970,24 @@ msgid "| get_length . .  the length of the current stream"
 msgstr "| info . . .  informació sobre el flux actual\n"
 
 #: modules/control/rc.c:870
-#, fuzzy
 msgid "| volume [X] . . . . . . . .  set/get audio volume"
-msgstr "| volume [X] . . . . . . . .  defineix/reb el volum d'àudio\n"
+msgstr "| volum [X] . . . . . . . .  defineix/rep el volum d'àudio"
 
 #: modules/control/rc.c:871
-#, fuzzy
 msgid "| volup [X]  . . . . .  raise audio volume X steps"
-msgstr "| volup [X]  . . . . . puja el volum de l'àudio X punts\n"
+msgstr "| volam [X]  . . . . . puja el volum de l'àudio X punts"
 
 #: modules/control/rc.c:872
-#, fuzzy
 msgid "| voldown [X]  . . . .  lower audio volume X steps"
-msgstr "| voldown [X]  . . . .  baixa el volum de l'àudio X punts\n"
+msgstr "| voldown [X]  . . . .  baixa el volum de l'àudio X punts"
 
 #: modules/control/rc.c:873
-#, fuzzy
 msgid "| adev [X] . . . . . . . . .  set/get audio device"
-msgstr "| adev [X] . . . . . . . . . defineix/reb el dispositiu d'àudio\n"
+msgstr "| adev [X] . . . . . . . . . defineix/obté el dispositiu d'àudio"
 
 #: modules/control/rc.c:874
-#, fuzzy
 msgid "| achan [X]. . . . . . . .  set/get audio channels"
-msgstr "| achan [X]. . . . . . . .  defineix/reb els canals d'àudio\n"
+msgstr "| achan [X]. . . . . . . .  defineix/obté els canals d'àudio"
 
 #: modules/control/rc.c:875
 #, fuzzy
@@ -10457,32 +10024,24 @@ msgid "| menu [on|off|up|down|left|right|select] use menu"
 msgstr ""
 
 #: modules/control/rc.c:886
-#, fuzzy
 msgid "| marq-marquee STRING  . . overlay STRING in video"
-msgstr "| marq-marquee STRING  . . superposar STRING en el vídeo\n"
+msgstr "| marq-marquee STRING  . . superposar STRING al vídeo"
 
 #: modules/control/rc.c:887
-#, fuzzy
 msgid "| marq-x X . . . . . . . . . . . .offset from left"
-msgstr ""
-"| marq-x X . . . . .  desplaçament de la marquesina, des de l'esquerra\n"
+msgstr "| marq-x X . . . . .  marge des de l'esquerra"
 
 #: modules/control/rc.c:888
-#, fuzzy
 msgid "| marq-y Y . . . . . . . . . . . . offset from top"
-msgstr ""
-"| marq-y Y . . . . . . temps d'espera de la marquesina, des de la part "
-"superior\n"
+msgstr "| marq-y Y . . . . . . marge des de la part superior"
 
 #: modules/control/rc.c:889
-#, fuzzy
 msgid "| marq-position #. . .  .relative position control"
-msgstr "| goto . . . . . . . . . . . .  vés a l'element de l'índex\n"
+msgstr "| marq-position #. . . .control de posició relativa"
 
 #: modules/control/rc.c:890
-#, fuzzy
 msgid "| marq-color # . . . . . . . . . . font color, RGB"
-msgstr "| goto . . . . . . . . . . . .  vés a l'element de l'índex\n"
+msgstr "| marq-color # . . . . . . . . . . color de la font, RGB"
 
 #: modules/control/rc.c:891
 #, fuzzy
@@ -10490,53 +10049,44 @@ msgid "| marq-opacity # . . . . . . . . . . . . . opacity"
 msgstr "| play. . . . . . . . . . . . . . . . reprodueix el flux\n"
 
 #: modules/control/rc.c:892
-#, fuzzy
 msgid "| marq-timeout T. . . . . . . . . . timeout, in ms"
-msgstr "| marq-timeout T. . . . temps d'espera de la marquesina, en ms\n"
+msgstr "| marc-tempsesgotat T. . . . temps d'espera , en ms"
 
 #: modules/control/rc.c:893
-#, fuzzy
 msgid "| marq-size # . . . . . . . . font size, in pixels"
-msgstr "| title_n  . . . . . .  el títol següent en l'element actual\n"
+msgstr "| mrac-tamany#  . . . . . .  tamany de la font, en píxels"
 
 #: modules/control/rc.c:895
 msgid "| logo-file STRING . . .the overlay file path/name"
 msgstr ""
 
 #: modules/control/rc.c:896
-#, fuzzy
 msgid "| logo-x X . . . . . . . . . . . .offset from left"
-msgstr "| goto . . . . . . . . . . . .  vés a l'element de l'índex\n"
+msgstr "| logo-x X . . . . . . . . . . . . marge de l'esquerra"
 
 #: modules/control/rc.c:897
-#, fuzzy
 msgid "| logo-y Y . . . . . . . . . . . . offset from top"
-msgstr "| goto . . . . . . . . . . . .  vés a l'element de l'índex\n"
+msgstr "| logo-y Y . . . . . . . . . . . . marge superior"
 
 #: modules/control/rc.c:898
-#, fuzzy
 msgid "| logo-position #. . . . . . . . relative position"
-msgstr "| goto . . . . . . . . . . . .  vés a l'element de l'índex\n"
+msgstr "| logo-position #. . . . . . . . posició relativa"
 
 #: modules/control/rc.c:899
-#, fuzzy
 msgid "| logo-transparency #. . . . . . . . .transparency"
-msgstr "| goto . . . . . . . . . . . .  vés a l'element de l'índex\n"
+msgstr "| logo-transparency #. . . . . . . . .  transparència"
 
 #: modules/control/rc.c:901
-#, fuzzy
 msgid "| mosaic-alpha # . . . . . . . . . . . . . . alpha"
-msgstr "| pause  . . . . . . . . . . . . . .  commuta a pausa\n"
+msgstr "| mosaic-alpha # . . . . . . . . . . . . . . alfa"
 
 #: modules/control/rc.c:902
-#, fuzzy
 msgid "| mosaic-height #. . . . . . . . . . . . . .height"
-msgstr "| help . . . . . . . . . . . . . aquest missatge d’ajuda\n"
+msgstr "| mosaic-height #. . . . . . . . . . . . . .alçada"
 
 #: modules/control/rc.c:903
-#, fuzzy
 msgid "| mosaic-width # . . . . . . . . . . . . . . width"
-msgstr "| quit . . . . . . . . . . . . . . . . .  surt del programa\n"
+msgstr "| mosaic-width # . . . . . . . . . . . . . . amplada"
 
 #: modules/control/rc.c:904
 msgid "| mosaic-xoffset # . . . .top left corner position"
@@ -10595,45 +10145,34 @@ msgid ""
 msgstr ""
 
 #: modules/control/rc.c:920
-#, fuzzy
 msgid "| help . . . . . . . . . . . . . this help message"
-msgstr "| help . . . . . . . . . . . . . aquest missatge d’ajuda\n"
+msgstr "| help . . . . . . . . . . . . . aquest missatge d’ajuda"
 
 #: modules/control/rc.c:921
-#, fuzzy
 msgid "| longhelp . . . . . . . . . a longer help message"
-msgstr "| help . . . . . . . . . . . . . aquest missatge d’ajuda\n"
+msgstr "| help . . . . . . . . . . . . . missatge d’ajuda més llarg"
 
 #: modules/control/rc.c:922
-#, fuzzy
 msgid "| logout . . . . .  exit (if in socket connection)"
-msgstr "| logout . . . . . .surt (si és en la connexió del sòcol )\n"
+msgstr "| logout . . . . . .surt (si és en la connexió del sòcol )"
 
 #: modules/control/rc.c:923
-#, fuzzy
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc"
-msgstr "| quit . . . . . . . . . . . . . . . . .  surt del programa\n"
+msgstr "| quit . . . . . . . . . . . . . . . . .  surt del vlc"
 
 #: modules/control/rc.c:925
-#, fuzzy
 msgid "+----[ end of help ]"
-msgstr "+----[ fi de l’ajuda ]\n"
+msgstr "+----[ fi de l’ajuda ]"
 
 #: modules/control/rc.c:1035
-#, fuzzy
 msgid "Press menu select or pause to continue."
-msgstr ""
-"\n"
-"Premeu la tecla RETORN per continuar...\n"
+msgstr "Premeu selecciona menú o pausa per continuar..."
 
 #: modules/control/rc.c:1273 modules/control/rc.c:1561
 #: modules/control/rc.c:1631 modules/control/rc.c:1800
 #: modules/control/rc.c:1899
-#, fuzzy
 msgid "Type 'menu select' or 'pause' to continue."
-msgstr ""
-"\n"
-"Premeu la tecla RETORN per continuar...\n"
+msgstr "Escriu 'selecciona menú' o 'pausa' per continuar."
 
 #: modules/control/rc.c:1341
 #, fuzzy
@@ -10641,11 +10180,8 @@ msgid "goto is deprecated"
 msgstr "Nombre mínim de fotogrames B (desestimat)"
 
 #: modules/control/rc.c:1457
-#, fuzzy
 msgid "Type 'pause' to continue."
-msgstr ""
-"\n"
-"Premeu la tecla RETORN per continuar...\n"
+msgstr "Escriu 'pausa' per continuar."
 
 #: modules/control/rc.c:1884 modules/control/rc.c:1923
 msgid "Please provide one of the following parameters:"
@@ -10656,14 +10192,12 @@ msgid "Threshold"
 msgstr "Llindar"
 
 #: modules/control/showintf.c:64
-#, fuzzy
 msgid "Height of the zone triggering the interface."
 msgstr "Alçada de la zona que activa la interfície"
 
 #: modules/control/telnet.c:70
-#, fuzzy
 msgid "Host"
-msgstr "House"
+msgstr "Hoste"
 
 #: modules/control/telnet.c:71
 msgid ""
@@ -10693,9 +10227,8 @@ msgid ""
 msgstr ""
 
 #: modules/control/telnet.c:94
-#, fuzzy
 msgid "VLM remote control interface"
-msgstr "Interfície del control remot"
+msgstr "Interfície del control remot VLM"
 
 #: modules/control/telnet.c:398
 msgid "Line too long\r\n"
@@ -10741,22 +10274,20 @@ msgid "Force interleaved method"
 msgstr "Força el mètode d'entrellaçat"
 
 #: modules/demux/avi/avi.c:44
-#, fuzzy
 msgid "Force interleaved method."
-msgstr "Força el mètode d'entrellaçat"
+msgstr "Força el mètode d'entrellaçat."
 
 #: modules/demux/avi/avi.c:46
 msgid "Force index creation"
 msgstr "Força la creació d'un índex"
 
 #: modules/demux/avi/avi.c:48
-#, fuzzy
 msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
 msgstr ""
-"Recrea un índex pel fitxer AVI de manera que pugueu cercar-lo amb més "
-"fiabilitat."
+"Recrea un índex pel fitxer AVI.Fes servir això si l'arxiu està danyat o "
+"incomplet (sense recerca)."
 
 #: modules/demux/avi/avi.c:56
 msgid "Ask"
@@ -10776,9 +10307,8 @@ msgid "AVI demuxer"
 msgstr "Demultiplexor AVI"
 
 #: modules/demux/avi/avi.c:583
-#, fuzzy
 msgid "AVI Index"
-msgstr "Índex"
+msgstr "Índex de l'Arxiu AVI"
 
 #: modules/demux/avi/avi.c:584
 msgid ""
@@ -10801,12 +10331,10 @@ msgid "Fixing AVI Index..."
 msgstr "Índex"
 
 #: modules/demux/demuxdump.c:38
-#, fuzzy
 msgid "Dump filename"
-msgstr "Nom del fitxer de registre"
+msgstr "Talla el nom de l'arxiu"
 
 #: modules/demux/demuxdump.c:40
-#, fuzzy
 msgid "Name of the file to which the raw stream will be dumped."
 msgstr "Especifica un nom d'un fitxer on el flux bàsic serà abocat"
 
@@ -10940,18 +10468,16 @@ msgstr ""
 "fitxers, utilitzeu 0 pel directe."
 
 #: modules/demux/mjpeg.c:50
-#, fuzzy
 msgid "M-JPEG camera demuxer"
-msgstr "Demultiplexor de càmera JPEG"
+msgstr "Demultiplexor de càmera M-JPEG"
 
 #: modules/demux/mkv.cpp:396
 msgid "Matroska stream demuxer"
 msgstr "Demultiplexor de flux Matroska"
 
 #: modules/demux/mkv.cpp:403
-#, fuzzy
 msgid "Ordered chapters"
-msgstr "Capítol següent"
+msgstr "Capítols ordenats"
 
 #: modules/demux/mkv.cpp:404
 msgid "Play ordered chapters as specified in the segment."
@@ -10967,9 +10493,8 @@ msgid "Use chapter codecs found in the segment."
 msgstr ""
 
 #: modules/demux/mkv.cpp:411
-#, fuzzy
 msgid "Preload Directory"
-msgstr "Directori font"
+msgstr "Directori de Pre-càrrega"
 
 #: modules/demux/mkv.cpp:412
 msgid ""
@@ -10978,14 +10503,12 @@ msgid ""
 msgstr ""
 
 #: modules/demux/mkv.cpp:415
-#, fuzzy
 msgid "Seek based on percent not time"
-msgstr "Cerca basada en el percentatge no en el temps"
+msgstr "Cerca basada en el percentatge, no en el temps"
 
 #: modules/demux/mkv.cpp:416
-#, fuzzy
 msgid "Seek based on percent not time."
-msgstr "Cerca basada en el percentatge no en el temps"
+msgstr "Cerca basada en el percentatge, no en el temps."
 
 #: modules/demux/mkv.cpp:419
 msgid "Dummy Elements"
@@ -10996,23 +10519,20 @@ msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
 
 #: modules/demux/mkv.cpp:3234
-#, fuzzy
 msgid "---  DVD Menu"
-msgstr "Utilitza els menús del DVD"
+msgstr "--- Menú DVD"
 
 #: modules/demux/mkv.cpp:3240
 msgid "First Played"
 msgstr ""
 
 #: modules/demux/mkv.cpp:3242
-#, fuzzy
 msgid "Video Manager"
-msgstr "Codificador de vídeo"
+msgstr "Control de Vídeo"
 
 #: modules/demux/mkv.cpp:3248
-#, fuzzy
 msgid "----- Title"
-msgstr "Títol:"
+msgstr "----- Títol"
 
 #: modules/demux/mod.c:48
 msgid "Enable noise reduction algorithm"
@@ -11029,19 +10549,16 @@ msgid "Reverberation level (from 0 to 100, default value is 0)."
 msgstr "Nivell de reverberació (0-100 per defecte a 0)"
 
 #: modules/demux/mod.c:52
-#, fuzzy
 msgid "Reverberation delay, in ms. Usual values are from to 40 to 200ms."
 msgstr "Retard de reverberació en ms (normalment 40-200 ms)"
 
 #: modules/demux/mod.c:54
-#, fuzzy
 msgid "Enable megabass mode"
-msgstr "Habilita els pics"
+msgstr "Habilita els pics de megabass"
 
 #: modules/demux/mod.c:55
-#, fuzzy
 msgid "Megabass mode level (from 0 to 100, default value is 0)."
-msgstr "Nivell del mega bass(0-100, per defecte a 0)"
+msgstr "Nivell del mega bass(0-100, per defecte és 0)"
 
 #: modules/demux/mod.c:58
 msgid ""
@@ -17531,14 +17048,13 @@ msgstr ""
 "Us permet especificar el port de vídeo utilitzat per defecte pel flux de RTP."
 
 #: modules/stream_out/rtp.c:94
-#, fuzzy
 msgid ""
 "This is the hop limit (also known as \"Time-To-Live\" or TTL) of the "
 "multicast packets sent by the stream output (0 = use operating system built-"
 "in default)."
 msgstr ""
 "Indiqueu aquí el Temps de Vida dels paquets multidifusió enviats per la "
-"sortida de flux. "
+"sortida de flux."
 
 #: modules/stream_out/rtp.c:98
 msgid "MP4A LATM"
@@ -18497,9 +18013,8 @@ msgid "Y offset, down from the top."
 msgstr "Ajust de Y, de sota a dalt."
 
 #: modules/video_filter/marq.c:101
-#, fuzzy
 msgid "Timeout"
-msgstr "Hora"
+msgstr "Temps esgotat"
 
 #: modules/video_filter/marq.c:102
 #, fuzzy
@@ -20207,6 +19722,261 @@ msgstr "Visualitza el filtre"
 msgid "Spectrum analyser"
 msgstr "Analitzador d'espectre"
 
+#~ msgid "Errors"
+#~ msgstr "Errors"
+
+#~ msgid "Login"
+#~ msgstr "Entra"
+
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "Interfície de la sortida multicast d'IPv6"
+
+#~ msgid ""
+#~ "This is the size of the temporary files tha will be used to store the "
+#~ "timeshifted streams."
+#~ msgstr ""
+#~ "Els filtres de vídeo s'utilitzen pel post-processament del flux de vídeo."
+
+#~ msgid "Time-To-Live of the outgoing stream."
+#~ msgstr "Us permet definir el temps de duració del flux de sortida."
+
+#~ msgid "Audio filter for float32->s8 conversion"
+#~ msgstr "Filtre d'àudio per conversió float32->s8"
+
+#~ msgid "Audio filter for float32->u16 conversion"
+#~ msgstr "Filtre d'àudio per conversió float32->u16"
+
+#~ msgid "Audio filter for float32->u8 conversion"
+#~ msgstr "Filtre d'àudio per conversió float32->u8"
+
+#~ msgid "Audio filter for s16->fixed32 conversion"
+#~ msgstr "Filtre d'àudio per conversió s16->fixed32"
+
+#~ msgid "Audio filter for s16->float32 conversion"
+#~ msgstr "Filtre d'àudio per conversió s16->float32"
+
+#~ msgid "Audio filter for s16->float32 with endianness conversion"
+#~ msgstr "Filtre d'àudio per la conversió s16->float32 començant pel final"
+
+#~ msgid "Audio filter for s8->float32 conversion"
+#~ msgstr "Filtre d'àudio per conversió s8->float32"
+
+#~ msgid "Audio filter for u8->fixed32 conversion"
+#~ msgstr "Filtre d'àudio per conversió u8->fixed32"
+
+#~ msgid "Audio filter for u8->float32 conversion"
+#~ msgstr "Filtre d'àudio per conversió u8->float32"
+
+#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
+#~ msgstr "| time-color # . . . . . . . . . . . .color de la font, RGB"
+
+#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
+#~ msgstr "|time-opacity # . . . . . . . . . . . . . opacitat"
+
+#~ msgid "| time-size # . . . . . . . . font size, in pixels"
+#~ msgstr "| time-size # . . . . . . . . cos de la font, en píxels"
+
+#~ msgid "General interface setttings"
+#~ msgstr "Paràmetres generals de la interfície"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Directori de la instantània del vídeo"
+
+#~ msgid "Default IPv6 multicast interface. This overrides the routing table."
+#~ msgstr ""
+#~ "Interfície per defecte d'emissió múltiple IPv6.Això sobreescriurà la "
+#~ "taula de ruta"
+
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr "Imprimeix l'ajuda dels mòduls (es pot combinar amb --advanced)"
+
+#~ msgid ""
+#~ "Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
+#~ "empty if you don't have one."
+#~ msgstr ""
+#~ "Ruta al arxiu clau privat x509 PEM que s'utilitzarà per la sortida de "
+#~ "flux HTTP/SSL. Deixeu-ho buit  si no teniu cap."
+
+#~ msgid ""
+#~ "Path to the x509 PEM trusted root CA certificates (certificate authority) "
+#~ "file that will be used forHTTPS. Leave empty if you don't have one."
+#~ msgstr ""
+#~ "Ruta al fitxer del certificat  x509 PEM trusted root CA (autoritat de "
+#~ "certificat) que serà utilitzat per la sortida de flux HTTP/SSL. Deixeu-ho "
+#~ "buit si no en teniu un."
+
+#~ msgid "Name to give to this stream/channel on the icecast server."
+#~ msgstr "Nom  a donar a aquest flux/canal al servidor icecast."
+
+#~ msgid ""
+#~ "Sets minimum interval between IDR-frames. In H.264, I-frames do not "
+#~ "necessarily bound a closed GOP because it is allowable for a P-frame to "
+#~ "be predicted from more frames than just the one frame before it (also see "
+#~ "frameref). Therefore, I-frames are not necessarily seekable. IDR-Frames "
+#~ "restrict subsequent P-frames from referring to any frame prior to the IDR-"
+#~ "Frame. \n"
+#~ "If scenecuts appear within this interval, they are still encoded as I-"
+#~ "frames, but do not start a new GOP."
+#~ msgstr ""
+#~ "En H. 264, els fotogrames I no s'han de vincular necessàriament a un GOP "
+#~ "tancat perquè està permès que els fotogrames P siguin predits per més "
+#~ "d'un fotograma anterior a ell (veure també frameref). Per tant, els "
+#~ "fotogrames I no són necessàriament fàcils de buscar. Els fotogrames IDR "
+#~ "restringeixen els fotogrames P subsegüents a partir de la referència a "
+#~ "fotogrames anteriors al fotograma IDR.\n"
+#~ "Si els talls d'escena apareixen dins d'aquest interval, seran codificats "
+#~ "com fotogrames I, però no s'iniciarà un nou GOP."
+
+#~ msgid ""
+#~ "Scene-cut detection. Controls how aggressively to insert extra I-frames. "
+#~ "With small values of scenecut, the codec often has to force an I-frame "
+#~ "when it would exceed keyint. Good values of scenecut may find a better "
+#~ "location for the I-frame. Large values use more I-frames than necessary, "
+#~ "thus wasting bits. -1 disables scene-cut detection, so I-frames are be "
+#~ "inserted only every other keyint frames, which probably leads to ugly "
+#~ "encoding artifacts. (1-100)."
+#~ msgstr ""
+#~ "Controla com d'agressiva serà la inserció de fotogrames I extres. Amb "
+#~ "valors petits de talls d'escena, el còdec ha d'imposar sovint un "
+#~ "fotograma I quan s'excedeix keyint. Valors correctes de talls d'escena "
+#~ "trobaran una bona posició pel fotograma I. Valors grans de talls d'escena "
+#~ "utilitzen més fotogrames I dels necessaris, malgastant bits. -1 "
+#~ "inhabilita la detecció de talls d'escena, per tant els fotogrames I seran "
+#~ "inserits només cada fotograma keyint, que probablement produirà efectes "
+#~ "de codificació lletjos.(1-100)"
+
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "Nombre de fotogrames B consecutius entre fotogrames I i P (1 a 16)"
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr "Nombre de fotogrames B consecutius entre fotogrames I i P "
+
+#~ msgid ""
+#~ "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
+#~ "encoding and decoding, but should save 10-15% bitrate."
+#~ msgstr ""
+#~ "Habilita la CABAC (Context-Adaptive Binary Arithmetic Coding). Redueix la "
+#~ "codificació i la descodificació, però estalvia la velocitat de bits en un "
+#~ "10-15%."
+
+#~ msgid ""
+#~ "Number of previous frames used as predictors. This is effective in Anime, "
+#~ "but seems to make little difference in live-action source material. Some "
+#~ "decoders are unable to deal with large frameref values. From 1 to 16"
+#~ msgstr ""
+#~ "Això és efectiu en Anime, però sembla fer una petita diferència en el "
+#~ "material font d'acció en directe. Alguns descodificadors són incapaços de "
+#~ "tractar amb grans valors de frameref.De l'1 al 16"
+
+#~ msgid ""
+#~ "This selects the quantizer to use. Lower values result in better "
+#~ "fidelity, but higher bitrates. 26 is a good default value. From 0 to 51. "
+#~ "0 means lossless"
+#~ msgstr ""
+#~ "Selecciona el quantificador a utilitzar (1 a 51). Valors petits produiran "
+#~ "una millor fidelitat però velocitat de bits més alta. El 26 és un bon "
+#~ "valor per defecte.Del 0 al 51.0 Significa gens de pèrdua."
+
+#~ msgid "1-pass Quality-based VBR. From 0 to 51"
+#~ msgstr "Qualitat de VBR a una passada.De 0 a 51"
+
+#~ msgid "Minimum quantizer, 15/35 seems to be a useful range."
+#~ msgstr "Quantificador mínim, 15/35 pot ser un marge útil."
+
+#~ msgid "Allowed variance in average. bitrate (in kbits/s)."
+#~ msgstr ""
+#~ "Variació permesa en la mitjana de la taxa de bits del flux (en kbits/s)."
+
+#~ msgid "Sets a maximum local bitrate in kbits/s."
+#~ msgstr "Selecciona la màxima taxa de bits del flux"
+
+#, fuzzy
+#~ msgid "Averaging period for the maximum local bitrate in kbits."
+#~ msgstr "Selecciona la màxima taxa de bits del flux"
+
+#~ msgid "QP curve compression. (0.0=CBR to 1.0=QCP)"
+#~ msgstr "Compressió de corba QP (0.0=CBR a 1.0=QCP)"
+
+#~ msgid "Direct MV prediction mode. "
+#~ msgstr "Mode de predicció de Direct MV "
+
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "Ignora el croma a l’estimació de pre-moviment"
+
+#~ msgid "PSNR calculation"
+#~ msgstr "Càlcul PSNR"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "Hora"
+
+#~ msgid "Text rendering"
+#~ msgstr "Representació del text"
+
+#~ msgid "Save As..."
+#~ msgstr "Anomena i desa"
+
+#~ msgid "Open network"
+#~ msgstr "Obre a la xarxa"
+
+#~ msgid "&Disc..."
+#~ msgstr "&Disc..."
+
+#~ msgid "&Network..."
+#~ msgstr "&Xarxa..."
+
+#~ msgid "Delete &all"
+#~ msgstr "Esborr&a-ho tot"
+
+#~ msgid "Play the selected stream"
+#~ msgstr "Reprodueix el flux actual"
+
+#~ msgid "Add subtitles"
+#~ msgstr "Afegeix subtítols"
+
+#~ msgid "Native Windows interface"
+#~ msgstr "Interfície nativa de Windows"
+
+#~ msgid "Language 0x%x"
+#~ msgstr "Idioma 0x%x"
+
+#~ msgid "Screen %d"
+#~ msgstr "Pantalla %d"
+
+#~ msgid "Open skin"
+#~ msgstr "Obre Interfície"
+
+#~ msgid "Skin files"
+#~ msgstr "Arxius d'Interfície"
+
+#~ msgid "All files"
+#~ msgstr "Tots els arxius"
+
+#~ msgid "Add file"
+#~ msgstr "Afegeix arxiu"
+
+#~ msgid "Stream Output MRL"
+#~ msgstr "Adreça de Sortida del Flux MRL"
+
+#~ msgid "A_udio"
+#~ msgstr "À_udio"
+
+#~ msgid "Open a File"
+#~ msgstr "Obre un Arxiu"
+
+#~ msgid "Open file..."
+#~ msgstr "Obre arxiu..."
+
+#~ msgid "Open disc..."
+#~ msgstr "Obre disc..."
+
+#~ msgid "Network stream..."
+#~ msgstr "Flux a la xarxa..."
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Mòdul de descodificació Tarkin"
@@ -20283,20 +20053,8 @@ msgstr "Analitzador d'espectre"
 #~ msgstr "ISO-9660 Conjunt de volum"
 
 #, fuzzy
-#~ msgid "Errors"
-#~ msgstr "Error"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "S'esta registrant"
-
-#, fuzzy
 #~ msgid "Console"
 #~ msgstr "Control"
-
-#, fuzzy
-#~ msgid "IPv6 multicast output interface"
-#~ msgstr "Interfície de control del joystick"
 
 #~ msgid "By category"
 #~ msgstr "Per categoria"
@@ -20306,17 +20064,6 @@ msgstr "Analitzador d'espectre"
 
 #~ msgid "All items, unsorted"
 #~ msgstr "Mostra tots elements, sense ordenar"
-
-#, fuzzy
-#~ msgid ""
-#~ "This is the size of the temporary files tha will be used to store the "
-#~ "timeshifted streams."
-#~ msgstr ""
-#~ "Els filtres de vídeo s'utilitzen pel post-processament del flux de vídeo"
-
-#, fuzzy
-#~ msgid "Time-To-Live of the outgoing stream."
-#~ msgstr "Us permet definir el temps de vida del flux de sortida."
 
 #, fuzzy
 #~ msgid "Audio filter for fixed32<->float32 conversion"
@@ -20329,42 +20076,6 @@ msgstr "Analitzador d'espectre"
 #, fuzzy
 #~ msgid "Audio filter for float32->s16 conversion"
 #~ msgstr "Filtre d'àudio per conversió float32->s16"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->s8 conversion"
-#~ msgstr "Filtre d'àudio per conversió float32->s8"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u16 conversion"
-#~ msgstr "Filtre d'àudio per conversió float32->u16"
-
-#, fuzzy
-#~ msgid "Audio filter for float32->u8 conversion"
-#~ msgstr "Filtre d'àudio per conversió float32->u8"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->fixed32 conversion"
-#~ msgstr "Filtre d'àudio per conversió s16->fixed32"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 conversion"
-#~ msgstr "Filtre d'àudio per conversió s16->float32"
-
-#, fuzzy
-#~ msgid "Audio filter for s16->float32 with endianness conversion"
-#~ msgstr "Filtre d'àudio per la conversió s16->float32 començant pel final"
-
-#, fuzzy
-#~ msgid "Audio filter for s8->float32 conversion"
-#~ msgstr "Filtre d'àudio per conversió s8->float32"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->fixed32 conversion"
-#~ msgstr "Filtre d'àudio per conversió u8->fixed32"
-
-#, fuzzy
-#~ msgid "Audio filter for u8->float32 conversion"
-#~ msgstr "Filtre d'àudio per conversió u8->float32"
 
 #~ msgid "Linux OSS audio output"
 #~ msgstr "Sortida d’àudio Linux OSS"
@@ -20393,20 +20104,6 @@ msgstr "Analitzador d'espectre"
 #, fuzzy
 #~ msgid "| time-position #. . . . . . . . relative position"
 #~ msgstr "| goto . . . . . . . . . . . .  vés a l'element de l'índex\n"
-
-#, fuzzy
-#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
-#~ msgstr ""
-#~ "| next . . . . . . . . . . . .  següent element de la llista de "
-#~ "reproducció\n"
-
-#, fuzzy
-#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
-#~ msgstr "| play. . . . . . . . . . . . . . . . reprodueix el flux\n"
-
-#, fuzzy
-#~ msgid "| time-size # . . . . . . . . font size, in pixels"
-#~ msgstr "| title_n  . . . . . .  el títol següent en l'element actual\n"
 
 #~ msgid "Playlist metademux"
 #~ msgstr "Metademultiplexor de la llista de reproducció"
@@ -22870,3 +22567,27 @@ msgstr "Analitzador d'espectre"
 
 #~ msgid "Control"
 #~ msgstr "Control"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "Port de la interfície de Telnet"
+
+#, fuzzy
+#~ msgid "You have to select two bookmarks."
+#~ msgstr "Heu de seleccionar dos preferits."
+
+#~ msgid "choose the screen to be used for fullscreen mode."
+#~ msgstr "Escull la pantalla per ser utilitzada al mode de pantalla completa."
+
+#~ msgid "Jump"
+#~ msgstr "Salta"
+
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection "
+#~ "(Basic authentication only)."
+#~ msgstr ""
+#~ "Us permet modificar el nom d'usuari que serà utilitzat per la connexió "
+#~ "(només autenticació bàsica)"
+
+#~ msgid "X11 OpenGL provider"
+#~ msgstr "Proveïdor X11 OpenGL"

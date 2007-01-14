@@ -1242,7 +1242,7 @@ msgstr "Fout: %s\n"
 #: src/libvlc-common.c:1599
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
-msgstr ""
+msgstr "Gebaseerd op svn wijziging [%s]\n"
 
 #: src/libvlc-common.c:1631
 msgid ""
@@ -1451,7 +1451,7 @@ msgstr "Standaard \"admin\""
 
 #: src/libvlc-module.c:104
 msgid "This stream will always be opened at VLC startup."
-msgstr ""
+msgstr "Deze stream zal altijd geopend worden bij het opstarten van VLC."
 
 #: src/libvlc-module.c:107
 #, fuzzy
@@ -4234,7 +4234,7 @@ msgstr "CPU"
 
 #: src/libvlc-module.c:1601
 msgid "Special modules"
-msgstr ""
+msgstr "Speciale modules"
 
 #: src/libvlc-module.c:1608
 msgid "Plugins"
@@ -4860,7 +4860,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:193
 msgid "Uzbek"
-msgstr ""
+msgstr "Uzbeeks"
 
 #: src/text/iso-639_def.h:194
 msgid "Vietnamese"
@@ -4884,7 +4884,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:199
 msgid "Yiddish"
-msgstr ""
+msgstr "Jiddisch"
 
 #: src/text/iso-639_def.h:200
 msgid "Yoruba"
@@ -5170,7 +5170,7 @@ msgstr "Buffergrootte in microseconden"
 
 #: modules/access/cdda/cdda.c:134
 msgid "Number of blocks per CD read"
-msgstr ""
+msgstr "Aantal blokken per Cd leesopdracht"
 
 #: modules/access/cdda/cdda.c:139
 msgid "Format to use in playlist \"title\" field when no CDDB"
@@ -5186,11 +5186,11 @@ msgstr ""
 
 #: modules/access/cdda/cdda.c:150
 msgid "Do CD-Text lookups?"
-msgstr ""
+msgstr "Aan CD-Text lookups doen?"
 
 #: modules/access/cdda/cdda.c:151
 msgid "If set, get CD-Text information"
-msgstr ""
+msgstr "Indien ingesteld, zal de CD-Text opgehaald worden"
 
 #: modules/access/cdda/cdda.c:160
 msgid "Use Navigation-style playback?"
@@ -5469,6 +5469,8 @@ msgid ""
 "Force the DirectShow video input to use a specific frame rate(eg. 0 means "
 "default, 25, 29.97, 50, 59.94, etc.)"
 msgstr ""
+"Forceer de DirectShow video invoer om gebruik te maken van een specifieke "
+"frame rate(bijvoorbeeld 0 is de standaard, 25, 29.97, 50, 59.94, enz.)"
 
 #: modules/access/dshow/dshow.cpp:121
 msgid "Device properties"
@@ -5487,7 +5489,7 @@ msgstr "Tuner eigenschappen"
 
 #: modules/access/dshow/dshow.cpp:127
 msgid "Show the tuner properties [channel selection] page."
-msgstr ""
+msgstr "Geef de tuner (kanaal selectie) instellingspagina weer."
 
 #: modules/access/dshow/dshow.cpp:128
 msgid "Tuner TV Channel"
@@ -5499,7 +5501,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:132
 msgid "Tuner country code"
-msgstr ""
+msgstr "Landcode van de tuner"
 
 #: modules/access/dshow/dshow.cpp:134
 msgid ""
@@ -5663,41 +5665,43 @@ msgstr "Hiermee kunt u naar de stream kijken terwijl u aan het streamen bent."
 
 #: modules/access/dvb/access.c:97
 msgid "Satellite number in the Diseqc system"
-msgstr ""
+msgstr "Sateliet nummer in Diseqc systeem"
 
 #: modules/access/dvb/access.c:98
 msgid "[0=no diseqc, 1-4=satellite number]."
-msgstr ""
+msgstr "[0=geen diseqc, 1-4=nr van de sateliet]"
 
 #: modules/access/dvb/access.c:100
 msgid "LNB voltage"
-msgstr ""
+msgstr "LNB voltage"
 
 #: modules/access/dvb/access.c:101
 msgid "In Volts [0, 13=vertical, 18=horizontal]."
-msgstr ""
+msgstr "In volt [0, 13=vertikaal, 18=horizontaal]/"
 
 #: modules/access/dvb/access.c:103
 msgid "High LNB voltage"
-msgstr ""
+msgstr "Hoog LNB voltage"
 
 #: modules/access/dvb/access.c:104
 msgid ""
 "Enable high voltage if your cables are particularly long. This is not "
 "supported by all frontends."
 msgstr ""
+"Schakel hoog voltage in indien uw kabels vrij lang zijn. Dit wordt niet "
+"altijd ondersteund."
 
 #: modules/access/dvb/access.c:107
 msgid "22 kHz tone"
-msgstr ""
+msgstr "22 kHz toon"
 
 #: modules/access/dvb/access.c:108
 msgid "[0=off, 1=on, -1=auto]."
-msgstr ""
+msgstr "[0=uit, 1=aan, -1=automatisch]."
 
 #: modules/access/dvb/access.c:110
 msgid "Transponder FEC"
-msgstr ""
+msgstr "Transponder FEC"
 
 #: modules/access/dvb/access.c:111
 #, fuzzy
@@ -5876,7 +5880,7 @@ msgstr ""
 
 #: modules/access/dv.c:74
 msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr ""
+msgstr "Digitale video invoer (Firewire/IEEE1394)"
 
 #: modules/access/dv.c:75
 msgid "dv"
@@ -5979,7 +5983,7 @@ msgstr "DVD zonder menus"
 
 #: modules/access/dvdread.c:94
 msgid "DVDRead Input (DVD without menu support)"
-msgstr ""
+msgstr "DVDRead Invoer (DVD zonder menu ondersteuning)"
 
 #: modules/access/dvdread.c:239
 #, c-format
@@ -6037,11 +6041,11 @@ msgstr ""
 
 #: modules/access/fake.c:58 modules/codec/fake.c:75
 msgid "Fake"
-msgstr ""
+msgstr "Vals"
 
 #: modules/access/fake.c:59
 msgid "Fake input"
-msgstr ""
+msgstr "Valse invoer"
 
 #: modules/access/file.c:81
 #, fuzzy
@@ -6412,10 +6416,13 @@ msgstr "MIME"
 #: modules/access_output/http.c:69
 msgid "MIME returned by the server (autodetected if not specified."
 msgstr ""
+"MIME terug gegeven door de server (automatisch gedetecteerd indien niet "
+"opgegeven)."
 
 #: modules/access_output/http.c:73
 msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
 msgstr ""
+"Pad naar het x509 PEM certificaat bestand dat gebruikt zal worden voor HTTPS."
 
 #: modules/access_output/http.c:76
 msgid ""
@@ -6664,13 +6671,15 @@ msgstr "Breedte van de op te nemen stream (-1 voor autodetectie)"
 
 #: modules/access/pvr.c:80
 msgid "B Frames"
-msgstr ""
+msgstr "B Frames"
 
 #: modules/access/pvr.c:81
 msgid ""
 "If this option is set, B-Frames will be used. Use this option to set the "
 "number of B-Frames."
 msgstr ""
+"Indien deze optie geactiveerd is, zullen B-Frames gebruikt worden. Gebruik "
+"deze optie om het aantal B-Frames in te stellen."
 
 #: modules/access/pvr.c:85
 msgid "Bitrate to use (-1 for default)."
@@ -7048,7 +7057,7 @@ msgstr "Tuner:"
 
 #: modules/access/v4l.c:124
 msgid "Tuner to use, if there are several ones."
-msgstr ""
+msgstr "De te gebruiken tuner indien er meerdere zijn."
 
 #: modules/access/v4l.c:127
 msgid ""
@@ -7231,7 +7240,7 @@ msgstr "Lijst ID"
 
 #: modules/access/vcdx/vcd.c:95
 msgid "(Super) Video CD"
-msgstr ""
+msgstr "(Super) Video CD"
 
 #: modules/access/vcdx/vcd.c:96
 msgid "Video CD (VCD 1.0, 1.1, 2.0, SVCD, HQVCD) input"
@@ -7247,7 +7256,7 @@ msgstr "Indien niet nul, dan geeft dit aanvullende debug informatie."
 
 #: modules/access/vcdx/vcd.c:111 modules/access/vcdx/vcd.c:112
 msgid "Number of CD blocks to get in a single read."
-msgstr ""
+msgstr "Aantal te lezen CD blokken in een leesopdracht."
 
 #: modules/access/vcdx/vcd.c:116
 msgid "Use playback control?"
@@ -7630,7 +7639,7 @@ msgstr "Equalizer"
 
 #: modules/audio_filter/param_eq.c:53
 msgid "Low freq (Hz)"
-msgstr ""
+msgstr "Lage frekwentie (Hz)"
 
 #: modules/audio_filter/param_eq.c:56
 msgid "Low freq gain (Db)"
@@ -7638,7 +7647,7 @@ msgstr ""
 
 #: modules/audio_filter/param_eq.c:57
 msgid "High freq (Hz)"
-msgstr ""
+msgstr "Hoge frekwentie (Hz)"
 
 #: modules/audio_filter/param_eq.c:60
 msgid "High freq gain (Db)"
@@ -7646,7 +7655,7 @@ msgstr ""
 
 #: modules/audio_filter/param_eq.c:61
 msgid "Freq 1 (Hz)"
-msgstr ""
+msgstr "Frekwentie 1 (Hz)"
 
 #: modules/audio_filter/param_eq.c:64
 msgid "Freq 1 gain (Db)"
@@ -7670,7 +7679,7 @@ msgstr ""
 
 #: modules/audio_filter/param_eq.c:73
 msgid "Freq 3 (Hz)"
-msgstr ""
+msgstr "Frekwentie 3 (Hz)"
 
 #: modules/audio_filter/param_eq.c:76
 msgid "Freq 3 gain (Db)"
@@ -7779,7 +7788,7 @@ msgstr ""
 
 #: modules/audio_output/alsa.c:939
 msgid "Unknown soundcard"
-msgstr ""
+msgstr "Onbekende geluidskaart"
 
 #: modules/audio_output/arts.c:63
 msgid "aRts audio output"
@@ -19594,6 +19603,76 @@ msgstr "Visuele effecten filter"
 msgid "Spectrum analyser"
 msgstr "Spectrum analyser"
 
+#~ msgid "General interface setttings"
+#~ msgstr "Algemene interface instellingen"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Video snapshot bestandsmap"
+
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr ""
+#~ "toon help VLC en al zijn modules (kan worden gecombineerd met --advanced)"
+
+#, fuzzy
+#~ msgid ""
+#~ "Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
+#~ "empty if you don't have one."
+#~ msgstr ""
+#~ "Pad naar het private x509 PEM certificaat bestand dat gebruikt zal worden "
+#~ "voor HTTPS. Laat dit leeg indien u er geen heeft."
+
+#~ msgid "Name to give to this stream/channel on the icecast server."
+#~ msgstr "Te geven naam aan deze stream/kanaal op de icecast server."
+
+#, fuzzy
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "Aantal blanco pixels tussen de banden."
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr "Aantal blanco pixels tussen de banden. "
+
+#, fuzzy
+#~ msgid "Allowed variance in average. bitrate (in kbits/s)."
+#~ msgstr "Selecteer stream met maximale bitrate"
+
+#, fuzzy
+#~ msgid "Sets a maximum local bitrate in kbits/s."
+#~ msgstr "Selecteer stream met maximale bitrate"
+
+#, fuzzy
+#~ msgid "Averaging period for the maximum local bitrate in kbits."
+#~ msgstr "Selecteer stream met maximale bitrate"
+
+#, fuzzy
+#~ msgid "QP curve compression. (0.0=CBR to 1.0=QCP)"
+#~ msgstr "DTS dynamisch bereik compressie"
+
+#, fuzzy
+#~ msgid "Direct MV prediction mode. "
+#~ msgstr "DirectMedia Object decoder "
+
+#, fuzzy
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "Interlaced encoding"
+
+#, fuzzy
+#~ msgid "PSNR calculation"
+#~ msgstr "Verzadiging"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "Start positie"
+
+#~ msgid "Text rendering"
+#~ msgstr "Tekst rendering"
+
+#~ msgid "Save As..."
+#~ msgstr "Bewaar Als..."
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Tarkin decodeer module"
@@ -22234,3 +22313,19 @@ msgstr "Spectrum analyser"
 
 #~ msgid "Control"
 #~ msgstr "Control"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "Poort telnet interface"
+
+#~ msgid "choose the screen to be used for fullscreen mode."
+#~ msgstr "Kies het scherm voor de mode: volledig scherm"
+
+#~ msgid "Jump"
+#~ msgstr "Spring"
+
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection "
+#~ "(Basic authentication only)."
+#~ msgstr ""
+#~ "Wijzig de gebruikersnaam voor de connectie (Alleen Basic authentificatie)."

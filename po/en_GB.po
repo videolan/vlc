@@ -34,7 +34,7 @@ msgstr "VLC preferences"
 
 #: include/vlc_config_cat.h:38
 msgid "Select \"Advanced Options\" to see all options."
-msgstr ""
+msgstr "Select \"Advanced Options\" to see all options."
 
 #: include/vlc_config_cat.h:40 include/vlc_config_cat.h:131
 #: modules/gui/macosx/playlistinfo.m:62 modules/gui/wince/playlist.cpp:674
@@ -63,7 +63,7 @@ msgstr "Skinnable Interface"
 
 #: include/vlc_config_cat.h:49
 msgid "Settings for the main interface"
-msgstr ""
+msgstr "Settings for the main interface"
 
 #: include/vlc_config_cat.h:51 src/libvlc-module.c:89
 #, fuzzy
@@ -103,11 +103,11 @@ msgstr "General settings"
 #: include/vlc_config_cat.h:64 include/vlc_config_cat.h:89
 #: src/video_output/video_output.c:429
 msgid "Filters"
-msgstr ""
+msgstr "Filters"
 
 #: include/vlc_config_cat.h:66
 msgid "Audio filters are used to postprocess the audio stream."
-msgstr ""
+msgstr "Audio filters are used to postprocess the audio stream."
 
 #: include/vlc_config_cat.h:68 src/audio_output/input.c:84
 #: modules/gui/macosx/intf.m:569 modules/gui/macosx/intf.m:570
@@ -130,7 +130,7 @@ msgstr "These are general settings for audio output modules."
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:578
 #: modules/gui/wxwidgets/menus.cpp:282 modules/stream_out/transcode.c:290
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Miscellaneous"
 
 #: include/vlc_config_cat.h:76
 #, fuzzy
@@ -163,7 +163,7 @@ msgstr "Choose your preferred video output and configure it here."
 
 #: include/vlc_config_cat.h:91
 msgid "Video filters are used to postprocess the video stream."
-msgstr ""
+msgstr "Video filters are used to postprocess the video stream."
 
 #: include/vlc_config_cat.h:93
 msgid "Subtitles/OSD"
@@ -177,7 +177,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:103
 msgid "Input / Codecs"
-msgstr ""
+msgstr "Input / Codecs"
 
 #: include/vlc_config_cat.h:104
 msgid ""
@@ -19402,6 +19402,42 @@ msgid "Spectrum analyser"
 msgstr "Spectrum"
 
 #, fuzzy
+#~ msgid "General interface setttings"
+#~ msgstr "General settings"
+
+#, fuzzy
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "Number of threads"
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr "Number of threads "
+
+#, fuzzy
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "Enable trellis quantisation"
+
+#, fuzzy
+#~ msgid "PSNR calculation"
+#~ msgstr "Polarisation"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "Options"
+
+#~ msgid "Text rendering"
+#~ msgstr "Text rendering"
+
+#, fuzzy
+#~ msgid "VLM configuration"
+#~ msgstr "Advanced options..."
+
+#~ msgid "Save As..."
+#~ msgstr "Save As…"
+
+#, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Decoder modules settings"
 
@@ -20872,3 +20908,14 @@ msgstr "Spectrum"
 #, fuzzy
 #~ msgid "Right-Bottom"
 #~ msgstr "Right"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "Skinnable Interface"
+
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection "
+#~ "(Basic authentication only)."
+#~ msgstr ""
+#~ "Allows you to modify the user name that will be used for the connection "
+#~ "(Basic authentication only)."

@@ -169,6 +169,8 @@ msgid ""
 "These are the settings for the input, demultiplexing and decoding parts of "
 "VLC. Encoder settings can also be found here."
 msgstr ""
+"Dette er innstillinger for inndata-, signalsplitting- og dekodingdelene av "
+"VLC. Omkoderinnstillinger finnes også her."
 
 #: include/vlc_config_cat.h:107
 msgid "Access modules"
@@ -199,11 +201,11 @@ msgstr ""
 
 #: include/vlc_config_cat.h:119
 msgid "Demuxers"
-msgstr ""
+msgstr "Signalsplittere"
 
 #: include/vlc_config_cat.h:120
 msgid "Demuxers are used to separate audio and video streams."
-msgstr ""
+msgstr "Signalsplittere brukes for å dele lyd- og videostrømmer."
 
 #: include/vlc_config_cat.h:122
 msgid "Video codecs"
@@ -219,7 +221,7 @@ msgstr "Lyd kodeker"
 
 #: include/vlc_config_cat.h:126
 msgid "Settings for the audio-only decoders and encoders."
-msgstr ""
+msgstr "Innstillinger for lyd-dekodere og omkodere."
 
 #: include/vlc_config_cat.h:128
 msgid "Other codecs"
@@ -227,7 +229,7 @@ msgstr "Andre kodeker"
 
 #: include/vlc_config_cat.h:129
 msgid "Settings for audio+video and miscellaneous decoders and encoders."
-msgstr ""
+msgstr "Innstillinger for lyd+video og diverse dekodere og omkodere."
 
 #: include/vlc_config_cat.h:132
 msgid "General input settings. Use with care."
@@ -236,7 +238,7 @@ msgstr "Generelle inndata instillinger. Bruk med forsiktighet"
 #: include/vlc_config_cat.h:135 src/libvlc-module.c:1530
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:152
 msgid "Stream output"
-msgstr ""
+msgstr "Strømutdata"
 
 #: include/vlc_config_cat.h:137
 msgid ""
@@ -251,11 +253,11 @@ msgstr ""
 
 #: include/vlc_config_cat.h:145
 msgid "General stream output settings"
-msgstr ""
+msgstr "Generelle strømutdatainnstillinger"
 
 #: include/vlc_config_cat.h:147
 msgid "Muxers"
-msgstr ""
+msgstr "Multipleksere"
 
 #: include/vlc_config_cat.h:149
 msgid ""
@@ -264,6 +266,11 @@ msgid ""
 "always force a specific muxer. You should probably not do that.\n"
 "You can also set default parameters for each muxer."
 msgstr ""
+"Multipleksere lager innkapslingsformatene som blir brukt for å sette alle de "
+"elementære strømmene (video, lyd, ...) sammen. Denne innstillingen tillater "
+"deg til å tvinge bruk av en spesifikk multiplekser. Du burde mest trolig "
+"ikke gjøre det.\n"
+"Du kan også sette standardparametre for hver multiplekser."
 
 #: include/vlc_config_cat.h:155
 msgid "Access output"
@@ -405,11 +412,12 @@ msgstr ""
 
 #: include/vlc_config_cat.h:220
 msgid "Encoders settings"
-msgstr ""
+msgstr "Omkoderinnstillinger"
 
 #: include/vlc_config_cat.h:222
 msgid "These are general settings for video/audio/subtitles encoding modules."
 msgstr ""
+"Dette er generelle innstillinger for video/lyd/undertekst omkodermoduler."
 
 #: include/vlc_config_cat.h:225
 msgid "Dialog providers settings"
@@ -681,7 +689,7 @@ msgstr "Artist"
 
 #: include/vlc_meta.h:35
 msgid "Genre"
-msgstr ""
+msgstr "Sjanger"
 
 #: include/vlc_meta.h:36 modules/mux/asf.c:52
 msgid "Copyright"
@@ -753,6 +761,11 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
+"Dette programmet kommer ikke med NOEN GARANTI, så langt som dette er tillat "
+"av lov.\n"
+"Du kan redistribuere det under termene i GNU General Public License;\n"
+"les filen ved navn COPYING for detaljer.\n"
+"Utviklet av VideoLAN-teamet; les AUTHORS-filen for mer informasjon.\n"
 
 #: src/audio_output/filters.c:154 src/audio_output/filters.c:201
 #: src/audio_output/filters.c:224
@@ -17806,6 +17819,27 @@ msgstr ""
 #: modules/visualization/visual/visual.c:120
 msgid "Spectrum analyser"
 msgstr ""
+
+#~ msgid "General interface setttings"
+#~ msgstr "Generelle grensesnitt-instillinger"
+
+#~ msgid "SAP interface module"
+#~ msgstr "SAP grensesnittmodul"
+
+#~ msgid "&Controls"
+#~ msgstr "&Kontroller"
+
+#~ msgid "C&hannels"
+#~ msgstr "K&analer"
+
+#~ msgid "Select angle"
+#~ msgstr "Velg vinkel"
+
+#~ msgid "Select next title"
+#~ msgstr "Velg neste tittel"
+
+#~ msgid "Delete &all"
+#~ msgstr "Slett &alle"
 
 #, fuzzy
 #~ msgid "Teletext page"

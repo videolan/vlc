@@ -1552,6 +1552,7 @@ msgid ""
 "This delays the audio output. The delay must be given in milliseconds.This "
 "can be handy if you notice a lag between the video and the audio."
 msgstr ""
+"此选项将延迟音频的输出。延迟以毫秒为单位。当视频和音频不同步时可以在此调节。"
 
 #: src/libvlc-module.c:192
 msgid "Audio output channels mode"
@@ -1667,7 +1668,7 @@ msgstr "视频 X 坐标"
 msgid ""
 "You can enforce the position of the top left corner of the video window (X "
 "coordinate)."
-msgstr ""
+msgstr "强制指定视频窗口起点（左上角）的 X 坐标。"
 
 #: src/libvlc-module.c:260
 msgid "Video Y coordinate"
@@ -1677,7 +1678,7 @@ msgstr "视频 Y 坐标"
 msgid ""
 "You can enforce the position of the top left corner of the video window (Y "
 "coordinate)."
-msgstr ""
+msgstr "强制指定视频窗口起点（左上角）的 Y 坐标。"
 
 #: src/libvlc-module.c:265
 msgid "Video title"
@@ -1687,7 +1688,7 @@ msgstr "视频标题"
 msgid ""
 "Custom title for the video window (in case the video is not embedded in the "
 "interface)."
-msgstr ""
+msgstr "定制视频窗口的标题（当视频未被嵌入界面时）。"
 
 #: src/libvlc-module.c:270
 msgid "Video alignment"
@@ -1699,6 +1700,8 @@ msgid ""
 "centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can also use "
 "combinations of these values, like 6=4+2 meaning top-right)."
 msgstr ""
+"强制指定视频在其窗口中的对齐方式。默认值 0 为居中（0 = 居中，1 = 左，2 = 右，"
+"4 = 上，8 = 下，可以设置组合值，如 6 = 4 + 2 表示右上方对齐）。"
 
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
 #: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:129
@@ -1766,7 +1769,7 @@ msgstr "灰度视频输出"
 msgid ""
 "Output video in grayscale. As the color information aren't decoded, this can "
 "save some processing power."
-msgstr ""
+msgstr "视频灰阶输出。色彩信息将不被解码，可以减轻处理负载。"
 
 #: src/libvlc-module.c:289
 #, fuzzy
@@ -1794,7 +1797,7 @@ msgstr "重叠视频输出"
 msgid ""
 "Overlay is the hardware acceleration capability of your video card (ability "
 "to render video directly). VLC will try to use it by default."
-msgstr ""
+msgstr "“覆盖”是显卡的硬件加速能力（直接视频渲染能力）。VLC 默认尝试使用覆盖。"
 
 #: src/libvlc-module.c:302 src/video_output/vout_intf.c:404
 msgid "Always on top"
@@ -1832,6 +1835,7 @@ msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or to clone or distort the video window."
 msgstr ""
+"在此添加用于增强图像效果的后处理过滤器，如反交错，或克隆、扭曲视频窗口。"
 
 #: src/libvlc-module.c:320
 msgid "Video filter module"
@@ -1861,7 +1865,7 @@ msgstr "视频快照格式"
 
 #: src/libvlc-module.c:336
 msgid "Image format which will be used to store the video snapshots"
-msgstr ""
+msgstr "视频截图所使用的图像格式"
 
 #: src/libvlc-module.c:338
 msgid "Display video snapshot preview"
@@ -1869,7 +1873,7 @@ msgstr "显示视频快照预览"
 
 #: src/libvlc-module.c:340
 msgid "Display the snapshot preview in the screen's top-left corner."
-msgstr ""
+msgstr "在屏幕左上角显示截图预览。"
 
 #: src/libvlc-module.c:342
 msgid "Use sequential numbers instead of timestamps"
@@ -2505,6 +2509,8 @@ msgid ""
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
 "users should alter this option as it can break playback of all your streams."
 msgstr ""
+"VLC 优先使用的解码器列表。如“dummy,a52”表示在其他解码器之前优先尝试使用 "
+"dummy 和 a52 解码器。只有高级用户应该调整此选项，否则有可能破坏所有流的播放。"
 
 #: src/libvlc-module.c:692
 msgid "Preferred encoders list"
@@ -2714,7 +2720,7 @@ msgstr "如果你的处理器支持 AltiVec 指令集，VLC 可以利用它。"
 msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
-msgstr ""
+msgstr "这些选项用于选择默认模块。除非真正理解其含义，请不要改动。"
 
 #: src/libvlc-module.c:814
 msgid "Memory copy module"
@@ -2724,7 +2730,7 @@ msgstr "内存复制模块"
 msgid ""
 "You can select which memory copy module you want to use. By default VLC will "
 "select the fastest one supported by your hardware."
-msgstr ""
+msgstr "选择内存拷贝模块。VLC 默认使用硬件支持的最快的那个。"
 
 #: src/libvlc-module.c:819
 msgid "Access module"
@@ -2790,7 +2796,7 @@ msgstr "最小线程数量"
 
 #: src/libvlc-module.c:853
 msgid "This option minimizes the number of threads needed to run VLC."
-msgstr ""
+msgstr "此选项将 VLC 运行所需线程数减至最少。"
 
 #: src/libvlc-module.c:855
 msgid "Modules search path"
@@ -2990,7 +2996,7 @@ msgstr "服务探索模块"
 msgid ""
 "Specifies the services discovery modules to load, separated by semi-colons. "
 "Typical values are sap, hal, ..."
-msgstr ""
+msgstr "指定加载服务发现模块，逗号分隔。通常为“sap, hal, ...”"
 
 #: src/libvlc-module.c:978
 msgid "Play files randomly forever"
@@ -3064,7 +3070,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1018
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
-msgstr ""
+msgstr "这些设置是 VLC 的全局键盘绑定，即“热键”"
 
 #: src/libvlc-module.c:1021 src/video_output/vout_intf.c:413
 #: modules/gui/beos/VideoOutput.cpp:1057 modules/gui/macosx/controls.m:400
@@ -3734,6 +3740,35 @@ msgid ""
 "certain time\n"
 "  vlc:quit                       Special item to quit VLC\n"
 msgstr ""
+"用法: %s [选项] [流] ...\n"
+"可以在命令行指定多个流。它们将按指定顺序置于在播放列表中并播放。\n"
+"\n"
+"选项样式：\n"
+"  --option A global option that is set for the duration of the program.\n"
+"   -option A single letter version of a global --option.\n"
+"   :option An option that only applies to the stream directly before it\n"
+"    and that overrides previous settings.\n"
+"\n"
+"流 MRL 语法:\n"
+"[[access][/demux]://]URL[@[title][:chapter][-[title][:chapter]]] [:"
+"option=value ...]\n"
+"\n"
+"Many of the global --options can also be used as MRL specific :options.\n"
+"Multiple :option=value pairs can be specified.\n"
+"\n"
+"URL 语法:\n"
+"  [file://]文件名 纯多媒体文件\n"
+"  http://ip:port/file HTTP URL\n"
+"  ftp://ip:port/file FTP URL\n"
+"  mms://ip:port/file MMS URL\n"
+"  screen:// Screen capture\n"
+"  [dvd://][device][@raw_device] DVD 设备\n"
+"  [vcd://][device] VCD 设备\n"
+"  [cdda://][device] Audio CD 设备\n"
+"  udp:[[<source address>]@[<bind address>][:<bind port>]] UDP stream sent by "
+"a streaming server\n"
+"  vlc:pause:<seconds> 特殊选项：使播放列表暂停指定时间\n"
+"  vlc:quit 特殊选项：退出 VLC\n"
 
 #: src/libvlc-module.c:1316 src/video_output/vout_intf.c:425
 #: modules/gui/macosx/controls.m:438 modules/gui/macosx/controls.m:876
@@ -3884,7 +3919,7 @@ msgstr "布尔值"
 
 #: src/misc/configuration.c:1192
 msgid "key"
-msgstr ""
+msgstr "键"
 
 #: src/playlist/engine.c:125 src/playlist/engine.c:127
 #: src/playlist/loadsave.c:101
@@ -5780,11 +5815,11 @@ msgstr "Microsoft Media Server (MMS)输入"
 
 #: modules/access_output/dummy.c:41 modules/stream_out/dummy.c:48
 msgid "Dummy stream output"
-msgstr ""
+msgstr "虚拟串流输出"
 
 #: modules/access_output/dummy.c:42 modules/misc/dummy/dummy.c:58
 msgid "Dummy"
-msgstr ""
+msgstr "虚拟"
 
 #: modules/access_output/file.c:63
 msgid "Append to file"
@@ -10686,7 +10721,7 @@ msgstr "恢复默认值"
 
 #: modules/gui/macosx/extended.m:115 modules/gui/wxwidgets/extrapanel.cpp:244
 msgid "Gamma"
-msgstr ""
+msgstr "virtualization"
 
 #: modules/gui/macosx/extended.m:117 modules/gui/wxwidgets/extrapanel.cpp:239
 msgid "Saturation"
@@ -12627,9 +12662,8 @@ msgid "Next track"
 msgstr "下一轨"
 
 #: modules/gui/qt4/qt4.cpp:47
-#, fuzzy
 msgid "Qt interface"
-msgstr "显示界面"
+msgstr "Qt界面"
 
 #: modules/gui/qt4/ui/equalizer.ui:63
 #, fuzzy
@@ -18088,6 +18122,343 @@ msgstr "可视化过滤器"
 msgid "Spectrum analyser"
 msgstr "频谱分析器"
 
+#~ msgid "General interface setttings"
+#~ msgstr "一般界面设置"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "视频快照目录"
+
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr "打印 VLC及其所有模块的帮助（可与 --advanced 组合使用）"
+
+#, fuzzy
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "两个 I 帧之间的 P 帧的数目"
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr "两个 I 帧之间的 P 帧的数目 "
+
+#, fuzzy
+#~ msgid "Direct MV prediction mode. "
+#~ msgstr "DirectMedia物件译码器 "
+
+#, fuzzy
+#~ msgid "RTP/RTSP/SDP demuxer (using Live555.com)"
+#~ msgstr "live.com (RTSP/RTP/SDP) 解多任务器"
+
+#, fuzzy
+#~ msgid "Image"
+#~ msgstr "图像文件"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "时间"
+
+#, fuzzy
+#~ msgid "Number of streams"
+#~ msgstr "线程数量"
+
+#~ msgid "Adjust Image"
+#~ msgstr "调整影像"
+
+#, fuzzy
+#~ msgid "Check for updates..."
+#~ msgstr "检查更新..."
+
+#~ msgid "delay"
+#~ msgstr "延迟"
+
+#~ msgid "More info"
+#~ msgstr "更多信息"
+
+#~ msgid "Control interface settings"
+#~ msgstr "控制界面设置"
+
+#~ msgid "Text rendering"
+#~ msgstr "字体渲染"
+
+#~ msgid ""
+#~ "Use the settings of the \"freetype\" module to choose the font you  want "
+#~ "VLC to use for text rendering (to display subtitles for example)."
+#~ msgstr ""
+#~ "使用 \"freetype\" 模块中的设置来选择您所要 VLC 渲染文字使用的字体(例如显示"
+#~ "标题)。"
+
+#~ msgid "You can specify a custom video window title here."
+#~ msgstr "你可以在这里指定视频窗口的标题"
+
+#~ msgid "Program to select"
+#~ msgstr "要选择的节目"
+
+#~ msgid "Programs to select"
+#~ msgstr "要选择的节目"
+
+#, fuzzy
+#~ msgid "Interfaces"
+#~ msgstr "界面"
+
+#~ msgid "Default to 4212"
+#~ msgstr "默认为4212"
+
+#, fuzzy
+#~ msgid "Go To Position"
+#~ msgstr "Logo位置"
+
+#~ msgid "Fill fullscreen"
+#~ msgstr "放大到全屏幕"
+
+#~ msgid "&Shuffle Playlist"
+#~ msgstr "乱化播放清单"
+
+#, fuzzy
+#~ msgid "VLC media player - Updates"
+#~ msgstr "VLC多媒体播放程序"
+
+#~ msgid "Check for updates now !"
+#~ msgstr "现在检查更新 !"
+
+#, fuzzy
+#~ msgid "VLM configuration"
+#~ msgstr "VLM设置档"
+
+#~ msgid "Font filename"
+#~ msgstr "字体文件名称"
+
+#~ msgid "IPv4-SAP listening"
+#~ msgstr "IPv4-SAP 监听"
+
+#~ msgid "IPv6-SAP listening"
+#~ msgstr "IPv6-SAP 监听"
+
+#~ msgid "Ascii Art"
+#~ msgstr "Ascii 图片"
+
+#~ msgid "Select effect"
+#~ msgstr "选择效果"
+
+#, fuzzy
+#~ msgid "Small playlist"
+#~ msgstr "储存播放列表"
+
+#~ msgid "M3U file|*.m3u"
+#~ msgstr "M3U 文件|*.m3u"
+
+#~ msgid "Enable CABAC"
+#~ msgstr "启用CABAC"
+
+#~ msgid "Enable loop filter"
+#~ msgstr "开启循环过滤器"
+
+#~ msgid "Analyse mode"
+#~ msgstr "分析模式"
+
+#~ msgid "Properties"
+#~ msgstr "属性"
+
+#~ msgid "from "
+#~ msgstr "从 "
+
+#~ msgid "Save As..."
+#~ msgstr "另存为..."
+
+#~ msgid "type : "
+#~ msgstr "类型: "
+
+#~ msgid "URL : "
+#~ msgstr "网址: "
+
+#~ msgid "file size : "
+#~ msgstr "文件大小 : "
+
+#~ msgid "file md5 hash : "
+#~ msgstr "文件 md5 散列: "
+
+#~ msgid "Choose a mirror"
+#~ msgstr "选择一个镜像"
+
+#~ msgid "Downloading..."
+#~ msgstr "正在下载..."
+
+#~ msgid " "
+#~ msgstr " "
+
+#, fuzzy
+#~ msgid "Jump 3 seconds backwards"
+#~ msgstr "向后10秒钟"
+
+#~ msgid "Jump 10 seconds backwards"
+#~ msgstr "向后10秒钟"
+
+#~ msgid "Jump 1 minute backwards"
+#~ msgstr "向后1分钟"
+
+#~ msgid "Jump 5 minutes backwards"
+#~ msgstr "向后5分钟"
+
+#, fuzzy
+#~ msgid "Jump 3 seconds forward"
+#~ msgstr "向前10秒钟"
+
+#~ msgid "Jump 10 seconds forward"
+#~ msgstr "向前10秒钟"
+
+#~ msgid "Jump 1 minute forward"
+#~ msgstr "向前1分钟"
+
+#~ msgid "Jump 5 minutes forward"
+#~ msgstr "向后5分钟"
+
+#~ msgid "Settings related to the various access filter used by VLC.\n"
+#~ msgstr "关于 VLC 使用的各种存取模块的设置。\n"
+
+#, fuzzy
+#~ msgid "Open MRL"
+#~ msgstr "开启"
+
+#~ msgid "Channel mixer"
+#~ msgstr "频道混音器"
+
+#~ msgid "Choose program (SID)"
+#~ msgstr "选择程序(SID)"
+
+#~ msgid "Choose programs"
+#~ msgstr "选择程序"
+
+#, fuzzy
+#~ msgid "Choose audio track"
+#~ msgstr "循环音轨"
+
+#~ msgid "Choose subtitles track"
+#~ msgstr "选择字幕轨"
+
+#, fuzzy
+#~ msgid "Shout"
+#~ msgstr "快照"
+
+#, fuzzy
+#~ msgid "Current version"
+#~ msgstr "色彩反向"
+
+#, fuzzy
+#~ msgid "Your version"
+#~ msgstr "色彩反向"
+
+#, fuzzy
+#~ msgid "Mirror"
+#~ msgstr "错误"
+
+#, fuzzy
+#~ msgid "Streamming"
+#~ msgstr "串流"
+
+#, fuzzy
+#~ msgid "Windows GAPI"
+#~ msgstr "窗口"
+
+#, fuzzy
+#~ msgid "Windows GDI"
+#~ msgstr "窗口"
+
+#~ msgid "Choose a stream output"
+#~ msgstr "选择串流输出"
+
+#~ msgid "Loop playlist on end"
+#~ msgstr "循环播放清单"
+
+#~ msgid "GNOME interface"
+#~ msgstr "GNOME界面"
+
+#~ msgid "Select a network stream"
+#~ msgstr "选择一个网络串流"
+
+#~ msgid "Stop Stream"
+#~ msgstr "停止串流"
+
+#~ msgid "Play Stream"
+#~ msgstr "播放串流"
+
+#~ msgid "Pause Stream"
+#~ msgstr "暂停串流"
+
+#~ msgid "Play Slower"
+#~ msgstr "慢速播放"
+
+#~ msgid "Fast"
+#~ msgstr "快速"
+
+#~ msgid "Play Faster"
+#~ msgstr "快速播放"
+
+#~ msgid "Previous file"
+#~ msgstr "上一个文件"
+
+#~ msgid "Next File"
+#~ msgstr "下一个文件"
+
+#~ msgid "Title:"
+#~ msgstr "标题:"
+
+#~ msgid "Chapter:"
+#~ msgstr "章节:"
+
+#~ msgid "Vertical"
+#~ msgstr "垂直"
+
+#~ msgid "Path:"
+#~ msgstr "路径:"
+
+#~ msgid "Gtk+ interface"
+#~ msgstr "Gtk+ 界面"
+
+#~ msgid "Exit the program"
+#~ msgstr "退出程序"
+
+#~ msgid "About this application"
+#~ msgstr "关于这个应用程序"
+
+#~ msgid "Authors"
+#~ msgstr "作者"
+
+#~ msgid "Select a subtitles file"
+#~ msgstr "选择一个字幕档"
+
+#~ msgid "Select File"
+#~ msgstr "选择文件"
+
+#~ msgid "Title %d (%d)"
+#~ msgstr "标题 %d (%d)"
+
+#~ msgid "Chapter %d"
+#~ msgstr "章节 %d"
+
+#~ msgid "Languages"
+#~ msgstr "语言"
+
+#~ msgid "KDE interface"
+#~ msgstr "KDE界面"
+
+#~ msgid "Controls"
+#~ msgstr "控制"
+
+#~ msgid "Pause stream"
+#~ msgstr "暂停串流"
+
+#~ msgid "Play stream"
+#~ msgstr "播放串流"
+
+#~ msgid "&Select All"
+#~ msgstr "全选(&S)"
+
+#~ msgid "SAP interface"
+#~ msgstr "SAP界面"
+
+#~ msgid "Next file"
+#~ msgstr "下一个文件"
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Tarkin译码器模块"
@@ -18501,3 +18872,362 @@ msgstr "频谱分析器"
 
 #~ msgid "Right-Bottom"
 #~ msgstr "右下方"
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "Logo文件名"
+
+#~ msgid "Adds distorsion effects"
+#~ msgstr "增加畸变效果"
+
+#~ msgid "Inverts the image colors"
+#~ msgstr "反转图像颜色"
+
+#, fuzzy
+#~ msgid ""
+#~ "This filters prevents the audio output level from exceeding a defined "
+#~ "value."
+#~ msgstr "这个过滤器阻止音频输出功率超过设定值."
+
+#, fuzzy
+#~ msgid ""
+#~ "Use this to save a stream to a file. You have the ability to reencode the "
+#~ "stream. You can save whatever VLC can read.\n"
+#~ "Please notice that VLC is not very suited for file to file transcoding. "
+#~ "You should use its transcoding features to save network streams, for "
+#~ "example."
+#~ msgstr ""
+#~ "用此项可以将串流保存到一个文件。您有可能会重新编码串流。您可以保存任何 "
+#~ "VLC 可以读取的东西。\n"
+#~ "请注意，VLC 可能不是很适合于文件到文件的转码。您应该使用它的转码功能来保存"
+#~ "一些其它的东西，诸如网络流。"
+
+#~ msgid "In this page, you will select how your input stream will be sent."
+#~ msgstr "在这一页，你可以选择你的输入串流的传送方式"
+
+#~ msgid ""
+#~ "In this page, you will define a few additionnal parameters for your "
+#~ "transcoding"
+#~ msgstr "在这一页，你可以定义转码时使用的一些附加的参数"
+
+#~ msgid "This option allows you to always open a default stream on start-up."
+#~ msgstr "此选项允许您在启动时总是打开一个默认的串流。"
+
+#~ msgid ""
+#~ "If this option is enabled, VLC will always start a video in fullscreen "
+#~ "mode."
+#~ msgstr "如果该选项被打开，VLC会使用全屏幕模式打开视频"
+
+#~ msgid ""
+#~ "Allows you to specify the image format in which the video snapshots will "
+#~ "be stored."
+#~ msgstr "允许你指定视频快照的影像格式"
+
+#, fuzzy
+#~ msgid ""
+#~ "Specify the IPv4 address of the networking interface. This overrides the "
+#~ "routing table."
+#~ msgstr "表示这是组播输出接口.这个重写了路由表."
+
+#~ msgid "Input start time (seconds)"
+#~ msgstr "输入起始时间(秒)"
+
+#~ msgid "Input stop time (seconds)"
+#~ msgstr "输入停止时间(秒)"
+
+#~ msgid ""
+#~ "Allows you to modify the default TCP connection timeout. This value "
+#~ "should be set in millisecond units."
+#~ msgstr "允许你修改默认的TCP连接超时时间. 这个值以毫秒为单位."
+
+#~ msgid "Preferred codecs list"
+#~ msgstr "偏好的编码器清单"
+
+#~ msgid "Select the key to turn off audio volume."
+#~ msgstr "选择按键以关闭音频音量"
+
+#~ msgid "Standard filesystem file input"
+#~ msgstr "标准文件系统文件输入"
+
+#~ msgid "GnomeVFS filesystem file input"
+#~ msgstr "GnomeVFS 文件系统文件输入"
+
+#~ msgid "Output channels number"
+#~ msgstr "输出频道数量"
+
+#~ msgid "Timeout of subpictures"
+#~ msgstr "画中画超时时间"
+
+#~ msgid "Allows you to specify the output video width."
+#~ msgstr "允许你指定输出视频宽度"
+
+#~ msgid "Allows you to specify the output video height."
+#~ msgstr "允许你指定输出视频高度"
+
+#~ msgid "This allows you to change the display name of the Service."
+#~ msgstr "允许你改变服务的显示名字"
+
+#~ msgid "Telnet Interface host"
+#~ msgstr "Telnet 接口主机"
+
+#~ msgid "Default to listen on all network interfaces"
+#~ msgstr "默认监听所有网络接口"
+
+#~ msgid "Telnet Interface port"
+#~ msgstr "Telnet接口端口"
+
+#~ msgid "Telnet Interface password"
+#~ msgstr "Telnet接口密码"
+
+#~ msgid "You have to select two bookmarks."
+#~ msgstr "你必须选择两个书签"
+
+#, fuzzy
+#~ msgid "Go to specific position"
+#~ msgstr "Logo位置"
+
+#~ msgid "Crops the image"
+#~ msgstr "获取图像"
+
+#, fuzzy
+#~ msgid "Use embedded video output"
+#~ msgstr "QT Embedded 视频输出"
+
+#~ msgid "Advanced output:"
+#~ msgstr "高级输出:"
+
+#~ msgid "Output Options"
+#~ msgstr "输出选项"
+
+#~ msgid "Transcode options"
+#~ msgstr "转码选项"
+
+#~ msgid "If your stream has audio and you want to transcode it, enable this."
+#~ msgstr "如果你的流有音频而且你想要进行转码,打开此项"
+
+#~ msgid "If your stream has video and you want to transcode it, enable this."
+#~ msgstr "如果你的流有视频而且你想要进行转码,打开此项"
+
+#, fuzzy
+#~ msgid "You you need to select a file, you want to save to."
+#~ msgstr "你必须选择文件以另存"
+
+#~ msgid "Last skin used"
+#~ msgstr "上一个使用的面板"
+
+#~ msgid "Select the path to the last skin used."
+#~ msgstr "选择上一个使用的面板的路径"
+
+#~ msgid "Config of last used skin."
+#~ msgstr "组态上一次使用的面板"
+
+#~ msgid "Destination Target:"
+#~ msgstr "目标:"
+
+#~ msgid "Output methods"
+#~ msgstr "输出方式"
+
+#~ msgid "Miscellaneous options"
+#~ msgstr "杂项选项"
+
+#~ msgid "Subtitles options"
+#~ msgstr "字幕选项"
+
+#~ msgid "Show bookmarks dialog when the interface starts."
+#~ msgstr "接口启动时显示书签对话框"
+
+#~ msgid "Show taskbar entry"
+#~ msgstr "显示任务栏项"
+
+#~ msgid "The size of the fonts used by the osd module"
+#~ msgstr "OSD模块所使用的字号"
+
+#~ msgid "Allows you to define the title that will be put in ASF comments."
+#~ msgstr "允许你定义要放入ASF批注中的标题."
+
+#~ msgid "Allows you to define the comment that will be put in ASF comments."
+#~ msgstr "允许你定义要放入ASF批注中的批注."
+
+#~ msgid ""
+#~ "Allows you to specify the output access method used for the streaming "
+#~ "output."
+#~ msgstr "允许你指定串流输出的输出存取方法"
+
+#~ msgid "Allows you to specify the muxer used for the audio streaming output."
+#~ msgstr "允许你指定音频串流输出的多任务器"
+
+#~ msgid "Allows you to specify the muxer used for the video streaming output."
+#~ msgstr "允许你指定视频串流输出的多任务器"
+
+#~ msgid "Allows you to specify the output URL used for the streaming output."
+#~ msgstr "允许你指定串流输出的URL"
+
+#~ msgid ""
+#~ "Allows you to specify the output URL used for the audio streaming output."
+#~ msgstr "允许你指定音频串流输出的URL"
+
+#~ msgid ""
+#~ "Allows you to specify the output URL used for the video streaming output."
+#~ msgstr "允许你指定视频串流输出的URL"
+
+#~ msgid ""
+#~ "Allows you to specify the session name used for the streaming output."
+#~ msgstr "允许你为流输出标明会话名称."
+
+#~ msgid ""
+#~ "Allows you to specify a URL with additional information on the stream."
+#~ msgstr "允许你在流上标明URL及一些附加信息"
+
+#~ msgid "Allows you to specify contact e-mail address for this session."
+#~ msgstr "允许你标明会话的联系电邮地址"
+
+#~ msgid ""
+#~ "Allows you to specify the output muxer method used for the streaming "
+#~ "output."
+#~ msgstr "允许你指定串流输出的输出多任务器"
+
+#~ msgid "Output URL (deprecated)"
+#~ msgstr "输出URL (不建议使用)"
+
+#~ msgid ""
+#~ "Allows you to specify the video bitrate used for the streaming output."
+#~ msgstr "允许你指定串流输出的视频位率"
+
+#~ msgid "Allows you to specify a maximum output video width."
+#~ msgstr "允许你指定输出视频的最大宽度"
+
+#~ msgid "Allows you to specify a maximum output video height."
+#~ msgstr "允许你指定输出视频的最大高度"
+
+#~ msgid ""
+#~ "Allows you to specify video filters used after the video transcoding and "
+#~ "subpictures overlaying."
+#~ msgstr "允许你指定在视频转码后和画中画功能中使用的视频过滤器。"
+
+#~ msgid "Allows you to specify the top coordinate for the video cropping."
+#~ msgstr "允许你指定视频修整的上方坐标"
+
+#~ msgid "Allows you to specify the left coordinate for the video cropping."
+#~ msgstr "允许你指定视频修整的左方坐标"
+
+#~ msgid "Allows you to specify the bottom coordinate for the video cropping."
+#~ msgstr "允许你指定视频修整的下方坐标"
+
+#~ msgid "Allows you to specify the right coordinate for the video cropping."
+#~ msgstr "允许你指定视频修整的右方坐标"
+
+#~ msgid ""
+#~ "Allows you to specify the audio bitrate used for the streaming output."
+#~ msgstr "允许你指定串流输出的音频位率"
+
+#~ msgid ""
+#~ "Allows you to specify the audio sample rate used for the streaming output."
+#~ msgstr "允许你指定串流输出的音频采样率"
+
+#~ msgid ""
+#~ "Allows you to specify the number of audio channels used for the streaming "
+#~ "output."
+#~ msgstr "允许你指定串流输出的音频频道数量"
+
+#~ msgid ""
+#~ "Allows you to specify the destination subtitles codec used for the "
+#~ "streaming output."
+#~ msgstr "允许你指定串流输出的目的字幕编码器"
+
+#~ msgid "List of video output modules"
+#~ msgstr "视频输出模块清单"
+
+#~ msgid "Select the specific video output modules that you want to activate."
+#~ msgstr "选择你想要激活的特定视频输出模块."
+
+#~ msgid "Marquee text"
+#~ msgstr "滚动字幕文字"
+
+#~ msgid "X offset, from left"
+#~ msgstr "X 偏移量，从左面"
+
+#~ msgid "Y offset, from the top"
+#~ msgstr "Y 偏移量，从上面"
+
+#~ msgid "Top left corner y coordinate"
+#~ msgstr "左上角 y 坐标"
+
+#~ msgid "OSD menu configuration file"
+#~ msgstr "OSD 菜单设置文件"
+
+#~ msgid "On Screen Display menu subfilter"
+#~ msgstr "OSD 菜单子过滤器"
+
+#~ msgid ""
+#~ "If the OpenGL cube effect is enabled, this controls its rotation speed."
+#~ msgstr "如果 OpenGL 立方体效果打开了，这项将控制它的旋转速度。"
+
+#~ msgid "Allows you to select different visual effects."
+#~ msgstr "允许你选择不同的视觉效果"
+
+#~ msgid "choose the screen to be used for fullscreen mode."
+#~ msgstr "选择全屏幕模式所使用的屏幕。"
+
+#~ msgid "Allows you to reduce the speed of the animation (default 6, max 10)."
+#~ msgstr "允许您减低动画的速度 (默认为 6, 最大为 10)。"
+
+#~ msgid "Defines whether to draw the original spectrum graphic routine."
+#~ msgstr "定义是否显示原始的频谱图形过程"
+
+#~ msgid "Defines whether to draw the bands."
+#~ msgstr "定义是否显示频带"
+
+#~ msgid "Vertical offset in pixels of the displayed text"
+#~ msgstr "显示文字的垂直偏移像素"
+
+#~ msgid "Offset in pixels of the shadow"
+#~ msgstr "阴影的偏移像素"
+
+#~ msgid "Allows you to set the desired frame rate."
+#~ msgstr "允许你指定所期望的帧率。"
+
+#~ msgid "MPEG-I/II audio demuxer"
+#~ msgstr "MPEG-I/II音频解多任务器"
+
+#~ msgid "Ogg stream demuxer"
+#~ msgstr "Ogg串流解多任务器"
+
+#, fuzzy
+#~ msgid "Podcast playlist import"
+#~ msgstr "PLS播放列表汇入"
+
+#~ msgid "Text subtitles demux"
+#~ msgstr "文字字幕解多任务"
+
+#~ msgid "ID3 tag parser using libid3tag"
+#~ msgstr "ID3标签解析器(使用libid3tag)"
+
+#~ msgid "This selects the analysing mode."
+#~ msgstr "选择分析模式"
+
+#~ msgid "Sets maximum interval between IDR-frames"
+#~ msgstr "设置IDR帧最大间隔"
+
+#~ msgid "Sets minimum interval between IDR-frames"
+#~ msgstr "设置IDR帧最小间隔"
+
+#~ msgid "Scene-cut detection."
+#~ msgstr "场景切割检测"
+
+#~ msgid "Interface showing control interface"
+#~ msgstr "显示控制接口的界面"
+
+#~ msgid "Item Info"
+#~ msgstr "项目信息"
+
+#~ msgid "Time To Live"
+#~ msgstr "有效时间"
+
+#~ msgid "Force options for separate subtitle files."
+#~ msgstr "强制分离字幕文件选项"
+
+#~ msgid "CoreAudio output"
+#~ msgstr "CoreAudio输出"
+
+#~ msgid "SLP announce"
+#~ msgstr "SLP通告"

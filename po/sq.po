@@ -17771,6 +17771,12 @@ msgstr "Fitltri i treguesit"
 msgid "Spectrum analyser"
 msgstr "Analizatori i spektrit"
 
+#~ msgid "General interface setttings"
+#~ msgstr "Preferenca te pergjithsme mbi pamjen"
+
+#~ msgid "Text rendering"
+#~ msgstr "Krijim i tekstit"
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Krijim i tekstit"

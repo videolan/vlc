@@ -19731,6 +19731,45 @@ msgstr "Filter vizualizátora"
 msgid "Spectrum analyser"
 msgstr "Spektrálny analyzátor"
 
+#~ msgid "&Disc..."
+#~ msgstr "&Disk..."
+
+#~ msgid "&Network..."
+#~ msgstr "&Sieť..."
+
+#~ msgid "Play the selected stream"
+#~ msgstr "Prehrať vybraný stream"
+
+#~ msgid "Add subtitles"
+#~ msgstr "Pridať titulky"
+
+#~ msgid "Language 0x%x"
+#~ msgstr "Jazyk 0x%x"
+
+#~ msgid "Open skin"
+#~ msgstr "Otvoriť skin"
+
+#~ msgid "Skin files"
+#~ msgstr "Skin súbor"
+
+#~ msgid "All files"
+#~ msgstr "Všetky súbory"
+
+#~ msgid "Add file"
+#~ msgstr "Pridať súbor"
+
+#~ msgid "Open a File"
+#~ msgstr "Otvoriť súbor"
+
+#~ msgid "Open file..."
+#~ msgstr "Otvoriť súbor..."
+
+#~ msgid "Open disc..."
+#~ msgstr "Otvoriť disk..."
+
+#~ msgid "Network stream..."
+#~ msgstr "Sieťový stream"
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Dekódovací modul Tarkin"

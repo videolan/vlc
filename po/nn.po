@@ -17851,6 +17851,10 @@ msgid "Spectrum analyser"
 msgstr ""
 
 #, fuzzy
+#~ msgid "General interface setttings"
+#~ msgstr "Generelle grensesnittsinnstillingar"
+
+#, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Videofiltermodul"
 

@@ -18026,6 +18026,12 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
+#~ msgid "General interface setttings"
+#~ msgstr "הגדרות ממשק כלליות"
+
+#~ msgid "Save As..."
+#~ msgstr "שמירה בשם..."
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "מודול פענוח Tarkin"
@@ -18830,3 +18836,13 @@ msgstr ""
 
 #~ msgid "Uh Oh! Unable to find playlist !"
 #~ msgstr "אוי לא! לא ניתן למצוא רשימת השמעה!"
+
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection."
+#~ msgstr "מאפשר לשנות שם המשתמש שיינתן בהתחברות."
+
+#~ msgid "Set the Brightness of the video input"
+#~ msgstr "קבע את בהירות קלט הוידאו"
+
+#~ msgid "no items in playlist"
+#~ msgstr "אין פריטים ברשימת ההשמעה"

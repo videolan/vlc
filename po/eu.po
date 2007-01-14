@@ -18028,6 +18028,12 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
+#~ msgid "General interface setttings"
+#~ msgstr "Interfazearen ezarpen orokorrak"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Bideo argazkien direktorioa"
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Bideo iragazki modulua"

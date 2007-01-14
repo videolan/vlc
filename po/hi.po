@@ -17860,6 +17860,9 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
+#~ msgid "General interface setttings"
+#~ msgstr "सामान्य इंटरफ़ेस विन्यास"
+
 #~ msgid "CDDB Artist"
 #~ msgstr "सी डि डि बि कलाकार्"
 

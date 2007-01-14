@@ -17853,6 +17853,9 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
+#~ msgid "General interface setttings"
+#~ msgstr "Pamata saskarnes iestatījumi"
+
 #~ msgid "CDDB Artist"
 #~ msgstr "CDDB Izpildītājs"
 

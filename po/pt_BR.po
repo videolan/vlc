@@ -19912,6 +19912,59 @@ msgstr "Filtro do visualizador"
 msgid "Spectrum analyser"
 msgstr "Espectro"
 
+#~ msgid "General interface setttings"
+#~ msgstr "Configurações gerais da interface"
+
+#, fuzzy
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr "Imprimir ajuda sobre o módulo (pode ser combinado com --advanced)"
+
+#, fuzzy
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "Número de pixels em branco entre as faixas"
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr "Número de pixels em branco entre as faixas "
+
+#, fuzzy
+#~ msgid "Allowed variance in average. bitrate (in kbits/s)."
+#~ msgstr "Selecione o bitrate máximo do stream"
+
+#, fuzzy
+#~ msgid "Sets a maximum local bitrate in kbits/s."
+#~ msgstr "Selecione o bitrate máximo do stream"
+
+#, fuzzy
+#~ msgid "Averaging period for the maximum local bitrate in kbits."
+#~ msgstr "Selecione o bitrate máximo do stream"
+
+#, fuzzy
+#~ msgid "QP curve compression. (0.0=CBR to 1.0=QCP)"
+#~ msgstr "Limite de compressão DTS dinâmico"
+
+#, fuzzy
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "Permite remapear as ações."
+
+#, fuzzy
+#~ msgid "PSNR calculation"
+#~ msgstr "Saturação"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "Posição de início"
+
+#, fuzzy
+#~ msgid "Text rendering"
+#~ msgstr "Renderização direta"
+
+#~ msgid "Save As..."
+#~ msgstr "Salvar como..."
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Módulo decodificador Tarkin"
@@ -22998,3 +23051,21 @@ msgstr "Espectro"
 
 #~ msgid "Control"
 #~ msgstr "Controle"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "Alternar _Interface"
+
+#~ msgid "choose the screen to be used for fullscreen mode."
+#~ msgstr "escolha a tela a ser usada para o modo tela cheia."
+
+#~ msgid "Jump"
+#~ msgstr "Pular"
+
+#, fuzzy
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection "
+#~ "(Basic authentication only)."
+#~ msgstr ""
+#~ "Permite que você modifique o nome de usuário que será usado para a "
+#~ "conexão. (Apenas autenticação básica)."

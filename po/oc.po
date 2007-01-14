@@ -20,9 +20,8 @@ msgid "VLC preferences"
 msgstr "Preférencias VLC"
 
 #: include/vlc_config_cat.h:38
-#, fuzzy
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "Picar \"Opcions Avançadas\" per veire totas las opcions."
+msgstr "Seleccionatz \"Opcions avançadas\" per véser totas las opcions."
 
 #: include/vlc_config_cat.h:40 include/vlc_config_cat.h:131
 #: modules/gui/macosx/playlistinfo.m:62 modules/gui/wince/playlist.cpp:674
@@ -36,9 +35,8 @@ msgid "Interface"
 msgstr "Interfàcia"
 
 #: include/vlc_config_cat.h:44
-#, fuzzy
 msgid "Settings for VLC's interfaces"
-msgstr "Paramètres intefàcia VLC"
+msgstr "Paramètres de las interfaces de VLC"
 
 #: include/vlc_config_cat.h:46
 #, fuzzy
@@ -46,14 +44,12 @@ msgid "General interface settings"
 msgstr "Paramètres interfàcia principala"
 
 #: include/vlc_config_cat.h:48
-#, fuzzy
 msgid "Main interfaces"
-msgstr "Reglatge"
+msgstr "Interfaces principalas"
 
 #: include/vlc_config_cat.h:49
-#, fuzzy
 msgid "Settings for the main interface"
-msgstr "Paramètres intefàcia VLC"
+msgstr "Paramètres de l'interfaç principala"
 
 #: include/vlc_config_cat.h:51 src/libvlc-module.c:89
 msgid "Control interfaces"
@@ -121,9 +117,8 @@ msgid "Miscellaneous"
 msgstr "Divèrs"
 
 #: include/vlc_config_cat.h:76
-#, fuzzy
 msgid "Miscellaneous audio settings and modules."
-msgstr "Paramètres divèrses audio e modulis"
+msgstr "Paramètres divèrses audio e modules"
 
 #: include/vlc_config_cat.h:79 src/input/es_out.c:1635
 #: src/libvlc-module.c:1291 modules/gui/macosx/extended.m:79
@@ -11277,9 +11272,8 @@ msgid "Author"
 msgstr "Autor"
 
 #: modules/gui/macosx/playlistinfo.m:63
-#, fuzzy
 msgid "Advanced Information"
-msgstr "Mai d'Opcions"
+msgstr "Informacions avançadas"
 
 #: modules/gui/macosx/playlistinfo.m:81 modules/gui/qt4/ui/input_stats.ui:381
 msgid "Read at media"
@@ -12967,9 +12961,8 @@ msgid "Stream and Media Info"
 msgstr "Informacion del Flus e del Supòrt"
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:83
-#, fuzzy
 msgid "Advanced information"
-msgstr "Mai d'Opcions"
+msgstr "Informacions avançadas"
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:93
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:192
@@ -13077,9 +13070,8 @@ msgid "Advanced Settings..."
 msgstr "Mai d'Opcions..."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:657
-#, fuzzy
 msgid "File:"
-msgstr "Fichièr"
+msgstr "Fichièr :"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:694
 msgid "DVD (menus)"
@@ -13425,9 +13417,8 @@ msgid "Subtitles file"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
-#, fuzzy
 msgid "Options"
-msgstr "Opcions:"
+msgstr "Opcions"
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:208
 msgid ""
@@ -13796,9 +13787,8 @@ msgid "Online Help"
 msgstr ""
 
 #: modules/gui/wxwidgets/interface.cpp:617
-#, fuzzy
 msgid "About..."
-msgstr "A prepaus"
+msgstr "A prepaus..."
 
 #: modules/gui/wxwidgets/interface.cpp:619
 msgid "Check for Updates..."
@@ -18125,6 +18115,33 @@ msgstr "Veire filtre"
 msgid "Spectrum analyser"
 msgstr ""
 
+#~ msgid "Errors"
+#~ msgstr "Errors"
+
+#~ msgid "Login"
+#~ msgstr "Se connectar"
+
+#~ msgid "Yes"
+#~ msgstr "Òc"
+
+#~ msgid "Interfaces"
+#~ msgstr "Interfaces"
+
+#~ msgid "General interface setttings"
+#~ msgstr "Paramètres de l'interfaç principala"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Repertòri per captura video"
+
+#~ msgid "Text rendering"
+#~ msgstr "Aparéncia del tèxte"
+
+#~ msgid "Select effect"
+#~ msgstr "Causir efèit"
+
+#~ msgid "Save As..."
+#~ msgstr "Enregistrar coma..."
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Module de filtre video"
@@ -18201,14 +18218,6 @@ msgstr ""
 #~ msgstr "ISO-9660 Volume Set"
 
 #, fuzzy
-#~ msgid "Errors"
-#~ msgstr "Error"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "Georgian"
-
-#, fuzzy
 #~ msgid "Console"
 #~ msgstr "Tampar"
 
@@ -18225,10 +18234,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Mime type"
 #~ msgstr "Tipe de Disc"
-
-#, fuzzy
-#~ msgid "Yes"
-#~ msgstr "Òc"
 
 #~ msgid "Open Messages Window"
 #~ msgstr "Dobrir Finèstra Messatges"
@@ -18305,10 +18310,6 @@ msgstr ""
 
 #~ msgid "This option allows you to always open a default stream on start-up."
 #~ msgstr " ..."
-
-#, fuzzy
-#~ msgid "Interfaces"
-#~ msgstr "Interfàcia"
 
 #~ msgid "You can set the address and port the http interface will bind to."
 #~ msgstr "..."

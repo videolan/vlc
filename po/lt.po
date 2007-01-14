@@ -17770,6 +17770,9 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
+#~ msgid "General interface setttings"
+#~ msgstr "Bendri išvaizdos nustatymai"
+
 #, fuzzy
 #~ msgid "Stream information"
 #~ msgstr "Bendri išvaizdos nustatymai"

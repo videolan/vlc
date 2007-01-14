@@ -19189,6 +19189,71 @@ msgstr "Visualiseringsfilter"
 msgid "Spectrum analyser"
 msgstr "Spektrum"
 
+#~ msgid "General interface setttings"
+#~ msgstr "Generelle grænseflade indstillinger"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Video snapshot mappe"
+
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr ""
+#~ "udskriv hjælp for VLC og alle dets moduler (kan kombineres med --advanced)"
+
+#, fuzzy
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "Antal b-frames der kan efterfølger hinanden mellem I- og P-frames"
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr "Antal b-frames der kan efterfølger hinanden mellem I- og P-frames "
+
+#, fuzzy
+#~ msgid ""
+#~ "Number of previous frames used as predictors. This is effective in Anime, "
+#~ "but seems to make little difference in live-action source material. Some "
+#~ "decoders are unable to deal with large frameref values. From 1 to 16"
+#~ msgstr ""
+#~ "Er effektivt for Anime materiale, men gør umiddelbart ikke den store "
+#~ "forskel med normalt film materiale. Nogle afkodere er ikke istand til at "
+#~ "håndtere store frameref værdier."
+
+#, fuzzy
+#~ msgid "Allowed variance in average. bitrate (in kbits/s)."
+#~ msgstr "Vælg stream med højest bitrate"
+
+#, fuzzy
+#~ msgid "Sets a maximum local bitrate in kbits/s."
+#~ msgstr "Vælg stream med højest bitrate"
+
+#, fuzzy
+#~ msgid "Averaging period for the maximum local bitrate in kbits."
+#~ msgstr "Vælg stream med højest bitrate"
+
+#, fuzzy
+#~ msgid "Direct MV prediction mode. "
+#~ msgstr "DirectMedia objekt decoder "
+
+#, fuzzy
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "Aktiver interlaced indkodning"
+
+#, fuzzy
+#~ msgid "PSNR calculation"
+#~ msgstr "Mætning"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "Tidsforskydelse"
+
+#~ msgid "Text rendering"
+#~ msgstr "Tekstudførelse"
+
+#~ msgid "Save As..."
+#~ msgstr "Gem som..."
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Videofilter modul"
@@ -21072,3 +21137,23 @@ msgstr "Spektrum"
 
 #~ msgid "Control"
 #~ msgstr "Control"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "Telnet grænseflade port"
+
+#~ msgid "choose the screen to be used for fullscreen mode."
+#~ msgstr "vælg den skærm der skal bruges \"fuldskærm\" aktiveres"
+
+#~ msgid "Jump"
+#~ msgstr "Hop"
+
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection "
+#~ "(Basic authentication only)."
+#~ msgstr ""
+#~ "Lader dig ændre det brugernavn der vil blive brugt for forbindelsen "
+#~ "(Basal autorisation)"
+
+#~ msgid "X11 OpenGL provider"
+#~ msgstr "X11 OpenGL provider"

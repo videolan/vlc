@@ -19044,6 +19044,60 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
+#~ msgid "General interface setttings"
+#~ msgstr "Setari generale pentru interfata"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Directorul de instantanee video"
+
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr ""
+#~ "tipareste ajutor pentru VLC si pentru toate modulele lui( poate fi "
+#~ "combinat cu --advanced)"
+
+#, fuzzy
+#~ msgid ""
+#~ "Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
+#~ "empty if you don't have one."
+#~ msgstr ""
+#~ "Calea spre fisierul cu cheia privata  x509 PEM care va fi folosit de "
+#~ "fluxul de iesire HTTP/SSL. Lasati gol daca nu aveti unul."
+
+#, fuzzy
+#~ msgid ""
+#~ "Path to the x509 PEM trusted root CA certificates (certificate authority) "
+#~ "file that will be used forHTTPS. Leave empty if you don't have one."
+#~ msgstr ""
+#~ "Calea spre fisierul cu cheia privata  x509 PEM care va fi folosit de "
+#~ "fluxul de iesire HTTP/SSL. Lasati gol daca nu aveti unul."
+
+#, fuzzy
+#~ msgid ""
+#~ "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
+#~ "encoding and decoding, but should save 10-15% bitrate."
+#~ msgstr ""
+#~ "Activeaza CABAC (Context-Adaptive Binary Arithmetic Coding). Putin mai "
+#~ "lenta la codare decodare, dar ar trebui sa economiseasca 10-15% bitrate."
+
+#, fuzzy
+#~ msgid "Allowed variance in average. bitrate (in kbits/s)."
+#~ msgstr "Seteaza variatia permisa in bitrate-ul obijnuit."
+
+#~ msgid "Sets a maximum local bitrate in kbits/s."
+#~ msgstr "Seteaza un bitrate local maxim in kbps."
+
+#, fuzzy
+#~ msgid "Averaging period for the maximum local bitrate in kbits."
+#~ msgstr "Seteaza un bitrate local maxim in kbps."
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "Deplasare timp"
+
+#~ msgid "Text rendering"
+#~ msgstr "Desenarea textului"
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Modul decodor Tarkin"
@@ -19770,3 +19824,14 @@ msgstr ""
 #, fuzzy
 #~ msgid "Dummy VF"
 #~ msgstr "Fals"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "Setari generale pentru interfata"
+
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection "
+#~ "(Basic authentication only)."
+#~ msgstr ""
+#~ "Va permite sa modificati numele de utilizator care va fi folosit pentru "
+#~ "conexiune (Doar pentru autentificarea de baza)."

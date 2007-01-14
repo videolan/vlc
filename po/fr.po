@@ -19538,6 +19538,284 @@ msgstr "Filtre de visualisation"
 msgid "Spectrum analyser"
 msgstr "Analyseur de spectre"
 
+#~ msgid "QP factor between I and P."
+#~ msgstr "Facteur de QP entre I et P."
+
+#~ msgid "QP factor between P and B."
+#~ msgstr "Facteur de QP entre P et B."
+
+#~ msgid ""
+#~ "This parameter controls quality versus speed tradeoffs involved in the "
+#~ "motion estimation decision process (lower = quicker and higher = better "
+#~ "quality). From 1 to 6."
+#~ msgstr ""
+#~ "Ce paramètre contrôle la qualité par rapport aux compromis de vitesses "
+#~ "impliquées dans le processus de choix du mouvement estimé (faible = plus "
+#~ "rapide et élevé = meilleure qualité)."
+
+#~ msgid "PSNR calculation"
+#~ msgstr "Calcul du PSNR"
+
+#~ msgid "Timestamp"
+#~ msgstr "Horodatage"
+
+#~ msgid ""
+#~ "Width in pixels of the border than can be drawn horizontally around the "
+#~ "mosaic."
+#~ msgstr "Largeur de la bordure horizontale autour de la mosaïque."
+
+#~ msgid "Text rendering"
+#~ msgstr "Rendu du texte"
+
+#~ msgid "Open MRL"
+#~ msgstr "Ouvrir MRL"
+
+#~ msgid "Streamming"
+#~ msgstr "Diffusion"
+
+#~ msgid "Dummy stream ouput"
+#~ msgstr "Flux sortant factice"
+
+#~ msgid "Audio Bitrate"
+#~ msgstr "Taux d'échantillonnage audio"
+
+#~ msgid "Segment Filename"
+#~ msgstr "Nom de fichier du segment"
+
+#~ msgid "Acid Punk"
+#~ msgstr "Acid Punk"
+
+#~ msgid "Acid Jazz"
+#~ msgstr "Acid Jazz"
+
+#~ msgid "Group Info"
+#~ msgstr "Infos sur le groupe"
+
+#~ msgid "Dummy stream"
+#~ msgstr "Flux factice"
+
+#~ msgid "List of vout modules"
+#~ msgstr "Liste des modules vout"
+
+#~ msgid "General interface setttings"
+#~ msgstr "Paramètres généraux de l’interface"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Répertoire des captures"
+
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr ""
+#~ "Afficher l’aide de VLC et de ses modules (peut être combiné avec --"
+#~ "advanced)"
+
+#~ msgid ""
+#~ "Path to the x509 PEM private key file that will  be used for HTTPS. Leave "
+#~ "empty if you don't have one."
+#~ msgstr ""
+#~ "Chemin du fichier x509 de clé privée à utiliser pour HTTPS. Ne rien "
+#~ "entrer si vous n'en n'avez pas."
+
+#~ msgid ""
+#~ "Path to the x509 PEM trusted root CA certificates (certificate authority) "
+#~ "file that will be used forHTTPS. Leave empty if you don't have one."
+#~ msgstr ""
+#~ "Chemin du fichier x509 d'autorité de certification qui sera utilisé pour "
+#~ "HTTPS. Ne rien entrer si vous n'en n'avez pas."
+
+#~ msgid ""
+#~ "Sets minimum interval between IDR-frames. In H.264, I-frames do not "
+#~ "necessarily bound a closed GOP because it is allowable for a P-frame to "
+#~ "be predicted from more frames than just the one frame before it (also see "
+#~ "frameref). Therefore, I-frames are not necessarily seekable. IDR-Frames "
+#~ "restrict subsequent P-frames from referring to any frame prior to the IDR-"
+#~ "Frame. \n"
+#~ "If scenecuts appear within this interval, they are still encoded as I-"
+#~ "frames, but do not start a new GOP."
+#~ msgstr ""
+#~ "Intervalle minimum entre des images IDR. En H.264, les images I ne "
+#~ "délimitent pas forcément un GOP, car il est possible pour une image P "
+#~ "d'être prédite à partir de plus d'une image précédente (voir aussi "
+#~ "frameref). Il n'est donc pas toujours possible de se déplacer jusqu'aux "
+#~ "images I. Les images IDR interdisent aux images P suivantes de se référer "
+#~ "à une image précédant l'image IDR. \n"
+#~ "Si des changements de scène ont lieu pendant cet intervalle, ils sont "
+#~ "toujours codés comme des images I, mais n'initient pas de nouveau GOP."
+
+#~ msgid "Extra I-Frames aggressivity"
+#~ msgstr "Agressivité des images I"
+
+#~ msgid ""
+#~ "Scene-cut detection. Controls how aggressively to insert extra I-frames. "
+#~ "With small values of scenecut, the codec often has to force an I-frame "
+#~ "when it would exceed keyint. Good values of scenecut may find a better "
+#~ "location for the I-frame. Large values use more I-frames than necessary, "
+#~ "thus wasting bits. -1 disables scene-cut detection, so I-frames are be "
+#~ "inserted only every other keyint frames, which probably leads to ugly "
+#~ "encoding artifacts. (1-100)."
+#~ msgstr ""
+#~ "Cette valeur contrôle l'ajout d'images I aux changements de scène. Avec "
+#~ "de petites valeurs, le codec doit souvent forcer une image I pour ne pas "
+#~ "dépasser l'interface maximal. De bonnes valeurs peuvent trouver une "
+#~ "meilleure position pour l'image I. De grandes valeurs utilisent plus "
+#~ "d'images I que nécessaire, perdant ainsi du débit. -1 désactive la "
+#~ "détection de changements de scène, ce qui entraine l'insertion d'images I "
+#~ "seulement à la fin de l'intervale maximal, ce qui causerait probablement "
+#~ "des artefacts d'encodage."
+
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "Nombre d’images B consécutives entre images I et P (de 1 à 16)."
+
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr ""
+#~ "Forcer le nombre d'images B spécifié à être utilisé, sauf éventuellement "
+#~ "avant une image I. "
+
+#~ msgid "B-frames usage"
+#~ msgstr "Utilisation d'images B"
+
+#~ msgid ""
+#~ "Bias the choice to use B-frames. Positive values cause more B-frames, "
+#~ "negative values cause less B-frames. "
+#~ msgstr ""
+#~ "Modifier le choix d'utilisation des images B. Les valeurs positives "
+#~ "augmentent le nombre d'images B, les valeurs négatives le diminuent. "
+
+#~ msgid ""
+#~ "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
+#~ "encoding and decoding, but should save 10-15% bitrate."
+#~ msgstr ""
+#~ "CABAC (Codage arithmétique binaire adaptatif). Ceci ralentit l'encodage "
+#~ "et le décodage, mais entraîne un gain de débit de 10 à 15%."
+
+#~ msgid ""
+#~ "Number of previous frames used as predictors. This is effective in Anime, "
+#~ "but seems to make little difference in live-action source material. Some "
+#~ "decoders are unable to deal with large frameref values. From 1 to 16"
+#~ msgstr ""
+#~ "Nombre d'images précédentes à utiliser pour la prédiction. Ceci est très "
+#~ "efficace pour les dessins animés, mais semble ne pas faire beaucoup de "
+#~ "différences pour les scènes réelles. Certains décodeurs ne savent pas "
+#~ "traiter des valeurs élevées. Les valeurs vont de 1 à 16."
+
+#~ msgid ""
+#~ "This selects the quantizer to use. Lower values result in better "
+#~ "fidelity, but higher bitrates. 26 is a good default value. From 0 to 51. "
+#~ "0 means lossless"
+#~ msgstr ""
+#~ "Quantisateur à utiliser, entre 1 et 51. Des valeurs plus faibles "
+#~ "améliorent la fidélité mais augmentent le débit. La valeur par défaut de "
+#~ "26 est bonne. 0 signifie que l'encodage sera sans perte."
+
+#~ msgid "1-pass Quality-based VBR. From 0 to 51"
+#~ msgstr "VBR basé sur la qualité en une passe. De 0 à 51."
+
+#~ msgid "Minimum quantizer, 15/35 seems to be a useful range."
+#~ msgstr "Quantisateur minimal, 15 à 35 semble être une bonne échelle"
+
+#~ msgid "Allowed variance in average. bitrate (in kbits/s)."
+#~ msgstr "Variance autorisée du débit moyen, en kbits/s."
+
+#~ msgid "Sets a maximum local bitrate in kbits/s."
+#~ msgstr "Règle le débit maximum local en kbits/s."
+
+#~ msgid "Averaging period for the maximum local bitrate in kbits."
+#~ msgstr "Période de moyennage pour le débit maximal local en kbits."
+
+#~ msgid "Sets the initial buffer occupancy as a fraction of the buffer size."
+#~ msgstr ""
+#~ "Ceci configure l'occupation initiale du tampon en tant que fraction de la "
+#~ "taille du tampon."
+
+#~ msgid "QP curve compression. (0.0=CBR to 1.0=QCP)"
+#~ msgstr "Compression de la courbe de QP. (0.0 = CBR, 1.0 = QCP)"
+
+#~ msgid "Direct MV prediction mode. "
+#~ msgstr "Mode de prédiction des vecteurs de mouvement directs. "
+
+#~ msgid ""
+#~ "Maximum distance to search for motion estimation, measured from predicted "
+#~ "position(s). Default of 16 is good for most footage, high motion "
+#~ "sequences may benefit from settings between 24-32. From 0 to 64."
+#~ msgstr ""
+#~ "Distance maximale de recherche pour l'estimation de mouvement, à partir "
+#~ "des positions prédites. La valeur par défaut de 16 convient pour la "
+#~ "plupart des séquences. Pour des séquences à fort mouvement, des réglages "
+#~ "de l'ordre de 24-32 peuvent être meilleurs. Les valeurs vont de 0 à 64."
+
+#~ msgid "RD based mode decision for B-frames."
+#~ msgstr "Mode de décision pour images B basé sur RD"
+
+#~ msgid "RD based mode decision for B-frames. This requires subme 6."
+#~ msgstr ""
+#~ "Mode de décision pour les images B basé sur RD. Ceci nécessite subme 6."
+
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "Ignorer le chroma dans l'estimation de mouvement"
+
+#~ msgid "Dct-domain noise reduction. Adaptive pseudo-deadzone."
+#~ msgstr "Réduction de bruit DCT. Pseudo zone morte adaptative."
+
+#~ msgid ""
+#~ "Address and port the HTTP interface will listen on. It defaults to all "
+#~ "network interfaces (0.0.0.0). If you want the telnet interface to be "
+#~ "available only on the local machine, enter 127.0.0.1"
+#~ msgstr ""
+#~ "Adresse et port d'écoute pour l'interface HTTP. Par défaut, l'interface "
+#~ "écoute sur toutes les interfaces réseau. Si vous souhaitez que "
+#~ "l'interface HTTP ne soit disponible que pour la machine locale, utilisez "
+#~ "127.0.0.1"
+
+#~ msgid "RTP/RTSP/SDP demuxer (using Live555.com)"
+#~ msgstr "Démultiplexeur RTP/RTSP/SDP (utilisant Live555)"
+
+#~ msgid "Port to use for tunneling the RTSP/RTP over HTTP"
+#~ msgstr "Port à utiliser pour la tunnelisation du RTSP/RTP par HTTP."
+
+#~ msgid ""
+#~ "Windows configuration of the last used. This option is updated "
+#~ "automatically by the skins module."
+#~ msgstr ""
+#~ "Configuration des fenêtres du dernier skin utilisé. Cette option est mise "
+#~ "à jour automatiquement."
+
+#~ msgid ""
+#~ "It is possible to apply effects to the renderedtext to improve its "
+#~ "readability."
+#~ msgstr ""
+#~ "Il est possible d'appliquer des effets au texte afin d'améliorer sa "
+#~ "lisibilité."
+
+#~ msgid ""
+#~ "Enforces alignment of all access units on PES boundaries. This is a waste "
+#~ "of bandwidth."
+#~ msgstr ""
+#~ "Forcer l'alignement sur les limites de PES. Ceci gâche de la bande "
+#~ "passante."
+
+#~ msgid ""
+#~ "Pictures coming from the picture video outputs will be delayed accord to "
+#~ "thi value (in milliseconds, should be >= 100 ms). For high values, you "
+#~ "will need to raise caching values."
+#~ msgstr ""
+#~ "Les images provenant des sorties vidéo seront différées en conséquence "
+#~ "(en milisecondes, >= 100 ms). Pour utiliser des valeurs élevées, "
+#~ "augmenter le cache de fichier et les autres caches."
+
+#~ msgid "This is the subtitles coded that will be used."
+#~ msgstr "Codec de sous-titres à utilser"
+
+#~ msgid "Save As..."
+#~ msgstr "Enregistrer sous…"
+
+#~ msgid "File read"
+#~ msgstr "Fichier en cours de lecture"
+
+#~ msgid "Select angle"
+#~ msgstr "Selectionner l'angle"
+
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Décodeur VC1"
 
@@ -19984,28 +20262,6 @@ msgstr "Analyseur de spectre"
 #~ "d'expiration. Ceci permet d'être sûr qu'ils sont visibles au moins "
 #~ "pendant le délai spécifié."
 
-#, fuzzy
-#~ msgid "QP factor between I and P."
-#~ msgstr "Facteur de QP entre I et P"
-
-#, fuzzy
-#~ msgid "QP factor between P and B."
-#~ msgstr "Facteur de QP entre P et B"
-
-#, fuzzy
-#~ msgid ""
-#~ "This parameter controls quality versus speed tradeoffs involved in the "
-#~ "motion estimation decision process (lower = quicker and higher = better "
-#~ "quality). From 1 to 6."
-#~ msgstr ""
-#~ "Ce paramètre contrôle la qualité par rapport aux compromis de vitesses "
-#~ "impliquées dans le processus de choix du mouvement estimé (faible = plus "
-#~ "rapide et élevé = meilleure qualité)."
-
-#, fuzzy
-#~ msgid "PSNR calculation"
-#~ msgstr "Calcul du PSNR"
-
 #~ msgid ""
 #~ "This has no effect on actual encoding quality, it just prevents the stats "
 #~ "from being calculated (for speed)."
@@ -20015,10 +20271,6 @@ msgstr "Analyseur de spectre"
 
 #~ msgid "Image"
 #~ msgstr "Image"
-
-#, fuzzy
-#~ msgid "Timestamp"
-#~ msgstr "Différé"
 
 #~ msgid "Center-Center"
 #~ msgstr "Centré"
@@ -20076,12 +20328,6 @@ msgstr "Analyseur de spectre"
 #~ msgid "Horizontal border width"
 #~ msgstr "Largeur de la frontière horizontale en pixels"
 
-#, fuzzy
-#~ msgid ""
-#~ "Width in pixels of the border than can be drawn horizontally around the "
-#~ "mosaic."
-#~ msgstr "Largeur en pixels de la bordure à laisser autour de la mosaïque"
-
 #~ msgid "Adjust Image"
 #~ msgstr "Ajuster l’image"
 
@@ -20099,10 +20345,6 @@ msgstr "Analyseur de spectre"
 
 #~ msgid "Control interface settings"
 #~ msgstr "Paramètres de l’interface de contrôle"
-
-#, fuzzy
-#~ msgid "Text rendering"
-#~ msgstr "Rendu du texte"
 
 #~ msgid ""
 #~ "Use the settings of the \"freetype\" module to choose the font you  want "
@@ -20295,10 +20537,6 @@ msgstr "Analyseur de spectre"
 #~ msgid "Settings related to the various access filter used by VLC.\n"
 #~ msgstr "Réglages pour les filtres d’entrée utilisés par VLC.\n"
 
-#, fuzzy
-#~ msgid "Open MRL"
-#~ msgstr "Ouvrir"
-
 #~ msgid "Channel mixer"
 #~ msgstr "Mélangeur de canaux"
 
@@ -20337,10 +20575,6 @@ msgstr "Analyseur de spectre"
 
 #~ msgid "UPnP"
 #~ msgstr "UPnP"
-
-#, fuzzy
-#~ msgid "Streamming"
-#~ msgstr "Diffusion"
 
 #~ msgid "RSS"
 #~ msgstr "RSS"
@@ -20404,10 +20638,6 @@ msgstr "Analyseur de spectre"
 #~ msgid "file"
 #~ msgstr "fichier"
 
-#, fuzzy
-#~ msgid "Dummy stream ouput"
-#~ msgstr "Flux de sortie inutile"
-
 #~ msgid "File stream ouput"
 #~ msgstr "Fichier flux de sortie"
 
@@ -20438,16 +20668,8 @@ msgstr "Analyseur de spectre"
 #~ msgstr "Plat"
 
 #, fuzzy
-#~ msgid "Audio Bitrate"
-#~ msgstr "Débit audio :"
-
-#, fuzzy
 #~ msgid "playlist metademux"
 #~ msgstr "Liste de lecture (meta-demultiplexeur)"
-
-#, fuzzy
-#~ msgid "Segment Filename"
-#~ msgstr "Nom de fichier du Segment"
 
 #, fuzzy
 #~ msgid "Muxing Application"
@@ -20481,14 +20703,6 @@ msgstr "Analyseur de spectre"
 
 #~ msgid "Psychadelic"
 #~ msgstr "Psychédélique"
-
-#, fuzzy
-#~ msgid "Acid Punk"
-#~ msgstr "Acid punk"
-
-#, fuzzy
-#~ msgid "Acid Jazz"
-#~ msgstr "Acid jazz"
 
 #~ msgid "Rock & Roll"
 #~ msgstr "Rock & Roll"
@@ -20848,10 +21062,6 @@ msgstr "Analyseur de spectre"
 #~ msgid "Playlist Item options"
 #~ msgstr "Options des listes de lecture"
 
-#, fuzzy
-#~ msgid "Group Info"
-#~ msgstr "Nom du groupe"
-
 #~ msgid "Audio menu"
 #~ msgstr "Menu audio"
 
@@ -20918,10 +21128,6 @@ msgstr "Analyseur de spectre"
 #~ msgid "SAP interface"
 #~ msgstr "Interface SAP"
 
-#, fuzzy
-#~ msgid "Dummy stream"
-#~ msgstr "Flux de sortie inutile"
-
 #~ msgid "Standard stream"
 #~ msgstr "Flux standard"
 
@@ -20930,10 +21136,6 @@ msgstr "Analyseur de spectre"
 
 #~ msgid "Adjust"
 #~ msgstr "Ajuster"
-
-#, fuzzy
-#~ msgid "List of vout modules"
-#~ msgstr "Liste des modules de sortie vidéo"
 
 #~ msgid "logo"
 #~ msgstr "logo"
@@ -21440,9 +21642,8 @@ msgstr "Analyseur de spectre"
 #~ msgid "This allows you to change the display name of the Service."
 #~ msgstr "Ceci vous permet de changer le nom du service."
 
-#, fuzzy
 #~ msgid "Telnet Interface host"
-#~ msgstr "Port de l’interface telnet"
+#~ msgstr "Hôte de l’interface telnet"
 
 #~ msgid "Default to listen on all network interfaces"
 #~ msgstr ""
@@ -21463,9 +21664,8 @@ msgstr "Analyseur de spectre"
 #~ msgid "Size offset"
 #~ msgstr "Position"
 
-#, fuzzy
 #~ msgid "You have to select two bookmarks."
-#~ msgstr "Vous devez sélectionner deux signets"
+#~ msgstr "Vous devez sélectionner deux signets."
 
 #, fuzzy
 #~ msgid "Go to specific position"
@@ -22617,7 +22817,6 @@ msgstr "Analyseur de spectre"
 #~ msgid "Faux"
 #~ msgstr "TTY factice"
 
-#, fuzzy
 #~ msgid ""
 #~ "Allows you to modify the user name that will be used for the connection "
 #~ "(Basic authentication only)."
@@ -22762,3 +22961,9 @@ msgstr "Analyseur de spectre"
 #, fuzzy
 #~ msgid "Dummy VF"
 #~ msgstr "Inutile"
+
+#~ msgid "choose the screen to be used for fullscreen mode."
+#~ msgstr "Choisissez l’écran à utiliser pour le mode plein écran"
+
+#~ msgid "Jump"
+#~ msgstr "Aller à"

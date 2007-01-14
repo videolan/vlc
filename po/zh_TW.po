@@ -22,9 +22,8 @@ msgid "VLC preferences"
 msgstr "偏好設定"
 
 #: include/vlc_config_cat.h:38
-#, fuzzy
 msgid "Select \"Advanced Options\" to see all options."
-msgstr "點選\"進階選項\"檢視所有選項"
+msgstr "選擇\"進階選項\"以檢視所有選項"
 
 #: include/vlc_config_cat.h:40 include/vlc_config_cat.h:131
 #: modules/gui/macosx/playlistinfo.m:62 modules/gui/wince/playlist.cpp:674
@@ -38,7 +37,6 @@ msgid "Interface"
 msgstr "介面"
 
 #: include/vlc_config_cat.h:44
-#, fuzzy
 msgid "Settings for VLC's interfaces"
 msgstr "VLC介面設定"
 
@@ -48,23 +46,20 @@ msgid "General interface settings"
 msgstr "一般介面設定"
 
 #: include/vlc_config_cat.h:48
-#, fuzzy
 msgid "Main interfaces"
-msgstr "可面板化介面"
+msgstr "主介面"
 
 #: include/vlc_config_cat.h:49
-#, fuzzy
 msgid "Settings for the main interface"
-msgstr "VLC介面設定"
+msgstr "主介面設定"
 
 #: include/vlc_config_cat.h:51 src/libvlc-module.c:89
 msgid "Control interfaces"
 msgstr "控制介面"
 
 #: include/vlc_config_cat.h:52
-#, fuzzy
 msgid "Settings for VLC's control interfaces"
-msgstr "VLC介面設定"
+msgstr "VLC控制介面設定"
 
 #: include/vlc_config_cat.h:54 include/vlc_config_cat.h:55
 msgid "Hotkeys settings"
@@ -95,9 +90,8 @@ msgid "Filters"
 msgstr "濾波器"
 
 #: include/vlc_config_cat.h:66
-#, fuzzy
 msgid "Audio filters are used to postprocess the audio stream."
-msgstr "解多工器是用來分離音訊和視訊串流"
+msgstr "音訊過濾器是用來後處理音訊串流"
 
 #: include/vlc_config_cat.h:68 src/audio_output/input.c:84
 #: modules/gui/macosx/intf.m:569 modules/gui/macosx/intf.m:570
@@ -123,9 +117,8 @@ msgid "Miscellaneous"
 msgstr "雜項"
 
 #: include/vlc_config_cat.h:76
-#, fuzzy
 msgid "Miscellaneous audio settings and modules."
-msgstr "模組及音訊雜項設定"
+msgstr "音訊雜項設定和模組"
 
 #: include/vlc_config_cat.h:79 src/input/es_out.c:1635
 #: src/libvlc-module.c:1291 modules/gui/macosx/extended.m:79
@@ -152,9 +145,8 @@ msgid "Choose your preferred video output and configure it here."
 msgstr "選擇你所偏好的視訊輸出模組並設定"
 
 #: include/vlc_config_cat.h:91
-#, fuzzy
 msgid "Video filters are used to postprocess the video stream."
-msgstr "解多工器是用來分離音訊和視訊串流"
+msgstr "視訊過濾器是用來後處理視訊串流"
 
 #: include/vlc_config_cat.h:93
 msgid "Subtitles/OSD"
@@ -187,9 +179,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:113
-#, fuzzy
 msgid "Access filters"
-msgstr "存取模組"
+msgstr "存取過濾器"
 
 #: include/vlc_config_cat.h:115
 msgid ""
@@ -203,7 +194,6 @@ msgid "Demuxers"
 msgstr "解多工器"
 
 #: include/vlc_config_cat.h:120
-#, fuzzy
 msgid "Demuxers are used to separate audio and video streams."
 msgstr "解多工器是用來分離音訊和視訊串流"
 
@@ -212,7 +202,6 @@ msgid "Video codecs"
 msgstr "視訊編碼器"
 
 #: include/vlc_config_cat.h:123
-#, fuzzy
 msgid "Settings for the video-only decoders and encoders."
 msgstr "設定純視訊編碼及解碼器"
 
@@ -221,7 +210,6 @@ msgid "Audio codecs"
 msgstr "音訊編碼器"
 
 #: include/vlc_config_cat.h:126
-#, fuzzy
 msgid "Settings for the audio-only decoders and encoders."
 msgstr "設定純音訊編碼及解碼器"
 
@@ -230,14 +218,12 @@ msgid "Other codecs"
 msgstr "其他編碼器"
 
 #: include/vlc_config_cat.h:129
-#, fuzzy
 msgid "Settings for audio+video and miscellaneous decoders and encoders."
-msgstr "設定音訊+視訊、雜項編碼及解碼器"
+msgstr "設定音訊+視訊和雜項編碼及解碼器"
 
 #: include/vlc_config_cat.h:132
-#, fuzzy
 msgid "General input settings. Use with care."
-msgstr "進階輸入設定，請注意。"
+msgstr "一般輸入設定，小心使用。"
 
 #: include/vlc_config_cat.h:135 src/libvlc-module.c:1530
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:152
@@ -297,7 +283,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:170
 msgid "Sout stream"
-msgstr ""
+msgstr "Sout串流"
 
 #: include/vlc_config_cat.h:171
 msgid ""
@@ -308,7 +294,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:176 modules/services_discovery/sap.c:124
 msgid "SAP"
-msgstr ""
+msgstr "SAP"
 
 #: include/vlc_config_cat.h:178
 msgid ""
@@ -319,7 +305,7 @@ msgstr ""
 #: include/vlc_config_cat.h:181
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:67
 msgid "VOD"
-msgstr ""
+msgstr "VOD"
 
 #: include/vlc_config_cat.h:182
 msgid "VLC's implementation of Video On Demand"
@@ -345,7 +331,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:191
 msgid "General playlist behaviour"
-msgstr ""
+msgstr "一般播放清單行為"
 
 #: include/vlc_config_cat.h:192 modules/gui/macosx/playlist.m:434
 msgid "Services discovery"
@@ -377,9 +363,8 @@ msgid ""
 msgstr ""
 
 #: include/vlc_config_cat.h:204
-#, fuzzy
 msgid "Advanced settings"
-msgstr "進階選項..."
+msgstr "進階設定"
 
 #: include/vlc_config_cat.h:205
 msgid "Other advanced settings"
@@ -439,9 +424,8 @@ msgid "No help available"
 msgstr "尚無可用的說明檔"
 
 #: include/vlc_config_cat.h:239
-#, fuzzy
 msgid "There is no help available for these modules."
-msgstr "本模組尚無可用的說明檔"
+msgstr "本模組尚無可用的說明"
 
 #: include/vlc_interface.h:146
 msgid ""
@@ -524,9 +508,8 @@ msgstr "排序(&S)"
 
 #: include/vlc_intf_strings.h:53
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
-#, fuzzy
 msgid "Add node"
-msgstr "音訊編碼器"
+msgstr "增加節點"
 
 #: include/vlc_intf_strings.h:54
 #, fuzzy
@@ -539,9 +522,8 @@ msgid "Save..."
 msgstr "另存新擋..."
 
 #: include/vlc_intf_strings.h:59 src/libvlc-module.c:982
-#, fuzzy
 msgid "Repeat all"
-msgstr "重複播放全部"
+msgstr "重複全部"
 
 #: include/vlc_intf_strings.h:60
 #, fuzzy
@@ -710,7 +692,7 @@ msgstr "著作權"
 
 #: include/vlc_meta.h:37
 msgid "Album/movie/show title"
-msgstr ""
+msgstr "專輯/電影/秀 標題"
 
 #: include/vlc_meta.h:38
 msgid "Track number/position in set"
@@ -745,11 +727,11 @@ msgstr "語言"
 
 #: include/vlc_meta.h:45 modules/misc/notify/notify.c:182
 msgid "Now Playing"
-msgstr ""
+msgstr "正在播放"
 
 #: include/vlc_meta.h:46 modules/access/vcdx/info.c:98
 msgid "Publisher"
-msgstr ""
+msgstr "出版者"
 
 #: include/vlc_meta.h:47
 msgid "Encoded by"
@@ -857,62 +839,62 @@ msgstr "杜比環繞"
 
 #: src/audio_output/output.c:146
 msgid "Reverse stereo"
-msgstr ""
+msgstr "反向立體聲"
 
 #: src/extras/getopt.c:636
 #, c-format
 msgid "%s: option `%s' is ambiguous\n"
-msgstr ""
+msgstr "%s：選項「%s」不明確\n"
 
 #: src/extras/getopt.c:661
 #, c-format
 msgid "%s: option `--%s' doesn't allow an argument\n"
-msgstr ""
+msgstr "%s：選項「--%s」不允許有參數\n"
 
 #: src/extras/getopt.c:666
 #, c-format
 msgid "%s: option `%c%s' doesn't allow an argument\n"
-msgstr ""
+msgstr "%s：選項「%c%s」不允許有參數\n"
 
 #: src/extras/getopt.c:684 src/extras/getopt.c:857
 #, c-format
 msgid "%s: option `%s' requires an argument\n"
-msgstr ""
+msgstr "%s：選項「%s」需要參數\n"
 
 #: src/extras/getopt.c:713
 #, c-format
 msgid "%s: unrecognized option `--%s'\n"
-msgstr ""
+msgstr "%s：無法識別選項「--%s」\n"
 
 #: src/extras/getopt.c:717
 #, c-format
 msgid "%s: unrecognized option `%c%s'\n"
-msgstr ""
+msgstr "%s：無法識別選項「%c%s」\n"
 
 #: src/extras/getopt.c:743
 #, c-format
 msgid "%s: illegal option -- %c\n"
-msgstr ""
+msgstr "%s：選項不合法 -- %c\n"
 
 #: src/extras/getopt.c:746
 #, c-format
 msgid "%s: invalid option -- %c\n"
-msgstr ""
+msgstr "%s：選項無效 -- %c\n"
 
 #: src/extras/getopt.c:776 src/extras/getopt.c:906
 #, c-format
 msgid "%s: option requires an argument -- %c\n"
-msgstr ""
+msgstr "%s：選項需要參數 -- %c\n"
 
 #: src/extras/getopt.c:823
 #, c-format
 msgid "%s: option `-W %s' is ambiguous\n"
-msgstr ""
+msgstr "%s：選項「-W %s」不明確\n"
 
 #: src/extras/getopt.c:841
 #, c-format
 msgid "%s: option `-W %s' doesn't allow an argument\n"
-msgstr ""
+msgstr "%s：選項「-W %s」不允許有參數\n"
 
 #: src/input/control.c:287
 #, c-format
@@ -989,7 +971,7 @@ msgstr "採樣率"
 #: src/input/es_out.c:1616 modules/codec/faad.c:335
 #, c-format
 msgid "%d Hz"
-msgstr ""
+msgstr "%d Hz"
 
 #: src/input/es_out.c:1622
 msgid "Bits per sample"
@@ -1003,7 +985,7 @@ msgstr "位元率"
 #: src/input/es_out.c:1628
 #, c-format
 msgid "%d kb/s"
-msgstr ""
+msgstr "%d kb/s"
 
 #: src/input/es_out.c:1639
 msgid "Resolution"
@@ -1106,7 +1088,7 @@ msgstr "上一個章節"
 #: src/input/vlm.c:1141 src/input/vlm.c:1248
 #, c-format
 msgid "Media: %s"
-msgstr ""
+msgstr "媒體: %s"
 
 #: src/interface/interaction.c:268 src/interface/interaction.c:364
 #: modules/demux/avi/avi.c:587 modules/gui/beos/InterfaceWindow.cpp:158
@@ -1162,15 +1144,15 @@ msgstr "說明選項"
 
 #: src/libvlc-common.c:1364 src/misc/configuration.c:1217
 msgid "string"
-msgstr ""
+msgstr "字串"
 
 #: src/libvlc-common.c:1383 src/misc/configuration.c:1181
 msgid "integer"
-msgstr ""
+msgstr "整數"
 
 #: src/libvlc-common.c:1403 src/misc/configuration.c:1206
 msgid "float"
-msgstr ""
+msgstr "浮點數"
 
 #: src/libvlc-common.c:1410
 msgid " (default enabled)"
@@ -1181,19 +1163,19 @@ msgid " (default disabled)"
 msgstr " (預設關閉)"
 
 #: src/libvlc-common.c:1593
-#, fuzzy, c-format
+#, c-format
 msgid "VLC version %s\n"
-msgstr "色彩反向"
+msgstr "VLC 版本 %s\n"
 
 #: src/libvlc-common.c:1594
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
-msgstr ""
+msgstr "由 %s@%s.%s 編譯\n"
 
 #: src/libvlc-common.c:1596
 #, c-format
 msgid "Compiler: %s\n"
-msgstr ""
+msgstr "編譯者: %s\n"
 
 #: src/libvlc-common.c:1599
 #, c-format
@@ -1211,6 +1193,8 @@ msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
 msgstr ""
+"\n"
+"Press the RETURN key to continue...\n"
 
 #: src/libvlc-module.c:47 src/libvlc-module.c:211
 msgid "Auto"
@@ -1218,35 +1202,35 @@ msgstr "自動"
 
 #: src/libvlc-module.c:47
 msgid "American English"
-msgstr ""
+msgstr "美式英文"
 
 #: src/libvlc-module.c:47
 msgid "British English"
-msgstr ""
+msgstr "英式英文"
 
 #: src/libvlc-module.c:48 src/text/iso-639_def.h:59
 msgid "Catalan"
-msgstr ""
+msgstr "加泰隆語"
 
 #: src/libvlc-module.c:48 src/text/iso-639_def.h:67
 msgid "Czech"
-msgstr ""
+msgstr "捷克語"
 
 #: src/libvlc-module.c:48 src/text/iso-639_def.h:68
 msgid "Danish"
-msgstr ""
+msgstr "丹麥文"
 
 #: src/libvlc-module.c:48 src/text/iso-639_def.h:80
 msgid "German"
-msgstr ""
+msgstr "德文"
 
 #: src/libvlc-module.c:48 src/text/iso-639_def.h:169
 msgid "Spanish"
-msgstr ""
+msgstr "西班牙文"
 
 #: src/libvlc-module.c:49 src/text/iso-639_def.h:77
 msgid "French"
-msgstr ""
+msgstr "法文"
 
 #: src/libvlc-module.c:49
 msgid "Galician"
@@ -1254,7 +1238,7 @@ msgstr ""
 
 #: src/libvlc-module.c:49 src/text/iso-639_def.h:88
 msgid "Hebrew"
-msgstr ""
+msgstr "希伯來文"
 
 #: src/libvlc-module.c:49 src/text/iso-639_def.h:92
 msgid "Hungarian"
@@ -1262,47 +1246,47 @@ msgstr ""
 
 #: src/libvlc-module.c:49 src/text/iso-639_def.h:99
 msgid "Italian"
-msgstr ""
+msgstr "義大利文"
 
 #: src/libvlc-module.c:50 src/text/iso-639_def.h:101
 msgid "Japanese"
-msgstr ""
+msgstr "日文"
 
 #: src/libvlc-module.c:50 src/text/iso-639_def.h:79
 msgid "Georgian"
-msgstr ""
+msgstr "喬治亞文"
 
 #: src/libvlc-module.c:50 src/text/iso-639_def.h:111
 msgid "Korean"
-msgstr ""
+msgstr "韓文"
 
 #: src/libvlc-module.c:50 src/text/iso-639_def.h:125
 msgid "Malay"
-msgstr ""
+msgstr "馬來語"
 
 #: src/libvlc-module.c:50 src/text/iso-639_def.h:69
 msgid "Dutch"
-msgstr ""
+msgstr "荷蘭文"
 
 #: src/libvlc-module.c:51
 msgid "Occitan"
-msgstr ""
+msgstr "奧克文"
 
 #: src/libvlc-module.c:51
 msgid "Brazilian Portuguese"
-msgstr ""
+msgstr "巴西葡萄牙文"
 
 #: src/libvlc-module.c:51 src/text/iso-639_def.h:153
 msgid "Romanian"
-msgstr ""
+msgstr "羅馬尼亞文"
 
 #: src/libvlc-module.c:51 src/text/iso-639_def.h:155
 msgid "Russian"
-msgstr ""
+msgstr "俄羅斯文"
 
 #: src/libvlc-module.c:52 src/text/iso-639_def.h:161
 msgid "Slovak"
-msgstr ""
+msgstr "斯洛伐克語"
 
 #: src/libvlc-module.c:52 src/text/iso-639_def.h:162
 msgid "Slovenian"
@@ -1310,19 +1294,19 @@ msgstr ""
 
 #: src/libvlc-module.c:52 src/text/iso-639_def.h:174
 msgid "Swedish"
-msgstr ""
+msgstr "瑞典文"
 
 #: src/libvlc-module.c:52 src/text/iso-639_def.h:187
 msgid "Turkish"
-msgstr ""
+msgstr "土耳其文"
 
 #: src/libvlc-module.c:53
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "簡體中文"
 
 #: src/libvlc-module.c:53
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "正體中文"
 
 #: src/libvlc-module.c:72
 msgid ""
@@ -1354,9 +1338,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:91
-#, fuzzy
 msgid "You can select control interfaces for VLC."
-msgstr "這個選項允許你選擇控制介面"
+msgstr "你可以替VLC選擇控制介面"
 
 #: src/libvlc-module.c:93
 msgid "Verbosity (0,1,2)"
@@ -1373,18 +1356,16 @@ msgid "Be quiet"
 msgstr "安靜"
 
 #: src/libvlc-module.c:100
-#, fuzzy
 msgid "Turn off all warning and information messages."
-msgstr "這個選項會關閉所有緊告及資訊訊息"
+msgstr "關閉所有緊告及資訊訊息"
 
 #: src/libvlc-module.c:102
-#, fuzzy
 msgid "Default stream"
-msgstr "預設"
+msgstr "預設串流"
 
 #: src/libvlc-module.c:104
 msgid "This stream will always be opened at VLC startup."
-msgstr ""
+msgstr "這個串流將在VLC開始時總是自動被開啟"
 
 #: src/libvlc-module.c:107
 msgid ""
@@ -1471,9 +1452,8 @@ msgid "This will force a mono audio output."
 msgstr "強制使用單聲道輸出"
 
 #: src/libvlc-module.c:159
-#, fuzzy
 msgid "Default audio volume"
-msgstr "預設裝置"
+msgstr "預設音訊音量"
 
 #: src/libvlc-module.c:161
 msgid ""
@@ -1491,9 +1471,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:169
-#, fuzzy
 msgid "Audio output volume step"
-msgstr "輸出音量"
+msgstr "音訊輸出音量等級"
 
 #: src/libvlc-module.c:171
 #, fuzzy
@@ -1534,9 +1513,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:192
-#, fuzzy
 msgid "Audio output channels mode"
-msgstr "偏好的音訊輸出頻道模式"
+msgstr "音訊輸出頻道模式"
 
 #: src/libvlc-module.c:194
 msgid ""
@@ -1558,7 +1536,7 @@ msgstr ""
 
 #: src/libvlc-module.c:203
 msgid "Force detection of Dolby Surround"
-msgstr ""
+msgstr "強制偵測杜比環繞"
 
 #: src/libvlc-module.c:205
 msgid ""
@@ -1569,13 +1547,12 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:211
-#, fuzzy
 msgid "On"
-msgstr "開啟"
+msgstr "開"
 
 #: src/libvlc-module.c:211
 msgid "Off"
-msgstr ""
+msgstr "關"
 
 #: src/libvlc-module.c:216
 msgid "This adds audio post processing filters, to modify the sound rendering."
@@ -1644,9 +1621,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:255
-#, fuzzy
 msgid "Video X coordinate"
-msgstr "視訊y座標"
+msgstr "視訊X座標"
 
 #: src/libvlc-module.c:257
 msgid ""
@@ -1655,9 +1631,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:260
-#, fuzzy
 msgid "Video Y coordinate"
-msgstr "視訊y座標"
+msgstr "視訊Y座標"
 
 #: src/libvlc-module.c:262
 msgid ""
@@ -1742,7 +1717,7 @@ msgstr "縮放視訊"
 
 #: src/libvlc-module.c:282
 msgid "You can zoom the video by the specified factor."
-msgstr ""
+msgstr "你可以藉由指定因子來縮放視訊"
 
 #: src/libvlc-module.c:284
 msgid "Grayscale video output"
@@ -1770,7 +1745,7 @@ msgstr "全螢幕視訊輸出"
 
 #: src/libvlc-module.c:295
 msgid "Start video in fullscreen mode"
-msgstr ""
+msgstr "開始播放視訊時使用全螢幕模式"
 
 #: src/libvlc-module.c:297
 msgid "Overlay video output"
@@ -1792,15 +1767,15 @@ msgstr "永遠讓視訊視窗顯示在其他視窗之上"
 
 #: src/libvlc-module.c:306
 msgid "Disable screensaver"
-msgstr ""
+msgstr "取消螢幕保護程式"
 
 #: src/libvlc-module.c:307
 msgid "Disable the screensaver during video playback."
-msgstr ""
+msgstr "在視訊播放期間關閉螢幕保護程式"
 
 #: src/libvlc-module.c:309
 msgid "Window decorations"
-msgstr ""
+msgstr "視窗飾物"
 
 #: src/libvlc-module.c:311
 #, fuzzy
@@ -1871,9 +1846,8 @@ msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr ""
 
 #: src/libvlc-module.c:346
-#, fuzzy
 msgid "Video cropping"
-msgstr "視訊修整(右方)"
+msgstr "視訊裁切"
 
 #: src/libvlc-module.c:348
 msgid ""
@@ -1883,7 +1857,7 @@ msgstr ""
 
 #: src/libvlc-module.c:352
 msgid "Source aspect ratio"
-msgstr ""
+msgstr "來源長寬比"
 
 #: src/libvlc-module.c:354
 msgid ""
@@ -1917,7 +1891,7 @@ msgstr ""
 
 #: src/libvlc-module.c:371
 msgid "Fix HDTV height"
-msgstr ""
+msgstr "修正HDTV高度"
 
 #: src/libvlc-module.c:373
 msgid ""
@@ -2004,7 +1978,7 @@ msgstr ""
 
 #: src/libvlc-module.c:425 modules/control/netsync.c:75
 msgid "Network synchronisation"
-msgstr ""
+msgstr "網路同步"
 
 #: src/libvlc-module.c:426
 msgid ""
@@ -2035,7 +2009,7 @@ msgstr "啟動"
 
 #: src/libvlc-module.c:434
 msgid "UDP port"
-msgstr ""
+msgstr "UDP通訊埠"
 
 #: src/libvlc-module.c:436
 #, fuzzy
@@ -2044,7 +2018,7 @@ msgstr "預設的音樂CD裝置"
 
 #: src/libvlc-module.c:438
 msgid "MTU of the network interface"
-msgstr ""
+msgstr "網路介面MTU"
 
 #: src/libvlc-module.c:440
 msgid ""
@@ -2073,9 +2047,8 @@ msgid "Default multicast interface. This overrides the routing table."
 msgstr ""
 
 #: src/libvlc-module.c:453
-#, fuzzy
 msgid "IPv4 multicast output interface address"
-msgstr "搖桿控制介面"
+msgstr "IPv4群播輸出介面位址"
 
 #: src/libvlc-module.c:455
 msgid ""
@@ -2107,9 +2080,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:477 modules/gui/wxwidgets/dialogs/open.cpp:777
-#, fuzzy
 msgid "Audio track"
-msgstr "音訊軌"
+msgstr "音軌"
 
 #: src/libvlc-module.c:479
 #, fuzzy
@@ -2126,9 +2098,8 @@ msgid "Stream number of the subtitle track to use (from 0 to n)."
 msgstr "設定你想使用的音訊頻道的串流數量(從0到n)"
 
 #: src/libvlc-module.c:487
-#, fuzzy
 msgid "Audio language"
-msgstr "選擇音訊語言"
+msgstr "音訊語言"
 
 #: src/libvlc-module.c:489
 #, fuzzy
@@ -2138,9 +2109,8 @@ msgid ""
 msgstr "設定你想使用的音訊頻道的串流數量(從0到n)"
 
 #: src/libvlc-module.c:492
-#, fuzzy
 msgid "Subtitle language"
-msgstr "選擇音訊語言"
+msgstr "字幕語言"
 
 #: src/libvlc-module.c:494
 #, fuzzy
@@ -2150,9 +2120,8 @@ msgid ""
 msgstr "設定你想使用的音訊頻道的串流數量(從0到n)"
 
 #: src/libvlc-module.c:498
-#, fuzzy
 msgid "Audio track ID"
-msgstr "音訊軌"
+msgstr "音軌ID"
 
 #: src/libvlc-module.c:500
 #, fuzzy
@@ -2160,9 +2129,8 @@ msgid "Stream ID of the audio track to use."
 msgstr "設定你想使用的音訊頻道的串流數量(從0到n)"
 
 #: src/libvlc-module.c:502
-#, fuzzy
 msgid "Subtitles track ID"
-msgstr "字幕軌"
+msgstr "字幕軌ID"
 
 #: src/libvlc-module.c:504
 #, fuzzy
@@ -2171,7 +2139,7 @@ msgstr "設定你想使用的音訊頻道的串流數量(從0到n)"
 
 #: src/libvlc-module.c:506
 msgid "Input repetitions"
-msgstr ""
+msgstr "輸入重複"
 
 #: src/libvlc-module.c:508
 msgid "Number of time the same input will be repeated"
@@ -2179,16 +2147,15 @@ msgstr ""
 
 #: src/libvlc-module.c:510
 msgid "Start time"
-msgstr ""
+msgstr "開始時間"
 
 #: src/libvlc-module.c:512
 msgid "The stream will start at this position (in seconds)."
 msgstr ""
 
 #: src/libvlc-module.c:514
-#, fuzzy
 msgid "Stop time"
-msgstr "停止串流"
+msgstr "停止時間"
 
 #: src/libvlc-module.c:516
 msgid "The stream will stop at this position (in seconds)."
@@ -2235,9 +2202,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:543
-#, fuzzy
 msgid "Force subtitle position"
-msgstr "強制SPU位置"
+msgstr "強制字幕位置"
 
 #: src/libvlc-module.c:545
 msgid ""
@@ -2260,13 +2226,10 @@ msgid "On Screen Display"
 msgstr "畫面上顯示(OSD)"
 
 #: src/libvlc-module.c:554
-#, fuzzy
 msgid ""
 "VLC can display messages on the video. This is called OSD (On Screen "
 "Display)."
-msgstr ""
-"VLC可以在視訊上顯示訊息，稱之為OSD(On Screen Display)，你可以在這裡關閉這項功"
-"能"
+msgstr "VLC可以在視訊上顯示訊息，稱之為OSD(On Screen Display)"
 
 #: src/libvlc-module.c:557
 #, fuzzy
@@ -2388,27 +2351,24 @@ msgid "Force IPv6"
 msgstr "強制使用IPv6"
 
 #: src/libvlc-module.c:624
-#, fuzzy
 msgid "IPv6 will be used by default for all connections."
-msgstr "選取這項功能，將會對所有的UDP及HTTP連線使用IPv6"
+msgstr "將會預設對所有的連線使用IPv6"
 
 #: src/libvlc-module.c:626
 msgid "Force IPv4"
 msgstr "強制使用IPv4"
 
 #: src/libvlc-module.c:628
-#, fuzzy
 msgid "IPv4 will be used by default for all connections."
-msgstr "選取這項功能，將會對所有的UDP及HTTP連線使用IPv4"
+msgstr "將會預設對所有的連線使用IPv4"
 
 #: src/libvlc-module.c:630
 msgid "TCP connection timeout"
-msgstr ""
+msgstr "TCP連線逾時"
 
 #: src/libvlc-module.c:632
-#, fuzzy
 msgid "Default TCP connection timeout (in milliseconds). "
-msgstr "變更預設快取值(ms)"
+msgstr "預設TCP連接逾時(in milliseconds). "
 
 #: src/libvlc-module.c:634
 msgid "SOCKS server"
@@ -2438,7 +2398,7 @@ msgstr ""
 
 #: src/libvlc-module.c:647
 msgid "Title metadata"
-msgstr ""
+msgstr "標題描述資料"
 
 #: src/libvlc-module.c:649
 msgid "Allows you to specify a \"title\" metadata for an input."
@@ -2446,7 +2406,7 @@ msgstr ""
 
 #: src/libvlc-module.c:651
 msgid "Author metadata"
-msgstr ""
+msgstr "作者描述資料"
 
 #: src/libvlc-module.c:653
 msgid "Allows you to specify an \"author\" metadata for an input."
@@ -2454,7 +2414,7 @@ msgstr ""
 
 #: src/libvlc-module.c:655
 msgid "Artist metadata"
-msgstr ""
+msgstr "藝人描述資料"
 
 #: src/libvlc-module.c:657
 msgid "Allows you to specify an \"artist\" metadata for an input."
@@ -2462,7 +2422,7 @@ msgstr ""
 
 #: src/libvlc-module.c:659
 msgid "Genre metadata"
-msgstr ""
+msgstr "類型描述資料"
 
 #: src/libvlc-module.c:661
 msgid "Allows you to specify a \"genre\" metadata for an input."
@@ -2470,7 +2430,7 @@ msgstr ""
 
 #: src/libvlc-module.c:663
 msgid "Copyright metadata"
-msgstr ""
+msgstr "著作權描述資料"
 
 #: src/libvlc-module.c:665
 msgid "Allows you to specify a \"copyright\" metadata for an input."
@@ -2508,9 +2468,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:685
-#, fuzzy
 msgid "Preferred decoders list"
-msgstr "偏好的編碼器清單"
+msgstr "偏好的解碼器清單"
 
 #: src/libvlc-module.c:687
 msgid ""
@@ -2536,9 +2495,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:706
-#, fuzzy
 msgid "Default stream output chain"
-msgstr "雙工串流輸出"
+msgstr "預設串流輸出鏈"
 
 #: src/libvlc-module.c:708
 msgid ""
@@ -2549,7 +2507,7 @@ msgstr ""
 
 #: src/libvlc-module.c:712
 msgid "Enable streaming of all ES"
-msgstr ""
+msgstr "對所有的ES啟用串流"
 
 #: src/libvlc-module.c:714
 msgid "Stream all elementary streams (video, audio and subtitles)"
@@ -2585,9 +2543,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:730
-#, fuzzy
 msgid "Enable SPU stream output"
-msgstr "啟動音訊串流輸出"
+msgstr "啟用SPU串流輸出"
 
 #: src/libvlc-module.c:732
 msgid ""
@@ -2658,9 +2615,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:774
-#, fuzzy
 msgid "Enable FPU support"
-msgstr "啟用CPU MMX支援"
+msgstr "啟用FPU支援"
 
 #: src/libvlc-module.c:776
 #, fuzzy
@@ -2757,9 +2713,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:825
-#, fuzzy
 msgid "Access filter module"
-msgstr "存取模組"
+msgstr "存取過濾器模組"
 
 #: src/libvlc-module.c:827
 msgid ""
@@ -2861,21 +2816,20 @@ msgid "Writes process id into specified file."
 msgstr ""
 
 #: src/libvlc-module.c:879
-#, fuzzy
 msgid "Log to file"
-msgstr "Logo檔名"
+msgstr "記錄至檔案"
 
 #: src/libvlc-module.c:881
 msgid "Log all VLC messages to a text file."
-msgstr ""
+msgstr "記錄所有VLC訊息到文字檔"
 
 #: src/libvlc-module.c:883
 msgid "Log to syslog"
-msgstr ""
+msgstr "記錄至syslog"
 
 #: src/libvlc-module.c:885
 msgid "Log all VLC messages to syslog (UNIX systems)."
-msgstr ""
+msgstr "記錄所有VLC訊息至syslog(UNIX系統)"
 
 #: src/libvlc-module.c:887
 msgid "Allow only one running instance"
@@ -2972,7 +2926,7 @@ msgstr ""
 
 #: src/libvlc-module.c:956
 msgid "Automatically preparse files"
-msgstr ""
+msgstr "自動地預分析檔案"
 
 #: src/libvlc-module.c:958
 msgid ""
@@ -3020,19 +2974,16 @@ msgid "VLC will randomly play files in the playlist until interrupted."
 msgstr "選擇後，VLC會隨機地播放清單中的檔案，直到中斷"
 
 #: src/libvlc-module.c:984
-#, fuzzy
 msgid "VLC will keep playing the playlist indefinitely."
-msgstr "啟動後，VLC會一遍又一遍地的播放目前播放清單中的項目"
+msgstr "VLC將會持續地的播放這個清單"
 
 #: src/libvlc-module.c:986
-#, fuzzy
 msgid "Repeat current item"
-msgstr "重複播放目前項目"
+msgstr "重複目前項目"
 
 #: src/libvlc-module.c:988
-#, fuzzy
 msgid "VLC will keep playing the current playlist item."
-msgstr "啟動後，VLC會一遍又一遍地的播放目前播放清單中的項目"
+msgstr "VLC將會持續地的播放目前播放清單中的項目"
 
 #: src/libvlc-module.c:990
 msgid "Play and stop"
@@ -3205,7 +3156,7 @@ msgstr "選擇熱鍵以顯示位置"
 
 #: src/libvlc-module.c:1042
 msgid "Very short backwards jump"
-msgstr ""
+msgstr "極短距離向後跳躍"
 
 #: src/libvlc-module.c:1044
 #, fuzzy
@@ -3214,7 +3165,7 @@ msgstr "選擇熱鍵以向後5分鐘"
 
 #: src/libvlc-module.c:1045
 msgid "Short backwards jump"
-msgstr ""
+msgstr "短距離向後跳躍"
 
 #: src/libvlc-module.c:1047
 #, fuzzy
@@ -3223,7 +3174,7 @@ msgstr "選擇熱鍵以向後10秒鐘"
 
 #: src/libvlc-module.c:1048
 msgid "Medium backwards jump"
-msgstr ""
+msgstr "中距離向後跳躍"
 
 #: src/libvlc-module.c:1050
 #, fuzzy
@@ -3232,7 +3183,7 @@ msgstr "選擇熱鍵以向後1分鐘"
 
 #: src/libvlc-module.c:1051
 msgid "Long backwards jump"
-msgstr ""
+msgstr "長距離向後跳躍"
 
 #: src/libvlc-module.c:1053
 #, fuzzy
@@ -3277,36 +3228,35 @@ msgstr "選擇熱鍵以向前10秒鐘"
 
 #: src/libvlc-module.c:1068
 msgid "Very short jump length"
-msgstr ""
+msgstr "極短距離跳躍長度"
 
 #: src/libvlc-module.c:1069
 msgid "Very short jump length, in seconds."
-msgstr ""
+msgstr "極短距離跳躍長度，秒"
 
 #: src/libvlc-module.c:1070
 msgid "Short jump length"
-msgstr ""
+msgstr "短距離跳躍長度"
 
 #: src/libvlc-module.c:1071
 msgid "Short jump length, in seconds."
-msgstr ""
+msgstr "短距離跳躍長度，秒"
 
 #: src/libvlc-module.c:1072
 msgid "Medium jump length"
-msgstr ""
+msgstr "中距離跳躍長度"
 
 #: src/libvlc-module.c:1073
 msgid "Medium jump length, in seconds."
-msgstr ""
+msgstr "中距離跳躍長度，秒"
 
 #: src/libvlc-module.c:1074
-#, fuzzy
 msgid "Long jump length"
-msgstr "字型大小"
+msgstr "長距離跳躍長度"
 
 #: src/libvlc-module.c:1075
 msgid "Long jump length, in seconds."
-msgstr ""
+msgstr "長距離跳躍長度，秒"
 
 #: src/libvlc-module.c:1077 modules/control/hotkeys.c:244
 #: modules/gui/beos/InterfaceWindow.cpp:275
@@ -3358,9 +3308,8 @@ msgid "Select the key to activate selected item in DVD menus."
 msgstr "選擇熱鍵以啟動所選擇的DVD選單項目"
 
 #: src/libvlc-module.c:1089
-#, fuzzy
 msgid "Go to the DVD menu"
-msgstr "使用DVD選單"
+msgstr "前往DVD選單"
 
 #: src/libvlc-module.c:1090
 #, fuzzy
@@ -3368,9 +3317,8 @@ msgid "Select the key to take you to the DVD menu"
 msgstr "選擇熱鍵以啟動所選擇的DVD選單項目"
 
 #: src/libvlc-module.c:1091
-#, fuzzy
 msgid "Select previous DVD title"
-msgstr "選擇上一個標題"
+msgstr "選擇上一個DVD標題"
 
 #: src/libvlc-module.c:1092
 #, fuzzy
@@ -3378,9 +3326,8 @@ msgid "Select the key to choose the previous title from the DVD"
 msgstr "選擇熱鍵以播放清單中的上一個項目"
 
 #: src/libvlc-module.c:1093
-#, fuzzy
 msgid "Select next DVD title"
-msgstr "選擇下一個章節"
+msgstr "選擇下一個DVD標題"
 
 #: src/libvlc-module.c:1094
 #, fuzzy
@@ -3388,9 +3335,8 @@ msgid "Select the key to choose the next title from the DVD"
 msgstr "選擇按鍵以向左移動DVD選單中的選擇器"
 
 #: src/libvlc-module.c:1095
-#, fuzzy
 msgid "Select prev DVD chapter"
-msgstr "選擇上一個章節"
+msgstr "選擇上一個DVD章節"
 
 #: src/libvlc-module.c:1096
 #, fuzzy
@@ -3398,9 +3344,8 @@ msgid "Select the key to choose the previous chapter from the DVD"
 msgstr "選擇熱鍵以播放清單中的上一個項目"
 
 #: src/libvlc-module.c:1097
-#, fuzzy
 msgid "Select next DVD chapter"
-msgstr "選擇下一個章節"
+msgstr "選擇下一個DVD章節"
 
 #: src/libvlc-module.c:1098
 #, fuzzy
@@ -3430,9 +3375,8 @@ msgid "Mute"
 msgstr "靜音"
 
 #: src/libvlc-module.c:1104
-#, fuzzy
 msgid "Select the key to mute audio."
-msgstr "選擇熱鍵以暫停"
+msgstr "選擇熱鍵以靜音"
 
 #: src/libvlc-module.c:1105
 msgid "Subtitle delay up"
@@ -3595,9 +3539,8 @@ msgid "Playlist bookmark 10"
 msgstr "播放清單書籤 10"
 
 #: src/libvlc-module.c:1147
-#, fuzzy
 msgid "This allows you to define playlist bookmarks."
-msgstr "這個選項允許你定義播放清單書籤"
+msgstr "允許你定義播放清單書籤"
 
 #: src/libvlc-module.c:1149
 msgid "Go back in browsing history"
@@ -3674,9 +3617,8 @@ msgid "Raise the interface above all other windows."
 msgstr ""
 
 #: src/libvlc-module.c:1166
-#, fuzzy
 msgid "Hide interface"
-msgstr "顯示介面"
+msgstr "隱藏介面"
 
 #: src/libvlc-module.c:1167
 msgid "Lower the interface below all other windows."
@@ -3692,9 +3634,8 @@ msgstr "擷取視訊快照並寫入磁碟"
 
 #: src/libvlc-module.c:1171 modules/access_filter/record.c:53
 #: modules/access_filter/record.c:54
-#, fuzzy
 msgid "Record"
-msgstr "回捲"
+msgstr "錄製"
 
 #: src/libvlc-module.c:1172
 msgid "Record access filter start/stop."
@@ -3798,9 +3739,8 @@ msgid "Snapshot"
 msgstr "快照"
 
 #: src/libvlc-module.c:1329
-#, fuzzy
 msgid "Window properties"
-msgstr "字型設定"
+msgstr "視窗設置"
 
 #: src/libvlc-module.c:1372
 #, fuzzy
@@ -3822,7 +3762,6 @@ msgid "France"
 msgstr "取消"
 
 #: src/libvlc-module.c:1406
-#, fuzzy
 msgid "Track settings"
 msgstr "軌道設定"
 
@@ -3844,7 +3783,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1473
 msgid "Metadata"
-msgstr ""
+msgstr "詮釋資料"
 
 #: src/libvlc-module.c:1503
 msgid "Decoders"
@@ -3855,32 +3794,29 @@ msgstr "解碼器"
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:265
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:378
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:106
-#, fuzzy
 msgid "Input"
-msgstr "輸入清單"
+msgstr "輸入"
 
 #: src/libvlc-module.c:1546
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:522
 msgid "VLM"
-msgstr ""
+msgstr "VLM"
 
 #: src/libvlc-module.c:1579
 msgid "CPU"
-msgstr ""
+msgstr "CPU"
 
 #: src/libvlc-module.c:1601
-#, fuzzy
 msgid "Special modules"
-msgstr "輸出模組"
+msgstr "特殊模組"
 
 #: src/libvlc-module.c:1608
 msgid "Plugins"
 msgstr "外掛"
 
 #: src/libvlc-module.c:1616
-#, fuzzy
 msgid "Performance options"
-msgstr "轉碼選項"
+msgstr "效能選項"
 
 #: src/libvlc-module.c:1767
 msgid "Hot keys"
@@ -3905,9 +3841,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:2182
-#, fuzzy
 msgid "print help for the advanced options"
-msgstr "顯示進階選項"
+msgstr "列印進接選項說明"
 
 #: src/libvlc-module.c:2187
 msgid "ask for extra verbosity when displaying help"
@@ -3915,7 +3850,7 @@ msgstr ""
 
 #: src/libvlc-module.c:2193
 msgid "print a list of available modules"
-msgstr ""
+msgstr "列印可用模組清單"
 
 #: src/libvlc-module.c:2199
 msgid "print help on a specific module (can be combined with --advanced)"
@@ -3927,7 +3862,7 @@ msgstr ""
 
 #: src/libvlc-module.c:2209
 msgid "reset the current config to the default values"
-msgstr ""
+msgstr "重置目前組態至預設值"
 
 #: src/libvlc-module.c:2214
 msgid "use alternate config file"
@@ -3939,15 +3874,15 @@ msgstr "重置目前外掛快取"
 
 #: src/libvlc-module.c:2224
 msgid "print version information"
-msgstr ""
+msgstr "列印版本資訊"
 
 #: src/misc/configuration.c:1181
 msgid "boolean"
-msgstr ""
+msgstr "布林值"
 
 #: src/misc/configuration.c:1192
 msgid "key"
-msgstr ""
+msgstr "金鑰"
 
 #: src/playlist/engine.c:125 src/playlist/engine.c:127
 #: src/playlist/loadsave.c:101
@@ -3968,47 +3903,47 @@ msgstr ""
 
 #: src/text/iso-639_def.h:40
 msgid "Afrikaans"
-msgstr ""
+msgstr "南非荷蘭文"
 
 #: src/text/iso-639_def.h:41
 msgid "Albanian"
-msgstr ""
+msgstr "阿爾巴尼亞文"
 
 #: src/text/iso-639_def.h:42
 msgid "Amharic"
-msgstr ""
+msgstr "阿姆哈拉文"
 
 #: src/text/iso-639_def.h:43
 msgid "Arabic"
-msgstr ""
+msgstr "阿拉伯文"
 
 #: src/text/iso-639_def.h:44
 msgid "Armenian"
-msgstr ""
+msgstr "亞美尼亞文"
 
 #: src/text/iso-639_def.h:45
 msgid "Assamese"
-msgstr ""
+msgstr "阿薩姆語"
 
 #: src/text/iso-639_def.h:46
 msgid "Avestan"
-msgstr ""
+msgstr "阿維斯陀語"
 
 #: src/text/iso-639_def.h:47
 msgid "Aymara"
-msgstr ""
+msgstr "艾馬拉語"
 
 #: src/text/iso-639_def.h:48
 msgid "Azerbaijani"
-msgstr ""
+msgstr "亞塞拜疆文"
 
 #: src/text/iso-639_def.h:49
 msgid "Bashkir"
-msgstr ""
+msgstr "巴什基爾語"
 
 #: src/text/iso-639_def.h:50
 msgid "Basque"
-msgstr ""
+msgstr "巴斯克文"
 
 #: src/text/iso-639_def.h:51
 msgid "Belarusian"
@@ -4016,11 +3951,11 @@ msgstr ""
 
 #: src/text/iso-639_def.h:52
 msgid "Bengali"
-msgstr ""
+msgstr "孟加拉語"
 
 #: src/text/iso-639_def.h:53
 msgid "Bihari"
-msgstr ""
+msgstr "比哈爾語"
 
 #: src/text/iso-639_def.h:54
 msgid "Bislama"
@@ -4028,31 +3963,31 @@ msgstr ""
 
 #: src/text/iso-639_def.h:55
 msgid "Bosnian"
-msgstr ""
+msgstr "波士尼亞語"
 
 #: src/text/iso-639_def.h:56
 msgid "Breton"
-msgstr ""
+msgstr "不列塔尼文"
 
 #: src/text/iso-639_def.h:57
 msgid "Bulgarian"
-msgstr ""
+msgstr "保加利亞文"
 
 #: src/text/iso-639_def.h:58
 msgid "Burmese"
-msgstr ""
+msgstr "緬甸文"
 
 #: src/text/iso-639_def.h:60
 msgid "Chamorro"
-msgstr ""
+msgstr "夏莫羅語"
 
 #: src/text/iso-639_def.h:61
 msgid "Chechen"
-msgstr ""
+msgstr "車臣語"
 
 #: src/text/iso-639_def.h:62
 msgid "Chinese"
-msgstr ""
+msgstr "中文"
 
 #: src/text/iso-639_def.h:63
 msgid "Church Slavic"
@@ -4072,35 +4007,35 @@ msgstr ""
 
 #: src/text/iso-639_def.h:70
 msgid "Dzongkha"
-msgstr ""
+msgstr "不丹文"
 
 #: src/text/iso-639_def.h:71
 msgid "English"
-msgstr ""
+msgstr "英語"
 
 #: src/text/iso-639_def.h:72
 msgid "Esperanto"
-msgstr ""
+msgstr "世界語"
 
 #: src/text/iso-639_def.h:73
 msgid "Estonian"
-msgstr ""
+msgstr "愛沙尼亞文"
 
 #: src/text/iso-639_def.h:74
 msgid "Faroese"
-msgstr ""
+msgstr "法羅文"
 
 #: src/text/iso-639_def.h:75
 msgid "Fijian"
-msgstr ""
+msgstr "斐濟語"
 
 #: src/text/iso-639_def.h:76
 msgid "Finnish"
-msgstr ""
+msgstr "芬蘭文"
 
 #: src/text/iso-639_def.h:78
 msgid "Frisian"
-msgstr ""
+msgstr "弗裡斯蘭語"
 
 #: src/text/iso-639_def.h:81
 msgid "Gaelic (Scots)"
@@ -4108,15 +4043,15 @@ msgstr ""
 
 #: src/text/iso-639_def.h:82
 msgid "Irish"
-msgstr ""
+msgstr "愛爾蘭文"
 
 #: src/text/iso-639_def.h:83
 msgid "Gallegan"
-msgstr ""
+msgstr "嘉樂岡文"
 
 #: src/text/iso-639_def.h:84
 msgid "Manx"
-msgstr ""
+msgstr "馬恩語"
 
 #: src/text/iso-639_def.h:85
 msgid "Greek, Modern ()"
@@ -4124,15 +4059,15 @@ msgstr ""
 
 #: src/text/iso-639_def.h:86
 msgid "Guarani"
-msgstr ""
+msgstr "瓜拉尼語"
 
 #: src/text/iso-639_def.h:87
 msgid "Gujarati"
-msgstr ""
+msgstr "印度古吉拉特語"
 
 #: src/text/iso-639_def.h:89
 msgid "Herero"
-msgstr ""
+msgstr "赫雷羅語"
 
 #: src/text/iso-639_def.h:90
 msgid "Hindi"
@@ -4144,7 +4079,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:93
 msgid "Icelandic"
-msgstr ""
+msgstr "冰島文"
 
 #: src/text/iso-639_def.h:94
 msgid "Inuktitut"
@@ -4160,7 +4095,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:97
 msgid "Indonesian"
-msgstr ""
+msgstr "印尼文"
 
 #: src/text/iso-639_def.h:98
 msgid "Inupiaq"
@@ -4168,7 +4103,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:100
 msgid "Javanese"
-msgstr ""
+msgstr "爪哇語"
 
 #: src/text/iso-639_def.h:102
 msgid "Kalaallisut (Greenlandic)"
@@ -4176,35 +4111,35 @@ msgstr ""
 
 #: src/text/iso-639_def.h:103
 msgid "Kannada"
-msgstr ""
+msgstr "卡納達語"
 
 #: src/text/iso-639_def.h:104
 msgid "Kashmiri"
-msgstr ""
+msgstr "克什米爾語"
 
 #: src/text/iso-639_def.h:105
 msgid "Kazakh"
-msgstr ""
+msgstr "哈薩克語"
 
 #: src/text/iso-639_def.h:106
 msgid "Khmer"
-msgstr ""
+msgstr "高棉語"
 
 #: src/text/iso-639_def.h:107
 msgid "Kikuyu"
-msgstr ""
+msgstr "吉函式庫尤語"
 
 #: src/text/iso-639_def.h:108
 msgid "Kinyarwanda"
-msgstr ""
+msgstr "金亞盧安達文"
 
 #: src/text/iso-639_def.h:109
 msgid "Kirghiz"
-msgstr ""
+msgstr "吉爾吉斯語"
 
 #: src/text/iso-639_def.h:110
 msgid "Komi"
-msgstr ""
+msgstr "科米語"
 
 #: src/text/iso-639_def.h:112
 msgid "Kuanyama"
@@ -4212,27 +4147,27 @@ msgstr ""
 
 #: src/text/iso-639_def.h:113
 msgid "Kurdish"
-msgstr ""
+msgstr "庫德文"
 
 #: src/text/iso-639_def.h:114
 msgid "Lao"
-msgstr ""
+msgstr "寮文"
 
 #: src/text/iso-639_def.h:115
 msgid "Latin"
-msgstr ""
+msgstr "拉丁文"
 
 #: src/text/iso-639_def.h:116
 msgid "Latvian"
-msgstr ""
+msgstr "拉脫維亞文"
 
 #: src/text/iso-639_def.h:117
 msgid "Lingala"
-msgstr ""
+msgstr "林加拉語"
 
 #: src/text/iso-639_def.h:118
 msgid "Lithuanian"
-msgstr ""
+msgstr "立陶宛語"
 
 #: src/text/iso-639_def.h:119
 msgid "Letzeburgesch"
@@ -4240,19 +4175,19 @@ msgstr ""
 
 #: src/text/iso-639_def.h:120
 msgid "Macedonian"
-msgstr ""
+msgstr "馬其頓語"
 
 #: src/text/iso-639_def.h:121
 msgid "Marshall"
-msgstr ""
+msgstr "馬紹爾群島語"
 
 #: src/text/iso-639_def.h:122
 msgid "Malayalam"
-msgstr ""
+msgstr "馬拉雅拉姆語"
 
 #: src/text/iso-639_def.h:123
 msgid "Maori"
-msgstr ""
+msgstr "毛利語"
 
 #: src/text/iso-639_def.h:124
 msgid "Marathi"
@@ -4272,11 +4207,11 @@ msgstr ""
 
 #: src/text/iso-639_def.h:129
 msgid "Mongolian"
-msgstr ""
+msgstr "蒙古文"
 
 #: src/text/iso-639_def.h:130
 msgid "Nauru"
-msgstr ""
+msgstr "諾魯語"
 
 #: src/text/iso-639_def.h:131
 msgid "Navajo"
@@ -4284,27 +4219,27 @@ msgstr ""
 
 #: src/text/iso-639_def.h:132
 msgid "Ndebele, South"
-msgstr ""
+msgstr "南恩德比利語"
 
 #: src/text/iso-639_def.h:133
 msgid "Ndebele, North"
-msgstr ""
+msgstr "北恩德比利語"
 
 #: src/text/iso-639_def.h:134
 msgid "Ndonga"
-msgstr ""
+msgstr "湯加語"
 
 #: src/text/iso-639_def.h:135
 msgid "Nepali"
-msgstr ""
+msgstr "尼泊爾語"
 
 #: src/text/iso-639_def.h:136
 msgid "Norwegian"
-msgstr ""
+msgstr "挪威語"
 
 #: src/text/iso-639_def.h:137
 msgid "Norwegian Nynorsk"
-msgstr ""
+msgstr "新挪威文"
 
 #: src/text/iso-639_def.h:138
 msgid "Norwegian Bokmaal"
@@ -4320,11 +4255,11 @@ msgstr ""
 
 #: src/text/iso-639_def.h:141
 msgid "Oriya"
-msgstr ""
+msgstr "歐利亞文"
 
 #: src/text/iso-639_def.h:142
 msgid "Oromo"
-msgstr ""
+msgstr "奧羅莫語"
 
 #: src/text/iso-639_def.h:144
 msgid "Ossetian; Ossetic"
@@ -4336,51 +4271,51 @@ msgstr ""
 
 #: src/text/iso-639_def.h:146
 msgid "Persian"
-msgstr ""
+msgstr "波斯語"
 
 #: src/text/iso-639_def.h:147
 msgid "Pali"
-msgstr ""
+msgstr "巴利語"
 
 #: src/text/iso-639_def.h:148
 msgid "Polish"
-msgstr ""
+msgstr "波蘭文"
 
 #: src/text/iso-639_def.h:149
 msgid "Portuguese"
-msgstr ""
+msgstr "葡萄牙文"
 
 #: src/text/iso-639_def.h:150
 msgid "Pushto"
-msgstr ""
+msgstr "普什圖語"
 
 #: src/text/iso-639_def.h:151
 msgid "Quechua"
-msgstr ""
+msgstr "蓋丘亞語"
 
 #: src/text/iso-639_def.h:152
 msgid "Raeto-Romance"
-msgstr ""
+msgstr "里托羅曼語"
 
 #: src/text/iso-639_def.h:154
 msgid "Rundi"
-msgstr ""
+msgstr "隆迪語"
 
 #: src/text/iso-639_def.h:156
 msgid "Sango"
-msgstr ""
+msgstr "桑戈語"
 
 #: src/text/iso-639_def.h:157
 msgid "Sanskrit"
-msgstr ""
+msgstr "梵文"
 
 #: src/text/iso-639_def.h:158
 msgid "Serbian"
-msgstr ""
+msgstr "塞爾維亞文"
 
 #: src/text/iso-639_def.h:159
 msgid "Croatian"
-msgstr ""
+msgstr "克羅埃西亞文"
 
 #: src/text/iso-639_def.h:160
 msgid "Sinhalese"
@@ -4400,7 +4335,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:166
 msgid "Sindhi"
-msgstr ""
+msgstr "信德語"
 
 #: src/text/iso-639_def.h:167
 msgid "Somali"
@@ -4408,59 +4343,59 @@ msgstr ""
 
 #: src/text/iso-639_def.h:168
 msgid "Sotho, Southern"
-msgstr ""
+msgstr "南索託語"
 
 #: src/text/iso-639_def.h:170
 msgid "Sardinian"
-msgstr ""
+msgstr "薩丁文"
 
 #: src/text/iso-639_def.h:171
 msgid "Swati"
-msgstr ""
+msgstr "斯瓦特語"
 
 #: src/text/iso-639_def.h:172
 msgid "Sundanese"
-msgstr ""
+msgstr "巽他語"
 
 #: src/text/iso-639_def.h:173
 msgid "Swahili"
-msgstr ""
+msgstr "斯華西里文"
 
 #: src/text/iso-639_def.h:175
 msgid "Tahitian"
-msgstr ""
+msgstr "塔希提語"
 
 #: src/text/iso-639_def.h:176
 msgid "Tamil"
-msgstr ""
+msgstr "坦米爾語"
 
 #: src/text/iso-639_def.h:177
 msgid "Tatar"
-msgstr ""
+msgstr "韃靼文"
 
 #: src/text/iso-639_def.h:178
 msgid "Telugu"
-msgstr ""
+msgstr "泰盧固語"
 
 #: src/text/iso-639_def.h:179
 msgid "Tajik"
-msgstr ""
+msgstr "塔吉克語"
 
 #: src/text/iso-639_def.h:180
 msgid "Tagalog"
-msgstr ""
+msgstr "塔加路語"
 
 #: src/text/iso-639_def.h:181
 msgid "Thai"
-msgstr ""
+msgstr "泰語"
 
 #: src/text/iso-639_def.h:182
 msgid "Tibetan"
-msgstr ""
+msgstr "藏文"
 
 #: src/text/iso-639_def.h:183
 msgid "Tigrinya"
-msgstr ""
+msgstr "提格裡尼亞語"
 
 #: src/text/iso-639_def.h:184
 msgid "Tonga (Tonga Islands)"
@@ -4468,19 +4403,19 @@ msgstr ""
 
 #: src/text/iso-639_def.h:185
 msgid "Tswana"
-msgstr ""
+msgstr "塞特斯瓦那文"
 
 #: src/text/iso-639_def.h:186
 msgid "Tsonga"
-msgstr ""
+msgstr "頌加文"
 
 #: src/text/iso-639_def.h:188
 msgid "Turkmen"
-msgstr ""
+msgstr "土函式庫曼語"
 
 #: src/text/iso-639_def.h:189
 msgid "Twi"
-msgstr ""
+msgstr "特維語"
 
 #: src/text/iso-639_def.h:190
 msgid "Uighur"
@@ -4488,19 +4423,19 @@ msgstr ""
 
 #: src/text/iso-639_def.h:191
 msgid "Ukrainian"
-msgstr ""
+msgstr "烏克蘭語"
 
 #: src/text/iso-639_def.h:192
 msgid "Urdu"
-msgstr ""
+msgstr "烏都語"
 
 #: src/text/iso-639_def.h:193
 msgid "Uzbek"
-msgstr ""
+msgstr "烏茲別克語"
 
 #: src/text/iso-639_def.h:194
 msgid "Vietnamese"
-msgstr ""
+msgstr "越南文"
 
 #: src/text/iso-639_def.h:195
 msgid "Volapuk"
@@ -4508,23 +4443,23 @@ msgstr ""
 
 #: src/text/iso-639_def.h:196
 msgid "Welsh"
-msgstr ""
+msgstr "威爾斯語"
 
 #: src/text/iso-639_def.h:197
 msgid "Wolof"
-msgstr ""
+msgstr "沃洛夫語"
 
 #: src/text/iso-639_def.h:198
 msgid "Xhosa"
-msgstr ""
+msgstr "科薩文"
 
 #: src/text/iso-639_def.h:199
 msgid "Yiddish"
-msgstr ""
+msgstr "意第緒語"
 
 #: src/text/iso-639_def.h:200
 msgid "Yoruba"
-msgstr ""
+msgstr "約魯巴語"
 
 #: src/text/iso-639_def.h:201
 msgid "Zhuang"
@@ -4532,7 +4467,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:202
 msgid "Zulu"
-msgstr ""
+msgstr "祖魯語"
 
 #: src/text/iso_lang.c:70 modules/gui/wxwidgets/dialogs/preferences.cpp:980
 msgid "Unknown"
@@ -4541,7 +4476,7 @@ msgstr "未知"
 #: src/video_output/video_output.c:403 modules/gui/macosx/intf.m:590
 #: modules/gui/macosx/intf.m:591 modules/video_filter/deinterlace.c:122
 msgid "Deinterlace"
-msgstr ""
+msgstr "交錯式"
 
 #: src/video_output/video_output.c:407 modules/video_filter/deinterlace.c:117
 msgid "Discard"
@@ -4549,41 +4484,41 @@ msgstr ""
 
 #: src/video_output/video_output.c:409 modules/video_filter/deinterlace.c:117
 msgid "Blend"
-msgstr ""
+msgstr "混合"
 
 #: src/video_output/video_output.c:411 modules/video_filter/deinterlace.c:117
 msgid "Mean"
-msgstr ""
+msgstr "平均數"
 
 #: src/video_output/video_output.c:413 modules/video_filter/deinterlace.c:118
 msgid "Bob"
-msgstr ""
+msgstr "Bob"
 
 #: src/video_output/video_output.c:415 modules/video_filter/deinterlace.c:118
 msgid "Linear"
-msgstr ""
+msgstr "線性"
 
 #: src/video_output/vout_intf.c:228
 msgid "1:4 Quarter"
-msgstr ""
+msgstr "1:4 四分之一"
 
 #: src/video_output/vout_intf.c:230
 msgid "1:2 Half"
-msgstr ""
+msgstr "1:2 二分之一"
 
 #: src/video_output/vout_intf.c:232
 msgid "1:1 Original"
-msgstr ""
+msgstr "1:1 原始"
 
 #: src/video_output/vout_intf.c:234
 msgid "2:1 Double"
-msgstr ""
+msgstr "2:1 雙倍"
 
 #: src/video_output/vout_intf.c:261 modules/gui/macosx/intf.m:584
 #: modules/gui/macosx/intf.m:585 modules/video_filter/crop.c:102
 #: modules/video_output/x11/xvmc.c:130
 msgid "Crop"
-msgstr ""
+msgstr "裁剪"
 
 #: src/video_output/vout_intf.c:348 modules/gui/macosx/intf.m:582
 #: modules/gui/macosx/intf.m:583
@@ -4630,10 +4565,9 @@ msgstr "音樂CD輸入"
 
 #: modules/access/cdda.c:73
 msgid "[cdda:][device][@[track]]"
-msgstr ""
+msgstr "[cdda:][device][@[track]]"
 
 #: modules/access/cdda.c:85
-#, fuzzy
 msgid "CDDB Server"
 msgstr "CDDB伺服器"
 
@@ -4664,7 +4598,7 @@ msgstr "音訊軌"
 #: modules/access/cdda/cdda.c:42 modules/access/directory.c:80
 #: modules/codec/x264.c:321 modules/codec/x264.c:327 modules/codec/x264.c:332
 msgid "none"
-msgstr ""
+msgstr "j6"
 
 #: modules/access/cdda/cdda.c:42
 msgid "overlap"
@@ -4672,7 +4606,7 @@ msgstr ""
 
 #: modules/access/cdda/cdda.c:43
 msgid "full"
-msgstr ""
+msgstr "完全"
 
 #: modules/access/cdda/cdda.c:47
 msgid ""
@@ -4756,12 +4690,11 @@ msgstr ""
 
 #: modules/access/cdda/cdda.c:113
 msgid "Compact Disc Digital Audio (CD-DA) input"
-msgstr ""
+msgstr "Compact Disc Digital Audio (CD-DA)輸入"
 
 #: modules/access/cdda/cdda.c:115
-#, fuzzy
 msgid "Audio Compact Disc"
-msgstr "音樂CD"
+msgstr "音訊光碟"
 
 #: modules/access/cdda/cdda.c:124
 msgid "Additional debug"
@@ -4805,9 +4738,8 @@ msgid "Tracks are navigated via Navagation rather than a playlist entries"
 msgstr ""
 
 #: modules/access/cdda/cdda.c:174
-#, fuzzy
 msgid "CDDB"
-msgstr "CDDB年份"
+msgstr "CDDB"
 
 #: modules/access/cdda/cdda.c:177
 msgid "Format to use in playlist \"title\" field when using CDDB"
@@ -4889,7 +4821,7 @@ msgstr "光碟"
 #: modules/access/cdda/info.c:328 modules/access/cdda/info.c:396
 #: modules/gui/macosx/playlist.m:130
 msgid "Duration"
-msgstr ""
+msgstr "持續時間"
 
 #: modules/access/cdda/info.c:333
 msgid "Media Catalog Number (MCN)"
@@ -4897,7 +4829,7 @@ msgstr ""
 
 #: modules/access/cdda/info.c:337 modules/access/vcdx/info.c:103
 msgid "Tracks"
-msgstr ""
+msgstr "音軌"
 
 #: modules/access/cdda/info.c:393 modules/access/cdda/info.c:815
 #: modules/access/cdda/info.c:856 modules/access/vcdx/access.c:472
@@ -4905,15 +4837,15 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/open.cpp:1708
 #: modules/gui/wxwidgets/dialogs/open.cpp:1728
 msgid "Track"
-msgstr ""
+msgstr "音軌"
 
 #: modules/access/cdda/info.c:400
 msgid "MRL"
-msgstr ""
+msgstr "MRL"
 
 #: modules/access/cdda/info.c:856
 msgid "Track Number"
-msgstr ""
+msgstr "音軌編號"
 
 #: modules/access/dc1394.c:65
 #, fuzzy
@@ -4922,7 +4854,7 @@ msgstr "沒有輸入"
 
 #: modules/access/directory.c:72
 msgid "Subdirectory behavior"
-msgstr ""
+msgstr "子目錄行為"
 
 #: modules/access/directory.c:74
 msgid ""
@@ -4934,11 +4866,11 @@ msgstr ""
 
 #: modules/access/directory.c:80
 msgid "collapse"
-msgstr ""
+msgstr "收摺"
 
 #: modules/access/directory.c:81
 msgid "expand"
-msgstr ""
+msgstr "展開"
 
 #: modules/access/directory.c:83
 msgid "Ignored extensions"
@@ -4954,17 +4886,17 @@ msgstr ""
 
 #: modules/access/directory.c:92
 msgid "Directory"
-msgstr ""
+msgstr "目錄"
 
 #: modules/access/directory.c:94
 msgid "Standard filesystem directory input"
-msgstr ""
+msgstr "標準檔案系統目錄輸入"
 
 #: modules/access/dshow/dshow.cpp:76 modules/access/dshow/dshow.cpp:78
 #: modules/codec/ffmpeg/ffmpeg.c:73 modules/demux/mpc.c:56
 #: modules/video_output/opengl.c:122 modules/video_output/opengl.c:176
 msgid "None"
-msgstr ""
+msgstr "無"
 
 #: modules/access/dshow/dshow.cpp:81
 msgid "Cable"
@@ -5052,7 +4984,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:121
 msgid "Device properties"
-msgstr ""
+msgstr "裝置設置"
 
 #: modules/access/dshow/dshow.cpp:123
 msgid ""
@@ -5147,7 +5079,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:169
 msgid "DirectShow"
-msgstr ""
+msgstr "DirectShow"
 
 #: modules/access/dshow/dshow.cpp:170 modules/access/dshow/dshow.cpp:231
 msgid "DirectShow input"
@@ -5327,16 +5259,15 @@ msgstr ""
 
 #: modules/access/dvb/access.c:148
 msgid "HTTP Host address"
-msgstr ""
+msgstr "HTTP主機位址"
 
 #: modules/access/dvb/access.c:150
 msgid "To enable the internal HTTP server, set its address and port here."
 msgstr ""
 
 #: modules/access/dvb/access.c:152
-#, fuzzy
 msgid "HTTP user name"
-msgstr "SOCKS使用者名稱"
+msgstr "HTTP使用者名稱"
 
 #: modules/access/dvb/access.c:154
 msgid ""
@@ -5344,9 +5275,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/access.c:157
-#, fuzzy
 msgid "HTTP password"
-msgstr "SOCKS密碼"
+msgstr "HTTP密碼"
 
 #: modules/access/dvb/access.c:159
 msgid ""
@@ -5355,7 +5285,7 @@ msgstr ""
 
 #: modules/access/dvb/access.c:162
 msgid "HTTP ACL"
-msgstr ""
+msgstr "HTTP ACL"
 
 #: modules/access/dvb/access.c:164
 msgid ""
@@ -5375,7 +5305,7 @@ msgstr ""
 #: modules/access/dvb/access.c:172 modules/access_output/http.c:75
 #: modules/control/http/http.c:52
 msgid "Private key file"
-msgstr ""
+msgstr "私鑰檔案"
 
 #: modules/access/dvb/access.c:173
 msgid "HTTP interface x509 PEM private key file"
@@ -5384,7 +5314,7 @@ msgstr ""
 #: modules/access/dvb/access.c:175 modules/access_output/http.c:79
 #: modules/control/http/http.c:54
 msgid "Root CA file"
-msgstr ""
+msgstr "Root CA檔案"
 
 #: modules/access/dvb/access.c:176
 msgid "HTTP interface x509 PEM trusted root CA certificates file"
@@ -5401,16 +5331,15 @@ msgstr ""
 
 #: modules/access/dvb/access.c:183
 msgid "DVB"
-msgstr ""
+msgstr "DVB"
 
 #: modules/access/dvb/access.c:184
 msgid "DVB input with v4l2 support"
 msgstr ""
 
 #: modules/access/dvb/access.c:236
-#, fuzzy
 msgid "HTTP server"
-msgstr "沒有伺服器"
+msgstr "HTTP伺服器"
 
 #: modules/access/dvb/access.c:716
 #, fuzzy
@@ -5443,7 +5372,7 @@ msgstr ""
 
 #: modules/access/dv.c:75
 msgid "dv"
-msgstr ""
+msgstr "dv"
 
 #: modules/access/dvdnav.c:63 modules/access/dvdread.c:60
 msgid "DVD angle"
@@ -5512,7 +5441,7 @@ msgstr "標題"
 
 #: modules/access/dvdread.c:87
 msgid "Key"
-msgstr ""
+msgstr "金鑰"
 
 #: modules/access/dvdread.c:93
 msgid "DVD without menus"
@@ -5544,7 +5473,7 @@ msgstr ""
 
 #: modules/access/fake.c:45 modules/access/pvr.c:73 modules/access/v4l.c:139
 msgid "Framerate"
-msgstr ""
+msgstr "框率"
 
 #: modules/access/fake.c:47
 msgid "Number of frames per second (eg. 24, 25, 29.97, 30)."
@@ -5553,7 +5482,7 @@ msgstr ""
 #: modules/access/fake.c:48 modules/stream_out/bridge.c:37
 #: modules/stream_out/mosaic_bridge.c:104
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: modules/access/fake.c:50
 msgid ""
@@ -5596,9 +5525,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/file.c:89
-#, fuzzy
 msgid "File input"
-msgstr "沒有輸入"
+msgstr "檔案輸入"
 
 #: modules/access/file.c:90 modules/access_output/file.c:69
 #: modules/audio_output/file.c:109 modules/gui/beos/InterfaceWindow.cpp:262
@@ -5714,7 +5642,7 @@ msgstr ""
 
 #: modules/access/ftp.c:58
 msgid "FTP user name"
-msgstr ""
+msgstr "FTP使用者名稱"
 
 #: modules/access/ftp.c:59 modules/access/smb.c:66
 msgid "User name that will be used for the connection."
@@ -5722,7 +5650,7 @@ msgstr ""
 
 #: modules/access/ftp.c:61
 msgid "FTP password"
-msgstr ""
+msgstr "FTP密碼"
 
 #: modules/access/ftp.c:62 modules/access/smb.c:69
 msgid "Password that will be used for the connection."
@@ -5730,7 +5658,7 @@ msgstr ""
 
 #: modules/access/ftp.c:64
 msgid "FTP account"
-msgstr ""
+msgstr "FTP帳號"
 
 #: modules/access/ftp.c:65
 msgid "Account that will be used for the connection."
@@ -5738,7 +5666,7 @@ msgstr ""
 
 #: modules/access/ftp.c:70
 msgid "FTP input"
-msgstr ""
+msgstr "FTP輸入"
 
 #: modules/access/ftp.c:87
 #, fuzzy
@@ -5777,13 +5705,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/gnomevfs.c:51
-#, fuzzy
 msgid "GnomeVFS input"
-msgstr "沒有輸入"
+msgstr "GnomeVFS輸入"
 
 #: modules/access/http.c:50
 msgid "HTTP proxy"
-msgstr ""
+msgstr "HTTP 代理伺服器"
 
 #: modules/access/http.c:52
 msgid ""
@@ -5799,7 +5726,7 @@ msgstr ""
 
 #: modules/access/http.c:61
 msgid "HTTP user agent"
-msgstr ""
+msgstr "HTTP使用者代理人"
 
 #: modules/access/http.c:62
 msgid "User agent that will be used for the connection."
@@ -5816,7 +5743,7 @@ msgstr ""
 
 #: modules/access/http.c:71
 msgid "Continuous stream"
-msgstr ""
+msgstr "連續的串流"
 
 #: modules/access/http.c:72
 msgid ""
@@ -5831,7 +5758,7 @@ msgstr "HTTP輸入"
 
 #: modules/access/http.c:80
 msgid "HTTP(S)"
-msgstr ""
+msgstr "HTTP(S)"
 
 #: modules/access/http.c:297
 msgid "HTTP authentication"
@@ -5857,9 +5784,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/mms/mms.c:56
-#, fuzzy
 msgid "Maximum bitrate"
-msgstr "最大化編碼位元率"
+msgstr "最大化位元率"
 
 #: modules/access/mms/mms.c:58
 msgid "Select the stream with the maximum bitrate under that limit."
@@ -5891,7 +5817,7 @@ msgstr "檔案串流輸出"
 
 #: modules/access_output/http.c:60 modules/misc/audioscrobbler.c:118
 msgid "Username"
-msgstr ""
+msgstr "使用者名稱"
 
 #: modules/access_output/http.c:61
 msgid "User name that will be requested to access the stream."
@@ -5900,7 +5826,7 @@ msgstr ""
 #: modules/access_output/http.c:63 modules/control/telnet.c:79
 #: modules/control/telnet.c:270 modules/misc/audioscrobbler.c:120
 msgid "Password"
-msgstr ""
+msgstr "密碼"
 
 #: modules/access_output/http.c:64
 msgid "Password that will be requested to access the stream."
@@ -5908,7 +5834,7 @@ msgstr ""
 
 #: modules/access_output/http.c:68
 msgid "Mime"
-msgstr ""
+msgstr "Mime"
 
 #: modules/access_output/http.c:69
 msgid "MIME returned by the server (autodetected if not specified."
@@ -5946,30 +5872,27 @@ msgstr ""
 
 #: modules/access_output/http.c:93
 msgid "HTTP stream output"
-msgstr ""
+msgstr "HTTP串流輸出"
 
 #: modules/access_output/shout.c:59
-#, fuzzy
 msgid "Stream name"
-msgstr "串流"
+msgstr "串流名稱"
 
 #: modules/access_output/shout.c:60
 msgid "Name to give to this stream/channel on the shoutcast/icecast server."
 msgstr ""
 
 #: modules/access_output/shout.c:63
-#, fuzzy
 msgid "Stream description"
-msgstr "描述"
+msgstr "串流描述"
 
 #: modules/access_output/shout.c:64
 msgid "Description of the stream content or information about your channel."
 msgstr ""
 
 #: modules/access_output/shout.c:67
-#, fuzzy
 msgid "Stream MP3"
-msgstr "串流"
+msgstr "串流MP3"
 
 #: modules/access_output/shout.c:68
 msgid ""
@@ -6002,7 +5925,7 @@ msgstr ""
 
 #: modules/access_output/shout.c:90 modules/access/v4l.c:125
 msgid "Samplerate"
-msgstr ""
+msgstr "取樣頻率"
 
 #: modules/access_output/shout.c:91
 msgid "Samplerate information of the transcoded stream. "
@@ -6038,9 +5961,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/shout.c:106
-#, fuzzy
 msgid "IceCAST output"
-msgstr "存取輸出"
+msgstr "IceCAST輸出"
 
 #: modules/access_output/udp.c:76 modules/access/rtsp/access.c:41
 #: modules/demux/live555.cpp:64
@@ -6055,7 +5977,7 @@ msgstr ""
 
 #: modules/access_output/udp.c:81
 msgid "Group packets"
-msgstr ""
+msgstr "全組封包"
 
 #: modules/access_output/udp.c:82
 msgid ""
@@ -6164,16 +6086,15 @@ msgstr ""
 
 #: modules/access/pvr.c:87
 msgid "Bitrate peak"
-msgstr ""
+msgstr "位元率峰值"
 
 #: modules/access/pvr.c:88
 msgid "Peak bitrate in VBR mode."
 msgstr ""
 
 #: modules/access/pvr.c:91
-#, fuzzy
 msgid "Bitrate mode)"
-msgstr "位元率"
+msgstr "位元率模式)"
 
 #: modules/access/pvr.c:92
 msgid "Bitrate mode to use (VBR or CBR)."
@@ -6190,11 +6111,11 @@ msgstr ""
 #: modules/access/pvr.c:98 modules/access/vcdx/info.c:97
 #: modules/gui/macosx/intf.m:502 modules/gui/wxwidgets/interface.cpp:1392
 msgid "Volume"
-msgstr ""
+msgstr "音量"
 
 #: modules/access/pvr.c:99
 msgid "Audio volume (0-65535)."
-msgstr ""
+msgstr "音量(0-65535)"
 
 #: modules/access/pvr.c:101 modules/access/v4l.c:95
 msgid "Channel"
@@ -6207,31 +6128,31 @@ msgstr ""
 
 #: modules/access/pvr.c:108 modules/access/v4l.c:146
 msgid "Automatic"
-msgstr ""
+msgstr "自動"
 
 #: modules/access/pvr.c:108 modules/access/v4l.c:146
 msgid "SECAM"
-msgstr ""
+msgstr "SECAM"
 
 #: modules/access/pvr.c:108 modules/access/v4l.c:146
 msgid "PAL"
-msgstr ""
+msgstr "PAL"
 
 #: modules/access/pvr.c:108 modules/access/v4l.c:146
 msgid "NTSC"
-msgstr ""
+msgstr "NTSC"
 
 #: modules/access/pvr.c:111
 msgid "vbr"
-msgstr ""
+msgstr "vbr"
 
 #: modules/access/pvr.c:111
 msgid "cbr"
-msgstr ""
+msgstr "cbr"
 
 #: modules/access/pvr.c:116
 msgid "PVR"
-msgstr ""
+msgstr "PVR"
 
 #: modules/access/pvr.c:117
 msgid "IVTV MPEG Encoding cards input"
@@ -6244,7 +6165,7 @@ msgstr ""
 
 #: modules/access/rtsp/access.c:47 modules/access/rtsp/access.c:48
 msgid "Real RTSP"
-msgstr ""
+msgstr "Real RTSP"
 
 #: modules/access/rtsp/access.c:93
 #, fuzzy
@@ -6299,15 +6220,15 @@ msgstr ""
 
 #: modules/access/smb.c:65
 msgid "SMB user name"
-msgstr ""
+msgstr "SMB使用者名稱"
 
 #: modules/access/smb.c:68
 msgid "SMB password"
-msgstr ""
+msgstr "SMB密碼"
 
 #: modules/access/smb.c:71
 msgid "SMB domain"
-msgstr ""
+msgstr "SMB網域"
 
 #: modules/access/smb.c:72
 msgid "Domain/Workgroup that will be used for the connection."
@@ -6324,7 +6245,7 @@ msgstr ""
 
 #: modules/access/tcp.c:46
 msgid "TCP"
-msgstr ""
+msgstr "TCP"
 
 #: modules/access/tcp.c:47
 msgid "TCP input"
@@ -6337,7 +6258,7 @@ msgstr ""
 
 #: modules/access/udp.c:46
 msgid "Autodetection of MTU"
-msgstr ""
+msgstr "自動偵測MTU"
 
 #: modules/access/udp.c:48
 msgid ""
@@ -6358,11 +6279,11 @@ msgstr ""
 #: modules/access/udp.c:60 modules/gui/macosx/open.m:185
 #: modules/gui/macosx/open.m:713 modules/gui/wxwidgets/dialogs/open.cpp:802
 msgid "UDP/RTP"
-msgstr ""
+msgstr "UDP/RTP"
 
 #: modules/access/udp.c:61
 msgid "UDP/RTP input"
-msgstr ""
+msgstr "UDP/RTP輸入"
 
 #: modules/access/v4l2.c:53 modules/gui/macosx/open.m:169
 #: modules/gui/wxwidgets/dialogs/open.cpp:721
@@ -6444,9 +6365,8 @@ msgid "Brightness"
 msgstr "亮度"
 
 #: modules/access/v4l.c:113
-#, fuzzy
 msgid "Brightness of the video input."
-msgstr "設定視訊輸入亮度"
+msgstr "視訊輸入亮度"
 
 #: modules/access/v4l.c:114 modules/gui/macosx/extended.m:116
 #: modules/gui/wxwidgets/extrapanel.cpp:224
@@ -6454,21 +6374,18 @@ msgid "Hue"
 msgstr "色調"
 
 #: modules/access/v4l.c:116
-#, fuzzy
 msgid "Hue of the video input."
-msgstr "設定視訊輸入色調"
+msgstr "視訊輸入色調"
 
 #: modules/access/v4l.c:117 modules/misc/notify/xosd.c:80
 #: modules/video_filter/colorthres.c:49 modules/video_filter/marq.c:112
 #: modules/video_filter/rss.c:146
-#, fuzzy
 msgid "Color"
 msgstr "色彩"
 
 #: modules/access/v4l.c:119
-#, fuzzy
 msgid "Color of the video input."
-msgstr "設定視訊輸入對比"
+msgstr "視訊輸入色彩"
 
 #: modules/access/v4l.c:120 modules/gui/macosx/extended.m:114
 #: modules/gui/wxwidgets/extrapanel.cpp:229
@@ -6476,9 +6393,8 @@ msgid "Contrast"
 msgstr "對比"
 
 #: modules/access/v4l.c:122
-#, fuzzy
 msgid "Contrast of the video input."
-msgstr "設定視訊輸入對比"
+msgstr "視訊輸入對比"
 
 #: modules/access/v4l.c:123
 msgid "Tuner"
@@ -6500,7 +6416,7 @@ msgstr ""
 
 #: modules/access/v4l.c:131
 msgid "MJPEG"
-msgstr ""
+msgstr "MJPEG"
 
 #: modules/access/v4l.c:133
 msgid "Set this option if the capture device outputs MJPEG"
@@ -6519,13 +6435,12 @@ msgid "Quality"
 msgstr "品質"
 
 #: modules/access/v4l.c:138
-#, fuzzy
 msgid "Quality of the stream."
-msgstr "設定串流品質"
+msgstr "串流品質"
 
 #: modules/access/v4l.c:149
 msgid "Video4Linux"
-msgstr ""
+msgstr "Video4Linux"
 
 #: modules/access/v4l.c:150
 msgid "Video4Linux input"
@@ -6539,7 +6454,7 @@ msgstr ""
 #: modules/gui/macosx/open.m:502 modules/gui/macosx/open.m:592
 #: modules/gui/wxwidgets/dialogs/open.cpp:696
 msgid "VCD"
-msgstr ""
+msgstr "VCD"
 
 #: modules/access/vcd/vcd.c:48
 msgid "VCD input"
@@ -6547,7 +6462,7 @@ msgstr "VCD 輸入"
 
 #: modules/access/vcd/vcd.c:54
 msgid "[vcd:][device][@[title][,[chapter]]]"
-msgstr ""
+msgstr "[vcd:][device][@[title][,[chapter]]]"
 
 #: modules/access/vcdx/access.c:105
 msgid "The above message had unknown log level"
@@ -6561,21 +6476,21 @@ msgstr ""
 #: modules/access/vcdx/access.c:690 modules/access/vcdx/info.c:290
 #: modules/access/vcdx/info.c:291
 msgid "Entry"
-msgstr ""
+msgstr "條目"
 
 #: modules/access/vcdx/access.c:409 modules/access/vcdx/info.c:102
 msgid "Segments"
-msgstr ""
+msgstr "片段"
 
 #: modules/access/vcdx/access.c:428 modules/access/vcdx/access.c:709
 #: modules/access/vcdx/info.c:294 modules/access/vcdx/info.c:295
 #: modules/demux/mkv.cpp:5260
 msgid "Segment"
-msgstr ""
+msgstr "片段"
 
 #: modules/access/vcdx/access.c:533
 msgid "LID"
-msgstr ""
+msgstr "LID"
 
 #: modules/access/vcdx/info.c:90
 msgid "VCD Format"
@@ -6583,11 +6498,11 @@ msgstr "VCD格式"
 
 #: modules/access/vcdx/info.c:91 modules/demux/mpc.c:56
 msgid "Album"
-msgstr ""
+msgstr "專輯"
 
 #: modules/access/vcdx/info.c:92
 msgid "Application"
-msgstr ""
+msgstr "應用程式"
 
 #: modules/access/vcdx/info.c:93
 msgid "Preparer"
@@ -6628,11 +6543,11 @@ msgstr ""
 #: modules/access/vcdx/info.c:139 modules/access/vcdx/info.c:142
 #: modules/access/vcdx/info.c:151 modules/access/vcdx/info.c:166
 msgid "type"
-msgstr ""
+msgstr "型態"
 
 #: modules/access/vcdx/info.c:139
 msgid "end"
-msgstr ""
+msgstr "結束"
 
 #: modules/access/vcdx/info.c:142
 msgid "play list"
@@ -6657,11 +6572,11 @@ msgstr ""
 
 #: modules/access/vcdx/vcd.c:95
 msgid "(Super) Video CD"
-msgstr ""
+msgstr "(Super) Video CD"
 
 #: modules/access/vcdx/vcd.c:96
 msgid "Video CD (VCD 1.0, 1.1, 2.0, SVCD, HQVCD) input"
-msgstr ""
+msgstr "Video CD (VCD 1.0, 1.1, 2.0, SVCD, HQVCD)輸入"
 
 #: modules/access/vcdx/vcd.c:97
 msgid "vcdx://[device-or-file][@{P,S,T}num]"
@@ -6718,9 +6633,8 @@ msgid "Simple decoder for Dolby Surround encoded streams"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/dolby.c:47
-#, fuzzy
 msgid "Dolby Surround decoder"
-msgstr "杜比環繞"
+msgstr "杜比環繞解碼器"
 
 #: modules/audio_filter/channel_mixer/headphone.c:55
 msgid ""
@@ -6768,7 +6682,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/headphone.c:79
 msgid "Headphone effect"
-msgstr ""
+msgstr "耳機效果"
 
 #: modules/audio_filter/channel_mixer/mono.c:87
 msgid "Use downmix algorithme."
@@ -6922,16 +6836,16 @@ msgstr ""
 #: modules/audio_filter/equalizer_presets.h:40
 #: modules/meta_engine/id3genres.h:60
 msgid "Classical"
-msgstr ""
+msgstr "古典"
 
 #: modules/audio_filter/equalizer_presets.h:40
 msgid "Club"
-msgstr ""
+msgstr "俱樂部"
 
 #: modules/audio_filter/equalizer_presets.h:40
 #: modules/meta_engine/id3genres.h:31
 msgid "Dance"
-msgstr ""
+msgstr "舞曲"
 
 #: modules/audio_filter/equalizer_presets.h:40
 msgid "Full bass"
@@ -6947,7 +6861,7 @@ msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:41
 msgid "Headphones"
-msgstr ""
+msgstr "耳機"
 
 #: modules/audio_filter/equalizer_presets.h:42
 msgid "Large Hall"
@@ -6955,44 +6869,44 @@ msgstr ""
 
 #: modules/audio_filter/equalizer_presets.h:42
 msgid "Live"
-msgstr ""
+msgstr "現場"
 
 #: modules/audio_filter/equalizer_presets.h:42
 msgid "Party"
-msgstr ""
+msgstr "派對"
 
 #: modules/audio_filter/equalizer_presets.h:42
 #: modules/meta_engine/id3genres.h:41
 msgid "Pop"
-msgstr ""
+msgstr "流行音樂"
 
 #: modules/audio_filter/equalizer_presets.h:42
 #: modules/meta_engine/id3genres.h:44
 msgid "Reggae"
-msgstr ""
+msgstr "雷鬼"
 
 #: modules/audio_filter/equalizer_presets.h:43
 #: modules/meta_engine/id3genres.h:45
 msgid "Rock"
-msgstr ""
+msgstr "搖滾樂"
 
 #: modules/audio_filter/equalizer_presets.h:43
 #: modules/meta_engine/id3genres.h:49
 msgid "Ska"
-msgstr ""
+msgstr "斯卡"
 
 #: modules/audio_filter/equalizer_presets.h:43
 msgid "Soft"
-msgstr ""
+msgstr "輕柔"
 
 #: modules/audio_filter/equalizer_presets.h:43
 msgid "Soft rock"
-msgstr ""
+msgstr "輕柔搖滾"
 
 #: modules/audio_filter/equalizer_presets.h:43
 #: modules/meta_engine/id3genres.h:46
 msgid "Techno"
-msgstr ""
+msgstr "電子音樂"
 
 #: modules/audio_filter/format.c:202
 msgid "Audio filter for PCM format conversion"
@@ -7031,23 +6945,23 @@ msgstr "等化器"
 
 #: modules/audio_filter/param_eq.c:53
 msgid "Low freq (Hz)"
-msgstr ""
+msgstr "低頻 (Hz)"
 
 #: modules/audio_filter/param_eq.c:56
 msgid "Low freq gain (Db)"
-msgstr ""
+msgstr "低頻增益 (Db)"
 
 #: modules/audio_filter/param_eq.c:57
 msgid "High freq (Hz)"
-msgstr ""
+msgstr "高頻 (Hz)"
 
 #: modules/audio_filter/param_eq.c:60
 msgid "High freq gain (Db)"
-msgstr ""
+msgstr "高頻增益 (Db)"
 
 #: modules/audio_filter/param_eq.c:61
 msgid "Freq 1 (Hz)"
-msgstr ""
+msgstr "頻率 1 (Hz)"
 
 #: modules/audio_filter/param_eq.c:64
 msgid "Freq 1 gain (Db)"
@@ -7055,31 +6969,31 @@ msgstr ""
 
 #: modules/audio_filter/param_eq.c:66
 msgid "Freq 1 Q"
-msgstr ""
+msgstr "頻率 1 Q"
 
 #: modules/audio_filter/param_eq.c:67
 msgid "Freq 2 (Hz)"
-msgstr ""
+msgstr "頻率 2 (Hz)"
 
 #: modules/audio_filter/param_eq.c:70
 msgid "Freq 2 gain (Db)"
-msgstr ""
+msgstr "頻率 2 增益 (Db)"
 
 #: modules/audio_filter/param_eq.c:72
 msgid "Freq 2 Q"
-msgstr ""
+msgstr "頻率 2 Q"
 
 #: modules/audio_filter/param_eq.c:73
 msgid "Freq 3 (Hz)"
-msgstr ""
+msgstr "頻率 3 (Hz)"
 
 #: modules/audio_filter/param_eq.c:76
 msgid "Freq 3 gain (Db)"
-msgstr ""
+msgstr "頻率 3 增益 (Db)"
 
 #: modules/audio_filter/param_eq.c:78
 msgid "Freq 3 Q"
-msgstr ""
+msgstr "頻率 3 Q"
 
 #: modules/audio_filter/resampler/bandlimited.c:84
 msgid "Audio filter for band-limited interpolation resampling"
@@ -7136,7 +7050,7 @@ msgstr "音訊裝置"
 #: modules/audio_output/sdl.c:182 modules/audio_output/sdl.c:201
 #: modules/audio_output/waveout.c:432
 msgid "Mono"
-msgstr ""
+msgstr "單聲道"
 
 #: modules/audio_output/alsa.c:198 modules/audio_output/directx.c:450
 #: modules/audio_output/oss.c:179 modules/audio_output/portaudio.c:419
@@ -7190,9 +7104,8 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/auhal.c:135
-#, fuzzy
 msgid "HAL AudioUnit output"
-msgstr "ALSA音訊輸出"
+msgstr "HAL AudioUnit輸出"
 
 #: modules/audio_output/auhal.c:243
 msgid ""
@@ -7241,16 +7154,15 @@ msgstr "DirectX音訊輸出"
 
 #: modules/audio_output/directx.c:432 modules/audio_output/portaudio.c:427
 msgid "3 Front 2 Rear"
-msgstr ""
+msgstr "3前2後"
 
 #: modules/audio_output/esd.c:67
 msgid "EsounD audio output"
 msgstr "EsounD音訊輸出"
 
 #: modules/audio_output/esd.c:70
-#, fuzzy
 msgid "Esound server"
-msgstr "沒有伺服器"
+msgstr "Esound伺服器"
 
 #: modules/audio_output/file.c:78
 msgid "Output format"
@@ -7263,9 +7175,8 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/file.c:82
-#, fuzzy
 msgid "Number of output channels"
-msgstr "複製數量"
+msgstr "輸出頻道數量"
 
 #: modules/audio_output/file.c:83
 msgid ""
@@ -7275,7 +7186,7 @@ msgstr ""
 
 #: modules/audio_output/file.c:86
 msgid "Add WAVE header"
-msgstr ""
+msgstr "增加WAVE標頭"
 
 #: modules/audio_output/file.c:87
 msgid "Instead of writing a raw file, you can add a WAV header to the file."
@@ -7295,12 +7206,11 @@ msgstr ""
 
 #: modules/audio_output/hd1000a.cpp:76
 msgid "Roku HD1000 audio output"
-msgstr ""
+msgstr "Roku HD1000音訊輸出"
 
 #: modules/audio_output/jack.c:62
-#, fuzzy
 msgid "JACK audio output"
-msgstr "ALSA音訊輸出"
+msgstr "JACK audio輸出"
 
 #: modules/audio_output/oss.c:99
 msgid "Try to work around buggy OSS drivers"
@@ -7340,7 +7250,7 @@ msgstr ""
 
 #: modules/audio_output/waveout.c:385
 msgid "5.1"
-msgstr ""
+msgstr "5.1"
 
 #: modules/codec/a52.c:91
 msgid "A/52 parser"
@@ -7360,7 +7270,7 @@ msgstr ""
 
 #: modules/codec/araw.c:53
 msgid "Raw audio encoder"
-msgstr ""
+msgstr "原始音訊編碼器"
 
 #: modules/codec/cinepak.c:38
 msgid "Cinepak video decoder"
@@ -7384,9 +7294,8 @@ msgid "Encoding quality"
 msgstr "編碼品質"
 
 #: modules/codec/dirac.c:69
-#, fuzzy
 msgid "Quality of the encoding between 1.0 (low) and 10.0 (high)."
-msgstr "允許你指定品質，介於1.0(低)到10.0(高)之間"
+msgstr "編碼品質，介於 1.0 (低)到 10.0 (高)之間"
 
 #: modules/codec/dirac.c:74
 msgid "Dirac video decoder"
@@ -7477,9 +7386,8 @@ msgid "AAC extension"
 msgstr ""
 
 #: modules/codec/fake.c:45 modules/video_output/image.c:80
-#, fuzzy
 msgid "Image file"
-msgstr "影像複製"
+msgstr "影像檔"
 
 #: modules/codec/fake.c:47
 msgid "Path of the image file for fake input."
@@ -7487,20 +7395,17 @@ msgstr ""
 
 #: modules/codec/fake.c:50 modules/stream_out/mosaic_bridge.c:110
 #: modules/stream_out/transcode.c:75
-#, fuzzy
 msgid "Output video width."
-msgstr "視訊寬度"
+msgstr "輸出視訊寬度"
 
 #: modules/codec/fake.c:53 modules/stream_out/mosaic_bridge.c:113
 #: modules/stream_out/transcode.c:78
-#, fuzzy
 msgid "Output video height."
-msgstr "視訊高度"
+msgstr "輸出視訊高度"
 
 #: modules/codec/fake.c:54 modules/video_filter/mosaic.c:133
-#, fuzzy
 msgid "Keep aspect ratio"
-msgstr "採樣率"
+msgstr "保持長寬比"
 
 #: modules/codec/fake.c:56
 msgid "Consider width and height as maximum values."
@@ -7508,7 +7413,7 @@ msgstr ""
 
 #: modules/codec/fake.c:57
 msgid "Background aspect ratio"
-msgstr ""
+msgstr "背景長寬比"
 
 #: modules/codec/fake.c:59
 msgid "Aspect ratio of the image file (4:3, 16:9). Default is square pixels."
@@ -7570,9 +7475,8 @@ msgid "Non-key"
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:73
-#, fuzzy
 msgid "All"
-msgstr "全部"
+msgstr "所有的"
 
 #: modules/codec/ffmpeg/ffmpeg.c:76
 msgid "rd"
@@ -7580,11 +7484,11 @@ msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:76
 msgid "bits"
-msgstr ""
+msgstr "位元"
 
 #: modules/codec/ffmpeg/ffmpeg.c:76
 msgid "simple"
-msgstr ""
+msgstr "簡易"
 
 #: modules/codec/ffmpeg/ffmpeg.c:80 modules/codec/ffmpeg/scale.c:72
 msgid "Fast bilinear"
@@ -7592,7 +7496,7 @@ msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:80 modules/codec/ffmpeg/scale.c:72
 msgid "Bilinear"
-msgstr ""
+msgstr "雙線性"
 
 #: modules/codec/ffmpeg/ffmpeg.c:80 modules/codec/ffmpeg/scale.c:72
 msgid "Bicubic (good quality)"
@@ -7608,7 +7512,7 @@ msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:82 modules/codec/ffmpeg/scale.c:74
 msgid "Area"
-msgstr ""
+msgstr "區域"
 
 #: modules/codec/ffmpeg/ffmpeg.c:82 modules/codec/ffmpeg/scale.c:74
 msgid "Luma bicubic / chroma bilinear"
@@ -7649,14 +7553,12 @@ msgid "Encoding"
 msgstr "編碼"
 
 #: modules/codec/ffmpeg/ffmpeg.c:130
-#, fuzzy
 msgid "FFmpeg audio/video encoder"
-msgstr "ffmpeg音訊/視訊編碼器"
+msgstr "FFmpeg音訊/視訊編碼器"
 
 #: modules/codec/ffmpeg/ffmpeg.c:188
-#, fuzzy
 msgid "FFmpeg demuxer"
-msgstr "ffmpeg解多工器"
+msgstr "FFmpeg解多工器"
 
 #: modules/codec/ffmpeg/ffmpeg.c:194
 #, fuzzy
@@ -7668,14 +7570,12 @@ msgid "Video scaling filter"
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:213
-#, fuzzy
 msgid "FFmpeg chroma conversion"
-msgstr "ffmpeg彩度轉換"
+msgstr "FFmpeg彩度轉換"
 
 #: modules/codec/ffmpeg/ffmpeg.c:219
-#, fuzzy
 msgid "FFmpeg video filter"
-msgstr "ffmpeg視訊過濾器"
+msgstr "FFmpeg視訊過濾器"
 
 #: modules/codec/ffmpeg/ffmpeg.c:225
 #, fuzzy
@@ -7689,7 +7589,7 @@ msgstr "ffmpeg視訊過濾器"
 
 #: modules/codec/ffmpeg/ffmpeg.h:87 modules/codec/ffmpeg/ffmpeg.h:89
 msgid "Direct rendering"
-msgstr ""
+msgstr "直接成像"
 
 #: modules/codec/ffmpeg/ffmpeg.h:91
 msgid "Error resilience"
@@ -7724,7 +7624,7 @@ msgstr ""
 #: modules/codec/ffmpeg/ffmpeg.h:111 modules/codec/ffmpeg/ffmpeg.h:244
 #: modules/stream_out/transcode.c:180
 msgid "Hurry up"
-msgstr ""
+msgstr "快一點"
 
 #: modules/codec/ffmpeg/ffmpeg.h:113
 msgid ""
@@ -7928,7 +7828,7 @@ msgstr ""
 #: modules/codec/ffmpeg/ffmpeg.h:228 modules/codec/x264.c:269
 #: modules/demux/mod.c:73
 msgid "Noise reduction"
-msgstr ""
+msgstr "雜訊降低"
 
 #: modules/codec/ffmpeg/ffmpeg.h:229
 msgid ""
@@ -8027,9 +7927,8 @@ msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:279
-#, fuzzy
 msgid "Motion masking"
-msgstr "動作對應"
+msgstr "動作遮罩"
 
 #: modules/codec/ffmpeg/ffmpeg.h:280
 msgid ""
@@ -8069,7 +7968,7 @@ msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:297
 msgid "Scaling mode"
-msgstr ""
+msgstr "比例縮放模式"
 
 #: modules/codec/ffmpeg/ffmpeg.h:298
 msgid "Scaling mode to use."
@@ -8117,13 +8016,12 @@ msgid "Video decoder using openmash"
 msgstr "視訊解碼器(使用openmash)"
 
 #: modules/codec/mpeg_audio.c:106
-#, fuzzy
 msgid "MPEG audio layer I/II/III decoder"
-msgstr "MPEG音訊解碼器"
+msgstr "MPEG audio layer I/II/III音訊解碼器"
 
 #: modules/codec/mpeg_audio.c:117
 msgid "MPEG audio layer I/II/III packetizer"
-msgstr ""
+msgstr "MPEG audio layer I/II/III封包器"
 
 #: modules/codec/png.c:54
 msgid "PNG video decoder"
@@ -8135,21 +8033,19 @@ msgstr "QuickTime函式庫解碼器"
 
 #: modules/codec/rawvideo.c:68
 msgid "Pseudo raw video decoder"
-msgstr ""
+msgstr "虛擬原始視訊解碼器"
 
 #: modules/codec/rawvideo.c:75
 msgid "Pseudo raw video packetizer"
 msgstr ""
 
 #: modules/codec/realaudio.c:60
-#, fuzzy
 msgid "RealAudio library decoder"
-msgstr "QuickTime函式庫解碼器"
+msgstr "RealAudio函式庫解碼器"
 
 #: modules/codec/sdl_image.c:55
-#, fuzzy
 msgid "SDL_image video decoder"
-msgstr "Dirac視訊解碼器"
+msgstr "SDL_image視訊解碼器"
 
 #: modules/codec/speex.c:106
 msgid "Speex audio decoder"
@@ -8196,9 +8092,8 @@ msgid "Set the justification of subtitles"
 msgstr "設定字幕對齊"
 
 #: modules/codec/subsdec.c:135
-#, fuzzy
 msgid "UTF-8 subtitles autodetection"
-msgstr "字幕自動偵測路徑"
+msgstr "UTF-8字幕自動偵測"
 
 #: modules/codec/subsdec.c:136
 msgid ""
@@ -8206,9 +8101,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/subsdec.c:138
-#, fuzzy
 msgid "Formatted Subtitles"
-msgstr "字幕"
+msgstr "已格式化字幕"
 
 #: modules/codec/subsdec.c:139
 msgid ""
@@ -8217,9 +8111,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/subsdec.c:145
-#, fuzzy
 msgid "Text subtitles decoder"
-msgstr "字體字幕解碼器"
+msgstr "文字字幕解碼器"
 
 #: modules/codec/subsdec.c:366
 msgid ""
@@ -8285,7 +8178,7 @@ msgstr ""
 
 #: modules/codec/twolame.c:55
 msgid "Stereo mode"
-msgstr ""
+msgstr "立體聲模式"
 
 #: modules/codec/twolame.c:56
 msgid "Handling mode for stereo streams"
@@ -8293,7 +8186,7 @@ msgstr ""
 
 #: modules/codec/twolame.c:57
 msgid "VBR mode"
-msgstr ""
+msgstr "VBR模式"
 
 #: modules/codec/twolame.c:59
 msgid "Use Variable BitRate. Default is to use Constant BitRate (CBR)."
@@ -8309,16 +8202,15 @@ msgstr ""
 
 #: modules/codec/twolame.c:66
 msgid "Dual mono"
-msgstr ""
+msgstr "雙單聲道"
 
 #: modules/codec/twolame.c:66
 msgid "Joint stereo"
-msgstr ""
+msgstr "共同立體聲"
 
 #: modules/codec/twolame.c:71
-#, fuzzy
 msgid "Libtwolame audio encoder"
-msgstr "libtoolame音訊編碼器"
+msgstr "Libtwolame音訊編碼器"
 
 #: modules/codec/vorbis.c:160
 msgid "Maximum encoding bitrate"
@@ -8363,9 +8255,8 @@ msgid "Vorbis comment"
 msgstr ""
 
 #: modules/codec/x264.c:44
-#, fuzzy
 msgid "Maximum GOP size"
-msgstr "最大化編碼位元率"
+msgstr "最大化GOP大小"
 
 #: modules/codec/x264.c:45
 msgid ""
@@ -8448,7 +8339,7 @@ msgstr ""
 
 #: modules/codec/x264.c:87
 msgid "CABAC"
-msgstr ""
+msgstr "CABAC"
 
 #: modules/codec/x264.c:88
 msgid ""
@@ -8560,9 +8451,8 @@ msgid "Allowed variance in average bitrate (in kbits/s)."
 msgstr ""
 
 #: modules/codec/x264.c:144
-#, fuzzy
 msgid "Max local bitrate"
-msgstr "最大化編碼位元率"
+msgstr "最大本地位元率"
 
 #: modules/codec/x264.c:145
 msgid "Sets a maximum local bitrate (in kbits/s)."
@@ -8570,7 +8460,7 @@ msgstr ""
 
 #: modules/codec/x264.c:147
 msgid "VBV buffer"
-msgstr ""
+msgstr "VBV緩衝器"
 
 #: modules/codec/x264.c:148
 msgid "Averaging period for the maximum local bitrate (in kbits)."
@@ -8695,7 +8585,7 @@ msgstr ""
 
 #: modules/codec/x264.c:209
 msgid "Maximum motion vector search range"
-msgstr ""
+msgstr "最大化動作向量搜尋範圍"
 
 #: modules/codec/x264.c:210
 msgid ""
@@ -8827,7 +8717,7 @@ msgstr ""
 
 #: modules/codec/x264.c:285
 msgid "CPU optimizations"
-msgstr ""
+msgstr "CPU最佳化"
 
 #: modules/codec/x264.c:286
 msgid "Use assembler CPU optimizations."
@@ -8867,7 +8757,7 @@ msgstr "靜音模式"
 #: modules/codec/x264.c:299 modules/gui/macosx/playlistinfo.m:64
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:85
 msgid "Statistics"
-msgstr ""
+msgstr "統計"
 
 #: modules/codec/x264.c:300
 msgid "Print stats for each frame."
@@ -8917,9 +8807,8 @@ msgid "normal"
 msgstr "正常"
 
 #: modules/codec/x264.c:321
-#, fuzzy
 msgid "slow"
-msgstr "慢速"
+msgstr "慢"
 
 #: modules/codec/x264.c:321
 msgid "all"
@@ -8974,24 +8863,21 @@ msgstr ""
 
 #: modules/control/gestures.c:88
 msgid "Middle"
-msgstr ""
+msgstr "中"
 
 #: modules/control/gestures.c:91
-#, fuzzy
 msgid "Gestures"
-msgstr "類型"
+msgstr "手勢"
 
 #: modules/control/gestures.c:99
 msgid "Mouse gestures control interface"
 msgstr ""
 
 #: modules/control/hotkeys.c:94
-#, fuzzy
 msgid "Define playlist bookmarks."
-msgstr "設定播放清單書籤 9"
+msgstr "定義播放清單書籤。"
 
 #: modules/control/hotkeys.c:97
-#, fuzzy
 msgid "Hotkeys"
 msgstr "熱鍵"
 
@@ -9011,17 +8897,17 @@ msgstr "字幕軌: %s"
 
 #: modules/control/hotkeys.c:446
 msgid "N/A"
-msgstr ""
+msgstr "不存在"
 
 #: modules/control/hotkeys.c:499
-#, fuzzy, c-format
+#, c-format
 msgid "Aspect ratio: %s"
-msgstr "採樣率"
+msgstr "長寬比: %s"
 
 #: modules/control/hotkeys.c:525
 #, c-format
 msgid "Crop: %s"
-msgstr ""
+msgstr "裁切: %s"
 
 #: modules/control/hotkeys.c:551
 #, fuzzy, c-format
@@ -9061,12 +8947,11 @@ msgstr ""
 
 #: modules/control/http/http.c:40 modules/control/http/http.c:41
 msgid "Source directory"
-msgstr ""
+msgstr "來源目錄"
 
 #: modules/control/http/http.c:42
-#, fuzzy
 msgid "Charset"
-msgstr "選擇"
+msgstr "字元集"
 
 #: modules/control/http/http.c:44
 msgid "Charset declared in Content-Type header (default UTF-8)."
@@ -9101,15 +8986,15 @@ msgstr ""
 #: modules/control/http/http.c:61
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:472
 msgid "HTTP"
-msgstr ""
+msgstr "HTTP"
 
 #: modules/control/http/http.c:62
 msgid "HTTP remote control interface"
-msgstr ""
+msgstr "HTTP遠端控制介面"
 
 #: modules/control/http/http.c:71
 msgid "HTTP SSL"
-msgstr ""
+msgstr "HTTP SSL"
 
 #: modules/control/lirc.c:58
 msgid "Infrared remote control interface"
@@ -9139,16 +9024,15 @@ msgstr ""
 
 #: modules/control/netsync.c:69
 msgid "Master client ip address"
-msgstr ""
+msgstr "主用戶端IP位址"
 
 #: modules/control/netsync.c:70
 msgid "IP address of the master client used for the network synchronisation."
 msgstr ""
 
 #: modules/control/netsync.c:74
-#, fuzzy
 msgid "Network Sync"
-msgstr "網路:"
+msgstr "網路同步"
 
 #: modules/control/ntservice.c:39
 msgid "Install Windows Service"
@@ -9196,9 +9080,8 @@ msgid ""
 msgstr ""
 
 #: modules/control/ntservice.c:61
-#, fuzzy
 msgid "NT Service"
-msgstr "服務"
+msgstr "NT Services"
 
 #: modules/control/ntservice.c:62
 msgid "Windows Service interface"
@@ -9252,7 +9135,7 @@ msgstr ""
 
 #: modules/control/rc.c:183
 msgid "RC"
-msgstr ""
+msgstr "RC"
 
 #: modules/control/rc.c:186
 msgid "Remote control interface"
@@ -9603,7 +9486,7 @@ msgstr ""
 
 #: modules/control/showintf.c:63
 msgid "Threshold"
-msgstr ""
+msgstr "閥值"
 
 #: modules/control/showintf.c:64
 msgid "Height of the zone triggering the interface."
@@ -9611,7 +9494,7 @@ msgstr ""
 
 #: modules/control/telnet.c:70
 msgid "Host"
-msgstr ""
+msgstr "主機"
 
 #: modules/control/telnet.c:71
 msgid ""
@@ -9641,9 +9524,8 @@ msgid ""
 msgstr ""
 
 #: modules/control/telnet.c:94
-#, fuzzy
 msgid "VLM remote control interface"
-msgstr "搖控介面"
+msgstr "VLM遠端控制介面"
 
 #: modules/control/telnet.c:398
 msgid "Line too long\r\n"
@@ -9721,9 +9603,8 @@ msgid "AVI demuxer"
 msgstr "AVI解多工器"
 
 #: modules/demux/avi/avi.c:583
-#, fuzzy
 msgid "AVI Index"
-msgstr "AVI解多工器"
+msgstr "AVI索引"
 
 #: modules/demux/avi/avi.c:584
 msgid ""
@@ -9770,7 +9651,7 @@ msgstr "調節器數量"
 
 #: modules/demux/dts.c:40
 msgid "Raw DTS demuxer"
-msgstr ""
+msgstr "原始DTS解多功器"
 
 #: modules/demux/flac.c:39
 msgid "FLAC demuxer"
@@ -9832,9 +9713,8 @@ msgid "Use RTP over RTSP (TCP)"
 msgstr ""
 
 #: modules/demux/live555.cpp:101
-#, fuzzy
 msgid "Client port"
-msgstr "視訊埠"
+msgstr "用戶端連接埠"
 
 #: modules/demux/live555.cpp:102
 msgid "Port to use for the RTP source of the session"
@@ -9868,9 +9748,8 @@ msgid ""
 msgstr ""
 
 #: modules/demux/mjpeg.c:50
-#, fuzzy
 msgid "M-JPEG camera demuxer"
-msgstr "MPEG-4音訊解多工器"
+msgstr "M-JPEG攝影機解多工器"
 
 #: modules/demux/mkv.cpp:396
 msgid "Matroska stream demuxer"
@@ -9886,18 +9765,16 @@ msgid "Play ordered chapters as specified in the segment."
 msgstr ""
 
 #: modules/demux/mkv.cpp:407
-#, fuzzy
 msgid "Chapter codecs"
-msgstr "其他編碼器"
+msgstr "章節編碼器"
 
 #: modules/demux/mkv.cpp:408
 msgid "Use chapter codecs found in the segment."
 msgstr ""
 
 #: modules/demux/mkv.cpp:411
-#, fuzzy
 msgid "Preload Directory"
-msgstr "選擇一個檔案或目錄"
+msgstr "預載目錄"
 
 #: modules/demux/mkv.cpp:412
 msgid ""
@@ -9922,23 +9799,20 @@ msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
 
 #: modules/demux/mkv.cpp:3234
-#, fuzzy
 msgid "---  DVD Menu"
-msgstr "使用DVD選單"
+msgstr "--- DVD選單"
 
 #: modules/demux/mkv.cpp:3240
 msgid "First Played"
-msgstr ""
+msgstr "第一次播放"
 
 #: modules/demux/mkv.cpp:3242
-#, fuzzy
 msgid "Video Manager"
-msgstr "視訊編碼器"
+msgstr "視訊管理員"
 
 #: modules/demux/mkv.cpp:3248
-#, fuzzy
 msgid "----- Title"
-msgstr "標題"
+msgstr "----- 標題"
 
 #: modules/demux/mod.c:48
 msgid "Enable noise reduction algorithm"
@@ -9959,9 +9833,8 @@ msgid "Reverberation delay, in ms. Usual values are from to 40 to 200ms."
 msgstr ""
 
 #: modules/demux/mod.c:54
-#, fuzzy
 msgid "Enable megabass mode"
-msgstr "開啟峰值"
+msgstr "啟用megabass模式"
 
 #: modules/demux/mod.c:55
 msgid "Megabass mode level (from 0 to 100, default value is 0)."
@@ -9974,9 +9847,8 @@ msgid ""
 msgstr ""
 
 #: modules/demux/mod.c:61
-#, fuzzy
 msgid "Surround effect level (from 0 to 100, default value is 0)."
-msgstr "環繞等級(0-100，預設為0)"
+msgstr "環繞效果等級(從0到100，預設值為0)"
 
 #: modules/demux/mod.c:63
 #, fuzzy
@@ -10017,9 +9889,8 @@ msgid "Surround"
 msgstr "環繞"
 
 #: modules/demux/mod.c:93
-#, fuzzy
 msgid "Surround level"
-msgstr "環繞等級(0-100)"
+msgstr "環繞等級"
 
 #: modules/demux/mod.c:95
 msgid "Surround delay (ms)"
@@ -10041,9 +9912,8 @@ msgid ""
 msgstr ""
 
 #: modules/demux/mpc.c:60
-#, fuzzy
 msgid "MusePack demuxer"
-msgstr "PS解多工器"
+msgstr "MusePack解多工器"
 
 #: modules/demux/mpeg/h264.c:40
 msgid "Desired frame rate for the H264 stream."
@@ -10062,9 +9932,8 @@ msgid "MPEG-4 video demuxer"
 msgstr "MPEG-4視訊解多工器"
 
 #: modules/demux/mpeg/mpga.c:46
-#, fuzzy
 msgid "MPEG audio / MP3 demuxer"
-msgstr "MPEG-4音訊解多工器"
+msgstr "MPEG audio / MP3解多工器"
 
 #: modules/demux/mpeg/mpgv.c:42
 msgid "MPEG-I/II video demuxer"
@@ -10079,14 +9948,12 @@ msgid "NullSoft demuxer"
 msgstr "NullSoft解多工器"
 
 #: modules/demux/nuv.c:46
-#, fuzzy
 msgid "Nuv demuxer"
-msgstr "AU解多工器"
+msgstr "Nuv解多工器"
 
 #: modules/demux/ogg.c:45
-#, fuzzy
 msgid "OGG demuxer"
-msgstr "AAC解多工器"
+msgstr "OGG解多工器"
 
 #: modules/demux/playlist/gvp.c:211
 #, fuzzy
@@ -10094,9 +9961,8 @@ msgid "Google Video"
 msgstr "縮放視訊"
 
 #: modules/demux/playlist/playlist.c:36
-#, fuzzy
 msgid "Auto start"
-msgstr "製作人"
+msgstr "自動開始"
 
 #: modules/demux/playlist/playlist.c:38
 msgid "Automatically start playing the playlist content once it's loaded.\n"
@@ -10119,24 +9985,20 @@ msgid "PLS playlist import"
 msgstr "PLS播放清單匯入"
 
 #: modules/demux/playlist/playlist.c:69
-#, fuzzy
 msgid "B4S playlist import"
-msgstr "PLS播放清單匯入"
+msgstr "B4S播放清單匯入"
 
 #: modules/demux/playlist/playlist.c:75
-#, fuzzy
 msgid "DVB playlist import"
-msgstr "PLS播放清單匯入"
+msgstr "DVB播放清單匯入"
 
 #: modules/demux/playlist/playlist.c:80
-#, fuzzy
 msgid "Podcast parser"
-msgstr "CDDB分類"
+msgstr "Podcast分析器"
 
 #: modules/demux/playlist/playlist.c:85
-#, fuzzy
 msgid "XSPF playlist import"
-msgstr "PLS播放清單匯入"
+msgstr "XSPF播放清單匯入"
 
 #: modules/demux/playlist/playlist.c:90
 msgid "New winamp 5.2 shoutcast import"
@@ -10162,9 +10024,8 @@ msgstr "PLS播放清單匯入"
 
 #: modules/demux/playlist/podcast.c:237 modules/demux/playlist/podcast.c:251
 #: modules/demux/playlist/podcast.c:276 modules/demux/playlist/podcast.c:288
-#, fuzzy
 msgid "Podcast Info"
-msgstr "位置"
+msgstr "Podcast資訊"
 
 #: modules/demux/playlist/podcast.c:251
 #, fuzzy
@@ -10179,7 +10040,7 @@ msgstr "封包器"
 #: modules/demux/playlist/shoutcast.c:421
 #: modules/services_discovery/shout.c:134
 msgid "Shoutcast"
-msgstr ""
+msgstr "Shoutcast"
 
 #: modules/demux/ps.c:39
 #, fuzzy
@@ -10194,9 +10055,8 @@ msgid ""
 msgstr ""
 
 #: modules/demux/ps.c:52 modules/demux/ps.c:63
-#, fuzzy
 msgid "MPEG-PS demuxer"
-msgstr "PS解多工器"
+msgstr "MPEG-PS解多工器"
 
 #: modules/demux/pva.c:39
 msgid "PVA demuxer"
@@ -10228,22 +10088,20 @@ msgid ""
 msgstr ""
 
 #: modules/demux/subtitle.c:67
-#, fuzzy
 msgid "Text subtitles parser"
-msgstr "字體字幕解碼器"
+msgstr "文字字幕分析器"
 
 #: modules/demux/subtitle.c:72 modules/gui/wxwidgets/dialogs/subtitles.cpp:202
 msgid "Frames per second"
-msgstr ""
+msgstr "每秒頁框數"
 
 #: modules/demux/subtitle.c:75
 msgid "Subtitles delay"
 msgstr "字幕延遲"
 
 #: modules/demux/subtitle.c:77
-#, fuzzy
 msgid "Subtitles format"
-msgstr "字幕延遲"
+msgstr "字幕格式"
 
 #: modules/demux/ts.c:91
 msgid "Extra PMT"
@@ -10266,7 +10124,7 @@ msgstr ""
 
 #: modules/demux/ts.c:101
 msgid "Fast udp streaming"
-msgstr ""
+msgstr "快速udp串流"
 
 #: modules/demux/ts.c:103
 msgid "Sends TS to specific ip:port by udp (you must know what you are doing)."
@@ -10324,7 +10182,7 @@ msgstr ""
 
 #: modules/demux/ts.c:125
 msgid "Append"
-msgstr ""
+msgstr "新增"
 
 #: modules/demux/ts.c:127
 msgid ""
@@ -10371,23 +10229,20 @@ msgid "TY Stream audio/video demux"
 msgstr "ffmpeg音訊/視訊編碼器"
 
 #: modules/demux/vobsub.c:49
-#, fuzzy
 msgid "Vobsub subtitles parser"
-msgstr "Vobsub字幕解多工"
+msgstr "Vobsub字幕分析器"
 
 #: modules/demux/voc.c:42
-#, fuzzy
 msgid "VOC demuxer"
-msgstr "AAC解多工器"
+msgstr "VOC解多工器"
 
 #: modules/demux/wav.c:41
 msgid "WAV demuxer"
 msgstr "WAV解多工器"
 
 #: modules/demux/xa.c:41
-#, fuzzy
 msgid "XA demuxer"
-msgstr "AU解多工器"
+msgstr "XA解多工器"
 
 #: modules/gui/beos/BeOS.cpp:52
 msgid "Use DVD Menus"
@@ -10520,11 +10375,11 @@ msgstr "全選"
 
 #: modules/gui/beos/PlayListWindow.cpp:106
 msgid "Select None"
-msgstr ""
+msgstr "全部不選"
 
 #: modules/gui/beos/PlayListWindow.cpp:111
 msgid "Sort Reverse"
-msgstr ""
+msgstr "反向排列"
 
 #: modules/gui/beos/PlayListWindow.cpp:114
 msgid "Sort by Name"
@@ -10584,15 +10439,15 @@ msgstr "顯示介面"
 
 #: modules/gui/beos/VideoOutput.cpp:1048
 msgid "50%"
-msgstr ""
+msgstr "50%"
 
 #: modules/gui/beos/VideoOutput.cpp:1051
 msgid "100%"
-msgstr ""
+msgstr "100%"
 
 #: modules/gui/beos/VideoOutput.cpp:1054
 msgid "200%"
-msgstr ""
+msgstr "200%"
 
 #: modules/gui/beos/VideoOutput.cpp:1064
 msgid "Vertical Sync"
@@ -10643,7 +10498,7 @@ msgstr "清除"
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:167
 #: modules/video_filter/extract.c:66
 msgid "Extract"
-msgstr ""
+msgstr "解壓縮"
 
 #: modules/gui/macosx/bookmarks.m:103 modules/gui/macosx/bookmarks.m:109
 #: modules/gui/macosx/sfilters.m:72 modules/gui/pda/pda.c:281
@@ -10653,9 +10508,8 @@ msgid "Time"
 msgstr "時間"
 
 #: modules/gui/macosx/bookmarks.m:136 modules/gui/macosx/playlist.m:663
-#, fuzzy
 msgid "Untitled"
-msgstr "標題"
+msgstr "無標題"
 
 #: modules/gui/macosx/bookmarks.m:229
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:443
@@ -10668,7 +10522,6 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/bookmarks.m:237
-#, fuzzy
 msgid "Input has changed"
 msgstr "輸入已改變"
 
@@ -10685,7 +10538,7 @@ msgstr "無效的選擇"
 
 #: modules/gui/macosx/bookmarks.m:290
 msgid "Two bookmarks have to be selected."
-msgstr ""
+msgstr "兩個書籤已被選取"
 
 #: modules/gui/macosx/bookmarks.m:298
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:358
@@ -10697,18 +10550,16 @@ msgid "The stream must be playing or paused for bookmarks to work."
 msgstr ""
 
 #: modules/gui/macosx/controls.m:56 modules/gui/macosx/controls.m:858
-#, fuzzy
 msgid "Jump To Time"
-msgstr "跳至: "
+msgstr "跳至特定時間"
 
 #: modules/gui/macosx/controls.m:59
 msgid "sec."
-msgstr ""
+msgstr "秒"
 
 #: modules/gui/macosx/controls.m:60
-#, fuzzy
 msgid "Jump to time"
-msgstr "跳至: "
+msgstr "跳至特定時間"
 
 #: modules/gui/macosx/controls.m:163
 msgid "Random On"
@@ -10743,12 +10594,12 @@ msgstr ""
 #: modules/gui/macosx/controls.m:426 modules/gui/macosx/controls.m:873
 #: modules/gui/macosx/intf.m:574
 msgid "Normal Size"
-msgstr ""
+msgstr "正常大小"
 
 #: modules/gui/macosx/controls.m:428 modules/gui/macosx/controls.m:874
 #: modules/gui/macosx/intf.m:575
 msgid "Double Size"
-msgstr ""
+msgstr "雙倍大小"
 
 #: modules/gui/macosx/controls.m:430 modules/gui/macosx/controls.m:878
 #: modules/gui/macosx/controls.m:889 modules/gui/macosx/intf.m:578
@@ -10808,12 +10659,10 @@ msgid "Extended controls"
 msgstr "延伸控制"
 
 #: modules/gui/macosx/extended.m:82 modules/gui/wxwidgets/extrapanel.cpp:300
-#, fuzzy
 msgid "Video filters"
 msgstr "視訊過濾器"
 
 #: modules/gui/macosx/extended.m:83 modules/gui/wxwidgets/extrapanel.cpp:204
-#, fuzzy
 msgid "Image adjustment"
 msgstr "影像調整"
 
@@ -10823,22 +10672,21 @@ msgstr ""
 
 #: modules/gui/macosx/extended.m:85 modules/video_filter/wave.c:51
 msgid "Wave"
-msgstr ""
+msgstr "波浪"
 
 #: modules/gui/macosx/extended.m:86 modules/video_filter/ripple.c:50
 msgid "Ripple"
-msgstr ""
+msgstr "漣漪"
 
 #: modules/gui/macosx/extended.m:87 modules/meta_engine/id3genres.h:95
 #: modules/video_filter/psychedelic.c:51
 msgid "Psychedelic"
-msgstr ""
+msgstr "迷幻樂"
 
 #: modules/gui/macosx/extended.m:88 modules/video_filter/gradient.c:68
 #: modules/video_filter/gradient.c:74
-#, fuzzy
 msgid "Gradient"
-msgstr "畫面"
+msgstr "漸層"
 
 #: modules/gui/macosx/extended.m:89
 #, fuzzy
@@ -10865,7 +10713,7 @@ msgstr "建立數個影像複製"
 
 #: modules/gui/macosx/extended.m:96
 msgid "Image cropping"
-msgstr ""
+msgstr "影像裁切"
 
 #: modules/gui/macosx/extended.m:97
 #, fuzzy
@@ -10884,7 +10732,7 @@ msgstr "建立數個影像複製"
 #: modules/gui/macosx/extended.m:100 modules/gui/wxwidgets/extrapanel.cpp:151
 #: modules/video_filter/transform.c:67
 msgid "Transformation"
-msgstr ""
+msgstr "轉換"
 
 #: modules/gui/macosx/extended.m:101 modules/gui/wxwidgets/extrapanel.cpp:151
 msgid "Rotates or flips the image"
@@ -10930,7 +10778,7 @@ msgstr "virtualization"
 
 #: modules/gui/macosx/extended.m:117 modules/gui/wxwidgets/extrapanel.cpp:239
 msgid "Saturation"
-msgstr ""
+msgstr "飽和度"
 
 #: modules/gui/macosx/extended.m:118 modules/gui/macosx/macosx.m:59
 #: modules/gui/macosx/sfilters.m:79 modules/gui/macosx/sfilters.m:90
@@ -11007,7 +10855,7 @@ msgstr "開啟當機紀錄"
 
 #: modules/gui/macosx/intf.m:513
 msgid "Check for Update..."
-msgstr ""
+msgstr "檢查更新..."
 
 #: modules/gui/macosx/intf.m:514
 msgid "Preferences..."
@@ -11079,9 +10927,8 @@ msgid "Paste"
 msgstr "貼上"
 
 #: modules/gui/macosx/intf.m:539
-#, fuzzy
 msgid "Playback"
-msgstr "暫停重播"
+msgstr "播放"
 
 #: modules/gui/macosx/intf.m:560 modules/gui/macosx/intf.m:630
 msgid "Volume Up"
@@ -11116,9 +10963,8 @@ msgstr "延伸控制"
 #: modules/gui/macosx/intf.m:603 modules/gui/macosx/intf.m:636
 #: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:348
 #: modules/gui/macosx/playlist.m:430
-#, fuzzy
 msgid "Information"
-msgstr "更多資訊"
+msgstr "資訊"
 
 #: modules/gui/macosx/intf.m:607
 msgid "Bring All to Front"
@@ -11153,14 +10999,13 @@ msgid "Make a donation"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:616
-#, fuzzy
 msgid "Online Forum"
-msgstr "線上文件"
+msgstr "線上論壇"
 
 #: modules/gui/macosx/intf.m:1222
-#, fuzzy, c-format
+#, c-format
 msgid "Volume: %d%%"
-msgstr "減低音量"
+msgstr "音量: %d%%"
 
 #: modules/gui/macosx/intf.m:1857
 msgid "No CrashLog found"
@@ -11217,7 +11062,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:73
 msgid "Use as Desktop Background"
-msgstr ""
+msgstr "使用作為桌面背景"
 
 #: modules/gui/macosx/macosx.m:74
 msgid ""
@@ -11234,9 +11079,8 @@ msgid "Shows a lucent controller when moving the mouse in fullscreen mode."
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:81
-#, fuzzy
 msgid "Remember wizard options"
-msgstr "採樣率"
+msgstr "記住精靈選項"
 
 #: modules/gui/macosx/macosx.m:82
 msgid "Remember the options in the wizard during one session of VLC."
@@ -11251,9 +11095,8 @@ msgid "Start playback of new items immediately once they were added."
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:90
-#, fuzzy
 msgid "Mac OS X interface"
-msgstr "XOSD介面"
+msgstr "Mac OS X介面"
 
 #: modules/gui/macosx/macosx.m:105
 msgid "Quartz video"
@@ -11288,14 +11131,13 @@ msgid "Use DVD menus"
 msgstr "使用DVD選單"
 
 #: modules/gui/macosx/open.m:175 modules/gui/macosx/open.m:491
-#, fuzzy
 msgid "VIDEO_TS directory"
-msgstr "開啟VIDEO_TS目錄"
+msgstr "VIDEO_TS目錄"
 
 #: modules/gui/macosx/open.m:176 modules/gui/macosx/open.m:608
 #: modules/gui/wxwidgets/dialogs/open.cpp:695
 msgid "DVD"
-msgstr ""
+msgstr "DVD"
 
 #: modules/gui/macosx/open.m:181 modules/gui/macosx/output.m:146
 #: modules/gui/wxwidgets/dialogs/open.cpp:847
@@ -11306,11 +11148,11 @@ msgstr "位置"
 #: modules/gui/macosx/open.m:186 modules/gui/macosx/open.m:725
 #: modules/gui/wxwidgets/dialogs/open.cpp:803
 msgid "UDP/RTP Multicast"
-msgstr ""
+msgstr "UDP/RTP群播"
 
 #: modules/gui/macosx/open.m:187 modules/gui/macosx/open.m:738
 msgid "HTTP/FTP/MMS/RTSP"
-msgstr ""
+msgstr "HTTP/FTP/MMS/RTSP"
 
 #: modules/gui/macosx/open.m:188 modules/gui/wxwidgets/dialogs/open.cpp:821
 #: modules/services_discovery/sap.c:113
@@ -11339,7 +11181,7 @@ msgstr "延遲"
 
 #: modules/gui/macosx/open.m:254
 msgid "FPS"
-msgstr ""
+msgstr "FPS"
 
 #: modules/gui/macosx/open.m:256
 msgid "Subtitles encoding"
@@ -11350,9 +11192,8 @@ msgid "Font size"
 msgstr "字型大小"
 
 #: modules/gui/macosx/open.m:260
-#, fuzzy
 msgid "Subtitles alignment"
-msgstr "字幕檔"
+msgstr "字幕對齊"
 
 #: modules/gui/macosx/open.m:263
 msgid "Font Properties"
@@ -11373,14 +11214,12 @@ msgid "Open VIDEO_TS Directory"
 msgstr "開啟VIDEO_TS目錄"
 
 #: modules/gui/macosx/output.m:136
-#, fuzzy
 msgid "Streaming/Saving:"
-msgstr "串流"
+msgstr "串流/儲存:"
 
 #: modules/gui/macosx/output.m:140
-#, fuzzy
 msgid "Streaming and Transcoding Options"
-msgstr "串流/轉碼精靈"
+msgstr "串流和轉碼選項"
 
 #: modules/gui/macosx/output.m:141
 #, fuzzy
@@ -11414,12 +11253,12 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:834
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:873
 msgid "Bitrate (kb/s)"
-msgstr ""
+msgstr "位元率(kb/s)"
 
 #: modules/gui/macosx/output.m:166
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:782
 msgid "Scale"
-msgstr ""
+msgstr "縮放"
 
 #: modules/gui/macosx/output.m:180
 msgid "Stream Announcing"
@@ -11440,7 +11279,7 @@ msgstr ""
 
 #: modules/gui/macosx/output.m:184 modules/gui/macosx/output.m:647
 msgid "Export SDP as file"
-msgstr ""
+msgstr "匯出SDP至檔案"
 
 #: modules/gui/macosx/output.m:186
 msgid "Channel Name"
@@ -11448,7 +11287,7 @@ msgstr "頻道名稱"
 
 #: modules/gui/macosx/output.m:187
 msgid "SDP URL"
-msgstr ""
+msgstr "SDP URL"
 
 #: modules/gui/macosx/output.m:525
 msgid "Save File"
@@ -11459,7 +11298,7 @@ msgstr "儲存檔案"
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:591
 msgid "URI"
-msgstr ""
+msgstr "URI"
 
 #: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/playlist.m:129
 #: modules/gui/macosx/wizard.m:392 modules/gui/wince/playlist.cpp:674
@@ -11468,18 +11307,16 @@ msgid "Author"
 msgstr "製作人"
 
 #: modules/gui/macosx/playlistinfo.m:63
-#, fuzzy
 msgid "Advanced Information"
-msgstr "進階選項"
+msgstr "進階資訊"
 
 #: modules/gui/macosx/playlistinfo.m:81 modules/gui/qt4/ui/input_stats.ui:381
 msgid "Read at media"
 msgstr ""
 
 #: modules/gui/macosx/playlistinfo.m:82 modules/gui/qt4/ui/input_stats.ui:388
-#, fuzzy
 msgid "Input bitrate"
-msgstr "輸入清單"
+msgstr "輸入位元率"
 
 #: modules/gui/macosx/playlistinfo.m:83 modules/gui/qt4/ui/input_stats.ui:367
 #, fuzzy
@@ -11487,9 +11324,8 @@ msgid "Demuxed"
 msgstr "解多工器"
 
 #: modules/gui/macosx/playlistinfo.m:84 modules/gui/qt4/ui/input_stats.ui:374
-#, fuzzy
 msgid "Stream bitrate"
-msgstr "最大化編碼位元率"
+msgstr "串流位元率"
 
 #: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
 #: modules/gui/qt4/ui/input_stats.ui:81 modules/gui/qt4/ui/input_stats.ui:129
@@ -11517,16 +11353,15 @@ msgstr "串流"
 
 #: modules/gui/macosx/playlistinfo.m:92 modules/gui/qt4/ui/input_stats.ui:266
 msgid "Sent packets"
-msgstr ""
+msgstr "傳送封包"
 
 #: modules/gui/macosx/playlistinfo.m:93 modules/gui/qt4/ui/input_stats.ui:259
 msgid "Sent bytes"
-msgstr ""
+msgstr "傳送位元組"
 
 #: modules/gui/macosx/playlistinfo.m:94
-#, fuzzy
 msgid "Send rate"
-msgstr "採樣率"
+msgstr "傳送率"
 
 #: modules/gui/macosx/playlistinfo.m:98 modules/gui/qt4/ui/input_stats.ui:47
 #, fuzzy
@@ -11546,9 +11381,8 @@ msgid "Expand Node"
 msgstr ""
 
 #: modules/gui/macosx/playlist.m:431
-#, fuzzy
 msgid "Get Stream Information"
-msgstr "更多資訊"
+msgstr "取得串流資訊"
 
 #: modules/gui/macosx/playlist.m:432
 msgid "Sort Node by Name"
@@ -11560,19 +11394,16 @@ msgstr "依製作人排序節點"
 
 #: modules/gui/macosx/playlist.m:436 modules/gui/macosx/playlist.m:479
 #: modules/gui/macosx/playlist.m:1381
-#, fuzzy
 msgid "No items in the playlist"
 msgstr "播放清單中沒有項目"
 
 #: modules/gui/macosx/playlist.m:441
-#, fuzzy
 msgid "Search in Playlist"
-msgstr "開啟播放清單"
+msgstr "在播放清單中搜尋"
 
 #: modules/gui/macosx/playlist.m:442
-#, fuzzy
 msgid "Add Folder to Playlist"
-msgstr "增加至播放清單"
+msgstr "增加資料夾至播放清單"
 
 #: modules/gui/macosx/playlist.m:444
 #, fuzzy
@@ -11589,17 +11420,15 @@ msgid "XML Shareable Playlist Format (XSPF)"
 msgstr ""
 
 #: modules/gui/macosx/playlist.m:473 modules/gui/macosx/playlist.m:1374
-#, fuzzy, c-format
+#, c-format
 msgid "%i items in the playlist"
-msgstr "播放清單中有 %i 個項目"
+msgstr "%i 個項目在播放清單"
 
 #: modules/gui/macosx/playlist.m:481 modules/gui/macosx/playlist.m:1385
-#, fuzzy
 msgid "1 item in the playlist"
-msgstr "播放清單中有 1 個項目"
+msgstr "1 個項目在播放清單"
 
 #: modules/gui/macosx/playlist.m:666
-#, fuzzy
 msgid "Save Playlist"
 msgstr "儲存播放清單"
 
@@ -11614,7 +11443,7 @@ msgstr ""
 
 #: modules/gui/macosx/playlist.m:1351
 msgid "Empty Folder"
-msgstr ""
+msgstr "空的資料夾"
 
 #: modules/gui/macosx/prefs.m:123
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:213
@@ -11642,14 +11471,12 @@ msgstr ""
 
 #: modules/gui/macosx/prefs_widgets.m:1222
 #: modules/gui/wxwidgets/dialogs.cpp:478
-#, fuzzy
 msgid "Select a directory"
-msgstr "選擇一個檔案或目錄"
+msgstr "請選擇一個目錄"
 
 #: modules/gui/macosx/prefs_widgets.m:1222
-#, fuzzy
 msgid "Select a file"
-msgstr "選擇檔案"
+msgstr "選擇一個檔案"
 
 #: modules/gui/macosx/prefs_widgets.m:1223
 msgid "Select"
@@ -11661,25 +11488,22 @@ msgid "Subpicture Filters"
 msgstr "字幕"
 
 #: modules/gui/macosx/sfilters.m:71
-#, fuzzy
 msgid "Logo"
-msgstr "循環"
+msgstr "Logo"
 
 #: modules/gui/macosx/sfilters.m:73 modules/video_filter/marq.c:136
 msgid "Marquee"
 msgstr ""
 
 #: modules/gui/macosx/sfilters.m:74
-#, fuzzy
 msgid "Save settings"
-msgstr "視訊設定"
+msgstr "儲存設定"
 
 #: modules/gui/macosx/sfilters.m:76 modules/gui/macosx/sfilters.m:80
 #: modules/gui/macosx/sfilters.m:87
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:399
-#, fuzzy
 msgid "Enabled"
-msgstr "啟動"
+msgstr "已啟用"
 
 #: modules/gui/macosx/sfilters.m:77
 #, fuzzy
@@ -11700,7 +11524,7 @@ msgstr "時間"
 #: modules/gui/macosx/sfilters.m:82 modules/gui/macosx/sfilters.m:94
 #: modules/gui/pda/pda_interface.c:611
 msgid "Size:"
-msgstr ""
+msgstr "大小:"
 
 #: modules/gui/macosx/sfilters.m:83 modules/gui/macosx/sfilters.m:88
 #, fuzzy
@@ -11714,7 +11538,7 @@ msgstr "開啟:"
 
 #: modules/gui/macosx/sfilters.m:86 modules/gui/macosx/sfilters.m:95
 msgid "(in pixels)"
-msgstr ""
+msgstr "(使用像素)"
 
 #: modules/gui/macosx/sfilters.m:89
 #, fuzzy
@@ -11728,45 +11552,43 @@ msgstr "時間"
 
 #: modules/gui/macosx/sfilters.m:92
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: modules/gui/macosx/sfilters.m:121 modules/misc/freetype.c:127
 #: modules/misc/win32text.c:85 modules/video_filter/marq.c:56
 #: modules/video_filter/rss.c:63
 msgid "Black"
-msgstr ""
+msgstr "黑色"
 
 #: modules/gui/macosx/sfilters.m:122 modules/misc/freetype.c:127
 #: modules/misc/win32text.c:85 modules/video_filter/marq.c:57
 #: modules/video_filter/rss.c:64
 msgid "Gray"
-msgstr ""
+msgstr "灰色"
 
 #: modules/gui/macosx/sfilters.m:123 modules/misc/freetype.c:127
 #: modules/misc/win32text.c:85 modules/video_filter/marq.c:57
 #: modules/video_filter/rss.c:64
-#, fuzzy
 msgid "Silver"
-msgstr "放慢"
+msgstr "銀色"
 
 #: modules/gui/macosx/sfilters.m:124 modules/misc/freetype.c:127
 #: modules/misc/win32text.c:85 modules/video_filter/marq.c:57
 #: modules/video_filter/rss.c:64
 msgid "White"
-msgstr ""
+msgstr "白色"
 
 #: modules/gui/macosx/sfilters.m:125 modules/misc/freetype.c:127
 #: modules/misc/win32text.c:85 modules/video_filter/marq.c:57
 #: modules/video_filter/rss.c:64
 msgid "Maroon"
-msgstr ""
+msgstr "茶色"
 
 #: modules/gui/macosx/sfilters.m:126 modules/misc/freetype.c:128
 #: modules/misc/win32text.c:86 modules/video_filter/colorthres.c:58
 #: modules/video_filter/marq.c:57 modules/video_filter/rss.c:64
-#, fuzzy
 msgid "Red"
-msgstr "回捲"
+msgstr "紅色"
 
 #: modules/gui/macosx/sfilters.m:127 modules/misc/freetype.c:128
 #: modules/misc/win32text.c:86 modules/video_filter/colorthres.c:58
@@ -11778,20 +11600,19 @@ msgstr ""
 #: modules/misc/win32text.c:86 modules/video_filter/colorthres.c:58
 #: modules/video_filter/marq.c:58 modules/video_filter/rss.c:65
 msgid "Yellow"
-msgstr ""
+msgstr "黃色"
 
 #: modules/gui/macosx/sfilters.m:129 modules/misc/freetype.c:128
 #: modules/misc/win32text.c:86 modules/video_filter/marq.c:58
 #: modules/video_filter/rss.c:65
 msgid "Olive"
-msgstr ""
+msgstr "橄欖色"
 
 #: modules/gui/macosx/sfilters.m:130 modules/misc/freetype.c:128
 #: modules/misc/win32text.c:86 modules/video_filter/marq.c:58
 #: modules/video_filter/rss.c:65
-#, fuzzy
 msgid "Green"
-msgstr "畫面"
+msgstr "綠色"
 
 #: modules/gui/macosx/sfilters.m:131 modules/misc/freetype.c:128
 #: modules/misc/win32text.c:86 modules/video_filter/marq.c:59
@@ -11802,45 +11623,44 @@ msgstr ""
 #: modules/gui/macosx/sfilters.m:132 modules/misc/freetype.c:129
 #: modules/misc/win32text.c:87 modules/video_filter/colorthres.c:58
 #: modules/video_filter/marq.c:59 modules/video_filter/rss.c:66
-#, fuzzy
 msgid "Lime"
-msgstr "時間"
+msgstr "萊姆色"
 
 #: modules/gui/macosx/sfilters.m:133 modules/misc/freetype.c:129
 #: modules/misc/win32text.c:87 modules/video_filter/marq.c:59
 #: modules/video_filter/rss.c:66
 msgid "Purple"
-msgstr ""
+msgstr "紫色"
 
 #: modules/gui/macosx/sfilters.m:134 modules/misc/freetype.c:129
 #: modules/misc/win32text.c:87 modules/video_filter/marq.c:59
 #: modules/video_filter/rss.c:66
 msgid "Navy"
-msgstr ""
+msgstr "深藍色"
 
 #: modules/gui/macosx/sfilters.m:135 modules/misc/freetype.c:129
 #: modules/misc/win32text.c:87 modules/video_filter/colorthres.c:58
 #: modules/video_filter/marq.c:59 modules/video_filter/rss.c:66
 msgid "Blue"
-msgstr ""
+msgstr "藍色"
 
 #: modules/gui/macosx/sfilters.m:136 modules/misc/freetype.c:129
 #: modules/misc/win32text.c:87 modules/video_filter/colorthres.c:58
 #: modules/video_filter/marq.c:60 modules/video_filter/rss.c:67
 msgid "Aqua"
-msgstr ""
+msgstr "水藍色"
 
 #: modules/gui/macosx/update.m:84
 msgid "Check for Updates"
-msgstr ""
+msgstr "檢查是否有更新"
 
 #: modules/gui/macosx/update.m:85
 msgid "Download now"
-msgstr ""
+msgstr "現在下載"
 
 #: modules/gui/macosx/update.m:92
 msgid "Checking for Updates..."
-msgstr ""
+msgstr "檢查更新中..."
 
 #: modules/gui/macosx/update.m:183
 #, c-format
@@ -11967,7 +11787,7 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:238 modules/gui/wxwidgets/streamdata.cpp:150
 msgid "MPEG 1 Format"
-msgstr ""
+msgstr "MPEG 1格式"
 
 #: modules/gui/macosx/wizard.m:257
 msgid ""
@@ -12006,9 +11826,8 @@ msgid "Enter the address of the computer to stream to."
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:274 modules/gui/macosx/wizard.m:412
-#, fuzzy
 msgid "Use this to stream to a single computer."
-msgstr "串流至網路"
+msgstr "使用這個以串流至單一電腦"
 
 #: modules/gui/macosx/wizard.m:276 modules/gui/macosx/wizard.m:286
 msgid ""
@@ -12040,7 +11859,7 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:361
 msgid "Back"
-msgstr ""
+msgstr "返回"
 
 #: modules/gui/macosx/wizard.m:364 modules/gui/macosx/wizard.m:367
 #: modules/gui/macosx/wizard.m:1287
@@ -12086,7 +11905,6 @@ msgid "Choose input"
 msgstr "選擇輸出"
 
 #: modules/gui/macosx/wizard.m:383
-#, fuzzy
 msgid "Choose here your input stream."
 msgstr "在這選擇你的輸入串流"
 
@@ -12121,12 +11939,12 @@ msgstr ""
 #: modules/gui/macosx/wizard.m:399
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:625
 msgid "From"
-msgstr ""
+msgstr "來自"
 
 #: modules/gui/macosx/wizard.m:400
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:630
 msgid "To"
-msgstr ""
+msgstr "到"
 
 #: modules/gui/macosx/wizard.m:404
 #, fuzzy
@@ -12136,7 +11954,7 @@ msgstr "在這一頁，你可以選擇你的輸入串流的傳送方式"
 #: modules/gui/macosx/wizard.m:406 modules/gui/macosx/wizard.m:461
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1040 modules/stream_out/rtp.c:51
 msgid "Destination"
-msgstr ""
+msgstr "目的地"
 
 #: modules/gui/macosx/wizard.m:407 modules/gui/macosx/wizard.m:473
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1026
@@ -12149,11 +11967,11 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:410
 msgid "UDP Unicast"
-msgstr ""
+msgstr "UDP聯播"
 
 #: modules/gui/macosx/wizard.m:411
 msgid "UDP Multicast"
-msgstr ""
+msgstr "UDP群播"
 
 #: modules/gui/macosx/wizard.m:416 modules/gui/pda/pda_interface.c:1221
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:125
@@ -12250,9 +12068,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:460
-#, fuzzy
 msgid "Summary"
-msgstr "虛擬"
+msgstr "摘要"
 
 #: modules/gui/macosx/wizard.m:463
 #, fuzzy
@@ -12261,19 +12078,16 @@ msgstr "影像格式"
 
 #: modules/gui/macosx/wizard.m:465
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:107
-#, fuzzy
 msgid "Input stream"
-msgstr "輸入清單"
+msgstr "輸入串流"
 
 #: modules/gui/macosx/wizard.m:471
-#, fuzzy
 msgid "Save file to"
-msgstr "儲存檔案"
+msgstr "儲存檔案至"
 
 #: modules/gui/macosx/wizard.m:629
-#, fuzzy
 msgid "No input selected"
-msgstr "沒有輸入"
+msgstr "尚未選擇輸入"
 
 #: modules/gui/macosx/wizard.m:631
 msgid ""
@@ -12304,14 +12118,12 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:1114
-#, fuzzy
 msgid "Select the directory to save to"
-msgstr "選擇檔案以儲存至"
+msgstr "選擇目錄以儲存至"
 
 #: modules/gui/macosx/wizard.m:1165
-#, fuzzy
 msgid "No folder selected"
-msgstr "沒有輸入"
+msgstr "尚未選擇資料夾"
 
 #: modules/gui/macosx/wizard.m:1167
 #, fuzzy
@@ -12326,7 +12138,7 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:1172
 msgid "No file selected"
-msgstr ""
+msgstr "未選取任何檔案"
 
 #: modules/gui/macosx/wizard.m:1174
 msgid "A file where to save the stream has to be selected."
@@ -12339,23 +12151,22 @@ msgstr ""
 
 #: modules/gui/macosx/wizard.m:1368
 msgid "Finish"
-msgstr ""
+msgstr "完成"
 
 #: modules/gui/macosx/wizard.m:1373
-#, fuzzy, c-format
+#, c-format
 msgid "%i items"
-msgstr "檢視項目(&V)"
+msgstr "%i 項目"
 
 #: modules/gui/macosx/wizard.m:1381 modules/gui/macosx/wizard.m:1435
 msgid "yes"
-msgstr ""
+msgstr "是"
 
 #: modules/gui/macosx/wizard.m:1383 modules/gui/macosx/wizard.m:1393
 #: modules/gui/macosx/wizard.m:1406 modules/gui/macosx/wizard.m:1418
 #: modules/gui/macosx/wizard.m:1438
-#, fuzzy
 msgid "no"
-msgstr "資訊"
+msgstr "否"
 
 #: modules/gui/macosx/wizard.m:1389
 #, objc-format
@@ -12368,9 +12179,8 @@ msgid "yes: %@ @ %@ kb/s"
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:1657
-#, fuzzy
 msgid "This allows to stream on a network."
-msgstr "串流至網路"
+msgstr "允許串流至網路"
 
 #: modules/gui/macosx/wizard.m:1665
 msgid ""
@@ -12428,9 +12238,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/ncurses.c:109
-#, fuzzy
 msgid "Ncurses interface"
-msgstr "Qt介面"
+msgstr "Ncurses介面"
 
 #: modules/gui/pda/pda.c:58
 msgid "Autoplay selected file"
@@ -12467,7 +12276,7 @@ msgstr "群組"
 
 #: modules/gui/pda/pda.c:288
 msgid "Index"
-msgstr ""
+msgstr "索引"
 
 #: modules/gui/pda/pda_interface.c:286 modules/gui/pda/pda_interface.c:287
 msgid "Forward"
@@ -12475,7 +12284,7 @@ msgstr "向前"
 
 #: modules/gui/pda/pda_interface.c:308
 msgid "00:00:00"
-msgstr ""
+msgstr "00:00:00"
 
 #: modules/gui/pda/pda_interface.c:361 modules/gui/pda/pda_interface.c:543
 #: modules/gui/pda/pda_interface.c:869 modules/gui/pda/pda_interface.c:1216
@@ -12484,23 +12293,23 @@ msgstr "增加至播放清單"
 
 #: modules/gui/pda/pda_interface.c:384
 msgid "MRL:"
-msgstr ""
+msgstr "MRL:"
 
 #: modules/gui/pda/pda_interface.c:423
 msgid "Port:"
-msgstr ""
+msgstr "埠："
 
 #: modules/gui/pda/pda_interface.c:432
 msgid "Address:"
-msgstr ""
+msgstr "位址："
 
 #: modules/gui/pda/pda_interface.c:471
 msgid "unicast"
-msgstr ""
+msgstr "unicast"
 
 #: modules/gui/pda/pda_interface.c:472
 msgid "multicast"
-msgstr ""
+msgstr "multicast"
 
 #: modules/gui/pda/pda_interface.c:481
 msgid "Network: "
@@ -12508,40 +12317,39 @@ msgstr "網路:"
 
 #: modules/gui/pda/pda_interface.c:498
 msgid "udp"
-msgstr ""
+msgstr "udp"
 
 #: modules/gui/pda/pda_interface.c:499
 msgid "udp6"
-msgstr ""
+msgstr "udp6"
 
 #: modules/gui/pda/pda_interface.c:500
 msgid "rtp"
-msgstr ""
+msgstr "rtp"
 
 #: modules/gui/pda/pda_interface.c:501
 msgid "rtp4"
-msgstr ""
+msgstr "rtp4"
 
 #: modules/gui/pda/pda_interface.c:502
 msgid "ftp"
-msgstr ""
+msgstr "ftp"
 
 #: modules/gui/pda/pda_interface.c:503
 msgid "http"
-msgstr ""
+msgstr "http"
 
 #: modules/gui/pda/pda_interface.c:504
 msgid "sout"
-msgstr ""
+msgstr "sout"
 
 #: modules/gui/pda/pda_interface.c:505
 msgid "mms"
-msgstr ""
+msgstr "mms"
 
 #: modules/gui/pda/pda_interface.c:513
-#, fuzzy
 msgid "Protocol:"
-msgstr "協定"
+msgstr "通信協定:"
 
 #: modules/gui/pda/pda_interface.c:522 modules/gui/pda/pda_interface.c:848
 msgid "Transcode:"
@@ -12551,7 +12359,7 @@ msgstr "轉碼:"
 #: modules/gui/pda/pda_interface.c:857 modules/gui/pda/pda_interface.c:1098
 #: modules/gui/pda/pda_interface.c:1166 modules/gui/pda/pda_interface.c:1173
 msgid "enable"
-msgstr ""
+msgstr "啟用"
 
 #: modules/gui/pda/pda_interface.c:575
 msgid "Video:"
@@ -12575,7 +12383,7 @@ msgstr "頻率:"
 
 #: modules/gui/pda/pda_interface.c:629
 msgid "Samplerate:"
-msgstr ""
+msgstr "取樣頻率:"
 
 #: modules/gui/pda/pda_interface.c:638
 msgid "Quality:"
@@ -12591,7 +12399,7 @@ msgstr "音效:"
 
 #: modules/gui/pda/pda_interface.c:665
 msgid "MJPEG:"
-msgstr ""
+msgstr "MJPEG:"
 
 #: modules/gui/pda/pda_interface.c:674
 msgid "Decimation:"
@@ -12599,15 +12407,15 @@ msgstr ""
 
 #: modules/gui/pda/pda_interface.c:740
 msgid "pal"
-msgstr ""
+msgstr "pal"
 
 #: modules/gui/pda/pda_interface.c:741
 msgid "ntsc"
-msgstr ""
+msgstr "ntsc"
 
 #: modules/gui/pda/pda_interface.c:742
 msgid "secam"
-msgstr ""
+msgstr "secam"
 
 #: modules/gui/pda/pda_interface.c:760
 msgid "240x192"
@@ -12619,43 +12427,43 @@ msgstr ""
 
 #: modules/gui/pda/pda_interface.c:762
 msgid "qsif"
-msgstr ""
+msgstr "qsif"
 
 #: modules/gui/pda/pda_interface.c:763
 msgid "qcif"
-msgstr ""
+msgstr "qcif"
 
 #: modules/gui/pda/pda_interface.c:764
 msgid "sif"
-msgstr ""
+msgstr "sif"
 
 #: modules/gui/pda/pda_interface.c:765
 msgid "cif"
-msgstr ""
+msgstr "cif"
 
 #: modules/gui/pda/pda_interface.c:766
 msgid "vga"
-msgstr ""
+msgstr "vga"
 
 #: modules/gui/pda/pda_interface.c:782
 msgid "kHz"
-msgstr ""
+msgstr "kHz"
 
 #: modules/gui/pda/pda_interface.c:792
 msgid "Hz/s"
-msgstr ""
+msgstr "Hz/s"
 
 #: modules/gui/pda/pda_interface.c:814
 msgid "mono"
-msgstr ""
+msgstr "單聲道"
 
 #: modules/gui/pda/pda_interface.c:815
 msgid "stereo"
-msgstr ""
+msgstr "立體聲"
 
 #: modules/gui/pda/pda_interface.c:874
 msgid "Camera"
-msgstr ""
+msgstr "攝影機"
 
 #: modules/gui/pda/pda_interface.c:901
 msgid "Video Codec:"
@@ -12663,23 +12471,23 @@ msgstr "視訊編碼器:"
 
 #: modules/gui/pda/pda_interface.c:918
 msgid "huffyuv"
-msgstr ""
+msgstr "huffyuv"
 
 #: modules/gui/pda/pda_interface.c:919
 msgid "mp1v"
-msgstr ""
+msgstr "mp1v"
 
 #: modules/gui/pda/pda_interface.c:920
 msgid "mp2v"
-msgstr ""
+msgstr "mp2v"
 
 #: modules/gui/pda/pda_interface.c:921
 msgid "mp4v"
-msgstr ""
+msgstr "mp4v"
 
 #: modules/gui/pda/pda_interface.c:922
 msgid "H263"
-msgstr ""
+msgstr "H263"
 
 #: modules/gui/pda/pda_interface.c:923
 msgid "WMV1"
@@ -12719,7 +12527,7 @@ msgstr "多工器"
 
 #: modules/gui/pda/pda_interface.c:996
 msgid "URL:"
-msgstr ""
+msgstr "URL:"
 
 #: modules/gui/pda/pda_interface.c:1005
 msgid "Time To Live (TTL):"
@@ -12727,55 +12535,55 @@ msgstr "有效時間(TTL):"
 
 #: modules/gui/pda/pda_interface.c:1030
 msgid "127.0.0.1"
-msgstr ""
+msgstr "127.0.0.1"
 
 #: modules/gui/pda/pda_interface.c:1031
 msgid "localhost"
-msgstr ""
+msgstr "localhost"
 
 #: modules/gui/pda/pda_interface.c:1032
 msgid "localhost.localdomain"
-msgstr ""
+msgstr "localhost.localdomain"
 
 #: modules/gui/pda/pda_interface.c:1033
 msgid "239.0.0.42"
-msgstr ""
+msgstr "239.0.0.42"
 
 #: modules/gui/pda/pda_interface.c:1050
 msgid "PS"
-msgstr ""
+msgstr "PS"
 
 #: modules/gui/pda/pda_interface.c:1051
 msgid "TS"
-msgstr ""
+msgstr "TS"
 
 #: modules/gui/pda/pda_interface.c:1052
 msgid "MPEG1"
-msgstr ""
+msgstr "MPEG1"
 
 #: modules/gui/pda/pda_interface.c:1053
 msgid "AVI"
-msgstr ""
+msgstr "AVI"
 
 #: modules/gui/pda/pda_interface.c:1054
 msgid "OGG"
-msgstr ""
+msgstr "OGG"
 
 #: modules/gui/pda/pda_interface.c:1055
 msgid "MP4"
-msgstr ""
+msgstr "MP4"
 
 #: modules/gui/pda/pda_interface.c:1056
 msgid "MOV"
-msgstr ""
+msgstr "MOV"
 
 #: modules/gui/pda/pda_interface.c:1057
 msgid "ASF"
-msgstr ""
+msgstr "ASF"
 
 #: modules/gui/pda/pda_interface.c:1073 modules/gui/pda/pda_interface.c:1131
 msgid "kbits/s"
-msgstr ""
+msgstr "kbits/s"
 
 #: modules/gui/pda/pda_interface.c:1084
 msgid "alaw"
@@ -12787,23 +12595,23 @@ msgstr ""
 
 #: modules/gui/pda/pda_interface.c:1086
 msgid "mpga"
-msgstr ""
+msgstr "mpga"
 
 #: modules/gui/pda/pda_interface.c:1087
 msgid "mp3"
-msgstr ""
+msgstr "mp3"
 
 #: modules/gui/pda/pda_interface.c:1088
 msgid "a52"
-msgstr ""
+msgstr "a52"
 
 #: modules/gui/pda/pda_interface.c:1089
 msgid "vorb"
-msgstr ""
+msgstr "vorb"
 
 #: modules/gui/pda/pda_interface.c:1121
 msgid "bits/s"
-msgstr ""
+msgstr "bits/s"
 
 #: modules/gui/pda/pda_interface.c:1134
 msgid "Audio Bitrate :"
@@ -12858,12 +12666,12 @@ msgstr "製作人: the VideoLAN Team, http://www.videolan.org/team/"
 
 #: modules/gui/pda/pda_interface.c:1349
 msgid "(c) 1996-2004 the the VideoLAN team team"
-msgstr ""
+msgstr "(c) 1996-2004 the the VideoLAN team team"
 
 #: modules/gui/pda/pda_support.c:90 modules/gui/pda/pda_support.c:114
 #, c-format
 msgid "Couldn't find pixmap file: %s"
-msgstr ""
+msgstr "無法找到點陣圖檔案：%s"
 
 #: modules/gui/qnx/qnx.c:44
 msgid "QNX RTOS video and audio output"
@@ -12948,11 +12756,12 @@ msgid "Open playlist"
 msgstr "開啟播放清單"
 
 #: modules/gui/skins2/src/dialogs.cpp:231
-#, fuzzy
 msgid ""
 "All playlists|*.pls;*.m3u;*.asx;*.b4s;*.xspf|M3U files|*.m3u|XSPF playlist|*."
 "xspf"
-msgstr "所有播放清單|*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u"
+msgstr ""
+"所有播放清單|*.pls;*.m3u;*.asx;*.b4s;*.xspf|M3U files|*.m3u|XSPF playlist|*."
+"xspf"
 
 #: modules/gui/skins2/src/dialogs.cpp:240
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:955
@@ -12984,21 +12793,19 @@ msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:434
 #: modules/gui/wxwidgets/wxwidgets.cpp:101
-#, fuzzy
 msgid "Systray icon"
-msgstr "顯示串流位置"
+msgstr "系統列圖示"
 
 #: modules/gui/skins2/src/skin_main.cpp:435
 #: modules/gui/wxwidgets/wxwidgets.cpp:102
-#, fuzzy
 msgid "Show a systray icon for VLC"
-msgstr "顯示串流位置"
+msgstr "顯示VLC系統列圖示"
 
 #: modules/gui/skins2/src/skin_main.cpp:436
 #: modules/gui/skins2/src/skin_main.cpp:437
 #: modules/gui/wxwidgets/wxwidgets.cpp:95
 msgid "Show VLC on the taskbar"
-msgstr ""
+msgstr "在工作列上顯示VLC"
 
 #: modules/gui/skins2/src/skin_main.cpp:438
 msgid "Enable transparency effects"
@@ -13018,7 +12825,7 @@ msgstr "喔喔!無法找到播放清單 !"
 
 #: modules/gui/skins2/src/skin_main.cpp:466
 msgid "Skins"
-msgstr ""
+msgstr "面板"
 
 #: modules/gui/skins2/src/skin_main.cpp:467
 msgid "Skinnable Interface"
@@ -13051,6 +12858,8 @@ msgid ""
 "(c) 1996-2006 - the VideoLAN Team\n"
 "\n"
 msgstr ""
+"(c) 1996-2006 - the VideoLAN Team\n"
+"\n"
 
 #: modules/gui/wince/interface.cpp:498 modules/gui/wxwidgets/interface.cpp:950
 msgid "Compiled by "
@@ -13058,7 +12867,7 @@ msgstr ""
 
 #: modules/gui/wince/interface.cpp:500 modules/gui/wxwidgets/interface.cpp:952
 msgid "Compiler: "
-msgstr ""
+msgstr "編譯者: "
 
 #: modules/gui/wince/interface.cpp:502 modules/gui/wxwidgets/interface.cpp:954
 msgid "Based on SVN revision: "
@@ -13116,7 +12925,7 @@ msgstr "編輯書籤"
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:101
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:197
 msgid "Bytes"
-msgstr ""
+msgstr "Bytes"
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:105
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:78
@@ -13206,14 +13015,12 @@ msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
-#, fuzzy
 msgid "Stream and Media Info"
 msgstr "串流及媒體資訊"
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:83
-#, fuzzy
 msgid "Advanced information"
-msgstr "進階選項"
+msgstr "進階資訊"
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:93
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:192
@@ -13275,12 +13082,10 @@ msgid "Open..."
 msgstr "開啟..."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:428
-#, fuzzy
 msgid "Stream/Save"
-msgstr "串流"
+msgstr "串流/儲存"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:429
-#, fuzzy
 msgid "Use VLC as a stream server"
 msgstr "使用VLC作為串流伺服器"
 
@@ -13313,14 +13118,12 @@ msgid "Use an external subtitles file."
 msgstr "使用字幕檔"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:641
-#, fuzzy
 msgid "Advanced Settings..."
-msgstr "進階選項..."
+msgstr "進階設定..."
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:657
-#, fuzzy
 msgid "File:"
-msgstr "檔案"
+msgstr "檔案:"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:694
 msgid "DVD (menus)"
@@ -13345,11 +13148,11 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:804
 msgid "HTTP/HTTPS/FTP/MMS"
-msgstr ""
+msgstr "HTTP/HTTPS/FTP/MMS"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:805
 msgid "RTSP"
-msgstr ""
+msgstr "RTSP"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:925
 #, fuzzy
@@ -13375,14 +13178,12 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1293
-#, fuzzy
 msgid "Open subtitles file"
-msgstr "使用字幕檔"
+msgstr "開啟字幕檔"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1670
-#, fuzzy
 msgid "Title number."
-msgstr "調節器數量"
+msgstr "標題數量"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:1673
 msgid ""
@@ -13431,7 +13232,7 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:52
 msgid "Shuffle"
-msgstr ""
+msgstr "隨意排列"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:243
 msgid "&Simple Add File..."
@@ -13442,9 +13243,8 @@ msgid "Add &Directory..."
 msgstr "增加目錄(&D)..."
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:245
-#, fuzzy
 msgid "&Add URL..."
-msgstr "增加MRL(&A)..."
+msgstr "增加URL(&A)..."
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:247
 #, fuzzy
@@ -13460,19 +13260,16 @@ msgid "&Save Playlist..."
 msgstr "儲存播放清單(&S)..."
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:257
-#, fuzzy
 msgid "Sort by &Title"
 msgstr "依標題排序(&T)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:258
-#, fuzzy
 msgid "&Reverse Sort by Title"
 msgstr "依標題反向排序(&R)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:260
-#, fuzzy
 msgid "&Shuffle"
-msgstr "亂化播放清單"
+msgstr "亂化(&S)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:264
 msgid "D&elete"
@@ -13495,9 +13292,8 @@ msgid "&View items"
 msgstr "檢視項目(&V)"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:282
-#, fuzzy
 msgid "Play this Branch"
-msgstr "播放該分支"
+msgstr "播放本分支"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:283
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:291
@@ -13505,9 +13301,8 @@ msgid "Preparse"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:284
-#, fuzzy
 msgid "Sort this Branch"
-msgstr "排序該分支"
+msgstr "排序本分支"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:286
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:293
@@ -13515,15 +13310,14 @@ msgid "Info"
 msgstr "資訊"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:287
-#, fuzzy
 msgid "Add Node"
-msgstr "音訊編碼器"
+msgstr "增加節點"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:370
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:833
 #: modules/gui/wxwidgets/playlist_manager.cpp:423
 msgid "root"
-msgstr ""
+msgstr "根目錄"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:604
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:844
@@ -13532,9 +13326,8 @@ msgid "%i items in playlist"
 msgstr "播放清單中有 %i 個項目"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:936
-#, fuzzy
 msgid "XSPF playlist"
-msgstr "儲存播放清單"
+msgstr "XSPF播放清單"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:943
 msgid "Playlist is empty"
@@ -13557,11 +13350,11 @@ msgstr "最大等級"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1624
 msgid "Please enter node name"
-msgstr ""
+msgstr "請輸入節點名稱"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1625
 msgid "New node"
-msgstr ""
+msgstr "新節點"
 
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:208
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:79
@@ -13576,15 +13369,15 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:196
 msgid "Alt"
-msgstr ""
+msgstr "Alt"
 
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:198
 msgid "Ctrl"
-msgstr ""
+msgstr "Ctrl"
 
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:200
 msgid "Shift"
-msgstr ""
+msgstr "Shift"
 
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:446
 msgid ""
@@ -13597,9 +13390,8 @@ msgid "Stream output MRL"
 msgstr "串流輸出MRL"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:171
-#, fuzzy
 msgid "Target:"
-msgstr "開啟目標:"
+msgstr "目標:"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:174
 msgid ""
@@ -13608,9 +13400,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:462
-#, fuzzy
 msgid "Outputs"
-msgstr "輸出URL"
+msgstr "輸出"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:470
 msgid "Play locally"
@@ -13618,16 +13409,16 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:473
 msgid "MMSH"
-msgstr ""
+msgstr "MMSH"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:474
 #: modules/stream_out/rtp.c:108
 msgid "RTP"
-msgstr ""
+msgstr "RTP"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:475
 msgid "UDP"
-msgstr ""
+msgstr "UDP"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:592
 msgid "Group name"
@@ -13651,7 +13442,6 @@ msgid "Audio codec"
 msgstr "音訊編碼器"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:888
-#, fuzzy
 msgid "Subtitles codec"
 msgstr "字幕編碼器"
 
@@ -13673,9 +13463,8 @@ msgid "Subtitles file"
 msgstr "字幕檔"
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
-#, fuzzy
 msgid "Options"
-msgstr "選項:"
+msgstr "選項"
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:208
 msgid ""
@@ -13692,13 +13481,12 @@ msgid "Open file"
 msgstr "開啟檔案"
 
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:65
-#, fuzzy
 msgid "Updates"
 msgstr "更新"
 
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:78
 msgid "Check for updates"
-msgstr ""
+msgstr "檢查更新"
 
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:170
 msgid ""
@@ -13708,9 +13496,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/updatevlc.cpp:198
-#, fuzzy
 msgid "Save file..."
-msgstr "儲存檔案"
+msgstr "儲存檔案..."
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:65
 msgid "Broadcasts"
@@ -13718,17 +13505,15 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:78
 msgid "Load"
-msgstr ""
+msgstr "載入"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:217
-#, fuzzy
 msgid "Load Configuration"
-msgstr "VLM設定檔"
+msgstr "載入組態"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:231
-#, fuzzy
 msgid "Save Configuration"
-msgstr "VLM設定檔"
+msgstr "儲存組態"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:247
 msgid "New broadcast"
@@ -13741,18 +13526,16 @@ msgid "Choose"
 msgstr "選擇"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:388
-#, fuzzy
 msgid "Output"
-msgstr "輸出URL"
+msgstr "輸出"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:404
 msgid "Loop"
 msgstr "循環"
 
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:560
-#, fuzzy
 msgid "VLM stream"
-msgstr "播放串流"
+msgstr "VLM串流"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:86
 #, fuzzy
@@ -13793,9 +13576,8 @@ msgid "You must choose a stream"
 msgstr "你必須選擇一個串流"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:113
-#, fuzzy
 msgid "Unable to find playlist"
-msgstr "喔喔!無法找到播放清單 !"
+msgstr "無法找到播放清單"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:115
 msgid ""
@@ -13813,9 +13595,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:130
-#, fuzzy
 msgid "Transcode video (if available)"
-msgstr "視訊轉碼"
+msgstr "視訊轉碼(如果可用)"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:131
 #, fuzzy
@@ -13841,9 +13622,8 @@ msgid "This does not appear to be a valid multicast address"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:145
-#, fuzzy
 msgid "Please enter an address"
-msgstr "你必須輸入位置"
+msgstr "請輸入一個位址"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:149
 msgid ""
@@ -13888,14 +13668,12 @@ msgid "More information"
 msgstr "更多資訊"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1277
-#, fuzzy
 msgid "Save to file"
-msgstr "儲存檔案"
+msgstr "儲存至檔案"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:134
-#, fuzzy
 msgid "Transcode audio (if available)"
-msgstr "音訊轉碼"
+msgstr "音訊轉碼(如果可用)"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:40
 msgid ""
@@ -13918,7 +13696,7 @@ msgstr "選擇效果"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:149
 msgid "Image inversion"
-msgstr ""
+msgstr "影像反轉"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:150
 msgid "Blurring"
@@ -13926,7 +13704,7 @@ msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:152 modules/video_filter/magnify.c:60
 msgid "Magnify"
-msgstr ""
+msgstr "放大"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:152
 #, fuzzy
@@ -13947,7 +13725,7 @@ msgstr "視訊選項"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:284
 msgid "Aspect Ratio"
-msgstr ""
+msgstr "長寬比"
 
 #: modules/gui/wxwidgets/extrapanel.cpp:402
 msgid "Prevents the audio output level from going over a predefined value."
@@ -13984,24 +13762,20 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/extrapanel.cpp:1007
-#, fuzzy
 msgid "More Information"
 msgstr "更多資訊"
 
 #: modules/gui/wxwidgets/input_manager.cpp:181
-#, fuzzy
 msgid "Stopped"
-msgstr "停止"
+msgstr "已停止"
 
 #: modules/gui/wxwidgets/input_manager.cpp:206
-#, fuzzy
 msgid "Paused"
-msgstr "暫停"
+msgstr "已暫停"
 
 #: modules/gui/wxwidgets/input_manager.cpp:206
-#, fuzzy
 msgid "Playing"
-msgstr "播放"
+msgstr "播放中"
 
 #: modules/gui/wxwidgets/interface.cpp:577
 msgid "Quick &Open File...\tCtrl-O"
@@ -14012,9 +13786,8 @@ msgid "Open &File...\tCtrl-F"
 msgstr "開啟檔案(&F)...\tCtrl-F"
 
 #: modules/gui/wxwidgets/interface.cpp:581
-#, fuzzy
 msgid "Open Dir&ectory...\tCtrl-E"
-msgstr "開啟檔案(&F)...\tCtrl-F"
+msgstr "開啟目錄(&E)...\tCtrl-E"
 
 #: modules/gui/wxwidgets/interface.cpp:582
 msgid "Open &Disc...\tCtrl-D"
@@ -14025,9 +13798,8 @@ msgid "Open &Network Stream...\tCtrl-N"
 msgstr "開啟網路串流(&N)...\tCtrl-N"
 
 #: modules/gui/wxwidgets/interface.cpp:586
-#, fuzzy
 msgid "Open C&apture Device...\tCtrl-A"
-msgstr "開啟擷取裝置(&C)...\tCtrl-C"
+msgstr "開啟擷取裝置(&A)...\tCtrl-A"
 
 #: modules/gui/wxwidgets/interface.cpp:589
 msgid "&Wizard...\tCtrl-W"
@@ -14052,7 +13824,7 @@ msgstr "串流及媒體資訊(&I)...\tCtrl-I"
 
 #: modules/gui/wxwidgets/interface.cpp:604
 msgid "VLM Control...\tCtrl-V"
-msgstr ""
+msgstr "VLM控制...\tCtrl-V"
 
 #: modules/gui/wxwidgets/interface.cpp:614
 #, fuzzy
@@ -14065,13 +13837,12 @@ msgid "Online Help"
 msgstr "線上文件"
 
 #: modules/gui/wxwidgets/interface.cpp:617
-#, fuzzy
 msgid "About..."
-msgstr "關於"
+msgstr "關於..."
 
 #: modules/gui/wxwidgets/interface.cpp:619
 msgid "Check for Updates..."
-msgstr ""
+msgstr "檢查更新..."
 
 #: modules/gui/wxwidgets/interface.cpp:623
 msgid "&File"
@@ -14124,27 +13895,23 @@ msgid "Play faster"
 msgstr "快速播放"
 
 #: modules/gui/wxwidgets/interface.cpp:890
-#, fuzzy
 msgid "Extended &GUI\tCtrl-G"
-msgstr "延伸使用者介面(&E)"
+msgstr "延伸使用者介面(&G)\tCtrl-G"
 
 #: modules/gui/wxwidgets/interface.cpp:893
-#, fuzzy
 msgid "&Bookmarks...\tCtrl-B"
-msgstr "書籤(&B)"
+msgstr "書籤(&B)...\tCtrl-B"
 
 #: modules/gui/wxwidgets/interface.cpp:895
-#, fuzzy
 msgid "Preference&s...\tCtrl-S"
-msgstr "偏好設定..."
+msgstr "偏好設定(S)...\tCtrl-S"
 
 #: modules/gui/wxwidgets/interface.cpp:948
-#, fuzzy
 msgid ""
 " (wxWidgets interface)\n"
 "\n"
 msgstr ""
-" (wxWindows介面)\n"
+" (wxWidgets介面)\n"
 "\n"
 
 #: modules/gui/wxwidgets/interface.cpp:961
@@ -14153,6 +13920,9 @@ msgid ""
 "http://www.videolan.org/\n"
 "\n"
 msgstr ""
+"The VideoLAN team <videolan@videolan.org>\n"
+"http://www.videolan.org/\n"
+"\n"
 
 #: modules/gui/wxwidgets/interface.cpp:963
 #, c-format
@@ -14160,18 +13930,16 @@ msgid "About %s"
 msgstr "關於 %s"
 
 #: modules/gui/wxwidgets/interface.cpp:1531
-#, fuzzy
 msgid "Show/Hide Interface"
-msgstr "顯示介面"
+msgstr "顯示/隱藏介面"
 
 #: modules/gui/wxwidgets/menus.cpp:127
 msgid "Open &File..."
 msgstr "開啟檔案(&F)"
 
 #: modules/gui/wxwidgets/menus.cpp:128
-#, fuzzy
 msgid "Open D&irectory..."
-msgstr "開啟檔案(&F)...\tCtrl-F"
+msgstr "開啟目錄(&D)..."
 
 #: modules/gui/wxwidgets/menus.cpp:129
 msgid "Open &Disc..."
@@ -14242,13 +14010,12 @@ msgid "RTP Unicast"
 msgstr ""
 
 #: modules/gui/wxwidgets/streamdata.cpp:122
-#, fuzzy
 msgid "Stream to a single computer."
-msgstr "串流至網路"
+msgstr "串流至單一電腦"
 
 #: modules/gui/wxwidgets/streamdata.cpp:125
 msgid "RTP Multicast"
-msgstr ""
+msgstr "RTP群播"
 
 #: modules/gui/wxwidgets/streamdata.cpp:126
 msgid ""
@@ -14279,19 +14046,16 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:89
-#, fuzzy
 msgid "Bookmarks dialog"
-msgstr "顯示書籤對話框"
+msgstr "書籤對話框"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:90
-#, fuzzy
 msgid "Show bookmarks dialog at startup"
-msgstr "顯示書籤對話框"
+msgstr "開始時顯示書籤對話框"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:91
-#, fuzzy
 msgid "Extended GUI"
-msgstr "延伸使用者介面(&E)"
+msgstr "延伸使用者介面"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:92
 msgid ""
@@ -14300,12 +14064,11 @@ msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:94
 msgid "Taskbar"
-msgstr ""
+msgstr "工作列"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:96
-#, fuzzy
 msgid "Minimal interface"
-msgstr "可面板化介面"
+msgstr "最小化介面"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:97
 msgid "Use minimal interface, with no toolbar and fewer menus."
@@ -14321,9 +14084,8 @@ msgid "Resize VLC to match the video resolution."
 msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:103
-#, fuzzy
 msgid "Show labels in toolbar"
-msgstr "顯示工具列按鈕文字"
+msgstr "在工具列顯示標籤"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:104
 #, fuzzy
@@ -14331,9 +14093,8 @@ msgid "Show labels below the icons in the toolbar."
 msgstr "在工具列圖示的下方顯示文字"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:106
-#, fuzzy
 msgid "Playlist view"
-msgstr "播放清單"
+msgstr "播放清單檢視"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:107
 msgid ""
@@ -14345,16 +14106,15 @@ msgstr ""
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:114
 msgid "Embedded"
-msgstr ""
+msgstr "嵌入"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:115
 msgid "Both"
-msgstr ""
+msgstr "兩者"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:124
-#, fuzzy
 msgid "wxWidgets interface module"
-msgstr "wxWindows介面模組"
+msgstr "wxWidgets介面模組"
 
 #: modules/gui/wxwidgets/wxwidgets.cpp:165
 msgid "last config"
@@ -14375,47 +14135,47 @@ msgstr ""
 
 #: modules/meta_engine/id3genres.h:28
 msgid "Blues"
-msgstr ""
+msgstr "藍調"
 
 #: modules/meta_engine/id3genres.h:29
 msgid "Classic rock"
-msgstr ""
+msgstr "古典搖滾"
 
 #: modules/meta_engine/id3genres.h:30
 msgid "Country"
-msgstr ""
+msgstr "鄉村音樂"
 
 #: modules/meta_engine/id3genres.h:32
 msgid "Disco"
-msgstr ""
+msgstr "狄斯可"
 
 #: modules/meta_engine/id3genres.h:33
 msgid "Funk"
-msgstr ""
+msgstr "放客"
 
 #: modules/meta_engine/id3genres.h:34
 msgid "Grunge"
-msgstr ""
+msgstr "車庫搖滾"
 
 #: modules/meta_engine/id3genres.h:35
 msgid "Hip-Hop"
-msgstr ""
+msgstr "嘻哈音樂"
 
 #: modules/meta_engine/id3genres.h:36
 msgid "Jazz"
-msgstr ""
+msgstr "爵士樂"
 
 #: modules/meta_engine/id3genres.h:37
 msgid "Metal"
-msgstr ""
+msgstr "金屬樂"
 
 #: modules/meta_engine/id3genres.h:38
 msgid "New Age"
-msgstr ""
+msgstr "新世紀"
 
 #: modules/meta_engine/id3genres.h:39
 msgid "Oldies"
-msgstr ""
+msgstr "懷舊音樂"
 
 #: modules/meta_engine/id3genres.h:40
 msgid "Other"
@@ -14423,23 +14183,23 @@ msgstr "其他"
 
 #: modules/meta_engine/id3genres.h:42
 msgid "R&B"
-msgstr ""
+msgstr "R&B"
 
 #: modules/meta_engine/id3genres.h:43
 msgid "Rap"
-msgstr ""
+msgstr "饒舌歌"
 
 #: modules/meta_engine/id3genres.h:47
 msgid "Industrial"
-msgstr ""
+msgstr "工業搖滾"
 
 #: modules/meta_engine/id3genres.h:48
 msgid "Alternative"
-msgstr ""
+msgstr "另類音樂"
 
 #: modules/meta_engine/id3genres.h:50
 msgid "Death metal"
-msgstr ""
+msgstr "死亡金屬"
 
 #: modules/meta_engine/id3genres.h:51
 msgid "Pranks"
@@ -14447,51 +14207,51 @@ msgstr ""
 
 #: modules/meta_engine/id3genres.h:52
 msgid "Soundtrack"
-msgstr ""
+msgstr "電影原聲帶"
 
 #: modules/meta_engine/id3genres.h:53
 msgid "Euro-Techno"
-msgstr ""
+msgstr "歐陸科技舞曲"
 
 #: modules/meta_engine/id3genres.h:54
 msgid "Ambient"
-msgstr ""
+msgstr "環境音樂"
 
 #: modules/meta_engine/id3genres.h:55
 msgid "Trip-Hop"
-msgstr ""
+msgstr "迷幻舞曲"
 
 #: modules/meta_engine/id3genres.h:56
 msgid "Vocal"
-msgstr ""
+msgstr "聲樂"
 
 #: modules/meta_engine/id3genres.h:57
 msgid "Jazz+Funk"
-msgstr ""
+msgstr "爵士+放客"
 
 #: modules/meta_engine/id3genres.h:58
 msgid "Fusion"
-msgstr ""
+msgstr "融合爵士樂"
 
 #: modules/meta_engine/id3genres.h:59
 msgid "Trance"
-msgstr ""
+msgstr "迷幻電子"
 
 #: modules/meta_engine/id3genres.h:61
 msgid "Instrumental"
-msgstr ""
+msgstr "樂器演奏"
 
 #: modules/meta_engine/id3genres.h:62
 msgid "Acid"
-msgstr ""
+msgstr "迷幻音樂"
 
 #: modules/meta_engine/id3genres.h:63
 msgid "House"
-msgstr ""
+msgstr "浩室樂"
 
 #: modules/meta_engine/id3genres.h:64
 msgid "Game"
-msgstr ""
+msgstr "遊戲音樂"
 
 #: modules/meta_engine/id3genres.h:65
 msgid "Sound clip"
@@ -14499,11 +14259,11 @@ msgstr ""
 
 #: modules/meta_engine/id3genres.h:66
 msgid "Gospel"
-msgstr ""
+msgstr "福音歌曲"
 
 #: modules/meta_engine/id3genres.h:67 modules/video_filter/noise.c:52
 msgid "Noise"
-msgstr ""
+msgstr "噪音音樂"
 
 #: modules/meta_engine/id3genres.h:68
 msgid "Alternative rock"
@@ -14515,15 +14275,15 @@ msgstr ""
 
 #: modules/meta_engine/id3genres.h:70
 msgid "Soul"
-msgstr ""
+msgstr "靈魂樂"
 
 #: modules/meta_engine/id3genres.h:71
 msgid "Punk"
-msgstr ""
+msgstr "龐克音樂"
 
 #: modules/meta_engine/id3genres.h:72
 msgid "Space"
-msgstr ""
+msgstr "太空搖滾"
 
 #: modules/meta_engine/id3genres.h:73
 msgid "Meditative"
@@ -14539,35 +14299,35 @@ msgstr ""
 
 #: modules/meta_engine/id3genres.h:76
 msgid "Ethnic"
-msgstr ""
+msgstr "少數民族音樂"
 
 #: modules/meta_engine/id3genres.h:77
 msgid "Gothic"
-msgstr ""
+msgstr "歌德搖滾"
 
 #: modules/meta_engine/id3genres.h:78
 msgid "Darkwave"
-msgstr ""
+msgstr "黑潮音樂"
 
 #: modules/meta_engine/id3genres.h:79
 msgid "Techno-Industrial"
-msgstr ""
+msgstr "電子工業搖滾"
 
 #: modules/meta_engine/id3genres.h:80
 msgid "Electronic"
-msgstr ""
+msgstr "電子樂"
 
 #: modules/meta_engine/id3genres.h:81
 msgid "Pop-Folk"
-msgstr ""
+msgstr "流行老歌"
 
 #: modules/meta_engine/id3genres.h:82
 msgid "Eurodance"
-msgstr ""
+msgstr "歐陸舞曲"
 
 #: modules/meta_engine/id3genres.h:83
 msgid "Dream"
-msgstr ""
+msgstr "夢幻音樂"
 
 #: modules/meta_engine/id3genres.h:84
 msgid "Southern rock"
@@ -14575,11 +14335,11 @@ msgstr ""
 
 #: modules/meta_engine/id3genres.h:85
 msgid "Comedy"
-msgstr ""
+msgstr "喜劇音樂"
 
 #: modules/meta_engine/id3genres.h:86
 msgid "Cult"
-msgstr ""
+msgstr "偶像崇拜音樂"
 
 #: modules/meta_engine/id3genres.h:87
 msgid "Gangsta"
@@ -14587,7 +14347,7 @@ msgstr ""
 
 #: modules/meta_engine/id3genres.h:88
 msgid "Top 40"
-msgstr ""
+msgstr "排行榜前 40 名"
 
 #: modules/meta_engine/id3genres.h:89
 msgid "Christian rap"
@@ -14599,39 +14359,39 @@ msgstr ""
 
 #: modules/meta_engine/id3genres.h:91
 msgid "Jungle"
-msgstr ""
+msgstr "叢林音樂"
 
 #: modules/meta_engine/id3genres.h:92
 msgid "Native American"
-msgstr ""
+msgstr "美國本土音樂"
 
 #: modules/meta_engine/id3genres.h:93
 msgid "Cabaret"
-msgstr ""
+msgstr "夜總會音樂"
 
 #: modules/meta_engine/id3genres.h:94
 msgid "New wave"
-msgstr ""
+msgstr "新浪潮"
 
 #: modules/meta_engine/id3genres.h:96
 msgid "Rave"
-msgstr ""
+msgstr "銳舞音樂"
 
 #: modules/meta_engine/id3genres.h:97
 msgid "Showtunes"
-msgstr ""
+msgstr "歌舞劇音樂"
 
 #: modules/meta_engine/id3genres.h:98
 msgid "Trailer"
-msgstr ""
+msgstr "電影預告片音樂"
 
 #: modules/meta_engine/id3genres.h:99
 msgid "Lo-Fi"
-msgstr ""
+msgstr "低傳真"
 
 #: modules/meta_engine/id3genres.h:100
 msgid "Tribal"
-msgstr ""
+msgstr "部落音樂"
 
 #: modules/meta_engine/id3genres.h:101
 msgid "Acid punk"
@@ -14643,15 +14403,15 @@ msgstr ""
 
 #: modules/meta_engine/id3genres.h:103
 msgid "Polka"
-msgstr ""
+msgstr "波爾卡舞曲"
 
 #: modules/meta_engine/id3genres.h:104
 msgid "Retro"
-msgstr ""
+msgstr "復古音樂"
 
 #: modules/meta_engine/id3genres.h:105
 msgid "Musical"
-msgstr ""
+msgstr "音樂劇"
 
 #: modules/meta_engine/id3genres.h:106
 msgid "Rock & roll"
@@ -14662,9 +14422,8 @@ msgid "Hard rock"
 msgstr ""
 
 #: modules/meta_engine/id3tag.c:53
-#, fuzzy
 msgid "ID3 tags parser"
-msgstr "DTS解析器"
+msgstr "ID3標籤分析器"
 
 #: modules/meta_engine/musicbrainz.c:48
 msgid "MusicBrainz"
@@ -14806,7 +14565,7 @@ msgstr ""
 #: modules/misc/freetype.c:90 modules/misc/win32text.c:62
 #: modules/video_filter/marq.c:105 modules/video_filter/rss.c:138
 msgid "Opacity"
-msgstr ""
+msgstr "透明度"
 
 #: modules/misc/freetype.c:91 modules/misc/win32text.c:63
 msgid ""
@@ -14816,7 +14575,7 @@ msgstr ""
 
 #: modules/misc/freetype.c:94 modules/misc/win32text.c:66
 msgid "Text default color"
-msgstr ""
+msgstr "預設文字顏色"
 
 #: modules/misc/freetype.c:95 modules/misc/win32text.c:67
 msgid ""
@@ -14828,7 +14587,7 @@ msgstr ""
 
 #: modules/misc/freetype.c:99 modules/misc/win32text.c:71
 msgid "Relative font size"
-msgstr ""
+msgstr "相對的字型大小"
 
 #: modules/misc/freetype.c:100 modules/misc/win32text.c:72
 msgid ""
@@ -14864,9 +14623,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/freetype.c:110
-#, fuzzy
 msgid "Font Effect"
-msgstr "Goom效果"
+msgstr "字型效果"
 
 #: modules/misc/freetype.c:111
 msgid ""
@@ -14876,11 +14634,11 @@ msgstr ""
 
 #: modules/misc/freetype.c:119
 msgid "Background"
-msgstr ""
+msgstr "背景顏色"
 
 #: modules/misc/freetype.c:119
 msgid "Outline"
-msgstr ""
+msgstr "輪廓"
 
 #: modules/misc/freetype.c:120
 msgid "Fat Outline"
@@ -14954,7 +14712,7 @@ msgstr ""
 
 #: modules/misc/logger.c:113 modules/video_filter/marq.c:80
 msgid "Text"
-msgstr ""
+msgstr "文字"
 
 #: modules/misc/logger.c:119
 msgid "Log format"
@@ -14974,11 +14732,11 @@ msgstr ""
 
 #: modules/misc/logger.c:130
 msgid "Logging"
-msgstr ""
+msgstr "記錄"
 
 #: modules/misc/logger.c:131
 msgid "File logging"
-msgstr ""
+msgstr "檔案記錄"
 
 #: modules/misc/logger.c:137
 msgid "Log filename"
@@ -14986,12 +14744,11 @@ msgstr "記錄檔檔名"
 
 #: modules/misc/logger.c:137
 msgid "Specify the log filename."
-msgstr ""
+msgstr "指定記錄檔案名稱"
 
 #: modules/misc/logger.c:142
-#, fuzzy
 msgid "RRD output file"
-msgstr "輸出檔案"
+msgstr "RRD輸出檔案"
 
 #: modules/misc/logger.c:143
 msgid "Output data for RRDTool in this file."
@@ -15018,9 +14775,8 @@ msgid "MMX EXT memcpy"
 msgstr ""
 
 #: modules/misc/notify/growl.c:59
-#, fuzzy
 msgid "Growl server"
-msgstr "沒有伺服器"
+msgstr "Growl伺服器"
 
 #: modules/misc/notify/growl.c:60
 msgid ""
@@ -15029,18 +14785,16 @@ msgid ""
 msgstr ""
 
 #: modules/misc/notify/growl.c:63
-#, fuzzy
 msgid "Growl password"
-msgstr "SOCKS密碼"
+msgstr "Growl密碼"
 
 #: modules/misc/notify/growl.c:65
 msgid "Growl password on the server."
 msgstr ""
 
 #: modules/misc/notify/growl.c:66
-#, fuzzy
 msgid "Growl UDP port"
-msgstr "TCP指令輸入"
+msgstr "Growl UDP埠"
 
 #: modules/misc/notify/growl.c:68
 #, fuzzy
@@ -15053,9 +14807,8 @@ msgstr ""
 
 #: modules/misc/notify/growl.c:146 modules/misc/notify/msn.c:163
 #: modules/misc/notify/notify.c:163
-#, fuzzy
 msgid "(no title)"
-msgstr "標題"
+msgstr "(無標題)"
 
 #: modules/misc/notify/growl.c:147 modules/misc/notify/msn.c:164
 msgid "(no artist)"
@@ -15076,9 +14829,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/notify/msn.c:71
-#, fuzzy
 msgid "MSN Now-Playing"
-msgstr "播放"
+msgstr "MSN Now-Playing"
 
 #: modules/misc/notify/notify.c:59
 #, fuzzy
@@ -15154,12 +14906,10 @@ msgid "Old playlist exporter"
 msgstr ""
 
 #: modules/misc/playlist/export.c:56
-#, fuzzy
 msgid "XSPF playlist export"
-msgstr "PLS播放清單匯入"
+msgstr "XSPF播放清單匯出"
 
 #: modules/misc/probe/hal.c:53 modules/services_discovery/hal.c:84
-#, fuzzy
 msgid "HAL devices detection"
 msgstr "HAL裝置偵測"
 
@@ -15183,7 +14933,7 @@ msgstr "視訊"
 
 #: modules/misc/rtsp.c:49
 msgid "RTSP host address"
-msgstr ""
+msgstr "RTSP主機位址"
 
 #: modules/misc/rtsp.c:52
 msgid ""
@@ -15194,9 +14944,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/rtsp.c:57
-#, fuzzy
 msgid "Maximum number of connections"
-msgstr "複製數量"
+msgstr "最大連線數"
 
 #: modules/misc/rtsp.c:58
 msgid ""
@@ -15210,11 +14959,11 @@ msgstr ""
 
 #: modules/misc/rtsp.c:64
 msgid "RTSP VoD"
-msgstr ""
+msgstr "RTSP VoD"
 
 #: modules/misc/rtsp.c:65
 msgid "RTSP VoD server"
-msgstr ""
+msgstr "RTSP VoD伺服器"
 
 #: modules/misc/screensaver.c:82
 msgid "X Screensaver disabler"
@@ -15281,9 +15030,8 @@ msgid "\"Rating\" to put in ASF comments."
 msgstr ""
 
 #: modules/mux/asf.c:58
-#, fuzzy
 msgid "Packet Size"
-msgstr "封包器"
+msgstr "封包大小"
 
 #: modules/mux/asf.c:59
 msgid "ASF packet size -- default is 4096 bytes"
@@ -15323,7 +15071,7 @@ msgstr "MP4/MOV多工器"
 
 #: modules/mux/mpeg/ps.c:45 modules/mux/mpeg/ts.c:144
 msgid "DTS delay (ms)"
-msgstr ""
+msgstr "DTS延遲(ms)"
 
 #: modules/mux/mpeg/ps.c:46
 msgid ""
@@ -15395,9 +15143,8 @@ msgid "Assign a fixed Network ID (for SDT table)"
 msgstr ""
 
 #: modules/mux/mpeg/ts.c:98
-#, fuzzy
 msgid "PMT Program numbers"
-msgstr "調節器數量"
+msgstr "PMT程式數量"
 
 #: modules/mux/mpeg/ts.c:99
 msgid ""
@@ -15436,9 +15183,8 @@ msgid ""
 msgstr ""
 
 #: modules/mux/mpeg/ts.c:115
-#, fuzzy
 msgid "Data alignment"
-msgstr "視訊對齊"
+msgstr "資料對齊"
 
 #: modules/mux/mpeg/ts.c:116
 msgid ""
@@ -15550,14 +15296,12 @@ msgid ""
 msgstr ""
 
 #: modules/mux/mpjpeg.c:52
-#, fuzzy
 msgid "Multipart JPEG muxer"
-msgstr "輸出多工器"
+msgstr "多部JPEG多工器"
 
 #: modules/mux/ogg.c:49
-#, fuzzy
 msgid "Ogg/OGM muxer"
-msgstr "Ogg/ogm多工器"
+msgstr "Ogg/OGM多工器"
 
 #: modules/mux/wav.c:42
 msgid "WAV muxer"
@@ -15568,9 +15312,8 @@ msgid "Copy packetizer"
 msgstr ""
 
 #: modules/packetizer/h264.c:49
-#, fuzzy
 msgid "H.264 video packetizer"
-msgstr "H264視訊封包器"
+msgstr "H.264視訊封包器"
 
 #: modules/packetizer/mpeg4audio.c:119
 msgid "MPEG4 audio packetizer"
@@ -15602,7 +15345,7 @@ msgstr ""
 #: modules/services_discovery/bonjour.c:309
 #: modules/services_discovery/bonjour.c:311
 msgid "Bonjour"
-msgstr ""
+msgstr "Bonjour"
 
 #: modules/services_discovery/hal.c:172
 #: modules/services_discovery/upnp_cc.cpp:97
@@ -15619,15 +15362,13 @@ msgid "Enter the list of podcasts to retrieve, separated by '|' (pipe)."
 msgstr ""
 
 #: modules/services_discovery/podcast.c:61
-#, fuzzy
 msgid "Podcasts"
-msgstr "貼上"
+msgstr "Podcasts"
 
 #: modules/services_discovery/podcast.c:151
 #: modules/services_discovery/podcast.c:153
-#, fuzzy
 msgid "Podcast"
-msgstr "貼上"
+msgstr "Podcast"
 
 #: modules/services_discovery/sap.c:80
 msgid "SAP multicast address"
@@ -15641,7 +15382,7 @@ msgstr ""
 
 #: modules/services_discovery/sap.c:84
 msgid "IPv4 SAP"
-msgstr ""
+msgstr "IPv4 SAP"
 
 #: modules/services_discovery/sap.c:86
 msgid "Listen to IPv4 announcements on the standard address."
@@ -15649,7 +15390,7 @@ msgstr ""
 
 #: modules/services_discovery/sap.c:88
 msgid "IPv6 SAP"
-msgstr ""
+msgstr "IPv6 SAP"
 
 #: modules/services_discovery/sap.c:90
 msgid "Listen to IPv6 announcements on the standard addresses."
@@ -15723,17 +15464,16 @@ msgid "SAP sessions"
 msgstr "權限"
 
 #: modules/services_discovery/sap.c:783 modules/services_discovery/sap.c:787
-#, fuzzy
 msgid "Session"
-msgstr "權限"
+msgstr "作業階段"
 
 #: modules/services_discovery/sap.c:783
 msgid "Tool"
-msgstr ""
+msgstr "工具"
 
 #: modules/services_discovery/sap.c:788
 msgid "User"
-msgstr ""
+msgstr "使用者"
 
 #: modules/services_discovery/shout.c:65
 msgid "Shoutcast radio listings"
@@ -15788,14 +15528,12 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/bridge.c:60
-#, fuzzy
 msgid "Bridge"
-msgstr "亮度"
+msgstr "橋接"
 
 #: modules/stream_out/bridge.c:61
-#, fuzzy
 msgid "Bridge stream output"
-msgstr "檔案串流輸出"
+msgstr "橋接串流輸出"
 
 #: modules/stream_out/bridge.c:63
 msgid "Bridge out"
@@ -15822,9 +15560,8 @@ msgid "Introduces a delay in the display of the stream."
 msgstr ""
 
 #: modules/stream_out/display.c:51 modules/video_filter/deinterlace.c:127
-#, fuzzy
 msgid "Display"
-msgstr "延遲"
+msgstr "顯示"
 
 #: modules/stream_out/display.c:52
 msgid "Display stream output"
@@ -15891,9 +15628,8 @@ msgid "Output URL"
 msgstr "輸出URL"
 
 #: modules/stream_out/es.c:61
-#, fuzzy
 msgid "This is the default output URI."
-msgstr "預設的VCD裝置"
+msgstr "這是預設的輸出URI"
 
 #: modules/stream_out/es.c:62
 msgid "Audio output URL"
@@ -15953,7 +15689,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:54
 msgid "SDP"
-msgstr ""
+msgstr "SDP"
 
 #: modules/stream_out/rtp.c:56
 msgid ""
@@ -15976,7 +15712,7 @@ msgstr "允許你指定串流輸出的URL"
 
 #: modules/stream_out/rtp.c:65 modules/stream_out/standard.c:51
 msgid "Session name"
-msgstr ""
+msgstr "工作階段名稱"
 
 #: modules/stream_out/rtp.c:67
 msgid ""
@@ -15986,7 +15722,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:69
 msgid "Session description"
-msgstr ""
+msgstr "工作階段描述"
 
 #: modules/stream_out/rtp.c:71
 msgid ""
@@ -15996,7 +15732,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:73
 msgid "Session URL"
-msgstr ""
+msgstr "工作階段URL"
 
 #: modules/stream_out/rtp.c:75
 msgid ""
@@ -16007,7 +15743,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:78
 msgid "Session email"
-msgstr ""
+msgstr "工作階段email"
 
 #: modules/stream_out/rtp.c:80
 msgid ""
@@ -16049,7 +15785,7 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:98
 msgid "MP4A LATM"
-msgstr ""
+msgstr "MP4A LATM"
 
 #: modules/stream_out/rtp.c:100
 #, fuzzy
@@ -16065,14 +15801,12 @@ msgid "This is the output access method that will be used."
 msgstr ""
 
 #: modules/stream_out/standard.c:46
-#, fuzzy
 msgid "This is the muxer that will be used."
-msgstr "預設的VCD裝置"
+msgstr "這是將會使用的多工器"
 
 #: modules/stream_out/standard.c:47
-#, fuzzy
 msgid "Output destination"
-msgstr "輸出選項"
+msgstr "輸出目的地"
 
 #: modules/stream_out/standard.c:50
 #, fuzzy
@@ -16104,16 +15838,14 @@ msgid "Announce this session with SAP."
 msgstr ""
 
 #: modules/stream_out/standard.c:70
-#, fuzzy
 msgid "Standard"
-msgstr "標準播放"
+msgstr "標準"
 
 #: modules/stream_out/standard.c:71
 msgid "Standard stream output"
 msgstr "標準串流輸出"
 
 #: modules/stream_out/switcher.c:81
-#, fuzzy
 msgid "Files"
 msgstr "檔案"
 
@@ -16123,7 +15855,6 @@ msgid "Full paths of the files separated by colons."
 msgstr "欲使用的PNG檔案完整路徑"
 
 #: modules/stream_out/switcher.c:84
-#, fuzzy
 msgid "Sizes"
 msgstr "大小"
 
@@ -16133,7 +15864,7 @@ msgstr ""
 
 #: modules/stream_out/switcher.c:87
 msgid "Aspect ratio"
-msgstr ""
+msgstr "寬高比"
 
 #: modules/stream_out/switcher.c:89
 msgid "Aspect ratio (4:3, 16:9)."
@@ -16150,7 +15881,7 @@ msgstr ""
 
 #: modules/stream_out/switcher.c:93
 msgid "Command"
-msgstr ""
+msgstr "指令"
 
 #: modules/stream_out/switcher.c:95
 msgid "Initial command to execute."
@@ -16174,9 +15905,8 @@ msgid "Fixed quantizer scale to use."
 msgstr ""
 
 #: modules/stream_out/switcher.c:102
-#, fuzzy
 msgid "Mute audio"
-msgstr "啟動音訊"
+msgstr "靜音"
 
 #: modules/stream_out/switcher.c:104
 msgid "Mute audio when command is not 0."
@@ -16203,9 +15933,8 @@ msgid "Destination video codec"
 msgstr "目的視訊編碼器"
 
 #: modules/stream_out/transcode.c:57
-#, fuzzy
 msgid "This is the video codec that will be used."
-msgstr "預設的DVD裝置"
+msgstr "這是將會使用的視訊編碼器"
 
 #: modules/stream_out/transcode.c:58
 msgid "Video bitrate"
@@ -16242,27 +15971,22 @@ msgid "Specify the deinterlace module to use."
 msgstr "介面模組"
 
 #: modules/stream_out/transcode.c:79
-#, fuzzy
 msgid "Maximum video width"
-msgstr "視訊寬度"
+msgstr "最大化視訊寬度"
 
 #: modules/stream_out/transcode.c:81
-#, fuzzy
 msgid "Maximum output video width."
-msgstr "視訊寬度"
+msgstr "最大化輸出視訊寬度"
 
 #: modules/stream_out/transcode.c:82
-#, fuzzy
 msgid "Maximum video height"
-msgstr "視訊高度"
+msgstr "最大化視訊高度"
 
 #: modules/stream_out/transcode.c:84
-#, fuzzy
 msgid "Maximum output video height."
-msgstr "視訊高度"
+msgstr "最大化輸出視訊高度"
 
 #: modules/stream_out/transcode.c:85
-#, fuzzy
 msgid "Video filter"
 msgstr "視訊過濾器"
 
@@ -16273,72 +15997,64 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/transcode.c:90
-#, fuzzy
 msgid "Video crop (top)"
-msgstr "視訊修整(上方)"
+msgstr "視訊裁切(上)"
 
 #: modules/stream_out/transcode.c:92
 msgid "Number of pixels to crop at the top of the video."
 msgstr ""
 
 #: modules/stream_out/transcode.c:93
-#, fuzzy
 msgid "Video crop (left)"
-msgstr "視訊修整(左方)"
+msgstr "視訊裁切(左)"
 
 #: modules/stream_out/transcode.c:95
 msgid "Number of pixels to crop at the left of the video."
 msgstr ""
 
 #: modules/stream_out/transcode.c:96
-#, fuzzy
 msgid "Video crop (bottom)"
-msgstr "視訊修整(下方)"
+msgstr "視訊裁切(下)"
 
 #: modules/stream_out/transcode.c:98
 msgid "Number of pixels to crop at the bottom of the video."
 msgstr ""
 
 #: modules/stream_out/transcode.c:99
-#, fuzzy
 msgid "Video crop (right)"
-msgstr "視訊修整(右方)"
+msgstr "視訊裁切(右)"
 
 #: modules/stream_out/transcode.c:101
 msgid "Number of pixels to crop at the right of the video."
 msgstr ""
 
 #: modules/stream_out/transcode.c:103
-#, fuzzy
 msgid "Video padding (top)"
-msgstr "視訊修整(上方)"
+msgstr "視訊填充(上)"
 
 #: modules/stream_out/transcode.c:105
 msgid "Size of the black border to add at the top of the video."
 msgstr ""
 
 #: modules/stream_out/transcode.c:106
-#, fuzzy
 msgid "Video padding (left)"
-msgstr "視訊修整(左方)"
+msgstr "視訊填充(左)"
 
 #: modules/stream_out/transcode.c:108
 msgid "Size of the black border to add at the left of the video."
 msgstr ""
 
 #: modules/stream_out/transcode.c:109
-#, fuzzy
 msgid "Video padding (bottom)"
-msgstr "視訊修整(下方)"
+msgstr "視訊填充(下)"
 
 #: modules/stream_out/transcode.c:111
 msgid "Size of the black border to add at the bottom of the video."
 msgstr ""
 
 #: modules/stream_out/transcode.c:112
-#, fuzzy
 msgid "Video padding (right)"
-msgstr "視訊修整(右方)"
+msgstr "視訊填充(右)"
 
 #: modules/stream_out/transcode.c:114
 msgid "Size of the black border to add at the right of the video."
@@ -16458,9 +16174,8 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/transcode.c:163 modules/video_filter/osdmenu.c:117
-#, fuzzy
 msgid "OSD menu"
-msgstr "DVD(選單)"
+msgstr "OSD選單"
 
 #: modules/stream_out/transcode.c:165
 msgid ""
@@ -16477,7 +16192,7 @@ msgstr ""
 
 #: modules/stream_out/transcode.c:170
 msgid "High priority"
-msgstr ""
+msgstr "高優先權"
 
 #: modules/stream_out/transcode.c:172
 msgid ""
@@ -16536,9 +16251,8 @@ msgid "AltiVec conversions from "
 msgstr ""
 
 #: modules/video_filter/adjust.c:57
-#, fuzzy
 msgid "Brightness threshold"
-msgstr "動作閥值"
+msgstr "亮度閥值"
 
 #: modules/video_filter/adjust.c:58
 msgid ""
@@ -16612,7 +16326,6 @@ msgid "Number of video windows in which to clone the video."
 msgstr ""
 
 #: modules/video_filter/clone.c:59
-#, fuzzy
 msgid "Video output modules"
 msgstr "視訊輸出模組"
 
@@ -16814,18 +16527,16 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/gradient.c:63
-#, fuzzy
 msgid "Apply cartoon effect"
-msgstr "選擇效果"
+msgstr "套用卡通效果"
 
 #: modules/video_filter/gradient.c:64
 msgid "Apply cartoon effect. It is only used by \"gradient\" and \"edge\"."
 msgstr ""
 
 #: modules/video_filter/gradient.c:68
-#, fuzzy
 msgid "Edge"
-msgstr "亮度"
+msgstr "邊緣"
 
 #: modules/video_filter/gradient.c:68
 msgid "Hough"
@@ -16845,9 +16556,8 @@ msgid "Color inversion"
 msgstr "色彩反向"
 
 #: modules/video_filter/logo.c:68
-#, fuzzy
 msgid "Logo filenames"
-msgstr "Logo檔名"
+msgstr "Logo檔案名稱"
 
 #: modules/video_filter/logo.c:69
 msgid ""
@@ -16874,18 +16584,16 @@ msgid "Individual image display time of 0 - 60000 ms."
 msgstr ""
 
 #: modules/video_filter/logo.c:78 modules/video_filter/osdmenu.c:49
-#, fuzzy
 msgid "X coordinate"
-msgstr "視訊y座標"
+msgstr "X座標"
 
 #: modules/video_filter/logo.c:79
 msgid "X coordinate of the logo. You can move the logo by left-clicking it."
 msgstr ""
 
 #: modules/video_filter/logo.c:81 modules/video_filter/osdmenu.c:52
-#, fuzzy
 msgid "Y coordinate"
-msgstr "視訊y座標"
+msgstr "Y座標"
 
 #: modules/video_filter/logo.c:82
 msgid "Y coordinate of the logo. You can move the logo by left-clicking it."
@@ -16942,27 +16650,24 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/marq.c:97 modules/video_filter/rss.c:134
-#, fuzzy
 msgid "X offset"
-msgstr "時間補償"
+msgstr "X補償"
 
 #: modules/video_filter/marq.c:98 modules/video_filter/rss.c:135
 msgid "X offset, from the left screen edge."
 msgstr ""
 
 #: modules/video_filter/marq.c:99 modules/video_filter/rss.c:136
-#, fuzzy
 msgid "Y offset"
-msgstr "時間補償"
+msgstr "Y補償"
 
 #: modules/video_filter/marq.c:100 modules/video_filter/rss.c:137
 msgid "Y offset, down from the top."
 msgstr ""
 
 #: modules/video_filter/marq.c:101
-#, fuzzy
 msgid "Timeout"
-msgstr "時間"
+msgstr "逾時"
 
 #: modules/video_filter/marq.c:102
 msgid ""
@@ -16977,9 +16682,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/marq.c:108 modules/video_filter/rss.c:142
-#, fuzzy
 msgid "Font size, pixels"
-msgstr "字型大小"
+msgstr "字型大小, 像素"
 
 #: modules/video_filter/marq.c:109 modules/video_filter/rss.c:143
 msgid "Font size, in pixels. Default is -1 (use default font size)."
@@ -16994,9 +16698,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/marq.c:118
-#, fuzzy
 msgid "Marquee position"
-msgstr "起始位置"
+msgstr "跑馬燈位置"
 
 #: modules/video_filter/marq.c:120
 msgid ""
@@ -17006,18 +16709,16 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/marq.c:159 modules/video_filter/rss.c:191
-#, fuzzy
 msgid "Misc"
-msgstr "光碟"
+msgstr "雜項"
 
 #: modules/video_filter/marq.c:163
-#, fuzzy
 msgid "Marquee display"
-msgstr "畫面上顯示(OSD)"
+msgstr "跑馬燈顯示"
 
 #: modules/video_filter/mosaic.c:95
 msgid "Transparency"
-msgstr ""
+msgstr "透明度"
 
 #: modules/video_filter/mosaic.c:96
 msgid ""
@@ -17098,7 +16799,7 @@ msgstr ""
 #: modules/video_filter/mosaic.c:126 modules/video_filter/panoramix.c:84
 #: modules/video_filter/wall.c:57
 msgid "Number of rows"
-msgstr ""
+msgstr "列數"
 
 #: modules/video_filter/mosaic.c:127
 msgid ""
@@ -17109,7 +16810,7 @@ msgstr ""
 #: modules/video_filter/mosaic.c:129 modules/video_filter/panoramix.c:80
 #: modules/video_filter/wall.c:53
 msgid "Number of columns"
-msgstr ""
+msgstr "行的數目"
 
 #: modules/video_filter/mosaic.c:130
 msgid ""
@@ -17161,9 +16862,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/mosaic.c:154
-#, fuzzy
 msgid "Bluescreen"
-msgstr "全螢幕"
+msgstr "藍色畫面"
 
 #: modules/video_filter/mosaic.c:155
 msgid ""
@@ -17373,14 +17073,12 @@ msgid "Name of internal OpenCV plugin filter to use"
 msgstr ""
 
 #: modules/video_filter/osdmenu.c:40
-#, fuzzy
 msgid "Configuration file"
-msgstr "VLM設定檔"
+msgstr "組態檔案"
 
 #: modules/video_filter/osdmenu.c:43
-#, fuzzy
 msgid "Configuration file for the OSD Menu"
-msgstr "組態選項"
+msgstr "OSD選單組態檔"
 
 #: modules/video_filter/osdmenu.c:44
 msgid "Path to OSD menu images"
@@ -17397,9 +17095,8 @@ msgid "You can move the OSD menu by left-clicking on it."
 msgstr ""
 
 #: modules/video_filter/osdmenu.c:55
-#, fuzzy
 msgid "Menu position"
-msgstr "Logo位置"
+msgstr "選單位置"
 
 #: modules/video_filter/osdmenu.c:57
 msgid ""
@@ -17409,9 +17106,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/osdmenu.c:61
-#, fuzzy
 msgid "Menu timeout"
-msgstr "時間"
+msgstr "選單逾時"
 
 #: modules/video_filter/osdmenu.c:63
 msgid ""
@@ -17433,9 +17129,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/osdmenu.c:116
-#, fuzzy
 msgid "On Screen Display menu"
-msgstr "畫面上顯示(OSD)"
+msgstr "On Screen Display選單"
 
 #: modules/video_filter/panoramix.c:81
 msgid ""
@@ -17736,9 +17431,8 @@ msgid "Speed of the RSS/Atom feeds (bigger is slower)."
 msgstr ""
 
 #: modules/video_filter/rss.c:125
-#, fuzzy
 msgid "Max length"
-msgstr "最大等級"
+msgstr "最大長度"
 
 #: modules/video_filter/rss.c:126
 #, fuzzy
@@ -17746,9 +17440,8 @@ msgid "Maximum number of characters displayed on the screen."
 msgstr "複製數量"
 
 #: modules/video_filter/rss.c:128
-#, fuzzy
 msgid "Refresh time"
-msgstr "重新整理清單"
+msgstr "更新時間"
 
 #: modules/video_filter/rss.c:129
 msgid ""
@@ -17771,9 +17464,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/rss.c:152
-#, fuzzy
 msgid "Text position"
-msgstr "Logo位置"
+msgstr "文字位置"
 
 #: modules/video_filter/rss.c:154
 msgid ""
@@ -17788,9 +17480,8 @@ msgid "RSS and Atom feed display"
 msgstr "畫面上顯示(OSD)"
 
 #: modules/video_filter/rv32.c:52
-#, fuzzy
 msgid "RV32 conversion filter"
-msgstr "VLM設定檔"
+msgstr "RV32轉換過濾器"
 
 #: modules/video_filter/transform.c:57
 msgid "Transform type"
@@ -17860,16 +17551,15 @@ msgstr "複製視訊過濾器"
 
 #: modules/video_output/aa.c:55
 msgid "ASCII Art"
-msgstr ""
+msgstr "ASCII Art"
 
 #: modules/video_output/aa.c:58
 msgid "ASCII-art video output"
 msgstr "ASCII-art視訊輸出"
 
 #: modules/video_output/caca.c:81
-#, fuzzy
 msgid "Color ASCII art video output"
-msgstr "彩色ASCII藝術視訊輸出"
+msgstr "彩色ASCII art視訊輸出"
 
 #: modules/video_output/directfb.c:69
 msgid "DirectFB video output http://www.directfb.org/"
@@ -17960,9 +17650,8 @@ msgstr ""
 
 #: modules/video_output/ggi.c:56 modules/video_output/x11/glx.c:101
 #: modules/video_output/x11/x11.c:52 modules/video_output/x11/xvideo.c:58
-#, fuzzy
 msgid "X11 display"
-msgstr "延遲"
+msgstr "X11顯示"
 
 #: modules/video_output/ggi.c:58
 msgid ""
@@ -17983,9 +17672,8 @@ msgid "Image format"
 msgstr "影像格式"
 
 #: modules/video_output/image.c:50
-#, fuzzy
 msgid "Format of the output images (png or jpg)."
-msgstr "設定輸出影像格式"
+msgstr "輸出影像格式(png或jpg)"
 
 #: modules/video_output/image.c:52
 #, fuzzy
@@ -18048,7 +17736,7 @@ msgstr ""
 
 #: modules/video_output/opengl.c:122 modules/video_output/opengl.c:176
 msgid "Cube"
-msgstr ""
+msgstr "立方體"
 
 #: modules/video_output/opengl.c:122 modules/video_output/opengl.c:176
 msgid "Transparent Cube"
@@ -18144,9 +17832,8 @@ msgid "Rotation speed of the OpenGL cube effect, if enabled."
 msgstr ""
 
 #: modules/video_output/opengl.c:168
-#, fuzzy
 msgid "Effect"
-msgstr "跳出"
+msgstr "效果"
 
 #: modules/video_output/opengl.c:170
 msgid "Several visual OpenGL effects are available."
@@ -18172,27 +17859,22 @@ msgid "Simple DirectMedia Layer video output"
 msgstr ""
 
 #: modules/video_output/snapshot.c:60
-#, fuzzy
 msgid "Snapshot width"
 msgstr "快照寬度"
 
 #: modules/video_output/snapshot.c:61
-#, fuzzy
 msgid "Width of the snapshot image."
 msgstr "設定快照影像的寬度"
 
 #: modules/video_output/snapshot.c:63
-#, fuzzy
 msgid "Snapshot height"
 msgstr "快照高度"
 
 #: modules/video_output/snapshot.c:64
-#, fuzzy
 msgid "Height of the snapshot image."
 msgstr "設定快照影像的高度"
 
 #: modules/video_output/snapshot.c:66
-#, fuzzy
 msgid "Chroma"
 msgstr "彩度"
 
@@ -18202,7 +17884,6 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/snapshot.c:70
-#, fuzzy
 msgid "Cache size (number of images)"
 msgstr "快取大小(影像數量)"
 
@@ -18212,7 +17893,6 @@ msgid "Snapshot cache size (number of images to keep)."
 msgstr "設定快取大小(保留影像的數量)"
 
 #: modules/video_output/snapshot.c:75
-#, fuzzy
 msgid "Snapshot module"
 msgstr "快照模組"
 
@@ -18386,9 +18066,8 @@ msgid ""
 msgstr "設定影像的色調，介於0和360之間，預設值為0"
 
 #: modules/visualization/goom.c:70
-#, fuzzy
 msgid "Goom"
-msgstr "縮放"
+msgstr "Goom"
 
 #: modules/visualization/goom.c:71
 msgid "Goom effect"
@@ -18493,9 +18172,8 @@ msgid "Determines how many sections of spectrum will exist."
 msgstr ""
 
 #: modules/visualization/visual/visual.c:89
-#, fuzzy
 msgid "Peak height"
-msgstr "視訊高度"
+msgstr "峰值高度"
 
 #: modules/visualization/visual/visual.c:91
 #, fuzzy
@@ -18539,9 +18217,504 @@ msgstr "視覺化過濾器"
 msgid "Spectrum analyser"
 msgstr "頻譜分析器"
 
-#, fuzzy
 #~ msgid "VC-1 decoder module"
-#~ msgstr "Tarkin解碼器模組"
+#~ msgstr "VC-1解碼器模組"
+
+#~ msgid "Errors"
+#~ msgstr "錯誤"
+
+#~ msgid "Login"
+#~ msgstr "登入"
+
+#~ msgid "IPv6 multicast output interface"
+#~ msgstr "IPv6群播輸出介面"
+
+#~ msgid "Podcast Link"
+#~ msgstr "Podcast連結"
+
+#~ msgid "Podcast Copyright"
+#~ msgstr "Podcast版權"
+
+#~ msgid "Podcast Category"
+#~ msgstr "Podcast分類"
+
+#~ msgid "Podcast Subtitle"
+#~ msgstr "Podcast字幕"
+
+#~ msgid "Sorted by Album"
+#~ msgstr "依專輯排序"
+
+#~ msgid "UDP/IPv4 network abstraction layer"
+#~ msgstr "UDP/IPv4網路抽象層"
+
+#~ msgid "UDP/IPv6 network abstraction layer"
+#~ msgstr "UDP/IPv6網路抽象層"
+
+#~ msgid "Automatic black border cropping."
+#~ msgstr "自動裁切黑色邊框"
+
+#~ msgid "Growl"
+#~ msgstr "Growl"
+
+#~ msgid "Vertical border width"
+#~ msgstr "垂直邊框寬度"
+
+#~ msgid "Horizontal border width"
+#~ msgstr "水平邊框寬度"
+
+#~ msgid "Create"
+#~ msgstr "建立"
+
+#~ msgid "Number of streams"
+#~ msgstr "串流數量"
+
+#~ msgid "Center-Center"
+#~ msgstr "正中"
+
+#~ msgid "Left-Center"
+#~ msgstr "左中"
+
+#~ msgid "Right-Center"
+#~ msgstr "右中"
+
+#~ msgid "Center-Top"
+#~ msgstr "中上"
+
+#~ msgid "Left-Top"
+#~ msgstr "左上"
+
+#~ msgid "Right-Top"
+#~ msgstr "右上"
+
+#~ msgid "Center-Bottom"
+#~ msgstr "中下"
+
+#~ msgid "Left-Bottom"
+#~ msgstr "左下"
+
+#~ msgid "Right-Bottom"
+#~ msgstr "右下"
+
+#~ msgid "Interfaces"
+#~ msgstr "介面"
+
+#~ msgid "Go To Position"
+#~ msgstr "前往位置"
+
+#~ msgid "VLC media player - Updates"
+#~ msgstr "VLC多媒體播放程式 - 更新"
+
+#~ msgid "Small playlist"
+#~ msgstr "小型播放清單"
+
+#~ msgid "URL : "
+#~ msgstr "URL : "
+
+#~ msgid "file size : "
+#~ msgstr "檔案大小 : "
+
+#~ msgid "Choose a mirror"
+#~ msgstr "選擇一個鏡像"
+
+#~ msgid "Jump 3 seconds backwards"
+#~ msgstr "向後跳 3 秒"
+
+#~ msgid "Jump 3 seconds forward"
+#~ msgstr "向前跳 3 秒"
+
+#~ msgid "Shout"
+#~ msgstr "Shout"
+
+#~ msgid "Open MRL"
+#~ msgstr "開啟MRL"
+
+#~ msgid "Choose audio track"
+#~ msgstr "選擇音軌"
+
+#~ msgid "Current version"
+#~ msgstr "目前的版本"
+
+#~ msgid "Your version"
+#~ msgstr "你的版本"
+
+#~ msgid "Mirror"
+#~ msgstr "鏡像"
+
+#~ msgid "Streamming"
+#~ msgstr "串流"
+
+#~ msgid "General interface setttings"
+#~ msgstr "一般介面設定"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "視訊快照目錄"
+
+#~ msgid "DCA"
+#~ msgstr "DCA"
+
+#, fuzzy
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "頻帶間的空白像素數量"
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr "頻帶間的空白像素數量 "
+
+#, fuzzy
+#~ msgid "Direct MV prediction mode. "
+#~ msgstr "DirectMedia物件解碼器 "
+
+#, fuzzy
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "啟用交錯編碼"
+
+#~ msgid "Creating AVI Index ..."
+#~ msgstr "建立AVI索引中 ..."
+
+#~ msgid "RTP/RTSP/SDP demuxer (using Live555.com)"
+#~ msgstr "RTP/RTSP/SDP解多功器(使用Live555.com)"
+
+#~ msgid "Podcast Keywords"
+#~ msgstr "Podcast關鍵字"
+
+#~ msgid "Dismiss"
+#~ msgstr "取消"
+
+#~ msgid "Timestamp"
+#~ msgstr "時間戳記"
+
+#~ msgid "MSN"
+#~ msgstr "MSN"
+
+#~ msgid " to "
+#~ msgstr " 到 "
+
+#~ msgid "Check for updates..."
+#~ msgstr "檢查更新..."
+
+#~ msgid "fps"
+#~ msgstr "fps"
+
+#~ msgid "Text rendering"
+#~ msgstr "字體表現"
+
+#~ msgid "DTS"
+#~ msgstr "DTS"
+
+#~ msgid "Check for updates now !"
+#~ msgstr "現在就檢查更新!"
+
+#~ msgid "VLM configuration"
+#~ msgstr "VLM組態檔"
+
+#~ msgid "Ascii Art"
+#~ msgstr "Ascii Art"
+
+#~ msgid "Properties"
+#~ msgstr "屬性"
+
+#~ msgid "from "
+#~ msgstr "從 "
+
+#~ msgid "Yes"
+#~ msgstr "是"
+
+#~ msgid "No"
+#~ msgstr "否"
+
+#~ msgid "Save As..."
+#~ msgstr "另存新擋..."
+
+#~ msgid "HTTP/HTTPS"
+#~ msgstr "HTTP/HTTPS"
+
+#~ msgid "UPnP"
+#~ msgstr "UPnP"
+
+#~ msgid "RSS"
+#~ msgstr "RSS"
+
+#~ msgid "Next Chapter"
+#~ msgstr "下一章"
+
+#~ msgid "Previous Chapter"
+#~ msgstr "上一章"
+
+#~ msgid "file"
+#~ msgstr "檔案"
+
+#~ msgid "Flags"
+#~ msgstr "旗標"
+
+#~ msgid "Audio Bitrate"
+#~ msgstr "音訊位元率"
+
+#~ msgid "Pop/Funk"
+#~ msgstr "流行樂/放客"
+
+#~ msgid "Psychadelic"
+#~ msgstr "迷幻音樂"
+
+#~ msgid "Acid Punk"
+#~ msgstr "迷幻龐克"
+
+#~ msgid "Acid Jazz"
+#~ msgstr "迷幻爵士"
+
+#~ msgid "Rock & Roll"
+#~ msgstr "搖滾樂"
+
+#~ msgid "Hard Rock"
+#~ msgstr "重搖滾"
+
+#~ msgid "GNOME"
+#~ msgstr "GNOME"
+
+#~ msgid "Open _Disc..."
+#~ msgstr "開啟光碟(_D)..."
+
+#~ msgid "Open a DVD or VCD"
+#~ msgstr "開啟DVD或VCD"
+
+#~ msgid "_Network Stream..."
+#~ msgstr "網路串流(_N)..."
+
+#~ msgid "_Eject Disc"
+#~ msgstr "彈出光碟(_E)"
+
+#~ msgid "Eject disc"
+#~ msgstr "彈出光碟"
+
+#~ msgid "_Title"
+#~ msgstr "標題(_T)"
+
+#~ msgid "_Chapter"
+#~ msgstr "章(_C)"
+
+#~ msgid "_Language"
+#~ msgstr "語言(_L)"
+
+#~ msgid "_Subtitles"
+#~ msgstr "字幕(_S)"
+
+#~ msgid "_Fullscreen"
+#~ msgstr "全螢幕(_F)"
+
+#~ msgid "(c) 1996-2003 the VideoLAN team"
+#~ msgstr "(c) 1996-2003 the VideoLAN team"
+
+#~ msgid "HTTP/FTP/MMS"
+#~ msgstr "HTTP/FTP/MMS"
+
+#~ msgid "Gtk+"
+#~ msgstr "Gtk+"
+
+#~ msgid "_Settings"
+#~ msgstr "設定(_S)"
+
+#~ msgid "_Help"
+#~ msgstr "說明(_H)"
+
+#~ msgid "_About..."
+#~ msgstr "關於(_A)..."
+
+#~ msgid "_Play"
+#~ msgstr "播放(_P)"
+
+#~ msgid "_Invert"
+#~ msgstr "反轉(_I)"
+
+#~ msgid "_Select"
+#~ msgstr "選擇(_S)"
+
+#~ msgid "Selected:"
+#~ msgstr "已選取:"
+
+#~ msgid "Gtk2 interface"
+#~ msgstr "Gtk2介面"
+
+#~ msgid "_New"
+#~ msgstr "新增(_N)"
+
+#~ msgid "TTL"
+#~ msgstr "TTL"
+
+#~ msgid "Ogg"
+#~ msgstr "Ogg"
+
+#~ msgid "MPEG PS"
+#~ msgstr "MPEG PS"
+
+#~ msgid "MPEG 4"
+#~ msgstr "MPEG 4"
+
+#~ msgid "MPEG 1"
+#~ msgstr "MPEG 1"
+
+#~ msgid "Quicktime"
+#~ msgstr "Quicktime"
+
+#~ msgid "http://"
+#~ msgstr "http://"
+
+#~ msgid "udp://@:1234"
+#~ msgstr "udp://@:1234"
+
+#~ msgid "udp6://@:1234"
+#~ msgstr "udp6://@:1234"
+
+#~ msgid "rtp://"
+#~ msgstr "rtp://"
+
+#~ msgid "rtp6://"
+#~ msgstr "rtp6://"
+
+#~ msgid "/dev/dsp"
+#~ msgstr "/dev/dsp"
+
+#~ msgid "/dev/video"
+#~ msgstr "/dev/video"
+
+#~ msgid "http://www.videolan.org"
+#~ msgstr "http://www.videolan.org"
+
+#~ msgid "Open a network stream"
+#~ msgstr "開啟一個網路串流"
+
+#~ msgid "Eject the DVD/CD"
+#~ msgstr "彈出DVD/CD"
+
+#~ msgid "Exit this program"
+#~ msgstr "離開這個程式"
+
+#~ msgid "About this program"
+#~ msgstr "關於這個程式"
+
+#~ msgid "Simple &Open ..."
+#~ msgstr "簡易開啟(&O)..."
+
+#~ msgid "&Eject Disc"
+#~ msgstr "彈出光碟(&E)"
+
+#~ msgid "E&xit"
+#~ msgstr "結束(&X)"
+
+#~ msgid "&File info..."
+#~ msgstr "檔案資訊(&F)..."
+
+#~ msgid ""
+#~ "(C) 1996-2003 - the VideoLAN Team\n"
+#~ "\n"
+#~ msgstr ""
+#~ "(C) 1996-2003 - the VideoLAN Team\n"
+#~ "\n"
+
+#~ msgid "Audio menu"
+#~ msgstr "音訊選單"
+
+#~ msgid "&Simple Add..."
+#~ msgstr "簡易新增(&S)..."
+
+#~ msgid "&Disable"
+#~ msgstr "停用(&D)"
+
+#~ msgid "no info"
+#~ msgstr "沒有資訊"
+
+#~ msgid "General Settings"
+#~ msgstr "一般設定"
+
+#~ msgid "Standard stream"
+#~ msgstr "標準串流"
+
+#~ msgid "Adjust"
+#~ msgstr "調整"
+
+#~ msgid "logo"
+#~ msgstr "logo"
+
+#~ msgid "X11"
+#~ msgstr "X11"
+
+#~ msgid "XOSD module"
+#~ msgstr "XOSD模組"
+
+#~ msgid "Close Menu"
+#~ msgstr "關閉選單"
+
+#~ msgid "&Title:"
+#~ msgstr "標題(&T):"
+
+#~ msgid "&Chapter:"
+#~ msgstr "章(&C):"
+
+#~ msgid "Open &file..."
+#~ msgstr "開啟檔案(&F)..."
+
+#~ msgid "Open &disc..."
+#~ msgstr "開啟光碟(&D)..."
+
+#~ msgid "&Network stream..."
+#~ msgstr "網路串流(&N)..."
+
+#~ msgid "&Hide interface"
+#~ msgstr "隱藏介面(&H)"
+
+#~ msgid "&Chapter"
+#~ msgstr "章(&C)"
+
+#~ msgid "&Language"
+#~ msgstr "語言(&L)"
+
+#~ msgid "&Subtitles"
+#~ msgstr "字幕(&S)"
+
+#~ msgid "Network Stream..."
+#~ msgstr "網路串流..."
+
+#~ msgid "&Add subtitles..."
+#~ msgstr "增加字幕(&A)..."
+
+#~ msgid "Exit"
+#~ msgstr "離開"
+
+#~ msgid "&Fullscreen"
+#~ msgstr "全螢幕(&F)"
+
+#~ msgid "Select next title"
+#~ msgstr "選擇下一標題"
+
+#~ msgid "&Mute"
+#~ msgstr "靜音(&M)"
+
+#~ msgid "Open network"
+#~ msgstr "開啟網路"
+
+#~ msgid "All files"
+#~ msgstr "所有檔案"
+
+#~ msgid "Add file"
+#~ msgstr "增加檔案"
+
+#~ msgid "Stream Output MRL"
+#~ msgstr "串流輸出MRL"
+
+#~ msgid "A_udio"
+#~ msgstr "音訊(_U)"
+
+#~ msgid "Open a File"
+#~ msgstr "開啟一個檔案"
+
+#~ msgid "Open file..."
+#~ msgstr "開啟檔案..."
+
+#~ msgid "Open disc..."
+#~ msgstr "開啟光碟..."
+
+#~ msgid "Network stream..."
+#~ msgstr "網路串流..."
 
 #, fuzzy
 #~ msgid "Ignore subtitle flag"
@@ -18567,20 +18740,8 @@ msgstr "頻譜分析器"
 #~ msgstr "CDDB標題"
 
 #, fuzzy
-#~ msgid "Errors"
-#~ msgstr "錯誤"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "循環"
-
-#, fuzzy
 #~ msgid "Console"
 #~ msgstr "控制"
-
-#, fuzzy
-#~ msgid "IPv6 multicast output interface"
-#~ msgstr "搖桿控制介面"
 
 #~ msgid "Manually added"
 #~ msgstr "手動增加"
@@ -18598,22 +18759,6 @@ msgstr "頻譜分析器"
 #, fuzzy
 #~ msgid "Listeners"
 #~ msgstr "濾波器"
-
-#, fuzzy
-#~ msgid "Podcast Link"
-#~ msgstr "位置"
-
-#, fuzzy
-#~ msgid "Podcast Copyright"
-#~ msgstr "著作權"
-
-#, fuzzy
-#~ msgid "Podcast Category"
-#~ msgstr "CDDB分類"
-
-#, fuzzy
-#~ msgid "Podcast Subtitle"
-#~ msgstr "字幕"
 
 #, fuzzy
 #~ msgid "Podcast Publication Date"
@@ -18648,28 +18793,12 @@ msgstr "頻譜分析器"
 #~ msgid "Sorted by Artist"
 #~ msgstr "依製作人排序"
 
-#, fuzzy
-#~ msgid "Sorted by Album"
-#~ msgstr "依名稱排序"
-
-#, fuzzy
-#~ msgid "UDP/IPv4 network abstraction layer"
-#~ msgstr "IPv4網路抽象層"
-
-#, fuzzy
-#~ msgid "UDP/IPv6 network abstraction layer"
-#~ msgstr "IPv6網路抽象層"
-
 #~ msgid "DAAP access"
 #~ msgstr "DAAP存取"
 
 #, fuzzy
 #~ msgid "This allows you to specify the Time-To-Live for the output stream."
 #~ msgstr "允許你指定該輸出串流的有效時間"
-
-#, fuzzy
-#~ msgid "Automatic black border cropping."
-#~ msgstr "自動修整"
 
 #~ msgid "History parameter"
 #~ msgstr "歷史參數"
@@ -18680,64 +18809,8 @@ msgstr "頻譜分析器"
 #~ msgid "Standard Play"
 #~ msgstr "標準播放"
 
-#, fuzzy
-#~ msgid "Growl"
-#~ msgstr "群組"
-
-#, fuzzy
-#~ msgid "Vertical border width"
-#~ msgstr "垂直補償"
-
-#, fuzzy
-#~ msgid "Horizontal border width"
-#~ msgstr "水平"
-
-#, fuzzy
-#~ msgid "Create"
-#~ msgstr "置中"
-
-#, fuzzy
-#~ msgid "Number of streams"
-#~ msgstr "執行緒數量"
-
 #~ msgid "Image"
 #~ msgstr "影像"
-
-#, fuzzy
-#~ msgid "Center-Center"
-#~ msgstr "置中"
-
-#, fuzzy
-#~ msgid "Left-Center"
-#~ msgstr "置中"
-
-#, fuzzy
-#~ msgid "Right-Center"
-#~ msgstr "置中"
-
-#, fuzzy
-#~ msgid "Center-Top"
-#~ msgstr "置中"
-
-#, fuzzy
-#~ msgid "Left-Top"
-#~ msgstr "左"
-
-#, fuzzy
-#~ msgid "Right-Top"
-#~ msgstr "右"
-
-#, fuzzy
-#~ msgid "Center-Bottom"
-#~ msgstr "置中"
-
-#, fuzzy
-#~ msgid "Left-Bottom"
-#~ msgstr "底部"
-
-#, fuzzy
-#~ msgid "Right-Bottom"
-#~ msgstr "底部"
 
 #~ msgid "Adjust Image"
 #~ msgstr "調整影像"
@@ -18797,10 +18870,6 @@ msgstr "頻譜分析器"
 #~ msgid "Select the key to turn off audio volume."
 #~ msgstr "選擇按鍵以關閉音訊音量"
 
-#, fuzzy
-#~ msgid "Interfaces"
-#~ msgstr "介面"
-
 #~ msgid "Standard filesystem file input"
 #~ msgstr "標準檔案系統檔案輸入"
 
@@ -18820,10 +18889,6 @@ msgstr "頻譜分析器"
 
 #~ msgid "Allows you to specify the output video height."
 #~ msgstr "允許你指定輸出視訊高度"
-
-#, fuzzy
-#~ msgid "Go To Position"
-#~ msgstr "Logo位置"
 
 #, fuzzy
 #~ msgid "Go to specific position"
@@ -18862,10 +18927,6 @@ msgstr "頻譜分析器"
 
 #~ msgid "Subtitles options"
 #~ msgstr "字幕選項"
-
-#, fuzzy
-#~ msgid "VLC media player - Updates"
-#~ msgstr "VLC多媒體播放程式"
 
 #~ msgid "Show bookmarks dialog when the interface starts."
 #~ msgstr "介面啟動時顯示書籤對話框"
@@ -18984,10 +19045,6 @@ msgstr "頻譜分析器"
 #~ msgstr "陰影的補償像素"
 
 #, fuzzy
-#~ msgid "Small playlist"
-#~ msgstr "儲存播放清單"
-
-#, fuzzy
 #~ msgid "Allows you to set the desired frame rate."
 #~ msgstr "允許你指定串流輸出的多工器"
 
@@ -19019,18 +19076,6 @@ msgstr "頻譜分析器"
 #~ msgid "Item Info"
 #~ msgstr "項目資訊"
 
-#, fuzzy
-#~ msgid "URL : "
-#~ msgstr "網址"
-
-#, fuzzy
-#~ msgid "file size : "
-#~ msgstr "視訊大小"
-
-#, fuzzy
-#~ msgid "Choose a mirror"
-#~ msgstr "選擇目錄"
-
 #~ msgid "Time To Live"
 #~ msgstr "有效時間"
 
@@ -19043,10 +19088,6 @@ msgstr "頻譜分析器"
 #~ msgid "CoreAudio output"
 #~ msgstr "CoreAudio輸出"
 
-#, fuzzy
-#~ msgid "Jump 3 seconds backwards"
-#~ msgstr "向後10秒鐘"
-
 #~ msgid "Jump 10 seconds backwards"
 #~ msgstr "向後10秒鐘"
 
@@ -19058,10 +19099,6 @@ msgstr "頻譜分析器"
 
 #~ msgid "Jump 5 minutes backwards"
 #~ msgstr "向後5分鐘"
-
-#, fuzzy
-#~ msgid "Jump 3 seconds forward"
-#~ msgstr "向前10秒鐘"
 
 #~ msgid "Jump 10 seconds forward"
 #~ msgstr "向前10秒鐘"
@@ -19079,20 +19116,12 @@ msgstr "頻譜分析器"
 #~ msgstr "選擇熱鍵以向後5分鐘"
 
 #, fuzzy
-#~ msgid "Shout"
-#~ msgstr "快照"
-
-#, fuzzy
 #~ msgid "Windows GAPI"
 #~ msgstr "視窗"
 
 #, fuzzy
 #~ msgid "Windows GDI"
 #~ msgstr "視窗"
-
-#, fuzzy
-#~ msgid "Open MRL"
-#~ msgstr "開啟"
 
 #~ msgid "Audio output volume"
 #~ msgstr "輸出音量"
@@ -19106,31 +19135,11 @@ msgstr "頻譜分析器"
 #~ msgid "Choose programs"
 #~ msgstr "選擇程式"
 
-#, fuzzy
-#~ msgid "Choose audio track"
-#~ msgstr "循環音軌"
-
 #~ msgid "Choose subtitles track"
 #~ msgstr "選擇字幕軌"
 
 #~ msgid "live.com (RTSP/RTP/SDP) demuxer"
 #~ msgstr "live.com (RTSP/RTP/SDP)解多工器"
-
-#, fuzzy
-#~ msgid "Current version"
-#~ msgstr "色彩反向"
-
-#, fuzzy
-#~ msgid "Your version"
-#~ msgstr "色彩反向"
-
-#, fuzzy
-#~ msgid "Mirror"
-#~ msgstr "錯誤"
-
-#, fuzzy
-#~ msgid "Streamming"
-#~ msgstr "串流"
 
 #~ msgid "Channel mixer"
 #~ msgstr "頻道混音器"
@@ -19647,3 +19656,22 @@ msgstr "頻譜分析器"
 
 #~ msgid "Control"
 #~ msgstr "控制"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "一般介面設定"
+
+#, fuzzy
+#~ msgid "You have to select two bookmarks."
+#~ msgstr "你必須選擇兩個書籤"
+
+#~ msgid ""
+#~ "Allows you to specify the audio bitrate used for the streaming output."
+#~ msgstr "允許你指定串流輸出的音訊位元率"
+
+#~ msgid ""
+#~ "Allows you to specify the audio sample rate used for the streaming output."
+#~ msgstr "允許你指定串流輸出的音訊採樣率"
+
+#~ msgid "Jump"
+#~ msgstr "跳至"

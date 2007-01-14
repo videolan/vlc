@@ -30,11 +30,11 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:82
 #: modules/visualization/visual/visual.c:113
 msgid "General"
-msgstr ""
+msgstr "সাধারণ"
 
 #: include/vlc_config_cat.h:43 modules/misc/dummy/dummy.c:65
 msgid "Interface"
-msgstr ""
+msgstr "ইন্টারফেস"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for VLC's interfaces"
@@ -73,7 +73,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:850
 #: modules/gui/wxwidgets/extrapanel.cpp:178 modules/stream_out/transcode.c:258
 msgid "Audio"
-msgstr ""
+msgstr "অডিও"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio settings"
@@ -85,9 +85,8 @@ msgstr ""
 
 #: include/vlc_config_cat.h:64 include/vlc_config_cat.h:89
 #: src/video_output/video_output.c:429
-#, fuzzy
 msgid "Filters"
-msgstr "_নথী"
+msgstr "ফিল্টার"
 
 #: include/vlc_config_cat.h:66
 msgid "Audio filters are used to postprocess the audio stream."
@@ -96,7 +95,7 @@ msgstr ""
 #: include/vlc_config_cat.h:68 src/audio_output/input.c:84
 #: modules/gui/macosx/intf.m:569 modules/gui/macosx/intf.m:570
 msgid "Visualizations"
-msgstr ""
+msgstr "দৃশ্যায়ণ"
 
 #: include/vlc_config_cat.h:70 src/audio_output/input.c:158
 msgid "Audio visualizations"
@@ -114,7 +113,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:578
 #: modules/gui/wxwidgets/menus.cpp:282 modules/stream_out/transcode.c:290
 msgid "Miscellaneous"
-msgstr ""
+msgstr "বিবিধ"
 
 #: include/vlc_config_cat.h:76
 msgid "Miscellaneous audio settings and modules."
@@ -129,17 +128,16 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:811
 #: modules/gui/wxwidgets/extrapanel.cpp:176 modules/misc/dummy/dummy.c:95
 #: modules/stream_out/transcode.c:202
-#, fuzzy
 msgid "Video"
-msgstr "_দশরন"
+msgstr "ভিডিও"
 
 #: include/vlc_config_cat.h:80
 msgid "Video settings"
-msgstr ""
+msgstr "ভিডিও সেটিংস"
 
 #: include/vlc_config_cat.h:82 include/vlc_config_cat.h:83
 msgid "General video settings"
-msgstr ""
+msgstr "সাধারণ ভিডিও সেটিংস"
 
 #: include/vlc_config_cat.h:87
 msgid "Choose your preferred video output and configure it here."
@@ -480,7 +478,7 @@ msgstr ""
 #: modules/gui/wxwidgets/interface.cpp:1234
 #: modules/gui/wxwidgets/menus.cpp:266 modules/gui/wxwidgets/menus.cpp:277
 msgid "Play"
-msgstr ""
+msgstr "চালাও"
 
 #: include/vlc_intf_strings.h:49
 msgid "Fetch information"
@@ -1004,12 +1002,12 @@ msgstr ""
 #: modules/gui/macosx/intf.m:556 modules/gui/macosx/intf.m:557
 #: modules/gui/macosx/open.m:171 modules/gui/wxwidgets/dialogs/open.cpp:763
 msgid "Chapter"
-msgstr ""
+msgstr "অধ্যায়"
 
 #: src/input/var.c:148 modules/access/vcdx/info.c:302
 #: modules/access/vcdx/info.c:303 modules/gui/beos/InterfaceWindow.cpp:292
 msgid "Navigation"
-msgstr ""
+msgstr "নেভিগেশন"
 
 #: src/input/var.c:163 modules/gui/macosx/intf.m:580
 #: modules/gui/macosx/intf.m:581
@@ -6147,7 +6145,7 @@ msgstr ""
 #: modules/access/v4l2.c:53 modules/gui/macosx/open.m:169
 #: modules/gui/wxwidgets/dialogs/open.cpp:721
 msgid "Device name"
-msgstr ""
+msgstr "যন্ত্রের নাম"
 
 #: modules/access/v4l2.c:55
 msgid ""
@@ -10236,7 +10234,7 @@ msgstr ""
 
 #: modules/gui/macosx/about.m:73 modules/gui/macosx/intf.m:511
 msgid "About VLC media player"
-msgstr ""
+msgstr "ভিএলসি মিডিয়া প্লেয়ার পরিচিতি"
 
 #: modules/gui/macosx/about.m:81
 #, c-format
@@ -10251,17 +10249,17 @@ msgstr ""
 #: modules/gui/macosx/bookmarks.m:92 modules/gui/macosx/intf.m:601
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:139
 msgid "Bookmarks"
-msgstr ""
+msgstr "বুকমার্ক"
 
 #: modules/gui/macosx/bookmarks.m:93
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:159
 msgid "Add"
-msgstr ""
+msgstr "যোগ করো"
 
 #: modules/gui/macosx/bookmarks.m:94 modules/gui/macosx/intf.m:536
 #: modules/gui/wxwidgets/dialogs/messages.cpp:77
 msgid "Clear"
-msgstr ""
+msgstr "পরিষ্কার করো"
 
 #: modules/gui/macosx/bookmarks.m:96
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:167
@@ -10274,7 +10272,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:99
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:198
 msgid "Time"
-msgstr ""
+msgstr "সময়"
 
 #: modules/gui/macosx/bookmarks.m:136 modules/gui/macosx/playlist.m:663
 #, fuzzy
@@ -10406,7 +10404,7 @@ msgstr ""
 #: modules/gui/wxwidgets/interface.cpp:1228
 #: modules/gui/wxwidgets/menus.cpp:268 modules/misc/notify/xosd.c:235
 msgid "Pause"
-msgstr ""
+msgstr "স্থগিত"
 
 #: modules/gui/macosx/equalizer.m:140 modules/gui/wxwidgets/extrapanel.cpp:471
 msgid "2 Pass"
@@ -10539,7 +10537,7 @@ msgstr ""
 
 #: modules/gui/macosx/extended.m:115 modules/gui/wxwidgets/extrapanel.cpp:244
 msgid "Gamma"
-msgstr ""
+msgstr "গামা"
 
 #: modules/gui/macosx/extended.m:117 modules/gui/wxwidgets/extrapanel.cpp:239
 msgid "Saturation"
@@ -10579,7 +10577,7 @@ msgstr ""
 #: modules/gui/macosx/interaction.m:139
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:81
 msgid "Error"
-msgstr ""
+msgstr "ত্রুটি"
 
 #: modules/gui/macosx/interaction.m:219 modules/gui/macosx/interaction.m:285
 #, c-format
@@ -10607,7 +10605,7 @@ msgstr ""
 #: modules/gui/pda/pda_interface.c:1355
 #: modules/gui/qt4/ui/main_interface.ui:21
 msgid "VLC media player"
-msgstr ""
+msgstr "ভিএলসি মিডিয়া প্লেয়ার"
 
 #: modules/gui/macosx/intf.m:508
 msgid "Open CrashLog"
@@ -10619,7 +10617,7 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:514
 msgid "Preferences..."
-msgstr ""
+msgstr "পছন্দ..."
 
 #: modules/gui/macosx/intf.m:517
 msgid "Services"
@@ -10639,12 +10637,11 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:521 modules/gui/wxwidgets/interface.cpp:1520
 msgid "Quit VLC"
-msgstr ""
+msgstr "ভিএলসি প্রস্থান করো"
 
 #: modules/gui/macosx/intf.m:523
-#, fuzzy
 msgid "1:File"
-msgstr "_নথী"
+msgstr "1:ফাইল"
 
 #: modules/gui/macosx/intf.m:524
 msgid "Open File..."
@@ -10723,7 +10720,7 @@ msgstr ""
 #: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:348
 #: modules/gui/macosx/playlist.m:430
 msgid "Information"
-msgstr ""
+msgstr "তথ্য"
 
 #: modules/gui/macosx/intf.m:607
 msgid "Bring All to Front"
@@ -10731,7 +10728,7 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:609
 msgid "Help"
-msgstr ""
+msgstr "সহায়িকা"
 
 #: modules/gui/macosx/intf.m:610
 msgid "ReadMe..."
@@ -10739,19 +10736,19 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:611
 msgid "Online Documentation"
-msgstr ""
+msgstr "অনলাইন ডকুমেন্টেশন"
 
 #: modules/gui/macosx/intf.m:612
 msgid "Report a Bug"
-msgstr ""
+msgstr "একটি ত্রুটি রিপোর্ট করুন"
 
 #: modules/gui/macosx/intf.m:613
 msgid "VideoLAN Website"
-msgstr ""
+msgstr "ভিডিওল্যান ওয়েবসাইট"
 
 #: modules/gui/macosx/intf.m:614
 msgid "License"
-msgstr ""
+msgstr "লাইসেন্স"
 
 #: modules/gui/macosx/intf.m:615
 msgid "Make a donation"
@@ -10764,7 +10761,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:1222
 #, c-format
 msgid "Volume: %d%%"
-msgstr ""
+msgstr "ভলিউম: %d%%"
 
 #: modules/gui/macosx/intf.m:1857
 msgid "No CrashLog found"
@@ -10785,7 +10782,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:54
 msgid "Video device"
-msgstr ""
+msgstr "ভিডিও যন্ত্র"
 
 #: modules/gui/macosx/macosx.m:55
 msgid ""
@@ -10820,7 +10817,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:73
 msgid "Use as Desktop Background"
-msgstr ""
+msgstr "ডেস্কটপ পটভূমি হিসেবে ব্যবহার করো"
 
 #: modules/gui/macosx/macosx.m:74
 msgid ""
@@ -10862,7 +10859,7 @@ msgstr ""
 
 #: modules/gui/macosx/open.m:156
 msgid "Open Source"
-msgstr ""
+msgstr "মুক্ত উৎস"
 
 #: modules/gui/macosx/open.m:157 modules/gui/wince/open.cpp:130
 msgid "Media Resource Locator (MRL)"
@@ -10878,7 +10875,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:501
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:82
 msgid "Browse..."
-msgstr ""
+msgstr "ব্রাউজ করো..."
 
 #: modules/gui/macosx/open.m:167
 msgid "Treat as a pipe rather than as a file"
@@ -10895,13 +10892,13 @@ msgstr ""
 #: modules/gui/macosx/open.m:176 modules/gui/macosx/open.m:608
 #: modules/gui/wxwidgets/dialogs/open.cpp:695
 msgid "DVD"
-msgstr ""
+msgstr "ডিভিডি"
 
 #: modules/gui/macosx/open.m:181 modules/gui/macosx/output.m:146
 #: modules/gui/wxwidgets/dialogs/open.cpp:847
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:520
 msgid "Address"
-msgstr ""
+msgstr "ঠিকানা"
 
 #: modules/gui/macosx/open.m:186 modules/gui/macosx/open.m:725
 #: modules/gui/wxwidgets/dialogs/open.cpp:803
@@ -11617,7 +11614,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:484
 #: modules/gui/wxwidgets/extrapanel.cpp:317
 msgid "More Info"
-msgstr ""
+msgstr "অতিরিক্ত তথ্য"
 
 #: modules/gui/macosx/wizard.m:372
 msgid ""
@@ -13525,41 +13522,39 @@ msgstr ""
 
 #: modules/gui/wxwidgets/interface.cpp:617
 msgid "About..."
-msgstr ""
+msgstr "পরিচিতি..."
 
 #: modules/gui/wxwidgets/interface.cpp:619
 msgid "Check for Updates..."
 msgstr ""
 
 #: modules/gui/wxwidgets/interface.cpp:623
-#, fuzzy
 msgid "&File"
-msgstr "_নথী"
+msgstr "ফাইল (&ফ)"
 
 #: modules/gui/wxwidgets/interface.cpp:624
-#, fuzzy
 msgid "&View"
-msgstr "_দশরন"
+msgstr "প্রদর্শন (&দ)"
 
 #: modules/gui/wxwidgets/interface.cpp:625
 msgid "&Settings"
-msgstr ""
+msgstr "সেটিংস (&ট)"
 
 #: modules/gui/wxwidgets/interface.cpp:626
 msgid "&Audio"
-msgstr ""
+msgstr "অডিও (&অ)"
 
 #: modules/gui/wxwidgets/interface.cpp:627
 msgid "&Video"
-msgstr ""
+msgstr "ভিডিও (&ভ)"
 
 #: modules/gui/wxwidgets/interface.cpp:628
 msgid "&Navigation"
-msgstr ""
+msgstr "নেভিগেশন (&ন)"
 
 #: modules/gui/wxwidgets/interface.cpp:629
 msgid "&Help"
-msgstr ""
+msgstr "সহায়িকা (&স)"
 
 #: modules/gui/wxwidgets/interface.cpp:689
 #: modules/gui/wxwidgets/interface.cpp:700
@@ -13610,7 +13605,7 @@ msgstr ""
 #: modules/gui/wxwidgets/interface.cpp:963
 #, c-format
 msgid "About %s"
-msgstr ""
+msgstr "%s পরিচিতি"
 
 #: modules/gui/wxwidgets/interface.cpp:1531
 msgid "Show/Hide Interface"
@@ -13650,7 +13645,7 @@ msgstr ""
 
 #: modules/gui/wxwidgets/menus.cpp:575 modules/gui/wxwidgets/menus.cpp:602
 msgid "Empty"
-msgstr ""
+msgstr "খালি"
 
 #: modules/gui/wxwidgets/streamdata.cpp:31
 msgid "MPEG-1 Video codec (useable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
@@ -17778,6 +17773,89 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr ""
 
+#~ msgid "_Title"
+#~ msgstr "শিরোনাম (_শ)"
+
+#, fuzzy
+#~ msgid "Listeners"
+#~ msgstr "_নথী"
+
+#~ msgid " "
+#~ msgstr " "
+
+#, fuzzy
+#~ msgid "Choose audio track"
+#~ msgstr "কাজ েশষ"
+
+#~ msgid "_Chapter"
+#~ msgstr "অধ্যায় (_অ)"
+
+#~ msgid "_Language"
+#~ msgstr "ভাষা (_ভ)"
+
+#~ msgid "_Fullscreen"
+#~ msgstr "পূর্ণপর্দা (_ণ)"
+
+#~ msgid "_Audio"
+#~ msgstr "অডিও (_অ)"
+
+#~ msgid "_Video"
+#~ msgstr "ভিডিও (_ভ)"
+
+#~ msgid "Net"
+#~ msgstr "নেট"
+
+#~ msgid "Fast"
+#~ msgstr "দ্রুত"
+
+#~ msgid "Prev"
+#~ msgstr "পূর্ববর্তী"
+
+#~ msgid "Title:"
+#~ msgstr "শিরোনাম:"
+
+#~ msgid "Chapter:"
+#~ msgstr "অধ্যায়"
+
+#~ msgid "Path:"
+#~ msgstr "পাথ:"
+
+#~ msgid "_Close"
+#~ msgstr "বন্ধ (_ব)"
+
+#~ msgid "E_xit"
+#~ msgstr "বন্ধ (_প)"
+
+#~ msgid "_Settings"
+#~ msgstr "সেটিংস (_ট)"
+
+#~ msgid "_Help"
+#~ msgstr "সহায়িকা (_স)"
+
+#~ msgid "_About..."
+#~ msgstr "পরিচিতি... (_প)"
+
+#~ msgid "About this application"
+#~ msgstr "এই অ্যাপ্লিকেশনের পরিচিতি"
+
+#~ msgid "_Play"
+#~ msgstr "চালাও (_চ)"
+
+#~ msgid "Authors"
+#~ msgstr "লেখকবৃন্দ"
+
+#~ msgid "_New"
+#~ msgstr "নতুন (_ন)"
+
+#~ msgid "_Edit"
+#~ msgstr "সম্পাদনা (_ম)"
+
+#~ msgid "_About"
+#~ msgstr "পরিচিতি (_প)"
+
+#~ msgid "Languages"
+#~ msgstr "ভাষাসমূহ"
+
 #, fuzzy
 #~ msgid "Line"
 #~ msgstr "_নথী"
@@ -17789,10 +17867,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Choose the program"
 #~ msgstr "কাজ েশষ"
-
-#, fuzzy
-#~ msgid "_Title"
-#~ msgstr "_নথী"
 
 #, fuzzy
 #~ msgid "Switch program"

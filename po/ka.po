@@ -18535,6 +18535,124 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr "სპექტრის ანალიზატორი"
 
+#~ msgid "General interface setttings"
+#~ msgstr "ინტერფეისის ზოგადი პარამეტრები"
+
+#, fuzzy
+#~ msgid "Video snapshot directory"
+#~ msgstr "ვიდეო დირექტორია"
+
+#, fuzzy
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "B კადრები I და კადრები."
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr "B კადრები I და კადრები. "
+
+#, fuzzy
+#~ msgid "Sets the initial buffer occupancy as a fraction of the buffer size."
+#~ msgstr "a სიდიდე."
+
+#, fuzzy
+#~ msgid "Playlist metademux"
+#~ msgstr "დასაკვრელი სია"
+
+#, fuzzy
+#~ msgid "Image"
+#~ msgstr "სურათი"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "დრო"
+
+#, fuzzy
+#~ msgid "Sorted by Artist"
+#~ msgstr "სორტირება გეზი"
+
+#, fuzzy
+#~ msgid ""
+#~ "Pictures coming from the picture video outputs will be delayed accord to "
+#~ "thi value (in milliseconds, should be >= 100 ms). For high values, you "
+#~ "will need to raise caching values."
+#~ msgstr "სურათები მწ -სკენ და."
+
+#, fuzzy
+#~ msgid "A file containing a simple playlist"
+#~ msgstr "აღწერა სია"
+
+#, fuzzy
+#~ msgid "Time format string (%Y%m%d %H%M%S)"
+#~ msgstr "დრო M S"
+
+#, fuzzy
+#~ msgid "Time overlay"
+#~ msgstr "დრო"
+
+#, fuzzy
+#~ msgid "Time display sub filter"
+#~ msgstr "დრო"
+
+#, fuzzy
+#~ msgid "Check for updates..."
+#~ msgstr "შემოწმება."
+
+#, fuzzy
+#~ msgid "delay"
+#~ msgstr "დაყოვნება"
+
+#, fuzzy
+#~ msgid "fps"
+#~ msgstr "ftp"
+
+#~ msgid "More info"
+#~ msgstr "მეტი ინფორმაცია"
+
+#~ msgid "Control interface settings"
+#~ msgstr "მართვის ინტერფეისის პარამეტრები"
+
+#~ msgid "Interfaces"
+#~ msgstr "ინტერფეისები"
+
+#, fuzzy
+#~ msgid "Go To Position"
+#~ msgstr "ლოგოს პოზიცია"
+
+#~ msgid "Name of DVD device to read from."
+#~ msgstr "წამკითხველი DVD მოწყობილობის სახელი"
+
+#~ msgid "VLC media player - Updates"
+#~ msgstr "VLC მედია დამკვრელი - განახლებელი"
+
+#~ msgid "VLM configuration"
+#~ msgstr "VLM კონფიგურაცია"
+
+#~ msgid "Font filename"
+#~ msgstr "შრიფტის ფაილის სახელი"
+
+#, fuzzy
+#~ msgid "Podcast Service Discovery"
+#~ msgstr "სერვისი"
+
+#, fuzzy
+#~ msgid "IPv4-SAP listening"
+#~ msgstr "SAP"
+
+#, fuzzy
+#~ msgid "IPv6-SAP listening"
+#~ msgstr "SAP"
+
+#~ msgid "Height in pixels"
+#~ msgstr "სიმაღლე პიქსელებში"
+
+#~ msgid "Width in pixels"
+#~ msgstr "სიგანე პიქსელებში"
+
+#~ msgid "Small playlist"
+#~ msgstr "პატარა სია"
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "ვიდეო ფილტრის მოდული"
@@ -18924,3 +19042,131 @@ msgstr "სპექტრის ანალიზატორი"
 #, fuzzy
 #~ msgid "Maximum number of Shoutcast radio streams which would be listed."
 #~ msgstr "რიცხვი ის."
+
+#, fuzzy
+#~ msgid "Loop filter"
+#~ msgstr "ლოგო"
+
+#, fuzzy
+#~ msgid "Deblocking loop filter (increases quality)."
+#~ msgstr "გამოყენება."
+
+#~ msgid "Filter twice the audio"
+#~ msgstr "აუდიოს ორჯერ ფილტრირება"
+
+#, fuzzy
+#~ msgid "Timeout of subpictures"
+#~ msgstr "დაყოვნების დრო"
+
+#, fuzzy
+#~ msgid "Select how stereo streams will be handled"
+#~ msgstr "სტერეო"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "Telnet ინტერფეისის ჰოსტი"
+
+#~ msgid "Telnet Interface port"
+#~ msgstr "Telnet ინტერფეისის პორტი"
+
+#~ msgid "Telnet Interface password"
+#~ msgstr "Telnet ინტერფეისის პაროლი"
+
+#, fuzzy
+#~ msgid "Go to specific position"
+#~ msgstr "ლოგოს პოზიცია"
+
+#, fuzzy
+#~ msgid ""
+#~ "Choose a number corresponding to a screen in you video device selection "
+#~ "menu and this screen will be used by default as the screen for "
+#~ "'fullscreen'."
+#~ msgstr "არჩევა a რიცხვი -სკენ a და ნაგულისხმევი."
+
+#, fuzzy
+#~ msgid "Override"
+#~ msgstr "ვიდეო"
+
+#, fuzzy
+#~ msgid "Output Options"
+#~ msgstr "ნიშნულება"
+
+#~ msgid "Miscellaneous options"
+#~ msgstr "სხვადასხვა ოფციები"
+
+#~ msgid "Subtitles options"
+#~ msgstr "ტიტრების ოფციები"
+
+#, fuzzy
+#~ msgid "Show taskbar entry"
+#~ msgstr "ანახე"
+
+#, fuzzy
+#~ msgid "The size of the fonts used by the osd module"
+#~ msgstr "სიდიდე"
+
+#, fuzzy
+#~ msgid ""
+#~ "Defines the delay before resumed TLS sessions will be expired (in "
+#~ "seconds)."
+#~ msgstr "წამი."
+
+#, fuzzy
+#~ msgid "Assigns a program number to each PMT"
+#~ msgstr "a პროგრამა რიცხვი -სკენ"
+
+#, fuzzy
+#~ msgid "Podcast '|' (pipe) seperated URLs list"
+#~ msgstr "ვებმისამართები"
+
+#, fuzzy
+#~ msgid "Output URL (deprecated)"
+#~ msgstr "URL"
+
+#, fuzzy
+#~ msgid "List of video output modules"
+#~ msgstr "სია"
+
+#, fuzzy
+#~ msgid "Alpha blending (0 -> 255). Default is 255"
+#~ msgstr "ნაგულისხმევი"
+
+#, fuzzy
+#~ msgid "Order as a comma separated list of picture-id(s)"
+#~ msgstr "წესრიგი a"
+
+#, fuzzy
+#~ msgid "Timeout of OSD menu"
+#~ msgstr "დაყოვნების დრო"
+
+#, fuzzy
+#~ msgid "Update speed of OSD menu"
+#~ msgstr "განახლება"
+
+#, fuzzy
+#~ msgid "RSS/Atom feed URLs"
+#~ msgstr "ვებმისამართები"
+
+#, fuzzy
+#~ msgid "RSS/Atom feed speed"
+#~ msgstr "ვებმისამართები"
+
+#, fuzzy
+#~ msgid ""
+#~ "If the OpenGL cube effect is enabled, this controls its rotation speed."
+#~ msgstr "OpenGL ჩართული."
+
+#, fuzzy
+#~ msgid "Vertical offset in pixels of the displayed text"
+#~ msgstr "პიქსელი"
+
+#, fuzzy
+#~ msgid "Offset in pixels of the shadow"
+#~ msgstr "წანაცვლება პიქსელი"
+
+#~ msgid "Podcast playlist import"
+#~ msgstr "Podcast დასაკრავი სიის იმპოტი"
+
+#, fuzzy
+#~ msgid "Text subtitles demux"
+#~ msgstr "ტექსტი"

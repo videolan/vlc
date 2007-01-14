@@ -18400,6 +18400,33 @@ msgstr ""
 msgid "Spectrum analyser"
 msgstr "Spektrum analizörü"
 
+#~ msgid "General interface setttings"
+#~ msgstr "Genel arayüz ayarları"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Video enstantane klasörü"
+
+#, fuzzy
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "Geçmeli video kodlama etkin"
+
+#, fuzzy
+#~ msgid "PSNR calculation"
+#~ msgstr "Doyma/Doygunluk"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "Zaman kaydırma"
+
+#~ msgid "Text rendering"
+#~ msgstr "Metin gösterimi"
+
+#~ msgid "Save As..."
+#~ msgstr "Farklı Kaydet..."
+
+#~ msgid "Pause stream"
+#~ msgstr "Akışı duraklat"
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Video süzgeç modülü"
@@ -19409,3 +19436,13 @@ msgstr "Spektrum analizörü"
 #, fuzzy
 #~ msgid "Dummy VF"
 #~ msgstr "Boş/Aptal"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "Telnet Arayüzü portu"
+
+#~ msgid "Random effect"
+#~ msgstr "Rastgele efekt"
+
+#~ msgid "Jump"
+#~ msgstr "Atla"

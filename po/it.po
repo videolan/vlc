@@ -13514,7 +13514,6 @@ msgid "Next track"
 msgstr "Traccia successiva"
 
 #: modules/gui/qt4/qt4.cpp:47
-#, fuzzy
 msgid "Qt interface"
 msgstr "interfaccia Qt"
 
@@ -19319,6 +19318,92 @@ msgstr "Filtro visualizzatore"
 msgid "Spectrum analyser"
 msgstr "Analizzatore di spettro"
 
+#~ msgid "General interface setttings"
+#~ msgstr "Impostazioni generali dell'interfaccia"
+
+#~ msgid "Video snapshot directory"
+#~ msgstr "Cartella delle schermate video catturate"
+
+#, fuzzy
+#~ msgid ""
+#~ "print help for VLC and all it's modules (can be combined with --advanced)"
+#~ msgstr "mostra l'aiuto su un modulo (puo' essere combinato con --advanced)"
+
+#, fuzzy
+#~ msgid "Number of consecutive B-frames between I and P-frames. (1 to 16)"
+#~ msgstr "Pixel bianchi tra le bande."
+
+#, fuzzy
+#~ msgid ""
+#~ "Force the specified number of consecutive B-frames to be used, except "
+#~ "possibly before an I-frame. "
+#~ msgstr "Pixel bianchi tra le bande. "
+
+#, fuzzy
+#~ msgid "Allowed variance in average. bitrate (in kbits/s)."
+#~ msgstr "Seleziona la sorgente a più alto bitrate"
+
+#, fuzzy
+#~ msgid "Sets a maximum local bitrate in kbits/s."
+#~ msgstr "Seleziona la sorgente a più alto bitrate"
+
+#, fuzzy
+#~ msgid "Averaging period for the maximum local bitrate in kbits."
+#~ msgstr "Seleziona la sorgente a più alto bitrate"
+
+#, fuzzy
+#~ msgid "QP curve compression. (0.0=CBR to 1.0=QCP)"
+#~ msgstr "Compressione dinamica DTS"
+
+#, fuzzy
+#~ msgid "Direct MV prediction mode. "
+#~ msgstr "Decodifica DirectMedia Object "
+
+#, fuzzy
+#~ msgid "Ignore chroma in motion estimation"
+#~ msgstr "Abilita predizione di movimento"
+
+#, fuzzy
+#~ msgid "PSNR calculation"
+#~ msgstr "Saturazione"
+
+#, fuzzy
+#~ msgid "Image"
+#~ msgstr "Dimensione Immagine"
+
+#, fuzzy
+#~ msgid "Timestamp"
+#~ msgstr "Posizione del logo"
+
+#~ msgid "Text rendering"
+#~ msgstr "Rendering del testo"
+
+#, fuzzy
+#~ msgid "Analyse mode"
+#~ msgstr "Modalità silenziosa"
+
+#~ msgid "Save As..."
+#~ msgstr "Salva con Nome..."
+
+#, fuzzy
+#~ msgid "RSS"
+#~ msgstr "OSS"
+
+#~ msgid "Text renderer settings"
+#~ msgstr "Impostazioni di visualizzazione dei testi"
+
+#~ msgid "Open a file"
+#~ msgstr "Apri un File"
+
+#~ msgid "Select angle"
+#~ msgstr "Seleziona angolo"
+
+#~ msgid "All files"
+#~ msgstr "Tutti i files"
+
+#~ msgid "Add file"
+#~ msgstr "Aggiungi file"
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "modulo decodifica flac"
@@ -23340,3 +23425,91 @@ msgstr "Analizzatore di spettro"
 
 #~ msgid "About vlc"
 #~ msgstr "Info su vlc"
+
+#, fuzzy
+#~ msgid "Telnet Interface host"
+#~ msgstr "Porta dell'interfaccia telnet"
+
+#, fuzzy
+#~ msgid "You have to select two bookmarks."
+#~ msgstr "E' necessario selezionare due segnalibri"
+
+#, fuzzy
+#~ msgid "Output URL (deprecated)"
+#~ msgstr "URL di uscita (deprecato)"
+
+#~ msgid "List of video output modules"
+#~ msgstr "Elenco moduli di uscita video"
+
+#~ msgid "You can choose the default scaling mode."
+#~ msgstr "E' possibilie scegliere il modo di ridimensionamento."
+
+#~ msgid "choose the screen to be used for fullscreen mode."
+#~ msgstr "scelta dello schermo per il modo a schermo intero."
+
+#~ msgid "Network interface address"
+#~ msgstr "Indirizzo interfaccia di rete"
+
+#~ msgid "Motion threshold"
+#~ msgstr "Soglia di movimento"
+
+#~ msgid "Show tooltips"
+#~ msgstr "Mostra suggerimenti"
+
+#~ msgid "Select audio channel"
+#~ msgstr "Seleziona canale audio"
+
+#~ msgid "Invert"
+#~ msgstr "Inverti"
+
+#~ msgid "Close the window"
+#~ msgstr "Chiudi la finestra"
+
+#~ msgid "Jump"
+#~ msgstr "Salta"
+
+#~ msgid "Video Filters"
+#~ msgstr "Filtri Video"
+
+#~ msgid ""
+#~ "Allows you to modify the user name that will be used for the connection "
+#~ "(Basic authentication only)."
+#~ msgstr ""
+#~ "Permette di specificare il nome utente da utilizzare per la connessione "
+#~ "HTTP (solo autentificazione Basic)."
+
+#~ msgid "Repeat"
+#~ msgstr "Ripeti"
+
+#~ msgid "X11 OpenGL provider"
+#~ msgstr "Fornitore OpenGL X11"
+
+#~ msgid "Enter a name for the new group:"
+#~ msgstr "Specificare un nome per il nuovo gruppo:"
+
+#~ msgid "Interface menu"
+#~ msgstr "Menu Interfaccia"
+
+#~ msgid "Welcome, streaming wizard"
+#~ msgstr "Benvenuto nel wizard di trasmissione"
+
+#~ msgid "Codec download"
+#~ msgstr "Scarica il codec"
+
+#~ msgid "Advanced open"
+#~ msgstr "Opzioni d'apertura avanzate"
+
+#~ msgid "Show information about the file being played"
+#~ msgstr "Mostra le informazioni sul file in riproduzione"
+
+#~ msgid "scope effect"
+#~ msgstr "effetto oscilloscopio"
+
+#~ msgid "Reset config file"
+#~ msgstr "Azzera file di configurazione"
+
+#~ msgid "tarkin"
+#~ msgstr "tarkin"
+
+#~ msgid "libmpeg2 decoder module"
+#~ msgstr "modulo decodifica libmpeg2"

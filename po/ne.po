@@ -18889,6 +18889,15 @@ msgstr "द्रष्टा फिल्टर"
 msgid "Spectrum analyser"
 msgstr "स्पेकट्रम विश्लेषक"
 
+#~ msgid " "
+#~ msgstr " "
+
+#~ msgid "_File"
+#~ msgstr "_फाइल"
+
+#~ msgid "_About..."
+#~ msgstr "_बारेमा"
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "टार्किन असङ्केतन मोड्युल"
@@ -19341,3 +19350,6 @@ msgstr "स्पेकट्रम विश्लेषक"
 
 #~ msgid "About this application"
 #~ msgstr "प्रोग्राम बारेमा"
+
+#~ msgid "_Navigation"
+#~ msgstr "_नेभिगेसन्"

@@ -19217,6 +19217,9 @@ msgstr "Filter vizualizacije"
 msgid "Spectrum analyser"
 msgstr "Spektralna analiza"
 
+#~ msgid "General interface setttings"
+#~ msgstr "Osnovne nastavitve vmesnika"
+
 #, fuzzy
 #~ msgid "VC-1 decoder module"
 #~ msgstr "Tarkin dekodirnik"

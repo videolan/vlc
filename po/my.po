@@ -17873,6 +17873,16 @@ msgid "Spectrum analyser"
 msgstr ""
 
 #, fuzzy
+#~ msgid "Listeners"
+#~ msgstr "_့ဒတဂိ"
+
+#~ msgid " "
+#~ msgstr " "
+
+#~ msgid "_About..."
+#~ msgstr "_ံအဋအ,္တ"
+
+#, fuzzy
 #~ msgid "Line"
 #~ msgstr "_့ဒတဂိ"
 
@@ -17953,3 +17963,11 @@ msgstr ""
 #, fuzzy
 #~ msgid "vlc preferences"
 #~ msgstr "_မဧ္ာိရဟ,ိပ၇ာိ"
+
+#, fuzzy
+#~ msgid "Polarization"
+#~ msgstr "_ံအဋအ,္တ"
+
+#, fuzzy
+#~ msgid "Configure the application"
+#~ msgstr "_ံအဋအ,္တ"

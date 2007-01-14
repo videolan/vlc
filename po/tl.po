@@ -17871,6 +17871,16 @@ msgid "Spectrum analyser"
 msgstr ""
 
 #, fuzzy
+#~ msgid "Listeners"
+#~ msgstr "_Fayl"
+
+#~ msgid " "
+#~ msgstr " "
+
+#~ msgid "_About..."
+#~ msgstr "_Bahin sa"
+
+#, fuzzy
 #~ msgid "Line"
 #~ msgstr "_Fayl"
 
@@ -17951,3 +17961,11 @@ msgstr ""
 #, fuzzy
 #~ msgid "vlc preferences"
 #~ msgstr "_Preperenses"
+
+#, fuzzy
+#~ msgid "Polarization"
+#~ msgstr "_Nabigit"
+
+#, fuzzy
+#~ msgid "Configure the application"
+#~ msgstr "Mahitungod sa Aplikasyon"
