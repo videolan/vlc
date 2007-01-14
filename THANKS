@@ -42,7 +42,7 @@ Chris Clepper - OpenGL fix
 Christian Henz - libupnp service discovery plugin, CyberLink UPnP fixes
 Christof Baumgaertner - dbox web intf
 Christophe Burgalat <c.burgalat _at_ broadcastavenue _dot_ com> - XVMC (cle266) patch for VIA boards
-Christophe Mutricy <xtophe at nxtelevision dot com> - many fixes (preferences, M3U, ...)
+Christophe Mutricy <xtophe at nxtelevision dot com> - many fixes (preferences, M3U, ...), contrib system for 3rd party libraries
 Christopher Johnson <cjohnson at mint.net> - Qt fix in vlc.spec
 Colin Simmonds <colin_simmonds at Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian at cisco.com> - ac3dec uninitialized data structure fix
@@ -83,7 +83,7 @@ Jan Van Boghout <vlc at macrabbit.com> - iTunes like slider for OSX intf
 Javier Varela <tonxabar at hotmail.com> - Spanish translation
 Jean-Alexis Montignies <ja at sente.ch> - coreaudio multiple streams fix
 Jean-Baptiste Kempf <jb at via dot ecp.fr> - Contrib system upgrade
-Jean-Baptiste Le Stang <jp.lestand at lestang.org> - Equalizer-GUI-fixes (OSX)
+Jean-Baptiste Le Stang <jp.lestand at lestang.org> - Equalizer-GUI-fixes (OSX), Universal Binary Script
 Jean-Philippe Grimaldi <jeanphi at via.ecp.fr> - bug fixes
 Dugal Harris <dugalh at protoclea dot. co dot za > - ActiveX bug fixes
 Jean-Pierre Kuypers <Kuypers at sri.ucl.ac.be> - French translation

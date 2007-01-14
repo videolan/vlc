@@ -214,6 +214,7 @@ D: Directory input
 D: Mac OS X Video Output
 D: Mac OS X Audio Output
 D: Kasenna client support
+D: contrib system for 3rd party libraries
 S: Netherlands
 
 N: Gaël Hendryckx
@@ -259,11 +260,12 @@ D: AC3 decoder
 D: MPEG audio decoder
 S: France
 
-N: Felix Kühne
-E: fkuehne@users.sourceforge.net
+N: Felix Paul Kühne
+E: fkuehne@videolan.org
 C: fkuehne
-D: MacOS X Interface (Wizard, structure, extended controls panel, bookmarks window)
+D: MacOS X Interface (wizard, structure, extended controls panel, bookmarks window, fullscreen controller)
 D: Interface Interaction (core and OSX)
+D: contrib system for 3rd party libraries
 D: German translation
 S: Germany
 
@@ -290,6 +292,7 @@ D: Many ports (Mac OS X, iPAQ, *BSD, Solaris...)
 D: DVB input
 D: mosaic
 D: TS muxer/demuxer improvements
+D: contrib system for 3rd party libraries
 D: documentation
 S: France
 
@@ -318,6 +321,7 @@ C: titer
 D: BeOS module fixes and enhancements
 D: Stream output
 D: Mac OS X OpenGL video output
+D: contrib system for 3rd party libraries
 S: France
 
 N: Benjamin Pracht
