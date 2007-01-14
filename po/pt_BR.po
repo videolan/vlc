@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pt_BR\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-13 00:44+0000\n"
+"POT-Creation-Date: 2007-01-14 01:26+0000\n"
 "PO-Revision-Date: 2004-04-06 11:41-0300\n"
 "Last-Translator: André de Barros Martins Ribeiro <andrerib@ajato.com.br>\n"
 "Language-Team: Brazilian Portuguese\n"
@@ -760,7 +760,7 @@ msgstr "URL"
 msgid "Language"
 msgstr "Linguagem"
 
-#: include/vlc_meta.h:45 modules/misc/notify/notify.c:184
+#: include/vlc_meta.h:45 modules/misc/notify/notify.c:182
 #, fuzzy
 msgid "Now Playing"
 msgstr "Tocar"
@@ -849,7 +849,7 @@ msgstr "Canais de Audio"
 #: src/audio_output/output.c:104 src/audio_output/output.c:139
 #: modules/access/v4l.c:128 modules/audio_output/alsa.c:191
 #: modules/audio_output/alsa.c:222 modules/audio_output/directx.c:464
-#: modules/audio_output/oss.c:203 modules/audio_output/portaudio.c:412
+#: modules/audio_output/oss.c:203 modules/audio_output/portaudio.c:408
 #: modules/audio_output/sdl.c:181 modules/audio_output/sdl.c:198
 #: modules/audio_output/waveout.c:419 modules/codec/twolame.c:66
 msgid "Stereo"
@@ -6520,7 +6520,7 @@ msgstr ""
 "Permite que você modifique o nome de usuário que será usado para a conexão."
 
 #: modules/access_output/http.c:63 modules/control/telnet.c:79
-#: modules/control/telnet.c:256 modules/misc/audioscrobbler.c:120
+#: modules/control/telnet.c:270 modules/misc/audioscrobbler.c:120
 #, fuzzy
 msgid "Password"
 msgstr "Senha FTP"
@@ -7882,7 +7882,7 @@ msgstr "Nome do dispositivo ALSA"
 
 #: modules/audio_output/alsa.c:128 modules/audio_output/auhal.c:128
 #: modules/audio_output/auhal.c:972 modules/audio_output/directx.c:400
-#: modules/audio_output/oss.c:130 modules/audio_output/portaudio.c:398
+#: modules/audio_output/oss.c:130 modules/audio_output/portaudio.c:394
 #: modules/audio_output/sdl.c:176 modules/audio_output/sdl.c:194
 #: modules/audio_output/waveout.c:370 modules/gui/macosx/intf.m:567
 #: modules/gui/macosx/intf.m:568
@@ -7890,14 +7890,14 @@ msgid "Audio Device"
 msgstr "Dispositivo de Audio"
 
 #: modules/audio_output/alsa.c:185 modules/audio_output/directx.c:477
-#: modules/audio_output/oss.c:223 modules/audio_output/portaudio.c:404
+#: modules/audio_output/oss.c:223 modules/audio_output/portaudio.c:400
 #: modules/audio_output/sdl.c:182 modules/audio_output/sdl.c:201
 #: modules/audio_output/waveout.c:432
 msgid "Mono"
 msgstr "Mono"
 
 #: modules/audio_output/alsa.c:198 modules/audio_output/directx.c:450
-#: modules/audio_output/oss.c:179 modules/audio_output/portaudio.c:423
+#: modules/audio_output/oss.c:179 modules/audio_output/portaudio.c:419
 #: modules/audio_output/waveout.c:404
 msgid "2 Front 2 Rear"
 msgstr "2 Frontais 2 Traseiros"
@@ -8002,7 +8002,7 @@ msgstr ""
 msgid "DirectX audio output"
 msgstr "Saída de audio DirectX"
 
-#: modules/audio_output/directx.c:432 modules/audio_output/portaudio.c:431
+#: modules/audio_output/directx.c:432 modules/audio_output/portaudio.c:427
 msgid "3 Front 2 Rear"
 msgstr "3 Frontais 2 Traseiras"
 
@@ -8103,7 +8103,7 @@ msgstr "Dispositivo OSS dsp"
 msgid "Portaudio identifier for the output device"
 msgstr ""
 
-#: modules/audio_output/portaudio.c:113 modules/audio_output/portaudio.c:115
+#: modules/audio_output/portaudio.c:112
 #, fuzzy
 msgid "PORTAUDIO audio output"
 msgstr "Saída de audio ALSA"
@@ -8956,11 +8956,6 @@ msgstr "packetizer de audio Flac"
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr "decodificador de MPEG I/II (usando libmpeg2)"
 
-#: modules/codec/libvc1.c:54
-#, fuzzy
-msgid "VC-1 decoder module"
-msgstr "Módulo decodificador Tarkin"
-
 #: modules/codec/lpcm.c:83
 msgid "Linear PCM audio decoder"
 msgstr "Decodificador linear de audio PCM"
@@ -9115,31 +9110,6 @@ msgstr "Packetizer OGT Philips (legendas de SVCD)"
 #: modules/codec/tarkin.c:75
 msgid "Tarkin decoder module"
 msgstr "Módulo decodificador Tarkin"
-
-#: modules/codec/telx.c:56
-msgid "Teletext page"
-msgstr ""
-
-#: modules/codec/telx.c:57
-msgid ""
-"Set displayed teletext page for subtitles, 0 for all pages, 888 should be a "
-"standard value. Just leave it to zero if your stream has only one language "
-"for subtitles."
-msgstr ""
-
-#: modules/codec/telx.c:59
-#, fuzzy
-msgid "Ignore subtitle flag"
-msgstr "Usar arquivo de legendas"
-
-#: modules/codec/telx.c:60
-msgid "Ignore the subtitle flag, try this if your subtitles don't appear."
-msgstr ""
-
-#: modules/codec/telx.c:64
-#, fuzzy
-msgid "Teletext subtitles decoder"
-msgstr "decodificador de texto de legendas"
 
 #: modules/codec/theora.c:92 modules/codec/vorbis.c:158
 msgid ""
@@ -10597,16 +10567,16 @@ msgstr ""
 msgid "VLM remote control interface"
 msgstr "Interface de controle remoto"
 
-#: modules/control/telnet.c:382
+#: modules/control/telnet.c:398
 msgid "Line too long\r\n"
 msgstr ""
 
-#: modules/control/telnet.c:412
+#: modules/control/telnet.c:428
 #, fuzzy
 msgid "Welcome, Master"
 msgstr "Abrir assistente de streaming"
 
-#: modules/control/telnet.c:424
+#: modules/control/telnet.c:451
 msgid ""
 "\r\n"
 "Wrong password.\r\n"
@@ -11635,7 +11605,7 @@ msgid "Extract"
 msgstr ""
 
 #: modules/gui/macosx/bookmarks.m:103 modules/gui/macosx/bookmarks.m:109
-#: modules/gui/macosx/sfilters.m:72 modules/gui/pda/pda.c:285
+#: modules/gui/macosx/sfilters.m:72 modules/gui/pda/pda.c:281
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:99
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:198
 msgid "Time"
@@ -13495,32 +13465,32 @@ msgstr ""
 "Toca automaticamente um arquivo quando selecionado na lista de seleção de "
 "aquivos"
 
-#: modules/gui/pda/pda.c:67 modules/gui/pda/pda.c:69
+#: modules/gui/pda/pda.c:66
 msgid "PDA Linux Gtk2+ interface"
 msgstr "Interface PDA Linux Gtk2+"
 
-#: modules/gui/pda/pda.c:224 modules/gui/pda/pda.c:279
+#: modules/gui/pda/pda.c:220 modules/gui/pda/pda.c:275
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:497
 msgid "Filename"
 msgstr "Nome do arq."
 
-#: modules/gui/pda/pda.c:230
+#: modules/gui/pda/pda.c:226
 msgid "Permissions"
 msgstr "Permissões"
 
-#: modules/gui/pda/pda.c:236
+#: modules/gui/pda/pda.c:232
 msgid "Size"
 msgstr "Tamanho"
 
-#: modules/gui/pda/pda.c:242
+#: modules/gui/pda/pda.c:238
 msgid "Owner"
 msgstr "Dono"
 
-#: modules/gui/pda/pda.c:248
+#: modules/gui/pda/pda.c:244
 msgid "Group"
 msgstr "Grupo"
 
-#: modules/gui/pda/pda.c:292
+#: modules/gui/pda/pda.c:288
 msgid "Index"
 msgstr "Índice"
 
@@ -16210,7 +16180,7 @@ msgid "Growl Notification Plugin"
 msgstr ""
 
 #: modules/misc/notify/growl.c:146 modules/misc/notify/msn.c:163
-#: modules/misc/notify/notify.c:165
+#: modules/misc/notify/notify.c:163
 #, fuzzy
 msgid "(no title)"
 msgstr "Sem Título"
@@ -16255,12 +16225,12 @@ msgstr ""
 msgid "LibNotify Notification Plugin"
 msgstr ""
 
-#: modules/misc/notify/notify.c:157
+#: modules/misc/notify/notify.c:155
 #, fuzzy
 msgid "no artist"
 msgstr "Artista"
 
-#: modules/misc/notify/notify.c:160
+#: modules/misc/notify/notify.c:158
 #, fuzzy
 msgid "no album"
 msgstr "Álbum"
@@ -19941,6 +19911,18 @@ msgstr "Filtro do visualizador"
 #, fuzzy
 msgid "Spectrum analyser"
 msgstr "Espectro"
+
+#, fuzzy
+#~ msgid "VC-1 decoder module"
+#~ msgstr "Módulo decodificador Tarkin"
+
+#, fuzzy
+#~ msgid "Ignore subtitle flag"
+#~ msgstr "Usar arquivo de legendas"
+
+#, fuzzy
+#~ msgid "Teletext subtitles decoder"
+#~ msgstr "decodificador de texto de legendas"
 
 #~ msgid "Video filters settings"
 #~ msgstr "Configurações de filtros de vídeo"

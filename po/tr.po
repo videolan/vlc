@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.8.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-01-13 00:44+0000\n"
+"POT-Creation-Date: 2007-01-14 01:26+0000\n"
 "PO-Revision-Date: 2005-06-25 12:34+0200\n"
 "Last-Translator: xLeopar <xleopar@yahoo.com>\n"
 "Language-Team: Turkish\n"
@@ -749,7 +749,7 @@ msgstr "URL"
 msgid "Language"
 msgstr "Dil"
 
-#: include/vlc_meta.h:45 modules/misc/notify/notify.c:184
+#: include/vlc_meta.h:45 modules/misc/notify/notify.c:182
 msgid "Now Playing"
 msgstr "Şimdi oynatıyor"
 
@@ -838,7 +838,7 @@ msgstr "Ses Kanalları"
 #: src/audio_output/output.c:104 src/audio_output/output.c:139
 #: modules/access/v4l.c:128 modules/audio_output/alsa.c:191
 #: modules/audio_output/alsa.c:222 modules/audio_output/directx.c:464
-#: modules/audio_output/oss.c:203 modules/audio_output/portaudio.c:412
+#: modules/audio_output/oss.c:203 modules/audio_output/portaudio.c:408
 #: modules/audio_output/sdl.c:181 modules/audio_output/sdl.c:198
 #: modules/audio_output/waveout.c:419 modules/codec/twolame.c:66
 msgid "Stereo"
@@ -5868,7 +5868,7 @@ msgid "User name that will be requested to access the stream."
 msgstr ""
 
 #: modules/access_output/http.c:63 modules/control/telnet.c:79
-#: modules/control/telnet.c:256 modules/misc/audioscrobbler.c:120
+#: modules/control/telnet.c:270 modules/misc/audioscrobbler.c:120
 msgid "Password"
 msgstr "Parola"
 
@@ -7087,7 +7087,7 @@ msgstr ""
 
 #: modules/audio_output/alsa.c:128 modules/audio_output/auhal.c:128
 #: modules/audio_output/auhal.c:972 modules/audio_output/directx.c:400
-#: modules/audio_output/oss.c:130 modules/audio_output/portaudio.c:398
+#: modules/audio_output/oss.c:130 modules/audio_output/portaudio.c:394
 #: modules/audio_output/sdl.c:176 modules/audio_output/sdl.c:194
 #: modules/audio_output/waveout.c:370 modules/gui/macosx/intf.m:567
 #: modules/gui/macosx/intf.m:568
@@ -7095,14 +7095,14 @@ msgid "Audio Device"
 msgstr "Ses Aygıtı"
 
 #: modules/audio_output/alsa.c:185 modules/audio_output/directx.c:477
-#: modules/audio_output/oss.c:223 modules/audio_output/portaudio.c:404
+#: modules/audio_output/oss.c:223 modules/audio_output/portaudio.c:400
 #: modules/audio_output/sdl.c:182 modules/audio_output/sdl.c:201
 #: modules/audio_output/waveout.c:432
 msgid "Mono"
 msgstr "Mono"
 
 #: modules/audio_output/alsa.c:198 modules/audio_output/directx.c:450
-#: modules/audio_output/oss.c:179 modules/audio_output/portaudio.c:423
+#: modules/audio_output/oss.c:179 modules/audio_output/portaudio.c:419
 #: modules/audio_output/waveout.c:404
 msgid "2 Front 2 Rear"
 msgstr "2 Ön 2 Arka"
@@ -7201,7 +7201,7 @@ msgstr ""
 msgid "DirectX audio output"
 msgstr "DirectX ses çıktısı"
 
-#: modules/audio_output/directx.c:432 modules/audio_output/portaudio.c:431
+#: modules/audio_output/directx.c:432 modules/audio_output/portaudio.c:427
 msgid "3 Front 2 Rear"
 msgstr "3 Ön 2 Arka"
 
@@ -7287,7 +7287,7 @@ msgstr ""
 msgid "Portaudio identifier for the output device"
 msgstr ""
 
-#: modules/audio_output/portaudio.c:113 modules/audio_output/portaudio.c:115
+#: modules/audio_output/portaudio.c:112
 msgid "PORTAUDIO audio output"
 msgstr ""
 
@@ -8060,11 +8060,6 @@ msgstr ""
 msgid "MPEG I/II video decoder (using libmpeg2)"
 msgstr ""
 
-#: modules/codec/libvc1.c:54
-#, fuzzy
-msgid "VC-1 decoder module"
-msgstr "Video süzgeç modülü"
-
 #: modules/codec/lpcm.c:83
 msgid "Linear PCM audio decoder"
 msgstr ""
@@ -8214,31 +8209,6 @@ msgstr ""
 #: modules/codec/tarkin.c:75
 msgid "Tarkin decoder module"
 msgstr ""
-
-#: modules/codec/telx.c:56
-msgid "Teletext page"
-msgstr ""
-
-#: modules/codec/telx.c:57
-msgid ""
-"Set displayed teletext page for subtitles, 0 for all pages, 888 should be a "
-"standard value. Just leave it to zero if your stream has only one language "
-"for subtitles."
-msgstr ""
-
-#: modules/codec/telx.c:59
-#, fuzzy
-msgid "Ignore subtitle flag"
-msgstr "Altyazı dosyasını kullan"
-
-#: modules/codec/telx.c:60
-msgid "Ignore the subtitle flag, try this if your subtitles don't appear."
-msgstr ""
-
-#: modules/codec/telx.c:64
-#, fuzzy
-msgid "Teletext subtitles decoder"
-msgstr "DVB altyazı kod çözücüsü"
 
 #: modules/codec/theora.c:92 modules/codec/vorbis.c:158
 msgid ""
@@ -9634,15 +9604,15 @@ msgstr ""
 msgid "VLM remote control interface"
 msgstr "VLM uzaktan kontrol arayüzü"
 
-#: modules/control/telnet.c:382
+#: modules/control/telnet.c:398
 msgid "Line too long\r\n"
 msgstr ""
 
-#: modules/control/telnet.c:412
+#: modules/control/telnet.c:428
 msgid "Welcome, Master"
 msgstr ""
 
-#: modules/control/telnet.c:424
+#: modules/control/telnet.c:451
 msgid ""
 "\r\n"
 "Wrong password.\r\n"
@@ -10627,7 +10597,7 @@ msgid "Extract"
 msgstr "Çıkart/Kaldır"
 
 #: modules/gui/macosx/bookmarks.m:103 modules/gui/macosx/bookmarks.m:109
-#: modules/gui/macosx/sfilters.m:72 modules/gui/pda/pda.c:285
+#: modules/gui/macosx/sfilters.m:72 modules/gui/pda/pda.c:281
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:99
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:198
 msgid "Time"
@@ -12408,32 +12378,32 @@ msgstr "Seçilen dosyayı otomatik oynat"
 msgid "Automatically play a file when selected in the file selection list"
 msgstr ""
 
-#: modules/gui/pda/pda.c:67 modules/gui/pda/pda.c:69
+#: modules/gui/pda/pda.c:66
 msgid "PDA Linux Gtk2+ interface"
 msgstr "PDA Linux Gtk2+ arayüzü"
 
-#: modules/gui/pda/pda.c:224 modules/gui/pda/pda.c:279
+#: modules/gui/pda/pda.c:220 modules/gui/pda/pda.c:275
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:497
 msgid "Filename"
 msgstr "Dosya adı"
 
-#: modules/gui/pda/pda.c:230
+#: modules/gui/pda/pda.c:226
 msgid "Permissions"
 msgstr "İzinler"
 
-#: modules/gui/pda/pda.c:236
+#: modules/gui/pda/pda.c:232
 msgid "Size"
 msgstr "Boyut"
 
-#: modules/gui/pda/pda.c:242
+#: modules/gui/pda/pda.c:238
 msgid "Owner"
 msgstr "Sahibi"
 
-#: modules/gui/pda/pda.c:248
+#: modules/gui/pda/pda.c:244
 msgid "Group"
 msgstr "Grubu"
 
-#: modules/gui/pda/pda.c:292
+#: modules/gui/pda/pda.c:288
 msgid "Index"
 msgstr "İndeks"
 
@@ -15004,7 +14974,7 @@ msgid "Growl Notification Plugin"
 msgstr ""
 
 #: modules/misc/notify/growl.c:146 modules/misc/notify/msn.c:163
-#: modules/misc/notify/notify.c:165
+#: modules/misc/notify/notify.c:163
 #, fuzzy
 msgid "(no title)"
 msgstr "Başlıksız"
@@ -15049,12 +15019,12 @@ msgstr ""
 msgid "LibNotify Notification Plugin"
 msgstr ""
 
-#: modules/misc/notify/notify.c:157
+#: modules/misc/notify/notify.c:155
 #, fuzzy
 msgid "no artist"
 msgstr "Sanatçı"
 
-#: modules/misc/notify/notify.c:160
+#: modules/misc/notify/notify.c:158
 #, fuzzy
 msgid "no album"
 msgstr "Albüm"
@@ -18429,6 +18399,18 @@ msgstr ""
 #: modules/visualization/visual/visual.c:120
 msgid "Spectrum analyser"
 msgstr "Spektrum analizörü"
+
+#, fuzzy
+#~ msgid "VC-1 decoder module"
+#~ msgstr "Video süzgeç modülü"
+
+#, fuzzy
+#~ msgid "Ignore subtitle flag"
+#~ msgstr "Altyazı dosyasını kullan"
+
+#, fuzzy
+#~ msgid "Teletext subtitles decoder"
+#~ msgstr "DVB altyazı kod çözücüsü"
 
 #~ msgid "Video filters settings"
 #~ msgstr "Video süzgeçleri ayarları"
