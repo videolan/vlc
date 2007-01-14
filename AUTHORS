@@ -304,6 +304,15 @@ D: xosd interface plug-in
 D: SLP
 S: France
 
+N: Christophe Mutricy
+E: xtophe at videolan d0t org
+C: xtophe
+D: libnotify plugin
+D: contrib system for 3rd party libraries
+D: win32 binary contribs
+D: Varios fixes (configure.ac, wxWidgets, M3U, ...)
+S: England
+
 N: Florian G. Pflug
 E: fgp@phlo.org
 C: fgp

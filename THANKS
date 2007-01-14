@@ -42,7 +42,6 @@ Chris Clepper - OpenGL fix
 Christian Henz - libupnp service discovery plugin, CyberLink UPnP fixes
 Christof Baumgaertner - dbox web intf
 Christophe Burgalat <c.burgalat _at_ broadcastavenue _dot_ com> - XVMC (cle266) patch for VIA boards
-Christophe Mutricy <xtophe at nxtelevision dot com> - many fixes (preferences, M3U, ...), contrib system for 3rd party libraries
 Christopher Johnson <cjohnson at mint.net> - Qt fix in vlc.spec
 Colin Simmonds <colin_simmonds at Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian at cisco.com> - ac3dec uninitialized data structure fix
