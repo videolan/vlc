@@ -1528,6 +1528,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     playlist_t * p_playlist;
     vout_thread_t * p_vout;
+    int returnedValue = 0;
 
 #define p_input p_intf->p_sys->p_input
     if( p_input )
@@ -1554,6 +1555,14 @@ static VLCMain *_o_sharedMainInstance = nil;
         msleep( 100000 );
     }
     msleep( 500000 );
+    
+    /* make sure that the current volume is saved */
+    config_PutInt( p_intf->p_libvlc, "volume", i_lastShownVolume );
+    returnedValue = config_SaveConfigFile( p_intf->p_libvlc, "main" );
+    if( returnedValue != 0 )
+        msg_Err( p_intf, 
+                 "error while saving volume in osx's terminate method (%i)",
+                 returnedValue );
 
     /* save the prefs if they were changed in the extended panel */
     if (o_extended && [o_extended getConfigChanged])
