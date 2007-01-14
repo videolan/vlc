@@ -60,6 +60,13 @@ static void Close( vlc_object_t * );
 
 #define RAWMUX_TEXT N_( "MUX for RAW RTSP transport" )
 
+#define SESSION_TIMEOUT_TEXT N_( "Sets the timeout option in the RTSP " \
+    "session string" )
+#define SESSION_TIMEOUT_LONGTEXT N_( "Defines what timeout option to add " \
+    "to the RTSP session ID string. Setting it to a negative number removes " \
+    "the timeout option entirely. This is needed by some IPTV STBs (such as " \
+    "those made by HansunTech) which get confused by it. The default is 5." )
+
 vlc_module_begin();
     set_shortname( _("RTSP VoD" ) );
     set_description( _("RTSP VoD server") );
@@ -72,6 +79,8 @@ vlc_module_begin();
     add_string( "rtsp-raw-mux", "ts", NULL, RAWMUX_TEXT, RAWMUX_TEXT, VLC_TRUE );
     add_integer( "rtsp-throttle-users", 0, NULL, THROTLE_TEXT,
                                            THROTLE_LONGTEXT, VLC_TRUE );
+    add_integer( "rtsp-session-timeout", 5, NULL, SESSION_TIMEOUT_TEXT,
+                 SESSION_TIMEOUT_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -172,6 +181,8 @@ struct vod_sys_t
 
     char *psz_raw_mux;
 
+    int i_session_timeout;
+
     /* List of media */
     int i_media;
     vod_media_t **media;
@@ -226,6 +237,9 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys ) goto error;
     p_sys->p_rtsp_host = 0;
 
+    var_Create( p_this, "rtsp-session-timeout", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    p_sys->i_session_timeout = var_GetInteger( p_this, "rtsp-session-timeout" );
+
     var_Create( p_this, "rtsp-throttle-users", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     p_sys->i_throttle_users = var_GetInteger( p_this, "rtsp-throtle-users" );
     msg_Dbg( p_this, "allowing up to %d connections", p_sys->i_throttle_users );
@@ -275,6 +289,7 @@ static void Close( vlc_object_t * p_this )
     vod_sys_t *p_sys = p_vod->p_sys;
 
     httpd_HostDelete( p_sys->p_rtsp_host );
+    var_Destroy( p_this, "rtsp-session-timeout" );
     var_Destroy( p_this, "rtsp-throttle-users" );
     var_Destroy( p_this, "rtsp-raw-mux" );
 
@@ -388,10 +403,12 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
     while( p_media->i_es ) MediaDelES( p_vod, p_media, &p_media->es[0]->fmt );
 
     vlc_mutex_destroy( &p_media->lock );
-    free( p_media->psz_session_name );
-    free( p_media->psz_session_description );
-    free( p_media->psz_session_url );
-    free( p_media->psz_session_email );
+
+    if( p_media->psz_session_name ) free( p_media->psz_session_name );
+    if( p_media->psz_session_description ) free( p_media->psz_session_description );
+    if( p_media->psz_session_url ) free( p_media->psz_session_url );
+    if( p_media->psz_session_email ) free( p_media->psz_session_email );
+    if( p_media->psz_mux ) free( p_media->psz_mux );
     free( p_media );
 }
 
@@ -400,7 +417,10 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     media_es_t *p_es = malloc( sizeof(media_es_t) );
     char *psz_urlc;
 
+    if( !p_es ) return VLC_ENOMEM;
     memset( p_es, 0, sizeof(media_es_t) );
+
+    if( p_media->psz_mux ) free( p_media->psz_mux );
     p_media->psz_mux = NULL;
 
     /* TODO: update SDP, etc... */
@@ -484,12 +504,12 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             }
             break;
         case VLC_FOURCC( 'm', 'p', '2', 't' ):
-            p_media->psz_mux = "ts";
+            p_media->psz_mux = strdup("ts");
             p_es->i_payload_type = 33;
             p_es->psz_rtpmap = strdup( "MP2T/90000" );
             break;
         case VLC_FOURCC( 'm', 'p', '2', 'p' ):
-            p_media->psz_mux = "ps";
+            p_media->psz_mux = strdup("ps");
             p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_rtpmap = strdup( "MP2P/90000" );
             break;
@@ -578,7 +598,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
 
 static void MediaDelES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt)
 {
-    media_es_t *p_es = 0;
+    media_es_t *p_es = NULL;
     int i;
 
     /* Find the ES */
@@ -684,7 +704,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     answer->i_version = query->i_version;
     answer->i_type    = HTTPD_MSG_ANSWER;
     answer->i_body    = 0;
-    answer->p_body      = NULL;
+    answer->p_body    = NULL;
 
     switch( query->i_type )
     {
@@ -697,7 +717,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( strstr( psz_transport, "unicast" ) &&
                 strstr( psz_transport, "client_port=" ) )
             {
-                rtsp_client_t *p_rtsp;
+                rtsp_client_t *p_rtsp = NULL;
                 char ip[NI_MAXNUMERICHOST];
                 i_port = atoi( strstr( psz_transport, "client_port=" ) +
                                 strlen("client_port=") );
@@ -705,7 +725,9 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 if( strstr( psz_transport, "MP2T/H2221/UDP" ) ||
                     strstr( psz_transport, "RAW/RAW/UDP" ) )
                 {
-                    p_media->psz_mux = p_vod->p_sys->psz_raw_mux;
+                    if( p_media->psz_mux ) free( p_media->psz_mux );
+                    p_media->psz_mux = NULL;
+                    p_media->psz_mux = strdup( p_vod->p_sys->psz_raw_mux );
                     p_media->b_raw = VLC_TRUE;
                 }
 
@@ -735,6 +757,14 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     }
                     asprintf( &psz_session, "%d", rand() );
                     p_rtsp = RtspClientNew( p_media, psz_session );
+                    if( !p_rtsp )
+                    {
+                        answer->i_status = 454;
+                        answer->psz_status = strdup( "Unknown session id" );
+                        answer->i_body = 0;
+                        answer->p_body = NULL;
+                        break;
+                    }
                 }
                 else
                 {
@@ -803,7 +833,14 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             msg_Dbg( p_vod, "HTTPD_MSG_PLAY for session: %s", psz_session );
 
             p_rtsp = RtspClientGet( p_media, psz_session );
-            if( !p_rtsp ) break;
+            if( !p_rtsp )
+            {
+                answer->i_status = 500;
+                answer->psz_status = strdup( "Internal server error" );
+                answer->i_body = 0;
+                answer->p_body = NULL;
+                break;
+            }
 
             if( p_rtsp->b_playing )
             {
@@ -984,8 +1021,12 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
     if( psz_session )
     {
-        httpd_MsgAdd( answer, "Session", "%s;timeout=5", psz_session );
-    }
+         if( p_media->p_vod->p_sys->i_session_timeout >= 0 )
+             httpd_MsgAdd( answer, "Session", "%s;timeout=%i", psz_session,
+               p_media->p_vod->p_sys->i_session_timeout );
+         else
+              httpd_MsgAdd( answer, "Session", "%s", psz_session );
+    } 
 
     return VLC_SUCCESS;
 }
@@ -1026,8 +1067,8 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( strstr( psz_transport, "unicast" ) &&
                 strstr( psz_transport, "client_port=" ) )
             {
-                rtsp_client_t *p_rtsp;
-                rtsp_client_es_t *p_rtsp_es;
+                rtsp_client_t *p_rtsp = NULL;
+                rtsp_client_es_t *p_rtsp_es = NULL;
                 char ip[NI_MAXNUMERICHOST];
                 int i_port = atoi( strstr( psz_transport, "client_port=" ) +
                                 strlen("client_port=") );
@@ -1073,6 +1114,14 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 }
 
                 p_rtsp_es = malloc( sizeof(rtsp_client_es_t) );
+                if( !p_rtsp_es )
+                {
+                    answer->i_status = 500;
+                    answer->psz_status = strdup( "Internal server error" );
+                    answer->i_body = 0;
+                    answer->p_body = NULL;
+                    break;
+                }
                 p_rtsp_es->i_port = i_port;
                 p_rtsp_es->psz_ip = strdup( ip );
                 p_rtsp_es->p_media_es = p_es;
@@ -1088,18 +1137,18 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     if( strstr( psz_transport, "MP2T/H2221/UDP" ) )
                     {
                         httpd_MsgAdd( answer, "Transport", "MP2T/H2221/UDP;client_port=%d-%d",
-                                      i_port, i_port + 1 );
+                                      p_rtsp_es->i_port, p_rtsp_es->i_port + 1 );
                     }
                     else if( strstr( psz_transport, "RAW/RAW/UDP" ) )
                     {
                         httpd_MsgAdd( answer, "Transport", "RAW/RAW/UDP;client_port=%d-%d",
-                                      i_port, i_port + 1 );
+                                      p_rtsp_es->i_port, p_rtsp_es->i_port + 1 );
                     }
                 }
                 else
                 {
                     httpd_MsgAdd( answer, "Transport", "RTP/AVP/UDP;client_port=%d-%d",
-                                  i_port, i_port + 1 );
+                                  p_rtsp_es->i_port, p_rtsp_es->i_port + 1 );
                 }
             }
             else /* TODO  strstr( psz_transport, "interleaved" ) ) */
