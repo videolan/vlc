@@ -124,6 +124,7 @@ static int Open( vlc_object_t * p_this )
     /* Load the headers */
     if( DemuxInit( p_demux ) )
     {
+        free( p_sys );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
