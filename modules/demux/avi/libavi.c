@@ -204,6 +204,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
     i_read = stream_Read( s, p_read, i_read ); \
     if( i_read < (int64_t)__EVEN(p_chk->common.i_chunk_size ) + 8 ) \
     { \
+        free( p_buff ); \
         return VLC_EGENERIC; \
     }\
     p_read += 8; \
