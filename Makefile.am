@@ -288,7 +288,7 @@ LIBVLC = src/$(LIB_libvlc)
 vlc_LDFLAGS =
 else
 if HAVE_WIN32
-vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc` -Wl,-rpath $(libdir) -L$(top_builddir)/src -lvlc
+vlc_LDFLAGS = -L$(top_builddir)/src -lvlc `$(VLC_CONFIG) --libs vlc`
 LIB_libvlc = libvlc.dll.a
 LIBVLC =
 else
