@@ -35,7 +35,7 @@ BEGIN
             VALUE "ProductVersion", STRINGIFY( VERSION )
             VALUE "OriginalFilename", "npvlc.dll\0"
             VALUE "FileVersion", STRINGIFY( VERSION )
-            VALUE "FileDescription", "Version " STRINGIFY( VERSION ) ", copyright 1996-2006 The VideoLAN Team<br><a href=""http://www.videolan.org/"">http://www.videolan.org/</a>\0"
+            VALUE "FileDescription", "Version " STRINGIFY( VERSION ) ", copyright 1996-2007 The VideoLAN Team<br><a href=""http://www.videolan.org/"">http://www.videolan.org/</a>\0"
             VALUE "InternalName", "npvlc\0"
             VALUE "CompanyName", "VideoLAN Team\0"
             VALUE "LegalCopyright", "Copyright \251 1996-2006 The VideoLAN Team\0"

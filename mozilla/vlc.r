@@ -13,7 +13,7 @@ data 'carb' (0)
 resource 'STR#' (126)
 {
     {
-        "Version 0.9.0, copyright 1996-2006 The VideoLAN Team"
+        "Version 0.9.0, copyright 1996-2007 The VideoLAN Team"
         "<BR><A HREF='http://www.videolan.org'>http://www.videolan.org</A>",
         "VLC Multimedia Plugin"
     };

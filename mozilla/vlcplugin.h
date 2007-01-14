@@ -121,7 +121,7 @@ private:
  ******************************************************************************/
 #define PLUGIN_NAME         "VLC Multimedia Plugin"
 #define PLUGIN_DESCRIPTION \
-    "Version %s, copyright 1996-2006 The VideoLAN Team" \
+    "Version %s, copyright 1996-2007 The VideoLAN Team" \
     "<br><a href=\"http://www.videolan.org/\">http://www.videolan.org/</a>"
 
 #define PLUGIN_MIMETYPES \
