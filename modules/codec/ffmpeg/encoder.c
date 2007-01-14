@@ -799,10 +799,10 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     }
     else
     {
-        frame.pts = AV_NOPTS_VALUE;
+        frame.pts = (int64_t)AV_NOPTS_VALUE;
     }
 
-    if ( frame.pts != (int64_t)  AV_NOPTS_VALUE && frame.pts != 0 )
+    if ( frame.pts != (int64_t)AV_NOPTS_VALUE && frame.pts != 0 )
     {
         if ( p_sys->i_last_pts == frame.pts )
         {
@@ -852,7 +852,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             /* No delay -> output pts == input pts */
             p_block->i_pts = p_block->i_dts = p_pict->date;
         }
-        else if( p_sys->p_context->coded_frame->pts != (signed int) AV_NOPTS_VALUE &&
+        else if( p_sys->p_context->coded_frame->pts != (int64_t)AV_NOPTS_VALUE &&
             p_sys->p_context->coded_frame->pts != 0 &&
             p_sys->i_buggy_pts_detect != p_sys->p_context->coded_frame->pts )
         {
@@ -861,11 +861,11 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 
             /* Ugly work-around for stupid libavcodec behaviour */
             {
-            int64_t i_framenum = p_block->i_pts *
-                p_enc->fmt_in.video.i_frame_rate /
-                p_enc->fmt_in.video.i_frame_rate_base / AV_TIME_BASE;
+                int64_t i_framenum = p_block->i_pts *
+                    p_enc->fmt_in.video.i_frame_rate /
+                    p_enc->fmt_in.video.i_frame_rate_base / AV_TIME_BASE;
 
-            p_block->i_pts = p_sys->pi_delay_pts[i_framenum % MAX_FRAME_DELAY];
+                p_block->i_pts = p_sys->pi_delay_pts[i_framenum % MAX_FRAME_DELAY];
             }
             /* End work-around */
 
