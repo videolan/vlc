@@ -148,6 +148,7 @@ Rene Gollent <rgollent at u.arizona.edu> - BeOS interface fix
 Rob Casey (rob dot casey AT swishgroup dot com dot au) - Amino RTSP fix
 Roine Gustafsson <roine at popstar.com> - spudec bug fixes
 Rudolf Cornelissen <rag.cornelissen at inter.nl.net> - BeOS fixes
+Saso Kiselkov <skiselkov _at_ gmail dot com> - RTSP session timeout fix for some STBs 
 Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX 
 improvements
 Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
