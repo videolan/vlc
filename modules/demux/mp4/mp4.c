@@ -1663,7 +1663,7 @@ static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
     vlc_bool_t b_reselect = VLC_FALSE;
 
     /* now see if actual es is ok */
-    if( (p_track->i_chunk == 0) ||
+    if( (p_track->i_chunk < 0) ||
         (p_track->i_chunk >= p_track->i_chunk_count - 1) ||
         (p_track->chunk[p_track->i_chunk].i_sample_description_index !=
             p_track->chunk[i_chunk].i_sample_description_index) )
