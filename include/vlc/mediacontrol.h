@@ -37,6 +37,7 @@ extern "C" {
 # endif
 
 #if defined( WIN32 )
+#include <windows.h>
 #define WINDOWHANDLE HWND
 #else
 #define WINDOWHANDLE int
