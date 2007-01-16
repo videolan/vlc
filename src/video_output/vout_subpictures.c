@@ -804,6 +804,9 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 }
             }
 
+            i_x_offset = __MIN( i_x_offset, 0 );
+            i_y_offset = __MIN( i_y_offset, 0 );
+
             p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
                 p_pic_src, &p_region->picture, i_x_offset, i_y_offset,
                 i_fade_alpha * p_subpic->i_alpha / 255 );
