@@ -720,3 +720,7 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 < Meuuh> a mother is not generally considered a woman
   -- #videolan
 %
+<olsen_> hi, how can i adjust the brightness?
+<Dnumgis> olsen_: usually there is a nob on your monitor
+  -- #videolan
+%
