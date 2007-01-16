@@ -199,6 +199,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !aout_DateGet( &p_sys->end_date ) && !(*pp_block)->i_pts )
     {
         /* We've just started the stream, wait for the first PTS. */
+        msg_Dbg( p_dec, "waiting for PTS" );
         block_Release( *pp_block );
         return NULL;
     }
