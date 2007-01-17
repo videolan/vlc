@@ -433,7 +433,6 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                     if( cd->psz_name ) free( cd->psz_name );
                     cd->psz_name = strdup(  config_CategoryNameGet(
                                                       p_item->value.i ) );
-                    msg_Err(p_intf, "found a subcategory %s", cd->psz_name );
                     if( cd->psz_help ) free( cd->psz_help );
                     char *psz_help = config_CategoryHelpGet( p_item->value.i );
                     if( psz_help )
@@ -507,18 +506,15 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         /* Exclude the main module */
         if( !strcmp( p_module->psz_object_name, "main" ) )
             continue;
-        msg_Err(p_intf, "processing %s", p_module->psz_object_name);
         /* Exclude empty plugins (submodules don't have config options, they
          * are stored in the parent module) */
         if( p_module->b_submodule )
               continue;
 //            p_item = ((module_t *)p_module->p_parent)->p_config;
         else
-//msg_Err(p_intf,"1p_item=0x%x, p_end=0x%x, i_optoin=%i", p_item, p_end, i_options);
         for (size_t i = 0; i < p_module->confsize; i++)
         {
             module_config_t *p_item = p_module->p_config + i;
-            msg_Err(p_intf,"i_type=0x%x, value=%i", p_item->i_type, p_item->value.i);
             if( p_item->i_type == CONFIG_CATEGORY )
             {
                 i_category = p_item->value.i;
@@ -531,11 +527,9 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                 i_options ++;
             if( i_options > 0 && i_category >= 0 && i_subcategory >= 0 )
             {
-                msg_Err(p_intf,"break");
                 break;
             }
         }
-msg_Err(p_intf,"p_item=0x%x, p_end=0x%x, i_optoin=%i, i_category=%i", p_item, p_end, i_options, i_category);
 
         if( !i_options ) continue;
 
@@ -548,7 +542,6 @@ msg_Err(p_intf,"p_item=0x%x, p_end=0x%x, i_optoin=%i, i_category=%i", p_item, p_
         {
             ConfigTreeData *config_data =
                     (ConfigTreeData *)GetItemData( category_item );
-//            msg_Err(p_intf,"%i, %i", config_data->i_object_id, i_category);
             if( config_data->i_object_id == i_category )
             {
                 b_found = VLC_TRUE;
@@ -556,7 +549,6 @@ msg_Err(p_intf,"p_item=0x%x, p_end=0x%x, i_optoin=%i, i_category=%i", p_item, p_
             }
             category_item = GetNextChild( root_item, cookie );
         }
-msg_Err(p_intf, "found=%i", b_found);
         if( !b_found ) continue;
 
         /* Find subcategory item */
@@ -610,7 +602,6 @@ msg_Err(p_intf, "found=%i", b_found);
         #else
         i_image = -1;
         #endif
-        msg_Err(p_intf, "adding %s with image %i ", p_module->psz_shortname ?                                       p_module->psz_shortname : p_module->psz_object_name, i_image);
         AppendItem( subcategory_item, wxU( p_module->psz_shortname ?
                        p_module->psz_shortname : p_module->psz_object_name )
                                     , i_image, -1,
@@ -958,9 +949,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                 {
                     break;
                 }
-                if( p_item < p_end )
-                    break;
-            } while( p_item++ );
+            } while( p_item++ <= p_end );
         }
 
         /* Add a head title to the panel */
