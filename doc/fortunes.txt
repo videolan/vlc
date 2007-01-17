@@ -724,3 +724,8 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 <Dnumgis> olsen_: usually there is a nob on your monitor
   -- #videolan
 %
+< Jastr> is there a way to see the rtp stream before it hits darwin?
+< Dnumgis> Jastr: the rtp stream is a ninja assasin, you never see it
+                 before it hits
+  -- #videolan
+%
