@@ -86,6 +86,7 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
 vlc_module_begin();
 #   define TELX_CFG_PREFIX "telx-"
     set_description( _("Teletext subtitles decoder") );
+    set_shortname( "Teletext" );
     set_capability( "decoder", 50 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_SCODEC );
@@ -492,7 +493,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             /* row 0 : flags and header line */
             int flag = 0;
             int a;
-            char *t = NULL;
             
             for ( a = 0; a < 6; a++ )
             {
