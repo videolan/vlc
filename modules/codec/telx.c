@@ -471,7 +471,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         uint8_t * packet = (uint8_t *) p_block->p_buffer+offset;
         int vbi = ((0x20 & packet[2]) != 0 ? 0 : 313) + (0x1F & packet[2]);
       
-        dbg((p_dec, "vbi %d header %02x %02x %02x\n", vbi packet[0], packet[1], packet[2]));
+        dbg((p_dec, "vbi %d header %02x %02x %02x\n", vbi, packet[0], packet[1], packet[2]));
         if ( packet[0] == 0xFF ) continue;
 
 /*      if (packet[1] != 0x2C) { */
