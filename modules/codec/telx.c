@@ -24,36 +24,16 @@
  * information on teletext format can be found here : 
  * http://pdc.ro.nu/teletext.html
  *
- * TODO :
- *
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <assert.h>
 #include <stdint.h>
 
-/* This is an ugly test so that this source compile for both 0.8.6 and current
- * trunk version. Considere this hack to be temporary, but I need it so that
- * I can maintain my patch for both current svn and 0.8.6 in an easy way. */
-#ifdef VLC_ENOITEM
-/* svn trunk */
 #include "vlc_vout.h"
-#else
-/* 0.8.6 */
-#include <vlc/vout.h>
-#include <vlc/decoder.h>
-#include <vlc/sout.h>
-/* #include "vlc_es.h" */
-/* #include "vlc_block.h" */
-/* #include "vlc_video.h" */
-/* #include "vlc_spu.h" */
-#endif
-
 #include "vlc_bits.h"
 #include "vlc_codec.h"
 
-
 /* #define TELX_DEBUG */
-
 #ifdef TELX_DEBUG
 #   define dbg( a ) msg_Dbg a 
 #else
@@ -84,7 +64,6 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
 #define IGNORE_SUB_FLAG_LONGTEXT N_("Ignore the subtitle flag, try this if your subtitles don't appear.")
 
 vlc_module_begin();
-#   define TELX_CFG_PREFIX "telx-"
     set_description( _("Teletext subtitles decoder") );
     set_shortname( "Teletext" );
     set_capability( "decoder", 50 );
@@ -698,8 +677,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         goto error;
     }
     
-    p_spu->b_pausable = VLC_TRUE;
-    
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');
@@ -723,6 +700,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
     p_spu->b_ephemer = (p_block->i_length == 0);
     p_spu->b_absolute = VLC_FALSE;
+    p_spu->b_pausable = VLC_TRUE;
     dbg((p_dec, "%ld --> %ld\n", (long int) p_block->i_pts/100000, (long int)p_block->i_length/100000));
 
     block_Release( p_block );
