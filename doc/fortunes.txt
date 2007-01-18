@@ -729,3 +729,8 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
                  before it hits
   -- #videolan
 %
+<zigovr3> what is atsc ?
+<xtophe> like dvb but in america
+<xtophe> with packet measured in inches instead of mm
+  -- #videolan
+%
