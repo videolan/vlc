@@ -110,7 +110,7 @@ struct decoder_sys_t
   char        ppsz_lines[32][128];
   char        psz_prev_text[512];
   mtime_t     prev_pts;
-  int         i_page;
+  int         i_page[9];
   vlc_bool_t  b_erase[9];
   uint16_t *  pi_active_national_set[9];
 };
@@ -159,6 +159,7 @@ static uint16_t ppi_national_subsets[][20] =
   { 0x0023, 0x00a4, 0x0162, 0x00c2, 0x015e, 0x0102, 0x00ce, 0x0131, 
     0x0163, 0x00e2, 0x015f, 0x0103, 0x00ee }, /* rumanian ,111 */
 
+  /* I have these tables too, but I don't know how they can be triggered */
   { 0x0023, 0x0024, 0x0160, 0x0117, 0x0119, 0x017d, 0x010d, 0x016b, 
     0x0161, 0x0105, 0x0173, 0x017e, 0x012f }, /* lettish,lithuanian ,1000 */
 
@@ -315,6 +316,7 @@ static int hamming_8_4( int a )
 
 // utc-2 --> utf-8
 // this is not a general function, but it's enough for what we do here
+// the result buffer need to be at least 4 bytes long
 static void to_utf8( char * res, uint16_t ch )
 {
     if( ch >= 0x80 )
@@ -461,13 +463,18 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     *pp_block = NULL;
 
+    dbg((p_dec, "start of telx packet with header %2x\n",
+                * (uint8_t *) p_block->p_buffer));
     len = p_block->i_buffer;
     for ( offset = 1; offset + 46 <= len; offset += 46 )
     {
         uint8_t * packet = (uint8_t *) p_block->p_buffer+offset;
+        int vbi = ((0x20 & packet[2]) != 0 ? 0 : 313) + (0x1F & packet[2]);
       
-        /* dbg((p_dec, "header %02x %02x %02x\n", packet[0], packet[1], packet[2])); */
-/*       if (packet[1] != 0x2C) { */
+        dbg((p_dec, "vbi %d header %02x %02x %02x\n", vbi packet[0], packet[1], packet[2]));
+        if ( packet[0] == 0xFF ) continue;
+
+/*      if (packet[1] != 0x2C) { */
 /*         printf("wrong header\n"); */
 /*         //goto error; */
 /*         continue; */
@@ -500,28 +507,37 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                           << (a * 4);
             }
 
-            dbg((p_dec, "mag %d flags %x page %x character set %d subtitles %d\n%s\n", magazine, flag, 
-                 //p_sys->i_page, 
-                 (0xF0 & bytereverse(hamming_8_4(packet[7]) )) |
-                 (0xF & bytereverse(hamming_8_4(packet[6]) )>>4 ),
-                 7 & flag>>21, 1 & flag>>15, t));
-
     /*         if (!b_ignore_sub_flag && !(1 & flag>>15)) */
     /*           continue; */
 
-            p_sys->i_page = (0xF0 & bytereverse( hamming_8_4(packet[7]) )) |
+            p_sys->i_page[magazine] = (0xF0 & bytereverse( hamming_8_4(packet[7]) )) |
                              (0xF & (bytereverse( hamming_8_4(packet[6]) ) >> 4) );
 
             decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
                            packet + 14, 40 - 14 );
 
+            dbg((p_dec, "mag %d flags %x page %x character set %d subtitles %d", magazine, flag,
+                 p_sys->i_page[magazine],
+                 7 & flag>>21, 1 & flag>>15, psz_line));
+
             p_sys->pi_active_national_set[magazine] =
                                  ppi_national_subsets[7 & (flag >> 21)];
 
             p_sys->b_is_subtitle[magazine] = b_ignore_sub_flag
-                                              || (1 & (flag >> 15));
-            
-            if ( (i_conf_wanted_page && p_sys->i_page != i_wanted_page)
+                                              || ( (1 & (flag >> 15))
+                                                  && (1 & (flag>>16)) );
+
+            dbg(( p_dec, "FLAGS%s%s%s%s%s%s%s mag_ser %d",
+                  (1 & (flag>>14))? " news" : "",
+                  (1 & (flag>>15))? " subtitle" : "",
+                  (1 & (flag>>7))? " erase" : "",
+                  (1 & (flag>>16))? " suppressed_head" : "",
+                  (1 & (flag>>17))? " update" : "",
+                  (1 & (flag>>18))? " interrupt" : "",
+                  (1 & (flag>>19))? " inhibit" : "",
+                  (1 & (flag>>20)) ));
+           
+            if ( (i_conf_wanted_page && p_sys->i_page[magazine] != i_wanted_page)
                    || !p_sys->b_is_subtitle[magazine] )
                 continue;
 
@@ -531,8 +547,10 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             /* kludge here : 
              * we ignore the erase flag if it happens less than 1.5 seconds
              * before last caption
-             *TODO make this time configurable */
-            if ( p_block->i_pts > p_sys->prev_pts + 1500000 && 
+             * TODO   make this time configurable
+             * UPDATE the kludge seems to be no more necessary
+             *        so it's commented out*/
+            if ( /*p_block->i_pts > p_sys->prev_pts + 1500000 && */
                  p_sys->b_erase[magazine] )
             {
                 int i;
@@ -563,8 +581,9 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             int i;
             /* row 1-23 : normal lines */
 
-            if ( (i_conf_wanted_page && p_sys->i_page != i_wanted_page)
-                   || !p_sys->b_is_subtitle[magazine] )
+            if ( (i_conf_wanted_page && p_sys->i_page[magazine] != i_wanted_page)
+                   || !p_sys->b_is_subtitle[magazine] 
+                   || (!i_conf_wanted_page && p_sys->i_page[magazine] > 0x99) )
                 continue;
 
             decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
@@ -617,7 +636,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         else if ( row == 25 )
         {
             /* row 25 : alternate header line */
-            if ( (i_conf_wanted_page && p_sys->i_page != i_wanted_page)
+            if ( (i_conf_wanted_page && p_sys->i_page[magazine] != i_wanted_page)
                    || !p_sys->b_is_subtitle[magazine] )
                 continue;
 
