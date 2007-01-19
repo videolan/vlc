@@ -41,27 +41,19 @@
 #endif
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int telx_conf_cb ( vlc_object_t *,      /* variable's object */
-                          char const *,            /* variable name */
-                          vlc_value_t,                 /* old value */
-                          vlc_value_t,                 /* new value */
-                          void * );                /* callback data */
-
-/*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 static subpicture_t *Decode( decoder_t *, block_t ** );
 
-
-#define PAGE_TEXT N_("Teletext page")
-#define PAGE_LONGTEXT N_("Set displayed teletext page for subtitles, 0 for all pages, 888 should be a standard value. Just leave it to zero if your stream has only one language for subtitles.")
+#define OVERRIDE_PAGE_TEXT N_("Override page")
+#define OVERRIDE_PAGE_LONGTEXT N_("Override the indicated page, try this if " \
+        "your subtitles don't appear (0 = autodetect, usually 888 or 889).")
 
 #define IGNORE_SUB_FLAG_TEXT N_("Ignore subtitle flag")
-#define IGNORE_SUB_FLAG_LONGTEXT N_("Ignore the subtitle flag, try this if your subtitles don't appear.")
+#define IGNORE_SUB_FLAG_LONGTEXT N_("Ignore the subtitle flag, try this if " \
+        "your subtitles don't appear.")
 
 vlc_module_begin();
     set_description( _("Teletext subtitles decoder") );
@@ -71,9 +63,9 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_SCODEC );
     set_callbacks( Open, Close );
 
-    add_integer( "telx-page", 0, telx_conf_cb, PAGE_TEXT, PAGE_LONGTEXT,
-                 VLC_FALSE );
-    add_bool( "telx-ignore-subtitle-flag", 0, telx_conf_cb,
+    add_integer( "telx-override-page", -1, NULL,
+                 OVERRIDE_PAGE_TEXT, OVERRIDE_PAGE_LONGTEXT, VLC_TRUE );
+    add_bool( "telx-ignore-subtitle-flag", 0, NULL,
               IGNORE_SUB_FLAG_TEXT, IGNORE_SUB_FLAG_LONGTEXT, VLC_TRUE );
 
 vlc_module_end();
@@ -92,14 +84,13 @@ struct decoder_sys_t
   int         i_page[9];
   vlc_bool_t  b_erase[9];
   uint16_t *  pi_active_national_set[9];
+  int         i_wanted_page, i_wanted_magazine;
+  vlc_bool_t  b_ignore_sub_flag;
 };
 
 /****************************************************************************
  * Local data
  ****************************************************************************/
-
-static int i_conf_wanted_page = 0; /* default 0 = all pages */
-static vlc_bool_t b_ignore_sub_flag = 0;
 
 /*
  * My doc only mentions 13 national characters, but experiments show there 
@@ -188,14 +179,36 @@ static int Open( vlc_object_t *p_this )
     for ( i = 0; i < 9; i++ )
         p_sys->pi_active_national_set[i] = ppi_national_subsets[1];
 
-    var_Create( p_dec, "telx-page", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "telx-page", &val );
-    i_conf_wanted_page = val.i_int;
+    var_Create( p_dec, "telx-override-page",
+                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_dec, "telx-override-page", &val );
+    if( val.i_int == -1 )
+    {
+        p_sys->i_wanted_magazine = p_dec->fmt_in.subs.dvb.i_id >> 16;
+        if( p_sys->i_wanted_magazine == 0 )
+            p_sys->i_wanted_magazine = 8;
+        p_sys->i_wanted_page = p_dec->fmt_in.subs.dvb.i_id & 0xff;
+    }
+    else if( val.i_int == 0 )
+    {
+        p_sys->i_wanted_magazine = -1;
+        p_sys->i_wanted_page = -1;
+    }
+    else
+    {
+        p_sys->i_wanted_magazine = val.i_int / 100;
+        p_sys->i_wanted_page = (((val.i_int % 100) / 10) << 4)
+                                | ((val.i_int % 100) % 10);
+    }
 
     var_Create( p_dec, "telx-ignore-subtitle-flag",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "telx-ignore-subtitle-flag", &val );
-    b_ignore_sub_flag = val.b_bool;
+    p_sys->b_ignore_sub_flag = val.b_bool;
+
+    msg_Dbg( p_dec, "starting telx on magazine %d page %x flag %d",
+             p_sys->i_wanted_magazine, p_sys->i_wanted_page,
+             p_sys->b_ignore_sub_flag );
 
     return VLC_SUCCESS;
 
@@ -206,30 +219,6 @@ static int Open( vlc_object_t *p_this )
 /*     } */
 /*     return VLC_EGENERIC; */
 }
-
-/*****************************************************************************
- * Config callback
- *****************************************************************************/
-static int telx_conf_cb ( vlc_object_t * obj,      /* variable's object */
-                          char const * name,       /* variable name */
-                          vlc_value_t oldv,        /* old value */
-                          vlc_value_t newv,        /* new value */
-                          void * data)             /* callback data */
-{
-    if ( !strcmp(name, "telx-page") )
-    {
-        i_conf_wanted_page = newv.i_int;
-        dbg((obj, "display teletext page changed to %d\n", i_conf_wanted_page));
-    }
-    else if ( !strcmp(name, "telx-ignore-subtitle-flag") )
-    {
-        b_ignore_sub_flag = newv.b_bool;
-        dbg((obj, "ignore sub flag changed to %d\n", (int) b_ignore_sub_flag));
-    }
-
-    return 0;
-}
-
 
 /*****************************************************************************
  * Close:
@@ -430,9 +419,11 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     video_format_t fmt;
     /* int erase = 0; */
     int len, offset;
+#if 0
     int i_wanted_magazine = i_conf_wanted_page / 100;
     int i_wanted_page = 0x10 * ((i_conf_wanted_page % 100) / 10)
                          | (i_conf_wanted_page % 10);
+#endif
     vlc_bool_t b_update = VLC_FALSE;
     char psz_text[512], *pt = psz_text;
     char psz_line[256];
@@ -472,7 +463,9 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         magazine = (7 & row) == 0 ? 8 : (7 & row);
         row >>= 3;
 
-        if ( i_conf_wanted_page && magazine != i_wanted_magazine ) continue;
+        if ( p_sys->i_wanted_page != -1
+              && magazine != p_sys->i_wanted_magazine )
+            continue;
 
         if ( row == 0 )
         {
@@ -486,7 +479,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                           << (a * 4);
             }
 
-    /*         if (!b_ignore_sub_flag && !(1 & flag>>15)) */
+    /*         if (!p_sys->b_ignore_sub_flag && !(1 & flag>>15)) */
     /*           continue; */
 
             p_sys->i_page[magazine] = (0xF0 & bytereverse( hamming_8_4(packet[7]) )) |
@@ -502,7 +495,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             p_sys->pi_active_national_set[magazine] =
                                  ppi_national_subsets[7 & (flag >> 21)];
 
-            p_sys->b_is_subtitle[magazine] = b_ignore_sub_flag
+            p_sys->b_is_subtitle[magazine] = p_sys->b_ignore_sub_flag
                                               || ( (1 & (flag >> 15))
                                                   && (1 & (flag>>16)) );
 
@@ -516,7 +509,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                   (1 & (flag>>19))? " inhibit" : "",
                   (1 & (flag>>20)) ));
            
-            if ( (i_conf_wanted_page && p_sys->i_page[magazine] != i_wanted_page)
+            if ( (p_sys->i_wanted_page != -1
+                   && p_sys->i_page[magazine] != p_sys->i_wanted_page)
                    || !p_sys->b_is_subtitle[magazine] )
                 continue;
 
@@ -560,9 +554,11 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             int i;
             /* row 1-23 : normal lines */
 
-            if ( (i_conf_wanted_page && p_sys->i_page[magazine] != i_wanted_page)
+            if ( (p_sys->i_wanted_page != -1
+                   && p_sys->i_page[magazine] != p_sys->i_wanted_page)
                    || !p_sys->b_is_subtitle[magazine] 
-                   || (!i_conf_wanted_page && p_sys->i_page[magazine] > 0x99) )
+                   || (p_sys->i_wanted_page == -1
+                        && p_sys->i_page[magazine] > 0x99) )
                 continue;
 
             decode_string( psz_line, sizeof(psz_line), p_sys, magazine,
@@ -615,7 +611,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         else if ( row == 25 )
         {
             /* row 25 : alternate header line */
-            if ( (i_conf_wanted_page && p_sys->i_page[magazine] != i_wanted_page)
+            if ( (p_sys->i_wanted_page != -1
+                   && p_sys->i_page[magazine] != p_sys->i_wanted_page)
                    || !p_sys->b_is_subtitle[magazine] )
                 continue;
 

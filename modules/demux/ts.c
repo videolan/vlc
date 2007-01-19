@@ -2655,7 +2655,7 @@ static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
              i_table_id, i_table_id, i_extension, i_extension );
 #endif
     if( p_demux->p_sys->pid[0].psi->i_pat_version == -1 )
-	return;
+        return;
 
     if( i_table_id == 0x42 )
     {
@@ -3016,69 +3016,210 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     msg_Dbg( p_demux, "    * EBU Teletext descriptor" );
                     pid->es->fmt.i_cat = SPU_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 't', 'e', 'l', 'x' );
-                    pid->es->fmt.psz_description = strdup( "Teletext" );
                     pid->es->fmt.i_extra = p_dr->i_length;
                     pid->es->fmt.p_extra = malloc( p_dr->i_length );
                     memcpy( pid->es->fmt.p_extra, p_dr->p_data,
                             p_dr->i_length );
+
+#ifdef _DVBPSI_DR_56_H_
+                    pid->es->fmt.i_group = p_pmt->i_program_number;
+
+                    /* If i_dvb_program == -1 it means the user specified
+                     * --sout-all or --programs, so she want to stream, and
+                     * she doesn't want to stream several identical ESes
+                     * with different language descriptors. So for -1 we
+                     * just enable descriptor pass-through. --Meuuh */
+                    if( p_sys->i_dvb_program != -1 )
+                    {
+                        uint16_t n, i = 0;
+                        dvbpsi_teletext_dr_t *sub;
+
+                        sub = dvbpsi_DecodeTeletextDr( p_dr );
+                        if( !sub ) continue;
+
+                        /* Each subtitle ES contains n languages,
+                         * We are going to create n ES for the n tracks */
+                        for( n = 0; n < sub->i_pages_number; n++ )
+                        {
+                            dvbpsi_teletextpage_t *p_page = &sub->p_pages[n];
+                            if( p_page->i_teletext_type == 0x2
+                                 || p_page->i_teletext_type == 0x5 )
+                            {
+                                ts_es_t *p_es;
+
+                                if( i == 0 )
+                                {
+                                    p_es = pid->es;
+                                }
+                                else
+                                {
+                                    p_es = malloc( sizeof( ts_es_t ) );
+                                    p_es->fmt = pid->es->fmt;
+                                    p_es->id = NULL;
+                                    p_es->p_pes = NULL;
+                                    p_es->i_pes_size = 0;
+                                    p_es->i_pes_gathered = 0;
+                                    p_es->pp_last = &p_es->p_pes;
+                                    p_es->p_mpeg4desc = NULL;
+
+                                    TAB_APPEND( pid->i_extra_es, pid->extra_es,
+                                                p_es );
+                                }
+
+                                p_es->fmt.psz_language = malloc( 4 );
+                                memcpy( p_es->fmt.psz_language,
+                                        p_page->i_iso6392_language_code, 3 );
+                                p_es->fmt.psz_language[3] = 0;
+
+                                switch( p_page->i_teletext_type )
+                                {
+                                case 0x2:
+                                    p_es->fmt.psz_description =
+                                        strdup(_("subtitles"));
+                                    msg_Dbg( p_demux,
+                                             "    * sub lan=%s page=%d%x",
+                                             p_es->fmt.psz_language,
+                                             p_page->i_teletext_magazine_number,
+                                             p_page->i_teletext_page_number );
+                                    break;
+
+                                case 0x5:
+                                    p_es->fmt.psz_description =
+                                        strdup(_("hearing impaired"));
+                                    msg_Dbg( p_demux,
+                                             "    * hearing impaired lan=%s page=%d%x",
+                                             p_es->fmt.psz_language,
+                                             p_page->i_teletext_magazine_number,
+                                             p_page->i_teletext_page_number );
+                                    break;
+                                default:
+                                    break;
+                                }
+
+                                p_es->fmt.subs.dvb.i_id =
+                                    p_page->i_teletext_page_number;
+                                /* Hack, FIXME */
+                                p_es->fmt.subs.dvb.i_id |=
+                                ((int)p_page->i_teletext_magazine_number << 16);
+
+                                i++;
+                            }
+                        }
+
+                        if( !i )
+                            pid->es->fmt.i_cat = UNKNOWN_ES;
+                    }
+#else
+                    pid->es->fmt.psz_description = strdup( "Teletext" );
+#endif
                 }
-#ifdef _DVBPSI_DR_59_H_
                 else if( p_dr->i_tag == 0x59 )
                 {
-                    uint16_t n;
-                    dvbpsi_subtitling_dr_t *sub;
-
                     /* DVB subtitles */
                     pid->es->fmt.i_cat = SPU_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 'd', 'v', 'b', 's' );
+                    pid->es->fmt.i_extra = p_dr->i_length;
+                    pid->es->fmt.p_extra = malloc( p_dr->i_length );
+                    memcpy( pid->es->fmt.p_extra, p_dr->p_data,
+                            p_dr->i_length );
+
+#ifdef _DVBPSI_DR_59_H_
                     pid->es->fmt.i_group = p_pmt->i_program_number;
 
-                    sub = dvbpsi_DecodeSubtitlingDr( p_dr );
-                    if( !sub ) continue;
-
-                    /* Each subtitle ES contains n languages,
-                     * We are going to create n ES for the n tracks */
-                    if( sub->i_subtitles_number > 0 )
+                    /* If i_dvb_program == -1 it means the user specified
+                     * --sout-all or --programs, so she want to stream, and
+                     * she doesn't want to stream several identical ESes
+                     * with different language descriptors. So for -1 we
+                     * just enable descriptor pass-through. --Meuuh */
+                    if( p_sys->i_dvb_program != -1 )
                     {
-                        pid->es->fmt.psz_language = malloc( 4 );
-                        memcpy( pid->es->fmt.psz_language,
-                                sub->p_subtitle[0].i_iso6392_language_code, 3);
-                        pid->es->fmt.psz_language[3] = 0;
+                        uint16_t n, i = 0;
+                        dvbpsi_subtitling_dr_t *sub;
 
-                        pid->es->fmt.subs.dvb.i_id =
-                            sub->p_subtitle[0].i_composition_page_id;
-                        /* Hack, FIXME */
-                        pid->es->fmt.subs.dvb.i_id |=
-                          ((int)sub->p_subtitle[0].i_ancillary_page_id << 16);
+                        sub = dvbpsi_DecodeSubtitlingDr( p_dr );
+                        if( !sub ) continue;
+
+                        for( n = 0; n < sub->i_subtitles_number; n++ )
+                        {
+                            dvbpsi_subtitle_t *p_sub = &sub->p_subtitle[n];
+                            ts_es_t *p_es;
+
+                            if( i == 0 )
+                            {
+                                p_es = pid->es;
+                            }
+                            else
+                            {
+                                p_es = malloc( sizeof( ts_es_t ) );
+                                p_es->fmt = pid->es->fmt;
+                                p_es->id = NULL;
+                                p_es->p_pes = NULL;
+                                p_es->i_pes_size = 0;
+                                p_es->i_pes_gathered = 0;
+                                p_es->pp_last = &p_es->p_pes;
+                                p_es->p_mpeg4desc = NULL;
+
+                                TAB_APPEND( pid->i_extra_es, pid->extra_es,
+                                            p_es );
+                            }
+
+                            p_es->fmt.psz_language = malloc( 4 );
+                            memcpy( p_es->fmt.psz_language,
+                                    p_sub->i_iso6392_language_code, 3 );
+                            p_es->fmt.psz_language[3] = 0;
+
+                            switch( p_sub->i_subtitling_type )
+                            {
+                            case 0x10:
+                                p_es->fmt.psz_description =
+                                    strdup(_("subtitles"));
+                                break;
+                            case 0x11:
+                                p_es->fmt.psz_description =
+                                    strdup(_("4:3 subtitles"));
+                                break;
+                            case 0x12:
+                                p_es->fmt.psz_description =
+                                    strdup(_("16:9 subtitles"));
+                                break;
+                            case 0x13:
+                                p_es->fmt.psz_description =
+                                    strdup(_("2.21:1 subtitles"));
+                                break;
+                            case 0x20:
+                                p_es->fmt.psz_description =
+                                    strdup(_("hearing impaired"));
+                                break;
+                            case 0x21:
+                                p_es->fmt.psz_description =
+                                    strdup(_("4:3 hearing impaired"));
+                                break;
+                            case 0x22:
+                                p_es->fmt.psz_description =
+                                    strdup(_("16:9 hearing impaired"));
+                                break;
+                            case 0x23:
+                                p_es->fmt.psz_description =
+                                    strdup(_("2.21:1 hearing impaired"));
+                                break;
+                            default:
+                                break;
+                            }
+
+                            p_es->fmt.subs.dvb.i_id =
+                                p_sub->i_composition_page_id;
+                            /* Hack, FIXME */
+                            p_es->fmt.subs.dvb.i_id |=
+                              ((int)p_sub->i_ancillary_page_id << 16);
+
+                            i++;
+                        }
+
+                        if( !i )
+                            pid->es->fmt.i_cat = UNKNOWN_ES;
                     }
-                    else pid->es->fmt.i_cat = UNKNOWN_ES;
-
-                    for( n = 1; n < sub->i_subtitles_number; n++ )
-                    {
-                        ts_es_t *p_es = malloc( sizeof( ts_es_t ) );
-                        p_es->fmt = pid->es->fmt;
-                        p_es->id = NULL;
-                        p_es->p_pes = NULL;
-                        p_es->i_pes_size = 0;
-                        p_es->i_pes_gathered = 0;
-                        p_es->pp_last = &p_es->p_pes;
-                        p_es->p_mpeg4desc = NULL;
-
-                        p_es->fmt.psz_language = malloc( 4 );
-                        memcpy( p_es->fmt.psz_language,
-                                sub->p_subtitle[n].i_iso6392_language_code, 3);
-                        p_es->fmt.psz_language[3] = 0;
-
-                        p_es->fmt.subs.dvb.i_id =
-                            sub->p_subtitle[n].i_composition_page_id;
-                        /* Hack, FIXME */
-                        p_es->fmt.subs.dvb.i_id |=
-                          ((int)sub->p_subtitle[n].i_ancillary_page_id << 16);
-
-                        TAB_APPEND( pid->i_extra_es, pid->extra_es, p_es );
-                    }
-                }
 #endif /* _DVBPSI_DR_59_H_ */
+                }
             }
         }
         else if( p_es->i_type == 0xa0 )
@@ -3121,7 +3262,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
         if( pid->es->fmt.i_cat == AUDIO_ES ||
             ( pid->es->fmt.i_cat == SPU_ES &&
-              pid->es->fmt.i_codec != VLC_FOURCC('d','v','b','s') ) )
+              pid->es->fmt.i_codec != VLC_FOURCC('d','v','b','s') &&
+              pid->es->fmt.i_codec != VLC_FOURCC('t','e','l','x') ) )
         {
             /* get language descriptor */
             dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;
@@ -3133,7 +3275,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
                 if( p_decoded )
                 {
-#if DR_0A_API_VER >= 2
+#if defined(DR_0A_API_VER) && (DR_0A_API_VER >= 2)
                     pid->es->fmt.psz_language = malloc( 4 );
                     memcpy( pid->es->fmt.psz_language,
                             p_decoded->code[0].iso_639_code, 3 );
