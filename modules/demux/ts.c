@@ -3021,7 +3021,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     memcpy( pid->es->fmt.p_extra, p_dr->p_data,
                             p_dr->i_length );
 
-#ifdef _DVBPSI_DR_56_H_
+#if defined _DVBPSI_DR_56_H_ && defined DVBPSI_VERSION \
+                    && DVBPSI_VERSION_INT > ((0<<16)+(1<<8)+5)
                     pid->es->fmt.i_group = p_pmt->i_program_number;
 
                     /* If i_dvb_program == -1 it means the user specified
@@ -3110,8 +3111,9 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                             pid->es->fmt.i_cat = UNKNOWN_ES;
                     }
 #else
+                    pid->es->fmt.subs.dvb.i_id = -1;
                     pid->es->fmt.psz_description = strdup( "Teletext" );
-#endif
+#endif  /* defined _DVBPSI_DR_56_H_  && DVBPSI_VERSION(0,1,6) */
                 }
                 else if( p_dr->i_tag == 0x59 )
                 {

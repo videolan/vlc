@@ -49,7 +49,9 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
 
 #define OVERRIDE_PAGE_TEXT N_("Override page")
 #define OVERRIDE_PAGE_LONGTEXT N_("Override the indicated page, try this if " \
-        "your subtitles don't appear (0 = autodetect, usually 888 or 889).")
+        "your subtitles don't appear (-1 = autodetect from TS, " \
+        "0 = autodetect from teletext, " \
+        ">0 = actual page number, usually 888 or 889).")
 
 #define IGNORE_SUB_FLAG_TEXT N_("Ignore subtitle flag")
 #define IGNORE_SUB_FLAG_LONGTEXT N_("Ignore the subtitle flag, try this if " \
@@ -173,6 +175,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
+
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
     p_sys->i_align = 0;
@@ -182,14 +185,14 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_dec, "telx-override-page",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "telx-override-page", &val );
-    if( val.i_int == -1 )
+    if( val.i_int == -1 && p_dec->fmt_in.subs.dvb.i_id != -1 )
     {
         p_sys->i_wanted_magazine = p_dec->fmt_in.subs.dvb.i_id >> 16;
         if( p_sys->i_wanted_magazine == 0 )
             p_sys->i_wanted_magazine = 8;
         p_sys->i_wanted_page = p_dec->fmt_in.subs.dvb.i_id & 0xff;
     }
-    else if( val.i_int == 0 )
+    else if( val.i_int <= 0 )
     {
         p_sys->i_wanted_magazine = -1;
         p_sys->i_wanted_page = -1;
@@ -200,7 +203,6 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_wanted_page = (((val.i_int % 100) / 10) << 4)
                                 | ((val.i_int % 100) % 10);
     }
-
     var_Create( p_dec, "telx-ignore-subtitle-flag",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "telx-ignore-subtitle-flag", &val );
