@@ -1,32 +1,3 @@
---- gnutls-1.4.0/lib/gnutls_buffers.c	2006-03-08 11:44:59.000000000 +0100
-+++ gnutls/lib/gnutls_buffers.c	2006-07-12 14:29:06.000000000 +0200
-@@ -275,9 +275,12 @@
- 	{
- 	  _gnutls_read_log ("READ: %d returned from %d, errno=%d\n", i,
- 			    fd, errno);
--
-+#ifdef _WIN32
-+       if (WSAGetLastError() == WSAEWOULDBLOCK) {
-+#else
- 	  if (errno == EAGAIN || errno == EINTR)
- 	    {
-+#endif
- 	      if (sizeOfPtr - left > 0)
- 		{
- 
-@@ -707,8 +710,12 @@
- 
-       if (i == -1)
- 	{
-+#ifdef _WIN32
-+      if (WSAGetLastError() == WSAEWOULDBLOCK) {
-+#else
- 	  if (errno == EAGAIN || errno == EINTR)
- 	    {
-+#endif
- 	      session->internals.record_send_buffer_prev_size += n - left;
- 
- 	      retval =
 --- gnutls-1.4.0/gl/gai_strerror.c	2006-05-12 06:02:19.000000000 -0400
 +++ gnutls/gl/gai_strerror.c	2006-11-22 10:28:13.937500000 -0500
 @@ -64,7 +64,7 @@
@@ -46,3 +17,27 @@
  #ifdef _LIBC
  libc_hidden_def (gai_strerror)
  #endif
+--- gnutls-1.6.1/configure.in	2006-11-26 11:19:05.000000000 +0100
++++ gnutls/configure.in	2007-01-20 01:52:24.000000000 +0100
+@@ -187,9 +187,6 @@
+ 	fi
+ fi
+ 
+-# Needs to be called outside of 'if' clause.
+-AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes")
+-
+ AC_MSG_RESULT([***
+ *** Detecting C library capabilities...
+ ])
+@@ -583,6 +572,11 @@
+ LIBGNUTLS_EXTRA_CFLAGS="$LIBOPENCDK_CFLAGS -I${includedir}"
+ AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
+ AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
++
++
++# Needs to be called outside of 'if' clause.
++AM_CONDITIONAL(HAVE_LD_OUTPUT_DEF, test "$output_def" = "yes" -a "${enable_shared}" != "no")
++
+ export ac_full
+ 
+ CFLAGS="${CFLAGS} ${LIBGCRYPT_CFLAGS}"

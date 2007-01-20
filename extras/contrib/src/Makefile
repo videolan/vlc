@@ -1648,13 +1648,14 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 ifdef HAVE_WIN32
 	patch -p0 < Patches/gnutls-win32.patch
+	(cd $@; cd lgl; ln -sf alloca_.h alloca.h) 
 endif
 
 .gnutls: gnutls .gcrypt .gpg-error
 ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc && cd gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
+	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" --target=i586-mingw32msvc && cd gl && make && cd ../lgl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && cd gl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && cd gl && make && cd ../lgl && make &&  cd ../lib &&make && make install && cd ../includes && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
