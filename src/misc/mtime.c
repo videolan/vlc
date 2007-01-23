@@ -201,7 +201,7 @@ mtime_t mdate( void )
         {
             /* Counter wrapped */
             i_wrap_counts++;
-            usec_time += I64C(0x100000000000);
+            usec_time += I64C(0x100000000) * 1000;
         }
         i_previous_time = usec_time;
         LeaveCriticalSection( &date_lock );
