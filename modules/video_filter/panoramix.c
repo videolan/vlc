@@ -38,18 +38,16 @@
 #ifdef OVERLAP
     #include <math.h>
     // OS CODE DEPENDANT to get display dimensions
-    #ifdef SYS_LINUX
-        #include <X11/Xlib.h>
-    #else
     #ifdef SYS_MINGW32
         #include <windows.h>
-    #endif
+    #else 
+        #include <X11/Xlib.h>   
     #endif
     #define GAMMA        1
 //  #define PACKED_YUV    1
     #define F2(a) ((a)*(a))
     #define F4(a,b,x) ((a)*(F2(x))+((b)*(x)))
-    #define ACCURACY 255
+    #define ACCURACY 1000
     #define RATIO_MAX 2500
     #define CLIP_01(a) (a < 0.0 ? 0.0 : (a > 1.0 ? 1.0 : a))
 //    #define CLIP_0A(a) (a < 0.0 ? 0.0 : (a > ACCURACY ? ACCURACY : a))
@@ -90,7 +88,7 @@ static int  SendEvents( vlc_object_t *, char const *,
     "defaults to all")
 
 vlc_module_begin();
-    set_description( _("Panoramix: wall with overlap video filter") );
+    set_description( N_("Panoramix: wall with overlap video filter") );
     set_shortname( _("Panoramix" ));
     set_capability( "video filter", 0 );
     set_category( CAT_VIDEO );
@@ -183,7 +181,7 @@ vlc_module_begin();
     add_integer_with_range( "bz-whitelevel-red", 0, 0, 255, NULL, RGAMMA_WL_TEXT, RGAMMA_WL_LONGTEXT, VLC_TRUE );
     add_integer_with_range( "bz-whitelevel-green", 0, 0, 255, NULL, GGAMMA_WL_TEXT, GGAMMA_WL_LONGTEXT, VLC_TRUE );
     add_integer_with_range( "bz-whitelevel-blue", 0, 0, 255, NULL, BGAMMA_WL_TEXT, BGAMMA_WL_LONGTEXT, VLC_TRUE );
-#ifdef SYS_LINUX
+#ifndef SYS_MINGW32
 #define XINERAMA_TEXT N_("Xinerama option")
 #define XINERAMA_LONGTEXT N_("Uncheck if you have not used xinerama")
     add_bool( "xinerama", 1, NULL, XINERAMA_TEXT, XINERAMA_LONGTEXT, VLC_TRUE );
@@ -228,7 +226,7 @@ struct vout_sys_t
     uint8_t         LUT2[VOUT_MAX_PLANES][256][500];
 #endif
 #endif
-#ifdef SYS_LINUX
+#ifndef SYS_MINGW32
     vlc_bool_t   b_xinerama;
 #endif
 #endif
@@ -338,8 +336,8 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
     p_vout->pf_control = Control;
 
     /* Look what method was requested */
-    p_vout->p_sys->i_col = config_GetInt( p_vout, "panoramix-cols" );
-    p_vout->p_sys->i_row = config_GetInt( p_vout, "panoramix-rows" );
+    p_vout->p_sys->i_col = var_CreateGetInteger( p_vout, "panoramix-cols" );
+    p_vout->p_sys->i_row = var_CreateGetInteger( p_vout, "panoramix-rows" );
 
 // OS dependant code :  Autodetect number of displays in wall
 #ifdef SYS_MINGW32
@@ -362,40 +360,41 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
                 p_vout->p_sys->i_row = 1;
             }
         }
-        config_PutInt( p_vout, "panoramix-cols", p_vout->p_sys->i_col);
-        config_PutInt( p_vout, "panoramix-rows", p_vout->p_sys->i_row);
+        var_SetInteger( p_vout, "panoramix-cols", p_vout->p_sys->i_col);
+        var_SetInteger( p_vout, "panoramix-rows", p_vout->p_sys->i_row);
     }
 #endif
 
 #ifdef OVERLAP
-    p_vout->p_sys->i_offset_x = config_GetInt( p_vout, "offset-x" );
-    if (p_vout->p_sys->i_col > 2) p_vout->p_sys->i_offset_x = 0; // offset-x is used in case of 2x1 wall & autocrop
-    p_vout->p_sys->b_autocrop = !(config_GetInt( p_vout, "ratio" ) == 0);
-    if (!p_vout->p_sys->b_autocrop) p_vout->p_sys->b_autocrop = config_GetInt( p_vout, "autocrop" );
-    p_vout->p_sys->b_attenuate = config_GetInt( p_vout, "panoramix-attenuate");
-    p_vout->p_sys->bz_length = config_GetInt( p_vout, "bz-length" );
+    p_vout->p_sys->i_offset_x = var_CreateGetInteger( p_vout, "offset-x" );
+    if (p_vout->p_sys->i_col > 2) p_vout->p_sys->i_offset_x = 0; // offset-x is used in case of 2x1 wall & autocrop    
+    p_vout->p_sys->b_autocrop = !(var_CreateGetInteger( p_vout, "crop-ratio" ) == 0);
+    if (!p_vout->p_sys->b_autocrop) p_vout->p_sys->b_autocrop = var_CreateGetInteger( p_vout, "autocrop" );		
+    p_vout->p_sys->b_attenuate = var_CreateGetInteger( p_vout, "panoramix-attenuate");
+    p_vout->p_sys->bz_length = var_CreateGetInteger( p_vout, "bz-length" );
     if (p_vout->p_sys->i_row > 1)
-        p_vout->p_sys->bz_height = config_GetInt( p_vout, "bz-height" );
+        p_vout->p_sys->bz_height = var_CreateGetInteger( p_vout, "bz-height" );
     else
         p_vout->p_sys->bz_height = 100;
-    p_vout->p_sys->bz_begin = config_GetInt( p_vout, "bz-begin" );
-    p_vout->p_sys->bz_middle = config_GetInt( p_vout, "bz-middle" );
-    p_vout->p_sys->bz_end = config_GetInt( p_vout, "bz-end" );
-    p_vout->p_sys->bz_middle_pos = config_GetInt( p_vout, "bz-middle-pos" );
+    p_vout->p_sys->bz_begin = var_CreateGetInteger( p_vout, "bz-begin" );
+    p_vout->p_sys->bz_middle = var_CreateGetInteger( p_vout, "bz-middle" );
+    p_vout->p_sys->bz_end = var_CreateGetInteger( p_vout, "bz-end" );
+    p_vout->p_sys->bz_middle_pos = var_CreateGetInteger( p_vout, "bz-middle-pos" );
     double d_p = 100.0 / p_vout->p_sys->bz_middle_pos;
-    p_vout->p_sys->i_ratio_max = config_GetInt( p_vout, "ratio-max" ); // in crop module with autocrop ...
-    p_vout->p_sys->i_ratio = config_GetInt( p_vout, "ratio" ); // in crop module with manual ratio ...
+    p_vout->p_sys->i_ratio_max = var_CreateGetInteger( p_vout, "autocrop-ratio-max" ); // in crop module with autocrop ...
+    p_vout->p_sys->i_ratio = var_CreateGetInteger( p_vout, "crop-ratio" ); // in crop module with manual ratio ...	
+    
     p_vout->p_sys->a_2 = d_p * p_vout->p_sys->bz_begin - (double)(d_p * d_p / (d_p - 1)) * p_vout->p_sys->bz_middle + (double)(d_p / (d_p - 1)) * p_vout->p_sys->bz_end;
     p_vout->p_sys->a_1 = -(d_p + 1) * p_vout->p_sys->bz_begin + (double)(d_p * d_p / (d_p - 1)) * p_vout->p_sys->bz_middle - (double)(1 / (d_p - 1)) * p_vout->p_sys->bz_end;
     p_vout->p_sys->a_0 =  p_vout->p_sys->bz_begin;
 
 #ifdef GAMMA
-    p_vout->p_sys->f_gamma_red = config_GetFloat( p_vout, "bz-gamma-red" );
-    p_vout->p_sys->f_gamma_green = config_GetFloat( p_vout, "bz-gamma-green" );
-    p_vout->p_sys->f_gamma_blue = config_GetFloat( p_vout, "bz-gamma-blue" );
+    p_vout->p_sys->f_gamma_red = var_CreateGetFloat( p_vout, "bz-gamma-red" );
+    p_vout->p_sys->f_gamma_green = var_CreateGetFloat( p_vout, "bz-gamma-green" );
+    p_vout->p_sys->f_gamma_blue = var_CreateGetFloat( p_vout, "bz-gamma-blue" );
 #endif
-#ifdef SYS_LINUX
-    p_vout->p_sys->b_xinerama= config_GetInt( p_vout, "xinerama" );
+#ifndef SYS_MINGW32
+    p_vout->p_sys->b_xinerama= var_CreateGetInteger( p_vout, "xinerama" );
 #endif
 #else
     p_vout->p_sys->i_col = __MAX( 1, __MIN( 15, p_vout->p_sys->i_col ) );
@@ -471,9 +470,18 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
 
 #ifdef OVERLAP
 /*****************************************************************************
+ * CLIP_0A: clip between 0 and ACCURACY
+ *****************************************************************************/
+inline static int CLIP_0A( int a )
+{
+    return (a > ACCURACY) ? ACCURACY : (a < 0) ? 0 : a;
+}
+
+#ifdef GAMMA
+/*****************************************************************************
  *  Gamma: Gamma correction
  *****************************************************************************/
-double Gamma_Correction(int i_plane, float f_component, float f_BlackCrush[VOUT_MAX_PLANES], float f_WhiteCrush[VOUT_MAX_PLANES], float f_BlackLevel[VOUT_MAX_PLANES], float f_WhiteLevel[VOUT_MAX_PLANES], float f_Gamma[VOUT_MAX_PLANES])
+static double Gamma_Correction(int i_plane, float f_component, float f_BlackCrush[VOUT_MAX_PLANES], float f_WhiteCrush[VOUT_MAX_PLANES], float f_BlackLevel[VOUT_MAX_PLANES], float f_WhiteLevel[VOUT_MAX_PLANES], float f_Gamma[VOUT_MAX_PLANES])
 {
     float f_Input;
 
@@ -487,15 +495,6 @@ double Gamma_Correction(int i_plane, float f_component, float f_BlackCrush[VOUT_
     }
            else
             return 1.0;
-}
-
-#ifdef GAMMA
-/*****************************************************************************
- * CLIP_0A: clip between 0 and ACCURACY
- *****************************************************************************/
-inline static int CLIP_0A( int a )
-{
-    return (a > ACCURACY) ? ACCURACY : (a < 0) ? 0 : a;
 }
 
 #ifdef PACKED_YUV
@@ -530,7 +529,7 @@ static uint8_t F(uint8_t i, float gamma)
  *****************************************************************************/
 static int AdjustHeight( vout_thread_t *p_vout )
 {
-    vlc_bool_t b_fullscreen = config_GetInt( p_vout, "fullscreen" );
+    vlc_bool_t b_fullscreen = var_CreateGetInteger( p_vout, "fullscreen" );
     int i_window_width = p_vout->i_window_width;
     int i_window_height = p_vout->i_window_height;
     double d_halfLength = 0;
@@ -541,30 +540,24 @@ static int AdjustHeight( vout_thread_t *p_vout )
 // OS DEPENDANT CODE to get display dimensions
         if (b_fullscreen)
         {
-#ifdef SYS_LINUX
-            Display *p_display = XOpenDisplay( "" );
-        if (p_vout->p_sys->b_xinerama)
-         if (p_vout->p_sys->i_row == 2)
-         {
-            i_window_width = DisplayWidth(p_display, 0) / 2;
-            i_window_height = DisplayHeight(p_display, 0) /2;
-         }
-         else // p_vout->p_sys->i_row == 1
-         {
-            i_window_width = DisplayWidth(p_display, 0) / 2;
-            i_window_height = DisplayHeight(p_display, 0);
-         }
-        else
-        {
-            i_window_width = DisplayWidth(p_display, 0);
-            i_window_height = DisplayHeight(p_display, 0);
-        }
-#elif SYS_MINGW32
+#ifdef SYS_MINGW32
             i_window_width  = GetSystemMetrics(SM_CXSCREEN);
             i_window_height = GetSystemMetrics(SM_CYSCREEN);
+#else            
+            Display *p_display = XOpenDisplay( "" );
+	        if (p_vout->p_sys->b_xinerama)
+	        {
+	            i_window_width = DisplayWidth(p_display, 0) / p_vout->p_sys->i_col;
+	            i_window_height = DisplayHeight(p_display, 0) / p_vout->p_sys->i_row;
+	         }
+	        else
+	        {
+	            i_window_width = DisplayWidth(p_display, 0);
+	            i_window_height = DisplayHeight(p_display, 0);
+	        } 
+	       	XCloseDisplay( p_display );     
+	       	free(p_display);  
 #endif
-        config_PutInt( p_vout, "width", i_window_width);
-        config_PutInt( p_vout, "height", i_window_height);
         var_SetInteger( p_vout, "width", i_window_width);
         var_SetInteger( p_vout, "height", i_window_height);
         p_vout->i_window_width = i_window_width;
@@ -594,8 +587,8 @@ static int AdjustHeight( vout_thread_t *p_vout )
               }
               p_vout->p_sys->i_halfLength = (d_halfLength + 0.5);
               p_vout->p_sys->bz_length = (p_vout->p_sys->i_halfLength * 100.0 * p_vout->p_sys->i_col) / p_vout->render.i_width;
-              config_PutInt( p_vout, "bz-length", p_vout->p_sys->bz_length);
-              config_PutInt( p_vout, "panoramix-rows", p_vout->p_sys->i_row);
+              var_SetInteger( p_vout, "bz-length", p_vout->p_sys->bz_length);
+              var_SetInteger( p_vout, "panoramix-rows", p_vout->p_sys->i_row);
               }
         }
         else
@@ -612,7 +605,7 @@ static int AdjustHeight( vout_thread_t *p_vout )
                 double d_bz_length = (p_vout->p_sys->i_halfLength * p_vout->p_sys->i_col * 100.0) / p_vout->render.i_width;
                 // F(2x) != 2F(x) in opengl module
                 if (p_vout->p_sys->i_col == 2) d_bz_length = (100.0 * d_bz_length) / (100.0 - d_bz_length) ;
-                config_PutInt( p_vout, "bz-length", (int)(d_bz_length + 0.5));
+                var_SetInteger( p_vout, "bz-length", (int)(d_bz_length + 0.5));
             }
             i_offset =  (int)d_halfLength - (int)
                         (p_vout->p_sys->i_halfLength * (double)i_window_height *
@@ -652,21 +645,21 @@ static int Init( vout_thread_t *p_vout )
         float    f_BlackLevel[VOUT_MAX_PLANES];
         float    f_WhiteCrush[VOUT_MAX_PLANES];
         float    f_WhiteLevel[VOUT_MAX_PLANES];
-        p_vout->p_sys->f_gamma[0] = config_GetFloat( p_vout, "bz-gamma-red" );
-        p_vout->p_sys->f_gamma[1] = config_GetFloat( p_vout, "bz-gamma-green" );
-        p_vout->p_sys->f_gamma[2] = config_GetFloat( p_vout, "bz-gamma-blue" );
-        f_BlackCrush[0] = (float)config_GetInt( p_vout, "bz-blackcrush-red" ) / 255.0;
-        f_BlackCrush[1] = (float)config_GetInt( p_vout, "bz-blackcrush-green" ) / 255.0;
-        f_BlackCrush[2] = (float)config_GetInt( p_vout, "bz-blackcrush-blue" ) / 255.0;
-        f_WhiteCrush[0] = (float)config_GetInt( p_vout, "bz-whitecrush-red" ) / 255.0;
-        f_WhiteCrush[1] = (float)config_GetInt( p_vout, "bz-whitecrush-green" ) / 255.0;
-        f_WhiteCrush[2] = (float)config_GetInt( p_vout, "bz-whitecrush-blue" ) / 255.0;
-        f_BlackLevel[0] = (float)config_GetInt( p_vout, "bz-blacklevel-red" ) / 255.0;
-        f_BlackLevel[1] = (float)config_GetInt( p_vout, "bz-blacklevel-green" ) / 255.0;
-        f_BlackLevel[2] = (float)config_GetInt( p_vout, "bz-blacklevel-blue" ) / 255.0;
-        f_WhiteLevel[0] = (float)config_GetInt( p_vout, "bz-whitelevel-red" ) / 255.0;
-        f_WhiteLevel[1] = (float)config_GetInt( p_vout, "bz-whitelevel-green" ) / 255.0;
-        f_WhiteLevel[2] = (float)config_GetInt( p_vout, "bz-whitelevel-blue" ) / 255.0;
+        p_vout->p_sys->f_gamma[0] = var_CreateGetFloat( p_vout, "bz-gamma-red" );
+        p_vout->p_sys->f_gamma[1] = var_CreateGetFloat( p_vout, "bz-gamma-green" );
+        p_vout->p_sys->f_gamma[2] = var_CreateGetFloat( p_vout, "bz-gamma-blue" );
+        f_BlackCrush[0] = var_CreateGetInteger( p_vout, "bz-blackcrush-red" ) / 255.0;
+        f_BlackCrush[1] = var_CreateGetInteger( p_vout, "bz-blackcrush-green" ) / 255.0;
+        f_BlackCrush[2] = var_CreateGetInteger( p_vout, "bz-blackcrush-blue" ) / 255.0;
+        f_WhiteCrush[0] = var_CreateGetInteger( p_vout, "bz-whitecrush-red" ) / 255.0;
+        f_WhiteCrush[1] = var_CreateGetInteger( p_vout, "bz-whitecrush-green" ) / 255.0;
+        f_WhiteCrush[2] = var_CreateGetInteger( p_vout, "bz-whitecrush-blue" ) / 255.0;
+        f_BlackLevel[0] = var_CreateGetInteger( p_vout, "bz-blacklevel-red" ) / 255.0;
+        f_BlackLevel[1] = var_CreateGetInteger( p_vout, "bz-blacklevel-green" ) / 255.0;
+        f_BlackLevel[2] = var_CreateGetInteger( p_vout, "bz-blacklevel-blue" ) / 255.0;
+        f_WhiteLevel[0] = var_CreateGetInteger( p_vout, "bz-whitelevel-red" ) / 255.0;
+        f_WhiteLevel[1] = var_CreateGetInteger( p_vout, "bz-whitelevel-green" ) / 255.0;
+        f_WhiteLevel[2] = var_CreateGetInteger( p_vout, "bz-whitelevel-blue" ) / 255.0;
         switch (p_vout->render.i_chroma)
         {
         // planar YVU
@@ -677,16 +670,16 @@ static int Init( vout_thread_t *p_vout )
             case VLC_FOURCC('U','Y','N','V'):    // packed by 2
             case VLC_FOURCC('Y','4','2','2'):    // packed by 2
     //        case VLC_FOURCC('c','y','u','v'):    // packed by 2
-                p_vout->p_sys->f_gamma[2] = config_GetFloat( p_vout, "bz-gamma-green" );
-                p_vout->p_sys->f_gamma[1] = config_GetFloat( p_vout, "bz-gamma-blue" );
-                f_BlackCrush[2] = (float)config_GetInt( p_vout, "bz-blackcrush-green" ) / 255.0;
-                f_BlackCrush[1] = (float)config_GetInt( p_vout, "bz-blackcrush-blue" ) / 255.0;
-                f_WhiteCrush[2] = (float)config_GetInt( p_vout, "bz-whitecrush-green" ) / 255.0;
-                f_WhiteCrush[1] = (float)config_GetInt( p_vout, "bz-whitecrush-blue" ) / 255.0;
-                f_BlackLevel[2] = (float)config_GetInt( p_vout, "bz-blacklevel-green" ) / 255.0;
-                f_BlackLevel[1] = (float)config_GetInt( p_vout, "bz-blacklevel-blue" ) / 255.0;
-                f_WhiteLevel[2] = (float)config_GetInt( p_vout, "bz-whitelevel-green" ) / 255.0;
-                f_WhiteLevel[1] = (float)config_GetInt( p_vout, "bz-whitelevel-blue" ) / 255.0;
+                p_vout->p_sys->f_gamma[2] = var_CreateGetFloat( p_vout, "bz-gamma-green" );
+                p_vout->p_sys->f_gamma[1] = var_CreateGetFloat( p_vout, "bz-gamma-blue" );
+                f_BlackCrush[2] = var_CreateGetInteger( p_vout, "bz-blackcrush-green" ) / 255.0;
+                f_BlackCrush[1] = var_CreateGetInteger( p_vout, "bz-blackcrush-blue" ) / 255.0;
+                f_WhiteCrush[2] = var_CreateGetInteger( p_vout, "bz-whitecrush-green" ) / 255.0;
+                f_WhiteCrush[1] = var_CreateGetInteger( p_vout, "bz-whitecrush-blue" ) / 255.0;
+                f_BlackLevel[2] = var_CreateGetInteger( p_vout, "bz-blacklevel-green" ) / 255.0;
+                f_BlackLevel[1] = var_CreateGetInteger( p_vout, "bz-blacklevel-blue" ) / 255.0;
+                f_WhiteLevel[2] = var_CreateGetInteger( p_vout, "bz-whitelevel-green" ) / 255.0;
+                f_WhiteLevel[1] = var_CreateGetInteger( p_vout, "bz-whitelevel-blue" ) / 255.0;
         // planar YUV
             case VLC_FOURCC('I','4','4','4'):
             case VLC_FOURCC('I','4','2','2'):
@@ -816,7 +809,6 @@ static int Init( vout_thread_t *p_vout )
 #ifdef OVERLAP
             if (p_vout->p_sys->i_offset_x < 0)
             {
-                config_PutInt(p_vout, "video-x", -p_vout->p_sys->i_offset_x);
                 var_SetInteger(p_vout, "video-x", -p_vout->p_sys->i_offset_x);
                 p_vout->p_sys->i_offset_x = 0;
             }
@@ -844,11 +836,13 @@ static int Init( vout_thread_t *p_vout )
                 else if (i_row == p_vout->p_sys->i_row -1) p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout->i_alignment |= VOUT_ALIGN_TOP;
             }
     // i_n : number of active pp_vout
+			int i_video_x = var_GetInteger( p_vout, "video-x");    
+      		int i_video_y = var_GetInteger( p_vout, "video-y");   	
             int i_index, i_n = p_vout->p_sys->i_vout;
                 for (i_index = p_vout->p_sys->i_vout; i_index >= 0; i_index--) if (!p_vout->p_sys->pp_vout[i_index].b_active) i_n -= 1;
             var_SetInteger( p_vout, "align", p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout->i_alignment );
-            var_SetInteger( p_vout, "video-x", p_vout->p_sys->i_offset_x + ((i_n + 1) % p_vout->p_sys->i_col) * p_vout->i_window_width);
-            var_SetInteger( p_vout, "video-y", ((i_n + 1) / p_vout->p_sys->i_col) * p_vout->i_window_height);
+            var_SetInteger( p_vout, "video-x",i_video_x + p_vout->p_sys->i_offset_x + ((i_n + 1) % p_vout->p_sys->i_col) * p_vout->i_window_width);
+            var_SetInteger( p_vout, "video-y",i_video_y + ((i_n + 1) / p_vout->p_sys->i_col) * p_vout->i_window_height);
 #endif
             p_vout->p_sys->i_vout++;
         }
@@ -869,7 +863,7 @@ static void End( vout_thread_t *p_vout )
     int i_index;
 
 #ifdef OVERLAP
-    config_PutInt( p_vout, "bz-length", p_vout->p_sys->bz_length);
+    var_SetInteger( p_vout, "bz-length", p_vout->p_sys->bz_length);
 #endif
     /* Free the fake output buffers we allocated */
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
