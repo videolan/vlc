@@ -151,6 +151,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     out->pf_del     = EsOutDel;
     out->pf_control = EsOutControl;
     out->p_sys      = p_sys;
+    out->b_sout     = (p_input->p->p_sout != NULL ? VLC_TRUE : VLC_FALSE);
 
     p_sys->p_input = p_input;
 

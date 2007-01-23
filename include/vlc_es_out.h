@@ -94,6 +94,7 @@ struct es_out_t
     int          (*pf_send)   ( es_out_t *, es_out_id_t *, block_t * );
     void         (*pf_del)    ( es_out_t *, es_out_id_t * );
     int          (*pf_control)( es_out_t *, int i_query, va_list );
+    vlc_bool_t      b_sout;
 
     es_out_sys_t    *p_sys;
 };

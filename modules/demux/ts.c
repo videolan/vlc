@@ -3025,12 +3025,9 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     && DVBPSI_VERSION_INT > ((0<<16)+(1<<8)+5)
                     pid->es->fmt.i_group = p_pmt->i_program_number;
 
-                    /* If i_dvb_program == -1 it means the user specified
-                     * --sout-all or --programs, so she want to stream, and
-                     * she doesn't want to stream several identical ESes
-                     * with different language descriptors. So for -1 we
-                     * just enable descriptor pass-through. --Meuuh */
-                    if( p_sys->i_dvb_program != -1 )
+                    /* In stream output mode, only enable descriptor
+                     * pass-through. */
+                    if( !p_demux->out->b_sout )
                     {
                         uint16_t n, i = 0;
                         dvbpsi_teletext_dr_t *sub;
@@ -3110,10 +3107,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                         if( !i )
                             pid->es->fmt.i_cat = UNKNOWN_ES;
                     }
-#else
-                    pid->es->fmt.subs.dvb.i_id = -1;
-                    pid->es->fmt.psz_description = strdup( "Teletext" );
+                    else
 #endif  /* defined _DVBPSI_DR_56_H_  && DVBPSI_VERSION(0,1,6) */
+                    {
+                        pid->es->fmt.subs.dvb.i_id = -1;
+                        pid->es->fmt.psz_description = strdup( "Teletext" );
+                    }
                 }
                 else if( p_dr->i_tag == 0x59 )
                 {
@@ -3128,12 +3127,9 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 #ifdef _DVBPSI_DR_59_H_
                     pid->es->fmt.i_group = p_pmt->i_program_number;
 
-                    /* If i_dvb_program == -1 it means the user specified
-                     * --sout-all or --programs, so she want to stream, and
-                     * she doesn't want to stream several identical ESes
-                     * with different language descriptors. So for -1 we
-                     * just enable descriptor pass-through. --Meuuh */
-                    if( p_sys->i_dvb_program != -1 )
+                    /* In stream output mode, only enable descriptor
+                     * pass-through. */
+                    if( !p_demux->out->b_sout )
                     {
                         uint16_t n, i = 0;
                         dvbpsi_subtitling_dr_t *sub;
@@ -3220,7 +3216,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                         if( !i )
                             pid->es->fmt.i_cat = UNKNOWN_ES;
                     }
+                    else
 #endif /* _DVBPSI_DR_59_H_ */
+                    {
+                        pid->es->fmt.subs.dvb.i_id = -1;
+                        pid->es->fmt.psz_description = strdup( "DVB subtitles" );
+                    }
                 }
             }
         }
