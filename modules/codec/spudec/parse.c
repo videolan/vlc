@@ -147,6 +147,9 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
     uint8_t i_command = SPU_CMD_END;
     mtime_t date = 0;
 
+    if( !p_spu || !p_spu_data )
+        return VLC_EGENERIC;
+
     /* Initialize the structure */
     p_spu->i_start = p_spu->i_stop = 0;
     p_spu->b_ephemer = VLC_FALSE;
@@ -205,7 +208,6 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
             break;
 
         case SPU_CMD_SET_PALETTE:
-
             /* 03xxxx (palette) */
             if( i_index + 3 > p_sys->i_spu_size )
             {
@@ -350,6 +352,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
     if( !p_spu->i_start )
     {
         msg_Err( p_dec, "no `start display' command" );
+        return VLC_EGENERIC;
     }
 
     if( p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
