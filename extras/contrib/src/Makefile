@@ -11,6 +11,7 @@
 #          Christophe Mutricy <xtophe AT xtelevision.com>
 #          Gildas Bazin <gbazin at videolan dot org>
 #          Damien Fouilleul <damienf at videolan dot org>
+#          Jean-Baptiste Kempf <jb at videolan dot org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -400,7 +401,7 @@ pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 
 CLEAN_FILE += .pkgcfg
 CLEAN_PKG += pkgconfig
-DISTCLEAN_PKG += pkgconfig-$(PKGCFG_VERSION).tar.gz
+DISTCLEAN_PKG += pkg-config-$(PKGCFG_VERSION).tar.gz
 
 # ***************************************************************************
 # gettext
@@ -690,7 +691,7 @@ endif
 
 CLEAN_FILE += .tremor
 CLEAN_PKG += tremor
-DISTCLEAN_PKG += tremor-$(TREMOR_VERSION).tar.gz
+#DISTCLEAN_PKG += tremor-$(TREMOR_VERSION).tar.gz
 
 # ***************************************************************************
 # theora
@@ -867,13 +868,13 @@ DISTCLEAN_PKG += lame-$(LAME_VERSION).tar.gz
 # libebml
 # ***************************************************************************
 
-ifdef SVN
-libebml: 
-	$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libebml libebml
-else
 libebml-$(LIBEBML_VERSION).tar.bz2:
 	$(WGET) $(LIBEBML_URL)
 
+ifdef SVN
+libebml:
+	$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libebml libebml
+else
 libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 endif
@@ -898,13 +899,13 @@ DISTCLEAN_PKG += libebml-$(LIBEBML_VERSION).tar.bz2
 # libmatroska
 # ***************************************************************************
 
+libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
+	$(WGET) $(LIBMATROSKA_URL)
+
 ifdef SVN
 libmatroska:
 	$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libmatroska libmatroska
 else
-libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
-	$(WGET) $(LIBMATROSKA_URL)
-
 libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 endif
@@ -967,14 +968,14 @@ DISTCLEAN_PKG += ffmpeg-$(FFMPEG_VERSION).tar.gz
 # libdvdcss
 # ***************************************************************************
 
+libdvdcss-$(LIBDVDCSS_VERSION).tar.gz:
+	$(WGET) $(LIBDVDCSS_URL)
+
 ifdef SVN
 libdvdcss: 
 	$(SVN) co svn://svn.videolan.org/libdvdcss/trunk libdvdcss
 	cd $@ && sh bootstrap
 else
-libdvdcss-$(LIBDVDCSS_VERSION).tar.gz:
-	$(WGET) $(LIBDVDCSS_URL)
-
 libdvdcss: libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 	$(EXTRACT_GZ)
 endif
@@ -1197,6 +1198,9 @@ CLEAN_PKG += libdca
 # libx264
 # ***************************************************************************
 
+x264-$(X264_VERSION).tar.gz:
+	$(WGET) $(X264_URL)
+
 ifdef SVN
 x264: 
 	$(SVN) co svn://svn.videolan.org/x264/trunk/ x264
@@ -1204,8 +1208,6 @@ ifdef HAVE_WIN32
 	(cd x264; patch -p0 < ../Patches/x264-svn-win32.patch )
 endif
 else
-x264-$(X264_VERSION).tar.gz:
-	$(WGET) $(X264_URL)
 
 x264: x264-$(X264_VERSION).tar.gz
 	$(EXTRACT_GZ)
@@ -1311,20 +1313,20 @@ DISTCLEAN_PKG += libcdio-$(CDIO_VERSION).tar.gz
 # ***************************************************************************
 # OpenMash
 # ***************************************************************************
-
-mash-src-$(MASH_VERSION).tar.gz:
-	$(WGET) $(MASH_URL)
-
-mash-code: mash-src-$(MASH_VERSION).tar.gz
-	$(EXTRACT_GZ)
-
-.mash: mash-code
-	(cd $<; ./configure && make)
-	touch $@
-
-CLEAN_FILE += .mash
-CLEAN_PKG += mash-code
-DISTCLEAN_PKG += mash-src-$(MASH_VERSION).tar.gz
+#
+#mash-src-$(MASH_VERSION).tar.gz:
+#	$(WGET) $(MASH_URL)
+#
+#mash-code: mash-src-$(MASH_VERSION).tar.gz
+#	$(EXTRACT_GZ)
+#
+#.mash: mash-code
+#	(cd $<; ./configure && make)
+#	touch $@
+#
+#CLEAN_FILE += .mash
+#CLEAN_PKG += mash-code
+#DISTCLEAN_PKG += mash-src-$(MASH_VERSION).tar.gz
 
 # ***************************************************************************
 # wxWidgets
@@ -1364,7 +1366,7 @@ qt4: qt4-$(QT4_VERSION)-win32-bin.tar.gz
 
 CLEAN_FILE += .qt4
 CLEAN_PKG += qt4
-DISTCLEAN_PKG += qt4-$(QT4_VERSION).tar.gz
+#DISTCLEAN_PKG += qt4-$(QT4_VERSION).tar.gz
 
 # ***************************************************************************
 # zlib
@@ -1407,7 +1409,7 @@ endif
 
 CLEAN_FILE += .portaudio
 CLEAN_PKG += portaudio
-DISTCLEAN_PKG += pa_snapshot_v$(PORTAUDIO__VERSION).tar.gz
+DISTCLEAN_PKG += pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz
 
 
 # ***************************************************************************
@@ -1553,7 +1555,7 @@ libraw1394: libraw1394-$(LIBRAW1394_VERSION).tar.gz
 	
 CLEAN_file += .libraw1394
 CLEAN_PKG += libraw1394
-DISTCLEAN_PKG += libraw1394-$(LIBRAW1394_VERSION)
+DISTCLEAN_PKG += libraw1394-$(LIBRAW1394_VERSION).tar.gz
 
 # ***************************************************************************
 # libdc1394
@@ -1585,7 +1587,7 @@ libdc1394: libdc1394-$(LIBDC1394_VERSION).tar.gz
 	
 CLEAN_file += .libdc1394
 CLEAN_PKG += libdc1394
-DISTCLEAN_PKG += libdc1394-$(LIBDC1394_VERSION)
+DISTCLEAN_PKG += libdc1394-$(LIBDC1394_VERSION).tar.gz
 
 # ***************************************************************************
 libgpg-error-$(GPGERROR_VERSION).tar.gz:
@@ -1763,7 +1765,7 @@ glib-19990228.zip:
 
 CLEAN_FILE += .gecko-win32
 CLEAN_PKG += gecko-sdk-win32
-DISTCLEAN_PKG += gecko-sdk-i586-pc-msvc-1.7.5.zip libIDL-0.6.3-win32-bin.zip vc71-glib-1.2.10-bin.zip
+DISTCLEAN_PKG += gecko-sdk-i586-pc-msvc-1.8b1.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
 
 # ***************************************************************************
 # mozilla
@@ -1992,7 +1994,7 @@ endif
 
 CLEAN_FILE += .clinkcc
 CLEAN_PKG += clinkcc
-DISTCLEAN_PKG += clinkcc-$(CLINKCC_VERSION).tar.gz
+DISTCLEAN_PKG += clinkcc$(CLINKCC_VERSION).tar.gz
 
 # ***************************************************************************
 # NASM assembler
@@ -2046,7 +2048,7 @@ libunicows: libunicows-$(UNICOWS_VERSION).tar.gz
 
 CLEAN_FILE += .unicows
 CLEAN_PKG += libunicows
-DISTCLEAN_PKG += libunicows-$(UNICOWS_VERSION)-src.tar.gz
+DISTCLEAN_PKG += libunicows-$(UNICOWS_VERSION).tar.gz
 
 # ***************************************************************************
 # TagLib read and editing of tags of popular audio formats
@@ -2091,3 +2093,4 @@ clean-src: clean
 
 distclean: clean-src
 
+source:  $(DISTCLEAN_PKG)
