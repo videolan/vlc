@@ -57,6 +57,12 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
 #define IGNORE_SUB_FLAG_LONGTEXT N_("Ignore the subtitle flag, try this if " \
         "your subtitles don't appear.")
 
+#define FRENCH_WORKAROUND_TEXT N_("Workaround for France")
+#define FRENCH_WORKAROUND_LONGTEXT N_("Some French channels do not flag " \
+        "their subtitling pages correctly due to a historical " \
+        "interpretation mistake. Try using this wrong interpretation if " \
+        "your subtitles don't appear.")
+
 vlc_module_begin();
     set_description( _("Teletext subtitles decoder") );
     set_shortname( "Teletext" );
@@ -69,6 +75,8 @@ vlc_module_begin();
                  OVERRIDE_PAGE_TEXT, OVERRIDE_PAGE_LONGTEXT, VLC_TRUE );
     add_bool( "telx-ignore-subtitle-flag", 0, NULL,
               IGNORE_SUB_FLAG_TEXT, IGNORE_SUB_FLAG_LONGTEXT, VLC_TRUE );
+    add_bool( "telx-french-workaround", 0, NULL,
+              FRENCH_WORKAROUND_TEXT, FRENCH_WORKAROUND_LONGTEXT, VLC_TRUE );
 
 vlc_module_end();
 
@@ -191,6 +199,19 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->i_wanted_magazine == 0 )
             p_sys->i_wanted_magazine = 8;
         p_sys->i_wanted_page = p_dec->fmt_in.subs.dvb.i_id & 0xff;
+
+        var_Create( p_dec, "telx-french-workaround",
+                    VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+        var_Get( p_dec, "telx-french-workaround", &val );
+        if( p_sys->i_wanted_page < 100 &&
+              (val.b_bool || (p_sys->i_wanted_page % 16) >= 10))
+        {
+            /* See http://www.nada.kth.se/~ragge/vdr/ttxtsubs/TROUBLESHOOTING.txt
+             * paragraph about French channels - they mix up decimal and
+             * hexadecimal */
+            p_sys->i_wanted_page = (p_sys->i_wanted_page / 10) * 16 +
+                                   (p_sys->i_wanted_page % 10);
+        }
     }
     else if( val.i_int <= 0 )
     {
