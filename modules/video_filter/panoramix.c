@@ -636,6 +636,8 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 #ifdef OVERLAP
     p_vout->p_sys->b_has_changed = p_vout->p_sys->b_attenuate;
+	int i_video_x = var_GetInteger( p_vout, "video-x");
+    int i_video_y = var_GetInteger( p_vout, "video-y");
 #ifdef GAMMA
     if (p_vout->p_sys->b_attenuate)
     {
@@ -836,8 +838,6 @@ static int Init( vout_thread_t *p_vout )
                 else if (i_row == p_vout->p_sys->i_row -1) p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout->i_alignment |= VOUT_ALIGN_TOP;
             }
     // i_n : number of active pp_vout
-			int i_video_x = var_GetInteger( p_vout, "video-x");    
-      		int i_video_y = var_GetInteger( p_vout, "video-y");   	
             int i_index, i_n = p_vout->p_sys->i_vout;
                 for (i_index = p_vout->p_sys->i_vout; i_index >= 0; i_index--) if (!p_vout->p_sys->pp_vout[i_index].b_active) i_n -= 1;
             var_SetInteger( p_vout, "align", p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout->i_alignment );

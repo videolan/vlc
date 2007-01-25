@@ -238,7 +238,7 @@ static int Init( vout_thread_t *p_vout )
         p_vout->p_sys->i_ratio = 0;
     else
     {
-        p_vout->p_sys->i_ratio = config_GetInt( p_vout, "ratio" );
+        p_vout->p_sys->i_ratio = config_GetInt( p_vout, "crop-ratio" );
         // ratio < width / height => ratio = 0 (unchange ratio)
         if (p_vout->p_sys->i_ratio < (p_vout->output.i_width * 1000) / p_vout->output.i_height)
             p_vout->p_sys->i_ratio = 0;
@@ -353,15 +353,14 @@ static int Init( vout_thread_t *p_vout )
                      p_vout->p_sys->i_width, p_vout->p_sys->i_height,
                      p_vout->p_sys->i_x, p_vout->p_sys->i_y,
                      p_vout->p_sys->b_autocrop ? "" : "not " );
-#ifdef BEST_AUTOCROP
-    msg_Info( p_vout, "ratio %d",  p_vout->p_sys->i_aspect / 432);
-#endif
-
     /* Set current output image properties */
     p_vout->p_sys->i_aspect = p_vout->fmt_out.i_aspect
            * p_vout->fmt_out.i_visible_height / p_vout->p_sys->i_height
            * p_vout->p_sys->i_width / p_vout->fmt_out.i_visible_width;
 
+#ifdef BEST_AUTOCROP
+    msg_Info( p_vout, "ratio %d",  p_vout->p_sys->i_aspect / 432);
+#endif
     fmt.i_width = fmt.i_visible_width = p_vout->p_sys->i_width;
     fmt.i_height = fmt.i_visible_height = p_vout->p_sys->i_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
