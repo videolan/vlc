@@ -1532,7 +1532,7 @@ vlc_module_begin();
     add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT, VLC_TRUE );
     add_bool( "sout-display", VLC_FALSE, NULL, SOUT_DISPLAY_TEXT,
                                 SOUT_DISPLAY_LONGTEXT, VLC_TRUE );
-    add_bool( "sout-keep", VLC_FALSE, NULL, SOUT_KEEP_TEXT,
+    add_bool( "sout-keep", VLC_TRUE, NULL, SOUT_KEEP_TEXT,
                                 SOUT_KEEP_LONGTEXT, VLC_TRUE );
     add_bool( "sout-all", 0, NULL, SOUT_ALL_TEXT,
                                 SOUT_ALL_LONGTEXT, VLC_TRUE );

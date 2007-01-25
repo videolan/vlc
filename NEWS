@@ -16,6 +16,7 @@ Important notes:
      features, we advise you to keep vlc 0.8.6
    - Similarly, "Bookmarks" will be reintroduced in an improved version at a 
      later point
+  * The default for --sout-keep has changed. It's now activated by default.
 
 Changes:
 --------
