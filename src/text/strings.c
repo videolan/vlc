@@ -683,6 +683,7 @@ void filename_sanitize( char *str )
 #endif
                 *str = '_';
         }
+        str++;
     }
 }
 
@@ -708,5 +709,6 @@ void path_sanitize( char *str )
 #endif
                 *str = '_';
         }
+        str++;
     }
 }
