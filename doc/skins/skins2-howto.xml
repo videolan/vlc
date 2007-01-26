@@ -353,7 +353,7 @@ difficulty to understand how VLC skins work.</para>
 
 <sect2 id="Group">
   <title>Group</title>
-  <para>Adds an offset to the elements it contains. A Group is only supposed to ease the job of the skin designer, who can adjust the position of a group of controls without modifying all the coordinates, but you can ignore it if you want (only one Group is necessary, inside the Window tag). Group tags can be nested.</para>
+  <para>Adds an offset to the elements it contains. A Group is only supposed to ease the job of the skin designer, who can adjust the position of a group of controls without modifying all the coordinates, but you can ignore it if you want (only one Group is necessary, inside the <link linkend="Layout">Layout</link> tag). Group tags can be nested.</para>
   <sect3 id="groupx">
     <title>x</title>
     <para>Try and guess.</para>
