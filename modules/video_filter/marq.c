@@ -251,7 +251,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     subpicture_t *p_spu;
     video_format_t fmt;
     time_t t;
-    char *buf;
 
     if( p_sys->last_time == time( NULL ) )
     {
@@ -289,9 +288,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     {
         p_sys->b_need_update = VLC_FALSE;
     }
-    buf = str_format_time( p_sys->psz_marquee );
-    p_spu->p_region->psz_text = str_format_meta( p_filter, buf );
-    free( buf );
+    p_spu->p_region->psz_text = str_format( p_filter, p_sys->psz_marquee );
     p_spu->i_start = date;
     p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout * 1000;
     p_spu->b_ephemer = VLC_TRUE;

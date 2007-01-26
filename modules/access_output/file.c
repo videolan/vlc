@@ -132,12 +132,11 @@ static int Open( vlc_object_t *p_this )
     else
     {
         int fd;
-        char *psz_tmp = str_format_time( p_access->psz_name );
-        char *psz_tmp2 = str_format_meta( p_access, psz_tmp );
+        char *psz_tmp = str_format( p_access, p_access->psz_name );
+        path_sanitize( psz_tmp );
 
+        fd = utf8_open( psz_tmp, i_flags, 0666 );
         free( psz_tmp );
-        fd = utf8_open( psz_tmp2, i_flags, 0666 );
-        free( psz_tmp2 );
 
         if( fd == -1 )
         {

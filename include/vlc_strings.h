@@ -38,9 +38,14 @@
 VLC_EXPORT( void, resolve_xml_special_chars, ( char *psz_value ) );
 VLC_EXPORT( char *, convert_xml_special_chars, ( const char *psz_content ) );
 
-VLC_EXPORT( char *, str_format_time, ( char * ) );
+VLC_EXPORT( char *, str_format_time, ( const char * ) );
 #define str_format_meta( a, b ) __str_format_meta( VLC_OBJECT( a ), b )
-VLC_EXPORT( char *, __str_format_meta, ( vlc_object_t *, char * ) );
+VLC_EXPORT( char *, __str_format_meta, ( vlc_object_t *, const char * ) );
+#define str_format( a, b ) __str_format( VLC_OBJECT( a ), b )
+VLC_EXPORT( char *, __str_format, ( vlc_object_t *, const char * ) );
+
+VLC_EXPORT( void, filename_sanitize, ( char * ) );
+VLC_EXPORT( void, path_sanitize, ( char * ) );
 
 /**
  * @}

@@ -331,7 +331,7 @@ char *convert_xml_special_chars( const char *psz_content )
 /****************************************************************************
  * String formating functions
  ****************************************************************************/
-char *str_format_time(char *tformat )
+char *str_format_time( const char *tformat )
 {
     char buffer[255];
     time_t curtime;
@@ -369,9 +369,9 @@ char *str_format_time(char *tformat )
                         *d = '-';                                   \
                         d++;                                        \
                     }
-char *__str_format_meta( vlc_object_t *p_object, char *string )
+char *__str_format_meta( vlc_object_t *p_object, const char *string )
 {
-    char *s = string;
+    const char *s = string;
     char *dst = malloc( 1000 );
     char *d = dst;
     int b_is_format = 0;
@@ -645,4 +645,68 @@ char *__str_format_meta( vlc_object_t *p_object, char *string )
     }
 
     return dst;
+}
+
+/**
+ * Apply str format time and str format meta
+ */
+char *__str_format( vlc_object_t *p_this, const char *psz_src )
+{
+    char *psz_buf1, *psz_buf2;
+    psz_buf1 = str_format_time( psz_src );
+    psz_buf2 = str_format_meta( p_this, psz_buf1 );
+    free( psz_buf1 );
+    return psz_buf2;
+}
+
+/**
+ * Remove forbidden characters from filenames (including slashes)
+ */
+void filename_sanitize( char *str )
+{
+    while( *str )
+    {
+        switch( *str )
+        {
+            case '/':
+#ifdef WIN32
+            case '*':
+            case '.':
+            case '"':
+            case '\\':
+            case '[':
+            case ']':
+            case ':':
+            case ';':
+            case '|':
+            case '=':
+#endif
+                *str = '_';
+        }
+    }
+}
+
+/**
+ * Remove forbidden characters from full paths (leaves slashes)
+ */
+void path_sanitize( char *str )
+{
+    while( *str )
+    {
+        switch( *str )
+        {
+#ifdef WIN32
+            case '*':
+            case '.':
+            case '"':
+            case '[':
+            case ']':
+            case ':':
+            case ';':
+            case '|':
+            case '=':
+#endif
+                *str = '_';
+        }
+    }
 }

@@ -280,12 +280,16 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
                                                      p_vout->render.i_height;
 
     if( p_vout->p_sys->b_time )
+    {
         psz_tmp = str_format_time( p_vout->p_sys->psz_prefix );
+        path_sanitize( psz_tmp );
+    }
     else
         psz_tmp = p_vout->p_sys->psz_prefix;
     if( p_vout->p_sys->b_meta )
     {
         psz_prefix = str_format_meta( p_vout, psz_tmp );
+        path_sanitize( psz_prefix );
         if( p_vout->p_sys->b_time )
             free( psz_tmp );
     }

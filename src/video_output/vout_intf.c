@@ -638,10 +638,10 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         if( !psz_prefix ) psz_prefix = strdup( "vlcsnap-" );
         else
         {
-            char *psz_tmp = str_format_time( psz_prefix );
+            char *psz_tmp = str_format( p_vout, psz_prefix );
+            filename_sanitize( psz_tmp );
             free( psz_prefix );
-            psz_prefix = str_format_meta( p_vout, psz_tmp );
-            free( psz_tmp );
+            psz_prefix = psz_tmp;
         }
 
         closedir( path );
@@ -669,7 +669,8 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     }
     else // The user specified a full path name (including file name)
     {
-        psz_filename = str_format_meta( p_vout, val.psz_string );
+        psz_filename = str_format( p_vout, val.psz_string );
+        path_sanitize( psz_filename );
     }
 
     free( val.psz_string );
