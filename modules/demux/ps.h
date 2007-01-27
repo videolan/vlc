@@ -28,8 +28,8 @@
                                           ((id)&0xff) + (256 - 0xc0))
 
 typedef struct ps_psm_t ps_psm_t;
-static inline int ps_id_to_type( ps_psm_t *, int );
-static inline uint8_t *ps_id_to_lang( ps_psm_t *, int );
+static inline int ps_id_to_type( const ps_psm_t *, int );
+static inline const uint8_t *ps_id_to_lang( const ps_psm_t *, int );
 
 typedef struct
 {
@@ -404,7 +404,7 @@ struct ps_psm_t
     ps_es_t **es;
 };
 
-static inline int ps_id_to_type( ps_psm_t *p_psm, int i_id )
+static inline int ps_id_to_type( const ps_psm_t *p_psm, int i_id )
 {
     int i;
     for( i = 0; p_psm && i < p_psm->i_es; i++ )
@@ -414,7 +414,7 @@ static inline int ps_id_to_type( ps_psm_t *p_psm, int i_id )
     return 0;
 }
 
-static inline uint8_t *ps_id_to_lang( ps_psm_t *p_psm, int i_id )
+static inline const uint8_t *ps_id_to_lang( const ps_psm_t *p_psm, int i_id )
 {
     int i;
     for( i = 0; p_psm && i < p_psm->i_es; i++ )
