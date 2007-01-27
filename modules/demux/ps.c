@@ -44,8 +44,8 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  OpenForce( vlc_object_t * );
 static int  Open   ( vlc_object_t * );
-static int  OpenAlt( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
@@ -53,7 +53,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_capability( "demux2", 1 );
-    set_callbacks( Open, Close );
+    set_callbacks( OpenForce, Close );
     add_shortcut( "ps" );
 
     add_bool( "ps-trust-timestamps", VLC_TRUE, NULL, TIME_TEXT,
@@ -62,7 +62,7 @@ vlc_module_begin();
     add_submodule();
     set_description( _("MPEG-PS demuxer") );
     set_capability( "demux2", 9 );
-    set_callbacks( OpenAlt, Close );
+    set_callbacks( Open, Close );
 vlc_module_end();
 
 /*****************************************************************************
@@ -94,7 +94,7 @@ static block_t *ps_pkt_read   ( stream_t *, uint32_t i_code );
 /*****************************************************************************
  * Open
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int OpenCommon( vlc_object_t *p_this, vlc_bool_t b_force )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
@@ -107,9 +107,11 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( p_peek[0] != 0 || p_peek[1] != 0 ||
-        p_peek[2] != 1 || p_peek[3] < 0xb9 )
+    if( memcmp( p_peek, "\x00\x00\x01", 3 ) || ( p_peek[3] < 0xb9 ) )
     {
+        if( !b_force )
+            return VLC_EGENERIC;
+
         msg_Warn( p_demux, "this does not look like an MPEG PS stream, "
                   "continuing anyway" );
     }
@@ -125,7 +127,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_length   = -1;
     p_sys->i_current_pts = (mtime_t) 0;
     p_sys->i_time_track = -1;
-    
+
     p_sys->b_lost_sync = VLC_FALSE;
     p_sys->b_have_pack = VLC_FALSE;
     p_sys->b_seekable  = VLC_FALSE;
@@ -140,24 +142,14 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static int OpenAlt( vlc_object_t *p_this )
+static int OpenForce( vlc_object_t *p_this )
 {
-    demux_t *p_demux = (demux_t*)p_this;
-    uint8_t *p_peek;
+    return OpenCommon( p_this, VLC_TRUE );
+}
 
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
-    {
-        msg_Err( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
-
-    if( p_peek[0] != 0 || p_peek[1] != 0 ||
-        p_peek[2] != 1 || p_peek[3] < 0xb9 )
-    {
-        if( !p_demux->b_force ) return VLC_EGENERIC;
-    }
-
-    return Open( p_this );
+static int Open( vlc_object_t *p_this )
+{
+    return OpenCommon( p_this, ((demux_t *)p_this)->b_force );
 }
 
 /*****************************************************************************
@@ -252,7 +244,7 @@ static void FindLength( demux_t *p_demux )
         i_size = stream_Size( p_demux->s );
         i_end = __MAX( 0, __MIN( 200000, i_size ) );
         stream_Seek( p_demux->s, i_size - i_end );
-    
+
         while( !p_demux->b_die && Demux2( p_demux, VLC_TRUE ) > 0 );
         if( i_current_pos >= 0 ) stream_Seek( p_demux->s, i_current_pos );
     }
