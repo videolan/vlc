@@ -66,15 +66,21 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
     tk->i_id = i_id;
     if( ( i_id&0xff00 ) == 0xbd00 )
     {
-        if( ( i_id&0xf8 ) == 0x88 )
+        if( ( i_id&0xf8 ) == 0x88 || (i_id&0xf8) == 0x98 )
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('d','t','s',' ') );
             tk->i_skip = 4;
         }
-        else if( ( i_id&0xf0 ) == 0x80 )
+        else if( ( i_id&0xf0 ) == 0x80
+               ||  (i_id&0xf0) == 0xc0 ) /* AC-3, Can also be used for DD+/E-AC-3 */
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('a','5','2',' ') );
             tk->i_skip = 4;
+        }
+        else if( (i_id&0xf0) == 0xb0 )
+        {
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','l','p',' ') );
+            /* FIXME / untested ... no known decoder (at least not in VLC/ffmpeg) */
         }
         else if( ( i_id&0xe0 ) == 0x20 )
         {
@@ -93,6 +99,18 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
         else if( ( i_id&0xfc ) == 0x00 )
         {
             es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('c','v','d',' ') );
+        }
+        else
+        {
+            es_format_Init( &tk->fmt, UNKNOWN_ES, 0 );
+            return VLC_EGENERIC;
+        }
+    }
+    else if( (i_id&0xff00) == 0xfd00 )
+    {
+        if( i_id>=0x55 && i_id<=0x5f )
+        {
+            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('v','c','1',' ') );
         }
         else
         {
@@ -391,7 +409,7 @@ static inline int ps_id_to_type( ps_psm_t *p_psm, int i_id )
     int i;
     for( i = 0; p_psm && i < p_psm->i_es; i++ )
     {
-        if( p_psm->es[i]->i_id == i_id ) return p_psm->es[i]->i_type;     
+        if( p_psm->es[i]->i_id == i_id ) return p_psm->es[i]->i_type;
     }
     return 0;
 }
@@ -401,7 +419,7 @@ static inline uint8_t *ps_id_to_lang( ps_psm_t *p_psm, int i_id )
     int i;
     for( i = 0; p_psm && i < p_psm->i_es; i++ )
     {
-        if( p_psm->es[i]->i_id == i_id ) return p_psm->es[i]->lang;     
+        if( p_psm->es[i]->i_id == i_id ) return p_psm->es[i]->lang;
     }
     return 0;
 }
@@ -497,7 +515,7 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
         p_psm->es = realloc( p_psm->es, sizeof(ps_es_t *) * (p_psm->i_es+1) );
         p_psm->es[p_psm->i_es] = malloc( sizeof(ps_es_t) );
         *p_psm->es[p_psm->i_es++] = es;
-        i_es_base += 4 + i_info_length; 
+        i_es_base += 4 + i_info_length;
     }
 
     /* TODO: CRC */
