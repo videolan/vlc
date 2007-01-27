@@ -505,7 +505,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  * Divers:
  *****************************************************************************/
 
-/* PSResynch: resynch on a system starcode
+/* PSResynch: resynch on a system startcode
  *  It doesn't skip more than 512 bytes
  *  -1 -> error, 0 -> not synch, 1 -> ok
  */
