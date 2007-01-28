@@ -53,7 +53,7 @@ struct LayeredControl
 
 
 /// Base class for layouts
-class GenericLayout: public SkinObject, public Box
+class GenericLayout: public SkinObject
 {
     public:
         GenericLayout( intf_thread_t *pIntf, int width, int height,
@@ -84,12 +84,20 @@ class GenericLayout: public SkinObject, public Box
         virtual OSGraphics *getImage() const { return m_pImage; }
 
         /// Get the position of the layout (relative to the screen)
+        /**
+         * Note: These values are different from the m_rect.getLeft() and
+         * m_rect.getTop(), which always return 0.
+         * The latter methods are there as a "root rect" for the panels and
+         * controls, since each control knows its parent rect, but returns
+         * coordinates relative to the root rect.
+         */
         virtual int getLeft() const { return m_pWindow->getLeft(); }
         virtual int getTop() const { return m_pWindow->getTop(); }
 
         /// Get the size of the layout
-        virtual int getWidth() const { return m_width; }
-        virtual int getHeight() const { return m_height; }
+        virtual int getWidth() const { return m_rect.getWidth(); }
+        virtual int getHeight() const { return m_rect.getHeight(); }
+        virtual const GenericRect &getRect() const { return m_rect; }
 
         /// Get the minimum and maximum size of the layout
         virtual int getMinWidth() const { return m_minWidth; }
@@ -141,14 +149,14 @@ class GenericLayout: public SkinObject, public Box
         /// Parent window of the layout
         TopWindow *m_pWindow;
         /// Layout size
-        int m_width, m_height;
+        Rect m_rect;
         int m_minWidth, m_maxWidth;
         int m_minHeight, m_maxHeight;
         /// Image of the layout
         OSGraphics *m_pImage;
         /// List of the controls in the layout
         list<LayeredControl> m_controlList;
-        //// Video control
+        /// Video control
         CtrlVideo *m_pVideoControl;
         /// List of the anchors in the layout
         list<Anchor*> m_anchorList;

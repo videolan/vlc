@@ -81,7 +81,7 @@ class WindowManager: public SkinObject
          */
         void move( TopWindow &rWindow, int left, int top ) const;
 
-        /// Tell the window manager that a resize is initiated for rWindow
+        /// Tell the window manager that a resize is initiated for rLayout
         void startResize( GenericLayout &rLayout, Direction_t direction );
 
         /// Tell the window manager that the current resizing ended

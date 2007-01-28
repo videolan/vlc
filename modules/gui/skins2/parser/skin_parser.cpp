@@ -36,6 +36,11 @@ SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName,
     {
         m_pData = new BuilderData();
     }
+
+    // Special id, we don't want any control to have the same one
+    m_idSet.insert( "none" );
+    // At the beginning, there is no Panel
+    m_panelStack.push_back( "none" );
 }
 
 
@@ -196,7 +201,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 convertBoolean( attr["ykeepratio"] ), attr["visible"],
                 attr["up"], attr["down"], attr["over"], attr["action"],
                 attr["tooltiptext"], attr["help"],
-                m_curLayer, m_curWindowId, m_curLayoutId );
+                m_curLayer, m_curWindowId, m_curLayoutId, m_panelStack.back() );
         m_curLayer++;
         m_pData->m_listButton.push_back( button );
     }
@@ -233,7 +238,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["up2"], attr["down2"], attr["over2"], attr["state"],
                 attr["action1"], attr["action2"], attr["tooltiptext1"],
                 attr["tooltiptext2"], attr["help"], m_curLayer, m_curWindowId,
-                m_curLayoutId );
+                m_curLayoutId, m_panelStack.back() );
         m_curLayer++;
         m_pData->m_listCheckbox.push_back( checkbox );
     }
@@ -282,7 +287,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 convertBoolean( attr["xkeepratio"] ),
                 convertBoolean( attr["ykeepratio"] ), attr["visible"],
                 attr["image"], attr["action"], attr["action2"], attr["resize"],
-                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId );
+                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId,
+                m_panelStack.back() );
         m_curLayer++;
         m_pData->m_listImage.push_back( imageData );
     }
@@ -305,6 +311,32 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         m_pData->m_listLayout.push_back( layout );
         m_curLayer = 0;
     }
+
+    else if( rName == "Panel" )
+    {
+        CheckDefault( "x", "0" );
+        CheckDefault( "y", "0" );
+        CheckDefault( "lefttop", "lefttop" );
+        CheckDefault( "rightbottom", "lefttop" );
+        CheckDefault( "xkeepratio", "false" );
+        CheckDefault( "ykeepratio", "false" );
+        RequireDefault( "width" );
+        RequireDefault( "height" );
+
+        string panelId = uniqueId( "none" );
+        const BuilderData::Panel panel( panelId,
+                atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
+                attr["lefttop"], attr["rightbottom"],
+                convertBoolean( attr["xkeepratio"] ),
+                convertBoolean( attr["ykeepratio"] ),
+                atoi( attr["width"] ), atoi( attr["height" ] ),
+                m_curLayer, m_curWindowId, m_curLayoutId, m_panelStack.back() );
+        m_curLayer++;
+        m_pData->m_listPanel.push_back( panel );
+        // Add the panel to the stack
+        m_panelStack.push_back( panelId );
+    }
+
     else if( rName == "Playlist" )
     {
         RequireDefault( "id" );
@@ -346,7 +378,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["bgcolor1"],
                 attr["bgcolor2"],
                 attr["selcolor"], attr["help"],
-                m_curLayer, m_curWindowId, m_curLayoutId );
+                m_curLayer, m_curWindowId, m_curLayoutId, m_panelStack.back() );
         m_curLayer++;
         m_pData->m_listTree.push_back( treeData );
     }
@@ -389,7 +421,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 attr["fgcolor"], attr["playcolor"],
                 attr["bgcolor1"], attr["bgcolor2"],
                 attr["selcolor"], attr["help"],
-                m_curLayer, m_curWindowId, m_curLayoutId );
+                m_curLayer, m_curWindowId, m_curLayoutId, m_panelStack.back() );
         m_curLayer++;
         m_pData->m_listTree.push_back( treeData );
     }
@@ -421,7 +453,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 atoi( attr["nbImages"] ), atof( attr["minAngle"] ) * M_PI /180,
                 atof( attr["maxAngle"] ) * M_PI / 180, attr["value"],
                 attr["tooltiptext"], attr["help"], m_curLayer, m_curWindowId,
-                m_curLayoutId );
+                m_curLayoutId, m_panelStack.back() );
         m_curLayer++;
         m_pData->m_listRadialSlider.push_back( radial );
     }
@@ -458,7 +490,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 convertBoolean( attr["ykeepratio"] ), attr["up"], attr["down"],
                 attr["over"], attr["points"], atoi( attr["thickness"] ),
                 newValue, "none", 0, 0, 0, 0, attr["tooltiptext"],
-                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId );
+                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId,
+                m_panelStack.back() );
         m_curLayer++;
         m_pData->m_listSlider.push_back( slider );
     }
@@ -508,7 +541,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 convertBoolean( attr["ykeepratio"] ),
                 convertColor( attr["color"] ),
                 attr["scrolling"], attr["alignment"],
-                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId );
+                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId,
+                m_panelStack.back() );
         m_curLayer++;
         m_pData->m_listText.push_back( textData );
     }
@@ -568,7 +602,8 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                 convertBoolean( attr["xkeepratio"] ),
                 convertBoolean( attr["ykeepratio"] ),
                 attr["visible"], convertBoolean( attr["autoresize"] ),
-                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId );
+                attr["help"], m_curLayer, m_curWindowId, m_curLayoutId,
+                m_panelStack.back() );
         m_curLayer++;
         m_pData->m_listVideo.push_back( videoData );
     }
@@ -610,6 +645,10 @@ void SkinParser::handleEndElement( const string &rName )
     {
         m_curPopupId = "";
         m_popupPosList.pop_back();
+    }
+    else if( rName == "Panel" )
+    {
+        m_panelStack.pop_back();
     }
 }
 

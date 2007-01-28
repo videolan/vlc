@@ -61,6 +61,8 @@ class SkinParser: public XMLParser
         /// Current offset of the controls
         int m_xOffset, m_yOffset;
         list<int> m_xOffsetList, m_yOffsetList;
+        /// Stack of panel ids
+        list<string> m_panelStack;
         /// Layer of the current control in the layout
         int m_curLayer;
         /// Set of used id

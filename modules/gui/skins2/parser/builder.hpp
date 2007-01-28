@@ -37,7 +37,7 @@ class Bezier;
 class CmdGeneric;
 class GenericFont;
 class Position;
-class Box;
+class GenericRect;
 
 
 /// Class for skin construction
@@ -79,6 +79,7 @@ class Builder: public SkinObject
         void addButton( const BuilderData::Button &rData );
         void addCheckbox( const BuilderData::Checkbox &rData );
         void addImage( const BuilderData::Image &rData );
+        void addPanel( const BuilderData::Panel &rData );
         void addText( const BuilderData::Text &rData );
         void addRadialSlider( const BuilderData::RadialSlider &rData );
         void addSlider( const BuilderData::Slider &rData );
@@ -90,7 +91,8 @@ class Builder: public SkinObject
         const Position makePosition( const string &rLeftTop,
                                      const string &rRightBottom,
                                      int xPos, int yPos, int width, int height,
-                                     const Box &rBox, bool xKeepRatio = false,
+                                     const GenericRect &rRect,
+                                     bool xKeepRatio = false,
                                      bool yKeepRatio = false ) const;
 
         // Build the full path of a file

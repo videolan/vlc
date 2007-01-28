@@ -33,6 +33,7 @@
 #include "../commands/cmd_generic.hpp"
 #include "../utils/bezier.hpp"
 #include "../utils/variable.hpp"
+#include "../utils/position.hpp"
 #include "../controls/ctrl_generic.hpp"
 #include <string>
 #include <list>
@@ -55,12 +56,13 @@ class Theme: public SkinObject
         void loadConfig();
         void saveConfig();
 
-        GenericBitmap *getBitmapById( const string &id );
-        GenericFont *getFontById( const string &id );
-        Popup *getPopupById( const string &id );
-        TopWindow *getWindowById( const string &id );
-        GenericLayout *getLayoutById( const string &id );
-        CtrlGeneric *getControlById( const string &id );
+        GenericBitmap *getBitmapById( const string &id ) const;
+        GenericFont *getFontById( const string &id ) const;
+        Popup *getPopupById( const string &id ) const;
+        TopWindow *getWindowById( const string &id ) const;
+        GenericLayout *getLayoutById( const string &id ) const;
+        CtrlGeneric *getControlById( const string &id ) const;
+        Position *getPositionById( const string &id ) const;
 
         WindowManager &getWindowManager() { return m_windowManager; }
 
@@ -77,6 +79,8 @@ class Theme: public SkinObject
         map<string, GenericLayoutPtr> m_layouts;
         /// Store the controls by ID
         map<string, CtrlGenericPtr> m_controls;
+        /// Store the panel positions by ID
+        map<string, PositionPtr> m_positions;
         /// Store the commands
         list<CmdGenericPtr> m_commands;
         /// Store the Bezier curves

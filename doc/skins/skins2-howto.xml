@@ -65,24 +65,6 @@ difficulty to understand how VLC skins work.</para>
 
 </sect1>
 
-<sect1 id="bezier">
-<title>Bezier curves</title>
-
-<para>One cool thing with VLC sliders is that they are not necessarily rectilinear, but they can follow any Bezier curve. So if you want to have a slider moving on a half-circle, or even doing a loop, you can!</para>
-
-<para>This is not the place to explain how Bezier curves work (see <ulink url="http://astronomy.swin.edu.au/~pbourke/curves/bezier/">http://astronomy.swin.edu.au/~pbourke/curves/bezier/</ulink> for a nice introduction), the main thing to know is that a Bezier curve can be characterized by a set of points. Once you have them (thanks to the <link linkend="CurveMaker">CurveMaker</link> utility for example<!--XXX: deprecated-->), you just need to enter the list of points in the <link linkend="sliderpoints">points</link> attribute. Here is an example with 3 points: points="(2,50),(45,120),(88,50)".</para>
-
-<para>Bezier curves can be used with the <link linkend="Slider">Slider</link> and <link linkend="Anchor">Anchor</link> tags:</para>
-
-<itemizedlist>
-  <listitem><para>For sliders, it defines the curve followed by the cursor of the slider. This curve is of course invisible, so if you want a visible background for your <link linkend="Slider">Slider</link> you need to provide it yourself using the <link linkend="Image">Image</link> tag.</para></listitem>
-  <listitem><para>For anchors, the use of Bezier curves is more anecdotic. Its purpose is to have non-ponctual anchor, the whole curve becoming the anchor. In this case, a ponctual anchor (and only a ponctual one) can be attracted by any point of the curve, if it is in its range of action. In fact, you can consider the curve as an easy way to define at once many anchors that share the same properties (except their position, of course :)).</para></listitem>
-</itemizedlist>
-
-<note><para>The coordinates are relative to the upper-left corner of the control (i.e. to its <link linkend="x">x</link> and <link linkend="y">y</link> attributes).</para></note>
-
-</sect1>
-
 <sect1>
 <title>The bitmaps</title>
 
@@ -321,12 +303,12 @@ difficulty to understand how VLC skins work.</para>
   </sect3>
   <sect3 id="layoutwidth">
     <title>width</title>
-    <para><!--TODO: calculate it in VLC :)-->Width of the layout. this value is required since VLC is not (yet?) able to calculate it using the sizes and positions of the controls.</para>
+    <para><!--TODO: calculate it in VLC :)-->Initial width of the layout. This value is required since VLC is not (yet?) able to calculate it using the sizes and positions of the controls.</para>
     <para><emphasis>Required.</emphasis></para>
   </sect3>
   <sect3 id="layoutheight">
     <title>height</title>
-    <para><!--TODO: calculate it in VLC :)-->Height of the layout. this value is required since VLC is not (yet?) able to calculate it using the sizes and positions of the controls.</para>
+    <para><!--TODO: calculate it in VLC :)-->Initial height of the layout. This value is required since VLC is not (yet?) able to calculate it using the sizes and positions of the controls.</para>
     <para><emphasis>Required.</emphasis></para>
   </sect3>
   <sect3 id="minwidth">
@@ -353,16 +335,54 @@ difficulty to understand how VLC skins work.</para>
 
 <sect2 id="Group">
   <title>Group</title>
-  <para>Adds an offset to the elements it contains. A Group is only supposed to ease the job of the skin designer, who can adjust the position of a group of controls without modifying all the coordinates, but you can ignore it if you want (only one Group is necessary, inside the <link linkend="Layout">Layout</link> tag). Group tags can be nested.</para>
+  <para>Add an offset to the elements it contains. A Group is only supposed to ease the job of the skin designer, who can adjust the position of a group of controls without modifying all the coordinates, but you can ignore it if you want (only one Group is necessary, inside the <link linkend="Layout">Layout</link> tag). Group tags can be nested. Note that Group elements are deprecated, since <link linkend="Panel">Panel</link> elements are more powerful.</para>
   <sect3 id="groupx">
     <title>x</title>
-    <para>Try and guess.</para>
+    <para>Horizontal offset, relative to the container box (see the <link linkend="layoutmodel">Layout model</link> for more details).</para>
     <para>Default value: 0</para>
   </sect3>
   <sect3 id="groupy">
     <title>y</title>
-    <para>What do you think?</para>
+    <para>Vertical offset, relative to the container box (see the <link linkend="layoutmodel">Layout model</link> for more details).</para>
     <para>Default value: 0</para>
+  </sect3>
+</sect2>
+
+<sect2 id="Panel">
+  <title>Panel</title>
+  <para>A Panel can be seen as an enhanced <link linkend="Layout">Group</link>. It also adds an offset to the elements it contains, but in addition it becomes their reference for the lefttop, rightbottom, xkeepratio and ykeepratio attributes. Panel tags can be nested. Since VLC 0.9.0.</para>
+  <para>See the <link linkend="commattr">common attributes</link>.</para>
+  <sect3 id="panelx">
+    <title>x</title>
+    <para>Same as the <link linkend="x">x</link> attribute of the <link linkend="commattr">common attributes</link>.</para>
+  </sect3>
+  <sect3 id="panely">
+    <title>y</title>
+    <para>Same as the <link linkend="y">y</link> attribute of the <link linkend="commattr">common attributes</link>.</para>
+  </sect3>
+  <sect3 id="panelwidth">
+    <title>width</title>
+    <para>Initial width of this container box (see the <link linkend="layoutmodel">Layout model</link> for more details).</para>
+  </sect3>
+  <sect3 id="panelheight">
+    <title>height</title>
+    <para>Initial height of this container box (see the <link linkend="layoutmodel">Layout model</link> for more details).</para>
+  </sect3>
+  <sect3 id="panellefttop">
+    <title>lefttop</title>
+    <para>Same as the <link linkend="lefttop">lefttop</link> attribute of the <link linkend="commattr">common attributes</link>.</para>
+  </sect3>
+  <sect3 id="panelrightbottom">
+    <title>rightbottom</title>
+    <para>Same as the <link linkend="rightbottom">rightbottom</link> attribute of the <link linkend="commattr">common attributes</link>.</para>
+  </sect3>
+  <sect3 id="panelxkeepratio">
+    <title>xkeepratio</title>
+    <para>Same as the <link linkend="xkeepratio">xkeepratio</link> attribute of the <link linkend="commattr">common attributes</link>.</para>
+  </sect3>
+  <sect3 id="panelykeepratio">
+    <title>ykeepratio</title>
+    <para>Same as the <link linkend="ykeepratio">ykeepratio</link> attribute of the <link linkend="commattr">common attributes</link>.</para>
   </sect3>
 </sect2>
 
@@ -371,7 +391,7 @@ difficulty to understand how VLC skins work.</para>
   <para>Create a "magnetic point" (or curve) in the current window. If an anchor of another window enters in the range of action of this anchor, the 2 anchors will automatically be on the same place, and the windows are "sticked". Each anchor has a priority (<link linkend="anchorpriority">priority</link> attribute), and the anchor with the highest priority is the winner, which means that when moving its window all the other anchored windows will move too. To break the effect of 2 anchored windows, you need to move the window whose anchor has the lower priority.</para>
   <sect3 id="anchorx">
     <title>x</title>
-    <para>Is it really necessary to explain ?</para>
+    <para>Is it really necessary to explain?</para>
     <para>Default value: 0</para>
   </sect3>
   <sect3 id="anchory">
@@ -419,34 +439,34 @@ difficulty to understand how VLC skins work.</para>
   </sect3>
   <sect3 id="x">
     <title>x</title>
-    <para>Horizontal offset of the control, relative to the parent tag (usually <link linkend="Group">Group</link> or <link linkend="Layout">Layout</link>).</para>
+    <para>Horizontal offset of the control, relative to the container box (see the <link linkend="layoutmodel">Layout model</link>) or to the parent <link linkend="Group">Group</link>.</para>
     <para>Default value: 0</para>
   </sect3>
   <sect3 id="y">
     <title>y</title>
-    <para>Vertical offset of the control, relative to the parent tag (usually <link linkend="Group">Group</link> or <link linkend="Layout">Layout</link>).</para>
+    <para>Vertical offset of the control, relative to the container box (see the <link linkend="layoutmodel">Layout model</link>) or to the parent <link linkend="Group">Group</link>.</para>
     <para>Default value: 0</para>
   </sect3>
   <sect3 id="lefttop">
     <title>lefttop</title>
-    <para>Indicate to which corner of the Layout the top-left-hand corner of this control is attached, in case of resizing. Possible values are 'lefttop', 'leftbottom', 'righttop' and 'rightbottom'.</para>
+    <para>Indicate to which corner of the container box the top-left-hand corner of this control is attached, in case of resizing. Possible values are 'lefttop', 'leftbottom', 'righttop' and 'rightbottom'. See the <link linkend="layoutmodel">Layout model</link> for more details.</para>
     <para>Default value: lefttop</para>
   </sect3>
   <sect3 id="rightbottom">
     <title>rightbottom</title>
-    <para>Indicate to which corner of the Layout the bottom-right-hand corner of this control is attached, in case of resizing.</para>
+    <para>Indicate to which corner of the container box the bottom-right-hand corner of this control is attached, in case of resizing. See the <link linkend="layoutmodel">Layout model</link> for more details.</para>
     <para>Default value: lefttop</para>
   </sect3>
   <sect3 id="xkeepratio">
     <title>xkeepratio</title>
-    <para>When set to true, the behaviour of the horizontal resizing is changed. Instead of taking into account the <link linkend="lefttop">lefttop</link> and <link linkend="rightbottom">rightbottom</link> attributes to determine how the control will be moved/resized, only its initial position inside the <link linkend="Layout">Layout</link> matters. For example, if initially the space to the left of the control is twice as big as the one to its right, this will stay the same during any horizontal resizing. The width of the control stays constant.</para>
-    <para>This attribute can be particularly useful to keep a control centered in the layout, without resizing it (to resize it, you would rather use the lefttop/rightbottom attributes). Available since VLC 0.8.6.</para>
+    <para>When set to true, the behaviour of the horizontal resizing is changed. Instead of taking into account the <link linkend="lefttop">lefttop</link> and <link linkend="rightbottom">rightbottom</link> attributes to determine how the control will be moved/resized, only its initial position inside the container box matters. For example, if initially the space to the left of the control is twice as big as the one to its right, this will stay the same during any horizontal resizing. The width of the control stays constant.</para>
+    <para>This attribute can be particularly useful to keep a control centered in the container box, without resizing it (to resize it, you would rather use the lefttop/rightbottom attributes). See the <link linkend="layoutmodel">Layout model</link> for more details. Available since VLC 0.8.6.</para>
     <para>Default value: false</para>
   </sect3>
   <sect3 id="ykeepratio">
     <title>ykeepratio</title>
     <para>When set to true, the behaviour of the vertical resizing is changed. Instead of taking into account the <link linkend="lefttop">lefttop</link> and <link linkend="rightbottom">rightbottom</link> attributes to determine how the control will be moved/resized, only its initial position inside the <link linkend="Layout">Layout</link> matters. For example, if initially the space to the top of the control is twice as big as the one to its bottom, this will stay the same during any vertical resizing. The height of the control stays constant.</para>
-    <para>This attribute can be particularly useful to keep a control centered in the layout, without resizing it (to resize it, you would rather use the lefttop/rightbottom attributes). Available since VLC 0.8.6.</para>
+    <para>This attribute can be particularly useful to keep a control centered in the container box, without resizing it (to resize it, you would rather use the lefttop/rightbottom attributes). See the <link linkend="layoutmodel">Layout model</link> for more details. Available since VLC 0.8.6.</para>
     <para>Default value: false</para>
   </sect3>
   <sect3 id="help">
@@ -1114,6 +1134,38 @@ difficulty to understand how VLC skins work.</para>
 
 </sect1>
 
+<sect1 id="layoutmodel">
+<title>Layout model</title>
+
+<para>Placing the controls on a window is easy, using their x and y attributes, but these positions become insufficient for a resizable window. Some controls (or groups of controls) should stay centered in the window, others should follow the right side of the window, others should change their size automatically, etc... To handle these various behaviours, the layout model followed by the skins engine is a model based on nested boxes.</para>
+
+<para>There are 2 kinds of boxes:</para>
+
+<itemizedlist>
+  <listitem><para>
+    <emphasis>simple boxes</emphasis>: These boxes cannot contain other boxes. All the visible controls are simple boxes: Image, Button, Checkbox, Text, Slider, RadialSlider, Playlist, Playtree, Video.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>container boxes</emphasis>: These boxes can contain other boxes. Only two XML tags create container boxes: <link linkend="Panel">Panel</link> and <link linkend="Layout">Layout</link>. The Layout tag is necessarily the top-level box for the current layout, and cannot be contained, but Panel elements can be contained.
+  </para></listitem>
+</itemizedlist>
+
+<para>A box inside a container box always defines how it should react when its container box is resized. Two different mechanisms are provided: corners anchoring (useful when resizing of the inner box is wanted, for example) and constant ratio (mainly useful to keep the inner box centered inside its parent):</para>
+<itemizedlist>
+  <listitem><para>
+    <emphasis>corners anchoring</emphasis>: The top-left-hand corner (TL) and the bottom-right-hand corner (BR) of the inner box are "tied" to corners of the container box (TL, TR, BL or BR). When any resizing occurs, tied corners move together, which can move or resize the inner box. For example, if the TL corner of the inner box is tied to the TL corner of the container (let's write it TL/TL), and if the BR corner of the inner box is also tied to the TL corner of the container box (BR/TL), the inner box will not be resized, and will always stay at the same place (this is the default behaviour). If we have TL/TL and TL/BL, the inner box is resized vertically its container is resized. If we have TL/TR and BR/TR, the inner box moves with the TR corner of its container. We could even define TL/BR and BR/TL, in which case increasing the size of the container box would shrink the size of the inner box... until it disappears completely!
+  </para>
+  <para>This mechanism is controlled by the <link linkend="lefttop">lefttop</link> and <link linkend="rightbottom">rightbottom</link> attributes of the controls.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>constant ratio</emphasis>: When a box doesn't fill completely its container box, there is space on the top, bottom, left and right of the inner box. It is possible to force the ratio between the space on the top and the space on the bottom (or the one on the left and the one on the right)  to be constant. Any resizing of the container box will then move the inner box accordingly, and the size of the inner box will never change (it overrides the corners anchoring mechanism). The horizontal and vertical ratios being independent, it is for example possible to keep only the horizontal ratio constant, in which case the inner box can still resize vertically (depending on its attributes for the corners anchoring, of course).
+  </para>
+  <para>This mechanism is controlled by the <link linkend="xkeepratio">xkeepratio</link> and <link linkend="ykeepratio">ykeepratio</link> attributes of the controls.
+  </para></listitem>
+</itemizedlist>
+
+</sect1>
+
 
 <sect1>
 
@@ -1136,6 +1188,24 @@ difficulty to understand how VLC skins work.</para>
 
 </sect1>
 
+<sect1 id="bezier">
+<title>Bezier curves</title>
+
+<para>One cool thing with VLC sliders is that they are not necessarily rectilinear, but they can follow any Bezier curve. So if you want to have a slider moving on a half-circle, or even doing a loop, you can!</para>
+
+<para>This is not the place to explain how Bezier curves work (see <ulink url="http://astronomy.swin.edu.au/~pbourke/curves/bezier/">http://astronomy.swin.edu.au/~pbourke/curves/bezier/</ulink> for a nice introduction), the main thing to know is that a Bezier curve can be characterized by a set of points. Once you have them (thanks to the <link linkend="CurveMaker">CurveMaker</link> utility for example<!--XXX: deprecated-->), you just need to enter the list of points in the <link linkend="sliderpoints">points</link> attribute. Here is an example with 3 points: points="(2,50),(45,120),(88,50)".</para>
+
+<para>Bezier curves can be used with the <link linkend="Slider">Slider</link> and <link linkend="Anchor">Anchor</link> tags:</para>
+
+<itemizedlist>
+    <listitem><para>For sliders, it defines the curve followed by the cursor of the slider. This curve is of course invisible, so if you want a visible background for your <link linkend="Slider">Slider</link> you need to provide it yourself using a <link linkend="SliderBackground">SliderBackground</link> or <link linkend="Image">Image</link> tag.</para></listitem>
+  <listitem><para>For anchors, the use of Bezier curves is more anecdotic. Its purpose is to have non-ponctual anchor, the whole curve becoming the anchor. In this case, a ponctual anchor (and only a ponctual one) can be attracted by any point of the curve, if it is in its range of action. In fact, you can consider the curve as an easy way to define at once many anchors that share the same properties (except their position, of course :)).</para></listitem>
+</itemizedlist>
+
+<note><para>The coordinates are relative to the upper-left corner of the control (i.e. to its <link linkend="x">x</link> and <link linkend="y">y</link> attributes).</para></note>
+
+</sect1>
+
 <sect1>
 <title>Tools and advice</title>
 
@@ -1143,7 +1213,7 @@ difficulty to understand how VLC skins work.</para>
   <title>Generating Bezier curves</title>
 
   <para>
-To generate easily Bezier curves, you can use the <ulink url="/vlc/skins/VLC-curve-maker.exe">curve-maker</ulink> (sorry, this is for Windows users only). Basically, you add and remove points at will, and you can move them to see how the curve evolves. When you have reached the perfect curve, you just have to copy-paste the list of abscissas and ordinates to form the <link linkend="sliderpoints">points</link> attribute of your <link linkend="Slider">Slider</link> or <link linkend="Playlist">Playlist</link>. The curve-maker also allows to load a .bmp file, this could be useful if you want to follow a specific pattern of a slider, for example.
+To generate easily Bezier curves, you can use the <ulink url="/vlc/skins/VLC-curve-maker.exe">CurveMaker</ulink> utility (sorry, this is for Windows users only). Basically, you add and remove points at will, and you can move them to see how the curve evolves. When you have reached the perfect curve, you just have to copy-paste the list of abscissas and ordinates to form the <link linkend="sliderpoints">points</link> attribute of your <link linkend="Slider">Slider</link> or <link linkend="Anchor">Anchor</link>. The curve-maker also allows to load a .bmp file, this could be useful if you want to follow a specific pattern of a slider, for example.
   </para>
 
 <note><para>This tool was made for the first version of the skins and has not been modified since then. This explains why it does not use PNG files and why it does not generate directly the value of the <link linkend="sliderpoints">points</link> attribute.</para></note>

@@ -36,8 +36,8 @@
 GenericLayout::GenericLayout( intf_thread_t *pIntf, int width, int height,
                               int minWidth, int maxWidth, int minHeight,
                               int maxHeight ):
-    SkinObject( pIntf ), m_pWindow( NULL ), m_width( width ),
-    m_height( height ), m_minWidth( minWidth ), m_maxWidth( maxWidth ),
+    SkinObject( pIntf ), m_pWindow( NULL ), m_rect( 0, 0, width, height ),
+    m_minWidth( minWidth ), m_maxWidth( maxWidth ),
     m_minHeight( minHeight ), m_maxHeight( maxHeight ), m_pVideoControl( NULL ),
     m_visible( false ), m_pVarActive( NULL )
 {
@@ -106,7 +106,7 @@ void GenericLayout::addControl( CtrlGeneric *pControl,
         pControl->draw( *m_pImage, rPosition.getLeft(), rPosition.getTop() );
 
         // Add the control in the list.
-        // This list must remain sorted by layer order 
+        // This list must remain sorted by layer order
         list<LayeredControl>::iterator it;
         for( it = m_controlList.begin(); it != m_controlList.end(); it++ )
         {
@@ -165,8 +165,7 @@ void GenericLayout::onControlUpdate( const CtrlGeneric &rCtrl,
 void GenericLayout::resize( int width, int height )
 {
     // Update the window size
-    m_width = width;
-    m_height = height;
+    m_rect = Rect( 0, 0 , width, height );
 
     // Recreate a new image
     if( m_pImage )
@@ -199,7 +198,7 @@ void GenericLayout::resize( int width, int height )
 
 void GenericLayout::refreshAll()
 {
-    refreshRect( 0, 0, m_width, m_height );
+    refreshRect( 0, 0, m_rect.getWidth(), m_rect.getHeight() );
 }
 
 
@@ -231,10 +230,10 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
             x = 0;
         if( y < 0)
             y = 0;
-        if( x + width > m_width )
-            width = m_width - x;
-        if( y + height > m_height )
-            height = m_height - y;
+        if( x + width > m_rect.getWidth() )
+            width = m_rect.getWidth() - x;
+        if( y + height > m_rect.getHeight() )
+            height = m_rect.getHeight() - y;
 
         // Refresh the window... but do not paint on a visible video control!
         if( !m_pVideoControl || !m_pVideoControl->isVisible() )

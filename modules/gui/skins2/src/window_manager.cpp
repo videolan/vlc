@@ -465,17 +465,17 @@ void WindowManager::checkAnchors( TopWindow *pWindow,
         {
             yOffset = workArea.getTop() - (*itMov)->getTop();
         }
-        if( newLeft + (*itMov)->getWidth() > workArea.getRight() - m_magnet &&
-            newLeft + (*itMov)->getWidth() < workArea.getRight() + m_magnet )
+        int right = workArea.getLeft() + workArea.getWidth();
+        if( newLeft + (*itMov)->getWidth() > right - m_magnet &&
+            newLeft + (*itMov)->getWidth() < right + m_magnet )
         {
-            xOffset = workArea.getRight() - (*itMov)->getLeft()
-                      - (*itMov)->getWidth();
+            xOffset = right - (*itMov)->getLeft() - (*itMov)->getWidth();
         }
-        if( newTop + (*itMov)->getHeight() > workArea.getBottom() - m_magnet &&
-            newTop + (*itMov)->getHeight() <  workArea.getBottom() + m_magnet )
+        int bottom = workArea.getTop() + workArea.getHeight();
+        if( newTop + (*itMov)->getHeight() > bottom - m_magnet &&
+            newTop + (*itMov)->getHeight() <  bottom + m_magnet )
         {
-            yOffset =  workArea.getBottom() - (*itMov)->getTop()
-                       - (*itMov)->getHeight();
+            yOffset =  bottom - (*itMov)->getTop() - (*itMov)->getHeight();
         }
     }
 

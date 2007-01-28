@@ -27,6 +27,7 @@
 
 #include "variable.hpp"
 #include "observer.hpp"
+#include "pointer.hpp"
 
 
 /// Interface for rectangular objects
@@ -41,17 +42,23 @@ class Box
 };
 
 
+/// Interface for rectangular objects with a position
+class GenericRect: public Box
+{
+    public:
+        virtual int getLeft() const = 0;
+        virtual int getTop() const = 0;
+};
+
+
 /// Characterization of a rectangle
-class Rect: public Box
+class Rect: public GenericRect
 {
     public:
         Rect( int left, int top, int right, int bottom );
 
         virtual int getLeft() const { return m_left; }
         virtual int getTop() const { return m_top; }
-        virtual int getRight() const { return m_right; }
-        virtual int getBottom() const { return m_bottom; }
-
         virtual int getWidth() const { return m_right - m_left; }
         virtual int getHeight() const { return m_bottom - m_top; }
 
@@ -64,7 +71,13 @@ class Rect: public Box
 
 
 /// Relative position of a rectangle in a box
-class Position
+/**
+ * Note: Even if the object is tied to its direct container rectangle, the
+ * coordinates returned by getLeft(), getTop(), getRight() and getBottom() are
+ * not relative to the direct container (which is usually a panel or the layout)
+ * but to the root container (i.e. the layout).
+ */
+class Position: public GenericRect
 {
     public:
         /// Type for reference edge/corner
@@ -81,20 +94,21 @@ class Position
         };
 
         /// Create a new position relative to the given box
-        Position( int left, int top, int right, int bottom, const Box &rBox,
+        Position( int left, int top, int right, int bottom,
+                  const GenericRect &rRect,
                   Ref_t refLeftTop, Ref_t refRightBottom,
                   bool xKeepRatio, bool yKeepRatio );
 
         ~Position() {}
 
         /// Get the position relative to the left top corner of the box
-        int getLeft() const;
-        int getTop() const;
+        virtual int getLeft() const;
+        virtual int getTop() const;
         int getRight() const;
         int getBottom() const;
         /// Get the size of the rectangle
-        int getWidth() const;
-        int getHeight() const;
+        virtual int getWidth() const;
+        virtual int getHeight() const;
         /// Get the reference corners
         Ref_t getRefLeftTop() const { return m_refLeftTop; }
         Ref_t getRefRightBottom() const { return m_refRighBottom; }
@@ -105,7 +119,7 @@ class Position
         int m_top;
         int m_right;
         int m_bottom;
-        const Box &m_rBox;
+        const GenericRect &m_rRect;
         Ref_t m_refLeftTop;
         Ref_t m_refRighBottom;
         /// "Keep ratio" mode
@@ -116,6 +130,8 @@ class Position
         /// Initial height ratio (usually between 0 and 1)
         double m_yRatio;
 };
+
+typedef CountedPtr<Position> PositionPtr;
 
 
 /// Variable implementing the Box interface

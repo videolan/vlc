@@ -197,35 +197,39 @@ void Theme::saveConfig()
     while( pos != string::npos ); \
     return NULL;
 
-GenericBitmap *Theme::getBitmapById( const string &id )
+GenericBitmap *Theme::getBitmapById( const string &id ) const
 {
     FIND_FIRST_OBJECT( GenericBitmapPtr, m_bitmaps );
 }
 
-GenericFont *Theme::getFontById( const string &id )
+GenericFont *Theme::getFontById( const string &id ) const
 {
     FIND_FIRST_OBJECT( GenericFontPtr, m_fonts );
 }
 
-Popup *Theme::getPopupById( const string &id )
+Popup *Theme::getPopupById( const string &id ) const
 {
     FIND_OBJECT( PopupPtr, m_popups );
 }
 
-TopWindow *Theme::getWindowById( const string &id )
+TopWindow *Theme::getWindowById( const string &id ) const
 {
     FIND_OBJECT( TopWindowPtr, m_windows );
 }
 
-GenericLayout *Theme::getLayoutById( const string &id )
+GenericLayout *Theme::getLayoutById( const string &id ) const
 {
     FIND_OBJECT( GenericLayoutPtr, m_layouts );
 }
 
-CtrlGeneric *Theme::getControlById( const string &id )
+CtrlGeneric *Theme::getControlById( const string &id ) const
 {
     FIND_OBJECT( CtrlGenericPtr, m_controls );
 }
 
+Position *Theme::getPositionById( const string &id ) const
+{
+    FIND_OBJECT( PositionPtr, m_positions );
+}
 
 

@@ -87,11 +87,24 @@
         minheight   CDATA   "-1"
         maxheight   CDATA   "-1"
     >
+<!-- Grouping elements -->
 <!ELEMENT Group (Group|Image|Button|Playlist|Slider|RadialSlider|Text|Checkbox|
-                 Anchor|Video|Playtree)+>
+                 Anchor|Video|Playtree|Panel)+>
     <!ATTLIST Group
         x           CDATA   "0"
         y           CDATA   "0"
+    >
+<!ELEMENT Panel (Group|Image|Button|Playlist|Slider|RadialSlider|Text|Checkbox|
+                 Anchor|Video|Playtree|Panel)+>
+    <!ATTLIST Panel
+        x           CDATA   "0"
+        y           CDATA   "0"
+        lefttop     CDATA   "lefttop"
+        rightbottom CDATA   "lefttop"
+        xkeepratio  CDATA   "false"
+        ykeepratio  CDATA   "false"
+        width       CDATA   #REQUIRED
+        height      CDATA   #REQUIRED
     >
 
 <!-- Anchors -->
