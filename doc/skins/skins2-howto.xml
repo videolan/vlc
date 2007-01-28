@@ -364,10 +364,12 @@ difficulty to understand how VLC skins work.</para>
   <sect3 id="panelwidth">
     <title>width</title>
     <para>Initial width of this container box (see the <link linkend="layoutmodel">Layout model</link> for more details).</para>
+    <para><emphasis>Required.</emphasis></para>
   </sect3>
   <sect3 id="panelheight">
     <title>height</title>
     <para>Initial height of this container box (see the <link linkend="layoutmodel">Layout model</link> for more details).</para>
+    <para><emphasis>Required.</emphasis></para>
   </sect3>
   <sect3 id="panellefttop">
     <title>lefttop</title>
@@ -1105,7 +1107,7 @@ difficulty to understand how VLC skins work.</para>
    <emphasis>dvd.isActive</emphasis>: True when a DVD is currently playing. This variable can be used to display buttons associated to the <link linkend="dvdactions">dvd.* actions</link> only when needed (since VLC 0.8.5).
   </para></listitem>
   <listitem><para>
-    <emphasis>WindowID.isMaximized</emphasis>: True when the window whose <link linkend="windowid">id</link> is "WindowID" is maximized, false otherwise.
+    <emphasis>WindowID.isMaximized</emphasis>: True when the window whose <link linkend="windowid">id</link> is "WindowID" is maximized, false otherwise (since VLC 0.9.0).
   </para></listitem>
   <listitem><para>
     <emphasis>WindowID.isVisible</emphasis>: True when the window whose <link linkend="windowid">id</link> is "WindowID" is visible, false otherwise.
@@ -1163,7 +1165,7 @@ difficulty to understand how VLC skins work.</para>
 <para>A box inside a container box always defines how it should react when its container box is resized. Two different mechanisms are provided: corners anchoring (useful when resizing of the inner box is wanted, for example) and constant ratio (mainly useful to keep the inner box centered inside its parent):</para>
 <itemizedlist>
   <listitem><para>
-    <emphasis>corners anchoring</emphasis>: The top-left-hand corner (TL) and the bottom-right-hand corner (BR) of the inner box are "tied" to corners of the container box (TL, TR, BL or BR). When any resizing occurs, tied corners move together, which can move or resize the inner box. For example, if the TL corner of the inner box is tied to the TL corner of the container (let's write it TL/TL), and if the BR corner of the inner box is also tied to the TL corner of the container box (BR/TL), the inner box will not be resized, and will always stay at the same place (this is the default behaviour). If we have TL/TL and TL/BL, the inner box is resized vertically its container is resized. If we have TL/TR and BR/TR, the inner box moves with the TR corner of its container. We could even define TL/BR and BR/TL, in which case increasing the size of the container box would shrink the size of the inner box... until it disappears completely!
+    <emphasis>corners anchoring</emphasis>: The top-left-hand corner (TL) and the bottom-right-hand corner (BR) of the inner box are "tied" to corners of the container box (TL, TR, BL or BR). When any resizing occurs, tied corners move together, which can move or resize the inner box. For example, if the TL corner of the inner box is tied to the TL corner of the container (let's write it TL/TL), and if the BR corner of the inner box is also tied to the TL corner of the container box (BR/TL), the inner box will not be resized, and will always stay at the same place (this is the default behaviour). If we have TL/TL and TL/BL, the inner box is resized vertically when its container is resized. If we have TL/TR and BR/TR, the inner box moves with the TR corner of its container. We could even define TL/BR and BR/TL, in which case increasing the size of the container box would shrink the size of the inner box... until it disappears completely!
   </para>
   <para>This mechanism is controlled by the <link linkend="lefttop">lefttop</link> and <link linkend="rightbottom">rightbottom</link> attributes of the controls.
   </para></listitem>
