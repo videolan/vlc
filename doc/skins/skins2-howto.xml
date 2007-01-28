@@ -1246,26 +1246,17 @@ VLC is able to give warnings and error messages about a loaded skin if it finds 
 
   <sect2>
   <title>Relative paths</title>
-
-  <para>
-For the Bitmap tags, do not use absolute paths but relative paths (they are relative to the XML file directory), so that your skin can be reused by anybody without a particular file structure.
-  </para>
+  <para>For the Bitmap tags, do not use absolute paths but relative paths (they are relative to the XML file directory), so that your skin can be reused by anybody without a particular file structure.</para>
   </sect2>
 
   <sect2>
   <title>Get inspiration</title>
-
-  <para>
-In order to use plainly the possibilities given, you should look at how existing skins are made, it may give you ideas for your own skins...
-  </para>
+  <para>In order to use plainly the possibilities given, you should look at how existing skins are made, it may give you ideas for your own skins... You can also consult <link url="http://wiki.videolan.org/DefaultSkinRequirements">on the wiki</ulink> a list of features usually expected from a skin. </para>
   </sect2>
 
   <sect2>
   <title>Submit your skin!</title>
-
-  <para>
-Once your skin is finished, you can share it with other people. The easiest way is probably to send it by email to vlc -at- videolan -dot- org, so that we can put it on the website with the other ones.
-  </para>
+  <para>Once your skin is finished, you can share it with other people. The easiest way is probably to send it by email to vlc -at- videolan -dot- org, so that we can put it on the website with the other ones. You can also post it in the <ulink url="http://forum.videolan.org/viewforum.php?f=15">skins forum</ulink>. Feel free to ask for support there if you have any problems...</para>
   </sect2>
 
 </sect1>
