@@ -78,6 +78,9 @@ class TopWindow: public GenericWindow
         /// Called by a control when its tooltip changed
         virtual void onTooltipChange( const CtrlGeneric &rCtrl );
 
+        /// Get the "maximized" variable
+        VarBool &getMaximizedVar() { return *m_pVarMaximized; }
+
         /// Get the initial visibility status
         bool isVisible() const { return m_visible; }
 
@@ -89,8 +92,13 @@ class TopWindow: public GenericWindow
         virtual void innerHide();
 
     private:
+        /**
+         * These methods are only used by the window manager
+         */
+        //@{
         /// Change the active layout
         virtual void setActiveLayout( GenericLayout *pLayout );
+        //@}
 
         /// Initial visibility status
         bool m_visible;
@@ -107,12 +115,19 @@ class TopWindow: public GenericWindow
         /// Current key modifier (also used for mouse)
         int m_currModifier;
 
-        /// Find the uppest control in the layout hit by the mouse, and send
-        /// it an enter event if needed
+        /// Variable for the visibility of the window
+        VarBoolImpl *m_pVarMaximized;
+
+        /**
+         * Find the uppest control in the layout hit by the mouse, and send
+         * it an enter event if needed
+         */
         CtrlGeneric *findHitControl( int xPos, int yPos );
 
-        /// Update the lastHitControl pointer and send a leave event to the
-        /// right control
+        /**
+         * Update the lastHitControl pointer and send a leave event to the
+         * right control
+         */
         void setLastHit( CtrlGeneric *pNewHitControl );
 };
 

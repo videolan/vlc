@@ -59,6 +59,8 @@ class Rect: public GenericRect
 
         virtual int getLeft() const { return m_left; }
         virtual int getTop() const { return m_top; }
+        virtual int getRight() const { return m_right; }
+        virtual int getBottom() const { return m_bottom; }
         virtual int getWidth() const { return m_right - m_left; }
         virtual int getHeight() const { return m_bottom - m_top; }
 

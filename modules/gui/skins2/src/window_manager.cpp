@@ -29,11 +29,11 @@
 #include "anchor.hpp"
 #include "tooltip.hpp"
 #include "var_manager.hpp"
-#include "../utils/position.hpp"
 
 
 WindowManager::WindowManager( intf_thread_t *pIntf ):
     SkinObject( pIntf ), m_magnet( 0 ), m_direction( kNone ),
+    m_maximizeRect(0, 0, 50, 50),
     m_pTooltip( NULL ), m_pPopup( NULL )
 {
     // Create and register a variable for the "on top" status
@@ -314,6 +314,50 @@ void WindowManager::resize( GenericLayout &rLayout,
                          (*it)->getTop() + yNewOffset );
         }
     }
+}
+
+
+void WindowManager::maximize( TopWindow &rWindow )
+{
+    // Save the current position/size of the window, to be able to restore it
+    m_maximizeRect = Rect( rWindow.getLeft(), rWindow.getTop(),
+                           rWindow.getLeft() + rWindow.getWidth(),
+                           rWindow.getTop() + rWindow.getHeight() );
+
+    Rect workArea = OSFactory::instance( getIntf() )->getWorkArea();
+    // Move the window
+    startMove( rWindow );
+    move( rWindow, workArea.getLeft(), workArea.getTop() );
+    stopMove();
+    // Now resize it
+    // FIXME: Ugly const_cast
+    GenericLayout &rLayout = (GenericLayout&)rWindow.getActiveLayout();
+    startResize( rLayout, kResizeSE );
+    resize( rLayout, workArea.getWidth(), workArea.getHeight() );
+    stopResize();
+    rWindow.m_pVarMaximized->set( true );
+
+    // Make the window unmovable by unregistering it
+//     unregisterWindow( rWindow );
+}
+
+
+void WindowManager::unmaximize( TopWindow &rWindow )
+{
+    // Register the window to allow moving it
+//     registerWindow( rWindow );
+
+    // Resize the window
+    // FIXME: Ugly const_cast
+    GenericLayout &rLayout = (GenericLayout&)rWindow.getActiveLayout();
+    startResize( rLayout, kResizeSE );
+    resize( rLayout, m_maximizeRect.getWidth(), m_maximizeRect.getHeight() );
+    stopResize();
+    // Now move it
+    startMove( rWindow );
+    move( rWindow, m_maximizeRect.getLeft(), m_maximizeRect.getTop() );
+    stopMove();
+    rWindow.m_pVarMaximized->set( false );
 }
 
 

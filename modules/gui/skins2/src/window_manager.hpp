@@ -27,6 +27,7 @@
 
 #include "skin_common.hpp"
 #include "top_window.hpp"
+#include "../utils/position.hpp"
 #include <list>
 #include <map>
 #include <set>
@@ -88,12 +89,18 @@ class WindowManager: public SkinObject
         void stopResize();
 
         /**
-         * Resize the rWindow window to (width, height), and move all its
+         * Resize the rLayout layout to (width, height), and move all its
          * anchored windows, if some anchors are moved during the resizing.
          * If a new anchoring is detected, the windows will move (or resize)
          * accordingly.
          */
         void resize( GenericLayout &rLayout, int width, int height ) const;
+
+        /// Maximize the given window
+        void maximize( TopWindow &rWindow );
+
+        /// Unmaximize the given window
+        void unmaximize( TopWindow &rWindow );
 
         /// Raise all the registered windows
         void raiseAll() const;
@@ -201,6 +208,8 @@ class WindowManager: public SkinObject
         int m_moveAlpha;
         /// Direction of the current resizing
         Direction_t m_direction;
+        /// Rect of the last maximized window
+        Rect m_maximizeRect;
         /// Tooltip
         Tooltip *m_pTooltip;
         /// Active popup, if any

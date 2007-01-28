@@ -225,6 +225,40 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
             pCommand = new CmdLayout( getIntf(), *pWin, *pLayout );
         }
     }
+    else if( rAction.find( ".maximize()" ) != string::npos )
+    {
+        int leftPos = rAction.find( ".maximize()" );
+        string windowId = rAction.substr( 0, leftPos );
+
+        TopWindow *pWin = pTheme->getWindowById( windowId );
+        if( !pWin )
+        {
+            msg_Err( getIntf(), "unknown window (%s)", windowId.c_str() );
+        }
+        else
+        {
+            pCommand = new CmdMaximize( getIntf(),
+                                        pTheme->getWindowManager(),
+                                        *pWin );
+        }
+    }
+    else if( rAction.find( ".unmaximize()" ) != string::npos )
+    {
+        int leftPos = rAction.find( ".unmaximize()" );
+        string windowId = rAction.substr( 0, leftPos );
+
+        TopWindow *pWin = pTheme->getWindowById( windowId );
+        if( !pWin )
+        {
+            msg_Err( getIntf(), "unknown window (%s)", windowId.c_str() );
+        }
+        else
+        {
+            pCommand = new CmdUnmaximize( getIntf(),
+                                          pTheme->getWindowManager(),
+                                          *pWin );
+        }
+    }
     else if( rAction.find( ".show()" ) != string::npos )
     {
         int leftPos = rAction.find( ".show()" );
@@ -420,7 +454,25 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
                 }
                 else
                 {
-                    msg_Err( getIntf(), "unknown window (%s)", windowId.c_str() );
+                    msg_Err( getIntf(), "unknown window (%s)",
+                             windowId.c_str() );
+                    return NULL;
+                }
+            }
+            else if( token.find( ".isMaximized" ) != string::npos )
+            {
+                int leftPos = token.find( ".isMaximized" );
+                string windowId = token.substr( 0, leftPos );
+                TopWindow *pWin = pTheme->getWindowById( windowId );
+                if( pWin )
+                {
+                    // Push the "maximized" variable onto the stack
+                    varStack.push_back( &pWin->getMaximizedVar() );
+                }
+                else
+                {
+                    msg_Err( getIntf(), "unknown window (%s)",
+                             windowId.c_str() );
                     return NULL;
                 }
             }
@@ -436,7 +488,8 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
                 }
                 else
                 {
-                    msg_Err( getIntf(), "unknown layout (%s)", layoutId.c_str() );
+                    msg_Err( getIntf(), "unknown layout (%s)",
+                             layoutId.c_str() );
                     return NULL;
                 }
             }

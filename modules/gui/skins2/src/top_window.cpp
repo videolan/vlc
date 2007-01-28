@@ -58,6 +58,10 @@ TopWindow::TopWindow( intf_thread_t *pIntf, int left, int top,
 {
     // Register as a moving window
     m_rWindowManager.registerWindow( *this );
+
+    // Create the "maximized" variable and register it in the manager
+    m_pVarMaximized = new VarBoolImpl( pIntf );
+    VarManager::instance( pIntf )->registerVar( VariablePtr( m_pVarMaximized ) );
 }
 
 

@@ -996,6 +996,12 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>WindowID.hide()</emphasis>: Hide the <link linkend="Window">Window</link> whose <link linkend="windowid">id</link> attribute is 'WindowID'.
   </para></listitem>
   <listitem><para>
+    <emphasis>WindowID.maximize()</emphasis>: Maximize the <link linkend="Window">Window</link> whose <link linkend="windowid">id</link> attribute is 'WindowID'. Since VLC 0.9.0.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>WindowID.unmaximize()</emphasis>: Unmaximize the <link linkend="Window">Window</link> whose <link linkend="windowid">id</link> attribute is 'WindowID'. Since VLC 0.9.0.
+  </para></listitem>
+  <listitem><para>
     <emphasis>WindowID.setLayout(LayoutID)</emphasis>: Change the layout of the <link linkend="Window">Window</link> whose <link linkend="windowid">id</link> attribute is 'WindowID', using the <link linkend="Layout">Layout</link> whose <link linkend="layoutid">id</link> attribute is 'LayoutID'.
   </para></listitem>
 </itemizedlist>
@@ -1096,6 +1102,9 @@ difficulty to understand how VLC skins work.</para>
   </para></listitem>
   <listitem><para>
    <emphasis>dvd.isActive</emphasis>: True when a DVD is currently playing. This variable can be used to display buttons associated to the <link linkend="dvdactions">dvd.* actions</link> only when needed (since VLC 0.8.5).
+  </para></listitem>
+  <listitem><para>
+    <emphasis>WindowID.isMaximized</emphasis>: True when the window whose <link linkend="windowid">id</link> is "WindowID" is maximized, false otherwise.
   </para></listitem>
   <listitem><para>
     <emphasis>WindowID.isVisible</emphasis>: True when the window whose <link linkend="windowid">id</link> is "WindowID" is visible, false otherwise.

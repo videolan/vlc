@@ -129,13 +129,16 @@ void GenericWindow::toggleOnTop( bool onTop ) const
 
 void GenericWindow::onUpdate( Subject<VarBool> &rVariable, void*arg )
 {
-    if( m_pVarVisible->get() )
+    if (&rVariable == m_pVarVisible )
     {
-        innerShow();
-    }
-    else
-    {
-        innerHide();
+        if( m_pVarVisible->get() )
+        {
+            innerShow();
+        }
+        else
+        {
+            innerHide();
+        }
     }
 }
 
