@@ -73,7 +73,7 @@ case $HOST in
 	    echo "HAVE_DARWIN_OS = 1" >> config.mak
 	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
 	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.9.sdk" >> config.mak
-	    CFLAGS_TUNING=" -mtune=G4"
+	    CFLAGS_TUNING=" -arch ppc -mtune=G4"
 	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK}"
 	    EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
 	    echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
@@ -164,6 +164,8 @@ if test -f /sw/bin/svn; then
         echo "SVN = /sw/bin/svn" >> config.mak
 elif test -f /usr/local/bin/svn; then
         echo "SVN = /usr/local/bin/svn" >> config.mak
+elif test -f /usr/bin/svn; then
+	echo "SVN = /usr/bin/svn" >> config.mak
 elif test -f /opt/local/bin/svn; then
 	echo "SVN = /opt/local/bin/svn" >> config.mak
 elif svn help >/dev/null 2>&1; then
