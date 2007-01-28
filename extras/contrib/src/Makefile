@@ -1876,9 +1876,7 @@ libmpcdec-$(MUSE_VERSION).tar.bz2:
 mpcdec: libmpcdec-$(MUSE_VERSION).tar.bz2 
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/mpcdec.patch
-ifdef HAVE_WIN32
 	(cd $@; ./autogen.sh)
-endif
 
 .mpcdec: mpcdec
 ifdef HAVE_WIN32 
