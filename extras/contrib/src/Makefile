@@ -693,7 +693,8 @@ endif
 
 ifdef SVN
 tremor-source: tremor
-	                tar cfvz tremor-$(DATE).tar.gz tremor
+	cd tremor; find . -name '.svn' -exec "rm -rf" {}\; cd ..;
+	tar cfvz tremor-$(DATE).tar.gz tremor
 
 SOURCE += tremor-source
 endif
@@ -902,6 +903,7 @@ endif
 
 ifdef SVN
 libebml-source: libebml
+	cd libebml; find . -name '.svn' -exec "rm -rf" {}\; cd ..;
 	tar cfvz  libebml-$(DATE).tar.gz libebml
 SOURCE += libebml-source	
 endif
@@ -939,6 +941,7 @@ endif
 
 ifdef SVN
 libmatroska-source: libmatroska
+	cd libmatroska; find . -name '.svn' -exec "rm -rf" {}\; cd ..;
 	tar cfvz libmatroska-$(DATE).tar.gz libmatroska
 
 SOURCE += libmatroska-source
@@ -985,7 +988,8 @@ endif
 
 ifdef SVN
 ffmpeg-source: ffmpeg
-	        tar cfvz ffmpeg-$(DATE).tar.gz ffmpeg
+	cd ffmpeg; find . -name '.svn' -exec "rm -rf" {}\; cd ..;
+	tar cfvz ffmpeg-$(DATE).tar.gz ffmpeg
 
 SOURCE += ffmpeg-source
 endif
@@ -1017,7 +1021,8 @@ endif
 
 ifdef SVN
 libdvdcss-source: libdvdcss
-	                tar cfvz libdvdcss-$(DATE).tar.gz libdvdcss
+	cd libmatroska; find . -name '.svn' -exec "rm -rf" {}\; cd ..;
+	tar cfvz libdvdcss-$(DATE).tar.gz libdvdcss
 
 SOURCE += libdvdcss-source
 endif
@@ -1231,7 +1236,8 @@ libdca:
 
 ifdef SVN
 libdca-source: libdca
-	                tar cfvz libdca-$(DATE).tar.gz libdca
+	cd libca; find . -name '.svn' -exec "rm -rf" {}\; cd ..;
+	tar cfvz libdca-$(DATE).tar.gz libdca
 
 SOURCE += libdca-source
 endif
@@ -1275,7 +1281,8 @@ endif
 
 ifdef SVN
 libx264-source: libx264
-	                tar cfvz libx264-$(DATE).tar.gz libx264
+	cd libx264; find . -name '.svn' -exec "rm -rf" {}\; cd ..;
+	tar cfvz libx264-$(DATE).tar.gz libx264
 
 SOURCE += libx264-source
 endif
@@ -2143,4 +2150,4 @@ clean-src: clean
 
 distclean: clean-src
 
-source:  $(DISTCLEAN_PKG)
+source: SOURCE $(DISTCLEAN_PKG)
