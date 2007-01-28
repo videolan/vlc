@@ -140,6 +140,8 @@ FFMPEG_CFLAGS += -DHAVE_LRINTF
 endif
 endif
 
+DATE=`date +%Y-%m-%d`
+
 # ***************************************************************************
 # Standard rules
 # ***************************************************************************
@@ -689,6 +691,13 @@ endif
 	$(INSTALL_NAME)
 	touch $@
 
+ifdef SVN
+tremor-source: tremor
+	                tar cfvz tremor-$(DATE).tar.gz tremor
+
+SOURCE += tremor-source
+endif
+
 CLEAN_FILE += .tremor
 CLEAN_PKG += tremor
 #DISTCLEAN_PKG += tremor-$(TREMOR_VERSION).tar.gz
@@ -891,6 +900,12 @@ else
 endif	
 	touch $@
 
+ifdef SVN
+libebml-source: libebml
+	tar cfvz  libebml-$(DATE).tar.gz libebml
+SOURCE += libebml-source	
+endif
+
 CLEAN_FILE += .ebml
 CLEAN_PKG += libebml
 DISTCLEAN_PKG += libebml-$(LIBEBML_VERSION).tar.bz2
@@ -921,6 +936,14 @@ else
 	$(RANLIB) $(PREFIX)/lib/libmatroska.a
 endif
 	touch $@
+
+ifdef SVN
+libmatroska-source: libmatroska
+	tar cfvz libmatroska-$(DATE).tar.gz libmatroska
+
+SOURCE += libmatroska-source
+endif
+
 
 CLEAN_FILE += .matroska
 CLEAN_PKG += libmatroska
@@ -960,6 +983,13 @@ endif
 	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-a52 --disable-ffplay --enable-swscaler && make install-libs install-headers)
 	touch $@
 
+ifdef SVN
+ffmpeg-source: ffmpeg
+	        tar cfvz ffmpeg-$(DATE).tar.gz ffmpeg
+
+SOURCE += ffmpeg-source
+endif
+
 CLEAN_FILE += .ffmpeg
 CLEAN_PKG += ffmpeg ffmpeg.cvs
 DISTCLEAN_PKG += ffmpeg-$(FFMPEG_VERSION).tar.gz
@@ -984,6 +1014,14 @@ endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --disable-doc --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
+
+ifdef SVN
+libdvdcss-source: libdvdcss
+	                tar cfvz libdvdcss-$(DATE).tar.gz libdvdcss
+
+SOURCE += libdvdcss-source
+endif
+
 
 CLEAN_FILE += .dvdcss
 CLEAN_PKG += libdvdcss
@@ -1191,6 +1229,13 @@ libdca:
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	touch $@
 
+ifdef SVN
+libdca-source: libdca
+	                tar cfvz libdca-$(DATE).tar.gz libdca
+
+SOURCE += libdca-source
+endif
+
 CLEAN_FILE += .libdca
 CLEAN_PKG += libdca
 
@@ -1227,6 +1272,13 @@ else
 	(cd $<; ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 endif
 	touch $@
+
+ifdef SVN
+libx264-source: libx264
+	                tar cfvz libx264-$(DATE).tar.gz libx264
+
+SOURCE += libx264-source
+endif
 
 CLEAN_FILE += .x264
 CLEAN_PKG += x264
