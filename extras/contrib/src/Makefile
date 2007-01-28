@@ -2150,4 +2150,4 @@ clean-src: clean
 
 distclean: clean-src
 
-source: SOURCE $(DISTCLEAN_PKG)
+source: $(SOURCE) $(DISTCLEAN_PKG)
