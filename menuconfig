@@ -1,14 +1,7 @@
-#! /bin/sh
+#! /bin/bash
 #
 # VLC media player configuration script, borrowed from linux menuconfig
 # Cyril Deguet <asmax@videolan.org>
-
-# Currently out of date
-
-echo "'./menuconfig' is currently not maintained and out-of-date. Use './configure' instead."
-
-exit 1
-
 #
 #-----------------------------------------------------------------
 # William Roadcap was the original author of Menuconfig.

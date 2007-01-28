@@ -16,6 +16,7 @@ if [ "$CONFIG_WXWIDGETS" = "y" ]; then
   string 'wx-config path' CONFIG_WITHWXCONFIGPATH ""
   string 'wx-config name' CONFIG_WITHWXCONFIG ""
 fi
+bool 'QT4 interface' CONFIG_QT4
 bool 'Skins interface' CONFIG_SKINS
 if [ "$CONFIG_SKINS" = "y" ]; then
   string 'xml2-config path' CONFIG_WITHXML2CONFIGPATH ""

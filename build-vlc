@@ -87,6 +87,7 @@ WITHFFMPEGFAAC ffmpeg-faac
 GALAKTOS galaktos
 HTTPD httpd
 JACK jack
+QT4 qt4
 "
 PATHS="
 WITHXML2CONFIGPATH xml2-config-path
@@ -136,15 +137,15 @@ then
 fi
 
 echo -n "./configure " > .cmd
-source .config
+. ./.config
 
 check_features () {
 while [ -n "$1" ]
 do
    eval x="\$CONFIG_$1"
-   if [ "$x" == "y" ]
+   if [ "$x" = "y" ]
    then
-      if [ "$1" == "WITHFFMPEGMP3LAME" ] || [ "$1" == "WITHFFMPEGFAAC" ]
+      if [ "$1" = "WITHFFMPEGMP3LAME" ] || [ "$1" = "WITHFFMPEGFAAC" ]
       then
          echo -n "--with-$2 " >> .cmd
       else
@@ -186,6 +187,6 @@ then
    ./bootstrap
 fi
 
-source .cmd
+. ./.cmd
 make
 rm -f .cmd

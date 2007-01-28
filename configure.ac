@@ -4542,7 +4542,7 @@ dnl
 dnl Skins2 module
 dnl
 AC_ARG_ENABLE(skins2,
-  [  --enable-skins2         Skins2 interface module (experimental)])
+  [  --enable-skins2         Skins2 interface module (default disabled)])
 if test "${enable_skins2}" = "yes" ||
   (test "${SYS}" != "darwin" && test "${SYS}" != "beos" &&
    test "${SYS}" != "mingwce" && test "${enable_skins2}" != "no"); then
