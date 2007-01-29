@@ -1251,7 +1251,7 @@ VLC is able to give warnings and error messages about a loaded skin if it finds 
 
   <sect2>
   <title>Get inspiration</title>
-  <para>In order to use plainly the possibilities given, you should look at how existing skins are made, it may give you ideas for your own skins... You can also consult <link url="http://wiki.videolan.org/DefaultSkinRequirements">on the wiki</ulink> a list of features usually expected from a skin. </para>
+  <para>In order to use plainly the possibilities given, you should look at how existing skins are made, it may give you ideas for your own skins... You can also consult <ulink url="http://wiki.videolan.org/DefaultSkinRequirements">on the wiki</ulink> a list of features usually expected from a skin. </para>
   </sect2>
 
   <sect2>
