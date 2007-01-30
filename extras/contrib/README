@@ -10,6 +10,10 @@ You can specify an argument to cross compile, for example:
 This will look for a i586-pc-beos-gcc cross compiler. Default is to
 build natively.
 
+Bootstrap generates your default contrib configuration and puts it in a file
+named 'distro.mak'. Edit this file to fine-tune your preferences for 3rd-party
+libraries that will be build in the contrib system.
+
 Customize config.mak if you need to, then you need to choose between
 building from source (can take a long time but is easily customizable)
 and fetching a pre-compiled binary package. Either type 'make src'
