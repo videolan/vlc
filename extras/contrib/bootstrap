@@ -146,7 +146,14 @@ case $HOST in
         ;;
     *)
             if test "$HOST" = "$BUILD"; then
-                echo "PKG_CONFIG_LIBDIR = /usr/lib/pkgconfig" >> config.mak
+		if test -d "/usr/lib/pkgconfig"; then
+		    if test -z "$PKG_CONFIG_PATH"; then
+	               	echo "PKG_CONFIG_PATH = /usr/lib/pkgconfig" >> config.mak
+		    fi
+		    if test -z "$PKG_CONFIG_LIBDIR"; then
+                	echo "PKG_CONFIG_LIBDIR = /usr/lib/pkgconfig" >> config.mak
+		    fi
+		fi
             fi
             # Try to match distribution
             if test -f /etc/fedora-release; then
