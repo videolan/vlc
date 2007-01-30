@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
- *
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -29,25 +29,10 @@
 
 #include <QWidget>
 #include <QTabWidget>
-#include "ui/input_stats.h"
-
+#include <QLabel>
 
 class QTreeWidget;
 class QTreeWidgetItem;
-
-class InputStatsPanel: public QWidget
-{
-    Q_OBJECT;
-public:
-    InputStatsPanel( QWidget *, intf_thread_t * );
-    virtual ~InputStatsPanel();
-private:
-    intf_thread_t *p_intf;
-    Ui::InputStats ui;
-public slots:
-    void update( input_item_t * );
-    void clear();
-};
 
 class MetaPanel: public QWidget
 {
@@ -72,6 +57,42 @@ private:
     QLabel *nowplaying_text;
     QLabel *publisher_text;
 
+public slots:
+    void update( input_item_t * );
+    void clear();
+};
+
+
+class InputStatsPanel: public QWidget
+{
+    Q_OBJECT;
+public:
+    InputStatsPanel( QWidget *, intf_thread_t * );
+    virtual ~InputStatsPanel();
+private:
+    intf_thread_t *p_intf;
+
+    QTreeWidget *StatsTree;
+    QTreeWidgetItem *input;
+    QTreeWidgetItem *read_media_stat;
+    QTreeWidgetItem *input_bitrate_stat;
+    QTreeWidgetItem *demuxed_stat;
+    QTreeWidgetItem *stream_bitrate_stat;
+
+    QTreeWidgetItem *video;
+    QTreeWidgetItem *vdecoded_stat;
+    QTreeWidgetItem *vdisplayed_stat;
+    QTreeWidgetItem *vlost_frames_stat;
+
+    QTreeWidgetItem *streaming;
+    QTreeWidgetItem *send_stat;
+    QTreeWidgetItem *send_bytes_stat;
+    QTreeWidgetItem *send_bitrate_stat;
+
+    QTreeWidgetItem *audio;
+    QTreeWidgetItem *adecoded_stat;
+    QTreeWidgetItem *aplayed_stat;
+    QTreeWidgetItem *alost_stat;
 
 public slots:
     void update( input_item_t * );
@@ -87,7 +108,6 @@ public:
 private:
     intf_thread_t *p_intf;
     QTreeWidget *InfoTree;
-
 public slots:
     void update( input_item_t * );
     void clear();

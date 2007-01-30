@@ -29,59 +29,14 @@
 #include <QPushButton>
 #include <QHeaderView>
 #include <QList>
+#include <QGridLayout>
+
 
 /************************************************************************
  * Single panels
  ************************************************************************/
 
-InputStatsPanel::InputStatsPanel( QWidget *parent, intf_thread_t *_p_intf ) :
-                                  QWidget( parent ), p_intf( _p_intf )
-{
-    ui.setupUi( this );
-}
-
-InputStatsPanel::~InputStatsPanel()
-{
-}
-
-void InputStatsPanel::update( input_item_t *p_item )
-{
-    vlc_mutex_lock( &p_item->p_stats->lock );
-
-#define UPDATE( widget,format, calc... ) \
-    { QString str; ui.widget->setText( str.sprintf( format, ## calc ) );  }
-
-    UPDATE( read_text, "%8.0f", (float)(p_item->p_stats->i_read_bytes)/1000);
-    UPDATE( input_bitrate_text, "%6.0f",
-                    (float)(p_item->p_stats->f_input_bitrate * 8000 ));
-    UPDATE( demuxed_text, "%8.0f",
-                    (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
-    UPDATE( stream_bitrate_text, "%6.0f",
-                    (float)(p_item->p_stats->f_demux_bitrate * 8000 ));
-
-    /* Video */
-    UPDATE( vdecoded_text, "%5i", p_item->p_stats->i_decoded_video );
-    UPDATE( vdisplayed_text, "%5i", p_item->p_stats->i_displayed_pictures );
-    UPDATE( vlost_frames, "%5i", p_item->p_stats->i_lost_pictures );
-
-    /* Sout */
-    UPDATE( sent_text, "%5i", p_item->p_stats->i_sent_packets );
-    UPDATE( sent_bytes_text, "%8.0f",
-            (float)(p_item->p_stats->i_sent_bytes)/1000 );
-    UPDATE( send_bitrate_text, "%6.0f",
-            (float)(p_item->p_stats->f_send_bitrate*8)*1000 );
-
-    /* Audio*/
-    UPDATE( adecoded_text, "%5i", p_item->p_stats->i_decoded_audio );
-    UPDATE( aplayed_text, "%5i", p_item->p_stats->i_played_abuffers );
-    UPDATE( alost_text, "%5i", p_item->p_stats->i_lost_abuffers );
-
-    vlc_mutex_unlock(& p_item->p_stats->lock );
-}
-
-void InputStatsPanel::clear()
-{
-}
+/* First Panel - Meta Info */
 
 MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
                                     QWidget( parent ), p_intf( _p_intf )
@@ -147,6 +102,110 @@ void MetaPanel::update( input_item_t *p_item )
 void MetaPanel::clear()
 {
 }
+
+/* Second Panel - Stats */
+
+InputStatsPanel::InputStatsPanel( QWidget *parent, intf_thread_t *_p_intf ) :
+                                  QWidget( parent ), p_intf( _p_intf )
+{
+     QGridLayout *layout = new QGridLayout(this);
+     StatsTree = new QTreeWidget(this);
+     QList<QTreeWidgetItem *> items;
+
+     layout->addWidget(StatsTree, 0, 0 );
+     StatsTree->setColumnCount( 3 );
+     StatsTree->header()->hide();
+
+#define CREATE_TREE_ITEM( itemName, itemText, itemValue, unit ) {              \
+    itemName =                                                           \
+        new QTreeWidgetItem((QStringList () << itemText << itemValue << unit ));  \
+    itemName->setTextAlignment( 1 , Qt::AlignRight ) ; }
+
+
+#define CREATE_CATEGORY( catName, itemText ) {                           \
+    CREATE_TREE_ITEM( catName, itemText , "", "" );                      \
+    catName->setExpanded( true );                                        \
+    StatsTree->addTopLevelItem( catName );    }
+
+#define CREATE_AND_ADD_TO_CAT( itemName, itemText, itemValue, catName, unit ) { \
+    CREATE_TREE_ITEM( itemName, itemText, itemValue, unit );             \
+    catName->addChild( itemName ); }
+
+    CREATE_CATEGORY( input, "Input" );
+    CREATE_CATEGORY( video, "Video" );
+    CREATE_CATEGORY( streaming, "Streaming" );
+    CREATE_CATEGORY( audio, "Audio" );
+
+    CREATE_AND_ADD_TO_CAT( read_media_stat, "Read at media", "0", input , "kB") ;
+    CREATE_AND_ADD_TO_CAT( input_bitrate_stat, "Input bitrate", "0", input, "kb/s") ;
+    CREATE_AND_ADD_TO_CAT( demuxed_stat, "Demuxed", "0", input, "kB") ;
+    CREATE_AND_ADD_TO_CAT( stream_bitrate_stat, "Stream bitrate", "0", input, "kb/s") ;
+
+    CREATE_AND_ADD_TO_CAT( vdecoded_stat, "Decoded blocks", "0", video, "" ) ;
+    CREATE_AND_ADD_TO_CAT( vdisplayed_stat, "Displayed frames", "0", video, "") ;
+    CREATE_AND_ADD_TO_CAT( vlost_frames_stat, "Lost frames", "0", video, "") ;
+
+    CREATE_AND_ADD_TO_CAT( send_stat, "Sent packets", "0", streaming, "") ;
+    CREATE_AND_ADD_TO_CAT( send_bytes_stat, "Sent bytes", "0", streaming, "kB") ;
+    CREATE_AND_ADD_TO_CAT( send_bitrate_stat, "Sent bitrates", "0", streaming, "kb/s") ;
+
+    CREATE_AND_ADD_TO_CAT( adecoded_stat, "Decoded blocks", "0", audio, "") ;
+    CREATE_AND_ADD_TO_CAT( aplayed_stat, "Played buffers", "0", audio, "") ;
+    CREATE_AND_ADD_TO_CAT( alost_stat, "Lost buffers", "0", audio, "") ;
+
+    input->setExpanded( true );
+    video->setExpanded( true );
+    streaming->setExpanded( true );
+    audio->setExpanded( true );
+
+    StatsTree->resizeColumnToContents( 0 );
+    StatsTree->setColumnWidth( 1 , 100 );
+}
+
+InputStatsPanel::~InputStatsPanel()
+{
+}
+
+void InputStatsPanel::update( input_item_t *p_item )
+{
+    vlc_mutex_lock( &p_item->p_stats->lock );
+
+#define UPDATE( widget, format, calc... ) \
+    { QString str; widget->setText( 1 , str.sprintf( format, ## calc ) );  }
+
+    UPDATE( read_media_stat, "%8.0f", (float)(p_item->p_stats->i_read_bytes)/1000);
+    UPDATE( input_bitrate_stat, "%6.0f",
+                    (float)(p_item->p_stats->f_input_bitrate * 8000 ));
+    UPDATE( demuxed_stat, "%8.0f",
+                    (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
+    UPDATE( stream_bitrate_stat, "%6.0f",
+                    (float)(p_item->p_stats->f_demux_bitrate * 8000 ));
+
+    /* Video */
+    UPDATE( vdecoded_stat, "%5i", p_item->p_stats->i_decoded_video );
+    UPDATE( vdisplayed_stat, "%5i", p_item->p_stats->i_displayed_pictures );
+    UPDATE( vlost_frames_stat, "%5i", p_item->p_stats->i_lost_pictures );
+
+    /* Sout */
+    UPDATE( send_stat, "%5i", p_item->p_stats->i_sent_packets );
+    UPDATE( send_bytes_stat, "%8.0f",
+            (float)(p_item->p_stats->i_sent_bytes)/1000 );
+    UPDATE( send_bitrate_stat, "%6.0f",
+            (float)(p_item->p_stats->f_send_bitrate*8)*1000 );
+
+    /* Audio*/
+    UPDATE( adecoded_stat, "%5i", p_item->p_stats->i_decoded_audio );
+    UPDATE( aplayed_stat, "%5i", p_item->p_stats->i_played_abuffers );
+    UPDATE( alost_stat, "%5i", p_item->p_stats->i_lost_abuffers );
+
+    vlc_mutex_unlock(& p_item->p_stats->lock );
+}
+
+void InputStatsPanel::clear()
+{
+}
+
+/* Third panel - Stream info */
 
 InfoPanel::InfoPanel( QWidget *parent, intf_thread_t *_p_intf ) :
                                       QWidget( parent ), p_intf( _p_intf )
