@@ -94,8 +94,8 @@
  * The evil global variable. We handle it with care, don't worry.
  *****************************************************************************/
 static libvlc_global_data_t   libvlc_global;
-static libvlc_global_data_t * p_libvlc_global;
-static libvlc_int_t *    p_static_vlc;
+static libvlc_global_data_t * p_libvlc_global = NULL;
+static libvlc_int_t *    p_static_vlc = NULL;
 static volatile unsigned int i_instances = 0;
 
 /*****************************************************************************
@@ -150,7 +150,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     int i_ret;
     libvlc_int_t * p_libvlc = NULL;
     vlc_value_t lockval;
-    char *psz_env;
+    char *psz_env = NULL;
 
     /* &libvlc_global never changes,
      * so we can safely call this multiple times. */
@@ -183,7 +183,11 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     /* Allocate a libvlc instance object */
     p_libvlc = vlc_object_create( p_libvlc_global, VLC_OBJECT_LIBVLC );
-    if( p_libvlc == NULL ) { i_instances--; return NULL; }
+    if( p_libvlc == NULL )
+    {
+        i_instances--;
+        return NULL;
+    }
     p_libvlc->thread_id = 0;
     p_libvlc->p_playlist = NULL;
     p_libvlc->psz_object_name = "libvlc";
@@ -993,6 +997,9 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
 {
     vlc_value_t lockval;
 
+    if( !p_libvlc )
+        return VLC_EGENERIC;
+
     if( p_libvlc->p_memcpy_module )
     {
         module_Unneed( p_libvlc, p_libvlc->p_memcpy_module );
@@ -1032,6 +1039,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
 
     if( b_release ) vlc_object_release( p_libvlc );
     vlc_object_destroy( p_libvlc );
+    p_libvlc = NULL;
 
     /* Stop thread system: last one out please shut the door!
      * The number of initializations of the thread system is counted, we 
@@ -1722,7 +1730,7 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
     char **devices;
     char *block_dev;
     dbus_bool_t b_dvd;
-    DBusConnection *p_connection;
+    DBusConnection *p_connection = NULL;
     DBusError       error;
 
 #ifdef HAVE_HAL_1

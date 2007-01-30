@@ -90,7 +90,7 @@ static vlc_mutex_t    structure_lock;
 vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
                                  int i_type, const char *psz_type )
 {
-    vlc_object_t * p_new;
+    vlc_object_t * p_new = NULL;
 
     if( i_type == VLC_OBJECT_GLOBAL )
     {
@@ -429,7 +429,10 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 
     /* global is not dynamically allocated by vlc_object_create */
     if( p_this->i_object_type != VLC_OBJECT_GLOBAL )
+    {
         free( p_this );
+        p_this = NULL;
+    }
 }
 
 /**
@@ -575,6 +578,8 @@ void __vlc_object_release( vlc_object_t *p_this )
  *****************************************************************************/
 void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 {
+    if( !p_this ) return;
+
     vlc_mutex_lock( &structure_lock );
 
     /* Attach the parent to its child */
@@ -601,6 +606,8 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
  *****************************************************************************/
 void __vlc_object_detach( vlc_object_t *p_this )
 {
+    if( !p_this ) return;
+
     vlc_mutex_lock( &structure_lock );
     if( !p_this->p_parent )
     {
@@ -617,6 +624,7 @@ void __vlc_object_detach( vlc_object_t *p_this )
 
     DetachObject( p_this );
     vlc_mutex_unlock( &structure_lock );
+    p_this = NULL;
 }
 
 /**

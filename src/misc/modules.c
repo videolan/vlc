@@ -173,7 +173,7 @@ static void module_LoadMain( vlc_object_t *p_this );
  *****************************************************************************/
 void __module_InitBank( vlc_object_t *p_this )
 {
-    module_bank_t *p_bank;
+    module_bank_t *p_bank = NULL;
     vlc_value_t  lockval;
 
     var_Create( p_this->p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
@@ -190,6 +190,8 @@ void __module_InitBank( vlc_object_t *p_this )
     var_Destroy( p_this->p_libvlc_global, "libvlc" );
 
     p_bank = vlc_object_create( p_this, sizeof(module_bank_t) );
+    if( !p_bank )
+        return;
     p_bank->psz_object_name = "module bank";
     p_bank->i_usage = 1;
     p_bank->i_cache = p_bank->i_loaded_cache = 0;
@@ -209,8 +211,6 @@ void __module_InitBank( vlc_object_t *p_this )
     vlc_object_attach( p_bank, p_this->p_libvlc_global );
 
     module_LoadMain( p_this );
-
-    return;
 }
 
 /*****************************************************************************
@@ -233,7 +233,7 @@ void __module_ResetBank( vlc_object_t *p_this )
  *****************************************************************************/
 void __module_EndBank( vlc_object_t *p_this )
 {
-    module_t * p_next;
+    module_t * p_next = NULL;
     vlc_value_t lockval;
 
     var_Create( p_this->p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
@@ -261,20 +261,30 @@ void __module_EndBank( vlc_object_t *p_this )
     if( p_bank->b_cache ) CacheSave( p_this );
     while( p_bank->i_loaded_cache-- )
     {
-        DeleteModule (p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module);
-        free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
-        free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
+        if( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] )
+        {
+            DeleteModule (p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module);
+            free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
+            free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
+            p_bank->pp_loaded_cache[p_bank->i_loaded_cache] = NULL;
+        }
     }
     if( p_bank->pp_loaded_cache )
+    {
         free( p_bank->pp_loaded_cache );
-
+        p_bank->pp_loaded_cache = NULL;
+    }
     while( p_bank->i_cache-- )
     {
         free( p_bank->pp_cache[p_bank->i_cache]->psz_file );
         free( p_bank->pp_cache[p_bank->i_cache] );
+        p_bank->pp_cache[p_bank->i_cache] = NULL;
     }
     if( p_bank->pp_cache )
+    {
         free( p_bank->pp_cache );
+        p_bank->pp_cache = NULL;
+    }
 #undef p_bank
 #endif
 
@@ -987,7 +997,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
 static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
                                int64_t i_file_time, int64_t i_file_size )
 {
-    module_t * p_module;
+    module_t * p_module = NULL;
     module_cache_t *p_cache_entry = NULL;
 
     /*
@@ -1009,7 +1019,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
         }
         else
         {
-            module_config_t *p_item, *p_end;
+            module_config_t *p_item = NULL, *p_end = NULL;
 
             p_module = p_cache_entry->p_module;
             p_module->b_loaded = VLC_FALSE;
@@ -1036,21 +1046,24 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
                     p_module->psz_object_name, p_module->psz_longname ); */
 
         vlc_object_attach( p_module, p_this->p_libvlc_global->p_module_bank );
-    }
 
-    if( !p_this->p_libvlc_global->p_module_bank->b_cache ) return 0;
+        if( !p_this->p_libvlc_global->p_module_bank->b_cache )
+            return 0;
 
-    /* Add entry to cache */
+        /* Add entry to cache */
 #define p_bank p_this->p_libvlc_global->p_module_bank
-    p_bank->pp_cache =
-        realloc( p_bank->pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
-    p_bank->pp_cache[p_bank->i_cache] = malloc( sizeof(module_cache_t) );
-    p_bank->pp_cache[p_bank->i_cache]->psz_file = strdup( psz_file );
-    p_bank->pp_cache[p_bank->i_cache]->i_time = i_file_time;
-    p_bank->pp_cache[p_bank->i_cache]->i_size = i_file_size;
-    p_bank->pp_cache[p_bank->i_cache]->b_junk = p_module ? 0 : 1;
-    p_bank->pp_cache[p_bank->i_cache]->p_module = p_module;
-    p_bank->i_cache++;
+        p_bank->pp_cache =
+            realloc( p_bank->pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
+        p_bank->pp_cache[p_bank->i_cache] = malloc( sizeof(module_cache_t) );
+        if( !p_bank->pp_cache[p_bank->i_cache] )
+            return -1;
+        p_bank->pp_cache[p_bank->i_cache]->psz_file = strdup( psz_file );
+        p_bank->pp_cache[p_bank->i_cache]->i_time = i_file_time;
+        p_bank->pp_cache[p_bank->i_cache]->i_size = i_file_size;
+        p_bank->pp_cache[p_bank->i_cache]->b_junk = p_module ? 0 : 1;
+        p_bank->pp_cache[p_bank->i_cache]->p_module = p_module;
+        p_bank->i_cache++;
+    }
 
     return p_module ? 0 : -1;
 }
@@ -1064,10 +1077,11 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
  *****************************************************************************/
 static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
 {
-    module_t * p_module;
+    module_t * p_module = NULL;
     module_handle_t handle;
 
-    if( LoadModule( p_this, psz_file, &handle ) ) return NULL;
+    if( LoadModule( p_this, psz_file, &handle ) )
+        return NULL;
 
     /* Now that we have successfully loaded the module, we can
      * allocate a structure for it */
@@ -1222,6 +1236,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
  *****************************************************************************/
 static int DeleteModule( module_t * p_module )
 {
+    if( !p_module ) return VLC_EGENERIC;
     vlc_object_detach( p_module );
 
     /* We free the structures that we strdup()ed in Allocate*Module(). */
@@ -1247,7 +1262,7 @@ static int DeleteModule( module_t * p_module )
 
     config_Free( p_module );
     vlc_object_destroy( p_module );
-
+    p_module = NULL;
     return 0;
 }
 

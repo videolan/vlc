@@ -1256,6 +1256,8 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
     vlc_list_t *p_list;
     int i_index, i_count;
 
+    if( !p_this ) return -1;
+
     /* Check if there's anything to save */
     vlc_mutex_lock( &p_this->p_libvlc->config_lock );
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
