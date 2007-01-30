@@ -131,27 +131,28 @@ InputStatsPanel::InputStatsPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     CREATE_TREE_ITEM( itemName, itemText, itemValue, unit );             \
     catName->addChild( itemName ); }
 
-    CREATE_CATEGORY( input, "Input" );
-    CREATE_CATEGORY( video, "Video" );
-    CREATE_CATEGORY( streaming, "Streaming" );
-    CREATE_CATEGORY( audio, "Audio" );
+    CREATE_CATEGORY( input, qtr("Input") );
+    CREATE_CATEGORY( video, qtr("Video") );
+    CREATE_CATEGORY( streaming, qtr("Streaming") );
+    CREATE_CATEGORY( audio, qtr("Audio") );
 
-    CREATE_AND_ADD_TO_CAT( read_media_stat, "Read at media", "0", input , "kB") ;
-    CREATE_AND_ADD_TO_CAT( input_bitrate_stat, "Input bitrate", "0", input, "kb/s") ;
-    CREATE_AND_ADD_TO_CAT( demuxed_stat, "Demuxed", "0", input, "kB") ;
-    CREATE_AND_ADD_TO_CAT( stream_bitrate_stat, "Stream bitrate", "0", input, "kb/s") ;
 
-    CREATE_AND_ADD_TO_CAT( vdecoded_stat, "Decoded blocks", "0", video, "" ) ;
-    CREATE_AND_ADD_TO_CAT( vdisplayed_stat, "Displayed frames", "0", video, "") ;
-    CREATE_AND_ADD_TO_CAT( vlost_frames_stat, "Lost frames", "0", video, "") ;
+    CREATE_AND_ADD_TO_CAT( read_media_stat, qtr("Read at media"), "0", input , "kB") ;
+    CREATE_AND_ADD_TO_CAT( input_bitrate_stat, qtr("Input bitrate"), "0", input, "kb/s") ;
+    CREATE_AND_ADD_TO_CAT( demuxed_stat, qtr("Demuxed"), "0", input, "kB") ;
+    CREATE_AND_ADD_TO_CAT( stream_bitrate_stat, qtr("Stream bitrate"), "0", input, "kb/s") ;
 
-    CREATE_AND_ADD_TO_CAT( send_stat, "Sent packets", "0", streaming, "") ;
-    CREATE_AND_ADD_TO_CAT( send_bytes_stat, "Sent bytes", "0", streaming, "kB") ;
-    CREATE_AND_ADD_TO_CAT( send_bitrate_stat, "Sent bitrates", "0", streaming, "kb/s") ;
+    CREATE_AND_ADD_TO_CAT( vdecoded_stat, qtr("Decoded blocks"), "0", video, "" ) ;
+    CREATE_AND_ADD_TO_CAT( vdisplayed_stat, qtr("Displayed frames"), "0", video, "") ;
+    CREATE_AND_ADD_TO_CAT( vlost_frames_stat, qtr("Lost frames"), "0", video, "") ;
 
-    CREATE_AND_ADD_TO_CAT( adecoded_stat, "Decoded blocks", "0", audio, "") ;
-    CREATE_AND_ADD_TO_CAT( aplayed_stat, "Played buffers", "0", audio, "") ;
-    CREATE_AND_ADD_TO_CAT( alost_stat, "Lost buffers", "0", audio, "") ;
+    CREATE_AND_ADD_TO_CAT( send_stat, qtr("Sent packets"), "0", streaming, "") ;
+    CREATE_AND_ADD_TO_CAT( send_bytes_stat, qtr("Sent bytes"), "0", streaming, "kB") ;
+    CREATE_AND_ADD_TO_CAT( send_bitrate_stat, qtr("Sent bitrates"), "0", streaming, "kb/s") ;
+
+    CREATE_AND_ADD_TO_CAT( adecoded_stat, qtr("Decoded blocks"), "0", audio, "") ;
+    CREATE_AND_ADD_TO_CAT( aplayed_stat, qtr("Played buffers"), "0", audio, "") ;
+    CREATE_AND_ADD_TO_CAT( alost_stat, qtr("Lost buffers"), "0", audio, "") ;
 
     input->setExpanded( true );
     video->setExpanded( true );
