@@ -68,8 +68,8 @@ clean: FORCE
 	@echo "    'make bin' isn't available at the moment"
 	@echo "    you probably wanna run 'make clean-src' then"
 	@echo "    you can still run 'make clean-bin' manually if needed"
-	rm -rf config.mak
 	$(MAKE) clean-src
+	rm -rf config.mak distro.mak
 
 package-macosx: FORCE
 	@if test -d tmp; then \
