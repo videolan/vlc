@@ -51,7 +51,7 @@ public:
 
     REFCLSID getClassID(void) { return (REFCLSID)_classid; };
 
-    LPCSTR getInPlaceWndClassName(void) const { return TEXT("VLC Plugin In-Place"); };
+    LPCTSTR getInPlaceWndClassName(void) const { return TEXT("VLC Plugin In-Place"); };
     HINSTANCE getHInstance(void) const { return _hinstance; };
     LPPICTURE getInPlacePict(void) const
         { if( NULL != _inplace_picture) _inplace_picture->AddRef(); return _inplace_picture; };

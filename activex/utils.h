@@ -32,8 +32,6 @@ extern char *CStrFromWSTR(UINT codePage, LPCWSTR wstr, UINT len);
 extern char *CStrFromBSTR(UINT codePage, BSTR bstr);
 extern BSTR BSTRFromCStr(UINT codePage, LPCSTR s);
 
-extern char *CStrFromGUID(REFGUID clsid);
-
 // properties
 extern HRESULT GetObjectProperty(LPUNKNOWN object, DISPID dispID, VARIANT& v);
 

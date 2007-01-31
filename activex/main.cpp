@@ -29,6 +29,7 @@
 #include <windows.h>
 #include <shlwapi.h>
 
+#include <tchar.h>
 #include <guiddef.h>
 
 using namespace std;
@@ -80,10 +81,10 @@ STDAPI DllCanUnloadNow(VOID)
     return (0 == i_class_ref) ? S_OK: S_FALSE;
 };
 
-static inline HKEY keyCreate(HKEY parentKey, LPCSTR keyName)
+static inline HKEY keyCreate(HKEY parentKey, LPCTSTR keyName)
 {
     HKEY childKey;
-    if( ERROR_SUCCESS == RegCreateKeyExA(parentKey, keyName, 0, NULL,
+    if( ERROR_SUCCESS == RegCreateKeyEx(parentKey, keyName, 0, NULL,
                 REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &childKey, NULL) )
     {
         return childKey;
@@ -91,24 +92,24 @@ static inline HKEY keyCreate(HKEY parentKey, LPCSTR keyName)
     return NULL;
 };
 
-static inline HKEY keySet(HKEY hKey, LPCSTR valueName, const void *s, size_t len)
+static inline HKEY keySet(HKEY hKey, LPCTSTR valueName, const void *s, size_t len, DWORD dwType = REG_SZ)
 {
     if( NULL != hKey )
     {
-        RegSetValueExA(hKey, valueName, 0, REG_SZ,
+        RegSetValueEx(hKey, valueName, 0, dwType,
             (const BYTE*)s, len);
     }
     return hKey;
 };
 
-static inline HKEY keySetDef(HKEY hKey, const void *s, size_t len)
+static inline HKEY keySetDef(HKEY hKey, const void *s, size_t len, DWORD dwType = REG_SZ)
 {
-    return keySet(hKey, NULL, s, len);
+    return keySet(hKey, NULL, s, len, dwType);
 };
 
-static inline HKEY keySetDef(HKEY hKey, LPCSTR s)
+static inline HKEY keySetDef(HKEY hKey, LPCTSTR s)
 {
-    return keySetDef(hKey, s, strlen(s)+1);
+    return keySetDef(hKey, s, sizeof(TCHAR)*(_tcslen(s)+1), REG_SZ);
 };
 
 static inline HKEY keyClose(HKEY hKey)
@@ -122,23 +123,21 @@ static inline HKEY keyClose(HKEY hKey)
 
 static HRESULT UnregisterProgID(REFCLSID rclsid, unsigned int version)
 {
-    LPCSTR psz_CLSID = CStrFromGUID(rclsid);
+    OLECHAR szCLSID[GUID_STRLEN];
 
-    if( NULL == psz_CLSID )
-        return E_OUTOFMEMORY;
+    StringFromGUID2(rclsid, szCLSID, GUID_STRLEN);
 
-    char progId[sizeof(PROGID_STR)+16];
-    sprintf(progId, "%s.%u", PROGID_STR, version);
+    TCHAR progId[sizeof(PROGID_STR)+16];
+    _stprintf(progId, TEXT("%s.%u"), TEXT(PROGID_STR), version);
 
-    SHDeleteKeyA(HKEY_CLASSES_ROOT, progId);
+    SHDeleteKey(HKEY_CLASSES_ROOT, progId);
 
     HKEY hClsIDKey;
-    if( ERROR_SUCCESS == RegOpenKeyExA(HKEY_CLASSES_ROOT, "CLSID", 0, KEY_WRITE, &hClsIDKey) )
+    if( ERROR_SUCCESS == RegOpenKeyEx(HKEY_CLASSES_ROOT, TEXT("CLSID"), 0, KEY_WRITE, &hClsIDKey) )
     {
-        SHDeleteKey(hClsIDKey, psz_CLSID);
+        SHDeleteKey(hClsIDKey, szCLSID);
         RegCloseKey(hClsIDKey);
     }
-    CoTaskMemFree((void *)psz_CLSID);
 };
 
 STDAPI DllUnregisterServer(VOID)
@@ -173,20 +172,19 @@ STDAPI DllUnregisterServer(VOID)
     return S_OK;
 };
 
-static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int version, BOOL isDefault, const char *path, size_t pathLen)
+static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int version, BOOL isDefault, LPCTSTR path, size_t pathLen)
 {
-    char progId[sizeof(PROGID_STR)+16];
-    sprintf(progId, "%s.%u", PROGID_STR, version);
+    TCHAR progId[sizeof(PROGID_STR)+16];
+    _stprintf(progId, TEXT("%s.%u"), TEXT(PROGID_STR), version);
 
-    char description[sizeof(DESCRIPTION)+16];
-    sprintf(description, "%s v%u", DESCRIPTION, version);
+    TCHAR description[sizeof(DESCRIPTION)+16];
+    _stprintf(description, TEXT("%s v%u"), TEXT(DESCRIPTION), version);
 
     HKEY hClassKey;
     {
-        LPCSTR psz_CLSID = CStrFromGUID(rclsid);
+        OLECHAR szCLSID[GUID_STRLEN];
 
-        if( NULL == psz_CLSID )
-            return E_OUTOFMEMORY;
+        StringFromGUID2(rclsid, szCLSID, GUID_STRLEN);
 
         HKEY hProgKey = keyCreate(HKEY_CLASSES_ROOT, progId);
         if( NULL != hProgKey )
@@ -194,9 +192,9 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
             // default key value
             keySetDef(hProgKey, description);
 
-            keyClose(keySetDef(keyCreate(hProgKey, "CLSID"),
-                psz_CLSID,
-                GUID_STRLEN));
+            keyClose(keySetDef(keyCreate(hProgKey, TEXT("CLSID")),
+                szCLSID,
+                sizeof(szCLSID)));
 
             //hSubKey = keyClose(keyCreate(hBaseKey, "Insertable"));
  
@@ -204,22 +202,21 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
         }
         if( isDefault )
         {
-            hProgKey = keyCreate(HKEY_CLASSES_ROOT, PROGID_STR);
+            hProgKey = keyCreate(HKEY_CLASSES_ROOT, TEXT(PROGID_STR));
             if( NULL != hProgKey )
             {
                 // default key value
                 keySetDef(hProgKey, description);
 
-                keyClose(keySetDef(keyCreate(hProgKey, "CLSID"),
-                    psz_CLSID,
-                    GUID_STRLEN));
+                keyClose(keySetDef(keyCreate(hProgKey, TEXT("CLSID")),
+                    szCLSID,
+                    sizeof(szCLSID)));
 
-                keyClose(keySetDef(keyCreate(hProgKey, "CurVer"),
+                keyClose(keySetDef(keyCreate(hProgKey, TEXT("CurVer")),
                     progId));
             }
         }
-        hClassKey = keyCreate(hParent, psz_CLSID);
-        CoTaskMemFree((void *)psz_CLSID);
+        hClassKey = keyCreate(hParent, szCLSID);
     }
     if( NULL != hClassKey )
     {
@@ -227,45 +224,45 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
         keySetDef(hClassKey, description);
 
         // Control key value
-        keyClose(keyCreate(hClassKey, "Control"));
+        keyClose(keyCreate(hClassKey, TEXT("Control")));
 
         // Insertable key value
-        //keyClose(keyCreate(hClassKey, "Insertable"));
+        //keyClose(keyCreate(hClassKey, TEXT("Insertable")));
 
         // ToolboxBitmap32 key value
         {
-            char iconPath[pathLen+3];
-            memcpy(iconPath, path, pathLen);
-            strcpy(iconPath+pathLen, ",1");
+            TCHAR iconPath[pathLen+3];
+            memcpy(iconPath, path, sizeof(TCHAR)*pathLen);
+            _tcscpy(iconPath+pathLen, TEXT(",1"));
             keyClose(keySetDef(keyCreate(hClassKey,
-                "ToolboxBitmap32"),
+                TEXT("ToolboxBitmap32")),
                 iconPath, sizeof(iconPath)));
         }
 
 #ifdef BUILD_LOCALSERVER
         // LocalServer32 key value
         keyClose(keySetDef(keyCreate(hClassKey,
-            "LocalServer32", path, pathLen+1)));
+            TEXT("LocalServer32"), path, sizeof(TCHAR)*(pathLen+1))));
 #else
         // InprocServer32 key value
         {
             HKEY hSubKey = keySetDef(keyCreate(hClassKey,
-                "InprocServer32"),
-                path, pathLen+1);
+                TEXT("InprocServer32")),
+                path, sizeof(TCHAR)*(pathLen+1));
             keySet(hSubKey,
-                "ThreadingModel",
-                THREADING_MODEL, sizeof(THREADING_MODEL));
+                TEXT("ThreadingModel"),
+                TEXT(THREADING_MODEL), sizeof(TEXT(THREADING_MODEL)));
             keyClose(hSubKey);
         }
 #endif
 
         // MiscStatus key value
         keyClose(keySetDef(keyCreate(hClassKey,
-            "MiscStatus\\1"),
-            MISC_STATUS, sizeof(MISC_STATUS)));
+            TEXT("MiscStatus\\1")),
+            TEXT(MISC_STATUS), sizeof(TEXT(MISC_STATUS))));
 
         // Programmable key value
-        keyClose(keyCreate(hClassKey, "Programmable"));
+        keyClose(keyCreate(hClassKey, TEXT("Programmable")));
 
         // ProgID key value
         keyClose(keySetDef(keyCreate(hClassKey,
@@ -274,23 +271,23 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
 
         // VersionIndependentProgID key value
         keyClose(keySetDef(keyCreate(hClassKey,
-            "VersionIndependentProgID"),
-            PROGID_STR, sizeof(PROGID_STR)));
+            TEXT("VersionIndependentProgID")),
+            TEXT(PROGID_STR), sizeof(TEXT(PROGID_STR))));
 
         // Version key value
         keyClose(keySetDef(keyCreate(hClassKey,
-            "Version"),
-            "1.0"));
+            TEXT("Version")),
+            TEXT("1.0")));
 
         // TypeLib key value
-        LPCSTR psz_LIBID = CStrFromGUID(LIBID_AXVLC);
-        if( NULL != psz_LIBID )
-        {
-            keyClose(keySetDef(keyCreate(hClassKey,
-                    "TypeLib"),
-                    psz_LIBID, GUID_STRLEN));
-            CoTaskMemFree((void *)psz_LIBID);
-        }
+        OLECHAR szLIBID[GUID_STRLEN];
+
+        StringFromGUID2(LIBID_AXVLC, szLIBID, GUID_STRLEN);
+
+        keyClose(keySetDef(keyCreate(hClassKey,
+                TEXT("TypeLib")),
+                szLIBID, sizeof(szLIBID)));
+ 
         RegCloseKey(hClassKey);
     }
     return S_OK;
@@ -300,14 +297,14 @@ STDAPI DllRegisterServer(VOID)
 {
     DllUnregisterServer();
 
-    char DllPath[MAX_PATH];
-    DWORD DllPathLen=GetModuleFileNameA(h_instance, DllPath, sizeof(DllPath)) ;
+    TCHAR DllPath[MAX_PATH];
+    DWORD DllPathLen=GetModuleFileName(h_instance, DllPath, MAX_PATH) ;
     if( 0 == DllPathLen )
         return E_UNEXPECTED;
 
     HKEY hBaseKey;
 
-    if( ERROR_SUCCESS != RegOpenKeyExA(HKEY_CLASSES_ROOT, "CLSID", 0, KEY_CREATE_SUB_KEY, &hBaseKey) )
+    if( ERROR_SUCCESS != RegOpenKeyEx(HKEY_CLASSES_ROOT, TEXT("CLSID"), 0, KEY_CREATE_SUB_KEY, &hBaseKey) )
         return SELFREG_E_CLASS;
 
     RegisterClassID(hBaseKey, CLSID_VLCPlugin, 1, FALSE, DllPath, DllPathLen);
@@ -334,34 +331,19 @@ STDAPI DllRegisterServer(VOID)
         pcr->Release();
     }
 
+#ifdef BUILD_LOCALSERVER
+    // replace .exe by .tlb
+    _tcscpy(DllPath+DllPathLen-4, TEXT(".tlb"));
+#endif
+
     // register type lib into the registry
     ITypeLib *typeLib;
 
-#ifdef BUILD_LOCALSERVER
-    // replace .exe by .tlb
-    strcpy(DllPath+DllPathLen-4, ".tlb");
-#endif
-
-#ifndef OLE2ANSI
-    size_t typeLibPathLen = MultiByteToWideChar(CP_ACP, 0, DllPath, -1, NULL, 0);
-    if( typeLibPathLen > 0 )
-    {
-        LPOLESTR typeLibPath = (LPOLESTR)CoTaskMemAlloc(typeLibPathLen*sizeof(wchar_t));
-        MultiByteToWideChar(CP_ACP, 0, DllPath, DllPathLen, typeLibPath, typeLibPathLen);
-        if( FAILED(LoadTypeLibEx(typeLibPath, REGKIND_REGISTER, &typeLib)) )
-#ifndef BUILD_LOCALSERVER
-            return SELFREG_E_TYPELIB;
+    HRESULT result = LoadTypeLibEx(DllPath, REGKIND_REGISTER, &typeLib);
+    if( SUCCEEDED(result) )
         typeLib->Release();
-#endif
-        CoTaskMemFree((void *)typeLibPath);
-    }
-#else
-    if( FAILED(LoadTypeLibEx((LPOLESTR)DllPath, REGKIND_REGISTER, &typeLib)) )
-        return SELFREG_E_TYPELIB;
-    typeLib->Release();
-#endif
 
-    return S_OK;
+    return result;
 };
 
 #ifdef BUILD_LOCALSERVER

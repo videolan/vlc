@@ -430,30 +430,43 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         int   ppsz_argc = 1;
 
         HKEY h_key;
-        DWORD i_type, i_data = MAX_PATH + 1;
-        char p_data[MAX_PATH + 1];
-        if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\\VideoLAN\\VLC",
+        char p_data[MAX_PATH];
+        if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, TEXT("Software\\VideoLAN\\VLC"),
                           0, KEY_READ, &h_key ) == ERROR_SUCCESS )
         {
-            if( RegQueryValueEx( h_key, "InstallDir", 0, &i_type,
-                                 (LPBYTE)p_data, &i_data ) == ERROR_SUCCESS )
+            DWORD i_type, i_data = MAX_PATH;
+            TCHAR w_data[MAX_PATH];
+            if( RegQueryValueEx( h_key, TEXT("InstallDir"), 0, &i_type,
+                                 (LPBYTE)w_data, &i_data ) == ERROR_SUCCESS )
             {
                 if( i_type == REG_SZ )
                 {
-                    strcat( p_data, "\\plugins" );
-                    ppsz_argv[ppsz_argc++] = "--plugin-path";
-                    ppsz_argv[ppsz_argc++] = p_data;
+                    if( WideCharToMultiByte(CP_UTF8, 0, w_data, -1, p_data,
+                             sizeof(p_data)-sizeof("\\plugins")+1, NULL, NULL) )
+                    {
+                        strcat( p_data, "\\plugins" );
+                        ppsz_argv[ppsz_argc++] = "--plugin-path";
+                        ppsz_argv[ppsz_argc++] = p_data;
+                    }
                 }
             }
             RegCloseKey( h_key );
         }
 
-        char p_path[MAX_PATH+1];
-        DWORD len = GetModuleFileNameA(DllGetModule(), p_path, sizeof(p_path));
-        if( len > 0 )
+        char p_path[MAX_PATH];
         {
-            p_path[len] = '\0';
-            ppsz_argv[0] = p_path;
+            TCHAR w_path[MAX_PATH];
+            DWORD len = GetModuleFileName(DllGetModule(), w_path, MAX_PATH);
+            if( len > 0 )
+            {
+                len = WideCharToMultiByte(CP_UTF8, 0, w_path, len, p_path,
+                           sizeof(p_path)-1, NULL, NULL);
+                if( len > 0 )
+                {
+                    p_path[len] = '\0';
+                    ppsz_argv[0] = p_path;
+                }
+            }
         }
 
         // make sure plugin isn't affected with VLC single instance mode
@@ -681,7 +694,7 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
     ** properly displayed.
     */
     _inplacewnd = CreateWindow(_p_class->getInPlaceWndClassName(),
-            "VLC Plugin In-Place Window",
+            TEXT("VLC Plugin In-Place Window"),
             WS_CHILD|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
             lprcPosRect->left,
             lprcPosRect->top,
