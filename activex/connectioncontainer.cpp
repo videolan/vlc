@@ -36,6 +36,8 @@ struct VLCEnumConnectionsDereference
     {
         CONNECTDATA cd;
 
+        i->second->AddRef();
+
         cd.dwCookie = i->first;
         cd.pUnk     = i->second;
         return cd;
@@ -115,12 +117,13 @@ STDMETHODIMP VLCConnectionPoint::Advise(IUnknown *pUnk, DWORD *pdwCookie)
     if( (NULL == pUnk) || (NULL == pdwCookie) )
         return E_POINTER;
 
-    pUnk->AddRef();
-
-    *pdwCookie = ++dwCookieCounter;
-    _connections[*pdwCookie] = pUnk;
-
-    return S_OK;
+    if( SUCCEEDED(pUnk->QueryInterface(_iid, (LPVOID *)&pUnk)) )
+    {
+        *pdwCookie = ++dwCookieCounter;
+        _connections[*pdwCookie] = pUnk;
+        return S_OK;
+    }
+    return CONNECT_E_CANNOTCONNECT;
 };
 
 STDMETHODIMP VLCConnectionPoint::Unadvise(DWORD pdwCookie)
@@ -157,7 +160,7 @@ void VLCConnectionPoint::fireEvent(DISPID dispId, DISPPARAMS *pDispParams)
         if( NULL != pUnk )
         {
             IDispatch *pDisp;
-            if( SUCCEEDED(pUnk->QueryInterface(IID_IDispatch, (LPVOID *)&pDisp)) )
+            if( SUCCEEDED(pUnk->QueryInterface(_iid, (LPVOID *)&pDisp)) )
             {
                 pDisp->Invoke(dispId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, pDispParams, NULL, NULL, NULL);
                 pDisp->Release();
