@@ -45,7 +45,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
     set_description( (char*)_("Qt interface") );
-    set_category( CAT_INTERFACE) ;
+    set_category( CAT_INTERFACE ) ;
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     set_capability( "interface", 100 );
     set_callbacks( Open, Close );
@@ -69,6 +69,11 @@ static int Open( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     p_intf->pf_run = Run;
     p_intf->p_sys = (intf_sys_t *)malloc(sizeof( intf_sys_t ) );
+    if( !p_intf->p_sys )
+    {
+        msg_Err(p_intf, "Out of memory");
+        return VLC_ENOMEM;
+    }
     memset( p_intf->p_sys, 0, sizeof( intf_sys_t ) );
 
     p_intf->p_sys->p_playlist = pl_Yield( p_intf );
