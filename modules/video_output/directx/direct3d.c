@@ -82,7 +82,7 @@ static void Direct3DVoutRenderScene     ( vout_thread_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 
-static int get_capability_for_osversion()
+static int get_capability_for_osversion(void)
 {
     OSVERSIONINFO winVer;
     winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -707,35 +707,25 @@ static void Direct3DVoutRelease( vout_thread_t *p_vout )
  *****************************************************************************/
 static int Direct3DVoutOpen( vout_thread_t *p_vout )
 {
-    HRESULT hr = S_OK;
-    LPDIRECT3D9 p_d3dobj = p_vout->p_sys->p_d3dobj;;
-    D3DDISPLAYMODE d3ddm;
+    HRESULT hr;
+    LPDIRECT3D9 p_d3dobj = p_vout->p_sys->p_d3dobj;
     LPDIRECT3DDEVICE9 p_d3ddev;
-
-    /*
-    ** Get the current desktop display mode, so we can set up a back
-    ** buffer of the same format
-    */
-    hr = IDirect3D9_GetAdapterDisplayMode(p_d3dobj, D3DADAPTER_DEFAULT, &d3ddm );
-    if( FAILED(hr))
-    {
-       msg_Err( p_vout, "Could not read adapter display mode. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
-    }
 
     /* Set up the structure used to create the D3DDevice. */
     ZeroMemory( &p_vout->p_sys->d3dpp, sizeof(D3DPRESENT_PARAMETERS) );
     p_vout->p_sys->d3dpp.Windowed               = TRUE;
     p_vout->p_sys->d3dpp.hDeviceWindow          = p_vout->p_sys->hvideownd;
+    p_vout->p_sys->d3dpp.BackBufferWidth        = p_vout->render.i_width;
+    p_vout->p_sys->d3dpp.BackBufferHeight       = p_vout->render.i_height;
     p_vout->p_sys->d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
-    p_vout->p_sys->d3dpp.PresentationInterval   = D3DPRESENT_INTERVAL_DEFAULT;
-    p_vout->p_sys->d3dpp.BackBufferFormat       = d3ddm.Format;
+    p_vout->p_sys->d3dpp.PresentationInterval   = D3DPRESENT_INTERVAL_IMMEDIATE;
+    p_vout->p_sys->d3dpp.BackBufferFormat       = D3DFMT_UNKNOWN;
     p_vout->p_sys->d3dpp.BackBufferCount        = 1;
     p_vout->p_sys->d3dpp.EnableAutoDepthStencil = TRUE;
     p_vout->p_sys->d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 
     // Create the D3DDevice
-    hr = IDirect3D9_CreateDevice(p_d3dobj, D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, NULL,
+    hr = IDirect3D9_CreateDevice(p_d3dobj, D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, p_vout->p_sys->hvideownd,
                 D3DCREATE_SOFTWARE_VERTEXPROCESSING, &(p_vout->p_sys->d3dpp), &p_d3ddev );
     if( FAILED(hr) )                                      
     {
