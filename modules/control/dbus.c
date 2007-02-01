@@ -58,6 +58,7 @@
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -371,11 +372,25 @@ DBUS_METHOD( AddTrack )
 }
 
 DBUS_METHOD( GetCurrentTrack )
-{ //TODO
+{
     REPLY_INIT;
     OUT_ARGUMENTS;
     dbus_int32_t i_position = 0;
-    //TODO get position of playing element
+    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
+    
+    while ( p_tested_item->i_id != p_playlist->status.p_item->i_id )
+    {
+        i_position++;
+        p_tested_item = playlist_GetNextLeaf( p_playlist, 
+                        p_playlist->p_root_onelevel, 
+                        p_tested_item,
+                        VLC_FALSE,
+                        VLC_FALSE );
+    }
+
+    pl_Release( p_playlist );
+
     ADD_INT32( &i_position );
     REPLY_SEND;
 }
@@ -407,23 +422,42 @@ DBUS_METHOD( GetMetadata )
 }
 
 DBUS_METHOD( GetLength )
-{ //TODO
+{ 
     REPLY_INIT;
     OUT_ARGUMENTS;
+
     dbus_int32_t i_elements = 0;
-    //TODO: return number of elements in playlist
+    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
+    playlist_item_t* p_last_item = playlist_GetLastLeaf( p_playlist, p_playlist->p_root_onelevel ); 
+
+    while ( p_tested_item->i_id != p_last_item->i_id )
+    {
+        i_elements++;
+        p_tested_item = playlist_GetNextLeaf( p_playlist, 
+                        p_playlist->p_root_onelevel, 
+                        p_tested_item,
+                        VLC_FALSE,
+                        VLC_FALSE );
+    }
+
+    pl_Release( p_playlist );
+    
     ADD_INT32( &i_elements );
     REPLY_SEND;
 }
 
 DBUS_METHOD( DelTrack )
-{ //TODO
+{
+  /*FIXME: Doesn't work.*/
     REPLY_INIT;
 
     DBusError error;
     dbus_error_init( &error );
 
-    dbus_int32_t i_position;
+    dbus_int32_t i_position, i_count = 0;
+    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
 
     dbus_message_get_args( p_from, &error,
             DBUS_TYPE_INT32, &i_position,
@@ -436,8 +470,21 @@ DBUS_METHOD( DelTrack )
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
+    
+    while ( i_count < i_position ) 
+    {
+        i_count++;
+        p_tested_item = playlist_GetNextLeaf( p_playlist, 
+                        p_playlist->p_root_onelevel, 
+                        p_tested_item,
+                        VLC_FALSE,
+                        VLC_FALSE );
+    }
 
-    //TODO delete the element
+    playlist_NodeRemoveItem( p_playlist, 
+		    p_tested_item, 
+		    p_playlist->p_root_onelevel );
+    pl_Release( p_playlist );
 
     REPLY_SEND;
 }

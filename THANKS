@@ -117,7 +117,7 @@ Mateus Krepsky Ludwich <mateus @t csp dot com d.t br> - rc interface mosaic-orde
 Mathias C. Berens | welcome-soft <berens at welcome-soft.de> - German translation
 Mathias Kretschmer <mathias at research.att.com> - IP Multicast support
 Mats Rojestal <mats.rojestal at bredband dot net> - compilation fixes for Solaris 9
-Matthieu Lochegnies <lochegm1 at cti.ecp.fr> - MPEG audio emphasis fix
+Matthieu Lochegnies <prof at tocard dot org> - MPEG audio emphasis fix
 Max Rudberg <max_08 at mac.com> - Mac OS X controller art (v0.7.0)
 Michael Mondragon <mammon at lokmail.net> - ncurses compilation fix
 Mickael Hoerdt <hoerdt at clarinet.u-strasbg.fr> - IPv6 SSM multicast patch
@@ -125,6 +125,7 @@ Mike Schrag <mschrag at pobox dot com> - directx device selection
 Mikko Hirvonen <masse at astro dot helsinki dot fi> - Firefox-1.5.x development configure patch
 Michel Lanners <mlan at cpu.lu> - fixed typos and AltiVec detection
 Miroslav Oujeský <oujesky at mail dot muni dot cz> - Czech translation
+Mirsal Ennaime <mirsal at  gmail dot com> - D-Bus amelioration
 Moritz Bunkus <moritz at bunkus dot org> - Matroska patches
 Morten Brix Pedersen <morten at wtf.dk> - Danish translation
 Nilmoni Deb <ndeb at ece.cmu.edu> - autoconf and Makefile fixes
