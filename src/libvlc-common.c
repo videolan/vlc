@@ -578,13 +578,14 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
 
 /* FIXME: could be replaced by using Unix sockets */
 #ifdef HAVE_DBUS_3
+    dbus_threads_init_default();
+
     if( config_GetInt( p_libvlc, "one-instance" ) )
     {
         /* Initialise D-Bus interface, check for other instances */
         DBusConnection  *p_conn;
         DBusError       dbus_error;
 
-        dbus_threads_init_default();
         dbus_error_init( &dbus_error );
 
         /* connect to the session bus */
