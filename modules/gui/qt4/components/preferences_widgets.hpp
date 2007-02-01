@@ -34,10 +34,12 @@
 #include <QCheckBox>
 #include <QVector>
 #include <QDialog>
+#include <QLabel>
 
-#include "ui/input_stats.h"
 #include "qt4.hpp"
 #include <assert.h>
+
+class QGridLayout;
 
 class ConfigControl : public QObject
 {
