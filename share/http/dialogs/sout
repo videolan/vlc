@@ -224,7 +224,7 @@ Note that the sout chain is used and sent to VLC by the input dialog
               <option value="mp2a">mp2a</option>
               <option value="mp3">mp3</option>
               <option value="mp4a">mp4a</option>
-              <option value="a42">a52</option>
+              <option value="a52">a52</option>
               <option value="vorb">vorb</option>
               <option value="flac">flac</option>
               <option value="spx">spx</option>
