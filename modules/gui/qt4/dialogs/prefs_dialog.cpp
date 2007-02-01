@@ -155,9 +155,12 @@ void PrefsDialog::changeSimplePanel( QListWidgetItem *item )
         main_panel_l->removeWidget( simple_panel );
         simple_panel->hide();
     }
-    if( !simple_panels[number] )
+    simple_panel = simple_panels[number];
+    if( !simple_panel )
+    {
         simple_panel = new SPrefsPanel( p_intf, main_panel, number );
-    simple_panels[number] = simple_panel;
+        simple_panels[number] = simple_panel;
+    }
     main_panel_l->addWidget( simple_panel );
     simple_panel->show();
 }
