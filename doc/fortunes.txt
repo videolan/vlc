@@ -734,3 +734,19 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 <xtophe> with packet measured in inches instead of mm
   -- #videolan
 %
+13:35 < kwolf_> hello
+13:35 < kwolf_> anyone here i can bug? :-)
+[ monologue ... noone helps ]
+14:01 < kwolf_> anyone?
+14:03 < kwolf_> please *whine*
+14:04 < kwolf_> i am a girl, i need help :-D
+14:06 < Dnumgis> kwolf_: I'm a lonely geek who know your answer, are you good looking?
+  -- #videolan
+% Previous continued
+14:09 < wereHamster> for (i=0;i<10;++i) printf("I'm a girl\n")
+14:09 < wereHamster> am I a girl now?
+14:09 < Dnumgis> wereHamster: you definitly need to send me a picture before I belive you :)
+14:11 < Foxdie> live webcam ftw
+14:11 < Dnumgis> Foxdie: right, I'll definitly need a live webcam to belive wereHamster is a girl
+14:13 < Dnumgis> Foxdie: as a matter of fact all streaming related support requests here should be formulated as follows: "I'm a nice looking girl that have problems making my live webcam work"
+  -- #videolan
