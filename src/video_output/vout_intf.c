@@ -597,7 +597,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( p_mypicturesdir == NULL )
         {
-            asprintf( &val.psz_string, "%s/" CONFIG_DIR,
+            asprintf( &val.psz_string, "%s\\" CONFIG_DIR,
                       p_vout->p_libvlc->psz_homedir );
         }
         else
@@ -651,7 +651,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             FILE *p_file;
             do
             {
-                asprintf( &psz_filename, "%s/%s%05d.%s", val.psz_string,
+                asprintf( &psz_filename, "%s" DIR_SEP "%s%05d.%s", val.psz_string,
                           psz_prefix, i_num++, format.psz_string );
             }
             while( ( p_file = utf8_fopen( psz_filename, "r" ) ) && !fclose( p_file ) );
@@ -659,7 +659,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         }
         else
         {
-            asprintf( &psz_filename, "%s/%s%u.%s", val.psz_string,
+            asprintf( &psz_filename, "%s" DIR_SEP "%s%u.%s", val.psz_string,
                       psz_prefix,
                       (unsigned int)(p_pic->date / 100000) & 0xFFFFFF,
                       format.psz_string );
