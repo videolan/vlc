@@ -1,7 +1,7 @@
 /*****************************************************************************
  * interaction.h: Mac OS X interaction dialogs
  *****************************************************************************
- * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright (C) 2005-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
@@ -93,6 +93,16 @@
 {
     return o_error_panel;
 }
+
+#if GC_ENABLED
+-(void)finalize
+{
+	/* dealloc doesn't get called on 10.5 if GC is enabled, so we need to provide the basic functionality here */
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[o_interaction_list removeAllObjects];
+    [super finalize];
+}
+#endif
 
 -(void)dealloc
 {

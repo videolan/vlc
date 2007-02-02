@@ -51,6 +51,9 @@ unsigned int CocoaKeyToVLC( unichar i_key );
             @"/System/Library/CoreServices/SystemVersion.plist"] \
             objectForKey: @"ProductVersion"] floatValue]
 
+/* switch this to 1, if you want to use Obj-C with GC */
+#define GC_ENABLED 0
+
 /*****************************************************************************
  * intf_sys_t: description and status of the interface
  *****************************************************************************/
@@ -315,6 +318,7 @@ struct intf_sys_t
 - (void)manage;
 - (void)manageIntf:(NSTimer *)o_timer;
 - (void)setupMenus;
+- (void)refreshVoutDeviceMenu:(NSNotification *)o_notification;
 - (void)setScrollField:(NSString *)o_string stopAfter:(int )timeout;
 - (void)resetScrollField;
 

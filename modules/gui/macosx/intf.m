@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -483,6 +483,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* update the playmode stuff */
     p_intf->p_sys->b_playmode_update = VLC_TRUE;
 
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(refreshVoutDeviceMenu:)
+                                                 name: NSApplicationDidChangeScreenParametersNotification
+                                               object: nil];
+    
     nib_main_loaded = TRUE;
 }
 
@@ -1335,6 +1340,32 @@ static VLCMain *_o_sharedMainInstance = nil;
 #undef p_input
 }
 
+- (void)refreshVoutDeviceMenu:(NSNotification *)o_notification
+{
+    int x,y = 0;
+    vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                              FIND_ANYWHERE );
+    
+    if(! p_vout )
+        return;
+    
+    /* clean the menu before adding new entries */
+    if( [o_mi_screen hasSubmenu] )
+    {
+        y = [[o_mi_screen submenu] numberOfItems] - 1;
+        msg_Dbg( VLCIntf, "%i items in submenu", y );
+        while( x != y )
+        {
+            msg_Dbg( VLCIntf, "removing item %i of %i", x, y );
+            [[o_mi_screen submenu] removeItemAtIndex: x];
+            x++;
+        }
+    }
+
+    [o_controls setupVarMenuItem: o_mi_screen target: (vlc_object_t *)p_vout
+                             var: "video-device" selector: @selector(toggleVar:)];
+}
+
 - (void)setScrollField:(NSString *)o_string stopAfter:(int)timeout
 {
     if( timeout != -1 )
@@ -1572,6 +1603,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     
     p_intf->b_interaction = VLC_FALSE;
     var_DelCallback( p_intf, "interaction", InteractCallback, self );
+    
+    /* remove global observer watching for vout device changes correctly */
+    [[NSNotificationCenter defaultCenter] removeObserver: self
+                                                    name: NSApplicationDidChangeScreenParametersNotification
+                                                  object: nil];
 
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on -- FK (10/6/05) */

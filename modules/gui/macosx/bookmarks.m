@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bookmarks.m: MacOS X Bookmarks window
  *****************************************************************************
- * Copyright (C) 2005, 2006 the VideoLAN team
+ * Copyright (C) 2005 - 2007 the VideoLAN team
  * $Id$
  *
  * Authors: Felix Kühne <fkuehne@users.sf.net>
@@ -78,11 +78,19 @@ static VLCBookmarks *_o_sharedInstance = nil;
 - (void)dealloc
 {
     if( p_old_input )
-    {
         vlc_object_release( p_old_input );
-    }
     [super dealloc];
 }
+
+#if GC_ENABLED
+- (void)finalize
+{
+    /* release old input even if GC is enabled on 10.5 */
+    if( p_old_input )   
+        vlc_object_release( p_old_input );
+    [super finalize];
+}
+#endif
 
 - (void)initStrings
 {
@@ -253,9 +261,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     i = [o_tbl_dataTable selectedRow];
     
     if( pp_bookmarks[i]->psz_name ) 
-    {
         free( pp_bookmarks[i]->psz_name );
-    }
 
     pp_bookmarks[i]->psz_name = strdup([[o_edit_fld_name stringValue] UTF8String]); 
     pp_bookmarks[i]->i_byte_offset = [[o_edit_fld_bytes stringValue] intValue];
@@ -354,10 +360,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT, 
         FIND_ANYWHERE );
     
-    if( !p_input ) 
-    {
-        return;
-    }
+    if( !p_input ) return;
 
     input_Control( p_input, INPUT_SET_BOOKMARK, [o_tbl_dataTable selectedRow] );
 
@@ -375,10 +378,9 @@ static VLCBookmarks *_o_sharedInstance = nil;
     if( !p_input ) return;
 
     int i_focused = [o_tbl_dataTable selectedRow];
+
     if( i_focused >= 0 )
-    {
         input_Control( p_input, INPUT_DEL_BOOKMARK, i_focused );
-    }
 
     vlc_object_release( p_input );
     
@@ -407,10 +409,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
     
-    if( !p_input )
-    {
-        return 0;
-    }
+    if( !p_input ) return 0;
     else if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
                        &i_bookmarks ) != VLC_SUCCESS )
     {
@@ -435,10 +434,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
     char *toBeReturned;
     int i_toBeReturned = 0;
     
-    if( !p_input )
-    {
-        return @"";
-    } 
+    if( !p_input ) return @"";
     else if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
                        &i_bookmarks ) != VLC_SUCCESS )
     {
@@ -468,11 +464,10 @@ static VLCBookmarks *_o_sharedInstance = nil;
         }
         else
         {
-            /* may not happen, but just in case */
+            /* may not happen, just in case */
             vlc_object_release( p_input );
             msg_Err(p_intf, "unknown table column identifier (%s) while "
                 "updating the bookmark table", [[theTableColumn identifier]
-
                 UTF8String] );
             return @"unknown identifier";
         }

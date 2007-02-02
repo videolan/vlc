@@ -27,12 +27,12 @@
  *****************************************************************************
  *
  * Note that changes made by any members or contributors of the VideoLAN team
- * (i.e. changes that were checked in into one of VideoLAN's source code
+ * (i.e. changes that were checked in exclusively into one of VideoLAN's source code
  * repositories) are licensed under the GNU General Public License version 2,
  * or (at your option) any later version. 
  * Thus, the following statements apply to our changes:
  *
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2007 the VideoLAN team
  * Authors: Eric Petit <titer@m0k.org>
  *          Felix Kühne <fkuehne at videolan dot org>
  *

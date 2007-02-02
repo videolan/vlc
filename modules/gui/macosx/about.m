@@ -1,7 +1,7 @@
 /*****************************************************************************
  * about.m: MacOS X About Panel
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>

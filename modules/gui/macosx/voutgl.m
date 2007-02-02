@@ -434,6 +434,7 @@ static void Unlock( vout_thread_t * p_vout )
 {
     Lock( p_vout );
     [[self openGLContext] makeCurrentContext];
+    /* FIXME: we should use CGLFlushDrawable instead, as glFlush is pretty slow */
     glFlush();
     [super drawRect:rect];
     Unlock( p_vout );

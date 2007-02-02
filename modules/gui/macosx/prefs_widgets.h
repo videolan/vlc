@@ -1,7 +1,7 @@
 /*****************************************************************************
  * prefs_widgets.h: Preferences controls
  *****************************************************************************
- * Copyright (C) 2002-2003 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org> 
@@ -183,21 +183,7 @@ static NSMenu   *o_keys_menu = nil;
 
 @end
 
-@interface KeyConfigControlBefore103 : VLCConfigControl
-{
-    NSButton        *o_cmd_checkbox;
-    NSButton        *o_ctrl_checkbox;
-    NSButton        *o_alt_checkbox;
-    NSButton        *o_shift_checkbox;
-    NSPopUpButton   *o_popup;
-}
-
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view;
-
-@end
-
-@interface KeyConfigControlAfter103 : VLCConfigControl
+@interface KeyConfigControl : VLCConfigControl
 {
     NSPopUpButton   *o_popup;
 }

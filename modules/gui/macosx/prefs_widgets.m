@@ -1,7 +1,7 @@
 /*****************************************************************************
  * prefs_widgets.m: Preferences controls
  *****************************************************************************
- * Copyright (C) 2002-2003 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
@@ -51,13 +51,10 @@
         action:nil keyEquivalent:@""];                                      \
     [o_mi setKeyEquivalentModifierMask:                                     \
         0];                                                                 \
-if( MACOS_VERSION >= 10.3 )                                                 \
     [o_mi setAlternate: NO];                                                \
     [o_mi setTag:                                                           \
         ( value )];                                                         \
     [o_menu addItem: o_mi];                                                 \
-if( MACOS_VERSION >= 10.3 )                                                 \
-{                                                                           \
 /*  Ctrl */                                                                 \
     o_mi = [[NSMenuItem alloc] initWithTitle:                               \
         [[NSString stringWithUTF8String:                                    \
@@ -245,7 +242,6 @@ if( MACOS_VERSION >= 10.3 )                                                 \
     [o_mi setTag:                                                           \
         KEY_MODIFIER_COMMAND | ( value )];                                  \
     [o_menu addItem: o_mi];                                                 \
-}                                                                           \
 }
 
 #define ADD_LABEL( o_label, superFrame, x_offset, my_y_offset, label )      \
@@ -412,6 +408,16 @@ if( MACOS_VERSION >= 10.3 )                                                 \
     frame.origin.y = i_yPos;
     [self setFrame:frame];
 }
+
+#if GC_ENABLED
+- (void)finalize
+{
+    /* since dealloc isn't called on 10.5 if GC is enabled and since GC is
+     * Obj-C only, we need to do this: */
+    if( psz_name ) free( psz_name );
+    [super finalize];
+}
+#endif
 
 - (void)dealloc
 {
@@ -890,18 +896,9 @@ if( MACOS_VERSION >= 10.3 )                                                 \
         }
         break;
     case CONFIG_ITEM_KEY:
-        if( MACOS_VERSION < 10.3 )
-        {
-            p_control = [[KeyConfigControlBefore103 alloc]
+        p_control = [[KeyConfigControl alloc]
                         initWithItem: _p_item
                         withView: o_parent_view];
-        }
-        else
-        {
-            p_control = [[KeyConfigControlAfter103 alloc]
-                        initWithItem: _p_item
-                        withView: o_parent_view];
-        }
         break;
     case CONFIG_ITEM_MODULE_LIST:
     case CONFIG_ITEM_MODULE_LIST_CAT:
@@ -1974,155 +1971,7 @@ if( MACOS_VERSION >= 10.3 )                                                 \
 
 @end
 
-@implementation KeyConfigControlBefore103
-
-- (id) initWithItem: (module_config_t *)_p_item
-           withView: (NSView *)o_parent_view
-{
-    NSRect mainFrame = [o_parent_view frame];
-    NSString *o_labelString, *o_tooltip;
-    mainFrame.size.height = 37;
-    mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
-    mainFrame.origin.x = LEFTMARGIN;
-    mainFrame.origin.y = 0;
-
-    if( [super initWithFrame: mainFrame item: _p_item] != nil )
-    {
-        i_view_type = CONFIG_ITEM_KEY_BEFORE_10_3;
-
-        /* add the label */
-        if( p_item->psz_text )
-            o_labelString = [[VLCMain sharedInstance]
-                                localizedString: (char *)p_item->psz_text];
-        else
-            o_labelString = [NSString stringWithString:@""];
-        ADD_LABEL( o_label, mainFrame, 0, -10, o_labelString )
-        [o_label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: o_label];
-
-        /* add the checkboxes */
-        o_tooltip = [[VLCMain sharedInstance] wrapString:
-            [[VLCMain sharedInstance]
-                localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
-        ADD_CHECKBOX( o_cmd_checkbox, mainFrame,
-            [o_label frame].size.width + 2, 0,
-            [NSString stringWithUTF8String:PLACE_OF_INTEREST_SIGN], o_tooltip,
-            ((((unsigned int)p_item->value.i) & KEY_MODIFIER_COMMAND)?YES:NO),
-            NSImageLeft )
-        [o_cmd_checkbox setState: p_item->value.i & KEY_MODIFIER_COMMAND];
-        ADD_CHECKBOX( o_ctrl_checkbox, mainFrame,
-            [o_cmd_checkbox frame].size.width +
-            [o_cmd_checkbox frame].origin.x + 6, 0,
-            [NSString stringWithUTF8String:UP_ARROWHEAD], o_tooltip,
-            ((((unsigned int)p_item->value.i) & KEY_MODIFIER_CTRL)?YES:NO),
-            NSImageLeft )
-        [o_ctrl_checkbox setState: p_item->value.i & KEY_MODIFIER_CTRL];
-        ADD_CHECKBOX( o_alt_checkbox, mainFrame, [o_label frame].size.width +
-            2, -2 - [o_cmd_checkbox frame].size.height,
-            [NSString stringWithUTF8String:OPTION_KEY], o_tooltip,
-            ((((unsigned int)p_item->value.i) & KEY_MODIFIER_ALT)?YES:NO),
-            NSImageLeft )
-        [o_alt_checkbox setState: p_item->value.i & KEY_MODIFIER_ALT];
-        ADD_CHECKBOX( o_shift_checkbox, mainFrame,
-            [o_cmd_checkbox frame].size.width +
-            [o_cmd_checkbox frame].origin.x + 6, -2 -
-            [o_cmd_checkbox frame].size.height,
-            [NSString stringWithUTF8String:UPWARDS_WHITE_ARROW], o_tooltip,
-            ((((unsigned int)p_item->value.i) & KEY_MODIFIER_SHIFT)?YES:NO),
-            NSImageLeft )
-        [o_shift_checkbox setState: p_item->value.i & KEY_MODIFIER_SHIFT];
-        [self addSubview: o_cmd_checkbox];
-        [self addSubview: o_ctrl_checkbox];
-        [self addSubview: o_alt_checkbox];
-        [self addSubview: o_shift_checkbox];
-
-        /* build the popup */
-        ADD_POPUP( o_popup, mainFrame, [o_shift_checkbox frame].origin.x +
-            [o_shift_checkbox frame].size.width + 4,
-            4, 0, o_tooltip )
-        [o_popup setAutoresizingMask:NSViewWidthSizable ];
-
-        if( o_keys_menu == nil )
-        {
-            unsigned int i;
-            o_keys_menu = [[NSMenu alloc] initWithTitle: @"Keys Menu"];
-            for ( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++)
-                if( vlc_keys[i].psz_key_string && *vlc_keys[i].psz_key_string )
-                    POPULATE_A_KEY( o_keys_menu,
-                        [NSString stringWithCString:vlc_keys[i].psz_key_string]
-                        , vlc_keys[i].i_key_code)
-        }
-        [o_popup setMenu:[o_keys_menu copyWithZone:nil]];
-        [o_popup selectItemWithTitle: [[VLCMain sharedInstance]
-            localizedString:(char *)KeyToString(
-            (((unsigned int)p_item->value.i) & ~KEY_MODIFIER ))]];
-        [self addSubview: o_popup];
-    }
-    return self;
-}
-
-- (void) alignWithXPosition:(int)i_xPos
-{
-    NSRect frame;
-    NSRect superFrame = [self frame];
-    frame = [o_label frame];
-    frame.origin.x = i_xPos - frame.size.width - 3;
-    [o_label setFrame:frame];
-
-    frame = [o_cmd_checkbox frame];
-    frame.origin.x = i_xPos;
-    [o_cmd_checkbox setFrame:frame];
-
-    frame = [o_ctrl_checkbox frame];
-    frame.origin.x = [o_cmd_checkbox frame].size.width +
-                        [o_cmd_checkbox frame].origin.x + 4;
-    [o_ctrl_checkbox setFrame:frame];
-
-    frame = [o_alt_checkbox frame];
-    frame.origin.x = i_xPos;
-    [o_alt_checkbox setFrame:frame];
-
-    frame = [o_shift_checkbox frame];
-    frame.origin.x = [o_cmd_checkbox frame].size.width +
-                        [o_cmd_checkbox frame].origin.x + 4;
-    [o_shift_checkbox setFrame:frame];
-
-    frame = [o_popup frame];
-    frame.origin.x = [o_shift_checkbox frame].origin.x +
-                        [o_shift_checkbox frame].size.width + 3;
-    frame.size.width = superFrame.size.width - frame.origin.x + 2;
-    [o_popup setFrame:frame];
-}
-
-- (void)dealloc
-{
-    [o_cmd_checkbox release];
-    [o_ctrl_checkbox release];
-    [o_alt_checkbox release];
-    [o_shift_checkbox release];
-    [o_popup release];
-    [super dealloc];
-}
-
-- (int)intValue
-{
-    unsigned int i_new_key = 0;
-
-    i_new_key |= ([o_cmd_checkbox state] == NSOnState) ?
-        KEY_MODIFIER_COMMAND : 0;
-    i_new_key |= ([o_ctrl_checkbox state] == NSOnState) ?
-        KEY_MODIFIER_CTRL : 0;
-    i_new_key |= ([o_alt_checkbox state] == NSOnState) ?
-        KEY_MODIFIER_ALT : 0;
-    i_new_key |= ([o_shift_checkbox state] == NSOnState) ?
-        KEY_MODIFIER_SHIFT : 0;
-
-    i_new_key |= StringToKey((char *)[[[o_popup selectedItem] title] cString]);
-    return i_new_key;
-}
-@end
-
-@implementation KeyConfigControlAfter103
+@implementation KeyConfigControl
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
 {
@@ -2298,13 +2147,11 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
     o_scrollview = [[[NSScrollView alloc] initWithFrame: s_rc] retain];
     [o_scrollview setDrawsBackground: NO];
     [o_scrollview setBorderType: NSBezelBorder];
-    if( MACOS_VERSION >= 10.3 )
-        [o_scrollview setAutohidesScrollers:YES];
+    [o_scrollview setAutohidesScrollers:YES];
 
     NSTableView *o_tableview;
     o_tableview = [[NSTableView alloc] initWithFrame : s_rc];
-    if( MACOS_VERSION >= 10.3 )
-        [o_tableview setUsesAlternatingRowBackgroundColors:YES];
+    [o_tableview setUsesAlternatingRowBackgroundColors:YES];
     [o_tableview setHeaderView:nil];
 /* TODO: find a good way to fix the row height and text size*/
 /* FIXME: support for multiple selection... */

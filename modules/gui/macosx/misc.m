@@ -1,7 +1,7 @@
 /*****************************************************************************
  * misc.m: code not specific to vlc
  *****************************************************************************
- * Copyright (C) 2003-2005 the VideoLAN team
+ * Copyright (C) 2003-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -66,6 +66,15 @@
     [self unregisterDraggedTypes];
     [super dealloc];
 }
+
+#if GC_ENABLED
+- (void)finalize
+{
+    /* dealloc doesn't get called on 10.5 if GC is enabled, so we need to provide the basic functionality here */
+    [self unregisterDraggedTypes];
+    [super finalize];
+}
+#endif
 
 - (void)awakeFromNib
 {
@@ -144,6 +153,15 @@
     [self unregisterDraggedTypes];
     [super dealloc];
 }
+
+#if GC_ENABLED
+- (void)finalize
+{
+    /* dealloc doesn't get called on 10.5 if GC is enabled, so we need to provide the basic functionality here */
+    [self unregisterDraggedTypes];
+    [super finalize];
+}
+#endif
 
 - (void)awakeFromNib
 {

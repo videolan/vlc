@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fspanel.m: MacOS X full screen panel
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$
  *
  * Authors: JŽr™me Decoodt <djc at videolan dot org>
@@ -30,7 +30,7 @@
 #import "vout.h"
 #import "fspanel.h"
 
-#define KEEP_VISIBLE_AFTER_ACTION 4 /* time in half-sec until this panel will hide again after an user's action */
+#define KEEP_VISIBLE_AFTER_ACTION 4 /* time in half-sec until this panel will hide again after a user's action */
 
 /*****************************************************************************
  * VLCFSPanel
@@ -91,6 +91,17 @@
 {
     return YES;
 }
+
+#if GC_ENABLED
+- (void)finalize
+{
+	/* dealloc isn't called on 10.5 in case that GC is enabled, so we need to provide the functionality here */
+	[[NSNotificationCenter defaultCenter] removeObserver: self];
+	[self setFadeTimer:nil];
+	
+	[super finalize];
+}
+#endif
 
 -(void)dealloc
 {
