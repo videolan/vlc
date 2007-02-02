@@ -718,6 +718,7 @@ static int Direct3DVoutOpen( vout_thread_t *p_vout )
     p_vout->p_sys->d3dpp.BackBufferWidth        = p_vout->render.i_width;
     p_vout->p_sys->d3dpp.BackBufferHeight       = p_vout->render.i_height;
     p_vout->p_sys->d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
+    p_vout->p_sys->d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
     p_vout->p_sys->d3dpp.PresentationInterval   = D3DPRESENT_INTERVAL_IMMEDIATE;
     p_vout->p_sys->d3dpp.BackBufferFormat       = D3DFMT_UNKNOWN;
     p_vout->p_sys->d3dpp.BackBufferCount        = 1;
@@ -769,6 +770,8 @@ static int Direct3DVoutResetDevice( vout_thread_t *p_vout, UINT i_width, UINT i_
         d3dpp.BackBufferWidth  = i_width;
     if( i_height )
         d3dpp.BackBufferHeight = i_height;
+    if( d3dpp.Windowed )
+        d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
 
     // release all D3D objects
     Direct3DVoutReleaseScene( p_vout );
@@ -777,20 +780,20 @@ static int Direct3DVoutResetDevice( vout_thread_t *p_vout, UINT i_width, UINT i_
     hr = IDirect3DDevice9_Reset(p_d3ddev, &d3dpp);
     if( SUCCEEDED(hr) )
     {
+        memcpy(&(p_vout->p_sys->d3dpp), &d3dpp, sizeof(d3dpp));
         // re-create them
-        if( (VLC_SUCCESS == Direct3DVoutCreatePictures(p_vout, 1))
-         && (VLC_SUCCESS == Direct3DVoutCreateScene(p_vout)) )
+        if( (VLC_SUCCESS != Direct3DVoutCreatePictures(p_vout, 1))
+         || (VLC_SUCCESS != Direct3DVoutCreateScene(p_vout)) )
         {
-            p_vout->p_sys->d3dpp.BackBufferWidth  = i_width;
-            p_vout->p_sys->d3dpp.BackBufferHeight = i_height;
-            return VLC_SUCCESS;
+            msg_Dbg(p_vout, "%s failed !", __FUNCTION__);
+            return VLC_EGENERIC;
         }
-        return VLC_EGENERIC;
     }
     else {
         msg_Err(p_vout, "%s failed ! (hr=%08lX)", __FUNCTION__, hr);
         return VLC_EGENERIC;
     }
+    msg_Dbg(p_vout, "%s successful !", __FUNCTION__);
     return VLC_SUCCESS;
 }
 
@@ -1426,8 +1429,8 @@ static void Direct3DVoutRenderSurface( vout_thread_t *p_vout, picture_t *p_pic )
 static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
 {
     LPDIRECT3DDEVICE9       p_d3ddev  = p_vout->p_sys->p_d3ddev;
-    LPDIRECT3DTEXTURE9      p_d3dtex  = p_vout->p_sys->p_d3dtex;
-    LPDIRECT3DVERTEXBUFFER9 p_d3dvtc  = p_vout->p_sys->p_d3dvtc;
+    LPDIRECT3DTEXTURE9      p_d3dtex;
+    LPDIRECT3DVERTEXBUFFER9 p_d3dvtc;
     LPDIRECT3DSURFACE9      p_d3dsrc, p_d3ddest;
     CUSTOMVERTEX            *p_vertices;
     HRESULT hr;
@@ -1444,6 +1447,8 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
             return;
         }
     }
+    p_d3dtex  = p_vout->p_sys->p_d3dtex;
+    p_d3dvtc  = p_vout->p_sys->p_d3dvtc;
 
     /* Clear the backbuffer and the zbuffer */
     hr = IDirect3DDevice9_Clear( p_d3ddev, 0, NULL, D3DCLEAR_TARGET,
