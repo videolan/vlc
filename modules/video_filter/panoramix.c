@@ -40,8 +40,8 @@
     // OS CODE DEPENDANT to get display dimensions
     #ifdef SYS_MINGW32
         #include <windows.h>
-    #else 
-        #include <X11/Xlib.h>   
+    #else
+        #include <X11/Xlib.h>
     #endif
     #define GAMMA        1
 //  #define PACKED_YUV    1
@@ -367,7 +367,7 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
 
 #ifdef OVERLAP
     p_vout->p_sys->i_offset_x = var_CreateGetInteger( p_vout, "offset-x" );
-    if (p_vout->p_sys->i_col > 2) p_vout->p_sys->i_offset_x = 0; // offset-x is used in case of 2x1 wall & autocrop    
+    if (p_vout->p_sys->i_col > 2) p_vout->p_sys->i_offset_x = 0; // offset-x is used in case of 2x1 wall & autocrop
     p_vout->p_sys->b_autocrop = !(var_CreateGetInteger( p_vout, "crop-ratio" ) == 0);
     if (!p_vout->p_sys->b_autocrop) p_vout->p_sys->b_autocrop = var_CreateGetInteger( p_vout, "autocrop" );		
     p_vout->p_sys->b_attenuate = var_CreateGetInteger( p_vout, "panoramix-attenuate");
@@ -383,7 +383,7 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
     double d_p = 100.0 / p_vout->p_sys->bz_middle_pos;
     p_vout->p_sys->i_ratio_max = var_CreateGetInteger( p_vout, "autocrop-ratio-max" ); // in crop module with autocrop ...
     p_vout->p_sys->i_ratio = var_CreateGetInteger( p_vout, "crop-ratio" ); // in crop module with manual ratio ...	
-    
+
     p_vout->p_sys->a_2 = d_p * p_vout->p_sys->bz_begin - (double)(d_p * d_p / (d_p - 1)) * p_vout->p_sys->bz_middle + (double)(d_p / (d_p - 1)) * p_vout->p_sys->bz_end;
     p_vout->p_sys->a_1 = -(d_p + 1) * p_vout->p_sys->bz_begin + (double)(d_p * d_p / (d_p - 1)) * p_vout->p_sys->bz_middle - (double)(1 / (d_p - 1)) * p_vout->p_sys->bz_end;
     p_vout->p_sys->a_0 =  p_vout->p_sys->bz_begin;
@@ -498,13 +498,6 @@ static double Gamma_Correction(int i_plane, float f_component, float f_BlackCrus
 }
 
 #ifdef PACKED_YUV
-/*****************************************************************************
- * Clip: clip an 32 bits int in 8 bits
- *****************************************************************************/
-inline static int32_t clip( int32_t a )
-{
-    return (a > 255) ? 255 : (a < 0) ? 0 : a;
-}
 
 /*****************************************************************************
  * F: Function to calculate Gamma correction
@@ -516,9 +509,9 @@ static uint8_t F(uint8_t i, float gamma)
 // return clip(255 * pow(input, 1.0 / gamma));
 
  if (input < 0.5)
-     return clip((255 * pow(2 * input, gamma)) / 2);
+     return clip_uint8((255 * pow(2 * input, gamma)) / 2);
  else
-     return clip(255 * (1 - pow(2 * (1 - input), gamma) / 2));
+     return clip_uint8(255 * (1 - pow(2 * (1 - input), gamma) / 2));
 
 }
 #endif
@@ -543,7 +536,7 @@ static int AdjustHeight( vout_thread_t *p_vout )
 #ifdef SYS_MINGW32
             i_window_width  = GetSystemMetrics(SM_CXSCREEN);
             i_window_height = GetSystemMetrics(SM_CYSCREEN);
-#else            
+#else
             Display *p_display = XOpenDisplay( "" );
 	        if (p_vout->p_sys->b_xinerama)
 	        {
@@ -554,9 +547,9 @@ static int AdjustHeight( vout_thread_t *p_vout )
 	        {
 	            i_window_width = DisplayWidth(p_display, 0);
 	            i_window_height = DisplayHeight(p_display, 0);
-	        } 
-	       	XCloseDisplay( p_display );     
-	       	free(p_display);  
+	        }
+	       	XCloseDisplay( p_display );
+	       	free(p_display);
 #endif
         var_SetInteger( p_vout, "width", i_window_width);
         var_SetInteger( p_vout, "height", i_window_height);

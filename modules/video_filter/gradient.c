@@ -418,10 +418,7 @@ static void FilterGradient( filter_t *p_filter, picture_t *p_inpic,
         else
         {
             FOR
-            if( a>>8 )
-                p_outpix[y*i_dst_pitch+x] = 255;
-            else
-                p_outpix[y*i_dst_pitch+x] = (uint8_t)a;
+            p_outpix[y*i_dst_pitch+x] = clip_uint8( a );
             }}
         }
     }

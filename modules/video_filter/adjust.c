@@ -106,11 +106,6 @@ struct filter_sys_t
 {
 };
 
-inline static int32_t clip( int32_t a )
-{
-    return (a > 255) ? 255 : (a < 0) ? 0 : a;
-}
-
 /*****************************************************************************
  * Create: allocates adjust video thread output method
  *****************************************************************************
@@ -259,13 +254,13 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         /* Fill the gamma lookup table */
         for( i = 0 ; i < 256 ; i++ )
         {
-          pi_gamma[ i ] = clip( pow(i / 255.0, f_gamma) * 255.0);
+          pi_gamma[ i ] = clip_uint8_vlc( pow(i / 255.0, f_gamma) * 255.0);
         }
 
         /* Fill the luma lookup table */
         for( i = 0 ; i < 256 ; i++ )
         {
-            pi_luma[ i ] = pi_gamma[clip( i_lum + i_cont * i / 256)];
+            pi_luma[ i ] = pi_gamma[clip_uint8_vlc( i_lum + i_cont * i / 256)];
         }
     }
     else
@@ -343,9 +338,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     {
 #define WRITE_UV_CLIP() \
     i_u = *p_in++ ; i_v = *p_in_v++ ; \
-    *p_out++ = clip( (( ((i_u * i_cos + i_v * i_sin - i_x) >> 8) \
+    *p_out++ = clip_uint8_vlc( (( ((i_u * i_cos + i_v * i_sin - i_x) >> 8) \
                            * i_sat) >> 8) + 128); \
-    *p_out_v++ = clip( (( ((i_v * i_cos - i_u * i_sin - i_y) >> 8) \
+    *p_out_v++ = clip_uint8_vlc( (( ((i_v * i_cos - i_u * i_sin - i_y) >> 8) \
                            * i_sat) >> 8) + 128)
 
         uint8_t i_u, i_v;

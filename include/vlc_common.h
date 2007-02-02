@@ -627,6 +627,13 @@ static int64_t GCD( int64_t a, int64_t b )
     else return a;
 }
 
+/* function imported from libavutil/common.h */
+static inline uint8_t clip_uint8_vlc( int32_t a )
+{
+    if( a&(~255) ) return (-a)>>31;
+    else           return a;
+}
+
 /* Malloc with automatic error */
 #define MALLOC_VOID( var, type ) { var = (type*)malloc( sizeof( type) ); \
                                    if( !var ) return; }
