@@ -742,7 +742,7 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 14:04 < kwolf_> i am a girl, i need help :-D
 14:06 < Dnumgis> kwolf_: I'm a lonely geek who know your answer, are you good looking?
   -- #videolan
-% Previous continued
+%
 < wereHamster> for (i=0;i<10;++i) printf("I'm a girl\n")
 < wereHamster> am I a girl now?
 < Dnumgis> wereHamster: you definitly need to send me a picture before I belive you :)
