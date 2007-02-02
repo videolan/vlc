@@ -207,7 +207,6 @@
                 showBookmarks = id; 
                 showExtended = id; 
                 showMessagesPanel = id; 
-                showOrHidePlaylistColumns = id; 
                 showSFilters = id; 
                 showWizard = id; 
                 timesliderUpdate = id; 
@@ -325,7 +324,6 @@
                 "o_mu_ffmpeg_pp" = id; 
                 "o_mu_file" = id; 
                 "o_mu_help" = id; 
-                "o_mu_plcolumns" = id; 
                 "o_mu_program" = id; 
                 "o_mu_screen" = id; 
                 "o_mu_subtitle" = id; 
