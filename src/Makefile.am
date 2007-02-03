@@ -1,4 +1,4 @@
-###############################################################################
+
 # Automake targets and declarations
 ###############################################################################
 
@@ -156,8 +156,8 @@ endif
 if HAVE_WIN32
 DATA_noinst_libvlc = libvlc$(LIBEXT) libvlc$(LIBEXT).a
 
-libvlc.dll.a: libvlc$(LIBEXT)
-	$(DLLTOOL) --export-all-symbols -l $@ -D $< $(libvlc_a_OBJECTS)
+libvlc.dll.a libvlc.def: libvlc$(LIBEXT)
+	$(DLLTOOL) -z libvlc.def -l libvlc.dll.a -D $< $(libvlc_a_OBJECTS)
 
 libvlc$(LIBEXT): $(libvlc_a_OBJECTS)
 	@ldfl="`$(VLC_CONFIG) --libs plugin libvlc pic` $(INCLUDED_LIBINTL)" ; \

@@ -156,6 +156,15 @@ struct vlc_list_t
 #endif
 
 /*****************************************************************************
+ * Shared library Export macros
+ *****************************************************************************/
+#if defined(WIN32) && defined(DLL_EXPORT)
+#  define VLC_PUBLIC_API extern __declspec(dllexport)
+#else
+#  define VLC_PUBLIC_API extern
+#endif
+
+/*****************************************************************************
  * Exported libvlc API
  *****************************************************************************/
 #if !defined( __LIBVLC__ )
@@ -165,49 +174,49 @@ struct vlc_list_t
  *
  * \return a string containing the libvlc version
  */
-char const * VLC_Version ( void );
+VLC_PUBLIC_API char const * VLC_Version ( void );
 
 /**
  * Retrieve libvlc compile time
  *
  * \return a string containing the libvlc compile time
  */
-char const * VLC_CompileTime ( void );
+VLC_PUBLIC_API char const * VLC_CompileTime ( void );
 
 /**
  * Retrieve the username of the libvlc builder
  *
  * \return a string containing the username of the libvlc builder
  */
-char const * VLC_CompileBy ( void );
+VLC_PUBLIC_API char const * VLC_CompileBy ( void );
 
 /**
  * Retrieve the host of the libvlc builder
  *
  * \return a string containing the host of the libvlc builder
  */
-char const * VLC_CompileHost ( void );
+VLC_PUBLIC_API char const * VLC_CompileHost ( void );
 
 /**
  * Retrieve the domain name of the host of the libvlc builder
  *
  * \return a string containing the domain name of the host of the libvlc builder
  */
-char const * VLC_CompileDomain ( void );
+VLC_PUBLIC_API char const * VLC_CompileDomain ( void );
 
 /**
  * Retrieve libvlc compiler version
  *
  * \return a string containing the libvlc compiler version
  */
-char const * VLC_Compiler ( void );
+VLC_PUBLIC_API char const * VLC_Compiler ( void );
 
 /**
  * Retrieve libvlc changeset
  *
  * \return a string containing the libvlc subversion changeset
  */
-char const * VLC_Changeset ( void );
+VLC_PUBLIC_API char const * VLC_Changeset ( void );
 
 /**
  * Return an error string
@@ -215,7 +224,7 @@ char const * VLC_Changeset ( void );
  * \param i_err an error code
  * \return an error string
  */
-char const * VLC_Error ( int i_err );
+VLC_PUBLIC_API char const * VLC_Error ( int i_err );
 
 #endif /* __LIBVLC__ */
 
@@ -227,7 +236,7 @@ char const * VLC_Error ( int i_err );
  *
  * \return vlc object id or an error code
  */
-int     VLC_Create( void );
+VLC_PUBLIC_API int     VLC_Create( void );
 
 /**
  * Initialize a vlc_t structure
@@ -243,7 +252,7 @@ int     VLC_Create( void );
  *  \param ppsz_argv an array of arguments
  *  \return VLC_SUCCESS on success
  */
-int     VLC_Init( int, int, char *[] );
+VLC_PUBLIC_API int     VLC_Init( int, int, char *[] );
 
 /**
  * Add an interface
@@ -259,7 +268,7 @@ int     VLC_Init( int, int, char *[] );
  * \param b_play start playing when the interface is done loading
  * \return VLC_SUCCESS on success
  */
-int     VLC_AddIntf( int, char const *, vlc_bool_t, vlc_bool_t );
+VLC_PUBLIC_API int     VLC_AddIntf( int, char const *, vlc_bool_t, vlc_bool_t );
 
 /**
  * Ask vlc to die
@@ -270,7 +279,7 @@ int     VLC_AddIntf( int, char const *, vlc_bool_t, vlc_bool_t );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_Die( int );
+VLC_PUBLIC_API int     VLC_Die( int );
 
 /**
  * Clean up all the intf, playlist, vout and aout
@@ -283,7 +292,7 @@ int     VLC_Die( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_CleanUp( int );
+VLC_PUBLIC_API int     VLC_CleanUp( int );
 
 /**
  * Destroy all threads and the VLC object
@@ -295,7 +304,7 @@ int     VLC_CleanUp( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_Destroy( int );
+VLC_PUBLIC_API int     VLC_Destroy( int );
 
 /**
  * Set a VLC variable
@@ -309,7 +318,7 @@ int     VLC_Destroy( int );
  * \param value a vlc_value_t structure
  * \return VLC_SUCCESS on success
  */
-int     VLC_VariableSet( int, char const *, vlc_value_t );
+VLC_PUBLIC_API int     VLC_VariableSet( int, char const *, vlc_value_t );
 
 /**
  * Get a VLC variable
@@ -324,7 +333,7 @@ int     VLC_VariableSet( int, char const *, vlc_value_t );
  * \param p_value a pointer to a vlc_value_t structure
  * \return VLC_SUCCESS on success
  */
-int     VLC_VariableGet( int, char const *, vlc_value_t * );
+VLC_PUBLIC_API int     VLC_VariableGet( int, char const *, vlc_value_t * );
 
 /**
  * Get a VLC variable type
@@ -337,7 +346,7 @@ int     VLC_VariableGet( int, char const *, vlc_value_t * );
  * \param pi_type a pointer to an integer
  * \return VLC_SUCCESS on success
  */
-int     VLC_VariableType( int, char const *, int * );
+VLC_PUBLIC_API int     VLC_VariableType( int, char const *, int * );
 
 /**
  * Add a target to the current playlist
@@ -353,7 +362,7 @@ int     VLC_VariableType( int, char const *, int * );
  * \param i_pos the position at which to add the new target (PLAYLIST_END for end)
  * \return VLC_SUCCESS on success
  */
-int     VLC_AddTarget( int, char const *, const char **, int, int, int );
+VLC_PUBLIC_API int     VLC_AddTarget( int, char const *, const char **, int, int, int );
 
 /**
  * Start the playlist and play the currently selected playlist item
@@ -365,7 +374,7 @@ int     VLC_AddTarget( int, char const *, const char **, int, int, int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_Play( int );
+VLC_PUBLIC_API int     VLC_Play( int );
 
 /**
  * Pause the currently playing item. Resume it if already paused
@@ -376,7 +385,7 @@ int     VLC_Play( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int     VLC_Pause( int );
+VLC_PUBLIC_API int     VLC_Pause( int );
 
 /**
  * Stop the playlist
@@ -389,7 +398,7 @@ int     VLC_Pause( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int             VLC_Stop( int );
+VLC_PUBLIC_API int             VLC_Stop( int );
 
 /**
  * Tell if VLC is playing
@@ -400,7 +409,7 @@ int             VLC_Stop( int );
  * \param i_object a vlc object id
  * \return VLC_TRUE or VLC_FALSE
  */
-vlc_bool_t      VLC_IsPlaying( int );
+VLC_PUBLIC_API vlc_bool_t      VLC_IsPlaying( int );
 
 /**
  * Get the current position in a input
@@ -412,7 +421,7 @@ vlc_bool_t      VLC_IsPlaying( int );
  * \param i_object a vlc object id
  * \return a float in the range of 0.0 - 1.0
  */
-float           VLC_PositionGet( int );
+VLC_PUBLIC_API float           VLC_PositionGet( int );
 
 /**
  * Set the current position in a input
@@ -425,7 +434,7 @@ float           VLC_PositionGet( int );
  * \param i_position a float in the range of 0.0 - 1.0
  * \return a float in the range of 0.0 - 1.0
  */
-float           VLC_PositionSet( int, float );
+VLC_PUBLIC_API float           VLC_PositionSet( int, float );
 
 /**
  * Get the current position in a input
@@ -436,7 +445,7 @@ float           VLC_PositionSet( int, float );
  * \param i_object a vlc object id
  * \return the offset from 0:00 in seconds
  */
-int             VLC_TimeGet( int );
+VLC_PUBLIC_API int             VLC_TimeGet( int );
 
 /**
  * Seek to a position in the current input
@@ -451,7 +460,7 @@ int             VLC_TimeGet( int );
  * \param b_relative seek relative from current position
  * \return VLC_SUCCESS on success
  */
-int             VLC_TimeSet( int, int, vlc_bool_t );
+VLC_PUBLIC_API int             VLC_TimeSet( int, int, vlc_bool_t );
 
 /**
  * Get the total length of a input
@@ -462,7 +471,7 @@ int             VLC_TimeSet( int, int, vlc_bool_t );
  * \param i_object a vlc object id
  * \return the length in seconds
  */
-int             VLC_LengthGet( int );
+VLC_PUBLIC_API int             VLC_LengthGet( int );
 
 /**
  * Play the input faster than realtime
@@ -473,7 +482,7 @@ int             VLC_LengthGet( int );
  * \param i_object a vlc object id
  * \return the current speedrate
  */
-float           VLC_SpeedFaster( int );
+VLC_PUBLIC_API float           VLC_SpeedFaster( int );
 
 /**
  * Play the input slower than realtime
@@ -484,7 +493,7 @@ float           VLC_SpeedFaster( int );
  * \param i_object a vlc object id
  * \return the current speedrate
  */
-float           VLC_SpeedSlower( int );
+VLC_PUBLIC_API float           VLC_SpeedSlower( int );
 
 /**
  * Return the current playlist item
@@ -492,7 +501,7 @@ float           VLC_SpeedSlower( int );
  * \param i_object a vlc object id
  * \return the index of the playlistitem that is currently selected for play
  */
-int             VLC_PlaylistIndex( int );
+VLC_PUBLIC_API int             VLC_PlaylistIndex( int );
 
 /**
  * Total amount of items in the playlist
@@ -500,7 +509,7 @@ int             VLC_PlaylistIndex( int );
  * \param i_object a vlc object id
  * \return amount of playlist items
  */
-int             VLC_PlaylistNumberOfItems( int );
+VLC_PUBLIC_API int             VLC_PlaylistNumberOfItems( int );
 
 /**
  * Next playlist item
@@ -510,7 +519,7 @@ int             VLC_PlaylistNumberOfItems( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int             VLC_PlaylistNext( int );
+VLC_PUBLIC_API int             VLC_PlaylistNext( int );
 
 /**
  * Previous playlist item
@@ -520,7 +529,7 @@ int             VLC_PlaylistNext( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int             VLC_PlaylistPrev( int );
+VLC_PUBLIC_API int             VLC_PlaylistPrev( int );
 
 /**
  * Clear the contents of the playlist
@@ -532,7 +541,7 @@ int             VLC_PlaylistPrev( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int             VLC_PlaylistClear( int );
+VLC_PUBLIC_API int             VLC_PlaylistClear( int );
 
 /**
  * Change the volume
@@ -541,7 +550,7 @@ int             VLC_PlaylistClear( int );
  * \param i_volume something in a range from 0-200
  * \return the new volume (range 0-200 %)
  */
-int             VLC_VolumeSet( int, int );
+VLC_PUBLIC_API int             VLC_VolumeSet( int, int );
 
 /**
  * Get the current volume
@@ -551,7 +560,7 @@ int             VLC_VolumeSet( int, int );
  * \param i_object a vlc object id
  * \return the current volume (range 0-200 %)
  */
-int             VLC_VolumeGet( int );
+VLC_PUBLIC_API int             VLC_VolumeGet( int );
 
 /**
  * Mute/Unmute the volume
@@ -559,7 +568,7 @@ int             VLC_VolumeGet( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int            VLC_VolumeMute( int );
+VLC_PUBLIC_API int            VLC_VolumeMute( int );
 
 /**
  * Toggle Fullscreen mode
@@ -569,7 +578,7 @@ int            VLC_VolumeMute( int );
  * \param i_object a vlc object id
  * \return VLC_SUCCESS on success
  */
-int             VLC_FullScreen( int );
+VLC_PUBLIC_API int             VLC_FullScreen( int );
 
 
 # ifdef __cplusplus

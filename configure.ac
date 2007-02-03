@@ -5602,6 +5602,7 @@ AS_IF([test "${SYS}" = "mingw32" || test "${enable_libtool}" != "no"], [
   AC_DEFINE(HAVE_SHARED_LIBVLC, 1, [Define to 1 if libvlc is built as a shared library.])
   FILE_LIBVLC_DLL="!define LIBVLC_DLL libvlc.dll"
   VLC_ADD_PLUGINS([${BUILTINS}])
+  VLC_ADD_CPPFLAGS([libvlc],[-DDLL_EXPORT])
   BUILTINS=""
 ], [
   LDFLAGS_vlc="${LDFLAGS_vlc} ${LDFLAGS_libvlc}"

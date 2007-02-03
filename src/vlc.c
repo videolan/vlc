@@ -75,8 +75,10 @@ int main( int i_argc, char *ppsz_argv[] )
     }
 #endif
 
-    rootwrap ();
-    
+#if defined (HAVE_GETEUID) && !defined (SYS_BEOS)
+     rootwrap ();
+#endif
+
     /* Create a libvlc structure */
     i_ret = VLC_Create();
     if( i_ret < 0 )
