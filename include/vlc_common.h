@@ -1010,6 +1010,8 @@ VLC_INTERNAL( long, vlc_telldir, ( void * ) );
 #   define rewinddir vlc_rewinddir
 #   define seekdir vlc_seekdir
 #   define telldir vlc_telldir
+#elif !defined(__PLUGIN__)
+#   define vlc_wclosedir NULL
 #endif
 
 /* Format type specifiers for 64 bits numbers */
