@@ -64,10 +64,10 @@ esac
 
 # Check for automake
 amvers="no"
-for v in "-1.9" "19" "-1.8" "18" "-1.7" "17"; do
+for v in "-1.10" "110" "-1.9" "19" "-1.8" "18" "-1.7" "17"; do
   if automake${v} --version >/dev/null 2>&1; then
     amsuff="${v}"
-    amvers="${v}"
+    amvers="`echo ${v} | sed -e 's/^-//'`"
     break
   fi
 done
@@ -125,8 +125,8 @@ else
   PKGCONFIG=no
 fi
 
-aclocal=aclocal${amvers}
-automake=automake${amvers}
+aclocal=aclocal${amsuff}
+automake=automake${amsuff}
 autoconf=autoconf
 autoheader=autoheader
 
