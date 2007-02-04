@@ -741,6 +741,31 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
 }
 
 /*****************************************************************************
+ * module_Exists: tell if a module exists.
+ *****************************************************************************
+ * This function is a boolean function that tells if a module exist or not.
+ *****************************************************************************/
+
+vlc_bool_t __module_Exists(  vlc_object_t *p_this, const char * psz_name )
+{
+    vlc_list_t *p_list;
+    int i;
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    for( i = 0 ; i < p_list->i_count; i++)
+    {
+        if (!strcmp(
+              ((module_t *) p_list->p_values[i].p_object)->psz_shortname ,
+              psz_name ) )
+        {
+            /* We can release the list, and return yes */
+            vlc_list_release( p_list ); return VLC_TRUE;
+        }
+    }
+    vlc_list_release( p_list ); return VLC_FALSE;
+}
+
+
+/*****************************************************************************
  * Following functions are local.
  *****************************************************************************/
 

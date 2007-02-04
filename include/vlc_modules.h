@@ -108,3 +108,5 @@ struct module_t
 VLC_EXPORT( module_t *, __module_Need, ( vlc_object_t *, const char *, const char *, vlc_bool_t ) );
 #define module_Unneed(a,b) __module_Unneed(VLC_OBJECT(a),b)
 VLC_EXPORT( void, __module_Unneed, ( vlc_object_t *, module_t * ) );
+#define module_Exist(a,b) __module_Exists(VLC_OBJECT(a),b)
+VLC_EXPORT( vlc_bool_t,  __module_Exists, ( vlc_object_t *, const char * ) );
