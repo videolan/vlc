@@ -125,7 +125,7 @@ Mike Schrag <mschrag at pobox dot com> - directx device selection
 Mikko Hirvonen <masse at astro dot helsinki dot fi> - Firefox-1.5.x development configure patch
 Michel Lanners <mlan at cpu.lu> - fixed typos and AltiVec detection
 Miroslav Oujeský <oujesky at mail dot muni dot cz> - Czech translation
-Mirsal Ennaime <mirsal at  gmail dot com> - D-Bus amelioration
+Mirsal Ennaime <mirsal.ennaime at gmail dot com> - D-Bus ameliorations
 Moritz Bunkus <moritz at bunkus dot org> - Matroska patches
 Morten Brix Pedersen <morten at wtf.dk> - Danish translation
 Nilmoni Deb <ndeb at ece.cmu.edu> - autoconf and Makefile fixes

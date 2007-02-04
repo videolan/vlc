@@ -379,11 +379,12 @@ DBUS_METHOD( GetCurrentTrack )
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
     
-    while ( p_tested_item->i_id != p_playlist->status.p_item->i_id )
+    while ( p_tested_item->p_input->i_id != 
+                    p_playlist->status.p_item->p_input->i_id )
     {
         i_position++;
         p_tested_item = playlist_GetNextLeaf( p_playlist, 
-                        p_playlist->p_root_onelevel, 
+                        p_playlist->p_root_onelevel,
                         p_tested_item,
                         VLC_FALSE,
                         VLC_FALSE );
@@ -429,13 +430,14 @@ DBUS_METHOD( GetLength )
     dbus_int32_t i_elements = 0;
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
-    playlist_item_t* p_last_item = playlist_GetLastLeaf( p_playlist, p_playlist->p_root_onelevel ); 
+    playlist_item_t* p_last_item = playlist_GetLastLeaf( p_playlist, 
+                    p_playlist->p_root_onelevel ); 
 
-    while ( p_tested_item->i_id != p_last_item->i_id )
+    while ( p_tested_item->p_input->i_id != p_last_item->p_input->i_id )
     {
         i_elements++;
         p_tested_item = playlist_GetNextLeaf( p_playlist, 
-                        p_playlist->p_root_onelevel, 
+                        p_playlist->p_root_onelevel,
                         p_tested_item,
                         VLC_FALSE,
                         VLC_FALSE );
@@ -449,7 +451,6 @@ DBUS_METHOD( GetLength )
 
 DBUS_METHOD( DelTrack )
 {
-  /*FIXME: Doesn't work.*/
     REPLY_INIT;
 
     DBusError error;
@@ -481,11 +482,14 @@ DBUS_METHOD( DelTrack )
                         VLC_FALSE );
     }
 
-    playlist_NodeRemoveItem( p_playlist, 
-		    p_tested_item, 
-		    p_playlist->p_root_onelevel );
-    pl_Release( p_playlist );
+    PL_LOCK 
+    playlist_DeleteFromInput( p_playlist, 
+		    p_tested_item->p_input->i_id, 
+		    VLC_TRUE );
+    PL_UNLOCK
 
+    pl_Release( p_playlist );
+    
     REPLY_SEND;
 }
 
