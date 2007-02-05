@@ -699,38 +699,36 @@ int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
             continue;
         }
 
-        struct addrinfo *ptr2;
-        for (ptr2 = rem; ptr2 != NULL; ptr2 = ptr2->ai_next)
+        val = -1;
+        for (struct addrinfo *ptr2 = rem; ptr2 != NULL; ptr2 = ptr2->ai_next)
         {
             if ((ptr2->ai_family != ptr->ai_family)
              || (ptr2->ai_socktype != ptr->ai_socktype)
              || (ptr2->ai_protocol != ptr->ai_protocol))
                 continue;
 
-            if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen))
+            if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
+              ? net_SourceSubscribe (obj, fd,
+                                     ptr2->ai_addr, ptr2->ai_addrlen,
+                                     ptr->ai_addr, ptr->ai_addrlen)
+              : connect (fd, ptr2->ai_addr, ptr2->ai_addrlen))
             {
-                if (net_SourceSubscribe (obj, fd,
-                                         ptr2->ai_addr, ptr2->ai_addrlen,
-                                         ptr->ai_addr, ptr->ai_addrlen) == 0)
-                    break;
+                msg_Err (obj, "cannot connect to %s port %d: %s",
+                         psz_server, i_server, net_strerror (net_errno));
+                continue;
             }
-            else
-            {
-                if (connect (fd, ptr2->ai_addr, ptr2->ai_addrlen) == 0)
-                    break;
-            }
+            val = fd;
+            break;
         }
 
-        if (ptr2 == NULL)
-        {
-            msg_Err (obj, "cannot connect to %s port %d: %s",
-                     psz_server, i_server, net_strerror (net_errno));
-            close (fd);
-            continue;
-        }
+        if (val != -1)
+            break;
 
-        return fd;
+        close (fd);
     }
 
-    return -1;
+    vlc_freeaddrinfo (rem);
+    vlc_freeaddrinfo (loc);
+    return val;
 }
+
