@@ -1011,6 +1011,26 @@ if test "${ac_cv_c_omit_frame_pointer}" != "no"; then
     VLC_ADD_CFLAGS([i420_yuy2_mmx],[-fomit-frame-pointer])
 fi
 
+dnl Check for -fvisibility=hidden
+AC_CACHE_CHECK([if \$CC accepts -fvisibility=hidden],
+    [ac_cv_c_visibility_hidden],
+    [CFLAGS="${CFLAGS_save} -fvisibility=hidden"
+     AC_TRY_COMPILE([],,ac_cv_c_visibility_hidden=yes, ac_cv_c_visibility_hidden=no)])
+if test "${ac_cv_c_visibility_hidden}" != "no"; then
+    VLC_ADD_CFLAGS([libvlc],[-fvisibility=hidden])
+    VLC_ADD_CFLAGS([plugin],[-fvisibility=hidden])
+fi
+
+dnl Check for -fvisibility-inlines-hidden
+AC_CACHE_CHECK([if \$CC accepts -fvisibility-inlines-hidden],
+    [ac_cv_c_visibility_inlines_hidden],
+    [CFLAGS="${CFLAGS_save} -fvisibility-inlines-hidden"
+     AC_TRY_COMPILE([],,ac_cv_c_visibility_inlines_hidden=yes, ac_cv_c_visibility_inlines_hidden=no)])
+if test "${ac_cv_c_visibility_inlines_hidden}" != "no"; then
+    VLC_ADD_CFLAGS([libvlc],[-fvisibility-inlines-hidden])
+    VLC_ADD_CFLAGS([plugin],[-fvisibility-inlines-hidden])
+fi
+
 dnl Check for -mdynamic-no-pic
 AC_CACHE_CHECK([if \$CC accepts -mdynamic-no-pic],
     [ac_cv_c_dynamic_no_pic],
@@ -1089,7 +1109,7 @@ if test "${ac_cv_c_attribute_format}" != "no"; then
     AC_DEFINE(HAVE_ATTRIBUTE_FORMAT, 1, Support for __attribute__((format())) with function pointers)
 fi
 
-dnl Check for __attribute__(())
+dnl Check for __attribute__((packed))
 AC_CACHE_CHECK([for __attribute__((packed))],
   [ac_cv_c_attribute_packed],
   [ac_cv_c_attribute_packed=no
@@ -1097,6 +1117,16 @@ AC_CACHE_CHECK([for __attribute__((packed))],
                     [ac_cv_c_attribute_packed=yes])])
 if test "${ac_cv_c_attribute_packed}" != "no"; then
   AC_DEFINE(HAVE_ATTRIBUTE_PACKED, 1, Support for __attribute__((packed)) for structs)
+fi
+
+dnl Check for __attribute__((visibility()))
+AC_CACHE_CHECK([for __attribute__((visibility()))],
+  [ac_cv_c_attribute_visibility],
+  [ac_cv_c_attribute_visibility=no
+   AC_TRY_COMPILE(, [extern __attribute__((visibility("default"))) int foo(int);],
+                    [ac_cv_c_attribute_visibility=yes])])
+if test "${ac_cv_c_attribute_visibility}" != "no"; then
+  AC_DEFINE(HAVE_ATTRIBUTE_VISIBILITY, 1, Support for __attribute__((visibility())) for exporting symbols)
 fi
 
 dnl
