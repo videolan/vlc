@@ -2389,7 +2389,7 @@ if test "${enable_screen}" != "no"; then
     CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
     AC_CHECK_HEADERS(X11/Xlib.h, [
       VLC_ADD_PLUGINS([screen])
-      VLC_ADD_LDFLAGS([screen],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
+      VLC_ADD_LDFLAGS([screen],[${X_LIBS} ${X_PRE_LIBS} -lX11])
       VLC_ADD_CPPFLAGS([screen],[${X_CFLAGS}])
     ])
     CPPFLAGS="${CPPFLAGS_save}"
@@ -3638,9 +3638,14 @@ if test "${enable_x11}" != "no" &&
    test "${enable_x11}" = "yes"); then
   CPPFLAGS="${CPPFLAGS_save} ${X_FLAGS}"
   AC_CHECK_HEADERS(X11/Xlib.h, [
-    VLC_ADD_PLUGINS([x11 panoramix])
-    VLC_ADD_LDFLAGS([x11 panoramix],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
-    VLC_ADD_CPPFLAGS([x11 panoramix],[${X_CFLAGS}])
+    VLC_ADD_PLUGINS([panoramix])
+    VLC_ADD_LDFLAGS([panoramix],[${X_LIBS} ${X_PRE_LIBS} -lX11])
+    VLC_ADD_CPPFLAGS([panoramix],[${X_CFLAGS}])
+    AC_CHECK_HEADERS(X11/Xext.h, [
+      VLC_ADD_PLUGINS([x11])
+      VLC_ADD_LDFLAGS([x11],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
+      VLC_ADD_CPPFLAGS([x11],[${X_CFLAGS}])
+    ])
   ])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
