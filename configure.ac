@@ -1017,19 +1017,20 @@ AC_CACHE_CHECK([if \$CC accepts -fvisibility=hidden],
     [CFLAGS="${CFLAGS_save} -fvisibility=hidden"
      AC_TRY_COMPILE([],,ac_cv_c_visibility_hidden=yes, ac_cv_c_visibility_hidden=no)])
 if test "${ac_cv_c_visibility_hidden}" != "no"; then
-    VLC_ADD_CFLAGS([libvlc],[-fvisibility=hidden])
-    VLC_ADD_CFLAGS([plugin],[-fvisibility=hidden])
+    VLC_ADD_CFLAGS([libvlc plugin],[-fvisibility=hidden])
 fi
 
 dnl Check for -fvisibility-inlines-hidden
-AC_CACHE_CHECK([if \$CC accepts -fvisibility-inlines-hidden],
-    [ac_cv_c_visibility_inlines_hidden],
-    [CFLAGS="${CFLAGS_save} -fvisibility-inlines-hidden"
-     AC_TRY_COMPILE([],,ac_cv_c_visibility_inlines_hidden=yes, ac_cv_c_visibility_inlines_hidden=no)])
-if test "${ac_cv_c_visibility_inlines_hidden}" != "no"; then
-    VLC_ADD_CFLAGS([libvlc],[-fvisibility-inlines-hidden])
-    VLC_ADD_CFLAGS([plugin],[-fvisibility-inlines-hidden])
-fi
+AC_LANG_PUSH(C++)
+    AC_CACHE_CHECK([if \$CXX accepts -fvisibility-inlines-hidden],
+        [ac_cv_c_visibility_inlines_hidden],
+        [CXXFLAGS="${CXXFLAGS_save} -fvisibility-inlines-hidden"
+         AC_TRY_COMPILE([],,ac_cv_c_visibility_inlines_hidden=yes, ac_cv_c_visibility_inlines_hidden=no)])
+    if test "${ac_cv_c_visibility_inlines_hidden}" != "no"; then
+        VLC_ADD_CXXFLAGS([libvlc plugin],[-fvisibility-inlines-hidden])
+    fi
+    CXXFLAGS="${CXXFLAGS_save}"
+AC_LANG_POP(C++)
 
 dnl Check for -mdynamic-no-pic
 AC_CACHE_CHECK([if \$CC accepts -mdynamic-no-pic],
