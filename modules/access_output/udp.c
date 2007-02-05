@@ -279,9 +279,12 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_thread->i_handle = i_handle;
     net_StopRecv( i_handle );
+
+#ifdef UDPLITE_SEND_CSCOV
     if (proto == IPPROTO_UDPLITE)
         setsockopt (i_handle, SOL_UDPLITE, UDPLITE_SEND_CSCOV,
                     &cscov, sizeof (cscov));
+#endif
 
     var_Get( p_access, SOUT_CFG_PREFIX "caching", &val );
     p_sys->p_thread->i_caching = (int64_t)val.i_int * 1000;
