@@ -123,7 +123,6 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
     memset (&hints, 0, sizeof( hints ));
     hints.ai_family = family;
     hints.ai_socktype = socktype;
-    hints.ai_protocol = protocol;
     hints.ai_flags = AI_PASSIVE;
 
     msg_Dbg (p_this, "net: listening to %s port %d", psz_host, i_port);
@@ -142,7 +141,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
     for (struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
         int fd = net_Socket (p_this, ptr->ai_family, ptr->ai_socktype,
-                             ptr->ai_protocol);
+                             protocol ?: ptr->ai_protocol);
         if (fd == -1)
         {
             msg_Dbg (p_this, "socket error: %s", net_strerror (net_errno));
@@ -178,7 +177,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
             net_Close (fd);
 #if !defined(WIN32) && !defined(UNDER_CE)
             fd = rootwrap_bind (ptr->ai_family, ptr->ai_socktype,
-                                ptr->ai_protocol, ptr->ai_addr,
+                                protocol ?: ptr->ai_protocol, ptr->ai_addr,
                                 ptr->ai_addrlen);
             if (fd != -1)
             {
