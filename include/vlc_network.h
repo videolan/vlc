@@ -83,12 +83,17 @@ VLC_EXPORT( int *, __net_ListenTCP, ( vlc_object_t *, const char *, int ) );
 #define net_Accept(a, b, c) __net_Accept(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __net_Accept, ( vlc_object_t *, int *, mtime_t ) );
 
-#define net_ConnectUDP(a, b, c, d ) __net_ConnectUDP(VLC_OBJECT(a), b, c, d)
-VLC_EXPORT( int, __net_ConnectUDP, ( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim ) );
+#define net_ConnectDgram(a, b, c, d, e ) __net_ConnectDgram(VLC_OBJECT(a), b, c, d, e)
+VLC_EXPORT( int, __net_ConnectDgram, ( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim, int proto ) );
+
+static inline int net_ConnectUDP (vlc_object_t *obj, const char *host, int port, int hlim)
+{
+    return net_ConnectDgram (obj, host, port, hlim, 0);
+}
 
 static inline int net_ListenUDP1 (vlc_object_t *obj, const char *host, int port)
 {
-	return net_ListenSingle (obj, host, port, AF_UNSPEC, SOCK_DGRAM, IPPROTO_UDP);
+    return net_ListenSingle (obj, host, port, AF_UNSPEC, SOCK_DGRAM, 0);
 }
 
 #define net_OpenDgram( a, b, c, d, e, g, h ) __net_OpenDgram(VLC_OBJECT(a), b, c, d, e, g, h)

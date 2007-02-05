@@ -52,6 +52,20 @@
 
 #include <vlc_network.h>
 
+#if defined (HAVE_NETINET_UDPLITE_H)
+# include <netinet/udplite.h>
+#elif defined (__linux__)
+# define UDPLITE_SEND_CSCOV     10
+# define UDPLITE_RECV_CSCOV     11
+#endif
+
+#ifndef IPPROTO_UDPLITE
+# define IPPROTO_UDPLITE 136 /* from IANA */
+#endif
+#ifndef SOL_UDPLITE
+# define SOL_UDPLITE IPPROTO_UDPLITE
+#endif
+
 #define MAX_EMPTY_BLOCKS 200
 
 #if defined(WIN32) || defined(UNDER_CE)
@@ -105,6 +119,8 @@ vlc_module_begin();
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );
     add_shortcut( "rtp" ); // Will work only with ts muxer
+    add_shortcut( "udplite" );
+    add_shortcut( "rtplite" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -180,7 +196,8 @@ static int Open( vlc_object_t *p_this )
 
     char                *psz_parser;
     char                *psz_dst_addr;
-    int                 i_dst_port;
+    int                 i_dst_port, proto = IPPROTO_UDP, cscov = 8;
+    const char          *protoname = "UDP";
 
     int                 i_handle;
 
@@ -199,14 +216,16 @@ static int Open( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof(sout_access_out_sys_t) );
     p_access->p_sys = p_sys;
 
-    if( p_access->psz_access != NULL &&
-        !strcmp( p_access->psz_access, "rtp" ) )
+    if( p_access->psz_access != NULL )
     {
-        p_sys->b_rtpts = 1;
-    }
-    else
-    {
-        p_sys->b_rtpts = 0;
+        if (strncmp (p_access->psz_access, "rtp", 3) == 0)
+        {
+            p_sys->b_rtpts = 1;
+            cscov += RTP_HEADER_LENGTH;
+        }
+        if ((strlen (p_access->psz_access) >= 3)
+         && (strcmp (p_access->psz_access + 3, "lite") == 0))
+            proto = IPPROTO_UDPLITE;
     }
 
     psz_parser = strdup( p_access->psz_name );
@@ -251,7 +270,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->p_fifo = block_FifoNew( p_access );
     p_sys->p_thread->p_empty_blocks = block_FifoNew( p_access );
 
-    i_handle = net_ConnectUDP( p_this, psz_dst_addr, i_dst_port, -1 );
+    i_handle = net_ConnectDgram( p_this, psz_dst_addr, i_dst_port, -1, proto );
     if( i_handle == -1 )
     {
          msg_Err( p_access, "failed to create UDP socket" );
@@ -260,6 +279,9 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_thread->i_handle = i_handle;
     net_StopRecv( i_handle );
+    if (proto == IPPROTO_UDPLITE)
+        setsockopt (i_handle, SOL_UDPLITE, UDPLITE_SEND_CSCOV,
+                    &cscov, sizeof (cscov));
 
     var_Get( p_access, SOUT_CFG_PREFIX "caching", &val );
     p_sys->p_thread->i_caching = (int64_t)val.i_int * 1000;

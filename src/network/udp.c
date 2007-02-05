@@ -511,13 +511,13 @@ int net_SetDSCP( int fd, uint8_t dscp )
 
 
 /*****************************************************************************
- * __net_ConnectUDP:
+ * __net_ConnectDgram:
  *****************************************************************************
- * Open a UDP socket to send data to a defined destination, with an optional
- * hop limit.
+ * Open a datagram socket to send data to a defined destination, with an
+ * optional hop limit.
  *****************************************************************************/
-int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
-                      int i_hlim )
+int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
+                        int i_hlim, int proto )
 {
     struct addrinfo hints, *res, *ptr;
     int             i_val, i_handle = -1;
@@ -546,7 +546,7 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
     {
         char *str;
         int fd = net_Socket (p_this, ptr->ai_family, ptr->ai_socktype,
-                             ptr->ai_protocol);
+                             proto ?: ptr->ai_protocol);
         if (fd == -1)
             continue;
 
