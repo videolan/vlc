@@ -45,8 +45,6 @@
 static void SigHandler  ( int i_signal );
 #endif
 
-extern void rootwrap( void );
-
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
  *****************************************************************************/
@@ -76,7 +74,7 @@ int main( int i_argc, char *ppsz_argv[] )
 #endif
 
 #if defined (HAVE_GETEUID) && !defined (SYS_BEOS)
-     rootwrap ();
+    /* FIXME: rootwrap (); */
 #endif
 
     /* Create a libvlc structure */
