@@ -267,7 +267,7 @@ static void Run( intf_thread_t *p_intf )
             cl = malloc( sizeof( telnet_client_t ));
             if( cl )
             {
-                char   *psz_pwd = strdup( _("Password") );
+                char   *psz_pwd = strdup( "Password" );
                 char   *psz_tmp = NULL;
                 size_t ctrl_len = strlen( ": \xff\xfb\x01" );
                 size_t passwd_len = strlen( psz_pwd );
@@ -395,7 +395,7 @@ static void Run( intf_thread_t *p_intf )
 
                 if( (cl->p_buffer_read - cl->buffer_read) == 999 )
                 {
-                    Write_message( cl, NULL, _( "Line too long\r\n" ),
+                    Write_message( cl, NULL, "Line too long\r\n",
                                    cl->i_mode + 2 );
                 }
 
@@ -425,7 +425,7 @@ static void Run( intf_thread_t *p_intf )
                 *cl->p_buffer_read = '\0';
                 if( strcmp( psz_password, cl->buffer_read ) == 0 )
                 {
-                    char *psz_welcome = strdup( _("Welcome, Master") );
+                    char *psz_welcome = strdup( "Welcome, Master" );
                     char *psz_tmp = NULL;
                     size_t welcome_len = strlen( psz_welcome );
                     size_t ctrl_len = strlen("\xff\xfc\x01\r\n");
@@ -448,7 +448,7 @@ static void Run( intf_thread_t *p_intf )
                 {
                     /* wrong password */
                     Write_message( cl, NULL,
-                                   _( "\r\nWrong password.\r\nPassword: " ),
+                                   "\r\nWrong password.\r\nPassword: ",
                                    WRITE_MODE_PWD );
                 }
             }
