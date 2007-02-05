@@ -136,7 +136,8 @@ static int Open( vlc_object_t *p_this )
     int  i_bind_port, i_server_port = 0;
     int fam = AF_UNSPEC, proto = IPPROTO_UDP, cscov = 8;
 
-    if (strlen (p_access->psz_access) >= 4)
+    if (strlen (p_access->psz_access) >= 3)
+    {
         switch (p_access->psz_access[3])
         {
             case '4':
@@ -147,9 +148,10 @@ static int Open( vlc_object_t *p_this )
                 fam = AF_INET6;
                 break;
         }
-    if (strcmp (p_access->psz_access + 3, "lite") == 0)
-        proto = IPPROTO_UDPLITE;
-    if (strncmp (p_access->psz_access, "rtp", 3) == 0)
+        if (strcmp (p_access->psz_access + 3, "lite") == 0)
+            proto = IPPROTO_UDPLITE;
+   }
+   if (strncmp (p_access->psz_access, "rtp", 3) == 0)
         /* Checksum coverage: RTP header is AT LEAST 12 bytes
          * in addition to UDP header (8 bytes) */
         cscov += 12;
