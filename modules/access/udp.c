@@ -209,7 +209,7 @@ static int Open( vlc_object_t *p_this )
     MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
 
     p_sys->fd = net_OpenDgram( p_access, psz_bind_addr, i_bind_port,
-                               psz_server_addr, i_server_port, fam, SOCK_DGRAM, proto );
+                               psz_server_addr, i_server_port, fam, proto );
     free (psz_name);
     if( p_sys->fd == -1 )
     {
