@@ -35,6 +35,21 @@
 #include <vlc_access.h>
 #include <vlc_network.h>
 
+#if defined (HAVE_NETINET_UDPLITE_H)
+# include <netinet/udplite.h>
+#elif defined (__linux__)
+# define UDPLITE_SEND_CSCOV     10
+# define UDPLITE_RECV_CSCOV     11
+#endif
+
+#ifndef IPPROTO_UDPLITE
+# define IPPROTO_UDPLITE 136 /* from IANA */
+#endif
+#ifndef SOL_UDPLITE
+# define SOL_UDPLITE IPPROTO_UDPLITE
+#endif
+
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -77,6 +92,9 @@ vlc_module_begin();
     add_shortcut( "rtp" );
     add_shortcut( "rtp4" );
     add_shortcut( "rtp6" );
+    add_shortcut( "udplite" );
+    add_shortcut( "rtplite" );
+
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -116,34 +134,25 @@ static int Open( vlc_object_t *p_this )
     char *psz_parser;
     const char *psz_server_addr, *psz_bind_addr = "";
     int  i_bind_port, i_server_port = 0;
+    int fam = AF_UNSPEC, proto = IPPROTO_UDP, cscov = 8;
 
-    /* First set ipv4/ipv6 */
-    var_Create( p_access, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_access, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-
-    if( *p_access->psz_access )
-    {
-        vlc_value_t val;
-        /* Find out which shortcut was used */
-        if( !strncmp( p_access->psz_access, "udp4", 6 ) ||
-            !strncmp( p_access->psz_access, "rtp4", 6 ))
+    if (strlen (p_access->psz_access) >= 4)
+        switch (p_access->psz_access[3])
         {
-            val.b_bool = VLC_TRUE;
-            var_Set( p_access, "ipv4", val );
+            case '4':
+                fam = AF_INET;
+                break;
 
-            val.b_bool = VLC_FALSE;
-            var_Set( p_access, "ipv6", val );
+            case '6':
+                fam = AF_INET6;
+                break;
         }
-        else if( !strncmp( p_access->psz_access, "udp6", 6 ) ||
-                 !strncmp( p_access->psz_access, "rtp6", 6 ) )
-        {
-            val.b_bool = VLC_TRUE;
-            var_Set( p_access, "ipv6", val );
-
-            val.b_bool = VLC_FALSE;
-            var_Set( p_access, "ipv4", val );
-        }
-    }
+    if (strcmp (p_access->psz_access + 3, "lite") == 0)
+        proto = IPPROTO_UDPLITE;
+    if (strncmp (p_access->psz_access, "rtp", 3) == 0)
+        /* Checksum coverage: RTP header is AT LEAST 12 bytes
+         * in addition to UDP header (8 bytes) */
+        cscov += 12;
 
     i_bind_port = var_CreateGetInteger( p_access, "server-port" );
 
@@ -195,18 +204,22 @@ static int Open( vlc_object_t *p_this )
     p_access->info.b_prebuffered = VLC_FALSE;
     MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
 
-    p_sys->fd = net_OpenUDP( p_access, psz_bind_addr, i_bind_port,
-                                      psz_server_addr, i_server_port );
-    if( p_sys->fd < 0 )
+    p_sys->fd = net_Open( p_access, psz_bind_addr, i_bind_port,
+                          psz_server_addr, i_server_port, fam, SOCK_DGRAM, proto );
+    free (psz_name);
+    if( p_sys->fd == -1 )
     {
         msg_Err( p_access, "cannot open socket" );
-        free( psz_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
-    free( psz_name );
 
     net_StopSend( p_sys->fd );
+
+#ifdef UDPLITE_RECV_CSCOV
+    if (proto == IPPROTO_UDPLITE)
+        setsockopt (p_sys->fd, SOL_UDPLITE, UDPLITE_RECV_CSCOV, &cscov, sizeof (cscov));
+#endif
 
     /* FIXME */
     p_sys->i_mtu = var_CreateGetInteger( p_access, "mtu" );

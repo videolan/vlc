@@ -618,25 +618,27 @@ int __net_ConnectUDP( vlc_object_t *p_this, const char *psz_host, int i_port,
 
 
 /*****************************************************************************
- * __net_OpenUDP:
+ * __net_OpenDgram:
  *****************************************************************************
- * Open a UDP connection and return a handle
+ * OpenDgram a datagram socket and return a handle
  *****************************************************************************/
-int __net_OpenUDP( vlc_object_t *obj, const char *psz_bind, int i_bind,
-                   const char *psz_server, int i_server )
+int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
+                     const char *psz_server, int i_server,
+                     int family, int protocol )
 {
     struct addrinfo hints, *loc, *rem;
     int val;
 
     if( !*psz_server )
-        return net_ListenUDP1 (obj, psz_bind, i_bind);
+        return net_ListenSingle (obj, psz_bind, i_bind,
+                                 family, SOCK_DGRAM, protocol);
 
     msg_Dbg( obj, "net: connecting to [%s]:%d from [%s]:%d",
              psz_server, i_server, psz_bind, i_bind );
 
     memset (&hints, 0, sizeof (hints));
+    hints.ai_family = family;
     hints.ai_socktype = SOCK_DGRAM;
-    hints.ai_protocol = IPPROTO_UDP;
     hints.ai_flags = AI_PASSIVE;
 
     val = vlc_getaddrinfo (obj, psz_server, i_server, &hints, &rem);
@@ -659,7 +661,7 @@ int __net_OpenUDP( vlc_object_t *obj, const char *psz_bind, int i_bind,
     for (struct addrinfo *ptr = loc; ptr != NULL; ptr = ptr->ai_next)
     {
         int fd = net_Socket (obj, ptr->ai_family, ptr->ai_socktype,
-                             ptr->ai_protocol);
+                             protocol ?: ptr->ai_protocol);
         if (fd == -1)
             continue; // usually, address family not supported
 

@@ -91,8 +91,8 @@ static inline int net_ListenUDP1 (vlc_object_t *obj, const char *host, int port)
 	return net_ListenSingle (obj, host, port, AF_UNSPEC, SOCK_DGRAM, IPPROTO_UDP);
 }
 
-#define net_OpenUDP(a, b, c, d, e ) __net_OpenUDP(VLC_OBJECT(a), b, c, d, e)
-VLC_EXPORT( int, __net_OpenUDP, ( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server ) );
+#define net_OpenDgram( a, b, c, d, e, g, h ) __net_OpenDgram(VLC_OBJECT(a), b, c, d, e, g, h)
+VLC_EXPORT( int, __net_OpenDgram, ( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server, int family, int proto ) );
 
 VLC_EXPORT( void, net_Close, ( int fd ) );
 VLC_EXPORT( void, net_ListenClose, ( int *fd ) );

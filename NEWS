@@ -28,6 +28,9 @@ Playlist:
     * Shoutcast TV listings
     * Audioscrobbler/last.fm support
 
+Input/Demuxers:
+  * Support for UDP-Lite (requires OS support) for UDP-Raw and RTP
+
 Decoders:
  * VP60/VP61 codecs support
 
