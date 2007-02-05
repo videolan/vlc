@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>389</height>
+    <width>426</width>
+    <height>429</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -20,6 +20,113 @@
     <number>6</number>
    </property>
    <item row="2" column="0" >
+    <widget class="QGroupBox" name="displayBox" >
+     <property name="title" >
+      <string>Display</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="2" >
+       <widget class="QCheckBox" name="windowDecorations" >
+        <property name="text" >
+         <string>Window decorations</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+        <property name="tristate" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QCheckBox" name="fullscreen" >
+        <property name="text" >
+         <string>Fullscreen</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QCheckBox" name="alwaysOnTop" >
+        <property name="text" >
+         <string>Always on top</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="2" >
+       <widget class="QComboBox" name="outputModule" />
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Output</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QCheckBox" name="overlay" >
+        <property name="text" >
+         <string>Accelerated video output</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+        <property name="tristate" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QCheckBox" name="skipFrames" >
+        <property name="text" >
+         <string>Skip Frames</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" >
+    <widget class="QGroupBox" name="directXBox" >
+     <property name="title" >
+      <string>DirectX</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="1" colspan="2" >
+       <widget class="QComboBox" name="displayDevice" />
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>Display Device</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QCheckBox" name="wallpaperMode" >
+        <property name="text" >
+         <string>Enable Wallpaper Mode</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0" >
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
       <string>Video snapshots</string>
@@ -56,7 +163,11 @@
        </widget>
       </item>
       <item row="1" column="1" >
-       <widget class="QLineEdit" name="snapshotsPrefix" />
+       <widget class="QLineEdit" name="snapshotsPrefix" >
+        <property name="text" >
+         <string>vlc-snap</string>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0" >
        <widget class="QLabel" name="label_3" >
@@ -78,65 +189,31 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
-      <string>Display</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item row="2" column="1" colspan="2" >
-       <widget class="QComboBox" name="outputModule" />
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
-         <string>Output</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="2" >
-       <widget class="QCheckBox" name="fullscreen" >
-        <property name="text" >
-         <string>Fullscreen</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" >
-       <widget class="QCheckBox" name="windowDecorations" >
-        <property name="text" >
-         <string>Window decorations</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" colspan="2" >
-       <widget class="QCheckBox" name="alwaysOnTop" >
-        <property name="text" >
-         <string>Always on top</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2" >
-       <widget class="QCheckBox" name="overlay" >
-        <property name="text" >
-         <string>Accelerated video output</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
    <item row="0" column="0" >
     <widget class="QCheckBox" name="enableVideo" >
      <property name="text" >
       <string>Enable video</string>
      </property>
+     <property name="checked" >
+      <bool>true</bool>
+     </property>
     </widget>
+   </item>
+   <item row="1" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>7</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
