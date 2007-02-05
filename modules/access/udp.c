@@ -2,12 +2,14 @@
  * udp.c: raw UDP & RTP input module
  *****************************************************************************
  * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2007 Remi Denis-Courmont
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
+ *          Remi Denis-Courmont
  *
  * Reviewed: 23 October 2003, Jean-Paul Saman <jpsaman _at_ videolan _dot_ org>
  *
@@ -206,8 +208,8 @@ static int Open( vlc_object_t *p_this )
     p_access->info.b_prebuffered = VLC_FALSE;
     MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
 
-    p_sys->fd = net_Open( p_access, psz_bind_addr, i_bind_port,
-                          psz_server_addr, i_server_port, fam, SOCK_DGRAM, proto );
+    p_sys->fd = net_OpenDgram( p_access, psz_bind_addr, i_bind_port,
+                               psz_server_addr, i_server_port, fam, SOCK_DGRAM, proto );
     free (psz_name);
     if( p_sys->fd == -1 )
     {
