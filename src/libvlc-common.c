@@ -1009,17 +1009,17 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
 
     if( config_GetInt( p_libvlc, "daemon" ) )
     {
-      psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
-      if( psz_pidfile != NULL )
-      {
-        msg_Dbg( p_libvlc, "removing pid file %s", psz_pidfile );
-        if( unlink( psz_pidfile ) == -1 )
+        psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
+        if( psz_pidfile != NULL )
         {
-          msg_Dbg( p_libvlc, "removing pid file %s: failed: %s",
-              psz_pidfile, strerror(errno) );
+            msg_Dbg( p_libvlc, "removing pid file %s", psz_pidfile );
+            if( unlink( psz_pidfile ) == -1 )
+            {
+                msg_Dbg( p_libvlc, "removing pid file %s: failed: %s",
+                        psz_pidfile, strerror(errno) );
+            }
         }
-      }
-      free ( psz_pidfile );
+        free ( psz_pidfile );
     }
 #endif
 
