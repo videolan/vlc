@@ -3641,7 +3641,7 @@ if test "${enable_x11}" != "no" &&
     VLC_ADD_PLUGINS([panoramix])
     VLC_ADD_LDFLAGS([panoramix],[${X_LIBS} ${X_PRE_LIBS} -lX11])
     VLC_ADD_CPPFLAGS([panoramix],[${X_CFLAGS}])
-    AC_CHECK_HEADERS(X11/Xext.h, [
+    AC_CHECK_LIB(Xext, XShmAttach, [
       VLC_ADD_PLUGINS([x11])
       VLC_ADD_LDFLAGS([x11],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
       VLC_ADD_CPPFLAGS([x11],[${X_CFLAGS}])
