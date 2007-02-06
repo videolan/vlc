@@ -51,6 +51,8 @@ static void Destroy   ( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
 
+#define FILTER_PREFIX "sharpen-"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -65,6 +67,10 @@ vlc_module_begin();
     add_shortcut( "sharpen" );
     set_callbacks( Create, Destroy );
 vlc_module_end();
+
+static const char *ppsz_filter_options[] = {
+    "sigma", NULL
+};
 
 /*****************************************************************************
  * filter_sys_t: Sharpen video filter descriptor
@@ -105,7 +111,13 @@ static int Create( vlc_object_t *p_this )
 
     p_filter->pf_video_filter = Filter;
 
-    p_filter->p_sys->f_sigma = var_GetFloat(p_this, "sharpen-sigma");
+    config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
+                   p_filter->p_cfg );
+
+    var_Create( p_filter, FILTER_PREFIX "sigma",
+                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+
+    p_filter->p_sys->f_sigma = var_GetFloat(p_this, FILTER_PREFIX "sigma");
 
     return VLC_SUCCESS;
 }
