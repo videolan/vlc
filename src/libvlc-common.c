@@ -233,14 +233,14 @@ libvlc_int_t * libvlc_InternalCreate( void )
 int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
 {
     char         p_capabilities[200];
-    char *       p_tmp;
-    char *       psz_modules;
-    char *       psz_parser;
-    char *       psz_control;
+    char *       p_tmp = NULL;
+    char *       psz_modules = NULL;
+    char *       psz_parser = NULL;
+    char *       psz_control = NULL;
     vlc_bool_t   b_exit = VLC_FALSE;
     int          i_ret = VLC_EEXIT;
-    module_t    *p_help_module;
-    playlist_t  *p_playlist;
+    module_t    *p_help_module = NULL;
+    playlist_t  *p_playlist = NULL;
     vlc_value_t  val;
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
@@ -330,16 +330,19 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     if( p_libvlc->psz_userdir == NULL )
         p_libvlc->psz_userdir = strdup(p_libvlc->psz_homedir);
     p_libvlc->psz_configfile = config_GetPsz( p_libvlc, "config" );
-    if( p_libvlc->psz_configfile != NULL && p_libvlc->psz_configfile[0] == '~'
-         && p_libvlc->psz_configfile[1] == '/' )
+    if( (p_libvlc->psz_configfile != NULL) && (p_libvlc->psz_configfile[0] == '~')
+         && (p_libvlc->psz_configfile[1] == '/') )
     {
         char *psz = malloc( strlen(p_libvlc->psz_userdir)
                              + strlen(p_libvlc->psz_configfile) );
-        /* This is incomplete : we should also support the ~cmassiot/ syntax. */
-        sprintf( psz, "%s/%s", p_libvlc->psz_userdir,
-                               p_libvlc->psz_configfile + 2 );
-        free( p_libvlc->psz_configfile );
-        p_libvlc->psz_configfile = psz;
+        if( psz )
+        {
+            /* This is incomplete : we should also support the ~cmassiot/ syntax. */
+            sprintf( psz, "%s/%s", p_libvlc->psz_userdir,
+                                p_libvlc->psz_configfile + 2 );
+            free( p_libvlc->psz_configfile );
+            p_libvlc->psz_configfile = psz;
+        } /* else keep old config stuff */
     }
 
     /* Check for plugins cache options */
@@ -360,17 +363,17 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     if( config_GetInt( p_libvlc, "daemon" ) )
     {
 #if HAVE_DAEMON
+        char *psz_pidfile = NULL;
+
         if( daemon( 1, 0) != 0 )
         {
             msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
             b_exit = VLC_TRUE;
         }
-
         p_libvlc->p_libvlc_global->b_daemon = VLC_TRUE;
 
         /* lets check if we need to write the pidfile */
-        char * psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
-
+        psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
         if( psz_pidfile != NULL )
         {
             FILE *pidfile;
@@ -583,7 +586,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     if( config_GetInt( p_libvlc, "one-instance" ) )
     {
         /* Initialise D-Bus interface, check for other instances */
-        DBusConnection  *p_conn;
+        DBusConnection  *p_conn = NULL;
         DBusError       dbus_error;
 
         dbus_error_init( &dbus_error );
@@ -601,7 +604,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
             /* check if a Media Player is available
              * if not: D-Bus control is not enabled on the other
              * instance and we can't pass MRLs to it */
-            DBusMessage *p_test_msg, *p_test_reply;
+            DBusMessage *p_test_msg = NULL;
+            DBusMessage *p_test_reply = NULL;
             p_test_msg =  dbus_message_new_method_call(
                     "org.freedesktop.MediaPlayer", "/",
                     "org.freedesktop.MediaPlayer", "Identity" );
@@ -617,14 +621,14 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
             }
             else
             {
+                int i_input;
+                DBusMessage* p_dbus_msg = NULL;
+                DBusMessageIter dbus_args;
+                DBusPendingCall* p_dbus_pending = NULL;
+                dbus_bool_t b_play;
+
                 dbus_message_unref( p_test_reply );
                 msg_Warn( p_libvlc, "Another Media Player is running. Exiting");
-
-                int i_input;
-                DBusMessage* p_dbus_msg;
-                DBusMessageIter dbus_args;
-                DBusPendingCall* p_dbus_pending;
-                dbus_bool_t b_play;
 
                 for( i_input = optind;i_input < i_argc;i_input++ )
                 {
@@ -717,8 +721,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
      * Output messages that may still be in the queue
      */
     msg_Flush( p_libvlc );
-
-    /* p_libvlc initialization. FIXME ? */
 
     if( !config_GetInt( p_libvlc, "fpu" ) )
         libvlc_global.i_cpu &= ~CPU_CAPABILITY_FPU;
@@ -877,7 +879,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     if( config_GetInt( p_libvlc, "syslog" ) == 1 )
     {
         const char *psz_logmode = "logmode=syslog";
-        libvlc_InternalAddIntf( 0, "logger,none", VLC_FALSE, VLC_FALSE,
+        libvlc_InternalAddIntf( p_libvlc, "logger,none", VLC_FALSE, VLC_FALSE,
                                 1, &psz_logmode );
     }
 #endif
@@ -934,10 +936,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
  */
 int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 {
-    intf_thread_t      * p_intf;
-    vout_thread_t      * p_vout;
-    aout_instance_t    * p_aout;
-    announce_handler_t * p_announce;
+    intf_thread_t      * p_intf = NULL;
+    vout_thread_t      * p_vout = NULL;
+    aout_instance_t    * p_aout = NULL;
+    announce_handler_t * p_announce = NULL;
 
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
@@ -947,6 +949,7 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         vlc_object_detach( p_intf );
         vlc_object_release( p_intf );
         intf_Destroy( p_intf );
+        p_intf = NULL;
     }
 
     /* Free playlist */
@@ -1059,7 +1062,10 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
                             int i_options, const char *const *ppsz_options )
 {
     int i_err;
-    intf_thread_t *p_intf;
+    intf_thread_t *p_intf = NULL;
+
+    if( !p_libvlc )
+        return VLC_EGENERIC;
 
 #ifndef WIN32
     if( p_libvlc->p_libvlc_global->b_daemon && b_block && !psz_module )
@@ -1075,7 +1081,6 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
     /* Try to create the interface */
     p_intf = intf_Create( p_libvlc, psz_module ? psz_module : "$intf",
                           i_options, ppsz_options );
-
     if( p_intf == NULL )
     {
         msg_Err( p_libvlc, "interface \"%s\" initialization failed",
@@ -1095,11 +1100,11 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
     {
         vlc_object_detach( p_intf );
         intf_Destroy( p_intf );
+        p_intf = NULL;
         return i_err;
     }
     return VLC_SUCCESS;
 };
-
 
 /*****************************************************************************
  * SetLanguage: set the interface language.
@@ -1113,7 +1118,7 @@ static void SetLanguage ( char const *psz_lang )
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 
-    const char *          psz_path;
+    const char *    psz_path = NULL;
 #if defined( __APPLE__ ) || defined ( WIN32 ) || defined( SYS_BEOS )
     char            psz_tmp[1024];
 #endif
@@ -1274,7 +1279,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 #else
 #   define OPTION_VALUE_SEP " "
 #endif
-    vlc_list_t *p_list;
+    vlc_list_t *p_list = NULL;
     char psz_spaces_text[PADDING_SPACES+LINE_START+1];
     char psz_spaces_longtext[LINE_START+3];
     char psz_format[sizeof(FORMAT_STRING)];
@@ -1300,8 +1305,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     {
         vlc_bool_t b_help_module;
         module_t *p_parser = (module_t *)p_list->p_values[i_index].p_object;
-        module_config_t *p_item,
-                        *p_end = p_parser->p_config + p_parser->confsize;
+        module_config_t *p_item = NULL;
+        module_config_t *p_end = p_parser->p_config + p_parser->confsize;
 
         if( psz_module_name && strcmp( psz_module_name,
                                        p_parser->psz_object_name ) )
@@ -1548,8 +1553,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
  *****************************************************************************/
 static void ListModules( libvlc_int_t *p_this )
 {
-    vlc_list_t *p_list;
-    module_t *p_parser;
+    vlc_list_t *p_list = NULL;
+    module_t *p_parser = NULL;
     char psz_spaces[22];
     int i_index;
 
@@ -1624,7 +1629,7 @@ static void Version( void )
 static void ShowConsole( vlc_bool_t b_dofile )
 {
 #   ifndef UNDER_CE
-    FILE *f_help;
+    FILE *f_help = NULL;
 
     if( getenv( "PWD" ) && getenv( "PS1" ) ) return; /* cygwin shell */
 
@@ -1639,7 +1644,6 @@ static void ShowConsole( vlc_bool_t b_dofile )
         freopen( "vlc-help.txt", "wt", stdout );
         utf8_fprintf( stderr, _("\nDumped content to vlc-help.txt file.\n") );
     }
-
     else freopen( "CONOUT$", "w", stdout );
 
 #   endif
@@ -1677,8 +1681,9 @@ static int ConsoleWidth( void )
     int i_width = 80;
 
 #ifndef WIN32
-    char buf[20], *psz_parser;
-    FILE *file;
+    char buf[20];
+    char *psz_parser = NULL;
+    FILE *file = NULL;
     int i_ret;
 
     file = popen( "stty size 2>/dev/null", "r" );
@@ -1726,16 +1731,16 @@ static int VerboseCallback( vlc_object_t *p_this, const char *psz_variable,
 static void InitDeviceValues( libvlc_int_t *p_vlc )
 {
 #ifdef HAVE_HAL
-    LibHalContext * ctx;
+    LibHalContext * ctx = NULL;
     int i, i_devices;
-    char **devices;
-    char *block_dev;
+    char **devices = NULL;
+    char *block_dev = NULL;
     dbus_bool_t b_dvd;
     DBusConnection *p_connection = NULL;
     DBusError       error;
 
 #ifdef HAVE_HAL_1
-    ctx =  libhal_ctx_new();
+    ctx = libhal_ctx_new();
     if( !ctx ) return;
     dbus_error_init( &error );
     p_connection = dbus_bus_get ( DBUS_BUS_SYSTEM, &error );
