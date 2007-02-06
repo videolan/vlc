@@ -189,7 +189,7 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/fs_background.png \
 	extras/MacOSX/fullscreen_panel.svg \
 	extras/MacOSX/ub.sh \
-	extras/MacOSX/vlc.pbproj/project.pbxproj \
+	extras/MacOSX/vlc.xcodeproj/project.pbxproj \
 	extras/MacOSX/Delete_Preferences.app/Contents/Info.plist \
 	extras/MacOSX/Delete_Preferences.app/Contents/PkgInfo \
 	extras/MacOSX/Delete_Preferences.app/Contents/MacOS/applet \
