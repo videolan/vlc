@@ -5,14 +5,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>685</width>
-    <height>565</height>
+    <width>475</width>
+    <height>597</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" >
+  <layout class="QVBoxLayout" >
    <property name="margin" >
     <number>9</number>
    </property>
@@ -20,191 +20,282 @@
     <number>6</number>
    </property>
    <item>
-    <layout class="QGridLayout" >
-     <property name="margin" >
-      <number>0</number>
+    <widget class="QCheckBox" name="enableAudio" >
+     <property name="text" >
+      <string>Enable audio</string>
      </property>
-     <property name="spacing" >
-      <number>6</number>
+     <property name="checked" >
+      <bool>true</bool>
      </property>
-     <item row="2" column="1" >
-      <widget class="QSlider" name="defaultVolume" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>1</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize" >
-        <size>
-         <width>200</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0" colspan="2" >
-      <widget class="QGroupBox" name="groupBox_2" >
-       <property name="title" >
-        <string>Output</string>
-       </property>
-       <layout class="QGridLayout" >
-        <property name="margin" >
-         <number>9</number>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3" >
+     <property name="title" >
+      <string>General Audio</string>
+     </property>
+     <widget class="QSlider" name="defaultVolume" >
+      <property name="geometry" >
+       <rect>
+        <x>250</x>
+        <y>60</y>
+        <width>200</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="sizePolicy" >
+       <sizepolicy>
+        <hsizetype>1</hsizetype>
+        <vsizetype>0</vsizetype>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize" >
+       <size>
+        <width>200</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="orientation" >
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2" >
+      <property name="geometry" >
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>249</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text" >
+       <string>Default volume</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox" >
+      <property name="geometry" >
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>231</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text" >
+       <string>Use S/PDIF when available</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="preferredAudioLanguage" >
+      <property name="geometry" >
+       <rect>
+        <x>250</x>
+        <y>20</y>
+        <width>200</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="sizePolicy" >
+       <sizepolicy>
+        <hsizetype>1</hsizetype>
+        <vsizetype>0</vsizetype>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize" >
+       <size>
+        <width>300</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8" >
+      <property name="geometry" >
+       <rect>
+        <x>10</x>
+        <y>120</y>
+        <width>249</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text" >
+       <string>Force detection of Dolby Surround</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="preferredAudioLanguage_2" >
+      <property name="geometry" >
+       <rect>
+        <x>250</x>
+        <y>120</y>
+        <width>200</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="sizePolicy" >
+       <sizepolicy>
+        <hsizetype>1</hsizetype>
+        <vsizetype>0</vsizetype>
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize" >
+       <size>
+        <width>300</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="currentIndex" >
+       <number>-1</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label" >
+      <property name="geometry" >
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>249</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="text" >
+       <string>Preferred audio language</string>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
+      <string>Output</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="3" column="2" >
+       <widget class="QPushButton" name="fileBrowseButton" >
+        <property name="text" >
+         <string>Browse</string>
         </property>
-        <property name="spacing" >
-         <number>6</number>
+       </widget>
+      </item>
+      <item row="4" column="2" >
+       <widget class="QPushButton" name="fileBrowseButton_2" >
+        <property name="text" >
+         <string>Browse</string>
         </property>
-        <item row="0" column="1" >
-         <widget class="QComboBox" name="outputModule" />
-        </item>
-        <item row="2" column="1" >
-         <widget class="QSpinBox" name="directXDevice" >
-          <property name="maximumSize" >
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" >
-         <widget class="QLineEdit" name="lineEdit" />
-        </item>
-        <item row="0" column="0" >
-         <widget class="QLabel" name="label_3" >
-          <property name="text" >
-           <string>Type</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" >
-         <widget class="QLabel" name="label_4" >
-          <property name="text" >
-           <string>Device</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1" >
-         <widget class="QComboBox" name="alsaDevice" />
-        </item>
-        <item row="2" column="0" >
-         <widget class="QLabel" name="label_6" >
-          <property name="text" >
-           <string>Device</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" >
-         <widget class="QLabel" name="label_7" >
-          <property name="text" >
-           <string>File</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="1" column="0" >
-      <widget class="QLabel" name="label" >
-       <property name="text" >
-        <string>Preferred audio language</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1" >
-      <widget class="QComboBox" name="preferredAudioLanguage" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>1</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize" >
-        <size>
-         <width>300</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0" >
-      <widget class="QLabel" name="label_2" >
-       <property name="text" >
-        <string>Default volume</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0" >
-      <widget class="QCheckBox" name="enableAudio" >
-       <property name="text" >
-        <string>Enable audio</string>
-       </property>
-       <property name="checked" >
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0" colspan="2" >
-      <widget class="QGroupBox" name="groupBox" >
-       <property name="title" >
-        <string>Effects</string>
-       </property>
-       <layout class="QGridLayout" >
-        <property name="margin" >
-         <number>9</number>
+       </widget>
+      </item>
+      <item row="4" column="1" >
+       <widget class="QLineEdit" name="lineEdit" />
+      </item>
+      <item row="3" column="1" >
+       <widget class="QLineEdit" name="lineEdit_2" />
+      </item>
+      <item row="2" column="1" colspan="2" >
+       <widget class="QComboBox" name="alsaDevice_2" />
+      </item>
+      <item row="1" column="1" colspan="2" >
+       <widget class="QComboBox" name="alsaDevice" />
+      </item>
+      <item row="0" column="1" colspan="2" >
+       <widget class="QComboBox" name="outputModule" />
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>DirectX Device</string>
         </property>
-        <property name="spacing" >
-         <number>6</number>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Alsa Device</string>
         </property>
-        <item row="1" column="1" >
-         <widget class="QSlider" name="horizontalSlider" >
-          <property name="toolTip" >
-           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Type</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_9" >
+        <property name="text" >
+         <string>OSS Device</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>File</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Effects</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="1" >
+       <widget class="QSlider" name="horizontalSlider" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
 &lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Maximum volume when using the volume normalizer&lt;/p>&lt;/body>&lt;/html></string>
-          </property>
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" >
-         <widget class="QComboBox" name="visualisation" />
-        </item>
-        <item row="0" column="0" >
-         <widget class="QCheckBox" name="headphoneEffect" >
-          <property name="text" >
-           <string>Headphone surround effect</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" >
-         <widget class="QCheckBox" name="volumeNormalizer" >
-          <property name="text" >
-           <string>Volume normalizer</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" >
-         <widget class="QLabel" name="label_5" >
-          <property name="text" >
-           <string>Visualisation</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
+        </property>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QComboBox" name="visualisation" />
+      </item>
+      <item row="0" column="0" >
+       <widget class="QCheckBox" name="headphoneEffect" >
+        <property name="text" >
+         <string>Headphone surround effect</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QCheckBox" name="volumeNormalizer" >
+        <property name="text" >
+         <string>Volume normalizer</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>Visualisation</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>
