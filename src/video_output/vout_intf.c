@@ -858,7 +858,12 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
         goto initwsize_end;
     }
 
-    if( p_vout->fmt_in.i_sar_num >= p_vout->fmt_in.i_sar_den )
+    if( p_vout->fmt_in.i_sar_num == 0 || p_vout->fmt_in.i_sar_den == 0 ) {
+        msg_Warn( p_vout, "fucked up aspect" );
+        *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom / FP_FACTOR );
+        *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom /FP_FACTOR);
+    }
+    else if( p_vout->fmt_in.i_sar_num >= p_vout->fmt_in.i_sar_den )
     {
         *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom *
             p_vout->fmt_in.i_sar_num / p_vout->fmt_in.i_sar_den / FP_FACTOR );
