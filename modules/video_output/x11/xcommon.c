@@ -57,6 +57,7 @@
 #include <X11/Xmd.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
+#include <X11/XF86keysym.h>
 #ifdef HAVE_SYS_SHM_H
 #   include <X11/extensions/XShm.h>
 #endif
@@ -3048,6 +3049,13 @@ static struct
 
     { XK_Insert, KEY_INSERT },
     { XK_Delete, KEY_DELETE },
+    { XF86XK_AudioNext, KEY_MEDIA_NEXT_TRACK},
+    { XF86XK_AudioPrev, KEY_MEDIA_PREV_TRACK},
+    { XF86XK_AudioMute, KEY_VOLUME_MUTE },
+    { XF86XK_AudioLowerVolume, KEY_VOLUME_DOWN },
+    { XF86XK_AudioRaiseVolume, KEY_VOLUME_UP },
+    { XF86XK_AudioPlay, KEY_MEDIA_PLAY_PAUSE },
+    { XF86XK_AudioPause, KEY_MEDIA_PLAY_PAUSE },
 
     { 0, 0 }
 };
