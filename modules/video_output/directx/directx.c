@@ -857,6 +857,12 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
             return;
         }
         DirectXUnlockSurface( p_vout, p_pic );
+
+        /* if set, remove the black brush to avoid flickering in repaint operations */
+        if( 0UL != GetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND) )
+        {
+            SetClassLong(p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND, (ULONG)0UL);
+        }
     }
 }
 

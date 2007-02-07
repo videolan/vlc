@@ -624,6 +624,12 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     HRESULT hr = IDirect3DDevice9_Present(p_d3ddev, NULL, NULL, NULL, NULL);
     if( FAILED(hr) )
         msg_Dbg( p_vout, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+
+    /* if set, remove the black brush to avoid flickering in repaint operations */
+    if( 0UL != GetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND) )
+    {
+        SetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND, 0UL);
+    }
 }
 
 /*****************************************************************************
