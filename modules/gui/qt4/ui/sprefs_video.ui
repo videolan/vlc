@@ -1,4 +1,5 @@
 <ui version="4.0" >
+ <author>Jean-Baptiste Kempf</author>
  <class>SPrefsVideo</class>
  <widget class="QWidget" name="SPrefsVideo" >
   <property name="geometry" >
@@ -217,6 +218,7 @@
    </item>
   </layout>
  </widget>
+ <includes/>
  <resources/>
  <connections/>
 </ui>

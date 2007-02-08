@@ -20,6 +20,7 @@ TOUI = 	\
 	ui/open \
 	ui/main_interface \
 	ui/sprefs_audio \
+	ui/sprefs_input \
 	ui/sprefs_interface \
 	ui/sprefs_playlist \
 	ui/sprefs_subtitles \
@@ -175,6 +176,7 @@ EXTRA_DIST += \
 	ui/open.ui \
 	ui/main_interface.ui \
 	ui/sprefs_audio.ui \
+	ui/sprefs_input.ui \
 	ui/sprefs_interface.ui \
 	ui/sprefs_playlist.ui \
 	ui/sprefs_subtitles.ui \

@@ -1,11 +1,12 @@
 <ui version="4.0" >
+ <author>Jean-Baptiste Kempf</author>
  <class>SPrefsAudio</class>
  <widget class="QWidget" name="SPrefsAudio" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>475</width>
+    <width>418</width>
     <height>597</height>
    </rect>
   </property>
@@ -30,140 +31,122 @@
     </widget>
    </item>
    <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="title" >
       <string>General Audio</string>
      </property>
-     <widget class="QSlider" name="defaultVolume" >
-      <property name="geometry" >
-       <rect>
-        <x>250</x>
-        <y>60</y>
-        <width>200</width>
-        <height>16</height>
-       </rect>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
       </property>
-      <property name="sizePolicy" >
-       <sizepolicy>
-        <hsizetype>1</hsizetype>
-        <vsizetype>0</vsizetype>
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+      <property name="spacing" >
+       <number>6</number>
       </property>
-      <property name="maximumSize" >
-       <size>
-        <width>200</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="orientation" >
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_2" >
-      <property name="geometry" >
-       <rect>
-        <x>10</x>
-        <y>50</y>
-        <width>249</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text" >
-       <string>Default volume</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="checkBox" >
-      <property name="geometry" >
-       <rect>
-        <x>10</x>
-        <y>90</y>
-        <width>231</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text" >
-       <string>Use S/PDIF when available</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="preferredAudioLanguage" >
-      <property name="geometry" >
-       <rect>
-        <x>250</x>
-        <y>20</y>
-        <width>200</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="sizePolicy" >
-       <sizepolicy>
-        <hsizetype>1</hsizetype>
-        <vsizetype>0</vsizetype>
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize" >
-       <size>
-        <width>300</width>
-        <height>16777215</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_8" >
-      <property name="geometry" >
-       <rect>
-        <x>10</x>
-        <y>120</y>
-        <width>249</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="text" >
-       <string>Force detection of Dolby Surround</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="preferredAudioLanguage_2" >
-      <property name="geometry" >
-       <rect>
-        <x>250</x>
-        <y>120</y>
-        <width>200</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="sizePolicy" >
-       <sizepolicy>
-        <hsizetype>1</hsizetype>
-        <vsizetype>0</vsizetype>
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize" >
-       <size>
-        <width>300</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="currentIndex" >
-       <number>-1</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label" >
-      <property name="geometry" >
-       <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>249</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="text" >
-       <string>Preferred audio language</string>
-      </property>
-     </widget>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QLabel" name="label_8" >
+        <property name="text" >
+         <string>Force detection of Dolby Surround</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" >
+       <widget class="QComboBox" name="preferredAudioLanguage_2" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>3</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="currentIndex" >
+         <number>-1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="3" >
+       <widget class="QCheckBox" name="checkBox" >
+        <property name="text" >
+         <string>Use S/PDIF when available</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2" >
+       <widget class="QComboBox" name="preferredAudioLanguage" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Preferred audio language</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QSlider" name="defaultVolume" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Default volume</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -178,12 +161,8 @@
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item row="3" column="2" >
-       <widget class="QPushButton" name="fileBrowseButton" >
-        <property name="text" >
-         <string>Browse</string>
-        </property>
-       </widget>
+      <item row="4" column="1" >
+       <widget class="QLineEdit" name="FileName" />
       </item>
       <item row="4" column="2" >
        <widget class="QPushButton" name="fileBrowseButton_2" >
@@ -192,14 +171,46 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1" >
-       <widget class="QLineEdit" name="lineEdit" />
+      <item row="4" column="0" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>File</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2" >
+       <widget class="QPushButton" name="OSSBrowse" >
+        <property name="text" >
+         <string>Browse</string>
+        </property>
+       </widget>
       </item>
       <item row="3" column="1" >
-       <widget class="QLineEdit" name="lineEdit_2" />
+       <widget class="QLineEdit" name="OSSDevice" />
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="OSSLabel" >
+        <property name="text" >
+         <string>OSS Device</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="DirectXLabel" >
+        <property name="text" >
+         <string>DirectX Device</string>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1" colspan="2" >
-       <widget class="QComboBox" name="alsaDevice_2" />
+       <widget class="QComboBox" name="DirectXDevice" />
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="alsaLabel" >
+        <property name="text" >
+         <string>Alsa Device</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="1" colspan="2" >
        <widget class="QComboBox" name="alsaDevice" />
@@ -207,38 +218,10 @@
       <item row="0" column="1" colspan="2" >
        <widget class="QComboBox" name="outputModule" />
       </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
-         <string>DirectX Device</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
-         <string>Alsa Device</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
          <string>Type</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="label_9" >
-        <property name="text" >
-         <string>OSS Device</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" >
-       <widget class="QLabel" name="label_7" >
-        <property name="text" >
-         <string>File</string>
         </property>
        </widget>
       </item>
@@ -299,6 +282,7 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
+ <includes/>
  <resources/>
  <connections/>
 </ui>

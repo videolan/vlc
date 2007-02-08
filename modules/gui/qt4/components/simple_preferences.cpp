@@ -43,6 +43,7 @@
 #include "pixmaps/video_50x50.xpm"
 
 #include "ui/sprefs_audio.h"
+#include "ui/sprefs_input.h"
 #include "ui/sprefs_video.h"
 #include "ui/sprefs_subtitles.h"
 #include "ui/sprefs_playlist.h"
