@@ -751,3 +751,8 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 < Dnumgis> Foxdie: as a matter of fact all streaming related support requests here should be formulated as follows: "I'm a nice looking girl that have problems making my live webcam work"
   -- #videolan
 %
+<DrkMatter> Working with video and audio coding/decoding is one of the most
+            tiresome, confusing experience I've ever had.
+<sam> try anal sex next time
+  -- #videolan
+%
