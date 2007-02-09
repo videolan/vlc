@@ -285,6 +285,14 @@ static void Close( vlc_object_t * );
 #define ASM_TEXT N_("CPU optimizations")
 #define ASM_LONGTEXT N_( "Use assembler CPU optimizations.")
 
+#define STAT_IN_TEXT N_("Statistics input file")
+#define STAT_IN_LONGTEXT N_( "Read rate-control stastics from provided file (for multi-pass " \
+    "encoding.")
+
+#define STAT_OUT_TEXT N_("Statistics output file")
+#define STAT_OUT_LONGTEXT N_( "Write rate-control stastics to provided file (for multi-pass " \
+    "encoding.")
+
 #define PSNR_TEXT N_("PSNR computation")
 #define PSNR_LONGTEXT N_( "Compute and print PSNR stats. This has no effect on " \
     "the actual encoding quality." )
@@ -587,6 +595,12 @@ vlc_module_begin();
               VERBOSE_LONGTEXT, VLC_FALSE );
 #endif
 
+    add_string( SOUT_CFG_PREFIX "stat-in", NULL, NULL, STAT_IN_TEXT,
+                STAT_IN_LONGTEXT, VLC_FALSE );
+
+    add_string( SOUT_CFG_PREFIX "stat-out", NULL, NULL, STAT_OUT_TEXT,
+                STAT_OUT_LONGTEXT, VLC_FALSE );
+
 vlc_module_end();
 
 /*****************************************************************************
@@ -602,7 +616,8 @@ static const char *ppsz_sout_options[] = {
     "pbratio", "psnr", "qblur", "qp", "qcomp", "qpstep", "qpmax", "qpmin",
     "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut", "sps-id",
     "ssim", "subme", "subpel", "tolerance", "trellis", "verbose",
-    "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", NULL
+    "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "stat-in", "stat-out",
+    NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -1067,6 +1082,35 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_threads = p_enc->i_threads;
 #endif
 
+    /* Statistics input/output preferences */
+    var_Get( p_enc, SOUT_CFG_PREFIX "stat-in", &val );
+    if( val.psz_string && *val.psz_string )
+    {
+        p_sys->param.rc.b_stat_read = 1;
+        p_sys->param.rc.psz_stat_in = val.psz_string;
+        
+        msg_Dbg( p_enc, "Reading encoding statistics from \"%s\"\n",
+          p_sys->param.rc.psz_stat_in );
+    }
+    else
+    {
+        p_sys->param.rc.b_stat_read = 0;
+    }
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "stat-out", &val );
+    if( val.psz_string && *val.psz_string )
+    {
+        p_sys->param.rc.b_stat_write = 1;
+        p_sys->param.rc.psz_stat_out = val.psz_string;
+        
+        msg_Dbg( p_enc, "Writing encoding statistics to \"%s\"\n",
+          p_sys->param.rc.psz_stat_out );
+    }
+    else
+    {
+        p_sys->param.rc.b_stat_write = 0;
+    }
+
     /* Open the encoder */
     p_sys->h = x264_encoder_open( &p_sys->param );
 
@@ -1184,6 +1228,16 @@ static void Close( vlc_object_t *p_this )
 {
     encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
+    
+    if( p_sys->param.rc.b_stat_read )
+    {
+        free( p_sys->param.rc.psz_stat_in );
+    }
+    
+    if( p_sys->param.rc.b_stat_write )
+    {
+        free( p_sys->param.rc.psz_stat_out );
+    }
 
     x264_encoder_close( p_sys->h );
     free( p_sys->p_buffer );

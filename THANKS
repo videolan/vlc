@@ -149,11 +149,11 @@ Rene Gollent <rgollent at u.arizona.edu> - BeOS interface fix
 Rob Casey (rob dot casey AT swishgroup dot com dot au) - Amino RTSP fix
 Roine Gustafsson <roine at popstar.com> - spudec bug fixes
 Rudolf Cornelissen <rag.cornelissen at inter.nl.net> - BeOS fixes
-Saso Kiselkov <skiselkov _at_ gmail dot com> - RTSP session timeout fix for some STBs 
+Sašo Kiselkov <skiselkov _at_ gmail dot com> - RTSP session timeout fix for some STBs, multipass x264 patch
 Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX 
 improvements
 Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
-Simon Damkj�r Andersen <simondamkjaer at gmail.com> - playmode icons and the entire Fullscreen Panel design for the OSX GUI (v0.8.6)
+Simon Damkjær Andersen <simondamkjaer at gmail.com> - playmode icons and the entire Fullscreen Panel design for the OSX GUI (v0.8.6)
 Steve Lhomme <steve dot lhomme at free dot fr> - MSVC fixes and Matroska enhancements
 Steve Brown <sbrown at cortland.com> - fix for optional PES size bug
 Steven M. Schultz <sms at TO.GD-ES.COM> - BSD/OS port
