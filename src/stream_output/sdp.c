@@ -27,6 +27,8 @@
 # include <vlc_network.h>
 # include <vlc_charset.h>
 
+# include "stream_output.h"
+
 # define MAXSDPADDRESS 47
 
 static

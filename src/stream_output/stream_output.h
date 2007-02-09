@@ -101,3 +101,8 @@ int announce_UnRegister( announce_handler_t *p_announce,
 
 sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce );
 void announce_SAPHandlerDestroy( sap_handler_t *p_sap );
+
+char *StartSDP (const char *name,
+                const struct sockaddr *orig, socklen_t origlen,
+                const struct sockaddr *addr, socklen_t addrlen);
+
