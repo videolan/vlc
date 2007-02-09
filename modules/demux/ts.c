@@ -967,7 +967,7 @@ static int DemuxFile( demux_t *p_demux )
         p_pid = &p_sys->pid[ ((p_buffer[i_pos+1]&0x1f)<<8)|p_buffer[i_pos+2] ];
 
         /* Detect discontinuity indicator in adaptation field */
-        if( b_adaptation )
+        if( b_adaptation && p_buffer[i_pos + 4] > 0 )
         {
             if( p_buffer[i_pos+5]&0x80 )
                 msg_Warn( p_demux, "discontinuity indicator (pid=%d) ", p_pid->i_pid );
