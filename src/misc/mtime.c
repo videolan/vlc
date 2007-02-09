@@ -3,6 +3,7 @@
  * Functions are prototyped in vlc_mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright © 2006-2007 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -32,6 +33,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <time.h>                      /* clock_gettime(), clock_nanosleep() */
 #include <stdlib.h>                                               /* lldiv() */
+#include <assert.h>
 
 
 #if defined( PTH_INIT_IN_PTH_H )                                  /* GNU Pth */
@@ -386,3 +388,34 @@ mtime_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
 
     return p_date->date;
 }
+
+/**
+ * @return NTP 64-bits timestamp in host byte order.
+ */
+uint64_t NTPtime64 (void)
+{
+    struct timespec ts;
+#if defined (CLOCK_REALTIME)
+    clock_gettime (CLOCK_REALTIME, &ts);
+#else
+    {
+        struct timeval tv;
+        gettimeofday (&tv, NULL);
+        ts.tv_sec = tv.tv_sec;
+        ts.tv_nsec = tv.tv_usec * 1000;
+    }
+#endif
+
+    /* Convert nanoseconds to 32-bits fraction (232 picosecond units) */
+    uint64_t t = (uint64_t)(ts.tv_nsec) << 32;
+    t /= 1000000000;
+
+
+    /* There is 70 years (incl. 17 leap ones) offset to the Unix Epoch.
+     * No leap seconds during that period since they were not invented yet.
+     */
+    assert (t < 0x100000000);
+    t |= ((70LL * 365 + 17) * 24 * 60 * 60 + ts.tv_sec) << 32;
+    return t;
+}
+
