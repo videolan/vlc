@@ -381,6 +381,11 @@ function snapshot()
 {
     loadXMLDoc( 'requests/status.xml?command=snapshot', parse_status );
 }
+function hotkey( str )
+{
+    /* Use hotkey name (without the "key-" part) as the argument to simulate a hotkey press */
+    loadXMLDoc( 'requests/status.xml?command=key&val='+str, parse_status );
+}
 function update_status()
 {
     loadXMLDoc( 'requests/status.xml', parse_status );
