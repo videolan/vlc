@@ -72,6 +72,19 @@ struct sap_address_t
     int i_limit;
 };
 
+/* A SAP session descriptor, enqueued in the SAP handler queue */
+struct sap_session_t {
+    char          *psz_sdp;
+    uint8_t       *psz_data;
+    unsigned      i_length;
+    sap_address_t *p_address;
+    session_descriptor_t *p_sd;
+
+    /* Last and next send */
+    mtime_t        i_last;
+    mtime_t        i_next;
+};
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -252,7 +265,6 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         msg_Err( p_sap, "This should not happen. VLC needs fixing." );
         return VLC_EGENERIC;
     }
-
     /* Determine SAP multicast address automatically */
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_DGRAM;
@@ -296,7 +308,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                 /* SSM <=> ff3x::/32 */
                 b_ssm = (U32_AT (a6->s6_addr) & 0xfff0ffff) == 0xff300000;
 
-		/* force flags to zero, preserve scope */
+                /* force flags to zero, preserve scope */
                 a6->s6_addr[1] &= 0xf;
             }
             else
@@ -369,6 +381,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
 
     /* XXX: Check for dupes */
     p_sap_session = (sap_session_t*)malloc(sizeof(sap_session_t));
+    p_sap_session->p_sd = p_session;
     p_sap_session->p_address = NULL;
 
     /* Add the address to the buffer */
@@ -510,9 +523,6 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     msg_Dbg( p_sap,"%i addresses, %i sessions",
                    p_sap->i_addresses,p_sap->i_sessions);
 
-    /* Remember the SAP session for later deletion */
-    p_session->p_sap = p_sap_session;
-
     vlc_mutex_unlock( &p_sap->object_lock );
 
     return VLC_SUCCESS;
@@ -525,20 +535,21 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
     int i;
     vlc_mutex_lock( &p_sap->object_lock );
 
-    msg_Dbg( p_sap,"removing SAP announce %p",p_session->p_sap);
+    msg_Dbg( p_sap, "removing session %p from SAP", p_session);
 
     /* Dequeue the announce */
     for( i = 0; i< p_sap->i_sessions; i++)
     {
-        if( p_session->p_sap == p_sap->pp_sessions[i] )
+        if( p_session == p_sap->pp_sessions[i]->p_sd )
         {
+            sap_session_t *p_mysession = p_sap->pp_sessions[i];
             REMOVE_ELEM( p_sap->pp_sessions,
                          p_sap->i_sessions,
                          i );
 
-            FREENULL( p_session->p_sap->psz_sdp );
-            FREENULL( p_session->p_sap->psz_data );
-            free( p_session->p_sap );
+            free( p_mysession->psz_sdp );
+            free( p_mysession->psz_data );
+            free( p_mysession );
             break;
         }
     }

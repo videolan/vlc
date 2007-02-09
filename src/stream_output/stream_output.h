@@ -47,18 +47,6 @@ VLC_EXPORT( int,                sout_InputSendBuffer,  ( sout_packetizer_input_t
 
 /* Announce system */
 
-/* A SAP session descriptor, enqueued in the SAP handler queue */
-struct sap_session_t {
-    char          *psz_sdp;
-    uint8_t       *psz_data;
-    unsigned      i_length;
-    sap_address_t *p_address;
-
-    /* Last and next send */
-    mtime_t        i_last;
-    mtime_t        i_next;
-};
-
 /* The SAP handler, running in a separate thread */
 struct sap_handler_t
 {

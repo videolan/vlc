@@ -220,16 +220,8 @@ struct session_descriptor_t
 
     char *psz_group;
 
-    sap_session_t *p_sap; /* If we have a sap session, remember it */
     char *psz_sdp;
     vlc_bool_t b_rtp;
-};
-
-#define METHOD_TYPE_SAP 1
-
-struct announce_method_t
-{
-    int i_type;
 };
 
 VLC_EXPORT( int,                sout_AnnounceRegister, (sout_instance_t *,session_descriptor_t*, announce_method_t* ) );
@@ -238,7 +230,7 @@ VLC_EXPORT( int,                sout_AnnounceUnRegister, (sout_instance_t *,sess
 
 VLC_EXPORT(session_descriptor_t*,sout_AnnounceSessionCreate, (void) );
 VLC_EXPORT(void,                 sout_AnnounceSessionDestroy, (session_descriptor_t *) );
-VLC_EXPORT(announce_method_t*,   sout_AnnounceMethodCreate, (int) );
+VLC_EXPORT(announce_method_t*,   sout_SAPMethod, (void) );
 
 #ifdef __cplusplus
 }

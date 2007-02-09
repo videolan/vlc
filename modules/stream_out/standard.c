@@ -316,8 +316,7 @@ static int Open( vlc_object_t *p_this )
         ( strstr( psz_access, "udp" ) || strstr( psz_access , "rtp" ) ) )
     {
         session_descriptor_t *p_session = sout_AnnounceSessionCreate();
-        announce_method_t *p_method =
-            sout_AnnounceMethodCreate( METHOD_TYPE_SAP );
+        announce_method_t *p_method = sout_SAPMethod();
         vlc_url_t url;
 
         var_Get( p_stream, SOUT_CFG_PREFIX "name", &val );

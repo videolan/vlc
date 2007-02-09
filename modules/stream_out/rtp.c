@@ -1533,7 +1533,7 @@ static int SapSetup( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_instance_t   *p_sout = p_stream->p_sout;
-    announce_method_t *p_method = sout_AnnounceMethodCreate( METHOD_TYPE_SAP );
+    announce_method_t *p_method = sout_SAPMethod();
 
     /* Remove the previous session */
     if( p_sys->p_session != NULL)

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * announce.c : announce handler
  *****************************************************************************
- * Copyright (C) 2002-2004 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -31,6 +31,10 @@
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
 #include "stream_output.h"
+
+struct announce_method_t
+{
+} sap_method;
 
 /****************************************************************************
  * Sout-side functions
@@ -101,11 +105,6 @@ session_descriptor_t *sout_AnnounceRegisterSDP( sout_instance_t *p_sout,
             return NULL;
         }
         vlc_object_yield( p_announce );
-    }
-
-    if( p_method->i_type != METHOD_TYPE_SAP )
-    {
-        msg_Warn( p_sout, "forcing SAP announcement");
     }
 
     p_session = sout_AnnounceSessionCreate();
@@ -180,21 +179,11 @@ void sout_AnnounceSessionDestroy( session_descriptor_t *p_session )
 }
 
 /**
- * Create and initialize an announcement method structure
- *
- * \param i_type METHOD_TYPE_SAP
- * \return a new announce_method structure
+ * \return the SAP announce method
  */
-announce_method_t * sout_AnnounceMethodCreate( int i_type )
+announce_method_t * sout_SAPMethod (void)
 {
-    announce_method_t *p_method;
-
-    p_method = (announce_method_t *)malloc( sizeof(announce_method_t) );
-    if( p_method == NULL )
-        return NULL;
-
-    p_method->i_type = i_type;
-    return p_method;
+    return &sap_method;
 }
 
 /************************************************************************
@@ -233,12 +222,11 @@ announce_handler_t *__announce_HandlerCreate( vlc_object_t *p_this )
  */
 int announce_HandlerDestroy( announce_handler_t *p_announce )
 {
-
     if( p_announce->p_sap )
     {
-        p_announce->p_sap->b_die = VLC_TRUE;
+        ((vlc_object_t *)p_announce->p_sap)->b_die = VLC_TRUE;
         /* Wait for the SAP thread to exit */
-        vlc_thread_join( p_announce->p_sap );
+        vlc_thread_join( (vlc_object_t *)p_announce->p_sap );
         announce_SAPHandlerDestroy( p_announce->p_sap );
     }
 
@@ -255,7 +243,7 @@ int announce_Register( announce_handler_t *p_announce,
 {
 
     msg_Dbg( p_announce, "registering announce");
-    if( p_method->i_type == METHOD_TYPE_SAP )
+    if( p_method == &sap_method )
     {
         /* Do we already have a SAP announce handler ? */
         if( !p_announce->p_sap )
@@ -275,7 +263,7 @@ int announce_Register( announce_handler_t *p_announce,
     }
     else
     {
-        msg_Dbg( p_announce, "announce type unsupported" );
+        msg_Err( p_announce, "announce type unsupported" );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;;
@@ -287,14 +275,7 @@ int announce_UnRegister( announce_handler_t *p_announce,
                   session_descriptor_t *p_session )
 {
     msg_Dbg( p_announce, "unregistering announce" );
-    if( p_session->p_sap != NULL ) /* SAP Announce */
-    {
-        if( !p_announce->p_sap )
-        {
-            msg_Err( p_announce, "can't remove announce, no SAP handler");
-            return VLC_ENOOBJ;
-        }
+    if( p_announce->p_sap )
         p_announce->p_sap->pf_del( p_announce->p_sap, p_session );
-    }
     return VLC_SUCCESS;
 }
