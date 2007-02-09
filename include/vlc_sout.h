@@ -216,7 +216,6 @@ struct session_descriptor_t
     char *psz_name;
     char *psz_uri;
     int i_port;
-    int i_ttl;
     int i_payload;   /* SAP Payload type */
 
     char *psz_group;
