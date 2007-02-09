@@ -752,6 +752,11 @@ static void Run( intf_thread_t *p_intf )
         {
             checkUpdates( p_intf, psz_arg );
         }
+        else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
+        {
+            var_SetInteger( p_intf->p_libvlc, "key-pressed",
+                            config_GetInt( p_intf, psz_arg ) );
+        }
         else switch( psz_cmd[0] )
         {
         case 'f':
@@ -878,6 +883,7 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| vcrop [X]  . . . . . . . . .  set/get video crop"));
     msg_rc(_("| vzoom [X]  . . . . . . . . .  set/get video zoom"));
     msg_rc(_("| strack [X] . . . . . . . set/get subtitles track"));
+    msg_rc(_("| key [hotkey name]  . . . . simulate hotkey press"));
     msg_rc(_("| menu [on|off|up|down|left|right|select] use menu"));
     msg_rc(  "| ");
 
