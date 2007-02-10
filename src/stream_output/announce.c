@@ -266,7 +266,7 @@ int announce_Register( announce_handler_t *p_announce,
         msg_Err( p_announce, "announce type unsupported" );
         return VLC_EGENERIC;
     }
-    return VLC_SUCCESS;;
+    return VLC_SUCCESS;
 }
 
 
