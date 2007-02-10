@@ -21,15 +21,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-# include <vlc/vlc.h>
+#include <vlc/vlc.h>
 
-# include <string.h>
-# include <vlc_network.h>
-# include <vlc_charset.h>
+#include <string.h>
+#include <vlc_network.h>
+#include <vlc_charset.h>
 
-# include "stream_output.h"
+#include "stream_output.h"
 
-# define MAXSDPADDRESS 47
+#define MAXSDPADDRESS 47
 
 static
 char *AddressToSDP (const struct sockaddr *addr, socklen_t addrlen, char *buf)
@@ -68,35 +68,68 @@ char *AddressToSDP (const struct sockaddr *addr, socklen_t addrlen, char *buf)
 }
 
 
-char *StartSDP (const char *name,
+static vlc_bool_t IsSDPString (const char *str)
+{
+    if (strchr (str, '\r') != NULL)
+        return VLC_FALSE;
+    if (strchr (str, '\n') != NULL)
+        return VLC_FALSE;
+    if (!IsUTF8 (str))
+        return VLC_FALSE;
+    return VLC_TRUE;
+}
+
+
+char *StartSDP (const char *name, const char *description, const char *url,
+                const char *email, const char *phone,
                 const struct sockaddr *orig, socklen_t origlen,
                 const struct sockaddr *addr, socklen_t addrlen)
 {
     uint64_t t = NTPtime64 ();
     char *sdp, machine[MAXSDPADDRESS], conn[MAXSDPADDRESS];
+    const char *preurl = "\r\nu=", *premail = "\r\ne=", *prephone = "\r\np=";
 
-    if (strchr (name, '\r') || strchr (name, '\n') || !IsUTF8 (name)
+    if (name == NULL)
+        name = "Unnamed";
+    if (description == NULL)
+        description = "N/A";
+    if (url == NULL)
+        preurl = url = "";
+    if (email == NULL)
+        premail = email = "";
+    if (phone == NULL)
+        prephone = phone = "";
+
+    if (!IsSDPString (name) || !IsSDPString (description)
+     || !IsSDPString (url) || !IsSDPString (email) || !IsSDPString (phone)
      || (AddressToSDP ((struct sockaddr *)&orig, origlen, machine) == NULL)
      || (AddressToSDP ((struct sockaddr *)&addr, addrlen, conn) == NULL))
         return NULL;
 
-    if (asprintf (&sdp, "v=0\r\n"
-                        "o=- "I64Fu" "I64Fu" %s\r\n"
-                        "s=%s\r\n"
-                        "i=N/A\r\n" // must be there even if useless
-                        // no URL, email and phone here */
-                        "c=%s\r\n"
+    if (asprintf (&sdp, "v=0"
+                    "\r\no=- "I64Fu" "I64Fu" %s"
+                    "\r\ns=%s"
+                    "\r\ni=%s"
+                    "%s%s" // optional URL
+                    "%s%s" // optional email
+                    "%s%s" // optional phone number
+                    "\r\nc=%s"
                         // bandwidth not specified
-                        "t= 0 0" // one dummy time span
+                    "\r\nt= 0 0" // one dummy time span
                         // no repeating
                         // no time zone adjustment (silly idea anyway)
                         // no encryption key (deprecated)
-                        "a=tool:"PACKAGE_STRING"\r\n"
-                        "a=recvonly\r\n"
-                        "a=type:broadcast\r\n"
-                        "a=charset:UTF-8\r\n",
+                    "\r\na=tool:"PACKAGE_STRING
+                    "\r\na=recvonly"
+                    "\r\na=type:broadcast"
+                    "\r\na=charset:UTF-8"
+                    "\r\n",
                /* o= */ t, t, machine,
                /* s= */ name,
+               /* i= */ description,
+               /* u= */ preurl, url,
+               /* e= */ premail, email,
+               /* p= */ prephone, phone,
                /* c= */ conn) == -1)
         return NULL;
     return sdp;
