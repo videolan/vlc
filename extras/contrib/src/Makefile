@@ -613,7 +613,7 @@ DISTCLEAN_PKG += libvorbis-$(VORBIS_VERSION).tar.gz
 
 ifdef SVN
 tremor: 
-	$(SVN) co http://svn.xiph.org/trunk/Tremor tremor
+	$(SVN) export http://svn.xiph.org/trunk/Tremor tremor
 	(cd $@ && patch -p0 < ../Patches/tremor.patch)
 	(cd $@; rm -f ogg.h && echo "#include <ogg/ogg.h>" > ogg.h && rm -f os_types.h && echo "#include <ogg/os_types.h>" > os_types.h && ./autogen.sh)
 else
@@ -822,7 +822,7 @@ libebml-$(LIBEBML_VERSION).tar.bz2:
 
 ifdef SVN
 libebml:
-	$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libebml libebml
+	$(SVN) export http://svn.matroska.org/svn/matroska/trunk/libebml libebml
 else
 libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
@@ -861,7 +861,7 @@ libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
 
 ifdef SVN
 libmatroska:
-	$(SVN) co http://svn.matroska.org/svn/matroska/trunk/libmatroska libmatroska
+	$(SVN) export http://svn.matroska.org/svn/matroska/trunk/libmatroska libmatroska
 else
 libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
@@ -898,7 +898,7 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 # ***************************************************************************
 
 ffmpeg:
-	$(SVN) co $(FFMPEG_SVN)  ffmpeg
+	$(SVN) export $(FFMPEG_SVN)  ffmpeg
 ifeq ($(HOST),i586-pc-beos)
 	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-beos.patch)
 endif
@@ -946,7 +946,7 @@ libdvdcss-$(LIBDVDCSS_VERSION).tar.gz:
 
 ifdef SVN
 libdvdcss: 
-	$(SVN) co svn://svn.videolan.org/libdvdcss/trunk libdvdcss
+	$(SVN) export svn://svn.videolan.org/libdvdcss/trunk libdvdcss
 	cd $@ && sh bootstrap
 else
 libdvdcss: libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
@@ -1167,7 +1167,7 @@ DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 # ***************************************************************************
 
 libdca:
-	$(SVN) co $(LIBDCA_SVN) libdca
+	$(SVN) export $(LIBDCA_SVN) libdca
 	(cd $@; ./bootstrap)
 
 .libdca: libdca
@@ -1195,7 +1195,7 @@ x264-$(X264_VERSION).tar.gz:
 
 ifdef SVN
 x264: 
-	$(SVN) co svn://svn.videolan.org/x264/trunk/ x264
+	$(SVN) export svn://svn.videolan.org/x264/trunk/ x264
 ifdef HAVE_WIN32
 	(cd x264; patch -p0 < ../Patches/x264-svn-win32.patch )
 endif
@@ -1534,7 +1534,7 @@ DISTCLEAN_PKG += zvbi-$(ZVBI_VERSION).tar.bz2
 
 #ifdef SVN
 #libraw1394:
-#	$(SVN) co -r 325 $(LIBDC1394_SVN)/libraw1394/trunk/libraw1394  libraw1394
+#	$(SVN) export -r 325 $(LIBDC1394_SVN)/libraw1394/trunk/libraw1394  libraw1394
 #        (cd $<; libtoolize --copy --force; \
 #                autopoint -f; \
 #                aclocal -I extras/contrib/share/aclocal; \
@@ -1564,7 +1564,7 @@ DISTCLEAN_PKG += libraw1394-$(LIBRAW1394_VERSION).tar.gz
 
 #ifdef SVN
 #libdc1394:
-#	$(SVN) co -r 325 $(LIBDC1394_SVN)/libdc1394/trunk/libdc1394  libdc1394
+#	$(SVN) export -r 325 $(LIBDC1394_SVN)/libdc1394/trunk/libdc1394  libdc1394
 #        (cd $<; libtoolize --copy --force; \
 #                autopoint -f; \
 #                aclocal -I extras/contrib/share/aclocal; \
