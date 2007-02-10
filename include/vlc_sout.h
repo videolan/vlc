@@ -1,7 +1,7 @@
 /*****************************************************************************
  * stream_output.h : stream output module
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -69,11 +69,7 @@ struct sout_access_out_t
     VLC_COMMON_MEMBERS
 
     module_t                *p_module;
-
-    sout_instance_t         *p_sout;
-
     char                    *psz_access;
-    config_chain_t              *p_cfg;
 
     int                      i_writes;
     /** Local counter reset each time it is transferred to stats */
@@ -84,6 +80,10 @@ struct sout_access_out_t
     int                     (*pf_seek)( sout_access_out_t *, off_t );
     int                     (*pf_read)( sout_access_out_t *, block_t * );
     int                     (*pf_write)( sout_access_out_t *, block_t * );
+    int                     (*pf_control)( sout_access_out_t *, int, va_list);
+
+    config_chain_t              *p_cfg;
+    sout_instance_t         *p_sout;
 };
 
 VLC_EXPORT( sout_access_out_t *,sout_AccessOutNew, ( sout_instance_t *, char *psz_access, char *psz_name ) );
@@ -91,6 +91,7 @@ VLC_EXPORT( void,               sout_AccessOutDelete, ( sout_access_out_t * ) );
 VLC_EXPORT( int,                sout_AccessOutSeek,   ( sout_access_out_t *, off_t ) );
 VLC_EXPORT( int,                sout_AccessOutRead,   ( sout_access_out_t *, block_t * ) );
 VLC_EXPORT( int,                sout_AccessOutWrite,  ( sout_access_out_t *, block_t * ) );
+VLC_EXPORT( int,                sout_AccessOutControl,( sout_access_out_t *, int, va_list ) );
 
 /** Muxer structure */
 struct  sout_mux_t

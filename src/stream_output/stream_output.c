@@ -1,7 +1,7 @@
 /*****************************************************************************
  * stream_output.c : stream output module
  *****************************************************************************
- * Copyright (C) 2002-2004 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -299,6 +299,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
     p_access->pf_seek    = NULL;
     p_access->pf_read    = NULL;
     p_access->pf_write   = NULL;
+    p_access->pf_control = NULL;
     p_access->p_module   = NULL;
 
     p_access->i_writes = 0;
@@ -383,6 +384,15 @@ int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
         }
     }
     return p_access->pf_write( p_access, p_buffer );
+}
+
+/**
+ * sout_AccessOutControl
+ */
+int sout_AccessOutControl (sout_access_out_t *access, int query, va_list args)
+{
+    return (access->pf_control) ? access->pf_control (access, query, args)
+                                : VLC_EGENERIC;
 }
 
 /*****************************************************************************
