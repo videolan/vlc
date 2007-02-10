@@ -43,9 +43,6 @@
 #ifdef WIN32
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
-#   ifndef IN_MULTICAST
-#       define IN_MULTICAST(a) IN_CLASSD(a)
-#   endif
 #else
 #   include <sys/socket.h>
 #endif
