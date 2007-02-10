@@ -252,12 +252,18 @@ static int Open( vlc_object_t *p_this )
         i_dst_port = DEFAULT_PORT;
     }
 
+    if (var_Create (p_access, "dst-port", VLC_VAR_INTEGER)
+     || var_Create (p_access, "src-port", VLC_VAR_INTEGER)
+     || var_Create (p_access, "dst-addr", VLC_VAR_STRING)
+     || var_Create (p_access, "src-addr", VLC_VAR_STRING))
+        return VLC_ENOMEM;
+
     p_sys->p_thread =
         vlc_object_create( p_access, sizeof( sout_access_thread_t ) );
     if( !p_sys->p_thread )
     {
         msg_Err( p_access, "out of memory" );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     vlc_object_attach( p_sys->p_thread, p_access );
@@ -273,7 +279,23 @@ static int Open( vlc_object_t *p_this )
          msg_Err( p_access, "failed to create %s socket", protoname );
          return VLC_EGENERIC;
     }
+    else
+    {
+        char addr[NI_MAXNUMERICHOST];
+        int port;
 
+        if (net_GetSockAddress (i_handle, addr, &port) == 0)
+        {
+            var_SetString (p_access, "src-addr", addr);
+            var_SetInteger (p_access, "src-port", port);
+        }
+
+        if (net_GetPeerAddress (i_handle, addr, &port) == 0)
+        {
+            var_SetString (p_access, "dst-addr", addr);
+            var_SetInteger (p_access, "dst-port", port);
+        }
+    }
     p_sys->p_thread->i_handle = i_handle;
     net_StopRecv( i_handle );
 
