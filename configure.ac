@@ -3122,10 +3122,14 @@ AC_CHECK_HEADERS(sysfs/libsysfs.h, [
 dnl
 dnl skins2 module
 dnl
-AC_CHECK_HEADERS(libtar.h, [
-  VLC_ADD_LDFLAGS([skins2],[-ltar])
-] )
+AC_ARG_ENABLE(libtar,
+  [  --enable libtar support for skins2 (default enabled)])
 
+AS_IF([test "${enable_libtar}" != "no"],[
+  AC_CHECK_HEADERS(libtar.h, [
+    VLC_ADD_LDFLAGS([skins2],[-ltar])
+  ] )
+])
 
 
 dnl
@@ -3821,6 +3825,8 @@ dnl  SDL module
 dnl
 AC_ARG_ENABLE(sdl,
   [  --enable-sdl            SDL support (default enabled)])
+AC_ARG_ENABLE(sdl-image,
+  [  --enable-sdl-image            SDL image support (default enabled)])
 if test "${enable_sdl}" != "no"
 then
   SDL_PATH="${PATH}"
@@ -3874,21 +3880,23 @@ then
 Please install it and try again. Alternatively you can also configure with
 --disable-sdl.])
       ])])
-    AC_CHECK_HEADERS(${SDL_IMAGE}, [AC_DEFINE_UNQUOTED(SDL_IMAGE_INCLUDE_FILE,
-      <${SDL_IMAGE}>, Indicate the path of SDL_image.h)
-      VLC_ADD_PLUGINS([sdl_image])
-      AC_CHECK_LIB(png, png_set_rows,
-        [VLC_ADD_LDFLAGS([sdl_image],[-lpng -lz])],[],[-lz])
-      AC_CHECK_LIB(jpeg, jpeg_start_decompress,
-        [VLC_ADD_LDFLAGS([sdl_image],[-ljpeg])])
-      AC_CHECK_LIB(tiff, TIFFClientOpen,
-        [VLC_ADD_LDFLAGS([sdl_image],[-ltiff])])
-      VLC_ADD_LDFLAGS([sdl_image], [-lSDL_image])],
-      [ AC_CHECK_HEADERS(SDL_image.h, AC_DEFINE(SDL_IMAGE_INCLUDE_FILE, <SDL_image.h>,
-          As a last resort we also test for SDL_image.h presence),
-      [ AC_MSG_WARN([The development package for SDL_image is not installed.
-You should install it alongside your SDL package.])
-      ])])
+    AS_IF([ test "${enable_sdl_image}" != "no"],[
+      AC_CHECK_HEADERS(${SDL_IMAGE}, [AC_DEFINE_UNQUOTED(SDL_IMAGE_INCLUDE_FILE,
+        <${SDL_IMAGE}>, Indicate the path of SDL_image.h)
+        VLC_ADD_PLUGINS([sdl_image])
+        AC_CHECK_LIB(png, png_set_rows,
+          [VLC_ADD_LDFLAGS([sdl_image],[-lpng -lz])],[],[-lz])
+        AC_CHECK_LIB(jpeg, jpeg_start_decompress,
+          [VLC_ADD_LDFLAGS([sdl_image],[-ljpeg])])
+        AC_CHECK_LIB(tiff, TIFFClientOpen,
+          [VLC_ADD_LDFLAGS([sdl_image],[-ltiff])])
+        VLC_ADD_LDFLAGS([sdl_image], [-lSDL_image])],
+        [ AC_CHECK_HEADERS(SDL_image.h, AC_DEFINE(SDL_IMAGE_INCLUDE_FILE, <SDL_image.h>,
+            As a last resort we also test for SDL_image.h presence),
+        [ AC_MSG_WARN([The development package for SDL_image is not installed.
+  You should install it alongside your SDL package.])
+        ])])
+    ])
     CPPFLAGS="${CPPFLAGS_save}"
     if expr 1.1.5 \> `${SDL_CONFIG} --version` >/dev/null
     then
