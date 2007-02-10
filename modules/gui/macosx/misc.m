@@ -47,6 +47,11 @@
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
+    /* We indeed want to prioritize Cocoa key equivalent against libvlc,
+       so we perform the menu equivalent now. */
+    if([[NSApp mainMenu] performKeyEquivalent:o_event])
+        return TRUE;
+
     return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event] ||
            [(VLCControls *)[[VLCMain sharedInstance] getControls] keyEvent:o_event];
 }
