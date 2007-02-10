@@ -1,7 +1,7 @@
 /*****************************************************************************
  * udp.c
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -228,28 +228,23 @@ static int Open( vlc_object_t *p_this )
     psz_parser = strdup( p_access->psz_path );
 
     psz_dst_addr = psz_parser;
-    i_dst_port = 0;
+    i_dst_port = DEFAULT_PORT;
 
-    if ( *psz_parser == '[' )
+    if (psz_parser[0] == '[')
     {
-        while( *psz_parser && *psz_parser != ']' )
+        psz_parser = strchr (psz_parser, ']');
+        if (psz_parser != NULL)
         {
-            psz_parser++;
+            *psz_parser++ = '\0';
+            psz_dst_addr++;
         }
     }
-    while( *psz_parser && *psz_parser != ':' )
+
+    psz_parser = strchr (psz_parser, ':');
+    if (psz_parser != NULL)
     {
-        psz_parser++;
-    }
-    if( *psz_parser == ':' )
-    {
-        *psz_parser = '\0';
-        psz_parser++;
-        i_dst_port = atoi( psz_parser );
-    }
-    if( i_dst_port <= 0 )
-    {
-        i_dst_port = DEFAULT_PORT;
+        *psz_parser++ = '\0';
+        i_dst_port = atoi (psz_parser);
     }
 
     if (var_Create (p_access, "dst-port", VLC_VAR_INTEGER)
