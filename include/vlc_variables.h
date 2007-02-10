@@ -353,7 +353,7 @@ static inline char *__var_GetString( vlc_object_t *p_obj, const char *psz_name )
 static inline char *__var_GetNonEmptyString( vlc_object_t *obj, const char *name )
 {
     vlc_value_t val;
-    if (!__var_Get (obj, name, &val))
+    if (__var_Get (obj, name, &val))
         return NULL;
     if (*val.psz_string)
         return val.psz_string;
