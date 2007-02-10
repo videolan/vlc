@@ -180,7 +180,7 @@ static int Open( vlc_object_t *p_this )
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
-    psz_accessname = psz_parser = strdup( p_access->psz_name );
+    psz_accessname = psz_parser = strdup( p_access->psz_path );
 
     if( !p_access->psz_name )
     {
