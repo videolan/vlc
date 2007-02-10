@@ -382,7 +382,6 @@ static int Open( vlc_object_t *p_this )
         dst = var_GetNonEmptyString (p_access, "dst-addr");
         sport = var_GetInteger (p_access, "src-port");
         dport = var_GetInteger (p_access, "dst-port");
-        msg_Err (p_stream, "%p, %p, %d, %d", src, dst, sport, dport);
 
         if ((psz_sdp_fmt == NULL)
          || (asprintf (&fmt, psz_sdp_fmt, payload_type) == -1))
