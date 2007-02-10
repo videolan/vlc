@@ -58,6 +58,25 @@
   "This allows you to specify a group for the session, that will be announced "\
   "if you choose to use SAP." )
 
+#define DESC_TEXT N_("Session descriptipn")
+#define DESC_LONGTEXT N_( \
+    "This allows you to give a short description with details about the stream, " \
+    "that will be announced in the SDP (Session Descriptor)." )
+#define URL_TEXT N_("Session URL")
+#define URL_LONGTEXT N_( \
+    "This allows you to give an URL with more details about the stream " \
+    "(often the website of the streaming organization), that will " \
+    "be announced in the SDP (Session Descriptor)." )
+#define EMAIL_TEXT N_("Session email")
+#define EMAIL_LONGTEXT N_( \
+    "This allows you to give a contact mail address for the stream, that will " \
+    "be announced in the SDP (Session Descriptor)." )
+#define PHONE_TEXT N_("Session phone number")
+#define PHONE_LONGTEXT N_( \
+    "This allows you to give a contact telephone number for the stream, that will " \
+    "be announced in the SDP (Session Descriptor)." )
+
+
 #define SAP_TEXT N_("SAP announcing")
 #define SAP_LONGTEXT N_("Announce this session with SAP.")
 
@@ -81,12 +100,19 @@ vlc_module_begin();
                 MUX_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DST_TEXT,
                 DST_LONGTEXT, VLC_FALSE );
-        add_deprecated( SOUT_CFG_PREFIX "url", VLC_FALSE );
 
     add_bool( SOUT_CFG_PREFIX "sap", 0, NULL, SAP_TEXT, SAP_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT, NAME_LONGTEXT,
                                         VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "group", "", NULL, GROUP_TEXT, GROUP_LONGTEXT,
+                                        VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "description", "", NULL, DESC_TEXT, DESC_LONGTEXT,
+                                        VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "url", "", NULL, URL_TEXT, URL_LONGTEXT,
+                                        VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "email", "", NULL, EMAIL_TEXT, EMAIL_LONGTEXT,
+                                        VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "phone", "", NULL, PHONE_TEXT, PHONE_LONGTEXT,
                                         VLC_TRUE );
     add_suppressed_bool( SOUT_CFG_PREFIX "sap-ipv6" );
 
@@ -99,7 +125,7 @@ vlc_module_end();
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
     "access", "mux", "url", "dst",
-    "sap", "name", "group",  NULL
+    "sap", "name", "group", "description", "url", "email", "phone", NULL
 };
 
 #define DEFAULT_PORT 1234
@@ -310,29 +336,14 @@ static int Open( vlc_object_t *p_this )
     }
     msg_Dbg( p_stream, "mux opened" );
 
-    /*  *** Create the SAP Session structure *** */
-    var_Get( p_stream, SOUT_CFG_PREFIX "sap", &val );
-    if( val.b_bool &&
-        ( strstr( psz_access, "udp" ) || strstr( psz_access , "rtp" ) ) )
+    /* *** Create the SAP Session structure *** */
+    if( var_GetBool( p_stream, SOUT_CFG_PREFIX"sap" ) &&
+        ( strncmp( psz_access, "udp", 3 ) || strncmp( psz_access , "rtp", 3 ) ) )
     {
-        session_descriptor_t *p_session = sout_AnnounceSessionCreate();
-        announce_method_t *p_method = sout_SAPMethod();
+        session_descriptor_t *p_session;
+        announce_method_t *p_method = sout_SAPMethod ();
         vlc_url_t url;
-
-        var_Get( p_stream, SOUT_CFG_PREFIX "name", &val );
-        if( *val.psz_string )
-            p_session->psz_name = val.psz_string;
-        else
-        {
-            p_session->psz_name = strdup( psz_url );
-            free( val.psz_string );
-        }
-
-        var_Get( p_stream, SOUT_CFG_PREFIX "group", &val );
-        if( *val.psz_string )
-            p_session->psz_group = val.psz_string;
-        else
-            free( val.psz_string );
+        p_session = sout_AnnounceSessionCreate (VLC_OBJECT (p_stream), SOUT_CFG_PREFIX);
 
         /* Now, parse the URL to extract host and port */
         vlc_UrlParse( &url, psz_url , 0);
@@ -341,20 +352,20 @@ static int Open( vlc_object_t *p_this )
         {
             if( url.i_port == 0 ) url.i_port = DEFAULT_PORT;
 
+#if 0
             p_session->psz_uri = strdup( url.psz_host );
             p_session->i_port = url.i_port;
             p_session->psz_sdp = NULL;
             p_session->i_payload = 33;
             p_session->b_rtp = strstr( psz_access, "rtp") ? 1 : 0;
-
+#endif
             msg_Info( p_this, "SAP Enabled");
 
             sout_AnnounceRegister( p_sout, p_session, p_method );
             p_stream->p_sys->p_session = p_session;
         }
         vlc_UrlClean( &url );
-
-        free( p_method );
+        sout_MethodRelease (p_method);
     }
 
     p_stream->pf_add    = Add;

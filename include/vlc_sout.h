@@ -209,28 +209,14 @@ static inline int sout_StreamIdSend( sout_stream_t *s, sout_stream_id_t *id, blo
 /****************************************************************************
  * Announce handler mess
  ****************************************************************************/
-struct sap_session_t;
-
-struct session_descriptor_t
-{
-    char *psz_name;
-    char *psz_uri;
-    int i_port;
-    int i_payload;   /* SAP Payload type */
-
-    char *psz_group;
-
-    char *psz_sdp;
-    vlc_bool_t b_rtp;
-};
-
 VLC_EXPORT( int,                sout_AnnounceRegister, (sout_instance_t *,session_descriptor_t*, announce_method_t* ) );
-VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, (sout_instance_t *,const char *, const char *, announce_method_t* ) );
+VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, (sout_instance_t *, const char *, const char *, const char *, announce_method_t* ) );
 VLC_EXPORT( int,                sout_AnnounceUnRegister, (sout_instance_t *,session_descriptor_t* ) );
 
-VLC_EXPORT(session_descriptor_t*,sout_AnnounceSessionCreate, (void) );
+VLC_EXPORT(session_descriptor_t*,sout_AnnounceSessionCreate, (vlc_object_t *obj, const char *cfgpref) );
 VLC_EXPORT(void,                 sout_AnnounceSessionDestroy, (session_descriptor_t *) );
 VLC_EXPORT(announce_method_t*,   sout_SAPMethod, (void) );
+VLC_EXPORT(void,                 sout_MethodRelease, (announce_method_t *) );
 
 #ifdef __cplusplus
 }

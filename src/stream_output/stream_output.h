@@ -68,6 +68,28 @@ struct sap_handler_t
     /* private data, not in p_sys as there is one kind of sap_handler_t */
 };
 
+struct session_descriptor_t
+{
+    char *psz_name;
+    char *psz_group;
+
+    char *description;
+    char *url; // meta URL for SAP, potentially real URL for other cases
+    char *email;
+    char *phone;
+
+    struct sockaddr_storage orig;
+    socklen_t origlen;
+    struct sockaddr_storage addr;
+    socklen_t addrlen;
+
+    int i_payload;   /* SAP Payload type */
+
+    char *psz_sdp;
+    vlc_bool_t b_rtp;
+    vlc_bool_t b_ssm;
+};
+
 /* The main announce handler object */
 struct announce_handler_t
 {

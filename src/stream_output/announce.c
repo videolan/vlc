@@ -27,9 +27,11 @@
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
+#include <assert.h>
 
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
+#include <vlc_network.h> /* FIXME: fix RegisterSDP() and remove this */
 #include "stream_output.h"
 
 struct announce_method_t
@@ -82,11 +84,12 @@ int sout_AnnounceRegister( sout_instance_t *p_sout,
  *
  * \param p_sout a sout instance structure
  * \param psz_sdp the SDP to register
- * \param psz_uri session URI (needed for SAP address auto detection
+ * \param psz_uri session address (needed for SAP address auto detection)
  * \param p_method an announce method descriptor
  * \return the new session descriptor structure
  */
-session_descriptor_t *sout_AnnounceRegisterSDP( sout_instance_t *p_sout,
+session_descriptor_t *
+sout_AnnounceRegisterSDP( sout_instance_t *p_sout, const char *cfgpref,
                           const char *psz_sdp, const char *psz_uri,
                           announce_method_t *p_method )
 {
@@ -107,9 +110,19 @@ session_descriptor_t *sout_AnnounceRegisterSDP( sout_instance_t *p_sout,
         vlc_object_yield( p_announce );
     }
 
-    p_session = sout_AnnounceSessionCreate();
+    p_session = sout_AnnounceSessionCreate(VLC_OBJECT (p_sout), cfgpref);
     p_session->psz_sdp = strdup( psz_sdp );
-    p_session->psz_uri = strdup( psz_uri );
+
+    /* GRUIK. We should not convert back-and-forth from string to numbers */
+    struct addrinfo *res;
+    if (vlc_getaddrinfo (VLC_OBJECT (p_sout), psz_uri, 0, NULL, &res) == 0)
+    {
+        if (res->ai_addrlen <= sizeof (p_session->addr))
+            memcpy (&p_session->addr, res->ai_addr,
+                    p_session->addrlen = res->ai_addrlen);
+        freeaddrinfo (res);
+    }
+
     announce_Register( p_announce, p_session, p_method );
 
     vlc_object_release( p_announce );
@@ -148,15 +161,34 @@ int sout_AnnounceUnRegister( sout_instance_t *p_sout,
  *
  * \return a new session descriptor
  */
-session_descriptor_t * sout_AnnounceSessionCreate(void)
+session_descriptor_t * sout_AnnounceSessionCreate (vlc_object_t *obj,
+                                                   const char *cfgpref)
 {
-    session_descriptor_t *p_session;
+    size_t cfglen = strlen (cfgpref);
+    if (cfglen > 100)
+        return NULL;
 
-    p_session = (session_descriptor_t *)malloc( sizeof(session_descriptor_t));
+    char varname[cfglen + sizeof ("description")], *subvar = varname + cfglen;
+    strcpy (varname, cfgpref);
+
+    session_descriptor_t *p_session = calloc (1, sizeof (*p_session));
     if (p_session == NULL)
         return NULL;
 
-    memset (p_session, 0, sizeof (*p_session));
+    strcpy (subvar, "name");
+    p_session->psz_name = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "group");
+    p_session->psz_group = var_GetNonEmptyString (obj, varname);
+
+    strcpy (subvar, "description");
+    p_session->description = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "url");
+    p_session->url = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "email");
+    p_session->email = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "phone");
+    p_session->phone = var_GetNonEmptyString (obj, varname);
+
     return p_session;
 }
 
@@ -170,10 +202,13 @@ void sout_AnnounceSessionDestroy( session_descriptor_t *p_session )
 {
     if( p_session )
     {
-        FREENULL( p_session->psz_name );
-        FREENULL( p_session->psz_group );
-        FREENULL( p_session->psz_uri );
-        FREENULL( p_session->psz_sdp );
+        free (p_session->psz_name);
+        free (p_session->psz_group);
+        free (p_session->psz_sdp);
+        free (p_session->description);
+        free (p_session->url);
+        free (p_session->email);
+        free (p_session->phone);
         free( p_session );
     }
 }
@@ -184,6 +219,11 @@ void sout_AnnounceSessionDestroy( session_descriptor_t *p_session )
 announce_method_t * sout_SAPMethod (void)
 {
     return &sap_method;
+}
+
+void sout_MethodRelease (announce_method_t *m)
+{
+    assert (m == &sap_method);
 }
 
 /************************************************************************
@@ -241,6 +281,8 @@ int announce_Register( announce_handler_t *p_announce,
                        session_descriptor_t *p_session,
                        announce_method_t *p_method )
 {
+    if (p_method == NULL)
+        return VLC_EGENERIC;
 
     msg_Dbg( p_announce, "registering announce");
     if( p_method == &sap_method )

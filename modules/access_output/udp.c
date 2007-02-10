@@ -399,7 +399,7 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
             int i_payload_size = p_sys->i_mtu;
             if( p_sys->b_rtpts )
                 i_payload_size -= RTP_HEADER_LENGTH;
-            
+
             int i_write = __MIN( p_buffer->i_buffer, i_payload_size );
 
             i_packets++;
