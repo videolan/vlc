@@ -286,12 +286,14 @@ static int Open( vlc_object_t *p_this )
 
         if (net_GetSockAddress (i_handle, addr, &port) == 0)
         {
+            msg_Dbg (p_access, "source: %s port %d", addr, port);
             var_SetString (p_access, "src-addr", addr);
             var_SetInteger (p_access, "src-port", port);
         }
 
         if (net_GetPeerAddress (i_handle, addr, &port) == 0)
         {
+            msg_Dbg (p_access, "destination: %s port %d", addr, port);
             var_SetString (p_access, "dst-addr", addr);
             var_SetInteger (p_access, "dst-port", port);
         }
