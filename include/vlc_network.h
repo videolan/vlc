@@ -317,6 +317,20 @@ static inline int net_GetPeerAddress( int fd, char *address, int *port )
         ? VLC_EGENERIC : 0;
 }
 
+static inline uint16_t net_GetPort (const struct sockaddr *addr)
+{
+    switch (addr->sa_family)
+    {
+#ifdef AF_INET6
+        case AF_INET6:
+            return ((const struct sockaddr_in6 *)addr)->sin6_port;
+#endif
+        case AF_INET:
+            return ((const struct sockaddr_in *)addr)->sin_port;
+    }
+    return 0;
+}
+
 # ifdef __cplusplus
 }
 # endif
