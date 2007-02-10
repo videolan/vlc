@@ -75,7 +75,7 @@ struct sout_access_out_t
     /** Local counter reset each time it is transferred to stats */
     int64_t                  i_sent_bytes;
 
-    char                    *psz_name;
+    char                    *psz_path;
     sout_access_out_sys_t   *p_sys;
     int                     (*pf_seek)( sout_access_out_t *, off_t );
     int                     (*pf_read)( sout_access_out_t *, block_t * );
@@ -86,7 +86,7 @@ struct sout_access_out_t
     sout_instance_t         *p_sout;
 };
 
-VLC_EXPORT( sout_access_out_t *,sout_AccessOutNew, ( sout_instance_t *, char *psz_access, char *psz_name ) );
+VLC_EXPORT( sout_access_out_t *,sout_AccessOutNew, ( sout_instance_t *, const char *psz_access, const char *psz_name ) );
 VLC_EXPORT( void,               sout_AccessOutDelete, ( sout_access_out_t * ) );
 VLC_EXPORT( int,                sout_AccessOutSeek,   ( sout_access_out_t *, off_t ) );
 VLC_EXPORT( int,                sout_AccessOutRead,   ( sout_access_out_t *, block_t * ) );

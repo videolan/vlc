@@ -89,7 +89,7 @@ int E_(OpenMux)( vlc_object_t *p_this )
 
     /* Find the requested muxer */
     file_oformat =
-        guess_format(NULL, p_mux->p_access->psz_name, NULL);
+        guess_format(NULL, p_mux->p_access->psz_path, NULL);
     if (!file_oformat)
     {
       msg_Err( p_mux, "unable for find a suitable output format" );

@@ -513,7 +513,7 @@ static int Open( vlc_object_t *p_this )
         p_grab->p_sout      = p_sout;
         p_grab->psz_access  = strdup( "grab" );
         p_grab->p_cfg       = NULL;
-        p_grab->psz_name    = strdup( "" );
+        p_grab->psz_path    = strdup( "" );
         p_grab->p_sys       = (sout_access_out_sys_t*)p_stream;
         p_grab->pf_seek     = NULL;
         p_grab->pf_write    = AccessOutGrabberWrite;

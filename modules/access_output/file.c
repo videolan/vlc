@@ -105,7 +105,7 @@ static int Open( vlc_object_t *p_this )
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
-    if( !p_access->psz_name )
+    if( !p_access->psz_path )
     {
         msg_Err( p_access, "no file name specified" );
         return VLC_EGENERIC;
@@ -121,7 +121,7 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_access, SOUT_CFG_PREFIX "append", &val );
     i_flags |= val.b_bool ? O_APPEND : O_TRUNC;
 
-    if( !strcmp( p_access->psz_name, "-" ) )
+    if( !strcmp( p_access->psz_path, "-" ) )
     {
 #if defined(WIN32)
         setmode (STDOUT_FILENO, O_BINARY);
@@ -132,7 +132,7 @@ static int Open( vlc_object_t *p_this )
     else
     {
         int fd;
-        char *psz_tmp = str_format( p_access, p_access->psz_name );
+        char *psz_tmp = str_format( p_access, p_access->psz_path );
         path_sanitize( psz_tmp );
 
         fd = utf8_open( psz_tmp, i_flags, 0666 );
@@ -140,7 +140,7 @@ static int Open( vlc_object_t *p_this )
 
         if( fd == -1 )
         {
-            msg_Err( p_access, "cannot open `%s' (%s)", p_access->psz_name,
+            msg_Err( p_access, "cannot open `%s' (%s)", p_access->psz_path,
                      strerror( errno ) );
             free( p_access->p_sys );
             return( VLC_EGENERIC );
@@ -152,7 +152,7 @@ static int Open( vlc_object_t *p_this )
     p_access->pf_read  = Read;
     p_access->pf_seek  = Seek;
 
-    msg_Dbg( p_access, "file access output opened (`%s')", p_access->psz_name );
+    msg_Dbg( p_access, "file access output opened (`%s')", p_access->psz_path );
 
     /* Update pace control flag */
     if( p_access->psz_access && !strcmp( p_access->psz_access, "stream" ) )
@@ -168,7 +168,7 @@ static void Close( vlc_object_t * p_this )
 {
     sout_access_out_t *p_access = (sout_access_out_t*)p_this;
 
-    if( strcmp( p_access->psz_name, "-" ) )
+    if( strcmp( p_access->psz_path, "-" ) )
     {
         if( p_access->p_sys->i_handle )
         {
@@ -189,7 +189,7 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static int Read( sout_access_out_t *p_access, block_t *p_buffer )
 {
-    if( strcmp( p_access->psz_name, "-" ) )
+    if( strcmp( p_access->psz_path, "-" ) )
     {
         return read( p_access->p_sys->i_handle, p_buffer->p_buffer,
                      p_buffer->i_buffer );
@@ -225,7 +225,7 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
  *****************************************************************************/
 static int Seek( sout_access_out_t *p_access, off_t i_pos )
 {
-    if( strcmp( p_access->psz_name, "-" ) )
+    if( strcmp( p_access->psz_path, "-" ) )
     {
 #if defined( WIN32 ) && !defined( UNDER_CE )
         return( _lseeki64( p_access->p_sys->i_handle, i_pos, SEEK_SET ) );

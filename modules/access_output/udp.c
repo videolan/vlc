@@ -225,7 +225,7 @@ static int Open( vlc_object_t *p_this )
     if (p_sys->b_rtpts)
         cscov += RTP_HEADER_LENGTH;
 
-    psz_parser = strdup( p_access->psz_name );
+    psz_parser = strdup( p_access->psz_path );
 
     psz_dst_addr = psz_parser;
     i_dst_port = 0;

@@ -275,7 +275,7 @@ int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
  * sout_AccessOutNew: allocate a new access out
  *****************************************************************************/
 sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
-                                      char *psz_access, char *psz_name )
+                                      const char *psz_access, const char *psz_name )
 {
     sout_access_out_t *p_access;
     char              *psz_next;
@@ -293,7 +293,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
     {
         free( psz_next );
     }
-    p_access->psz_name   = strdup( psz_name ? psz_name : "" );
+    p_access->psz_path   = strdup( psz_name ? psz_name : "" );
     p_access->p_sout     = p_sout;
     p_access->p_sys = NULL;
     p_access->pf_seek    = NULL;
@@ -313,7 +313,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
     if( !p_access->p_module )
     {
         free( p_access->psz_access );
-        free( p_access->psz_name );
+        free( p_access->psz_path );
         vlc_object_detach( p_access );
         vlc_object_destroy( p_access );
         return( NULL );
@@ -335,7 +335,7 @@ void sout_AccessOutDelete( sout_access_out_t *p_access )
 
     config_ChainDestroy( p_access->p_cfg );
 
-    free( p_access->psz_name );
+    free( p_access->psz_path );
 
     vlc_object_destroy( p_access );
 }

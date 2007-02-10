@@ -367,7 +367,7 @@ static int OutOpen( vlc_object_t *p_this )
     /* Init p_access */
     p_sys->fd_data = -1;
 
-    if( parseURL( &p_sys->url, p_access->psz_name ) )
+    if( parseURL( &p_sys->url, p_access->psz_path ) )
         goto exit_error;
 
     if( Connect( p_this, p_sys ) )
