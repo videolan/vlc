@@ -83,10 +83,8 @@ struct session_descriptor_t
     struct sockaddr_storage addr;
     socklen_t addrlen;
 
-    int i_payload;   /* SAP Payload type */
-
+    char *sdpformat; // format suitable for SDP
     char *psz_sdp;
-    vlc_bool_t b_rtp;
     vlc_bool_t b_ssm;
 };
 

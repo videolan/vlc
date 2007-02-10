@@ -192,6 +192,31 @@ session_descriptor_t * sout_AnnounceSessionCreate (vlc_object_t *obj,
     return p_session;
 }
 
+int sout_SessionSetMedia (vlc_object_t *obj, session_descriptor_t *p_session,
+                          char *fmt, char *src, int sport,
+                          char *dst, int dport)
+{
+    p_session->sdpformat = fmt;
+
+    /* GRUIK. We should not convert back-and-forth from string to numbers */
+    struct addrinfo *res;
+    if (vlc_getaddrinfo (obj, dst, dport, NULL, &res) == 0)
+    {
+        if (res->ai_addrlen <= sizeof (p_session->addr))
+            memcpy (&p_session->addr, res->ai_addr,
+                    p_session->addrlen = res->ai_addrlen);
+        freeaddrinfo (res);
+    }
+    if (vlc_getaddrinfo (obj, src, sport, NULL, &res) == 0)
+    {
+        if (res->ai_addrlen <= sizeof (p_session->orig))
+            memcpy (&p_session->orig, res->ai_addr,
+                    p_session->origlen = res->ai_addrlen);
+        freeaddrinfo (res);
+    }
+    return 0;
+}
+
 /**
  * Destroy a session descriptor and free all
  *

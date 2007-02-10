@@ -24,11 +24,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>
-#include <string.h>
-
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #include <vlc_network.h>
 #include "vlc_url.h"
@@ -245,8 +246,10 @@ static int Open( vlc_object_t *p_this )
         {
             psz_mux = strdup("asfh");
         }
-        else if( !strncmp( psz_access, "udp", 3 ) ||
-                 !strncmp( psz_access, "rtp", 3 ) )
+        else if (!strcmp (psz_access, "udp")
+              || !strcmp (psz_access, "rtp") || !strcmp (psz_access, "udplite")
+              || !strcmp (psz_access, "tcp") || !strcmp (psz_access, "sctp")
+              || !strcmp (psz_access, "dccp"))
         {
             psz_mux = strdup("ts");
         }
@@ -337,13 +340,69 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_stream, "mux opened" );
 
     /* *** Create the SAP Session structure *** */
-    if( var_GetBool( p_stream, SOUT_CFG_PREFIX"sap" ) &&
-        ( strncmp( psz_access, "udp", 3 ) || strncmp( psz_access , "rtp", 3 ) ) )
+    if( var_GetBool( p_stream, SOUT_CFG_PREFIX"sap" ) )
     {
         session_descriptor_t *p_session;
         announce_method_t *p_method = sout_SAPMethod ();
         vlc_url_t url;
-        p_session = sout_AnnounceSessionCreate (VLC_OBJECT (p_stream), SOUT_CFG_PREFIX);
+        const int payload_type = 33;
+
+        static const struct { const char *access; const char *fmt; } fmts[] =
+            {
+                { "udp",      "udp mpeg" },
+                { "rtp",      "RTP/AVP %d" },
+                { "udplite",  "UDPLite/RTP/AVP %d" },
+                /* Currently unsupported access outputs: */
+                { "dccp",     "DCCP/RTP/AVP %d" },
+                { "tcp",      "TCP/RTP/AVP %d" },
+                /* TLS/DTLS variants (none implemented). */
+                { "dtls",     "UDP/TLS/RTP/AVP %d" },
+                { "dtlslite", "UDPLite/TLS/RTP/AVP %d" },
+                { "dccps",    "DCCP/TLS/RTP/AVP %d" },
+                { "tls",      "TCP/TLS/RTP/AVP %d" },
+                /* SRTP (not implemented) */
+                { "srtp",     "RTP/SAVP %d" },
+                { "sudplite", "UDPLite/RTP/SAVP %d" },
+                { "sdccp",    "DCCP/RTP/SAVP %d" },
+                { "stcp",     "TCP/RTP/SAVP %d" },
+                { NULL,       NULL }
+            };
+        const char *psz_sdp_fmt = NULL;
+        char *fmt, *src, *dst;
+        int sport, dport;
+
+        for (unsigned i = 0; fmts[i].access != NULL; i++)
+            if (strcasecmp (fmts[i].access, psz_access) == 0)
+            {
+                psz_sdp_fmt = fmts[i].fmt;
+                break;
+            }
+
+        src = var_GetNonEmptyString (p_access, "src-addr");
+        dst = var_GetNonEmptyString (p_access, "dst-addr");
+        sport = var_GetInteger (p_access, "src-port");
+        dport = var_GetInteger (p_access, "dst-port");
+        msg_Err (p_stream, "%p, %p, %d, %d", src, dst, sport, dport);
+
+        if ((psz_sdp_fmt == NULL)
+         || (asprintf (&fmt, psz_sdp_fmt, payload_type) == -1))
+            fmt = NULL;
+
+        msg_Dbg( p_stream, "SAP advertized format: %s", fmt);
+        if ((fmt == NULL) || ((src == NULL) && (dst == NULL)))
+        {
+            msg_Err (p_access, "SAP announces not supported for access %s",
+                     psz_access);
+            free (fmt);
+            free (src);
+            free (dst);
+            goto nosap;
+        }
+
+        p_session = sout_AnnounceSessionCreate (VLC_OBJECT (p_stream),
+                                                SOUT_CFG_PREFIX);
+        sout_SessionSetMedia (VLC_OBJECT (p_stream), p_session, fmt,
+                              src, sport, dst, dport);
 
         /* Now, parse the URL to extract host and port */
         vlc_UrlParse( &url, psz_url , 0);
@@ -355,7 +414,6 @@ static int Open( vlc_object_t *p_this )
 #if 0
             p_session->psz_uri = strdup( url.psz_host );
             p_session->i_port = url.i_port;
-            p_session->i_payload = 33;
             p_session->b_rtp = strstr( psz_access, "rtp") ? 1 : 0;
 #endif
             msg_Info( p_this, "SAP Enabled");
@@ -366,6 +424,7 @@ static int Open( vlc_object_t *p_this )
         vlc_UrlClean( &url );
         sout_MethodRelease (p_method);
     }
+nosap:
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;

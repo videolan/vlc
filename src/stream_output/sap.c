@@ -382,6 +382,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         if( p_address->i_wfd != -1 )
         {
             net_StopRecv( p_address->i_wfd );
+            p_address->origlen = sizeof (p_address->orig);
             getsockname (p_address->i_wfd, (struct sockaddr *)&p_address->orig,
                          &p_address->origlen);
         }
@@ -624,13 +625,12 @@ static char *SDPGenerate( sap_handler_t *p_sap,
         sfilter = NULL;
 
     int res = asprintf (&psz_sdp, "%s" "%s" "%s"
-                        "m=video %d %s %d\r\n",
+                        "m=video %d %s\r\n",
                         head,
                         plgroup ?: "",
                         sfilter ?: "",
                         net_GetPort ((const struct sockaddr *)&p_session->addr),
-                        p_session->b_rtp ? "RTP/AVP" : "udp",
-                        p_session->i_payload);
+                        p_session->sdpformat);
     free (plgroup);
     free (sfilter);
 

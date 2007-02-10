@@ -215,6 +215,7 @@ VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, (sout_instance_t *, c
 VLC_EXPORT( int,                sout_AnnounceUnRegister, (sout_instance_t *,session_descriptor_t* ) );
 
 VLC_EXPORT(session_descriptor_t*,sout_AnnounceSessionCreate, (vlc_object_t *obj, const char *cfgpref) );
+VLC_EXPORT(int,                  sout_SessionSetMedia, (vlc_object_t *obj, session_descriptor_t *, char *, char *, int, char *, int) );
 VLC_EXPORT(void,                 sout_AnnounceSessionDestroy, (session_descriptor_t *) );
 VLC_EXPORT(announce_method_t*,   sout_SAPMethod, (void) );
 VLC_EXPORT(void,                 sout_MethodRelease, (announce_method_t *) );
