@@ -327,7 +327,7 @@ enum input_state_e
  */
 #define INPUT_RATE_DEFAULT  1000
 #define INPUT_RATE_MIN       125            /* Up to 8/1 */
-#define INPUT_RATE_MAX      8000            /* Up to 1/8 */
+#define INPUT_RATE_MAX     32000            /* Up to 1/8 */
 
 /* i_update field of access_t/demux_t */
 #define INPUT_UPDATE_NONE       0x0000
