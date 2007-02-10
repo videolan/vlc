@@ -85,12 +85,13 @@ static vlc_bool_t IsSDPString (const char *str)
 
 
 char *StartSDP (const char *name, const char *description, const char *url,
-                const char *email, const char *phone,
+                const char *email, const char *phone, vlc_bool_t ssm,
                 const struct sockaddr *orig, socklen_t origlen,
                 const struct sockaddr *addr, socklen_t addrlen)
 {
     uint64_t t = NTPtime64 ();
-    char *sdp, machine[MAXSDPADDRESS], conn[MAXSDPADDRESS];
+    char *sdp, machine[MAXSDPADDRESS], conn[MAXSDPADDRESS],
+         sfilter[MAXSDPADDRESS + sizeof ("\r\na=source-filter: incl * ")];
     const char *preurl = "\r\nu=", *premail = "\r\ne=", *prephone = "\r\np=";
 
     if (name == NULL)
@@ -110,6 +111,12 @@ char *StartSDP (const char *name, const char *description, const char *url,
      || (AddressToSDP ((struct sockaddr *)addr, addrlen, conn) == NULL))
         return NULL;
 
+    if (ssm)
+        sprintf (sfilter, "\r\na=source-filter: incl IN IP%c * %s",
+                 machine[5], machine + 7);
+    else
+        *sfilter = '\0';
+
     if (asprintf (&sdp, "v=0"
                     "\r\no=- "I64Fu" "I64Fu" %s"
                     "\r\ns=%s"
@@ -127,6 +134,7 @@ char *StartSDP (const char *name, const char *description, const char *url,
                     "\r\na=recvonly"
                     "\r\na=type:broadcast"
                     "\r\na=charset:UTF-8"
+		    "%s" // optional source filter
                     "\r\n",
                /* o= */ t, t, machine,
                /* s= */ name,
@@ -134,7 +142,8 @@ char *StartSDP (const char *name, const char *description, const char *url,
                /* u= */ preurl, url,
                /* e= */ premail, email,
                /* p= */ prephone, phone,
-               /* c= */ conn) == -1)
+               /* c= */ conn,
+    /* source-filter */ sfilter) == -1)
         return NULL;
     return sdp;
 }

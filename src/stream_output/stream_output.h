@@ -111,7 +111,7 @@ sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce );
 void announce_SAPHandlerDestroy( sap_handler_t *p_sap );
 
 char *StartSDP (const char *name, const char *description, const char *url,
-                const char *email, const char *phone,
+                const char *email, const char *phone, vlc_bool_t ssm,
                 const struct sockaddr *orig, socklen_t origlen,
                 const struct sockaddr *addr, socklen_t addrlen);
 

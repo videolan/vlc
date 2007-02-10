@@ -321,7 +321,6 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
                 ipv4 = 0xe0027ffe;
             }
 
-            /* FIXME FIXME FIXME */
             if( ipv4 == 0 )
             {
                 msg_Err( p_sap, "Out-of-scope multicast address "
@@ -600,7 +599,7 @@ static char *SDPGenerate( sap_handler_t *p_sap,
     char *psz_group, *psz_name, *psz_sdp;
 
      char *head = StartSDP (p_session->psz_name, p_session->description,
-        p_session->url, p_session->email, p_session->phone,
+        p_session->url, p_session->email, p_session->phone, b_ssm,
         (const struct sockaddr *)&p_session->orig, p_session->origlen,
         (const struct sockaddr *)&p_session->addr, p_session->addrlen);
     if (head == NULL)
@@ -614,32 +613,20 @@ static char *SDPGenerate( sap_handler_t *p_sap,
      || (asprintf (&plgroup, "a=x-plgroup:%s\r\n", psz_group) == -1))
         plgroup = NULL;
 
-    char *sfilter;
-#if 0
-    if ((!b_ssm)
-     || (asprintf (&sfilter, "a=source-filter: incl IN IP%c * %s\r\n",
-                   ipv, p_addr->psz_machine) == -1))
-#else
-# warning FIXME: repair Source Specific Multicast
-#endif
-        sfilter = NULL;
-
     const char *comedia = NULL;
     if (!strncasecmp (p_session->sdpformat, "DCCP", 4)
      || !strncasecmp (p_session->sdpformat, "TCP", 3))
         comedia = "a=setup:passive\r\n"
                   "a=connection:new\r\n";
 
-    int res = asprintf (&psz_sdp, "%s" "%s" "%s" "%s"
+    int res = asprintf (&psz_sdp, "%s" "%s" "%s"
                         "m=video %d %s\r\n",
                         head,
                         plgroup ?: "",
-                        sfilter ?: "",
                         comedia ?: "",
                         net_GetPort ((const struct sockaddr *)&p_session->addr),
                         p_session->sdpformat);
     free (plgroup);
-    free (sfilter);
 
     if (res == -1)
         return NULL;
