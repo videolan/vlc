@@ -25,11 +25,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>
 
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
+
+#include <stdlib.h>
+#include <stdio.h>
 
 #include <vlc_input.h>
 #include <vlc_playlist.h>
@@ -180,7 +182,7 @@ static int Open( vlc_object_t *p_this )
     psz_bind_addr = psz_parser = strdup( p_access->psz_name );
 
     i_bind_port = 0;
-    psz_file_name = "";
+    psz_file_name = NULL;
 
     while( *psz_parser && *psz_parser != ':' && *psz_parser != '/' )
     {
@@ -204,7 +206,7 @@ static int Open( vlc_object_t *p_this )
         psz_file_name = psz_parser;
     }
 
-    if( !*psz_file_name )
+    if( psz_file_name == NULL )
     {
         psz_file_name = strdup( "/" );
     }
