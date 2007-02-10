@@ -624,11 +624,18 @@ static char *SDPGenerate( sap_handler_t *p_sap,
 #endif
         sfilter = NULL;
 
-    int res = asprintf (&psz_sdp, "%s" "%s" "%s"
+    const char *comedia = NULL;
+    if (!strncasecmp (p_session->sdpformat, "DCCP", 4)
+     || !strncasecmp (p_session->sdpformat, "TCP", 3))
+        comedia = "a=setup:passive\r\n"
+                  "a=connection:new\r\n";
+
+    int res = asprintf (&psz_sdp, "%s" "%s" "%s" "%s"
                         "m=video %d %s\r\n",
                         head,
                         plgroup ?: "",
                         sfilter ?: "",
+                        comedia ?: "",
                         net_GetPort ((const struct sockaddr *)&p_session->addr),
                         p_session->sdpformat);
     free (plgroup);
