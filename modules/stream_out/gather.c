@@ -121,7 +121,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_id_t  *id;
     int i;
 
-    /* search a output compatible */
+    /* search a compatible output */
     for( i = 0; i < p_sys->i_id; i++ )
     {
         id = p_sys->id[i];
@@ -142,7 +142,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
     }
 
-    /* destroy all output of the same categorie */
+    /* destroy all outputs from the same category */
     for( i = 0; i < p_sys->i_id; i++ )
     {
         id = p_sys->id[i];
