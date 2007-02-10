@@ -267,29 +267,20 @@ static void Run( intf_thread_t *p_intf )
             cl = malloc( sizeof( telnet_client_t ));
             if( cl )
             {
-                char   *psz_pwd = strdup( "Password" );
-                char   *psz_tmp = NULL;
-                size_t ctrl_len = strlen( ": \xff\xfb\x01" );
-                size_t passwd_len = strlen( psz_pwd );
-
                 memset( cl, 0, sizeof(telnet_client_t) );
                 cl->i_tel_cmd = 0;
                 cl->fd = fd;
                 cl->buffer_write = NULL;
                 cl->p_buffer_write = cl->buffer_write;
-                psz_tmp = malloc( passwd_len + ctrl_len + 1 );
-                if( !psz_tmp )
-                {
-                    free( psz_pwd );
-                    continue;
-                }
-                memset( psz_tmp, 0, passwd_len + ctrl_len + 1 );
-                memcpy( psz_tmp, psz_pwd, passwd_len );
-                memcpy( psz_tmp + passwd_len, ": \xff\xfb\x01", ctrl_len );
-                Write_message( cl, NULL, psz_tmp, WRITE_MODE_PWD );
+                Write_message( cl, NULL,
+                               "Password: \xff\xfb\x01" , WRITE_MODE_PWD );
+
                 TAB_APPEND( p_sys->i_clients, p_sys->clients, cl );
-                free( psz_pwd );
-                free( psz_tmp );
+            }
+            else
+            {
+                msg_Err( p_intf, "Out of mem");
+                continue;
             }
         }
 
@@ -414,35 +405,19 @@ static void Run( intf_thread_t *p_intf )
         {
             telnet_client_t *cl = p_sys->clients[i];
 
-            if( (cl->i_mode >= WRITE_MODE_PWD) && (cl->i_buffer_write == 0) )
+            if( cl->i_mode >= WRITE_MODE_PWD && cl->i_buffer_write == 0 )
             {
                // we have finished to send
                cl->i_mode -= 2; // corresponding READ MODE
             }
-            else if( (cl->i_mode == READ_MODE_PWD) &&
-                     (*cl->p_buffer_read == '\n') )
+            else if( cl->i_mode == READ_MODE_PWD &&
+                     *cl->p_buffer_read == '\n' )
             {
                 *cl->p_buffer_read = '\0';
                 if( strcmp( psz_password, cl->buffer_read ) == 0 )
                 {
-                    char *psz_welcome = strdup( "Welcome, Master" );
-                    char *psz_tmp = NULL;
-                    size_t welcome_len = strlen( psz_welcome );
-                    size_t ctrl_len = strlen("\xff\xfc\x01\r\n");
-
-                    psz_tmp = malloc( welcome_len + ctrl_len + 4 + 1 );
-                    if( !psz_tmp )
-                    {
-                        free( psz_welcome );
-                        continue;
-                    }
-                    memset( psz_tmp, 0, welcome_len + ctrl_len + 4 + 1 );
-                    memcpy( psz_tmp, "\xff\xfc\x01\r\n", ctrl_len );
-                    memcpy( psz_tmp + ctrl_len, psz_welcome, welcome_len );
-                    memcpy( psz_tmp + ctrl_len + welcome_len, "\r\n> ", 4 );
-                    Write_message( cl, NULL, psz_tmp, WRITE_MODE_CMD );
-                    free( psz_welcome );
-                    free( psz_tmp );
+                    Write_message( cl, NULL, "\xff\xfc\x01\r\nWelcome, "
+                                   "Master\r\n> ", WRITE_MODE_CMD );
                 }
                 else
                 {
@@ -452,8 +427,8 @@ static void Run( intf_thread_t *p_intf )
                                    WRITE_MODE_PWD );
                 }
             }
-            else if( (cl->i_mode == READ_MODE_CMD) &&
-                     (*cl->p_buffer_read == '\n') )
+            else if( cl->i_mode == READ_MODE_CMD &&
+                     *cl->p_buffer_read == '\n' )
             {
                 /* ok, here is a command line */
                 if( !strncmp( cl->buffer_read, "logout", 6 ) ||
