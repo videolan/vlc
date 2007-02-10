@@ -433,7 +433,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             break;
 #endif
         case AF_INET:
-            headsize =+ 4;
+            headsize += 4;
             break;
         default:
             msg_Err( p_sap, "Address family %d not supported by SAP",
