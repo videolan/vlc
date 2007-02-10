@@ -117,7 +117,6 @@ vlc_module_begin();
     add_shortcut( "udp" );
     add_shortcut( "rtp" ); // Will work only with ts muxer
     add_shortcut( "udplite" );
-    add_shortcut( "rtplite" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -205,25 +204,26 @@ static int Open( vlc_object_t *p_this )
     config_ChainParse( p_access, "",
                        ppsz_core_options, p_access->p_cfg );
 
-    if( !( p_sys = malloc( sizeof( sout_access_out_sys_t ) ) ) )
+    if( !( p_sys = calloc ( 1, sizeof( sout_access_out_sys_t ) ) ) )
     {
         msg_Err( p_access, "not enough memory" );
         return VLC_EGENERIC;
     }
-    memset( p_sys, 0, sizeof(sout_access_out_sys_t) );
     p_access->p_sys = p_sys;
 
     if( p_access->psz_access != NULL )
     {
-        if (strncmp (p_access->psz_access, "rtp", 3) == 0)
+        if (strcmp (p_access->psz_access, "rtp") == 0)
+            p_sys->b_rtpts = VLC_TRUE;
+        if (strcmp (p_access->psz_access, "udplite") == 0)
         {
-            p_sys->b_rtpts = 1;
-            cscov += RTP_HEADER_LENGTH;
-        }
-        if ((strlen (p_access->psz_access) >= 3)
-         && (strcmp (p_access->psz_access + 3, "lite") == 0))
+            protoname = "UDP-Lite";
             proto = IPPROTO_UDPLITE;
+            p_sys->b_rtpts = VLC_TRUE;
+        }
     }
+    if (p_sys->b_rtpts)
+        cscov += RTP_HEADER_LENGTH;
 
     psz_parser = strdup( p_access->psz_name );
 
@@ -270,7 +270,7 @@ static int Open( vlc_object_t *p_this )
     i_handle = net_ConnectDgram( p_this, psz_dst_addr, i_dst_port, -1, proto );
     if( i_handle == -1 )
     {
-         msg_Err( p_access, "failed to create UDP socket" );
+         msg_Err( p_access, "failed to create %s socket", protoname );
          return VLC_EGENERIC;
     }
 
@@ -310,8 +310,8 @@ static int Open( vlc_object_t *p_this )
 
     p_access->pf_seek = Seek;
 
-    msg_Dbg( p_access, "udp access output opened(%s:%d)",
-             psz_dst_addr, i_dst_port );
+    msg_Dbg( p_access, "%s access output opened(%s:%d)",
+             protoname, psz_dst_addr, i_dst_port );
 
     free( psz_dst_addr );
 
@@ -354,7 +354,7 @@ static void Close( vlc_object_t * p_this )
     /* update p_sout->i_out_pace_nocontrol */
     p_access->p_sout->i_out_pace_nocontrol--;
 
-    msg_Dbg( p_access, "udp access output closed" );
+    msg_Dbg( p_access, "UDP access output closed" );
     free( p_sys );
 }
 
@@ -383,7 +383,7 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
         {
             if( p_sys->p_buffer->i_dts + p_sys->p_thread->i_caching < mdate() )
             {
-                msg_Dbg( p_access, "late packet for udp input (" I64Fd ")",
+                msg_Dbg( p_access, "late packet for UDP input (" I64Fd ")",
                          mdate() - p_sys->p_buffer->i_dts
                           - p_sys->p_thread->i_caching );
             }

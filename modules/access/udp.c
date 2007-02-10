@@ -95,7 +95,6 @@ vlc_module_begin();
     add_shortcut( "rtp4" );
     add_shortcut( "rtp6" );
     add_shortcut( "udplite" );
-    add_shortcut( "rtplite" );
 
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -136,7 +135,7 @@ static int Open( vlc_object_t *p_this )
     char *psz_parser;
     const char *psz_server_addr, *psz_bind_addr = "";
     int  i_bind_port, i_server_port = 0;
-    int fam = AF_UNSPEC, proto = IPPROTO_UDP, cscov = 8;
+    int fam = AF_UNSPEC, proto = IPPROTO_UDP;
 
     if (strlen (p_access->psz_access) >= 3)
     {
@@ -152,11 +151,7 @@ static int Open( vlc_object_t *p_this )
         }
         if (strcmp (p_access->psz_access + 3, "lite") == 0)
             proto = IPPROTO_UDPLITE;
-   }
-   if (strncmp (p_access->psz_access, "rtp", 3) == 0)
-        /* Checksum coverage: RTP header is AT LEAST 12 bytes
-         * in addition to UDP header (8 bytes) */
-        cscov += 12;
+    }
 
     i_bind_port = var_CreateGetInteger( p_access, "server-port" );
 
@@ -222,7 +217,9 @@ static int Open( vlc_object_t *p_this )
 
 #ifdef UDPLITE_RECV_CSCOV
     if (proto == IPPROTO_UDPLITE)
-        setsockopt (p_sys->fd, SOL_UDPLITE, UDPLITE_RECV_CSCOV, &cscov, sizeof (cscov));
+        /* UDP header: 8 bytes + RTP header: 12 bytes (or more) */
+        setsockopt (p_sys->fd, SOL_UDPLITE, UDPLITE_RECV_CSCOV,
+                    &(int){ 20 }, sizeof (int));
 #endif
 
     /* FIXME */
