@@ -131,7 +131,7 @@ static int Open( vlc_object_t *p_this )
     sout_access_out_t   *p_access;
     sout_mux_t          *p_mux;
 
-    char                *psz_mux_byext = NULL;
+    const char          *psz_mux_byext = NULL;
 
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
@@ -178,7 +178,7 @@ static int Open( vlc_object_t *p_this )
             { "wav","wav" },
             { NULL,  NULL }
         };
-        char *psz_ext = strrchr( psz_url, '.' ) + 1;
+        const char *psz_ext = strrchr( psz_url, '.' ) + 1;
         int  i;
 
         msg_Dbg( p_this, "extension is %s", psz_ext );
