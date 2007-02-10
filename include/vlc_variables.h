@@ -350,6 +350,18 @@ static inline char *__var_GetString( vlc_object_t *p_obj, const char *psz_name )
         return strdup( "" );
 }
 
+static inline char *__var_GetNonEmptyString( vlc_object_t *obj, const char *name )
+{
+    vlc_value_t val;
+    if (!__var_Get (obj, name, &val))
+        return NULL;
+    if (*val.psz_string)
+        return val.psz_string;
+    free (val.psz_string);
+    return NULL;
+}
+
+
 /**
  * __var_GetInteger() with automatic casting
  */
@@ -370,6 +382,7 @@ static inline char *__var_GetString( vlc_object_t *p_obj, const char *psz_name )
  * __var_GetString() with automatic casting
  */
 #define var_GetString(a,b)   __var_GetString( VLC_OBJECT(a),b)
+#define var_GetNonEmptyString(a,b)   __var_GetNonEmptyString( VLC_OBJECT(a),b)
 
 
 
