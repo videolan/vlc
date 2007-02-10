@@ -328,6 +328,54 @@ char *convert_xml_special_chars( const char *psz_content )
     return psz_temp;
 }
 
+/* Base64 encoding */
+char *vlc_b64_encode( const char *src )
+{
+    static const char b64[] =
+           "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    size_t len = strlen( src );
+    const uint8_t *in = (const uint8_t *)src;
+
+    char *ret;
+    char *dst = (char *)malloc( ( len + 4 ) * 4 / 3 );
+    if( dst == NULL )
+        return NULL;
+
+    ret = dst;
+
+    while( len > 0 )
+    {
+        /* pops (up to) 3 bytes of input, push 4 bytes */
+        uint32_t v = *in++ << 24; // 1/3
+        *dst++ = b64[v >> 26]; // 1/4
+        v = v << 6;
+
+        if( len >= 2 )
+            v |= *in++ << 22; // 2/3
+        *dst++ = b64[v >> 26]; // 2/4
+        v = v << 6;
+
+        if( len >= 3 )
+            v |= *in++ << 20; // 3/3
+        *dst++ = ( len >= 2 ) ? b64[v >> 26] : '='; // 3/4
+        v = v << 6;
+
+        *dst++ = ( len >= 3 ) ? b64[v >> 26] : '='; // 4/4
+
+        len--;
+        if( len > 0 )
+        {
+            len--;
+            if( len > 0 )
+                len--;
+        }
+    }
+
+    *dst = '\0';
+
+    return ret;
+}
+
 /****************************************************************************
  * String formating functions
  ****************************************************************************/
