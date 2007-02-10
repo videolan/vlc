@@ -34,6 +34,10 @@
 static
 char *AddressToSDP (const struct sockaddr *addr, socklen_t addrlen, char *buf)
 {
+    if (addrlen < offsetof (struct sockaddr, sa_family)
+                 + sizeof (addr->sa_family))
+        return NULL;
+
     const char *ttl = NULL;
     strcpy (buf, "IN IP* ");
 
@@ -57,7 +61,7 @@ char *AddressToSDP (const struct sockaddr *addr, socklen_t addrlen, char *buf)
             return NULL;
     }
 
-    if (vlc_getnameinfo (addr, addrlen, buf + 4, MAXSDPADDRESS - 4, NULL,
+    if (vlc_getnameinfo (addr, addrlen, buf + 7, MAXSDPADDRESS - 7, NULL,
                          NI_NUMERICHOST))
         return NULL;
 
@@ -102,8 +106,8 @@ char *StartSDP (const char *name, const char *description, const char *url,
 
     if (!IsSDPString (name) || !IsSDPString (description)
      || !IsSDPString (url) || !IsSDPString (email) || !IsSDPString (phone)
-     || (AddressToSDP ((struct sockaddr *)&orig, origlen, machine) == NULL)
-     || (AddressToSDP ((struct sockaddr *)&addr, addrlen, conn) == NULL))
+     || (AddressToSDP ((struct sockaddr *)orig, origlen, machine) == NULL)
+     || (AddressToSDP ((struct sockaddr *)addr, addrlen, conn) == NULL))
         return NULL;
 
     if (asprintf (&sdp, "v=0"
@@ -115,7 +119,7 @@ char *StartSDP (const char *name, const char *description, const char *url,
                     "%s%s" // optional phone number
                     "\r\nc=%s"
                         // bandwidth not specified
-                    "\r\nt= 0 0" // one dummy time span
+                    "\r\nt=0 0" // one dummy time span
                         // no repeating
                         // no time zone adjustment (silly idea anyway)
                         // no encryption key (deprecated)
