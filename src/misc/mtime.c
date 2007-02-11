@@ -2,12 +2,13 @@
  * mtime.c: high resolution time management functions
  * Functions are prototyped in vlc_mtime.h.
  *****************************************************************************
- * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright (C) 1998-2007 the VideoLAN team
  * Copyright © 2006-2007 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Rémi Denis-Courmont <rem$videolan,org>
+ *          Gisle Vanem
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +55,7 @@
 #   include <sys/time.h>
 #endif
 
-#if defined(HAVE_NANOSLEEP) && !defined(HAVE_STRUCT_TIMESPEC)
+#if !defined(HAVE_STRUCT_TIMESPEC)
 struct timespec
 {
     time_t  tv_sec;
@@ -388,6 +389,47 @@ mtime_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
 
     return p_date->date;
 }
+
+#ifdef WIN32
+/*
+ * Number of micro-seconds between the beginning of the Windows epoch
+ * (Jan. 1, 1601) and the Unix epoch (Jan. 1, 1970).
+ *
+ * This assumes all Win32 compilers have 64-bit support.
+ */
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS) || defined(__WATCOMC__)
+#   define DELTA_EPOCH_IN_USEC  11644473600000000Ui64
+#else
+#   define DELTA_EPOCH_IN_USEC  11644473600000000ULL
+#endif
+
+static uint64_t filetime_to_unix_epoch (const FILETIME *ft)
+{
+    uint64_t res = (uint64_t) ft->dwHighDateTime << 32;
+
+    res |= ft->dwLowDateTime;
+    res /= 10;                   /* from 100 nano-sec periods to usec */
+    res -= DELTA_EPOCH_IN_USEC;  /* from Win epoch to Unix epoch */
+    return (res);
+}
+
+static int gettimeofday (struct timeval *tv, void *tz )
+{
+    FILETIME  ft;
+    uint64_t tim;
+
+    if (!tv) {
+        return VLC_EGENERIC;
+    }
+    GetSystemTimeAsFileTime (&ft);
+    tim = filetime_to_unix_epoch (&ft);
+    tv->tv_sec  = (long) (tim / 1000000L);
+    tv->tv_usec = (long) (tim % 1000000L);
+    return (0);
+}
+#endif
+
+
 
 /**
  * @return NTP 64-bits timestamp in host byte order.
