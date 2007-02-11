@@ -24,9 +24,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. ***************************************************************************/
 
 #include <vlc_sout.h>
-#if defined( WIN32 )
-#   include <winsock2.h>
-#endif
+#include <vlc_network.h>
 
 /****************************************************************************
  * sout_packetizer_input_t: p_sout <-> p_packetizer
