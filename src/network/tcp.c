@@ -276,82 +276,77 @@ int *__net_ListenTCP (vlc_object_t *p_this, const char *psz_host, int i_port)
  *****************************************************************************
  * Accept a connection on a set of listening sockets and return it
  *****************************************************************************/
-int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
+int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
 {
-    vlc_bool_t b_die = p_this->b_die, b_block = (i_wait < 0);
+    vlc_bool_t b_block = (i_wait < 0);
+    msg_Err (p_this, "waiting for connection...");
 
-    while( p_this->b_die == b_die )
+    while( !p_this->b_die )
     {
-        int i_val = -1, *pi, *pi_end;
-        struct timeval timeout;
-        fd_set fds_r, fds_e;
-
-        pi = pi_fd;
+        int maxfd = -1;
+        fd_set readset;
 
         /* Initialize file descriptor set */
-        FD_ZERO( &fds_r );
-        FD_ZERO( &fds_e );
+        FD_ZERO (&readset);
 
-        for( pi = pi_fd; *pi != -1; pi++ )
+        int *pi_end;
+        for (const int *pi = pi_fd; *pi != -1; pi++)
         {
-            int i_fd = *pi;
+            int fd = *pi;
 
-            if( i_fd > i_val )
-                i_val = i_fd;
+            if (fd > maxfd)
+                maxfd = fd;
 
-            FD_SET( i_fd, &fds_r );
-            FD_SET( i_fd, &fds_e );
+            FD_SET (fd, &readset);
+            pi_end++;
         }
-        pi_end = pi;
 
-        timeout.tv_sec = 0;
-        timeout.tv_usec = b_block ? 500000 : i_wait;
+        struct timeval tv = { 0, b_block ? 500000 : i_wait };
 
-        i_val = select( i_val + 1, &fds_r, NULL, &fds_e, &timeout );
-        if( ( ( i_val < 0 ) && ( net_errno == EINTR ) ) || i_val == 0 )
+        int val = select (maxfd, &readset, NULL, NULL, &tv);
+        if (val == 0)
         {
-            if( b_block )
+            if (b_block)
                 continue;
-            else
-                return -1;
+            return -1;
         }
-        else if( i_val < 0 )
+        if (val < 0)
         {
-            msg_Err( p_this, "network select error (%s)",
-                     net_strerror( net_errno ) );
+            if (net_errno != EINTR)
+                msg_Err( p_this, "network select error (%s)",
+                        net_strerror( net_errno ) );
             return -1;
         }
 
-        for( pi = pi_fd; *pi != -1; pi++ )
+        for (const int *pi = pi_fd; *pi != -1; pi++)
         {
-            int i_fd = *pi;
+            int fd = *pi;
 
-            if( !FD_ISSET( i_fd, &fds_r ) && !FD_ISSET( i_fd, &fds_e ) )
+            if (!FD_ISSET (fd, &readset))
                 continue;
 
-            i_val = accept( i_fd, NULL, 0 );
-            if( i_val < 0 )
-                msg_Err( p_this, "accept failed (%s)",
-                         net_strerror( net_errno ) );
-            else
+            fd = accept (fd, NULL, 0);
+            if (fd < 0)
             {
-                const int yes = 1;
-                setsockopt( i_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof( yes ));
-#if defined (WIN32) || defined (UNDER_CE)
-                ioctlsocket (i_fd, FIONBIO, &(unsigned long){ 1 });
-#else
-                fcntl (i_fd, F_SETFD, FD_CLOEXEC);
-                fcntl (i_fd, F_SETFL, fcntl (i_fd, F_GETFL, 0) | O_NONBLOCK);
-#endif
-                /*
-                 * This round-robin trick ensures that the first sockets in
-                 * pi_fd won't prevent the last ones from getting accept'ed.
-                 */
-                --pi_end;
-                memmove( pi, pi + 1, pi_end - pi );
-                *pi_end = i_fd;
-                return i_val;
+                msg_Err (p_this, "accept failed (%s)",
+                         net_strerror (net_errno));
+                continue;
             }
+            setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
+#if defined (WIN32) || defined (UNDER_CE)
+            ioctlsocket (fd, FIONBIO, &(unsigned long){ 1 });
+#else
+            fcntl (fd, F_SETFD, FD_CLOEXEC);
+            fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
+#endif
+
+            /*
+             * This round-robin trick ensures that the first sockets in
+             * pi_fd won't prevent the last ones from getting accept'ed.
+             */
+            --pi_end;
+            memmove (pi_fd, pi_fd + 1, pi_end - pi_fd);
+            *pi_end = *pi;
         }
     }
 
