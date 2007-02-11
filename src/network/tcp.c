@@ -279,7 +279,6 @@ int *__net_ListenTCP (vlc_object_t *p_this, const char *psz_host, int i_port)
 int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
 {
     vlc_bool_t b_block = (i_wait < 0);
-    msg_Err (p_this, "waiting for connection...");
 
     while( !p_this->b_die )
     {
