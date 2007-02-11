@@ -120,7 +120,6 @@ void InputManager::update()
     }
     else
     {
-        msg_Dbg( p_intf, "******** NONE" );
         emit navigationChanged( 0 );
     }
 
