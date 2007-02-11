@@ -624,7 +624,7 @@ static char *SDPGenerate( sap_handler_t *p_sap,
                         head,
                         plgroup ?: "",
                         comedia ?: "",
-                        net_GetPort ((const struct sockaddr *)&p_session->addr),
+                        ntohs (net_GetPort ((const struct sockaddr *)&p_session->addr)),
                         p_session->sdpformat);
     free (plgroup);
 
