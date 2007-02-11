@@ -365,10 +365,10 @@ static void CloseDecoder( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * local Functions
+ *
  *****************************************************************************/
-static void LibavcodecCallback( void *p_opaque, int i_level,
-                                const char *psz_format, va_list va )
+void E_(LibavcodecCallback)( void *p_opaque, int i_level,
+                             const char *psz_format, va_list va )
 {
     int i_vlc_level;
     AVCodecContext *p_avctx = (AVCodecContext *)p_opaque;
@@ -416,7 +416,7 @@ static void LibavcodecCallback( void *p_opaque, int i_level,
                               + 18 + 5 );
     snprintf( psz_new_format, strlen(psz_format) + strlen(psz_item_name)
               + 18 + 5, "%s (%s@%p)", psz_format, p_avc->item_name(p_opaque), p_opaque );
-    msg_GenericVa( p_this, MSG_QUEUE_NORMAL,i_vlc_level,
+    msg_GenericVa( p_this, MSG_QUEUE_NORMAL, i_vlc_level,
                     MODULE_STRING, psz_new_format, va );
     free( psz_new_format );
 }
@@ -434,7 +434,7 @@ void E_(InitLibavcodec)( vlc_object_t *p_object )
     {
         avcodec_init();
         avcodec_register_all();
-        av_log_set_callback( LibavcodecCallback );
+        av_log_set_callback( E_(LibavcodecCallback) );
         b_ffmpeginit = 1;
 
         msg_Dbg( p_object, "libavcodec initialized (interface %d )",

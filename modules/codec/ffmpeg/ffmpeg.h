@@ -29,6 +29,8 @@ struct AVCodecContext;
 struct AVCodec;
 
 void E_(InitLibavcodec)( vlc_object_t * );
+void E_(LibavcodecCallback)( void *p_opaque, int i_level,
+                             const char *psz_format, va_list va );
 int E_(GetFfmpegCodec) ( vlc_fourcc_t, int *, int *, const char ** );
 int E_(GetVlcFourcc)   ( int, int *, vlc_fourcc_t *, const char ** );
 int E_(GetFfmpegChroma)( vlc_fourcc_t );
