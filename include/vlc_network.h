@@ -120,8 +120,8 @@ VLC_EXPORT( int, __net_Read, ( vlc_object_t *p_this, int fd, const v_socket_t *,
 #define net_ReadNonBlock(a,b,c,d,e,f) __net_ReadNonBlock(VLC_OBJECT(a),b,c,d,e,f)
 VLC_EXPORT( int, __net_ReadNonBlock, ( vlc_object_t *p_this, int fd, const v_socket_t *, uint8_t *p_data, int i_data, mtime_t i_wait ) );
 
-#define net_Select(a,b,c,d,e,f,g) __net_Select(VLC_OBJECT(a),b,c,d,e,f,g)
-VLC_EXPORT( int, __net_Select, ( vlc_object_t *p_this, const int *pi_fd, const v_socket_t *const *, int i_fd, uint8_t *p_data, int i_data, mtime_t i_wait ) );
+#define net_Select(a,b,c,d,e,f) __net_Select(VLC_OBJECT(a),b,c,d,e,f)
+VLC_EXPORT( int, __net_Select, ( vlc_object_t *p_this, const int *pi_fd, int i_fd, uint8_t *p_data, int i_data, mtime_t i_wait ) );
 
 #define net_Write(a,b,c,d,e) __net_Write(VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __net_Write, ( vlc_object_t *p_this, int fd, const v_socket_t *, const uint8_t *p_data, int i_data ) );

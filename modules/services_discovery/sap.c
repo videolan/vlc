@@ -524,7 +524,7 @@ static void Run( services_discovery_t *p_sd )
         int i_read;
         uint8_t p_buffer[MAX_SAP_BUFFER+1];
 
-        i_read = net_Select( p_sd, p_sd->p_sys->pi_fd, NULL,
+        i_read = net_Select( p_sd, p_sd->p_sys->pi_fd,
                              p_sd->p_sys->i_fd, p_buffer,
                              MAX_SAP_BUFFER, 500000 );
 
@@ -658,13 +658,12 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         int newsize = Decompress (buf, &decomp, end - buf);
         if (newsize < 0)
         {
-            msg_Warn( p_sd, "decompression of sap packet failed" );
+            msg_Dbg( p_sd, "decompression of SAP packet failed" );
             return VLC_EGENERIC;
         }
 
         decomp = realloc (decomp, newsize + 1);
         decomp[newsize] = '\0';
-
         psz_sdp = (const char *)decomp;
         len = newsize;
     }

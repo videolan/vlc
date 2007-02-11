@@ -464,20 +464,13 @@ int __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
  * that has some.
  *****************************************************************************/
 int __net_Select( vlc_object_t *restrict p_this, const int *restrict pi_fd,
-                  const v_socket_t *const *restrict pp_vs,
                   int i_fd, uint8_t *restrict p_data, int i_data,
                   mtime_t i_wait )
 {
-    if( pp_vs == NULL )
-    {
-        const v_socket_t *vsv[i_fd];
-        memset( vsv, 0, sizeof (vsv) );
+    const v_socket_t *vsv[i_fd];
+    memset( vsv, 0, sizeof (vsv) );
 
-        return net_ReadInner( p_this, i_fd, pi_fd, vsv, p_data, i_data,
-                              i_wait / 1000, VLC_FALSE );
-    }
-
-    return net_ReadInner( p_this, i_fd, pi_fd, pp_vs, p_data, i_data,
+    return net_ReadInner( p_this, i_fd, pi_fd, vsv, p_data, i_data,
                           i_wait / 1000, VLC_FALSE );
 }
 
