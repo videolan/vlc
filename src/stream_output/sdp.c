@@ -135,7 +135,7 @@ char *StartSDP (const char *name, const char *description, const char *url,
                     "\r\na=recvonly"
                     "\r\na=type:broadcast"
                     "\r\na=charset:UTF-8"
-		    "%s" // optional source filter
+                    "%s" // optional source filter
                     "\r\n",
                /* o= */ t, t, machine,
                /* s= */ name,
