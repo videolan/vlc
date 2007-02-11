@@ -349,18 +349,19 @@ static int Open( vlc_object_t *p_this )
 
         static const struct { const char *access; const char *fmt; } fmts[] =
             {
+                /* TLS/DTLS variants (none implemented): */
+                { "dtlslite", "UDPLite/TLS/RTP/AVP %d" },
+                { "dtls",     "UDP/TLS/RTP/AVP %d" },
+                { "dccps",    "DCCP/TLS/RTP/AVP %d" },
+                { "tls",      "TCP/TLS/RTP/AVP %d" },
+                /* Plain text: */
+                { "udplite",  "UDPLite/RTP/AVP %d" },
                 { "udp",      "udp mpeg" },
                 { "rtp",      "RTP/AVP %d" },
-                { "udplite",  "UDPLite/RTP/AVP %d" },
                 /* Currently unsupported access outputs: */
                 { "dccp",     "DCCP/RTP/AVP %d" },
                 { "tcp",      "TCP/RTP/AVP %d" },
-                /* TLS/DTLS variants (none implemented). */
-                { "dtls",     "UDP/TLS/RTP/AVP %d" },
-                { "dtlslite", "UDPLite/TLS/RTP/AVP %d" },
-                { "dccps",    "DCCP/TLS/RTP/AVP %d" },
-                { "tls",      "TCP/TLS/RTP/AVP %d" },
-                /* SRTP (not implemented) */
+                /* SRTP (none implemented): */
                 { "srtp",     "RTP/SAVP %d" },
                 { "sudplite", "UDPLite/RTP/SAVP %d" },
                 { "sdccp",    "DCCP/RTP/SAVP %d" },
@@ -372,7 +373,7 @@ static int Open( vlc_object_t *p_this )
         int sport, dport;
 
         for (unsigned i = 0; fmts[i].access != NULL; i++)
-            if (strcasecmp (fmts[i].access, psz_access) == 0)
+            if (strncasecmp (fmts[i].access, psz_access, strlen (fmts[i].access)) == 0)
             {
                 psz_sdp_fmt = fmts[i].fmt;
                 break;
