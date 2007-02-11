@@ -393,11 +393,6 @@ static int OpenDemux( vlc_object_t *p_this )
         goto error;
     }
 
-    if( p_sdp->mediac > 1 )
-    {
-        goto error;
-    }
-
     if( ParseConnection( VLC_OBJECT( p_demux ), p_sdp ) )
     {
         p_sdp->psz_uri = NULL;
@@ -706,25 +701,22 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     p_sdp = ParseSDP( VLC_OBJECT(p_sd), psz_sdp );
 
     if( p_sdp == NULL )
-    {
         return VLC_EGENERIC;
-    }
 
     /* Decide whether we should add a playlist item for this SDP */
     /* Parse connection information (c= & m= ) */
     if( ParseConnection( VLC_OBJECT(p_sd), p_sdp ) )
-    {
         p_sdp->psz_uri = NULL;
-    }
 
     /* Multi-media or no-parse -> pass to LIVE.COM */
-    if( p_sdp->mediac > 1 || ( p_sdp->i_media_type != 14 &&
-                                p_sdp->i_media_type != 32 &&
-                                p_sdp->i_media_type != 33) ||
-        p_sd->p_sys->b_parse == VLC_FALSE )
+    if( ( p_sdp->i_media_type != 14
+       && p_sdp->i_media_type != 32
+       && p_sdp->i_media_type != 33)
+     || p_sd->p_sys->b_parse == VLC_FALSE )
     {
-        if( p_sdp->psz_uri ) free( p_sdp->psz_uri );
-        asprintf( &p_sdp->psz_uri, "sdp://%s", p_sdp->psz_sdp );
+        free( p_sdp->psz_uri );
+        if (asprintf( &p_sdp->psz_uri, "sdp://%s", p_sdp->psz_sdp ) == -1)
+            p_sdp->psz_uri = NULL;
     }
 
     if( p_sdp->psz_uri == NULL ) return VLC_EGENERIC;
@@ -1186,7 +1178,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                     msg_Dbg (p_obj, "missing SDP media port");
                     goto error;
                 }
-                int port = atoi (data);
+                int port = atoi (++data);
                 if (port <= 0 || port >= 65536)
                 {
                     msg_Dbg (p_obj, "invalid transport port %d", port);
@@ -1200,7 +1192,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                     msg_Dbg (p_obj, "missing SDP media format");
                     goto error;
                 }
-                m->fmt = strdup (data);
+                m->fmt = strdup (++data);
                 if (m->fmt == NULL)
                     goto error;
 
