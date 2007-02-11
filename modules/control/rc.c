@@ -502,6 +502,11 @@ static void Run( intf_thread_t *p_intf )
         {
             p_intf->p_sys->i_socket =
                 net_Accept( p_intf, p_intf->p_sys->pi_socket_listen, 0 );
+            if( p_intf->p_sys->i_socket == -1 )
+            {
+                msleep( INTF_IDLE_SLEEP );
+                continue;
+            }
         }
 
         b_complete = ReadCommand( p_intf, p_buffer, &i_size );
