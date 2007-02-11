@@ -182,7 +182,7 @@ static int Open( vlc_object_t *p_this )
 
     psz_accessname = psz_parser = strdup( p_access->psz_path );
 
-    if( !p_access->psz_name )
+    if( !p_access->psz_path )
     {
         msg_Err( p_access,
                  "please specify url=user:password@host:port/mountpoint" );
