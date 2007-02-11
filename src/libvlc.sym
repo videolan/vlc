@@ -203,6 +203,7 @@ playlist_GetPreferredNode
 playlist_IsServicesDiscoveryLoaded
 playlist_ItemGetById
 playlist_ItemGetByInput
+playlist_ItemGetByInputId
 __playlist_ItemNewFromInput
 playlist_ItemNewWithType
 playlist_ItemSetName

@@ -382,8 +382,9 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
                                    vlc_bool_t );
 
 /********************************** Item search *************************/
-VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int, vlc_bool_t) );
+VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int, vlc_bool_t ) );
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetByInput, (playlist_t *,input_item_t *, vlc_bool_t ) );
+VLC_EXPORT( playlist_item_t *, playlist_ItemGetByInputId, (playlist_t *, int, playlist_item_t *) );
 
 VLC_EXPORT( int, playlist_LiveSearchUpdate, (playlist_t *, playlist_item_t *, const char *) );
 

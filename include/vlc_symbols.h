@@ -245,6 +245,7 @@ struct module_symbols_t
     playlist_item_t* (*playlist_ItemToNode_inner) (playlist_t *,playlist_item_t *, vlc_bool_t);
     playlist_item_t * (*playlist_ItemGetById_inner) (playlist_t *, int, vlc_bool_t);
     playlist_item_t * (*playlist_ItemGetByInput_inner) (playlist_t *,input_item_t *, vlc_bool_t);
+    playlist_item_t * (*playlist_ItemGetByInputId_inner) (playlist_t *, int, playlist_item_t *);
     int (*playlist_RecursiveNodeSort_inner) (playlist_t *, playlist_item_t *,int, int);
     int (*playlist_Export_inner) (playlist_t *p_playlist, const char *psz_name, playlist_item_t *p_export_root, const char *psz_type);
     spu_t * (*__spu_Create_inner) (vlc_object_t *);
@@ -681,6 +682,7 @@ struct module_symbols_t
 #  define playlist_ItemToNode (p_symbols)->playlist_ItemToNode_inner
 #  define playlist_ItemGetById (p_symbols)->playlist_ItemGetById_inner
 #  define playlist_ItemGetByInput (p_symbols)->playlist_ItemGetByInput_inner
+#  define playlist_ItemGetByInputId (p_symbols)->playlist_ItemGetByInputId_inner
 #  define playlist_RecursiveNodeSort (p_symbols)->playlist_RecursiveNodeSort_inner
 #  define playlist_Export (p_symbols)->playlist_Export_inner
 #  define __spu_Create (p_symbols)->__spu_Create_inner
@@ -1120,6 +1122,7 @@ struct module_symbols_t
     ((p_symbols)->playlist_ItemToNode_inner) = playlist_ItemToNode; \
     ((p_symbols)->playlist_ItemGetById_inner) = playlist_ItemGetById; \
     ((p_symbols)->playlist_ItemGetByInput_inner) = playlist_ItemGetByInput; \
+    ((p_symbols)->playlist_ItemGetByInputId_inner) = playlist_ItemGetByInputId; \
     ((p_symbols)->playlist_RecursiveNodeSort_inner) = playlist_RecursiveNodeSort; \
     ((p_symbols)->playlist_Export_inner) = playlist_Export; \
     ((p_symbols)->__spu_Create_inner) = __spu_Create; \
