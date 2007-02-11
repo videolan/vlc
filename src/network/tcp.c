@@ -288,7 +288,7 @@ int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
         /* Initialize file descriptor set */
         FD_ZERO (&readset);
 
-        int *pi_end;
+        int *pi_end = pi_fd;
         for (const int *pi = pi_fd; *pi != -1; pi++)
         {
             int fd = *pi;
@@ -302,7 +302,7 @@ int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
 
         struct timeval tv = { 0, b_block ? 500000 : i_wait };
 
-        int val = select (maxfd, &readset, NULL, NULL, &tv);
+        int val = select (maxfd + 1, &readset, NULL, NULL, &tv);
         if (val == 0)
         {
             if (b_block)
@@ -346,6 +346,8 @@ int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
             --pi_end;
             memmove (pi_fd, pi_fd + 1, pi_end - pi_fd);
             *pi_end = *pi;
+            msg_Dbg (p_this, "accepted socket %d (from socket %d)", fd, *pi);
+            return fd;
         }
     }
 
