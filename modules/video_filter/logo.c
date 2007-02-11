@@ -450,6 +450,10 @@ static int Init( vout_thread_t *p_vout )
             p_sys->posx = p_vout->render.i_width / 2 - p_sys->i_width / 2;
         }
     }
+    else
+    {
+        p_sys->pos = 0;
+    }
 
     /* Try to open the real video output */
     msg_Dbg( p_vout, "spawning the real video output" );
@@ -554,12 +558,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_inpic )
                     p_sys->p_blend->fmt_in.video.i_visible_height =
                         p_pic->p[Y_PLANE].i_visible_lines;
 
-            /* Just in case the new image would overflow the vout */
-            if( (unsigned int)(p_sys->posy + p_sys->i_height)
-                                                > p_vout->render.i_height
-             || (unsigned int)(p_sys->posx + p_sys->i_width)
-                                                > p_vout->render.i_width
-             || p_sys->pos )
+            if( p_sys->pos )
             {
                 if( p_sys->pos & SUBPICTURE_ALIGN_BOTTOM )
                 {
@@ -569,7 +568,6 @@ static void Render( vout_thread_t *p_vout, picture_t *p_inpic )
                 {
                     p_sys->posy = p_vout->render.i_height/2 - p_sys->i_height/2;
                 }
-
                 if( p_sys->pos & SUBPICTURE_ALIGN_RIGHT )
                 {
                     p_sys->posx = p_vout->render.i_width - p_sys->i_width;
