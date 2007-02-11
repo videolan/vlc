@@ -337,8 +337,11 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
             {
                 const int yes = 1;
                 setsockopt( i_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof( yes ));
-#ifdef FD_CLOEXEC
-                fcntl( i_fd, F_SETFD, FD_CLOEXEC );
+#if defined (WIN32) || defined (UNDER_CE)
+                ioctlsocket (i_fd, FIONBIO, &(unsigned long){ 1 });
+#else
+                fcntl (i_fd, F_SETFD, FD_CLOEXEC);
+                fcntl (i_fd, F_SETFL, fcntl (i_fd, F_GETFL, 0) | O_NONBLOCK);
 #endif
                 /*
                  * This round-robin trick ensures that the first sockets in
