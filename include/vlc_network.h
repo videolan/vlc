@@ -331,6 +331,20 @@ static inline uint16_t net_GetPort (const struct sockaddr *addr)
     return 0;
 }
 
+static inline void net_SetPort (struct sockaddr *addr, uint16_t port)
+{
+    switch (addr->sa_family)
+    {
+#ifdef AF_INET6
+        case AF_INET6:
+            ((struct sockaddr_in6 *)addr)->sin6_port = port;
+	    break;
+#endif
+        case AF_INET:
+            ((struct sockaddr_in *)addr)->sin_port = port;
+	    break;
+    }
+}
 # ifdef __cplusplus
 }
 # endif
