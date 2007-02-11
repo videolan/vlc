@@ -215,7 +215,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     if( p_enc->fmt_out.i_cat == VIDEO_ES && i_cat != VIDEO_ES )
     {
         msg_Err( p_enc, "\"%s\" is not a video encoder", psz_namecodec );
-        intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"), 
+        intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"),
                         _("\"%s\" is no video encoder."), psz_namecodec );
         return VLC_EGENERIC;
     }
@@ -223,7 +223,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     if( p_enc->fmt_out.i_cat == AUDIO_ES && i_cat != AUDIO_ES )
     {
         msg_Err( p_enc, "\"%s\" is not an audio encoder", psz_namecodec );
-        intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"), 
+        intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"),
                         _("\"%s\" is no audio encoder."), psz_namecodec );
         return VLC_EGENERIC;
     }
@@ -235,7 +235,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     if( !p_codec )
     {
         msg_Err( p_enc, "cannot find encoder %s", psz_namecodec );
-        intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"), 
+        intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"),
                         _("VLC could not find encoder \"%s\"."), psz_namecodec );
         return VLC_EGENERIC;
     }
@@ -407,7 +407,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->max_b_frames =
             __MAX( __MIN( p_sys->i_b_frames, FF_MAX_B_FRAMES ), 0 );
         p_context->b_frame_strategy = 0;
-        if( !p_context->max_b_frames  && 
+        if( !p_context->max_b_frames  &&
             (  p_enc->fmt_out.i_codec == VLC_FOURCC('m', 'p', '2', 'v') ||
                p_enc->fmt_out.i_codec == VLC_FOURCC('m', 'p', '1', 'v') ) )
             p_context->flags |= CODEC_FLAG_LOW_DELAY;
@@ -589,7 +589,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             {
                 vlc_mutex_unlock( lockval.p_address );
                 msg_Err( p_enc, "cannot open encoder" );
-                intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"), 
+                intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"),
                                 _("VLC could not open the encoder.") );
                 free( p_sys );
                 return VLC_EGENERIC;
@@ -598,7 +598,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         else
         {
             msg_Err( p_enc, "cannot open encoder" );
-            intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"), 
+            intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"),
                             _("VLC could not open the encoder.") );
             free( p_sys );
             return VLC_EGENERIC;
@@ -784,7 +784,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                 {
                     if ( p_sys->b_trellis )
                         p_sys->p_context->flags |= CODEC_FLAG_TRELLIS_QUANT;
-                        
+
                     p_sys->p_context->noise_reduction =
                         p_sys->i_noise_reduction;
                 }

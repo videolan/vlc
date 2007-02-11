@@ -314,7 +314,7 @@ static int Demux( demux_t *p_demux )
 
     if( pkt.dts > 0  &&
         ( pkt.stream_index == p_sys->i_pcr_tk || p_sys->i_pcr_tk < 0 ) )
-    {    
+    {
         p_sys->i_pcr_tk = pkt.stream_index;
         p_sys->i_pcr = p_frame->i_dts;
 

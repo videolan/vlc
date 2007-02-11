@@ -248,7 +248,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     codec->bit_rate = p_input->p_fmt->i_bitrate;
-    codec->codec_tag = p_input->p_fmt->i_codec;
+    /* This is a hack */
+    if( i_codec_id == CODEC_ID_MP2 )
+        i_codec_id = CODEC_ID_MP3;
+    codec->codec_tag = av_codec_get_tag( p_sys->oc->oformat->codec_tag, i_codec_id );//p_input->p_fmt->i_codec;
     codec->codec_id = i_codec_id;
 
     if( p_input->p_fmt->i_extra )
@@ -337,6 +340,9 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     if( p_data->i_dts > 0 )
         pkt.dts = p_data->i_dts * p_stream->time_base.den /
             I64C(1000000) / p_stream->time_base.num;
+
+    /* this is another hack to prevent libavformat from triggering the "non monotone timestamps" check in avformat/utils.c */
+    p_stream->cur_dts = AV_NOPTS_VALUE;
 
     if( av_write_frame( p_sys->oc, &pkt ) < 0 )
     {
