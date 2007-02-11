@@ -44,6 +44,10 @@
 /* Version checking */
 #if defined(HAVE_FFMPEG_AVFORMAT_H) || defined(HAVE_LIBAVFORMAT_TREE)
 
+static const char *ppsz_mux_options[] = {
+    "mux", NULL
+};
+
 /*****************************************************************************
  * mux_sys_t: mux descriptor
  *****************************************************************************/
@@ -79,17 +83,28 @@ static offset_t IOSeek( void *opaque, offset_t offset, int whence );
  *****************************************************************************/
 int E_(OpenMux)( vlc_object_t *p_this )
 {
-    AVOutputFormat *file_oformat; 
+    AVOutputFormat *file_oformat;
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys;
     AVFormatParameters params, *ap = &params;
+    char *psz_mux;
 
     /* Should we call it only once ? */
     av_register_all();
 
+    config_ChainParse( p_mux, "ffmpeg-", ppsz_mux_options, p_mux->p_cfg );
+
     /* Find the requested muxer */
-    file_oformat =
-        guess_format(NULL, p_mux->p_access->psz_path, NULL);
+    psz_mux = var_GetNonEmptyString( p_mux, "ffmpeg-mux" );
+    if( psz_mux )
+    {
+        file_oformat = guess_format( psz_mux, NULL, NULL );
+    }
+    else
+    {
+        file_oformat =
+            guess_format(NULL, p_mux->p_access->psz_path, NULL);
+    }
     if (!file_oformat)
     {
       msg_Err( p_mux, "unable for find a suitable output format" );

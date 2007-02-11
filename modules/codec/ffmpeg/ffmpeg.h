@@ -297,3 +297,6 @@ N_("<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...
 #define SCALEMODE_TEXT N_("Scaling mode")
 #define SCALEMODE_LONGTEXT N_("Scaling mode to use.")
 
+#define MUX_TEXT N_("Ffmpeg mux")
+#define MUX_LONGTEXT N_("Force use of ffmpeg muxer.")
+

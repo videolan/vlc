@@ -193,6 +193,8 @@ vlc_module_begin();
     add_submodule();
     set_description( _("FFmpeg muxer" ) );
     set_capability( "sout mux", 2 );
+    add_string( "ffmpeg-mux", NULL, NULL, MUX_TEXT,
+                MUX_LONGTEXT, VLC_TRUE );
     set_callbacks( E_(OpenMux), E_(CloseMux) );
 
 #if defined(HAVE_FFMPEG_SWSCALE_H) || defined(HAVE_LIBSWSCALE_TREE)
