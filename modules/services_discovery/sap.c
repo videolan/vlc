@@ -703,6 +703,8 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     if( p_sdp == NULL )
         return VLC_EGENERIC;
 
+    p_sdp->psz_sdp = psz_sdp;
+
     /* Decide whether we should add a playlist item for this SDP */
     /* Parse connection information (c= & m= ) */
     if( ParseConnection( VLC_OBJECT(p_sd), p_sdp ) )
@@ -1328,9 +1330,8 @@ static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i
 
 static void FreeSDP( sdp_t *p_sdp )
 {
-    FREENULL( p_sdp->psz_sdp );
-    FREENULL( p_sdp->psz_sessionname );
-    FREENULL( p_sdp->psz_uri );
+    free( p_sdp->psz_sessionname );
+    free( p_sdp->psz_uri );
 
     for (unsigned j = 0; j < p_sdp->mediac; j++)
     {
