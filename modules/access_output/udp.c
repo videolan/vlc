@@ -100,6 +100,9 @@ static void Close( vlc_object_t * );
                        "directly, without trying to fill the MTU (ie, " \
                        "without trying to make the biggest possible packets " \
                        "in order to improve streaming)." )
+#define AUTO_MCAST_TEXT N_("Automatic multicast streaming")
+#define AUTO_MCAST_LONGTEXT N_("Allocates an outbound multicast address " \
+                               "automatically.")
 
 vlc_module_begin();
     set_description( _("UDP stream output") );
@@ -112,6 +115,8 @@ vlc_module_begin();
     add_suppressed_integer( SOUT_CFG_PREFIX "late" );
     add_bool( SOUT_CFG_PREFIX "raw",  0, NULL, RAW_TEXT, RAW_LONGTEXT,
                                  VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "auto-mcast", 0, NULL, AUTO_MCAST_TEXT,
+              AUTO_MCAST_LONGTEXT, VLC_TRUE );
 
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );
@@ -125,6 +130,7 @@ vlc_module_end();
  *****************************************************************************/
 
 static const char *ppsz_sout_options[] = {
+    "auto-mcast",
     "caching",
     "group",
     "raw",
@@ -146,6 +152,7 @@ static int  Seek    ( sout_access_out_t *, off_t  );
 
 static void ThreadWrite( vlc_object_t * );
 static block_t *NewUDPPacket( sout_access_out_t *, mtime_t );
+static const char *MakeRandMulticast (int family, char *buf, size_t buflen);
 
 typedef struct sout_access_thread_t
 {
@@ -190,8 +197,7 @@ static int Open( vlc_object_t *p_this )
     sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t   *p_sys;
 
-    char                *psz_parser;
-    char                *psz_dst_addr;
+    char                *psz_dst_addr = NULL;
     int                 i_dst_port, proto = IPPROTO_UDP, cscov = 8;
     const char          *protoname = "UDP";
 
@@ -225,26 +231,26 @@ static int Open( vlc_object_t *p_this )
     if (p_sys->b_rtpts)
         cscov += RTP_HEADER_LENGTH;
 
-    psz_parser = strdup( p_access->psz_path );
-
-    psz_dst_addr = psz_parser;
     i_dst_port = DEFAULT_PORT;
-
-    if (psz_parser[0] == '[')
+    if (var_CreateGetBool (p_access, SOUT_CFG_PREFIX"auto-mcast"))
     {
-        psz_parser = strchr (psz_parser, ']');
+        char buf[INET6_ADDRSTRLEN];
+        if (MakeRandMulticast (AF_INET, buf, sizeof (buf)) != NULL)
+            psz_dst_addr = strdup (buf);
+    }
+    else
+    {
+        char *psz_parser = psz_dst_addr = strdup( p_access->psz_path );
+
+        if (psz_parser[0] == '[')
+            psz_parser = strchr (psz_parser, ']');
+
+        psz_parser = strchr (psz_parser, ':');
         if (psz_parser != NULL)
         {
             *psz_parser++ = '\0';
-            psz_dst_addr++;
+            i_dst_port = atoi (psz_parser);
         }
-    }
-
-    psz_parser = strchr (psz_parser, ':');
-    if (psz_parser != NULL)
-    {
-        *psz_parser++ = '\0';
-        i_dst_port = atoi (psz_parser);
     }
 
     if (var_Create (p_access, "dst-port", VLC_VAR_INTEGER)
@@ -328,9 +334,6 @@ static int Open( vlc_object_t *p_this )
     else p_access->pf_write = Write;
 
     p_access->pf_seek = Seek;
-
-    msg_Dbg( p_access, "%s access output opened(%s:%d)",
-             protoname, psz_dst_addr, i_dst_port );
 
     free( psz_dst_addr );
 
@@ -632,4 +635,35 @@ static void ThreadWrite( vlc_object_t *p_this )
 
         i_date_last = i_date;
     }
+}
+
+
+static const char *MakeRandMulticast (int family, char *buf, size_t buflen)
+{
+    uint32_t rand = (getpid() & 0xffff)
+                  | (uint32_t)(((mdate () >> 10) & 0xffff) << 16);
+
+    switch (family)
+    {
+#ifdef AF_INET6
+        case AF_INET6:
+        {
+            struct in6_addr addr;
+            memcpy (&addr, "\xff\x38\x00\x00" "\x00\x00\x00\x00"
+                           "\x00\x00\x00\x00", 12);
+            rand |= 0x80000000;
+            memcpy (addr.s6_addr + 12, &(uint32_t){ htonl (rand) }, 4);
+            return inet_ntop (family, &addr, buf, buflen);
+        }
+#endif
+
+        case AF_INET:
+        {
+            struct in_addr addr;
+            addr.s_addr = htonl ((rand & 0xffffff) | 0xe8000000);
+            return inet_ntop (family, &addr, buf, buflen);
+        }
+    }
+    errno = EAFNOSUPPORT;
+    return NULL;
 }
