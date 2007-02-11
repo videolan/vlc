@@ -344,7 +344,6 @@ static int Open( vlc_object_t *p_this )
     {
         session_descriptor_t *p_session;
         announce_method_t *p_method = sout_SAPMethod ();
-        vlc_url_t url;
         const int payload_type = 33;
 
         static const struct { const char *access; const char *fmt; } fmts[] =
@@ -403,25 +402,8 @@ static int Open( vlc_object_t *p_this )
                                                 SOUT_CFG_PREFIX);
         sout_SessionSetMedia (VLC_OBJECT (p_stream), p_session, fmt,
                               src, sport, dst, dport);
-
-        /* Now, parse the URL to extract host and port */
-        vlc_UrlParse( &url, psz_url , 0);
-
-        if( url.psz_host )
-        {
-            if( url.i_port == 0 ) url.i_port = DEFAULT_PORT;
-
-#if 0
-            p_session->psz_uri = strdup( url.psz_host );
-            p_session->i_port = url.i_port;
-            p_session->b_rtp = strstr( psz_access, "rtp") ? 1 : 0;
-#endif
-            msg_Info( p_this, "SAP Enabled");
-
-            sout_AnnounceRegister( p_sout, p_session, p_method );
-            p_stream->p_sys->p_session = p_session;
-        }
-        vlc_UrlClean( &url );
+        sout_AnnounceRegister( p_sout, p_session, p_method );
+        p_stream->p_sys->p_session = p_session;
         sout_MethodRelease (p_method);
     }
 nosap:
