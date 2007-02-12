@@ -182,7 +182,7 @@ struct sdp_media_t
 /* The structure that contains sdp information */
 struct  sdp_t
 {
-    char *psz_sdp;
+    const char *psz_sdp;
 
     /* o field */
     char     username[64];
@@ -829,6 +829,17 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     return p_sap;
 }
 
+
+static const char *FindAttribute (const sdp_t *sdp, unsigned media,
+                                  const char *name)
+{
+    /* Look for media attribute, and fallback to session */
+    return GetAttribute (sdp->mediav[media].pp_attributes,
+                         sdp->mediav[media].i_attributes, name)
+        ?: GetAttribute (sdp->pp_attributes, sdp->i_attributes, name);
+}
+
+
 /* Fill p_sdp->psz_uri */
 static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
 {
@@ -872,12 +883,14 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     if (p_sdp->i_media_type == 0)
          p_sdp->i_media_type = 33;
 
+    /* RTP protocol, nul, VLC shortcut, nul, flags byte as follow:
+     * 0x1: Connection-Oriented media. */
     static const char proto_match[] =
-        "udp\0"             "udp\0"
-        "RTP/AVP\0"         "rtp\0"
-        "UDPLite/RTP/AVP\0" "udplite\0"
-        "DCCP/RTP/AVP\0"    "dccp\0"
-        "TCP/RTP/AVP\0"     "tcp\0"
+        "udp\0"             "udp\0\0"
+        "RTP/AVP\0"         "rtp\0\0"
+        "UDPLite/RTP/AVP\0" "udplite\0\0"
+        "DCCP/RTP/AVP\0"    "dccp\0\1"
+        "TCP/RTP/AVP\0"     "rtptcp\0\1"
         "\0";
 
     const char *vlc_proto = NULL;
@@ -886,10 +899,25 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         if (strcasecmp (proto, sdp_proto))
         {
             vlc_proto = proto + strlen (proto) + 1;
+
+            if (vlc_proto[strlen (vlc_proto) + 1] & 1)
+            {
+                /* COMEDIA check */
+                const char *setup = FindAttribute (p_sdp, 0, "setup");
+                if (setup == NULL)
+                    setup = "active"; /* default value */
+
+                if (strcmp (setup, "actpass") && strcmp (setup, "passive"))
+                {
+                    msg_Dbg (p_obj, "unsupported COMEDIA mode: %s", setup);
+                    free (sdp_proto);
+                    return VLC_EGENERIC;
+                }
+            }
             break;
         }
         proto += strlen (proto) + 1;
-        proto += strlen (proto) + 1;
+        proto += strlen (proto) + 2;
     }
 
     free (sdp_proto);
@@ -901,13 +929,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     }
 
     /* handle SSM case */
-    const char *sfilter = GetAttribute( p_sdp->mediav[0].pp_attributes,
-                                        p_sdp->mediav[0].i_attributes,
-                                        "source-filter" );
-    if (sfilter == NULL)
-        sfilter = GetAttribute( p_sdp->pp_attributes, p_sdp->i_attributes,
-                                "source-filter" );
-
+    const char *sfilter = FindAttribute (p_sdp, 0, "source-filter");
     char psz_source[258] = "";
     if (sfilter != NULL)
     {
