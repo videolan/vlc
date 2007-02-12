@@ -39,6 +39,7 @@
 #include <vlc/vlc.h>
 
 #ifdef WIN32
+#include <windows.h>
 extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
                            int expand_wildcards, int *startupinfo);
 #endif
@@ -113,7 +114,34 @@ int main( int i_argc, char *ppsz_argv[] )
         __wgetmainargs(&i_wargc, &wargv, &wenvp, 0, &si);
 
         for( i = 1; i < i_wargc; i++ )
-            ppsz_argv[i] = FromWide( wargv[i] );
+        {
+            int len = WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, NULL, 0, NULL, NULL);
+            if( len > 0 )
+            {
+                if( len > 1 ) {
+                    char *utf8arg = (char *)malloc(len);
+                    if( NULL != utf8arg )
+                    {
+                        WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, utf8arg, len, NULL, NULL);
+                        ppsz_argv[i] = utf8arg;
+                    }
+                    else
+                    {
+                        /* failed!, quit */
+                        return -1;
+                    }
+                }
+                else
+                {
+                    ppsz_argv[i] = "";
+                }
+            }
+            else
+            {
+                /* failed!, quit */
+                return -1;
+            }
+        }
     }
 #endif
 
