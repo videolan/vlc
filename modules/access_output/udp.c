@@ -663,7 +663,7 @@ static const char *MakeRandMulticast (int family, char *buf, size_t buflen)
             }
             return NULL;
 #else
-            return inet_ntop (family, &(addr.sin_addr), buf, buflen);
+            return inet_ntop (family, &(addr.sin6_addr), buf, buflen);
 #endif
         }
 #endif
@@ -682,7 +682,7 @@ static const char *MakeRandMulticast (int family, char *buf, size_t buflen)
             }
             return NULL;
 #else
-            return inet_ntop (family, &addr, buf, buflen);
+            return inet_ntop (family, &(addr.sin_addr), buf, buflen);
 #endif
         }
     }
