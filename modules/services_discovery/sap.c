@@ -949,10 +949,15 @@ static int ParseSDPConnection (const char *str, struct sockaddr_storage *addr,
 # endif
            *addrlen = sizeof (struct sockaddr_in6);
 
+#if defined(WIN32) || defined(UNDER_CE)
+            if( WSAStringToAddressA(host, AF_INET6, NULL,
+                    (LPSOCKADDR)addr, addrlen) )
+                return -1;
+#else
             if (inet_pton (AF_INET6, host,
                            &((struct sockaddr_in6 *)addr)->sin6_addr) <= 0)
                 return -1;
-
+#endif
             *number = (res >= 3) ? n1 : 1;
             break;
 #endif
@@ -964,9 +969,15 @@ static int ParseSDPConnection (const char *str, struct sockaddr_storage *addr,
 # endif
            *addrlen = sizeof (struct sockaddr_in);
 
+#if defined(WIN32) || defined(UNDER_CE)
+            if( WSAStringToAddressA(host, AF_INET, NULL,
+                    (LPSOCKADDR)addr, addrlen) )
+                return -1;
+#else
             if (inet_pton (AF_INET, host,
                            &((struct sockaddr_in *)addr)->sin_addr) <= 0)
                 return -1;
+#endif
 
             *number = (res >= 4) ? n2 : 1;
             break;
