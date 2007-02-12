@@ -38,6 +38,11 @@
 
 #include <vlc/vlc.h>
 
+#ifdef WIN32
+extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
+                           int expand_wildcards, int *startupinfo);
+#endif
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -96,6 +101,20 @@ int main( int i_argc, char *ppsz_argv[] )
     /* Other signals */
     signal( SIGALRM, SIG_IGN );
     signal( SIGPIPE, SIG_IGN );
+#endif
+
+#ifdef WIN32
+    /* Replace argv[1..n] with unicode for Windows NT and above */
+    if( GetVersion() < 0x80000000 )
+    {
+        wchar_t **wargv, **wenvp;
+        int i,i_wargc;
+        int si = { 0 };
+        __wgetmainargs(&i_wargc, &wargv, &wenvp, 0, &si);
+
+        for( i = 1; i < i_wargc; i++ )
+            ppsz_argv[i] = FromWide( wargv[i] );
+    }
 #endif
 
     /* Initialize libvlc */

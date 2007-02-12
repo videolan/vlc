@@ -39,9 +39,6 @@
 
 #include <winsock.h>
 
-extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
-                           int expand_wildcards, int *startupinfo);
-
 /*****************************************************************************
  * system_Init: initialize winsock and misc other things.
  *****************************************************************************/
@@ -85,18 +82,6 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 
     /* Call mdate() once to make sure it is initialized properly */
     mdate();
-
-    /* Replace argv[1..n] with unicode for Windows NT and above */
-    if( GetVersion() < 0x80000000 )
-    {
-        wchar_t **wargv, **wenvp;
-        int i,i_wargc;
-        int si = { 0 };
-        __wgetmainargs(&i_wargc, &wargv, &wenvp, 0, &si);
-
-        for( i = 1; i < i_wargc; i++ )
-            ppsz_argv[i] = FromWide( wargv[i] );
-    }
 
     /* WinSock Library Init. */
     if( !WSAStartup( MAKEWORD( 2, 2 ), &Data ) )
