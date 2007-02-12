@@ -259,7 +259,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     codec->codec_tag = av_codec_get_tag( p_sys->oc->oformat->codec_tag, i_codec_id );
 #else
 #   warning "WARNING!!!!!!!"
-#   warning "Using libavformat muxing with versions older than 51.8.0 (r7593) might produce borken files.
+#   warning "Using libavformat muxing with versions older than 51.8.0 (r7593) might produce broken files.
     codec->codec_tag = p_input->p_fmt->i_codec;
 #endif
     codec->codec_id = i_codec_id;
