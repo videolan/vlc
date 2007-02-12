@@ -120,7 +120,7 @@ sout_AnnounceRegisterSDP( sout_instance_t *p_sout, const char *cfgpref,
         if (res->ai_addrlen <= sizeof (p_session->addr))
             memcpy (&p_session->addr, res->ai_addr,
                     p_session->addrlen = res->ai_addrlen);
-        freeaddrinfo (res);
+        vlc_freeaddrinfo (res);
     }
 
     announce_Register( p_announce, p_session, p_method );
@@ -205,14 +205,14 @@ int sout_SessionSetMedia (vlc_object_t *obj, session_descriptor_t *p_session,
         if (res->ai_addrlen <= sizeof (p_session->addr))
             memcpy (&p_session->addr, res->ai_addr,
                     p_session->addrlen = res->ai_addrlen);
-        freeaddrinfo (res);
+        vlc_freeaddrinfo (res);
     }
     if (vlc_getaddrinfo (obj, src, sport, NULL, &res) == 0)
     {
         if (res->ai_addrlen <= sizeof (p_session->orig))
             memcpy (&p_session->orig, res->ai_addr,
                     p_session->origlen = res->ai_addrlen);
-        freeaddrinfo (res);
+        vlc_freeaddrinfo (res);
     }
     return 0;
 }

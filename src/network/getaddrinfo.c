@@ -236,6 +236,100 @@ __getnameinfo( const struct sockaddr *sa, socklen_t salen,
 
 #endif /* if !HAVE_GETNAMEINFO */
 
+#if defined( WIN32 ) && !defined( UNDER_CE )
+    /*
+     * Here is the kind of kludge you need to keep binary compatibility among
+     * varying OS versions...
+     */
+typedef int (CALLBACK * GETNAMEINFO) ( const struct sockaddr*, socklen_t,
+                                           char*, DWORD, char*, DWORD, int );
+typedef int (CALLBACK * GETADDRINFO) (const char *, const char *,
+                                          const struct addrinfo *,
+                                          struct addrinfo **);
+
+typedef void (CALLBACK * FREEADDRINFO) ( struct addrinfo * );
+
+
+static WINAPI int _ws2_getnameinfo_bind( const struct sockaddr *sa, socklen_t salen,
+               char *host, DWORD hostlen, char *serv, DWORD servlen, int flags );
+
+static WINAPI int _ws2_getaddrinfo_bind(const char *node, const char *service,
+               const struct addrinfo *hints, struct addrinfo **res);
+
+static WINAPI void _ws2_freeaddrinfo_bind( struct addrinfo *infos );
+
+static GETNAMEINFO ws2_getnameinfo = _ws2_getnameinfo_bind;
+static GETADDRINFO ws2_getaddrinfo = _ws2_getaddrinfo_bind;
+static FREEADDRINFO ws2_freeaddrinfo = _ws2_freeaddrinfo_bind;
+
+static int _ws2_find_ipv6_api(void)
+{
+    /* For Windows XP and above, IPv6 stack is in WS2_32.DLL */
+    HINSTANCE module = LoadLibrary( "ws2_32.dll" );
+    if( module != NULL )
+    {
+        ws2_getnameinfo = (GETNAMEINFO)GetProcAddress( module, "getnameinfo" );
+        ws2_getaddrinfo = (GETADDRINFO)GetProcAddress( module, "getaddrinfo" );
+        ws2_freeaddrinfo = (FREEADDRINFO)GetProcAddress( module, "freeaddrinfo" );
+        if( ws2_getnameinfo && ws2_getaddrinfo && ws2_freeaddrinfo )
+        {
+            /* got them */
+            return 1;
+        }
+        FreeLibrary( module );
+
+        /* For Windows 2000 and below, try IPv6 stack in in WSHIP6.DLL */
+        module = LoadLibrary( "wship6.dll" );
+        if( module != NULL )
+        {
+            ws2_getnameinfo = (GETNAMEINFO)GetProcAddress( module, "getnameinfo" );
+            ws2_getaddrinfo = (GETADDRINFO)GetProcAddress( module, "getaddrinfo" );
+            ws2_freeaddrinfo = (FREEADDRINFO)GetProcAddress( module, "freeaddrinfo" );
+            if( ws2_getnameinfo && ws2_getaddrinfo && ws2_freeaddrinfo )
+            {
+                /* got them */
+                return 1;
+            }
+            FreeLibrary( module );
+        }
+    }
+    /* no API */
+    return 0;
+}
+
+static WINAPI int _ws2_getnameinfo_bind( const struct sockaddr *sa, socklen_t salen,
+               char *host, DWORD hostlen, char *serv, DWORD servlen, int flags )
+{
+    if( _ws2_find_ipv6_api() )
+    {
+        return ws2_getnameinfo(sa, salen, host, hostlen, serv, servlen, flags);
+    }
+    /* return a possible error if API is not found */
+    WSASetLastError(WSAHOST_NOT_FOUND);
+    return WSAHOST_NOT_FOUND;
+}
+
+static WINAPI int _ws2_getaddrinfo_bind(const char *node, const char *service,
+               const struct addrinfo *hints, struct addrinfo **res)
+{
+    if( _ws2_find_ipv6_api() )
+    {
+        return ws2_getaddrinfo(node, service, hints, res);
+    }
+    /* return a possible error if API is not found */
+    WSASetLastError(WSAHOST_NOT_FOUND);
+    return WSAHOST_NOT_FOUND;
+}
+
+static WINAPI void _ws2_freeaddrinfo_bind( struct addrinfo *infos )
+{
+    if( _ws2_find_ipv6_api() )
+    {
+        ws2_freeaddrinfo(infos);
+    }
+}
+
+#endif
 
 #ifndef HAVE_GETADDRINFO
 /*
@@ -505,16 +599,6 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
 {
     char psz_servbuf[6], *psz_serv;
     int i_servlen, i_val;
-#if defined( WIN32 ) && !defined( UNDER_CE )
-    /*
-     * Here is the kind of kludge you need to keep binary compatibility among
-     * varying OS versions...
-     */
-    typedef int (CALLBACK * GETNAMEINFO) ( const struct sockaddr*, socklen_t,
-                                           char*, DWORD, char*, DWORD, int );
-    HINSTANCE module;
-    GETNAMEINFO ws2_getnameinfo;
-#endif
 
     flags |= NI_NUMERICSERV;
     if( portnum != NULL )
@@ -528,25 +612,8 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
         i_servlen = 0;
     }
 #if defined( WIN32 ) && !defined( UNDER_CE )
-    /* Production IPv6 stack releases are in WS2_32.DLL */
-    module = LoadLibrary( "ws2_32.dll" );
-    if( module != NULL )
-    {
-        ws2_getnameinfo = (GETNAMEINFO)GetProcAddress( module, "getnameinfo" );
-
-        if( ws2_getnameinfo != NULL )
-        {
-            i_val = ws2_getnameinfo( sa, salen, host, hostlen, psz_serv,
-                                     i_servlen, flags );
-            FreeLibrary( module );
-
-            if( portnum != NULL )
-                *portnum = atoi( psz_serv );
-            return i_val;
-        }
-
-        FreeLibrary( module );
-    }
+    i_val = ws2_getnameinfo( sa, salen, host, hostlen, psz_serv,
+                                 i_servlen, flags );
 #endif
 #if defined( HAVE_GETNAMEINFO ) || defined( UNDER_CE )
     i_val = getnameinfo(sa, salen, host, hostlen, psz_serv, i_servlen, flags);
@@ -649,41 +716,21 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     }
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
-    typedef int (CALLBACK * GETADDRINFO) (const char *, const char *,
-                                          const struct addrinfo *,
-                                          struct addrinfo **);
-    static GETADDRINFO ws2_getaddrinfo = NULL;
-
-    if (ws2_getaddrinfo == NULL)
+    /*
+     * Winsock tries to resolve numerical IPv4 addresses as AAAA
+     * and IPv6 addresses as A... There comes the work around.
+     */
+    if ((hints.ai_flags & AI_NUMERICHOST) == 0)
     {
-        static HINSTANCE module = NULL;
+        hints.ai_flags |= AI_NUMERICHOST;
 
-        if (module == NULL)
-            module = LoadLibrary( "ws2_32.dll" );
+        if (ws2_getaddrinfo (psz_node, psz_service, &hints, res) == 0)
+            return 0;
 
-        if (module != NULL)
-            ws2_getaddrinfo =
-                    (GETADDRINFO)GetProcAddress (module, "getaddrinfo");
+        hints.ai_flags &= ~AI_NUMERICHOST;
     }
 
-    if (ws2_getaddrinfo != NULL)
-    {
-        /*
-         * Winsock tries to resolve numerical IPv4 addresses as AAAA
-         * and IPv6 addresses as A... There comes the work around.
-         */
-        if ((hints.ai_flags & AI_NUMERICHOST) == 0)
-        {
-            hints.ai_flags |= AI_NUMERICHOST;
-
-            if (ws2_getaddrinfo (psz_node, psz_service, &hints, res) == 0)
-                return 0;
-
-            hints.ai_flags &= ~AI_NUMERICHOST;
-        }
-
-        return ws2_getaddrinfo (psz_node, psz_service, &hints, res);
-    }
+    return ws2_getaddrinfo (psz_node, psz_service, &hints, res);
 #endif
 #if defined( HAVE_GETADDRINFO ) || defined( UNDER_CE )
 # ifdef AI_IDN
@@ -733,28 +780,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 void vlc_freeaddrinfo( struct addrinfo *infos )
 {
 #if defined( WIN32 ) && !defined( UNDER_CE )
-    typedef void (CALLBACK * FREEADDRINFO) ( struct addrinfo * );
-    HINSTANCE module;
-    FREEADDRINFO ws2_freeaddrinfo;
-     
-    module = LoadLibrary( "ws2_32.dll" );
-    if( module != NULL )
-    {
-        ws2_freeaddrinfo = (FREEADDRINFO)GetProcAddress( module, "freeaddrinfo" );
-
-        /*
-         * NOTE: it is assumed that ws2_32.dll defines either both or neither
-         * getaddrinfo() and freeaddrinfo().
-         */
-        if( ws2_freeaddrinfo != NULL )
-        {
-            ws2_freeaddrinfo( infos );
-            FreeLibrary( module );
-            return;
-        }
-
-        FreeLibrary( module );
-    }
+    ws2_freeaddrinfo( infos );
 #endif
 #if defined( HAVE_GETADDRINFO ) || defined( UNDER_CE )
     freeaddrinfo( infos );
