@@ -236,7 +236,11 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_framed_rtp = b_framed;
     if (b_framed)
+    {
+        /* We don't do autodetection and prebuffering in case of framing */
+        p_access->pf_block = BlockRTP;
         p_sys->i_mtu = 65535;
+    }
     else
     {
         /* FIXME */
@@ -577,9 +581,7 @@ static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
         if( i_count > 2 && (i_date - i_first) > p_sys->i_rtp_late )
             break;
 
-        p = BlockParseRTP( p_access,
-                           p_sys->b_framed_rtp ? BlockTCP( p_access )
-                                               : BlockUDP( p_access ) );
+        p = BlockParseRTP( p_access, BlockUDP( p_access ) );
         if( !p && (i_date - i_first) > p_sys->i_rtp_late ) 
         {
             msg_Err( p_access, "error in RTP prebuffering!" );
@@ -604,8 +606,9 @@ static block_t *BlockRTP( access_t *p_access )
     while ( !p_sys->p_list ||
              ( mdate() - p_sys->p_list->i_pts ) < p_sys->i_rtp_late )
     {
-        p = BlockParseRTP( p_access, BlockUDP( p_access ));
-
+        p = BlockParseRTP( p_access,
+                           p_sys->b_framed_rtp ? BlockTCP( p_access )
+                                               : BlockUDP( p_access ) );
         if ( !p )
             return NULL;
 
