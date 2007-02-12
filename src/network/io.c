@@ -286,12 +286,7 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
     {
         unsigned i;
         ssize_t n;
-#ifdef HAVE_POLL
         struct pollfd ufd[fdc];
-#else
-        int maxfd = -1;
-        fd_set set;
-#endif
 
         int delay_ms = 500;
         if ((wait_ms != -1) && (wait_ms < 500))
@@ -303,7 +298,6 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
             goto error;
         }
 
-#ifdef HAVE_POLL
         memset (ufd, 0, sizeof (ufd));
 
         for( i = 0; i < fdc; i++ )
@@ -313,28 +307,6 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         }
 
         n = poll( ufd, fdc, delay_ms );
-#else
-        FD_ZERO (&set);
-
-        for( i = 0; i < fdc; i++ )
-        {
-#if !defined(WIN32) && !defined(UNDER_CE)
-            if( fdv[i] >= FD_SETSIZE )
-            {
-                /* We don't want to overflow select() fd_set */
-                msg_Err( p_this, "select set overflow" );
-                return -1;
-            }
-#endif
-            FD_SET( fdv[i], &set );
-            if( fdv[i] > maxfd )
-                maxfd = fdv[i];
-        }
-
-        n = select( maxfd + 1, &set, NULL, NULL,
-                    (wait_ms == -1) ? NULL
-                                  : &(struct timeval){ 0, delay_ms * 1000 } );
-#endif
         if( n == -1 )
             goto error;
 
@@ -345,15 +317,12 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
 
         for (i = 0;; i++)
         {
-#ifdef HAVE_POLL
             if ((i_total > 0) && (ufd[i].revents & POLLERR))
                 return i_total; // error will be dequeued on next run
 
             if ((ufd[i].revents & POLLIN) == 0)
-#else
-            if (!FD_ISSET (fdv[i], &set))
                 continue;
-#endif
+
             fdc = 1;
             fdv += i;
             vsv += i;
