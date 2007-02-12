@@ -288,6 +288,11 @@ void CtrlText::onPositionChange()
         if( m_pImg->getWidth() < getPosition()->getWidth() )
         {
             m_pCurrImg = m_pImg;
+
+            // When the control becomes wide enough for the text to display,
+            // make sure to stop any scrolling effect
+            m_pTimer->stop();
+            m_xPos = 0;
         }
         else
         {
