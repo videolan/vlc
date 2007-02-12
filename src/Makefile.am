@@ -275,6 +275,7 @@ SOURCES_libvlc_common = \
 	network/httpd.c \
 	network/rootwrap.c \
 	network/tls.c \
+	network/poll.c \
 	text/charset.c \
 	text/strings.c \
 	text/unicode.c \

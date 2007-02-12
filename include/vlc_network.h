@@ -2,6 +2,7 @@
  * vlc_network.h: interface to communicate with network plug-ins
  *****************************************************************************
  * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright © 2006-2007 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -138,6 +139,27 @@ VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, const v_socket_
 #ifndef HAVE_INET_PTON
 /* only in core, so no need for C++ extern "C" */
 int inet_pton(int af, const char *src, void *dst);
+#endif
+
+#ifndef HAVE_POLL
+enum
+{
+    POLLIN=1,
+    POLLOUT=2,
+    POLLPRI=4
+    POLLERR=8,  // unsupported stub
+    POLLHUP=16, // unsupported stub
+    POLLNVAL=32 // unsupported stub
+};
+
+struct pollfd
+{
+	int fd;
+	int events;
+	int revents;
+};
+
+int poll (struct pollfd *fds, unsigned nfds, int timeout);
 #endif
 
 
