@@ -95,6 +95,7 @@ vlc_module_begin();
     add_shortcut( "rtp4" );
     add_shortcut( "rtp6" );
     add_shortcut( "udplite" );
+    add_shortcut( "rtptcp" );
 
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -105,6 +106,7 @@ vlc_module_end();
 #define RTP_HEADER_LEN 12
 
 static block_t *BlockUDP( access_t * );
+static block_t *BlockTCP( access_t * );
 static block_t *BlockRTP( access_t * );
 static block_t *BlockChoose( access_t * );
 static int Control( access_t *, int, va_list );
@@ -115,12 +117,14 @@ struct access_sys_t
 
     int i_mtu;
     vlc_bool_t b_auto_mtu;
+    vlc_bool_t b_framed_rtp;
 
     /* reorder rtp packets when out-of-sequence */
-    mtime_t i_rtp_late;
     uint16_t i_last_seqno;
+    mtime_t i_rtp_late;
     block_t *p_list;
     block_t *p_end;
+    block_t *p_partial_frame; /* Partial Framed RTP packet */
 };
 
 /*****************************************************************************
@@ -136,6 +140,7 @@ static int Open( vlc_object_t *p_this )
     const char *psz_server_addr, *psz_bind_addr = "";
     int  i_bind_port, i_server_port = 0;
     int fam = AF_UNSPEC, proto = IPPROTO_UDP;
+    vlc_bool_t b_framed = VLC_FALSE;
 
     if (strlen (p_access->psz_access) >= 3)
     {
@@ -151,6 +156,11 @@ static int Open( vlc_object_t *p_this )
         }
         if (strcmp (p_access->psz_access + 3, "lite") == 0)
             proto = IPPROTO_UDPLITE;
+        if (strcmp (p_access->psz_access + 3, "tcp") == 0)
+        {
+            proto = IPPROTO_TCP;
+            b_framed = VLC_TRUE;
+        }
     }
 
     i_bind_port = var_CreateGetInteger( p_access, "server-port" );
@@ -203,7 +213,9 @@ static int Open( vlc_object_t *p_this )
     p_access->info.b_prebuffered = VLC_FALSE;
     MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
 
-    p_sys->fd = net_OpenDgram( p_access, psz_bind_addr, i_bind_port,
+    p_sys->fd = b_framed
+              ? net_ConnectTCP( p_access, psz_server_addr, i_server_port )
+              : net_OpenDgram( p_access, psz_bind_addr, i_bind_port,
                                psz_server_addr, i_server_port, fam, proto );
     free (psz_name);
     if( p_sys->fd == -1 )
@@ -222,12 +234,18 @@ static int Open( vlc_object_t *p_this )
                     &(int){ 20 }, sizeof (int));
 #endif
 
-    /* FIXME */
-    p_sys->i_mtu = var_CreateGetInteger( p_access, "mtu" );
-    if( p_sys->i_mtu <= 1 )
-        p_sys->i_mtu  = 1500;   /* Avoid problem */
+    p_sys->b_framed_rtp = b_framed;
+    if (b_framed)
+        p_sys->i_mtu = 65535;
+    else
+    {
+        /* FIXME */
+        p_sys->i_mtu = var_CreateGetInteger( p_access, "mtu" );
+        if( p_sys->i_mtu <= 1 )
+            p_sys->i_mtu  = 1500;   /* Avoid problem */
 
-    p_sys->b_auto_mtu = var_CreateGetBool( p_access, "udp-auto-mtu" );;
+        p_sys->b_auto_mtu = var_CreateGetBool( p_access, "udp-auto-mtu" );;
+    }
 
     /* Update default_pts to a suitable value for udp access */
     var_Create( p_access, "udp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -330,6 +348,68 @@ static block_t *BlockUDP( access_t *p_access )
     return p_block;
 }
 
+/*****************************************************************************
+ * BlockTCP: Framed RTP/AVP packet reception for COMEDIA
+ * Still an I-D (draft-ietf-avt-rtp-framing-contrans-06) - subject to change.
+ *****************************************************************************/
+static block_t *BlockTCP( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    block_t      *p_block = p_sys->p_partial_frame;
+    int i_read;
+
+    if( p_block == NULL )
+    {
+        /* MTU should always be 65535 in this case */
+        p_sys->p_partial_frame = p_block = block_New( p_access, 65537 );
+        if (p_block == NULL)
+            return NULL;
+    }
+
+    /* Read RTP framing */
+    if (p_block->i_buffer < 2)
+    {
+        /* FIXME: not very efficient */
+        i_read = net_Read( p_access, p_sys->fd, NULL,
+                           p_block->p_buffer + p_block->i_buffer,
+                           2 - p_block->i_buffer, VLC_FALSE );
+        if( i_read <= 0 )
+            goto error;
+
+        p_block->i_buffer += i_read;
+        if (p_block->i_buffer < 2)
+            return NULL;
+    }
+
+    uint16_t framelen = GetWLE( p_block->p_buffer );
+    /* Read RTP frame */
+    if( framelen > 0 )
+    {
+        i_read = net_Read( p_access, p_sys->fd, NULL,
+                           p_block->p_buffer + p_block->i_buffer,
+                           2 + framelen - p_block->i_buffer, VLC_FALSE );
+        if( i_read <= 0 )
+            goto error;
+
+        p_block->i_buffer += i_read;
+    }
+
+    if( p_block->i_buffer < (2 + framelen) )
+        return NULL; // incomplete frame
+
+    /* Hide framing from RTP layer */
+    p_block->p_buffer += 2;
+    p_block->i_buffer -= 2;
+    p_sys->p_partial_frame = NULL;
+    return p_block;
+
+error:
+    block_Release( p_block );
+    p_sys->p_partial_frame = NULL;
+    return NULL;
+}
+
+
 /*
  * rtp_ChainInsert - insert a p_block in the chain and
  * look at the sequence numbers.
@@ -389,7 +469,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
             }
 
             if( !i_tmp )   /* trash duplicate */
-                break;    
+                break;
 
             /* reordering failed - append the packet to the end of queue */
             msg_Dbg(p_access, "RTP: sequence changed (or buffer too small) "
@@ -497,7 +577,9 @@ static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
         if( i_count > 2 && (i_date - i_first) > p_sys->i_rtp_late )
             break;
 
-        p = BlockParseRTP( p_access, BlockUDP( p_access ));
+        p = BlockParseRTP( p_access,
+                           p_sys->b_framed_rtp ? BlockTCP( p_access )
+                                               : BlockUDP( p_access ) );
         if( !p && (i_date - i_first) > p_sys->i_rtp_late ) 
         {
             msg_Err( p_access, "error in RTP prebuffering!" );
@@ -519,12 +601,12 @@ static block_t *BlockRTP( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     block_t *p;
 
-    while ( !p_sys->p_list || 
+    while ( !p_sys->p_list ||
              ( mdate() - p_sys->p_list->i_pts ) < p_sys->i_rtp_late )
     {
         p = BlockParseRTP( p_access, BlockUDP( p_access ));
 
-        if ( !p ) 
+        if ( !p )
             return NULL;
 
         rtp_ChainInsert( p_access, p );
