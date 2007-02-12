@@ -51,7 +51,8 @@
 
 #if defined( WIN32 ) || defined( UNDER_CE )
 #   include <windows.h>
-#else
+#endif
+#if defined(HAVE_SYS_TIME_H)
 #   include <sys/time.h>
 #endif
 
