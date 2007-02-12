@@ -1995,6 +1995,8 @@ static int InputSourceInit( input_thread_t *p_input,
     else
     {
         psz_path = psz_dup;
+        if( !strncmp( psz_path, "file://", 7 ) )
+            psz_path += 7;
         msg_Dbg( p_input, "trying to pre-parse %s",  psz_path );
         psz_demux = "";
         psz_access = "file";

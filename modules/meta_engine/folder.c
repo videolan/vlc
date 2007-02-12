@@ -84,6 +84,9 @@ static int FindMeta( vlc_object_t *p_this )
         *psz_dir = '\0';
     }
 
+    if( !strncmp( psz_dir, "file://", 7 ) )
+        psz_dir += 7;
+
     for( i = 0; b_have_art == VLC_FALSE && i < 3; i++ )
     {
         switch( i )
