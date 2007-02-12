@@ -138,7 +138,7 @@ VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, const v_socket_
 
 #ifndef HAVE_INET_PTON
 /* only in core, so no need for C++ extern "C" */
-int inet_pton(int af, const char *src, void *dst);
+VLC_EXPORT (int, inet_pton, (int af, const char *src, void *dst) );
 #endif
 
 #ifndef HAVE_POLL
