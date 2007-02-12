@@ -442,8 +442,12 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     else if( i_payload_type !=  33 )
         msg_Dbg( p_access, "unsupported RTP payload type (%u)", i_payload_type );
     if( i_extension_flag )
+    {
+        if( p_block->i_buffer < 16 )
+            goto trash;
         i_extension_length = 4 +
             4 * ( (p_block->p_buffer[14] << 8) + p_block->p_buffer[15] );
+    }
 
     /* Skip header + CSRC extension field n*(32 bits) + extension */
     i_skip += RTP_HEADER_LEN + 4*i_CSRC_count + i_extension_length;
