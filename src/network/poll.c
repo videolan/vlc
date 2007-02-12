@@ -69,9 +69,9 @@ int poll (struct pollfd *fds, unsigned nfds, int timeout)
     for (unsigned i = 0; i < nfds; i++)
     {
         int fd = fds[i].fd;
-        fds[i].revents = (FD_ISSET (fds[i].fd, &rdset) ? POLLIN : 0)
-                       | (FD_ISSET (fds[i].fd, &wrset) ? POLLOUT : 0)
-                       | (FD_ISSET (fds[i].fd, &exset) ? POLLPRI : 0);
+        fds[i].revents = (FD_ISSET (fd, &rdset) ? POLLIN : 0)
+                       | (FD_ISSET (fd, &wrset) ? POLLOUT : 0)
+                       | (FD_ISSET (fd, &exset) ? POLLPRI : 0);
     }
     return val;
 }

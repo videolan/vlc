@@ -146,7 +146,7 @@ enum
 {
     POLLIN=1,
     POLLOUT=2,
-    POLLPRI=4
+    POLLPRI=4,
     POLLERR=8,  // unsupported stub
     POLLHUP=16, // unsupported stub
     POLLNVAL=32 // unsupported stub
