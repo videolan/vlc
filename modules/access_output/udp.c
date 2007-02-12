@@ -653,7 +653,16 @@ static const char *MakeRandMulticast (int family, char *buf, size_t buflen)
                            "\x00\x00\x00\x00", 12);
             rand |= 0x80000000;
             memcpy (addr.s6_addr + 12, &(uint32_t){ htonl (rand) }, 4);
+#if defined(WIN32) || defined(UNDER_CE)
+            if( 0 == WSAAddressToStringA((LPSOCKADDR)&addr, sizeof(struct in6_addr), NULL, buf, &buflen) )
+            {
+                buf[buflen] = '\0';
+                return buf;
+            }
+            return NULL;
+#else
             return inet_ntop (family, &addr, buf, buflen);
+#endif
         }
 #endif
 
@@ -661,9 +670,22 @@ static const char *MakeRandMulticast (int family, char *buf, size_t buflen)
         {
             struct in_addr addr;
             addr.s_addr = htonl ((rand & 0xffffff) | 0xe8000000);
+#if defined(WIN32) || defined(UNDER_CE)
+            if( 0 == WSAAddressToStringA((LPSOCKADDR)&addr, sizeof(struct in_addr), NULL, buf, &buflen) )
+            {
+                buf[buflen] = '\0';
+                return buf;
+            }
+            return NULL;
+#else
             return inet_ntop (family, &addr, buf, buflen);
+#endif
         }
     }
+#if defined(WIN32) || defined(UNDER_CE)
+    WSASetLastError(WSAEAFNOSUPPORT);
+#else
     errno = EAFNOSUPPORT;
+#endif
     return NULL;
 }
