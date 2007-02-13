@@ -360,7 +360,9 @@ static block_t *BlockTCP( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     block_t      *p_block = p_sys->p_partial_frame;
-    int i_read;
+
+    if( p_access->info.b_eof )
+        return NULL;
 
     if( p_block == NULL )
     {
@@ -374,9 +376,9 @@ static block_t *BlockTCP( access_t *p_access )
     if (p_block->i_buffer < 2)
     {
         /* FIXME: not very efficient */
-        i_read = net_Read( p_access, p_sys->fd, NULL,
-                           p_block->p_buffer + p_block->i_buffer,
-                           2 - p_block->i_buffer, VLC_FALSE );
+        int i_read = net_Read( p_access, p_sys->fd, NULL,
+                               p_block->p_buffer + p_block->i_buffer,
+                               2 - p_block->i_buffer, VLC_FALSE );
         if( i_read <= 0 )
             goto error;
 
@@ -389,9 +391,9 @@ static block_t *BlockTCP( access_t *p_access )
     /* Read RTP frame */
     if( framelen > 0 )
     {
-        i_read = net_Read( p_access, p_sys->fd, NULL,
-                           p_block->p_buffer + p_block->i_buffer,
-                           2 + framelen - p_block->i_buffer, VLC_FALSE );
+        int i_read = net_Read( p_access, p_sys->fd, NULL,
+                               p_block->p_buffer + p_block->i_buffer,
+                               2 + framelen - p_block->i_buffer, VLC_FALSE );
         if( i_read <= 0 )
             goto error;
 
@@ -408,6 +410,7 @@ static block_t *BlockTCP( access_t *p_access )
     return p_block;
 
 error:
+    p_access->info.b_eof = VLC_TRUE;
     block_Release( p_block );
     p_sys->p_partial_frame = NULL;
     return NULL;
