@@ -84,8 +84,9 @@ static int FindMeta( vlc_object_t *p_this )
         *psz_dir = '\0';
     }
 
-    if( !strncmp( psz_dir, "file://", 7 ) )
-        psz_dir += 7;
+    char *psz_path = psz_dir;
+    if( !strncmp( psz_path, "file://", 7 ) )
+        psz_path += 7;
 
     for( i = 0; b_have_art == VLC_FALSE && i < 3; i++ )
     {
@@ -94,19 +95,19 @@ static int FindMeta( vlc_object_t *p_this )
             case 0:
             /* Windows Folder.jpg */
             snprintf( psz_filename, MAX_PATH,
-                      "file://%sFolder.jpg", psz_dir );
+                      "file://%sFolder.jpg", psz_path );
             break;
 
             case 1:
             /* Windows AlbumArtSmall.jpg == small version of Folder.jpg */
             snprintf( psz_filename, MAX_PATH,
-                  "file://%sAlbumArtSmall.jpg", psz_dir );
+                  "file://%sAlbumArtSmall.jpg", psz_path );
             break;
 
             case 2:
             /* KDE (?) .folder.png */
             snprintf( psz_filename, MAX_PATH,
-                  "file://%s.folder.png", psz_dir );
+                  "file://%s.folder.png", psz_path );
             break;
         }
 
