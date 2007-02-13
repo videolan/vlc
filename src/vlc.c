@@ -35,6 +35,9 @@
 #ifdef HAVE_TIME_H
 #   include <time.h>                                               /* time() */
 #endif
+#ifdef HAVE_PTHREAD_H
+#   include <pthread.h>
+#endif
 
 #include <vlc/vlc.h>
 
@@ -48,7 +51,7 @@ extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
  * Local prototypes.
  *****************************************************************************/
 #if !defined(WIN32) && !defined(UNDER_CE)
-static void SigHandler  ( int i_signal );
+static void *SigHandler  ( void *set );
 #endif
 
 /*****************************************************************************
@@ -91,17 +94,30 @@ int main( int i_argc, char *ppsz_argv[] )
     }
 
 #if !defined(WIN32) && !defined(UNDER_CE)
-    /* Set the signal handlers. SIGTERM is not intercepted, because we need at
-     * least one method to kill the program when all other methods failed, and
-     * when we don't want to use SIGKILL.
+    /* Synchronously intercepted signals. Thy request a clean shutdown,
+     * and force an unclean shutdown if they are triggered again 2+ seconds
+     * later. We have to handle SIGTERM cleanly because of daemon mode.
      * Note that we set the signals after the vlc_create call. */
-    signal( SIGINT,  SigHandler );
-    signal( SIGHUP,  SigHandler );
-    signal( SIGQUIT, SigHandler );
+    static const int sigs[] = { SIGINT, SIGHUP, SIGQUIT, SIGTERM };
+    /* Ignored signals */
+    static const int ignored[] = { SIGALRM, SIGPIPE };
 
-    /* Other signals */
-    signal( SIGALRM, SIG_IGN );
-    signal( SIGPIPE, SIG_IGN );
+    sigset_t set;
+    pthread_t sigth;
+
+    sigemptyset (&set);
+    for (unsigned i = 0; i < sizeof (sigs) / sizeof (sigs[0]); i++)
+        sigaddset (&set, sigs[i]);
+    for (unsigned i = 0; i < sizeof (ignored) / sizeof (ignored[0]); i++)
+        sigaddset (&set, ignored[i]);
+
+    /* Block all these signals */
+    pthread_sigmask (SIG_BLOCK, &set, NULL);
+
+    for (unsigned i = 0; i < sizeof (ignored) / sizeof (ignored[0]); i++)
+        sigdelset (&set, ignored[i]);
+
+    pthread_create (&sigth, NULL, SigHandler, &set);
 #endif
 
 #ifdef WIN32
@@ -155,6 +171,11 @@ int main( int i_argc, char *ppsz_argv[] )
 
     i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE, VLC_TRUE );
 
+#if !defined(WIN32) && !defined(UNDER_CE)
+    pthread_cancel (sigth);
+    pthread_join (sigth, NULL);
+#endif
+
     /* Finish the threads */
     VLC_CleanUp( 0 );
 
@@ -168,42 +189,46 @@ int main( int i_argc, char *ppsz_argv[] )
 /*****************************************************************************
  * SigHandler: system signal handler
  *****************************************************************************
- * This function is called when a fatal signal is received by the program.
+ * This thread receives all handled signals synchronously.
  * It tries to end the program in a clean way.
  *****************************************************************************/
-static void SigHandler( int i_signal )
+static void *SigHandler( void *data )
 {
-    static time_t abort_time = 0;
-    static volatile vlc_bool_t b_die = VLC_FALSE;
+    const sigset_t *set = (sigset_t *)data;
+    time_t abort_time = 0;
+    vlc_bool_t b_die = VLC_FALSE;
 
-    /* Once a signal has been trapped, the termination sequence will be
-     * armed and subsequent signals will be ignored to avoid sending signals
-     * to a libvlc structure having been destroyed */
-
-    if( !b_die )
+    for (;;)
     {
-        b_die = VLC_TRUE;
-        abort_time = time( NULL );
+        int i_signal, state;
+        (void)sigwait (set, &i_signal);
 
-        fprintf( stderr, "signal %d received, terminating vlc - do it "
-                         "again in case it gets stuck\n", i_signal );
+        /* Once a signal has been trapped, the termination sequence will be
+         * armed and subsequent signals will be ignored to avoid sending
+         * signals to a libvlc structure having been destroyed */
 
-        /* Acknowledge the signal received */
-        VLC_Die( 0 );
+        pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &state);
+        if( !b_die )
+        {
+            b_die = VLC_TRUE;
+            abort_time = time( NULL );
+
+            fprintf( stderr, "signal %d received, terminating vlc - do it "
+                            "again in case it gets stuck\n", i_signal );
+
+            /* Acknowledge the signal received */
+            VLC_Die( 0 );
+        }
+        else if( time( NULL ) > abort_time + 2 )
+        {
+            /* If user asks again 1 or 2 seconds later, die badly */
+            pthread_sigmask (SIG_UNBLOCK, set, NULL);
+            fprintf( stderr, "user insisted too much, dying badly\n" );
+            abort();
+        }
+        pthread_setcancelstate (state, NULL);
     }
-    else if( time( NULL ) > abort_time + 2 )
-    {
-        /* If user asks again 1 or 2 seconds later, die badly */
-        signal( SIGINT,  SIG_DFL );
-        signal( SIGHUP,  SIG_DFL );
-        signal( SIGQUIT, SIG_DFL );
-        signal( SIGALRM, SIG_DFL );
-        signal( SIGPIPE, SIG_DFL );
-
-        fprintf( stderr, "user insisted too much, dying badly\n" );
-
-        abort();
-    }
+    /* Never reached */
 }
 #endif
 
