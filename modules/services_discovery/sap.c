@@ -894,26 +894,13 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         "\0";
 
     const char *vlc_proto = NULL;
+    uint8_t flags = 0;
     for (const char *proto = proto_match; *proto;)
     {
         if (strcasecmp (proto, sdp_proto))
         {
             vlc_proto = proto + strlen (proto) + 1;
-
-            if (vlc_proto[strlen (vlc_proto) + 1] & 1)
-            {
-                /* COMEDIA check */
-                const char *setup = FindAttribute (p_sdp, 0, "setup");
-                if (setup == NULL)
-                    setup = "active"; /* default value */
-
-                if (strcmp (setup, "actpass") && strcmp (setup, "passive"))
-                {
-                    msg_Dbg (p_obj, "unsupported COMEDIA mode: %s", setup);
-                    free (sdp_proto);
-                    return VLC_EGENERIC;
-                }
-            }
+            flags = vlc_proto[strlen (vlc_proto) + 1];
             break;
         }
         proto += strlen (proto) + 1;
@@ -928,24 +915,72 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         return VLC_EGENERIC;
     }
 
-    /* handle SSM case */
-    const char *sfilter = FindAttribute (p_sdp, 0, "source-filter");
-    char psz_source[258] = "";
-    if (sfilter != NULL)
+    if (flags & 1)
     {
-        char psz_source_ip[256];
+        /* Connection-oriented media */
+        const char *setup = FindAttribute (p_sdp, 0, "setup");
+        if (setup == NULL)
+            setup = "active"; /* default value */
 
-        if (sscanf (sfilter, " incl IN IP%*c %*s %255s ", psz_source_ip) == 1)
+        if (strcmp (setup, "actpass") && strcmp (setup, "passive"))
         {
-            if (strchr (psz_source_ip, ':') != NULL)
-                sprintf (psz_source, "[%s]", psz_source_ip);
-            else
-                strcpy (psz_source, psz_source_ip);
+            msg_Dbg (p_obj, "unsupported COMEDIA mode: %s", setup);
+            return VLC_EGENERIC;
         }
-    }
 
-    asprintf( &p_sdp->psz_uri, "%s://%s@%s:%i", vlc_proto, psz_source,
-              host, port );
+        if (asprintf (&p_sdp->psz_uri, "%s://%s:%d", vlc_proto,
+                      host, port) == -1)
+            return VLC_ENOMEM;
+    }
+    else
+    {
+        /* Non-connected (normally multicast) media */
+
+        char psz_source[258] = "";
+        const char *sfilter = FindAttribute (p_sdp, 0, "source-filter");
+        if (sfilter != NULL)
+        {
+            char psz_source_ip[256];
+            unsigned ipv;
+
+            if (sscanf (sfilter, " incl IN IP%u %*s %255s ", &ipv,
+                        psz_source_ip) == 2)
+            {
+                /* According to RFC4570, FQDNs can be used for source-filters,
+                * but -seriously- this is impractical */
+                switch (ipv)
+                {
+#ifdef AF_INET6
+                    case 6:
+                    {
+                        struct in6_addr addr;
+                        if ((inet_pton (AF_INET6, psz_source_ip, &addr) > 0)
+                        && (inet_ntop (AF_INET6, &addr, psz_source + 1,
+                                        sizeof (psz_source) - 2) != NULL))
+                        {
+                            psz_source[0] = '[';
+                            psz_source[strlen (psz_source)] = ']';
+                        }
+                        break;
+                    }
+#endif
+                    case 4:
+                    {
+                        struct in_addr addr;
+                        if ((inet_pton (AF_INET, psz_source_ip, &addr) > 0)
+                        && (inet_ntop (AF_INET, &addr, psz_source,
+                                        sizeof (psz_source)) == NULL))
+                            *psz_source = '\0';
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (asprintf (&p_sdp->psz_uri, "%s://%s@%s:%i", vlc_proto, psz_source,
+                     host, port) == -1)
+            return VLC_ENOMEM;
+    }
 
     return VLC_SUCCESS;
 }
