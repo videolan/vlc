@@ -70,18 +70,23 @@ extern "C" {
 /* Portable networking layer communication */
 int net_Socket (vlc_object_t *obj, int family, int socktype, int proto);
 
-#define net_ConnectTCP(a, b, c) __net_ConnectTCP(VLC_OBJECT(a), b, c)
-#define net_OpenTCP(a, b, c) __net_ConnectTCP(VLC_OBJECT(a), b, c)
-VLC_EXPORT( int, __net_ConnectTCP, ( vlc_object_t *p_this, const char *psz_host, int i_port ) );
+VLC_EXPORT( int, __net_Connect, (vlc_object_t *p_this, const char *psz_host, int i_port, int socktype, int protocol) );
 
 VLC_EXPORT( int *, net_Listen, (vlc_object_t *p_this, const char *psz_host, int i_port,
                                 int family, int socktype, int protocol) );
 VLC_EXPORT( int, net_ListenSingle, (vlc_object_t *p_this, const char *psz_host, int i_port, int family, int socktype, int protocol) );
 
 #define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
-static inline int *__net_ListenTCP ( vlc_object_t *obj, const char *host, int port)
+#define net_ConnectTCP(a, b, c) __net_ConnectTCP(VLC_OBJECT(a), b, c)
+
+static inline int *__net_ListenTCP (vlc_object_t *obj, const char *host, int port)
 {
     return net_Listen (obj, host, port, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP);
+}
+
+static inline int __net_ConnectTCP (vlc_object_t *obj, const char *host, int port)
+{
+    return __net_Connect (obj, host, port, SOCK_STREAM, IPPROTO_TCP);
 }
 
 #define net_Accept(a, b, c) __net_Accept(VLC_OBJECT(a), b, c)

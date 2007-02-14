@@ -61,11 +61,13 @@ extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
                        int i_protocol );
 
 /*****************************************************************************
- * __net_ConnectTCP:
+ * __net_Connect:
  *****************************************************************************
- * Open a TCP connection and return a handle
+ * Open a network connection.
+ * @return socket handler or -1 on error.
  *****************************************************************************/
-int __net_ConnectTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
+int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
+                   int type, int proto )
 {
     struct addrinfo hints, *res, *ptr;
     const char      *psz_realhost;
@@ -113,8 +115,8 @@ int __net_ConnectTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
 
     for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
     {
-        int fd = net_Socket( p_this, ptr->ai_family, ptr->ai_socktype,
-                             ptr->ai_protocol );
+        int fd = net_Socket( p_this, ptr->ai_family, type ?: ptr->ai_socktype,
+                             proto ?: ptr->ai_protocol );
         if( fd == -1 )
         {
             if( u_errstep <= 0 )
