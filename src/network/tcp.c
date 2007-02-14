@@ -260,18 +260,6 @@ next_ai: /* failure */
 
 
 /*****************************************************************************
- * __net_ListenTCP:
- *****************************************************************************
- * Open TCP passive "listening" socket(s)
- * This function returns NULL in case of error.
- *****************************************************************************/
-int *__net_ListenTCP (vlc_object_t *p_this, const char *psz_host, int i_port)
-{
-    return net_Listen (p_this, psz_host, i_port, AF_UNSPEC, SOCK_STREAM,
-                       IPPROTO_TCP);
-}
-
-/*****************************************************************************
  * __net_Accept:
  *****************************************************************************
  * Accept a connection on a set of listening sockets and return it
