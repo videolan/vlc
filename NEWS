@@ -29,7 +29,8 @@ Playlist:
     * Audioscrobbler/last.fm support
 
 Input/Demuxers:
-  * UDP-Lite (requires OS support) for raw and RTP encapsulation
+  * UDP-Lite protocol (requires OS support) for RTP/AVP
+  * DCCP protocol (requires OS support) for RTP/AVP
 
 Decoders:
  * VP60/VP61 codecs support
@@ -44,7 +45,7 @@ Video output:
  * New sharpen video filter (increase the contrast of adjacent pixels)
 
 Stream output:
- * UDP-Lite (requires OS support) for raw and RTP/TS encapsulation
+ * UDP-Lite (requires OS support) for RTP/TS encapsulation
 
 Interfaces:
  * Windows/Linux

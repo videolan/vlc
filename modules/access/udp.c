@@ -37,11 +37,22 @@
 #include <vlc_access.h>
 #include <vlc_network.h>
 
+/* Big pile of stuff missing form glibc 2.5 */
 #if defined (HAVE_NETINET_UDPLITE_H)
 # include <netinet/udplite.h>
 #elif defined (__linux__)
 # define UDPLITE_SEND_CSCOV     10
 # define UDPLITE_RECV_CSCOV     11
+#endif
+
+#ifndef SOCK_DCCP /* provisional API */
+# ifdef __linux__
+#  define SOCK_DCCP 6
+# endif
+#endif
+
+#ifndef IPPROTO_DCCP
+# define IPPROTO_DCCP 33 /* IANA */
 #endif
 
 #ifndef IPPROTO_UDPLITE
@@ -96,6 +107,7 @@ vlc_module_begin();
     add_shortcut( "rtp6" );
     add_shortcut( "udplite" );
     add_shortcut( "rtptcp" );
+    add_shortcut( "dccp" );
 
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -140,7 +152,6 @@ static int Open( vlc_object_t *p_this )
     const char *psz_server_addr, *psz_bind_addr = "";
     int  i_bind_port, i_server_port = 0;
     int fam = AF_UNSPEC, proto = IPPROTO_UDP;
-    vlc_bool_t b_framed = VLC_FALSE;
 
     if (strlen (p_access->psz_access) >= 3)
     {
@@ -156,11 +167,12 @@ static int Open( vlc_object_t *p_this )
         }
         if (strcmp (p_access->psz_access + 3, "lite") == 0)
             proto = IPPROTO_UDPLITE;
+        else
         if (strcmp (p_access->psz_access + 3, "tcp") == 0)
-        {
             proto = IPPROTO_TCP;
-            b_framed = VLC_TRUE;
-        }
+        else
+        if (strcmp (p_access->psz_access, "dccp") == 0)
+            proto = IPPROTO_DCCP;
     }
 
     i_bind_port = var_CreateGetInteger( p_access, "server-port" );
@@ -213,10 +225,30 @@ static int Open( vlc_object_t *p_this )
     p_access->info.b_prebuffered = VLC_FALSE;
     MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
 
-    p_sys->fd = b_framed
-              ? net_ConnectTCP( p_access, psz_server_addr, i_server_port )
-              : net_OpenDgram( p_access, psz_bind_addr, i_bind_port,
-                               psz_server_addr, i_server_port, fam, proto );
+    switch (proto)
+    {
+        case IPPROTO_UDP:
+        case IPPROTO_UDPLITE:
+            p_sys->fd = net_OpenDgram( p_access, psz_bind_addr, i_bind_port,
+                                       psz_server_addr, i_server_port, fam,
+                                       proto );
+            break;
+
+        case IPPROTO_TCP:
+            p_sys = net_ConnectTCP( p_access, psz_server_addr, i_server_port );
+            p_sys->b_framed_rtp = VLC_TRUE;
+            break;
+
+        case IPPROTO_DCCP:
+#ifdef SOCK_DCCP
+            p_sys->fd = net_Connect( p_access, psz_server_addr, i_server_port,
+                                     SOCK_DCCP, IPPROTO_DCCP );
+#else
+            p_sys->fd = -1;
+            msg_Err( p_access, "DCCP support not compiled-in!" );
+#endif
+            break;
+    }
     free (psz_name);
     if( p_sys->fd == -1 )
     {
@@ -234,8 +266,7 @@ static int Open( vlc_object_t *p_this )
                     &(int){ 20 }, sizeof (int));
 #endif
 
-    p_sys->b_framed_rtp = b_framed;
-    if (b_framed)
+    if (p_sys->b_framed_rtp)
     {
         /* We don't do autodetection and prebuffering in case of framing */
         p_access->pf_block = BlockRTP;
