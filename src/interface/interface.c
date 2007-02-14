@@ -224,7 +224,6 @@ int intf_RunThread( intf_thread_t *p_intf )
                 msleep( INTF_IDLE_SLEEP * 2);
         }
         p_intf->b_die = VLC_TRUE;
-        /* Do not join the thread... intf_StopThread will do it for us */
     }
     else
     {
