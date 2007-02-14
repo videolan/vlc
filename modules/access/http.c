@@ -40,6 +40,7 @@
 #include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_tls.h>
+#include <vlc_strings.h>
 
 /*****************************************************************************
  * Module descriptor
