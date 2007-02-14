@@ -154,9 +154,9 @@ enum
 
 struct pollfd
 {
-	int fd;
-	int events;
-	int revents;
+    int fd;
+    int events;
+    int revents;
 };
 
 int poll (struct pollfd *fds, unsigned nfds, int timeout);
