@@ -1482,6 +1482,12 @@ static int Mux( sout_mux_t *p_mux )
                                 i_header_size = 0x24;
                                 b_data_alignment = 1;
                             }
+                            else if( p_input->p_fmt->i_codec ==
+                                       VLC_FOURCC('d','v','b','s') )
+                            {
+                                /* EN 300 473 */
+                                b_data_alignment = 1;
+                            }
                         }
                         else if( p_data->i_length < 0 ||
                                  p_data->i_length > 2000000 )
