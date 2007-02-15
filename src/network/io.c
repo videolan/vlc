@@ -435,19 +435,16 @@ ssize_t __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
 /*****************************************************************************
  * __net_Select:
  *****************************************************************************
- * Read from several sockets (with timeout). Takes data from the first socket
- * that has some.
- * NOTE: DO NOT USE this API with a non-zero delay. You were warned.
+ * Read from several sockets. Takes data from the first socket that has some.
  *****************************************************************************/
 ssize_t __net_Select( vlc_object_t *restrict p_this,
                       const int *restrict fds, int nfd,
-                      uint8_t *restrict buf, size_t len, mtime_t i_wait )
+                      uint8_t *restrict buf, size_t len )
 {
     const v_socket_t *vsv[nfd];
     memset( vsv, 0, sizeof (vsv) );
 
-    return net_ReadInner( p_this, nfd, fds, vsv, buf, len,
-                          i_wait / 1000, VLC_FALSE );
+    return net_ReadInner( p_this, nfd, fds, vsv, buf, len, -1, VLC_FALSE );
 }
 
 

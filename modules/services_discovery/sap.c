@@ -526,7 +526,7 @@ static void Run( services_discovery_t *p_sd )
 
         i_read = net_Select( p_sd, p_sd->p_sys->pi_fd,
                              p_sd->p_sys->i_fd, p_buffer,
-                             MAX_SAP_BUFFER, 500000 );
+                             MAX_SAP_BUFFER );
 
         /* Check for items that need deletion */
         for( i = 0; i < p_sd->p_sys->i_announces; i++ )
