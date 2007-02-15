@@ -34,13 +34,13 @@ extern "C" {
 /***************************************************************************
  * Internal creation and destruction functions
  ***************************************************************************/
-libvlc_int_t *libvlc_InternalCreate( void );
-int libvlc_InternalInit( libvlc_int_t *, int, char *ppsz_argv[] );
-int libvlc_InternalCleanup( libvlc_int_t * );
-int libvlc_InternalDestroy( libvlc_int_t *, vlc_bool_t );
+VLC_EXPORT (libvlc_int_t *, libvlc_InternalCreate, ( void ) );
+VLC_EXPORT (int, libvlc_InternalInit, ( libvlc_int_t *, int, char *ppsz_argv[] ) );
+VLC_EXPORT (int, libvlc_InternalCleanup, ( libvlc_int_t * ) );
+VLC_EXPORT (int, libvlc_InternalDestroy, ( libvlc_int_t *, vlc_bool_t ) );
 
-int libvlc_InternalAddIntf( libvlc_int_t *, const char *, vlc_bool_t,
-                            vlc_bool_t, int, const char *const * );
+VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char *, vlc_bool_t,
+                            vlc_bool_t, int, const char *const * ) );
 
 /***************************************************************************
  * Opaque structures for libvlc API
