@@ -648,47 +648,23 @@ static const char *MakeRandMulticast (int family, char *buf, size_t buflen)
 #ifdef AF_INET6
         case AF_INET6:
         {
-            struct sockaddr_in6 addr;
-            memset(&addr, 0, sizeof(addr));
+            struct in6_addr addr;
             memcpy (&addr, "\xff\x38\x00\x00" "\x00\x00\x00\x00"
                            "\x00\x00\x00\x00", 12);
             rand |= 0x80000000;
-            memcpy (addr.sin6_addr.s6_addr + 12, &(uint32_t){ htonl (rand) }, 4);
-#if defined(WIN32) || defined(UNDER_CE)
-            addr.sin6_family = AF_INET6;
-            if( 0 == WSAAddressToStringA((LPSOCKADDR)&addr, sizeof(struct sockaddr_in6), NULL, buf, &buflen) )
-            {
-                buf[buflen] = '\0';
-                return buf;
-            }
-            return NULL;
-#else
-            return inet_ntop (family, &(addr.sin6_addr), buf, buflen);
-#endif
+            memcpy (addr.s6_addr + 12, &(uint32_t){ htonl (rand) }, 4);
+            return inet_ntop (family, &addr, buf, buflen);
         }
 #endif
 
         case AF_INET:
         {
-            struct sockaddr_in addr;
-            memset(&addr, 0, sizeof(addr));
-            addr.sin_addr.s_addr = htonl ((rand & 0xffffff) | 0xe8000000);
-#if defined(WIN32) || defined(UNDER_CE)
-            addr.sin_family = AF_INET;
-            if( 0 == WSAAddressToStringA((LPSOCKADDR)&addr, sizeof(struct sockaddr_in), NULL, buf, &buflen) )
-            {
-                buf[buflen] = '\0';
-                return buf;
-            }
-            return NULL;
-#else
-            return inet_ntop (family, &(addr.sin_addr), buf, buflen);
-#endif
+            struct in_addr addr;
+            addr.s_addr = htonl ((rand & 0xffffff) | 0xe8000000);
+            return inet_ntop (family, &addr, buf, buflen);
         }
     }
-#if defined(WIN32) || defined(UNDER_CE)
-    WSASetLastError(WSAEAFNOSUPPORT);
-#else
+#ifdef EAFNOSUPPORT
     errno = EAFNOSUPPORT;
 #endif
     return NULL;
