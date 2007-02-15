@@ -73,8 +73,7 @@ int net_Socket (vlc_object_t *obj, int family, int socktype, int proto);
 #define net_Connect(a, b, c, d, e) __net_Connect(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( int, __net_Connect, (vlc_object_t *p_this, const char *psz_host, int i_port, int socktype, int protocol) );
 
-VLC_EXPORT( int *, net_Listen, (vlc_object_t *p_this, const char *psz_host, int i_port,
-                                int family, int socktype, int protocol) );
+VLC_EXPORT( int *, net_Listen, (vlc_object_t *p_this, const char *psz_host, int i_port, int family, int socktype, int protocol) );
 VLC_EXPORT( int, net_ListenSingle, (vlc_object_t *p_this, const char *psz_host, int i_port, int family, int socktype, int protocol) );
 
 #define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
