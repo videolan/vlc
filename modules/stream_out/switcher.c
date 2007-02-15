@@ -649,12 +649,13 @@ static int UnpackFromFile( sout_stream_t *p_stream, const char *psz_file,
 static void NetCommand( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    char psz_buffer[10];
+    char psz_buffer[11];
     int i_len = net_ReadNonBlock( p_stream, p_sys->i_fd, NULL, (uint8_t *)&psz_buffer[0],
-                                  sizeof( psz_buffer ), 0 );
+                                  sizeof( psz_buffer ) - 1, 0 );
 
     if ( i_len > 0 )
     {
+        psz_buffer[i_len] = '\0';
         int i_cmd = strtol( psz_buffer, NULL, 0 );
         if ( i_cmd < -1 || i_cmd > p_sys->i_nb_pictures )
         {
