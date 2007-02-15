@@ -402,13 +402,13 @@ error:
  * If b_retry is true, then we repeat until we have read the right amount of
  * data
  *****************************************************************************/
-int __net_Read( vlc_object_t *restrict p_this, int fd,
-                const v_socket_t *restrict p_vs,
-                uint8_t *restrict p_data, int i_data, vlc_bool_t b_retry )
+ssize_t __net_Read( vlc_object_t *restrict p_this, int fd,
+                    const v_socket_t *restrict p_vs,
+                    uint8_t *restrict buf, size_t len, vlc_bool_t b_retry )
 {
     return net_ReadInner( p_this, 1, &(int){ fd },
-                          &(const v_socket_t *){ p_vs },
-                          p_data, i_data, -1, b_retry );
+                          &(const v_socket_t *){ p_vs }, buf, len, -1,
+                          b_retry );
 }
 
 
@@ -417,13 +417,13 @@ int __net_Read( vlc_object_t *restrict p_this, int fd,
  *****************************************************************************
  * Read from a network socket, non blocking mode (with timeout)
  *****************************************************************************/
-int __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
-                        const v_socket_t *restrict p_vs,
-                        uint8_t *restrict p_data, int i_data, mtime_t i_wait)
+ssize_t __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
+                            const v_socket_t *restrict p_vs,
+                            uint8_t *restrict buf, size_t len, mtime_t i_wait)
 {
     return net_ReadInner (p_this, 1, &(int){ fd },
                           &(const v_socket_t *){ p_vs },
-                          p_data, i_data, i_wait / 1000, VLC_FALSE);
+                          buf, len, i_wait / 1000, VLC_FALSE);
 }
 
 
@@ -433,68 +433,47 @@ int __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
  * Read from several sockets (with timeout). Takes data from the first socket
  * that has some.
  *****************************************************************************/
-int __net_Select( vlc_object_t *restrict p_this, const int *restrict pi_fd,
-                  int i_fd, uint8_t *restrict p_data, int i_data,
-                  mtime_t i_wait )
+ssize_t __net_Select( vlc_object_t *restrict p_this,
+                      const int *restrict fds, int nfd,
+                      uint8_t *restrict buf, size_t len, mtime_t i_wait )
 {
-    const v_socket_t *vsv[i_fd];
+    const v_socket_t *vsv[nfd];
     memset( vsv, 0, sizeof (vsv) );
 
-    return net_ReadInner( p_this, i_fd, pi_fd, vsv, p_data, i_data,
+    return net_ReadInner( p_this, nfd, fds, vsv, buf, len,
                           i_wait / 1000, VLC_FALSE );
 }
 
 
 /* Write exact amount requested */
-int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
-                 const uint8_t *p_data, int i_data )
+ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
+                     const uint8_t *p_data, size_t i_data )
 {
     size_t i_total = 0;
 
     while( i_data > 0 )
     {
         if( p_this->b_die )
-            return i_total;
+            break;
 
-#ifdef HAVE_POLL
         struct pollfd ufd[1];
         memset (ufd, 0, sizeof (ufd));
         ufd[0].fd = fd;
         ufd[0].events = POLLOUT;
 
         int val = poll (ufd, 1, 500);
-        if ((val > 0) && (ufd[0].revents & POLLERR) && (i_total > 0))
-            return i_total; // error will be dequeued separately on next call
-#else
-        fd_set set;
-        FD_ZERO (&set);
-
-#if !defined(WIN32) && !defined(UNDER_CE)
-        if (fd >= FD_SETSIZE)
-        {
-            /* We don't want to overflow select() fd_set */
-            msg_Err (p_this, "select set overflow");
-            return -1;
-        }
-#endif
-        FD_SET (fd, &set);
-
-        int val = select (fd + 1, NULL, &set, NULL,
-                          &(struct timeval){ 0, 500000 });
-#endif
         switch (val)
         {
             case -1:
-                if (errno != EINTR)
-                {
-                    msg_Err (p_this, "Write error: %s",
-                             net_strerror (net_errno));
-                    return i_total ? (int)i_total : -1;
-                }
+               msg_Err (p_this, "Write error: %s", net_strerror (net_errno));
+               goto out;
 
             case 0:
                 continue;
         }
+
+        if ((ufd[0].revents & POLLERR) && (i_total > 0))
+            return i_total; // error will be dequeued separately on next call
 
         if (p_vs != NULL)
             val = p_vs->pf_send (p_vs->p_sys, p_data, i_data);
@@ -506,7 +485,10 @@ int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 #endif
 
         if (val == -1)
-            return i_total ? (int)i_total : -1;
+        {
+            msg_Err (p_this, "Write error: %s", net_strerror (net_errno));
+            break;
+        }
         if (val == 0)
             return i_total;
 
@@ -515,7 +497,11 @@ int __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         i_total += val;
     }
 
-    return i_total;
+out:
+    if ((i_total > 0) || (i_data == 0))
+        return i_total;
+
+    return -1;
 }
 
 char *__net_Gets( vlc_object_t *p_this, int fd, const v_socket_t *p_vs )
@@ -558,8 +544,8 @@ char *__net_Gets( vlc_object_t *p_this, int fd, const v_socket_t *p_vs )
     return psz_line;
 }
 
-int net_Printf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
-                const char *psz_fmt, ... )
+ssize_t net_Printf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
+                    const char *psz_fmt, ... )
 {
     int i_ret;
     va_list args;
@@ -570,8 +556,8 @@ int net_Printf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
     return i_ret;
 }
 
-int __net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
-                    const char *psz_fmt, va_list args )
+ssize_t __net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
+                        const char *psz_fmt, va_list args )
 {
     char    *psz;
     int     i_size, i_ret;
