@@ -100,7 +100,6 @@ misc/modules.c: misc/modules_builtin.h
 ###############################################################################
 
 libvlc_a_SOURCES = $(SOURCES_libvlc) $(SOURCES_libvlc_control)
-nodist_libvlc_a_SOURCES = misc/version.c
 libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags libvlc pic` -DUSE_BUILTINS
 libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc pic`
 libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc pic`
@@ -330,7 +329,11 @@ SOURCES_libvlc_control = \
 
 if !USE_LIBTOOL
 if !HAVE_WIN32
+nodist_libvlc_a_SOURCES = misc/version.c
 CLEANFILES += misc/version.c
+
+misc/version.c: FORCE
+	$(TOOLBOX) --update-version
 endif
 
 # Install shared libvlc
@@ -341,9 +344,6 @@ install-exec-local:
 uninstall-local:
 	test -z "$(DATA_noinst_libvlc)" || rm -f "$(DESTDIR)$(libdir)/$(DATA_noinst_libvlc)"
 endif
-
-misc/version.c: FORCE
-	$(TOOLBOX) --update-version
 
 ###############################################################################
 # Stamp rules
