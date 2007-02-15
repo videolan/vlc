@@ -359,26 +359,30 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                  * with the first part of the datagram. */
                     msg_Err( p_this, "Receive error: "
                                      "Increase the mtu size (--mtu option)" );
-                    i_total += i_buflen;
-                    return i_total;
+                    n = i_buflen;
+                    break;
+
+                default:
+                    goto error;
             }
 #else
             if( errno == EAGAIN ) /* spurious wake-up (sucks if fdc > 1) */
                 continue;
-#endif
             goto error;
+#endif
         }
 
         if (n == 0) // EOF
-            return i_total;
+            break;
 
         i_total += n;
         p_buf += n;
         i_buflen -= n;
 
         if (!waitall)
-            return i_total;
+            break;
 
+        /* FIXME: This is broken. Do not us this. */
         if (wait_ms != -1)
         {
             wait_ms -= delay_ms;
@@ -389,8 +393,7 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
     return i_total;
 
 error:
-    if( errno != EINTR )
-        msg_Err( p_this, "Read error: %s", net_strerror (net_errno) );
+    msg_Err( p_this, "Read error: %s", net_strerror (net_errno) );
     return i_total ? (ssize_t)i_total : -1;
 }
 
@@ -400,30 +403,32 @@ error:
  *****************************************************************************
  * Read from a network socket
  * If b_retry is true, then we repeat until we have read the right amount of
- * data
+ * data; in that case, a short count means EOF has been reached.
  *****************************************************************************/
 ssize_t __net_Read( vlc_object_t *restrict p_this, int fd,
                     const v_socket_t *restrict p_vs,
                     uint8_t *restrict buf, size_t len, vlc_bool_t b_retry )
 {
     return net_ReadInner( p_this, 1, &(int){ fd },
-                          &(const v_socket_t *){ p_vs }, buf, len, -1,
-                          b_retry );
+                          &(const v_socket_t *){ p_vs },
+                          buf, len, -1, b_retry );
 }
 
 
 /*****************************************************************************
  * __net_ReadNonBlock:
  *****************************************************************************
- * Read from a network socket, non blocking mode (with timeout)
+ * Read from a network socket, non blocking mode.
+ * This function should only be used after a poll() (or select(), but you
+ * should use poll instead of select()) invocation to avoid busy loops.
  *****************************************************************************/
 ssize_t __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
                             const v_socket_t *restrict p_vs,
-                            uint8_t *restrict buf, size_t len, mtime_t i_wait)
+                            uint8_t *restrict buf, size_t len )
 {
     return net_ReadInner (p_this, 1, &(int){ fd },
                           &(const v_socket_t *){ p_vs },
-                          buf, len, i_wait / 1000, VLC_FALSE);
+                          buf, len, 0, VLC_FALSE);
 }
 
 
@@ -432,6 +437,7 @@ ssize_t __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
  *****************************************************************************
  * Read from several sockets (with timeout). Takes data from the first socket
  * that has some.
+ * NOTE: DO NOT USE this API with a non-zero delay. You were warned.
  *****************************************************************************/
 ssize_t __net_Select( vlc_object_t *restrict p_this,
                       const int *restrict fds, int nfd,

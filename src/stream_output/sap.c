@@ -653,7 +653,7 @@ static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address )
     {
         /* Might be too slow if we have huge data */
         i_read = net_ReadNonBlock( p_sap, p_address->i_rfd, NULL, buffer,
-                                   SAP_MAX_BUFFER, 0 );
+                                   SAP_MAX_BUFFER );
         i_tot += i_read;
     } while( i_read > 0 );
 
