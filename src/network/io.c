@@ -279,7 +279,7 @@ static ssize_t
 net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                const v_socket_t *const *restrict vsv,
                uint8_t *restrict p_buf, size_t i_buflen,
-               int wait_ms, vlc_bool_t waitall )
+               vlc_bool_t dontwait, vlc_bool_t waitall )
 {
     size_t i_total = 0;
 
@@ -289,10 +289,7 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         ssize_t n;
         struct pollfd ufd[fdc];
 
-        int delay_ms = 500;
-        if ((wait_ms != -1) && (wait_ms < 500))
-            delay_ms = wait_ms;
-
+        int delay_ms = dontwait ? 0 : 500;
         if (p_this->b_die)
         {
             errno = EINTR;
@@ -379,16 +376,8 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         p_buf += n;
         i_buflen -= n;
 
-        if (!waitall)
+        if (dontwait || !waitall)
             break;
-
-        /* FIXME: This is broken. Do not us this. */
-        if (wait_ms != -1)
-        {
-            wait_ms -= delay_ms;
-            if (wait_ms == 0)
-                return i_total; // time's up!
-        }
     }
     return i_total;
 
@@ -411,7 +400,7 @@ ssize_t __net_Read( vlc_object_t *restrict p_this, int fd,
 {
     return net_ReadInner( p_this, 1, &(int){ fd },
                           &(const v_socket_t *){ p_vs },
-                          buf, len, -1, b_retry );
+                          buf, len, VLC_FALSE, b_retry );
 }
 
 
@@ -428,7 +417,7 @@ ssize_t __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
 {
     return net_ReadInner (p_this, 1, &(int){ fd },
                           &(const v_socket_t *){ p_vs },
-                          buf, len, 0, VLC_FALSE);
+                          buf, len, VLC_TRUE, VLC_FALSE);
 }
 
 
@@ -444,7 +433,8 @@ ssize_t __net_Select( vlc_object_t *restrict p_this,
     const v_socket_t *vsv[nfd];
     memset( vsv, 0, sizeof (vsv) );
 
-    return net_ReadInner( p_this, nfd, fds, vsv, buf, len, -1, VLC_FALSE );
+    return net_ReadInner( p_this, nfd, fds, vsv,
+                          buf, len, VLC_FALSE, VLC_FALSE );
 }
 
 
