@@ -1,12 +1,13 @@
 /*****************************************************************************
  * io.c: network I/O functions
  *****************************************************************************
- * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright (C) 2004-2005, 2007 the VideoLAN team
  * Copyright © 2005-2006 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *          Rémi Denis-Courmont <rem # videolan.org>
+ *          Christophe Mutricy <xtophe at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -649,3 +650,54 @@ int inet_pton(int af, const char *src, void *dst)
     return 0;
 }
 #endif /* HAVE_INET_PTON */
+
+#ifndef HAVE_INET_NTOP
+#ifdef WIN32
+const char *inet_ntop(int af, const void * src,
+                               char * dst, socklen_t cnt)
+{
+    switch( af )
+    {
+#ifdef AF_INET6
+        case AF_INET6:
+            {
+                struct sockaddr_in6 addr;
+                memset(&addr, 0, sizeof(addr));
+                addr.sin6_family = AF_INET6;
+                addr.sin6_addr = *((struct in6_addr*)src);
+                if( 0 == WSAAddressToStringA((LPSOCKADDR)&addr, 
+                                             sizeof(struct sockaddr_in6), 
+                                             NULL, dst, &cnt) )
+                {
+                    dst[cnt] = '\0';
+                    return dst;
+                }
+                errno = WSAGetLastError();
+                return NULL;
+
+            }
+
+#endif
+        case AF_INET:
+            {
+                struct sockaddr_in addr;
+                memset(&addr, 0, sizeof(addr));
+                addr.sin_family = AF_INET;
+                addr.sin_addr = *((struct in_addr*)src);
+                if( 0 == WSAAddressToStringA((LPSOCKADDR)&addr,
+                                             sizeof(struct sockaddr_in),
+                                             NULL, dst, &cnt) )
+                {
+                    dst[cnt] = '\0';
+                    return dst;
+                }
+                errno = WSAGetLastError();
+                return NULL;
+
+            }
+    }
+    errno = EAFNOSUPPORT;
+    return NULL;
+}
+#endif
+#endif

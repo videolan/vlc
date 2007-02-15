@@ -2407,6 +2407,11 @@ AC_CHECK_FUNCS(inet_pton,[have_ipv6=yes],[
 AS_IF([test "${have_ipv6}" = "yes"], [
   AC_DEFINE(HAVE_INET_PTON, 1, [Define to 1 if you have inet_pton().])])
 
+
+AC_CHECK_FUNCS(inet_ntop,[
+  AC_DEFINE(HAVE_INET_NTOP, 1, [Define to 1 if you have inet_ntop().])])
+
+
 dnl
 dnl  ogg demux plugin
 dnl
