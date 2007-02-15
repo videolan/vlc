@@ -436,7 +436,7 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 }
 
 
-void __vlc_object_die( vlc_object_t *p_this )
+void __vlc_object_kill( vlc_object_t *p_this )
 {
     vlc_mutex_lock( &p_this->object_lock );
     p_this->b_die = VLC_TRUE;
