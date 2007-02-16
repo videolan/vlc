@@ -300,7 +300,7 @@ fi
 dnl
 dnl Gettext stuff
 dnl
-ALL_LINGUAS="af ar bn ca co cs da de el en_GB es eu fr fur gl he hi hu it ja ka ko lt lv ms my nb ne nl nn no oc pa pl ps pt_BR pt_PT ro ru sk sl sq sv tet th tl tr zh_CN zh_TW"
+ALL_LINGUAS="af ar bn ca co cs da de el en_GB es eu fr fur gl he hi hu it ja ka ko lt lv ms my ne nl no oc pa pl ps pt_BR pt_PT ro ru sk sl sq sv tet th tl tr zh_CN zh_TW"
 AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT
 AS_IF([test "${nls_cv_force_use_gnu_gettext}" = "yes"], [
