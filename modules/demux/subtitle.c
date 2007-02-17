@@ -54,12 +54,12 @@ static void Close( vlc_object_t *p_this );
 #define SUB_TYPE_LONGTEXT \
     N_("Force the subtiles format. Valid values are : \"microdvd\", " \
     "\"subrip\",  \"ssa1\", \"ssa2-4\", \"ass\", \"vplayer\" " \
-    "\"sami\", \"dvdsubtitle\" and \"auto\" (meaning autodetection, this " \
+    "\"sami\", \"dvdsubtitle\", \"mpl2\" and \"auto\" (meaning autodetection, this " \
     "should always work).")
 static const char *ppsz_sub_type[] =
 {
     "auto", "microdvd", "subrip", "subviewer", "ssa1",
-    "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle"
+    "ssa2-4", "ass", "vplayer", "sami", "dvdsubtitle", "mpl2"
 };
 
 vlc_module_begin();
@@ -96,7 +96,8 @@ enum
     SUB_TYPE_VPLAYER,
     SUB_TYPE_SAMI,
     SUB_TYPE_SUBVIEWER,
-    SUB_TYPE_DVDSUBTITLE
+    SUB_TYPE_DVDSUBTITLE,
+    SUB_TYPE_MPL2
 };
 
 typedef struct
@@ -141,6 +142,7 @@ static int  ParseSSA        ( demux_t *, subtitle_t * );
 static int  ParseVplayer    ( demux_t *, subtitle_t * );
 static int  ParseSami       ( demux_t *, subtitle_t * );
 static int  ParseDVDSubtitle( demux_t *, subtitle_t * );
+static int  ParseMPL2       ( demux_t *, subtitle_t * );
 
 static struct
 {
@@ -159,6 +161,7 @@ static struct
     { "vplayer",    SUB_TYPE_VPLAYER,     "VPlayer",     ParseVplayer },
     { "sami",       SUB_TYPE_SAMI,        "SAMI",        ParseSami },
     { "dvdsubtitle",SUB_TYPE_DVDSUBTITLE, "DVDSubtitle", ParseDVDSubtitle },
+    { "mpl2",       SUB_TYPE_MPL2,        "MPL2",        ParseMPL2 },
     { NULL,         SUB_TYPE_UNKNOWN,     "Unknown",     NULL }
 };
 
@@ -311,6 +314,12 @@ static int Open ( vlc_object_t *p_this )
                              &i_dummy, &i_dummy ) == 4 )
             {
                 p_sys->i_type = SUB_TYPE_DVDSUBTITLE;
+                break;
+            }
+            else if( sscanf( s, "[%d][%d]", &i_dummy, &i_dummy ) == 2 ||
+                     sscanf( s, "[%d][]", &i_dummy ) == 1)
+            {
+                p_sys->i_type = SUB_TYPE_MPL2;
                 break;
             }
 
@@ -1287,3 +1296,54 @@ static int ParseDVDSubtitle( demux_t *p_demux, subtitle_t *p_subtitle )
     }
 }
 
+static int ParseMPL2( demux_t *p_demux, subtitle_t *p_subtitle )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    text_t      *txt = &p_sys->txt;
+    /*
+     * each line:
+     *  [n1][n2]Line1|Line2|Line3....
+     * where n1 and n2 are the video frame number...
+     * [n2] can also be []
+     */
+    char *s;
+
+    char buffer_text[MAX_LINE + 1];
+    int    i_start;
+    int    i_stop;
+    unsigned int i;
+
+    p_subtitle->i_start = 0;
+    p_subtitle->i_stop  = 0;
+    p_subtitle->psz_text = NULL;
+
+    for( ;; )
+    {
+        if( ( s = TextGetLine( txt ) ) == NULL )
+        {
+            return( VLC_EGENERIC );
+        }
+        i_start = 0;
+        i_stop  = 0;
+
+        memset( buffer_text, '\0', MAX_LINE );
+        if( sscanf( s, "[%d][]%[^\r\n]", &i_start, buffer_text ) == 2 ||
+            sscanf( s, "[%d][%d]%[^\r\n]", &i_start, &i_stop, buffer_text ) == 3)
+        {
+            break;
+        }
+    }
+
+    /* replace | by \n */
+    for( i = 0; i < strlen( buffer_text ); i++ )
+    {
+        if( buffer_text[i] == '|' )
+        {
+            buffer_text[i] = '\n';
+        }
+    }
+    p_subtitle->i_start = (int64_t)i_start * 100000;
+    p_subtitle->i_stop  = (int64_t)i_stop  * 100000;
+    p_subtitle->psz_text = strndup( buffer_text, MAX_LINE );
+    return( 0 );
+}
