@@ -701,6 +701,9 @@ flac-$(FLAC_VERSION).tar.gz:
 
 flac: flac-$(FLAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_WIN32
+	patch -p0 < Patches/flac-mingw32.patch
+endif
 ifneq ($(HOST),$(BUILD))
 	(patch -p0 < Patches/flac-cross.patch && cd $@ && autoconf)
 endif
