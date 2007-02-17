@@ -23,12 +23,13 @@ host = document.location.toString().replace( /http:\/\//, '' ).replace( /[:/].*/
   <vlc id="include" param1="dialogs/input" />
   <vlc id="include" param1="dialogs/playlist" />
 
-  <input id="sout_mrl" type="hidden" value=":sout=#transcode{vcodec=FLV1,acodec=mp3,channels=1,samplerate=44100}:std{access=http{mime=video/x-flv},mux=ffmpeg{mux=flv},dst=0.0.0.0:8081/stream.flv}" />
+  <input id="sout_mrl" type="hidden" value=":sout=#transcode{vcodec=FLV1,acodec=mp3,channels=2,samplerate=44100}:std{access=http{mime=video/x-flv},mux=ffmpeg{mux=flv},dst=0.0.0.0:8081/stream.flv} :no-sout-keep" />
 
-  <div style='height: 100%; width: 100%;'>
-  <object type="application/x-shockwave-flash" data="http://flowplayer.sourceforge.net/video/FlowPlayer.swf" width="100%" height="600px" id="FlowPlayer">
+  <div style='height: 100%; width: 100%; text-align: center;'>
+  <object type="application/x-shockwave-flash" data="http://flowplayer.sourceforge.net/video/FlowPlayer.swf" width="800px" height="600px" id="FlowPlayer" style="z-index: 0">
 	  <param name="allowScriptAccess" value="sameDomain" />
-	  <param name="movie" value="http://flowplayer.sourceforge.net/video/FlowPlayer.swf" />
+	  <param name="movie" value="/tmp/FlowPlayer.swf" />
+	  <!--<param name="movie" value="http://flowplayer.sourceforge.net/video/FlowPlayer.swf" />-->
 	  <param name="quality" value="high" />
     <!--	  <param name="scale" value="noScale" />-->
 	  <param name="wmode" value="transparent" />
@@ -40,6 +41,7 @@ host = document.location.toString().replace( /http:\/\//, '' ).replace( /[:/].*/
 // ]]>
 </script>
   </object>
+  <p style="font-size: small;">Uses the <a href="http://flowplayer.sourceforge.net/">Flow Player</a> free flash video player for playback (client side).</p>
   </div>
   <vlc id="include" param1="dialogs/footer" />
 </body>
