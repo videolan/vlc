@@ -428,6 +428,12 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
         return VLC_SUCCESS;
 
     case MUX_GET_MIME:
+    {
+        char **ppsz = (char**)va_arg( args, char ** );
+        *ppsz = strdup( p_mux->p_sys->oc->oformat->mime_type );
+        return VLC_SUCCESS;
+    }
+
     default:
         return VLC_EGENERIC;
     }

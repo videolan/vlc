@@ -23,7 +23,7 @@ host = document.location.toString().replace( /http:\/\//, '' ).replace( /[:/].*/
   <vlc id="include" param1="dialogs/input" />
   <vlc id="include" param1="dialogs/playlist" />
 
-  <input id="sout_mrl" type="hidden" value=":sout=#transcode{vcodec=FLV1,acodec=mp3,channels=2,samplerate=44100}:std{access=http{mime=video/x-flv},mux=ffmpeg{mux=flv},dst=0.0.0.0:8081/stream.flv} :no-sout-keep" />
+  <input id="sout_mrl" type="hidden" value=":sout=#transcode{vcodec=FLV1,acodec=mp3,channels=2,samplerate=44100}:std{access=http,mux=ffmpeg{mux=flv},dst=0.0.0.0:8081/stream.flv} :no-sout-keep" />
 
   <div style='height: 100%; width: 100%; text-align: center;'>
   <object type="application/x-shockwave-flash" data="http://flowplayer.sourceforge.net/video/FlowPlayer.swf" width="800px" height="600px" id="FlowPlayer" style="z-index: 0">
