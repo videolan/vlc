@@ -710,7 +710,7 @@ ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest --disable-asm-optimizations && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
 else
 ifdef HAVE_DARWIN_OS
-	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && sed -e 's%-Wl,-syslibroot,%-syslibroot %' -i.orig src/libFLAC/Makefile && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
+	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
 else
 	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
 endif
