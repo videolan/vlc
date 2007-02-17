@@ -7,26 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.8.6-svn20061012\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-02-06 15:17+0100\n"
+"POT-Creation-Date: 2007-02-17 14:45+0000\n"
 "PO-Revision-Date: 2006-11-11 18:47+0900\n"
 "Last-Translator: Kang Jeong-Hee <keizie@gmail.com>\n"
 "Language-Team: Korean Linux User Group\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: include/vlc/vlc.h:591
-#, fuzzy
-msgid ""
-"This program comes with NO WARRANTY, to the extent permitted by law.\n"
-"You may redistribute it under the terms of the GNU General Public License;\n"
-"see the file named COPYING for details.\n"
-"Written by the VideoLAN team; see the AUTHORS file.\n"
-msgstr ""
-"법률에 의해 허가되는 범위에서 이 프로그램에는 무슨 보증도 없습니다. \n"
-"당신은, GNU GPL의 조항에 근거해 재배포할지도 모릅니다. \n"
-"COPYING 파일에 상세가 쓰여져 있기 때문에, 참조해 주세요. \n"
-"Written by the VideoLAN team at Ecole Centrale, Paris. \n"
 
 #: include/vlc_config_cat.h:36
 msgid "VLC preferences"
@@ -323,7 +310,7 @@ msgid ""
 "for each sout stream module here."
 msgstr ""
 
-#: include/vlc_config_cat.h:176 modules/services_discovery/sap.c:124
+#: include/vlc_config_cat.h:176 modules/services_discovery/sap.c:126
 #, fuzzy
 msgid "SAP"
 msgstr "SDP"
@@ -799,6 +786,19 @@ msgstr "코덱명 디바이스명"
 msgid "Codec Description"
 msgstr "코덱 설명"
 
+#: include/vlc/vlc.h:591
+#, fuzzy
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute it under the terms of the GNU General Public License;\n"
+"see the file named COPYING for details.\n"
+"Written by the VideoLAN team; see the AUTHORS file.\n"
+msgstr ""
+"법률에 의해 허가되는 범위에서 이 프로그램에는 무슨 보증도 없습니다. \n"
+"당신은, GNU GPL의 조항에 근거해 재배포할지도 모릅니다. \n"
+"COPYING 파일에 상세가 쓰여져 있기 때문에, 참조해 주세요. \n"
+"Written by the VideoLAN team at Ecole Centrale, Paris. \n"
+
 #: src/audio_output/filters.c:154 src/audio_output/filters.c:201
 #: src/audio_output/filters.c:224
 #, fuzzy
@@ -1019,8 +1019,8 @@ msgstr ""
 msgid "Bits per sample"
 msgstr "비트/샘플"
 
-#: src/input/es_out.c:1628 modules/access/pvr.c:84
-#: modules/access_output/shout.c:87
+#: src/input/es_out.c:1628 modules/access_output/shout.c:87
+#: modules/access/pvr.c:84
 msgid "Bitrate"
 msgstr "bit rate"
 
@@ -1046,20 +1046,20 @@ msgstr "샘플 레이트"
 msgid "Subtitle"
 msgstr "자막"
 
-#: src/input/input.c:2058
+#: src/input/input.c:2060
 msgid "Your input can't be opened"
 msgstr ""
 
-#: src/input/input.c:2059
+#: src/input/input.c:2061
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 
-#: src/input/input.c:2134
+#: src/input/input.c:2136
 msgid "Can't recognize the input's format"
 msgstr ""
 
-#: src/input/input.c:2135
+#: src/input/input.c:2137
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
 msgstr ""
@@ -1149,31 +1149,31 @@ msgstr "취소"
 msgid "Ok"
 msgstr ""
 
-#: src/interface/interface.c:340
+#: src/interface/interface.c:339
 msgid "Switch interface"
 msgstr "인터페이스를 변환"
 
-#: src/interface/interface.c:367 modules/gui/macosx/intf.m:520
+#: src/interface/interface.c:366 modules/gui/macosx/intf.m:520
 #: modules/gui/macosx/intf.m:521
 msgid "Add Interface"
 msgstr "인터페이스를 추가"
 
-#: src/interface/interface.c:373
+#: src/interface/interface.c:372
 #, fuzzy
 msgid "Telnet Interface"
 msgstr "Telnet 인터페이스 포토"
 
-#: src/interface/interface.c:376
+#: src/interface/interface.c:375
 #, fuzzy
 msgid "Web Interface"
 msgstr "인터페이스"
 
-#: src/interface/interface.c:379
+#: src/interface/interface.c:378
 #, fuzzy
 msgid "Debug logging"
 msgstr "파이르로깅인타페스"
 
-#: src/interface/interface.c:382
+#: src/interface/interface.c:381
 #, fuzzy
 msgid "Mouse Gestures"
 msgstr "장르"
@@ -1187,53 +1187,53 @@ msgstr "ko"
 msgid "Help options"
 msgstr "도움말 선택사항"
 
-#: src/libvlc-common.c:1378 src/misc/configuration.c:1217
+#: src/libvlc-common.c:1399 src/misc/configuration.c:1217
 msgid "string"
 msgstr "캐릭터 라인"
 
-#: src/libvlc-common.c:1397 src/misc/configuration.c:1181
+#: src/libvlc-common.c:1418 src/misc/configuration.c:1181
 msgid "integer"
 msgstr "정수"
 
-#: src/libvlc-common.c:1417 src/misc/configuration.c:1206
+#: src/libvlc-common.c:1438 src/misc/configuration.c:1206
 msgid "float"
 msgstr "부동 소수점"
 
-#: src/libvlc-common.c:1424
+#: src/libvlc-common.c:1445
 msgid " (default enabled)"
 msgstr " (디폴트 유효)"
 
-#: src/libvlc-common.c:1425
+#: src/libvlc-common.c:1446
 msgid " (default disabled)"
 msgstr " (디폴트 무효)"
 
-#: src/libvlc-common.c:1607
+#: src/libvlc-common.c:1628
 #, fuzzy, c-format
 msgid "VLC version %s\n"
 msgstr "사이즈"
 
-#: src/libvlc-common.c:1608
+#: src/libvlc-common.c:1629
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
 msgstr ""
 
-#: src/libvlc-common.c:1610
+#: src/libvlc-common.c:1631
 #, fuzzy, c-format
 msgid "Compiler: %s\n"
 msgstr "에러"
 
-#: src/libvlc-common.c:1613
+#: src/libvlc-common.c:1634
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
 msgstr ""
 
-#: src/libvlc-common.c:1645
+#: src/libvlc-common.c:1666
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 
-#: src/libvlc-common.c:1665
+#: src/libvlc-common.c:1686
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -4127,7 +4127,7 @@ msgid "key"
 msgstr "키"
 
 #: src/playlist/engine.c:125 src/playlist/engine.c:127
-#: src/playlist/loadsave.c:101
+#: src/playlist/loadsave.c:104
 msgid "Media Library"
 msgstr ""
 
@@ -4803,14 +4803,23 @@ msgstr "인연 잡기"
 msgid "Aspect-ratio"
 msgstr "어스펙트비"
 
+#: modules/access/cdda/access.c:294
+msgid "CD reading failed"
+msgstr ""
+
+#: modules/access/cdda/access.c:295
+#, c-format
+msgid "VLC could not get a new block of size: %i."
+msgstr ""
+
 #: modules/access/cdda.c:60 modules/access/dshow/dshow.cpp:93
-#: modules/access/dv.c:68 modules/access/dvb/access.c:73
+#: modules/access/dvb/access.c:73 modules/access/dv.c:68
 #: modules/access/dvdnav.c:67 modules/access/dvdread.c:64
 #: modules/access/fake.c:41 modules/access/file.c:79 modules/access/ftp.c:54
-#: modules/access/gnomevfs.c:45 modules/access/http.c:56
+#: modules/access/gnomevfs.c:45 modules/access/http.c:57
 #: modules/access/mms/mms.c:46 modules/access/pvr.c:47
 #: modules/access/screen/screen.c:36 modules/access/smb.c:61
-#: modules/access/tcp.c:37 modules/access/udp.c:58 modules/access/v4l.c:76
+#: modules/access/tcp.c:37 modules/access/udp.c:69 modules/access/v4l.c:76
 #: modules/access/vcd/vcd.c:41
 msgid "Caching value in ms"
 msgstr "캐싱치 (밀리 세컨드)"
@@ -4869,17 +4878,8 @@ msgstr "음성 트랙"
 msgid "Audio CD - Track %i"
 msgstr "음성 트랙"
 
-#: modules/access/cdda/access.c:294
-msgid "CD reading failed"
-msgstr ""
-
-#: modules/access/cdda/access.c:295
-#, c-format
-msgid "VLC could not get a new block of size: %i."
-msgstr ""
-
 #: modules/access/cdda/cdda.c:42 modules/access/directory.c:80
-#: modules/codec/x264.c:321 modules/codec/x264.c:327 modules/codec/x264.c:332
+#: modules/codec/x264.c:329 modules/codec/x264.c:335 modules/codec/x264.c:340
 msgid "none"
 msgstr "없음"
 
@@ -5408,22 +5408,6 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
 
-#: modules/access/dv.c:70
-#, fuzzy
-msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
-msgstr ""
-"udp 스트림로 사용되는 기정의 캐싱치가 변경 가능합니다. 단위는 밀리 세컨드로 "
-"손가락정합니다. "
-
-#: modules/access/dv.c:74
-msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr ""
-
-#: modules/access/dv.c:75
-#, fuzzy
-msgid "dv"
-msgstr "추가"
-
 #: modules/access/dvb/access.c:75
 #, fuzzy
 msgid ""
@@ -5622,7 +5606,7 @@ msgid ""
 "range of IPs entitled to log into the internal HTTP server."
 msgstr ""
 
-#: modules/access/dvb/access.c:168 modules/access_output/http.c:72
+#: modules/access/dvb/access.c:168 modules/access_output/http.c:74
 #: modules/control/http/http.c:49
 #, fuzzy
 msgid "Certificate file"
@@ -5632,7 +5616,7 @@ msgstr "자막 파일을 사용"
 msgid "HTTP interface x509 PEM certificate file (enables SSL)"
 msgstr ""
 
-#: modules/access/dvb/access.c:172 modules/access_output/http.c:75
+#: modules/access/dvb/access.c:172 modules/access_output/http.c:77
 #: modules/control/http/http.c:52
 msgid "Private key file"
 msgstr ""
@@ -5641,7 +5625,7 @@ msgstr ""
 msgid "HTTP interface x509 PEM private key file"
 msgstr ""
 
-#: modules/access/dvb/access.c:175 modules/access_output/http.c:79
+#: modules/access/dvb/access.c:175 modules/access_output/http.c:81
 #: modules/control/http/http.c:54
 #, fuzzy
 msgid "Root CA file"
@@ -5651,7 +5635,7 @@ msgstr "파일을 선택한다"
 msgid "HTTP interface x509 PEM trusted root CA certificates file"
 msgstr ""
 
-#: modules/access/dvb/access.c:179 modules/access_output/http.c:84
+#: modules/access/dvb/access.c:179 modules/access_output/http.c:86
 #: modules/control/http/http.c:57
 #, fuzzy
 msgid "CRL file"
@@ -5694,6 +5678,22 @@ msgstr "시각화"
 #, c-format
 msgid "The provided polarization \"%c\" is not valid."
 msgstr ""
+
+#: modules/access/dv.c:70
+#, fuzzy
+msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
+msgstr ""
+"udp 스트림로 사용되는 기정의 캐싱치가 변경 가능합니다. 단위는 밀리 세컨드로 "
+"손가락정합니다. "
+
+#: modules/access/dv.c:74
+msgid "Digital Video (Firewire/ieee1394)  input"
+msgstr ""
+
+#: modules/access/dv.c:75
+#, fuzzy
+msgid "dv"
+msgstr "추가"
 
 #: modules/access/dvdnav.c:63 modules/access/dvdread.c:60
 msgid "DVD angle"
@@ -5907,6 +5907,81 @@ msgstr ""
 msgid "VLC could not open file \"%s\" (%s)."
 msgstr ""
 
+#: modules/access_filter/dump.c:39
+#, fuzzy
+msgid "Force use of dump module"
+msgstr "음성 출력 모듈 액세스"
+
+#: modules/access_filter/dump.c:40
+msgid "Activate the dump module even for media with fast seeking."
+msgstr ""
+
+#: modules/access_filter/dump.c:43
+msgid "Maximum size of temporary file (Mb)"
+msgstr ""
+
+#: modules/access_filter/dump.c:44
+msgid ""
+"The dump module will abort dumping of the media if more than this much "
+"megabyte were performed."
+msgstr ""
+
+#: modules/access_filter/record.c:45
+#, fuzzy
+msgid "Record directory"
+msgstr "원본 디렉토리"
+
+#: modules/access_filter/record.c:47
+#, fuzzy
+msgid "Directory where the record will be stored."
+msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
+
+#: modules/access_filter/record.c:323
+#, fuzzy
+msgid "Recording"
+msgstr "자막 엔콘코드중"
+
+#: modules/access_filter/record.c:325
+#, fuzzy
+msgid "Recording done"
+msgstr "자막 엔콘코드중"
+
+#: modules/access_filter/timeshift.c:46
+#, fuzzy
+msgid "Timeshift granularity"
+msgstr "수직 방향 위치"
+
+#: modules/access_filter/timeshift.c:48
+#, fuzzy
+msgid ""
+"This is the size of the temporary files that will be used to store the "
+"timeshifted streams."
+msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
+
+#: modules/access_filter/timeshift.c:50
+#, fuzzy
+msgid "Timeshift directory"
+msgstr "소스의 어스펙트·레시오"
+
+#: modules/access_filter/timeshift.c:51
+msgid "Directory used to store the timeshift temporary files."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:53
+msgid "Force use of the timeshift module"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:54
+msgid ""
+"Force use of the timeshift module even if the access declares that it can "
+"control pace or pause."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
+#, fuzzy
+msgid "Timeshift"
+msgstr "수직 방향 위치"
+
 #: modules/access/ftp.c:56
 #, fuzzy
 msgid ""
@@ -5990,11 +6065,11 @@ msgstr ""
 msgid "GnomeVFS input"
 msgstr "입력이 없습니다. \n"
 
-#: modules/access/http.c:50
+#: modules/access/http.c:51
 msgid "HTTP proxy"
 msgstr "HTTP 프록시"
 
-#: modules/access/http.c:52
+#: modules/access/http.c:53
 #, fuzzy
 msgid ""
 "HTTP proxy to be usesd It must be of the form http://[user[:pass]@]myproxy."
@@ -6005,7 +6080,7 @@ msgstr ""
 "이야있고. none 가 지정되었을 경우에는, HTTP_PROXYenvironment 변수가 시도됩니"
 "다. "
 
-#: modules/access/http.c:58
+#: modules/access/http.c:59
 #, fuzzy
 msgid ""
 "Caching value for HTTP streams. This value should be set in milliseconds."
@@ -6013,50 +6088,50 @@ msgstr ""
 "udp 스트림로 사용되는 기정의 캐싱치가 변경 가능합니다. 단위는 밀리 세컨드로 "
 "손가락정합니다. "
 
-#: modules/access/http.c:61
+#: modules/access/http.c:62
 msgid "HTTP user agent"
 msgstr "HTTP 유저 에이전트"
 
-#: modules/access/http.c:62
+#: modules/access/http.c:63
 #, fuzzy
 msgid "User agent that will be used for the connection."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/access/http.c:65
+#: modules/access/http.c:66
 #, fuzzy
 msgid "Auto re-connect"
 msgstr "음성 코덱"
 
-#: modules/access/http.c:67
+#: modules/access/http.c:68
 msgid ""
 "Automatically try to reconnect to the stream in case of a sudden disconnect."
 msgstr ""
 
-#: modules/access/http.c:71
+#: modules/access/http.c:72
 #, fuzzy
 msgid "Continuous stream"
 msgstr "스트림의 정지"
 
-#: modules/access/http.c:72
+#: modules/access/http.c:73
 msgid ""
 "Read a file that is being constantly updated (for example, a JPG file on a "
 "server).You should not globally enable this option as it will break all "
 "other types of HTTP streams."
 msgstr ""
 
-#: modules/access/http.c:78
+#: modules/access/http.c:79
 msgid "HTTP input"
 msgstr "HTTP 입력"
 
-#: modules/access/http.c:80
+#: modules/access/http.c:81
 msgid "HTTP(S)"
 msgstr ""
 
-#: modules/access/http.c:297
+#: modules/access/http.c:298
 msgid "HTTP authentication"
 msgstr ""
 
-#: modules/access/http.c:298 modules/demux/live555.cpp:759
+#: modules/access/http.c:299 modules/demux/live555.cpp:759
 msgid "Please enter a valid login name and a password."
 msgstr ""
 
@@ -6090,6 +6165,239 @@ msgstr ""
 #: modules/access/mms/mms.c:62
 msgid "Microsoft Media Server (MMS) input"
 msgstr ""
+
+#: modules/access_output/dummy.c:41 modules/stream_out/dummy.c:48
+msgid "Dummy stream output"
+msgstr "더미 스트림 출력"
+
+#: modules/access_output/dummy.c:42 modules/misc/dummy/dummy.c:58
+msgid "Dummy"
+msgstr ""
+
+#: modules/access_output/file.c:63
+#, fuzzy
+msgid "Append to file"
+msgstr "파일을 연다"
+
+#: modules/access_output/file.c:64
+msgid "Append to file if it exists instead of replacing it."
+msgstr ""
+
+#: modules/access_output/file.c:68
+#, fuzzy
+msgid "File stream output"
+msgstr "스트림의 출력처의 선택"
+
+#: modules/access_output/http.c:62 modules/misc/audioscrobbler.c:118
+msgid "Username"
+msgstr "유저명"
+
+#: modules/access_output/http.c:63
+#, fuzzy
+msgid "User name that will be requested to access the stream."
+msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
+
+#: modules/access_output/http.c:65 modules/control/telnet.c:79
+#: modules/misc/audioscrobbler.c:120
+msgid "Password"
+msgstr "패스워드"
+
+#: modules/access_output/http.c:66
+#, fuzzy
+msgid "Password that will be requested to access the stream."
+msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
+
+#: modules/access_output/http.c:70
+#, fuzzy
+msgid "Mime"
+msgstr "시간"
+
+#: modules/access_output/http.c:71
+msgid "MIME returned by the server (autodetected if not specified."
+msgstr ""
+
+#: modules/access_output/http.c:75
+msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
+msgstr ""
+
+#: modules/access_output/http.c:78
+msgid ""
+"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
+"empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:82
+msgid ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used for HTTPS. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:87
+msgid ""
+"Path to the x509 PEM Certificates Revocation List file that will be used for "
+"SSL. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:90
+msgid "Advertise with Bonjour"
+msgstr ""
+
+#: modules/access_output/http.c:91
+msgid "Advertise the stream with the Bonjour protocol."
+msgstr ""
+
+#: modules/access_output/http.c:95
+#, fuzzy
+msgid "HTTP stream output"
+msgstr "스트림의 출력처의 선택"
+
+#: modules/access_output/shout.c:59
+#, fuzzy
+msgid "Stream name"
+msgstr "스트림"
+
+#: modules/access_output/shout.c:60
+msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:63
+#, fuzzy
+msgid "Stream description"
+msgstr "코덱 설명"
+
+#: modules/access_output/shout.c:64
+msgid "Description of the stream content or information about your channel."
+msgstr ""
+
+#: modules/access_output/shout.c:67
+#, fuzzy
+msgid "Stream MP3"
+msgstr "스트림 "
+
+#: modules/access_output/shout.c:68
+msgid ""
+"You normally have to feed the shoutcast module with Ogg streams. It is also "
+"possible to stream MP3 instead, so you can forward MP3 streams to the "
+"shoutcast/icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:77
+#, fuzzy
+msgid "Genre description"
+msgstr "코덱 설명"
+
+#: modules/access_output/shout.c:78
+msgid "Genre of the content. "
+msgstr ""
+
+#: modules/access_output/shout.c:80
+#, fuzzy
+msgid "URL description"
+msgstr "설명"
+
+#: modules/access_output/shout.c:81
+msgid "URL with information about the stream or your channel. "
+msgstr ""
+
+#: modules/access_output/shout.c:88
+#, fuzzy
+msgid "Bitrate information of the transcoded stream. "
+msgstr "스트림을 안내한다"
+
+#: modules/access_output/shout.c:90 modules/access/v4l.c:125
+#, fuzzy
+msgid "Samplerate"
+msgstr "샘플 레이트"
+
+#: modules/access_output/shout.c:91
+#, fuzzy
+msgid "Samplerate information of the transcoded stream. "
+msgstr "스트림을 안내한다"
+
+#: modules/access_output/shout.c:93
+#, fuzzy
+msgid "Number of channels"
+msgstr "클론의 수"
+
+#: modules/access_output/shout.c:94
+#, fuzzy
+msgid "Number of channels information of the transcoded stream. "
+msgstr "스트림을 안내한다"
+
+#: modules/access_output/shout.c:96
+msgid "Ogg Vorbis Quality"
+msgstr ""
+
+#: modules/access_output/shout.c:97
+#, fuzzy
+msgid "Ogg Vorbis Quality information of the transcoded stream. "
+msgstr "스트림을 안내한다"
+
+#: modules/access_output/shout.c:99
+#, fuzzy
+msgid "Stream public"
+msgstr "스트림 출력"
+
+#: modules/access_output/shout.c:100
+msgid ""
+"Make the server publicly available on the 'Yellow Pages' (directory listing "
+"of streams) on the icecast/shoutcast website. Requires the bitrate "
+"information specified for shoutcast. Requires Ogg streaming for icecast."
+msgstr ""
+
+#: modules/access_output/shout.c:106
+#, fuzzy
+msgid "IceCAST output"
+msgstr "음성 출력 모듈 액세스"
+
+#: modules/access_output/udp.c:87 modules/access/rtsp/access.c:41
+#: modules/demux/live555.cpp:64
+msgid "Caching value (ms)"
+msgstr "캐싱치 (밀리 세컨드)"
+
+#: modules/access_output/udp.c:89
+#, fuzzy
+msgid ""
+"Default caching value for outbound UDP streams. This value should be set in "
+"milliseconds."
+msgstr ""
+"udp 스트림로 사용되는 기정의 캐싱치가 변경 가능합니다. 단위는 밀리 세컨드로 "
+"손가락정합니다. "
+
+#: modules/access_output/udp.c:92
+msgid "Group packets"
+msgstr "그룹 패킷"
+
+#: modules/access_output/udp.c:93
+msgid ""
+"Packets can be sent one by one at the right time or by groups. You can "
+"choose the number of packets that will be sent at a time. It helps reducing "
+"the scheduling load on heavily-loaded systems."
+msgstr ""
+
+#: modules/access_output/udp.c:98
+msgid "Raw write"
+msgstr ""
+
+#: modules/access_output/udp.c:99
+msgid ""
+"Packets will be sent directly, without trying to fill the MTU (ie, without "
+"trying to make the biggest possible packets in order to improve streaming)."
+msgstr ""
+
+#: modules/access_output/udp.c:103
+#, fuzzy
+msgid "Automatic multicast streaming"
+msgstr "자동인연 잡기"
+
+#: modules/access_output/udp.c:104
+msgid "Allocates an outbound multicast address automatically."
+msgstr ""
+
+#: modules/access_output/udp.c:108
+#, fuzzy
+msgid "UDP stream output"
+msgstr "UDP 스트림 출력"
 
 #: modules/access/pvr.c:49
 #, fuzzy
@@ -6262,11 +6570,6 @@ msgstr "PVR"
 msgid "IVTV MPEG Encoding cards input"
 msgstr ""
 
-#: modules/access/rtsp/access.c:41 modules/access_output/udp.c:90
-#: modules/demux/live555.cpp:64
-msgid "Caching value (ms)"
-msgstr "캐싱치 (밀리 세컨드)"
-
 #: modules/access/rtsp/access.c:43
 #, fuzzy
 msgid ""
@@ -6381,7 +6684,7 @@ msgstr "CPU"
 msgid "TCP input"
 msgstr "TCP 입력"
 
-#: modules/access/udp.c:60
+#: modules/access/udp.c:71
 #, fuzzy
 msgid ""
 "Caching value for UDP streams. This value should be set in milliseconds."
@@ -6389,21 +6692,21 @@ msgstr ""
 "udp 스트림로 사용되는 기정의 캐싱치가 변경 가능합니다. 단위는 밀리 세컨드로 "
 "손가락정합니다. "
 
-#: modules/access/udp.c:63
+#: modules/access/udp.c:74
 msgid "Autodetection of MTU"
 msgstr ""
 
-#: modules/access/udp.c:65
+#: modules/access/udp.c:76
 msgid ""
 "Automatically detect the line's MTU. This will increase the size if "
 "truncated packets are found"
 msgstr ""
 
-#: modules/access/udp.c:68
+#: modules/access/udp.c:79
 msgid "RTP reordering timeout in ms"
 msgstr ""
 
-#: modules/access/udp.c:70
+#: modules/access/udp.c:81
 #, fuzzy
 msgid ""
 "VLC reorders RTP packets. The input will wait for late packets at most the "
@@ -6412,14 +6715,40 @@ msgstr ""
 "udp 스트림로 사용되는 기정의 캐싱치가 변경 가능합니다. 단위는 밀리 세컨드로 "
 "손가락정합니다. "
 
-#: modules/access/udp.c:77 modules/gui/macosx/open.m:185
+#: modules/access/udp.c:88 modules/gui/macosx/open.m:185
 #: modules/gui/macosx/open.m:713 modules/gui/wxwidgets/dialogs/open.cpp:802
 msgid "UDP/RTP"
 msgstr ""
 
-#: modules/access/udp.c:78
+#: modules/access/udp.c:89
 msgid "UDP/RTP input"
 msgstr "UDP/RTP 입력"
+
+#: modules/access/v4l2.c:53 modules/gui/macosx/open.m:169
+#: modules/gui/wxwidgets/dialogs/open.cpp:721
+msgid "Device name"
+msgstr "디바이스명"
+
+#: modules/access/v4l2.c:55
+msgid ""
+"Name of the device to use. If you don't specify anything, /dev/video0 will "
+"be used."
+msgstr ""
+
+#: modules/access/v4l2.c:59
+msgid ""
+"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
+msgstr ""
+
+#: modules/access/v4l2.c:64
+#, fuzzy
+msgid "Video4Linux2"
+msgstr "Video4Linux"
+
+#: modules/access/v4l2.c:65
+#, fuzzy
+msgid "Video4Linux2 input"
+msgstr "Video4Linux 입력"
 
 #: modules/access/v4l.c:78
 #, fuzzy
@@ -6515,11 +6844,6 @@ msgstr "튜너:"
 msgid "Tuner to use, if there are several ones."
 msgstr ""
 
-#: modules/access/v4l.c:125 modules/access_output/shout.c:90
-#, fuzzy
-msgid "Samplerate"
-msgstr "샘플 레이트"
-
 #: modules/access/v4l.c:127
 msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100)"
@@ -6563,32 +6887,6 @@ msgstr "Video4Linux"
 
 #: modules/access/v4l.c:150
 msgid "Video4Linux input"
-msgstr "Video4Linux 입력"
-
-#: modules/access/v4l2.c:53 modules/gui/macosx/open.m:169
-#: modules/gui/wxwidgets/dialogs/open.cpp:721
-msgid "Device name"
-msgstr "디바이스명"
-
-#: modules/access/v4l2.c:55
-msgid ""
-"Name of the device to use. If you don't specify anything, /dev/video0 will "
-"be used."
-msgstr ""
-
-#: modules/access/v4l2.c:59
-msgid ""
-"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
-msgstr ""
-
-#: modules/access/v4l2.c:64
-#, fuzzy
-msgid "Video4Linux2"
-msgstr "Video4Linux"
-
-#: modules/access/v4l2.c:65
-#, fuzzy
-msgid "Video4Linux2 input"
 msgstr "Video4Linux 입력"
 
 #: modules/access/vcd/vcd.c:43
@@ -6787,295 +7085,6 @@ msgstr "재생목록의 \"author\" 필드에서 사용하는 형식"
 #: modules/access/vcdx/vcd.c:143
 msgid "Format to use in the playlist's \"title\" field."
 msgstr "재생목록의 \"title\" 필드에서 사용하는 형식"
-
-#: modules/access_filter/dump.c:39
-#, fuzzy
-msgid "Force use of dump module"
-msgstr "음성 출력 모듈 액세스"
-
-#: modules/access_filter/dump.c:40
-msgid "Activate the dump module even for media with fast seeking."
-msgstr ""
-
-#: modules/access_filter/dump.c:43
-msgid "Maximum size of temporary file (Mb)"
-msgstr ""
-
-#: modules/access_filter/dump.c:44
-msgid ""
-"The dump module will abort dumping of the media if more than this much "
-"megabyte were performed."
-msgstr ""
-
-#: modules/access_filter/record.c:45
-#, fuzzy
-msgid "Record directory"
-msgstr "원본 디렉토리"
-
-#: modules/access_filter/record.c:47
-#, fuzzy
-msgid "Directory where the record will be stored."
-msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
-
-#: modules/access_filter/record.c:323
-#, fuzzy
-msgid "Recording"
-msgstr "자막 엔콘코드중"
-
-#: modules/access_filter/record.c:325
-#, fuzzy
-msgid "Recording done"
-msgstr "자막 엔콘코드중"
-
-#: modules/access_filter/timeshift.c:46
-#, fuzzy
-msgid "Timeshift granularity"
-msgstr "수직 방향 위치"
-
-#: modules/access_filter/timeshift.c:48
-#, fuzzy
-msgid ""
-"This is the size of the temporary files that will be used to store the "
-"timeshifted streams."
-msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
-
-#: modules/access_filter/timeshift.c:50
-#, fuzzy
-msgid "Timeshift directory"
-msgstr "소스의 어스펙트·레시오"
-
-#: modules/access_filter/timeshift.c:51
-msgid "Directory used to store the timeshift temporary files."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:53
-msgid "Force use of the timeshift module"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:54
-msgid ""
-"Force use of the timeshift module even if the access declares that it can "
-"control pace or pause."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
-#, fuzzy
-msgid "Timeshift"
-msgstr "수직 방향 위치"
-
-#: modules/access_output/dummy.c:41 modules/stream_out/dummy.c:48
-msgid "Dummy stream output"
-msgstr "더미 스트림 출력"
-
-#: modules/access_output/dummy.c:42 modules/misc/dummy/dummy.c:58
-msgid "Dummy"
-msgstr ""
-
-#: modules/access_output/file.c:63
-#, fuzzy
-msgid "Append to file"
-msgstr "파일을 연다"
-
-#: modules/access_output/file.c:64
-msgid "Append to file if it exists instead of replacing it."
-msgstr ""
-
-#: modules/access_output/file.c:68
-#, fuzzy
-msgid "File stream output"
-msgstr "스트림의 출력처의 선택"
-
-#: modules/access_output/http.c:60 modules/misc/audioscrobbler.c:118
-msgid "Username"
-msgstr "유저명"
-
-#: modules/access_output/http.c:61
-#, fuzzy
-msgid "User name that will be requested to access the stream."
-msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
-
-#: modules/access_output/http.c:63 modules/control/telnet.c:79
-#: modules/misc/audioscrobbler.c:120
-msgid "Password"
-msgstr "패스워드"
-
-#: modules/access_output/http.c:64
-#, fuzzy
-msgid "Password that will be requested to access the stream."
-msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
-
-#: modules/access_output/http.c:68
-#, fuzzy
-msgid "Mime"
-msgstr "시간"
-
-#: modules/access_output/http.c:69
-msgid "MIME returned by the server (autodetected if not specified."
-msgstr ""
-
-#: modules/access_output/http.c:73
-msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
-msgstr ""
-
-#: modules/access_output/http.c:76
-msgid ""
-"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
-"empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:80
-msgid ""
-"Path to the x509 PEM trusted root CA certificates (certificate authority) "
-"file that will be used for HTTPS. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:85
-msgid ""
-"Path to the x509 PEM Certificates Revocation List file that will be used for "
-"SSL. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:88
-msgid "Advertise with Bonjour"
-msgstr ""
-
-#: modules/access_output/http.c:89
-msgid "Advertise the stream with the Bonjour protocol."
-msgstr ""
-
-#: modules/access_output/http.c:93
-#, fuzzy
-msgid "HTTP stream output"
-msgstr "스트림의 출력처의 선택"
-
-#: modules/access_output/shout.c:59
-#, fuzzy
-msgid "Stream name"
-msgstr "스트림"
-
-#: modules/access_output/shout.c:60
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:63
-#, fuzzy
-msgid "Stream description"
-msgstr "코덱 설명"
-
-#: modules/access_output/shout.c:64
-msgid "Description of the stream content or information about your channel."
-msgstr ""
-
-#: modules/access_output/shout.c:67
-#, fuzzy
-msgid "Stream MP3"
-msgstr "스트림 "
-
-#: modules/access_output/shout.c:68
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:77
-#, fuzzy
-msgid "Genre description"
-msgstr "코덱 설명"
-
-#: modules/access_output/shout.c:78
-msgid "Genre of the content. "
-msgstr ""
-
-#: modules/access_output/shout.c:80
-#, fuzzy
-msgid "URL description"
-msgstr "설명"
-
-#: modules/access_output/shout.c:81
-msgid "URL with information about the stream or your channel. "
-msgstr ""
-
-#: modules/access_output/shout.c:88
-#, fuzzy
-msgid "Bitrate information of the transcoded stream. "
-msgstr "스트림을 안내한다"
-
-#: modules/access_output/shout.c:91
-#, fuzzy
-msgid "Samplerate information of the transcoded stream. "
-msgstr "스트림을 안내한다"
-
-#: modules/access_output/shout.c:93
-#, fuzzy
-msgid "Number of channels"
-msgstr "클론의 수"
-
-#: modules/access_output/shout.c:94
-#, fuzzy
-msgid "Number of channels information of the transcoded stream. "
-msgstr "스트림을 안내한다"
-
-#: modules/access_output/shout.c:96
-msgid "Ogg Vorbis Quality"
-msgstr ""
-
-#: modules/access_output/shout.c:97
-#, fuzzy
-msgid "Ogg Vorbis Quality information of the transcoded stream. "
-msgstr "스트림을 안내한다"
-
-#: modules/access_output/shout.c:99
-#, fuzzy
-msgid "Stream public"
-msgstr "스트림 출력"
-
-#: modules/access_output/shout.c:100
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-
-#: modules/access_output/shout.c:106
-#, fuzzy
-msgid "IceCAST output"
-msgstr "음성 출력 모듈 액세스"
-
-#: modules/access_output/udp.c:92
-#, fuzzy
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-"udp 스트림로 사용되는 기정의 캐싱치가 변경 가능합니다. 단위는 밀리 세컨드로 "
-"손가락정합니다. "
-
-#: modules/access_output/udp.c:95
-msgid "Group packets"
-msgstr "그룹 패킷"
-
-#: modules/access_output/udp.c:96
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-
-#: modules/access_output/udp.c:101
-msgid "Raw write"
-msgstr ""
-
-#: modules/access_output/udp.c:102
-msgid ""
-"Packets will be sent directly, without trying to fill the MTU (ie, without "
-"trying to make the biggest possible packets in order to improve streaming)."
-msgstr ""
-
-#: modules/access_output/udp.c:108
-#, fuzzy
-msgid "UDP stream output"
-msgstr "UDP 스트림 출력"
 
 #: modules/audio_filter/channel_mixer/dolby.c:46
 msgid "Simple decoder for Dolby Surround encoded streams"
@@ -8093,36 +8102,36 @@ msgstr "MPEG 1/2레이어1/2음성·디코더"
 msgid "FFmpeg muxer"
 msgstr "MPEG 1/2레이어1/2음성·디코더"
 
-#: modules/codec/ffmpeg/ffmpeg.c:201 modules/video_filter/scale.c:53
+#: modules/codec/ffmpeg/ffmpeg.c:203 modules/video_filter/scale.c:53
 #, fuzzy
 msgid "Video scaling filter"
 msgstr "설정"
 
-#: modules/codec/ffmpeg/ffmpeg.c:213
+#: modules/codec/ffmpeg/ffmpeg.c:215
 msgid "FFmpeg chroma conversion"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.c:219
+#: modules/codec/ffmpeg/ffmpeg.c:221
 msgid "FFmpeg video filter"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.c:225
+#: modules/codec/ffmpeg/ffmpeg.c:227
 msgid "FFmpeg crop padd filter"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.c:231
+#: modules/codec/ffmpeg/ffmpeg.c:233
 msgid "FFmpeg deinterlace video filter"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:87 modules/codec/ffmpeg/ffmpeg.h:89
+#: modules/codec/ffmpeg/ffmpeg.h:89 modules/codec/ffmpeg/ffmpeg.h:91
 msgid "Direct rendering"
 msgstr "다이렉트 렌더링"
 
-#: modules/codec/ffmpeg/ffmpeg.h:91
+#: modules/codec/ffmpeg/ffmpeg.h:93
 msgid "Error resilience"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:93
+#: modules/codec/ffmpeg/ffmpeg.h:95
 msgid ""
 "Ffmpeg can do error resilience.\n"
 "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) this "
@@ -8130,11 +8139,11 @@ msgid ""
 "Valid values range from 0 to 4 (0 disables all errors resilience)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:98
+#: modules/codec/ffmpeg/ffmpeg.h:100
 msgid "Workaround bugs"
 msgstr "버그 회피"
 
-#: modules/codec/ffmpeg/ffmpeg.h:100
+#: modules/codec/ffmpeg/ffmpeg.h:102
 msgid ""
 "Try to fix some bugs:\n"
 "1  autodetect\n"
@@ -8148,43 +8157,43 @@ msgid ""
 "\", enter 40."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:111 modules/codec/ffmpeg/ffmpeg.h:244
+#: modules/codec/ffmpeg/ffmpeg.h:113 modules/codec/ffmpeg/ffmpeg.h:246
 #: modules/stream_out/transcode.c:180
 msgid "Hurry up"
 msgstr "서둘러"
 
-#: modules/codec/ffmpeg/ffmpeg.h:113
+#: modules/codec/ffmpeg/ffmpeg.h:115
 msgid ""
 "The decoder can partially decode or skip frame(s) when there is not enough "
 "time. It's useful with low CPU power but it can produce distorted pictures."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:117
+#: modules/codec/ffmpeg/ffmpeg.h:119
 #, fuzzy
 msgid "Post processing quality"
 msgstr "후 처리"
 
-#: modules/codec/ffmpeg/ffmpeg.h:119
+#: modules/codec/ffmpeg/ffmpeg.h:121
 msgid ""
 "Quality of post processing. Valid range is 0 to 6\n"
 "Higher levels require considerable more CPU power, but produce better "
 "looking pictures."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:123
+#: modules/codec/ffmpeg/ffmpeg.h:125
 msgid "Debug mask"
 msgstr "데바그마스크"
 
-#: modules/codec/ffmpeg/ffmpeg.h:124
+#: modules/codec/ffmpeg/ffmpeg.h:126
 msgid "Set ffmpeg debug mask"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:127
+#: modules/codec/ffmpeg/ffmpeg.h:129
 #, fuzzy
 msgid "Visualize motion vectors"
 msgstr "시각화 모션 벡터"
 
-#: modules/codec/ffmpeg/ffmpeg.h:129
+#: modules/codec/ffmpeg/ffmpeg.h:131
 msgid ""
 "You can overlay the motion vectors (arrows showing how the images move) on "
 "the image. This value is a mask, based on these values:\n"
@@ -8194,32 +8203,32 @@ msgid ""
 "To visualize all vectors, the value should be 7."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:136
+#: modules/codec/ffmpeg/ffmpeg.h:138
 msgid "Low resolution decoding"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:137
+#: modules/codec/ffmpeg/ffmpeg.h:139
 msgid ""
 "Only decode a low resolution version of the video. This requires less "
 "processing power"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:140
+#: modules/codec/ffmpeg/ffmpeg.h:142
 msgid "Skip the loop filter for H.264 decoding"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:141
+#: modules/codec/ffmpeg/ffmpeg.h:143
 msgid ""
 "Skipping the loop filter (aka deblocking) usually has a detrimental effect "
 "on quality. However it provides a big speedup for high definition streams."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:145
+#: modules/codec/ffmpeg/ffmpeg.h:147
 #, fuzzy
 msgid "FFmpeg post processing filter chains"
 msgstr "ffmpeg 후 처리 모듈"
 
-#: modules/codec/ffmpeg/ffmpeg.h:148
+#: modules/codec/ffmpeg/ffmpeg.h:150
 msgid ""
 "<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:"
 "<option>...]]...\n"
@@ -8264,138 +8273,138 @@ msgid ""
 "fq     forceQuant      <quantizer>             Force quantizer\n"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:187
+#: modules/codec/ffmpeg/ffmpeg.h:189
 msgid "Ratio of key frames"
 msgstr "키 프레임의 비율"
 
-#: modules/codec/ffmpeg/ffmpeg.h:188
+#: modules/codec/ffmpeg/ffmpeg.h:190
 #, fuzzy
 msgid "Number of frames that will be coded for one key frame."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/codec/ffmpeg/ffmpeg.h:191
+#: modules/codec/ffmpeg/ffmpeg.h:193
 msgid "Ratio of B frames"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:192
+#: modules/codec/ffmpeg/ffmpeg.h:194
 #, fuzzy
 msgid "Number of B frames that will be coded between two reference frames."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/codec/ffmpeg/ffmpeg.h:195
+#: modules/codec/ffmpeg/ffmpeg.h:197
 #, fuzzy
 msgid "Video bitrate tolerance"
 msgstr "음성"
 
-#: modules/codec/ffmpeg/ffmpeg.h:196
+#: modules/codec/ffmpeg/ffmpeg.h:198
 #, fuzzy
 msgid "Video bitrate tolerance in kbit/s."
 msgstr "음성"
 
-#: modules/codec/ffmpeg/ffmpeg.h:198
+#: modules/codec/ffmpeg/ffmpeg.h:200
 #, fuzzy
 msgid "Interlaced encoding"
 msgstr "자막·디코더·모듈"
 
-#: modules/codec/ffmpeg/ffmpeg.h:199
+#: modules/codec/ffmpeg/ffmpeg.h:201
 #, fuzzy
 msgid "Enable dedicated algorithms for interlaced frames."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/codec/ffmpeg/ffmpeg.h:202
+#: modules/codec/ffmpeg/ffmpeg.h:204
 #, fuzzy
 msgid "Interlaced motion estimation"
 msgstr "자막·디코더·모듈"
 
-#: modules/codec/ffmpeg/ffmpeg.h:203
+#: modules/codec/ffmpeg/ffmpeg.h:205
 #, fuzzy
 msgid "Enable interlaced motion estimation algorithms. This requires more CPU."
 msgstr "자막·디코더·모듈"
 
-#: modules/codec/ffmpeg/ffmpeg.h:206
+#: modules/codec/ffmpeg/ffmpeg.h:208
 #, fuzzy
 msgid "Pre-motion estimation"
 msgstr "모션 보정 모듈"
 
-#: modules/codec/ffmpeg/ffmpeg.h:207
+#: modules/codec/ffmpeg/ffmpeg.h:209
 #, fuzzy
 msgid "Enable the pre-motion estimation algorithm."
 msgstr "자막·디코더·모듈"
 
-#: modules/codec/ffmpeg/ffmpeg.h:210
+#: modules/codec/ffmpeg/ffmpeg.h:212
 #, fuzzy
 msgid "Strict rate control"
 msgstr "리모트·컨트롤"
 
-#: modules/codec/ffmpeg/ffmpeg.h:211
+#: modules/codec/ffmpeg/ffmpeg.h:213
 #, fuzzy
 msgid "Enable the strict rate control algorithm."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/codec/ffmpeg/ffmpeg.h:214
+#: modules/codec/ffmpeg/ffmpeg.h:216
 #, fuzzy
 msgid "Rate control buffer size"
 msgstr "리모트·컨트롤·인터페이스·모듈"
 
-#: modules/codec/ffmpeg/ffmpeg.h:215
+#: modules/codec/ffmpeg/ffmpeg.h:217
 msgid ""
 "Rate control buffer size (in kbytes). A bigger buffer will allow for better "
 "rate control, but will cause a delay in the stream."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:219
+#: modules/codec/ffmpeg/ffmpeg.h:221
 #, fuzzy
 msgid "Rate control buffer aggressiveness"
 msgstr "리모트·컨트롤·인터페이스·모듈"
 
-#: modules/codec/ffmpeg/ffmpeg.h:220
+#: modules/codec/ffmpeg/ffmpeg.h:222
 #, fuzzy
 msgid "Rate control buffer aggressiveness."
 msgstr "리모트·컨트롤·인터페이스·모듈"
 
-#: modules/codec/ffmpeg/ffmpeg.h:223
+#: modules/codec/ffmpeg/ffmpeg.h:225
 msgid "I quantization factor"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:225
+#: modules/codec/ffmpeg/ffmpeg.h:227
 msgid ""
 "Quantization factor of I frames, compared with P frames (for instance 1.0 => "
 "same qscale for I and P frames)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:228 modules/codec/x264.c:269
+#: modules/codec/ffmpeg/ffmpeg.h:230 modules/codec/x264.c:269
 #: modules/demux/mod.c:73
 msgid "Noise reduction"
 msgstr "노이즈 축소"
 
-#: modules/codec/ffmpeg/ffmpeg.h:229
+#: modules/codec/ffmpeg/ffmpeg.h:231
 msgid ""
 "Enable a simple noise reduction algorithm to lower the encoding length and "
 "bitrate, at the expense of lower quality frames."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:233
+#: modules/codec/ffmpeg/ffmpeg.h:235
 msgid "MPEG4 quantization matrix"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:234
+#: modules/codec/ffmpeg/ffmpeg.h:236
 msgid ""
 "Use the MPEG4 quantization matrix for MPEG2 encoding. This generally yields "
 "a better looking picture, while still retaining the compatibility with "
 "standard MPEG2 decoders."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:239
+#: modules/codec/ffmpeg/ffmpeg.h:241
 msgid "Quality level"
 msgstr "품질 레벨"
 
-#: modules/codec/ffmpeg/ffmpeg.h:240
+#: modules/codec/ffmpeg/ffmpeg.h:242
 msgid ""
 "Quality level for the encoding of motions vectors (this can slow down the "
 "encoding very much)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:245
+#: modules/codec/ffmpeg/ffmpeg.h:247
 msgid ""
 "The encoder can make on-the-fly quality tradeoffs if your CPU can't keep up "
 "with the encoding rate. It will disable trellis quantization, then the rate "
@@ -8403,118 +8412,128 @@ msgid ""
 "to ease the encoder's task."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:251
+#: modules/codec/ffmpeg/ffmpeg.h:253
 msgid "Minimum video quantizer scale"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:252
+#: modules/codec/ffmpeg/ffmpeg.h:254
 #, fuzzy
 msgid "Minimum video quantizer scale."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/codec/ffmpeg/ffmpeg.h:255
+#: modules/codec/ffmpeg/ffmpeg.h:257
 msgid "Maximum video quantizer scale"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:256
+#: modules/codec/ffmpeg/ffmpeg.h:258
 #, fuzzy
 msgid "Maximum video quantizer scale."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/codec/ffmpeg/ffmpeg.h:259
+#: modules/codec/ffmpeg/ffmpeg.h:261
 #, fuzzy
 msgid "Trellis quantization"
 msgstr "시각화"
 
-#: modules/codec/ffmpeg/ffmpeg.h:260
+#: modules/codec/ffmpeg/ffmpeg.h:262
 msgid "Enable trellis quantization (rate distortion for block coefficients)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:263
+#: modules/codec/ffmpeg/ffmpeg.h:265
 msgid "Fixed quantizer scale"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:264
+#: modules/codec/ffmpeg/ffmpeg.h:266
 msgid ""
 "A fixed video quantizer scale for VBR encoding (accepted values: 0.01 to "
 "255.0)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:267
+#: modules/codec/ffmpeg/ffmpeg.h:269
 msgid "Strict standard compliance"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:268
+#: modules/codec/ffmpeg/ffmpeg.h:270
 msgid ""
 "Force a strict standard compliance when encoding (accepted values: -1, 0, 1)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:271
+#: modules/codec/ffmpeg/ffmpeg.h:273
 msgid "Luminance masking"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:272
+#: modules/codec/ffmpeg/ffmpeg.h:274
 msgid "Raise the quantizer for very bright macroblocks (default: 0.0)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:275
+#: modules/codec/ffmpeg/ffmpeg.h:277
 msgid "Darkness masking"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:276
+#: modules/codec/ffmpeg/ffmpeg.h:278
 msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:279
+#: modules/codec/ffmpeg/ffmpeg.h:281
 #, fuzzy
 msgid "Motion masking"
 msgstr "자동인연 잡기"
 
-#: modules/codec/ffmpeg/ffmpeg.h:280
+#: modules/codec/ffmpeg/ffmpeg.h:282
 msgid ""
 "Raise the quantizer for macroblocks with a high temporal complexity "
 "(default: 0.0)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:283
+#: modules/codec/ffmpeg/ffmpeg.h:285
 msgid "Border masking"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:284
+#: modules/codec/ffmpeg/ffmpeg.h:286
 msgid ""
 "Raise the quantizer for macroblocks at the border of the frame (default: "
 "0.0)."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:287
+#: modules/codec/ffmpeg/ffmpeg.h:289
 msgid "Luminance elimination"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:288
+#: modules/codec/ffmpeg/ffmpeg.h:290
 msgid ""
 "Eliminates luminance blocks when the PSNR isn't much changed (default: 0.0). "
 "The H264 specification recommends -4."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:292
+#: modules/codec/ffmpeg/ffmpeg.h:294
 msgid "Chrominance elimination"
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:293
+#: modules/codec/ffmpeg/ffmpeg.h:295
 msgid ""
 "Eliminates chrominance blocks when the PSNR isn't much changed (default: "
 "0.0). The H264 specification recommends 7."
 msgstr ""
 
-#: modules/codec/ffmpeg/ffmpeg.h:297
+#: modules/codec/ffmpeg/ffmpeg.h:299
 #, fuzzy
 msgid "Scaling mode"
 msgstr "만곡 모드"
 
-#: modules/codec/ffmpeg/ffmpeg.h:298
+#: modules/codec/ffmpeg/ffmpeg.h:300
 #, fuzzy
 msgid "Scaling mode to use."
 msgstr "만곡 모드"
+
+#: modules/codec/ffmpeg/ffmpeg.h:302
+#, fuzzy
+msgid "Ffmpeg mux"
+msgstr "MPEG 1/2레이어1/2음성·디코더"
+
+#: modules/codec/ffmpeg/ffmpeg.h:303
+#, fuzzy
+msgid "Force use of ffmpeg muxer."
+msgstr "음성 출력 모듈 액세스"
 
 #: modules/codec/ffmpeg/postprocess.c:86 modules/gui/macosx/intf.m:597
 #: modules/gui/macosx/intf.m:598
@@ -8529,17 +8548,17 @@ msgstr "1 (낮다)"
 msgid "6 (Highest)"
 msgstr "6 (높다)"
 
-#: modules/codec/flac.c:174
+#: modules/codec/flac.c:178
 #, fuzzy
 msgid "Flac audio decoder"
 msgstr "유사 AC3 음성·디코더"
 
-#: modules/codec/flac.c:179
+#: modules/codec/flac.c:183
 #, fuzzy
 msgid "Flac audio encoder"
 msgstr "유사 AC3 음성·디코더"
 
-#: modules/codec/flac.c:185
+#: modules/codec/flac.c:189
 #, fuzzy
 msgid "Flac audio packetizer"
 msgstr "자막·디코더·모듈"
@@ -9348,115 +9367,133 @@ msgstr "극성"
 
 #: modules/codec/x264.c:288
 #, fuzzy
+msgid "Statistics input file"
+msgstr "위성 입력 모듈"
+
+#: modules/codec/x264.c:289
+msgid "Read rate-control stastics from provided file (for multi-pass encoding."
+msgstr ""
+
+#: modules/codec/x264.c:292
+#, fuzzy
+msgid "Statistics output file"
+msgstr "음성 출력 URL"
+
+#: modules/codec/x264.c:293
+msgid "Write rate-control stastics to provided file (for multi-pass encoding."
+msgstr ""
+
+#: modules/codec/x264.c:296
+#, fuzzy
 msgid "PSNR computation"
 msgstr "지속 기간"
 
-#: modules/codec/x264.c:289
+#: modules/codec/x264.c:297
 msgid ""
 "Compute and print PSNR stats. This has no effect on the actual encoding "
 "quality."
 msgstr ""
 
-#: modules/codec/x264.c:292
+#: modules/codec/x264.c:300
 #, fuzzy
 msgid "SSIM computation"
 msgstr "없음"
 
-#: modules/codec/x264.c:293
+#: modules/codec/x264.c:301
 msgid ""
 "Compute and print SSIM stats. This has no effect on the actual encoding "
 "quality."
 msgstr ""
 
-#: modules/codec/x264.c:296
+#: modules/codec/x264.c:304
 #, fuzzy
 msgid "Quiet mode"
 msgstr "만곡 모드"
 
-#: modules/codec/x264.c:297
+#: modules/codec/x264.c:305
 #, fuzzy
 msgid "Quiet mode."
 msgstr "네트워크"
 
-#: modules/codec/x264.c:299 modules/gui/macosx/playlistinfo.m:64
+#: modules/codec/x264.c:307 modules/gui/macosx/playlistinfo.m:64
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:85
 msgid "Statistics"
 msgstr ""
 
-#: modules/codec/x264.c:300
+#: modules/codec/x264.c:308
 msgid "Print stats for each frame."
 msgstr ""
 
-#: modules/codec/x264.c:303
+#: modules/codec/x264.c:311
 msgid "SPS and PPS id numbers"
 msgstr ""
 
-#: modules/codec/x264.c:304
+#: modules/codec/x264.c:312
 msgid ""
 "Set SPS and PPS id numbers to allow concatenating streams with different "
 "settings."
 msgstr ""
 
-#: modules/codec/x264.c:308
+#: modules/codec/x264.c:316
 #, fuzzy
 msgid "Access unit delimiters"
 msgstr "액세스 모듈"
 
-#: modules/codec/x264.c:309
+#: modules/codec/x264.c:317
 msgid "Generate access unit delimiter NAL units."
 msgstr ""
 
-#: modules/codec/x264.c:315
+#: modules/codec/x264.c:323
 #, fuzzy
 msgid "dia"
 msgstr "디스크"
 
-#: modules/codec/x264.c:315
+#: modules/codec/x264.c:323
 msgid "hex"
 msgstr ""
 
-#: modules/codec/x264.c:315
+#: modules/codec/x264.c:323
 msgid "umh"
 msgstr ""
 
-#: modules/codec/x264.c:315
+#: modules/codec/x264.c:323
 #, fuzzy
 msgid "esa"
 msgstr "블루스"
 
-#: modules/codec/x264.c:321
+#: modules/codec/x264.c:329
 #, fuzzy
 msgid "fast"
 msgstr "빨리 감기"
 
-#: modules/codec/x264.c:321
+#: modules/codec/x264.c:329
 #, fuzzy
 msgid "normal"
 msgstr "없음"
 
-#: modules/codec/x264.c:321
+#: modules/codec/x264.c:329
 #, fuzzy
 msgid "slow"
 msgstr "슬로우"
 
-#: modules/codec/x264.c:321
+#: modules/codec/x264.c:329
 msgid "all"
 msgstr "모두"
 
-#: modules/codec/x264.c:327 modules/codec/x264.c:332
+#: modules/codec/x264.c:335 modules/codec/x264.c:340
 msgid "spatial"
 msgstr ""
 
-#: modules/codec/x264.c:327 modules/codec/x264.c:332
+#: modules/codec/x264.c:335 modules/codec/x264.c:340
 msgid "temporal"
 msgstr ""
 
-#: modules/codec/x264.c:327 modules/gui/pda/pda_interface.c:743
+#: modules/codec/x264.c:335 modules/gui/pda/pda_interface.c:743
 #: modules/video_filter/mosaic.c:177
 msgid "auto"
 msgstr "자동"
 
-#: modules/codec/x264.c:336
+#: modules/codec/x264.c:344
 msgid "H.264/MPEG4 AVC encoder (using x264 library)"
 msgstr "h264 영상 encode에 x264 라이브러리를 사용한다"
 
@@ -9799,394 +9836,398 @@ msgstr "리모트·컨트롤·인터페이스·모듈"
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr "리모트·컨트롤·인터페이스·모듈"
 
-#: modules/control/rc.c:802
+#: modules/control/rc.c:809
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr ""
 
-#: modules/control/rc.c:835
+#: modules/control/rc.c:842
 #, fuzzy
 msgid "+----[ Remote control commands ]"
 msgstr "+----[ 리모트 제어 커멘드 ]\n"
 
-#: modules/control/rc.c:837
+#: modules/control/rc.c:844
 #, fuzzy
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:838
+#: modules/control/rc.c:845
 #, fuzzy
 msgid "| enqueue XYZ  . . . . . . . queue XYZ to playlist"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:839
+#: modules/control/rc.c:846
 #, fuzzy
 msgid "| playlist . . .  show items currently in playlist"
 msgstr "| playlist .  .  .  현재의 재생목록중의 항목을 표시 \n"
 
-#: modules/control/rc.c:840
+#: modules/control/rc.c:847
 #, fuzzy
 msgid "| play . . . . . . . . . . . . . . . . play stream"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:841
+#: modules/control/rc.c:848
 #, fuzzy
 msgid "| stop . . . . . . . . . . . . . . . . stop stream"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:842
+#: modules/control/rc.c:849
 #, fuzzy
 msgid "| next . . . . . . . . . . . .  next playlist item"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:843
+#: modules/control/rc.c:850
 #, fuzzy
 msgid "| prev . . . . . . . . . .  previous playlist item"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:844
+#: modules/control/rc.c:851
 #, fuzzy
 msgid "| goto . . . . . . . . . . . .  goto item at index"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:845
+#: modules/control/rc.c:852
 #, fuzzy
 msgid "| repeat [on|off] . .  toggle playlist item repeat"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:846
+#: modules/control/rc.c:853
 #, fuzzy
 msgid "| loop [on|off] . . . .  toggle playlist item loop"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:847
+#: modules/control/rc.c:854
 #, fuzzy
 msgid "| clear . . . . . . . . . . .   clear the playlist"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:848
+#: modules/control/rc.c:855
 #, fuzzy
 msgid "| status . . . . . . . . . current playlist status"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:849
+#: modules/control/rc.c:856
 msgid "| title [X]  . . . . set/get title in current item"
 msgstr ""
 
-#: modules/control/rc.c:850
+#: modules/control/rc.c:857
 msgid "| title_n  . . . . . .  next title in current item"
 msgstr ""
 
-#: modules/control/rc.c:851
+#: modules/control/rc.c:858
 msgid "| title_p  . . . .  previous title in current item"
 msgstr ""
 
-#: modules/control/rc.c:852
+#: modules/control/rc.c:859
 msgid "| chapter [X]  . . set/get chapter in current item"
 msgstr ""
 
-#: modules/control/rc.c:853
+#: modules/control/rc.c:860
 msgid "| chapter_n  . . . .  next chapter in current item"
 msgstr ""
 
-#: modules/control/rc.c:854
+#: modules/control/rc.c:861
 msgid "| chapter_p  . .  previous chapter in current item"
 msgstr ""
 
-#: modules/control/rc.c:856
+#: modules/control/rc.c:863
 msgid "| seek X . seek in seconds, for instance `seek 12'"
 msgstr ""
 
-#: modules/control/rc.c:857
+#: modules/control/rc.c:864
 #, fuzzy
 msgid "| pause  . . . . . . . . . . . . . .  toggle pause"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:858
+#: modules/control/rc.c:865
 #, fuzzy
 msgid "| fastforward  . . . . . .  .  set to maximum rate"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:859
+#: modules/control/rc.c:866
 #, fuzzy
 msgid "| rewind  . . . . . . . . . .  set to minimum rate"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:860
+#: modules/control/rc.c:867
 msgid "| faster . . . . . . . .  faster playing of stream"
 msgstr ""
 
-#: modules/control/rc.c:861
+#: modules/control/rc.c:868
 msgid "| slower . . . . . . . .  slower playing of stream"
 msgstr ""
 
-#: modules/control/rc.c:862
+#: modules/control/rc.c:869
 msgid "| normal . . . . . . . .  normal playing of stream"
 msgstr ""
 
-#: modules/control/rc.c:863
+#: modules/control/rc.c:870
 #, fuzzy
 msgid "| f [on|off] . . . . . . . . . . toggle fullscreen"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:864
+#: modules/control/rc.c:871
 msgid "| info . . .  information about the current stream"
 msgstr ""
 
-#: modules/control/rc.c:865
+#: modules/control/rc.c:872
 msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr ""
 
-#: modules/control/rc.c:866
+#: modules/control/rc.c:873
 msgid "| is_playing . .  1 if a stream plays, 0 otherwise"
 msgstr ""
 
-#: modules/control/rc.c:867
+#: modules/control/rc.c:874
 msgid "| get_title . . .  the title of the current stream"
 msgstr ""
 
-#: modules/control/rc.c:868
+#: modules/control/rc.c:875
 msgid "| get_length . .  the length of the current stream"
 msgstr ""
 
-#: modules/control/rc.c:870
+#: modules/control/rc.c:877
 msgid "| volume [X] . . . . . . . .  set/get audio volume"
 msgstr ""
 
-#: modules/control/rc.c:871
+#: modules/control/rc.c:878
 msgid "| volup [X]  . . . . .  raise audio volume X steps"
 msgstr ""
 
-#: modules/control/rc.c:872
+#: modules/control/rc.c:879
 msgid "| voldown [X]  . . . .  lower audio volume X steps"
 msgstr ""
 
-#: modules/control/rc.c:873
+#: modules/control/rc.c:880
 msgid "| adev [X] . . . . . . . . .  set/get audio device"
 msgstr ""
 
-#: modules/control/rc.c:874
+#: modules/control/rc.c:881
 msgid "| achan [X]. . . . . . . .  set/get audio channels"
 msgstr ""
 
-#: modules/control/rc.c:875
+#: modules/control/rc.c:882
 #, fuzzy
 msgid "| atrack [X] . . . . . . . . . set/get audio track"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:876
+#: modules/control/rc.c:883
 #, fuzzy
 msgid "| vtrack [X] . . . . . . . . . set/get video track"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:877
+#: modules/control/rc.c:884
 msgid "| vratio [X]  . . . . . set/get video aspect ratio"
 msgstr ""
 
-#: modules/control/rc.c:878
+#: modules/control/rc.c:885
 #, fuzzy
 msgid "| vcrop [X]  . . . . . . . . .  set/get video crop"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:879
+#: modules/control/rc.c:886
 #, fuzzy
 msgid "| vzoom [X]  . . . . . . . . .  set/get video zoom"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:880
+#: modules/control/rc.c:887
 #, fuzzy
 msgid "| strack [X] . . . . . . . set/get subtitles track"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:881
+#: modules/control/rc.c:888
+msgid "| key [hotkey name]  . . . . simulate hotkey press"
+msgstr ""
+
+#: modules/control/rc.c:889
 msgid "| menu [on|off|up|down|left|right|select] use menu"
 msgstr ""
 
-#: modules/control/rc.c:886
+#: modules/control/rc.c:894
 msgid "| marq-marquee STRING  . . overlay STRING in video"
 msgstr ""
 
-#: modules/control/rc.c:887
+#: modules/control/rc.c:895
 #, fuzzy
 msgid "| marq-x X . . . . . . . . . . . .offset from left"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:888
+#: modules/control/rc.c:896
 #, fuzzy
 msgid "| marq-y Y . . . . . . . . . . . . offset from top"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:889
+#: modules/control/rc.c:897
 #, fuzzy
 msgid "| marq-position #. . .  .relative position control"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:890
+#: modules/control/rc.c:898
 #, fuzzy
 msgid "| marq-color # . . . . . . . . . . font color, RGB"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:891
+#: modules/control/rc.c:899
 #, fuzzy
 msgid "| marq-opacity # . . . . . . . . . . . . . opacity"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:892
+#: modules/control/rc.c:900
 #, fuzzy
 msgid "| marq-timeout T. . . . . . . . . . timeout, in ms"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:893
+#: modules/control/rc.c:901
 #, fuzzy
 msgid "| marq-size # . . . . . . . . font size, in pixels"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:895
+#: modules/control/rc.c:903
 msgid "| logo-file STRING . . .the overlay file path/name"
 msgstr ""
 
-#: modules/control/rc.c:896
+#: modules/control/rc.c:904
 #, fuzzy
 msgid "| logo-x X . . . . . . . . . . . .offset from left"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:897
+#: modules/control/rc.c:905
 #, fuzzy
 msgid "| logo-y Y . . . . . . . . . . . . offset from top"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:898
+#: modules/control/rc.c:906
 #, fuzzy
 msgid "| logo-position #. . . . . . . . relative position"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:899
+#: modules/control/rc.c:907
 msgid "| logo-transparency #. . . . . . . . .transparency"
 msgstr ""
 
-#: modules/control/rc.c:901
+#: modules/control/rc.c:909
 #, fuzzy
 msgid "| mosaic-alpha # . . . . . . . . . . . . . . alpha"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:902
+#: modules/control/rc.c:910
 #, fuzzy
 msgid "| mosaic-height #. . . . . . . . . . . . . .height"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:903
+#: modules/control/rc.c:911
 #, fuzzy
 msgid "| mosaic-width # . . . . . . . . . . . . . . width"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:904
+#: modules/control/rc.c:912
 msgid "| mosaic-xoffset # . . . .top left corner position"
 msgstr ""
 
-#: modules/control/rc.c:905
+#: modules/control/rc.c:913
 msgid "| mosaic-yoffset # . . . .top left corner position"
 msgstr ""
 
-#: modules/control/rc.c:906
+#: modules/control/rc.c:914
 #, fuzzy
 msgid "| mosaic-offsets x,y(,x,y)*. . . . list of offsets"
 msgstr ""
 "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 플레이 재생목록에 추가 \n"
 
-#: modules/control/rc.c:907
+#: modules/control/rc.c:915
 msgid "| mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
 msgstr ""
 
-#: modules/control/rc.c:908
+#: modules/control/rc.c:916
 #, fuzzy
 msgid "| mosaic-vborder # . . . . . . . . vertical border"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:909
+#: modules/control/rc.c:917
 msgid "| mosaic-hborder # . . . . . . . horizontal border"
 msgstr ""
 
-#: modules/control/rc.c:910
+#: modules/control/rc.c:918
 msgid "| mosaic-position {0=auto,1=fixed} . . . .position"
 msgstr ""
 
-#: modules/control/rc.c:911
+#: modules/control/rc.c:919
 #, fuzzy
 msgid "| mosaic-rows #. . . . . . . . . . .number of rows"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:912
+#: modules/control/rc.c:920
 #, fuzzy
 msgid "| mosaic-cols #. . . . . . . . . . .number of cols"
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:913
+#: modules/control/rc.c:921
 #, fuzzy
 msgid "| mosaic-order id(,id)* . . . . order of pictures "
 msgstr "| add XYZ  .  .  .  .  .  .  .  .  .  .  XYZ 를 재생목록에 추가 \n"
 
-#: modules/control/rc.c:914
+#: modules/control/rc.c:922
 msgid "| mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
 msgstr ""
 
-#: modules/control/rc.c:916
+#: modules/control/rc.c:924
 msgid ""
 "| check-updates [newer] [equal] [older]\n"
 "|               [undef] [info] [source] [binary] [plugin]"
 msgstr ""
 
-#: modules/control/rc.c:920
+#: modules/control/rc.c:928
 #, fuzzy
 msgid "| help . . . . . . . . . . . . . this help message"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:921
+#: modules/control/rc.c:929
 msgid "| longhelp . . . . . . . . . a longer help message"
 msgstr ""
 
-#: modules/control/rc.c:922
+#: modules/control/rc.c:930
 msgid "| logout . . . . .  exit (if in socket connection)"
 msgstr ""
 
-#: modules/control/rc.c:923
+#: modules/control/rc.c:931
 #, fuzzy
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr "| play .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  스트림 재생 \n"
 
-#: modules/control/rc.c:925
+#: modules/control/rc.c:933
 #, fuzzy
 msgid "+----[ end of help ]"
 msgstr "+---[ %s 의 끝 ]\n"
 
-#: modules/control/rc.c:1035
+#: modules/control/rc.c:1043
 #, fuzzy
 msgid "Press menu select or pause to continue."
 msgstr ""
 "\n"
 "계속하려면  Enter 키를 눌러 주세요. \n"
 
-#: modules/control/rc.c:1273 modules/control/rc.c:1561
-#: modules/control/rc.c:1631 modules/control/rc.c:1800
-#: modules/control/rc.c:1899
+#: modules/control/rc.c:1281 modules/control/rc.c:1569
+#: modules/control/rc.c:1639 modules/control/rc.c:1808
+#: modules/control/rc.c:1907
 #, fuzzy
 msgid "Type 'menu select' or 'pause' to continue."
 msgstr ""
 "\n"
 "계속하려면  Enter 키를 눌러 주세요. \n"
 
-#: modules/control/rc.c:1341
+#: modules/control/rc.c:1349
 #, fuzzy
 msgid "goto is deprecated"
 msgstr "출력 포맷"
 
-#: modules/control/rc.c:1457
+#: modules/control/rc.c:1465
 #, fuzzy
 msgid "Type 'pause' to continue."
 msgstr ""
 "\n"
 "계속하려면  Enter 키를 눌러 주세요. \n"
 
-#: modules/control/rc.c:1884 modules/control/rc.c:1923
+#: modules/control/rc.c:1892 modules/control/rc.c:1931
 msgid "Please provide one of the following parameters:"
 msgstr ""
 
@@ -11763,8 +11804,8 @@ msgid "Extended Controls"
 msgstr "리모트·컨트롤"
 
 #: modules/gui/macosx/intf.m:608 modules/gui/macosx/intf.m:641
-#: modules/gui/macosx/playlist.m:430 modules/gui/macosx/playlistinfo.m:55
-#: modules/gui/macosx/playlistinfo.m:358
+#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:358
+#: modules/gui/macosx/playlist.m:430
 #, fuzzy
 msgid "Information"
 msgstr "버젼 정보의 인쇄"
@@ -11965,7 +12006,7 @@ msgid "HTTP/FTP/MMS/RTSP"
 msgstr ""
 
 #: modules/gui/macosx/open.m:188 modules/gui/wxwidgets/dialogs/open.cpp:821
-#: modules/services_discovery/sap.c:113
+#: modules/services_discovery/sap.c:115
 msgid "Allow timeshifting"
 msgstr ""
 
@@ -12117,11 +12158,88 @@ msgstr "SDP"
 msgid "Save File"
 msgstr "파일의 보존"
 
-#: modules/gui/macosx/playlist.m:129 modules/gui/macosx/playlistinfo.m:58
+#: modules/gui/macosx/playlistinfo.m:56
+#: modules/gui/qt4/components/infopanels.cpp:52
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
+msgid "URI"
+msgstr "URI"
+
+#: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/playlist.m:129
 #: modules/gui/macosx/wizard.m:392 modules/gui/wince/playlist.cpp:674
 #: modules/mux/asf.c:50
 msgid "Author"
 msgstr "작성자"
+
+#: modules/gui/macosx/playlistinfo.m:63
+#, fuzzy
+msgid "Advanced Information"
+msgstr "고급 선택사항"
+
+#: modules/gui/macosx/playlistinfo.m:81
+msgid "Read at media"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:82
+#, fuzzy
+msgid "Input bitrate"
+msgstr "스트림의 정지"
+
+#: modules/gui/macosx/playlistinfo.m:83
+#, fuzzy
+msgid "Demuxed"
+msgstr "demux 모듈"
+
+#: modules/gui/macosx/playlistinfo.m:84
+#, fuzzy
+msgid "Stream bitrate"
+msgstr "encode의 최대 bit rate"
+
+#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
+#, fuzzy
+msgid "Decoded blocks"
+msgstr "디코더"
+
+#: modules/gui/macosx/playlistinfo.m:88
+#, fuzzy
+msgid "Displayed frames"
+msgstr "키 프레임을 사용"
+
+#: modules/gui/macosx/playlistinfo.m:89
+#, fuzzy
+msgid "Lost frames"
+msgstr "키 프레임을 사용"
+
+#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:403
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:314
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
+#: modules/video_filter/deinterlace.c:137
+#, fuzzy
+msgid "Streaming"
+msgstr "스트림의 정지"
+
+#: modules/gui/macosx/playlistinfo.m:92
+#, fuzzy
+msgid "Sent packets"
+msgstr "그룹 패킷"
+
+#: modules/gui/macosx/playlistinfo.m:93
+msgid "Sent bytes"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:94
+#, fuzzy
+msgid "Send rate"
+msgstr "샘플 레이트"
+
+#: modules/gui/macosx/playlistinfo.m:98
+#, fuzzy
+msgid "Played buffers"
+msgstr "빨리 감기 재생"
+
+#: modules/gui/macosx/playlistinfo.m:99
+msgid "Lost buffers"
+msgstr ""
 
 #: modules/gui/macosx/playlist.m:425
 msgid "Save Playlist..."
@@ -12199,83 +12317,6 @@ msgstr "구획으로부터 인연 잡기까지의 지오메트리를 지정"
 #: modules/gui/macosx/playlist.m:1351
 msgid "Empty Folder"
 msgstr "빈 폴더"
-
-#: modules/gui/macosx/playlistinfo.m:56
-#: modules/gui/qt4/components/infopanels.cpp:52
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
-msgid "URI"
-msgstr "URI"
-
-#: modules/gui/macosx/playlistinfo.m:63
-#, fuzzy
-msgid "Advanced Information"
-msgstr "고급 선택사항"
-
-#: modules/gui/macosx/playlistinfo.m:81
-msgid "Read at media"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:82
-#, fuzzy
-msgid "Input bitrate"
-msgstr "스트림의 정지"
-
-#: modules/gui/macosx/playlistinfo.m:83
-#, fuzzy
-msgid "Demuxed"
-msgstr "demux 모듈"
-
-#: modules/gui/macosx/playlistinfo.m:84
-#, fuzzy
-msgid "Stream bitrate"
-msgstr "encode의 최대 bit rate"
-
-#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
-#, fuzzy
-msgid "Decoded blocks"
-msgstr "디코더"
-
-#: modules/gui/macosx/playlistinfo.m:88
-#, fuzzy
-msgid "Displayed frames"
-msgstr "키 프레임을 사용"
-
-#: modules/gui/macosx/playlistinfo.m:89
-#, fuzzy
-msgid "Lost frames"
-msgstr "키 프레임을 사용"
-
-#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:403
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:314
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
-#: modules/video_filter/deinterlace.c:137
-#, fuzzy
-msgid "Streaming"
-msgstr "스트림의 정지"
-
-#: modules/gui/macosx/playlistinfo.m:92
-#, fuzzy
-msgid "Sent packets"
-msgstr "그룹 패킷"
-
-#: modules/gui/macosx/playlistinfo.m:93
-msgid "Sent bytes"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:94
-#, fuzzy
-msgid "Send rate"
-msgstr "샘플 레이트"
-
-#: modules/gui/macosx/playlistinfo.m:98
-#, fuzzy
-msgid "Played buffers"
-msgstr "빨리 감기 재생"
-
-#: modules/gui/macosx/playlistinfo.m:99
-msgid "Lost buffers"
-msgstr ""
 
 #: modules/gui/macosx/prefs.m:123
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:213
@@ -13806,11 +13847,6 @@ msgstr "wxWindows 인터페이스 모듈"
 msgid "WinCE dialogs provider"
 msgstr "wxWindows 다이얼로그 제공"
 
-#: modules/gui/wxwidgets/dialogs.cpp:437
-#: modules/gui/wxwidgets/dialogs/open.cpp:1263
-msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
-msgstr ""
-
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:75
 #, fuzzy
 msgid "Edit bookmark"
@@ -13900,6 +13936,11 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:452
 msgid "Input has changed "
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:437
+#: modules/gui/wxwidgets/dialogs/open.cpp:1263
+msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
@@ -15733,6 +15774,10 @@ msgstr ""
 msgid "Output data for RRDTool in this file."
 msgstr ""
 
+#: modules/misc/memcpy/memcpyaltivec.c:56
+msgid "AltiVec memcpy"
+msgstr "AltiVec memcpy"
+
 #: modules/misc/memcpy/memcpy.c:83
 msgid "libc memcpy"
 msgstr "libc memcpy"
@@ -15749,10 +15794,6 @@ msgstr "MMX memcpy"
 #: modules/misc/memcpy/memcpy.c:99
 msgid "MMX EXT memcpy"
 msgstr "MMX 확장 memcpy"
-
-#: modules/misc/memcpy/memcpyaltivec.c:56
-msgid "AltiVec memcpy"
-msgstr "AltiVec memcpy"
 
 #: modules/misc/notify/growl.c:59
 #, fuzzy
@@ -16399,113 +16440,113 @@ msgstr "페이스트"
 msgid "Podcast"
 msgstr "페이스트"
 
-#: modules/services_discovery/sap.c:80
+#: modules/services_discovery/sap.c:82
 msgid "SAP multicast address"
 msgstr "SAP 멀티 캐스트 주소"
 
-#: modules/services_discovery/sap.c:81
+#: modules/services_discovery/sap.c:83
 msgid ""
 "The SAP module normally chooses itself the right addresses to listen to. "
 "However, you can specify a specific address."
 msgstr ""
 
-#: modules/services_discovery/sap.c:84
+#: modules/services_discovery/sap.c:86
 #, fuzzy
 msgid "IPv4 SAP"
 msgstr "IPv6 SAP 스코프"
 
-#: modules/services_discovery/sap.c:86
+#: modules/services_discovery/sap.c:88
 msgid "Listen to IPv4 announcements on the standard address."
 msgstr ""
 
-#: modules/services_discovery/sap.c:88
+#: modules/services_discovery/sap.c:90
 #, fuzzy
 msgid "IPv6 SAP"
 msgstr "IPv6 SAP 스코프"
 
-#: modules/services_discovery/sap.c:90
+#: modules/services_discovery/sap.c:92
 msgid "Listen to IPv6 announcements on the standard addresses."
 msgstr ""
 
-#: modules/services_discovery/sap.c:92
+#: modules/services_discovery/sap.c:94
 msgid "IPv6 SAP scope"
 msgstr "IPv6 SAP 스코프"
 
-#: modules/services_discovery/sap.c:94
+#: modules/services_discovery/sap.c:96
 msgid "Scope for IPv6 announcements (default is 8)."
 msgstr ""
 
-#: modules/services_discovery/sap.c:95
+#: modules/services_discovery/sap.c:97
 msgid "SAP timeout (seconds)"
 msgstr "SAP 타임 아웃 (초)"
 
-#: modules/services_discovery/sap.c:97
+#: modules/services_discovery/sap.c:99
 msgid ""
 "Delay after which SAP items get deleted if no new announcement is received."
 msgstr ""
 
-#: modules/services_discovery/sap.c:99
+#: modules/services_discovery/sap.c:101
 msgid "Try to parse the announce"
 msgstr ""
 
-#: modules/services_discovery/sap.c:101
+#: modules/services_discovery/sap.c:103
 msgid ""
 "This enables actual parsing of the announces by the SAP module. Otherwise, "
 "all announcements are parsed by the \"livedotcom\" (RTP/RTSP) module."
 msgstr ""
 
-#: modules/services_discovery/sap.c:104
+#: modules/services_discovery/sap.c:106
 #, fuzzy
 msgid "SAP Strict mode"
 msgstr "인터페이스·모듈"
 
-#: modules/services_discovery/sap.c:106
+#: modules/services_discovery/sap.c:108
 msgid ""
 "When this is set, the SAP parser will discard some non-compliant "
 "announcements."
 msgstr ""
 
-#: modules/services_discovery/sap.c:108
+#: modules/services_discovery/sap.c:110
 msgid "Use SAP cache"
 msgstr ""
 
-#: modules/services_discovery/sap.c:110
+#: modules/services_discovery/sap.c:112
 msgid ""
 "This enables a SAP caching mechanism. This will result in lower SAP startup "
 "time, but you could end up with items corresponding to legacy streams."
 msgstr ""
 
-#: modules/services_discovery/sap.c:114
+#: modules/services_discovery/sap.c:116
 msgid ""
 "This automatically enables timeshifting for streams discovered through SAP "
 "announcements."
 msgstr ""
 
-#: modules/services_discovery/sap.c:125
+#: modules/services_discovery/sap.c:127
 #, fuzzy
 msgid "SAP Announcements"
 msgstr "SAP 아나운스:"
 
-#: modules/services_discovery/sap.c:152
+#: modules/services_discovery/sap.c:154
 msgid "SDP file parser for UDP"
 msgstr ""
 
-#: modules/services_discovery/sap.c:304
+#: modules/services_discovery/sap.c:320
 #, fuzzy
 msgid "SAP sessions"
 msgstr "세션명"
 
-#: modules/services_discovery/sap.c:783 modules/services_discovery/sap.c:787
+#: modules/services_discovery/sap.c:786 modules/services_discovery/sap.c:790
 #, fuzzy
 msgid "Session"
 msgstr "세션명"
 
-#: modules/services_discovery/sap.c:783
+#: modules/services_discovery/sap.c:786
 #, fuzzy
 msgid "Tool"
 msgstr "상"
 
-#: modules/services_discovery/sap.c:788
+#: modules/services_discovery/sap.c:791
 #, fuzzy
 msgid "User"
 msgstr "유저명"
@@ -16613,7 +16654,7 @@ msgstr "스트림 출력의 표시"
 msgid "Duplicate stream output"
 msgstr "스트림 출력의 복제"
 
-#: modules/stream_out/es.c:38 modules/stream_out/standard.c:39
+#: modules/stream_out/es.c:38 modules/stream_out/standard.c:40
 msgid "Output access method"
 msgstr "출력 액세스 방법"
 
@@ -16640,7 +16681,7 @@ msgstr "영상 출력의 액세스 방법"
 msgid "This is the output access method that will be used for video."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/stream_out/es.c:49 modules/stream_out/standard.c:43
+#: modules/stream_out/es.c:49 modules/stream_out/standard.c:44
 #, fuzzy
 msgid "Output muxer"
 msgstr "출력 형식"
@@ -16762,7 +16803,7 @@ msgid ""
 "is to use no muxer (standard RTP stream)."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/stream_out/rtp.c:65 modules/stream_out/standard.c:51
+#: modules/stream_out/rtp.c:65 modules/stream_out/standard.c:52
 msgid "Session name"
 msgstr "세션명"
 
@@ -16784,24 +16825,24 @@ msgid ""
 "announced in the SDP (Session Descriptor)."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/stream_out/rtp.c:73
+#: modules/stream_out/rtp.c:73 modules/stream_out/standard.c:66
 #, fuzzy
 msgid "Session URL"
 msgstr "세션명"
 
-#: modules/stream_out/rtp.c:75
+#: modules/stream_out/rtp.c:75 modules/stream_out/standard.c:68
 msgid ""
 "This allows you to give an URL with more details about the stream (often the "
 "website of the streaming organization), that will be announced in the SDP "
 "(Session Descriptor)."
 msgstr ""
 
-#: modules/stream_out/rtp.c:78
+#: modules/stream_out/rtp.c:78 modules/stream_out/standard.c:71
 #, fuzzy
 msgid "Session email"
 msgstr "세션명"
 
-#: modules/stream_out/rtp.c:80
+#: modules/stream_out/rtp.c:80 modules/stream_out/standard.c:73
 msgid ""
 "This allows you to give a contact mail address for the stream, that will be "
 "announced in the SDP (Session Descriptor)."
@@ -16854,59 +16895,83 @@ msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 msgid "RTP stream output"
 msgstr "스트림의 출력처의 선택"
 
-#: modules/stream_out/standard.c:42
+#: modules/stream_out/standard.c:43
 msgid "This is the output access method that will be used."
 msgstr ""
 
-#: modules/stream_out/standard.c:46
+#: modules/stream_out/standard.c:47
 #, fuzzy
 msgid "This is the muxer that will be used."
 msgstr "VCD 디바이스의 기정치를 지정합니다. "
 
-#: modules/stream_out/standard.c:47
+#: modules/stream_out/standard.c:48
 #, fuzzy
 msgid "Output destination"
 msgstr "송신지의 어스펙트·레시오"
 
-#: modules/stream_out/standard.c:50
+#: modules/stream_out/standard.c:51
 #, fuzzy
 msgid "This is the destination (URL) that will be used for the stream."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/stream_out/standard.c:53
+#: modules/stream_out/standard.c:54
 #, fuzzy
 msgid ""
 "This allows you to specify a name for the session, that will be announced if "
 "you choose to use SAP."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/stream_out/standard.c:56
+#: modules/stream_out/standard.c:57
 #, fuzzy
 msgid "Session groupname"
 msgstr "세션명"
 
-#: modules/stream_out/standard.c:58
+#: modules/stream_out/standard.c:59
 #, fuzzy
 msgid ""
 "This allows you to specify a group for the session, that will be announced "
 "if you choose to use SAP."
 msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
 
-#: modules/stream_out/standard.c:61
+#: modules/stream_out/standard.c:62
+#, fuzzy
+msgid "Session descriptipn"
+msgstr "코덱 설명"
+
+#: modules/stream_out/standard.c:64
+#, fuzzy
+msgid ""
+"This allows you to give a short description with details about the stream, "
+"that will be announced in the SDP (Session Descriptor)."
+msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
+
+#: modules/stream_out/standard.c:75
+#, fuzzy
+msgid "Session phone number"
+msgstr "세션명"
+
+#: modules/stream_out/standard.c:77
+#, fuzzy
+msgid ""
+"This allows you to give a contact telephone number for the stream, that will "
+"be announced in the SDP (Session Descriptor)."
+msgstr "VLC가 선택하는 패킷의 순서를 선택합니다. "
+
+#: modules/stream_out/standard.c:81
 #, fuzzy
 msgid "SAP announcing"
 msgstr "스트림 출력"
 
-#: modules/stream_out/standard.c:62
+#: modules/stream_out/standard.c:82
 msgid "Announce this session with SAP."
 msgstr ""
 
-#: modules/stream_out/standard.c:70
+#: modules/stream_out/standard.c:90
 #, fuzzy
 msgid "Standard"
 msgstr "표준 재생"
 
-#: modules/stream_out/standard.c:71
+#: modules/stream_out/standard.c:91
 msgid "Standard stream output"
 msgstr "표준 스트림 출력"
 
@@ -18604,11 +18669,11 @@ msgstr ""
 msgid "Set the Sharpen strength, between 0 and 2. Defaults to 0.05."
 msgstr ""
 
-#: modules/video_filter/sharpen.c:58
+#: modules/video_filter/sharpen.c:60
 msgid "Augment contrast between contours."
 msgstr ""
 
-#: modules/video_filter/sharpen.c:59
+#: modules/video_filter/sharpen.c:61
 #, fuzzy
 msgid "Sharpen video filter"
 msgstr "비디오·필터·모듈"
@@ -20632,10 +20697,6 @@ msgstr "스펙트럼"
 #, fuzzy
 #~ msgid "Use diseqc with antenna"
 #~ msgstr "안테나와 diseqc를 사용"
-
-#, fuzzy
-#~ msgid "Satellite input"
-#~ msgstr "위성 입력 모듈"
 
 #~ msgid "SLP attribute identifiers"
 #~ msgstr "SLP 속성 식별자"
