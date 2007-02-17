@@ -381,14 +381,17 @@ static int Mux( sout_mux_t *p_mux )
     {
         msg_Dbg( p_mux, "writing header" );
 
-        p_sys->b_write_header = VLC_FALSE;
 
         if( av_write_header( p_sys->oc ) < 0 )
         {
             msg_Err( p_mux, "could not write header" );
+        p_sys->b_write_header = VLC_FALSE;
             p_sys->b_error = VLC_TRUE;
             return VLC_EGENERIC;
         }
+
+        put_flush_packet( &p_sys->oc->pb );
+        p_sys->b_write_header = VLC_FALSE;
     }
 
     for( ;; )
@@ -440,6 +443,9 @@ static int IOWrite( void *opaque, uint8_t *buf, int buf_size )
 
     block_t *p_buf = block_New( p_mux->p_sout, buf_size );
     if( buf_size > 0 ) memcpy( p_buf->p_buffer, buf, buf_size );
+
+    if( p_mux->p_sys->b_write_header )
+        p_buf->i_flags |= BLOCK_FLAG_HEADER;
 
     i_ret = sout_AccessOutWrite( p_mux->p_access, p_buf );
     return i_ret ? i_ret : -1;
