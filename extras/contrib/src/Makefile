@@ -701,9 +701,6 @@ flac-$(FLAC_VERSION).tar.gz:
 
 flac: flac-$(FLAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_DARWIN_OS
-	patch -p0 < Patches/flac-mactel.patch
-endif
 ifneq ($(HOST),$(BUILD))
 	(patch -p0 < Patches/flac-cross.patch && cd $@ && autoconf)
 endif
