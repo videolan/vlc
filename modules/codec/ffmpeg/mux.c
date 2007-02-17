@@ -252,14 +252,19 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     codec->bit_rate = p_input->p_fmt->i_bitrate;
-    /* This is a hack */
-    if( i_codec_id == CODEC_ID_MP2 )
-        i_codec_id = CODEC_ID_MP3;
 #if LIBAVFORMAT_VERSION_INT >= ((51<<16)+(8<<8)+0)
     codec->codec_tag = av_codec_get_tag( p_sys->oc->oformat->codec_tag, i_codec_id );
+    if( !codec->codec_tag && i_codec_id == CODEC_ID_MP2 )
+    {
+        i_codec_id = CODEC_ID_MP3;
+        codec->codec_tag = av_codec_get_tag( p_sys->oc->oformat->codec_tag, i_codec_id );
+    }
 #else
 #   warning "WARNING!!!!!!!"
 #   warning "Using libavformat muxing with versions older than 51.8.0 (r7593) might produce broken files.
+    /* This is a hack */
+    if( i_codec_id == CODEC_ID_MP2 )
+        i_codec_id = CODEC_ID_MP3;
     codec->codec_tag = p_input->p_fmt->i_codec;
 #endif
     codec->codec_id = i_codec_id;
