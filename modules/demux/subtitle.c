@@ -1,7 +1,7 @@
 /*****************************************************************************
  * subtitle.c: Demux for subtitle text files.
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
