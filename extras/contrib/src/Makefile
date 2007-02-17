@@ -710,7 +710,7 @@ endif
 
 .FLAC: flac 
 ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest --disable-asm-optimizations && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
+	(cd $<; $(HOSTCC) CFLAGS="-I$(PREFIX)/src/flac/include $${CFLAGS}" ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
 else
 ifdef HAVE_DARWIN_OS
 ifeq ($(HOST),i686-apple-darwin8)
