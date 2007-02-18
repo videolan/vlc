@@ -364,15 +364,15 @@ LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
 #undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE
 
 /* local function to be used in libvlc_vlm_show_media only */
-char* recurse_answer( char* psz_prefix, vlm_message_t *p_answer ) {
+static char* recurse_answer( char* psz_prefix, vlm_message_t *p_answer ) {
     char* psz_childprefix;
     char* psz_response="";
     char* response_tmp;
     int i;
     vlm_message_t *aw_child, **paw_child;
-    
+
     asprintf( &psz_childprefix, "%s%s.", psz_prefix, p_answer->psz_name );
-    
+
     if ( p_answer->i_child )
     {
         paw_child = p_answer->child;
@@ -426,4 +426,5 @@ char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
     free( psz_message );
     return(psz_response );
 #endif
+    return NULL;
 }
