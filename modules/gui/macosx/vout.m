@@ -316,7 +316,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     }
 }
 
-- (void)scaleWindowWithFactor: (float)factor
+- (void)scaleWindowWithFactor: (float)factor animate: (BOOL)animate
 {
     NSSize newsize;
     int i_corrected_height, i_corrected_width;
@@ -355,7 +355,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         new_frame.origin.x = topleftscreen.x;
         new_frame.origin.y = topleftscreen.y - new_frame.size.height;
 
-        [o_window setFrame: new_frame display: NO];
+        [o_window setFrame: new_frame display: animate animate: animate];
 
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
     }
@@ -877,7 +877,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     {
         [o_window setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
         [self updateTitle];
-        [self scaleWindowWithFactor: 1.0];
+        [self scaleWindowWithFactor: 1.0 animate: NO];
         [o_window makeKeyAndOrderFront: self];
     }
     return b_return;

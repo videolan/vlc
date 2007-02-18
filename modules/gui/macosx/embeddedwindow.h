@@ -26,7 +26,7 @@
  *****************************************************************************/
 
 
-@interface VLCEmbeddedWindow : NSObject
+@interface VLCEmbeddedWindow : NSWindow
 {
     IBOutlet id o_btn_backward;
     IBOutlet id o_btn_forward;
@@ -34,12 +34,13 @@
     IBOutlet id o_btn_play;
     IBOutlet id o_slider;
     IBOutlet id o_time;
-    IBOutlet id o_window;
 
     NSImage * o_img_play;
     NSImage * o_img_play_pressed;
     NSImage * o_img_pause;
     NSImage * o_img_pause_pressed;
+    
+    NSRect o_saved_frame;
 }
 
 - (void)setTime:(NSString *)o_arg_ime position:(float)f_position;

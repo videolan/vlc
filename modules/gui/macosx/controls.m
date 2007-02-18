@@ -422,11 +422,11 @@
         if( o_vout_view )
         {
             if( [o_title isEqualToString: _NS("Half Size") ] )
-                [o_vout_view scaleWindowWithFactor: 0.5];
+                [o_vout_view scaleWindowWithFactor: 0.5 animate: YES];
             else if( [o_title isEqualToString: _NS("Normal Size") ] )
-                [o_vout_view scaleWindowWithFactor: 1.0];
+                [o_vout_view scaleWindowWithFactor: 1.0 animate: YES];
             else if( [o_title isEqualToString: _NS("Double Size") ] )
-                [o_vout_view scaleWindowWithFactor: 2.0];
+                [o_vout_view scaleWindowWithFactor: 2.0 animate: YES];
             else if( [o_title isEqualToString: _NS("Float on Top") ] )
                 [o_vout_view toggleFloatOnTop];
             else if( [o_title isEqualToString: _NS("Fit to Screen") ] )

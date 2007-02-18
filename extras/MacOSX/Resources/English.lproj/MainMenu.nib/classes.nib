@@ -67,9 +67,8 @@
                 "o_btn_play" = id; 
                 "o_slider" = id; 
                 "o_time" = id; 
-                "o_window" = id; 
             }; 
-            SUPERCLASS = NSObject; 
+            SUPERCLASS = NSWindow; 
         }, 
         {
             ACTIONS = {

@@ -58,7 +58,7 @@
 - (void)closeVout;
 - (void)updateTitle;
 - (void)manage;
-- (void)scaleWindowWithFactor: (float)factor;
+- (void)scaleWindowWithFactor: (float)factor animate: (BOOL)animate;
 - (void)setOnTop:(BOOL)b_on_top;
 - (void)toggleFloatOnTop;
 - (void)toggleFullscreen;

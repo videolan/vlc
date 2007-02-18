@@ -37,7 +37,7 @@
 
 - (void)awakeFromNib
 {
-    [o_window setDelegate: self];
+    [self setDelegate: self];
 
     [o_btn_backward setToolTip: _NS("Rewind")];
     [o_btn_forward setToolTip: _NS("Fast Forward")];
@@ -49,6 +49,8 @@
     o_img_play_pressed = [NSImage imageNamed: @"play_embedded_blue"];
     o_img_pause = [NSImage imageNamed: @"pause_embedded"];
     o_img_pause_pressed = [NSImage imageNamed: @"pause_embedded_blue"];
+
+    o_saved_frame = NSMakeRect( 0.0f, 0.0f, 0.0f, 0.0f );
 }
 
 - (void)setTime:(NSString *)o_arg_time position:(float)f_position
@@ -83,6 +85,26 @@
 - (void)setFullscreen:(BOOL)b_fullscreen
 {
     [o_btn_fullscreen setState: b_fullscreen];
+}
+
+- (void)zoom:(id)sender
+{
+    if( ![self isZoomed] )
+    {
+        NSRect zoomRect = [[self screen] frame];
+        o_saved_frame = [self frame];
+        /* we don't have to take care of the eventual menu bar and dock
+          as zoomRect will be cropped automatically by setFrame:display:
+          to the right rectangle */
+        [self setFrame: zoomRect display: YES animate: YES];
+    }
+    else
+    {
+        /* unzoom to the saved_frame if the o_saved_frame coords look sound
+           (just in case) */
+        if( o_saved_frame.size.width > 0 && o_saved_frame.size.height > 0 )
+            [self setFrame: o_saved_frame display: YES animate: YES];
+    }
 }
 
 - (BOOL)windowShouldClose:(id)sender
