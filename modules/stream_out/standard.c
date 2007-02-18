@@ -1,7 +1,7 @@
 /*****************************************************************************
  * standard.c: standard stream output module
  *****************************************************************************
- * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright (C) 2003-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -203,6 +203,7 @@ static int Open( vlc_object_t *p_this )
             { "ps",  "ps" },
             { "mpeg1","mpeg1" },
             { "wav","wav" },
+            { "flv", "ffmpeg{mux=flv}" },
             { NULL,  NULL }
         };
         const char *psz_ext = strrchr( psz_url, '.' ) + 1;
