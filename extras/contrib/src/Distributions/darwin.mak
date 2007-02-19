@@ -1,7 +1,7 @@
 # Darwin rules
 all: .autoconf .automake .libtool .intl .pkgcfg .freetype .fribidi \
     .a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
-    .FLAC .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
+    .flac .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
     .dvdcss .dvdnav .dvdread .dvbpsi .live .caca .mod \
     .png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager \
     .SDL_image .glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder \
