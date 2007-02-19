@@ -197,7 +197,7 @@ struct sout_access_out_sys_t
 #define DEFAULT_PORT 1234
 #define RTP_HEADER_LENGTH 12
 
-static int OpenRTCP (sout_access_out_t *obj);
+static int OpenRTCP (sout_access_out_t *obj, int proto);
 static void SendRTCP (sout_access_thread_t *obj, uint32_t timestamp);
 static void CloseRTCP (sout_access_thread_t *obj);
 
@@ -344,7 +344,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_sequence_number = rand()&0xffff;
     p_sys->i_ssrc            = rand()&0xffffffff;
 
-    if (p_sys->b_rtpts && OpenRTCP (p_access))
+    if (p_sys->b_rtpts && OpenRTCP (p_access, proto))
     {
         msg_Err (p_access, "cannot initialize RTCP sender");
         net_Close (i_handle);
@@ -729,10 +729,9 @@ static const char *MakeRandMulticast (int family, char *buf, size_t buflen)
  * - it is assumed we_sent = true (could be wrong), since we are THE sender,
  * - we always send SR + SDES, while running,
  * - FIXME: we do not implement separate rate limiting for SDES,
- * - FIXME: we should send BYE when stopping,
  * - we do not implement any profile-specific extensions for the time being.
  */
-static int OpenRTCP (sout_access_out_t *obj)
+static int OpenRTCP (sout_access_out_t *obj, int proto)
 {
     sout_access_out_sys_t *p_sys = obj->p_sys;
     uint8_t *ptr;
@@ -748,8 +747,7 @@ static int OpenRTCP (sout_access_out_t *obj)
 
     sport++;
     dport++;
-    /* FIXME: should we use UDP for non-UDP protos? */
-    fd = net_OpenDgram (obj, src, sport, dst, dport, AF_UNSPEC, IPPROTO_UDP);
+    fd = net_OpenDgram (obj, src, sport, dst, dport, AF_UNSPEC, proto);
     if (fd == -1)
         return VLC_EGENERIC;
 
@@ -799,7 +797,17 @@ static int OpenRTCP (sout_access_out_t *obj)
 
 static void CloseRTCP (sout_access_thread_t *obj)
 {
-    /* TODO: send RTCP BYE */
+    uint8_t *ptr = obj->rtcp_data;
+    /* Bye */
+    ptr[0] = (2 << 6) | 1; /* V = 2, P = 0, SC = 1 */
+    ptr[1] = 203; /* payload type: Bye */
+    SetWBE (ptr + 2, 1);
+    /* SSRC is already there :) */
+
+    /* We are THE sender, so we are more important than anybody else, so
+     * we can afford not to check bandwidth constraints here. */
+    send (obj->rtcp_handle, obj->rtcp_data, 8, 0);
+
     if (obj->rtcp_handle != -1)
         net_Close (obj->rtcp_handle);
 }
