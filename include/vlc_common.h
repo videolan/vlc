@@ -730,14 +730,14 @@ static inline uint64_t GetQWLE( const void * _p )
 #define GetQWBE( p )    U64_AT( p )
 
 /* Helper writer functions */
-#define SetWLE( p, v ) _SetWLE( (uint8_t*)p, v)
+#define SetWLE( p, v ) _SetWLE( (uint8_t*)(p), v)
 static inline void _SetWLE( uint8_t *p, uint16_t i_dw )
 {
     p[1] = ( i_dw >>  8 )&0xff;
     p[0] = ( i_dw       )&0xff;
 }
 
-#define SetDWLE( p, v ) _SetDWLE( (uint8_t*)p, v)
+#define SetDWLE( p, v ) _SetDWLE( (uint8_t*)(p), v)
 static inline void _SetDWLE( uint8_t *p, uint32_t i_dw )
 {
     p[3] = ( i_dw >> 24 )&0xff;
@@ -745,20 +745,20 @@ static inline void _SetDWLE( uint8_t *p, uint32_t i_dw )
     p[1] = ( i_dw >>  8 )&0xff;
     p[0] = ( i_dw       )&0xff;
 }
-#define SetQWLE( p, v ) _SetQWLE( (uint8_t*)p, v)
+#define SetQWLE( p, v ) _SetQWLE( (uint8_t*)(p), v)
 static inline void _SetQWLE( uint8_t *p, uint64_t i_qw )
 {
     SetDWLE( p,   i_qw&0xffffffff );
     SetDWLE( p+4, ( i_qw >> 32)&0xffffffff );
 }
-#define SetWBE( p, v ) _SetWBE( (uint8_t*)p, v)
+#define SetWBE( p, v ) _SetWBE( (uint8_t*)(p), v)
 static inline void _SetWBE( uint8_t *p, uint16_t i_dw )
 {
     p[0] = ( i_dw >>  8 )&0xff;
     p[1] = ( i_dw       )&0xff;
 }
 
-#define SetDWBE( p, v ) _SetDWBE( (uint8_t*)p, v)
+#define SetDWBE( p, v ) _SetDWBE( (uint8_t*)(p), v)
 static inline void _SetDWBE( uint8_t *p, uint32_t i_dw )
 {
     p[0] = ( i_dw >> 24 )&0xff;
@@ -766,7 +766,7 @@ static inline void _SetDWBE( uint8_t *p, uint32_t i_dw )
     p[2] = ( i_dw >>  8 )&0xff;
     p[3] = ( i_dw       )&0xff;
 }
-#define SetQWBE( p, v ) _SetQWBE( (uint8_t*)p, v)
+#define SetQWBE( p, v ) _SetQWBE( (uint8_t*)(p), v)
 static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 {
     SetDWBE( p+4,   i_qw&0xffffffff );
