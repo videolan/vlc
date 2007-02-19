@@ -1488,8 +1488,8 @@ then
   VLC_ADD_PLUGINS([packetizer_copy])
 
   VLC_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es stream_out_rtp stream_out_description vod_rtsp])
-  VLC_ADD_PLUGINS([stream_out_duplicate stream_out_gather stream_out_display stream_out_transcode stream_out_bridge stream_out_mosaic_bridge stream_out_autodel])
-#  VLC_ADD_PLUGINS([stream_out_transrate])
+  VLC_ADD_PLUGINS([stream_out_duplicate stream_out_display stream_out_transcode stream_out_bridge stream_out_mosaic_bridge stream_out_autodel])
+#  VLC_ADD_PLUGINS([stream_out_gather stream_out_transrate])
 #  VLC_ADD_PLUGINS([rtcp])
   VLC_ADD_PLUGINS([profile_parser])
 
