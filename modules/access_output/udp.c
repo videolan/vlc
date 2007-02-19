@@ -173,17 +173,17 @@ typedef struct sout_access_thread_t
 
 struct sout_access_out_sys_t
 {
-    int                 b_rtpts;  // 1 if add rtp/ts header
+    int                 i_mtu;
+
+    vlc_bool_t          b_rtpts;  // 1 if add rtp/ts header
+    vlc_bool_t          b_mtu_warning;
     uint16_t            i_sequence_number;
     uint32_t            i_ssrc;
-
-    int                 i_mtu;
 
     block_t             *p_buffer;
 
     sout_access_thread_t *p_thread;
 
-    vlc_bool_t          b_mtu_warning;
 };
 
 #define DEFAULT_PORT 1234
