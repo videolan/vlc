@@ -270,13 +270,19 @@ static int Open( vlc_object_t *p_this )
      || var_Create (p_access, "src-port", VLC_VAR_INTEGER)
      || var_Create (p_access, "dst-addr", VLC_VAR_STRING)
      || var_Create (p_access, "src-addr", VLC_VAR_STRING))
+    {
+        free (p_sys);
+        free (psz_dst_addr);
         return VLC_ENOMEM;
+    }
 
     p_sys->p_thread =
         vlc_object_create( p_access, sizeof( sout_access_thread_t ) );
     if( !p_sys->p_thread )
     {
         msg_Err( p_access, "out of memory" );
+        free (p_sys);
+        free (psz_dst_addr);
         return VLC_ENOMEM;
     }
 
@@ -288,9 +294,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->p_empty_blocks = block_FifoNew( p_access );
 
     i_handle = net_ConnectDgram( p_this, psz_dst_addr, i_dst_port, -1, proto );
+    free (psz_dst_addr);
+
     if( i_handle == -1 )
     {
          msg_Err( p_access, "failed to create %s socket", protoname );
+         vlc_object_destroy (p_sys->p_thread);
+         free (p_sys);
          return VLC_EGENERIC;
     }
     else
@@ -337,6 +347,9 @@ static int Open( vlc_object_t *p_this )
     if (p_sys->b_rtpts && OpenRTCP (p_access))
     {
         msg_Err (p_access, "cannot initialize RTCP sender");
+        net_Close (i_handle);
+        vlc_object_destroy (p_sys->p_thread);
+        free (p_sys);
         return VLC_EGENERIC;
     }
 
@@ -344,7 +357,9 @@ static int Open( vlc_object_t *p_this )
                            VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
     {
         msg_Err( p_access->p_sout, "cannot spawn sout access thread" );
+        net_Close (i_handle);
         vlc_object_destroy( p_sys->p_thread );
+        free (p_sys);
         return VLC_EGENERIC;
     }
 
@@ -353,8 +368,6 @@ static int Open( vlc_object_t *p_this )
     else p_access->pf_write = Write;
 
     p_access->pf_seek = Seek;
-
-    free( psz_dst_addr );
 
     /* update p_sout->i_out_pace_nocontrol */
     p_access->p_sout->i_out_pace_nocontrol++;
