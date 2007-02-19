@@ -461,3 +461,22 @@ diff -ur libdvdnav/src/vm/vm.c libdvdnav.new/src/vm/vm.c
  menus_LDADD   = $(DVDNAV_LIB)
  
  $(DVDNAV_LIB):
+--- libdvdnav/src/dvdnav_internal.h.orig	2007-02-19 18:41:27.784456800 +0000
++++ libdvdnav/src/dvdnav_internal.h	2007-02-19 18:41:50.706478500 +0000
+@@ -45,6 +45,7 @@
+ #define pthread_mutex_unlock(a)  LeaveCriticalSection(a)
+ #define pthread_mutex_destroy(a)
+ 
++#if 0
+ /* replacement gettimeofday implementation */
+ #include <sys/timeb.h>
+ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
+@@ -56,6 +57,8 @@
+   return 0;
+ }
+ #define gettimeofday(TV, TZ) _private_gettimeofday((TV), (TZ))
++#endif
++
+ #include <io.h> /* read() */
+ #define lseek64 _lseeki64
+ 

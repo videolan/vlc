@@ -129,6 +129,7 @@ case $HOST in
         ;;
     i686-pc-cygwin)
             echo "HAVE_WIN32 = 1" >> config.mak
+            echo "HAVE_CYGWIN = 1" >> config.mak
             CC="gcc -mno-cygwin -isystem /usr/include/mingw"
             CXX="g++ -mno-cygwin -isystem /usr/include/mingw"
             HOST=`$CC -dumpmachine`

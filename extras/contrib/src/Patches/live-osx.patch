@@ -1,23 +1,21 @@
-diff -ruN live.old/Makefile.tail live/Makefile.tail
---- live.old/Makefile.tail	2006-11-16 03:09:43.000000000 +0100
-+++ live/Makefile.tail	2006-11-16 22:10:06.000000000 +0100
-@@ -18,9 +18,7 @@
+--- live/Makefile.tail.orig	2006-07-04 06:25:31.000000000 +0100
++++ live/Makefile.tail	2007-02-19 17:18:51.471486600 +0000
+@@ -14,8 +14,6 @@
+ 
  ALL =	$(LIVEMEDIA_LIB) \
  	$(GROUPSOCK_LIB) \
- 	$(USAGE_ENVIRONMENT_LIB) \
+-	$(USAGE_ENVIRONMENT_LIB) \
 -	$(BASIC_USAGE_ENVIRONMENT_LIB) \
--	$(TESTPROGS_APP) \
--	$(MEDIA_SERVER_APP)
+-	$(TESTPROGS_APP)
 +	$(BASIC_USAGE_ENVIRONMENT_LIB)
  all:	$(ALL)
- 
  
 diff -ruN live.old/config.macosx live/config.macosx
 --- live.old/config.macosx	2006-11-16 03:09:43.000000000 +0100
 +++ live/config.macosx	2006-11-16 22:09:58.000000000 +0100
 @@ -1,4 +1,4 @@
--COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t -DHAVE_SOCKADDR_LEN=1
-+COMPILE_OPTS =		$(INCLUDES) -I. EXTRA_CFLAGS -DBSD=1 -O -DSOCKLEN_T=socklen_t -DUSE_LOCALE -DHAVE_SOCKADDR_LEN=1
+-COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t
++COMPILE_OPTS =		$(INCLUDES) -I. $(EXTRA_CFLAGS) -DBSD=1 -O -DSOCKLEN_T=socklen_t
  C =			c
  C_COMPILER =		cc
  C_FLAGS =		$(COMPILE_OPTS)
@@ -26,7 +24,7 @@ diff -ruN live.old/config.macosx live/config.macosx
  OBJ =			o
  LINK =			c++ -o 
 -LINK_OPTS =		-L.
-+LINK_OPTS =		-L. EXTRA_LDFLAGS 
++LINK_OPTS =		-L. $(EXTRA_LDFLAGS)
  CONSOLE_LINK_OPTS =	$(LINK_OPTS)
 -LIBRARY_LINK =		ld -o 
 -LIBRARY_LINK_OPTS =	$(LINK_OPTS) -r 

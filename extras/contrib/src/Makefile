@@ -99,14 +99,14 @@ ifneq ($(BUILD),$(HOST))
     # Compiling for MinGW under Cygwin could be deemed as cross compiling
     # unfortunately there isn't a complete separate GCC toolchain for MinGW under Cygwin
     #
-    ifeq ($(findstring cygwin,$(BUILD)),)
+    ifndef HAVE_CYGWIN
         # We are REALLY cross compiling
         FFMPEGCONF=--cross-prefix=$(HOST)-
         X264CONF=--crosscompile=$(HOST)
-	PTHREADSCONF="CROSS=$(HOST)-"
+	    PTHREADSCONF="CROSS=$(HOST)-"
     else
         # We are compiling for MinGW on Cygwin
-	PTHREADSCONF=$(HOSTCC)
+	    PTHREADSCONF=$(HOSTCC)
     endif
 endif
 
@@ -371,8 +371,8 @@ ifeq ($(BUILD),i586-pc-beos)
 	( cd $< && for f in `find . -name libtool`; do  sed -e 's/ -shared / -nostart /' -e 's/^predep_objects.*/predep_objects=""/' -i  $$f; chmod +x $$f; done )
 endif
 ifneq ($(HOST),$(BUILD))
-# We'll use the installed gettext and only need to cross-compile libintl
-	( cd $< && make -C gettext-runtime/intl && make -C gettext-runtime/intl install )
+# We'll use the installed gettext and only need to cross-compile libintl, also build autopoint and gettextsize tools need for VLC bootstrap
+	( cd $< && make -C gettext-runtime/intl && make -C gettext-runtime/intl install && make -C gettext-tools/misc install )
 else
 # Build and install the whole gettext
 	( cd $< && make && make install )
@@ -426,7 +426,11 @@ freetype2: freetype-$(FREETYPE2_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .freetype: freetype2
+ifdef HAVE_CYGWIN
+	(cd $<; CPPFLAGS="$(EXTRA_CPPFLAGS)" CFLAGS="$(EXTRA_CFLAGS)" LDFLAGS="$(EXTRA_LDFLAGS)"  -I$(PREFIX)/include" ./configure --target=$(HOST) --disable-pic --disable-shared --prefix=$(PREFIX) && make && make install)
+else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+endif
 	$(INSTALL_NAME)
 	touch $@
 
@@ -708,7 +712,7 @@ ifneq ($(HOST),$(BUILD))
 	(patch -p0 < Patches/flac-cross.patch && cd $@ && autoconf)
 endif
 
-.FLAC: flac 
+.flac: flac .ogg 
 ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
 else
