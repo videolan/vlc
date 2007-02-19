@@ -25,14 +25,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <vlc/vlc.h>
+
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <assert.h>
 
-#include <vlc/vlc.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
 
@@ -169,6 +171,12 @@ typedef struct sout_access_thread_t
 
     block_fifo_t *p_empty_blocks;
 
+    uint32_t sent_pkts;
+    uint32_t sent_bytes;
+    size_t   rtcp_size;
+    int      rtcp_handle;
+    uint8_t  rtcp_data[28 + 8 + (2 * 257)];
+
 } sout_access_thread_t;
 
 struct sout_access_out_sys_t
@@ -189,9 +197,14 @@ struct sout_access_out_sys_t
 #define DEFAULT_PORT 1234
 #define RTP_HEADER_LENGTH 12
 
+static int OpenRTCP (sout_access_out_t *obj);
+static void SendRTCP (sout_access_thread_t *obj, uint32_t timestamp);
+static void CloseRTCP (sout_access_thread_t *obj);
+
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
+/* FIXME: lots of leaks in error handling here! */
 static int Open( vlc_object_t *p_this )
 {
     sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
@@ -316,6 +329,17 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_mtu = var_CreateGetInteger( p_this, "mtu" );
 
+    srand( (uint32_t)mdate());
+    p_sys->p_buffer          = NULL;
+    p_sys->i_sequence_number = rand()&0xffff;
+    p_sys->i_ssrc            = rand()&0xffffffff;
+
+    if (p_sys->b_rtpts && OpenRTCP (p_access))
+    {
+        msg_Err (p_access, "cannot initialize RTCP sender");
+        return VLC_EGENERIC;
+    }
+
     if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
                            VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
     {
@@ -323,11 +347,6 @@ static int Open( vlc_object_t *p_this )
         vlc_object_destroy( p_sys->p_thread );
         return VLC_EGENERIC;
     }
-
-    srand( (uint32_t)mdate());
-    p_sys->p_buffer          = NULL;
-    p_sys->i_sequence_number = rand()&0xffff;
-    p_sys->i_ssrc            = rand()&0xffffffff;
 
     var_Get( p_access, SOUT_CFG_PREFIX "raw", &val );
     if( val.b_bool )  p_access->pf_write = WriteRaw;
@@ -370,6 +389,7 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->p_buffer ) block_Release( p_sys->p_buffer );
 
     net_Close( p_sys->p_thread->i_handle );
+    CloseRTCP (p_sys->p_thread);
 
     vlc_object_detach( p_sys->p_thread );
     vlc_object_destroy( p_sys->p_thread );
@@ -517,7 +537,7 @@ static block_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
     }
     else
     {
-        p_buffer = block_FifoGet(p_sys->p_thread->p_empty_blocks );       
+        p_buffer = block_FifoGet(p_sys->p_thread->p_empty_blocks );
         p_buffer->i_flags = 0;
         p_buffer = block_Realloc( p_buffer, 0, p_sys->i_mtu );
     }
@@ -533,10 +553,10 @@ static block_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
         p_buffer->p_buffer[0] = 0x80;
         p_buffer->p_buffer[1] = 0x21; // mpeg2-ts
 
-        SetWLE( p_buffer->p_buffer + 2, p_sys->i_sequence_number );
+        SetWBE( p_buffer->p_buffer + 2, p_sys->i_sequence_number );
         p_sys->i_sequence_number++;
-        SetDWLE( p_buffer->p_buffer + 4, i_timestamp );
-        SetDWLE( p_buffer->p_buffer + 8, p_sys->i_ssrc );
+        SetDWBE( p_buffer->p_buffer + 4, i_timestamp );
+        SetDWBE( p_buffer->p_buffer + 8, p_sys->i_ssrc );
 
         p_buffer->i_buffer = RTP_HEADER_LENGTH;
     }
@@ -557,6 +577,7 @@ static void ThreadWrite( vlc_object_t *p_this )
     char strerror_buf[WINSOCK_STRERROR_SIZE];
 # define strerror( x ) winsock_strerror( strerror_buf )
 #endif
+    size_t rtcp_counter = 0;
 
     while( !p_thread->b_die )
     {
@@ -605,10 +626,17 @@ static void ThreadWrite( vlc_object_t *p_this )
             mwait( i_date );
             i_to_send = p_thread->i_group;
         }
-        if( send( p_thread->i_handle, p_pk->p_buffer, p_pk->i_buffer, 0 )
-              == -1 )
+        ssize_t val = send( p_thread->i_handle, p_pk->p_buffer,
+                            p_pk->i_buffer, 0 );
+        if (val == -1)
         {
             msg_Warn( p_thread, "send error: %s", strerror(errno) );
+        }
+        else
+        {
+            p_thread->sent_pkts++;
+            p_thread->sent_bytes += val;
+            rtcp_counter += val;
         }
 
         if( i_dropped_packets )
@@ -625,6 +653,16 @@ static void ThreadWrite( vlc_object_t *p_this )
                      i_sent - i_date );
         }
 #endif
+
+        if (p_thread->rtcp_handle != -1)
+        {
+            /* FIXME: this is a very incorrect simplistic RTCP timer */
+            if ((rtcp_counter / 80) >= p_thread->rtcp_size)
+            {
+                SendRTCP (p_thread, p_pk->i_dts * 9 / 100);
+                rtcp_counter = 0;
+            }
+        }
 
         block_FifoPut( p_thread->p_empty_blocks, p_pk );
 
@@ -663,4 +701,103 @@ static const char *MakeRandMulticast (int family, char *buf, size_t buflen)
     errno = EAFNOSUPPORT;
 #endif
     return NULL;
+}
+
+
+/*
+ * NOTE on RTCP implementation:
+ * - there is a single sender (us), no conferencing here! => n = sender = 1,
+ * - as such we need not bother to include Receiver Reports,
+ * - in unicast case, there is a single receiver => members = 1 + 1 = 2,
+ *   and obviously n > 25% of members,
+ * - in multicast case, we do not want to maintain the number of receivers
+ *   and we assume it is big (i.e. than 3) because that's what broadcasting is
+ *   all about,
+ * - it is assumed we_sent = true (could be wrong), since we are THE sender,
+ * - we always send SR + SDES, while running,
+ * - FIXME: we do not implement separate rate limiting for SDES,
+ * - FIXME: we should send BYE when stopping,
+ * - we do not implement any profile-specific extensions for the time being.
+ */
+static int OpenRTCP (sout_access_out_t *obj)
+{
+    sout_access_out_sys_t *p_sys = obj->p_sys;
+    uint8_t *ptr;
+    int fd;
+
+    char src[NI_MAXNUMERICHOST], dst[NI_MAXNUMERICHOST];
+    int sport, dport;
+
+    fd = obj->p_sys->p_thread->i_handle;
+    if (net_GetSockAddress (fd, src, &sport)
+     || net_GetPeerAddress (fd, dst, &dport))
+        return VLC_EGENERIC;
+
+    sport++;
+    dport++;
+    /* FIXME: should we use UDP for non-UDP protos? */
+    fd = net_OpenDgram (obj, src, sport, dst, dport, AF_UNSPEC, IPPROTO_UDP);
+    if (fd == -1)
+        return VLC_EGENERIC;
+
+    obj->p_sys->p_thread->rtcp_handle = fd;
+
+    ptr = (uint8_t *)strchr (src, '%');
+    if (ptr != NULL)
+        *ptr = '\0'; /* remove scope ID frop IPv6 addresses */
+
+    ptr = obj->p_sys->p_thread->rtcp_data;
+
+    /* Sender report */
+    ptr[0] = 2 << 6; /* V = 2, P = RC = 0 */
+    ptr[1] = 200; /* payload type: Sender Report */
+    SetWBE (ptr + 2, 6); /* length = 6 (7 double words) */
+    SetDWBE (ptr + 4, p_sys->i_ssrc);
+    ptr += 28;
+    /* timestamps and counter are handled later */
+
+    /* Source description */
+    uint8_t *sdes = ptr;
+    ptr[0] = (2 << 6) | 1; /* V = 2, P = 0, SC = 1 */
+    ptr[1] = 202; /* payload type: Source Description */
+    uint8_t *lenptr = ptr + 2;
+    SetDWBE (ptr + 4, p_sys->i_ssrc);
+    ptr += 8;
+
+    ptr[0] = 1; /* CNAME - mandatory */
+    assert (NI_MAXNUMERICHOST <= 256);
+    ptr[1] = strlen (src);
+    memcpy (ptr + 2, src, ptr[1]);
+    ptr += ptr[1] + 2;
+
+    static const char tool[] = PACKAGE_STRING;
+    ptr[0] = 6; /* TOOL */
+    ptr[1] = (sizeof (tool) > 256) ? 255 : (sizeof (tool) - 1);
+    memcpy (ptr + 2, tool, ptr[1]);
+    ptr += ptr[1] + 2;
+
+    while ((ptr - sdes) & 3) /* 32-bits padding */
+        *ptr++ = 0;
+    SetWBE (lenptr, ptr - sdes);
+
+    obj->p_sys->p_thread->rtcp_size = ptr - obj->p_sys->p_thread->rtcp_data;
+    return VLC_SUCCESS;
+}
+
+static void CloseRTCP (sout_access_thread_t *obj)
+{
+    /* TODO: send RTCP BYE */
+    if (obj->rtcp_handle != -1)
+        net_Close (obj->rtcp_handle);
+}
+
+static void SendRTCP (sout_access_thread_t *obj, uint32_t timestamp)
+{
+    uint8_t *ptr = obj->rtcp_data;
+    SetQWBE (ptr + 8, NTPtime64 ());
+    SetDWBE (ptr + 16, timestamp);
+    SetDWBE (ptr + 20, obj->sent_pkts);
+    SetDWBE (ptr + 24, obj->sent_bytes);
+
+    send (obj->rtcp_handle, ptr, obj->rtcp_size, 0);
 }
