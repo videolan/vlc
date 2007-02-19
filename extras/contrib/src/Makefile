@@ -1074,8 +1074,12 @@ live555-$(LIVEDOTCOM_VERSION).tar.gz:
 live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/live.patch
+ifdef HAVE_WIN32 
 	patch -p0 < Patches/livedotcom-win32.patch
+endif
+ifdef HAVE_DARWIN_OS
 	patch -p0 < Patches/live-osx.patch
+endif
 
 .live: live
 ifdef HAVE_WIN32 
