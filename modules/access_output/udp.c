@@ -533,19 +533,10 @@ static block_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
         p_buffer->p_buffer[0] = 0x80;
         p_buffer->p_buffer[1] = 0x21; // mpeg2-ts
 
-        p_buffer->p_buffer[2] = ( p_sys->i_sequence_number >> 8 )&0xff;
-        p_buffer->p_buffer[3] = p_sys->i_sequence_number&0xff;
+        SetWLE( p_buffer->p_buffer + 2, p_sys->i_sequence_number );
         p_sys->i_sequence_number++;
-
-        p_buffer->p_buffer[4] = ( i_timestamp >> 24 )&0xff;
-        p_buffer->p_buffer[5] = ( i_timestamp >> 16 )&0xff;
-        p_buffer->p_buffer[6] = ( i_timestamp >>  8 )&0xff;
-        p_buffer->p_buffer[7] = i_timestamp&0xff;
-
-        p_buffer->p_buffer[ 8] = ( p_sys->i_ssrc >> 24 )&0xff;
-        p_buffer->p_buffer[ 9] = ( p_sys->i_ssrc >> 16 )&0xff;
-        p_buffer->p_buffer[10] = ( p_sys->i_ssrc >>  8 )&0xff;
-        p_buffer->p_buffer[11] = p_sys->i_ssrc&0xff;
+        SetDWLE( p_buffer->p_buffer + 4, i_timestamp );
+        SetDWLE( p_buffer->p_buffer + 8, p_sys->i_ssrc );
 
         p_buffer->i_buffer = RTP_HEADER_LENGTH;
     }
@@ -579,9 +570,9 @@ static void ThreadWrite( vlc_object_t *p_this )
           while( p_tmp ) { p_tmp = p_tmp->p_next; i++;}
           p_tmp = p_thread->p_fifo->p_first;
           while( p_tmp ) { p_tmp = p_tmp->p_next; j++;}
-	  msg_Err( p_thread, "fifo depth: %d/%d, empty blocks: %d/%d",
+          msg_Dbg( p_thread, "fifo depth: %d/%d, empty blocks: %d/%d",
                    p_thread->p_fifo->i_depth, j,p_thread->p_empty_blocks->i_depth,i );
-	}
+        }
 #endif
         p_pk = block_FifoGet( p_thread->p_fifo );
 
