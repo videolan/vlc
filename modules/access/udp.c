@@ -224,6 +224,7 @@ static int Open( vlc_object_t *p_this )
     ACCESS_SET_CALLBACKS( NULL, BlockChoose, Control, NULL );
     p_access->info.b_prebuffered = VLC_FALSE;
     MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
+    memset (p_sys, 0, sizeof (*p_sys));
 
     switch (proto)
     {
