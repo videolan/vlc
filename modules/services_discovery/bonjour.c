@@ -184,12 +184,14 @@ static void resolve_callback(
             playlist_item_t *p_item;
             p_item = playlist_NodeAddInput( p_sys->p_playlist, p_input,
                                             p_sys->p_node_cat,
-                                            PLAYLIST_APPEND, PLAYLIST_END );
+                                            PLAYLIST_APPEND, PLAYLIST_END,
+                                            VLC_FALSE);
             p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
             p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
             p_item = playlist_NodeAddInput( p_sys->p_playlist, p_input,
                                             p_sys->p_node_one,
-                                            PLAYLIST_APPEND, PLAYLIST_END );
+                                            PLAYLIST_APPEND, PLAYLIST_END,
+                                            VLC_FALSE );
             p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
             p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
        }

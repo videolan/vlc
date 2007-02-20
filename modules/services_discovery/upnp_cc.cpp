@@ -240,7 +240,8 @@ void UPnPHandler::AddContent( playlist_item_t *p_parent, ContentNode *node )
         ItemNode *iNode = (ItemNode *)node;
         input_item_t *p_input = input_ItemNew( p_sd, iNode->getResource(), title );
         playlist_BothAddInput( p_sys->p_playlist, p_input, p_parent,
-                               PLAYLIST_APPEND, PLAYLIST_END, NULL, NULL );
+                               PLAYLIST_APPEND, PLAYLIST_END, NULL, NULL,
+                               VLC_FALSE );
     } else if ( node->isContainerNode() )
     {
         ContainerNode *conNode = (ContainerNode *)node;

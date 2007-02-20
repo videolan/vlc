@@ -48,13 +48,12 @@ extern "C" {
  * @{
  */
 
-struct libvlc_exception_t
+typedef struct
 {
     int b_raised;
     int i_code;
     char *psz_message;
-};
-typedef struct libvlc_exception_t libvlc_exception_t;
+} libvlc_exception_t;
 
 /**
  * Initialize an exception structure. This can be called several times to reuse
@@ -139,6 +138,13 @@ VLC_PUBLIC_API void libvlc_destroy( libvlc_instance_t *, libvlc_exception_t * );
  * LibVLC Playlist handling
  * @{
  */
+
+typedef struct {
+    int i_id;
+    char * psz_uri;
+    char * psz_name
+
+} libvlc_playlist_item_t;
 
 /**
  * Set loop variable

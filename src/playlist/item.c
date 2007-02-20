@@ -136,7 +136,8 @@ void playlist_Clear( playlist_t * p_playlist, vlc_bool_t b_locked )
  * This function is to be used only by the playlist */
 int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
 {
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id,  VLC_TRUE );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id,
+                                                    VLC_TRUE );
     if( !p_item ) return VLC_EGENERIC;
     return DeleteInner( p_playlist, p_item, VLC_TRUE );
 }
@@ -157,10 +158,10 @@ int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
  */
 int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
                   const char *psz_name, int i_mode, int i_pos,
-                  vlc_bool_t b_playlist )
+                  vlc_bool_t b_playlist, vlc_bool_t b_locked )
 {
     return playlist_AddExt( p_playlist, psz_uri, psz_name,
-                            i_mode, i_pos, -1, NULL, 0, b_playlist );
+                            i_mode, i_pos, -1, NULL, 0, b_playlist, b_locked );
 }
 
 /**
@@ -182,14 +183,15 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
 int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
                      const char *psz_name, int i_mode, int i_pos,
                      mtime_t i_duration, const char *const *ppsz_options,
-                     int i_options, vlc_bool_t b_playlist )
+                     int i_options, vlc_bool_t b_playlist, vlc_bool_t b_locked )
 {
     int i_ret;
     input_item_t *p_input = input_ItemNewExt( p_playlist, psz_uri, psz_name,
                                               i_options, ppsz_options,
                                               i_duration );
 
-    i_ret = playlist_AddInput( p_playlist, p_input, i_mode, i_pos, b_playlist );
+    i_ret = playlist_AddInput( p_playlist, p_input, i_mode, i_pos, b_playlist,
+                               b_locked );
     if( i_ret == VLC_SUCCESS )
         return p_input->i_id;
     return -1;
@@ -197,7 +199,8 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
 
 /** Add an input item to the playlist node */
 int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
-                      int i_mode, int i_pos, vlc_bool_t b_playlist )
+                       int i_mode, int i_pos, vlc_bool_t b_playlist,
+                       vlc_bool_t b_locked )
 {
     playlist_item_t *p_item_cat, *p_item_one;
 
@@ -205,7 +208,7 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
         PL_DEBUG( "adding item `%s' ( %s )", p_input->psz_name,
                                              p_input->psz_uri );
 
-    PL_LOCK;
+    if( !b_locked ) PL_LOCK;
 
     /* Add to ONELEVEL */
     p_item_one = playlist_ItemNewFromInput( p_playlist, p_input );
@@ -223,7 +226,7 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
 
     GoAndPreparse( p_playlist, i_mode, p_item_cat, p_item_one );
 
-    PL_UNLOCK;
+    if( !b_locked ) PL_UNLOCK;
     return VLC_SUCCESS;
 }
 
@@ -233,12 +236,12 @@ int playlist_BothAddInput( playlist_t *p_playlist,
                            input_item_t *p_input,
                            playlist_item_t *p_direct_parent,
                            int i_mode, int i_pos,
-                           int *i_cat, int *i_one )
+                           int *i_cat, int *i_one, vlc_bool_t b_locked )
 {
     playlist_item_t *p_item_cat, *p_item_one, *p_up;
     int i_top;
     assert( p_input );
-    vlc_mutex_lock( & p_playlist->object_lock );
+    if( !b_locked ) PL_LOCK;
 
     /* Add to category */
     p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input );
@@ -271,7 +274,7 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     if( i_cat ) *i_cat = p_item_cat->i_id;
     if( i_one ) *i_one = p_item_one->i_id;
 
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    if( !b_locked ) PL_UNLOCK;
     return VLC_SUCCESS;
 }
 
@@ -279,19 +282,20 @@ int playlist_BothAddInput( playlist_t *p_playlist,
 playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
                                          input_item_t *p_input,
                                          playlist_item_t *p_parent,
-                                         int i_mode, int i_pos )
+                                         int i_mode, int i_pos,
+                                         vlc_bool_t b_locked )
 {
     playlist_item_t *p_item;
     assert( p_input );
     assert( p_parent && p_parent->i_children != -1 );
 
-    vlc_mutex_lock( &p_playlist->object_lock );
+    if( !b_locked ) PL_LOCK;
 
     p_item = playlist_ItemNewFromInput( p_playlist, p_input );
     if( p_item == NULL ) return NULL;
     AddItem( p_playlist, p_item, p_parent, i_mode, i_pos );
 
-    vlc_mutex_unlock( &p_playlist->object_lock );
+    if( !b_locked ) PL_UNLOCK;
 
     return p_item;
 }

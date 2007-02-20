@@ -343,7 +343,8 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                     else
                     {
                         playlist_AddInput( p_sys->p_playlist, p_input,
-                                     PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE );
+                                     PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
+                                     VLC_FALSE);
                         msg_Dbg( p_intf, "requested mrl add: %s", mrl );
                     }
 

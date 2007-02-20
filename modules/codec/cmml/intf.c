@@ -796,7 +796,8 @@ static void ReplacePlaylistItem( playlist_t *p_playlist, char *psz_uri )
 {
     playlist_Stop( p_playlist );
     (void) playlist_Add( p_playlist, psz_uri, psz_uri,
-                         PLAYLIST_INSERT /* FIXME: used to be PLAYLIST_REPLACE */, PLAYLIST_END|PLAYLIST_GO, VLC_TRUE /* FIXME: p_playlist->status.i_index */ );
+                         PLAYLIST_INSERT /* FIXME: used to be PLAYLIST_REPLACE */, PLAYLIST_END|PLAYLIST_GO, VLC_TRUE /* FIXME: p_playlist->status.i_index */,
+                         VLC_FALSE);
 }
 
 /****************************************************************************

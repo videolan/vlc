@@ -314,7 +314,7 @@ int VLC_AddTarget( int i_object, char const *psz_target,
     LIBVLC_PLAYLIST_FUNC;
     i_err = playlist_AddExt( p_libvlc->p_playlist, psz_target,
                              NULL,  i_mode, i_pos, -1,
-                             ppsz_options, i_options, VLC_TRUE );
+                             ppsz_options, i_options, VLC_TRUE, VLC_FALSE );
     LIBVLC_PLAYLIST_FUNC_END;
     return i_err;
 }

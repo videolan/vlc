@@ -187,7 +187,7 @@ static int Demux( demux_t *p_demux )
                                         _(VLC_META_ARTIST), "%s", psz_artist );
             playlist_BothAddInput( p_playlist, p_input, p_item_in_category,
                                    PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                                   PLAYLIST_END, NULL, NULL );
+                                   PLAYLIST_END, NULL, NULL, VLC_FALSE );
             free( psz_mrl );
             // XXX Not to be a scare monger, but I suspect options are leaked
         }

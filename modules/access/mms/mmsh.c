@@ -112,7 +112,8 @@ int E_(MMSHOpen)( access_t *p_access )
 
         /** \bug we do not autodelete here */
         playlist_Add( p_playlist, psz_location, psz_location,
-                      PLAYLIST_INSERT | PLAYLIST_GO, PLAYLIST_END, VLC_TRUE );
+                      PLAYLIST_INSERT | PLAYLIST_GO, PLAYLIST_END, VLC_TRUE,
+                      VLC_FALSE );
         vlc_object_release( p_playlist );
 
         free( psz_location );

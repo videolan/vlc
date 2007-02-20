@@ -226,10 +226,12 @@ static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
         return;
     }
     p_item_cat = playlist_NodeAddInput( p_playlist,
-            p_input,p_sd->p_sys->p_node_cat, PLAYLIST_APPEND, PLAYLIST_END );
+            p_input,p_sd->p_sys->p_node_cat, PLAYLIST_APPEND, PLAYLIST_END,
+            VLC_FALSE );
     p_item_cat->i_flags &= ~PLAYLIST_SKIP_FLAG;
     p_item_one = playlist_NodeAddInput( p_playlist,
-            p_input,p_sd->p_sys->p_node_one, PLAYLIST_APPEND, PLAYLIST_END );
+            p_input,p_sd->p_sys->p_node_one, PLAYLIST_APPEND, PLAYLIST_END,
+            VLC_FALSE );
     p_item_one->i_flags &= ~PLAYLIST_SKIP_FLAG;
 
     vlc_object_release( p_playlist );

@@ -270,7 +270,7 @@ static int Demux( demux_t *p_demux )
                     playlist_BothAddInput( p_playlist, p_input,
                                            p_item_in_category,
                                            PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                                           PLAYLIST_END, NULL, NULL );
+                                           PLAYLIST_END, NULL, NULL, VLC_FALSE );
                     FREENULL( psz_name );
                     FREENULL( psz_mrl );
                     FREENULL( psz_genre );

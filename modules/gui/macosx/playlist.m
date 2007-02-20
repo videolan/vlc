@@ -1011,7 +1011,8 @@ NSLog( @"expandable" );
 
         /* Add the item */
         playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
-             i_position == -1 ? PLAYLIST_END : i_position + i_item, VLC_TRUE );
+             i_position == -1 ? PLAYLIST_END : i_position + i_item, VLC_TRUE,
+	     VLC_FALSE );
 
         if( i_item == 0 && !b_enqueue )
         {

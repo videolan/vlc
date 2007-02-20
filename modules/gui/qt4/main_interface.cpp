@@ -521,7 +521,7 @@ void MainInterface::dropEvent(QDropEvent *event)
         if( s.length() > 0 ) {
             playlist_Add( THEPL, qtu(s), NULL,
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO:0),
-                          PLAYLIST_END, VLC_TRUE );
+                          PLAYLIST_END, VLC_TRUE, VLC_FALSE );
             first = false;
         }
      }

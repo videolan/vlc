@@ -31,6 +31,23 @@
 
 #define PL p_instance->p_libvlc_int->p_playlist
 
+static inline int playlist_was_locked( libvlc_instance_t *p_instance )
+{
+    int was_locked;
+    vlc_mutex_lock( &p_instance->instance_lock );
+    was_locked = p_instance->b_playlist_locked;
+    vlc_mutex_unlock( &p_instance->instance_lock );
+    return was_locked;
+}
+
+static inline void playlist_mark_locked( libvlc_instance_t *p_instance,
+                                         int locked )
+{
+    vlc_mutex_lock( &p_instance->instance_lock );
+    p_instance->b_playlist_locked = locked;
+    vlc_mutex_unlock( &p_instance->instance_lock );
+}
+
 void libvlc_playlist_loop( libvlc_instance_t *p_instance, vlc_bool_t loop,
                            libvlc_exception_t *p_e)
 {
@@ -42,30 +59,54 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
                            int i_options, char **ppsz_options,
                            libvlc_exception_t *p_e )
 {
+    int did_lock = 0;
     assert( PL );
     ///\todo Handle additionnal options
 
     if( PL->items.i_size == 0 ) RAISEVOID( "Empty playlist" );
     if( i_id > 0 )
     {
-        playlist_item_t *p_item = playlist_ItemGetByInputId( PL, i_id,
-                                                           PL->status.p_node );
-        if( !p_item ) RAISEVOID( "Unable to find item" );
+        playlist_item_t *p_item;
+        if (! playlist_was_locked( p_instance ) )
+        {
+            playlist_mark_locked( p_instance, 1 );
+            vlc_mutex_lock( &PL->object_lock );
+            did_lock = 1;
+        }
 
-        playlist_Control( PL, PLAYLIST_VIEWPLAY, VLC_FALSE,
+        p_item = playlist_ItemGetByInputId( PL, i_id,
+                                            PL->status.p_node );
+        if( !p_item )
+        {
+            if( did_lock == 1 )
+            {
+                vlc_mutex_unlock( &PL->object_lock );
+                playlist_mark_locked( p_instance, 0 );
+            }
+            RAISEVOID( "Unable to find item" );
+        }
+
+        playlist_Control( PL, PLAYLIST_VIEWPLAY, VLC_TRUE,
                           PL->status.p_node, p_item );
+        if( did_lock == 1 )
+        {
+            vlc_mutex_unlock( &PL->object_lock );
+            playlist_mark_locked( p_instance, 0 );
+        }
     }
     else
     {
-        playlist_Play( PL );
+        playlist_Control( PL, PLAYLIST_PLAY,
+                          playlist_was_locked( p_instance ) );
     }
 }
 
 void libvlc_playlist_pause( libvlc_instance_t *p_instance,
-                           libvlc_exception_t *p_e )
+                            libvlc_exception_t *p_e )
 {
     assert( PL );
-    if( playlist_Pause( PL ) != VLC_SUCCESS )
+    if( playlist_Control( PL, PLAYLIST_PAUSE,
+                          playlist_was_locked( p_instance ) ) != VLC_SUCCESS )
         RAISEVOID( "Empty playlist" );
 }
 
@@ -74,29 +115,32 @@ void libvlc_playlist_stop( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_e )
 {
     assert( PL );
-    if( playlist_Stop( PL ) != VLC_SUCCESS )
+    if( playlist_Control( PL, PLAYLIST_STOP,
+                          playlist_was_locked( p_instance ) ) != VLC_SUCCESS )
         RAISEVOID( "Empty playlist" );
 }
 
 void libvlc_playlist_clear( libvlc_instance_t *p_instance,
-                           libvlc_exception_t *p_e )
+                            libvlc_exception_t *p_e )
 {
     assert( PL );
-    playlist_Clear( PL, VLC_FALSE );
+    playlist_Clear( PL, playlist_was_locked( p_instance ) );
 }
 
 void libvlc_playlist_next( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_e )
 {
     assert( PL );
-    if( playlist_Next( PL ) != VLC_SUCCESS )
+    if( playlist_Control( PL, PLAYLIST_SKIP, playlist_was_locked( p_instance ),
+                          1 ) != VLC_SUCCESS )
         RAISEVOID( "Empty playlist" );
 }
 
 void libvlc_playlist_prev( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_e )
 {
-    if( playlist_Prev( PL ) != VLC_SUCCESS )
+    if( playlist_Control( PL, PLAYLIST_SKIP, playlist_was_locked( p_instance ),
+                          -1  ) != VLC_SUCCESS )
         RAISEVOID( "Empty playlist" );
 }
 
@@ -113,11 +157,16 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
                                   libvlc_exception_t *p_e )
 {
     assert( PL );
+    if( playlist_was_locked( p_instance ) )
+    {
+        libvlc_exeption_raise( p_e, "You must unlock playlist before "
+                               "calling libvlc_playlist_add" );
+        return VLC_EGENERIC;
+    }
     return playlist_AddExt( PL, psz_uri, psz_name,
                             PLAYLIST_INSERT, PLAYLIST_END, -1, ppsz_options,
-                            i_options, 1 );
+                            i_options, 1, VLC_FALSE );
 }
-
 
 
 int libvlc_playlist_delete_item( libvlc_instance_t *p_instance, int i_id,
@@ -125,7 +174,8 @@ int libvlc_playlist_delete_item( libvlc_instance_t *p_instance, int i_id,
 {
     assert( PL );
 
-    if( playlist_DeleteFromInput( PL, i_id, VLC_FALSE ) )
+    if( playlist_DeleteFromInput( PL, i_id,
+                                  playlist_was_locked( p_instance ) ) )
     {
         libvlc_exception_raise( p_e, "deletion failed" );
         return VLC_ENOITEM;
@@ -144,8 +194,24 @@ int libvlc_playlist_items_count( libvlc_instance_t *p_instance,
                                  libvlc_exception_t *p_e )
 {
     assert( PL );
-    return PL->items.i_size;
+    return playlist_CurrentSize( PL );
 }
+
+void libvlc_playlist_lock( libvlc_instance_t *p_instance )
+{
+    assert( PL );
+    vlc_mutex_lock( &PL->object_lock );
+    p_instance->b_playlist_locked = 1;
+}
+
+void libvlc_playlist_unlock( libvlc_instance_t *p_instance )
+{
+    assert( PL );
+    p_instance->b_playlist_locked = 0;
+    vlc_mutex_unlock( &PL->object_lock );
+}
+
+
 
 libvlc_input_t * libvlc_playlist_get_input( libvlc_instance_t *p_instance,
                                             libvlc_exception_t *p_e )

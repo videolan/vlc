@@ -516,7 +516,8 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                                            p_parent_category,
                                            PLAYLIST_APPEND|PLAYLIST_PREPARSE|
                                            PLAYLIST_NO_REBUILD,
-                                           PLAYLIST_END, NULL, NULL );
+                                           PLAYLIST_END, NULL, NULL,
+                                           VLC_FALSE );
                 }
             }
         }

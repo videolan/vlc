@@ -121,7 +121,7 @@ void OpenDialog::ok()
              playlist_Add( THEPL, psz_utf8, NULL,
                            PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
                            ( i ? PLAYLIST_PREPARSE : 0 ),
-                           PLAYLIST_END, VLC_TRUE );
+                           PLAYLIST_END, VLC_TRUE, VLC_FALSE );
          }
 
     }

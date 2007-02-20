@@ -419,7 +419,7 @@ static int Open( vlc_object_t * p_this )
                         playlist_BothAddInput( p_playlist, p_input,
                                                p_item_in_category,
                                                PLAYLIST_APPEND, PLAYLIST_END,
-                                               NULL, NULL);
+                                               NULL, NULL, VLC_FALSE );
                     }
                 }
                 else

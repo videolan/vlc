@@ -503,7 +503,8 @@ static int GetTracks( access_t *p_access,
         }
 #endif
         playlist_BothAddInput( p_playlist, p_input_item, p_item_in_category,
-                               PLAYLIST_APPEND, PLAYLIST_END, NULL, NULL );
+                               PLAYLIST_APPEND, PLAYLIST_END, NULL, NULL,
+                               VLC_FALSE );
         free( psz_uri ); free( psz_opt ); free( psz_name );
         free( psz_first ); free( psz_last );
     }

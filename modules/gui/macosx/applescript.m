@@ -58,7 +58,7 @@
                                     [[[NSFileManager defaultManager]
                                     displayNameAtPath: o_urlString] UTF8String] );
             playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
-                               PLAYLIST_END, VLC_TRUE );
+                               PLAYLIST_END, VLC_TRUE, VLC_FALSE );
 
 
             o_url = [NSURL fileURLWithPath: o_urlString];

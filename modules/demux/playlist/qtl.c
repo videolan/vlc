@@ -362,7 +362,7 @@ static int Demux( demux_t *p_demux )
         playlist_BothAddInput( p_sys->p_playlist, p_input,
                                p_sys->p_item_in_category,
                                PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                               PLAYLIST_END, NULL, NULL );
+                               PLAYLIST_END, NULL, NULL, VLC_FALSE );
         if( psz_qtnext )
         {
             p_input = input_ItemNewExt( p_sys->p_playlist,
@@ -370,7 +370,7 @@ static int Demux( demux_t *p_demux )
             playlist_BothAddInput( p_sys->p_playlist, p_input,
                                    p_sys->p_item_in_category,
                                    PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                                   PLAYLIST_END, NULL, NULL );
+                                   PLAYLIST_END, NULL, NULL, VLC_FALSE );
         }
     }
 

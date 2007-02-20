@@ -1367,7 +1367,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         {
             msg_rc( "Trying to add %s to playlist.", newval.psz_string );
             playlist_AddInput( p_playlist, p_item,
-                     PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE );
+                     PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
+                     VLC_FALSE );
         }
     }
     else if( !strcmp( psz_cmd, "enqueue" ) &&
@@ -1379,7 +1380,8 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         {
             msg_rc( "trying to enqueue %s to playlist", newval.psz_string );
             playlist_AddInput( p_playlist, p_item,
-                               PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE );
+                               PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
+                               VLC_FALSE);
         }
     }
     else if( !strcmp( psz_cmd, "playlist" ) )

@@ -325,13 +325,13 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                     NULL, PLAYLIST_APPEND ,
                     PLAYLIST_END, -1,
                     (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                    i_options, VLC_TRUE );
+                    i_options, VLC_TRUE, VLC_FALSE );
                 } else {
                   playlist_AddExt( p_playlist, ppsz_argv[i_opt],
                     NULL, PLAYLIST_APPEND | PLAYLIST_GO,
                     PLAYLIST_END, -1,
                     (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                    i_options, VLC_TRUE );
+                    i_options, VLC_TRUE, VLC_FALSE );
                 }
 
                 i_opt += i_options;

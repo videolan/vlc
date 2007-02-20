@@ -368,11 +368,11 @@ VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, int, vlc_bool_t ) );
 VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *, const char * ) );
 
 /******************** Item addition ********************/
-VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, int, int, vlc_bool_t ) );
-VLC_EXPORT( int,  playlist_AddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, const char *const *,int, vlc_bool_t ) );
-VLC_EXPORT( int, playlist_AddInput, ( playlist_t *, input_item_t *,int , int, vlc_bool_t ) );
-VLC_EXPORT( playlist_item_t *, playlist_NodeAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int ) );
-VLC_EXPORT( int, playlist_BothAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int, int*, int* ) );
+VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, int, int, vlc_bool_t, vlc_bool_t ) );
+VLC_EXPORT( int,  playlist_AddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, const char *const *,int, vlc_bool_t, vlc_bool_t ) );
+VLC_EXPORT( int, playlist_AddInput, ( playlist_t *, input_item_t *, int, int, vlc_bool_t, vlc_bool_t ) );
+VLC_EXPORT( playlist_item_t *, playlist_NodeAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int, vlc_bool_t ) );
+VLC_EXPORT( int, playlist_BothAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int, int*, int*, vlc_bool_t ) );
 
 /********************** Misc item operations **********************/
 VLC_EXPORT( playlist_item_t*, playlist_ItemToNode, (playlist_t *,playlist_item_t *, vlc_bool_t) );
@@ -415,7 +415,7 @@ static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
     snprintf( psz_uri, 256+9, "file/://%s", psz_file );
     p_input = input_ItemNewExt( p_playlist, psz_uri, psz_file, 0, NULL, -1 );
     playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, PLAYLIST_END,
-                       VLC_TRUE );
+                       VLC_TRUE, VLC_FALSE );
     input_Read( p_playlist, p_input, VLC_TRUE );
     return VLC_SUCCESS;
 }

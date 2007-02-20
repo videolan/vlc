@@ -167,9 +167,11 @@ static int Open( vlc_object_t *p_this )
                                     p_sys->ppsz_urls[i], 0, NULL, -1 );
         input_ItemAddOption( p_input, "demux=podcast" );
         p_item = playlist_NodeAddInput( p_playlist, p_input, p_sys->p_node_cat,
-                                        PLAYLIST_APPEND, PLAYLIST_END );
+                                        PLAYLIST_APPEND, PLAYLIST_END,
+                                        VLC_FALSE );
         p_item = playlist_NodeAddInput( p_playlist, p_input, p_sys->p_node_one,
-                                        PLAYLIST_APPEND, PLAYLIST_END );
+                                        PLAYLIST_APPEND, PLAYLIST_END,
+                                        VLC_FALSE );
         free( psz_buf );
         p_sys->pp_input[i] = input_CreateThread( p_playlist, p_input );
     }

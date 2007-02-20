@@ -813,13 +813,14 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     }
 
     p_item = playlist_NodeAddInput( pl_Get( p_sd ), p_input, p_child,
-                                    PLAYLIST_APPEND, PLAYLIST_END );
+                                    PLAYLIST_APPEND, PLAYLIST_END, VLC_FALSE );
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
     p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
     p_sap->i_item_id_cat = p_item->i_id;
 
     p_item = playlist_NodeAddInput( pl_Get( p_sd ), p_input,
-                        p_sys->p_node_one, PLAYLIST_APPEND, PLAYLIST_END );
+                        p_sys->p_node_one, PLAYLIST_APPEND, PLAYLIST_END,
+                        VLC_FALSE );
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
     p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
     p_sap->i_item_id_one = p_item->i_id;

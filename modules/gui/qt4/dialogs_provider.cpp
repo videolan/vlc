@@ -239,7 +239,7 @@ void DialogsProvider::addFromSimple( bool pl, bool go)
                                                ( i ? PLAYLIST_PREPARSE : 0 ) )
                          : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
                       PLAYLIST_END,
-                      pl ? VLC_TRUE : VLC_FALSE );
+                      pl ? VLC_TRUE : VLC_FALSE, VLC_FALSE );
         i++;
     }
 }
@@ -319,7 +319,7 @@ static void openDirectory( intf_thread_t* p_intf, bool pl, bool go )
                                                0, NULL, -1 );
     playlist_AddInput( THEPL, p_input,
                        go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
-                       PLAYLIST_END, pl);
+                       PLAYLIST_END, pl, VLC_FALSE );
     input_Read( THEPL, p_input, VLC_FALSE );
 }
 
@@ -354,7 +354,7 @@ void DialogsProvider::streamingDialog()
 
             playlist_AddExt( THEPL, qtu( o->mrl ), "Streaming",
                              PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
-                             -1, &psz_option, 1, VLC_TRUE );
+                             -1, &psz_option, 1, VLC_TRUE, VLC_FALSE );
         }
         delete s;
     }
