@@ -427,7 +427,7 @@ freetype2: freetype-$(FREETYPE2_VERSION).tar.gz
 
 .freetype: freetype2
 ifdef HAVE_CYGWIN
-	(cd $<; CPPFLAGS="$(EXTRA_CPPFLAGS)" CFLAGS="$(EXTRA_CFLAGS)" LDFLAGS="$(EXTRA_LDFLAGS)"  -I$(PREFIX)/include" ./configure --target=$(HOST) --disable-pic --disable-shared --prefix=$(PREFIX) && make && make install)
+	(cd $<; CPPFLAGS="$(EXTRA_CPPFLAGS)" CFLAGS="$(EXTRA_CFLAGS)" LDFLAGS="$(EXTRA_LDFLAGS)" ./configure --target=$(HOST) --disable-pic --disable-shared --prefix=$(PREFIX) && make && make install)
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 endif
@@ -712,7 +712,7 @@ ifneq ($(HOST),$(BUILD))
 	(patch -p0 < Patches/flac-cross.patch && cd $@ && autoconf)
 endif
 
-.flac: flac .ogg 
+.FLAC: flac .ogg 
 ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
 else
@@ -729,7 +729,7 @@ endif
 	$(INSTALL_NAME)
 	touch $@
 
-CLEAN_FILE += .flac
+CLEAN_FILE += .FLAC
 CLEAN_PKG += flac
 DISTCLEAN_PKG += flac-$(FLAC_VERSION).tar.gz
 
