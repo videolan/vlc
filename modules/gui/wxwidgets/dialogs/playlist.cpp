@@ -1316,7 +1316,7 @@ bool PlaylistFileDropTarget::OnDropFiles( wxCoord x, wxCoord y,
         input_item_t *p_input = input_ItemNew( p->p_playlist,
                                               psz_utf8, psz_utf8 );
         playlist_NodeAddInput( p->p_playlist, p_input,
-                               p_dest, PLAYLIST_PREPARSE, i_pos );
+                               p_dest, PLAYLIST_PREPARSE, i_pos, VLC_FALSE );
         wxDnDLocaleFree( psz_utf8 );
     }
 
