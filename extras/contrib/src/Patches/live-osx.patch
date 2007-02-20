@@ -1,20 +1,21 @@
-diff -ruN live.o/Makefile.tail live/Makefile.tail
---- live.o/Makefile.tail	2007-02-20 01:15:46.000000000 +0100
-+++ live/Makefile.tail	2007-02-20 01:16:36.000000000 +0100
-@@ -14,9 +14,7 @@
+diff -ruN live/Makefile.tail live.new/Makefile.tail
+--- live/Makefile.tail	2007-01-17 21:44:27.000000000 +0100
++++ live.new/Makefile.tail	2007-02-20 08:45:20.000000000 +0100
+@@ -17,10 +17,7 @@
  
  ALL =	$(LIVEMEDIA_LIB) \
  	$(GROUPSOCK_LIB) \
 -	$(USAGE_ENVIRONMENT_LIB) \
 -	$(BASIC_USAGE_ENVIRONMENT_LIB) \
--	$(TESTPROGS_APP)
-+	$(BASIC_USAGE_ENVIRONMENT_LIB)
+-	$(TESTPROGS_APP) \
+-	$(MEDIA_SERVER_APP)
++	$(BASIC_USAGE_ENVIRONMENT_LIB) 
  all:	$(ALL)
  
  
-diff -ruN live.o/config.macosx live/config.macosx
---- live.o/config.macosx	2007-02-20 01:15:46.000000000 +0100
-+++ live/config.macosx	2007-02-20 01:17:02.000000000 +0100
+diff -ruN live/config.macosx live.new/config.macosx
+--- live/config.macosx	2007-01-17 21:44:26.000000000 +0100
++++ live.new/config.macosx	2007-02-20 08:43:45.000000000 +0100
 @@ -1,4 +1,4 @@
 -COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t -DHAVE_SOCKADDR_LEN=1
 +COMPILE_OPTS =		$(INCLUDES) -I. $(EXTRA_LDFLAGS) -DBSD=1 -O -DSOCKLEN_T=socklen_t -DHAVE_SOCKADDR_LEN=1
