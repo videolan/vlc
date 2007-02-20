@@ -418,13 +418,8 @@ static inline void __var_DecInteger( vlc_object_t *p_obj, const char *psz_name )
  */
 static inline int __var_CreateGetInteger( vlc_object_t *p_obj, const char *psz_name )
 {
-    vlc_value_t val;
-
     __var_Create( p_obj, psz_name, VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    if( !__var_Get( p_obj, psz_name, &val ) )
-        return val.i_int;
-    else
-        return 0;
+    return __var_GetInteger( p_obj, psz_name );
 }
 
 /**
@@ -435,13 +430,8 @@ static inline int __var_CreateGetInteger( vlc_object_t *p_obj, const char *psz_n
  */
 static inline int __var_CreateGetBool( vlc_object_t *p_obj, const char *psz_name )
 {
-    vlc_value_t val;
-
     __var_Create( p_obj, psz_name, VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    if( !__var_Get( p_obj, psz_name, &val ) )
-        return val.b_bool;
-    else
-        return VLC_FALSE;
+    return __var_GetBool( p_obj, psz_name );
 }
 
 /**
@@ -452,13 +442,8 @@ static inline int __var_CreateGetBool( vlc_object_t *p_obj, const char *psz_name
  */
 static inline int64_t __var_CreateGetTime( vlc_object_t *p_obj, const char *psz_name )
 {
-    vlc_value_t val;
-
     __var_Create( p_obj, psz_name, VLC_VAR_TIME | VLC_VAR_DOINHERIT );
-    if( !__var_Get( p_obj, psz_name, &val ) )
-        return val.i_time;
-    else
-        return 0;
+    return __var_GetTime( p_obj, psz_name );
 }
 
 /**
@@ -469,13 +454,8 @@ static inline int64_t __var_CreateGetTime( vlc_object_t *p_obj, const char *psz_
  */
 static inline float __var_CreateGetFloat( vlc_object_t *p_obj, const char *psz_name )
 {
-    vlc_value_t val;
-
     __var_Create( p_obj, psz_name, VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    if( !__var_Get( p_obj, psz_name, &val ) )
-        return val.f_float;
-    else
-        return 0.0;
+    return __var_GetFloat( p_obj, psz_name );
 }
 
 /**
@@ -484,15 +464,18 @@ static inline float __var_CreateGetFloat( vlc_object_t *p_obj, const char *psz_n
  * \param p_obj The object that holds the variable
  * \param psz_name The name of the variable
  */
-static inline char *__var_CreateGetString( vlc_object_t *p_obj, const char *psz_name )
+static inline char *__var_CreateGetString( vlc_object_t *p_obj,
+                                           const char *psz_name )
 {
-    vlc_value_t val;
-
     __var_Create( p_obj, psz_name, VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    if( !__var_Get( p_obj, psz_name, &val ) )
-        return val.psz_string;
-    else
-        return strdup( "" );
+    return __var_GetString( p_obj, psz_name );
+}
+
+static inline char *__var_CreateGetNonEmptyString( vlc_object_t *p_obj,
+                                                   const char *psz_name )
+{
+    __var_Create( p_obj, psz_name, VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    return __var_GetNonEmptyString( p_obj, psz_name );
 }
 
 /**
@@ -515,6 +498,7 @@ static inline char *__var_CreateGetString( vlc_object_t *p_obj, const char *psz_
  * __var_CreateGetString() with automatic casting
  */
 #define var_CreateGetString(a,b)   __var_CreateGetString( VLC_OBJECT(a),b)
+#define var_CreateGetNonEmptyString(a,b)   __var_CreateGetNonEmptyString( VLC_OBJECT(a),b)
 
 /**
  * @}
