@@ -712,7 +712,7 @@ ifneq ($(HOST),$(BUILD))
 	(patch -p0 < Patches/flac-cross.patch && cd $@ && autoconf)
 endif
 
-.FLAC: flac .ogg 
+.flac: flac .ogg 
 ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
 else
@@ -729,7 +729,7 @@ endif
 	$(INSTALL_NAME)
 	touch $@
 
-CLEAN_FILE += .FLAC
+CLEAN_FILE += .flac
 CLEAN_PKG += flac
 DISTCLEAN_PKG += flac-$(FLAC_VERSION).tar.gz
 
