@@ -874,7 +874,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         return VLC_ENOMEM;
 
     char *subtype = strchr (sdp_proto, ' ');
-    if (sdp_proto == NULL)
+    if (subtype == NULL)
     {
         msg_Dbg (p_obj, "missing SDP media subtype: %s", sdp_proto);
         p_sdp->i_media_type = 0;
@@ -901,7 +901,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     uint8_t flags = 0;
     for (const char *proto = proto_match; *proto;)
     {
-        if (strcasecmp (proto, sdp_proto))
+        if (strcasecmp (proto, sdp_proto) == 0)
         {
             vlc_proto = proto + strlen (proto) + 1;
             flags = vlc_proto[strlen (vlc_proto) + 1];
