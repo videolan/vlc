@@ -188,7 +188,7 @@ static inline vlc_bool_t isDemux( demux_t *p_demux, const char *psz_requested )
 #define POKE( peek, stuff, size ) (strncasecmp( (char *)peek, stuff, size )==0)
 
 #define COMMON_INIT_PACKETIZER( location ) \
-    location = vlc_object_create( p_demux, VLC_OBJECT_DECODER ); \
+    location = vlc_object_create( p_demux, VLC_OBJECT_PACKETIZER ); \
     location->pf_decode_audio = 0; \
     location->pf_decode_video = 0; \
     location->pf_decode_sub = 0; \

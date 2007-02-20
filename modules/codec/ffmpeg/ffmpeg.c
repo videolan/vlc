@@ -306,10 +306,10 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_context->dsp_mask |= FF_MM_SSE2;
     }
 
+    p_dec->b_need_packetized = VLC_TRUE;
     switch( i_cat )
     {
     case VIDEO_ES:
-        p_dec->b_need_packetized = VLC_TRUE;
         p_dec->pf_decode_video = E_(DecodeVideo);
         i_result = E_( InitVideoDec )( p_dec, p_context, p_codec,
                                        i_codec_id, psz_namecodec );
