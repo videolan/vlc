@@ -352,7 +352,14 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         return NULL;
 
     if( p_sys->iconv_handle == (vlc_iconv_t)-1 )
-        EnsureUTF8( psz_subtitle );
+    {
+        if (EnsureUTF8( psz_subtitle ) == NULL)
+        {
+            msg_Err( p_dec, _("failed to convert subtitle encoding.\n"
+                     "Try manually setting a character-encoding "
+                     "before you open the file.") );
+        }
+    }
     else
     {
 
