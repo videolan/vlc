@@ -182,7 +182,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+          (decoder_sys_t *)calloc(1, sizeof(decoder_sys_t)) ) == NULL )
     {
         msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
@@ -198,43 +198,64 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->pp_ssa_styles = NULL;
     p_sys->i_ssa_styles = 0;
 
+    char *psz_charset = NULL;
+    /* First try demux-specified encoding */
     if( p_dec->fmt_in.subs.psz_encoding && *p_dec->fmt_in.subs.psz_encoding )
     {
-        msg_Dbg( p_dec, "using demux suggested character encoding: %s",
-                 p_dec->fmt_in.subs.psz_encoding );
-        if( strcmp( p_dec->fmt_in.subs.psz_encoding, "UTF-8" ) )
-            p_sys->iconv_handle = vlc_iconv_open( "UTF-8", p_dec->fmt_in.subs.psz_encoding );
+        psz_charset = strdup (p_dec->fmt_in.subs.psz_encoding);
+        msg_Dbg (p_dec, "trying demuxer-specified character encoding: %s",
+                 p_dec->fmt_in.subs.psz_encoding ?: "not specified");
     }
-    else
+
+    /* Second, try configured encoding */
+    if (psz_charset == NULL)
     {
-        var_Create( p_dec, "subsdec-encoding",
-                    VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-        var_Get( p_dec, "subsdec-encoding", &val );
-        if( !strcmp( val.psz_string, DEFAULT_NAME ) )
+        psz_charset = var_CreateGetNonEmptyString (p_dec, "subsdec-encoding");
+        if ((psz_charset != NULL) && !strcasecmp (psz_charset, DEFAULT_NAME))
         {
-            const char *psz_charset = GetFallbackEncoding();
+            free (psz_charset);
+            psz_charset = NULL;
+        }
 
-            p_sys->b_autodetect_utf8 = var_CreateGetBool( p_dec,
-                    "subsdec-autodetect-utf8" );
-
-            p_sys->iconv_handle = vlc_iconv_open( "UTF-8", psz_charset );
-            msg_Dbg( p_dec, "using fallback character encoding: %s", psz_charset );
-        }
-        else if( !strcmp( val.psz_string, "UTF-8" ) )
-        {
-            msg_Dbg( p_dec, "using enforced character encoding: UTF-8" );
-        }
-        else if( val.psz_string )
-        {
-            msg_Dbg( p_dec, "using enforced character encoding: %s", val.psz_string );
-            p_sys->iconv_handle = vlc_iconv_open( "UTF-8", val.psz_string );
-            if( p_sys->iconv_handle == (vlc_iconv_t)-1 )
-            {
-                msg_Warn( p_dec, "unable to do requested conversion" );
-            }
-        }
-        if( val.psz_string ) free( val.psz_string );
+        msg_Dbg (p_dec, "trying configured character encoding: %s",
+                 psz_charset ?: "not specified");
     }
+
+    /* Third, try "local" encoding with optional UTF-8 autodetection */
+    if (psz_charset == NULL)
+    {
+        psz_charset = strdup (GetFallbackEncoding ());
+        msg_Dbg (p_dec, "trying default character encoding: %s",
+                 psz_charset ?: "not specified");
+
+        if (var_CreateGetBool (p_dec, "subsdec-autodetect-utf8"))
+        {
+            msg_Dbg (p_dec, "using automatic UTF-8 detection");
+            p_sys->b_autodetect_utf8 = VLC_TRUE;
+        }
+    }
+
+    if (psz_charset == NULL)
+    {
+        psz_charset = strdup ("UTF-8");
+        msg_Dbg (p_dec, "trying hard-coded character encoding: %s",
+                 psz_charset ?: "error");
+    }
+
+    if (psz_charset == NULL)
+    {
+        free (p_sys);
+        return VLC_ENOMEM;
+    }
+
+    if (strcasecmp (psz_charset, "UTF-8") && strcasecmp (psz_charset, "utf8"))
+    {
+        p_sys->iconv_handle = vlc_iconv_open ("UTF-8", psz_charset);
+        if (p_sys->iconv_handle == (vlc_iconv_t)(-1))
+            msg_Err (p_dec, "cannot convert from %s: %s", psz_charset,
+                     strerror (errno));
+    }
+    free (psz_charset);
 
     var_Create( p_dec, "subsdec-align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "subsdec-align", &val );
