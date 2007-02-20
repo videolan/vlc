@@ -33,6 +33,8 @@
 #include <vlc_osd.h>
 #include <vlc_filter.h>
 #include <vlc_charset.h>
+#include <errno.h>
+#include <string.h>
 
 typedef struct
 {
