@@ -48,7 +48,7 @@
     [win setBackgroundColor:[NSColor clearColor]];
     
     /* let the window sit on top of everything else and start out completely transparent */
-    [win setLevel:NSFloatingWindowLevel];
+    [win setLevel:NSModalPanelWindowLevel];
     [win setAlphaValue:0.0];
     i_device = 0;
 
@@ -217,7 +217,6 @@
     {
         b_keptVisible = NO;
         b_fadeQueued = NO;
-        [[self fadeTimer] release];
         [self setFadeTimer: NULL];
         [self fadeIn];
         return;
