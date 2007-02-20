@@ -224,12 +224,12 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
     p_intf( _p_intf ), p_open_dialog( dialog ), p_advanced_dialog( NULL )
 {
     wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
-    module_config_t *p_item = p_module->p_config,
-                    *p_end = p_item + p_module->confsize;
     bool b_advanced = false;
+    int n;
 
-    if( p_item ) do
+    for( n = 0; n < p_module->confsize; n++ )
     {
+        module_config_t *p_item = &p_module->p_config[n];
         if( !(p_item->i_type & CONFIG_HINT) && p_item->b_advanced )
             b_advanced = true;
 
@@ -248,7 +248,6 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
 
         sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
     }
-    while( p_item < p_end && p_item++ );
 
     if( b_advanced )
     {
@@ -284,9 +283,9 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
         sizer->Add( mrl_sizer_sizer, 0, wxEXPAND | wxALL, 2 );
 
         /* Add advanced options to panel */
-        module_config_t *p_item = p_module->p_config;
-        if( p_item ) do
+        for( n = 0; n < p_module->confsize; n++ )
         {
+            module_config_t *p_item = &p_module->p_config[n];
             if( p_item->i_type & CONFIG_HINT || !p_item->b_advanced )
                 continue;
 
@@ -304,7 +303,6 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
 
             sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
         }
-        while( p_item < p_end && p_item++ );
 
         /* Separation */
         wxPanel *dummy_panel = new wxPanel( p_advanced_dialog, -1 );
