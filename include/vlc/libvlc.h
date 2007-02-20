@@ -142,7 +142,7 @@ VLC_PUBLIC_API void libvlc_destroy( libvlc_instance_t *, libvlc_exception_t * );
 typedef struct {
     int i_id;
     char * psz_uri;
-    char * psz_name
+    char * psz_name;
 
 } libvlc_playlist_item_t;
 
