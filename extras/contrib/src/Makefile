@@ -1080,6 +1080,7 @@ endif
 ifdef HAVE_DARWIN_OS
 	patch -p0 < Patches/live-osx.patch
 endif
+	patch -p0 < Patches/live-starttime.patch
 
 .live: live
 ifdef HAVE_WIN32 
@@ -1565,6 +1566,7 @@ libraw1394: libraw1394-$(LIBRAW1394_VERSION).tar.gz
 
 .libraw1394: libraw1394
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make DESTDIR=$(PRFIX) install)
+#	sed 's/^typedef u_int8_t  byte_t;/\/* typedef u_int8_t  byte_t;\*\//'
 	touch $@
 	
 CLEAN_file += .libraw1394
