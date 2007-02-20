@@ -159,7 +159,7 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
     assert( PL );
     if( playlist_was_locked( p_instance ) )
     {
-        libvlc_exeption_raise( p_e, "You must unlock playlist before "
+        libvlc_exception_raise( p_e, "You must unlock playlist before "
                                "calling libvlc_playlist_add" );
         return VLC_EGENERIC;
     }
