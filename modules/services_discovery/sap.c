@@ -1266,7 +1266,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                 expect = 'b';
                 if (cat == 'c')
                 {
-                    struct sdp_media_t *m = p_sdp->mediav + p_sdp->mediac;
+                    struct sdp_media_t *m = p_sdp->mediav + p_sdp->mediac - 1;
                     if (ParseSDPConnection (data, &m->addr, &m->addrlen,
                                             &m->n_addr))
                     {
