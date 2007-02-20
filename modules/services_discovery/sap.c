@@ -1058,6 +1058,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
     memset (&glob_addr, 0, sizeof (glob_addr));
     socklen_t glob_len = 0;
     unsigned glob_count = 1;
+    int port = 0;
 
     /* TODO: use iconv and charset attribute instead of EnsureUTF8 */
     while (*psz_sdp)
@@ -1240,7 +1241,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                     msg_Dbg (p_obj, "missing SDP media port");
                     goto error;
                 }
-                int port = atoi (++data);
+                port = atoi (++data);
                 if (port <= 0 || port >= 65536)
                 {
                     msg_Dbg (p_obj, "invalid transport port %d", port);
@@ -1277,6 +1278,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                                  "%s", data);
                         goto error;
                     }
+                    net_SetPort ((struct sockaddr *)&m->addr, htons (port));
                     break;
                 }
             case 'b':
