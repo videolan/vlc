@@ -277,6 +277,8 @@ struct demux_sys_t
     static inline attribute_t *MakeAttribute (const char *str);
     static const char *GetAttribute (attribute_t **tab, unsigned n, const char *name);
     static inline void FreeAttribute (attribute_t *a);
+    static const char *FindAttribute (const sdp_t *sdp, unsigned media,
+                                      const char *name);
 
     static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 );
     static int InitSocket( services_discovery_t *p_sd, const char *psz_address, int i_port );
@@ -792,9 +794,10 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     }
 
     /* Handle group */
-    psz_value = GetAttribute( p_sap->p_sdp->pp_attributes, p_sap->p_sdp->i_attributes, "x-plgroup" );
-    if( psz_value == NULL )
-        psz_value = GetAttribute( p_sap->p_sdp->pp_attributes, p_sap->p_sdp->i_attributes, "plgroup" );
+    if (p_sap->p_sdp->mediac >= 1)
+        psz_value = FindAttribute (p_sap->p_sdp, 0, "x-plgroup");
+    else
+        psz_value = GetAttribute( p_sap->p_sdp->pp_attributes, p_sap->p_sdp->i_attributes, "x-plgroup" );
 
     if( psz_value != NULL )
     {
