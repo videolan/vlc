@@ -49,7 +49,7 @@
  * Local prototypes
  *****************************************************************************/
 static  int Run  ( input_thread_t *p_input );
-static  int RunAndClean  ( input_thread_t *p_input );
+static  int RunAndDestroy  ( input_thread_t *p_input );
 
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
                                   const char *, vlc_bool_t );
@@ -197,8 +197,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_ConfigVarInit( p_input );
 
     /* Create Objects variables for public Get and Set */
-    if( !p_input->b_preparsing )
-        input_ControlVarInit( p_input );
+    input_ControlVarInit( p_input );
 
     p_input->p->input.i_cr_average = var_GetInteger( p_input, "cr-average" );
 
@@ -254,9 +253,25 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_Control( p_input, INPUT_DEL_INFO, _(VLC_META_INFO_CAT),
                    VLC_META_NOW_PLAYING );     /* ? Don't translate as it might has been copied ? */
 
+    /* */
+    if( p_input->b_preparsing )
+        p_input->i_flags |= OBJECT_FLAGS_QUIET | OBJECT_FLAGS_NOINTERACT;
+
+    /* Attach only once we are ready */
+    vlc_object_attach( p_input, p_parent );
+
     return p_input;
 }
 
+static void Destroy( input_thread_t *p_input )
+{
+    vlc_object_detach( p_input );
+
+    vlc_mutex_destroy( &p_input->p->lock_control );
+    free( p_input->p );
+
+    vlc_object_destroy( p_input );
+}
 /**
  * Initialize an input thread and run it. You will need to monitor the
  * thread to clean up after it is done
@@ -282,18 +297,13 @@ input_thread_t *__input_CreateThread2( vlc_object_t *p_parent,
     if( !p_input )
         return NULL;
 
-    /* Now we can attach our new input */
-    vlc_object_attach( p_input, p_parent );
-
     /* Create thread and wait for its readiness. */
     if( vlc_thread_create( p_input, "input", Run,
                             VLC_THREAD_PRIORITY_INPUT, VLC_TRUE ) )
     {
         input_ChangeState( p_input, ERROR_S );
         msg_Err( p_input, "cannot create input thread" );
-        vlc_object_detach( p_input );
-        free( p_input->p );
-        vlc_object_destroy( p_input );
+        Destroy( p_input );
         return NULL;
     }
 
@@ -318,24 +328,19 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
     if( !p_input )
         return VLC_EGENERIC;
 
-    /* Now we can attach our new input */
-    vlc_object_attach( p_input, p_parent );
-
     if( b_block )
     {
-        RunAndClean( p_input );
+        RunAndDestroy( p_input );
         return VLC_SUCCESS;
     }
     else
     {
-        if( vlc_thread_create( p_input, "input", RunAndClean,
+        if( vlc_thread_create( p_input, "input", RunAndDestroy,
                                VLC_THREAD_PRIORITY_INPUT, VLC_TRUE ) )
         {
             input_ChangeState( p_input, ERROR_S );
             msg_Err( p_input, "cannot create input thread" );
-            vlc_object_detach( p_input );
-	    free( p_input->p );
-            vlc_object_destroy( p_input );
+            Destroy( p_input );
             return VLC_EGENERIC;
         }
     }
@@ -359,23 +364,17 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
     if( !p_input )
         return VLC_EGENERIC;
 
-    p_input->i_flags |= OBJECT_FLAGS_QUIET;
-    p_input->i_flags |= OBJECT_FLAGS_NOINTERACT;
-
-    /* Now we can attach our new input */
-    vlc_object_attach( p_input, p_parent );
-
     Init( p_input );
 
     /* Clean up master */
     InputSourceClean( p_input, &p_input->p->input );
 
+    /* FIXME shouldn't we call End() to ? */
+
     /* Unload all modules */
     if( p_input->p->p_es_out ) input_EsOutDelete( p_input->p->p_es_out );
 
-    vlc_object_detach( p_input );
-    free( p_input->p );
-    vlc_object_destroy( p_input );
+    Destroy( p_input );
 
     return VLC_SUCCESS;
 }
@@ -434,11 +433,8 @@ void input_DestroyThread( input_thread_t *p_input )
     /* Join the thread */
     vlc_thread_join( p_input );
 
-    /* Delete input lock (only after thread joined) */
-    vlc_mutex_destroy( &p_input->p->lock_control );
-
-    /* TODO: maybe input_DestroyThread should also delete p_input instead
-     * of the playlist but I'm not sure if it's possible */
+    /* */
+    Destroy( p_input );
 }
 
 /*****************************************************************************
@@ -498,20 +494,17 @@ static int Run( input_thread_t *p_input )
 }
 
 /*****************************************************************************
- * RunAndClean: main thread loop
+ * RunAndDestroy: main thread loop
  * This is the "just forget me" thread that spawns the input processing chain,
  * reads the stream, cleans up and releases memory
  *****************************************************************************/
-static int RunAndClean( input_thread_t *p_input )
+static int RunAndDestroy( input_thread_t *p_input )
 {
     /* Signal that the thread is launched */
     vlc_thread_ready( p_input );
 
     if( Init( p_input ) )
-    {
-        /* If we failed, just exit */
-        return 0;
-    }
+        goto exit;
 
     MainLoop( p_input );
 
@@ -535,11 +528,9 @@ static int RunAndClean( input_thread_t *p_input )
     /* Clean up */
     End( p_input );
 
+exit:
     /* Release memory */
-    vlc_object_detach( p_input );
-    free( p_input->p );
-    vlc_object_destroy( p_input );
-
+    Destroy( p_input );
     return 0;
 }
 
@@ -1143,14 +1134,11 @@ static void End( input_thread_t * p_input )
 {
     int i;
 
-    msg_Dbg( p_input, "closing input" );
-
     /* We are at the end */
     input_ChangeState( p_input, END_S );
 
     /* Clean control variables */
-    if( !p_input->b_preparsing )
-        input_ControlVarClean( p_input );
+    input_ControlVarClean( p_input );
 
     /* Clean up master */
     InputSourceClean( p_input, &p_input->p->input );

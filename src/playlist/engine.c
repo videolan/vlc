@@ -259,13 +259,6 @@ check_input:
             /* Destroy input */
             input_DestroyThread( p_input );
 
-            /* Unlink current input
-             * (_after_ input_DestroyThread for vout garbage collector) */
-            vlc_object_detach( p_input );
-
-            /* Destroy object */
-            vlc_object_destroy( p_input );
-
             PL_LOCK;
 
             p_playlist->gc_date = mdate();
@@ -389,12 +382,6 @@ void playlist_LastLoop( playlist_t *p_playlist )
 
             /* Destroy input */
             input_DestroyThread( p_input );
-            /* Unlink current input (_after_ input_DestroyThread for vout
-             * garbage collector)*/
-            vlc_object_detach( p_input );
-
-            /* Destroy object */
-            vlc_object_destroy( p_input );
             continue;
         }
         else if( p_playlist->p_input->b_die )

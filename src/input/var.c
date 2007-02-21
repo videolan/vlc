@@ -75,46 +75,49 @@ void input_ControlVarInit ( input_thread_t *p_input )
 {
     vlc_value_t val, text;
 
+    /* XXX we put callback only in non preparsing mode. We need to create the variable
+     * unless someone want to check all var_Get/var_Change return value ... */
+#define ADD_CALLBACK( name, callback ) do { if( !p_input->b_preparsing ) { var_AddCallback( p_input, name, callback, NULL ); } } while(0)
     /* State */
     var_Create( p_input, "state", VLC_VAR_INTEGER );
     val.i_int = p_input->i_state;
     var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
-    var_AddCallback( p_input, "state", StateCallback, NULL );
+    ADD_CALLBACK( "state", StateCallback );
 
     /* Rate */
     var_Create( p_input, "rate", VLC_VAR_INTEGER );
     val.i_int = p_input->p->i_rate;
     var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
-    var_AddCallback( p_input, "rate", RateCallback, NULL );
+    ADD_CALLBACK( "rate", RateCallback );
 
     var_Create( p_input, "rate-slower", VLC_VAR_VOID );
-    var_AddCallback( p_input, "rate-slower", RateCallback, NULL );
+    ADD_CALLBACK( "rate-slower", RateCallback );
 
     var_Create( p_input, "rate-faster", VLC_VAR_VOID );
-    var_AddCallback( p_input, "rate-faster", RateCallback, NULL );
+    ADD_CALLBACK( "rate-faster", RateCallback );
 
     /* Position */
     var_Create( p_input, "position",  VLC_VAR_FLOAT );
     var_Create( p_input, "position-offset",  VLC_VAR_FLOAT );
     val.f_float = 0.0;
     var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
-    var_AddCallback( p_input, "position", PositionCallback, NULL );
-    var_AddCallback( p_input, "position-offset", PositionCallback, NULL );
+    ADD_CALLBACK( "position", PositionCallback );
+    ADD_CALLBACK( "position-offset", PositionCallback );
 
     /* Time */
     var_Create( p_input, "time",  VLC_VAR_TIME );
     var_Create( p_input, "time-offset",  VLC_VAR_TIME );    /* relative */
     val.i_time = 0;
     var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
-    var_AddCallback( p_input, "time", TimeCallback, NULL );
-    var_AddCallback( p_input, "time-offset", TimeCallback, NULL );
+    ADD_CALLBACK( "time", TimeCallback );
+    ADD_CALLBACK( "time-offset", TimeCallback );
 
     /* Bookmark */
     var_Create( p_input, "bookmark", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE |
                 VLC_VAR_ISCOMMAND );
     val.psz_string = _("Bookmark");
     var_Change( p_input, "bookmark", VLC_VAR_SETTEXT, &val, NULL );
-    var_AddCallback( p_input, "bookmark", BookmarkCallback, NULL );
+    ADD_CALLBACK( "bookmark", BookmarkCallback );
 
     /* Program */
     var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE |
@@ -124,7 +127,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
         var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val, NULL );
     text.psz_string = _("Program");
     var_Change( p_input, "program", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_input, "program", ProgramCallback, NULL );
+    ADD_CALLBACK( "program", ProgramCallback );
 
     /* Programs */
     var_Create( p_input, "programs", VLC_VAR_LIST | VLC_VAR_DOINHERIT );
@@ -135,13 +138,13 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Create( p_input, "title", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Title");
     var_Change( p_input, "title", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_input, "title", TitleCallback, NULL );
+    ADD_CALLBACK( "title", TitleCallback );
 
     /* Chapter */
     var_Create( p_input, "chapter", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Chapter");
     var_Change( p_input, "chapter", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_input, "chapter", SeekpointCallback, NULL );
+    ADD_CALLBACK( "chapter", SeekpointCallback );
 
     /* Navigation The callback is added after */
     var_Create( p_input, "navigation", VLC_VAR_VARIABLE | VLC_VAR_HASCHOICE );
@@ -152,29 +155,29 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Create( p_input, "audio-delay", VLC_VAR_TIME );
     val.i_time = 0;
     var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val, NULL );
-    var_AddCallback( p_input, "audio-delay", EsDelayCallback, NULL );
+    ADD_CALLBACK( "audio-delay", EsDelayCallback );
     var_Create( p_input, "spu-delay", VLC_VAR_TIME );
     val.i_time = 0;
     var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
-    var_AddCallback( p_input, "spu-delay", EsDelayCallback, NULL );
+    ADD_CALLBACK( "spu-delay", EsDelayCallback );
 
     /* Video ES */
     var_Create( p_input, "video-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Video Track");
     var_Change( p_input, "video-es", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_input, "video-es", ESCallback, NULL );
+    ADD_CALLBACK( "video-es", ESCallback );
 
     /* Audio ES */
     var_Create( p_input, "audio-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Audio Track");
     var_Change( p_input, "audio-es", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_input, "audio-es", ESCallback, NULL );
+    ADD_CALLBACK( "audio-es", ESCallback );
 
     /* Spu ES */
     var_Create( p_input, "spu-es", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
     text.psz_string = _("Subtitles Track");
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_input, "spu-es", ESCallback, NULL );
+    ADD_CALLBACK( "spu-es", ESCallback );
 
     /* Special read only objects variables for intf */
     var_Create( p_input, "bookmarks", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -183,14 +186,18 @@ void input_ControlVarInit ( input_thread_t *p_input )
     val.i_time = 0;
     var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
 
-    /* Special "intf-change" variable, it allows intf to set up a callback
-     * to be notified of some changes.
-     * TODO list all changes warn by this callbacks */
-    var_Create( p_input, "intf-change", VLC_VAR_BOOL );
-    var_SetBool( p_input, "intf-change", VLC_TRUE );
+    if( !p_input->b_preparsing )
+    {
+        /* Special "intf-change" variable, it allows intf to set up a callback
+         * to be notified of some changes.
+         * TODO list all changes warn by this callbacks */
+        var_Create( p_input, "intf-change", VLC_VAR_BOOL );
+        var_SetBool( p_input, "intf-change", VLC_TRUE );
 
-   /* item-change variable */
-    var_Create( p_input, "item-change", VLC_VAR_INTEGER );
+       /* item-change variable */
+        var_Create( p_input, "item-change", VLC_VAR_INTEGER );
+    }
+#undef ADD_CALLBACK
 }
 
 /*****************************************************************************

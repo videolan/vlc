@@ -200,8 +200,6 @@ static void Close( vlc_object_t *p_this )
         {
             input_StopThread( p_sd->p_sys->pp_input[i] );
             input_DestroyThread( p_sd->p_sys->pp_input[i] );
-            vlc_object_detach( p_sd->p_sys->pp_input[i] );
-            vlc_object_destroy( p_sd->p_sys->pp_input[i] );
             p_sd->p_sys->pp_input[i] = NULL;
         }
     }
@@ -233,8 +231,6 @@ static void Run( services_discovery_t *p_sd )
             {
                 input_StopThread( p_sd->p_sys->pp_input[i] );
                 input_DestroyThread( p_sd->p_sys->pp_input[i] );
-                vlc_object_detach( p_sd->p_sys->pp_input[i] );
-                vlc_object_destroy( p_sd->p_sys->pp_input[i] );
                 p_sd->p_sys->pp_input[i] = NULL;
             }
         }

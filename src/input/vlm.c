@@ -1147,8 +1147,6 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
 
                 input_StopThread( p_input );
                 input_DestroyThread( p_input );
-                vlc_object_detach( p_input );
-                vlc_object_destroy( p_input );
             }
             free( psz_output );
             free( psz_header );
@@ -1241,8 +1239,6 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
         {
             input_StopThread( p_instance->p_input );
             input_DestroyThread( p_instance->p_input );
-            vlc_object_detach( p_instance->p_input );
-            vlc_object_destroy( p_instance->p_input );
         }
 
         asprintf( &psz_header, _("Media: %s"), media->psz_name );
@@ -1362,8 +1358,6 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
         {
             input_StopThread( p_instance->p_input );
             input_DestroyThread( p_instance->p_input );
-            vlc_object_detach( p_instance->p_input );
-            vlc_object_destroy( p_instance->p_input );
         }
 
         input_ItemClean( &p_instance->item );
@@ -2497,8 +2491,6 @@ static int Manage( vlc_object_t* p_object )
 
                 input_StopThread( p_instance->p_input );
                 input_DestroyThread( p_instance->p_input );
-                vlc_object_detach( p_instance->p_input );
-                vlc_object_destroy( p_instance->p_input );
 
                 p_instance->i_index++;
                 if( p_instance->i_index == p_media->i_input &&
