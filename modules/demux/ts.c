@@ -3307,9 +3307,10 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                         break;
                     }
                     pid->es->fmt.i_extra_languages = p_decoded->i_code_count-1;
-                    pid->es->fmt.p_extra_languages =
-                        malloc( sizeof(*pid->es->fmt.p_extra_languages) *
-                                pid->es->fmt.i_extra_languages );
+                    if( pid->es->fmt.i_extra_languages > 0 )
+                        pid->es->fmt.p_extra_languages =
+                            malloc( sizeof(*pid->es->fmt.p_extra_languages) *
+                                    pid->es->fmt.i_extra_languages );
                     for( i = 0; i < pid->es->fmt.i_extra_languages; i++ ) {
                         msg_Dbg( p_demux, "bang" );
                         pid->es->fmt.p_extra_languages[i].psz_language =
