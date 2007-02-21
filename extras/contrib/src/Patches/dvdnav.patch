@@ -341,6 +341,18 @@ diff -ur libdvdnav/src/vm/vm.c libdvdnav.new/src/vm/vm.c
  fi      
 --- libdvdnav/configure.ac	2005-02-11 12:33:19.000000000 +0000
 +++ libdvdnav.new/configure.ac	2005-12-02 15:23:13.921875000 +0000
+@@ -128,7 +128,10 @@
+ AC_TYPE_SIZE_T
+ dnl AC_CHECK_TYPES([ptrdiff_t])
+ AC_C_BIGENDIAN
+-
++dnl ---------------------------------------------
++dnl Check for basic *nix fonction that we may emulate on other OS
++dnl ---------------------------------------------
++AC_CHECK_FUNCS(gettimeofday)
+ dnl ---------------------------------------------
+ dnl threads
+ dnl ---------------------------------------------
 @@ -138,7 +138,7 @@
      THREAD_CFLAGS="-I/usr/local/include -D_THREAD_SAFE"
      CFLAGS="$THREAD_CFLAGS $CFLAGS"
@@ -467,7 +479,7 @@ diff -ur libdvdnav/src/vm/vm.c libdvdnav.new/src/vm/vm.c
  #define pthread_mutex_unlock(a)  LeaveCriticalSection(a)
  #define pthread_mutex_destroy(a)
  
-+#if 0
++#ifndef HAVE_GETIMEOFDAY 
  /* replacement gettimeofday implementation */
  #include <sys/timeb.h>
  static inline int _private_gettimeofday( struct timeval *tv, void *tz )
