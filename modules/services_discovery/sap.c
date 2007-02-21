@@ -205,7 +205,7 @@ struct  sdp_t
 
     /* medias (well, we only support one atm) */
     unsigned            mediac;
-    struct sdp_media_t  mediav[1];
+    struct sdp_media_t *mediav;
 };
 
 struct attribute_t
@@ -847,16 +847,37 @@ static const char *FindAttribute (const sdp_t *sdp, unsigned media,
 /* Fill p_sdp->psz_uri */
 static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
 {
-    if (p_sdp->mediac != 1)
+    if (p_sdp->mediac == 0)
+    {
+        msg_Dbg (p_obj, "Ignoring SDP with no media");
         return VLC_EGENERIC;
+    }
+
+    for (unsigned i = 1; i < p_sdp->mediac; i++)
+    {
+        if ((p_sdp->mediav[i].n_addr != p_sdp->mediav->n_addr)
+         || (p_sdp->mediav[i].addrlen != p_sdp->mediav->addrlen)
+         || memcmp (&p_sdp->mediav[i].addr, &p_sdp->mediav->addr,
+                    p_sdp->mediav->addrlen))
+        {
+            msg_Dbg (p_obj, "Multiple media ports not supported -> live555");
+            return VLC_EGENERIC;
+        }
+    }
+
+    if (p_sdp->mediav->n_addr != 1)
+    {
+        msg_Dbg (p_obj, "Layered encoding not supported -> live555");
+        return VLC_EGENERIC;
+    }
 
     char psz_uri[1026];
     const char *host;
     int port;
 
     psz_uri[0] = '[';
-    if (vlc_getnameinfo ((struct sockaddr *)&(p_sdp->mediav[0].addr),
-                         p_sdp->mediav[0].addrlen, psz_uri + 1,
+    if (vlc_getnameinfo ((struct sockaddr *)&(p_sdp->mediav->addr),
+                         p_sdp->mediav->addrlen, psz_uri + 1,
                          sizeof (psz_uri) - 2, &port, NI_NUMERICHOST))
         return VLC_EGENERIC;
 
@@ -1222,6 +1243,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
 
             /* Media description */
             case 'm':
+            media:
             {
                 expect = 'i';
                 if (cat != 'm')
@@ -1229,8 +1251,16 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                     msg_Dbg (p_obj, "missing SDP media description");
                     goto error;
                 }
-                struct sdp_media_t *m = p_sdp->mediav + p_sdp->mediac;
+                struct sdp_media_t *m;
+                m = realloc (p_sdp->mediav, (p_sdp->mediac + 1) * sizeof (*m));
+                if (m == NULL)
+                    goto error;
 
+                p_sdp->mediav = m;
+                m += p_sdp->mediac;
+                p_sdp->mediac++;
+
+                memset (m, 0, sizeof (*m));
                 memcpy (&m->addr, &glob_addr, m->addrlen = glob_len);
                 m->n_addr = glob_count;
 
@@ -1259,7 +1289,6 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                 if (m->fmt == NULL)
                     goto error;
 
-                p_sdp->mediac++;
                 break;
             }
             case 'i':
@@ -1303,11 +1332,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                 }
 
                 if (cat == 'm')
-                {
-                    /* TODO */
-                    msg_Dbg (p_obj, "multi-media SDP not implemented -> live555");
-                    goto error;
-                }
+                    goto media;
 
                 if (cat != 'm')
                 {
@@ -1401,6 +1426,7 @@ static void FreeSDP( sdp_t *p_sdp )
         for (int i = 0; i < p_sdp->mediav[j].i_attributes; i++)
             FreeAttribute (p_sdp->mediav[j].pp_attributes[i]);
     }
+    free (p_sdp->mediav);
 
     for (int i = 0; i < p_sdp->i_attributes; i++)
         FreeAttribute (p_sdp->pp_attributes[i]);
