@@ -164,8 +164,6 @@ struct httpd_client_t
 
     int     i_ref;
 
-    struct  sockaddr_storage sock;
-    int     i_sock_size;
     int     fd;
 
     int     i_mode;
@@ -1508,9 +1506,7 @@ static void httpd_ClientClean( httpd_client_t *cl )
     }
 }
 
-static httpd_client_t *httpd_ClientNew( int fd, struct sockaddr_storage *sock,
-                                        int i_sock_size,
-                                        tls_session_t *p_tls, mtime_t now )
+static httpd_client_t *httpd_ClientNew( int fd, tls_session_t *p_tls, mtime_t now )
 {
     httpd_client_t *cl = malloc( sizeof( httpd_client_t ) );
 
@@ -1518,8 +1514,6 @@ static httpd_client_t *httpd_ClientNew( int fd, struct sockaddr_storage *sock,
 
     cl->i_ref   = 0;
     cl->fd      = fd;
-    memcpy( &cl->sock, sock, sizeof( cl->sock ) );
-    cl->i_sock_size = i_sock_size;
     cl->url     = NULL;
     cl->p_tls = p_tls;
 
@@ -2443,14 +2437,9 @@ static void httpd_HostThread( httpd_host_t *host )
             if (ufd[nfd].revents == 0)
                 continue;
 
-            struct sockaddr_storage addr;
-            socklen_t addrlen = sizeof (addr);
-
-            int fd = accept (ufd[nfd].fd, (struct sockaddr *)&addr, &addrlen);
+            int fd = net_Accept (host, host->fds, 0);
             if (fd == -1)
                 continue;
-
-            net_SetupSocket (fd);
 
             int i_state = 0;
 
@@ -2474,23 +2463,22 @@ static void httpd_HostThread( httpd_host_t *host )
                         break;
                 }
 
-                if (p_tls == NULL)
+                if ((p_tls == NULL) != (host->p_tls == NULL))
                     break; // wasted TLS session, cannot accept() anymore
             }
 
             httpd_client_t *cl;
-            char ip[NI_MAXNUMERICHOST];
             stats_UpdateInteger( host, host->p_total_counter, 1, NULL );
             stats_UpdateInteger( host, host->p_active_counter, 1, NULL );
-            cl = httpd_ClientNew( fd, &addr, addrlen, p_tls, now );
-            httpd_ClientIP( cl, ip );
-            msg_Dbg( host, "Connection from %s", ip );
+            cl = httpd_ClientNew( fd, p_tls, now );
             p_tls = NULL;
             vlc_mutex_lock( &host->lock );
             TAB_APPEND( host->i_client, host->client, cl );
             vlc_mutex_unlock( &host->lock );
             cl->i_state = i_state; // override state for TLS
-            break; // cannot accept more than one because of TLS
+
+            if (host->p_tls != NULL)
+                break; // cannot accept further without new TLS session
         }
 
         /* now try all others socket */
