@@ -479,7 +479,7 @@ diff -ur libdvdnav/src/vm/vm.c libdvdnav.new/src/vm/vm.c
  #define pthread_mutex_unlock(a)  LeaveCriticalSection(a)
  #define pthread_mutex_destroy(a)
  
-+#ifndef HAVE_GETIMEOFDAY 
++#ifndef HAVE_GETTIMEOFDAY
  /* replacement gettimeofday implementation */
  #include <sys/timeb.h>
  static inline int _private_gettimeofday( struct timeval *tv, void *tz )

@@ -427,7 +427,7 @@ freetype2: freetype-$(FREETYPE2_VERSION).tar.gz
 
 .freetype: freetype2
 ifdef HAVE_CYGWIN
-	(cd $<; CPPFLAGS="$(EXTRA_CPPFLAGS)" CFLAGS="$(EXTRA_CFLAGS)" LDFLAGS="$(EXTRA_LDFLAGS)" ./configure --target=$(HOST) --disable-pic --disable-shared --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --target=$(HOST) --disable-pic --disable-shared --prefix=$(PREFIX) && make && make install)
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 endif
