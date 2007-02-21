@@ -73,7 +73,23 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
     }
     url->psz_buffer = psz_parse = psz_dup = strdup( psz_url );
 
+    /* Search a valid protocol */
     p  = strstr( psz_parse, ":/" );
+    if( p != NULL )
+    {
+        char *p2;
+        for( p2 = psz_parse; p2 < p; p2++ )
+        {
+#define I(i,a,b) ( (a) <= (i) && (i) <= (b) )
+            if( !I(*p2, 'a', 'z' ) && !I(*p2, 'A', 'Z') && !I(*p2, '0', '9') && *p2 != '+' && *p2 != '-' && *p2 != '.' )
+            {
+                p = NULL;
+                break;
+            }
+#undef I
+        }
+    }
+
     if( p != NULL )
     {
         /* we have a protocol */
