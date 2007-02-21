@@ -251,20 +251,9 @@ static void Run( intf_thread_t *p_intf )
 
         /* if a new client wants to communicate */
         fd = net_Accept( p_intf, p_sys->pi_fd, p_sys->i_clients > 0 ? 0 : -1 );
-        if( fd > 0 )
+        if( fd != -1 )
         {
-            telnet_client_t *cl = NULL;
-
-            /* to be non blocking */
-#if defined( WIN32 ) || defined( UNDER_CE )
-            {
-                unsigned long i_dummy = 1;
-                ioctlsocket( fd, FIONBIO, &i_dummy );
-            }
-#else
-            fcntl( fd, F_SETFL, O_NONBLOCK );
-#endif
-            cl = malloc( sizeof( telnet_client_t ));
+            telnet_client_t *cl = malloc( sizeof( telnet_client_t ));
             if( cl )
             {
                 memset( cl, 0, sizeof(telnet_client_t) );
@@ -279,7 +268,7 @@ static void Run( intf_thread_t *p_intf )
             }
             else
             {
-                msg_Err( p_intf, "Out of mem");
+                net_Close( fd );
                 continue;
             }
         }
