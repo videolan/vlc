@@ -299,7 +299,11 @@ net_ReadInner( vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         int delay_ms = dontwait ? 0 : 500;
         if (p_this->b_die)
         {
+#if defined(WIN32) || defined(UNDER_CE)
+            WSASetLastError(WSAEINTR);
+#else
             errno = EINTR;
+#endif
             goto error;
         }
 
