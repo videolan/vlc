@@ -48,6 +48,10 @@
 #   include <fcntl.h>
 #endif
 
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
+
 #if defined( UNDER_CE )
 #   include <winsock.h>
 #elif defined( WIN32 )
@@ -87,7 +91,8 @@ struct httpd_host_t
     /* address/port and socket for listening at connections */
     char        *psz_hostname;
     int         i_port;
-    int         *fd;
+    int         *fds;
+    unsigned     nfd;
 
     /* Statistics */
     counter_t *p_active_counter;
@@ -1131,12 +1136,13 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     vlc_mutex_init( httpd, &host->lock );
     host->i_ref = 1;
 
-    host->fd = net_ListenTCP( p_this, psz_host, i_port );
-    if( host->fd == NULL )
+    host->fds = net_ListenTCP( p_this, psz_host, i_port );
+    if( host->fds == NULL )
     {
         msg_Err( p_this, "cannot create socket(s) for HTTP host" );
         goto error;
     }
+    for (host->nfd = 0; host->fds[host->nfd] != -1; host->nfd++);
 
     host->i_port = i_port;
     host->psz_hostname = psz_host;
@@ -1174,7 +1180,7 @@ error:
 
     if( host != NULL )
     {
-        net_ListenClose( host->fd );
+        net_ListenClose( host->fds );
         vlc_mutex_destroy( &host->lock );
         vlc_object_destroy( host );
     }
@@ -1228,7 +1234,7 @@ void httpd_HostDelete( httpd_host_t *host )
     if( host->p_tls != NULL)
         tls_ServerDelete( host->p_tls );
 
-    net_ListenClose( host->fd );
+    net_ListenClose( host->fds );
     free( host->psz_hostname );
 
     vlc_mutex_destroy( &host->lock );
@@ -2026,16 +2032,6 @@ static void httpd_HostThread( httpd_host_t *host )
 
     while( !host->b_die )
     {
-        struct timeval  timeout;
-        fd_set          fds_read;
-        fd_set          fds_write;
-        /* FIXME: (too) many int variables */
-        int             fd, i_fd;
-        int             i_handle_max = -1;
-        int             i_ret;
-        int             i_client;
-        int             b_low_delay = 0;
-
         if( host->i_url <= 0 )
         {
             /* 0.2s */
@@ -2043,31 +2039,31 @@ static void httpd_HostThread( httpd_host_t *host )
             continue;
         }
 
-        /* built a set of handle to select */
-        FD_ZERO( &fds_read );
-        FD_ZERO( &fds_write );
-
-        for( i_fd = 0; (fd = host->fd[i_fd]) != -1; i_fd++ )
-        {
-            FD_SET( fd, &fds_read );
-            if( fd > i_handle_max )
-                i_handle_max = fd;
-        }
-
         /* prepare a new TLS session */
         if( ( p_tls == NULL ) && ( host->p_tls != NULL ) )
             p_tls = tls_ServerSessionPrepare( host->p_tls );
 
+        struct pollfd ufd[host->nfd + host->i_client];
+        unsigned nfd;
+        for (nfd = 0; nfd < host->nfd; nfd++)
+        {
+            ufd[nfd].fd = host->fds[nfd];
+            ufd[nfd].events = POLLIN;
+            ufd[nfd].revents = 0;
+        }
+
         /* add all socket that should be read/write and close dead connection */
         vlc_mutex_lock( &host->lock );
-        for( i_client = 0; i_client < host->i_client; i_client++ )
+        mtime_t now = mdate();
+        vlc_bool_t b_low_delay = VLC_FALSE;
+
+        for(int i_client = 0; i_client < host->i_client; i_client++ )
         {
             httpd_client_t *cl = host->client[i_client];
-
             if( cl->i_ref < 0 || ( cl->i_ref == 0 &&
                 ( cl->i_state == HTTPD_CLIENT_DEAD ||
                   ( cl->i_activity_timeout > 0 &&
-                    cl->i_activity_date+cl->i_activity_timeout < mdate()) ) ) )
+                    cl->i_activity_date+cl->i_activity_timeout < now) ) ) )
             {
                 httpd_ClientClean( cl );
                 stats_UpdateInteger( host, host->p_active_counter, -1, NULL );
@@ -2076,17 +2072,22 @@ static void httpd_HostThread( httpd_host_t *host )
                 i_client--;
                 continue;
             }
-            else if( ( cl->i_state == HTTPD_CLIENT_RECEIVING )
+
+            struct pollfd *pufd = ufd + nfd;
+            assert (pufd < ufd + (sizeof (ufd) / sizeof (ufd[0])));
+
+            pufd->fd = cl->fd;
+            pufd->events = pufd->revents = 0;
+
+            if( ( cl->i_state == HTTPD_CLIENT_RECEIVING )
                   || ( cl->i_state == HTTPD_CLIENT_TLS_HS_IN ) )
             {
-                FD_SET( cl->fd, &fds_read );
-                i_handle_max = __MAX( i_handle_max, cl->fd );
+                pufd->events = POLLIN;
             }
             else if( ( cl->i_state == HTTPD_CLIENT_SENDING )
                   || ( cl->i_state == HTTPD_CLIENT_TLS_HS_OUT ) )
             {
-                FD_SET( cl->fd, &fds_write );
-                i_handle_max = __MAX( i_handle_max, cl->fd );
+                pufd->events = POLLOUT;
             }
             else if( cl->i_state == HTTPD_CLIENT_RECEIVE_DONE )
             {
@@ -2188,10 +2189,9 @@ static void httpd_HostThread( httpd_host_t *host )
                 {
                     vlc_bool_t b_auth_failed = VLC_FALSE;
                     vlc_bool_t b_hosts_failed = VLC_FALSE;
-                    int i;
 
                     /* Search the url and trigger callbacks */
-                    for( i = 0; i < host->i_url; i++ )
+                    for(int i = 0; i < host->i_url; i++ )
                     {
                         httpd_url_t *url = host->url[i];
 
@@ -2394,7 +2394,7 @@ static void httpd_HostThread( httpd_host_t *host )
                                           &cl->answer, &cl->query );
                 if( cl->answer.i_type != HTTPD_MSG_NONE )
                 {
-                    /* we have new data, so reenter send mode */
+                    /* we have new data, so re-enter send mode */
                     cl->i_buffer      = 0;
                     cl->p_buffer      = cl->answer.p_body;
                     cl->i_buffer_size = cl->answer.i_body;
@@ -2413,117 +2413,103 @@ static void httpd_HostThread( httpd_host_t *host )
             if( cl->i_mode == HTTPD_CLIENT_BIDIR &&
                 cl->i_state == HTTPD_CLIENT_SENDING )
             {
-                FD_SET( cl->fd, &fds_read );
-                i_handle_max = __MAX( i_handle_max, cl->fd );
+                pufd->events |= POLLIN;
             }
+
+            if (pufd->events != 0)
+                nfd++;
         }
         vlc_mutex_unlock( &host->lock );
 
         /* we will wait 100ms or 20ms (not too big 'cause HTTPD_CLIENT_WAITING) */
-        timeout.tv_sec = 0;
-        timeout.tv_usec = b_low_delay ? 20000 : 100000;
-
-        i_ret = select( i_handle_max + 1,
-                        &fds_read, &fds_write, NULL, &timeout );
-
-        if( (i_ret == -1) && (errno != EINTR) )
+        switch (poll (ufd, nfd, b_low_delay ? 20 : 100))
         {
-            msg_Warn( host, "select error: %s", net_strerror( net_errno ) );
-            msleep( 1000 );
-            continue;
-        }
-        else if( i_ret <= 0 )
-        {
-            continue;
+            case -1:
+                if (errno != EINTR)
+                {
+                    /* This is most likely a bug */
+                    msg_Err( host, "polling error: %s", strerror (errno));
+                    msleep( 1000 );
+                }
+            case 0:
+                continue;
         }
 
         /* accept new connections */
-        for( i_fd = 0; (fd = host->fd[i_fd]) != -1; i_fd++ )
+        for (nfd = 0; nfd < host->nfd; nfd++)
         {
-            if( FD_ISSET( fd, &fds_read ) )
+            assert (ufd[nfd].fd == host->fds[nfd]);
+
+            if (ufd[nfd].revents == 0)
+                continue;
+
+            struct sockaddr_storage addr;
+            socklen_t addrlen = sizeof (addr);
+
+            int fd = accept (ufd[nfd].fd, (struct sockaddr *)&addr, &addrlen);
+            if (fd == -1)
+                continue;
+
+            net_SetupSocket (fd);
+
+            int i_state = 0;
+
+            if (p_tls != NULL)
             {
-                socklen_t i_sock_size = sizeof( struct sockaddr_storage );
-                struct  sockaddr_storage sock;
-
-                fd = accept( fd, (struct sockaddr *)&sock, &i_sock_size );
-
-                if( fd >= 0 )
+                switch (tls_ServerSessionHandshake (p_tls, fd))
                 {
-                    int i_state = 1;
-
-                    setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, &i_state, sizeof (i_state));
-                    i_state = 0;
-
-                    /* set this new socket non-block */
-#if defined( WIN32 ) || defined( UNDER_CE )
-                    {
-                        unsigned long i_dummy = 1;
-                        ioctlsocket( fd, FIONBIO, &i_dummy );
-                    }
-#else
-                    fcntl( fd, F_SETFD, FD_CLOEXEC );
-                    {
-                        int i_val = fcntl( fd, F_GETFL );
-                        fcntl( fd, F_SETFL,
-                               O_NONBLOCK | ((i_val != -1) ? i_val : 0) );
-                    }
-
-                    if( fd >= FD_SETSIZE )
-                    {
-                        net_Close( fd );
+                    case -1:
+                        msg_Err( host, "Rejecting TLS connection" );
+                        net_Close (fd);
                         fd = -1;
-                    }
-                    else
-#endif
-                    if( p_tls != NULL)
-                    {
-                        switch ( tls_ServerSessionHandshake( p_tls, fd ) )
-                        {
-                            case -1:
-                                msg_Err( host, "Rejecting TLS connection" );
-                                net_Close( fd );
-                                fd = -1;
-                                p_tls = NULL;
-                                break;
-
-                            case 1: /* missing input - most likely */
-                                i_state = HTTPD_CLIENT_TLS_HS_IN;
-                                break;
-
-                            case 2: /* missing output */
-                                i_state = HTTPD_CLIENT_TLS_HS_OUT;
-                                break;
-                        }
-                    }
-
-                    if( fd >= 0 )
-                    {
-                        httpd_client_t *cl;
-                        char ip[NI_MAXNUMERICHOST];
-                        stats_UpdateInteger( host, host->p_total_counter,
-                                             1, NULL );
-                        stats_UpdateInteger( host, host->p_active_counter,
-                                             1, NULL );
-                        cl = httpd_ClientNew( fd, &sock, i_sock_size, p_tls );
-                        httpd_ClientIP( cl, ip );
-                        msg_Dbg( host, "Connection from %s", ip );
                         p_tls = NULL;
-                        vlc_mutex_lock( &host->lock );
-                        TAB_APPEND( host->i_client, host->client, cl );
-                        vlc_mutex_unlock( &host->lock );
+                        break;
 
-                        if( i_state != 0 )
-                            cl->i_state = i_state; // override state for TLS
-                    }
+                    case 1: /* missing input - most likely */
+                        i_state = HTTPD_CLIENT_TLS_HS_IN;
+                        break;
+
+                    case 2: /* missing output */
+                        i_state = HTTPD_CLIENT_TLS_HS_OUT;
+                        break;
                 }
+
+                if (p_tls == NULL)
+                    break; // wasted TLS session, cannot accept() anymore
             }
+
+            httpd_client_t *cl;
+            char ip[NI_MAXNUMERICHOST];
+            stats_UpdateInteger( host, host->p_total_counter, 1, NULL );
+            stats_UpdateInteger( host, host->p_active_counter, 1, NULL );
+            cl = httpd_ClientNew( fd, &addr, addrlen, p_tls );
+            httpd_ClientIP( cl, ip );
+            msg_Dbg( host, "Connection from %s", ip );
+            p_tls = NULL;
+            vlc_mutex_lock( &host->lock );
+            TAB_APPEND( host->i_client, host->client, cl );
+            vlc_mutex_unlock( &host->lock );
+            cl->i_state = i_state; // override state for TLS
+            break; // cannot accept more than one because of TLS
         }
 
         /* now try all others socket */
         vlc_mutex_lock( &host->lock );
-        for( i_client = 0; i_client < host->i_client; i_client++ )
+
+        for( int i_client = 0; i_client < host->i_client; i_client++ )
         {
             httpd_client_t *cl = host->client[i_client];
+            const struct pollfd *pufd = ufd + nfd;
+
+            assert (pufd < ufd + (sizeof (ufd) / sizeof (ufd[0])));
+
+            if (cl->fd != pufd->fd)
+                continue; // we were not waiting for this client
+            nfd++;
+
+            if (pufd->revents == 0)
+                continue; // no event received
+
             if( cl->i_state == HTTPD_CLIENT_RECEIVING )
             {
                 httpd_ClientRecv( cl );
@@ -2543,7 +2529,7 @@ static void httpd_HostThread( httpd_host_t *host )
 
             if( cl->i_mode == HTTPD_CLIENT_BIDIR &&
                 cl->i_state == HTTPD_CLIENT_SENDING &&
-                FD_ISSET( cl->fd, &fds_read ) )
+                (pufd->revents & POLLIN) )
             {
                 cl->b_read_waiting = VLC_TRUE;
             }
