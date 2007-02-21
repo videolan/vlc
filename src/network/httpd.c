@@ -1453,10 +1453,10 @@ void httpd_MsgAdd( httpd_message_t *msg, const char *name, const char *psz_value
     TAB_APPEND( msg->i_value, msg->value, value );
 }
 
-static void httpd_ClientInit( httpd_client_t *cl )
+static void httpd_ClientInit( httpd_client_t *cl, mtime_t now )
 {
     cl->i_state = HTTPD_CLIENT_RECEIVING;
-    cl->i_activity_date = mdate();
+    cl->i_activity_date = now;
     cl->i_activity_timeout = I64C(10000000);
     cl->i_buffer_size = HTTPD_CL_BUFSIZE;
     cl->i_buffer = 0;
@@ -1510,7 +1510,7 @@ static void httpd_ClientClean( httpd_client_t *cl )
 
 static httpd_client_t *httpd_ClientNew( int fd, struct sockaddr_storage *sock,
                                         int i_sock_size,
-                                        tls_session_t *p_tls )
+                                        tls_session_t *p_tls, mtime_t now )
 {
     httpd_client_t *cl = malloc( sizeof( httpd_client_t ) );
 
@@ -1523,7 +1523,7 @@ static httpd_client_t *httpd_ClientNew( int fd, struct sockaddr_storage *sock,
     cl->url     = NULL;
     cl->p_tls = p_tls;
 
-    httpd_ClientInit( cl );
+    httpd_ClientInit( cl, now );
 
     return cl;
 }
@@ -1850,7 +1850,6 @@ static void httpd_ClientRecv( httpd_client_t *cl )
             cl->i_state = HTTPD_CLIENT_DEAD;
         }
     }
-    cl->i_activity_date = mdate();
 
     /* XXX: for QT I have to disable timeout. Try to find why */
     if( cl->query.i_proto == HTTPD_PROTO_RTSP )
@@ -1933,7 +1932,6 @@ static void httpd_ClientSend( httpd_client_t *cl )
                            cl->i_buffer_size - cl->i_buffer );
     if( i_len >= 0 )
     {
-        cl->i_activity_date = mdate();
         cl->i_buffer += i_len;
 
         if( cl->i_buffer >= cl->i_buffer_size )
@@ -2435,6 +2433,8 @@ static void httpd_HostThread( httpd_host_t *host )
                 continue;
         }
 
+        now = mdate();
+
         /* accept new connections */
         for (nfd = 0; nfd < host->nfd; nfd++)
         {
@@ -2482,7 +2482,7 @@ static void httpd_HostThread( httpd_host_t *host )
             char ip[NI_MAXNUMERICHOST];
             stats_UpdateInteger( host, host->p_total_counter, 1, NULL );
             stats_UpdateInteger( host, host->p_active_counter, 1, NULL );
-            cl = httpd_ClientNew( fd, &addr, addrlen, p_tls );
+            cl = httpd_ClientNew( fd, &addr, addrlen, p_tls, now );
             httpd_ClientIP( cl, ip );
             msg_Dbg( host, "Connection from %s", ip );
             p_tls = NULL;
@@ -2509,6 +2509,8 @@ static void httpd_HostThread( httpd_host_t *host )
 
             if (pufd->revents == 0)
                 continue; // no event received
+
+            cl->i_activity_date = now;
 
             if( cl->i_state == HTTPD_CLIENT_RECEIVING )
             {
