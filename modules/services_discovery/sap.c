@@ -1425,6 +1425,7 @@ static void FreeSDP( sdp_t *p_sdp )
         free (p_sdp->mediav[j].fmt);
         for (int i = 0; i < p_sdp->mediav[j].i_attributes; i++)
             FreeAttribute (p_sdp->mediav[j].pp_attributes[i]);
+        free (p_sdp->mediav[j].pp_attributes);
     }
     free (p_sdp->mediav);
 
