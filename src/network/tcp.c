@@ -40,6 +40,9 @@
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
 
 #include <vlc_network.h>
 #if defined (WIN32) || defined (UNDER_CE)
@@ -272,50 +275,43 @@ int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
 
     while( !p_this->b_die )
     {
-        int maxfd = -1;
-        fd_set readset;
+        unsigned n = 0;
+        while (pi_fd[n] != -1)
+            n++;
+        struct pollfd ufd[n];
 
         /* Initialize file descriptor set */
-        FD_ZERO (&readset);
-
-        int *pi_end = pi_fd;
-        for (const int *pi = pi_fd; *pi != -1; pi++)
+        for (unsigned i = 0; i < n; i++)
         {
-            int fd = *pi;
-
-            if (fd > maxfd)
-                maxfd = fd;
-
-            FD_SET (fd, &readset);
-            pi_end++;
+            ufd[i].fd = pi_fd[i];
+            ufd[i].events = POLLIN;
+            ufd[i].revents = 0;
         }
 
-        struct timeval tv = { 0, b_block ? 500000 : i_wait };
-
-        int val = select (maxfd + 1, &readset, NULL, NULL, &tv);
-        if (val == 0)
+        switch (poll (ufd, n, b_block ? 500 : i_wait))
         {
-            if (b_block)
-                continue;
-            return -1;
+            case -1:
+                if (net_errno != EINTR)
+                {
+                    msg_Err (p_this, "poll error: %s",
+                             net_strerror (net_errno));
+                }
+                return -1;
+
+            case 0:
+                if (b_block)
+                    continue;
+                return -1;
         }
-        if (val < 0)
-        {
-            if (net_errno != EINTR)
-                msg_Err( p_this, "network select error (%s)",
-                        net_strerror( net_errno ) );
-            return -1;
-        }
 
-        for (const int *pi = pi_fd; *pi != -1; pi++)
+        for (unsigned i = 0; i < n; i++)
         {
-            int fd = *pi;
-
-            if (!FD_ISSET (fd, &readset))
+            if (ufd[i].revents == 0)
                 continue;
 
-            fd = accept (fd, NULL, 0);
-            if (fd < 0)
+            int sfd = ufd[i].fd;
+            int fd = accept (sfd, NULL, NULL);
+            if (fd == -1)
             {
                 msg_Err (p_this, "accept failed (%s)",
                          net_strerror (net_errno));
@@ -324,13 +320,12 @@ int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
             net_SetupSocket (fd);
 
             /*
-             * This round-robin trick ensures that the first sockets in
-             * pi_fd won't prevent the last ones from getting accept'ed.
+             * Move listening socket to the end to let the others in the
+             * set a chance next time.
              */
-            --pi_end;
-            memmove (pi_fd, pi_fd + 1, pi_end - pi_fd);
-            *pi_end = *pi;
-            msg_Dbg (p_this, "accepted socket %d (from socket %d)", fd, *pi);
+            memmove (pi_fd + i, pi_fd + i + 1, n - (i + 1));
+            pi_fd[n - 1] = sfd;
+            msg_Dbg (p_this, "accepted socket %d (from socket %d)", fd, sfd);
             return fd;
         }
     }
