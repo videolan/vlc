@@ -67,6 +67,20 @@
 extern int rootwrap_bind (int family, int socktype, int protocol,
                           const struct sockaddr *addr, size_t alen);
 
+int net_SetupSocket (int fd)
+{
+#if defined (WIN32) || defined (UNDER_CE)
+    ioctlsocket (fd, FIONBIO, &(unsigned long){ 1 });
+#else
+    fcntl (fd, F_SETFD, FD_CLOEXEC);
+    fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
+#endif
+
+    setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
+    return 0;
+}
+
+
 int net_Socket (vlc_object_t *p_this, int family, int socktype,
                 int protocol)
 {
@@ -79,14 +93,7 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
         return -1;
     }
 
-#if defined (WIN32) || defined (UNDER_CE)
-    ioctlsocket (fd, FIONBIO, &(unsigned long){ 1 });
-#else
-    fcntl (fd, F_SETFD, FD_CLOEXEC);
-    fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
-#endif
-
-    setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
+    net_SetupSocket (fd);
 
 #ifdef IPV6_V6ONLY
     /*

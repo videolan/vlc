@@ -69,6 +69,7 @@ extern "C" {
 
 /* Portable networking layer communication */
 int net_Socket (vlc_object_t *obj, int family, int socktype, int proto);
+int net_SetupSocket (int fd);
 
 #define net_Connect(a, b, c, d, e) __net_Connect(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( int, __net_Connect, (vlc_object_t *p_this, const char *psz_host, int i_port, int socktype, int protocol) );

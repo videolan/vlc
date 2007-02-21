@@ -321,13 +321,7 @@ int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
                          net_strerror (net_errno));
                 continue;
             }
-            setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
-#if defined (WIN32) || defined (UNDER_CE)
-            ioctlsocket (fd, FIONBIO, &(unsigned long){ 1 });
-#else
-            fcntl (fd, F_SETFD, FD_CLOEXEC);
-            fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
-#endif
+            net_SetupSocket (fd);
 
             /*
              * This round-robin trick ensures that the first sockets in
