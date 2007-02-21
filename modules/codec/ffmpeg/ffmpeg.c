@@ -944,7 +944,6 @@ static struct
       VIDEO_ES, "VMware Video" },
 #endif
 
-
     /*
      *  Image codecs
      */
@@ -1094,6 +1093,13 @@ static struct
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(16<<8)+0)
     { VLC_FOURCC('w','v','p','k'), CODEC_ID_WAVPACK,
       AUDIO_ES, "WavPack" },
+#endif
+
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(34<<8)+0)
+    { VLC_FOURCC('g','s','m',' '), CODEC_ID_GSM,
+      AUDIO_ES, "GSM Audio" },
+    { VLC_FOURCC('g','s','m','s'), CODEC_ID_GSM_MS,
+      AUDIO_ES, "Microsoft GSM Audio" },
 #endif
 
     /* PCM */
