@@ -1228,7 +1228,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
             TAB_APPEND( media->i_instance, media->instance, p_instance );
         }
 
-        if( ( psz_args && sscanf(psz_args, "%d", &i) == 1 ) && && i > 0 && i-1 < media->i_input )
+        if( ( psz_args && sscanf(psz_args, "%d", &i) == 1 ) && i > 0 && i-1 < media->i_input )
         {
             p_instance->i_index = i-1;
         }
