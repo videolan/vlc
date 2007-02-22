@@ -2210,31 +2210,35 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
 }
 
 static vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
-                     playlist_item_t **pp_item )
+                            playlist_item_t **pp_item )
 {
-     vlc_bool_t b_play = var_CreateGetBool( p_demux, "playlist-autostart" );
+    input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+    vlc_bool_t b_play = var_CreateGetBool( p_demux, "playlist-autostart" );
 
-     if( b_play && p_playlist->status.p_item &&
-             p_playlist->status.p_item->p_input ==
-                input_GetItem((input_thread_t *)p_demux->p_parent))
-     {
-         msg_Dbg( p_playlist, "starting playlist playback" );
-         *pp_item = p_playlist->status.p_item;
-         b_play = VLC_TRUE;
-     }
-     else
-     {
-         input_item_t *p_current = input_GetItem(
-                                    (input_thread_t*)p_demux->p_parent);
-         *pp_item = playlist_ItemGetByInput( p_playlist, p_current, VLC_FALSE );
-         if( !*pp_item )
-         {
-             msg_Dbg( p_playlist, "unable to find item in playlist");
-         }
-         msg_Dbg( p_playlist, "not starting playlist playback");
-         b_play = VLC_FALSE;
-     }
-     return b_play;
+    *pp_item = NULL;
+    if( p_input )
+    {
+        if( b_play && p_playlist->status.p_item &&
+            p_playlist->status.p_item->p_input == input_GetItem(p_input) )
+        {
+            msg_Dbg( p_playlist, "starting playlist playback" );
+            *pp_item = p_playlist->status.p_item;
+            b_play = VLC_TRUE;
+        }
+        else
+        {
+            input_item_t *p_current = input_GetItem( p_input );
+
+            *pp_item = playlist_ItemGetByInput( p_playlist, p_current, VLC_FALSE );
+            if( !*pp_item )
+                msg_Dbg( p_playlist, "unable to find item in playlist");
+
+            msg_Dbg( p_playlist, "not starting playlist playback");
+            b_play = VLC_FALSE;
+        }
+        vlc_object_release( p_input );
+    }
+    return b_play;
 }
 
 
