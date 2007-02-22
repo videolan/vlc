@@ -1629,7 +1629,7 @@ if test "${enable_live555}" != "no"; then
     AC_MSG_WARN(--with-livedotcom-tree is deprecated. Use --with-live555-tree instead.)
   with_live555_tree="${with_livedotcom_tree}"
   fi
-  
+
   if test -z "${with_live555_tree}" -a "${CXX}" != ""; then
     AC_LANG_PUSH(C++)
     CPPFLAGS_save="${CPPFLAGS}"
@@ -5383,13 +5383,19 @@ then
            # include <npapi.h>
            #endif
           ])
-        if test "${MOZILLA_CONFIG_HEADERS}" = "0"; then
+        if test "${MOZILLA_REQUIRED_HEADERS}" = "0"; then
             AC_MSG_ERROR([Please install the Firefox development tools; mozilla-config.h, plugin/npapi.h and plugin/npruntime.h were not found.])
         fi
         MOZILLA_REQUIRED_HEADERS=
         mozilla=:
         firefox_include=`pkg-config --variable=includedir firefox-plugin`
-        MOZILLA_CONFIG_H="${firefox_include}/mozilla-config.h"
+        if test -f "${firefox_include}/mozilla-config.h" -a -f "${firefox_include}/mozilla-config32.h"; then
+            MOZILLA_CONFIG_H="${firefox_include}/mozilla-config32.h"
+        elif test -f "${firefox_include}/mozilla-config.h" -a -f "${firefox_include}/mozilla-config64.h"; then
+            MOZILLA_CONFIG_H="${firefox_include}/mozilla-config64.h"
+        else
+            MOZILLA_CONFIG_H="${firefox_include}/mozilla-config.h"
+        fi
         if grep '^#define MOZ_X11 1' ${MOZILLA_CONFIG_H} 2>&1 > /dev/null ; then
             VLC_ADD_LDFLAGS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt])
         fi
