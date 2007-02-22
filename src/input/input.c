@@ -365,14 +365,7 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
         return VLC_EGENERIC;
 
     Init( p_input );
-
-    /* Clean up master */
-    InputSourceClean( p_input, &p_input->p->input );
-
-    /* FIXME shouldn't we call End() to ? */
-
-    /* Unload all modules */
-    if( p_input->p->p_es_out ) input_EsOutDelete( p_input->p->p_es_out );
+    End( p_input );
 
     Destroy( p_input );
 
@@ -1155,54 +1148,57 @@ static void End( input_thread_t * p_input )
     if( p_input->p->p_es_out )
         input_EsOutDelete( p_input->p->p_es_out );
 
+    if( !p_input->b_preparsing )
+    {
 #define CL_CO( c ) stats_CounterClean( p_input->p->counters.p_##c ); p_input->p->counters.p_##c = NULL;
-    if( p_input->p_libvlc->b_stats )
-    {
-        /* make sure we are up to date */
-        stats_ComputeInputStats( p_input, p_input->p->input.p_item->p_stats );
-        if( p_input->p_libvlc->p_playlist->p_stats_computer == p_input )
+        if( p_input->p_libvlc->b_stats )
         {
-            stats_ComputeGlobalStats( p_input->p_libvlc->p_playlist,
-                                      p_input->p_libvlc->p_playlist->p_stats );
-            p_input->p_libvlc->p_playlist->p_stats_computer = NULL;
+            /* make sure we are up to date */
+            stats_ComputeInputStats( p_input, p_input->p->input.p_item->p_stats );
+            if( p_input->p_libvlc->p_playlist->p_stats_computer == p_input )
+            {
+                stats_ComputeGlobalStats( p_input->p_libvlc->p_playlist,
+                                          p_input->p_libvlc->p_playlist->p_stats );
+                p_input->p_libvlc->p_playlist->p_stats_computer = NULL;
+            }
+            CL_CO( read_bytes );
+            CL_CO( read_packets );
+            CL_CO( demux_read );
+            CL_CO( input_bitrate );
+            CL_CO( demux_bitrate );
+            CL_CO( played_abuffers );
+            CL_CO( lost_abuffers );
+            CL_CO( displayed_pictures );
+            CL_CO( lost_pictures );
+            CL_CO( decoded_audio) ;
+            CL_CO( decoded_video );
+            CL_CO( decoded_sub) ;
         }
-        CL_CO( read_bytes );
-        CL_CO( read_packets );
-        CL_CO( demux_read );
-        CL_CO( input_bitrate );
-        CL_CO( demux_bitrate );
-        CL_CO( played_abuffers );
-        CL_CO( lost_abuffers );
-        CL_CO( displayed_pictures );
-        CL_CO( lost_pictures );
-        CL_CO( decoded_audio) ;
-        CL_CO( decoded_video );
-        CL_CO( decoded_sub) ;
-    }
 
-    /* Close optional stream output instance */
-    if( p_input->p->p_sout )
-    {
-        vlc_value_t keep;
-
-        CL_CO( sout_sent_packets );
-        CL_CO( sout_sent_bytes );
-        CL_CO( sout_send_bitrate );
-
-        if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool )
+        /* Close optional stream output instance */
+        if( p_input->p->p_sout )
         {
-            /* attach sout to the playlist */
-            msg_Dbg( p_input, "keeping sout" );
-            vlc_object_detach( p_input->p->p_sout );
-            vlc_object_attach( p_input->p->p_sout, p_input->p_libvlc->p_playlist );
+            vlc_value_t keep;
+
+            CL_CO( sout_sent_packets );
+            CL_CO( sout_sent_bytes );
+            CL_CO( sout_send_bitrate );
+
+            if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool )
+            {
+                /* attach sout to the playlist */
+                msg_Dbg( p_input, "keeping sout" );
+                vlc_object_detach( p_input->p->p_sout );
+                vlc_object_attach( p_input->p->p_sout, p_input->p_libvlc->p_playlist );
+            }
+            else
+            {
+                msg_Dbg( p_input, "destroying sout" );
+                sout_DeleteInstance( p_input->p->p_sout );
+            }
         }
-        else
-        {
-            msg_Dbg( p_input, "destroying sout" );
-            sout_DeleteInstance( p_input->p->p_sout );
-        }
-    }
 #undef CL_CO
+    }
 
     vlc_mutex_destroy( &p_input->p->counters.counters_lock );
 
