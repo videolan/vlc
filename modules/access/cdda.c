@@ -141,10 +141,6 @@ static int Open( vlc_object_t *p_this )
     vcddev_t *vcddev;
     char *psz_name;
     int i_mrl_tracknum = -1;
-
-    input_thread_t *p_input;
-    playlist_item_t *p_item = NULL;
-    playlist_t *p_playlist  = NULL;
     int i_ret;
 
     if( !p_access->psz_path || !*p_access->psz_path )
@@ -179,36 +175,38 @@ static int Open( vlc_object_t *p_this )
     STANDARD_BLOCK_ACCESS_INIT
     p_sys->vcddev = vcddev;
 
-    /* We only do separate items if the whole disc is requested -
-     *  Dirty hack we access some private data ! */
-    p_input = (input_thread_t *)( p_access->p_parent );
-
    /* Do we play a single track ? */
    p_sys->i_track = var_CreateGetInteger( p_access, "cdda-track" );
 
    if( p_sys->i_track < 0 && i_mrl_tracknum <= 0 )
    {
-        p_playlist = pl_Yield( p_access );
-        if( p_playlist->status.p_item->p_input ==
-             input_GetItem( (input_thread_t *)p_access->p_parent))
-            p_item = p_playlist->status.p_item;
-        else
+        /* We only do separate items if the whole disc is requested */
+        playlist_t *p_playlist = pl_Yield( p_access );
+
+        i_ret = -1;
+        if( p_playlist )
         {
-            input_item_t *p_current = input_GetItem(
-                                        (input_thread_t*)p_access->p_parent);
-            p_item = playlist_ItemGetByInput( p_playlist, p_current, VLC_FALSE );
-
-            if( !p_item )
+            input_thread_t *p_input = (input_thread_t*)vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
+            if( p_input )
             {
-                msg_Dbg( p_playlist, "unable to find item in playlist");
-                return -1;
+                input_item_t *p_current = input_GetItem( p_input );
+                playlist_item_t *p_item;
+
+                if( p_playlist->status.p_item->p_input == p_current )
+                    p_item = p_playlist->status.p_item;
+                else
+                    p_item = playlist_ItemGetByInput( p_playlist, p_current, VLC_FALSE );
+
+                if( p_item )
+                    i_ret = GetTracks( p_access, p_playlist, p_item );
+                else
+                    msg_Dbg( p_playlist, "unable to find item in playlist");
+                vlc_object_release( p_input );
             }
+            vlc_object_release( p_playlist );
         }
-
-        i_ret = GetTracks( p_access, p_playlist, p_item );
-
-        if( p_playlist ) vlc_object_release( p_playlist );
-        if( i_ret < 0 ) goto error;
+        if( i_ret < 0 )
+            goto error;
     }
     else
     {
@@ -261,7 +259,6 @@ static int Open( vlc_object_t *p_this )
 error:
     ioctl_Close( VLC_OBJECT(p_access), p_sys->vcddev );
     free( p_sys );
-    if( p_playlist ) vlc_object_release( p_playlist );
     return VLC_EGENERIC;
 }
 

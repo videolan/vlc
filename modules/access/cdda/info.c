@@ -937,19 +937,19 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
     CDDAMetaInfoInit( p_access );
     CDDAMetaInfo( p_access, p_cdda->i_track );
 
-    if (p_playlist) {
+    if( p_playlist )
+    {
+        input_thread_t *p_input = (input_thread_t*)vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
+        if( p_input )
+        {
+            p_item = playlist_ItemGetByInput( p_playlist, input_GetItem(p_input), VLC_FALSE );
 
-      p_item = playlist_ItemGetByInput( p_playlist,
-                        input_GetItem(((input_thread_t *)p_access->p_parent)), VLC_FALSE );
-
-      if( p_item == p_playlist->status.p_item && !b_single_track )
-	{
-	  b_play = VLC_TRUE;
-	}
-      else
-	{
-	  b_play = VLC_FALSE;
-	}
+            if( p_item == p_playlist->status.p_item && !b_single_track )
+                b_play = VLC_TRUE;
+            else
+                b_play = VLC_FALSE;
+            vlc_object_release( p_input );
+        }
     }
 
     if( b_single_track && !p_cdda->b_nav_mode )

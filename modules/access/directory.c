@@ -195,22 +195,32 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
         return VLC_ENOMEM;
 
     playlist_t         *p_playlist = pl_Yield( p_access );
-    playlist_item_t    *p_item_in_category;
-    input_item_t       *p_current_input = input_GetItem(
-                                    (input_thread_t*)p_access->p_parent);
-    playlist_item_t    *p_current = playlist_ItemGetByInput( p_playlist,
-                                                             p_current_input,
-                                                             VLC_FALSE );
+    input_thread_t     *p_input = (input_thread_t*)vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
 
-    if( p_current == NULL )
+    playlist_item_t    *p_item_in_category;
+    input_item_t       *p_current_input;
+    playlist_item_t    *p_current;
+
+    if( !p_input )
+    {
+        msg_Err( p_access, "unable to find input (internal error)" );
+        vlc_object_release( p_playlist );
+        return VLC_ENOOBJ;
+    }
+
+    p_current_input = input_GetItem( p_input );
+    p_current = playlist_ItemGetByInput( p_playlist, p_current_input, VLC_FALSE );
+
+    if( !p_current )
     {
         msg_Err( p_access, "unable to find item in playlist" );
+        vlc_object_release( p_input );
         vlc_object_release( p_playlist );
         return VLC_ENOOBJ;
     }
 
     /* Remove the ending '/' char */
-    if (psz_name[0])
+    if( psz_name[0] )
     {
         char *ptr = psz_name + strlen (psz_name);
         switch (*--ptr)
@@ -249,6 +259,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     playlist_Signal( p_playlist );
 
     if( psz_name ) free( psz_name );
+    vlc_object_release( p_input );
     vlc_object_release( p_playlist );
 
     /* Return fake data forever */
