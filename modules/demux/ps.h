@@ -106,18 +106,6 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
             return VLC_EGENERIC;
         }
     }
-    else if( (i_id&0xff00) == 0xfd00 )
-    {
-        if( i_id>=0x55 && i_id<=0x5f )
-        {
-            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('v','c','1',' ') );
-        }
-        else
-        {
-            es_format_Init( &tk->fmt, UNKNOWN_ES, 0 );
-            return VLC_EGENERIC;
-        }
-    }
     else
     {
         int i_type = ps_id_to_type( p_psm , i_id );
