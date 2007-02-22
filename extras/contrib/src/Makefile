@@ -1081,6 +1081,7 @@ ifdef HAVE_DARWIN_OS
 	patch -p0 < Patches/live-osx.patch
 endif
 	patch -p0 < Patches/live-starttime.patch
+	patch -p0 < Patches/live-config.patch
 
 .live: live
 ifdef HAVE_WIN32 

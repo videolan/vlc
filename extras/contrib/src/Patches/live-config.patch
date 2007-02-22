@@ -1,0 +1,101 @@
+diff -x Makefile -uN live/config.armlinux live.new/config.armlinux
+--- live/config.armlinux	2007-02-20 12:33:45.000000000 +0100
++++ live.new/config.armlinux	2007-02-22 09:34:34.000000000 +0100
+@@ -1,5 +1,5 @@
+ CROSS_COMPILE=		arm-elf-
+-COMPILE_OPTS =		$(INCLUDES) -I. -O2 -DSOCKLEN_T=socklen_t -DNO_STRSTREAM=1 -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64
++COMPILE_OPTS =		$(INCLUDES) -I. -O2 -DSOCKLEN_T=socklen_t -DNO_STRSTREAM=1 -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -DUSE_SYSTEM_RANDOM=1
+ C =			c
+ C_COMPILER =		$(CROSS_COMPILE)gcc
+ C_FLAGS =		$(COMPILE_OPTS)
+diff -x Makefile -uN live/config.cygwin live.new/config.cygwin
+--- live/config.cygwin	2007-02-20 12:33:45.000000000 +0100
++++ live.new/config.cygwin	2007-02-22 09:32:20.000000000 +0100
+@@ -1,4 +1,4 @@
+-COMPILE_OPTS =		$(INCLUDES) -I. -O -DSOCKLEN_T=socklen_t
++COMPILE_OPTS =		$(INCLUDES) -I. -O -DSOCKLEN_T=socklen_t -DUSE_SYSTEM_RANDOM=1
+ C =			c
+ C_COMPILER =		gcc
+ C_FLAGS =		$(COMPILE_OPTS) -DUSE_OUR_BZERO=1 -D__CYGWIN__
+diff -x Makefile -uN live/config.freebsd live.new/config.freebsd
+--- live/config.freebsd	2007-02-20 12:33:45.000000000 +0100
++++ live.new/config.freebsd	2007-02-22 09:32:06.000000000 +0100
+@@ -1,4 +1,4 @@
+-COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t -DHAVE_SOCKADDR_LEN=1
++COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t -DHAVE_SOCKADDR_LEN=1 -DUSE_SYSTEM_RANDOM=1
+ C =			c
+ C_COMPILER =		cc
+ C_FLAGS =		$(COMPILE_OPTS)
+diff -x Makefile -uN live/config.linux live.new/config.linux
+--- live/config.linux	2007-02-20 12:33:45.000000000 +0100
++++ live.new/config.linux	2007-02-22 09:31:24.000000000 +0100
+@@ -1,4 +1,4 @@
+-COMPILE_OPTS =		$(INCLUDES) -I. -O2 -DSOCKLEN_T=socklen_t -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64
++COMPILE_OPTS =		$(INCLUDES) -I. -O2 -DSOCKLEN_T=socklen_t -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -DUSE_SYSTEM_RANDOM=1
+ C =			c
+ C_COMPILER =		cc
+ C_FLAGS =		$(COMPILE_OPTS)
+diff -x Makefile -uN live/config.linux-gdb live.new/config.linux-gdb
+--- live/config.linux-gdb	2007-02-20 12:33:45.000000000 +0100
++++ live.new/config.linux-gdb	2007-02-22 09:09:55.000000000 +0100
+@@ -1,4 +1,4 @@
+-COMPILE_OPTS =		$(INCLUDES) -I. -O -DSOCKLEN_T=socklen_t -g -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64
++COMPILE_OPTS =		$(INCLUDES) -I. -O -DSOCKLEN_T=socklen_t -g -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -DUSE_SYSTEM_RANDOM=1
+ C =			c
+ C_COMPILER =		cc
+ C_FLAGS =		$(COMPILE_OPTS)
+diff -x Makefile -uN live/config.macosx live.new/config.macosx
+--- live/config.macosx	2007-02-20 12:33:45.000000000 +0100
++++ live.new/config.macosx	2007-02-22 09:10:07.000000000 +0100
+@@ -1,4 +1,4 @@
+-COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t -DHAVE_SOCKADDR_LEN=1
++COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t -DHAVE_SOCKADDR_LEN=1 -DUSE_SYSTEM_RANDOM=1
+ C =			c
+ C_COMPILER =		cc
+ C_FLAGS =		$(COMPILE_OPTS)
+diff -x Makefile -uN live/config.macosx-before-version-10.4 live.new/config.macosx-before-version-10.4
+--- live/config.macosx-before-version-10.4	2007-02-20 12:33:45.000000000 +0100
++++ live.new/config.macosx-before-version-10.4	2007-02-22 09:10:30.000000000 +0100
+@@ -1,4 +1,4 @@
+-COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=int
++COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=int -DUSE_SYSTEM_RANDOM=1
+ C =			c
+ C_COMPILER =		cc
+ C_FLAGS =		$(COMPILE_OPTS)
+diff -x Makefile -uN live/config.mingw live.new/config.mingw
+--- live/config.mingw	2007-02-20 12:33:45.000000000 +0100
++++ live.new/config.mingw	2007-02-22 09:10:48.000000000 +0100
+@@ -1,4 +1,4 @@
+-COMPILE_OPTS =         $(INCLUDES) -I. -O -DSOCKLEN_T=int
++COMPILE_OPTS =         $(INCLUDES) -I. -O -DSOCKLEN_T=int -DUSE_SYSTEM_RANDOM=1
+ C =                    c
+ C_COMPILER =           gcc
+ C_FLAGS =              $(COMPILE_OPTS) -DUSE_OUR_BZERO=1 -D__MINGW32__
+diff -x Makefile -uN live/config.openbsd live.new/config.openbsd
+--- live/config.openbsd	2007-02-20 12:33:45.000000000 +0100
++++ live.new/config.openbsd	2007-02-22 09:31:42.000000000 +0100
+@@ -1,5 +1,5 @@
+ .SUFFIXES: .cpp
+-COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t
++COMPILE_OPTS =		$(INCLUDES) -I. -DBSD=1 -O -DSOCKLEN_T=socklen_t -DUSE_SYSTEM_RANDOM=1
+ C =			c
+ C_COMPILER =		cc
+ C_FLAGS =		$(COMPILE_OPTS)
+diff -x Makefile -uN live/config.solaris live.new/config.solaris
+--- live/config.solaris	2007-02-20 12:33:45.000000000 +0100
++++ live.new/config.solaris	2007-02-22 09:34:49.000000000 +0100
+@@ -1,4 +1,4 @@
+-COMPILE_OPTS =		$(INCLUDES) -I. -O -DSOLARIS -DSOCKLEN_T=socklen_t
++COMPILE_OPTS =		$(INCLUDES) -I. -O -DSOLARIS -DSOCKLEN_T=socklen_t -DUSE_SYSTEM_RANDOM=1
+ C =			c
+ C_COMPILER =		cc
+ C_FLAGS =		$(COMPILE_OPTS)
+diff -x Makefile -uN live/config.uClinux live.new/config.uClinux
+--- live/config.uClinux	2007-02-20 12:33:45.000000000 +0100
++++ live.new/config.uClinux	2007-02-22 09:35:01.000000000 +0100
+@@ -1,4 +1,4 @@
+-COMPILE_OPTS =		$(INCLUDES) -I. -O2 -DSOCKLEN_T=socklen_t -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64
++COMPILE_OPTS =		$(INCLUDES) -I. -O2 -DSOCKLEN_T=socklen_t -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -DUSE_SYSTEM_RANDOM=1
+ C =			c
+ C_COMPILER =		$(CC)
+ CFLAGS +=		$(COMPILE_OPTS)
