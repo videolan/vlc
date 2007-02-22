@@ -329,6 +329,10 @@ void __spu_DestroyRegion( vlc_object_t *p_this, subpicture_region_t *p_region )
         p_region->picture.pf_release( &p_region->picture );
     if( p_region->fmt.p_palette ) free( p_region->fmt.p_palette );
     if( p_region->p_cache ) __spu_DestroyRegion( p_this, p_region->p_cache );
+
+    if( p_region->psz_text )
+        free( p_region->psz_text );
+    //free( p_region->p_style ); FIXME --fenrir plugin does not allocate the memory for it. I think it might lead to segfault, video renderer can live longer than the decoder
     free( p_region );
 }
 
