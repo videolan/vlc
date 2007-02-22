@@ -37,8 +37,6 @@
 #include <stdio.h>                                                   /* FILE */
 #include <string.h>                                            /* strerror() */
 
-#include <assert.h>
-
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include "interface.h"
