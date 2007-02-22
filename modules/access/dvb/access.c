@@ -253,14 +253,21 @@ vlc_module_begin();
 #endif
 
     set_capability( "access2", 0 );
-    add_shortcut( "dvb" );
-    add_shortcut( "dvb-s" );
+    add_shortcut( "dvb" );      /* Generic name */
+
+    add_shortcut( "dvb-s" );    /* Satellite */
     add_shortcut( "qpsk" );
-    add_shortcut( "dvb-c" );
+    add_shortcut( "satellite" );
+
+    add_shortcut( "dvb-c" );    /* Cable */
     add_shortcut( "cable" );
-    add_shortcut( "dvb-t" );
+
+    add_shortcut( "dvb-t" );    /* Terrestrial */
     add_shortcut( "terrestrial" );
-    add_shortcut( "satellite" );    /* compatibility with the interface. */
+
+    add_shortcut( "atsc" );     /* Atsc */
+    add_shortcut( "usdigital" );
+
     set_callbacks( Open, Close );
 vlc_module_end();
 

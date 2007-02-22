@@ -684,29 +684,47 @@ static fe_code_rate_t DecodeFEC( access_t *p_access, int i_val )
     return fe_fec;
 }
 
-static fe_modulation_t DecodeModulation( access_t *p_access )
+static fe_modulation_t DecodeModulationQAM( access_t *p_access )
 {
-    vlc_value_t         val;
-    fe_modulation_t     fe_modulation = 0;
-
-    var_Get( p_access, "dvb-modulation", &val );
-
-    switch( val.i_int )
+    switch( var_GetInteger( p_access, "dvb-modulation" ) )
     {
-        case -1: fe_modulation = QPSK; break;
-        case 0: fe_modulation = QAM_AUTO; break;
-        case 8: fe_modulation = VSB_8; break;      // ugly hack
-        case 16: fe_modulation = QAM_16; break;
-        case 32: fe_modulation = QAM_32; break;
-        case 64: fe_modulation = QAM_64; break;
-        case 128: fe_modulation = QAM_128; break;
-        case 256: fe_modulation = QAM_256; break;
+        case 0:     return QAM_AUTO;
+        case 16:    return QAM_16;
+        case 32:    return QAM_32;
+        case 64:    return QAM_64;
+        case 128:   return QAM_128;
+        case 256:   return QAM_256;
         default:
-            msg_Dbg( p_access, "terrestrial/cable dvb has constellation/modulation not set, using auto");
-            fe_modulation = QAM_AUTO;
-            break;
+            msg_Dbg( p_access, "QAM modulation not set, using auto");
+            return QAM_AUTO;
     }
-    return fe_modulation;
+}
+static fe_modulation_t DecodeModulationOFDM( access_t *p_access )
+{
+    switch( var_GetInteger( p_access, "dvb-modulation" ) )
+    {
+        case -1:    return QPSK;
+        case 0:     return QAM_AUTO;
+        case 16:    return QAM_16;
+        case 32:    return QAM_32;
+        case 64:    return QAM_64;
+        case 128:   return QAM_128;
+        case 256:   return QAM_256;
+        default:
+            msg_Dbg( p_access, "OFDM modulation not set, using QAM auto");
+            return QAM_AUTO;
+    }
+}
+static fe_modulation_t DecodeModulationATSC( access_t *p_access )
+{
+    switch( var_GetInteger( p_access, "dvb-modulation" ) )
+    {
+        case 8:     return VSB_8;
+        case 16:    return VSB_16;
+        default:
+            msg_Dbg( p_access, "ATSC modulation not set, using VSB 8");
+            return VSB_8;
+    }
 }
 
 /*****************************************************************************
@@ -1003,7 +1021,7 @@ static int FrontendSetQAM( access_t *p_access )
     var_Get( p_access, "dvb-fec", &val );
     fep.u.qam.fec_inner = DecodeFEC( p_access, val.i_int );
 
-    fep.u.qam.modulation = DecodeModulation( p_access );
+    fep.u.qam.modulation = DecodeModulationQAM( p_access );
 
     /* Empty the event queue */
     for( ; ; )
@@ -1136,7 +1154,7 @@ static int FrontendSetOFDM( access_t * p_access )
     fep.u.ofdm.code_rate_HP = DecodeFEC( p_access, val.i_int );
     var_Get( p_access, "dvb-code-rate-lp", &val );
     fep.u.ofdm.code_rate_LP = DecodeFEC( p_access, val.i_int );
-    fep.u.ofdm.constellation = DecodeModulation( p_access );
+    fep.u.ofdm.constellation = DecodeModulationOFDM( p_access );
     fep.u.ofdm.transmission_mode = DecodeTransmission( p_access );
     fep.u.ofdm.guard_interval = DecodeGuardInterval( p_access );
     fep.u.ofdm.hierarchy_information = DecodeHierarchy( p_access );
@@ -1176,7 +1194,7 @@ static int FrontendSetATSC( access_t *p_access )
     var_Get( p_access, "dvb-frequency", &val );
     fep.frequency = val.i_int;
 
-    fep.u.vsb.modulation = DecodeModulation( p_access );
+    fep.u.vsb.modulation = DecodeModulationATSC( p_access );
 
     /* Empty the event queue */
     for( ; ; )
