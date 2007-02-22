@@ -1867,6 +1867,7 @@ int E_(en50221_Init)( access_t * p_access )
     else
     {
         struct ca_slot_info info;
+        info.num = 0;
 
         /* We don't reset the CAM in that case because it's done by the
          * ASIC. */
