@@ -2500,7 +2500,7 @@ static int Manage( vlc_object_t* p_object )
                 {
                     /* FIXME, find a way to select the right instance */
                     char buffer[12];
-                    sprintf( buffer, "%d", p_instance->i_index );
+                    sprintf( buffer, "%d", p_instance->i_index+1 );
                     vlm_MediaControl( vlm, p_media, p_instance->psz_name,
                                       "play", buffer );
                 }
@@ -2509,8 +2509,8 @@ static int Manage( vlc_object_t* p_object )
                     if( vlm_MediaControl( vlm, p_media, p_instance->psz_name,
                                           "stop", 0 ) == VLC_SUCCESS )
                     {
-			 j--; /* the aray is one element smaller now. */
-		    }
+                         j--; /* the aray is one element smaller now. */
+                    }
                 }
             }
         }
