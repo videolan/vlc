@@ -180,11 +180,10 @@ int playlist_ThreadDestroy( playlist_t * p_playlist )
  */
 static void RunControlThread ( playlist_t *p_playlist )
 {
-   int i_loops = 0;
+    int i_loops = 0;
 
-   /* Tell above that we're ready */
-   vlc_thread_ready( p_playlist );
-
+    /* Tell above that we're ready */
+    vlc_thread_ready( p_playlist );
     while( !p_playlist->b_die )
     {
         i_loops++;
@@ -205,7 +204,6 @@ static void RunControlThread ( playlist_t *p_playlist )
             PL_UNLOCK;
         }
     }
-
     playlist_LastLoop( p_playlist );
 }
 
