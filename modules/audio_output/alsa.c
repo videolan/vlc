@@ -982,7 +982,6 @@ static void GetDevicesForCard(module_config_t *p_item, int i_card)
         p_item->i_list++;
         p_item->ppsz_list[ p_item->i_list ] = NULL;
         p_item->ppsz_list_text[ p_item->i_list ] = NULL;
-                
     }
 
     snd_ctl_close( p_ctl );

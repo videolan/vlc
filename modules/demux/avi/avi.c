@@ -1077,7 +1077,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
         msg_Err( p_demux, "Can not yet process muxed avi substreams without seeking" );
         return VLC_EGENERIC;
     }
-   
+
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time + 1 );
 
     /* *** find master stream for data packet skipping algo *** */
@@ -1318,8 +1318,6 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 
 /*****************************************************************************
  * Control:
- *****************************************************************************
- *
  *****************************************************************************/
 static double ControlGetPosition( demux_t *p_demux )
 {
@@ -1354,7 +1352,7 @@ static double ControlGetPosition( demux_t *p_demux )
     return 0.0;
 }
 
-static int    Control( demux_t *p_demux, int i_query, va_list args )
+static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i;

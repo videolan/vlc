@@ -1162,7 +1162,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 char    *p_64_sps = NULL;
                 char    *p_64_pps = NULL;
                 char    hexa[6];
-                
+
                 while( i_buffer > 4 && 
                     p_buffer[0] == 0 && p_buffer[1] == 0 &&
                     p_buffer[2] == 0 && p_buffer[3] == 1 )
@@ -1172,9 +1172,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                     int i_size      = 0;
                     int i_startcode = 0;
                     int i_encoded   = 0;
-                    
+
                     msg_Dbg( p_stream, "we found a startcode for NAL with TYPE:%d", i_nal_type );
-                    
+
                     for( i_offset = 1; i_offset+3 < i_buffer ; i_offset++)
                     {
                         if( p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 && p_buffer[i_offset+2] == 0 && p_buffer[i_offset+3] == 1 )
