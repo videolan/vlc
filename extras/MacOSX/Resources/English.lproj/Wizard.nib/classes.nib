@@ -91,6 +91,7 @@
                 "o_t6_btn_mrInfo_ttl" = id; 
                 "o_t6_ckb_local" = id; 
                 "o_t6_ckb_sap" = id; 
+                "o_t6_ckb_soverlay" = id; 
                 "o_t6_fld_sap" = id; 
                 "o_t6_fld_ttl" = id; 
                 "o_t6_text" = id; 
@@ -99,6 +100,7 @@
                 "o_t7_btn_chooseFile" = id; 
                 "o_t7_btn_mrInfo_local" = id; 
                 "o_t7_ckb_local" = id; 
+                "o_t7_ckb_soverlay" = id; 
                 "o_t7_fld_filePath" = id; 
                 "o_t7_text" = id; 
                 "o_t7_title" = id; 
@@ -111,6 +113,7 @@
                 "o_t8_fld_partExtract" = id; 
                 "o_t8_fld_sap" = id; 
                 "o_t8_fld_saveFileTo" = id; 
+                "o_t8_fld_soverlay" = id; 
                 "o_t8_fld_strmgMthd" = id; 
                 "o_t8_fld_trnscdAudio" = id; 
                 "o_t8_fld_trnscdVideo" = id; 
@@ -123,6 +126,7 @@
                 "o_t8_txt_partExtract" = id; 
                 "o_t8_txt_sap" = id; 
                 "o_t8_txt_saveFileTo" = id; 
+                "o_t8_txt_soverlay" = id; 
                 "o_t8_txt_strmgMthd" = id; 
                 "o_t8_txt_text" = id; 
                 "o_t8_txt_title" = id; 
