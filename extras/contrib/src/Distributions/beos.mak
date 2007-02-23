@@ -4,7 +4,7 @@ ifeq ($(HOST),$(BUILD))
 all: .perl .autoconf .automake .libtool .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.flac .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
-	.dvdnav .dvbpsi .aclocal .libdca
+	.dvdnav .dvbpsi .libdca .aclocal
    #.speex seems
 else
 # Cross compiling: we already have the Linux tools, only build the
@@ -12,6 +12,6 @@ else
 all: .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.flac .faad .faac .lame .twolame .ebml .matroska .ffmpeg .dvdcss \
-	.dvdnav .dvbpsi .aclocal .libdca
+	.dvdnav .dvbpsi .libdca .aclocal
 endif
 #.speex

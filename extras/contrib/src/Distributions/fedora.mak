@@ -5,5 +5,6 @@ all: .intl .freetype .fribidi .zlib \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.mpcdec \
 	.dvdnav .dvbpsi .wxwidgets .dirac \
-	.aclocal .libdca .libraw1394 .libdc1394
+	.libdca .libraw1394 .libdc1394 \
+	.aclocal
 

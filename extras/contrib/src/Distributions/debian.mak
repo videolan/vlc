@@ -5,6 +5,7 @@ all: .iconv .intl .freetype .fribidi .zlib \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.png .gpg-error .gcrypt .gnutls .mpcdec \
 	.dvdnav .dvbpsi .wxwidgets .dirac \
-	.aclocal .libdca .libraw1394 .libdc1394
+	.libdca .libraw1394 .libdc1394 \
+	.aclocal 
 #	.SDL_image  .daap .cddb .cdio .vcdimager
 
