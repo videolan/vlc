@@ -1,11 +1,12 @@
 /*****************************************************************************
  * darwin_specific.m: Darwin specific features
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
+ *          Pierre d'Herbemont <pdherbemont@free.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,69 +22,48 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#include <string.h>                                              /* strdup() */
+#include <string.h>                                              /* strdup(), strstr() */
 #include <stdlib.h>                                                /* free() */
+#include <dirent.h>                                                /* *dir() */
 
 #include <vlc/vlc.h>
 
-#include <Cocoa/Cocoa.h>
-#include <CoreFoundation/CFString.h>
+#include <CoreFoundation/CoreFoundation.h>
 
 #ifdef HAVE_LOCALE_H
 #   include <locale.h>
 #endif
 
+/* CFLocaleCopyAvailableLocaleIdentifiers is present only on post-10.4 */
+extern CFArrayRef CFLocaleCopyAvailableLocaleIdentifiers(void) __attribute__((weak_import));
+
+/* emulate CFLocaleCopyAvailableLocaleIdentifiers on pre-10.4 */
+static CFArrayRef copy_all_locale_indentifiers(void)
+{
+    CFMutableArrayRef available_locales;
+    DIR * dir;
+    struct dirent *file;
+
+    dir = opendir( "/usr/share/locale" );
+    available_locales = CFArrayCreateMutable( kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks );
+
+    while ( (file = readdir(dir)) )
+    {
+        /* we should probably filter out garbage */
+        /* we can't use CFStringCreateWithFileSystemRepresentation as it is supported only on post-10.4 
+           (and this function is only for pre-10.2) */
+        CFStringRef locale = CFStringCreateWithCString( kCFAllocatorDefault, file->d_name, kCFStringEncodingUTF8 );
+        CFArrayAppendValue( available_locales, (void*)locale );
+        CFRelease( locale );
+    }
+
+    closedir( dir );
+    return available_locales;
+}
+
 /*****************************************************************************
  * system_Init: fill in program path & retrieve language
  *****************************************************************************/
-static int FindLanguage( const char * psz_lang )
-{
-    const char ** ppsz_parser;
-    const char * ppsz_all[] =
-    {
-        "Catalan", "ca",
-        "Czech", "cs",
-        "Danish", "da",
-        "German", "de",
-        "British", "en_GB",
-        "English", "en",
-        "Spanish", "es",
-        "French", "fr",
-        "Galician", "gl",
-        "Hebrew", "he",
-        "Hungarian", "hu",
-        "Italian", "it",
-        "Japanese", "ja",
-        "Korean", "ko",
-        "Georgian", "ka",
-        "Malay", "ms",
-        "Dutch", "nl",
-        "Occitan", "oc",
-        "Brazilian Portuguese", "pt_BR",
-        "Romanian", "ro",
-        "Russian", "ru",
-        "Slovak", "sk",
-        "Slovenian", "sl",
-        "Swedish", "sv",
-        "Turkish", "tr",
-        "Simplified Chinese", "zh_CN",
-        "Chinese Traditional", "zh_TW",
-        NULL
-    };
-
-    for( ppsz_parser = ppsz_all ; ppsz_parser[0] ; ppsz_parser += 2 )
-    {
-        if( !strcmp( psz_lang, ppsz_parser[0] )
-             || !strcmp( psz_lang, ppsz_parser[1] ) )
-        {
-            setenv( "LANG", ppsz_parser[1], 1 );
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
 void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     char i_dummy;
@@ -108,24 +88,32 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
     /* Check if $LANG is set. */
     if ( (p_char = getenv("LANG")) == NULL )
     {
-        NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+        /*
+           Retrieve the preferred language as chosen in  System Preferences.app
+           (note that CFLocaleCopyCurrent() is not used because it returns the
+            prefered locale not language) 
+        */
+        CFArrayRef all_locales, preferred_locales;
+        char psz_locale[50];
 
-        /* Retrieve user's preferences. */
-        NSUserDefaults * o_defs = [NSUserDefaults standardUserDefaults];
-        NSArray * o_languages = [o_defs objectForKey:@"AppleLanguages"];
-        NSEnumerator * o_enumerator = [o_languages objectEnumerator];
-        NSString * o_lang;
+        if( CFLocaleCopyAvailableLocaleIdentifiers )
+            all_locales = CFLocaleCopyAvailableLocaleIdentifiers();
+        else
+            all_locales = copy_all_locale_indentifiers();
 
-        while ( (o_lang = [o_enumerator nextObject]) )
+        preferred_locales = CFBundleCopyLocalizationsForPreferences( all_locales, NULL );
+
+        if ( preferred_locales )
         {
-            const char * psz_string = [o_lang lossyCString];
-            if ( FindLanguage( psz_string ) )
+            if ( CFArrayGetCount( preferred_locales ) )
             {
-                break;
+                CFStringRef user_language_string_ref = CFArrayGetValueAtIndex( preferred_locales, 0 );
+                CFStringGetCString( user_language_string_ref, psz_locale, sizeof(psz_locale), kCFStringEncodingUTF8 );
+                setenv( "LANG", psz_locale, 1 );
             }
+            CFRelease( preferred_locales );
         }
-
-        [o_pool release];
+        CFRelease( all_locales );
     }
 
     vlc_mutex_init( p_this, &p_this->p_libvlc_global->iconv_lock );
