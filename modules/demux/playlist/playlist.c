@@ -113,6 +113,10 @@ vlc_module_begin();
         add_shortcut( "gvp" );
         set_capability( "demux2", 10 );
         set_callbacks( E_(Import_GVP), E_(Close_GVP) );
+    add_submodule();
+        set_description( _("Dummy ifo demux") );
+        set_capability( "demux2", 12 );
+        set_callbacks( E_(Import_IFO), E_(Close_IFO) );
 vlc_module_end();
 
 
