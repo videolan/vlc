@@ -77,7 +77,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
      * http://developer.apple.com/techpubs/macosx/Cocoa/
      * TasksAndConcepts/ProgrammingTopics/Multithreading/index.html
      * This thread does absolutely nothing at all. */
-    [NSThread detachNewThreadSelector:@selector(self) toTarget:[NSString string] withObject:nil];
+    //[NSThread detachNewThreadSelector:@selector(self) toTarget:[NSString string] withObject:nil];
 
     p_intf->p_sys->o_sendport = [[NSPort port] retain];
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
@@ -1155,7 +1155,6 @@ static VLCMain *_o_sharedMainInstance = nil;
         if( p_intf->p_sys->b_current_title_update )
         {
             NSString *o_temp;
-            vout_thread_t *p_vout;
             playlist_t * p_playlist = pl_Yield( p_intf );
 
             if( p_playlist->status.p_item == NULL )
@@ -1171,25 +1170,8 @@ static VLCMain *_o_sharedMainInstance = nil;
             [self setScrollField: o_temp stopAfter:-1];
             [[[self getControls] getFSPanel] setStreamTitle: o_temp];
 
-            p_vout = vlc_object_find( p_intf->p_sys->p_input, VLC_OBJECT_VOUT,
-                                                    FIND_PARENT );
-            if( p_vout != NULL )
-            {
-                id o_vout_wnd;
-                NSEnumerator * o_enum = [[NSApp orderedWindows] objectEnumerator];
-
-                while( ( o_vout_wnd = [o_enum nextObject] ) )
-                {
-                    if( [[o_vout_wnd className] isEqualToString: @"VLCWindow"]
-                        || [[[VLCMain sharedInstance] getEmbeddedList]
-                                            windowContainsEmbedded: o_vout_wnd] )
-                    {
-                        msg_Dbg( p_intf, "updateTitle call getVoutView" );
-                        [[o_vout_wnd getVoutView] updateTitle];
-                    }
-                }
-                vlc_object_release( (vlc_object_t *)p_vout );
-            }
+            [[o_controls getVoutView] updateTitle];
+            
             [o_playlist updateRowSelection];
             vlc_object_release( p_playlist );
             p_intf->p_sys->b_current_title_update = FALSE;
