@@ -50,8 +50,8 @@ static CFArrayRef copy_all_locale_indentifiers(void)
     while ( (file = readdir(dir)) )
     {
         /* we should probably filter out garbage */
-        /* we can't use CFStringCreateWithFileSystemRepresentation as it is supported only on post-10.4 
-           (and this function is only for pre-10.2) */
+        /* we can't use CFStringCreateWithFileSystemRepresentation as it is 
+         * supported only on post-10.4 (and this function is only for pre-10.4) */
         CFStringRef locale = CFStringCreateWithCString( kCFAllocatorDefault, file->d_name, kCFStringEncodingUTF8 );
         CFArrayAppendValue( available_locales, (void*)locale );
         CFRelease( locale );
