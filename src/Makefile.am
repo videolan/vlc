@@ -189,7 +189,7 @@ SOURCES_libvlc_beos = \
 	$(NULL)
 
 SOURCES_libvlc_darwin = \
-	misc/darwin_specific.m \
+	misc/darwin_specific.c \
 	$(NULL)
 
 SOURCES_libvlc_win32 = \
