@@ -135,7 +135,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         END_SPREFS_CAT;
 
-        case SPrefsInputAndCodecs: break;
+        START_SPREFS_CAT( InputAndCodecs );
+
+
+        END_SPREFS_CAT;
 
         START_SPREFS_CAT( Playlist );
         END_SPREFS_CAT;

@@ -1,6 +1,6 @@
 <ui version="4.0" >
  <author>Jean-Baptiste Kempf</author>
- <class>Spref_input</class>
+ <class>SPrefsInputAndCodecs</class>
  <widget class="QWidget" name="Spref_input" >
   <property name="geometry" >
    <rect>
