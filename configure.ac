@@ -184,6 +184,7 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_LDFLAGS([mkv mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_CFLAGS([libvlc vlc],[-x objective-c])
+    VLC_ADD_LDFLAGS([vlc],[-undefined dynamic_lookup])
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
     AC_CHECK_TOOL(WINDRES, windres, :)
