@@ -38,7 +38,7 @@
 #include "pixmaps/audio_50x50.xpm"
 #include "pixmaps/input_and_codecs_50x50.xpm"
 #include "pixmaps/interface_50x50.xpm"
-#include "pixmaps/playlist_50x50.xpm"
+//#include "pixmaps/playlist_50x50.xpm"
 #include "pixmaps/subtitles_50x50.xpm"
 #include "pixmaps/video_50x50.xpm"
 
@@ -46,7 +46,7 @@
 #include "ui/sprefs_input.h"
 #include "ui/sprefs_video.h"
 #include "ui/sprefs_subtitles.h"
-#include "ui/sprefs_playlist.h"
+//#include "ui/sprefs_playlist.h"
 #include "ui/sprefs_interface.h"
 
 #define ITEM_HEIGHT 50
@@ -69,7 +69,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     ADD_CATEGORY( SPrefsAudio, qtr("Audio"), audio_50x50_xpm );
     ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input and Codecs"),
                   input_and_codecs_50x50_xpm );
-    ADD_CATEGORY( SPrefsPlaylist, qtr("Playlist"), playlist_50x50_xpm );
+//    ADD_CATEGORY( SPrefsPlaylist, qtr("Playlist"), playlist_50x50_xpm );
     ADD_CATEGORY( SPrefsInterface, qtr("Interface"), interface_50x50_xpm );
     ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles"), subtitles_50x50_xpm );
     ADD_CATEGORY( SPrefsAdvanced, qtr("Advanced"), advanced_50x50_xpm );
@@ -140,8 +140,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         END_SPREFS_CAT;
 
-        START_SPREFS_CAT( Playlist );
-        END_SPREFS_CAT;
+/*        START_SPREFS_CAT( Playlist );
+        END_SPREFS_CAT;*/
 
         START_SPREFS_CAT( Interface );
 
