@@ -1173,6 +1173,12 @@ static const char *ppsz_pltree_descriptions[] = { N_("Default"), N_("Always"), N
 #define DUMP_KEY_TEXT N_("Dump")
 #define DUMP_KEY_LONGTEXT N_("Media dump access filter trigger.")
 
+#define LOOP_KEY_TEXT N_("Normal/Repeat/Loop")
+#define LOOP_KEY_LONGTEXT N_("Toggle Normal/Repeat/Loop playlist modes")
+
+#define RANDOM_KEY_TEXT N_("Random")
+#define RANDOM_KEY_LONGTEXT N_("Toggle random playlist playback")
+
 #define ZOOM_KEY_TEXT N_("Zoom")
 #define ZOOM_KEY_LONGTEXT N_("Zoom")
 
@@ -1841,6 +1847,8 @@ vlc_module_begin();
 #   define KEY_SNAPSHOT           KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'s'
 #   define KEY_ZOOM               'z'
 #   define KEY_UNZOOM             KEY_MODIFIER_SHIFT|'z'
+#   define KEY_RANDOM             'r'
+#   define KEY_LOOP               KEY_MODIFIER_SHIFT|'l'
 
 #   define KEY_CROP_TOP           KEY_MODIFIER_ALT|'i'
 #   define KEY_UNCROP_TOP         KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'i'
@@ -1908,6 +1916,8 @@ vlc_module_begin();
 #   define KEY_SUBDELAY_DOWN      KEY_MODIFIER_CTRL|'j'
 #   define KEY_AUDIODELAY_UP      KEY_MODIFIER_CTRL|'k'
 #   define KEY_AUDIODELAY_DOWN    KEY_MODIFIER_CTRL|'l'
+#   define KEY_RANDOM             'r'
+#   define KEY_LOOP               KEY_MODIFIER_SHIFT|'l'
 
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     'k'
@@ -2078,6 +2088,10 @@ vlc_module_begin();
              CROP_RIGHT_KEY_TEXT, CROP_RIGHT_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-uncrop-right", KEY_UNCROP_RIGHT, NULL,
              UNCROP_RIGHT_KEY_TEXT, UNCROP_RIGHT_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-random", KEY_RANDOM, NULL,
+             RANDOM_KEY_TEXT, RANDOM_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-loop", KEY_LOOP, NULL,
+             LOOP_KEY_TEXT, LOOP_KEY_LONGTEXT, VLC_FALSE );
 
     set_section ( N_("Jump sizes" ), NULL );
     add_integer( "extrashort-jump-size", 3, NULL, JIEXTRASHORT_TEXT,
@@ -2316,6 +2330,8 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-history-forward", ACTIONID_HISTORY_FORWARD, 0, 0, 0, 0 },
     { "key-record", ACTIONID_RECORD, 0, 0, 0, 0 },
     { "key-dump", ACTIONID_DUMP, 0, 0, 0, 0 },
+    { "key-random", ACTIONID_RANDOM, 0, 0, 0, 0 },
+    { "key-loop", ACTIONID_LOOP, 0, 0, 0, 0 },
     { NULL, 0, 0, 0, 0, 0 }
 };
 

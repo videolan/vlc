@@ -297,6 +297,35 @@ static void Run( intf_thread_t *p_intf )
                 var_Set( p_playlist, "fullscreen", val );
             }
         }
+        else if( i_action == ACTIONID_LOOP )
+        {
+            /* Toggle Normal -> Loop -> Repeat -> Normal ... */
+            vlc_value_t val2;
+            var_Get( p_playlist, "loop", &val );
+            var_Get( p_playlist, "repeat", &val2 );
+            if( val2.b_bool == VLC_TRUE )
+            {
+                val.b_bool = VLC_FALSE;
+                val2.b_bool = VLC_FALSE;
+            }
+            else if( val.b_bool == VLC_TRUE )
+            {
+                val.b_bool = VLC_FALSE;
+                val2.b_bool = VLC_TRUE;
+            }
+            else
+            {
+                val.b_bool = VLC_TRUE;
+            }
+            var_Set( p_playlist, "loop", val );
+            var_Set( p_playlist, "repeat", val2 );
+        }
+        else if( i_action == ACTIONID_RANDOM )
+        {
+            var_Get( p_playlist, "random", &val );
+            val.b_bool = !val.b_bool;
+            var_Set( p_playlist, "random", val );
+        }
         else if( i_action == ACTIONID_PLAY_PAUSE )
         {
             val.i_int = PLAYING_S;
