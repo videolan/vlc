@@ -695,16 +695,19 @@ static int Open( vlc_object_t *p_this )
         if( i_pid >= 2 && i_pid < 8192 )
         {
             ts_pid_t *pmt = &p_sys->pid[i_pid];
+            ts_prg_psi_t *prg;
 
             msg_Dbg( p_demux, "extra pmt specified (pid=%d)", i_pid );
             PIDInit( pmt, VLC_TRUE, NULL );
-            pmt->psi->i_prg = 1;
-            pmt->psi->prg = malloc( sizeof(ts_prg_psi_t) );
-            /* FIXME we should also ask for a number */
-            pmt->psi->prg[0]->handle =
-                dvbpsi_AttachPMT( 1, (dvbpsi_pmt_callback)PMTCallBack,
-                                  p_demux );
-            pmt->psi->prg[0]->i_number = 0; /* special one */
+
+            /* Dummy PMT */
+            prg = malloc( sizeof( ts_prg_psi_t ) );
+            memset( prg, 0, sizeof( ts_prg_psi_t ) );
+            prg->i_pid_pcr  = -1;
+            prg->i_pid_pmt  = -1;
+            prg->i_number   = 0;    /* special */
+            prg->handle     = dvbpsi_AttachPMT( 1, (dvbpsi_pmt_callback)PMTCallBack, p_demux );
+            TAB_APPEND( pmt->psi->i_prg, pmt->psi->prg, prg );
 
             psz = strchr( psz, '=' ) + 1;   /* can't failed */
             while( psz && *psz )
@@ -1933,6 +1936,7 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
 
         case 0x06:  /* PES_PRIVATE  (fixed later) */
         case 0x12:  /* MPEG-4 generic (sub/scene/...) (fixed later) */
+        case 0xEA:  /* Privately managed ES (VC-1) (fixed later */
         default:
             es_format_Init( fmt, UNKNOWN_ES, 0 );
             break;
@@ -3221,6 +3225,46 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     {
                         pid->es->fmt.subs.dvb.i_id = -1;
                         pid->es->fmt.psz_description = strdup( "DVB subtitles" );
+                    }
+                }
+            }
+        }
+        else if( p_es->i_type == 0xEA )
+        {
+            dvbpsi_descriptor_t *p_dr;
+
+            for( p_dr = p_es->p_first_descriptor; p_dr != NULL;
+                 p_dr = p_dr->p_next )
+            {
+                msg_Dbg( p_demux, "  * es pid=%d type=%d dr->i_tag=0x%x",
+                         p_es->i_pid, p_es->i_type, p_dr->i_tag );
+
+                if( p_dr->i_tag == 0x05 )
+                {
+                    /* Registration Descriptor */
+                    if( p_dr->i_length < 4 ) // XXX VC-1 has extended this descriptor with sub-descriptor
+                    {
+                        msg_Warn( p_demux, "invalid Registration Descriptor" );
+                    }
+                    else
+                    {
+                        if( !memcmp( p_dr->p_data, "VC-1", 4 ) )
+                        {
+                            /* registration descriptor for VC-1 (SMPTE rp227) */
+                            pid->es->fmt.i_cat = VIDEO_ES;
+                            pid->es->fmt.i_codec = VLC_FOURCC('W','V','C','1');
+
+                            /* XXX With Simple and Main profile the SEQUENCE
+                             * header is modified: video width and height are
+                             * inserted just after the start code as 2 int16_t
+                             * The packetizer will take care of that. */
+                        }
+                        else
+                        {
+                            msg_Warn( p_demux,
+                                      "unknown Registration Descriptor (%4.4s)",
+                                      p_dr->p_data );
+                        }
                     }
                 }
             }
