@@ -2080,7 +2080,7 @@ static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
         MessageAddChild( "repeat (number_of_repetitions)" );
 
         message_child = MessageAdd( "Control Commands Syntax:" );
-        MessageAddChild( "play" );
+        MessageAddChild( "play [input_number]" );
         MessageAddChild( "pause" );
         MessageAddChild( "stop" );
         MessageAddChild( "seek [+-](percentage) | [+-](seconds)s | [+-](miliseconds)ms" );
