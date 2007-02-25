@@ -54,7 +54,9 @@ vlc_module_end();
 
 struct sout_stream_sys_t
 {
+    int            i_id;
     input_thread_t *p_input;
+
     mtime_t i_stream_start;
 };
 
@@ -76,8 +78,8 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_send = Send;
     p_sys = p_stream->p_sys = malloc(sizeof(sout_stream_sys_t));
 
-    p_sys->p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( !p_sys->p_input ) return VLC_EGENERIC;
+    p_sys->i_id = 0;
+    p_sys->p_input = NULL;
 
     p_sys->i_stream_start = 0;
 
@@ -90,33 +92,54 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     sout_stream_t *p_stream = (sout_stream_t *)p_this;
-    vlc_object_release( p_stream->p_sys->p_input );
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    /* It can happen only if buggy */
+    if( p_sys->p_input )
+        vlc_object_release( p_sys->p_input );
 }
 
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t *id;
-    es_format_t *p_fmt_copy = malloc(sizeof(es_format_t));
-    input_item_t *p_item = input_GetItem(p_sys->p_input);
+    es_format_t *p_fmt_copy;
+    input_item_t *p_item;
 
-    id = malloc( sizeof( sout_stream_id_t ) );
-    id->i_d_u_m_m_y = 0;
+    if( !p_sys->p_input )
+        p_sys->p_input = vlc_object_find( p_stream, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( !p_sys->p_input )
+        return NULL;
+    
+    p_item = input_GetItem(p_sys->p_input);
 
+    p_fmt_copy = malloc(sizeof(es_format_t));
     es_format_Copy( p_fmt_copy, p_fmt );
 
     vlc_mutex_lock( &p_item->lock );
-    TAB_APPEND( p_item->i_es,
-                p_item->es, p_fmt_copy );
+    TAB_APPEND( p_item->i_es, p_item->es, p_fmt_copy );
     vlc_mutex_unlock( &p_item->lock );
 
-    if( p_sys->i_stream_start <= 0 ) p_sys->i_stream_start = mdate();
+    p_sys->i_id++;
+    if( p_sys->i_stream_start <= 0 )
+        p_sys->i_stream_start = mdate();
 
+    id = malloc( sizeof( sout_stream_id_t ) );
+    id->i_d_u_m_m_y = 0;
     return id;
 }
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    p_sys->i_id--;
+    if( p_sys->i_id <= 0 )
+    {
+        vlc_object_release( p_sys->p_input );
+        p_sys->p_input = NULL;
+    }
+
     free( id );
     return VLC_SUCCESS;
 }
@@ -128,10 +151,8 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     block_ChainRelease( p_buffer );
 
-    if( p_sys->i_stream_start + 1500000 < mdate() )
-    {
+    if( p_sys->p_input && p_sys->i_stream_start + 1500000 < mdate() )
         p_sys->p_input->b_eof = VLC_TRUE;
-    }
 
     return VLC_SUCCESS;
 }
