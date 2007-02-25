@@ -34,6 +34,7 @@
 #include <vlc_config_cat.h>
 #include <assert.h>
 
+//TODO Rename all advanced to hotkeys since they will be no advanced section
 #include "pixmaps/advanced_50x50.xpm"
 #include "pixmaps/audio_50x50.xpm"
 #include "pixmaps/input_and_codecs_50x50.xpm"
@@ -72,7 +73,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
 //    ADD_CATEGORY( SPrefsPlaylist, qtr("Playlist"), playlist_50x50_xpm );
     ADD_CATEGORY( SPrefsInterface, qtr("Interface"), interface_50x50_xpm );
     ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles"), subtitles_50x50_xpm );
-    ADD_CATEGORY( SPrefsAdvanced, qtr("Advanced"), advanced_50x50_xpm );
+    ADD_CATEGORY( SPrefsAdvanced, qtr("Hotkeys"), advanced_50x50_xpm );
 
     setCurrentRow( SPrefsInterface );
 }

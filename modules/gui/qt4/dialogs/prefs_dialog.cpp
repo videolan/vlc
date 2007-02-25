@@ -34,7 +34,8 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QCheckBox>
-
+#include <QScrollArea>
+#include <QLabel>
 PrefsDialog *PrefsDialog::instance = NULL;
 
 PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
@@ -42,6 +43,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      QGridLayout *main_layout = new QGridLayout(this);
      setWindowTitle( qtr( "Preferences" ) );
      resize( 800, 450 );
+     setMaximumHeight (450);
 
      tree_panel = new QWidget(0);
      tree_panel_l = new QHBoxLayout;
@@ -50,27 +52,47 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      main_panel_l = new QHBoxLayout;
      main_panel->setLayout( main_panel_l );
 
+
      // Choice for types
      types = new QGroupBox( "Show settings" );
-     QHBoxLayout *tl = new QHBoxLayout(0);
-     tl->setSpacing( 3 ); tl->setMargin( 3 );
-     small = new QRadioButton( "Basic", types ); tl->addWidget( small );
-     all = new QRadioButton( "All", types ); tl->addWidget( all );
-     types->setLayout(tl);
+     QHBoxLayout *types_l = new QHBoxLayout(0);
+     types_l->setSpacing( 3 ); types_l->setMargin( 3 );
+     small = new QRadioButton( "Basic", types ); types_l->addWidget( small );
+     all = new QRadioButton( "All", types ); types_l->addWidget( all );
+     types->setLayout(types_l);
      small->setChecked( true );
+
+     // Title Label
+     QLabel *panel_label = new QLabel;
+     QFont labelFont = QApplication::font( static_cast<QWidget*>(0) );
+     labelFont.setPointSize( labelFont.pointSize() + 4 ); 
+     labelFont.setBold( true );
+     panel_label->setFont( labelFont );
+
+     // Title <hr>
+     QFrame *title_line = new QFrame;
+     title_line->setFrameShape(QFrame::HLine);
+     title_line->setFrameShadow(QFrame::Sunken);
+
+     QScrollArea *scrollArea = new QScrollArea;
 
      advanced_tree = NULL;
      simple_tree = NULL;
      simple_panel = NULL;
      advanced_panel = NULL;
 
-     main_layout->addWidget( types, 0,0,1,1 );
-     main_layout->addWidget( tree_panel, 1,0,1,1 );
-     main_layout->addWidget( main_panel, 0, 1, 2, 1 );
+     main_layout->addWidget( tree_panel, 0, 0, 3, 1 );
+     main_layout->addWidget( types, 3, 0, 1, 1 );
+
+     main_layout->addWidget( panel_label, 0, 1, 1, 1 );
+     main_layout->addWidget( title_line, 1, 1, 1, 1 );
+     main_layout->addWidget( main_panel, 2, 1, 2, 1 );
 
      main_layout->setColumnMinimumWidth( 0, 200 );
      main_layout->setColumnStretch( 0, 1 );
      main_layout->setColumnStretch( 1,3 );
+
+     main_layout->setRowStretch( 2, 4);
 
      setSmall();
 
@@ -79,8 +101,9 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
                                                         &save, _("Save"),
                                                         &cancel, _("Cancel"),
                                                         NULL, NULL );
-     main_layout->addLayout( buttonsLayout, 2,0, 1 ,3 );
+     main_layout->addLayout( buttonsLayout, 4, 0, 1 ,3 );
      setLayout( main_layout );
+
 
      BUTTONACT( save, save() );
      BUTTONACT( cancel, cancel() );
