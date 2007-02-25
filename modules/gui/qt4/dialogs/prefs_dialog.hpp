@@ -41,6 +41,7 @@ class QWidget;
 class QCheckBox;
 class QListWidget;
 class QListWidgetItem;
+class QLabel;
 
 class PrefsDialog : public QVLCFrame
 {
@@ -73,6 +74,8 @@ private:
     QRadioButton *small,*all;
 
     QGridLayout *main_layout;
+
+//    QLabel *panel_label;
 
     static PrefsDialog *instance;
 private slots:

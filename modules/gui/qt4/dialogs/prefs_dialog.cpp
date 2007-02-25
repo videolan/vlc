@@ -52,7 +52,6 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      main_panel_l = new QHBoxLayout;
      main_panel->setLayout( main_panel_l );
 
-
      // Choice for types
      types = new QGroupBox( "Show settings" );
      QHBoxLayout *types_l = new QHBoxLayout(0);
@@ -62,20 +61,6 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      types->setLayout(types_l);
      small->setChecked( true );
 
-     // Title Label
-     QLabel *panel_label = new QLabel;
-     QFont labelFont = QApplication::font( static_cast<QWidget*>(0) );
-     labelFont.setPointSize( labelFont.pointSize() + 4 ); 
-     labelFont.setBold( true );
-     panel_label->setFont( labelFont );
-
-     // Title <hr>
-     QFrame *title_line = new QFrame;
-     title_line->setFrameShape(QFrame::HLine);
-     title_line->setFrameShadow(QFrame::Sunken);
-
-     QScrollArea *scrollArea = new QScrollArea;
-
      advanced_tree = NULL;
      simple_tree = NULL;
      simple_panel = NULL;
@@ -84,9 +69,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      main_layout->addWidget( tree_panel, 0, 0, 3, 1 );
      main_layout->addWidget( types, 3, 0, 1, 1 );
 
-     main_layout->addWidget( panel_label, 0, 1, 1, 1 );
-     main_layout->addWidget( title_line, 1, 1, 1, 1 );
-     main_layout->addWidget( main_panel, 2, 1, 2, 1 );
+     main_layout->addWidget( main_panel, 0, 1, 4, 1 );
 
      main_layout->setColumnMinimumWidth( 0, 200 );
      main_layout->setColumnStretch( 0, 1 );
@@ -186,6 +169,7 @@ void PrefsDialog::changeSimplePanel( QListWidgetItem *item )
     }
     main_panel_l->addWidget( simple_panel );
     simple_panel->show();
+//    panel_label->setText(qtr("Test"));
 }
 
 void PrefsDialog::changePanel( QTreeWidgetItem *item )

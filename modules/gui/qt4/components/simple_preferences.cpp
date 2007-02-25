@@ -100,12 +100,25 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         case SPrefs ## name:        \
         {                           \
             Ui::SPrefs ## name ui;  \
-            ui.setupUi( this );
+            ui.setupUi( panel );
 
 #define END_SPREFS_CAT      \
             break;          \
         }
-
+    QVBoxLayout *panel_layout = new QVBoxLayout();
+    QString head;
+    QWidget *panel = new QWidget();
+// Title Label
+        QLabel *panel_label = new QLabel;
+        QFont labelFont = QApplication::font( static_cast<QWidget*>(0) );
+        labelFont.setPointSize( labelFont.pointSize() + 4 );
+        labelFont.setBold( true );
+        panel_label->setFont( labelFont );
+    
+        // Title <hr>
+        QFrame *title_line = new QFrame;
+        title_line->setFrameShape(QFrame::HLine);
+        title_line->setFrameShadow(QFrame::Sunken);
 
     switch( number )
     {
@@ -165,6 +178,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         START_SPREFS_CAT( Hotkeys );
         END_SPREFS_CAT;
         }
+  panel_layout->addWidget(panel_label);
+       panel_layout->addWidget(title_line);
+       panel_layout->addWidget( panel );
+
+       this->setLayout(panel_layout);
+
 }
 
 void SPrefsPanel::apply()
