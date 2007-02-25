@@ -2035,9 +2035,9 @@ static void httpd_HostThread( httpd_host_t *host )
         if( ( p_tls == NULL ) && ( host->p_tls != NULL ) )
             p_tls = tls_ServerSessionPrepare( host->p_tls );
 
-        struct pollfd ufd[host->nfd + host->i_client + host->nfd]; /* We have nfd listening sockets, i_client, and lay accept up to nfd new client */
+        struct pollfd ufd[host->nfd + host->i_client];
         unsigned nfd;
-        for (nfd = 0; nfd < host->nfd; nfd++)
+        for( nfd = 0; nfd < host->nfd; nfd++ )
         {
             ufd[nfd].fd = host->fds[nfd];
             ufd[nfd].events = POLLIN;
@@ -2414,7 +2414,7 @@ static void httpd_HostThread( httpd_host_t *host )
         vlc_mutex_unlock( &host->lock );
 
         /* we will wait 100ms or 20ms (not too big 'cause HTTPD_CLIENT_WAITING) */
-        switch (poll (ufd, nfd, b_low_delay ? 20 : 100))
+        switch( poll( ufd, nfd, b_low_delay ? 20 : 100) )
         {
             case -1:
                 if (errno != EINTR)
@@ -2427,75 +2427,19 @@ static void httpd_HostThread( httpd_host_t *host )
                 continue;
         }
 
-        now = mdate();
-
-        /* accept new connections */
-        for (nfd = 0; nfd < host->nfd; nfd++)
-        {
-            assert (ufd[nfd].fd == host->fds[nfd]);
-
-            if (ufd[nfd].revents == 0)
-                continue;
-
-            int fd = net_Accept (host, host->fds, 0);
-            if (fd == -1)
-                continue;
-
-            int i_state = 0;
-
-            if (p_tls != NULL)
-            {
-                switch (tls_ServerSessionHandshake (p_tls, fd))
-                {
-                    case -1:
-                        msg_Err( host, "Rejecting TLS connection" );
-                        net_Close (fd);
-                        fd = -1;
-                        p_tls = NULL;
-                        break;
-
-                    case 1: /* missing input - most likely */
-                        i_state = HTTPD_CLIENT_TLS_HS_IN;
-                        break;
-
-                    case 2: /* missing output */
-                        i_state = HTTPD_CLIENT_TLS_HS_OUT;
-                        break;
-                }
-
-                if ((p_tls == NULL) != (host->p_tls == NULL))
-                    break; // wasted TLS session, cannot accept() anymore
-            }
-
-            httpd_client_t *cl;
-            stats_UpdateInteger( host, host->p_total_counter, 1, NULL );
-            stats_UpdateInteger( host, host->p_active_counter, 1, NULL );
-            cl = httpd_ClientNew( fd, p_tls, now );
-            p_tls = NULL;
-            vlc_mutex_lock( &host->lock );
-            TAB_APPEND( host->i_client, host->client, cl );
-            vlc_mutex_unlock( &host->lock );
-            cl->i_state = i_state; // override state for TLS
-
-            if (host->p_tls != NULL)
-                break; // cannot accept further without new TLS session
-        }
-
-        /* now try all others socket */
+        /* Handle client sockets */
         vlc_mutex_lock( &host->lock );
-
+        now = mdate();
         for( int i_client = 0; i_client < host->i_client; i_client++ )
         {
             httpd_client_t *cl = host->client[i_client];
-            const struct pollfd *pufd = ufd + nfd;
+            const struct pollfd *pufd = &ufd[host->nfd + i_client];
 
-            assert (pufd < ufd + (sizeof (ufd) / sizeof (ufd[0])));
+            assert( pufd < &ufd[sizeof(ufd) / sizeof(ufd[0])] );
 
-            if (cl->fd != pufd->fd)
+            if( cl->fd != pufd->fd )
                 continue; // we were not waiting for this client
-            nfd++;
-
-            if (pufd->revents == 0)
+            if( pufd->revents == 0 )
                 continue; // no event received
 
             cl->i_activity_date = now;
@@ -2525,6 +2469,62 @@ static void httpd_HostThread( httpd_host_t *host )
             }
         }
         vlc_mutex_unlock( &host->lock );
+
+        /* Handle server sockets (accept new connections) */
+        for( nfd = 0; nfd < host->nfd; nfd++ )
+        {
+            httpd_client_t *cl;
+            int fd;
+            int i_state = -1;
+
+            assert (ufd[nfd].fd == host->fds[nfd]);
+
+            if( ufd[nfd].revents == 0 )
+                continue;
+
+            /* */
+            fd = net_Accept( host, host->fds, 0 );
+            if( fd < 0 )
+                continue;
+
+            if( p_tls != NULL )
+            {
+                switch( tls_ServerSessionHandshake( p_tls, fd ) )
+                {
+                    case -1:
+                        msg_Err( host, "Rejecting TLS connection" );
+                        net_Close( fd );
+                        fd = -1;
+                        p_tls = NULL;
+                        break;
+
+                    case 1: /* missing input - most likely */
+                        i_state = HTTPD_CLIENT_TLS_HS_IN;
+                        break;
+
+                    case 2: /* missing output */
+                        i_state = HTTPD_CLIENT_TLS_HS_OUT;
+                        break;
+                }
+
+                if( (p_tls == NULL) != (host->p_tls == NULL) )
+                    break; // wasted TLS session, cannot accept() anymore
+            }
+
+            stats_UpdateInteger( host, host->p_total_counter, 1, NULL );
+            stats_UpdateInteger( host, host->p_active_counter, 1, NULL );
+            cl = httpd_ClientNew( fd, p_tls, now );
+            p_tls = NULL;
+            vlc_mutex_lock( &host->lock );
+            TAB_APPEND( host->i_client, host->client, cl );
+            vlc_mutex_unlock( &host->lock );
+            if( i_state != -1 )
+                cl->i_state = i_state; // override state for TLS
+
+            if (host->p_tls != NULL)
+                break; // cannot accept further without new TLS session
+        }
+
     }
 
     if( p_tls != NULL )
