@@ -260,7 +260,7 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
     }
 }
 
-libvlc_drawable_t libvlc_video_get_handle( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
+libvlc_drawable_t libvlc_video_get_parent( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
     libvlc_drawable_t result;
     
