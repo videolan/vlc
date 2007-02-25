@@ -472,7 +472,56 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
         case VLC_FOURCC( 'h', '2', '6', '4' ):
             p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_rtpmap = strdup( "H264/90000" );
-            p_es->psz_fmtp = strdup( "packetization-mode=1" );
+            p_es->psz_fmtp = NULL;
+            /* FIXME AAAAAAAAAAAARRRRRRRRGGGG copied from stream_out/rtp.c */
+            if( p_fmt->i_extra > 0 )
+            {
+                uint8_t *p_buffer = p_fmt->p_extra;
+                int     i_buffer = p_fmt->i_extra;
+                char    *p_64_sps = NULL;
+                char    *p_64_pps = NULL;
+                char    hexa[6+1];
+
+                while( i_buffer > 4 &&
+                       p_buffer[0] == 0 && p_buffer[1] == 0 &&
+                       p_buffer[2] == 0 && p_buffer[3] == 1 )
+                {
+                    const int i_nal_type = p_buffer[4]&0x1f;
+                    int i_offset;
+                    int i_size      = 0;
+
+                    i_size = i_buffer;
+                    for( i_offset = 4; i_offset+3 < i_buffer ; i_offset++)
+                    {
+                        if( p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 && p_buffer[i_offset+2] == 0 && p_buffer[i_offset+3] == 1 )
+                        {
+                            /* we found another startcode */
+                            i_size = i_offset;
+                            break;
+                        }
+                    }
+                    if( i_nal_type == 7 )
+                    {
+                        p_64_sps = vlc_b64_encode_binary( &p_buffer[4], i_size - 4 );
+                        sprintf_hexa( hexa, &p_buffer[5], 3 );
+                    }
+                    else if( i_nal_type == 8 )
+                    {
+                        p_64_pps = vlc_b64_encode_binary( &p_buffer[4], i_size - 4 );
+                    }
+                    i_buffer -= i_size;
+                    p_buffer += i_size;
+                }
+                /* */
+                if( p_64_sps && p_64_pps )
+                    asprintf( &p_es->psz_fmtp, "packetization-mode=1;profile-level-id=%s;sprop-parameter-sets=%s,%s;", hexa, p_64_sps, p_64_pps );
+                if( p_64_sps )
+                    free( p_64_sps );
+                if( p_64_pps )
+                    free( p_64_pps );
+            }
+            if( !p_es->psz_fmtp )
+                p_es->psz_fmtp = strdup( "packetization-mode=1" );
             break;
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
             p_es->i_payload_type = p_media->i_payload_type++;
