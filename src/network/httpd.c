@@ -2035,7 +2035,7 @@ static void httpd_HostThread( httpd_host_t *host )
         if( ( p_tls == NULL ) && ( host->p_tls != NULL ) )
             p_tls = tls_ServerSessionPrepare( host->p_tls );
 
-        struct pollfd ufd[host->nfd + host->i_client];
+        struct pollfd ufd[host->nfd + host->i_client + host->nfd]; /* We have nfd listening sockets, i_client, and lay accept up to nfd new client */
         unsigned nfd;
         for (nfd = 0; nfd < host->nfd; nfd++)
         {
