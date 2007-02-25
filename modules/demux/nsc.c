@@ -136,7 +136,7 @@ static int load_byte( unsigned char encoding_type,
     return 0;
 }
 
-char *nscdec( vlc_object_t *p_demux, char* p_encoded )
+static char *nscdec( vlc_object_t *p_demux, char* p_encoded )
 {
     unsigned int i;
     unsigned char tmp;

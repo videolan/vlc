@@ -71,7 +71,7 @@ struct demux_sys_t
 
 #define __EVEN( x ) ( ( (x)%2 != 0 ) ? ((x)+1) : (x) )
 
-static int ChunkFind( demux_t *, char *, unsigned int * );
+static int ChunkFind( demux_t *, const char *, unsigned int * );
 
 static void FrameInfo_IMA_ADPCM( demux_t *, unsigned int *, int * );
 static void FrameInfo_MS_ADPCM ( demux_t *, unsigned int *, int * );
@@ -365,7 +365,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /*****************************************************************************
  * Local functions
  *****************************************************************************/
-static int ChunkFind( demux_t *p_demux, char *fcc, unsigned int *pi_size )
+static int ChunkFind( demux_t *p_demux, const char *fcc, unsigned int *pi_size )
 {
     uint8_t *p_peek;
 

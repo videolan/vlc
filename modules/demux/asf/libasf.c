@@ -1419,7 +1419,7 @@ static void ASF_ObjectDumpDebug( vlc_object_t *p_obj,
     char str[1024];
     int i;
     union asf_object_u *p_child;
-    char *psz_name;
+    const char *psz_name;
 
     /* Find the name */
     for( i = 0; ASF_ObjectDumpDebugInfo[i].p_id != NULL; i++ )

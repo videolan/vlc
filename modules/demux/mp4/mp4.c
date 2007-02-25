@@ -484,7 +484,7 @@ static int Open( vlc_object_t * p_this )
 
         if( p_sys->track[i].b_ok )
         {
-            char *psz_cat;
+            const char *psz_cat;
             switch( p_sys->track[i].fmt.i_cat )
             {
                 case( VIDEO_ES ):

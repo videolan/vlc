@@ -2600,8 +2600,9 @@ static void __get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
 }
 
 static void __MP4_BoxGet( MP4_Box_t **pp_result,
-                          MP4_Box_t *p_box, char *psz_fmt, va_list args)
+                          MP4_Box_t *p_box, const char *psz_fmt, va_list args)
 {
+    char *psz_dup;
     char    *psz_path;
 
     if( !p_box )
@@ -2620,7 +2621,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
     }
 
 //    fprintf( stderr, "path:'%s'\n", psz_path );
-    psz_fmt = psz_path; /* keep this pointer, as it need to be unallocated */
+    psz_dup = psz_path; /* keep this pointer, as it need to be unallocated */
     for( ; ; )
     {
         char *psz_token;
@@ -2632,7 +2633,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
         if( !psz_token )
         {
             FREENULL( psz_token );
-            free( psz_fmt );
+            free( psz_dup );
             *pp_result = p_box;
             return;
         }
@@ -2647,7 +2648,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
             if( !p_box )
             {
                 free( psz_token );
-                free( psz_fmt );
+                free( psz_dup );
                 *pp_result = NULL;
                 return;
             }
@@ -2664,7 +2665,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
             if( !p_box )
             {
                 free( psz_token );
-                free( psz_fmt );
+                free( psz_dup );
                 *pp_result = NULL;
                 return;
             }
@@ -2681,7 +2682,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
                 if( !p_box )
                 {
                     free( psz_token );
-                    free( psz_fmt );
+                    free( psz_dup );
                     *pp_result = NULL;
                     return;
                 }
@@ -2705,7 +2706,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
                 if( !p_box )
                 {
                     free( psz_token );
-                    free( psz_fmt );
+                    free( psz_dup );
                     *pp_result = NULL;
                     return;
                 }
@@ -2721,7 +2722,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
         {
 //            fprintf( stderr, "Argg malformed token \"%s\"",psz_token );
             FREENULL( psz_token );
-            free( psz_fmt );
+            free( psz_dup );
             *pp_result = NULL;
             return;
         }
@@ -2739,7 +2740,7 @@ static void __MP4_BoxGet( MP4_Box_t **pp_result,
  * ex: /moov/trak[12]
  *     ../mdia
  *****************************************************************************/
-MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, char *psz_fmt, ... )
+MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, const char *psz_fmt, ... )
 {
     va_list args;
     MP4_Box_t *p_result;
@@ -2760,7 +2761,7 @@ MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, char *psz_fmt, ... )
  * ex: /moov/trak[12]
  *     ../mdia
  *****************************************************************************/
-int MP4_BoxCount( MP4_Box_t *p_box, char *psz_fmt, ... )
+int MP4_BoxCount( MP4_Box_t *p_box, const char *psz_fmt, ... )
 {
     va_list args;
     int     i_count;

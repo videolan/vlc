@@ -132,8 +132,8 @@ static int Open( vlc_object_t * p_this )
     /* Store the header and Seektable for avcodec */
     fmt.i_extra = 22 + (p_sys->i_totalframes * 4) + 4;
     fmt.p_extra = malloc( fmt.i_extra );
-    memcpy( fmt.p_extra, p_header, 22 );
-    memcpy( fmt.p_extra+22, p_seektable, fmt.i_extra -22 );
+    memcpy( (uint8_t*)fmt.p_extra, p_header, 22 );
+    memcpy( (uint8_t*)fmt.p_extra+22, p_seektable, fmt.i_extra -22 );
 
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     free( p_seektable );
