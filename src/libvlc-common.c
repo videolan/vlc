@@ -1007,6 +1007,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
 #ifndef WIN32
     char* psz_pidfile = NULL;
 
+    if( p_libvlc->p_libvlc_global->p_module_bank )
     if( config_GetInt( p_libvlc, "daemon" ) )
     {
         psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
