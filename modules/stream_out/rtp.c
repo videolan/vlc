@@ -436,7 +436,8 @@ static int Open( vlc_object_t *p_this )
     if( *val.psz_string )
     {
         sout_access_out_t *p_grab;
-        char *psz_rtpmap, url[NI_MAXHOST + 8], access[17], psz_ttl[5], ipv;
+        const char *psz_rtpmap;
+        char url[NI_MAXHOST + 8], access[17], psz_ttl[5], ipv;
 
         if( b_rtsp )
         {
@@ -938,68 +939,6 @@ static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
     s[2*i_data] = '\0';
 }
 
-static const char basis_64[] =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-int ap_base64encode_len(int len)
-{
-    return ((len + 2) / 3 * 4) + 1;
-}
-
-int ap_base64encode_binary(char *encoded,
-                                       const unsigned char *string, int len)
-{
-    int i;
-    char *p;
-
-    p = encoded;
-    for (i = 0; i < len - 2; i += 3) {
-        *p++ = basis_64[(string[i] >> 2) & 0x3F];
-        *p++ = basis_64[((string[i] & 0x3) << 4) |
-                        ((int) (string[i + 1] & 0xF0) >> 4)];
-        *p++ = basis_64[((string[i + 1] & 0xF) << 2) |
-                        ((int) (string[i + 2] & 0xC0) >> 6)];
-        *p++ = basis_64[string[i + 2] & 0x3F];
-    }
-    if (i < len) {
-        *p++ = basis_64[(string[i] >> 2) & 0x3F];
-        if (i == (len - 1)) {
-            *p++ = basis_64[((string[i] & 0x3) << 4)];
-            *p++ = '=';
-        }
-        else {
-            *p++ = basis_64[((string[i] & 0x3) << 4) |
-                            ((int) (string[i + 1] & 0xF0) >> 4)];
-            *p++ = basis_64[((string[i + 1] & 0xF) << 2)];
-        }
-        *p++ = '=';
-    }
-
-    *p++ = '\0';
-    return p - encoded;
-}
-
-int ap_base64encode(char *encoded, const char *string, int len)
-{
-    return ap_base64encode_binary(encoded, (const unsigned char *) string, len);
-}
-
-char *b64_encode(char *buf, int len)
-{
-    int elen;
-    char *out;
-
-    if(len == 0)
-        len = strlen(buf);
-
-    elen = ap_base64encode_len(len);
-    out = (char *) malloc(sizeof(char) * (elen + 1));
-
-    ap_base64encode(out, buf, len);
-
-    return out;
-}
-
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_instance_t   *p_sout = p_stream->p_sout;
@@ -1155,62 +1094,58 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->i_clock_rate = 90000;
             id->psz_rtpmap = strdup( "H264/90000" );
             id->pf_packetize = rtp_packetize_h264;
+            id->psz_fmtp = NULL;
+
             if( p_fmt->i_extra > 0 )
             {
                 uint8_t *p_buffer = p_fmt->p_extra;
                 int     i_buffer = p_fmt->i_extra;
                 char    *p_64_sps = NULL;
                 char    *p_64_pps = NULL;
-                char    hexa[6];
+                char    hexa[6+1];
 
                 while( i_buffer > 4 && 
-                    p_buffer[0] == 0 && p_buffer[1] == 0 &&
-                    p_buffer[2] == 0 && p_buffer[3] == 1 )
+                       p_buffer[0] == 0 && p_buffer[1] == 0 &&
+                       p_buffer[2] == 0 && p_buffer[3] == 1 )
                 {
                     const int i_nal_type = p_buffer[4]&0x1f;
-                    int i_offset    = 1;
+                    int i_offset;
                     int i_size      = 0;
-                    int i_startcode = 0;
-                    int i_encoded   = 0;
 
                     msg_Dbg( p_stream, "we found a startcode for NAL with TYPE:%d", i_nal_type );
 
-                    for( i_offset = 1; i_offset+3 < i_buffer ; i_offset++)
+                    i_size = i_buffer;
+                    for( i_offset = 4; i_offset+3 < i_buffer ; i_offset++)
                     {
                         if( p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 && p_buffer[i_offset+2] == 0 && p_buffer[i_offset+3] == 1 )
                         {
                             /* we found another startcode */
-                            i_startcode = i_offset;
+                            i_size = i_offset;
                             break;
                         } 
                     }
-                    i_size = i_startcode ? i_startcode : i_buffer;
                     if( i_nal_type == 7 )
                     {
-                        p_64_sps = (char *)malloc( ap_base64encode_len( i_size - 4) );
-                        i_encoded = ap_base64encode_binary( p_64_sps, &p_buffer[4], i_size - 4 );
-                        p_64_sps[i_encoded] = '\0';
+                        p_64_sps = vlc_b64_encode_binary( &p_buffer[4], i_size - 4 );
                         sprintf_hexa( hexa, &p_buffer[5], 3 );
-                        hexa[6] = '\0'; 
                     }
-                    if( i_nal_type == 8 )
+                    else if( i_nal_type == 8 )
                     {
-                        p_64_pps = (char *)malloc( ap_base64encode_len( i_size - 4) );
-                        i_encoded = ap_base64encode_binary( p_64_pps, &p_buffer[4], i_size - 4 );
-                        p_64_pps[i_encoded] = '\0';
+                        p_64_pps = vlc_b64_encode_binary( &p_buffer[4], i_size - 4 );
                     }
                     i_buffer -= i_size;
                     p_buffer += i_size;
                 }
-                /* FIXME: All this is a bit unsafe */
-                asprintf( &id->psz_fmtp, "packetization-mode=1;profile-level-id=%s;sprop-parameter-sets=%s,%s;", hexa, p_64_sps, p_64_pps );
-                free( p_64_sps );
-                free( p_64_pps );
+                /* */
+                if( p_64_sps && p_64_pps )
+                    asprintf( &id->psz_fmtp, "packetization-mode=1;profile-level-id=%s;sprop-parameter-sets=%s,%s;", hexa, p_64_sps, p_64_pps );
+                if( p_64_sps )
+                    free( p_64_sps );
+                if( p_64_pps )
+                    free( p_64_pps );
             }
-            else
+            if( !id->psz_fmtp )
                 id->psz_fmtp = strdup( "packetization-mode=1" );
-if( p_fmt->i_extra > 0 )
-msg_Dbg( p_stream, "WE HAVE %d bytes extra data", p_fmt->i_extra );
             break;
 
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):

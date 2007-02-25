@@ -38,6 +38,7 @@
 VLC_EXPORT( void, resolve_xml_special_chars, ( char *psz_value ) );
 VLC_EXPORT( char *, convert_xml_special_chars, ( const char *psz_content ) );
 
+VLC_EXPORT( char *, vlc_b64_encode_binary, ( const uint8_t *, size_t ) );
 VLC_EXPORT( char *, vlc_b64_encode, ( const char * ) );
 
 VLC_EXPORT( char *, str_format_time, ( const char * ) );
