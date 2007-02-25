@@ -23,9 +23,10 @@
 
 #include <vlc_demux.h>
 
-#define PS_TK_COUNT (512 - 0xc0)
+/* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream */
+#define PS_TK_COUNT (768 - 0xc0)
 #define PS_ID_TO_TK( id ) ((id) <= 0xff ? (id) - 0xc0 : \
-                                          ((id)&0xff) + (256 - 0xc0))
+            ((id)&0xff) + (((id)&0xff00) == 0xbd00 ? 256-0xC0 : 512-0xc0) )
 
 typedef struct ps_psm_t ps_psm_t;
 static inline int ps_id_to_type( const ps_psm_t *, int );
@@ -106,6 +107,19 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
             return VLC_EGENERIC;
         }
     }
+    else if( (i_id&0xff00) == 0xfd00 )
+    {
+        uint8_t i_sub_id = i_id & 0xff;
+        if( i_sub_id >= 0x55 && i_sub_id <= 0x5f )
+        {
+            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('W','V','C','1') );
+        }
+        else
+        {
+            es_format_Init( &tk->fmt, UNKNOWN_ES, 0 );
+            return VLC_EGENERIC;
+        }
+    }
     else
     {
         int i_type = ps_id_to_type( p_psm , i_id );
@@ -164,7 +178,63 @@ static inline int ps_pkt_id( block_t *p_pkt )
         p_pkt->i_buffer >= 9 &&
         p_pkt->i_buffer >= 9 + p_pkt->p_buffer[8] )
     {
+        /* VOB extension */
         return 0xbd00 | p_pkt->p_buffer[9+p_pkt->p_buffer[8]];
+    }
+    else if( p_pkt->p_buffer[3] == 0xfd &&
+             p_pkt->i_buffer >= 9 &&
+             (p_pkt->p_buffer[6]&0xC0) == 0x80 &&   /* mpeg2 */
+             (p_pkt->p_buffer[7]&0x01) == 0x01 )    /* extension_flag */
+    {
+        /* ISO 13818 amendment 2 and SMPTE RP 227 */
+        const uint8_t i_flags = p_pkt->p_buffer[7];
+        int i_skip = 9;
+
+
+        /* Find PES extension */
+        if( (i_flags & 0x80 ) )
+        {
+            i_skip += 5;        /* pts */
+            if( (i_flags & 0x40) )
+                i_skip += 5;    /* dts */
+        }
+        if( (i_flags & 0x20 ) )
+            i_skip += 6;
+        if( (i_flags & 0x10 ) )
+            i_skip += 3;
+        if( (i_flags & 0x08 ) )
+            i_skip += 1;
+        if( (i_flags & 0x04 ) )
+            i_skip += 1;
+        if( (i_flags & 0x02 ) )
+            i_skip += 2;
+
+        if( i_skip < p_pkt->i_buffer && (p_pkt->p_buffer[i_skip]&0x01) )
+        {
+            const uint8_t i_flags2 = p_pkt->p_buffer[i_skip];
+
+            /* Find PES extension 2 */
+            i_skip += 1;
+            if( i_flags2 & 0x80 )
+                i_skip += 16;
+            if( (i_flags2 & 0x40) && i_skip < p_pkt->i_buffer )
+                i_skip += 1 + p_pkt->p_buffer[i_skip];
+            if( i_flags2 & 0x20 )
+                i_skip += 2;
+            if( i_flags2 & 0x10 )
+                i_skip += 2;
+
+            if( i_skip + 1 < p_pkt->i_buffer )
+            {
+                const int i_extension_field_length = p_pkt->p_buffer[i_skip]&0x7f;
+                if( i_extension_field_length >=1 )
+                {
+                    int i_stream_id_extension_flag = (p_pkt->p_buffer[i_skip+1] >> 7)&0x1;
+                    if( i_stream_id_extension_flag == 0 )
+                        return 0xfd00 | (p_pkt->p_buffer[i_skip+1]&0x7f);
+                }
+            }
+        }
     }
     return p_pkt->p_buffer[3];
 }
@@ -471,6 +541,11 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
             p_buffer[ i_es_base + 3 ];
 
         if( i_es_base + 4 + i_info_length > i_length ) break;
+
+        /* TODO Add support for VC-1 stream:
+         *      stream_type=0xea, stream_id=0xfd AND registration
+         *      descriptor 0x5 with format_identifier == 0x56432D31 (VC-1)
+         *      (I need a sample that use PSM with VC-1) */
 
         es.p_descriptor = 0;
         es.i_descriptor = i_info_length;
