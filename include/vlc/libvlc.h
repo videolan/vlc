@@ -432,6 +432,15 @@ VLC_PUBLIC_API int libvlc_video_reparent( libvlc_input_t *, libvlc_drawable_t, l
 VLC_PUBLIC_API void libvlc_video_set_parent( libvlc_instance_t *, libvlc_drawable_t, libvlc_exception_t * );
 
 /**
+ * Set the default video output parent
+ *  this settings will be used as default for all video outputs
+ * \param p_instance libvlc instance
+ * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
+ * \param p_exception an initialized exception
+ */
+VLC_PUBLIC_API libvlc_drawable_t libvlc_video_get_handle( libvlc_instance_t *, libvlc_exception_t * );
+
+/**
  * Set the default video output size
  *  this settings will be used as default for all video outputs
  * \param p_instance libvlc instance

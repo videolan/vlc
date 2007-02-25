@@ -260,6 +260,16 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
     }
 }
 
+libvlc_drawable_t libvlc_video_get_handle( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
+{
+    libvlc_drawable_t result;
+    
+    result = var_GetInteger( p_instance->p_libvlc_int, "drawable" );
+    
+    return result;
+}
+
+
 void libvlc_video_set_size( libvlc_instance_t *p_instance, int width, int height,
                            libvlc_exception_t *p_e )
 {
