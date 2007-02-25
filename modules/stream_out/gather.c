@@ -48,8 +48,7 @@ vlc_module_end();
  *****************************************************************************/
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *,
-                               block_t* );
+static int               Send( sout_stream_t *, sout_stream_id_t *, block_t* );
 
 struct sout_stream_id_t
 {
@@ -103,10 +102,14 @@ static void Close( vlc_object_t * p_this )
 
     for( i = 0; i < p_sys->i_id; i++ )
     {
-        p_sys->p_out->pf_del( p_sys->p_out, p_sys->id[i]->id );
-        free( p_sys->id[i] );
+        sout_stream_id_t *id = p_sys->id[i];
+
+        sout_StreamIdDel( p_sys->p_out, id );
+        es_format_Clean( &id->fmt );
+        free( id );
     }
-    free( p_sys->id );
+    if( p_sys->id )
+        free( p_sys->id );
 
     sout_StreamDelete( p_sys->p_out );
     free( p_sys );
@@ -125,21 +128,32 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     for( i = 0; i < p_sys->i_id; i++ )
     {
         id = p_sys->id[i];
-        if( !id->b_used &&
-            id->fmt.i_cat == p_fmt->i_cat &&
-            id->fmt.i_codec == p_fmt->i_codec &&
-            ( ( id->fmt.i_cat == AUDIO_ES &&
-                id->fmt.audio.i_rate == p_fmt->audio.i_rate &&
-                id->fmt.audio.i_channels == p_fmt->audio.i_channels &&
-                id->fmt.audio.i_blockalign == p_fmt->audio.i_blockalign ) ||
-              ( id->fmt.i_cat == VIDEO_ES &&
-                id->fmt.video.i_width == p_fmt->video.i_width &&
-                id->fmt.video.i_height == p_fmt->video.i_height ) ) )
+        if( id->b_used )
+            continue;
+
+        if( id->fmt.i_cat != p_fmt->i_cat || id->fmt.i_codec != p_fmt->i_codec )
+            continue;
+
+        if( id->fmt.i_cat == AUDIO_ES )
         {
-            msg_Dbg( p_stream, "reusing already opened output" );
-            id->b_used = VLC_TRUE;
-            return id;
+            audio_format_t *p_a = &id->fmt.audio;
+            if( p_a->i_rate != p_fmt->audio.i_rate ||
+                p_a->i_channels != p_fmt->audio.i_channels ||
+                p_a->i_blockalign != p_fmt->audio.i_blockalign )
+                continue;
         }
+        else if( id->fmt.i_cat == VIDEO_ES )
+        {
+            video_format_t *p_v = &id->fmt.video;
+            if( p_v->i_width != p_fmt->video.i_width ||
+                p_v->i_height != p_fmt->video.i_height )
+                continue;
+        }
+
+        /* */
+        msg_Dbg( p_stream, "reusing already opened output" );
+        id->b_used = VLC_TRUE;
+        return id;
     }
 
     /* destroy all outputs from the same category */
@@ -149,20 +163,20 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         if( !id->b_used && id->fmt.i_cat == p_fmt->i_cat )
         {
             TAB_REMOVE( p_sys->i_id, p_sys->id, id );
-            p_sys->p_out->pf_del( p_sys->p_out, id );
+            sout_StreamIdDel( p_sys->p_out, id );
+            es_format_Clean( &id->fmt );
+            free( id );
 
             i = 0;
             continue;
         }
     }
 
-    id = malloc( sizeof( sout_stream_id_t ) );
     msg_Dbg( p_stream, "creating new output" );
-    memcpy( &id->fmt, p_fmt, sizeof( es_format_t ) );
-    id->fmt.i_extra = 0;
-    id->fmt.p_extra = NULL;
+    id = malloc( sizeof( sout_stream_id_t ) );
+    es_format_Copy( &id->fmt, p_fmt );
     id->b_used           = VLC_TRUE;
-    id->id               = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
+    id->id               = sout_StreamIdAdd( p_sys->p_out, &id->fmt );
     if( id->id == NULL )
     {
         free( id );
@@ -190,5 +204,6 @@ static int Send( sout_stream_t *p_stream,
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    return p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
+    return sout_StreamIdSend( p_sys->p_out, id->id, p_buffer );
 }
+
