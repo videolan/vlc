@@ -2486,21 +2486,24 @@ static int Manage( vlc_object_t* p_object )
                 vlm_media_instance_t *p_instance = p_media->instance[j];
 
                 if( !p_instance->p_input ||
-                    ( !p_instance->p_input->b_eof &&
-                      !p_instance->p_input->b_error ) ) continue;
-
-                input_StopThread( p_instance->p_input );
-                input_DestroyThread( p_instance->p_input );
+                    ( !p_instance->p_input->b_eof && !p_instance->p_input->b_error ) )
+                    continue;
 
                 p_instance->i_index++;
-                if( p_instance->i_index == p_media->i_input &&
-                    p_media->b_loop ) p_instance->i_index = 0;
+                if( p_instance->i_index >= p_media->i_input && p_media->b_loop )
+                    p_instance->i_index = 0;
 
                 if( p_instance->i_index < p_media->i_input )
                 {
-                    /* FIXME, find a way to select the right instance */
                     char buffer[12];
+
+                    input_StopThread( p_instance->p_input );
+                    input_DestroyThread( p_instance->p_input );
+                    p_instance->p_input = NULL;
+
+                    /* FIXME, find a way to select the right instance */
                     sprintf( buffer, "%d", p_instance->i_index+1 );
+
                     vlm_MediaControl( vlm, p_media, p_instance->psz_name,
                                       "play", buffer );
                 }
