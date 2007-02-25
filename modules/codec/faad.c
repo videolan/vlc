@@ -338,29 +338,27 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
 
         /* Convert frame.channel_position to our own channel values */
+        p_dec->fmt_out.audio.i_physical_channels = 0;
         for( i = 0; i < frame.channels; i++ )
         {
             /* Find the channel code */
             for( j = 0; j < MAX_CHANNEL_POSITIONS; j++ )
             {
                 if( frame.channel_position[i] == pi_channels_in[j] )
-                {
-                    p_sys->pi_channel_positions[i] = pi_channels_out[j];
-                    p_dec->fmt_out.audio.i_physical_channels |=
-                        pi_channels_out[j];
                     break;
-                }
             }
-
-            if( j == MAX_CHANNEL_POSITIONS )
+            if( j >= MAX_CHANNEL_POSITIONS )
             {
                 msg_Warn( p_dec, "unknown channel ordering" );
-
-                /* Try to invent something */
-                p_sys->pi_channel_positions[i] = pi_channels_out[i];
-                p_dec->fmt_out.audio.i_physical_channels |=
-                    pi_channels_out[i];
+                /* Invent something */
+                j = i;
             }
+            /* */
+            p_sys->pi_channel_positions[i] = pi_channels_out[j];
+            if( p_dec->fmt_out.audio.i_physical_channels & pi_channels_out[j] )
+                frame.channels--; /* We loose a duplicated channel */
+            else
+                p_dec->fmt_out.audio.i_physical_channels |= pi_channels_out[j];
         }
         p_dec->fmt_out.audio.i_original_channels =
             p_dec->fmt_out.audio.i_physical_channels;
@@ -420,9 +418,9 @@ static void DoReordering( decoder_t *p_dec,
     int i, j, k;
 
     /* Find the channels mapping */
-    for( i = 0, j = 0; i < MAX_CHANNEL_POSITIONS; i++ )
+    for( k = 0, j = 0; k < i_nb_channels; k++ )
     {
-        for( k = 0; k < i_nb_channels; k++ )
+        for( i = 0; i < MAX_CHANNEL_POSITIONS; i++ )
         {
             if( pi_channels_ordered[i] == pi_chan_positions[k] )
             {
