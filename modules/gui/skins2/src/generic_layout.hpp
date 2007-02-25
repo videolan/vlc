@@ -149,7 +149,7 @@ class GenericLayout: public SkinObject
         /// Parent window of the layout
         TopWindow *m_pWindow;
         /// Layout size
-        Rect m_rect;
+        SkinsRect m_rect;
         int m_minWidth, m_maxWidth;
         int m_minHeight, m_maxHeight;
         /// Image of the layout

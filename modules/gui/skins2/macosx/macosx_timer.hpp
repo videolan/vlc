@@ -28,13 +28,14 @@
 
 // Forward declaration
 class MacOSXTimerLoop;
+class CmdGeneric;
 
 
 // MacOSX specific timer
 class MacOSXTimer: public OSTimer
 {
     public:
-        MacOSXTimer( intf_thread_t *pIntf, const Callback &rCallback );
+        MacOSXTimer( intf_thread_t *pIntf, CmdGeneric &rCmd );
         virtual ~MacOSXTimer();
 
         /// (Re)start the timer with the given delay (in ms). If oneShot is
@@ -45,8 +46,8 @@ class MacOSXTimer: public OSTimer
         virtual void stop();
 
     private:
-        /// Callback to execute
-        Callback m_callback;
+        /// Command to execute
+        CmdGeneric &m_rCommand;
 };
 
 

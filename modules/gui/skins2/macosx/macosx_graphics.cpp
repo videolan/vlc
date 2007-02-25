@@ -24,6 +24,7 @@
 #ifdef MACOSX_SKINS
 
 #include "macosx_graphics.hpp"
+#include "macosx_window.hpp"
 
 
 MacOSXGraphics::MacOSXGraphics( intf_thread_t *pIntf, int width, int height ):
@@ -55,7 +56,7 @@ void MacOSXGraphics::drawGraphics( const OSGraphics &rGraphics, int xSrc,
 
 void MacOSXGraphics::drawBitmap( const GenericBitmap &rBitmap, int xSrc,
                                  int ySrc, int xDest, int yDest, int width,
-                                 int height )
+                                 int height, bool blend )
 {
     // TODO
 }
@@ -84,7 +85,18 @@ void MacOSXGraphics::applyMaskToWindow( OSWindow &rWindow )
 void MacOSXGraphics::copyToWindow( OSWindow &rWindow, int xSrc,  int ySrc,
                                 int width, int height, int xDest, int yDest )
 {
-    // TODO
+    // Get the graphics context
+    WindowRef win = ((MacOSXWindow&)rWindow).getWindowRef();
+    SetPortWindowPort( win );
+    GrafPtr port = GetWindowPort( win );
+    CGContextRef gc;
+    QDBeginCGContext( port, &gc );
+
+//    CGContextSetRGBFillColor( gc, 1, 0, 0, 1 );
+//    CGContextFillRect( gc, CGRectMake( 0, 0, 50, 50 ));
+
+    // Release the graphics context
+    QDEndCGContext( port, &gc );
 }
 
 

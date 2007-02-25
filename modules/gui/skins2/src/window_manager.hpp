@@ -209,7 +209,7 @@ class WindowManager: public SkinObject
         /// Direction of the current resizing
         Direction_t m_direction;
         /// Rect of the last maximized window
-        Rect m_maximizeRect;
+        SkinsRect m_maximizeRect;
         /// Tooltip
         Tooltip *m_pTooltip;
         /// Active popup, if any

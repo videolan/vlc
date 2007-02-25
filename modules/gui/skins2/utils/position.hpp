@@ -52,10 +52,10 @@ class GenericRect: public Box
 
 
 /// Characterization of a rectangle
-class Rect: public GenericRect
+class SkinsRect: public GenericRect
 {
     public:
-        Rect( int left, int top, int right, int bottom );
+        SkinsRect( int left, int top, int right, int bottom );
 
         virtual int getLeft() const { return m_left; }
         virtual int getTop() const { return m_top; }

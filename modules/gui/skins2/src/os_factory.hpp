@@ -121,7 +121,7 @@ class OSFactory: public SkinObject
         virtual int getScreenHeight() const = 0;
 
         /// Get the work area (screen area without taskbars)
-        virtual Rect getWorkArea() const = 0;
+        virtual SkinsRect getWorkArea() const = 0;
 
         /// Get the position of the mouse
         virtual void getMousePos( int &rXPos, int &rYPos ) const = 0;

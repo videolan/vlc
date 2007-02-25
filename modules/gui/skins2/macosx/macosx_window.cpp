@@ -24,6 +24,8 @@
 #ifdef MACOSX_SKINS
 
 #include "macosx_window.hpp"
+#include "macosx_loop.hpp"
+#include "../src/os_factory.hpp"
 
 
 MacOSXWindow::MacOSXWindow( intf_thread_t *pIntf, GenericWindow &rWindow,
@@ -31,43 +33,52 @@ MacOSXWindow::MacOSXWindow( intf_thread_t *pIntf, GenericWindow &rWindow,
                             MacOSXWindow *pParentWindow ):
     OSWindow( pIntf ), m_pParent( pParentWindow ), m_dragDrop( dragDrop )
 {
-    // TODO
+    // Create the window
+    Rect rect;
+    SetRect( &rect, 0, 0, 0, 0 );
+    CreateNewWindow( kDocumentWindowClass, kWindowNoShadowAttribute |
+                     kWindowNoTitleBarAttribute, &rect, &m_win );
+
+    // Create the event handler for this window
+    OSFactory *pOSFactory = OSFactory::instance( getIntf() );
+    ((MacOSXLoop*)pOSFactory->getOSLoop())->registerWindow( rWindow, m_win );
 }
 
 
 MacOSXWindow::~MacOSXWindow()
 {
-    // TODO
+    DisposeWindow( m_win );
 }
 
 
 void MacOSXWindow::show( int left, int top ) const
 {
-    // TODO
+    ShowWindow( m_win );
 }
 
 
 void MacOSXWindow::hide() const
 {
-    // TODO
+    HideWindow( m_win );
 }
 
 
 void MacOSXWindow::moveResize( int left, int top, int width, int height ) const
 {
-    // TODO
+    MoveWindow( m_win, left, top, false );
+    SizeWindow( m_win, width, height, true );
 }
 
 
 void MacOSXWindow::raise() const
 {
-    // TODO
+    SelectWindow( m_win );
 }
 
 
 void MacOSXWindow::setOpacity( uint8_t value ) const
 {
-    // TODO
+    SetWindowAlpha( m_win, (float)value / 255.0 );
 }
 
 

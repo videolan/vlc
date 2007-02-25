@@ -4620,13 +4620,20 @@ if test "${enable_skins2}" = "yes" ||
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
     VLC_ADD_LDFLAGS([skins2],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32])
 
+  else if test "${skins2_missing_lib}" = "no" && (test "${SYS}" = "darwin"); then
+    VLC_ADD_PLUGINS([skins2])
+    ALIASES="${ALIASES} svlc"
+    VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -DMACOSX_SKINS])
+    VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
+    VLC_ADD_LDFLAGS([skins2],[-framework Carbon])
+
   else if test "${skins2_missing_lib}" = "no"; then
     VLC_ADD_PLUGINS([skins2])
     ALIASES="${ALIASES} svlc"
     VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 ${X_CFLAGS} -DX11_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
     VLC_ADD_LDFLAGS([skins2],[${X_LIBS} ${X_PRE_LIBS} -lXext -lX11])
-  fi fi
+  fi fi fi
 fi
 
 

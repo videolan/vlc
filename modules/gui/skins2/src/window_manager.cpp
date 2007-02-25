@@ -320,11 +320,11 @@ void WindowManager::resize( GenericLayout &rLayout,
 void WindowManager::maximize( TopWindow &rWindow )
 {
     // Save the current position/size of the window, to be able to restore it
-    m_maximizeRect = Rect( rWindow.getLeft(), rWindow.getTop(),
-                           rWindow.getLeft() + rWindow.getWidth(),
-                           rWindow.getTop() + rWindow.getHeight() );
+    m_maximizeRect = SkinsRect( rWindow.getLeft(), rWindow.getTop(),
+                               rWindow.getLeft() + rWindow.getWidth(),
+                               rWindow.getTop() + rWindow.getHeight() );
 
-    Rect workArea = OSFactory::instance( getIntf() )->getWorkArea();
+    SkinsRect workArea = OSFactory::instance( getIntf() )->getWorkArea();
     // Move the window
     startMove( rWindow );
     move( rWindow, workArea.getLeft(), workArea.getTop() );
@@ -486,7 +486,7 @@ void WindowManager::checkAnchors( TopWindow *pWindow,
     AncList_t::const_iterator itAncMov, itAncSta;
 
     // Check magnetism with screen edges first (actually it is the work area)
-    Rect workArea = OSFactory::instance( getIntf() )->getWorkArea();
+    SkinsRect workArea = OSFactory::instance( getIntf() )->getWorkArea();
     // Iterate through the moving windows
     for( itMov = m_movingWindows.begin();
          itMov != m_movingWindows.end(); itMov++ )

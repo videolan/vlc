@@ -365,12 +365,12 @@ int Win32Factory::getScreenHeight() const
 }
 
 
-Rect Win32Factory::getWorkArea() const
+SkinsRect Win32Factory::getWorkArea() const
 {
     RECT r;
     SystemParametersInfo( SPI_GETWORKAREA, 0, &r, 0 );
     // Fill a Rect object
-    Rect rect( r.left, r.top, r.right, r.bottom );
+    SkinsRect SkinsRect( r.left, r.top, r.right, r.bottom );
     return rect;
 }
 

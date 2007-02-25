@@ -28,7 +28,7 @@
 const string VarBox::m_type = "box";
 
 
-Rect::Rect( int left, int top, int right, int bottom ):
+SkinsRect::SkinsRect( int left, int top, int right, int bottom ):
     m_left( left ), m_top( top ), m_right( right ), m_bottom( bottom )
 {
 }

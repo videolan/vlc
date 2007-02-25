@@ -98,7 +98,7 @@ class Win32Factory: public OSFactory
         virtual int getScreenHeight() const;
 
         /// Get the work area (screen area without taskbars)
-        virtual Rect getWorkArea() const;
+        virtual SkinsRect getWorkArea() const;
 
         /// Get the position of the mouse
         virtual void getMousePos( int &rXPos, int &rYPos ) const;

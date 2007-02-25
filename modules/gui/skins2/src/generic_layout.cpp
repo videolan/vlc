@@ -165,7 +165,7 @@ void GenericLayout::onControlUpdate( const CtrlGeneric &rCtrl,
 void GenericLayout::resize( int width, int height )
 {
     // Update the window size
-    m_rect = Rect( 0, 0 , width, height );
+    m_rect = SkinsRect( 0, 0 , width, height );
 
     // Recreate a new image
     if( m_pImage )

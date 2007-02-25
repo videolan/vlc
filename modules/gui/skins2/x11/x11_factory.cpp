@@ -170,10 +170,10 @@ int X11Factory::getScreenHeight() const
 }
 
 
-Rect X11Factory::getWorkArea() const
+SkinsRect X11Factory::getWorkArea() const
 {
     // XXX
-    return Rect( 0, 0, getScreenWidth(), getScreenHeight() );
+    return SkinsRect( 0, 0, getScreenWidth(), getScreenHeight() );
 }
 
 

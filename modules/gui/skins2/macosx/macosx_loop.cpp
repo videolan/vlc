@@ -23,8 +23,29 @@
 
 #ifdef MACOSX_SKINS
 
-#include <Carbon/Carbon.h>
 #include "macosx_loop.hpp"
+#include "macosx_window.hpp"
+#include "../src/generic_window.hpp"
+#include "../events/evt_refresh.hpp"
+
+static pascal OSStatus WinEventHandler( EventHandlerCallRef handler,
+                                        EventRef event, void *data )
+{
+    GenericWindow *pWin = (GenericWindow*)data;
+    intf_thread_t *pIntf = pWin->getIntf();
+
+    //fprintf(stderr, "event\n" );
+    UInt32 evclass = GetEventClass( event );
+    UInt32 evkind = GetEventKind( event );
+
+    switch( evclass )
+    {
+    case kEventClassWindow:
+        EvtRefresh evt( pIntf, 0, 0, -1, -1);
+        pWin->processEvent( evt );
+        break;
+    }
+}
 
 
 MacOSXLoop::MacOSXLoop( intf_thread_t *pIntf ):
@@ -64,41 +85,7 @@ void MacOSXLoop::run()
     // Main event loop
     while( !m_exit )
     {
-        EventRef pEvent;
-        OSStatus err = ReceiveNextEvent( 0, NULL, kEventDurationForever, true,
-                                         &pEvent );
-        if( err != noErr )
-        {
-            // Get the event type
-            UInt32 evClass = GetEventClass( pEvent );
-
-            switch( evClass )
-            {
-                case kEventClassMouse:
-                {
-                    break;
-                }
-
-                case kEventClassKeyboard:
-                {
-                    break;
-                }
-
-                case kEventClassWindow:
-                {
-                    handleWindowEvent( pEvent );
-                    break;
-                }
-
-                default:
-                {
-                    EventTargetRef pTarget;
-                    pTarget = GetEventDispatcherTarget();
-                    SendEventToEventTarget( pEvent, pTarget );
-                    ReleaseEvent( pEvent );
-                }
-            }
-        }
+        sleep(1);
     }
 }
 
@@ -109,11 +96,16 @@ void MacOSXLoop::exit()
 }
 
 
-void MacOSXLoop::handleWindowEvent( EventRef pEvent )
+void MacOSXLoop::registerWindow( GenericWindow &rGenWin, WindowRef win )
 {
-    UInt32 evKind = GetEventKind( pEvent );
-
+    // Create the event handler
+    EventTypeSpec evList[] = {
+        { kEventClassWindow, kEventWindowUpdate },
+        { kEventClassMouse, kEventMouseMoved }
+    };
+    EventHandlerUPP handler = NewEventHandlerUPP( WinEventHandler );
+    InstallWindowEventHandler( win, handler, GetEventTypeCount( evList ),
+                               evList, &rGenWin, NULL );
 }
-
 
 #endif

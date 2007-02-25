@@ -24,10 +24,11 @@
 #ifdef MACOSX_SKINS
 
 #include "macosx_timer.hpp"
+#include "../commands/cmd_generic.hpp"
 
 
-MacOSXTimer::MacOSXTimer( intf_thread_t *pIntf, const Callback &rCallback ):
-    OSTimer( pIntf ), m_callback( rCallback )
+MacOSXTimer::MacOSXTimer( intf_thread_t *pIntf,  CmdGeneric &rCmd ):
+    OSTimer( pIntf ), m_rCommand( rCmd )
 {
     // TODO
 }
