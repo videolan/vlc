@@ -263,7 +263,7 @@ void __module_EndBank( vlc_object_t *p_this )
     {
         if( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] )
         {
-            DeleteModule (p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module);
+            DeleteModule( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
             p_bank->pp_loaded_cache[p_bank->i_loaded_cache] = NULL;
@@ -1044,6 +1044,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
         }
         else
         {
+            vlc_bool_t b_force_load = VLC_FALSE;
             module_config_t *p_item = NULL, *p_end = NULL;
 
             p_module = p_cache_entry->p_module;
@@ -1056,7 +1057,16 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
                  p_item < p_end; p_item++ )
             {
                 if( p_item->pf_callback || p_item->i_action )
-                    p_module = AllocatePlugin( p_this, psz_file );
+                {
+                    b_force_load = VLC_TRUE;
+                }
+            }
+            if( b_force_load == VLC_TRUE )
+            {
+                int i_oldid = p_module->i_object_id;
+                module_t *p_new_module = AllocatePlugin( p_this, psz_file );
+                vlc_object_attach( p_module, p_new_module );
+                p_module = p_new_module;
             }
         }
     }
