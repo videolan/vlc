@@ -25,6 +25,7 @@ TOUI = 	\
 	ui/sprefs_playlist \
 	ui/sprefs_subtitles \
 	ui/sprefs_video \
+	ui/sprefs_hotkeys \
 	ui/streampanel \
 	ui/sout
 
@@ -179,6 +180,7 @@ EXTRA_DIST += \
 	ui/sprefs_input.ui \
 	ui/sprefs_interface.ui \
 	ui/sprefs_playlist.ui \
+	ui/sprefs_hotkeys.ui \
 	ui/sprefs_subtitles.ui \
 	ui/sprefs_video.ui \
 	ui/streampanel.ui \

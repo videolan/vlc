@@ -1,5 +1,5 @@
 /* XPM */
-static char * advanced_50x50_xpm[] = {
+static char * hotkeys_50x50_xpm[] = {
 "50 50 2 1",
 " 	c #FFFFFF",
 ".	c #000000",

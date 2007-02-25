@@ -35,7 +35,7 @@ enum {
 //    SPrefsPlaylist,
     SPrefsInterface,
     SPrefsSubtitles,
-    SPrefsAdvanced,
+    SPrefsHotkeys,
     SPrefsMax
 };
 #define SPrefsDefaultCat SPrefsInterface
