@@ -1063,7 +1063,6 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
             }
             if( b_force_load == VLC_TRUE )
             {
-                int i_oldid = p_module->i_object_id;
                 module_t *p_new_module = AllocatePlugin( p_this, psz_file );
                 vlc_object_attach( p_module, p_new_module );
                 p_module = p_new_module;
