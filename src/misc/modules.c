@@ -1044,7 +1044,6 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
         }
         else
         {
-            vlc_bool_t b_force_load = VLC_FALSE;
             module_config_t *p_item = NULL, *p_end = NULL;
 
             p_module = p_cache_entry->p_module;
@@ -1058,14 +1057,11 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
             {
                 if( p_item->pf_callback || p_item->i_action )
                 {
-                    b_force_load = VLC_TRUE;
+                    module_t *p_new_module = AllocatePlugin( p_this, psz_file );
+                    vlc_object_attach( p_module, p_new_module );
+                    p_module = p_new_module;
+                    break;
                 }
-            }
-            if( b_force_load == VLC_TRUE )
-            {
-                module_t *p_new_module = AllocatePlugin( p_this, psz_file );
-                vlc_object_attach( p_module, p_new_module );
-                p_module = p_new_module;
             }
         }
     }
