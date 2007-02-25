@@ -1,13 +1,13 @@
 <ui version="4.0" >
  <author>Jean-Baptiste Kempf</author>
  <class>SPrefsHotkeys</class>
- <widget class="QWidget" name="SPrefsVideo" >
+ <widget class="QWidget" name="SPrefsHotkeys" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>426</width>
-    <height>474</height>
+    <width>421</width>
+    <height>511</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -45,6 +45,20 @@
    </item>
    <item row="1" column="0" colspan="2" >
     <widget class="QTreeWidget" name="shortcutsTree" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>3</vsizetype>
+       <horstretch>4</horstretch>
+       <verstretch>4</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize" >
+      <size>
+       <width>350</width>
+       <height>350</height>
+      </size>
+     </property>
      <property name="columnCount" >
       <number>2</number>
      </property>
@@ -58,7 +72,7 @@
        <string>Shortcut</string>
       </property>
      </column>
-   </widget>
+    </widget>
    </item>
    <item row="0" column="0" >
     <widget class="QLabel" name="label" >

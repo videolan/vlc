@@ -70,7 +70,6 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     ADD_CATEGORY( SPrefsAudio, qtr("Audio"), audio_50x50_xpm );
     ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input and Codecs"),
                   input_and_codecs_50x50_xpm );
-//    ADD_CATEGORY( SPrefsPlaylist, qtr("Playlist"), playlist_50x50_xpm );
     ADD_CATEGORY( SPrefsInterface, qtr("Interface"), interface_50x50_xpm );
     ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles"), subtitles_50x50_xpm );
     ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), hotkeys_50x50_xpm );
@@ -96,34 +95,38 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 controls.append( control );                               \
             }
 
-#define START_SPREFS_CAT( name )    \
-        case SPrefs ## name:        \
-        {                           \
-            Ui::SPrefs ## name ui;  \
-            ui.setupUi( panel );
+#define START_SPREFS_CAT( name , label )    \
+        case SPrefs ## name:                \
+        {                                   \
+            Ui::SPrefs ## name ui;          \
+            ui.setupUi( panel );            \
+            panel_label->setText( qtr( label ) );
 
 #define END_SPREFS_CAT      \
             break;          \
         }
+
     QVBoxLayout *panel_layout = new QVBoxLayout();
-    QString head;
     QWidget *panel = new QWidget();
-// Title Label
-        QLabel *panel_label = new QLabel;
-        QFont labelFont = QApplication::font( static_cast<QWidget*>(0) );
-        labelFont.setPointSize( labelFont.pointSize() + 4 );
-        labelFont.setBold( true );
-        panel_label->setFont( labelFont );
-    
-        // Title <hr>
-        QFrame *title_line = new QFrame;
-        title_line->setFrameShape(QFrame::HLine);
-        title_line->setFrameShadow(QFrame::Sunken);
+
+    // Title Label
+    QLabel *panel_label = new QLabel;
+    QFont labelFont = QApplication::font( static_cast<QWidget*>(0) );
+    labelFont.setPointSize( labelFont.pointSize() + 4 );
+    labelFont.setBold( true );
+    panel_label->setFont( labelFont );
+
+    // Title <hr>
+    QFrame *title_line = new QFrame;
+    title_line->setFrameShape(QFrame::HLine);
+    title_line->setFrameShadow(QFrame::Sunken);
 
     switch( number )
     {
-        START_SPREFS_CAT( Video );
-
+        START_SPREFS_CAT( Video , "General video settings" );
+         #ifndef WIN32
+            ui.directXBox->setVisible( false );
+         #endif
             CONFIG_GENERIC( "video", Bool, NULL, enableVideo );
 
             CONFIG_GENERIC( "fullscreen", Bool, NULL, fullscreen );
@@ -143,27 +146,33 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         END_SPREFS_CAT;
 
-        START_SPREFS_CAT( Audio );
-
+        START_SPREFS_CAT( Audio,  "General audio settings" );
+         #ifndef WIN32
+            ui.DirectXLabel->setVisible( false );
+            ui.DirectXDevice->setVisible( false );
+         #endif
+         #ifdef WIN32
+            ui.OSSBrowse->hide();
+            ui.OSSDevice->hide();
+            ui.OSSLabel->hide();
+            ui.alsaDevice->hide();
+            ui.alsaLabel->hide();
+         #endif
             CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
 
         END_SPREFS_CAT;
 
-        START_SPREFS_CAT( InputAndCodecs );
-
+        START_SPREFS_CAT( InputAndCodecs, "Input & Codecs settings"  );
 
         END_SPREFS_CAT;
 
-/*        START_SPREFS_CAT( Playlist );
-        END_SPREFS_CAT;*/
-
-        START_SPREFS_CAT( Interface );
+        START_SPREFS_CAT( Interface, "Interfaces settings" );
 
             CONFIG_GENERIC( "language", StringList, NULL, language );
 
         END_SPREFS_CAT;
 
-        START_SPREFS_CAT( Subtitles );
+        START_SPREFS_CAT( Subtitles, "Subtitles & OSD settings" );
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
             CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );
@@ -175,15 +184,16 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         END_SPREFS_CAT;
 
-        START_SPREFS_CAT( Hotkeys );
+        START_SPREFS_CAT( Hotkeys, "Configure Hotkeys" );
         END_SPREFS_CAT;
         }
-  panel_layout->addWidget(panel_label);
-       panel_layout->addWidget(title_line);
-       panel_layout->addWidget( panel );
 
-       this->setLayout(panel_layout);
+    panel_layout->addWidget(panel_label);
+    panel_layout->addWidget(title_line);
+    panel_layout->addWidget( panel );
+    panel_layout->addStretch( 2 );
 
+    this->setLayout(panel_layout);
 }
 
 void SPrefsPanel::apply()

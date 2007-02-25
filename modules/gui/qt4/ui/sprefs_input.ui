@@ -1,13 +1,13 @@
 <ui version="4.0" >
  <author>Jean-Baptiste Kempf</author>
  <class>SPrefsInputAndCodecs</class>
- <widget class="QWidget" name="Spref_input" >
+ <widget class="QWidget" name="SprefsInputAndCodecs" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>439</width>
-    <height>552</height>
+    <width>422</width>
+    <height>437</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -32,15 +32,15 @@
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item row="2" column="2" >
-       <widget class="QPushButton" name="CDDevice" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>Browse</string>
+         <string>Disk Device</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="QLineEdit" name="CDDevice" />
+      <item row="0" column="1" >
+       <widget class="QLineEdit" name="DVDDevice" />
       </item>
       <item row="0" column="2" >
        <widget class="QPushButton" name="DVDBrowse" >
@@ -48,40 +48,6 @@
          <string>Browse</string>
         </property>
        </widget>
-      </item>
-      <item row="1" column="2" >
-       <widget class="QPushButton" name="VCDBrowse" >
-        <property name="text" >
-         <string>Browse</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_3" >
-        <property name="text" >
-         <string>Audio CD Device</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
-         <string>VCD Device</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" >
-       <widget class="QLineEdit" name="DVDDevice" />
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>DVD Device</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QLineEdit" name="VCDDevice" />
       </item>
      </layout>
     </widget>
@@ -98,6 +64,13 @@
       <property name="spacing" >
        <number>6</number>
       </property>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Default Network caching in ms</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0" >
        <widget class="QLabel" name="label_7" >
         <property name="text" >
@@ -105,14 +78,23 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
-         <string>UDP Default Port</string>
+      <item row="2" column="2" >
+       <widget class="QSpinBox" name="networkCache" >
+        <property name="alignment" >
+         <set>Qt::AlignRight</set>
+        </property>
+        <property name="maximum" >
+         <number>10000</number>
+        </property>
+        <property name="value" >
+         <number>300</number>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
+      <item row="1" column="1" colspan="2" >
+       <widget class="QLineEdit" name="lineEdit" />
+      </item>
+      <item row="0" column="1" colspan="2" >
        <widget class="QSpinBox" name="UDPPort" >
         <property name="alignment" >
          <set>Qt::AlignRight</set>
@@ -128,8 +110,12 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QLineEdit" name="lineEdit" />
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>UDP Default Port</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -219,81 +205,6 @@
        <widget class="QCheckBox" name="DumpBox" >
         <property name="text" >
          <string>Dump</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_5" >
-     <property name="title" >
-      <string>Caching</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item row="2" column="1" >
-       <widget class="QSpinBox" name="localCache" >
-        <property name="alignment" >
-         <set>Qt::AlignRight</set>
-        </property>
-        <property name="maximum" >
-         <number>10000</number>
-        </property>
-        <property name="value" >
-         <number>300</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QSpinBox" name="DiscCache" >
-        <property name="alignment" >
-         <set>Qt::AlignRight</set>
-        </property>
-        <property name="maximum" >
-         <number>10000</number>
-        </property>
-        <property name="value" >
-         <number>300</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" >
-       <widget class="QSpinBox" name="networkCache" >
-        <property name="alignment" >
-         <set>Qt::AlignRight</set>
-        </property>
-        <property name="maximum" >
-         <number>10000</number>
-        </property>
-        <property name="value" >
-         <number>300</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>Default Network caching in ms</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_8" >
-        <property name="text" >
-         <string>Default Disc caching in ms</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_9" >
-        <property name="text" >
-         <string>Default local caching in ms</string>
         </property>
        </widget>
       </item>
