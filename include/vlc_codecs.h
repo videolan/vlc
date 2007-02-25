@@ -236,6 +236,7 @@ typedef struct
 #define WAVE_FORMAT_WMAL                0x0163 /* WMA 9 Lossless */
 #define WAVE_FORMAT_DIVIO_AAC           0x4143
 #define WAVE_FORMAT_AAC                 0x00FF
+#define WAVE_FORMAT_FFMPEG_AAC          0x706D
 
 /* Need to check these */
 #define WAVE_FORMAT_DK3                 0x0061
@@ -321,6 +322,7 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_DTS_MS,     VLC_FOURCC( 'd', 't', 's', ' ' ), "DTS Coherent Acoustics" },
     { WAVE_FORMAT_DIVIO_AAC,  VLC_FOURCC( 'm', 'p', '4', 'a' ), "MPEG-4 Audio (Divio)" },
     { WAVE_FORMAT_AAC,        VLC_FOURCC( 'm', 'p', '4', 'a' ), "MPEG-4 Audio" },
+    { WAVE_FORMAT_FFMPEG_AAC, VLC_FOURCC( 'm', 'p', '4', 'a' ), "MPEG-4 Audio" },
     { WAVE_FORMAT_VORB_1,     VLC_FOURCC( 'v', 'o', 'r', '1' ), "Vorbis 1 Audio" },
     { WAVE_FORMAT_VORB_1PLUS, VLC_FOURCC( 'v', 'o', '1', '+' ), "Vorbis 1+ Audio" },
     { WAVE_FORMAT_VORB_2,     VLC_FOURCC( 'v', 'o', 'r', '2' ), "Vorbis 2 Audio" },
