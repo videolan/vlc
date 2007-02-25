@@ -286,8 +286,8 @@ static int  RtspCallbackId( httpd_callback_sys_t *, httpd_client_t *,
                             httpd_message_t *, httpd_message_t * );
 
 
-static rtsp_client_t *RtspClientNew( sout_stream_t *, char *psz_session );
-static rtsp_client_t *RtspClientGet( sout_stream_t *, char *psz_session );
+static rtsp_client_t *RtspClientNew( sout_stream_t *, const char *psz_session );
+static rtsp_client_t *RtspClientGet( sout_stream_t *, const char *psz_session );
 static void           RtspClientDel( sout_stream_t *, rtsp_client_t * );
 
 /*****************************************************************************
@@ -899,7 +899,7 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         }
         if( b_rtsp )
         {
-            p += sprintf( p, "a=control:trackID=%d\r\n", i );
+            p += sprintf( p, "a=control:/trackID=%d\r\n", i );
         }
     }
     if( p_sys->p_mux )
@@ -1564,11 +1564,11 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
 /****************************************************************************
  * RTSP:
  ****************************************************************************/
-static rtsp_client_t *RtspClientNew( sout_stream_t *p_stream, char *psz_session )
+static rtsp_client_t *RtspClientNew( sout_stream_t *p_stream, const char *psz_session )
 {
     rtsp_client_t *rtsp = malloc( sizeof( rtsp_client_t ));
 
-    rtsp->psz_session = psz_session;
+    rtsp->psz_session = strdup( psz_session );
     rtsp->i_last = 0;
     rtsp->b_playing = VLC_FALSE;
     rtsp->i_id = 0;
@@ -1580,7 +1580,7 @@ static rtsp_client_t *RtspClientNew( sout_stream_t *p_stream, char *psz_session 
 
     return rtsp;
 }
-static rtsp_client_t *RtspClientGet( sout_stream_t *p_stream, char *psz_session )
+static rtsp_client_t *RtspClientGet( sout_stream_t *p_stream, const char *psz_session )
 {
     int i;
 
@@ -1649,8 +1649,8 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     sout_stream_t *p_stream = (sout_stream_t*)p_args;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     char *psz_destination = p_sys->psz_destination;
-    char *psz_session = NULL;
-    char *psz_cseq = NULL;
+    const char *psz_session = NULL;
+    const char *psz_cseq = NULL;
     int i_cseq = 0;
 
     if( answer == NULL || query == NULL )
@@ -1672,7 +1672,7 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             answer->i_status = 200;
             answer->psz_status = strdup( "OK" );
             httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
-	    httpd_MsgAdd( answer, "Content-Base",  "%s/", p_sys->psz_rtsp_control );
+            httpd_MsgAdd( answer, "Content-Base",  "%s", p_sys->psz_rtsp_control );
             answer->p_body = (uint8_t *)psz_sdp;
             answer->i_body = strlen( psz_sdp );
             break;
@@ -1773,9 +1773,7 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )
-    {
         httpd_MsgAdd( answer, "Session", "%s;timeout=5", psz_session );
-    }
     return VLC_SUCCESS;
 }
 
@@ -1786,17 +1784,20 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     sout_stream_id_t *id = (sout_stream_id_t*)p_args;
     sout_stream_t    *p_stream = id->p_stream;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    char *psz_session = NULL;
-    char *psz_cseq = NULL;
+    char psz_session_init[100];
+    const char *psz_session = NULL;
+    const char *psz_cseq = NULL;
     int  i_cseq = 0;
 
 
     if( answer == NULL || query == NULL )
-    {
         return VLC_SUCCESS;
-    }
     //fprintf( stderr, "RtspCallback query: type=%d\n", query->i_type );
 
+    /* */
+    snprintf( psz_session_init, sizeof(psz_session_init), "%d", rand() );
+
+    /* */
     answer->i_proto = HTTPD_PROTO_RTSP;
     answer->i_version= query->i_version;
     answer->i_type   = HTTPD_MSG_ANSWER;
@@ -1805,7 +1806,7 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     {
         case HTTPD_MSG_SETUP:
         {
-            char *psz_transport = httpd_MsgGet( query, "Transport" );
+            const char *psz_transport = httpd_MsgGet( query, "Transport" );
 
             //fprintf( stderr, "HTTPD_MSG_SETUP: transport=%s\n", psz_transport );
 
@@ -1816,12 +1817,11 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 answer->psz_status = strdup( "OK" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
+
                 psz_session = httpd_MsgGet( query, "Session" );
                 if( !psz_session )
-                {
-                    psz_session = malloc( 100 );
-                    sprintf( psz_session, "%d", rand() );
-                }
+                    psz_session = psz_session_init;
+
                 httpd_MsgAdd( answer, "Transport",
                               "RTP/AVP/UDP;destination=%s;port=%d-%d;ttl=%d",
                               id->psz_destination, id->i_port,id->i_port+1,
@@ -1850,10 +1850,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 psz_session = httpd_MsgGet( query, "Session" );
                 if( !psz_session )
                 {
-                    psz_session = malloc( 100 );
-                    sprintf( psz_session, "%d", rand() );
-
-                    rtsp = RtspClientNew( p_stream, psz_session );
+                    psz_session = psz_session_init;
+                    rtsp = RtspClientNew( p_stream, psz_session_init );
                 }
                 else
                 {
@@ -1925,9 +1923,7 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )
-    {
         httpd_MsgAdd( answer, "Session", "%s"/*;timeout=5*/, psz_session );
-    }
     return VLC_SUCCESS;
 }
 
