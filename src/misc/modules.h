@@ -67,6 +67,7 @@ struct module_cache_t
 
     /* Optional extra data */
     module_t *p_module;
+    vlc_bool_t b_used;
 };
 
 #define module_InitBank(a)     __module_InitBank(VLC_OBJECT(a))

@@ -137,7 +137,7 @@ static int  AllocatePluginFile  ( vlc_object_t *, char *, int64_t, int64_t );
 static module_t * AllocatePlugin( vlc_object_t *, char * );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
-static int  DeleteModule ( module_t * );
+static int  DeleteModule ( module_t *, vlc_bool_t );
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void   DupModule        ( module_t * );
 static void   UndupModule      ( module_t * );
@@ -263,7 +263,7 @@ void __module_EndBank( vlc_object_t *p_this )
     {
         if( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] )
         {
-            DeleteModule( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module );
+            DeleteModule( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module, p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->b_used );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
             p_bank->pp_loaded_cache[p_bank->i_loaded_cache] = NULL;
@@ -294,7 +294,7 @@ void __module_EndBank( vlc_object_t *p_this )
     {
         p_next = (module_t *)p_this->p_libvlc_global->p_module_bank->pp_children[0];
 
-        if( DeleteModule( p_next ) )
+        if( DeleteModule( p_next, VLC_TRUE ) )
         {
             /* Module deletion failed */
             msg_Err( p_this, "module \"%s\" can't be removed, trying harder",
@@ -639,7 +639,7 @@ found_shortcut:
             {
                 CacheMerge( p_this, p_module, p_new_module );
                 vlc_object_attach( p_new_module, p_module );
-                DeleteModule( p_new_module );
+                DeleteModule( p_new_module, VLC_TRUE );
             }
         }
 #endif
@@ -1057,12 +1057,12 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
             {
                 if( p_item->pf_callback || p_item->i_action )
                 {
-                    module_t *p_new_module = AllocatePlugin( p_this, psz_file );
-                    vlc_object_attach( p_module, p_new_module );
-                    p_module = p_new_module;
+                    module_t *p_module = AllocatePlugin( p_this, psz_file );
                     break;
                 }
             }
+            if( p_module == p_cache_entry->p_module )
+                p_cache_entry->b_used = VLC_TRUE;
         }
     }
 
@@ -1091,6 +1091,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
         p_bank->pp_cache[p_bank->i_cache]->i_time = i_file_time;
         p_bank->pp_cache[p_bank->i_cache]->i_size = i_file_size;
         p_bank->pp_cache[p_bank->i_cache]->b_junk = p_module ? 0 : 1;
+        p_bank->pp_cache[p_bank->i_cache]->b_used = VLC_TRUE;
         p_bank->pp_cache[p_bank->i_cache]->p_module = p_module;
         p_bank->i_cache++;
     }
@@ -1264,10 +1265,11 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
  *****************************************************************************
  * This function can only be called if the module isn't being used.
  *****************************************************************************/
-static int DeleteModule( module_t * p_module )
+static int DeleteModule( module_t * p_module, vlc_bool_t b_detach )
 {
     if( !p_module ) return VLC_EGENERIC;
-    vlc_object_detach( p_module );
+    if( b_detach )
+        vlc_object_detach( p_module );
 
     /* We free the structures that we strdup()ed in Allocate*Module(). */
 #ifdef HAVE_DYNAMIC_PLUGINS
@@ -1774,6 +1776,7 @@ static void CacheLoad( vlc_object_t *p_this )
         LOAD_IMMEDIATE( pp_cache[i]->i_time );
         LOAD_IMMEDIATE( pp_cache[i]->i_size );
         LOAD_IMMEDIATE( pp_cache[i]->b_junk );
+        pp_cache[i]->b_used = VLC_FALSE;
 
         if( pp_cache[i]->b_junk ) continue;
 
@@ -2216,7 +2219,7 @@ static void CacheMerge( vlc_object_t *p_this, module_t *p_cache,
 }
 
 /*****************************************************************************
- * FindPluginCache: finds the cache entry corresponding to a file
+ * CacheFind: finds the cache entry corresponding to a file
  *****************************************************************************/
 static module_cache_t *CacheFind( vlc_object_t *p_this, char *psz_file,
                                   int64_t i_time, int64_t i_size )
