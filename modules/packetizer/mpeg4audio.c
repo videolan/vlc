@@ -193,6 +193,8 @@ static int OpenPacketizer( vlc_object_t *p_this )
     {
         msg_Dbg( p_dec, "no decoder specific info, must be an ADTS stream" );
 
+        aout_DateInit( &p_sys->end_date, p_dec->fmt_in.audio.i_rate );
+
         /* We will try to create a AAC Config from adts */
         p_dec->fmt_out.i_extra = 0;
         p_dec->fmt_out.p_extra = NULL;
