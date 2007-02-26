@@ -198,6 +198,12 @@ int poll (struct pollfd *fds, unsigned nfds, int timeout);
 # define net_StopRecv( fd ) (void)0
 #endif
 
+#ifdef WIN32
+# define net_Close( fd ) closesocket ((SOCKET)fd)
+#else
+# define net_Close( fd ) close (fd)
+#endif
+
 /* Portable network names/addresses resolution layer */
 
 /* GAI error codes */

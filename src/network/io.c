@@ -265,23 +265,6 @@ int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
 
 
 
-/*****************************************************************************
- * __net_Close:
- *****************************************************************************
- * Close a network handle
- *****************************************************************************/
-void net_Close (int fd)
-{
-#ifdef UNDER_CE
-    CloseHandle ((HANDLE)fd);
-#elif defined (WIN32)
-    closesocket (fd);
-#else
-    (void)close (fd);
-#endif
-}
-
-
 static ssize_t
 net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                const v_socket_t *const *restrict vsv,
