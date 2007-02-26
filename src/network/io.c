@@ -382,7 +382,8 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                     goto error;
             }
 #else
-            if (errno == EAGAIN) /* spurious wake-up (sucks if fdc > 1) */
+            /* spurious wake-up or TLS did not yield any actual data */
+            if (errno == EAGAIN)
                 continue;
             goto error;
 #endif
@@ -417,23 +418,6 @@ ssize_t __net_Read( vlc_object_t *restrict p_this, int fd,
     return net_ReadInner( p_this, 1, &(int){ fd },
                           &(const v_socket_t *){ p_vs },
                           buf, len, VLC_FALSE, b_retry );
-}
-
-
-/*****************************************************************************
- * __net_ReadNonBlock:
- *****************************************************************************
- * Read from a network socket, non blocking mode.
- * This function should only be used after a poll() (or select(), but you
- * should use poll instead of select()) invocation to avoid busy loops.
- *****************************************************************************/
-ssize_t __net_ReadNonBlock( vlc_object_t *restrict p_this, int fd,
-                            const v_socket_t *restrict p_vs,
-                            uint8_t *restrict buf, size_t len )
-{
-    return net_ReadInner (p_this, 1, &(int){ fd },
-                          &(const v_socket_t *){ p_vs },
-                          buf, len, VLC_TRUE, VLC_FALSE);
 }
 
 
