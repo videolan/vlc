@@ -3053,17 +3053,17 @@ then
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot cd to ${with_twolame_tree}])
     fi
-    if test -f "${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a"
+    if test -f "${real_twolame_tree}/libtwolame/.libs/libtwolame.a"
     then
       dnl  Use a custom twolame
-      AC_MSG_RESULT(${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a)
+      AC_MSG_RESULT(${real_twolame_tree}/libtwolame/.libs/libtwolame.a)
       VLC_ADD_BUILTINS([twolame])
-      VLC_ADD_LDFLAGS([twolame],[${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a])
-      VLC_ADD_CPPFLAGS([twolame],[-I${real_twolame_tree}/src/libtwolame -DLIBTWOLAME_STATIC])
+      VLC_ADD_LDFLAGS([twolame],[${real_twolame_tree}/libtwolame/.libs/libtwolame.a])
+      VLC_ADD_CPPFLAGS([twolame],[-I${real_twolame_tree}/libtwolame -DLIBTWOLAME_STATIC])
     else
       dnl  The given libtwolame wasn't built
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_twolame_tree}/src/libtwolame/.libs/libtwolame.a, make sure you compiled libtwolame in ${with_twolame_tree}])
+      AC_MSG_ERROR([cannot find ${real_twolame_tree}/libtwolame/.libs/libtwolame.a, make sure you compiled libtwolame in ${with_twolame_tree}])
     fi
   else
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_twolame} -DLIBTWOLAME_STATIC"
