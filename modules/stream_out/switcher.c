@@ -650,8 +650,7 @@ static void NetCommand( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     char psz_buffer[11];
-    int i_len = net_ReadNonBlock( p_stream, p_sys->i_fd, NULL, (uint8_t *)&psz_buffer[0],
-                                  sizeof( psz_buffer ) - 1 );
+    int i_len = recv( p_sys->i_fd, psz_buffer, sizeof( psz_buffer ) - 1, 0 );
 
     if ( i_len > 0 )
     {

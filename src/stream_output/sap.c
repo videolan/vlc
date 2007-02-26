@@ -638,9 +638,8 @@ static char *SDPGenerate( sap_handler_t *p_sap,
 
 static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address )
 {
-    int i_read;
     uint8_t buffer[SAP_MAX_BUFFER];
-    int i_tot = 0;
+    ssize_t i_tot = 0;
     mtime_t i_temp;
     int i_rate;
 
@@ -649,13 +648,14 @@ static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address )
         p_address->t1 = mdate();
         return VLC_SUCCESS;
     }
-    do
+    for (;;)
     {
         /* Might be too slow if we have huge data */
-        i_read = net_ReadNonBlock( p_sap, p_address->i_rfd, NULL, buffer,
-                                   SAP_MAX_BUFFER );
+        ssize_t i_read = recv( p_address->i_rfd, buffer, SAP_MAX_BUFFER, 0 );
+        if (i_read == -1)
+            break;
         i_tot += i_read;
-    } while( i_read > 0 );
+    }
 
     i_temp = mdate();
 
