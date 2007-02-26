@@ -282,22 +282,17 @@ void net_Close (int fd)
 }
 
 
-static ssize_t net_ReadInner( vlc_object_t *restrict p_this,
-                              unsigned i_fdc, const int *p_fdv,
-                              const v_socket_t *const *restrict pp_vsv,
-                              uint8_t *restrict p_buf, size_t i_buflen,
-                              vlc_bool_t dontwait, vlc_bool_t waitall )
+static ssize_t
+net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
+               const v_socket_t *const *restrict vsv,
+               uint8_t *restrict p_buf, size_t i_buflen,
+               vlc_bool_t dontwait, vlc_bool_t waitall)
 {
     size_t i_total = 0;
 
-    while( i_buflen > 0 )
+    while (i_buflen > 0)
     {
-        unsigned int i;
-        ssize_t n;
-        struct pollfd ufd[i_fdc];
-
-        int delay_ms = dontwait ? 0 : 500;
-        if( p_this->b_die )
+        if (p_this->b_die)
         {
 #if defined(WIN32) || defined(UNDER_CE)
             WSASetLastError(WSAEINTR);
@@ -307,57 +302,67 @@ static ssize_t net_ReadInner( vlc_object_t *restrict p_this,
             goto error;
         }
 
-        memset (ufd, 0, sizeof (ufd));
+        struct pollfd ufd[fdc];
 
-        for( i = 0; i < i_fdc; i++ )
+        for (unsigned i = 0; i < fdc; i++)
         {
-            ufd[i].fd = p_fdv[i];
+            ufd[i].fd = fdv[i];
             ufd[i].events = POLLIN;
+            ufd[i].revents = 0;
         }
 
-        n = poll( ufd, i_fdc, delay_ms );
-        if( n == -1 )
-            goto error;
-
-        assert ((unsigned)n <= i_fdc);
-
-        if( n == 0 ) // timeout
-            continue;
-
-        for( i = 0; i < i_fdc; i++ )
+        switch (poll (ufd, fdc, dontwait ? 0 : 500))
         {
-            if( i_total > 0 && (ufd[i].revents & POLLERR) )
-                return i_total; // error will be dequeued on next run
+            case -1:
+                goto error;
 
-            if( (ufd[i].revents & POLLIN) == 0 )
+            case 0: // timeout
+                continue;
+        }
+
+        for (unsigned i = 0;; i++)
+        {
+            assert (i < fdc); /* no events found = bug ! */
+
+            if (ufd[i].revents == 0)
                 continue;
 
-            /* */
-            i_fdc  = 1;
-            p_fdv  = &p_fdv[i];
-            pp_vsv = &pp_vsv[i];
+            if (i_total > 0)
+            {
+                // Errors (-1) and EOF (0) will be returned on next run
+                if (ufd[i].revents & (POLLERR|POLLNVAL|POLLHUP))
+                    return i_total;
+            }
+            else
+            {
+                if (ufd[i].revents & POLLHUP)
+                    return 0; // EOF, read() would yield 0
+            }
+
+            fdc = 1;
+            fdv += i;
+            vsv += i;
             break;
         }
-        if( i >= i_fdc )
-            continue;
 
-        if( (*pp_vsv) != NULL )
+        ssize_t n;
+        if (*vsv != NULL)
         {
-            n = (*pp_vsv)->pf_recv( (*pp_vsv)->p_sys, p_buf, i_buflen );
+            n = (*vsv)->pf_recv ((*vsv)->p_sys, p_buf, i_buflen);
         }
         else
         {
 #if defined(WIN32) || defined(UNDER_CE)
-            n = recv( *p_fdv, p_buf, i_buflen, 0 );
+            n = recv (*fdv, p_buf, i_buflen, 0);
 #else
-            n = read( *p_fdv, p_buf, i_buflen );
+            n = read (*fdv, p_buf, i_buflen);
 #endif
         }
 
-        if( n == -1 )
+        if (n == -1)
         {
 #if defined(WIN32) || defined(UNDER_CE)
-            switch( WSAGetLastError() )
+            switch (WSAGetLastError())
             {
                 case WSAEWOULDBLOCK:
                 /* only happens with vs != NULL (SSL) - not really an error */
@@ -368,8 +373,8 @@ static ssize_t net_ReadInner( vlc_object_t *restrict p_this,
                 /* On Win32, recv() fails if the datagram doesn't fit inside
                  * the passed buffer, even though the buffer will be filled
                  * with the first part of the datagram. */
-                    msg_Err( p_this, "Receive error: "
-                                     "Increase the mtu size (--mtu option)" );
+                    msg_Err (p_this, "Receive error: "
+                                     "Increase the mtu size (--mtu option)");
                     n = i_buflen;
                     break;
 
@@ -377,26 +382,23 @@ static ssize_t net_ReadInner( vlc_object_t *restrict p_this,
                     goto error;
             }
 #else
-            if( errno == EAGAIN ) /* spurious wake-up (sucks if i_fdc > 1) */
+            if (errno == EAGAIN) /* spurious wake-up (sucks if fdc > 1) */
                 continue;
             goto error;
 #endif
         }
 
-        if( n == 0 ) // EOF
-            break;
-
         i_total += n;
         p_buf += n;
         i_buflen -= n;
 
-        if( dontwait || !waitall )
+        if ((n == 0) || dontwait || !waitall)
             break;
     }
     return i_total;
 
 error:
-    msg_Err( p_this, "Read error: %s", net_strerror( net_errno ) );
+    msg_Err (p_this, "Read error: %s", net_strerror (net_errno));
     return i_total ? (ssize_t)i_total : -1;
 }
 
