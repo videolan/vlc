@@ -87,11 +87,10 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
         }
 
         vlc_mutex_init( p_this->p_libvlc, &p_vlm->lock );
-        p_vlm->i_media      = 0;
-        p_vlm->media        = NULL;
-        p_vlm->i_vod        = 0;
-        p_vlm->i_schedule   = 0;
-        p_vlm->schedule     = NULL;
+        TAB_INIT( p_vlm->i_media, p_vlm->media );
+        TAB_INIT( p_vlm->i_schedule, p_vlm->schedule );
+        p_vlm->i_vod = 0;
+        p_vlm->vod = NULL;
 
         vlc_object_yield( p_vlm );
         vlc_object_attach( p_vlm, p_this->p_libvlc );
@@ -1114,6 +1113,7 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
             input_thread_t *p_input;
             char *psz_output;
             char *psz_header;
+            char *psz_dup;
             int i;
 
             input_ItemClean( &media->item );
@@ -1125,25 +1125,26 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
                 asprintf( &psz_output, "#description" );
 
             media->item.psz_uri = strdup( media->input[0] );
-            media->item.ppsz_options = malloc( sizeof( char* ) );
-            asprintf( &media->item.ppsz_options[0], "sout=%s", psz_output);
-            media->item.i_options = 1;
+
+            TAB_INIT( media->item.i_options, media->item.ppsz_options );
+
+            asprintf( &psz_dup, "sout=%s", psz_output);
+            TAB_APPEND( media->item.i_options, media->item.ppsz_options, psz_dup );
             for( i = 0; i < media->i_option; i++ )
             {
-                media->item.i_options++;
-                media->item.ppsz_options =
-                    realloc( media->item.ppsz_options,
-                             media->item.i_options * sizeof( char* ) );
-                media->item.ppsz_options[ media->item.i_options - 1 ] =
-                    strdup( media->option[i] );
+                psz_dup = strdup( media->option[i] );
+                TAB_APPEND( media->item.i_options, media->item.ppsz_options, psz_dup );
             }
+            psz_dup = strdup( "no-sout-keep" );
+            TAB_APPEND( media->item.i_options, media->item.ppsz_options, psz_dup );
 
             asprintf( &psz_header, _("Media: %s"), media->psz_name );
 
             if( (p_input = input_CreateThread2( vlm, &media->item, psz_header
                                               ) ) )
             {
-                while( !p_input->b_eof && !p_input->b_error ) msleep( 100000 );
+                while( !p_input->b_eof && !p_input->b_error )
+                    msleep( 100000 );
 
                 input_StopThread( p_input );
                 input_DestroyThread( p_input );
@@ -1195,34 +1196,37 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
 
         if( !p_instance )
         {
+            char *psz_dup;
+
             p_instance = malloc( sizeof(vlm_media_instance_t) );
-            if( !p_instance ) return VLC_EGENERIC;
+            if( !p_instance )
+                return VLC_ENOMEM;
+
             memset( p_instance, 0, sizeof(vlm_media_instance_t) );
+
+            p_instance->psz_name = psz_id ? strdup( psz_id ) : NULL;
             input_ItemInit( VLC_OBJECT(vlm), &p_instance->item );
             p_instance->p_input = NULL;
 
-            if( ( media->psz_output != NULL ) || ( media->psz_vod_output != NULL ) )
+            TAB_INIT( p_instance->item.i_options, p_instance->item.ppsz_options );
+
+            if( media->psz_output != NULL || media->psz_vod_output != NULL )
             {
-                p_instance->item.ppsz_options = malloc( sizeof( char* ) );
-                asprintf( &p_instance->item.ppsz_options[0], "sout=%s%s%s",
+                asprintf( &psz_dup, "sout=%s%s%s",
                           media->psz_output ? media->psz_output : "",
-                          (media->psz_output && media->psz_vod_output) ?
-                          ":" : media->psz_vod_output ? "#" : "",
+                          (media->psz_output && media->psz_vod_output) ? ":" : media->psz_vod_output ? "#" : "",
                           media->psz_vod_output ? media->psz_vod_output : "" );
-                p_instance->item.i_options = 1;
+                TAB_APPEND( p_instance->item.i_options, p_instance->item.ppsz_options, psz_dup );
             }
 
             for( i = 0; i < media->i_option; i++ )
             {
-                p_instance->item.i_options++;
-                p_instance->item.ppsz_options =
-                    realloc( p_instance->item.ppsz_options,
-                             p_instance->item.i_options * sizeof( char* ) );
-                p_instance->item.ppsz_options[p_instance->item.i_options - 1] =
-                    strdup( media->option[i] );
+                psz_dup = strdup( media->option[i] );
+                TAB_APPEND( p_instance->item.i_options, p_instance->item.ppsz_options, psz_dup );
             }
+            psz_dup = strdup( "no-sout-keep" );
+            TAB_APPEND( p_instance->item.i_options, p_instance->item.ppsz_options, psz_dup );
 
-            p_instance->psz_name = psz_id ? strdup( psz_id ) : NULL;
             TAB_APPEND( media->i_instance, media->instance, p_instance );
         }
 

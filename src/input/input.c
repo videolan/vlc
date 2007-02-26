@@ -1186,15 +1186,18 @@ static void End( input_thread_t * p_input )
 
             if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool )
             {
+                playlist_t  *p_playlist = pl_Yield( p_input );
+
                 /* attach sout to the playlist */
-                msg_Dbg( p_input, "keeping sout" );
                 vlc_object_detach( p_input->p->p_sout );
-                vlc_object_attach( p_input->p->p_sout, p_input->p_libvlc->p_playlist );
+                vlc_object_attach( p_input->p->p_sout, p_playlist );
+                pl_Release( p_input );
+                msg_Dbg( p_input, "kept sout" );
             }
             else
             {
-                msg_Dbg( p_input, "destroying sout" );
                 sout_DeleteInstance( p_input->p->p_sout );
+                msg_Dbg( p_input, "destroyed sout" );
             }
         }
 #undef CL_CO
