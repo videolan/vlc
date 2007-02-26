@@ -46,7 +46,7 @@ extern LPWSTR CombineURL(LPCWSTR baseUrl, LPCWSTR url);
 /**************************************************************************************************/
 
 /* this function object is used to dereference the iterator into a value */
-template <class T, class Iterator>
+template <typename T, class Iterator>
 struct VLCDereference
 {
     T operator()(const Iterator& i) const
@@ -55,7 +55,7 @@ struct VLCDereference
     };
 };
 
-template<REFIID EnumeratorIID, class Enumerator, class T, class Iterator, typename Dereference = VLCDereference<T, Iterator> >
+template<REFIID EnumeratorIID, class Enumerator, typename T, class Iterator, typename Dereference = VLCDereference<T, Iterator> >
 class VLCEnumIterator : public Enumerator
 {
 

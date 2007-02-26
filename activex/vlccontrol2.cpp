@@ -853,6 +853,89 @@ STDMETHODIMP VLCLog::put_verbosity(long verbosity)
 
 /*******************************************************************************/
 
+/* STL forward iterator used by VLCEnumIterator class to implement IEnumVARIANT */
+
+class VLCMessageSTLIterator
+{
+
+public:
+
+    VLCMessageSTLIterator(IVLCMessageIterator* iter) : iter(iter), msg(NULL)
+    {
+        // get first message
+        operator++();
+    };
+
+    VLCMessageSTLIterator(const VLCMessageSTLIterator& other)
+    {
+        iter = other.iter;
+        if( iter )
+            iter->AddRef();
+        msg = other.msg;
+        if( msg )
+            msg->AddRef();
+    };
+
+    virtual ~VLCMessageSTLIterator()
+    {
+        if( msg )
+            msg->Release();
+
+        if( iter )
+            iter->Release();
+    };
+
+    // we only need prefix ++ operator
+    VLCMessageSTLIterator& operator++()
+    {
+        VARIANT_BOOL hasNext = VARIANT_FALSE;
+        if( iter )
+        {
+            iter->get_hasNext(&hasNext);
+
+            if( msg )
+            {
+                msg->Release();
+                msg = NULL;
+            }
+            if( VARIANT_TRUE == hasNext ) {
+                iter->next(&msg);
+            }
+        }
+        return *this;
+    };
+
+    VARIANT operator*() const
+    {
+        VARIANT v;
+        VariantInit(&v);
+        if( msg )
+        {
+            if( SUCCEEDED(msg->QueryInterface(IID_IDispatch, (LPVOID*)&V_DISPATCH(&v))) )
+            {
+                V_VT(&v) = VT_DISPATCH;
+            }
+        }
+        return v;
+    };
+
+    bool operator==(const VLCMessageSTLIterator& other) const
+    {
+        return msg == other.msg;
+    };
+
+    bool operator!=(const VLCMessageSTLIterator& other) const
+    {
+        return msg != other.msg;
+    };
+
+private:
+    IVLCMessageIterator* iter;
+    IVLCMessage*         msg;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 VLCMessages::~VLCMessages()
 {
     if( _p_typeinfo )
@@ -935,9 +1018,16 @@ STDMETHODIMP VLCMessages::get__NewEnum(LPUNKNOWN* _NewEnum)
     if( NULL == _NewEnum )
         return E_POINTER;
 
-    // TODO
-    *_NewEnum = NULL;
-    return E_NOTIMPL;
+    IVLCMessageIterator* iter = NULL;
+    iterator(&iter);
+
+    *_NewEnum= new VLCEnumIterator<IID_IEnumVARIANT,
+                       IEnumVARIANT,
+                       VARIANT,
+                       VLCMessageSTLIterator>
+                       (VLCMessageSTLIterator(iter), VLCMessageSTLIterator(NULL));
+
+    return *_NewEnum ? S_OK : E_OUTOFMEMORY;
 };
 
 STDMETHODIMP VLCMessages::clear()
@@ -1646,11 +1736,11 @@ STDMETHODIMP VLCPlaylist::add(BSTR uri, VARIANT name, VARIANT options, long* ite
         }
 
         *item = libvlc_playlist_add_extended(p_libvlc,
-            psz_uri,
-            psz_name,
-            i_options,
-            const_cast<const char **>(ppsz_options),
-            &ex);
+                    psz_uri,
+                    psz_name,
+                    i_options,
+                    const_cast<const char **>(ppsz_options),
+                    &ex);
 
         VLCControl::FreeTargetOptions(ppsz_options, i_options);
         CoTaskMemFree(psz_uri);
