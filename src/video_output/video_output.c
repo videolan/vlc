@@ -148,6 +148,8 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
                 vlc_object_release( p_vout );
                 p_vout = NULL;
             }
+            if( p_vout )
+                vlc_object_detach( p_vout );    /* Remove it from the GC */
             vlc_mutex_unlock( &p_playlist->gc_lock );
             pl_Release( p_this );
         }
@@ -192,7 +194,6 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
             p_vout->b_filter_change )
         {
             /* We are not interested in this format, close this vout */
-            vlc_object_detach( p_vout );
             vlc_object_release( p_vout );
             vout_Destroy( p_vout );
             p_vout = NULL;
@@ -200,7 +201,6 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         else
         {
             /* This video output is cool! Hijack it. */
-            vlc_object_detach( p_vout );
             spu_Attach( p_vout->p_spu, p_this, VLC_TRUE );
             vlc_object_attach( p_vout, p_this );
             vlc_object_release( p_vout );
