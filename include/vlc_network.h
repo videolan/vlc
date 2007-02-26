@@ -180,7 +180,7 @@ int poll (struct pollfd *fds, unsigned nfds, int timeout);
 /* Microsoft: same semantic, same value, different name... go figure */
 # define SHUT_RD SD_RECEIVE
 # define SHUT_WR SD_SEND
-# define SHUT_BOTH
+# define SHUT_RDWR SD_BOTH
 # define net_Close( fd ) closesocket ((SOCKET)fd)
 #else
 # define net_Close( fd ) close (fd)
