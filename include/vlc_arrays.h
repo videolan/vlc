@@ -73,40 +73,50 @@
     }                                                                         \
     while( 0 )
 
+#define TAB_INIT( count, tab )                  \
+  do {                                          \
+    (count) = 0;                                \
+    (tab) = NULL;                               \
+  } while(0)
+
+#define TAB_CLEAN( count, tab )                 \
+  do {                                          \
+    if( tab ) free( tab );                      \
+    (count)= 0;                                 \
+    (tab)= NULL;                                \
+  } while(0)
 
 #define TAB_APPEND( count, tab, p )             \
+  do {                                          \
     if( (count) > 0 )                           \
-    {                                           \
         (tab) = realloc( tab, sizeof( void ** ) * ( (count) + 1 ) ); \
-    }                                           \
     else                                        \
-    {                                           \
         (tab) = malloc( sizeof( void ** ) );    \
-    }                                           \
-    (tab)[count] = (p);        \
-    (count)++
+    (tab)[count] = (p);                         \
+    (count)++;                                  \
+  } while(0)
 
 #define TAB_FIND( count, tab, p, index )        \
-    {                                           \
+  do {                                          \
         int _i_;                                \
         (index) = -1;                           \
         for( _i_ = 0; _i_ < (count); _i_++ )    \
         {                                       \
-            if( (tab)[_i_] == (p) )  \
+            if( (tab)[_i_] == (p) )             \
             {                                   \
                 (index) = _i_;                  \
                 break;                          \
             }                                   \
         }                                       \
-    }
+  } while(0)
 
 #define TAB_REMOVE( count, tab, p )             \
-    {                                           \
+  do {                                          \
         int _i_index_;                          \
         TAB_FIND( count, tab, p, _i_index_ );   \
         if( _i_index_ >= 0 )                    \
         {                                       \
-            if( (count) > 1 )                     \
+            if( (count) > 1 )                   \
             {                                   \
                 memmove( ((void**)(tab) + _i_index_),    \
                          ((void**)(tab) + _i_index_+1),  \
@@ -119,7 +129,7 @@
                 (tab) = NULL;                   \
             }                                   \
         }                                       \
-    }
+  } while(0)
 
 /**
  * Binary search in a sorted array. The key must be comparable by < and >
@@ -130,7 +140,8 @@
  * \param key value of the key
  * \param answer index of answer within the array. -1 if not found
  */
-#define BSEARCH( entries, count, elem, zetype, key, answer ) {  \
+#define BSEARCH( entries, count, elem, zetype, key, answer ) \
+   do {  \
     int low = 0, high = count - 1;   \
     answer = -1; \
     while( low <= high ) {\
@@ -145,7 +156,7 @@
             answer = mid;  break;   \
         }\
     } \
-}
+ } while(0)
 
 /************************************************************************
  * Dictionaries
