@@ -323,7 +323,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
     p_sys->p_thread->i_handle = i_handle;
-    net_StopRecv( i_handle );
+    shutdown( i_handle, SHUT_RD );
 
 #ifdef UDPLITE_SEND_CSCOV
     if (proto == IPPROTO_UDPLITE)

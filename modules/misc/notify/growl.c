@@ -278,7 +278,7 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
          return VLC_EGENERIC;
     }
 
-    net_StopRecv( i_handle );
+    shutdown( i_handle, SHUT_RD );
     if( send( i_handle, p_data, i_offset, 0 )
           == -1 )
     {

@@ -258,7 +258,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    net_StopSend( p_sys->fd );
+    shutdown( p_sys->fd, SHUT_WR );
 
 #ifdef UDPLITE_RECV_CSCOV
     if (proto == IPPROTO_UDPLITE)

@@ -758,10 +758,8 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
         return VLC_EGENERIC;
     }
 
-    if( p_access->i_object_type == VLC_OBJECT_ACCESS )
-        net_StopSend( p_sys->fd_data );
-    else
-        net_StopRecv( p_sys->fd_data );
+    shutdown( p_sys->fd_data,
+              ( p_access->i_object_type == VLC_OBJECT_ACCESS ) );
 
     return VLC_SUCCESS;
 }

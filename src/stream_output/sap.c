@@ -380,7 +380,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         p_address->i_wfd = net_ConnectUDP( VLC_OBJECT(p_sap), psz_addr, SAP_PORT, 255 );
         if( p_address->i_wfd != -1 )
         {
-            net_StopRecv( p_address->i_wfd );
+            shutdown( p_address->i_wfd, SHUT_RD );
             p_address->origlen = sizeof (p_address->orig);
             getsockname (p_address->i_wfd, (struct sockaddr *)&p_address->orig,
                          &p_address->origlen);
@@ -390,7 +390,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         {
             p_address->i_rfd = net_ListenUDP1( (vlc_object_t*)p_sap, psz_addr, SAP_PORT );
             if( p_address->i_rfd != -1 )
-                net_StopSend( p_address->i_rfd );
+                shutdown( p_address->i_rfd, SHUT_WR );
             p_address->i_buff = 0;
             p_address->b_enabled = VLC_TRUE;
             p_address->b_ready = VLC_FALSE;

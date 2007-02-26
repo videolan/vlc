@@ -176,29 +176,11 @@ struct pollfd
 int poll (struct pollfd *fds, unsigned nfds, int timeout);
 #endif
 
-
-/*****************************************************************************
- * net_StopRecv/Send
- *****************************************************************************
- * Wrappers for shutdown()
- *****************************************************************************/
-#if defined (SHUT_WR)
-/* the standard way */
-# define net_StopSend( fd ) (void)shutdown( fd, SHUT_WR )
-# define net_StopRecv( fd ) (void)shutdown( fd, SHUT_RD )
-#elif defined (SD_SEND)
-/* the Microsoft seemingly-purposedly-different-for-the-sake-of-it way */
-# define net_StopSend( fd ) (void)shutdown( fd, SD_SEND )
-# define net_StopRecv( fd ) (void)shutdown( fd, SD_RECEIVE )
-#else
-# ifndef SYS_BEOS /* R5 just doesn't have a working shutdown() */
-#  warning FIXME: implement shutdown on your platform!
-# endif
-# define net_StopSend( fd ) (void)0
-# define net_StopRecv( fd ) (void)0
-#endif
-
 #ifdef WIN32
+/* Microsoft: same semantic, same value, different name... go figure */
+# define SHUT_RD SD_RECEIVE
+# define SHUT_WR SD_SEND
+# define SHUT_BOTH
 # define net_Close( fd ) closesocket ((SOCKET)fd)
 #else
 # define net_Close( fd ) close (fd)
