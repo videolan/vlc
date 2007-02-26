@@ -261,7 +261,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 #else
 #   warning "WARNING!!!!!!!"
-#   warning "Using libavformat muxing with versions older than 51.8.0 (r7593) might produce broken files.
+#   warning "Using libavformat muxing with versions older than 51.8.0 (r7593) might produce broken files."
     /* This is a hack */
     if( i_codec_id == CODEC_ID_MP2 )
         i_codec_id = CODEC_ID_MP3;
