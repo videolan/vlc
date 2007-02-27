@@ -672,7 +672,7 @@ static void ThreadWrite( vlc_object_t *p_this )
             /* FIXME: this is a very incorrect simplistic RTCP timer */
             if ((rtcp_counter / 80) >= p_thread->rtcp_size)
             {
-                SendRTCP (p_thread, p_pk->i_dts * 9 / 100);
+                SendRTCP (p_thread, GetDWBE (p_pk->p_buffer + 4));
                 rtcp_counter = 0;
             }
         }
