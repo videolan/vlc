@@ -2467,8 +2467,6 @@ static int rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id
             out->i_dts    = i_dts + i * i_length / i_count;
             out->i_length = i_length / i_count;
 
-            fprintf( stderr, "FU-A: payload=%d hdr=0x%x\n", i_payload, i_nal_hdr);
-
             /* */
             rtp_packetize_common( id, out, (b_last && i_payload == i_data), i_pts );
             out->i_buffer = 14 + i_payload;
