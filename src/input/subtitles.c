@@ -400,7 +400,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                                 "autodetected subtitle: %s with priority %d",
                                 psz_path, i_prio );
 
-                    if( utf8_stat( psz_path, &st ) && S_ISREG( st.st_mode ) )
+                    if( !utf8_stat( psz_path, &st ) && S_ISREG( st.st_mode ) )
                     {
                         msg_Dbg( p_this,
                                 "autodetected subtitle: %s with priority %d",
@@ -412,7 +412,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                     }
                     else
                     {
-                        msg_Dbg( p_this, "fopen failed" );
+                        msg_Dbg( p_this, "stat failed" );
                     }
                 }
                 if( i_sub_count >= MAX_SUBTITLE_FILES ) break;
