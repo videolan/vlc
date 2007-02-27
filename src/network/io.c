@@ -293,7 +293,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
             ufd[i].revents = 0;
         }
 
-        switch (poll (ufd, fdc, dontwait ? 0 : 500))
+        switch (poll (ufd, fdc, 500))
         {
             case -1:
                 goto error;
