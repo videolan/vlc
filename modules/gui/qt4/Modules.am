@@ -192,7 +192,7 @@ EXTRA_DIST += \
 	pixmaps/type_net.xpm \
 	pixmaps/type_playlist.xpm \
 	pixmaps/video.xpm \
-	pixmaps/advanced_50x50.xpm \
+	pixmaps/hotkeys_50x50.xpm \
 	pixmaps/audio_50x50.xpm \
 	pixmaps/input_and_codecs_50x50.xpm \
 	pixmaps/interface_50x50.xpm \
