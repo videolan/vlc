@@ -6,7 +6,7 @@
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Antoine Cellerier <dionoea@videolan.org>
- *
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -38,7 +38,6 @@
 #include "pixmaps/audio_50x50.xpm"
 #include "pixmaps/input_and_codecs_50x50.xpm"
 #include "pixmaps/interface_50x50.xpm"
-//#include "pixmaps/playlist_50x50.xpm"
 #include "pixmaps/subtitles_50x50.xpm"
 #include "pixmaps/video_50x50.xpm"
 
@@ -47,7 +46,6 @@
 #include "ui/sprefs_video.h"
 #include "ui/sprefs_subtitles.h"
 #include "ui/sprefs_hotkeys.h"
-//#include "ui/sprefs_playlist.h"
 #include "ui/sprefs_interface.h"
 
 #define ITEM_HEIGHT 50
@@ -133,32 +131,59 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "overlay", Bool, NULL, overlay );
             CONFIG_GENERIC( "video-on-top", Bool, NULL, alwaysOnTop );
             CONFIG_GENERIC( "video-deco", Bool, NULL, windowDecorations );
-
+            CONFIG_GENERIC( "skip-frames" , Bool, NULL, skipFrames);
             CONFIG_GENERIC( "vout", Module, NULL, outputModule );
 
+#ifdef WIN32
+            CONFIG_GENERIC( "directx-wallpaper" , Bool , NULL, wallpaperMode );
+            CONFIG_GENERIC( "directx-device", String, NULL, dXdisplayDevice );
+#endif
+
             CONFIG_GENERIC( "snapshot-path", String, NULL,
-            snapshotsDirectory ); /* FIXME -> use file instead of string */
+                    snapshotsDirectory ); /* FIXME -> use file instead of string */
             CONFIG_GENERIC( "snapshot-prefix", String, NULL, snapshotsPrefix );
             CONFIG_GENERIC( "snapshot-sequential", Bool, NULL,
                             snapshotsSequentialNumbering );
             CONFIG_GENERIC( "snapshot-format", StringList, NULL,
                             snapshotsFormat );
-
-        END_SPREFS_CAT;
+         END_SPREFS_CAT;
 
         START_SPREFS_CAT( Audio,  "General audio settings" );
-         #ifndef WIN32
-            ui.DirectXLabel->setVisible( false );
-            ui.DirectXDevice->setVisible( false );
-         #endif
-         #ifdef WIN32
+#ifdef WIN32
             ui.OSSBrowse->hide();
             ui.OSSDevice->hide();
             ui.OSSLabel->hide();
             ui.alsaDevice->hide();
             ui.alsaLabel->hide();
-         #endif
-            CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
+#else
+            ui.DirectXLabel->setVisible( false );
+            ui.DirectXDevice->setVisible( false );
+#endif
+         CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
+
+/*       CONFIG_GENERIC( "volume" ,  RangedInt, NULL, defaultVolume );*/ //FIXME Why ?
+/*         CONFIG_GENERIC( "audio-language" , String , NULL, 
+                    preferredAudioLanguage ); */ //FIXME WHy ?
+         CONFIG_GENERIC( "spdif" , Bool , NULL, spdifBox );
+/*         CONFIG_GENERIC( "force-dolby-surround" , Integer , NULL, 
+                    detectionDolby );*/
+
+         CONFIG_GENERIC( "aout" , Module , NULL, outputModule );
+#ifndef WIN32
+/*       CONFIG_GENERIC( "alsadev" , String , NULL, alsaDevice );*/
+         CONFIG_GENERIC( "dspdev" , String , NULL, OSSDevice );//FIXME File
+#else
+         CONFIG_GENERIC( "directx-audio-device" , Integer, NULL, 
+                 DirectXDevice );
+#endif
+         CONFIG_GENERIC( "audiofile-file" , String , NULL, FileName ); //Fixme File
+
+
+         CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
+#if 0 // Not found for normalizer effect
+         CONFIG_GENERIC( "" , , NULL, );
+#endif
+         CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
 
         END_SPREFS_CAT;
 

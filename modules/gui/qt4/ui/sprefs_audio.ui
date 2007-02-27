@@ -42,15 +42,15 @@
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item row="2" column="0" colspan="2" >
+      <item row="2" column="0" >
        <widget class="QLabel" name="label_8" >
         <property name="text" >
          <string>Force detection of Dolby Surround</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="2" >
-       <widget class="QComboBox" name="preferredAudioLanguage_2" >
+      <item row="2" column="1" >
+       <widget class="QComboBox" name="detectionDolby" >
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>3</hsizetype>
@@ -70,14 +70,14 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="3" >
-       <widget class="QCheckBox" name="checkBox" >
+      <item row="1" column="0" colspan="2" >
+       <widget class="QCheckBox" name="spdifBox" >
         <property name="text" >
          <string>Use S/PDIF when available</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="2" >
+      <item row="3" column="1" >
        <widget class="QComboBox" name="preferredAudioLanguage" >
         <property name="sizePolicy" >
          <sizepolicy>
@@ -95,14 +95,14 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2" >
+      <item row="3" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
          <string>Preferred audio language</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2" >
+      <item row="0" column="1" >
        <widget class="QSlider" name="defaultVolume" >
         <property name="sizePolicy" >
          <sizepolicy>
@@ -123,7 +123,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0" colspan="2" >
+      <item row="0" column="0" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
          <string>Default volume</string>
