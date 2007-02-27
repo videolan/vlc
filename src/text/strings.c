@@ -383,6 +383,85 @@ char *vlc_b64_encode( const char *src )
         return vlc_b64_encode_binary( (const uint8_t*)"", 0 );
 }
 
+/* Base64 decoding */
+size_t vlc_b64_decode_binary_to_buffer( uint8_t *p_dst, size_t i_dst, const char *p_src )
+{
+    static const int b64[256] = {
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 00-0F */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 10-1F */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,62,-1,-1,-1,63,  /* 20-2F */
+        52,53,54,55,56,57,58,59,60,61,-1,-1,-1,-1,-1,-1,  /* 30-3F */
+        -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,  /* 40-4F */
+        15,16,17,18,19,20,21,22,23,24,25,-1,-1,-1,-1,-1,  /* 50-5F */
+        -1,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,  /* 60-6F */
+        41,42,43,44,45,46,47,48,49,50,51,-1,-1,-1,-1,-1,  /* 70-7F */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 80-8F */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 90-9F */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* A0-AF */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* B0-BF */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* C0-CF */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* D0-DF */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* E0-EF */
+        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1   /* F0-FF */
+    };
+    uint8_t *p_start = p_dst;
+    uint8_t *p = (uint8_t *)p_src;
+
+    int i_level;
+    int i_last;
+
+    for( i_level = 0, i_last = 0; i_dst > 0 && *p != '\0'; i_dst--, p++ )
+    {
+        const int c = b64[(unsigned int)*p];
+        if( c == -1 )
+            continue;
+
+        switch( i_level )
+        {
+            case 0:
+                i_level++;
+                break;
+            case 1:
+                *p_dst++ = ( i_last << 2 ) | ( ( c >> 4)&0x03 );
+                i_level++;
+                break;
+            case 2:
+                *p_dst++ = ( ( i_last << 4 )&0xf0 ) | ( ( c >> 2 )&0x0f );
+                i_level++;
+                break;
+            case 3:
+                *p_dst++ = ( ( i_last &0x03 ) << 6 ) | c;
+                i_level = 0;
+        }
+        i_last = c;
+    }
+
+    return p_dst - p_start;
+}
+size_t vlc_b64_decode_binary( uint8_t **pp_dst, const char *psz_src )
+{
+    const int i_src = strlen( psz_src );
+    uint8_t   *p_dst;
+
+    *pp_dst = p_dst = malloc( i_src );
+    if( !p_dst )
+        return 0;
+    return  vlc_b64_decode_binary_to_buffer( p_dst, i_src, psz_src );
+}
+char *vlc_b64_decode( const char *psz_src )
+{
+    const int i_src = strlen( psz_src );
+    char *p_dst = malloc( i_src + 1 );
+    size_t i_dst;
+    if( !p_dst )
+        return NULL;
+
+    i_dst = vlc_b64_decode_binary_to_buffer( (uint8_t*)p_dst, i_src, psz_src );
+    p_dst[i_dst] = '\0';
+
+    return p_dst;
+}
+
 /****************************************************************************
  * String formating functions
  ****************************************************************************/

@@ -41,6 +41,10 @@ VLC_EXPORT( char *, convert_xml_special_chars, ( const char *psz_content ) );
 VLC_EXPORT( char *, vlc_b64_encode_binary, ( const uint8_t *, size_t ) );
 VLC_EXPORT( char *, vlc_b64_encode, ( const char * ) );
 
+VLC_EXPORT( size_t, vlc_b64_decode_binary_to_buffer, ( uint8_t *p_dst, size_t i_dst_max, const char *psz_src ) );
+VLC_EXPORT( size_t, vlc_b64_decode_binary, ( uint8_t **pp_dst, const char *psz_src ) );
+VLC_EXPORT( char *, vlc_b64_decode, ( const char *psz_src ) );
+
 VLC_EXPORT( char *, str_format_time, ( const char * ) );
 #define str_format_meta( a, b ) __str_format_meta( VLC_OBJECT( a ), b )
 VLC_EXPORT( char *, __str_format_meta, ( vlc_object_t *, const char * ) );
