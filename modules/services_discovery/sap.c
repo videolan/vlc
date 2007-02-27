@@ -49,6 +49,7 @@
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
 #endif
+#include <net/if.h>
 
 /************************************************************************
  * Macros and definitions
@@ -67,14 +68,6 @@
 /* Link-local SAP address */
 #define SAP_V4_LINK_ADDRESS     "224.0.0.255"
 #define ADD_SESSION 1
-
-#define SAP_V6_1 "FF0"
-/* Scope is inserted between them */
-#define SAP_V6_2 "::2:7FFE"
-/* See RFC3513 for list of valid scopes */
-/* FIXME: find a way to listen to link-local scope */
-static const char ipv6_scopes[] = "1456789ABCDE";
-
 
 /*****************************************************************************
  * Module descriptor
@@ -497,12 +490,25 @@ static void Run( services_discovery_t *p_sd )
     }
     if( var_CreateGetInteger( p_sd, "sap-ipv6" ) )
     {
-        char psz_address[] = SAP_V6_1"0"SAP_V6_2;
-        const char *c_scope;
+        char psz_address[NI_MAXNUMERICHOST] = "ff02::2:7ffe%";
 
-        for( c_scope = ipv6_scopes; *c_scope; c_scope++ )
+        struct if_nameindex *l = if_nameindex ();
+        if (l != NULL)
         {
-            psz_address[sizeof(SAP_V6_1) - 1] = *c_scope;
+            char *ptr = strchr (psz_address, '%') + 1;
+            for (unsigned i = 0; l[i].if_index; i++)
+            {
+                strcpy (ptr, l[i].if_name);
+                InitSocket (p_sd, psz_address, SAP_PORT);
+            }
+            if_freenameindex (l);
+        }
+        *strchr (psz_address, '%') = '\0';
+
+        static const char ipv6_scopes[] = "1456789ABCDE";
+        for (const char *c_scope = ipv6_scopes; *c_scope; c_scope++)
+        {
+            psz_address[3] = *c_scope;
             InitSocket( p_sd, psz_address, SAP_PORT );
         }
     }
