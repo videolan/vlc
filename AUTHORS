@@ -3,7 +3,7 @@
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
 # 
-# The fields are: name (N), email (E), web-address (W), CVS account login (C),
+# The fields are: name (N), email (E), web-address (W), SVN account login (C),
 # PGP key ID and fingerprint (P), description (D), and snail-mail address (S).
 
 N: Laurent Aimar
@@ -137,9 +137,10 @@ S: France
 N: Rémi Denis-Courmont
 E: rem#videolan.org
 C: courmisch
+D: network/DNS
 D: SSL/TLS support (core, HTTP server, HTTP input)
 D: VOC files demultiplexer
-S: France
+S: Finland
 
 N: Colin Delacroix
 E: colin@zoy.org
