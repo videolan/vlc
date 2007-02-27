@@ -390,12 +390,8 @@ static int Open( vlc_object_t *p_this )
     /* must not exceed 999 once formatted */
 
     if( val.i_int < 0 )
-    {
-        msg_Warn( p_stream, "illegal TTL %d, using 1", val.i_int );
-        val.i_int = -1;
-    }
+        msg_Warn( p_stream, "illegal TTL %d, the SDP advertised value will be faked", val.i_int );
     p_sys->i_ttl = val.i_int;
-
 
     var_Get( p_stream, SOUT_CFG_PREFIX "mp4a-latm", &val );
     p_sys->b_latm = val.b_bool;
@@ -536,8 +532,7 @@ static int Open( vlc_object_t *p_this )
 	   a= source-filter: we need our source address
            a= x-plgroup: (missing)
            RTP packets need to get the correct src IP address  */
-        if( (ipv == 4)
-	 && net_AddressIsMulticast( (vlc_object_t *)p_stream, p_sys->psz_destination ) )
+        if( ipv == 4 && net_AddressIsMulticast( VLC_OBJECT(p_stream), p_sys->psz_destination ) )
         {
             snprintf( psz_ttl, sizeof( psz_ttl ), "/%d", p_sys->i_ttl );
             psz_ttl[sizeof( psz_ttl ) - 1] = '\0';
@@ -858,7 +853,7 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
     {
         /* Add the ttl if it is a multicast address */
         /* FIXME: 1 is not a correct default value in the case of IPv6 */
-        p += sprintf( p, "/%d\r\n", p_sys->i_ttl ?: 1 );
+        p += sprintf( p, "/%d\r\n", p_sys->i_ttl ? p_sys->i_ttl : 1 );
     }
     else
     {
@@ -1825,7 +1820,7 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 httpd_MsgAdd( answer, "Transport",
                               "RTP/AVP/UDP;destination=%s;port=%d-%d;ttl=%d",
                               id->psz_destination, id->i_port,id->i_port+1,
-                              p_sys->i_ttl );
+                              p_sys->i_ttl > 0 ? p_sys->i_ttl : 1);
             }
             else if( strstr( psz_transport, "unicast" ) && strstr( psz_transport, "client_port=" ) )
             {
