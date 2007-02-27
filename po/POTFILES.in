@@ -113,7 +113,7 @@ src/misc/configuration.c
 src/misc/configuration_chain.c
 src/misc/configuration.h
 src/misc/cpu.c
-src/misc/darwin_specific.m
+src/misc/darwin_specific.c
 src/misc/devices.c
 src/misc/error.c
 src/misc/image.c
@@ -436,6 +436,7 @@ modules/demux/playlist/asx.c
 modules/demux/playlist/b4s.c
 modules/demux/playlist/dvb.c
 modules/demux/playlist/gvp.c
+modules/demux/playlist/ifo.c
 modules/demux/playlist/m3u.c
 modules/demux/playlist/playlist.c
 modules/demux/playlist/playlist.h
@@ -455,6 +456,7 @@ modules/demux/subtitle.c
 modules/demux/ts.c
 modules/demux/tta.c
 modules/demux/ty.c
+modules/demux/vc1.c
 modules/demux/vobsub.c
 modules/demux/voc.c
 modules/demux/wav.c
@@ -982,6 +984,7 @@ modules/packetizer/h264.c
 modules/packetizer/mpeg4audio.c
 modules/packetizer/mpeg4video.c
 modules/packetizer/mpegvideo.c
+modules/packetizer/vc1.c
 modules/services_discovery/bonjour.c
 modules/services_discovery/hal.c
 modules/services_discovery/podcast.c
