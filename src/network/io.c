@@ -268,8 +268,7 @@ int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
 static ssize_t
 net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
                const v_socket_t *const *restrict vsv,
-               uint8_t *restrict p_buf, size_t i_buflen,
-               vlc_bool_t dontwait, vlc_bool_t waitall)
+               uint8_t *restrict p_buf, size_t i_buflen, vlc_bool_t waitall)
 {
     size_t i_total = 0;
 
@@ -335,11 +334,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         }
         else
         {
-#if defined(WIN32) || defined(UNDER_CE)
             n = recv (*fdv, p_buf, i_buflen, 0);
-#else
-            n = read (*fdv, p_buf, i_buflen);
-#endif
         }
 
         if (n == -1)
@@ -376,7 +371,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         p_buf += n;
         i_buflen -= n;
 
-        if ((n == 0) || dontwait || !waitall)
+        if ((n == 0) || !waitall)
             break;
     }
     return i_total;
@@ -400,7 +395,7 @@ ssize_t __net_Read( vlc_object_t *restrict p_this, int fd,
 {
     return net_ReadInner( p_this, 1, &(int){ fd },
                           &(const v_socket_t *){ p_vs },
-                          buf, len, VLC_FALSE, b_retry );
+                          buf, len, b_retry );
 }
 
 
@@ -417,7 +412,7 @@ ssize_t __net_Select( vlc_object_t *restrict p_this,
     memset( vsv, 0, sizeof (vsv) );
 
     return net_ReadInner( p_this, nfd, fds, vsv,
-                          buf, len, VLC_FALSE, VLC_FALSE );
+                          buf, len, VLC_FALSE );
 }
 
 
