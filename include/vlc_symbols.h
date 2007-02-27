@@ -74,24 +74,24 @@ struct module_symbols_t
     mtime_t (*date_Get_inner) (const date_t *);
     void (*date_Move_inner) (date_t *, mtime_t);
     mtime_t (*date_Increment_inner) (date_t *, uint32_t);
-    int (*__net_ConnectTCP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port);
-    int * (*__net_ListenTCP_inner) (vlc_object_t *, const char *, int);
+    void *__net_ConnectTCP_deprecated;
+    void *__net_ListenTCP_deprecated;
     int (*__net_Accept_inner) (vlc_object_t *, int *, mtime_t);
-    int (*__net_OpenUDP_inner) (vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server);
-    void (*net_Close_inner) (int fd);
-    int (*__net_Read_inner) (vlc_object_t *p_this, int fd, const v_socket_t *, uint8_t *p_data, int i_data, vlc_bool_t b_retry);
-    int (*__net_ReadNonBlock_inner) (vlc_object_t *p_this, int fd, const v_socket_t *, uint8_t *p_data, int i_data, mtime_t i_wait);
-    int (*__net_Select_inner) (vlc_object_t *p_this, const int *pi_fd, const v_socket_t *const *, int i_fd, uint8_t *p_data, int i_data, mtime_t i_wait);
-    int (*__net_Write_inner) (vlc_object_t *p_this, int fd, const v_socket_t *, const uint8_t *p_data, int i_data);
+    void *__net_OpenUDP_deprecated;
+    void *net_Close_deprecated;
+    ssize_t (*__net_Read_inner) (vlc_object_t *p_this, int fd, const v_socket_t *, uint8_t *p_data, size_t i_data, vlc_bool_t b_retry);
+    void *__net_ReadNonBlock_deprecated;
+    ssize_t (*__net_Select_inner) (vlc_object_t *p_this, const int *pi_fd, int i_fd, uint8_t *p_data, size_t i_data);
+    ssize_t (*__net_Write_inner) (vlc_object_t *p_this, int fd, const v_socket_t *, const uint8_t *p_data, size_t i_data);
     char * (*__net_Gets_inner) (vlc_object_t *p_this, int fd, const v_socket_t *);
-    int (*net_Printf_inner) (vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, ...);
-    int (*__net_vaPrintf_inner) (vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args);
+    ssize_t (*net_Printf_inner) (vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, ...);
+    ssize_t (*__net_vaPrintf_inner) (vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args);
     int (*vout_ShowTextRelative_inner) (vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t);
     int (*vout_ShowTextAbsolute_inner) (vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t);
     void (*__vout_OSDMessage_inner) (vlc_object_t *, int, char *, ...);
     void (*vout_OSDSlider_inner) (vlc_object_t *, int, int , short);
     void (*vout_OSDIcon_inner) (vlc_object_t *, int, short);
-    sout_access_out_t * (*sout_AccessOutNew_inner) (sout_instance_t *, char *psz_access, char *psz_name);
+    sout_access_out_t * (*sout_AccessOutNew_inner) (sout_instance_t *, const char *psz_access, const char *psz_name);
     void (*sout_AccessOutDelete_inner) (sout_access_out_t *);
     int (*sout_AccessOutSeek_inner) (sout_access_out_t *, off_t);
     int (*sout_AccessOutRead_inner) (sout_access_out_t *, block_t *);
@@ -104,11 +104,11 @@ struct module_symbols_t
     sout_stream_t * (*sout_StreamNew_inner) (sout_instance_t *, char *psz_chain);
     void (*sout_StreamDelete_inner) (sout_stream_t *);
     int (*sout_AnnounceRegister_inner) (sout_instance_t *,session_descriptor_t*, announce_method_t*);
-    session_descriptor_t* (*sout_AnnounceRegisterSDP_inner) (sout_instance_t *,const char *, const char *, announce_method_t*);
+    session_descriptor_t* (*sout_AnnounceRegisterSDP_inner) (sout_instance_t *, const char *, const char *, const char *, announce_method_t*);
     int (*sout_AnnounceUnRegister_inner) (sout_instance_t *,session_descriptor_t*);
-    session_descriptor_t* (*sout_AnnounceSessionCreate_inner) (void);
+    session_descriptor_t* (*sout_AnnounceSessionCreate_inner) (vlc_object_t *obj, const char *cfgpref);
     void (*sout_AnnounceSessionDestroy_inner) (session_descriptor_t *);
-    announce_method_t* (*sout_AnnounceMethodCreate_inner) (int);
+    void *sout_AnnounceMethodCreate_deprecated;
     int (*__var_Create_inner) (vlc_object_t *, const char *, int);
     int (*__var_Destroy_inner) (vlc_object_t *, const char *);
     int (*__var_Change_inner) (vlc_object_t *, const char *, int, vlc_value_t *, vlc_value_t *);
@@ -232,7 +232,7 @@ struct module_symbols_t
     vlc_bool_t (*playlist_IsServicesDiscoveryLoaded_inner) (playlist_t *,const char *);
     playlist_item_t* (*playlist_ItemNewWithType_inner) (vlc_object_t *,const char *,const char *, int , const char *const *, int, int);
     int (*playlist_ItemSetName_inner) (playlist_item_t *, const char *);
-    playlist_item_t * (*playlist_NodeCreate_inner) (playlist_t *, const char *, playlist_item_t * p_parent);
+    playlist_item_t * (*playlist_NodeCreate_inner) (playlist_t *, const char *, playlist_item_t * p_parent, int i_flags);
     int (*playlist_NodeAppend_inner) (playlist_t *,playlist_item_t*,playlist_item_t *);
     int (*playlist_NodeInsert_inner) (playlist_t *,playlist_item_t*,playlist_item_t *, int);
     int (*playlist_NodeRemoveItem_inner) (playlist_t *,playlist_item_t*,playlist_item_t *);
@@ -240,8 +240,8 @@ struct module_symbols_t
     playlist_item_t * (*playlist_ChildSearchName_inner) (playlist_item_t*, const char*);
     int (*playlist_NodeDelete_inner) (playlist_t *, playlist_item_t *, vlc_bool_t , vlc_bool_t);
     int (*playlist_NodeEmpty_inner) (playlist_t *, playlist_item_t *, vlc_bool_t);
-    int (*playlist_Add_inner) (playlist_t *, const char *, const char *, int, int, vlc_bool_t);
-    int (*playlist_AddExt_inner) (playlist_t *, const char *, const char *, int, int, mtime_t, const char *const *,int, vlc_bool_t);
+    int (*playlist_Add_inner) (playlist_t *, const char *, const char *, int, int, vlc_bool_t, vlc_bool_t);
+    int (*playlist_AddExt_inner) (playlist_t *, const char *, const char *, int, int, mtime_t, const char *const *,int, vlc_bool_t, vlc_bool_t);
     playlist_item_t* (*playlist_ItemToNode_inner) (playlist_t *,playlist_item_t *, vlc_bool_t);
     playlist_item_t * (*playlist_ItemGetById_inner) (playlist_t *, int, vlc_bool_t);
     playlist_item_t * (*playlist_ItemGetByInput_inner) (playlist_t *,input_item_t *, vlc_bool_t);
@@ -356,7 +356,7 @@ struct module_symbols_t
     void (*osd_Message_inner) (spu_t *, int, char *, ...);
     int (*osd_ShowTextAbsolute_inner) (spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t);
     int (*__input_Read_inner) (vlc_object_t *, input_item_t *, vlc_bool_t);
-    int (*__net_ConnectUDP_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int hlim);
+    void *__net_ConnectUDP_deprecated;
     int (*__intf_UserFatal_inner) (vlc_object_t*, vlc_bool_t, const char*, const char*, ...);
     int (*__intf_UserLoginPassword_inner) (vlc_object_t*, const char*, const char*, char **, char **);
     int (*__intf_UserYesNo_inner) (vlc_object_t*, const char*, const char*, const char*, const char*, const char*);
@@ -366,7 +366,7 @@ struct module_symbols_t
     void (*stats_ComputeInputStats_inner) (input_thread_t*, input_stats_t*);
     void (*stats_DumpInputStats_inner) (input_stats_t *);
     void (*stats_ReinitInputStats_inner) (input_stats_t *);
-    input_thread_t * (*__input_CreateThread2_inner) (vlc_object_t *, input_item_t *, char *);
+    void *__input_CreateThread2_deprecated;
     libvlc_int_t * (*vlc_current_object_inner) (int);
     void (*__var_OptionParse_inner) (vlc_object_t *, const char *);
     void (*__stats_TimerDump_inner) (vlc_object_t*, unsigned int);
@@ -407,8 +407,8 @@ struct module_symbols_t
     size_t (*vlc_strlcpy_inner) (char *, const char *, size_t);
     input_item_t * (*__input_ItemNewExt_inner) (vlc_object_t *, const char *, const char*, int, const char *const *, int);
     input_item_t * (*input_ItemNewWithType_inner) (vlc_object_t *, const char *, const char *e, int, const char *const *, int, int);
-    playlist_item_t * (*playlist_NodeAddInput_inner) (playlist_t *, input_item_t *,playlist_item_t *,int , int);
-    int (*playlist_BothAddInput_inner) (playlist_t *, input_item_t *,playlist_item_t *,int , int, int*, int*);
+    playlist_item_t * (*playlist_NodeAddInput_inner) (playlist_t *, input_item_t *,playlist_item_t *,int , int, vlc_bool_t);
+    int (*playlist_BothAddInput_inner) (playlist_t *, input_item_t *,playlist_item_t *,int , int, int*, int*, vlc_bool_t);
     playlist_item_t * (*__playlist_ItemNewFromInput_inner) (vlc_object_t *p_obj,input_item_t *p_input);
     input_item_t * (*input_ItemGetById_inner) (playlist_t *, int);
     int (*playlist_LiveSearchUpdate_inner) (playlist_t *, playlist_item_t *, const char *);
@@ -423,12 +423,12 @@ struct module_symbols_t
     vlc_bool_t (*__intf_UserProgressIsCancelled_inner) (vlc_object_t*, int);
     int (*__intf_Progress_inner) (vlc_object_t*, const char*, const char*, float, int);
     void (*__intf_ProgressUpdate_inner) (vlc_object_t*, int, const char*, float, int);
-    int (*playlist_AddInput_inner) (playlist_t *, input_item_t *,int , int, vlc_bool_t);
-    void (*vlc_DictInsert_inner) (dict_t *, int, const char *, void *);
-    void* (*vlc_DictGet_inner) (dict_t *, int, const char *);
-    int (*vlc_DictLookup_inner) (dict_t *, int, const char *);
-    void (*vlc_DictClear_inner) (dict_t *);
-    dict_t * (*vlc_DictNew_inner) (void);
+    int (*playlist_AddInput_inner) (playlist_t *, input_item_t *, int, int, vlc_bool_t, vlc_bool_t);
+    void *vlc_DictInsert_deprecated;
+    void *vlc_DictGet_deprecated;
+    void *vlc_DictLookup_deprecated;
+    void *vlc_DictClear_deprecated;
+    void *vlc_DictNew_deprecated;
     playlist_item_t * (*playlist_GetPreferredNode_inner) (playlist_t *p_playlist, playlist_item_t *p_node);
     int (*utf8_fprintf_inner) (FILE *, const char *, ...);
     int (*utf8_vfprintf_inner) (FILE *stream, const char *fmt, va_list ap);
@@ -448,12 +448,36 @@ struct module_symbols_t
     char * (*config_ChainCreate_inner) (char **, config_chain_t **, const char *);
     int (*utf8_open_inner) (const char *filename, int flags, mode_t mode);
     int (*net_ListenSingle_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int family, int socktype, int protocol);
-    char * (*str_format_time_inner) (char *);
-    char * (*__str_format_meta_inner) (vlc_object_t *, char *);
+    char * (*str_format_time_inner) (const char *);
+    char * (*__str_format_meta_inner) (vlc_object_t *, const char *);
     int (*vout_Snapshot_inner) (vout_thread_t *p_vout, picture_t *p_pic);
     void (*streaming_GuiDescToChain_inner) (vlc_object_t*, sout_chain_t*, sout_gui_descr_t*);
     input_item_t* (*input_GetItem_inner) (input_thread_t*);
     const char * (*config_GetDataDir_inner) (const vlc_object_t *);
+    int (*__net_Connect_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int socktype, int protocol);
+    int (*__net_ConnectDgram_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int hlim, int proto);
+    const char * (*msg_GetObjectTypeName_inner) (int i_object_type);
+    void (*sout_MethodRelease_inner) (announce_method_t *);
+    int (*sout_AccessOutControl_inner) (sout_access_out_t *, int, va_list);
+    void (*__vlc_object_kill_inner) (vlc_object_t *);
+    void (*path_sanitize_inner) (char *);
+    char * (*__str_format_inner) (vlc_object_t *, const char *);
+    int (*__net_OpenDgram_inner) (vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server, int family, int proto);
+    char * (*vlc_b64_encode_inner) (const char *);
+    void (*msg_StackSet_inner) (int, const char*, ...);
+    void (*msg_StackAdd_inner) (const char*, ...);
+    int * (*net_Listen_inner) (vlc_object_t *p_this, const char *psz_host, int i_port, int family, int socktype, int protocol);
+    int (*sout_SessionSetMedia_inner) (vlc_object_t *obj, session_descriptor_t *, char *, char *, int, char *, int);
+    int (*__vlc_threadvar_create_inner) (vlc_object_t *, vlc_threadvar_t *);
+    void (*filename_sanitize_inner) (char *);
+    announce_method_t* (*sout_SAPMethod_inner) (void);
+    int (*utf8_loaddir_inner) (DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ));
+    vlc_bool_t (*__module_Exists_inner) (vlc_object_t *, const char *);
+    char * (*vlc_b64_encode_binary_inner) (const uint8_t *, size_t);
+    uint64_t (*NTPtime64_inner) (void);
+    vlm_message_t * (*vlm_MessageAdd_inner) (vlm_message_t *, vlm_message_t *);
+    vlm_message_t * (*vlm_MessageNew_inner) (const char *, const char *, ...);
+    const char* (*msg_StackMsg_inner) (void);
 };
 # if defined (__PLUGIN__)
 #  define aout_OutputNextBuffer (p_symbols)->aout_OutputNextBuffer_inner
@@ -511,13 +535,8 @@ struct module_symbols_t
 #  define date_Get (p_symbols)->date_Get_inner
 #  define date_Move (p_symbols)->date_Move_inner
 #  define date_Increment (p_symbols)->date_Increment_inner
-#  define __net_ConnectTCP (p_symbols)->__net_ConnectTCP_inner
-#  define __net_ListenTCP (p_symbols)->__net_ListenTCP_inner
 #  define __net_Accept (p_symbols)->__net_Accept_inner
-#  define __net_OpenUDP (p_symbols)->__net_OpenUDP_inner
-#  define net_Close (p_symbols)->net_Close_inner
 #  define __net_Read (p_symbols)->__net_Read_inner
-#  define __net_ReadNonBlock (p_symbols)->__net_ReadNonBlock_inner
 #  define __net_Select (p_symbols)->__net_Select_inner
 #  define __net_Write (p_symbols)->__net_Write_inner
 #  define __net_Gets (p_symbols)->__net_Gets_inner
@@ -545,7 +564,6 @@ struct module_symbols_t
 #  define sout_AnnounceUnRegister (p_symbols)->sout_AnnounceUnRegister_inner
 #  define sout_AnnounceSessionCreate (p_symbols)->sout_AnnounceSessionCreate_inner
 #  define sout_AnnounceSessionDestroy (p_symbols)->sout_AnnounceSessionDestroy_inner
-#  define sout_AnnounceMethodCreate (p_symbols)->sout_AnnounceMethodCreate_inner
 #  define __var_Create (p_symbols)->__var_Create_inner
 #  define __var_Destroy (p_symbols)->__var_Destroy_inner
 #  define __var_Change (p_symbols)->__var_Change_inner
@@ -793,7 +811,6 @@ struct module_symbols_t
 #  define osd_Message (p_symbols)->osd_Message_inner
 #  define osd_ShowTextAbsolute (p_symbols)->osd_ShowTextAbsolute_inner
 #  define __input_Read (p_symbols)->__input_Read_inner
-#  define __net_ConnectUDP (p_symbols)->__net_ConnectUDP_inner
 #  define __intf_UserFatal (p_symbols)->__intf_UserFatal_inner
 #  define __intf_UserLoginPassword (p_symbols)->__intf_UserLoginPassword_inner
 #  define __intf_UserYesNo (p_symbols)->__intf_UserYesNo_inner
@@ -803,7 +820,6 @@ struct module_symbols_t
 #  define stats_ComputeInputStats (p_symbols)->stats_ComputeInputStats_inner
 #  define stats_DumpInputStats (p_symbols)->stats_DumpInputStats_inner
 #  define stats_ReinitInputStats (p_symbols)->stats_ReinitInputStats_inner
-#  define __input_CreateThread2 (p_symbols)->__input_CreateThread2_inner
 #  define vlc_current_object (p_symbols)->vlc_current_object_inner
 #  define __var_OptionParse (p_symbols)->__var_OptionParse_inner
 #  define __stats_TimerDump (p_symbols)->__stats_TimerDump_inner
@@ -861,11 +877,6 @@ struct module_symbols_t
 #  define __intf_Progress (p_symbols)->__intf_Progress_inner
 #  define __intf_ProgressUpdate (p_symbols)->__intf_ProgressUpdate_inner
 #  define playlist_AddInput (p_symbols)->playlist_AddInput_inner
-#  define vlc_DictInsert (p_symbols)->vlc_DictInsert_inner
-#  define vlc_DictGet (p_symbols)->vlc_DictGet_inner
-#  define vlc_DictLookup (p_symbols)->vlc_DictLookup_inner
-#  define vlc_DictClear (p_symbols)->vlc_DictClear_inner
-#  define vlc_DictNew (p_symbols)->vlc_DictNew_inner
 #  define playlist_GetPreferredNode (p_symbols)->playlist_GetPreferredNode_inner
 #  define utf8_fprintf (p_symbols)->utf8_fprintf_inner
 #  define utf8_vfprintf (p_symbols)->utf8_vfprintf_inner
@@ -891,6 +902,30 @@ struct module_symbols_t
 #  define streaming_GuiDescToChain (p_symbols)->streaming_GuiDescToChain_inner
 #  define input_GetItem (p_symbols)->input_GetItem_inner
 #  define config_GetDataDir (p_symbols)->config_GetDataDir_inner
+#  define __net_Connect (p_symbols)->__net_Connect_inner
+#  define __net_ConnectDgram (p_symbols)->__net_ConnectDgram_inner
+#  define msg_GetObjectTypeName (p_symbols)->msg_GetObjectTypeName_inner
+#  define sout_MethodRelease (p_symbols)->sout_MethodRelease_inner
+#  define sout_AccessOutControl (p_symbols)->sout_AccessOutControl_inner
+#  define __vlc_object_kill (p_symbols)->__vlc_object_kill_inner
+#  define path_sanitize (p_symbols)->path_sanitize_inner
+#  define __str_format (p_symbols)->__str_format_inner
+#  define __net_OpenDgram (p_symbols)->__net_OpenDgram_inner
+#  define vlc_b64_encode (p_symbols)->vlc_b64_encode_inner
+#  define msg_StackSet (p_symbols)->msg_StackSet_inner
+#  define msg_StackAdd (p_symbols)->msg_StackAdd_inner
+#  define net_Listen (p_symbols)->net_Listen_inner
+#  define sout_SessionSetMedia (p_symbols)->sout_SessionSetMedia_inner
+#  define __vlc_threadvar_create (p_symbols)->__vlc_threadvar_create_inner
+#  define filename_sanitize (p_symbols)->filename_sanitize_inner
+#  define sout_SAPMethod (p_symbols)->sout_SAPMethod_inner
+#  define utf8_loaddir (p_symbols)->utf8_loaddir_inner
+#  define __module_Exists (p_symbols)->__module_Exists_inner
+#  define vlc_b64_encode_binary (p_symbols)->vlc_b64_encode_binary_inner
+#  define NTPtime64 (p_symbols)->NTPtime64_inner
+#  define vlm_MessageAdd (p_symbols)->vlm_MessageAdd_inner
+#  define vlm_MessageNew (p_symbols)->vlm_MessageNew_inner
+#  define msg_StackMsg (p_symbols)->msg_StackMsg_inner
 # elif defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 /******************************************************************
  * STORE_SYMBOLS: store VLC APIs into p_symbols for plugin access.
@@ -951,13 +986,8 @@ struct module_symbols_t
     ((p_symbols)->date_Get_inner) = date_Get; \
     ((p_symbols)->date_Move_inner) = date_Move; \
     ((p_symbols)->date_Increment_inner) = date_Increment; \
-    ((p_symbols)->__net_ConnectTCP_inner) = __net_ConnectTCP; \
-    ((p_symbols)->__net_ListenTCP_inner) = __net_ListenTCP; \
     ((p_symbols)->__net_Accept_inner) = __net_Accept; \
-    ((p_symbols)->__net_OpenUDP_inner) = __net_OpenUDP; \
-    ((p_symbols)->net_Close_inner) = net_Close; \
     ((p_symbols)->__net_Read_inner) = __net_Read; \
-    ((p_symbols)->__net_ReadNonBlock_inner) = __net_ReadNonBlock; \
     ((p_symbols)->__net_Select_inner) = __net_Select; \
     ((p_symbols)->__net_Write_inner) = __net_Write; \
     ((p_symbols)->__net_Gets_inner) = __net_Gets; \
@@ -985,7 +1015,6 @@ struct module_symbols_t
     ((p_symbols)->sout_AnnounceUnRegister_inner) = sout_AnnounceUnRegister; \
     ((p_symbols)->sout_AnnounceSessionCreate_inner) = sout_AnnounceSessionCreate; \
     ((p_symbols)->sout_AnnounceSessionDestroy_inner) = sout_AnnounceSessionDestroy; \
-    ((p_symbols)->sout_AnnounceMethodCreate_inner) = sout_AnnounceMethodCreate; \
     ((p_symbols)->__var_Create_inner) = __var_Create; \
     ((p_symbols)->__var_Destroy_inner) = __var_Destroy; \
     ((p_symbols)->__var_Change_inner) = __var_Change; \
@@ -1233,7 +1262,6 @@ struct module_symbols_t
     ((p_symbols)->osd_Message_inner) = osd_Message; \
     ((p_symbols)->osd_ShowTextAbsolute_inner) = osd_ShowTextAbsolute; \
     ((p_symbols)->__input_Read_inner) = __input_Read; \
-    ((p_symbols)->__net_ConnectUDP_inner) = __net_ConnectUDP; \
     ((p_symbols)->__intf_UserFatal_inner) = __intf_UserFatal; \
     ((p_symbols)->__intf_UserLoginPassword_inner) = __intf_UserLoginPassword; \
     ((p_symbols)->__intf_UserYesNo_inner) = __intf_UserYesNo; \
@@ -1243,7 +1271,6 @@ struct module_symbols_t
     ((p_symbols)->stats_ComputeInputStats_inner) = stats_ComputeInputStats; \
     ((p_symbols)->stats_DumpInputStats_inner) = stats_DumpInputStats; \
     ((p_symbols)->stats_ReinitInputStats_inner) = stats_ReinitInputStats; \
-    ((p_symbols)->__input_CreateThread2_inner) = __input_CreateThread2; \
     ((p_symbols)->vlc_current_object_inner) = vlc_current_object; \
     ((p_symbols)->__var_OptionParse_inner) = __var_OptionParse; \
     ((p_symbols)->__stats_TimerDump_inner) = __stats_TimerDump; \
@@ -1301,11 +1328,6 @@ struct module_symbols_t
     ((p_symbols)->__intf_Progress_inner) = __intf_Progress; \
     ((p_symbols)->__intf_ProgressUpdate_inner) = __intf_ProgressUpdate; \
     ((p_symbols)->playlist_AddInput_inner) = playlist_AddInput; \
-    ((p_symbols)->vlc_DictInsert_inner) = vlc_DictInsert; \
-    ((p_symbols)->vlc_DictGet_inner) = vlc_DictGet; \
-    ((p_symbols)->vlc_DictLookup_inner) = vlc_DictLookup; \
-    ((p_symbols)->vlc_DictClear_inner) = vlc_DictClear; \
-    ((p_symbols)->vlc_DictNew_inner) = vlc_DictNew; \
     ((p_symbols)->playlist_GetPreferredNode_inner) = playlist_GetPreferredNode; \
     ((p_symbols)->utf8_fprintf_inner) = utf8_fprintf; \
     ((p_symbols)->utf8_vfprintf_inner) = utf8_vfprintf; \
@@ -1331,6 +1353,43 @@ struct module_symbols_t
     ((p_symbols)->streaming_GuiDescToChain_inner) = streaming_GuiDescToChain; \
     ((p_symbols)->input_GetItem_inner) = input_GetItem; \
     ((p_symbols)->config_GetDataDir_inner) = config_GetDataDir; \
+    ((p_symbols)->__net_Connect_inner) = __net_Connect; \
+    ((p_symbols)->__net_ConnectDgram_inner) = __net_ConnectDgram; \
+    ((p_symbols)->msg_GetObjectTypeName_inner) = msg_GetObjectTypeName; \
+    ((p_symbols)->sout_MethodRelease_inner) = sout_MethodRelease; \
+    ((p_symbols)->sout_AccessOutControl_inner) = sout_AccessOutControl; \
+    ((p_symbols)->__vlc_object_kill_inner) = __vlc_object_kill; \
+    ((p_symbols)->path_sanitize_inner) = path_sanitize; \
+    ((p_symbols)->__str_format_inner) = __str_format; \
+    ((p_symbols)->__net_OpenDgram_inner) = __net_OpenDgram; \
+    ((p_symbols)->vlc_b64_encode_inner) = vlc_b64_encode; \
+    ((p_symbols)->msg_StackSet_inner) = msg_StackSet; \
+    ((p_symbols)->msg_StackAdd_inner) = msg_StackAdd; \
+    ((p_symbols)->net_Listen_inner) = net_Listen; \
+    ((p_symbols)->sout_SessionSetMedia_inner) = sout_SessionSetMedia; \
+    ((p_symbols)->__vlc_threadvar_create_inner) = __vlc_threadvar_create; \
+    ((p_symbols)->filename_sanitize_inner) = filename_sanitize; \
+    ((p_symbols)->sout_SAPMethod_inner) = sout_SAPMethod; \
+    ((p_symbols)->utf8_loaddir_inner) = utf8_loaddir; \
+    ((p_symbols)->__module_Exists_inner) = __module_Exists; \
+    ((p_symbols)->vlc_b64_encode_binary_inner) = vlc_b64_encode_binary; \
+    ((p_symbols)->NTPtime64_inner) = NTPtime64; \
+    ((p_symbols)->vlm_MessageAdd_inner) = vlm_MessageAdd; \
+    ((p_symbols)->vlm_MessageNew_inner) = vlm_MessageNew; \
+    ((p_symbols)->msg_StackMsg_inner) = msg_StackMsg; \
+    (p_symbols)->__net_ConnectTCP_deprecated = NULL; \
+    (p_symbols)->__net_ListenTCP_deprecated = NULL; \
+    (p_symbols)->__net_OpenUDP_deprecated = NULL; \
+    (p_symbols)->net_Close_deprecated = NULL; \
+    (p_symbols)->__net_ReadNonBlock_deprecated = NULL; \
+    (p_symbols)->sout_AnnounceMethodCreate_deprecated = NULL; \
+    (p_symbols)->__net_ConnectUDP_deprecated = NULL; \
+    (p_symbols)->__input_CreateThread2_deprecated = NULL; \
+    (p_symbols)->vlc_DictInsert_deprecated = NULL; \
+    (p_symbols)->vlc_DictGet_deprecated = NULL; \
+    (p_symbols)->vlc_DictLookup_deprecated = NULL; \
+    (p_symbols)->vlc_DictClear_deprecated = NULL; \
+    (p_symbols)->vlc_DictNew_deprecated = NULL; \
 
 # endif /* __PLUGIN__ */
 #endif /* __VLC_SYMBOLS_H */
