@@ -183,7 +183,7 @@ int poll (struct pollfd *fds, unsigned nfds, int timeout);
 # define SHUT_RDWR SD_BOTH
 # define net_Close( fd ) closesocket ((SOCKET)fd)
 #else
-# define net_Close( fd ) close (fd)
+# define net_Close( fd ) (void)close (fd)
 #endif
 
 /* Portable network names/addresses resolution layer */
