@@ -143,95 +143,6 @@ void input_ClockInit( input_clock_t *cl, vlc_bool_t b_master, int i_cr_average )
     cl->b_master = b_master;
 }
 
-#if 0
-/*****************************************************************************
- * input_ClockManageControl: handles the messages from the interface
- *****************************************************************************
- * Returns UNDEF_S if nothing happened, PAUSE_S if the stream was paused
- *****************************************************************************/
-int input_ClockManageControl( input_thread_t * p_input,
-                               input_clock_t *cl, mtime_t i_clock )
-{
-#if 0
-    vlc_value_t val;
-    int i_return_value = UNDEF_S;
-
-    vlc_mutex_lock( &p_input->p->stream.stream_lock );
-
-    if( p_input->p->stream.i_new_status == PAUSE_S )
-    {
-        int i_old_status;
-
-        vlc_mutex_lock( &p_input->p->stream.control.control_lock );
-        i_old_status = p_input->p->stream.control.i_status;
-        p_input->p->stream.control.i_status = PAUSE_S;
-        vlc_mutex_unlock( &p_input->p->stream.control.control_lock );
-
-        vlc_cond_wait( &p_input->p->stream.stream_wait,
-                       &p_input->p->stream.stream_lock );
-        ClockNewRef( p_pgrm, i_clock, p_pgrm->last_pts > mdate() ?
-                                      p_pgrm->last_pts : mdate() );
-
-        if( p_input->p->stream.i_new_status == PAUSE_S )
-        {
-            /* PAUSE_S undoes the pause state: Return to old state. */
-            vlc_mutex_lock( &p_input->p->stream.control.control_lock );
-            p_input->p->stream.control.i_status = i_old_status;
-            vlc_mutex_unlock( &p_input->p->stream.control.control_lock );
-
-            p_input->p->stream.i_new_status = UNDEF_S;
-            p_input->p->stream.i_new_rate = UNDEF_S;
-        }
-
-        /* We handle i_new_status != PAUSE_S below... */
-
-        i_return_value = PAUSE_S;
-    }
-
-    if( p_input->p->stream.i_new_status != UNDEF_S )
-    {
-        vlc_mutex_lock( &p_input->p->stream.control.control_lock );
-
-        p_input->p->stream.control.i_status = p_input->stream.i_new_status;
-
-        ClockNewRef( p_pgrm, i_clock,
-                     ClockToSysdate( p_input, p_pgrm, i_clock ) );
-
-        if( p_input->p->stream.control.i_status == PLAYING_S )
-        {
-            p_input->p->stream.control.i_rate = DEFAULT_RATE;
-            p_input->p->stream.control.b_mute = 0;
-        }
-        else
-        {
-            p_input->p->stream.control.i_rate = p_input->stream.i_new_rate;
-            p_input->p->stream.control.b_mute = 1;
-
-            /* Feed the audio decoders with a NULL packet to avoid
-             * discontinuities. */
-            input_EscapeAudioDiscontinuity( p_input );
-        }
-
-        val.i_int = p_input->p->stream.control.i_rate;
-        var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
-
-        val.i_int = p_input->p->stream.control.i_status;
-        var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
-
-        p_input->p->stream.i_new_status = UNDEF_S;
-        p_input->p->stream.i_new_rate = UNDEF_S;
-
-        vlc_mutex_unlock( &p_input->p->stream.control.control_lock );
-    }
-
-    vlc_mutex_unlock( &p_input->p->stream.stream_lock );
-
-    return( i_return_value );
-#endif
-    return UNDEF_S;
-}
-#endif
-
 /*****************************************************************************
  * input_ClockSetPCR: manages a clock reference
  *****************************************************************************/
@@ -280,10 +191,6 @@ void input_ClockSetPCR( input_thread_t *p_input,
              * stream ?). */
             msg_Warn( p_input, "clock gap, unexpected stream discontinuity" );
             input_ClockInit( cl, cl->b_master, cl->i_cr_average );
-            /* FIXME needed ? */
-#if 0
-            input_EscapeDiscontinuity( p_input );
-#endif
         }
 
         cl->last_cr = i_clock;
@@ -303,11 +210,6 @@ void input_ClockSetPCR( input_thread_t *p_input,
                 }
                 mwait( i_wakeup );
             }
-            /* FIXME Not needed anymore ? */
-#if 0
-            /* Now take into account interface changes. */
-            input_ClockManageControl( p_input, cl, i_clock );
-#endif
         }
         else if ( mdate() - cl->last_sysdate > 200000 )
         {
