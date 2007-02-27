@@ -391,9 +391,8 @@ static int Open( vlc_object_t *p_this )
 
     if( val.i_int < 0 )
     {
-        msg_Err( p_stream, "illegal TTL %d", val.i_int );
-        free( p_sys );
-        return VLC_EGENERIC;
+        msg_Warn( p_stream, "illegal TTL %d, using 1", val.i_int );
+        val.i_int = -1;
     }
     p_sys->i_ttl = val.i_int;
 
@@ -2413,108 +2412,119 @@ static int rtp_packetize_h263( sout_stream_t *p_stream, sout_stream_id_t *id,
 }
 
 /* rfc3984 */
-static int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
-                               block_t *in )
+static int rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id,
+                                   const uint8_t *p_data, int i_data, int64_t i_pts, int64_t i_dts, vlc_bool_t b_last, int64_t i_length )
 {
-    int     i_max   = id->i_mtu - 12; /* payload max in one packet */
-    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
-    uint8_t *p_data = in->p_buffer;
-    int     i_data  = in->i_buffer;
-    block_t *out;
-    int     i_nal_type;
-    int     i_payload;
-
-    while( i_data > 5 &&
-           ( p_data[0] != 0x00 || p_data[1] != 0x00 || p_data[2] != 0x01 || /* startcode */
-            (p_data[3]&0x1f) < 1 || (p_data[3]&0x1f) > 23 ) ) /* naltype should be between 1 and 23 */
-    {
-        p_data++;
-        i_data--;
-    }
+    const int i_max = id->i_mtu - 12; /* payload max in one packet */
+    int i_nal_hdr;
+    int i_nal_type;
 
     if( i_data < 5 )
         return VLC_SUCCESS;
 
-    p_data+=3;
-    i_data-=3;
-    i_nal_type = p_data[0]&0x1f;
-
-    /* Skip global headers */
+    i_nal_hdr = p_data[3];
+    i_nal_type = i_nal_hdr&0x1f;
     if( i_nal_type == 7 || i_nal_type == 8 )
-        return VLC_SUCCESS;
-    
-    if( i_data <= i_max ) /* The whole pack will fit in one rtp payload */
     {
-        /* single NAL */
-        i_payload = __MIN( i_max, i_data );
-        out = block_New( p_stream, 12 + i_payload );
+        /* XXX Why do you want to remove them ? It will break streaming with 
+         * SPS/PPS change (broadcast) ? */
+        return VLC_SUCCESS;
+    }
 
-        /* rtp common header */
-        rtp_packetize_common( id, out, 1,
-                              in->i_pts > 0 ? in->i_pts : in->i_dts );
+    /* Skip start code */
+    p_data += 3;
+    i_data -= 3;
 
-        memcpy( &out->p_buffer[12], p_data, i_payload );
+    /* */
+    if( i_data <= i_max )
+    {
+        /* Single NAL unit packet */
+        block_t *out = block_New( p_stream, 12 + i_data );
+        out->i_dts    = i_dts;
+        out->i_length = i_length;
 
-        out->i_buffer   = 12 + i_payload;
-        out->i_dts    = in->i_dts;
-        out->i_length = in->i_length;
+        /* */
+        rtp_packetize_common( id, out, b_last, i_pts );
+        out->i_buffer = 12 + i_data;
+
+        memcpy( &out->p_buffer[12], p_data, i_data );
 
         rtp_packetize_send( id, out );
-
-        /*msg_Dbg( p_stream, "nal-out plain %d %02x", i_payload, out->p_buffer[16] );*/
     }
     else
     {
-        /* FU-A */
-        uint8_t     nalh; /* The nalheader byte */
-        int i=0, start=1, end=0, first=0;
- 
-        nalh = *p_data;
+        /* FU-A Fragmentation Unit without interleaving */
+        const int i_count = ( i_data-1 + i_max-2 - 1 ) / (i_max-2);
+        int i;
+
         p_data++;
         i_data--;
 
-        i_max   = id->i_mtu - 14;
-        i_count = ( i_data + i_max - 1 ) / i_max;
-
-        /*msg_Dbg( p_stream, "nal-out fragmented %02x %d", nalh, i_rest);*/
-
-        while( end == 0 )
+        for( i = 0; i < i_count; i++ )
         {
-            i_payload = __MIN( i_max, i_data );
-            out = block_New( p_stream, 14 + i_payload );
+            const int i_payload = __MIN( i_data, i_max-2 );
+            block_t *out = block_New( p_stream, 12 + 2 + i_payload );
+            out->i_dts    = i_dts + i * i_length / i_count;
+            out->i_length = i_length / i_count;
 
-            if( i_data == i_payload )
-                end = 1;
+            fprintf( stderr, "FU-A: payload=%d hdr=0x%x\n", i_payload, i_nal_hdr);
 
-            /* rtp common header */
-            rtp_packetize_common( id, out, (end)?1:0,
-                              in->i_pts > 0 ? in->i_pts : in->i_dts );
+            /* */
+            rtp_packetize_common( id, out, (b_last && i_payload == i_data), i_pts );
+            out->i_buffer = 14 + i_payload;
 
             /* FU indicator */
-            out->p_buffer[12] = (nalh&0x60)|28;
+            out->p_buffer[12] = 0x00 | (i_nal_hdr & 0x60) | 28;
             /* FU header */
-            out->p_buffer[13] = (start<<7)|(end<<6)|(nalh&0x1f);
-
-            memcpy( &out->p_buffer[14], p_data+first, i_payload );
- 
-            out->i_buffer   = 14 + i_payload;
-
-            // not sure what of these should be used and what it does :)
-            out->i_pts    = in->i_pts;
-            out->i_dts    = in->i_dts;
-            //out->i_dts    = in->i_dts + i * in->i_length / i_count;
-            //out->i_length = in->i_length / i_count;
+            out->p_buffer[13] = ( i == 0 ? 0x80 : 0x00 ) | ( (i == i_count-1) ? 0x40 : 0x00 )  | i_nal_type;
+            memcpy( &out->p_buffer[14], p_data, i_payload );
 
             rtp_packetize_send( id, out );
 
-            /*msg_Dbg( p_stream, "nal-out fragmented: frag %d %d %02x %02x %d", start,end,
-            out->p_buffer[12], out->p_buffer[13], i_payload );*/
-
             i_data -= i_payload;
-            first += i_payload;
-            i++;
-            start=0;
+            p_data += i_payload;
         }
+    }
+    return VLC_SUCCESS;
+}
+
+static int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
+                               block_t *in )
+{
+    const uint8_t *p_buffer = in->p_buffer;
+    int i_buffer = in->i_buffer;
+
+    while( i_buffer > 4 && ( p_buffer[0] != 0 || p_buffer[1] != 0 || p_buffer[2] != 1 ) )
+    {
+        i_buffer--;
+        p_buffer++;
+    }
+
+    /* Split nal units */
+    while( i_buffer > 4 )
+    {
+        int i_offset;
+        int i_size = i_buffer;
+        int i_skip = i_buffer;
+
+        /* search nal end */
+        for( i_offset = 4; i_offset+2 < i_buffer ; i_offset++)
+        {
+            if( p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 && p_buffer[i_offset+2] == 1 )
+            {
+                /* we found another startcode */
+                i_size = i_offset - ( p_buffer[i_offset-1] == 0 ? 1 : 0);
+                i_skip = i_offset;
+                break;
+            } 
+        }
+        /* TODO add STAP-A to remove a lot of overhead with small slice/sei/... */
+        rtp_packetize_h264_nal( p_stream, id, p_buffer, i_size,
+                                (in->i_pts > 0 ? in->i_pts : in->i_dts), in->i_dts,
+                                (i_size >= i_buffer), in->i_length * i_size / in->i_buffer );
+
+        i_buffer -= i_skip;
+        p_buffer += i_skip;
     }
     return VLC_SUCCESS;
 }
