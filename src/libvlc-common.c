@@ -217,7 +217,8 @@ libvlc_int_t * libvlc_InternalCreate( void )
     /* Fake attachment */
     p_libvlc->b_attached = VLC_TRUE;
     /* Store data for the non-reentrant API */
-    p_static_vlc = p_libvlc;
+    if( !p_static_vlc )
+        p_static_vlc = p_libvlc;
 
     return p_libvlc;
 }
