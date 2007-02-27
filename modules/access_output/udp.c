@@ -105,6 +105,10 @@ static void Close( vlc_object_t * );
 #define AUTO_MCAST_TEXT N_("Automatic multicast streaming")
 #define AUTO_MCAST_LONGTEXT N_("Allocates an outbound multicast address " \
                                "automatically.")
+#define UDPLITE_TEXT N_("UDP-Lite")
+#define UDPLITE_LONGTEXT N_("Use UDP-Lite/IP instead of normal UDP/IP")
+#define CSCOV_TEXT N_("Checksum coverage")
+#define CSCOV_LONGTEXT N_("Payload bytes covered by layer-4 checksum")
 
 vlc_module_begin();
     set_description( _("UDP stream output") );
@@ -119,11 +123,12 @@ vlc_module_begin();
                                  VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "auto-mcast", 0, NULL, AUTO_MCAST_TEXT,
               AUTO_MCAST_LONGTEXT, VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "udplite", 0, NULL, UDPLITE_TEXT, UDPLITE_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "cscov", 12, NULL, CSCOV_TEXT, CSCOV_LONGTEXT, VLC_TRUE );
 
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );
     add_shortcut( "rtp" ); // Will work only with ts muxer
-    add_shortcut( "udplite" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -136,6 +141,8 @@ static const char *ppsz_sout_options[] = {
     "caching",
     "group",
     "raw",
+    "lite",
+    "cscov",
     NULL
 };
 
@@ -204,14 +211,13 @@ static void CloseRTCP (sout_access_thread_t *obj);
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
-/* FIXME: lots of leaks in error handling here! */
 static int Open( vlc_object_t *p_this )
 {
     sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t   *p_sys;
 
     char                *psz_dst_addr = NULL;
-    int                 i_dst_port, proto = IPPROTO_UDP, cscov = 8;
+    int                 i_dst_port, proto = IPPROTO_UDP;
     const char          *protoname = "UDP";
 
     int                 i_handle;
@@ -223,10 +229,18 @@ static int Open( vlc_object_t *p_this )
     config_ChainParse( p_access, "",
                        ppsz_core_options, p_access->p_cfg );
 
+    if (var_Create (p_access, "dst-port", VLC_VAR_INTEGER)
+     || var_Create (p_access, "src-port", VLC_VAR_INTEGER)
+     || var_Create (p_access, "dst-addr", VLC_VAR_STRING)
+     || var_Create (p_access, "src-addr", VLC_VAR_STRING))
+    {
+        return VLC_ENOMEM;
+    }
+
     if( !( p_sys = calloc ( 1, sizeof( sout_access_out_sys_t ) ) ) )
     {
         msg_Err( p_access, "not enough memory" );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
     p_access->p_sys = p_sys;
 
@@ -234,18 +248,16 @@ static int Open( vlc_object_t *p_this )
     {
         if (strcmp (p_access->psz_access, "rtp") == 0)
             p_sys->b_rtpts = VLC_TRUE;
-        if (strcmp (p_access->psz_access, "udplite") == 0)
-        {
-            protoname = "UDP-Lite";
-            proto = IPPROTO_UDPLITE;
-            p_sys->b_rtpts = VLC_TRUE;
-        }
     }
-    if (p_sys->b_rtpts)
-        cscov += RTP_HEADER_LENGTH;
+
+    if (var_GetBool (p_access, SOUT_CFG_PREFIX"lite"))
+    {
+        protoname = "UDP-Lite";
+        proto = IPPROTO_UDPLITE;
+    }
 
     i_dst_port = DEFAULT_PORT;
-    if (var_CreateGetBool (p_access, SOUT_CFG_PREFIX"auto-mcast"))
+    if (var_GetBool (p_access, SOUT_CFG_PREFIX"auto-mcast"))
     {
         char buf[INET6_ADDRSTRLEN];
         if (MakeRandMulticast (AF_INET, buf, sizeof (buf)) != NULL)
@@ -264,16 +276,6 @@ static int Open( vlc_object_t *p_this )
             *psz_parser++ = '\0';
             i_dst_port = atoi (psz_parser);
         }
-    }
-
-    if (var_Create (p_access, "dst-port", VLC_VAR_INTEGER)
-     || var_Create (p_access, "src-port", VLC_VAR_INTEGER)
-     || var_Create (p_access, "dst-addr", VLC_VAR_STRING)
-     || var_Create (p_access, "src-addr", VLC_VAR_STRING))
-    {
-        free (p_sys);
-        free (psz_dst_addr);
-        return VLC_ENOMEM;
     }
 
     p_sys->p_thread =
@@ -325,11 +327,31 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->i_handle = i_handle;
     shutdown( i_handle, SHUT_RD );
 
+    int cscov = var_GetInteger (p_access, SOUT_CFG_PREFIX"cscov");
+    if (cscov)
+    {
+        switch (proto)
+        {
 #ifdef UDPLITE_SEND_CSCOV
-    if (proto == IPPROTO_UDPLITE)
-        setsockopt (i_handle, SOL_UDPLITE, UDPLITE_SEND_CSCOV,
-                    &cscov, sizeof (cscov));
+            case IPPROTO_UDPLITE:
+                cscov += 8;
+                setsockopt (i_handle, SOL_UDPLITE, UDPLITE_SEND_CSCOV,
+                            &(int){ cscov }, sizeof (cscov));
+                break;
 #endif
+#ifdef DCCP_SOCKOPT_RECV_CSCOV
+            /* FIXME: ^^is this the right name ? */
+            /* FIXME: is this inherited by accept() ? */
+            case IPPROTO_DCCP:
+                cscov = ((cscov + 3) >> 2) + 1;
+                if (cscov > 15)
+                    break; /* out of DCCP cscov range */
+                setsockopt (i_handle, SOL_DCCP, DCCP_SOCKOPT_RECV_CSCOV,
+                            &(int){ cscov }, sizeof (cscov));
+                break;
+#endif
+        }
+    }
 
     var_Get( p_access, SOUT_CFG_PREFIX "caching", &val );
     p_sys->p_thread->i_caching = (int64_t)val.i_int * 1000;
