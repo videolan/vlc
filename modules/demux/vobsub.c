@@ -179,9 +179,9 @@ static int Open ( vlc_object_t *p_this )
         }
     }
 
-    psz_vobname = strdup( p_demux->psz_path );
+    asprintf( &psz_vobname, "%s://%s", p_demux->psz_access, p_demux->psz_path );
     i_len = strlen( psz_vobname );
-    memcpy( psz_vobname + i_len - 4, ".sub", 4 );
+    if( i_len >= 4 ) memcpy( psz_vobname + i_len - 4, ".sub", 4 );
 
     /* open file */
     p_sys->p_vobsub_stream = stream_UrlNew( p_demux, psz_vobname );
