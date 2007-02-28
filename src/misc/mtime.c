@@ -231,7 +231,7 @@ mtime_t mdate( void )
  */
 void mwait( mtime_t date )
 {
-#if defined (HAVE_CLOCK_NANOSLEEP)
+#if 0 && defined (HAVE_CLOCK_NANOSLEEP)
     lldiv_t d = lldiv( date, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
 
