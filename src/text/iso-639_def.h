@@ -149,6 +149,7 @@ static const iso639_lang_t p_languages[] =
     { N_( "Portuguese" ),       "Portugues",   "pt", "por", "por" },
     { N_( "Pushto" ),           "",            "ps", "pus", "pus" },
     { N_( "Quechua" ),          "",            "qu", "que", "que" },
+    { N_( "Original audio" ),   "",            "",   "qaa", "qaa" },
     { N_( "Raeto-Romance" ),    "",            "rm", "roh", "roh" },
     { N_( "Romanian" ),         "",            "ro", "ron", "rum" },
     { N_( "Rundi" ),            "",            "rn", "run", "run" },
