@@ -73,45 +73,6 @@ static void mrl_Clean( mrl_t *p_mrl );
 sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
 {
     sout_instance_t *p_sout;
-    vlc_value_t keep;
-
-    if( var_Get( p_parent, "sout-keep", &keep ) >= 0 && keep.b_bool )
-    {
-        /* Remove the sout from the playlist garbage collector */
-        playlist_t *p_playlist = pl_Yield( p_parent );
-
-        vlc_mutex_lock( &p_playlist->gc_lock );
-        p_sout = vlc_object_find( p_playlist, VLC_OBJECT_SOUT, FIND_CHILD );
-        if( p_sout && p_sout->p_parent != (vlc_object_t *)p_playlist )
-        {
-            vlc_object_release( p_sout );
-            p_sout = NULL;
-        }
-        if( p_sout )
-            vlc_object_detach( p_sout );    /* Remove it from the GC */
-        vlc_mutex_unlock( &p_playlist->gc_lock );
-
-        pl_Release( p_parent );
-
-        /* */
-
-        if( p_sout )
-        {
-            if( !strcmp( p_sout->psz_sout, psz_dest ) )
-            {
-                msg_Dbg( p_parent, "sout keep: reusing sout" );
-                msg_Dbg( p_parent, "sout keep: you probably want to use "
-                          "gather stream_out" );
-                vlc_object_attach( p_sout, p_parent );
-                vlc_object_release( p_sout );
-                return p_sout;
-            }
-
-            msg_Dbg( p_parent, "sout keep: destroying unusable sout" );
-            vlc_object_release( p_sout );
-            sout_DeleteInstance( p_sout );
-        }
-    }
 
     /* *** Allocate descriptor *** */
     p_sout = vlc_object_create( p_parent, VLC_OBJECT_SOUT );
@@ -164,9 +125,6 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
  *****************************************************************************/
 void sout_DeleteInstance( sout_instance_t * p_sout )
 {
-    /* Unlink object */
-    vlc_object_detach( p_sout );
-
     /* remove the stream out chain */
     sout_StreamDelete( p_sout->p_stream );
 

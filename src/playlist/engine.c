@@ -210,6 +210,8 @@ static void ObjectGarbageCollector( playlist_t *p_playlist )
             vlc_object_release( p_obj );
             break;
         }
+        msg_Dbg( p_playlist, "garbage collector destroying 1 sout" );
+        vlc_object_detach( p_obj );
         vlc_object_release( p_obj );
         sout_DeleteInstance( (sout_instance_t*)p_obj );
     }
@@ -409,6 +411,7 @@ void playlist_LastLoop( playlist_t *p_playlist )
     while( ( p_obj = vlc_object_find( p_playlist,
                                       VLC_OBJECT_SOUT, FIND_CHILD ) ) )
     {
+        vlc_object_detach( p_obj );
         vlc_object_release( p_obj );
         sout_DeleteInstance( (sout_instance_t*)p_obj );
     }

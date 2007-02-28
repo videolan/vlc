@@ -52,11 +52,12 @@ static  int Run  ( input_thread_t *p_input );
 static  int RunAndDestroy  ( input_thread_t *p_input );
 
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
-                                  const char *, vlc_bool_t );
+                                  const char *, vlc_bool_t, sout_instance_t * );
 static  int             Init    ( input_thread_t *p_input );
 static void             Error   ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input );
+static void             Destroy( input_thread_t *p_input, sout_instance_t **pp_sout );
 
 static inline int ControlPopNoLock( input_thread_t *, int *, vlc_value_t * );
 static void       ControlReduce( input_thread_t * );
@@ -79,6 +80,9 @@ static void SlaveDemux( input_thread_t *p_input );
 static void SlaveSeek( input_thread_t *p_input );
 
 static void InputMetaUser( input_thread_t *p_input );
+
+static sout_instance_t *SoutFind( vlc_object_t *p_parent, input_item_t *p_item, vlc_bool_t * );
+static void SoutKeep( sout_instance_t * );
 
 /*****************************************************************************
  * This function creates a new input, and returns a pointer
@@ -105,7 +109,7 @@ static void InputMetaUser( input_thread_t *p_input );
  * TODO complete this list (?)
  *****************************************************************************/
 static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
-                               const char *psz_header, vlc_bool_t b_quick )
+                               const char *psz_header, vlc_bool_t b_quick, sout_instance_t *p_sout )
 {
     input_thread_t *p_input = NULL;                 /* thread descriptor */
     vlc_value_t val;
@@ -151,6 +155,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->p_meta  = NULL;
     p_input->p->p_es_out = NULL;
     p_input->p->p_sout  = NULL;
+    p_input->p->b_sout_keep  = VLC_FALSE;
     p_input->p->b_out_pace_control = VLC_FALSE;
     p_input->i_pts_delay = 0;
 
@@ -188,9 +193,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     /* Parse input options */
     vlc_mutex_lock( &p_item->lock );
     for( i = 0; i < p_item->i_options; i++ )
-    {
         var_OptionParse( p_input, p_item->ppsz_options[i] );
-    }
     vlc_mutex_unlock( &p_item->lock );
 
     /* Create Object Variables for private use only */
@@ -257,21 +260,38 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     if( p_input->b_preparsing )
         p_input->i_flags |= OBJECT_FLAGS_QUIET | OBJECT_FLAGS_NOINTERACT;
 
+    /* */
+    if( p_sout )
+        p_input->p->p_sout = p_sout;
+
     /* Attach only once we are ready */
     vlc_object_attach( p_input, p_parent );
 
     return p_input;
 }
 
-static void Destroy( input_thread_t *p_input )
+static void Destroy( input_thread_t *p_input, sout_instance_t **pp_sout )
 {
     vlc_object_detach( p_input );
+
+    if( pp_sout )
+        *pp_sout = NULL;
+    if( p_input->p->p_sout )
+    {
+        if( pp_sout )
+            *pp_sout = p_input->p->p_sout;
+        else if( p_input->p->b_sout_keep )
+            SoutKeep( p_input->p->p_sout );
+        else
+            sout_DeleteInstance( p_input->p->p_sout );
+    }
 
     vlc_mutex_destroy( &p_input->p->lock_control );
     free( p_input->p );
 
     vlc_object_destroy( p_input );
 }
+
 /**
  * Initialize an input thread and run it. You will need to monitor the
  * thread to clean up after it is done
@@ -283,27 +303,35 @@ static void Destroy( input_thread_t *p_input )
 input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
                                       input_item_t *p_item )
 {
-    return __input_CreateThread2( p_parent, p_item, NULL );
+    vlc_bool_t b_sout_keep;
+    sout_instance_t *p_sout = SoutFind( p_parent, p_item, &b_sout_keep );
+    input_thread_t *p_input =  __input_CreateThreadExtended( p_parent, p_item, NULL, p_sout );
+
+    if( !p_input && p_sout )
+        SoutKeep( p_sout );
+
+    p_input->p->b_sout_keep = b_sout_keep;
+    return p_input;
 }
 
-/* Gruik ! */
-input_thread_t *__input_CreateThread2( vlc_object_t *p_parent,
-                                       input_item_t *p_item,
-                                       const char *psz_header )
+/* */
+input_thread_t *__input_CreateThreadExtended( vlc_object_t *p_parent,
+                                              input_item_t *p_item,
+                                              const char *psz_log, sout_instance_t *p_sout )
 {
-    input_thread_t *p_input = NULL;      /* thread descriptor */
+    input_thread_t *p_input;
 
-    p_input = Create( p_parent, p_item, psz_header, VLC_FALSE );
+    p_input = Create( p_parent, p_item, psz_log, VLC_FALSE, p_sout );
     if( !p_input )
         return NULL;
 
     /* Create thread and wait for its readiness. */
     if( vlc_thread_create( p_input, "input", Run,
-                            VLC_THREAD_PRIORITY_INPUT, VLC_TRUE ) )
+                           VLC_THREAD_PRIORITY_INPUT, VLC_TRUE ) )
     {
         input_ChangeState( p_input, ERROR_S );
         msg_Err( p_input, "cannot create input thread" );
-        Destroy( p_input );
+        Destroy( p_input, &p_sout );
         return NULL;
     }
 
@@ -322,11 +350,17 @@ input_thread_t *__input_CreateThread2( vlc_object_t *p_parent,
 int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
                    vlc_bool_t b_block )
 {
-    input_thread_t *p_input = NULL;         /* thread descriptor */
+    vlc_bool_t b_sout_keep;
+    sout_instance_t *p_sout = SoutFind( p_parent, p_item, &b_sout_keep );
+    input_thread_t *p_input;
 
-    p_input = Create( p_parent, p_item, NULL, VLC_FALSE );
-    if( !p_input )
+    p_input = Create( p_parent, p_item, NULL, VLC_FALSE, p_sout );
+    if( !p_input && p_sout )
+    {
+        SoutKeep( p_sout );
         return VLC_EGENERIC;
+    }
+    p_input->p->b_sout_keep = b_sout_keep;
 
     if( b_block )
     {
@@ -340,7 +374,7 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
         {
             input_ChangeState( p_input, ERROR_S );
             msg_Err( p_input, "cannot create input thread" );
-            Destroy( p_input );
+            Destroy( p_input, NULL );
             return VLC_EGENERIC;
         }
     }
@@ -357,17 +391,17 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
  */
 int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 {
-    input_thread_t *p_input = NULL;           /* thread descriptor */
+    input_thread_t *p_input;
 
     /* Allocate descriptor */
-    p_input = Create( p_parent, p_item, NULL, VLC_TRUE );
+    p_input = Create( p_parent, p_item, NULL, VLC_TRUE, NULL );
     if( !p_input )
         return VLC_EGENERIC;
 
     Init( p_input );
     End( p_input );
 
-    Destroy( p_input );
+    Destroy( p_input, NULL );
 
     return VLC_SUCCESS;
 }
@@ -423,11 +457,16 @@ void input_StopThread( input_thread_t *p_input )
  */
 void input_DestroyThread( input_thread_t *p_input )
 {
+    input_DestroyThreadExtended( p_input, NULL );
+}
+
+void input_DestroyThreadExtended( input_thread_t *p_input, sout_instance_t **pp_sout )
+{
     /* Join the thread */
     vlc_thread_join( p_input );
 
     /* */
-    Destroy( p_input );
+    Destroy( p_input, pp_sout );
 }
 
 /*****************************************************************************
@@ -523,7 +562,7 @@ static int RunAndDestroy( input_thread_t *p_input )
 
 exit:
     /* Release memory */
-    Destroy( p_input );
+    Destroy( p_input, NULL );
     return 0;
 }
 
@@ -534,6 +573,7 @@ static void MainLoop( input_thread_t *p_input )
 {
     int64_t i_intf_update = 0;
     int i_updates = 0;
+
     while( !p_input->b_die && !p_input->b_error && !p_input->p->input.b_eof )
     {
         vlc_bool_t b_force_update = VLC_FALSE;
@@ -744,19 +784,45 @@ static int Init( input_thread_t * p_input )
                 p_input->p->counters.p_input_bitrate->update_interval = 1000000;
         }
 
-        /* handle sout */
+        /* Find a usable sout and attach it to p_input */
         psz = var_GetString( p_input, "sout" );
         if( *psz && strncasecmp( p_input->p->input.p_item->psz_uri, "vlc:", 4 ) )
         {
-            p_input->p->p_sout = sout_NewInstance( p_input, psz );
-            if( p_input->p->p_sout == NULL )
+            /* Check the validity of the provided sout */
+            if( p_input->p->p_sout )
             {
-                input_ChangeState( p_input, ERROR_S );
-                msg_Err( p_input, "cannot start stream output instance, " \
-                                  "aborting" );
-                free( psz );
-                return VLC_EGENERIC;
+                if( strcmp( p_input->p->p_sout->psz_sout, psz ) )
+                {
+                    msg_Dbg( p_input, "destroying unusable sout" );
+
+                    sout_DeleteInstance( p_input->p->p_sout );
+                    p_input->p->p_sout = NULL;
+                }
             }
+
+            if( p_input->p->p_sout )
+            {
+                /* Reuse it */
+                msg_Dbg( p_input, "sout keep: reusing sout" );
+                msg_Dbg( p_input, "sout keep: you probably want to use "
+                                  "gather stream_out" );
+                vlc_object_attach( p_input->p->p_sout, p_input );
+            }
+            else
+            {
+                /* Create a new one */
+                p_input->p->p_sout = sout_NewInstance( p_input, psz );
+
+                if( !p_input->p->p_sout )
+                {
+                    input_ChangeState( p_input, ERROR_S );
+                    msg_Err( p_input, "cannot start stream output instance, " \
+                                      "aborting" );
+                    free( psz );
+                    return VLC_EGENERIC;
+                }
+            }
+
             if( p_input->p_libvlc->b_stats )
             {
                 INIT_COUNTER( sout_sent_packets, INTEGER, COUNTER );
@@ -766,6 +832,13 @@ static int Init( input_thread_t * p_input )
                      p_input->p->counters.p_sout_send_bitrate->update_interval =
                              1000000;
             }
+        }
+        else if( p_input->p->p_sout )
+        {
+            msg_Dbg( p_input, "destroying useless sout" );
+
+            sout_DeleteInstance( p_input->p->p_sout );
+            p_input->p->p_sout = NULL;
         }
         free( psz );
     }
@@ -1093,7 +1166,7 @@ error:
         input_EsOutDelete( p_input->p->p_es_out );
 
     if( p_input->p->p_sout )
-        sout_DeleteInstance( p_input->p->p_sout );
+        vlc_object_detach( p_input->p->p_sout );
 
     /* Mark them deleted */
     p_input->p->input.p_demux = NULL;
@@ -1178,27 +1251,11 @@ static void End( input_thread_t * p_input )
         /* Close optional stream output instance */
         if( p_input->p->p_sout )
         {
-            vlc_value_t keep;
-
             CL_CO( sout_sent_packets );
             CL_CO( sout_sent_bytes );
             CL_CO( sout_send_bitrate );
 
-            if( var_Get( p_input, "sout-keep", &keep ) >= 0 && keep.b_bool )
-            {
-                playlist_t  *p_playlist = pl_Yield( p_input );
-
-                /* attach sout to the playlist */
-                vlc_object_detach( p_input->p->p_sout );
-                vlc_object_attach( p_input->p->p_sout, p_playlist );
-                pl_Release( p_input );
-                msg_Dbg( p_input, "kept sout" );
-            }
-            else
-            {
-                sout_DeleteInstance( p_input->p->p_sout );
-                msg_Dbg( p_input, "destroyed sout" );
-            }
+            vlc_object_detach( p_input->p->p_sout );
         }
 #undef CL_CO
     }
@@ -1207,6 +1264,74 @@ static void End( input_thread_t * p_input )
 
     /* Tell we're dead */
     p_input->b_dead = VLC_TRUE;
+}
+
+static sout_instance_t *SoutFind( vlc_object_t *p_parent, input_item_t *p_item, vlc_bool_t *pb_sout_keep )
+{
+    vlc_bool_t b_keep_sout = var_CreateGetBool( p_parent, "sout-keep" );
+    sout_instance_t *p_sout = NULL;
+    int i;
+
+    /* Search sout-keep options
+     * XXX it has to be done here, but it is duplicated work :( */
+    vlc_mutex_lock( &p_item->lock );
+    for( i = 0; i < p_item->i_options; i++ )
+    {
+        const char *psz_option = p_item->ppsz_options[i];
+        if( !psz_option )
+            continue;
+        if( *psz_option == ':' )
+            psz_option++;
+
+        if( !strcmp( psz_option, "sout-keep" ) )
+            b_keep_sout = VLC_TRUE;
+        else if( !strcmp( psz_option, "no-sout-keep" ) || !strcmp( psz_option, "nosout-keep" ) )
+            b_keep_sout = VLC_FALSE;
+    }
+    vlc_mutex_unlock( &p_item->lock );
+
+    /* Find a potential sout to reuse
+     * XXX it might be unusable but this will be checked later */
+    if( b_keep_sout )
+    {
+        /* Remove the sout from the playlist garbage collector */
+        playlist_t *p_playlist = pl_Yield( p_parent );
+
+        vlc_mutex_lock( &p_playlist->gc_lock );
+        p_sout = vlc_object_find( p_playlist, VLC_OBJECT_SOUT, FIND_CHILD );
+        if( p_sout )
+        {
+            if( p_sout->p_parent != VLC_OBJECT(p_playlist) )
+            {
+                vlc_object_release( p_sout );
+                p_sout = NULL;
+            }
+            else
+            {
+                vlc_object_detach( p_sout );    /* Remove it from the GC */
+
+                vlc_object_release( p_sout );
+            }
+        }
+        vlc_mutex_unlock( &p_playlist->gc_lock );
+
+        pl_Release( p_parent );
+    }
+
+    if( pb_sout_keep )
+        *pb_sout_keep = b_keep_sout;
+
+    return p_sout;
+}
+static void SoutKeep( sout_instance_t *p_sout )
+{
+    /* attach sout to the playlist */
+    playlist_t  *p_playlist = pl_Yield( p_sout );
+
+    msg_Dbg( p_sout, "sout has been kept" );
+    vlc_object_attach( p_sout, p_playlist );
+
+    pl_Release( p_sout );
 }
 
 /*****************************************************************************

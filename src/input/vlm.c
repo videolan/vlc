@@ -1140,14 +1140,13 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
 
             asprintf( &psz_header, _("Media: %s"), media->psz_name );
 
-            if( (p_input = input_CreateThread2( vlm, &media->item, psz_header
-                                              ) ) )
+            if( (p_input = input_CreateThreadExtended( vlm, &media->item, psz_header, NULL ) ) )
             {
                 while( !p_input->b_eof && !p_input->b_error )
                     msleep( 100000 );
 
                 input_StopThread( p_input );
-                input_DestroyThread( p_input );
+                input_DestroyThreadExtended( p_input, NULL );
             }
             free( psz_output );
             free( psz_header );
@@ -1242,12 +1241,11 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
         if( p_instance->p_input )
         {
             input_StopThread( p_instance->p_input );
-            input_DestroyThread( p_instance->p_input );
+            input_DestroyThreadExtended( p_instance->p_input, NULL );
         }
 
         asprintf( &psz_header, _("Media: %s"), media->psz_name );
-        p_instance->p_input = input_CreateThread2( vlm, &p_instance->item,
-                                                   psz_header );
+        p_instance->p_input = input_CreateThreadExtended( vlm, &p_instance->item, psz_header, NULL );
         if( !p_instance->p_input )
         {
             TAB_REMOVE( media->i_instance, media->instance, p_instance );
@@ -1361,7 +1359,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
         if( p_instance->p_input )
         {
             input_StopThread( p_instance->p_input );
-            input_DestroyThread( p_instance->p_input );
+            input_DestroyThreadExtended( p_instance->p_input, NULL );
         }
 
         input_ItemClean( &p_instance->item );
@@ -2502,7 +2500,7 @@ static int Manage( vlc_object_t* p_object )
                     char buffer[12];
 
                     input_StopThread( p_instance->p_input );
-                    input_DestroyThread( p_instance->p_input );
+                    input_DestroyThreadExtended( p_instance->p_input, NULL );
                     p_instance->p_input = NULL;
 
                     /* FIXME, find a way to select the right instance */

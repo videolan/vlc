@@ -93,6 +93,7 @@ struct input_thread_private_t
     /* Output */
     es_out_t    *p_es_out;
     sout_instance_t *p_sout;            /* XXX Move it to es_out ? */
+    vlc_bool_t      b_sout_keep;
     vlc_bool_t      b_out_pace_control; /*     idem ? */
 
     /* Main input properties */
@@ -225,8 +226,10 @@ int         input_DownloadAndCacheArt ( playlist_t *, input_item_t * );
  ***************************************************************************/
 
 /* input.c */
-#define input_CreateThread2(a,b,c) __input_CreateThread2(VLC_OBJECT(a),b,c)
-input_thread_t *__input_CreateThread2 ( vlc_object_t *, input_item_t *, const char * );
+#define input_CreateThreadExtended(a,b,c,d) __input_CreateThreadExtended(VLC_OBJECT(a),b,c,d)
+input_thread_t *__input_CreateThreadExtended ( vlc_object_t *, input_item_t *, const char *, sout_instance_t * );
+
+void input_DestroyThreadExtended( input_thread_t *p_input, sout_instance_t ** );
 
 /* var.c */
 void input_ControlVarInit ( input_thread_t * );
