@@ -101,6 +101,8 @@ public:
                           QGridLayout *, int& );
     IntegerConfigControl( vlc_object_t *, module_config_t *,
                           QLabel*, QSpinBox* );
+    IntegerConfigControl( vlc_object_t *, module_config_t *,
+                          QLabel*, QSlider* );
     virtual ~IntegerConfigControl() {};
     virtual int getValue();
     virtual void show() { spin->show(); label->show(); }
@@ -108,7 +110,6 @@ public:
 
 protected:
     QSpinBox *spin;
-
 private:
     QLabel *label;
     void finish();
@@ -123,6 +124,20 @@ public:
                                QLabel*, QSpinBox* );
 private:
     void finish();
+};
+
+class IntegerRangeSliderConfigControl : public VIntConfigControl
+{
+public:
+    IntegerRangeSliderConfigControl( vlc_object_t *, module_config_t *,
+                                QLabel *, QSlider *, bool * );
+    virtual ~IntegerRangeSliderConfigControl() {};
+    virtual int getValue();
+protected:
+         QSlider *slider;
+private:
+         QLabel *label;
+         void finish();
 };
 
 class IntegerListConfigControl : public VIntConfigControl

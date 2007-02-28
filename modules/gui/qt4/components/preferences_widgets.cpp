@@ -43,6 +43,7 @@
 #include <QComboBox>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QSlider>
 
 #include <vlc_keys.h>
 
@@ -546,6 +547,29 @@ void IntegerRangeConfigControl::finish()
     spin->setMaximum( p_item->max.i );
     spin->setMinimum( p_item->min.i );
 }
+
+IntegerRangeSliderConfigControl::IntegerRangeSliderConfigControl(
+                                            vlc_object_t *_p_this,
+                                            module_config_t *_p_item,
+                                            QLabel *_label, QSlider *_slider,
+                                            bool *_bool          ) :
+                    VIntConfigControl( _p_this, _p_item )
+{
+    slider = _slider;
+    label = _label;
+    slider->setMaximum( p_item->max.i );
+    slider->setMinimum( p_item->min.i );
+    slider->setValue( p_item->value.i );
+    slider->setToolTip( qfu(p_item->psz_longtext) );
+    if( label )
+        label->setToolTip( qfu(p_item->psz_longtext) );
+}
+
+int IntegerRangeSliderConfigControl::getValue()
+{
+        return slider->value();
+}
+
 
 /********* Integer / choice list **********/
 IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
