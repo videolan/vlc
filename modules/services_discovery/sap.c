@@ -49,7 +49,10 @@
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
 #endif
-#include <net/if.h>
+
+#ifndef WIN32
+#   include <net/if.h>
+#endif
 
 /************************************************************************
  * Macros and definitions
@@ -492,6 +495,7 @@ static void Run( services_discovery_t *p_sd )
     {
         char psz_address[NI_MAXNUMERICHOST] = "ff02::2:7ffe%";
 
+#ifndef WIN32
         struct if_nameindex *l = if_nameindex ();
         if (l != NULL)
         {
@@ -503,6 +507,30 @@ static void Run( services_discovery_t *p_sd )
             }
             if_freenameindex (l);
         }
+#else
+        /* this is the Winsock2 equivalant of SIOCGIFCONF on BSD stacks,
+           which if_nameindex uses internally anyway */
+
+        // first create a dummy socket to pin down the protocol family
+        SOCKET s = socket(PF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+        if( s != INVALID_SOCKET )
+        {
+            INTERFACE_INFO ifaces[10]; // Assume there will be no more than 10 IP interfaces
+            size_t len = sizeof(ifaces); 
+             
+            if( SOCKET_ERROR != WSAIoctl(s, SIO_GET_INTERFACE_LIST, NULL, 0, &ifaces, len, &len, NULL, NULL) )
+            {
+                unsigned ifcount = len/sizeof(INTERFACE_INFO);
+                char *ptr = strchr (psz_address, '%') + 1;
+                for(unsigned i = 1; i<=ifcount; ++i )
+                {
+                    // append link-local zone identifier
+                    sprintf(ptr, "%d", i);
+                }
+            }
+            closesocket(s);
+        }
+#endif
         *strchr (psz_address, '%') = '\0';
 
         static const char ipv6_scopes[] = "1456789ABCDE";
