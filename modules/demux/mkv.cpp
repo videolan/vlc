@@ -1887,12 +1887,12 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 
     if( i_track >= p_segment->tracks.size() )
     {
-        msg_Err( p_demux, "invalid track number=%d", block->TrackNum() );
+        msg_Err( p_demux, "invalid track number" );
         return;
     }
     if( tk->fmt.i_cat != NAV_ES && tk->p_es == NULL )
     {
-        msg_Err( p_demux, "unknown track number=%d", block->TrackNum() );
+        msg_Err( p_demux, "unknown track number" );
         return;
     }
     if( i_pts + i_duration < p_sys->i_start_pts && tk->fmt.i_cat == AUDIO_ES )
