@@ -257,7 +257,7 @@ static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
         p_dst = p_pic->p[i_plane].p_pixels;
-        i_width = p_pic->p[i_plane].i_visible_pitch;
+        i_width = p_pic->p[i_plane].i_pitch;
 
         if( p_sys->b_invert )
             p_src += (i_width * (p_pic->p[i_plane].i_visible_lines - 1));
@@ -266,7 +266,7 @@ static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
         {
             p_dec->p_libvlc->pf_memcpy( p_dst, p_src, i_width );
             p_src += p_sys->b_invert ? -i_width : i_width;
-            p_dst += p_pic->p[i_plane].i_pitch;
+            p_dst += i_width;
         }
 
         if( p_sys->b_invert )
@@ -324,11 +324,11 @@ static block_t *SendFrame( decoder_t *p_dec, block_t *p_block )
             return p_block;
         }
 
-        p_tmp = malloc( pic.p[0].i_visible_pitch );
+        p_tmp = malloc( pic.p[0].i_pitch );
         p_pixels = p_block->p_buffer;
         for( i = 0; i < pic.i_planes; i++ )
         {
-            int i_pitch = pic.p[i].i_visible_pitch;
+            int i_pitch = pic.p[i].i_pitch;
             uint8_t *p_top = p_pixels;
             uint8_t *p_bottom = p_pixels + i_pitch *
                 (pic.p[i].i_visible_lines - 1);
