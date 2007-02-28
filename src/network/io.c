@@ -309,7 +309,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
             if (ufd[i].revents == 0)
                 continue;
 
-#ifdef POLLRHUP /* This is nice but non-portable */
+#ifdef POLLRDHUP /* This is nice but non-portable */
 # define POLLRDHUP 0
 #endif
             if (i_total > 0)
