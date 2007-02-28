@@ -23,6 +23,7 @@
 #include <vlc/vlc.h>
 #include <vlc_playlist.h>
 #include "playlist_internal.h"
+#include "misc/configuration.h"
 #include <vlc_charset.h>
 
 #include <errno.h>
@@ -118,14 +119,22 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
 int playlist_MLDump( playlist_t *p_playlist )
 {
-    char *psz_uri, *psz_homedir =p_playlist->p_libvlc->psz_homedir;
+    char *psz_uri, *psz_homedir = p_playlist->p_libvlc->psz_homedir;
     if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
     if( !psz_homedir )
     {
-        msg_Err( p_playlist, "no home directory, cannot load media library") ;
+        msg_Err( p_playlist, "no home directory, cannot save media library") ;
         return VLC_EGENERIC;
     }
-    asprintf( &psz_uri, "%s" DIR_SEP CONFIG_DIR DIR_SEP
+
+    char psz_dirname[ strlen( psz_homedir ) + sizeof( DIR_SEP CONFIG_DIR ) ];
+    sprintf( psz_dirname, "%s" DIR_SEP CONFIG_DIR, psz_homedir );
+    if( config_CreateDir( (vlc_object_t *)p_playlist, psz_dirname ) )
+    {
+        return VLC_EGENERIC;
+    }
+
+    asprintf( &psz_uri, "%s" DIR_SEP "%s", psz_dirname,
                         "ml.xsp",  psz_homedir );
     stats_TimerStart( p_playlist, "ML Dump", STATS_TIMER_ML_DUMP );
     playlist_Export( p_playlist, psz_uri, p_playlist->p_ml_category,
