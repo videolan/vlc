@@ -309,15 +309,18 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
             if (ufd[i].revents == 0)
                 continue;
 
+#ifdef POLLRHUP /* This is nice but non-portable */
+# define POLLRDHUP 0
+#endif
             if (i_total > 0)
             {
                 // Errors (-1) and EOF (0) will be returned on next run
-                if (ufd[i].revents & (POLLERR|POLLNVAL|POLLHUP))
+                if (ufd[i].revents & (POLLERR|POLLNVAL|POLLRDHUP))
                     return i_total;
             }
             else
             {
-                if (ufd[i].revents & POLLHUP)
+                if (ufd[i].revents & POLLRDHUP)
                     return 0; // EOF, read() would yield 0
             }
 
@@ -443,25 +446,19 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                 continue;
         }
 
-        if ((ufd[0].revents & POLLERR) && (i_total > 0))
+        if ((ufd[0].revents & (POLLERR|POLLNVAL|POLLHUP)) && (i_total > 0))
             return i_total; // error will be dequeued separately on next call
 
         if (p_vs != NULL)
             val = p_vs->pf_send (p_vs->p_sys, p_data, i_data);
         else
-#if defined(WIN32) || defined(UNDER_CE)
             val = send (fd, p_data, i_data, 0);
-#else
-            val = write (fd, p_data, i_data);
-#endif
 
         if (val == -1)
         {
             msg_Err (p_this, "Write error: %s", net_strerror (net_errno));
             break;
         }
-        if (val == 0)
-            return i_total;
 
         p_data += val;
         i_data -= val;
