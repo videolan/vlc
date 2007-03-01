@@ -92,7 +92,7 @@ static mtime_t ClockToSysdate( input_thread_t *p_input,
                         * (mtime_t)p_input->p->i_rate
                         * (mtime_t)300;
         i_sysdate /= 27;
-        i_sysdate /= 1000;
+        i_sysdate /= INPUT_RATE_DEFAULT;
         i_sysdate += (mtime_t)cl->sysdate_ref;
     }
 
