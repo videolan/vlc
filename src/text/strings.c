@@ -804,15 +804,14 @@ void filename_sanitize( char *str )
         {
             case '/':
 #ifdef WIN32
+            case '\\':
             case '*':
             case '"':
-            case '\\':
-            case '[':
-            case ']':
+            case "?":
             case ':':
-            case ';':
             case '|':
-            case '=':
+            case '<':
+            case '>'
 #endif
                 *str = '_';
         }
@@ -825,22 +824,21 @@ void filename_sanitize( char *str )
  */
 void path_sanitize( char *str )
 {
+#ifdef WIN32
     while( *str )
     {
         switch( *str )
         {
-#ifdef WIN32
             case '*':
             case '"':
-            case '[':
-            case ']':
+            case "?":
             case ':':
-            case ';':
             case '|':
-            case '=':
-#endif
+            case '<':
+            case '>'
                 *str = '_';
         }
         str++;
     }
+#endif
 }
