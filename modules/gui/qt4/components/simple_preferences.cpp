@@ -231,9 +231,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         END_SPREFS_CAT;
 
         START_SPREFS_CAT( Subtitles, "Subtitles & OSD settings" );
+            CONFIG_GENERIC( "osd", Bool, NULL, OSDBox);
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
             CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );
+
             CONFIG_GENERIC( "freetype-font", String, NULL, font ); /* FIXME -> use file instead of string */
             CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,
