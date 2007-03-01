@@ -753,7 +753,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
             /* NOTE: Using i_idn here would not be thread-safe */
             hints.ai_flags &= ~AI_IDN;
             i_idn = VLC_FALSE;
-            msg_Dbg( p_this, "localized Domain Names not supported - " \
+            msg_Dbg( p_this, "International Domain Names not supported - " \
                 "disabled" );
         }
     }
