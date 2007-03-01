@@ -284,16 +284,24 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     if( o_mrl != nil )
     {
-        /* FIXME once psz_access is exported, since that syntax is no longer valid */
-#if 0
-        if( p_input->input.p_access && !strcmp( p_input->input.p_access->p_module->psz_shortname, "File" ) )
-        {
-            NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
-            if( prefix_range.location != NSNotFound )
-                [o_mrl deleteCharactersInRange: prefix_range];
+        /* FIXME once psz_access is exported, we could check if we are
+         * reading from a file in a smarter way. */
+
+        NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
+        if( prefix_range.location != NSNotFound )
+            [o_mrl deleteCharactersInRange: prefix_range];
+
+        if( [o_mrl characterAtIndex:0] == '/' )
+        { 
+            /* it's a local file */
             [o_window setRepresentedFilename: o_mrl];
         }
-#endif
+        else
+        {
+            /* it's from the network or somewhere else,
+             * we clear the previous path */
+            [o_window setRepresentedFilename: @""];
+        }
         [o_window setTitle: o_title];
     }
     else
