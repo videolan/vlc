@@ -807,11 +807,11 @@ void filename_sanitize( char *str )
             case '\\':
             case '*':
             case '"':
-            case "?":
+            case '?':
             case ':':
             case '|':
             case '<':
-            case '>'
+            case '>':
 #endif
                 *str = '_';
         }
@@ -831,11 +831,11 @@ void path_sanitize( char *str )
         {
             case '*':
             case '"':
-            case "?":
+            case '?':
             case ':':
             case '|':
             case '<':
-            case '>'
+            case '>':
                 *str = '_';
         }
         str++;
