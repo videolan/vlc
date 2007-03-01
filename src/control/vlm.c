@@ -25,7 +25,7 @@
 #include <vlc/libvlc.h>
 #include <vlc_es.h>
 #include <vlc_input.h>
-#include <vlc_vlm.h>
+#include "../input/vlm_internal.h"
 
 static void InitVLM( libvlc_instance_t *p_instance )
 {
