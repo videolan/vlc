@@ -175,9 +175,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
          CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
 
-         CONFIG_GENERIC_NO_BOOL( "volume" ,  IntegerRangeSlider, NULL, defaultVolume ); 
+         CONFIG_GENERIC_NO_BOOL( "volume" ,  IntegerRangeSlider, NULL, 
+                 defaultVolume );
          CONFIG_GENERIC( "audio-language" , StringList , NULL, 
-                    preferredAudioLanguage );  
+                    preferredAudioLanguage );
          CONFIG_GENERIC( "spdif" , Bool , NULL, spdifBox );
          CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL, 
                     detectionDolby );
@@ -194,7 +195,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
          CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
 //         CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer 
-         CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL, volNormalizer );
+         CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL, 
+                 volNormalizer );
          CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
         END_SPREFS_CAT;
 
@@ -218,10 +220,14 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 //        CONFIG_GENERIC( "", Bool, NULL, RecordBox ); //FIXME activate record 
         END_SPREFS_CAT;
 
+        /* Interface Panel */
         START_SPREFS_CAT( Interface, "Interfaces settings" );
-
             CONFIG_GENERIC( "language", StringList, NULL, language );
 
+/*            CONFIG_GENERIC( "intf", Module, NULL, ??? ); */ //FIXME interface choice
+            CONFIG_GENERIC ("one-instance", Bool, NULL, OneInterfaceMode );
+            CONFIG_GENERIC ("playlist-enqueue", Bool, NULL, 
+                    EnqueueOneInterfaceMode );
         END_SPREFS_CAT;
 
         START_SPREFS_CAT( Subtitles, "Subtitles & OSD settings" );
