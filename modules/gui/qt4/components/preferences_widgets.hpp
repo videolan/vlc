@@ -130,7 +130,7 @@ class IntegerRangeSliderConfigControl : public VIntConfigControl
 {
 public:
     IntegerRangeSliderConfigControl( vlc_object_t *, module_config_t *,
-                                QLabel *, QSlider *, bool * );
+                                QLabel *, QSlider * );
     virtual ~IntegerRangeSliderConfigControl() {};
     virtual int getValue();
 protected:

@@ -551,8 +551,7 @@ void IntegerRangeConfigControl::finish()
 IntegerRangeSliderConfigControl::IntegerRangeSliderConfigControl(
                                             vlc_object_t *_p_this,
                                             module_config_t *_p_item,
-                                            QLabel *_label, QSlider *_slider,
-                                            bool *_bool          ) :
+                                            QLabel *_label, QSlider *_slider ):
                     VIntConfigControl( _p_this, _p_item )
 {
     slider = _slider;

@@ -93,6 +93,17 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 controls.append( control );                               \
             }
 
+#define CONFIG_GENERIC_NO_BOOL( option, type, label, qcontrol )           \
+            p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
+            if( p_config )                                                \
+            {                                                             \
+                control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
+                           p_config, label, ui.qcontrol );                \
+                controls.append( control );                               \
+            }
+
+
+
 #define START_SPREFS_CAT( name , label )    \
         case SPrefs ## name:                \
         {                                   \
@@ -162,8 +173,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
          CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
 
-       CONFIG_GENERIC( "volume" ,  IntegerRangeSlider, NULL, defaultVolume ); 
-
+         CONFIG_GENERIC_NO_BOOL( "volume" ,  IntegerRangeSlider, NULL, defaultVolume ); 
          CONFIG_GENERIC( "audio-language" , StringList , NULL, 
                     preferredAudioLanguage );  
          CONFIG_GENERIC( "spdif" , Bool , NULL, spdifBox );
@@ -172,21 +182,18 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
          CONFIG_GENERIC( "aout" , Module , NULL, outputModule );
 #ifndef WIN32
-       CONFIG_GENERIC( "alsadev" , StringList , NULL, alsaDevice );
+         CONFIG_GENERIC( "alsadev" , StringList , NULL, alsaDevice );
          CONFIG_GENERIC( "dspdev" , String , NULL, OSSDevice );//FIXME File
 #else
-       CONFIG_GENERIC( "directx-audio-device" , IntegerList, NULL, 
+         CONFIG_GENERIC( "directx-audio-device" , IntegerList, NULL, 
                  DirectXDevice );
 #endif
          CONFIG_GENERIC( "audiofile-file" , String , NULL, FileName ); //Fixme File
 
-
          CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
-#if 0 // Not found for normalizer effect
-         CONFIG_GENERIC( "" , , NULL, );
-#endif
+//         CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer 
+         CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL, volNormalizer );
          CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
-
         END_SPREFS_CAT;
 
         START_SPREFS_CAT( InputAndCodecs, "Input & Codecs settings"  );
