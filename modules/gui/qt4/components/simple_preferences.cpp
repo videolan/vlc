@@ -136,7 +136,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 #ifdef WIN32
             CONFIG_GENERIC( "directx-wallpaper" , Bool , NULL, wallpaperMode );
-      //      CONFIG_GENERIC( "directx-device", String, NULL, dXdisplayDevice );
+            CONFIG_GENERIC( "directx-device", StringList, NULL, 
+                    dXdisplayDevice );
 #endif
 
             CONFIG_GENERIC( "snapshot-path", String, NULL,
@@ -163,19 +164,19 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
        CONFIG_GENERIC( "volume" ,  IntegerRangeSlider, NULL, defaultVolume ); 
 
-/*         CONFIG_GENERIC( "audio-language" , String , NULL, 
-                    preferredAudioLanguage ); */ //FIXME WHy ?
+         CONFIG_GENERIC( "audio-language" , StringList , NULL, 
+                    preferredAudioLanguage );  
          CONFIG_GENERIC( "spdif" , Bool , NULL, spdifBox );
-/*         CONFIG_GENERIC( "force-dolby-surround" , Integer , NULL, 
-                    detectionDolby );*/
+         CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL, 
+                    detectionDolby );
 
          CONFIG_GENERIC( "aout" , Module , NULL, outputModule );
 #ifndef WIN32
-/*       CONFIG_GENERIC( "alsadev" , String , NULL, alsaDevice );*/
+       CONFIG_GENERIC( "alsadev" , StringList , NULL, alsaDevice );
          CONFIG_GENERIC( "dspdev" , String , NULL, OSSDevice );//FIXME File
 #else
-/*       CONFIG_GENERIC( "directx-audio-device" , Integer, NULL, 
-                 DirectXDevice );*/
+       CONFIG_GENERIC( "directx-audio-device" , IntegerList, NULL, 
+                 DirectXDevice );
 #endif
          CONFIG_GENERIC( "audiofile-file" , String , NULL, FileName ); //Fixme File
 
