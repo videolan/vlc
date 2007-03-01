@@ -94,10 +94,6 @@ struct httpd_host_t
     int         *fds;
     unsigned     nfd;
 
-    /* Statistics */
-    counter_t *p_active_counter;
-    counter_t *p_total_counter;
-
     vlc_mutex_t lock;
 
     /* all registered url (becarefull that 2 httpd_url_t could point at the same url)
@@ -2016,11 +2012,8 @@ static void httpd_ClientTlsHsOut( httpd_client_t *cl )
 static void httpd_HostThread( httpd_host_t *host )
 {
     tls_session_t *p_tls = NULL;
-
-    host->p_total_counter = stats_CounterCreate( host,
-                                          VLC_VAR_INTEGER, STATS_COUNTER );
-    host->p_active_counter = stats_CounterCreate( host,
-                                          VLC_VAR_INTEGER, STATS_COUNTER );
+    counter_t *p_total_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
+    counter_t *p_active_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
 
     while( !host->b_die )
     {
@@ -2058,7 +2051,7 @@ static void httpd_HostThread( httpd_host_t *host )
                     cl->i_activity_date+cl->i_activity_timeout < now) ) ) )
             {
                 httpd_ClientClean( cl );
-                stats_UpdateInteger( host, host->p_active_counter, -1, NULL );
+                stats_UpdateInteger( host, p_active_counter, -1, NULL );
                 TAB_REMOVE( host->i_client, host->client, cl );
                 free( cl );
                 i_client--;
@@ -2511,8 +2504,8 @@ static void httpd_HostThread( httpd_host_t *host )
                     break; // wasted TLS session, cannot accept() anymore
             }
 
-            stats_UpdateInteger( host, host->p_total_counter, 1, NULL );
-            stats_UpdateInteger( host, host->p_active_counter, 1, NULL );
+            stats_UpdateInteger( host, p_total_counter, 1, NULL );
+            stats_UpdateInteger( host, p_active_counter, 1, NULL );
             cl = httpd_ClientNew( fd, p_tls, now );
             p_tls = NULL;
             vlc_mutex_lock( &host->lock );
@@ -2529,6 +2522,10 @@ static void httpd_HostThread( httpd_host_t *host )
 
     if( p_tls != NULL )
         tls_ServerSessionClose( p_tls );
+    if( p_total_counter )
+        stats_CounterClean( p_total_counter );
+    if( p_active_counter )
+        stats_CounterClean( p_active_counter );
 }
 
 #else /* ENABLE_HTTPD */
