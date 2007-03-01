@@ -39,19 +39,14 @@
 #include <windows.h>
 extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
                            int expand_wildcards, int *startupinfo);
+static inline void Kill(void) { }
 #else
 
 # include <signal.h>
 # include <time.h>
 # include <pthread.h>
-# include <stdbool.h>
 
-static struct
-{
-    bool flag;
-    pthread_mutex_t lock;
-} live = { true, PTHREAD_MUTEX_INITIALIZER };
-
+static void Kill (void);
 static void *SigHandler (void *set);
 #endif
 
@@ -175,6 +170,8 @@ int main( int i_argc, char *ppsz_argv[] )
     /* Finish the threads */
     VLC_CleanUp( 0 );
 
+    Kill ();
+
     /* Destroy the libvlc structure */
     VLC_Destroy( 0 );
 
@@ -218,13 +215,7 @@ static void *SigHandler (void *data)
                             "again in case it gets stuck\n", i_signal);
 
             /* Acknowledge the signal received */
-            pthread_mutex_lock (&live.lock);
-            if (live.flag)
-            {
-                VLC_Die (0);
-                live.flag = false;
-            }
-            pthread_mutex_unlock (&live.lock);
+            Kill ();
         }
         else if( time( NULL ) > abort_time + 2 )
         {
@@ -237,6 +228,20 @@ static void *SigHandler (void *data)
     }
     /* Never reached */
 }
+
+
+static void KillOnce (void)
+{
+    VLC_Die (0);
+}
+
+
+static void Kill (void)
+{
+    static pthread_once_t once = PTHREAD_ONCE_INIT;
+    pthread_once (&once, KillOnce);
+}
+
 #endif
 
 #if defined(UNDER_CE)
