@@ -97,6 +97,7 @@ static void Close( vlc_object_t *p_this )
     /* It can happen only if buggy */
     if( p_sys->p_input )
         vlc_object_release( p_sys->p_input );
+    free( p_sys );
 }
 
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
