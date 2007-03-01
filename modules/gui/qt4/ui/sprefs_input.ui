@@ -1,7 +1,7 @@
 <ui version="4.0" >
  <author>Jean-Baptiste Kempf</author>
  <class>SPrefsInputAndCodecs</class>
- <widget class="QWidget" name="SprefsInputAndCodecs" >
+ <widget class="QWidget" name="SPrefsInputAndCodecs" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -92,7 +92,7 @@
        </widget>
       </item>
       <item row="1" column="1" colspan="2" >
-       <widget class="QLineEdit" name="lineEdit" />
+       <widget class="QLineEdit" name="proxy" />
       </item>
       <item row="0" column="1" colspan="2" >
        <widget class="QSpinBox" name="UDPPort" >
@@ -113,7 +113,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
-         <string>UDP Default Port</string>
+         <string>Server Default Port</string>
         </property>
        </widget>
       </item>
@@ -133,9 +133,9 @@
        <number>6</number>
       </property>
       <item row="2" column="0" >
-       <widget class="QCheckBox" name="RTCP_TCPBox" >
+       <widget class="QCheckBox" name="RTSP_TCPBox" >
         <property name="text" >
-         <string>Use RTP over RTCP (TCP)</string>
+         <string>Use RTP over RTSP (TCP)</string>
         </property>
        </widget>
       </item>

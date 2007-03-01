@@ -132,6 +132,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
     switch( number )
     {
+        /* Video Panel Implementation */
         START_SPREFS_CAT( Video , "General video settings" );
          #ifndef WIN32
             ui.directXBox->setVisible( false );
@@ -160,6 +161,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             snapshotsFormat );
          END_SPREFS_CAT;
 
+         /* Audio Panel Implementation */
         START_SPREFS_CAT( Audio,  "General audio settings" );
 #ifdef WIN32
             ui.OSSBrowse->hide();
@@ -196,8 +198,24 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
          CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
         END_SPREFS_CAT;
 
+        /* Input and Codecs Panel Implementation */
         START_SPREFS_CAT( InputAndCodecs, "Input & Codecs settings"  );
+          /* Disk Devices */
+/*          CONFIG_GENERIC( );*/
 
+          CONFIG_GENERIC_NO_BOOL( "server-port", Integer, NULL, UDPPort );
+          CONFIG_GENERIC( "http-proxy", String , NULL, proxy );
+
+          /* Caching */
+/*          CONFIG_GENERIC( );*/
+
+          CONFIG_GENERIC_NO_BOOL( "ffmpeg-pp-q", Integer, NULL, PostProcLevel );
+          CONFIG_GENERIC( "avi-index", IntegerList, NULL, AviRepair );
+          CONFIG_GENERIC( "rtsp-tcp", Bool, NULL, RTSP_TCPBox );
+
+          CONFIG_GENERIC( "timeshift-force", Bool, NULL, timeshiftBox );
+          CONFIG_GENERIC( "dump-force", Bool, NULL, DumpBox );
+//        CONFIG_GENERIC( "", Bool, NULL, RecordBox ); //FIXME activate record 
         END_SPREFS_CAT;
 
         START_SPREFS_CAT( Interface, "Interfaces settings" );
