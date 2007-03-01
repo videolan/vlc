@@ -27,31 +27,32 @@
 
 #include "config.h"
 
+#include <vlc/vlc.h>
 #include <stdio.h>                                              /* fprintf() */
 #include <stdlib.h>                                  /* putenv(), strtol(),  */
-#ifdef HAVE_SIGNAL_H
-#   include <signal.h>                            /* SIGHUP, SIGINT, SIGKILL */
-#endif
-#ifdef HAVE_TIME_H
-#   include <time.h>                                               /* time() */
-#endif
-#ifdef HAVE_PTHREAD_H
-#   include <pthread.h>
-#endif
 
-#include <vlc/vlc.h>
-
-#ifdef WIN32
-#include <windows.h>
-extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
-                           int expand_wildcards, int *startupinfo);
-#endif
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-#if !defined(WIN32) && !defined(UNDER_CE)
-static void *SigHandler  ( void *set );
+#ifdef WIN32
+#include <windows.h>
+extern void __wgetmainargs(int *argc, wchar_t ***wargv, wchar_t ***wenviron,
+                           int expand_wildcards, int *startupinfo);
+#else
+
+# include <signal.h>
+# include <time.h>
+# include <pthread.h>
+# include <stdbool.h>
+
+static struct
+{
+    bool flag;
+    pthread_mutex_t lock;
+} live = { true, PTHREAD_MUTEX_INITIALIZER };
+
+static void *SigHandler (void *set);
 #endif
 
 /*****************************************************************************
@@ -171,16 +172,16 @@ int main( int i_argc, char *ppsz_argv[] )
 
     i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE, VLC_TRUE );
 
-#if !defined(WIN32) && !defined(UNDER_CE)
-    pthread_cancel (sigth);
-    pthread_join (sigth, NULL);
-#endif
-
     /* Finish the threads */
     VLC_CleanUp( 0 );
 
     /* Destroy the libvlc structure */
     VLC_Destroy( 0 );
+
+#if !defined(WIN32) && !defined(UNDER_CE)
+    pthread_cancel (sigth);
+    pthread_join (sigth, NULL);
+#endif
 
     return i_ret;
 }
@@ -192,7 +193,7 @@ int main( int i_argc, char *ppsz_argv[] )
  * This thread receives all handled signals synchronously.
  * It tries to end the program in a clean way.
  *****************************************************************************/
-static void *SigHandler( void *data )
+static void *SigHandler (void *data)
 {
     const sigset_t *set = (sigset_t *)data;
     time_t abort_time = 0;
@@ -208,23 +209,29 @@ static void *SigHandler( void *data )
          * signals to a libvlc structure having been destroyed */
 
         pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &state);
-        if( !b_die )
+        if (!b_die)
         {
             b_die = VLC_TRUE;
-            abort_time = time( NULL );
+            abort_time = time (NULL);
 
-            fprintf( stderr, "signal %d received, terminating vlc - do it "
-                            "again in case it gets stuck\n", i_signal );
+            fprintf (stderr, "signal %d received, terminating vlc - do it "
+                            "again in case it gets stuck\n", i_signal);
 
             /* Acknowledge the signal received */
-            VLC_Die( 0 );
+            pthread_mutex_lock (&live.lock);
+            if (live.flag)
+            {
+                VLC_Die (0);
+                live.flag = false;
+            }
+            pthread_mutex_unlock (&live.lock);
         }
         else if( time( NULL ) > abort_time + 2 )
         {
             /* If user asks again 1 or 2 seconds later, die badly */
             pthread_sigmask (SIG_UNBLOCK, set, NULL);
-            fprintf( stderr, "user insisted too much, dying badly\n" );
-            abort();
+            fprintf (stderr, "user insisted too much, dying badly\n");
+            abort ();
         }
         pthread_setcancelstate (state, NULL);
     }
