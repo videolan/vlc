@@ -102,9 +102,9 @@ void DialogsProvider::customEvent( QEvent *event )
                mediaInfoDialog(); break;
             case INTF_DIALOG_INTERACTION:
                doInteraction( de->p_arg ); break;
-            case INTF_DIALOG_VLM:
             case INTF_DIALOG_BOOKMARKS:
                bookmarksDialog(); break;
+            case INTF_DIALOG_VLM:
             case INTF_DIALOG_WIZARD:
             default:
                msg_Warn( p_intf, "unimplemented dialog\n" );
