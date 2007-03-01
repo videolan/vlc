@@ -450,6 +450,7 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
     while( p_media->i_rtsp > 0 )
         RtspClientDel( p_media, p_media->rtsp[0] );
     TAB_CLEAN( p_media->i_rtsp, p_media->rtsp );
+
     httpd_UrlDelete( p_media->p_rtsp_url );
     if( p_media->psz_rtsp_path ) free( p_media->psz_rtsp_path );
     if( p_media->psz_rtsp_control_v6 ) free( p_media->psz_rtsp_control_v6 );
@@ -731,6 +732,7 @@ static void MediaDelES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt)
 
     if( p_es->p_rtsp_url ) httpd_UrlDelete( p_es->p_rtsp_url );
     es_format_Clean( &p_es->fmt );
+    free( p_es );
 }
 
 /* */
