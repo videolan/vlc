@@ -158,6 +158,7 @@ mtime_t mdate( void )
 #elif defined( WIN32 ) || defined( UNDER_CE )
     /* We don't need the real date, just the value of a high precision timer */
     static mtime_t freq = I64C(-1);
+    mtime_t usec_time;
 
     if( freq == I64C(-1) )
     {
