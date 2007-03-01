@@ -209,6 +209,9 @@
 #define FOURCC_0xa9gen VLC_FOURCC( 0xa9, 'g', 'e', 'n' )
 #define FOURCC_WLOC VLC_FOURCC( 'W', 'L', 'O', 'C' )
 
+#define FOURCC_meta VLC_FOURCC( 'm', 'e', 't', 'a' )
+#define FOURCC_ilst VLC_FOURCC( 'i', 'l', 's', 't' )
+
 /* Do you want some debug information on all read boxes ? */
 #define MP4_VERBOSE  1
 

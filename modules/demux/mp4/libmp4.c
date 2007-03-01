@@ -2087,10 +2087,10 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
     p_box->data.p_0xa9xxx->psz_text = NULL;
 
     MP4_GET2BYTES( i_length );
-    MP4_GET2BYTES( i_dummy );
 
     if( i_length > 0 )
     {
+        MP4_GET2BYTES( i_dummy );
         if( i_length > i_read ) i_length = i_read;
 
         p_box->data.p_0xa9xxx->psz_text = malloc( i_length + 1 );
@@ -2106,12 +2106,72 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
                  p_box->data.p_0xa9xxx->psz_text );
 #endif
     }
+    else
+    {
+        /* try iTune/Quicktime format, rewind to start */
+        p_peek -= 2; i_read += 2;
+        // we are expecting a 'data' box
+        uint32_t i_data_len;
+        uint32_t i_data_tag;
+
+        MP4_GET4BYTES( i_data_len );
+        if( i_data_len > i_read ) i_data_len = i_read;
+        MP4_GETFOURCC( i_data_tag );
+        if( (i_data_len > 0) && (i_data_tag == VLC_FOURCC('d', 'a', 't', 'a')) )
+        {
+            /* data box contains a version/flags field */
+            uint32_t i_version;
+            uint32_t i_reserved;
+            MP4_GET4BYTES( i_version );
+            MP4_GET4BYTES( i_reserved );
+            // version should be 0, flags should be 1 for text, 0 for data
+            if( i_version == 0x00000001 )
+            {
+                // the rest is the text
+                i_data_len -= 12;
+                p_box->data.p_0xa9xxx->psz_text = malloc( i_data_len + 1 );
+
+                memcpy( p_box->data.p_0xa9xxx->psz_text,
+                        p_peek, i_data_len );
+                p_box->data.p_0xa9xxx->psz_text[i_data_len] = '\0';
+#ifdef MP4_VERBOSE
+        msg_Dbg( p_stream,
+                 "read box: \"%4.4s\" text=`%s'",
+                 (char*)&p_box->i_type,
+                 p_box->data.p_0xa9xxx->psz_text );
+#endif
+            }
+            else
+            {
+                // TODO: handle data values for ID3 tag values, track num or cover art,etc...
+            }
+        }
+    }
 
     MP4_READBOX_EXIT( 1 );
 }
 static void MP4_FreeBox_0xa9xxx( MP4_Box_t *p_box )
 {
     FREENULL( p_box->data.p_0xa9xxx->psz_text );
+}
+
+static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    uint8_t meta_data[8];
+    int i_actually_read;
+
+    // skip over box header
+    i_actually_read = stream_Read( p_stream, meta_data, 8 );
+    if( i_actually_read < 8 )
+        return 0;
+
+    /* meta content starts with a 4 byte version/flags value (should be 0) */
+    i_actually_read = stream_Read( p_stream, meta_data, 4 );
+    if( i_actually_read < 4 )
+        return 0;
+
+    /* then it behaves like a container */
+    return MP4_ReadBoxContainerRaw( p_stream, p_box );
 }
 
 /* For generic */
@@ -2184,6 +2244,7 @@ static struct
     { FOURCC_tref,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
     { FOURCC_gmhd,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
     { FOURCC_wave,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
+    { FOURCC_ilst,  MP4_ReadBoxContainer,   MP4_FreeBox_Common },
 
     /* specific box */
     { FOURCC_ftyp,  MP4_ReadBox_ftyp,       MP4_FreeBox_ftyp },
@@ -2337,6 +2398,9 @@ static struct
     { FOURCC_0xa9url,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9ope,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9com,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+
+    /* iTunes/Quicktime meta info */
+    { FOURCC_meta,  MP4_ReadBox_meta,       MP4_FreeBox_Common },
 
     /* Last entry */
     { 0,             MP4_ReadBox_default,       NULL }

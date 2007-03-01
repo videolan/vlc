@@ -783,16 +783,23 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_META:
         {
             vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t*);
-            MP4_Box_t  *p_udta   = MP4_BoxGet( p_sys->p_root, "/moov/udta" );
             MP4_Box_t  *p_0xa9xxx;
+
+            MP4_Box_t  *p_udta = MP4_BoxGet( p_sys->p_root, "/moov/udta/meta/ilst" );
             if( p_udta == NULL )
             {
-                return VLC_EGENERIC;
+                p_udta = MP4_BoxGet( p_sys->p_root, "/moov/udta" );
+                if( p_udta == NULL )
+                {
+                    return VLC_EGENERIC;
+                }
             }
+
             for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL;
                  p_0xa9xxx = p_0xa9xxx->p_next )
             {
                 char *psz_utf;
+
                 if( !p_0xa9xxx || !p_0xa9xxx->data.p_0xa9xxx )
                     continue;
                 psz_utf = strdup( p_0xa9xxx->data.p_0xa9xxx->psz_text );
@@ -805,7 +812,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 switch( p_0xa9xxx->i_type )
                 {
                 case FOURCC_0xa9nam: /* Full name */
-                    vlc_meta_SetArtist( p_meta, psz_utf );
+                    vlc_meta_SetTitle( p_meta, psz_utf );
                     break;
                 case FOURCC_0xa9aut:
                     vlc_meta_SetArtist( p_meta, psz_utf );
@@ -826,9 +833,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     vlc_meta_SetGenre( p_meta, psz_utf );
                     break;
 
+                case FOURCC_0xa9alb: /* Album */
+                    vlc_meta_SetAlbum( p_meta, psz_utf );
+                    break;
+
                 case FOURCC_0xa9swr:
                 case FOURCC_0xa9inf: /* Information */
-                case FOURCC_0xa9alb: /* Album */
                 case FOURCC_0xa9dir: /* Director */
                 case FOURCC_0xa9dis: /* Disclaimer */
                 case FOURCC_0xa9enc: /* Encoded By */
