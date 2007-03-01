@@ -110,6 +110,24 @@ char *secstotimestr( char *psz_buffer, int i_seconds )
     return( psz_buffer );
 }
 
+/**
+ * Return a value that is no bigger than the clock precision
+ * (possibly zero).
+ */
+static inline unsigned mprec( void )
+{
+#if defined (HAVE_CLOCK_NANOSLEEP)
+    struct timespec ts;
+    if( clock_getres( CLOCK_MONOTONIC, &ts ))
+        clock_getres( CLOCK_REALTIME, &ts );
+
+    return ts.tv_nsec / 1000;
+#endif
+    return 0;
+}
+
+static unsigned prec = 0;
+static volatile mtime_t cached_time = 0;
 
 /**
  * Return high precision date
@@ -119,6 +137,8 @@ char *secstotimestr( char *psz_buffer, int i_seconds )
  */
 mtime_t mdate( void )
 {
+    mtime_t res;
+
 #if defined (HAVE_CLOCK_NANOSLEEP)
     struct timespec ts;
 
@@ -129,11 +149,11 @@ mtime_t mdate( void )
         /* Run-time fallback to real-time clock (always available) */
         (void)clock_gettime( CLOCK_REALTIME, &ts );
 
-    return ((mtime_t)ts.tv_sec * (mtime_t)1000000)
+    res = ((mtime_t)ts.tv_sec * (mtime_t)1000000)
            + (mtime_t)(ts.tv_nsec / 1000);
 
 #elif defined( HAVE_KERNEL_OS_H )
-    return( real_time_clock_usecs() );
+    res = real_time_clock_usecs();
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
     /* We don't need the real date, just the value of a high precision timer */
@@ -175,8 +195,7 @@ mtime_t mdate( void )
         /* We need to split the division to avoid 63-bits overflow */
         lldiv_t d = lldiv (counter.QuadPart, freq);
 
-        return (d.quot * 1000000)
-             + ((d.rem * 1000000) / freq);
+        res = (d.quot * 1000000) + ((d.rem * 1000000) / freq);
     }
     else
     {
@@ -188,7 +207,6 @@ mtime_t mdate( void )
         static CRITICAL_SECTION date_lock;
         static mtime_t i_previous_time = I64C(-1);
         static int i_wrap_counts = -1;
-        mtime_t usec_time;
 
         if( i_wrap_counts == -1 )
         {
@@ -199,9 +217,9 @@ mtime_t mdate( void )
         }
 
         EnterCriticalSection( &date_lock );
-        usec_time = I64C(1000) *
+        res = I64C(1000) *
             (i_wrap_counts * I64C(0x100000000) + GetTickCount());
-        if( i_previous_time > usec_time )
+        if( i_previous_time > res )
         {
             /* Counter wrapped */
             i_wrap_counts++;
@@ -209,16 +227,16 @@ mtime_t mdate( void )
         }
         i_previous_time = usec_time;
         LeaveCriticalSection( &date_lock );
-
-        return usec_time;
     }
 #else
     struct timeval tv_date;
 
     /* gettimeofday() cannot fail given &tv_date is a valid address */
     (void)gettimeofday( &tv_date, NULL );
-    return( (mtime_t) tv_date.tv_sec * 1000000 + (mtime_t) tv_date.tv_usec );
+    res = (mtime_t) tv_date.tv_sec * 1000000 + (mtime_t) tv_date.tv_usec;
 #endif
+
+    return cached_time = res;
 }
 
 /**
@@ -231,6 +249,14 @@ mtime_t mdate( void )
  */
 void mwait( mtime_t date )
 {
+    if( prec == 0 )
+        prec = mprec();
+
+    /* If the deadline is already elapsed, or within the clock precision,
+     * do not even bother the clock. */
+    if( ( date - cached_time ) < (mtime_t)prec ) // OK: mtime_t is signed
+        return;
+
 #if 0 && defined (HAVE_CLOCK_NANOSLEEP)
     lldiv_t d = lldiv( date, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
@@ -256,6 +282,8 @@ void mwait( mtime_t date )
  */
 void msleep( mtime_t delay )
 {
+    mtime_t earlier = cached_time;
+
 #if defined( HAVE_CLOCK_NANOSLEEP ) 
     lldiv_t d = lldiv( delay, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
@@ -297,6 +325,10 @@ void msleep( mtime_t delay )
      * can be ignored. */
     select( 0, NULL, NULL, NULL, &tv_delay );
 #endif
+
+    earlier += delay;
+    if( cached_time < earlier )
+        cached_time = earlier;
 }
 
 /*
