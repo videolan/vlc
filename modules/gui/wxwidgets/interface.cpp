@@ -301,7 +301,7 @@ enum
     OnWebLink_Event,
     OnWebHelp_Event,
     UpdateVLC_Event,
-    VLM_Event,
+    //VLM_Event,
 
     Iconize_Event,
 };
@@ -315,7 +315,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(OnWebLink_Event, Interface::OnWebLink)
     EVT_MENU(OnWebHelp_Event, Interface::OnWebHelp)
     EVT_MENU(UpdateVLC_Event, Interface::OnShowDialog)
-    EVT_MENU(VLM_Event, Interface::OnShowDialog)
+    //EVT_MENU(VLM_Event, Interface::OnShowDialog)
 
     EVT_MENU(Playlist_Event, Interface::OnShowDialog)
     EVT_MENU(PlaylistSmall_Event, Interface::OnSmallPlaylist)
@@ -600,8 +600,10 @@ void Interface::CreateOurMenuBar()
     view_menu->Append( Logs_Event, wxU(_("&Messages...\tCtrl-M")) );
     view_menu->Append( FileInfo_Event,
                        wxU(_("Stream and Media &Info...\tCtrl-I")) );
+#if 0
     view_menu->Append( VLM_Event,
                        wxU(_("VLM Control...\tCtrl-V")) );
+#endif
 
     /* Create the "Auto-generated" menus */
     p_settings_menu = SettingsMenu( p_intf, this );
@@ -1027,9 +1029,11 @@ void Interface::OnShowDialog( wxCommandEvent& event )
         case UpdateVLC_Event:
             i_id = INTF_DIALOG_UPDATEVLC;
             break;
+#if 0
         case VLM_Event:
             i_id = INTF_DIALOG_VLM;
             break;
+#endif
         default:
             i_id = INTF_DIALOG_FILE;
             break;

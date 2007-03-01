@@ -24,6 +24,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#if 0
 #include "dialogs/vlm/vlm_slider_manager.hpp"
 #include "dialogs/vlm/vlm_stream.hpp"
 #include "dialogs/vlm/vlm_streampanel.hpp"
@@ -216,3 +217,4 @@ void VLMSliderManager::ProcessUpdate( wxScrollEvent &event )
 
 #undef WIN32
 }
+#endif

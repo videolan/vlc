@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#if 0
 #include "dialogs/vlm/vlm_stream.hpp"
 #include "dialogs/vlm/vlm_wrapper.hpp"
 
@@ -108,3 +109,4 @@ VLMVODStream::VLMVODStream( intf_thread_t *_p_intf, vlm_media_t *_p_media,
 VLMVODStream::~VLMVODStream()
 {
 }
+#endif

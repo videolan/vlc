@@ -35,7 +35,7 @@
 
 #include "vlc_charset.h"
 
-#include "dialogs/vlm/vlm_panel.hpp"
+//#include "dialogs/vlm/vlm_panel.hpp"
 #include "dialogs/bookmarks.hpp"
 #include "dialogs/wizard.hpp"
 #include "dialogs/playlist.hpp"
@@ -67,7 +67,7 @@ private:
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnUpdateVLC( wxCommandEvent& event );
-    void OnVLM( wxCommandEvent& event );
+    //void OnVLM( wxCommandEvent& event );
     void OnInteraction( wxCommandEvent& event );
     void OnExit( wxCommandEvent& event );
     void OnPlaylist( wxCommandEvent& event );
@@ -112,7 +112,7 @@ public:
     wxFrame             *p_bookmarks_dialog;
     wxFileDialog        *p_file_generic_dialog;
     UpdateVLC           *p_updatevlc_dialog;
-    VLMFrame            *p_vlm_dialog;
+    //VLMFrame            *p_vlm_dialog;
 };
 }
 
@@ -161,8 +161,10 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnExitThread)
     EVT_COMMAND(INTF_DIALOG_UPDATEVLC, wxEVT_DIALOG,
                 DialogsProvider::OnUpdateVLC)
+#if 0
     EVT_COMMAND(INTF_DIALOG_VLM, wxEVT_DIALOG,
                 DialogsProvider::OnVLM)
+#endif
     EVT_COMMAND( INTF_DIALOG_INTERACTION, wxEVT_DIALOG,
                 DialogsProvider::OnInteraction )
 END_EVENT_TABLE()
@@ -191,7 +193,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
     p_bookmarks_dialog = NULL;
     p_dir_dialog = NULL;
     p_updatevlc_dialog = NULL;
-    p_vlm_dialog = NULL;
+    //p_vlm_dialog = NULL;
 
     /* Give our interface a nice little icon */
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
@@ -263,7 +265,7 @@ DialogsProvider::~DialogsProvider()
     if( p_wizard_dialog ) delete p_wizard_dialog;
     if( p_bookmarks_dialog ) delete p_bookmarks_dialog;
     if( p_updatevlc_dialog ) delete p_updatevlc_dialog;
-    if( p_vlm_dialog ) delete p_vlm_dialog;
+    //if( p_vlm_dialog ) delete p_vlm_dialog;
 
 
     if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
@@ -562,6 +564,7 @@ void DialogsProvider::OnUpdateVLC( wxCommandEvent& WXUNUSED(event) )
     }
 }
 
+#if 0
 void DialogsProvider::OnVLM( wxCommandEvent& WXUNUSED(event) )
 {
     /* Show/hide the file info window */
@@ -573,6 +576,7 @@ void DialogsProvider::OnVLM( wxCommandEvent& WXUNUSED(event) )
         p_vlm_dialog->Show( !p_vlm_dialog->IsShown() );
     }
 }
+#endif
 
 void DialogsProvider::OnInteraction( wxCommandEvent& event )
 {

@@ -23,6 +23,7 @@
 
 /* FIXME: This is not wx-specific */
 
+#if 0
 #include "dialogs/vlm/vlm_wrapper.hpp"
 
 VLMWrapper::VLMWrapper( intf_thread_t *_p_intf )
@@ -131,3 +132,5 @@ void VLMWrapper::EditVod( const char* name, const char* input,
         vlm_MessageDelete( message );
     }
 }
+#endif
+
