@@ -805,7 +805,6 @@ void filename_sanitize( char *str )
             case '/':
 #ifdef WIN32
             case '*':
-            case '.':
             case '"':
             case '\\':
             case '[':
@@ -832,7 +831,6 @@ void path_sanitize( char *str )
         {
 #ifdef WIN32
             case '*':
-            case '.':
             case '"':
             case '[':
             case ']':
