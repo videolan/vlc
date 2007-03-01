@@ -177,6 +177,12 @@ int main( int i_argc, char *ppsz_argv[] )
 
 #if !defined(WIN32) && !defined(UNDER_CE)
     pthread_cancel (sigth);
+# ifdef __APPLE__
+    /* In Mac OS X up to 10.4.8 sigwait (among others) is not a pthread
+     * cancellation point, so we throw a dummy quit signal to end
+     * sigwait() in the sigth thread */
+    pthread_kill (sigth, SIGQUIT);
+# endif
     pthread_join (sigth, NULL);
 #endif
 
@@ -200,6 +206,12 @@ static void *SigHandler (void *data)
     {
         int i_signal, state;
         (void)sigwait (set, &i_signal);
+
+#ifdef __APPLE__
+        /* In Mac OS X up to 10.4.8 sigwait (among others) is not a pthread
+         * cancellation point */
+        pthread_testcancel();
+#endif
 
         /* Once a signal has been trapped, the termination sequence will be
          * armed and subsequent signals will be ignored to avoid sending
