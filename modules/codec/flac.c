@@ -279,9 +279,10 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
+    es_format_t es_save = p_dec->fmt_out;
     int i_ret;
 
-    /* Hmmm, mem leak ?*/
+    /* */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
     i_ret = OpenDecoder( p_this );
@@ -289,8 +290,11 @@ static int OpenPacketizer( vlc_object_t *p_this )
     /* Set output properties */
     p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','a','c');
 
-    if( i_ret != VLC_SUCCESS ) return i_ret;
-
+    if( i_ret != VLC_SUCCESS )
+    {
+        es_format_Clean( &p_dec->fmt_out );
+        p_dec->fmt_out = es_save;
+    }
     return i_ret;
 }
 
