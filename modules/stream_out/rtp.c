@@ -643,53 +643,37 @@ static void Close( vlc_object_t * p_this )
     }
 
     while( p_sys->i_rtsp > 0 )
-    {
         RtspClientDel( p_stream, p_sys->rtsp[0] );
-    }
 
     vlc_mutex_destroy( &p_sys->lock_sdp );
 
     if( p_sys->p_httpd_file )
-    {
         httpd_FileDelete( p_sys->p_httpd_file );
-    }
+
     if( p_sys->p_httpd_host )
-    {
         httpd_HostDelete( p_sys->p_httpd_host );
-    }
+
     if( p_sys->p_rtsp_url )
-    {
         httpd_UrlDelete( p_sys->p_rtsp_url );
-    }
+
     if( p_sys->p_rtsp_host )
-    {
         httpd_HostDelete( p_sys->p_rtsp_host );
-    }
+
     if( p_sys->psz_session_name )
-    {
         free( p_sys->psz_session_name );
-        p_sys->psz_session_name = NULL;
-    }
+
     if( p_sys->psz_session_description )
-    {
         free( p_sys->psz_session_description );
-        p_sys->psz_session_description = NULL;
-    }
+
     if( p_sys->psz_session_url )
-    {
         free( p_sys->psz_session_url );
-        p_sys->psz_session_url = NULL;
-    }
+
     if( p_sys->psz_session_email )
-    {
         free( p_sys->psz_session_email );
-        p_sys->psz_session_email = NULL;
-    }
+
     if( p_sys->psz_sdp )
-    {
         free( p_sys->psz_sdp );
-        p_sys->psz_sdp = NULL;
-    }
+
     if( p_sys->b_export_sdp_file )
     {
 #ifdef HAVE_UNISTD_H
@@ -697,6 +681,8 @@ static void Close( vlc_object_t * p_this )
 #endif
         free( p_sys->psz_sdp_file );
     }
+    if( p_sys->psz_destination )
+        free( p_sys->psz_destination );
     free( p_sys );
 }
 
