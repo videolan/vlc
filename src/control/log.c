@@ -92,7 +92,10 @@ unsigned libvlc_log_count( const libvlc_log_t *p_log, libvlc_exception_t *p_e )
         int i_start = p_log->p_messages->i_start;
         int i_stop  = *(p_log->p_messages->pi_stop);
 
-        return (i_stop - i_start) % VLC_MSG_QSIZE;
+        if( i_stop >= i_start )
+            return i_stop-i_start;
+        else
+            return VLC_MSG_QSIZE-(i_start-i_stop);
     }
     RAISEZERO("Invalid log object!");
 }
