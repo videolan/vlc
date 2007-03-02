@@ -163,50 +163,27 @@ __getnameinfo( const struct sockaddr *sa, socklen_t salen,
 
         if (host != NULL)
         {
-            int solved = 0;
-
             /* host name resolution */
             if (!(flags & NI_NUMERICHOST))
             {
-                struct hostent *hent;
-
-                hent = gethostbyaddr ((const void*)&addr->sin_addr,
-                                      4, AF_INET);
-
-                if (hent != NULL)
-                {
-                    strlcpy (host, hent->h_name, hostlen);
-
-                    /*
-                     * only keep first part of hostname
-                     * if user don't want fully qualified
-                     * domain name
-                     */
-                    if (flags & NI_NOFQDN)
-                    {
-                        char *ptr;
-
-                        ptr = strchr (host, '.');
-                        if (ptr != NULL)
-                            *ptr = 0;
-                    }
-
-                    solved = 1;
-                }
-                else if (flags & NI_NAMEREQD)
-                    return gai_error_from_herrno ();
+                if (flags & NI_NAMEREQD)
+                    return EAI_NONAME;
             }
 
-            if (!solved)
-                /* inet_ntoa() can't fail */
-                strlcpy (host, inet_ntoa (addr->sin_addr), hostlen);
+            /* inet_ntoa() is not thread-safe, do not use it */
+            uint32_t ipv4 = ntohl (addr->sin_addr);
+
+            if (snprintf (host, hostlen, "%u.%u.%u.%u", ipv4 >> 24,
+                          (ipv4 >> 16) & 0xff, (ipv4 >> 8) & 0xff,
+                          ipv4 & 0xff) >= hostlen)
+                return EAI_OVERFLOW;
         }
 
         if (serv != NULL)
         {
-            snprintf (serv, servlen, "%u",
-                      (unsigned int)ntohs (addr->sin_port));
-            serv[servlen - 1] = '\0';
+            if (snprintf (serv, servlen, "%u",
+                          (unsigned int)ntohs (addr->sin_port)) >= servlen)
+                return EAI_OVERFLOW;
         }
     }
     return 0;
