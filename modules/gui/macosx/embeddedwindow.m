@@ -138,10 +138,12 @@
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     BOOL blackout_other_displays = var_GetBool( p_vout, "macosx-black" );
 
-    /* We should get the screen pointed by var_GetInteger( p_vout, "video-device" ) */
-    screen = [self screen];
+    screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_GetInteger( p_vout, "video-device" )];
 
     vlc_object_release( p_vout );
+
+    if (!screen)
+        screen = [self screen];
 
     screen_rect = [screen frame];
 
@@ -150,7 +152,7 @@
     [NSCursor setHiddenUntilMouseMoves: YES];
     
     if (blackout_other_displays)
-        ; /* We should do something like [screen blackoutOtherScreens]; */
+        [screen blackoutOtherScreens]; /* We should do something like [screen blackoutOtherScreens]; */
 
     /* Only create the o_fullscreen_window if we are not in the middle of the zooming animation */
     if (!o_fullscreen_window)
@@ -262,7 +264,7 @@
     [o_fullscreen_window setAcceptsMouseMovedEvents: TRUE];
 
     /* tell the fspanel to move itself to front next time it's triggered */
-    [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: 0 /* Get this right */];
+    [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
     
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
 }
@@ -273,6 +275,9 @@
     NSRect frame;
     
     [o_btn_fullscreen setState: NO];
+
+    /* We always try to do so */
+    [NSScreen unblackoutScreens];
 
     /* Don't do anything if o_fullscreen_window is already closed */
     if (!o_fullscreen_window)

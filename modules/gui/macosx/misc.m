@@ -29,6 +29,116 @@
 #include "controls.h"
 
 /*****************************************************************************
+ * NSAnimation (VLCAdditions)
+ *
+ *  Missing extension to NSAnimation
+ *****************************************************************************/
+
+@implementation NSAnimation (VLCAdditions)
+/* fake class attributes  */
+static NSMapTable *VLCAdditions_userInfo = NULL;
+
++ (void)load
+{
+    /* init our fake object attribute */
+    VLCAdditions_userInfo = NSCreateMapTable(NSNonRetainedObjectMapKeyCallBacks, NSObjectMapValueCallBacks, 16);
+}
+
+- (void)dealloc
+{
+    NSMapRemove(VLCAdditions_userInfo, self);
+    [super dealloc];
+}
+
+- (void)setUserInfo: (void *)userInfo
+{
+    NSMapInsert(VLCAdditions_userInfo, self, (void*)userInfo);
+}
+
+- (void *)userInfo
+{
+    return NSMapGet(VLCAdditions_userInfo, self);
+}
+@end
+
+/*****************************************************************************
+ * NSScreen (VLCAdditions)
+ *
+ *  Missing extension to NSScreen
+ *****************************************************************************/
+
+@implementation NSScreen (VLCAdditions)
+
+static NSMutableArray *blackoutWindows = NULL;
+
++ (void)load
+{
+    /* init our fake object attribute */
+    blackoutWindows = [[NSMutableArray alloc] initWithCapacity:1];
+}
+
++ (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID
+{
+    int i;
+    
+    for( i = 0; i < [[NSScreen screens] count]; i++ )
+    {
+        NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
+        if([screen displayID] == displayID)
+            return screen;
+    }
+    return nil;
+}
+
+- (CGDirectDisplayID)displayID
+{
+    return (CGDirectDisplayID)_screenNumber;
+}
+
+- (void)blackoutOtherScreens
+{
+    unsigned int i;
+
+    /* Free our previous blackout window (follow blackoutWindow alloc strategy) */
+    [blackoutWindows makeObjectsPerformSelector:@selector(close)];
+    [blackoutWindows removeAllObjects];
+
+    
+    for(i = 0; i < [[NSScreen screens] count]; i++)
+    {
+        VLCWindow *blackoutWindow;
+        NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
+        if(self == screen)
+            continue;
+        /* blackoutWindow alloc strategy
+            - The NSMutableArray blackoutWindows has the blackoutWindow references
+            - blackoutOtherDisplays is responsible for alloc/releasing its Windows
+        */
+        blackoutWindow = [[VLCWindow alloc] initWithContentRect: [screen frame] styleMask: NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
+        [blackoutWindow setBackgroundColor:[NSColor blackColor]];
+        [blackoutWindow setLevel: NSFloatingWindowLevel]; /* Disappear when Expose is triggered */
+        
+        [blackoutWindow orderFront: self animate: YES];
+
+        [blackoutWindows addObject: blackoutWindow];
+        [blackoutWindow release];
+    }
+}
+
++ (void)unblackoutScreens
+{
+    unsigned int i;
+
+    for(i = 0; i < [blackoutWindows count]; i++)
+    {
+        VLCWindow *blackoutWindow = [blackoutWindows objectAtIndex: i];
+        [blackoutWindow closeAndAnimate: YES];
+    }
+}
+
+@end
+
+/*****************************************************************************
  * VLCWindow
  *
  *  Missing extension to NSWindow
@@ -55,6 +165,158 @@
         return b_canBecomeKeyWindow;
 
     return [super canBecomeKeyWindow];
+}
+
+- (void)closeAndAnimate: (BOOL)animate
+{
+    NSInvocation *invoc;
+    
+    if (!animate || MACOS_VERSION < 10.4f)
+    {
+        [super close];
+        return;
+    }
+
+    invoc = [NSInvocation invocationWithMethodSignature:[super methodSignatureForSelector:@selector(close)]];
+    [invoc setTarget: (id)super];
+
+    if (![self isVisible] || [self alphaValue] == 0.0)
+    {
+        [super close];
+        return;
+    }
+
+    [self orderOut: self animate: YES callback: invoc];
+}
+
+- (void)orderOut: (id)sender animate: (BOOL)animate
+{
+    NSInvocation *invoc = [NSInvocation invocationWithMethodSignature:[super methodSignatureForSelector:@selector(orderOut:)]];
+    [invoc setTarget: (id)super];
+    [invoc setArgument: sender atIndex: 0];
+    [self orderOut: sender animate: animate callback: invoc];
+}
+
+- (void)orderOut: (id)sender animate: (BOOL)animate callback:(NSInvocation *)callback
+{
+    NSViewAnimation *anim;
+    NSViewAnimation *current_anim;
+    NSMutableDictionary *dict;
+
+    if (!animate || MACOS_VERSION < 10.4f)
+    {
+        [self orderOut: sender];
+        return;
+    }
+
+    dict = [[NSMutableDictionary alloc] initWithCapacity:2];
+
+    [dict setObject:self forKey:NSViewAnimationTargetKey];
+
+    [dict setObject:NSViewAnimationFadeOutEffect forKey:NSViewAnimationEffectKey];
+    anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict, nil]];
+    [dict release];
+
+    [anim setAnimationBlockingMode:NSAnimationNonblocking];
+    [anim setDuration:0.9];
+    [anim setFrameRate:30];
+    [anim setUserInfo: callback];
+
+    @synchronized(self) {
+        current_anim = self->animation;
+
+        if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeOutEffect && [current_anim isAnimating])
+        {
+            [anim release];
+        }
+        else
+        {
+            if (current_anim)
+            {
+                [current_anim stopAnimation];
+                [anim setCurrentProgress:1.0-[current_anim currentProgress]];
+                [current_anim release];
+            }
+            else
+                [anim setCurrentProgress:1.0 - [self alphaValue]];
+            self->animation = anim;
+            [self setDelegate: self];
+            [anim startAnimation];
+        }
+    }
+}
+
+- (void)orderFront: (id)sender animate: (BOOL)animate
+{
+    NSViewAnimation *anim;
+    NSViewAnimation *current_anim;
+    NSMutableDictionary *dict;
+    
+    if (!animate || MACOS_VERSION < 10.4f)
+    {
+        [super orderFront: sender];
+        [self setAlphaValue: 1.0];
+        return;
+    }
+
+    if (![self isVisible])
+    {
+        [self setAlphaValue: 0.0];
+        [super orderFront: sender];
+    }
+    else if ([self alphaValue] == 1.0)
+    {
+        [super orderFront: self];
+        return;
+    }
+
+    dict = [[NSMutableDictionary alloc] initWithCapacity:2];
+
+    [dict setObject:self forKey:NSViewAnimationTargetKey];
+    
+    [dict setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
+    anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict, nil]];
+    [dict release];
+    
+    [anim setAnimationBlockingMode:NSAnimationNonblocking];
+    [anim setDuration:0.5];
+    [anim setFrameRate:30];
+
+    @synchronized(self) {
+        current_anim = self->animation;
+
+        if ([[[current_anim viewAnimations] objectAtIndex:0] objectForKey: NSViewAnimationEffectKey] == NSViewAnimationFadeInEffect && [current_anim isAnimating])
+        {
+            [anim release];
+        }
+        else
+        {
+            if (current_anim)
+            {
+                [current_anim stopAnimation];
+                [anim setCurrentProgress:1.0 - [current_anim currentProgress]];
+                [current_anim release];
+            }
+            else
+                [anim setCurrentProgress:[self alphaValue]];
+            self->animation = anim;
+            [self setDelegate: self];
+            [self orderFront: sender];
+            [anim startAnimation];
+        }
+    }
+}
+
+- (void)animationDidEnd:(NSAnimation*)anim
+{
+    if ([self alphaValue] <= 0.0)
+    {
+        NSInvocation * invoc;
+        [super orderOut: nil];
+        [self setAlphaValue: 1.0];
+        if ((invoc = [anim userInfo]))
+            [invoc invoke];
+    }
 }
 @end
 

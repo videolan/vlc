@@ -21,6 +21,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import <ApplicationServices/ApplicationServices.h>
+
+/*****************************************************************************
+ * NSAnimation (VLCAddition)
+ *****************************************************************************/
+
+@interface NSAnimation (VLCAdditions)
+- (void)setUserInfo: (void *)userInfo;
+- (void *)userInfo;
+@end
+
+/*****************************************************************************
+ * NSScreen (VLCAdditions)
+ *
+ *  Missing extension to NSScreen
+ *****************************************************************************/
+
+@interface NSScreen (VLCAdditions)
+
++ (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID;
+- (CGDirectDisplayID)displayID;
+- (void)blackoutOtherScreens;
++ (void)unblackoutScreens;
+@end
+
 /*****************************************************************************
  * VLCWindow
  *
@@ -31,9 +56,22 @@
 {
     BOOL b_canBecomeKeyWindow;
     BOOL b_isset_canBecomeKeyWindow;
+    NSViewAnimation *animation;
 }
 
 - (void)setCanBecomeKeyWindow: (BOOL)canBecomeKey;
+
+/* animate mode is only supported in >=10.4 */
+- (void)orderFront: (id)sender animate: (BOOL)animate;
+
+/* animate mode is only supported in >=10.4 */
+- (void)orderOut: (id)sender animate: (BOOL)animate;
+
+/* animate mode is only supported in >=10.4 */
+- (void)orderOut: (id)sender animate: (BOOL)animate callback:(NSInvocation *)callback;
+
+/* animate mode is only supported in >=10.4 */
+- (void)closeAndAnimate: (BOOL)animate;
 @end
 
 
