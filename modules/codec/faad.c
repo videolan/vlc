@@ -320,8 +320,9 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_dec->p_parent->i_object_type == VLC_OBJECT_INPUT )
         {
           input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
-          char *psz_cat, *psz_ext = (frame.sbr && frame.ps) ? "SBR+PS" :
-            frame.sbr ? "SBR" : "PS";
+          char *psz_cat;
+          const char *psz_ext = (frame.sbr && frame.ps) ? "SBR+PS" :
+                                    frame.sbr ? "SBR" : "PS";
 
           msg_Dbg( p_dec, "AAC %s (channels: %u, samplerate: %lu)",
                    psz_ext, frame.channels, frame.samplerate );
