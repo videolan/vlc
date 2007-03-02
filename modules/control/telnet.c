@@ -403,7 +403,7 @@ static void Run( intf_thread_t *p_intf )
                      *cl->p_buffer_read == '\n' )
             {
                 *cl->p_buffer_read = '\0';
-                if( strcmp( psz_password, cl->buffer_read ) == 0 )
+                if( !psz_password || !strcmp( psz_password, cl->buffer_read ) )
                 {
                     Write_message( cl, NULL, "\xff\xfc\x01\r\nWelcome, "
                                    "Master\r\n> ", WRITE_MODE_CMD );
@@ -460,6 +460,8 @@ static void Run( intf_thread_t *p_intf )
             }
         }
     }
+    if( psz_password )
+        free( psz_password );
 }
 
 static void Write_message( telnet_client_t *client, vlm_message_t *message,
