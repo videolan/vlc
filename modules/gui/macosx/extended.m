@@ -381,7 +381,7 @@ static VLCExtended *_o_sharedInstance = nil;
 
         while ((o_window = [o_enumerator nextObject]))
         {
-            if( [[o_window className] isEqualToString: @"VLCWindow"] ||
+            if( [[o_window className] isEqualToString: @"VLCVoutWindow"] ||
                 [[[VLCMain sharedInstance] getEmbeddedList]
                                     windowContainsEmbedded: o_window])
             {

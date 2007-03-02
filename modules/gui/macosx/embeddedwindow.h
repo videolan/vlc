@@ -25,6 +25,7 @@
  * VLCEmbeddedWindow interface
  *****************************************************************************/
 
+#import "misc.h"
 
 @interface VLCEmbeddedWindow : NSWindow
 {
@@ -34,6 +35,7 @@
     IBOutlet id o_btn_play;
     IBOutlet id o_slider;
     IBOutlet id o_time;
+    IBOutlet id o_view;
 
     NSImage * o_img_play;
     NSImage * o_img_play_pressed;
@@ -41,12 +43,22 @@
     NSImage * o_img_pause_pressed;
     
     NSRect o_saved_frame;
+
+    VLCWindow       * o_fullscreen_window;
+    NSViewAnimation * o_fullscreen_anim1;
+    NSViewAnimation * o_fullscreen_anim2;
+    NSView          * o_temp_view;
 }
 
 - (void)setTime:(NSString *)o_arg_ime position:(float)f_position;
 - (void)playStatusUpdated:(int)i_status;
 - (void)setSeekable:(BOOL)b_seekable;
-- (void)setFullscreen:(BOOL)b_fullscreen;
 
+- (void)enterFullscreen;
+- (void)leaveFullscreen;
+
+/* private */
+- (void)hasEndedFullscreen;
+- (void)hasBecomeFullscreen;
 @end
 

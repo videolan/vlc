@@ -99,7 +99,7 @@
             o_vout_view = [o_embedded_vout_list getViewForWindow: o_window];
         }
         /* We have a detached vout */
-        else if( [[o_window className] isEqualToString: @"VLCWindow"] )
+        else if( [[o_window className] isEqualToString: @"VLCVoutWindow"] )
         {
             msg_Dbg( VLCIntf, "detached vout controls.m call getVoutView" );
             o_vout_view = [o_window getVoutView];
@@ -894,7 +894,7 @@
 
             while( (o_window = [o_enumerator nextObject]))
             {
-                if( [[o_window className] isEqualToString: @"VLCWindow"] ||
+                if( [[o_window className] isEqualToString: @"VLCVoutWindow"] ||
                             [[[VLCMain sharedInstance] getEmbeddedList]
                             windowContainsEmbedded: o_window])
                 {

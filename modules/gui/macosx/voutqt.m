@@ -46,13 +46,13 @@
 /*****************************************************************************
  * VLCView interface
  *****************************************************************************/
-@interface VLCQTView : NSQuickDrawView
+@interface VLCQTView : NSQuickDrawView <VLCVoutViewResetting>
 {
     vout_thread_t * p_vout;
 }
 
++ (void)resetVout: (vout_thread_t *)p_vout;
 - (id) initWithVout:(vout_thread_t *)p_vout;
-
 @end
 
 struct vout_sys_t
@@ -479,74 +479,12 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 {
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
-    QTDestroySequence( p_vout );
-
-    if( !p_vout->b_fullscreen )
-    {
-	if( !p_vout->p_sys->b_embedded )
-	{
-	    /* Save window size and position */
-	    p_vout->p_sys->s_frame.size =
-		[p_vout->p_sys->o_vout_view frame].size;
-	    p_vout->p_sys->s_frame.origin =
-		[[p_vout->p_sys->o_vout_view getWindow] frame].origin;
-	    p_vout->p_sys->b_saved_frame = VLC_TRUE;
-	}
-	else
-	{
-	    var_DelCallback(p_vout->p_libvlc, "drawableredraw", DrawableRedraw, p_vout);
-	    DisposeRgn(p_vout->p_sys->clip_mask);
-	}
-    }
-    [p_vout->p_sys->o_vout_view closeVout];
-
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
-    if( p_vout->b_fullscreen || !p_vout->p_sys->b_embedded )
-    {
-	Rect s_rect;
-        p_vout->p_sys->clip_mask = NULL;
-#define o_qtview p_vout->p_sys->o_qtview
-	o_qtview = [[VLCQTView alloc] initWithVout: p_vout];
-	[o_qtview autorelease];
-	
-	if( p_vout->p_sys->b_saved_frame )
-	{
-	    p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
-		subView: o_qtview
-		frame: &p_vout->p_sys->s_frame];
-	}
-	else
-	{
-	    p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
-		subView: o_qtview frame: nil];
-	}
-
-	/* Retrieve the QuickDraw port */
-	[o_qtview lockFocus];
-	p_vout->p_sys->p_qdport = [o_qtview qdPort];
-	[o_qtview unlockFocus];
-#undef o_qtview
-	GetPortBounds( p_vout->p_sys->p_qdport, &s_rect );
-	p_vout->p_sys->i_origx = s_rect.left;
-	p_vout->p_sys->i_origy = s_rect.top;
-	p_vout->p_sys->i_width = s_rect.right - s_rect.left;
-	p_vout->p_sys->i_height = s_rect.bottom - s_rect.top;
-    }
+    if( p_vout->b_fullscreen )
+        [p_vout->p_sys->o_vout_view enterFullscreen];
     else
-    {
-        /* Create the clipping mask */
-        p_vout->p_sys->clip_mask = NewRgn();
-	UpdateEmbeddedGeometry(p_vout);
-	var_AddCallback(p_vout->p_libvlc, "drawableredraw", DrawableRedraw, p_vout);
-    }
-    QTScaleMatrix( p_vout );
-
-    if( QTCreateSequence( p_vout ) )
-    {
-        msg_Err( p_vout, "unable to initialize QT: QTCreateSequence failed" );
-        return( 1 );
-    }
+        [p_vout->p_sys->o_vout_view leaveFullscreen];
 
     [o_pool release];
     return 0;
@@ -861,6 +799,76 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
  * VLCQTView implementation
  *****************************************************************************/
 @implementation VLCQTView
+
+/* This function will reset the o_vout_view. It's useful to go fullscreen. */
++ (void)resetVout: (vout_thread_t *)p_vout
+{
+    QTDestroySequence( p_vout );
+
+    if( p_vout->b_fullscreen )
+    {
+	if( !p_vout->p_sys->b_embedded )
+	{
+	    /* Save window size and position */
+	    p_vout->p_sys->s_frame.size =
+		[p_vout->p_sys->o_vout_view frame].size;
+	    p_vout->p_sys->s_frame.origin =
+		[[p_vout->p_sys->o_vout_view getWindow] frame].origin;
+	    p_vout->p_sys->b_saved_frame = VLC_TRUE;
+	}
+        else
+        {
+            var_DelCallback(p_vout->p_libvlc, "drawableredraw", DrawableRedraw, p_vout);
+            DisposeRgn(p_vout->p_sys->clip_mask);
+        }
+    }
+
+    if( p_vout->b_fullscreen || !p_vout->p_sys->b_embedded )
+    {
+	Rect s_rect;
+        p_vout->p_sys->clip_mask = NULL;
+#define o_qtview p_vout->p_sys->o_qtview
+	o_qtview = [[VLCQTView alloc] initWithVout: p_vout];
+	[o_qtview autorelease];
+	
+	if( p_vout->p_sys->b_saved_frame )
+	{
+	    p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+		subView: o_qtview
+		frame: &p_vout->p_sys->s_frame];
+	}
+	else
+	{
+	    p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+		subView: o_qtview frame: nil];
+	}
+
+	/* Retrieve the QuickDraw port */
+	[o_qtview lockFocus];
+	p_vout->p_sys->p_qdport = [o_qtview qdPort];
+	[o_qtview unlockFocus];
+#undef o_qtview
+	GetPortBounds( p_vout->p_sys->p_qdport, &s_rect );
+	p_vout->p_sys->i_origx = s_rect.left;
+	p_vout->p_sys->i_origy = s_rect.top;
+	p_vout->p_sys->i_width = s_rect.right - s_rect.left;
+	p_vout->p_sys->i_height = s_rect.bottom - s_rect.top;
+    }
+    else
+    {
+        /* Create the clipping mask */
+        p_vout->p_sys->clip_mask = NewRgn();
+	UpdateEmbeddedGeometry(p_vout);
+	var_AddCallback(p_vout->p_libvlc, "drawableredraw", DrawableRedraw, p_vout);
+    }
+    QTScaleMatrix( p_vout );
+
+    if( QTCreateSequence( p_vout ) )
+    {
+        msg_Err( p_vout, "unable to initialize QT: QTCreateSequence failed" );
+        return;
+    }
+}
 
 - (id) initWithVout:(vout_thread_t *)_p_vout
 {

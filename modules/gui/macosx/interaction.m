@@ -159,7 +159,7 @@
 
         while( ( o_window = [o_enum nextObject] ) )
         {
-            if( [[o_window className] isEqualToString: @"VLCWindow"] )
+            if( [[o_window className] isEqualToString: @"VLCVoutWindow"] )
             {
                 vlc_object_release( (vlc_object_t *)p_vout );
                 break;

@@ -44,11 +44,16 @@
 /*****************************************************************************
  * VLCVoutView interface
  *****************************************************************************/
+@protocol VLCVoutViewResetting
++ (void)resetVout: (vout_thread_t *)p_vout;
+@end
+
 @interface VLCVoutView : NSView
 {
     vout_thread_t * p_vout;
-    NSView        * o_view;
     NSRect        * s_frame;
+
+    NSView <VLCVoutViewResetting> * o_view;
 
     vout_thread_t * p_real_vout;
     id              o_window;
@@ -70,6 +75,8 @@
                             frame: (NSRect *) s_frame;
 + (vout_thread_t *)getRealVout: (vout_thread_t *)p_vout;
 
+- (void)enterFullscreen;
+- (void)leaveFullscreen;
 @end
 
 /*****************************************************************************
@@ -102,17 +109,19 @@
 /*****************************************************************************
  * VLCDetachedEmbeddedView interface
  *****************************************************************************/
+@class VLCEmbeddedWindow;
 
 @interface VLCDetachedEmbeddedVoutView : VLCEmbeddedVoutView
 {
+    id o_embeddedwindow;
 }
 
 @end
 
 /*****************************************************************************
- * VLCWindow interface
+ * VLCVoutWindow interface
  *****************************************************************************/
-@interface VLCWindow : NSWindow
+@interface VLCVoutWindow : NSWindow
 {
     vout_thread_t * p_vout;
     VLCVoutView   * o_view;

@@ -29,6 +29,36 @@
 #include "controls.h"
 
 /*****************************************************************************
+ * VLCWindow
+ *
+ *  Missing extension to NSWindow
+ *****************************************************************************/
+
+@implementation VLCWindow
+- (id)initWithContentRect:(NSRect)contentRect styleMask:(unsigned int)styleMask
+    backing:(NSBackingStoreType)backingType defer:(BOOL)flag
+{
+    self = [super initWithContentRect:contentRect styleMask:styleMask backing:backingType defer:flag];
+    if( self )
+        b_isset_canBecomeKeyWindow = NO;
+    return self;
+}
+- (void)setCanBecomeKeyWindow: (BOOL)canBecomeKey
+{
+    b_isset_canBecomeKeyWindow = YES;
+    b_canBecomeKeyWindow = canBecomeKey;
+}
+
+- (BOOL)canBecomeKeyWindow
+{
+    if(b_isset_canBecomeKeyWindow)
+        return b_canBecomeKeyWindow;
+
+    return [super canBecomeKeyWindow];
+}
+@end
+
+/*****************************************************************************
  * VLCControllerWindow
  *****************************************************************************/
 

@@ -44,13 +44,14 @@
 #include <AGL/agl.h>
 
 /*****************************************************************************
- * VLCView interface
+ * VLCGLView interface
  *****************************************************************************/
-@interface VLCGLView : NSOpenGLView
+@interface VLCGLView : NSOpenGLView <VLCVoutViewResetting>
 {
     vout_thread_t * p_vout;
 }
 
++ (void)resetVout: (vout_thread_t *)p_vout;
 - (id) initWithVout: (vout_thread_t *) p_vout;
 @end
 
@@ -241,38 +242,12 @@ static int Manage( vout_thread_t * p_vout )
     {
         NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
-        if( !p_vout->b_fullscreen )
-        {
-            /* Save window size and position */
-            p_vout->p_sys->s_frame.size =
-                [p_vout->p_sys->o_vout_view frame].size;
-            p_vout->p_sys->s_frame.origin =
-                [[p_vout->p_sys->o_vout_view getWindow ]frame].origin;
-            p_vout->p_sys->b_saved_frame = VLC_TRUE;
-        }
-        [p_vout->p_sys->o_vout_view closeVout];
-
         p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
-#define o_glview p_vout->p_sys->o_glview
-        o_glview = [[VLCGLView alloc] initWithVout: p_vout];
-        [o_glview autorelease];
-
-        if( p_vout->p_sys->b_saved_frame )
-        {
-            p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
-                        subView: o_glview
-                        frame: &p_vout->p_sys->s_frame];
-        }
+        if( p_vout->b_fullscreen )
+            [p_vout->p_sys->o_vout_view enterFullscreen];
         else
-        {
-            p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
-                        subView: o_glview frame: nil];
-
-        }
-
-        [[o_glview openGLContext] makeCurrentContext];
-#undef o_glview
+            [p_vout->p_sys->o_vout_view leaveFullscreen];
 
         [o_pool release];
 
@@ -326,6 +301,42 @@ static void Unlock( vout_thread_t * p_vout )
  * VLCGLView implementation
  *****************************************************************************/
 @implementation VLCGLView
+
+/* This function will reset the o_vout_view. It's useful to go fullscreen. */
++ (void)resetVout: (vout_thread_t *)p_vout
+{
+    if( p_vout->b_fullscreen )
+    {
+        /* Save window size and position */
+        p_vout->p_sys->s_frame.size =
+            [p_vout->p_sys->o_vout_view frame].size;
+        p_vout->p_sys->s_frame.origin =
+            [[p_vout->p_sys->o_vout_view getWindow ]frame].origin;
+        p_vout->p_sys->b_saved_frame = VLC_TRUE;
+    }
+
+    [p_vout->p_sys->o_vout_view closeVout];
+
+#define o_glview p_vout->p_sys->o_glview
+    o_glview = [[VLCGLView alloc] initWithVout: p_vout];
+    [o_glview autorelease];
+    
+    if( p_vout->p_sys->b_saved_frame )
+    {
+        p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+                                                      subView: o_glview
+                                                        frame: &p_vout->p_sys->s_frame];
+    }
+    else
+    {
+        p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+                                                      subView: o_glview frame: nil];
+        
+    }
+    
+    [[o_glview openGLContext] makeCurrentContext];
+#undef o_glview
+}
 
 - (id) initWithVout: (vout_thread_t *) vout
 {

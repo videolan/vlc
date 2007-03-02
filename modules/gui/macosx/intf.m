@@ -472,8 +472,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
     var_AddCallback( p_playlist, "intf-show", ShowController, self);
 
-    [o_embedded_window setFullscreen: var_GetBool( p_playlist,
-                                                        "fullscreen" )];
     vlc_object_release( p_playlist );
     
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
