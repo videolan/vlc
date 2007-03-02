@@ -37,6 +37,13 @@ static void InitVLM( libvlc_instance_t *p_instance )
 #endif
 }
 
+/* XXX this code has to be rewritten, disable it for now */
+#define vlm_MediaNew( a, b, c) (NULL)
+#define vlm_MediaDelete(a,b,c)
+#define vlm_MediaSetup(a,b,c,d) (-1)
+#define vlm_MediaControl(a,b,c,d,e) (-1)
+#define vlm_MediaSearch(a,b) (NULL)
+
 #define CHECK_VLM { if( !p_instance->p_vlm ) InitVLM( p_instance ); \
                     if( !p_instance->p_vlm ) {\
                   libvlc_exception_raise( p_exception, \
