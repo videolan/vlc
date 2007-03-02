@@ -256,9 +256,13 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
     block_t *p_ret = p_dec->p_sys->p_block;
 
     if( pp_block == NULL || *pp_block == NULL )
+        return NULL;
+    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
+        block_Release( *pp_block );
         return NULL;
     }
+
     p_block = *pp_block;
     *pp_block = NULL;
 
@@ -291,9 +295,13 @@ static block_t *PacketizeSub( decoder_t *p_dec, block_t **pp_block )
     block_t *p_block;
 
     if( pp_block == NULL || *pp_block == NULL )
+        return NULL;
+    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
+        block_Release( *pp_block );
         return NULL;
     }
+
     p_block = *pp_block;
     *pp_block = NULL;
 

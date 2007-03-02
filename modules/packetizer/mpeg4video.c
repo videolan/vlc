@@ -224,7 +224,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
     if( pp_block == NULL || *pp_block == NULL ) return NULL;
 
-    if( (*pp_block)->i_flags & BLOCK_FLAG_DISCONTINUITY )
+    if( (*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
         p_sys->i_state = STATE_NOSYNC;
         if( p_sys->p_frame ) block_ChainRelease( p_sys->p_frame );
