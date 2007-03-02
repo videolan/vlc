@@ -798,6 +798,16 @@ char *__str_format( vlc_object_t *p_this, const char *psz_src )
  */
 void filename_sanitize( char *str )
 {
+    if( *str == '.' && (str[1] == '\0' || (str[1] == '.' && str[2] == '\0' ) ) )
+    {
+        while( *str )
+        {
+            *str = '_';
+            str++;
+        }
+        return;
+    }
+
     while( *str )
     {
         switch( *str )
@@ -824,9 +834,14 @@ void filename_sanitize( char *str )
  */
 void path_sanitize( char *str )
 {
-#ifdef WIN32
+#if 0
+    Uncomment the two blocks to prevent /../ or /./, i'm not sure that we
+    want to.
+    char *prev = str - 1;
+#endif
     while( *str )
     {
+#ifdef WIN32
         switch( *str )
         {
             case '*':
@@ -838,7 +853,26 @@ void path_sanitize( char *str )
             case '>':
                 *str = '_';
         }
+#endif
+#if 0
+        if( *str == '/'
+#ifdef WIN32
+            || *str == '\\'
+#endif
+            )
+        {
+            if( str - prev == 2 && prev[1] == '.' )
+            {
+                prev[1] = '.';
+            }
+            else if( str - prev == 3 && prev[1] == '.' && prev[2] == '.' )
+            {
+                prev[1] = '_';
+                prev[2] = '_';
+            }
+            prev = str;
+        }
+#endif
         str++;
     }
-#endif
 }
