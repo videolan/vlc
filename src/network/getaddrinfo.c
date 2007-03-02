@@ -53,6 +53,9 @@
 #ifndef AF_UNSPEC
 #   define AF_UNSPEC   0
 #endif
+#ifndef EAI_OVERFLOW
+#   define EAI_OVERFLOW -12   /* Argument buffer overflow.  */
+#endif
 
 #define _NI_MASK (NI_NUMERICHOST|NI_NUMERICSERV|NI_NOFQDN|NI_NAMEREQD|\
                   NI_DGRAM)
@@ -171,7 +174,7 @@ __getnameinfo( const struct sockaddr *sa, socklen_t salen,
             }
 
             /* inet_ntoa() is not thread-safe, do not use it */
-            uint32_t ipv4 = ntohl (addr->sin_addr);
+            uint32_t ipv4 = ntohl (addr->sin_addr.s_addr);
 
             if (snprintf (host, hostlen, "%u.%u.%u.%u", ipv4 >> 24,
                           (ipv4 >> 16) & 0xff, (ipv4 >> 8) & 0xff,
