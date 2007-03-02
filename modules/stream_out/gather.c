@@ -81,12 +81,11 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    p_sys->i_id         = 0;
-    p_sys->id           = NULL;
-
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
+
+    TAB_INIT( p_sys->i_id, p_sys->id );
 
     return VLC_SUCCESS;
 }
@@ -104,12 +103,11 @@ static void Close( vlc_object_t * p_this )
     {
         sout_stream_id_t *id = p_sys->id[i];
 
-        sout_StreamIdDel( p_sys->p_out, id );
+        sout_StreamIdDel( p_sys->p_out, id->id );
         es_format_Clean( &id->fmt );
         free( id );
     }
-    if( p_sys->id )
-        free( p_sys->id );
+    TAB_CLEAN( p_sys->i_id, p_sys->id );
 
     sout_StreamDelete( p_sys->p_out );
     free( p_sys );
@@ -163,7 +161,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         if( !id->b_used && id->fmt.i_cat == p_fmt->i_cat )
         {
             TAB_REMOVE( p_sys->i_id, p_sys->id, id );
-            sout_StreamIdDel( p_sys->p_out, id );
+            sout_StreamIdDel( p_sys->p_out, id->id );
             es_format_Clean( &id->fmt );
             free( id );
 
