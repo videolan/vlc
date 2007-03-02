@@ -85,7 +85,31 @@ case $HOST in
 	    echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak
         ;;
+    powerpc-apple-darwin9)
+	    SDK_TARGET=10.3
+	    echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
+	    echo "HAVE_DARWIN_OS = 1" >> config.mak
+	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
+	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.9.sdk" >> config.mak
+	    CFLAGS_TUNING=" -arch ppc -mtune=G4"
+	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK}"
+	    EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
+	    echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
+        cat src/Distributions/darwin.mak >> distro.mak
+        ;;
     i686-apple-darwin8)
+	    SDK_TARGET=10.4
+	    echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
+	    echo "HAVE_DARWIN_OS = 1" >> config.mak
+	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
+	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
+	    CFLAGS_TUNING=" -march=pentium-m -mtune=prescott"
+	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK}"
+	    EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
+	    echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
+        cat src/Distributions/darwin.mak >> distro.mak
+        ;;
+    i686-apple-darwin9)
 	    SDK_TARGET=10.4
 	    echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
 	    echo "HAVE_DARWIN_OS = 1" >> config.mak
