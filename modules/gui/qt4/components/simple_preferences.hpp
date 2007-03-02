@@ -32,7 +32,6 @@ enum {
     SPrefsVideo = 0,
     SPrefsAudio,
     SPrefsInputAndCodecs,
-//    SPrefsPlaylist,
     SPrefsInterface,
     SPrefsSubtitles,
     SPrefsHotkeys,

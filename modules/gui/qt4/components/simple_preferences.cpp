@@ -58,11 +58,15 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
 {
     setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
     setAlternatingRowColors( true );
+    setViewMode(QListView::IconMode);
+    setMaximumWidth(200);
 
-#define ADD_CATEGORY( id, label, icon )                             \
-    addItem( label );                                               \
-    item( id )->setIcon( QIcon( QPixmap( icon ) ) );                \
-    item( id )->setData( Qt::UserRole, qVariantFromValue( (int)id ) );
+#define ADD_CATEGORY( id, label, icon )                                 \
+    addItem( label );                                                   \
+    item( id )->setIcon( QIcon( QPixmap( icon ) ) );                    \
+    item( id )->setData( Qt::UserRole, qVariantFromValue( (int)id ) );  \
+    item( id )->setTextAlignment(Qt::AlignHCenter);                     \
+    item( id )->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
     ADD_CATEGORY( SPrefsVideo, qtr("Video"), video_50x50_xpm );
     ADD_CATEGORY( SPrefsAudio, qtr("Audio"), audio_50x50_xpm );
