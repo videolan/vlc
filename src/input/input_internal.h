@@ -245,7 +245,7 @@ void stream_AccessDelete( stream_t *s );
 void stream_AccessReset( stream_t *s );
 void stream_AccessUpdate( stream_t *s );
 
-/* decoder.c FIXME make it public ?*/
+/* decoder.c */
 void       input_DecoderDiscontinuity( decoder_t * p_dec );
 vlc_bool_t input_DecoderEmpty( decoder_t * p_dec );
 void       input_DecoderPreroll( decoder_t *p_dec, int64_t i_preroll_end );

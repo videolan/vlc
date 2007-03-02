@@ -1549,7 +1549,6 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 /* Reset clock */
                 es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
-                input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE );
             }
             else if( val.i_int == PAUSE_S && p_input->i_state == PLAYING_S &&
                      p_input->p->b_can_pause )
@@ -1577,6 +1576,10 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 /* Switch to new state */
                 p_input->i_state = val.i_int;
                 var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
+
+                /* Send discontinuity to decoders (it will allow them to flush
+                 * if implemented */
+                input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE );
             }
             else if( val.i_int == PAUSE_S && !p_input->p->b_can_pause )
             {
@@ -1624,13 +1627,14 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             }
             if( i_rate != p_input->p->i_rate )
             {
-                p_input->p->i_rate  = i_rate;
                 val.i_int = i_rate;
                 var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
 
-                /* We haven't send data to decoder when rate != default */
-                if( i_rate == INPUT_RATE_DEFAULT )
+                /* We will not send audio data if new rate != default */
+                if( i_rate != INPUT_RATE_DEFAULT && p_input->p->i_rate == INPUT_RATE_DEFAULT )
                     input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE );
+
+                p_input->p->i_rate  = i_rate;
 
                 /* Reset clock */
                 es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
