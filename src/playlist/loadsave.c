@@ -134,8 +134,7 @@ int playlist_MLDump( playlist_t *p_playlist )
         return VLC_EGENERIC;
     }
 
-    asprintf( &psz_uri, "%s" DIR_SEP "%s", psz_dirname,
-                        "ml.xsp",  psz_homedir );
+    asprintf( &psz_uri, "%s" DIR_SEP "%s", psz_dirname, "ml.xsp" );
     stats_TimerStart( p_playlist, "ML Dump", STATS_TIMER_ML_DUMP );
     playlist_Export( p_playlist, psz_uri, p_playlist->p_ml_category,
                      "export-xspf" );
