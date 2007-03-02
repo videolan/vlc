@@ -204,31 +204,9 @@ __getnameinfo( const struct sockaddr *sa, socklen_t salen,
 
         if (serv != NULL)
         {
-            struct servent *sent = NULL;
-
-#ifndef SYS_BEOS /* No getservbyport() */
-            int solved = 0;
-
-            /* service name resolution */
-            if (!(flags & NI_NUMERICSERV))
-            {
-
-                sent = getservbyport(addr->sin_port,
-                                     (flags & NI_DGRAM)
-                                     ? "udp" : "tcp");
-                if (sent != NULL)
-                {
-                    strlcpy (serv, sent->s_name, servlen);
-                    solved = 1;
-                }
-            }
-            if (sent == NULL)
-#endif
-            {
-                snprintf (serv, servlen, "%u",
-                          (unsigned int)ntohs (addr->sin_port));
-                serv[servlen - 1] = '\0';
-            }
+            snprintf (serv, servlen, "%u",
+                      (unsigned int)ntohs (addr->sin_port));
+            serv[servlen - 1] = '\0';
         }
     }
     return 0;
@@ -476,7 +454,7 @@ __getaddrinfo (const char *node, const char *service,
                 protocol = IPPROTO_UDP;
                 break;
 
-#ifndef SYS_BEOS
+#ifndef SOCK_RAW
             case SOCK_RAW:
 #endif
             case 0:
