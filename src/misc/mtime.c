@@ -128,6 +128,9 @@ static inline unsigned mprec( void )
 
 static unsigned prec = 0;
 static volatile mtime_t cached_time = 0;
+#if (_POSIX_MONOTONIC_CLOCK - 0 < 0)
+# define CLOCK_MONOTONIC CLOCK_REALTIME
+#endif
 
 /**
  * Return high precision date
@@ -142,10 +145,8 @@ mtime_t mdate( void )
 #if defined (HAVE_CLOCK_NANOSLEEP)
     struct timespec ts;
 
-# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
     /* Try to use POSIX monotonic clock if available */
-    if( clock_gettime( CLOCK_MONOTONIC, &ts ) )
-# endif
+    if( clock_gettime( CLOCK_MONOTONIC, &ts ) == EINVAL )
         /* Run-time fallback to real-time clock (always available) */
         (void)clock_gettime( CLOCK_REALTIME, &ts );
 
@@ -262,10 +263,14 @@ void mwait( mtime_t date )
     lldiv_t d = lldiv( date, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
 
-# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
-    if( clock_nanosleep( CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL ) )
-# endif
-        clock_nanosleep( CLOCK_REALTIME, TIMER_ABSTIME, &ts, NULL );
+    int val;
+    while( ( val = clock_nanosleep( CLOCK_MONOTONIC, TIMER_ABSTIME, &ts,
+                                    NULL ) ) == EINTR );
+    if( val == EINVAL )
+    {
+        ts.tv_sec = d.quot; ts.tv_nsec = d.rem * 1000;
+        while( clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL ) == EINTR );
+    }
 #else
 
     mtime_t delay = date - mdate();
@@ -289,10 +294,13 @@ void msleep( mtime_t delay )
     lldiv_t d = lldiv( delay, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
 
-# if (_POSIX_MONOTONIC_CLOCK - 0 >= 0)
-    if( clock_nanosleep( CLOCK_MONOTONIC, 0, &ts, NULL ) )
-# endif
-        clock_nanosleep( CLOCK_REALTIME, 0, &ts, NULL );
+    int val;
+    while( ( val = clock_nanosleep( CLOCK_MONOTONIC, 0, &ts, &ts ) ) == EINTR );
+    if( val == EINVAL )
+    {
+        ts.tv_sec = d.quot; ts.tv_nsec = d.rem * 1000;
+        while( clock_nanosleep( CLOCK_REALTIME, 0, &ts, &ts ) == EINTR );
+    }
 
 #elif defined( HAVE_KERNEL_OS_H )
     snooze( delay );
@@ -312,7 +320,7 @@ void msleep( mtime_t delay )
     ts_delay.tv_sec = delay / 1000000;
     ts_delay.tv_nsec = (delay % 1000000) * 1000;
 
-    nanosleep( &ts_delay, NULL );
+    while( nanosleep( &ts_delay, &ts_delay ) && ( errno == EINTR ) );
 
 #else
     struct timeval tv_delay;
@@ -320,10 +328,8 @@ void msleep( mtime_t delay )
     tv_delay.tv_sec = delay / 1000000;
     tv_delay.tv_usec = delay % 1000000;
 
-    /* select() return value should be tested, since several possible errors
-     * can occur. However, they should only happen in very particular occasions
-     * (i.e. when a signal is sent to the thread, or when memory is full), and
-     * can be ignored. */
+    /* If a signal is caught, you are screwed. Update your OS to nanosleep()
+     * or clock_nanosleep() if this is an issue. */
     select( 0, NULL, NULL, NULL, &tv_delay );
 #endif
 
