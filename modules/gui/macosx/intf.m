@@ -1131,11 +1131,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if( p_intf->p_sys->b_fullscreen_update )
     {
-        playlist_t * p_playlist = pl_Yield( p_intf );
-        var_Get( p_playlist, "fullscreen", &val );
-        [o_embedded_window setFullscreen: val.b_bool];
-        vlc_object_release( p_playlist );
-
         p_intf->p_sys->b_fullscreen_update = VLC_FALSE;
     }
 
