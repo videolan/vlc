@@ -42,8 +42,11 @@ typedef struct
     /* "playlist" index */
     int i_index;
 
-    input_item_t   item;
-    input_thread_t *p_input;
+    vlc_bool_t      b_sout_keep;
+
+    input_item_t    item;
+    input_thread_t  *p_input;
+    sout_instance_t *p_sout;
 
 } vlm_media_instance_t;
 
@@ -113,11 +116,5 @@ struct vlm_t
     int            i_schedule;
     vlm_schedule_t **schedule;
 };
-
-vlm_media_t *vlm_MediaNew( vlm_t *, const char *, int );
-void		 vlm_MediaDelete( vlm_t *, vlm_media_t *, const char * );
-int	 		 vlm_MediaSetup( vlm_t *, vlm_media_t *, const char *, const char * );
-int			 vlm_MediaControl( vlm_t *, vlm_media_t *, const char *, const char *, const char * );
-vlm_media_t *vlm_MediaSearch( vlm_t *, const char *);
 
 #endif

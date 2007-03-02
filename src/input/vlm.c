@@ -48,6 +48,8 @@
 #include "vlm_internal.h"
 #include <vlc_vod.h>
 #include <vlc_charset.h>
+#include <vlc_sout.h>
+#include "../stream_output/stream_output.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -75,6 +77,12 @@ static int vlm_ScheduleSetup( vlm_schedule_t *schedule, const char *psz_cmd,
 
 static int vlm_MediaVodControl( void *, vod_media_t *, const char *, int, va_list );
 
+
+static vlm_media_t *vlm_MediaNew( vlm_t *, const char *, int );
+static void         vlm_MediaDelete( vlm_t *, vlm_media_t *, const char * );
+static int          vlm_MediaSetup( vlm_t *, vlm_media_t *, const char *, const char * );
+static int          vlm_MediaControl( vlm_t *, vlm_media_t *, const char *, const char *, const char * );
+static vlm_media_t *vlm_MediaSearch( vlm_t *, const char *);
 
 /*****************************************************************************
  * vlm_New:
@@ -158,7 +166,6 @@ void vlm_Delete( vlm_t *p_vlm )
 {
     vlc_value_t lockval;
 
-    msg_Err( p_vlm, "vlm_Delete called" );
     var_Get( p_vlm->p_libvlc_global, "vlm_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
@@ -175,8 +182,6 @@ void vlm_Delete( vlm_t *p_vlm )
 
     vlc_object_detach( p_vlm );
 
-    vlc_mutex_destroy( &p_vlm->lock );
-
     while( p_vlm->i_media )
         vlm_MediaDelete( p_vlm, p_vlm->media[0], NULL );
     TAB_CLEAN( p_vlm->i_media, p_vlm->media );
@@ -184,6 +189,8 @@ void vlm_Delete( vlm_t *p_vlm )
     while( p_vlm->i_schedule )
         vlm_ScheduleDelete( p_vlm, p_vlm->schedule[0], NULL );
     TAB_CLEAN( p_vlm->schedule, p_vlm->schedule );
+
+    vlc_mutex_destroy( &p_vlm->lock );
 
     vlc_object_destroy( p_vlm );
     vlc_mutex_unlock( lockval.p_address );
@@ -211,40 +218,36 @@ static const char quotes[] = "\"'";
  * @return NULL on mal-formatted string,
  * pointer past the last character otherwise.
  */
-static const char *FindCommandEnd (const char *psz_sent)
+static const char *FindCommandEnd( const char *psz_sent )
 {
     char c, quote = 0;
 
-    while ((c = *psz_sent) != '\0')
+    while( (c = *psz_sent) != '\0' )
     {
-        if (!quote)
+        if( !quote )
         {
-            if (strchr(quotes,c))   // opening quote
+            if( strchr(quotes,c) )   // opening quote
                 quote = c;
-            else
-            if (isspace(c))         // non-escaped space
+            else if( isspace(c) )         // non-escaped space
                 return psz_sent;
-            else
-            if( c == '\\' )
+            else if( c == '\\' )
             {
                 psz_sent++;         // skip escaped character
-                if (*psz_sent == '\0')
+                if( *psz_sent == '\0' )
                     return psz_sent;
             }
         }
         else
         {
-            if (c == quote)         // non-escaped matching quote
+            if( c == quote )         // non-escaped matching quote
                 quote = 0;
-            else
-            if ((quote == '"') && (c == '\\'))
+            else if( (quote == '"') && (c == '\\') )
             {
                 psz_sent++;         // skip escaped character
                 if (*psz_sent == '\0')
                     return NULL;    // error, closing quote missing
             }
         }
-
         psz_sent++;
     }
 
@@ -262,21 +265,20 @@ static const char *FindCommandEnd (const char *psz_sent)
  *
  * @return 0 on success, -1 on error.
  */
-static int Unescape (char *out, const char *in)
+static int Unescape( char *out, const char *in )
 {
     char c, quote = 0;
 
-    while ((c = *in++) != '\0')
+    while( (c = *in++) != '\0' )
     {
-        if (!quote)
+        if( !quote )
         {
             if (strchr(quotes,c))   // opening quote
             {
                 quote = c;
                 continue;
             }
-            else
-            if( c == '\\' )
+            else if( c == '\\' )
             {
                 switch (c = *in++)
                 {
@@ -290,7 +292,7 @@ static int Unescape (char *out, const char *in)
                         *out = '\0';
                         return 0;
                 }
-                if (isspace(c))
+                if( isspace(c) )
                 {
                     *out++ = c;
                     continue;
@@ -301,14 +303,14 @@ static int Unescape (char *out, const char *in)
         }
         else
         {
-            if (c == quote)         // non-escaped matching quote
+            if( c == quote )         // non-escaped matching quote
             {
                 quote = 0;
                 continue;
             }
-            if ((quote == '"') && (c == '\\'))
+            if( (quote == '"') && (c == '\\') )
             {
-                switch (c = *in++)
+                switch( c = *in++ )
                 {
                     case '"':
                     case '\\':
@@ -836,9 +838,7 @@ vlm_media_t *vlm_MediaSearch( vlm_t *vlm, const char *psz_name )
     for( i = 0; i < vlm->i_media; i++ )
     {
         if( strcmp( psz_name, vlm->media[i]->psz_name ) == 0 )
-        {
             return vlm->media[i];
-        }
     }
 
     return NULL;
@@ -940,7 +940,7 @@ vlm_MediaInstanceSearch( vlm_t *vlm, vlm_media_t *media,
     return NULL;
 }
 
-vlm_media_t *vlm_MediaNew( vlm_t *vlm, const char *psz_name, int i_type )
+static vlm_media_t *vlm_MediaNew( vlm_t *vlm, const char *psz_name, int i_type )
 {
     vlm_media_t *media = malloc( sizeof( vlm_media_t ) );
 
@@ -995,7 +995,7 @@ vlm_media_t *vlm_MediaNew( vlm_t *vlm, const char *psz_name, int i_type )
 }
 
 /* for now, simple delete. After, del with options (last arg) */
-void vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, const char *psz_name )
+static void vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, const char *psz_name )
 {
     if( media == NULL ) return;
 
@@ -1040,7 +1040,7 @@ void vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, const char *psz_name )
     free( media );
 }
 
-int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
+static int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
                     const char *psz_value )
 {
     if( !psz_cmd) return VLC_EGENERIC;
@@ -1207,7 +1207,44 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, const char *psz_cmd,
     return VLC_SUCCESS;
 }
 
-int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
+static vlm_media_instance_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char *psz_name )
+{
+    vlm_media_instance_t *p_instance = malloc( sizeof(vlm_media_instance_t) );
+    if( !p_instance )
+        return NULL;
+
+    memset( p_instance, 0, sizeof(vlm_media_instance_t) );
+
+    p_instance->psz_name = NULL;
+    if( psz_name )
+        p_instance->psz_name = strdup( psz_name );
+
+    input_ItemInit( VLC_OBJECT(p_vlm), &p_instance->item );
+
+    p_instance->i_index = 0;
+    p_instance->b_sout_keep = VLC_FALSE;
+    p_instance->p_input = NULL;
+    p_instance->p_sout = NULL;
+
+    return p_instance;
+}
+static void vlm_MediaInstanceDelete( vlm_media_instance_t *p_instance )
+{
+    if( p_instance->p_input )
+    {
+        input_StopThread( p_instance->p_input );
+        input_DestroyThreadExtended( p_instance->p_input, &p_instance->p_sout );
+    }
+    if( p_instance->p_sout )
+        sout_DeleteInstance( p_instance->p_sout );
+
+    input_ItemClean( &p_instance->item );
+    if( p_instance->psz_name )
+        free( p_instance->psz_name );
+    free( p_instance );
+}
+
+static int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
                       const char *psz_command, const char *psz_args )
 {
     vlm_media_instance_t *p_instance;
@@ -1224,15 +1261,9 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
         {
             char *psz_dup;
 
-            p_instance = malloc( sizeof(vlm_media_instance_t) );
+            p_instance = vlm_MediaInstanceNew( vlm, psz_id );
             if( !p_instance )
                 return VLC_ENOMEM;
-
-            memset( p_instance, 0, sizeof(vlm_media_instance_t) );
-
-            p_instance->psz_name = psz_id ? strdup( psz_id ) : NULL;
-            input_ItemInit( VLC_OBJECT(vlm), &p_instance->item );
-            p_instance->p_input = NULL;
 
             TAB_INIT( p_instance->item.i_options, p_instance->item.ppsz_options );
 
@@ -1247,10 +1278,25 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
 
             for( i = 0; i < media->i_option; i++ )
             {
-                psz_dup = strdup( media->option[i] );
-                TAB_APPEND( p_instance->item.i_options, p_instance->item.ppsz_options, psz_dup );
+                if( !strcmp( media->option[i], "sout-keep" ) )
+                {
+                    p_instance->b_sout_keep = VLC_TRUE;
+                }
+                else if( !strcmp( media->option[i], "nosout-keep" ) || !strcmp( media->option[i], "no-sout-keep" ) )
+                {
+                    p_instance->b_sout_keep = VLC_FALSE;
+                }
+                else
+                {
+                    psz_dup = strdup( media->option[i] );
+                    TAB_APPEND( p_instance->item.i_options, p_instance->item.ppsz_options, psz_dup );
+                }
             }
-            psz_dup = strdup( "no-sout-keep" );
+            /* We force the right sout-keep value (avoid using the sout-keep from the global configuration) */
+            if( media->i_type != VOD_TYPE && p_instance->b_sout_keep )
+                psz_dup = strdup( "sout-keep" );
+            else
+                psz_dup = strdup( "no-sout-keep" );
             TAB_APPEND( p_instance->item.i_options, p_instance->item.ppsz_options, psz_dup );
 
             TAB_APPEND( media->i_instance, media->instance, p_instance );
@@ -1261,30 +1307,36 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
             p_instance->i_index = i-1;
         }
 
-        if( p_instance->item.psz_uri ) free( p_instance->item.psz_uri );
+        if( p_instance->item.psz_uri )
+            free( p_instance->item.psz_uri );
         p_instance->item.psz_uri =
             strdup( media->input[p_instance->i_index] );
 
         if( p_instance->p_input )
         {
             input_StopThread( p_instance->p_input );
-            input_DestroyThreadExtended( p_instance->p_input, NULL );
+            input_DestroyThreadExtended( p_instance->p_input, &p_instance->p_sout );
+            if( !p_instance->b_sout_keep && p_instance->p_sout )
+            {
+                sout_DeleteInstance( p_instance->p_sout );
+                p_instance->p_sout = NULL;
+            }
         }
 
         asprintf( &psz_header, _("Media: %s"), media->psz_name );
-        p_instance->p_input = input_CreateThreadExtended( vlm, &p_instance->item, psz_header, NULL );
+        p_instance->p_input = input_CreateThreadExtended( vlm, &p_instance->item, psz_header, p_instance->p_sout );
         if( !p_instance->p_input )
         {
             TAB_REMOVE( media->i_instance, media->instance, p_instance );
-            input_ItemClean( &p_instance->item );
-            if( p_instance->psz_name ) free( p_instance->psz_name );
+            vlm_MediaInstanceDelete( p_instance );
         }
         free( psz_header );
 
         return VLC_SUCCESS;
     }
 
-    if( !p_instance ) return VLC_EGENERIC;
+    if( !p_instance )
+        return VLC_EGENERIC;
 
     if( !strcmp( psz_command, "seek" ) )
     {
@@ -1383,16 +1435,7 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, const char *psz_id,
     {
         TAB_REMOVE( media->i_instance, media->instance, p_instance );
 
-        if( p_instance->p_input )
-        {
-            input_StopThread( p_instance->p_input );
-            input_DestroyThreadExtended( p_instance->p_input, NULL );
-        }
-
-        input_ItemClean( &p_instance->item );
-        if( p_instance->psz_name ) free( p_instance->psz_name );
-        free( p_instance );
-
+        vlm_MediaInstanceDelete( p_instance );
         return VLC_SUCCESS;
     }
     else if( !strcmp( psz_command, "pause" ) )
@@ -2497,8 +2540,6 @@ static int Manage( vlc_object_t* p_object )
 
     i_lastcheck = vlm_Date();
 
-    msleep( 100000 );
-
     while( !vlm->b_die )
     {
         char **ppsz_scheduled_commands = NULL;
@@ -2524,17 +2565,12 @@ static int Manage( vlc_object_t* p_object )
 
                 if( p_instance->i_index < p_media->i_input )
                 {
-                    char buffer[12];
-
-                    input_StopThread( p_instance->p_input );
-                    input_DestroyThreadExtended( p_instance->p_input, NULL );
-                    p_instance->p_input = NULL;
+                    char psz_index[32];
 
                     /* FIXME, find a way to select the right instance */
-                    sprintf( buffer, "%d", p_instance->i_index+1 );
-
+                    snprintf( psz_index, sizeof(psz_index), "%d", p_instance->i_index+1 );
                     vlm_MediaControl( vlm, p_media, p_instance->psz_name,
-                                      "play", buffer );
+                                      "play", psz_index );
                 }
                 else
                 {
