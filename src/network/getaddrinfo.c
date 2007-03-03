@@ -2,7 +2,7 @@
  * getaddrinfo.c: getaddrinfo/getnameinfo replacement functions
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
- * Copyright (C) 2002-2004 Rémi Denis-Courmont
+ * Copyright (C) 2002-2007 Rémi Denis-Courmont
  * $Id$
  *
  * Author: Rémi Denis-Courmont <rem # videolan.org>
@@ -573,22 +573,7 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
 #if defined( HAVE_GETNAMEINFO ) || defined( UNDER_CE )
     i_val = getnameinfo(sa, salen, host, hostlen, psz_serv, i_servlen, flags);
 #else
-    {
-# ifdef HAVE_USABLE_MUTEX_THAT_DONT_NEED_LIBVLC_POINTER
-        static vlc_value_t lock;
-
-        /* my getnameinfo implementation is not thread-safe as it uses
-         * gethostbyaddr and the likes */
-        vlc_mutex_lock( lock.p_address );
-#else
-# warning FIXME : This is not thread-safe!
-#endif
-        i_val = __getnameinfo( sa, salen, host, hostlen, psz_serv, i_servlen,
-                               flags );
-# ifdef HAVE_USABLE_MUTEX_THAT_DONT_NEED_LIBVLC_POINTER
-        vlc_mutex_unlock( lock.p_address );
-# endif
-    }
+    i_val = __getnameinfo (sa, salen, host, hostlen, psz_serv, i_servlen, flags);
 #endif
 
     if( portnum != NULL )
