@@ -2467,7 +2467,6 @@ static void httpd_HostThread( httpd_host_t *host )
         for( nfd = 0; nfd < host->nfd; nfd++ )
         {
             httpd_client_t *cl;
-            int fd;
             int i_state = -1;
 
             assert (ufd[nfd].fd == host->fds[nfd]);
@@ -2476,7 +2475,8 @@ static void httpd_HostThread( httpd_host_t *host )
                 continue;
 
             /* */
-            fd = net_Accept( host, host->fds, 0 );
+            int kludge[] = { ufd[nfd].fd, -1 };
+            int fd = net_Accept( host, kludge, 0 );
             if( fd < 0 )
                 continue;
 
