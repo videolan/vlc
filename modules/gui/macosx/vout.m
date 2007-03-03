@@ -1003,7 +1003,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     p_real_vout = [VLCVoutView getRealVout: p_vout];
     i_device = var_GetInteger( p_real_vout->p_libvlc, "video-device" );
-    b_black = var_GetBool( p_vout, "macosx-black" );
+    b_black = NO;
     b_embedded = var_GetBool( p_vout, "macosx-embedded" );
 
     /* Find out on which screen to open the window */
@@ -1021,6 +1021,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         NSRect screen_rect = [o_screen frame];
         screen_rect.origin.x = screen_rect.origin.y = 0;
 
+        b_black = var_GetBool( p_vout, "macosx-black" );
+
         /* move the FSPanel to front in case that it is currently shown
          * this won't and is not supposed to work when it's fading right now */
         if( [[[[VLCMain sharedInstance] getControls] getFSPanel] isDisplayed] )
@@ -1035,9 +1037,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
               backing: NSBackingStoreBuffered
               defer: YES screen: o_screen];
         
-        if( b_black == VLC_TRUE )
-            [o_screen blackoutOtherScreens];
-
         if( b_menubar_screen )
         {
             SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
@@ -1045,7 +1044,11 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         if( b_black == VLC_TRUE )
         {
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
-            CGDisplayFade( token, 2 , kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false );
+            CGDisplayFade( token, 0.6 , kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
+
+            [o_screen blackoutOtherScreens];
+
+            CGDisplayFade( token, 0.3 , kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
             CGReleaseDisplayFadeReservation( token);
         }
     }
@@ -1117,22 +1120,27 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 {
     /* XXX waitUntilDone = NO to avoid a possible deadlock when hitting
        Command-Q */
-    [self setContentView: NULL];
     [self performSelectorOnMainThread: @selector(closeReal:)
         withObject: NULL waitUntilDone: NO];
 }
 
 - (id)closeReal:(id)sender
 {
-    [NSScreen unblackoutScreens];
     if( b_black == VLC_TRUE )
     {
         CGDisplayFadeReservationToken token;
         CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
-        CGDisplayFade( token, 2, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, false );
+        CGDisplayFade( token, 0.3 , kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
+        
+        [self disableScreenUpdatesUntilFlush];
+        [self orderOut: self];
+
+        CGDisplayFade( token, 0.6 , kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, YES );
         CGReleaseDisplayFadeReservation( token);
         CGDisplayRestoreColorSyncSettings();
     }
+    [NSScreen unblackoutScreens];
+
     SetSystemUIMode( kUIModeNormal, 0);
     [super close];
     /* this does only work in embedded mode */

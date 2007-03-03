@@ -116,15 +116,22 @@ static NSMutableArray *blackoutWindows = NULL;
     
     for(i = 0; i < [[NSScreen screens] count]; i++)
     {
-        VLCWindow *blackoutWindow;
         NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
+        VLCWindow *blackoutWindow;
+        NSRect screen_rect;
+        
         if([self isScreen: screen])
             continue;
+
+        screen_rect = [screen frame];
+        screen_rect.origin.x = screen_rect.origin.y = 0.0f;
+
         /* blackoutWindow alloc strategy
             - The NSMutableArray blackoutWindows has the blackoutWindow references
             - blackoutOtherDisplays is responsible for alloc/releasing its Windows
         */
-        blackoutWindow = [[VLCWindow alloc] initWithContentRect: [screen frame] styleMask: NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
+        blackoutWindow = [[VLCWindow alloc] initWithContentRect: screen_rect styleMask: NSBorderlessWindowMask
+                backing: NSBackingStoreBuffered defer: NO screen: screen];
         [blackoutWindow setBackgroundColor:[NSColor blackColor]];
         [blackoutWindow setLevel: NSFloatingWindowLevel]; /* Disappear when Expose is triggered */
         
