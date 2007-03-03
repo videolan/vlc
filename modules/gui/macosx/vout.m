@@ -1124,6 +1124,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (id)closeReal:(id)sender
 {
+    [NSScreen unblackoutScreens];
     if( b_black == VLC_TRUE )
     {
         CGDisplayFadeReservationToken token;
