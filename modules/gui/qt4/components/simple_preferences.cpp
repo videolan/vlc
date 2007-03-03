@@ -7,6 +7,7 @@
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Antoine Cellerier <dionoea@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -190,12 +191,14 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
          CONFIG_GENERIC( "aout" , Module , NULL, outputModule );
 #ifndef WIN32
          CONFIG_GENERIC( "alsadev" , StringList , NULL, alsaDevice );
-         CONFIG_GENERIC( "dspdev" , String , NULL, OSSDevice );//FIXME File
+         CONFIG_GENERIC( "dspdev" , String , NULL, OSSDevice );
+                //FIXME File
 #else
          CONFIG_GENERIC( "directx-audio-device" , IntegerList, NULL, 
                  DirectXDevice );
 #endif
-         CONFIG_GENERIC( "audiofile-file" , String , NULL, FileName ); //Fixme File
+         CONFIG_GENERIC( "audiofile-file" , String , NULL, FileName ); 
+                //Fixme File
 
          CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
 //         CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer 
@@ -228,9 +231,18 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         START_SPREFS_CAT( Interface, "Interfaces settings" );
             CONFIG_GENERIC( "language", StringList, NULL, language );
 
+            /* interface */
+/*            p_config = config_FindConfig( VLC_OBJECT(p_intf), "intf" );
+            if( p_config->value.psz && strcmp( p_config->value.psz, "qt4" ))
+                    ui.qt4->setChecked( true );
+            if( p_config->value.psz && strcmp( p_config->value.psz, "skins2" ))
+                    ui.skins->setChecked( true );*/
 /*            CONFIG_GENERIC( "intf", Module, NULL, ??? ); */ //FIXME interface choice
-            CONFIG_GENERIC ("one-instance", Bool, NULL, OneInterfaceMode );
-            CONFIG_GENERIC ("playlist-enqueue", Bool, NULL, 
+            CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
+            CONFIG_GENERIC( "skins2-last", String, NULL, fileSkin); 
+                    //FIXME File
+            CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
+            CONFIG_GENERIC( "playlist-enqueue", Bool, NULL, 
                     EnqueueOneInterfaceMode );
         END_SPREFS_CAT;
 
@@ -240,7 +252,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
             CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );
 
-            CONFIG_GENERIC( "freetype-font", String, NULL, font ); /* FIXME -> use file instead of string */
+            CONFIG_GENERIC( "freetype-font", String, NULL, font ); 
+                    /* FIXME -> use file instead of string */
             CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,
                             fontSize );
