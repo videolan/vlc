@@ -174,13 +174,6 @@
     
     [self lockFullscreenAnimation];
 
-    /* This is a recursive lock. If we are already in the middle of an animation we
-     * unlock it. We don't add an extra locking here, because enter/leavefullscreen
-     * are executed always in the same thread */ 
-    if (b_animation_lock_alreadylocked)
-        [self unlockFullscreenAnimation];
-    b_animation_lock_alreadylocked = YES;
-
     if (!screen)
         screen = [self screen];
 
@@ -248,16 +241,16 @@
     {
         /* We were already fullscreen nothing to do when NSAnimation
          * is not supported */
-        [self unlockFullscreenAnimation];
         b_animation_lock_alreadylocked = NO;
+        [self unlockFullscreenAnimation];
         return;
     }
 
     /* We are in fullscreen (and no animation is running) */
     if (b_fullscreen)
     {
-        [self unlockFullscreenAnimation];
         b_animation_lock_alreadylocked = NO;
+        [self unlockFullscreenAnimation];
         return;
     }
 
@@ -272,6 +265,13 @@
         [o_fullscreen_anim2 release];
     }
  
+     /* This is a recursive lock. If we are already in the middle of an animation we
+     * unlock it. We don't add an extra locking here, because enter/leavefullscreen
+     * are executed always in the same thread */ 
+    if (b_animation_lock_alreadylocked)
+        [self unlockFullscreenAnimation];
+    b_animation_lock_alreadylocked = YES;
+
     if ([screen isMainScreen])
         SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
 
@@ -331,13 +331,6 @@
 
     [self lockFullscreenAnimation];
 
-    /* This is a recursive lock. If we are already in the middle of an animation we
-     * unlock it. We don't add an extra locking here, because enter/leavefullscreen
-     * are executed always in the same thread */ 
-    if (b_animation_lock_alreadylocked)
-        [self unlockFullscreenAnimation];
-    b_animation_lock_alreadylocked = YES;
-
     b_fullscreen = NO;
     [o_btn_fullscreen setState: NO];
 
@@ -347,8 +340,8 @@
     /* Don't do anything if o_fullscreen_window is already closed */
     if (!o_fullscreen_window)
     {
-        [self unlockFullscreenAnimation];
         b_animation_lock_alreadylocked = NO;
+        [self unlockFullscreenAnimation];
         return;
     }
 
@@ -386,6 +379,13 @@
         [o_fullscreen_anim2 stopAnimation];
         [o_fullscreen_anim2 release];
     }
+
+    /* This is a recursive lock. If we are already in the middle of an animation we
+     * unlock it. We don't add an extra locking here, because enter/leavefullscreen
+     * are executed always in the same thread */ 
+    if (b_animation_lock_alreadylocked)
+        [self unlockFullscreenAnimation];
+    b_animation_lock_alreadylocked = YES;
 
     frame = [[o_temp_view superview] convertRect: [o_temp_view frame] toView: nil]; /* Convert to Window base coord */
     frame.origin.x += [self frame].origin.x; 
@@ -438,8 +438,8 @@
 
     [o_fullscreen_window release];
     o_fullscreen_window = nil;
-    [self unlockFullscreenAnimation];
     b_animation_lock_alreadylocked = NO;
+    [self unlockFullscreenAnimation];
 }
 
 - (void)animationDidEnd:(NSAnimation*)animation
