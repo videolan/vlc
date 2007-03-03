@@ -470,8 +470,6 @@ static WINAPI int _ws2_getnameinfo_bind( const struct sockaddr *sa, socklen_t sa
 static WINAPI int _ws2_getaddrinfo_bind(const char *node, const char *service,
                const struct addrinfo *hints, struct addrinfo **res);
 
-static WINAPI void _ws2_freeaddrinfo_bind( struct addrinfo *infos );
-
 static GETNAMEINFO ws2_getnameinfo = _ws2_getnameinfo_bind;
 static GETADDRINFO ws2_getaddrinfo = _ws2_getaddrinfo_bind;
 static FREEADDRINFO ws2_freeaddrinfo;
@@ -508,6 +506,8 @@ static WINAPI int _ws2_getnameinfo_bind( const struct sockaddr *sa, socklen_t sa
     WSASetLastError (WSAEAFNOSUPPORT);
     return EAI_FAMILY;
 }
+#undef getnameinfo
+#define getnameinfo ws2_getnameinfo
 
 static WINAPI int _ws2_getaddrinfo_bind(const char *node, const char *service,
                const struct addrinfo *hints, struct addrinfo **res)
@@ -525,6 +525,11 @@ static WINAPI int _ws2_getaddrinfo_bind(const char *node, const char *service,
     WSASetLastError (WSAHOST_NOT_FOUND);
     return EAI_NONAME;
 }
+#undef getaddrinfo
+#undef freeaddrinfo
+#define getaddrinfo ws2_getaddrinfo
+#define freeaddrinfo ws2_freeaddrinfo
+#define HAVE_GETADDRINFO
 #endif
 
 
@@ -547,11 +552,7 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
         i_servlen = 0;
     }
 
-#ifndef WIN32
     i_val = getnameinfo(sa, salen, host, hostlen, psz_serv, i_servlen, flags);
-#else
-    i_val = ws2_getnameinfo (sa, salen, host, hostlen, psz_serv, i_servlen, flags);
-#endif
 
     if( portnum != NULL )
         *portnum = atoi( psz_serv );
@@ -666,8 +667,6 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     }
 # endif
     return getaddrinfo (psz_node, psz_service, &hints, res);
-#elif defined (WIN32)
-    return ws2_getaddrinfo (psz_node, psz_service, &hints, res);
 #else
     int ret;
     vlc_value_t lock;
@@ -685,9 +684,5 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 
 void vlc_freeaddrinfo( struct addrinfo *infos )
 {
-#ifndef WIN32
     freeaddrinfo (infos);
-#else
-    ws2_freeaddrinfo (infos);
-#endif
 }
