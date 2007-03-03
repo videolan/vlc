@@ -561,13 +561,8 @@ vlc_module_begin();
 
 /* Input/Output */
 
-#if defined(__DARWIN__) && defined(__INTEL__)
-    add_bool( SOUT_CFG_PREFIX "asm", 0, NULL, ASM_TEXT,
-              ASM_LONGTEXT, VLC_FALSE );
-#else
     add_bool( SOUT_CFG_PREFIX "asm", 1, NULL, ASM_TEXT,
               ASM_LONGTEXT, VLC_FALSE );
-#endif
 
     /* x264 psnr = 1 (default). disable PSNR computation for speed. */
     add_bool( SOUT_CFG_PREFIX "psnr", 0, NULL, PSNR_TEXT,
