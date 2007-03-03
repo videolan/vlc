@@ -566,12 +566,11 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
         psz_serv = NULL;
         i_servlen = 0;
     }
-#if defined( WIN32 ) && !defined( UNDER_CE )
-    i_val = ws2_getnameinfo( sa, salen, host, hostlen, psz_serv,
-                                 i_servlen, flags );
-#endif
-#if defined( HAVE_GETNAMEINFO ) || defined( UNDER_CE )
+
+#if defined (HAVE_GETNAMEINFO)
     i_val = getnameinfo(sa, salen, host, hostlen, psz_serv, i_servlen, flags);
+#elif defined (WIN32)
+    i_val = ws2_getnameinfo (sa, salen, host, hostlen, psz_serv, i_servlen, flags);
 #else
     i_val = __getnameinfo (sa, salen, host, hostlen, psz_serv, i_servlen, flags);
 #endif
@@ -655,7 +654,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
         }
     }
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
+#ifdef WIN32
     /*
      * Winsock tries to resolve numerical IPv4 addresses as AAAA
      * and IPv6 addresses as A... There comes the work around.
@@ -669,61 +668,50 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 
         hints.ai_flags &= ~AI_NUMERICHOST;
     }
-
-    return ws2_getaddrinfo (psz_node, psz_service, &hints, res);
 #endif
-#if defined( HAVE_GETADDRINFO ) || defined( UNDER_CE )
+#if defined (HAVE_GETADDRINFO)
 # ifdef AI_IDN
     /* Run-time I18n Domain Names support */
+    static vlc_bool_t b_idn = VLC_TRUE; /* beware of thread-safety */
+
+    if (b_idn)
     {
-        static vlc_bool_t i_idn = VLC_TRUE; /* beware of thread-safety */
+        hints.ai_flags |= AI_IDN;
+        int ret = getaddrinfo (psz_node, psz_service, &hints, res);
 
-        if( i_idn )
-        {
-            int i_ret;
+        if (ret != EAI_BADFLAGS)
+            return ret;
 
-            hints.ai_flags |= AI_IDN;
-            i_ret = getaddrinfo( psz_node, psz_service, &hints, res );
-
-            if( i_ret != EAI_BADFLAGS )
-                return i_ret;
-
-            /* libidn not available: disable and retry without it */
-
-            /* NOTE: Using i_idn here would not be thread-safe */
-            hints.ai_flags &= ~AI_IDN;
-            i_idn = VLC_FALSE;
-            msg_Dbg( p_this, "International Domain Names not supported - " \
-                "disabled" );
-        }
+        /* IDN not available: disable and retry without it */
+        hints.ai_flags &= ~AI_IDN;
+        b_idn = VLC_FALSE;
+        msg_Info (p_this, "International Domain Names not supported");
     }
 # endif
-    return getaddrinfo( psz_node, psz_service, &hints, res );
+    return getaddrinfo (psz_node, psz_service, &hints, res);
+#elif defined (WIN32)
+    return ws2_getaddrinfo (psz_node, psz_service, &hints, res);
 #else
-{
-    int i_ret;
-
+    int ret;
     vlc_value_t lock;
 
-    var_Create( p_this->p_libvlc, "getaddrinfo_mutex", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "getaddrinfo_mutex", &lock );
-    vlc_mutex_lock( lock.p_address );
+    var_Create (p_this->p_libvlc, "getaddrinfo_mutex", VLC_VAR_MUTEX);
+    var_Get (p_this->p_libvlc, "getaddrinfo_mutex", &lock);
+    vlc_mutex_lock (lock.p_address);
 
-    i_ret = __getaddrinfo( psz_node, psz_service, &hints, res );
-    vlc_mutex_unlock( lock.p_address );
-    return i_ret;
-}
+    int ret = __getaddrinfo (psz_node, psz_service, &hints, res);
+    vlc_mutex_unlock (lock.p_address);
+    return ret;
 #endif
 }
 
 
 void vlc_freeaddrinfo( struct addrinfo *infos )
 {
-#if defined( WIN32 ) && !defined( UNDER_CE )
-    ws2_freeaddrinfo( infos );
-#endif
-#if defined( HAVE_GETADDRINFO ) || defined( UNDER_CE )
-    freeaddrinfo( infos );
+#if defined (HAVE_GETADDRINFO)
+    freeaddrinfo (infos);
+#elif defined (WIN32)
+    ws2_freeaddrinfo (infos);
 #else
     __freeaddrinfo( infos );
 #endif
