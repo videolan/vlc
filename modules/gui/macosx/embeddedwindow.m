@@ -67,6 +67,7 @@
     /* Not fullscreen when we wake up */
     [o_btn_fullscreen setState: NO];
     b_fullscreen = NO;
+    o_animation_lock = [[NSLock alloc] init];
 }
 
 - (void)setTime:(NSString *)o_arg_time position:(float)f_position
@@ -144,6 +145,16 @@
     return b_fullscreen;
 }
 
+- (void)lockFullscreenAnimation
+{
+    [o_animation_lock lock];
+}
+
+- (void)unlockFullscreenAnimation
+{
+    [o_animation_lock unlock];
+}
+
 - (void)enterFullscreen
 {
     NSMutableDictionary *dict1, *dict2;
@@ -156,6 +167,8 @@
     screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_GetInteger( p_vout, "video-device" )];
 
     vlc_object_release( p_vout );
+    
+    [self lockFullscreenAnimation];
 
     if (!screen)
         screen = [self screen];
@@ -204,7 +217,10 @@
 
             CGDisplayFade( token, 0.5, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
             CGReleaseDisplayFadeReservation( token);
+
+            /* Will release the lock */
             [self hasBecomeFullscreen];
+
             return;
         }
         
@@ -221,12 +237,16 @@
     {
         /* We were already fullscreen nothing to do when NSAnimation
          * is not supported */
+        [self unlockFullscreenAnimation];
         return;
     }
 
     /* We are in fullscreen (and no animation is running) */
     if (b_fullscreen)
+    {
+        [self unlockFullscreenAnimation];
         return;
+    }
 
     if (o_fullscreen_anim1)
     {
@@ -273,6 +293,7 @@
     [o_fullscreen_anim2 startWhenAnimation: o_fullscreen_anim1 reachesProgress: 1.0];
 
     [o_fullscreen_anim1 startAnimation];
+    /* fullscreenAnimation will be unlocked when animation ends */
 }
 
 - (void)hasBecomeFullscreen
@@ -287,13 +308,16 @@
     
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
     b_fullscreen = YES;
+    [self unlockFullscreenAnimation];
 }
 
 - (void)leaveFullscreen
 {
     NSMutableDictionary *dict1, *dict2;
     NSRect frame;
-    
+
+    [self lockFullscreenAnimation];
+
     b_fullscreen = NO;
     [o_btn_fullscreen setState: NO];
 
@@ -302,7 +326,10 @@
 
     /* Don't do anything if o_fullscreen_window is already closed */
     if (!o_fullscreen_window)
+    {
+        [self lockFullscreenAnimation];
         return;
+    }
 
     if (![self isVisible] || MACOS_VERSION < 10.4f)
     {
@@ -317,6 +344,7 @@
         [[[[VLCMain sharedInstance] getControls] getFSPanel] setNonActive: nil];
         SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
 
+        /* Will release the lock */
         [self hasEndedFullscreen];
 
         CGDisplayFade( token, 0.5, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
@@ -369,6 +397,7 @@
     [o_fullscreen_anim1 setFrameRate: 30];
     [o_fullscreen_anim2 startWhenAnimation: o_fullscreen_anim1 reachesProgress: 1.0];
     [o_fullscreen_anim1 startAnimation];
+    /* fullscreenAnimation will be unlocked when animation ends */
 }
 
 - (void)hasEndedFullscreen
@@ -388,6 +417,7 @@
 
     [o_fullscreen_window release];
     o_fullscreen_window = nil;
+    [self unlockFullscreenAnimation];
 }
 
 - (void)animationDidEnd:(NSAnimation*)animation

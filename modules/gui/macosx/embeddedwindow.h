@@ -50,6 +50,7 @@
     NSView          * o_temp_view;
     /* set to yes if we are fullscreen and all animations are over */
     BOOL              b_fullscreen;
+    NSLock          * o_animation_lock;
 }
 
 - (void)setTime:(NSString *)o_arg_ime position:(float)f_position;
@@ -59,6 +60,9 @@
 - (NSView *)mainView;
 
 - (BOOL)isFullscreen;
+
+- (void)lockFullscreenAnimation;
+- (void)unlockFullscreenAnimation;
 
 - (void)enterFullscreen;
 - (void)leaveFullscreen;

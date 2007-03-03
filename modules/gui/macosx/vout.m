@@ -929,6 +929,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         [o_window setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
         [self updateTitle];
 
+        [o_window lockFullscreenAnimation];
+
         /* Make the window the front and key window before animating */
         if ([o_window isVisible] && (![o_window isFullscreen]))
             [o_window makeKeyAndOrderFront: self];
@@ -938,6 +940,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         /* Make sure our window is visible, if we are not in fullscreen */
         if (![o_window isFullscreen])
             [o_window makeKeyAndOrderFront: self];
+        [o_window unlockFullscreenAnimation];
 
     }
     return b_return;
