@@ -242,16 +242,18 @@ static void *SigHandler (void *data)
 }
 
 
-static void KillOnce (void)
-{
-    VLC_Die (0);
-}
-
-
+#include <stdbool.h>
 static void Kill (void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once (&once, KillOnce);
+    static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+    static bool killed = false;;
+    pthread_mutex_lock (&lock);
+    if (!killed)
+    {
+        VLC_Die (0);
+        killed = true;
+    }
+    pthread_mutex_unlock (&lock);
 }
 
 #endif
