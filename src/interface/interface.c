@@ -467,26 +467,10 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
     o_libvlc = p_libvlc;
 }
 
-- (void)stop: (id)sender
-{
-    NSEvent *o_event;
-    NSAutoreleasePool *o_pool;
-    [super stop:sender];
-
-    o_pool = [[NSAutoreleasePool alloc] init];
-    /* send a dummy event to break out of the event loop */
-    o_event = [NSEvent mouseEventWithType: NSLeftMouseDown
-                location: NSMakePoint( 1, 1 ) modifierFlags: 0
-                timestamp: 1 windowNumber: [[NSApp mainWindow] windowNumber]
-                context: [NSGraphicsContext currentContext] eventNumber: 1
-                clickCount: 1 pressure: 0.0];
-    [NSApp postEvent: o_event atStart: YES];
-    [o_pool release];
-}
-
 - (void)terminate: (id)sender
 {
     o_libvlc->b_die = VLC_TRUE;
+    [super terminate: sender];
 }
 
 @end
