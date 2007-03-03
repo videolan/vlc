@@ -42,6 +42,7 @@
 
 + (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID;
 - (BOOL)isMainScreen;
+- (BOOL)isScreen: (NSScreen*)screen;
 - (CGDirectDisplayID)displayID;
 - (void)blackoutOtherScreens;
 + (void)unblackoutScreens;

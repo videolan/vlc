@@ -95,6 +95,11 @@ static NSMutableArray *blackoutWindows = NULL;
     return ([self displayID] == [[[NSScreen screens] objectAtIndex:0] displayID]);
 }
 
+- (BOOL)isScreen: (NSScreen*)screen
+{
+    return ([self displayID] == [screen displayID]);
+}
+
 - (CGDirectDisplayID)displayID
 {
     return (CGDirectDisplayID)_screenNumber;
@@ -113,7 +118,7 @@ static NSMutableArray *blackoutWindows = NULL;
     {
         VLCWindow *blackoutWindow;
         NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
-        if(self == screen)
+        if([self isScreen: screen])
             continue;
         /* blackoutWindow alloc strategy
             - The NSMutableArray blackoutWindows has the blackoutWindow references
