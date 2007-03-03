@@ -476,75 +476,57 @@ static WINAPI void _ws2_freeaddrinfo_bind( struct addrinfo *infos );
 
 static GETNAMEINFO ws2_getnameinfo = _ws2_getnameinfo_bind;
 static GETADDRINFO ws2_getaddrinfo = _ws2_getaddrinfo_bind;
-static FREEADDRINFO ws2_freeaddrinfo = _ws2_freeaddrinfo_bind;
+static FREEADDRINFO ws2_freeaddrinfo;
 
-static int _ws2_find_ipv6_api(void)
+static FARPROC ws2_find_api (const char *name)
 {
-    /* For Windows XP and above, IPv6 stack is in WS2_32.DLL */
-    HINSTANCE module = LoadLibrary( "ws2_32.dll" );
-    if( module != NULL )
-    {
-        ws2_getnameinfo = (GETNAMEINFO)GetProcAddress( module, "getnameinfo" );
-        ws2_getaddrinfo = (GETADDRINFO)GetProcAddress( module, "getaddrinfo" );
-        ws2_freeaddrinfo = (FREEADDRINFO)GetProcAddress( module, "freeaddrinfo" );
-        if( ws2_getnameinfo && ws2_getaddrinfo && ws2_freeaddrinfo )
-        {
-            /* got them */
-            return 1;
-        }
-        FreeLibrary( module );
+    FARPROC f = NULL;
 
-        /* For Windows 2000 and below, try IPv6 stack in in WSHIP6.DLL */
-        module = LoadLibrary( "wship6.dll" );
-        if( module != NULL )
-        {
-            ws2_getnameinfo = (GETNAMEINFO)GetProcAddress( module, "getnameinfo" );
-            ws2_getaddrinfo = (GETADDRINFO)GetProcAddress( module, "getaddrinfo" );
-            ws2_freeaddrinfo = (FREEADDRINFO)GetProcAddress( module, "freeaddrinfo" );
-            if( ws2_getnameinfo && ws2_getaddrinfo && ws2_freeaddrinfo )
-            {
-                /* got them */
-                return 1;
-            }
-            FreeLibrary( module );
-        }
+    HMODULE m = GetModuleHandle ("WS2_32");
+    if (m != NULL)
+        f = GetProcAddress (m, name);
+
+    if (f == NULL)
+    {
+        /* Windows 2K IPv6 preview */
+        m = LoadLibrary ("WSHIP6");
+        if (m != NULL)
+            f = GetProcAddress (m, name);
     }
-    /* no API */
-    return 0;
+
+    return f;
 }
 
 static WINAPI int _ws2_getnameinfo_bind( const struct sockaddr *sa, socklen_t salen,
                char *host, DWORD hostlen, char *serv, DWORD servlen, int flags )
 {
-    if( _ws2_find_ipv6_api() )
+    GETNAMEINFO entry = (GETNAMEINFO)ws2_find_api ("getnameinfo");
+    if (entry != NULL)
     {
-        return ws2_getnameinfo(sa, salen, host, hostlen, serv, servlen, flags);
+        ws2_getnameinfo = entry;
+        return entry (sa, salen, host, hostlen, serv, servlen, flags);
     }
     /* return a possible error if API is not found */
-    WSASetLastError(WSAHOST_NOT_FOUND);
-    return WSAHOST_NOT_FOUND;
+    WSASetLastError (WSAEAFNOSUPPORT);
+    return EAI_FAMILY;
 }
 
 static WINAPI int _ws2_getaddrinfo_bind(const char *node, const char *service,
                const struct addrinfo *hints, struct addrinfo **res)
 {
-    if( _ws2_find_ipv6_api() )
+    GETADDRINFO entry = (GETADDRINFO)ws2_find_api ("getaddrinfo");
+    FREEADDRINFO freentry = (FREEADDRINFO)ws2_find_api ("freeaddrinfo");
+
+    if ((entry != NULL) && (freentry != NULL))
     {
-        return ws2_getaddrinfo(node, service, hints, res);
+        ws2_freeaddrinfo = freentry;
+        ws2_getaddrinfo = entry;
+        return entry (node, service, hints, res);
     }
     /* return a possible error if API is not found */
-    WSASetLastError(WSAHOST_NOT_FOUND);
-    return WSAHOST_NOT_FOUND;
+    WSASetLastError (WSAHOST_NOT_FOUND);
+    return EAI_NONAME;
 }
-
-static WINAPI void _ws2_freeaddrinfo_bind( struct addrinfo *infos )
-{
-    if( _ws2_find_ipv6_api() )
-    {
-        ws2_freeaddrinfo(infos);
-    }
-}
-
 #endif
 
 
