@@ -22,6 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#define _WIN32_WINNT 0x501
 #include <vlc/vlc.h>
 
 #include <stddef.h> /* size_t */
@@ -450,7 +451,7 @@ getaddrinfo (const char *node, const char *service,
 #endif /* if !HAVE_GETADDRINFO */
 #endif
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
+#if 0 && defined( WIN32 ) && !defined( UNDER_CE )
     /*
      * Here is the kind of kludge you need to keep binary compatibility among
      * varying OS versions...
@@ -641,7 +642,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     {
         hints.ai_flags |= AI_NUMERICHOST;
 
-        if (ws2_getaddrinfo (psz_node, psz_service, &hints, res) == 0)
+        if (getaddrinfo (psz_node, psz_service, &hints, res) == 0)
             return 0;
 
         hints.ai_flags &= ~AI_NUMERICHOST;
@@ -675,7 +676,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     var_Get (p_this->p_libvlc, "getaddrinfo_mutex", &lock);
     vlc_mutex_lock (lock.p_address);
 
-    int ret = getaddrinfo (psz_node, psz_service, &hints, res);
+    ret = getaddrinfo (psz_node, psz_service, &hints, res);
     vlc_mutex_unlock (lock.p_address);
     return ret;
 #endif
