@@ -337,7 +337,11 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         }
         else
         {
+#ifdef WIN32
             n = recv (*fdv, p_buf, i_buflen, 0);
+#else
+            n = read (*fdv, p_buf, i_buflen);
+#endif
         }
 
         if (n == -1)
@@ -452,7 +456,11 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         if (p_vs != NULL)
             val = p_vs->pf_send (p_vs->p_sys, p_data, i_data);
         else
+#ifdef WIN32
             val = send (fd, p_data, i_data, 0);
+#else
+            val = write (fd, p_data, i_data);
+#endif
 
         if (val == -1)
         {
