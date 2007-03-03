@@ -313,6 +313,7 @@
     i_timeToKeepVisibleInSec -= 1;
     if( i_timeToKeepVisibleInSec < 1 )
     {
+        [NSCursor setHiddenUntilMouseMoves: YES];
         [self fadeOut];
         [timer invalidate];
         [timer release];
