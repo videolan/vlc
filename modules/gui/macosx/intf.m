@@ -105,6 +105,8 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
 /*****************************************************************************
  * Run: main loop
  *****************************************************************************/
+jmp_buf jmpbuffer;
+
 static void Run( intf_thread_t *p_intf )
 {
     /* Do it again - for some unknown reason, vlc_thread_create() often
@@ -113,7 +115,11 @@ static void Run( intf_thread_t *p_intf )
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
     [[VLCMain sharedInstance] setIntf: p_intf];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
-    [NSApp run];
+
+    /* Install a jmpbuffer to where we can go back before the NSApp exit
+     * see applicationWillTerminate: */
+    if(setjmp(jmpbuffer) == 0)
+        [NSApp run];
 }
 
 int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
@@ -1544,14 +1550,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     vout_thread_t * p_vout;
     int returnedValue = 0;
     
-#define p_input p_intf->p_sys->p_input
-    if( p_input )
-    {
-        vlc_object_release( p_input );
-        p_input = NULL;
-    }
-#undef p_input
-
     /* Stop playback */
     p_playlist = pl_Yield( p_intf );
     playlist_Stop( p_playlist );
@@ -1573,7 +1571,15 @@ static VLCMain *_o_sharedMainInstance = nil;
     
     p_intf->b_interaction = VLC_FALSE;
     var_DelCallback( p_intf, "interaction", InteractCallback, self );
-    
+
+#define p_input p_intf->p_sys->p_input
+    if( p_input )
+    {
+        vlc_object_release( p_input );
+        p_input = NULL;
+    }
+#undef p_input
+
     /* remove global observer watching for vout device changes correctly */
     [[NSNotificationCenter defaultCenter] removeObserver: self
                                                     name: NSApplicationDidChangeScreenParametersNotification
@@ -1646,7 +1652,12 @@ static VLCMain *_o_sharedMainInstance = nil;
     [[NSUserDefaults standardUserDefaults] synchronize];
 
     p_intf->b_die = VLC_TRUE;
+
+    /* Go back to Run() and make libvlc exit properly */
+    longjmp( jmpbuffer, 1 );
+    /* not reached */
 }
+
 
 - (IBAction)clearRecentItems:(id)sender
 {
