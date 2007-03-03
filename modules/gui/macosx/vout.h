@@ -109,7 +109,6 @@
 /*****************************************************************************
  * VLCDetachedEmbeddedView interface
  *****************************************************************************/
-@class VLCEmbeddedWindow;
 
 @interface VLCDetachedEmbeddedVoutView : VLCEmbeddedVoutView
 {
