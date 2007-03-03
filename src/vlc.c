@@ -202,6 +202,11 @@ static void *SigHandler (void *data)
     time_t abort_time = 0;
     vlc_bool_t b_die = VLC_FALSE;
 
+#ifdef __APPLE__
+    /* We really prefer the "force quit" menu item to act immediately */
+    b_die = VLC_TRUE;
+#endif
+
     for (;;)
     {
         int i_signal, state;
