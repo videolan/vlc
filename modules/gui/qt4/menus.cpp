@@ -143,8 +143,8 @@ QMenu *QVLCMenu::FileMenu()
     QMenu *menu = new QMenu();
 /*    DP_SADD( qtr("Quick &Open File...") , "", "", simpleOpenDialog() );*/
     DP_SADD( qtr("Open &File..." ), "", "", openFileDialog() );
-    DP_SADD( qtr("Open &Network..." ), "", "", openNetDialog());
     DP_SADD( qtr("Open &Disc..." ), "", "", openDiscDialog());
+    DP_SADD( qtr("Open &Network..." ), "", "", openNetDialog());
     menu->addSeparator();
     DP_SADD( qtr("Streaming..."), "", "", streamingDialog() );
     menu->addSeparator();

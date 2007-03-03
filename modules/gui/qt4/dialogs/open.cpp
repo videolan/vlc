@@ -46,7 +46,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     diskOpenPanel = new DiskOpenPanel(this , p_intf );
     netOpenPanel = new NetOpenPanel(this , p_intf );
     ui.Tab->addTab(fileOpenPanel, qtr("File"));
-    ui.Tab->addTab(diskOpenPanel, qtr("Disk"));
+    ui.Tab->addTab(diskOpenPanel, qtr("Disc"));
     ui.Tab->addTab(netOpenPanel, qtr("Network"));
 
     ui.advancedFrame->hide();
@@ -146,8 +146,6 @@ void OpenDialog::toggleAdvancedPanel()
         }
         resize( width(), mainHeight + advHeight );
     }
-
-    showTab( 2 );
 }
 
 void OpenDialog::updateMRL() {
