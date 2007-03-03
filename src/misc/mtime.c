@@ -35,6 +35,7 @@
 #include <time.h>                      /* clock_gettime(), clock_nanosleep() */
 #include <stdlib.h>                                               /* lldiv() */
 #include <assert.h>
+#include <errno.h>
 
 
 #if defined( PTH_INIT_IN_PTH_H )                                  /* GNU Pth */
