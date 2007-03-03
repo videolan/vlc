@@ -129,13 +129,13 @@ ifdef HAVE_BEOS
 FFMPEGCONF+= --cpu=x86 --disable-debug --disable-audio-beos
 endif
 
-ifeq ($(HOST),i686-apple-darwin8)
+ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEGCONF += --enable-memalign-hack
 endif
 
 ifdef HAVE_DARWIN_OS
 X264CONF += --enable-pic
-ifneq ($(HOST),i686-apple-darwin8)
+ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEG_CFLAGS += -DHAVE_LRINTF
 endif
 endif
@@ -717,7 +717,7 @@ ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
 else
 ifdef HAVE_DARWIN_OS
-ifeq ($(HOST),i686-apple-darwin8)
+ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm-optimizations&& cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
 else
 	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
@@ -1497,7 +1497,7 @@ else
 	(cat Patches/libpng-osx.patch | sed -e 's%??PREFIX??%$(PREFIX)%' -e 's%??EXTRA_CFLAGS??%$(EXTRA_CFLAGS)%' -e 's%??EXTRA_LDFLAGS??%$(EXTRA_LDFLAGS)%' | patch -p0)
 endif
 	(patch -p0 < Patches/libpng-makefile.patch)
-ifeq ($(HOST),i686-apple-darwin8)
+ifdef HAVE_DARWIN_OS_ON_INTEL
 	(patch -p0 < Patches/libpng-darwin-mactel.patch)
 endif
 
@@ -1618,7 +1618,7 @@ ifdef HAVE_WIN32
 endif
 
 .gpg-error: libgpg-error
-ifeq ($(HOST),i686-apple-darwin8)
+ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $<; ./autogen.sh)
 endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls --disable-shared && make && make install)
@@ -1644,7 +1644,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2
 ifdef HAVE_WIN32
 	(cd $<; ./autogen.sh && $(HOSTCC) ./configure $(HOSTCONF) --target=i586-mingw32msvc --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && sed -i 46s@sys/times.h@sys/time.h@ cipher/random.c && make && make install)
 else
-ifeq ($(HOST),i686-apple-darwin8)
+ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $<; $(HOSTCC) ./configure --host=$(HOST) --build=$(BUILD) --prefix=$(PREFIX) --disable-asm CFLAGS="$(CFLAGS)" && make && make install)
 endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
