@@ -90,6 +90,11 @@ static NSMutableArray *blackoutWindows = NULL;
     return nil;
 }
 
+- (BOOL)isMainScreen
+{
+    return ([self displayID] == [[[NSScreen screens] objectAtIndex:0] displayID]);
+}
+
 - (CGDirectDisplayID)displayID
 {
     return (CGDirectDisplayID)_screenNumber;

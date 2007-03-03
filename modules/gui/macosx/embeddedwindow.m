@@ -193,7 +193,7 @@
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
             CGDisplayFade( token, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
             
-            if (screen == [NSScreen mainScreen])
+            if ([screen isMainScreen])
                 SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
             
             [[self contentView] replaceSubview:o_view with:o_temp_view];
@@ -239,7 +239,7 @@
         [o_fullscreen_anim2 release];
     }
  
-    if (screen == [NSScreen mainScreen])
+    if ([screen isMainScreen])
         SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
 
     dict1 = [[NSMutableDictionary alloc] initWithCapacity:2];

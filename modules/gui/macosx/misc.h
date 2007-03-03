@@ -41,6 +41,7 @@
 @interface NSScreen (VLCAdditions)
 
 + (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID;
+- (BOOL)isMainScreen;
 - (CGDirectDisplayID)displayID;
 - (void)blackoutOtherScreens;
 + (void)unblackoutScreens;
