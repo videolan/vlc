@@ -103,35 +103,6 @@ const char *vlc_gai_strerror (int errnum)
 #endif
 
 #ifndef WIN32
-#if !(defined (HAVE_GETNAMEINFO) && defined (HAVE_GETADDRINFO))
-/*
- * Converts the current herrno error value into an EAI_* error code.
- * That error code is normally returned by getnameinfo() or getaddrinfo().
- */
-static int
-gai_error_from_herrno (void)
-{
-    switch (h_errno)
-    {
-        case HOST_NOT_FOUND:
-            return EAI_NONAME;
-
-        case NO_ADDRESS:
-# if (NO_ADDRESS != NO_DATA)
-        case NO_DATA:
-# endif
-            return EAI_NODATA;
-
-        case NO_RECOVERY:
-            return EAI_FAIL;
-
-        case TRY_AGAIN:
-            return EAI_AGAIN;
-    }
-    return EAI_SYSTEM;
-}
-#endif /* if !(HAVE_GETNAMEINFO && HAVE_GETADDRINFO) */
-
 #ifndef HAVE_GETNAMEINFO
 /*
  * getnameinfo() non-thread-safe IPv4-only implementation,
@@ -191,6 +162,33 @@ getnameinfo (const struct sockaddr *sa, socklen_t salen,
 #endif /* if !HAVE_GETNAMEINFO */
 
 #ifndef HAVE_GETADDRINFO
+/*
+ * Converts the current herrno error value into an EAI_* error code.
+ * That error code is normally returned by getnameinfo() or getaddrinfo().
+ */
+static int
+gai_error_from_herrno (void)
+{
+    switch (h_errno)
+    {
+        case HOST_NOT_FOUND:
+            return EAI_NONAME;
+
+        case NO_ADDRESS:
+# if (NO_ADDRESS != NO_DATA)
+        case NO_DATA:
+# endif
+            return EAI_NODATA;
+
+        case NO_RECOVERY:
+            return EAI_FAIL;
+
+        case TRY_AGAIN:
+            return EAI_AGAIN;
+    }
+    return EAI_SYSTEM;
+}
+
 /*
  * This functions must be used to free the memory allocated by getaddrinfo().
  */
@@ -368,7 +366,7 @@ getaddrinfo (const char *node, const char *service,
             entry = gethostbyname (node);
 
         if (entry == NULL)
-            return EAI_NONAME;
+            return gai_error_from_herrno ();
 
         if ((entry->h_length != 4) || (entry->h_addrtype != AF_INET))
             return EAI_FAMILY;
