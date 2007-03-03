@@ -53,9 +53,6 @@
 #ifndef AF_UNSPEC
 #   define AF_UNSPEC   0
 #endif
-#ifndef EAI_OVERFLOW
-#   define EAI_OVERFLOW -12   /* Argument buffer overflow.  */
-#endif
 
 #define _NI_MASK (NI_NUMERICHOST|NI_NUMERICSERV|NI_NOFQDN|NI_NAMEREQD|\
                   NI_DGRAM)
@@ -100,7 +97,6 @@ const char *vlc_gai_strerror( int errnum )
 
     return __gai_unknownerr;
 }
-# undef _EAI_POSITIVE_MAX
 #else /* ifndef HAVE_GAI_STRERROR */
 const char *vlc_gai_strerror( int errnum )
 {

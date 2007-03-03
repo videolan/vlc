@@ -221,8 +221,11 @@ int poll (struct pollfd *fds, unsigned nfds, int timeout);
 # ifndef EAI_MEMORY
 #  define EAI_MEMORY -10
 # endif
+#ifndef EAI_OVERFLOW
+#  define EAI_OVERFLOW -11
+#endif
 # ifndef EAI_SYSTEM
-#  define EAI_SYSTEM -11
+#  define EAI_SYSTEM -12
 # endif
 
 
