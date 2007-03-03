@@ -307,7 +307,7 @@ struct intf_sys_t
 - (id)getMainIntfPgbar;
 - (id)getControllerWindow;
 - (id)getVoutMenu;
-- (void)terminate;
+- (void)applicationWillTerminate:(NSNotification *)notification;
 - (NSString *)localizedString:(char *)psz;
 - (char *)delocalizeString:(NSString *)psz;
 - (NSString *)wrapString: (NSString *)o_in_string toWidth: (int)i_width;

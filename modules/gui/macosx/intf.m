@@ -114,7 +114,6 @@ static void Run( intf_thread_t *p_intf )
     [[VLCMain sharedInstance] setIntf: p_intf];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
     [NSApp run];
-    [[VLCMain sharedInstance] terminate];
 }
 
 int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
@@ -352,7 +351,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_remote = [[AppleRemote alloc] init];
 	[o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
     [o_remote setDelegate: _o_sharedMainInstance];
-    
+
     return _o_sharedMainInstance;
 }
 
@@ -1530,12 +1529,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 #undef p_input
 }
 
-- (void)terminate
+- (void)applicationWillTerminate:(NSNotification *)notification
 {
     playlist_t * p_playlist;
     vout_thread_t * p_vout;
     int returnedValue = 0;
-
+    
 #define p_input p_intf->p_sys->p_input
     if( p_input )
     {
@@ -1549,19 +1548,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     playlist_Stop( p_playlist );
     vlc_object_release( p_playlist );
 
-    /* FIXME - Wait here until all vouts are terminated because
-       libvlc's VLC_CleanUp destroys interfaces before vouts, which isn't
-       good on OS X. We definitly need a cleaner way to handle this,
-       but this may hopefully be good enough for now.
-         -- titer 2003/11/22 */
-    while( ( p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                       FIND_ANYWHERE ) ) )
-    {
-        vlc_object_release( p_vout );
-        msleep( 100000 );
-    }
-    msleep( 500000 );
-    
     /* make sure that the current volume is saved */
     config_PutInt( p_intf->p_libvlc, "volume", i_lastShownVolume );
     returnedValue = config_SaveConfigFile( p_intf->p_libvlc, "main" );
