@@ -701,6 +701,15 @@ static VLCMain *_o_sharedMainInstance = nil;
     return( o_str );
 }
 
+/* When user click in the Dock icon our double click in the finder */
+- (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication hasVisibleWindows:(BOOL)hasVisibleWindows
+{	
+    if (!hasVisibleWindows)
+        [o_window makeKeyAndOrderFront:self];
+
+    return YES;
+}
+
 /* Listen to the remote in exclusive mode, only when VLC is the active
    application */
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
