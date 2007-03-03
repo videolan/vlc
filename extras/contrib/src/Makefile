@@ -930,7 +930,7 @@ ifdef HAVE_WINCE
 else
 .ffmpeg: ffmpeg .faac .lame
 endif
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-liba52 --disable-ffplay --enable-swscaler && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-liba52 --disable-ffplay --enable-swscaler && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
