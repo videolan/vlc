@@ -567,12 +567,10 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
         i_servlen = 0;
     }
 
-#if defined (HAVE_GETNAMEINFO)
+#ifndef WIN32
     i_val = getnameinfo(sa, salen, host, hostlen, psz_serv, i_servlen, flags);
-#elif defined (WIN32)
-    i_val = ws2_getnameinfo (sa, salen, host, hostlen, psz_serv, i_servlen, flags);
 #else
-    i_val = __getnameinfo (sa, salen, host, hostlen, psz_serv, i_servlen, flags);
+    i_val = ws2_getnameinfo (sa, salen, host, hostlen, psz_serv, i_servlen, flags);
 #endif
 
     if( portnum != NULL )
@@ -582,7 +580,6 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
 }
 
 
-/* TODO: support for setting sin6_scope_id */
 int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
                      int i_port, const struct addrinfo *p_hints,
                      struct addrinfo **res )
@@ -657,7 +654,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 #ifdef WIN32
     /*
      * Winsock tries to resolve numerical IPv4 addresses as AAAA
-     * and IPv6 addresses as A... There comes the work around.
+     * and IPv6 addresses as A... There comes the bug-to-bug fix.
      */
     if ((hints.ai_flags & AI_NUMERICHOST) == 0)
     {
@@ -699,7 +696,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     var_Get (p_this->p_libvlc, "getaddrinfo_mutex", &lock);
     vlc_mutex_lock (lock.p_address);
 
-    int ret = __getaddrinfo (psz_node, psz_service, &hints, res);
+    int ret = getaddrinfo (psz_node, psz_service, &hints, res);
     vlc_mutex_unlock (lock.p_address);
     return ret;
 #endif
@@ -708,11 +705,9 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 
 void vlc_freeaddrinfo( struct addrinfo *infos )
 {
-#if defined (HAVE_GETADDRINFO)
+#ifndef WIN32
     freeaddrinfo (infos);
-#elif defined (WIN32)
-    ws2_freeaddrinfo (infos);
 #else
-    __freeaddrinfo( infos );
+    ws2_freeaddrinfo (infos);
 #endif
 }
