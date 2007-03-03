@@ -46,15 +46,18 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
 
 InputManager::~InputManager()
 {
+    delInput();
 }
 
 void InputManager::setInput( input_thread_t *_p_input )
 {
+    delInput();
     p_input = _p_input;
     emit positionUpdated( 0.0,0,0 );
     b_had_audio = b_had_video = b_has_audio = b_has_video = false;
     if( p_input )
     {
+        vlc_object_yield( p_input );
         vlc_value_t val;
         var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
         b_has_video = val.i_int > 0;
@@ -63,14 +66,16 @@ void InputManager::setInput( input_thread_t *_p_input )
         var_AddCallback( p_input, "audio-es", ChangeAudio, this );
         var_AddCallback( p_input, "video-es", ChangeVideo, this );
     }
-
 }
+
 void InputManager::delInput()
 {
     if( p_input )
     {
         var_DelCallback( p_input, "audio-es", ChangeAudio, this );
         var_DelCallback( p_input, "video-es", ChangeVideo, this );
+        vlc_object_release( p_input );
+        p_input = NULL;
     }
 }
 
@@ -85,6 +90,8 @@ void InputManager::update()
         msg_Dbg( p_intf, "*********** NAV 0");
         emit navigationChanged( 0 );
         emit statusChanged( 0 ); // 0 = STOPPED, 1 = PLAY, 2 = PAUSE
+        delInput();
+        return;
     }
 
     if( !b_had_audio && b_has_audio )
