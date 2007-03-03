@@ -756,3 +756,8 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 <sam> try anal sex next time
   -- #videolan
 %
+< Bond493> Can anyone refer me to some documents which describe the VLC player internal? I'd 
+           like to learn how to write a media player espcially on embedded platform.
+< Dnumgis> Bond493: we keep this information secret in order to keep ahead of the competition
+  -- #videolan
+%
