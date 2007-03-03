@@ -925,8 +925,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         if(!([o_window isFullscreen]))
             [o_window makeKeyAndOrderFront: self];
 
-        NSLog(@"We are %s animating (%s)",  [o_window isVisible] && (![o_window isFullscreen]) ? "" :"not", [o_window isFullscreen] ? "fullscreen" : "");
-
         [self scaleWindowWithFactor: 1.0 animate: [o_window isVisible] && (![o_window isFullscreen])];
     }
     return b_return;
@@ -1001,7 +999,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( !o_screen )
         o_screen = [NSScreen mainScreen];
 
-    if( o_screen == [NSScreen mainScreen] )
+    if( [o_screen isMainScreen] )
         b_menubar_screen = VLC_TRUE;
 
     if( p_vout->b_fullscreen )
