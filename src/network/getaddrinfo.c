@@ -80,6 +80,7 @@ static struct
     { EAI_SERVICE,    "Incompatible service for socket type" },
     { EAI_ADDRFAMILY, "Unavailable address family for host name" },
     { EAI_MEMORY,     "Memory allocation failure" },
+    { EAI_OVERFLOW,   "Buffer overflow" },
     { EAI_SYSTEM,     "System error" },
     { 0,              NULL }
 };
