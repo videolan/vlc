@@ -2058,8 +2058,8 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
         }
         else
         {
-            bs_write( s, 16, p_region->i_x );
-            bs_write( s, 16, p_region->i_y );
+            bs_write( s, 16, p_subpic->i_x + p_region->i_x );
+            bs_write( s, 16, p_subpic->i_y + p_region->i_y );
         }
     }
 }
