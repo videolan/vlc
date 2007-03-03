@@ -671,12 +671,16 @@ package-win-common:
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/http/old/admin"
 	cp $(srcdir)/share/http/*.html $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.html ;
+	cp $(srcdir)/share/http/.hosts $(top_builddir)/vlc-${VERSION}/http/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/.hosts ;
 	cp $(srcdir)/share/http/*.css $(top_builddir)/vlc-${VERSION}/http/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/*.css ;
 	cp $(srcdir)/share/http/js/*.js $(top_builddir)/vlc-${VERSION}/http/js/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/js/*.js ;
 	cp $(srcdir)/share/http/dialogs/* $(top_builddir)/vlc-${VERSION}/http/dialogs/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/dialogs/* ;
+	cp $(srcdir)/share/http/dialogs/.hosts $(top_builddir)/vlc-${VERSION}/http/dialogs/ ;
+	unix2dos $(top_builddir)/vlc-${VERSION}/http/dialogs/.hosts ;
 	cp $(srcdir)/share/http/*.ico $(top_builddir)/vlc-${VERSION}/http/ ;
 	cp $(srcdir)/share/http/images/*.png $(top_builddir)/vlc-${VERSION}/http/images/
 	cp $(srcdir)/share/http/requests/*.xml $(top_builddir)/vlc-${VERSION}/http/requests/ ;
@@ -687,11 +691,13 @@ package-win-common:
 	cp $(srcdir)/share/http/old/*.html $(top_builddir)/vlc-${VERSION}/http/old/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/old/*.html ;
 	cp $(srcdir)/share/http/old/*.css $(top_builddir)/vlc-${VERSION}/http/old/ ;
+	cp $(srcdir)/share/http/old/.hosts $(top_builddir)/vlc-${VERSION}/http/old/ ;
 	cp $(srcdir)/share/http/old/*.png $(top_builddir)/vlc-${VERSION}/http/old/ ;
 	cp $(srcdir)/share/http/old/vlm/*.html $(top_builddir)/vlc-${VERSION}/http/old/vlm/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/old/vlm/*.html ;
 	cp $(srcdir)/share/http/old/admin/*.html $(top_builddir)/vlc-${VERSION}/http/old/admin/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/http/old/admin/*.html ;
+	cp $(srcdir)/share/http/old/admin/.access $(top_builddir)/vlc-${VERSION}/http/old/admin/ ;
 
 	cp $(srcdir)/share/vlc48x48.ico $(top_builddir)/vlc-${VERSION}/ ;
 
