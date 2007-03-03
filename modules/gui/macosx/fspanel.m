@@ -49,10 +49,10 @@
     
     /* let the window sit on top of everything else and start out completely transparent */
     [win setLevel:NSModalPanelWindowLevel];
-    [win setAlphaValue:0.0];
     i_device = 0;
-
     [win center];
+    [self setNonActive:nil];
+
     return win;
 }
 
@@ -119,13 +119,18 @@
     NSPoint theCoordinate;
     NSRect theScreensFrame;
     NSRect theWindowsFrame;
-
-    if( i_device < 0 || i_device >= (signed int)[[NSScreen screens] count] )
+    NSScreen *screen;
+    
+    /* user-defined screen */
+    screen = [NSScreen screenWithDisplayID: (CGDirectDisplayID)i_device];
+    
+    if (!screen)
+    {
         /* invalid preferences or none specified, using main screen */
-        theScreensFrame = [[NSScreen mainScreen] frame];
-    else
-        /* user-defined screen */
-        theScreensFrame = [[[NSScreen screens] objectAtIndex: i_device] frame];
+        screen = [NSScreen mainScreen];
+    }
+
+    theScreensFrame = [screen frame];
 
     theWindowsFrame = [self frame];
     
