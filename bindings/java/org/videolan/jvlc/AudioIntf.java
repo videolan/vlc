@@ -35,25 +35,25 @@ public interface AudioIntf {
 	/**
 	 * Constant for left channel audio 
 	 */
-	final String LEFT_CHANNEL		= "left";
+	final int LEFT_CHANNEL		= 3;
 	
 	/**
 	 * Constant for right channel audio 
 	 */
-	final String RIGHT_CHANNEL		= "right";
+	final int RIGHT_CHANNEL		= 4;
 
 	/**
 	 * Constant for reverse channel audio 
 	 */
-	final String REVERSE_CHANNEL 	= "reverse";
+	final int REVERSE_CHANNEL 	= 2;
 	/**
 	 * Constant for stereo channel audio 
 	 */
-	final String STEREO_CHANNEL 	= "stereo";
+	final int STEREO_CHANNEL 	= 1;
 	/**
 	 * Constant for dolby channel audio 
 	 */
-	final String DOLBY_CHANNEL		= "dolby";
+	final int DOLBY_CHANNEL		= 5;
 
 	/**
 	 * @return audio track
