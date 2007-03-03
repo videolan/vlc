@@ -66,6 +66,7 @@
 
     /* Not fullscreen when we wake up */
     [o_btn_fullscreen setState: NO];
+    b_fullscreen = NO;
 }
 
 - (void)setTime:(NSString *)o_arg_time position:(float)f_position
@@ -126,9 +127,23 @@
     return YES;
 }
 
+- (NSView *)mainView
+{
+    if (o_fullscreen_window)
+        return o_temp_view;
+    else
+        return o_view;
+}
+
 /*****************************************************************************
  * Fullscreen support
  */
+
+- (BOOL)isFullscreen
+{
+    return b_fullscreen;
+}
+
 - (void)enterFullscreen
 {
     NSMutableDictionary *dict1, *dict2;
@@ -209,6 +224,10 @@
         return;
     }
 
+    /* We are in fullscreen (and no animation is running) */
+    if (b_fullscreen)
+        return;
+
     if (o_fullscreen_anim1)
     {
         [o_fullscreen_anim1 stopAnimation];
@@ -267,6 +286,7 @@
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
     
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
+    b_fullscreen = YES;
 }
 
 - (void)leaveFullscreen
@@ -274,6 +294,7 @@
     NSMutableDictionary *dict1, *dict2;
     NSRect frame;
     
+    b_fullscreen = NO;
     [o_btn_fullscreen setState: NO];
 
     /* We always try to do so */
@@ -283,7 +304,7 @@
     if (!o_fullscreen_window)
         return;
 
-    if (MACOS_VERSION < 10.4f)
+    if (![self isVisible] || MACOS_VERSION < 10.4f)
     {
         /* We don't animate if we are not visible or if we are running on
         * Mac OS X <10.4 which doesn't support NSAnimation, instead we
@@ -296,7 +317,6 @@
         [[[[VLCMain sharedInstance] getControls] getFSPanel] setNonActive: nil];
         SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
 
-        [self makeKeyAndOrderFront:self];
         [self hasEndedFullscreen];
 
         CGDisplayFade( token, 0.5, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal, 0, 0, 0, NO );
@@ -361,7 +381,8 @@
     [[self contentView] replaceSubview:o_temp_view with:o_view];
     [o_view release];
     [o_view setFrame:[o_temp_view frame]];
-    [self makeKeyAndOrderFront:self];
+    if ([self isVisible])
+        [self makeKeyAndOrderFront:self];
     [o_fullscreen_window orderOut: self];
     EnableScreenUpdates();
 
@@ -391,4 +412,34 @@
     }
 }
 
+- (void)orderOut: (id)sender
+{
+    [super orderOut: sender];
+    /* Make sure we leave fullscreen */
+    [self leaveFullscreen];
+}
+
+/* Make sure setFrame gets executed on main thread especially if we are animating.
+ * (Thus we won't block the video output thread) */
+- (void)setFrame:(NSRect)frame display:(BOOL)display animate:(BOOL)animate
+{
+    struct { NSRect frame; BOOL display; BOOL animate;} args;
+    NSData *packedargs;
+
+    args.frame = frame;
+    args.display = display;
+    args.animate = animate;
+
+    packedargs = [NSData dataWithBytes:&args length:sizeof(args)];
+
+    [self performSelectorOnMainThread:@selector(setFrameOnMainThread:)
+                    withObject: packedargs waitUntilDone: YES];
+}
+
+- (void)setFrameOnMainThread:(NSData*)packedargs
+{
+    struct args { NSRect frame; BOOL display; BOOL animate; } * args = (struct args*)[packedargs bytes];
+
+    [super setFrame: args->frame display: args->display animate:args->animate];
+}
 @end

@@ -48,11 +48,17 @@
     NSViewAnimation * o_fullscreen_anim1;
     NSViewAnimation * o_fullscreen_anim2;
     NSView          * o_temp_view;
+    /* set to yes if we are fullscreen and all animations are over */
+    BOOL              b_fullscreen;
 }
 
 - (void)setTime:(NSString *)o_arg_ime position:(float)f_position;
 - (void)playStatusUpdated:(int)i_status;
 - (void)setSeekable:(BOOL)b_seekable;
+
+- (NSView *)mainView;
+
+- (BOOL)isFullscreen;
 
 - (void)enterFullscreen;
 - (void)leaveFullscreen;
@@ -60,5 +66,7 @@
 /* private */
 - (void)hasEndedFullscreen;
 - (void)hasBecomeFullscreen;
+
+- (void)setFrameOnMainThread:(NSData*)packedargs;
 @end
 

@@ -245,10 +245,21 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     [o_view setFrameSize: [self frame].size];
 }
 
+- (void)drawRect:(NSRect)rect
+{
+    /* When there is no subview we draw a black background */
+    [self lockFocus];
+    [[NSColor blackColor] set];
+    NSRectFill(rect);
+    [self unlockFocus];
+}
+
 - (void)closeVout
 {
     [[[[VLCMain sharedInstance] getControls] getFSPanel] fadeOut];
 
+    /* Make sure we don't see a white flash */
+    [[self window] disableScreenUpdatesUntilFlush];
     [o_view removeFromSuperview];
     o_view = nil;
     p_vout = NULL;
@@ -334,6 +345,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     if ( !p_vout->b_fullscreen )
     {
+        NSView *mainView;
         NSRect new_frame;
         topleftbase.x = 0;
         topleftbase.y = [o_window frame].size.height;
@@ -355,11 +367,18 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
             newsize.height = (int) ( i_corrected_height * factor );
         }
 
+        /* In fullscreen mode we need to use a view that is different from
+         * ourselves, with the VLCEmbeddedWindow */
+        if([o_window isKindOfClass:[VLCEmbeddedWindow class]])
+            mainView = [o_window mainView];
+        else
+            mainView = self;
+
         /* Calculate the window's new size */
         new_frame.size.width = [o_window frame].size.width -
-                                    [self frame].size.width + newsize.width;
+                                    [mainView frame].size.width + newsize.width;
         new_frame.size.height = [o_window frame].size.height -
-                                    [self frame].size.height + newsize.height;
+                                    [mainView frame].size.height + newsize.height;
 
         new_frame.origin.x = topleftscreen.x;
         new_frame.origin.y = topleftscreen.y - new_frame.size.height;
@@ -894,19 +913,34 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 {
     BOOL b_return = [super setVout: p_arg_vout subView: view frame: s_arg_frame];
 
+    /* o_window needs to point to our o_embeddedwindow, super might have set it
+     * to the fullscreen window that o_embeddedwindow setups during fullscreen */
+    o_window = o_embeddedwindow;
+    
     if( b_return )
     {
         [o_window setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
         [self updateTitle];
-        [self scaleWindowWithFactor: 1.0 animate: NO];
-        [o_window makeKeyAndOrderFront: self];
+
+        if(!([o_window isFullscreen]))
+            [o_window makeKeyAndOrderFront: self];
+
+        NSLog(@"We are %s animating (%s)",  [o_window isVisible] && (![o_window isFullscreen]) ? "" :"not", [o_window isFullscreen] ? "fullscreen" : "");
+
+        [self scaleWindowWithFactor: 1.0 animate: [o_window isVisible] && (![o_window isFullscreen])];
     }
     return b_return;
 }
 
 - (void)closeVout
 {
-    [o_window orderOut: self];
+    playlist_t * p_playlist = pl_Yield( VLCIntf );
+
+    if(!playlist_IsPlaying( p_playlist ))
+        [o_window performSelectorOnMainThread: @selector(orderOut:) withObject: self waitUntilDone: YES];
+    
+    vlc_object_release( p_playlist );
+
     [super closeVout];
 }
 
