@@ -154,65 +154,37 @@ int intf_RunThread( intf_thread_t *p_intf )
 #ifdef __APPLE__
     NSAutoreleasePool * o_pool;
 
-    if( p_intf->b_block )
-    {
-        /* This is the primary intf */
-        /* Run a manager thread, launch the interface, kill the manager */
-        if( vlc_thread_create( p_intf, "manage", Manager,
-                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
-        {
-            msg_Err( p_intf, "cannot spawn manager thread" );
-            return VLC_EGENERIC;
-        }
-    }
-
+    /* If !clivlc, then run as a OS X application */
     if( p_intf->b_block && strncmp( p_intf->p_libvlc->psz_object_name,
                                     "clivlc", 6) )
     {
         o_pool = [[NSAutoreleasePool alloc] init];
         [VLCApplication sharedApplication];
         [NSApp setVLC: p_intf->p_libvlc];
-    }
 
-    if( p_intf->b_block &&
-        ( !strncmp( p_intf->p_module->psz_object_name, "macosx" , 6 ) ||
-          !strncmp( p_intf->p_libvlc->psz_object_name, "clivlc", 6 ) ) )
-    {
-        /* VLC in normal primary interface mode */
-        RunInterface( p_intf );
+        if( p_intf->pf_run )
+            RunInterface( p_intf );
+        else
+        {
+            [NSApp run];
+            while( !intf_ShouldDie( p_intf ) )
+                msleep( INTF_IDLE_SLEEP * 2);
+        }
         p_intf->b_die = VLC_TRUE;
     }
     else
+#endif
+    if( p_intf->b_block )
     {
-        /* This interface doesn't need to be run */
-        if( !p_intf->pf_run )
-            return VLC_SUCCESS;
-
-        /* Run the interface in a separate thread */
+        /* If we are clivlc+macosx, don't run the macosx GUI */
         if( !strcmp( p_intf->p_module->psz_object_name, "macosx" ) )
         {
             msg_Err( p_intf, "You cannot run the MacOS X module as an "
-                             "extra interface. Please read the "
+                             "interface in clivlc mode. Please read the "
                              "README.MacOSX.rtf file.");
             return VLC_EGENERIC;
         }
-        if( vlc_thread_create( p_intf, "interface", RunInterface,
-                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
-        {
-            msg_Err( p_intf, "cannot spawn interface thread" );
-            return VLC_EGENERIC;
-        }
-
-        if( p_intf->b_block )
-        {
-            /* VLC in primary interface mode with a working macosx vout */
-            [NSApp run];
-            p_intf->b_die = VLC_TRUE;
-        }
-    }
-#else
-    if( p_intf->b_block )
-    {
+        
         /* If the main interface does not have a run function,
          * implement a waiting loop ourselves
          */
@@ -232,6 +204,15 @@ int intf_RunThread( intf_thread_t *p_intf )
             return VLC_SUCCESS;
 
         /* Run the interface in a separate thread */
+        if( !strcmp( p_intf->p_module->psz_object_name, "macosx" ) )
+        {
+            msg_Err( p_intf, "You cannot run the MacOS X module as an "
+                             "extra interface. Please read the "
+                             "README.MacOSX.rtf file.");
+            return VLC_EGENERIC;
+        }
+
+        /* Run the interface in a separate thread */
         if( vlc_thread_create( p_intf, "interface", RunInterface,
                                VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
         {
@@ -239,7 +220,6 @@ int intf_RunThread( intf_thread_t *p_intf )
             return VLC_EGENERIC;
         }
     }
-#endif
 
     return VLC_SUCCESS;
 }
