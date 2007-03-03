@@ -50,7 +50,8 @@
     NSView          * o_temp_view;
     /* set to yes if we are fullscreen and all animations are over */
     BOOL              b_fullscreen;
-    NSLock          * o_animation_lock;
+    BOOL              b_animation_lock_alreadylocked;
+    NSRecursiveLock * o_animation_lock;
 }
 
 - (void)setTime:(NSString *)o_arg_ime position:(float)f_position;

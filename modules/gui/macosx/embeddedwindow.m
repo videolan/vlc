@@ -67,7 +67,11 @@
     /* Not fullscreen when we wake up */
     [o_btn_fullscreen setState: NO];
     b_fullscreen = NO;
-    o_animation_lock = [[NSLock alloc] init];
+    /* Use a recursive lock to be able to trigger enter/leavefullscreen
+     * in middle of an animation, providing that the enter/leave functions
+     * are called from the same thread */
+    o_animation_lock = [[NSRecursiveLock alloc] init];
+    b_animation_lock_alreadylocked = NO;
 }
 
 - (void)setTime:(NSString *)o_arg_time position:(float)f_position
@@ -170,6 +174,13 @@
     
     [self lockFullscreenAnimation];
 
+    /* This is a recursive lock. If we are already in the middle of an animation we
+     * unlock it. We don't add an extra locking here, because enter/leavefullscreen
+     * are executed always in the same thread */ 
+    if (b_animation_lock_alreadylocked)
+        [self unlockFullscreenAnimation];
+    b_animation_lock_alreadylocked = YES;
+
     if (!screen)
         screen = [self screen];
 
@@ -238,6 +249,7 @@
         /* We were already fullscreen nothing to do when NSAnimation
          * is not supported */
         [self unlockFullscreenAnimation];
+        b_animation_lock_alreadylocked = NO;
         return;
     }
 
@@ -245,6 +257,7 @@
     if (b_fullscreen)
     {
         [self unlockFullscreenAnimation];
+        b_animation_lock_alreadylocked = NO;
         return;
     }
 
@@ -318,6 +331,13 @@
 
     [self lockFullscreenAnimation];
 
+    /* This is a recursive lock. If we are already in the middle of an animation we
+     * unlock it. We don't add an extra locking here, because enter/leavefullscreen
+     * are executed always in the same thread */ 
+    if (b_animation_lock_alreadylocked)
+        [self unlockFullscreenAnimation];
+    b_animation_lock_alreadylocked = YES;
+
     b_fullscreen = NO;
     [o_btn_fullscreen setState: NO];
 
@@ -327,7 +347,8 @@
     /* Don't do anything if o_fullscreen_window is already closed */
     if (!o_fullscreen_window)
     {
-        [self lockFullscreenAnimation];
+        [self unlockFullscreenAnimation];
+        b_animation_lock_alreadylocked = NO;
         return;
     }
 
@@ -418,6 +439,7 @@
     [o_fullscreen_window release];
     o_fullscreen_window = nil;
     [self unlockFullscreenAnimation];
+    b_animation_lock_alreadylocked = NO;
 }
 
 - (void)animationDidEnd:(NSAnimation*)animation

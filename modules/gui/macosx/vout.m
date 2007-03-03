@@ -926,10 +926,11 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     
     if( b_return )
     {
-        [o_window setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
-        [self updateTitle];
-
         [o_window lockFullscreenAnimation];
+
+        [o_window setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
+
+        [self updateTitle];
 
         /* Make the window the front and key window before animating */
         if ([o_window isVisible] && (![o_window isFullscreen]))
