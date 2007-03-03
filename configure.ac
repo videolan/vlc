@@ -1364,7 +1364,7 @@ fi
 AC_CHECK_HEADERS(altivec.h)
 CPPFLAGS="${CPPFLAGS_save}"
 
-if test "${ac_cv_c_altivec}" != "no"; then
+if test "${ac_cv_c_altivec}" != "no" -a "${enable_altivec}" != "no" ; then
   AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C AltiVec extensions.)
   VLC_ADD_CFLAGS([libvlc],[${ac_cv_c_altivec}])
   VLC_ADD_CFLAGS([idctaltivec motionaltivec],[${ac_cv_c_altivec}])
