@@ -289,7 +289,6 @@ net_IPv6Join (vlc_object_t *obj, int fd, const struct sockaddr_in6 *src)
 }
 
 
-#if 0
 #if defined (WIN32) && !defined (MCAST_JOIN_SOURCE_GROUP)
 /*
  * I hate manual definitions: Error-prone. Portability hell.
@@ -298,16 +297,12 @@ net_IPv6Join (vlc_object_t *obj, int fd, const struct sockaddr_in6 *src)
  */
 #  warning Your C headers are out-of-date. Please update.
 
-/* No, I won't guess the layout of these two.
- * No, I don't want another socket protection level type-of obnoxious bug. */
-#  error Hmmm? This needs fixing.
-#  define MCAST_JOIN_GROUP XXX
+#  define MCAST_JOIN_GROUP 41
 struct group_req
 {
-    uint32_t gr_interface; FIXME
-    struct sockaddr_storage gr_group; FIXME
+    ULONG gr_interface;
+    struct sockaddr_storage gr_group;
 };
-
 
 #  define MCAST_JOIN_SOURCE_GROUP 45 /* from <ws2ipdef.h> */
 struct group_source_req
@@ -316,7 +311,6 @@ struct group_source_req
     struct sockaddr_storage gsr_group;
     struct sockaddr_storage gsr_source;
 };
-#endif
 #endif
 
 /**
