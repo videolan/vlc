@@ -861,15 +861,15 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 }
 
 - (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
-                     frame: (NSRect *) s_arg_frame
-
+                 frame: (NSRect *)s_arg_frame showWindow: (BOOL)b_show_window
 {
     BOOL b_return;
     b_return = [super setVout: p_arg_vout subView: view frame: s_arg_frame];
     if( b_return )
     {
         o_window = [self window];
-        [o_window makeKeyAndOrderFront: self];
+        if (b_show_window)
+            [o_window makeKeyAndOrderFront: self];
         [o_window setAcceptsMouseMovedEvents: TRUE];
 
         if( var_GetBool( p_real_vout, "video-on-top" ) )
@@ -880,6 +880,13 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         [view setFrameSize: [self frame].size];
     }
     return b_return;
+}
+
+- (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
+                     frame: (NSRect *) s_arg_frame
+
+{
+    return [self setVout: p_arg_vout subView: view frame:s_arg_frame showWindow: YES];
 }
 
 - (void)setUsed: (BOOL)b_new_used
@@ -911,7 +918,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
                      frame: (NSRect *) s_arg_frame
 {
-    BOOL b_return = [super setVout: p_arg_vout subView: view frame: s_arg_frame];
+    BOOL b_return = [super setVout: p_arg_vout subView: view frame: s_arg_frame showWindow: NO];
 
     /* o_window needs to point to our o_embeddedwindow, super might have set it
      * to the fullscreen window that o_embeddedwindow setups during fullscreen */
@@ -922,10 +929,16 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         [o_window setAlphaValue: var_GetFloat( p_vout, "macosx-opaqueness" )];
         [self updateTitle];
 
-        if(!([o_window isFullscreen]))
+        /* Make the window the front and key window before animating */
+        if ([o_window isVisible] && (![o_window isFullscreen]))
             [o_window makeKeyAndOrderFront: self];
 
         [self scaleWindowWithFactor: 1.0 animate: [o_window isVisible] && (![o_window isFullscreen])];
+
+        /* Make sure our window is visible, if we are not in fullscreen */
+        if (![o_window isFullscreen])
+            [o_window makeKeyAndOrderFront: self];
+
     }
     return b_return;
 }

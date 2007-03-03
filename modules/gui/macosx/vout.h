@@ -101,6 +101,9 @@
     BOOL b_used;
 }
 
+- (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
+                 frame: (NSRect *)s_arg_frame showWindow: (BOOL)b_show_window;
+
 - (void)setUsed: (BOOL)b_new_used;
 - (BOOL)isUsed;
 
