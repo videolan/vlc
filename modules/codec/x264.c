@@ -218,6 +218,10 @@ static void Close( vlc_object_t * );
     "Default of 16 is good for most footage, high motion sequences may " \
     "benefit from settings between 24 and 32. Range 0 to 64." )
 
+#define MVRANGE_TEXT N_("Maximum motion vector length")
+#define MVRANGE_LONGTEXT N_( "Maximum motion vector length in pixels. " \
+    "-1 is automatic, based on level." )
+
 #define SUBME_TEXT N_("Subpixel motion estimation and partition decision " \
     "quality")
 #if X264_BUILD >= 46 /* r477 */
@@ -502,6 +506,9 @@ vlc_module_begin();
         change_integer_range( 1, 64 );
 #endif
 
+    add_integer( SOUT_CFG_PREFIX "mvrange", -1, NULL, MVRANGE_TEXT,
+                 MVRANGE_LONGTEXT, VLC_FALSE );
+
     add_integer( SOUT_CFG_PREFIX "subme", 5, NULL, SUBME_TEXT,
                  SUBME_LONGTEXT, VLC_FALSE );
         change_integer_range( 1, SUBME_MAX );
@@ -609,11 +616,12 @@ static const char *ppsz_sout_options[] = {
     "cplxblur", "crf", "dct-decimate", "deadzone-inter", "deadzone-intra",
     "deblock", "direct", "direct-8x8", "filter", "fast-pskip", "frameref",
     "interlaced", "ipratio", "keyint", "keyint-min", "level", "loopfilter",
-    "me", "merange", "min-keyint", "mixed-refs", "nf", "nr", "partitions",
-    "pass", "pbratio", "psnr", "qblur", "qp", "qcomp", "qpstep", "qpmax",
-    "qpmin", "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut",
-    "sps-id", "ssim", "stats", "subme", "subpel", "tolerance", "trellis",
-    "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", NULL
+    "me", "merange", "min-keyint", "mixed-refs", "mvrange", "nf", "nr",
+    "partitions", "pass", "pbratio", "psnr", "qblur", "qp", "qcomp",
+    "qpstep", "qpmax", "qpmin", "qp-max", "qp-min", "quiet", "ratetol",
+    "ref", "scenecut", "sps-id", "ssim", "stats", "subme", "subpel",
+    "tolerance", "trellis", "verbose", "vbv-bufsize", "vbv-init",
+    "vbv-maxrate", "weightb", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -866,6 +874,9 @@ static int  Open ( vlc_object_t *p_this )
     if( val.i_int >= 1 && val.i_int <= 64 )
         p_sys->param.analyse.i_me_range = val.i_int;
 #endif
+
+    var_Get( p_enc, SOUT_CFG_PREFIX "mvrange", &val );
+        p_sys->param.analyse.i_mv_range = val.i_int;
 
     var_Get( p_enc, SOUT_CFG_PREFIX "direct", &val );
     if( !strcmp( val.psz_string, "none" ) )
