@@ -4880,7 +4880,8 @@ dnl
 enableqt4=false
 AC_ARG_ENABLE(qt4,
   [  --enable-qt4            QT 4 support (default enabled) ])
-AS_IF([test "${enable_qt4}" != "no"], [
+AS_IF([test "${enable_qt4}" != "no" &&
+  (test "${SYS}" != "darwin" || test "${enable_qt4}" = "yes")], [
   PKG_CHECK_MODULES(QT4, QtCore QtGui,
     [ VLC_ADD_PLUGINS([qt4])
       ALIASES="${ALIASES} qvlc"
