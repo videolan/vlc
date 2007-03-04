@@ -367,7 +367,6 @@ static VLCTreeItem *o_root_item = nil;
                         
                         break;
                     default:
-                        NSLog(@"unknow item in pref");
                         break;
                     }
                 } while( p_item < p_end && p_item++ );
@@ -532,7 +531,7 @@ static VLCTreeItem *o_root_item = nil;
     o_view = [[VLCFlippedView alloc] initWithFrame: s_vrc];
     [o_view setAutoresizingMask: NSViewWidthSizable | NSViewMinYMargin |
                                     NSViewMaxYMargin];
-NSLog(@"%s", __FUNCTION__);
+
 /* Create all subviews if it isn't already done because we cannot use */
 /* setHiden for MacOS < 10.3*/
     if( o_subviews == nil )
