@@ -112,9 +112,6 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->i_size = 0;
     p_intf->pf_run = Run;
 
-    p_intf->p_sys->p_input = NULL;
-    p_intf->p_sys->p_vout = NULL;
-
     var_AddCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
     return VLC_SUCCESS;
 }
@@ -127,14 +124,7 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     var_DelCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
-    if( p_intf->p_sys->p_input )
-    {
-        vlc_object_release( p_intf->p_sys->p_input );
-    }
-    if( p_intf->p_sys->p_vout )
-    {
-        vlc_object_release( p_intf->p_sys->p_vout );
-    }
+
     vlc_mutex_destroy( &p_intf->p_sys->change_lock );
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -173,46 +163,6 @@ static void Run( intf_thread_t *p_intf )
         /* Sleep a bit */
 //        msleep( INTF_IDLE_SLEEP );
 
-        /* Update the input */
-        if( p_intf->p_sys->p_input == NULL )
-        {
-            PL_LOCK;
-            p_intf->p_sys->p_input = p_playlist->p_input;
-            if( p_intf->p_sys->p_input )
-                vlc_object_yield( p_intf->p_sys->p_input );
-            PL_UNLOCK;
-        }
-        else if( p_intf->p_sys->p_input->b_dead )
-        {
-            vlc_object_release( p_intf->p_sys->p_input );
-            p_intf->p_sys->p_input = NULL;
-        }
-        p_input = p_intf->p_sys->p_input;
-
-        /* Update the vout */
-        p_last_vout = p_intf->p_sys->p_vout;
-        if( p_vout == NULL )
-        {
-            p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-            p_intf->p_sys->p_vout = p_vout;
-        }
-        else if( p_vout->b_die )
-        {
-            vlc_object_release( p_vout );
-            p_vout = NULL;
-            p_intf->p_sys->p_vout = NULL;
-        }
-
-        /* Register OSD channels */
-        if( p_vout && p_vout != p_last_vout )
-        {
-            for( i = 0; i < CHANNELS_NUMBER; i++ )
-            {
-                spu_Control( p_vout->p_spu, SPU_CHANNEL_REGISTER,
-                             &p_intf->p_sys->p_channels[ i ] );
-            }
-        }
-
         /* Find action triggered by hotkey */
         i_action = 0;
         i_key = GetKey( p_intf );
@@ -237,11 +187,36 @@ static void Run( intf_thread_t *p_intf )
             continue;
         }
 
+        /* Update the input */
+        PL_LOCK;
+        p_input = p_playlist->p_input;
+        if( p_input )
+            vlc_object_yield( p_input );
+        PL_UNLOCK;
+        
+        /* Update the vout */
+        p_last_vout = p_vout;
+        p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+
+        /* Register OSD channels */
+        if( p_vout && p_vout != p_last_vout )
+        {
+            for( i = 0; i < CHANNELS_NUMBER; i++ )
+            {
+                spu_Control( p_vout->p_spu, SPU_CHANNEL_REGISTER,
+                             &p_intf->p_sys->p_channels[ i ] );
+            }
+        }
+
         if( i_action == ACTIONID_QUIT )
         {
             p_intf->p_libvlc->b_die = VLC_TRUE;
             ClearChannels( p_intf, p_vout );
             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Quit" ) );
+            if( p_vout )
+                vlc_object_release( p_vout );
+            if( p_input )
+                vlc_object_release( p_input );
             continue;
         }
         else if( i_action == ACTIONID_VOL_UP )
@@ -738,6 +713,10 @@ static void Run( intf_thread_t *p_intf )
                 }
             }
         }
+        if( p_vout )
+            vlc_object_release( p_vout );
+        if( p_input )
+            vlc_object_release( p_input );
     }
     pl_Release( p_intf );
 }
