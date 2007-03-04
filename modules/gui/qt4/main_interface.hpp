@@ -77,6 +77,11 @@ private:
     VideoWidget         *videoWidget;
     virtual void keyPressEvent( QKeyEvent *);
 
+    bool embeddedPlaylistWasActive;
+    bool videoIsActive;
+    QSize savedVideoSize;
+
+
     BackgroundWidget    *bgWidget;
     VisualSelector      *visualSelector;
     ControlsWidget      *advControls;

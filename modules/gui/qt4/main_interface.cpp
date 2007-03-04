@@ -75,10 +75,6 @@ static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
     return p_intf->p_sys->p_mi->controlVideo( p_win, i_q, a );
 }
 
-bool embeddedPlaylistWasActive;
-bool videoIsActive;
-QSize savedVideoSize;
-
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
     /* Configuration */
@@ -292,13 +288,13 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
         if( VISIBLE( playlistWidget ) )
         {
             embeddedPlaylistWasActive = true;
-            playlistWidget->hide();
+//            playlistWidget->hide();
         }
         bool bgWasVisible = false;
         if( VISIBLE( bgWidget) )
         {
             bgWasVisible = true;
-            bgWidget->hide();
+//            bgWidget->hide();
         }
         if( THEMIM->getIM()->hasVideo() || !bgWasVisible )
         {
@@ -311,7 +307,7 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
             // videoWidget->widgetSize = bgWidget->widgeTSize;
             videoWidget->widgetSize = QSize( *pi_width, *pi_height );
         }
-        videoWidget->updateGeometry(); /// FIXME: Needed ?
+//        videoWidget->updateGeometry(); /// FIXME: Needed ?
         need_components_update = true;
     }
     return ret;
@@ -324,9 +320,9 @@ void MainInterface::releaseVideo( void *p_win )
     videoWidget->resize( videoWidget->widgetSize );
 
     if( embeddedPlaylistWasActive )
-        playlistWidget->show();
+        ;//playlistWidget->show();
     else if( bgWidget )
-        bgWidget->show();
+        ;//bgWidget->show();
 
     videoIsActive = false;
     need_components_update = true;
@@ -351,7 +347,7 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
             unsigned int i_width  = va_arg( args, unsigned int );
             unsigned int i_height = va_arg( args, unsigned int );
             videoWidget->widgetSize = QSize( i_width, i_height );
-            videoWidget->updateGeometry();
+            // videoWidget->updateGeometry();
             need_components_update = true;
             i_ret = VLC_SUCCESS;
             break;
