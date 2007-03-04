@@ -1086,6 +1086,8 @@ static VLCMain *_o_sharedMainInstance = nil;
         p_intf->p_sys->b_current_title_update = VLC_TRUE;
         p_intf->p_sys->b_intf_update = VLC_TRUE;
         p_intf->p_sys->b_input_update = VLC_FALSE;
+        if( p_intf->p_sys->p_input )
+            vlc_object_yield( p_intf->p_sys->p_input );
     }
     if( p_intf->p_sys->b_intf_update )
     {
@@ -1103,7 +1105,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         if( ( b_input = ( p_intf->p_sys->p_input != NULL ) ) )
         {
-            vlc_object_yield( p_intf->p_sys->p_input );
             /* seekable streams */
             b_seekable = var_GetBool( p_intf->p_sys->p_input, "seekable" );
 
@@ -1112,7 +1113,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
             /* chapters & titles */
             //b_chapters = p_intf->p_sys->p_input->stream.i_area_nb > 1;
-            vlc_object_release( p_intf->p_sys->p_input );
         }
 
         [o_btn_stop setEnabled: b_input];
@@ -1551,6 +1551,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     vout_thread_t * p_vout;
     int returnedValue = 0;
     
+    if (p_intf->p_sys->p_input)
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+        p_intf->p_sys->p_input = NULL;
+    }
     /* Stop playback */
     p_playlist = pl_Yield( p_intf );
     playlist_Stop( p_playlist );
