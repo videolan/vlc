@@ -372,10 +372,10 @@ ifeq ($(BUILD),i586-pc-beos)
 endif
 ifneq ($(HOST),$(BUILD))
 # We'll use the installed gettext and only need to cross-compile libintl, also build autopoint and gettextsize tools need for VLC bootstrap
-	( cd $< && make -C gettext-runtime/intl && make -C gettext-runtime/intl install && make -C gettext-tools/misc install )
+	( cd $< && make -C gettext-runtime/intl && patch -p1 < ../Patches/libintl.patch && make -C gettext-runtime/intl install && make -C gettext-tools/misc install )
 else
 # Build and install the whole gettext
-	( cd $< && make && make install )
+	( cd $< && make && patch -p1 < ../Patches/libintl.patch && make install )
 endif
 # Work around another non-sense of autoconf.
 ifdef HAVE_WIN32
