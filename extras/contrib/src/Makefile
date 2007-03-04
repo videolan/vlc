@@ -1472,7 +1472,7 @@ endif
 
 .twolame: twolame
 ifdef HAVE_WIN32
-	(cd twolame/win32; wget "http://twolame.svn.sourceforge.net/viewvc/*checkout*/twolame/trunk/win32/winutil.h")
+	(cd twolame/win32; $(WGET) "http://twolame.svn.sourceforge.net/viewvc/*checkout*/twolame/trunk/win32/winutil.h")
 endif	
 	(cd twolame; $(HOSTCC) CFLAGS="${CFLAGS}  -DLIBTWOLAME_STATIC" ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd libtwolame &&  make && make install)
 	$(INSTALL_NAME)
