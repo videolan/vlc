@@ -4896,7 +4896,7 @@ AS_IF([test "${enable_qt4}" != "no" &&
       ],[
 	 AC_MSG_WARN(QT4 library not found)
       ])
-    ])
+    )
 ])
 AM_CONDITIONAL(ENABLE_QT4, test "$enableqt4" = "true")
 
