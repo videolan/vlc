@@ -229,8 +229,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         /* Interface Panel */
         START_SPREFS_CAT( Interface, "Interfaces settings" );
-            CONFIG_GENERIC( "language", StringList, NULL, language );
 
+            CONFIG_GENERIC( "language", StringList, NULL, language );
+#if !defined( WIN32 ) && !defined( HAVE_DBUS_3 )
+            ui.OneInterfaceBox->hide();
+#endif
             /* interface */
 /*            p_config = config_FindConfig( VLC_OBJECT(p_intf), "intf" );
             if( p_config->value.psz && strcmp( p_config->value.psz, "qt4" ))
@@ -241,9 +244,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
             CONFIG_GENERIC( "skins2-last", String, NULL, fileSkin); 
                     //FIXME File
+#if defined( WIN32 ) || defined(HAVE_DBUS_3)
             CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
             CONFIG_GENERIC( "playlist-enqueue", Bool, NULL, 
                     EnqueueOneInterfaceMode );
+#endif
         END_SPREFS_CAT;
 
         START_SPREFS_CAT( Subtitles, "Subtitles & OSD settings" );
