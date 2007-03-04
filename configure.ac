@@ -4891,7 +4891,12 @@ AS_IF([test "${enable_qt4}" != "no" &&
       MOC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/moc
       RCC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/rcc
       UIC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/uic],
-    [AC_MSG_ERROR(QT4 library not found)])
+      AS_IF([test "${enable_qt4}" = "yes"],[
+	AC_MSG_ERROR(QT4 library not found)
+      ],[
+	 AC_MSG_WARN(QT4 library not found)
+      ])
+    ])
 ])
 AM_CONDITIONAL(ENABLE_QT4, test "$enableqt4" = "true")
 
