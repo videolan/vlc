@@ -1353,6 +1353,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [o_controls setupVarMenuItem: o_mi_screen target: (vlc_object_t *)p_vout
                              var: "video-device" selector: @selector(toggleVar:)];
+    vlc_object_release( (vlc_object_t *)p_vout );
 }
 
 - (void)setScrollField:(NSString *)o_string stopAfter:(int)timeout
@@ -1571,14 +1572,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     
     p_intf->b_interaction = VLC_FALSE;
     var_DelCallback( p_intf, "interaction", InteractCallback, self );
-
-#define p_input p_intf->p_sys->p_input
-    if( p_input )
-    {
-        vlc_object_release( p_input );
-        p_input = NULL;
-    }
-#undef p_input
 
     /* remove global observer watching for vout device changes correctly */
     [[NSNotificationCenter defaultCenter] removeObserver: self

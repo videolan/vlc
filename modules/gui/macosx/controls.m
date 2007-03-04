@@ -393,6 +393,7 @@
         intf_thread_t * p_intf = VLCIntf;
         val.i_int = config_GetInt( p_intf, "key-position" );
         var_Set( p_intf, "key-pressed", val );
+        vlc_object_release( (vlc_object_t *)p_vout );
     }
 }
 

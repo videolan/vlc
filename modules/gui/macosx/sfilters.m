@@ -646,8 +646,6 @@ static VLCsFilters *_o_sharedInstance = nil;
 
     free( psz_string );
 
-    vlc_object_release( p_intf );
-
     o_config_changed = YES;
 }
 @end
