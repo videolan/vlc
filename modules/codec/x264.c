@@ -163,6 +163,12 @@ static void Close( vlc_object_t * );
 #define CHROMA_QP_OFFSET_TEXT N_("QP difference between chroma and luma")
 #define CHROMA_QP_OFFSET_LONGTEXT N_( "QP difference between chroma and luma.")
 
+#define PASS_TEXT N_("Multipass ratecontrol")
+#define PASS_LONGTEXT N_( "Multipass ratecontrol:\n" \
+    " - 1: First pass, creates stats file\n" \
+    " - 2: Last pass, does not overwrite stats file\n" \
+    " - 3: Nth pass, overwrites stats file\n" )
+
 #define QCOMP_TEXT N_("QP curve compression")
 #define QCOMP_LONGTEXT N_( "QP curve compression. Range 0.0 (CBR) to 1.0 (QCP).")
 
@@ -285,13 +291,8 @@ static void Close( vlc_object_t * );
 #define ASM_TEXT N_("CPU optimizations")
 #define ASM_LONGTEXT N_( "Use assembler CPU optimizations.")
 
-#define STAT_IN_TEXT N_("Statistics input file")
-#define STAT_IN_LONGTEXT N_( "Read rate-control stastics from provided file (for multi-pass " \
-    "encoding.")
-
-#define STAT_OUT_TEXT N_("Statistics output file")
-#define STAT_OUT_LONGTEXT N_( "Write rate-control stastics to provided file (for multi-pass " \
-    "encoding.")
+#define STATS_TEXT N_("Filename for 2 pass stats file")
+#define STATS_LONGTEXT N_( "Filename for 2 pass stats file for multi-pass encoding.")
 
 #define PSNR_TEXT N_("PSNR computation")
 #define PSNR_LONGTEXT N_( "Compute and print PSNR stats. This has no effect on " \
@@ -454,6 +455,10 @@ vlc_module_begin();
                  CHROMA_QP_OFFSET_LONGTEXT, VLC_FALSE );
 #endif
 
+    add_integer( SOUT_CFG_PREFIX "pass", 0, NULL, PASS_TEXT,
+                 PASS_LONGTEXT, VLC_FALSE );
+        change_integer_range( 0, 3 );
+
     add_float( SOUT_CFG_PREFIX "qcomp", 0.60, NULL, QCOMP_TEXT,
                QCOMP_LONGTEXT, VLC_FALSE );
         change_float_range( 0, 1 );
@@ -590,11 +595,8 @@ vlc_module_begin();
               VERBOSE_LONGTEXT, VLC_FALSE );
 #endif
 
-    add_string( SOUT_CFG_PREFIX "stat-in", NULL, NULL, STAT_IN_TEXT,
-                STAT_IN_LONGTEXT, VLC_FALSE );
-
-    add_string( SOUT_CFG_PREFIX "stat-out", NULL, NULL, STAT_OUT_TEXT,
-                STAT_OUT_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "stats", "x264_2pass.log", NULL, STATS_TEXT,
+                STATS_LONGTEXT, VLC_FALSE );
 
 vlc_module_end();
 
@@ -608,11 +610,10 @@ static const char *ppsz_sout_options[] = {
     "deblock", "direct", "direct-8x8", "filter", "fast-pskip", "frameref",
     "interlaced", "ipratio", "keyint", "keyint-min", "level", "loopfilter",
     "me", "merange", "min-keyint", "mixed-refs", "nf", "nr", "partitions",
-    "pbratio", "psnr", "qblur", "qp", "qcomp", "qpstep", "qpmax", "qpmin",
-    "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut", "sps-id",
-    "ssim", "subme", "subpel", "tolerance", "trellis", "verbose",
-    "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "stat-in", "stat-out",
-    NULL
+    "pass", "pbratio", "psnr", "qblur", "qp", "qcomp", "qpstep", "qpmax",
+    "qpmin", "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut",
+    "sps-id", "ssim", "stats", "subme", "subpel", "tolerance", "trellis",
+    "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -1077,33 +1078,19 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_threads = p_enc->i_threads;
 #endif
 
-    /* Statistics input/output preferences */
-    var_Get( p_enc, SOUT_CFG_PREFIX "stat-in", &val );
-    if( val.psz_string && *val.psz_string )
+    var_Get( p_enc, SOUT_CFG_PREFIX "stats", &val );
+    if( val.psz_string )
     {
-        p_sys->param.rc.b_stat_read = 1;
         p_sys->param.rc.psz_stat_in = val.psz_string;
-        
-        msg_Dbg( p_enc, "Reading encoding statistics from \"%s\"\n",
-          p_sys->param.rc.psz_stat_in );
-    }
-    else
-    {
-        p_sys->param.rc.b_stat_read = 0;
+        p_sys->param.rc.psz_stat_out = val.psz_string;
+        free( val.psz_string );
     }
 
-    var_Get( p_enc, SOUT_CFG_PREFIX "stat-out", &val );
-    if( val.psz_string && *val.psz_string )
+    var_Get( p_enc, SOUT_CFG_PREFIX "pass", &val );
+    if( val.i_int > 0 && val.i_int <= 3 )
     {
-        p_sys->param.rc.b_stat_write = 1;
-        p_sys->param.rc.psz_stat_out = val.psz_string;
-        
-        msg_Dbg( p_enc, "Writing encoding statistics to \"%s\"\n",
-          p_sys->param.rc.psz_stat_out );
-    }
-    else
-    {
-        p_sys->param.rc.b_stat_write = 0;
+        p_sys->param.rc.b_stat_write = val.i_int & 1;
+        p_sys->param.rc.b_stat_read = val.i_int & 2;
     }
 
     /* Open the encoder */
