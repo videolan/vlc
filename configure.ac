@@ -4778,18 +4778,11 @@ dnl
 dnl  wxWidgets module
 dnl
 AC_ARG_ENABLE(wxwidgets,
-  [  --enable-wxwidgets      wxWidgets support (default enabled)])
-if test "${enable_wxwindows}" 
-then
-  AC_MSG_WARN(--{en|dis}able-wxwindows is deprecated. Use --{en|dis}able-wxwidgets instead.)
-fi
+  [  --enable-wxwidgets      wxWidgets support (default disabled)])
 
-if test "${enable_wxwindows}" = "no"
+if test "${enable_wxwidgets}" = "yes"
 then
-  enable_wxwidgets="no"
-fi
-if test "${enable_wxwidgets}" != "no"
-then
+  AC_MSG_WARN([wxWidgets support is deprecated and will be removed. Consider using Qt4 instead.])
   WXWIDGETS_PATH="${PATH}"
   AC_ARG_WITH(wx-config-path,
     [    --with-wx-config-path=PATH wx-config path (default search in \$PATH)],
@@ -4810,7 +4803,7 @@ then
   then
     if expr 2.6.0 \> `${WX_CONFIG} --version` >/dev/null ||  expr 2.7.0 \<= `${WX_CONFIG} --version` >/dev/null
     then
-      AC_MSG_ERROR([You need wxWidgets of the 2.6 branch. Please upgrade and try again. Alternatively you can also configure with --disable-wxwidgets.])
+      AC_MSG_ERROR([You need wxWidgets of the 2.6 branch. Please upgrade/downgrade and try again. Better yet, you can configure with --disable-wxwidgets.])
     fi
     AC_LANG_PUSH(C++)
     # Turn this error:
@@ -4844,7 +4837,7 @@ then
       # the following is required to compile for win32
       VLC_ADD_CXXFLAGS([wxwidgets],[-D_UNICODE -DUNICODE])
     else
-      AC_MSG_ERROR([You need a unicode build of wxWidgets. Please upgrade and try again. Alternatively you can also configure with --disable-wxwidgets.])
+      AC_MSG_ERROR([You need a unicode build of wxWidgets. Please fix that and try again. Better yet, you can configure with --disable-wxwidgets.])
     fi
     if test "$have_libcdio" = "yes"
     then 
@@ -4886,19 +4879,19 @@ dnl QT 4
 dnl
 enableqt4=false
 AC_ARG_ENABLE(qt4,
-  [  --enable-qt4            QT 4 support (default disabled) ],
-  [if test "${enable_qt4}" = "yes"; then
-      PKG_CHECK_MODULES(QT4, QtCore QtGui,
-  	[ VLC_ADD_PLUGINS([qt4])
-          ALIASES="${ALIASES} qvlc"
-	  enableqt4=true
-	  VLC_ADD_LDFLAGS([qt4],[$QT4_LIBS])
-	  VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS])
-	  MOC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/moc
-	  RCC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/rcc
-	  UIC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/uic],
-       [AC_MSG_WARN(QT4 library not found)])
-   fi])
+  [  --enable-qt4            QT 4 support (default disabled) ])
+AS_IF([test "${enable_qt4}" = "yes"], [
+  PKG_CHECK_MODULES(QT4, QtCore QtGui,
+    [ VLC_ADD_PLUGINS([qt4])
+      ALIASES="${ALIASES} qvlc"
+      enableqt4=true
+      VLC_ADD_LDFLAGS([qt4],[$QT4_LIBS])
+      VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS])
+      MOC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/moc
+      RCC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/rcc
+      UIC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/uic],
+    [AC_MSG_ERROR(QT4 library not found)])
+])
 AM_CONDITIONAL(ENABLE_QT4, test "$enableqt4" = "true")
 
 dnl
