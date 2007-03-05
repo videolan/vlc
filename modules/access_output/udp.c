@@ -700,7 +700,7 @@ static void ThreadWrite( vlc_object_t *p_this )
         }
 #endif
 
-        if (p_thread->rtcp_handle != -1)
+        if ((p_thread->rtcp_handle != -1) && (p_pk->i_buffer >= 8))
         {
             /* FIXME: this is a very incorrect simplistic RTCP timer */
             if ((rtcp_counter / 80) >= p_thread->rtcp_size)
