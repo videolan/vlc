@@ -22,7 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#define _WIN32_WINNT 0x501
 #include <vlc/vlc.h>
 
 #include <stddef.h> /* size_t */
@@ -451,42 +450,41 @@ getaddrinfo (const char *node, const char *service,
 #endif /* if !HAVE_GETADDRINFO */
 #endif
 
-#if 0 && defined( WIN32 ) && !defined( UNDER_CE )
+#if defined( WIN32 ) && !defined( UNDER_CE )
     /*
      * Here is the kind of kludge you need to keep binary compatibility among
      * varying OS versions...
      */
-typedef int (CALLBACK * GETNAMEINFO) ( const struct sockaddr*, socklen_t,
-                                           char*, DWORD, char*, DWORD, int );
-typedef int (CALLBACK * GETADDRINFO) (const char *, const char *,
-                                          const struct addrinfo *,
-                                          struct addrinfo **);
+typedef int (WSAAPI * GETNAMEINFO) ( const struct sockaddr FAR *, socklen_t,
+                                           char FAR *, DWORD, char FAR *, DWORD, int );
+typedef int (WSAAPI * GETADDRINFO) (const char FAR *, const char FAR *,
+                                          const struct addrinfo FAR *,
+                                          struct addrinfo FAR * FAR *);
 
-typedef void (CALLBACK * FREEADDRINFO) ( struct addrinfo * );
+typedef void (WSAAPI * FREEADDRINFO) ( struct addrinfo FAR * );
 
-
-static WINAPI int _ws2_getnameinfo_bind( const struct sockaddr *sa, socklen_t salen,
-               char *host, DWORD hostlen, char *serv, DWORD servlen, int flags );
-
-static WINAPI int _ws2_getaddrinfo_bind(const char *node, const char *service,
-               const struct addrinfo *hints, struct addrinfo **res);
+static int WSAAPI _ws2_getnameinfo_bind ( const struct sockaddr FAR *, socklen_t,
+                                           char FAR *, DWORD, char FAR *, DWORD, int );
+static int WSAAPI _ws2_getaddrinfo_bind (const char FAR *, const char FAR *,
+                                          const struct addrinfo FAR *,
+                                          struct addrinfo FAR * FAR *);
 
 static GETNAMEINFO ws2_getnameinfo = _ws2_getnameinfo_bind;
 static GETADDRINFO ws2_getaddrinfo = _ws2_getaddrinfo_bind;
 static FREEADDRINFO ws2_freeaddrinfo;
 
-static FARPROC ws2_find_api (const char *name)
+static FARPROC ws2_find_api (LPCTSTR name)
 {
     FARPROC f = NULL;
 
-    HMODULE m = GetModuleHandle ("WS2_32");
+    HMODULE m = GetModuleHandle (TEXT("WS2_32"));
     if (m != NULL)
         f = GetProcAddress (m, name);
 
     if (f == NULL)
     {
         /* Windows 2K IPv6 preview */
-        m = LoadLibrary ("WSHIP6");
+        m = LoadLibrary (TEXT("WSHIP6"));
         if (m != NULL)
             f = GetProcAddress (m, name);
     }
@@ -494,14 +492,15 @@ static FARPROC ws2_find_api (const char *name)
     return f;
 }
 
-static WINAPI int _ws2_getnameinfo_bind( const struct sockaddr *sa, socklen_t salen,
-               char *host, DWORD hostlen, char *serv, DWORD servlen, int flags )
+static WSAAPI int _ws2_getnameinfo_bind( const struct sockaddr FAR * sa, socklen_t salen,
+               char FAR *host, DWORD hostlen, char FAR *serv, DWORD servlen, int flags )
 {
-    GETNAMEINFO entry = (GETNAMEINFO)ws2_find_api ("getnameinfo");
+    GETNAMEINFO entry = (GETNAMEINFO)ws2_find_api (TEXT("getnameinfo"));
     if (entry != NULL)
     {
+        int result = entry (sa, salen, host, hostlen, serv, servlen, flags);
         ws2_getnameinfo = entry;
-        return entry (sa, salen, host, hostlen, serv, servlen, flags);
+        return result;
     }
     /* return a possible error if API is not found */
     WSASetLastError (WSAEAFNOSUPPORT);
@@ -510,17 +509,21 @@ static WINAPI int _ws2_getnameinfo_bind( const struct sockaddr *sa, socklen_t sa
 #undef getnameinfo
 #define getnameinfo ws2_getnameinfo
 
-static WINAPI int _ws2_getaddrinfo_bind(const char *node, const char *service,
-               const struct addrinfo *hints, struct addrinfo **res)
+static WSAAPI int _ws2_getaddrinfo_bind(const char FAR *node, const char FAR *service,
+               const struct addrinfo FAR *hints, struct addrinfo FAR * FAR *res)
 {
-    GETADDRINFO entry = (GETADDRINFO)ws2_find_api ("getaddrinfo");
-    FREEADDRINFO freentry = (FREEADDRINFO)ws2_find_api ("freeaddrinfo");
+    GETADDRINFO entry;
+    FREEADDRINFO freentry;
+
+    entry = (GETADDRINFO)ws2_find_api (TEXT("getaddrinfo"));
+    freentry = (FREEADDRINFO)ws2_find_api (TEXT("freeaddrinfo"));
 
     if ((entry != NULL) && (freentry != NULL))
     {
+        int result = entry (node, service, hints, res);
         ws2_freeaddrinfo = freentry;
         ws2_getaddrinfo = entry;
-        return entry (node, service, hints, res);
+        return result;
     }
     /* return a possible error if API is not found */
     WSASetLastError (WSAHOST_NOT_FOUND);
