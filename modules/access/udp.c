@@ -531,54 +531,86 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
  *****************************************************************************/
 static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
 {
-    int      i_rtp_version;
-    int      i_CSRC_count;
     int      i_payload_type;
-    int      i_skip = 0;
-    int      i_extension_flag = 0;
-    int      i_extension_length = 0;
-    uint16_t i_sequence_number = 0;
+    size_t   i_skip = RTP_HEADER_LEN;
 
     if( p_block == NULL )
         return NULL;
 
     if( p_block->i_buffer < RTP_HEADER_LEN )
+    {
+        msg_Dbg( p_access, "short RTP packet received" );
         goto trash;
+    }
 
     /* Parse the header and make some verifications.
      * See RFC 3550. */
-    i_rtp_version     = ( p_block->p_buffer[0] & 0xC0 ) >> 6;
-    i_CSRC_count      = p_block->p_buffer[0] & 0x0F;
-    i_extension_flag  = p_block->p_buffer[0] & 0x10;
-    i_payload_type    = p_block->p_buffer[1] & 0x7F;
-    i_sequence_number = (p_block->p_buffer[2] << 8 ) + p_block->p_buffer[3];
-
-    if( i_rtp_version != 2 )
-        msg_Dbg( p_access, "RTP version is %u, should be 2", i_rtp_version );
-
-    if( i_payload_type == 14 || i_payload_type == 32)
-        i_skip = 4;
-    else if( i_payload_type !=  33 )
-        msg_Dbg( p_access, "unsupported RTP payload type (%u)", i_payload_type );
-    if( i_extension_flag )
+    // Version number:
+    if( ( p_block->p_buffer[0] >> 6 ) != 2)
     {
-        if( p_block->i_buffer < 16 )
+        msg_Dbg( p_access, "RTP version is %u instead of 2",
+                 p_block->p_buffer[0] >> 6 );
+        goto trash;
+    }
+    // Padding bit:
+    uint8_t pad = (p_block->p_buffer[0] & 0x20)
+                    ? p_block->p_buffer[p_block->i_buffer - 1] : 0;
+    // Extension header:
+    if ((p_block->p_buffer[0] & 0x10)) /* Extension header */
+    {
+        i_skip += 4;
+        if ((size_t)p_block->i_buffer < i_skip)
             goto trash;
-        i_extension_length = 4 +
-            4 * ( (p_block->p_buffer[14] << 8) + p_block->p_buffer[15] );
+
+        i_skip += 4 * GetWBE( p_block->p_buffer + 14 );
+    }
+    // CSRC count:
+    i_skip += (p_block->p_buffer[0] & 0x0F) * 4;
+
+    i_payload_type    = p_block->p_buffer[1] & 0x7F;
+
+    /* Remember sequence number in i_dts */
+    p_block->i_pts = mdate();
+    p_block->i_dts = (mtime_t) GetWBE( p_block->p_buffer + 2 );
+
+    /* FIXME: use ptmap */
+    switch( i_payload_type )
+    {
+        case 14: // MPA: MPEG Audio (RFC2250, §3.4)
+            i_skip += 4; // 32 bits RTP/MPA header
+            break;
+
+        case 32: // MPV: MPEG Video (RFC2250, §3.5)
+            i_skip += 4; // 32 bits RTP/MPV header
+            if( (size_t)p_block->i_buffer < i_skip )
+                goto trash;
+            if( p_block->p_buffer[i_skip - 3] & 0x4 )
+            {
+                /* MPEG2 Video extension header */
+                /* TODO: shouldn't we skip this too ? */
+            }
+            break;
+
+        case 33: // MP2: MPEG TS (RFC2250, §2)
+            /* plain TS over RTP */
+            break;
+
+        default:
+            msg_Dbg( p_access, "unsupported RTP payload type: %u", i_payload_type );
+            goto trash;
     }
 
-    /* Skip header + CSRC extension field n*(32 bits) + extension */
-    i_skip += RTP_HEADER_LEN + 4*i_CSRC_count + i_extension_length;
-
-    if( i_skip >= p_block->i_buffer )
+    if( (size_t)p_block->i_buffer < (i_skip + pad) )
         goto trash;
 
-    /* Return the packet without the RTP header, remember seqno in i_dts */
+    /* Remove the RTP header */
     p_block->i_buffer -= i_skip;
     p_block->p_buffer += i_skip;
-    p_block->i_pts = mdate();
-    p_block->i_dts = (mtime_t) i_sequence_number;
+
+    /* This is the place for deciphering and authentication */
+
+    /* Remove padding (at the end) */
+    p_block->i_buffer -= pad;
 
 #if 0
     /* Emulate packet loss */
@@ -593,7 +625,6 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     return p_block;
 
 trash:
-    msg_Warn( p_access, "received a too short packet for RTP" );
     block_Release( p_block );
     return NULL;
 }
