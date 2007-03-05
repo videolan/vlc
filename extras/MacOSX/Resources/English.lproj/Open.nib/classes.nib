@@ -239,6 +239,8 @@
         }, 
         {
             ACTIONS = {
+                eyetvLaunch = id; 
+                eyetvSwitchChannel = id; 
                 openDisc = id; 
                 openDiscMenusChanged = id; 
                 openDiscStepperChanged = id; 
@@ -278,6 +280,18 @@
                 "o_disc_type" = id; 
                 "o_disc_videots_btn_browse" = id; 
                 "o_disc_videots_folder" = id; 
+                "o_eyetv_channels_pop" = id; 
+                "o_eyetv_chn_bgbar" = id; 
+                "o_eyetv_chn_status_txt" = id; 
+                "o_eyetv_currentChannel_lbl" = id; 
+                "o_eyetv_launchEyeTV_btn" = id; 
+                "o_eyetv_nextProgram_btn" = id; 
+                "o_eyetv_noDeviceLong_lbl" = id; 
+                "o_eyetv_noDevice_lbl" = id; 
+                "o_eyetv_noEyeTVLong_lbl" = id; 
+                "o_eyetv_noEyeTV_lbl" = id; 
+                "o_eyetv_previousProgram_btn" = id; 
+                "o_eyetv_tabView" = id; 
                 "o_file_btn_browse" = id; 
                 "o_file_path" = id; 
                 "o_file_stream" = id; 
