@@ -72,6 +72,7 @@
 		C2F2A707095AE51700018C74 /* play_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A703095AE51600018C74 /* play_embedded_blue.png */; };
 		C2F2A708095AE51700018C74 /* skip_forward_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A704095AE51600018C74 /* skip_forward_embedded_blue.png */; };
 		C2F2A709095AE51700018C74 /* skip_previous_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A705095AE51600018C74 /* skip_previous_embedded_blue.png */; };
+		CC1941250B9C1F8400635F6B /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC1941240B9C1F8400635F6B /* QTKit.framework */; };
 		CC1AC1BC0A7BDA41002478C3 /* InteractionErrorPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC1AC1BA0A7BDA41002478C3 /* InteractionErrorPanel.nib */; };
 		CC1B4B4D09A8CF9E0078AD2E /* Interaction.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC1B4B4B09A8CF9E0078AD2E /* Interaction.nib */; };
 		CC26BF2C09A7A05000E94D62 /* Update.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC26BF2A09A7A05000E94D62 /* Update.nib */; };
@@ -146,7 +147,7 @@
 			productName = vlc;
 			productReference = 014CEA410018CDE011CA2923 /* VLC.bundle */;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
 <plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
@@ -954,6 +955,7 @@
 		C2F2A703095AE51600018C74 /* play_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = play_embedded_blue.png; path = Resources/play_embedded_blue.png; sourceTree = "<group>"; };
 		C2F2A704095AE51600018C74 /* skip_forward_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = skip_forward_embedded_blue.png; path = Resources/skip_forward_embedded_blue.png; sourceTree = "<group>"; };
 		C2F2A705095AE51600018C74 /* skip_previous_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = skip_previous_embedded_blue.png; path = Resources/skip_previous_embedded_blue.png; sourceTree = "<group>"; };
+		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		CC1AC1BB0A7BDA41002478C3 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/InteractionErrorPanel.nib; sourceTree = "<group>"; };
 		CC1B4B4C09A8CF9E0078AD2E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Interaction.nib; sourceTree = "<group>"; };
 		CC1B4C1409A8EC690078AD2E /* interaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interaction.h; path = ../../modules/gui/macosx/interaction.h; sourceTree = "<group>"; };
@@ -971,6 +973,8 @@
 		CC4ED9B20ABE07C800CA4CC5 /* shuffle_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = shuffle_embedded.png; path = Resources/shuffle_embedded.png; sourceTree = "<group>"; };
 		CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppleRemote.h; path = ../../modules/gui/macosx/AppleRemote.h; sourceTree = SOURCE_ROOT; };
 		CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppleRemote.m; path = ../../modules/gui/macosx/AppleRemote.m; sourceTree = SOURCE_ROOT; };
+		CC6EDD4F0B9CA2140096068A /* eyetv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = eyetv.h; path = ../../modules/gui/macosx/eyetv.h; sourceTree = SOURCE_ROOT; };
+		CC6EDD500B9CA2140096068A /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../modules/gui/macosx/eyetv.m; sourceTree = SOURCE_ROOT; };
 		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
 		CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = embeddedwindow.m; path = ../../modules/gui/macosx/embeddedwindow.m; sourceTree = SOURCE_ROOT; };
 		CCCB86C00ACFDFB300CF1E10 /* fs_time_slider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_time_slider.png; path = Resources/fs_time_slider.png; sourceTree = "<group>"; };
@@ -1034,6 +1038,7 @@
 			files = (
 				1058C7AFFEA557BF11CA2CBB /* Cocoa.framework in Frameworks */,
 				CC3DC89C0A7CDB9600B53F32 /* ApplicationServices.framework in Frameworks */,
+				CC1941250B9C1F8400635F6B /* QTKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1130,6 +1135,8 @@
 				CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */,
 				2AEF857609A5FEC900130822 /* fspanel.h */,
 				2AEF857709A5FEC900130822 /* fspanel.m */,
+				CC6EDD4F0B9CA2140096068A /* eyetv.h */,
+				CC6EDD500B9CA2140096068A /* eyetv.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -1137,6 +1144,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CC1941240B9C1F8400635F6B /* QTKit.framework */,
 				CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */,
 				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
 			);
@@ -1304,10 +1312,12 @@
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 089C166AFE841209C02AAC07 /* vlc */;
 			projectDirPath = "";
 			projectRoot = ../..;
+			shouldCheckCompatibility = 1;
 			targets = (
 				089C1673FE841209C02AAC07 /* vlc */,
 			);
