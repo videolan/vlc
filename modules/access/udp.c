@@ -236,7 +236,7 @@ static int Open( vlc_object_t *p_this )
             break;
 
         case IPPROTO_TCP:
-            p_sys = net_ConnectTCP( p_access, psz_server_addr, i_server_port );
+            p_sys->fd = net_ConnectTCP( p_access, psz_server_addr, i_server_port );
             p_sys->b_framed_rtp = VLC_TRUE;
             break;
 
@@ -721,8 +721,7 @@ static block_t *BlockChoose( access_t *p_access )
     /* Parse the header and make some verifications.
      * See RFC 3550. */
 
-    i_rtp_version  = ( p_block->p_buffer[0] & 0xC0 ) >> 6;
-    i_CSRC_count   = ( p_block->p_buffer[0] & 0x0F );
+    i_rtp_version  = p_block->p_buffer[0] >> 6;
     i_payload_type = ( p_block->p_buffer[1] & 0x7F );
 
     if( i_rtp_version != 2 )
