@@ -102,6 +102,9 @@ static void Close( vlc_object_t * );
                        "directly, without trying to fill the MTU (ie, " \
                        "without trying to make the biggest possible packets " \
                        "in order to improve streaming)." )
+#define RTCP_TEXT N_("Force RTCP Sender Reports")
+#define RTCP_LONGTEXT N_("Sends RTCP Sender Report packets even if " \
+                         "RTP encapsulation is not done")
 #define AUTO_MCAST_TEXT N_("Automatic multicast streaming")
 #define AUTO_MCAST_LONGTEXT N_("Allocates an outbound multicast address " \
                                "automatically.")
@@ -119,11 +122,13 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "group", 1, NULL, GROUP_TEXT, GROUP_LONGTEXT,
                                  VLC_TRUE );
     add_suppressed_integer( SOUT_CFG_PREFIX "late" );
-    add_bool( SOUT_CFG_PREFIX "raw",  0, NULL, RAW_TEXT, RAW_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "raw",  VLC_FALSE, NULL, RAW_TEXT, RAW_LONGTEXT,
                                  VLC_TRUE );
-    add_bool( SOUT_CFG_PREFIX "auto-mcast", 0, NULL, AUTO_MCAST_TEXT,
+    add_bool( SOUT_CFG_PREFIX "rtcp",  VLC_FALSE, NULL, RTCP_TEXT, RTCP_LONGTEXT,
+              VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "auto-mcast", VLC_FALSE, NULL, AUTO_MCAST_TEXT,
               AUTO_MCAST_LONGTEXT, VLC_TRUE );
-    add_bool( SOUT_CFG_PREFIX "udplite", 0, NULL, UDPLITE_TEXT, UDPLITE_LONGTEXT, VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "udplite", VLC_FALSE, NULL, UDPLITE_TEXT, UDPLITE_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "cscov", 12, NULL, CSCOV_TEXT, CSCOV_LONGTEXT, VLC_TRUE );
 
     set_capability( "sout access", 100 );
@@ -141,6 +146,7 @@ static const char *ppsz_sout_options[] = {
     "caching",
     "group",
     "raw",
+    "rtcp",
     "lite",
     "cscov",
     NULL
@@ -190,7 +196,7 @@ struct sout_access_out_sys_t
 {
     int                 i_mtu;
 
-    vlc_bool_t          b_rtpts;  // 1 if add rtp/ts header
+    vlc_bool_t          b_rtpts; // true for RTP/MP2 encapsulation
     vlc_bool_t          b_mtu_warning;
     uint16_t            i_sequence_number;
     uint32_t            i_ssrc;
@@ -223,6 +229,7 @@ static int Open( vlc_object_t *p_this )
     int                 i_handle;
 
     vlc_value_t         val;
+    vlc_bool_t          b_rtcp = VLC_FALSE;
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX,
                        ppsz_sout_options, p_access->p_cfg );
@@ -247,7 +254,11 @@ static int Open( vlc_object_t *p_this )
     if( p_access->psz_access != NULL )
     {
         if (strcmp (p_access->psz_access, "rtp") == 0)
-            p_sys->b_rtpts = VLC_TRUE;
+            p_sys->b_rtpts = b_rtcp = VLC_TRUE;
+        else
+            /* This option is really only meant for the RTP streaming output
+             * plugin. Doing RTCP for raw UDP will yield weird results. */
+            b_rtcp = var_GetBool (p_access, SOUT_CFG_PREFIX"rtcp");
     }
 
     if (var_GetBool (p_access, SOUT_CFG_PREFIX"lite"))
@@ -366,7 +377,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_sequence_number = rand()&0xffff;
     p_sys->i_ssrc            = rand()&0xffffffff;
 
-    if (p_sys->b_rtpts && OpenRTCP (p_access, proto))
+    if (b_rtcp && OpenRTCP (p_access, proto))
     {
         msg_Err (p_access, "cannot initialize RTCP sender");
         net_Close (i_handle);
@@ -819,6 +830,9 @@ static int OpenRTCP (sout_access_out_t *obj, int proto)
 
 static void CloseRTCP (sout_access_thread_t *obj)
 {
+    if (obj->rtcp_handle == -1)
+        return;
+
     uint8_t *ptr = obj->rtcp_data;
     /* Bye */
     ptr[0] = (2 << 6) | 1; /* V = 2, P = 0, SC = 1 */
@@ -829,9 +843,7 @@ static void CloseRTCP (sout_access_thread_t *obj)
     /* We are THE sender, so we are more important than anybody else, so
      * we can afford not to check bandwidth constraints here. */
     send (obj->rtcp_handle, obj->rtcp_data, 8, 0);
-
-    if (obj->rtcp_handle != -1)
-        net_Close (obj->rtcp_handle);
+    net_Close (obj->rtcp_handle);
 }
 
 static void SendRTCP (sout_access_thread_t *obj, uint32_t timestamp)
