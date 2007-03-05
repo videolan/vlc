@@ -48,6 +48,7 @@
 #import "embeddedwindow.h"
 #import "update.h"
 #import "AppleRemote.h"
+#import "eyetv.h"
 
 #import <vlc_input.h>
 
@@ -358,6 +359,14 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_remote = [[AppleRemote alloc] init];
 	[o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
     [o_remote setDelegate: _o_sharedMainInstance];
+
+    o_eyetv = [[VLCEyeTVController alloc] init];
+
+    /* announce our launch to a potential eyetv plugin */
+    [[NSDistributedNotificationCenter defaultCenter] postNotificationName: @"VLCOSXGUIInit"
+                                                                   object: @"VLCEyeTVSupport"
+                                                                 userInfo: NULL
+                                                       deliverImmediately: YES];
 
     return _o_sharedMainInstance;
 }
@@ -1017,6 +1026,13 @@ static VLCMain *_o_sharedMainInstance = nil;
     return o_vout_menu;
 }
 
+- (id)getEyeTVController
+{
+    if( o_eyetv )
+        return o_eyetv;
+    return nil;
+}
+
 - (void)manage
 {
     playlist_t * p_playlist;
@@ -1620,6 +1636,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if( o_interaction_list != nil )
         [o_interaction_list release];
+
+    if( o_eyetv != nil )
+        [o_eyetv release];
 
     if( o_img_pause_pressed != nil )
     {

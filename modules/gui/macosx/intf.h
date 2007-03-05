@@ -105,6 +105,7 @@ struct intf_sys_t
     id o_interaction_list;      /* VLCInteractionList*/
     id o_sfilters;              /* VLCsFilters    */
     id o_update;                /* VLCUpdate      */
+    id o_eyetv;                 /* VLCEyeTVController */
     BOOL nib_main_loaded;       /* reference to the main-nib */
     BOOL nib_open_loaded;       /* reference to the open-nib */
     BOOL nib_about_loaded;      /* reference to the about-nib */
@@ -307,6 +308,7 @@ struct intf_sys_t
 - (id)getMainIntfPgbar;
 - (id)getControllerWindow;
 - (id)getVoutMenu;
+- (id)getEyeTVController;
 - (void)applicationWillTerminate:(NSNotification *)notification;
 - (NSString *)localizedString:(char *)psz;
 - (char *)delocalizeString:(NSString *)psz;

@@ -5030,13 +5030,16 @@ AC_ARG_ENABLE(macosx,
   [  --enable-macosx         MacOS X support (default enabled on MacOS X)],
   [if test "${enable_macosx}" = "yes"
    then
-     VLC_ADD_BUILTINS([macosx])
-     VLC_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC -framework OpenGL -framework AGL])
+     VLC_ADD_PLUGINS([access_eyetv])
+     VLC_ADD_LDFLAGS([access_eyetv], [-framework CoreFoundation])
+     VLC_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC -framework OpenGL -framework AGL -framework QTKit])
      VLC_ADD_OBJCFLAGS( [macosx],[-fobjc-exceptions] )
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
+     VLC_ADD_PLUGINS([access_eyetv])
+     VLC_ADD_LDFLAGS([access_eyetv], [-framework CoreFoundation])
      VLC_ADD_BUILTINS([macosx])
-     VLC_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC -framework OpenGL -framework AGL])
+     VLC_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC -framework OpenGL -framework AGL -framework QTKit])
      VLC_ADD_OBJCFLAGS( [macosx],[-fobjc-exceptions] )
    )])
 CFLAGS=$ORIGCFLAGS

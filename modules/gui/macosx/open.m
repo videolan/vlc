@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.m: MacOS X module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
@@ -39,11 +39,11 @@
 #include <IOKit/storage/IOCDMedia.h>
 #include <IOKit/storage/IODVDMedia.h>
 
-#include "intf.h"
-#include "playlist.h"
-#include "open.h"
-#include "output.h"
-#import <vlc_interface.h>
+#import "intf.h"
+#import "playlist.h"
+#import "open.h"
+#import "output.h"
+#import "eyetv.h"
 
 /*****************************************************************************
  * GetEjectableMediaOfClass 
@@ -189,7 +189,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
-
+    
+    [o_eyetv_chn_bgbar setUsesThreadedAnimation: YES];
+    /* FIXME: implement EyeTV l10n here */
+    
     [self setSubPanel];
 
 
@@ -231,6 +234,21 @@ static VLCOpen *_o_sharedMainInstance = nil;
         selector: @selector(openNetInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: o_net_http_url];
+
+    /* wake up with the correct GUI */
+    if( [[[VLCMain sharedInstance] getEyeTVController] isEyeTVrunning] == YES )
+        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"nodevice"];
+    if( [[[VLCMain sharedInstance] getEyeTVController] isDeviceConnected] == YES )
+    {
+        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"eyetvup"];
+        [self setupChannelInfo];
+    }
+    
+    [[NSDistributedNotificationCenter defaultCenter] addObserver: self
+                                                        selector: @selector(eyetvChanged:)
+                                                            name: NULL
+                                                          object: @"VLCEyeTVSupport"
+                                              suspensionBehavior: NSNotificationSuspensionBehaviorDeliverImmediately];
     
     /* register clicks on text fields */
     [[NSNotificationCenter defaultCenter] addObserver: self
@@ -777,6 +795,83 @@ static VLCOpen *_o_sharedMainInstance = nil;
         else
             [o_playlist appendArray: o_array atPos: -1 enqueue:YES];
     }
+}
+
+- (IBAction)eyetvSwitchChannel:(id)sender
+{
+    if( sender == o_eyetv_nextProgram_btn )
+        [[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: YES];
+    else if( sender == o_eyetv_previousProgram_btn )
+        [[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: NO];
+    else if( sender == o_eyetv_channels_pop )
+        [[[VLCMain sharedInstance] getEyeTVController] selectChannel: 
+            [sender indexOfSelectedItem]];
+    else
+        msg_Err( VLCIntf, "eyetvSwitchChannel sent by unknown object" );
+}
+
+- (IBAction)eyetvLaunch:(id)sender
+{
+    [[[VLCMain sharedInstance] getEyeTVController] launchEyeTV];
+}
+
+- (void)eyetvChanged:(NSNotification *)o_notification
+{
+    if( [[o_notification name] isEqualToString: @"DeviceAdded"] )
+    {
+        msg_Dbg( VLCIntf, "eyetv device was added" );
+        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"eyetvup"];
+        [self setupChannelInfo];
+    }
+    else if( [[o_notification name] isEqualToString: @"DeviceRemoved"] )
+    {
+        /* leave the channel selection like that,
+         * switch to our "no device" tab */
+        msg_Dbg( VLCIntf, "eyetv device was removed" );
+        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"nodevice"];
+    }
+    else if( [[o_notification name] isEqualToString: @"PluginQuit"] )
+    {
+        /* switch to the "launch eyetv" tab */
+        msg_Dbg( VLCIntf, "eyetv was terminated" );
+        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"noeyetv"];
+    }
+    else if( [[o_notification name] isEqualToString: @"PluginInit"] )
+    {
+        /* we got no device yet */
+        msg_Dbg( VLCIntf, "eyetv was launched, no device yet" );
+        [o_eyetv_tabView selectTabViewItemWithIdentifier:@"nodevice"];
+    }
+    else
+        msg_Warn( VLCIntf, "unknown external notify '%s' received", [[o_notification name] UTF8String] );
+}
+
+/* little helper method, since this code needs to be run by multiple objects */
+- (void)setupChannelInfo
+{
+    /* set up channel selection */
+    [o_eyetv_channels_pop removeAllItems];
+    [o_eyetv_chn_bgbar setHidden: NO];
+    [o_eyetv_chn_bgbar animate: self];
+    [o_eyetv_chn_status_txt setStringValue: _NS("Retrieving Channel Info...")];
+    [o_eyetv_chn_status_txt setHidden: NO];
+    
+    /* retrieve info */
+    int x = 0;
+    int channelCount = ( [[[VLCMain sharedInstance] getEyeTVController] getNumberOfChannels] + 1 );
+    while( x != channelCount )
+    {
+        /* we have to add items this way, because we accept duplicates 
+         * additionally, we save a bit of time */
+        [[o_eyetv_channels_pop menu] addItemWithTitle: [[[VLCMain sharedInstance] getEyeTVController] getNameOfChannel: x]
+                                               action: nil
+                                        keyEquivalent: @""];
+        x += 1;
+    }
+    
+    /* clean up GUI */
+    [o_eyetv_chn_bgbar setHidden: YES];
+    [o_eyetv_chn_status_txt setHidden: YES];
 }
 
 - (IBAction)subsChanged:(id)sender

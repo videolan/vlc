@@ -42,10 +42,15 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_btn_ok;
     IBOutlet id o_btn_cancel;
 
+    IBOutlet id o_output_ckbox;
+    IBOutlet id o_sout_options;
+
+    /* open file */
     IBOutlet id o_file_path;
     IBOutlet id o_file_btn_browse;
     IBOutlet id o_file_stream;
 
+    /* open disc */
     IBOutlet id o_disc_type;
     IBOutlet id o_disc_device;
     IBOutlet id o_disc_device_lbl;
@@ -59,6 +64,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_disc_videots_btn_browse;
     IBOutlet id o_disc_dvd_menus;
 
+    /* open network */
     IBOutlet id o_net_mode;
     IBOutlet id o_net_udp_port;
     IBOutlet id o_net_udp_port_lbl;
@@ -72,6 +78,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_net_http_url_lbl;
     IBOutlet id o_net_timeshift_ckbox;
 
+    /* open subtitle file */
     IBOutlet id o_file_sub_ckbox;
     IBOutlet id o_file_sub_btn_settings;
     IBOutlet id o_file_sub_sheet;
@@ -94,8 +101,19 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_file_sub_font_box;
     IBOutlet id o_file_sub_file_box;
 
-    IBOutlet id o_output_ckbox;
-    IBOutlet id o_sout_options;
+    /* open eyetv support */
+    IBOutlet id o_eyetv_tabView;
+    IBOutlet id o_eyetv_channels_pop;
+    IBOutlet id o_eyetv_currentChannel_lbl;
+    IBOutlet id o_eyetv_chn_status_txt;
+    IBOutlet id o_eyetv_chn_bgbar;
+    IBOutlet id o_eyetv_launchEyeTV_btn;
+    IBOutlet id o_eyetv_nextProgram_btn;
+    IBOutlet id o_eyetv_noDevice_lbl;
+    IBOutlet id o_eyetv_noDeviceLong_lbl;
+    IBOutlet id o_eyetv_noEyeTV_lbl;
+    IBOutlet id o_eyetv_noEyeTVLong_lbl;
+    IBOutlet id o_eyetv_previousProgram_btn;
     
     BOOL b_autoplay;
 }
@@ -124,6 +142,11 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (IBAction)openNetModeChanged:(id)sender;
 - (IBAction)openNetStepperChanged:(id)sender;
 - (void)openNetInfoChanged:(NSNotification *)o_notification;
+
+- (IBAction)eyetvSwitchChannel:(id)sender;
+- (IBAction)eyetvLaunch:(id)sender;
+- (void)eyetvChanged:(NSNotification *)o_notification;
+- (void)setupChannelInfo;
 
 - (IBAction)subsChanged:(id)sender;
 - (IBAction)subSettings:(id)sender;
