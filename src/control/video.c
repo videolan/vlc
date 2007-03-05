@@ -29,14 +29,13 @@
 #include <vlc_vout.h>
 
 /*
- * Remember to release the returned vout_thread_t since it is locked at
+ * Remember to release the returned input_thread_t since it is locked at
  * the end of this function.
  */
-static vout_thread_t *GetVout( libvlc_input_t *p_input,
+static input_thread_t *GetInputThread( libvlc_input_t *p_input,
                                libvlc_exception_t *p_exception )
 {
     input_thread_t *p_input_thread;
-    vout_thread_t *p_vout;
 
     if( !p_input )
     {
@@ -53,17 +52,31 @@ static vout_thread_t *GetVout( libvlc_input_t *p_input,
         return NULL;
     }
 
-    p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
-    if( !p_vout )
-    {
-        vlc_object_release( p_input_thread );
-        libvlc_exception_raise( p_exception, "No active video output" );
-        return NULL;
-    }
-    vlc_object_release( p_input_thread );
+    return p_input_thread;;
+}
 
+/*
+ * Remember to release the returned vout_thread_t since it is locked at
+ * the end of this function.
+ */
+static vout_thread_t *GetVout( libvlc_input_t *p_input,
+                               libvlc_exception_t *p_exception )
+{
+    input_thread_t *p_input_thread = GetInputThread(p_input, p_exception);
+    vout_thread_t *p_vout = NULL;
+
+    if( p_input_thread )
+    {
+        p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
+        if( !p_vout )
+        {
+            libvlc_exception_raise( p_exception, "No active video output" );
+        }
+        vlc_object_release( p_input_thread );
+    }
     return p_vout;
 }
+
 /**********************************************************************
  * Exported functions
  **********************************************************************/
@@ -196,20 +209,22 @@ int libvlc_video_get_width( libvlc_input_t *p_input,
 vlc_bool_t libvlc_input_has_vout( libvlc_input_t *p_input,
                                   libvlc_exception_t *p_e )
 {
-    vout_thread_t *p_vout = GetVout( p_input, p_e );
-    if ( NULL == p_vout )
+    input_thread_t *p_input_thread = GetInputThread(p_input, p_e);
+    vlc_bool_t has_vout = VLC_FALSE;
+
+    if( p_input_thread )
     {
-        if ( libvlc_exception_raised( p_e )
-         &&  strcmp( "No active video output", libvlc_exception_get_message( p_e ) ) == 0 )
+        vout_thread_t *p_vout;
+
+        p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
+        if( p_vout )
         {
-            libvlc_exception_clear( p_e );
+            has_vout = VLC_TRUE;
+            vlc_object_release( p_vout );
         }
-        return VLC_FALSE;
+        vlc_object_release( p_input_thread );
     }
-
-    vlc_object_release( p_vout );
-
-    return VLC_TRUE;
+    return has_vout;
 }
 
 int libvlc_video_reparent( libvlc_input_t *p_input, libvlc_drawable_t d,
@@ -217,23 +232,22 @@ int libvlc_video_reparent( libvlc_input_t *p_input, libvlc_drawable_t d,
 {
     vout_thread_t *p_vout = GetVout( p_input, p_e );
 
-    if ( p_vout == NULL)
+    if( p_vout )
     {
-        /// \todo: set exception
-        return 0;
+        vout_Control( p_vout , VOUT_REPARENT, d);
+        vlc_object_release( p_vout );
     }
-
-    vout_Control( p_vout , VOUT_REPARENT, d);
-    vlc_object_release( p_vout );
-
     return 0;
 }
 
 void libvlc_video_resize( libvlc_input_t *p_input, int width, int height, libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_input, p_e );
-    vout_Control( p_vout, VOUT_SET_SIZE, width, height );
-    vlc_object_release( p_vout );
+    if( p_vout )
+    {
+        vout_Control( p_vout, VOUT_SET_SIZE, width, height );
+        vlc_object_release( p_vout );
+    }
 }
 
 /* global video settings */
