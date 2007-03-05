@@ -586,7 +586,7 @@ static block_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
 
         /* add rtp/ts header */
         p_buffer->p_buffer[0] = 0x80;
-        p_buffer->p_buffer[1] = 0x21; // mpeg2-ts
+        p_buffer->p_buffer[1] = 33; // mpeg2-ts
 
         SetWBE( p_buffer->p_buffer + 2, p_sys->i_sequence_number );
         p_sys->i_sequence_number++;
