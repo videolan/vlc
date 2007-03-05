@@ -1598,10 +1598,7 @@ NSLog( @"expandable" );
         playlist_item_t *p_node = [item pointerValue];
 
         NSArray *o_array = [NSArray array];
-        NSArray *o_values = [[o_pasteboard propertyListForType:
-                                        NSFilenamesPboardType]
-                                sortedArrayUsingSelector:
-                                        @selector(caseInsensitiveCompare:)];
+        NSArray *o_values = [o_pasteboard propertyListForType: NSFilenamesPboardType];
 
         for( i = 0; i < (int)[o_values count]; i++)
         {
