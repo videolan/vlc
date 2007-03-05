@@ -197,6 +197,7 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     p_intf->p_sys->b_playlist_update = VLC_TRUE;
     p_intf->p_sys->b_intf_update = VLC_TRUE;
     p_intf->p_sys->b_playmode_update = VLC_TRUE;
+    p_intf->p_sys->b_current_title_update = VLC_TRUE;
     return VLC_SUCCESS;
 }
 
