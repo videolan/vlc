@@ -498,6 +498,7 @@ static WSAAPI int _ws2_getnameinfo_bind( const struct sockaddr FAR * sa, socklen
     GETNAMEINFO entry = (GETNAMEINFO)ws2_find_api (TEXT("getnameinfo"));
     if (entry != NULL)
     {
+        /* call API before replacing function pointer to avoid crash */
         int result = entry (sa, salen, host, hostlen, serv, servlen, flags);
         ws2_getnameinfo = entry;
         return result;
@@ -520,6 +521,7 @@ static WSAAPI int _ws2_getaddrinfo_bind(const char FAR *node, const char FAR *se
 
     if ((entry != NULL) && (freentry != NULL))
     {
+        /* call API before replacing function pointer to avoid crash */
         int result = entry (node, service, hints, res);
         ws2_freeaddrinfo = freentry;
         ws2_getaddrinfo = entry;
