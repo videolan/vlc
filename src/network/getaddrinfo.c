@@ -102,7 +102,6 @@ const char *vlc_gai_strerror (int errnum)
 }
 #endif
 
-#ifndef WIN32
 #ifndef HAVE_GETNAMEINFO
 /*
  * getnameinfo() non-thread-safe IPv4-only implementation,
@@ -448,7 +447,6 @@ getaddrinfo (const char *node, const char *service,
     return 0;
 }
 #endif /* if !HAVE_GETADDRINFO */
-#endif
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
     /*
@@ -503,12 +501,16 @@ static WSAAPI int _ws2_getnameinfo_bind( const struct sockaddr FAR * sa, socklen
         ws2_getnameinfo = entry;
         return result;
     }
-    /* return a possible error if API is not found */
-    WSASetLastError (WSAEAFNOSUPPORT);
-    return EAI_FAMILY;
+    return getnameinfo (sa, salen, host, hostlen, serv, servlen, flags);
 }
 #undef getnameinfo
 #define getnameinfo ws2_getnameinfo
+
+/* So much for using different calling conventions */
+static WSAAPI void call_freeaddrinfo (struct addrinfo *infos)
+{
+    freeaddrinfo (infos);
+}
 
 static WSAAPI int _ws2_getaddrinfo_bind(const char FAR *node, const char FAR *service,
                const struct addrinfo FAR *hints, struct addrinfo FAR * FAR *res)
@@ -527,9 +529,8 @@ static WSAAPI int _ws2_getaddrinfo_bind(const char FAR *node, const char FAR *se
         ws2_getaddrinfo = entry;
         return result;
     }
-    /* return a possible error if API is not found */
-    WSASetLastError (WSAHOST_NOT_FOUND);
-    return EAI_NONAME;
+    ws2_freeaddrinfo = call_freeaddrinfo;
+    return getaddrinfo (node, service, hints, res);
 }
 #undef getaddrinfo
 #undef freeaddrinfo
