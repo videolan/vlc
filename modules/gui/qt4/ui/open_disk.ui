@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>448</width>
-    <height>275</height>
+    <width>487</width>
+    <height>254</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -25,60 +25,50 @@
      <property name="title" >
       <string>Disc selection</string>
      </property>
-     <layout class="QHBoxLayout" >
+     <layout class="QGridLayout" >
       <property name="margin" >
        <number>9</number>
       </property>
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item>
-       <layout class="QGridLayout" >
-        <property name="margin" >
-         <number>0</number>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Disk device</string>
         </property>
-        <property name="spacing" >
-         <number>6</number>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QRadioButton" name="vcdRadioButton" >
+        <property name="text" >
+         <string>SVCD/VCD</string>
         </property>
-        <item row="0" column="1" >
-         <widget class="QRadioButton" name="vcdRadioButton" >
-          <property name="text" >
-           <string>SVCD/VCD</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" >
-         <widget class="QRadioButton" name="dvdRadioButton" >
-          <property name="text" >
-           <string>DVD</string>
-          </property>
-          <property name="checked" >
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2" >
-         <widget class="QRadioButton" name="audioCDRadioButton" >
-          <property name="text" >
-           <string>Audio CD</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" >
-         <widget class="QLabel" name="label" >
-          <property name="text" >
-           <string>Disk device</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1" colspan="2" >
-         <widget class="QComboBox" name="deviceCombo" >
-          <property name="editable" >
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2" >
+       <widget class="QComboBox" name="deviceCombo" >
+        <property name="editable" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QRadioButton" name="audioCDRadioButton" >
+        <property name="text" >
+         <string>Audio CD</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QRadioButton" name="dvdRadioButton" >
+        <property name="text" >
+         <string>DVD</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -96,71 +86,74 @@
      <property name="title" >
       <string>Starting position</string>
      </property>
-     <layout class="QHBoxLayout" >
+     <layout class="QGridLayout" >
       <property name="margin" >
        <number>9</number>
       </property>
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item>
-       <layout class="QGridLayout" >
-        <property name="margin" >
-         <number>0</number>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Chapter</string>
         </property>
-        <property name="spacing" >
-         <number>6</number>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QSpinBox" name="chapterSpin" >
+        <property name="suffix" >
+         <string/>
         </property>
-        <item row="0" column="1" >
-         <widget class="QSpinBox" name="titleSpin" >
-          <property name="autoFillBackground" >
-           <bool>false</bool>
-          </property>
-          <property name="suffix" >
-           <string/>
-          </property>
-          <property name="minimum" >
-           <number>-1</number>
-          </property>
-          <property name="value" >
-           <number>-1</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" >
-         <widget class="QLabel" name="label_2" >
-          <property name="text" >
-           <string>Title</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" >
-         <widget class="QLabel" name="label_3" >
-          <property name="text" >
-           <string>Chapter</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1" >
-         <widget class="QSpinBox" name="chapterSpin" >
-          <property name="suffix" >
-           <string/>
-          </property>
-          <property name="prefix" >
-           <string/>
-          </property>
-          <property name="minimum" >
-           <number>-1</number>
-          </property>
-          <property name="value" >
-           <number>-1</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
+        <property name="prefix" >
+         <string/>
+        </property>
+        <property name="minimum" >
+         <number>-1</number>
+        </property>
+        <property name="value" >
+         <number>-1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Title</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QSpinBox" name="titleSpin" >
+        <property name="autoFillBackground" >
+         <bool>false</bool>
+        </property>
+        <property name="suffix" >
+         <string/>
+        </property>
+        <property name="minimum" >
+         <number>-1</number>
+        </property>
+        <property name="value" >
+         <number>-1</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

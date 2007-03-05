@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>487</width>
-    <height>151</height>
+    <height>181</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -21,57 +21,36 @@
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QGridLayout" >
    <property name="margin" >
     <number>9</number>
    </property>
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item>
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
+   <item row="2" column="1" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
      </property>
-     <property name="spacing" >
-      <number>6</number>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
      </property>
-     <item>
-      <widget class="QLabel" name="label" >
-       <property name="text" >
-        <string>File</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="fileInput" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>7</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="editable" >
-        <bool>true</bool>
-       </property>
-       <property name="maxVisibleItems" >
-        <number>7</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="fileBrowseButton" >
-       <property name="text" >
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    </spacer>
    </item>
-   <item>
+   <item row="1" column="0" colspan="3" >
     <widget class="QGroupBox" name="subGroupBox" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>1</hsizetype>
+       <vsizetype>5</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title" >
       <string>Use a subtitles file</string>
      </property>
@@ -81,155 +60,167 @@
      <property name="checked" >
       <bool>false</bool>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QGridLayout" >
       <property name="margin" >
        <number>9</number>
       </property>
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item>
-       <layout class="QHBoxLayout" >
-        <property name="margin" >
-         <number>0</number>
+      <item row="0" column="4" >
+       <widget class="QPushButton" name="subBrowseButton" >
+        <property name="text" >
+         <string>Browse</string>
         </property>
-        <property name="spacing" >
-         <number>6</number>
-        </property>
-        <item>
-         <widget class="QComboBox" name="subInput" >
-          <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>7</hsizetype>
-            <vsizetype>0</vsizetype>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="editable" >
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="subBrowseButton" >
-          <property name="text" >
-           <string>Browse</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       </widget>
       </item>
-      <item>
-       <layout class="QHBoxLayout" >
-        <property name="margin" >
+      <item row="0" column="0" colspan="4" >
+       <widget class="QComboBox" name="subInput" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="editable" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QComboBox" name="sizeSubComboBox" >
+        <property name="minimumSize" >
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <item>
+         <property name="text" >
+          <string>Very Small</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Small</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Normal</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Big</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Very Big</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="2" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="4" >
+       <widget class="QComboBox" name="alignSubComboBox" >
+        <property name="minimumSize" >
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="currentIndex" >
          <number>0</number>
         </property>
-        <property name="spacing" >
-         <number>6</number>
+        <property name="insertPolicy" >
+         <enum>QComboBox::NoInsert</enum>
+        </property>
+        <property name="minimumContentsLength" >
+         <number>0</number>
         </property>
         <item>
-         <widget class="QLabel" name="sizeSubLabel" >
-          <property name="text" >
-           <string>Size:</string>
-          </property>
-         </widget>
+         <property name="text" >
+          <string>Left</string>
+         </property>
         </item>
         <item>
-         <widget class="QComboBox" name="sizeSubComboBox" >
-          <property name="minimumSize" >
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <item>
-           <property name="text" >
-            <string>Very Small</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>Small</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>Normal</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>Big</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>Very Big</string>
-           </property>
-          </item>
-         </widget>
+         <property name="text" >
+          <string>Center</string>
+         </property>
         </item>
         <item>
-         <spacer>
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" >
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
+         <property name="text" >
+          <string>Right</string>
+         </property>
         </item>
-        <item>
-         <widget class="QLabel" name="alignSubLabel" >
-          <property name="text" >
-           <string>Alignment:</string>
-          </property>
-          <property name="buddy" >
-           <cstring>alignSubLabel</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="alignSubComboBox" >
-          <property name="minimumSize" >
-           <size>
-            <width>80</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="currentIndex" >
-           <number>0</number>
-          </property>
-          <property name="insertPolicy" >
-           <enum>QComboBox::NoInsert</enum>
-          </property>
-          <property name="minimumContentsLength" >
-           <number>0</number>
-          </property>
-          <item>
-           <property name="text" >
-            <string>Left</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>Center</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
-            <string>Right</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="sizeSubLabel" >
+        <property name="text" >
+         <string>Size:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" >
+       <widget class="QLabel" name="alignSubLabel" >
+        <property name="text" >
+         <string>Alignment:</string>
+        </property>
+        <property name="buddy" >
+         <cstring>alignSubLabel</cstring>
+        </property>
+       </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="0" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>File</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" >
+    <widget class="QPushButton" name="fileBrowseButton" >
+     <property name="text" >
+      <string>Browse</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" >
+    <widget class="QComboBox" name="fileInput" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="editable" >
+      <bool>true</bool>
+     </property>
+     <property name="maxVisibleItems" >
+      <number>7</number>
+     </property>
     </widget>
    </item>
   </layout>
