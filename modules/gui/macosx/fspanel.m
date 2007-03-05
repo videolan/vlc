@@ -28,6 +28,7 @@
 #import "intf.h"
 #import "controls.h"
 #import "vout.h"
+#import "misc.h"
 #import "fspanel.h"
 
 #define KEEP_VISIBLE_AFTER_ACTION 4 /* time in half-sec until this panel will hide again after a user's action */
