@@ -1056,7 +1056,6 @@ static VLCMain *_o_sharedMainInstance = nil;
             /* input stopped */
             p_intf->p_sys->b_intf_update = VLC_TRUE;
             p_intf->p_sys->i_play_status = END_S;
-            [self setScrollField: _NS("VLC media player") stopAfter:-1];
             msg_Dbg( p_intf, "input has stopped, refreshing interface" );
             p_intf->p_sys->p_input = NULL;
         }
@@ -1252,7 +1251,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [self updateMessageArray];
 
-    if( (i_end_scroll != -1) && (mdate() > i_end_scroll) )
+    if( ((i_end_scroll != -1) && (mdate() > i_end_scroll)) || !p_input )
         [self resetScrollField];
 
     [NSTimer scheduledTimerWithTimeInterval: 0.3
