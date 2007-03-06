@@ -385,8 +385,7 @@ static block_t *BlockUDP( access_t *p_access )
 }
 
 /*****************************************************************************
- * BlockTCP: Framed RTP/AVP packet reception for COMEDIA
- * Still an I-D (draft-ietf-avt-rtp-framing-contrans-06) - subject to change.
+ * BlockTCP: Framed RTP/AVP packet reception for COMEDIA (see RFC4571)
  *****************************************************************************/
 static block_t *BlockTCP( access_t *p_access )
 {
@@ -573,7 +572,7 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     p_block->i_pts = mdate();
     p_block->i_dts = (mtime_t) GetWBE( p_block->p_buffer + 2 );
 
-    /* FIXME: use ptmap */
+    /* FIXME: use rtpmap */
     switch( i_payload_type )
     {
         case 14: // MPA: MPEG Audio (RFC2250, §3.4)
@@ -735,17 +734,17 @@ static block_t *BlockChoose( access_t *p_access )
     switch( i_payload_type )
     {
         case 33:
-            msg_Dbg( p_access, "detected TS over RTP" );
+            msg_Dbg( p_access, "detected MPEG2 TS over RTP" );
             p_access->psz_demux = strdup( "ts" );
             break;
 
         case 14:
-            msg_Dbg( p_access, "detected MPEG audio over RTP" );
+            msg_Dbg( p_access, "detected MPEG Audio over RTP" );
             p_access->psz_demux = strdup( "mpga" );
             break;
 
         case 32:
-            msg_Dbg( p_access, "detected MPEG video over RTP" );
+            msg_Dbg( p_access, "detected MPEG Video over RTP" );
             p_access->psz_demux = strdup( "mpgv" );
             break;
 
