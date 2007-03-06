@@ -1361,18 +1361,24 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
 if test "${ac_cv_c_altivec}" != "no"; then
   CPPFLAGS="${CPPFLAGS_save} ${ac_cv_c_altivec}"
 fi
-AC_CHECK_HEADERS(altivec.h)
-CPPFLAGS="${CPPFLAGS_save}"
 
-if test "${ac_cv_c_altivec}" != "no" -a "${enable_altivec}" != "no" ; then
-  AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C AltiVec extensions.)
-  VLC_ADD_CFLAGS([libvlc],[${ac_cv_c_altivec}])
-  VLC_ADD_CFLAGS([idctaltivec motionaltivec],[${ac_cv_c_altivec}])
-  VLC_ADD_CFLAGS([i420_yuy2_altivec memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
-  if test "${ac_cv_altivec_inline}" = "no"; then
-    ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
+AS_IF( test "${enable_altivec}" != "no",
+[
+  AC_CHECK_HEADERS(altivec.h)
+  CPPFLAGS="${CPPFLAGS_save}"
+  
+  if test "${ac_cv_c_altivec}" != "no"; then
+    AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C AltiVec extensions.)
+    VLC_ADD_CFLAGS([libvlc],[${ac_cv_c_altivec}])
+    VLC_ADD_CFLAGS([idctaltivec motionaltivec],[${ac_cv_c_altivec}])
+    VLC_ADD_CFLAGS([i420_yuy2_altivec memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
+    if test "${ac_cv_altivec_inline}" = "no"; then
+      ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
+    fi
   fi
-fi
+],[
+  CPPFLAGS="${CPPFLAGS_save}"
+])
 
 AC_CACHE_CHECK([if linker needs -framework vecLib],
     [ac_cv_ld_altivec],
