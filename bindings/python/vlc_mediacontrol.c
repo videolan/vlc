@@ -36,7 +36,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
     PyObject* py_param = NULL;
     char** ppsz_args = NULL;
     libvlc_instance_t* p_instance = NULL;
-    int i_size = 0;
+    Py_ssize_t i_size = 0;
     
     self = PyObject_New( MediaControl, &MediaControl_Type );
 
@@ -49,7 +49,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
         }
         else
         {
-            int i_index;
+            Py_ssize_t i_index;
 
             if( ! PySequence_Check( py_param ) )
             {
@@ -341,8 +341,8 @@ MediaControl_playlist_get_list( PyObject *self, PyObject *args )
     PyObject *py_retval;
     mediacontrol_Exception *exception = NULL;
     mediacontrol_PlaylistSeq* pl;
-    int i_index;
-    int i_playlist_size;
+    Py_ssize_t i_index;
+    Py_ssize_t i_playlist_size;
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;

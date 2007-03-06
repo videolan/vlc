@@ -499,8 +499,8 @@ static PyObject *
 vlcObject_var_list( PyObject *self, PyObject *args )
 {
     PyObject *p_retval;
-    int i_size;
-    int i_index;
+    Py_ssize_t i_size;
+    Py_ssize_t i_index;
 
     i_size = VLCSELF->p_object->i_vars;
     p_retval = PyTuple_New( i_size );
@@ -619,8 +619,8 @@ static PyObject *
 vlcObject_children( PyObject *self, PyObject *args )
 {
     PyObject *p_retval;
-    int i_size;
-    int i_index;
+    Py_ssize_t i_size;
+    Py_ssize_t i_index;
 
     i_size = VLCSELF->p_object->i_children;
     p_retval = PyTuple_New( i_size );

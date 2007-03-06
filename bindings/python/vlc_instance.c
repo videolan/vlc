@@ -23,11 +23,11 @@
 #include "vlcglue.h"
 
 /* Helper functions */
-static int
+static Py_ssize_t
 pyoptions_to_args(PyObject *py_options, char*** pppsz_args)
 {
-    int i_size;
-    int i_index;
+    Py_ssize_t i_size;
+    Py_ssize_t  i_index;
     char** ppsz_args = *pppsz_args;
     
     ppsz_args = NULL;
@@ -438,28 +438,25 @@ static PyObject *
 vlcInstance_audio_get_channel( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
-    char* psz_ret;
-    PyObject* o_ret;
+    int i_ret;
 
     LIBVLC_TRY;
-    psz_ret = libvlc_audio_get_channel( LIBVLC_INSTANCE->p_instance, &ex );
+    i_ret = libvlc_audio_get_channel( LIBVLC_INSTANCE->p_instance, &ex );
     LIBVLC_EXCEPT;
-    o_ret=Py_BuildValue( "s", psz_ret );
-    free( psz_ret );
-    return o_ret;
+    return Py_BuildValue( "i", i_ret );
 }
 
 static PyObject *
 vlcInstance_audio_set_channel( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
-    char* psz_channel;
+    int i_channel;
 
-    if( !PyArg_ParseTuple( args, "s", &psz_channel ) )
+    if( !PyArg_ParseTuple( args, "i", &i_channel ) )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_audio_set_channel( LIBVLC_INSTANCE->p_instance, psz_channel, &ex );
+    libvlc_audio_set_channel( LIBVLC_INSTANCE->p_instance, i_channel, &ex );
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
