@@ -1182,12 +1182,12 @@ static inline int LoadMessages (void)
 #if !defined( __APPLE__ ) && !defined( WIN32 ) && !defined( SYS_BEOS )
     static const char psz_path[] = LOCALEDIR;
 #else
-    char buf[1024];
-    if (snprintf (buf, sizeof (buf), "%s/%s", libvlc_global.psz_vlcpath,
-                  "locale")) >= sizeof (buf)
+    char psz_path[1024];
+    if (snprintf (psz_path, sizeof (psz_path), "%s/%s",
+                  libvlc_global.psz_vlcpath, "locale")
+                     >= (int)sizeof (psz_path))
         return -1;
 
-    const char *psz_path = psz_tmp;
 #endif
     if (bindtextdomain (PACKAGE_NAME, psz_path) == NULL)
     {
