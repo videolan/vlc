@@ -102,9 +102,8 @@ static void Close( vlc_object_t * );
                        "directly, without trying to fill the MTU (ie, " \
                        "without trying to make the biggest possible packets " \
                        "in order to improve streaming)." )
-#define RTCP_TEXT N_("Force RTCP Sender Reports")
-#define RTCP_LONGTEXT N_("Sends RTCP Sender Report packets even if " \
-                         "RTP encapsulation is not done")
+#define RTCP_TEXT N_("RTCP destination port number")
+#define RTCP_LONGTEXT N_("Sends RTCP packets to this port (0 = auto)")
 #define AUTO_MCAST_TEXT N_("Automatic multicast streaming")
 #define AUTO_MCAST_LONGTEXT N_("Allocates an outbound multicast address " \
                                "automatically.")
@@ -124,8 +123,8 @@ vlc_module_begin();
     add_suppressed_integer( SOUT_CFG_PREFIX "late" );
     add_bool( SOUT_CFG_PREFIX "raw",  VLC_FALSE, NULL, RAW_TEXT, RAW_LONGTEXT,
                                  VLC_TRUE );
-    add_bool( SOUT_CFG_PREFIX "rtcp",  VLC_FALSE, NULL, RTCP_TEXT, RTCP_LONGTEXT,
-              VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "rtcp",  0, NULL, RTCP_TEXT, RTCP_LONGTEXT,
+                 VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "auto-mcast", VLC_FALSE, NULL, AUTO_MCAST_TEXT,
               AUTO_MCAST_LONGTEXT, VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "udplite", VLC_FALSE, NULL, UDPLITE_TEXT, UDPLITE_LONGTEXT, VLC_TRUE );
@@ -210,7 +209,7 @@ struct sout_access_out_sys_t
 #define DEFAULT_PORT 1234
 #define RTP_HEADER_LENGTH 12
 
-static int OpenRTCP (sout_access_out_t *obj, int proto);
+static int OpenRTCP (sout_access_out_t *obj, int proto, uint16_t dport);
 static void SendRTCP (sout_access_thread_t *obj, uint32_t timestamp);
 static void CloseRTCP (sout_access_thread_t *obj);
 
@@ -223,13 +222,12 @@ static int Open( vlc_object_t *p_this )
     sout_access_out_sys_t   *p_sys;
 
     char                *psz_dst_addr = NULL;
-    int                 i_dst_port, proto = IPPROTO_UDP;
+    int                 i_dst_port, i_rtcp_port = 0, proto = IPPROTO_UDP;
     const char          *protoname = "UDP";
 
     int                 i_handle;
 
     vlc_value_t         val;
-    vlc_bool_t          b_rtcp = VLC_FALSE;
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX,
                        ppsz_sout_options, p_access->p_cfg );
@@ -254,11 +252,7 @@ static int Open( vlc_object_t *p_this )
     if( p_access->psz_access != NULL )
     {
         if (strcmp (p_access->psz_access, "rtp") == 0)
-            p_sys->b_rtpts = b_rtcp = VLC_TRUE;
-        else
-            /* This option is really only meant for the RTP streaming output
-             * plugin. Doing RTCP for raw UDP will yield weird results. */
-            b_rtcp = var_GetBool (p_access, SOUT_CFG_PREFIX"rtcp");
+            p_sys->b_rtpts = VLC_TRUE;
     }
 
     if (var_GetBool (p_access, SOUT_CFG_PREFIX"lite"))
@@ -288,6 +282,14 @@ static int Open( vlc_object_t *p_this )
             i_dst_port = atoi (psz_parser);
         }
     }
+
+    /* This option is really only meant for the RTP streaming output
+     * plugin. Doing RTCP for raw UDP will yield weird results. */
+    i_rtcp_port = var_GetInteger (p_access, SOUT_CFG_PREFIX"rtcp");
+    /* If RTCP port is not specified, use the default, if we do RTP/MP2 encap,
+     * or do not use RTCP at all otherwise. */
+    if ((i_rtcp_port == 0) && (p_sys->b_rtpts))
+        i_rtcp_port = i_dst_port + 1;
 
     p_sys->p_thread =
         vlc_object_create( p_access, sizeof( sout_access_thread_t ) );
@@ -377,7 +379,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_sequence_number = rand()&0xffff;
     p_sys->i_ssrc            = rand()&0xffffffff;
 
-    if (b_rtcp && OpenRTCP (p_access, proto))
+    if (i_rtcp_port && OpenRTCP (p_access, proto, i_rtcp_port))
     {
         msg_Err (p_access, "cannot initialize RTCP sender");
         net_Close (i_handle);
@@ -764,22 +766,21 @@ static const char *MakeRandMulticast (int family, char *buf, size_t buflen)
  * - FIXME: we do not implement separate rate limiting for SDES,
  * - we do not implement any profile-specific extensions for the time being.
  */
-static int OpenRTCP (sout_access_out_t *obj, int proto)
+static int OpenRTCP (sout_access_out_t *obj, int proto, uint16_t dport)
 {
     sout_access_out_sys_t *p_sys = obj->p_sys;
     uint8_t *ptr;
     int fd;
 
     char src[NI_MAXNUMERICHOST], dst[NI_MAXNUMERICHOST];
-    int sport, dport;
+    int sport;
 
     fd = obj->p_sys->p_thread->i_handle;
     if (net_GetSockAddress (fd, src, &sport)
-     || net_GetPeerAddress (fd, dst, &dport))
+     || net_GetPeerAddress (fd, dst, NULL))
         return VLC_EGENERIC;
 
     sport++;
-    dport++;
     fd = net_OpenDgram (obj, src, sport, dst, dport, AF_UNSPEC, proto);
     if (fd == -1)
         return VLC_EGENERIC;
