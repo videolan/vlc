@@ -223,7 +223,7 @@ QStringList DialogsProvider::showSimpleOpen(QString help, bool all,
     return QFileDialog::getOpenFileNames( NULL,
                                           help.isNull() ?
                                               qfu(I_OP_SEL_FILES ) : help,
-                                          p_intf->p_libvlc->psz_homedir,
+                                          qfu( p_intf->p_libvlc->psz_homedir ), 
                                           fileTypes );
 }
 
@@ -273,9 +273,9 @@ void DialogsProvider::savePlaylist()
 {
     QFileDialog *qfd = new QFileDialog( NULL,
                                    qtr("Choose a filename to save playlist"),
-                                   p_intf->p_libvlc->psz_homedir,
-                                   qfu("XSPF playlist (*.xspf);; ") +
-                                   qfu("M3U playlist (*.m3u);; Any (*.*) ") );
+                                   qfu( p_intf->p_libvlc->psz_homedir ),
+                                   qtr("XSPF playlist (*.xspf);; ") +
+                                   qtr("M3U playlist (*.m3u);; Any (*.*) ") );
     qfd->setFileMode( QFileDialog::AnyFile );
     qfd->setAcceptMode( QFileDialog::AcceptSave );
     qfd->setConfirmOverwrite( true );
