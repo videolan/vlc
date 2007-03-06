@@ -104,6 +104,7 @@ static volatile unsigned int i_instances = 0;
 void LocaleInit( vlc_object_t * );
 void LocaleDeinit( void );
 static void SetLanguage   ( char const * );
+static inline int LoadMessages (void);
 static int  GetFilenames  ( libvlc_int_t *, int, char *[] );
 static void Help          ( libvlc_int_t *, char const *psz_help_name );
 static void Usage         ( libvlc_int_t *, char const *psz_module_name );
@@ -271,6 +272,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
      * Support for gettext
      */
     SetLanguage( "" );
+    LoadMessages ();
 
     /*
      * Global iconv, must be done after setlocale()
@@ -1135,22 +1137,20 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
  *****************************************************************************/
 static void SetLanguage ( char const *psz_lang )
 {
+    if (psz_lang == NULL)
+        return;
+
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 
-    const char *    psz_path = NULL;
-#if defined( __APPLE__ ) || defined ( WIN32 ) || defined( SYS_BEOS )
-    char            psz_tmp[1024];
-#endif
-
-    if( psz_lang && !*psz_lang )
+    if( !*psz_lang )
     {
 #   if defined( HAVE_LC_MESSAGES )
-        setlocale( LC_MESSAGES, psz_lang );
+        setlocale( LC_MESSAGES, "" );
 #   endif
-        setlocale( LC_CTYPE, psz_lang );
+        setlocale( LC_CTYPE, "" );
     }
-    else if( psz_lang )
+    else
     {
 #ifdef __APPLE__
         /* I need that under Darwin, please check it doesn't disturb
@@ -1170,24 +1170,51 @@ static void SetLanguage ( char const *psz_lang )
 
         setlocale( LC_ALL, psz_lang );
     }
+#endif
+}
 
+
+static inline int LoadMessages (void)
+{
+#if defined( ENABLE_NLS ) \
+     && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
     /* Specify where to find the locales for current domain */
 #if !defined( __APPLE__ ) && !defined( WIN32 ) && !defined( SYS_BEOS )
-    psz_path = LOCALEDIR;
+    static const char psz_path[] = LOCALEDIR;
 #else
-    snprintf( psz_tmp, sizeof(psz_tmp), "%s/%s", libvlc_global.psz_vlcpath,
-              "locale" );
-    psz_path = psz_tmp;
+    char buf[1024];
+    if (snprintf (buf, sizeof (buf), "%s/%s", libvlc_global.psz_vlcpath,
+                  "locale")) >= sizeof (buf)
+        return -1;
+
+    const char *psz_path = psz_tmp;
 #endif
-    if( !bindtextdomain( PACKAGE_NAME, psz_path ) )
+    if (bindtextdomain (PACKAGE_NAME, psz_path) == NULL)
     {
-        fprintf( stderr, "warning: couldn't bind domain %s in directory %s\n",
-                 PACKAGE_NAME, psz_path );
+        fprintf (stderr, "Warning: cannot bind text domain "PACKAGE_NAME
+                         " to directory %s\n", psz_path);
+        return -1;
     }
 
-    /* Set the default domain */
-    bind_textdomain_codeset( PACKAGE_NAME, "UTF-8" );
+    /* LibVLC wants all messages in UTF-8.
+     * Unfortunately, we cannot ask UTF-8 for strerror(), strsignal()
+     * and other functions that are not part of our text domain.
+     */
+    if (bind_textdomain_codeset (PACKAGE_NAME, "UTF-8") == NULL)
+    {
+        fprintf (stderr, "Error: cannot set Unicode encoding for text domain "
+                         PACKAGE_NAME"\n");
+        // Unbinds the text domain to avoid broken encoding
+        bindtextdomain (PACKAGE_NAME, "DOES_NOT_EXIST");
+        return -1;
+    }
+
+    /* LibVLC does NOT set the default textdomain, since it is a library.
+     * This could otherwise break programs using LibVLC (other than VLC).
+     * textdomain (PACKAGE_NAME);
+     */
 #endif
+    return 0;
 }
 
 /*****************************************************************************
