@@ -157,7 +157,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     dXdisplayDevice );
 #endif
 
-            CONFIG_GENERIC( "snapshot-path", String, NULL,
+            CONFIG_GENERIC( "snapshot-path", File, NULL,
                     snapshotsDirectory ); /* FIXME -> use file instead of string */
             CONFIG_GENERIC( "snapshot-prefix", String, NULL, snapshotsPrefix );
             CONFIG_GENERIC( "snapshot-sequential", Bool, NULL,
@@ -191,13 +191,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
          CONFIG_GENERIC( "aout" , Module , NULL, outputModule );
 #ifndef WIN32
          CONFIG_GENERIC( "alsadev" , StringList , NULL, alsaDevice );
-         CONFIG_GENERIC( "dspdev" , String , NULL, OSSDevice );
+         CONFIG_GENERIC( "dspdev" , File , NULL, OSSDevice );
                 //FIXME File
 #else
          CONFIG_GENERIC( "directx-audio-device" , IntegerList, NULL, 
                  DirectXDevice );
 #endif
-         CONFIG_GENERIC( "audiofile-file" , String , NULL, FileName ); 
+         CONFIG_GENERIC( "audiofile-file" , File , NULL, FileName ); 
                 //Fixme File
 
          CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
@@ -242,7 +242,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     ui.skins->setChecked( true );*/
 /*            CONFIG_GENERIC( "intf", Module, NULL, ??? ); */ //FIXME interface choice
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
-            CONFIG_GENERIC( "skins2-last", String, NULL, fileSkin); 
+            CONFIG_GENERIC( "skins2-last", File, NULL, fileSkin); 
                     //FIXME File
 #if defined( WIN32 ) || defined(HAVE_DBUS_3)
             CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
@@ -257,7 +257,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
             CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );
 
-            CONFIG_GENERIC( "freetype-font", String, NULL, font ); 
+            CONFIG_GENERIC( "freetype-font", File, NULL, font ); 
                     /* FIXME -> use file instead of string */
             CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,

@@ -35,6 +35,7 @@
 #include <QVector>
 #include <QDialog>
 #include <QLabel>
+#include <QFile>
 
 #include "qt4.hpp"
 #include <assert.h>
@@ -250,6 +251,28 @@ private:
     QLineEdit *text;
     QLabel *label;
 };
+
+class FileConfigControl : public VStringConfigControl
+{
+    Q_OBJECT;
+public:
+    FileConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                         QGridLayout *, int&, bool pwd );
+    FileConfigControl( vlc_object_t *, module_config_t *, QLabel *,
+                        QLineEdit*, bool pwd );
+    virtual ~FileConfigControl() {};
+    virtual QString getValue() { return text->text(); };
+    virtual void show() { text->show(); label->show(); }
+    virtual void hide() { text->hide(); label->hide(); }
+public slots: 
+    void updateField();
+private:
+    void finish();
+    QLineEdit *text;
+    QLabel *label;
+    QPushButton *browse;
+};
+
 
 class ModuleConfigControl : public VStringConfigControl
 {

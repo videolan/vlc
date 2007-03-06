@@ -44,6 +44,7 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <QSlider>
+#include <QFileDialog>
 
 #include <vlc_keys.h>
 
@@ -101,7 +102,8 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
                                                   l, line );
         break;
     case CONFIG_ITEM_FILE:
-        fprintf( stderr, "Todo (CONFIG_ITEM_FILE)\n" );
+        p_control = new FileConfigControl( p_this, p_item, parent, l,
+                                                line, false );
         break;
     case CONFIG_ITEM_DIRECTORY:
         fprintf( stderr, "Todo (CONFIG_ITEM_DIRECTORY)\n" );
@@ -200,6 +202,60 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
 }
 
 void StringConfigControl::finish()
+{
+    text->setText( qfu(p_item->value.psz) );
+    text->setToolTip( qfu(p_item->psz_longtext) );
+    if( label )
+        label->setToolTip( qfu(p_item->psz_longtext) );
+}
+
+/*********** File **************/
+FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
+                                          module_config_t *_p_item,
+                                          QWidget *_parent, QGridLayout *l,
+                                          int &line, bool pwd ) :
+                           VStringConfigControl( _p_this, _p_item, _parent )
+{
+    label = new QLabel( qfu(p_item->psz_text) );
+    text = new QLineEdit( qfu(p_item->value.psz) );
+    browse = new QPushButton( qtr( "Browse" ) );
+
+    BUTTONACT( browse, updateField() );
+
+    finish();
+
+    if( !l )
+    {
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget( label, 0 ); layout->addWidget( text, 1 );
+        layout->addWidget( browse, 2 );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        l->addWidget( label, line, 0 ); l->addWidget( text, line, 1 );
+        l->addWidget( browse, line, 2 );
+    }
+}
+
+
+FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
+                                   module_config_t *_p_item,
+                                   QLabel *_label, QLineEdit *_text, bool pwd ):
+                           VStringConfigControl( _p_this, _p_item )
+{
+    text = _text;
+    label = _label;
+    finish( );
+}
+
+void FileConfigControl::updateField()
+{
+        text->setText( QFileDialog::getOpenFileName( NULL, 
+                qtr( "Select File" ), qfu( p_this->p_libvlc->psz_homedir ) ) );
+}
+
+void FileConfigControl::finish()
 {
     text->setText( qfu(p_item->value.psz) );
     text->setToolTip( qfu(p_item->psz_longtext) );
