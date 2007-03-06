@@ -124,7 +124,7 @@ mediacontrol_RGBPicture *mediacontrol_RGBPicture__alloc( int datasize );
  * Free a RGBPicture structure.
  * \param pic: the RGBPicture structure
  */
-void mediacontrol_RGBPicture__free( mediacontrol_RGBPicture *pic );
+VLC_PUBLIC_API void mediacontrol_RGBPicture__free( mediacontrol_RGBPicture *pic );
 
 mediacontrol_RGBPicture *
   _mediacontrol_createRGBPicture( int, int, long, vlc_int64_t l_date,
@@ -132,21 +132,21 @@ mediacontrol_RGBPicture *
 
 mediacontrol_PlaylistSeq *mediacontrol_PlaylistSeq__alloc( int size );
 
-void mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq *ps );
+VLC_PUBLIC_API void mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq *ps );
 
 /**
  * Initialize an exception structure.
  * \param p_exception the exception to initialize. If NULL, a new exception will be created.
  * \return the exception
  */
-mediacontrol_Exception *
+VLC_PUBLIC_API mediacontrol_Exception *
   mediacontrol_exception_init( mediacontrol_Exception *exception );
 
 /**
  * Free an exception structure.
  * \return the exception
  */
-void mediacontrol_exception_free(mediacontrol_Exception *exception);
+VLC_PUBLIC_API void mediacontrol_exception_free(mediacontrol_Exception *exception);
 
 /*****************************************************************************
  * Core functions
@@ -159,7 +159,7 @@ void mediacontrol_exception_free(mediacontrol_Exception *exception);
  * \param exception an initialized exception pointer
  * \return a mediacontrol_Instance
  */
-mediacontrol_Instance *
+VLC_PUBLIC_API mediacontrol_Instance *
 mediacontrol_new( int argc, char **argv, mediacontrol_Exception *exception );
 
 /**
@@ -168,7 +168,7 @@ mediacontrol_new( int argc, char **argv, mediacontrol_Exception *exception );
  * \param exception an initialized exception pointer
  * \return a mediacontrol_Instance
  */
-mediacontrol_Instance *
+VLC_PUBLIC_API mediacontrol_Instance *
 mediacontrol_new_from_instance( libvlc_instance_t* p_instance,
 				mediacontrol_Exception *exception );
 
@@ -177,7 +177,7 @@ mediacontrol_new_from_instance( libvlc_instance_t* p_instance,
  * \param self: the mediacontrol instance
  * \return a libvlc instance
  */
-libvlc_instance_t*
+VLC_PUBLIC_API libvlc_instance_t*
 mediacontrol_get_libvlc_instance( mediacontrol_Instance* self );
 
 /**
@@ -188,7 +188,7 @@ mediacontrol_get_libvlc_instance( mediacontrol_Instance* self );
  * \param exception an initialized exception pointer
  * \return a mediacontrol_Position
  */
-mediacontrol_Position * mediacontrol_get_media_position(
+VLC_PUBLIC_API mediacontrol_Position * mediacontrol_get_media_position(
                          mediacontrol_Instance *self,
                          const mediacontrol_PositionOrigin an_origin,
                          const mediacontrol_PositionKey a_key,
@@ -200,7 +200,7 @@ mediacontrol_Position * mediacontrol_get_media_position(
  * \param a_position a mediacontrol_Position
  * \param exception an initialized exception pointer
  */
-void mediacontrol_set_media_position( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_set_media_position( mediacontrol_Instance *self,
                                       const mediacontrol_Position *a_position,
                                       mediacontrol_Exception *exception );
 
@@ -210,7 +210,7 @@ void mediacontrol_set_media_position( mediacontrol_Instance *self,
  * \param a_position a mediacontrol_Position
  * \param exception an initialized exception pointer
  */
-void mediacontrol_start( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_start( mediacontrol_Instance *self,
                          const mediacontrol_Position *a_position,
                          mediacontrol_Exception *exception );
 
@@ -220,7 +220,7 @@ void mediacontrol_start( mediacontrol_Instance *self,
  * \param a_position a mediacontrol_Position (ignored for now)
  * \param exception an initialized exception pointer
  */
-void mediacontrol_pause( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_pause( mediacontrol_Instance *self,
                          const mediacontrol_Position *a_position,
                          mediacontrol_Exception *exception );
 
@@ -230,7 +230,7 @@ void mediacontrol_pause( mediacontrol_Instance *self,
  * \param a_position a mediacontrol_Position (ignored for now)
  * \param exception an initialized exception pointer
  */
-void mediacontrol_resume( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_resume( mediacontrol_Instance *self,
                           const mediacontrol_Position *a_position,
                           mediacontrol_Exception *exception );
 
@@ -240,7 +240,7 @@ void mediacontrol_resume( mediacontrol_Instance *self,
  * \param a_position a mediacontrol_Position (ignored for now)
  * \param exception an initialized exception pointer
  */
-void mediacontrol_stop( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_stop( mediacontrol_Instance *self,
                         const mediacontrol_Position *a_position,
                         mediacontrol_Exception *exception );
 
@@ -248,7 +248,7 @@ void mediacontrol_stop( mediacontrol_Instance *self,
  * Exit the player
  * \param self the mediacontrol instance
  */
-void mediacontrol_exit( mediacontrol_Instance *self );
+VLC_PUBLIC_API void mediacontrol_exit( mediacontrol_Instance *self );
 
 /**
  * Add a new MRL to the playlist
@@ -256,7 +256,7 @@ void mediacontrol_exit( mediacontrol_Instance *self );
  * \param psz_file the MRL
  * \param exception an initialized exception pointer
  */
-void mediacontrol_playlist_add_item( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_playlist_add_item( mediacontrol_Instance *self,
                                      const char* psz_file,
                                      mediacontrol_Exception *exception );
 /**
@@ -264,7 +264,7 @@ void mediacontrol_playlist_add_item( mediacontrol_Instance *self,
  * \param self the mediacontrol instance
  * \param exception an initialized exception pointer
  */
-void mediacontrol_playlist_clear( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_playlist_clear( mediacontrol_Instance *self,
                                   mediacontrol_Exception *exception );
 /**
  * Get a flattened view of the playlist
@@ -272,7 +272,7 @@ void mediacontrol_playlist_clear( mediacontrol_Instance *self,
  * \param exception an initialized exception pointer
  * \return a list of strings
  */
-mediacontrol_PlaylistSeq *
+VLC_PUBLIC_API mediacontrol_PlaylistSeq *
   mediacontrol_playlist_get_list( mediacontrol_Instance *self,
                                   mediacontrol_Exception *exception );
 
@@ -281,7 +281,7 @@ mediacontrol_PlaylistSeq *
  * \param self the mediacontrol instance
  * \param exception an initialized exception pointer
  */
-void
+VLC_PUBLIC_API void
 mediacontrol_playlist_next_item( mediacontrol_Instance *self,
                                  mediacontrol_Exception *exception );
 
@@ -295,7 +295,7 @@ mediacontrol_playlist_next_item( mediacontrol_Instance *self,
  * \param exception an initialized exception pointer
  * \return a RGBpicture
  */
-mediacontrol_RGBPicture *
+VLC_PUBLIC_API mediacontrol_RGBPicture *
   mediacontrol_snapshot( mediacontrol_Instance *self,
                          const mediacontrol_Position *a_position,
                          mediacontrol_Exception *exception );
@@ -307,7 +307,7 @@ mediacontrol_RGBPicture *
  * \param exception an initialized exception pointer
  * \return a NULL-terminated list of RGBpicture
  */
-mediacontrol_RGBPicture **
+VLC_PUBLIC_API mediacontrol_RGBPicture **
   mediacontrol_all_snapshots( mediacontrol_Instance *self,
                               mediacontrol_Exception *exception );
 
@@ -319,7 +319,7 @@ mediacontrol_RGBPicture **
  * \param end the end position
  * \param exception an initialized exception pointer
  */
-void mediacontrol_display_text( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_display_text( mediacontrol_Instance *self,
                                 const char *message,
                                 const mediacontrol_Position *begin,
                                 const mediacontrol_Position *end,
@@ -332,7 +332,7 @@ void mediacontrol_display_text( mediacontrol_Instance *self,
  * \param exception an initialized exception pointer
  * \return a mediacontrol_StreamInformation
  */
-mediacontrol_StreamInformation *
+VLC_PUBLIC_API mediacontrol_StreamInformation *
   mediacontrol_get_stream_information( mediacontrol_Instance *self,
                                        mediacontrol_PositionKey a_key,
                                        mediacontrol_Exception *exception );
@@ -343,7 +343,7 @@ mediacontrol_StreamInformation *
  * \param exception an initialized exception pointer
  * \return the volume
  */
-unsigned short
+VLC_PUBLIC_API unsigned short
   mediacontrol_sound_get_volume( mediacontrol_Instance *self,
                                  mediacontrol_Exception *exception );
 /**
@@ -352,7 +352,7 @@ unsigned short
  * \param volume the volume (normalized in [0..100])
  * \param exception an initialized exception pointer
  */
-void mediacontrol_sound_set_volume( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_sound_set_volume( mediacontrol_Instance *self,
                                     const unsigned short volume,
                                     mediacontrol_Exception *exception );
 
@@ -362,7 +362,7 @@ void mediacontrol_sound_set_volume( mediacontrol_Instance *self,
  * \param visual_id the Xid or HWND, depending on the platform
  * \param exception an initialized exception pointer
  */
-vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
+VLC_PUBLIC_API vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
                                     WINDOWHANDLE visual_id,
                                     mediacontrol_Exception *exception );
 
@@ -372,7 +372,7 @@ vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
  * \param exception an initialized exception pointer
  * \return the rate
  */
-int mediacontrol_get_rate( mediacontrol_Instance *self,
+VLC_PUBLIC_API int mediacontrol_get_rate( mediacontrol_Instance *self,
 			   mediacontrol_Exception *exception );
 
 /**
@@ -381,7 +381,7 @@ int mediacontrol_get_rate( mediacontrol_Instance *self,
  * \param rate the desired rate
  * \param exception an initialized exception pointer
  */
-void mediacontrol_set_rate( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_set_rate( mediacontrol_Instance *self,
 			    const int rate,
 			    mediacontrol_Exception *exception );
 
@@ -391,7 +391,7 @@ void mediacontrol_set_rate( mediacontrol_Instance *self,
  * \param exception an initialized exception pointer
  * \return the fullscreen status
  */
-int mediacontrol_get_fullscreen( mediacontrol_Instance *self,
+VLC_PUBLIC_API int mediacontrol_get_fullscreen( mediacontrol_Instance *self,
 				 mediacontrol_Exception *exception );
 
 /**
@@ -400,7 +400,7 @@ int mediacontrol_get_fullscreen( mediacontrol_Instance *self,
  * \param b_fullscreen the desired status
  * \param exception an initialized exception pointer
  */
-void mediacontrol_set_fullscreen( mediacontrol_Instance *self,
+VLC_PUBLIC_API void mediacontrol_set_fullscreen( mediacontrol_Instance *self,
 				  const int b_fullscreen,
 				  mediacontrol_Exception *exception );
 
