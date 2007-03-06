@@ -35,6 +35,7 @@
 #include <vlc_network.h>
 #include <vlc_tls.h>
 #include <vlc_acl.h>
+#include <vlc_strings.h>
 #include "../libvlc.h"
 
 #include <string.h>
@@ -186,63 +187,6 @@ struct httpd_client_t
 /*****************************************************************************
  * Various functions
  *****************************************************************************/
-/*char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";*/
-static void b64_decode( char *restrict dest, const char *restrict src )
-{
-    int  i_level;
-    int  last = 0;
-    int  b64[256] = {
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 00-0F */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 10-1F */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,62,-1,-1,-1,63,  /* 20-2F */
-        52,53,54,55,56,57,58,59,60,61,-1,-1,-1,-1,-1,-1,  /* 30-3F */
-        -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,  /* 40-4F */
-        15,16,17,18,19,20,21,22,23,24,25,-1,-1,-1,-1,-1,  /* 50-5F */
-        -1,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,  /* 60-6F */
-        41,42,43,44,45,46,47,48,49,50,51,-1,-1,-1,-1,-1,  /* 70-7F */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 80-8F */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 90-9F */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* A0-AF */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* B0-BF */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* C0-CF */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* D0-DF */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* E0-EF */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1   /* F0-FF */
-        };
-
-    for( i_level = 0; *src != '\0'; src++ )
-    {
-        int  c;
-
-        c = b64[(unsigned int)*src];
-        if( c == -1 )
-        {
-            continue;
-        }
-
-        switch( i_level )
-        {
-            case 0:
-                i_level++;
-                break;
-            case 1:
-                *dest++ = ( last << 2 ) | ( ( c >> 4)&0x03 );
-                i_level++;
-                break;
-            case 2:
-                *dest++ = ( ( last << 4 )&0xf0 ) | ( ( c >> 2 )&0x0f );
-                i_level++;
-                break;
-            case 3:
-                *dest++ = ( ( last &0x03 ) << 6 ) | c;
-                i_level = 0;
-        }
-        last = c;
-    }
-
-    *dest = '\0';
-}
-
 static struct
 {
     const char *psz_ext;
@@ -2204,7 +2148,7 @@ static void httpd_HostThread( httpd_host_t *host )
                                 {
                                     /* create the headers */
                                     const char *b64 = httpd_MsgGet( query, "Authorization" ); /* BASIC id */
-                                    char *auth;
+                                    char *auth = NULL;
                                     char *id;
 
                                     asprintf( &id, "%s:%s", url->psz_user, url->psz_password );
@@ -2216,15 +2160,10 @@ static void httpd_HostThread( httpd_host_t *host )
                                         {
                                             b64++;
                                         }
-                                        auth = malloc( strlen(b64) + 1 );
-                                        b64_decode( auth, b64 );
-                                    }
-                                    else
-                                    {
-                                        auth = strdup( "" );
+                                        auth = vlc_b64_decode( b64 );
                                     }
 
-                                    if( strcmp( id, auth ) )
+                                    if( (auth == NULL) || strcmp( id, auth ) )
                                     {
                                         httpd_MsgAdd( answer, "WWW-Authenticate", "Basic realm=\"%s\"", url->psz_user );
                                         /* We fail for all url */
