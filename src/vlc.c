@@ -30,6 +30,7 @@
 #include <vlc/vlc.h>
 #include <stdio.h>                                              /* fprintf() */
 #include <stdlib.h>                                  /* putenv(), strtol(),  */
+#include <locale.h>
 
 
 /*****************************************************************************
@@ -56,6 +57,8 @@ static void *SigHandler (void *set);
 int main( int i_argc, char *ppsz_argv[] )
 {
     int i_ret;
+
+    setlocale (LC_ALL, "");
 
 #ifndef __APPLE__
     /* This clutters OSX GUI error logs */
@@ -145,7 +148,7 @@ int main( int i_argc, char *ppsz_argv[] )
                 }
                 else
                 {
-                    ppsz_argv[i] = "";
+                    ppsz_argv[i] = strdup ("");
                 }
             }
             else
