@@ -6,6 +6,7 @@
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Antoine Cellerier <dionoea@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +37,7 @@
 #include <QDialog>
 #include <QLabel>
 #include <QFile>
+#include <QPushButton>
 
 #include "qt4.hpp"
 #include <assert.h>
@@ -262,17 +264,37 @@ public:
                         QLineEdit*, bool pwd );
     virtual ~FileConfigControl() {};
     virtual QString getValue() { return text->text(); };
-    virtual void show() { text->show(); label->show(); }
-    virtual void hide() { text->hide(); label->hide(); }
-public slots: 
+    virtual void show() { text->show(); label->show(); browse->show(); }
+    virtual void hide() { text->hide(); label->hide(); browse->hide(); }
+public slots:
     void updateField();
-private:
+protected:
     void finish();
+private:
     QLineEdit *text;
     QLabel *label;
     QPushButton *browse;
 };
 
+class DirectoryConfigControl : public FileConfigControl
+{
+    Q_OBJECT;
+public:
+    DirectoryConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                         QGridLayout *, int&, bool pwd );
+    DirectoryConfigControl( vlc_object_t *, module_config_t *, QLabel *,
+                        QLineEdit*, bool pwd );
+    virtual ~DirectoryConfigControl() {};
+    virtual QString getValue() { return text->text(); };
+    virtual void show() { text->show(); label->show(); browse->show(); }
+    virtual void hide() { text->hide(); label->hide(); browse->hide(); }
+public slots:
+    void updateField();
+private:
+    QLineEdit *text;
+    QLabel *label;
+    QPushButton *browse;
+};
 
 class ModuleConfigControl : public VStringConfigControl
 {

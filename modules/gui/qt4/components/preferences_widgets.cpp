@@ -1,11 +1,12 @@
 /*****************************************************************************
  * preferences_widgets.cpp : Widgets for preferences displays
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Antoine Cellerier <dionoea@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,7 +107,8 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
                                                 line, false );
         break;
     case CONFIG_ITEM_DIRECTORY:
-        fprintf( stderr, "Todo (CONFIG_ITEM_DIRECTORY)\n" );
+        p_control = new DirectoryConfigControl( p_this, p_item, parent, l,
+                                                line, false );
         break;
     case CONFIG_ITEM_KEY:
         p_control = new KeySelectorControl( p_this, p_item, parent, l, line );
@@ -261,6 +263,28 @@ void FileConfigControl::finish()
     text->setToolTip( qfu(p_item->psz_longtext) );
     if( label )
         label->setToolTip( qfu(p_item->psz_longtext) );
+}
+
+/********* String / Directory **********/
+
+DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
+                        module_config_t *_p_item, QWidget *_p_widget,
+                        QGridLayout *_p_layout, int& _int, bool _pwd ) :
+     FileConfigControl( _p_this, _p_item, _p_widget, _p_layout, _int, _pwd)
+{}
+
+DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
+                        module_config_t *_p_item, QLabel *_p_label,
+                        QLineEdit *_p_line, bool _pwd ) :
+     FileConfigControl( _p_this, _p_item, _p_label, _p_line, _pwd)
+{}
+
+
+void DirectoryConfigControl::updateField()
+{
+    text->setText( QFileDialog::getOpenFileName( NULL,
+                qtr( "Select File" ), qfu( p_this->p_libvlc->psz_homedir ),
+                NULL, 0,  QFileDialog::ShowDirsOnly ) );
 }
 
 /********* String / choice list **********/
