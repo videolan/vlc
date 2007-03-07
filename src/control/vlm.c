@@ -25,8 +25,8 @@
 #include <vlc/libvlc.h>
 #include <vlc_es.h>
 #include <vlc_input.h>
-#include "../input/vlm_internal.h"
 
+#if 0
 static void InitVLM( libvlc_instance_t *p_instance )
 {
 #ifdef ENABLE_VLM
@@ -318,7 +318,7 @@ void libvlc_vlm_seek_media( libvlc_instance_t *p_instance, char *psz_name,
 #endif
 }
 
-#ifdef ENABLE_VLM
+#ifdef ENABLE_VLM && 0
 #define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, default)\
 returnType libvlc_vlm_get_media_## attr( libvlc_instance_t *p_instance, \
                         char *psz_name, int i_instance, \
@@ -435,3 +435,111 @@ char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
 #endif
     return NULL;
 }
+#else
+void libvlc_vlm_add_broadcast( libvlc_instance_t *p_instance, char *psz_name,
+                               char *psz_input, char *psz_output,
+                               int i_options, char **ppsz_options,
+                               int b_enabled, int b_loop,
+                               libvlc_exception_t *p_exception )
+{
+    libvlc_exception_raise( p_exception, "Media %s creation failed", psz_name );
+}
+
+void libvlc_vlm_del_media( libvlc_instance_t *p_instance, char *psz_name,
+                           libvlc_exception_t *p_exception )
+{
+    libvlc_exception_raise( p_exception, "Unable to delete %s", psz_name );
+}
+
+void libvlc_vlm_set_enabled( libvlc_instance_t *p_instance, char *psz_name,
+                             int b_enabled, libvlc_exception_t *p_exception )
+{
+    libvlc_exception_raise( p_exception, "Unable to enable %s", psz_name );
+}
+
+void libvlc_vlm_set_loop( libvlc_instance_t *p_instance, char *psz_name,
+                          int b_loop, libvlc_exception_t *p_exception )
+{
+    libvlc_exception_raise( p_exception, "Unable change %s loop property", psz_name );
+}
+
+void libvlc_vlm_set_output( libvlc_instance_t *p_instance, char *psz_name,
+                            char *psz_output,  libvlc_exception_t *p_exception )
+{
+    libvlc_exception_raise( p_exception, "Unable change %s output property", psz_name );
+}
+
+void libvlc_vlm_set_input( libvlc_instance_t *p_instance, char *psz_name,
+                           char *psz_input,  libvlc_exception_t *p_exception )
+{
+    libvlc_exception_raise( p_exception, "Unable change %s input property", psz_name );
+}
+
+void libvlc_vlm_add_input( libvlc_instance_t *p_instance, char *psz_name,
+                           char *psz_input,  libvlc_exception_t *p_exception )
+{
+    libvlc_exception_raise( p_exception, "Unable change %s input property", psz_name );
+}
+
+
+void libvlc_vlm_change_media( libvlc_instance_t *p_instance, char *psz_name,
+                              char *psz_input, char *psz_output, int i_options,
+                              char **ppsz_options, int b_enabled, int b_loop,
+                              libvlc_exception_t *p_exception )
+{
+    libvlc_exception_raise( p_exception, "Unable change %s properties", psz_name );
+}
+
+void libvlc_vlm_play_media( libvlc_instance_t *p_instance, char *psz_name,
+                            libvlc_exception_t *p_exception )
+    
+{
+    libvlc_exception_raise( p_exception, "Unable to play %s", psz_name );
+}
+
+void libvlc_vlm_stop_media( libvlc_instance_t *p_instance, char *psz_name,
+                            libvlc_exception_t *p_exception )
+    
+{
+    libvlc_exception_raise( p_exception, "Unable to stop %s", psz_name );
+}
+
+void libvlc_vlm_pause_media( libvlc_instance_t *p_instance, char *psz_name,
+                            libvlc_exception_t *p_exception )
+    
+{
+    libvlc_exception_raise( p_exception, "Unable to pause %s", psz_name );
+}
+
+void libvlc_vlm_seek_media( libvlc_instance_t *p_instance, char *psz_name,
+                            float f_percentage, libvlc_exception_t *p_exception )
+    
+{
+    libvlc_exception_raise( p_exception, "Unable to seek %s to %f", psz_name, f_percentage );
+}
+
+#define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, ret)\
+returnType libvlc_vlm_get_media_## attr( libvlc_instance_t *p_instance, \
+                        char *psz_name, int i_instance, libvlc_exception_t *p_exception ) \
+{ \
+    libvlc_exception_raise( p_exception, "Unable to get %s "#attr "attribute" ); \
+    return ret; \
+}
+
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( position, float, Float, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( time, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( length, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( rate, int, Integer, -1);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( title, int, Integer, 0);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( chapter, int, Integer, 0);
+LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
+
+#undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE
+
+char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
+                             libvlc_exception_t *p_exception )
+{
+    libvlc_exception_raise( p_exception, "Unable to call show %s", psz_name );
+    return NULL;
+}
+#endif
