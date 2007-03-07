@@ -398,8 +398,8 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
     if( !p_input )
         return VLC_EGENERIC;
 
-    Init( p_input );
-    End( p_input );
+    if( !Init( p_input ) )
+        End( p_input );
 
     Destroy( p_input, NULL );
 
@@ -1166,7 +1166,10 @@ error:
         input_EsOutDelete( p_input->p->p_es_out );
 
     if( p_input->p->p_sout )
+    {
         vlc_object_detach( p_input->p->p_sout );
+        sout_DeleteInstance( p_input->p->p_sout );
+    }
 
     /* Mark them deleted */
     p_input->p->input.p_demux = NULL;
