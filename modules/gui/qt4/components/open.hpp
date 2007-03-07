@@ -31,6 +31,7 @@
 #include "ui/open_file.h"
 #include "ui/open_disk.h"
 #include "ui/open_net.h"
+#include "ui/open_capture.h"
 
 class OpenPanel: public QWidget
 {
@@ -95,6 +96,20 @@ private:
     Ui::OpenDisk ui;
 public slots:
     virtual void updateMRL() ;
+};
+
+
+class CaptureOpenPanel: public OpenPanel
+{
+    Q_OBJECT;
+public:
+    CaptureOpenPanel( QWidget *, intf_thread_t * );
+    virtual ~CaptureOpenPanel();
+    virtual void clear() ;
+private:
+    Ui::OpenCapture ui;
+public slots:
+    virtual void updateMRL();
 };
 
 #endif

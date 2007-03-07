@@ -17,6 +17,7 @@ TOUI = 	\
 	ui/open_file \
 	ui/open_disk \
 	ui/open_net \
+	ui/open_capture \
 	ui/open \
 	ui/main_interface \
 	ui/sprefs_audio \
@@ -174,6 +175,7 @@ EXTRA_DIST += \
 	ui/open_file.ui \
 	ui/open_disk.ui \
 	ui/open_net.ui \
+	ui/open_capture.ui \
 	ui/open.ui \
 	ui/main_interface.ui \
 	ui/sprefs_audio.ui \
