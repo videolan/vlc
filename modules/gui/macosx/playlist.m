@@ -172,7 +172,7 @@
 
     if( i_return <= 0 )
         i_return = 0;
-NSLog( @"%d children for %s", i_return, p_item->p_input->psz_name ); 
+
     return i_return;
 }
 
@@ -198,9 +198,7 @@ NSLog( @"%d children for %s", i_return, p_item->p_input->psz_name );
     vlc_object_release( p_playlist );
 
     o_value = [o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", p_return]];
-    #if 0
-    NSLog( @"%s", p_return->p_input->psz_name);
-    #endif
+
     if( o_value == nil )
     {
         o_value = [[NSValue valueWithPointer: p_return] retain];
@@ -231,11 +229,7 @@ NSLog( @"%d children for %s", i_return, p_item->p_input->psz_name );
     }
     vlc_object_release( p_playlist );
 
-NSLog( @"expandable" ); 
-    if( i_return <= 0 )
-        return NO;
-    else
-        return YES;
+    return (i_return > 0);
 }
 
 /* retrieve the string values for the cells */
@@ -251,7 +245,6 @@ NSLog( @"expandable" );
     {
         return( @"error");
     }
-//NSLog( @"values for %p", p_item ); 
     
     if( [[o_tc identifier] isEqualToString:@"1"] )
     {
