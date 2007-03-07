@@ -1367,8 +1367,7 @@ static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner )
     pid->p_owner    = p_owner;
     pid->i_owner_number = 0;
 
-    pid->extra_es   = NULL;
-    pid->i_extra_es = 0;
+    TAB_INIT( pid->i_extra_es, pid->extra_es );
 
     if( b_psi )
     {
@@ -3056,7 +3055,11 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                                 else
                                 {
                                     p_es = malloc( sizeof( ts_es_t ) );
-                                    p_es->fmt = pid->es->fmt;
+                                    
+                                    es_format_Copy( &p_es->fmt, &pid->es->fmt );
+                                    free( p_es->fmt.psz_language ); p_es->fmt.psz_language = NULL;
+                                    free( p_es->fmt.psz_description ); p_es->fmt.psz_description = NULL;
+
                                     p_es->id = NULL;
                                     p_es->p_pes = NULL;
                                     p_es->i_pes_size = 0;
@@ -3153,7 +3156,11 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                             else
                             {
                                 p_es = malloc( sizeof( ts_es_t ) );
-                                p_es->fmt = pid->es->fmt;
+
+                                es_format_Copy( &p_es->fmt, &pid->es->fmt );
+                                free( p_es->fmt.psz_language ); p_es->fmt.psz_language = NULL;
+                                free( p_es->fmt.psz_description ); p_es->fmt.psz_description = NULL;
+
                                 p_es->id = NULL;
                                 p_es->p_pes = NULL;
                                 p_es->i_pes_size = 0;
