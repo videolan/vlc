@@ -903,7 +903,7 @@ static int Request( access_t *p_access, int64_t i_tell )
     }
     else
     {
-        char *psz_path = p_sys->url.psz_path;
+        const char *psz_path = p_sys->url.psz_path;
         if( !psz_path || !*psz_path )
         {
             psz_path = "/";

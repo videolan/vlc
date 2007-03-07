@@ -142,7 +142,7 @@ static void Close( vlc_object_t * );
 
 static int i_norm_list[] =
     { VIDEO_MODE_AUTO, VIDEO_MODE_SECAM, VIDEO_MODE_PAL, VIDEO_MODE_NTSC };
-static char *psz_norm_list_text[] =
+static const char *psz_norm_list_text[] =
     { N_("Automatic"), N_("SECAM"), N_("PAL"),  N_("NTSC") };
 
 vlc_module_begin();
