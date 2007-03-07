@@ -107,6 +107,16 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 controls.append( control );                               \
             }
 
+#define CONFIG_GENERIC_FILE( option, type, label, qcontrol, qbutton )         \
+                p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
+                if( p_config )                                                \
+                {                                                             \
+                    control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
+                               p_config, label, ui.qcontrol, ui.qbutton,      \
+                            false );                                          \
+                    controls.append( control );                               \
+                }
+
 
 
 #define START_SPREFS_CAT( name , label )    \
@@ -157,8 +167,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     dXdisplayDevice );
 #endif
 
-            CONFIG_GENERIC( "snapshot-path", Directory, NULL,
-                    snapshotsDirectory );
+            CONFIG_GENERIC_FILE( "snapshot-path", Directory, NULL,
+                    snapshotsDirectory, snapshotsDirectoryBrowse );
             CONFIG_GENERIC( "snapshot-prefix", String, NULL, snapshotsPrefix );
             CONFIG_GENERIC( "snapshot-sequential", Bool, NULL,
                             snapshotsSequentialNumbering );
@@ -191,12 +201,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
          CONFIG_GENERIC( "aout" , Module , NULL, outputModule );
 #ifndef WIN32
          CONFIG_GENERIC( "alsadev" , StringList , NULL, alsaDevice );
-         CONFIG_GENERIC( "dspdev" , File , NULL, OSSDevice );
+         CONFIG_GENERIC_FILE( "dspdev" , File , NULL, OSSDevice, OSSBrowse );
 #else
          CONFIG_GENERIC( "directx-audio-device" , IntegerList, NULL, 
                  DirectXDevice );
 #endif
-         CONFIG_GENERIC( "audiofile-file" , File , NULL, FileName ); 
+         CONFIG_GENERIC_FILE( "audiofile-file" , File , NULL, FileName, 
+                 fileBrowseButton );
 
          CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
 //         CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer 
@@ -240,7 +251,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     ui.skins->setChecked( true );*/
 /*            CONFIG_GENERIC( "intf", Module, NULL, ??? ); */ //FIXME interface choice
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
-            CONFIG_GENERIC( "skins2-last", File, NULL, fileSkin); 
+            CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin, 
+                    skinBrowse );
 #if defined( WIN32 ) || defined(HAVE_DBUS_3)
             CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
             CONFIG_GENERIC( "playlist-enqueue", Bool, NULL, 
@@ -254,7 +266,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
             CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );
 
-            CONFIG_GENERIC( "freetype-font", File, NULL, font ); 
+            CONFIG_GENERIC_FILE( "freetype-font", File, NULL, font, 
+                    fontBrowse ); 
             CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,
                             fontSize );

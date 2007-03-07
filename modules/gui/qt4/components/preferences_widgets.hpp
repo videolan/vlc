@@ -261,7 +261,7 @@ public:
     FileConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                          QGridLayout *, int&, bool pwd );
     FileConfigControl( vlc_object_t *, module_config_t *, QLabel *,
-                        QLineEdit*, bool pwd );
+                        QLineEdit *, QPushButton *, bool pwd );
     virtual ~FileConfigControl() {};
     virtual QString getValue() { return text->text(); };
     virtual void show() { text->show(); label->show(); browse->show(); }
@@ -283,7 +283,7 @@ public:
     DirectoryConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                          QGridLayout *, int&, bool pwd );
     DirectoryConfigControl( vlc_object_t *, module_config_t *, QLabel *,
-                        QLineEdit*, bool pwd );
+                        QLineEdit *, QPushButton *, bool pwd );
     virtual ~DirectoryConfigControl() {};
     virtual QString getValue() { return text->text(); };
     virtual void show() { text->show(); label->show(); browse->show(); }

@@ -243,11 +243,16 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
 
 FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
                                    module_config_t *_p_item,
-                                   QLabel *_label, QLineEdit *_text, bool pwd ):
+                                   QLabel *_label, QLineEdit *_text, 
+                                   QPushButton *_button, bool pwd ):
                            VStringConfigControl( _p_this, _p_item )
 {
+    browse = _button;
     text = _text;
     label = _label;
+
+    BUTTONACT( browse, updateField() );
+
     finish( );
 }
 
@@ -275,8 +280,8 @@ DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
 
 DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
                         module_config_t *_p_item, QLabel *_p_label,
-                        QLineEdit *_p_line, bool _pwd ) :
-     FileConfigControl( _p_this, _p_item, _p_label, _p_line, _pwd)
+                        QLineEdit *_p_line, QPushButton *_p_button, bool _pwd ):
+     FileConfigControl( _p_this, _p_item, _p_label, _p_line, _p_button, _pwd)
 {}
 
 
