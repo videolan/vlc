@@ -53,7 +53,7 @@ static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
 
 static int  pi_replaygain_type[] = { 0, 1, 2 };
-static char *ppsz_replaygain_type[] = { N_("None"), N_("Title"), N_("Album") };
+static const char *ppsz_replaygain_type[] = { N_("None"), N_("Title"), N_("Album") };
 
 vlc_module_begin();
     set_shortname( "MPC" );
