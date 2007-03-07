@@ -26,14 +26,7 @@
 
 #include <vlc_vlm.h>
 
-
-enum
-{
-	VOD_TYPE = 0,
-	BROADCAST_TYPE,
-	SCHEDULE_TYPE,
-};
-
+/* Private */
 typedef struct
 {
     /* instance name */
@@ -48,40 +41,25 @@ typedef struct
     input_thread_t  *p_input;
     sout_instance_t *p_sout;
 
-} vlm_media_instance_t;
+} vlm_media_instance_sys_t;
 
-struct vlm_media_t
+
+typedef struct
 {
-    vlc_bool_t b_enabled;
-    int      i_type;
+    vlm_media_t cfg;
 
-    /* name "media" is reserved */
-    char    *psz_name;
-    input_item_t item;
-
-    /* "playlist" */
-    int     i_input;
-    char    **input;
-
-    int     i_option;
-    char    **option;
-
-    char    *psz_output;
-
-    /* only for broadcast */
-    vlc_bool_t b_loop;
-
-    /* only for vod */
-    vod_media_t *vod_media;
-    char *psz_vod_output;
-    char *psz_mux;
+    struct
+    {
+        input_item_t item;
+        vod_media_t *p_media;
+    } vod;
 
     /* actual input instances */
-    int                  i_instance;
-    vlm_media_instance_t **instance;
-};
+    int                      i_instance;
+    vlm_media_instance_sys_t **instance;
+} vlm_media_sys_t;
 
-struct vlm_schedule_t
+typedef struct 
 {
     /* names "schedule" is reserved */
     char    *psz_name;
@@ -98,7 +76,7 @@ struct vlm_schedule_t
     /* number of times you have to repeat
        i_repeat < 0 : endless repeat     */
     int i_repeat;
-};
+} vlm_schedule_sys_t;
 
 
 struct vlm_t
@@ -107,14 +85,20 @@ struct vlm_t
 
     vlc_mutex_t lock;
 
-    int            i_media;
-    vlm_media_t    **media;
+    /* */
+    int64_t        i_id;
 
+    /* Vod server (used by media) */
     int            i_vod;
-    vod_t          *vod;
+    vod_t          *p_vod;
 
+    /* Media list */
+    int                i_media;
+    vlm_media_sys_t    **media;
+
+    /* Schedule list */
     int            i_schedule;
-    vlm_schedule_t **schedule;
+    vlm_schedule_sys_t **schedule;
 };
 
 #endif

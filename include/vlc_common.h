@@ -425,8 +425,6 @@ typedef struct osd_menu_state_t osd_menu_state_t;
 /* VLM */
 typedef struct vlm_t         vlm_t;
 typedef struct vlm_message_t vlm_message_t;
-typedef struct vlm_media_t   vlm_media_t;
-typedef struct vlm_schedule_t vlm_schedule_t;
 
 /* divers */
 typedef struct vlc_meta_t    vlc_meta_t;
