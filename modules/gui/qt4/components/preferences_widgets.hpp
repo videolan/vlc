@@ -46,7 +46,7 @@ class QGridLayout;
 
 class ConfigControl : public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     ConfigControl( vlc_object_t *_p_this, module_config_t *_p_conf,
                    QWidget *p ) : p_this( _p_this ), p_item( _p_conf )
@@ -87,6 +87,7 @@ signals:
  *******************************************************/
 class VIntConfigControl : public ConfigControl
 {
+Q_OBJECT
 public:
     VIntConfigControl( vlc_object_t *a, module_config_t *b, QWidget *c ) :
             ConfigControl(a,b,c) {};
@@ -99,6 +100,7 @@ public:
 
 class IntegerConfigControl : public VIntConfigControl
 {
+Q_OBJECT
 public:
     IntegerConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                           QGridLayout *, int& );
@@ -181,6 +183,7 @@ private:
  *******************************************************/
 class VFloatConfigControl : public ConfigControl
 {
+    Q_OBJECT
 public:
     VFloatConfigControl( vlc_object_t *a, module_config_t *b, QWidget *c ) :
                 ConfigControl(a,b,c) {};
@@ -193,6 +196,7 @@ public:
 
 class FloatConfigControl : public VFloatConfigControl
 {
+    Q_OBJECT
 public:
     FloatConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                         QGridLayout *, int& );
@@ -213,6 +217,7 @@ private:
 
 class FloatRangeConfigControl : public FloatConfigControl
 {
+    Q_OBJECT
 public:
     FloatRangeConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                              QGridLayout *, int& );
@@ -227,6 +232,7 @@ private:
  *******************************************************/
 class VStringConfigControl : public ConfigControl
 {
+    Q_OBJECT
 public:
     VStringConfigControl( vlc_object_t *a, module_config_t *b, QWidget *c ) :
                 ConfigControl(a,b,c) {};
@@ -239,6 +245,7 @@ public:
 
 class StringConfigControl : public VStringConfigControl
 {
+    Q_OBJECT
 public:
     StringConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                          QGridLayout *, int&,  bool pwd );

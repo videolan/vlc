@@ -34,6 +34,9 @@ class QMenuBar;
 
 class MenuItemData : public QObject
 {
+
+Q_OBJECT
+
 public:
     MenuItemData( int i_id, int _i_type, vlc_value_t _val, const char *_var )
     {
@@ -94,6 +97,8 @@ private:
 
 class MenuFunc : public QObject
 {
+Q_OBJECT
+
 public:
     MenuFunc( QMenu *_menu, int _id ) { menu = _menu; id = _id; };
     void doFunc( intf_thread_t *p_intf)
