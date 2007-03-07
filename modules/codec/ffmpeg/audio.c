@@ -148,11 +148,9 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_samples = NULL;
     p_sys->i_samples = 0;
 
+    aout_DateSet( &p_sys->end_date, 0 );
     if( p_dec->fmt_in.audio.i_rate )
-    {
         aout_DateInit( &p_sys->end_date, p_dec->fmt_in.audio.i_rate );
-        aout_DateSet( &p_sys->end_date, 0 );
-    }
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
