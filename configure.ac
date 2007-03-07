@@ -844,8 +844,8 @@ fi
 dnl Check for dbus
 AC_ARG_ENABLE(dbus,
   [  --enable-dbus           Linux D-BUS message bus system (default enabled)])
- 
-if test "${enable_dbus}" != "no" -a "$SYS" = "Linux"
+
+if test "${enable_dbus}" != "no" -a "${SYS}" = "linux"
 then
   dnl api stable dbus
   PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.0.0,
