@@ -267,8 +267,8 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 CaptureOpenPanel::~CaptureOpenPanel()
 {}
 
-CaptureOpenPanel::clear()
+void CaptureOpenPanel::clear()
 {}
 
-CaptureOpenPanel::updateMRL()
+void CaptureOpenPanel::updateMRL()
 {}
