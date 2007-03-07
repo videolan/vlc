@@ -145,6 +145,7 @@ DIST_http = \
 	http/images/slider_left.png \
 	http/images/slider_point.png \
 	http/images/slider_right.png \
+	http/images/snapshot.png \
 	http/images/slow.png \
 	http/images/sort.png \
 	http/images/sout.png \
