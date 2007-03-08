@@ -11,19 +11,28 @@ libjvlc_la_SOURCES = \
 libjvlc_la_CPPFLAGS = `$(VLC_CONFIG) --cflags pic` $(JINCLUDES)
 libjvlc_la_LIBADD = ../../../src/libvlc-control.la $(LIBJINCLUDES)
 
+libjvlc_a_SOURCES=$(libjvlc_la_SOURCES)
+libjvlc_a_CPPFLAGS = `$(VLC_CONFIG) --cflags pic` $(JINCLUDES)
+libjvlc_a_LIBADD = ../../../src/libvlc.a
+
+
 if BUILD_JAVA
 
 if USE_LIBTOOL
 lib_LTLIBRARIES = libjvlc.la
 else
+lib_LIBRARIES = libjvlc.a
+endif 
 
-COBJECTS = utils.o video-jni.o audio-jni.o input-jni.o playlist-jni.o vlm-jni.o core-jni.o graphics-jni.o
+if HAVE_WIN32
+DATA_noinst_libjvlc = libjvlc$(LIBEXT) libjvlc$(LIBEXT).a
 
-JAVACXXFLAGS = -I. -Isrc -I../../ -I ../../include -I../../../include  $(JINCLUDES) `top_builddir=../../.. ../../../vlc-config --cflags pic` -c
-AM_CXXFLAGS = $(JAVACXXFLAGS)
+libjvlc.dll.a libjvlc.def: libjvlc$(LIBEXT)
+	$(DLLTOOL) -z libjvlc.def -l libjvlc.dll.a -D $< $(libjvlc_a_OBJECTS)
 
-all-am: $(COBJECTS)
+libjvlc$(LIBEXT): $(libjvlc_a_OBJECTS)
 
+all: libjvlc.dll.a
 endif
 
 .PHONY: clean-local
