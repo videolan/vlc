@@ -32,6 +32,7 @@
 
 /* MACROS */
 
+/* DBus related */
 #define DBUS_METHOD( method_function ) \
     static DBusHandlerResult method_function \
             ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this ) 
@@ -75,6 +76,11 @@
 #define ADD_BOOL( b ) DBUS_ADD( DBUS_TYPE_BOOLEAN, b )
 #define ADD_INT32( i ) DBUS_ADD( DBUS_TYPE_INT32, i )
 #define ADD_BYTE( b ) DBUS_ADD( DBUS_TYPE_BYTE, b )
+
+/* VLC related */
+#define TEST_NEXT \
+    p_tested_item = playlist_GetNextLeaf( p_playlist, \
+            p_playlist->p_root_onelevel, p_tested_item, VLC_FALSE, VLC_FALSE );
 
 /* XML data to answer org.freedesktop.DBus.Introspectable.Introspect requests */
 

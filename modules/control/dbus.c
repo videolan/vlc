@@ -4,7 +4,8 @@
  * Copyright (C) 2006 Rafaël Carré
  * $Id$
  *
- * Author:    Rafaël Carré <funman at videolanorg>
+ * Authors:    Rafaël Carré <funman at videolanorg>
+ *             Mirsal Ennaime <mirsal dot ennaime at gmail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,6 +71,9 @@ static void Run        ( intf_thread_t * );
 
 static int TrackChange( vlc_object_t *p_this, const char *psz_var,
                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
+
+static int GetInputMeta ( input_item_t *p_input, 
+                    DBusMessageIter *args);
 
 struct intf_sys_t
 {
@@ -365,7 +369,8 @@ DBUS_METHOD( AddTrack )
 
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_Add( p_playlist, psz_mrl, NULL, PLAYLIST_APPEND |
-            ( ( b_play == TRUE ) ? PLAYLIST_GO : 0 ) , PLAYLIST_END, VLC_TRUE );
+            ( ( b_play == TRUE ) ? PLAYLIST_GO : 0 ) , 
+	    PLAYLIST_END, VLC_TRUE, VLC_FALSE );
     pl_Release( p_playlist );
 
     REPLY_SEND;
@@ -383,11 +388,7 @@ DBUS_METHOD( GetCurrentTrack )
                     p_playlist->status.p_item->p_input->i_id )
     {
         i_position++;
-        p_tested_item = playlist_GetNextLeaf( p_playlist, 
-                        p_playlist->p_root_onelevel,
-                        p_tested_item,
-                        VLC_FALSE,
-                        VLC_FALSE );
+        TEST_NEXT;
     }
 
     pl_Release( p_playlist );
@@ -397,13 +398,16 @@ DBUS_METHOD( GetCurrentTrack )
 }
 
 DBUS_METHOD( GetMetadata )
-{ //TODO reads int, returns a{sv}
+{ 
     REPLY_INIT;
     OUT_ARGUMENTS;
     DBusError error;
     dbus_error_init( &error );
 
-    dbus_int32_t i_position;
+    dbus_int32_t i_position, i_count = 0;
+    
+    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
 
     dbus_message_get_args( p_from, &error,
             DBUS_TYPE_INT32, &i_position,
@@ -416,9 +420,16 @@ DBUS_METHOD( GetMetadata )
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
+    
+    while ( i_count < i_position ) 
+    {
+        i_count++;
+	    TEST_NEXT;
+    }
 
-    //TODO return a{sv}
+    GetInputMeta ( p_tested_item->p_input, &args );
 
+    pl_Release( p_playlist );
     REPLY_SEND;
 }
 
@@ -436,11 +447,7 @@ DBUS_METHOD( GetLength )
     while ( p_tested_item->p_input->i_id != p_last_item->p_input->i_id )
     {
         i_elements++;
-        p_tested_item = playlist_GetNextLeaf( p_playlist, 
-                        p_playlist->p_root_onelevel,
-                        p_tested_item,
-                        VLC_FALSE,
-                        VLC_FALSE );
+	TEST_NEXT;
     }
 
     pl_Release( p_playlist );
@@ -475,18 +482,14 @@ DBUS_METHOD( DelTrack )
     while ( i_count < i_position ) 
     {
         i_count++;
-        p_tested_item = playlist_GetNextLeaf( p_playlist, 
-                        p_playlist->p_root_onelevel, 
-                        p_tested_item,
-                        VLC_FALSE,
-                        VLC_FALSE );
+        TEST_NEXT;
     }
 
-    PL_LOCK 
+    PL_LOCK; 
     playlist_DeleteFromInput( p_playlist, 
 		    p_tested_item->p_input->i_id, 
 		    VLC_TRUE );
-    PL_UNLOCK
+    PL_UNLOCK;
 
     pl_Release( p_playlist );
     
@@ -684,12 +687,12 @@ static void Run          ( intf_thread_t *p_intf )
  *****************************************************************************/
 
 DBUS_SIGNAL( TrackChangeSignal )
-{ /* emit the name of the new item */
+{ /* emit the metadata of the new item */
     SIGNAL_INIT( "TrackChange" );
     OUT_ARGUMENTS;
 
     input_thread_t *p_input = (input_thread_t*) p_data;
-    ADD_STRING( &input_GetItem(p_input)->psz_name );
+    GetInputMeta ( input_GetItem(p_input), &args );
 
     SIGNAL_SEND;
 }
@@ -724,3 +727,71 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * GetInputMeta: Fill a DBusMessage with the given input item metadata
+ *****************************************************************************/
+
+#define ADD_META( entry, type, data ) \
+    if( data ) { \
+        dbus_message_iter_open_container( &dict, DBUS_TYPE_DICT_ENTRY, \
+                NULL, &dict_entry ); \
+        dbus_message_iter_append_basic( &dict_entry, DBUS_TYPE_STRING, \
+                &ppsz_meta_items[entry] ); \
+	dbus_message_iter_open_container( &dict_entry, DBUS_TYPE_VARIANT, \
+                type##_AS_STRING, &variant ); \
+        dbus_message_iter_append_basic( &variant, \
+                type, \
+                & data ); \
+        dbus_message_iter_close_container( &dict_entry, &variant ); \
+        dbus_message_iter_close_container( &dict, &dict_entry ); }\
+
+#define ADD_VLC_META_STRING( entry, item ) \
+        ADD_META( entry, DBUS_TYPE_STRING, \
+                p_input->p_meta->psz_##item );
+
+static int GetInputMeta( input_item_t* p_input, 
+                        DBusMessageIter *args )
+{ /*FIXME: Works only for already read metadata. */ 
+  /*FIXME: Should return the length in seconds rather than milliseconds */
+  
+    DBusMessageIter dict, dict_entry, variant;
+
+    const char* ppsz_meta_items[] = 
+    {
+    "title", "artist", "genre", "copyright", "album", "tracknum",
+    "description", "rating", "date", "setting", "url", "language",
+    "nowplaying", "publisher", "encodedby", "arturl", "trackid",
+    "status", "URI", "length", "video-codec", "audio-codec",
+    "video-bitrate", "audio-bitrate", "audio-samplerate"
+    };
+    
+    dbus_message_iter_open_container( args, DBUS_TYPE_ARRAY, "{sv}", &dict );
+
+    ADD_VLC_META_STRING( 0, title );
+    ADD_VLC_META_STRING( 1, artist );
+    ADD_VLC_META_STRING( 2, genre );
+    ADD_VLC_META_STRING( 3, copyright );
+    ADD_VLC_META_STRING( 4, album );
+    ADD_VLC_META_STRING( 5, tracknum );
+    ADD_VLC_META_STRING( 6, description );
+    ADD_VLC_META_STRING( 7, rating );
+    ADD_VLC_META_STRING( 8, date );
+    ADD_VLC_META_STRING( 9, setting );
+    ADD_VLC_META_STRING( 10, url );
+    ADD_VLC_META_STRING( 11, language );
+    ADD_VLC_META_STRING( 12, nowplaying );
+    ADD_VLC_META_STRING( 13, publisher );
+    ADD_VLC_META_STRING( 14, encodedby );
+    ADD_VLC_META_STRING( 15, arturl );
+    ADD_VLC_META_STRING( 16, trackid ); 
+
+    ADD_META( 17, DBUS_TYPE_INT32, p_input->p_meta->i_status );
+    ADD_META( 18, DBUS_TYPE_STRING, p_input->psz_uri ); 
+    ADD_META( 19, DBUS_TYPE_INT64, p_input->i_duration ); 
+
+    dbus_message_iter_close_container( args, &dict );
+    return VLC_SUCCESS;
+}
+
+#undef ADD_META
+#undef ADD_VLC_META_STRING
