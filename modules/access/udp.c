@@ -554,17 +554,17 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     // Padding bit:
     uint8_t pad = (p_block->p_buffer[0] & 0x20)
                     ? p_block->p_buffer[p_block->i_buffer - 1] : 0;
+    // CSRC count:
+    i_skip += (p_block->p_buffer[0] & 0x0F) * 4;
     // Extension header:
-    if ((p_block->p_buffer[0] & 0x10)) /* Extension header */
+    if (p_block->p_buffer[0] & 0x10) /* Extension header */
     {
         i_skip += 4;
         if ((size_t)p_block->i_buffer < i_skip)
             goto trash;
 
-        i_skip += 4 * GetWBE( p_block->p_buffer + 14 );
+        i_skip += 4 * GetWBE( p_block->p_buffer + i_skip + 2 );
     }
-    // CSRC count:
-    i_skip += (p_block->p_buffer[0] & 0x0F) * 4;
 
     i_payload_type    = p_block->p_buffer[1] & 0x7F;
 
