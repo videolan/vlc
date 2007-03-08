@@ -2072,7 +2072,7 @@ static int Manage( vlc_object_t* p_object )
                     if( p_media->cfg.b_vod || i_new_input_index >= p_media->cfg.i_input )
                         vlm_ControlInternal( vlm, VLM_STOP_MEDIA_INSTANCE, p_media->cfg.id, p_instance->psz_name );
                     else
-                        vlm_ControlInternal( vlm, VLM_START_MEDIA_BROADCAST_INSTANCE, p_media->cfg.id, p_instance->psz_name );
+                        vlm_ControlInternal( vlm, VLM_START_MEDIA_BROADCAST_INSTANCE, p_media->cfg.id, p_instance->psz_name, i_new_input_index );
 
                     j = 0;
                 }
