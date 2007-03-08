@@ -42,12 +42,15 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     setModal( modal );
     ui.setupUi( this );
     setWindowTitle( qtr("Open" ) );
-    fileOpenPanel = new FileOpenPanel(this , p_intf );
-    diskOpenPanel = new DiskOpenPanel(this , p_intf );
-    netOpenPanel = new NetOpenPanel(this , p_intf );
-    ui.Tab->addTab(fileOpenPanel, qtr("File"));
-    ui.Tab->addTab(diskOpenPanel, qtr("Disc"));
-    ui.Tab->addTab(netOpenPanel, qtr("Network"));
+    fileOpenPanel = new FileOpenPanel( this , p_intf );
+    diskOpenPanel = new DiskOpenPanel( this , p_intf );
+    netOpenPanel = new NetOpenPanel( this , p_intf );
+    captureOpenPanel = new CaptureOpenPanel( this, p_intf );
+
+    ui.Tab->addTab( fileOpenPanel, qtr( "File" ) );
+    ui.Tab->addTab( diskOpenPanel, qtr( "Disc" ) );
+    ui.Tab->addTab( netOpenPanel, qtr( "Network" ) );
+    ui.Tab->addTab( captureOpenPanel, qtr( "Capture" ) );
 
     ui.advancedFrame->hide();
 
@@ -57,6 +60,9 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     CONNECT( fileOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
     CONNECT( netOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
     CONNECT( diskOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
+    CONNECT( captureOpenPanel, mrlUpdated( QString ), this,
+            updateMRL(QString) );
+
 
     CONNECT( fileOpenPanel, methodChanged( QString ),
              this, newMethod(QString) );
@@ -122,7 +128,7 @@ void OpenDialog::ok()
                            PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
                            ( i ? PLAYLIST_PREPARSE : 0 ),
                            PLAYLIST_END, VLC_TRUE, VLC_FALSE );
-         }
+        }
 
     }
     else

@@ -59,7 +59,7 @@
     </widget>
    </item>
    <item row="2" column="0" colspan="3" >
-    <widget class="QGroupBox" name="groupBox_3" >
+    <widget class="QGroupBox" name="Options" >
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>5</hsizetype>
@@ -83,6 +83,7 @@
    </item>
   </layout>
  </widget>
+ <includes/>
  <resources/>
  <connections/>
 </ui>

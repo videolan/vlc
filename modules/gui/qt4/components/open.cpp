@@ -271,4 +271,7 @@ void CaptureOpenPanel::clear()
 {}
 
 void CaptureOpenPanel::updateMRL()
-{}
+{
+    QString mrl = "";
+    emit mrlUpdated(mrl);
+}

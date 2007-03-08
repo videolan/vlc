@@ -86,7 +86,7 @@ void DialogsProvider::customEvent( QEvent *event )
             case INTF_DIALOG_NET:
                 openNetDialog(); break;
             case INTF_DIALOG_CAPTURE:
-                openDialog(); break;
+                openCaptureDialog(); break;
             case INTF_DIALOG_PLAYLIST:
                 playlistDialog(); break;
             case INTF_DIALOG_MESSAGES:
@@ -172,6 +172,10 @@ void DialogsProvider::openDiscDialog()
 void DialogsProvider::openNetDialog()
 {
     openDialog( 2 );
+}
+void DialogsProvider::openCaptureDialog()
+{
+    openDialog( 3 );
 }
 void DialogsProvider::openDialog( int i_tab )
 {

@@ -145,6 +145,7 @@ QMenu *QVLCMenu::FileMenu()
     DP_SADD( qtr("Open &File..." ), "", "", openFileDialog() );
     DP_SADD( qtr("Open &Disc..." ), "", "", openDiscDialog());
     DP_SADD( qtr("Open &Network..." ), "", "", openNetDialog());
+    DP_SADD( qtr("Open &Network..." ), "", "", openCaptureDialog());
     menu->addSeparator();
     DP_SADD( qtr("Streaming..."), "", "", streamingDialog() );
     menu->addSeparator();

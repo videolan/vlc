@@ -60,6 +60,7 @@ private:
     FileOpenPanel *fileOpenPanel;
     NetOpenPanel *netOpenPanel;
     DiskOpenPanel *diskOpenPanel;
+    CaptureOpenPanel *captureOpenPanel;
 
     QString storedMethod;
     int advHeight, mainHeight;
