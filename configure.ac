@@ -2914,7 +2914,6 @@ dnl Trying with pkg-config
       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
       AC_CHECK_HEADERS(ffmpeg/avformat.h)
-      AC_CHECK_HEADERS(ffmpeg/swscale.h)
       AC_CHECK_HEADERS(ffmpeg/avutil.h)
       AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
 
@@ -2942,6 +2941,7 @@ dnl Trying with pkg-config
       CPPFLAGS="${CPPFLAGS_save}"
 
       AC_CHECK_LIB(swscale, sws_getContext, [
+        AC_CHECK_HEADERS(ffmpeg/swscale.h)
         VLC_ADD_LDFLAGS([ffmpeg],[-lswscale]) ], [], [-lavcodec $LDAVUTIL])
       LDFLAGS="${LDFLAGS_save}"
       CPPFLAGS="${CPPFLAGS_save}"
