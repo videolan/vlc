@@ -563,7 +563,7 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
         if ((size_t)p_block->i_buffer < i_skip)
             goto trash;
 
-        i_skip += 4 * GetWBE( p_block->p_buffer + i_skip + 2 );
+        i_skip += 4 * GetWBE( p_block->p_buffer + i_skip - 2 );
     }
 
     i_payload_type    = p_block->p_buffer[1] & 0x7F;
