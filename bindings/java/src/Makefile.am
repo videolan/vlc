@@ -26,11 +26,25 @@ endif
 
 if HAVE_WIN32
 DATA_noinst_libjvlc = libjvlc$(LIBEXT) libjvlc$(LIBEXT).a
+LIBRARIES_libvlc = $(top_builddir)/src/libvlc.dll.a
+libjvlc_a_DEPENDENCIES = libjvlc.def $(LIBRARIES_libvlc)
+LDFLAGS_jvlc = `$(VLC_CONFIG) --libs libvlc`
+libjvlc_DATA = libjvlc$(LIBEXT)
 
-libjvlc.dll.a libjvlc.def: libjvlc$(LIBEXT)
-	$(DLLTOOL) -z libjvlc.def -l libjvlc.dll.a -D $< $(libjvlc_a_OBJECTS)
+libjvlcdir=$(srcdir)
 
-libjvlc$(LIBEXT): $(libjvlc_a_OBJECTS)
+#libjvlc.dll.a libjvlc.def: libjvlc$(LIBEXT)
+#	$(DLLTOOL) -z libjvlc.def -l libjvlc.dll.a -D $< $(libjvlc_a_OBJECTS)
+
+libjvlc$(LIBEXT): $(libjvlc_a_OBJECTS) \
+                      $(libjvlc_a_DEPENDENCIES)
+		  $(CXXLINK) $(libjvlc_a_OBJECTS) \
+		        $(srcdir)/libjvlc.def \
+		        $(LIBRARIES_libvlc) -shared $(LIBRARIES_libvlc) $(LIBJINCLUDES) $(LDFLAGS_jvlc) \
+		        $(INCLUDED_LIBINTL)
+# Cygwin work-around, copied by other makefiles
+			@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
+
 
 all: libjvlc.dll.a
 endif

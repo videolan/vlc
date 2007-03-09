@@ -39,7 +39,7 @@ PROCESSOR_FAMILY = `uname -m | sed -e 's/^i.86/i386/' | sed -e 's/^x86_64/amd64/
 
 if HAVE_WIN32
 JINCLUDES = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/win32
-LIBJINCLUDES = -L${JAVA_HOME}/jre/bin -lawt
+LIBJINCLUDES = -L${JAVA_HOME}/lib -ljawt
 JCH = javah
 else
 JINCLUDES = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
