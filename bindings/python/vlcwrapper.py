@@ -4,10 +4,11 @@ class (completion in ipython, access variable as attributes, etc).
 $Id$
 """
 import vlc
+import vlcinternal
 
 class VLCObject(object):
     def __init__(self, id):
-        object.__setattr__(self, '_o', vlc.Object(id))
+        object.__setattr__(self, '_o', vlcinternal.Object(id))
 
     def find(self, typ):
 	"""Returns a VLCObject for the given child.
