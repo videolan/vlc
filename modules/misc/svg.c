@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
+#include <vlc_charset.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include <vlc_block.h>
@@ -57,7 +58,7 @@ static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 static int  RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
                         subpicture_region_t *p_region_in );
-
+static char *svg_GetTemplate( vlc_object_t *p_this );
 
 /*****************************************************************************
  * Module descriptor
