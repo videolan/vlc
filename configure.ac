@@ -5304,12 +5304,12 @@ AC_ARG_ENABLE(loader,
 AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
 AS_IF([test "${enable_loader}" = "yes"],
   [ VLC_ADD_PLUGINS([dmo])
-    VLC_ADD_CPPFLAGS([dmo],[-I../../../@top_srcdir@/loader])
-    VLC_ADD_LDFLAGS([dmo],[../../../loader/libloader.la -lpthread])
-    VLC_ADD_CPPFLAGS([quicktime],[-I../../@top_srcdir@/loader])
-    VLC_ADD_LDFLAGS([quicktime],[../../loader/libloader.la -lpthread])
-    VLC_ADD_CPPFLAGS([realaudio],[-I../../@top_srcdir@/loader -DLOADER])
-    VLC_ADD_LDFLAGS([realaudio],[../../loader/libloader.la -ldl -lpthread])
+    VLC_ADD_CPPFLAGS([dmo],[-I../../../@top_srcdir@/libs/loader])
+    VLC_ADD_LDFLAGS([dmo],[../../../libs/loader/libloader.la -lpthread])
+    VLC_ADD_CPPFLAGS([quicktime],[-I../../@top_srcdir@/libs/loader])
+    VLC_ADD_LDFLAGS([quicktime],[../../libs/loader/libloader.la -lpthread])
+    VLC_ADD_CPPFLAGS([realaudio],[-I../../@top_srcdir@/libs/loader -DLOADER])
+    VLC_ADD_LDFLAGS([realaudio],[../../libs/loader/libloader.la -ldl -lpthread])
   ])
 
 dnl
@@ -5771,7 +5771,8 @@ AC_CONFIG_FILES([
   doc/Makefile
   intl/Makefile
   ipkg/Makefile
-  loader/Makefile
+  libs/Makefile
+  libs/loader/Makefile
   modules/Makefile
   mozilla/Makefile
   m4/Makefile
