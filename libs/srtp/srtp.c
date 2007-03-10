@@ -651,6 +651,7 @@ srtcp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
     const uint8_t *tag = rtcp_digest (s->rtp.mac, buf, len);
     memcpy (buf + len, tag, s->tag_len);
     *lenp = len + s->tag_len;
+    s->rtcp_index++; /* Update index */
     return 0;
 }
 
@@ -682,8 +683,13 @@ srtcp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
          return EACCES;
 
     len -= 4; /* Remove SRTCP index before decryption */
-    *lenp = len;
+    uint32_t index;
+    memcpy (&index, buf + len, 4);
+    index = ntohl (index);
+    if (((index - s->rtcp_index) & 0xffffffff) < 0x80000000)
+        s->rtcp_index = index; /* Update index */
 
+    *lenp = len;
     return srtp_crypt (s, buf, len);
 }
 
