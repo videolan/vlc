@@ -1535,8 +1535,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                                 "You should use --%s instead.\n",
                                 p_conf->psz_name, p_conf->psz_current);
                     }
-                    //*psz_name = *(p_conf->psz_current);
-                    psz_name = p_conf->psz_current;
+                    *psz_name = *(p_conf->psz_current);
                     p_conf = config_FindConfig( p_this, psz_name );
                 }
 
