@@ -33,6 +33,8 @@
 
 #include <gcrypt.h>
 
+#define debug( ... ) (void)0
+
 /* TODO:
  * Useful stuff:
  * - ROC profil thingy (multicast really needs this)
@@ -52,7 +54,6 @@ typedef struct srtp_proto_t
     gcry_cipher_hd_t cipher;
     gcry_md_hd_t     mac;
     uint32_t         salt[4];
-    uint8_t          mac_len;
 } srtp_proto_t;
 
 struct srtp_session_t
@@ -64,6 +65,7 @@ struct srtp_session_t
     uint32_t rtcp_index;
     uint32_t rtp_roc;
     uint16_t rtp_seq;
+    uint8_t  tag_len;
 };
 
 enum
@@ -176,14 +178,14 @@ srtp_create (const char *name, unsigned flags, unsigned kdr, uint16_t winsize)
     if (winsize != 0)
         return NULL; // FIXME: replay protection not implemented yet
 
-    uint8_t mac_len;
+    uint8_t tag_len;
     int cipher = GCRY_CIPHER_AES, md = GCRY_MD_SHA1;
 
     if (strcmp (name, "AES_CM_128_HMAC_SHA1_80") == 0)
-        mac_len = 80;
+        tag_len = 10;
     else
     if (strcmp (name, "AES_CM_128_HMAC_SHA1_32") == 0)
-        mac_len = 32;
+        tag_len = 4;
     else
     // F8_128_HMAC_SHA1_80 is not implemented
         return NULL;
@@ -198,6 +200,7 @@ srtp_create (const char *name, unsigned flags, unsigned kdr, uint16_t winsize)
     memset (s, 0, sizeof (*s));
     s->flags = flags;
     s->kdr = kdr;
+    s->tag_len = tag_len;
 
     if (proto_create (&s->rtp, cipher, md) == 0)
     {
@@ -254,6 +257,7 @@ derive (gcry_cipher_hd_t prf, const void *salt,
     return 0;
 }
 
+#include <stdio.h>
 
 static int
 proto_derive (srtp_proto_t *p, gcry_cipher_hd_t prf,
@@ -263,14 +267,20 @@ proto_derive (srtp_proto_t *p, gcry_cipher_hd_t prf,
     if (saltlen != 14)
         return -1;
 
-    uint8_t cipherkey[16];
+    uint32_t cipherkey[4], authkey[5];
     uint8_t label = rtcp ? SRTCP_CRYPT : SRTP_CRYPT;
 
     if (derive (prf, salt, r, rlen, label++, cipherkey, 16)
      || gcry_cipher_setkey (p->cipher, cipherkey, 16)
-     || derive (prf, salt, r, rlen, label++, NULL, 0) /* FIXME HMAC */
+     || derive (prf, salt, r, rlen, label++, authkey, 20)
+     || gcry_md_setkey (p->mac, authkey, 20)
      || derive (prf, salt, r, rlen, label++, p->salt, 14))
         return -1;
+
+    debug (" cipher key: %08x%08x%08x%08x\n auth key: %08x%08x%08x%08x%08x\n",
+            ntohl (cipherkey[0]), ntohl (cipherkey[1]), ntohl (cipherkey[2]),
+            ntohl (cipherkey[3]), ntohl (authkey[0]), ntohl (authkey[1]),
+            ntohl (authkey[2]), ntohl (authkey[3]), ntohl (authkey[4]));
 
     return 0;
 }
@@ -388,6 +398,17 @@ rtp_encrypt (gcry_cipher_hd_t hd, uint32_t ssrc, uint32_t roc, uint16_t seq,
 }
 
 
+/** Message Authentication and Integrity for RTP */
+static const uint8_t *
+rtp_digest (gcry_md_hd_t md, const void *data, size_t len, uint32_t roc)
+{
+    gcry_md_reset (md);
+    gcry_md_write (md, data, len);
+    gcry_md_write (md, &(uint32_t){ htonl (roc) }, 4);
+    return gcry_md_read (md, 0);
+}
+
+
 /**
  * Encrypts/decrypts a RTP packet and updates SRTP context
  * (CTR block cypher mode of operation has identical encryption and
@@ -399,7 +420,7 @@ rtp_encrypt (gcry_cipher_hd_t hd, uint32_t ssrc, uint32_t roc, uint16_t seq,
  * @return 0 on success, in case of error:
  *  EINVAL  malformatted RTP packet
  */
-static int srtp_encrypt (srtp_session_t *s, uint8_t *buf, size_t len)
+static int srtp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
 {
     assert (s != NULL);
 
@@ -419,7 +440,7 @@ static int srtp_encrypt (srtp_session_t *s, uint8_t *buf, size_t len)
             return EINVAL;
 
         memcpy (&extlen, buf + offset - 2, 2);
-        offset += htons (extlen);
+        offset += htons (extlen); // skips RTP extension header
     }
 
     if (len < offset)
@@ -465,47 +486,68 @@ static int srtp_encrypt (srtp_session_t *s, uint8_t *buf, size_t len)
  * @param bufsize size (bytes) of the packet buffer
  *
  * @return 0 on success, in case of error:
- *  EINVAL  malformatted RTP packet
+ *  EINVAL  malformatted RTP packet or internal error
  *  ENOSPC  bufsize is too small (to add authentication tag)
  */
 int
 srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
 {
     size_t len = *lenp;
-    int val = srtp_encrypt (s, buf, len);
+    int val = srtp_crypt (s, buf, len);
     if (val)
         return val;
 
-    if (bufsize < (len + s->rtp.mac_len))
+    if (s->flags & SRTP_UNAUTHENTICATED)
+        return 0;
+
+    if (bufsize < (len + s->tag_len))
         return ENOSPC;
 
-    /* FIXME: HMAC and anti-replay */
+    const uint8_t *tag = rtp_digest (s->rtp.mac, buf, len, s->rtp_roc);
+    memcpy (buf + len, tag, s->tag_len);
+    *lenp = len + s->tag_len;
+
     return 0;
 }
 
 
 /**
- * Turns a RTP packet into a SRTP packet: encrypt it, then computes
- * the authentication tag and appends it.
- * Note that you can encrypt packet in disorder.
+ * Turns a SRTP packet into a RTP packet: authenticates the packet,
+ * then decrypts it.
  *
- * @param buf RTP packet to be decrypted/digested
+ * @param buf RTP packet to be digested/decrypted
  * @param lenp pointer to the RTP packet length on entry,
  *             set to the SRTP length on exit (undefined in case of error)
  *
  * @return 0 on success, in case of error:
- *  EINVAL  malformatted RTP packet
+ *  EINVAL  malformatted SRTP packet
  *  EACCES  authentication failed (spoofed packet or out-of-sync)
  */
 int
 srtp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
 {
     size_t len = *lenp;
-    int val = srtp_encrypt (s, buf, len);
-    if (val)
-        return val;
 
-    /* FIXME: HMAC and anti-replay */
-    return 0;
+    if (!(s->flags & SRTP_UNAUTHENTICATED))
+    {
+        if (len < s->tag_len)
+            return EINVAL;
+        len -= s->tag_len;
+        *lenp = len;
+
+        const uint8_t *tag = rtp_digest (s->rtp.mac, buf, len, s->rtp_roc);
+        debug  (" Auth tag: %08x%08x%04x (wanted)\n"
+                " Auth tag: %08x%08x%04x (recv'd)\n",
+                ntohl (((uint32_t *)tag)[0]), ntohl (((uint32_t *)tag)[1]),
+                ntohs (((uint16_t *)tag)[4]),
+                ntohl (((uint32_t *)w)[0]), ntohl (((uint32_t *)w)[1]),
+                ntohs (((uint16_t *)w)[4]));
+        if (memcmp (buf + len, tag, s->tag_len))
+            return EACCES;
+    }
+
+    /* FIXME: anti-replay */
+
+    return srtp_crypt (s, buf, len);
 }
 
