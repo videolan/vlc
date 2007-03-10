@@ -98,7 +98,6 @@ char *vlc_strndup( const char *string, size_t n )
 
     len = __MIN( len, n );
     psz = (char*)malloc( len + 1 );
-
     if( psz != NULL )
     {
         memcpy( (void*)psz, (const void*)string, len );
@@ -256,10 +255,12 @@ int vlc_asprintf( char **strp, const char *fmt, ... )
 double vlc_atof( const char *nptr )
 {
     double f_result;
-    wchar_t *psz_tmp;
+    wchar_t *psz_tmp = NULL;
     int i_len = strlen( nptr ) + 1;
 
     psz_tmp = malloc( i_len * sizeof(wchar_t) );
+    if( !psz_tmp )
+        return NULL;
     MultiByteToWideChar( CP_ACP, 0, nptr, -1, psz_tmp, i_len );
     f_result = wcstod( psz_tmp, NULL );
     free( psz_tmp );
@@ -411,14 +412,16 @@ typedef struct vlc_DIR
 
 void *vlc_wopendir( const wchar_t *wpath )
 {
-    vlc_DIR *p_dir;
-    _WDIR *p_real_dir;
+    vlc_DIR *p_dir = NULL;
+    _WDIR *p_real_dir = NULL;
 
     if ( wpath == NULL || wpath[0] == '\0'
           || (wcscmp (wpath, L"\\") == 0) )
     {
         /* Special mode to list drive letters */
         p_dir = malloc( sizeof(vlc_DIR) );
+        if( !p_dir )
+            return NULL;
         p_dir->p_real_dir = NULL;
         p_dir->i_drives = GetLogicalDrives();
         return (void *)p_dir;
@@ -429,6 +432,11 @@ void *vlc_wopendir( const wchar_t *wpath )
         return NULL;
 
     p_dir = malloc( sizeof(vlc_DIR) );
+    if( !p_dir )
+    {
+        _wclosedir( p_real_dir );
+        return NULL;
+    }
     p_dir->p_real_dir = p_real_dir;
 
     assert (wpath[0]); // wpath[1] is defined
@@ -551,8 +559,19 @@ int vlc_scandir( const char *name, struct dirent ***namelist,
         pp_list = realloc( pp_list, ( ret + 1 ) * sizeof( struct dirent * ) );
         size = sizeof( struct dirent ) + strlen( p_content->d_name ) + 1;
         pp_list[ret] = malloc( size );
-        memcpy( pp_list[ret], p_content, size );
-        ret++;
+        if( pp_list[ret] )
+        {
+            memcpy( pp_list[ret], p_content, size );
+            ret++;
+        }
+        else
+        {
+            /* Continuing is useless when no more memory can be allocted,
+             * so better return what we have found.
+             */
+            ret = -1;
+            break;
+        }
     }
 
     closedir( p_dir );
@@ -937,7 +956,12 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
         close( pi_stdin[0] );
 
     *pi_data = 0;
+    if( *pp_data )
+        free( *pp_data );
+    *pp_data = NULL;
     *pp_data = malloc( 1025 );  /* +1 for \0 */
+    if( !*pp_data )
+        return -1;
 
     while ( !p_object->b_die )
     {
@@ -1021,7 +1045,7 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
     BOOL bFuncRetn = FALSE;
     HANDLE hChildStdinRd, hChildStdinWr, hChildStdoutRd, hChildStdoutWr;
     DWORD i_status;
-    char *psz_cmd, *p_env, *p;
+    char *psz_cmd = NULL, *p_env = NULL, *p = NULL;
     char **ppsz_parser;
     int i_size;
 
@@ -1064,6 +1088,8 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
 
     /* Set up the command line. */
     psz_cmd = malloc(32768);
+    if( !psz_cmd )
+        return -1;
     psz_cmd[0] = '\0';
     i_size = 32768;
     ppsz_parser = &ppsz_argv[0];
@@ -1091,6 +1117,12 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
 
     /* Set up the environment. */
     p = p_env = malloc(32768);
+    if( !p )
+    {
+        free( psz_cmd );
+        return -1;
+    }
+
     i_size = 32768;
     ppsz_parser = &ppsz_env[0];
     while ( *ppsz_parser != NULL && i_size > 0 )
@@ -1143,6 +1175,9 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
 
     /* Read output from the child process. */
     *pi_data = 0;
+    if( *pp_data )
+        free( pp_data );
+    *pp_data = NULL;
     *pp_data = malloc( 1025 );  /* +1 for \0 */
 
     while ( !p_object->b_die )
@@ -1176,6 +1211,5 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
 #endif
 
     (*pp_data)[*pi_data] = '\0';
-
     return 0;
 }
