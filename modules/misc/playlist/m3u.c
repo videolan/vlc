@@ -51,8 +51,7 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
     for( i = 0; i< p_root->i_children ; i++)
     {
         playlist_item_t *p_current = p_root->pp_children[i];
-        if( !p_current )
-            continue;
+        assert( p_current );
 
         if( p_current->i_flags & PLAYLIST_SAVE_FLAG )
             continue;
@@ -119,4 +118,3 @@ int Export_M3U( vlc_object_t *p_this )
     DoChildren( p_playlist, p_export, p_export->p_root );
     return VLC_SUCCESS;
 }
-
