@@ -387,13 +387,45 @@ rtp_crypt (gcry_cipher_hd_t hd, uint32_t ssrc, uint32_t roc, uint16_t seq,
 }
 
 
+/** Determines SRTP Roll-Over-Counter (in host-byte order) */
+static uint32_t
+srtp_compute_roc (const srtp_session_t *s, uint16_t seq)
+{
+    uint32_t roc = s->rtp_roc;
+
+    if (((seq - s->rtp_seq) & 0xffff) < 0x8000)
+    {
+        /* Sequence is ahead, good */
+        if (seq < s->rtp_seq)
+            roc++; /* Sequence number wrap */
+    }
+    else
+    {
+        /* Sequence is late, bad */
+        if (seq > s->rtp_seq)
+            roc--; /* Wrap back */
+    }
+    return roc;
+}
+
+
+/** Returns RTP sequence (in host-byte order) */
+static inline uint16_t rtp_seq (const uint8_t *buf)
+{
+    return (buf[2] << 8) | buf[3];
+}
+
+
 /** Message Authentication and Integrity for RTP */
 static const uint8_t *
-rtp_digest (gcry_md_hd_t md, const void *data, size_t len, uint32_t roc)
+rtp_digest (srtp_session_t *s, const uint8_t *data, size_t len)
 {
+    const gcry_md_hd_t md = s->rtp.mac;
+    uint32_t roc = htonl (srtp_compute_roc (s, rtp_seq (data)));
+
     gcry_md_reset (md);
     gcry_md_write (md, data, len);
-    gcry_md_write (md, &(uint32_t){ htonl (roc) }, 4);
+    gcry_md_write (md, &roc, 4);
     return gcry_md_read (md, 0);
 }
 
@@ -436,27 +468,22 @@ static int srtp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
         return EINVAL;
 
     /* Determines RTP 48-bits counter and SSRC */
-    uint32_t ssrc;
+    uint16_t seq = rtp_seq (buf);
+    uint32_t roc = srtp_compute_roc (s, seq), ssrc;
     memcpy (&ssrc, buf + 8, 4);
 
-    uint16_t seq = (buf[2] << 8) | buf[3];
-    if (((seq - s->rtp_seq) & 0xffff) < 32768)
-    {
-        if (seq < s->rtp_seq)
-            s->rtp_roc++; /* Sequence number wrap */
-    }
+    /* Updates ROC and sequence (it's safe now) */
+    if (roc > s->rtp_roc)
+        s->rtp_seq = seq, s->rtp_roc = roc;
     else
-    {
-        if (seq > s->rtp_seq)
-            s->rtp_roc--;
-    }
+    if (seq > s->rtp_seq)
+        s->rtp_seq = seq;
 
-    s->rtp_seq = seq;
-
+    /* Encrypt/Decrypt */
     if (s->flags & SRTP_UNENCRYPTED)
         return 0;
 
-    if (rtp_crypt (s->rtp.cipher, ssrc, s->rtp_roc, seq, s->rtp.salt,
+    if (rtp_crypt (s->rtp.cipher, ssrc, roc, seq, s->rtp.salt,
                    buf + offset, len - offset))
         return EINVAL;
 
@@ -486,15 +513,15 @@ srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
     if (val)
         return val;
 
-    if (s->flags & SRTP_UNAUTHENTICATED)
-        return 0;
+    if (!(s->flags & SRTP_UNAUTHENTICATED))
+    {
+        if (bufsize < (len + s->tag_len))
+            return ENOSPC;
 
-    if (bufsize < (len + s->tag_len))
-        return ENOSPC;
-
-    const uint8_t *tag = rtp_digest (s->rtp.mac, buf, len, s->rtp_roc);
-    memcpy (buf + len, tag, s->tag_len);
-    *lenp = len + s->tag_len;
+        const uint8_t *tag = rtp_digest (s, buf, len);
+        memcpy (buf + len, tag, s->tag_len);
+        *lenp = len + s->tag_len;
+    }
 
     return 0;
 }
@@ -520,11 +547,11 @@ srtp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
 
     if (!(s->flags & SRTP_UNAUTHENTICATED))
     {
-        if (len < s->tag_len)
+        if (len < (12u + s->tag_len))
             return EINVAL;
         len -= s->tag_len;
 
-        const uint8_t *tag = rtp_digest (s->rtp.mac, buf, len, s->rtp_roc);
+        const uint8_t *tag = rtp_digest (s, buf, len);
         if (memcmp (buf + len, tag, s->tag_len))
             return EACCES;
 
