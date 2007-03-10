@@ -148,6 +148,9 @@ int libvlc_audio_get_track( libvlc_input_t *p_input,
     input_thread_t *p_input_thread = GetInput( p_input, p_e );
     int i_track = 0;
 
+    if( !p_input_thread )
+        return -1;
+
     i_track = var_GetInteger( p_input_thread, "audio-es" );
     vlc_object_release( p_input_thread );
 
@@ -164,6 +167,9 @@ void libvlc_audio_set_track( libvlc_input_t *p_input, int i_track,
     vlc_value_t val_list;
     int i_ret = -1;
     int i;
+
+    if( !p_input_thread )
+        return;
 
     var_Change( p_input_thread, "audio-es", VLC_VAR_GETCHOICES, &val_list, NULL );
     for( i = 0; i < val_list.p_list->i_count; i++ )
