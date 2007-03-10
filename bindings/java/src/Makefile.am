@@ -25,18 +25,18 @@ lib_LIBRARIES = libjvlc.a
 endif 
 
 if HAVE_WIN32
-DATA_noinst_libjvlc = libjvlc$(LIBEXT) libjvlc$(LIBEXT).a
+DATA_noinst_libjvlc = jvlc$(LIBEXT) libjvlc$(LIBEXT).a
 LIBRARIES_libvlc = $(top_builddir)/src/libvlc.dll.a
 libjvlc_a_DEPENDENCIES = libjvlc.def $(LIBRARIES_libvlc)
 LDFLAGS_jvlc = `$(VLC_CONFIG) --libs libvlc`
-libjvlc_DATA = libjvlc$(LIBEXT)
+libjvlc_DATA = jvlc$(LIBEXT)
 
 libjvlcdir=$(srcdir)
 
-#libjvlc.dll.a libjvlc.def: libjvlc$(LIBEXT)
-#	$(DLLTOOL) -z libjvlc.def -l libjvlc.dll.a -D $< $(libjvlc_a_OBJECTS)
+libjvlc.dll.a libjvlc.def:
+	$(DLLTOOL) -z libjvlc.def -l libjvlc.dll.a -D $< $(libjvlc_a_OBJECTS)
 
-libjvlc$(LIBEXT): $(libjvlc_a_OBJECTS) \
+jvlc$(LIBEXT): $(libjvlc_a_OBJECTS) \
                       $(libjvlc_a_DEPENDENCIES)
 		  $(CXXLINK) $(libjvlc_a_OBJECTS) -Wl,--kill-at \
 		        $(srcdir)/libjvlc.def \
@@ -52,6 +52,6 @@ endif
 .PHONY: clean-local
 
 clean-local:
-	rm -f *.o *~
+	rm -f *.o *~ *.def *.dll
 
 endif
