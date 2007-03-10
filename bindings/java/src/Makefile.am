@@ -38,7 +38,7 @@ libjvlcdir=$(srcdir)
 
 libjvlc$(LIBEXT): $(libjvlc_a_OBJECTS) \
                       $(libjvlc_a_DEPENDENCIES)
-		  $(CXXLINK) $(libjvlc_a_OBJECTS) \
+		  $(CXXLINK) $(libjvlc_a_OBJECTS) -Wl,--kill-at \
 		        $(srcdir)/libjvlc.def \
 		        $(LIBRARIES_libvlc) -shared $(LIBRARIES_libvlc) $(LIBJINCLUDES) $(LDFLAGS_jvlc) \
 		        $(INCLUDED_LIBINTL)
