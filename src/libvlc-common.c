@@ -1795,6 +1795,11 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
     p_connection = dbus_bus_get ( DBUS_BUS_SYSTEM, &error );
     if( dbus_error_is_set( &error ) )
     {
+#ifdef HAVE_HAL_1
+        libhal_ctx_shutdown( ctx, NULL );
+#else
+        hal_shutdown( ctx );
+#endif
         dbus_error_free( &error );
         return;
     }
