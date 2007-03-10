@@ -37,7 +37,6 @@
 #include <vlc_aout.h>
 #include <vlc_intf_strings.h>
 #include <vlc_vout.h>
-#include <assert.h>
 
 class ConfClickHandler : public QObject
 {
