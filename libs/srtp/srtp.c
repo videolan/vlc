@@ -33,9 +33,6 @@
 
 #include <gcrypt.h>
 
-#include <netinet/in.h>
-#include <pthread.h>
-
 /* TODO:
  * Useful stuff:
  * - ROC profil thingy (multicast really needs this)
@@ -79,7 +76,11 @@ enum
     SRTCP_SALT
 };
 
-#ifndef WIN32
+#ifdef WIN32
+# include <winsock2.h>
+#else
+# include <netinet/in.h>
+# include <pthread.h>
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
 #endif
 
@@ -465,7 +466,7 @@ static int srtp_encrypt (srtp_session_t *s, uint8_t *buf, size_t len)
  *
  * @return 0 on success, in case of error:
  *  EINVAL  malformatted RTP packet
- *  ENOBUFS bufsize is too small
+ *  ENOSPC  bufsize is too small (to add authentication tag)
  */
 int
 srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
@@ -476,7 +477,7 @@ srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
         return val;
 
     if (bufsize < (len + s->rtp.mac_len))
-        return ENOBUFS;
+        return ENOSPC;
 
     /* FIXME: HMAC and anti-replay */
     return 0;
