@@ -594,8 +594,7 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
         vlc_mutex_unlock( &p_obj->object_lock );
         if( p_item )
         {
-            if( !p_item->p_meta )
-                return;
+            assert( p_item->p_meta );
             if( !b_fetch_art )
             {
                 input_MetaFetch( p_playlist, p_item );

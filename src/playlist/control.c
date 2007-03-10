@@ -75,8 +75,6 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         {
             p_node = p_playlist->status.p_node;
             assert( p_node );
-            if( !p_node )
-                break;
         }
         p_playlist->request.i_status = PLAYLIST_RUNNING;
         p_playlist->request.i_skip = 0;
