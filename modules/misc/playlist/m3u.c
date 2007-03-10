@@ -51,6 +51,9 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
     for( i = 0; i< p_root->i_children ; i++)
     {
         playlist_item_t *p_current = p_root->pp_children[i];
+        if( !p_current )
+            continue;
+
         if( p_current->i_flags & PLAYLIST_SAVE_FLAG )
             continue;
 
