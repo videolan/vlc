@@ -87,7 +87,8 @@ playlist_item_t * playlist_ItemGetByInputId( playlist_t *p_playlist,
                                              playlist_item_t *p_root )
 {
     int i;
-    assert( p_root != NULL );
+
+    if( !p_root ) return NULL;
     for( i = 0 ; i< p_root->i_children ; i++ )
     {
         if( p_root->pp_children[i]->i_children == -1 &&
