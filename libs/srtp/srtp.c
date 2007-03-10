@@ -38,7 +38,6 @@
 /* TODO:
  * Useful stuff:
  * - ROC profile thingy (multicast really needs this)
- * - replay protection
  *
  * Useless stuff (because nothing depends on it):
  * - non-nul key derivation rate
@@ -440,6 +439,7 @@ rtp_digest (srtp_session_t *s, const uint8_t *data, size_t len)
  *
  * @return 0 on success, in case of error:
  *  EINVAL  malformatted RTP packet
+ *  EACCES  replayed packet or out-of-window or sync lost
  */
 static int srtp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
 {
@@ -473,11 +473,22 @@ static int srtp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
     memcpy (&ssrc, buf + 8, 4);
 
     /* Updates ROC and sequence (it's safe now) */
-    if (roc > s->rtp_roc)
+    int16_t diff = seq - s->rtp_seq;
+    if (diff > 0)
+    {
+        /* Sequence in the future, good */
+        s->rtp.window = s->rtp.window << diff;
+        s->rtp.window |= 1;
         s->rtp_seq = seq, s->rtp_roc = roc;
+    }
     else
-    if (seq > s->rtp_seq)
-        s->rtp_seq = seq;
+    {
+        /* Sequence in the past/present, bad */
+        diff = -diff;
+        if ((diff >= 64) || ((s->rtp.window >> diff) & 1))
+            return EACCES; /* Replay attack */
+        s->rtp.window |= 1 << diff;
+    }
 
     /* Encrypt/Decrypt */
     if (s->flags & SRTP_UNENCRYPTED)
@@ -504,6 +515,7 @@ static int srtp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
  * @return 0 on success, in case of error:
  *  EINVAL  malformatted RTP packet or internal error
  *  ENOSPC  bufsize is too small (to add authentication tag)
+ *  EACCES  packet would trigger a replay error on receiver
  */
 int
 srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
@@ -543,7 +555,6 @@ int
 srtp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
 {
     size_t len = *lenp;
-    /* FIXME: anti-replay */
 
     if (!(s->flags & SRTP_UNAUTHENTICATED))
     {
@@ -600,12 +611,31 @@ static int srtcp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
     if ((len < 12) || ((buf[0] >> 6) != 2))
         return EINVAL;
 
-    /* Updates SRTCP index (safe here) */
     uint32_t index;
     memcpy (&index, buf + len, 4);
     index = ntohl (index);
-    if (((index - s->rtcp_index) & 0x7fffffff) < 0x40000000)
-        s->rtcp_index = index; /* Update index */
+    if (((index >> 31) != 0) != ((s->flags & SRTCP_UNENCRYPTED) == 0))
+        return EINVAL; // E-bit mismatch
+
+    index &= ~(1 << 31); // clear E-bit for counter
+
+    /* Updates SRTCP index (safe here) */
+    int32_t diff = index - s->rtcp_index;
+    if (diff > 0)
+    {
+        /* Packet in the future, good */
+        s->rtcp.window = s->rtcp.window << diff;
+        s->rtcp.window |= 1;
+        s->rtcp_index = index;
+    }
+    else
+    {
+        /* Packet in the past/present, bad */
+        diff = -diff;
+        if ((diff >= 64) || ((s->rtcp.window >> diff) & 1))
+            return EACCES; // replay attack!
+        s->rtp.window |= 1 << diff;
+    }
 
     /* Crypts SRTCP */
     if (s->flags & SRTCP_UNENCRYPTED)
@@ -678,7 +708,6 @@ int
 srtcp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
 {
     size_t len = *lenp;
-    /* FIXME: anti-replay ?? */
 
     if (len < (4u + s->tag_len))
         return EINVAL;

@@ -72,11 +72,16 @@ int main (void)
     for (;;)
     {
         len = read (fd, buf, sizeof (buf));
-        if (srtp_recv (s, buf, &len))
-            fputs ("Cannot decrypt!\n", stderr);
+        int val = srtp_recv (s, buf, &len);
+        if (val)
+        {
+            fprintf (stderr, "Cannot decrypt: %s\n", strerror (val));
+            continue;
+        }
+
         puts ((char *)buf + 12);
-        if (srtp_send (s, buf, &len, sizeof (buf)) || srtp_recv (s, buf, &len))
-            break;
+        //if (srtp_send (s, buf, &len, sizeof (buf)) || srtp_recv (s, buf, &len))
+        //    break;
         puts ((char *)buf + 12);
     }
 
