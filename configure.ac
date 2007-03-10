@@ -5235,6 +5235,9 @@ AS_IF([test "${enable_gnutls}" != "no"], [
   ])
 ])
 
+AM_PATH_LIBGCRYPT([1:1.1.94], [have_libgcrypt="yes"], [have_libgcrypt="no"])
+AM_CONDITIONAL([HAVE_LIBGCRYPT], [test "${have_libgcrypt}" = "yes"])
+
 
 dnl
 dnl  Endianness check, AC_C_BIGENDIAN doesn't work if we are cross-compiling
@@ -5773,6 +5776,7 @@ AC_CONFIG_FILES([
   ipkg/Makefile
   libs/Makefile
   libs/loader/Makefile
+  libs/srtp/Makefile
   modules/Makefile
   mozilla/Makefile
   m4/Makefile

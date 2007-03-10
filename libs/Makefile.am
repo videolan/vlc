@@ -1,2 +1,1 @@
-SUBDIRS = loader
-
+SUBDIRS = loader srtp
