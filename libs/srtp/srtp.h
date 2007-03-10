@@ -36,8 +36,7 @@ enum
 extern "C" {
 # endif
 
-srtp_session_t *srtp_create (const char *name, unsigned flags, unsigned kdr,
-                             uint16_t winsize);
+srtp_session_t *srtp_create (const char *name, unsigned flags, unsigned kdr);
 void srtp_destroy (srtp_session_t *s);
 int srtp_setkey (srtp_session_t *s, const void *key, size_t keylen,
                  const void *salt, size_t saltlen);

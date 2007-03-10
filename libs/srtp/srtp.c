@@ -49,6 +49,7 @@ typedef struct srtp_proto_t
 {
     gcry_cipher_hd_t cipher;
     gcry_md_hd_t     mac;
+    uint64_t         window;
     uint32_t         salt[4];
 } srtp_proto_t;
 
@@ -161,21 +162,17 @@ static int proto_create (srtp_proto_t *p, int gcipher, int gmd)
  *
  * @param name cipher-suite name
  * @param kdr key derivation rate
- * @param winsize anti-replay windows size (between 64 and 32767 inclusive)
- *                0 disable replay attack protection (OK for send only)
  * @param flags OR'ed optional flags.
  *
  * @return NULL in case of error
  */
 srtp_session_t *
-srtp_create (const char *name, unsigned flags, unsigned kdr, uint16_t winsize)
+srtp_create (const char *name, unsigned flags, unsigned kdr)
 {
     assert (name != NULL);
 
     if (kdr != 0)
         return NULL; // FIXME: KDR not implemented yet
-    if (winsize != 0)
-        return NULL; // FIXME: replay protection not implemented yet
 
     uint8_t tag_len;
     int cipher = GCRY_CIPHER_AES, md = GCRY_MD_SHA1;
@@ -189,7 +186,7 @@ srtp_create (const char *name, unsigned flags, unsigned kdr, uint16_t winsize)
     // F8_128_HMAC_SHA1_80 is not implemented
         return NULL;
 
-    if ((flags & ~SRTP_FLAGS_MASK) || (winsize > 32767) || init_libgcrypt ())
+    if ((flags & ~SRTP_FLAGS_MASK) || init_libgcrypt ())
         return NULL;
 
     srtp_session_t *s = malloc (sizeof (*s));
@@ -657,7 +654,7 @@ srtcp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
     if (memcmp (buf + len, tag, s->tag_len))
          return EACCES;
 
-    len -= 4; /* Remove SRTCP index befor decryption */
+    len -= 4; /* Remove SRTCP index before decryption */
     *lenp = len;
 
     return srtp_crypt (s, buf, len);
