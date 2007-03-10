@@ -600,10 +600,14 @@ static int srtcp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
     if ((len < 12) || ((buf[0] >> 6) != 2))
         return EINVAL;
 
-    uint32_t index = s->rtcp_index++;
-    if (index == 0x7fffffff)
-        s->rtcp_index = 0; /* 31-bit wrap */
+    /* Updates SRTCP index (safe here) */
+    uint32_t index;
+    memcpy (&index, buf + len, 4);
+    index = ntohl (index);
+    if (((index - s->rtcp_index) & 0x7fffffff) < 0x40000000)
+        s->rtcp_index = index; /* Update index */
 
+    /* Crypts SRTCP */
     if (s->flags & SRTCP_UNENCRYPTED)
         return 0;
 
@@ -637,7 +641,10 @@ srtcp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
     if (bufsize < (len + 4 + s->tag_len))
         return ENOSPC;
 
-    uint32_t index = s->rtcp_index;
+    uint32_t index = ++s->rtcp_index;
+    if (index >> 31)
+        s->rtcp_index = index = 0; /* 31-bit wrap */
+
     if ((s->flags & SRTCP_UNENCRYPTED) == 0)
         index |= 0x80000000; /* Set Encrypted bit */
     memcpy (buf + len, &(uint32_t){ htonl (index) }, 4);
@@ -646,12 +653,11 @@ srtcp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
     if (val)
         return val;
 
-    len += 4; /* Digest SRTCP index too */
+    len += 4; /* Digests SRTCP index too */
 
     const uint8_t *tag = rtcp_digest (s->rtp.mac, buf, len);
     memcpy (buf + len, tag, s->tag_len);
     *lenp = len + s->tag_len;
-    s->rtcp_index++; /* Update index */
     return 0;
 }
 
@@ -683,12 +689,6 @@ srtcp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
          return EACCES;
 
     len -= 4; /* Remove SRTCP index before decryption */
-    uint32_t index;
-    memcpy (&index, buf + len, 4);
-    index = ntohl (index);
-    if (((index - s->rtcp_index) & 0xffffffff) < 0x80000000)
-        s->rtcp_index = index; /* Update index */
-
     *lenp = len;
     return srtp_crypt (s, buf, len);
 }
