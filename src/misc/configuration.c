@@ -1486,7 +1486,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
     opterr = 0;
     optind = 1;
     while( ( i_cmd = getopt_long( *pi_argc, ppsz_argv, psz_shortopts,
-                                  p_longopts, &i_index ) ) != EOF )
+                                  p_longopts, &i_index ) ) != -1 )
     {
         /* A long option has been recognized */
         if( i_cmd == 0 )
@@ -1535,6 +1535,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                                 "You should use --%s instead.\n",
                                 p_conf->psz_name, p_conf->psz_current);
                     }
+                    //*psz_name = *(p_conf->psz_current);
                     psz_name = p_conf->psz_current;
                     p_conf = config_FindConfig( p_this, psz_name );
                 }
