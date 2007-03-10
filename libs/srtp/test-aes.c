@@ -117,7 +117,7 @@ static void test_keystream (void)
     if (gcry_cipher_setkey (hd, key, sizeof (key)))
         fatal ("Cipher key error");
 
-    if (rtp_encrypt (hd, 0, 0, 0, salt, buf, 0xff020))
+    if (rtp_crypt (hd, 0, 0, 0, salt, buf, 0xff020))
         fatal ("Encryption failure");
     gcry_cipher_close (hd);
 

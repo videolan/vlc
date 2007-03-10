@@ -37,12 +37,8 @@
 
 /* TODO:
  * Useful stuff:
- * - ROC profil thingy (multicast really needs this)
+ * - ROC profile thingy (multicast really needs this)
  * - replay protection
- *
- * Requirements for conformance:
- * - suites with NULL cipher
- * - SRTCP
  *
  * Useless stuff (because nothing depends on it):
  * - non-nul key derivation rate
@@ -158,7 +154,10 @@ static int proto_create (srtp_proto_t *p, int gcipher, int gmd)
 
 
 /**
- * Allocates a Secure RTP session.
+ * Allocates a Secure RTP one-way session.
+ * The same session cannot be used both ways because this would confuse
+ * internal cryptographic counters; it is however of course feasible to open
+ * multiple simultaneous sessions with the same master key.
  *
  * @param name cipher-suite name
  * @param kdr key derivation rate
@@ -257,7 +256,6 @@ derive (gcry_cipher_hd_t prf, const void *salt,
     return 0;
 }
 
-#include <stdio.h>
 
 static int
 proto_derive (srtp_proto_t *p, gcry_cipher_hd_t prf,
@@ -267,20 +265,15 @@ proto_derive (srtp_proto_t *p, gcry_cipher_hd_t prf,
     if (saltlen != 14)
         return -1;
 
-    uint32_t cipherkey[4], authkey[5];
+    uint8_t keybuf[20];
     uint8_t label = rtcp ? SRTCP_CRYPT : SRTP_CRYPT;
 
-    if (derive (prf, salt, r, rlen, label++, cipherkey, 16)
-     || gcry_cipher_setkey (p->cipher, cipherkey, 16)
-     || derive (prf, salt, r, rlen, label++, authkey, 20)
-     || gcry_md_setkey (p->mac, authkey, 20)
-     || derive (prf, salt, r, rlen, label++, p->salt, 14))
+    if (derive (prf, salt, r, rlen, label++, keybuf, 16)
+     || gcry_cipher_setkey (p->cipher, keybuf, 16)
+     || derive (prf, salt, r, rlen, label++, keybuf, 20)
+     || gcry_md_setkey (p->mac, keybuf, 20)
+     || derive (prf, salt, r, rlen, label, p->salt, 14))
         return -1;
-
-    debug (" cipher key: %08x%08x%08x%08x\n auth key: %08x%08x%08x%08x%08x\n",
-            ntohl (cipherkey[0]), ntohl (cipherkey[1]), ntohl (cipherkey[2]),
-            ntohl (cipherkey[3]), ntohl (authkey[0]), ntohl (authkey[1]),
-            ntohl (authkey[2]), ntohl (authkey[3]), ntohl (authkey[4]));
 
     return 0;
 }
@@ -329,7 +322,6 @@ srtp_derive (srtp_session_t *s, const void *key, size_t keylen,
 }
 
 
-
 /**
  * Sets (or resets) the master key and master salt for a SRTP session.
  * This must be done at least once before using rtp_send(), rtp_recv(),
@@ -350,7 +342,7 @@ srtp_setkey (srtp_session_t *s, const void *key, size_t keylen,
 
 /** AES-CM encryption/decryption (ctr length = 16 bytes) */
 static int
-encrypt (gcry_cipher_hd_t hd, uint32_t *ctr, uint8_t *data, size_t len)
+ctr_crypt (gcry_cipher_hd_t hd, uint32_t *ctr, uint8_t *data, size_t len)
 {
     const size_t ctrlen = 16;
     while (len >= ctrlen)
@@ -382,9 +374,9 @@ encrypt (gcry_cipher_hd_t hd, uint32_t *ctr, uint8_t *data, size_t len)
 
 
 /** AES-CM for RTP (salt = 14 bytes + 2 nul bytes) */
-static inline int
-rtp_encrypt (gcry_cipher_hd_t hd, uint32_t ssrc, uint32_t roc, uint16_t seq,
-             const uint32_t *salt, uint8_t *data, size_t len)
+static int
+rtp_crypt (gcry_cipher_hd_t hd, uint32_t ssrc, uint32_t roc, uint16_t seq,
+           const uint32_t *salt, uint8_t *data, size_t len)
 {
     /* Determines cryptographic counter (IV) */
     uint32_t counter[4];
@@ -394,7 +386,7 @@ rtp_encrypt (gcry_cipher_hd_t hd, uint32_t ssrc, uint32_t roc, uint16_t seq,
     counter[3] = salt[3] ^ htonl (seq << 16);
 
     /* Encryption */
-    return encrypt (hd, counter, data, len);
+    return ctr_crypt (hd, counter, data, len);
 }
 
 
@@ -414,7 +406,7 @@ rtp_digest (gcry_md_hd_t md, const void *data, size_t len, uint32_t roc)
  * (CTR block cypher mode of operation has identical encryption and
  * decryption function).
  *
- * @param buf RTP packet to be encrypted/digested
+ * @param buf RTP packet to be en-/decrypted
  * @param len RTP packet length
  *
  * @return 0 on success, in case of error:
@@ -467,8 +459,8 @@ static int srtp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
     if (s->flags & SRTP_UNENCRYPTED)
         return 0;
 
-    if (rtp_encrypt (s->rtp.cipher, ssrc, s->rtp_roc, seq, s->rtp.salt,
-                     buf + offset, len - offset))
+    if (rtp_crypt (s->rtp.cipher, ssrc, s->rtp_roc, seq, s->rtp.salt,
+                   buf + offset, len - offset))
         return EINVAL;
 
     return 0;
@@ -516,8 +508,8 @@ srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
  * then decrypts it.
  *
  * @param buf RTP packet to be digested/decrypted
- * @param lenp pointer to the RTP packet length on entry,
- *             set to the SRTP length on exit (undefined in case of error)
+ * @param lenp pointer to the SRTP packet length on entry,
+ *             set to the RTP length on exit (undefined in case of error)
  *
  * @return 0 on success, in case of error:
  *  EINVAL  malformatted SRTP packet
@@ -527,26 +519,146 @@ int
 srtp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
 {
     size_t len = *lenp;
+    /* FIXME: anti-replay */
 
     if (!(s->flags & SRTP_UNAUTHENTICATED))
     {
         if (len < s->tag_len)
             return EINVAL;
         len -= s->tag_len;
-        *lenp = len;
 
         const uint8_t *tag = rtp_digest (s->rtp.mac, buf, len, s->rtp_roc);
-        debug  (" Auth tag: %08x%08x%04x (wanted)\n"
-                " Auth tag: %08x%08x%04x (recv'd)\n",
-                ntohl (((uint32_t *)tag)[0]), ntohl (((uint32_t *)tag)[1]),
-                ntohs (((uint16_t *)tag)[4]),
-                ntohl (((uint32_t *)w)[0]), ntohl (((uint32_t *)w)[1]),
-                ntohs (((uint16_t *)w)[4]));
         if (memcmp (buf + len, tag, s->tag_len))
             return EACCES;
+
+        *lenp = len;
     }
 
-    /* FIXME: anti-replay */
+    return srtp_crypt (s, buf, len);
+}
+
+
+/** AES-CM for RTCP (salt = 14 bytes + 2 nul bytes) */
+static int
+rtcp_crypt (gcry_cipher_hd_t hd, uint32_t ssrc, uint32_t index,
+            const uint32_t *salt, uint8_t *data, size_t len)
+{
+    return rtp_crypt (hd, ssrc, index >> 16, index & 0xffff, salt, data, len);
+}
+
+
+/** Message Authentication and Integrity for RTCP */
+static const uint8_t *
+rtcp_digest (gcry_md_hd_t md, const void *data, size_t len)
+{
+    gcry_md_reset (md);
+    gcry_md_write (md, data, len);
+    return gcry_md_read (md, 0);
+}
+
+
+/**
+ * Encrypts/decrypts a RTCP packet and updates SRTCP context
+ * (CTR block cypher mode of operation has identical encryption and
+ * decryption function).
+ *
+ * @param buf RTCP packet to be en-/decrypted
+ * @param len RTCP packet length
+ *
+ * @return 0 on success, in case of error:
+ *  EINVAL  malformatted RTCP packet
+ */
+static int srtcp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
+{
+    assert (s != NULL);
+
+    /* 8-bytes unencrypted header, and 4-bytes unencrypted footer */
+    if ((len < 12) || ((buf[0] >> 6) != 2))
+        return EINVAL;
+
+    uint32_t index = s->rtcp_index++;
+    if (index == 0x7fffffff)
+        s->rtcp_index = 0; /* 31-bit wrap */
+
+    if (s->flags & SRTCP_UNENCRYPTED)
+        return 0;
+
+    uint32_t ssrc;
+    memcpy (&ssrc, buf + 4, 4);
+
+    if (rtcp_crypt (s->rtcp.cipher, ssrc, index, s->rtp.salt,
+                    buf + 8, len - 8))
+        return EINVAL;
+    return 0;
+}
+
+
+/**
+ * Turns a RTCP packet into a SRTCP packet: encrypt it, then computes
+ * the authentication tag and appends it.
+ *
+ * @param buf RTCP packet to be encrypted/digested
+ * @param lenp pointer to the RTCP packet length on entry,
+ *             set to the SRTCP length on exit (undefined in case of error)
+ * @param bufsize size (bytes) of the packet buffer
+ *
+ * @return 0 on success, in case of error:
+ *  EINVAL  malformatted RTCP packet or internal error
+ *  ENOSPC  bufsize is too small (to add index and authentication tag)
+ */
+int
+srtcp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
+{
+    size_t len = *lenp;
+    if (bufsize < (len + 4 + s->tag_len))
+        return ENOSPC;
+
+    uint32_t index = s->rtcp_index;
+    if ((s->flags & SRTCP_UNENCRYPTED) == 0)
+        index |= 0x80000000; /* Set Encrypted bit */
+    memcpy (buf + len, &(uint32_t){ htonl (index) }, 4);
+
+    int val = srtcp_crypt (s, buf, len);
+    if (val)
+        return val;
+
+    len += 4; /* Digest SRTCP index too */
+
+    const uint8_t *tag = rtcp_digest (s->rtp.mac, buf, len);
+    memcpy (buf + len, tag, s->tag_len);
+    *lenp = len + s->tag_len;
+    return 0;
+}
+
+
+/**
+ * Turns a SRTCP packet into a RTCP packet: authenticates the packet,
+ * then decrypts it.
+ *
+ * @param buf RTCP packet to be digested/decrypted
+ * @param lenp pointer to the SRTCP packet length on entry,
+ *             set to the RTCP length on exit (undefined in case of error)
+ *
+ * @return 0 on success, in case of error:
+ *  EINVAL  malformatted SRTCP packet
+ *  EACCES  authentication failed (spoofed packet or out-of-sync)
+ */
+int
+srtcp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
+{
+    size_t len = *lenp;
+    /* FIXME: anti-replay ?? */
+
+    if (len < (4u + s->tag_len))
+        return EINVAL;
+    len -= s->tag_len;
+
+    const uint8_t *tag = rtcp_digest (s->rtp.mac, buf, len);
+    if (memcmp (buf + len, tag, s->tag_len))
+         return EACCES;
+
+    len -= 4; /* Remove SRTCP index befor decryption */
+    *lenp = len;
 
     return srtp_crypt (s, buf, len);
 }

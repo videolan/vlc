@@ -39,11 +39,14 @@ extern "C" {
 srtp_session_t *srtp_create (const char *name, unsigned flags, unsigned kdr,
                              uint16_t winsize);
 void srtp_destroy (srtp_session_t *s);
-int srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t maxsize);
-int srtp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp);
-
 int srtp_setkey (srtp_session_t *s, const void *key, size_t keylen,
                  const void *salt, size_t saltlen);
+
+int srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t maxsize);
+int srtp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp);
+int srtcp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t maxsiz);
+int srtcp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp);
+
 # ifdef __cplusplus
 }
 # endif
