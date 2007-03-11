@@ -24,22 +24,49 @@ typedef struct srtp_session_t srtp_session_t;
 
 enum
 {
-	SRTP_UNENCRYPTED=0x1, // do not encrypt SRTP packets
-	SRTCP_UNENCRYPTED=0x2, // do not encrypt SRTCP packets
-	SRTP_NULL_CIPHER=0x3, // use NULL cipher (encrypt nothing)
-	SRTP_UNAUTHENTICATED=0x4, // do not authenticated SRTP packets
-	SRTP_FLAGS_MASK=0x7
+    SRTP_UNENCRYPTED=0x1,   // do not encrypt SRTP packets
+    SRTCP_UNENCRYPTED=0x2,  // do not encrypt SRTCP packets
+    SRTP_UNAUTHENTICATED=0x4, // authenticate only SRTCP packets
+
+    SRTP_RCC_MODE1=0x10,    // use Roll-over-Counter Carry mode 1
+    SRTP_RCC_MODE2=0x20,    // use Roll-over-Counter Carry mode 2
+    SRTP_RCC_MODE3=0x30,    // use Roll-over-Counter Carry mode 3 (insecure)
+
+    SRTP_FLAGS_MASK=0x38
 };
 
+/* SRTP encryption algorithms (ciphers); same values as MIKEY */
+enum
+{
+    SRTP_ENCR_NULL=0,
+    SRTP_ENCR_AES_CM=1,
+    SRTP_ENCR_AES_F8=2 // not implemented
+};
+
+/* SRTP authenticaton algorithms; same values as MIKEY */
+enum
+{
+    SRTP_AUTH_NULL=0,
+    SRTP_AUTH_HMAC_SHA1=1
+};
+
+/* SRTP pseudo random function; same values as MIKEY */
+enum
+{
+    SRTP_PRF_AES_CM=0
+};
 
 # ifdef __cplusplus
 extern "C" {
 # endif
 
-srtp_session_t *srtp_create (const char *name, unsigned flags, unsigned kdr);
+srtp_session_t *srtp_create (int encr, int auth, unsigned tag_len, int prf,
+                             unsigned flags);
 void srtp_destroy (srtp_session_t *s);
+
 int srtp_setkey (srtp_session_t *s, const void *key, size_t keylen,
                  const void *salt, size_t saltlen);
+void srtp_setrcc_rate (srtp_session_t *s, uint16_t rate);
 
 int srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t maxsize);
 int srtp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp);

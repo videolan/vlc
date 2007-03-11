@@ -61,6 +61,7 @@ struct srtp_session_t
     uint32_t rtcp_index;
     uint32_t rtp_roc;
     uint16_t rtp_seq;
+    uint16_t rtp_rcc;
     uint8_t  tag_len;
 };
 
@@ -73,6 +74,7 @@ enum
     SRTCP_AUTH,
     SRTCP_SALT
 };
+
 
 #ifdef WIN32
 # include <winsock2.h>
@@ -159,33 +161,52 @@ static int proto_create (srtp_proto_t *p, int gcipher, int gmd)
  * internal cryptographic counters; it is however of course feasible to open
  * multiple simultaneous sessions with the same master key.
  *
- * @param name cipher-suite name
- * @param kdr key derivation rate
+ * @param encr encryption algorithm number
+ * @param auth authentication algortihm number
+ * @param tag_len authentication tag byte length (NOT including RCC)
  * @param flags OR'ed optional flags.
  *
  * @return NULL in case of error
  */
 srtp_session_t *
-srtp_create (const char *name, unsigned flags, unsigned kdr)
+srtp_create (int encr, int auth, unsigned tag_len, int prf, unsigned flags)
 {
-    assert (name != NULL);
-
-    if (kdr != 0)
-        return NULL; // FIXME: KDR not implemented yet
-
-    uint8_t tag_len;
-    int cipher = GCRY_CIPHER_AES, md = GCRY_MD_SHA1;
-
-    if (strcmp (name, "AES_CM_128_HMAC_SHA1_80") == 0)
-        tag_len = 10;
-    else
-    if (strcmp (name, "AES_CM_128_HMAC_SHA1_32") == 0)
-        tag_len = 4;
-    else
-    // F8_128_HMAC_SHA1_80 is not implemented
+    if ((flags & ~SRTP_FLAGS_MASK) || init_libgcrypt ())
         return NULL;
 
-    if ((flags & ~SRTP_FLAGS_MASK) || init_libgcrypt ())
+    int cipher, md;
+    switch (encr)
+    {
+        case SRTP_ENCR_NULL:
+            cipher = GCRY_CIPHER_NONE;
+            break;
+
+        case SRTP_ENCR_AES_CM:
+            cipher = GCRY_CIPHER_AES;
+            break;
+
+        default:
+            return NULL;
+    }
+
+    switch (auth)
+    {
+        case SRTP_AUTH_NULL:
+            md = GCRY_MD_NONE;
+            break;
+
+        case SRTP_AUTH_HMAC_SHA1:
+            md = GCRY_MD_SHA1;
+            break;
+
+        default:
+            return NULL;
+    }
+
+    if (tag_len > gcry_md_get_algo_dlen (auth))
+        return NULL;
+
+    if (prf != SRTP_PRF_AES_CM)
         return NULL;
 
     srtp_session_t *s = malloc (sizeof (*s));
@@ -194,7 +215,6 @@ srtp_create (const char *name, unsigned flags, unsigned kdr)
 
     memset (s, 0, sizeof (*s));
     s->flags = flags;
-    s->kdr = kdr;
     s->tag_len = tag_len;
 
     if (proto_create (&s->rtp, cipher, md) == 0)
@@ -333,6 +353,33 @@ srtp_setkey (srtp_session_t *s, const void *key, size_t keylen,
              const void *salt, size_t saltlen)
 {
     return srtp_derive (s, key, keylen, salt, saltlen) ? EINVAL : 0;
+}
+
+
+/**
+ * Sets Roll-over-Counter Carry (RCC) rate for the SRTP session. If not
+ * specified (through this function), the default rate of ONE is assumed
+ * (i.e. every RTP packets will carry the RoC). RCC rate is ignored if none
+ * of the RCC mode has been selected.
+ *
+ * The RCC mode is selected through one of these flags for srtp_create():
+ *  SRTP_RCC_MODE1: integrity protection only for RoC carrying packets
+ *  SRTP_RCC_MODE2: integrity protection for all packets
+ *  SRTP_RCC_MODE3: no integrity protection
+ *
+ * RCC mode 3 is insecure. Compared to plain RTP, it provides confidentiality
+ * (through encryption) but is much more prone to DoS. It can only be used if
+ * anti-spoofing protection is provided by lower network layers (e.g. IPsec,
+ * or trusted routers and proper source address filtering).
+ *
+ * If RCC rate is 1, RCC mode 1 and 2 are functionally identical.
+ *
+ * @param rate RoC Carry rate (MUST NOT be zero)
+ */
+void srtp_setrcc_rate (srtp_session_t *s, uint16_t rate)
+{
+    assert (rate != 0);
+    s->rtp_rcc = rate;
 }
 
 

@@ -51,7 +51,8 @@ int main (void)
     static const uint8_t salt[14] =
         "\x12\x34\x56\x78\x90" "\x12\x34\x56\x78\x90" "\x12\x34\x56\x78";
 
-    srtp_session_t *s = srtp_create ("AES_CM_128_HMAC_SHA1_80", 0, 0);
+    srtp_session_t *s = srtp_create (SRTP_ENCR_AES_CM, SRTP_AUTH_HMAC_SHA1, 10,
+                                     SRTP_PRF_AES_CM, 0);
     if (s == NULL)
         return 1;
     if (srtp_setkey (s, key, 16, salt, 14))
