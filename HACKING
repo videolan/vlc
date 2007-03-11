@@ -16,13 +16,11 @@ ____________
 
 You will need the following tools if you plan to use the SVN version of vlc:
 
- - autoconf version 2.50 or later
-
- - automake version 1.5 (but 1.6 or later is recommended)
-
- - gettext version 0.10.40 (but 0.11.3 or later is recommended)
-
- - perl version 5.005 or later
+ - Autoconf version 2.60 or later
+ - Automake version 1.9 or later
+ - gettext version 0.11.5 or later
+ - pkg-config
+ - libgcrypt 1.2 (or compatible)
 
 After retrieving the SVN tree, you need to run the bootstrap script to
 generate all the files needed to build vlc. You can then run configure.
