@@ -87,7 +87,7 @@ STDMETHODIMP VLCAudio::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCAudio::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+STDMETHODIMP VLCAudio::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
     if( SUCCEEDED(loadTypeInfo()) )
@@ -190,7 +190,8 @@ STDMETHODIMP VLCAudio::put_volume(long volume)
         libvlc_audio_set_volume(p_libvlc, volume, &ex);
         if( libvlc_exception_raised(&ex) )
         {
-            _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
+            _p_instance->setErrorInfo(IID_IVLCAudio,
+                         libvlc_exception_get_message(&ex));
             libvlc_exception_clear(&ex);
             return E_FAIL;
         }
@@ -216,7 +217,8 @@ STDMETHODIMP VLCAudio::get_track(long* track)
         libvlc_input_free(p_input);
         if( libvlc_exception_raised(&ex) )
         {
-            _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
+            _p_instance->setErrorInfo(IID_IVLCAudio,
+                         libvlc_exception_get_message(&ex));
             libvlc_exception_clear(&ex);
             return E_FAIL;
         }
@@ -239,7 +241,8 @@ STDMETHODIMP VLCAudio::put_track(long track)
         libvlc_input_free(p_input);
         if( libvlc_exception_raised(&ex) )
         {
-            _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
+            _p_instance->setErrorInfo(IID_IVLCAudio,
+                         libvlc_exception_get_message(&ex));
             libvlc_exception_clear(&ex);
             return E_FAIL;
         }
@@ -307,7 +310,8 @@ STDMETHODIMP VLCAudio::toggleMute()
         libvlc_audio_toggle_mute(p_libvlc, &ex);
         if( libvlc_exception_raised(&ex) )
         {
-            _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
+            _p_instance->setErrorInfo(IID_IVLCAudio,
+                         libvlc_exception_get_message(&ex));
             libvlc_exception_clear(&ex);
             return E_FAIL;
         }
@@ -373,7 +377,7 @@ STDMETHODIMP VLCInput::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCInput::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+STDMETHODIMP VLCInput::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
     if( SUCCEEDED(loadTypeInfo()) )
@@ -738,7 +742,7 @@ STDMETHODIMP VLCLog::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCLog::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+STDMETHODIMP VLCLog::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
     if( SUCCEEDED(loadTypeInfo()) )
@@ -991,7 +995,7 @@ STDMETHODIMP VLCMessages::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInf
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCMessages::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+STDMETHODIMP VLCMessages::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
     if( SUCCEEDED(loadTypeInfo()) )
@@ -1157,7 +1161,7 @@ STDMETHODIMP VLCMessageIterator::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO*
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCMessageIterator::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+STDMETHODIMP VLCMessageIterator::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
     if( SUCCEEDED(loadTypeInfo()) )
@@ -1288,7 +1292,7 @@ STDMETHODIMP VLCMessage::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCMessage::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+STDMETHODIMP VLCMessage::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
     if( SUCCEEDED(loadTypeInfo()) )
@@ -1448,7 +1452,7 @@ STDMETHODIMP VLCPlaylistItems::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* p
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCPlaylistItems::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+STDMETHODIMP VLCPlaylistItems::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
     if( SUCCEEDED(loadTypeInfo()) )
@@ -1597,7 +1601,7 @@ STDMETHODIMP VLCPlaylist::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInf
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCPlaylist::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+STDMETHODIMP VLCPlaylist::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
     if( SUCCEEDED(loadTypeInfo()) )
@@ -2003,7 +2007,7 @@ STDMETHODIMP VLCVideo::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCVideo::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+STDMETHODIMP VLCVideo::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
     if( SUCCEEDED(loadTypeInfo()) )
@@ -2211,6 +2215,58 @@ STDMETHODIMP VLCVideo::put_aspectRatio(BSTR aspect)
                 libvlc_exception_clear(&ex);
                 return E_FAIL;
             }
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCVideo::get_subtitle(long* spu)
+{
+    if( NULL == spu )
+        return E_POINTER;
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        if( ! libvlc_exception_raised(&ex) )
+        {
+            *spu = libvlc_video_get_spu(p_input, &ex);
+            libvlc_input_free(p_input);
+            if( ! libvlc_exception_raised(&ex) )
+            {
+                return NOERROR;
+            }
+        }
+        _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCVideo::put_subtitle(long spu)
+{
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_video_set_spu(p_input, spu, &ex);
+        libvlc_input_free(p_input);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
         }
         return NOERROR;
     }
@@ -2438,7 +2494,7 @@ STDMETHODIMP VLCControl2::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInf
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCControl2::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+STDMETHODIMP VLCControl2::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
     if( SUCCEEDED(loadTypeInfo()) )

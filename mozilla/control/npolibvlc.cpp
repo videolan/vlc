@@ -1760,6 +1760,7 @@ const NPUTF8 * const LibvlcVideoNPObject::propertyNames[] =
     "height",
     "width",
     "aspectRatio",
+    "subtitle",
     "crop"
 };
 
@@ -1769,6 +1770,7 @@ enum LibvlcVideoNPObjectPropertyIds
     ID_video_height,
     ID_video_width,
     ID_video_aspectratio,
+    ID_video_subtitle,
     ID_video_crop
 };
 
@@ -1845,6 +1847,19 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::getProperty(int index, NPVari
                     return INVOKERESULT_GENERIC_ERROR;
 
                 STRINGZ_TO_NPVARIANT(psz_aspect, result);
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_video_subtitle:
+            {
+                int i_spu = libvlc_video_get_spu(p_input, &ex);
+                libvlc_input_free(p_input);
+                if( libvlc_exception_raised(&ex) )
+                {
+                    NPN_SetException(this, libvlc_exception_get_message(&ex));
+                    libvlc_exception_clear(&ex);
+                    return INVOKERESULT_GENERIC_ERROR;
+                }
+                INT32_TO_NPVARIANT(i_spu, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_video_crop:
@@ -1935,6 +1950,24 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::setProperty(int index, const 
                     return INVOKERESULT_GENERIC_ERROR;
                 }
                 return INVOKERESULT_NO_ERROR;
+            }
+            case ID_video_subtitle:
+            {
+                if( isNumberValue(value) )
+                {
+                    libvlc_video_set_spu(p_input,
+                                         numberValue(value), &ex);
+                    libvlc_input_free(p_input);
+                    if( libvlc_exception_raised(&ex) )
+                    {
+                        NPN_SetException(this, libvlc_exception_get_message(&ex));
+                        libvlc_exception_clear(&ex);
+                        return INVOKERESULT_GENERIC_ERROR;
+                    }
+                    return INVOKERESULT_NO_ERROR;
+                }
+                libvlc_input_free(p_input);
+                return INVOKERESULT_INVALID_VALUE;
             }
             case ID_video_crop:
             {

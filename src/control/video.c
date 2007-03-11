@@ -7,6 +7,7 @@
  *
  * Authors: Cl�ent Stenac <zorglub@videolan.org>
  *          Filippo Carone <littlejohn@videolan.org>
+ *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -352,7 +353,7 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance,
 }
 
 char *libvlc_video_get_aspect_ratio( libvlc_input_t *p_input,
-                                   libvlc_exception_t *p_e )
+                                     libvlc_exception_t *p_e )
 {
     char *psz_aspect = 0;
     vout_thread_t *p_vout = GetVout( p_input, p_e );
@@ -380,6 +381,74 @@ void libvlc_video_set_aspect_ratio( libvlc_input_t *p_input,
                         "Unexpected error while setting aspect-ratio value" );
 
     vlc_object_release( p_vout );
+}
+
+int libvlc_video_get_spu( libvlc_input_t *p_input,
+                          libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread = GetInputThread( p_input, p_e );
+    vlc_value_t val_list;
+    vlc_value_t val;
+    int i_spu = -1;
+    int i_ret = -1;
+    int i;
+
+    if( !p_input_thread )
+        return -1;
+
+    i_ret = var_Get( p_input_thread, "spu-es", &val );
+    if( i_ret < 0 )
+    {
+        libvlc_exception_raise( p_e, "Getting subtitle information failed" );
+        vlc_object_release( p_input_thread );
+        return i_ret;
+    }
+
+    var_Change( p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &val_list, NULL );
+    for( i = 0; i < val_list.p_list->i_count; i++ )
+    {
+        vlc_value_t spu_val = val_list.p_list->p_values[i];
+        if( val.i_int == spu_val.i_int )
+        {
+            i_spu = i;
+            break;
+        }
+    }
+    vlc_object_release( p_input_thread );
+    return i_spu;
+}
+
+void libvlc_video_set_spu( libvlc_input_t *p_input, int i_spu,
+                           libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread = GetInputThread( p_input, p_e );
+    vlc_value_t val_list;
+    int i_ret = -1;
+    int i;
+
+    if( !p_input_thread )
+        return;
+
+    var_Change( p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &val_list, NULL );
+    for( i = 0; i < val_list.p_list->i_count; i++ )
+    {
+        vlc_value_t val = val_list.p_list->p_values[i];
+        if( i_spu == i )
+        {
+            vlc_value_t new_val;
+
+            new_val.i_int = val.i_int;
+            i_ret = var_Set( p_input_thread, "spu-es", new_val );
+            if( i_ret < 0 )
+            {
+                libvlc_exception_raise( p_e, "Setting subtitle value failed" );
+            }
+            vlc_object_release( p_input_thread );
+            return;
+        }
+    }
+    libvlc_exception_raise( p_e, "Subtitle value out of range" );
+    vlc_object_release( p_input_thread );
 }
 
 char *libvlc_video_get_crop_geometry( libvlc_input_t *p_input,

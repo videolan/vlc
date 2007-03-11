@@ -189,6 +189,18 @@ VLC_PUBLIC_API int libvlc_playlist_isplaying( libvlc_instance_t *, libvlc_except
 VLC_PUBLIC_API int libvlc_playlist_items_count( libvlc_instance_t *, libvlc_exception_t * );
 
 /**
+ * Lock the playlist instance
+ * \param p_instance the instance
+ */
+VLC_PUBLIC_API void libvlc_playlist_lock( libvlc_instance_t * );
+
+/**
+ * Unlock the playlist instance
+ * \param p_instance the instance
+ */
+VLC_PUBLIC_API void libvlc_playlist_unlock( libvlc_instance_t * );
+
+/**
  * Stop playing
  * \param p_instance the instance to stop
  * \param p_exception an initialized exception
@@ -376,6 +388,22 @@ VLC_PUBLIC_API char *libvlc_video_get_aspect_ratio( libvlc_input_t *, libvlc_exc
  * \param p_exception an initialized exception
  */
 VLC_PUBLIC_API void libvlc_video_set_aspect_ratio( libvlc_input_t *, char *, libvlc_exception_t * );
+
+/**
+ * Get current video subtitle
+ * \param p_input the input
+ * \param p_exception an initialized exception
+ * \return the video subtitle selected
+ */
+VLC_PUBLIC_API int libvlc_video_get_spu( libvlc_input_t *, libvlc_exception_t * );
+
+/**
+ * Set new video subtitle
+ * \param p_input the input
+ * \param i_spu new video subtitle to select
+ * \param p_exception an initialized exception
+ */
+VLC_PUBLIC_API void libvlc_video_set_spu( libvlc_input_t *, int , libvlc_exception_t * );
 
 /**
  * Get current crop filter geometry
@@ -606,6 +634,15 @@ VLC_PUBLIC_API void libvlc_vlm_set_output( libvlc_instance_t *, char *, char*,
 VLC_PUBLIC_API void libvlc_vlm_set_input( libvlc_instance_t *, char *, char*,
                                           libvlc_exception_t *);
 
+/**
+ * Add a media's input MRL. This will add the specified one.
+ * \param p_instance the instance
+ * \param psz_name the media to work on
+ * \param psz_input the input MRL
+ * \param p_exception an initialized exception
+ */
+VLC_PUBLIC_API void libvlc_vlm_add_input( libvlc_instance_t *, char *, char *,
+                                          libvlc_exception_t *p_exception );
 /**
  * Set output for a media
  * \param p_instance the instance

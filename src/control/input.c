@@ -137,7 +137,7 @@ float libvlc_input_get_position( libvlc_input_t *p_input,
 float libvlc_input_get_fps( libvlc_input_t *p_input,
                             libvlc_exception_t *p_e) 
 {
-    double f_fps;
+    double f_fps = 0.0;
     input_thread_t *p_input_thread;
 
     p_input_thread = libvlc_get_input_thread ( p_input, p_e );

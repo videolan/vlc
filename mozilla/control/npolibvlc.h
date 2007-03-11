@@ -252,4 +252,3 @@ protected:
 
     InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
 };
-

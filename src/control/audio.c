@@ -146,14 +146,34 @@ int libvlc_audio_get_track( libvlc_input_t *p_input,
                             libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread = GetInput( p_input, p_e );
-    int i_track = 0;
+    vlc_value_t val_list;
+    vlc_value_t val;
+    int i_track = -1;
+    int i_ret = -1;
+    int i;
 
     if( !p_input_thread )
         return -1;
 
-    i_track = var_GetInteger( p_input_thread, "audio-es" );
-    vlc_object_release( p_input_thread );
+    i_ret = var_Get( p_input_thread, "audio-es", &val );
+    if( i_ret < 0 )
+    {
+        libvlc_exception_raise( p_e, "Getting Audio track information failed" );
+        vlc_object_release( p_input_thread );
+        return i_ret;
+    }
 
+    var_Change( p_input_thread, "audio-es", VLC_VAR_GETCHOICES, &val_list, NULL );
+    for( i = 0; i < val_list.p_list->i_count; i++ )
+    {
+        vlc_value_t track_val = val_list.p_list->p_values[i];
+        if( track_val.i_int == val.i_int )
+        {
+            i_track = i;
+            break;
+       }
+    }
+    vlc_object_release( p_input_thread );
     return i_track;
 }
 
@@ -175,9 +195,9 @@ void libvlc_audio_set_track( libvlc_input_t *p_input, int i_track,
     for( i = 0; i < val_list.p_list->i_count; i++ )
     {
         vlc_value_t val = val_list.p_list->p_values[i];
-        if( i_track == val.i_int )
+        if( i_track == i )
         {
-            i_ret = var_SetInteger( p_input_thread, "audio-es", i_track );
+            i_ret = var_Set( p_input_thread, "audio-es", val );
             if( i_ret < 0 )
             {
                 libvlc_exception_raise( p_e, "Setting audio track failed" );
