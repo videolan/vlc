@@ -835,8 +835,10 @@ void filename_sanitize( char *str )
 void path_sanitize( char *str )
 {
 #if 0
-    Uncomment the two blocks to prevent /../ or /./, i'm not sure that we
-    want to.
+    /*
+     * Uncomment the two blocks to prevent /../ or /./, i'm not sure that we
+     * want to.
+     */
     char *prev = str - 1;
 #endif
     while( *str )

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-03-11 00:09+0000\n"
+"POT-Creation-Date: 2007-03-11 12:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -11097,7 +11097,6 @@ msgstr ""
 
 #: modules/gui/macosx/open.m:561 modules/gui/macosx/open.m:613
 #: modules/gui/macosx/open.m:621 modules/gui/macosx/open.m:629
-#, objc-format
 msgid "No %@s found"
 msgstr ""
 
@@ -12050,12 +12049,10 @@ msgid "no"
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:1407
-#, objc-format
 msgid "yes: from %@ to %@ secs"
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:1417 modules/gui/macosx/wizard.m:1435
-#, objc-format
 msgid "yes: %@ @ %@ kb/s"
 msgstr ""
 
