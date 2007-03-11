@@ -99,6 +99,7 @@ src/input/stream.c
 src/input/subtitles.c
 src/input/var.c
 src/input/vlm.c
+src/input/vlm_internal.h
 src/interface/interaction.c
 src/interface/interface.c
 src/interface/interface.h
@@ -203,6 +204,7 @@ modules/access/dvb/linux_dvb.c
 modules/access/dv.c
 modules/access/dvdnav.c
 modules/access/dvdread.c
+modules/access/eyetv.c
 modules/access/fake.c
 modules/access/file.c
 modules/access_filter/dump.c
@@ -500,6 +502,8 @@ modules/gui/macosx/equalizer.h
 modules/gui/macosx/equalizer.m
 modules/gui/macosx/extended.h
 modules/gui/macosx/extended.m
+modules/gui/macosx/eyetv.h
+modules/gui/macosx/eyetv.m
 modules/gui/macosx/fspanel.h
 modules/gui/macosx/fspanel.m
 modules/gui/macosx/interaction.h
@@ -595,6 +599,7 @@ modules/gui/qt4/qt4.cpp
 modules/gui/qt4/qt4.hpp
 modules/gui/qt4/ui/equalizer.ui
 modules/gui/qt4/ui/main_interface.ui
+modules/gui/qt4/ui/open_capture.ui
 modules/gui/qt4/ui/open_disk.ui
 modules/gui/qt4/ui/open_file.ui
 modules/gui/qt4/ui/open_net.ui
