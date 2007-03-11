@@ -17,6 +17,12 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/* TODO:
+ * Useless stuff (because nothing depends on it):
+ * - non-nul key derivation rate
+ * - MKI payload
+ */
+
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
@@ -33,16 +39,15 @@
 
 #include <gcrypt.h>
 
-#define debug( ... ) (void)0
+#ifdef WIN32
+# include <winsock2.h>
+#else
+# include <netinet/in.h>
+# include <pthread.h>
+GCRY_THREAD_OPTION_PTHREAD_IMPL;
+#endif
 
-/* TODO:
- * Useful stuff:
- * - ROC profile thingy (multicast really needs this)
- *
- * Useless stuff (because nothing depends on it):
- * - non-nul key derivation rate
- * - MKI payload
- */
+#define debug( ... ) (void)0
 
 typedef struct srtp_proto_t
 {
@@ -76,13 +81,10 @@ enum
 };
 
 
-#ifdef WIN32
-# include <winsock2.h>
-#else
-# include <netinet/in.h>
-# include <pthread.h>
-GCRY_THREAD_OPTION_PTHREAD_IMPL;
-#endif
+static inline unsigned rcc_mode (const srtp_session_t *s)
+{
+    return (s->flags >> 4) & 3;
+}
 
 static bool libgcrypt_usable = false;
 
@@ -216,6 +218,12 @@ srtp_create (int encr, int auth, unsigned tag_len, int prf, unsigned flags)
     memset (s, 0, sizeof (*s));
     s->flags = flags;
     s->tag_len = tag_len;
+    s->rtp_rcc = 1; /* Default RCC rate */
+    if (rcc_mode (s))
+    {
+        if (tag_len < 4)
+            goto error;
+    }
 
     if (proto_create (&s->rtp, cipher, md) == 0)
     {
@@ -224,6 +232,7 @@ srtp_create (int encr, int auth, unsigned tag_len, int prf, unsigned flags)
         proto_destroy (&s->rtp);
     }
 
+error:
     free (s);
     return NULL;
 }
@@ -440,14 +449,14 @@ static inline uint16_t rtp_seq (const uint8_t *buf)
 
 /** Message Authentication and Integrity for RTP */
 static const uint8_t *
-rtp_digest (srtp_session_t *s, const uint8_t *data, size_t len)
+rtp_digest (srtp_session_t *s, const uint8_t *data, size_t len,
+            uint32_t roc)
 {
     const gcry_md_hd_t md = s->rtp.mac;
-    uint32_t roc = htonl (srtp_compute_roc (s, rtp_seq (data)));
 
     gcry_md_reset (md);
     gcry_md_write (md, data, len);
-    gcry_md_write (md, &roc, 4);
+    gcry_md_write (md, &(uint32_t){ htonl (roc) }, 4);
     return gcry_md_read (md, 0);
 }
 
@@ -532,12 +541,13 @@ static int srtp_crypt (srtp_session_t *s, uint8_t *buf, size_t len)
  *
  * @param buf RTP packet to be encrypted/digested
  * @param lenp pointer to the RTP packet length on entry,
- *             set to the SRTP length on exit (undefined in case of error)
+ *             set to the SRTP length on exit (undefined on non-ENOSPC error)
  * @param bufsize size (bytes) of the packet buffer
  *
  * @return 0 on success, in case of error:
  *  EINVAL  malformatted RTP packet or internal error
- *  ENOSPC  bufsize is too small (to add authentication tag)
+ *  ENOSPC  bufsize is too small to add authentication tag
+ *          (<lenp> will hold the required byte size)
  *  EACCES  packet would trigger a replay error on receiver
  */
 int
@@ -550,12 +560,32 @@ srtp_send (srtp_session_t *s, uint8_t *buf, size_t *lenp, size_t bufsize)
 
     if (!(s->flags & SRTP_UNAUTHENTICATED))
     {
-        if (bufsize < (len + s->tag_len))
+        size_t tag_len = s->tag_len;
+        *lenp = len + tag_len;
+        if (bufsize < (len + tag_len))
             return ENOSPC;
 
-        const uint8_t *tag = rtp_digest (s, buf, len);
-        memcpy (buf + len, tag, s->tag_len);
-        *lenp = len + s->tag_len;
+        uint32_t roc = srtp_compute_roc (s, rtp_seq (buf));
+        const uint8_t *tag = rtp_digest (s, buf, len, roc);
+        if (rcc_mode (s))
+        {
+            assert (s->rtp_rcc);
+            if ((rtp_seq (buf) % s->rtp_rcc) == 0)
+            {
+                memcpy (buf + len, &(uint32_t){ htonl (s->rtp_roc) }, 4);
+                len += 4;
+                if (rcc_mode (s) == 3)
+                    tag_len = 0;
+                else
+                    tag_len -= 4;
+            }
+            else
+            {
+                if (rcc_mode (s) & 1)
+                    tag_len = 0;
+            }
+        }
+        memcpy (buf + len, tag, tag_len);
     }
 
     return 0;
@@ -578,17 +608,53 @@ int
 srtp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
 {
     size_t len = *lenp;
+    if (len < 12u)
+        return EINVAL;
 
     if (!(s->flags & SRTP_UNAUTHENTICATED))
     {
-        if (len < (12u + s->tag_len))
-            return EINVAL;
-        len -= s->tag_len;
+        size_t tag_len = s->tag_len, roc_len = 0;
+        if (rcc_mode (s))
+        {
+            if ((rtp_seq (buf) % s->rtp_rcc) == 0)
+            {
+                roc_len = 4;
+                if (rcc_mode (s) == 3)
+                    tag_len = 0;
+                else
+                    tag_len -= 4;
+            }
+            else
+            {
+                if (rcc_mode (s) & 1)
+                    tag_len = 0; // RCC mode 1 or 3: no auth
+            }
+        }
 
-        const uint8_t *tag = rtp_digest (s, buf, len);
-        if (memcmp (buf + len, tag, s->tag_len))
+        if (len < (12u + roc_len + tag_len))
+            return EINVAL;
+        len -= roc_len + tag_len;
+
+        uint32_t roc = srtp_compute_roc (s, rtp_seq (buf)), rcc;
+        if (roc_len)
+        {
+            assert (roc_len == 4);
+            memcpy (&rcc, buf + len, 4);
+            rcc = ntohl (rcc);
+        }
+        else
+            rcc = roc;
+
+        const uint8_t *tag = rtp_digest (s, buf, len, rcc);
+        if (memcmp (buf + len + roc_len, tag, s->tag_len))
             return EACCES;
 
+        if (roc_len)
+        {
+            /* Authenticated packet carried a Roll-Over-Counter */
+            s->rtp_roc += rcc - roc;
+            assert (srtp_compute_roc (s, rtp_seq (buf)) == rcc);
+        }
         *lenp = len;
     }
 
