@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <time.h>
 #include <errno.h>
 
@@ -165,6 +166,7 @@ static void Dump (access_t *access, const uint8_t *buffer, size_t len)
         goto error;
     }
 
+    assert (len > 0);
     if (fwrite (buffer, len, 1, stream) != 1)
     {
         msg_Err (access, "cannot write to file: %s", strerror (errno));
