@@ -10,6 +10,7 @@
  *          Derk-Jan Hartman <hartman at videolan dot org>
  *          Eric Petit <titer@m0k.org>
  *          Benjamin Pracht <bigben at videolan dot org>
+ *          Damien Fouilleul <damienf at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,13 +64,14 @@ struct vout_sys_t
     vlc_bool_t          b_saved_frame;
     NSRect              s_frame;
     vlc_bool_t          b_got_frame;
-    vlc_mutex_t         lock;
     /* Mozilla plugin-related variables */
     vlc_bool_t          b_embedded;
     AGLContext          agl_ctx;
     AGLDrawable         agl_drawable;
     int                 i_offx, i_offy;
     int                 i_width, i_height;
+    WindowRef           theWindow;
+    WindowGroupRef      winGroup;
 };
 
 /*****************************************************************************
@@ -89,6 +91,8 @@ static void aglEnd    ( vout_thread_t * p_vout );
 static int  aglManage ( vout_thread_t * p_vout );
 static int  aglControl( vout_thread_t *, int, va_list );
 static void aglSwap   ( vout_thread_t * p_vout );
+static int  aglLock   ( vout_thread_t * p_vout );
+static void aglUnlock ( vout_thread_t * p_vout );
 
 int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 {
@@ -111,8 +115,6 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     }
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
-
-    vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
 
     var_Get( p_vout->p_libvlc, "drawable", &value_drawable );
     if( value_drawable.i_int != 0 )
@@ -160,8 +162,8 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
         p_vout->pf_manage           = aglManage;
         p_vout->pf_control          = aglControl;
         p_vout->pf_swap             = aglSwap;
-        p_vout->pf_lock             = Lock;
-        p_vout->pf_unlock           = Unlock;
+        p_vout->pf_lock             = aglLock;
+        p_vout->pf_unlock           = aglUnlock;
     }
     else
     {
@@ -210,7 +212,6 @@ void E_(CloseVideoGL) ( vlc_object_t * p_this )
         [o_pool release];
     }
     /* Clean up */
-    vlc_mutex_destroy( &p_vout->p_sys->lock );
     free( p_vout->p_sys );
 }
 
@@ -282,21 +283,22 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 static void Swap( vout_thread_t * p_vout )
 {
     p_vout->p_sys->b_got_frame = VLC_TRUE;
-    [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
-    glFlush();
+    [[p_vout->p_sys->o_glview openGLContext] flushBuffer];
 }
 
 static int Lock( vout_thread_t * p_vout )
 {
-    vlc_mutex_lock( &p_vout->p_sys->lock );
-    CGLLockContext( (CGLContextObj)p_vout->p_sys->agl_ctx );
-    return 0;
+    if( kCGLNoError == CGLLockContext([[p_vout->p_sys->o_glview openGLContext] CGLContextObj]) )
+    {
+	[[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
+	return 0;
+    }
+    return 1;
 }
 
 static void Unlock( vout_thread_t * p_vout )
 {
-    CGLUnlockContext( (CGLContextObj)p_vout->p_sys->agl_ctx );
-    vlc_mutex_unlock( &p_vout->p_sys->lock );
+    CGLUnlockContext([[p_vout->p_sys->o_glview openGLContext] CGLContextObj]);
 }
 
 /*****************************************************************************
@@ -335,8 +337,6 @@ static void Unlock( vout_thread_t * p_vout )
                                                       subView: o_glview frame: nil];
         
     }
-    
-    [[o_glview openGLContext] makeCurrentContext];
 #undef o_glview
 }
 
@@ -346,6 +346,7 @@ static void Unlock( vout_thread_t * p_vout )
 
     NSOpenGLPixelFormatAttribute attribs[] =
     {
+        NSOpenGLPFADoubleBuffer,
         NSOpenGLPFAAccelerated,
         NSOpenGLPFANoRecovery,
         NSOpenGLPFAColorSize, 24,
@@ -386,8 +387,6 @@ static void Unlock( vout_thread_t * p_vout )
 
     Lock( p_vout );
     NSRect bounds = [self bounds];
-
-    [[self openGLContext] makeCurrentContext];
 
     var_Get( p_vout, "macosx-stretch", &val );
     if( val.b_bool )
@@ -446,9 +445,7 @@ static void Unlock( vout_thread_t * p_vout )
 - (void) drawRect: (NSRect) rect
 {
     Lock( p_vout );
-    [[self openGLContext] makeCurrentContext];
-    /* FIXME: we should use CGLFlushDrawable instead, as glFlush is pretty slow */
-    glFlush();
+    [[p_vout->p_sys->o_glview openGLContext] flushBuffer];
     [super drawRect:rect];
     Unlock( p_vout );
 }
@@ -461,6 +458,7 @@ static void Unlock( vout_thread_t * p_vout )
 
 static void aglSetViewport( vout_thread_t *p_vout, Rect viewBounds, Rect clipBounds );
 static void aglReshape( vout_thread_t * p_vout );
+static OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, EventRef event, void *userData);
 
 static int aglInit( vout_thread_t * p_vout )
 {
@@ -490,15 +488,18 @@ static int aglInit( vout_thread_t * p_vout )
     var_Get( p_vout->p_libvlc, "drawable-clip-right", &val );
     clipBounds.right = val.i_int;
 
+    aglLock(p_vout);
     aglSetViewport(p_vout, viewBounds, clipBounds);
-
-    aglSetCurrentContext(p_vout->p_sys->agl_ctx);
+    aglReshape(p_vout);
+    aglUnlock(p_vout);
+    
     return VLC_SUCCESS;
 }
 
 static void aglEnd( vout_thread_t * p_vout )
 {
     aglSetCurrentContext(NULL);
+    if( p_vout->p_sys->theWindow ) DisposeWindow( p_vout->p_sys->theWindow );
 }
 
 static void aglReshape( vout_thread_t * p_vout )
@@ -507,11 +508,7 @@ static void aglReshape( vout_thread_t * p_vout )
     unsigned int i_height = p_vout->p_sys->i_height;
     unsigned int i_width  = p_vout->p_sys->i_width;
 
-    Lock( p_vout );
-
     vout_PlacePicture(p_vout, i_width, i_height, &x, &y, &i_width, &i_height); 
-
-    aglSetCurrentContext(p_vout->p_sys->agl_ctx);
 
     glViewport( p_vout->p_sys->i_offx + x, p_vout->p_sys->i_offy + y, i_width, i_height );
 
@@ -520,7 +517,6 @@ static void aglReshape( vout_thread_t * p_vout )
         /* Ask the opengl module to redraw */
         vout_thread_t * p_parent;
         p_parent = (vout_thread_t *) p_vout->p_parent;
-        Unlock( p_vout );
         if( p_parent && p_parent->pf_display )
         {
             p_parent->pf_display( p_parent, NULL );
@@ -529,7 +525,31 @@ static void aglReshape( vout_thread_t * p_vout )
     else
     {
         glClear( GL_COLOR_BUFFER_BIT );
-        Unlock( p_vout );
+    }
+}
+
+/* private event class */
+enum 
+{
+    kEventClassVLCPlugin = 'vlcp',
+};
+/* private event kinds */
+enum
+{
+    kEventVLCPluginShowFullscreen = 32768,
+    kEventVLCPluginHideFullscreen,
+};
+
+static void sendEventToMainThread(EventTargetRef target, UInt32 class, UInt32 kind)
+{
+    EventRef myEvent;
+    if( noErr == CreateEvent(NULL, class, kind, 0, kEventAttributeNone, &myEvent) )
+    {
+        if( noErr == SetEventParameter(myEvent, kEventParamPostTarget, typeEventTargetRef, sizeof(EventTargetRef), &target) )
+        {
+            PostEventToQueue(GetMainEventQueue(), myEvent, kEventPriorityStandard);
+        }
+        ReleaseEvent(myEvent);
     }
 }
 
@@ -537,13 +557,122 @@ static int aglManage( vout_thread_t * p_vout )
 {
     if( p_vout->i_changes & VOUT_ASPECT_CHANGE )
     {
+        aglLock( p_vout );
         aglReshape(p_vout);
+        aglUnlock( p_vout );
         p_vout->i_changes &= ~VOUT_ASPECT_CHANGE;
     }
     if( p_vout->i_changes & VOUT_CROP_CHANGE )
     {
+        aglLock( p_vout );
         aglReshape(p_vout);
+        aglUnlock( p_vout );
         p_vout->i_changes &= ~VOUT_CROP_CHANGE;
+    }
+    if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
+    {
+        aglSetDrawable(p_vout->p_sys->agl_ctx, NULL);
+        aglLock( p_vout );
+        if( p_vout->b_fullscreen )
+        {
+            /* Close the fullscreen window and resume normal drawing */
+            vlc_value_t val;
+            Rect viewBounds;    
+            Rect clipBounds;
+
+            var_Get( p_vout->p_libvlc, "drawable", &val );
+            p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
+            aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
+
+            var_Get( p_vout->p_libvlc, "drawable-view-top", &val );
+            viewBounds.top = val.i_int;
+            var_Get( p_vout->p_libvlc, "drawable-view-left", &val );
+            viewBounds.left = val.i_int;
+            var_Get( p_vout->p_libvlc, "drawable-view-bottom", &val );
+            viewBounds.bottom = val.i_int;
+            var_Get( p_vout->p_libvlc, "drawable-view-right", &val );
+            viewBounds.right = val.i_int;
+            var_Get( p_vout->p_libvlc, "drawable-clip-top", &val );
+            clipBounds.top = val.i_int;
+            var_Get( p_vout->p_libvlc, "drawable-clip-left", &val );
+            clipBounds.left = val.i_int;
+            var_Get( p_vout->p_libvlc, "drawable-clip-bottom", &val );
+            clipBounds.bottom = val.i_int;
+            var_Get( p_vout->p_libvlc, "drawable-clip-right", &val );
+            clipBounds.right = val.i_int;
+
+            aglSetCurrentContext(p_vout->p_sys->agl_ctx);
+            aglSetViewport(p_vout, viewBounds, clipBounds);
+
+            /* Most Carbon APIs are not thread-safe, therefore delagate some GUI visibilty update to the main thread */
+            sendEventToMainThread(GetWindowEventTarget(p_vout->p_sys->theWindow), kEventClassVLCPlugin, kEventVLCPluginHideFullscreen);
+        }
+        else
+        {
+            Rect deviceRect;
+            
+            GDHandle deviceHdl = GetMainDevice();
+            deviceRect = (*deviceHdl)->gdRect;
+            
+            if( !p_vout->p_sys->theWindow )
+            {
+                /* Create a window */
+                WindowAttributes    windowAttrs;
+
+                windowAttrs = kWindowStandardDocumentAttributes
+                            | kWindowStandardHandlerAttribute
+                            | kWindowLiveResizeAttribute
+                            | kWindowNoShadowAttribute;
+                                            
+                windowAttrs &= (~kWindowResizableAttribute);
+
+                CreateNewWindow(kDocumentWindowClass, windowAttrs, &deviceRect, &p_vout->p_sys->theWindow);
+                if( !p_vout->p_sys->winGroup )
+                {
+                    CreateWindowGroup(0, &p_vout->p_sys->winGroup);
+                    SetWindowGroup(p_vout->p_sys->theWindow, p_vout->p_sys->winGroup);
+                    SetWindowGroupParent( p_vout->p_sys->winGroup, GetWindowGroupOfClass(kDocumentWindowClass) ) ;
+                }
+                
+                // Window title
+                CFStringRef titleKey    = CFSTR("Fullscreen VLC media plugin");
+                CFStringRef windowTitle = CFCopyLocalizedString(titleKey, NULL);
+                SetWindowTitleWithCFString(p_vout->p_sys->theWindow, windowTitle);
+                CFRelease(titleKey);
+                CFRelease(windowTitle);
+                
+                //Install event handler
+                static const EventTypeSpec win_events[] = {
+                    { kEventClassMouse, kEventMouseDown },
+                    { kEventClassMouse, kEventMouseMoved },
+                    { kEventClassMouse, kEventMouseUp },
+                    { kEventClassWindow, kEventWindowClosed },
+                    { kEventClassWindow, kEventWindowBoundsChanged },
+                    { kEventClassCommand, kEventCommandProcess },
+                    { kEventClassVLCPlugin, kEventVLCPluginShowFullscreen },
+                    { kEventClassVLCPlugin, kEventVLCPluginHideFullscreen },
+                };
+                InstallWindowEventHandler (p_vout->p_sys->theWindow, NewEventHandlerUPP (WindowEventHandler), GetEventTypeCount(win_events), win_events, p_vout, NULL);
+            }
+            else
+            {
+                /* just in case device resolution changed */
+                SetWindowBounds(p_vout->p_sys->theWindow, kWindowContentRgn, &deviceRect);
+            }
+            glClear( GL_COLOR_BUFFER_BIT );
+            p_vout->p_sys->agl_drawable = (AGLDrawable)GetWindowPort(p_vout->p_sys->theWindow);
+            aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
+            aglSetCurrentContext(p_vout->p_sys->agl_ctx);
+            aglSetViewport(p_vout, deviceRect, deviceRect);
+            //aglSetFullScreen(p_vout->p_sys->agl_ctx, device_width, device_height, 0, 0);
+
+            /* Most Carbon APIs are not thread-safe, therefore delagate some GUI visibilty update to the main thread */
+            sendEventToMainThread(GetWindowEventTarget(p_vout->p_sys->theWindow), kEventClassVLCPlugin, kEventVLCPluginShowFullscreen);
+        }
+        aglReshape(p_vout);
+        aglUnlock( p_vout );
+        p_vout->b_fullscreen = !p_vout->b_fullscreen;
+        p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
     return VLC_SUCCESS;
 }
@@ -553,8 +682,8 @@ static int aglControl( vout_thread_t *p_vout, int i_query, va_list args )
     switch( i_query )
     {
         case VOUT_SET_VIEWPORT:
-	{
-	    Rect viewBounds, clipBounds;
+        {
+            Rect viewBounds, clipBounds;
             viewBounds.top = va_arg( args, int);
             viewBounds.left = va_arg( args, int);
             viewBounds.bottom = va_arg( args, int);
@@ -563,20 +692,27 @@ static int aglControl( vout_thread_t *p_vout, int i_query, va_list args )
             clipBounds.left = va_arg( args, int);
             clipBounds.bottom = va_arg( args, int);
             clipBounds.right = va_arg( args, int);
-	    aglSetViewport(p_vout, viewBounds, clipBounds);
+            
+            if( !p_vout->b_fullscreen ) 
+            {
+                aglLock( p_vout );
+                aglSetViewport(p_vout, viewBounds, clipBounds);
+                aglReshape( p_vout );
+                aglUnlock( p_vout );
+            }
             return VLC_SUCCESS;
-	}
+        }
 
         case VOUT_REPARENT:
-	{
-	    AGLDrawable drawable = (AGLDrawable)va_arg( args, int);
-	    if( drawable != p_vout->p_sys->agl_drawable )
-	    {
-		p_vout->p_sys->agl_drawable = drawable;
-		aglSetDrawable(p_vout->p_sys->agl_ctx, drawable);
-	    }
+        {
+            AGLDrawable drawable = (AGLDrawable)va_arg( args, int);
+            if( !p_vout->b_fullscreen && drawable != p_vout->p_sys->agl_drawable )
+            {
+                p_vout->p_sys->agl_drawable = drawable;
+                aglSetDrawable(p_vout->p_sys->agl_ctx, drawable);
+            }
             return VLC_SUCCESS;
-	}
+        }
 
         default:
             return vout_vaControlDefault( p_vout, i_query, args );
@@ -589,6 +725,7 @@ static void aglSwap( vout_thread_t * p_vout )
     aglSwapBuffers(p_vout->p_sys->agl_ctx);
 }
 
+/* Enter this function with the p_vout locked */
 static void aglSetViewport( vout_thread_t *p_vout, Rect viewBounds, Rect clipBounds )
 {
     // mozilla plugin provides coordinates based on port bounds
@@ -622,6 +759,256 @@ static void aglSetViewport( vout_thread_t *p_vout, Rect viewBounds, Rect clipBou
                             - p_vout->p_sys->i_height; 
 
     aglUpdateContext(p_vout->p_sys->agl_ctx);
-    aglReshape( p_vout );
 }
+
+//default window event handler
+static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, EventRef event, void *userData)
+{
+    OSStatus result = noErr;
+    UInt32 class = GetEventClass (event);
+    UInt32 kind = GetEventKind (event); 
+    vout_thread_t *p_vout = (vout_thread_t *)userData;
+
+    result = CallNextEventHandler(nextHandler, event);
+    if(class == kEventClassCommand)
+    {
+        HICommand theHICommand;
+        GetEventParameter( event, kEventParamDirectObject, typeHICommand, NULL, sizeof( HICommand ), NULL, &theHICommand );
+        
+        switch ( theHICommand.commandID )
+        {
+            default:
+                result = eventNotHandledErr;
+        }
+    }
+    else if(class == kEventClassWindow)
+    {
+        WindowRef     window;
+        Rect          rectPort = {0,0,0,0};
+        
+        GetEventParameter(event, kEventParamDirectObject, typeWindowRef, NULL, sizeof(WindowRef), NULL, &window);
+
+        if(window)
+        {
+            GetPortBounds(GetWindowPort(window), &rectPort);
+        }   
+
+        switch (kind)
+        {
+            case kEventWindowClosed:
+            case kEventWindowZoomed:
+            case kEventWindowBoundsChanged:
+                break;
+            
+            default:
+                result = eventNotHandledErr;
+        }
+    }
+    else if(class == kEventClassMouse)
+    {
+        switch (kind)
+        {
+            case kEventMouseDown:
+            {
+                UInt16     button;
+        
+                GetEventParameter(event, kEventParamMouseButton, typeMouseButton, NULL, sizeof(button), NULL, &button);
+                switch (button)
+                {
+                    case kEventMouseButtonPrimary:
+                    {
+                        vlc_value_t val;
+
+                        var_Get( p_vout, "mouse-button-down", &val );
+                        val.i_int |= 1;
+                        var_Set( p_vout, "mouse-button-down", val );
+                        break;
+                    }
+                    case kEventMouseButtonSecondary:
+                    {
+                        vlc_value_t val;
+
+                        var_Get( p_vout, "mouse-button-down", &val );
+                        val.i_int |= 2;
+                        var_Set( p_vout, "mouse-button-down", val );
+                        break;
+                    }
+                    case kEventMouseButtonTertiary:
+                    {
+                        vlc_value_t val;
+
+                        var_Get( p_vout, "mouse-button-down", &val );
+                        val.i_int |= 4;
+                        var_Set( p_vout, "mouse-button-down", val );
+                        break;
+                    }
+                    default:
+                        result = eventNotHandledErr;
+                }
+                break;
+            }
+
+            case kEventMouseUp:
+            {
+                UInt16     button;
+        
+                GetEventParameter(event, kEventParamMouseButton, typeMouseButton, NULL, sizeof(button), NULL, &button);
+                switch (button)
+                {
+                    case kEventMouseButtonPrimary:
+                    {
+                        UInt32 clickCount = 0;
+                        GetEventParameter(event, kEventParamClickCount, typeUInt32, NULL, sizeof(clickCount), NULL, &clickCount);
+                        if( clickCount > 1 )
+                        {
+                            vlc_value_t val;
+
+                            val.b_bool = VLC_FALSE;
+                            var_Set((vout_thread_t *) p_vout->p_parent, "fullscreen", val);
+                        }
+                        else
+                        {
+                            vlc_value_t val;
+
+                            val.b_bool = VLC_TRUE;
+                            var_Set( p_vout, "mouse-clicked", val );
+
+                            var_Get( p_vout, "mouse-button-down", &val );
+                            val.i_int &= ~1;
+                            var_Set( p_vout, "mouse-button-down", val );
+                        }
+                        break;
+                    }
+                    case kEventMouseButtonSecondary:
+                    {
+                        vlc_value_t val;
+
+                        var_Get( p_vout, "mouse-button-down", &val );
+                        val.i_int &= ~2;
+                        var_Set( p_vout, "mouse-button-down", val );
+                        break;
+                    }
+                    case kEventMouseButtonTertiary:
+                    {
+                        vlc_value_t val;
+
+                        var_Get( p_vout, "mouse-button-down", &val );
+                        val.i_int &= ~2;
+                        var_Set( p_vout, "mouse-button-down", val );
+                        break;
+                    }
+                    default:
+                        result = eventNotHandledErr;
+                }
+                break;
+            }
+
+            case kEventMouseMoved:
+            {
+                Point ml;
+                vlc_value_t val;
+
+                unsigned int i_x, i_y;
+                unsigned int i_height = p_vout->p_sys->i_height;
+                unsigned int i_width  = p_vout->p_sys->i_width;
+
+                vout_PlacePicture(p_vout, i_width, i_height, &i_x, &i_y, &i_width, &i_height); 
+
+                GetEventParameter(event, kEventParamWindowMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &ml);
+                
+                val.i_int = ( ((int)ml.h) - i_x ) *
+                            p_vout->render.i_width / i_width;
+                var_Set( p_vout, "mouse-x", val );
+
+                val.i_int = ( ((int)ml.v) - i_y ) *
+                            p_vout->render.i_height / i_height;
+
+                var_Set( p_vout, "mouse-y", val );
+
+                val.b_bool = VLC_TRUE;
+                var_Set( p_vout, "mouse-moved", val );
+
+                break;
+            }
+            
+            default:
+                result = eventNotHandledErr;
+        }
+    }
+    else if(class == kEventClassTextInput)
+    {
+        switch (kind)
+        {
+            case kEventTextInputUnicodeForKeyEvent:
+            {
+                break;
+            }
+            default:
+                result = eventNotHandledErr;
+        }
+    }
+    else if(class == kEventClassVLCPlugin)
+    {
+        switch (kind)
+        {
+            case kEventVLCPluginShowFullscreen:
+                ShowWindow (p_vout->p_sys->theWindow);
+                SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+                //CGDisplayHideCursor(kCGDirectMainDisplay);
+                break;
+            case kEventVLCPluginHideFullscreen:
+                HideWindow (p_vout->p_sys->theWindow);
+                SetSystemUIMode( kUIModeNormal, 0);
+                CGDisplayShowCursor(kCGDirectMainDisplay);
+                break;
+            default:
+                result = eventNotHandledErr;
+                break;
+        }
+    }
+    return result;
+}
+
+static int aglLock( vout_thread_t * p_vout )
+{
+#ifdef __ppc__
+    /*
+     * before 10.4, we set the AGL context as current and
+     * then we retrieve and use the matching CGL context 
+     */
+    aglSetCurrentContext(p_vout->p_sys->agl_ctx);
+    return kCGLNoError != CGLLockContext( CGLGetCurrentContext() );
+#else
+    /* since 10.4, this is the safe way to get the underlying CGL context */
+    CGLContextObj cglContext;
+    if( aglGetCGLContext(p_vout->p_sys->agl_ctx, (void**)&cglContext) )
+    {
+        if( kCGLNoError == CGLLockContext( cglContext ) )
+	{
+	    aglSetCurrentContext(p_vout->p_sys->agl_ctx);
+	    return 0;
+	}
+    }
+    return 1;
+#endif
+}
+
+static void aglUnlock( vout_thread_t * p_vout )
+{
+#ifdef __ppc__
+    /*
+     * before 10.4, we assume that the AGL context is current.
+     * therefore, we use the current CGL context 
+     */
+    CGLUnlockContext( CGLGetCurrentContext() );
+#else
+    /* since 10.4, this is the safe way to get the underlying CGL context */
+    CGLContextObj cglContext;
+    if( aglGetCGLContext(p_vout->p_sys->agl_ctx, (void**)&cglContext) )
+    {
+        CGLUnlockContext( cglContext );
+    }
+#endif
+}
+
 
