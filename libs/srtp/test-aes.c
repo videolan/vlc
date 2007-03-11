@@ -63,7 +63,7 @@ static void test_derivation (void)
     printf (" master salt: ");
     printhex (salt, sizeof (salt));
 
-    if (gcry_cipher_open (&prf, GCRY_CIPHER_AES, GCRY_CIPHER_MODE_ECB, 0)
+    if (gcry_cipher_open (&prf, GCRY_CIPHER_AES, GCRY_CIPHER_MODE_CTR, 0)
      || gcry_cipher_setkey (prf, key, sizeof (key)))
         fatal ("Internal PRF error");
 

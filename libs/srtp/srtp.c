@@ -230,6 +230,37 @@ srtp_create (int encr, int auth, unsigned tag_len, int prf, unsigned flags)
 
 
 /**
+ * Counter Mode encryption/decryption (ctr length = 16 bytes)
+ * with non-padded (truncated) text
+ */
+static int
+ctr_crypt (gcry_cipher_hd_t hd, const void *ctr, uint8_t *data, size_t len)
+{
+    const size_t ctrlen = 16;
+    div_t d = div (len, ctrlen);
+
+    if (gcry_cipher_setctr (hd, ctr, ctrlen)
+     || gcry_cipher_encrypt (hd, data, d.quot * ctrlen, NULL, 0))
+        return -1;
+
+    if (d.rem)
+    {
+        /* Truncated last block */
+        uint8_t dummy[ctrlen];
+        data += d.quot * ctrlen;
+        memcpy (dummy, data, d.rem);
+        memset (dummy + d.rem, 0, ctrlen - d.rem);
+
+        if (gcry_cipher_encrypt (hd, dummy, ctrlen, data, ctrlen))
+            return -1;
+        memcpy (data, dummy, d.rem);
+    }
+
+    return 0;
+}
+
+
+/**
  * AES-CM key derivation (saltlen = 14 bytes)
  */
 static int
@@ -247,29 +278,8 @@ derive (gcry_cipher_hd_t prf, const void *salt,
     for (size_t i = 0; i < rlen; i++)
         iv[sizeof (iv) - rlen + i] ^= r[i];
 
-    /* TODO: retry with CTR mode */
-    while (outlen >= sizeof (iv))
-    {
-        /* AES */
-        if (gcry_cipher_encrypt (prf, out, sizeof (iv), iv, sizeof (iv)))
-            return EINVAL;
-        outlen -= sizeof (iv);
-        out = ((uint8_t *)out) + sizeof (iv);
-
-        /* Increment IV in network byte order */
-        if (++iv[sizeof (iv) - 1] == 0)
-            ++iv[sizeof (iv) -2];
-    }
-
-    if (outlen > 0)
-    {
-        /* Truncated last AES output block */
-        if (gcry_cipher_encrypt (prf, iv, sizeof (iv), NULL, 0))
-            return -1;
-        memcpy (out, iv, outlen);
-    }
-
-    return 0;
+    memset (out, 0, outlen);
+    return ctr_crypt (prf, iv, out, outlen);
 }
 
 
@@ -305,8 +315,7 @@ srtp_derive (srtp_session_t *s, const void *key, size_t keylen,
     gcry_cipher_hd_t prf;
     uint8_t r[6];
 
-    /* TODO: retry with CTR mode */
-    if (gcry_cipher_open (&prf, GCRY_CIPHER_AES, GCRY_CIPHER_MODE_ECB, 0)
+    if (gcry_cipher_open (&prf, GCRY_CIPHER_AES, GCRY_CIPHER_MODE_CTR, 0)
      || gcry_cipher_setkey (prf, key, keylen))
         return -1;
 
@@ -380,39 +389,6 @@ void srtp_setrcc_rate (srtp_session_t *s, uint16_t rate)
 {
     assert (rate != 0);
     s->rtp_rcc = rate;
-}
-
-
-/** AES-CM encryption/decryption (ctr length = 16 bytes) */
-static int
-ctr_crypt (gcry_cipher_hd_t hd, uint32_t *ctr, uint8_t *data, size_t len)
-{
-    const size_t ctrlen = 16;
-    while (len >= ctrlen)
-    {
-        if (gcry_cipher_setctr (hd, ctr, ctrlen)
-         || gcry_cipher_encrypt (hd, data, ctrlen, NULL, 0))
-            return -1;
-
-        data += ctrlen;
-        len -= ctrlen;
-        ctr[3] = htonl (ntohl (ctr[3]) + 1);
-    }
-
-    if (len > 0)
-    {
-        /* Truncated last block */
-        uint8_t dummy[ctrlen];
-        memcpy (dummy, data, len);
-        memset (dummy + len, 0, ctrlen - len);
-
-        if (gcry_cipher_setctr (hd, ctr, ctrlen)
-         || gcry_cipher_encrypt (hd, dummy, ctrlen, data, ctrlen))
-            return -1;
-        memcpy (data, dummy, len);
-    }
-
-    return 0;
 }
 
 
