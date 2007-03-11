@@ -235,6 +235,7 @@ SOURCES_libvlc_common = \
 	input/input.c \
 	input/meta.c \
 	input/input_internal.h \
+	input/vlm_internal.h \
 	input/stream.c \
 	input/mem_stream.c \
 	input/subtitles.c \
