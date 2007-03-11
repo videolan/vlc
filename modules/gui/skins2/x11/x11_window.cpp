@@ -73,11 +73,11 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
 
     // Changing decorations
     struct {
-        uint32_t flags;
-        uint32_t functions;
-        uint32_t decorations;
-        int32_t  input_mode;
-        uint32_t status;
+        unsigned long flags;
+        unsigned long functions;
+        unsigned long decorations;
+        signed   long input_mode;
+        unsigned long status;
     } motifWmHints;
     Atom hints_atom = XInternAtom( XDISPLAY, "_MOTIF_WM_HINTS", False );
     motifWmHints.flags = 2;    // MWM_HINTS_DECORATIONS;
