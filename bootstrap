@@ -64,7 +64,7 @@ esac
 
 # Check for automake
 amvers="no"
-for v in "-1.10" "110" "-1.9" "19" "-1.8" "18" "-1.7" "17"; do
+for v in "-1.10" "110" "-1.9" "19"; do
   if automake${v} --version >/dev/null 2>&1; then
     amsuff="${v}"
     amvers="`echo ${v} | sed -e 's/^-//'`"
@@ -78,9 +78,9 @@ if test "${amvers}" = "no" && automake --version > /dev/null 2>&1; then
 fi
 
 case "${amvers}" in
-  no|1.[0123456]|1.[0123456].*|1[0123456]|1.[0123456]-*)
+  no|1.[012345678]|1.[0123456].*|1[0123456]|1.[0123456]-*)
     set +x
-    echo "$0: you need automake version 1.7 or later"
+    echo "$0: you need automake version 1.9 or later"
     exit 1
     ;;
 esac

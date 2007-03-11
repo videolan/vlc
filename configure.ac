@@ -9,13 +9,13 @@ VERSION_EXTRA="svn"
 CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
 CODENAME="Grishenko"
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.59) dnl this really should be 2.59c
 AC_CONFIG_SRCDIR(src/libvlc.c)
 AC_CONFIG_AUX_DIR(autotools)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE([1.7 check-news dist-bzip2])
+AM_INIT_AUTOMAKE([1.9 check-news dist-bzip2 no-dist-gzip -Wall])
 AM_CONFIG_HEADER(config.h)
 
 dnl Too many people are not aware of maintainer mode:
@@ -26,8 +26,6 @@ dnl can't expect you to enable it manually.
 
 AS_IF([test "x${enable_maintainer_mode}" != "xno"],
 	[enable_maintainer_mode="yes"])
-
-dnl HA! HA!
 AM_MAINTAINER_MODE
 
 dnl
@@ -5774,7 +5772,6 @@ AC_CONFIG_FILES([
   doc/Makefile
   intl/Makefile
   ipkg/Makefile
-  libs/Makefile
   libs/loader/Makefile
   libs/srtp/Makefile
   modules/Makefile
