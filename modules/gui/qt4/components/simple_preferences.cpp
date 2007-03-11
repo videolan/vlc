@@ -33,7 +33,6 @@
 #include "qt4.hpp"
 
 #include <vlc_config_cat.h>
-#include <assert.h>
 
 #include "pixmaps/hotkeys_50x50.xpm"
 #include "pixmaps/audio_50x50.xpm"
