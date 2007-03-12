@@ -54,10 +54,6 @@
 #   define AF_UNSPEC   0
 #endif
 
-#define _NI_MASK (NI_NUMERICHOST|NI_NUMERICSERV|NI_NOFQDN|NI_NAMEREQD|\
-                  NI_DGRAM)
-#define _AI_MASK (AI_PASSIVE|AI_CANONNAME|AI_NUMERICHOST)
-
 
 #ifndef HAVE_GAI_STRERROR
 static struct
@@ -103,6 +99,8 @@ const char *vlc_gai_strerror (int errnum)
 #endif
 
 #ifndef HAVE_GETNAMEINFO
+#define _NI_MASK (NI_NUMERICHOST|NI_NUMERICSERV|NI_NOFQDN|NI_NAMEREQD|\
+                  NI_DGRAM)
 /*
  * getnameinfo() non-thread-safe IPv4-only implementation,
  * Address-family-independant address to hostname translation
@@ -161,6 +159,7 @@ getnameinfo (const struct sockaddr *sa, socklen_t salen,
 #endif /* if !HAVE_GETNAMEINFO */
 
 #ifndef HAVE_GETADDRINFO
+#define _AI_MASK (AI_PASSIVE|AI_CANONNAME|AI_NUMERICHOST)
 /*
  * Converts the current herrno error value into an EAI_* error code.
  * That error code is normally returned by getnameinfo() or getaddrinfo().
@@ -595,10 +594,12 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
         hints.ai_family = p_hints->ai_family;
         hints.ai_socktype = p_hints->ai_socktype;
         hints.ai_protocol = p_hints->ai_protocol;
-        hints.ai_flags = p_hints->ai_flags & (AI_NUMERICHOST|AI_PASSIVE);
+        hints.ai_flags = p_hints->ai_flags & (AI_NUMERICHOST|AI_PASSIVE|AI_CANONNAME);
     }
+#ifdef AI_NUMERICSERV
     /* we only ever use port *numbers* */
     hints.ai_flags |= AI_NUMERICSERV;
+#endif
 
     if( hints.ai_family == AF_UNSPEC )
     {
