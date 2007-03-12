@@ -589,10 +589,16 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     snprintf( psz_service, 6, "%d", i_port );
 
     /* Check if we have to force ipv4 or ipv6 */
-    if( p_hints == NULL )
-        memset( &hints, 0, sizeof( hints ) );
-    else
-        memcpy( &hints, p_hints, sizeof( hints ) );
+    memset (&hints, 0, sizeof (hints));
+    if (p_hints != NULL)
+    {
+        hints.ai_family = p_hints->ai_family;
+        hints.ai_socktype = p_hints->ai_socktype;
+        hints.ai_protocol = p_hints->ai_protocol;
+        hints.ai_flags = p_hints->ai_flags & (AI_NUMERICHOST|AI_PASSIVE);
+    }
+    /* we only ever use port *numbers* */
+    hints.ai_flags |= AI_NUMERICSERV;
 
     if( hints.ai_family == AF_UNSPEC )
     {
