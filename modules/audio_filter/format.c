@@ -245,7 +245,7 @@ static block_t *Float32toS24( filter_t *p_filter, block_t *p_block )
     uint8_t *p_out = (uint8_t *)p_in;
     int32_t out;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 4; i--; )
     {
         if ( *p_in >= 1.0 ) out = 8388607;
         else if ( *p_in < -1.0 ) out = -8388608;
@@ -272,7 +272,7 @@ static block_t *Float32toS16( filter_t *p_filter, block_t *p_block )
     float *p_in = (float *)p_block->p_buffer;
     int16_t *p_out = (int16_t *)p_in;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 4; i--; )
     {
 #if 0
         /* Slow version. */
@@ -300,7 +300,7 @@ static block_t *Float32toU16( filter_t *p_filter, block_t *p_block )
     float *p_in = (float *)p_block->p_buffer;
     uint16_t *p_out = (uint16_t *)p_in;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 4; i--; )
     {
         if ( *p_in >= 1.0 ) *p_out = 65535;
         else if ( *p_in < -1.0 ) *p_out = 0;
@@ -320,7 +320,7 @@ static block_t *S24toFloat32( filter_t *p_filter, block_t *p_block )
     int i;
 
     p_block_out =
-        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer*4/3 );
+        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer * 4 / 3 );
     if( !p_block_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
@@ -330,8 +330,9 @@ static block_t *S24toFloat32( filter_t *p_filter, block_t *p_block )
     p_in = p_block->p_buffer;
     p_out = (float *)p_block_out->p_buffer;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 3; i--; )
     {
+        /* FIXME: unaligned reads */
 #ifdef WORDS_BIGENDIAN
         *p_out = ((float)( (((int32_t)*(int16_t *)(p_in)) << 8) + p_in[2]))
 #else
@@ -358,7 +359,7 @@ static block_t *S24toS16( filter_t *p_filter, block_t *p_block )
     uint8_t *p_in = (uint8_t *)p_block->p_buffer;
     uint8_t *p_out = (uint8_t *)p_in;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 3; i--; )
     {
 #ifdef WORDS_BIGENDIAN
         *p_out++ = *p_in++;
@@ -393,7 +394,7 @@ static block_t *S16toFloat32( filter_t *p_filter, block_t *p_block )
     p_in = (int16_t *)p_block->p_buffer;
     p_out = (float *)p_block_out->p_buffer;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 2; i--; )
     {
 #if 0
         /* Slow version */
@@ -423,7 +424,7 @@ static block_t *S16toFloat32( filter_t *p_filter, block_t *p_block )
 static block_t *U16toFloat32( filter_t *p_filter, block_t *p_block )
 {
     block_t *p_block_out;
-    int16_t *p_in;
+    uint16_t *p_in;
     float *p_out;
     int i;
 
@@ -435,10 +436,10 @@ static block_t *U16toFloat32( filter_t *p_filter, block_t *p_block )
         return NULL;
     }
 
-    p_in = (int16_t *)p_block->p_buffer;
+    p_in = (uint16_t *)p_block->p_buffer;
     p_out = (float *)p_block_out->p_buffer;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 2; i--; )
     {
         *p_out++ = (float)(*p_in++ - 32768) / 32768.0;
     }
@@ -470,7 +471,7 @@ static block_t *S16toS24( filter_t *p_filter, block_t *p_block )
     p_in = (uint8_t *)p_block->p_buffer;
     p_out = (uint8_t *)p_block_out->p_buffer;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 2; i--; )
     {
 #ifdef WORDS_BIGENDIAN
         *p_out++ = *p_in++;
@@ -499,7 +500,7 @@ static block_t *S16toS8( filter_t *p_filter, block_t *p_block )
     int16_t *p_in = (int16_t *)p_block->p_buffer;
     int8_t *p_out = (int8_t *)p_in;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 2; i--; )
         *p_out++ = (*p_in++) >> 8;
 
     p_block->i_buffer /= 2;
@@ -511,7 +512,7 @@ static block_t *S16toU8( filter_t *p_filter, block_t *p_block )
     int16_t *p_in = (int16_t *)p_block->p_buffer;
     uint8_t *p_out = (uint8_t *)p_in;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 2; i--; )
         *p_out++ = ((*p_in++) + 32768) >> 8;
 
     p_block->i_buffer /= 2;
@@ -523,7 +524,7 @@ static block_t *S16toU16( filter_t *p_filter, block_t *p_block )
     int16_t *p_in = (int16_t *)p_block->p_buffer;
     uint16_t *p_out = (uint16_t *)p_in;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 2; i--; )
         *p_out++ = (*p_in++) + 32768;
 
     return p_block;
@@ -535,7 +536,7 @@ static block_t *U16toS8( filter_t *p_filter, block_t *p_block )
     uint16_t *p_in = (uint16_t *)p_block->p_buffer;
     int8_t *p_out = (int8_t *)p_in;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 2; i--; )
         *p_out++ = ((int)(*p_in++) - 32768) >> 8;
 
     p_block->i_buffer /= 2;
@@ -547,7 +548,7 @@ static block_t *U16toU8( filter_t *p_filter, block_t *p_block )
     uint16_t *p_in = (uint16_t *)p_block->p_buffer;
     uint8_t *p_out = (uint8_t *)p_in;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 2; i--; )
         *p_out++ = (*p_in++) >> 8;
 
     p_block->i_buffer /= 2;
@@ -556,10 +557,10 @@ static block_t *U16toU8( filter_t *p_filter, block_t *p_block )
 static block_t *U16toS16( filter_t *p_filter, block_t *p_block )
 {
     int i;
-    int16_t *p_in = (int16_t *)p_block->p_buffer;
-    uint16_t *p_out = (uint16_t *)p_in;
+    uint16_t *p_in = (uint16_t *)p_block->p_buffer;
+    int16_t *p_out = (int16_t *)p_in;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer / 2; i--; )
         *p_out++ = (int)(*p_in++) - 32768;
 
     return p_block;
@@ -571,7 +572,7 @@ static block_t *S8toU8( filter_t *p_filter, block_t *p_block )
     int8_t *p_in = (int8_t *)p_block->p_buffer;
     uint8_t *p_out = (uint8_t *)p_in;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer; i--; )
         *p_out++ = ((*p_in++) + 128);
 
     return p_block;
@@ -582,7 +583,7 @@ static block_t *U8toS8( filter_t *p_filter, block_t *p_block )
     uint8_t *p_in = (uint8_t *)p_block->p_buffer;
     int8_t *p_out = (int8_t *)p_in;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer; i--; )
         *p_out++ = ((*p_in++) - 128);
 
     return p_block;
@@ -607,7 +608,7 @@ static block_t *S8toU16( filter_t *p_filter, block_t *p_block )
     p_in = (int8_t *)p_block->p_buffer;
     p_out = (uint16_t *)p_block_out->p_buffer;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer; i--; )
         *p_out++ = ((*p_in++) + 128) << 8;
 
     p_block_out->i_samples = p_block->i_samples;
@@ -638,7 +639,7 @@ static block_t *U8toS16( filter_t *p_filter, block_t *p_block )
     p_in = (uint8_t *)p_block->p_buffer;
     p_out = (int16_t *)p_block_out->p_buffer;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer; i--; )
         *p_out++ = ((*p_in++) - 128) << 8;
 
     p_block_out->i_samples = p_block->i_samples;
@@ -670,7 +671,7 @@ static block_t *S8toS16( filter_t *p_filter, block_t *p_block )
     p_in = (int8_t *)p_block->p_buffer;
     p_out = (int16_t *)p_block_out->p_buffer;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer; i--; )
         *p_out++ = (*p_in++) << 8;
 
     p_block_out->i_samples = p_block->i_samples;
@@ -701,7 +702,7 @@ static block_t *U8toU16( filter_t *p_filter, block_t *p_block )
     p_in = (uint8_t *)p_block->p_buffer;
     p_out = (uint16_t *)p_block_out->p_buffer;
 
-    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    for( i = p_block->i_buffer; i--; )
         *p_out++ = (*p_in++) << 8;
 
     p_block_out->i_samples = p_block->i_samples;
