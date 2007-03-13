@@ -21,7 +21,7 @@ function VlcSyntax()
   " return values
   syn keyword cConstant VLC_SUCCESS VLC_EGENERIC VLC_ENOMEM VLC_ETHREAD
   syn keyword cConstant VLC_ESTATUS VLC_EEXIT VLC_EMODULE VLC_EOBJECT
-  syn keyword cConstant VLC_ENOOBJ VLC_ENOMOD
+  syn keyword cConstant VLC_ENOOBJ VLC_ENOMOD VLC_VAR_ADDRESS
   " custom types
   syn keyword cType vlc_fixed_t mtime_t byte_t dctelem_t count_t ssize_t off_t
   syn keyword cType vlc_bool_t vlc_fourcc_t vlc_value_t
