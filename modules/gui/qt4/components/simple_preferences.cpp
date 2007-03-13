@@ -56,17 +56,20 @@
 SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
                                   QListWidget( _parent ), p_intf( _p_intf )
 {
-    setIconSize( QSize( ITEM_HEIGHT * 2 ,ITEM_HEIGHT  ) );
-    setViewMode(QListView::IconMode);
+    setIconSize( QSize( ITEM_HEIGHT, ITEM_HEIGHT ) );
+    setViewMode(QListView::ListMode);
     setMovement(QListView::Static);
     setMaximumWidth(200);
     setSpacing(0);
-//    setAlternatingRowColors( true );
+    setWordWrap(true);
+    setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setAlternatingRowColors( true );
 
 #define ADD_CATEGORY( id, label, icon )                                  \
     addItem( label );                                                    \
     item( id )->setIcon( QIcon( ":/pixmaps/" #icon ) )  ;   \
-    item( id )->setTextAlignment( Qt::AlignHCenter );                    \
+    item( id )->setTextAlignment( Qt::AlignLeft | Qt::AlignVCenter );      \
     item( id )->setData( Qt::UserRole, qVariantFromValue( (int)id ) );   \
     item( id )->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
 
