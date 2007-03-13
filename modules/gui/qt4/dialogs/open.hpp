@@ -66,7 +66,7 @@ private:
     int advHeight, mainHeight;
 private slots:
     void cancel();
-    void ok();
+    void playOrEnqueue(bool);
     void toggleAdvancedPanel();
     void updateMRL(QString);
     void updateMRL();

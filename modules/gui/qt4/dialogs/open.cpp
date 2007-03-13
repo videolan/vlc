@@ -74,8 +74,9 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());
     CONNECT( ui.cacheSpinBox, valueChanged(int), this, updateMRL());
 
-    BUTTONACT( ui.closeButton, ok());
+    BUTTONACT( ui.closeButton, playOrEnqueue());
     BUTTONACT( ui.cancelButton, cancel());
+    BUTTONACT( ui.enqueueButton, playOrEnqueue( true ));
     BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
 
     /* Initialize caching */
@@ -110,7 +111,7 @@ void OpenDialog::cancel()
         reject();
 }
 
-void OpenDialog::ok()
+void OpenDialog::playOrEnqueue(bool b_enqueue = false )
 {
     this->toggleVisible();
     mrl = ui.advancedLineInput->text();
@@ -123,11 +124,22 @@ void OpenDialog::ok()
              QString mrli = tempMRL[i].remove( QRegExp( "^\"" ) ).
                                        remove( QRegExp( "\"\\s+$" ) );
              const char * psz_utf8 = qtu( tempMRL[i] );
-             /* Play the first one, parse and enqueue the other ones */
-             playlist_Add( THEPL, psz_utf8, NULL,
-                           PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
-                           ( i ? PLAYLIST_PREPARSE : 0 ),
-                           PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+             if ( b_enqueue )
+             {
+                 /* Enqueue and Preparse all items*/
+                 playlist_Add( THEPL, psz_utf8, NULL,
+                                PLAYLIST_APPEND | PLAYLIST_PREPARSE,
+                                PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+
+             }
+             else
+             {
+                 /* Play the first one, parse and enqueue the other ones */
+                 playlist_Add( THEPL, psz_utf8, NULL,
+                                PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
+                                ( i ? PLAYLIST_PREPARSE : 0 ),
+                                PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+             }
         }
 
     }

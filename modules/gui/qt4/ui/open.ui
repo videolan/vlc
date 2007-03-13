@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>525</width>
+    <width>440</width>
     <height>231</height>
    </rect>
   </property>
@@ -165,9 +165,16 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="enqueueButton" >
+       <property name="text" >
+        <string>Enqueue</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="closeButton" >
        <property name="text" >
-        <string>Open</string>
+        <string>Play</string>
        </property>
       </widget>
      </item>
