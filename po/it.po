@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-03-11 12:52+0200\n"
+"POT-Creation-Date: 2007-03-14 00:25+0100\n"
 "PO-Revision-Date: 2007-01-05 13:24+0100\n"
 "Last-Translator: Vincenzo Reale <smart2128@baslug.org>\n"
 "Language-Team: Italian <kde-i18n-it@mail.kde.org>\n"
@@ -876,7 +876,7 @@ msgstr "Stereo"
 
 #: src/audio_output/output.c:106 src/audio_output/output.c:142
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
-#: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:131
+#: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:136
 #: modules/control/gestures.c:88 modules/video_filter/logo.c:97
 #: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:181
 #: modules/video_filter/osdmenu.c:76 modules/video_filter/rss.c:160
@@ -885,7 +885,7 @@ msgstr "Sinistra"
 
 #: src/audio_output/output.c:108 src/audio_output/output.c:144
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
-#: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:131
+#: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:136
 #: modules/control/gestures.c:88 modules/video_filter/logo.c:97
 #: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:181
 #: modules/video_filter/osdmenu.c:76 modules/video_filter/rss.c:160
@@ -1157,7 +1157,7 @@ msgstr "Media: %s"
 #: modules/gui/macosx/interaction.m:145 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/playlistinfo.m:60 modules/gui/macosx/prefs.m:122
 #: modules/gui/macosx/prefs.m:142 modules/gui/macosx/wizard.m:362
-#: modules/gui/qt4/dialogs/prefs_dialog.cpp:85
+#: modules/gui/qt4/dialogs/prefs_dialog.cpp:90
 msgid "Cancel"
 msgstr "Annulla"
 
@@ -1190,56 +1190,56 @@ msgstr "Registrazione log di debug"
 msgid "Mouse Gestures"
 msgstr "Movimenti del mouse"
 
-#: src/libvlc-common.c:284 src/libvlc-common.c:455 src/misc/modules.c:1717
+#: src/libvlc-common.c:287 src/libvlc-common.c:458 src/misc/modules.c:1717
 #: src/misc/modules.c:2041
 msgid "C"
 msgstr "C"
 
-#: src/libvlc-common.c:300
+#: src/libvlc-common.c:303
 msgid "Help options"
 msgstr "Impostazioni guida"
 
-#: src/libvlc-common.c:1427 src/misc/configuration.c:1217
+#: src/libvlc-common.c:1415 src/misc/configuration.c:1217
 msgid "string"
 msgstr "stringa"
 
-#: src/libvlc-common.c:1446 src/misc/configuration.c:1181
+#: src/libvlc-common.c:1434 src/misc/configuration.c:1181
 msgid "integer"
 msgstr "intero"
 
-#: src/libvlc-common.c:1466 src/misc/configuration.c:1206
+#: src/libvlc-common.c:1454 src/misc/configuration.c:1206
 msgid "float"
 msgstr "virgola mobile"
 
-#: src/libvlc-common.c:1473
+#: src/libvlc-common.c:1461
 msgid " (default enabled)"
 msgstr " (predefinito abilitato)"
 
-#: src/libvlc-common.c:1474
+#: src/libvlc-common.c:1462
 msgid " (default disabled)"
 msgstr " (predefinito disabilitato)"
 
-#: src/libvlc-common.c:1656
+#: src/libvlc-common.c:1644
 #, c-format
 msgid "VLC version %s\n"
 msgstr "VLC versione %s\n"
 
-#: src/libvlc-common.c:1657
+#: src/libvlc-common.c:1645
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
 msgstr "Compilato da %s@%s.%s\n"
 
-#: src/libvlc-common.c:1659
+#: src/libvlc-common.c:1647
 #, c-format
 msgid "Compiler: %s\n"
 msgstr "Compilatore: %s\n"
 
-#: src/libvlc-common.c:1662
+#: src/libvlc-common.c:1650
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
 msgstr "Basato sulle modifiche in svn [%s]\n"
 
-#: src/libvlc-common.c:1694
+#: src/libvlc-common.c:1682
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
@@ -1247,7 +1247,7 @@ msgstr ""
 "\n"
 "contenuto copiato nel file vlc-help.txt.\n"
 
-#: src/libvlc-common.c:1714
+#: src/libvlc-common.c:1702
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -1793,7 +1793,7 @@ msgstr ""
 "6=4+2 significa alto-destra)."
 
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
-#: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:131
+#: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:136
 #: modules/video_filter/logo.c:97 modules/video_filter/marq.c:126
 #: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:76
 #: modules/video_filter/rss.c:160
@@ -3940,8 +3940,8 @@ msgstr "Registra"
 msgid "Record access filter start/stop."
 msgstr ""
 
-#: src/libvlc-module.c:1173 modules/access_filter/dump.c:50
-#: modules/access_filter/dump.c:51
+#: src/libvlc-module.c:1173 modules/access_filter/dump.c:51
+#: modules/access_filter/dump.c:52
 msgid "Dump"
 msgstr ""
 
@@ -4088,7 +4088,7 @@ msgstr "Proprietà della finestra"
 msgid "Subpictures"
 msgstr "Immagini"
 
-#: src/libvlc-module.c:1385 modules/codec/subsdec.c:146
+#: src/libvlc-module.c:1385 modules/codec/subsdec.c:151
 #: modules/demux/subtitle.c:66 modules/gui/beos/InterfaceWindow.cpp:278
 msgid "Subtitles"
 msgstr "Sottotitoli"
@@ -6026,20 +6026,20 @@ msgstr ""
 msgid "VLC could not open file \"%s\" (%s)."
 msgstr ""
 
-#: modules/access_filter/dump.c:38
+#: modules/access_filter/dump.c:39
 #, fuzzy
 msgid "Force use of dump module"
 msgstr "Modulo accesso uscita"
 
-#: modules/access_filter/dump.c:39
+#: modules/access_filter/dump.c:40
 msgid "Activate the dump module even for media with fast seeking."
 msgstr ""
 
-#: modules/access_filter/dump.c:42
+#: modules/access_filter/dump.c:43
 msgid "Maximum size of temporary file (Mb)"
 msgstr ""
 
-#: modules/access_filter/dump.c:43
+#: modules/access_filter/dump.c:44
 msgid ""
 "The dump module will abort dumping of the media if more than this much "
 "megabyte were performed."
@@ -7055,7 +7055,7 @@ msgstr "Segmenti"
 
 #: modules/access/vcdx/access.c:428 modules/access/vcdx/access.c:709
 #: modules/access/vcdx/info.c:294 modules/access/vcdx/info.c:295
-#: modules/demux/mkv.cpp:5260
+#: modules/demux/mkv.cpp:5271
 msgid "Segment"
 msgstr "Segmento"
 
@@ -8768,48 +8768,48 @@ msgstr "Decodificatore sottotitoli DVD"
 msgid "DVD subtitles packetizer"
 msgstr "Incapsulazione sottotitoli DVD"
 
-#: modules/codec/subsdec.c:133
+#: modules/codec/subsdec.c:138
 msgid "Subtitles text encoding"
 msgstr "Codifica testo sottotitoli"
 
-#: modules/codec/subsdec.c:134
+#: modules/codec/subsdec.c:139
 msgid "Set the encoding used in text subtitles"
 msgstr "Codifica usata nel testo sottotitoli"
 
-#: modules/codec/subsdec.c:135
+#: modules/codec/subsdec.c:140
 msgid "Subtitles justification"
 msgstr "Giustificazione sottotitoli"
 
-#: modules/codec/subsdec.c:136
+#: modules/codec/subsdec.c:141
 msgid "Set the justification of subtitles"
 msgstr "Giustificazione dei sottotitoli"
 
-#: modules/codec/subsdec.c:137
+#: modules/codec/subsdec.c:142
 msgid "UTF-8 subtitles autodetection"
 msgstr "Rilevamento automatico dei sottotitoli UTF-8"
 
-#: modules/codec/subsdec.c:138
+#: modules/codec/subsdec.c:143
 msgid ""
 "This enables automatic detection of UTF-8 encoding within subtitles files."
 msgstr ""
 "Abilita il rilevamento automatico della codifica UTF-8 nei file dei "
 "sottotitoli."
 
-#: modules/codec/subsdec.c:140
+#: modules/codec/subsdec.c:145
 msgid "Formatted Subtitles"
 msgstr "Sottotitoli formattati"
 
-#: modules/codec/subsdec.c:141
+#: modules/codec/subsdec.c:146
 msgid ""
 "Some subtitle formats allow for text formatting. VLC partly implements this, "
 "but you can choose to disable all formatting."
 msgstr ""
 
-#: modules/codec/subsdec.c:147
+#: modules/codec/subsdec.c:152
 msgid "Text subtitles decoder"
 msgstr "Decodificatore testo dei sottotitoli"
 
-#: modules/codec/subsdec.c:360 modules/codec/subsdec.c:396
+#: modules/codec/subsdec.c:371 modules/codec/subsdec.c:407
 msgid ""
 "failed to convert subtitle encoding.\n"
 "Try manually setting a character-encoding before you open the file."
@@ -10605,19 +10605,19 @@ msgstr "Sorgente dummy"
 msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
 
-#: modules/demux/mkv.cpp:3234
+#: modules/demux/mkv.cpp:3245
 msgid "---  DVD Menu"
 msgstr "---  Menu DVD"
 
-#: modules/demux/mkv.cpp:3240
+#: modules/demux/mkv.cpp:3251
 msgid "First Played"
 msgstr ""
 
-#: modules/demux/mkv.cpp:3242
+#: modules/demux/mkv.cpp:3253
 msgid "Video Manager"
 msgstr "Gestore video"
 
-#: modules/demux/mkv.cpp:3248
+#: modules/demux/mkv.cpp:3259
 msgid "----- Title"
 msgstr "----- Titolo"
 
@@ -11283,7 +11283,7 @@ msgstr "Applica"
 
 #: modules/gui/beos/PreferencesWindow.cpp:254 modules/gui/macosx/output.m:526
 #: modules/gui/macosx/playlist.m:660 modules/gui/macosx/prefs.m:121
-#: modules/gui/qt4/dialogs/prefs_dialog.cpp:84
+#: modules/gui/qt4/dialogs/prefs_dialog.cpp:89
 msgid "Save"
 msgstr "Registra"
 
@@ -12317,7 +12317,7 @@ msgstr "Cartella vuota"
 msgid "Reset All"
 msgstr "Azzera tutto"
 
-#: modules/gui/macosx/prefs.m:142
+#: modules/gui/macosx/prefs.m:142 modules/gui/qt4/dialogs/prefs_dialog.cpp:91
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:296
 msgid "Reset Preferences"
 msgstr "Azzera Preferenze"
@@ -12429,98 +12429,98 @@ msgstr "Tempo"
 msgid "ms"
 msgstr "mms"
 
-#: modules/gui/macosx/sfilters.m:121 modules/misc/freetype.c:127
+#: modules/gui/macosx/sfilters.m:121 modules/misc/freetype.c:146
 #: modules/misc/win32text.c:85 modules/video_filter/marq.c:56
 #: modules/video_filter/rss.c:63
 msgid "Black"
 msgstr "Nero"
 
-#: modules/gui/macosx/sfilters.m:122 modules/misc/freetype.c:127
+#: modules/gui/macosx/sfilters.m:122 modules/misc/freetype.c:146
 #: modules/misc/win32text.c:85 modules/video_filter/marq.c:57
 #: modules/video_filter/rss.c:64
 msgid "Gray"
 msgstr "Grigio"
 
-#: modules/gui/macosx/sfilters.m:123 modules/misc/freetype.c:127
+#: modules/gui/macosx/sfilters.m:123 modules/misc/freetype.c:146
 #: modules/misc/win32text.c:85 modules/video_filter/marq.c:57
 #: modules/video_filter/rss.c:64
 msgid "Silver"
 msgstr "Argento"
 
-#: modules/gui/macosx/sfilters.m:124 modules/misc/freetype.c:127
+#: modules/gui/macosx/sfilters.m:124 modules/misc/freetype.c:146
 #: modules/misc/win32text.c:85 modules/video_filter/marq.c:57
 #: modules/video_filter/rss.c:64
 msgid "White"
 msgstr "Bianco"
 
-#: modules/gui/macosx/sfilters.m:125 modules/misc/freetype.c:127
+#: modules/gui/macosx/sfilters.m:125 modules/misc/freetype.c:146
 #: modules/misc/win32text.c:85 modules/video_filter/marq.c:57
 #: modules/video_filter/rss.c:64
 msgid "Maroon"
 msgstr "Marrone"
 
-#: modules/gui/macosx/sfilters.m:126 modules/misc/freetype.c:128
+#: modules/gui/macosx/sfilters.m:126 modules/misc/freetype.c:147
 #: modules/misc/win32text.c:86 modules/video_filter/colorthres.c:58
 #: modules/video_filter/marq.c:57 modules/video_filter/rss.c:64
 msgid "Red"
 msgstr "Rosso"
 
-#: modules/gui/macosx/sfilters.m:127 modules/misc/freetype.c:128
+#: modules/gui/macosx/sfilters.m:127 modules/misc/freetype.c:147
 #: modules/misc/win32text.c:86 modules/video_filter/colorthres.c:58
 #: modules/video_filter/marq.c:58 modules/video_filter/rss.c:65
 msgid "Fuchsia"
 msgstr "Fucsia"
 
-#: modules/gui/macosx/sfilters.m:128 modules/misc/freetype.c:128
+#: modules/gui/macosx/sfilters.m:128 modules/misc/freetype.c:147
 #: modules/misc/win32text.c:86 modules/video_filter/colorthres.c:58
 #: modules/video_filter/marq.c:58 modules/video_filter/rss.c:65
 msgid "Yellow"
 msgstr "Giallo"
 
-#: modules/gui/macosx/sfilters.m:129 modules/misc/freetype.c:128
+#: modules/gui/macosx/sfilters.m:129 modules/misc/freetype.c:147
 #: modules/misc/win32text.c:86 modules/video_filter/marq.c:58
 #: modules/video_filter/rss.c:65
 msgid "Olive"
 msgstr "Oliva"
 
-#: modules/gui/macosx/sfilters.m:130 modules/misc/freetype.c:128
+#: modules/gui/macosx/sfilters.m:130 modules/misc/freetype.c:147
 #: modules/misc/win32text.c:86 modules/video_filter/marq.c:58
 #: modules/video_filter/rss.c:65
 msgid "Green"
 msgstr "Verde"
 
-#: modules/gui/macosx/sfilters.m:131 modules/misc/freetype.c:128
+#: modules/gui/macosx/sfilters.m:131 modules/misc/freetype.c:147
 #: modules/misc/win32text.c:86 modules/video_filter/marq.c:59
 #: modules/video_filter/rss.c:66
 #, fuzzy
 msgid "Teal"
 msgstr "Tamil"
 
-#: modules/gui/macosx/sfilters.m:132 modules/misc/freetype.c:129
+#: modules/gui/macosx/sfilters.m:132 modules/misc/freetype.c:148
 #: modules/misc/win32text.c:87 modules/video_filter/colorthres.c:58
 #: modules/video_filter/marq.c:59 modules/video_filter/rss.c:66
 msgid "Lime"
 msgstr "Lime"
 
-#: modules/gui/macosx/sfilters.m:133 modules/misc/freetype.c:129
+#: modules/gui/macosx/sfilters.m:133 modules/misc/freetype.c:148
 #: modules/misc/win32text.c:87 modules/video_filter/marq.c:59
 #: modules/video_filter/rss.c:66
 msgid "Purple"
 msgstr "Viola"
 
-#: modules/gui/macosx/sfilters.m:134 modules/misc/freetype.c:129
+#: modules/gui/macosx/sfilters.m:134 modules/misc/freetype.c:148
 #: modules/misc/win32text.c:87 modules/video_filter/marq.c:59
 #: modules/video_filter/rss.c:66
 msgid "Navy"
 msgstr ""
 
-#: modules/gui/macosx/sfilters.m:135 modules/misc/freetype.c:129
+#: modules/gui/macosx/sfilters.m:135 modules/misc/freetype.c:148
 #: modules/misc/win32text.c:87 modules/video_filter/colorthres.c:58
 #: modules/video_filter/marq.c:59 modules/video_filter/rss.c:66
 msgid "Blue"
 msgstr "Blu"
 
-#: modules/gui/macosx/sfilters.m:136 modules/misc/freetype.c:129
+#: modules/gui/macosx/sfilters.m:136 modules/misc/freetype.c:148
 #: modules/misc/win32text.c:87 modules/video_filter/colorthres.c:58
 #: modules/video_filter/marq.c:60 modules/video_filter/rss.c:67
 msgid "Aqua"
@@ -14311,7 +14311,7 @@ msgid "Can't save"
 msgstr "Impossibile salvare"
 
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:1425
-#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:105
+#: modules/gui/wxwidgets/wxwidgets.cpp:114 modules/misc/freetype.c:124
 #: modules/misc/win32text.c:77
 msgid "Normal"
 msgstr "Normale"
@@ -15606,21 +15606,21 @@ msgstr "Trasmissione in uscita \"dummy\""
 msgid "Dummy font renderer function"
 msgstr "Funzione generatore font dummy"
 
-#: modules/misc/freetype.c:83 modules/misc/notify/xosd.c:78
+#: modules/misc/freetype.c:102 modules/misc/notify/xosd.c:78
 #: modules/misc/win32text.c:54 modules/video_filter/marq.c:148
 #: modules/video_filter/rss.c:182
 msgid "Font"
 msgstr "Carattere"
 
-#: modules/misc/freetype.c:84 modules/misc/win32text.c:55
+#: modules/misc/freetype.c:103 modules/misc/win32text.c:55
 msgid "Filename for the font you want to use"
 msgstr "Nome file del carattere che si desidera utilizzare"
 
-#: modules/misc/freetype.c:85 modules/misc/win32text.c:56
+#: modules/misc/freetype.c:104 modules/misc/win32text.c:56
 msgid "Font size in pixels"
 msgstr "Dimensione carattere (px)"
 
-#: modules/misc/freetype.c:86
+#: modules/misc/freetype.c:105
 #, fuzzy
 msgid ""
 "This is the default size of the fonts that will be rendered on the video. If "
@@ -15630,22 +15630,22 @@ msgstr ""
 "La dimensione dei caratteri utilizzati dal modulo osd. Se impostata ad un "
 "valore diverso da 0, modifica la dimensione relativa dei caratteri "
 
-#: modules/misc/freetype.c:90 modules/misc/win32text.c:62
+#: modules/misc/freetype.c:109 modules/misc/win32text.c:62
 #: modules/video_filter/marq.c:105 modules/video_filter/rss.c:138
 msgid "Opacity"
 msgstr "Opacità"
 
-#: modules/misc/freetype.c:91 modules/misc/win32text.c:63
+#: modules/misc/freetype.c:110 modules/misc/win32text.c:63
 msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque. "
 msgstr ""
 
-#: modules/misc/freetype.c:94 modules/misc/win32text.c:66
+#: modules/misc/freetype.c:113 modules/misc/win32text.c:66
 msgid "Text default color"
 msgstr "Colore predefinito del testo"
 
-#: modules/misc/freetype.c:95 modules/misc/win32text.c:67
+#: modules/misc/freetype.c:114 modules/misc/win32text.c:67
 msgid ""
 "The color of the text that will be rendered on the video. This must be an "
 "hexadecimal (like HTML colors). The first two chars are for red, then green, "
@@ -15653,73 +15653,73 @@ msgid ""
 "(red + green), #FFFFFF = white"
 msgstr ""
 
-#: modules/misc/freetype.c:99 modules/misc/win32text.c:71
+#: modules/misc/freetype.c:118 modules/misc/win32text.c:71
 #, fuzzy
 msgid "Relative font size"
 msgstr "Dimensione del buffer per il controllo di banda"
 
-#: modules/misc/freetype.c:100 modules/misc/win32text.c:72
+#: modules/misc/freetype.c:119 modules/misc/win32text.c:72
 msgid ""
 "This is the relative default size of the fonts that will be rendered on the "
 "video. If absolute font size is set, relative size will be overriden."
 msgstr ""
 
-#: modules/misc/freetype.c:105 modules/misc/win32text.c:77
+#: modules/misc/freetype.c:124 modules/misc/win32text.c:77
 msgid "Smaller"
 msgstr "Più piccolo"
 
-#: modules/misc/freetype.c:105 modules/misc/win32text.c:77
+#: modules/misc/freetype.c:124 modules/misc/win32text.c:77
 msgid "Small"
 msgstr "Piccolo"
 
-#: modules/misc/freetype.c:106 modules/misc/win32text.c:78
+#: modules/misc/freetype.c:125 modules/misc/win32text.c:78
 msgid "Large"
 msgstr "Grande"
 
-#: modules/misc/freetype.c:106 modules/misc/win32text.c:78
+#: modules/misc/freetype.c:125 modules/misc/win32text.c:78
 msgid "Larger"
 msgstr "Più grande"
 
-#: modules/misc/freetype.c:107
+#: modules/misc/freetype.c:126
 msgid "Use YUVP renderer"
 msgstr "Usa rendering YUVP"
 
-#: modules/misc/freetype.c:108
+#: modules/misc/freetype.c:127
 msgid ""
 "This renders the font using \"paletized YUV\". This option is only needed if "
 "you want to encode into DVB subtitles"
 msgstr ""
 
-#: modules/misc/freetype.c:110
+#: modules/misc/freetype.c:129
 #, fuzzy
 msgid "Font Effect"
 msgstr "Espelli"
 
-#: modules/misc/freetype.c:111
+#: modules/misc/freetype.c:130
 msgid ""
 "It is possible to apply effects to the rendered text to improve its "
 "readability."
 msgstr ""
 
-#: modules/misc/freetype.c:119
+#: modules/misc/freetype.c:138
 msgid "Background"
 msgstr "Sfondo"
 
-#: modules/misc/freetype.c:119
+#: modules/misc/freetype.c:138
 #, fuzzy
 msgid "Outline"
 msgstr "Vecchi successi"
 
-#: modules/misc/freetype.c:120
+#: modules/misc/freetype.c:139
 #, fuzzy
 msgid "Fat Outline"
 msgstr "Bilineare rapido"
 
-#: modules/misc/freetype.c:132 modules/misc/win32text.c:90
+#: modules/misc/freetype.c:151 modules/misc/win32text.c:90
 msgid "Text renderer"
 msgstr "Rendering del testo"
 
-#: modules/misc/freetype.c:133
+#: modules/misc/freetype.c:152
 msgid "Freetype2 font renderer"
 msgstr "Generatore di caratteri Freetype2"
 
@@ -18774,6 +18774,33 @@ msgstr "Specchia verticalmente"
 #: modules/video_filter/transform.c:66
 msgid "Video transformation filter"
 msgstr "Filtro trasformazione video"
+
+#: modules/video_filter/vidmon.c:52 modules/video_filter/vidmon.c:53
+msgid "Show Y Waveform"
+msgstr ""
+
+#: modules/video_filter/vidmon.c:54 modules/video_filter/vidmon.c:55
+msgid "Show UV Waveform"
+msgstr ""
+
+#: modules/video_filter/vidmon.c:56
+#, fuzzy
+msgid "Halve sample rate"
+msgstr "Campionamento"
+
+#: modules/video_filter/vidmon.c:57
+msgid "Only sample half the x and half the y values"
+msgstr ""
+
+#: modules/video_filter/vidmon.c:60
+#, fuzzy
+msgid "Video monitoring filter"
+msgstr "Filtro ridimensionamento video"
+
+#: modules/video_filter/vidmon.c:61
+#, fuzzy
+msgid "Video Monitor"
+msgstr "Filtro video"
 
 #: modules/video_filter/wall.c:54
 #, fuzzy
