@@ -30,6 +30,7 @@ Basil Achermann <vlc at acherma dot com> - Patch to handle esc and space key eve
 Barak Ori <barakori at gmail dot com> - Bidi fixes
 Benjamin Mironer <bmironer at noos.fr> - Mac OS X fixes
 Benoit Steiner <benny at via.ecp.fr> - MPEG system input, network input
+Bernie Purcell <b dot purcell at adbglobal dot com> - MKV USF subtitles support,HTML tags for subtitles and subtitles renderer enhancements
 Bill <wenwuangel at hotmail .com> - memleak fixes
 Bill Eldridge <bill at rfa.org> - documentation
 Bob Maguire <maguirer at rjmaguire dot com> - addition of some controls to the OSX interface

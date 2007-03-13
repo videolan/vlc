@@ -3948,6 +3948,9 @@ then
     VLC_ADD_PLUGINS([freetype])
     VLC_ADD_CFLAGS([freetype],[`${FREETYPE_CONFIG} --cflags`])
     VLC_ADD_LDFLAGS([freetype],[`${FREETYPE_CONFIG} --libs`])
+    AC_CHECK_HEADERS(fontconfig/fontconfig.h,
+      [VLC_ADD_CFLAGS([freetype],[-DHAVE_FONTCONFIG])
+       VLC_ADD_LDFLAGS([freetype],[-lfontconfig])])
     AC_CHECK_HEADERS(Carbon/Carbon.h,
       [VLC_ADD_LDFLAGS([freetype],[-framework Carbon])])
   elif test "${enable_freetype}" =  "yes"

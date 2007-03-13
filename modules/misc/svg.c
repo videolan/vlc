@@ -145,6 +145,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_height = p_filter->fmt_out.video.i_height;
 
     p_filter->pf_render_text = RenderText;
+    p_filter->pf_render_html = NULL;
     p_filter->p_sys = p_sys;
 
     /* MUST call this before any RSVG funcs */

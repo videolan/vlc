@@ -35,6 +35,7 @@ Input/Demuxers:
 Decoders:
  * VP60/VP61 codecs support
  * Teletext subtitles (telx) support
+ * MKV USF subtitles support
 
 Video output:
  * Adjust, Invert and Distort (now splitted into Wave, Ripple, Gradient
@@ -43,6 +44,7 @@ Video output:
  * Rewrite motion detection video filter
  * New extract video filter (extract Red, Green and Blue components from a video)
  * New sharpen video filter (increase the contrast of adjacent pixels)
+ * Enhancements to subtitles' renderer to support bold, italics and some HTML tags
 
 Stream output:
  * UDP-Lite (requires OS support) for RTP/TS encapsulation

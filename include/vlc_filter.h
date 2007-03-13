@@ -68,6 +68,8 @@ struct filter_t
     subpicture_t *      ( *pf_sub_filter ) ( filter_t *, mtime_t );
     int                 ( *pf_render_text ) ( filter_t *, subpicture_region_t *,
                                               subpicture_region_t * );
+    int                 ( *pf_render_html ) ( filter_t *, subpicture_region_t *,
+                                              subpicture_region_t * );
 
     /*
      * Buffers allocation

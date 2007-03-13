@@ -184,6 +184,7 @@ static int Create( vlc_object_t *p_this )
 
     if( psz_fontfile ) free( psz_fontfile );
     p_filter->pf_render_text = RenderText;
+    p_filter->pf_render_html = NULL;
     return VLC_SUCCESS;
 
  error:
