@@ -271,7 +271,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     /*
      * Support for gettext
      */
-    SetLanguage( "" );
+#ifdef HAVE_LC_MESSAGES
+    setlocale( LC_MESSAGES, "" );
+#endif
+    setlocale( LC_CTYPE, "" );
     LoadMessages ();
 
     /*
@@ -1128,6 +1131,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
     return VLC_SUCCESS;
 };
 
+#if defined (__APPLE__) || defined (WIN32)
 /*****************************************************************************
  * SetLanguage: set the interface language.
  *****************************************************************************
@@ -1135,43 +1139,27 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
  * as well as the LC_CTYPE category for string sorting and possible wide
  * character support.
  *****************************************************************************/
-static void SetLanguage ( char const *psz_lang )
+static void SetLanguage ( const char *psz_lang )
 {
-    if (psz_lang == NULL)
-        return;
-
-#if defined( ENABLE_NLS ) \
-     && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
-
-    if( !*psz_lang )
-    {
-#   if defined( HAVE_LC_MESSAGES )
-        setlocale( LC_MESSAGES, "" );
-#   endif
-        setlocale( LC_CTYPE, "" );
-    }
-    else
-    {
 #ifdef __APPLE__
-        /* I need that under Darwin, please check it doesn't disturb
-         * other platforms. --Meuuh */
-        setenv( "LANG", psz_lang, 1 );
+    /* I need that under Darwin, please check it doesn't disturb
+     * other platforms. --Meuuh */
+    setenv( "LANG", psz_lang, 1 );
 
-#elif defined( SYS_BEOS ) || defined( WIN32 )
-        /* We set LC_ALL manually because it is the only way to set
-         * the language at runtime under eg. Windows. Beware that this
-         * makes the environment unconsistent when libvlc is unloaded and
-         * should probably be moved to a safer place like vlc.c. */
-        static char psz_lcall[20];
-        snprintf( psz_lcall, 19, "LC_ALL=%s", psz_lang );
-        psz_lcall[19] = '\0';
-        putenv( psz_lcall );
+#else
+    /* We set LC_ALL manually because it is the only way to set
+     * the language at runtime under eg. Windows. Beware that this
+     * makes the environment unconsistent when libvlc is unloaded and
+     * should probably be moved to a safer place like vlc.c. */
+    static char psz_lcall[20];
+    snprintf( psz_lcall, 19, "LC_ALL=%s", psz_lang );
+    psz_lcall[19] = '\0';
+    putenv( psz_lcall );
 #endif
 
-        setlocale( LC_ALL, psz_lang );
-    }
-#endif
+    setlocale( LC_ALL, psz_lang );
 }
+#endif
 
 
 static inline int LoadMessages (void)
