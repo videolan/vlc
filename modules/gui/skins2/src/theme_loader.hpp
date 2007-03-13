@@ -37,10 +37,7 @@ class ThemeLoader: public SkinObject
         ThemeLoader( intf_thread_t *pIntf ): SkinObject( pIntf ) {}
         virtual ~ThemeLoader() {}
 
-        /**
-         * The expected fileName must be an UTF-8 string (usually the result of
-         * a call to FromLocale())
-         */
+        // The expected fileName must be an UTF-8 string
         bool load( const string &fileName );
 
     private:
