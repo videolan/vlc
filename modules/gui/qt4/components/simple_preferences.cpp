@@ -70,14 +70,14 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     item( id )->setData( Qt::UserRole, qVariantFromValue( (int)id ) );   \
     item( id )->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
 
-    ADD_CATEGORY( SPrefsVideo, qtr("Video"), spref_cone_Video_64.png );
-    ADD_CATEGORY( SPrefsAudio, qtr("Audio"), spref_cone_Audio_64.png );
-    ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input and Codecs"),
-                  spref_cone_Input_64.png );
     ADD_CATEGORY( SPrefsInterface, qtr("Interface"),
                   spref_cone_Interface_64.png );
+    ADD_CATEGORY( SPrefsAudio, qtr("Audio"), spref_cone_Audio_64.png );
+    ADD_CATEGORY( SPrefsVideo, qtr("Video"), spref_cone_Video_64.png );
     ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles"),
                   spref_cone_Subtitles_64.png );
+    ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input and Codecs"),
+                  spref_cone_Input_64.png );
     ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), spref_cone_Hotkeys_64.png );
 
     setCurrentRow( SPrefsInterface );

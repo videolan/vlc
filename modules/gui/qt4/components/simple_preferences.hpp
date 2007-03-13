@@ -29,11 +29,11 @@
 #include <vlc_interface.h>
 
 enum {
-    SPrefsVideo = 0,
+    SPrefsInterface = 0,
     SPrefsAudio,
-    SPrefsInputAndCodecs,
-    SPrefsInterface,
+    SPrefsVideo,
     SPrefsSubtitles,
+    SPrefsInputAndCodecs,
     SPrefsHotkeys,
     SPrefsMax
 };
