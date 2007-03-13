@@ -85,6 +85,7 @@ private slots:
      void setSmall();
      void save();
      void cancel();
+     void reset();
 };
 
 #endif

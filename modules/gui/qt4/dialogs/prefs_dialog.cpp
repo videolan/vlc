@@ -36,6 +36,8 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QScrollArea>
+#include <QMessageBox>
+
 
 PrefsDialog *PrefsDialog::instance = NULL;
 
@@ -43,9 +45,9 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
      QGridLayout *main_layout = new QGridLayout( this );
      setWindowTitle( qtr( "Preferences" ) );
-     resize( 800, 650 );
+     resize( 700, 650 );
      setMaximumHeight( 650 );
-     setMaximumWidth( 800 );
+     setMaximumWidth( 700 );
 
      tree_panel = new QWidget( 0 );
      tree_panel_l = new QHBoxLayout;
@@ -82,17 +84,18 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
      setSmall();
 
-     QPushButton *save, *cancel;
+     QPushButton *save, *cancel, *reset;
      QHBoxLayout *buttonsLayout = QVLCFrame::doButtons( this, NULL,
-                                                        &save, _("Save"),
-                                                        &cancel, _("Cancel"),
-                                                        NULL, NULL );
+                                      &save, _("Save"),
+                                      &cancel, _("Cancel"),
+                                      &reset, _( "Reset Preferences" ) );
      main_layout->addLayout( buttonsLayout, 4, 0, 1 ,3 );
      setLayout( main_layout );
 
 
      BUTTONACT( save, save() );
      BUTTONACT( cancel, cancel() );
+     BUTTONACT( reset, reset() );
      BUTTONACT( small, setSmall() );
      BUTTONACT( all, setAll() );
 
@@ -249,4 +252,19 @@ void PrefsDialog::cancel()
         advanced_panel = NULL;
     }
     hide();
+}
+
+void PrefsDialog::reset()
+{
+    int ret = QMessageBox::question(this, qtr("Reset Preferences"),
+                 qtr("This will reset your VLC media player preferences.\n"
+                         "Are you sure you want to continue?"),
+                  QMessageBox::Ok | QMessageBox::Cancel,
+                                                         QMessageBox::Ok);
+    if ( ret == QMessageBox::Ok )
+    {
+        config_ResetAll( p_intf );
+        // TODO reset changes ?
+         config_SaveConfigFile( p_intf, NULL );
+    }
 }
