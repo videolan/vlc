@@ -48,7 +48,7 @@
 #include "ui/sprefs_hotkeys.h"
 #include "ui/sprefs_interface.h"
 
-#define ITEM_HEIGHT 50
+#define ITEM_HEIGHT 64
 
 /*********************************************************************
  * The List of categories
@@ -56,25 +56,29 @@
 SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
                                   QListWidget( _parent ), p_intf( _p_intf )
 {
-    setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
-    setAlternatingRowColors( true );
+    setIconSize( QSize( ITEM_HEIGHT * 2 ,ITEM_HEIGHT  ) );
     setViewMode(QListView::IconMode);
+    setMovement(QListView::Static);
     setMaximumWidth(200);
+    setSpacing(0);
+//    setAlternatingRowColors( true );
 
-#define ADD_CATEGORY( id, label, icon )                                 \
-    addItem( label );                                                   \
-    item( id )->setIcon( QIcon( QPixmap( icon ) ) );                    \
-    item( id )->setData( Qt::UserRole, qVariantFromValue( (int)id ) );  \
-    item( id )->setTextAlignment(Qt::AlignHCenter);                     \
-    item( id )->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+#define ADD_CATEGORY( id, label, icon )                                  \
+    addItem( label );                                                    \
+    item( id )->setIcon( QIcon( ":/pixmaps/" #icon ) )  ;   \
+    item( id )->setTextAlignment( Qt::AlignHCenter );                    \
+    item( id )->setData( Qt::UserRole, qVariantFromValue( (int)id ) );   \
+    item( id )->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
 
-    ADD_CATEGORY( SPrefsVideo, qtr("Video"), video_50x50_xpm );
-    ADD_CATEGORY( SPrefsAudio, qtr("Audio"), audio_50x50_xpm );
+    ADD_CATEGORY( SPrefsVideo, qtr("Video"), spref_cone_Video_64.png );
+    ADD_CATEGORY( SPrefsAudio, qtr("Audio"), spref_cone_Audio_64.png );
     ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input and Codecs"),
-                  input_and_codecs_50x50_xpm );
-    ADD_CATEGORY( SPrefsInterface, qtr("Interface"), interface_50x50_xpm );
-    ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles"), subtitles_50x50_xpm );
-    ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), hotkeys_50x50_xpm );
+                  spref_cone_Input_64.png );
+    ADD_CATEGORY( SPrefsInterface, qtr("Interface"),
+                  spref_cone_Interface_64.png );
+    ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles"),
+                  spref_cone_Subtitles_64.png );
+    ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), spref_cone_Hotkeys_64.png );
 
     setCurrentRow( SPrefsInterface );
 }

@@ -11,5 +11,11 @@
   <file alias="vlc128.png">../../../share/vlc128x128.png</file>
   <file alias="noart.png">pixmaps/noart.png</file>
   <file>pixmaps/playlist_icon.png</file>
+  <file>pixmaps/spref_cone_Audio_64.png</file>
+  <file>pixmaps/spref_cone_Video_64.png</file>
+  <file>pixmaps/spref_cone_Input_64.png</file>
+  <file>pixmaps/spref_cone_Hotkeys_64.png</file>
+  <file>pixmaps/spref_cone_Subtitles_64.png</file>
+  <file>pixmaps/spref_cone_Interface_64.png</file>
  </qresource>
 </RCC>

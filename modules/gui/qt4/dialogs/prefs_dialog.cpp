@@ -5,7 +5,8 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
- *
+ *          Jean-Baptiste Kempf <jb@videolan.org>
+ *  
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -40,25 +41,27 @@ PrefsDialog *PrefsDialog::instance = NULL;
 
 PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
-     QGridLayout *main_layout = new QGridLayout(this);
+     QGridLayout *main_layout = new QGridLayout( this );
      setWindowTitle( qtr( "Preferences" ) );
-     resize( 800, 600 );
-     setMaximumHeight (600);
+     resize( 800, 650 );
+     setMaximumHeight( 650 );
+     setMaximumWidth( 800 );
 
-     tree_panel = new QWidget(0);
+     tree_panel = new QWidget( 0 );
      tree_panel_l = new QHBoxLayout;
      tree_panel->setLayout( tree_panel_l );
-     main_panel = new QWidget(0);
+     main_panel = new QWidget( 0 );
      main_panel_l = new QHBoxLayout;
      main_panel->setLayout( main_panel_l );
 
      // Choice for types
      types = new QGroupBox( "Show settings" );
+     types->setAlignment( Qt::AlignHCenter );
      QHBoxLayout *types_l = new QHBoxLayout(0);
      types_l->setSpacing( 3 ); types_l->setMargin( 3 );
      small = new QRadioButton( "Basic", types ); types_l->addWidget( small );
      all = new QRadioButton( "All", types ); types_l->addWidget( all );
-     types->setLayout(types_l);
+     types->setLayout( types_l );
      small->setChecked( true );
 
      advanced_tree = NULL;
@@ -71,7 +74,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
      main_layout->addWidget( main_panel, 0, 1, 4, 1 );
 
-     main_layout->setColumnMinimumWidth( 0, 200 );
+     main_layout->setColumnMinimumWidth( 0, 150 );
      main_layout->setColumnStretch( 0, 1 );
      main_layout->setColumnStretch( 1,3 );
 
@@ -169,7 +172,7 @@ void PrefsDialog::changeSimplePanel( QListWidgetItem *item )
     }
     main_panel_l->addWidget( simple_panel );
     simple_panel->show();
-//    panel_label->setText(qtr("Test"));
+//    panel_label->setText(qtr("Test")); //FIXME
 }
 
 void PrefsDialog::changePanel( QTreeWidgetItem *item )
@@ -209,7 +212,7 @@ void PrefsDialog::showModulePrefs( char *psz_module )
                                    i_module++ )
             {
                 QTreeWidgetItem *module_item = subcat_item->child( i_module );
-                PrefsItemData *mod_data = module_item->data(0, Qt::UserRole).
+                PrefsItemData *mod_data = module_item->data( 0, Qt::UserRole ).
                                                     value<PrefsItemData *>();
                 if( !strcmp( mod_data->psz_name, psz_module ) ) {
                     advanced_tree->setCurrentItem( module_item );
