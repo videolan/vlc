@@ -173,7 +173,7 @@ static inline char *locale_dup (const char *string, vlc_bool_t from)
 void LocaleFree (const char *str)
 {
 #if defined (USE_ICONV)
-    if (find_charset ())
+    if (!find_charset ())
         free ((char *)str);
 #elif defined (USE_MB2MB)
     free ((char *)str);
