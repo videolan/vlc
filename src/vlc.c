@@ -203,12 +203,6 @@ static void *SigHandler (void *data)
 {
     const sigset_t *set = (sigset_t *)data;
     time_t abort_time = 0;
-    vlc_bool_t b_die = VLC_FALSE;
-
-#ifdef __APPLE__
-    /* We really prefer the "force quit" menu item to act immediately */
-    b_die = VLC_TRUE;
-#endif
 
     for (;;)
     {
@@ -226,10 +220,10 @@ static void *SigHandler (void *data)
          * signals to a libvlc structure having been destroyed */
 
         pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &state);
-        if (!b_die)
+        if (abort_time == 0)
         {
-            b_die = VLC_TRUE;
-            abort_time = time (NULL);
+            time (&abort_time);
+            abort_time += 2;
 
             fprintf (stderr, "signal %d received, terminating vlc - do it "
                             "again in case it gets stuck\n", i_signal);
@@ -237,9 +231,10 @@ static void *SigHandler (void *data)
             /* Acknowledge the signal received */
             Kill ();
         }
-        else if( time( NULL ) > abort_time + 2 )
-        {
-            /* If user asks again 1 or 2 seconds later, die badly */
+        else
+        if (time (NULL) <= abort_time)
+	{
+            /* If user asks again more than 2 seconds later, die badly */
             pthread_sigmask (SIG_UNBLOCK, set, NULL);
             fprintf (stderr, "user insisted too much, dying badly\n");
             abort ();
@@ -250,18 +245,15 @@ static void *SigHandler (void *data)
 }
 
 
-#include <stdbool.h>
+static void KillOnce (void)
+{
+	VLC_Die (0);
+}
+
 static void Kill (void)
 {
-    static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
-    static bool killed = false;;
-    pthread_mutex_lock (&lock);
-    if (!killed)
-    {
-        VLC_Die (0);
-        killed = true;
-    }
-    pthread_mutex_unlock (&lock);
+    static pthread_once_t once = PTHREAD_ONCE_INIT;
+    pthread_once (KillOnce);
 }
 
 #endif
