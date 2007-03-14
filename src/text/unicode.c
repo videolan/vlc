@@ -185,7 +185,6 @@ static char *locale_fast (const char *string, locale_data_t *p)
     return strdup (output);
 #elif defined (USE_MB2MB)
     char *out;
-    wchar_t *wide;
     int len;
 
     if (string == NULL)
