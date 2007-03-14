@@ -31,7 +31,7 @@ set -x
 AUTOMAKESUCKS=no
 INSTALLSUCKS=no
 
-ACLOCAL_ARGS="-I m4"
+ACLOCAL_ARGS="-I m4 ${ACLOCAL_ARGS}"
 
 # Check for contrib directory
 if test -d extras/contrib/bin; then
