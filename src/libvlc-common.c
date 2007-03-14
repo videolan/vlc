@@ -1208,7 +1208,6 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, char *ppsz_argv[] )
      * and their input options */
     for( i_opt = i_argc - 1; i_opt >= optind; i_opt-- )
     {
-        const char *psz_target;
         i_options = 0;
 
         /* Count the input options */
@@ -1221,27 +1220,10 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, char *ppsz_argv[] )
         /* TODO: write an internal function of this one, to avoid
          *       unnecessary lookups. */
 
-#ifdef WIN32
-        if( GetVersion() < 0x80000000 )
-        {
-            VLC_AddTarget( p_vlc->i_object_id, ppsz_argv[i_opt],
+        VLC_AddTarget( p_vlc->i_object_id, ppsz_argv[i_opt],
                        (char const **)( i_options ? &ppsz_argv[i_opt + 1] :
                                         NULL ), i_options,
                        PLAYLIST_INSERT, 0 );
-        }
-        else
-#endif
-        {
-            /* FIXME: it's too late to call FromLocale here. We should
-               convert ALL arguments to UTF8 before they get parsed */
-
-            psz_target = FromLocale( ppsz_argv[ i_opt ] );
-            VLC_AddTarget( p_vlc->i_object_id, psz_target,
-                       (char const **)( i_options ? &ppsz_argv[i_opt + 1] :
-                                        NULL ), i_options,
-                       PLAYLIST_INSERT, 0 );
-            LocaleFree( psz_target );
-        }
     }
 
     return VLC_SUCCESS;
