@@ -72,89 +72,40 @@
 # error No UTF8 charset conversion implemented on this platform!
 #endif
 
-typedef struct locale_data_t
-{
 #if defined (USE_ICONV)
-    vlc_iconv_t hd;
-    vlc_mutex_t lock;
-#elif defined (USE_MB2MB)
-    UINT fromCP;
-    UINT toCP;
-#endif
-} locale_data_t;
+static char charset[sizeof ("CSISO11SWEDISHFORNAMES//translit")] = "";
 
-static locale_data_t from_locale, to_locale;
-
-
-void LocaleInit( vlc_object_t *p_this )
+static void find_charset_once (void)
 {
-#if defined USE_ICONV
     char *psz_charset;
+    if (vlc_current_charset (&psz_charset)
+     || (psz_charset == NULL)
+     || ((size_t)snprintf (charset, sizeof (charset), "%s//translit",
+                           psz_charset) >= sizeof (charset)))
+        strcpy (charset, "UTF-8");
 
-    if( vlc_current_charset( &psz_charset ) )
-        /* UTF-8 */
-        from_locale.hd = to_locale.hd = (vlc_iconv_t)(-1);
-    else
-    {
-        /* not UTF-8 */
-        char psz_buf[strlen( psz_charset ) + sizeof( "//translit" )];
-        const char *psz_conv;
-
-        /*
-         * Still allow non-ASCII characters when the locale is not set.
-         * Western Europeans are being favored for historical reasons.
-         */
-        if( strcmp( psz_charset, "ASCII" ) )
-        {
-            sprintf( psz_buf, "%s//translit", psz_charset );
-            psz_conv = psz_buf;
-        }
-        else
-            psz_conv = "ISO-8859-1//translit";
-
-        vlc_mutex_init( p_this, &from_locale.lock );
-        vlc_mutex_init( p_this, &to_locale.lock );
-        from_locale.hd = vlc_iconv_open( "UTF-8", psz_conv );
-        to_locale.hd = vlc_iconv_open( psz_conv, "UTF-8" );
-    }
-
-    free( psz_charset );
-
-    assert( (from_locale.hd == (vlc_iconv_t)(-1))
-            == (to_locale.hd == (vlc_iconv_t)(-1)) );
-
-#elif defined (USE_MB2MB)
-    to_locale.toCP = from_locale.fromCP = CP_ACP;
-    from_locale.toCP = to_locale.fromCP = CP_UTF8;
-#else
-    (void)p_this;
-#endif
+    free (psz_charset);
 }
 
-void LocaleDeinit( void )
+static int find_charset (void)
 {
-#ifdef USE_ICONV
-    if( to_locale.hd != (vlc_iconv_t)(-1) )
-    {
-        vlc_iconv_close( to_locale.hd );
-        vlc_mutex_destroy( &to_locale.lock );
-    }
-
-    if( from_locale.hd != (vlc_iconv_t)(-1) )
-    {
-        vlc_iconv_close( from_locale.hd );
-        vlc_mutex_destroy( &from_locale.lock );
-    }
-#endif
+    static pthread_once_t once = PTHREAD_ONCE_INIT;
+    pthread_once (&once, find_charset_once);
+    return strcmp (charset, "UTF-8");
 }
+#endif
 
-static char *locale_fast (const char *string, locale_data_t *p)
+
+static char *locale_fast (const char *string, vlc_bool_t from)
 {
 #if defined (USE_ICONV)
-    vlc_iconv_t hd = p->hd;
-
-    if (hd == (vlc_iconv_t)(-1))
+    if (find_charset ())
         return (char *)string;
+
+    vlc_iconv_t hd = vlc_iconv_open (from ? "UTF-8" : charset,
+                                     from ? charset : "UTF-8");
+    if (hd == (vlc_iconv_t)(-1))
+        return strdup (string); /* Uho! */
 
     const char *iptr = string;
     size_t inb = strlen (string);
@@ -164,9 +115,6 @@ static char *locale_fast (const char *string, locale_data_t *p)
     if (string == NULL)
         return NULL;
 
-    vlc_mutex_lock (&p->lock);
-    vlc_iconv (hd, NULL, NULL, NULL, NULL);
-
     while (vlc_iconv (hd, &iptr, &inb, &optr, &outb) == (size_t)(-1))
     {
         *optr++ = '?';
@@ -175,8 +123,8 @@ static char *locale_fast (const char *string, locale_data_t *p)
         inb--;
         vlc_iconv (hd, NULL, NULL, NULL, NULL);
     }
-    vlc_mutex_unlock (&p->lock);
     *optr = '\0';
+    vlc_iconv_close (hd);
 
     assert (inb == 0);
     assert (*iptr == '\0');
@@ -190,10 +138,11 @@ static char *locale_fast (const char *string, locale_data_t *p)
     if (string == NULL)
         return NULL;
 
-    len = 1 + MultiByteToWideChar (p->fromCP, 0, string, -1, NULL, 0);
+    len = 1 + MultiByteToWideChar (from ? CP_ACP : CP_UTF8,
+                                   0, string, -1, NULL, 0);
     wchar_t wide[len];
 
-    MultiByteToWideChar (p->fromCP, 0, string, -1, wide, len);
+    MultiByteToWideChar (from ? CP_UTF8 : CP_ACP, 0, string, -1, wide, len);
     len = 1 + WideCharToMultiByte (p->toCP, 0, wide, -1, NULL, 0, NULL, NULL);
     out = malloc (len);
     if (out == NULL)
@@ -207,14 +156,14 @@ static char *locale_fast (const char *string, locale_data_t *p)
 }
 
 
-static inline char *locale_dup (const char *string, locale_data_t *p)
+static inline char *locale_dup (const char *string, vlc_bool_t from)
 {
 #if defined (USE_ICONV)
-    return (p->hd == (vlc_iconv_t)(-1))
-            ? strdup (string)
-            : locale_fast (string, p);
+    if (find_charset ())
+        return strdup (string);
+    return locale_fast (string, from);
 #elif defined (USE_MB2MB)
-    return locale_fast (string, p);
+    return locale_fast (string, from);
 #else
     return strdup (string);
 #endif
@@ -224,10 +173,7 @@ static inline char *locale_dup (const char *string, locale_data_t *p)
 void LocaleFree (const char *str)
 {
 #if defined (USE_ICONV)
-    assert ((to_locale.hd == (vlc_iconv_t)(-1))
-         == (from_locale.hd == (vlc_iconv_t)(-1)));
-
-    if( to_locale.hd != (vlc_iconv_t)(-1) )
+    if (strcmp (charset, "UTF-8"))
         free ((char *)str);
 #elif defined (USE_MB2MB)
     free ((char *)str);
@@ -246,12 +192,12 @@ void LocaleFree (const char *str)
  */
 char *FromLocale (const char *locale)
 {
-    return locale_fast (locale, &from_locale);
+    return locale_fast (locale, VLC_TRUE);
 }
 
 char *FromLocaleDup (const char *locale)
 {
-    return locale_dup (locale, &from_locale);
+    return locale_dup (locale, VLC_TRUE);
 }
 
 
@@ -266,13 +212,13 @@ char *FromLocaleDup (const char *locale)
  */
 char *ToLocale (const char *utf8)
 {
-    return locale_fast (utf8, &to_locale);
+    return locale_fast (utf8, VLC_FALSE);
 }
 
 
 static char *ToLocaleDup (const char *utf8)
 {
-    return locale_dup (utf8, &to_locale);
+    return locale_dup (utf8, VLC_FALSE);
 }
 
 

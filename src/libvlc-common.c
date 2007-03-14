@@ -101,8 +101,6 @@ static volatile unsigned int i_instances = 0;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-void LocaleInit( vlc_object_t * );
-void LocaleDeinit( void );
 static void SetLanguage   ( char const * );
 static inline int LoadMessages (void);
 static int  GetFilenames  ( libvlc_int_t *, int, char *[] );
@@ -276,12 +274,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
 #endif
     setlocale( LC_CTYPE, "" );
     LoadMessages ();
-
-    /*
-     * Global iconv, must be done after setlocale()
-     * so that vlc_current_charset() works.
-     */
-    LocaleInit( (vlc_object_t *)p_libvlc );
 
     /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
     msg_Dbg( p_libvlc, "translation test: code is \"%s\"", _("C") );
@@ -1052,9 +1044,6 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
     {
         /* System specific cleaning code */
         system_End( p_libvlc );
-
-       /* Destroy global iconv */
-        LocaleDeinit();
     }
     vlc_mutex_unlock( lockval.p_address );
     var_Destroy( p_libvlc_global, "libvlc" );
