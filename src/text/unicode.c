@@ -62,15 +62,14 @@
 # define ASSUME_UTF8 1
 #endif
 
-#ifndef ASSUME_UTF8
-# if defined (HAVE_ICONV)
-/* libiconv is more powerful than Win32 API (it has translit) */
-#  define USE_ICONV 1
-# elif defined (WIN32) || defined (UNDER_CE)
-#  define USE_MB2MB 1
-# else
-#  error No UTF8 charset conversion implemented on this platform!
-# endif
+#if defined (ASSUME_UTF8)
+/* Cool */
+#elif defined (WIN32) || defined (UNDER_CE)
+# define USE_MB2MB 1
+#elif defined (HAVE_ICONV)
+# define USE_ICONV 1
+#else
+# error No UTF8 charset conversion implemented on this platform!
 #endif
 
 typedef struct locale_data_t
@@ -192,17 +191,14 @@ static char *locale_fast (const char *string, locale_data_t *p)
     if (string == NULL)
         return NULL;
 
-    len = MultiByteToWideChar (p->fromCP, 0, string, -1, NULL, 0);
-    if (len == 0)
-        return NULL;
-
+    len = 1 + MultiByteToWideChar (p->fromCP, 0, string, -1, NULL, 0);
     wchar_t wide[len];
 
     MultiByteToWideChar (p->fromCP, 0, string, -1, wide, len);
-    len = WideCharToMultiByte (p->toCP, 0, wide, -1, NULL, 0, NULL, NULL);
-    if (len == 0)
-        return NULL;
+    len = 1 + WideCharToMultiByte (p->toCP, 0, wide, -1, NULL, 0, NULL, NULL);
     out = malloc (len);
+    if (out == NULL)
+        return NULL;
 
     WideCharToMultiByte (p->toCP, 0, wide, -1, out, len, NULL, NULL);
     return out;
