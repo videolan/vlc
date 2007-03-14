@@ -33,7 +33,7 @@
    <item>
     <widget class="QCheckBox" name="advancedCheckBox" >
      <property name="text" >
-      <string>Show more options</string>
+      <string>&amp;Show more options</string>
      </property>
     </widget>
    </item>
@@ -160,21 +160,21 @@
      <item>
       <widget class="QPushButton" name="cancelButton" >
        <property name="text" >
-        <string>Cancel</string>
+        <string>&amp;Cancel</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="enqueueButton" >
        <property name="text" >
-        <string>Enqueue</string>
+        <string>&amp;Enqueue</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="closeButton" >
        <property name="text" >
-        <string>Play</string>
+        <string>&amp;Play</string>
        </property>
        <property name="default" >
         <bool>true</bool>

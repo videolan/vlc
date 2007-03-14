@@ -47,10 +47,10 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     netOpenPanel = new NetOpenPanel( this , p_intf );
     captureOpenPanel = new CaptureOpenPanel( this, p_intf );
 
-    ui.Tab->addTab( fileOpenPanel, qtr( "File" ) );
-    ui.Tab->addTab( diskOpenPanel, qtr( "Disc" ) );
-    ui.Tab->addTab( netOpenPanel, qtr( "Network" ) );
-    ui.Tab->addTab( captureOpenPanel, qtr( "Capture" ) );
+    ui.Tab->addTab( fileOpenPanel, qtr( "&File" ) );
+    ui.Tab->addTab( diskOpenPanel, qtr( "&Disc" ) );
+    ui.Tab->addTab( netOpenPanel, qtr( "&Network" ) );
+    ui.Tab->addTab( captureOpenPanel, qtr( "Capture &Device" ) );
 
     ui.advancedFrame->hide();
 
@@ -74,9 +74,9 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());
     CONNECT( ui.cacheSpinBox, valueChanged(int), this, updateMRL());
 
-    BUTTONACT( ui.closeButton, playOrEnqueue());
+    BUTTONACT( ui.closeButton, play());
     BUTTONACT( ui.cancelButton, cancel());
-    BUTTONACT( ui.enqueueButton, playOrEnqueue( true ));
+    BUTTONACT( ui.enqueueButton, enqueue());
     BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
 
     /* Initialize caching */
@@ -111,7 +111,17 @@ void OpenDialog::cancel()
         reject();
 }
 
-void OpenDialog::playOrEnqueue(bool b_enqueue = false )
+void OpenDialog::play()
+{
+    playOrEnqueue( false );
+}
+
+void OpenDialog::enqueue()
+{
+    playOrEnqueue( true );
+}
+
+void OpenDialog::playOrEnqueue( bool b_enqueue = false )
 {
     this->toggleVisible();
     mrl = ui.advancedLineInput->text();

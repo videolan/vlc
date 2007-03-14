@@ -64,11 +64,14 @@ private:
 
     QString storedMethod;
     int advHeight, mainHeight;
+
+    void playOrEnqueue( bool );
 private slots:
     void cancel();
-    void playOrEnqueue(bool);
+    void play();
+    void enqueue();
     void toggleAdvancedPanel();
-    void updateMRL(QString);
+    void updateMRL( QString );
     void updateMRL();
     void newMethod(QString);
     void signalCurrent();
