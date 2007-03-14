@@ -91,7 +91,7 @@ static int find_charset (void)
 {
     static pthread_once_t once = PTHREAD_ONCE_INIT;
     pthread_once (&once, find_charset_once);
-    return strcmp (charset, "UTF-8");
+    return !strcmp (charset, "UTF-8");
 }
 #endif
 
@@ -173,7 +173,7 @@ static inline char *locale_dup (const char *string, vlc_bool_t from)
 void LocaleFree (const char *str)
 {
 #if defined (USE_ICONV)
-    if (strcmp (charset, "UTF-8"))
+    if (find_charset ())
         free ((char *)str);
 #elif defined (USE_MB2MB)
     free ((char *)str);
