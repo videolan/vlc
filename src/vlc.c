@@ -32,6 +32,10 @@
 #include <stdlib.h>                                  /* putenv(), strtol(),  */
 #include <locale.h>
 
+/* Explicit HACK */
+extern void LocaleFree (const char *);
+extern char *FromLocale (const char *);
+
 
 /*****************************************************************************
  * Local prototypes.
@@ -89,7 +93,7 @@ int main( int i_argc, char *ppsz_argv[] )
     i_ret = VLC_Create();
     if( i_ret < 0 )
     {
-        return i_ret;
+        return -i_ret;
     }
 
 #if !defined(WIN32) && !defined(UNDER_CE)
@@ -143,7 +147,7 @@ int main( int i_argc, char *ppsz_argv[] )
                     else
                     {
                         /* failed!, quit */
-                        return -1;
+                        return 1;
                     }
                 }
                 else
@@ -154,18 +158,24 @@ int main( int i_argc, char *ppsz_argv[] )
             else
             {
                 /* failed!, quit */
-                return -1;
+                return 1;
             }
         }
     }
+    else
 #endif
+    {
+        for (int i = 0; i < i_argc; i++)
+            if ((ppsz_argv[i] = FromLocale (ppsz_argv[i])) == NULL)
+                return 1; // BOOM!
+    }
 
     /* Initialize libvlc */
     i_ret = VLC_Init( 0, i_argc, ppsz_argv );
     if( i_ret < 0 )
     {
         VLC_Destroy( 0 );
-        return i_ret == VLC_EEXITSUCCESS ? 0 : i_ret;
+        return i_ret == VLC_EEXITSUCCESS ? 0 : -i_ret;
     }
 
     i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE, VLC_TRUE );
@@ -178,6 +188,9 @@ int main( int i_argc, char *ppsz_argv[] )
     /* Destroy the libvlc structure */
     VLC_Destroy( 0 );
 
+    for (int i = 0; i < i_argc; i++)
+        LocaleFree (ppsz_argv[i]);
+
 #if !defined(WIN32) && !defined(UNDER_CE)
     pthread_cancel (sigth);
 # ifdef __APPLE__
@@ -189,7 +202,7 @@ int main( int i_argc, char *ppsz_argv[] )
     pthread_join (sigth, NULL);
 #endif
 
-    return i_ret;
+    return -i_ret;
 }
 
 #if !defined(WIN32) && !defined(UNDER_CE)
