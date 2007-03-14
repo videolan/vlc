@@ -253,7 +253,7 @@ static void KillOnce (void)
 static void Kill (void)
 {
     static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once (KillOnce);
+    pthread_once (&once, KillOnce);
 }
 
 #endif
