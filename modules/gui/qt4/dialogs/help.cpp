@@ -77,11 +77,22 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     layout->addWidget( tab, 1, 0, 1, 2 );
     layout->addWidget( closeButton, 2, 1, 1, 1 );
 
-    QFile *licenseFile = new QFile( "/usr/src/vlc/COPYING" );
-    QTextEdit *licenseEdit = new QTextEdit( this );
-    licenseEdit->setText( licenseFile->readAll() );
-    licenseEdit->setReadOnly( true );
+    /* GPL License */
+    QFile *licenseFile = new QFile( "/usr/src/vlc/COPYING" ); 
+    QTextEdit *licenseEdit = new QTextEdit( this ); 
+    licenseEdit->setText( licenseFile->readAll() ); 
+    licenseEdit->setReadOnly( true ); 
 
+    /* People who helped */
+    QFile *thanksFile = new QFile( "/usr/src/vlc/THANKS" );
+    QTextEdit *thanksEdit = new QTextEdit( this );
+    thanksEdit->setText( thanksFile->readAll() );
+    thanksEdit->setReadOnly( true );
+
+    /* add the tabs to the Tabwidget */
+    tab->addTab( NULL, _( "Information" ) );
+    tab->addTab( NULL, _( "Authors" ) );
+    tab->addTab( thanksEdit, _("Thanks") );
     tab->addTab( licenseEdit, _("Distribution License") );
 
     BUTTONACT( closeButton, close() );
