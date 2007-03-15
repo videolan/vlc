@@ -42,6 +42,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     setModal( modal );
     ui.setupUi( this );
     setWindowTitle( qtr("Open" ) );
+
     fileOpenPanel = new FileOpenPanel( this , p_intf );
     diskOpenPanel = new DiskOpenPanel( this , p_intf );
     netOpenPanel = new NetOpenPanel( this , p_intf );

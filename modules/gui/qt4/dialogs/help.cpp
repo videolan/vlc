@@ -29,13 +29,16 @@
 
 #include <QTextBrowser>
 #include <QTabWidget>
+#include <QFile>
+#include <QTextBrowser>
+#include <QLabel>
 
 HelpDialog *HelpDialog::instance = NULL;
 
 HelpDialog::HelpDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Help" ) );
-    resize(450, 500);
+    resize(600, 500);
 
     QGridLayout *layout = new QGridLayout(this);
     QTextBrowser *helpBrowser = new QTextBrowser(this);
@@ -60,14 +63,27 @@ AboutDialog *AboutDialog::instance = NULL;
 AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "About" ) );
-    resize( 450, 250 );
+    resize( 600, 500 );
 
     QGridLayout *layout = new QGridLayout( this );
     QTabWidget *tab = new QTabWidget( this );
+
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
-    
-    layout->addWidget( tab, 0, 0); 
-    layout->addWidget( closeButton, 1, 3 );
+    closeButton->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
+
+    QLabel *introduction = new QLabel( qtr( "Infos about VLC media player" ) );
+
+    layout->addWidget( introduction, 0, 0, 1, 2 );
+    layout->addWidget( tab, 1, 0, 1, 2 );
+    layout->addWidget( closeButton, 2, 1, 1, 1 );
+
+    QFile *licenseFile = new QFile( "/usr/src/vlc/COPYING" );
+    QTextEdit *licenseEdit = new QTextEdit( this );
+    licenseEdit->setText( licenseFile->readAll() );
+    licenseEdit->setReadOnly( true );
+
+    tab->addTab( licenseEdit, _("Distribution License") );
+
     BUTTONACT( closeButton, close() );
 }
 
