@@ -214,6 +214,7 @@ const char *GetFallbackEncoding( void )
 
     return FindFallbackEncoding (psz_lang);
 #else
+    static char buf[16] = "";
     if (buf[0] == 0)
         snprintf (buf, sizeof (buf), "CP%u", GetACP ());
     return buf;

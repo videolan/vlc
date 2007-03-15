@@ -142,13 +142,13 @@ static char *locale_fast (const char *string, vlc_bool_t from)
                                    0, string, -1, NULL, 0);
     wchar_t wide[len];
 
-    MultiByteToWideChar (from ? CP_UTF8 : CP_ACP, 0, string, -1, wide, len);
-    len = 1 + WideCharToMultiByte (p->toCP, 0, wide, -1, NULL, 0, NULL, NULL);
+    MultiByteToWideChar (from ? CP_ACP : CP_UTF8, 0, string, -1, wide, len);
+    len = 1 + WideCharToMultiByte (from ? CP_UTF8 : CP_ACP, 0, wide, -1, NULL, 0, NULL, NULL);
     out = malloc (len);
     if (out == NULL)
         return NULL;
 
-    WideCharToMultiByte (p->toCP, 0, wide, -1, out, len, NULL, NULL);
+    WideCharToMultiByte (from ? CP_UTF8 : CP_ACP, 0, wide, -1, out, len, NULL, NULL);
     return out;
 #else
     return (char *)string;
