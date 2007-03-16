@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pt_PT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-03-14 00:25+0100\n"
+"POT-Creation-Date: 2007-03-16 20:29+0000\n"
 "PO-Revision-Date: 2007-02-27 18:06-0000\n"
 "Last-Translator: Ari Constâncio <ari.constancio at gmail dot com>\n"
 "Language-Team: Portuguese\n"
@@ -1113,56 +1113,56 @@ msgstr ""
 msgid "Mouse Gestures"
 msgstr ""
 
-#: src/libvlc-common.c:287 src/libvlc-common.c:458 src/misc/modules.c:1717
+#: src/libvlc-common.c:279 src/libvlc-common.c:450 src/misc/modules.c:1717
 #: src/misc/modules.c:2041
 msgid "C"
 msgstr "C"
 
-#: src/libvlc-common.c:303
+#: src/libvlc-common.c:295
 msgid "Help options"
 msgstr "Opções de ajuda"
 
-#: src/libvlc-common.c:1415 src/misc/configuration.c:1217
+#: src/libvlc-common.c:1386 src/misc/configuration.c:1217
 msgid "string"
 msgstr "string"
 
-#: src/libvlc-common.c:1434 src/misc/configuration.c:1181
+#: src/libvlc-common.c:1405 src/misc/configuration.c:1181
 msgid "integer"
 msgstr "inteiro"
 
-#: src/libvlc-common.c:1454 src/misc/configuration.c:1206
+#: src/libvlc-common.c:1425 src/misc/configuration.c:1206
 msgid "float"
 msgstr "precisão simples"
 
-#: src/libvlc-common.c:1461
+#: src/libvlc-common.c:1432
 msgid " (default enabled)"
 msgstr " (padrão activado)"
 
-#: src/libvlc-common.c:1462
+#: src/libvlc-common.c:1433
 msgid " (default disabled)"
 msgstr " (padrão desactivado)"
 
-#: src/libvlc-common.c:1644
+#: src/libvlc-common.c:1615
 #, c-format
 msgid "VLC version %s\n"
 msgstr "Versão VLC %s\n"
 
-#: src/libvlc-common.c:1645
+#: src/libvlc-common.c:1616
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
 msgstr "Compilado por %s@%s.%s\n"
 
-#: src/libvlc-common.c:1647
+#: src/libvlc-common.c:1618
 #, c-format
 msgid "Compiler: %s\n"
 msgstr "Compilador: %s\n"
 
-#: src/libvlc-common.c:1650
+#: src/libvlc-common.c:1621
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
 msgstr ""
 
-#: src/libvlc-common.c:1682
+#: src/libvlc-common.c:1653
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
@@ -1170,7 +1170,7 @@ msgstr ""
 "\n"
 "Conteúdo enviado para vlc-help.txt\n"
 
-#: src/libvlc-common.c:1702
+#: src/libvlc-common.c:1673
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -6924,51 +6924,51 @@ msgstr ""
 msgid "Low freq (Hz)"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:56
-msgid "Low freq gain (Db)"
+#: modules/audio_filter/param_eq.c:55
+msgid "Low freq gain (dB)"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:57
+#: modules/audio_filter/param_eq.c:56
 msgid "High freq (Hz)"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:60
-msgid "High freq gain (Db)"
+#: modules/audio_filter/param_eq.c:58
+msgid "High freq gain (dB)"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:61
+#: modules/audio_filter/param_eq.c:59
 msgid "Freq 1 (Hz)"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:64
-msgid "Freq 1 gain (Db)"
+#: modules/audio_filter/param_eq.c:61
+msgid "Freq 1 gain (dB)"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:66
+#: modules/audio_filter/param_eq.c:63
 msgid "Freq 1 Q"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:67
+#: modules/audio_filter/param_eq.c:64
 msgid "Freq 2 (Hz)"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:70
-msgid "Freq 2 gain (Db)"
+#: modules/audio_filter/param_eq.c:66
+msgid "Freq 2 gain (dB)"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:72
+#: modules/audio_filter/param_eq.c:68
 msgid "Freq 2 Q"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:73
+#: modules/audio_filter/param_eq.c:69
 msgid "Freq 3 (Hz)"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:76
-msgid "Freq 3 gain (Db)"
+#: modules/audio_filter/param_eq.c:71
+msgid "Freq 3 gain (dB)"
 msgstr ""
 
-#: modules/audio_filter/param_eq.c:78
+#: modules/audio_filter/param_eq.c:73
 msgid "Freq 3 Q"
 msgstr ""
 
@@ -10954,7 +10954,7 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:621 modules/gui/macosx/intf.m:654
 #: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:358
-#: modules/gui/macosx/playlist.m:423
+#: modules/gui/macosx/playlist.m:423 modules/gui/qt4/dialogs/help.cpp:93
 msgid "Information"
 msgstr "Informação"
 
@@ -12659,6 +12659,21 @@ msgstr ""
 #: modules/gui/qnx/qnx.c:44
 msgid "QNX RTOS video and audio output"
 msgstr ""
+
+#: modules/gui/qt4/dialogs/help.cpp:94
+#, fuzzy
+msgid "Authors"
+msgstr "Autor"
+
+#: modules/gui/qt4/dialogs/help.cpp:95
+#, fuzzy
+msgid "Thanks"
+msgstr "Tailandês"
+
+#: modules/gui/qt4/dialogs/help.cpp:96
+#, fuzzy
+msgid "Distribution License"
+msgstr "Distorção"
 
 #: modules/gui/qt4/dialogs_provider.cpp:201
 msgid "Media Files"
@@ -17445,33 +17460,6 @@ msgstr ""
 msgid "Video transformation filter"
 msgstr ""
 
-#: modules/video_filter/vidmon.c:52 modules/video_filter/vidmon.c:53
-msgid "Show Y Waveform"
-msgstr ""
-
-#: modules/video_filter/vidmon.c:54 modules/video_filter/vidmon.c:55
-msgid "Show UV Waveform"
-msgstr ""
-
-#: modules/video_filter/vidmon.c:56
-#, fuzzy
-msgid "Halve sample rate"
-msgstr "Taxa de amostragem"
-
-#: modules/video_filter/vidmon.c:57
-msgid "Only sample half the x and half the y values"
-msgstr ""
-
-#: modules/video_filter/vidmon.c:60
-#, fuzzy
-msgid "Video monitoring filter"
-msgstr "Filtros de vídeo"
-
-#: modules/video_filter/vidmon.c:61
-#, fuzzy
-msgid "Video Monitor"
-msgstr "Porta vídeo"
-
 #: modules/video_filter/wall.c:54
 msgid "Number of horizontal windows in which to split the video."
 msgstr ""
@@ -18151,6 +18139,18 @@ msgstr "Filtro de visualizador"
 #: modules/visualization/visual/visual.c:120
 msgid "Spectrum analyser"
 msgstr "Analisador de espectro"
+
+#, fuzzy
+#~ msgid "Halve sample rate"
+#~ msgstr "Taxa de amostragem"
+
+#, fuzzy
+#~ msgid "Video monitoring filter"
+#~ msgstr "Filtros de vídeo"
+
+#, fuzzy
+#~ msgid "Video Monitor"
+#~ msgstr "Porta vídeo"
 
 #~ msgid "Statistics output file"
 #~ msgstr "Ficheiro de saída de estatísticas"
