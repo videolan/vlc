@@ -1,7 +1,7 @@
 /*****************************************************************************
  * param_eq.c:
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright © 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Antti Huovilainen
@@ -51,29 +51,24 @@ vlc_module_begin();
     set_subcategory( SUBCAT_AUDIO_AFILTER );
 
     add_float( "param-eq-lowf", 100, NULL, N_("Low freq (Hz)"),"", VLC_FALSE );
-    /// \bug Db -> dB
     add_float_with_range( "param-eq-lowgain", 0, -20.0, 20.0, NULL,
-                          N_("Low freq gain (Db)"), "",VLC_FALSE );
+                          N_("Low freq gain (dB)"), "",VLC_FALSE );
     add_float( "param-eq-highf", 10000, NULL, N_("High freq (Hz)"),"", VLC_FALSE );
-    /// \bug Db -> dB
     add_float_with_range( "param-eq-highgain", 0, -20.0, 20.0, NULL,
-                          N_("High freq gain (Db)"),"",VLC_FALSE );
+                          N_("High freq gain (dB)"),"",VLC_FALSE );
     add_float( "param-eq-f1", 300, NULL, N_("Freq 1 (Hz)"),"", VLC_FALSE );
-    /// \bug Db -> dB
     add_float_with_range( "param-eq-gain1", 0, -20.0, 20.0, NULL,
-                          N_("Freq 1 gain (Db)"), "",VLC_FALSE );
+                          N_("Freq 1 gain (dB)"), "",VLC_FALSE );
     add_float_with_range( "param-eq-q1", 3, 0.1, 100.0, NULL,
                           N_("Freq 1 Q"), "",VLC_FALSE );
     add_float( "param-eq-f2", 1000, NULL, N_("Freq 2 (Hz)"),"", VLC_FALSE );
-    /// \bug Db -> dB
     add_float_with_range( "param-eq-gain2", 0, -20.0, 20.0, NULL,
-                          N_("Freq 2 gain (Db)"),"",VLC_FALSE );
+                          N_("Freq 2 gain (dB)"),"",VLC_FALSE );
     add_float_with_range( "param-eq-q2", 3, 0.1, 100.0, NULL,
                           N_("Freq 2 Q"),"",VLC_FALSE );
     add_float( "param-eq-f3", 3000, NULL, N_("Freq 3 (Hz)"),"", VLC_FALSE );
-    /// \bug Db -> dB
     add_float_with_range( "param-eq-gain3", 0, -20.0, 20.0, NULL,
-                          N_("Freq 3 gain (Db)"),"",VLC_FALSE );
+                          N_("Freq 3 gain (dB)"),"",VLC_FALSE );
     add_float_with_range( "param-eq-q3", 3, 0.1, 100.0, NULL,
                           N_("Freq 3 Q"),"",VLC_FALSE );
 
