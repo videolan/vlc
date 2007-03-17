@@ -2787,20 +2787,21 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
  *****************************************************************************/
 static int X11ErrorHandler( Display * display, XErrorEvent * event )
 {
-    /* Ingnore errors on XSetInputFocus()
-     * (they happen when a window is not yet mapped) */
-    if( event->request_code == X_SetInputFocus )
+    switch( event->request_code )
     {
-        fprintf(stderr, "XSetInputFocus failed\n");
+    case X_SetInputFocus:
+        /* Ingnore errors on XSetInputFocus()
+         * (they happen when a window is not yet mapped) */
         return 0;
-    }
 
-    if( event->request_code == 150 /* MIT-SHM */ &&
-        event->minor_code == X_ShmAttach )
-    {
-        fprintf(stderr, "XShmAttach failed\n");
-        b_shm = VLC_FALSE;
-        return 0;
+    case 150: /* MIT-SHM */
+    case 146: /* MIT-SHM too, what gives? */
+        if( event->minor_code == X_ShmAttach )
+        {
+            b_shm = VLC_FALSE;
+            return 0;
+        }
+        break;
     }
 
     XSetErrorHandler(NULL);
