@@ -1724,7 +1724,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
     p_sub = stream_MemoryNew( VLC_OBJECT(p_filter),
                               p_region_in->psz_html,
                               strlen( p_region_in->psz_html ),
-                              VLC_FALSE );
+                              VLC_TRUE );
     if( p_sub )
     {
         p_xml = xml_Create( p_filter );
