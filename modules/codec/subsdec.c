@@ -751,7 +751,7 @@ static void ParseUSFHeader( decoder_t *p_dec )
     p_sub = stream_MemoryNew( VLC_OBJECT(p_dec),
                               p_dec->fmt_in.p_extra,
                               p_dec->fmt_in.i_extra,
-                              VLC_FALSE );
+                              VLC_TRUE );
     if( p_sub )
     {
         p_xml = xml_Create( p_dec );
