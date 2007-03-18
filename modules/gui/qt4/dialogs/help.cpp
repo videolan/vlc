@@ -30,7 +30,6 @@
 #include <QTextBrowser>
 #include <QTabWidget>
 #include <QFile>
-#include <QTextBrowser>
 #include <QLabel>
 
 HelpDialog *HelpDialog::instance = NULL;
