@@ -26,6 +26,11 @@
 #include "qt4.hpp"
 #include "components/open.hpp"
 #include "dialogs_provider.hpp"
+#include "util/customwidgets.hpp"
+
+#include <QFileDialog>
+#include <QDialogButtonBox>
+#include <QLineEdit>
 
 /**************************************************************************
  * File open
@@ -33,10 +38,39 @@
 FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
+    /* Classic UI Setup */
     ui.setupUi( this );
 
+    /* Use a QFileDialog and customize it because we don't want to
+       rewrite it all. Be careful to your eyes cause there are a few hacks.
+       Be very careful and test correctly when you modify this. */
 
-    BUTTONACT( ui.fileBrowseButton, browseFile() );
+    // Make this QFileDialog a child of tempWidget from the ui.
+    dialogBox = new QFileDialog( ui.tempWidget );
+    dialogBox->setFileMode( QFileDialog::ExistingFiles );
+    dialogBox->setDirectory( qfu( p_intf->p_libvlc->psz_homedir ) );
+    /* We don't want to see a grip in the middle of the window, do we? */
+    dialogBox->setSizeGripEnabled( false );
+
+    // Add it to the layout
+    ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
+
+    // But hide the two OK/Cancel buttons. Enable them for debug.
+    findChild<QDialogButtonBox*>()->hide();
+
+    /* Ugly hacks to get the good Widget */
+    //This lineEdit is the normal line in the fileDialog.
+    lineFileEdit = findChildren<QLineEdit*>()[3];
+    lineFileEdit->hide();
+
+    /* Make a list of QLabel inside the QFileDialog to access the good ones */
+    QList<QLabel *> listLabel = findChildren<QLabel*>();
+
+    /* Hide the FileNames one. Enable it for debug */
+    listLabel[4]->hide();
+    /* Change the text that was uncool in the usual box */
+    listLabel[5]->setText( qtr( "Filter:" ) );
+
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
 
     BUTTONACT( ui.subGroupBox, updateMRL());
@@ -44,6 +78,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.subInput, editTextChanged(QString ), this, updateMRL());
     CONNECT( ui.alignSubComboBox, currentIndexChanged(int), this, updateMRL());
     CONNECT( ui.sizeSubComboBox, currentIndexChanged(int), this, updateMRL());
+    CONNECT( lineFileEdit, textChanged( QString ), this, browseFile());
 }
 
 FileOpenPanel::~FileOpenPanel()
@@ -57,14 +92,10 @@ QStringList FileOpenPanel::browse(QString help)
 void FileOpenPanel::browseFile()
 {
     QString fileString = "";
-    QStringList files = browse( qtr("Open File") );
-    foreach( QString file, files) {
-        fileString += "\"" + file + "\" ";
+    foreach( QString file, dialogBox->selectedFiles() ) { 
+         fileString += "\"" + file + "\" ";
     }
     ui.fileInput->setEditText( fileString );
-    ui.fileInput->addItem( fileString );
-    if ( ui.fileInput->count() > 8 ) ui.fileInput->removeItem(0);
-
     updateMRL();
 }
 
@@ -83,14 +114,24 @@ void FileOpenPanel::updateMRL()
         mrl.append( " :subsdec-align=" + ui.alignSubComboBox->currentText() );
         mrl.append( " :sub-rel-fontsize=" + ui.sizeSubComboBox->currentText() );
     }
-    emit mrlUpdated(mrl);
+    emit mrlUpdated( mrl );
     emit methodChanged( "file-caching" );
 }
 
+
+/* Function called by Open Dialog when clicke on Play/Enqueue */
+void FileOpenPanel::accept()
+{
+    ui.fileInput->addItem(ui.fileInput->currentText());
+    if ( ui.fileInput->count() > 8 ) ui.fileInput->removeItem(0);
+}
+
+
+/* Function called by Open Dialog when clicked on cancel */
 void FileOpenPanel::clear()
 {
-    ui.fileInput->setEditText( "");
-    ui.subInput->setEditText( "");
+    ui.fileInput->setEditText( "" );
+    ui.subInput->setEditText( "" );
 }
 
 

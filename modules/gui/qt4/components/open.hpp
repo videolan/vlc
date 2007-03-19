@@ -33,6 +33,9 @@
 #include "ui/open_net.h"
 #include "ui/open_capture.h"
 
+class QFileDialog;
+class QLineEdit;
+
 class OpenPanel: public QWidget
 {
     Q_OBJECT;
@@ -59,9 +62,12 @@ public:
     FileOpenPanel( QWidget *, intf_thread_t * );
     virtual ~FileOpenPanel();
     virtual void clear() ;
+    virtual void accept() ;
 private:
     Ui::OpenFile ui;
     QStringList browse( QString );
+    QFileDialog *dialogBox;
+    QLineEdit *lineFileEdit;
 public slots:
     virtual void updateMRL();
 private slots:
