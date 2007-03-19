@@ -79,7 +79,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     /* GPL License */
     QFile *licenseFile = new QFile( "/usr/src/vlc/COPYING" ); 
     QTextEdit *licenseEdit = new QTextEdit( this ); 
-    licenseEdit->setText( licenseFile->readAll() ); 
+//    licenseEdit->setText( licenseFile->readAll() ); 
     licenseEdit->setReadOnly( true ); 
 
     /* People who helped */
