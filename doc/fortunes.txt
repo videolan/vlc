@@ -764,3 +764,9 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
  < pdherbemont> :p j'aimerai bien être un peu plus polard parfois *sigh*
   -- #videolan
 %
+< DiDjCodt> dionoea: /leave xxx ?
+< dionoea> nah. Btw, i have a localised irssi. Using /qui j-b works the same was as /who j-b
+< dionoea> really awesome
+-!- thresh [n=popa3d@unaffiliated/thresh] has quit ["j-b"]
+  -- #videolan
+%
