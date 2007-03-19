@@ -85,7 +85,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     /* People who helped */
     QFile *thanksFile = new QFile( "/usr/src/vlc/THANKS" );
     QTextEdit *thanksEdit = new QTextEdit( this );
-    thanksEdit->setText( thanksFile->readAll() );
+//    thanksEdit->setText( thanksFile->readAll() );
     thanksEdit->setReadOnly( true );
 
     /* add the tabs to the Tabwidget */
