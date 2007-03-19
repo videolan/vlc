@@ -68,11 +68,13 @@ private:
     QStringList browse( QString );
     QFileDialog *dialogBox;
     QLineEdit *lineFileEdit;
+    bool eventFilter(QObject *, QEvent *);
 public slots:
     virtual void updateMRL();
 private slots:
     void browseFile();
     void browseFileSub();
+
 };
 
 class NetOpenPanel: public OpenPanel

@@ -71,9 +71,16 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* Change the text that was uncool in the usual box */
     listLabel[5]->setText( qtr( "Filter:" ) );
 
-    BUTTONACT( ui.subBrowseButton, browseFileSub() );
+    /* Hacks Continued Catch the close event */
+    dialogBox->installEventFilter( this );
 
-    BUTTONACT( ui.subGroupBox, updateMRL());
+    // Hide the subtitles control by default.
+    ui.subFrame->hide();
+
+
+    BUTTONACT( ui.subBrowseButton, browseFileSub() );
+    BUTTONACT( ui.subCheckBox, updateMRL());
+
     CONNECT( ui.fileInput, editTextChanged(QString ), this, updateMRL());
     CONNECT( ui.subInput, editTextChanged(QString ), this, updateMRL());
     CONNECT( ui.alignSubComboBox, currentIndexChanged(int), this, updateMRL());
@@ -109,7 +116,7 @@ void FileOpenPanel::updateMRL()
 {
     QString mrl = ui.fileInput->currentText();
 
-    if( ui.subGroupBox->isChecked() ) {
+    if( ui.subCheckBox->isChecked() ) {
         mrl.append( " :sub-file=" + ui.subInput->currentText() );
         mrl.append( " :subsdec-align=" + ui.alignSubComboBox->currentText() );
         mrl.append( " :sub-rel-fontsize=" + ui.sizeSubComboBox->currentText() );
@@ -134,6 +141,18 @@ void FileOpenPanel::clear()
     ui.subInput->setEditText( "" );
 }
 
+bool FileOpenPanel::eventFilter(QObject *object, QEvent *event)
+{
+    printf( "coin\n" );
+    if ( ( object == dialogBox ) && ( event->type() == QEvent::Hide ) )
+    {
+         event->ignore();
+         return true;
+    }
+    // standard event processing
+    else
+        return QObject::eventFilter(object, event);
+}
 
 /**************************************************************************
  * Disk open
