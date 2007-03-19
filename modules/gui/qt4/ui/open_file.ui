@@ -245,8 +245,8 @@
      </property>
      <property name="sizeHint" >
       <size>
-       <width>525</width>
-       <height>31</height>
+       <width>200</width>
+       <height>2</height>
       </size>
      </property>
     </spacer>
