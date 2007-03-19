@@ -848,7 +848,7 @@ static int SessionsSetup( demux_t *p_demux )
     delete iter;
     if( p_sys->i_track <= 0 ) i_return = VLC_EGENERIC;
 
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1171929600)
+#if (LIVEMEDIA_LIBRARY_VERSION_INT > 1171929600)
     /* Retrieve the starttime if possible */
     p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
 #else
@@ -916,7 +916,7 @@ static int Play( demux_t *p_demux )
     }
 #endif
 
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1171929600)
+#if (LIVEMEDIA_LIBRARY_VERSION_INT > 1171929600)
     /* Retrieve the starttime if possible */
     p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
 #else
@@ -1131,7 +1131,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     msg_Dbg( p_demux, "set pos startseq: %u", p_sys->track[i]->i_start_seq );
                 }
 #endif
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1171929600)
+#if (LIVEMEDIA_LIBRARY_VERSION_INT > 1171929600)
                 /* Retrieve the starttime if possible */
                 p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
 #else
@@ -1207,7 +1207,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 msg_Dbg( p_demux, "set pause startseq: %u", p_sys->track[i]->i_start_seq );
             }
 #endif
-#if (LIVEMEDIA_LIBRARY_VERSION_INT >= 1171929600)
+#if (LIVEMEDIA_LIBRARY_VERSION_INT > 1171929600)
             /* Retrieve the starttime if possible */
             p_sys->i_npt_start = (int64_t)( p_sys->ms->playStartTime() * (double)1000000.0 );
 #else
