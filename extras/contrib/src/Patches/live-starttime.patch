@@ -158,3 +158,15 @@ diff -ruN live.orig/liveMedia/include/RTSPClient.hh live/liveMedia/include/RTSPC
    Boolean parseGetParameterHeader(char const* line, 
                                    const char* param,
                                    char*& value);
+--- live/liveMedia/include/liveMedia_version.hh	2007-02-20 12:33:45.000000000 +0100
++++ live.new/liveMedia/include/liveMedia_version.hh	2007-03-19 22:06:23.000000000 +0100
+@@ -4,7 +4,7 @@
+ #ifndef _LIVEMEDIA_VERSION_HH
+ #define _LIVEMEDIA_VERSION_HH
+ 
+-#define LIVEMEDIA_LIBRARY_VERSION_STRING	"2007.02.20"
+-#define LIVEMEDIA_LIBRARY_VERSION_INT		1171929600
++#define LIVEMEDIA_LIBRARY_VERSION_STRING	"2007.03.19"
++#define LIVEMEDIA_LIBRARY_VERSION_INT		9999999999
+ 
+ #endif
