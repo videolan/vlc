@@ -61,7 +61,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     setMovement(QListView::Static);
     setMaximumWidth(200);
     setSpacing(0);
-    setWordWrap(true);
+//  setWordWrap(true);
     setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setAlternatingRowColors( true );
