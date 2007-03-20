@@ -45,14 +45,6 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
        rewrite it all. Be careful to your eyes cause there are a few hacks.
        Be very careful and test correctly when you modify this. */
 
-    // Make this QFileDialog a child of tempWidget from the ui.
-    dialogBox = new QFileDialog( ui.tempWidget );
-    dialogBox->setFileMode( QFileDialog::ExistingFiles );
-    dialogBox->setDirectory( qfu( p_intf->p_libvlc->psz_homedir ) );
-    /* We don't want to see a grip in the middle of the window, do we? */
-    dialogBox->setSizeGripEnabled( false );
-    dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ));
-
     /* Set Filters for file selection */
     QString fileTypes = "";
     ADD_FILTER_MEDIA( fileTypes );
@@ -62,7 +54,13 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ADD_FILTER_ALL( fileTypes );
     fileTypes.replace(QString(";*"), QString(" *"));
 
-    dialogBox->setFilter( fileTypes );
+    // Make this QFileDialog a child of tempWidget from the ui.
+    dialogBox = new QFileDialog( ui.tempWidget, NULL, 
+            qfu( p_intf->p_libvlc->psz_homedir ), fileTypes );
+    dialogBox->setFileMode( QFileDialog::ExistingFiles );
+    /* We don't want to see a grip in the middle of the window, do we? */
+    dialogBox->setSizeGripEnabled( false );
+    dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ));
 
     // Add it to the layout
     ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
