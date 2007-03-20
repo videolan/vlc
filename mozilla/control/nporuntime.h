@@ -71,17 +71,21 @@ public:
 protected:
     void *operator new(size_t n)
     {
+        /*
+        ** Assume that browser has a smarter memory allocator
+        ** than plain old malloc() and use it instead.
+        */
         return NPN_MemAlloc(n);
     };
 
     void operator delete(void *p)
     {
-        /*
-        ** Some memory scribble happens occasionally on freed object
-        ** when used on Firefox (MacOS X) and may cause crash, a leak
-        ** sounds like the better option.
-        */
-        //NPN_MemFree(p);
+        NPN_MemFree(p);
+    };
+
+    bool isValid()
+    {
+        return _instance != NULL;
     };
 
     RuntimeNPObject(NPP instance, const NPClass *aClass) :
@@ -197,7 +201,7 @@ template<class T>
 static bool RuntimeNPClassGetProperty(NPObject *npobj, NPIdentifier name, NPVariant *result)
 {
     RuntimeNPObject *vObj = static_cast<RuntimeNPObject *>(npobj);
-    if( vObj->_instance )
+    if( vObj->isValid() )
     {
         const RuntimeNPClass<T> *vClass = static_cast<RuntimeNPClass<T> *>(npobj->_class);
         int index = vClass->indexOfProperty(name);
@@ -213,7 +217,7 @@ template<class T>
 static bool RuntimeNPClassSetProperty(NPObject *npobj, NPIdentifier name, const NPVariant *value)
 {
     RuntimeNPObject *vObj = static_cast<RuntimeNPObject *>(npobj);
-    if( vObj->_instance )
+    if( vObj->isValid() )
     {
         const RuntimeNPClass<T> *vClass = static_cast<RuntimeNPClass<T> *>(npobj->_class);
         int index = vClass->indexOfProperty(name);
@@ -229,7 +233,7 @@ template<class T>
 static bool RuntimeNPClassRemoveProperty(NPObject *npobj, NPIdentifier name)
 {
     RuntimeNPObject *vObj = static_cast<RuntimeNPObject *>(npobj);
-    if( vObj->_instance )
+    if( vObj->isValid() )
     {
         const RuntimeNPClass<T> *vClass = static_cast<RuntimeNPClass<T> *>(npobj->_class);
         int index = vClass->indexOfProperty(name);
@@ -247,7 +251,7 @@ static bool RuntimeNPClassInvoke(NPObject *npobj, NPIdentifier name,
                                     NPVariant *result)
 {
     RuntimeNPObject *vObj = static_cast<RuntimeNPObject *>(npobj);
-    if( vObj->_instance )
+    if( vObj->isValid() )
     {
         const RuntimeNPClass<T> *vClass = static_cast<RuntimeNPClass<T> *>(npobj->_class);
         int index = vClass->indexOfMethod(name);
@@ -266,7 +270,7 @@ static bool RuntimeNPClassInvokeDefault(NPObject *npobj,
                                            NPVariant *result)
 {
     RuntimeNPObject *vObj = static_cast<RuntimeNPObject *>(npobj);
-    if( vObj->_instance )
+    if( vObj->isValid() )
     {
         return vObj->returnInvokeResult(vObj->invokeDefault(args, argCount, *result));
     }
