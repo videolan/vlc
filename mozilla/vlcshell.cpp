@@ -133,6 +133,16 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
     return NPERR_NO_ERROR;
 }
 
+/*
+ * there is some confusion in gecko headers regarding definition of this API
+ * NPPVariable is wrongly defined as NPNVariable, which sounds incorrect.
+ */
+
+NPError NPP_SetValue( NPP instance, NPNVariable variable, void *value )
+{
+    return NPERR_GENERIC_ERROR;
+}
+
 /******************************************************************************
  * Mac-only API calls
  *****************************************************************************/
@@ -287,10 +297,14 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
     }
 
     status = p_plugin->init(argc, argn, argv);
-    if( NPERR_NO_ERROR == status ) {
+    if( NPERR_NO_ERROR == status )
+    {
         instance->pdata = reinterpret_cast<void*>(p_plugin);
+        //NPN_SetValue(instance, NPPVpluginWindowBool, (void *)false);
+        NPN_SetValue(instance, NPPVpluginTransparentBool, (void *)false);
     }
-    else {
+    else
+    {
         delete p_plugin;
     }
     return status;

@@ -56,23 +56,23 @@ JRIGlobalRef Private_GetJavaClass(void);
 ////\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//.
 // Private_GetJavaClass (global function)
 //
-//	Given a Java class reference (thru NPP_GetJavaClass) inform JRT
-//	of this class existence
+//      Given a Java class reference (thru NPP_GetJavaClass) inform JRT
+//      of this class existence
 //
 JRIGlobalRef
 Private_GetJavaClass(void)
 {
     jref clazz = NPP_GetJavaClass();
     if (clazz) {
-		JRIEnv* env = NPN_GetJavaEnv();
-		return JRI_NewGlobalRef(env, clazz);
+        JRIEnv* env = NPN_GetJavaEnv();
+        return JRI_NewGlobalRef(env, clazz);
     }
     return NULL;
 }
 
 //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\.
 ////\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//.
-//						PLUGIN DLL entry points   
+//                                              PLUGIN DLL entry points   
 //
 // These are the Windows specific DLL entry points. They must be exoprted
 //
@@ -87,7 +87,7 @@ static NPPluginFuncs* g_pluginFuncs;
 ////\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//.
 // NP_GetEntryPoints
 //
-//	fills in the func table used by Navigator to call entry points in
+//      fills in the func table used by Navigator to call entry points in
 //  plugin DLL.  Note that these entry points ensure that DS is loaded
 //  by using the NP_LOADDS macro, when compiling for Win16
 //
@@ -116,10 +116,10 @@ NP_GetEntryPoints(NPPluginFuncs* pFuncs)
     pFuncs->write         = NPP_Write;
     pFuncs->print         = NPP_Print;
     pFuncs->event         = 0;       /// reserved 
-    pFuncs->getvalue	  = NPP_GetValue;
-    //pFuncs->setvalue	  = NPP_SetValue;
+    pFuncs->getvalue      = NPP_GetValue;
+    pFuncs->setvalue      = NPP_SetValue;
 
-	g_pluginFuncs		  = pFuncs;
+    g_pluginFuncs             = pFuncs;
 
     return NPERR_NO_ERROR;
 }
@@ -128,7 +128,7 @@ NP_GetEntryPoints(NPPluginFuncs* pFuncs)
 ////\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//.
 // NP_Initialize
 //
-//	called immediately after the plugin DLL is loaded
+//      called immediately after the plugin DLL is loaded
 //
 #ifdef __MINGW32__
 extern "C" __declspec(dllexport) NPError WINAPI
@@ -148,18 +148,18 @@ NP_Initialize(NPNetscapeFuncs* pFuncs)
     if(HIBYTE(pFuncs->version) > NP_VERSION_MAJOR)
         return NPERR_INCOMPATIBLE_VERSION_ERROR;
 
-	// We have to defer these assignments until g_pNavigatorFuncs is set
+    // We have to defer these assignments until g_pNavigatorFuncs is set
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
 
-	if( navMinorVers >= NPVERS_HAS_NOTIFICATION ) {
-		g_pluginFuncs->urlnotify = NPP_URLNotify;
-	}
-	
-	if( navMinorVers >= NPVERS_HAS_LIVECONNECT ) {
-		g_pluginFuncs->javaClass = Private_GetJavaClass();
-	}
+    if( navMinorVers >= NPVERS_HAS_NOTIFICATION ) {
+        g_pluginFuncs->urlnotify = NPP_URLNotify;
+    }
+    
+    if( navMinorVers >= NPVERS_HAS_LIVECONNECT ) {
+        g_pluginFuncs->javaClass = Private_GetJavaClass();
+    }
 
-	// NPP_Initialize is a standard (cross-platform) initialize function.
+    // NPP_Initialize is a standard (cross-platform) initialize function.
     return NPP_Initialize();
 }
 
@@ -167,9 +167,9 @@ NP_Initialize(NPNetscapeFuncs* pFuncs)
 ////\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//.
 // NP_Shutdown
 //
-//	called immediately before the plugin DLL is unloaded.
-//	This functio shuold check for some ref count on the dll to see if it is
-//	unloadable or it needs to stay in memory. 
+//      called immediately before the plugin DLL is unloaded.
+//      This functio shuold check for some ref count on the dll to see if it is
+//      unloadable or it needs to stay in memory. 
 //
 #ifdef __MINGW32__
 extern "C" __declspec(dllexport) NPError WINAPI
@@ -183,7 +183,7 @@ NP_Shutdown()
     return NPERR_NO_ERROR;
 }
 
-//						END - PLUGIN DLL entry points   
+//                                              END - PLUGIN DLL entry points   
 ////\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//.
 //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\.
 
@@ -212,15 +212,15 @@ void NPN_Version(int* plugin_major, int* plugin_minor, int* netscape_major, int*
 NPError NPN_GetURLNotify(NPP instance, const char *url, const char *target, void* notifyData)
 
 {
-	int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
-	NPError err;
-	if( navMinorVers >= NPVERS_HAS_NOTIFICATION ) {
-		err = g_pNavigatorFuncs->geturlnotify(instance, url, target, notifyData);
-	}
-	else {
-		err = NPERR_INCOMPATIBLE_VERSION_ERROR;
-	}
-	return err;
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    NPError err;
+    if( navMinorVers >= NPVERS_HAS_NOTIFICATION ) {
+        err = g_pNavigatorFuncs->geturlnotify(instance, url, target, notifyData);
+    }
+    else {
+        err = NPERR_INCOMPATIBLE_VERSION_ERROR;
+    }
+    return err;
 }
 
 
@@ -231,15 +231,15 @@ NPError NPN_GetURL(NPP instance, const char *url, const char *target)
 
 NPError NPN_PostURLNotify(NPP instance, const char* url, const char* window, uint32 len, const char* buf, NPBool file, void* notifyData)
 {
-	int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
-	NPError err;
-	if( navMinorVers >= NPVERS_HAS_NOTIFICATION ) {
-		err = g_pNavigatorFuncs->posturlnotify(instance, url, window, len, buf, file, notifyData);
-	}
-	else {
-		err = NPERR_INCOMPATIBLE_VERSION_ERROR;
-	}
-	return err;
+    int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
+    NPError err;
+    if( navMinorVers >= NPVERS_HAS_NOTIFICATION ) {
+        err = g_pNavigatorFuncs->posturlnotify(instance, url, window, len, buf, file, notifyData);
+    }
+    else {
+        err = NPERR_INCOMPATIBLE_VERSION_ERROR;
+    }
+    return err;
 }
 
 
@@ -261,18 +261,18 @@ NPError NPN_RequestRead(NPStream* stream, NPByteRange* rangeList)
    by Netscape in the current window.
 */
 NPError NPN_NewStream(NPP instance, NPMIMEType type, 
-								const char* target, NPStream** stream)
+                                                                const char* target, NPStream** stream)
 {
-	int navMinorVersion = g_pNavigatorFuncs->version & 0xFF;
-	NPError err;
+    int navMinorVersion = g_pNavigatorFuncs->version & 0xFF;
+    NPError err;
 
-	if( navMinorVersion >= NPVERS_HAS_STREAMOUTPUT ) {
-		err = g_pNavigatorFuncs->newstream(instance, type, target, stream);
-	}
-	else {
-		err = NPERR_INCOMPATIBLE_VERSION_ERROR;
-	}
-	return err;
+    if( navMinorVersion >= NPVERS_HAS_STREAMOUTPUT ) {
+        err = g_pNavigatorFuncs->newstream(instance, type, target, stream);
+    }
+    else {
+        err = NPERR_INCOMPATIBLE_VERSION_ERROR;
+    }
+    return err;
 }
 
 /* Provides len bytes of data.
@@ -280,16 +280,16 @@ NPError NPN_NewStream(NPP instance, NPMIMEType type,
 int32 NPN_Write(NPP instance, NPStream *stream,
                 int32 len, void *buffer)
 {
-	int navMinorVersion = g_pNavigatorFuncs->version & 0xFF;
-	int32 result;
+    int navMinorVersion = g_pNavigatorFuncs->version & 0xFF;
+    int32 result;
 
-	if( navMinorVersion >= NPVERS_HAS_STREAMOUTPUT ) {
-		result = g_pNavigatorFuncs->write(instance, stream, len, buffer);
-	}
-	else {
-		result = -1;
-	}
-	return result;
+    if( navMinorVersion >= NPVERS_HAS_STREAMOUTPUT ) {
+        result = g_pNavigatorFuncs->write(instance, stream, len, buffer);
+    }
+    else {
+        result = -1;
+    }
+    return result;
 }
 
 /* Closes a stream object.  
@@ -297,16 +297,16 @@ reason indicates why the stream was closed.
 */
 NPError NPN_DestroyStream(NPP instance, NPStream* stream, NPError reason)
 {
-	int navMinorVersion = g_pNavigatorFuncs->version & 0xFF;
-	NPError err;
+    int navMinorVersion = g_pNavigatorFuncs->version & 0xFF;
+    NPError err;
 
-	if( navMinorVersion >= NPVERS_HAS_STREAMOUTPUT ) {
-		err = g_pNavigatorFuncs->destroystream(instance, stream, reason);
-	}
-	else {
-		err = NPERR_INCOMPATIBLE_VERSION_ERROR;
-	}
-	return err;
+    if( navMinorVersion >= NPVERS_HAS_STREAMOUTPUT ) {
+        err = g_pNavigatorFuncs->destroystream(instance, stream, reason);
+    }
+    else {
+        err = NPERR_INCOMPATIBLE_VERSION_ERROR;
+    }
+    return err;
 }
 
 /* Provides a text status message in the Netscape client user interface
@@ -349,12 +349,12 @@ void NPN_ReloadPlugins(NPBool reloadPages)
 
 JRIEnv* NPN_GetJavaEnv(void)
 {
-	return g_pNavigatorFuncs->getJavaEnv();
+    return g_pNavigatorFuncs->getJavaEnv();
 }
 
 jref NPN_GetJavaPeer(NPP instance)
 {
-	return g_pNavigatorFuncs->getJavaPeer(instance);
+    return g_pNavigatorFuncs->getJavaPeer(instance);
 }
 
 NPError NPN_GetValue(NPP instance, NPNVariable variable, void *result)
@@ -387,7 +387,7 @@ NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->getstringidentifier(name);
+        return g_pNavigatorFuncs->getstringidentifier(name);
     }
     return NULL;
 }
@@ -397,7 +397,7 @@ void NPN_GetStringIdentifiers(const NPUTF8 **names, int32_t nameCount, NPIdentif
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	g_pNavigatorFuncs->getstringidentifiers(names, nameCount, identifiers);
+        g_pNavigatorFuncs->getstringidentifiers(names, nameCount, identifiers);
     }
 }
 
@@ -406,7 +406,7 @@ NPIdentifier NPN_GetIntIdentifier(int32_t intid)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->getintidentifier(intid);
+        return g_pNavigatorFuncs->getintidentifier(intid);
     }
     return NULL;
 }
@@ -416,7 +416,7 @@ bool NPN_IdentifierIsString(NPIdentifier identifier)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->identifierisstring(identifier);
+        return g_pNavigatorFuncs->identifierisstring(identifier);
     }
     return false;
 }
@@ -426,7 +426,7 @@ NPUTF8 *NPN_UTF8FromIdentifier(NPIdentifier identifier)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->utf8fromidentifier(identifier);
+        return g_pNavigatorFuncs->utf8fromidentifier(identifier);
     }
     return NULL;
 }
@@ -436,7 +436,7 @@ int32_t NPN_IntFromIdentifier(NPIdentifier identifier)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->intfromidentifier(identifier);
+        return g_pNavigatorFuncs->intfromidentifier(identifier);
     }
     return 0;
 }
@@ -446,7 +446,7 @@ NPObject *NPN_CreateObject(NPP instance, NPClass *aClass)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->createobject(instance, aClass);
+        return g_pNavigatorFuncs->createobject(instance, aClass);
     }
     return NULL;
 }
@@ -456,7 +456,7 @@ NPObject *NPN_RetainObject(NPObject *npobj)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->retainobject(npobj);
+        return g_pNavigatorFuncs->retainobject(npobj);
     }
     return NULL;
 }
@@ -466,7 +466,7 @@ void NPN_ReleaseObject(NPObject *npobj)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	g_pNavigatorFuncs->releaseobject(npobj);
+        g_pNavigatorFuncs->releaseobject(npobj);
     }
 }
 
@@ -475,7 +475,7 @@ bool NPN_Invoke(NPP instance, NPObject *npobj, NPIdentifier methodName, const NP
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->invoke(instance, npobj, methodName, args, argCount, result);
+        return g_pNavigatorFuncs->invoke(instance, npobj, methodName, args, argCount, result);
     }
     return false;
 }
@@ -485,7 +485,7 @@ bool NPN_InvokeDefault(NPP instance, NPObject *npobj, const NPVariant *args, uin
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->invokeDefault(instance, npobj, args, argCount, result);
+        return g_pNavigatorFuncs->invokeDefault(instance, npobj, args, argCount, result);
     }
     return false;
 }
@@ -495,7 +495,7 @@ bool NPN_Evaluate(NPP instance, NPObject *npobj, NPString *script, NPVariant *re
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->evaluate(instance, npobj, script, result);
+        return g_pNavigatorFuncs->evaluate(instance, npobj, script, result);
     }
     return false;
 }
@@ -505,7 +505,7 @@ bool NPN_GetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, N
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->getproperty(instance, npobj, propertyName, result);
+        return g_pNavigatorFuncs->getproperty(instance, npobj, propertyName, result);
     }
     return false;
 }
@@ -515,7 +515,7 @@ bool NPN_SetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, c
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->setproperty(instance, npobj, propertyName, value);
+        return g_pNavigatorFuncs->setproperty(instance, npobj, propertyName, value);
     }
     return false;
 }
@@ -525,7 +525,7 @@ bool NPN_RemoveProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->removeproperty(instance, npobj, propertyName);
+        return g_pNavigatorFuncs->removeproperty(instance, npobj, propertyName);
     }
     return false;
 }
@@ -535,7 +535,7 @@ bool NPN_HasProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->hasproperty(instance, npobj, propertyName);
+        return g_pNavigatorFuncs->hasproperty(instance, npobj, propertyName);
     }
     return false;
 }
@@ -545,7 +545,7 @@ bool NPN_HasMethod(NPP instance, NPObject *npobj, NPIdentifier methodName)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	return g_pNavigatorFuncs->hasmethod(instance, npobj, methodName);
+        return g_pNavigatorFuncs->hasmethod(instance, npobj, methodName);
     }
     return false;
 }
@@ -555,7 +555,7 @@ void NPN_ReleaseVariantValue(NPVariant *variant)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	g_pNavigatorFuncs->releasevariantvalue(variant);
+        g_pNavigatorFuncs->releasevariantvalue(variant);
     }
 }
 
@@ -564,7 +564,7 @@ void NPN_SetException(NPObject *npobj, const NPUTF8 *message)
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
     {   
-	g_pNavigatorFuncs->setexception(npobj, message);
+        g_pNavigatorFuncs->setexception(npobj, message);
     }
 }
 

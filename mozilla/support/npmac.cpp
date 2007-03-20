@@ -667,7 +667,7 @@ NPError Private_GetValue( NPP instance, NPPVariable variable, void *value )
     NPError err;
     EnterCodeResource();
     PLUGINDEBUGSTR("\pGetValue;g;");
-    err = NPP_GetValue( instance, variable, value);
+    err = NPP_GetValue(instance, variable, value);
     ExitCodeResource();
     return err;
 }
@@ -677,7 +677,7 @@ NPError Private_SetValue( NPP instance, NPNVariable variable, void *value )
     NPError err;
     EnterCodeResource();
     PLUGINDEBUGSTR("\pSetValue;g;");
-    err = NPERR_NO_ERROR; //NPP_SetValue( instance, variable, value);
+    err = NPP_SetValue(instance, variable, value);
     ExitCodeResource();
     return err;
 }
