@@ -45,6 +45,7 @@ protected:
 
     InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
 
+private:
     NPObject *audioObj;
     NPObject *inputObj;
     NPObject *logObj;
@@ -184,7 +185,7 @@ protected:
     static const NPUTF8 * const methodNames[];
 
 private:
-    LibvlcMessagesNPObject* _p_vlcmessages;
+    NPObject* _p_vlcmessages;
 };
 
 class LibvlcPlaylistItemsNPObject: public RuntimeNPObject
@@ -229,7 +230,7 @@ protected:
     void parseOptions(NPObject *obj, int *i_options, char*** ppsz_options);
 
 private:
-    LibvlcPlaylistItemsNPObject* _p_vlcplaylistitems;
+    NPObject*  _p_vlcplaylistitems;
 };
 
 class LibvlcVideoNPObject: public RuntimeNPObject

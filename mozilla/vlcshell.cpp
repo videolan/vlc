@@ -147,6 +147,12 @@ int16 NPP_HandleEvent( NPP instance, void * event )
     }
 
     VlcPlugin *p_plugin = (VlcPlugin*)instance->pdata;
+
+    if( p_plugin == NULL )
+    {
+        return false;
+    }
+
     EventRecord *myEvent = (EventRecord*)event;
 
     switch( myEvent->what )
@@ -311,8 +317,7 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
     }
 #endif
 
-    if( p_plugin )
-        delete p_plugin;
+    delete p_plugin;
 
     return NPERR_NO_ERROR;
 }
@@ -479,6 +484,10 @@ NPError NPP_NewStream( NPP instance, NPMIMEType type, NPStream *stream,
     }
 
     VlcPlugin *p_plugin = reinterpret_cast<VlcPlugin *>(instance->pdata);
+    if( NULL == p_plugin )
+    {
+        return NPERR_INVALID_INSTANCE_ERROR;
+    }
 
    /*
    ** Firefox/Mozilla may decide to open a stream from the URL specified
@@ -529,6 +538,10 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
     }
 
     VlcPlugin *p_plugin = reinterpret_cast<VlcPlugin *>(instance->pdata);
+    if( NULL == p_plugin )
+    {
+        return;
+    }
 
     if( libvlc_playlist_add( p_plugin->getVLC(), fname, stream->url, NULL ) != -1 )
     {
