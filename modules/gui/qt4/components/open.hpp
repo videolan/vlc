@@ -74,6 +74,7 @@ public slots:
 private slots:
     void browseFile();
     void browseFileSub();
+    void toggleSubtitleFrame();
 
 };
 

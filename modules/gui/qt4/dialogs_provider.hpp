@@ -33,6 +33,31 @@
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 
+#define ADD_FILTER_MEDIA( string )       \
+    string += _("Media Files");      \
+    string += " ( ";                 \
+    string += EXTENSIONS_MEDIA;      \
+    string += ");;";
+#define ADD_FILTER_VIDEO( string )       \
+    string += _("Video Files");      \
+    string += " ( ";                 \
+    string += EXTENSIONS_VIDEO;      \
+    string += ");;";
+#define ADD_FILTER_AUDIO( string )       \
+    string += _("Audio Files");      \
+    string += " ( ";                 \
+    string += EXTENSIONS_AUDIO;      \
+    string += ");;";
+#define ADD_FILTER_PLAYLIST( string )\
+    string += _("Playlist Files");   \
+    string += " ( ";                 \
+    string += EXTENSIONS_PLAYLIST;   \
+    string += ");;";
+#define ADD_FILTER_ALL( string )     \
+    string += _("All Files");        \
+    string += " (*.*)";
+
+
 class QEvent;
 class QSignalMapper;
 class QVLCMenu;

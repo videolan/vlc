@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>463</width>
+    <width>435</width>
     <height>249</height>
    </rect>
   </property>
@@ -28,6 +28,76 @@
    <property name="spacing" >
     <number>6</number>
    </property>
+   <item row="1" column="1" colspan="2" >
+    <widget class="QComboBox" name="fileInput" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="editable" >
+      <bool>true</bool>
+     </property>
+     <property name="maxVisibleItems" >
+      <number>7</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="fileLabel" >
+     <property name="maximumSize" >
+      <size>
+       <width>85</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text" >
+      <string>File Names:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="3" >
+    <widget class="QWidget" native="1" name="tempWidget" />
+   </item>
+   <item row="5" column="0" colspan="3" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>200</width>
+       <height>2</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="2" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>273</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="0" colspan="2" >
+    <widget class="QCheckBox" name="subCheckBox" >
+     <property name="text" >
+      <string>Use a subtitles file</string>
+     </property>
+    </widget>
+   </item>
    <item row="4" column="0" colspan="3" >
     <widget class="QFrame" name="subFrame" >
      <property name="sizePolicy" >
@@ -197,86 +267,6 @@
       </item>
      </layout>
     </widget>
-   </item>
-   <item row="3" column="0" colspan="2" >
-    <widget class="QCheckBox" name="subCheckBox" >
-     <property name="text" >
-      <string>Use a subtitles file</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType" >
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>273</width>
-       <height>16</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="1" >
-    <widget class="QLabel" name="fileLabel" >
-     <property name="text" >
-      <string>File / Directory Names;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2" >
-    <widget class="QComboBox" name="fileInput" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="editable" >
-      <bool>true</bool>
-     </property>
-     <property name="maxVisibleItems" >
-      <number>7</number>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1" colspan="2" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>200</width>
-       <height>2</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="1" colspan="2" >
-    <widget class="QWidget" native="1" name="tempWidget" />
-   </item>
-   <item row="1" column="0" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType" >
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>16</width>
-       <height>26</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

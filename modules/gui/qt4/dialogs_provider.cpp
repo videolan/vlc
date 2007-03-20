@@ -196,33 +196,20 @@ QStringList DialogsProvider::showSimpleOpen(QString help, bool all,
                                             bool audio, bool video,
                                             bool subs, bool pls)
 {
-    QString fileTypes;
+    QString fileTypes = "";
     if( all ) {
-        fileTypes = _("Media Files");
-        fileTypes += " ( ";
-        fileTypes += EXTENSIONS_MEDIA;
-        fileTypes += ");;";
+        ADD_FILTER_MEDIA( fileTypes );
     }
     if( video ) {
-        fileTypes += _("Video Files");
-        fileTypes += " ( ";
-        fileTypes += EXTENSIONS_VIDEO;
-        fileTypes += ");;";
+        ADD_FILTER_VIDEO( fileTypes );
     }
     if( audio ) {
-        fileTypes += _("Sound Files");
-        fileTypes += " ( ";
-        fileTypes += EXTENSIONS_AUDIO;
-        fileTypes += ");;";
+        ADD_FILTER_AUDIO( fileTypes );
     }
     if( pls ) {
-        fileTypes += _("PlayList Files");
-        fileTypes += " ( ";
-        fileTypes += EXTENSIONS_PLAYLIST;
-        fileTypes += ");;";
+        ADD_FILTER_PLAYLIST( fileTypes );
     }
-    fileTypes += _("All Files");
-    fileTypes += " (*.*)";
+    ADD_FILTER_ALL( fileTypes );
     fileTypes.replace(QString(";*"), QString(" *"));
     return QFileDialog::getOpenFileNames( NULL,
                                           help.isNull() ?

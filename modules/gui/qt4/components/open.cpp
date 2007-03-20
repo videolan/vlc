@@ -51,6 +51,18 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dialogBox->setDirectory( qfu( p_intf->p_libvlc->psz_homedir ) );
     /* We don't want to see a grip in the middle of the window, do we? */
     dialogBox->setSizeGripEnabled( false );
+    dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ));
+
+    /* Set Filters for file selection */
+    QString fileTypes = "";
+    ADD_FILTER_MEDIA( fileTypes );
+    ADD_FILTER_VIDEO( fileTypes );
+    ADD_FILTER_AUDIO( fileTypes );
+    ADD_FILTER_PLAYLIST( fileTypes );
+    ADD_FILTER_ALL( fileTypes );
+    fileTypes.replace(QString(";*"), QString(" *"));
+
+    dialogBox->setFilter( fileTypes );
 
     // Add it to the layout
     ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
@@ -79,7 +91,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
-    BUTTONACT( ui.subCheckBox, updateMRL());
+    BUTTONACT( ui.subCheckBox, toggleSubtitleFrame());
 
     CONNECT( ui.fileInput, editTextChanged(QString ), this, updateMRL());
     CONNECT( ui.subInput, editTextChanged(QString ), this, updateMRL());
@@ -143,7 +155,6 @@ void FileOpenPanel::clear()
 
 bool FileOpenPanel::eventFilter(QObject *object, QEvent *event)
 {
-    printf( "coin\n" );
     if ( ( object == dialogBox ) && ( event->type() == QEvent::Hide ) )
     {
          event->ignore();
@@ -152,6 +163,23 @@ bool FileOpenPanel::eventFilter(QObject *object, QEvent *event)
     // standard event processing
     else
         return QObject::eventFilter(object, event);
+}
+
+void FileOpenPanel::toggleSubtitleFrame()
+{
+    if (ui.subFrame->isVisible())
+    {
+        ui.subFrame->hide();
+//        setMinimumHeight(1);
+        resize( sizeHint());
+    }
+    else
+    {
+        ui.subFrame->show();
+    }
+
+    /* Update the MRL */
+    updateMRL();
 }
 
 /**************************************************************************
