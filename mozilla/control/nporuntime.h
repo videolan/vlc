@@ -88,7 +88,7 @@ protected:
         _instance(instance)
     {
         _class = const_cast<NPClass *>(aClass);
-        //referenceCount = 1;
+        referenceCount = 1;
     };
     virtual ~RuntimeNPObject() {};
 
