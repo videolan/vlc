@@ -274,7 +274,7 @@ public:
     virtual void show() { text->show(); label->show(); browse->show(); }
     virtual void hide() { text->hide(); label->hide(); browse->hide(); }
 public slots:
-    void updateField();
+    virtual void updateField();
 protected:
     void finish();
 private:
@@ -296,7 +296,7 @@ public:
     virtual void show() { text->show(); label->show(); browse->show(); }
     virtual void hide() { text->hide(); label->hide(); browse->hide(); }
 public slots:
-    void updateField();
+    virtual void updateField();
 private:
     QLineEdit *text;
     QLabel *label;

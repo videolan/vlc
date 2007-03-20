@@ -123,8 +123,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     controls.append( control );                               \
                 }
 
-
-
 #define START_SPREFS_CAT( name , label )    \
         case SPrefs ## name:                \
         {                                   \
@@ -199,7 +197,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
          CONFIG_GENERIC_NO_BOOL( "volume" ,  IntegerRangeSlider, NULL, 
                  defaultVolume );
          CONFIG_GENERIC( "audio-language" , StringList , NULL, 
-                    preferredAudioLanguage );
+                    preferredAudioLanguage ); //FIXME
+
          CONFIG_GENERIC( "spdif" , Bool , NULL, spdifBox );
          CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL, 
                     detectionDolby );
@@ -216,7 +215,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                  fileBrowseButton );
 
          CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
-//         CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer 
+//         CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer //FIXME
          CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL, 
                  volNormalizer );
          CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
@@ -225,13 +224,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         /* Input and Codecs Panel Implementation */
         START_SPREFS_CAT( InputAndCodecs, "Input & Codecs settings"  );
           /* Disk Devices */
-/*          CONFIG_GENERIC( );*/
+/*          CONFIG_GENERIC( );*/ //FIXME
 
           CONFIG_GENERIC_NO_BOOL( "server-port", Integer, NULL, UDPPort );
           CONFIG_GENERIC( "http-proxy", String , NULL, proxy );
 
           /* Caching */
-/*          CONFIG_GENERIC( );*/
+/*          CONFIG_GENERIC( );*/ //FIXME
 
           CONFIG_GENERIC_NO_BOOL( "ffmpeg-pp-q", Integer, NULL, PostProcLevel );
           CONFIG_GENERIC( "avi-index", IntegerList, NULL, AviRepair );
@@ -244,8 +243,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         /* Interface Panel */
         START_SPREFS_CAT( Interface, "Interfaces settings" );
-
-            CONFIG_GENERIC( "language", StringList, NULL, language );
+            
+            CONFIG_GENERIC( "language", StringList, NULL, language );//FIXME
 #if !defined( WIN32 ) && !defined( HAVE_DBUS_3 )
             ui.OneInterfaceBox->hide();
 #endif
@@ -270,8 +269,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "osd", Bool, NULL, OSDBox);
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
-            CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );
-
+            CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );//FIXME
             CONFIG_GENERIC_FILE( "freetype-font", File, NULL, font, 
                     fontBrowse ); 
             CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
@@ -282,6 +280,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         END_SPREFS_CAT;
 
         START_SPREFS_CAT( Hotkeys, "Configure Hotkeys" );
+        //FIMXE
         END_SPREFS_CAT;
         }
 
