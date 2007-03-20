@@ -176,13 +176,13 @@ static void QteMain( qte_thread_t *p_this )
     /* Run as standalone GuiServer or as GuiClient. */
     QApplication* pApp = new QApplication(i_argc, NULL,
         (p_this->b_gui_server ? (QApplication::GuiServer):(QApplication::GuiClient)) );
-    if(pApp)
+    if( pApp )
     {
         p_this->p_qte_application = pApp;
     }
 
     QWidget* pWidget = new QWidget(0, _("video") );
-    if(pWidget)
+    if( pWidget )
     {
         p_this->p_qte_widget = pWidget;
     }
@@ -194,4 +194,3 @@ static void QteMain( qte_thread_t *p_this )
     vlc_thread_ready( p_this );
     p_this->p_qte_application->exec();
 }
-
