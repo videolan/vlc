@@ -112,6 +112,7 @@ struct filter_sys_t
     int i_ttl;
     time_t t_last_update;
     vlc_bool_t b_images;
+    int i_title;
 
     int i_cur_feed;
     int i_cur_item;
@@ -121,7 +122,7 @@ struct filter_sys_t
 #define MSG_TEXT N_("Feed URLs")
 #define MSG_LONGTEXT N_("RSS/Atom feed '|' (pipe) seperated URLs.")
 #define SPEED_TEXT N_("Speed of feeds")
-#define SPEED_LONGTEXT N_("Speed of the RSS/Atom feeds (bigger is slower).")
+#define SPEED_LONGTEXT N_("Speed of the RSS/Atom feeds in milliseconds (bigger is slower).")
 #define LENGTH_TEXT N_("Max length")
 #define LENGTH_LONGTEXT N_("Maximum number of characters displayed on the " \
                 "screen." )
@@ -155,12 +156,25 @@ struct filter_sys_t
   "(0=center, 1=left, 2=right, 4=top, 8=bottom; you can " \
   "also use combinations of these values, eg 6 = top-right).")
 
+#define TITLE_TEXT N_("Title display mode")
+#define TITLE_LONGTEXT N_("Title display mode. Default is 0 (hidden) if the feed has an image and feed images are enabled, 1 otherwise.")
+
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *ppsz_pos_descriptions[] =
      { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
      N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
-#define CFG_PREFIX "rrs-"
+enum title_modes {
+    default_title=-1,
+    hide_title,
+    prepend_title,
+    scroll_title };
+
+static int pi_title_modes[] = { default_title, hide_title, prepend_title, scroll_title };
+static const char *ppsz_title_modes[] =
+    { N_("Default"), N_("Don't show"), N_("Always visible"), N_("Scroll with feed") };
+
+#define CFG_PREFIX "rss-"
 
 /*****************************************************************************
  * Module descriptor
@@ -195,6 +209,8 @@ vlc_module_begin();
                  VLC_FALSE );
     add_integer( CFG_PREFIX "ttl", 1800, NULL, TTL_TEXT, TTL_LONGTEXT, VLC_FALSE );
     add_bool( CFG_PREFIX "images", 1, NULL, IMAGE_TEXT, IMAGE_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "title", default_title, NULL, TITLE_TEXT, TITLE_LONGTEXT, VLC_FALSE );
+        change_integer_list( pi_title_modes, ppsz_title_modes, 0 );
 
     set_description( _("RSS and Atom feed display") );
     add_shortcut( "rss" );
@@ -203,7 +219,7 @@ vlc_module_end();
 
 static const char *ppsz_filter_options[] = {
     "urls", "x", "y", "position", "color", "size", "speed", "length",
-    "ttl", "images", NULL
+    "ttl", "images", "title", NULL
 };
 
 /*****************************************************************************
@@ -229,27 +245,28 @@ static int CreateFilter( vlc_object_t *p_this )
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    p_sys->psz_urls = var_CreateGetString( p_filter, "rss-urls" );
+    p_sys->psz_urls = var_CreateGetString( p_filter, CFG_PREFIX "urls" );
+    p_sys->i_title = var_CreateGetInteger( p_filter, CFG_PREFIX "title" );
     p_sys->i_cur_feed = 0;
-    p_sys->i_cur_item = 0;
+    p_sys->i_cur_item = p_sys->i_title == scroll_title ? -1 : 0;
     p_sys->i_cur_char = 0;
     p_sys->i_feeds = 0;
     p_sys->p_feeds = NULL;
-    p_sys->i_speed = var_CreateGetInteger( p_filter, "rss-speed" );
-    p_sys->i_length = var_CreateGetInteger( p_filter, "rss-length" );
-    p_sys->i_ttl = __MAX( 0, var_CreateGetInteger( p_filter, "rss-ttl" ) );
-    p_sys->b_images = var_CreateGetBool( p_filter, "rss-images" );
+    p_sys->i_speed = var_CreateGetInteger( p_filter, CFG_PREFIX "speed" );
+    p_sys->i_length = var_CreateGetInteger( p_filter, CFG_PREFIX "length" );
+    p_sys->i_ttl = __MAX( 0, var_CreateGetInteger( p_filter, CFG_PREFIX "ttl" ) );
+    p_sys->b_images = var_CreateGetBool( p_filter, CFG_PREFIX "images" );
     p_sys->psz_marquee = (char *)malloc( p_sys->i_length );
 
     p_sys->p_style = malloc( sizeof( text_style_t ));
     memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ));
 
-    p_sys->i_xoff = var_CreateGetInteger( p_filter, "rss-x" );
-    p_sys->i_yoff = var_CreateGetInteger( p_filter, "rss-y" );
-    p_sys->i_pos = var_CreateGetInteger( p_filter, "rss-position" );
-    p_sys->p_style->i_font_alpha = 255 - var_CreateGetInteger( p_filter, "rss-opacity" );
-    p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter, "rss-color" );
-    p_sys->p_style->i_font_size = var_CreateGetInteger( p_filter, "rss-size" );
+    p_sys->i_xoff = var_CreateGetInteger( p_filter, CFG_PREFIX "x" );
+    p_sys->i_yoff = var_CreateGetInteger( p_filter, CFG_PREFIX "y" );
+    p_sys->i_pos = var_CreateGetInteger( p_filter, CFG_PREFIX "position" );
+    p_sys->p_style->i_font_alpha = 255 - var_CreateGetInteger( p_filter, CFG_PREFIX "opacity" );
+    p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter, CFG_PREFIX "color" );
+    p_sys->p_style->i_font_size = var_CreateGetInteger( p_filter, CFG_PREFIX "size" );
 
     if( p_sys->b_images == VLC_TRUE && p_sys->p_style->i_font_size == -1 )
     {
@@ -303,17 +320,18 @@ static void DestroyFilter( vlc_object_t *p_this )
     free( p_sys );
 
     /* Delete the RSS variables */
-    var_Destroy( p_filter, "rss-urls" );
-    var_Destroy( p_filter, "rss-speed" );
-    var_Destroy( p_filter, "rss-length" );
-    var_Destroy( p_filter, "rss-ttl" );
-    var_Destroy( p_filter, "rss-images" );
-    var_Destroy( p_filter, "rss-x" );
-    var_Destroy( p_filter, "rss-y" );
-    var_Destroy( p_filter, "rss-position" );
-    var_Destroy( p_filter, "rss-color");
-    var_Destroy( p_filter, "rss-opacity");
-    var_Destroy( p_filter, "rss-size");
+    var_Destroy( p_filter, CFG_PREFIX "urls" );
+    var_Destroy( p_filter, CFG_PREFIX "speed" );
+    var_Destroy( p_filter, CFG_PREFIX "length" );
+    var_Destroy( p_filter, CFG_PREFIX "ttl" );
+    var_Destroy( p_filter, CFG_PREFIX "images" );
+    var_Destroy( p_filter, CFG_PREFIX "x" );
+    var_Destroy( p_filter, CFG_PREFIX "y" );
+    var_Destroy( p_filter, CFG_PREFIX "position" );
+    var_Destroy( p_filter, CFG_PREFIX "color");
+    var_Destroy( p_filter, CFG_PREFIX "opacity");
+    var_Destroy( p_filter, CFG_PREFIX "size");
+    var_Destroy( p_filter, CFG_PREFIX "title" );
 }
 
 /****************************************************************************
@@ -336,8 +354,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     vlc_mutex_lock( &p_sys->lock );
 
     if( p_sys->last_date
-       + ( p_sys->i_cur_char == 0 && p_sys->i_cur_item == 0 ? 5 : 1 )
-           /* ( ... ? 5 : 1 ) means "wait more for the 1st char" */
+       + ( p_sys->i_cur_char == 0 && p_sys->i_cur_item == ( p_sys->i_title == scroll_title ? -1 : 0 ) ? 5 : 1 )
+           /* ( ... ? 5 : 1 ) means "wait 5 times more for the 1st char" */
        * p_sys->i_speed > date )
     {
         vlc_mutex_unlock( &p_sys->lock );
@@ -351,7 +369,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         msg_Dbg( p_filter, "Forcing update of all the RSS feeds" );
         if( FetchRSS( p_filter ) )
         {
-            msg_Err( p_filter, "failed while fetching RSS ... too bad" );
+            msg_Err( p_filter, "Failed while fetching RSS ... too bad" );
             vlc_mutex_unlock( &p_sys->lock );
             return NULL; /* FIXME : we most likely messed up all the data,
                           * so we might need to do something about it */
@@ -361,13 +379,16 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     p_sys->last_date = date;
     p_sys->i_cur_char++;
-    if( p_sys->p_feeds[p_sys->i_cur_feed].p_items[p_sys->i_cur_item].psz_title[p_sys->i_cur_char] == 0 )
+    if( p_sys->i_cur_item == -1 ? p_sys->p_feeds[p_sys->i_cur_feed].psz_title[p_sys->i_cur_char] == 0 : p_sys->p_feeds[p_sys->i_cur_feed].p_items[p_sys->i_cur_item].psz_title[p_sys->i_cur_char] == 0 )
     {
         p_sys->i_cur_char = 0;
         p_sys->i_cur_item++;
         if( p_sys->i_cur_item >= p_sys->p_feeds[p_sys->i_cur_feed].i_items )
         {
-            p_sys->i_cur_item = 0;
+            if( p_sys->i_title == scroll_title )
+                p_sys->i_cur_item = -1;
+            else
+                p_sys->i_cur_item = 0;
             p_sys->i_cur_feed = (p_sys->i_cur_feed + 1)%p_sys->i_feeds;
         }
     }
@@ -393,21 +414,34 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
        be p_sys->i_length characters long. */
     i_item = p_sys->i_cur_item;
     i_feed = p_sys->i_cur_feed;
-    p_feed = &p_sys->p_feeds[p_sys->i_cur_feed];
+    p_feed = &p_sys->p_feeds[i_feed];
 
-    if( p_feed->p_pic )
+    if( ( p_feed->p_pic && p_sys->i_title == default_title )
+        || p_sys->i_title == hide_title )
     {
         /* Don't display the feed's title if we have an image */
         snprintf( p_sys->psz_marquee, p_sys->i_length, "%s",
                   p_sys->p_feeds[i_feed].p_items[i_item].psz_title
                   +p_sys->i_cur_char );
     }
-    else
+    else if( ( !p_feed->p_pic && p_sys->i_title == default_title )
+             || p_sys->i_title == prepend_title )
     {
         snprintf( p_sys->psz_marquee, p_sys->i_length, "%s : %s",
                   p_sys->p_feeds[i_feed].psz_title,
                   p_sys->p_feeds[i_feed].p_items[i_item].psz_title
                   +p_sys->i_cur_char );
+    }
+    else /* scrolling title */
+    {
+        if( i_item == -1 )
+            snprintf( p_sys->psz_marquee, p_sys->i_length, "%s : %s",
+                      p_sys->p_feeds[i_feed].psz_title + p_sys->i_cur_char,
+                      p_sys->p_feeds[i_feed].p_items[i_item+1].psz_title );
+        else
+            snprintf( p_sys->psz_marquee, p_sys->i_length, "%s",
+                      p_sys->p_feeds[i_feed].p_items[i_item].psz_title
+                      +p_sys->i_cur_char );
     }
 
     while( strlen( p_sys->psz_marquee ) < (unsigned int)p_sys->i_length )
