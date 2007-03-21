@@ -574,7 +574,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         {
             i_scale_height = i_scale_height * p_fmt->i_height /
                              p_subpic->i_original_picture_height;
-            i_scale_width = i_scale_height * i_scale_height / p_fmt->i_height; 
+            i_scale_width = i_scale_height * i_scale_height / p_fmt->i_height;
         }
 
         /* Set default subpicture aspect ratio */
@@ -641,7 +641,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     else if( p_spu->p_text->pf_render_text )
                     {
                         p_spu->p_text->pf_render_text( p_spu->p_text,
-                                                       p_region, p_region ); 
+                                                       p_region, p_region );
                     }
                 }
             }
@@ -743,7 +743,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     p_subpic->i_y * i_scale_height / 1000;
 
             }
-            
+
             i_x_offset = __MAX( i_x_offset, 0 );
             i_y_offset = __MAX( i_y_offset, 0 );
 
