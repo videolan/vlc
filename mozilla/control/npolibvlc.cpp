@@ -48,11 +48,11 @@ LibvlcRootNPObject::~LibvlcRootNPObject()
     */
     if( isValid() )
     {
-	if( audioObj    ) NPN_ReleaseObject(audioObj);
-	if( inputObj    ) NPN_ReleaseObject(inputObj);
-	if( logObj      ) NPN_ReleaseObject(logObj);
-	if( playlistObj ) NPN_ReleaseObject(playlistObj);
-	if( videoObj    ) NPN_ReleaseObject(videoObj);
+        if( audioObj    ) NPN_ReleaseObject(audioObj);
+        if( inputObj    ) NPN_ReleaseObject(inputObj);
+        if( logObj      ) NPN_ReleaseObject(logObj);
+        if( playlistObj ) NPN_ReleaseObject(playlistObj);
+        if( videoObj    ) NPN_ReleaseObject(videoObj);
     }
 }
 
@@ -86,44 +86,34 @@ RuntimeNPObject::InvokeResult LibvlcRootNPObject::getProperty(int index, NPVaria
         switch( index )
         {
             case ID_root_audio:
-		// create child object in lazyman fashion to avoid ownership problem with firefox
-		if( audioObj )
-		    NPN_RetainObject(audioObj);
-		else
-		    audioObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcAudioNPObject>::getClass());
-                OBJECT_TO_NPVARIANT(audioObj, result);
+                // create child object in lazyman fashion to avoid ownership problem with firefox
+                if( ! audioObj )
+                    audioObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcAudioNPObject>::getClass());
+                OBJECT_TO_NPVARIANT(NPN_RetainObject(audioObj), result);
                 return INVOKERESULT_NO_ERROR;
             case ID_root_input:
-		// create child object in lazyman fashion to avoid ownership problem with firefox
-		if( inputObj )
-		    NPN_RetainObject(inputObj);
-		else
-		    inputObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcInputNPObject>::getClass());
-                OBJECT_TO_NPVARIANT(inputObj, result);
+                // create child object in lazyman fashion to avoid ownership problem with firefox
+                if( ! inputObj )
+                    inputObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcInputNPObject>::getClass());
+                OBJECT_TO_NPVARIANT(NPN_RetainObject(inputObj), result);
                 return INVOKERESULT_NO_ERROR;
             case ID_root_log:
-		// create child object in lazyman fashion to avoid ownership problem with firefox
-		if( logObj )
-		    NPN_RetainObject(logObj);
-		else
-		    logObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcLogNPObject>::getClass());
-                OBJECT_TO_NPVARIANT(logObj, result);
+                // create child object in lazyman fashion to avoid ownership problem with firefox
+                if( ! logObj )
+                    logObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcLogNPObject>::getClass());
+                OBJECT_TO_NPVARIANT(NPN_RetainObject(logObj), result);
                 return INVOKERESULT_NO_ERROR;
             case ID_root_playlist:
-		// create child object in lazyman fashion to avoid ownership problem with firefox
-		if( playlistObj )
-		    NPN_RetainObject(playlistObj);
-		else
-		    playlistObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcPlaylistNPObject>::getClass());
-                OBJECT_TO_NPVARIANT(playlistObj, result);
+                // create child object in lazyman fashion to avoid ownership problem with firefox
+                if( ! playlistObj )
+                    playlistObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcPlaylistNPObject>::getClass());
+                OBJECT_TO_NPVARIANT(NPN_RetainObject(playlistObj), result);
                 return INVOKERESULT_NO_ERROR;
             case ID_root_video:
-		// create child object in lazyman fashion to avoid ownership problem with firefox
-		if( videoObj )
-		    NPN_RetainObject(videoObj);
-		else
-		    videoObj = NPN_CreateObject(_instance,RuntimeNPClass<LibvlcVideoNPObject>::getClass());
-                OBJECT_TO_NPVARIANT(videoObj, result);
+                // create child object in lazyman fashion to avoid ownership problem with firefox
+                if( ! videoObj )
+                    videoObj = NPN_CreateObject(_instance,RuntimeNPClass<LibvlcVideoNPObject>::getClass());
+                OBJECT_TO_NPVARIANT(NPN_RetainObject(videoObj), result);
                 return INVOKERESULT_NO_ERROR;
             case ID_root_VersionInfo:
             {
@@ -1057,7 +1047,7 @@ LibvlcLogNPObject::~LibvlcLogNPObject()
 {
     if( isValid() )
     {
-	if( messagesObj ) NPN_ReleaseObject(messagesObj);
+        if( messagesObj ) NPN_ReleaseObject(messagesObj);
     }
 };
 
@@ -1088,12 +1078,10 @@ RuntimeNPObject::InvokeResult LibvlcLogNPObject::getProperty(int index, NPVarian
         {
             case ID_log_messages:
             {
-		// create child object in lazyman fashion to avoid ownership problem with firefox
-		if( messagesObj )
-		    NPN_RetainObject(messagesObj);
-		else
-		    messagesObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcMessagesNPObject>::getClass());
-                OBJECT_TO_NPVARIANT(messagesObj, result);
+                // create child object in lazyman fashion to avoid ownership problem with firefox
+                if( ! messagesObj )
+                    messagesObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcMessagesNPObject>::getClass());
+                OBJECT_TO_NPVARIANT(NPN_RetainObject(messagesObj), result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_log_verbosity:
@@ -1311,7 +1299,7 @@ LibvlcPlaylistNPObject::~LibvlcPlaylistNPObject()
 {
     if( isValid() )
     {
-	if( playlistItemsObj ) NPN_ReleaseObject(playlistItemsObj);
+        if( playlistItemsObj ) NPN_ReleaseObject(playlistItemsObj);
     }
 };
 
@@ -1368,12 +1356,10 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::getProperty(int index, NPV
             }
             case ID_playlist_items:
             {
-		// create child object in lazyman fashion to avoid ownership problem with firefox
-		if( playlistItemsObj )
-		    NPN_RetainObject(playlistItemsObj);
-		else
-		    playlistItemsObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcPlaylistItemsNPObject>::getClass());
-                OBJECT_TO_NPVARIANT(playlistItemsObj, result);
+                // create child object in lazyman fashion to avoid ownership problem with firefox
+                if( ! playlistItemsObj )
+                    playlistItemsObj = NPN_CreateObject(_instance, RuntimeNPClass<LibvlcPlaylistItemsNPObject>::getClass());
+                OBJECT_TO_NPVARIANT(NPN_RetainObject(playlistItemsObj), result);
                 return INVOKERESULT_NO_ERROR;
             }
             default:
