@@ -75,6 +75,13 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     memset( p_intf->p_sys, 0, sizeof( intf_sys_t ) );
+#ifdef HAVE_GETENV
+    if( !getenv( "DISPLAY" ) )
+    {
+        msg_Err(p_intf, "no X server");
+        return VLC_EGENERIC;
+    }
+#endif
 
     p_intf->p_sys->p_playlist = pl_Yield( p_intf );
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
@@ -124,8 +131,9 @@ static void Init( intf_thread_t *p_intf )
     char *argv[] = { "" };
     int argc = 1;
     Q_INIT_RESOURCE( vlc );
-
+msg_Err(p_intf,"before Qapplication constructor");
     QApplication *app = new QApplication( argc, argv , true );
+    msg_Err(p_intf,"after constructoe");
     app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
     p_intf->p_sys->p_app = app;
 
