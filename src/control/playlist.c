@@ -227,7 +227,12 @@ libvlc_input_t * libvlc_playlist_get_input( libvlc_instance_t *p_instance,
         return NULL;
     }
     p_input = (libvlc_input_t *)malloc( sizeof( libvlc_input_t ) );
-
+    if( !p_input )
+    {
+        libvlc_exception_raise( p_e, "out of memory" );
+        vlc_mutex_unlock( &p_instance->p_playlist->object_lock );
+        return NULL;
+    }
     p_input->i_input_id = PL->p_input->i_object_id;
     p_input->p_instance = p_instance;
     vlc_mutex_unlock( &PL->object_lock );
