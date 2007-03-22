@@ -1650,11 +1650,12 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
     return INVOKERESULT_GENERIC_ERROR;
 }
 
-void LibvlcPlaylistNPObject::parseOptions(const NPString &s, int *i_options, char*** ppsz_options)
+void LibvlcPlaylistNPObject::parseOptions(const NPString &nps, int *i_options, char*** ppsz_options)
 {
-    if( s.utf8length )
+    if( nps.utf8length )
     {
-        char *val = stringValue(s);
+        char *s = stringValue(nps);
+        char *val = s;
         if( val )
         {
             long capacity = 16;
@@ -1663,7 +1664,7 @@ void LibvlcPlaylistNPObject::parseOptions(const NPString &s, int *i_options, cha
             {
                 int nOptions = 0;
 
-                char *end = val + s.utf8length;
+                char *end = val + nps.utf8length;
                 while( val < end )
                 {
                     // skip leading blanks
@@ -1694,11 +1695,11 @@ void LibvlcPlaylistNPObject::parseOptions(const NPString &s, int *i_options, cha
                             if( ! moreOptions )
                             {
                                 /* failed to allocate more memory */
-                                delete val;
+                                delete s;
                                 /* return what we got so far */
                                 *i_options = nOptions;
                                 *ppsz_options = options;
-                                break;
+                                return;
                             }
                             options = moreOptions;
                         }
@@ -1712,7 +1713,7 @@ void LibvlcPlaylistNPObject::parseOptions(const NPString &s, int *i_options, cha
                 *i_options = nOptions;
                 *ppsz_options = options;
             }
-            delete val;
+            delete s;
         }
     }
 }
