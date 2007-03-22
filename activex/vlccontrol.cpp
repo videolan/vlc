@@ -546,6 +546,92 @@ void VLCControl::FreeTargetOptions(char **cOptions, int cOptionCount)
     }
 };
 
+static HRESULT parseStringOptions(int codePage, BSTR bstr, char*** cOptions, int *cOptionCount)
+{
+    HRESULT hr = E_INVALIDARG;
+    if( SysStringLen(bstr) > 0 )
+    {
+        hr = E_OUTOFMEMORY;
+        char *s = CStrFromBSTR(codePage, bstr);
+        char *val = s;
+        if( val )
+        {
+            long capacity = 16;
+            char **options = (char **)CoTaskMemAlloc(capacity*sizeof(char *));
+            if( options )
+            {
+                int nOptions = 0;
+
+                char *end = val + strlen(val);
+                while( val < end )
+                {
+                    // skip leading blanks
+                    while( (val < end)
+                        && ((*val == ' ' ) || (*val == '\t')) )
+                        ++val;
+
+                    char *start = val;
+                    // skip till we get a blank character
+                    while( (val < end)
+                        && (*val != ' ' )
+                        && (*val != '\t') )
+                    {
+                        char c = *(val++);
+                        if( ('\'' == c) || ('"' == c) )
+                        {
+                            // skip till end of string
+                            while( (val < end) && (*(val++) != c ) );
+                        }
+                    }
+
+                    if( val > start )
+                    {
+                        if( nOptions == capacity )
+                        {
+                            capacity += 16;
+                            char **moreOptions = (char **)CoTaskMemRealloc(options, capacity*sizeof(char*)); 
+                            if( ! moreOptions )
+                            {
+                                /* failed to allocate more memory */
+                                CoTaskMemFree(s);
+                                /* return what we got so far */
+                                *cOptionCount = nOptions;
+                                *cOptions = options;
+                                return NOERROR;
+                            }
+                            options = moreOptions;
+                        }
+                        *(val++) = '\0';
+                        options[nOptions] = (char *)CoTaskMemAlloc(val-start);
+                        if( options[nOptions] )
+                        {
+                            memcpy(options[nOptions], start, val-start);
+                            ++nOptions;
+                        }
+                        else
+                        {
+                            /* failed to allocate memory */
+                            CoTaskMemFree(s);
+                            /* return what we got so far */
+                            *cOptionCount = nOptions;
+                            *cOptions = options;
+                            return NOERROR;
+                        }
+                    }
+                    else
+                        // must be end of string
+                        break;
+                }
+                *cOptionCount = nOptions;
+                *cOptions = options;
+                hr = NOERROR;
+            }
+            CoTaskMemFree(s);
+        }
+    }
+    return hr;
+}
+
 HRESULT VLCControl::CreateTargetOptions(int codePage, VARIANT *options, char ***cOptions, int *cOptionCount)
 {
     HRESULT hr = E_INVALIDARG;
@@ -568,7 +654,7 @@ HRESULT VLCControl::CreateTargetOptions(int codePage, VARIANT *options, char ***
     }
     else if( VT_DISPATCH == V_VT(options) )
     {
-        // collection parameter
+        // if object is a collection, retrieve enumerator
         VARIANT colEnum;
         V_VT(&colEnum) = VT_UNKNOWN;
         hr = GetObjectProperty(V_DISPATCH(options), DISPID_NEWENUM, colEnum);
@@ -628,6 +714,18 @@ HRESULT VLCControl::CreateTargetOptions(int codePage, VARIANT *options, char ***
                     hr = E_OUTOFMEMORY;
 
                 enumVar->Release();
+            }
+        }
+        else
+        {
+            // coerce object into a string and parse it
+            VARIANT v_name;
+            VariantInit(&v_name);
+            hr = VariantChangeType(&v_name, options, 0, VT_BSTR);
+            if( SUCCEEDED(hr) )
+            {
+                hr = parseStringOptions(codePage, V_BSTR(&v_name), cOptions, cOptionCount);
+                VariantClear(&v_name);
             }
         }
     }
@@ -725,6 +823,22 @@ HRESULT VLCControl::CreateTargetOptions(int codePage, VARIANT *options, char ***
             *cOptionCount = 0;
             return NOERROR;
         }
+    }
+    else if( VT_UNKNOWN == V_VT(options) )
+    {
+        // coerce object into a string and parse it
+        VARIANT v_name;
+        VariantInit(&v_name);
+        hr = VariantChangeType(&v_name, options, 0, VT_BSTR);
+        if( SUCCEEDED(hr) )
+        {
+            hr = parseStringOptions(codePage, V_BSTR(&v_name), cOptions, cOptionCount);
+            VariantClear(&v_name);
+        }
+    }
+    else if( VT_BSTR == V_VT(options) )
+    {
+        hr = parseStringOptions(codePage, V_BSTR(options), cOptions, cOptionCount);
     }
     return hr;
 };
