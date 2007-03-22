@@ -99,7 +99,7 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
 
         default:
             /* move on to instance variables ... */
-            break;
+            ;
     }
 
     if( instance == NULL )
@@ -119,18 +119,20 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
     switch( variable )
     {
         case NPPVpluginScriptableNPObject:
-            /* create an instance and return it */
-            *(NPObject**)value = p_plugin->getScriptObject();
-            if( NULL == *(NPObject**)value )
+            /* retrieve plugin root class */
+            NPClass *scriptClass = p_plugin->getScriptClass();
+            if( scriptClass )
             {
-                return NPERR_OUT_OF_MEMORY_ERROR;
+                /* create an instance and return it */
+                *(NPObject**)value = NPN_CreateObject(instance, scriptClass);
+                return NPERR_NO_ERROR;
             }
             break;
 
         default:
-            return NPERR_GENERIC_ERROR;
+            ;
     }
-    return NPERR_NO_ERROR;
+    return NPERR_GENERIC_ERROR;
 }
 
 /*
