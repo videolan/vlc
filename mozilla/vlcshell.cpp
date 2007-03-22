@@ -119,6 +119,7 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
     switch( variable )
     {
         case NPPVpluginScriptableNPObject:
+        {
             /* retrieve plugin root class */
             NPClass *scriptClass = p_plugin->getScriptClass();
             if( scriptClass )
@@ -128,6 +129,7 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
                 return NPERR_NO_ERROR;
             }
             break;
+        }
 
         default:
             ;
