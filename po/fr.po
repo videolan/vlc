@@ -3144,7 +3144,7 @@ msgstr ""
 
 #: src/libvlc-module.c:910
 msgid "One instance when started from file"
-msgstr "Une seule instance lorsque démarrer depuis un fichier"
+msgstr "Une seule instance lorsque démarré depuis un fichier"
 
 #: src/libvlc-module.c:912
 msgid "Allow only one running instance when started from file."
