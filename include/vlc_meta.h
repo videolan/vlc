@@ -76,22 +76,18 @@ struct vlc_meta_t
     char *psz_encodedby;
     char *psz_arturl;
     char *psz_trackid;
-#if 0 //not used
-    char *psz_artistid;
-    char *psz_albumid;
-#endif
+
+    int  i_extra;
+    char **ppsz_extra_name;
+    char **ppsz_extra_value;
 
     int i_status;
-#if 0
-    /* track meta information */
-    int         i_track;
-    vlc_meta_t  **track;
-#endif
+
 };
 
-#define vlc_meta_Set( meta,var,val ) { \
+#define vlc_meta_Set( meta,var,val ) do { \
     if( meta->psz_##var ) free( meta->psz_##var ); \
-    meta->psz_##var = strdup( val ); }
+    meta->psz_##var = (val) ? strdup( val ) : NULL; } while(0)
 
 #define vlc_meta_SetTitle( meta, b ) vlc_meta_Set( meta, title, b );
 #define vlc_meta_SetArtist( meta, b ) vlc_meta_Set( meta, artist, b );
@@ -110,11 +106,6 @@ struct vlc_meta_t
 #define vlc_meta_SetEncodedBy( meta, b ) vlc_meta_Set( meta, encodedby, b );
 #define vlc_meta_SetArtURL( meta, b ) vlc_meta_Set( meta, arturl, b );
 #define vlc_meta_SetTrackID( meta, b ) vlc_meta_Set( meta, trackid, b );
-#if 0 //not used
-#define vlc_meta_SetArtistID( meta, b ) vlc_meta_Set( meta, artistid, b );
-#define vlc_meta_SetAlbumID( meta, b ) vlc_meta_Set( meta, albumid, b );
-#endif
-
 
 static inline vlc_meta_t *vlc_meta_New( void )
 {
@@ -137,16 +128,19 @@ static inline vlc_meta_t *vlc_meta_New( void )
     m->psz_encodedby = NULL;
     m->psz_arturl = NULL;
     m->psz_trackid = NULL;
-#if 0 //not used
-    m->psz_artistid = NULL;
-    m->psz_albumid = NULL;
-#endif
+
+    m->i_extra = 0;
+    m->ppsz_extra_name = NULL;
+    m->ppsz_extra_value = NULL;
+
     m->i_status = 0;
     return m;
 }
 
 static inline void vlc_meta_Delete( vlc_meta_t *m )
 {
+    int i;
+
     free( m->psz_title );
     free( m->psz_artist );
     free( m->psz_genre );
@@ -163,17 +157,27 @@ static inline void vlc_meta_Delete( vlc_meta_t *m )
     free( m->psz_publisher );
     free( m->psz_encodedby );
     free( m->psz_trackid );
-#if 0 //not used
-    free( m->psz_artistid );
-    free( m->psz_albumid );
-#endif
     free( m->psz_arturl );
+    for( i = 0; i < m->i_extra; i++ )
+    {
+        free( m->ppsz_extra_name[i] );
+        free( m->ppsz_extra_value[i] );
+    }
+    free( m->ppsz_extra_name );
+    free( m->ppsz_extra_value );
 
     free( m );
 }
-
-static inline void vlc_meta_Merge( vlc_meta_t *dst, vlc_meta_t *src )
+static inline void vlc_meta_AddExtra( vlc_meta_t *m, const char *psz_name, const char *psz_value )
 {
+    int i_extra = m->i_extra;
+    TAB_APPEND_CPP( char, m->i_extra, m->ppsz_extra_name,  strdup(psz_name) );
+    TAB_APPEND_CPP( char, i_extra,    m->ppsz_extra_value, strdup(psz_value) );
+}
+
+static inline void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
+{
+    int i;
     if( !dst || !src ) return;
 #define COPY_FIELD( a ) \
     if( src->psz_ ## a ) { \
@@ -196,13 +200,25 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, vlc_meta_t *src )
     COPY_FIELD( publisher );
     COPY_FIELD( encodedby );
     COPY_FIELD( trackid );
-#if 0 //not used
-    COPY_FIELD( artistid );
-    COPY_FIELD( albumid );
-#endif
     COPY_FIELD( arturl );
+#undef COPY_FIELD
+
+    for( i = 0; i < src->i_extra; i++ )
+    {
+        int j;
+        for( j = 0; j < dst->i_extra; j++ )
+        {
+            if( !strcmp( dst->ppsz_extra_name[i], src->ppsz_extra_name[i] ) )
+            {
+                free( dst->ppsz_extra_value[i] );
+                dst->ppsz_extra_value[i] = strdup( src->ppsz_extra_value[i] );
+                break;
+            }
+            if( j >= dst->i_extra )
+                vlc_meta_AddExtra( dst, src->ppsz_extra_name[i], src->ppsz_extra_value[i] );
+        }
+    }
 }
-    /** \todo Track meta */
 
 enum {
     ALBUM_ART_WHEN_ASKED,
