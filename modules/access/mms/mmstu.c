@@ -1218,14 +1218,15 @@ static int  mms_ParsePacket( access_t *p_access,
 
     if( i_packet_seq_num != p_sys->i_packet_seq_num )
     {
+#if 0
         /* FIXME for udp could be just wrong order ? */
         msg_Warn( p_access,
                   "detected packet lost (%d != %d)",
                   i_packet_seq_num,
                   p_sys->i_packet_seq_num );
-        p_sys->i_packet_seq_num = i_packet_seq_num;
+#endif
     }
-    p_sys->i_packet_seq_num++;
+    p_sys->i_packet_seq_num = i_packet_seq_num + 1;
 
     if( i_packet_id == p_sys->i_header_packet_id_type )
     {
