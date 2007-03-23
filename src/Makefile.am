@@ -59,6 +59,7 @@ HEADERS_include = \
 	../include/vlc_demux.h \
 	../include/vlc_es.h \
 	../include/vlc_es_out.h \
+	../include/vlc_epg.h \
 	../include/vlc_filter.h \
 	../include/vlc_config_cat.h \
 	../include/vlc_httpd.h \
