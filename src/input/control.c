@@ -205,15 +205,16 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             char *psz_name = (char *)va_arg( args, char * );
 
             info_category_t *p_cat = NULL;
+            int i_cat;
             int i;
 
             vlc_mutex_lock( &p_input->p->input.p_item->lock );
-            for( i = 0; i < p_input->p->input.p_item->i_categories; i++ )
+            for( i_cat = 0; i_cat < p_input->p->input.p_item->i_categories; i_cat++ )
             {
-                if( !strcmp( p_input->p->input.p_item->pp_categories[i]->psz_name,
+                if( !strcmp( p_input->p->input.p_item->pp_categories[i_cat]->psz_name,
                              psz_cat ) )
                 {
-                    p_cat = p_input->p->input.p_item->pp_categories[i];
+                    p_cat = p_input->p->input.p_item->pp_categories[i_cat];
                     break;
                 }
             }
@@ -223,27 +224,48 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
 
-            for( i = 0; i < p_cat->i_infos; i++ )
+            if( psz_name )
             {
-                if( !strcmp( p_cat->pp_infos[i]->psz_name, psz_name ) )
+                /* Remove a specific info */
+                for( i = 0; i < p_cat->i_infos; i++ )
+                {
+                    if( !strcmp( p_cat->pp_infos[i]->psz_name, psz_name ) )
+                    {
+                        free( p_cat->pp_infos[i]->psz_name );
+                        if( p_cat->pp_infos[i]->psz_value )
+                            free( p_cat->pp_infos[i]->psz_value );
+                        free( p_cat->pp_infos[i] );
+                        REMOVE_ELEM( p_cat->pp_infos, p_cat->i_infos, i );
+                        break;
+                    }
+                }
+                if( i >= p_cat->i_infos )
+                {
+                    vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+                    return VLC_EGENERIC;
+                }
+            }
+            else
+            {
+                /* Remove the complete categorie */
+                for( i = 0; i < p_cat->i_infos; i++ )
                 {
                     free( p_cat->pp_infos[i]->psz_name );
                     if( p_cat->pp_infos[i]->psz_value )
                         free( p_cat->pp_infos[i]->psz_value );
                     free( p_cat->pp_infos[i] );
-                    REMOVE_ELEM( p_cat->pp_infos, p_cat->i_infos, i );
-                    break;
                 }
+                if( p_cat->pp_infos )
+                    free( p_cat->pp_infos );
+                REMOVE_ELEM( p_input->p->input.p_item->pp_categories, p_input->p->input.p_item->i_categories, i_cat );
             }
             vlc_mutex_unlock( &p_input->p->input.p_item->lock );
 
-            if( i >= p_cat->i_infos )
-                return VLC_EGENERIC;
-
             if( !p_input->b_preparsing )
                 NotifyPlaylist( p_input );
+
+            return VLC_SUCCESS;
         }
-        return VLC_SUCCESS;
 
 
         case INPUT_GET_INFO:

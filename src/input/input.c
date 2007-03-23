@@ -253,8 +253,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     }
 
     /* Remove 'Now playing' info as it is probably outdated */
-    input_Control( p_input, INPUT_DEL_INFO, _(VLC_META_INFO_CAT),
-                   VLC_META_NOW_PLAYING );     /* ? Don't translate as it might has been copied ? */
+    input_Control( p_input, INPUT_DEL_INFO, _(VLC_META_INFO_CAT), VLC_META_NOW_PLAYING );
+    vlc_meta_SetNowPlaying( p_item->p_meta, NULL );
 
     /* */
     if( p_input->b_preparsing )
