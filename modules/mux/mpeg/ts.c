@@ -157,10 +157,9 @@ static void    Close  ( vlc_object_t * );
   "16 char string (8 hexadecimal bytes).")
 
 #define CPKT_TEXT N_("Packet size in bytes to encrypt")
-/// \bug [String] Extra space
 #define CPKT_LONGTEXT N_("Size of the TS packet to encrypt. " \
     "The encryption routines subtract the TS-header from the value before " \
-    "encrypting. " )
+    "encrypting." )
 
 #define SOUT_CFG_PREFIX "sout-ts-"
 #ifdef HAVE_BSEARCH

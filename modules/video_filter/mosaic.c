@@ -122,10 +122,9 @@ struct filter_sys_t
         "fixed: use the user-defined number of rows and columns. " \
         "offsets: use the user-defined offsets for each image." )
 
-/// \bug [String] missing closing parenthesis
 #define ROWS_TEXT N_("Number of rows")
 #define ROWS_LONGTEXT N_("Number of image rows in the mosaic (only used if "\
-        "positionning method is set to \"fixed\"." )
+        "positionning method is set to \"fixed\")." )
 #define COLS_TEXT N_("Number of columns")
 #define COLS_LONGTEXT N_("Number of image columns in the mosaic (only used if "\
         "positionning method is set to \"fixed\"." )

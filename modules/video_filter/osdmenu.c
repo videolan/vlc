@@ -38,9 +38,8 @@
 
 /* FIXME: Future extension make the definition file in XML format. */
 #define OSD_FILE_TEXT N_("Configuration file")
-/// \bug [String] missing dot
 #define OSD_FILE_LONGTEXT N_( \
-    "Configuration file for the OSD Menu" )
+    "Configuration file for the OSD Menu." )
 #define OSD_PATH_TEXT N_("Path to OSD menu images")
 #define OSD_PATH_LONGTEXT N_( \
     "Path to the OSD menu images. This will override the path defined in the " \

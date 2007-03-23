@@ -1666,14 +1666,12 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         disc_audio->SetRange( 0, 7 );  // up to 8 audio channels
         disc_chapter->SetRange( 0, 255 );
         disc_title->SetToolTip( wxU(_("Title number.")) );
-        // \bug [string] needs to be DVDs instead of DVD's
         disc_sub->SetToolTip( wxU(_(
-          "DVD's can have up to 32 subtitles numbered 0..31. "
+          "DVDs can have up to 32 subtitles numbered 0..31. "
           "Note this is not the same thing as a subtitle name (e.g. 'en'). "
           "If a value -1 is used, no subtitle will be shown." )) );
-        // \bug [string] needs to be DVDs instead of DVD's
         disc_audio->SetToolTip( wxU(_("Audio track number. "
-          "DVD's can have up to 8 audio tracks numbered 0..7."
+          "DVDs can have up to 8 audio tracks numbered 0..7."
         )) );
         break;
 
@@ -1709,13 +1707,11 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         disc_title->SetRange( 0, 99 );  // only 100 tracks allowed on VCDs
         disc_sub->SetRange( -1, 3 );    // up to 4 subtitles -1 = no subtitle
         disc_audio->SetRange( 0, 1 );   // up to 2 audio tracks
-        // \bug [string] needs to be SVCDs instead of SVCD's
         disc_sub->SetToolTip( wxU(_(
-          "SVCD's can have up to 4 subtitles numbered 0..3. "
+          "SVCDs can have up to 4 subtitles numbered 0..3. "
           "If a value -1 is used, no subtitle will be shown." )) );
-        // \bug [string] needs to be SVCDs instead of SVCD's
         disc_audio->SetToolTip( wxU(_("Audio track number. "
-          "VCD's can have up to 2 audio tracks numbered 0 or 1. "
+          "VCDs can have up to 2 audio tracks numbered 0 or 1. "
         )) );
         break;
 

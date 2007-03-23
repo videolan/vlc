@@ -381,10 +381,9 @@ static const char *ppsz_align_descriptions[] =
     "pixels (1:1). If you have a 16:9 screen, you might need to change this " \
     "to 4:3 in order to keep proportions.")
 
-/// \bug [String] Remove "this option"
 #define SKIP_FRAMES_TEXT N_("Skip frames")
 #define SKIP_FRAMES_LONGTEXT N_( \
-    "This option enables framedropping on MPEG2 stream. Framedropping " \
+    "Enables framedropping on MPEG2 stream. Framedropping " \
     "occurs when your computer is not powerful enough" )
 
 #define DROP_LATE_FRAMES_TEXT N_("Drop late frames")
@@ -558,11 +557,10 @@ static const char *ppsz_clock_descriptions[] =
 #define TEXTRENDERER_LONGTEXT N_( \
     "VLC normally uses Freetype for rendering, but this allows you to use svg for instance.")
 
-/// \bug typo arbitraty
 #define SUB_FILTER_TEXT N_("Subpictures filter module")
 #define SUB_FILTER_LONGTEXT N_( \
     "This adds so-called \"subpicture filters\". These filters overlay " \
-    "some images or text over the video (like a logo, arbitraty text...)." )
+    "some images or text over the video (like a logo, arbitrary text...)." )
 
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
 #define SUB_AUTO_LONGTEXT N_( \

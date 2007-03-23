@@ -99,17 +99,16 @@ static const char *ppsz_amtuner_mode_text[] = { N_("Default"),
     "Name of the video device that will be used by the " \
     "DirectShow plugin. If you don't specify anything, the default device " \
     "will be used.")
-/// \bug [String] size stuff should be on video !
 #define ADEV_TEXT N_("Audio device name")
 #define ADEV_LONGTEXT N_( \
     "Name of the audio device that will be used by the " \
     "DirectShow plugin. If you don't specify anything, the default device " \
-    "will be used. You can specify a standard size (cif, d1, ...) or <width>x<height>")
+    "will be used. ")
 #define SIZE_TEXT N_("Video size")
 #define SIZE_LONGTEXT N_( \
     "Size of the video that will be displayed by the " \
     "DirectShow plugin. If you don't specify anything the default size for " \
-    "your device will be used.")
+    "your device will be used. You can specify a standard size (cif, d1, ...) or <width>x<height>.")
 #define CHROMA_TEXT N_("Video input chroma format")
 #define CHROMA_LONGTEXT N_( \
     "Force the DirectShow video input to use a specific chroma format " \

@@ -52,11 +52,10 @@ static void Close( vlc_object_t * );
 #define PRESET_LONGTEXT N_("Preset to use for the equalizer." )
 
 #define BANDS_TEXT N_( "Bands gain")
-/// \bug [String] missing dot
 #define BANDS_LONGTEXT N_( \
          "Don't use presets, but manually specified bands. You need to " \
          "provide 10 values between -20dB and 20dB, separated by spaces, " \
-         "e.g. \"0 2 4 2 0 -2 -4 -2 0\"" )
+         "e.g. \"0 2 4 2 0 -2 -4 -2 0\"." )
 
 #define TWOPASS_TEXT N_( "Two pass" )
 #define TWOPASS_LONGTEXT N_( "Filter the audio twice. This provides a more "  \

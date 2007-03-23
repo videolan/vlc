@@ -34,9 +34,8 @@
  * Module descriptor
  *****************************************************************************/
 #define AUTOSTART_TEXT N_( "Auto start" )
-/// \bug [String] Why \n ?
 #define AUTOSTART_LONGTEXT N_( "Automatically start playing the playlist " \
-                "content once it's loaded.\n" )
+                "content once it's loaded." )
 
 #define SHOW_ADULT_TEXT N_( "Show shoutcast adult content" )
 #define SHOW_ADULT_LONGTEXT N_( "Show NC17 rated video streams when " \

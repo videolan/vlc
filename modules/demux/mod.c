@@ -44,8 +44,7 @@
 static int  Open    ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
-/// \bug [String] missing .
-#define NOISE_LONGTEXT N_("Enable noise reduction algorithm")
+#define NOISE_LONGTEXT N_("Enable noise reduction algorithm.")
 #define REVERB_LONGTEXT N_("Enable reverberation" )
 #define REVERB_LEVEL_LONGTEXT N_( "Reverberation level (from 0 " \
                 "to 100, default value is 0)." )
@@ -54,14 +53,13 @@ static void Close  ( vlc_object_t * );
 #define MEGABASS_LONGTEXT N_( "Enable megabass mode" )
 #define MEGABASS_LEVEL_LONGTEXT N_("Megabass mode level (from 0 to 100, " \
                 "default value is 0)." )
-/// \bug [String] Missing space after dot
-#define MEGABASS_RANGE_LONGTEXT N_("Megabass mode cutoff frequency, in Hz." \
+#define MEGABASS_RANGE_LONGTEXT N_("Megabass mode cutoff frequency, in Hz. " \
                 "This is the maximum frequency for which the megabass " \
-                "effect applies. Valid values are from 10 to 100 Hz" )
+                "effect applies. Valid values are from 10 to 100 Hz." )
 #define SURROUND_LEVEL_LONGTEXT N_( "Surround effect level (from 0 to 100, " \
                 "default value is 0)." )
 #define SURROUND_DELAY_LONGTEXT N_("Surround delay, in ms. Usual values are " \
-                "from 5 to 40 ms" )
+                "from 5 to 40 ms." )
 
 vlc_module_begin();
     set_shortname( "MOD");

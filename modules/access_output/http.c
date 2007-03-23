@@ -65,12 +65,9 @@ static void Close( vlc_object_t * );
 #define PASS_TEXT N_("Password")
 #define PASS_LONGTEXT N_("Password that will be " \
                          "requested to access the stream." )
-
-/// \bug [String] missing closing parenthesis
 #define MIME_TEXT N_("Mime")
 #define MIME_LONGTEXT N_("MIME returned by the server (autodetected " \
-                        "if not specified." )
-
+                        "if not specified)." )
 #define CERT_TEXT N_( "Certificate file" )
 #define CERT_LONGTEXT N_( "Path to the x509 PEM certificate file that will "\
                           "be used for HTTPS." )
