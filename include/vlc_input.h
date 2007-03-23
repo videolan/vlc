@@ -32,6 +32,7 @@
 
 #include <vlc_es.h>
 #include <vlc_meta.h>
+#include <vlc_epg.h>
 
 struct vlc_meta_t;
 
