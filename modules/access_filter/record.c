@@ -83,7 +83,7 @@ struct access_sys_t
     vlc_bool_t b_dump;
 
     char *psz_path;
-    char *psz_ext;
+    const char *psz_ext;
     char *psz_file;
     int64_t i_size;
     FILE *f;
