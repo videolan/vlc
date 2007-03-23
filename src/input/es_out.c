@@ -57,8 +57,11 @@ typedef struct
     /* Clock for this program */
     input_clock_t clock;
 
+    char    *psz_name;
     char    *psz_now_playing;
+    char    *psz_publisher;
 
+    vlc_epg_t *p_epg;
 } es_out_pgrm_t;
 
 struct es_out_id_t
@@ -136,6 +139,8 @@ static char *LanguageGetCode( const char *psz_lang );
 static char **LanguageSplit( const char *psz_langs );
 static int LanguageArrayIndex( char **ppsz_langs, char *psz_lang );
 
+static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm );
+
 /*****************************************************************************
  * input_EsOutNew:
  *****************************************************************************/
@@ -159,13 +164,12 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     p_sys->i_mode   = ES_OUT_MODE_AUTO;
 
 
-    p_sys->i_pgrm   = 0;
-    p_sys->pgrm     = NULL;
+    TAB_INIT( p_sys->i_pgrm, p_sys->pgrm );
     p_sys->p_pgrm   = NULL;
 
     p_sys->i_id    = 0;
-    p_sys->i_es    = 0;
-    p_sys->es      = NULL;
+
+    TAB_INIT( p_sys->i_es, p_sys->es );
 
     p_sys->i_audio = 0;
     p_sys->i_video = 0;
@@ -260,14 +264,22 @@ void input_EsOutDelete( es_out_t *out )
     if( p_sys->es )
         free( p_sys->es );
 
+    /* FIXME duplicate work EsOutProgramDel (but we cannot use it) add a EsOutProgramClean ? */
     for( i = 0; i < p_sys->i_pgrm; i++ )
     {
-        if( p_sys->pgrm[i]->psz_now_playing )
-            free( p_sys->pgrm[i]->psz_now_playing );
-        free( p_sys->pgrm[i] );
+        es_out_pgrm_t *p_pgrm = p_sys->pgrm[i];
+        if( p_pgrm->psz_now_playing )
+            free( p_pgrm->psz_now_playing );
+        if( p_pgrm->psz_publisher )
+            free( p_pgrm->psz_publisher );
+        if( p_pgrm->psz_name )
+            free( p_pgrm->psz_name );
+        if( p_pgrm->p_epg )
+            vlc_epg_Delete( p_pgrm->p_epg );
+
+        free( p_pgrm );
     }
-    if( p_sys->pgrm )
-        free( p_sys->pgrm );
+    TAB_CLEAN( p_sys->i_pgrm, p_sys->pgrm );
 
     free( p_sys );
     free( out );
@@ -471,17 +483,11 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
         EsOutSelect( out, p_sys->es[i], VLC_FALSE );
     }
 
-    /* Update now playing if defined per program */
-    if( p_pgrm->psz_now_playing )
-    {
-        char *psz_cat = malloc( strlen(_("Program")) + 10 );
-
-        sprintf( psz_cat, "%s %d", _("Program"), p_pgrm->i_id );
-        input_Control( p_input, INPUT_ADD_INFO, _(VLC_META_INFO_CAT),
-                       _(VLC_META_NOW_PLAYING), "%s", p_pgrm->psz_now_playing );
-        free( psz_cat );
-    }
-
+    /* Update now playing */
+    vlc_meta_SetNowPlaying( p_input->p->input.p_item->p_meta,
+                            p_pgrm->psz_now_playing );
+    vlc_meta_SetPublisher( p_input->p->input.p_item->p_meta,
+                           p_pgrm->psz_publisher );
 
     var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
 }
@@ -501,7 +507,10 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->i_id = i_group;
     p_pgrm->i_es = 0;
     p_pgrm->b_selected = VLC_FALSE;
+    p_pgrm->psz_name = NULL;
     p_pgrm->psz_now_playing = NULL;
+    p_pgrm->psz_publisher = NULL;
+    p_pgrm->p_epg = NULL;
     input_ClockInit( &p_pgrm->clock, VLC_FALSE, p_input->p->input.i_cr_average );
 
     /* Append it */
@@ -555,9 +564,13 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
     TAB_REMOVE( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
 
     /* If program is selected we need to unselect it */
-    if( p_sys->p_pgrm == p_pgrm ) p_sys->p_pgrm = 0;
+    if( p_sys->p_pgrm == p_pgrm ) p_sys->p_pgrm = NULL;
 
+    if( p_pgrm->psz_name ) free( p_pgrm->psz_name );
     if( p_pgrm->psz_now_playing ) free( p_pgrm->psz_now_playing );
+    if( p_pgrm->psz_publisher ) free( p_pgrm->psz_publisher );
+    if( p_pgrm->p_epg )
+        vlc_epg_Delete( p_pgrm->p_epg );
     free( p_pgrm );
 
     /* Update "program" variable */
@@ -571,30 +584,32 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
 
 /* EsOutProgramMeta:
  */
+static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm )
+{
+    char *psz = NULL;
+    if( p_pgrm->psz_name )
+        asprintf( &psz, _("%s [%s %d]"), p_pgrm->psz_name, _("Program"), p_pgrm->i_id );
+    else
+        asprintf( &psz, "%s %d", _("Program"), p_pgrm->i_id );
+    return psz;
+}
+
 static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     es_out_pgrm_t     *p_pgrm = NULL;
     input_thread_t    *p_input = p_sys->p_input;
-    char              *psz_cat = malloc( strlen(_("Program")) + 10 );
+    char              *psz_cat;
     char              *psz_title = NULL;
-    char              *psz_now_playing = NULL;
     char              *psz_provider = NULL;
     int i;
 
     msg_Dbg( p_input, "EsOutProgramMeta: number=%d", i_group );
-    sprintf( psz_cat, "%s %d", _("Program"), i_group );
 
-    if( p_meta->psz_title ) psz_title = p_meta->psz_title;
-    if( p_meta->psz_publisher ) psz_provider = p_meta->psz_publisher;
-    if( p_meta->psz_nowplaying ) psz_now_playing = p_meta->psz_nowplaying;
-
-    if( !psz_title && !psz_now_playing )
-    {
-        free( psz_cat );
+    /* Check against empty meta data (empty for what we handle) */
+    if( !p_meta->psz_title && !p_meta->psz_nowplaying && !p_meta->psz_publisher && p_meta->i_extra <= 0 )
         return;
-    }
-
+    /* Find program */
     for( i = 0; i < p_sys->i_pgrm; i++ )
     {
         if( p_sys->pgrm[i]->i_id == i_group )
@@ -603,18 +618,30 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
             break;
         }
     }
+    if( p_pgrm == NULL )
+        p_pgrm = EsOutProgramAdd( out, i_group );   /* Create it */
 
-    if( p_pgrm == NULL ) {
-	free( psz_cat );
-	msg_Dbg( p_input, "Trying to add meta for non-existing program" );
-	return;
-    }
+    /* */
+    psz_title = p_meta->psz_title;
+    psz_provider = p_meta->psz_publisher;
 
     /* Update the description text of the program */
     if( psz_title && *psz_title )
     {
         vlc_value_t val;
         vlc_value_t text;
+
+        if( !p_pgrm->psz_name || strcmp( p_pgrm->psz_name, psz_title ) )
+        {
+            char *psz_cat = EsOutProgramGetMetaName( p_pgrm );
+
+            /* Remove old entries */
+            input_Control( p_input, INPUT_DEL_INFO, psz_cat, NULL );
+            /* TODO update epg name */
+            free( psz_cat );
+        }
+        if( p_pgrm->psz_name ) free( p_pgrm->psz_name );
+        p_pgrm->psz_name = strdup( psz_title );
 
         /* ugly but it works */
         val.i_int = i_group;
@@ -632,16 +659,151 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
             var_Change( p_input, "program", VLC_VAR_ADDCHOICE, &val, &text );
         }
     }
-    if( psz_now_playing )
-    {
-        if( p_pgrm->psz_now_playing ) free( p_pgrm->psz_now_playing );
-        p_pgrm->psz_now_playing = strdup(psz_now_playing);
 
+    psz_cat = EsOutProgramGetMetaName( p_pgrm );
+    if( psz_provider )
+    {
         if( p_sys->p_pgrm == p_pgrm )
+            vlc_meta_SetPublisher( p_input->p->input.p_item->p_meta, psz_provider );
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _(VLC_META_PUBLISHER), psz_provider );
+    }
+    for( i = 0; i < p_meta->i_extra; i++ )
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _(p_meta->ppsz_extra_name[i]), p_meta->ppsz_extra_value[i] );
+
+    free( psz_cat );
+}
+#define TAB_INSERT_CAST( cast, count, tab, p, index ) do { \
+    if( (count) > 0 )                                                     \
+        (tab) = cast realloc( tab, sizeof( void ** ) * ( (count) + 1 ) ); \
+    else                                                \
+        (tab) = cast malloc( sizeof( void ** ) );       \
+    if( (count) - (index) > 0 )                         \
+        memmove( (void**)(tab) + (index) + 1,           \
+                 (void**)(tab) + (index),               \
+                 ((count) - (index)) * sizeof(*(tab)) );\
+    (tab)[(index)] = (p);                               \
+    (count)++;                                          \
+} while(0)
+
+#define TAB_INSERT( count, tab, p, index ) TAB_INSERT_CAST( , count, tab, p, index )
+
+static void vlc_epg_Merge( vlc_epg_t *p_dst, const vlc_epg_t *p_src )
+{
+    int i;
+
+    /* Add new event */
+    for( i = 0; i < p_src->i_event; i++ )
+    {
+        vlc_epg_event_t *p_evt = p_src->pp_event[i];
+        vlc_bool_t b_add = VLC_TRUE;
+        int j;
+
+        for( j = 0; j < p_dst->i_event; j++ )
         {
-            vlc_meta_SetNowPlaying( p_input->p->input.p_item->p_meta,
-                                    psz_now_playing );
+            if( p_dst->pp_event[j]->i_start == p_evt->i_start && p_dst->pp_event[j]->i_duration == p_evt->i_duration )
+            {
+                b_add = VLC_FALSE;
+                break;
+            }
+            if( p_dst->pp_event[j]->i_start > p_evt->i_start )
+                break;
         }
+        if( b_add )
+        {
+            vlc_epg_event_t *p_copy = malloc( sizeof(vlc_epg_event_t) );
+            if( !p_copy )
+                break;
+            memset( p_copy, 0, sizeof(vlc_epg_event_t) );
+            p_copy->i_start = p_evt->i_start;
+            p_copy->i_duration = p_evt->i_duration;
+            p_copy->psz_name = p_evt->psz_name ? strdup( p_evt->psz_name ) : NULL;
+            p_copy->psz_short_description = p_evt->psz_short_description ? strdup( p_evt->psz_short_description ) : NULL;
+            p_copy->psz_description = p_evt->psz_description ? strdup( p_evt->psz_description ) : NULL;
+            TAB_INSERT( p_dst->i_event, p_dst->pp_event, p_copy, j );
+        }
+    }
+    /* Update current */
+    vlc_epg_SetCurrent( p_dst, p_src->p_current ? p_src->p_current->i_start : -1 );
+
+    /* Keep only 1 old event  */
+    if( p_dst->p_current )
+    {
+        while( p_dst->i_event > 1 && p_dst->pp_event[0] != p_dst->p_current && p_dst->pp_event[1] != p_dst->p_current )
+            TAB_REMOVE( p_dst->i_event, p_dst->pp_event, p_dst->pp_event[0] );
+    }
+}
+
+static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+    input_thread_t    *p_input = p_sys->p_input;
+    es_out_pgrm_t     *p_pgrm = NULL;
+    char *psz_cat;
+    char *psz_epg;
+    int i;
+
+    /* Find program */
+    for( i = 0; i < p_sys->i_pgrm; i++ )
+    {
+        if( p_sys->pgrm[i]->i_id == i_group )
+        {
+            p_pgrm = p_sys->pgrm[i];
+            break;
+        }
+    }
+    if( p_pgrm == NULL )
+        p_pgrm = EsOutProgramAdd( out, i_group );   /* Create it */
+
+    /* Merge EPG */
+    if( !p_pgrm->p_epg )
+        p_pgrm->p_epg = vlc_epg_New( p_pgrm->psz_name );
+    vlc_epg_Merge( p_pgrm->p_epg, p_epg );
+
+    /* Update info */
+    psz_cat = EsOutProgramGetMetaName( p_pgrm );
+#ifdef HAVE_LOCALTIME_R
+    asprintf( &psz_epg, "EPG %s", psz_cat );
+    input_Control( p_input, INPUT_DEL_INFO, psz_epg, NULL );
+    msg_Dbg( p_input, "EsOutProgramEpg: number=%d name=%s", i_group, p_pgrm->p_epg->psz_name );
+    for( i = 0; i < p_pgrm->p_epg->i_event; i++ )
+    {
+        const vlc_epg_event_t *p_evt = p_pgrm->p_epg->pp_event[i];
+        time_t t_start = (time_t)p_evt->i_start;
+        struct tm tm_start;
+        char psz_start[128];
+
+        localtime_r( &t_start, &tm_start );
+
+        snprintf( psz_start, sizeof(psz_start), "%2.2d:%2.2d:%2.2d", tm_start.tm_hour, tm_start.tm_min, tm_start.tm_sec );
+        if( p_evt->psz_short_description || p_evt->psz_description )
+            input_Control( p_input, INPUT_ADD_INFO, psz_epg, psz_start, "%s (%2.2d:%2.2d) - %s",
+                           p_evt->psz_name,
+                           p_evt->i_duration/60/60, (p_evt->i_duration/60)%60,
+                           p_evt->psz_short_description ? p_evt->psz_short_description : p_evt->psz_description );
+        else
+            input_Control( p_input, INPUT_ADD_INFO, psz_epg, psz_start, "%s (%2.2d:%2.2d)",
+                           p_evt->psz_name,
+                           p_evt->i_duration/60/60, (p_evt->i_duration/60)%60 );
+    }
+    free( psz_epg );
+#endif
+    /* Update now playing */
+    if( p_pgrm->psz_now_playing )
+        free( p_pgrm->psz_now_playing );
+    p_pgrm->psz_now_playing = NULL;
+
+    if( p_epg->p_current && p_epg->p_current->psz_name && *p_epg->p_current->psz_name )
+    {
+        p_pgrm->psz_now_playing = strdup( p_epg->p_current->psz_name );
+        if( p_pgrm == p_sys->p_pgrm )
+            vlc_meta_SetNowPlaying( p_input->p->input.p_item->p_meta, p_pgrm->psz_now_playing );
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _(VLC_META_NOW_PLAYING), p_pgrm->psz_now_playing );
+    }
+    else
+    {
+        if( p_pgrm == p_sys->p_pgrm )
+            vlc_meta_SetNowPlaying( p_input->p->input.p_item->p_meta, NULL );
+        input_Control( p_input, INPUT_DEL_INFO, psz_cat, _(VLC_META_NOW_PLAYING) );
     }
     free( psz_cat );
 }
@@ -1448,6 +1610,14 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t * );
 
             EsOutProgramMeta( out, i_group, p_meta );
+            return VLC_SUCCESS;
+        }
+        case ES_OUT_SET_GROUP_EPG:
+        {
+            int i_group = (int)va_arg( args, int );
+            vlc_epg_t *p_epg = (vlc_epg_t*)va_arg( args, vlc_epg_t * );
+
+            EsOutProgramEpg( out, i_group, p_epg );
             return VLC_SUCCESS;
         }
         case ES_OUT_DEL_GROUP:
