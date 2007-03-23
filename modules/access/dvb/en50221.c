@@ -2309,6 +2309,12 @@ void E_(en50221_End)( access_t * p_access )
      * program. */
 }
 
+static inline void *FixUTF8( char *p )
+{
+    EnsureUTF8( p );
+    return p;
+}
+
 static char *dvbsi_to_utf8( char *psz_instring, size_t i_length )
 {
     const char *psz_encoding;
@@ -2317,7 +2323,7 @@ static char *dvbsi_to_utf8( char *psz_instring, size_t i_length )
     size_t i_in, i_out;
     vlc_iconv_t iconv_handle;
     if( i_length < 1 ) return NULL;
-    if( psz_instring[0] >= 0x20 )
+    if( psz_instring[0] < 0 || psz_instring[0] >= 0x20 )
     {
         psz_stringstart = psz_instring;
         psz_encoding = "ISO_8859-1"; /* should be ISO6937 according to spec, but this seems to be the one used */
@@ -2370,7 +2376,7 @@ static char *dvbsi_to_utf8( char *psz_instring, size_t i_length )
     case 0x10:
         if( i_length < 3 || psz_instring[1] != '\0' || psz_instring[2] > 0x0f
             || psz_instring[2] == 0 )
-            return EnsureUTF8(strndup(psz_instring,i_length));
+            return FixUTF8(strndup(psz_instring,i_length));
         sprintf( psz_encbuf, "ISO_8859-%d", psz_instring[2] );
         psz_stringstart = &psz_instring[3];
         psz_encoding = psz_encbuf;
@@ -2392,11 +2398,11 @@ static char *dvbsi_to_utf8( char *psz_instring, size_t i_length )
         psz_encoding = "BIG-5";
         break;
     case 0x15:
-        return EnsureUTF8(strndup(&psz_instring[1],i_length-1));
+        return FixUTF8(strndup(&psz_instring[1],i_length-1));
         break;
     default:
         /* invalid */
-        return EnsureUTF8(strndup(psz_instring,i_length));
+        return FixUTF8(strndup(psz_instring,i_length));
     }
     iconv_handle = vlc_iconv_open( "UTF-8", psz_encoding );
     i_in = i_length - (psz_stringstart - psz_instring );
