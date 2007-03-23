@@ -86,15 +86,20 @@
     (tab)= NULL;                                \
   } while(0)
 
-#define TAB_APPEND( count, tab, p )             \
+#define TAB_APPEND_CAST( cast, count, tab, p )             \
   do {                                          \
     if( (count) > 0 )                           \
-        (tab) = realloc( tab, sizeof( void ** ) * ( (count) + 1 ) ); \
+        (tab) = cast realloc( tab, sizeof( void ** ) * ( (count) + 1 ) ); \
     else                                        \
-        (tab) = malloc( sizeof( void ** ) );    \
+        (tab) = cast malloc( sizeof( void ** ) );    \
     (tab)[count] = (p);                         \
     (count)++;                                  \
   } while(0)
+
+#define TAB_APPEND( count, tab, p )             \
+    TAB_APPEND_CAST( , count, tab, p )
+#define TAB_APPEND_CPP( type, count, tab, p )   \
+    TAB_APPEND_CAST( (type**), count, tab, p )
 
 #define TAB_FIND( count, tab, p, index )        \
   do {                                          \
