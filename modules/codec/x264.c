@@ -635,6 +635,8 @@ struct encoder_sys_t
     uint8_t         *p_buffer;
 
     mtime_t         i_last_ref_pts;
+
+    char *psz_stat_name;
 };
 
 /*****************************************************************************
@@ -684,6 +686,7 @@ static int  Open ( vlc_object_t *p_this )
     p_enc->pf_encode_audio = NULL;
     p_enc->p_sys = p_sys = malloc( sizeof( encoder_sys_t ) );
     p_sys->i_last_ref_pts = 0;
+    p_sys->psz_stat_name = NULL;
 
     x264_param_default( &p_sys->param );
     p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
@@ -1092,9 +1095,9 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "stats", &val );
     if( val.psz_string )
     {
-        p_sys->param.rc.psz_stat_in = val.psz_string;
-        p_sys->param.rc.psz_stat_out = val.psz_string;
-        free( val.psz_string );
+        p_sys->param.rc.psz_stat_in  =
+        p_sys->param.rc.psz_stat_out =
+        p_sys->psz_stat_name         = val.psz_string;
     }
 
     var_Get( p_enc, SOUT_CFG_PREFIX "pass", &val );
@@ -1222,15 +1225,8 @@ static void Close( vlc_object_t *p_this )
     encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
     
-    if( p_sys->param.rc.b_stat_read )
-    {
-        free( p_sys->param.rc.psz_stat_in );
-    }
-    
-    if( p_sys->param.rc.b_stat_write )
-    {
-        free( p_sys->param.rc.psz_stat_out );
-    }
+    if( p_sys->psz_stat_name )
+        free( p_sys->psz_stat_name );
 
     x264_encoder_close( p_sys->h );
     free( p_sys->p_buffer );
