@@ -119,7 +119,7 @@ struct access_sys_t
 
     /* */
     int        i_code;
-    char       *psz_protocol;
+    const char *psz_protocol;
     int        i_version;
 
     char       *psz_mime;
