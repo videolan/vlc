@@ -296,6 +296,8 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         switch (poll (ufd, fdc, 500))
         {
             case -1:
+                if( errno == EINTR )
+                    continue;
                 goto error;
 
             case 0: // timeout
@@ -320,13 +322,14 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
             }
             else
             {
-                if (ufd[i].revents & POLLRDHUP)
+                if( ufd[i].revents & POLLRDHUP )
                     return 0; // EOF, read() would yield 0
             }
 
             fdc = 1;
             fdv += i;
             vsv += i;
+
             break;
         }
 
@@ -378,7 +381,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         p_buf += n;
         i_buflen -= n;
 
-        if ((n == 0) || !waitall)
+        if( n == 0 || !waitall )
             break;
     }
     return i_total;
@@ -443,6 +446,8 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         switch (val)
         {
             case -1:
+                if( errno == EINTR )
+                    continue;
                msg_Err (p_this, "Write error: %s", net_strerror (net_errno));
                goto out;
 
