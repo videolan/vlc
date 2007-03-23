@@ -57,7 +57,15 @@ static int  Control( access_t *, int, va_list );
 static int  Describe( access_t  *, char **ppsz_location );
 static int  Start( access_t *, int64_t );
 static void Stop( access_t * );
+
 static int  GetPacket( access_t *, chunk_t * );
+static void GetHeader( access_t *p_access );
+
+static int Restart( access_t * );
+static int Reset( access_t * );
+
+//#define MMSH_USER_AGENT "NSPlayer/4.1.0.3856"
+#define MMSH_USER_AGENT "NSPlayer/7.10.0.3059"
 
 /****************************************************************************
  * Open: connect to ftp server and ask for file
@@ -320,31 +328,15 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             chunk_t ck;
             if( GetPacket( p_access, &ck ) )
             {
-                if( (ck.i_type == 0x4524) && (ck.i_sequence != 0) &&
-                    (p_sys->b_broadcast) )
+                int i_ret = -1;
+                if( p_sys->b_broadcast )
                 {
-                    char *psz_location = NULL;
-
-                    p_sys->i_start = p_access->info.i_pos;
-
-                    msg_Dbg( p_access, "stoping the stream" );
-                    Stop( p_access );
-
-                    msg_Dbg( p_access, "describe the stream" );
-                    if( Describe( p_access, &psz_location ) )
-                    {
-                        msg_Err( p_access, "describe failed" );
-                        p_access->info.b_eof = VLC_TRUE;
-                        return 0;
-                    }
-                    if( Start( p_access, 0 ) )
-                    {
-                        msg_Err( p_access, "Start failed" );
-                        p_access->info.b_eof = VLC_TRUE;
-                        return 0;
-                    }
+                    if( ck.i_type == 0x4524 && ck.i_sequence != 0 )
+                        i_ret = Restart( p_access );
+                    else if( ck.i_type == 0x4324 )
+                        i_ret = Reset( p_access );
                 }
-                else
+                if( i_ret )
                 {
                     p_access->info.b_eof = VLC_TRUE;
                     return 0;
@@ -361,6 +353,86 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     return( i_data );
 }
 
+/* */
+static int Restart( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    char *psz_location = NULL;
+
+    msg_Dbg( p_access, "Restart the stream" );
+    p_sys->i_start = p_access->info.i_pos;
+
+    /* */
+    msg_Dbg( p_access, "stoping the stream" );
+    Stop( p_access );
+
+    /* */
+    msg_Dbg( p_access, "describe the stream" );
+    if( Describe( p_access, &psz_location ) )
+    {
+        msg_Err( p_access, "describe failed" );
+        return -1;
+    }
+    /* */
+    if( Start( p_access, 0 ) )
+    {
+        msg_Err( p_access, "Start failed" );
+        return -1;
+    }
+    return 0;
+}
+static int Reset( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    asf_header_t old_asfh = p_sys->asfh;
+    int i;
+
+    msg_Dbg( p_access, "Reset the stream" );
+    p_sys->i_start = p_access->info.i_pos;
+
+    /* */
+    p_sys->i_packet_sequence = 0;
+    p_sys->i_packet_used = 0;
+    p_sys->i_packet_length = 0;
+    p_sys->p_packet = NULL;
+
+    /* Get the next header FIXME memory loss ? */
+    GetHeader( p_access );
+    if( p_sys->i_header <= 0 )
+        return -1;
+
+    E_( asf_HeaderParse )( &p_sys->asfh,
+                           p_sys->p_header, p_sys->i_header );
+    msg_Dbg( p_access, "packet count="I64Fd" packet size=%d",
+             p_sys->asfh.i_data_packets_count,
+             p_sys->asfh.i_min_data_packet_size );
+
+    E_( asf_StreamSelect)( &p_sys->asfh,
+                           var_CreateGetInteger( p_access, "mms-maxbitrate" ),
+                           var_CreateGetInteger( p_access, "mms-all" ),
+                           var_CreateGetInteger( p_access, "audio" ),
+                           var_CreateGetInteger( p_access, "video" ) );
+
+    /* Check we have comptible asfh */
+    for( i = 1; i < 128; i++ )
+    {
+        asf_stream_t *p_old = &old_asfh.stream[i];
+        asf_stream_t *p_new = &p_sys->asfh.stream[i];
+
+        if( p_old->i_cat != p_new->i_cat || p_old->i_selected != p_new->i_selected )
+            break;
+    }
+    if( i < 128 )
+    {
+        msg_Warn( p_access, "incompatible asf header, restart" );
+        return Restart( p_access );
+    }
+
+    /* */
+    p_sys->i_packet_used = 0;
+    p_sys->i_packet_length = 0;
+    return 0;
+}
 /*****************************************************************************
  * Describe:
  *****************************************************************************/
@@ -392,7 +464,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                 "GET %s HTTP/1.0\r\n"
                 "Accept: */*\r\n"
-                "User-Agent: NSPlayer/4.1.0.3856\r\n"
+                "User-Agent: "MMSH_USER_AGENT"\r\n"
                 "Host: %s:%d\r\n"
                 "Pragma: no-cache,rate=1.000000,stream-time=0,stream-offset=0:0,request-context=%d,max-duration=0\r\n"
                 "Pragma: xClientGUID={"GUID_FMT"}\r\n"
@@ -501,26 +573,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     }
 
     /* Read the asf header */
-    p_sys->i_header = 0;
-    p_sys->p_header = NULL;
-    for( ;; )
-    {
-        chunk_t ck;
-        if( GetPacket( p_access, &ck ) ||
-            (ck.i_type != 0x4824) )
-        {
-            break;
-        }
-
-        if( ck.i_data > 0 )
-        {
-            p_sys->i_header += ck.i_data;
-            p_sys->p_header = realloc( p_sys->p_header, p_sys->i_header );
-            memcpy( &p_sys->p_header[p_sys->i_header - ck.i_data],
-                    ck.p_data, ck.i_data );
-        }
-    }
-    msg_Dbg( p_access, "complete header size=%d", p_sys->i_header );
+    GetHeader( p_access );
     if( p_sys->i_header <= 0 )
     {
         msg_Err( p_access, "header size == 0" );
@@ -555,6 +608,30 @@ error:
     }
     return VLC_EGENERIC;
 }
+static void GetHeader( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    /* Read the asf header */
+    p_sys->i_header = 0;
+    p_sys->p_header = NULL;
+    for( ;; )
+    {
+        chunk_t ck;
+        if( GetPacket( p_access, &ck ) || ck.i_type != 0x4824 )
+            break;
+
+        if( ck.i_data > 0 )
+        {
+            p_sys->i_header += ck.i_data;
+            p_sys->p_header = realloc( p_sys->p_header, p_sys->i_header );
+            memcpy( &p_sys->p_header[p_sys->i_header - ck.i_data],
+                    ck.p_data, ck.i_data );
+        }
+    }
+    msg_Dbg( p_access, "complete header size=%d", p_sys->i_header );
+}
+
 
 /*****************************************************************************
  *
@@ -563,6 +640,7 @@ static int Start( access_t *p_access, off_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int  i_streams = 0;
+    int  i_streams_selected = 0;
     int  i;
     char *psz;
 
@@ -578,13 +656,14 @@ static int Start( access_t *p_access, off_t i_pos )
 
     for( i = 1; i < 128; i++ )
     {
+        if( p_sys->asfh.stream[i].i_cat == ASF_STREAM_UNKNOWN )
+            continue;
+        i_streams++;
         if( p_sys->asfh.stream[i].i_selected )
-        {
-            i_streams++;
-        }
+            i_streams_selected++;
     }
 
-    if( i_streams <= 0 )
+    if( i_streams_selected <= 0 )
     {
         msg_Err( p_access, "no stream selected" );
         return VLC_EGENERIC;
@@ -592,7 +671,7 @@ static int Start( access_t *p_access, off_t i_pos )
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                 "GET %s HTTP/1.0\r\n"
                 "Accept: */*\r\n"
-                "User-Agent: NSPlayer/4.1.0.3856\r\n"
+                "User-Agent: "MMSH_USER_AGENT"\r\n"
                 "Host: %s:%d\r\n",
                 ( p_sys->url.psz_path == NULL || *p_sys->url.psz_path == '\0' ) ? "/" : p_sys->url.psz_path,
                 p_sys->url.psz_host, p_sys->url.i_port );
@@ -713,10 +792,8 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
      * entire header.
      */
     if( net_Read( p_access, p_sys->fd, NULL, p_sys->buffer, 4, VLC_TRUE ) < 4 )
-    {
-       msg_Err( p_access, "cannot read data" );
        return VLC_EGENERIC;
-    }
+
     p_ck->i_type = GetWLE( p_sys->buffer);
     p_ck->i_size = GetWLE( p_sys->buffer + 2);
 
@@ -753,14 +830,17 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
         }
         else
         {
-            msg_Warn( p_access, "next stream follow but not supported" );
+            msg_Warn( p_access, "next stream following" );
             return VLC_EGENERIC;
         }
     }
-    /* 0x4324 is CHUNK_TYPE_RESET. We can safely ignore it: a new stream will
-     * follow with a sequence of 0 */
-    else if( (p_ck->i_type != 0x4824) && (p_ck->i_type != 0x4424) &&
-             (p_ck->i_type != 0x4324) )
+    else if( p_ck->i_type == 0x4324 )
+    {
+        /* 0x4324 is CHUNK_TYPE_RESET: a new stream will follow with a sequence of 0 */
+        msg_Warn( p_access, "next stream following (reset) seq=%d", p_ck->i_sequence  );
+        return VLC_EGENERIC;
+    }
+    else if( (p_ck->i_type != 0x4824) && (p_ck->i_type != 0x4424) )
     {
         msg_Err( p_access, "invalid chunk FATAL (0x%x)", p_ck->i_type );
         return VLC_EGENERIC;
@@ -774,11 +854,13 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
         return VLC_EGENERIC;
     }
 
+#if 0
     if( (p_sys->i_packet_sequence != 0) &&
         (p_ck->i_sequence != p_sys->i_packet_sequence) )
     {
         msg_Warn( p_access, "packet lost ? (%d != %d)", p_ck->i_sequence, p_sys->i_packet_sequence );
     }
+#endif
 
     p_sys->i_packet_sequence = p_ck->i_sequence + 1;
     p_sys->i_packet_used   = 0;
