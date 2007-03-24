@@ -168,13 +168,15 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     if( i_new >= 0 )
     {
         /* If the types differ, variable creation failed. */
-        if( (i_type & ~VLC_VAR_DOINHERIT) != p_this->p_vars[i_new].i_type )
+        if( (i_type & ~(VLC_VAR_DOINHERIT|VLC_VAR_ISCOMMAND)) != p_this->p_vars[i_new].i_type )
         {
             vlc_mutex_unlock( &p_this->var_lock );
             return VLC_EBADVAR;
         }
 
         p_this->p_vars[i_new].i_usage++;
+        if( i_type & VLC_VAR_ISCOMMAND )
+            p_this->p_vars[i_new].i_type |= VLC_VAR_ISCOMMAND;
         vlc_mutex_unlock( &p_this->var_lock );
         return VLC_SUCCESS;
     }
