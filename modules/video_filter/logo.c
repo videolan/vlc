@@ -329,36 +329,22 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_display = NULL;
     p_vout->pf_control = Control;
 
-    p_logo_list->psz_filename = var_CreateGetString( p_this , "logo-file" );
+    p_logo_list->psz_filename = var_CreateGetStringCommand( p_this,
+                                                            "logo-file" );
     if( !p_logo_list->psz_filename || !*p_logo_list->psz_filename )
     {
         msg_Err( p_this, "logo file not specified" );
         return 0;
     }
 
-    var_Create( p_this, "logo-position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "logo-position", &val );
-    p_sys->pos = val.i_int;
-
-    var_Create( p_this, "logo-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "logo-x", &val );
-    p_sys->posx = val.i_int;
-
-    var_Create( p_this, "logo-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "logo-y", &val );
-    p_sys->posy = val.i_int;
-
-    var_Create( p_this, "logo-delay", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "logo-delay", &val );
-    p_logo_list->i_delay = __MAX( __MIN( val.i_int, 60000 ), 0 );
-
-    var_Create( p_this, "logo-repeat", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "logo-repeat", &val );
-    p_logo_list->i_repeat = val.i_int;
-
-    var_Create(p_this, "logo-transparency", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
-    var_Get( p_this, "logo-transparency", &val );
-    p_logo_list->i_alpha = __MAX( __MIN( val.i_int, 255 ), 0 );
+    p_sys->pos = var_CreateGetIntegerCommand( p_this, "logo-position" );
+    p_sys->posx = var_CreateGetIntegerCommand( p_this, "logo-x" );
+    p_sys->posy = var_CreateGetIntegerCommand( p_this, "logo-y" );
+    p_logo_list->i_delay = __MAX( __MIN(
+        var_CreateGetIntegerCommand( p_this, "logo-delay" ) , 60000 ), 0 );
+    p_logo_list->i_repeat = var_CreateGetIntegerCommand( p_this, "logo-repeat");
+    p_logo_list->i_alpha = __MAX( __MIN(
+        var_CreateGetIntegerCommand( p_this, "logo-transparency" ), 255 ), 0 );
 
     LoadLogoList( p_vout, p_logo_list );
 
@@ -732,7 +718,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     /* Hook used for callback variables */
     p_logo_list->psz_filename =
-        var_CreateGetString( p_filter->p_libvlc_global , "logo-file" );
+        var_CreateGetStringCommand( p_filter->p_libvlc_global , "logo-file" );
     if( !p_logo_list->psz_filename || !*p_logo_list->psz_filename )
     {
         msg_Err( p_this, "logo file not specified" );
@@ -741,15 +727,15 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->posx = var_CreateGetInteger( p_filter->p_libvlc_global , "logo-x" );
-    p_sys->posy = var_CreateGetInteger( p_filter->p_libvlc_global , "logo-y" );
-    p_sys->pos = var_CreateGetInteger( p_filter->p_libvlc_global , "logo-position" );
-    p_logo_list->i_alpha = __MAX( __MIN( var_CreateGetInteger(
-                           p_filter->p_libvlc_global, "logo-transparency"), 255 ), 0 );
+    p_sys->posx = var_CreateGetIntegerCommand( p_filter, "logo-x" );
+    p_sys->posy = var_CreateGetIntegerCommand( p_filter, "logo-y" );
+    p_sys->pos = var_CreateGetIntegerCommand( p_filter, "logo-position" );
+    p_logo_list->i_alpha = __MAX( __MIN( var_CreateGetIntegerCommand(
+                           p_filter, "logo-transparency"), 255 ), 0 );
     p_logo_list->i_delay =
-                    var_CreateGetInteger( p_filter->p_libvlc_global , "logo-delay" );
+        var_CreateGetIntegerCommand( p_filter, "logo-delay" );
     p_logo_list->i_repeat =
-                    var_CreateGetInteger( p_filter->p_libvlc_global , "logo-repeat" );
+        var_CreateGetIntegerCommand( p_filter, "logo-repeat" );
 
     var_AddCallback( p_filter->p_libvlc_global, "logo-file", LogoCallback, p_sys );
     var_AddCallback( p_filter->p_libvlc_global, "logo-x", LogoCallback, p_sys );

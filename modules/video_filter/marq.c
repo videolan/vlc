@@ -192,7 +192,7 @@ static int CreateFilter( vlc_object_t *p_this )
                        p_filter->p_cfg );
 
 #define CREATE_VAR( stor, type, var ) \
-    p_sys->stor = var_CreateGet##type( p_filter, var ); \
+    p_sys->stor = var_CreateGet##type##Command( p_filter, var ); \
     var_AddCallback( p_filter, var, MarqueeCallback, p_sys );
 
     CREATE_VAR( i_xoff, Integer, "marq-x" );

@@ -305,24 +305,17 @@ static int CreateFilter( vlc_object_t *p_this )
 
 #define GET_VAR( name, min, max )                                           \
     p_sys->i_##name = __MIN( max, __MAX( min,                               \
-                var_CreateGetInteger( p_filter, CFG_PREFIX #name ) ) );      \
-    var_Destroy( p_filter, CFG_PREFIX #name );                               \
-    var_Create( p_libvlc_global, CFG_PREFIX #name, VLC_VAR_INTEGER );               \
-    var_SetInteger( p_libvlc_global, CFG_PREFIX #name, p_sys->i_##name );           \
-    var_AddCallback( p_libvlc_global, CFG_PREFIX #name, MosaicCallback, p_sys );
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX #name ) ) );      \
+    var_AddCallback( p_filter, CFG_PREFIX #name, MosaicCallback, p_sys );
 
     GET_VAR( width, 0, INT_MAX );
     GET_VAR( height, 0, INT_MAX );
     GET_VAR( xoffset, 0, INT_MAX );
     GET_VAR( yoffset, 0, INT_MAX );
 
-    p_sys->i_align = __MIN( 10, __MAX( 0,  var_CreateGetInteger( p_filter, CFG_PREFIX "align" ) ) );
+    GET_VAR( align, 0, 10 );
     if( p_sys->i_align == 3 || p_sys->i_align == 7 )
         p_sys->i_align = 5;
-    var_Destroy( p_filter, CFG_PREFIX "align" );
-    var_Create( p_libvlc_global, CFG_PREFIX "align", VLC_VAR_INTEGER );
-    var_SetInteger( p_libvlc_global, CFG_PREFIX "align", p_sys->i_align );
-    var_AddCallback( p_libvlc_global, CFG_PREFIX "align", MosaicCallback, p_sys );
 
     GET_VAR( borderw, 0, INT_MAX );
     GET_VAR( borderh, 0, INT_MAX );
@@ -333,11 +326,9 @@ static int CreateFilter( vlc_object_t *p_this )
     GET_VAR( delay, 100, INT_MAX );
     p_sys->i_delay *= 1000;
 
-    p_sys->b_ar = var_CreateGetBool( p_filter, CFG_PREFIX "keep-aspect-ratio" );
-    var_Destroy( p_filter, CFG_PREFIX "keep-aspect-ratio" );
-    var_Create( p_libvlc_global, CFG_PREFIX "keep-aspect-ratio", VLC_VAR_INTEGER );
-    var_SetBool( p_libvlc_global, CFG_PREFIX "keep-aspect-ratio", p_sys->b_ar );
-    var_AddCallback( p_libvlc_global, CFG_PREFIX "keep-aspect-ratio", MosaicCallback,
+    p_sys->b_ar = var_CreateGetBoolCommand( p_filter,
+                                            CFG_PREFIX "keep-aspect-ratio" );
+    var_AddCallback( p_filter, CFG_PREFIX "keep-aspect-ratio", MosaicCallback,
                      p_sys );
 
     p_sys->b_keep = var_CreateGetBool( p_filter, CFG_PREFIX "keep-picture" );
@@ -348,10 +339,8 @@ static int CreateFilter( vlc_object_t *p_this )
 
     p_sys->i_order_length = 0;
     p_sys->ppsz_order = NULL;
-    psz_order = var_CreateGetString( p_filter, CFG_PREFIX "order" );
-
-    var_Create( p_libvlc_global, CFG_PREFIX "order", VLC_VAR_STRING);
-    var_AddCallback( p_libvlc_global, CFG_PREFIX "order", MosaicCallback, p_sys );
+    psz_order = var_CreateGetStringCommand( p_filter, CFG_PREFIX "order" );
+    var_AddCallback( p_filter, CFG_PREFIX "order", MosaicCallback, p_sys );
 
     if( psz_order[0] != 0 )
     {
@@ -371,26 +360,20 @@ static int CreateFilter( vlc_object_t *p_this )
     }
 
     /* Manage specific offsets for substreams */
-    psz_offsets = var_CreateGetString( p_filter, CFG_PREFIX "offsets" );
-    var_Destroy( p_filter, CFG_PREFIX "offsets" );
+    psz_offsets = var_CreateGetStringCommand( p_filter, CFG_PREFIX "offsets" );
     p_sys->i_offsets_length = 0;
     p_sys->pi_x_offsets = NULL;
     p_sys->pi_y_offsets = NULL;
     mosaic_ParseSetOffsets( (vlc_object_t *) p_filter, p_sys, psz_offsets );
-    var_Create( p_libvlc_global, CFG_PREFIX "offsets", VLC_VAR_STRING);
-    var_SetString( p_libvlc_global, CFG_PREFIX "offsets", psz_offsets );
-    var_AddCallback( p_libvlc_global, CFG_PREFIX "offsets", MosaicCallback, p_sys );
+    var_AddCallback( p_filter, CFG_PREFIX "offsets", MosaicCallback, p_sys );
 
     /* Bluescreen specific stuff */
     GET_VAR( bsu, 0x00, 0xff );
     GET_VAR( bsv, 0x00, 0xff );
     GET_VAR( bsut, 0x00, 0xff );
     GET_VAR( bsvt, 0x00, 0xff );
-    p_sys->b_bs = var_CreateGetBool( p_filter, CFG_PREFIX "bs" );
-    var_Destroy( p_filter, CFG_PREFIX "bs" );
-    var_Create( p_libvlc_global, CFG_PREFIX "bs", VLC_VAR_INTEGER );
-    var_SetBool( p_libvlc_global, CFG_PREFIX "bs", p_sys->b_bs );
-    var_AddCallback( p_libvlc_global, CFG_PREFIX "bs", MosaicCallback, p_sys );
+    p_sys->b_bs = var_CreateGetBoolCommand( p_filter, CFG_PREFIX "bs" );
+    var_AddCallback( p_filter, CFG_PREFIX "bs", MosaicCallback, p_sys );
     if( p_sys->b_bs && p_sys->b_keep )
     {
         msg_Warn( p_filter, CFG_PREFIX "keep-picture needs to be disabled for"
