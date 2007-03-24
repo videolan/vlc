@@ -55,7 +55,7 @@ Building packages
 =================
 
 To build a Debian package, you need to get the packaging info
-   svn co svn://svn.videolan.org/pkg-multimedia/unstable/vlc/debian debian 
+   svn co svn://svn.debian.org/pkg-multimedia/videolan/vlc/debian debian 
 and then
    dpkg-buildpackage -rfakeroot -us -uc
 
