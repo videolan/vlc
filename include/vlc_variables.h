@@ -501,6 +501,101 @@ static inline char *__var_CreateGetNonEmptyString( vlc_object_t *p_obj,
 #define var_CreateGetNonEmptyString(a,b)   __var_CreateGetNonEmptyString( VLC_OBJECT(a),b)
 
 /**
+ * Create a integer command variable with inherit and get its value.
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+static inline int __var_CreateGetIntegerCommand( vlc_object_t *p_obj, const char *psz_name )
+{
+    __var_Create( p_obj, psz_name, VLC_VAR_INTEGER | VLC_VAR_DOINHERIT
+                                   | VLC_VAR_ISCOMMAND );
+    return __var_GetInteger( p_obj, psz_name );
+}
+
+/**
+ * Create a boolean command variable with inherit and get its value.
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+static inline int __var_CreateGetBoolCommand( vlc_object_t *p_obj, const char *psz_name )
+{
+    __var_Create( p_obj, psz_name, VLC_VAR_BOOL | VLC_VAR_DOINHERIT
+                                   | VLC_VAR_ISCOMMAND );
+    return __var_GetBool( p_obj, psz_name );
+}
+
+/**
+ * Create a time command variable with inherit and get its value.
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+static inline int64_t __var_CreateGetTimeCommand( vlc_object_t *p_obj, const char *psz_name )
+{
+    __var_Create( p_obj, psz_name, VLC_VAR_TIME | VLC_VAR_DOINHERIT
+                                   | VLC_VAR_ISCOMMAND );
+    return __var_GetTime( p_obj, psz_name );
+}
+
+/**
+ * Create a float command variable with inherit and get its value.
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+static inline float __var_CreateGetFloatCommand( vlc_object_t *p_obj, const char *psz_name )
+{
+    __var_Create( p_obj, psz_name, VLC_VAR_FLOAT | VLC_VAR_DOINHERIT
+                                   | VLC_VAR_ISCOMMAND );
+    return __var_GetFloat( p_obj, psz_name );
+}
+
+/**
+ * Create a string command variable with inherit and get its value.
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+static inline char *__var_CreateGetStringCommand( vlc_object_t *p_obj,
+                                           const char *psz_name )
+{
+    __var_Create( p_obj, psz_name, VLC_VAR_STRING | VLC_VAR_DOINHERIT
+                                   | VLC_VAR_ISCOMMAND );
+    return __var_GetString( p_obj, psz_name );
+}
+
+static inline char *__var_CreateGetNonEmptyStringCommand( vlc_object_t *p_obj,
+                                                   const char *psz_name )
+{
+    __var_Create( p_obj, psz_name, VLC_VAR_STRING | VLC_VAR_DOINHERIT
+                                   | VLC_VAR_ISCOMMAND );
+    return __var_GetNonEmptyString( p_obj, psz_name );
+}
+
+/**
+ * __var_CreateGetInteger() with automatic casting
+ */
+#define var_CreateGetIntegerCommand(a,b)   __var_CreateGetIntegerCommand( VLC_OBJECT(a),b)
+/**
+ * __var_CreateGetBoolCommand() with automatic casting
+ */
+#define var_CreateGetBoolCommand(a,b)   __var_CreateGetBoolCommand( VLC_OBJECT(a),b)
+/**
+ * __var_CreateGetTimeCommand() with automatic casting
+ */
+#define var_CreateGetTimeCommand(a,b)   __var_CreateGetTimeCommand( VLC_OBJECT(a),b)
+/**
+ * __var_CreateGetFloat() with automatic casting
+ */
+#define var_CreateGetFloat(a,b)   __var_CreateGetFloat( VLC_OBJECT(a),b)
+/**
+ * __var_CreateGetStringCommand() with automatic casting
+ */
+#define var_CreateGetStringCommand(a,b)   __var_CreateGetStringCommand( VLC_OBJECT(a),b)
+#define var_CreateGetNonEmptyStringCommand(a,b)   __var_CreateGetNonEmptyStringCommand( VLC_OBJECT(a),b)
+/**
  * @}
  */
 
