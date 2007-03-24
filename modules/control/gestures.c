@@ -30,6 +30,7 @@
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 #include <vlc_vout.h>
+#include <vlc_aout.h>
 #include <vlc_playlist.h>
 
 #ifdef HAVE_UNISTD_H
@@ -148,10 +149,12 @@ void E_(Close) ( vlc_object_t *p_this )
 static void RunIntf( intf_thread_t *p_intf )
 {
     playlist_t * p_playlist = NULL;
-    
+
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_sys->p_vout = NULL;
     vlc_mutex_unlock( &p_intf->change_lock );
+
+    input_thread_t * p_input = p_intf->p_sys->p_input;
 
     if( InitThread( p_intf ) < 0 )
     {
@@ -170,10 +173,57 @@ static void RunIntf( intf_thread_t *p_intf )
          */
         if( p_intf->p_sys->b_got_gesture )
         {
+            vlc_value_t val;
+            int i_interval = 0;
             /* Do something */
+            /* If you modify this, please try to follow this convention:
+               Start with LEFT, RIGHT for playback related commands
+               and UP, DOWN, for other commands */
             switch( p_intf->p_sys->i_pattern )
             {
             case LEFT:
+                i_interval = config_GetInt( p_intf , "short-jump-size" );
+                if ( i_interval > 0 ) {
+                    val.i_time = ( (mtime_t)( -i_interval ) * 1000000L);
+                    var_Set( p_intf, "time-offset", val );
+                }
+                msg_Dbg(p_intf, "Go backward in the movie!");
+                break;
+            case RIGHT:
+                i_interval = config_GetInt( p_intf , "short-jump-size" );
+                if ( i_interval > 0 ) {
+                    val.i_time = ( (mtime_t)( i_interval ) * 1000000L);
+                    var_Set( p_intf, "time-offset", val );
+                }
+                msg_Dbg(p_intf, "Go forward in the movie!");
+                break;
+            case GESTURE(LEFT,UP,NONE,NONE):
+                /*FIXME BF*/
+                msg_Dbg(p_intf, "Going slower.");
+                break;
+            case GESTURE(RIGHT,UP,NONE,NONE):
+                /*FIXME FF*/
+                msg_Dbg(p_intf, "Going faster.");
+                break;
+            case GESTURE(LEFT,RIGHT,NONE,NONE):
+            case GESTURE(RIGHT,LEFT,NONE,NONE):
+                val.i_int = PLAYING_S;
+                if( p_input )
+                {
+                    var_Get( p_input, "state", &val);
+                    if( val.i_int == PAUSE_S )
+                    {
+                        val.i_int = PLAYING_S;
+                    }
+                    else
+                    {
+                        val.i_int = PAUSE_S;
+                    }
+                    var_Set( p_input, "state", val);
+                }
+                msg_Dbg(p_intf, "Play/Pause");
+                break;
+            case GESTURE(LEFT,DOWN,NONE,NONE):
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                               FIND_ANYWHERE );
                 if( p_playlist == NULL )
@@ -184,7 +234,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 playlist_Prev( p_playlist );
                 vlc_object_release( p_playlist );
                 break;
-            case RIGHT:
+            case GESTURE(RIGHT,DOWN,NONE,NONE):
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                               FIND_ANYWHERE );
                 if( p_playlist == NULL )
@@ -195,18 +245,124 @@ static void RunIntf( intf_thread_t *p_intf )
                 playlist_Next( p_playlist );
                 vlc_object_release( p_playlist );
                 break;
+            case UP:
+                {
+                    audio_volume_t i_newvol;
+                    aout_VolumeUp( p_intf, 1, &i_newvol );
+                    msg_Dbg(p_intf, "Louder");
+                }
+                break;
+            case DOWN:
+                {
+                    audio_volume_t i_newvol;
+                    aout_VolumeDown( p_intf, 1, &i_newvol );
+                    msg_Dbg(p_intf, "Quieter");
+                }
+                break;
+            case GESTURE(UP,DOWN,NONE,NONE):
+            case GESTURE(DOWN,UP,NONE,NONE):
+                {
+                    audio_volume_t i_newvol = -1;
+                    aout_VolumeMute( p_intf, &i_newvol );
+                    msg_Dbg(p_intf, "Mute sound");
+                }
+                break;
             case GESTURE(UP,RIGHT,NONE,NONE):
+                {
+                   vlc_value_t val, list, list2;
+                   int i_count, i;
+                   var_Get( p_input, "audio-es", &val );
+                   var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
+                               &list, &list2 );
+                   i_count = list.p_list->i_count;
+                   if( i_count <= 1 )
+                   {
+                       continue;
+                   }
+                   for( i = 0; i < i_count; i++ )
+                   {
+                       if( val.i_int == list.p_list->p_values[i].i_int )
+                       {
+                           break;
+                       }
+                   }
+                   /* value of audio-es was not in choices list */
+                   if( i == i_count )
+                   {
+                       msg_Warn( p_input,
+                               "invalid current audio track, selecting 0" );
+                       var_Set( p_input, "audio-es",
+                               list.p_list->p_values[0] );
+                       i = 0;
+                   }
+                   else if( i == i_count - 1 )
+                   {
+                       var_Set( p_input, "audio-es",
+                               list.p_list->p_values[1] );
+                       i = 1;
+                   }
+                   else
+                   {
+                       var_Set( p_input, "audio-es",
+                               list.p_list->p_values[i+1] );
+                       i++;
+                   }
+                }
+                break;
+            case GESTURE(DOWN,RIGHT,NONE,NONE):
+                {
+                    vlc_value_t val, list, list2;
+                    int i_count, i;
+                    var_Get( p_input, "spu-es", &val );
+
+                    var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
+                            &list, &list2 );
+                    i_count = list.p_list->i_count;
+                    if( i_count <= 1 )
+                    {
+                        continue;
+                    }
+                    for( i = 0; i < i_count; i++ )
+                    {
+                        if( val.i_int == list.p_list->p_values[i].i_int )
+                        {
+                            break;
+                        }
+                    }
+                    /* value of spu-es was not in choices list */
+                    if( i == i_count )
+                    {
+                        msg_Warn( p_input,
+                                "invalid current subtitle track, selecting 0" );
+                        var_Set( p_input, "spu-es", list.p_list->p_values[0] );
+                        i = 0;
+                    }
+                    else if( i == i_count - 1 )
+                    {
+                        var_Set( p_input, "spu-es", list.p_list->p_values[0] );
+                        i = 0;
+                    }
+                    else
+                    {
+                        var_Set( p_input, "spu-es", 
+                                list.p_list->p_values[i+1] );
+                        i = i + 1;
+                    }
+                }
+                break;
+            case GESTURE(UP,LEFT,NONE,NONE):
                 if (p_intf->p_sys->p_vout )
                 {
                     ((vout_thread_t *)p_intf->p_sys->p_vout)->i_changes |=
                         VOUT_FULLSCREEN_CHANGE;
                 }
                 break;
-            case GESTURE(DOWN,RIGHT,NONE,NONE):
+            case GESTURE(DOWN,LEFT,NONE,NONE):
                 /* FIXME: Should close the vout!"*/
                 p_intf->p_libvlc->b_die = VLC_TRUE;
                 break;
             case GESTURE(DOWN,LEFT,UP,RIGHT):
+            case GESTURE(UP,RIGHT,DOWN,LEFT):
                 msg_Dbg(p_intf, "a square was drawn!" );
                 break;
             default:
