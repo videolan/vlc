@@ -755,38 +755,39 @@ void __config_ResetAll( vlc_object_t *p_this )
 }
 
 
-static FILE *config_OpenConfigFile (vlc_object_t *obj, const char *mode)
+static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 {
-    static const char subpath[] = DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE;
-    const char *filename = obj->p_libvlc->psz_configfile;
-    const char *homedir;
-    size_t buflen = 0;
+    static const char psz_subpath[] = DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE;
+    const char *psz_filename = p_obj->p_libvlc->psz_configfile;
+    const char *psz_homedir;
+    size_t i_buflen = 0;
+    FILE *p_stream;
 
-    if (filename == NULL)
+    if( psz_filename == NULL )
     {
-        homedir = obj->p_libvlc->psz_homedir;
-        if (homedir == NULL)
+        psz_homedir = p_obj->p_libvlc->psz_homedir;
+        if( psz_homedir == NULL )
         {
-            msg_Err (obj, "no home directory defined");
+            msg_Err( p_obj, "no home directory defined" );
             return NULL;
         }
 
-        buflen = strlen (homedir) + sizeof (subpath);
+        i_buflen = strlen(psz_homedir) + sizeof(psz_subpath) + 1;
     }
 
-    char buf[buflen];
-    if (filename == NULL)
+    char buf[i_buflen];
+    if( psz_filename == NULL )
     {
-        sprintf (buf, "%s%s", homedir, subpath);
-        filename = buf;
+        sprintf( buf, "%s%s", psz_homedir, psz_subpath );
+        psz_filename = buf;
     }
 
-    msg_Dbg (obj, "opening config file (%s)", filename);
-    FILE *stream = utf8_fopen (filename, mode);
-    if ((stream == NULL) && (errno != ENOENT))
-        msg_Err (obj, "cannot open config file (%s): %s", strerror (errno));
+    msg_Dbg( p_obj, "opening config file (%s)", psz_filename );
+    p_stream = utf8_fopen( psz_filename, mode );
+    if( p_stream == NULL && errno != ENOENT )
+        msg_Err( p_obj, "cannot open config file (%s): %s", psz_filename, strerror(errno) );
 
-    return stream;
+    return p_stream;
 }
 
 
