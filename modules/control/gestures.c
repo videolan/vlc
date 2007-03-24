@@ -66,6 +66,7 @@ struct intf_sys_t
 int  E_(Open)   ( vlc_object_t * );
 void E_(Close)  ( vlc_object_t * );
 static int  InitThread     ( intf_thread_t *p_intf );
+static void EndThread      ( intf_thread_t *p_intf );
 static int  MouseEvent     ( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
 
@@ -246,14 +247,7 @@ static void RunIntf( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
     }
 
-    if( p_intf->p_sys->p_vout )
-    {
-        var_DelCallback( p_intf->p_sys->p_vout, "mouse-moved",
-                         MouseEvent, p_intf );
-        var_DelCallback( p_intf->p_sys->p_vout, "mouse-button-down",
-                         MouseEvent, p_intf );
-        vlc_object_release( p_intf->p_sys->p_vout );
-    }
+    EndThread( p_intf );
 }
 
 /*****************************************************************************
@@ -267,6 +261,9 @@ static int InitThread( intf_thread_t * p_intf )
     {
         input_thread_t * p_input;
 
+        /* p_intf->p_sys->p_input references counting strategy:
+         * - InitThread is responsible for only one ref count retaining
+         * - EndThread is responsible for the correspondinf release */
         p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_PARENT );
 
         vlc_mutex_lock( &p_intf->change_lock );
@@ -299,6 +296,26 @@ static int InitThread( intf_thread_t * p_intf )
     else
     {
         return -1;
+    }
+}
+
+/*****************************************************************************
+ * EndThread:
+ *****************************************************************************/
+static void EndThread( intf_thread_t * p_intf )
+{
+    if( p_intf->p_sys->p_vout )
+    {
+        var_DelCallback( p_intf->p_sys->p_vout, "mouse-moved",
+                         MouseEvent, p_intf );
+        var_DelCallback( p_intf->p_sys->p_vout, "mouse-button-down",
+                         MouseEvent, p_intf );
+        vlc_object_release( p_intf->p_sys->p_vout );
+    }
+
+    if( p_intf->p_sys->p_input )
+    {
+        vlc_object_release(p_intf->p_sys->p_input);
     }
 }
 
