@@ -25,11 +25,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#include <vlc/vlc.h>
+
 #include <string.h>                                              /* strdup() */
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <vlc/vlc.h>
 
 #undef iconv_t
 #undef iconv_open
@@ -49,6 +50,9 @@
 #   include <unistd.h>
 #   include <errno.h>
 #   include <sys/wait.h>
+#   include <fcntl.h>
+#   include <sys/socket.h>
+#   include <sys/poll.h>
 #endif
 
 #if defined(WIN32) || defined(UNDER_CE)
@@ -914,128 +918,122 @@ char **vlc_parse_cmdline( const char *psz_cmdline, int *i_args )
  * vlc_execve: Execute an external program with a given environment,
  * wait until it finishes and return its standard output
  *************************************************************************/
-int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
-                  char **ppsz_env, char *psz_cwd, char *p_in, int i_in,
-                  char **pp_data, int *pi_data )
+int __vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
+                  char *const *ppsz_env, const char *psz_cwd,
+                  const char *p_in, size_t i_in,
+                  char **pp_data, size_t *pi_data )
 {
 #ifdef HAVE_FORK
-    int pi_stdin[2];
-    int pi_stdout[2];
-    pid_t i_child_pid;
+# define BUFSIZE 1024
+    int fds[2], i_status;
 
-    pipe( pi_stdin );
-    pipe( pi_stdout );
-
-    if ( (i_child_pid = fork()) == -1 )
-    {
-        msg_Err( p_object, "unable to fork (%s)", strerror(errno) );
+    if (socketpair (AF_LOCAL, SOCK_STREAM, 0, fds))
         return -1;
-    }
 
-    if ( i_child_pid == 0 )
+    pid_t pid = -1;
+    if ((fds[0] > 2) && (fds[1] > 2))
+        pid = fork ();
+
+    switch (pid)
     {
-        close(0);
-        dup(pi_stdin[1]);
-        close(pi_stdin[0]);
+        case -1:
+            msg_Err (p_object, "unable to fork (%s)", strerror (errno));
+            close (fds[0]);
+            close (fds[1]);
+            return -1;
 
-        close(1);
-        dup(pi_stdout[1]);
-        close(pi_stdout[0]);
+        case 0:
+            /* NOTE:
+             * Like it or not, close can fail (and not only with EBADF)
+             */
+            if ((close (0) == 0) && (close (1) == 0) && (close (2) == 0)
+             && (dup (fds[1]) == 0) && (dup (fds[1]) == 1)
+             && (open ("/dev/null", O_RDONLY) == 2)
+             && ((psz_cwd == NULL) || (chdir (psz_cwd) == 0)))
+                execve (ppsz_argv[0], ppsz_argv, ppsz_env);
 
-        close(2);
-
-        if ( psz_cwd != NULL )
-            chdir( psz_cwd );
-        execve( ppsz_argv[0], ppsz_argv, ppsz_env );
-        exit(1);
+            exit (1);
     }
 
-    close(pi_stdin[1]);
-    close(pi_stdout[1]);
-    if ( !i_in )
-        close( pi_stdin[0] );
+    close (fds[1]);
 
     *pi_data = 0;
-    if( *pp_data )
-        free( *pp_data );
+    if (*pp_data)
+        free (*pp_data);
     *pp_data = NULL;
-    *pp_data = malloc( 1025 );  /* +1 for \0 */
-    if( !*pp_data )
-        return -1;
 
-    while ( !p_object->b_die )
+    if (i_in == 0)
+        shutdown (fds[0], SHUT_WR);
+
+    while (!p_object->b_die)
     {
-        int i_ret, i_status;
-        fd_set readfds, writefds;
-        struct timeval tv;
+        struct pollfd ufd[1];
+        memset (ufd, 0, sizeof (ufd));
+        ufd[0].fd = fds[0];
+        ufd[0].events = POLLIN;
 
-        FD_ZERO( &readfds );
-        FD_ZERO( &writefds );
-        FD_SET( pi_stdout[0], &readfds );
-        if ( i_in )
-            FD_SET( pi_stdin[0], &writefds );
+        if (i_in > 0)
+            ufd[0].events |= POLLOUT;
 
-        tv.tv_sec = 0;
-        tv.tv_usec = 10000;
+        if (poll (ufd, 1, 10) <= 0)
+            continue;
 
-        i_ret = select( pi_stdin[0] > pi_stdout[0] ? pi_stdin[0] + 1 :
-                        pi_stdout[0] + 1, &readfds, &writefds, NULL, &tv );
-        if ( i_ret > 0 )
+        if (ufd[0].revents & ~POLLOUT)
         {
-            if ( FD_ISSET( pi_stdout[0], &readfds ) )
-            {
-                ssize_t i_read = read( pi_stdout[0], &(*pp_data)[*pi_data],
-                                       1024 );
-                if ( i_read > 0 )
-                {
-                    *pi_data += i_read;
-                    *pp_data = realloc( *pp_data, *pi_data + 1025 );
-                }
-            }
-            if ( FD_ISSET( pi_stdin[0], &writefds ) )
-            {
-                ssize_t i_write = write( pi_stdin[0], p_in, __MIN(i_in, 1024) );
+            char *ptr = realloc (*pp_data, *pi_data + BUFSIZE + 1);
+            if (ptr == NULL)
+                break; /* safely abort */
 
-                if ( i_write > 0 )
-                {
-                    p_in += i_write;
-                    i_in -= i_write;
-                }
-                if ( !i_in )
-                    close( pi_stdin[0] );
+            *pp_data = ptr;
+
+            ssize_t val = read (fds[0], ptr + *pi_data, BUFSIZE);
+            switch (val)
+            {
+                case -1:
+                case 0:
+                    shutdown (fds[0], SHUT_RD);
+                    break;
+
+                default:
+                    *pi_data += val;
             }
         }
 
-        if ( waitpid( i_child_pid, &i_status, WNOHANG ) == i_child_pid )
+        if (ufd[0].revents & POLLOUT)
         {
-            if ( WIFEXITED( i_status ) )
+            ssize_t val = write (fds[0], p_in, i_in);
+            switch (val)
             {
-                if ( WEXITSTATUS( i_status ) )
-                {
-                    msg_Warn( p_object,
-                              "child %s returned with error code %d",
-                              ppsz_argv[0], WEXITSTATUS( i_status ) );
-                }
-            }
-            else
-            {
-                if ( WIFSIGNALED( i_status ) )
-                {
-                    msg_Warn( p_object,
-                              "child %s quit on signal %d", ppsz_argv[0],
-                              WTERMSIG( i_status ) );
-                }
-            }
-            if ( i_in )
-                close( pi_stdin[0] );
-            close( pi_stdout[0] );
-            break;
-        }
+                case -1:
+                case 0:
+                    i_in = 0;
+                    shutdown (fds[0], SHUT_WR);
+                    break;
 
-        if ( i_ret < 0 && errno != EINTR )
-        {
-            msg_Warn( p_object, "select failed (%s)", strerror(errno) );
+                default:
+                    i_in -= val;
+                    p_in += val;
+            }
         }
+    }
+
+    close (fds[0]);
+
+    while (waitpid (pid, &i_status, 0) == -1);
+
+    if (WIFEXITED (i_status))
+    {
+        i_status = WEXITSTATUS (i_status);
+        if (i_status)
+            msg_Warn (p_object,  "child %s (PID %d) exited with error code %d",
+                      ppsz_argv[0], (int)pid, i_status);
+    }
+    else
+    if (WIFSIGNALED (i_status)) // <-- this should be redumdant a check
+    {
+        i_status = WTERMSIG (i_status);
+        msg_Warn (p_object, "child %s (PID %d) exited on signal %d (%s)",
+                  ppsz_argv[0], (int)pid, i_status, strsignal (i_status));
     }
 
 #elif defined( WIN32 ) && !defined( UNDER_CE )
@@ -1209,6 +1207,9 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char **ppsz_argv,
     return -1;
 
 #endif
+
+    if (*pp_data == NULL)
+        return -1;
 
     (*pp_data)[*pi_data] = '\0';
     return 0;
