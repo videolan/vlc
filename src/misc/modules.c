@@ -428,7 +428,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     module_t *p_module;
 
     int   i_shortcuts = 0;
-    char *psz_shortcuts = NULL, *psz_var = NULL;
+    char *psz_shortcuts = NULL, *psz_var = NULL, *psz_alias = NULL;
     vlc_bool_t b_force_backup = p_this->b_force;
 
 
@@ -523,9 +523,15 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
             {
                 for( unsigned i = 0; p_module->pp_shortcuts[i]; i++ )
                 {
-                    if( !strcasecmp( psz_name, p_module->pp_shortcuts[i] ) )
+                    char *c;
+                    if( ( c = strchr( psz_name, '@' ) )
+                        ? !strncasecmp( psz_name, p_module->pp_shortcuts[i],
+                                        c-psz_name )
+                        : !strcasecmp( psz_name, p_module->pp_shortcuts[i] ) )
                     {
                         /* Found it */
+                        if( c && c[1] )
+                            psz_alias = c+1;
                         i_shortcut_bonus = i_short * 10000;
                         goto found_shortcut;
                     }
@@ -704,6 +710,12 @@ found_shortcut:
     }
     else
         msg_StackSet( VLC_EGENERIC, "no suitable %s module", psz_capability );
+
+    if( psz_alias && !p_this->psz_object_name )
+        /* This assumes that p_this is the object which will be using the
+         * module. That's not always the case ... but it is in most cases.
+         */
+        p_this->psz_object_name = strdup( psz_alias );
 
     if( psz_shortcuts )
     {

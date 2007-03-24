@@ -71,6 +71,7 @@ static int  DumpCommand( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 
 static vlc_object_t * FindObject    ( vlc_object_t *, int, int );
+static vlc_object_t * FindObjectName( vlc_object_t *, const char *, int );
 static void           DetachObject  ( vlc_object_t * );
 static void           PrintObject   ( vlc_object_t *, const char * );
 static void           DumpStructure ( vlc_object_t *, int, char * );
@@ -559,6 +560,60 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
 
 /**
  ****************************************************************************
+ * find a named object and increment its refcount
+ *****************************************************************************
+ * This function recursively looks for a given object name. i_mode can be one
+ * of FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
+ *****************************************************************************/
+void * __vlc_object_find_name( vlc_object_t *p_this, const char *psz_name,
+                               int i_mode )
+{
+    vlc_object_t *p_found;
+
+    vlc_mutex_lock( &structure_lock );
+
+    /* If have the requested name ourselves, don't look further */
+    if( !(i_mode & FIND_STRICT)
+        && p_this->psz_object_name
+        && !strcmp( p_this->psz_object_name, psz_name ) )
+    {
+        p_this->i_refcount++;
+        vlc_mutex_unlock( &structure_lock );
+        return p_this;
+    }
+
+    /* Otherwise, recursively look for the object */
+    if( (i_mode & 0x000f) == FIND_ANYWHERE )
+    {
+        vlc_object_t *p_root = p_this;
+
+        /* Find the root */
+        while( p_root->p_parent != NULL &&
+               p_root != VLC_OBJECT( p_this->p_libvlc ) )
+        {
+            p_root = p_root->p_parent;
+        }
+
+        p_found = FindObjectName( p_root, psz_name,
+                                 (i_mode & ~0x000f)|FIND_CHILD );
+        if( p_found == NULL && p_root != VLC_OBJECT( p_this->p_libvlc ) )
+        {
+            p_found = FindObjectName( VLC_OBJECT( p_this->p_libvlc ),
+                                      psz_name, (i_mode & ~0x000f)|FIND_CHILD );
+        }
+    }
+    else
+    {
+        p_found = FindObjectName( p_this, psz_name, i_mode );
+    }
+
+    vlc_mutex_unlock( &structure_lock );
+
+    return p_found;
+}
+
+/**
+ ****************************************************************************
  * increment an object refcount
  *****************************************************************************/
 void __vlc_object_yield( vlc_object_t *p_this )
@@ -958,6 +1013,61 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
             else if( p_tmp->i_children )
             {
                 p_tmp = FindObject( p_tmp, i_type, i_mode );
+                if( p_tmp )
+                {
+                    return p_tmp;
+                }
+            }
+        }
+        break;
+
+    case FIND_ANYWHERE:
+        /* Handled in vlc_object_find */
+        break;
+    }
+
+    return NULL;
+}
+
+static vlc_object_t * FindObjectName( vlc_object_t *p_this,
+                                      const char *psz_name,
+                                      int i_mode )
+{
+    int i;
+    vlc_object_t *p_tmp;
+
+    switch( i_mode & 0x000f )
+    {
+    case FIND_PARENT:
+        p_tmp = p_this->p_parent;
+        if( p_tmp )
+        {
+            if( p_tmp->psz_object_name
+                && !strcmp( p_tmp->psz_object_name, psz_name ) )
+            {
+                p_tmp->i_refcount++;
+                return p_tmp;
+            }
+            else
+            {
+                return FindObjectName( p_tmp, psz_name, i_mode );
+            }
+        }
+        break;
+
+    case FIND_CHILD:
+        for( i = p_this->i_children; i--; )
+        {
+            p_tmp = p_this->pp_children[i];
+            if( p_tmp->psz_object_name
+                && !strcmp( p_tmp->psz_object_name, psz_name ) )
+            {
+                p_tmp->i_refcount++;
+                return p_tmp;
+            }
+            else if( p_tmp->i_children )
+            {
+                p_tmp = FindObjectName( p_tmp, psz_name, i_mode );
                 if( p_tmp )
                 {
                     return p_tmp;
