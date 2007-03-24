@@ -1171,6 +1171,34 @@ error:
         sout_DeleteInstance( p_input->p->p_sout );
     }
 
+
+    if( !p_input->b_preparsing && p_input->p_libvlc->b_stats )
+    {
+#define EXIT_COUNTER( c ) do { if( p_input->p->counters.p_##c ) \
+                                   stats_CounterClean( p_input->p->counters.p_##c );\
+                               p_input->p->counters.p_##c = NULL; } while(0)
+        EXIT_COUNTER( read_bytes );
+        EXIT_COUNTER( read_packets );
+        EXIT_COUNTER( demux_read );
+        EXIT_COUNTER( input_bitrate );
+        EXIT_COUNTER( demux_bitrate );
+        EXIT_COUNTER( played_abuffers );
+        EXIT_COUNTER( lost_abuffers );
+        EXIT_COUNTER( displayed_pictures );
+        EXIT_COUNTER( lost_pictures );
+        EXIT_COUNTER( decoded_audio );
+        EXIT_COUNTER( decoded_video );
+        EXIT_COUNTER( decoded_sub );
+
+        if( p_input->p->p_sout )
+        {
+            EXIT_COUNTER( sout_sent_packets );
+            EXIT_COUNTER (sout_sent_bytes );
+            EXIT_COUNTER( sout_send_bitrate );
+        }
+#undef EXIT_COUNTER
+    }
+
     /* Mark them deleted */
     p_input->p->input.p_demux = NULL;
     p_input->p->input.p_stream = NULL;
