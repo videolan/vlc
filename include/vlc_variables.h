@@ -589,7 +589,7 @@ static inline char *__var_CreateGetNonEmptyStringCommand( vlc_object_t *p_obj,
 /**
  * __var_CreateGetFloat() with automatic casting
  */
-#define var_CreateGetFloat(a,b)   __var_CreateGetFloat( VLC_OBJECT(a),b)
+#define var_CreateGetFloatCommand(a,b)   __var_CreateGetFloatCommand( VLC_OBJECT(a),b)
 /**
  * __var_CreateGetStringCommand() with automatic casting
  */
