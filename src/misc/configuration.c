@@ -820,7 +820,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
      || memcmp (bom, "\xEF\xBB\xBF", 3))
     {
         convert = FromLocaleDup;
-        rewind (file); // no BOM, rewind
+        rewind (file); /* no BOM, rewind */
     }
 
     module_t *module = NULL;
@@ -829,7 +829,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 
     while (fgets (line, 1024, file) != NULL)
     {
-        // Ignore comments and empty lines
+        /* Ignore comments and empty lines */
         switch (line[0])
         {
             case '#':
@@ -842,10 +842,10 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         {
             char *ptr = strchr (line, ']');
             if (ptr == NULL)
-                continue; // syntax error;
+                continue; /* syntax error; */
             *ptr = '\0';
 
-            // New section ( = a given module)
+            /* New section ( = a given module) */
             strcpy (section, line + 1);
             module = NULL;
 
@@ -857,7 +857,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     module_t *m = (module_t *)p_list->p_values[i].p_object;
 
                     if ((strcmp (section, m->psz_object_name) == 0)
-                     && (m->i_config_items > 0)) // ignore config-less modules
+                     && (m->i_config_items > 0)) /* ignore config-less modules */
                     {
                         module = m;
                         if (psz_module_name != NULL)
@@ -873,7 +873,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         }
 
         if (module == NULL)
-            continue; // no need to parse if there is no matching module
+            continue; /* no need to parse if there is no matching module */
 
         char *ptr = strchr (line, '\n');
         if (ptr != NULL)
@@ -884,7 +884,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 
         ptr = strchr (line, '=');
         if (ptr == NULL)
-            continue; // syntax error
+            continue; /* syntax error */
 
         *ptr = '\0';
         const char *psz_option_value = ptr + 1;
@@ -1486,7 +1486,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
      * Parse the command line options
      */
     opterr = 0;
-    optind = 0; // set to 0 to tell GNU getopt to reinitialize
+    optind = 0; /* set to 0 to tell GNU getopt to reinitialize */
     while( ( i_cmd = getopt_long( *pi_argc, ppsz_argv, psz_shortopts,
                                   p_longopts, &i_index ) ) != -1 )
     {
