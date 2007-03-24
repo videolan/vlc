@@ -142,6 +142,7 @@ int E_(MMSHOpen)( access_t *p_access )
     if( p_sys->url.psz_host == NULL || *p_sys->url.psz_host == '\0' )
     {
         msg_Err( p_access, "invalid host" );
+        vlc_UrlClean( &p_sys->proxy );
         vlc_UrlClean( &p_sys->url );
         free( p_sys );
         return VLC_EGENERIC;
@@ -151,6 +152,7 @@ int E_(MMSHOpen)( access_t *p_access )
 
     if( Describe( p_access, &psz_location ) )
     {
+        vlc_UrlClean( &p_sys->proxy );
         vlc_UrlClean( &p_sys->url );
         free( p_sys );
         return VLC_EGENERIC;
@@ -178,6 +180,7 @@ int E_(MMSHOpen)( access_t *p_access )
     {
         msg_Err( p_access, "cannot start stream" );
         free( p_sys->p_header );
+        vlc_UrlClean( &p_sys->proxy );
         vlc_UrlClean( &p_sys->url );
         free( p_sys );
         return VLC_EGENERIC;
@@ -199,6 +202,12 @@ void E_( MMSHClose )( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
 
     Stop( p_access );
+
+    if( p_sys->p_header )
+        free( p_sys->p_header  );
+
+    vlc_UrlClean( &p_sys->proxy );
+    vlc_UrlClean( &p_sys->url );
     free( p_sys );
 }
 
@@ -695,6 +704,8 @@ static void GetHeader( access_t *p_access )
 
     /* Read the asf header */
     p_sys->i_header = 0;
+    if( p_sys->p_header )
+        free( p_sys->p_header  );
     p_sys->p_header = NULL;
     for( ;; )
     {
