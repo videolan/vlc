@@ -49,6 +49,9 @@ static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
+static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data );
 
 /*****************************************************************************
  * Module descriptor
@@ -104,6 +107,12 @@ static const char *ppsz_filter_options[] = {
  *****************************************************************************/
 struct filter_sys_t
 {
+    double     f_contrast;
+    double     f_brightness;
+    int        i_hue;
+    double     f_saturation;
+    double     f_gamma;
+    vlc_bool_t b_brightness_threshold;
 };
 
 /*****************************************************************************
@@ -114,6 +123,7 @@ struct filter_sys_t
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
 
     /* XXX: we might need to add/remove some FOURCCs ... */
     if(   p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0')
@@ -157,6 +167,7 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
+    p_sys = p_filter->p_sys;
 
     p_filter->pf_video_filter = Filter;
 
@@ -165,18 +176,21 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, "", ppsz_filter_options,
                    p_filter->p_cfg );
 
-    var_Create( p_filter, "contrast",
-                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "brightness",
-                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "hue",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "saturation",
-                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "gamma",
-                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "brightness-threshold",
-                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    p_sys->f_contrast = var_CreateGetFloatCommand( p_filter, "contrast" );
+    p_sys->f_brightness = var_CreateGetFloatCommand( p_filter, "brightness" );
+    p_sys->i_hue = var_CreateGetIntegerCommand( p_filter, "hue" );
+    p_sys->f_saturation = var_CreateGetFloatCommand( p_filter, "saturation" );
+    p_sys->f_gamma = var_CreateGetFloatCommand( p_filter, "gamma" );
+    p_sys->b_brightness_threshold =
+        var_CreateGetBoolCommand( p_filter, "brightness-threshold" );
+
+    var_AddCallback( p_filter, "contrast",   AdjustCallback, p_sys );
+    var_AddCallback( p_filter, "brightness", AdjustCallback, p_sys );
+    var_AddCallback( p_filter, "hue",        AdjustCallback, p_sys );
+    var_AddCallback( p_filter, "saturation", AdjustCallback, p_sys );
+    var_AddCallback( p_filter, "gamma",      AdjustCallback, p_sys );
+    var_AddCallback( p_filter, "brightness-threshold",
+                                             AdjustCallback, p_sys );
 
     return VLC_SUCCESS;
 }
@@ -214,7 +228,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     int32_t i_cont, i_lum;
     int i_sat, i_sin, i_cos, i_x, i_y;
     int i;
-    vlc_value_t val;
+
+    filter_sys_t *p_sys = p_filter->p_sys;
 
     if( !p_pic ) return NULL;
 
@@ -228,18 +243,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
 
     /* Getvariables */
-    var_Get( p_filter, "contrast", &val );
-    i_cont = (int) ( val.f_float * 255 );
-    var_Get( p_filter, "brightness", &val );
-    i_lum = (int) (( val.f_float - 1.0 ) * 255 );
-    var_Get( p_filter, "hue", &val );
-    f_hue = (float) ( val.i_int * M_PI / 180 );
-    var_Get( p_filter, "saturation", &val );
-    i_sat = (int) (val.f_float * 256 );
-    var_Get( p_filter, "gamma", &val );
-    f_gamma = 1.0 / val.f_float;
-    var_Get( p_filter, "brightness-threshold", &val );
-    b_thres = (vlc_bool_t) ( val.b_bool );
+    i_cont = (int)( p_sys->f_contrast * 255 );
+    i_lum = (int)( (p_sys->f_brightness - 1.0)*255 );
+    f_hue = (float)( p_sys->i_hue * M_PI / 180 );
+    i_sat = (int)( p_sys->f_saturation * 256 );
+    f_gamma = 1.0 / p_sys->f_gamma;
+    b_thres = p_sys->b_brightness_threshold;
 
     /*
      * Threshold mode drops out everything about luma, contrast and gamma.
@@ -425,4 +434,27 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         p_pic->pf_release( p_pic );
 
     return p_outpic;
+}
+
+static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *)p_data;
+
+    if( !strcmp( psz_var, "contrast" ) )
+        p_sys->f_contrast = newval.f_float;
+    else if( !strcmp( psz_var, "brightness" ) )
+        p_sys->f_brightness = newval.f_float;
+    else if( !strcmp( psz_var, "hue" ) )
+        p_sys->i_hue = newval.i_int;
+    else if( !strcmp( psz_var, "saturation" ) )
+        p_sys->f_saturation = newval.f_float;
+    else if( !strcmp( psz_var, "gamma" ) )
+        p_sys->f_gamma = newval.f_float;
+    else if( !strcmp( psz_var, "brightness-threshold" ) )
+        p_sys->b_brightness_threshold = newval.b_bool;
+    else
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
