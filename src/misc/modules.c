@@ -711,11 +711,16 @@ found_shortcut:
     else
         msg_StackSet( VLC_EGENERIC, "no suitable %s module", psz_capability );
 
-    if( psz_alias && !p_this->psz_object_name )
+    if( p_module && !p_this->psz_object_name )
+    {
         /* This assumes that p_this is the object which will be using the
          * module. That's not always the case ... but it is in most cases.
          */
-        p_this->psz_object_name = strdup( psz_alias );
+        if( psz_alias )
+            p_this->psz_object_name = strdup( psz_alias );
+        else
+            p_this->psz_object_name = strdup( p_module->psz_object_name );
+    }
 
     if( psz_shortcuts )
     {
