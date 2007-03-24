@@ -214,9 +214,6 @@ static void RunIntf( intf_thread_t *p_intf )
             p_intf->p_sys->b_got_gesture = VLC_FALSE;
         }
 
-
-        vlc_mutex_unlock( &p_intf->change_lock );
-
         /*
          * video output
          */
@@ -243,6 +240,8 @@ static void RunIntf( intf_thread_t *p_intf )
             }
         }
 
+        vlc_mutex_unlock( &p_intf->change_lock );
+
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );
     }
@@ -259,16 +258,19 @@ static int InitThread( intf_thread_t * p_intf )
     /* we might need some locking here */
     if( !intf_ShouldDie( p_intf ) )
     {
-        input_thread_t * p_input;
+        /* p_intf->change_lock locking strategy:
+         * - Every access to p_intf->p_sys are locked threw p_intf->change_lock
+         * - make sure there won't be  cross increment/decrement ref count
+         *   of p_intf->p_sys members p_intf->change_lock should be locked
+         *   during those operations */
+        vlc_mutex_lock( &p_intf->change_lock );
 
         /* p_intf->p_sys->p_input references counting strategy:
          * - InitThread is responsible for only one ref count retaining
          * - EndThread is responsible for the corresponding release */
-        p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_PARENT );
+        p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                                  FIND_PARENT );
 
-        vlc_mutex_lock( &p_intf->change_lock );
-
-        p_intf->p_sys->p_input = p_input;
         p_intf->p_sys->b_got_gesture = VLC_FALSE;
         p_intf->p_sys->b_button_pressed = VLC_FALSE;
         p_intf->p_sys->i_threshold =
@@ -304,6 +306,8 @@ static int InitThread( intf_thread_t * p_intf )
  *****************************************************************************/
 static void EndThread( intf_thread_t * p_intf )
 {
+    vlc_mutex_lock( &p_intf->change_lock );
+
     if( p_intf->p_sys->p_vout )
     {
         var_DelCallback( p_intf->p_sys->p_vout, "mouse-moved",
@@ -317,6 +321,8 @@ static void EndThread( intf_thread_t * p_intf )
     {
         vlc_object_release(p_intf->p_sys->p_input);
     }
+
+    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 /*****************************************************************************
@@ -331,13 +337,15 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     signed int i_horizontal, i_vertical;
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
 
+    vlc_mutex_lock( &p_intf->change_lock );
+
     /* don't process new gestures before the last events are processed */
     if( p_intf->p_sys->b_got_gesture )
     {
+        vlc_mutex_unlock( &p_intf->change_lock );
         return VLC_SUCCESS;
     }
 
-    vlc_mutex_lock( &p_intf->change_lock );
     if( !strcmp(psz_var, "mouse-moved" ) && p_intf->p_sys->b_button_pressed )
     {
         var_Get( p_intf->p_sys->p_vout, "mouse-x", &val );
