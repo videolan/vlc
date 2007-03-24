@@ -263,7 +263,7 @@ static int InitThread( intf_thread_t * p_intf )
 
         /* p_intf->p_sys->p_input references counting strategy:
          * - InitThread is responsible for only one ref count retaining
-         * - EndThread is responsible for the correspondinf release */
+         * - EndThread is responsible for the corresponding release */
         p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_PARENT );
 
         vlc_mutex_lock( &p_intf->change_lock );
