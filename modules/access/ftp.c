@@ -219,7 +219,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
             msg_Err( p_access, "user rejected" );
             intf_UserFatal( p_access, VLC_FALSE, 
                         _("Network interaction failed"), 
-                        _("Your connection attemp to the server was rejected.") );
+                        _("Your connection attempt to the server was rejected.") );
             return -1;
     }
 
@@ -754,7 +754,7 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
                          p_sys->url.psz_path ) < 0 ||
         ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) > 2 )
     {
-        msg_Err( p_access, "cannot retreive file" );
+        msg_Err( p_access, "cannot retrieve file" );
         return VLC_EGENERIC;
     }
 
