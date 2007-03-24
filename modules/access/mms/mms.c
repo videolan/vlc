@@ -57,6 +57,12 @@ static void Close( vlc_object_t * );
 #define BITRATE_LONGTEXT N_( \
     "Select the stream with the maximum bitrate under that limit."  )
 
+#define PROXY_TEXT N_("HTTP proxy")
+#define PROXY_LONGTEXT N_( \
+    "HTTP proxy to be used It must be of the form " \
+    "http://[user[:pass]@]myproxy.mydomain:myport/ ; " \
+    "if empty, the http_proxy environment variable will be tried." )
+
 vlc_module_begin();
     set_shortname( "MMS" );
     set_description( _("Microsoft Media Server (MMS) input") );
@@ -70,6 +76,8 @@ vlc_module_begin();
     add_bool( "mms-all", 0, NULL, ALL_TEXT, ALL_LONGTEXT, VLC_TRUE );
     add_integer( "mms-maxbitrate", 0, NULL, BITRATE_TEXT, BITRATE_LONGTEXT ,
                  VLC_FALSE );
+    add_string( "mmsh-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
+                    VLC_FALSE );
 
     add_shortcut( "mms" );
     add_shortcut( "mmsu" );

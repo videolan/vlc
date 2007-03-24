@@ -24,11 +24,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#define _GNU_SOURCE
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
 #include <vlc_access.h>
 #include "vlc_playlist.h"
+#include "vlc_strings.h"
 
 #include <vlc_network.h>
 #include "vlc_url.h"
@@ -74,6 +76,7 @@ int E_(MMSHOpen)( access_t *p_access )
 {
     access_sys_t    *p_sys;
     char            *psz_location = NULL;
+    char            *psz_proxy;
 
     /* init p_sys */
 
@@ -93,6 +96,46 @@ int E_(MMSHOpen)( access_t *p_access )
     p_sys->i_proto= MMS_PROTO_HTTP;
     p_sys->fd     = -1;
     p_sys->i_start= 0;
+
+    /* Handle proxy */
+    p_sys->b_proxy = VLC_FALSE;
+    memset( &p_sys->proxy, 0, sizeof(p_sys->proxy) );
+
+    /* Check proxy */
+    /* TODO reuse instead http-proxy from http access ? */
+    psz_proxy = var_CreateGetString( p_access, "mmsh-proxy" );
+    if( *psz_proxy )
+    {
+        p_sys->b_proxy = VLC_TRUE;
+        vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
+    }
+#ifdef HAVE_GETENV
+    else
+    {
+        char *psz_proxy = getenv( "http_proxy" );
+        if( psz_proxy && *psz_proxy )
+        {
+            p_sys->b_proxy = VLC_TRUE;
+            vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
+        }
+    }
+#endif
+    free( psz_proxy );
+
+    if( p_sys->b_proxy )
+    {
+       if( p_sys->proxy.psz_host == NULL || *p_sys->proxy.psz_host == '\0' )
+        {
+            msg_Warn( p_access, "invalid proxy host" );
+            vlc_UrlClean( &p_sys->proxy );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+        if( p_sys->proxy.i_port <= 0 )
+            p_sys->proxy.i_port = 80;
+        msg_Dbg( p_access, "Using http proxy %s:%d",
+                 p_sys->proxy.psz_host, p_sys->proxy.i_port );
+    }
 
     /* open a tcp connection */
     vlc_UrlParse( &p_sys->url, p_access->psz_path, 0 );
@@ -433,6 +476,55 @@ static int Reset( access_t *p_access )
     p_sys->i_packet_length = 0;
     return 0;
 }
+
+static int OpenConnection( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    vlc_url_t    srv = p_sys->b_proxy ? p_sys->proxy : p_sys->url;
+
+    if( ( p_sys->fd = net_ConnectTCP( p_access,
+                                      srv.psz_host, srv.i_port ) ) < 0 )
+    {
+        msg_Err( p_access, "cannot connect to %s:%d",
+                 srv.psz_host, srv.i_port );
+        return VLC_EGENERIC;
+    }
+
+    if( p_sys->b_proxy )
+    {
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+                    "GET http://%s:%d%s HTTP/1.0\r\n",
+                    p_sys->url.psz_host, p_sys->url.i_port,
+                    ( p_sys->url.psz_path == NULL || *p_sys->url.psz_path == '\0' ) ? "/" : p_sys->url.psz_path );
+
+        /* Proxy Authentication */
+        if( p_sys->proxy.psz_username && *p_sys->proxy.psz_username )
+        {
+            char *buf;
+            char *b64;
+
+            asprintf( &buf, "%s:%s", p_sys->proxy.psz_username,
+                       p_sys->proxy.psz_password ? p_sys->proxy.psz_password : "" );
+
+            b64 = vlc_b64_encode( buf );
+            free( buf );
+
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+                        "Proxy-Authorization: Basic %s\r\n", b64 );
+            free( b64 );
+        }
+    }
+    else
+    {
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+                    "GET %s HTTP/1.0\r\n"
+                    "Host: %s:%d\r\n",
+                    ( p_sys->url.psz_path == NULL || *p_sys->url.psz_path == '\0' ) ? "/" : p_sys->url.psz_path,
+                    p_sys->url.psz_host, p_sys->url.i_port );
+    }
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Describe:
  *****************************************************************************/
@@ -452,25 +544,14 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     p_sys->p_packet = NULL;
     E_( GenerateGuid )( &p_sys->guid );
 
-    if( ( p_sys->fd = net_ConnectTCP( p_access, p_sys->url.psz_host,
-                                            p_sys->url.i_port ) ) < 0 )
-    {
-        msg_Err( p_access, "cannot connect to %s:%d", p_sys->url.psz_host,
-                 p_sys->url.i_port );
-        goto error;
-    }
+    OpenConnection( p_access );
 
-    /* send first request */
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
-                "GET %s HTTP/1.0\r\n"
                 "Accept: */*\r\n"
                 "User-Agent: "MMSH_USER_AGENT"\r\n"
-                "Host: %s:%d\r\n"
                 "Pragma: no-cache,rate=1.000000,stream-time=0,stream-offset=0:0,request-context=%d,max-duration=0\r\n"
                 "Pragma: xClientGUID={"GUID_FMT"}\r\n"
                 "Connection: Close\r\n",
-                ( p_sys->url.psz_path == NULL || *p_sys->url.psz_path == '\0' ) ? "/" : p_sys->url.psz_path,
-                p_sys->url.psz_host, p_sys->url.i_port,
                 p_sys->i_request_context++,
                 GUID_PRINT( p_sys->guid ) );
 
@@ -646,14 +727,6 @@ static int Start( access_t *p_access, off_t i_pos )
 
     msg_Dbg( p_access, "starting stream" );
 
-    if( ( p_sys->fd = net_ConnectTCP( p_access, p_sys->url.psz_host,
-                                      p_sys->url.i_port ) ) < 0 )
-    {
-        /* should not occur */
-        msg_Err( p_access, "cannot connect to the server" );
-        return VLC_EGENERIC;
-    }
-
     for( i = 1; i < 128; i++ )
     {
         if( p_sys->asfh.stream[i].i_cat == ASF_STREAM_UNKNOWN )
@@ -662,19 +735,17 @@ static int Start( access_t *p_access, off_t i_pos )
         if( p_sys->asfh.stream[i].i_selected )
             i_streams_selected++;
     }
-
     if( i_streams_selected <= 0 )
     {
         msg_Err( p_access, "no stream selected" );
         return VLC_EGENERIC;
     }
+
+    OpenConnection( p_access );
+
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
-                "GET %s HTTP/1.0\r\n"
                 "Accept: */*\r\n"
-                "User-Agent: "MMSH_USER_AGENT"\r\n"
-                "Host: %s:%d\r\n",
-                ( p_sys->url.psz_path == NULL || *p_sys->url.psz_path == '\0' ) ? "/" : p_sys->url.psz_path,
-                p_sys->url.psz_host, p_sys->url.i_port );
+                "User-Agent: "MMSH_USER_AGENT"\r\n" );
     if( p_sys->b_broadcast )
     {
         net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
