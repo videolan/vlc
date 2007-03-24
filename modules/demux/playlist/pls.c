@@ -181,6 +181,8 @@ static int Demux( demux_t *p_demux )
         if( !strncasecmp( psz_key, "file", sizeof("file") -1 ) ||
             !strncasecmp( psz_key, "Ref", sizeof("Ref") -1 ) )
         {
+            if( psz_mrl_orig )
+                free( psz_mrl_orig );
             psz_mrl_orig =
             psz_mrl = E_(ProcessMRL)( psz_value, p_demux->p_sys->psz_prefix );
 
@@ -197,6 +199,8 @@ static int Demux( demux_t *p_demux )
         }
         else if( !strncasecmp( psz_key, "title", sizeof("title") -1 ) )
         {
+            if( psz_name )
+                free( psz_name );
             psz_name = strdup( psz_value );
         }
         else if( !strncasecmp( psz_key, "length", sizeof("length") -1 ) )
