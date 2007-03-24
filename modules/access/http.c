@@ -50,7 +50,7 @@ static void Close( vlc_object_t * );
 
 #define PROXY_TEXT N_("HTTP proxy")
 #define PROXY_LONGTEXT N_( \
-    "HTTP proxy to be usesd It must be of the form " \
+    "HTTP proxy to be used It must be of the form " \
     "http://[user[:pass]@]myproxy.mydomain:myport/ ; " \
     "if empty, the http_proxy environment variable will be tried." )
 
