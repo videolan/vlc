@@ -97,15 +97,11 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
 
 #ifdef IPV6_V6ONLY
     /*
-     * Accepts only IPv6 connections on IPv6 sockets
-     * (and open an IPv4 socket later as well if needed).
-     * Only Linux and FreeBSD can map IPv4 connections on IPv6 sockets,
-     * so this allows for more uniform handling across platforms. Besides,
-     * it makes sure that IPv4 addresses will be printed as w.x.y.z rather
-     * than ::ffff:w.x.y.z
+     * Accepts only IPv6 and IPv4 connections on IPv6 sockets.
+     * If possible, we should open two sockets, but it is not always possible.
      */
     if (family == AF_INET6)
-        setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 1 }, sizeof (int));
+        setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 0 }, sizeof (int));
 #endif
 
 #if defined (WIN32) || defined (UNDER_CE)
@@ -277,7 +273,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         if (p_this->b_die)
         {
 #if defined(WIN32) || defined(UNDER_CE)
-            WSASetLastError(WSAEINTR);
+            WSASetLastError (WSAEINTR);
 #else
             errno = EINTR;
 #endif
@@ -322,7 +318,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
             }
             else
             {
-                if( ufd[i].revents & POLLRDHUP )
+                if (ufd[i].revents & POLLRDHUP)
                     return 0; // EOF, read() would yield 0
             }
 
@@ -350,7 +346,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         if (n == -1)
         {
 #if defined(WIN32) || defined(UNDER_CE)
-            switch (WSAGetLastError())
+            switch (WSAGetLastError ())
             {
                 case WSAEWOULDBLOCK:
                 /* only happens with vs != NULL (SSL) - not really an error */
@@ -381,7 +377,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         p_buf += n;
         i_buflen -= n;
 
-        if( n == 0 || !waitall )
+        if ((n == 0) || !waitall)
             break;
     }
     return i_total;
