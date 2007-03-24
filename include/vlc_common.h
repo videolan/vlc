@@ -1138,7 +1138,7 @@ VLC_EXPORT( size_t, vlc_iconv, ( vlc_iconv_t, const char **, size_t *, char **, 
 VLC_EXPORT( int, vlc_iconv_close, ( vlc_iconv_t ) );
 
 /* execve wrapper (defined in src/extras/libc.c) */
-VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char **pp_argv, char **pp_env, char *psz_cwd, char *p_in, int i_in, char **pp_data, int *pi_data ) );
+VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char *const *pp_argv, char *const *pp_env, const char *psz_cwd, const char *p_in, size_t i_in, char **pp_data, size_t *pi_data ) );
 #define vlc_execve(a,b,c,d,e,f,g,h,i) __vlc_execve(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 
 /*****************************************************************************
