@@ -17,6 +17,10 @@ Important notes:
    - Similarly, "Bookmarks" will be reintroduced in an improved version at a 
      later point
   * The default for --sout-keep has changed. It's now activated by default.
+  * The marq, mosaic and logo commands in the rc interface changed. They
+    now require a target name as their first argument. Example:
+    vlc --sub-filter "marq@test{marquee=Hello}" -I rc <somevideo>
+    You can then use commands like: marq-marquue test Goodbye
 
 Changes:
 --------
