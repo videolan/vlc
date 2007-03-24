@@ -94,7 +94,6 @@ OpenDialog::~OpenDialog()
 
 void OpenDialog::showTab(int i_tab=0)
 {
-    printf ( "%i" , i_tab);
     this->show();
     ui.Tab->setCurrentIndex(i_tab);
 }

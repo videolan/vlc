@@ -149,6 +149,11 @@ void DialogsProvider::mediaInfoDialog()
     MediaInfoDialog::getInstance( p_intf )->toggleVisible();
 }
 
+void DialogsProvider::mediaCodecDialog()
+{
+    MediaInfoDialog::getInstance( p_intf )->showTab( 1 );
+}
+
 void DialogsProvider::bookmarksDialog()
 {
 }
@@ -179,7 +184,7 @@ void DialogsProvider::openCaptureDialog()
 }
 void DialogsProvider::openDialog( int i_tab )
 {
-    OpenDialog::getInstance( p_intf->p_sys->p_mi  , p_intf )->showTab( i_tab );
+    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf )->showTab( i_tab );
 }
 
 void DialogsProvider::PLAppendDialog()
@@ -188,7 +193,6 @@ void DialogsProvider::PLAppendDialog()
 void DialogsProvider::MLAppendDialog()
 {
 }
-
 
 /**** Simple open ****/
 

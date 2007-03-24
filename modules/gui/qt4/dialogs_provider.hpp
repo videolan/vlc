@@ -104,6 +104,7 @@ public slots:
     void playlistDialog();
     void bookmarksDialog();
     void mediaInfoDialog();
+    void mediaCodecDialog();
     void prefsDialog();
     void extendedDialog();
     void messagesDialog();

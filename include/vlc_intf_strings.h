@@ -39,6 +39,7 @@
 /******************* Menus *****************/
 
 #define I_MENU_INFO  N_("Information...")
+#define I_MENU_CODECINFO  N_("Codec Information...")
 #define I_MENU_MSG   N_("Messages...")
 #define I_MENU_EXT   N_("Extended settings...")
 

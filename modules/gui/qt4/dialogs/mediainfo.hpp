@@ -48,6 +48,8 @@ public:
         instance= NULL;
     }
     virtual ~MediaInfoDialog();
+
+    void showTab( int );
     bool need_update;
     void setInput( input_item_t * );
 private:

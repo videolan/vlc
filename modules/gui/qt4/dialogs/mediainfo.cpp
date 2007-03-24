@@ -69,6 +69,12 @@ MediaInfoDialog::~MediaInfoDialog()
     writeSettings( "mediainfo" );
 }
 
+void MediaInfoDialog::showTab(int i_tab=0)
+{
+    this->show();
+    IT->setCurrentIndex(i_tab);
+}
+
 static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {

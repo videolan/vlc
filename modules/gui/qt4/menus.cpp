@@ -181,6 +181,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     }
     DP_SADD( qtr(I_MENU_MSG), "", "", messagesDialog() );
     DP_SADD( qtr(I_MENU_INFO) , "", "", mediaInfoDialog() );
+    DP_SADD( qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog() );
     DP_SADD( qtr(I_MENU_EXT), "","",extendedDialog() );
     if( mi )
     {
