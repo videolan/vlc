@@ -1111,6 +1111,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     if( !file )
     {
         vlc_list_release( p_list );
+        free( p_bigbuffer );
         vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
         return -1;
     }
