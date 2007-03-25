@@ -351,13 +351,15 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     else
     {
         /* continue the parent's filter chain */
-        char *psz_end;
+        char *psz_tmp;
 
-        /* FIXME: use config_ChainParse */
-        psz_end = strchr( ((vout_thread_t *)p_parent)->psz_filter_chain, ':' );
-        if( psz_end && *(psz_end+1) )
-            p_vout->psz_filter_chain = strdup( psz_end+1 );
-        else p_vout->psz_filter_chain = NULL;
+        /* Ugly hack to jump to our configuration chain */
+        p_vout->psz_filter_chain
+            = ((vout_thread_t *)p_parent)->psz_filter_chain;
+        p_vout->psz_filter_chain
+            = config_ChainCreate( &psz_tmp, &p_cfg, p_vout->psz_filter_chain );
+        config_ChainDestroy( p_cfg );
+        free( psz_tmp );
 
         /* Create a video filter2 var ... but don't inherit values */
         var_Create( p_vout, "video-filter", VLC_VAR_STRING );
@@ -387,6 +389,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p_module = module_Need( p_vout,
         ( p_vout->psz_filter_chain && *p_vout->psz_filter_chain ) ?
         "video filter" : "video output", psz_name, 0 );
+    free( psz_name );
 
     if( p_vout->p_module == NULL )
     {
