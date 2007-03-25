@@ -111,7 +111,7 @@ int spu_Init( spu_t *p_spu )
 
     while( psz_parser && *psz_parser )
     {
-        config_chain_t *p_cfg; /* Do we ever need to free this ? */
+        config_chain_t *p_cfg;
         char *psz_name;
 
         psz_parser = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
@@ -138,6 +138,7 @@ int spu_Init( spu_t *p_spu )
         else
         {
             msg_Dbg( p_spu, "no sub filter found" );
+            config_ChainDestroy( p_spu->pp_filter[p_spu->i_filter]->p_cfg );
             vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
             vlc_object_destroy( p_spu->pp_filter[p_spu->i_filter] );
         }
@@ -206,6 +207,7 @@ void spu_Destroy( spu_t *p_spu )
         module_Unneed( p_spu->pp_filter[p_spu->i_filter],
                        p_spu->pp_filter[p_spu->i_filter]->p_module );
         free( p_spu->pp_filter[p_spu->i_filter]->p_owner );
+        config_ChainDestroy( p_spu->pp_filter[p_spu->i_filter]->p_cfg );
         vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
         vlc_object_destroy( p_spu->pp_filter[p_spu->i_filter] );
     }
