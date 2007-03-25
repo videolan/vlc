@@ -963,7 +963,7 @@ static struct
       VIDEO_ES, "BMP Image" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(21<<8)+0) && 0
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+1)
     { VLC_FOURCC('g','i','f',' '), CODEC_ID_GIF,
       VIDEO_ES, "GIF Image" },
 #endif
