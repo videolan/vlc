@@ -292,8 +292,6 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
         switch (poll (ufd, fdc, 500))
         {
             case -1:
-                if( errno == EINTR )
-                    continue;
                 goto error;
 
             case 0: // timeout
@@ -442,8 +440,6 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         switch (val)
         {
             case -1:
-                if( errno == EINTR )
-                    continue;
                msg_Err (p_this, "Write error: %s", net_strerror (net_errno));
                goto out;
 

@@ -103,7 +103,7 @@ int main( int i_argc, char *ppsz_argv[] )
      * Note that we set the signals after the vlc_create call. */
     static const int sigs[] = { SIGINT, SIGHUP, SIGQUIT, SIGTERM };
     /* Ignored signals */
-    static const int ignored[] = { SIGALRM, SIGPIPE };
+    static const int ignored[] = { SIGALRM, SIGPIPE, SIGCHLD };
 
     sigset_t set;
     pthread_t sigth;
