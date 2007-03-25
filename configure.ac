@@ -5385,18 +5385,22 @@ then
     dnl New firefox-1.5 SDK api
     PKG_CHECK_MODULES([FIREFOX], [firefox-plugin],
       [
-        PKG_CHECK_MODULES([MOZILLA_NSPR], [mozilla-nspr],
+        PKG_CHECK_MODULES([FIREFOX_XPCOM], [firefox-xpcom],
           [],
           [
-            PKG_CHECK_MODULES([NSPR], [nspr],
+            PKG_CHECK_MODULES([MOZILLA_NSPR], [mozilla-nspr],
               [],
               [
-                AC_MSG_ERROR([Please install the nspr development tools.])
+                PKG_CHECK_MODULES([NSPR], [nspr],
+                  [],
+                  [
+                    AC_MSG_ERROR([Please install the nspr development tools.])
+                  ]
+                )
               ]
             )
-          ]
-        )
-        CPPFLAGS="${CPPFLAGS_save} ${FIREFOX_CFLAGS} ${MOZILLA_NSPR_CFLAGS} ${NSPR_CFLAGS} ${MOZILLA_CPPFLAGS}"
+          ])
+        CPPFLAGS="${CPPFLAGS_save} ${FIREFOX_CFLAGS} ${FIREFOX_XPCOM_CFLAGS} ${MOZILLA_NSPR_CFLAGS} ${NSPR_CFLAGS} ${MOZILLA_CPPFLAGS}"
         MOZILLA_REQUIRED_HEADERS=1
         AC_CHECK_HEADERS(mozilla-config.h,,MOZILLA_REQUIRED_HEADERS=0)
         AC_CHECK_HEADERS(npapi.h,,MOZILLA_REQUIRED_HEADERS=0)
@@ -5422,7 +5426,7 @@ then
             VLC_ADD_LDFLAGS([mozilla], [${X_LIBS} ${X_PRE_LIBS} -lX11 -lXt])
         fi
         VLC_ADD_CPPFLAGS([mozilla],[${CPPFLAGS}])
-        VLC_ADD_LDFLAGS([mozilla],[${FIREFOX_LIBS} ${MOZILLA_NSPR_LIS} ${NSPR_LIBS} ${MOZILLA_LDFLAGS}])
+        VLC_ADD_LDFLAGS([mozilla],[${FIREFOX_LIBS} ${MOZILLA_NSPR_LIBS} ${NSPR_LIBS} ${MOZILLA_LDFLAGS}])
         VLC_ADD_PLUGINS([mozilla])
         MOZILLA_CONFIG=
         CPPFLAGS="${CPPFLAGS_save}"
