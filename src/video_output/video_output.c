@@ -228,7 +228,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     vout_thread_t  * p_vout;                            /* thread descriptor */
     input_thread_t * p_input_thread;
     int              i_index;                               /* loop variable */
-    char           * psz_plugin = NULL;
     vlc_value_t      val, text;
 
     unsigned int i_width = p_fmt->i_width;
@@ -354,6 +353,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         /* continue the parent's filter chain */
         char *psz_end;
 
+        /* FIXME: use config_ChainParse */
         psz_end = strchr( ((vout_thread_t *)p_parent)->psz_filter_chain, ':' );
         if( psz_end && *(psz_end+1) )
             p_vout->psz_filter_chain = strdup( psz_end+1 );
@@ -373,34 +373,21 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     {
         var_Create( p_vout, "vout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
         var_Get( p_vout, "vout", &val );
-        psz_plugin = val.psz_string;
+        psz_parser = val.psz_string;
     }
-#if 0
     else
     {
-        /* the filter chain is a string list of filters separated by double
-         * colons */
-        char *psz_end;
-
-        psz_end = strchr( p_vout->psz_filter_chain, ':' );
-        if( psz_end )
-            psz_plugin = strndup( p_vout->psz_filter_chain,
-                                  psz_end - p_vout->psz_filter_chain );
-        else psz_plugin = strdup( p_vout->psz_filter_chain );
+        psz_parser = strdup( p_vout->psz_filter_chain );
     }
-#endif
 
     /* Create the vout thread */
-    psz_parser = p_vout->psz_filter_chain;
-    printf("psz_parser: %s\n", psz_parser );
-    psz_parser = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
-    printf("psz_parser: %s\n", psz_parser );
+    config_ChainCreate( &psz_name, &p_cfg, psz_parser );
+    free( psz_parser );
     p_vout->p_cfg = p_cfg;
     p_vout->p_module = module_Need( p_vout,
         ( p_vout->psz_filter_chain && *p_vout->psz_filter_chain ) ?
         "video filter" : "video output", psz_name, 0 );
 
-    if( psz_plugin ) free( psz_plugin );
     if( p_vout->p_module == NULL )
     {
         msg_Err( p_vout, "no suitable vout module" );
