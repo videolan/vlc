@@ -145,13 +145,15 @@ static picture_t *GetNewPicture( decoder_t *p_dec )
     picture_t *p_pic;
     int i_plane;
 
-    p_dec->fmt_out.i_codec =
-        p_sys->p_dirac->seq_params.chroma == format411 ?
-        VLC_FOURCC('I','4','1','1') :
-        p_sys->p_dirac->seq_params.chroma == format420 ?
-        VLC_FOURCC('I','4','2','0') :
-        p_sys->p_dirac->seq_params.chroma == format422 ?
-        VLC_FOURCC('I','4','2','2') : 0;
+    switch( p_sys->p_dirac->seq_params.chroma )
+    {
+    case format420: p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0'); break;
+    case format422: p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','2'); break;
+    case format444: p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','4','4'); break;    // XXX 0.6 ?
+    default:        
+        p_dec->fmt_out.i_codec = 0;
+        break;
+    }
 
     p_dec->fmt_out.video.i_visible_width =
     p_dec->fmt_out.video.i_width = p_sys->p_dirac->seq_params.width;
@@ -160,17 +162,17 @@ static picture_t *GetNewPicture( decoder_t *p_dec )
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
 
     p_dec->fmt_out.video.i_frame_rate =
-        p_sys->p_dirac->seq_params.frame_rate.numerator;
+        p_sys->p_dirac->src_params.frame_rate.numerator;
     p_dec->fmt_out.video.i_frame_rate_base =
-        p_sys->p_dirac->seq_params.frame_rate.denominator;
+        p_sys->p_dirac->src_params.frame_rate.denominator;
 
     /* Get a new picture */
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
 
     if( p_pic == NULL ) return NULL;
+    p_pic->b_progressive = !p_sys->p_dirac->src_params.interlace;
+    p_pic->b_top_field_first = p_sys->p_dirac->src_params.topfieldfirst;
 
-    p_pic->b_progressive = !p_sys->p_dirac->seq_params.interlace;
-    p_pic->b_top_field_first = p_sys->p_dirac->seq_params.topfieldfirst;
     p_pic->i_nb_fields = 2;
 
     /* Copy picture stride by stride */
@@ -252,8 +254,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                      p_sys->p_dirac->seq_params.width,
                      p_sys->p_dirac->seq_params.height,
                      p_sys->p_dirac->seq_params.chroma,
-                     (float)p_sys->p_dirac->seq_params.frame_rate.numerator/
-                     p_sys->p_dirac->seq_params.frame_rate.denominator );
+                     (float)p_sys->p_dirac->src_params.frame_rate.numerator/
+                     p_sys->p_dirac->src_params.frame_rate.denominator );
 
             FreeFrameBuffer( p_sys->p_dirac );
             buf[0] = malloc( p_sys->p_dirac->seq_params.width *
@@ -353,20 +355,18 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
-    /* Initialse the encoder context with the presets for SD576 - Standard
-     * Definition Digital (some parameters will be overwritten later on) */
-    dirac_encoder_context_init( &p_sys->ctx, SD576 );
-
-    /* Override parameters if required */
+    dirac_encoder_context_init( &p_sys->ctx, VIDEO_FORMAT_CUSTOM );
+    /* */
     p_sys->ctx.seq_params.width = p_enc->fmt_in.video.i_width;
     p_sys->ctx.seq_params.height = p_enc->fmt_in.video.i_height;
     p_sys->ctx.seq_params.chroma = format420;
-    p_sys->ctx.seq_params.frame_rate.numerator =
+    /* */
+    p_sys->ctx.src_params.frame_rate.numerator =
         p_enc->fmt_in.video.i_frame_rate;
-    p_sys->ctx.seq_params.frame_rate.denominator =
+    p_sys->ctx.src_params.frame_rate.denominator =
         p_enc->fmt_in.video.i_frame_rate_base;
-    p_sys->ctx.seq_params.interlace = 0;
-    p_sys->ctx.seq_params.topfieldfirst = 0;
+    p_sys->ctx.src_params.interlace = 0;
+    p_sys->ctx.src_params.topfieldfirst = 0;
 
     var_Get( p_enc, ENC_CFG_PREFIX "quality", &val );
     f_quality = val.f_float;
