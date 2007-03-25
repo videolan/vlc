@@ -166,11 +166,6 @@ static void RunIntf( intf_thread_t *p_intf )
 {
     playlist_t * p_playlist = NULL;
 
-    vlc_mutex_lock( &p_intf->change_lock );
-    p_intf->p_sys->p_vout = NULL;
-    vlc_mutex_unlock( &p_intf->change_lock );
-
-
     if( InitThread( p_intf ) < 0 )
     {
         msg_Err( p_intf, "can't initialize interface thread" );
@@ -226,6 +221,9 @@ static void RunIntf( intf_thread_t *p_intf )
                     input_thread_t * p_input;
                     p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                               FIND_ANYWHERE );
+
+                   if( !p_playlist )
+                        break;
 
                     p_input = input_from_playlist( p_playlist );
 
@@ -324,12 +322,16 @@ static void RunIntf( intf_thread_t *p_intf )
                    i_count = list.p_list->i_count;
                    if( i_count <= 1 )
                    {
+                       vlc_object_release( p_input );
+                       vlc_object_release( p_playlist );
                        continue;
                    }
                    for( i = 0; i < i_count; i++ )
                    {
                        if( val.i_int == list.p_list->p_values[i].i_int )
                        {
+                           vlc_object_release( p_input );
+                           vlc_object_release( p_playlist );
                            break;
                        }
                    }
@@ -377,7 +379,6 @@ static void RunIntf( intf_thread_t *p_intf )
                         vlc_object_release( p_playlist );
                         break;
                     }
-                    
                     var_Get( p_input, "spu-es", &val );
 
                     var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
@@ -385,12 +386,16 @@ static void RunIntf( intf_thread_t *p_intf )
                     i_count = list.p_list->i_count;
                     if( i_count <= 1 )
                     {
+                        vlc_object_release( p_input );
+                        vlc_object_release( p_playlist );
                         continue;
                     }
                     for( i = 0; i < i_count; i++ )
                     {
                         if( val.i_int == list.p_list->p_values[i].i_int )
                         {
+                            vlc_object_release( p_input );
+                            vlc_object_release( p_playlist );
                             break;
                         }
                     }
