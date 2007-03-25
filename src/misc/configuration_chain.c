@@ -332,6 +332,9 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                       cfg->psz_name, cfg->psz_value );
             goto next;
         }
+
+        i_type &= 0x00f0;
+
         if( i_type != VLC_VAR_BOOL && cfg->psz_value == NULL )
         {
             msg_Warn( p_this, "missing value for option %s", cfg->psz_name );
@@ -360,7 +363,7 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                 val.psz_string = cfg->psz_value;
                 break;
             default:
-                msg_Warn( p_this, "unhandled config var type" );
+                msg_Warn( p_this, "unhandled config var type (%d)", i_type );
                 memset( &val, 0, sizeof( vlc_value_t ) );
                 break;
         }
