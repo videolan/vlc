@@ -217,11 +217,15 @@ int libvlc_audio_get_channel( libvlc_instance_t *p_instance,
                                 libvlc_exception_t *p_e )
 {
     aout_instance_t *p_aout = GetAOut( p_instance, p_e );
-    vlc_value_t val;
+    if( p_aout )
+    {
+        vlc_value_t val;
 
-    var_Get( p_aout, "audio-channels", &val );
-    vlc_object_release( p_aout );
-    return val.i_int;
+        var_Get( p_aout, "audio-channels", &val );
+        vlc_object_release( p_aout );
+        return val.i_int;
+    }
+    return -1;
 }
 
 /*****************************************************************************
@@ -231,29 +235,32 @@ void libvlc_audio_set_channel( libvlc_instance_t *p_instance, int i_channel,
                                libvlc_exception_t *p_e )
 {
     aout_instance_t *p_aout = GetAOut( p_instance, p_e );
-    vlc_value_t val;
-    int i_ret = -1;
-
-    val.i_int = i_channel;
-    switch( i_channel )
+    if( p_aout )
     {
-        case AOUT_VAR_CHAN_RSTEREO:
-        case AOUT_VAR_CHAN_STEREO:
-        case AOUT_VAR_CHAN_LEFT:
-        case AOUT_VAR_CHAN_RIGHT:
-        case AOUT_VAR_CHAN_DOLBYS:
-            i_ret = var_Set( p_aout, "audio-channels", val );
-            if( i_ret < 0 )
-            {
-                libvlc_exception_raise( p_e, "Failed setting audio channel" );
+        vlc_value_t val;
+        int i_ret = -1;
+
+        val.i_int = i_channel;
+        switch( i_channel )
+        {
+            case AOUT_VAR_CHAN_RSTEREO:
+            case AOUT_VAR_CHAN_STEREO:
+            case AOUT_VAR_CHAN_LEFT:
+            case AOUT_VAR_CHAN_RIGHT:
+            case AOUT_VAR_CHAN_DOLBYS:
+                i_ret = var_Set( p_aout, "audio-channels", val );
+                if( i_ret < 0 )
+                {
+                    libvlc_exception_raise( p_e, "Failed setting audio channel" );
+                    vlc_object_release( p_aout );
+                    return;
+                }
                 vlc_object_release( p_aout );
-                return;
-            }
-            vlc_object_release( p_aout );
-            return; /* Found */
-        default:
-            libvlc_exception_raise( p_e, "Audio channel out of range" );
-            break;
+                return; /* Found */
+            default:
+                libvlc_exception_raise( p_e, "Audio channel out of range" );
+                break;
+        }
+        vlc_object_release( p_aout );
     }
-    vlc_object_release( p_aout );
 }
