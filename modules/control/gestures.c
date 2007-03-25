@@ -110,10 +110,6 @@ int E_(Open) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    vlc_mutex_lock( &p_intf->change_lock );
-    p_intf->p_sys->p_vout = NULL;
-    vlc_mutex_unlock( &p_intf->change_lock );
-
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
@@ -169,6 +165,10 @@ void E_(Close) ( vlc_object_t *p_this )
 static void RunIntf( intf_thread_t *p_intf )
 {
     playlist_t * p_playlist = NULL;
+
+    vlc_mutex_lock( &p_intf->change_lock );
+    p_intf->p_sys->p_vout = NULL;
+    vlc_mutex_unlock( &p_intf->change_lock );
 
     if( InitThread( p_intf ) < 0 )
     {
