@@ -718,7 +718,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     /* Hook used for callback variables */
     p_logo_list->psz_filename =
-        var_CreateGetStringCommand( p_filter->p_libvlc_global , "logo-file" );
+        var_CreateGetStringCommand( p_filter, "logo-file" );
     if( !p_logo_list->psz_filename || !*p_logo_list->psz_filename )
     {
         msg_Err( p_this, "logo file not specified" );
