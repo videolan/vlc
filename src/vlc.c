@@ -101,24 +101,23 @@ int main( int i_argc, char *ppsz_argv[] )
      * and force an unclean shutdown if they are triggered again 2+ seconds
      * later. We have to handle SIGTERM cleanly because of daemon mode.
      * Note that we set the signals after the vlc_create call. */
-    static const int sigs[] = { SIGINT, SIGHUP, SIGQUIT, SIGTERM };
-    /* Ignored signals */
-    static const int ignored[] = { SIGALRM, SIGPIPE, SIGCHLD };
+    static const int exitsigs[] = { SIGINT, SIGHUP, SIGQUIT, SIGTERM };
+    static const int dummysigs[] = { SIGALRM, SIGPIPE, SIGCHLD };
 
     sigset_t set;
     pthread_t sigth;
 
     sigemptyset (&set);
-    for (unsigned i = 0; i < sizeof (sigs) / sizeof (sigs[0]); i++)
-        sigaddset (&set, sigs[i]);
-    for (unsigned i = 0; i < sizeof (ignored) / sizeof (ignored[0]); i++)
-        sigaddset (&set, ignored[i]);
+    for (unsigned i = 0; i < sizeof (exitsigs) / sizeof (exitsigs[0]); i++)
+        sigaddset (&set, exitsigs[i]);
+    for (unsigned i = 0; i < sizeof (dummysigs) / sizeof (dummysigs[0]); i++)
+        sigaddset (&set, dummysigs[i]);
 
     /* Block all these signals */
     pthread_sigmask (SIG_BLOCK, &set, NULL);
 
-    for (unsigned i = 0; i < sizeof (ignored) / sizeof (ignored[0]); i++)
-        sigdelset (&set, ignored[i]);
+    for (unsigned i = 0; i < sizeof (dummysigs) / sizeof (dummysigs[0]); i++)
+        sigdelset (&set, dummysigs[i]);
 
     pthread_create (&sigth, NULL, SigHandler, &set);
 #endif
