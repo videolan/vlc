@@ -329,7 +329,6 @@ static void RunIntf( intf_thread_t *p_intf )
                    {
                        if( val.i_int == list.p_list->p_values[i].i_int )
                        {
-                           vlc_object_release( p_input );
                            break;
                        }
                    }
@@ -389,7 +388,6 @@ static void RunIntf( intf_thread_t *p_intf )
                     {
                         if( val.i_int == list.p_list->p_values[i].i_int )
                         {
-                            vlc_object_release( p_input );
                             break;
                         }
                     }
