@@ -43,7 +43,6 @@
 struct intf_sys_t
 {
     vlc_object_t *      p_vout;
-    input_thread_t *    p_input;
     vlc_bool_t          b_got_gesture;
     vlc_bool_t          b_button_pressed;
     int                 i_mouse_x, i_mouse_y;
@@ -132,6 +131,23 @@ static int gesture( int i_pattern, int i_num )
 }
 
 /*****************************************************************************
+ * input_from_playlist: don't forget to release the return value
+ *  Also this function should really be available from core.
+ *****************************************************************************/
+static input_thread_t * input_from_playlist ( playlist_t *p_playlist )
+{
+    input_thread_t * p_input;
+
+    PL_LOCK; 
+    p_input = p_playlist->p_input; 
+    if( p_input ) 
+        vlc_object_yield( p_input ); 
+    PL_UNLOCK;
+
+    return p_input;
+}
+
+/*****************************************************************************
  * CloseIntf: destroy dummy interface
  *****************************************************************************/
 void E_(Close) ( vlc_object_t *p_this )
@@ -154,7 +170,6 @@ static void RunIntf( intf_thread_t *p_intf )
     p_intf->p_sys->p_vout = NULL;
     vlc_mutex_unlock( &p_intf->change_lock );
 
-    input_thread_t * p_input = p_intf->p_sys->p_input;
 
     if( InitThread( p_intf ) < 0 )
     {
@@ -207,21 +222,37 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
             case GESTURE(LEFT,RIGHT,NONE,NONE):
             case GESTURE(RIGHT,LEFT,NONE,NONE):
-                val.i_int = PLAYING_S;
-                if( p_input )
                 {
-                    var_Get( p_input, "state", &val);
-                    if( val.i_int == PAUSE_S )
+                    input_thread_t * p_input;
+                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                              FIND_ANYWHERE );
+
+                    p_input = input_from_playlist( p_playlist );
+
+                    if( !p_input )
                     {
-                        val.i_int = PLAYING_S;
+                        vlc_object_release( p_playlist );
+                        break;
                     }
-                    else
+                    
+                    val.i_int = PLAYING_S;
+                    if( p_input )
                     {
-                        val.i_int = PAUSE_S;
+                        var_Get( p_input, "state", &val);
+                        if( val.i_int == PAUSE_S )
+                        {
+                            val.i_int = PLAYING_S;
+                        }
+                        else
+                        {
+                            val.i_int = PAUSE_S;
+                        }
+                        var_Set( p_input, "state", val);
                     }
-                    var_Set( p_input, "state", val);
+                    msg_Dbg(p_intf, "Play/Pause");
+                    vlc_object_release( p_input );
+                    vlc_object_release( p_playlist );
                 }
-                msg_Dbg(p_intf, "Play/Pause");
                 break;
             case GESTURE(LEFT,DOWN,NONE,NONE):
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -269,8 +300,24 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
             case GESTURE(UP,RIGHT,NONE,NONE):
                 {
+                   input_thread_t * p_input;
                    vlc_value_t val, list, list2;
                    int i_count, i;
+
+                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                              FIND_ANYWHERE );
+
+                   if( !p_playlist )
+                        break;
+
+                    p_input = input_from_playlist( p_playlist );
+
+                    if( !p_input )
+                    {
+                        vlc_object_release( p_playlist );
+                        break;
+                    }
+
                    var_Get( p_input, "audio-es", &val );
                    var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
                                &list, &list2 );
@@ -307,12 +354,30 @@ static void RunIntf( intf_thread_t *p_intf )
                                list.p_list->p_values[i+1] );
                        i++;
                    }
+                   vlc_object_release( p_input );
+                   vlc_object_release( p_playlist );
                 }
                 break;
             case GESTURE(DOWN,RIGHT,NONE,NONE):
                 {
+                    input_thread_t * p_input;
                     vlc_value_t val, list, list2;
                     int i_count, i;
+
+                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                              FIND_ANYWHERE );
+
+                    if( !p_playlist )
+                        break;
+
+                    p_input = input_from_playlist( p_playlist );
+
+                    if( !p_input )
+                    {
+                        vlc_object_release( p_playlist );
+                        break;
+                    }
+                    
                     var_Get( p_input, "spu-es", &val );
 
                     var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
@@ -348,6 +413,8 @@ static void RunIntf( intf_thread_t *p_intf )
                                 list.p_list->p_values[i+1] );
                         i = i + 1;
                     }
+                    vlc_object_release( p_input );
+                    vlc_object_release( p_playlist );
                 }
                 break;
             case GESTURE(UP,LEFT,NONE,NONE):
@@ -424,12 +491,6 @@ static int InitThread( intf_thread_t * p_intf )
          *   during those operations */
         vlc_mutex_lock( &p_intf->change_lock );
 
-        /* p_intf->p_sys->p_input references counting strategy:
-         * - InitThread is responsible for only one ref count retaining
-         * - EndThread is responsible for the corresponding release */
-        p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-                                                  FIND_PARENT );
-
         p_intf->p_sys->b_got_gesture = VLC_FALSE;
         p_intf->p_sys->b_button_pressed = VLC_FALSE;
         p_intf->p_sys->i_threshold =
@@ -474,11 +535,6 @@ static void EndThread( intf_thread_t * p_intf )
         var_DelCallback( p_intf->p_sys->p_vout, "mouse-button-down",
                          MouseEvent, p_intf );
         vlc_object_release( p_intf->p_sys->p_vout );
-    }
-
-    if( p_intf->p_sys->p_input )
-    {
-        vlc_object_release(p_intf->p_sys->p_input);
     }
 
     vlc_mutex_unlock( &p_intf->change_lock );
