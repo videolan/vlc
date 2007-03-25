@@ -213,12 +213,15 @@ QStringList DialogsProvider::showSimpleOpen(QString help, bool all,
     if( pls ) {
         ADD_FILTER_PLAYLIST( fileTypes );
     }
+    if( subs ) {
+        ADD_FILTER_SUBTITLE( fileTypes );
+    }
     ADD_FILTER_ALL( fileTypes );
     fileTypes.replace(QString(";*"), QString(" *"));
     return QFileDialog::getOpenFileNames( NULL,
                                           help.isNull() ?
                                               qfu(I_OP_SEL_FILES ) : help,
-                                          qfu( p_intf->p_libvlc->psz_homedir ), 
+                                          qfu( p_intf->p_libvlc->psz_homedir ),
                                           fileTypes );
 }
 

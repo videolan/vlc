@@ -53,6 +53,11 @@
     string += " ( ";                 \
     string += EXTENSIONS_PLAYLIST;   \
     string += ");;";
+#define ADD_FILTER_SUBTITLE( string )\
+    string += _("Subtitles Files");   \
+    string += " ( ";                 \
+    string += EXTENSIONS_SUBTITLE;   \
+    string += ");;";
 #define ADD_FILTER_ALL( string )     \
     string += _("All Files");        \
     string += " (*.*)";
@@ -87,7 +92,7 @@ public:
 
     QStringList showSimpleOpen( QString help = QString(), bool all = true,
                                 bool video = true, bool audio = true,
-                                bool subs = true, bool pls = true );
+                                bool subs = false, bool pls = true );
 protected:
     friend class QVLCMenu;
     QSignalMapper *menusMapper;

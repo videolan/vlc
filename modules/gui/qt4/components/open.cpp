@@ -111,7 +111,7 @@ QStringList FileOpenPanel::browse(QString help)
 void FileOpenPanel::browseFile()
 {
     QString fileString = "";
-    foreach( QString file, dialogBox->selectedFiles() ) { 
+    foreach( QString file, dialogBox->selectedFiles() ) {
          fileString += "\"" + file + "\" ";
     }
     ui.fileInput->setEditText( fileString );
@@ -120,7 +120,11 @@ void FileOpenPanel::browseFile()
 
 void FileOpenPanel::browseFileSub()
 {
-    ui.subInput->setEditText( browse( qtr("Open subtitles file") ).join(" ") );
+    // FIXME We shouldn't allow the user to select more than one subtitles file
+    QStringList files = THEDP->showSimpleOpen( qtr("Open subtitles file"),
+                                               false, false, false,
+                                               true, false );
+    ui.subInput->setEditText( files.join(" ") );
     updateMRL();
 }
 
