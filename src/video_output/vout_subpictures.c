@@ -123,7 +123,7 @@ int spu_Init( spu_t *p_spu )
         vlc_object_attach( p_spu->pp_filter[p_spu->i_filter], p_spu );
         p_spu->pp_filter[p_spu->i_filter]->pf_sub_buffer_new = sub_new_buffer;
         p_spu->pp_filter[p_spu->i_filter]->pf_sub_buffer_del = sub_del_buffer;
-        p_spu->pp_filter[p_spu->i_filter]->p_cfg = p_cfg;;
+        p_spu->pp_filter[p_spu->i_filter]->p_cfg = p_cfg;
         p_spu->pp_filter[p_spu->i_filter]->p_module =
             module_Need( p_spu->pp_filter[p_spu->i_filter],
                          "sub filter", psz_name, 0 );
