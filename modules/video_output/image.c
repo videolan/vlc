@@ -76,6 +76,8 @@ static void Display   ( vout_thread_t *, picture_t * );
 static const char *psz_format_list[] = { "png", "jpeg" };
 static const char *psz_format_list_text[] = { "PNG", "JPEG" };
 
+#define CFG_PREFIX "image-out-"
+
 vlc_module_begin( );
     set_shortname( _( "Image file" ) );
     set_description( _( "Image video output" ) );
@@ -83,21 +85,27 @@ vlc_module_begin( );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     set_capability( "video output", 0 );
 
-    add_string( "image-out-format", "png", NULL,  FORMAT_TEXT, FORMAT_LONGTEXT,
-                                                  VLC_FALSE );
+    add_string(  CFG_PREFIX "format", "png", NULL,
+                 FORMAT_TEXT, FORMAT_LONGTEXT, VLC_FALSE );
     change_string_list( psz_format_list, psz_format_list_text, 0 );
-    add_integer( "image-width", -1, NULL,  WIDTH_TEXT, WIDTH_LONGTEXT,
-                                                  VLC_TRUE );
-    add_integer( "image-height", -1, NULL,  HEIGHT_TEXT, HEIGHT_LONGTEXT,
-                                                  VLC_TRUE );
-    add_integer( "image-out-ratio", 3, NULL, RATIO_TEXT, RATIO_LONGTEXT,
-                                                  VLC_FALSE );
-    add_string( "image-out-prefix", "img", NULL, PREFIX_TEXT, PREFIX_LONGTEXT,
-                                                  VLC_FALSE );
-    add_bool( "image-out-replace", 0, NULL, REPLACE_TEXT, REPLACE_LONGTEXT,
-                                                  VLC_FALSE );
+    add_integer( CFG_PREFIX "width", -1, NULL,
+                 WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
+        add_deprecated( "image-width", VLC_FALSE ); /* since 0.9.0 */
+    add_integer( CFG_PREFIX "height", -1, NULL,
+                 HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
+        add_deprecated( "image-height", VLC_FALSE ); /* since 0.9.0 */
+    add_integer( CFG_PREFIX "ratio", 3, NULL,
+                 RATIO_TEXT, RATIO_LONGTEXT, VLC_FALSE );
+    add_string(  CFG_PREFIX "prefix", "img", NULL,
+                 PREFIX_TEXT, PREFIX_LONGTEXT, VLC_FALSE );
+    add_bool(    CFG_PREFIX "replace", 0, NULL,
+                 REPLACE_TEXT, REPLACE_LONGTEXT, VLC_FALSE );
     set_callbacks( Create, Destroy );
 vlc_module_end();
+
+static const char *ppsz_vout_options[] = {
+    "format", "width", "height", "ratio", "prefix", "replace", NULL
+};
 
 /*****************************************************************************
  * vout_sys_t: video output descriptor
@@ -136,22 +144,25 @@ static int Create( vlc_object_t *p_this )
     if( ! p_vout->p_sys )
         return VLC_ENOMEM;
 
+    config_ChainParse( p_vout, CFG_PREFIX, ppsz_vout_options,
+                       p_vout->p_cfg );
+
     p_vout->p_sys->psz_prefix =
-            var_CreateGetString( p_this, "image-out-prefix" );
+            var_CreateGetString( p_this, CFG_PREFIX "prefix" );
     p_vout->p_sys->b_time = strchr( p_vout->p_sys->psz_prefix, '%' )
                             ? VLC_TRUE : VLC_FALSE;
     p_vout->p_sys->b_meta = strchr( p_vout->p_sys->psz_prefix, '$' )
                             ? VLC_TRUE : VLC_FALSE;
     p_vout->p_sys->psz_format =
-            var_CreateGetString( p_this, "image-out-format" );
+            var_CreateGetString( p_this, CFG_PREFIX "format" );
     p_vout->p_sys->i_width =
-            var_CreateGetInteger( p_this, "image-width" );
+            var_CreateGetInteger( p_this, CFG_PREFIX "width" );
     p_vout->p_sys->i_height =
-            var_CreateGetInteger( p_this, "image-height" );
+            var_CreateGetInteger( p_this, CFG_PREFIX "height" );
     p_vout->p_sys->i_ratio =
-            var_CreateGetInteger( p_this, "image-out-ratio" );
+            var_CreateGetInteger( p_this, CFG_PREFIX "ratio" );
     p_vout->p_sys->b_replace =
-            var_CreateGetBool( p_this, "image-out-replace" );
+            var_CreateGetBool( p_this, CFG_PREFIX "replace" );
     p_vout->p_sys->i_current = 0;
     p_vout->p_sys->p_image = image_HandlerCreate( p_vout );
 
