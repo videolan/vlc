@@ -125,8 +125,9 @@ void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value );
 
 /** This function extracts the value for a given argument name
  * from an HTTP request */
-char *E_(ExtractURIValue)( char *psz_uri, const char *psz_name,
-                             char *psz_value, int i_value_max );
+char *E_(ExtractURIValue)( char *restrict psz_uri,
+                           const char *restrict psz_name,
+                           char *restrict psz_value, size_t i_value_max );
 /** \todo Describe this function */
 int E_(TestURIParam)( char *psz_uri, const char *psz_name );
 

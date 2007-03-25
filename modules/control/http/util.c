@@ -719,10 +719,12 @@ int E_(TestURIParam)( char *psz_uri, const char *psz_name )
 
     return VLC_FALSE;
 }
-char *E_(ExtractURIValue)( char *psz_uri, const char *psz_name,
-                             char *psz_value, int i_value_max )
+
+static char *FindURIValue( char *psz_uri, const char *restrict psz_name,
+                           size_t *restrict p_len )
 {
-    char *p = psz_uri;
+    char *p = psz_uri, *end;
+    size_t len;
 
     while( (p = strstr( p, psz_name )) )
     {
@@ -733,48 +735,64 @@ char *E_(ExtractURIValue)( char *psz_uri, const char *psz_name,
         p++;
     }
 
-    if( p )
+    if( p == NULL )
     {
-        int i_len;
+        *p_len = 0;
+        return NULL;
+    }
 
-        p += strlen( psz_name );
-        if( *p == '=' ) p++;
+    p += strlen( psz_name );
+    if( *p == '=' ) p++;
 
-        if( strchr( p, '&' ) )
-        {
-            i_len = strchr( p, '&' ) - p;
-        }
-        else
-        {
-            /* for POST method */
-            if( strchr( p, '\n' ) )
-            {
-                i_len = strchr( p, '\n' ) - p;
-                if( i_len && *(p+i_len-1) == '\r' ) i_len--;
-            }
-            else
-            {
-                i_len = strlen( p );
-            }
-        }
-        i_len = __MIN( i_value_max - 1, i_len );
-        if( i_len > 0 )
-        {
-            strncpy( psz_value, p, i_len );
-            psz_value[i_len] = '\0';
-        }
-        else
-        {
-            strncpy( psz_value, "", i_value_max );
-        }
-        p += i_len;
+    if( ( end = strchr( p, '\n' ) ) != NULL )
+    {
+        /* POST method */
+        if( ( end > p ) && ( end[-1] == '\r' ) )
+            end--;
+
+        len = end - p;
     }
     else
     {
-        strncpy( psz_value, "", i_value_max );
+        /* GET method */
+        if( ( end = strchr( p, '&' ) ) != NULL )
+            len = end - p;
+        else
+            len = strlen( p );
     }
 
+    *p_len = len;
     return p;
+}
+
+char *E_(ExtractURIValue)( char *restrict psz_uri,
+                           const char *restrict psz_name,
+                           char *restrict psz_buf, size_t bufsize )
+{
+    size_t len;
+    char *psz_value = FindURIValue( psz_uri, psz_name, &len );
+    char *psz_next;
+
+    fprintf( stderr, "%s within %s:\n", psz_name, psz_uri );
+    if( psz_value == NULL )
+    {
+        if( bufsize > 0 )
+            *psz_buf = '\0';
+        return NULL;
+    }
+
+    psz_next = psz_value + len;
+
+    if( len >= bufsize )
+        len = bufsize - 1;
+
+    if( len > 0 )
+        strncpy( psz_buf, psz_value, len );
+    if( bufsize > 0 )
+        psz_buf[len] = '\0';
+
+    fprintf( stderr, "%s next %s\n", psz_buf, psz_next );
+    return psz_next;
 }
 
 /* Since the resulting string is smaller we can work in place, so it is
