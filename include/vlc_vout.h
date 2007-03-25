@@ -493,6 +493,9 @@ struct vout_thread_t
 
     /* Misc */
     vlc_bool_t       b_snapshot;     /**< take one snapshot on the next loop */
+
+    /* Video output configuration */
+    config_chain_t *p_cfg;
 };
 
 #define I_OUTPUTPICTURES p_vout->output.i_pictures

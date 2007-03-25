@@ -228,13 +228,17 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     vout_thread_t  * p_vout;                            /* thread descriptor */
     input_thread_t * p_input_thread;
     int              i_index;                               /* loop variable */
-    char           * psz_plugin;
+    char           * psz_plugin = NULL;
     vlc_value_t      val, text;
 
     unsigned int i_width = p_fmt->i_width;
     unsigned int i_height = p_fmt->i_height;
     vlc_fourcc_t i_chroma = p_fmt->i_chroma;
     unsigned int i_aspect = p_fmt->i_aspect;
+
+    config_chain_t *p_cfg;
+    char *psz_parser;
+    char *psz_name;
 
     /* Allocate descriptor */
     p_vout = vlc_object_create( p_parent, VLC_OBJECT_VOUT );
@@ -371,6 +375,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         var_Get( p_vout, "vout", &val );
         psz_plugin = val.psz_string;
     }
+#if 0
     else
     {
         /* the filter chain is a string list of filters separated by double
@@ -383,11 +388,17 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
                                   psz_end - p_vout->psz_filter_chain );
         else psz_plugin = strdup( p_vout->psz_filter_chain );
     }
+#endif
 
     /* Create the vout thread */
+    psz_parser = p_vout->psz_filter_chain;
+    printf("psz_parser: %s\n", psz_parser );
+    psz_parser = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
+    printf("psz_parser: %s\n", psz_parser );
+    p_vout->p_cfg = p_cfg;
     p_vout->p_module = module_Need( p_vout,
         ( p_vout->psz_filter_chain && *p_vout->psz_filter_chain ) ?
-        "video filter" : "video output", psz_plugin, 0 );
+        "video filter" : "video output", psz_name, 0 );
 
     if( psz_plugin ) free( psz_plugin );
     if( p_vout->p_module == NULL )
@@ -490,6 +501,8 @@ void vout_Destroy( vout_thread_t *p_vout )
     var_Destroy( p_vout, "intf-change" );
 
     if( p_vout->psz_filter_chain ) free( p_vout->psz_filter_chain );
+
+    config_ChainDestroy( p_vout->p_cfg );
 
     /* Free structure */
     vlc_object_destroy( p_vout );
