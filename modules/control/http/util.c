@@ -773,7 +773,6 @@ char *E_(ExtractURIValue)( char *restrict psz_uri,
     char *psz_value = FindURIValue( psz_uri, psz_name, &len );
     char *psz_next;
 
-    fprintf( stderr, "%s within %s:\n", psz_name, psz_uri );
     if( psz_value == NULL )
     {
         if( bufsize > 0 )
@@ -791,7 +790,6 @@ char *E_(ExtractURIValue)( char *restrict psz_uri,
     if( bufsize > 0 )
         psz_buf[len] = '\0';
 
-    fprintf( stderr, "%s next %s\n", psz_buf, psz_next );
     return psz_next;
 }
 
