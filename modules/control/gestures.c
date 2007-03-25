@@ -323,7 +323,7 @@ static void RunIntf( intf_thread_t *p_intf )
                    if( i_count <= 1 )
                    {
                        vlc_object_release( p_input );
-                       continue;
+                       break;
                    }
                    for( i = 0; i < i_count; i++ )
                    {
@@ -382,7 +382,7 @@ static void RunIntf( intf_thread_t *p_intf )
                     if( i_count <= 1 )
                     {
                         vlc_object_release( p_input );
-                        continue;
+                        break;
                     }
                     for( i = 0; i < i_count; i++ )
                     {
