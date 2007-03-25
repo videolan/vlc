@@ -226,12 +226,10 @@ static void RunIntf( intf_thread_t *p_intf )
                         break;
 
                     p_input = input_from_playlist( p_playlist );
-
+                    vlc_object_release( p_playlist );
+                    
                     if( !p_input )
-                    {
-                        vlc_object_release( p_playlist );
                         break;
-                    }
                     
                     val.i_int = PLAYING_S;
                     if( p_input )
@@ -249,7 +247,6 @@ static void RunIntf( intf_thread_t *p_intf )
                     }
                     msg_Dbg(p_intf, "Play/Pause");
                     vlc_object_release( p_input );
-                    vlc_object_release( p_playlist );
                 }
                 break;
             case GESTURE(LEFT,DOWN,NONE,NONE):
@@ -310,11 +307,10 @@ static void RunIntf( intf_thread_t *p_intf )
 
                     p_input = input_from_playlist( p_playlist );
 
+                    vlc_object_release( p_playlist );
+
                     if( !p_input )
-                    {
-                        vlc_object_release( p_playlist );
                         break;
-                    }
 
                    var_Get( p_input, "audio-es", &val );
                    var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
@@ -323,7 +319,6 @@ static void RunIntf( intf_thread_t *p_intf )
                    if( i_count <= 1 )
                    {
                        vlc_object_release( p_input );
-                       vlc_object_release( p_playlist );
                        continue;
                    }
                    for( i = 0; i < i_count; i++ )
@@ -331,7 +326,6 @@ static void RunIntf( intf_thread_t *p_intf )
                        if( val.i_int == list.p_list->p_values[i].i_int )
                        {
                            vlc_object_release( p_input );
-                           vlc_object_release( p_playlist );
                            break;
                        }
                    }
@@ -357,7 +351,6 @@ static void RunIntf( intf_thread_t *p_intf )
                        i++;
                    }
                    vlc_object_release( p_input );
-                   vlc_object_release( p_playlist );
                 }
                 break;
             case GESTURE(DOWN,RIGHT,NONE,NONE):
@@ -373,12 +366,11 @@ static void RunIntf( intf_thread_t *p_intf )
                         break;
 
                     p_input = input_from_playlist( p_playlist );
+                    vlc_object_release( p_playlist );
 
                     if( !p_input )
-                    {
-                        vlc_object_release( p_playlist );
                         break;
-                    }
+
                     var_Get( p_input, "spu-es", &val );
 
                     var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
@@ -387,7 +379,6 @@ static void RunIntf( intf_thread_t *p_intf )
                     if( i_count <= 1 )
                     {
                         vlc_object_release( p_input );
-                        vlc_object_release( p_playlist );
                         continue;
                     }
                     for( i = 0; i < i_count; i++ )
@@ -395,7 +386,6 @@ static void RunIntf( intf_thread_t *p_intf )
                         if( val.i_int == list.p_list->p_values[i].i_int )
                         {
                             vlc_object_release( p_input );
-                            vlc_object_release( p_playlist );
                             break;
                         }
                     }
@@ -419,7 +409,6 @@ static void RunIntf( intf_thread_t *p_intf )
                         i = i + 1;
                     }
                     vlc_object_release( p_input );
-                    vlc_object_release( p_playlist );
                 }
                 break;
             case GESTURE(UP,LEFT,NONE,NONE):
