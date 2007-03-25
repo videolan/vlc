@@ -87,6 +87,8 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define ACTIVE_LONGTEXT N_("Comma separated list of active windows, " \
     "defaults to all")
 
+#define CFG_PREFIX "panoramix-"
+
 vlc_module_begin();
     set_description( N_("Panoramix: wall with overlap video filter") );
     set_shortname( _("Panoramix" ));
@@ -94,53 +96,55 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
-    add_integer( "panoramix-cols", -1, NULL, COLS_TEXT, COLS_LONGTEXT, VLC_TRUE );
-    add_integer( "panoramix-rows", -1, NULL, ROWS_TEXT, ROWS_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "cols", -1, NULL,
+                 COLS_TEXT, COLS_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "rows", -1, NULL,
+                 ROWS_TEXT, ROWS_LONGTEXT, VLC_TRUE );
 
 #ifdef OVERLAP
 #define OFFSET_X_TEXT N_("Offset X offset (automatic compensation)")
 #define OFFSET_X_LONGTEXT N_("Select if you want an automatic offset in horizontal (in case of misalignment due to autoratio control)")
-    add_bool( "offset-x", 1, NULL, OFFSET_X_TEXT, OFFSET_X_LONGTEXT, VLC_TRUE );
+    add_bool( CFG_PREFIX "offset-x", 1, NULL, OFFSET_X_TEXT, OFFSET_X_LONGTEXT, VLC_TRUE );
 
 #define LENGTH_TEXT N_("length of the overlapping area (in %)")
 #define LENGTH_LONGTEXT N_("Select in percent the length of the blended zone")
-    add_integer_with_range( "bz-length", 100, 0, 100, NULL, LENGTH_TEXT, LENGTH_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-length", 100, 0, 100, NULL, LENGTH_TEXT, LENGTH_LONGTEXT, VLC_TRUE );
 
 #define HEIGHT_TEXT N_("height of the overlapping area (in %)")
 #define HEIGHT_LONGTEXT N_("Select in percent the height of the blended zone (case of 2x2 wall)")
-    add_integer_with_range( "bz-height", 100, 0, 100, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-height", 100, 0, 100, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
 
 #define ATTENUATION_TEXT N_("Attenuation")
 #define ATTENUATION_LONGTEXT N_("Check this option if you want attenuate blended zone by this plug-in (if option is unchecked, attenuate is made by opengl)")
-    add_bool( "panoramix-attenuate", 1, NULL, ATTENUATION_TEXT, ATTENUATION_LONGTEXT, VLC_FALSE );
+    add_bool( CFG_PREFIX "attenuate", 1, NULL, ATTENUATION_TEXT, ATTENUATION_LONGTEXT, VLC_FALSE );
 
 #define BEGIN_TEXT N_("Attenuation, begin (in %)")
 #define BEGIN_LONGTEXT N_("Select in percent the Lagrange coeff of the beginning blended zone")
-    add_integer_with_range( "bz-begin", 0, 0, 100, NULL, BEGIN_TEXT, BEGIN_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-begin", 0, 0, 100, NULL, BEGIN_TEXT, BEGIN_LONGTEXT, VLC_TRUE );
 
 #define MIDDLE_TEXT N_("Attenuation, middle (in %)")
 #define MIDDLE_LONGTEXT N_("Select in percent the Lagrange coeff of the middle of blended zone")
-    add_integer_with_range( "bz-middle", 50, 0, 100, NULL, MIDDLE_TEXT, MIDDLE_LONGTEXT, VLC_FALSE );
+    add_integer_with_range( CFG_PREFIX "bz-middle", 50, 0, 100, NULL, MIDDLE_TEXT, MIDDLE_LONGTEXT, VLC_FALSE );
 
 #define END_TEXT N_("Attenuation, end (in %)")
 #define END_LONGTEXT N_("Select in percent the Lagrange coeff of the end of blended zone")
-    add_integer_with_range( "bz-end", 100, 0, 100, NULL, END_TEXT, END_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-end", 100, 0, 100, NULL, END_TEXT, END_LONGTEXT, VLC_TRUE );
 
 #define MIDDLE_POS_TEXT N_("middle position (in %)")
 #define MIDDLE_POS_LONGTEXT N_("Select in percent (50 is center) the position of the middle point (Lagrange) of blended zone")
-    add_integer_with_range( "bz-middle-pos", 50, 1, 99, NULL, MIDDLE_POS_TEXT, MIDDLE_POS_LONGTEXT, VLC_FALSE );
+    add_integer_with_range( CFG_PREFIX "bz-middle-pos", 50, 1, 99, NULL, MIDDLE_POS_TEXT, MIDDLE_POS_LONGTEXT, VLC_FALSE );
 #ifdef GAMMA
 #define RGAMMA_TEXT N_("Gamma (Red) correction")
 #define RGAMMA_LONGTEXT N_("Select the gamma for the correction of blended zone (Red or Y component)")
-    add_float_with_range( "bz-gamma-red", 1, 0, 5, NULL, RGAMMA_TEXT, RGAMMA_LONGTEXT, VLC_TRUE );
+    add_float_with_range( CFG_PREFIX "bz-gamma-red", 1, 0, 5, NULL, RGAMMA_TEXT, RGAMMA_LONGTEXT, VLC_TRUE );
 
 #define GGAMMA_TEXT N_("Gamma (Green) correction")
 #define GGAMMA_LONGTEXT N_("Select the gamma for the correction of blended zone (Green or U component)")
-    add_float_with_range( "bz-gamma-green", 1, 0, 5, NULL, GGAMMA_TEXT, GGAMMA_LONGTEXT, VLC_TRUE );
+    add_float_with_range( CFG_PREFIX "bz-gamma-green", 1, 0, 5, NULL, GGAMMA_TEXT, GGAMMA_LONGTEXT, VLC_TRUE );
 
 #define BGAMMA_TEXT N_("Gamma (Blue) correction")
 #define BGAMMA_LONGTEXT N_("Select the gamma for the correction of blended zone (Blue or V component)")
-    add_float_with_range( "bz-gamma-blue", 1, 0, 5, NULL, BGAMMA_TEXT, BGAMMA_LONGTEXT, VLC_TRUE );
+    add_float_with_range( CFG_PREFIX "bz-gamma-blue", 1, 0, 5, NULL, BGAMMA_TEXT, BGAMMA_LONGTEXT, VLC_TRUE );
 #endif
 #define RGAMMA_BC_TEXT N_("Black Crush for Red")
 #define RGAMMA_BC_LONGTEXT N_("Select the Black Crush of blended zone (Red or Y component)")
@@ -169,30 +173,41 @@ vlc_module_begin();
 #define GGAMMA_WL_LONGTEXT N_("Select the White Level of blended zone (Green or U component)")
 #define BGAMMA_WL_TEXT N_("White Level for Blue")
 #define BGAMMA_WL_LONGTEXT N_("Select the White Level of blended zone (Blue or V component)")
-    add_integer_with_range( "bz-blackcrush-red", 140, 0, 255, NULL, RGAMMA_BC_TEXT, RGAMMA_BC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "bz-blackcrush-green", 140, 0, 255, NULL, GGAMMA_BC_TEXT, GGAMMA_BC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "bz-blackcrush-blue", 140, 0, 255, NULL, BGAMMA_BC_TEXT, BGAMMA_BC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "bz-whitecrush-red", 200, 0, 255, NULL, RGAMMA_WC_TEXT, RGAMMA_WC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "bz-whitecrush-green", 200, 0, 255, NULL, GGAMMA_WC_TEXT, GGAMMA_WC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "bz-whitecrush-blue", 200, 0, 255, NULL, BGAMMA_WC_TEXT, BGAMMA_WC_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "bz-blacklevel-red", 150, 0, 255, NULL, RGAMMA_BL_TEXT, RGAMMA_BL_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "bz-blacklevel-green", 150, 0, 255, NULL, GGAMMA_BL_TEXT, GGAMMA_BL_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "bz-blacklevel-blue", 150, 0, 255, NULL, BGAMMA_BL_TEXT, BGAMMA_BL_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "bz-whitelevel-red", 0, 0, 255, NULL, RGAMMA_WL_TEXT, RGAMMA_WL_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "bz-whitelevel-green", 0, 0, 255, NULL, GGAMMA_WL_TEXT, GGAMMA_WL_LONGTEXT, VLC_TRUE );
-    add_integer_with_range( "bz-whitelevel-blue", 0, 0, 255, NULL, BGAMMA_WL_TEXT, BGAMMA_WL_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-blackcrush-red", 140, 0, 255, NULL, RGAMMA_BC_TEXT, RGAMMA_BC_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-blackcrush-green", 140, 0, 255, NULL, GGAMMA_BC_TEXT, GGAMMA_BC_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-blackcrush-blue", 140, 0, 255, NULL, BGAMMA_BC_TEXT, BGAMMA_BC_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-whitecrush-red", 200, 0, 255, NULL, RGAMMA_WC_TEXT, RGAMMA_WC_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-whitecrush-green", 200, 0, 255, NULL, GGAMMA_WC_TEXT, GGAMMA_WC_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-whitecrush-blue", 200, 0, 255, NULL, BGAMMA_WC_TEXT, BGAMMA_WC_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-blacklevel-red", 150, 0, 255, NULL, RGAMMA_BL_TEXT, RGAMMA_BL_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-blacklevel-green", 150, 0, 255, NULL, GGAMMA_BL_TEXT, GGAMMA_BL_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-blacklevel-blue", 150, 0, 255, NULL, BGAMMA_BL_TEXT, BGAMMA_BL_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-whitelevel-red", 0, 0, 255, NULL, RGAMMA_WL_TEXT, RGAMMA_WL_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-whitelevel-green", 0, 0, 255, NULL, GGAMMA_WL_TEXT, GGAMMA_WL_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( CFG_PREFIX "bz-whitelevel-blue", 0, 0, 255, NULL, BGAMMA_WL_TEXT, BGAMMA_WL_LONGTEXT, VLC_TRUE );
 #ifndef SYS_MINGW32
 #define XINERAMA_TEXT N_("Xinerama option")
 #define XINERAMA_LONGTEXT N_("Uncheck if you have not used xinerama")
-    add_bool( "xinerama", 1, NULL, XINERAMA_TEXT, XINERAMA_LONGTEXT, VLC_TRUE );
+    add_bool( CFG_PREFIX "xinerama", 1, NULL, XINERAMA_TEXT, XINERAMA_LONGTEXT, VLC_TRUE );
 #endif
 #endif
 
-    add_string( "wall-active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT, VLC_TRUE );
+    add_string( CFG_PREFIX "active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT, VLC_TRUE );
 
     add_shortcut( "panoramix" );
     set_callbacks( Create, Destroy );
 vlc_module_end();
+
+static const char *ppsz_filter_options[] = {
+    "cols", "rows", "offset-x", "bz-length", "bz-height", "attenuate",
+    "bz-begin", "bz-middle", "bz-end", "bz-middle-pos", "bz-gamma-red",
+    "bz-gamma-green", "bz-gamma-blue", "bz-blackcrush-red",
+    "bz-blackcrush-green", "bz-blackcrush-blue", "bz-whitecrush-red",
+    "bz-whitecrush-green", "bz-whitecrush-blue", "bz-blacklevel-red",
+    "bz-blacklevel-green", "bz-blacklevel-blue", "bz-whitelevel-red",
+    "bz-whitelevel-green", "bz-whitelevel-blue", "xinerama", "active",
+    NULL
+};
 
 /*****************************************************************************
  * vout_sys_t: Wall video output method descriptor
@@ -335,9 +350,12 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
     p_vout->pf_display = NULL;
     p_vout->pf_control = Control;
 
+    config_ChainParse( p_vout, CFG_PREFIX, ppsz_filter_options,
+                       p_vout->p_cfg );
+
     /* Look what method was requested */
-    p_vout->p_sys->i_col = var_CreateGetInteger( p_vout, "panoramix-cols" );
-    p_vout->p_sys->i_row = var_CreateGetInteger( p_vout, "panoramix-rows" );
+    p_vout->p_sys->i_col = var_CreateGetInteger( p_vout, CFG_PREFIX "cols" );
+    p_vout->p_sys->i_row = var_CreateGetInteger( p_vout, CFG_PREFIX "rows" );
 
 // OS dependant code :  Autodetect number of displays in wall
 #ifdef SYS_MINGW32
@@ -360,41 +378,41 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
                 p_vout->p_sys->i_row = 1;
             }
         }
-        var_SetInteger( p_vout, "panoramix-cols", p_vout->p_sys->i_col);
-        var_SetInteger( p_vout, "panoramix-rows", p_vout->p_sys->i_row);
+        var_SetInteger( p_vout, CFG_PREFIX "cols", p_vout->p_sys->i_col);
+        var_SetInteger( p_vout, CFG_PREFIX "rows", p_vout->p_sys->i_row);
     }
 #endif
 
 #ifdef OVERLAP
-    p_vout->p_sys->i_offset_x = var_CreateGetInteger( p_vout, "offset-x" );
+    p_vout->p_sys->i_offset_x = var_CreateGetInteger( p_vout, CFG_PREFIX "offset-x" );
     if (p_vout->p_sys->i_col > 2) p_vout->p_sys->i_offset_x = 0; // offset-x is used in case of 2x1 wall & autocrop
     p_vout->p_sys->b_autocrop = !(var_CreateGetInteger( p_vout, "crop-ratio" ) == 0);
-    if (!p_vout->p_sys->b_autocrop) p_vout->p_sys->b_autocrop = var_CreateGetInteger( p_vout, "autocrop" );		
-    p_vout->p_sys->b_attenuate = var_CreateGetInteger( p_vout, "panoramix-attenuate");
-    p_vout->p_sys->bz_length = var_CreateGetInteger( p_vout, "bz-length" );
+    if (!p_vout->p_sys->b_autocrop) p_vout->p_sys->b_autocrop = var_CreateGetInteger( p_vout, "autocrop" );
+    p_vout->p_sys->b_attenuate = var_CreateGetInteger( p_vout, CFG_PREFIX "attenuate");
+    p_vout->p_sys->bz_length = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-length" );
     if (p_vout->p_sys->i_row > 1)
-        p_vout->p_sys->bz_height = var_CreateGetInteger( p_vout, "bz-height" );
+        p_vout->p_sys->bz_height = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-height" );
     else
         p_vout->p_sys->bz_height = 100;
-    p_vout->p_sys->bz_begin = var_CreateGetInteger( p_vout, "bz-begin" );
-    p_vout->p_sys->bz_middle = var_CreateGetInteger( p_vout, "bz-middle" );
-    p_vout->p_sys->bz_end = var_CreateGetInteger( p_vout, "bz-end" );
-    p_vout->p_sys->bz_middle_pos = var_CreateGetInteger( p_vout, "bz-middle-pos" );
+    p_vout->p_sys->bz_begin = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-begin" );
+    p_vout->p_sys->bz_middle = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-middle" );
+    p_vout->p_sys->bz_end = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-end" );
+    p_vout->p_sys->bz_middle_pos = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-middle-pos" );
     double d_p = 100.0 / p_vout->p_sys->bz_middle_pos;
     p_vout->p_sys->i_ratio_max = var_CreateGetInteger( p_vout, "autocrop-ratio-max" ); // in crop module with autocrop ...
-    p_vout->p_sys->i_ratio = var_CreateGetInteger( p_vout, "crop-ratio" ); // in crop module with manual ratio ...	
+    p_vout->p_sys->i_ratio = var_CreateGetInteger( p_vout, "crop-ratio" ); // in crop module with manual ratio ...
 
     p_vout->p_sys->a_2 = d_p * p_vout->p_sys->bz_begin - (double)(d_p * d_p / (d_p - 1)) * p_vout->p_sys->bz_middle + (double)(d_p / (d_p - 1)) * p_vout->p_sys->bz_end;
     p_vout->p_sys->a_1 = -(d_p + 1) * p_vout->p_sys->bz_begin + (double)(d_p * d_p / (d_p - 1)) * p_vout->p_sys->bz_middle - (double)(1 / (d_p - 1)) * p_vout->p_sys->bz_end;
     p_vout->p_sys->a_0 =  p_vout->p_sys->bz_begin;
 
 #ifdef GAMMA
-    p_vout->p_sys->f_gamma_red = var_CreateGetFloat( p_vout, "bz-gamma-red" );
-    p_vout->p_sys->f_gamma_green = var_CreateGetFloat( p_vout, "bz-gamma-green" );
-    p_vout->p_sys->f_gamma_blue = var_CreateGetFloat( p_vout, "bz-gamma-blue" );
+    p_vout->p_sys->f_gamma_red = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-red" );
+    p_vout->p_sys->f_gamma_green = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-green" );
+    p_vout->p_sys->f_gamma_blue = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-blue" );
 #endif
 #ifndef SYS_MINGW32
-    p_vout->p_sys->b_xinerama= var_CreateGetInteger( p_vout, "xinerama" );
+    p_vout->p_sys->b_xinerama= var_CreateGetInteger( p_vout, CFG_PREFIX "xinerama" );
 #endif
 #else
     p_vout->p_sys->i_col = __MAX( 1, __MIN( 15, p_vout->p_sys->i_col ) );
@@ -414,7 +432,8 @@ case VLC_FOURCC('c','y','u','v'):    // packed by 2
         return VLC_ENOMEM;
     }
 
-    psz_method_tmp = psz_method = config_GetPsz( p_vout, "wall-active" );
+    psz_method_tmp =
+    psz_method = var_CreateGetNonEmptyString( p_vout, CFG_PREFIX "active" );
 
     /* If no trailing vout are specified, take them all */
     if( psz_method == NULL )
@@ -538,18 +557,18 @@ static int AdjustHeight( vout_thread_t *p_vout )
             i_window_height = GetSystemMetrics(SM_CYSCREEN);
 #else
             Display *p_display = XOpenDisplay( "" );
-	        if (p_vout->p_sys->b_xinerama)
-	        {
-	            i_window_width = DisplayWidth(p_display, 0) / p_vout->p_sys->i_col;
-	            i_window_height = DisplayHeight(p_display, 0) / p_vout->p_sys->i_row;
-	         }
-	        else
-	        {
-	            i_window_width = DisplayWidth(p_display, 0);
-	            i_window_height = DisplayHeight(p_display, 0);
-	        }
-	       	XCloseDisplay( p_display );
-	       	free(p_display);
+            if (p_vout->p_sys->b_xinerama)
+            {
+                i_window_width = DisplayWidth(p_display, 0) / p_vout->p_sys->i_col;
+                i_window_height = DisplayHeight(p_display, 0) / p_vout->p_sys->i_row;
+             }
+            else
+            {
+                i_window_width = DisplayWidth(p_display, 0);
+                i_window_height = DisplayHeight(p_display, 0);
+            }
+               XCloseDisplay( p_display );
+               free(p_display);
 #endif
         var_SetInteger( p_vout, "width", i_window_width);
         var_SetInteger( p_vout, "height", i_window_height);
@@ -629,7 +648,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 #ifdef OVERLAP
     p_vout->p_sys->b_has_changed = p_vout->p_sys->b_attenuate;
-	int i_video_x = var_GetInteger( p_vout, "video-x");
+    int i_video_x = var_GetInteger( p_vout, "video-x");
     int i_video_y = var_GetInteger( p_vout, "video-y");
 #ifdef GAMMA
     if (p_vout->p_sys->b_attenuate)
@@ -640,21 +659,21 @@ static int Init( vout_thread_t *p_vout )
         float    f_BlackLevel[VOUT_MAX_PLANES];
         float    f_WhiteCrush[VOUT_MAX_PLANES];
         float    f_WhiteLevel[VOUT_MAX_PLANES];
-        p_vout->p_sys->f_gamma[0] = var_CreateGetFloat( p_vout, "bz-gamma-red" );
-        p_vout->p_sys->f_gamma[1] = var_CreateGetFloat( p_vout, "bz-gamma-green" );
-        p_vout->p_sys->f_gamma[2] = var_CreateGetFloat( p_vout, "bz-gamma-blue" );
-        f_BlackCrush[0] = var_CreateGetInteger( p_vout, "bz-blackcrush-red" ) / 255.0;
-        f_BlackCrush[1] = var_CreateGetInteger( p_vout, "bz-blackcrush-green" ) / 255.0;
-        f_BlackCrush[2] = var_CreateGetInteger( p_vout, "bz-blackcrush-blue" ) / 255.0;
-        f_WhiteCrush[0] = var_CreateGetInteger( p_vout, "bz-whitecrush-red" ) / 255.0;
-        f_WhiteCrush[1] = var_CreateGetInteger( p_vout, "bz-whitecrush-green" ) / 255.0;
-        f_WhiteCrush[2] = var_CreateGetInteger( p_vout, "bz-whitecrush-blue" ) / 255.0;
-        f_BlackLevel[0] = var_CreateGetInteger( p_vout, "bz-blacklevel-red" ) / 255.0;
-        f_BlackLevel[1] = var_CreateGetInteger( p_vout, "bz-blacklevel-green" ) / 255.0;
-        f_BlackLevel[2] = var_CreateGetInteger( p_vout, "bz-blacklevel-blue" ) / 255.0;
-        f_WhiteLevel[0] = var_CreateGetInteger( p_vout, "bz-whitelevel-red" ) / 255.0;
-        f_WhiteLevel[1] = var_CreateGetInteger( p_vout, "bz-whitelevel-green" ) / 255.0;
-        f_WhiteLevel[2] = var_CreateGetInteger( p_vout, "bz-whitelevel-blue" ) / 255.0;
+        p_vout->p_sys->f_gamma[0] = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-red" );
+        p_vout->p_sys->f_gamma[1] = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-green" );
+        p_vout->p_sys->f_gamma[2] = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-blue" );
+        f_BlackCrush[0] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blackcrush-red" ) / 255.0;
+        f_BlackCrush[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blackcrush-green" ) / 255.0;
+        f_BlackCrush[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blackcrush-blue" ) / 255.0;
+        f_WhiteCrush[0] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitecrush-red" ) / 255.0;
+        f_WhiteCrush[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitecrush-green" ) / 255.0;
+        f_WhiteCrush[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitecrush-blue" ) / 255.0;
+        f_BlackLevel[0] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blacklevel-red" ) / 255.0;
+        f_BlackLevel[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blacklevel-green" ) / 255.0;
+        f_BlackLevel[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blacklevel-blue" ) / 255.0;
+        f_WhiteLevel[0] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitelevel-red" ) / 255.0;
+        f_WhiteLevel[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitelevel-green" ) / 255.0;
+        f_WhiteLevel[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitelevel-blue" ) / 255.0;
         switch (p_vout->render.i_chroma)
         {
         // planar YVU
@@ -665,16 +684,16 @@ static int Init( vout_thread_t *p_vout )
             case VLC_FOURCC('U','Y','N','V'):    // packed by 2
             case VLC_FOURCC('Y','4','2','2'):    // packed by 2
     //        case VLC_FOURCC('c','y','u','v'):    // packed by 2
-                p_vout->p_sys->f_gamma[2] = var_CreateGetFloat( p_vout, "bz-gamma-green" );
-                p_vout->p_sys->f_gamma[1] = var_CreateGetFloat( p_vout, "bz-gamma-blue" );
-                f_BlackCrush[2] = var_CreateGetInteger( p_vout, "bz-blackcrush-green" ) / 255.0;
-                f_BlackCrush[1] = var_CreateGetInteger( p_vout, "bz-blackcrush-blue" ) / 255.0;
-                f_WhiteCrush[2] = var_CreateGetInteger( p_vout, "bz-whitecrush-green" ) / 255.0;
-                f_WhiteCrush[1] = var_CreateGetInteger( p_vout, "bz-whitecrush-blue" ) / 255.0;
-                f_BlackLevel[2] = var_CreateGetInteger( p_vout, "bz-blacklevel-green" ) / 255.0;
-                f_BlackLevel[1] = var_CreateGetInteger( p_vout, "bz-blacklevel-blue" ) / 255.0;
-                f_WhiteLevel[2] = var_CreateGetInteger( p_vout, "bz-whitelevel-green" ) / 255.0;
-                f_WhiteLevel[1] = var_CreateGetInteger( p_vout, "bz-whitelevel-blue" ) / 255.0;
+                p_vout->p_sys->f_gamma[2] = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-green" );
+                p_vout->p_sys->f_gamma[1] = var_CreateGetFloat( p_vout, CFG_PREFIX "bz-gamma-blue" );
+                f_BlackCrush[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blackcrush-green" ) / 255.0;
+                f_BlackCrush[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blackcrush-blue" ) / 255.0;
+                f_WhiteCrush[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitecrush-green" ) / 255.0;
+                f_WhiteCrush[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitecrush-blue" ) / 255.0;
+                f_BlackLevel[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blacklevel-green" ) / 255.0;
+                f_BlackLevel[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-blacklevel-blue" ) / 255.0;
+                f_WhiteLevel[2] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitelevel-green" ) / 255.0;
+                f_WhiteLevel[1] = var_CreateGetInteger( p_vout, CFG_PREFIX "bz-whitelevel-blue" ) / 255.0;
         // planar YUV
             case VLC_FOURCC('I','4','4','4'):
             case VLC_FOURCC('I','4','2','2'):

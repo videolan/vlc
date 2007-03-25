@@ -63,6 +63,8 @@ static int  MouseEvent   ( vlc_object_t *, char const *,
 #define BLACKSLOT_TEXT N_("Make one tile a black slot")
 #define BLACKSLOT_LONGTEXT N_("Make one slot black. Other tiles can only be swapped with the black slot.")
 
+#define CFG_PREFIX "puzzle-"
+
 vlc_module_begin();
     set_description( _("Puzzle interactive game video filter") );
     set_shortname( _( "Puzzle" ));
@@ -70,15 +72,19 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
-    add_integer_with_range( "puzzle-rows", 4, 1, 128, NULL,
+    add_integer_with_range( CFG_PREFIX "rows", 4, 1, 128, NULL,
                             ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
-    add_integer_with_range( "puzzle-cols", 4, 1, 128, NULL,
+    add_integer_with_range( CFG_PREFIX "cols", 4, 1, 128, NULL,
                             COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
-    add_bool( "puzzle-black-slot", 0, NULL,
+    add_bool( CFG_PREFIX "black-slot", 0, NULL,
               BLACKSLOT_TEXT, BLACKSLOT_LONGTEXT, VLC_FALSE );
 
     set_callbacks( Create, Destroy );
 vlc_module_end();
+
+static const char *ppsz_filter_options[] = {
+    "rows", "cols", "black-slot", NULL
+};
 
 /*****************************************************************************
  * vout_sys_t: Magnify video output method descriptor
@@ -199,9 +205,13 @@ static int Create( vlc_object_t *p_this )
 
     p_vout->p_sys->p_image = image_HandlerCreate( p_vout );
 
-    p_vout->p_sys->i_rows = config_GetInt( p_vout, "puzzle-rows" );
-    p_vout->p_sys->i_cols = config_GetInt( p_vout, "puzzle-cols" );
-    p_vout->p_sys->b_blackslot = config_GetInt( p_vout, "puzzle-black-slot" );
+    config_ChainParse( p_vout, CFG_PREFIX, ppsz_filter_options,
+                       p_vout->p_cfg );
+
+    p_vout->p_sys->i_rows = var_CreateGetInteger( p_vout, CFG_PREFIX "rows" );
+    p_vout->p_sys->i_cols = var_CreateGetInteger( p_vout, CFG_PREFIX "cols" );
+    p_vout->p_sys->b_blackslot =
+                      var_CreateGetInteger( p_vout, CFG_PREFIX "black-slot" );
 
     p_vout->p_sys->pi_order = NULL;
     shuffle( p_vout->p_sys );

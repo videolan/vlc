@@ -304,7 +304,6 @@ static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t *p_sys;
-    vlc_value_t val;
     logo_list_t *p_logo_list;
 
     /* Allocate structure */
@@ -329,22 +328,25 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_display = NULL;
     p_vout->pf_control = Control;
 
-    p_logo_list->psz_filename = var_CreateGetStringCommand( p_this,
+    config_ChainParse( p_vout, CFG_PREFIX, ppsz_filter_options,
+                       p_vout->p_cfg );
+
+    p_logo_list->psz_filename = var_CreateGetStringCommand( p_vout,
                                                             "logo-file" );
     if( !p_logo_list->psz_filename || !*p_logo_list->psz_filename )
     {
-        msg_Err( p_this, "logo file not specified" );
+        msg_Err( p_vout, "logo file not specified" );
         return 0;
     }
 
-    p_sys->pos = var_CreateGetIntegerCommand( p_this, "logo-position" );
-    p_sys->posx = var_CreateGetIntegerCommand( p_this, "logo-x" );
-    p_sys->posy = var_CreateGetIntegerCommand( p_this, "logo-y" );
+    p_sys->pos = var_CreateGetIntegerCommand( p_vout, "logo-position" );
+    p_sys->posx = var_CreateGetIntegerCommand( p_vout, "logo-x" );
+    p_sys->posy = var_CreateGetIntegerCommand( p_vout, "logo-y" );
     p_logo_list->i_delay = __MAX( __MIN(
-        var_CreateGetIntegerCommand( p_this, "logo-delay" ) , 60000 ), 0 );
-    p_logo_list->i_repeat = var_CreateGetIntegerCommand( p_this, "logo-repeat");
+        var_CreateGetIntegerCommand( p_vout, "logo-delay" ) , 60000 ), 0 );
+    p_logo_list->i_repeat = var_CreateGetIntegerCommand( p_vout, "logo-repeat");
     p_logo_list->i_alpha = __MAX( __MIN(
-        var_CreateGetIntegerCommand( p_this, "logo-transparency" ), 255 ), 0 );
+        var_CreateGetIntegerCommand( p_vout, "logo-transparency" ), 255 ), 0 );
 
     LoadLogoList( p_vout, p_logo_list );
 
@@ -714,7 +716,6 @@ static int CreateFilter( vlc_object_t *p_this )
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
-
 
     /* Hook used for callback variables */
     p_logo_list->psz_filename =

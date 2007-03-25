@@ -60,6 +60,8 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define VOUTLIST_LONGTEXT N_("You can use specific video output modules " \
         "for the clones. Use a comma-separated list of modules." )
 
+#define CFG_PREFIX "clone-"
+
 vlc_module_begin();
     set_description( _("Clone video filter") );
     set_capability( "video filter", 0 );
@@ -67,12 +69,16 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
-    add_integer( "clone-count", 2, NULL, COUNT_TEXT, COUNT_LONGTEXT, VLC_FALSE );
-    add_string ( "clone-vout-list", NULL, NULL, VOUTLIST_TEXT, VOUTLIST_LONGTEXT, VLC_TRUE );
+    add_integer( CFG_PREFIX "count", 2, NULL, COUNT_TEXT, COUNT_LONGTEXT, VLC_FALSE );
+    add_string ( CFG_PREFIX "vout-list", NULL, NULL, VOUTLIST_TEXT, VOUTLIST_LONGTEXT, VLC_TRUE );
 
     add_shortcut( "clone" );
     set_callbacks( Create, Destroy );
 vlc_module_end();
+
+static const char *ppsz_filter_options[] = {
+    "count", "vout-list", NULL
+};
 
 /*****************************************************************************
  * vout_sys_t: Clone video output method descriptor
@@ -130,7 +136,11 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_display = NULL;
     p_vout->pf_control = Control;
 
-    psz_clonelist = config_GetPsz( p_vout, "clone-vout-list" );
+    config_ChainParse( p_vout, CFG_PREFIX, ppsz_filter_options,
+                       p_vout->p_cfg );
+
+    psz_clonelist = var_CreateGetNonEmptyString( p_vout,
+                                                 CFG_PREFIX "vout-list" );
     if( psz_clonelist )
     {
         int i_dummy;
@@ -178,7 +188,8 @@ static int Create( vlc_object_t *p_this )
     {
         /* No list was specified. We will use the default vout, and get
          * the number of clones from clone-count */
-        p_vout->p_sys->i_clones = config_GetInt( p_vout, "clone-count" );
+        p_vout->p_sys->i_clones =
+            var_CreateGetInteger( p_vout, CFG_PREFIX "count" );
         p_vout->p_sys->ppsz_vout_list = NULL;
     }
 

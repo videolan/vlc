@@ -62,6 +62,8 @@ static const char *type_list_text[] = { N_("Rotate by 90 degrees"),
   N_("Rotate by 180 degrees"), N_("Rotate by 270 degrees"),
   N_("Flip horizontally"), N_("Flip vertically") };
 
+#define CFG_PREFIX "transform-"
+
 vlc_module_begin();
     set_description( _("Video transformation filter") );
     set_shortname( _("Transformation"));
@@ -69,13 +71,17 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
-    add_string( "transform-type", "90", NULL,
+    add_string( CFG_PREFIX "type", "90", NULL,
                           TYPE_TEXT, TYPE_LONGTEXT, VLC_FALSE);
         change_string_list( type_list, type_list_text, 0);
 
     add_shortcut( "transform" );
     set_callbacks( Create, Destroy );
 vlc_module_end();
+
+static const char *ppsz_filter_options[] = {
+    "type", NULL
+};
 
 /*****************************************************************************
  * vout_sys_t: Transform video output method descriptor
@@ -123,8 +129,11 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_display = NULL;
     p_vout->pf_control = Control;
 
+    config_ChainParse( p_vout, CFG_PREFIX, ppsz_filter_options,
+                           p_vout->p_cfg );
+
     /* Look what method was requested */
-    psz_method = config_GetPsz( p_vout, "transform-type" );
+    psz_method = var_CreateGetNonEmptyString( p_vout, "transform-type" );
 
     if( psz_method == NULL )
     {

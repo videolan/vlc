@@ -66,6 +66,8 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define ASPECT_LONGTEXT N_("Aspect ratio of the individual displays " \
    "building the wall.")
 
+#define CFG_PREFIX "wall-"
+
 vlc_module_begin();
     set_description( _("Wall video filter") );
     set_shortname( _("Image wall" ));
@@ -73,15 +75,19 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
 
-    add_integer( "wall-cols", 3, NULL, COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
-    add_integer( "wall-rows", 3, NULL, ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
-    add_string( "wall-active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT,
+    add_integer( CFG_PREFIX "cols", 3, NULL, COLS_TEXT, COLS_LONGTEXT, VLC_FALSE );
+    add_integer( CFG_PREFIX "rows", 3, NULL, ROWS_TEXT, ROWS_LONGTEXT, VLC_FALSE );
+    add_string( CFG_PREFIX "active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT,
                  VLC_TRUE );
-    add_string( "wall-element-aspect", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, VLC_FALSE );
+    add_string( CFG_PREFIX "element-aspect", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, VLC_FALSE );
 
     add_shortcut( "wall" );
     set_callbacks( Create, Destroy );
 vlc_module_end();
+
+static const char *ppsz_filter_options[] = {
+    "cols", "rows", "active", "element-aspect", NULL
+};
 
 /*****************************************************************************
  * vout_sys_t: Wall video output method descriptor
@@ -150,9 +156,12 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_display = NULL;
     p_vout->pf_control = Control;
 
+    config_ChainParse( p_vout, CFG_PREFIX, ppsz_filter_options,
+                       p_vout->p_cfg );
+
     /* Look what method was requested */
-    p_vout->p_sys->i_col = config_GetInt( p_vout, "wall-cols" );
-    p_vout->p_sys->i_row = config_GetInt( p_vout, "wall-rows" );
+    p_vout->p_sys->i_col = var_CreateGetInteger( p_vout, CFG_PREFIX "cols" );
+    p_vout->p_sys->i_row = var_CreateGetInteger( p_vout, CFG_PREFIX "rows" );
 
     p_vout->p_sys->i_col = __MAX( 1, __MIN( 15, p_vout->p_sys->i_col ) );
     p_vout->p_sys->i_row = __MAX( 1, __MIN( 15, p_vout->p_sys->i_row ) );
@@ -170,7 +179,8 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    psz_method_tmp = psz_method = config_GetPsz( p_vout, "wall-active" );
+    psz_method_tmp =
+    psz_method = var_CreateGetNonEmptyString( p_vout, CFG_PREFIX "active" );
 
     /* If no trailing vout are specified, take them all */
     if( psz_method == NULL )
@@ -240,7 +250,8 @@ static int Init( vout_thread_t *p_vout )
     int i_vstart_rounded = 0, i_hstart_rounded = 0;
     char *psz_aspect;
 
-    psz_aspect = config_GetPsz( p_vout, "wall-element-aspect" );
+    psz_aspect = var_CreateGetNonEmptyString( p_vout,
+                                              CFG_PREFIX "element-aspect" );
     if( psz_aspect && *psz_aspect )
     {
         char *psz_parser = strchr( psz_aspect, ':' );
@@ -256,7 +267,6 @@ static int Init( vout_thread_t *p_vout )
         }
         free( psz_aspect );
     }
-    
 
     i_xpos = var_CreateGetInteger( p_vout, "video-x" );
     i_ypos = var_CreateGetInteger( p_vout, "video-y" );
