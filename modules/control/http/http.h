@@ -128,6 +128,8 @@ void E_(HandleSeek)( intf_thread_t *p_intf, char *p_value );
 char *E_(ExtractURIValue)( char *restrict psz_uri,
                            const char *restrict psz_name,
                            char *restrict psz_value, size_t i_value_max );
+char *E_(ExtractURIString)( char *restrict psz_uri,
+                            const char *restrict psz_name );
 /** \todo Describe this function */
 int E_(TestURIParam)( char *psz_uri, const char *psz_name );
 

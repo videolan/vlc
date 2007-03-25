@@ -793,6 +793,25 @@ char *E_(ExtractURIValue)( char *restrict psz_uri,
     return psz_next;
 }
 
+char *E_(ExtractURIString)( char *restrict psz_uri,
+                            const char *restrict psz_name )
+{
+    size_t len;
+    char *psz_value = FindURIValue( psz_uri, psz_name, &len );
+
+    if( psz_value == NULL )
+        return NULL;
+
+    char *res = malloc( len + 1 );
+    if( res == NULL )
+        return NULL;
+
+    memcpy( res, psz_value, len );
+    res[len] = '\0';
+
+    return res;
+}
+
 /* Since the resulting string is smaller we can work in place, so it is
  * permitted to have psz == new. new points to the first word of the
  * string, the function returns the remaining string. */

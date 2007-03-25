@@ -349,14 +349,19 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         {
             char *url = E_(mvar_GetValue)( vars, "url_value" );
             char *name = E_(SSPop)( st );
-            char value[2048];
-            char *tmp;
+            char *value = E_(ExtractURIString)( url, name );
+            if( value != NULL )
+            {
+                char *tmp;
+                decode_URI( value );
+                tmp = E_(FromUTF8)( p_intf, value );
+                E_(SSPush)( st, tmp );
+                free( tmp );
+                free( value );
+            }
+            else
+                E_(SSPush)( st, "" );
 
-            E_(ExtractURIValue)( url, name, value, 2048 );
-            decode_URI( value );
-            tmp = E_(FromUTF8)( p_intf, value );
-            E_(SSPush)( st, tmp );
-            free( tmp );
             free( name );
         }
         else if( !strcmp( s, "url_encode" ) )
