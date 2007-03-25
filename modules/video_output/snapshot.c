@@ -22,12 +22,12 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * This module is a pseudo video output the offers the possibility to
+ * This module is a pseudo video output that offers the possibility to
  * keep a cache of low-res snapshots.
  * The snapshot structure is defined in include/snapshot.h
  * In order to access the current snapshot cache, object variables are used:
  *   snapshot-list-pointer : the pointer on the first element in the list
- *   snapshot-datasize     : size of a snapshot 
+ *   snapshot-datasize     : size of a snapshot
  *                           (also available in snapshot_t->i_datasize)
  *   snapshot-cache-size   : size of the cache list
  *
