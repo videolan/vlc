@@ -169,7 +169,7 @@ void FileOpenPanel::updateMRL()
         int align = ui.alignSubComboBox->itemData( ui.alignSubComboBox->currentIndex() ).toInt();
         mrl.append( " :subsdec-align=" + QString().setNum( align ) );
         int size = ui.sizeSubComboBox->itemData( ui.sizeSubComboBox->currentIndex() ).toInt();
-        mrl.append( " :sub-rel-fontsize=" + QString().setNum( size ) );
+        mrl.append( " :freetype-rel-fontsize=" + QString().setNum( size ) );
     }
     emit mrlUpdated( mrl );
     emit methodChanged( "file-caching" );
