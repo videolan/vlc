@@ -209,31 +209,6 @@
           <height>0</height>
          </size>
         </property>
-        <item>
-         <property name="text" >
-          <string>Very Small</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Small</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Normal</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Big</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Very Big</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item row="1" column="1" >

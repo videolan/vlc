@@ -89,6 +89,22 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     // Hide the subtitles control by default.
     ui.subFrame->hide();
 
+    /* Build the subs size combo box */
+    module_config_t *p_item =
+        config_FindConfig( VLC_OBJECT(p_intf), "freetype-rel-fontsize" );
+    if( p_item )
+    {
+        for( int i_index = 0; i_index < p_item->i_list; i_index++ )
+        {
+            ui.sizeSubComboBox->addItem(
+                qfu( p_item->ppsz_list_text[i_index] ),
+                QVariant( p_item->pi_list[i_index] ) );
+            if( p_item->value.i == p_item->pi_list[i_index] )
+            {
+                ui.sizeSubComboBox->setCurrentIndex( i_index );
+            }
+        }
+    }
 
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
     BUTTONACT( ui.subCheckBox, toggleSubtitleFrame());
