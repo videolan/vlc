@@ -99,7 +99,8 @@ public:
     QStringList showSimpleOpen( QString help = QString(),
                                 int filters = EXT_FILTER_MEDIA |
                                 EXT_FILTER_VIDEO | EXT_FILTER_AUDIO |
-                                EXT_FILTER_PLAYLIST );
+                                EXT_FILTER_PLAYLIST,
+                                QString path = QString() );
 protected:
     friend class QVLCMenu;
     QSignalMapper *menusMapper;

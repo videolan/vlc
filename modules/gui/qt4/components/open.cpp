@@ -122,7 +122,8 @@ void FileOpenPanel::browseFileSub()
 {
     // FIXME Handle selection of more than one subtitles file
     QStringList files = THEDP->showSimpleOpen( qtr("Open subtitles file"),
-                                               EXT_FILTER_SUBTITLE );
+                            EXT_FILTER_SUBTITLE,
+                            dialogBox->directory().absolutePath() );
     ui.subInput->setEditText( files.join(" ") );
     updateMRL();
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
  * main_inteface.cpp : Main interface
- ****************************************************************************
+ *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
  *
@@ -18,7 +18,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
 #include <QEvent>
 #include <QApplication>
@@ -44,7 +45,7 @@
 DialogsProvider* DialogsProvider::instance = NULL;
 
 DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
-                                      QObject( NULL ), p_intf( _p_intf )
+                                  QObject( NULL ), p_intf( _p_intf )
 {
     fixed_timer = new QTimer( this );
     fixed_timer->start( 150 /* milliseconds */ );
@@ -195,7 +196,8 @@ void DialogsProvider::MLAppendDialog()
 }
 
 /**** Simple open ****/
-QStringList DialogsProvider::showSimpleOpen( QString help, int filters )
+QStringList DialogsProvider::showSimpleOpen( QString help, int filters,
+                                             QString path )
 {
     QString fileTypes = "";
     if( filters & EXT_FILTER_MEDIA ) {
@@ -216,10 +218,9 @@ QStringList DialogsProvider::showSimpleOpen( QString help, int filters )
     ADD_FILTER_ALL( fileTypes );
     fileTypes.replace(QString(";*"), QString(" *"));
     return QFileDialog::getOpenFileNames( NULL,
-                                          help.isNull() ?
-                                              qfu(I_OP_SEL_FILES ) : help,
-                                          qfu( p_intf->p_libvlc->psz_homedir ),
-                                          fileTypes );
+        help.isNull() ? qfu(I_OP_SEL_FILES ) : help,
+        path.isNull() ? qfu( p_intf->p_libvlc->psz_homedir ) : path,
+        fileTypes );
 }
 
 void DialogsProvider::addFromSimple( bool pl, bool go)
