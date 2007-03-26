@@ -127,33 +127,39 @@ void OpenDialog::playOrEnqueue( bool b_enqueue = false )
 {
     this->toggleVisible();
     mrl = ui.advancedLineInput->text();
-    QStringList tempMRL = mrl.split( QRegExp("\"\\s+\""),
-                                     QString::SkipEmptyParts );
+
     if( !isModal() )
     {
-        for( size_t i = 0 ; i< tempMRL.size(); i++ )
+        QStringList tempMRL = SeparateEntries( mrl );
+        for( size_t i = 0; i < tempMRL.size(); i++ )
         {
-             QString mrli = tempMRL[i].remove( QRegExp( "^\"" ) ).
-                                       remove( QRegExp( "\"\\s+$" ) );
-             const char * psz_utf8 = qtu( tempMRL[i] );
-             if ( b_enqueue )
-             {
-                 /* Enqueue and Preparse all items*/
-                 playlist_Add( THEPL, psz_utf8, NULL,
-                                PLAYLIST_APPEND | PLAYLIST_PREPARSE,
-                                PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+            bool b_start = !i && !b_enqueue;
+            input_item_t *p_input;
+            const char *psz_utf8 = qtu( tempMRL[i] );
 
-             }
-             else
-             {
-                 /* Play the first one, parse and enqueue the other ones */
-                 playlist_Add( THEPL, psz_utf8, NULL,
-                                PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO) |
-                                ( i ? PLAYLIST_PREPARSE : 0 ),
-                                PLAYLIST_END, VLC_TRUE, VLC_FALSE );
-             }
+            p_input = input_ItemNew( p_intf, psz_utf8, NULL );
+
+            /* Insert options */
+            while( i + 1 < tempMRL.size() && tempMRL[i + 1].startsWith( ":" ) )
+            {
+                i++;
+                psz_utf8 = qtu( tempMRL[i] );
+                input_ItemAddOption( p_input, psz_utf8 );
+            }
+
+            if( b_start )
+            {
+                playlist_AddInput( THEPL, p_input,
+                                   PLAYLIST_APPEND | PLAYLIST_GO,
+                                   PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+            }
+            else
+            {
+                playlist_AddInput( THEPL, p_input,
+                                   PLAYLIST_APPEND|PLAYLIST_PREPARSE,
+                                   PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+            }
         }
-
     }
     else
         accept();
@@ -207,7 +213,7 @@ void OpenDialog::newMethod(QString method)
     }
 }
 
-QStringList SeparateEntries( QString entries )
+QStringList OpenDialog::SeparateEntries( QString entries )
 {
     bool b_quotes_mode = false;
 
@@ -217,9 +223,9 @@ QStringList SeparateEntries( QString entries )
     int index = 0;
     while( index < entries.size() )
     {
-        int delim_pos = entries.indexOf( QRegExp( "\\s+" ), index );
+        int delim_pos = entries.indexOf( QRegExp( "\\s+|\"" ), index );
         if( delim_pos < 0 ) delim_pos = entries.size() - 1;
-        entry += entries.mid( index, delim_pos );
+        entry += entries.mid( index, delim_pos - index + 1 );
         index = delim_pos + 1;
 
         if( entry.isEmpty() ) continue;
@@ -244,7 +250,7 @@ QStringList SeparateEntries( QString entries )
                 entry.endsWith( "\r" ) || entry.endsWith( "\n" ) )
                 entry.truncate( entry.size() - 1 );
             if( !entry.isEmpty() ) entries_array.append( entry );
-            entry = "";
+            entry.clear();
         }
         else
         {;}

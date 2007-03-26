@@ -66,6 +66,7 @@ private:
     int advHeight, mainHeight;
 
     void playOrEnqueue( bool );
+    QStringList SeparateEntries( QString );
 private slots:
     void cancel();
     void play();
