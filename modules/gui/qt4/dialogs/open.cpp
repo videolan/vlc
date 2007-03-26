@@ -1,6 +1,6 @@
 /*****************************************************************************
  * open.cpp : Advanced open dialog
- ****************************************************************************
+ *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id: streaminfo.cpp 16816 2006-09-23 20:56:52Z jb $
  *
@@ -18,7 +18,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
 #include <QTabWidget>
 #include <QGridLayout>
@@ -204,4 +205,52 @@ void OpenDialog::newMethod(QString method)
         int i_value = config_GetInt( p_intf, qta(storedMethod) );
         ui.cacheSpinBox->setValue(i_value);
     }
+}
+
+QStringList SeparateEntries( QString entries )
+{
+    bool b_quotes_mode = false;
+
+    QStringList entries_array;
+    QString entry;
+
+    int index = 0;
+    while( index < entries.size() )
+    {
+        int delim_pos = entries.indexOf( QRegExp( "\\s+" ), index );
+        if( delim_pos < 0 ) delim_pos = entries.size() - 1;
+        entry += entries.mid( index, delim_pos );
+        index = delim_pos + 1;
+
+        if( entry.isEmpty() ) continue;
+
+        if( !b_quotes_mode && entry.endsWith( "\"" ) )
+        {
+            /* Enters quotes mode */
+            entry.truncate( entry.size() - 1 );
+            b_quotes_mode = true;
+        }
+        else if( b_quotes_mode && entry.endsWith( "\"" ) )
+        {
+            /* Finished the quotes mode */
+            entry.truncate( entry.size() - 1 );
+            b_quotes_mode = false;
+        }
+        else if( !b_quotes_mode && !entry.endsWith( "\"" ) )
+        {
+            /* we found a non-quoted standalone string */
+            if( index < entries.size() ||
+                entry.endsWith( " " ) || entry.endsWith( "\t" ) ||
+                entry.endsWith( "\r" ) || entry.endsWith( "\n" ) )
+                entry.truncate( entry.size() - 1 );
+            if( !entry.isEmpty() ) entries_array.append( entry );
+            entry = "";
+        }
+        else
+        {;}
+    }
+
+    if( !entry.isEmpty() ) entries_array.append( entry );
+
+    return entries_array;
 }
