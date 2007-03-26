@@ -33,6 +33,12 @@
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 
+#define EXT_FILTER_MEDIA        0x01
+#define EXT_FILTER_VIDEO        0x02
+#define EXT_FILTER_AUDIO        0x04
+#define EXT_FILTER_PLAYLIST     0x08
+#define EXT_FILTER_SUBTITLE     0x10
+
 #define ADD_FILTER_MEDIA( string )   \
     string += _("Media Files");      \
     string += " ( ";                 \
@@ -90,9 +96,10 @@ public:
     virtual ~DialogsProvider();
     QTimer *fixed_timer;
 
-    QStringList showSimpleOpen( QString help = QString(), bool all = true,
-                                bool video = true, bool audio = true,
-                                bool subs = false, bool pls = true );
+    QStringList showSimpleOpen( QString help = QString(),
+                                int filters = EXT_FILTER_MEDIA |
+                                EXT_FILTER_VIDEO | EXT_FILTER_AUDIO |
+                                EXT_FILTER_PLAYLIST );
 protected:
     friend class QVLCMenu;
     QSignalMapper *menusMapper;

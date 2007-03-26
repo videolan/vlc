@@ -195,25 +195,22 @@ void DialogsProvider::MLAppendDialog()
 }
 
 /**** Simple open ****/
-
-QStringList DialogsProvider::showSimpleOpen(QString help, bool all,
-                                            bool audio, bool video,
-                                            bool subs, bool pls)
+QStringList DialogsProvider::showSimpleOpen( QString help, int filters )
 {
     QString fileTypes = "";
-    if( all ) {
+    if( filters & EXT_FILTER_MEDIA ) {
         ADD_FILTER_MEDIA( fileTypes );
     }
-    if( video ) {
+    if( filters & EXT_FILTER_VIDEO ) {
         ADD_FILTER_VIDEO( fileTypes );
     }
-    if( audio ) {
+    if( filters & EXT_FILTER_AUDIO ) {
         ADD_FILTER_AUDIO( fileTypes );
     }
-    if( pls ) {
+    if( filters & EXT_FILTER_PLAYLIST ) {
         ADD_FILTER_PLAYLIST( fileTypes );
     }
-    if( subs ) {
+    if( filters & EXT_FILTER_SUBTITLE ) {
         ADD_FILTER_SUBTITLE( fileTypes );
     }
     ADD_FILTER_ALL( fileTypes );
@@ -259,8 +256,8 @@ void DialogsProvider::simpleOpenDialog()
 
 void DialogsProvider::openPlaylist()
 {
-    QStringList files = showSimpleOpen( qtr( "Open playlist file" ), false,
-                                        false, false, false );
+    QStringList files = showSimpleOpen( qtr( "Open playlist file" ),
+                                        EXT_FILTER_PLAYLIST );
     foreach( QString file, files )
     {
         playlist_Import( THEPL, qtu(file) );

@@ -55,7 +55,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     fileTypes.replace(QString(";*"), QString(" *"));
 
     // Make this QFileDialog a child of tempWidget from the ui.
-    dialogBox = new QFileDialog( ui.tempWidget, NULL, 
+    dialogBox = new QFileDialog( ui.tempWidget, NULL,
             qfu( p_intf->p_libvlc->psz_homedir ), fileTypes );
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     /* We don't want to see a grip in the middle of the window, do we? */
@@ -120,10 +120,9 @@ void FileOpenPanel::browseFile()
 
 void FileOpenPanel::browseFileSub()
 {
-    // FIXME We shouldn't allow the user to select more than one subtitles file
+    // FIXME Handle selection of more than one subtitles file
     QStringList files = THEDP->showSimpleOpen( qtr("Open subtitles file"),
-                                               false, false, false,
-                                               true, false );
+                                               EXT_FILTER_SUBTITLE );
     ui.subInput->setEditText( files.join(" ") );
     updateMRL();
 }
