@@ -243,7 +243,7 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
 
 FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
                                    module_config_t *_p_item,
-                                   QLabel *_label, QLineEdit *_text, 
+                                   QLabel *_label, QLineEdit *_text,
                                    QPushButton *_button, bool pwd ):
                            VStringConfigControl( _p_this, _p_item )
 {
@@ -258,8 +258,10 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
 
 void FileConfigControl::updateField()
 {
-        text->setText( QFileDialog::getOpenFileName( NULL, 
-                qtr( "Select File" ), qfu( p_this->p_libvlc->psz_homedir ) ) );
+    QString file = QFileDialog::getOpenFileName( NULL,
+                  qtr( "Select File" ), qfu( p_this->p_libvlc->psz_homedir ) );
+    if( file.isNull() ) return;
+    text->setText( file );
 }
 
 void FileConfigControl::finish()
