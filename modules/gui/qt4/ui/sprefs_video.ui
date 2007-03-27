@@ -155,7 +155,7 @@
       <item row="0" column="3" >
        <widget class="QPushButton" name="snapshotsDirectoryBrowse" >
         <property name="text" >
-         <string>Browse</string>
+         <string>Browse...</string>
         </property>
        </widget>
       </item>

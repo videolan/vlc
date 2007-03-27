@@ -134,7 +134,7 @@
       <item row="0" column="2" >
        <widget class="QPushButton" name="fontBrowse" >
         <property name="text" >
-         <string>Browse</string>
+         <string>Browse...</string>
         </property>
        </widget>
       </item>

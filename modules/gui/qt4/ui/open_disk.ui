@@ -95,7 +95,7 @@
       <item row="2" column="7" >
        <widget class="QToolButton" name="toolButton" >
         <property name="text" >
-         <string>Browse</string>
+         <string>Browse...</string>
         </property>
        </widget>
       </item>

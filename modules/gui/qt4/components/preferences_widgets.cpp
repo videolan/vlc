@@ -225,7 +225,7 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
 {
     label = new QLabel( qfu(p_item->psz_text) );
     text = new QLineEdit( qfu(p_item->value.psz) );
-    browse = new QPushButton( qtr( "Browse" ) );
+    browse = new QPushButton( qtr( "Browse..." ) );
 
     BUTTONACT( browse, updateField() );
 

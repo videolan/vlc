@@ -74,7 +74,7 @@ p, li { white-space: pre-wrap; }
       <item row="4" column="2" >
        <widget class="QPushButton" name="skinBrowse" >
         <property name="text" >
-         <string>Browse</string>
+         <string>Browse...</string>
         </property>
        </widget>
       </item>

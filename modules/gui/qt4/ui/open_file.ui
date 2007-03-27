@@ -221,7 +221,7 @@
       <item row="0" column="6" colspan="2" >
        <widget class="QPushButton" name="subBrowseButton" >
         <property name="text" >
-         <string>Browse</string>
+         <string>Browse...</string>
         </property>
        </widget>
       </item>
