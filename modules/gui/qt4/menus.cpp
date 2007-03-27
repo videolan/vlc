@@ -1,10 +1,10 @@
 /*****************************************************************************
  * menus.cpp : Qt menus
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$
  *
- * Authors: ClÃment Stenac <zorglub@videolan.org>
+ * Authors: Clément Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,10 @@
 #include <QActionGroup>
 #include <QSignalMapper>
 
+#ifndef WIN32
+#   include <signal.h>
+#endif
+
 #include <vlc_intf_strings.h>
 
 #include "main_interface.hpp"
@@ -44,8 +48,30 @@ enum
 static QActionGroup *currentGroup;
 
 // Add static entries to menus
-#define DP_SADD( text, help, icon, slot ) { if( strlen(icon) > 0 ) { QAction *action = menu->addAction( text, THEDP, SLOT( slot ) ); action->setIcon(QIcon(icon));} else { menu->addAction( text, THEDP, SLOT( slot ) ); } }
-#define MIM_SADD( text, help, icon, slot ) { if( strlen(icon) > 0 ) { QAction *action = menu->addAction( text, THEMIM, SLOT( slot ) ); action->setIcon(QIcon(icon));} else { menu->addAction( text, THEMIM, SLOT( slot ) ); } }
+#define DP_SADD( text, help, icon, slot ) \
+    { \
+    if( strlen(icon) > 0 ) \
+    { \
+        QAction *action = menu->addAction( text, THEDP, SLOT( slot ) ); \
+        action->setIcon(QIcon(icon)); \
+    } \
+    else \
+    { \
+        menu->addAction( text, THEDP, SLOT( slot ) ); \
+    } \
+    }
+#define MIM_SADD( text, help, icon, slot ) \
+    { \
+    if( strlen(icon) > 0 ) \
+    { \
+        QAction *action = menu->addAction( text, THEMIM, SLOT( slot ) ); \
+        action->setIcon(QIcon(icon)); \
+    } \
+    else \
+    { \
+        menu->addAction( text, THEMIM, SLOT( slot ) ); \
+    } \
+    }
 #define PL_SADD
 
 /*****************************************************************************
@@ -124,7 +150,20 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
                               bool playlist, bool adv_controls_enabled,
                               bool visual_selector_enabled )
 {
+#ifndef WIN32    
+    /* Uglu klugde
+     * Remove SIGCHLD from the ignored signal the time to initialise
+     * Qt because it call gconf to get the icon theme */
+    sigset_t set;
+
+    sigemptyset( &set );
+    sigaddset( &set, SIGCHLD );
+    pthread_sigmask (SIG_UNBLOCK, &set, NULL);
+#endif
     QMenuBar *bar = mi->menuBar();
+#ifndef WIN32 
+    pthread_sigmask (SIG_BLOCK, &set, NULL);
+#endif
     BAR_ADD( FileMenu(), qtr("Media") );
     if( playlist )
     {
