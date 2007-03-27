@@ -145,7 +145,7 @@ static VLCUpdate *_o_sharedInstance = nil;
     NSString * pathToReleaseNote;
     pathToReleaseNote = [NSString stringWithFormat: \
         @"/tmp/vlc_releasenote_%d.tmp", mdate()];
-    
+
     if( p_uit )
     {
         p_uit->i_rs = UPDATE_RELEASE_STATUS_NEWER;
@@ -205,6 +205,10 @@ static VLCUpdate *_o_sharedInstance = nil;
                             p_uit->mirror.psz_type );
                     /* make sure that we perform this check only once */
                     releaseChecked = YES;
+                    /* Make sure the update window is showed in case we have something */
+                    [o_update_window center];
+                    [o_update_window makeKeyAndOrderFront: self];
+
                 }
                 else if(! releaseChecked )
                 {
@@ -219,7 +223,7 @@ static VLCUpdate *_o_sharedInstance = nil;
         }
 
         update_iterator_Delete( p_uit );
-        
+
         /* wait for our release notes if necessary, since the download is done
          * by another thread -- this does usually take 300000 to 500000 ms */
         if( gettingReleaseNote )

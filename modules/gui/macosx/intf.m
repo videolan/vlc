@@ -737,6 +737,15 @@ static VLCMain *_o_sharedMainInstance = nil;
     return YES;
 }
 
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+    /* Check for update silently on startup */
+    NSLog(@"checking for update");
+    if ( !nib_update_loaded )
+        nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
+    [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:NULL];
+}
+
 /* Listen to the remote in exclusive mode, only when VLC is the active
    application */
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
@@ -1844,12 +1853,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (IBAction)checkForUpdate:(id)sender
 {
     if ( !nib_update_loaded )
-    {
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
-        [o_update showUpdateWindow];
-    } else {
-        [o_update showUpdateWindow];
-    }
+
+    [o_update showUpdateWindow];
 }
 
 - (IBAction)openReadMe:(id)sender
