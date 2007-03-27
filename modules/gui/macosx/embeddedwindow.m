@@ -431,6 +431,7 @@
     [[self contentView] replaceSubview:o_temp_view with:o_view];
     [o_view release];
     [o_view setFrame:[o_temp_view frame]];
+    [self makeFirstResponder: o_view];
     if ([self isVisible])
         [self makeKeyAndOrderFront:self];
     [o_fullscreen_window orderOut: self];
