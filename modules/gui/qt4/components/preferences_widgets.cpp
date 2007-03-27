@@ -294,8 +294,10 @@ void DirectoryConfigControl::updateField()
 {
     QString dir = QFileDialog::getExistingDirectory( NULL,
                       qtr( "Select Directory" ),
-                      qfu( p_this->p_libvlc->psz_homedir ),
-                      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+                      text->text().isEmpty() ?
+                        qfu( p_this->p_libvlc->psz_homedir ) : text->text(),
+                      QFileDialog::ShowDirsOnly |
+                        QFileDialog::DontResolveSymlinks );
     if( dir.isNull() ) return;
     text->setText( dir );
 }
