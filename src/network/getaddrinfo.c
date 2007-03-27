@@ -113,9 +113,15 @@ const char *vlc_gai_strerror (int errnum)
  * GNU C library 2.0.x is known to lack this function, even though it defines
  * getaddrinfo().
  */
-static int
+#ifdef WIN32
+static int WSAAPI
+getnameinfo (const struct sockaddr *sa, socklen_t salen,
+             char *host, DWORD hostlen, char *serv, DWORD servlen, int flags)
+#else
+static int 
 getnameinfo (const struct sockaddr *sa, socklen_t salen,
              char *host, int hostlen, char *serv, int servlen, int flags)
+#endif
 {
     if (((size_t)salen < sizeof (struct sockaddr_in))
      || (sa->sa_family != AF_INET))
@@ -142,14 +148,14 @@ getnameinfo (const struct sockaddr *sa, socklen_t salen,
 
             if (snprintf (host, hostlen, "%u.%u.%u.%u", ipv4 >> 24,
                           (ipv4 >> 16) & 0xff, (ipv4 >> 8) & 0xff,
-                          ipv4 & 0xff) >= hostlen)
+                          ipv4 & 0xff) >= (int)hostlen)
                 return EAI_OVERFLOW;
         }
 
         if (serv != NULL)
         {
             if (snprintf (serv, servlen, "%u",
-                          (unsigned int)ntohs (addr->sin_port)) >= servlen)
+                          (unsigned int)ntohs (addr->sin_port)) >= (int)servlen)
                 return EAI_OVERFLOW;
         }
     }
@@ -190,7 +196,11 @@ gai_error_from_herrno (void)
 /*
  * This functions must be used to free the memory allocated by getaddrinfo().
  */
+#ifdef WIN32
+static void WSAAPI freeaddrinfo (struct addrinfo *res)
+#else
 static void freeaddrinfo (struct addrinfo *res)
+#endif
 {
     if (res != NULL)
     {
@@ -274,9 +284,15 @@ makeipv4info (int type, int proto, u_long ip, u_short port, const char *name)
  *
  * Only UDP and TCP over IPv4 are supported here.
  */
-static int
+#ifdef WIN32
+static int WSAAPI
 getaddrinfo (const char *node, const char *service,
              const struct addrinfo *hints, struct addrinfo **res)
+#else
+static int 
+getaddrinfo (const char *node, const char *service,
+             const struct addrinfo *hints, struct addrinfo **res)
+#endif
 {
     struct addrinfo *info;
     u_long ip;
@@ -493,43 +509,43 @@ static WSAAPI int _ws2_getnameinfo_bind( const struct sockaddr FAR * sa, socklen
                char FAR *host, DWORD hostlen, char FAR *serv, DWORD servlen, int flags )
 {
     GETNAMEINFO entry = (GETNAMEINFO)ws2_find_api (TEXT("getnameinfo"));
-    if (entry != NULL)
+    int result;
+
+    if (entry == NULL)
     {
-        /* call API before replacing function pointer to avoid crash */
-        int result = entry (sa, salen, host, hostlen, serv, servlen, flags);
-        ws2_getnameinfo = entry;
-        return result;
+        /* not found, use replacement API instead */
+	entry = getnameinfo;
+
     }
-    return getnameinfo (sa, salen, host, hostlen, serv, servlen, flags);
+    /* call API before replacing function pointer to avoid crash */
+    result = entry (sa, salen, host, hostlen, serv, servlen, flags);
+    ws2_getnameinfo = entry;
+    return result;
 }
 #undef getnameinfo
 #define getnameinfo ws2_getnameinfo
-
-/* So much for using different calling conventions */
-static WSAAPI void call_freeaddrinfo (struct addrinfo *infos)
-{
-    freeaddrinfo (infos);
-}
 
 static WSAAPI int _ws2_getaddrinfo_bind(const char FAR *node, const char FAR *service,
                const struct addrinfo FAR *hints, struct addrinfo FAR * FAR *res)
 {
     GETADDRINFO entry;
     FREEADDRINFO freentry;
+    int result;
 
     entry = (GETADDRINFO)ws2_find_api (TEXT("getaddrinfo"));
     freentry = (FREEADDRINFO)ws2_find_api (TEXT("freeaddrinfo"));
 
-    if ((entry != NULL) && (freentry != NULL))
+    if ((entry == NULL) ||  (freentry == NULL))
     {
-        /* call API before replacing function pointer to avoid crash */
-        int result = entry (node, service, hints, res);
-        ws2_freeaddrinfo = freentry;
-        ws2_getaddrinfo = entry;
-        return result;
+        /* not found, use replacement API instead */
+	entry = getaddrinfo;
+	freentry = freeaddrinfo;
     }
-    ws2_freeaddrinfo = call_freeaddrinfo;
-    return getaddrinfo (node, service, hints, res);
+    /* call API before replacing function pointer to avoid crash */
+    result = entry (node, service, hints, res);
+    ws2_freeaddrinfo = freentry;
+    ws2_getaddrinfo = entry;
+    return result;
 }
 #undef getaddrinfo
 #undef freeaddrinfo
