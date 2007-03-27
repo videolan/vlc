@@ -289,9 +289,12 @@ DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
 
 void DirectoryConfigControl::updateField()
 {
-    text->setText( QFileDialog::getOpenFileName( NULL,
-                qtr( "Select File" ), qfu( p_this->p_libvlc->psz_homedir ),
-                NULL, 0,  QFileDialog::ShowDirsOnly ) );
+    QString dir = QFileDialog::getExistingDirectory( NULL,
+                      qtr( "Select Directory" ),
+                      qfu( p_this->p_libvlc->psz_homedir ),
+                      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+    if( dir.isNull() ) return;
+    text->setText( dir );
 }
 
 /********* String / choice list **********/

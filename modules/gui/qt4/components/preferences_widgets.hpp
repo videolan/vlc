@@ -277,7 +277,6 @@ public slots:
     virtual void updateField();
 protected:
     void finish();
-private:
     QLineEdit *text;
     QLabel *label;
     QPushButton *browse;
@@ -292,15 +291,8 @@ public:
     DirectoryConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                         QLineEdit *, QPushButton *, bool pwd );
     virtual ~DirectoryConfigControl() {};
-    virtual QString getValue() { return text->text(); };
-    virtual void show() { text->show(); label->show(); browse->show(); }
-    virtual void hide() { text->hide(); label->hide(); browse->hide(); }
 public slots:
     virtual void updateField();
-private:
-    QLineEdit *text;
-    QLabel *label;
-    QPushButton *browse;
 };
 
 class ModuleConfigControl : public VStringConfigControl
