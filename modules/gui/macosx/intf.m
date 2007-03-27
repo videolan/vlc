@@ -740,7 +740,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     /* Check for update silently on startup */
-    NSLog(@"checking for update");
     if ( !nib_update_loaded )
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
     [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:NULL];
