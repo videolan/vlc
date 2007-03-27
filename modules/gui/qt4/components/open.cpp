@@ -156,6 +156,7 @@ void FileOpenPanel::browseFileSub()
     QStringList files = THEDP->showSimpleOpen( qtr("Open subtitles file"),
                             EXT_FILTER_SUBTITLE,
                             dialogBox->directory().absolutePath() );
+    if( files.isEmpty() ) return;
     ui.subInput->setEditText( files.join(" ") );
     updateMRL();
 }
