@@ -136,6 +136,9 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 - (void)checkForUpdate
 {
+    /* We may not run on first thread */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
     p_u = update_New( p_intf );
     update_Check( p_u, VLC_FALSE );
     update_iterator_t *p_uit = update_iterator_New( p_u );
@@ -267,6 +270,7 @@ static VLCUpdate *_o_sharedInstance = nil;
             msg_Warn( p_intf, "retrieving current release notes failed!" );
         }
     }
+    [pool release];
 }
 
 - (void)performDownload:(NSString *)path
