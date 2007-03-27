@@ -61,6 +61,7 @@ extern "C" {
 #define CONFIG_ITEM_MODULE_CAT              0x0090  /* Module option */
 #define CONFIG_ITEM_MODULE_LIST             0x00A0  /* Module option */
 #define CONFIG_ITEM_MODULE_LIST_CAT         0x00B0  /* Module option */
+#define CONFIG_ITEM_FONT                    0x00C0  /* Font option */
 
 #define CONFIG_ITEM                         0x00F0
 

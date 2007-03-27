@@ -46,6 +46,7 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QFileDialog>
+#include <QFontDialog>
 
 #include <vlc_keys.h>
 
@@ -109,6 +110,10 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
     case CONFIG_ITEM_DIRECTORY:
         p_control = new DirectoryConfigControl( p_this, p_item, parent, l,
                                                 line, false );
+        break;
+    case CONFIG_ITEM_FONT:
+        p_control = new FontConfigControl( p_this, p_item, parent, l,
+                                           line, false );
         break;
     case CONFIG_ITEM_KEY:
         p_control = new KeySelectorControl( p_this, p_item, parent, l, line );
@@ -273,7 +278,6 @@ void FileConfigControl::finish()
 }
 
 /********* String / Directory **********/
-
 DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
                         module_config_t *_p_item, QWidget *_p_widget,
                         QGridLayout *_p_layout, int& _int, bool _pwd ) :
@@ -286,7 +290,6 @@ DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
      FileConfigControl( _p_this, _p_item, _p_label, _p_line, _p_button, _pwd)
 {}
 
-
 void DirectoryConfigControl::updateField()
 {
     QString dir = QFileDialog::getExistingDirectory( NULL,
@@ -295,6 +298,27 @@ void DirectoryConfigControl::updateField()
                       QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
     if( dir.isNull() ) return;
     text->setText( dir );
+}
+
+/********* String / Font **********/
+FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
+                        module_config_t *_p_item, QWidget *_p_widget,
+                        QGridLayout *_p_layout, int& _int, bool _pwd ) :
+     FileConfigControl( _p_this, _p_item, _p_widget, _p_layout, _int, _pwd)
+{}
+
+FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
+                        module_config_t *_p_item, QLabel *_p_label,
+                        QLineEdit *_p_line, QPushButton *_p_button, bool _pwd ):
+     FileConfigControl( _p_this, _p_item, _p_label, _p_line, _p_button, _pwd)
+{}
+
+void FontConfigControl::updateField()
+{
+    bool ok;
+    QFont font = QFontDialog::getFont( &ok, QFont( text->text() ), NULL );
+    if( !ok ) return;
+    text->setText( font.family() );
 }
 
 /********* String / choice list **********/

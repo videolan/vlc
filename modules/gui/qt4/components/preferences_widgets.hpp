@@ -266,9 +266,9 @@ class FileConfigControl : public VStringConfigControl
     Q_OBJECT;
 public:
     FileConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                         QGridLayout *, int&, bool pwd );
+                       QGridLayout *, int&, bool pwd );
     FileConfigControl( vlc_object_t *, module_config_t *, QLabel *,
-                        QLineEdit *, QPushButton *, bool pwd );
+                       QLineEdit *, QPushButton *, bool pwd );
     virtual ~FileConfigControl() {};
     virtual QString getValue() { return text->text(); };
     virtual void show() { text->show(); label->show(); browse->show(); }
@@ -287,10 +287,23 @@ class DirectoryConfigControl : public FileConfigControl
     Q_OBJECT;
 public:
     DirectoryConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                         QGridLayout *, int&, bool pwd );
+                            QGridLayout *, int&, bool pwd );
     DirectoryConfigControl( vlc_object_t *, module_config_t *, QLabel *,
-                        QLineEdit *, QPushButton *, bool pwd );
+                            QLineEdit *, QPushButton *, bool pwd );
     virtual ~DirectoryConfigControl() {};
+public slots:
+    virtual void updateField();
+};
+
+class FontConfigControl : public FileConfigControl
+{
+    Q_OBJECT;
+public:
+    FontConfigControl( vlc_object_t *, module_config_t *, QWidget *,
+                       QGridLayout *, int&, bool pwd );
+    FontConfigControl( vlc_object_t *, module_config_t *, QLabel *,
+                       QLineEdit *, QPushButton *, bool pwd );
+    virtual ~FontConfigControl() {};
 public slots:
     virtual void updateField();
 };
