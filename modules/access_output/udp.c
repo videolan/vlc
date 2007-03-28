@@ -703,8 +703,7 @@ static void ThreadWrite( vlc_object_t *p_this )
 #endif
 
         if ((p_thread->rtcp_handle != -1) && (p_pk->i_buffer >= 8))
-        {
-            /* FIXME: this is a very incorrect simplistic RTCP timer */
+        {   // 1.25% rate limit:
             if ((rtcp_counter / 80) >= p_thread->rtcp_size)
             {
                 SendRTCP (p_thread, GetDWBE (p_pk->p_buffer + 4));
@@ -798,8 +797,9 @@ static int OpenRTCP (sout_access_out_t *obj, int proto, uint16_t dport)
     ptr[1] = 200; /* payload type: Sender Report */
     SetWBE (ptr + 2, 6); /* length = 6 (7 double words) */
     SetDWBE (ptr + 4, p_sys->i_ssrc);
+    SetQWBE (ptr + 8, NTPtime64 ());
     ptr += 28;
-    /* timestamps and counter are handled later */
+    /* timestamp and counter are handled later */
 
     /* Source description */
     uint8_t *sdes = ptr;
@@ -850,7 +850,13 @@ static void CloseRTCP (sout_access_thread_t *obj)
 static void SendRTCP (sout_access_thread_t *obj, uint32_t timestamp)
 {
     uint8_t *ptr = obj->rtcp_data;
-    SetQWBE (ptr + 8, NTPtime64 ());
+
+    uint32_t last = GetDWBE (ptr + 8); // last RTCP SR send time
+    uint64_t now64 = NTPtime64 ();
+    if ((now64 >> 32) < (last + 5))
+        return; // no more than one SR every 5 seconds
+
+    SetQWBE (ptr + 8, now64);
     SetDWBE (ptr + 16, timestamp);
     SetDWBE (ptr + 20, obj->sent_pkts);
     SetDWBE (ptr + 24, obj->sent_bytes);
