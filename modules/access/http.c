@@ -1078,8 +1078,19 @@ static int Request( access_t *p_access, int64_t i_tell )
         }
         else if( !strcasecmp( psz, "Location" ) )
         {
+            char * psz_new_loc;
+
+            /* Rework redirection that don't include server name */
+            if( !strncmp( psz_new_loc, "/", 1 ) )
+            {
+                asprintf(&psz_new_loc, "http://%s:%d%s", p_sys->url.psz_host,
+                        p_sys->url.i_port, p);
+            }
+            else
+                psz_new_loc = strdup( p );
+
             if( p_sys->psz_location ) free( p_sys->psz_location );
-            p_sys->psz_location = strdup( p );
+            p_sys->psz_location = psz_new_loc;
         }
         else if( !strcasecmp( psz, "Content-Type" ) )
         {
