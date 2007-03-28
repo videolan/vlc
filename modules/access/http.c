@@ -1081,7 +1081,7 @@ static int Request( access_t *p_access, int64_t i_tell )
             char * psz_new_loc;
 
             /* Rework redirection that don't include server name */
-            if( !strncmp( psz_new_loc, "/", 1 ) )
+            if( !strncmp( p, "/", 1 ) )
             {
                 asprintf(&psz_new_loc, "http://%s:%d%s", p_sys->url.psz_host,
                         p_sys->url.i_port, p);
