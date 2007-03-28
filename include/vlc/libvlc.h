@@ -451,6 +451,14 @@ VLC_PUBLIC_API void libvlc_video_resize( libvlc_input_t *, int, int, libvlc_exce
 VLC_PUBLIC_API int libvlc_video_reparent( libvlc_input_t *, libvlc_drawable_t, libvlc_exception_t * );
 
 /**
+ * Tell windowless video output to redraw rectangular area (MacOS X only)
+ * \param p_instance libvlc instance
+ * \param area coordinates within video drawable
+ * \param p_exception an initialized exception
+ */
+VLC_PUBLIC_API void libvlc_video_redraw_rectangle( libvlc_input_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
+
+/**
  * Set the default video output parent
  *  this settings will be used as default for all video outputs
  * \param p_instance libvlc instance
@@ -487,7 +495,6 @@ VLC_PUBLIC_API void libvlc_video_set_size( libvlc_instance_t *, int, int, libvlc
  * \param p_exception an initialized exception
  */
 VLC_PUBLIC_API void libvlc_video_set_viewport( libvlc_instance_t *, const libvlc_rectangle_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
-
 
 /** @} */
 

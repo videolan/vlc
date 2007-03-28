@@ -8,6 +8,7 @@
  * Authors: Cl�ent Stenac <zorglub@videolan.org>
  *          Filippo Carone <littlejohn@videolan.org>
  *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
+ *          Damien Fouilleul <damienf a_t videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -248,6 +249,25 @@ void libvlc_video_resize( libvlc_input_t *p_input, int width, int height, libvlc
     {
         vout_Control( p_vout, VOUT_SET_SIZE, width, height );
         vlc_object_release( p_vout );
+    }
+}
+
+void libvlc_video_redraw_rectangle( libvlc_input_t *p_input,
+                           const libvlc_rectangle_t *area,
+                           libvlc_exception_t *p_e )
+{
+    if( (NULL != area)
+     && ((area->bottom - area->top) > 0)
+     && ((area->right - area->left) > 0) )
+    {
+        vout_thread_t *p_vout = GetVout( p_input, p_e );
+        if( p_vout )
+        {
+            /* tell running vout to redraw area */
+            vout_Control( p_vout , VOUT_REDRAW_RECT,
+                               area->top, area->left, area->bottom, area->right );
+            vlc_object_release( p_vout );
+        }
     }
 }
 

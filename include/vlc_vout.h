@@ -607,7 +607,8 @@ enum output_query_e
     VOUT_SNAPSHOT,
     VOUT_CLOSE,
     VOUT_SET_FOCUS,         /* arg1= vlc_bool_t       res=    */
-    VOUT_SET_VIEWPORT       /* arg1= view rect, arg2=clip rect, res= */
+    VOUT_SET_VIEWPORT,      /* arg1= view rect, arg2=clip rect, res= */
+    VOUT_REDRAW_RECT,       /* arg1= area rect, res= */
 };
 
 typedef struct snapshot_t {
