@@ -72,6 +72,8 @@ struct vout_sys_t
     int                 i_width, i_height;
     WindowRef           theWindow;
     WindowGroupRef      winGroup;
+    vlc_bool_t          b_clipped_out;
+    Rect                clipBounds, viewBounds;             
 };
 
 /*****************************************************************************
@@ -290,8 +292,8 @@ static int Lock( vout_thread_t * p_vout )
 {
     if( kCGLNoError == CGLLockContext([[p_vout->p_sys->o_glview openGLContext] CGLContextObj]) )
     {
-	[[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
-	return 0;
+        [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
+        return 0;
     }
     return 1;
 }
@@ -488,11 +490,18 @@ static int aglInit( vout_thread_t * p_vout )
     var_Get( p_vout->p_libvlc, "drawable-clip-right", &val );
     clipBounds.right = val.i_int;
 
-    aglLock(p_vout);
-    aglSetViewport(p_vout, viewBounds, clipBounds);
-    aglReshape(p_vout);
-    aglUnlock(p_vout);
-    
+    p_vout->p_sys->b_clipped_out = (clipBounds.top == clipBounds.bottom)
+                                 || (clipBounds.left == clipBounds.right);
+    if( ! p_vout->p_sys->b_clipped_out )
+    {
+        aglLock(p_vout);
+        aglSetViewport(p_vout, viewBounds, clipBounds);
+        aglReshape(p_vout);
+        aglUnlock(p_vout);
+    }
+    p_vout->p_sys->clipBounds = clipBounds;
+    p_vout->p_sys->viewBounds = viewBounds;
+
     return VLC_SUCCESS;
 }
 
@@ -695,10 +704,49 @@ static int aglControl( vout_thread_t *p_vout, int i_query, va_list args )
             
             if( !p_vout->b_fullscreen ) 
             {
-                aglLock( p_vout );
-                aglSetViewport(p_vout, viewBounds, clipBounds);
-                aglReshape( p_vout );
-                aglUnlock( p_vout );
+                /*
+                ** check that the clip rect is not empty, as this is used
+                ** by Firefox to prevent a plugin from displaying during
+                ** a scrolling event. In this case we just prevent buffers
+                ** from being swapped and ignore clipping as this is less
+                ** disruptive than a GL geometry change
+                */
+
+                p_vout->p_sys->b_clipped_out = (clipBounds.top == clipBounds.bottom)
+                                             || (clipBounds.left == clipBounds.right);
+                if( ! p_vout->p_sys->b_clipped_out )
+                {
+                    /* ignore consecutive viewport update with identical parameters */
+                    if( memcmp(&clipBounds, &(p_vout->p_sys->clipBounds), sizeof(clipBounds) )
+                     && memcmp(&viewBounds, &(p_vout->p_sys->viewBounds), sizeof(viewBounds)) )
+                    {
+                        aglLock( p_vout );
+                        aglSetViewport(p_vout, viewBounds, clipBounds);
+                        aglReshape( p_vout );
+                        aglUnlock( p_vout );
+                        p_vout->p_sys->clipBounds = clipBounds;
+                        p_vout->p_sys->viewBounds = viewBounds;
+                    }
+                }
+            }
+            return VLC_SUCCESS;
+        }
+
+        case VOUT_REDRAW_RECT:
+        {
+            vout_thread_t * p_parent;
+            Rect areaBounds;
+
+            areaBounds.top = va_arg( args, int);
+            areaBounds.left = va_arg( args, int);
+            areaBounds.bottom = va_arg( args, int);
+            areaBounds.right = va_arg( args, int);
+
+            /* Ask the opengl module to redraw */
+            p_parent = (vout_thread_t *) p_vout->p_parent;
+            if( p_parent && p_parent->pf_display )
+            {
+                p_parent->pf_display( p_parent, NULL );
             }
             return VLC_SUCCESS;
         }
@@ -721,8 +769,16 @@ static int aglControl( vout_thread_t *p_vout, int i_query, va_list args )
 
 static void aglSwap( vout_thread_t * p_vout )
 {
-    p_vout->p_sys->b_got_frame = VLC_TRUE;
-    aglSwapBuffers(p_vout->p_sys->agl_ctx);
+    if( ! p_vout->p_sys->b_clipped_out )
+    {
+        p_vout->p_sys->b_got_frame = VLC_TRUE;
+        aglSwapBuffers(p_vout->p_sys->agl_ctx);
+    }
+    else
+    {
+        /* drop frame */
+        glFlush();
+    }
 }
 
 /* Enter this function with the p_vout locked */
@@ -984,10 +1040,10 @@ static int aglLock( vout_thread_t * p_vout )
     if( aglGetCGLContext(p_vout->p_sys->agl_ctx, (void**)&cglContext) )
     {
         if( kCGLNoError == CGLLockContext( cglContext ) )
-	{
-	    aglSetCurrentContext(p_vout->p_sys->agl_ctx);
-	    return 0;
-	}
+        {
+            aglSetCurrentContext(p_vout->p_sys->agl_ctx);
+            return 0;
+        }
     }
     return 1;
 #endif
