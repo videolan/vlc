@@ -26,6 +26,9 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
+#ifndef _VLC_VARIABLES_H
+#define _VLC_VARIABLES_H 1
+
 /**
  * \defgroup variables Variables
  *
@@ -598,4 +601,4 @@ static inline char *__var_CreateGetNonEmptyStringCommand( vlc_object_t *p_obj,
 /**
  * @}
  */
-
+#endif /*  _VLC_VARIABLES_H */ 

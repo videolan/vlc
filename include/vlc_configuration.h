@@ -27,6 +27,10 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
+#ifndef _VLC_CONFIGURATION_H
+#define _VLC_CONFIGURATION_H 1
+
+
 # ifdef __cplusplus
 extern "C" {
 # endif
@@ -483,3 +487,5 @@ static inline char *config_chain_find_value( config_chain_t *p_cfg, const char *
 # ifdef __cplusplus
 }
 # endif
+
+#endif /* _VLC_CONFIGURATION_H */
