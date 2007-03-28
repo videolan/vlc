@@ -1,12 +1,12 @@
 /*****************************************************************************
  * prefs_dialog.cpp : Preferences
- ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ *****************************************************************************
+ * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
- *  
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -19,7 +19,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
 #include "dialogs/prefs_dialog.hpp"
 #include "dialogs_provider.hpp"
@@ -37,7 +38,6 @@
 #include <QCheckBox>
 #include <QScrollArea>
 #include <QMessageBox>
-#include <QKeyEvent>
 
 
 PrefsDialog *PrefsDialog::instance = NULL;
@@ -266,14 +266,6 @@ void PrefsDialog::reset()
     {
         config_ResetAll( p_intf );
         // TODO reset changes ?
-         config_SaveConfigFile( p_intf, NULL );
-    }
-}
-
-void PrefsDialog::keyPressEvent( QKeyEvent *e )
-{
-    if( e->key() == Qt::Key_Escape )
-    {
-        cancel();
+        config_SaveConfigFile( p_intf, NULL );
     }
 }

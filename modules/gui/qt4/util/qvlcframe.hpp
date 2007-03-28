@@ -1,7 +1,7 @@
 /*****************************************************************************
  * qvlcframe.hpp : A few helpers
- ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ *****************************************************************************
+ * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -18,7 +18,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
 #ifndef _QVLCFRAME_H_
 #define _QVLCFRAME_H_
@@ -32,6 +33,7 @@
 #include <QMainWindow>
 #include <QPlastiqueStyle>
 #include <QPushButton>
+#include <QKeyEvent>
 #include "qt4.hpp"
 #include <vlc/vlc.h>
 #include <vlc_charset.h>
@@ -104,6 +106,17 @@ protected:
         settings.setValue( "pos", pos() );
         settings.endGroup();
     }
+    void cancel()
+    {
+        hide();
+    }
+    void keyPressEvent( QKeyEvent *keyEvent )
+    {
+        if( keyEvent->key() == Qt::Key_Escape )
+        {
+            cancel();
+        }
+    }
 };
 
 class QVLCDialog : public QDialog
@@ -121,6 +134,18 @@ public:
 
 protected:
     intf_thread_t *p_intf;
+
+    void cancel()
+    {
+        hide();
+    }
+    void keyPressEvent( QKeyEvent *keyEvent )
+    {
+        if( keyEvent->key() == Qt::Key_Escape )
+        {
+            cancel();
+        }
+    }
 };
 
 class QVLCMW : public QMainWindow

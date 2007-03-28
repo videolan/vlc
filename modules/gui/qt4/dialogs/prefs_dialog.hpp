@@ -1,7 +1,7 @@
 /*****************************************************************************
  * prefs_dialog.hpp : Preferences
- ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ *****************************************************************************
+ * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
- ****************************************************************************/
+ *****************************************************************************/
 
 #ifndef _PREFS_DIALOG_H_
 #define _PREFS_DIALOG_H_
@@ -86,7 +86,6 @@ private slots:
      void save();
      void cancel();
      void reset();
-     void keyPressEvent( QKeyEvent * );
 };
 
 #endif
