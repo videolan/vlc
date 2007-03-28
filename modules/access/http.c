@@ -1080,11 +1080,24 @@ static int Request( access_t *p_access, int64_t i_tell )
         {
             char * psz_new_loc;
 
-            /* Rework redirection that don't include server name */
-            if( !strncmp( p, "/", 1 ) )
+            /* This does not follow RFC 2068, but yet if the url is not absolute,
+             * handle it as everyone does. */
+            if( !strncmp( p, "/", 1 ) && !strncmp( p_sys->psz_location, "http", 4))
             {
-                asprintf(&psz_new_loc, "http://%s:%d%s", p_sys->url.psz_host,
-                        p_sys->url.i_port, p);
+                const char *psz_http_ext;
+
+                if( p_sys->psz_location[4] == ':' )
+                    psz_http_ext = "";
+                else if( !strncmp( p_sys->psz_location+4, "s:", 2) )
+                    psz_http_ext = "s";
+                else
+                    psz_http_ext = NULL; /* Shouldn't happen */
+                
+                if( psz_http_ext )
+                {
+                    asprintf(&psz_new_loc, "http%s://%s:%d%s", psz_http_ext,
+                        p_sys->url.psz_host, p_sys->url.i_port, p);
+                }
             }
             else
                 psz_new_loc = strdup( p );
