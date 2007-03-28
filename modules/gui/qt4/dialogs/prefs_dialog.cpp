@@ -37,6 +37,7 @@
 #include <QCheckBox>
 #include <QScrollArea>
 #include <QMessageBox>
+#include <QKeyEvent>
 
 
 PrefsDialog *PrefsDialog::instance = NULL;
@@ -266,5 +267,13 @@ void PrefsDialog::reset()
         config_ResetAll( p_intf );
         // TODO reset changes ?
          config_SaveConfigFile( p_intf, NULL );
+    }
+}
+
+void PrefsDialog::keyPressEvent( QKeyEvent *e )
+{
+    if( e->key() == Qt::Key_Escape )
+    {
+        cancel();
     }
 }
