@@ -66,10 +66,10 @@ public:
     NPP                 getBrowser()
                             { return p_browser; };
     char*               getAbsoluteURL(const char *url);
-    const NPWindow*     getWindow()
-                            { return &npwindow; };
-    void                setWindow(const NPWindow *window)
-                            { npwindow = *window; };
+    NPWindow&           getWindow()
+                            { return npwindow; };
+    void                setWindow(const NPWindow &window)
+                            { npwindow = window; };
 
     NPClass*            getScriptClass()
                             { return p_scriptClass; };

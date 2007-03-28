@@ -172,7 +172,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
     switch( myEvent->what )
     {
         case nullEvent:
-            break;
+            return true;
         case mouseDown:
         {
             if( (myEvent->when - lastMouseUp) < GetDblTime() )
@@ -204,44 +204,55 @@ int16 NPP_HandleEvent( NPP instance, void * event )
             return true;
         case updateEvt:
         {
-            int needsDisplay = TRUE;
-            libvlc_instance_t *p_vlc = p_plugin->getVLC();
-
-            if( p_vlc )
+            const NPWindow& npwindow = p_plugin->getWindow();
+            if( npwindow.window )
             {
-                if( libvlc_playlist_isplaying(p_vlc, NULL) )
+                int hasVout = FALSE;
+                libvlc_instance_t *p_vlc = p_plugin->getVLC();
+
+                if( p_vlc )
                 {
-                    libvlc_input_t *p_input = libvlc_playlist_get_input(p_vlc, NULL);
-                    if( p_input )
+                    if( libvlc_playlist_isplaying(p_vlc, NULL) )
                     {
-                        needsDisplay = ! libvlc_input_has_vout(p_input, NULL);
-                        libvlc_input_free(p_input);
+                        libvlc_input_t *p_input = libvlc_playlist_get_input(p_vlc, NULL);
+                        if( p_input )
+                        {
+                            hasVout = libvlc_input_has_vout(p_input, NULL);
+                            if( hasVout )
+                            {
+                                libvlc_rectangle_t area;
+                                area.left = 0;
+                                area.top = 0;
+                                area.right = npwindow.width;
+                                area.bottom = npwindow.height;
+                                libvlc_video_redraw_rectangle(p_input, &area, NULL);
+                            }
+                            libvlc_input_free(p_input);
+                        }
                     }
                 }
-            }
 
-            const NPWindow *npwindow = p_plugin->getWindow();
+                if( ! hasVout )
+                {
+                    /* draw the beautiful "No Picture" */
 
-            if( needsDisplay && npwindow->window )
-            {
-                /* draw the beautiful "No Picture" */
+                    ForeColor(blackColor);
+                    PenMode( patCopy );
 
-                ForeColor(blackColor);
-                PenMode( patCopy );
+                    /* seems that firefox forgets to set the following on occasion (reload) */
+                    SetOrigin(((NP_Port *)npwindow.window)->portx, ((NP_Port *)npwindow.window)->porty);
 
-                /* seems that firefox forgets to set the following on occasion (reload) */
-                SetOrigin(((NP_Port *)npwindow->window)->portx, ((NP_Port *)npwindow->window)->porty);
+                    Rect rect;
+                    rect.left = 0;
+                    rect.top = 0;
+                    rect.right = npwindow.width;
+                    rect.bottom = npwindow.height;
+                    PaintRect( &rect );
 
-                Rect rect;
-                rect.left = 0;
-                rect.top = 0;
-                rect.right = npwindow->width;
-                rect.bottom = npwindow->height;
-                PaintRect( &rect );
-
-                ForeColor(whiteColor);
-                MoveTo( (npwindow->width-80)/ 2  , npwindow->height / 2 );
-                DrawText( WINDOW_TEXT , 0 , strlen(WINDOW_TEXT) );
+                    ForeColor(whiteColor);
+                    MoveTo( (npwindow.width-80)/ 2  , npwindow.height / 2 );
+                    DrawText( WINDOW_TEXT , 0 , strlen(WINDOW_TEXT) );
+                }
             }
             return true;
         }
@@ -257,6 +268,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
         case NPEventType_ClippingChangedEvent:
             return false;
         case NPEventType_ScrollingBeginsEvent:
+            return true;
         case NPEventType_ScrollingEndsEvent:
             return true;
         default:
@@ -304,8 +316,10 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
     if( NPERR_NO_ERROR == status )
     {
         instance->pdata = reinterpret_cast<void*>(p_plugin);
-        //NPN_SetValue(instance, NPPVpluginWindowBool, (void *)false);
+#if 0
+        NPN_SetValue(instance, NPPVpluginWindowBool, (void *)false);
         NPN_SetValue(instance, NPPVpluginTransparentBool, (void *)false);
+#endif
     }
     else
     {
@@ -326,7 +340,7 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
     instance->pdata = NULL;
 
 #if XP_WIN
-    HWND win = (HWND)p_plugin->getWindow()->window;
+    HWND win = (HWND)p_plugin->getWindow().window;
     WNDPROC winproc = p_plugin->getWindowProc();
     if( winproc )
     {
@@ -365,14 +379,15 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
      *  size changes, etc.
      */
 
-    const NPWindow *curwin = p_plugin->getWindow();
+    /* retrieve current window */
+    NPWindow& curwin = p_plugin->getWindow();
 
 #ifdef XP_MACOSX
     if( window && window->window )
     {
         /* check if plugin has a new parent window */
         CGrafPtr drawable = (((NP_Port*) (window->window))->port);
-        if( !curwin->window || drawable != (((NP_Port*) (curwin->window))->port) )
+        if( !curwin.window || drawable != (((NP_Port*) (curwin.window))->port) )
         {
             /* set/change parent window */
             libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, NULL);
@@ -397,8 +412,13 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 
         libvlc_video_set_viewport(p_vlc, &view, &clip, NULL);
 
-        /* remember window details */
-        p_plugin->setWindow(window);
+        /* remember new window */
+        p_plugin->setWindow(*window);
+    }
+    else if( curwin.window ) {
+        /* change/set parent */
+        libvlc_video_set_parent(p_vlc, 0, NULL);
+        curwin.window = NULL;
     }
 #endif /* XP_MACOSX */
 
@@ -407,10 +427,10 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     {
         /* check if plugin has a new parent window */
         HWND drawable = (HWND) (window->window);
-        if( !curwin->window || drawable != curwin->window )
+        if( !curwin.window || drawable != curwin.window )
         {
             /* reset previous window settings */
-            HWND oldwin = (HWND)p_plugin->getWindow()->window;
+            HWND oldwin = (HWND)p_plugin->getWindow().window;
             WNDPROC oldproc = p_plugin->getWindowProc();
             if( oldproc )
             {
@@ -431,23 +451,24 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 
             /* change/set parent */
             libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, NULL);
+
+            /* remember new window */
+            p_plugin->setWindow(*window);
+
+            /* Redraw window */
+            InvalidateRect( (HWND)drawable, NULL, TRUE );
+            UpdateWindow( (HWND)drawable );
         }
-
-        /* remember window details */
-        p_plugin->setWindow(window);
-
-        /* Redraw window */
-        InvalidateRect( (HWND)drawable, NULL, TRUE );
-        UpdateWindow( (HWND)drawable );
     }
-    else
+    else if ( curwin->window )
     {
         /* reset WNDPROC */
-        HWND oldwin = (HWND)curwin->window;
+        HWND oldwin = (HWND)curwin.window;
         SetWindowLong( oldwin, GWL_WNDPROC, (LONG)(p_plugin->getWindowProc()) );
         p_plugin->setWindowProc(NULL);
         /* change/set parent */
         libvlc_video_set_parent(p_vlc, 0, NULL);
+        curwin->window = NULL;
     }
 #endif /* XP_WIN */
 
@@ -469,10 +490,16 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, NULL);
 
             /* remember window */
-            p_plugin->setWindow(window);
+            p_plugin->setWindow(*window);
 
             Redraw( w, (XtPointer)p_plugin, NULL );
         }
+    }
+    else if ( curwin->window )
+    {
+        /* change/set parent */
+        libvlc_video_set_parent(p_vlc, 0, NULL);
+        curwin->window = NULL;
     }
 #endif /* XP_UNIX */
 
@@ -694,11 +721,11 @@ static LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpa
 static void Redraw( Widget w, XtPointer closure, XEvent *event )
 {
     VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(closure);
-    const NPWindow *window = p_plugin->getWindow();
+    const NPWindow& window = p_plugin->getWindow();
     GC gc;
     XGCValues gcv;
 
-    Window  drawable   = (Window) window->window;
+    Window  drawable   = (Window) window.window;
     Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
 
     gcv.foreground = BlackPixel( p_display, 0 );
@@ -720,8 +747,8 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
 static void Resize ( Widget w, XtPointer closure, XEvent *event )
 {
     VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(closure);
-    const NPWindow *window = p_plugin->getWindow();
-    Window  drawable   = (Window) window->window;
+    const NPWindow& window = p_plugin->getWindow();
+    Window  drawable   = (Window) window.window;
     Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
 
     int i_ret;
