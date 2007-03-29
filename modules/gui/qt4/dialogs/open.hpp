@@ -51,6 +51,8 @@ public:
 
     QString mrl;
     QString mainMRL;
+public slots:
+    void play();
 private:
     static OpenDialog *instance;
     input_thread_t *p_input;
@@ -69,7 +71,6 @@ private:
     QStringList SeparateEntries( QString );
 private slots:
     void cancel();
-    void play();
     void enqueue();
     void toggleAdvancedPanel();
     void updateMRL( QString );

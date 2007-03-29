@@ -25,6 +25,7 @@
 
 #include "qt4.hpp"
 #include "components/open.hpp"
+#include "dialogs/open.hpp"
 #include "dialogs_provider.hpp"
 #include "util/customwidgets.hpp"
 
@@ -181,6 +182,10 @@ void FileOpenPanel::accept()
     if ( ui.fileInput->count() > 8 ) ui.fileInput->removeItem(0);
 }
 
+void FileOpenBox::accept()
+{
+    OpenDialog::getInstance( NULL, NULL )->play();
+}
 
 /* Function called by Open Dialog when clicked on cancel */
 void FileOpenPanel::clear()

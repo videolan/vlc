@@ -63,7 +63,7 @@ public:
         const QString &directory, const QString &filter ):
         QFileDialog( parent, caption, directory, filter ) {}
 public slots:
-    void accept() {}
+    void accept();
 };
 
 class FileOpenPanel: public OpenPanel
