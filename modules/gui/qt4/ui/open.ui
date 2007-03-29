@@ -39,11 +39,16 @@
    </item>
    <item>
     <widget class="QFrame" name="advancedFrame" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>1</hsizetype>
+       <vsizetype>5</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="frameShape" >
       <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow" >
-      <enum>QFrame::Raised</enum>
      </property>
      <layout class="QHBoxLayout" >
       <property name="margin" >
