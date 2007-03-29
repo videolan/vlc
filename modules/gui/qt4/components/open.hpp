@@ -79,7 +79,6 @@ private:
     QStringList browse( QString );
     FileOpenBox *dialogBox;
     QLineEdit *lineFileEdit;
-    bool eventFilter(QObject *, QEvent *);
 public slots:
     virtual void updateMRL();
 private slots:

@@ -83,9 +83,6 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* Change the text that was uncool in the usual box */
     listLabel[5]->setText( qtr( "Filter:" ) );
 
-    /* Hacks Continued Catch the close event */
-    dialogBox->installEventFilter( this );
-
     // Hide the subtitles control by default.
     ui.subFrame->hide();
 
@@ -190,18 +187,6 @@ void FileOpenPanel::clear()
 {
     ui.fileInput->setEditText( "" );
     ui.subInput->setEditText( "" );
-}
-
-bool FileOpenPanel::eventFilter(QObject *object, QEvent *event)
-{
-    if ( ( object == dialogBox ) && ( event->type() == QEvent::Hide ) )
-    {
-        event->ignore();
-        return true;
-    }
-    // standard event processing
-    else
-        return QObject::eventFilter(object, event);
 }
 
 void FileOpenPanel::toggleSubtitleFrame()
