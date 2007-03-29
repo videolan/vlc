@@ -48,16 +48,31 @@ enum
 static QActionGroup *currentGroup;
 
 // Add static entries to menus
-#define DP_SADD( text, help, icon, slot ) \
+#define DP_SADD( text, help, icon, slot, shortcut ) \
     { \
     if( strlen(icon) > 0 ) \
     { \
-        QAction *action = menu->addAction( text, THEDP, SLOT( slot ) ); \
-        action->setIcon(QIcon(icon)); \
+        if( strlen(shortcut) > 0 ) \
+        { \
+            menu->addAction( QIcon(icon), text, THEDP, SLOT( slot ), \
+                    tr(shortcut) );\
+        } \
+        else \
+        { \
+            menu->addAction( QIcon(icon), text, THEDP, SLOT( slot ) );\
+        } \
     } \
     else \
     { \
-        menu->addAction( text, THEDP, SLOT( slot ) ); \
+        if( strlen(shortcut) > 0 ) \
+        { \
+            menu->addAction( text, THEDP, SLOT( slot ), \
+                   qtr(shortcut) ); \
+        } \
+        else \
+        { \
+            menu->addAction( text, THEDP, SLOT( slot ) ); \
+        } \
     } \
     }
 #define MIM_SADD( text, help, icon, slot ) \
@@ -181,14 +196,15 @@ QMenu *QVLCMenu::FileMenu()
 {
     QMenu *menu = new QMenu();
 /*    DP_SADD( qtr("Quick &Open File...") , "", "", simpleOpenDialog() );*/
-    DP_SADD( qtr("Open &File..." ), "", "", openFileDialog() );
-    DP_SADD( qtr("Open &Disc..." ), "", "", openDiscDialog());
-    DP_SADD( qtr("Open &Network..." ), "", "", openNetDialog());
-    DP_SADD( qtr("Open &Capture Device..." ), "", "", openCaptureDialog());
+    DP_SADD( qtr("Open &File..." ), "", "", openFileDialog(), "Ctrl+O" );
+    DP_SADD( qtr("Open &Disc..." ), "", "", openDiscDialog(), "Ctrl+D" );
+    DP_SADD( qtr("Open &Network..." ), "", "", openNetDialog(), "Ctrl+N" );
+    DP_SADD( qtr("Open &Capture Device..." ), "", "", openCaptureDialog(),
+            "Ctrl+A" );
     menu->addSeparator();
-    DP_SADD( qtr("&Streaming..."), "", "", streamingDialog() );
+    DP_SADD( qtr("&Streaming..."), "", "", streamingDialog(), "Ctrl+S" );
     menu->addSeparator();
-    DP_SADD( qtr("&Quit") , "", "", quit() );
+    DP_SADD( qtr("&Quit") , "", "", quit(), "Ctrl+Q");
     return menu;
 }
 
@@ -198,8 +214,8 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
     menu->addMenu( SDMenu( p_intf ) );
     menu->addSeparator();
 
-    DP_SADD( qtr(I_PL_LOAD), "", "", openPlaylist() );
-    DP_SADD( qtr(I_PL_SAVE), "", "", savePlaylist() );
+    DP_SADD( qtr(I_PL_LOAD), "", "", openPlaylist(), "Ctrl+L" );
+    DP_SADD( qtr(I_PL_SAVE), "", "", savePlaylist(), "Ctrl+P" );
     menu->addSeparator();
     menu->addAction( qtr("Undock from interface"), mi,
                      SLOT( undockPlaylist() ) );
@@ -218,10 +234,10 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         menu->addMenu( intfmenu );
         menu->addSeparator();
     }
-    DP_SADD( qtr(I_MENU_MSG), "", "", messagesDialog() );
-    DP_SADD( qtr(I_MENU_INFO) , "", "", mediaInfoDialog() );
-    DP_SADD( qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog() );
-    DP_SADD( qtr(I_MENU_EXT), "","",extendedDialog() );
+    DP_SADD( qtr(I_MENU_MSG), "", "", messagesDialog(), "Ctrl+M" );
+    DP_SADD( qtr(I_MENU_INFO) , "", "", mediaInfoDialog(), "Ctrl+J" );
+    DP_SADD( qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog(), "Ctrl+I" );
+    DP_SADD( qtr(I_MENU_EXT), "","",extendedDialog(), "Ctrl+G" );
     if( mi )
     {
         menu->addSeparator();
@@ -237,7 +253,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
 #endif
     }
     menu->addSeparator();
-    DP_SADD( qtr("Preferences"), "", "", prefsDialog() );
+    DP_SADD( qtr("Preferences"), "", "", prefsDialog(), "Ctrl+P" );
     return menu;
 }
 
@@ -372,9 +388,9 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 QMenu *QVLCMenu::HelpMenu()
 {
     QMenu *menu = new QMenu();
-    DP_SADD( qtr("Help") , "", "", helpDialog() );
-                menu->addSeparator();
-    DP_SADD( qtr(I_MENU_ABOUT), "", "", aboutDialog() );
+    DP_SADD( qtr("Help") , "", "", helpDialog(), "F1" );
+    menu->addSeparator();
+    DP_SADD( qtr(I_MENU_ABOUT), "", "", aboutDialog(), "Ctrl+A");
     return menu;
 }
 
