@@ -218,7 +218,7 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
     DP_SADD( qtr(I_PL_SAVE), "", "", savePlaylist(), "Ctrl+P" );
     menu->addSeparator();
     menu->addAction( qtr("Undock from interface"), mi,
-                     SLOT( undockPlaylist() ) );
+                     SLOT( undockPlaylist() ), qtr("Ctrl+U") );
     return menu;
 }
 
@@ -390,7 +390,7 @@ QMenu *QVLCMenu::HelpMenu()
     QMenu *menu = new QMenu();
     DP_SADD( qtr("Help") , "", "", helpDialog(), "F1" );
     menu->addSeparator();
-    DP_SADD( qtr(I_MENU_ABOUT), "", "", aboutDialog(), "Ctrl+A");
+    DP_SADD( qtr(I_MENU_ABOUT), "", "", aboutDialog(), "Ctrl+Shift+F1");
     return menu;
 }
 
