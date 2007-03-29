@@ -65,13 +65,6 @@
         <property name="spacing" >
          <number>6</number>
         </property>
-        <item row="2" column="1" colspan="2" >
-         <widget class="QLineEdit" name="slaveText" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0" >
          <widget class="QLabel" name="cacheLabel" >
           <property name="sizePolicy" >
@@ -87,6 +80,16 @@
           </property>
          </widget>
         </item>
+        <item row="4" column="1" colspan="3" >
+         <widget class="QLineEdit" name="advancedLineInput" />
+        </item>
+        <item row="4" column="0" >
+         <widget class="QLabel" name="advancedLabel" >
+          <property name="text" >
+           <string>Customize</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="2" >
          <widget class="QLabel" name="label" >
           <property name="text" >
@@ -94,10 +97,27 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0" >
-         <widget class="QLabel" name="advancedLabel" >
+        <item row="1" column="0" colspan="4" >
+         <widget class="QCheckBox" name="slaveCheckbox" >
           <property name="text" >
-           <string>Customize</string>
+           <string>Play another media synchronously (extra audio file, ...)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3" >
+         <widget class="QToolButton" name="slaveBrowseButton" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>Browse...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" colspan="2" >
+         <widget class="QLineEdit" name="slaveText" >
+          <property name="enabled" >
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -129,23 +149,10 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="3" >
-         <widget class="QToolButton" name="slaveBrowseButton" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>Browse...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" colspan="3" >
-         <widget class="QLineEdit" name="advancedLineInput" />
-        </item>
-        <item row="1" column="0" colspan="4" >
-         <widget class="QCheckBox" name="slaveCheckbox" >
-          <property name="text" >
-           <string>Play another media synchronously (extra audio file, ...)</string>
+        <item row="3" column="1" colspan="2" >
+         <widget class="Line" name="line" >
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
