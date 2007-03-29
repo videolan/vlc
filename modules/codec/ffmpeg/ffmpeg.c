@@ -939,6 +939,11 @@ static struct
     { VLC_FOURCC('R','T','2','1'), CODEC_ID_INDEO2,
       VIDEO_ES, "Indeo Video v2" },
 
+    /* Flash Screen Video */
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(11<<8)+0)
+    { VLC_FOURCC('F','S','V','1'), CODEC_ID_FLASHSV,
+              VIDEO_ES, "Flash Screen Video" },
+#endif
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(13<<8)+0)
     { VLC_FOURCC('V','M','n','c'), CODEC_ID_VMNC,
       VIDEO_ES, "VMware Video" },
