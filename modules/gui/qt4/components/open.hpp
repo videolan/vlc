@@ -28,12 +28,12 @@
 #include <vlc/vlc.h>
 #include <QWidget>
 #include <QString>
+#include <QFileDialog>
 #include "ui/open_file.h"
 #include "ui/open_disk.h"
 #include "ui/open_net.h"
 #include "ui/open_capture.h"
 
-class QFileDialog;
 class QLineEdit;
 
 class OpenPanel: public QWidget
@@ -55,6 +55,17 @@ signals:
     void methodChanged( QString method );
 };
 
+class FileOpenBox: public QFileDialog
+{
+    Q_OBJECT;
+public:
+    FileOpenBox( QWidget *parent, const QString &caption,
+        const QString &directory, const QString &filter ):
+        QFileDialog( parent, caption, directory, filter ) {}
+public slots:
+    void accept() {}
+};
+
 class FileOpenPanel: public OpenPanel
 {
     Q_OBJECT;
@@ -66,7 +77,7 @@ public:
 private:
     Ui::OpenFile ui;
     QStringList browse( QString );
-    QFileDialog *dialogBox;
+    FileOpenBox *dialogBox;
     QLineEdit *lineFileEdit;
     bool eventFilter(QObject *, QEvent *);
 public slots:
@@ -75,7 +86,6 @@ private slots:
     void browseFile();
     void browseFileSub();
     void toggleSubtitleFrame();
-
 };
 
 class NetOpenPanel: public OpenPanel

@@ -55,7 +55,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     fileTypes.replace(QString(";*"), QString(" *"));
 
     // Make this QFileDialog a child of tempWidget from the ui.
-    dialogBox = new QFileDialog( ui.tempWidget, NULL,
+    dialogBox = new FileOpenBox( ui.tempWidget, NULL,
             qfu( p_intf->p_libvlc->psz_homedir ), fileTypes );
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     /* We don't want to see a grip in the middle of the window, do we? */
@@ -196,8 +196,8 @@ bool FileOpenPanel::eventFilter(QObject *object, QEvent *event)
 {
     if ( ( object == dialogBox ) && ( event->type() == QEvent::Hide ) )
     {
-         event->ignore();
-         return true;
+        event->ignore();
+        return true;
     }
     // standard event processing
     else
