@@ -460,7 +460,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             UpdateWindow( (HWND)drawable );
         }
     }
-    else if ( curwin->window )
+    else if ( curwin.window )
     {
         /* reset WNDPROC */
         HWND oldwin = (HWND)curwin.window;
@@ -468,7 +468,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         p_plugin->setWindowProc(NULL);
         /* change/set parent */
         libvlc_video_set_parent(p_vlc, 0, NULL);
-        curwin->window = NULL;
+        curwin.window = NULL;
     }
 #endif /* XP_WIN */
 
@@ -476,7 +476,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     if( window && window->window )
     {
         Window  drawable   = (Window) window->window;
-        if( !curwin->window || drawable != (Window)curwin->window )
+        if( !curwin.window || drawable != (Window)curwin.window )
         {
             Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
 
@@ -495,11 +495,11 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             Redraw( w, (XtPointer)p_plugin, NULL );
         }
     }
-    else if ( curwin->window )
+    else if ( curwin.window )
     {
         /* change/set parent */
         libvlc_video_set_parent(p_vlc, 0, NULL);
-        curwin->window = NULL;
+        curwin.window = NULL;
     }
 #endif /* XP_UNIX */
 
@@ -726,19 +726,19 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
     XGCValues gcv;
 
     Window  drawable   = (Window) window.window;
-    Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
+    Display *p_display = ((NPSetWindowCallbackStruct *)window.ws_info)->display;
 
     gcv.foreground = BlackPixel( p_display, 0 );
     gc = XCreateGC( p_display, drawable, GCForeground, &gcv );
 
     XFillRectangle( p_display, drawable, gc,
-                    0, 0, window->width, window->height );
+                    0, 0, window.width, window.height );
 
     gcv.foreground = WhitePixel( p_display, 0 );
     XChangeGC( p_display, gc, GCForeground, &gcv );
 
     XDrawString( p_display, drawable, gc,
-                 window->width / 2 - 40, window->height / 2,
+                 window.width / 2 - 40, window.height / 2,
                  WINDOW_TEXT, strlen(WINDOW_TEXT) );
 
     XFreeGC( p_display, gc );
@@ -749,7 +749,7 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
     VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(closure);
     const NPWindow& window = p_plugin->getWindow();
     Window  drawable   = (Window) window.window;
-    Display *p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
+    Display *p_display = ((NPSetWindowCallbackStruct *)window.ws_info)->display;
 
     int i_ret;
     Window root_return, parent_return, * children_return;
@@ -768,14 +768,14 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
     }
 #endif /* X11_RESIZE_DEBUG */
 
-    if( ! p_plugin->setSize(window->width, window->height) )
+    if( ! p_plugin->setSize(window.width, window.height) )
     {
         /* size already set */
         return;
     }
 
 
-    i_ret = XResizeWindow( p_display, drawable, window->width, window->height );
+    i_ret = XResizeWindow( p_display, drawable, window.width, window.height );
 
 #ifdef X11_RESIZE_DEBUG
     fprintf( stderr,
@@ -807,7 +807,7 @@ static void Resize ( Widget w, XtPointer closure, XEvent *event )
 #endif /* X11_RESIZE_DEBUG */
 
         i_ret = XResizeWindow( p_display, base_window,
-                window->width, window->height );
+                window.width, window.height );
 
 #ifdef X11_RESIZE_DEBUG
         fprintf( stderr,
