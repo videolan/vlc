@@ -701,23 +701,23 @@ static struct
       VIDEO_ES, "Flic Video" },
 
     /* MJPEG */
-    { VLC_FOURCC( 'M', 'J', 'P', 'G' ), CODEC_ID_MJPEG,
+    { VLC_FOURCC( 'M','J','P','G' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Motion JPEG Video" },
-    { VLC_FOURCC( 'm', 'j', 'p', 'g' ), CODEC_ID_MJPEG,
+    { VLC_FOURCC( 'm','j','p','g' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Motion JPEG Video" },
-    { VLC_FOURCC( 'm', 'j', 'p', 'a' ), CODEC_ID_MJPEG, /* for mov file */
+    { VLC_FOURCC( 'm','j','p','a' ), CODEC_ID_MJPEG, /* for mov file */
       VIDEO_ES, "Motion JPEG Video" },
-    { VLC_FOURCC( 'j', 'p', 'e', 'g' ), CODEC_ID_MJPEG,
+    { VLC_FOURCC( 'j','p','e','g' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Motion JPEG Video" },
-    { VLC_FOURCC( 'J', 'P', 'E', 'G' ), CODEC_ID_MJPEG,
+    { VLC_FOURCC( 'J','P','E','G' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Motion JPEG Video" },
-    { VLC_FOURCC( 'J', 'F', 'I', 'F' ), CODEC_ID_MJPEG,
+    { VLC_FOURCC( 'J','F','I','F' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Motion JPEG Video" },
-    { VLC_FOURCC( 'J', 'P', 'G', 'L' ), CODEC_ID_MJPEG,
+    { VLC_FOURCC( 'J','P','G','L' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Motion JPEG Video" },
-    { VLC_FOURCC( 'm', 'j', 'p', 'b' ), CODEC_ID_MJPEGB, /* for mov file */
+    { VLC_FOURCC( 'm','j','p','b' ), CODEC_ID_MJPEGB, /* for mov file */
       VIDEO_ES, "Motion JPEG B Video" },
-    { VLC_FOURCC( 'S', 'P', '5', 'X' ), CODEC_ID_SP5X,
+    { VLC_FOURCC( 'S','P','5','X' ), CODEC_ID_SP5X,
       VIDEO_ES, "Sunplus Motion JPEG Video" },
 
     /* DV */
