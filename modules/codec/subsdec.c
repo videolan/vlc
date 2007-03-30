@@ -7,6 +7,7 @@
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Samuel Hocevar <sam@zoy.org>
  *          Derk-Jan Hartman <hartman at videolan dot org>
+ *          Bernie Purcell <b dot purcell at adbglobal dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +78,8 @@ static void         ParseUSFHeaderTags( decoder_sys_t *, xml_reader_t * );
 static void         ParseSSAString ( decoder_t *, char *, subpicture_t * );
 static void         ParseUSFString ( decoder_t *, char *, subpicture_t * );
 static void         ParseColor     ( decoder_t *, char *, int *, int * );
-static void         StripTags      ( char * );
+static char        *StripTags      ( char * );
+static char        *CreateHtmlSubtitle ( char * );
 
 #define DEFAULT_NAME "Default"
 #define MAX_LINE 8192
@@ -451,10 +453,10 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         p_spu->i_y = 10;
 
         /* Remove formatting from string */
-        StripTags( psz_subtitle );
 
-        p_spu->p_region->psz_text = psz_subtitle;
-        p_spu->p_region->psz_html = NULL;
+        p_spu->p_region->psz_text = StripTags( psz_subtitle );
+        p_spu->p_region->psz_html = CreateHtmlSubtitle( psz_subtitle );
+
         p_spu->i_start = p_block->i_pts;
         p_spu->i_stop = p_block->i_pts + p_block->i_length;
         p_spu->b_ephemer = (p_block->i_length == 0);
@@ -474,8 +476,9 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         p_spu->b_absolute = VLC_FALSE;
         p_spu->i_original_picture_width = p_sys->i_original_width;
         p_spu->i_original_picture_height = p_sys->i_original_height;
-        if( psz_subtitle ) free( psz_subtitle );
     }
+    if( psz_subtitle ) free( psz_subtitle );
+
     return p_spu;
 }
 
@@ -501,8 +504,7 @@ static void ParseUSFString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
             p_style = p_sys->pp_ssa_styles[i];
     }
 
-    /* The StripTags() function doesn't handle HTML tags that have attribute/values with
-     * them, or properly translate <br/> sequences into newlines, or handle &' sequences
+    /* The StripTags() function doesn't do everything we need (eg. <br/> tag )
      * so do it here ourselves.
      */
     psz_text_start = malloc( strlen( psz_subtitle ));
@@ -514,7 +516,7 @@ static void ParseUSFString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
         {
             if( !strncasecmp( psz_subtitle, "<br/>", 5 ))
                 *psz_text++ = '\n';
-            else if( strncasecmp( psz_subtitle, "<text ", 6 ))
+            else if( !strncasecmp( psz_subtitle, "<text ", 6 ))
             {
                 char *psz_style = strcasestr( psz_subtitle, "style=\"" );
 
@@ -523,7 +525,7 @@ static void ParseUSFString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
                     int i_len;
 
                     psz_style += strspn( psz_style, "\"" ) + 1;
-                    i_len = strspn( psz_style, "\"" );
+                    i_len = strcspn( psz_style, "\"" );
 
                     psz_style[ i_len ] = '\0';
 
@@ -913,7 +915,7 @@ static void ParseUSFHeaderTags( decoder_sys_t *p_sys, xml_reader_t *p_xml_reader
                                     {
                                         unsigned long col = strtol(psz_value+1, NULL, 16);
                                         p_style->font_style.i_font_color = (col & 0x00ffffff);
-                                        // From DTD: <!-- alpha range = 0..100 -->
+                                        /* From DTD: <!-- alpha range = 0..100 --> */
                                         p_style->font_style.i_font_alpha = ((col >> 24) & 0xff) * 255 / 100;
                                     }
                                 }
@@ -923,7 +925,7 @@ static void ParseUSFHeaderTags( decoder_sys_t *p_sys, xml_reader_t *p_xml_reader
                                     {
                                         unsigned long col = strtol(psz_value+1, NULL, 16);
                                         p_style->font_style.i_outline_color = (col & 0x00ffffff);
-                                        // From DTD: <!-- alpha range = 0..100 -->
+                                        /* From DTD: <!-- alpha range = 0..100 --> */
                                         p_style->font_style.i_outline_alpha = ((col >> 24) & 0xff) * 255 / 100;
                                     }
                                 } 
@@ -933,7 +935,7 @@ static void ParseUSFHeaderTags( decoder_sys_t *p_sys, xml_reader_t *p_xml_reader
                                     {
                                         unsigned long col = strtol(psz_value+1, NULL, 16);
                                         p_style->font_style.i_shadow_color = (col & 0x00ffffff);
-                                        // From DTD: <!-- alpha range = 0..100 -->
+                                        /* From DTD: <!-- alpha range = 0..100 --> */
                                         p_style->font_style.i_shadow_alpha = ((col >> 24) & 0xff) * 255 / 100;
                                     }
                                 }
@@ -1166,45 +1168,293 @@ eof:
     return;
 }
 
-static void StripTags( char *psz_text )
+/* Function now handles tags which has attribute values, and tries
+ * to deal with &' commands too. It no longer modifies the string
+ * in place, so that the original text can be reused
+ */
+static char *StripTags( char *psz_subtitle )
 {
-    int i_left_moves = 0;
-    vlc_bool_t b_inside_tag = VLC_FALSE;
-    int i = 0;
-    int i_tag_start = -1;
-    while( psz_text[ i ] )
+    char *psz_text_start;
+
+    psz_text_start = malloc( strlen( psz_subtitle ) + 1 );
+
+    if( psz_text_start != NULL )
     {
-        if( !b_inside_tag )
+        char *psz_text = psz_text_start;
+
+        while( *psz_subtitle )
         {
-            if( psz_text[ i ] == '<' )
+            if( *psz_subtitle == '<' )
             {
-                b_inside_tag = VLC_TRUE;
-                i_tag_start = i;
+                psz_subtitle += strcspn( psz_subtitle, ">" );
             }
-            psz_text[ i - i_left_moves ] = psz_text[ i ];
-        }
-        else
-        {
-            if( ( psz_text[ i ] == ' ' ) ||
-                ( psz_text[ i ] == '\t' ) ||
-                ( psz_text[ i ] == '\n' ) ||
-                ( psz_text[ i ] == '\r' ) )
+            else if( *psz_subtitle == '&' )
             {
-                b_inside_tag = VLC_FALSE;
-                i_tag_start = -1;
-            }
-            else if( psz_text[ i ] == '>' )
-            {
-                i_left_moves += i - i_tag_start + 1;
-                i_tag_start = -1;
-                b_inside_tag = VLC_FALSE;
+                if( !strncasecmp( psz_subtitle, "&lt;", 4 ))
+                {
+                    *psz_text++ = '<';
+                    psz_subtitle += strcspn( psz_subtitle, ";" );
+                }
+                else if( !strncasecmp( psz_subtitle, "&gt;", 4 ))
+                {
+                    *psz_text++ = '>';
+                    psz_subtitle += strcspn( psz_subtitle, ";" );
+                }
+                else if( !strncasecmp( psz_subtitle, "&amp;", 5 ))
+                {
+                    *psz_text++ = '&';
+                    psz_subtitle += strcspn( psz_subtitle, ";" );
+                }
+                else
+                {
+                    /* Assume it is just a normal ampersand */
+                    *psz_text++ = '&';
+                }
             }
             else
             {
-                psz_text[ i - i_left_moves ] = psz_text[ i ];
+                *psz_text++ = *psz_subtitle;
+            }
+
+            psz_subtitle++;
+        }
+        *psz_text = '\0';
+        psz_text_start = realloc( psz_text_start, strlen( psz_text_start ) + 1 );
+    }
+    return psz_text_start;
+}
+
+/* Try to respect any style tags present in the subtitle string. The main
+ * problem here is a lack of adequate specs for the subtitle formats.
+ * SSA/ASS and USF are both detail spec'ed -- but they are handled elsewhere.
+ * SAMI has a detailed spec, but extensive rework is needed in the demux
+ * code to prevent all this style information being excised, as it presently
+ * does.
+ * That leaves the others - none of which were (I guess) originally intended
+ * to be carrying style information. Over time people have used them that way.
+ * In the absence of specifications from which to work, the tags supported
+ * have been restricted to the simple set permitted by the USF DTD, ie. :
+ *  Basic: <br>, <i>, <b>, <u>
+ *  Extended: <font>
+ *    Attributes: face
+ *                family
+ *                size
+ *                color
+ *                outline-color
+ *                shadow-color
+ *                outline-level
+ *                shadow-level
+ *                back-color
+ *                alpha
+ * There is also the further restriction that the subtitle be well-formed
+ * as an XML entity, ie. the HTML sentence:
+ *        <b><i>Bold and Italics</b></i>
+ * doesn't qualify because the tags aren't nested one inside the other.
+ * <text> tags are automatically added to the output to ensure
+ * well-formedness.
+ * If the text doesn't qualify for any reason, a NULL string is
+ * returned, and the rendering engine will fall back to the
+ * plain text version of the subtitle.
+ */
+static char *CreateHtmlSubtitle( char *psz_subtitle )
+{
+    char    psz_tagStack[ 100 ];
+    size_t  i_buf_size     = strlen( psz_subtitle ) + 100;
+    char   *psz_html_start = malloc( i_buf_size );
+
+    psz_tagStack[ 0 ] = '\0';
+
+    if( psz_html_start != NULL )
+    {
+        char *psz_html = psz_html_start;
+
+        strcpy( psz_html, "<text>" );
+        psz_html += 6;
+
+        while( *psz_subtitle )
+        {
+            if( *psz_subtitle == '\n' )
+            {
+                strcpy( psz_html, "<br/>" );
+                psz_html += 5;
+                psz_subtitle++;
+            }
+            else if( *psz_subtitle == '<' )
+            {
+                if( !strncasecmp( psz_subtitle, "<br/>", 5 ))
+                {
+                    strcpy( psz_html, "<br/>" );
+                    psz_html += 5;
+                    psz_subtitle += 5;
+                }
+                else if( !strncasecmp( psz_subtitle, "<b>", 3 ) )
+                {
+                    strcpy( psz_html, "<b>" );
+                    strcat( psz_tagStack, "b" );
+                    psz_html += 3;
+                    psz_subtitle += 3;
+                }
+                else if( !strncasecmp( psz_subtitle, "<i>", 3 ) )
+                {
+                    strcpy( psz_html, "<i>" );
+                    strcat( psz_tagStack, "i" );
+                    psz_html += 3;
+                    psz_subtitle += 3;
+                }
+                else if( !strncasecmp( psz_subtitle, "<u>", 3 ) )
+                {
+                    strcpy( psz_html, "<u>" );
+                    strcat( psz_tagStack, "u" );
+                    psz_html += 3;
+                    psz_subtitle += 3;
+                }
+                else if( !strncasecmp( psz_subtitle, "<font ", 6 ))
+                {
+                    const char *psz_attribs[] = { "face=\"", "family=\"", "size=\"",
+                            "color=\"", "outline-color=\"", "shadow-color=\"",
+                            "outline-level=\"", "shadow-level=\"", "back-color=\"",
+                            "alpha=\"", NULL };
+
+                    strcpy( psz_html, "<font " );
+                    strcat( psz_tagStack, "f" );
+                    psz_html += 6;
+                    psz_subtitle += 6;
+
+                    while( *psz_subtitle != '>' )
+                    {
+                        int  k;
+
+                        for( k=0; psz_attribs[ k ]; k++ )
+                        {
+                            int i_len = strlen( psz_attribs[ k ] );
+
+                            if( !strncasecmp( psz_subtitle, psz_attribs[ k ], i_len )) 
+                            {
+                                i_len += strcspn( psz_subtitle + i_len, "\"" ) + 1;
+
+                                strncpy( psz_html, psz_subtitle, i_len );
+                                psz_html += i_len;
+                                psz_subtitle += i_len;
+                                break;
+                            }
+                        }
+                        if( psz_attribs[ k ] == NULL )
+                        {
+                            /* Jump over unrecognised tag */
+                            int i_len = strcspn( psz_subtitle, "\"" ) + 1;
+
+                            i_len += strcspn( psz_subtitle + i_len, "\"" ) + 1;
+                            psz_subtitle += i_len;
+                        }
+                        while (*psz_subtitle == ' ')
+                            *psz_html++ = *psz_subtitle++;
+                    }
+                    *psz_html++ = *psz_subtitle++;
+                }
+                else if( !strncmp( psz_subtitle, "</", 2 ))
+                {
+                    vlc_bool_t  b_match     = VLC_FALSE;
+                    int         i_len       = strlen( psz_tagStack ) - 1;
+                    char       *psz_lastTag = NULL;
+
+                    if( i_len >= 0 )
+                    {
+                        psz_lastTag = psz_tagStack + i_len;
+                        i_len = 0;
+
+                        switch( *psz_lastTag )
+                        {
+                            case 'b':
+                                b_match = !strncasecmp( psz_subtitle, "</b>", 4 );
+                                i_len   = 4;
+                                break;
+                            case 'i':
+                                b_match = !strncasecmp( psz_subtitle, "</i>", 4 );
+                                i_len   = 4;
+                                break;
+                            case 'u':
+                                b_match = !strncasecmp( psz_subtitle, "</u>", 4 );
+                                i_len   = 4;
+                                break;
+                            case 'f':
+                                b_match = !strncasecmp( psz_subtitle, "</font>", 7 );
+                                i_len   = 7;
+                                break;
+                        }
+                    }
+                    if( ! b_match )
+                    {
+                        /* Not well formed -- kill everything */
+                        free( psz_html_start );
+                        psz_html_start = NULL;
+                        break;
+                    }
+                    *psz_lastTag = '\0';
+                    strncpy( psz_html, psz_subtitle, i_len );
+                    psz_html += i_len;
+                    psz_subtitle += i_len;
+                }
+                else
+                {
+                    psz_subtitle += strcspn( psz_subtitle, ">" );
+                }
+            }
+            else if( *psz_subtitle == '&' )
+            {
+                if( !strncasecmp( psz_subtitle, "&lt;", 4 ))
+                {
+                    strcpy( psz_html, "&lt;" );
+                    psz_html += 4;
+                    psz_subtitle += 4;
+                }
+                else if( !strncasecmp( psz_subtitle, "&gt;", 4 ))
+                {
+                    strcpy( psz_html, "&gt;" );
+                    psz_html += 4;
+                    psz_subtitle += 4;
+                }
+                else if( !strncasecmp( psz_subtitle, "&amp;", 5 ))
+                {
+                    strcpy( psz_html, "&amp;" );
+                    psz_html += 5;
+                    psz_subtitle += 5;
+                }
+                else
+                {
+                    strcpy( psz_html, "&amp;" );
+                    psz_html += 5;
+                    psz_subtitle++;
+                }
+            }
+            else
+            {
+                *psz_html++ = *psz_subtitle++;
+            }
+
+            if( ( size_t )( psz_html - psz_html_start ) > i_buf_size - 10 )
+            {
+                int i_len = psz_html - psz_html_start;
+
+                i_buf_size += 100;
+                psz_html_start = realloc( psz_html_start, i_buf_size );
+                psz_html = psz_html_start + i_len;
+                *psz_html = '\0';
             }
         }
-        i++;
+        strcpy( psz_html, "</text>" );
+        psz_html += 7;
+
+        if( psz_tagStack[ 0 ] != '\0' )
+        {
+            /* Not well formed -- kill everything */
+            free( psz_html_start );
+            psz_html_start = NULL;
+        }
+        else if( psz_html_start )
+        {
+            /* Shrink the memory requirements */
+            psz_html_start = realloc( psz_html_start,  psz_html - psz_html_start + 1 );
+        }
     }
-    psz_text[ i - i_left_moves ] = '\0';
+    return psz_html_start;
 }

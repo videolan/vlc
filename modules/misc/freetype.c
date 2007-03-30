@@ -1,11 +1,12 @@
 /*****************************************************************************
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
- * Copyright (C) 2002 - 2005 the VideoLAN team
+ * Copyright (C) 2002 - 2007 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
+ *          Bernie Purcell <b dot purcell at adbglobal dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
