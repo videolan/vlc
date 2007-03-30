@@ -122,8 +122,8 @@ static int SetFontSize( filter_t *, int );
     "relative size will be overriden." )
 
 static int   pi_sizes[] = { 20, 18, 16, 12, 6 };
-static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
-                                   N_("Large"), N_("Larger") };
+static const char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
+                                         N_("Large"), N_("Larger") };
 #define YUVP_TEXT N_("Use YUVP renderer")
 #define YUVP_LONGTEXT N_("This renders the font using \"paletized YUV\". " \
   "This option is only needed if you want to encode into DVB subtitles" )
@@ -136,14 +136,14 @@ static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
 #define EFFECT_OUTLINE_FAT 3
 
 static int   pi_effects[] = { 1, 2, 3 };
-static char *ppsz_effects_text[] = { N_("Background"),N_("Outline"),
-                                     N_("Fat Outline") };
+static const char *ppsz_effects_text[] = { N_("Background"),N_("Outline"),
+                                           N_("Fat Outline") };
 static int pi_color_values[] = {
   0x00000000, 0x00808080, 0x00C0C0C0, 0x00FFFFFF, 0x00800000,
   0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x00808000, 0x00008000, 0x00008080,
   0x0000FF00, 0x00800080, 0x00000080, 0x000000FF, 0x0000FFFF };
 
-static char *ppsz_color_descriptions[] = {
+static const char *ppsz_color_descriptions[] = {
   N_("Black"), N_("Gray"), N_("Silver"), N_("White"), N_("Maroon"),
   N_("Red"), N_("Fuchsia"), N_("Yellow"), N_("Olive"), N_("Green"), N_("Teal"),
   N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"), N_("Aqua") };
@@ -298,7 +298,7 @@ static int Create( vlc_object_t *p_this )
 #ifdef WIN32
         GetWindowsDirectory( psz_fontfile, PATH_MAX + 1 );
         strcat( psz_fontfile, "\\fonts\\arial.ttf" );
-#elif __APPLE__
+#elif defined(__APPLE__)
         strcpy( psz_fontfile, DEFAULT_FONT );
 #else
         msg_Err( p_filter, "user didn't specify a font" );
@@ -1140,7 +1140,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 }
 
 #ifdef HAVE_FONTCONFIG
-static int PushFont( font_stack_t **p_font, char *psz_name, int i_size,
+static int PushFont( font_stack_t **p_font, const char *psz_name, int i_size,
                      int i_color, int i_alpha )
 {
     font_stack_t *p_new;
@@ -1314,7 +1314,7 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
     {
         FT_BBox glyph_size;
 
-        FT_Glyph_Get_CBox( p_line->pp_glyphs[ i ], ft_glyph_bbox_pixels, &glyph_size );
+        FT_Glyph_Get_CBox( (FT_Glyph) p_line->pp_glyphs[ i ], ft_glyph_bbox_pixels, &glyph_size );
 
         line.xMax = p_line->p_glyph_pos[ i ].x + glyph_size.xMax -
             glyph_size.xMin + p_line->pp_glyphs[ i ]->left;
@@ -1482,7 +1482,7 @@ static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader, char *p
     }
     else
     {
-        PushFont( &p_fonts, FC_DEFAULT_FONT, 24, 0xffffff, 0 );
+        PushFont( &p_fonts, FC_DEFAULT_FONT, p_sys->i_font_size, 0xffffff, 0 );
     }
 
     while ( ( xml_ReaderRead( p_xml_reader ) == 1 ) && ( rv == VLC_SUCCESS ) )
@@ -1731,7 +1731,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
         return VLC_EGENERIC;
 
     p_sub = stream_MemoryNew( VLC_OBJECT(p_filter),
-                              p_region_in->psz_html,
+                              (uint8_t *) p_region_in->psz_html,
                               strlen( p_region_in->psz_html ),
                               VLC_TRUE );
     if( p_sub )
