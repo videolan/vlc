@@ -1,6 +1,6 @@
 diff -ruN dirac-0.6.0.old/Makefile.am dirac-0.6.0/Makefile.am
---- dirac-0.6.0.old/Makefile.am	2007-03-27 00:17:15.000000000 +0200
-+++ dirac-0.6.0/Makefile.am	2007-03-27 00:18:31.000000000 +0200
+--- dirac/Makefile.am	2007-03-27 00:17:15.000000000 +0200
++++ dirac/Makefile.am	2007-03-27 00:18:31.000000000 +0200
 @@ -2,17 +2,12 @@
  #
  
@@ -21,8 +21,8 @@ diff -ruN dirac-0.6.0.old/Makefile.am dirac-0.6.0/Makefile.am
  if HAVE_LATEX
  DOC_DIR = doc
 diff -ruN dirac-0.6.0.old/configure.ac dirac-0.6.0/configure.ac
---- dirac-0.6.0.old/configure.ac	2007-03-27 00:17:15.000000000 +0200
-+++ dirac-0.6.0/configure.ac	2007-03-27 00:19:52.000000000 +0200
+--- dirac/configure.ac	2007-03-27 00:17:15.000000000 +0200
++++ dirac/configure.ac	2007-03-27 00:19:52.000000000 +0200
 @@ -143,7 +143,7 @@
  dnl algorithm documentation is not distributed in
  dnl the release. It is available only from CVS
