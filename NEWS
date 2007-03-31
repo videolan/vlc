@@ -20,7 +20,7 @@ Important notes:
   * The marq, mosaic and logo commands in the rc interface changed. They
     now require a target name as their first argument. Example:
     vlc --sub-filter "marq@test{marquee=Hello}" -I rc <somevideo>
-    You can then use commands like: marq-marquee test Goodbye
+    You can then use commands like: @test marq-marquee Goodbye
 
 Changes:
 --------
