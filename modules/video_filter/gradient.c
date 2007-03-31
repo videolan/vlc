@@ -45,6 +45,9 @@ static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
+static int GradientCallback( vlc_object_t *, char const *,
+                             vlc_value_t, vlc_value_t,
+                             void * );
 
 static void FilterGradient( filter_t *, picture_t *, picture_t * );
 static void FilterEdge    ( filter_t *, picture_t *, picture_t * );
@@ -140,14 +143,8 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                    p_filter->p_cfg );
 
-    var_Create( p_filter, FILTER_PREFIX "mode",
-                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, FILTER_PREFIX "type",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, FILTER_PREFIX "cartoon",
-                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-
-    if( !(psz_method = var_GetString( p_filter, FILTER_PREFIX "mode" )) )
+    if( !(psz_method =
+        var_CreateGetNonEmptyStringCommand( p_filter, FILTER_PREFIX "mode" )) )
     {
         msg_Err( p_filter, "configuration variable "
                  FILTER_PREFIX "mode empty" );
@@ -176,9 +173,16 @@ static int Create( vlc_object_t *p_this )
     free( psz_method );
 
     p_filter->p_sys->i_gradient_type =
-        var_GetInteger( p_filter, FILTER_PREFIX "type" );
+        var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "type" );
     p_filter->p_sys->b_cartoon =
-        var_GetInteger( p_filter, FILTER_PREFIX "cartoon" );
+        var_CreateGetBoolCommand( p_filter, FILTER_PREFIX "cartoon" );
+
+    var_AddCallback( p_filter, FILTER_PREFIX "mode",
+                     GradientCallback, p_filter->p_sys );
+    var_AddCallback( p_filter, FILTER_PREFIX "type",
+                     GradientCallback, p_filter->p_sys );
+    var_AddCallback( p_filter, FILTER_PREFIX "cartoon",
+                     GradientCallback, p_filter->p_sys );
 
     p_filter->p_sys->p_buf32 = NULL;
     p_filter->p_sys->p_buf32_bis = NULL;
@@ -255,7 +259,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     return p_outpic;
 }
-
 
 /*****************************************************************************
  * Gaussian Convolution
@@ -735,3 +738,40 @@ static void FilterHough( filter_t *p_filter, picture_t *p_inpic,
     if( p_smooth ) free( p_smooth );
 }
 #undef p_pre_hough
+
+
+static int GradientCallback( vlc_object_t *p_this, char const *psz_var,
+                             vlc_value_t oldval, vlc_value_t newval,
+                             void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *)p_data;
+    if( !strcmp( psz_var, FILTER_PREFIX "mode" ) )
+    {
+        if( !strcmp( newval.psz_string, "gradient" ) )
+        {
+            p_sys->i_mode = GRADIENT;
+        }
+        else if( !strcmp( newval.psz_string, "edge" ) )
+        {
+            p_sys->i_mode = EDGE;
+        }
+        else if( !strcmp( newval.psz_string, "hough" ) )
+        {
+            p_sys->i_mode = HOUGH;
+        }
+        else
+        {
+            msg_Err( p_this, "no valid gradient mode provided" );
+            p_sys->i_mode = GRADIENT;
+        }
+    }
+    else if( !strcmp( psz_var, FILTER_PREFIX "type" ) )
+    {
+        p_sys->i_gradient_type = newval.i_int;
+    }
+    else if( !strcmp( psz_var, FILTER_PREFIX "cartoon" ) )
+    {
+        p_sys->b_cartoon = newval.b_bool;
+    }
+    return VLC_SUCCESS;
+}
