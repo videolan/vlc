@@ -1931,6 +1931,7 @@ DIRAC_SUBDIRS = libdirac_byteio libdirac_common libdirac_motionest libdirac_enco
 
 ifdef HAVE_WIN32
 DIRAC_SUBDIRS += win32
+endif
 
 .dirac: dirac
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  CFLAGS="$(CFLAGS)" && DOC_DIR="" make $(DIRAC_SUBDIRS) && DOC_DIR="" make install)
