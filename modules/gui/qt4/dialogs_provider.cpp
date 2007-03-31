@@ -34,7 +34,7 @@
 
 /* The dialogs */
 #include "dialogs/playlist.hpp"
-#include "dialogs/prefs_dialog.hpp"
+#include "dialogs/preferences.hpp"
 #include "dialogs/mediainfo.hpp"
 #include "dialogs/messages.hpp"
 #include "dialogs/extended.hpp"

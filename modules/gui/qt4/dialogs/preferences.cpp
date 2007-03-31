@@ -1,5 +1,5 @@
 /*****************************************************************************
- * prefs_dialog.cpp : Preferences
+ * preferences.cpp : Preferences
  *****************************************************************************
  * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$
@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "dialogs/prefs_dialog.hpp"
+#include "dialogs/preferences.hpp"
 #include "dialogs_provider.hpp"
 #include "util/qvlcframe.hpp"
 

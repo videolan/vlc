@@ -39,7 +39,7 @@ TOMOC = main_interface \
 	input_manager \
 	playlist_model \
 	dialogs/playlist \
-	dialogs/prefs_dialog \
+	dialogs/preferences \
 	dialogs/messages \
 	dialogs/errors \
 	dialogs/mediainfo \
@@ -73,7 +73,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/extended.moc.cpp \
 		dialogs/messages.moc.cpp \
 		dialogs/errors.moc.cpp \
-		dialogs/prefs_dialog.moc.cpp \
+		dialogs/preferences.moc.cpp \
 		dialogs/interaction.moc.cpp \
 		dialogs/sout.moc.cpp \
 		dialogs/help.moc.cpp \
@@ -119,7 +119,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		input_manager.cpp \
 		playlist_model.cpp \
 		dialogs/playlist.cpp \
-		dialogs/prefs_dialog.cpp \
+		dialogs/preferences.cpp \
 		dialogs/mediainfo.cpp \
 		dialogs/extended.cpp \
 		dialogs/messages.cpp \
@@ -155,7 +155,7 @@ EXTRA_DIST += \
 	dialogs/extended.hpp \
 	dialogs/messages.hpp \
 	dialogs/errors.hpp \
-	dialogs/prefs_dialog.hpp \
+	dialogs/preferences.hpp \
 	dialogs/interaction.hpp \
 	dialogs/sout.hpp \
 	dialogs/help.hpp \

@@ -29,7 +29,7 @@
 #include <QSignalMapper>
 
 #include "components/extended_panels.hpp"
-#include "dialogs/prefs_dialog.hpp"
+#include "dialogs/preferences.hpp"
 #include "dialogs_provider.hpp"
 #include "qt4.hpp"
 
