@@ -39,6 +39,8 @@ static int  Create      ( vlc_object_t * );
 static void Destroy     ( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
+static int ExtractCallback( vlc_object_t *, char const *,
+                            vlc_value_t, vlc_value_t, void * );
 
 static void get_red_from_yuv420( picture_t *, picture_t *, int, int, int );
 static void get_green_from_yuv420( picture_t *, picture_t *, int, int, int );
@@ -112,10 +114,10 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    var_Create( p_filter, FILTER_PREFIX "component",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    p_filter->p_sys->i_color = var_GetInteger( p_filter,
+    p_filter->p_sys->i_color = var_CreateGetIntegerCommand( p_filter,
                                                FILTER_PREFIX "component" );
+    var_AddCallback( p_filter, FILTER_PREFIX "component",
+                     ExtractCallback, p_filter->p_sys );
     switch( p_filter->p_sys->i_color )
     {
         case RED:
@@ -684,4 +686,32 @@ static void get_blue_from_yuv422( picture_t *p_inpic, picture_t *p_outpic,
         uout  += i_uv_pitch - i_uv_visible_pitch;
         vout  += i_uv_pitch - i_uv_visible_pitch;
     }
+}
+
+static int ExtractCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *)p_data;
+
+    if( !strcmp( psz_var, FILTER_PREFIX "component" ) )
+    {
+        p_sys->i_color = newval.i_int;
+        switch( p_sys->i_color )
+        {
+            case RED:
+            case GREEN:
+            case BLUE:
+                break;
+            default:
+                make_projection_matrix( p_sys->i_color,
+                                        p_sys->projection_matrix );
+                break;
+        }
+    }
+    else
+    {
+        msg_Warn( p_this, "Unknown callback command." );
+    }
+    return VLC_SUCCESS;
 }
