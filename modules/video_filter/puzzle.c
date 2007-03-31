@@ -52,6 +52,9 @@ static int  SendEvents   ( vlc_object_t *, char const *,
 static int  MouseEvent   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 
+static int PuzzleCallback( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -208,10 +211,18 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_vout, CFG_PREFIX, ppsz_filter_options,
                        p_vout->p_cfg );
 
-    p_vout->p_sys->i_rows = var_CreateGetInteger( p_vout, CFG_PREFIX "rows" );
-    p_vout->p_sys->i_cols = var_CreateGetInteger( p_vout, CFG_PREFIX "cols" );
+    p_vout->p_sys->i_rows =
+        var_CreateGetIntegerCommand( p_vout, CFG_PREFIX "rows" );
+    p_vout->p_sys->i_cols =
+        var_CreateGetIntegerCommand( p_vout, CFG_PREFIX "cols" );
     p_vout->p_sys->b_blackslot =
-                      var_CreateGetInteger( p_vout, CFG_PREFIX "black-slot" );
+        var_CreateGetBoolCommand( p_vout, CFG_PREFIX "black-slot" );
+    var_AddCallback( p_vout, CFG_PREFIX "rows",
+                     PuzzleCallback, p_vout->p_sys );
+    var_AddCallback( p_vout, CFG_PREFIX "cols",
+                     PuzzleCallback, p_vout->p_sys );
+    var_AddCallback( p_vout, CFG_PREFIX "black-slot",
+                     PuzzleCallback, p_vout->p_sys );
 
     p_vout->p_sys->pi_order = NULL;
     shuffle( p_vout->p_sys );
@@ -542,5 +553,26 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
             p_vout->p_sys->b_finished = finished( p_vout->p_sys );
         }
     }
+    return VLC_SUCCESS;
+}
+
+static int PuzzleCallback( vlc_object_t *p_this, char const *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    vout_sys_t *p_sys = (vout_sys_t *)p_data;
+    if( !strcmp( psz_var, CFG_PREFIX "rows" ) )
+    {
+        p_sys->i_rows = __MAX( 1, newval.i_int );
+    }
+    else if( !strcmp( psz_var, CFG_PREFIX "cols" ) )
+    {
+        p_sys->i_cols = __MAX( 1, newval.i_int );
+    }
+    else if( !strcmp( psz_var, CFG_PREFIX "black-slot" ) )
+    {
+        p_sys->b_blackslot = newval.b_bool;
+    }
+    shuffle( p_sys );
     return VLC_SUCCESS;
 }
