@@ -40,6 +40,7 @@ Decoders:
  * VP60/VP61/VP6F/VP62 support
  * Teletext subtitles (telx) support
  * MKV USF subtitles support
+ * HTML based subtitles support
  * Flash Screen Video support
 
 Encoders:
