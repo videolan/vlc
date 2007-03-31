@@ -50,7 +50,7 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     QLabel *timeIntro = new
         QLabel( "Enter below the desired time you want to go in the media." );
     timeIntro->setWordWrap( true );
-    timeIntro->setAlignment( Qt::AlignHCenter, Qt::AlignVCenter );
+    timeIntro->setAlignment( Qt::AlignCenter );
 
     timeEdit = new QTimeEdit();
     timeEdit->setDisplayFormat( "hh : mm : ss" );
