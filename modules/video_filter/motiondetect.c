@@ -161,19 +161,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     }
 
     p_outpix = p_outpic->p[Y_PLANE].p_pixels;
-#if 0
-    p_filter->p_libvlc->pf_memset( p_outpic->p[U_PLANE].p_pixels, 0x80,
-        p_inpic->p[U_PLANE].i_pitch * p_inpic->p[U_PLANE].i_visible_lines );
-    p_filter->p_libvlc->pf_memset( p_outpic->p[V_PLANE].p_pixels, 0x80,
-        p_inpic->p[V_PLANE].i_pitch * p_inpic->p[V_PLANE].i_visible_lines );
-#else
     p_filter->p_libvlc->pf_memcpy( p_outpic->p[U_PLANE].p_pixels,
                                    p_inpic->p[U_PLANE].p_pixels,
         p_inpic->p[U_PLANE].i_pitch * p_inpic->p[U_PLANE].i_visible_lines );
     p_filter->p_libvlc->pf_memcpy( p_outpic->p[V_PLANE].p_pixels,
                                    p_inpic->p[V_PLANE].p_pixels,
         p_inpic->p[V_PLANE].i_pitch * p_inpic->p[V_PLANE].i_visible_lines );
-#endif
 
     if( !p_sys->p_oldpix || !p_sys->p_buf )
     {
@@ -247,6 +240,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
                 {
                     diff = p_oldpix_u[i] - p_inpix_u[i];
                 }
+                if( p_inpix_v[i] > p_oldpix_v[i] )
+                {
+                    diff += p_inpix_v[i] - p_oldpix_v[i];
+                }
+                else
+                {
+                    diff += p_oldpix_v[i] - p_inpix_v[i];
+                }
                 switch( format )
                 {
                     case 1:
@@ -268,31 +269,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     /**
      * Apply some smoothing to remove noise
      */
-#if 1
     GaussianConvolution( p_buf2, p_buf, i_src_pitch, i_num_lines, i_src_visible );
 
-#else
-    uint32_t *pouet = p_buf2;
-    p_buf2 = p_buf;
-    p_buf = pouet;
-#endif
     /**
      * Copy luminance plane
      */
     for( i = 0; i < i_src_pitch * i_num_lines; i++ )
     {
-        /*if( p_buf[i] > 25 )
-        {
-            //p_outpix[i] = 255;
-        }
-        else// if( p_buf[i] > 15 )*/
-        {
-            p_outpix[i] = p_inpix[i];
-        }
-        /*else
-        {
-            p_outpix[i] = 0;
-        }*/
+        p_outpix[i] = p_inpix[i];
     }
 
     /**
@@ -372,7 +356,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
         {
             while( colors[p_buf[i]] != p_buf[i] )
                 p_buf[i] = colors[p_buf[i]];
-            //p_outpix[i] = /*(p_buf[i]%2) */ 0xff;
             if( color_x_min[p_buf[i]] == -1 )
             {
                 color_x_min[p_buf[i]] =
@@ -432,7 +415,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
             if( ( color_y_max[i] - color_y_min[i] ) * ( color_x_max[i] - color_x_min[i] ) < 16 ) continue;
             j++;
             int x, y;
-#if 1
             y = color_y_min[i];
             for( x = color_x_min[i]; x <= color_x_max[i]; x++ )
             {
@@ -453,22 +435,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
             {
                 p_outpix[y*i_src_pitch+x] = 0xff;
             }
-#else
-            for( x = color_x_min[i]; x <= color_x_max[i]; x++ )
-            {
-                for( y = color_y_min[i]; y <= color_y_max[i]; y++ )
-                {
-                    p_outpix[y*i_src_pitch+x] = 0x0;
-                        //p_inpix[y*i_src_pitch+x];
-                }
-            }
-#endif
         }
     }
-    printf("counted %d moving shapes\n", j);
+    msg_Dbg( p_filter, "Counted %d moving shapes.", j);
 
     /**
-     * We're done. Lets keep a copy of the Y plane
+     * We're done. Lets keep a copy of the picture
      */
     p_filter->p_libvlc->pf_memcpy( p_oldpix, p_inpix,
                                    i_src_pitch * i_num_lines );
