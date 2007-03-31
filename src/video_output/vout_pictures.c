@@ -592,6 +592,7 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
             break;
 
         case FOURCC_RV32:
+        case FOURCC_RGBA:
             p_format->i_bits_per_pixel = 32;
             break;
         case FOURCC_RV24:
@@ -820,6 +821,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         case FOURCC_RV32:
+        case FOURCC_RGBA:
             p_pic->p->i_lines = i_height_aligned;
             p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned * 4;

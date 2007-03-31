@@ -44,6 +44,9 @@
 /* Packed RGB 32bpp, usually 0x00ff0000, 0x0000ff00, 0x000000ff */
 #define FOURCC_RV32         VLC_FOURCC('R','V','3','2')
 
+/* Packed RGBA 32bpp, like RV32 with 0xff000000 used for alpha */
+#define FOURCC_RGBA         VLC_FOURCC('R','G','B','A')
+
 /* Planar YUV 4:2:0, Y:U:V */
 #define FOURCC_I420         VLC_FOURCC('I','4','2','0')
 #define FOURCC_IYUV         VLC_FOURCC('I','Y','U','V')

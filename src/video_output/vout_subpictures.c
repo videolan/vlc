@@ -502,6 +502,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_spu->p_blend->fmt_out.video.i_aspect = p_fmt->i_aspect;
             p_spu->p_blend->fmt_out.video.i_chroma = p_fmt->i_chroma;
             p_spu->p_blend->fmt_in.video.i_chroma = VLC_FOURCC('Y','U','V','P');
+            /* XXX: We'll also be using it for YUVA and RGBA blending ... */
 
             p_spu->p_blend->p_module =
                 module_Need( p_spu->p_blend, "video blending", 0, 0 );
@@ -612,6 +613,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_spu->p_scale->fmt_out.video.i_chroma =
                 p_spu->p_scale->fmt_in.video.i_chroma =
                     VLC_FOURCC('Y','U','V','P');
+            /* XXX: We'll also be using it for YUVA and RGBA blending ... */
             p_spu->p_scale->fmt_in.video.i_width =
                 p_spu->p_scale->fmt_in.video.i_height = 32;
             p_spu->p_scale->fmt_out.video.i_width =
@@ -671,7 +673,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             }
 
             if( (i_scale_width != 1000 || i_scale_height != 1000) &&
-                p_spu->p_scale && !p_region->p_cache )
+                p_spu->p_scale && !p_region->p_cache &&
+                VLC_FOURCC('R','G','B','A') != p_region->fmt.i_chroma /* FIXME */ )
             {
                 picture_t *p_pic;
 
