@@ -75,6 +75,8 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     ui.setupUi( this );
 
+#if 0
+
     SETUP_VFILTER( clone, true, qtr(I_CLONE_TIP),
                                 qtr("Configure the clone filter") );
     SETUP_VFILTER( magnify, false, qtr(I_MAGNIFY_TIP),
@@ -93,6 +95,7 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
                                    qtr("Configure the \"gradient\" effect"));
     SETUP_VFILTER( colorthres, true, qtr(I_COLORTHRES_TIP),
                                    qtr("Configure the color detection effect"));
+#endif
 }
 
 ExtVideo::~ExtVideo()
