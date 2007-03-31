@@ -37,6 +37,8 @@ ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     setWindowTitle( qtr( "Errors" ) );
     resize( 500 , 200 );
 
+    setWindowModality( Qt::ApplicationModal );
+
     QGridLayout *layout = new QGridLayout( this );
     QPushButton *closeButton = new QPushButton(qtr("&Close"));
     QPushButton *clearButton = new QPushButton(qtr("&Clear"));
