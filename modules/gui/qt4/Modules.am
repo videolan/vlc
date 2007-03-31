@@ -47,7 +47,8 @@ TOMOC = main_interface \
 	dialogs/interaction \
 	dialogs/sout \
 	dialogs/help \
-    dialogs/open \
+	dialogs/gototime \
+	dialogs/open \
 	components/extended_panels \
 	components/infopanels \
 	components/preferences_widgets \
@@ -76,6 +77,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/interaction.moc.cpp \
 		dialogs/sout.moc.cpp \
 		dialogs/help.moc.cpp \
+		dialogs/gototime.moc.cpp \
 		dialogs/open.moc.cpp \
 		components/extended_panels.moc.cpp \
 		components/infopanels.moc.cpp \
@@ -125,6 +127,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/interaction.cpp \
 		dialogs/sout.cpp \
 		dialogs/help.cpp \
+		dialogs/gototime.cpp \
 		dialogs/open.cpp \
 		components/extended_panels.cpp \
 		components/infopanels.cpp \
@@ -156,6 +159,7 @@ EXTRA_DIST += \
 	dialogs/interaction.hpp \
 	dialogs/sout.hpp \
 	dialogs/help.hpp \
+	dialogs/gototime.hpp \
 	dialogs/open.hpp \
 	components/extended_panels.hpp \
 	components/infopanels.hpp \

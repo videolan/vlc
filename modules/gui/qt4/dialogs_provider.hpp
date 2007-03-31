@@ -144,6 +144,7 @@ public slots:
     void MLAppendDir();
     void quit();
     void switchToSkins();
+    void gotoTimeDialog();
     void helpDialog();
     void aboutDialog();
 };

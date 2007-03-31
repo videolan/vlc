@@ -166,7 +166,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
                               bool visual_selector_enabled )
 {
 #ifndef WIN32    
-    /* Uglu klugde
+    /* Ugly klugde
      * Remove SIGCHLD from the ignored signal the time to initialise
      * Qt because it call gconf to get the icon theme */
     sigset_t set;
@@ -252,6 +252,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         if( visual_selector_enabled ) adv->setChecked( true );
 #endif
     }
+    DP_SADD( qtr(I_MENU_GOTOTIME), "","",gotoTimeDialog(), "Ctrl+T" );
     menu->addSeparator();
     DP_SADD( qtr("Preferences"), "", "", prefsDialog(), "Ctrl+P" );
     return menu;

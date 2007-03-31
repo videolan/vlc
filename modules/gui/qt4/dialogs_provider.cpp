@@ -41,6 +41,7 @@
 #include "dialogs/sout.hpp"
 #include "dialogs/open.hpp"
 #include "dialogs/help.hpp"
+#include "dialogs/gototime.hpp"
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -133,6 +134,11 @@ void DialogsProvider::extendedDialog()
 void DialogsProvider::messagesDialog()
 {
     MessagesDialog::getInstance( p_intf )->toggleVisible();
+}
+
+void DialogsProvider::gotoTimeDialog()
+{
+    GotoTimeDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::helpDialog()
