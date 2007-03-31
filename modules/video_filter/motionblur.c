@@ -41,6 +41,8 @@ static void Destroy      ( vlc_object_t * );
 static picture_t *Filter ( filter_t *, picture_t * );
 static void RenderBlur   ( filter_sys_t *, picture_t *, picture_t * );
 static void Copy         ( filter_t *, uint8_t **, picture_t * );
+static int MotionBlurCallback( vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -100,10 +102,10 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    var_Create( p_filter, FILTER_PREFIX "factor",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     p_filter->p_sys->i_factor =
-        var_GetInteger( p_filter, FILTER_PREFIX "factor" );
+        var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "factor" );
+    var_AddCallback( p_filter, FILTER_PREFIX "factor",
+                     MotionBlurCallback, p_filter->p_sys );
 
     p_filter->p_sys->pp_planes = NULL;
     p_filter->p_sys->i_planes = 0;
@@ -223,4 +225,14 @@ static void Copy( filter_t *p_filter, uint8_t **pp_planes, picture_t *p_pic )
             p_filter->p_sys->pp_planes[i_plane], p_pic->p[i_plane].p_pixels,
             p_pic->p[i_plane].i_pitch * p_pic->p[i_plane].i_visible_lines );
     }
+}
+
+static int MotionBlurCallback( vlc_object_t *p_this, char const *psz_var,
+                               vlc_value_t oldval, vlc_value_t newval,
+                               void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *)p_data;
+    if( !strcmp( psz_var, FILTER_PREFIX "factor" ) )
+        p_sys->i_factor = __MIN( 127, __MAX( 1, newval.i_int ) );
+    return VLC_SUCCESS;
 }
