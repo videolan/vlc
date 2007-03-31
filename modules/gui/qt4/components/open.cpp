@@ -59,6 +59,8 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
             qfu( p_intf->p_libvlc->psz_homedir ), fileTypes );
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
+    dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
+
     /* We don't want to see a grip in the middle of the window, do we? */
     dialogBox->setSizeGripEnabled( false );
     dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ));
