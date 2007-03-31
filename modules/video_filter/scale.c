@@ -66,7 +66,8 @@ static int OpenFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys;
 
     if( ( p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','U','V','P') &&
-          p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','U','V','A') ) ||
+          p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','U','V','A') &&
+          p_filter->fmt_in.video.i_chroma != VLC_FOURCC('R','G','B','A') ) ||
         p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
     {
         return VLC_EGENERIC;
@@ -109,7 +110,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     int i_plane, i, j, k, l;
 
     if( !p_pic ) return NULL;
-    
+
     /* Request output picture */
     p_pic_dst = p_filter->pf_vout_buffer_new( p_filter );
     if( !p_pic_dst )
@@ -120,14 +121,44 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    for( i_plane = 0; i_plane < p_pic_dst->i_planes; i_plane++ )
+    if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','P') ||
+        p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','A') )
     {
-        uint8_t *p_src = p_pic->p[i_plane].p_pixels;
-        uint8_t *p_dst = p_pic_dst->p[i_plane].p_pixels;
-        int i_src_pitch = p_pic->p[i_plane].i_pitch;
-        int i_dst_pitch = p_pic_dst->p[i_plane].i_pitch;
+        for( i_plane = 0; i_plane < p_pic_dst->i_planes; i_plane++ )
+        {
+            uint8_t *p_src = p_pic->p[i_plane].p_pixels;
+            uint8_t *p_dst = p_pic_dst->p[i_plane].p_pixels;
+            int i_src_pitch = p_pic->p[i_plane].i_pitch;
+            int i_dst_pitch = p_pic_dst->p[i_plane].i_pitch;
 
-        for( i = 0; i < p_pic_dst->p[i_plane].i_visible_lines; i++ )
+            for( i = 0; i < p_pic_dst->p[i_plane].i_visible_lines; i++ )
+            {
+                l = ( p_filter->fmt_in.video.i_height * i +
+                      p_filter->fmt_out.video.i_height / 2 ) /
+                    p_filter->fmt_out.video.i_height;
+
+                l = __MIN( (int)p_filter->fmt_in.video.i_height - 1, l );
+
+                for( j = 0; j < p_pic_dst->p[i_plane].i_visible_pitch; j++ )
+                {
+                    k = ( p_filter->fmt_in.video.i_width * j +
+                          p_filter->fmt_out.video.i_width / 2 ) /
+                        p_filter->fmt_out.video.i_width;
+
+                    k = __MIN( (int)p_filter->fmt_in.video.i_width - 1, k );
+
+                    p_dst[i * i_dst_pitch + j] = p_src[l * i_src_pitch + k];
+                }
+            }
+        }
+    }
+    else /* RGBA */
+    {
+        uint8_t *p_src = p_pic->p->p_pixels;
+        uint8_t *p_dst = p_pic_dst->p->p_pixels;
+        int i_src_pitch = p_pic->p->i_pitch;
+        int i_dst_pitch = p_pic_dst->p->i_pitch;
+        for( i = 0; i < p_pic_dst->p->i_visible_lines; i++ )
         {
             l = ( p_filter->fmt_in.video.i_height * i +
                   p_filter->fmt_out.video.i_height / 2 ) /
@@ -135,7 +166,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
             l = __MIN( (int)p_filter->fmt_in.video.i_height - 1, l );
 
-            for( j = 0; j < p_pic_dst->p[i_plane].i_visible_pitch; j++ )
+            for( j = 0; j < p_pic_dst->p->i_visible_pitch/4; j++ )
             {
                 k = ( p_filter->fmt_in.video.i_width * j +
                       p_filter->fmt_out.video.i_width / 2 ) /
@@ -143,7 +174,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
                 k = __MIN( (int)p_filter->fmt_in.video.i_width - 1, k );
 
-                p_dst[i * i_dst_pitch + j] = p_src[l * i_src_pitch + k];
+                *(uint32_t*)(&p_dst[i * i_dst_pitch + 4*j]) =
+                    *(uint32_t*)(&p_src[l * i_src_pitch + 4*k]);
             }
         }
     }

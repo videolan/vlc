@@ -673,8 +673,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             }
 
             if( (i_scale_width != 1000 || i_scale_height != 1000) &&
-                p_spu->p_scale && !p_region->p_cache &&
-                VLC_FOURCC('R','G','B','A') != p_region->fmt.i_chroma /* FIXME */ )
+                p_spu->p_scale && !p_region->p_cache )
             {
                 picture_t *p_pic;
 
