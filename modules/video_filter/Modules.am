@@ -29,4 +29,5 @@ SOURCES_puzzle = puzzle.c
 SOURCES_colorthres = colorthres.c
 SOURCES_extract = extract.c
 SOURCES_sharpen = sharpen.c
+SOURCES_erase = erase.c
 noinst_HEADERS = filter_common.h
