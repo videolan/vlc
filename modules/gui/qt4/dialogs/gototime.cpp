@@ -27,22 +27,35 @@
 #include "util/qvlcframe.hpp"
 #include "qt4.hpp"
 
-#include <QTextBrowser>
 #include <QTabWidget>
 #include <QFile>
 #include <QLabel>
+#include <QTimeEdit>
+#include <QGroupBox>
+#include <QHBoxLayout>
 
 GotoTimeDialog *GotoTimeDialog::instance = NULL;
 
 GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "GotoTime" ) );
-    resize(600, 500);
+    resize( 400, 200 );
 
-    QGridLayout *layout = new QGridLayout(this);
-    QPushButton *closeButton = new QPushButton(qtr("&Close"));
+    QGridLayout *layout = new QGridLayout( this );
 
-    layout->addWidget(closeButton, 1, 3);
+    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
+    QLabel *timeIntro = new 
+        QLabel( "Enter below the desired time you want to go in the media" );
+
+    QGroupBox *timeGroupBox = new QGroupBox( "Time" );
+    QHBoxLayout *boxLayout = new QHBoxLayout( timeGroupBox );
+
+    timeEdit = new QTimeEdit();
+    boxLayout->addWidget( timeEdit );
+
+    layout->addWidget( timeIntro, 0, 0, 1, 4 );
+    layout->addWidget( timeGroupBox, 1, 0, 1, 4 );
+    layout->addWidget( closeButton, 2, 3 );
 
     BUTTONACT( closeButton, close() );
 }
@@ -53,5 +66,6 @@ GotoTimeDialog::~GotoTimeDialog()
 
 void GotoTimeDialog::close()
 {
+
     this->toggleVisible();
 }

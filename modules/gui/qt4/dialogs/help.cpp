@@ -37,14 +37,14 @@ HelpDialog *HelpDialog::instance = NULL;
 HelpDialog::HelpDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Help" ) );
-    resize(600, 500);
+    resize( 600, 500 );
 
-    QGridLayout *layout = new QGridLayout(this);
-    QTextBrowser *helpBrowser = new QTextBrowser(this);
-    QPushButton *closeButton = new QPushButton(qtr("&Close"));
+    QGridLayout *layout = new QGridLayout( this );
+    QTextBrowser *helpBrowser = new QTextBrowser( this );
+    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
 
-    layout->addWidget(helpBrowser, 0, 0, 1, 0);
-    layout->addWidget(closeButton, 1, 3);
+    layout->addWidget( helpBrowser, 0, 0, 1, 0 );
+    layout->addWidget( closeButton, 1, 3 );
 
     BUTTONACT( closeButton, close() );
 }

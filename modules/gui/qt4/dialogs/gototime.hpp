@@ -25,6 +25,8 @@
 
 #include "util/qvlcframe.hpp"
 
+class QTimeEdit;
+
 class GotoTimeDialog : public QVLCFrame
 {
     Q_OBJECT;
@@ -36,6 +38,7 @@ public:
         return instance;
     }
     virtual ~GotoTimeDialog();
+    QTimeEdit *timeEdit;
 
 private:
     GotoTimeDialog( intf_thread_t *);
