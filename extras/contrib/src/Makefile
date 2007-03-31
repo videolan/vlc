@@ -930,7 +930,7 @@ ifdef HAVE_WINCE
 else
 .ffmpeg: ffmpeg .faac .lame
 endif
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-liba52 --disable-ffplay --enable-swscaler && make && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-liba52 --disable-ffplay && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
@@ -1920,14 +1920,19 @@ dirac-$(DIRAC_VERSION).tar.gz:
 dirac: dirac-$(DIRAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_DARWIN_OS
-	patch -p0 <Patches/dirac-osx.patch
+#	patch -p0 <Patches/dirac-osx.patch
 else
 	patch -p0 <Patches/dirac-cross.patch
 	(cd $@; aclocal && autoconf && automake)
 endif
 
+DIRAC_SUBDIRS = libdirac_byteio libdirac_common libdirac_motionest libdirac_encoder libdirac_decoder
+
+ifdef HAVE_WIN32
+DIRAC_SUBDIRS += win32
+
 .dirac: dirac
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  CFLAGS="$(CFLAGS)" && DOC_DIR="" make && DOC_DIR="" make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  CFLAGS="$(CFLAGS)" && DOC_DIR="" make $(DIRAC_SUBDIRS) && DOC_DIR="" make install)
 	touch $@
 
 # for MacOS X, dirac is split into two libraries, which needs be installed using two targets
