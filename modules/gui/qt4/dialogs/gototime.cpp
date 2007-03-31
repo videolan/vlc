@@ -32,30 +32,48 @@
 #include <QLabel>
 #include <QTimeEdit>
 #include <QGroupBox>
-#include <QHBoxLayout>
 
 GotoTimeDialog *GotoTimeDialog::instance = NULL;
 
 GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
-    setWindowTitle( qtr( "GotoTime" ) );
-    resize( 400, 200 );
+    setWindowTitle( qtr( "Go to Time" ) );
+    resize( 250, 180 );
 
-    QGridLayout *layout = new QGridLayout( this );
+    QGridLayout *mainLayout = new QGridLayout( this );
 
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
-    QLabel *timeIntro = new 
-        QLabel( "Enter below the desired time you want to go in the media" );
 
     QGroupBox *timeGroupBox = new QGroupBox( "Time" );
-    QHBoxLayout *boxLayout = new QHBoxLayout( timeGroupBox );
+    QGridLayout *boxLayout = new QGridLayout( timeGroupBox );
+
+    QLabel *timeIntro = new
+        QLabel( "Enter below the desired time you want to go in the media." );
+    timeIntro->setWordWrap( true );
+    timeIntro->setAlignment( Qt::AlignHCenter, Qt::AlignVCenter );
 
     timeEdit = new QTimeEdit();
-    boxLayout->addWidget( timeEdit );
+    timeEdit->setDisplayFormat( "hh : mm : ss" );
+    timeEdit->setAlignment( Qt::AlignRight );
+    timeEdit->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum );
 
-    layout->addWidget( timeIntro, 0, 0, 1, 4 );
-    layout->addWidget( timeGroupBox, 1, 0, 1, 4 );
-    layout->addWidget( closeButton, 2, 3 );
+    QLabel *helpFormat = new QLabel( timeEdit->displayFormat() );
+    helpFormat->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Preferred );
+
+    QSpacerItem *spacerBox = new QSpacerItem(20, 10, QSizePolicy::Minimum,
+                                        QSizePolicy::Fixed);
+
+    QSpacerItem *spacerItem = new QSpacerItem(20, 5, QSizePolicy::Minimum,
+                                        QSizePolicy::Expanding);
+
+    boxLayout->addWidget( timeIntro, 0, 0, 1, 2 );
+    boxLayout->addItem( spacerBox, 1, 0, 1, 2 );
+    boxLayout->addWidget( timeEdit, 2, 0, 1, 1 );
+    boxLayout->addWidget( helpFormat, 2, 1, 1, 1 );
+
+    mainLayout->addWidget( timeGroupBox, 0, 0, 1, 4 );
+    mainLayout->addItem( spacerItem, 1, 0 );
+    mainLayout->addWidget( closeButton, 2, 3 );
 
     BUTTONACT( closeButton, close() );
 }
