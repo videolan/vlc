@@ -57,6 +57,7 @@ static int pi_color_values[] = {
 static const char *ppsz_color_descriptions[] = {
   N_("Red"), N_("Fuchsia"), N_("Yellow"), N_("Lime"), N_("Blue"), N_("Aqua") };
 
+#define CFG_PREFIX "colorthres-"
 
 vlc_module_begin();
     set_description( _("Color threshold filter") );
@@ -64,15 +65,19 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "video filter2", 0 );
-    add_integer( "colorthres-color", 0x00FF0000, NULL, COLOR_TEXT,
+    add_integer( CFG_PREFIX "color", 0x00FF0000, NULL, COLOR_TEXT,
                  COLOR_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
-    add_integer( "colorthres-saturationthres", 20, NULL, "saturaton threshold",
+    add_integer( CFG_PREFIX "saturationthres", 20, NULL, "saturaton threshold",
                  "", VLC_FALSE );
-    add_integer( "colorthres-similaritythres", 15, NULL, "similarity threshold",
+    add_integer( CFG_PREFIX "similaritythres", 15, NULL, "similarity threshold",
                  "", VLC_FALSE );
     set_callbacks( Create, Destroy );
 vlc_module_end();
+
+static const char *ppsz_filter_options[] = {
+    "color", "saturationthes", "similaritythres", NULL
+};
 
 /*****************************************************************************
  * filter_sys_t: adjust filter method descriptor
@@ -104,9 +109,12 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    var_Create( p_filter, "colorthres-color", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "colorthres-similaritythres", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "colorthres-saturationthres", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
+                       p_filter->p_cfg );
+    var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "color" );
+    var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "similaritythres" );
+    var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "saturationthres" );
+
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
