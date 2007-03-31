@@ -1921,6 +1921,7 @@ dirac: dirac-$(DIRAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_DARWIN_OS
 #	patch -p0 <Patches/dirac-osx.patch
+	echo ""
 else
 	patch -p0 <Patches/dirac-cross.patch
 	(cd $@; aclocal && autoconf && automake)
