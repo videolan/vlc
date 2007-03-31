@@ -237,7 +237,7 @@ static int Init( vout_thread_t *p_vout )
 
     for( i_vout = 0; i_vout < p_vout->p_sys->i_clones; i_vout++ )
     {
-        if( p_vout->p_sys->ppsz_vout_list == NULL 
+        if( p_vout->p_sys->ppsz_vout_list == NULL
             || ( !strncmp( p_vout->p_sys->ppsz_vout_list[i_vout],
                            "default", 8 ) ) )
         {
