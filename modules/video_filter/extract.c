@@ -32,6 +32,8 @@
 
 #include "vlc_filter.h"
 
+#include "math.h"
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -48,7 +50,7 @@ static void get_blue_from_yuv420( picture_t *, picture_t *, int, int, int );
 static void get_red_from_yuv422( picture_t *, picture_t *, int, int, int );
 static void get_green_from_yuv422( picture_t *, picture_t *, int, int, int );
 static void get_blue_from_yuv422( picture_t *, picture_t *, int, int, int );
-static void make_projection_matrix( int color, int *matrix );
+static void make_projection_matrix( filter_t *, int color, int *matrix );
 static void get_custom_from_yuv420( picture_t *, picture_t *, int, int, int, int * );
 static void get_custom_from_yuv422( picture_t *, picture_t *, int, int, int, int * );
 
@@ -125,7 +127,7 @@ static int Create( vlc_object_t *p_this )
         case BLUE:
             break;
         default:
-            make_projection_matrix( p_filter->p_sys->i_color,
+            make_projection_matrix( p_filter, p_filter->p_sys->i_color,
                                     p_filter->p_sys->projection_matrix );
             break;
     }
@@ -262,7 +264,7 @@ static void mmult( double *res, double *a, double *b )
         }
     }
 }
-static void make_projection_matrix( int color, int *matrix )
+static void make_projection_matrix( filter_t *p_filter, int color, int *matrix )
 {
     double left_matrix[9] =
         {  76.24500,  149.68500,  29.07000,
@@ -287,18 +289,21 @@ static void make_projection_matrix( int color, int *matrix )
     double result1[9];
     double result[9];
     int i;
-    printf( "%f\n", red );
-    printf( "%f\n", green );
-    printf( "%f\n", blue );
+    msg_Dbg( p_filter, "red: %f", red );
+    msg_Dbg( p_filter, "green: %f", green );
+    msg_Dbg( p_filter, "blue: %f", blue );
     mmult( result1, rgb_matrix, right_matrix );
     mmult( result, left_matrix, result1 );
     for( i = 0; i < 9; i++ )
     {
         matrix[i] = (int)result[i];
-        printf( "%d ", matrix[i] );
-        if( i%3 == 2 ) printf( "\n" );
     }
+    msg_Dbg( p_filter, "Projection matrix:" );
+    msg_Dbg( p_filter, "%6d %6d %6d", matrix[0], matrix[1], matrix[2] );
+    msg_Dbg( p_filter, "%6d %6d %6d", matrix[3], matrix[4], matrix[5] );
+    msg_Dbg( p_filter, "%6d %6d %6d", matrix[6], matrix[7], matrix[8] );
 }
+
 static void get_custom_from_yuv420( picture_t *p_inpic, picture_t *p_outpic,
                                     int yp, int up, int vp, int *m )
 {
@@ -704,7 +709,7 @@ static int ExtractCallback( vlc_object_t *p_this, char const *psz_var,
             case BLUE:
                 break;
             default:
-                make_projection_matrix( p_sys->i_color,
+                make_projection_matrix( (filter_t *)p_this, p_sys->i_color,
                                         p_sys->projection_matrix );
                 break;
         }
