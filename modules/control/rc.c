@@ -85,8 +85,6 @@ static int  Input        ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Playlist     ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
-static int  Other        ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
 static int  Quit         ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int  Intf         ( vlc_object_t *, char const *,
@@ -382,38 +380,6 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     ADD( "goto", INTEGER, Playlist )
     ADD( "status", INTEGER, Playlist )
 
-    /* marquee on the fly items */
-    ADD( "marq-marquee", STRING, Other )
-    ADD( "marq-x", INTEGER, Other )
-    ADD( "marq-y", INTEGER, Other )
-    ADD( "marq-position", INTEGER, Other )
-    ADD( "marq-color", INTEGER, Other )
-    ADD( "marq-opacity", INTEGER, Other )
-    ADD( "marq-timeout", INTEGER, Other )
-    ADD( "marq-size", INTEGER, Other )
-
-    ADD( "mosaic-alpha", INTEGER, Other )
-    ADD( "mosaic-height", INTEGER, Other )
-    ADD( "mosaic-width", INTEGER, Other )
-    ADD( "mosaic-xoffset", INTEGER, Other )
-    ADD( "mosaic-yoffset", INTEGER, Other )
-    ADD( "mosaic-offsets", STRING, Other )
-    ADD( "mosaic-align", INTEGER, Other )
-    ADD( "mosaic-vborder", INTEGER, Other )
-    ADD( "mosaic-hborder", INTEGER, Other )
-    ADD( "mosaic-position", INTEGER, Other )
-    ADD( "mosaic-rows", INTEGER, Other )
-    ADD( "mosaic-cols", INTEGER, Other )
-    ADD( "mosaic-order", STRING, Other )
-    ADD( "mosaic-keep-aspect-ratio", INTEGER, Other )
-
-    /* logo on the fly items */
-    ADD( "logo-file", STRING, Other )
-    ADD( "logo-x", INTEGER, Other )
-    ADD( "logo-y", INTEGER, Other )
-    ADD( "logo-position", INTEGER, Other )
-    ADD( "logo-transparency", INTEGER, Other )
-
     /* OSD menu commands */
     ADD(  "menu", STRING, Menu )
 
@@ -628,8 +594,66 @@ static void Run( intf_thread_t *p_intf )
             psz_arg = "";
         }
 
+        /* module specfic commands: @<module name> <command> <args...> */
+        if( *psz_cmd == '@' && *psz_arg )
+        {
+            /* Parse miscellaneous commands */
+            char *psz_alias = psz_cmd + 1;
+            char *psz_mycmd = strdup( psz_arg );
+            char *psz_myarg = strchr( psz_mycmd, ' ' );
+            int i_ret = VLC_EGENERIC;
+
+            *psz_myarg = '\0';
+            psz_myarg ++;
+            vlc_object_t *p_obj =
+                vlc_object_find_name( p_input->p_libvlc, psz_alias,
+                                      FIND_CHILD );
+
+            if( !p_obj )
+                msg_rc( "Unknown destination object!" );
+            else
+            {
+                int i_type;
+                if( (i_type = var_Type( p_obj, psz_mycmd )) & VLC_VAR_ISCOMMAND )
+                {
+                    i_type &= 0xf0;
+                    if( i_type == VLC_VAR_INTEGER )
+                    {
+                        i_ret = var_SetInteger( p_obj, psz_mycmd,
+                                                atoi( psz_myarg ) );
+                    }
+                    else if( i_type == VLC_VAR_FLOAT )
+                    {
+                        i_ret = var_SetFloat( p_obj, psz_mycmd,
+                                              atof( psz_myarg ) );
+                    }
+                    else if( i_type == VLC_VAR_STRING )
+                    {
+                        i_ret = var_SetString( p_obj, psz_mycmd,
+                                               psz_myarg );
+                    }
+                    else if( i_type == VLC_VAR_BOOL )
+                    {
+                        i_ret = var_SetBool( p_obj, psz_mycmd,
+                                             atoi( psz_myarg ) );
+                    }
+                    else
+                    {
+                        msg_rc( "Unhandled command type. Fix the code!" );
+                    }
+                }
+                else
+                {
+                    msg_rc( "Unknown command! %d", i_type );
+                }
+                vlc_object_release( p_obj );
+            }
+            free( psz_mycmd );
+            msg_rc( "%s on object %s: returned %i (%s)",
+                    psz_mycmd, psz_alias, i_ret, vlc_error( i_ret ) );
+        }
         /* If the user typed a registered local command, try it */
-        if( var_Type( p_intf, psz_cmd ) & VLC_VAR_ISCOMMAND )
+        else if( var_Type( p_intf, psz_cmd ) & VLC_VAR_ISCOMMAND )
         {
             vlc_value_t val;
             int i_ret;
@@ -1435,112 +1459,6 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     vlc_object_release( p_playlist );
-    return VLC_SUCCESS;
-}
-
-static int Other( vlc_object_t *p_this, char const *psz_cmd,
-                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    vlc_object_t  *p_playlist;
-    vlc_value_t    val;
-    vlc_object_t  *p_input;
-
-    p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        return VLC_ENOOBJ;
-    }
-
-    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
-    if( !p_input )
-    {
-        vlc_object_release( p_playlist );
-        return VLC_ENOOBJ;
-    }
-
-    if( p_input )
-    {
-        var_Get( p_input, "state", &val );
-        if( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) )
-        {
-            msg_rc( _("Type 'pause' to continue.") );
-            vlc_object_release( p_playlist );
-            vlc_object_release( p_input );
-            return VLC_EGENERIC;
-        }
-    }
-
-    /* Parse miscellaneous commands */
-    if( newval.psz_string )
-    {
-        static const char vars[] =
-            "marq-marquee\0"
-            "marq-x\0" "marq-y\0" "marq-position\0" "marq-color\0"
-            "marq-opacity\0" "marq-size\0" "marq-timeout\0"
-            "mosaic-alpha\0" "mosaic-height\0" "mosaic-width\0"
-            "mosaic-xoffset\0" "mosaic-yoffset\0" "mosaic-align\0"
-            "mosaic-vborder\0" "mosaic-hborder\0" "mosaic-position\0"
-            "mosaic-rows\0" "mosaic-cols\0" "mosaic-order\0"
-            "mosaic-offsets\0" "mosaic-keep-aspect-ratio\0"
-            "logo-file\0" "logo-x\0" "logo-y\0" "logo-position\0"
-            "logo-transparency\0";
-        const char *psz_name = NULL;
-        char *psz_alias = strdup( newval.psz_string );
-        char *psz_arg = strchr( psz_alias, ' ' );
-
-        if( !psz_arg )
-        {
-            msg_rc( "Missing second argument." );
-        }
-        else
-        {
-            *psz_arg = '\0';
-            psz_arg ++;
-            for( psz_name = vars; *psz_name; psz_name += strlen( psz_name )+1 )
-            {
-                if( !strcmp( psz_name, psz_cmd ) )
-                {
-                    int i_type;
-                    vlc_object_t *p_obj =
-                        vlc_object_find_name( p_input->p_libvlc, psz_alias,
-                                              FIND_CHILD );
-
-                    if( !p_obj )
-                    {
-                        msg_rc( "Unknown destination object!" );
-                        break;
-                    }
-
-                    i_type = var_Type( p_obj, psz_name );
-
-                    if( i_type & VLC_VAR_INTEGER )
-                    {
-                        var_SetInteger( p_obj, psz_name,
-                                        atoi( psz_arg ) );
-                    }
-                    else if( i_type & VLC_VAR_STRING )
-                    {
-                        var_SetString( p_obj, psz_name,
-                                       psz_arg );
-                    }
-                    vlc_object_release( p_obj );
-                    break;
-                }
-            }
-
-            if( *psz_name == '\0' )
-                msg_rc( "Unknown command!" );
-        }
-        free( psz_alias );
-    }
-    else
-    {
-        msg_rc( "Incomplete command!" );
-    }
-
-    vlc_object_release( p_playlist );
-    vlc_object_release( p_input );
     return VLC_SUCCESS;
 }
 
