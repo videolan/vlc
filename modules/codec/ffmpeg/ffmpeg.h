@@ -37,13 +37,13 @@ int E_(GetFfmpegChroma)( vlc_fourcc_t );
 vlc_fourcc_t E_(GetVlcChroma)( int );
 
 /* Video decoder module */
-int  E_( InitVideoDec )( decoder_t *, AVCodecContext *, AVCodec *,
+int  E_( InitVideoDec )( decoder_t *, struct AVCodecContext *, struct AVCodec *,
                          int, const char * );
 void E_( EndVideoDec ) ( decoder_t * );
 picture_t *E_( DecodeVideo ) ( decoder_t *, block_t ** );
 
 /* Audio decoder module */
-int  E_( InitAudioDec )( decoder_t *, AVCodecContext *, AVCodec *,
+int  E_( InitAudioDec )( decoder_t *, struct AVCodecContext *, struct AVCodec *,
                          int, const char * );
 void E_( EndAudioDec ) ( decoder_t * );
 aout_buffer_t *E_( DecodeAudio ) ( decoder_t *, block_t ** );
@@ -80,7 +80,7 @@ void E_(CloseScaler)( vlc_object_t * );
 /* Postprocessing module */
 void *E_(OpenPostproc)( decoder_t *, vlc_bool_t * );
 int E_(InitPostproc)( decoder_t *, void *, int, int, int );
-int E_(PostprocPict)( decoder_t *, void *, picture_t *, AVFrame * );
+int E_(PostprocPict)( decoder_t *, void *, picture_t *, struct AVFrame * );
 void E_(ClosePostproc)( decoder_t *, void * );
 
 /*****************************************************************************
