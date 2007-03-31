@@ -174,35 +174,56 @@
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType" >
+        <enum>QSizePolicy::Minimum</enum>
+       </property>
        <property name="sizeHint" >
         <size>
-         <width>241</width>
+         <width>240</width>
          <height>20</height>
         </size>
        </property>
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="cancelButton" >
+      <widget class="QToolButton" name="cancelButton" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>7</hsizetype>
+         <vsizetype>1</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text" >
         <string>&amp;Cancel</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="enqueueButton" >
-       <property name="text" >
-        <string>&amp;Enqueue</string>
+      <widget class="QToolButton" name="playButton" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>7</hsizetype>
+         <vsizetype>0</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="closeButton" >
+       <property name="minimumSize" >
+        <size>
+         <width>90</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text" >
         <string>&amp;Play</string>
        </property>
-       <property name="default" >
-        <bool>true</bool>
+       <property name="popupMode" >
+        <enum>QToolButton::MenuButtonPopup</enum>
+       </property>
+       <property name="toolButtonStyle" >
+        <enum>Qt::ToolButtonTextOnly</enum>
        </property>
       </widget>
      </item>
@@ -214,7 +235,7 @@
   <tabstop>cacheSpinBox</tabstop>
   <tabstop>advancedLineInput</tabstop>
   <tabstop>Tab</tabstop>
-  <tabstop>closeButton</tabstop>
+  <tabstop>playButton</tabstop>
   <tabstop>cancelButton</tabstop>
  </tabstops>
  <resources/>

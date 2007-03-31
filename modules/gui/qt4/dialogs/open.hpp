@@ -53,6 +53,7 @@ public:
     QString mainMRL;
 public slots:
     void play();
+    void stream();
 private:
     static OpenDialog *instance;
     input_thread_t *p_input;

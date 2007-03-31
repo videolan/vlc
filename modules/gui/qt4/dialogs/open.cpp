@@ -25,7 +25,7 @@
 #include <QGridLayout>
 #include <QFileDialog>
 #include <QRegExp>
-
+#include <QMenu>
 #include "dialogs/open.hpp"
 #include "components/open.hpp"
 
@@ -57,6 +57,13 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
 
     ui.advancedFrame->hide();
 
+    QMenu * openButtonMenu = new QMenu( "Open" );
+    openButtonMenu->addAction( qtr("&Enqueue"), this, SLOT( enqueue() ),
+                                QKeySequence( "Alt+E") );
+    openButtonMenu->addAction( qtr("&Stream"), this, SLOT( stream() ) ,
+                                QKeySequence( "Alt+T" ) );
+
+    ui.playButton->setMenu( openButtonMenu );
     /* Force MRL update on tab change */
     CONNECT( ui.Tab, currentChanged(int), this, signalCurrent());
 
@@ -77,9 +84,8 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());
     CONNECT( ui.cacheSpinBox, valueChanged(int), this, updateMRL());
 
-    BUTTONACT( ui.closeButton, play());
+    BUTTONACT( ui.playButton, play());
     BUTTONACT( ui.cancelButton, cancel());
-    BUTTONACT( ui.enqueueButton, enqueue());
     BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
 
     /* Initialize caching */
@@ -163,6 +169,11 @@ void OpenDialog::playOrEnqueue( bool b_enqueue = false )
     }
     else
         accept();
+}
+
+void OpenDialog::stream()
+{
+//TODO. Policy not yet defined
 }
 
 void OpenDialog::toggleAdvancedPanel()
