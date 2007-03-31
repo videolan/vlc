@@ -52,6 +52,7 @@ Video output:
  * Rewrite motion detection video filter
  * New extract video filter (extract Red, Green and Blue components from a video)
  * New sharpen video filter (increase the contrast of adjacent pixels)
+ * New erase video filter (remove a logo from a video)
  * Enhancements to subtitles' renderer to support bold, italics and some HTML tags
 
 Stream output:
