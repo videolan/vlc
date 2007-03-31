@@ -50,6 +50,8 @@ static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
+static int SharpenCallback( vlc_object_t *, char const *,
+                            vlc_value_t, vlc_value_t, void * );
 
 #define FILTER_PREFIX "sharpen-"
 
@@ -114,10 +116,10 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                    p_filter->p_cfg );
 
-    var_Create( p_filter, FILTER_PREFIX "sigma",
-                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-
-    p_filter->p_sys->f_sigma = var_GetFloat(p_this, FILTER_PREFIX "sigma");
+    p_filter->p_sys->f_sigma =
+        var_CreateGetFloatCommand( p_filter, FILTER_PREFIX "sigma" );
+    var_AddCallback( p_filter, FILTER_PREFIX "sigma",
+                     SharpenCallback, p_filter->p_sys );
 
     return VLC_SUCCESS;
 }
@@ -145,7 +147,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     int i, j;
-    vlc_value_t val;
     uint8_t *p_src = NULL;
     uint8_t *p_out = NULL;
     int i_src_pitch;
@@ -172,7 +173,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( !p_src || !p_out )
     {
         msg_Warn( p_filter, "can't get Y plane" );
-        if( p_pic->pf_release ) 
+        if( p_pic->pf_release )
             p_pic->pf_release( p_pic );
         return NULL;
     }
@@ -231,4 +232,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         p_pic->pf_release( p_pic );
 
     return p_outpic;
+}
+
+static int SharpenCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *)p_data;
+    if( !strcmp( psz_var, FILTER_PREFIX "sigma" ) )
+        p_sys->f_sigma = __MIN( 2., __MAX( 0., newval.f_float ) );
+    return VLC_SUCCESS;
 }
