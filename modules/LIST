@@ -7,6 +7,7 @@ $Id$
  * aa: Ascii art video output
  * access_directory: Access module to read files in a directory
  * access_dv: Raw1394 Digital Video (Firewire/IEEE1394/I-Link) access module
+ * access_eyetv: Access module to connect to our plugin running within EyeTV
  * access_fake: Fake access to use for mosaic and other special streaming setups
  * access_file: File access module
  * access_filter_record: Raw input Recording module
@@ -88,13 +89,14 @@ $Id$
  * ffmpegaltivec: Video decoder using the ffmpeg library (Altivec version)
  * fixed32tofloat32: Audio converter from fixed 32 bits to float 32 bits
  * fixed32tos16: Fixed 32 bits to Signed 16 bits integer audio converter
- * flac: A/52 demuxer
- * flacdec: Flac decoder using libflac
+ * flacsys: A/52 demuxer
+ * flac: Flac decoder using libflac
  * float32_mixer: Precise float32 audio mixer
  * float32tos16: float32 to 16 bits signed integer audio converter
  * float32tos8: float32 to 8 bits signed integer audio converter
  * float32tou16: float32 to 16 bits unsigned integer audio converter
  * float32tou8: float32 to 8 bits unsigned integer audio converter
+ * folder: folder meta data and art finder
  * freetype: Utility to put text on video using freetype2
  * ftp : FTP input module
  * galaktos: a visualization module that outputs OpenGL
@@ -263,6 +265,7 @@ $Id$
  * svg: a svg renderer module
  * svgalib: SGVAlib output plugin
  * swscale: Image scaling module
+ * taglib: Taglib tags parser and writer
  * tarkin: a tarkin video decoder using libtarkin
  * telnet: Telnet control interface for VideoLAN Media Manager
  * telx: teletext subtitles decoder
@@ -288,6 +291,7 @@ $Id$
  * upnp: Universal Plug'n play discovery module
  * upnp_cc: Cyberlink UPNP discovery
  * upnp_intel: Intel SDL UPNP discovery
+ * v4l2: Video 4 Linux 2 input module
  * v4l: Video 4 Linux input module
  * vc1: VC-1 Video demuxer
  * vcd: input module for accessing Video CDs.
@@ -316,3 +320,4 @@ $Id$
  * xtag: XTAG xml parser
  * xvid: Decoder for the Xvid codec, using libxvidcore
  * xvideo: video output module using the XVideo API.
+ * xvmc: XVMC video output and decoder
