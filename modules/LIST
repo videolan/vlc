@@ -48,12 +48,15 @@ $Id$
  * cinepak: Cinepack video decoder
  * clone: Clone video filter
  * cmml: Continuous Media Markup Language annotations/hyperlinks decoder
+ * colorthres:  Theshold color based on similarity to reference color Video filter
  * crop: Crop video filter
  * cvdsub: CVD subtitles decoder
  * daap: iTunes shares services discovery
+ * dbus: D-Bus control interface
  * deinterlace: naive deinterlacing filter.
  * demuxdump: Pseudo-demuxer that dumps the stream
  * dirac: BBC Dirac codec
+ * direct3d: video output module using the Direct3D API.
  * directfb: Direct Framebuffer video output
  * directory : input module to read files in a directory
  * dmo: a DirectMediaObject decoder that uses DirectMedia to decode video (WMV3)
@@ -71,6 +74,7 @@ $Id$
  * dvdnav: access module for DVDs with libdvdnav
  * dvdread: input module for accessing DVDs, uses libdvdread.
  * equalizer: a equalizer audio filter
+ * erase: Logo erase video filter
  * es: input module for MPEG ES decapsulation.
  * esd: audio output module using the Esound sound daemon.
  * export: playlist export module
@@ -97,10 +101,12 @@ $Id$
  * glide: video output module using the Glide API.
  * glwin32: a opengl provider using DirectX OpenGL
  * glx: a opengl provider using X11 OpenGL
+ * gme: game music files demuxer
  * gnome2_main: Gtk+ wrapper for gtk_main
  * gnome_main: Gtk+ wrapper for gtk_main
  * gnutls: GNU TLS encryption/decryption module
  * goom: visualisation plugin based on goom
+ * gradient: Gradient and edge detection video effects filter
  * growl: announce currently playing stream to growl
  * gtk2_main: Gtk+ wrapper for gtk_main
  * gtk_main: Gtk+ wrapper for gtk_main
@@ -150,6 +156,7 @@ $Id$
  * mkv: Matroska demuxer
  * mod: MOD demuxer
  * mosaic: Module used to display a mosaic
+ * motion: Motion control interface
  * motionblur: Motion blur filter
  * motiondetect: Motion detection filter
  * mp4: MP4 file input module
@@ -170,6 +177,7 @@ $Id$
  * mux_wav: a WAV muxer
  * ncurses: interface module using the ncurses library.
  * netsync: synchronizes the clock of remote VLCs with a server for synchronous playback
+ * noise: Noise adding video filter
  * normvol: a audio filter for volume normalization. 
  * nsc: decoder for Microsoft proprietary NSC descriptors
  * nsv: NullSoft Video demuxer
@@ -185,6 +193,7 @@ $Id$
  * packetizer_mpeg4audio: MPEG4 audio packetizer
  * packetizer_mpeg4video: MPEG4 video packetizer
  * packetizer_mpegvideo: MPEG video packetizer
+ * panoramix: image wall panoramic video with edge blending filter
  * param_eq: parametric equalizer
  * pda: interface for iPaq using the Gtk2+ widget set.
  * playlist: playlist import module
@@ -192,9 +201,12 @@ $Id$
  * podcast: podcast feed parser
  * portaudio: audio output module that uses the portaudio library (www.portaudio.com)
  * ps: input module for MPEG PS decapsulation.
+ * psychedelic: Psychedelic video filter
+ * puzzle: puzzle video filter
  * pva: PVA demuxer
  * pvr: input module to read from a PVR card
  * qnx: QNX RTOS plugin
+ * qt4: interface module using the cross-platform Qt4 library.
  * qte: video output module for Qt Embedded.
  * qte_main: a QT Embedded GUI wrapper module.
  * quicktime: Quicktime decoder that uses the QT library
@@ -203,6 +215,7 @@ $Id$
  * rc: interface module using stdio.
  * real: partial Real audio/video demuxer
  * realaudio: Real audio decoder
+ * rotate: Video rotation filter
  * rss: Display a RSS feed on the video output
  * rtcp: incomplete RTCP implementation
  * rv32: RV32 image format conversion module
@@ -215,6 +228,7 @@ $Id$
  * screen: a input module that takes screenshots of the primary monitor
  * screensaver: screensaver disabling module
  * sdl_image: SDL-based image decoder
+ * sharpen: Sharpen video filter
  * shout: Shoutcast services discovery
  * showintf: shows the main interface
  * simple_channel_mixer: channel mixer
@@ -257,6 +271,7 @@ $Id$
  * trivial_mixer: Trivial audio mixer plugin
  * trivial_resampler: Simple audio resampler
  * ts: MPEG-TS demuxer
+ * tta: Lossless True Audio parser
  * twolame: a mp1 mp2 audio encoder based on twolame
  * ty: TY demuxer
  * u8tofixed32: unsigned 8 bits to fixed 32 bits audio converter 
@@ -266,6 +281,7 @@ $Id$
  * upnp_cc: Cyberlink UPNP discovery
  * upnp_intel: Intel SDL UPNP discovery
  * v4l: Video 4 Linux input module
+ * vc1: VC-1 Video demuxer
  * vcd: input module for accessing Video CDs.
  * vcdx: input module for accessing Video CDs with navigation & stills
  * visual: visualisation system
@@ -277,6 +293,7 @@ $Id$
  * vout_sdl: video output module using the SDL library.
  * wall: image wall filter.
  * wav: Wav demuxer
+ * wave: Wave video effect
  * waveout: simple audio output module for Windows.
  * win32text: Text renderer using native Win32 API
  * wince: Pocket PC interface
