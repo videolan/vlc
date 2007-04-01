@@ -135,7 +135,11 @@ public:
 protected:
     intf_thread_t *p_intf;
 
-    void cancel()
+    virtual void cancel()
+    {
+        hide();
+    }
+    virtual void close()
     {
         hide();
     }
@@ -144,6 +148,10 @@ protected:
         if( keyEvent->key() == Qt::Key_Escape )
         {
             cancel();
+        }
+        else if( keyEvent->key() == Qt::Key_Enter )
+        {
+            close();
         }
     }
 };
