@@ -86,7 +86,7 @@ static VLCUpdate *_o_sharedInstance = nil;
     [o_update_window setTitle: _NS("Check for Updates")];
     [o_btn_DownloadNow setTitle: _NS("Download now")];
     [o_btn_okay setTitle: _NS("OK")];
-    [o_chk_updateOnStartup setTitle: _NS("Check for update when VLC is launched")];
+    [o_chk_updateOnStartup setTitle: _NS("Check for VLC update automatically")];
     /* we don't use - (BOOL)shouldCheckUpdateOnStartup beccause we don't want the Alert
      * panel to pop up at this time */
     [o_chk_updateOnStartup setState: [[NSUserDefaults standardUserDefaults] boolForKey: kPrefUpdateOnStartup]];
