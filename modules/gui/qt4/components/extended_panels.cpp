@@ -38,6 +38,7 @@
 #include <vlc_aout.h>
 #include <vlc_intf_strings.h>
 #include <vlc_vout.h>
+#include <vlc_osd.h>
 
 #include <iostream>
 
@@ -297,7 +298,10 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
                                               FIND_ANYWHERE );
     if( p_vout )
     {
-        var_SetString( p_vout, psz_filter_type, psz_string );
+        if( !strcmp( psz_filter_type, "sub-filter" ) )
+            var_SetString( p_vout->p_spu, psz_filter_type, psz_string );
+        else
+            var_SetString( p_vout, psz_filter_type, psz_string );
         vlc_object_release( p_vout );
     }
 
@@ -307,7 +311,7 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
 void ExtVideo::updateFilters()
 {
     QString module = ModuleFromWidgetName( sender() );
-    std::cout << "Module name: " << module.toStdString() << std::endl;
+    //std::cout << "Module name: " << module.toStdString() << std::endl;
 
     QCheckBox *checkbox = qobject_cast<QCheckBox*>(sender());
     QGroupBox *groupbox = qobject_cast<QGroupBox*>(sender());
@@ -403,9 +407,9 @@ void ExtVideo::setWidgetValue( QObject *widget )
 void ExtVideo::updateFilterOptions()
 {
     QString module = ModuleFromWidgetName( sender()->parent() );
-    std::cout << "Module name: " << module.toStdString() << std::endl;
+    //std::cout << "Module name: " << module.toStdString() << std::endl;
     QString option = OptionFromWidgetName( sender() );
-    std::cout << "Option name: " << option.toStdString() << std::endl;
+    //std::cout << "Option name: " << option.toStdString() << std::endl;
 
     vlc_object_t *p_obj = (vlc_object_t *)
         vlc_object_find_name( p_intf->p_libvlc,
