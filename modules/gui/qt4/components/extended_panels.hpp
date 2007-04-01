@@ -37,15 +37,18 @@ class ExtVideo: public QWidget
 {
     Q_OBJECT
 public:
-    ExtVideo(  intf_thread_t *, QWidget * );
+    ExtVideo( intf_thread_t *, QWidget * );
     virtual ~ExtVideo();
-    void gotoConf( QObject* );
+    /*void gotoConf( QObject* );*/
 private:
     Ui::ExtVideoWidget ui;
     QSignalMapper* filterMapper;
     intf_thread_t *p_intf;
+    void setWidgetValue( QObject* );
+    void ChangeVFiltersString( char *psz_name, vlc_bool_t b_add );
 private slots:
-    void updateFilters( );
+    void updateFilters();
+    void updateFilterOptions();
 };
 
 class Equalizer: public QWidget

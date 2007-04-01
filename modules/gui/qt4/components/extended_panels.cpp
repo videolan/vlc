@@ -1,10 +1,11 @@
 /*****************************************************************************
  * extended_panels.cpp : Extended controls panels
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
- * $Id: preferences.cpp 16643 2006-09-13 12:45:46Z zorglub $
+ * Copyright (C) 2006-2007 the VideoLAN team
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Antoine Cellerier <dionoea .t videolan d@t org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +39,9 @@
 #include <vlc_intf_strings.h>
 #include <vlc_vout.h>
 
+#include <iostream>
+
+#if 0
 class ConfClickHandler : public QObject
 {
 public:
@@ -58,57 +62,181 @@ private:
     ExtVideo* e;
     intf_thread_t *p_intf;
 };
+#endif
 
-#define SETUP_VFILTER( widget, conf, tooltip, labtooltip ) \
-    ui.widget##Check->setToolTip( tooltip ); \
-    if (conf ) {\
-        ui.widget##Label->setToolTip( labtooltip ); \
-        ui.widget##Label->setPixmap( QPixmap(":/pixmaps/go-next.png") ); \
-        ui.widget##Label->installEventFilter(h); \
-    } \
-    CONNECT( ui.widget##Check, clicked(), this, updateFilters() ); \
+QString ModuleFromWidgetName( QObject *obj )
+{
+    return obj->objectName().replace("Enable","");
+}
+
+QString OptionFromWidgetName( QObject *obj )
+{
+    /* Gruik ? ... nah */
+    QString option = obj->objectName().replace( "Slider", "" )
+                                      .replace( "Combo" , "" )
+                                      .replace( "Dial"  , "" )
+                                      .replace( "Check" , "" )
+                                      .replace( "Spin"  , "" )
+                                      .replace( "Text"  , "" );
+    for( char a = 'A'; a <= 'Z'; a++ )
+    {
+        option = option.replace( QString( a ),
+                                 QString( '-' ) + QString( a + 'a' - 'A' ) );
+    }
+    return option;
+}
 
 ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
                            QWidget( _parent ) , p_intf( _p_intf )
 {
-    ConfClickHandler* h = new ConfClickHandler( p_intf, this );
-
     ui.setupUi( this );
 
-#if 0
+#define SETUP_VFILTER( widget ) \
+    { \
+        vlc_object_t *p_obj = (vlc_object_t *) \
+            vlc_object_find_name( p_intf->p_libvlc, \
+                                  #widget, \
+                                  FIND_CHILD ); \
+        QCheckBox *checkbox = qobject_cast<QCheckBox*>(ui.widget##Enable); \
+        QGroupBox *groupbox = qobject_cast<QGroupBox*>(ui.widget##Enable); \
+        if( p_obj ) \
+        { \
+            vlc_object_release( p_obj ); \
+            if( checkbox ) checkbox->setCheckState( Qt::Checked ); \
+            else groupbox->setChecked( true ); \
+        } \
+        else \
+        { \
+            if( checkbox ) checkbox->setCheckState( Qt::Unchecked ); \
+            else groupbox->setChecked( false ); \
+        } \
+    } \
+    CONNECT( ui.widget##Enable, clicked(), this, updateFilters() );
+#define SETUP_VFILTER_OPTION( widget, signal ) \
+    setWidgetValue( ui.widget ); \
+    CONNECT( ui.widget, signal, this, updateFilterOptions() );
 
-    SETUP_VFILTER( clone, true, qtr(I_CLONE_TIP),
-                                qtr("Configure the clone filter") );
-    SETUP_VFILTER( magnify, false, qtr(I_MAGNIFY_TIP),
-                                qtr("Configure the magnification effect"));
-    SETUP_VFILTER( wave, false, qtr(I_WAVE_TIP),
-                                qtr("Configure the waves effect"));
-    SETUP_VFILTER( ripple, false, qtr(I_RIPPLE_TIP),
-                                  qtr("Configure the \"water\" effect"));
-    SETUP_VFILTER( invert, false, qtr(I_INVERT_TIP),
-                                  qtr("Configure the color inversion effect"));
-    SETUP_VFILTER( puzzle, true, qtr(I_PUZZLE_TIP),
-                                  qtr("Configure the puzzle effect"));
-    SETUP_VFILTER( wall, true, qtr(I_WALL_TIP),
-                               qtr("Configure the wall filter") );
-    SETUP_VFILTER( gradient, true, qtr(I_GRADIENT_TIP),
-                                   qtr("Configure the \"gradient\" effect"));
-    SETUP_VFILTER( colorthres, true, qtr(I_COLORTHRES_TIP),
-                                   qtr("Configure the color detection effect"));
-#endif
+    SETUP_VFILTER( adjust )
+    SETUP_VFILTER_OPTION( hueSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( contrastSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( brightnessSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( saturationSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( gammaSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( brightnessThresholdCheck, stateChanged(int) )
+
+    SETUP_VFILTER( extract )
+    SETUP_VFILTER_OPTION( extractRedSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( extractGreenSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( extractBlueSlider, valueChanged(int) )
+
+    SETUP_VFILTER( colorthres )
+    SETUP_VFILTER_OPTION( colorthresRedSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( colorthresGreenSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( colorthresBlueSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( colorthresSaturationthresSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( colorthresSimilaritythresSlider, valueChanged(int) )
+
+    SETUP_VFILTER( invert )
+
+    SETUP_VFILTER( gradient )
+    SETUP_VFILTER_OPTION( gradientModeCombo, currentIndexChanged(QString) )
+    SETUP_VFILTER_OPTION( gradientTypeCheck, stateChanged(int) )
+    SETUP_VFILTER_OPTION( gradientCartoonCheck, stateChanged(int) )
+
+    SETUP_VFILTER( blur )
+    SETUP_VFILTER_OPTION( blurFactorSlider, valueChanged(int) )
+
+    SETUP_VFILTER( motiondetect )
+
+    SETUP_VFILTER( noise )
+
+    SETUP_VFILTER( psychedelic )
+
+    SETUP_VFILTER( sharpen )
+    SETUP_VFILTER_OPTION( sharpenSigmaSlider, valueChanged(int) )
+
+    SETUP_VFILTER( ripple )
+
+    SETUP_VFILTER( wave )
+
+    SETUP_VFILTER( transform )
+    SETUP_VFILTER_OPTION( transformTypeCombo, currentIndexChanged(QString) )
+
+    SETUP_VFILTER( rotate )
+    SETUP_VFILTER_OPTION( rotateAngleDial, valueChanged(int) )
+
+    SETUP_VFILTER( puzzle )
+    SETUP_VFILTER_OPTION( puzzleRowsSpin, valueChanged(int) )
+    SETUP_VFILTER_OPTION( puzzleColsSpin, valueChanged(int) )
+    SETUP_VFILTER_OPTION( puzzleBlackSlotCheck, stateChanged(int) )
+
+    SETUP_VFILTER( magnify )
+
+    SETUP_VFILTER( clone )
+    SETUP_VFILTER_OPTION( cloneCountSpin, valueChanged(int) )
+
+    SETUP_VFILTER( wall )
+    SETUP_VFILTER_OPTION( wallRowsSpin, valueChanged(int) )
+    SETUP_VFILTER_OPTION( wallColsSpin, valueChanged(int) )
+
+    SETUP_VFILTER( erase )
+    SETUP_VFILTER_OPTION( eraseMaskText, editingFinished() )
+    SETUP_VFILTER_OPTION( eraseYSpin, valueChanged(int) )
+    SETUP_VFILTER_OPTION( eraseXSpin, valueChanged(int) )
+
+    SETUP_VFILTER( marq )
+    SETUP_VFILTER_OPTION( marqMarqueeText, textChanged(QString) )
+    SETUP_VFILTER_OPTION( marqPositionCombo, currentIndexChanged(QString) )
+
+    SETUP_VFILTER( logo )
+    SETUP_VFILTER_OPTION( logoFileText, editingFinished() )
+    SETUP_VFILTER_OPTION( logoYSpin, valueChanged(int) )
+    SETUP_VFILTER_OPTION( logoXSpin, valueChanged(int) )
+    SETUP_VFILTER_OPTION( logoTransparencySlider, valueChanged(int) )
+
+#undef SETUP_VFILTER
+#undef SETUP_VFILTER_OPTION
 }
 
 ExtVideo::~ExtVideo()
 {
 }
 
-static void ChangeVFiltersString( intf_thread_t *p_intf,
-                                 char *psz_name, vlc_bool_t b_add )
+void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
 {
     vout_thread_t *p_vout;
     char *psz_parser, *psz_string;
 
-    psz_string = config_GetPsz( p_intf, "video-filter" );
+    char *psz_filter_type;
+    vlc_object_t *p_obj = (vlc_object_t *)
+        vlc_object_find_name( p_intf->p_libvlc_global, psz_name, FIND_CHILD );
+    if( !p_obj )
+    {
+        msg_Err( p_intf, "Unable to find filter module." );
+        return;
+    }
+
+    if( !strcmp( ((module_t*)p_obj)->psz_capability, "video filter2" ) )
+    {
+        psz_filter_type = "video-filter";
+    }
+    else if( !strcmp( ((module_t*)p_obj)->psz_capability, "video filter" ) )
+    {
+        psz_filter_type = "vout-filter";
+    }
+    else if( !strcmp( ((module_t*)p_obj)->psz_capability, "sub filter" ) )
+    {
+        psz_filter_type = "sub-filter";
+    }
+    else
+    {
+        vlc_object_release( p_obj );
+        msg_Err( p_intf, "Unknown video filter type." );
+        return;
+    }
+    vlc_object_release( p_obj );
+
+    psz_string = config_GetPsz( p_intf, psz_filter_type );
 
     if( !psz_string ) psz_string = strdup("");
 
@@ -156,14 +284,20 @@ static void ChangeVFiltersString( intf_thread_t *p_intf,
         }
     }
     /* Vout is not kept, so put that in the config */
-    config_PutPsz( p_intf, "video-filter", psz_string );
+    config_PutPsz( p_intf, psz_filter_type, psz_string );
+    if( !strcmp( psz_filter_type, "video-filter" ) )
+        ui.videoFilterText->setText( psz_string );
+    else if( !strcmp( psz_filter_type, "vout-filter" ) )
+        ui.voutFilterText->setText( psz_string );
+    else if( !strcmp( psz_filter_type, "sub-filter" ) )
+        ui.subpictureFilterText->setText( psz_string );
 
     /* Try to set on the fly */
     p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
     if( p_vout )
     {
-        var_SetString( p_vout, "video-filter", psz_string );
+        var_SetString( p_vout, psz_filter_type, psz_string );
         vlc_object_release( p_vout );
     }
 
@@ -172,12 +306,180 @@ static void ChangeVFiltersString( intf_thread_t *p_intf,
 
 void ExtVideo::updateFilters()
 {
-    QCheckBox* filter = qobject_cast<QCheckBox*>(sender());
-    QString module = filter->objectName().replace("Check", "");
+    QString module = ModuleFromWidgetName( sender() );
+    std::cout << "Module name: " << module.toStdString() << std::endl;
 
-    ChangeVFiltersString( p_intf, qtu(module), filter->isChecked() );
+    QCheckBox *checkbox = qobject_cast<QCheckBox*>(sender());
+    QGroupBox *groupbox = qobject_cast<QGroupBox*>(sender());
+
+    ChangeVFiltersString( qtu(module),
+                          checkbox ? checkbox->isChecked()
+                                   : groupbox->isChecked() );
 }
 
+void ExtVideo::setWidgetValue( QObject *widget )
+{
+    QString module = ModuleFromWidgetName( widget->parent() );
+    //std::cout << "Module name: " << module.toStdString() << std::endl;
+    QString option = OptionFromWidgetName( widget );
+    //std::cout << "Option name: " << option.toStdString() << std::endl;
+
+    vlc_object_t *p_obj = (vlc_object_t *)
+        vlc_object_find_name( p_intf->p_libvlc,
+                              module.toStdString().c_str(),
+                              FIND_CHILD );
+    int i_type;
+    vlc_value_t val;
+
+    if( !p_obj )
+    {
+        msg_Dbg( p_intf,
+                 "Module instance %s not found, looking in config values.",
+                 module.toStdString().c_str() );
+        i_type = config_GetType( p_intf, option.toStdString().c_str() ) & 0xf0;
+        switch( i_type )
+        {
+            case VLC_VAR_INTEGER:
+            case VLC_VAR_BOOL:
+                val.i_int = config_GetInt( p_intf, option.toStdString().c_str() );
+                break;
+            case VLC_VAR_FLOAT:
+                val.f_float = config_GetFloat( p_intf, option.toStdString().c_str() );
+                break;
+            case VLC_VAR_STRING:
+                val.psz_string = config_GetPsz( p_intf, option.toStdString().c_str() );
+                break;
+        }
+    }
+    else
+    {
+        i_type = var_Type( p_obj, option.toStdString().c_str() ) & 0xf0;
+        var_Get( p_obj, option.toStdString().c_str(), &val );
+        vlc_object_release( p_obj );
+    }
+
+    /* Try to cast to all the widgets we're likely to encounter. Only
+     * one of the casts is expected to work. */
+    QSlider        *slider        = qobject_cast<QSlider*>       (widget);
+    QCheckBox      *checkbox      = qobject_cast<QCheckBox*>     (widget);
+    QSpinBox       *spinbox       = qobject_cast<QSpinBox*>      (widget);
+    QDoubleSpinBox *doublespinbox = qobject_cast<QDoubleSpinBox*>(widget);
+    QDial          *dial          = qobject_cast<QDial*>         (widget);
+    QLineEdit      *lineedit      = qobject_cast<QLineEdit*>     (widget);
+    QComboBox      *combobox      = qobject_cast<QComboBox*>     (widget);
+
+    if( i_type == VLC_VAR_INTEGER || i_type == VLC_VAR_BOOL )
+    {
+        int i_int = 0;
+        if( slider )        slider->setValue( val.i_int );
+        else if( checkbox ) checkbox->setCheckState( val.i_int? Qt::Checked
+                                                              : Qt::Unchecked );
+        else if( spinbox )  spinbox->setValue( val.i_int );
+        else if( dial )     dial->setValue( val.i_int );
+        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+    }
+    else if( i_type == VLC_VAR_FLOAT )
+    {
+        double f_float = 0;
+        if( slider ) slider->setValue( (int)(val.f_float*(double)slider->tickInterval())); /* hack alert! */
+        else if( doublespinbox ) doublespinbox->setValue(val.f_float);
+        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+    }
+    else if( i_type == VLC_VAR_STRING )
+    {
+        const char *psz_string = NULL;
+        if( lineedit ) lineedit->setText( val.psz_string );
+        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        free( val.psz_string );
+    }
+    else
+        msg_Err( p_intf,
+                 "Module %s's %s variable is of an unsupported type (%d)",
+                 module.toStdString().c_str(),
+                 option.toStdString().c_str(),
+                 i_type );
+}
+
+void ExtVideo::updateFilterOptions()
+{
+    QString module = ModuleFromWidgetName( sender()->parent() );
+    std::cout << "Module name: " << module.toStdString() << std::endl;
+    QString option = OptionFromWidgetName( sender() );
+    std::cout << "Option name: " << option.toStdString() << std::endl;
+
+    vlc_object_t *p_obj = (vlc_object_t *)
+        vlc_object_find_name( p_intf->p_libvlc,
+                              module.toStdString().c_str(),
+                              FIND_CHILD );
+    if( !p_obj )
+    {
+        msg_Err( p_intf, "Module %s not found.", module.toStdString().c_str() );
+        return;
+    }
+
+    int i_type = var_Type( p_obj, option.toStdString().c_str() );
+    if( !( i_type & VLC_VAR_ISCOMMAND ) )
+    {
+        vlc_object_release( p_obj );
+        msg_Err( p_intf, "Module %s's %s variable isn't a command.",
+                 module.toStdString().c_str(),
+                 option.toStdString().c_str() );
+        return;
+    }
+
+    /* Try to cast to all the widgets we're likely to encounter. Only
+     * one of the casts is expected to work. */
+    QSlider        *slider        = qobject_cast<QSlider*>       (sender());
+    QCheckBox      *checkbox      = qobject_cast<QCheckBox*>     (sender());
+    QSpinBox       *spinbox       = qobject_cast<QSpinBox*>      (sender());
+    QDoubleSpinBox *doublespinbox = qobject_cast<QDoubleSpinBox*>(sender());
+    QDial          *dial          = qobject_cast<QDial*>         (sender());
+    QLineEdit      *lineedit      = qobject_cast<QLineEdit*>     (sender());
+    QComboBox      *combobox      = qobject_cast<QComboBox*>     (sender());
+
+    i_type &= 0xf0;
+    if( i_type == VLC_VAR_INTEGER || i_type == VLC_VAR_BOOL )
+    {
+        int i_int = 0;
+        if( slider )        i_int = slider->value();
+        else if( checkbox ) i_int = checkbox->checkState() == Qt::Checked;
+        else if( spinbox )  i_int = spinbox->value();
+        else if( dial )     i_int = dial->value();
+        else if( lineedit ) i_int = lineedit->text().toInt();
+        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        if( i_type == VLC_VAR_INTEGER )
+            var_SetInteger( p_obj, option.toStdString().c_str(), i_int );
+        else
+            var_SetBool( p_obj, option.toStdString().c_str(), i_int );
+    }
+    else if( i_type == VLC_VAR_FLOAT )
+    {
+        double f_float = 0;
+        if( slider )             f_float = (double)slider->value()
+                                         / (double)slider->tickInterval(); /* hack alert! */
+        else if( doublespinbox ) f_float = doublespinbox->value();
+        else if( lineedit ) f_float = lineedit->text().toDouble();
+        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        var_SetFloat( p_obj, option.toStdString().c_str(), f_float );
+    }
+    else if( i_type == VLC_VAR_STRING )
+    {
+        const char *psz_string = NULL;
+        if( lineedit ) psz_string = lineedit->text().toStdString().c_str();
+        else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        var_SetString( p_obj, option.toStdString().c_str(), psz_string );
+    }
+    else
+        msg_Err( p_intf,
+                 "Module %s's %s variable is of an unsupported type (%d)",
+                 module.toStdString().c_str(),
+                 option.toStdString().c_str(),
+                 i_type );
+
+    vlc_object_release( p_obj );
+}
+
+#if 0
 void ExtVideo::gotoConf( QObject* src )
 {
 #define SHOWCONF(module) \
@@ -196,6 +498,7 @@ void ExtVideo::gotoConf( QObject* src )
     SHOWCONF( "gradient" );
     SHOWCONF( "colorthres" )
 }
+#endif
 
 /**********************************************************************
  * Equalizer
