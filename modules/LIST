@@ -10,6 +10,7 @@ $Id$
  * access_eyetv: Access module to connect to our plugin running within EyeTV
  * access_fake: Fake access to use for mosaic and other special streaming setups
  * access_file: File access module
+ * access_filter_dump: Raw input Dump module
  * access_filter_record: Raw input Recording module
  * access_filter_timeshift: Timeshifting module
  * access_ftp: FTP Network access module
@@ -51,6 +52,8 @@ $Id$
  * clone: Clone video filter
  * cmml: Continuous Media Markup Language annotations/hyperlinks decoder
  * colorthres:  Theshold color based on similarity to reference color Video filter
+ * converter_fixed: Fixed-point audio format conversions
+ * converter_float: Floating-point audio format conversions
  * crop: Crop video filter
  * cvdsub: CVD subtitles decoder
  * daap: iTunes shares services discovery
@@ -87,15 +90,9 @@ $Id$
  * fb: video output module for the Linux framebuffer.
  * ffmpeg: Video decoder using the ffmpeg library
  * ffmpegaltivec: Video decoder using the ffmpeg library (Altivec version)
- * fixed32tofloat32: Audio converter from fixed 32 bits to float 32 bits
- * fixed32tos16: Fixed 32 bits to Signed 16 bits integer audio converter
- * flacsys: A/52 demuxer
  * flac: Flac decoder using libflac
+ * flacsys: FLAC demuxer
  * float32_mixer: Precise float32 audio mixer
- * float32tos16: float32 to 16 bits signed integer audio converter
- * float32tos8: float32 to 8 bits signed integer audio converter
- * float32tou16: float32 to 16 bits unsigned integer audio converter
- * float32tou8: float32 to 8 bits unsigned integer audio converter
  * folder: folder meta data and art finder
  * freetype: Utility to put text on video using freetype2
  * ftp : FTP input module
@@ -135,8 +132,6 @@ $Id$
  * id3tag: ID3 tag parser/skipper using libid3tag
  * image: Image file video output
  * invert: inverse video filter.
- * ipv4: IPv4 network abstraction layer
- * ipv6: IPv6 network abstraction layer
  * jack: jack server audio output
  * libmpeg2: Mpeg2 video decoder using libmpeg2
  * linear_resampler: linear audio resampler
@@ -160,6 +155,7 @@ $Id$
  * mjpeg: a demuxer for multipart and concatenated JPEG data.
  * mkv: Matroska demuxer
  * mod: MOD demuxer
+ * mono: stereo-to-mono downmix simple channel mixer
  * mosaic: Module used to display a mosaic
  * motion: Motion control interface
  * motionblur: Motion blur filter
@@ -184,7 +180,8 @@ $Id$
  * ncurses: interface module using the ncurses library.
  * netsync: synchronizes the clock of remote VLCs with a server for synchronous playback
  * noise: Noise adding video filter
- * normvol: a audio filter for volume normalization. 
+ * normvol: a audio filter for volume normalization.
+ * notify: notifications using libnotify
  * nsc: decoder for Microsoft proprietary NSC descriptors
  * nsv: NullSoft Video demuxer
  * ntservice: run VLC as a NT service
@@ -201,6 +198,7 @@ $Id$
  * packetizer_mpeg4audio: MPEG4 audio packetizer
  * packetizer_mpeg4video: MPEG4 video packetizer
  * packetizer_mpegvideo: MPEG video packetizer
+ * packetizer_vc1: VC-1 video packetizer
  * panoramix: image wall panoramic video with edge blending filter
  * param_eq: parametric equalizer
  * pda: interface for iPaq using the Gtk2+ widget set.
@@ -208,6 +206,8 @@ $Id$
  * png: PNG images decoder
  * podcast: podcast feed parser
  * portaudio: audio output module that uses the portaudio library (www.portaudio.com)
+ * probe_hal: HAL probing module
+ * profile_parser: Streaming Profile parser
  * ps: input module for MPEG PS decapsulation.
  * psychedelic: Psychedelic video filter
  * puzzle: puzzle video filter
@@ -228,10 +228,6 @@ $Id$
  * rss: Display a RSS feed on the video output
  * rtcp: incomplete RTCP implementation
  * rv32: RV32 image format conversion module
- * s16tofixed32: Signed 16 bits to fixed 32 bits audio converter
- * s16tofloat32: Signed 16 bits to float 32 bits audio converter
- * s16tofloat32swab: Signed 16 bits to float 32 bits audio converter with endianess change
- * s8tofloat32: Signed 8 bits to float 32 bits audio converter
  * sap: Interface module to read SAP/SDP announcments
  * scale: Images rescaler
  * screen: a input module that takes screenshots of the primary monitor
@@ -246,6 +242,7 @@ $Id$
  * spdif_mixer: dummy audio mixer for the S/PDIF output
  * speex: a speex audio decoder/packetizer using the libspeex library.
  * spudec: RLE DVD subtitles decoder.
+ * stream_out_autodel: monitor mux inputs and automatically add/delete streams
  * stream_out_bridge: "exchange" streams between sout instances. To be used with VLM
  * stream_out_description: helper module for RTSP vod
  * stream_out_display: displays a stream output chain 
@@ -273,7 +270,6 @@ $Id$
  * test2: Empty C++ module
  * test3: Empty Objective C module
  * test4: Stress test module
- * test_playlist: playlist test suite
  * theora: a theora video decoder/packetizer/encoder using the libtheora library.
  * time: Overlays the current time
  * transform: filter for horizontal and vertical image flips and 90° rotations
@@ -285,8 +281,6 @@ $Id$
  * tta: Lossless True Audio parser
  * twolame: a mp1 mp2 audio encoder based on twolame
  * ty: TY demuxer
- * u8tofixed32: unsigned 8 bits to fixed 32 bits audio converter 
- * u8tofloat32: unsigned 8 bits to float 32 bits audio converter 
  * ugly_resampler: Ugly audio resampler
  * upnp: Universal Plug'n play discovery module
  * upnp_cc: Cyberlink UPNP discovery
