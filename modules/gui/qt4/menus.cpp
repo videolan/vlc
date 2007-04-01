@@ -200,7 +200,7 @@ QMenu *QVLCMenu::FileMenu()
     DP_SADD( qtr("Open &Disc..." ), "", "", openDiscDialog(), "Ctrl+D" );
     DP_SADD( qtr("Open &Network..." ), "", "", openNetDialog(), "Ctrl+N" );
     DP_SADD( qtr("Open &Capture Device..." ), "", "", openCaptureDialog(),
-            "Ctrl+A" );
+            "Ctrl+C" );
     menu->addSeparator();
     DP_SADD( qtr("&Streaming..."), "", "", streamingDialog(), "Ctrl+S" );
     menu->addSeparator();
@@ -237,7 +237,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     DP_SADD( qtr(I_MENU_MSG), "", "", messagesDialog(), "Ctrl+M" );
     DP_SADD( qtr(I_MENU_INFO) , "", "", mediaInfoDialog(), "Ctrl+J" );
     DP_SADD( qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog(), "Ctrl+I" );
-    DP_SADD( qtr(I_MENU_EXT), "","",extendedDialog(), "Ctrl+G" );
+    DP_SADD( qtr(I_MENU_EXT), "","",extendedDialog(), "Ctrl+E" );
     if( mi )
     {
         menu->addSeparator();
@@ -271,7 +271,8 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     if( !p_intf->pf_show_dialog )
     {
         menu->addSeparator();
-        menu->addAction( qtr("Switch to skins"), THEDP, SLOT(switchToSkins()) );
+        menu->addAction( qtr("Switch to skins"), THEDP, SLOT(switchToSkins()),
+                 qtr("Ctrl+Z") );
     }
 
     CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() );
