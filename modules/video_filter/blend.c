@@ -43,10 +43,11 @@ struct filter_sys_t
 static int  OpenFilter ( vlc_object_t * );
 static void CloseFilter( vlc_object_t * );
 
-/* TODO i_alpha support for BlendR16 */
-/* YUVA */
 static void Blend( filter_t *, picture_t *, picture_t *, picture_t *,
                    int, int, int );
+
+/* TODO i_alpha support for BlendR16 */
+/* YUVA */
 static void BlendI420( filter_t *, picture_t *, picture_t *, picture_t *,
                        int, int, int, int, int );
 static void BlendR16( filter_t *, picture_t *, picture_t *, picture_t *,
@@ -67,6 +68,8 @@ static void BlendPalRV( filter_t *, picture_t *, picture_t *, picture_t *,
 /* RGBA */
 static void BlendRGBAI420( filter_t *, picture_t *, picture_t *, picture_t *,
                            int, int, int, int, int );
+static void BlendRGBAR16( filter_t *, picture_t *, picture_t *, picture_t *,
+                          int, int, int, int, int );
 static void BlendRGBAR24( filter_t *, picture_t *, picture_t *, picture_t *,
                           int, int, int, int, int );
 
@@ -106,6 +109,7 @@ static int OpenFilter( vlc_object_t *p_this )
       ( ( in_chroma  != VLC_FOURCC('R','G','B','A') ) ||
         ( out_chroma != VLC_FOURCC('I','4','2','0') &&
           out_chroma != VLC_FOURCC('Y','V','1','2') &&
+          out_chroma != VLC_FOURCC('R','V','1','6') &&
           out_chroma != VLC_FOURCC('R','V','2','4') &&
           out_chroma != VLC_FOURCC('R','V','3','2' ) ) )
       )
@@ -161,6 +165,12 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
                      (int)p_filter->fmt_in.video.i_visible_height);
 
     if( i_width <= 0 || i_height <= 0 ) return;
+
+#if 0
+    printf( "chroma: %4.4s -> %4.4s\n",
+             (char *)&p_filter->fmt_in.video.i_chroma,
+             (char *)&p_filter->fmt_out.video.i_chroma );
+#endif
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
@@ -231,10 +241,18 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
                                   i_x_offset, i_y_offset,
                                   i_width, i_height, i_alpha );
                     return;
+                case VLC_FOURCC('R','V','1','6'):
+                    BlendRGBAR16( p_filter, p_dst, p_dst_orig, p_src,
+                                  i_x_offset, i_y_offset,
+                                  i_width, i_height, i_alpha );
+                    return;
             }
     }
 
-    msg_Dbg( p_filter, "no matching alpha blending routine" );
+    msg_Dbg( p_filter, "no matching alpha blending routine "
+             "(chroma: %4.4s -> %4.4s)",
+             (char *)&p_filter->fmt_in.video.i_chroma,
+             (char *)&p_filter->fmt_out.video.i_chroma );
 }
 
 /***********************************************************************
@@ -1151,7 +1169,7 @@ static void BlendRGBAI420( filter_t *p_filter, picture_t *p_dst,
     return;
 }
 
-static void BlendRGBAR24( filter_t *p_filter, picture_t *p_dst_pic,
+static void BlendRGBAR16( filter_t *p_filter, picture_t *p_dst_pic,
                           picture_t *p_dst_orig, picture_t *p_src,
                           int i_x_offset, int i_y_offset,
                           int i_width, int i_height, int i_alpha )
@@ -1217,6 +1235,85 @@ static void BlendRGBAR24( filter_t *p_filter, picture_t *p_dst_pic,
             p_dst[i_x * i_pix_pitch + 2] = ( B * i_trans +
                 (uint16_t)p_src1[i_x * i_pix_pitch + 2] *
                 (MAX_TRANS - i_trans) ) >> TRANS_BITS;
+#undef      R
+#undef      G
+#undef      B
+        }
+    }
+
+#undef MAX_TRANS
+#undef TRANS_BITS
+
+    return;
+}
+
+static void BlendRGBAR24( filter_t *p_filter, picture_t *p_dst_pic,
+                          picture_t *p_dst_orig, picture_t *p_src,
+                          int i_x_offset, int i_y_offset,
+                          int i_width, int i_height, int i_alpha )
+{
+    int i_src1_pitch, i_src2_pitch, i_dst_pitch;
+    uint8_t *p_dst, *p_src1, *p_src2;
+    int i_x, i_y, i_pix_pitch, i_trans, i_src_pix_pitch;
+    uint16_t i_pix;
+
+    i_pix_pitch = p_dst_pic->p->i_pixel_pitch;
+    i_dst_pitch = p_dst_pic->p->i_pitch;
+    p_dst = p_dst_pic->p->p_pixels + i_x_offset * i_pix_pitch +
+            p_filter->fmt_out.video.i_x_offset * i_pix_pitch +
+            p_dst_pic->p->i_pitch *
+            ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src1_pitch = p_dst_orig->p->i_pitch;
+    p_src1 = p_dst_orig->p->p_pixels + i_x_offset * i_pix_pitch +
+             p_filter->fmt_out.video.i_x_offset * i_pix_pitch +
+             p_dst_orig->p->i_pitch *
+             ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src_pix_pitch = p_src->p->i_pixel_pitch;
+    i_src2_pitch = p_src->p->i_pitch;
+    p_src2 = p_src->p->p_pixels +
+             p_filter->fmt_in.video.i_x_offset * i_pix_pitch +
+             p_src->p->i_pitch * p_filter->fmt_in.video.i_y_offset;
+
+#define MAX_TRANS 255
+#define TRANS_BITS  8
+
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = 0; i_y < i_height; i_y++,
+         p_dst += i_dst_pitch, p_src1 += i_src1_pitch, p_src2 += i_src2_pitch )
+    {
+        /* Draw until we reach the end of the line */
+        for( i_x = 0; i_x < i_width; i_x++ )
+        {
+#define     R         ( p_src2[i_x * i_src_pix_pitch + 0] )
+#define     G         ( p_src2[i_x * i_src_pix_pitch + 1] )
+#define     B         ( p_src2[i_x * i_src_pix_pitch + 2] )
+            i_trans = ( p_src2[i_x * i_src_pix_pitch + 3] * i_alpha ) / 255;
+            if( !i_trans )
+            {
+                /* Completely transparent. Don't change pixel */
+                continue;
+            }
+            else if( i_trans == MAX_TRANS )
+            {
+                /* Completely opaque. Completely overwrite underlying pixel */
+                *((uint16_t *)(&p_dst[i_x * i_pix_pitch])) = ((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3);
+                continue;
+            }
+
+            /* Blending */
+            i_pix = *((uint16_t *)(&p_dst[i_x * i_pix_pitch]));
+            *((uint16_t *)(&p_dst[i_x * i_pix_pitch])) =
+                ( ( ( (R >> 3)*i_trans
+                    + (i_pix >> 11) * (MAX_TRANS - i_trans) )
+                    >> TRANS_BITS ) << 11 )
+              | ( ( ( (G >> 2)*i_trans
+                    + ((i_pix & 0x07e0)>> 5) * (MAX_TRANS - i_trans) )
+                    >> TRANS_BITS ) << 5  )
+              | ( ( ( (B >> 3)*i_trans
+                    + (i_pix & 0x001f) * (MAX_TRANS - i_trans) )
+                    >> TRANS_BITS ) );
 #undef      R
 #undef      G
 #undef      B
