@@ -68,6 +68,8 @@ static void BlendPalRV( filter_t *, picture_t *, picture_t *, picture_t *,
 /* RGBA */
 static void BlendRGBAI420( filter_t *, picture_t *, picture_t *, picture_t *,
                            int, int, int, int, int );
+static void BlendRGBAYUVPacked( filter_t *, picture_t *, picture_t *,
+                                picture_t *, int, int, int, int, int );
 static void BlendRGBAR16( filter_t *, picture_t *, picture_t *, picture_t *,
                           int, int, int, int, int );
 static void BlendRGBAR24( filter_t *, picture_t *, picture_t *, picture_t *,
@@ -94,9 +96,9 @@ static int OpenFilter( vlc_object_t *p_this )
      * We could try to use a chroma filter if we can't. */
     int in_chroma = p_filter->fmt_in.video.i_chroma;
     int out_chroma = p_filter->fmt_out.video.i_chroma;
-    if(
-      ( ( in_chroma  != VLC_FOURCC('Y','U','V','A') &&
-          in_chroma  != VLC_FOURCC('Y','U','V','P') ) ||
+    if( ( in_chroma  != VLC_FOURCC('Y','U','V','A') &&
+          in_chroma  != VLC_FOURCC('Y','U','V','P') &&
+          in_chroma  != VLC_FOURCC('R','G','B','A') ) ||
         ( out_chroma != VLC_FOURCC('I','4','2','0') &&
           out_chroma != VLC_FOURCC('Y','U','Y','2') &&
           out_chroma != VLC_FOURCC('Y','V','1','2') &&
@@ -105,14 +107,6 @@ static int OpenFilter( vlc_object_t *p_this )
           out_chroma != VLC_FOURCC('R','V','1','6') &&
           out_chroma != VLC_FOURCC('R','V','2','4') &&
           out_chroma != VLC_FOURCC('R','V','3','2') ) )
-      &&
-      ( ( in_chroma  != VLC_FOURCC('R','G','B','A') ) ||
-        ( out_chroma != VLC_FOURCC('I','4','2','0') &&
-          out_chroma != VLC_FOURCC('Y','V','1','2') &&
-          out_chroma != VLC_FOURCC('R','V','1','6') &&
-          out_chroma != VLC_FOURCC('R','V','2','4') &&
-          out_chroma != VLC_FOURCC('R','V','3','2' ) ) )
-      )
     {
         return VLC_EGENERIC;
     }
@@ -234,6 +228,13 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
                     BlendRGBAI420( p_filter, p_dst, p_dst_orig, p_src,
                                    i_x_offset, i_y_offset,
                                    i_width, i_height, i_alpha );
+                    return;
+                case VLC_FOURCC('Y','U','Y','2'):
+                case VLC_FOURCC('U','Y','V','Y'):
+                case VLC_FOURCC('Y','V','Y','U'):
+                    BlendRGBAYUVPacked( p_filter, p_dst, p_dst_orig, p_src,
+                                        i_x_offset, i_y_offset,
+                                        i_width, i_height, i_alpha );
                     return;
                 case VLC_FOURCC('R','V','2','4'):
                 case VLC_FOURCC('R','V','3','2'):
@@ -1317,6 +1318,117 @@ static void BlendRGBAR24( filter_t *p_filter, picture_t *p_dst_pic,
 #undef      R
 #undef      G
 #undef      B
+        }
+    }
+
+#undef MAX_TRANS
+#undef TRANS_BITS
+
+    return;
+}
+
+static void BlendRGBAYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
+                                picture_t *p_dst_orig, picture_t *p_src,
+                                int i_x_offset, int i_y_offset,
+                                int i_width, int i_height, int i_alpha )
+{
+    int i_src1_pitch, i_src2_pitch, i_dst_pitch, i_src_pix_pitch;
+    uint8_t *p_dst, *p_src1, *p_src2;
+    uint8_t *p_trans;
+    int i_x, i_y, i_pix_pitch, i_trans;
+    vlc_bool_t b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
+    int i_l_offset = 0, i_u_offset = 0, i_v_offset = 0;
+    uint8_t y, u, v;
+
+    if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') )
+    {
+        i_l_offset = 0;
+        i_u_offset = 1;
+        i_v_offset = 3;
+    }
+    else if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('U','Y','V','Y') )
+    {
+        i_l_offset = 1;
+        i_u_offset = 0;
+        i_v_offset = 2;
+    }
+    else if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','V','Y','U') )
+    {
+        i_l_offset = 0;
+        i_u_offset = 3;
+        i_v_offset = 1;
+    }
+
+    i_pix_pitch = 2;
+    i_dst_pitch = p_dst_pic->p->i_pitch;
+    p_dst = p_dst_pic->p->p_pixels + i_x_offset * i_pix_pitch +
+            p_filter->fmt_out.video.i_x_offset * i_pix_pitch +
+            p_dst_pic->p->i_pitch *
+            ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src1_pitch = p_dst_orig->p[Y_PLANE].i_pitch;
+    p_src1 = p_dst_orig->p->p_pixels + i_x_offset * i_pix_pitch +
+               p_filter->fmt_out.video.i_x_offset * i_pix_pitch +
+               p_dst_orig->p->i_pitch *
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src_pix_pitch = p_src->p->i_pixel_pitch;
+    i_src2_pitch = p_src->p->i_pitch;
+    p_src2 = p_src->p->p_pixels +
+             p_filter->fmt_in.video.i_x_offset * i_src2_pitch +
+             p_src->p->i_pitch * p_filter->fmt_in.video.i_y_offset;
+
+    i_width = (i_width >> 1) << 1; /* Needs to be a multiple of 2 */
+
+#define MAX_TRANS 255
+#define TRANS_BITS  8
+
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = 0; i_y < i_height; i_y++, p_trans += i_src2_pitch,
+         p_dst += i_dst_pitch, p_src1 += i_src1_pitch,
+         p_src2 += i_src2_pitch )
+    {
+        /* Draw until we reach the end of the line */
+        for( i_x = 0; i_x < i_width; i_x++, b_even = !b_even )
+        {
+#define     R         ( p_src2[i_x * i_src_pix_pitch + 0] )
+#define     G         ( p_src2[i_x * i_src_pix_pitch + 1] )
+#define     B         ( p_src2[i_x * i_src_pix_pitch + 2] )
+            i_trans = ( p_src2[i_x * i_src_pix_pitch + 3] * i_alpha ) / 255;
+            if( !i_trans )
+            {
+                /* Completely transparent. Don't change pixel */
+            }
+            else if( i_trans == MAX_TRANS )
+            {
+                /* Completely opaque. Completely overwrite underlying pixel */
+                rgb_to_yuv( &y, &u, &v, R, G, B );
+                p_dst[i_x * 2 + i_l_offset] = y;
+
+                if( b_even )
+                {
+                    p_dst[i_x * 2 + i_u_offset] = u;
+                    p_dst[i_x * 2 + i_v_offset] = v;
+                }
+            }
+            else
+            {
+                /* Blending */
+                rgb_to_yuv( &y, &u, &v, R, G, B );
+                p_dst[i_x * 2 + i_l_offset]     = ( (uint16_t)y * i_trans +
+                    (uint16_t)p_src1[i_x * 2 + i_l_offset] * (MAX_TRANS - i_trans) )
+                    >> TRANS_BITS;
+
+                if( b_even )
+                {
+                    p_dst[i_x * 2 + i_u_offset] = ( (uint16_t)u * i_trans +
+                        (uint16_t)p_src1[i_x * 2 + i_u_offset] * (MAX_TRANS - i_trans) )
+                        >> TRANS_BITS;
+                    p_dst[i_x * 2 + i_v_offset] = ( (uint16_t)v * i_trans +
+                        (uint16_t)p_src1[i_x * 2 + i_v_offset] * (MAX_TRANS - i_trans) )
+                        >> TRANS_BITS;
+                }
+            }
         }
     }
 
