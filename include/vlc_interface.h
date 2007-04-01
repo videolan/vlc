@@ -168,6 +168,7 @@ VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
 #define INTF_DIALOG_FILEINFO   12
 #define INTF_DIALOG_PREFS      13
 #define INTF_DIALOG_BOOKMARKS  14
+#define INTF_DIALOG_EXTENDED   15
 
 #define INTF_DIALOG_POPUPMENU  20
 #define INTF_DIALOG_AUDIOPOPUPMENU  21
