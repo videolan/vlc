@@ -237,10 +237,9 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     DP_SADD( qtr(I_MENU_MSG), "", "", messagesDialog(), "Ctrl+M" );
     DP_SADD( qtr(I_MENU_INFO) , "", "", mediaInfoDialog(), "Ctrl+J" );
     DP_SADD( qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog(), "Ctrl+I" );
-    DP_SADD( qtr(I_MENU_EXT), "","",extendedDialog(), "Ctrl+E" );
+    menu->addSeparator();
     if( mi )
     {
-        menu->addSeparator();
         QAction *adv = menu->addAction( qtr("Advanced controls" ),
                                         mi, SLOT( advanced() ) );
         adv->setCheckable( true );
@@ -252,6 +251,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         if( visual_selector_enabled ) adv->setChecked( true );
 #endif
     }
+    DP_SADD( qtr(I_MENU_EXT), "","",extendedDialog(), "Ctrl+E" );
     DP_SADD( qtr(I_MENU_GOTOTIME), "","",gotoTimeDialog(), "Ctrl+T" );
     menu->addSeparator();
     DP_SADD( qtr("Preferences"), "", "", prefsDialog(), "Ctrl+P" );
