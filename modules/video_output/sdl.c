@@ -98,6 +98,11 @@ static int  NewPicture      ( vout_thread_t *, picture_t * );
 static void SetPalette      ( vout_thread_t *,
                               uint16_t *, uint16_t *, uint16_t * );
 
+#define CHROMA_TEXT N_("SDL chroma format")
+#define CHROMA_LONGTEXT N_( \
+    "Force the SDL renderer to use a specific chroma format instead of " \
+    "trying to improve performances by using the most efficient one.")
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -108,6 +113,7 @@ vlc_module_begin();
     set_description( _("Simple DirectMedia Layer video output") );
     set_capability( "video output", 60 );
     add_shortcut( "sdl" );
+    add_string( "sdl-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
     /* XXX: check for conflicts with the SDL audio output */
     var_Create( p_module->p_libvlc_global, "sdl", VLC_VAR_MUTEX );
@@ -615,6 +621,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     /* SDL fucked up fourcc definitions on bigendian machines */
     uint32_t i_sdl_chroma;
+    char *psz_chroma = NULL;
+    uint32_t i_chroma = 0;
 
     /* Set main window's size */
     p_vout->p_sys->i_width = p_vout->b_fullscreen ? p_vout->output.i_width :
@@ -646,37 +654,59 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     SDL_LockSurface( p_vout->p_sys->p_display );
 
-    /* Choose the chroma we will try first. */
-    switch( p_vout->render.i_chroma )
+    if( ( psz_chroma = config_GetPsz( p_vout, "sdl-chroma" ) ) )
     {
-        case VLC_FOURCC('Y','U','Y','2'):
-        case VLC_FOURCC('Y','U','N','V'):
-            p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
-            i_sdl_chroma = SDL_YUY2_OVERLAY;
-            break;
-        case VLC_FOURCC('U','Y','V','Y'):
-        case VLC_FOURCC('U','Y','N','V'):
-        case VLC_FOURCC('Y','4','2','2'):
-            p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
-            i_sdl_chroma = SDL_UYVY_OVERLAY;
-            break;
-        case VLC_FOURCC('Y','V','Y','U'):
-            p_vout->output.i_chroma = VLC_FOURCC('Y','V','Y','U');
-            i_sdl_chroma = SDL_YVYU_OVERLAY;
-            break;
-        case VLC_FOURCC('Y','V','1','2'):
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-        default:
-            p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
-            i_sdl_chroma = SDL_YV12_OVERLAY;
-            break;
+        if( strlen( psz_chroma ) >= 4 )
+        {
+            memcpy(&i_chroma, psz_chroma, 4);
+            msg_Dbg( p_vout, "Forcing chroma to 0x%.8x (%4.4s)", i_chroma, (char*)&i_chroma );
+        }
+        else
+        {
+            free( psz_chroma );
+            psz_chroma = NULL;
+        }
     }
 
-    p_vout->p_sys->p_overlay =
-        SDL_CreateYUVOverlay( 32, 32, i_sdl_chroma, p_vout->p_sys->p_display );
-    /* FIXME: if the first overlay we find is software, don't stop,
-     * because we may find a hardware one later ... */
+    /* Choose the chroma we will try first. */
+    do
+    {
+        if( !psz_chroma ) i_chroma = 0;
+        switch( i_chroma ? i_chroma : p_vout->render.i_chroma )
+        {
+            case VLC_FOURCC('Y','U','Y','2'):
+            case VLC_FOURCC('Y','U','N','V'):
+                p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+                i_sdl_chroma = SDL_YUY2_OVERLAY;
+                break;
+            case VLC_FOURCC('U','Y','V','Y'):
+            case VLC_FOURCC('U','Y','N','V'):
+            case VLC_FOURCC('Y','4','2','2'):
+                p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
+                i_sdl_chroma = SDL_UYVY_OVERLAY;
+                break;
+            case VLC_FOURCC('Y','V','Y','U'):
+                p_vout->output.i_chroma = VLC_FOURCC('Y','V','Y','U');
+                i_sdl_chroma = SDL_YVYU_OVERLAY;
+                break;
+            case VLC_FOURCC('Y','V','1','2'):
+            case VLC_FOURCC('I','4','2','0'):
+            case VLC_FOURCC('I','Y','U','V'):
+            default:
+                p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
+                i_sdl_chroma = SDL_YV12_OVERLAY;
+                break;
+        }
+        free( psz_chroma ); psz_chroma = NULL;
+
+        p_vout->p_sys->p_overlay =
+            SDL_CreateYUVOverlay( 32, 32, i_sdl_chroma,
+                                  p_vout->p_sys->p_display );
+        /* FIXME: if the first overlay we find is software, don't stop,
+         * because we may find a hardware one later ... */
+    }
+    while( i_chroma && !p_vout->p_sys->p_overlay );
+
 
     /* If this best choice failed, fall back to other chromas */
     if( p_vout->p_sys->p_overlay == NULL )
