@@ -160,7 +160,7 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
 
     if( i_width <= 0 || i_height <= 0 ) return;
 
-#if 0
+#if 1
     printf( "chroma: %4.4s -> %4.4s\n",
              (char *)&p_filter->fmt_in.video.i_chroma,
              (char *)&p_filter->fmt_out.video.i_chroma );
@@ -1170,7 +1170,7 @@ static void BlendRGBAI420( filter_t *p_filter, picture_t *p_dst,
     return;
 }
 
-static void BlendRGBAR16( filter_t *p_filter, picture_t *p_dst_pic,
+static void BlendRGBAR24( filter_t *p_filter, picture_t *p_dst_pic,
                           picture_t *p_dst_orig, picture_t *p_src,
                           int i_x_offset, int i_y_offset,
                           int i_width, int i_height, int i_alpha )
@@ -1248,7 +1248,7 @@ static void BlendRGBAR16( filter_t *p_filter, picture_t *p_dst_pic,
     return;
 }
 
-static void BlendRGBAR24( filter_t *p_filter, picture_t *p_dst_pic,
+static void BlendRGBAR16( filter_t *p_filter, picture_t *p_dst_pic,
                           picture_t *p_dst_orig, picture_t *p_src,
                           int i_x_offset, int i_y_offset,
                           int i_width, int i_height, int i_alpha )
