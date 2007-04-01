@@ -81,33 +81,39 @@ void DialogsProvider::customEvent( QEvent *event )
         DialogEvent *de = static_cast<DialogEvent*>(event);
         switch( de->i_dialog )
         {
+            case INTF_DIALOG_FILE_SIMPLE:
             case INTF_DIALOG_FILE:
                 openDialog(); break;
             case INTF_DIALOG_DISC:
                 openDiscDialog(); break;
             case INTF_DIALOG_NET:
                 openNetDialog(); break;
+            case INTF_DIALOG_SAT:
             case INTF_DIALOG_CAPTURE:
                 openCaptureDialog(); break;
             case INTF_DIALOG_PLAYLIST:
                 playlistDialog(); break;
             case INTF_DIALOG_MESSAGES:
                 messagesDialog(); break;
+            case INTF_DIALOG_FILEINFO:
+               mediaInfoDialog(); break;
             case INTF_DIALOG_PREFS:
                prefsDialog(); break;
+            case INTF_DIALOG_BOOKMARKS:
+               bookmarksDialog(); break;
+            case INTF_DIALOG_EXTENDED:
+               extendedDialog(); break;
             case INTF_DIALOG_POPUPMENU:
             case INTF_DIALOG_AUDIOPOPUPMENU:
             case INTF_DIALOG_VIDEOPOPUPMENU:
             case INTF_DIALOG_MISCPOPUPMENU:
                popupMenu( de->i_dialog ); break;
-            case INTF_DIALOG_FILEINFO:
-               mediaInfoDialog(); break;
             case INTF_DIALOG_INTERACTION:
                doInteraction( de->p_arg ); break;
-            case INTF_DIALOG_BOOKMARKS:
-               bookmarksDialog(); break;
             case INTF_DIALOG_VLM:
             case INTF_DIALOG_WIZARD:
+            case INTF_DIALOG_UPDATEVLC:
+            case INTF_DIALOG_EXIT:
             default:
                msg_Warn( p_intf, "unimplemented dialog\n" );
         }
