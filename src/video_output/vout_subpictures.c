@@ -52,6 +52,11 @@ static void spu_del_buffer( filter_t *, subpicture_t * );
 static picture_t *spu_new_video_buffer( filter_t * );
 static void spu_del_video_buffer( filter_t *, picture_t * );
 
+static int spu_ParseChain( spu_t * );
+static void spu_DeleteChain( spu_t * );
+static int SubFilterCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
+
 struct filter_owner_sys_t
 {
     spu_t *p_spu;
@@ -96,7 +101,6 @@ spu_t *__spu_Create( vlc_object_t *p_this )
  */
 int spu_Init( spu_t *p_spu )
 {
-    char *psz_parser;
     vlc_value_t val;
 
     /* If the user requested a sub margin, we force the position. */
@@ -105,8 +109,18 @@ int spu_Init( spu_t *p_spu )
     p_spu->i_margin = val.i_int;
 
     var_Create( p_spu, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_spu, "sub-filter", &val );
+    var_AddCallback( p_spu, "sub-filter", SubFilterCallback, p_spu );
 
+    spu_ParseChain( p_spu );
+
+    return VLC_EGENERIC;
+}
+
+int spu_ParseChain( spu_t *p_spu )
+{
+    char *psz_parser;
+    vlc_value_t val;
+    var_Get( p_spu, "sub-filter", &val );
     psz_parser = val.psz_string;
 
     while( psz_parser && *psz_parser )
@@ -202,6 +216,15 @@ void spu_Destroy( spu_t *p_spu )
         vlc_object_destroy( p_spu->p_scale );
     }
 
+    spu_DeleteChain( p_spu );
+
+    vlc_mutex_destroy( &p_spu->subpicture_lock );
+    vlc_object_destroy( p_spu );
+}
+
+static void spu_DeleteChain( spu_t *p_spu )
+{
+    if( p_spu->i_filter )
     while( p_spu->i_filter-- )
     {
         module_Unneed( p_spu->pp_filter[p_spu->i_filter],
@@ -211,9 +234,6 @@ void spu_Destroy( spu_t *p_spu )
         vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
         vlc_object_destroy( p_spu->pp_filter[p_spu->i_filter] );
     }
-
-    vlc_mutex_destroy( &p_spu->subpicture_lock );
-    vlc_object_destroy( p_spu );
 }
 
 /**
@@ -1129,4 +1149,18 @@ static void spu_del_video_buffer( filter_t *p_filter, picture_t *p_pic )
 {
     if( p_pic && p_pic->p_data_orig ) free( p_pic->p_data_orig );
     if( p_pic ) free( p_pic );
+}
+
+static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    if( !strcmp( psz_var, "sub-filter" ) )
+    {
+        spu_t *p_spu = (spu_t *)p_data;
+        vlc_mutex_lock( &p_spu->subpicture_lock );
+        spu_DeleteChain( p_spu );
+        spu_ParseChain( p_spu );
+        vlc_mutex_unlock( &p_spu->subpicture_lock );
+    }
+    return VLC_SUCCESS;
 }
