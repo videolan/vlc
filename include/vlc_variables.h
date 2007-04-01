@@ -601,4 +601,4 @@ static inline char *__var_CreateGetNonEmptyStringCommand( vlc_object_t *p_obj,
 /**
  * @}
  */
-#endif /*  _VLC_VARIABLES_H */ 
+#endif /*  _VLC_VARIABLES_H */
