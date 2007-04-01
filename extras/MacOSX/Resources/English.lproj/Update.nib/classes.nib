@@ -2,13 +2,14 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {download = id; okay = id; }; 
+            ACTIONS = {changeCheckUpdateOnStartup = id; download = id; okay = id; }; 
             CLASS = VLCUpdate; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 "o_bar_checking" = id; 
                 "o_btn_DownloadNow" = id; 
                 "o_btn_okay" = id; 
+                "o_chk_updateOnStartup" = id; 
                 "o_fld_currentVersionAndSize" = id; 
                 "o_fld_releaseNote" = id; 
                 "o_fld_status" = id; 

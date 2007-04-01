@@ -742,7 +742,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* Check for update silently on startup */
     if ( !nib_update_loaded )
         nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner:self];
-    [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:NULL];
+
+    if([o_update shouldCheckForUpdate])
+        [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:NULL];
 }
 
 /* Listen to the remote in exclusive mode, only when VLC is the active

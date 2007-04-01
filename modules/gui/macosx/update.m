@@ -34,6 +34,8 @@
 #import "update.h"
 #import "intf.h"
 
+static NSString * kPrefUpdateOnStartup = @"UpdateOnStartup";
+static NSString * kPrefUpdateLastTimeChecked = @"UpdateLastTimeChecked";
 
 /*****************************************************************************
  * VLCExtended implementation
@@ -67,7 +69,7 @@ static VLCUpdate *_o_sharedInstance = nil;
     /* clean the interface */
     [o_fld_releaseNote setString: @""];
     
-    [self initStrings];
+    [self initInterface];
 }
 
 - (void)dealloc
@@ -78,12 +80,49 @@ static VLCUpdate *_o_sharedInstance = nil;
     [super dealloc];
 }
 
-- (void)initStrings
+- (void)initInterface
 {
     /* translate strings to the user's language */
     [o_update_window setTitle: _NS("Check for Updates")];
     [o_btn_DownloadNow setTitle: _NS("Download now")];
     [o_btn_okay setTitle: _NS("OK")];
+    [o_chk_updateOnStartup setTitle: _NS("Check for update when VLC is launched")];
+    /* we don't use - (BOOL)shouldCheckUpdateOnStartup beccause we don't want the Alert
+     * panel to pop up at this time */
+    [o_chk_updateOnStartup setState: [[NSUserDefaults standardUserDefaults] boolForKey: kPrefUpdateOnStartup]];
+}
+
+- (void)setShouldCheckUpdate: (BOOL)check
+{
+    [[NSUserDefaults standardUserDefaults] setBool: check forKey: kPrefUpdateOnStartup];
+    [o_chk_updateOnStartup setState: check];
+}
+
+- (BOOL)shouldCheckForUpdate
+{
+    NSDate *o_last_update;
+    NSDate *o_next_update;
+    
+    if(![[NSUserDefaults standardUserDefaults] objectForKey: kPrefUpdateOnStartup])
+    {
+        /* We don't have any preferences stored, ask the user. */
+        int res = NSRunInformationalAlertPanel( _NS("Do you want VLC to check for update automatically?"),
+              _NS("You can change this option later in the VLC update window."), _NS("Yes"), _NS("No"), nil );
+        [self setShouldCheckUpdate: res];
+    }
+
+    if( ![[NSUserDefaults standardUserDefaults] boolForKey: kPrefUpdateOnStartup] )
+        return NO;
+
+    o_last_update = [[NSUserDefaults standardUserDefaults] objectForKey: kPrefUpdateLastTimeChecked];
+    if( !o_last_update )
+        return YES;
+
+    o_next_update = [[[NSDate alloc] initWithTimeInterval: 60*60*24*2 /* every two days */ sinceDate: o_last_update] autorelease];
+    if( !o_next_update )
+        return YES;
+
+    return [o_next_update compare: [NSDate date]] == NSOrderedAscending;
 }
 
 - (void)showUpdateWindow
@@ -134,11 +173,15 @@ static VLCUpdate *_o_sharedInstance = nil;
     [o_update_window close];
 }
 
+- (IBAction)changeCheckUpdateOnStartup:(id)sender
+{
+    [self setShouldCheckUpdate: [sender state]];
+}
+
 - (void)checkForUpdate
 {
     /* We may not run on first thread */
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
     p_u = update_New( p_intf );
     update_Check( p_u, VLC_FALSE );
     update_iterator_t *p_uit = update_iterator_New( p_u );
@@ -148,6 +191,8 @@ static VLCUpdate *_o_sharedInstance = nil;
     NSString * pathToReleaseNote;
     pathToReleaseNote = [NSString stringWithFormat: \
         @"/tmp/vlc_releasenote_%d.tmp", mdate()];
+
+    [[NSUserDefaults standardUserDefaults] setObject: [NSDate date] forKey: kPrefUpdateLastTimeChecked];
 
     if( p_uit )
     {
@@ -210,6 +255,7 @@ static VLCUpdate *_o_sharedInstance = nil;
                     releaseChecked = YES;
                     /* Make sure the update window is showed in case we have something */
                     [o_update_window center];
+                    [o_update_window displayIfNeeded];
                     [o_update_window makeKeyAndOrderFront: self];
 
                 }

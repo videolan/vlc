@@ -34,6 +34,7 @@
     IBOutlet id o_fld_status;
     IBOutlet id o_update_window;
     IBOutlet id o_bar_checking;
+    IBOutlet id o_chk_updateOnStartup;
 
     NSString * o_urlOfBinary;
     update_t * p_u;
@@ -42,9 +43,12 @@
 
 - (IBAction)download:(id)sender;
 - (IBAction)okay:(id)sender;
+- (IBAction)changeCheckUpdateOnStartup:(id)sender;
+
+- (BOOL)shouldCheckForUpdate;
 
 - (void)showUpdateWindow;
-- (void)initStrings;
+- (void)initInterface;
 - (void)checkForUpdate;
 - (void)performDownload:(NSString *)path;
 
