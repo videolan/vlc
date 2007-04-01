@@ -4,7 +4,7 @@ all: .autoconf .automake .libtool .intl .pkgcfg .freetype .fribidi \
     .flac .speex .shout .faad .faac .lame .twolame .ebml .matroska .ffmpeg \
     .dvdcss .dvdnav .dvdread .dvbpsi .live .caca .mod \
     .png .gpg-error .gcrypt .gnutls .opendaap .cddb .cdio .vcdimager \
-    .SDL_image .glib .libidl .gecko .mpcdec .dirac_encoder .dirac_decoder \
+    .SDL_image .glib .gecko .mpcdec .dirac_encoder .dirac_decoder \
     .libdca .tag .x264 .goom2k4 .aclocal
 # .expat .clinkcc don't work with SDK yet
 # .glib .libidl .gecko are required to build the mozilla plugin
