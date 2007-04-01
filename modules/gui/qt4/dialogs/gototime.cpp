@@ -24,8 +24,10 @@
 #include "dialogs/gototime.hpp"
 
 #include "dialogs_provider.hpp"
+#include "main_interface.hpp"
 #include "util/qvlcframe.hpp"
 #include "qt4.hpp"
+#include "input_manager.hpp"
 
 #include <QTabWidget>
 #include <QFile>
@@ -89,8 +91,20 @@ GotoTimeDialog::~GotoTimeDialog()
 {
 }
 
+void GotoTimeDialog::cancel()
+{
+    timeEdit->setTime( QTime( 0, 0, 0) );
+    this->toggleVisible();
+}
+
 void GotoTimeDialog::close()
 {
+    vlc_value_t val;
 
+    if ( THEMIM->getIM()->hasInput() )
+    {
+        val.i_time = QTime( 0, 0, 0 ).msecsTo( timeEdit->time() );
+        var_Set( THEMIM->getInput(), "time", val );
+    }
     this->toggleVisible();
 }

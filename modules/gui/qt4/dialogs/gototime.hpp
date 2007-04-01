@@ -45,6 +45,7 @@ private:
     static GotoTimeDialog *instance;
 public slots:
     void close();
+    void cancel();
 };
 
 #endif
