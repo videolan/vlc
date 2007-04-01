@@ -36,6 +36,7 @@ $Id$
  * asf: ASF demuxer
  * au: AU file demuxer
  * audio_format: helper module for audio transcoding
+ * audioscrobbler: AudioScrobbler/Last.fm submission plugin
  * auhal: Audio output for MacOS X based on the AUHAL API.
  * avi: AVI File stream demuxer
  * bandlimited_resampler: Bandlimited interpolation audio resampler
@@ -53,6 +54,7 @@ $Id$
  * cvdsub: CVD subtitles decoder
  * daap: iTunes shares services discovery
  * dbus: D-Bus control interface
+ * dc1394: firewire input module
  * deinterlace: naive deinterlacing filter.
  * demuxdump: Pseudo-demuxer that dumps the stream
  * dirac: BBC Dirac codec
@@ -78,6 +80,7 @@ $Id$
  * es: input module for MPEG ES decapsulation.
  * esd: audio output module using the Esound sound daemon.
  * export: playlist export module
+ * extract: Extract RGB components video filter
  * faad: AAC decoder using libfaad2
  * fake: fake codec to be used in advanced streaming setups
  * fb: video output module for the Linux framebuffer.
@@ -166,6 +169,7 @@ $Id$
  * mpgatofixed32: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
  * mpgv: MPEG-I/II Video demuxer
  * msn: announce currently playing stream to MSN
+ * musicbrainz: Art fetcher for music albums
  * mux_asf: ASF muxer
  * mux_avi: AVI muxer
  * mux_dummy: dummy muxer
@@ -184,6 +188,8 @@ $Id$
  * ntservice: run VLC as a NT service
  * nuv: NUV demuxer
  * ogg: input module for OGG decapsulation.
+ * opencv_example: OpenCV example (face identification)
+ * opencv_wrapper: OpenCV wrapper video filter
  * opengl: a opengl video output that uses opengl provider modules
  * opie: interface for Opie using QT/Embedded library.
  * osdmenu: video_filter for displaying and streaming a On Screen Display menu
@@ -215,6 +221,7 @@ $Id$
  * rc: interface module using stdio.
  * real: partial Real audio/video demuxer
  * realaudio: Real audio decoder
+ * ripple: Ripple video effect
  * rotate: Video rotation filter
  * rss: Display a RSS feed on the video output
  * rtcp: incomplete RTCP implementation
@@ -258,6 +265,7 @@ $Id$
  * swscale: Image scaling module
  * tarkin: a tarkin video decoder using libtarkin
  * telnet: Telnet control interface for VideoLAN Media Manager
+ * telx: teletext subtitles decoder
  * test1: Empty C module
  * test2: Empty C++ module
  * test3: Empty Objective C module
