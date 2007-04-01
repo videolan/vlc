@@ -1,7 +1,7 @@
 /*****************************************************************************
  * GotoTime.cpp : GotoTime and About dialogs
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2007 the VideoLAN team
  * $Id: Messages.cpp 16024 2006-07-13 13:51:05Z xtophe $
  *
  * Authors: Jean-Baptiste Kempf <jb (at) videolan.org>
@@ -32,6 +32,7 @@
 #include <QLabel>
 #include <QTimeEdit>
 #include <QGroupBox>
+#include <QDialogButtonBox>
 
 GotoTimeDialog *GotoTimeDialog::instance = NULL;
 
@@ -42,7 +43,12 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 
     QGridLayout *mainLayout = new QGridLayout( this );
 
-    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
+    QPushButton *gotoButton = new QPushButton( qtr( "&Go" ) );
+    QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ) );
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+
+    buttonBox->addButton( gotoButton, QDialogButtonBox::AcceptRole );
+    buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
     QGroupBox *timeGroupBox = new QGroupBox( "Time" );
     QGridLayout *boxLayout = new QGridLayout( timeGroupBox );
@@ -73,9 +79,10 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 
     mainLayout->addWidget( timeGroupBox, 0, 0, 1, 4 );
     mainLayout->addItem( spacerItem, 1, 0 );
-    mainLayout->addWidget( closeButton, 2, 3 );
+    mainLayout->addWidget( buttonBox, 2, 3 );
 
-    BUTTONACT( closeButton, close() );
+    BUTTONACT( gotoButton, close() );
+    BUTTONACT( cancelButton, cancel() );
 }
 
 GotoTimeDialog::~GotoTimeDialog()
