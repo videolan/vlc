@@ -447,6 +447,7 @@ void ExtVideo::updateFilterOptions()
         else if( dial )     i_int = dial->value();
         else if( lineedit ) i_int = lineedit->text().toInt();
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        config_PutInt( p_intf, option.toStdString().c_str(), i_int );
         if( i_type == VLC_VAR_INTEGER )
             var_SetInteger( p_obj, option.toStdString().c_str(), i_int );
         else
@@ -460,6 +461,7 @@ void ExtVideo::updateFilterOptions()
         else if( doublespinbox ) f_float = doublespinbox->value();
         else if( lineedit ) f_float = lineedit->text().toDouble();
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        config_PutFloat( p_intf, option.toStdString().c_str(), f_float );
         var_SetFloat( p_obj, option.toStdString().c_str(), f_float );
     }
     else if( i_type == VLC_VAR_STRING )
@@ -467,6 +469,7 @@ void ExtVideo::updateFilterOptions()
         const char *psz_string = NULL;
         if( lineedit ) psz_string = lineedit->text().toStdString().c_str();
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        config_PutPsz( p_intf, option.toStdString().c_str(), psz_string );
         var_SetString( p_obj, option.toStdString().c_str(), psz_string );
     }
     else
