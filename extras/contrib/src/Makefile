@@ -1466,9 +1466,6 @@ twolame: twolame-$(TWOLAME_VERSION).tar.gz
 ifdef HAVE_BEOS
 	patch -p0 < Patches/twolame-BeOS.patch
 endif
-ifdef HAVE_DARWIN_OS
-	patch -p0 < Patches/twolame-osx.patch
-endif
 
 .twolame: twolame
 ifdef HAVE_WIN32
