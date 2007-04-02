@@ -47,17 +47,28 @@ static void Blend( filter_t *, picture_t *, picture_t *, picture_t *,
                    int, int, int );
 
 /* TODO i_alpha support for BlendR16 */
-/* YUVA, I420, YV12 */
+/* YUVA */
 static void BlendI420( filter_t *, picture_t *, picture_t *, picture_t *,
                        int, int, int, int, int );
-static void BlendI420I420( filter_t *, picture_t *, picture_t *, picture_t *,
-                           int, int, int, int );
 static void BlendR16( filter_t *, picture_t *, picture_t *, picture_t *,
                       int, int, int, int, int );
 static void BlendR24( filter_t *, picture_t *, picture_t *, picture_t *,
                       int, int, int, int, int );
 static void BlendYUVPacked( filter_t *, picture_t *, picture_t *, picture_t *,
                             int, int, int, int, int );
+
+/* I420, YV12 */
+static void BlendI420I420( filter_t *, picture_t *, picture_t *, picture_t *,
+                           int, int, int, int, int );
+static void BlendI420I420_no_alpha(
+                           filter_t *, picture_t *, picture_t *, picture_t *,
+                           int, int, int, int );
+static void BlendI420R16( filter_t *, picture_t *, picture_t *, picture_t *,
+                           int, int, int, int, int );
+static void BlendI420R24( filter_t *, picture_t *, picture_t *, picture_t *,
+                          int, int, int, int, int );
+static void BlendI420YUVPacked( filter_t *, picture_t *, picture_t *,
+                                picture_t *, int, int, int, int, int );
 
 /* YUVP */
 static void BlendPalI420( filter_t *, picture_t *, picture_t *, picture_t *,
@@ -174,18 +185,6 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
-        case VLC_FOURCC('Y','V','1','2'):
-        case VLC_FOURCC('I','4','2','0'):
-            if( i_alpha == 0xff &&
-              ( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('I','4','2','0')
-             || p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','V','1','2')
-              ) )
-            {
-                BlendI420I420( p_filter, p_dst, p_dst_orig, p_src,
-                               i_x_offset, i_y_offset,
-                               i_width, i_height );
-                return;
-            }
         case VLC_FOURCC('Y','U','V','A'):
             switch( p_filter->fmt_out.video.i_chroma )
             {
@@ -236,6 +235,41 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
                     BlendPalRV( p_filter, p_dst, p_dst_orig, p_src,
                                 i_x_offset, i_y_offset,
                                 i_width, i_height, i_alpha );
+                    return;
+            }
+        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('I','4','2','0'):
+            switch( p_filter->fmt_out.video.i_chroma )
+            {
+                case VLC_FOURCC('I','4','2','0'):
+                case VLC_FOURCC('Y','V','1','2'):
+                    if( i_alpha == 0xff )
+                        BlendI420I420_no_alpha(
+                                   p_filter, p_dst, p_dst_orig, p_src,
+                                   i_x_offset, i_y_offset,
+                                   i_width, i_height );
+                    else
+                        BlendI420I420( p_filter, p_dst, p_dst_orig, p_src,
+                                       i_x_offset, i_y_offset,
+                                       i_width, i_height, i_alpha );
+                    return;
+                case VLC_FOURCC('Y','U','Y','2'):
+                case VLC_FOURCC('U','Y','V','Y'):
+                case VLC_FOURCC('Y','V','Y','U'):
+                    BlendI420YUVPacked( p_filter, p_dst, p_dst_orig, p_src,
+                                        i_x_offset, i_y_offset,
+                                        i_width, i_height, i_alpha );
+                    return;
+                case VLC_FOURCC('R','V','1','6'):
+                    BlendI420R16( p_filter, p_dst, p_dst_orig, p_src,
+                                  i_x_offset, i_y_offset,
+                                  i_width, i_height, i_alpha );
+                    return;
+                case VLC_FOURCC('R','V','2','4'):
+                case VLC_FOURCC('R','V','3','2'):
+                    BlendI420R24( p_filter, p_dst, p_dst_orig, p_src,
+                                  i_x_offset, i_y_offset,
+                                  i_width, i_height, i_alpha );
                     return;
             }
         case VLC_FOURCC('R','G','B','A'):
@@ -363,24 +397,15 @@ static void BlendI420( filter_t *p_filter, picture_t *p_dst,
                p_filter->fmt_in.video.i_x_offset/2 +
                p_src->p[V_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
 
-    if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','V','1','2') ||
-        p_filter->fmt_in.video.i_chroma == VLC_FOURCC('I','4','2','0') )
-    {
-        p_trans = NULL;
-        i_trans = i_alpha;
-    }
-    else
-    {
-        p_trans = p_src->p[A_PLANE].p_pixels +
-                  p_filter->fmt_in.video.i_x_offset +
-                  p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
-    }
+    p_trans = p_src->p[A_PLANE].p_pixels +
+              p_filter->fmt_in.video.i_x_offset +
+              p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
 
 #define MAX_TRANS 255
 #define TRANS_BITS  8
 
     /* Draw until we reach the bottom of the subtitle */
-    for( i_y = 0; i_y < i_height; i_y++, p_trans += p_trans?i_src2_pitch:0,
+    for( i_y = 0; i_y < i_height; i_y++, p_trans += i_src2_pitch,
          p_dst_y += i_dst_pitch, p_src1_y += i_src1_pitch,
          p_src2_y += i_src2_pitch,
          p_dst_u += b_even_scanline ? i_dst_pitch/2 : 0,
@@ -437,84 +462,6 @@ static void BlendI420( filter_t *p_filter, picture_t *p_dst,
 
     return;
 }
-static void BlendI420I420( filter_t *p_filter, picture_t *p_dst,
-                           picture_t *p_dst_orig, picture_t *p_src,
-                           int i_x_offset, int i_y_offset,
-                           int i_width, int i_height )
-{
-    int i_src1_pitch, i_src2_pitch, i_dst_pitch;
-    uint8_t *p_src1_y, *p_src2_y, *p_dst_y;
-    uint8_t *p_src1_u, *p_src2_u, *p_dst_u;
-    uint8_t *p_src1_v, *p_src2_v, *p_dst_v;
-    int i_y;
-    vlc_bool_t b_even_scanline = i_y_offset % 2;
-
-    i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
-    p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
-              p_filter->fmt_out.video.i_x_offset +
-              p_dst->p[Y_PLANE].i_pitch *
-              ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
-    p_dst_u = p_dst->p[U_PLANE].p_pixels + i_x_offset/2 +
-              p_filter->fmt_out.video.i_x_offset/2 +
-              ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-              p_dst->p[U_PLANE].i_pitch;
-    p_dst_v = p_dst->p[V_PLANE].p_pixels + i_x_offset/2 +
-              p_filter->fmt_out.video.i_x_offset/2 +
-              ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-              p_dst->p[V_PLANE].i_pitch;
-
-    i_src1_pitch = p_dst_orig->p[Y_PLANE].i_pitch;
-    p_src1_y = p_dst_orig->p[Y_PLANE].p_pixels + i_x_offset +
-               p_filter->fmt_out.video.i_x_offset +
-               p_dst_orig->p[Y_PLANE].i_pitch *
-               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
-    p_src1_u = p_dst_orig->p[U_PLANE].p_pixels + i_x_offset/2 +
-               p_filter->fmt_out.video.i_x_offset/2 +
-               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-               p_dst_orig->p[U_PLANE].i_pitch;
-    p_src1_v = p_dst_orig->p[V_PLANE].p_pixels + i_x_offset/2 +
-               p_filter->fmt_out.video.i_x_offset/2 +
-               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
-               p_dst_orig->p[V_PLANE].i_pitch;
-
-    i_src2_pitch = p_src->p[Y_PLANE].i_pitch;
-    p_src2_y = p_src->p[Y_PLANE].p_pixels +
-               p_filter->fmt_in.video.i_x_offset +
-               p_src->p[Y_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
-    p_src2_u = p_src->p[U_PLANE].p_pixels +
-               p_filter->fmt_in.video.i_x_offset/2 +
-               p_src->p[U_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
-    p_src2_v = p_src->p[V_PLANE].p_pixels +
-               p_filter->fmt_in.video.i_x_offset/2 +
-               p_src->p[V_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
-
-    i_width &= ~1;
-
-    /* Draw until we reach the bottom of the subtitle */
-    for( i_y = 0; i_y < i_height; i_y++,
-         p_dst_y += i_dst_pitch, p_src1_y += i_src1_pitch,
-         p_src2_y += i_src2_pitch,
-         p_dst_u += b_even_scanline ? i_dst_pitch/2 : 0,
-         p_src1_u += b_even_scanline ? i_src1_pitch/2 : 0,
-         p_src2_u += i_src2_pitch,
-         p_dst_v += b_even_scanline ? i_dst_pitch/2 : 0,
-         p_src1_v += b_even_scanline ? i_src1_pitch/2 : 0,
-         p_src2_v += i_src2_pitch )
-    {
-        b_even_scanline = !b_even_scanline;
-
-        /* Completely opaque. Completely overwrite underlying pixel */
-        p_filter->p_libvlc->pf_memcpy( p_dst_y, p_src2_y, i_width );
-
-        if( b_even_scanline )
-        {
-            p_filter->p_libvlc->pf_memcpy( p_dst_u, p_src2_u, i_width/2 );
-            p_filter->p_libvlc->pf_memcpy( p_dst_y, p_src2_y, i_width/2 );
-        }
-    }
-
-    return;
-}
 
 static void BlendR16( filter_t *p_filter, picture_t *p_dst_pic,
                       picture_t *p_dst_orig, picture_t *p_src,
@@ -552,24 +499,15 @@ static void BlendR16( filter_t *p_filter, picture_t *p_dst_pic,
                p_filter->fmt_in.video.i_x_offset/2 +
                p_src->p[V_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
 
-    if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','V','1','2') ||
-        p_filter->fmt_in.video.i_chroma == VLC_FOURCC('I','4','2','0') )
-    {
-        p_trans = NULL;
-        i_trans = i_alpha;
-    }
-    else
-    {
-        p_trans = p_src->p[A_PLANE].p_pixels +
-                  p_filter->fmt_in.video.i_x_offset +
-                  p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
-    }
+    p_trans = p_src->p[A_PLANE].p_pixels +
+              p_filter->fmt_in.video.i_x_offset +
+              p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
 
 #define MAX_TRANS 255
 #define TRANS_BITS  8
 
     /* Draw until we reach the bottom of the subtitle */
-    for( i_y = 0; i_y < i_height; i_y++, p_trans += p_trans?i_src2_pitch:0,
+    for( i_y = 0; i_y < i_height; i_y++, p_trans += i_src2_pitch,
          p_dst += i_dst_pitch, p_src1 += i_src1_pitch,
          p_src2_y += i_src2_pitch, p_src2_u += i_src2_pitch,
          p_src2_v += i_src2_pitch )
@@ -645,24 +583,15 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
                p_filter->fmt_in.video.i_x_offset/2 +
                p_src->p[V_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
 
-    if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','V','1','2') ||
-        p_filter->fmt_in.video.i_chroma == VLC_FOURCC('I','4','2','0') )
-    {
-        p_trans = NULL;
-        i_trans = i_alpha;
-    }
-    else
-    {
-        p_trans = p_src->p[A_PLANE].p_pixels +
-                  p_filter->fmt_in.video.i_x_offset +
-                  p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
-    }
+    p_trans = p_src->p[A_PLANE].p_pixels +
+              p_filter->fmt_in.video.i_x_offset +
+              p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
 
 #define MAX_TRANS 255
 #define TRANS_BITS  8
 
     /* Draw until we reach the bottom of the subtitle */
-    for( i_y = 0; i_y < i_height; i_y++, p_trans += p_trans?i_src2_pitch:0,
+    for( i_y = 0; i_y < i_height; i_y++, p_trans += i_src2_pitch,
          p_dst += i_dst_pitch, p_src1 += i_src1_pitch,
          p_src2_y += i_src2_pitch, p_src2_u += i_src2_pitch,
          p_src2_v += i_src2_pitch )
@@ -767,18 +696,9 @@ static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
                p_filter->fmt_in.video.i_x_offset/2 +
                p_src->p[V_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
 
-    if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','V','1','2') ||
-        p_filter->fmt_in.video.i_chroma == VLC_FOURCC('I','4','2','0') )
-    {
-        p_trans = NULL;
-        i_trans = i_alpha;
-    }
-    else
-    {
-        p_trans = p_src->p[A_PLANE].p_pixels +
-                  p_filter->fmt_in.video.i_x_offset +
-                  p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
-    }
+    p_trans = p_src->p[A_PLANE].p_pixels +
+              p_filter->fmt_in.video.i_x_offset +
+              p_src->p[A_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
 
     i_width = (i_width >> 1) << 1; /* Needs to be a multiple of 2 */
 
@@ -786,7 +706,7 @@ static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
 #define TRANS_BITS  8
 
     /* Draw until we reach the bottom of the subtitle */
-    for( i_y = 0; i_y < i_height; i_y++, p_trans += p_trans?i_src2_pitch:0,
+    for( i_y = 0; i_y < i_height; i_y++, p_trans += i_src2_pitch,
          p_dst += i_dst_pitch, p_src1 += i_src1_pitch,
          p_src2_y += i_src2_pitch, p_src2_u += i_src2_pitch,
          p_src2_v += i_src2_pitch )
@@ -794,8 +714,7 @@ static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
         /* Draw until we reach the end of the line */
         for( i_x = 0; i_x < i_width; i_x++, b_even = !b_even )
         {
-            if( p_trans )
-                i_trans = ( p_trans[i_x] * i_alpha ) / 255;
+            i_trans = ( p_trans[i_x] * i_alpha ) / 255;
             if( !i_trans )
             {
                 /* Completely transparent. Don't change pixel */
@@ -848,6 +767,477 @@ static void BlendYUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
                         >> TRANS_BITS;
                 }
             }
+        }
+    }
+
+#undef MAX_TRANS
+#undef TRANS_BITS
+
+    return;
+}
+/***********************************************************************
+ * I420, YV12
+ ***********************************************************************/
+static void BlendI420I420( filter_t *p_filter, picture_t *p_dst,
+                           picture_t *p_dst_orig, picture_t *p_src,
+                           int i_x_offset, int i_y_offset,
+                           int i_width, int i_height, int i_alpha )
+{
+    int i_src1_pitch, i_src2_pitch, i_dst_pitch;
+    uint8_t *p_src1_y, *p_src2_y, *p_dst_y;
+    uint8_t *p_src1_u, *p_src2_u, *p_dst_u;
+    uint8_t *p_src1_v, *p_src2_v, *p_dst_v;
+    int i_x, i_y;
+    vlc_bool_t b_even_scanline = i_y_offset % 2;
+
+    i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
+    p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
+              p_filter->fmt_out.video.i_x_offset +
+              p_dst->p[Y_PLANE].i_pitch *
+              ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+    p_dst_u = p_dst->p[U_PLANE].p_pixels + i_x_offset/2 +
+              p_filter->fmt_out.video.i_x_offset/2 +
+              ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+              p_dst->p[U_PLANE].i_pitch;
+    p_dst_v = p_dst->p[V_PLANE].p_pixels + i_x_offset/2 +
+              p_filter->fmt_out.video.i_x_offset/2 +
+              ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+              p_dst->p[V_PLANE].i_pitch;
+
+    i_src1_pitch = p_dst_orig->p[Y_PLANE].i_pitch;
+    p_src1_y = p_dst_orig->p[Y_PLANE].p_pixels + i_x_offset +
+               p_filter->fmt_out.video.i_x_offset +
+               p_dst_orig->p[Y_PLANE].i_pitch *
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+    p_src1_u = p_dst_orig->p[U_PLANE].p_pixels + i_x_offset/2 +
+               p_filter->fmt_out.video.i_x_offset/2 +
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+               p_dst_orig->p[U_PLANE].i_pitch;
+    p_src1_v = p_dst_orig->p[V_PLANE].p_pixels + i_x_offset/2 +
+               p_filter->fmt_out.video.i_x_offset/2 +
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+               p_dst_orig->p[V_PLANE].i_pitch;
+
+    i_src2_pitch = p_src->p[Y_PLANE].i_pitch;
+    p_src2_y = p_src->p[Y_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset +
+               p_src->p[Y_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
+    p_src2_u = p_src->p[U_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset/2 +
+               p_src->p[U_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
+    p_src2_v = p_src->p[V_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset/2 +
+               p_src->p[V_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
+
+#define MAX_TRANS 255
+#define TRANS_BITS  8
+
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = 0; i_y < i_height; i_y++,
+         p_dst_y += i_dst_pitch, p_src1_y += i_src1_pitch,
+         p_src2_y += i_src2_pitch )
+    {
+        if( b_even_scanline )
+        {
+            p_dst_u  += i_dst_pitch/2;
+            p_dst_v  += i_dst_pitch/2;
+            p_src1_u += i_src1_pitch/2;
+            p_src1_v += i_src1_pitch/2;
+        }
+        b_even_scanline = !b_even_scanline;
+
+        /* Draw until we reach the end of the line */
+        for( i_x = 0; i_x < i_width; i_x++ )
+        {
+            if( i_alpha == MAX_TRANS )
+            {
+                /* Completely opaque. Completely overwrite underlying pixel */
+                p_dst_y[i_x] = p_src2_y[i_x];
+
+                if( b_even_scanline && i_x % 2 == 0 )
+                {
+                    p_dst_u[i_x/2] = p_src2_u[i_x/2];
+                    p_dst_v[i_x/2] = p_src2_v[i_x/2];
+                }
+                continue;
+            }
+
+            /* Blending */
+            p_dst_y[i_x] = ( (uint16_t)p_src2_y[i_x] * i_alpha +
+                (uint16_t)p_src1_y[i_x] * (MAX_TRANS - i_alpha) )
+                >> TRANS_BITS;
+
+            if( b_even_scanline && i_x % 2 == 0 )
+            {
+                p_dst_u[i_x/2] = ( (uint16_t)p_src2_u[i_x/2] * i_alpha +
+                (uint16_t)p_src1_u[i_x/2] * (MAX_TRANS - i_alpha) )
+                >> TRANS_BITS;
+                p_dst_v[i_x/2] = ( (uint16_t)p_src2_v[i_x/2] * i_alpha +
+                (uint16_t)p_src1_v[i_x/2] * (MAX_TRANS - i_alpha) )
+                >> TRANS_BITS;
+            }
+        }
+        if( i_y%2 == 1 )
+        {
+            p_src2_u += i_src2_pitch/2;
+            p_src2_v += i_src2_pitch/2;
+        }
+    }
+
+#undef MAX_TRANS
+#undef TRANS_BITS
+
+    return;
+}
+static void BlendI420I420_no_alpha( filter_t *p_filter, picture_t *p_dst,
+                                    picture_t *p_dst_orig, picture_t *p_src,
+                                    int i_x_offset, int i_y_offset,
+                                    int i_width, int i_height )
+{
+    int i_src1_pitch, i_src2_pitch, i_dst_pitch;
+    uint8_t *p_src1_y, *p_src2_y, *p_dst_y;
+    uint8_t *p_src1_u, *p_src2_u, *p_dst_u;
+    uint8_t *p_src1_v, *p_src2_v, *p_dst_v;
+    int i_y;
+    vlc_bool_t b_even_scanline = i_y_offset % 2;
+
+    i_dst_pitch = p_dst->p[Y_PLANE].i_pitch;
+    p_dst_y = p_dst->p[Y_PLANE].p_pixels + i_x_offset +
+              p_filter->fmt_out.video.i_x_offset +
+              p_dst->p[Y_PLANE].i_pitch *
+              ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+    p_dst_u = p_dst->p[U_PLANE].p_pixels + i_x_offset/2 +
+              p_filter->fmt_out.video.i_x_offset/2 +
+              ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+              p_dst->p[U_PLANE].i_pitch;
+    p_dst_v = p_dst->p[V_PLANE].p_pixels + i_x_offset/2 +
+              p_filter->fmt_out.video.i_x_offset/2 +
+              ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+              p_dst->p[V_PLANE].i_pitch;
+
+    i_src1_pitch = p_dst_orig->p[Y_PLANE].i_pitch;
+    p_src1_y = p_dst_orig->p[Y_PLANE].p_pixels + i_x_offset +
+               p_filter->fmt_out.video.i_x_offset +
+               p_dst_orig->p[Y_PLANE].i_pitch *
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+    p_src1_u = p_dst_orig->p[U_PLANE].p_pixels + i_x_offset/2 +
+               p_filter->fmt_out.video.i_x_offset/2 +
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+               p_dst_orig->p[U_PLANE].i_pitch;
+    p_src1_v = p_dst_orig->p[V_PLANE].p_pixels + i_x_offset/2 +
+               p_filter->fmt_out.video.i_x_offset/2 +
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset ) / 2 *
+               p_dst_orig->p[V_PLANE].i_pitch;
+
+    i_src2_pitch = p_src->p[Y_PLANE].i_pitch;
+    p_src2_y = p_src->p[Y_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset +
+               p_src->p[Y_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
+    p_src2_u = p_src->p[U_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset/2 +
+               p_src->p[U_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
+    p_src2_v = p_src->p[V_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset/2 +
+               p_src->p[V_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
+
+    i_width &= ~1;
+
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = 0; i_y < i_height; i_y++,
+         p_dst_y += i_dst_pitch, p_src1_y += i_src1_pitch,
+         p_src2_y += i_src2_pitch )
+    {
+        /* Completely opaque. Completely overwrite underlying pixel */
+        p_filter->p_libvlc->pf_memcpy( p_dst_y, p_src2_y, i_width );
+        if( b_even_scanline )
+        {
+            p_dst_u  += i_dst_pitch/2;
+            p_dst_v  += i_dst_pitch/2;
+            p_src1_u += i_src1_pitch/2;
+            p_src1_v += i_src1_pitch/2;
+        }
+        else
+        {
+            p_filter->p_libvlc->pf_memcpy( p_dst_u, p_src2_u, i_width/2 );
+            p_filter->p_libvlc->pf_memcpy( p_dst_v, p_src2_v, i_width/2 );
+        }
+        b_even_scanline = !b_even_scanline;
+        if( i_y%2 == 1 )
+        {
+            p_src2_u += i_src2_pitch/2;
+            p_src2_v += i_src2_pitch/2;
+        }
+    }
+
+    return;
+}
+
+static void BlendI420R16( filter_t *p_filter, picture_t *p_dst_pic,
+                          picture_t *p_dst_orig, picture_t *p_src,
+                          int i_x_offset, int i_y_offset,
+                          int i_width, int i_height, int i_alpha )
+{
+    int i_src1_pitch, i_src2_pitch, i_dst_pitch;
+    uint8_t *p_dst, *p_src1, *p_src2_y;
+    uint8_t *p_src2_u, *p_src2_v;
+    int i_x, i_y, i_pix_pitch;
+    int r, g, b;
+
+    i_pix_pitch = p_dst_pic->p->i_pixel_pitch;
+    i_dst_pitch = p_dst_pic->p->i_pitch;
+    p_dst = p_dst_pic->p->p_pixels + i_x_offset * i_pix_pitch +
+            p_filter->fmt_out.video.i_x_offset * i_pix_pitch +
+            p_dst_pic->p->i_pitch *
+            ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src1_pitch = p_dst_orig->p[Y_PLANE].i_pitch;
+    p_src1 = p_dst_orig->p->p_pixels + i_x_offset * i_pix_pitch +
+               p_filter->fmt_out.video.i_x_offset * i_pix_pitch +
+               p_dst_orig->p->i_pitch *
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src2_pitch = p_src->p[Y_PLANE].i_pitch;
+    p_src2_y = p_src->p[Y_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset +
+               p_src->p[Y_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
+    p_src2_u = p_src->p[U_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset/2 +
+               p_src->p[U_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
+    p_src2_v = p_src->p[V_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset/2 +
+               p_src->p[V_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
+
+#define MAX_TRANS 255
+#define TRANS_BITS  8
+
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = 0; i_y < i_height; i_y++,
+         p_dst += i_dst_pitch, p_src1 += i_src1_pitch,
+         p_src2_y += i_src2_pitch )
+    {
+        /* Draw until we reach the end of the line */
+        for( i_x = 0; i_x < i_width; i_x++ )
+        {
+            if( i_alpha == MAX_TRANS )
+            {
+                /* Completely opaque. Completely overwrite underlying pixel */
+                yuv_to_rgb( &r, &g, &b,
+                            p_src2_y[i_x], p_src2_u[i_x/2], p_src2_v[i_x/2] );
+
+    ((uint16_t *)(&p_dst[i_x * i_pix_pitch]))[0] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+                continue;
+            }
+
+            /* Blending */
+            /* FIXME: do the blending */
+            yuv_to_rgb( &r, &g, &b,
+                        p_src2_y[i_x], p_src2_u[i_x/2], p_src2_v[i_x/2] );
+
+    ((uint16_t *)(&p_dst[i_x * i_pix_pitch]))[0] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+        }
+        if( i_y%2 == 1 )
+        {
+            p_src2_u += i_src2_pitch/2;
+            p_src2_v += i_src2_pitch/2;
+        }
+    }
+
+#undef MAX_TRANS
+#undef TRANS_BITS
+
+    return;
+}
+
+static void BlendI420R24( filter_t *p_filter, picture_t *p_dst_pic,
+                          picture_t *p_dst_orig, picture_t *p_src,
+                          int i_x_offset, int i_y_offset,
+                          int i_width, int i_height, int i_alpha )
+{
+    int i_src1_pitch, i_src2_pitch, i_dst_pitch;
+    uint8_t *p_dst, *p_src1, *p_src2_y;
+    uint8_t *p_src2_u, *p_src2_v;
+    int i_x, i_y, i_pix_pitch;
+    int r, g, b;
+
+    i_pix_pitch = p_dst_pic->p->i_pixel_pitch;
+    i_dst_pitch = p_dst_pic->p->i_pitch;
+    p_dst = p_dst_pic->p->p_pixels + i_x_offset * i_pix_pitch +
+            p_filter->fmt_out.video.i_x_offset * i_pix_pitch +
+            p_dst_pic->p->i_pitch *
+            ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src1_pitch = p_dst_orig->p[Y_PLANE].i_pitch;
+    p_src1 = p_dst_orig->p->p_pixels + i_x_offset * i_pix_pitch +
+               p_filter->fmt_out.video.i_x_offset * i_pix_pitch +
+               p_dst_orig->p->i_pitch *
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src2_pitch = p_src->p[Y_PLANE].i_pitch;
+    p_src2_y = p_src->p[Y_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset +
+               p_src->p[Y_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
+    p_src2_u = p_src->p[U_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset/2 +
+               p_src->p[U_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
+    p_src2_v = p_src->p[V_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset/2 +
+               p_src->p[V_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
+
+#define MAX_TRANS 255
+#define TRANS_BITS  8
+
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = 0; i_y < i_height; i_y++,
+         p_dst += i_dst_pitch, p_src1 += i_src1_pitch,
+         p_src2_y += i_src2_pitch, p_src2_u += i_src2_pitch,
+         p_src2_v += i_src2_pitch )
+    {
+        /* Draw until we reach the end of the line */
+        for( i_x = 0; i_x < i_width; i_x++ )
+        {
+            if( i_alpha == MAX_TRANS )
+            {
+                /* Completely opaque. Completely overwrite underlying pixel */
+                yuv_to_rgb( &r, &g, &b,
+                            p_src2_y[i_x], p_src2_u[i_x/2], p_src2_v[i_x/2] );
+
+                p_dst[i_x * i_pix_pitch]     = r;
+                p_dst[i_x * i_pix_pitch + 1] = g;
+                p_dst[i_x * i_pix_pitch + 2] = b;
+                continue;
+            }
+
+            /* Blending */
+            yuv_to_rgb( &r, &g, &b,
+                        p_src2_y[i_x], p_src2_u[i_x/2], p_src2_v[i_x/2] );
+
+            p_dst[i_x * i_pix_pitch]     = ( r * i_alpha +
+                (uint16_t)p_src1[i_x * i_pix_pitch] *
+                (MAX_TRANS - i_alpha) ) >> TRANS_BITS;
+            p_dst[i_x * i_pix_pitch + 1] = ( g * i_alpha +
+                (uint16_t)p_src1[i_x * i_pix_pitch + 1] *
+                (MAX_TRANS - i_alpha) ) >> TRANS_BITS;
+            p_dst[i_x * i_pix_pitch + 2] = ( b * i_alpha +
+                (uint16_t)p_src1[i_x * i_pix_pitch + 2] *
+                (MAX_TRANS - i_alpha) ) >> TRANS_BITS;
+        }
+        if( i_y%2 == 1 )
+        {
+            p_src2_u += i_src2_pitch/2;
+            p_src2_v += i_src2_pitch/2;
+        }
+    }
+
+#undef MAX_TRANS
+#undef TRANS_BITS
+
+    return;
+}
+
+static void BlendI420YUVPacked( filter_t *p_filter, picture_t *p_dst_pic,
+                                picture_t *p_dst_orig, picture_t *p_src,
+                                int i_x_offset, int i_y_offset,
+                                int i_width, int i_height, int i_alpha )
+{
+    int i_src1_pitch, i_src2_pitch, i_dst_pitch;
+    uint8_t *p_dst, *p_src1, *p_src2_y;
+    uint8_t *p_src2_u, *p_src2_v;
+    int i_x, i_y, i_pix_pitch;
+    vlc_bool_t b_even = !((i_x_offset + p_filter->fmt_out.video.i_x_offset)%2);
+    int i_l_offset = 0, i_u_offset = 0, i_v_offset = 0;
+
+    if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','Y','2') )
+    {
+        i_l_offset = 0;
+        i_u_offset = 1;
+        i_v_offset = 3;
+    }
+    else if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('U','Y','V','Y') )
+    {
+        i_l_offset = 1;
+        i_u_offset = 0;
+        i_v_offset = 2;
+    }
+    else if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','V','Y','U') )
+    {
+        i_l_offset = 0;
+        i_u_offset = 3;
+        i_v_offset = 1;
+    }
+
+    i_pix_pitch = 2;
+    i_dst_pitch = p_dst_pic->p->i_pitch;
+    p_dst = p_dst_pic->p->p_pixels + i_x_offset * i_pix_pitch +
+            p_filter->fmt_out.video.i_x_offset * i_pix_pitch +
+            p_dst_pic->p->i_pitch *
+            ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src1_pitch = p_dst_orig->p[Y_PLANE].i_pitch;
+    p_src1 = p_dst_orig->p->p_pixels + i_x_offset * i_pix_pitch +
+               p_filter->fmt_out.video.i_x_offset * i_pix_pitch +
+               p_dst_orig->p->i_pitch *
+               ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
+
+    i_src2_pitch = p_src->p[Y_PLANE].i_pitch;
+    p_src2_y = p_src->p[Y_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset +
+               p_src->p[Y_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset;
+    p_src2_u = p_src->p[U_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset/2 +
+               p_src->p[U_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
+    p_src2_v = p_src->p[V_PLANE].p_pixels +
+               p_filter->fmt_in.video.i_x_offset/2 +
+               p_src->p[V_PLANE].i_pitch * p_filter->fmt_in.video.i_y_offset/2;
+
+    i_width &= ~1; /* Needs to be a multiple of 2 */
+
+#define MAX_TRANS 255
+#define TRANS_BITS  8
+
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = 0; i_y < i_height; i_y++,
+         p_dst += i_dst_pitch, p_src1 += i_src1_pitch,
+         p_src2_y += i_src2_pitch, p_src2_u += i_src2_pitch,
+         p_src2_v += i_src2_pitch )
+    {
+        /* Draw until we reach the end of the line */
+        for( i_x = 0; i_x < i_width; i_x++, b_even = !b_even )
+        {
+            if( i_alpha == MAX_TRANS )
+            {
+                /* Completely opaque. Completely overwrite underlying pixel */
+                p_dst[i_x * 2 + i_l_offset]     = p_src2_y[i_x];
+
+                if( b_even )
+                {
+                    p_dst[i_x * 2 + i_u_offset] = p_src2_u[i_x/2];
+                    p_dst[i_x * 2 + i_v_offset] = p_src2_v[i_x/2];
+                }
+            }
+            else
+            {
+                /* Blending */
+                p_dst[i_x * 2 + i_l_offset]     = ( (uint16_t)p_src2_y[i_x] * i_alpha +
+                    (uint16_t)p_src1[i_x * 2 + i_l_offset] * (MAX_TRANS - i_alpha) )
+                    >> TRANS_BITS;
+
+                if( b_even )
+                {
+                    uint16_t i_u = p_src2_u[i_x/2];
+                    uint16_t i_v = p_src2_v[i_x/2];
+                    p_dst[i_x * 2 + i_u_offset] = ( (uint16_t)i_u * i_alpha +
+                        (uint16_t)p_src1[i_x * 2 + i_u_offset] * (MAX_TRANS - i_alpha) )
+                        >> TRANS_BITS;
+                    p_dst[i_x * 2 + i_v_offset] = ( (uint16_t)i_v * i_alpha +
+                        (uint16_t)p_src1[i_x * 2 + i_v_offset] * (MAX_TRANS - i_alpha) )
+                        >> TRANS_BITS;
+                }
+            }
+        }
+        if( i_y%2 == 1 )
+        {
+            p_src2_u += i_src2_pitch/2;
+            p_src2_v += i_src2_pitch/2;
         }
     }
 
