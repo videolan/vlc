@@ -46,7 +46,7 @@ Decoders:
 Encoders:
  * Flash Screen Video support
 
-Video output:
+Video output and filters:
  * Adjust, Invert and Distort (now split into Wave, Ripple, Gradient and
    Psychedelic) video filters can now be streamed
  * New puzzle video output filter
@@ -57,6 +57,7 @@ Video output:
  * New erase video filter (remove a logo from a video)
  * Enhancements to subtitles' renderer to support bold, italics and some HTML
    tags
+ * Support for RGBA and I420 blending. This improves Mosaic CPU usage *a lot*.
 
 Stream output:
  * UDP-Lite (requires OS support) for RTP/TS encapsulation
