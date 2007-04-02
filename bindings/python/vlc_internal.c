@@ -254,6 +254,32 @@ vlcObject_find_object( PyObject *self, PyObject *args )
 }
 
 static PyObject *
+vlcObject_find_name( PyObject *self, PyObject *args )
+{
+    vlcObject *p_retval;
+    vlc_object_t *p_obj;
+    char *psz_name;
+    int i_object_type;
+
+    if( !PyArg_ParseTuple( args, "s", &psz_name ) )
+        return NULL;
+
+    p_obj = vlc_object_find_name( VLCSELF->p_object, psz_name, FIND_ANYWHERE );
+
+    if( !p_obj )
+    {
+        Py_INCREF( Py_None );
+        return Py_None;
+    }
+
+    p_retval = PyObject_New( vlcObject, &vlcObject_Type );
+
+    p_retval->p_object = p_obj;
+
+    return ( PyObject * )p_retval;
+}
+
+static PyObject *
 vlcObject_info( PyObject *self, PyObject *args )
 {
     PyObject *p_retval;
@@ -657,6 +683,8 @@ static PyMethodDef vlcObject_methods[] =
       "find_object( str ) -> Object     Find the object of a given type.\n\nAvailable types are : aout, decoder, input, httpd, intf, playlist, root, vlc, vout"},
     { "find_id", vlcObject_find_id, METH_VARARGS,
       "find_id( int ) -> Object      Find an object by id" },
+    { "find_name", vlcObject_find_name, METH_VARARGS,
+      "find_name( str ) -> Object      Find an object by name" },
     { "info", vlcObject_info, METH_NOARGS,
        "info( ) -> dict    Return information about the object" },
     { "release", vlcObject_release, METH_NOARGS,
