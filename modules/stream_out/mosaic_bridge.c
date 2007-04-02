@@ -438,7 +438,11 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             memset( &fmt_out, 0, sizeof(video_format_t) );
             fmt_in = p_sys->p_decoder->fmt_out.video;
 
+#if 0
             fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+#else
+            fmt_out.i_chroma = VLC_FOURCC('I','4','2','0');
+#endif
 
             if ( !p_sys->i_height )
             {
