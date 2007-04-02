@@ -67,6 +67,8 @@ static int OpenFilter( vlc_object_t *p_this )
 
     if( ( p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','U','V','P') &&
           p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','U','V','A') &&
+          p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0') &&
+          p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','V','1','2') &&
           p_filter->fmt_in.video.i_chroma != VLC_FOURCC('R','G','B','A') ) ||
         p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
     {
@@ -121,8 +123,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','P') ||
-        p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','A') )
+    if( p_filter->fmt_in.video.i_chroma != VLC_FOURCC('R','G','B','A') )
     {
         for( i_plane = 0; i_plane < p_pic_dst->i_planes; i_plane++ )
         {
