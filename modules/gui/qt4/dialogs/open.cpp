@@ -45,10 +45,10 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     setWindowTitle( qtr("Open" ) );
     resize( 500, 300);
 
-    fileOpenPanel = new FileOpenPanel( this , p_intf );
-    diskOpenPanel = new DiskOpenPanel( this , p_intf );
-    netOpenPanel = new NetOpenPanel( this , p_intf );
-    captureOpenPanel = new CaptureOpenPanel( this, p_intf );
+    fileOpenPanel = new FileOpenPanel( ui.Tab , p_intf );
+    diskOpenPanel = new DiskOpenPanel( ui.Tab , p_intf );
+    netOpenPanel = new NetOpenPanel( ui.Tab , p_intf );
+    captureOpenPanel = new CaptureOpenPanel( ui.Tab, p_intf );
 
     ui.Tab->addTab( fileOpenPanel, qtr( "&File" ) );
     ui.Tab->addTab( diskOpenPanel, qtr( "&Disc" ) );
@@ -119,6 +119,10 @@ void OpenDialog::cancel()
         reject();
 }
 
+void OpenDialog::close() 
+{
+    play();
+}
 void OpenDialog::play()
 {
     playOrEnqueue( false );
