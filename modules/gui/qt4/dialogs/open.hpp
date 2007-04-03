@@ -72,6 +72,7 @@ private:
     QStringList SeparateEntries( QString );
 private slots:
     void cancel();
+    void close();
     void enqueue();
     void toggleAdvancedPanel();
     void updateMRL( QString );
