@@ -2168,7 +2168,7 @@ STDMETHODIMP VLCVideo::get_aspectRatio(BSTR* aspect)
                 *aspect = BSTRFromCStr(CP_UTF8, psz_aspect);
                 free( psz_aspect );
                 psz_aspect = NULL;
-                return (NULL == aspect) ? E_OUTOFMEMORY : NOERROR;
+                return (NULL == *aspect) ? E_OUTOFMEMORY : NOERROR;
             }
             if( psz_aspect ) free( psz_aspect );
             psz_aspect = NULL;
