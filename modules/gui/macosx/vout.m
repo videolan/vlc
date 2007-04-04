@@ -1031,7 +1031,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         /* move the FSPanel to front in case that it is currently shown
          * this won't and is not supposed to work when it's fading right now */
         if( [[[[VLCMain sharedInstance] getControls] getFSPanel] isDisplayed] )
-            [[[[VLCMain sharedInstance] getControls] getFSPanel] orderFront: self];
+            [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
         
         /* tell the fspanel to move itself to front next time it's triggered */
         [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: i_device];
