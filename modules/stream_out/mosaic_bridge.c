@@ -52,6 +52,8 @@ struct sout_stream_sys_t
     unsigned int i_sar_num, i_sar_den;
     char *psz_id;
     vlc_bool_t b_inited;
+
+    picture_t *p_mask;
 };
 
 #define PICTURE_RING_SIZE 4
@@ -84,6 +86,22 @@ static void ReleasePicture( picture_t *p_pic )
     }
 }
 
+/* copied from video_filters/erase.c . Gruik ? */
+static void LoadMask( sout_stream_t *p_stream, const char *psz_filename )
+{
+    image_handler_t *p_image;
+    video_format_t fmt_in, fmt_out;
+    memset( &fmt_in, 0, sizeof( video_format_t ) );
+    memset( &fmt_out, 0, sizeof( video_format_t ) );
+    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+    if( p_stream->p_sys->p_mask )
+        p_stream->p_sys->p_mask->pf_release( p_stream->p_sys->p_mask );
+    p_image = image_HandlerCreate( p_stream );
+    p_stream->p_sys->p_mask =
+        image_ReadUrl( p_image, psz_filename, &fmt_in, &fmt_out );
+    image_HandlerDelete( p_image );
+}
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -114,6 +132,9 @@ static void video_unlink_picture_decoder( decoder_t *, picture_t * );
 #define RATIO_TEXT N_("Sample aspect ratio")
 #define RATIO_LONGTEXT N_( \
     "Sample aspect ratio of the destination (1:1, 3:4, 2:3)." )
+#define MASK_TEXT N_("Transparency mask")
+#define MASK_LONGTEXT N_( \
+    "Alpha blending transparency mask. Use's a png alpha channel.")
 
 #define SOUT_CFG_PREFIX "sout-mosaic-bridge-"
 
@@ -131,6 +152,8 @@ vlc_module_begin();
                  HEIGHT_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "sar", "1:1", NULL, RATIO_TEXT,
                 RATIO_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "mask", NULL, NULL, MASK_TEXT,
+                MASK_LONGTEXT, VLC_FALSE );
 
     set_callbacks( Open, Close );
 
@@ -138,7 +161,7 @@ vlc_module_begin();
 vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
-    "id", "width", "height", "sar", NULL
+    "id", "width", "height", "sar", "mask", NULL
 };
 
 /*****************************************************************************
@@ -169,6 +192,19 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_stream, SOUT_CFG_PREFIX "width", &val );
     p_sys->i_width = val.i_int;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "mask", &val );
+    if( val.psz_string && *val.psz_string )
+    {
+        p_sys->p_mask = NULL;
+        LoadMask( p_stream, val.psz_string );
+        if( !p_sys->p_mask )
+            msg_Err( p_stream, "Error while loading mask (%s).",
+                     val.psz_string );
+    }
+    else
+        p_sys->p_mask = NULL;
+    free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "sar", &val );
     if ( val.psz_string )
@@ -430,7 +466,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     {
         picture_t *p_new_pic;
 
-        if ( p_sys->i_height || p_sys->i_width )
+        if( p_sys->i_height || p_sys->i_width )
         {
             video_format_t fmt_out, fmt_in;
 
@@ -438,11 +474,10 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             memset( &fmt_out, 0, sizeof(video_format_t) );
             fmt_in = p_sys->p_decoder->fmt_out.video;
 
-#if 0
-            fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-#else
-            fmt_out.i_chroma = VLC_FOURCC('I','4','2','0');
-#endif
+            if( p_sys->p_mask )
+                fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+            else
+                fmt_out.i_chroma = VLC_FOURCC('I','4','2','0');
 
             if ( !p_sys->i_height )
             {
@@ -472,6 +507,55 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             {
                 msg_Err( p_stream, "image conversion failed" );
                 continue;
+            }
+
+            if( p_sys->p_mask )
+            {
+                plane_t *p_mask = p_sys->p_mask->p+A_PLANE;
+                plane_t *p_apic = p_new_pic->p+A_PLANE;
+                if(    p_mask->i_visible_pitch
+                    != p_apic->i_visible_pitch
+                    || p_mask->i_visible_lines
+                    != p_apic->i_visible_lines )
+                {
+                    msg_Warn( p_stream,
+                              "Mask size (%d x %d) and image size (%d x %d) "
+                              "don't match. The mask will not be applied.",
+                              p_mask->i_visible_pitch,
+                              p_mask->i_visible_lines,
+                              p_apic->i_visible_pitch,
+                              p_apic->i_visible_lines );
+                }
+                else
+                {
+                    if( p_mask->i_pitch != p_apic->i_pitch
+                    ||  p_mask->i_lines != p_apic->i_lines )
+                    {
+                        /* visible plane sizes match ... but not the undelying
+                         * buffer. I'm not sure that this can happen,
+                         * but better safe than sorry. */
+                        int i_line;
+                        int i_lines = p_mask->i_visible_lines;
+                        uint8_t *p_src = p_mask->p_pixels;
+                        uint8_t *p_dst = p_apic->p_pixels;
+                        int i_src_pitch = p_mask->i_pitch;
+                        int i_dst_pitch = p_apic->i_pitch;
+                        int i_visible_pitch = p_mask->i_visible_pitch;
+                        for( i_line = 0; i_line < i_lines; i_line++,
+                             p_src += i_src_pitch, p_dst += i_dst_pitch )
+                        {
+                            p_stream->p_libvlc->pf_memcpy(
+                                p_dst, p_src, i_visible_pitch );
+                        }
+                    }
+                    else
+                    {
+                        /* plane sizes match */
+                        p_stream->p_libvlc->pf_memcpy(
+                            p_apic->p_pixels, p_mask->p_pixels,
+                            p_mask->i_pitch * p_mask->i_lines );
+                    }
+                }
             }
         }
         else
