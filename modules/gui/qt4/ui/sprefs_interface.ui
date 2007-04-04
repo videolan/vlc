@@ -156,7 +156,7 @@ p, li { white-space: pre-wrap; }
       <item>
        <widget class="QCheckBox" name="OneInterfaceMode" >
         <property name="text" >
-         <string>Allow only one interface</string>
+         <string>Allow only one instance</string>
         </property>
        </widget>
       </item>
