@@ -80,6 +80,8 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
                   spref_cone_Input_64.png, 4 );
     ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), spref_cone_Hotkeys_64.png, 5 );
 
+    SPrefsInterface->setChecked( true );
+
     this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     setLayout( layout );
 }
