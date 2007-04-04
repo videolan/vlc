@@ -254,6 +254,9 @@ static void Close( vlc_object_t * p_this )
     if ( p_sys->psz_id )
         free( p_sys->psz_id );
 
+    if( p_stream->p_sys->p_mask )
+        p_stream->p_sys->p_mask->pf_release( p_stream->p_sys->p_mask );
+
     free( p_sys );
 }
 
