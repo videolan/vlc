@@ -247,7 +247,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         END_SPREFS_CAT;
 
         /* Interface Panel */
-        START_SPREFS_CAT( Interface, "Interfaces settings" );
+        START_SPREFS_CAT( Interface, "Interface settings" );
             
             CONFIG_GENERIC( "language", StringList, NULL, language );//FIXME
 #if !defined( WIN32 ) && !defined( HAVE_DBUS_3 )
