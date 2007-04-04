@@ -434,6 +434,38 @@ static void Run( intf_thread_t *p_intf )
                     msg_Err( p_intf, "shutdown requested" );
                     p_intf->p_libvlc->b_die = VLC_TRUE;
                 }
+                else if( *cl->buffer_read == '@'
+                          && strchr( cl->buffer_read, ' ' ) )
+                {
+                    /* Module specific commands (use same syntax as in the
+                     * rc interface) */
+                    char *psz_name = cl->buffer_read + 1;
+                    char *psz_cmd, *psz_arg, *psz_msg;
+                    int i_ret;
+
+                    psz_cmd = strchr( cl->buffer_read, ' ' );
+                    *psz_cmd = '\0';  psz_cmd++;
+                    if( ( psz_arg = strchr( psz_cmd, '\n' ) ) ) *psz_arg = '\0';
+                    if( ( psz_arg = strchr( psz_cmd, '\r' ) ) ) *psz_arg = '\0';
+                    if( ( psz_arg = strchr( psz_cmd, ' ' ) )
+                        && *psz_arg )
+                    {
+                        *psz_arg = '\0';
+                        psz_arg++;
+                    }
+
+                    i_ret = var_Command( p_intf, psz_name, psz_cmd, psz_arg,
+                                         &psz_msg );
+
+                    if( psz_msg )
+                    {
+                        vlm_message_t *message;
+                        message = vlm_MessageNew( "Module command", psz_msg );
+                        Write_message( cl, message, NULL, WRITE_MODE_CMD );
+                        vlm_MessageDelete( message );
+                        free( psz_msg );
+                    }
+                }
                 else
                 {
                     vlm_message_t *message;
@@ -451,6 +483,9 @@ static void Run( intf_thread_t *p_intf )
                             vlm_MessageNew( "logout, quit, exit" , NULL ) );
                         vlm_MessageAdd( p_my_help,
                             vlm_MessageNew( "shutdown" , NULL ) );
+                        vlm_MessageAdd( p_my_help,
+                            vlm_MessageNew( "@moduleinstance command argument",
+                                             NULL) );
                         vlm_MessageAdd( message, p_my_help );
                     }
                     Write_message( cl, message, NULL, WRITE_MODE_CMD );

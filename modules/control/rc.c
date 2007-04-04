@@ -601,56 +601,20 @@ static void Run( intf_thread_t *p_intf )
             char *psz_alias = psz_cmd + 1;
             char *psz_mycmd = strdup( psz_arg );
             char *psz_myarg = strchr( psz_mycmd, ' ' );
-            int i_ret = VLC_EGENERIC;
+            char *psz_msg;
 
             *psz_myarg = '\0';
             psz_myarg ++;
-            vlc_object_t *p_obj =
-                vlc_object_find_name( p_input->p_libvlc, psz_alias,
-                                      FIND_CHILD );
 
-            if( !p_obj )
-                msg_rc( "Unknown destination object!" );
-            else
+            var_Command( p_input, psz_alias, psz_mycmd, psz_myarg, &psz_msg );
+
+
+            if( psz_msg )
             {
-                int i_type;
-                if( (i_type = var_Type( p_obj, psz_mycmd )) & VLC_VAR_ISCOMMAND )
-                {
-                    i_type &= 0xf0;
-                    if( i_type == VLC_VAR_INTEGER )
-                    {
-                        i_ret = var_SetInteger( p_obj, psz_mycmd,
-                                                atoi( psz_myarg ) );
-                    }
-                    else if( i_type == VLC_VAR_FLOAT )
-                    {
-                        i_ret = var_SetFloat( p_obj, psz_mycmd,
-                                              atof( psz_myarg ) );
-                    }
-                    else if( i_type == VLC_VAR_STRING )
-                    {
-                        i_ret = var_SetString( p_obj, psz_mycmd,
-                                               psz_myarg );
-                    }
-                    else if( i_type == VLC_VAR_BOOL )
-                    {
-                        i_ret = var_SetBool( p_obj, psz_mycmd,
-                                             atoi( psz_myarg ) );
-                    }
-                    else
-                    {
-                        msg_rc( "Unhandled command type. Fix the code!" );
-                    }
-                }
-                else
-                {
-                    msg_rc( "Unknown command! %d", i_type );
-                }
-                vlc_object_release( p_obj );
+                msg_rc( psz_msg );
+                free( psz_msg );
             }
             free( psz_mycmd );
-            msg_rc( "%s on object %s: returned %i (%s)",
-                    psz_mycmd, psz_alias, i_ret, vlc_error( i_ret ) );
         }
         /* If the user typed a registered local command, try it */
         else if( var_Type( p_intf, psz_cmd ) & VLC_VAR_ISCOMMAND )

@@ -1428,3 +1428,61 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
 
     return InheritValue( p_this->p_parent, psz_name, p_val, i_type );
 }
+
+/**********************************************************************
+ * Execute a var command on an object identified by its name
+ **********************************************************************/
+int __var_Command( vlc_object_t *p_this, const char *psz_name,
+                   const char *psz_cmd, const char *psz_arg, char **psz_msg )
+{
+    vlc_object_t *p_obj = vlc_object_find_name( p_this->p_libvlc,
+                                                psz_name, FIND_CHILD );
+    int i_type, i_ret;
+
+    if( !p_obj )
+    {
+        if( psz_msg )
+            *psz_msg = strdup( "Unknown destination object." );
+        return VLC_ENOOBJ;
+    }
+
+    i_type = var_Type( p_obj, psz_cmd );
+    if( !( i_type&VLC_VAR_ISCOMMAND ) )
+    {
+        vlc_object_release( p_obj );
+        if( psz_msg )
+            *psz_msg = strdup( "Variable doesn't exist or isn't a command." );
+        return VLC_EGENERIC;
+    }
+
+    i_type &= 0xf0;
+    switch( i_type )
+    {
+        case VLC_VAR_INTEGER:
+            i_ret = var_SetInteger( p_obj, psz_cmd, atoi( psz_arg ) );
+            break;
+        case VLC_VAR_FLOAT:
+            i_ret = var_SetFloat( p_obj, psz_cmd, atof( psz_arg ) );
+            break;
+        case VLC_VAR_STRING:
+            i_ret = var_SetString( p_obj, psz_cmd, psz_arg );
+            break;
+        case VLC_VAR_BOOL:
+            i_ret = var_SetBool( p_obj, psz_cmd, atoi( psz_arg ) );
+            break;
+        default:
+            i_ret = VLC_EGENERIC;
+            break;
+    }
+
+    vlc_object_release( p_obj );
+
+    if( psz_msg )
+    {
+        *psz_msg = (char*)malloc( 80 );
+        sprintf( *psz_msg, "%s on object %s returned %i (%s)",
+                 psz_cmd, psz_name, i_ret, vlc_error( i_ret ) );
+    }
+
+    return i_ret;
+}
