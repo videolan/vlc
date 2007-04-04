@@ -27,6 +27,7 @@
 #include <QFont>
 #include <QToolButton>
 #include <QButtonGroup>
+#include <QUrl>
 
 #include "components/simple_preferences.hpp"
 #include "components/preferences_widgets.hpp"
@@ -154,6 +155,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     title_line->setFrameShape(QFrame::HLine);
     title_line->setFrameShadow(QFrame::Sunken);
 
+    QFont italicFont = QApplication::font( static_cast<QWidget*>(0) );
+    italicFont.setItalic( true );
+
     switch( number )
     {
         /* Video Panel Implementation */
@@ -248,7 +252,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         /* Interface Panel */
         START_SPREFS_CAT( Interface, "Interface settings" );
-            
+            ui.defaultLabel->setFont( italicFont );
+            ui.skinsLabel->setFont( italicFont );
+
             CONFIG_GENERIC( "language", StringList, NULL, language );//FIXME
 #if !defined( WIN32 ) && !defined( HAVE_DBUS_3 )
             ui.OneInterfaceBox->hide();
