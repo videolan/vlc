@@ -54,6 +54,7 @@ struct sout_stream_sys_t
     vlc_bool_t b_inited;
 
     picture_t *p_mask;
+    vlc_mutex_t mask_lock;
 };
 
 #define PICTURE_RING_SIZE 4
@@ -115,6 +116,8 @@ static void video_del_buffer( decoder_t *, picture_t * );
 static picture_t *video_new_buffer( decoder_t * );
 static void video_link_picture_decoder( decoder_t *, picture_t * );
 static void video_unlink_picture_decoder( decoder_t *, picture_t * );
+static int MosaicBridgeCallback( vlc_object_t *, char const *,
+                                 vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -193,7 +196,11 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_stream, SOUT_CFG_PREFIX "width", &val );
     p_sys->i_width = val.i_int;
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "mask", &val );
+    vlc_mutex_init( p_stream, &p_sys->mask_lock );
+    val.psz_string =
+    var_CreateGetStringCommand( p_stream, SOUT_CFG_PREFIX "mask" );
+    var_AddCallback( p_stream, SOUT_CFG_PREFIX "mask", MosaicBridgeCallback,
+                     p_stream );
     if( val.psz_string && *val.psz_string )
     {
         p_sys->p_mask = NULL;
@@ -254,6 +261,7 @@ static void Close( vlc_object_t * p_this )
     if ( p_sys->psz_id )
         free( p_sys->psz_id );
 
+    vlc_mutex_destroy( &p_sys->mask_lock );
     if( p_stream->p_sys->p_mask )
         p_stream->p_sys->p_mask->pf_release( p_stream->p_sys->p_mask );
 
@@ -478,7 +486,10 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             fmt_in = p_sys->p_decoder->fmt_out.video;
 
             if( p_sys->p_mask )
+            {
+                vlc_mutex_lock( &p_sys->mask_lock );
                 fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+            }
             else
                 fmt_out.i_chroma = VLC_FOURCC('I','4','2','0');
 
@@ -559,6 +570,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                             p_mask->i_pitch * p_mask->i_lines );
                     }
                 }
+                vlc_mutex_unlock( &p_sys->mask_lock );
             }
         }
         else
@@ -734,3 +746,34 @@ static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
     video_release_buffer( p_pic );
 }
 
+
+/**********************************************************************
+ * Callback to update (some) params on the fly
+ **********************************************************************/
+static int MosaicBridgeCallback( vlc_object_t *p_this, char const *psz_var,
+                                 vlc_value_t oldval, vlc_value_t newval,
+                                 void *p_data )
+{
+    sout_stream_t *p_stream = (sout_stream_t *)p_data;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    if( !strcmp( psz_var, SOUT_CFG_PREFIX "mask" ) )
+    {
+        vlc_mutex_lock( &p_sys->mask_lock );
+        if( newval.psz_string && *newval.psz_string )
+        {
+            LoadMask( p_stream, newval.psz_string );
+            if( !p_sys->p_mask )
+                msg_Err( p_stream, "Error while loading mask (%s).",
+                         newval.psz_string );
+        }
+        else if( p_sys->p_mask )
+        {
+            p_sys->p_mask->pf_release( p_sys->p_mask );
+            p_sys->p_mask = NULL;
+        }
+        vlc_mutex_unlock( &p_sys->mask_lock );
+    }
+
+    return VLC_SUCCESS;
+}
