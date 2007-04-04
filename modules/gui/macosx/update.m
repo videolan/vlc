@@ -262,7 +262,7 @@ static VLCUpdate *_o_sharedInstance = nil;
                 else if(! releaseChecked )
                 {
                     [o_fld_status setStringValue: _NS("This version of VLC " \
-                        "is latest available.")];
+                        "is the latest available.")];
                     [o_btn_DownloadNow setEnabled: NO];
                     msg_Dbg( p_intf, "current version is up-to-date" );
                     releaseChecked = YES;
