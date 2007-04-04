@@ -30,6 +30,8 @@
 #include "../src/vlcproc.hpp"
 #include "../src/window_manager.hpp"
 
+#include <cctype>
+
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
 #endif
