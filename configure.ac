@@ -842,8 +842,9 @@ fi
 dnl Check for dbus
 AC_ARG_ENABLE(dbus,
   [  --enable-dbus           Linux D-BUS message bus system (default enabled)])
-
-if test "${enable_dbus}" != "no" -a "${SYS}" = "linux"
+case "${SYS}" in
+    linux*|*bsd*)
+if test "${enable_dbus}" != "no"
 then
   dnl api stable dbus
   PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.0.0,
@@ -906,6 +907,8 @@ then
     fi
   )
 fi
+;;
+esac
 
 dnl Build the gtk_main plugins?
 NEED_GTK_MAIN=no
