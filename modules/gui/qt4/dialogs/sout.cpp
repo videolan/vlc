@@ -67,6 +67,8 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf ) :
     ui.vScale->addItem( "1.75" );
     ui.vScale->addItem( "2" );
 
+    ui.mrlEdit->setToolTip ( qtr("Stream output string.\n This is automatically generated when you change the above settings,\n but you can update it manually." ) ) ;
+
     /* Connect everything to the updateMRL function */
 #define CB(x) CONNECT( ui.x, clicked(bool), this, updateMRL() );
 #define CT(x) CONNECT( ui.x, textChanged(const QString), this, updateMRL() );
