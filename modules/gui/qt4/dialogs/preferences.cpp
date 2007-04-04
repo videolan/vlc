@@ -26,7 +26,7 @@
 #include "dialogs_provider.hpp"
 #include "util/qvlcframe.hpp"
 
-#include "components/preferences.hpp"
+#include "components/complete_preferences.hpp"
 #include "components/simple_preferences.hpp"
 #include "qt4.hpp"
 

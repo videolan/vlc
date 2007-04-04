@@ -52,7 +52,7 @@ TOMOC = main_interface \
 	components/extended_panels \
 	components/infopanels \
 	components/preferences_widgets \
-	components/preferences \
+	components/complete_preferences \
 	components/simple_preferences \
 	components/open \
 	components/interface_widgets \
@@ -82,7 +82,7 @@ nodist_SOURCES_qt4 = \
 		components/extended_panels.moc.cpp \
 		components/infopanels.moc.cpp \
 	 	components/preferences_widgets.moc.cpp \
-	 	components/preferences.moc.cpp \
+	 	components/complete_preferences.moc.cpp \
 		components/simple_preferences.moc.cpp \
 		components/open.moc.cpp \
 		components/interface_widgets.moc.cpp \
@@ -132,7 +132,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/extended_panels.cpp \
 		components/infopanels.cpp \
 		components/preferences_widgets.cpp \
-		components/preferences.cpp \
+		components/complete_preferences.cpp \
 		components/simple_preferences.cpp \
 		components/open.cpp \
 		components/interface_widgets.cpp \
@@ -164,7 +164,7 @@ EXTRA_DIST += \
 	components/extended_panels.hpp \
 	components/infopanels.hpp \
 	components/preferences_widgets.hpp \
-	components/preferences.hpp \
+	components/complete_preferences.hpp \
 	components/simple_preferences.hpp \
 	components/open.hpp \
 	components/interface_widgets.hpp \

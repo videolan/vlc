@@ -37,7 +37,7 @@
 #include <QPalette>
 #include <QColor>
 
-#include "components/preferences.hpp"
+#include "components/complete_preferences.hpp"
 #include "components/preferences_widgets.hpp"
 #include "qt4.hpp"
 
