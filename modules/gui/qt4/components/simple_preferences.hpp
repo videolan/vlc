@@ -25,6 +25,7 @@
 #define _SIMPLEPREFS_H_
 
 #include <QListWidget>
+#include <QVBoxLayout>
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 
@@ -41,7 +42,7 @@ enum {
 
 class ConfigControl;
 
-class SPrefsCatList : public QListWidget
+class SPrefsCatList : public QWidget
 {
     Q_OBJECT;
 public:
@@ -49,6 +50,10 @@ public:
     virtual ~SPrefsCatList() {};
 private:
     intf_thread_t *p_intf;
+signals:
+    void currentItemChanged( int );
+public slots:
+    void switchPanel( int );
 };
 
 class SPrefsPanel : public QWidget

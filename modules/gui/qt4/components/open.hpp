@@ -51,7 +51,7 @@ protected:
 public slots:
     virtual void updateMRL() = 0;
 signals:
-    void mrlUpdated(QString);
+    void mrlUpdated( QString );
     void methodChanged( QString method );
 };
 

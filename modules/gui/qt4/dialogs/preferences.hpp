@@ -80,7 +80,7 @@ private:
     static PrefsDialog *instance;
 private slots:
      void changePanel( QTreeWidgetItem * );
-     void changeSimplePanel( QListWidgetItem * );
+     void changeSimplePanel( int );
      void setAll();
      void setSmall();
      void save();

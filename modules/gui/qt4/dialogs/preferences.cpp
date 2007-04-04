@@ -143,8 +143,8 @@ void PrefsDialog::setSmall()
     {
          simple_tree = new SPrefsCatList( p_intf, tree_panel );
          CONNECT( simple_tree,
-                  currentItemChanged( QListWidgetItem *, QListWidgetItem *),
-                  this,  changeSimplePanel( QListWidgetItem * ) );
+                  currentItemChanged( int ),
+                  this,  changeSimplePanel( int ) );
     }
     tree_panel_l->addWidget( simple_tree );
     simple_tree->show();
@@ -160,9 +160,8 @@ void PrefsDialog::setSmall()
     simple_panel->show();
 }
 
-void PrefsDialog::changeSimplePanel( QListWidgetItem *item )
+void PrefsDialog::changeSimplePanel( int number )
 {
-    int number = item->data( Qt::UserRole ).toInt();
     if( simple_panel )
     {
         main_panel_l->removeWidget( simple_panel );
@@ -176,7 +175,6 @@ void PrefsDialog::changeSimplePanel( QListWidgetItem *item )
     }
     main_panel_l->addWidget( simple_panel );
     simple_panel->show();
-//    panel_label->setText(qtr("Test")); //FIXME
 }
 
 void PrefsDialog::changePanel( QTreeWidgetItem *item )

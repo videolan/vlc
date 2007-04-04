@@ -23,23 +23,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <QListWidget>
-#include <QListWidgetItem>
 #include <QString>
 #include <QFont>
+#include <QToolButton>
+#include <QButtonGroup>
 
 #include "components/simple_preferences.hpp"
 #include "components/preferences_widgets.hpp"
 #include "qt4.hpp"
 
 #include <vlc_config_cat.h>
-
-#include "pixmaps/hotkeys_50x50.xpm"
-#include "pixmaps/audio_50x50.xpm"
-#include "pixmaps/input_and_codecs_50x50.xpm"
-#include "pixmaps/interface_50x50.xpm"
-#include "pixmaps/subtitles_50x50.xpm"
-#include "pixmaps/video_50x50.xpm"
 
 #include "ui/sprefs_audio.h"
 #include "ui/sprefs_input.h"
@@ -48,42 +41,52 @@
 #include "ui/sprefs_hotkeys.h"
 #include "ui/sprefs_interface.h"
 
-#define ITEM_HEIGHT 64
+#define ICON_HEIGHT 64
+#define BUTTON_HEIGHT 76
 
 /*********************************************************************
  * The List of categories
  *********************************************************************/
 SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
-                                  QListWidget( _parent ), p_intf( _p_intf )
+                                  QWidget( _parent ), p_intf( _p_intf )
 {
-    setIconSize( QSize( ITEM_HEIGHT, ITEM_HEIGHT ) );
-    setViewMode(QListView::ListMode);
-    setMovement(QListView::Static);
-    setMaximumWidth(200);
-    setSpacing(0);
-//  setWordWrap(true);
-    setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setAlternatingRowColors( true );
+    QVBoxLayout *layout = new QVBoxLayout();
 
-#define ADD_CATEGORY( id, label, icon )                                  \
-    addItem( label );                                                    \
-    item( id )->setIcon( QIcon( ":/pixmaps/" #icon ) )  ;   \
-    item( id )->setTextAlignment( Qt::AlignLeft | Qt::AlignVCenter );      \
-    item( id )->setData( Qt::UserRole, qVariantFromValue( (int)id ) );   \
-    item( id )->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEnabled );
+    QButtonGroup *buttonGroup = new QButtonGroup( this );
+    buttonGroup->setExclusive ( true );
+    CONNECT( buttonGroup, buttonClicked ( int ),
+            this, switchPanel( int ) );
+
+#define ADD_CATEGORY( button, label, icon, numb )                           \
+    QToolButton * button = new QToolButton( this );                         \
+    button->setIcon( QIcon( ":/pixmaps/" #icon ) );                         \
+    button->setIconSize( QSize( ICON_HEIGHT , ICON_HEIGHT ) );              \
+    button->setText( label );                                               \
+    button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );              \
+    button->resize( BUTTON_HEIGHT , BUTTON_HEIGHT);                         \
+    button->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding) ;  \
+    button->setAutoRaise( true );                                           \
+    button->setCheckable( true );                                           \
+    buttonGroup->addButton( button, numb );                                 \
+    layout->addWidget( button );
 
     ADD_CATEGORY( SPrefsInterface, qtr("Interface"),
-                  spref_cone_Interface_64.png );
-    ADD_CATEGORY( SPrefsAudio, qtr("Audio"), spref_cone_Audio_64.png );
-    ADD_CATEGORY( SPrefsVideo, qtr("Video"), spref_cone_Video_64.png );
+                  spref_cone_Interface_64.png, 0 );
+    ADD_CATEGORY( SPrefsAudio, qtr("Audio"), spref_cone_Audio_64.png, 1 );
+    ADD_CATEGORY( SPrefsVideo, qtr("Video"), spref_cone_Video_64.png, 2 );
     ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles"),
-                  spref_cone_Subtitles_64.png );
+                  spref_cone_Subtitles_64.png, 3 );
     ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input and Codecs"),
-                  spref_cone_Input_64.png );
-    ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), spref_cone_Hotkeys_64.png );
+                  spref_cone_Input_64.png, 4 );
+    ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), spref_cone_Hotkeys_64.png, 5 );
 
-    setCurrentRow( SPrefsInterface );
+    this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    setLayout( layout );
+}
+
+void SPrefsCatList::switchPanel( int i )
+{
+    emit currentItemChanged( i );
 }
 
 /*********************************************************************
@@ -304,3 +307,4 @@ void SPrefsPanel::apply()
 
 void SPrefsPanel::clean()
 {}
+
