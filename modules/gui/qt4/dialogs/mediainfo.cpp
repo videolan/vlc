@@ -48,6 +48,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput ) :
     QGridLayout *layout = new QGridLayout(this);
     IT = new InfoTab( this, p_intf, true ) ;
     QPushButton *closeButton = new QPushButton(qtr("&Close"));
+    closeButton->setDefault( true );
 
     layout->addWidget(IT,0,0,1,3);
     layout->addWidget(closeButton,1,2);

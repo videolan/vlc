@@ -42,6 +42,7 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     QGridLayout *layout = new QGridLayout( this );
     QTextBrowser *helpBrowser = new QTextBrowser( this );
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
+    closeButton->setDefault( true );
 
     layout->addWidget( helpBrowser, 0, 0, 1, 0 );
     layout->addWidget( closeButton, 1, 3 );
@@ -69,6 +70,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     closeButton->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
+    closeButton->setDefault( true );
 
     QLabel *introduction = new QLabel( qtr( "Infos about VLC media player" ) );
 
