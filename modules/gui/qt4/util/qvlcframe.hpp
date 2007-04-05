@@ -114,17 +114,19 @@ protected:
     {
         hide();
     }
-    void keyPressEvent( QKeyEvent *keyEvent )
+    virtual void keyPressEvent( QKeyEvent *keyEvent )
     {
         if( keyEvent->key() == Qt::Key_Escape )
         {
+            msg_Dbg( p_intf, "Escp Key pressed" );
             cancel();
         }
-        else if( keyEvent->key() == Qt::Key_Enter )
+        else if( keyEvent->key() == Qt::Key_Return )
         {
-            msg_Dbg( p_intf, "Enter Key pressed" );
-            close();
-        }
+             msg_Dbg( p_intf, "Enter Key pressed" );
+             close();
+         }
+
     }
 };
 
@@ -152,16 +154,17 @@ protected:
     {
         hide();
     }
-    void keyPressEvent( QKeyEvent *keyEvent )
+    virtual void keyPressEvent( QKeyEvent *keyEvent )
     {
         if( keyEvent->key() == Qt::Key_Escape )
         {
+            msg_Dbg( p_intf, "Escp Key pressed" );
             cancel();
         }
-        else if( keyEvent->key() == Qt::Key_Enter )
+        else if( keyEvent->key() == Qt::Key_Return )
         {
-            msg_Dbg( p_intf, "Enter Key pressed" );
-            close();
+             msg_Dbg( p_intf, "Enter Key pressed" );
+             close();
         }
     }
 };

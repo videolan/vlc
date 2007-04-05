@@ -45,12 +45,16 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     QPushButton *clearButton = new QPushButton( qtr( "&Clear" ) );
     QPushButton *saveLogButton = new QPushButton( qtr( "&Save as..." ) );
+    closeButton->setDefault( true );
+
     verbosityBox = new QSpinBox();
     verbosityBox->setRange( 0, 2 );
     verbosityBox->setValue( config_GetInt( p_intf, "verbose" ) );
     verbosityBox->setWrapping( true );
     verbosityBox->setMaximumWidth( 50 );
+
     QLabel *verbosityLabel = new QLabel(qtr( "Verbosity Level" ) );
+
     messages = new QTextEdit();
     messages->setReadOnly( true );
     messages->setGeometry( 0, 0, 440, 600 );
@@ -142,7 +146,7 @@ void MessagesDialog::updateLog()
 
 void MessagesDialog::close()
 {
-    this->toggleVisible();
+    this->hide();
 }
 
 void MessagesDialog::clear()
