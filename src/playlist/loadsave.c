@@ -86,9 +86,6 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-#ifndef THIS_PIECE_OF_CODE_IS_FIXED // see #1047 and possibly others
-    (void)p_playlist;
-#else
     char *psz_uri, *psz_homedir =p_playlist->p_libvlc->psz_homedir;
     input_item_t *p_input;
 
@@ -113,7 +110,6 @@ int playlist_MLLoad( playlist_t *p_playlist )
     p_playlist->b_doing_ml = VLC_FALSE;
 
     free( psz_uri );
-#endif
     return VLC_SUCCESS;
 }
 
