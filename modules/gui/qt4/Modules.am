@@ -109,7 +109,7 @@ $(UIH): %.h: %.ui
 	echo "#define Q_(a,b) QString::fromUtf8(_(a))" > $@.uih-tmp
 	$(UIC) -tr "Q_" $< >> $@.uih-tmp
 	sed -i -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@.uih-tmp
-	mv $@.uih.tmp $@
+	mv $@.uih-tmp $@
 
 SOURCES_qt4 = 	qt4.cpp \
 		menus.cpp \
