@@ -39,6 +39,7 @@ int input_FindArtInCache( playlist_t *p_playlist, input_item_t *p_item );
 vlc_bool_t input_MetaSatisfied( playlist_t *p_playlist, input_item_t *p_item,
                                 uint32_t *pi_mandatory, uint32_t *pi_optional )
 {
+    (void)p_playlist;
     *pi_mandatory = VLC_META_ENGINE_TITLE | VLC_META_ENGINE_ARTIST;
     assert( p_item->p_meta );
 
@@ -250,18 +251,28 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     p_stream = stream_UrlNew( p_playlist, p_item->p_meta->psz_arturl );
     if( p_stream )
     {
-        void *p_buffer = malloc( 1<<16 );
+        uint8_t p_buffer[65536];
         long int l_read;
         FILE *p_file = utf8_fopen( psz_filename+7, "w" );
-        while( ( l_read = stream_Read( p_stream, p_buffer, 1<<16 ) ) )
+        int err = 0;
+        while( ( l_read = stream_Read( p_stream, p_buffer, sizeof (p_buffer) ) ) )
         {
-            fwrite( p_buffer, l_read, 1, p_file );
+            if( fwrite( p_buffer, l_read, 1, p_file ) != 1 )
+            {
+                err = errno;
+                break;
+            }
         }
-        free( p_buffer );
-        fclose( p_file );
+        if( fclose( p_file ) && !err )
+            err = errno;
         stream_Delete( p_stream );
-        msg_Dbg( p_playlist, "album art saved to %s\n", psz_filename );
         free( p_item->p_meta->psz_arturl );
+
+        if( err )
+            msg_Err( p_playlist, "%s: %s", psz_filename, strerror( err ) );
+        else
+            msg_Dbg( p_playlist, "album art saved to %s\n", psz_filename );
+
         p_item->p_meta->psz_arturl = strdup( psz_filename );
         i_status = VLC_SUCCESS;
     }
