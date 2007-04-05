@@ -86,8 +86,9 @@ struct vlc_meta_t
 };
 
 #define vlc_meta_Set( meta,var,val ) do { \
+    const char *str = val; \
     if( meta->psz_##var ) free( meta->psz_##var ); \
-    meta->psz_##var = (val) ? strdup( val ) : NULL; } while(0)
+    meta->psz_##var = str ? strdup( str ) : NULL; } while(0)
 
 #define vlc_meta_SetTitle( meta, b ) vlc_meta_Set( meta, title, b );
 #define vlc_meta_SetArtist( meta, b ) vlc_meta_Set( meta, artist, b );
