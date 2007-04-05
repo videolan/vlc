@@ -1,7 +1,7 @@
 /*****************************************************************************
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
@@ -2212,6 +2212,7 @@ static void CacheMerge( vlc_object_t *p_this, module_t *p_cache,
                         module_t *p_module )
 {
     int i_submodule;
+    (void)p_this;
 
     p_cache->pf_activate = p_module->pf_activate;
     p_cache->pf_deactivate = p_module->pf_deactivate;

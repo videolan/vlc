@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sap.c : SAP announce handler
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -89,10 +89,10 @@ struct sap_session_t {
  * Local prototypes
  *****************************************************************************/
 static void RunThread( vlc_object_t *p_this);
-static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address );
+static int ComputeRate( sap_address_t *p_address );
 static char *SDPGenerate( sap_handler_t *p_sap,
                           const session_descriptor_t *p_session,
-                          const sap_address_t *p_addr, vlc_bool_t b_ssm );
+                          vlc_bool_t b_ssm );
 
 static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
                                      sap_session_t *p_session );
@@ -207,7 +207,7 @@ static void RunThread( vlc_object_t *p_this)
             {
                 if( p_sap->pp_addresses[i]->b_enabled == VLC_TRUE )
                 {
-                    CalculateRate( p_sap, p_sap->pp_addresses[i] );
+                    ComputeRate( p_sap->pp_addresses[i] );
                 }
             }
         }
@@ -444,8 +444,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     /* If needed, build the SDP */
     if( p_session->psz_sdp == NULL )
     {
-        p_session->psz_sdp = SDPGenerate( p_sap, p_session,
-                                          p_sap_session->p_address, b_ssm );
+        p_session->psz_sdp = SDPGenerate( p_sap, p_session, b_ssm );
         if( p_session->psz_sdp == NULL )
         {
             vlc_mutex_unlock( &p_sap->object_lock );
@@ -594,7 +593,7 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
 
 static char *SDPGenerate( sap_handler_t *p_sap,
                           const session_descriptor_t *p_session,
-                          const sap_address_t *p_addr, vlc_bool_t b_ssm )
+                          vlc_bool_t b_ssm )
 {
     char *psz_group, *psz_name, *psz_sdp;
 
@@ -636,7 +635,7 @@ static char *SDPGenerate( sap_handler_t *p_sap,
     return psz_sdp;
 }
 
-static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address )
+static int ComputeRate( sap_address_t *p_address )
 {
     uint8_t buffer[SAP_MAX_BUFFER];
     ssize_t i_tot = 0;

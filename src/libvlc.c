@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libvlc.c: Implementation of the old libvlc API
  *****************************************************************************
- * Copyright (C) 1998-2006 the VideoLAN team
+ * Copyright (C) 1998-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -654,6 +654,7 @@ float VLC_SpeedSlower( int i_object )
  */
 int VLC_PlaylistIndex( int i_object )
 {
+    (void)i_object;
     printf( "This function is deprecated and should not be used anymore" );
     return -1;
 }

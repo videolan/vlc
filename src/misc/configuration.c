@@ -1,7 +1,7 @@
 /*****************************************************************************
  * configuration.c management of the modules configuration
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -1678,6 +1678,7 @@ const char *config_GetDataDir( const vlc_object_t *p_this )
     }
     return path;
 #else
+    (void)p_this;
     return DATA_PATH;
 #endif
 }
@@ -1692,10 +1693,6 @@ const char *config_GetDataDir( const vlc_object_t *p_this )
 static char *GetDir( vlc_bool_t b_appdata )
 {
     const char *psz_localhome = NULL;
-
-#if defined(HAVE_GETPWUID)
-    struct passwd *p_pw = NULL;
-#endif
 
 #if defined(WIN32) && !defined(UNDER_CE)
     typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
@@ -1753,6 +1750,9 @@ static char *GetDir( vlc_bool_t b_appdata )
 #endif
 
 #if defined(HAVE_GETPWUID)
+    struct passwd *p_pw;
+    (void)b_appdata;
+
     if( ( p_pw = getpwuid( getuid() ) ) == NULL )
 #endif
     {

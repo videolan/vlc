@@ -1,7 +1,7 @@
 /*****************************************************************************
  * osd_widgets.c : OSD widgets manipulation functions
  *****************************************************************************
- * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright (C) 2004-2007 the VideoLAN team
  * $Id$
  *
  * Author: Yoann Peronneau <yoann@videolan.org>
@@ -217,6 +217,7 @@ int osd_Slider( vlc_object_t *p_this, spu_t *p_spu,
 {
     subpicture_t *p_subpic;
     int i_x_margin, i_y_margin, i_x, i_y, i_width, i_height;
+    (void)p_this;
 
     p_subpic = osd_CreateWidget( p_spu, i_channel );
     if( p_subpic == NULL )
@@ -279,6 +280,7 @@ int osd_Icon( vlc_object_t *p_this, spu_t *p_spu,
 {
     subpicture_t *p_subpic;
     int i_x_margin, i_y_margin, i_x, i_y, i_width, i_height;
+    (void)p_this;
 
     p_subpic = osd_CreateWidget( p_spu, i_channel );
     if( p_subpic == NULL )

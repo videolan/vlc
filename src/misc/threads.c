@@ -1,12 +1,13 @@
 /*****************************************************************************
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Clément Sténac
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -174,6 +175,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
  *****************************************************************************/
 int __vlc_threads_end( vlc_object_t *p_this )
 {
+    (void)p_this;
 #if defined( PTH_INIT_IN_PTH_H )
 #elif defined( ST_INIT_IN_ST_H )
 #elif defined( UNDER_CE )
@@ -510,6 +512,7 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
 int __vlc_threadvar_create( vlc_object_t *p_this, vlc_threadvar_t *p_tls )
 {
     int i_ret;
+    (void)p_this;
 #if defined( PTH_INIT_IN_PTH_H )
     i_ret = pth_key_create( &p_tls->handle, NULL );
 #elif defined( HAVE_KERNEL_SCHEDULER_H )

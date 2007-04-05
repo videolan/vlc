@@ -1,7 +1,7 @@
 /*****************************************************************************
  * tls.c
  *****************************************************************************
- * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright © 2004-2007 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>

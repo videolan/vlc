@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dec.c : audio output API towards decoders
  *****************************************************************************
- * Copyright (C) 2002-2004 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -285,6 +285,7 @@ aout_buffer_t * aout_DecNewBuffer( aout_instance_t * p_aout,
 void aout_DecDeleteBuffer( aout_instance_t * p_aout, aout_input_t * p_input,
                            aout_buffer_t * p_buffer )
 {
+    (void)p_aout; (void)p_input;
     aout_BufferFree( p_buffer );
 }
 

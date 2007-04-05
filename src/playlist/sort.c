@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sort.c : Playlist sorting functions
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -83,6 +83,8 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     playlist_item_t *p_temp;
     vlc_value_t val;
     val.b_bool = VLC_TRUE;
+
+    (void)p_playlist; // a bit surprising we don't need p_playlist!
 
     if( i_mode == SORT_RANDOM )
     {

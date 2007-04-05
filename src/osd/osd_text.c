@@ -1,7 +1,7 @@
 /*****************************************************************************
  * osd_text.c : text manipulation functions
  *****************************************************************************
- * Copyright (C) 1999-2005 the VideoLAN team
+ * Copyright (C) 1999-2007 the VideoLAN team
  * $Id$
  *
  * Author: Sigmund Augdal Helberg <dnumgis@videolan.org>
@@ -70,6 +70,7 @@ int osd_ShowTextAbsolute( spu_t *p_spu_channel, int i_channel,
 {
     subpicture_t *p_spu;
     video_format_t fmt;
+    (void)p_style;
 
     if( !psz_string ) return VLC_EGENERIC;
 

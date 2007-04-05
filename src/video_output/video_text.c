@@ -1,7 +1,7 @@
 /*****************************************************************************
  * video_text.c : text manipulation functions
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2007 the VideoLAN team
  * $Id$
  *
  * Author: Sigmund Augdal Helberg <dnumgis@videolan.org>
@@ -65,12 +65,13 @@ int vout_ShowTextRelative( vout_thread_t *p_vout, int i_channel,
  *               is about to be shown
  */
 int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
-                           char *psz_string, text_style_t *p_style,
+                           const char *psz_string, text_style_t *p_style,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_start, mtime_t i_stop )
 {
     subpicture_t *p_spu;
     video_format_t fmt;
+    (void)p_style; // FIXME: <-- why ask for this if it's unused?!?
 
     if( !psz_string ) return VLC_EGENERIC;
 
@@ -116,7 +117,7 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
  * \param psz_format printf style formatting
  **/
 void __vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
-                        char *psz_format, ... )
+                        const char *psz_format, ... )
 {
     vout_thread_t *p_vout;
     char *psz_string;

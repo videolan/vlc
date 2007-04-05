@@ -1,7 +1,7 @@
 /*****************************************************************************
  * acl.c:
  *****************************************************************************
- * Copyright (C) 2005 Rémi Denis-Courmont
+ * Copyright © 2005-2007 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>
@@ -343,12 +343,14 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
                       psz_path);
             do
             {
-                fgets( line, sizeof( line ), file );
-                if( ferror( file ) || feof( file ) )
+                if( fgets( line, sizeof( line ), file ) == NULL )
                 {
-                    msg_Err( p_acl->p_owner, "error reading %s : %s\n",
-                             psz_path, strerror( errno ) );
-                    goto error;
+                     if( ferror( file ) )
+                     {
+                         msg_Err( p_acl->p_owner, "error reading %s : %s\n",
+                                  psz_path, strerror( errno ) );
+                     }
+                     goto error;
                 }
             }
             while( strchr( line, '\n' ) == NULL);

@@ -377,6 +377,7 @@ void streaming_GuiDescToChain( vlc_object_t *p_obj, sout_chain_t *p_chain,
                                sout_gui_descr_t *pd )
 {
     sout_duplicate_t *p_dup = NULL;
+    (void)p_obj;
     /* Clean up the chain */
     streaming_ChainClean( p_chain );
 

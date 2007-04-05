@@ -923,6 +923,7 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
                   const char *p_in, size_t i_in,
                   char **pp_data, size_t *pi_data )
 {
+    (void)i_argc; // <-- hmph
 #ifdef HAVE_FORK
 # define BUFSIZE 1024
     int fds[2], i_status;

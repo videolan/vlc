@@ -1,7 +1,7 @@
 /*****************************************************************************
  * engine.c : Run the playlist and handle its control
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -38,6 +38,8 @@ static void VariablesInit( playlist_t *p_playlist );
 static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
                            vlc_value_t oldval, vlc_value_t newval, void *a )
 {
+    (void)psz_cmd; (void)oldval; (void)newval; (void)a;
+
     ((playlist_t*)p_this)->b_reset_currently_playing = VLC_TRUE;
     playlist_Signal( ((playlist_t*)p_this) );
     return VLC_SUCCESS;

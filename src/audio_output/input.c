@@ -1,7 +1,7 @@
 /*****************************************************************************
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
- * Copyright (C) 2002-2004 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -43,7 +43,7 @@
 /** FIXME: Ugly but needed to access the counters */
 #include "input/input_internal.h"
 
-static void inputFailure( aout_instance_t *, aout_input_t *, char * );
+static void inputFailure( aout_instance_t *, aout_input_t *, const char * );
 static int VisualizationCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 static int EqualizerCallback( vlc_object_t *, char const *,
@@ -134,8 +134,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 
             for( i = 0; i < p_config->i_list; i++ )
             {
-                val.psz_string = p_config->ppsz_list[i];
-                text.psz_string = p_config->ppsz_list_text[i];
+                val.psz_string = (char *)p_config->ppsz_list[i];
+                text.psz_string = (char *)p_config->ppsz_list_text[i];
                 var_Change( p_aout, "equalizer", VLC_VAR_ADDCHOICE,
                             &val, &text );
             }
@@ -630,10 +630,10 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
  *****************************************************************************/
 
 static void inputFailure( aout_instance_t * p_aout, aout_input_t * p_input,
-                          char * psz_error_message )
+                          const char * psz_error_message )
 {
     /* error message */
-    msg_Err( p_aout, "couldn't set an input pipeline" );
+    msg_Err( p_aout, "%s", psz_error_message );
 
     /* clean up */
     aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
@@ -703,6 +703,7 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
     char *psz_mode = newval.psz_string;
     vlc_value_t val;
     int i;
+    (void)psz_cmd; (void)oldval; (void)p_data;
 
     if( !psz_mode || !*psz_mode )
     {
@@ -753,6 +754,7 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t val;
     int i;
     int i_ret;
+    (void)psz_cmd; (void)oldval; (void)p_data;
 
     if( !psz_mode || !*psz_mode )
     {

@@ -2,6 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2004-2006 the VideoLAN team
+ * Copyright © 2004-2007 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -646,6 +647,7 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
 {
     httpd_redirect_t *rdir = (httpd_redirect_t*)p_sys;
     char *p_body;
+    (void)cl;
 
     if( answer == NULL || query == NULL )
     {

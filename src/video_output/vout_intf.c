@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout_intf.c : video output interface
  *****************************************************************************
- * Copyright (C) 2000-2006 the VideoLAN team
+ * Copyright (C) 2000-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -792,6 +792,7 @@ void vout_EnableFilter( vout_thread_t *p_vout, char *psz_name,
  *****************************************************************************/
 int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
 {
+    (void)args;
     switch( i_query )
     {
     case VOUT_REPARENT:
@@ -894,6 +895,7 @@ static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    (void)psz_cmd; (void)oldval; (void)newval; (void)p_data;
     InitWindowSize( p_vout, &p_vout->i_window_width,
                     &p_vout->i_window_height );
     vout_Control( p_vout, VOUT_SET_SIZE, p_vout->i_window_width,
@@ -907,6 +909,8 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     int64_t i_aspect_num, i_aspect_den;
     unsigned int i_width, i_height;
+
+    (void)oldval; (void)p_data;
 
     /* Restore defaults */
     p_vout->fmt_in.i_x_offset = p_vout->fmt_render.i_x_offset;
@@ -1057,6 +1061,7 @@ static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t val;
 
     char *psz_end, *psz_parser = strchr( newval.psz_string, ':' );
+    (void)psz_cmd; (void)oldval; (void)p_data;
 
     /* Restore defaults */
     p_vout->fmt_in.i_sar_num = p_vout->fmt_render.i_sar_num;
@@ -1110,6 +1115,7 @@ static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     playlist_t *p_playlist = pl_Yield( p_this );
     vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, newval.b_bool );
+    (void)psz_cmd; (void)oldval; (void)p_data;
 
     /* Modify playlist as well because the vout might have to be restarted */
     var_Create( p_playlist, "video-on-top", VLC_VAR_BOOL );
@@ -1125,6 +1131,7 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vlc_value_t val;
     playlist_t *p_playlist = pl_Yield( p_this );
+    (void)psz_cmd; (void)oldval; (void)p_data;
 
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
@@ -1149,5 +1156,6 @@ static int SnapshotCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_Control( p_vout, VOUT_SNAPSHOT );
+    (void)psz_cmd; (void)oldval; (void)newval; (void)p_data;
     return VLC_SUCCESS;
 }

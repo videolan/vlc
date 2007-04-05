@@ -5,7 +5,7 @@
  * It includes functions allowing to open a new thread, send pictures to a
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
- * Copyright (C) 2000-2004 the VideoLAN team
+ * Copyright (C) 2000-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -1399,11 +1399,12 @@ static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
  * vout_VarCallback: generic callback for intf variables
  *****************************************************************************/
 int vout_VarCallback( vlc_object_t * p_this, const char * psz_variable,
-                      vlc_value_t old_value, vlc_value_t new_value,
-                      void * unused )
+                      vlc_value_t oldval, vlc_value_t newval,
+                      void *p_data )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     vlc_value_t val;
+    (void)psz_variable; (void)newval; (void)oldval; (void)p_data;
     val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;
@@ -1458,6 +1459,7 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     char *psz_mode = newval.psz_string;
     char *psz_filter, *psz_deinterlace = NULL;
+    (void)psz_cmd; (void)oldval; (void)p_data;
 
     var_Get( p_vout, "vout-filter", &val );
     psz_filter = val.psz_string;
@@ -1509,6 +1511,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     input_thread_t *p_input;
     vlc_value_t val;
+    (void)psz_cmd; (void)oldval; (void)p_data;
 
     p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
                                                  FIND_PARENT );
@@ -1595,6 +1598,7 @@ static int VideoFilter2Callback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    (void)psz_cmd; (void)oldval; (void)p_data;
 
     vlc_mutex_lock( &p_vout->vfilter_lock );
     ParseVideoFilter2Chain( p_vout, newval.psz_string );

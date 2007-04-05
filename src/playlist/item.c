@@ -1,7 +1,7 @@
 /*****************************************************************************
  * item.c : Playlist item creation/deletion/add/removal functions
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -408,6 +408,8 @@ static int TreeMove( playlist_t *p_playlist, playlist_item_t *p_item,
 {
     int j;
     playlist_item_t *p_detach = p_item->p_parent;
+    (void)p_playlist;
+
     if( p_node->i_children == -1 ) return VLC_EGENERIC;
 
     for( j = 0; j < p_detach->i_children; j++ )

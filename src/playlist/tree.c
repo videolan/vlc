@@ -1,7 +1,7 @@
 /*****************************************************************************
  * tree.c : Playlist tree walking functions
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -187,6 +187,7 @@ int playlist_NodeInsert( playlist_t *p_playlist,
                          playlist_item_t *p_parent,
                          int i_position )
 {
+   (void)p_playlist;
    assert( p_parent && p_parent->i_children != -1 );
    if( i_position == -1 ) i_position = p_parent->i_children ;
 
@@ -210,8 +211,9 @@ int playlist_NodeRemoveItem( playlist_t *p_playlist,
                         playlist_item_t *p_item,
                         playlist_item_t *p_parent )
 {
-   int i;
-   for( i= 0; i< p_parent->i_children ; i++ )
+   (void)p_playlist;
+
+   for(int i= 0; i< p_parent->i_children ; i++ )
    {
        if( p_parent->pp_children[i] == p_item )
        {
@@ -526,6 +528,8 @@ playlist_item_t *GetNextUncle( playlist_t *p_playlist, playlist_item_t *p_item,
     playlist_item_t *p_grandparent;
     vlc_bool_t b_found = VLC_FALSE;
 
+    (void)p_playlist;
+
     if( p_parent != NULL )
     {
         p_grandparent = p_parent->p_parent;
@@ -569,6 +573,8 @@ playlist_item_t *GetPrevUncle( playlist_t *p_playlist, playlist_item_t *p_item,
     playlist_item_t *p_parent = p_item->p_parent;
     playlist_item_t *p_grandparent;
     vlc_bool_t b_found = VLC_FALSE;
+
+    (void)p_playlist;
 
     if( p_parent != NULL )
     {

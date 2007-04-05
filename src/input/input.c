@@ -1,7 +1,7 @@
 /*****************************************************************************
  * input.c: input thread
  *****************************************************************************
- * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright (C) 1998-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -74,7 +74,7 @@ static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 static input_source_t *InputSourceNew( input_thread_t *);
 static int  InputSourceInit( input_thread_t *, input_source_t *,
                              const char *, const char *psz_forced_demux );
-static void InputSourceClean( input_thread_t *, input_source_t * );
+static void InputSourceClean( input_source_t * );
 
 static void SlaveDemux( input_thread_t *p_input );
 static void SlaveSeek( input_thread_t *p_input );
@@ -1238,12 +1238,12 @@ static void End( input_thread_t * p_input )
     input_ControlVarClean( p_input );
 
     /* Clean up master */
-    InputSourceClean( p_input, &p_input->p->input );
+    InputSourceClean( &p_input->p->input );
 
     /* Delete slave */
     for( i = 0; i < p_input->p->i_slave; i++ )
     {
-        InputSourceClean( p_input, p_input->p->slave[i] );
+        InputSourceClean( p_input->p->slave[i] );
         free( p_input->p->slave[i] );
     }
     if( p_input->p->slave ) free( p_input->p->slave );
@@ -1850,7 +1850,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                                         DEMUX_GET_TIME, &i_time ) )
                     {
                         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
-                        InputSourceClean( p_input, slave );
+                        InputSourceClean( slave );
                         free( slave );
                         break;
                     }
@@ -1858,7 +1858,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                                         DEMUX_SET_TIME, i_time ) )
                     {
                         msg_Err( p_input, "seek failed for new slave" );
-                        InputSourceClean( p_input, slave );
+                        InputSourceClean( slave );
                         free( slave );
                         break;
                     }
@@ -2326,7 +2326,7 @@ error:
 /*****************************************************************************
  * InputSourceClean:
  *****************************************************************************/
-static void InputSourceClean( input_thread_t *p_input, input_source_t *in )
+static void InputSourceClean( input_source_t *in )
 {
     if( in->p_demux )
         demux2_Delete( in->p_demux );
@@ -2480,6 +2480,8 @@ void MRLSplit( vlc_object_t *p_input, char *psz_dup,
         psz_path = psz_dup;
     }
     else
+#else
+    (void)p_input;
 #endif
 
     if( psz )

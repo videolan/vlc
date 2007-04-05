@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
- * Copyright (C) 2002-2004 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -285,6 +285,7 @@ void aout_VolumeSoftInit( aout_instance_t * p_aout )
 /* Placeholder for pf_volume_infos(). */
 int aout_VolumeSoftInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
 {
+    (void)p_aout;
     *pi_soft = 0;
     return 0;
 }
@@ -321,18 +322,21 @@ void aout_VolumeNoneInit( aout_instance_t * p_aout )
 /* Placeholder for pf_volume_infos(). */
 int aout_VolumeNoneInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
 {
+    (void)p_aout; (void)pi_soft;
     return -1;
 }
 
 /* Placeholder for pf_volume_get(). */
 int aout_VolumeNoneGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
 {
+    (void)p_aout; (void)pi_volume;
     return -1;
 }
 
 /* Placeholder for pf_volume_set(). */
 int aout_VolumeNoneSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 {
+    (void)p_aout; (void)i_volume;
     return -1;
 }
 
@@ -419,11 +423,12 @@ int aout_Restart( aout_instance_t * p_aout )
  * rebuilding the audio-device and audio-channels variables.
  *****************************************************************************/
 int aout_FindAndRestart( vlc_object_t * p_this, const char *psz_name,
-                         vlc_value_t oldval, vlc_value_t val, void *p_data )
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     aout_instance_t * p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
 
+    (void)psz_name; (void)oldval; (void)newval; (void)p_data;
     if ( p_aout == NULL ) return VLC_SUCCESS;
 
     if ( var_Type( p_aout, "audio-device" ) != 0 )
@@ -445,10 +450,11 @@ int aout_FindAndRestart( vlc_object_t * p_this, const char *psz_name,
  * aout_ChannelsRestart : change the audio device or channels and restart
  *****************************************************************************/
 int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
-                          vlc_value_t old_value, vlc_value_t new_value,
-                          void * unused )
+                          vlc_value_t oldval, vlc_value_t newval,
+                          void *p_data )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    (void)oldval; (void)newval; (void)p_data;
 
     if ( !strcmp( psz_variable, "audio-device" ) )
     {
@@ -537,5 +543,6 @@ void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
  */
 char *aout_VisualChange( vlc_object_t *p_this, int i_skip )
 {
+    (void)p_this; (void)i_skip;
     return strdup("foobar");
 }

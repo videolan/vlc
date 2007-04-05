@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
- * Copyright (C) 2000-2005 the VideoLAN team
+ * Copyright (C) 2000-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -320,6 +320,7 @@ subpicture_region_t *__spu_MakeRegion( vlc_object_t *p_this,
                                        picture_t *p_pic )
 {
     subpicture_region_t *p_region = malloc( sizeof(subpicture_region_t) );
+    (void)p_this;
     memset( p_region, 0, sizeof(subpicture_region_t) );
     p_region->p_next = 0;
     p_region->p_cache = 0;
@@ -1079,6 +1080,7 @@ static void UpdateSPU( spu_t *p_spu, vlc_object_t *p_object )
 static int CropCallback( vlc_object_t *p_object, char const *psz_var,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)psz_var; (void)oldval; (void)newval;
     UpdateSPU( (spu_t *)p_data, p_object );
     return VLC_SUCCESS;
 }
@@ -1103,6 +1105,7 @@ static void sub_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
 static subpicture_t *spu_new_buffer( filter_t *p_filter )
 {
     subpicture_t *p_subpic = (subpicture_t *)malloc(sizeof(subpicture_t));
+    (void)p_filter;
     memset( p_subpic, 0, sizeof(subpicture_t) );
     p_subpic->b_absolute = VLC_TRUE;
 
@@ -1147,6 +1150,7 @@ static picture_t *spu_new_video_buffer( filter_t *p_filter )
 
 static void spu_del_video_buffer( filter_t *p_filter, picture_t *p_pic )
 {
+    (void)p_filter;
     if( p_pic && p_pic->p_data_orig ) free( p_pic->p_data_orig );
     if( p_pic ) free( p_pic );
 }
@@ -1154,6 +1158,8 @@ static void spu_del_video_buffer( filter_t *p_filter, picture_t *p_pic )
 static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)p_object; (void)oldval; (void)newval;
+
     if( !strcmp( psz_var, "sub-filter" ) )
     {
         spu_t *p_spu = (spu_t *)p_data;

@@ -3,7 +3,7 @@
  * This library provides basic functions for threads to interact with user
  * interface, such as command line.
  *****************************************************************************
- * Copyright (C) 1998-2004 the VideoLAN team
+ * Copyright (C) 1998-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -398,6 +398,7 @@ static int SwitchIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    (void)psz_cmd; (void)oldval; (void)p_data;
 
     p_intf->psz_switch_intf =
         malloc( strlen(newval.psz_string) + sizeof(",none") );
@@ -412,6 +413,8 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     intf_thread_t *p_intf;
     char *psz_intf = malloc( strlen(newval.psz_string) + sizeof(",none") );
+
+    (void)psz_cmd; (void)oldval; (void)p_data;
 
     /* Try to create the interface */
     sprintf( psz_intf, "%s,none", newval.psz_string );

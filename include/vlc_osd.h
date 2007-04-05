@@ -610,7 +610,7 @@ VLC_EXPORT( int, vout_ShowTextRelative, ( vout_thread_t *, int, char *, text_sty
  *               if this is 0 the string will be shown untill the next string
  *               is about to be shown
  */
-VLC_EXPORT( int, vout_ShowTextAbsolute, ( vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
+VLC_EXPORT( int, vout_ShowTextAbsolute, ( vout_thread_t *, int, const char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
 
 /**
  * Write an informative message at the default location,
@@ -619,7 +619,7 @@ VLC_EXPORT( int, vout_ShowTextAbsolute, ( vout_thread_t *, int, char *, text_sty
  * \param i_channel Subpicture channel
  * \param psz_format printf style formatting
  **/
-VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, int, char *, ... ) );
+VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, int, const char *, ... ) );
 
 /**
  * Same as __vlc_OSDMessage() but with automatic casting

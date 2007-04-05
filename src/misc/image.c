@@ -600,6 +600,7 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
 
 static void video_del_buffer( decoder_t *p_dec, picture_t *p_pic )
 {
+    (void)p_dec;
     if( p_pic && p_pic->p_data_orig ) free( p_pic->p_data_orig );
     if( p_pic && p_pic->p_sys ) free( p_pic->p_sys );
     if( p_pic ) free( p_pic );
@@ -607,10 +608,12 @@ static void video_del_buffer( decoder_t *p_dec, picture_t *p_pic )
 
 static void video_link_picture( decoder_t *p_dec, picture_t *p_pic )
 {
+    (void)p_dec; (void)p_pic;
 }
 
 static void video_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
 {
+    (void)p_dec; (void)p_pic;
 }
 
 static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )

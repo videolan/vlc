@@ -1,7 +1,7 @@
 /*****************************************************************************
  * filters.c : audio output filters management
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -266,6 +266,7 @@ void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
                                   int i_nb_filters )
 {
     int i;
+    (void)p_aout;
 
     for ( i = 0; i < i_nb_filters; i++ )
     {

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * common.c : audio output management of common data structures
  *****************************************************************************
- * Copyright (C) 2002-2005 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -308,6 +308,7 @@ void aout_FifoInit( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
 void aout_FifoPush( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
                     aout_buffer_t * p_buffer )
 {
+    (void)p_aout;
     *p_fifo->pp_last = p_buffer;
     p_fifo->pp_last = &p_buffer->p_next;
     *p_fifo->pp_last = NULL;
@@ -332,6 +333,7 @@ void aout_FifoSet( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
                    mtime_t date )
 {
     aout_buffer_t * p_buffer;
+    (void)p_aout;
 
     aout_DateSet( &p_fifo->end_date, date );
     p_buffer = p_fifo->p_first;
@@ -352,6 +354,7 @@ void aout_FifoMoveDates( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
                          mtime_t difference )
 {
     aout_buffer_t * p_buffer;
+    (void)p_aout;
 
     aout_DateMove( &p_fifo->end_date, difference );
     p_buffer = p_fifo->p_first;
@@ -368,6 +371,7 @@ void aout_FifoMoveDates( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
  *****************************************************************************/
 mtime_t aout_FifoNextStart( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
+    (void)p_aout;
     return aout_DateGet( &p_fifo->end_date );
 }
 
@@ -377,6 +381,7 @@ mtime_t aout_FifoNextStart( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
  *****************************************************************************/
 mtime_t aout_FifoFirstDate( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
+    (void)p_aout;
     return p_fifo->p_first ?  p_fifo->p_first->start_date : 0;
 }
 
@@ -386,6 +391,7 @@ mtime_t aout_FifoFirstDate( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 aout_buffer_t * aout_FifoPop( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
     aout_buffer_t * p_buffer;
+    (void)p_aout;
 
     p_buffer = p_fifo->p_first;
     if ( p_buffer == NULL ) return NULL;
@@ -404,6 +410,7 @@ aout_buffer_t * aout_FifoPop( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
     aout_buffer_t * p_buffer;
+    (void)p_aout;
 
     p_buffer = p_fifo->p_first;
     while ( p_buffer != NULL )

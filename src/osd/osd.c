@@ -567,6 +567,7 @@ void __osd_MenuDown( vlc_object_t *p_this )
 static int osd_VolumeStep( vlc_object_t *p_this, int i_volume, int i_steps )
 {
     int i_volume_step = 0;
+    (void)i_steps;
 
     i_volume_step = config_GetInt( p_this->p_libvlc, "volume-step" );
     return (i_volume/i_volume_step);
