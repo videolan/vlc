@@ -268,11 +268,14 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    video_format_t fmt_in = {0}, fmt_out = {0};
+    video_format_t fmt_in, fmt_out;
 
     char *psz_filename;
     char *psz_prefix;
     char *psz_tmp;
+
+    memset (&fmt_in, 0, sizeof (fmt_in));
+    memset (&fmt_out, 0, sizeof (fmt_out));
 
     if( p_vout->p_sys->i_frames % p_vout->p_sys->i_ratio != 0 )
     {
