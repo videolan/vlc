@@ -274,8 +274,8 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     char *psz_prefix;
     char *psz_tmp;
 
-    memset (&fmt_in, 0, sizeof (fmt_in));
-    memset (&fmt_out, 0, sizeof (fmt_out));
+    memset( &fmt_in, 0, sizeof( fmt_in ) );
+    memset( &fmt_out, 0, sizeof( fmt_out ) );
 
     if( p_vout->p_sys->i_frames % p_vout->p_sys->i_ratio != 0 )
     {
