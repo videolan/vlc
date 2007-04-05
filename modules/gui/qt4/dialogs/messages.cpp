@@ -83,9 +83,10 @@ void MessagesDialog::updateLog()
     int i_stop = *p_sub->pi_stop;
     vlc_mutex_unlock( p_sub->p_lock );
 
-    messages->textCursor().movePosition( QTextCursor::End );
     if( p_sub->i_start != i_stop )
     {
+        messages->textCursor().movePosition( QTextCursor::End );
+
         for( i_start = p_sub->i_start;
                 i_start != i_stop;
                 i_start = (i_start+1) % VLC_MSG_QSIZE )
