@@ -1757,24 +1757,28 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
     char **devices = NULL;
     char *block_dev = NULL;
     dbus_bool_t b_dvd;
+#ifdef HAVE_HAL_1
     DBusConnection *p_connection = NULL;
     DBusError       error;
+#endif
 
 #ifdef HAVE_HAL_1
     ctx = libhal_ctx_new();
     if( !ctx ) return;
     dbus_error_init( &error );
     p_connection = dbus_bus_get ( DBUS_BUS_SYSTEM, &error );
-    if( dbus_error_is_set( &error ) )
+    if( dbus_error_is_set( &error ) || !p_connection )
     {
-#ifdef HAVE_HAL_1
         libhal_ctx_shutdown( ctx, NULL );
-#else
-        hal_shutdown( ctx );
-#endif
         dbus_error_free( &error );
         return;
     }
+#else
+    ctx = hal_initialize( NULL, FALSE );
+    if( !ctx ) return;
+#endif
+
+#ifdef HAVE_HAL_1
     libhal_ctx_set_dbus_connection( ctx, p_connection );
     if( libhal_ctx_init( ctx, &error ) )
 #else
