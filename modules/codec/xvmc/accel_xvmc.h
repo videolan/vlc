@@ -39,7 +39,6 @@
 extern "C" {
 #endif
 
-
 typedef struct vlc_macroblock_s
 {
     short  *blockptr;          /* pointer to current dct block */

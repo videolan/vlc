@@ -21,6 +21,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <vlc/vlc.h>
+#include <vlc_vout.h>
+
 #include "xxmc-config.h"
 
 #include <string.h>	/* memcmp/memset, try to remove */
@@ -30,6 +33,7 @@
 #include "mpeg2.h"
 #include "attributes.h"
 #include "mpeg2_internal.h"
+#include "xvmc_vld.h"
 
 static int mpeg2_accels = 0;
 
@@ -173,7 +177,7 @@ mpeg2_state_t mpeg2_parse( mpeg2dec_t * mpeg2dec )
 
     while(1)
     {
-        while( (unsignedint) (mpeg2dec->code - mpeg2dec->first_decode_slice)
+        while( (unsigned int) (mpeg2dec->code - mpeg2dec->first_decode_slice)
                  < mpeg2dec->nb_decode_slices )
         {
             size_buffer = mpeg2dec->buf_end - mpeg2dec->buf_start;
@@ -203,7 +207,7 @@ mpeg2_state_t mpeg2_parse( mpeg2dec_t * mpeg2dec )
                 }
             }
             mpeg2dec->bytes_since_tag += copied;
-            mpeg2_xxmc_slice( &(mpeg2dec->decoder), NULL,
+            mpeg2_xxmc_slice( mpeg2dec, NULL,
                               mpeg2dec->code,mpeg2dec->chunk_start,
                               mpeg2dec->chunk_size);
             mpeg2dec->prev_code = mpeg2dec->code;

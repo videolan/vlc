@@ -58,7 +58,7 @@ typedef struct mpeg2_sequence_s
     uint8_t colour_primaries;
     uint8_t transfer_characteristics;
     uint8_t matrix_coefficients;
-    int aspect_ratio_information;    
+    int aspect_ratio_information;
 } mpeg2_sequence_t;
 
 #define GOP_FLAG_DROP_FRAME 1

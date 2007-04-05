@@ -22,11 +22,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "xxmc-config.h"
+#include <vlc/vlc.h>
 
 #include <inttypes.h>
-#include <stdlib.h>	/* defines NULL */
-#include <string.h>	/* memcmp */
+#include <stdlib.h> /* defines NULL */
+#include <string.h> /* memcmp */
+
+#include "xxmc-config.h"
 
 #include "mpeg2.h"
 #include "attributes.h"
@@ -660,7 +662,6 @@ static int picture_display_ext( mpeg2dec_t * mpeg2dec )
             return 1;
         picture->display_offset[i].x = mpeg2dec->display_offset_x = x >> 1;
         picture->display_offset[i].y = mpeg2dec->display_offset_y = y >> 1;
-        }
     }
     for( ; i < 3; i++ )
     {

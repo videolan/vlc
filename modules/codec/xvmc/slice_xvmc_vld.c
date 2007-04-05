@@ -16,7 +16,7 @@
  *
  *
  */
- 
+
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
 #include <vlc_codec.h>
@@ -47,17 +47,15 @@ static uint8_t alternate_scan [64] ATTR_ALIGN(16) =
     53,61,22,30,7,15,23,31,38,46,54,62,39,47,55,63
 };
 
-
-
-
-void mpeg2_xxmc_choose_coding(decoder_t *p_dec, mpeg2_decoder_t * const decoder, picture_t *picture,
-			      double aspect_ratio, int flags) 
+void mpeg2_xxmc_choose_coding(decoder_t *p_dec,
+        mpeg2_decoder_t * const decoder, picture_t *picture,
+        double aspect_ratio, int flags)
 {
     if (picture)
     {
         //vlc_fourcc_t decoder_format = picture->format.i_chroma;
         //if (decoder_format == VLC_FOURCC('X','x','M','C')) {
-        vlc_xxmc_t *xxmc = (vlc_xxmc_t *) picture->p_accel_data;
+        vlc_xxmc_t *xxmc = (vlc_xxmc_t *) picture->p_data;
 
         /*
          * Make a request for acceleration type and mpeg coding from
@@ -88,12 +86,12 @@ void mpeg2_xxmc_choose_coding(decoder_t *p_dec, mpeg2_decoder_t * const decoder,
   }
 }
 
-void mpeg2_xxmc_slice( mpeg2dec_t *mpeg2dec, picture_t *picture, int code,
-		       uint8_t *buffer, int size) 
+void mpeg2_xxmc_slice( mpeg2dec_t *mpeg2dec, picture_t *picture,
+                        int code, uint8_t *buffer, int size)
 {
     mpeg2_decoder_t * const decoder = &(mpeg2dec->decoder);
     picture = (picture_t *)mpeg2dec->fbuf[0]->id;
-    vlc_xxmc_t *xxmc = (vlc_xxmc_t *) picture->p_accel_data;
+    vlc_xxmc_t *xxmc = (vlc_xxmc_t *) picture->p_data;
     vlc_vld_frame_t *vft = &xxmc->vld_frame;
     unsigned mb_frame_height;
     int i;
@@ -187,24 +185,24 @@ void mpeg2_xxmc_slice( mpeg2dec_t *mpeg2dec, picture_t *picture, int code,
     printf("\nSLICE DATA !!!! size=%d", size-4);
     int i=0;
     if ( vft->forward_reference_picture != NULL && ((vlc_xxmc_t *)
-         vft->forward_reference_picture->p_accel_data)->slice_data_size > 10)
+         vft->forward_reference_picture->p_data)->slice_data_size > 10)
     {
         printf("\nFORWARD SLICE DATA !!!! size=%d\n", ((vlc_xxmc_t *)
-               vft->forward_reference_picture->p_accel_data)->slice_data_size);
+               vft->forward_reference_picture->p_data)->slice_data_size);
         for (i=0;i<10;i++)
         {
-            printf("%d ", *(((vlc_xxmc_t *) vft->forward_reference_picture->p_accel_data)->slice_data+i));
+            printf("%d ", *(((vlc_xxmc_t *) vft->forward_reference_picture->p_data)->slice_data+i));
         }
         printf("\nFORWARD SLICE DATA END!!!!\n");
     }
     if ( vft->backward_reference_picture != NULL && ((vlc_xxmc_t *)
-         vft->backward_reference_picture->p_accel_data)->slice_data_size > 10)
+         vft->backward_reference_picture->p_data)->slice_data_size > 10)
     {
         printf("\nBACKWARD SLICE DATA !!!! size=%d\n", ((vlc_xxmc_t *)
-               vft->backward_reference_picture->p_accel_data)->slice_data_size);
+               vft->backward_reference_picture->p_data)->slice_data_size);
         for (i=0;i<10;i++)
         {
-            printf("%d ", *(((vlc_xxmc_t *) vft->backward_reference_picture->p_accel_data)->slice_data+i));
+            printf("%d ", *(((vlc_xxmc_t *) vft->backward_reference_picture->p_data)->slice_data+i));
         }
         printf("\nBACKWARD SLICE DATA END!!!!\n");
     }
@@ -280,7 +278,7 @@ void mpeg2_xxmc_slice( mpeg2dec_t *mpeg2dec, picture_t *picture, int code,
 
 void mpeg2_xxmc_vld_frame_complete(mpeg2dec_t *mpeg2dec, picture_t *picture, int code) 
 {
-    vlc_xxmc_t *xxmc = (vlc_xxmc_t *) picture->p_accel_data;
+    vlc_xxmc_t *xxmc = (vlc_xxmc_t *) picture->p_data;
     vlc_vld_frame_t *vft = &xxmc->vld_frame;
 
     if (xxmc->decoded)
