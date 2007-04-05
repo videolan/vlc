@@ -49,6 +49,7 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ) );
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
 
+    gotoButton->setDefault( true );
     buttonBox->addButton( gotoButton, QDialogButtonBox::AcceptRole );
     buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
@@ -99,12 +100,11 @@ void GotoTimeDialog::cancel()
 
 void GotoTimeDialog::close()
 {
-    vlc_value_t val;
-
     if ( THEMIM->getIM()->hasInput() )
     {
-        val.i_time = QTime( 0, 0, 0 ).msecsTo( timeEdit->time() );
-        var_Set( THEMIM->getInput(), "time", val );
+        int64_t i_time = (int64_t)
+            ( QTime( 0, 0, 0 ).msecsTo( timeEdit->time() ) ) * 1000;
+        var_SetTime( THEMIM->getInput(), "time", i_time );
     }
     this->toggleVisible();
 }
