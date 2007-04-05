@@ -75,8 +75,6 @@ private:
 
     QGridLayout *main_layout;
 
-//    QLabel *panel_label;
-
     static PrefsDialog *instance;
 private slots:
      void changePanel( QTreeWidgetItem * );
@@ -86,6 +84,7 @@ private slots:
      void save();
      void cancel();
      void reset();
+     void close(){ save(); };
 };
 
 #endif

@@ -110,11 +110,19 @@ protected:
     {
         hide();
     }
+    void close()
+    {
+        hide();
+    }
     void keyPressEvent( QKeyEvent *keyEvent )
     {
         if( keyEvent->key() == Qt::Key_Escape )
         {
             cancel();
+        }
+        else if( keyEvent->key() == Qt::Key_Enter )
+        {
+            close();
         }
     }
 };

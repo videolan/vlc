@@ -38,7 +38,7 @@
 #include <QCheckBox>
 #include <QScrollArea>
 #include <QMessageBox>
-
+#include <QDialogButtonBox>
 
 PrefsDialog *PrefsDialog::instance = NULL;
 
@@ -85,14 +85,17 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
      setSmall();
 
-     QPushButton *save, *cancel, *reset;
-     QHBoxLayout *buttonsLayout = QVLCFrame::doButtons( this, NULL,
-                                      &save, _("Save"),
-                                      &cancel, _("Cancel"),
-                                      &reset, _( "Reset Preferences" ) );
-     main_layout->addLayout( buttonsLayout, 4, 0, 1 ,3 );
-     setLayout( main_layout );
+     QDialogButtonBox *buttonsBox = new QDialogButtonBox();
+     QPushButton *save = new QPushButton( qtr( "&Save" ) );
+     QPushButton *cancel = new QPushButton( qtr( "&Cancel" ) );
+     QPushButton *reset = new QPushButton( qtr( "&Reset Preferences" ) );
 
+     buttonsBox->addButton( save, QDialogButtonBox::AcceptRole );
+     buttonsBox->addButton( cancel, QDialogButtonBox::RejectRole );
+     buttonsBox->addButton( reset, QDialogButtonBox::ActionRole );
+
+     main_layout->addWidget( buttonsBox, 4, 0, 1 ,3 );
+     setLayout( main_layout );
 
      BUTTONACT( save, save() );
      BUTTONACT( cancel, cancel() );
