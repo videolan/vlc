@@ -106,10 +106,10 @@ $(UIH): %.h: %.ui
 	mkdir -p -- ui
 	@echo "$(UIC) $< -> $@"
 	rm -f $@
-	echo "#define Q_(a,b) QString::fromUtf8(_(a))" > $@
-	$(UIC) -tr "Q_" $< >> $@
-	sed -i -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@
-
+	echo "#define Q_(a,b) QString::fromUtf8(_(a))" > $@.uih-tmp
+	$(UIC) -tr "Q_" $< >> $@.uih-tmp
+	sed -i -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@.uih-tmp
+	mv $@.uih.tmp $@
 
 SOURCES_qt4 = 	qt4.cpp \
 		menus.cpp \
