@@ -101,7 +101,9 @@ static volatile unsigned int i_instances = 0;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+#if defined (__APPLE__) || defined (WIN32)
 static void SetLanguage   ( char const * );
+#endif
 static inline int LoadMessages (void);
 static int  GetFilenames  ( libvlc_int_t *, int, char *[] );
 static void Help          ( libvlc_int_t *, char const *psz_help_name );
@@ -1319,7 +1321,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
         if( psz_module_name && strcmp( psz_module_name,
                                        p_parser->psz_object_name ) )
         {
-            char **pp_shortcut = p_parser->pp_shortcuts;
+            const char **pp_shortcut = p_parser->pp_shortcuts;
             while( *pp_shortcut )
             {
                 if( !strcmp( psz_module_name, *pp_shortcut ) )
@@ -1731,6 +1733,9 @@ static int VerboseCallback( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param)
 {
     libvlc_int_t *p_libvlc = (libvlc_int_t *)p_this;
+    (void)psz_variable;
+    (void)old_val;
+    (void)param;
 
     if( new_val.i_int >= -1 )
     {
@@ -1836,5 +1841,7 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
     {
         msg_Warn( p_vlc, "Unable to get HAL device properties" );
     }
-#endif
+#else
+    (void)p_vlc;
+#endif /* HAVE_HAL */
 }
