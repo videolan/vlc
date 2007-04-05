@@ -1,7 +1,7 @@
 /*****************************************************************************
  * image.c : wrapper for image reading/writing facilities
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2007 the VideoLAN team
  * $Id$
  *
  * Author: Gildas Bazin <gbazin@videolan.org>
@@ -30,6 +30,7 @@
  * Preamble
  *****************************************************************************/
 #include <ctype.h>
+#include <errno.h>
 #include <vlc/vlc.h>
 #include <vlc_codec.h>
 #include <vlc_filter.h>
@@ -242,7 +243,7 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
  *
  */
 
-static void PicRelease( picture_t *p_pic ){};
+static void PicRelease( picture_t *p_pic ) { (void)p_pic; }
 
 static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
                             video_format_t *p_fmt_in,
@@ -351,22 +352,27 @@ static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
     file = utf8_fopen( psz_url, "wb" );
     if( !file )
     {
-        msg_Dbg( p_image->p_parent, "could not open file %s for writing",
-                 psz_url );
+        msg_Err( p_image->p_parent, "%s: %s", psz_url, strerror( errno ) );
         return VLC_EGENERIC;
     }
 
     p_block = ImageWrite( p_image, p_pic, p_fmt_in, p_fmt_out );
 
+    int err = 0;
     if( p_block )
     {
-        fwrite( p_block->p_buffer, sizeof(char), p_block->i_buffer, file );
+        if( fwrite( p_block->p_buffer, p_block->i_buffer, 1, file ) != 1 )
+            err = errno;
         block_Release( p_block );
     }
 
-    fclose( file );
+    if( fclose( file ) && !err )
+        err = errno;
 
-    return p_block ? VLC_SUCCESS : VLC_EGENERIC;
+    if( err )
+       msg_Err( p_image->p_parent, "%s: %s", psz_url, strerror( err ) );
+
+    return err ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 /**
