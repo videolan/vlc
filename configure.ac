@@ -38,6 +38,7 @@ dnl Check for tools
 dnl
 AC_PROG_CC_C99
 AC_USE_SYSTEM_EXTENSIONS
+AC_DEFINE([_FORTIFY_SOURCE], 2, [Define to `2' to get glibc warnings.])
 AM_PROG_CC_C_O
 AC_PROG_CXX
 AC_PROG_CPP
