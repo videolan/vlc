@@ -47,6 +47,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     setWindowTitle( qtr("Open" ) );
     resize( 500, 300);
 
+    /* Tab definition and creation */
     fileOpenPanel = new FileOpenPanel( ui.Tab , p_intf );
     diskOpenPanel = new DiskOpenPanel( ui.Tab , p_intf );
     netOpenPanel = new NetOpenPanel( ui.Tab , p_intf );
@@ -57,8 +58,38 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     ui.Tab->addTab( netOpenPanel, qtr( "&Network" ) );
     ui.Tab->addTab( captureOpenPanel, qtr( "Capture &Device" ) );
 
+    /* Hide the advancedPanel */
     ui.advancedFrame->hide();
+
+    /* Buttons Creation */
+    QSizePolicy buttonSizePolicy(static_cast<QSizePolicy::Policy>(7), static_cast<QSizePolicy::Policy>(1));
+    buttonSizePolicy.setHorizontalStretch(0);
+    buttonSizePolicy.setVerticalStretch(0);
+
+    playButton = new QToolButton();
+    playButton->setText( qtr( "&Play" ) );
+    playButton->setSizePolicy( buttonSizePolicy );
+    playButton->setMinimumSize(QSize(90, 0));
+    playButton->setPopupMode(QToolButton::MenuButtonPopup);
+    playButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+
+    cancelButton = new QToolButton();
+    cancelButton->setText( qtr( "&Cancel" ) );
+    cancelButton->setSizePolicy( buttonSizePolicy );
+
     QMenu * openButtonMenu = new QMenu( "Open" );
+    openButtonMenu->addAction( qtr("&Enqueue"), this, SLOT( enqueue() ),
+                                    QKeySequence( "Alt+E") );
+    openButtonMenu->addAction( qtr("&Play"), this, SLOT( play() ),
+                                    QKeySequence( "Alt+P" ) );
+    openButtonMenu->addAction( qtr("&Stream"), this, SLOT( stream() ) ,
+                                    QKeySequence( "Alt+S" ) );
+
+    playButton->setMenu( openButtonMenu );
+
+    ui.buttonsBox->addButton( playButton, QDialogButtonBox::AcceptRole );
+    ui.buttonsBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
+
 
     /* Force MRL update on tab change */
     CONNECT( ui.Tab, currentChanged(int), this, signalCurrent());
@@ -79,20 +110,12 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());
     CONNECT( ui.cacheSpinBox, valueChanged(int), this, updateMRL());
 
-    openButtonMenu->addAction( qtr("&Enqueue"), this, SLOT( enqueue() ),
-                                    QKeySequence( "Alt+E") );
-    openButtonMenu->addAction( qtr("&Play"), this, SLOT( play() ),
-                                    QKeySequence( "Alt+P" ) );
-    openButtonMenu->addAction( qtr("&Stream"), this, SLOT( stream() ) ,
-                                    QKeySequence( "Alt+S" ) );
-
-    ui.playButton->setMenu( openButtonMenu );
-
-    BUTTONACT( ui.playButton, play());
+    /* Buttons action */
+    BUTTONACT( playButton, play());
+    BUTTONACT( cancelButton, cancel());
 
     if ( b_stream_after ) setAfter();
 
-    BUTTONACT( ui.cancelButton, cancel());
     BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
 
     /* Initialize caching */
@@ -110,13 +133,13 @@ void OpenDialog::setAfter()
 {
     if (!b_stream_after )
     {
-        ui.playButton->setText( qtr("&Play") );
-        BUTTONACT( ui.playButton, play() );
+        playButton->setText( qtr("&Play") );
+        BUTTONACT( playButton, play() );
     }
     else
     {
-        ui.playButton->setText( qtr("&Stream") );
-        BUTTONACT( ui.playButton, stream() );
+        playButton->setText( qtr("&Stream") );
+        BUTTONACT( playButton, stream() );
     }
 }
 
@@ -132,7 +155,9 @@ void OpenDialog::signalCurrent() {
     }
 }
 
-/* Actions */
+/*********** 
+ * Actions *
+ ***********/
 
 /* If Cancel is pressed or escaped */
 void OpenDialog::cancel()

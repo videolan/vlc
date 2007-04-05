@@ -34,6 +34,8 @@
 #include <QBoxLayout>
 #include <QString>
 
+class QToolButton;
+
 class OpenDialog : public QVLCDialog
 {
     Q_OBJECT;
@@ -78,7 +80,9 @@ private:
     int advHeight, mainHeight;
     bool b_stream_after;
     QStringList SeparateEntries( QString );
-
+    
+    QToolButton *cancelButton;
+    QToolButton *playButton;
     void playOrEnqueue( bool );
 
 private slots:

@@ -186,44 +186,12 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="cancelButton" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>7</hsizetype>
-         <vsizetype>1</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <widget class="QDialogButtonBox" name="buttonsBox" >
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
        </property>
-       <property name="text" >
-        <string>&amp;Cancel</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="playButton" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>7</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize" >
-        <size>
-         <width>90</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text" >
-        <string>&amp;Play</string>
-       </property>
-       <property name="popupMode" >
-        <enum>QToolButton::MenuButtonPopup</enum>
-       </property>
-       <property name="toolButtonStyle" >
-        <enum>Qt::ToolButtonTextOnly</enum>
+       <property name="standardButtons" >
+        <set>QDialogButtonBox::NoButton</set>
        </property>
       </widget>
      </item>
@@ -235,8 +203,6 @@
   <tabstop>cacheSpinBox</tabstop>
   <tabstop>advancedLineInput</tabstop>
   <tabstop>Tab</tabstop>
-  <tabstop>playButton</tabstop>
-  <tabstop>cancelButton</tabstop>
  </tabstops>
  <resources/>
  <connections>
