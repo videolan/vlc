@@ -54,9 +54,6 @@
         <property name="text" >
          <string>This is VLC's skinnable interface. You can download skins at http://www.videolan.org/vlc/skins.php to customize your player.</string>
         </property>
-        <property name="textFormat" >
-         <enum>Qt::PlainText</enum>
-        </property>
         <property name="alignment" >
          <set>Qt::AlignBottom|Qt::AlignJustify</set>
         </property>
