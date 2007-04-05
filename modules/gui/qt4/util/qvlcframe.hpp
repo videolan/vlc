@@ -106,11 +106,11 @@ protected:
         settings.setValue( "pos", pos() );
         settings.endGroup();
     }
-    void cancel()
+    virtual void cancel()
     {
         hide();
     }
-    void close()
+    virtual void close()
     {
         hide();
     }
@@ -122,6 +122,7 @@ protected:
         }
         else if( keyEvent->key() == Qt::Key_Enter )
         {
+            msg_Dbg( p_intf, "Enter Key pressed" );
             close();
         }
     }
@@ -159,6 +160,7 @@ protected:
         }
         else if( keyEvent->key() == Qt::Key_Enter )
         {
+            msg_Dbg( p_intf, "Enter Key pressed" );
             close();
         }
     }
