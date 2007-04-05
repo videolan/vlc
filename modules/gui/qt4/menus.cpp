@@ -202,7 +202,7 @@ QMenu *QVLCMenu::FileMenu()
     DP_SADD( qtr("Open &Capture Device..." ), "", "", openCaptureDialog(),
             "Ctrl+C" );
     menu->addSeparator();
-    DP_SADD( qtr("&Streaming..."), "", "", streamingDialog(), "Ctrl+S" );
+    DP_SADD( qtr("&Streaming..."), "", "", openThenStreamingDialogs(), "Ctrl+S" );
     menu->addSeparator();
     DP_SADD( qtr("&Quit") , "", "", quit(), "Ctrl+Q");
     return menu;

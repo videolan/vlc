@@ -33,7 +33,7 @@
    <item>
     <widget class="QCheckBox" name="advancedCheckBox" >
      <property name="text" >
-      <string>&amp;Show more options</string>
+      <string>Show &amp;more options</string>
      </property>
     </widget>
    </item>

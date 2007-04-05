@@ -94,7 +94,7 @@
    <item row="3" column="0" colspan="2" >
     <widget class="QCheckBox" name="subCheckBox" >
      <property name="text" >
-      <string>Use a subtitles file</string>
+      <string>Use a sub&amp;titles file</string>
      </property>
     </widget>
    </item>
@@ -153,7 +153,7 @@
          </size>
         </property>
         <property name="currentIndex" >
-         <number>0</number>
+         <number>-1</number>
         </property>
         <property name="insertPolicy" >
          <enum>QComboBox::NoInsert</enum>

@@ -37,10 +37,12 @@
 
 OpenDialog *OpenDialog::instance = NULL;
 
-OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
-                                                QVLCDialog( parent, _p_intf )
+OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
+                        bool _stream_after ) :  QVLCDialog( parent, _p_intf )
 {
     setModal( modal );
+    b_stream_after = _stream_after;
+
     ui.setupUi( this );
     setWindowTitle( qtr("Open" ) );
     resize( 500, 300);
@@ -56,14 +58,8 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     ui.Tab->addTab( captureOpenPanel, qtr( "Capture &Device" ) );
 
     ui.advancedFrame->hide();
-
     QMenu * openButtonMenu = new QMenu( "Open" );
-    openButtonMenu->addAction( qtr("&Enqueue"), this, SLOT( enqueue() ),
-                                QKeySequence( "Alt+E") );
-    openButtonMenu->addAction( qtr("&Stream"), this, SLOT( stream() ) ,
-                                QKeySequence( "Alt+T" ) );
 
-    ui.playButton->setMenu( openButtonMenu );
     /* Force MRL update on tab change */
     CONNECT( ui.Tab, currentChanged(int), this, signalCurrent());
 
@@ -72,7 +68,6 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     CONNECT( diskOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
     CONNECT( captureOpenPanel, mrlUpdated( QString ), this,
             updateMRL(QString) );
-
 
     CONNECT( fileOpenPanel, methodChanged( QString ),
              this, newMethod(QString) );
@@ -84,7 +79,19 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal ) :
     CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());
     CONNECT( ui.cacheSpinBox, valueChanged(int), this, updateMRL());
 
+    openButtonMenu->addAction( qtr("&Enqueue"), this, SLOT( enqueue() ),
+                                    QKeySequence( "Alt+E") );
+    openButtonMenu->addAction( qtr("&Play"), this, SLOT( play() ),
+                                    QKeySequence( "Alt+P" ) );
+    openButtonMenu->addAction( qtr("&Stream"), this, SLOT( stream() ) ,
+                                    QKeySequence( "Alt+S" ) );
+
+    ui.playButton->setMenu( openButtonMenu );
+
     BUTTONACT( ui.playButton, play());
+
+    if ( b_stream_after ) setAfter();
+
     BUTTONACT( ui.cancelButton, cancel());
     BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
 
@@ -99,6 +106,20 @@ OpenDialog::~OpenDialog()
 {
 }
 
+void OpenDialog::setAfter()
+{
+    if (!b_stream_after )
+    {
+        ui.playButton->setText( qtr("&Play") );
+        BUTTONACT( ui.playButton, play() );
+    }
+    else
+    {
+        ui.playButton->setText( qtr("&Stream") );
+        BUTTONACT( ui.playButton, stream() );
+    }
+}
+
 void OpenDialog::showTab(int i_tab=0)
 {
     this->show();
@@ -111,6 +132,9 @@ void OpenDialog::signalCurrent() {
     }
 }
 
+/* Actions */
+
+/* If Cancel is pressed or escaped */
 void OpenDialog::cancel()
 {
     fileOpenPanel->clear();
@@ -119,10 +143,20 @@ void OpenDialog::cancel()
         reject();
 }
 
-void OpenDialog::close() 
+/* If EnterKey is pressed */
+void OpenDialog::close()
 {
-    play();
+    if ( !b_stream_after )
+    {
+        play();
+    }
+    else
+    {
+        stream();
+    }
 }
+
+/* Play button */
 void OpenDialog::play()
 {
     playOrEnqueue( false );
@@ -132,6 +166,13 @@ void OpenDialog::enqueue()
 {
     playOrEnqueue( true );
 }
+
+void OpenDialog::stream()
+{
+    /* not finished FIXME */
+    THEDP->streamingDialog( mrl );
+}
+
 
 void OpenDialog::playOrEnqueue( bool b_enqueue = false )
 {
@@ -173,11 +214,6 @@ void OpenDialog::playOrEnqueue( bool b_enqueue = false )
     }
     else
         accept();
-}
-
-void OpenDialog::stream()
-{
-//TODO. Policy not yet defined
 }
 
 void OpenDialog::toggleAdvancedPanel()

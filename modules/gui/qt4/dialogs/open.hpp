@@ -38,26 +38,34 @@ class OpenDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
-    static OpenDialog * getInstance( QWidget *parent, intf_thread_t *p_intf )
+    static OpenDialog * getInstance( QWidget *parent, intf_thread_t *p_intf,
+                                        bool _stream_after = false )
     {
         if( !instance)
-            instance = new OpenDialog( parent, p_intf, false );
+            instance = new OpenDialog( parent, p_intf, false, _stream_after );
+        else
+        {
+            instance->b_stream_after = _stream_after;
+            instance->setAfter();
+        }
         return instance;
     }
-    OpenDialog( QWidget *parent, intf_thread_t *, bool modal );
+    OpenDialog( QWidget *parent, intf_thread_t *, bool modal, 
+            bool stream_after = false);
     virtual ~OpenDialog();
 
     void showTab( int );
 
     QString mrl;
     QString mainMRL;
+
 public slots:
     void play();
     void stream();
+    void enqueue();
 private:
     static OpenDialog *instance;
     input_thread_t *p_input;
-    QString mrlSub;
 
     Ui::Open ui;
     FileOpenPanel *fileOpenPanel;
@@ -66,14 +74,17 @@ private:
     CaptureOpenPanel *captureOpenPanel;
 
     QString storedMethod;
+    QString mrlSub;
     int advHeight, mainHeight;
+    bool b_stream_after;
+    QStringList SeparateEntries( QString );
 
     void playOrEnqueue( bool );
-    QStringList SeparateEntries( QString );
+
 private slots:
+    void setAfter();
     void cancel();
     void close();
-    void enqueue();
     void toggleAdvancedPanel();
     void updateMRL( QString );
     void updateMRL();

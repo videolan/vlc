@@ -346,6 +346,29 @@ void DialogsProvider::MLAppendDir()
  * Sout emulation
  ****************************************************************************/
 
+void DialogsProvider::streamingDialog( QString mrl)
+{
+    SoutDialog *s = new SoutDialog( p_intf->p_sys->p_mi, p_intf );
+    if( s->exec() == QDialog::Accepted )
+    {
+        msg_Err(p_intf, "mrl %s\n", qta(s->mrl));
+        /* Just do it */
+        int i_len = strlen( qtu(s->mrl) ) + 10;
+        char *psz_option = (char*)malloc(i_len);
+        snprintf( psz_option, i_len - 1, ":sout=%s", qtu(s->mrl));
+
+        playlist_AddExt( THEPL, qtu( mrl ), "Streaming",
+                         PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
+                        -1, &psz_option, 1, VLC_TRUE, VLC_FALSE );
+    }
+    delete s;
+}
+
+void DialogsProvider::openThenStreamingDialogs()
+{
+    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, true )->showTab( 0 );
+}
+/*
 void DialogsProvider::streamingDialog()
 {
     OpenDialog *o = new OpenDialog( p_intf->p_sys->p_mi, p_intf, true );
@@ -355,7 +378,7 @@ void DialogsProvider::streamingDialog()
         if( s->exec() == QDialog::Accepted )
         {
             msg_Err(p_intf, "mrl %s\n", qta(s->mrl));
-            /* Just do it */
+            /* Just do it  
             int i_len = strlen( qtu(s->mrl) ) + 10;
             char *psz_option = (char*)malloc(i_len);
             snprintf( psz_option, i_len - 1, ":sout=%s", qtu(s->mrl));
@@ -367,7 +390,9 @@ void DialogsProvider::streamingDialog()
         delete s;
     }
     delete o;
-}
+}*/
+
+
 
 /****************************************************************************
  * Menus / Interaction

@@ -137,7 +137,8 @@ public slots:
     void menuAction( QObject *);
     void menuUpdateAction( QObject *);
     void SDMenuAction( QString );
-    void streamingDialog();
+    void streamingDialog( QString mrl = "");
+    void openThenStreamingDialogs();
     void openPlaylist();
     void savePlaylist();
     void PLAppendDir();
