@@ -444,14 +444,16 @@ void vout_IntfInit( vout_thread_t *p_vout )
 int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 {
     image_handler_t *p_image = image_HandlerCreate( p_vout );
-    video_format_t fmt_in = {0}, fmt_out = {0};
+    video_format_t fmt_in, fmt_out;
     char *psz_filename = NULL;
     subpicture_t *p_subpic;
     picture_t *p_pif;
     vlc_value_t val, format;
     DIR *path;
-
     int i_ret;
+
+    memset( &fmt_in, 0, sizeof(video_format_t));
+    memset( &fmt_out, 0, sizeof(video_format_t));
 
     var_Get( p_vout, "snapshot-path", &val );
     if( val.psz_string && !*val.psz_string )
