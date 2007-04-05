@@ -160,7 +160,6 @@ mtime_t mdate( void )
 #elif defined( WIN32 ) || defined( UNDER_CE )
     /* We don't need the real date, just the value of a high precision timer */
     static mtime_t freq = I64C(-1);
-    mtime_t usec_time;
 
     if( freq == I64C(-1) )
     {
@@ -226,9 +225,9 @@ mtime_t mdate( void )
         {
             /* Counter wrapped */
             i_wrap_counts++;
-            usec_time += I64C(0x100000000) * 1000;
+            res += I64C(0x100000000) * 1000;
         }
-        i_previous_time = usec_time;
+        i_previous_time = res;
         LeaveCriticalSection( &date_lock );
     }
 #else
