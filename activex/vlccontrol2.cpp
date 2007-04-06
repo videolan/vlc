@@ -628,6 +628,7 @@ STDMETHODIMP VLCInput::get_fps(double* fps)
     if( NULL == fps )
         return E_POINTER;
 
+    *fps = 0.0;
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
@@ -2606,12 +2607,13 @@ STDMETHODIMP VLCControl2::get_VersionInfo(BSTR *version)
     if( NULL != versionStr )
     {
         *version = BSTRFromCStr(CP_UTF8, versionStr);
+
         return NULL == *version ? E_OUTOFMEMORY : NOERROR;
     }
     *version = NULL;
     return E_FAIL;
 };
- 
+
 STDMETHODIMP VLCControl2::get_Visible(VARIANT_BOOL *isVisible)
 {
     if( NULL == isVisible )

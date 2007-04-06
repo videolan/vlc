@@ -121,7 +121,7 @@ static inline HKEY keyClose(HKEY hKey)
     return NULL;
 };
 
-static HRESULT UnregisterProgID(REFCLSID rclsid, unsigned int version)
+static void UnregisterProgID(REFCLSID rclsid, unsigned int version)
 {
     OLECHAR szCLSID[GUID_STRLEN];
 

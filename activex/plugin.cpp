@@ -429,55 +429,55 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         char *ppsz_argv[32] = { "vlc" };
         int   ppsz_argc = 1;
 
+        char p_progpath[MAX_PATH];
+        {
+            TCHAR w_progpath[MAX_PATH];
+            DWORD len = GetModuleFileName(DllGetModule(), w_progpath, MAX_PATH);
+            if( len > 0 )
+            {
+                len = WideCharToMultiByte(CP_UTF8, 0, w_progpath, len, p_progpath,
+                           sizeof(p_progpath)-1, NULL, NULL);
+                if( len > 0 )
+                {
+                    p_progpath[len] = '\0';
+                    ppsz_argv[0] = p_progpath;
+                }
+            }
+        }
+
+        ppsz_argv[ppsz_argc++] = "-vv";
+
         HKEY h_key;
-        char p_data[MAX_PATH];
+        char p_pluginpath[MAX_PATH];
         if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, TEXT("Software\\VideoLAN\\VLC"),
                           0, KEY_READ, &h_key ) == ERROR_SUCCESS )
         {
             DWORD i_type, i_data = MAX_PATH;
-            TCHAR w_data[MAX_PATH];
+            TCHAR w_pluginpath[MAX_PATH];
             if( RegQueryValueEx( h_key, TEXT("InstallDir"), 0, &i_type,
-                                 (LPBYTE)w_data, &i_data ) == ERROR_SUCCESS )
+                                 (LPBYTE)w_pluginpath, &i_data ) == ERROR_SUCCESS )
             {
                 if( i_type == REG_SZ )
                 {
-                    if( WideCharToMultiByte(CP_UTF8, 0, w_data, -1, p_data,
-                             sizeof(p_data)-sizeof("\\plugins")+1, NULL, NULL) )
+                    if( WideCharToMultiByte(CP_UTF8, 0, w_pluginpath, -1, p_pluginpath,
+                             sizeof(p_pluginpath)-sizeof("\\plugins")+1, NULL, NULL) )
                     {
-                        strcat( p_data, "\\plugins" );
+                        strcat( p_pluginpath, "\\plugins" );
                         ppsz_argv[ppsz_argc++] = "--plugin-path";
-                        ppsz_argv[ppsz_argc++] = p_data;
+                        ppsz_argv[ppsz_argc++] = p_pluginpath;
                     }
                 }
             }
             RegCloseKey( h_key );
         }
 
-        char p_path[MAX_PATH];
-        {
-            TCHAR w_path[MAX_PATH];
-            DWORD len = GetModuleFileName(DllGetModule(), w_path, MAX_PATH);
-            if( len > 0 )
-            {
-                len = WideCharToMultiByte(CP_UTF8, 0, w_path, len, p_path,
-                           sizeof(p_path)-1, NULL, NULL);
-                if( len > 0 )
-                {
-                    p_path[len] = '\0';
-                    ppsz_argv[0] = p_path;
-                }
-            }
-        }
-
         // make sure plugin isn't affected with VLC single instance mode
         ppsz_argv[ppsz_argc++] = "--no-one-instance";
 
         /* common settings */
-        ppsz_argv[ppsz_argc++] = "-vv";
         ppsz_argv[ppsz_argc++] = "--no-stats";
         ppsz_argv[ppsz_argc++] = "--no-media-library";
-        ppsz_argv[ppsz_argc++] = "--intf";
-        ppsz_argv[ppsz_argc++] = "dummy";
+        ppsz_argv[ppsz_argc++] = "--intf=dummy";
 
         // loop mode is a configuration option only
         if( _b_autoloop )
@@ -496,6 +496,8 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
             ppsz_argv[ppsz_argc++] = "--fast-mutex";
             ppsz_argv[ppsz_argc++] = "--win9x-cv-method=1";
         }
+
+DebugBreak();
 
         _p_libvlc = libvlc_new(ppsz_argc, ppsz_argv, NULL);
         if( NULL == _p_libvlc )
