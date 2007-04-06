@@ -69,6 +69,8 @@ Interfaces:
    * Brand new interface for Linux and Windows, based on the Qt toolkit
  * All
    * Improved user interaction
+ * Unix
+   * Allow only one running instance, using D-Bus interface (experimental).
 
 
 Changes between 0.8.6a and 0.8.6-bugfix (not yet released):
