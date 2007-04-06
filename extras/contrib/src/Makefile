@@ -1183,7 +1183,7 @@ DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 # ***************************************************************************
 
 libdca:
-	$(SVN) export $(LIBDCA_SVN) libdca
+	$(SVN) co $(LIBDCA_SVN) -r 35 libdca
 	(cd $@; ./bootstrap)
 
 .libdca: libdca
