@@ -89,7 +89,14 @@ def Stop(widget):
 
 #update status display
 def update(widget):
+    item = tracklist.GetMetadata(tracklist.GetCurrentTrack())
     vol.set_value(player.VolumeGet())
+    try: 
+        a = item["artist"]
+    except:        a = ""
+    if a == "":
+        a = item["URI"] 
+    l_item.set_text(a)
     GetPlayStatus(0)
 
 #get playing status from remote vlc
@@ -204,7 +211,8 @@ exp.connect('activate',         expander)
 vol.connect('change-value',     volchange)
 vol.connect('scroll-event',     volchange)
 time_s.connect('adjust-bounds', timechange)
-
+vlcicon.set_events(gtk.gdk.BUTTON_PRESS_MASK) 
+vlcicon.connect('button_press_event', icon_clicked) 
 time_s.set_update_policy(gtk.UPDATE_DISCONTINUOUS)
 gobject.timeout_add( 2000, timeset)
 
