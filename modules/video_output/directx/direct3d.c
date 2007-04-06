@@ -725,7 +725,7 @@ static int Direct3DVoutOpen( vout_thread_t *p_vout )
     p_vout->p_sys->d3dpp.BackBufferHeight       = p_vout->render.i_height;
     p_vout->p_sys->d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
     p_vout->p_sys->d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
-    p_vout->p_sys->d3dpp.PresentationInterval   = D3DPRESENT_INTERVAL_IMMEDIATE;
+    p_vout->p_sys->d3dpp.PresentationInterval   = D3DPRESENT_INTERVAL_DEFAULT;
     p_vout->p_sys->d3dpp.BackBufferFormat       = D3DFMT_UNKNOWN;
     p_vout->p_sys->d3dpp.BackBufferCount        = 1;
     p_vout->p_sys->d3dpp.EnableAutoDepthStencil = TRUE;
