@@ -697,7 +697,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
             }
         }
         /* we unreference the connection when we've finished with it */
-        dbus_connection_unref( p_conn );
+	if( p_conn ) dbus_connection_unref( p_conn );
     }
 #endif
 
