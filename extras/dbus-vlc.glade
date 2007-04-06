@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.0.2 on Tue Nov 21 18:02:27 2006 by fun@zod-->
+<!--Generated with glade3 3.2.0 on Sat Apr  7 01:02:24 2007 by fun@ubuntu-->
 <glade-interface>
   <widget class="GtkWindow" id="window1">
     <property name="resizable">False</property>
@@ -17,8 +17,8 @@
                 <property name="width_request">37</property>
                 <property name="height_request">37</property>
                 <property name="visible">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
                 <property name="tooltip" translatable="yes">Previous</property>
+                <property name="relief">GTK_RELIEF_NONE</property>
                 <child>
                   <widget class="GtkImage" id="image8">
                     <property name="visible">True</property>
@@ -35,8 +35,8 @@
                 <property name="width_request">37</property>
                 <property name="height_request">37</property>
                 <property name="visible">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
                 <property name="tooltip" translatable="yes">Play/Pause</property>
+                <property name="relief">GTK_RELIEF_NONE</property>
                 <child>
                   <widget class="GtkImage" id="image6">
                     <property name="visible">True</property>
@@ -54,8 +54,8 @@
                 <property name="width_request">37</property>
                 <property name="height_request">37</property>
                 <property name="visible">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
                 <property name="tooltip" translatable="yes">Next</property>
+                <property name="relief">GTK_RELIEF_NONE</property>
                 <child>
                   <widget class="GtkImage" id="image1">
                     <property name="visible">True</property>
@@ -73,8 +73,8 @@
                 <property name="width_request">37</property>
                 <property name="height_request">37</property>
                 <property name="visible">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
                 <property name="tooltip" translatable="yes">Stop</property>
+                <property name="relief">GTK_RELIEF_NONE</property>
                 <child>
                   <widget class="GtkImage" id="image9">
                     <property name="visible">True</property>
@@ -93,8 +93,8 @@
                 <property name="width_request">37</property>
                 <property name="height_request">37</property>
                 <property name="visible">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
                 <property name="tooltip" translatable="yes">Quit vlc</property>
+                <property name="relief">GTK_RELIEF_NONE</property>
                 <child>
                   <widget class="GtkImage" id="image5">
                     <property name="width_request">26</property>
@@ -114,8 +114,8 @@
                 <property name="width_request">37</property>
                 <property name="height_request">37</property>
                 <property name="visible">True</property>
-                <property name="relief">GTK_RELIEF_NONE</property>
                 <property name="tooltip" translatable="yes">Close controller</property>
+                <property name="relief">GTK_RELIEF_NONE</property>
                 <child>
                   <widget class="GtkImage" id="image2">
                     <property name="visible">True</property>
@@ -160,12 +160,12 @@
                         <property name="height_request">20</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="tooltip" translatable="yes">Volume in %</property>
                         <property name="editable">False</property>
                         <property name="adjustment">100 0 100 1 10 10</property>
                         <property name="snap_to_ticks">True</property>
                         <property name="numeric">True</property>
                         <property name="update_policy">GTK_UPDATE_IF_VALID</property>
-                        <property name="tooltip" translatable="yes">Volume in %</property>
                       </widget>
                       <packing>
                         <property name="expand">False</property>
@@ -187,12 +187,12 @@
                         <property name="visible">True</property>
                         <child>
                           <widget class="GtkFileChooserButton" id="ChooseFile">
-                            <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
                             <property name="width_request">185</property>
                             <property name="height_request">35</property>
                             <property name="visible">True</property>
-                            <property name="title" translatable="yes">Select Da Directory !</property>
                             <property name="tooltip" translatable="yes">Choose a directory</property>
+                            <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
+                            <property name="title" translatable="yes">Select Da Directory !</property>
                           </widget>
                         </child>
                         <child>
@@ -218,8 +218,8 @@
                             <property name="width_request">35</property>
                             <property name="height_request">35</property>
                             <property name="visible">True</property>
-                            <property name="relief">GTK_RELIEF_NONE</property>
                             <property name="tooltip" translatable="yes">Add MRL, or directory if empty</property>
+                            <property name="relief">GTK_RELIEF_NONE</property>
                             <child>
                               <widget class="GtkImage" id="image4">
                                 <property name="width_request">100</property>
@@ -265,7 +265,6 @@
                             <property name="visible">True</property>
                             <property name="events"></property>
                             <property name="xpad">8</property>
-                            <property name="stock">gtk-missing-image</property>
                             <property name="icon_name">vlc</property>
                           </widget>
                         </child>
@@ -295,17 +294,6 @@
             <property name="position">1</property>
           </packing>
         </child>
-      </widget>
-    </child>
-  </widget>
-  <widget class="GtkMenu" id="menu1">
-    <property name="visible">True</property>
-    <child>
-      <widget class="GtkImageMenuItem" id="menuquit">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">gtk-quit</property>
-        <property name="use_underline">True</property>
-        <property name="use_stock">True</property>
       </widget>
     </child>
   </widget>

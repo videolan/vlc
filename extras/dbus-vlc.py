@@ -27,22 +27,31 @@
 #
 # Also notice it has been designed first for a previous specificaiton, and thus some code may not work/be disabled
 #
+# You'll need pygtk >= 2.10 to use gtk.StatusIcon
+#
 import dbus
 import dbus.glib
 import gtk
 import gtk.glade
-import egg.trayicon
 import gobject
 import os
 
 global position
 global timer
-#global playing
+global playing
+playing = False
 
 def itemchange_handler(item):
     gobject.timeout_add( 2000, timeset)
-    l_item.set_text(item)
+    try:
+        a = item["artist"]
+    except:
+        a = ""
+    if a == "":
+        a = item["URI"] 
+    l_item.set_text(a)
 
+#connect to the bus
 bus = dbus.SessionBus()
 player_o = bus.get_object("org.freedesktop.MediaPlayer", "/Player")
 tracklist_o = bus.get_object("org.freedesktop.MediaPlayer", "/TrackList")
@@ -54,6 +63,7 @@ try:
 except:
     True
 
+#plays an element
 def AddTrack(widget):
     mrl = e_mrl.get_text()
     if mrl != None and mrl != "":
@@ -62,7 +72,9 @@ def AddTrack(widget):
         mrl = bt_file.get_filename()
         if mrl != None and mrl != "":
             tracklist.AddTrack("directory://" + mrl, True)
+    update(0)
 
+#basic control
 def Next(widget):
     player.Next(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     update(0)
@@ -75,14 +87,15 @@ def Stop(widget):
     player.Stop(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     update(0)
 
+#update status display
 def update(widget):
-#    itemchange_handler(str(player.GetPlayingItem()))
     vol.set_value(player.VolumeGet())
     GetPlayStatus(0)
 
+#get playing status from remote vlc
 def GetPlayStatus(widget):
     global playing
-    status = str(player.GetStatus())
+    status = player.GetStatus()
     if status == 0:
         img_bt_toggle.set_from_stock("gtk-media-pause", gtk.ICON_SIZE_SMALL_TOOLBAR)
         playing = True
@@ -96,29 +109,38 @@ def Quit(widget):
 
 def Pause(widget):
     player.Pause()
-#        img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_SMALL_TOOLBAR)
-#        img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PLAY, gtk.ICON_SIZE_SMALL_TOOLBAR)
+    status = player.GetStatus()
+    if status == 0:
+        img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_SMALL_TOOLBAR)
+	gobject.timeout_add( 2000, timeset)
+    else:
+        img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PLAY, gtk.ICON_SIZE_SMALL_TOOLBAR)
     update(0)
 
+#callback for volume
 def volchange(widget, data):
     player.VolumeSet(vol.get_value_as_int(), reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
 
+#callback for position change
 def timechange(widget, x=None, y=None):
-    player.PositionSet(time_s.get_value(), reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
+    player.PositionSet(int(time_s.get_value()), reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
 
+#refresh position
 def timeset():
-#    global playing
+    global playing
     time_s.set_value(player.PositionGet())
-#    return playing
+    return playing
 
+#simple/full display
 def expander(widget):
     if exp.get_expanded() == False:
         exp.set_label("Less")
     else:
         exp.set_label("More")
 
+#close event
 def delete_event(self, widget):
-    widget.hide()
+    self.hide()
     return True
 
 def destroy(widget):
@@ -130,17 +152,15 @@ def key_release(widget, event):
         position = window.get_position()
         widget.hide()
 
-def tray_button(widget,event):
+#click on the tray icon
+def tray_button(widget):
     global position
-    if event.button == 1:
-        if window.get_property('visible'):
-            position = window.get_position()
-            window.hide()
-        else:
-            window.move(position[0], position[1])
-            window.show()
-    if event.button == 3:
-        menu.popup(None,None,None,event.button,event.time)
+    if window.get_property('visible'):
+        position = window.get_position()
+        window.hide()
+    else:
+        window.move(position[0], position[1])
+        window.show()
 
 xml = gtk.glade.XML('dbus-vlc.glade')
 
@@ -158,8 +178,6 @@ window      = xml.get_widget('window1')
 img_bt_toggle=xml.get_widget('image6')
 exp         = xml.get_widget('expander2')
 expvbox     = xml.get_widget('expandvbox')
-menu        = xml.get_widget('menu1')
-menuitem    = xml.get_widget('menuquit')
 vlcicon     = xml.get_widget('eventicon')
 vol         = xml.get_widget('vol')
 time_s      = xml.get_widget('time_s')
@@ -169,20 +187,11 @@ window.connect('delete_event',  delete_event)
 window.connect('destroy',       destroy)
 window.connect('key_release_event', key_release)
 
-tray = egg.trayicon.TrayIcon("VLC")
-eventbox = gtk.EventBox()
-tray.add(eventbox)
-eventbox.set_events(gtk.gdk.BUTTON_PRESS_MASK)
-eventbox.connect('button_press_event', tray_button)
-image = gtk.Image()
-eventbox.add(image)
-image.set_from_icon_name("vlc", gtk.ICON_SIZE_MENU)
-tray.show_all()
+tray = gtk.status_icon_new_from_icon_name("vlc")
+tray.connect('activate', tray_button)
 
 def icon_clicked(widget, event):
     update(0)
-
-menu.attach_to_widget(eventbox,None)
 
 bt_close.connect('clicked',     destroy)
 bt_quit.connect('clicked',      Quit)
@@ -192,9 +201,6 @@ bt_next.connect('clicked',      Next)
 bt_prev.connect('clicked',      Prev)
 bt_stop.connect('clicked',      Stop)
 exp.connect('activate',         expander)
-menuitem.connect('activate',    destroy)
-vlcicon.set_events(gtk.gdk.BUTTON_PRESS_MASK)
-vlcicon.connect('button_press_event', icon_clicked)
 vol.connect('change-value',     volchange)
 vol.connect('scroll-event',     volchange)
 time_s.connect('adjust-bounds', timechange)
@@ -218,5 +224,14 @@ try:
     update(0)
 except:
     True
+
+icon_theme = gtk.icon_theme_get_default()
+try:
+    pix = icon_theme.load_icon("vlc",24,0)
+    window.set_icon(pix)
+except:
+    True
+position = window.get_position()
+vol.set_value(player.VolumeGet())
 
 gtk.main()
