@@ -39,7 +39,6 @@ Input/Demuxers:
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
- * Teletext subtitles (telx) support
  * MKV USF subtitles support
  * HTML based subtitles support
  * Flash Screen Video support
@@ -73,15 +72,26 @@ Interfaces:
    * Allow only one running instance, using D-Bus interface (experimental).
 
 
-Changes between 0.8.6a and 0.8.6-bugfix (not yet released):
------------------------------------------------------------
+Changes between 0.8.6a and 0.8.6b:
+----------------------------------
 Various bugfixes notably:
  * out-of-bound read in demuxers
  * demuxers crashes (incl. CVE-2007-0256)
  * Mac OS X Interface crashes
+ * VP31 decoding on Windows platforms
 
-Mac OS X Interface:
- * further usability improvements
+Decoders:
+ * Enhanced Flash Video support incl. VP61 and VP60
+ * Teletext subtitles (telx) support
+
+Webbrowser plugins:
+ * rectified behaviour and improved usability
+
+Mac OS X Interface & Port:
+ * diverse usability improvements
+ * new wizard option to include subtitles
+ * screensaver/automatic sleep mode is enabled when a video is paused
+ * Improved Delete-Preferences-Script
 
 
 Changes between 0.8.6 and 0.8.6a:
