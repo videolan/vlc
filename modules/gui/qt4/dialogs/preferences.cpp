@@ -50,6 +50,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      setMaximumHeight( 650 );
      setMaximumWidth( 700 );
 
+     /* Create Panels */
      tree_panel = new QWidget( 0 );
      tree_panel_l = new QHBoxLayout;
      tree_panel->setLayout( tree_panel_l );
@@ -57,7 +58,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      main_panel_l = new QHBoxLayout;
      main_panel->setLayout( main_panel_l );
 
-     // Choice for types
+     /* Choice for types */
      types = new QGroupBox( "Show settings" );
      types->setAlignment( Qt::AlignHCenter );
      QHBoxLayout *types_l = new QHBoxLayout(0);
@@ -67,19 +68,20 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      types->setLayout( types_l );
      small->setChecked( true );
 
+     /* Tree and panel initialisations */
      advanced_tree = NULL;
      simple_tree = NULL;
      simple_panel = NULL;
      advanced_panel = NULL;
 
      main_layout->addWidget( tree_panel, 0, 0, 3, 1 );
-     main_layout->addWidget( types, 3, 0, 1, 1 );
+     main_layout->addWidget( types, 3, 0, 2, 1 );
 
      main_layout->addWidget( main_panel, 0, 1, 4, 1 );
 
      main_layout->setColumnMinimumWidth( 0, 150 );
      main_layout->setColumnStretch( 0, 1 );
-     main_layout->setColumnStretch( 1,3 );
+     main_layout->setColumnStretch( 1, 3 );
 
      main_layout->setRowStretch( 2, 4);
 
@@ -94,7 +96,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
      buttonsBox->addButton( cancel, QDialogButtonBox::RejectRole );
      buttonsBox->addButton( reset, QDialogButtonBox::ActionRole );
 
-     main_layout->addWidget( buttonsBox, 4, 0, 1 ,3 );
+     main_layout->addWidget( buttonsBox, 4, 1, 1 ,2 );
      setLayout( main_layout );
 
      BUTTONACT( save, save() );

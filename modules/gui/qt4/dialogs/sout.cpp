@@ -30,7 +30,7 @@
 SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf ) :
                                                 QVLCDialog( parent,  _p_intf )
 {
-    //setWindowTitle( qtr( "Stream output") );
+    setWindowTitle( qtr( "Stream output") );
     setModal( true );
     /* UI stuff */
     ui.setupUi( this );

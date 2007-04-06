@@ -94,7 +94,7 @@ void MediaInfoDialog::setInput(input_item_t *p_input)
 
 void MediaInfoDialog::update()
 {
-    // Timer runs at 150 ms, dont' update more than 2 times per second
+    /* Timer runs at 150 ms, dont' update more than 2 times per second */
     i_runs++;
     if( i_runs % 3 != 0 ) return;
 

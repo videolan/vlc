@@ -79,15 +79,15 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     layout->addWidget( closeButton, 2, 1, 1, 1 );
 
     /* GPL License */
-    QFile *licenseFile = new QFile( "/usr/src/vlc/COPYING" ); 
-    QTextEdit *licenseEdit = new QTextEdit( this ); 
-//    licenseEdit->setText( licenseFile->readAll() ); 
-    licenseEdit->setReadOnly( true ); 
+    QFile *licenseFile = new QFile( "/usr/src/vlc/COPYING" );
+    QTextEdit *licenseEdit = new QTextEdit( this );
+    licenseEdit->setText( licenseFile->readAll() );
+    licenseEdit->setReadOnly( true );
 
     /* People who helped */
     QFile *thanksFile = new QFile( "/usr/src/vlc/THANKS" );
     QTextEdit *thanksEdit = new QTextEdit( this );
-//    thanksEdit->setText( thanksFile->readAll() );
+    thanksEdit->setText( thanksFile->readAll() );
     thanksEdit->setReadOnly( true );
 
     /* add the tabs to the Tabwidget */
