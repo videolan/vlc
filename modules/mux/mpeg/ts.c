@@ -1484,7 +1484,7 @@ static int Mux( sout_mux_t *p_mux )
                             else if( p_input->p_fmt->i_codec ==
                                        VLC_FOURCC('d','v','b','s') )
                             {
-                                /* EN 300 473 */
+                                /* EN 300 743 */
                                 b_data_alignment = 1;
                             }
                         }
