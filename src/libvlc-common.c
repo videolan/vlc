@@ -1304,8 +1304,10 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     char psz_short[4];
     int i_index;
     int i_width = ConsoleWidth() - (PADDING_SPACES+LINE_START+1);
-    vlc_bool_t b_advanced = config_GetInt( p_this, "advanced" );
-    vlc_bool_t b_description;
+    int i_width_description = i_width + PADDING_SPACES - 1;
+    vlc_bool_t b_advanced    = config_GetInt( p_this, "advanced" );
+    vlc_bool_t b_description = config_GetInt( p_this, "help-verbose" );
+    vlc_bool_t b_description_hack;
 
     memset( psz_spaces_text, ' ', PADDING_SPACES+LINE_START );
     psz_spaces_text[PADDING_SPACES+LINE_START] = '\0';
@@ -1372,6 +1374,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             const char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
             const char *psz_suf = "", *psz_prefix = NULL;
             signed int i;
+            size_t i_cur_width;
 
             /* Skip deprecated options */
             if( p_item->psz_current )
@@ -1390,6 +1393,17 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             case CONFIG_HINT_USAGE:
                 if( !strcmp( "main", p_parser->psz_object_name ) )
                 utf8_fprintf( stdout, "\n %s\n", p_item->psz_text );
+                if( b_description && p_item->psz_longtext )
+                    utf8_fprintf( stdout, " %s\n", p_item->psz_longtext );
+                break;
+
+            case CONFIG_HINT_SUBCATEGORY:
+                if( strcmp( "main", p_parser->psz_object_name ) )
+                break;
+            case CONFIG_SECTION:
+                utf8_fprintf( stdout, "   %s:\n", p_item->psz_text );
+                if( b_description && p_item->psz_longtext )
+                    utf8_fprintf( stdout, "   %s\n", p_item->psz_longtext );
                 break;
 
             case CONFIG_ITEM_STRING:
@@ -1422,6 +1436,13 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 psz_type = _("integer");
                 psz_ket = ">";
 
+                if( p_item->min.i || p_item->max.i )
+                {
+                    sprintf( psz_buffer, "%s [%i .. %i]", psz_type,
+                             p_item->min.i, p_item->max.i );
+                    psz_type = psz_buffer;
+                }
+
                 if( p_item->i_list )
                 {
                     psz_bra = OPTION_VALUE_SEP "{";
@@ -1441,6 +1462,12 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 psz_bra = OPTION_VALUE_SEP "<";
                 psz_type = _("float");
                 psz_ket = ">";
+                if( p_item->min.f || p_item->max.f )
+                {
+                    sprintf( psz_buffer, "%s [%f .. %f]", psz_type,
+                             p_item->min.f, p_item->max.f );
+                    psz_type = psz_buffer;
+                }
                 break;
             case CONFIG_ITEM_BOOL:
                 psz_bra = ""; psz_type = ""; psz_ket = "";
@@ -1503,17 +1530,20 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 
             /* We wrap the rest of the output */
             sprintf( psz_buffer, "%s%s", p_item->psz_text, psz_suf );
-            b_description = config_GetInt( p_this, "help-verbose" );
+            b_description_hack = b_description;
 
  description:
             psz_text = psz_buffer;
+            i_cur_width = b_description && !b_description_hack
+                          ? i_width_description
+                          : i_width;
             while( *psz_text )
             {
                 char *psz_parser, *psz_word;
                 size_t i_end = strlen( psz_text );
 
                 /* If the remaining text fits in a line, print it. */
-                if( i_end <= (size_t)i_width )
+                if( i_end <= i_cur_width )
                 {
                     utf8_fprintf( stdout, "%s\n", psz_text );
                     break;
@@ -1530,7 +1560,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                     psz_parser = psz_parser ? psz_parser + 1
                                             : psz_text + i_end;
 
-                } while( psz_parser - psz_text <= i_width );
+                } while( psz_parser - psz_text <= i_cur_width );
 
                 /* We cut a word in one of these cases:
                  *  - it's the only word in the line and it's too long.
@@ -1538,13 +1568,13 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                  *    going to wrap is longer than 40% of the width, and even
                  *    if the word would have fit in the next line. */
                 if( psz_word == psz_text
-                     || ( psz_word - psz_text < 80 * i_width / 100
-                           && psz_parser - psz_word > 40 * i_width / 100 ) )
+                     || ( psz_word - psz_text < 80 * i_cur_width / 100
+                           && psz_parser - psz_word > 40 * i_cur_width / 100 ) )
                 {
-                    char c = psz_text[i_width];
-                    psz_text[i_width] = '\0';
+                    char c = psz_text[i_cur_width];
+                    psz_text[i_cur_width] = '\0';
                     utf8_fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
-                    psz_text += i_width;
+                    psz_text += i_cur_width;
                     psz_text[0] = c;
                 }
                 else
@@ -1555,10 +1585,10 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 }
             }
 
-            if( b_description && p_item->psz_longtext )
+            if( b_description_hack && p_item->psz_longtext )
             {
                 sprintf( psz_buffer, "%s%s", p_item->psz_longtext, psz_suf );
-                b_description = VLC_FALSE;
+                b_description_hack = VLC_FALSE;
                 psz_spaces = psz_spaces_longtext;
                 utf8_fprintf( stdout, "%s", psz_spaces );
                 goto description;
