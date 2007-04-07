@@ -859,10 +859,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
      */
     VLC_AddIntf( 0, "hotkeys,none", VLC_FALSE, VLC_FALSE );
 
+#ifdef HAVE_DBUS_3
     /* loads dbus control interface if in one-instance mode
      * we do it only when playlist exists, because dbus module needs it */
     if( config_GetInt( p_libvlc, "one-instance" ) )
         VLC_AddIntf( 0, "dbus,none", VLC_FALSE, VLC_FALSE );
+#endif
 
     /*
      * If needed, load the Xscreensaver interface
