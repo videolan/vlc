@@ -172,15 +172,20 @@ static const char *ppsz_sout_options[] = {
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    sout_stream_t     *p_stream = (sout_stream_t *)p_this;
-    sout_stream_sys_t *p_sys;
+    sout_stream_t        *p_stream = (sout_stream_t *)p_this;
+    sout_stream_sys_t    *p_sys;
     libvlc_global_data_t *p_libvlc_global = p_this->p_libvlc_global;
-    vlc_value_t val;
+    vlc_value_t           val;
 
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
-                   p_stream->p_cfg );
+                       p_stream->p_cfg );
 
-    p_sys          = malloc( sizeof( sout_stream_sys_t ) );
+    p_sys = malloc( sizeof( sout_stream_sys_t ) );
+    if( !p_sys )
+    {
+        return VLC_ENOMEM;
+    }
+
     p_stream->p_sys = p_sys;
     p_sys->b_inited = VLC_FALSE;
 
@@ -190,15 +195,19 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_stream, SOUT_CFG_PREFIX "id", &val );
     p_sys->psz_id = val.psz_string;
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "height", &val );
-    p_sys->i_height = val.i_int;
+    p_sys->i_height =
+        var_CreateGetIntegerCommand( p_stream, SOUT_CFG_PREFIX "height" );
+    var_AddCallback( p_stream, SOUT_CFG_PREFIX "height", MosaicBridgeCallback,
+                     p_stream );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "width", &val );
-    p_sys->i_width = val.i_int;
+    p_sys->i_width =
+        var_CreateGetIntegerCommand( p_stream, SOUT_CFG_PREFIX "width" );
+    var_AddCallback( p_stream, SOUT_CFG_PREFIX "width", MosaicBridgeCallback,
+                     p_stream );
 
     vlc_mutex_init( p_stream, &p_sys->mask_lock );
     val.psz_string =
-    var_CreateGetStringCommand( p_stream, SOUT_CFG_PREFIX "mask" );
+        var_CreateGetStringCommand( p_stream, SOUT_CFG_PREFIX "mask" );
     var_AddCallback( p_stream, SOUT_CFG_PREFIX "mask", MosaicBridgeCallback,
                      p_stream );
     if( val.psz_string && *val.psz_string )
@@ -359,6 +368,10 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         p_sys->p_image = image_HandlerCreate( p_stream );
     }
+    else
+    {
+        p_sys->p_image = NULL;
+    }
 
     msg_Dbg( p_stream, "mosaic bridge id=%s pos=%d", p_es->psz_id, i );
 
@@ -433,7 +446,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     vlc_mutex_unlock( p_sys->p_lock );
 
-    if ( p_sys->i_height || p_sys->i_width )
+    if ( p_sys->p_image )
     {
         image_HandlerDelete( p_sys->p_image );
     }
@@ -756,16 +769,21 @@ static int MosaicBridgeCallback( vlc_object_t *p_this, char const *psz_var,
 {
     sout_stream_t *p_stream = (sout_stream_t *)p_data;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    int i_ret = VLC_SUCCESS;
 
-    if( !strcmp( psz_var, SOUT_CFG_PREFIX "mask" ) )
+#define VAR_IS( a ) !strcmp( psz_var, SOUT_CFG_PREFIX a )
+    if( VAR_IS( "mask" ) )
     {
         vlc_mutex_lock( &p_sys->mask_lock );
         if( newval.psz_string && *newval.psz_string )
         {
             LoadMask( p_stream, newval.psz_string );
             if( !p_sys->p_mask )
+            {
                 msg_Err( p_stream, "Error while loading mask (%s).",
                          newval.psz_string );
+                i_ret = VLC_EGENERIC;
+            }
         }
         else if( p_sys->p_mask )
         {
@@ -774,6 +792,23 @@ static int MosaicBridgeCallback( vlc_object_t *p_this, char const *psz_var,
         }
         vlc_mutex_unlock( &p_sys->mask_lock );
     }
+    else if( VAR_IS( "height" ) )
+    {
+        /* We create the handler before updating the value in p_sys
+         * so we don't have to worry about locking */
+        if( !p_sys->p_image && newval.i_int )
+            p_sys->p_image = image_HandlerCreate( p_stream );
+        p_sys->i_height = newval.i_int;
+    }
+    else if( VAR_IS( "width" ) )
+    {
+        /* We create the handler before updating the value in p_sys
+         * so we don't have to worry about locking */
+        if( !p_sys->p_image && newval.i_int )
+            p_sys->p_image = image_HandlerCreate( p_stream );
+        p_sys->i_width = newval.i_int;
+    }
+#undef VAR_IS
 
-    return VLC_SUCCESS;
+    return i_ret;
 }
