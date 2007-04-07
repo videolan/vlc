@@ -1289,6 +1289,18 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
      *
      * The purpose of having bra and ket is that we might i18n them as well.
      */
+
+#   define COL(x)  "\033[" #x ";1m"
+#   define RED     COL(31)
+#   define GREEN   COL(32)
+#   define YELLOW  COL(33)
+#   define BLUE    COL(34)
+#   define MAGENTA COL(35)
+#   define CYAN    COL(36)
+#   define WHITE   COL(37)
+#   define GRAY    "\033[0m"
+#define COLOR_FORMAT_STRING (WHITE"  %s --%s"YELLOW"%s%s%s%s%s%s "GRAY)
+
 #define LINE_START 8
 #define PADDING_SPACES 25
 #ifdef WIN32
@@ -1299,7 +1311,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     vlc_list_t *p_list = NULL;
     char psz_spaces_text[PADDING_SPACES+LINE_START+1];
     char psz_spaces_longtext[LINE_START+3];
-    char psz_format[sizeof(FORMAT_STRING)];
+    char psz_format[sizeof(COLOR_FORMAT_STRING)];
     char psz_buffer[10000];
     char psz_short[4];
     int i_index;
@@ -1308,13 +1320,17 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     vlc_bool_t b_advanced    = config_GetInt( p_this, "advanced" );
     vlc_bool_t b_description = config_GetInt( p_this, "help-verbose" );
     vlc_bool_t b_description_hack;
+    vlc_bool_t b_color       = config_GetInt( p_this, "color" );
 
     memset( psz_spaces_text, ' ', PADDING_SPACES+LINE_START );
     psz_spaces_text[PADDING_SPACES+LINE_START] = '\0';
     memset( psz_spaces_longtext, ' ', LINE_START+2 );
     psz_spaces_longtext[LINE_START+2] = '\0';
 
-    strcpy( psz_format, FORMAT_STRING );
+    if( b_color )
+        strcpy( psz_format, COLOR_FORMAT_STRING );
+    else
+        strcpy( psz_format, FORMAT_STRING );
 
     /* List all modules */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -1361,7 +1377,13 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
 
         /* Print name of module */
         if( strcmp( "main", p_parser->psz_object_name ) )
-        utf8_fprintf( stdout, "\n %s\n", p_parser->psz_longname );
+        {
+            if( b_color )
+                utf8_fprintf( stdout, "\n " GREEN "%s" GRAY "\n",
+                              p_parser->psz_longname );
+            else
+                utf8_fprintf( stdout, "\n %s\n", p_parser->psz_longname );
+        }
 
         b_help_module = !strcmp( "help", p_parser->psz_object_name );
 
@@ -1392,18 +1414,41 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             case CONFIG_HINT_CATEGORY:
             case CONFIG_HINT_USAGE:
                 if( !strcmp( "main", p_parser->psz_object_name ) )
-                utf8_fprintf( stdout, "\n %s\n", p_item->psz_text );
+                {
+                    if( b_color )
+                        utf8_fprintf( stdout, GREEN "\n %s\n" GRAY,
+                                      p_item->psz_text );
+                    else
+                        utf8_fprintf( stdout, "\n %s\n", p_item->psz_text );
+                }
                 if( b_description && p_item->psz_longtext )
-                    utf8_fprintf( stdout, " %s\n", p_item->psz_longtext );
+                {
+                    if( b_color )
+                        utf8_fprintf( stdout, CYAN " %s\n" GRAY,
+                                      p_item->psz_longtext );
+                    else
+                        utf8_fprintf( stdout, " %s\n", p_item->psz_longtext );
+                }
                 break;
 
             case CONFIG_HINT_SUBCATEGORY:
                 if( strcmp( "main", p_parser->psz_object_name ) )
                 break;
             case CONFIG_SECTION:
-                utf8_fprintf( stdout, "   %s:\n", p_item->psz_text );
-                if( b_description && p_item->psz_longtext )
-                    utf8_fprintf( stdout, "   %s\n", p_item->psz_longtext );
+                if( b_color )
+                {
+                    utf8_fprintf( stdout, RED"   %s:\n"GRAY,
+                                  p_item->psz_text );
+                    if( b_description && p_item->psz_longtext )
+                        utf8_fprintf( stdout, MAGENTA"   %s\n"GRAY,
+                                      p_item->psz_longtext );
+                }
+                else
+                {
+                    utf8_fprintf( stdout, "   %s:\n", p_item->psz_text );
+                    if( b_description && p_item->psz_longtext )
+                        utf8_fprintf( stdout, "   %s\n", p_item->psz_longtext );
+                }
                 break;
 
             case CONFIG_ITEM_STRING:
@@ -1545,7 +1590,17 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                 /* If the remaining text fits in a line, print it. */
                 if( i_end <= i_cur_width )
                 {
-                    utf8_fprintf( stdout, "%s\n", psz_text );
+                    if( b_color )
+                    {
+                        if( !b_description || b_description_hack )
+                            utf8_fprintf( stdout, BLUE"%s\n"GRAY, psz_text );
+                        else
+                            utf8_fprintf( stdout, "%s\n", psz_text );
+                    }
+                    else
+                    {
+                        utf8_fprintf( stdout, "%s\n", psz_text );
+                    }
                     break;
                 }
 
@@ -1560,7 +1615,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                     psz_parser = psz_parser ? psz_parser + 1
                                             : psz_text + i_end;
 
-                } while( psz_parser - psz_text <= i_cur_width );
+                } while( (size_t)(psz_parser - psz_text) <= i_cur_width );
 
                 /* We cut a word in one of these cases:
                  *  - it's the only word in the line and it's too long.
@@ -1568,19 +1623,43 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                  *    going to wrap is longer than 40% of the width, and even
                  *    if the word would have fit in the next line. */
                 if( psz_word == psz_text
-                     || ( psz_word - psz_text < 80 * i_cur_width / 100
-                           && psz_parser - psz_word > 40 * i_cur_width / 100 ) )
+             || ( (size_t)(psz_word - psz_text) < 80 * i_cur_width / 100
+             && (size_t)(psz_parser - psz_word) > 40 * i_cur_width / 100 ) )
                 {
                     char c = psz_text[i_cur_width];
                     psz_text[i_cur_width] = '\0';
-                    utf8_fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
+                    if( b_color )
+                    {
+                        if( !b_description || b_description_hack )
+                            utf8_fprintf( stdout, BLUE"%s\n%s"GRAY,
+                                          psz_text, psz_spaces );
+                        else
+                            utf8_fprintf( stdout, "%s\n%s",
+                                          psz_text, psz_spaces );
+                    }
+                    else
+                    {
+                        utf8_fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
+                    }
                     psz_text += i_cur_width;
                     psz_text[0] = c;
                 }
                 else
                 {
                     psz_word[-1] = '\0';
-                    utf8_fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
+                    if( b_color )
+                    {
+                        if( !b_description || b_description_hack )
+                            utf8_fprintf( stdout, BLUE"%s\n%s"GRAY,
+                                          psz_text, psz_spaces );
+                        else
+                            utf8_fprintf( stdout, "%s\n%s",
+                                          psz_text, psz_spaces );
+                    }
+                    else
+                    {
+                        utf8_fprintf( stdout, "%s\n%s", psz_text, psz_spaces );
+                    }
                     psz_text = psz_word;
                 }
             }
