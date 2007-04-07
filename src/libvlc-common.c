@@ -1384,6 +1384,13 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             else
                 utf8_fprintf( stdout, "\n %s\n", p_parser->psz_longname );
         }
+        if( p_parser->psz_help )
+        {
+            if( b_color )
+                utf8_fprintf( stdout, CYAN" %s\n"GRAY, p_parser->psz_help );
+            else
+                utf8_fprintf( stdout, " %s\n", p_parser->psz_help );
+        }
 
         b_help_module = !strcmp( "help", p_parser->psz_object_name );
 
