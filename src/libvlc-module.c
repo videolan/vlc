@@ -2176,17 +2176,17 @@ vlc_module_end();
 
 const module_config_t libvlc_config[] =
 {
-    { 
+    {
         .i_type   = CONFIG_ITEM_BOOL,
         .psz_name = "help",
         .i_short  = 'h',
-        .psz_text = N_("print help for VLC (can be combined with --advanced)")
+        .psz_text = N_("print help for VLC (can be combined with --advanced and --help-verbose)")
     },
     {
         .i_type   = CONFIG_ITEM_BOOL,
         .psz_name = "longhelp",
         .i_short  = 'H',
-        .psz_text = N_("print help for VLC and all its modules (can be combined with --advanced)")
+        .psz_text = N_("print help for VLC and all its modules (can be combined with --advanced and --help-verbose)")
     },
     {
         .i_type   = CONFIG_ITEM_BOOL,
@@ -2208,7 +2208,7 @@ const module_config_t libvlc_config[] =
         .i_type   = CONFIG_ITEM_STRING,
         .psz_name = "module",
         .i_short  = 'p',
-        .psz_text = N_("print help on a specific module (can be combined with --advanced)")
+        .psz_text = N_("print help on a specific module (can be combined with --advanced and --help-verbose)")
     },
     {
         .i_type   = CONFIG_ITEM_BOOL,
