@@ -189,31 +189,31 @@ struct module_config_t
     void          *p_callback_data;
 
     /* Values list */
-    const char **ppsz_list;        /* List of possible values for the option */
-    int         *pi_list;          /* Idem for integers */
-    const char **ppsz_list_text;   /* Friendly names for list values */
-    int          i_list;           /* Options list size */
+    const char **ppsz_list;       /* List of possible values for the option */
+    int         *pi_list;                              /* Idem for integers */
+    const char **ppsz_list_text;          /* Friendly names for list values */
+    int          i_list;                               /* Options list size */
 
     /* Actions list */
     vlc_callback_t *ppf_action;    /* List of possible actions for a config */
     const char    **ppsz_action_text;         /* Friendly names for actions */
-    int            i_action;                            /* actions list size */
+    int            i_action;                           /* actions list size */
 
     /* Misc */
     vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
     vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
     vlc_bool_t   b_advanced;          /* Flag to indicate an advanced option */
     vlc_bool_t   b_internal;   /* Flag to indicate option is not to be shown */
-    vlc_bool_t   b_restart;    /* Flag to indicate the option need a restart */
-                               /* to take effect */
+    vlc_bool_t   b_restart;   /* Flag to indicate the option needs a restart */
+                              /* to take effect */
 
     /* Deprecated */
-    const char    *psz_current;   /* Good option name */
-    vlc_bool_t     b_strict;      /* Transitionnal or strict */
+    const char    *psz_current;                         /* Good option name */
+    vlc_bool_t     b_strict;                     /* Transitionnal or strict */
 
     /* Option values loaded from config file */
-    vlc_bool_t   b_autosave;       /* Config will be auto-saved at exit time */
-    vlc_bool_t   b_unsaveable;       /* confg should be saved*/
+    vlc_bool_t   b_autosave;      /* Config will be auto-saved at exit time */
+    vlc_bool_t   b_unsaveable;                    /* Config should be saved */
 };
 
 /*****************************************************************************
