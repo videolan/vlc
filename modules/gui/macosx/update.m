@@ -1,7 +1,7 @@
 /*****************************************************************************
  * update.m: MacOS X Check-For-Update window
  *****************************************************************************
- * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright (C) 2005-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Felix KŸhne <fkuehne@users.sf.net>
@@ -52,7 +52,7 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if (_o_sharedInstance) {
+    if( _o_sharedInstance ) {
         [self dealloc];
     } else {
         _o_sharedInstance = [super init];
@@ -86,8 +86,8 @@ static VLCUpdate *_o_sharedInstance = nil;
     [o_update_window setTitle: _NS("Check for Updates")];
     [o_btn_DownloadNow setTitle: _NS("Download now")];
     [o_btn_okay setTitle: _NS("OK")];
-    [o_chk_updateOnStartup setTitle: _NS("Check for VLC update automatically")];
-    /* we don't use - (BOOL)shouldCheckUpdateOnStartup beccause we don't want the Alert
+    [o_chk_updateOnStartup setTitle: _NS("Automatically check for updates")];
+    /* we don't use - (BOOL)shouldCheckUpdateOnStartup because we don't want the Alert
      * panel to pop up at this time */
     [o_chk_updateOnStartup setState: [[NSUserDefaults standardUserDefaults] boolForKey: kPrefUpdateOnStartup]];
 }
@@ -103,11 +103,11 @@ static VLCUpdate *_o_sharedInstance = nil;
     NSDate *o_last_update;
     NSDate *o_next_update;
     
-    if(![[NSUserDefaults standardUserDefaults] objectForKey: kPrefUpdateOnStartup])
+    if( ![[NSUserDefaults standardUserDefaults] objectForKey: kPrefUpdateOnStartup] )
     {
         /* We don't have any preferences stored, ask the user. */
-        int res = NSRunInformationalAlertPanel( _NS("Do you want VLC to check for update automatically?"),
-              _NS("You can change this option later in the VLC update window."), _NS("Yes"), _NS("No"), nil );
+        int res = NSRunInformationalAlertPanel( _NS("Do you want VLC to check for updates automatically?"),
+              _NS("You can change this option in VLC's update window later on."), _NS("Yes"), _NS("No"), nil );
         [self setShouldCheckUpdate: res];
     }
 
@@ -159,7 +159,7 @@ static VLCUpdate *_o_sharedInstance = nil;
 - (void)getLocationForSaving: (NSSavePanel *)sheet returnCode: \
     (int)returnCode contextInfo: (void *)contextInfo
 {
-    if (returnCode == NSOKButton)
+    if( returnCode == NSOKButton )
     {
         /* perform download and pass the selected path */
         [self performDownload: [sheet filename]];
@@ -310,10 +310,9 @@ static VLCUpdate *_o_sharedInstance = nil;
         {
             /* don't confuse the user, but make her happy */
             [o_fld_status setStringValue: _NS("This version of VLC " \
-                "is latest available.")];
+                "is the latest available.")];
             [o_btn_DownloadNow setEnabled: NO];
             msg_Dbg( p_intf, "current version is up-to-date" );
-            msg_Warn( p_intf, "retrieving current release notes failed!" );
         }
     }
     [pool release];
