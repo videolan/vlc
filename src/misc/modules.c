@@ -450,7 +450,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         /* If the user wants none, give him none. */
         if( !strcmp( psz_name, "none" ) )
         {
-            if( psz_var ) free( psz_var );
+            free( psz_var );
             return NULL;
         }
 
@@ -722,15 +722,8 @@ found_shortcut:
             p_this->psz_object_name = strdup( p_module->psz_object_name );
     }
 
-    if( psz_shortcuts )
-    {
-        free( psz_shortcuts );
-    }
-
-    if( psz_var )
-    {
-        free( psz_var );
-    }
+    free( psz_shortcuts );
+    free( psz_var );
 
     /* Don't forget that the module is still locked */
     return p_module;
@@ -767,13 +760,12 @@ vlc_bool_t __module_Exists(  vlc_object_t *p_this, const char * psz_name )
 {
     vlc_list_t *p_list;
     int i;
-    char *psz_module_name;
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
     for( i = 0 ; i < p_list->i_count; i++)
     {
-        psz_module_name =
+        const char *psz_module_name =
             ((module_t *) p_list->p_values[i].p_object)->psz_shortname;
-        if ( psz_module_name && !strcmp( psz_module_name, psz_name ) )
+        if( psz_module_name && !strcmp( psz_module_name, psz_name ) )
         {
             /* We can release the list, and return yes */
             vlc_list_release( p_list ); return VLC_TRUE;
@@ -842,8 +834,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     }
 
     /* Free plugin-path */
-    if( userpath != NULL )
-        free( userpath );
+    free( userpath );
 }
 
 /*****************************************************************************
@@ -1191,6 +1182,8 @@ static void DupModule( module_t *p_module )
     p_module->psz_shortname = p_module->psz_shortname ?
                                  strdup( p_module->psz_shortname ) : NULL;
     p_module->psz_longname = strdup( p_module->psz_longname );
+    p_module->psz_help = p_module->psz_help ? strdup( p_module->psz_help )
+                                            : NULL;
 
     if( p_module->psz_program != NULL )
     {
@@ -1220,18 +1213,15 @@ static void UndupModule( module_t *p_module )
 
     for( pp_shortcut = p_module->pp_shortcuts ; *pp_shortcut ; pp_shortcut++ )
     {
-        free( (void *)*pp_shortcut );
+        free( (void*)*pp_shortcut );
     }
 
-    free( (void *)p_module->psz_object_name );
-    free( (void *)p_module->psz_capability );
-    if( p_module->psz_shortname ) free( (void *)p_module->psz_shortname );
-    free( (void *)p_module->psz_longname );
-
-    if( p_module->psz_program != NULL )
-    {
-        free( (void *)p_module->psz_program );
-    }
+    free( (void*)p_module->psz_object_name );
+    free( (void*)p_module->psz_capability );
+    free( (void*)p_module->psz_shortname );
+    free( (void*)p_module->psz_longname );
+    free( (void*)p_module->psz_help );
+    free( (void*)p_module->psz_program );
 }
 
 #endif /* HAVE_DYNAMIC_PLUGINS */
@@ -1804,6 +1794,7 @@ static void CacheLoad( vlc_object_t *p_this )
         LOAD_STRING( pp_cache[i]->p_module->psz_object_name );
         LOAD_STRING( pp_cache[i]->p_module->psz_shortname );
         LOAD_STRING( pp_cache[i]->p_module->psz_longname );
+        LOAD_STRING( pp_cache[i]->p_module->psz_help );
         LOAD_STRING( pp_cache[i]->p_module->psz_program );
         for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
         {
@@ -1833,6 +1824,7 @@ static void CacheLoad( vlc_object_t *p_this )
             LOAD_STRING( p_module->psz_object_name );
             LOAD_STRING( p_module->psz_shortname );
             LOAD_STRING( p_module->psz_longname );
+            LOAD_STRING( p_module->psz_help );
             LOAD_STRING( p_module->psz_program );
             for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
             {
@@ -2092,6 +2084,7 @@ static void CacheSave( vlc_object_t *p_this )
         SAVE_STRING( pp_cache[i]->p_module->psz_object_name );
         SAVE_STRING( pp_cache[i]->p_module->psz_shortname );
         SAVE_STRING( pp_cache[i]->p_module->psz_longname );
+        SAVE_STRING( pp_cache[i]->p_module->psz_help );
         SAVE_STRING( pp_cache[i]->p_module->psz_program );
         for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
         {
@@ -2121,6 +2114,7 @@ static void CacheSave( vlc_object_t *p_this )
             SAVE_STRING( p_module->psz_object_name );
             SAVE_STRING( p_module->psz_shortname );
             SAVE_STRING( p_module->psz_longname );
+            SAVE_STRING( p_module->psz_help );
             SAVE_STRING( p_module->psz_program );
             for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
             {
