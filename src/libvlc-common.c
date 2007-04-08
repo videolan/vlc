@@ -1880,12 +1880,11 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
     char **devices = NULL;
     char *block_dev = NULL;
     dbus_bool_t b_dvd;
+
 #ifdef HAVE_HAL_1
     DBusConnection *p_connection = NULL;
     DBusError       error;
-#endif
 
-#ifdef HAVE_HAL_1
     ctx = libhal_ctx_new();
     if( !ctx ) return;
     dbus_error_init( &error );
@@ -1896,17 +1895,13 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
         dbus_error_free( &error );
         return;
     }
-#else
-    ctx = hal_initialize( NULL, FALSE );
-    if( !ctx ) return;
-#endif
-
-#ifdef HAVE_HAL_1
     libhal_ctx_set_dbus_connection( ctx, p_connection );
     if( libhal_ctx_init( ctx, &error ) )
 #else
-    if( ( ctx = hal_initialize( NULL, FALSE ) ) )
+    ctx = hal_initialize( NULL, FALSE );
+    if( ctx )
 #endif
+
     {
 #ifdef HAVE_HAL_1
         if( ( devices = libhal_get_all_devices( ctx, &i_devices, NULL ) ) )
