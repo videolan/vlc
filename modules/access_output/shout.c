@@ -241,7 +241,7 @@ static int Open( vlc_object_t *p_this )
     p_shout = p_sys->p_shout = shout_new();
     if( !p_shout
          || shout_set_host( p_shout, psz_host ) != SHOUTERR_SUCCESS
-         || shout_set_protocol( p_shout, SHOUT_PROTOCOL_HTTP ) != SHOUTERR_SUCCESS
+         || shout_set_protocol( p_shout, SHOUT_PROTOCOL_ICY ) != SHOUTERR_SUCCESS
          || shout_set_port( p_shout, i_port ) != SHOUTERR_SUCCESS
          || shout_set_password( p_shout, psz_pass ) != SHOUTERR_SUCCESS
          || shout_set_mount( p_shout, psz_mount ) != SHOUTERR_SUCCESS
@@ -251,7 +251,7 @@ static int Open( vlc_object_t *p_this )
          || shout_set_description( p_shout, psz_description ) != SHOUTERR_SUCCESS
          || shout_set_genre( p_shout, psz_genre ) != SHOUTERR_SUCCESS
          || shout_set_url( p_shout, psz_url ) != SHOUTERR_SUCCESS
-//       || shout_set_nonblocking( p_shout, 1 ) != SHOUTERR_SUCCESS
+         /* || shout_set_nonblocking( p_shout, 1 ) != SHOUTERR_SUCCESS */
       )
     {
         msg_Err( p_access, "failed to initialize shout streaming to %s:%i/%s",
@@ -280,13 +280,19 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-
     /* Don't force bitrate to 0 but only use when specified. This will otherwise
        show an empty field on icecast directory listing instead of NA */
     var_Get( p_access, SOUT_CFG_PREFIX "bitrate", &val );
     if( *val.psz_string )
     {
         i_ret = shout_set_audio_info( p_shout, SHOUT_AI_BITRATE, val.psz_string );
+        if( i_ret != SHOUTERR_SUCCESS )
+        {
+            msg_Err( p_access, "failed to set the information about the bitrate" );
+            free( p_access->p_sys );
+            free( psz_accessname );
+            return VLC_EGENERIC;
+        }
     }
     else
     {
@@ -297,93 +303,78 @@ static int Open( vlc_object_t *p_this )
         free( val.psz_string );
     }
 
-    if( i_ret != SHOUTERR_SUCCESS )
-    {
-        msg_Err( p_access, "failed to set the information about the bitrate" );
-        free( p_access->p_sys );
-        free( psz_accessname );
-        return VLC_EGENERIC;
-    }
-
     /* Information about samplerate, channels and quality will not be propagated
        through the YP protocol for icecast to the public directory listing when
        the icecast server is operating in shoutcast compatibility mode */
 
     var_Get( p_access, SOUT_CFG_PREFIX "samplerate", &val );
     if( *val.psz_string )
+    {
         i_ret = shout_set_audio_info( p_shout, SHOUT_AI_SAMPLERATE, val.psz_string );
-    else
-        free( val.psz_string );
-
-    if( i_ret != SHOUTERR_SUCCESS )
-    {
-        msg_Err( p_access, "failed to set the information about the samplerate" );
-        free( p_access->p_sys );
-        free( psz_accessname );
-        return VLC_EGENERIC;
-    }
-
-    var_Get( p_access, SOUT_CFG_PREFIX "channels", &val );
-    if( *val.psz_string )
-        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_CHANNELS, val.psz_string );
-    else
-        free( val.psz_string );
-
-    if( i_ret != SHOUTERR_SUCCESS )
-    {
-        msg_Err( p_access, "failed to set the information about the number of channels" );
-        free( p_access->p_sys );
-        free( psz_accessname );
-        return VLC_EGENERIC;
-    }
-
-    var_Get( p_access, SOUT_CFG_PREFIX "quality", &val );
-    if( *val.psz_string )
-        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_QUALITY, val.psz_string );
-    else
-        free( val.psz_string );
-
-    if( i_ret != SHOUTERR_SUCCESS )
-    {
-        msg_Err( p_access, "failed to set the information about Ogg Vorbis quality" );
-        free( p_access->p_sys );
-        free( psz_accessname );
-        return VLC_EGENERIC;
-    }
-
-    var_Get( p_access, SOUT_CFG_PREFIX "public", &val );
-    if( val.b_bool == VLC_TRUE )
-        i_ret = shout_set_public( p_shout, 1 );
-
-    if( i_ret != SHOUTERR_SUCCESS )
-    {
-        msg_Err( p_access, "failed to set the server status setting to public" );
-        free( p_access->p_sys );
-        free( psz_accessname );
-        return VLC_EGENERIC;
-    }
-
-    i_ret = shout_open( p_shout );
-    if( i_ret == SHOUTERR_SUCCESS )
-    {
-        i_ret = SHOUTERR_CONNECTED;
-    }
-    else
-    {
-        /* If default 'http' protocol for icecast 2.x fails, fall back to 'icy'
-           for shoutcast server */
-        msg_Warn( p_access, "failed to connect using 'http' (icecast 2.x) protocol, "
-                            "switching to 'icy' (shoutcast)" );
-
-        i_ret = shout_get_format( p_shout );
-        if( i_ret != SHOUT_FORMAT_MP3 )
+        if( i_ret != SHOUTERR_SUCCESS )
         {
-            msg_Err( p_access, "failed to use 'icy' protocol: only MP3 " \
-                               "streaming to shoutcast is supported" );
+            msg_Err( p_access, "failed to set the information about the samplerate" );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
         }
+    }
+    else
+        free( val.psz_string );
+
+    var_Get( p_access, SOUT_CFG_PREFIX "channels", &val );
+    if( *val.psz_string )
+    {
+        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_CHANNELS, val.psz_string );
+        if( i_ret != SHOUTERR_SUCCESS )
+        {
+            msg_Err( p_access, "failed to set the information about the number of channels" );
+            free( p_access->p_sys );
+            free( psz_accessname );
+            return VLC_EGENERIC;
+        }
+    }
+    else
+        free( val.psz_string );
+
+    var_Get( p_access, SOUT_CFG_PREFIX "quality", &val );
+    if( *val.psz_string )
+    {
+        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_QUALITY, val.psz_string );
+        if( i_ret != SHOUTERR_SUCCESS )
+        {
+            msg_Err( p_access, "failed to set the information about Ogg Vorbis quality" );
+            free( p_access->p_sys );
+            free( psz_accessname );
+            return VLC_EGENERIC;
+        }
+    }
+    else
+        free( val.psz_string );
+
+    var_Get( p_access, SOUT_CFG_PREFIX "public", &val );
+    if( val.b_bool == VLC_TRUE )
+    {
+        i_ret = shout_set_public( p_shout, 1 );
+        if( i_ret != SHOUTERR_SUCCESS )
+        {
+            msg_Err( p_access, "failed to set the server status setting to public" );
+            free( p_access->p_sys );
+            free( psz_accessname );
+            return VLC_EGENERIC;
+        }
+    }
+
+    /* Shoutcast using ICY protocol */
+    i_ret = shout_open( p_shout );
+    if( i_ret == SHOUTERR_SUCCESS )
+    {
+        i_ret = SHOUTERR_CONNECTED;
+        msg_Dbg( p_access, "connected using 'icy' (shoutcast) protocol" );
+    }
+    else
+    {
+        msg_Warn( p_access, "failed to connect using 'icy' (shoutcast) protocol" );
 
         /* Shout parameters cannot be changed on an open connection */
         i_ret = shout_close( p_shout );
@@ -392,10 +383,11 @@ static int Open( vlc_object_t *p_this )
             i_ret = SHOUTERR_UNCONNECTED;
         }
 
-        i_ret = shout_set_protocol( p_shout, SHOUT_PROTOCOL_ICY );
+        /* IceCAST using HTTP protocol */
+        i_ret = shout_set_protocol( p_shout, SHOUT_PROTOCOL_HTTP );
         if( i_ret != SHOUTERR_SUCCESS )
         {
-            msg_Err( p_access, "failed to set the protocol to 'icy'" );
+            msg_Err( p_access, "failed to set the protocol to 'http'" );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
@@ -405,7 +397,10 @@ static int Open( vlc_object_t *p_this )
         if( i_ret == SHOUTERR_SUCCESS )
         {
             i_ret = SHOUTERR_CONNECTED;
+            msg_Dbg( p_access, "connected using 'http' (icecast 2.x) protocol" );
         }
+        else
+            msg_Warn( p_access, "failed to connect using 'http' (icecast 2.x) protocol " );
     }
 
 /*
