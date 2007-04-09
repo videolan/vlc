@@ -820,7 +820,7 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
     p += sprintf( p, "v=0\r\n" );
     p += sprintf( p, "o=- "I64Fd" %d IN IP%c %s\r\n",
                   p_sys->i_sdp_id, p_sys->i_sdp_version,
-                  ipv, ipv == '6' ? "::" : "127.0.0.1" );
+                  ipv, ipv == '6' ? "::1" : "127.0.0.1" );
     if( *p_sys->psz_session_name )
         p += sprintf( p, "s=%s\r\n", p_sys->psz_session_name );
     if( *p_sys->psz_session_description )
@@ -835,16 +835,13 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
 
     p += sprintf( p, "c=IN IP%c %s", ipv, psz_destination );
 
-    if( net_AddressIsMulticast( (vlc_object_t *)p_stream, psz_destination ) )
+    if( ( ipv == 4 )
+     && net_AddressIsMulticast( (vlc_object_t *)p_stream, psz_destination ) )
     {
-        /* Add the ttl if it is a multicast address */
-        /* FIXME: 1 is not a correct default value in the case of IPv6 */
-        p += sprintf( p, "/%d\r\n", p_sys->i_ttl ? p_sys->i_ttl : 1 );
+        /* Add the deprecated TTL field if it is an IPv4 multicast address */
+        p += sprintf( p, "/%d", p_sys->i_ttl ?: 1 );
     }
-    else
-    {
-        p += sprintf( p, "\r\n" );
-    }
+    p += sprintf( p, "\r\n" );
 
     for( i = 0; i < p_sys->i_es; i++ )
     {
