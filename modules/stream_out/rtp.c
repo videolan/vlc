@@ -792,6 +792,10 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         sout_stream_id_t *id = p_sys->es[i];
 
         i_size += strlen( "m=**d*o * RTP/AVP *\r\n" ) + 10 + 10;
+        if ( id->i_bitrate )
+        {
+            i_size += strlen( "b=AS: *\r\n") + 10;
+        }
         if( id->psz_rtpmap )
         {
             i_size += strlen( "a=rtpmap:* *\r\n" ) + strlen( id->psz_rtpmap )+10;
@@ -799,10 +803,6 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         if( id->psz_fmtp )
         {
             i_size += strlen( "a=fmtp:* *\r\n" ) + strlen( id->psz_fmtp ) + 10;
-        }
-        if ( id->i_bitrate)
-        {
-            i_size += strlen( "b=AS: *\r\n") + 10;
         }
         if( b_rtsp )
         {
@@ -861,6 +861,10 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         {
             continue;
         }
+        if ( id->i_bitrate )
+        {
+            p += sprintf(p,"b=AS:%d\r\n",id->i_bitrate);
+        }
         if( id->psz_rtpmap )
         {
             p += sprintf( p, "a=rtpmap:%d %s\r\n", id->i_payload_type,
@@ -870,10 +874,6 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         {
             p += sprintf( p, "a=fmtp:%d %s\r\n", id->i_payload_type,
                           id->psz_fmtp );
-        }
-        if ( id->i_bitrate)
-        {
-            p += sprintf(p,"b=AS:%d\r\n",id->i_bitrate);
         }
         if( b_rtsp )
         {
