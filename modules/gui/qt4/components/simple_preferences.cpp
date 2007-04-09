@@ -82,9 +82,12 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), spref_cone_Hotkeys_64.png, 5 );
 
     SPrefsInterface->setChecked( true );
+    layout->setMargin( 0 );
+    layout->setSpacing( 1 );
 
     this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     setLayout( layout );
+
 }
 
 void SPrefsCatList::switchPanel( int i )
@@ -142,6 +145,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
     QVBoxLayout *panel_layout = new QVBoxLayout();
     QWidget *panel = new QWidget();
+    panel_layout->setMargin( 3 );
 
     // Title Label
     QLabel *panel_label = new QLabel;

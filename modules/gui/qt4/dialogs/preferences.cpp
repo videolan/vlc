@@ -44,68 +44,71 @@ PrefsDialog *PrefsDialog::instance = NULL;
 
 PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
-     QGridLayout *main_layout = new QGridLayout( this );
-     setWindowTitle( qtr( "Preferences" ) );
-     resize( 700, 650 );
-     setMaximumHeight( 650 );
-     setMaximumWidth( 700 );
+    QGridLayout *main_layout = new QGridLayout( this );
+    setWindowTitle( qtr( "Preferences" ) );
+    resize( 700, 650 );
 
-     /* Create Panels */
-     tree_panel = new QWidget( 0 );
-     tree_panel_l = new QHBoxLayout;
-     tree_panel->setLayout( tree_panel_l );
-     main_panel = new QWidget( 0 );
-     main_panel_l = new QHBoxLayout;
-     main_panel->setLayout( main_panel_l );
+    /* Create Panels */
+    tree_panel = new QWidget( 0 );
+    tree_panel_l = new QHBoxLayout;
+    tree_panel->setLayout( tree_panel_l );
+    main_panel = new QWidget( 0 );
+    main_panel_l = new QHBoxLayout;
+    main_panel->setLayout( main_panel_l );
 
-     /* Choice for types */
-     types = new QGroupBox( "Show settings" );
-     types->setAlignment( Qt::AlignHCenter );
-     QHBoxLayout *types_l = new QHBoxLayout(0);
-     types_l->setSpacing( 3 ); types_l->setMargin( 3 );
-     small = new QRadioButton( "Basic", types ); types_l->addWidget( small );
-     all = new QRadioButton( "All", types ); types_l->addWidget( all );
-     types->setLayout( types_l );
-     small->setChecked( true );
+    /* Choice for types */
+    types = new QGroupBox( "Show settings" );
+    types->setAlignment( Qt::AlignHCenter );
+    QHBoxLayout *types_l = new QHBoxLayout(0);
+    types_l->setSpacing( 3 ); types_l->setMargin( 3 );
+    small = new QRadioButton( "Basic", types ); types_l->addWidget( small );
+    all = new QRadioButton( "All", types ); types_l->addWidget( all );
+    types->setLayout( types_l );
+    small->setChecked( true );
 
-     /* Tree and panel initialisations */
-     advanced_tree = NULL;
-     simple_tree = NULL;
-     simple_panel = NULL;
-     advanced_panel = NULL;
+    /* Tree and panel initialisations */
+    advanced_tree = NULL;
+    simple_tree = NULL;
+    simple_panel = NULL;
+    advanced_panel = NULL;
 
-     main_layout->addWidget( tree_panel, 0, 0, 3, 1 );
-     main_layout->addWidget( types, 3, 0, 2, 1 );
+    /* Buttons */
+    QDialogButtonBox *buttonsBox = new QDialogButtonBox();
+    QPushButton *save = new QPushButton( qtr( "&Save" ) );
+    QPushButton *cancel = new QPushButton( qtr( "&Cancel" ) );
+    QPushButton *reset = new QPushButton( qtr( "&Reset Preferences" ) );
 
-     main_layout->addWidget( main_panel, 0, 1, 4, 1 );
+    buttonsBox->addButton( save, QDialogButtonBox::AcceptRole );
+    buttonsBox->addButton( cancel, QDialogButtonBox::RejectRole );
+    buttonsBox->addButton( reset, QDialogButtonBox::ActionRole );
 
-     main_layout->setColumnMinimumWidth( 0, 150 );
-     main_layout->setColumnStretch( 0, 1 );
-     main_layout->setColumnStretch( 1, 3 );
+    /* Layout  */
+    main_layout->addWidget( tree_panel, 0, 0, 3, 1 );
+    main_layout->addWidget( types, 3, 0, 2, 1 );
+    main_layout->addWidget( main_panel, 0, 1, 4, 1 );
+    main_layout->addWidget( buttonsBox, 4, 1, 1 ,2 );
 
-     main_layout->setRowStretch( 2, 4);
+    main_layout->setColumnMinimumWidth( 0, 150 );
+    main_layout->setColumnStretch( 0, 1 );
+    main_layout->setColumnStretch( 1, 3 );
 
-     setSmall();
+    main_layout->setRowStretch( 2, 4);
 
-     QDialogButtonBox *buttonsBox = new QDialogButtonBox();
-     QPushButton *save = new QPushButton( qtr( "&Save" ) );
-     QPushButton *cancel = new QPushButton( qtr( "&Cancel" ) );
-     QPushButton *reset = new QPushButton( qtr( "&Reset Preferences" ) );
+    setLayout( main_layout );
 
-     buttonsBox->addButton( save, QDialogButtonBox::AcceptRole );
-     buttonsBox->addButton( cancel, QDialogButtonBox::RejectRole );
-     buttonsBox->addButton( reset, QDialogButtonBox::ActionRole );
+    /* Margins */
+    tree_panel_l->setMargin( 1 );
+    main_panel_l->setMargin( 3 );
 
-     main_layout->addWidget( buttonsBox, 4, 1, 1 ,2 );
-     setLayout( main_layout );
+    setSmall();
 
-     BUTTONACT( save, save() );
-     BUTTONACT( cancel, cancel() );
-     BUTTONACT( reset, reset() );
-     BUTTONACT( small, setSmall() );
-     BUTTONACT( all, setAll() );
+    BUTTONACT( save, save() );
+    BUTTONACT( cancel, cancel() );
+    BUTTONACT( reset, reset() );
+    BUTTONACT( small, setSmall() );
+    BUTTONACT( all, setAll() );
 
-     for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;
+    for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;
 }
 
 void PrefsDialog::setAll()
@@ -268,7 +271,6 @@ void PrefsDialog::reset()
     if ( ret == QMessageBox::Ok )
     {
         config_ResetAll( p_intf );
-        // TODO reset changes ?
         config_SaveConfigFile( p_intf, NULL );
     }
 }

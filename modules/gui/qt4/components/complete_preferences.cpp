@@ -65,6 +65,8 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     setAlternatingRowColors( true );
     header()->hide();
     setIconSize( QSize( ITEM_HEIGHT,ITEM_HEIGHT ) );
+    setTextElideMode( Qt::ElideNone );
+    setHorizontalScrollBarPolicy ( Qt::ScrollBarAlwaysOn );
 
 #define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b##_xpm ))
     BI( audio, audio );
@@ -372,6 +374,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
 
     global_layout = new QVBoxLayout();
+    global_layout->setMargin( 2 );
     QString head;
     if( data->i_type == TYPE_SUBCATEGORY || data->i_type ==  TYPE_CATSUBCAT )
     {
