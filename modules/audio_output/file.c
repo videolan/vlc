@@ -32,6 +32,7 @@
 #include <vlc/vlc.h>
 #include <vlc_aout.h>
 #include <vlc_codecs.h> /* WAVEHEADER */
+#include <vlc_charset.h>
 
 #define FRAME_SIZE 2048
 #define A52_FRAME_NB 1536
