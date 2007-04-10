@@ -29,6 +29,7 @@
 
 #include <shlwapi.h>
 #include <wininet.h>
+#include <tchar.h>
 
 using namespace std;
 
@@ -2353,13 +2354,10 @@ STDMETHODIMP VLCVideo::put_crop(BSTR geometry)
     return hr;
 };
 
-STDMETHODIMP VLCVideo::takeSnapshot(BSTR filePath)
+STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
 {
-    if( NULL == filePath )
+    if( NULL == picture )
         return E_POINTER;
-
-    if( 0 == SysStringLen(filePath) )
-        return E_INVALIDARG;
 
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
@@ -2371,18 +2369,89 @@ STDMETHODIMP VLCVideo::takeSnapshot(BSTR filePath)
         libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            char *psz_filepath = CStrFromBSTR(CP_UTF8, filePath);
-            if( NULL == psz_filepath )
-            {
-                return E_OUTOFMEMORY;
-            }
-            /* TODO: check file security */
+            static int uniqueId = 0;
+            TCHAR path[MAX_PATH+1];
 
+            int pathlen = GetTempPath(MAX_PATH-24, path);
+            if( (0 == pathlen) || (pathlen > (MAX_PATH-24)) )
+                return E_FAIL;
+
+            /* check temp directory path by openning it */
+            {
+                HANDLE dirHandle = CreateFile(path,
+                                              GENERIC_READ,
+                                              FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+                                              NULL,
+                                              OPEN_EXISTING,
+                                              FILE_FLAG_BACKUP_SEMANTICS, NULL);
+                if( INVALID_HANDLE_VALUE == dirHandle )
+                {
+                    _p_instance->setErrorInfo(IID_IVLCVideo,
+                            "Invalid temporary directory for snapshot images, check values of TMP, TEMP envars.");
+                    return E_FAIL;
+                }
+                else
+                {
+                    BY_HANDLE_FILE_INFORMATION bhfi;
+                    BOOL res = GetFileInformationByHandle(dirHandle, &bhfi);
+                    CloseHandle(dirHandle);
+                    if( !res || !(bhfi.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
+                    {
+                        _p_instance->setErrorInfo(IID_IVLCVideo,
+                                "Invalid temporary directory for snapshot images, check values of TMP, TEMP envars.");
+                        return E_FAIL;
+                    }
+                }
+            }
+
+            TCHAR filepath[MAX_PATH+1];
+
+            _stprintf(filepath, TEXT("%sAXVLC%lXS%lX.bmp"),
+                     path, GetCurrentProcessId(), ++uniqueId);
+
+#ifdef _UNICODE
+            /* reuse path storage for UTF8 string */
+            char *psz_filepath = (char *)path;
+            WCHAR* wpath = filepath;
+#else
+            char *psz_filepath = path;
+            /* first convert to unicode using current code page */
+            WCHAR wpath[MAX_PATH+1];
+            if( 0 == MultiByteToWideChar(CP_ACP, 0, filepath, -1, wpath, sizeof(wpath)/sizeof(WCHAR)) )
+                return E_FAIL;
+#endif
+            /* convert to UTF8 */
+            pathlen = WideCharToMultiByte(CP_UTF8, 0, wpath, -1, psz_filepath, sizeof(path), NULL, NULL);
+            // fail if path is 0 or too short (i.e pathlen is the same as storage size)
+            if( (0 == pathlen) || (sizeof(path) == pathlen) )
+                return E_FAIL;
+
+            /* take snapshot into file */
             libvlc_video_take_snapshot(p_input, psz_filepath, &ex);
             libvlc_input_free(p_input);
             if( ! libvlc_exception_raised(&ex) )
             {
-                return NOERROR;
+                hr = E_FAIL;
+                /* open snapshot file */
+                HANDLE snapPic = LoadImage(NULL, filepath, IMAGE_BITMAP,0, 0, LR_CREATEDIBSECTION|LR_LOADFROMFILE);
+                if( snapPic )
+                {
+                    PICTDESC snapDesc;
+
+                    snapDesc.cbSizeofstruct = sizeof(PICTDESC);
+                    snapDesc.picType        = PICTYPE_BITMAP;
+                    snapDesc.bmp.hbitmap    = (HBITMAP)snapPic;
+                    snapDesc.bmp.hpal       = NULL;
+
+                    hr = OleCreatePictureIndirect(&snapDesc, IID_IPictureDisp, TRUE, (LPVOID*)picture);
+                    if( FAILED(hr) )
+                    {
+                        *picture = NULL;
+                        DeleteObject(snapPic);
+                    }
+                }
+                DeleteFile(filepath);
+                return hr;
             }
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));

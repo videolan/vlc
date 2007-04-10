@@ -497,8 +497,6 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
             ppsz_argv[ppsz_argc++] = "--win9x-cv-method=1";
         }
 
-DebugBreak();
-
         _p_libvlc = libvlc_new(ppsz_argc, ppsz_argv, NULL);
         if( NULL == _p_libvlc )
         {

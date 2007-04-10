@@ -24,7 +24,7 @@
 //comments terminated by [t] are by tonsofpcs, regarding the string review.  April 02, 2006. [t]
 //Possibly change all instances of "the current playlist" to "the playlist" and "current playlist" to "the playlist" [t]
 
-import "oaidl.idl";
+import "ocidl.idl";
 
 [
   uuid(DF2BBE39-40A8-433b-A279-073F48DA94B6),
@@ -435,8 +435,8 @@ library AXVLC
         [helpstring("toggle fullscreen/windowed state.")]
         HRESULT toggleFullscreen();
 
-        [helpstring("take video snapshot and save into into filePath.")]
-        HRESULT takeSnapshot(BSTR filePath);
+        [helpstring("take video snapshot and save it into picture object.")]
+        HRESULT takeSnapshot([out, retval] IPictureDisp** picture);
     };
 
     [
