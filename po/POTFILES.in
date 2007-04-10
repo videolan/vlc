@@ -549,6 +549,8 @@ modules/gui/pda/pda_support.h
 modules/gui/qnx/aout.c
 modules/gui/qnx/qnx.c
 modules/gui/qnx/vout.c
+modules/gui/qt4/components/complete_preferences.cpp
+modules/gui/qt4/components/complete_preferences.hpp
 modules/gui/qt4/components/extended_panels.cpp
 modules/gui/qt4/components/extended_panels.hpp
 modules/gui/qt4/components/infopanels.cpp
@@ -561,8 +563,6 @@ modules/gui/qt4/components/playlist/panels.hpp
 modules/gui/qt4/components/playlist/selector.cpp
 modules/gui/qt4/components/playlist/selector.hpp
 modules/gui/qt4/components/playlist/standardpanel.cpp
-modules/gui/qt4/components/preferences.cpp
-modules/gui/qt4/components/preferences.hpp
 modules/gui/qt4/components/preferences_widgets.cpp
 modules/gui/qt4/components/preferences_widgets.hpp
 modules/gui/qt4/components/simple_preferences.cpp
@@ -612,7 +612,6 @@ modules/gui/qt4/ui/sout.ui
 modules/gui/qt4/ui/sprefs_audio.ui
 modules/gui/qt4/ui/sprefs_input.ui
 modules/gui/qt4/ui/sprefs_interface.ui
-modules/gui/qt4/ui/sprefs_playlist.ui
 modules/gui/qt4/ui/sprefs_subtitles.ui
 modules/gui/qt4/ui/sprefs_video.ui
 modules/gui/qt4/ui/streampanel.ui

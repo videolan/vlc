@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-03 11:23+0200\n"
+"POT-Creation-Date: 2007-04-10 13:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -317,7 +317,7 @@ msgid "VLC's implementation of Video On Demand"
 msgstr ""
 
 #: include/vlc_config_cat.h:186 src/libvlc-module.c:1670
-#: src/playlist/engine.c:107 src/playlist/engine.c:109
+#: src/playlist/engine.c:109 src/playlist/engine.c:111
 #: modules/demux/playlist/playlist.c:55 modules/demux/playlist/playlist.c:56
 #: modules/gui/beos/InterfaceWindow.cpp:230
 #: modules/gui/beos/InterfaceWindow.cpp:324 modules/gui/macosx/intf.m:533
@@ -793,7 +793,7 @@ msgstr ""
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
 #: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:138
 #: modules/control/gestures.c:89 modules/video_filter/logo.c:97
-#: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:180
+#: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:200
 #: modules/video_filter/osdmenu.c:75 modules/video_filter/rss.c:164
 msgid "Left"
 msgstr ""
@@ -802,7 +802,7 @@ msgstr ""
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
 #: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:138
 #: modules/control/gestures.c:89 modules/video_filter/logo.c:97
-#: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:180
+#: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:200
 #: modules/video_filter/osdmenu.c:75 modules/video_filter/rss.c:164
 msgid "Right"
 msgstr ""
@@ -1075,7 +1075,6 @@ msgstr ""
 #: modules/gui/macosx/interaction.m:145 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/playlistinfo.m:60 modules/gui/macosx/prefs.m:122
 #: modules/gui/macosx/prefs.m:142 modules/gui/macosx/wizard.m:362
-#: modules/gui/qt4/dialogs/preferences.cpp:91
 msgid "Cancel"
 msgstr ""
 
@@ -1108,62 +1107,62 @@ msgstr ""
 msgid "Mouse Gestures"
 msgstr ""
 
-#: src/libvlc-common.c:279 src/libvlc-common.c:450 src/misc/modules.c:1734
-#: src/misc/modules.c:2058
+#: src/libvlc-common.c:281 src/libvlc-common.c:452 src/misc/modules.c:1725
+#: src/misc/modules.c:2051
 msgid "C"
 msgstr ""
 
-#: src/libvlc-common.c:295
+#: src/libvlc-common.c:297
 msgid "Help options"
 msgstr ""
 
-#: src/libvlc-common.c:1394 src/misc/configuration.c:1219
+#: src/libvlc-common.c:1469 src/misc/configuration.c:1219
 msgid "string"
 msgstr ""
 
-#: src/libvlc-common.c:1413 src/misc/configuration.c:1183
+#: src/libvlc-common.c:1488 src/misc/configuration.c:1183
 msgid "integer"
 msgstr ""
 
-#: src/libvlc-common.c:1433 src/misc/configuration.c:1208
+#: src/libvlc-common.c:1515 src/misc/configuration.c:1208
 msgid "float"
 msgstr ""
 
-#: src/libvlc-common.c:1440
+#: src/libvlc-common.c:1528
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc-common.c:1441
+#: src/libvlc-common.c:1529
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc-common.c:1623
+#: src/libvlc-common.c:1748
 #, c-format
 msgid "VLC version %s\n"
 msgstr ""
 
-#: src/libvlc-common.c:1624
+#: src/libvlc-common.c:1749
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
 msgstr ""
 
-#: src/libvlc-common.c:1626
+#: src/libvlc-common.c:1751
 #, c-format
 msgid "Compiler: %s\n"
 msgstr ""
 
-#: src/libvlc-common.c:1629
+#: src/libvlc-common.c:1754
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
 msgstr ""
 
-#: src/libvlc-common.c:1661
+#: src/libvlc-common.c:1786
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 
-#: src/libvlc-common.c:1681
+#: src/libvlc-common.c:1806
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -1564,8 +1563,8 @@ msgid ""
 "not take place, thus saving some processing power."
 msgstr ""
 
-#: src/libvlc-module.c:245 modules/codec/fake.c:48
-#: modules/stream_out/mosaic_bridge.c:108 modules/stream_out/transcode.c:73
+#: src/libvlc-module.c:245 modules/codec/fake.c:50
+#: modules/stream_out/mosaic_bridge.c:129 modules/stream_out/transcode.c:73
 #: modules/visualization/visual/visual.c:43
 msgid "Video width"
 msgstr ""
@@ -1576,8 +1575,8 @@ msgid ""
 "characteristics."
 msgstr ""
 
-#: src/libvlc-module.c:250 modules/codec/fake.c:51
-#: modules/stream_out/mosaic_bridge.c:111 modules/stream_out/transcode.c:76
+#: src/libvlc-module.c:250 modules/codec/fake.c:53
+#: modules/stream_out/mosaic_bridge.c:132 modules/stream_out/transcode.c:76
 #: modules/visualization/visual/visual.c:47
 msgid "Video height"
 msgstr ""
@@ -1632,49 +1631,49 @@ msgstr ""
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
 #: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:138
 #: modules/video_filter/logo.c:97 modules/video_filter/marq.c:126
-#: modules/video_filter/mosaic.c:180 modules/video_filter/osdmenu.c:75
+#: modules/video_filter/mosaic.c:200 modules/video_filter/osdmenu.c:75
 #: modules/video_filter/rss.c:164
 msgid "Center"
 msgstr ""
 
 #: src/libvlc-module.c:277 modules/codec/dvbsub.c:70
 #: modules/video_filter/logo.c:97 modules/video_filter/marq.c:126
-#: modules/video_filter/mosaic.c:180 modules/video_filter/osdmenu.c:75
+#: modules/video_filter/mosaic.c:200 modules/video_filter/osdmenu.c:75
 #: modules/video_filter/rss.c:164
 msgid "Top"
 msgstr ""
 
 #: src/libvlc-module.c:277 modules/codec/dvbsub.c:70
 #: modules/video_filter/logo.c:97 modules/video_filter/marq.c:126
-#: modules/video_filter/mosaic.c:180 modules/video_filter/osdmenu.c:75
+#: modules/video_filter/mosaic.c:200 modules/video_filter/osdmenu.c:75
 #: modules/video_filter/rss.c:164
 msgid "Bottom"
 msgstr ""
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:201 modules/video_filter/osdmenu.c:76
 #: modules/video_filter/rss.c:165
 msgid "Top-Left"
 msgstr ""
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:201 modules/video_filter/osdmenu.c:76
 #: modules/video_filter/rss.c:165
 msgid "Top-Right"
 msgstr ""
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:201 modules/video_filter/osdmenu.c:76
 #: modules/video_filter/rss.c:165
 msgid "Bottom-Left"
 msgstr ""
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:181 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:201 modules/video_filter/osdmenu.c:76
 #: modules/video_filter/rss.c:165
 msgid "Bottom-Right"
 msgstr ""
@@ -1982,7 +1981,7 @@ msgid ""
 "interface. On Ethernet it is usually 1500 bytes."
 msgstr ""
 
-#: src/libvlc-module.c:442 modules/stream_out/rtp.c:92
+#: src/libvlc-module.c:442 modules/stream_out/rtp.c:93
 msgid "Hop limit (TTL)"
 msgstr ""
 
@@ -3747,12 +3746,13 @@ msgid "main program"
 msgstr ""
 
 #: src/libvlc-module.c:2183
-msgid "print help for VLC (can be combined with --advanced)"
+msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
 
 #: src/libvlc-module.c:2189
 msgid ""
-"print help for VLC and all its modules (can be combined with --advanced)"
+"print help for VLC and all its modules (can be combined with --advanced and "
+"--help-verbose)"
 msgstr ""
 
 #: src/libvlc-module.c:2194
@@ -3768,7 +3768,9 @@ msgid "print a list of available modules"
 msgstr ""
 
 #: src/libvlc-module.c:2211
-msgid "print help on a specific module (can be combined with --advanced)"
+msgid ""
+"print help on a specific module (can be combined with --advanced and --help-"
+"verbose)"
 msgstr ""
 
 #: src/libvlc-module.c:2216
@@ -3799,7 +3801,7 @@ msgstr ""
 msgid "key"
 msgstr ""
 
-#: src/playlist/engine.c:125 src/playlist/engine.c:127
+#: src/playlist/engine.c:127 src/playlist/engine.c:129
 #: src/playlist/loadsave.c:105
 msgid "Media Library"
 msgstr ""
@@ -5382,7 +5384,7 @@ msgid "Number of frames per second (eg. 24, 25, 29.97, 30)."
 msgstr ""
 
 #: modules/access/fake.c:48 modules/stream_out/bridge.c:37
-#: modules/stream_out/mosaic_bridge.c:104
+#: modules/stream_out/mosaic_bridge.c:125
 msgid "ID"
 msgstr ""
 
@@ -5402,7 +5404,7 @@ msgid ""
 "meaning that the stream is unlimited)."
 msgstr ""
 
-#: modules/access/fake.c:58 modules/codec/fake.c:75
+#: modules/access/fake.c:58 modules/codec/fake.c:80
 msgid "Fake"
 msgstr ""
 
@@ -5429,7 +5431,7 @@ msgid "File input"
 msgstr ""
 
 #: modules/access/file.c:90 modules/access_output/file.c:69
-#: modules/audio_output/file.c:109 modules/gui/beos/InterfaceWindow.cpp:262
+#: modules/audio_output/file.c:110 modules/gui/beos/InterfaceWindow.cpp:262
 #: modules/gui/beos/MediaControlView.cpp:1233
 #: modules/gui/beos/PlayListWindow.cpp:85 modules/gui/macosx/open.m:162
 #: modules/gui/macosx/open.m:402 modules/gui/macosx/output.m:142
@@ -5649,7 +5651,7 @@ msgid "Norm of the stream (Automatic, SECAM, PAL, or NTSC)."
 msgstr ""
 
 #: modules/access/pvr.c:62 modules/access/v4l.c:105
-#: modules/video_filter/mosaic.c:101
+#: modules/video_filter/mosaic.c:102
 msgid "Width"
 msgstr ""
 
@@ -5658,7 +5660,7 @@ msgid "Width of the stream to capture (-1 for autodetection)."
 msgstr ""
 
 #: modules/access/pvr.c:66 modules/access/v4l.c:108
-#: modules/video_filter/mosaic.c:99
+#: modules/video_filter/mosaic.c:100
 msgid "Height"
 msgstr ""
 
@@ -7060,43 +7062,43 @@ msgstr ""
 msgid "Esound server"
 msgstr ""
 
-#: modules/audio_output/file.c:78
+#: modules/audio_output/file.c:79
 msgid "Output format"
 msgstr ""
 
-#: modules/audio_output/file.c:79
+#: modules/audio_output/file.c:80
 msgid ""
 "One of \"u8\", \"s8\", \"u16\", \"s16\", \"u16_le\", \"s16_le\", \"u16_be\", "
 "\"s16_be\", \"fixed32\", \"float32\" or \"spdif\""
 msgstr ""
 
-#: modules/audio_output/file.c:82
+#: modules/audio_output/file.c:83
 msgid "Number of output channels"
 msgstr ""
 
-#: modules/audio_output/file.c:83
+#: modules/audio_output/file.c:84
 msgid ""
 "By default, all the channels of the incoming will be saved but you can "
 "restrict the number of channels here."
 msgstr ""
 
-#: modules/audio_output/file.c:86
+#: modules/audio_output/file.c:87
 msgid "Add WAVE header"
 msgstr ""
 
-#: modules/audio_output/file.c:87
+#: modules/audio_output/file.c:88
 msgid "Instead of writing a raw file, you can add a WAV header to the file."
 msgstr ""
 
-#: modules/audio_output/file.c:104
+#: modules/audio_output/file.c:105
 msgid "Output file"
 msgstr ""
 
-#: modules/audio_output/file.c:105
+#: modules/audio_output/file.c:106
 msgid "File to which the audio samples will be written to."
 msgstr ""
 
-#: modules/audio_output/file.c:108
+#: modules/audio_output/file.c:109
 msgid "File audio output"
 msgstr ""
 
@@ -7275,57 +7277,65 @@ msgstr ""
 msgid "AAC extension"
 msgstr ""
 
-#: modules/codec/fake.c:45 modules/video_output/image.c:82
+#: modules/codec/fake.c:47 modules/video_output/image.c:82
 msgid "Image file"
 msgstr ""
 
-#: modules/codec/fake.c:47
+#: modules/codec/fake.c:49
 msgid "Path of the image file for fake input."
 msgstr ""
 
-#: modules/codec/fake.c:50 modules/stream_out/mosaic_bridge.c:110
+#: modules/codec/fake.c:52 modules/stream_out/mosaic_bridge.c:131
 #: modules/stream_out/transcode.c:75
 msgid "Output video width."
 msgstr ""
 
-#: modules/codec/fake.c:53 modules/stream_out/mosaic_bridge.c:113
+#: modules/codec/fake.c:55 modules/stream_out/mosaic_bridge.c:134
 #: modules/stream_out/transcode.c:78
 msgid "Output video height."
 msgstr ""
 
-#: modules/codec/fake.c:54 modules/video_filter/mosaic.c:132
+#: modules/codec/fake.c:56 modules/video_filter/mosaic.c:142
 msgid "Keep aspect ratio"
 msgstr ""
 
-#: modules/codec/fake.c:56
+#: modules/codec/fake.c:58
 msgid "Consider width and height as maximum values."
 msgstr ""
 
-#: modules/codec/fake.c:57
+#: modules/codec/fake.c:59
 msgid "Background aspect ratio"
 msgstr ""
 
-#: modules/codec/fake.c:59
+#: modules/codec/fake.c:61
 msgid "Aspect ratio of the image file (4:3, 16:9). Default is square pixels."
 msgstr ""
 
-#: modules/codec/fake.c:60 modules/stream_out/transcode.c:67
+#: modules/codec/fake.c:62 modules/stream_out/transcode.c:67
 msgid "Deinterlace video"
 msgstr ""
 
-#: modules/codec/fake.c:62
+#: modules/codec/fake.c:64
 msgid "Deinterlace the image after loading it."
 msgstr ""
 
-#: modules/codec/fake.c:63 modules/stream_out/transcode.c:70
+#: modules/codec/fake.c:65 modules/stream_out/transcode.c:70
 msgid "Deinterlace module"
 msgstr ""
 
-#: modules/codec/fake.c:65
+#: modules/codec/fake.c:67
 msgid "Deinterlace module to use."
 msgstr ""
 
-#: modules/codec/fake.c:76
+#: modules/codec/fake.c:68
+msgid "Chroma used."
+msgstr ""
+
+#: modules/codec/fake.c:70
+msgid "Force use of a specific chroma for output. Default is I420."
+msgstr ""
+
+#: modules/codec/fake.c:81
 msgid "Fake video decoder"
 msgstr ""
 
@@ -8750,7 +8760,7 @@ msgid "temporal"
 msgstr ""
 
 #: modules/codec/x264.c:340 modules/gui/pda/pda_interface.c:743
-#: modules/video_filter/mosaic.c:176
+#: modules/video_filter/mosaic.c:196
 msgid "auto"
 msgstr ""
 
@@ -8758,7 +8768,7 @@ msgstr ""
 msgid "H.264/MPEG4 AVC encoder (using x264 library)"
 msgstr ""
 
-#: modules/codec/xvmc/xxmc.c:100
+#: modules/codec/xvmc/xxmc.c:99
 msgid "MPEG I/II hw video decoder (using libmpeg2)"
 msgstr ""
 
@@ -9065,340 +9075,340 @@ msgstr ""
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr ""
 
-#: modules/control/rc.c:833
+#: modules/control/rc.c:797
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr ""
 
-#: modules/control/rc.c:866
+#: modules/control/rc.c:830
 msgid "+----[ Remote control commands ]"
 msgstr ""
 
-#: modules/control/rc.c:868
+#: modules/control/rc.c:832
 msgid "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
 msgstr ""
 
-#: modules/control/rc.c:869
+#: modules/control/rc.c:833
 msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
 msgstr ""
 
-#: modules/control/rc.c:870
+#: modules/control/rc.c:834
 msgid "| playlist . . . . .  show items currently in playlist"
 msgstr ""
 
-#: modules/control/rc.c:871
+#: modules/control/rc.c:835
 msgid "| play . . . . . . . . . . . . . . . . . . play stream"
 msgstr ""
 
-#: modules/control/rc.c:872
+#: modules/control/rc.c:836
 msgid "| stop . . . . . . . . . . . . . . . . . . stop stream"
 msgstr ""
 
-#: modules/control/rc.c:873
+#: modules/control/rc.c:837
 msgid "| next . . . . . . . . . . . . . .  next playlist item"
 msgstr ""
 
-#: modules/control/rc.c:874
+#: modules/control/rc.c:838
 msgid "| prev . . . . . . . . . . . .  previous playlist item"
 msgstr ""
 
-#: modules/control/rc.c:875
+#: modules/control/rc.c:839
 msgid "| goto . . . . . . . . . . . . . .  goto item at index"
 msgstr ""
 
-#: modules/control/rc.c:876
+#: modules/control/rc.c:840
 msgid "| repeat [on|off] . . . .  toggle playlist item repeat"
 msgstr ""
 
-#: modules/control/rc.c:877
+#: modules/control/rc.c:841
 msgid "| loop [on|off] . . . . . .  toggle playlist item loop"
 msgstr ""
 
-#: modules/control/rc.c:878
+#: modules/control/rc.c:842
 msgid "| clear . . . . . . . . . . . . .   clear the playlist"
 msgstr ""
 
-#: modules/control/rc.c:879
+#: modules/control/rc.c:843
 msgid "| status . . . . . . . . . . . current playlist status"
 msgstr ""
 
-#: modules/control/rc.c:880
+#: modules/control/rc.c:844
 msgid "| title [X]  . . . . . . set/get title in current item"
 msgstr ""
 
-#: modules/control/rc.c:881
+#: modules/control/rc.c:845
 msgid "| title_n  . . . . . . . .  next title in current item"
 msgstr ""
 
-#: modules/control/rc.c:882
+#: modules/control/rc.c:846
 msgid "| title_p  . . . . . .  previous title in current item"
 msgstr ""
 
-#: modules/control/rc.c:883
+#: modules/control/rc.c:847
 msgid "| chapter [X]  . . . . set/get chapter in current item"
 msgstr ""
 
-#: modules/control/rc.c:884
+#: modules/control/rc.c:848
 msgid "| chapter_n  . . . . . .  next chapter in current item"
 msgstr ""
 
-#: modules/control/rc.c:885
+#: modules/control/rc.c:849
 msgid "| chapter_p  . . . .  previous chapter in current item"
 msgstr ""
 
-#: modules/control/rc.c:887
+#: modules/control/rc.c:851
 msgid "| seek X . . . seek in seconds, for instance `seek 12'"
 msgstr ""
 
-#: modules/control/rc.c:888
+#: modules/control/rc.c:852
 msgid "| pause  . . . . . . . . . . . . . . . .  toggle pause"
 msgstr ""
 
-#: modules/control/rc.c:889
+#: modules/control/rc.c:853
 msgid "| fastforward  . . . . . . . .  .  set to maximum rate"
 msgstr ""
 
-#: modules/control/rc.c:890
+#: modules/control/rc.c:854
 msgid "| rewind  . . . . . . . . . . . .  set to minimum rate"
 msgstr ""
 
-#: modules/control/rc.c:891
+#: modules/control/rc.c:855
 msgid "| faster . . . . . . . . . .  faster playing of stream"
 msgstr ""
 
-#: modules/control/rc.c:892
+#: modules/control/rc.c:856
 msgid "| slower . . . . . . . . . .  slower playing of stream"
 msgstr ""
 
-#: modules/control/rc.c:893
+#: modules/control/rc.c:857
 msgid "| normal . . . . . . . . . .  normal playing of stream"
 msgstr ""
 
-#: modules/control/rc.c:894
+#: modules/control/rc.c:858
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
 msgstr ""
 
-#: modules/control/rc.c:895
+#: modules/control/rc.c:859
 msgid "| info . . . . .  information about the current stream"
 msgstr ""
 
-#: modules/control/rc.c:896
+#: modules/control/rc.c:860
 msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr ""
 
-#: modules/control/rc.c:897
+#: modules/control/rc.c:861
 msgid "| is_playing . . . .  1 if a stream plays, 0 otherwise"
 msgstr ""
 
-#: modules/control/rc.c:898
+#: modules/control/rc.c:862
 msgid "| get_title . . . . .  the title of the current stream"
 msgstr ""
 
-#: modules/control/rc.c:899
+#: modules/control/rc.c:863
 msgid "| get_length . . . .  the length of the current stream"
 msgstr ""
 
-#: modules/control/rc.c:901
+#: modules/control/rc.c:865
 msgid "| volume [X] . . . . . . . . . .  set/get audio volume"
 msgstr ""
 
-#: modules/control/rc.c:902
+#: modules/control/rc.c:866
 msgid "| volup [X]  . . . . . . .  raise audio volume X steps"
 msgstr ""
 
-#: modules/control/rc.c:903
+#: modules/control/rc.c:867
 msgid "| voldown [X]  . . . . . .  lower audio volume X steps"
 msgstr ""
 
-#: modules/control/rc.c:904
+#: modules/control/rc.c:868
 msgid "| adev [X] . . . . . . . . . . .  set/get audio device"
 msgstr ""
 
-#: modules/control/rc.c:905
+#: modules/control/rc.c:869
 msgid "| achan [X]. . . . . . . . . .  set/get audio channels"
 msgstr ""
 
-#: modules/control/rc.c:906
+#: modules/control/rc.c:870
 msgid "| atrack [X] . . . . . . . . . . . set/get audio track"
 msgstr ""
 
-#: modules/control/rc.c:907
+#: modules/control/rc.c:871
 msgid "| vtrack [X] . . . . . . . . . . . set/get video track"
 msgstr ""
 
-#: modules/control/rc.c:908
+#: modules/control/rc.c:872
 msgid "| vratio [X]  . . . . . . . set/get video aspect ratio"
 msgstr ""
 
-#: modules/control/rc.c:909
+#: modules/control/rc.c:873
 msgid "| vcrop [X]  . . . . . . . . . . .  set/get video crop"
 msgstr ""
 
-#: modules/control/rc.c:910
+#: modules/control/rc.c:874
 msgid "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
 msgstr ""
 
-#: modules/control/rc.c:911
+#: modules/control/rc.c:875
 msgid "| strack [X] . . . . . . . . . set/get subtitles track"
 msgstr ""
 
-#: modules/control/rc.c:912
+#: modules/control/rc.c:876
 msgid "| key [hotkey name] . . . . . .  simulate hotkey press"
 msgstr ""
 
-#: modules/control/rc.c:913
+#: modules/control/rc.c:877
 msgid "| menu . . [on|off|up|down|left|right|select] use menu"
 msgstr ""
 
-#: modules/control/rc.c:918
+#: modules/control/rc.c:882
 msgid "| @name marq-marquee  STRING  . . overlay STRING in video"
 msgstr ""
 
-#: modules/control/rc.c:919
+#: modules/control/rc.c:883
 msgid "| @name marq-x X . . . . . . . . . . . .offset from left"
 msgstr ""
 
-#: modules/control/rc.c:920
+#: modules/control/rc.c:884
 msgid "| @name marq-y Y . . . . . . . . . . . . offset from top"
 msgstr ""
 
-#: modules/control/rc.c:921
+#: modules/control/rc.c:885
 msgid "| @name marq-position #. . .  .relative position control"
 msgstr ""
 
-#: modules/control/rc.c:922
+#: modules/control/rc.c:886
 msgid "| @name marq-color # . . . . . . . . . . font color, RGB"
 msgstr ""
 
-#: modules/control/rc.c:923
+#: modules/control/rc.c:887
 msgid "| @name marq-opacity # . . . . . . . . . . . . . opacity"
 msgstr ""
 
-#: modules/control/rc.c:924
+#: modules/control/rc.c:888
 msgid "| @name marq-timeout T. . . . . . . . . . timeout, in ms"
 msgstr ""
 
-#: modules/control/rc.c:925
+#: modules/control/rc.c:889
 msgid "| @name marq-size # . . . . . . . . font size, in pixels"
 msgstr ""
 
-#: modules/control/rc.c:927
+#: modules/control/rc.c:891
 msgid "| @name logo-file STRING . . .the overlay file path/name"
 msgstr ""
 
-#: modules/control/rc.c:928
+#: modules/control/rc.c:892
 msgid "| @name logo-x X . . . . . . . . . . . .offset from left"
 msgstr ""
 
-#: modules/control/rc.c:929
+#: modules/control/rc.c:893
 msgid "| @name logo-y Y . . . . . . . . . . . . offset from top"
 msgstr ""
 
-#: modules/control/rc.c:930
+#: modules/control/rc.c:894
 msgid "| @name logo-position #. . . . . . . . relative position"
 msgstr ""
 
-#: modules/control/rc.c:931
+#: modules/control/rc.c:895
 msgid "| @name logo-transparency #. . . . . . . . .transparency"
 msgstr ""
 
-#: modules/control/rc.c:933
+#: modules/control/rc.c:897
 msgid "| @name mosaic-alpha # . . . . . . . . . . . . . . alpha"
 msgstr ""
 
-#: modules/control/rc.c:934
+#: modules/control/rc.c:898
 msgid "| @name mosaic-height #. . . . . . . . . . . . . .height"
 msgstr ""
 
-#: modules/control/rc.c:935
+#: modules/control/rc.c:899
 msgid "| @name mosaic-width # . . . . . . . . . . . . . . width"
 msgstr ""
 
-#: modules/control/rc.c:936
+#: modules/control/rc.c:900
 msgid "| @name mosaic-xoffset # . . . .top left corner position"
 msgstr ""
 
-#: modules/control/rc.c:937
+#: modules/control/rc.c:901
 msgid "| @name mosaic-yoffset # . . . .top left corner position"
 msgstr ""
 
-#: modules/control/rc.c:938
+#: modules/control/rc.c:902
 msgid "| @name mosaic-offsets x,y(,x,y)*. . . . list of offsets"
 msgstr ""
 
-#: modules/control/rc.c:939
+#: modules/control/rc.c:903
 msgid "| @name mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
 msgstr ""
 
-#: modules/control/rc.c:940
+#: modules/control/rc.c:904
 msgid "| @name mosaic-vborder # . . . . . . . . vertical border"
 msgstr ""
 
-#: modules/control/rc.c:941
+#: modules/control/rc.c:905
 msgid "| @name mosaic-hborder # . . . . . . . horizontal border"
 msgstr ""
 
-#: modules/control/rc.c:942
+#: modules/control/rc.c:906
 msgid "| @name mosaic-position {0=auto,1=fixed} . . . .position"
 msgstr ""
 
-#: modules/control/rc.c:943
+#: modules/control/rc.c:907
 msgid "| @name mosaic-rows #. . . . . . . . . . .number of rows"
 msgstr ""
 
-#: modules/control/rc.c:944
+#: modules/control/rc.c:908
 msgid "| @name mosaic-cols #. . . . . . . . . . .number of cols"
 msgstr ""
 
-#: modules/control/rc.c:945
+#: modules/control/rc.c:909
 msgid "| @name mosaic-order id(,id)* . . . . order of pictures "
 msgstr ""
 
-#: modules/control/rc.c:946
+#: modules/control/rc.c:910
 msgid "| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
 msgstr ""
 
-#: modules/control/rc.c:948
+#: modules/control/rc.c:912
 msgid ""
 "| check-updates [newer] [equal] [older]\n"
 "|               [undef] [info] [source] [binary] [plugin]"
 msgstr ""
 
-#: modules/control/rc.c:952
+#: modules/control/rc.c:916
 msgid "| help . . . . . . . . . . . . . . . this help message"
 msgstr ""
 
-#: modules/control/rc.c:953
+#: modules/control/rc.c:917
 msgid "| longhelp . . . . . . . . . . . a longer help message"
 msgstr ""
 
-#: modules/control/rc.c:954
+#: modules/control/rc.c:918
 msgid "| logout . . . . . . .  exit (if in socket connection)"
 msgstr ""
 
-#: modules/control/rc.c:955
+#: modules/control/rc.c:919
 msgid "| quit . . . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr ""
 
-#: modules/control/rc.c:957
+#: modules/control/rc.c:921
 msgid "+----[ end of help ]"
 msgstr ""
 
-#: modules/control/rc.c:1067
+#: modules/control/rc.c:1031
 msgid "Press menu select or pause to continue."
 msgstr ""
 
-#: modules/control/rc.c:1305 modules/control/rc.c:1517
-#: modules/control/rc.c:1587 modules/control/rc.c:1756
-#: modules/control/rc.c:1855
+#: modules/control/rc.c:1269 modules/control/rc.c:1481
+#: modules/control/rc.c:1551 modules/control/rc.c:1720
+#: modules/control/rc.c:1819
 msgid "Type 'menu select' or 'pause' to continue."
 msgstr ""
 
-#: modules/control/rc.c:1373
+#: modules/control/rc.c:1337
 msgid "goto is deprecated"
 msgstr ""
 
-#: modules/control/rc.c:1840 modules/control/rc.c:1879
+#: modules/control/rc.c:1804 modules/control/rc.c:1843
 msgid "Please provide one of the following parameters:"
 msgstr ""
 
@@ -9425,7 +9435,7 @@ msgstr ""
 #: modules/gui/macosx/open.m:182 modules/gui/macosx/output.m:147
 #: modules/gui/wxwidgets/dialogs/open.cpp:826
 #: modules/gui/wxwidgets/dialogs/open.cpp:853
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:531 modules/stream_out/rtp.c:82
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:531 modules/stream_out/rtp.c:83
 msgid "Port"
 msgstr ""
 
@@ -10342,7 +10352,6 @@ msgstr ""
 
 #: modules/gui/beos/PreferencesWindow.cpp:254 modules/gui/macosx/output.m:526
 #: modules/gui/macosx/playlist.m:660 modules/gui/macosx/prefs.m:121
-#: modules/gui/qt4/dialogs/preferences.cpp:90
 msgid "Save"
 msgstr ""
 
@@ -10864,7 +10873,7 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:632 modules/gui/macosx/intf.m:665
 #: modules/gui/macosx/playlist.m:423 modules/gui/macosx/playlistinfo.m:55
-#: modules/gui/macosx/playlistinfo.m:358 modules/gui/qt4/dialogs/help.cpp:92
+#: modules/gui/macosx/playlistinfo.m:358 modules/gui/qt4/dialogs/help.cpp:94
 msgid "Information"
 msgstr ""
 
@@ -11076,7 +11085,7 @@ msgstr ""
 #: modules/gui/macosx/open.m:270
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:215
 #: modules/stream_out/bridge.c:42 modules/stream_out/display.c:42
-#: modules/video_filter/mosaic.c:148
+#: modules/video_filter/mosaic.c:162
 msgid "Delay"
 msgstr ""
 
@@ -11343,7 +11352,7 @@ msgstr ""
 msgid "Reset All"
 msgstr ""
 
-#: modules/gui/macosx/prefs.m:142 modules/gui/qt4/dialogs/preferences.cpp:92
+#: modules/gui/macosx/prefs.m:142
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:296
 msgid "Reset Preferences"
 msgstr ""
@@ -11544,15 +11553,15 @@ msgid "Download now"
 msgstr ""
 
 #: modules/gui/macosx/update.m:89
-msgid "Check for VLC update automatically"
+msgid "Automatically check for updates"
 msgstr ""
 
 #: modules/gui/macosx/update.m:109
-msgid "Do you want VLC to check for update automatically?"
+msgid "Do you want VLC to check for updates automatically?"
 msgstr ""
 
 #: modules/gui/macosx/update.m:110
-msgid "You can change this option later in the VLC update window."
+msgid "You can change this option in VLC's update window later on."
 msgstr ""
 
 #: modules/gui/macosx/update.m:110
@@ -11577,7 +11586,7 @@ msgid "This version of VLC is outdated."
 msgstr ""
 
 #: modules/gui/macosx/update.m:264 modules/gui/macosx/update.m:312
-msgid "This version of VLC is latest available."
+msgid "This version of VLC is the latest available."
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:113
@@ -11851,7 +11860,7 @@ msgid "This page allows to select how the input stream will be sent."
 msgstr ""
 
 #: modules/gui/macosx/wizard.m:406 modules/gui/macosx/wizard.m:467
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:1040 modules/stream_out/rtp.c:51
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:1040 modules/stream_out/rtp.c:52
 msgid "Destination"
 msgstr ""
 
@@ -12582,15 +12591,15 @@ msgstr ""
 msgid "QNX RTOS video and audio output"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:93
+#: modules/gui/qt4/dialogs/help.cpp:95
 msgid "Authors"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:94
+#: modules/gui/qt4/dialogs/help.cpp:96
 msgid "Thanks"
 msgstr ""
 
-#: modules/gui/qt4/dialogs/help.cpp:95
+#: modules/gui/qt4/dialogs/help.cpp:97
 msgid "Distribution License"
 msgstr ""
 
@@ -13292,7 +13301,7 @@ msgid "MMSH"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:474
-#: modules/stream_out/rtp.c:108
+#: modules/stream_out/rtp.c:109
 msgid "RTP"
 msgstr ""
 
@@ -14770,11 +14779,11 @@ msgstr ""
 msgid "video"
 msgstr ""
 
-#: modules/misc/rtsp.c:50
+#: modules/misc/rtsp.c:51
 msgid "RTSP host address"
 msgstr ""
 
-#: modules/misc/rtsp.c:52
+#: modules/misc/rtsp.c:53
 msgid ""
 "This defines the address, port and path the RTSP VOD server will listen on.\n"
 "Syntax is address:port/path. The default is to listen on all interfaces "
@@ -14782,25 +14791,25 @@ msgid ""
 "To listen only on the local interface, use \"localhost\" as address."
 msgstr ""
 
-#: modules/misc/rtsp.c:57
+#: modules/misc/rtsp.c:58
 msgid "Maximum number of connections"
 msgstr ""
 
-#: modules/misc/rtsp.c:58
+#: modules/misc/rtsp.c:59
 msgid ""
 "This limits the maximum number of clients that can connect to the RTSP VOD. "
 "0 means no limit."
 msgstr ""
 
-#: modules/misc/rtsp.c:61
+#: modules/misc/rtsp.c:62
 msgid "MUX for RAW RTSP transport"
 msgstr ""
 
-#: modules/misc/rtsp.c:63
+#: modules/misc/rtsp.c:64
 msgid "Sets the timeout option in the RTSP session string"
 msgstr ""
 
-#: modules/misc/rtsp.c:65
+#: modules/misc/rtsp.c:66
 msgid ""
 "Defines what timeout option to add to the RTSP session ID string. Setting it "
 "to a negative number removes the timeout option entirely. This is needed by "
@@ -14808,11 +14817,11 @@ msgid ""
 "The default is 5."
 msgstr ""
 
-#: modules/misc/rtsp.c:71
+#: modules/misc/rtsp.c:72
 msgid "RTSP VoD"
 msgstr ""
 
-#: modules/misc/rtsp.c:72
+#: modules/misc/rtsp.c:73
 msgid "RTSP VoD server"
 msgstr ""
 
@@ -15498,35 +15507,43 @@ msgstr ""
 msgid "Gathering stream output"
 msgstr ""
 
-#: modules/stream_out/mosaic_bridge.c:106
+#: modules/stream_out/mosaic_bridge.c:127
 msgid "Specify an identifier string for this subpicture"
 msgstr ""
 
-#: modules/stream_out/mosaic_bridge.c:114
+#: modules/stream_out/mosaic_bridge.c:135
 msgid "Sample aspect ratio"
 msgstr ""
 
-#: modules/stream_out/mosaic_bridge.c:116
+#: modules/stream_out/mosaic_bridge.c:137
 msgid "Sample aspect ratio of the destination (1:1, 3:4, 2:3)."
 msgstr ""
 
-#: modules/stream_out/mosaic_bridge.c:121
+#: modules/stream_out/mosaic_bridge.c:138
+msgid "Transparency mask"
+msgstr ""
+
+#: modules/stream_out/mosaic_bridge.c:140
+msgid "Alpha blending transparency mask. Use's a png alpha channel."
+msgstr ""
+
+#: modules/stream_out/mosaic_bridge.c:145
 msgid "Mosaic bridge"
 msgstr ""
 
-#: modules/stream_out/mosaic_bridge.c:122
+#: modules/stream_out/mosaic_bridge.c:146
 msgid "Mosaic bridge stream output"
 msgstr ""
 
-#: modules/stream_out/rtp.c:53
+#: modules/stream_out/rtp.c:54
 msgid "This is the output URL that will be used."
 msgstr ""
 
-#: modules/stream_out/rtp.c:54
+#: modules/stream_out/rtp.c:55
 msgid "SDP"
 msgstr ""
 
-#: modules/stream_out/rtp.c:56
+#: modules/stream_out/rtp.c:57
 msgid ""
 "This allows you to specify how the SDP (Session Descriptor) for this RTP "
 "session will be made available. You must use an url: http://location to "
@@ -15534,95 +15551,95 @@ msgid ""
 "SDP to be announced via SAP."
 msgstr ""
 
-#: modules/stream_out/rtp.c:60
+#: modules/stream_out/rtp.c:61
 msgid "Muxer"
 msgstr ""
 
-#: modules/stream_out/rtp.c:62
+#: modules/stream_out/rtp.c:63
 msgid ""
 "This allows you to specify the muxer used for the streaming output. Default "
 "is to use no muxer (standard RTP stream)."
 msgstr ""
 
-#: modules/stream_out/rtp.c:65 modules/stream_out/standard.c:49
+#: modules/stream_out/rtp.c:66 modules/stream_out/standard.c:49
 msgid "Session name"
 msgstr ""
 
-#: modules/stream_out/rtp.c:67
+#: modules/stream_out/rtp.c:68
 msgid ""
 "This is the name of the session that will be announced in the SDP (Session "
 "Descriptor)."
 msgstr ""
 
-#: modules/stream_out/rtp.c:69
+#: modules/stream_out/rtp.c:70
 msgid "Session description"
 msgstr ""
 
-#: modules/stream_out/rtp.c:71
+#: modules/stream_out/rtp.c:72
 msgid ""
 "This allows you to give a broader description of the stream, that will be "
 "announced in the SDP (Session Descriptor)."
 msgstr ""
 
-#: modules/stream_out/rtp.c:73 modules/stream_out/standard.c:63
+#: modules/stream_out/rtp.c:74 modules/stream_out/standard.c:63
 msgid "Session URL"
 msgstr ""
 
-#: modules/stream_out/rtp.c:75 modules/stream_out/standard.c:65
+#: modules/stream_out/rtp.c:76 modules/stream_out/standard.c:65
 msgid ""
 "This allows you to give an URL with more details about the stream (often the "
 "website of the streaming organization), that will be announced in the SDP "
 "(Session Descriptor)."
 msgstr ""
 
-#: modules/stream_out/rtp.c:78 modules/stream_out/standard.c:68
+#: modules/stream_out/rtp.c:79 modules/stream_out/standard.c:68
 msgid "Session email"
 msgstr ""
 
-#: modules/stream_out/rtp.c:80 modules/stream_out/standard.c:70
+#: modules/stream_out/rtp.c:81 modules/stream_out/standard.c:70
 msgid ""
 "This allows you to give a contact mail address for the stream, that will be "
 "announced in the SDP (Session Descriptor)."
 msgstr ""
 
-#: modules/stream_out/rtp.c:84
+#: modules/stream_out/rtp.c:85
 msgid "This allows you to specify the base port for the RTP streaming."
 msgstr ""
 
-#: modules/stream_out/rtp.c:85
+#: modules/stream_out/rtp.c:86
 msgid "Audio port"
 msgstr ""
 
-#: modules/stream_out/rtp.c:87
+#: modules/stream_out/rtp.c:88
 msgid ""
 "This allows you to specify the default audio port for the RTP streaming."
 msgstr ""
 
-#: modules/stream_out/rtp.c:88
+#: modules/stream_out/rtp.c:89
 msgid "Video port"
 msgstr ""
 
-#: modules/stream_out/rtp.c:90
+#: modules/stream_out/rtp.c:91
 msgid ""
 "This allows you to specify the default video port for the RTP streaming."
 msgstr ""
 
-#: modules/stream_out/rtp.c:94
+#: modules/stream_out/rtp.c:95
 msgid ""
 "This is the hop limit (also known as \"Time-To-Live\" or TTL) of the "
 "multicast packets sent by the stream output (0 = use operating system built-"
 "in default)."
 msgstr ""
 
-#: modules/stream_out/rtp.c:98
+#: modules/stream_out/rtp.c:99
 msgid "MP4A LATM"
 msgstr ""
 
-#: modules/stream_out/rtp.c:100
+#: modules/stream_out/rtp.c:101
 msgid "This allows you to stream MPEG4 LATM audio streams (see RFC3016)."
 msgstr ""
 
-#: modules/stream_out/rtp.c:109
+#: modules/stream_out/rtp.c:110
 msgid "RTP stream output"
 msgstr ""
 
@@ -16555,203 +16572,207 @@ msgstr ""
 msgid "Transparency"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:96
+#: modules/video_filter/mosaic.c:97
 msgid ""
 "Transparency of the mosaic foreground pictures. 0 means transparent, 255 "
 "opaque (default)."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:100
+#: modules/video_filter/mosaic.c:101
 msgid "Total height of the mosaic, in pixels."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:102
+#: modules/video_filter/mosaic.c:103
 msgid "Total width of the mosaic, in pixels."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:104
+#: modules/video_filter/mosaic.c:105
 msgid "Top left corner X coordinate"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:105
+#: modules/video_filter/mosaic.c:107
 msgid "X Coordinate of the top-left corner of the mosaic."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:106
+#: modules/video_filter/mosaic.c:108
 msgid "Top left corner Y coordinate"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:107
+#: modules/video_filter/mosaic.c:110
 msgid "Y Coordinate of the top-left corner of the mosaic."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:108
+#: modules/video_filter/mosaic.c:112
 msgid "Border width"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:109
+#: modules/video_filter/mosaic.c:114
 msgid "Width in pixels of the border between miniatures."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:110
+#: modules/video_filter/mosaic.c:115
 msgid "Border height"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:111
+#: modules/video_filter/mosaic.c:117
 msgid "Height in pixels of the border between miniatures."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:113
+#: modules/video_filter/mosaic.c:119
 msgid "Mosaic alignment"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:115
+#: modules/video_filter/mosaic.c:121
 msgid ""
 "You can enforce the mosaic alignment on the video (0=center, 1=left, "
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg "
 "6 = top-right)."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:119
+#: modules/video_filter/mosaic.c:125
 msgid "Positioning method"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:120
+#: modules/video_filter/mosaic.c:127
 msgid ""
 "Positioning method for the mosaic. auto: automatically choose the best "
 "number of rows and columns. fixed: use the user-defined number of rows and "
 "columns. offsets: use the user-defined offsets for each image."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:125 modules/video_filter/panoramix.c:82
+#: modules/video_filter/mosaic.c:132 modules/video_filter/panoramix.c:82
 #: modules/video_filter/wall.c:57
 msgid "Number of rows"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:126
+#: modules/video_filter/mosaic.c:134
 msgid ""
 "Number of image rows in the mosaic (only used if positionning method is set "
 "to \"fixed\")."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:128 modules/video_filter/panoramix.c:78
+#: modules/video_filter/mosaic.c:137 modules/video_filter/panoramix.c:78
 #: modules/video_filter/wall.c:53
 msgid "Number of columns"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:129
+#: modules/video_filter/mosaic.c:139
 msgid ""
 "Number of image columns in the mosaic (only used if positionning method is "
 "set to \"fixed\"."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:133
+#: modules/video_filter/mosaic.c:144
 msgid "Keep the original aspect ratio when resizing mosaic elements."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:135
+#: modules/video_filter/mosaic.c:146
 msgid "Keep original size"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:136
+#: modules/video_filter/mosaic.c:148
 msgid "Keep the original size of mosaic elements."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:138
+#: modules/video_filter/mosaic.c:150
 msgid "Elements order"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:139
+#: modules/video_filter/mosaic.c:152
 msgid ""
 "You can enforce the order of the elements on the mosaic. You must give a "
 "comma-separated list of picture ID(s).These IDs are assigned in the \"mosaic-"
 "bridge\" module."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:143
+#: modules/video_filter/mosaic.c:156
 msgid "Offsets in order"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:144
+#: modules/video_filter/mosaic.c:158
 msgid ""
 "You can enforce the (x,y) offsets of the elements on the mosaic (only used "
 "if positioning method is set to \"offsets\"). You must give a comma-"
 "separated list of coordinates (eg: 10,10,150,10)."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:149
+#: modules/video_filter/mosaic.c:164
 msgid ""
 "Pictures coming from the mosaic elements will be delayed according to this "
 "value (in milliseconds). For high values you will need to raise caching at "
 "input."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:153
+#: modules/video_filter/mosaic.c:168
 msgid "Bluescreen"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:154
+#: modules/video_filter/mosaic.c:170
 msgid ""
 "This effect, also known as \"greenscreen\" or \"chroma key\" blends the "
 "\"blue parts\" of the foreground images of the mosaic on the background "
-"(like wheather forecast presenters). You can choose the \"key\" color for "
-"blending (blue by default)."
+"(like weather forecast). You can choose the \"key\" color for blending (blue "
+"by default)."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:159
+#: modules/video_filter/mosaic.c:175
 msgid "Bluescreen U value"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:160
+#: modules/video_filter/mosaic.c:177
 msgid ""
 "\"U\" value for the bluescreen key color (in YUV values). From 0 to 255. "
 "Defaults to 120 for blue."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:162
+#: modules/video_filter/mosaic.c:179
 msgid "Bluescreen V value"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:163
+#: modules/video_filter/mosaic.c:181
 msgid ""
 "\"V\" value for the bluescreen key color (in YUV values). From 0 to 255. "
 "Defaults to 90 for blue."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:165
+#: modules/video_filter/mosaic.c:183
 msgid "Bluescreen U tolerance"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:166
+#: modules/video_filter/mosaic.c:185
 msgid ""
 "Tolerance of the bluescreen blender on color variations for the U plane. A "
 "value between 10 and 20 seems sensible."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:169
+#: modules/video_filter/mosaic.c:188
 msgid "Bluescreen V tolerance"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:170
+#: modules/video_filter/mosaic.c:190
 msgid ""
 "Tolerance of the bluescreen blender on color variations for the V plane. A "
 "value between 10 and 20 seems sensible."
 msgstr ""
 
-#: modules/video_filter/mosaic.c:176
+#: modules/video_filter/mosaic.c:196
 msgid "fixed"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:176
+#: modules/video_filter/mosaic.c:196
 msgid "offsets"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:186
+#: modules/video_filter/mosaic.c:206
 msgid "Mosaic video sub filter"
 msgstr ""
 
-#: modules/video_filter/mosaic.c:187
+#: modules/video_filter/mosaic.c:207
 msgid "Mosaic"
+msgstr ""
+
+#: modules/video_filter/mosaic.c:259
+msgid "Bluescreen effect"
 msgstr ""
 
 #: modules/video_filter/motionblur.c:50
