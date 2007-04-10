@@ -841,6 +841,11 @@ void path_sanitize( char *str )
      */
     char *prev = str - 1;
 #endif
+#ifdef WIN32
+    /* check drive prefix if path is absolute */
+    if( isalpha(*str) && (':' == *(str+1)) )
+        str += 2;
+#endif
     while( *str )
     {
 #ifdef WIN32

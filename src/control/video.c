@@ -158,13 +158,18 @@ libvlc_video_take_snapshot( libvlc_input_t *p_input, char *psz_filepath,
     vout_thread_t *p_vout = GetVout( p_input, p_e );
     input_thread_t *p_input_thread;
 
-    char path[256];
-
     /* GetVout will raise the exception for us */
     if( !p_vout )
     {
         return;
     }
+
+    if( !psz_filepath )
+    {
+        libvlc_exception_raise( p_e, "filepath is null" );
+        return;
+    }
+
 
     p_input_thread = (input_thread_t*)vlc_object_get(
                                  p_input->p_instance->p_libvlc_int,
@@ -175,8 +180,7 @@ libvlc_video_take_snapshot( libvlc_input_t *p_input, char *psz_filepath,
         return;
     }
 
-    snprintf( path, 255, "%s", psz_filepath );
-    var_SetString( p_vout, "snapshot-path", path );
+    var_SetString( p_vout, "snapshot-path", psz_filepath );
     var_SetString( p_vout, "snapshot-format", "png" );
 
     vout_Control( p_vout, VOUT_SNAPSHOT );
