@@ -2205,6 +2205,11 @@ const module_config_t libvlc_config[] =
         .psz_text = N_("print a list of available modules")
     },
     {
+        .i_type   = CONFIG_ITEM_BOOL,
+        .psz_name = "list-verbose",
+        .psz_text = N_("print a list of available modules with extra detail")
+    },
+    {
         .i_type   = CONFIG_ITEM_STRING,
         .psz_name = "module",
         .i_short  = 'p',

@@ -108,7 +108,7 @@ static inline int LoadMessages (void);
 static int  GetFilenames  ( libvlc_int_t *, int, char *[] );
 static void Help          ( libvlc_int_t *, char const *psz_help_name );
 static void Usage         ( libvlc_int_t *, char const *psz_module_name );
-static void ListModules   ( libvlc_int_t * );
+static void ListModules   ( libvlc_int_t *, vlc_bool_t );
 static void Version       ( void );
 
 #ifdef WIN32
@@ -499,7 +499,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     /* Check for module list option */
     else if( config_GetInt( p_libvlc, "list" ) )
     {
-        ListModules( p_libvlc );
+        ListModules( p_libvlc, VLC_FALSE );
+        b_exit = VLC_TRUE;
+        i_ret = VLC_EEXITSUCCESS;
+    }
+    else if( config_GetInt( p_libvlc, "list-verbose" ) )
+    {
+        ListModules( p_libvlc, VLC_TRUE );
         b_exit = VLC_TRUE;
         i_ret = VLC_EEXITSUCCESS;
     }
@@ -697,7 +703,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
             }
         }
         /* we unreference the connection when we've finished with it */
-	if( p_conn ) dbus_connection_unref( p_conn );
+        if( p_conn ) dbus_connection_unref( p_conn );
     }
 #endif
 
@@ -1335,6 +1341,11 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
     /* List all modules */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
 
+    /* Ugly hack to make sure that the help options always come first
+     * (part 1) */
+    if( !psz_module_name )
+        Usage( p_this, "help" );
+
     /* Enumerate the config for each module */
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
@@ -1362,6 +1373,12 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
         {
             continue;
         }
+
+        b_help_module = !strcmp( "help", p_parser->psz_object_name );
+        /* Ugly hack to make sure that the help options always come first
+         * (part 2) */
+        if( !psz_module_name && b_help_module )
+            continue;
 
         /* Ignore modules with only advanced config options if requested */
         if( !b_advanced )
@@ -1391,8 +1408,6 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
             else
                 utf8_fprintf( stdout, " %s\n", p_parser->psz_help );
         }
-
-        b_help_module = !strcmp( "help", p_parser->psz_object_name );
 
         /* Print module options */
         for( p_item = p_parser->p_config;
@@ -1692,12 +1707,14 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
  * Print a list of all available modules (builtins and plugins) and a short
  * description for each one.
  *****************************************************************************/
-static void ListModules( libvlc_int_t *p_this )
+static void ListModules( libvlc_int_t *p_this, vlc_bool_t b_verbose )
 {
     vlc_list_t *p_list = NULL;
     module_t *p_parser = NULL;
     char psz_spaces[22];
     int i_index;
+
+    vlc_bool_t b_color = config_GetInt( p_this, "color" );
 
     memset( psz_spaces, ' ', 22 );
 
@@ -1721,8 +1738,52 @@ static void ListModules( libvlc_int_t *p_this )
         if( i < 0 ) i = 0;
         psz_spaces[i] = 0;
 
-        utf8_fprintf( stdout, "  %s%s %s\n", p_parser->psz_object_name,
-                         psz_spaces, p_parser->psz_longname );
+        if( b_color )
+            utf8_fprintf( stdout, GREEN"  %s%s "WHITE"%s\n"GRAY,
+                          p_parser->psz_object_name,
+                          psz_spaces,
+                          p_parser->psz_longname );
+        else
+            utf8_fprintf( stdout, "  %s%s %s\n",
+                          p_parser->psz_object_name,
+                          psz_spaces, p_parser->psz_longname );
+
+        if( b_verbose )
+        {
+            const char **pp_shortcut = p_parser->pp_shortcuts;
+            while( pp_shortcut && *pp_shortcut )
+            {
+                if( strcmp( *pp_shortcut, p_parser->psz_object_name ) )
+                {
+                    if( b_color )
+                        utf8_fprintf( stdout, CYAN"   s %s\n"GRAY,
+                                      *pp_shortcut );
+                    else
+                        utf8_fprintf( stdout, "   s %s\n",
+                                      *pp_shortcut );
+                }
+                pp_shortcut++;
+            }
+            if( p_parser->psz_capability )
+            {
+                if( b_color )
+                    utf8_fprintf( stdout, MAGENTA"   c %s (%d)\n"GRAY,
+                                  p_parser->psz_capability,
+                                  p_parser->i_score );
+                else
+                    utf8_fprintf( stdout, "   c %s (%d)\n",
+                                  p_parser->psz_capability,
+                                  p_parser->i_score );
+            }
+            if( p_parser->psz_program )
+            {
+                if( b_color )
+                    utf8_fprintf( stdout, YELLOW "   p %s\n"GRAY,
+                                  p_parser->psz_program );
+                else
+                    utf8_fprintf( stdout, "   p %s\n", p_parser->psz_program );
+            }
+        }
 
         psz_spaces[i] = ' ';
     }
