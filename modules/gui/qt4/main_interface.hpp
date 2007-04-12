@@ -76,6 +76,7 @@ private:
     /* Video */
     VideoWidget         *videoWidget;
     virtual void keyPressEvent( QKeyEvent *);
+    virtual void wheelEvent( QWheelEvent * );
 
     bool embeddedPlaylistWasActive;
     bool videoIsActive;

@@ -97,15 +97,21 @@ void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
 /***************************************************************************
  * Hotkeys converters
  ***************************************************************************/
+int qtKeyModifiersToVLC( QInputEvent* e )
+{
+    int i_keyModifiers = 0;
+    if( e->modifiers() & Qt::ShiftModifier ) i_keyModifiers |= KEY_MODIFIER_SHIFT;
+    if( e->modifiers() & Qt::AltModifier ) i_keyModifiers |= KEY_MODIFIER_ALT;
+    if( e->modifiers() & Qt::ControlModifier ) i_keyModifiers |= KEY_MODIFIER_CTRL;
+    if( e->modifiers() & Qt::MetaModifier ) i_keyModifiers |= KEY_MODIFIER_META;
+    return i_keyModifiers;
+}
 
 int qtEventToVLCKey( QKeyEvent *e )
 {
     int i_vlck = 0;
     /* Handle modifiers */
-    if( e->modifiers()& Qt::ShiftModifier ) i_vlck |= KEY_MODIFIER_SHIFT;
-    if( e->modifiers()& Qt::AltModifier ) i_vlck |= KEY_MODIFIER_ALT;
-    if( e->modifiers()& Qt::ControlModifier ) i_vlck |= KEY_MODIFIER_CTRL;
-    if( e->modifiers()& Qt::MetaModifier ) i_vlck |= KEY_MODIFIER_META;
+    i_vlck |= qtKeyModifiersToVLC( e );
 
     bool found = false;
     /* Look for some special keys */

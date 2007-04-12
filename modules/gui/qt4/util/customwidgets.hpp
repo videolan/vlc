@@ -88,5 +88,6 @@ signals:
 class QKeyEvent;
 int qtEventToVLCKey( QKeyEvent *e );
 QString VLCKeyToString( int val );
+int qtKeyModifiersToVLC( QInputEvent* e );
 
 #endif
