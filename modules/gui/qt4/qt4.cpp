@@ -47,7 +47,7 @@ vlc_module_begin();
     set_description( (char*)_("Qt interface") );
     set_category( CAT_INTERFACE ) ;
     set_subcategory( SUBCAT_INTERFACE_MAIN );
-    set_capability( "interface", 100 );
+    set_capability( "interface", 151 );
     set_callbacks( Open, Close );
 
     set_program( "qvlc" );
