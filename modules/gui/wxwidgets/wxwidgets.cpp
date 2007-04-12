@@ -115,11 +115,7 @@ static char *psz_playlist_views[] = { N_("Normal" ), N_("Embedded" ) ,
                                       N_("Both") };
 
 vlc_module_begin();
-#ifdef WIN32
     int i_score = 150;
-#else
-    int i_score = getenv( "DISPLAY" ) == NULL ? 15 : 150;
-#endif
     set_shortname( (char*) "wxWidgets" );
     set_description( (char *) _("wxWidgets interface module") );
     set_category( CAT_INTERFACE );
