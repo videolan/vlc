@@ -22,7 +22,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="title" >
-      <string>On Scrren Display</string>
+      <string>On Screen Display</string>
      </property>
      <layout class="QVBoxLayout" >
       <property name="margin" >
