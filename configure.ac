@@ -289,12 +289,21 @@ dnl
 AC_ARG_WITH(macosx-sdk,
    [  --with-macosx-sdk       compile for Mac OS X 10.3 SDK],[], with_macosx_sdk=no)
 if test "${with_macosx_sdk}" != "no" ; then
-  CFLAGS_save="${CFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk"; CFLAGS="${CFLAGS_save}"
-  CXXFLAGS_save="${CXXFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk"; CXXFLAGS="${CXXFLAGS_save}"
-  OBJCFLAGS_save="${OBJCFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk"; OBJCFLAGS="${OBJCFLAGS_save}"
-  LDFLAGS_save="${LDFLAGS_save} -isysroot /Developer/SDKs/MacOSX10.3.9.sdk -Wl,-syslibroot,/Developer/SDKs/MacOSX10.3.9.sdk"; LDFLAGS="${LDFLAGS_save}"
-  export MACOSX_DEPLOYMENT_TARGET=10.3
-  MACOSX_DEPLOYMENT_TARGET="10.3"
+    if test "${SYS}" = "darwin" -a "${host_cpu}" = "i686"; then
+        CFLAGS_save="${CFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"; CFLAGS="${CFLAGS_save}"
+        CXXFLAGS_save="${CXXFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"; CXXFLAGS="${CXXFLAGS_save}"
+        OBJCFLAGS_save="${OBJCFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.4 -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"; OBJCFLAGS="${OBJCFLAGS_save}"
+        LDFLAGS_save="${LDFLAGS_save} -isysroot /Developer/SDKs/MacOSX10.4u.sdk -Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk"; LDFLAGS="${LDFLAGS_save}"
+        export MACOSX_DEPLOYMENT_TARGET=10.4
+        MACOSX_DEPLOYMENT_TARGET="10.4"
+    elif test "${host_cpu}" = "powerpc"; then
+        CFLAGS_save="${CFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk -mmacosx-version-min=10.3"; CFLAGS="${CFLAGS_save}"
+        CXXFLAGS_save="${CXXFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk -mmacosx-version-min=10.3"; CXXFLAGS="${CXXFLAGS_save}"
+        OBJCFLAGS_save="${OBJCFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=10.3 -isysroot /Developer/SDKs/MacOSX10.3.9.sdk -mmacosx-version-min=10.3"; OBJCFLAGS="${OBJCFLAGS_save}"
+        LDFLAGS_save="${LDFLAGS_save} -isysroot /Developer/SDKs/MacOSX10.3.9.sdk -Wl,-syslibroot,/Developer/SDKs/MacOSX10.3.9.sdk"; LDFLAGS="${LDFLAGS_save}"
+        export MACOSX_DEPLOYMENT_TARGET=10.3
+        MACOSX_DEPLOYMENT_TARGET="10.3"
+    fi
 fi
 
 dnl

@@ -80,7 +80,7 @@ case $HOST in
 	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
 	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.9.sdk" >> config.mak
 	    CFLAGS_TUNING=" -arch ppc -mtune=G4"
-	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK}"
+	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
 	    EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
 	    echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak
@@ -92,7 +92,7 @@ case $HOST in
 #	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
 #	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.3.9.sdk" >> config.mak
 	    CFLAGS_TUNING=" -arch ppc -mtune=G4"
-#	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK}"
+#	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
 #	    EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
 	    echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak
@@ -105,7 +105,7 @@ case $HOST in
 	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
 	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
 	    CFLAGS_TUNING=" -march=pentium-m -mtune=prescott"
-	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK}"
+	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
 	    EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
 	    echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak
@@ -118,7 +118,7 @@ case $HOST in
 #	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
 #	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
 	    CFLAGS_TUNING=" -march=pentium-m -mtune=prescott"
-#	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK}"
+#	    EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
 #	    EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
 	    echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak
