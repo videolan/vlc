@@ -17,7 +17,7 @@
     <number>9</number>
    </property>
    <property name="spacing" >
-    <number>6</number>
+    <number>10</number>
    </property>
    <item>
     <widget class="QGroupBox" name="groupBox_3" >

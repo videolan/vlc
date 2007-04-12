@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>421</width>
-    <height>511</height>
+    <height>438</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -18,7 +18,7 @@
     <number>9</number>
    </property>
    <property name="spacing" >
-    <number>6</number>
+    <number>10</number>
    </property>
    <item row="2" column="1" >
     <widget class="QLineEdit" name="shortcutValue" >
