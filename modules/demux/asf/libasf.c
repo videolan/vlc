@@ -211,18 +211,21 @@ static int ASF_ReadObject_Data( stream_t *s, asf_object_t *p_obj )
 static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_index_t *p_index = (asf_object_index_t*)p_obj;
-    int                i_peek;
     uint8_t            *p_peek;
+    int                i;
 
-    if( ( i_peek = stream_Peek( s, &p_peek, 56 ) ) < 56 )
+    if( stream_Peek( s, &p_peek, p_index->i_object_size ) <
+        (int)p_index->i_object_size )
     {
-       return VLC_EGENERIC;
+        /* Just ignore */
+        return VLC_SUCCESS;
     }
+
     ASF_GetGUID( &p_index->i_file_id, p_peek + 24 );
     p_index->i_index_entry_time_interval = GetQWLE( p_peek + 40 );
     p_index->i_max_packet_count = GetDWLE( p_peek + 48 );
     p_index->i_index_entry_count = GetDWLE( p_peek + 52 );
-    p_index->index_entry = NULL; /* FIXME */
+    p_index->index_entry = NULL;
 
 #ifdef ASF_DEBUG
     msg_Dbg( s,
@@ -234,6 +237,20 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
             p_index->i_max_packet_count,
             (long int)p_index->i_index_entry_count );
 #endif
+
+    /* Sanity checking */
+    if( p_index->i_index_entry_count > (p_index->i_object_size - 56) / 6 )
+        p_index->i_index_entry_count = (p_index->i_object_size - 56) / 6;
+
+    p_index->index_entry = malloc( sizeof(asf_index_entry_t) *
+                                   p_index->i_index_entry_count );
+
+    for( i = 0, p_peek += 56; i < (int)p_index->i_index_entry_count;
+         i++, p_peek += 6 )
+    {
+        p_index->index_entry[i].i_packet_number = GetDWLE( p_peek );
+        p_index->index_entry[i].i_packet_count = GetDWLE( p_peek + 4 );
+    }
 
     return VLC_SUCCESS;
 }
