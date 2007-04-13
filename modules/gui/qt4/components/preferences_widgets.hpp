@@ -393,7 +393,9 @@ public:
     int keyValue;
     bool conflicts;
 private:
+    void checkForConflicts( int i_vlckey );
     void keyPressEvent( QKeyEvent *);
+    void wheelEvent( QWheelEvent *);
     QLabel *selected;
     QLabel *warning;
     const char * keyToChange;

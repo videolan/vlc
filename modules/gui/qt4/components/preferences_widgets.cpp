@@ -986,16 +986,13 @@ KeyInputDialog::KeyInputDialog( QList<module_config_t*>& _values,
     l->addLayout( l2 );
 }
 
-void KeyInputDialog::keyPressEvent( QKeyEvent *e )
+void KeyInputDialog::checkForConflicts( int i_vlckey )
 {
-    if( e->key() == Qt::Key_Tab ) return;
-    int i_vlck = qtEventToVLCKey( e );
-    selected->setText( VLCKeyToString( i_vlck ) );
     conflicts = false;
     module_config_t *p_current = NULL;
     foreach( p_current, values )
     {
-        if( p_current->value.i == i_vlck && strcmp( p_current->psz_text,
+        if( p_current->value.i == i_vlckey && strcmp( p_current->psz_text,
                                                     keyToChange ) )
         {
             p_current->value.i = 0;
@@ -1010,5 +1007,21 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
           QString( p_current->psz_text ) + "\"" );
     }
     else warning->setText( "" );
+}
+
+void KeyInputDialog::keyPressEvent( QKeyEvent *e )
+{
+    if( e->key() == Qt::Key_Tab ) return;
+    int i_vlck = qtEventToVLCKey( e );
+    selected->setText( VLCKeyToString( i_vlck ) );
+    checkForConflicts( i_vlck );
+    keyValue = i_vlck;
+}
+
+void KeyInputDialog::wheelEvent( QWheelEvent *e )
+{
+    int i_vlck = qtWheelEventToVLCKey( e );
+    selected->setText( VLCKeyToString( i_vlck ) );
+    checkForConflicts( i_vlck );
     keyValue = i_vlck;
 }

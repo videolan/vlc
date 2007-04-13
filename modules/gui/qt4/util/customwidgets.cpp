@@ -30,6 +30,7 @@
 #include <QColorGroup>
 #include <QRect>
 #include <QKeyEvent>
+#include <QWheelEvent>
 
 #include <vlc_keys.h>
 
@@ -154,6 +155,18 @@ int qtEventToVLCKey( QKeyEvent *e )
         else if( e->key() >= Qt::Key_Space && e->key() <= Qt::Key_AsciiTilde )
             i_vlck += e->key();
     }
+    return i_vlck;
+}
+
+int qtWheelEventToVLCKey( QWheelEvent *e )
+{
+    int i_vlck = 0;
+    /* Handle modifiers */
+    i_vlck |= qtKeyModifiersToVLC( e );
+    if ( e->delta() > 0 )
+        i_vlck |= KEY_MOUSEWHEELUP;
+    else
+        i_vlck |= KEY_MOUSEWHEELDOWN;
     return i_vlck;
 }
 

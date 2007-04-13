@@ -553,15 +553,7 @@ void MainInterface::keyPressEvent( QKeyEvent *e )
 
 void MainInterface::wheelEvent( QWheelEvent *e )
 {
-    int i_vlckey = 0;
-
-    if ( e->delta() > 0 )
-       i_vlckey = KEY_MOUSEWHEELUP;
-    else
-       i_vlckey = KEY_MOUSEWHEELDOWN;
-
-    /* Handle modifiers */
-    i_vlckey |= qtKeyModifiersToVLC( e );
+    int i_vlckey = qtWheelEventToVLCKey( e );
     var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlckey );
     e->accept();
 }
