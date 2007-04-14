@@ -89,6 +89,7 @@ typedef void * module_handle_t;
 typedef shl_t module_handle_t;
 #endif
 
+#if 0
 /**
  * Internal module descriptor
  */
@@ -146,6 +147,7 @@ struct module_t
     module_symbols_t *p_symbols;
 #endif
 };
+#endif
 
 
 #define module_InitBank(a)     __module_InitBank(VLC_OBJECT(a))
