@@ -111,9 +111,9 @@ src/libvlc.c
 src/libvlc.h
 src/misc/beos_specific.cpp
 src/misc/block.c
-src/misc/configuration.c
-src/misc/configuration.h
-src/misc/configuration_chain.c
+src/modules/configuration.c
+src/modules/configuration.h
+src/modules/configuration_chain.c
 src/misc/cpu.c
 src/misc/darwin_specific.c
 src/misc/devices.c
@@ -121,8 +121,8 @@ src/misc/error.c
 src/misc/image.c
 src/misc/md5.c
 src/misc/messages.c
-src/misc/modules.c
-src/misc/modules.h
+src/modules/modules.c
+src/modules/modules.h
 src/misc/mtime.c
 src/misc/objects.c
 src/misc/stats.c

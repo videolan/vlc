@@ -547,11 +547,11 @@ then
   fi
   BUILTINS=`sed -ne 's/.*builtins *= *" *\([^"]*\)".*/\1/p' ${builddir}/vlc-config`
 
-  file="${builddir}/src/misc/modules_builtin.h"
+  file="${builddir}/src/modules/builtin.h"
 
   rm -f "${file}.tmp"
-  mkdir -p -- "${builddir}/src/misc"
-  cat "${srcdir}/src/misc/modules_builtin.h.in" > "${file}.tmp" || exit 1
+  mkdir -p -- "${builddir}/src/modules"
+  cat "${srcdir}/src/modules/builtin.h.in" > "${file}.tmp" || exit 1
   if test -n "${BUILTINS}"
   then
     for i in `echo ${BUILTINS}`

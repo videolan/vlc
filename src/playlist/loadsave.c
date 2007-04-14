@@ -23,7 +23,7 @@
 #include <vlc/vlc.h>
 #include <vlc_playlist.h>
 #include "playlist_internal.h"
-#include "misc/configuration.h"
+#include "modules/configuration.h"
 #include <vlc_charset.h>
 
 #include <errno.h>

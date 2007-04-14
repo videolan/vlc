@@ -7,10 +7,10 @@ AUTOMAKE_OPTIONS = subdir-objects
 NULL =
 SUBDIRS =
 
-EXTRA_DIST = extras/COPYING misc/modules_builtin.h.in libvlc.sym
+EXTRA_DIST = extras/COPYING modules/builtin.h.in libvlc.sym
 
 BUILT_SOURCES = $(CLEANFILES)
-CLEANFILES = misc/modules_builtin.h
+CLEANFILES = modules/builtin.h
 MOSTLYCLEANFILES = $(DATA_noinst_libvlc)
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
@@ -90,11 +90,11 @@ HEADERS_include = \
 	../include/vlc_vout_synchro.h \
 	$(NULL)
 
-misc/modules_builtin.h: misc/modules_builtin.h.in
+modules/builtin.h: modules/builtin.h.in
 	$(TOOLBOX) --update-includes
 	touch $@
 
-misc/modules.c: misc/modules_builtin.h
+modules/modules.c: modules/builtin.h
 
 ###############################################################################
 # Building libvlc
@@ -286,14 +286,14 @@ SOURCES_libvlc_common = \
 	misc/md5.c \
 	misc/mtime.c \
 	misc/block.c \
-	misc/modules.h \
-	misc/modules.c \
+	modules/modules.h \
+	modules/modules.c \
 	misc/threads.c \
 	misc/stats.c \
 	misc/cpu.c \
-	misc/configuration.h \
-	misc/configuration.c \
-	misc/configuration_chain.c \
+	modules/configuration.h \
+	modules/configuration.c \
+	modules/configuration_chain.c \
 	misc/image.c \
 	misc/messages.c \
 	misc/objects.c \

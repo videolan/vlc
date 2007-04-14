@@ -75,7 +75,7 @@
 #   endif
 #endif
 
-#include "misc/configuration.h"
+#include "modules/configuration.h"
 
 #include "vlc_interface.h"
 #include "vlc_playlist.h"
@@ -111,15 +111,9 @@
 #include "vlc_strings.h"
 #include "vlc_streaming.h"
 
-#include "modules.h"
+#include "modules/modules.h"
+#include "modules/builtin.h"
 
-#if defined( _MSC_VER ) && defined( UNDER_CE )
-#    include "modules_builtin_evc.h"
-#elif defined( _MSC_VER )
-#    include "modules_builtin_msvc.h"
-#else
-#    include "modules_builtin.h"
-#endif
 #include "vlc_network.h"
 
 #if defined( WIN32 ) || defined( UNDER_CE )

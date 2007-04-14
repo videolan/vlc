@@ -36,8 +36,8 @@
 #include "control/libvlc_internal.h"
 #include <vlc_input.h>
 
-#include "misc/modules.h"
-#include "misc/configuration.h"
+#include "modules/modules.h"
+#include "modules/configuration.h"
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>                                              /* sprintf() */
