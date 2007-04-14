@@ -700,7 +700,6 @@ static block_t *BlockChoose( access_t *p_access )
 {
     block_t *p_block;
     int     i_rtp_version;
-    int     i_CSRC_count;
     int     i_payload_type;
 
     if( ( p_block = BlockUDP( p_access ) ) == NULL )
