@@ -124,7 +124,6 @@ E_(vlc_entry) ( module_t *p_module );
             module_t *p_submodule = p_module /* the ; gets added */
 
 #define vlc_module_end( )                                                     \
-            p_submodule->pp_shortcuts[ i_shortcut ] = NULL;                   \
         }                                                                     \
         res = config_Duplicate( p_module, p_config, ++i_config );             \
         for( size_t i = 0; i < i_config; i++ )                                \

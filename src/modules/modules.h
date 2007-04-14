@@ -71,6 +71,7 @@ struct module_cache_t
 };
 
 
+#if 0
 #define MODULE_SHORTCUT_MAX 50
 
 /* The module handle type. */
@@ -89,7 +90,6 @@ typedef void * module_handle_t;
 typedef shl_t module_handle_t;
 #endif
 
-#if 0
 /**
  * Internal module descriptor
  */
