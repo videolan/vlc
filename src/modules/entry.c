@@ -32,20 +32,12 @@ module_t *vlc_module_create (vlc_object_t *obj)
 #ifndef HAVE_SHARED_LIBVLC
     module->p_symbols = &obj->p_libvlc_global->p_module_bank->symbols;
 #endif
-    module->b_loaded = module->b_submodule = VLC_FALSE;
     module->b_reentrant = module->b_unloadable = VLC_TRUE;
     module->psz_object_name = module->psz_longname = default_name;
-    module->psz_help = module->psz_shortname = NULL;
     module->pp_shortcuts[0] = default_name;
-    for (unsigned i = 1; i < MODULE_SHORTCUT_MAX; i++)
-         module->pp_shortcuts[i] = NULL;
-
     module->i_cpu = 0;
-    module->psz_program = NULL;
     module->psz_capability = "";
     module->i_score = 1;
-    module->pf_activate = NULL;
-    module->pf_deactivate = NULL;
     return module;
 }
 
@@ -74,8 +66,6 @@ module_t *vlc_submodule_create (module_t *module)
     submodule->psz_capability = module->psz_capability;
     submodule->i_score = module->i_score;
     submodule->i_cpu = module->i_cpu;
-    submodule->pf_activate = NULL;
-    submodule->pf_deactivate = NULL;
     return submodule;
 }
 
