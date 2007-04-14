@@ -1182,25 +1182,19 @@ DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 # libdca
 # ***************************************************************************
 
-libdca:
-	$(SVN) co $(LIBDCA_SVN) -r 35 libdca
-	(cd $@; ./bootstrap)
+libdca-$(LIBDCA_VERSION).tar.bz2:
+	$(WGET) $(LIBDCA_URL)
+
+libdca: libdca-$(LIBDCA_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 
 .libdca: libdca
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	touch $@
 
-ifdef SVN
-libdca-source: libdca
-	cd libdca;   find . -depth -iname ".svn" -exec rm -rf {} \;
-	cd ..;
-	tar cfvz libdca-$(DATE).tar.gz libdca
-
-SOURCE += libdca-source
-endif
-
 CLEAN_FILE += .libdca
 CLEAN_PKG += libdca
+DISTCLEAN_PKG += libdca-$(LIBDCA_VERSION).tar.bz2
 
 # ***************************************************************************
 # libx264
