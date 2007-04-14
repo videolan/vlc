@@ -59,12 +59,16 @@
 #if defined( __BUILTIN__ )
 #   define E_( function )          CONCATENATE( function, MODULE_NAME )
 #   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
-#   define DECLARE_SYMBOLS         struct _u_n_u_s_e_d_
-#   define STORE_SYMBOLS           struct _u_n_u_s_e_d_
 #elif defined( __PLUGIN__ )
 #   define E_( function )          CONCATENATE( function, MODULE_SYMBOL )
 #   define __VLC_SYMBOL( symbol  ) CONCATENATE( symbol, MODULE_SYMBOL )
-#   define DECLARE_SYMBOLS         module_symbols_t* p_symbols
+#endif
+
+#if defined( __BUILTIN__ ) || defined( HAVE_SHARED_LIBVLC )
+#   define DECLARE_SYMBOLS         struct _u_n_u_s_e_d_
+#   define STORE_SYMBOLS           struct _u_n_u_s_e_d_
+#else
+#   define DECLARE_SYMBOLS         module_symbols_t* p_symbols = NULL
 #   define STORE_SYMBOLS           p_symbols = p_module->p_symbols
 #endif
 

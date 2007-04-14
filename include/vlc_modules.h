@@ -95,10 +95,10 @@ struct module_t
     vlc_bool_t          b_builtin;  /* Set to true if the module is built in */
     vlc_bool_t          b_loaded;        /* Set to true if the dll is loaded */
 
-    /*
-     * Symbol table we send to the module so that it can access vlc symbols
-     */
+#ifndef HAVE_SHARED_LIBVLC
+    /* Legacy symbols table */
     module_symbols_t *p_symbols;
+#endif
 };
 
 /*****************************************************************************
@@ -129,5 +129,5 @@ enum
     VLC_MODULE_CB_OPEN,
     VLC_MODULE_CB_CLOSE,
     VLC_MODULE_UNLOADABLE
-} vlc_module_property_t;
+};
 
