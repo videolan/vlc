@@ -287,7 +287,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     module_InitBank( p_libvlc );
 
     /* Hack: insert the help module here */
-    p_help_module = vlc_object_create( p_libvlc, VLC_OBJECT_MODULE );
+    p_help_module = vlc_module_create( p_libvlc );
     if( p_help_module == NULL )
     {
         module_EndBank( p_libvlc );

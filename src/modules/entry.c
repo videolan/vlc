@@ -21,11 +21,16 @@
 #include <vlc/vlc.h>
 #include <assert.h>
 
+#include "modules/modules.h"
+#include "libvlc.h"
+
 static const char default_name[] = "unnamed";
 
 module_t *vlc_module_create (vlc_object_t *obj)
 {
-    module_t *module = vlc_object_create (obj, VLC_OBJECT_MODULE);
+    module_t *module =
+        (module_t *)vlc_custom_create (obj, sizeof (module_t),
+                                       VLC_OBJECT_MODULE, "module");
     if (module == NULL)
         return NULL;
 
@@ -48,7 +53,8 @@ module_t *vlc_submodule_create (module_t *module)
     assert (!module->b_submodule); // subsubmodules are not supported
 
     module_t *submodule =
-            (module_t *)vlc_object_create (module, VLC_OBJECT_MODULE);
+        (module_t *)vlc_custom_create (VLC_OBJECT (module), sizeof (module_t),
+                                       VLC_OBJECT_MODULE, "submodule");
     if (submodule == NULL)
         return NULL;
 

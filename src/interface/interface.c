@@ -42,6 +42,7 @@
 #include <vlc_vout.h>
 
 #include "vlc_interface.h"
+#include "modules/modules.h" // Gruik!
 
 #ifdef __APPLE__
 #    include <Cocoa/Cocoa.h>

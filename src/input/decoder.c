@@ -171,8 +171,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         if( vlc_thread_create( p_dec, "decoder", DecoderThread,
                                i_priority, VLC_FALSE ) )
         {
-            msg_Err( p_dec, "cannot spawn decoder thread \"%s\"",
-                             p_dec->p_module->psz_object_name );
+            msg_Err( p_dec, "cannot spawn decoder thread" );
             module_Unneed( p_dec, p_dec->p_module );
             DeleteDecoder( p_dec );
             vlc_object_destroy( p_dec );

@@ -221,10 +221,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof(libvlc_int_t);
             psz_type = "libvlc";
             break;
-        case VLC_OBJECT_MODULE:
-            i_size = sizeof(module_t);
-            psz_type = "module";
-            break;
         case VLC_OBJECT_INTF:
             i_size = sizeof(intf_thread_t);
             psz_type = "interface";

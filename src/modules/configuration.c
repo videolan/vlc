@@ -64,6 +64,7 @@
 #endif
 
 #include "configuration.h"
+#include "modules/modules.h"
 
 static int ConfigStringToKey( const char * );
 static char *ConfigKeyToString( int );
