@@ -745,6 +745,10 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if([o_update shouldCheckForUpdate])
         [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:NULL];
+ 
+    /* Handle sleep notification */
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
+           name:NSWorkspaceWillSleepNotification object:nil];
 }
 
 /* Listen to the remote in exclusive mode, only when VLC is the active
@@ -756,6 +760,18 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)applicationDidResignActive:(NSNotification *)aNotification
 {
     [o_remote stopListening: self];
+}
+
+/* Triggered when the computer goes to sleep */
+- (void)computerWillSleep: (NSNotification *)notification
+{
+    /* Pause */
+    if ( p_intf->p_sys->i_play_status == PLAYING_S )
+    {
+        vlc_value_t val;
+        val.i_int = config_GetInt( p_intf, "key-play-pause" );
+        var_Set( p_intf->p_libvlc, "key-pressed", val );
+    }
 }
 
 /* Helper method for the remote control interface in order to trigger forward/backward and volume
