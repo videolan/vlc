@@ -3237,69 +3237,52 @@ AC_ARG_WITH(a52-fixed,
 dnl
 dnl DTS Coherent Acoustics decoder plugin
 dnl
-AC_ARG_ENABLE(dts,
-  [  --enable-dts            DTS Coherent Acoustics support with libdca (default enabled)])
-if test "${enable_dts}" != "no"; then
-  AC_ARG_WITH(dts-tree,
-    [    --with-dts-tree=PATH  libdts tree for static linking ],[],[])
-  if test "${with_dts_tree}" != "no" -a -n "${with_dts_tree}"
-  then
-    real_dts_tree="`cd ${with_dts_tree} 2>/dev/null && pwd`"
-    if test -z "${real_dts_tree}"
-    then
+AS_IF([test "x${enable_dts}" != "x"], [
+  AC_MSG_ERROR([--enable-dts is not obsolete. Please use libdca and --enable-dca.])
+])
+AS_IF([test "x${with_dts_tree}" != "x"], [
+  AC_MSG_ERROR([--with-dts-tree is obsolete. Please use libdca and --with-dca-tree.])
+])
+
+AC_ARG_ENABLE(dca,
+  [  --enable-dca            DTS Coherent Acoustics support with libdca (default enabled)])
+AS_IF([test "${enable_dca}" != "no"], [
+  AC_ARG_WITH(dca-tree,
+    [    --with-dca-tree=PATH  libdca tree for static linking],,
+    [with_dca_tree="no"])
+  AS_IF([test "${with_dca_tree}" != "no"], [
+    real_dca_tree="`cd ${with_dca_tree} 2>/dev/null && pwd`"
+    AS_IF([test -z "${real_dca_tree}"], [
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_dts_tree} directory doesn't exist])
-    fi
-    dnl  Use a custom libdts
-    AC_MSG_CHECKING(for dts.h in ${real_dts_tree}/include)
-    if test -f ${real_dts_tree}/include/dts.h
-    then
-      AC_MSG_RESULT(yes)
-      VLC_ADD_CPPFLAGS([dtstofloat32],[-I${real_dts_tree}/include])
-      VLC_ADD_LDFLAGS([dtstofloat32],[-L${real_dts_tree}/libdts])
-      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_dtstofloat32}"
-      AC_CHECK_LIB(dts_pic, dts_free, [
-        VLC_ADD_PLUGINS([dtstofloat32])
-        VLC_ADD_LDFLAGS([dtstofloat32],[-ldts_pic -lm])
-        ],[
-        AC_CHECK_LIB(dts, dts_free, [
-          VLC_ADD_BUILTINS([dtstofloat32])
-          VLC_ADD_LDFLAGS([dtstofloat32],[-ldts])
-          ],[
-          if test -f ${real_dts_tree}/libdts/libdts.a
-          then
-            AC_MSG_ERROR([make sure you have at least libdts-0.0.2])
-          else
-            AC_MSG_ERROR([the specified tree hasn't been compiled])
-          fi
-        ])
-      ], [-lm])
-      LDFLAGS="${LDFLAGS_save}"
-    else
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([the specified tree doesn't have dts.h])
-    fi
-  else
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_dtstofloat32}"
-    AC_CHECK_HEADERS(dts.h, [
-      AC_CHECK_LIB(dts_pic, dts_free, [
-        VLC_ADD_PLUGINS([dtstofloat32])
-        VLC_ADD_LDFLAGS([dtstofloat32],[-ldts_pic -lm])
-      ],[
-        AC_CHECK_LIB(dts, dts_free, [
-          VLC_ADD_BUILTINS([dtstofloat32])
-          VLC_ADD_LDFLAGS([dtstofloat32],[-ldts])
-        ],[
-          if test "${enable_dts}" = "yes"; then
-            AC_MSG_ERROR([Could not find libdts on your system: you may get it from http://www.videolan.org/dtsdec.html])
-          fi
-        ])
-      ], [-lm])
+      AC_MSG_ERROR([${with_dca_tree} directory doesn't exist])
     ])
-    LDFLAGS="${LDFLAGS_save}"
-  fi
-fi
+    dnl  Use a custom libdca
+    AC_MSG_CHECKING(for libdca in ${real_dca_tree})
+    AS_IF([test -f "${real_dca_tree}/libdca/.libs/libdca.a"], [
+      AC_MSG_RESULT(yes)
+      VLC_ADD_LDFLAGS([dtstofloat32],[${real_dca_tree}/libdca/.libs/libdca.a])
+      AS_IF([test -f "${real_dca_tree}/include/dca.h"], [
+        VLC_ADD_CPPFLAGS([dtstofloat32],[-I${real_dca_tree}/include])
+      ], [
+        VLC_ADD_CPPFLAGS([dtstofloat32],[-I${real_dca_tree}/../include])
+      ])
+    ], [
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([the specified tree doesn't have libdca/.libs/libdca.a])
+    ])
+  ], [
+    PKG_CHECK_MODULES([DCA], [libdca >= 0.0.5], [
+      VLC_ADD_PLUGINS([dtstofloat32])
+      VLC_ADD_CPPFLAGS([dtstofloat32], [${DCA_CFLAGS}])
+      VLC_ADD_LDFLAGS([dtstofloat32], [${DCA_LIBS}])
+    ], [
+      AS_IF([test "x${enable_dca}" != "x"], [
+        AC_MSG_ERROR([${DCA_PKG_ERRORS}])
+      ])
+    ])
+  ])
+])
 
 dnl
 dnl  Flac plugin
