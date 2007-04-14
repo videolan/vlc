@@ -1119,7 +1119,7 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
 
     /* Now that we have successfully loaded the module, we can
      * allocate a structure for it */
-    p_module = vlc_object_create( p_this, VLC_OBJECT_MODULE );
+    p_module = vlc_module_create( p_this );
     if( p_module == NULL )
     {
         msg_Err( p_this, "out of memory" );
@@ -1130,9 +1130,6 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
     /* We need to fill these since they may be needed by CallEntry() */
     p_module->psz_filename = psz_file;
     p_module->handle = handle;
-#ifndef HAVE_SHARED_LIBVLC
-    p_module->p_symbols = &p_this->p_libvlc_global->p_module_bank->symbols;
-#endif
     p_module->b_loaded = VLC_TRUE;
 
     /* Initialize the module: fill p_module, default config */

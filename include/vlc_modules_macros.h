@@ -117,22 +117,9 @@ E_(vlc_entry) ( module_t *p_module );
         size_t i_config = (size_t)(-1);                                       \
         module_config_t *p_config = NULL;                                     \
         STORE_SYMBOLS;                                                        \
-        p_module->b_submodule = VLC_FALSE;                                    \
-        p_module->b_unloadable = VLC_TRUE;                                    \
-        p_module->b_reentrant = VLC_TRUE;                                     \
-        p_module->psz_object_name = MODULE_STRING;                            \
-        p_module->psz_shortname = NULL;                                       \
-        p_module->psz_longname = MODULE_STRING;                               \
-        p_module->psz_help = NULL;                                            \
-        p_module->pp_shortcuts[ 0 ] = MODULE_STRING;                          \
-        for( unsigned i = 1; i < MODULE_SHORTCUT_MAX; i++ )                   \
-            p_module->pp_shortcuts[i] = NULL;                                 \
-        p_module->i_cpu = 0;                                                  \
-        p_module->psz_program = NULL;                                         \
-        p_module->psz_capability = "";                                        \
-        p_module->i_score = 1;                                                \
-        p_module->pf_activate = NULL;                                         \
-        p_module->pf_deactivate = NULL;                                       \
+        if (vlc_module_set (p_module, VLC_MODULE_NAME,                        \
+                            (void *)(MODULE_STRING)))                         \
+            goto error;                                                       \
         {                                                                     \
             module_t *p_submodule = p_module /* the ; gets added */
 
@@ -153,6 +140,11 @@ E_(vlc_entry) ( module_t *p_module );
             return res;                                                       \
         (void)i_shortcut;                                                     \
         return VLC_SUCCESS;                                                   \
+                                                                              \
+    error:                                                                    \
+        free( p_config );                                                     \
+        /* FIXME: cleanup submodules objects ??? */                           \
+        return VLC_EGENERIC;                                                  \
     }                                                                         \
     struct _u_n_u_s_e_d_ /* the ; gets added */
 
@@ -161,32 +153,40 @@ E_(vlc_entry) ( module_t *p_module );
     p_submodule = vlc_submodule_create( p_module )
 
 #define add_requirement( cap ) \
-    vlc_module_set (p_module, VLC_MODULE_CPU_REQUIREMENT, \
-                    (void *)(CPU_CAPABILITY_##cap))
+    if (vlc_module_set (p_module, VLC_MODULE_CPU_REQUIREMENT, \
+                        (void *)(CPU_CAPABILITY_##cap))) goto error
 
 #define add_shortcut( shortcut ) \
-    vlc_module_set (p_submodule, VLC_MODULE_SHORTCUT, (void*)(shortcut))
+    if (vlc_module_set (p_submodule, VLC_MODULE_SHORTCUT, (void*)(shortcut))) \
+        goto error
 
 #define set_shortname( shortname ) \
-    vlc_module_set (p_submodule, VLC_MODULE_SHORTNAME, (void*)(shortname))
+    if (vlc_module_set (p_submodule, VLC_MODULE_SHORTNAME, \
+                        (void*)(shortname))) goto error;
 
 #define set_description( desc ) \
-    vlc_module_set (p_submodule, VLC_MODULE_DESCRIPTION, (void*)(desc))
+    if (vlc_module_set (p_submodule, VLC_MODULE_DESCRIPTION, (void*)(desc))) \
+        goto error;
 
 #define set_help( help ) \
-    vlc_module_set (p_submodule, VLC_MODULE_HELP, (void*)(help))
+    if (vlc_module_set (p_submodule, VLC_MODULE_HELP, (void*)(help))) \
+        goto error
 
 #define set_capability( cap, score ) \
-    vlc_module_set (p_submodule, VLC_MODULE_CAPABILITY, (void *)(cap)); \
-    vlc_module_set (p_submodule, VLC_MODULE_SCORE, (void *)(score))
+    if (vlc_module_set (p_submodule, VLC_MODULE_CAPABILITY, (void *)(cap)) \
+     || vlc_module_set (p_submodule, VLC_MODULE_SCORE, (void *)(score))) \
+        goto error
 
 #define set_program( program ) \
-    vlc_module_set (p_submodule, VLC_MODULE_PROGRAM, (void *)(program))
+    if (vlc_module_set (p_submodule, VLC_MODULE_PROGRAM, (void *)(program))) \
+        goto error
 
 #define set_callbacks( activate, deactivate ) \
-    vlc_module_set (p_submodule, VLC_MODULE_CB_OPEN, (void *)(activate)); \
-    vlc_module_set (p_submodule, VLC_MODULE_CB_CLOSE, (void *)(deactivate))
+    if (vlc_module_set (p_submodule, VLC_MODULE_CB_OPEN, (void *)(activate)) \
+     || vlc_module_set (p_submodule, VLC_MODULE_CB_CLOSE, \
+                        (void *)(deactivate))) \
+        goto error
 
 #define linked_with_a_crap_library_which_uses_atexit( ) \
-    vlc_module_set (p_submodule, VLC_MODULE_UNLOADABLE, NULL)
+    if (vlc_module_set (p_submodule, VLC_MODULE_UNLOADABLE, NULL)) goto error
 
