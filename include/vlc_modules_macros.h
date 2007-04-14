@@ -121,6 +121,8 @@ E_(vlc_entry) ( module_t *p_module );
         p_module->psz_longname = MODULE_STRING;                               \
         p_module->psz_help = NULL;                                            \
         p_module->pp_shortcuts[ 0 ] = MODULE_STRING;                          \
+        for( unsigned i = 1; i < MODULE_SHORTCUT_MAX; i++ )                   \
+            p_module->pp_shortcuts[i] = NULL;                                 \
         p_module->i_cpu = 0;                                                  \
         p_module->psz_program = NULL;                                         \
         p_module->psz_capability = "";                                        \
@@ -151,55 +153,36 @@ E_(vlc_entry) ( module_t *p_module );
     struct _u_n_u_s_e_d_ /* the ; gets added */
 
 
-#define add_submodule( )                                                      \
-    p_submodule->pp_shortcuts[ i_shortcut ] = NULL;                           \
-    p_submodule =                                                             \
-            (module_t *)vlc_object_create( p_module, VLC_OBJECT_MODULE );     \
-    vlc_object_attach( p_submodule, p_module );                               \
-    p_submodule->b_submodule = VLC_TRUE;                                      \
-    /* Nuahahaha! Heritage! Polymorphism! Ugliness!! */                       \
-    for( i_shortcut = 0; p_module->pp_shortcuts[ i_shortcut ]; i_shortcut++ ) \
-    {                                                                         \
-        p_submodule->pp_shortcuts[ i_shortcut ] =                             \
-                                p_module->pp_shortcuts[ i_shortcut ];         \
-    }                                                                         \
-    p_submodule->psz_object_name = p_module->psz_object_name;                 \
-    p_submodule->psz_shortname = p_module->psz_shortname;                     \
-    p_submodule->psz_longname = p_module->psz_longname;                       \
-    p_submodule->psz_program = p_module->psz_program;                         \
-    p_submodule->psz_capability = p_module->psz_capability;                   \
-    p_submodule->i_score = p_module->i_score;                                 \
-    p_submodule->i_cpu = p_module->i_cpu;                                     \
-    p_submodule->pf_activate = NULL;                                          \
-    p_submodule->pf_deactivate = NULL
+#define add_submodule( ) \
+    p_submodule = vlc_submodule_create( p_module )
 
-#define add_requirement( cap )                                                \
-    p_module->i_cpu |= CPU_CAPABILITY_##cap
+#define add_requirement( cap ) \
+    vlc_module_set (p_module, VLC_MODULE_CPU_REQUIREMENT, \
+                    (void *)(CPU_CAPABILITY_##cap))
 
-#define add_shortcut( shortcut )                                              \
-    p_submodule->pp_shortcuts[ i_shortcut ] = shortcut;                       \
-    i_shortcut++
+#define add_shortcut( shortcut ) \
+    vlc_module_set (p_submodule, VLC_MODULE_SHORTCUT, (void*)(shortcut))
 
-#define set_shortname( desc )                                                 \
-    p_submodule->psz_shortname = desc
+#define set_shortname( shortname ) \
+    vlc_module_set (p_submodule, VLC_MODULE_SHORTNAME, (void*)(shortname))
 
-#define set_description( desc )                                               \
-    p_submodule->psz_longname = desc
+#define set_description( desc ) \
+    vlc_module_set (p_submodule, VLC_MODULE_DESCRIPTION, (void*)(desc))
 
-#define set_help( help )                                                      \
-    p_submodule->psz_help = help
+#define set_help( help ) \
+    vlc_module_set (p_submodule, VLC_MODULE_HELP, (void*)(help))
 
-#define set_capability( cap, score )                                          \
-    p_submodule->psz_capability = cap;                                        \
-    p_submodule->i_score = score
+#define set_capability( cap, score ) \
+    vlc_module_set (p_submodule, VLC_MODULE_CAPABILITY, (void *)(cap)); \
+    vlc_module_set (p_submodule, VLC_MODULE_SCORE, (void *)(score))
 
-#define set_program( program )                                                \
-    p_submodule->psz_program = program
+#define set_program( program ) \
+    vlc_module_set (p_submodule, VLC_MODULE_PROGRAM, (void *)(program))
 
-#define set_callbacks( activate, deactivate )                                 \
-    p_submodule->pf_activate = activate;                                      \
-    p_submodule->pf_deactivate = deactivate
+#define set_callbacks( activate, deactivate ) \
+    vlc_module_set (p_submodule, VLC_MODULE_CB_OPEN, (void *)(activate)); \
+    vlc_module_set (p_submodule, VLC_MODULE_CB_CLOSE, (void *)(deactivate))
 
-#define linked_with_a_crap_library_which_uses_atexit( )                       \
-    p_module->b_unloadable = VLC_FALSE
+#define linked_with_a_crap_library_which_uses_atexit( ) \
+    vlc_module_set (p_submodule, VLC_MODULE_UNLOADABLE, NULL)
 
