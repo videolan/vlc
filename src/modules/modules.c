@@ -1310,7 +1310,7 @@ static int DeleteModule( module_t * p_module, vlc_bool_t b_detach )
  *****************************************************************************/
 static int CallEntry( module_t * p_module )
 {
-    static const char * const psz_name = "vlc_entry" MODULE_SUFFIX;
+    static const char psz_name[] = "vlc_entry" MODULE_SUFFIX;
     int (* pf_symbol) ( module_t * p_module );
 
     /* Try to resolve the symbol */
@@ -1523,12 +1523,11 @@ static void * GetSymbol( module_handle_t handle, const char * psz_function )
      * can we do ? */
     if( p_symbol == NULL )
     {
-        char *psz_call = malloc( strlen( psz_function ) + 2 );
+        char psz_call[strlen( psz_function ) + 2];
 
-        strcpy( psz_call + 1, psz_function );
         psz_call[ 0 ] = '_';
+        memcpy( psz_call + 1, psz_function, sizeof (psz_call) - 1 );
         p_symbol = _module_getsymbol( handle, psz_call );
-        free( psz_call );
     }
 
     return p_symbol;
@@ -1675,7 +1674,7 @@ static void CacheLoad( vlc_object_t *p_this )
     free( psz_filename );
 
     /* Check the file size */
-    i_read = fread( &i_file_size, sizeof(char), sizeof(i_file_size), file );
+    i_read = fread( &i_file_size, 1, sizeof(i_file_size), file );
     if( i_read != sizeof(i_file_size) )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
@@ -1696,7 +1695,7 @@ static void CacheLoad( vlc_object_t *p_this )
 
     /* Check the file is a plugins cache */
     i_size = sizeof(PLUGINSCACHE_DIR COPYRIGHT_MESSAGE) - 1;
-    i_read = fread( p_cachestring, sizeof(char), i_size, file );
+    i_read = fread( p_cachestring, 1, i_size, file );
     if( i_read != i_size ||
         memcmp( p_cachestring, PLUGINSCACHE_DIR COPYRIGHT_MESSAGE, i_size ) )
     {
@@ -1706,7 +1705,7 @@ static void CacheLoad( vlc_object_t *p_this )
     }
 
     /* Check Sub-version number */
-    i_read = fread( &i_marker, sizeof(char), sizeof(i_marker), file );
+    i_read = fread( &i_marker, 1, sizeof(i_marker), file );
     if( i_read != sizeof(i_marker) || i_marker != CACHE_SUBVERSION_NUM )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
@@ -1717,7 +1716,7 @@ static void CacheLoad( vlc_object_t *p_this )
 
     /* Check the language hasn't changed */
     sprintf( p_lang, "%5.5s", _("C") ); i_size = 5;
-    i_read = fread( p_cachelang, sizeof(char), i_size, file );
+    i_read = fread( p_cachelang, 1, i_size, file );
     if( i_read != i_size || memcmp( p_cachelang, p_lang, i_size ) )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
@@ -1727,7 +1726,7 @@ static void CacheLoad( vlc_object_t *p_this )
     }
 
     /* Check header marker */
-    i_read = fread( &i_marker, sizeof(char), sizeof(i_marker), file );
+    i_read = fread( &i_marker, 1, sizeof(i_marker), file );
     if( i_read != sizeof(i_marker) ||
         i_marker != ftell( file ) - (int)sizeof(i_marker) )
     {
@@ -1738,7 +1737,14 @@ static void CacheLoad( vlc_object_t *p_this )
     }
 
     p_this->p_libvlc_global->p_module_bank->i_loaded_cache = 0;
-    fread( &i_cache, sizeof(char), sizeof(i_cache), file );
+    if (fread( &i_cache, 1, sizeof(i_cache), file ) != sizeof(i_cache) )
+    {
+        msg_Warn( p_this, "This doesn't look like a valid plugins cache "
+                  "(file too short)" );
+        fclose( file );
+        return;
+    }
+
     if( i_cache )
         pp_cache = p_this->p_libvlc_global->p_module_bank->pp_loaded_cache =
                    malloc( i_cache * sizeof(void *) );
