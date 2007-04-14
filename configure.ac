@@ -3238,7 +3238,7 @@ dnl
 dnl DTS Coherent Acoustics decoder plugin
 dnl
 AS_IF([test "x${enable_dts}" != "x"], [
-  AC_MSG_ERROR([--enable-dts is not obsolete. Please use libdca and --enable-dca.])
+  AC_MSG_ERROR([--enable-dts is obsolete. Please use libdca and --enable-dca.])
 ])
 AS_IF([test "x${with_dts_tree}" != "x"], [
   AC_MSG_ERROR([--with-dts-tree is obsolete. Please use libdca and --with-dca-tree.])
