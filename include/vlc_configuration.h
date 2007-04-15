@@ -69,34 +69,6 @@ extern "C" {
 
 #define CONFIG_ITEM                         0x00F0
 
-/* Item types that use a string value (i.e. serialized in the module cache) */
-#define CONFIG_STRING_TYPES \
-    { \
-        CONFIG_ITEM_STRING, CONFIG_ITEM_FILE, CONFIG_ITEM_MODULE, \
-        CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_MODULE_CAT, \
-        CONFIG_ITEM_MODULE_LIST, CONFIG_ITEM_MODULE_LIST_CAT \
-    }
-
-static inline int IsConfigStringType (int type)
-{
-    const unsigned char config_string_types[] = CONFIG_STRING_TYPES;
-
-    /* NOTE: this needs to be changed if we ever get more than 255 types */
-    return memchr (config_string_types, type, sizeof (config_string_types))
-            != NULL;
-}
-
-static inline int IsConfigIntegerType (int type)
-{
-    return (type == CONFIG_ITEM_INTEGER) || (type == CONFIG_ITEM_KEY)
-        || (type == CONFIG_ITEM_BOOL);
-}
-
-static inline int IsConfigFloatType (int type)
-{
-    return type == CONFIG_ITEM_FLOAT;
-}
-
 /*******************************************************************
  * All predefined categories and subcategories
  *******************************************************************/

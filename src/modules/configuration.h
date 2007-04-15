@@ -43,6 +43,8 @@ char *   config_GetHomeDir     ( void );
 char *   config_GetUserDir     ( void );
 int    __config_LoadConfigFile ( vlc_object_t *, const char * );
 
+int IsConfigStringType (int type);
+
 # ifdef __cplusplus
 }
 # endif

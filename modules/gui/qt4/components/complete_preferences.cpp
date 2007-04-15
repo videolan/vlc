@@ -188,31 +188,33 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     /* Build the tree of plugins */
     for( int i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        int i_subcategory = -1, i_category = -1, i_options = 0;
         p_module = (module_t *)p_list->p_values[i_index].p_object;
 
         // Main module excluded
         if( !strcmp( p_module->psz_object_name, "main" ) ) continue;
 
-        /* Exclude empty plugins (submodules don't have config options, they
-         * are stored in the parent module) */
+        /* Exclude submodules; they have no config options of their own */
         if( p_module->b_submodule ) continue;
+
+        unsigned i_subcategory = 0, i_category = 0;
+        bool b_options = false;
 
         for (size_t i = 0; i < p_module->confsize; i++)
         {
-            module_config_t *p_item = p_module->p_config + i;
+            const module_config_t *p_item = p_module->p_config + i;
 
             if( p_item->i_type == CONFIG_CATEGORY )
                 i_category = p_item->value.i;
             else if( p_item->i_type == CONFIG_SUBCATEGORY )
                 i_subcategory = p_item->value.i;
-            if( p_item->i_type & CONFIG_ITEM )
-                i_options++;
 
-            if( i_options > 0 && i_category >= 0 && i_subcategory >= 0 )
+            if( p_item->i_type & CONFIG_ITEM )
+                b_options = true;
+
+            if( b_options && i_category && i_subcategory )
                 break;
         }
-        if( !i_options ) continue; // Nothing to display
+        if( !b_options || i_category == 0 || i_subcategory == 0 ) continue;
 
         // Locate the category item;
         QTreeWidgetItem *subcat_item = NULL;

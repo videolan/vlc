@@ -89,6 +89,38 @@ static inline char *_strdupnull (const char *src)
     return strdup (_(src));
 }
 
+/* Item types that use a string value (i.e. serialized in the module cache) */
+int IsConfigStringType (int type)
+{
+    static const unsigned char config_types[] = 
+    {
+        CONFIG_ITEM_STRING, CONFIG_ITEM_FILE, CONFIG_ITEM_MODULE,
+        CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_MODULE_CAT,
+        CONFIG_ITEM_MODULE_LIST, CONFIG_ITEM_MODULE_LIST_CAT
+    };
+
+    /* NOTE: this needs to be changed if we ever get more than 255 types */
+    return memchr (config_types, type, sizeof (config_types)) != NULL;
+}
+
+
+static int IsConfigIntegerType (int type)
+{
+    static const unsigned char config_types[] = 
+    {
+        CONFIG_ITEM_INTEGER, CONFIG_ITEM_KEY, CONFIG_ITEM_BOOL,
+        CONFIG_CATEGORY, CONFIG_SUBCATEGORY
+    };
+
+    return memchr (config_types, type, sizeof (config_types)) != NULL;
+}
+
+
+static inline int IsConfigFloatType (int type)
+{
+    return type == CONFIG_ITEM_FLOAT;
+}
+
 
 /*****************************************************************************
  * config_GetType: get the type of a variable (bool, int, float, string)
