@@ -81,12 +81,10 @@
                               "can specify a specific address." )
 #define SAP_IPV4_TEXT N_( "IPv4 SAP" )
 #define SAP_IPV4_LONGTEXT N_( \
-      "Listen to IPv4 announcements " \
-      "on the standard address." )
+      "Listen to IPv4 announcements on the standard addresses." )
 #define SAP_IPV6_TEXT N_( "IPv6 SAP" )
 #define SAP_IPV6_LONGTEXT N_( \
-      "Listen to IPv6 announcements " \
-      "on the standard addresses." )
+      "Listen to IPv6 announcements on the standard addresses." )
 #define SAP_SCOPE_TEXT N_( "IPv6 SAP scope" )
 #define SAP_SCOPE_LONGTEXT N_( \
        "Scope for IPv6 announcements (default is 8)." )
