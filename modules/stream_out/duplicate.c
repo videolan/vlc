@@ -318,7 +318,7 @@ static vlc_bool_t ESSelected( es_format_t *fmt, char *psz_select )
     char  *psz_dup;
     char  *psz;
 
-    /* We have tree state variable : no tested (-1), failed(0), succeed(1) */
+    /* We have tri-state variable : no tested (-1), failed(0), succeed(1) */
     int i_cat = -1;
     int i_es  = -1;
     int i_prgm= -1;
