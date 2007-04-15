@@ -339,7 +339,6 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
     {
         msg_Err( session, "Certificate import error: %s",
                  gnutls_strerror( val ) );
-        gnutls_x509_crt_deinit( cert );
         goto crt_error;
     }
 
