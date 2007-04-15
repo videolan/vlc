@@ -1,7 +1,7 @@
 EXTRA_DIST = $(DIST_rsrc) \
 	applications/vlc.desktop.in \
 	$(skins2_default_vlt_FILES)
-MOSTLYCLEANFILES = $(nobase_pkgdata_DATA)
+MOSTLYCLEANFILES = $(nobase_pkgdata_DATA) $(nobase_data_DATA)
 
 pkgdatadir = $(datadir)/vlc
 
@@ -19,8 +19,12 @@ nobase_dist_pkgdata_DATA = \
 	$(DIST_osdmenu_dvd)
 
 nobase_pkgdata_DATA = skins2/default.vlt
-nobase_dist_data_DATA = applications/vlc.desktop
+nobase_data_DATA = applications/vlc.desktop
 nobase_dist_bin_SCRIPTS = applications/gnome-vlc-default.sh
+
+applications/vlc.desktop: applications/vlc.desktop.in $(top_builddir)/config.status
+	cd "$(top_builddir)" && \
+	$(SHELL) ./config.status --file=$(subdir)/applications/vlc.desktop
 
 DIST_rsrc = \
 	newres.h \
