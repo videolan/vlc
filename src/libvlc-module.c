@@ -896,7 +896,7 @@ static const char *ppsz_clock_descriptions[] =
     "for example if you associated VLC with some media types and you " \
     "don't want a new instance of VLC to be opened each time you " \
     "open a file in your file manager. This option will allow you " \
-    "to play the file with the already running instance or enqueue it." \
+    "to play the file with the already running instance or enqueue it. " \
     "This option require the D-Bus session daemon to be active " \
     "and the running instance of VLC to use D-Bus control interface.")
 

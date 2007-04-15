@@ -975,7 +975,8 @@ static void RunThread( vout_thread_t *p_vout)
 
                 p_vfilter->p_cfg = p_vout->p_vfilters_cfg[i];
                 p_vfilter->p_module = module_Need( p_vfilter, "video filter2",
-                                                 p_vout->psz_vfilters[i], 0 );
+                                                   p_vout->psz_vfilters[i],
+                                                   VLC_TRUE );
 
                 if( p_vfilter->p_module )
                 {

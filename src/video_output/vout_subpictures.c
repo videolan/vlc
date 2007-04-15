@@ -140,7 +140,7 @@ int spu_ParseChain( spu_t *p_spu )
         p_spu->pp_filter[p_spu->i_filter]->p_cfg = p_cfg;
         p_spu->pp_filter[p_spu->i_filter]->p_module =
             module_Need( p_spu->pp_filter[p_spu->i_filter],
-                         "sub filter", psz_name, 0 );
+                         "sub filter", psz_name, VLC_TRUE );
         if( p_spu->pp_filter[p_spu->i_filter]->p_module )
         {
             filter_owner_sys_t *p_sys = malloc( sizeof(filter_owner_sys_t) );
@@ -551,7 +551,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             if( psz_modulename && *psz_modulename )
             {
                 p_spu->p_text->p_module =
-                    module_Need( p_spu->p_text, "text renderer", psz_modulename, VLC_TRUE );
+                    module_Need( p_spu->p_text, "text renderer",
+                                 psz_modulename, VLC_TRUE );
             }
             if( !p_spu->p_text->p_module )
             {
