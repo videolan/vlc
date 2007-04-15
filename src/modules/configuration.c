@@ -824,6 +824,25 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 }
 
 
+static int strtoi (const char *str)
+{
+    char *end;
+    long l;
+
+    errno = 0;
+    l = strtol (str, &end, 0);
+
+    if (!errno)
+    {
+        if ((l > INT_MAX) || (l < INT_MIN))
+            errno = ERANGE;
+        if (*end)
+            errno = EINVAL;
+    }
+    return (int)l;
+}
+
+
 /*****************************************************************************
  * config_LoadConfigFile: loads the configuration file.
  *****************************************************************************
@@ -932,27 +951,28 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 continue;
 
             /* We found it */
+            errno = 0;
+
             switch( p_item->i_type )
             {
                 case CONFIG_ITEM_BOOL:
                 case CONFIG_ITEM_INTEGER:
-                    if( !*psz_option_value )
-                        break;                    /* ignore empty option */
-                    p_item->value.i = strtol( psz_option_value, 0, 0 );
-                    p_item->saved.i = p_item->value.i;
-
-                    /*msg_Dbg (p_this, "option \"%s\", value %i",
-                             psz_option_name, p_item->value.i);*/
+                {
+                    long l = strtoi (psz_option_value);
+                    if (errno)
+                        msg_Warn (p_this, "Integer value (%s) for %s: %s",
+                                  psz_option_value, psz_option_name,
+                                  strerror (errno));
+                    else
+                        p_item->saved.i = p_item->value.i = (int)l;
                     break;
+                }
 
                 case CONFIG_ITEM_FLOAT:
                     if( !*psz_option_value )
                         break;                    /* ignore empty option */
                     p_item->value.f = (float)i18n_atof( psz_option_value);
                     p_item->saved.f = p_item->value.f;
-
-                    /*msg_Dbg (p_this, "option \"%s\", value %f",
-                             psz_option_name, (double)p_item->value.f);*/
                     break;
 
                 case CONFIG_ITEM_KEY:
@@ -973,9 +993,6 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     p_item->saved.psz = strdupnull (p_item->value.psz);
 
                     vlc_mutex_unlock( p_item->p_lock );
-
-                    /*msg_Dbg (p_this, "option \"%s\", value \"%s\"",
-                             psz_option_name, psz_option_value ?: "");*/
                     break;
             }
 
@@ -983,9 +1000,14 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         }
     }
 
-    vlc_list_release( p_list );
+    if (ferror (file))
+    {
+        msg_Err (p_this, "error reading configuration: %s", strerror (errno));
+        clearerr (file);
+    }
+    fclose (file);
 
-    fclose( file );
+    vlc_list_release( p_list );
 
     vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
     return 0;
