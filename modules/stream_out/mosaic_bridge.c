@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mosaic_bridge.c:
  *****************************************************************************
- * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright (C) 2004-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
@@ -34,7 +34,8 @@
 #include <vlc_block.h>
 #include <vlc_codec.h>
 
-#include "vlc_image.h"
+#include <vlc_image.h>
+#include <vlc_filter.h>
 
 #include "../video_filter/mosaic.h"
 
@@ -53,8 +54,10 @@ struct sout_stream_sys_t
     char *psz_id;
     vlc_bool_t b_inited;
 
-    picture_t *p_mask;
-    vlc_mutex_t mask_lock;
+    int i_chroma; /* force image format chroma */
+
+    filter_t **pp_vfilters;
+    int i_vfilters;
 };
 
 #define PICTURE_RING_SIZE 4
@@ -87,22 +90,6 @@ static void ReleasePicture( picture_t *p_pic )
     }
 }
 
-/* copied from video_filters/erase.c . Gruik ? */
-static void LoadMask( sout_stream_t *p_stream, const char *psz_filename )
-{
-    image_handler_t *p_image;
-    video_format_t fmt_in, fmt_out;
-    memset( &fmt_in, 0, sizeof( video_format_t ) );
-    memset( &fmt_out, 0, sizeof( video_format_t ) );
-    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-    if( p_stream->p_sys->p_mask )
-        p_stream->p_sys->p_mask->pf_release( p_stream->p_sys->p_mask );
-    p_image = image_HandlerCreate( p_stream );
-    p_stream->p_sys->p_mask =
-        image_ReadUrl( p_image, psz_filename, &fmt_in, &fmt_out );
-    image_HandlerDelete( p_image );
-}
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -112,8 +99,15 @@ static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *, block_t * );
 
-static void video_del_buffer( decoder_t *, picture_t * );
-static picture_t *video_new_buffer( decoder_t * );
+inline static void video_del_buffer_decoder( decoder_t *, picture_t * );
+inline static void video_del_buffer_filter( filter_t *, picture_t * );
+static void video_del_buffer( vlc_object_t *, picture_t * );
+
+inline static picture_t *video_new_buffer_decoder( decoder_t * );
+inline static picture_t *video_new_buffer_filter( filter_t * );
+static picture_t *video_new_buffer( vlc_object_t *, decoder_owner_sys_t *,
+                                    es_format_t *, void (*)( picture_t * ) );
+
 static void video_link_picture_decoder( decoder_t *, picture_t * );
 static void video_unlink_picture_decoder( decoder_t *, picture_t * );
 static int MosaicBridgeCallback( vlc_object_t *, char const *,
@@ -135,11 +129,17 @@ static int MosaicBridgeCallback( vlc_object_t *, char const *,
 #define RATIO_TEXT N_("Sample aspect ratio")
 #define RATIO_LONGTEXT N_( \
     "Sample aspect ratio of the destination (1:1, 3:4, 2:3)." )
-#define MASK_TEXT N_("Transparency mask")
-#define MASK_LONGTEXT N_( \
-    "Alpha blending transparency mask. Use's a png alpha channel.")
 
-#define SOUT_CFG_PREFIX "sout-mosaic-bridge-"
+#define VFILTER_TEXT N_("Video filter")
+#define VFILTER_LONGTEXT N_( \
+    "Video filters will be applied to the video stream." );
+
+#define CHROMA_TEXT N_("Image chroma")
+#define CHROMA_LONGTEXT N_( \
+    "Force the use of a specific chroma. Use YUVA if you're planning " \
+    "to use the Alphamask or Bluescreen video filter." );
+
+#define CFG_PREFIX "sout-mosaic-bridge-"
 
 vlc_module_begin();
     set_shortname( _( "Mosaic bridge" ) );
@@ -147,16 +147,19 @@ vlc_module_begin();
     set_capability( "sout stream", 0 );
     add_shortcut( "mosaic-bridge" );
 
-    add_string( SOUT_CFG_PREFIX "id", "Id", NULL, ID_TEXT, ID_LONGTEXT,
+    add_string( CFG_PREFIX "id", "Id", NULL, ID_TEXT, ID_LONGTEXT,
                 VLC_FALSE );
-    add_integer( SOUT_CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
+    add_integer( CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
                  WIDTH_LONGTEXT, VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
+    add_integer( CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
                  HEIGHT_LONGTEXT, VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "sar", "1:1", NULL, RATIO_TEXT,
+    add_string( CFG_PREFIX "sar", "1:1", NULL, RATIO_TEXT,
                 RATIO_LONGTEXT, VLC_FALSE );
-    add_string( SOUT_CFG_PREFIX "mask", NULL, NULL, MASK_TEXT,
-                MASK_LONGTEXT, VLC_FALSE );
+    add_string( CFG_PREFIX "chroma", 0, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
+                VLC_FALSE );
+
+    add_module_list( CFG_PREFIX "vfilter", "video filter2",
+                     NULL, NULL, VFILTER_TEXT, VFILTER_LONGTEXT, VLC_FALSE );
 
     set_callbacks( Open, Close );
 
@@ -164,7 +167,7 @@ vlc_module_begin();
 vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
-    "id", "width", "height", "sar", "mask", NULL
+    "id", "width", "height", "sar", "vfilter", "chroma", NULL
 };
 
 /*****************************************************************************
@@ -177,7 +180,7 @@ static int Open( vlc_object_t *p_this )
     libvlc_global_data_t *p_libvlc_global = p_this->p_libvlc_global;
     vlc_value_t           val;
 
-    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+    config_ChainParse( p_stream, CFG_PREFIX, ppsz_sout_options,
                        p_stream->p_cfg );
 
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
@@ -192,37 +195,20 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_libvlc_global, "mosaic-lock", &val );
     p_sys->p_lock = val.p_address;
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "id", &val );
+    var_Get( p_stream, CFG_PREFIX "id", &val );
     p_sys->psz_id = val.psz_string;
 
     p_sys->i_height =
-        var_CreateGetIntegerCommand( p_stream, SOUT_CFG_PREFIX "height" );
-    var_AddCallback( p_stream, SOUT_CFG_PREFIX "height", MosaicBridgeCallback,
+        var_CreateGetIntegerCommand( p_stream, CFG_PREFIX "height" );
+    var_AddCallback( p_stream, CFG_PREFIX "height", MosaicBridgeCallback,
                      p_stream );
 
     p_sys->i_width =
-        var_CreateGetIntegerCommand( p_stream, SOUT_CFG_PREFIX "width" );
-    var_AddCallback( p_stream, SOUT_CFG_PREFIX "width", MosaicBridgeCallback,
+        var_CreateGetIntegerCommand( p_stream, CFG_PREFIX "width" );
+    var_AddCallback( p_stream, CFG_PREFIX "width", MosaicBridgeCallback,
                      p_stream );
 
-    vlc_mutex_init( p_stream, &p_sys->mask_lock );
-    val.psz_string =
-        var_CreateGetStringCommand( p_stream, SOUT_CFG_PREFIX "mask" );
-    var_AddCallback( p_stream, SOUT_CFG_PREFIX "mask", MosaicBridgeCallback,
-                     p_stream );
-    if( val.psz_string && *val.psz_string )
-    {
-        p_sys->p_mask = NULL;
-        LoadMask( p_stream, val.psz_string );
-        if( !p_sys->p_mask )
-            msg_Err( p_stream, "Error while loading mask (%s).",
-                     val.psz_string );
-    }
-    else
-        p_sys->p_mask = NULL;
-    free( val.psz_string );
-
-    var_Get( p_stream, SOUT_CFG_PREFIX "sar", &val );
+    var_Get( p_stream, CFG_PREFIX "sar", &val );
     if ( val.psz_string )
     {
         char *psz_parser = strchr( val.psz_string, ':' );
@@ -248,6 +234,14 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_sar_num = p_sys->i_sar_den = 1;
     }
 
+    p_sys->i_chroma = 0;
+    val.psz_string = var_GetNonEmptyString( p_stream, CFG_PREFIX "chroma" );
+    if( val.psz_string && strlen( val.psz_string ) >= 4 )
+    {
+        memcpy( &p_sys->i_chroma, val.psz_string, 4 );
+        msg_Dbg( p_stream, "Forcing image chroma to 0x%.8x (%4.4s)", p_sys->i_chroma, (char*)&p_sys->i_chroma );
+    }
+
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
@@ -270,10 +264,6 @@ static void Close( vlc_object_t * p_this )
     if ( p_sys->psz_id )
         free( p_sys->psz_id );
 
-    vlc_mutex_destroy( &p_sys->mask_lock );
-    if( p_stream->p_sys->p_mask )
-        p_stream->p_sys->p_mask->pf_release( p_stream->p_sys->p_mask );
-
     free( p_sys );
 }
 
@@ -282,6 +272,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     bridge_t *p_bridge;
     bridged_es_t *p_es;
+    char *psz_chain, *psz_parser;
     int i;
 
     if ( p_sys->b_inited )
@@ -299,8 +290,8 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_sys->p_decoder->fmt_out.i_extra = 0;
     p_sys->p_decoder->fmt_out.p_extra = 0;
     p_sys->p_decoder->pf_decode_video = 0;
-    p_sys->p_decoder->pf_vout_buffer_new = video_new_buffer;
-    p_sys->p_decoder->pf_vout_buffer_del = video_del_buffer;
+    p_sys->p_decoder->pf_vout_buffer_new = video_new_buffer_decoder;
+    p_sys->p_decoder->pf_vout_buffer_del = video_del_buffer_decoder;
     p_sys->p_decoder->pf_picture_link    = video_link_picture_decoder;
     p_sys->p_decoder->pf_picture_unlink  = video_unlink_picture_decoder;
     p_sys->p_decoder->p_owner = malloc( sizeof(decoder_owner_sys_t) );
@@ -375,6 +366,64 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     msg_Dbg( p_stream, "mosaic bridge id=%s pos=%d", p_es->psz_id, i );
 
+    /* Create user specified video filters */
+    psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
+    printf("psz_chain: [33;1m%s[0m\n", psz_chain );
+    {
+        config_chain_t *p_cfg;
+        for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
+        {
+            printf(" - %s\n", p_cfg->psz_value );
+        }
+    }
+    p_sys->i_vfilters = 0;
+    p_sys->pp_vfilters = NULL;
+    psz_parser = psz_chain;
+    while( psz_parser && *psz_parser )
+    {
+        config_chain_t *p_cfg;
+        char *psz_name;
+        filter_t **pp_vfilter;
+        psz_parser = config_ChainCreate( &psz_name, &p_cfg, psz_parser );
+        p_sys->i_vfilters++;
+        p_sys->pp_vfilters =
+            (filter_t **)realloc( p_sys->pp_vfilters,
+                                  p_sys->i_vfilters * sizeof(filter_t *) );
+        pp_vfilter = p_sys->pp_vfilters+(p_sys->i_vfilters - 1);
+        *pp_vfilter = vlc_object_create( p_stream, VLC_OBJECT_FILTER );
+        vlc_object_attach( *pp_vfilter, p_stream );
+        (*pp_vfilter)->pf_vout_buffer_new = video_new_buffer_filter;
+        (*pp_vfilter)->pf_vout_buffer_del = video_del_buffer_filter;
+        (*pp_vfilter)->fmt_in = p_sys->p_decoder->fmt_out;
+        if( p_sys->i_chroma )
+            (*pp_vfilter)->fmt_in.video.i_chroma = p_sys->i_chroma;
+        (*pp_vfilter)->fmt_out = (*pp_vfilter)->fmt_in;
+        (*pp_vfilter)->p_cfg = p_cfg;
+        (*pp_vfilter)->p_module =
+            module_Need( *pp_vfilter, "video filter2", psz_name, VLC_TRUE );
+        if( (*pp_vfilter)->p_module )
+        {
+            /* It worked! */
+            (*pp_vfilter)->p_owner = (filter_owner_sys_t *)
+                p_sys->p_decoder->p_owner;
+            msg_Err( p_stream, "Added video filter %s to the chain",
+                     psz_name );
+        }
+        else
+        {
+            /* Crap ... we didn't find a filter */
+            msg_Warn( p_stream,
+                      "no video filter matching name \"%s\" found",
+                      psz_name );
+            vlc_object_detach( *pp_vfilter );
+            vlc_object_destroy( *pp_vfilter );
+            p_sys->i_vfilters--;
+        }
+        //if( psz_parser && *psz_parser ) psz_parser++;
+        printf("\n\npsz_parser: %s\n\n", psz_parser );
+    }
+    free( psz_chain );
+
     return (sout_stream_id_t *)p_sys;
 }
 
@@ -384,6 +433,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     bridge_t *p_bridge;
     bridged_es_t *p_es;
     vlc_bool_t b_last_es = VLC_TRUE;
+    filter_t **pp_vfilter, **pp_end;
     int i;
 
     if ( !p_sys->b_inited )
@@ -411,6 +461,18 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
             }
         }
     }
+
+    /* Destroy user specified video filters */
+    pp_vfilter = p_sys->pp_vfilters;
+    pp_end = pp_vfilter + p_sys->i_vfilters;
+    for( ; pp_vfilter < pp_end; pp_vfilter++ )
+    {
+        vlc_object_detach( *pp_vfilter );
+        if( (*pp_vfilter)->p_module )
+            module_Unneed( *pp_vfilter, (*pp_vfilter)->p_module );
+        vlc_object_destroy( *pp_vfilter );
+    }
+    free( p_sys->pp_vfilters );
 
     vlc_mutex_lock( p_sys->p_lock );
 
@@ -498,11 +560,9 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             memset( &fmt_out, 0, sizeof(video_format_t) );
             fmt_in = p_sys->p_decoder->fmt_out.video;
 
-            if( p_sys->p_mask )
-            {
-                vlc_mutex_lock( &p_sys->mask_lock );
-                fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-            }
+
+            if( p_sys->i_chroma )
+                fmt_out.i_chroma = p_sys->i_chroma;
             else
                 fmt_out.i_chroma = VLC_FOURCC('I','4','2','0');
 
@@ -535,60 +595,11 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                 msg_Err( p_stream, "image conversion failed" );
                 continue;
             }
-
-            if( p_sys->p_mask )
-            {
-                plane_t *p_mask = p_sys->p_mask->p+A_PLANE;
-                plane_t *p_apic = p_new_pic->p+A_PLANE;
-                if(    p_mask->i_visible_pitch
-                    != p_apic->i_visible_pitch
-                    || p_mask->i_visible_lines
-                    != p_apic->i_visible_lines )
-                {
-                    msg_Warn( p_stream,
-                              "Mask size (%d x %d) and image size (%d x %d) "
-                              "don't match. The mask will not be applied.",
-                              p_mask->i_visible_pitch,
-                              p_mask->i_visible_lines,
-                              p_apic->i_visible_pitch,
-                              p_apic->i_visible_lines );
-                }
-                else
-                {
-                    if( p_mask->i_pitch != p_apic->i_pitch
-                    ||  p_mask->i_lines != p_apic->i_lines )
-                    {
-                        /* visible plane sizes match ... but not the undelying
-                         * buffer. I'm not sure that this can happen,
-                         * but better safe than sorry. */
-                        int i_line;
-                        int i_lines = p_mask->i_visible_lines;
-                        uint8_t *p_src = p_mask->p_pixels;
-                        uint8_t *p_dst = p_apic->p_pixels;
-                        int i_src_pitch = p_mask->i_pitch;
-                        int i_dst_pitch = p_apic->i_pitch;
-                        int i_visible_pitch = p_mask->i_visible_pitch;
-                        for( i_line = 0; i_line < i_lines; i_line++,
-                             p_src += i_src_pitch, p_dst += i_dst_pitch )
-                        {
-                            p_stream->p_libvlc->pf_memcpy(
-                                p_dst, p_src, i_visible_pitch );
-                        }
-                    }
-                    else
-                    {
-                        /* plane sizes match */
-                        p_stream->p_libvlc->pf_memcpy(
-                            p_apic->p_pixels, p_mask->p_pixels,
-                            p_mask->i_pitch * p_mask->i_lines );
-                    }
-                }
-                vlc_mutex_unlock( &p_sys->mask_lock );
-            }
         }
         else
         {
             p_new_pic = (picture_t*)malloc( sizeof(picture_t) );
+            /* TODO: chroma conversion if needed */
             vout_AllocatePicture( p_stream, p_new_pic, p_pic->format.i_chroma,
                                   p_pic->format.i_width, p_pic->format.i_height,
                                   p_sys->p_decoder->fmt_out.video.i_aspect );
@@ -602,8 +613,30 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         p_new_pic->p_sys = (picture_sys_t *)p_new_pic->pf_release;
         p_new_pic->pf_release = ReleasePicture;
         p_new_pic->date = p_pic->date;
-
         p_pic->pf_release( p_pic );
+
+        if( p_sys->pp_vfilters )
+        {
+            /* Apply user specified video filters */
+            filter_t **pp_vfilter = p_sys->pp_vfilters;
+            filter_t **pp_end = pp_vfilter + p_sys->i_vfilters;
+            for( ; pp_vfilter < pp_end; pp_vfilter++ )
+            {
+                (*pp_vfilter)->fmt_in.i_codec = p_new_pic->format.i_chroma;
+                (*pp_vfilter)->fmt_out.i_codec = p_new_pic->format.i_chroma;
+                (*pp_vfilter)->fmt_in.video = p_new_pic->format;
+                (*pp_vfilter)->fmt_out.video = p_new_pic->format;
+                p_new_pic = (*pp_vfilter)->pf_video_filter( *pp_vfilter,
+                                                             p_new_pic );
+                if( !p_new_pic )
+                {
+                    msg_Err( p_stream, "video filter failed" );
+                    break;
+                }
+            }
+            if( !p_new_pic ) continue;
+        }
+
         PushPicture( p_stream, p_new_pic );
     }
 
@@ -616,53 +649,78 @@ struct picture_sys_t
     vlc_bool_t b_dead;
 };
 
-static void video_release_buffer( picture_t *p_pic )
+static void video_release_buffer_decoder( picture_t *p_pic )
 {
     if( p_pic && !p_pic->i_refcount && p_pic->pf_release && p_pic->p_sys )
     {
-        video_del_buffer( (decoder_t *)p_pic->p_sys->p_owner, p_pic );
+        video_del_buffer_decoder( (decoder_t *)p_pic->p_sys->p_owner, p_pic );
     }
     else if( p_pic && p_pic->i_refcount > 0 ) p_pic->i_refcount--;
 }
 
-static picture_t *video_new_buffer( decoder_t *p_dec )
+static void video_release_buffer_filter( picture_t *p_pic )
 {
-    decoder_owner_sys_t *p_sys = (decoder_owner_sys_t *)p_dec->p_owner;
-    picture_t **pp_ring = p_dec->p_owner->pp_pics;
+    if( p_pic && !p_pic->i_refcount && p_pic->pf_release && p_pic->p_sys )
+    {
+        video_del_buffer_filter( (filter_t *)p_pic->p_sys->p_owner, p_pic );
+    }
+    else if( p_pic && p_pic->i_refcount > 0 ) p_pic->i_refcount--;
+}
+
+inline static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
+{
+    return video_new_buffer( VLC_OBJECT( p_dec ),
+                             (decoder_owner_sys_t *)p_dec->p_owner,
+                             &p_dec->fmt_out,
+                             video_release_buffer_decoder );
+}
+
+inline static picture_t *video_new_buffer_filter( filter_t *p_filter )
+{
+    return video_new_buffer( VLC_OBJECT( p_filter ),
+                             (decoder_owner_sys_t *)p_filter->p_owner,
+                             &p_filter->fmt_out,
+                             video_release_buffer_filter );
+}
+
+static picture_t *video_new_buffer( vlc_object_t *p_this,
+                                    decoder_owner_sys_t *p_sys,
+                                    es_format_t *fmt_out,
+                                    void ( *pf_release )( picture_t * ) )
+{
+    picture_t **pp_ring = p_sys->pp_pics;
     picture_t *p_pic;
     int i;
 
-    if( p_dec->fmt_out.video.i_width != p_sys->video.i_width ||
-        p_dec->fmt_out.video.i_height != p_sys->video.i_height ||
-        p_dec->fmt_out.video.i_chroma != p_sys->video.i_chroma ||
-        p_dec->fmt_out.video.i_aspect != p_sys->video.i_aspect )
+    if( fmt_out->video.i_width != p_sys->video.i_width ||
+        fmt_out->video.i_height != p_sys->video.i_height ||
+        fmt_out->video.i_chroma != p_sys->video.i_chroma ||
+        fmt_out->video.i_aspect != p_sys->video.i_aspect )
     {
-        if( !p_dec->fmt_out.video.i_sar_num ||
-            !p_dec->fmt_out.video.i_sar_den )
+        if( !fmt_out->video.i_sar_num ||
+            !fmt_out->video.i_sar_den )
         {
-            p_dec->fmt_out.video.i_sar_num =
-              p_dec->fmt_out.video.i_aspect * p_dec->fmt_out.video.i_height;
+            fmt_out->video.i_sar_num =
+                fmt_out->video.i_aspect * fmt_out->video.i_height;
 
-            p_dec->fmt_out.video.i_sar_den = VOUT_ASPECT_FACTOR *
-              p_dec->fmt_out.video.i_width;
+            fmt_out->video.i_sar_den =
+                VOUT_ASPECT_FACTOR * fmt_out->video.i_width;
         }
 
-        vlc_ureduce( &p_dec->fmt_out.video.i_sar_num,
-                     &p_dec->fmt_out.video.i_sar_den,
-                     p_dec->fmt_out.video.i_sar_num,
-                     p_dec->fmt_out.video.i_sar_den, 0 );
+        vlc_ureduce( &fmt_out->video.i_sar_num,
+                     &fmt_out->video.i_sar_den,
+                     fmt_out->video.i_sar_num,
+                     fmt_out->video.i_sar_den, 0 );
 
-        if( !p_dec->fmt_out.video.i_visible_width ||
-            !p_dec->fmt_out.video.i_visible_height )
+        if( !fmt_out->video.i_visible_width ||
+            !fmt_out->video.i_visible_height )
         {
-            p_dec->fmt_out.video.i_visible_width =
-                p_dec->fmt_out.video.i_width;
-            p_dec->fmt_out.video.i_visible_height =
-                p_dec->fmt_out.video.i_height;
+            fmt_out->video.i_visible_width = fmt_out->video.i_width;
+            fmt_out->video.i_visible_height = fmt_out->video.i_height;
         }
 
-        p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-        p_sys->video = p_dec->fmt_out.video;
+        fmt_out->video.i_chroma = fmt_out->i_codec;
+        p_sys->video = fmt_out->video;
 
         for( i = 0; i < PICTURE_RING_SIZE; i++ )
         {
@@ -700,7 +758,7 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
 
     if( i == PICTURE_RING_SIZE )
     {
-        msg_Err( p_dec, "decoder/filter is leaking pictures, "
+        msg_Err( p_this, "decoder/filter is leaking pictures, "
                  "resetting its ring buffer" );
 
         for( i = 0; i < PICTURE_RING_SIZE; i++ )
@@ -712,12 +770,12 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
     }
 
     p_pic = malloc( sizeof(picture_t) );
-    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-    vout_AllocatePicture( VLC_OBJECT(p_dec), p_pic,
-                          p_dec->fmt_out.video.i_chroma,
-                          p_dec->fmt_out.video.i_width,
-                          p_dec->fmt_out.video.i_height,
-                          p_dec->fmt_out.video.i_aspect );
+    fmt_out->video.i_chroma = fmt_out->i_codec;
+    vout_AllocatePicture( p_this, p_pic,
+                          fmt_out->video.i_chroma,
+                          fmt_out->video.i_width,
+                          fmt_out->video.i_height,
+                          fmt_out->video.i_aspect );
 
     if( !p_pic->i_planes )
     {
@@ -725,9 +783,9 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
         return NULL;
     }
 
-    p_pic->pf_release = video_release_buffer;
+    p_pic->pf_release = pf_release;
     p_pic->p_sys = malloc( sizeof(picture_sys_t) );
-    p_pic->p_sys->p_owner = VLC_OBJECT(p_dec);
+    p_pic->p_sys->p_owner = p_this;
     p_pic->p_sys->b_dead = VLC_FALSE;
     p_pic->i_status = RESERVED_PICTURE;
 
@@ -736,7 +794,19 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
     return p_pic;
 }
 
-static void video_del_buffer( decoder_t *p_this, picture_t *p_pic )
+inline static void video_del_buffer_decoder( decoder_t *p_this,
+                                             picture_t *p_pic )
+{
+    video_del_buffer( VLC_OBJECT( p_this ), p_pic );
+}
+
+inline static void video_del_buffer_filter( filter_t *p_this,
+                                            picture_t *p_pic )
+{
+    video_del_buffer( VLC_OBJECT( p_this ), p_pic );
+}
+
+static void video_del_buffer( vlc_object_t *p_this, picture_t *p_pic )
 {
     p_pic->i_refcount = 0;
     p_pic->i_status = DESTROYED_PICTURE;
@@ -756,7 +826,7 @@ static void video_link_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
 
 static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
 {
-    video_release_buffer( p_pic );
+    video_release_buffer_decoder( p_pic );
 }
 
 
@@ -771,28 +841,8 @@ static int MosaicBridgeCallback( vlc_object_t *p_this, char const *psz_var,
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     int i_ret = VLC_SUCCESS;
 
-#define VAR_IS( a ) !strcmp( psz_var, SOUT_CFG_PREFIX a )
-    if( VAR_IS( "mask" ) )
-    {
-        vlc_mutex_lock( &p_sys->mask_lock );
-        if( newval.psz_string && *newval.psz_string )
-        {
-            LoadMask( p_stream, newval.psz_string );
-            if( !p_sys->p_mask )
-            {
-                msg_Err( p_stream, "Error while loading mask (%s).",
-                         newval.psz_string );
-                i_ret = VLC_EGENERIC;
-            }
-        }
-        else if( p_sys->p_mask )
-        {
-            p_sys->p_mask->pf_release( p_sys->p_mask );
-            p_sys->p_mask = NULL;
-        }
-        vlc_mutex_unlock( &p_sys->mask_lock );
-    }
-    else if( VAR_IS( "height" ) )
+#define VAR_IS( a ) !strcmp( psz_var, CFG_PREFIX a )
+    if( VAR_IS( "height" ) )
     {
         /* We create the handler before updating the value in p_sys
          * so we don't have to worry about locking */

@@ -1187,7 +1187,7 @@ VLC_ADD_PLUGINS([packetizer_vc1])
 if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGINS([access_fake access_filter_timeshift access_filter_record access_filter_dump])
   VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf marq podcast shout sap fake folder])
-  VLC_ADD_PLUGINS([rss mosaic wall motiondetect clone crop erase])
+  VLC_ADD_PLUGINS([rss mosaic wall motiondetect clone crop erase bluescreen alphamask])
   VLC_ADD_PLUGINS([i420_yuy2 i422_yuy2 i420_ymga])
   VLC_ADD_PLUGINS([aout_file linear_resampler bandlimited_resampler])
   VLC_ADD_PLUGINS([float32_mixer spdif_mixer simple_channel_mixer])

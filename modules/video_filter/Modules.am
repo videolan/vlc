@@ -30,4 +30,6 @@ SOURCES_colorthres = colorthres.c
 SOURCES_extract = extract.c
 SOURCES_sharpen = sharpen.c
 SOURCES_erase = erase.c
+SOURCES_bluescreen = bluescreen.c
+SOURCES_alphamask = alphamask.c
 noinst_HEADERS = filter_common.h

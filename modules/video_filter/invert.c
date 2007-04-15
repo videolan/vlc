@@ -108,6 +108,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     int i_index;
+    int i_planes;
 
     if( !p_pic ) return NULL;
 
@@ -120,7 +121,20 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+    if( p_pic->format.i_chroma == VLC_FOURCC('Y','U','V','A') )
+    {
+        /* We don't want to invert the alpha plane */
+        i_planes = p_pic->i_planes - 1;
+        p_filter->p_libvlc->pf_memcpy(
+            p_outpic->p[A_PLANE].p_pixels, p_pic->p[A_PLANE].p_pixels,
+            p_pic->p[A_PLANE].i_pitch *  p_pic->p[A_PLANE].i_lines );
+    }
+    else
+    {
+        i_planes = p_pic->i_planes;
+    }
+
+    for( i_index = 0 ; i_index < i_planes ; i_index++ )
     {
         uint8_t *p_in, *p_in_end, *p_line_end, *p_out;
 
