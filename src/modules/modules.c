@@ -157,7 +157,7 @@ static void module_LoadMain( vlc_object_t *p_this );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 2
+#define CACHE_SUBVERSION_NUM 3
 
 /*****************************************************************************
  * module_InitBank: create the module bank.
