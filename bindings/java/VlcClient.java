@@ -71,7 +71,7 @@ class VLCPlayerFrame  extends Frame {
         add( fullScreenButton, gridBagConstraints);
 
 
-        jTextField1.setText("file:///home/little/a.avi");
+        jTextField1.setText("file://a.avi");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -143,7 +143,7 @@ class VLCPlayerFrame  extends Frame {
 
     private void setButtonActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-			jvlc.playlist.add("file:///home/little/a.avi", "a.avi");
+			jvlc.playlist.add("file://a.avi", "a.avi");
 			jvlc.playlist.play(-1, null);
 		} catch (VLCException e) {
 			// TODO Auto-generated catch block
