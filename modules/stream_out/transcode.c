@@ -297,8 +297,8 @@ vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
     "venc", "vcodec", "vb", "croptop", "cropbottom", "cropleft", "cropright",
-    "paddtop", "paddbottom", "paddleft", "paddright", 
-    "canvas-width", "canvas-height", "canvas-aspect", 
+    "paddtop", "paddbottom", "paddleft", "paddright",
+    "canvas-width", "canvas-height", "canvas-aspect",
     "scale", "fps", "width", "height", "vfilter", "deinterlace",
     "deinterlace-module", "threads", "hurry-up", "aenc", "acodec", "ab",
     "afilter", "samplerate", "channels", "senc", "scodec", "soverlay",
