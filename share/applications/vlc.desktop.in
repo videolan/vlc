@@ -1,6 +1,6 @@
 [Desktop Entry]
 Encoding=UTF-8
-Version=0.9.0
+Version=@VERSION@
 Name=VLC media player
 Name[fr]=Lecteur multimédia VLC
 Comment=Universal movies and music player
