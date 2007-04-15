@@ -69,12 +69,6 @@
 static int ConfigStringToKey( const char * );
 static char *ConfigKeyToString( int );
 
-static inline void freenull (const void *p)
-{
-    if (p != NULL)
-        free ((void *)p);
-}
-
 static inline char *strdupnull (const char *src)
 {
     if (src == NULL)
@@ -678,9 +672,9 @@ void config_Free( module_t *p_module )
 
         if (IsConfigStringType (p_item->i_type))
         {
-            freenull (p_item->value.psz);
-            freenull (p_item->orig.psz);
-            freenull (p_item->saved.psz);
+            free ((char *)p_item->value.psz);
+            free ((char *)p_item->orig.psz);
+            free ((char *)p_item->saved.psz);
         }
 
         if( p_item->i_list )
@@ -776,7 +770,7 @@ void __config_ResetAll( vlc_object_t *p_this )
             else
             if (IsConfigStringType (p_module->p_config[i].i_type))
             {
-                freenull (p_module->p_config[i].value.psz);
+                free ((char *)p_module->p_config[i].value.psz);
                 p_module->p_config[i].value.psz =
                         strdupnull (p_module->p_config[i].orig.psz);
             }
@@ -1252,7 +1246,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                 psz_key = ConfigKeyToString( i_value );
                 fprintf( file, "%s=%s\n", p_item->psz_name,
                          psz_key ? psz_key : "" );
-                freenull (psz_key);
+                free (psz_key);
 
                 p_item->saved.i = i_value;
                 break;
@@ -1281,7 +1275,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
                 if( b_autosave && !p_item->b_autosave ) break;
 
-                freenull (p_item->saved.psz);
+                free ((char *)p_item->saved.psz);
                 if( (psz_value && p_item->orig.psz &&
                      strcmp( psz_value, p_item->orig.psz )) ||
                     !psz_value || !p_item->orig.psz)
