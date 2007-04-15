@@ -145,7 +145,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     vlc_mutex_lock( &p_sys->mask_lock );
-    /* TODO: this should be a seperate "video filter2" */
     plane_t *p_mask = p_sys->p_mask->p+A_PLANE;
     plane_t *p_apic = p_pic->p+A_PLANE;
     if(    p_mask->i_visible_pitch
@@ -166,7 +165,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         if( p_mask->i_pitch != p_apic->i_pitch
         ||  p_mask->i_lines != p_apic->i_lines )
         {
-            /* visible plane sizes match ... but not the undelying
+            /* visible plane sizes match ... but not the underlying
              * buffer. I'm not sure that this can happen,
              * but better safe than sorry. */
             int i_line;
