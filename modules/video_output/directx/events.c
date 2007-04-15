@@ -977,9 +977,20 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         point.x = point.y = 0;
         ClientToScreen( p_vout->p_sys->hwnd, &point );
 
-        SetParent( p_vout->p_sys->hwnd, 0 );
-        p_vout->p_sys->i_window_style =
-            WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
+        int d = 0;
+
+        if( i_query == VOUT_REPARENT ) d = va_arg( args, int );
+        if( !d )
+        {
+            SetParent( p_vout->p_sys->hwnd, 0 );
+            p_vout->p_sys->i_window_style =
+                WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
+        }
+        else
+        {
+            SetParent( p_vout->p_sys->hwnd, d );
+            p_vout->p_sys->i_window_style = WS_CLIPCHILDREN;
+        }
         SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE,
                        p_vout->p_sys->i_window_style |
                        (i_query == VOUT_CLOSE ? 0 : WS_VISIBLE) );
