@@ -203,6 +203,14 @@ EXTRA_DIST += \
 	pixmaps/playlist_50x50.xpm \
 	pixmaps/subtitles_50x50.xpm \
 	pixmaps/video_50x50.xpm \
+	pixmaps/type_unknown.xpm \
+	pixmaps/type_afile.xpm \
+	pixmaps/type_vfile.xpm \
+	pixmaps/type_card.xpm \
+	pixmaps/type_disc.xpm \
+	pixmaps/type_cdda.xpm \
+	pixmaps/type_directory.xpm \
+	pixmaps/type_node.xpm \
 	pixmaps/go-next.png \
 	pixmaps/next.png \
 	pixmaps/noart.png \
