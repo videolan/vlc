@@ -202,4 +202,19 @@ EXTRA_DIST += \
 	pixmaps/interface_50x50.xpm \
 	pixmaps/playlist_50x50.xpm \
 	pixmaps/subtitles_50x50.xpm \
-	pixmaps/video_50x50.xpm
+	pixmaps/video_50x50.xpm \
+	pixmaps/go-next.png \
+	pixmaps/next.png \
+	pixmaps/noart.png \
+	pixmaps/playlist_icon.png \
+	pixmaps/play.png \
+	pixmaps/previous.png \
+	pixmaps/spref_cone_Audio_64.png \
+	pixmaps/spref_cone_Hotkeys_64.png \
+	pixmaps/spref_cone_Input_64.png \
+	pixmaps/spref_cone_Interface_64.png \
+	pixmaps/spref_cone_Subtitles_64.png \
+	pixmaps/spref_cone_Video_64.png \
+	pixmaps/stop.png \
+	pixmaps/volume-high.png \
+	pixmaps/volume-low.png
