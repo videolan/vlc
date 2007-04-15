@@ -86,10 +86,12 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-#ifndef THIS_PIECE_OF_CODE_IS_FIXED // see #1047 and possibly others
-    (void)p_playlist;
-#else
-    char *psz_uri, *psz_homedir =p_playlist->p_libvlc->psz_homedir;
+#if 0
+    FIXME: this code breaks streaming output (or streaming output breaks this,
+    whichever you prefer).
+
+    const char *psz_homedir = p_playlist->p_libvlc->psz_homedir;
+    char *psz_uri = NULL;
     input_item_t *p_input;
 
     if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
@@ -98,13 +100,21 @@ int playlist_MLLoad( playlist_t *p_playlist )
         msg_Err( p_playlist, "no home directory, cannot load media library") ;
         return VLC_EGENERIC;
     }
-    asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP CONFIG_DIR DIR_SEP
-                        "ml.xsp", psz_homedir );
+
+    if( asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP CONFIG_DIR DIR_SEP
+                        "ml.xsp", psz_homedir ) == -1 )
+    {
+        psz_uri = NULL;
+        goto error;
+    }
 
     p_input = input_ItemNewExt( p_playlist, psz_uri,
                                 _("Media Library"), 0, NULL, -1 );
-    p_playlist->p_ml_category->p_input = p_input;
-    p_playlist->p_ml_onelevel->p_input = p_input;
+    if( p_input == NULL )
+        goto error;
+
+    p_playlist->p_ml_onelevel->p_input =
+        p_playlist->p_ml_category->p_input = p_input;
 
     p_playlist->b_doing_ml = VLC_TRUE;
     stats_TimerStart( p_playlist, "ML Load", STATS_TIMER_ML_LOAD );
@@ -113,8 +123,15 @@ int playlist_MLLoad( playlist_t *p_playlist )
     p_playlist->b_doing_ml = VLC_FALSE;
 
     free( psz_uri );
-#endif
     return VLC_SUCCESS;
+
+error:
+    free( psz_uri );
+    return VLC_ENOMEM;
+#else
+    msg_Err( p_playlist, "Reloading playlist not implemented." );
+    return VLC_EGENERIC;
+#endif
 }
 
 int playlist_MLDump( playlist_t *p_playlist )
