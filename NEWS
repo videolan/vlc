@@ -58,7 +58,9 @@ Video output and filters:
  * Enhancements to subtitles' renderer to support bold, italics and some HTML
    tags
  * Support for RGBA and I420 blending. This improves Mosaic CPU usage *a lot*.
- * Add support for a transparency mask in the mosaic_bridge module.
+ * New transparency mask video filter (for use with the mosaic_bridge module).
+ * New bluescreen video filter (for use with the mosaic_bridge module). This
+   was previously part of the mosaic module.
 
 Stream output:
  * UDP-Lite (requires OS support) for RTP/TS encapsulation
