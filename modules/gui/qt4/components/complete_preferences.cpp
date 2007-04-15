@@ -79,24 +79,24 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 #undef BI
 
     /* Build the tree for the main module */
-    module_t *p_module = NULL;
+    const module_t *p_module = NULL;
     vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
                                         FIND_ANYWHERE );
     if( !p_list ) return;
-    for( int i_index = 0; p_module == NULL; i_index++ )
+    for( unsigned i = 0; p_module == NULL; i++ )
     {
-        assert (i_index < p_list->i_count);
+        assert (i < (unsigned)p_list->i_count);
 
-        p_module = (module_t *)p_list->p_values[i_index].p_object;
-        if( strcmp( p_module->psz_object_name, "main" ) )
-            p_module = NULL;
+        const module_t *p_main = (module_t *)p_list->p_values[i].p_object;
+        if( strcmp( p_main->psz_object_name, "main" ) == 0 )
+            p_module = p_main;
     }
 
     PrefsItemData *data = NULL;
     QTreeWidgetItem *current_item = NULL;
     for (size_t i = 0; i < p_module->confsize; i++)
     {
-        module_config_t *p_item = p_module->p_config + i;
+        const module_config_t *p_item = p_module->p_config + i;
         char *psz_help;
         QIcon icon;
         switch( p_item->i_type )
