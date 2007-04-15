@@ -47,7 +47,7 @@
 #   define net_errno (WSAGetLastError())
 extern const char *net_strerror( int val );
 #   ifndef IPV6_V6ONLY
-#       define IPV6_V6ONLY FIXME_FIXME_FIXME
+#       define IPV6_V6ONLY 27
 #   endif
 #else
 #   if HAVE_SYS_SOCKET_H
