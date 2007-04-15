@@ -183,7 +183,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INTERFACE_MAIN );
     set_description( _("Remote control interface") );
     add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
-#ifdef HAVE_ISATTY
+#if defined (HAVE_ISATTY) && !defined (WIN32)
     add_bool( "rc-fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, VLC_TRUE );
 #endif
     add_string( "rc-unix", 0, NULL, UNIX_TEXT, UNIX_LONGTEXT, VLC_TRUE );
