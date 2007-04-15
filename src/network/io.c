@@ -97,11 +97,11 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
 
 #ifdef IPV6_V6ONLY
     /*
-     * Accepts only IPv6 and IPv4 connections on IPv6 sockets.
+     * Accepts only IPv6 connections on IPv6 sockets.
      * If possible, we should open two sockets, but it is not always possible.
      */
     if (family == AF_INET6)
-        setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 0 }, sizeof (int));
+        setsockopt (fd, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 1 }, sizeof (int));
 #endif
 
 #if defined (WIN32) || defined (UNDER_CE)
@@ -237,28 +237,6 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
 
     return sockv;
 }
-
-
-int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
-                      int family, int socktype, int protocol)
-{
-    int *fdv = net_Listen (obj, host, port, family, socktype, protocol);
-    if (fdv == NULL)
-        return -1;
-
-    for (unsigned i = 1; fdv[i] != -1; i++)
-    {
-        msg_Warn (obj, "Multiple sockets opened. Dropping extra ones!");
-        net_Close (fdv[i]);
-    }
-
-    int fd = fdv[0];
-    assert (fd != -1);
-
-    free (fdv);
-    return fd;
-}
-
 
 
 static ssize_t

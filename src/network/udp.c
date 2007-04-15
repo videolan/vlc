@@ -2,7 +2,7 @@
  * udp.c:
  *****************************************************************************
  * Copyright (C) 2004-2006 the VideoLAN team
- * Copyright © 2006 Rémi Denis-Courmont
+ * Copyright © 2006-2007 Rémi Denis-Courmont
  *
  * $Id$
  *
@@ -67,11 +67,90 @@
 extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
                        int i_protocol );
 
+static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
+                             int family, int protocol)
+{
+    struct addrinfo hints, *res;
 
-/*
- * XXX: I am too lazy to put all these dual functions in “next generation”
- * network plugins.
- */
+    memset (&hints, 0, sizeof( hints ));
+    hints.ai_family = family;
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags = AI_PASSIVE;
+
+    if (host && !*host)
+        host = NULL;
+
+    msg_Dbg (obj, "net: opening %s datagram port %d", host ?: "any", port);
+
+    int val = vlc_getaddrinfo (obj, host, port, &hints, &res);
+    if (val)
+    {
+        msg_Err (obj, "Cannot resolve %s port %d : %s", host, port,
+                 vlc_gai_strerror (val));
+        return -1;
+    }
+
+    val = -1;
+
+    for (const struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
+    {
+        int fd = net_Socket (obj, ptr->ai_family, ptr->ai_socktype,
+                             protocol ?: ptr->ai_protocol);
+        if (fd == -1)
+        {
+            msg_Dbg (obj, "socket error: %s", net_strerror (net_errno));
+            continue;
+        }
+
+        if (ptr->ai_next != NULL)
+        {
+#ifdef IPV6_V6ONLY
+            if ((ptr->ai_family != AF_INET6)
+             || setsockopt (fd, SOL_IPV6, IPV6_V6ONLY, &(int){ 0 },
+                            sizeof (int)))
+#endif
+            {
+                msg_Err (obj, "Multiple network protocols present");
+                msg_Err (obj, "Please select network protocol manually");
+            }
+        }
+
+        /* Bind the socket */
+#if defined (WIN32) || defined (UNDER_CE)
+        if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
+         && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
+        {
+            struct sockaddr_in6 dumb =
+            {
+                .sin6_family = ptr->ai_addr->sa_family,
+                .sin6_port =  ((struct sockaddr_in *)(ptr->ai_addr))->sin_port
+            };
+            bind (fd, (struct sockaddr *)&dumb, ptr->ai_addrlen);
+        }
+        else
+#endif
+        if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
+        {
+            msg_Err (obj, "socket bind error (%s)", net_strerror (net_errno));
+            net_Close (fd);
+            continue;
+        }
+
+        if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
+         && net_Subscribe (obj, fd, ptr->ai_addr, ptr->ai_addrlen))
+        {
+            net_Close (fd);
+            continue;
+        }
+
+        val = fd;
+        break;
+    }
+
+    vlc_freeaddrinfo (res);
+    return val;
+}
+
 
 static int net_SetMcastHopLimit( vlc_object_t *p_this,
                                  int fd, int family, int hlim )
@@ -619,15 +698,14 @@ int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
                      const char *psz_server, int i_server,
                      int family, int protocol )
 {
+    if ((psz_server == NULL) || (psz_server[0] == '\0'))
+        return net_ListenSingle (obj, psz_bind, i_bind, family, protocol);
+
+    msg_Dbg (obj, "net: connecting to [%s]:%d from [%s]:%d",
+             psz_server, i_server, psz_bind, i_bind);
+
     struct addrinfo hints, *loc, *rem;
     int val;
-
-    if( !*psz_server )
-        return net_ListenSingle (obj, psz_bind, i_bind,
-                                 family, SOCK_DGRAM, protocol);
-
-    msg_Dbg( obj, "net: connecting to [%s]:%d from [%s]:%d",
-             psz_server, i_server, psz_bind, i_bind );
 
     memset (&hints, 0, sizeof (hints));
     hints.ai_family = family;
