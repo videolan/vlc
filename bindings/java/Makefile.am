@@ -40,11 +40,9 @@ PROCESSOR_FAMILY = `uname -m | sed -e 's/^i.86/i386/' | sed -e 's/^x86_64/amd64/
 if HAVE_WIN32
 JINCLUDES = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/win32
 LIBJINCLUDES = -L${JAVA_HOME}/lib -ljawt
-JCH = javah
 else
 JINCLUDES = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 LIBJINCLUDES = -L$(JAVA_HOME)/jre/lib/$(PROCESSOR_FAMILY) -ljawt
-JCH = gcjh -jni
 endif
 
 export JINCLUDES
@@ -52,15 +50,8 @@ export LIBJINCLUDES
 
 # Build targets
 
-if HAVE_WIN32
 %.class: %.java 
 	$(JAVAC) $? 
-	$(JCH) -o includes/$(*F).h org.videolan.jvlc.$(*F)
-else
-%.class: %.java
-	$(JAVAC) $?
-	$(JCH) $(@D)/$(*F) -o includes/$(*F).h
-endif
 
 VlcClient: $(OBJECTS)
 	$(JAVAC) VlcClient.java
@@ -71,6 +62,6 @@ VLCExample: $(OBJECTS)
 all-am: VlcClient VLCExample
 
 clean-local:
-	rm -f *.class *~ org/videolan/jvlc/*.class org_videolan*.h includes/*.h src/*.o *.so *.o *.dll
+	rm -f *.class *~ org/videolan/jvlc/*.class org_videolan*.h src/*.o *.so *.o *.dll
 
 endif
