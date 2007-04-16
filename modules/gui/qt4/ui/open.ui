@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>440</width>
-    <height>231</height>
+    <height>286</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -50,113 +50,134 @@
      <property name="frameShape" >
       <enum>QFrame::StyledPanel</enum>
      </property>
-     <layout class="QHBoxLayout" >
+     <layout class="QGridLayout" >
       <property name="margin" >
        <number>9</number>
       </property>
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item>
-       <layout class="QGridLayout" >
-        <property name="margin" >
-         <number>0</number>
+      <item row="0" column="4" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Start Time</string>
         </property>
-        <property name="spacing" >
-         <number>6</number>
+       </widget>
+      </item>
+      <item row="0" column="5" colspan="2" >
+       <widget class="QSpinBox" name="startTimeSpinBox" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>0</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <item row="0" column="0" >
-         <widget class="QLabel" name="cacheLabel" >
-          <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>0</hsizetype>
-            <vsizetype>5</vsizetype>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text" >
-           <string>Caching</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1" colspan="3" >
-         <widget class="QLineEdit" name="advancedLineInput" />
-        </item>
-        <item row="4" column="0" >
-         <widget class="QLabel" name="advancedLabel" >
-          <property name="text" >
-           <string>Customize</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2" >
-         <widget class="QLabel" name="label" >
-          <property name="text" >
-           <string>ms</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="4" >
-         <widget class="QCheckBox" name="slaveCheckbox" >
-          <property name="text" >
-           <string>Play another media synchronously (extra audio file, ...)</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3" >
-         <widget class="QToolButton" name="slaveBrowseButton" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>Browse...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" colspan="2" >
-         <widget class="QLineEdit" name="slaveText" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" >
-         <widget class="QLabel" name="label_2" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>Extra media</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" >
-         <widget class="QSpinBox" name="cacheSpinBox" >
-          <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>0</hsizetype>
-            <vsizetype>0</vsizetype>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight</set>
-          </property>
-          <property name="maximum" >
-           <number>999999</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" colspan="2" >
-         <widget class="Line" name="line" >
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
+        <property name="alignment" >
+         <set>Qt::AlignRight</set>
+        </property>
+        <property name="suffix" >
+         <string> s</string>
+        </property>
+        <property name="maximum" >
+         <number>999999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="cacheLabel" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>0</hsizetype>
+          <vsizetype>5</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>Caching</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1" colspan="7" >
+       <widget class="QLineEdit" name="advancedLineInput" />
+      </item>
+      <item row="2" column="0" colspan="8" >
+       <widget class="QCheckBox" name="slaveCheckbox" >
+        <property name="text" >
+         <string>Play another media synchronously (extra audio file, ...)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" colspan="5" >
+       <widget class="Line" name="line" >
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" >
+       <widget class="QLabel" name="advancedLabel" >
+        <property name="text" >
+         <string>Customize</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_2" >
+        <property name="enabled" >
+         <bool>false</bool>
+        </property>
+        <property name="text" >
+         <string>Extra media</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="5" >
+       <widget class="QLineEdit" name="slaveText" >
+        <property name="enabled" >
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="6" colspan="2" >
+       <widget class="QToolButton" name="slaveBrowseButton" >
+        <property name="enabled" >
+         <bool>false</bool>
+        </property>
+        <property name="text" >
+         <string>Browse...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="5" >
+       <widget class="Line" name="line_2" >
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QSpinBox" name="cacheSpinBox" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>0</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignRight</set>
+        </property>
+        <property name="suffix" >
+         <string> ms</string>
+        </property>
+        <property name="maximum" >
+         <number>999999</number>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

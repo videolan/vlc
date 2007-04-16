@@ -109,6 +109,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
 
     CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());
     CONNECT( ui.cacheSpinBox, valueChanged(int), this, updateMRL());
+    CONNECT( ui.startTimeSpinBox, valueChanged(int), this, updateMRL());
 
     /* Buttons action */
     BUTTONACT( playButton, play());
@@ -270,6 +271,10 @@ void OpenDialog::updateMRL() {
     if( i_cache != ui.cacheSpinBox->value() ) {
         mrl += QString(" :%1=%2").arg(storedMethod).
                                   arg(ui.cacheSpinBox->value());
+    }
+    if( ui.startTimeSpinBox->value()) {
+        mrl += " :start-time=" + QString("%1").
+            arg(ui.startTimeSpinBox->value());
     }
     ui.advancedLineInput->setText(mrl);
 }
