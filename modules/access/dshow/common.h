@@ -24,8 +24,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#ifdef size_t
 #undef size_t
+#endif
+#ifdef ptrdiff_t
 #undef ptrdiff_t
+#endif
 #include <string>
 #include <list>
 #include <deque>
