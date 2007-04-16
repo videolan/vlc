@@ -369,7 +369,8 @@ static int Init( vout_thread_t *p_vout )
 static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
 {
     vout_thread_t *p_real_vout = NULL;
-    video_format_t fmt = {0};
+    video_format_t fmt;
+    memset( &fmt, 0, sizeof( video_format_t ) );
 
     msg_Dbg( p_vout, "spawning the real video output" );
 

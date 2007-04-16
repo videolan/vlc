@@ -94,7 +94,9 @@ struct filter_sys_t
 static void LoadMask( filter_t *p_filter, const char *psz_filename )
 {
     image_handler_t *p_image;
-    video_format_t fmt_in = {0}, fmt_out = {0};
+    video_format_t fmt_in, fmt_out;
+    memset( &fmt_in, 0, sizeof( video_format_t ) );
+    memset( &fmt_out, 0, sizeof( video_format_t ) );
     fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
     if( p_filter->p_sys->p_mask )
         p_filter->p_sys->p_mask->pf_release( p_filter->p_sys->p_mask );
@@ -238,35 +240,32 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
         uint8_t *p_outpix = p_outpic->p[i_plane].p_pixels;
         uint8_t *p_mask = p_sys->p_mask->A_PIXELS;
 
+        int i_x = p_sys->i_x, i_y = p_sys->i_y;
         int x, y;
         int i_height = i_mask_visible_lines;
         int i_width = i_mask_visible_pitch;
-        if( i_plane )
+        if( i_plane ) /* U_PLANE or V_PLANE */
         {
-            i_height /= 2;
-            i_width /= 2;
+            i_width       /= 2;
+            i_height      /= 2;
+            i_x           /= 2;
+            i_y           /= 2;
         }
-        i_height = __MIN( i_visible_lines - (i_plane?p_sys->i_y/2:p_sys->i_y), i_height );
-        i_width = __MIN( i_visible_pitch - (i_plane?p_sys->i_x/2:p_sys->i_x), i_width );
+        i_height = __MIN( i_visible_lines - i_y, i_height );
+        i_width  = __MIN( i_visible_pitch - i_x, i_width  );
 
         p_filter->p_libvlc->pf_memcpy( p_outpix, p_inpix, i_pitch * i_lines );
 
-        for( y = 0; y < i_height;
-             y++, p_mask += i_plane ? 2*i_mask_pitch : i_mask_pitch )
+        for( y = 0; y < i_height; y++, p_mask += i_mask_pitch )
         {
-            uint8_t prev, next;
-            int prev_x = 0, next_x = -1;
-            p_outpix = i_plane ?
-            p_outpic->p[i_plane].p_pixels
-                       + (p_sys->i_y/2+y)*i_pitch + (p_sys->i_x/2)
-            :
-            p_outpic->p[i_plane].p_pixels
-                       + (p_sys->i_y+y)*i_pitch + p_sys->i_x;
-            if( p_sys->i_x )
+            uint8_t prev, next = 0;
+            int prev_x = -1, next_x = -2;
+            p_outpix = p_outpic->p[i_plane].p_pixels + (i_y+y)*i_pitch + i_x;
+            if( i_x )
             {
                 prev = *(p_outpix-1);
             }
-            else if( y || p_sys->i_y )
+            else if( y || i_y )
             {
                 prev = *(p_outpix-i_pitch);
             }
@@ -293,7 +292,7 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
                         if( next_x <= prev_x )
                         {
                             if( x0 == x ) x0++;
-                            if( (i_plane?p_sys->i_x/2:p_sys->i_x)+i_width >= i_visible_pitch )
+                            if( x0 >= i_visible_pitch )
                             {
                                 next_x = x0;
                                 next = prev;
@@ -304,9 +303,11 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
                                 next = p_outpix[x0];
                             }
                         }
+                        if( !( i_x || y || i_y ) )
+                            prev = next;
                     }
                     /* interpolate new value */
-                    p_outpix[x] = prev + (x-prev_x)*(next-prev)/(next_x-prev_x);
+                    p_outpix[x] = prev;// + (x-prev_x)*(next-prev)/(next_x-prev_x);
                 }
                 else
                 {
@@ -315,6 +316,29 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
                 }
             }
         }
+
+        /* Vertical bluring */
+        p_mask = p_sys->p_mask->A_PIXELS;
+        i_height = i_mask_visible_lines / (i_plane?2:1);
+        i_height = __MIN( i_visible_lines - i_y - 2, i_height );
+        for( y = __MAX(i_y-2,0); y < i_height;
+             y++, p_mask += i_mask_pitch )
+        {
+            p_outpix = p_outpic->p[i_plane].p_pixels + (i_y+y)*i_pitch + i_x;
+            for( x = 0; x < i_width; x++ )
+            {
+                if( p_mask[i_plane?2*x:x] > 127 )
+                {
+                    p_outpix[x] =
+                        ( (p_outpix[x-2*i_pitch]<<1)       /* 2 */
+                        + (p_outpix[x-i_pitch]<<2)         /* 4 */
+                        + (p_outpix[x]<<2)                 /* 4 */
+                        + (p_outpix[x+i_pitch]<<2)         /* 4 */
+                        + (p_outpix[x+2*i_pitch]<<1) )>>4; /* 2 */
+                }
+            }
+        }
+
     }
 }
 
