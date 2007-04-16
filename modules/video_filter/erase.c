@@ -307,7 +307,7 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
                             prev = next;
                     }
                     /* interpolate new value */
-                    p_outpix[x] = prev;// + (x-prev_x)*(next-prev)/(next_x-prev_x);
+                    p_outpix[x] = prev + (x-prev_x)*(next-prev)/(next_x-prev_x);
                 }
                 else
                 {
