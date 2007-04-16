@@ -5584,6 +5584,10 @@ then
   AC_PROG_JAVAC
   AC_PROG_JAVA
   PLUGINS_BINDINGS="${PLUGINS_BINDINGS} java"
+  if test "${JAVAC}" == "javac"
+  then
+    JAVAC="javac -cp ./ "
+  fi
 fi
 AM_CONDITIONAL(BUILD_JAVA, [test "${enable_java_bindings}" = "yes"])
 

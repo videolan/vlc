@@ -50,8 +50,8 @@ export LIBJINCLUDES
 
 # Build targets
 
-%.class: %.java 
-	$(JAVAC) $? 
+%.class: %.java
+	$(JAVAC) $?
 
 VlcClient: $(OBJECTS)
 	$(JAVAC) VlcClient.java
@@ -62,6 +62,6 @@ VLCExample: $(OBJECTS)
 all-am: VlcClient VLCExample
 
 clean-local:
-	rm -f *.class *~ org/videolan/jvlc/*.class org_videolan*.h src/*.o *.so *.o *.dll
+	rm -f *.class *~ org/videolan/jvlc/*.class src/*.o *.so *.o *.dll
 
 endif
