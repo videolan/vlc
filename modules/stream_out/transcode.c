@@ -1258,7 +1258,8 @@ static filter_t *transcode_audio_filter_new( sout_stream_t *p_stream,
     if( psz_name )
         p_filter->p_cfg = p_sys->p_afilters_cfg[id->i_ufilter];
 
-    p_filter->p_module = module_Need( p_filter, "audio filter2", psz_name, 0 );
+    p_filter->p_module = module_Need( p_filter, "audio filter2", psz_name,
+                                      VLC_TRUE );
     if( p_filter->p_module )
     {
         p_filter->fmt_out.audio.i_bitspersample =
@@ -2211,7 +2212,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 id->pp_filter[id->i_filter]->p_cfg = p_sys->p_deinterlace_cfg;
                 id->pp_filter[id->i_filter]->p_module =
                     module_Need( id->pp_filter[id->i_filter],
-                                 "video filter2", p_sys->psz_deinterlace, 0 );
+                                 "video filter2", p_sys->psz_deinterlace,
+                                 VLC_TRUE );
                 if( id->pp_filter[id->i_filter]->p_module )
                 {
                     id->pp_filter[id->i_filter]->p_owner =
@@ -2307,7 +2309,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 id->pp_ufilter[id->i_ufilter]->p_cfg = p_sys->p_vfilters_cfg[i];
                 id->pp_ufilter[id->i_ufilter]->p_module =
                     module_Need( id->pp_ufilter[id->i_ufilter],
-                          "video filter2", p_sys->psz_vfilters[i], 0 );
+                          "video filter2", p_sys->psz_vfilters[i], VLC_TRUE );
                 if( id->pp_ufilter[id->i_ufilter]->p_module )
                 {
                     id->pp_ufilter[id->i_ufilter]->p_owner =
