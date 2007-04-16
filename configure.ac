@@ -5584,9 +5584,9 @@ then
   AC_PROG_JAVAC
   AC_PROG_JAVA
   PLUGINS_BINDINGS="${PLUGINS_BINDINGS} java"
-  if test "${JAVAC}" == "javac"
+  if test "${JAVAC}" == "javac${EXEEXT}"
   then
-    JAVAC="javac -cp ./ "
+    JAVAC="javac${EXEEXT} -cp ./ "
   fi
 fi
 AM_CONDITIONAL(BUILD_JAVA, [test "${enable_java_bindings}" = "yes"])
