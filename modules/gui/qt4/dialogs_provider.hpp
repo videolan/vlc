@@ -68,6 +68,10 @@
     string += _("All Files");        \
     string += " (*.*)";
 
+#define OPEN_FILE_TAB           0x0
+#define OPEN_DISC_TAB           0x1
+#define OPEN_NETWORK_TAB        0x2
+#define OPEN_CAPTURE_TAB        0x3
 
 class QEvent;
 class QSignalMapper;

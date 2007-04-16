@@ -216,7 +216,7 @@ void FileOpenPanel::toggleSubtitleFrame()
 /**************************************************************************
  * Disk open
  **************************************************************************/
-DiskOpenPanel::DiskOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
+DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
@@ -230,16 +230,16 @@ DiskOpenPanel::DiskOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.chapterSpin, valueChanged(int), this, updateMRL());
 }
 
-DiskOpenPanel::~DiskOpenPanel()
+DiscOpenPanel::~DiscOpenPanel()
 {}
 
-void DiskOpenPanel::clear()
+void DiscOpenPanel::clear()
 {
     ui.titleSpin->setValue(0);
     ui.chapterSpin->setValue(0);
 }
 
-void DiskOpenPanel::updateMRL()
+void DiscOpenPanel::updateMRL()
 {
     QString mrl = "";
     /* DVD */

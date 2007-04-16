@@ -72,7 +72,7 @@ private:
     Ui::Open ui;
     FileOpenPanel *fileOpenPanel;
     NetOpenPanel *netOpenPanel;
-    DiskOpenPanel *diskOpenPanel;
+    DiscOpenPanel *discOpenPanel;
     CaptureOpenPanel *captureOpenPanel;
 
     QString storedMethod;

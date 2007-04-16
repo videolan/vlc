@@ -48,30 +48,32 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     resize( 500, 300);
 
     /* Tab definition and creation */
-    fileOpenPanel = new FileOpenPanel( ui.Tab , p_intf );
-    diskOpenPanel = new DiskOpenPanel( ui.Tab , p_intf );
-    netOpenPanel = new NetOpenPanel( ui.Tab , p_intf );
+    fileOpenPanel = new FileOpenPanel( ui.Tab, p_intf );
+    discOpenPanel = new DiscOpenPanel( ui.Tab, p_intf );
+    netOpenPanel = new NetOpenPanel( ui.Tab, p_intf );
     captureOpenPanel = new CaptureOpenPanel( ui.Tab, p_intf );
 
-    ui.Tab->addTab( fileOpenPanel, qtr( "&File" ) );
-    ui.Tab->addTab( diskOpenPanel, qtr( "&Disc" ) );
-    ui.Tab->addTab( netOpenPanel, qtr( "&Network" ) );
-    ui.Tab->addTab( captureOpenPanel, qtr( "Capture &Device" ) );
+    ui.Tab->insertTab( OPEN_FILE_TAB, fileOpenPanel, qtr( "&File" ) );
+    ui.Tab->insertTab( OPEN_DISC_TAB, discOpenPanel, qtr( "&Disc" ) );
+    ui.Tab->insertTab( OPEN_NETWORK_TAB, netOpenPanel, qtr( "&Network" ) );
+    ui.Tab->insertTab( OPEN_CAPTURE_TAB, captureOpenPanel,
+                                qtr( "Capture &Device" ) );
 
     /* Hide the advancedPanel */
     ui.advancedFrame->hide();
 
     /* Buttons Creation */
-    QSizePolicy buttonSizePolicy(static_cast<QSizePolicy::Policy>(7), static_cast<QSizePolicy::Policy>(1));
+    QSizePolicy buttonSizePolicy( static_cast<QSizePolicy::Policy>(7),
+                                  static_cast<QSizePolicy::Policy>(1) );
     buttonSizePolicy.setHorizontalStretch(0);
     buttonSizePolicy.setVerticalStretch(0);
 
     playButton = new QToolButton();
     playButton->setText( qtr( "&Play" ) );
     playButton->setSizePolicy( buttonSizePolicy );
-    playButton->setMinimumSize(QSize(90, 0));
-    playButton->setPopupMode(QToolButton::MenuButtonPopup);
-    playButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    playButton->setMinimumSize( QSize(90, 0) );
+    playButton->setPopupMode( QToolButton::MenuButtonPopup );
+    playButton->setToolButtonStyle( Qt::ToolButtonTextOnly );
 
     cancelButton = new QToolButton();
     cancelButton->setText( qtr( "&Cancel" ) );
@@ -96,7 +98,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
 
     CONNECT( fileOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
     CONNECT( netOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
-    CONNECT( diskOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
+    CONNECT( discOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
     CONNECT( captureOpenPanel, mrlUpdated( QString ), this,
             updateMRL(QString) );
 
@@ -104,7 +106,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
              this, newMethod(QString) );
     CONNECT( netOpenPanel, methodChanged( QString ),
              this, newMethod(QString) );
-    CONNECT( diskOpenPanel, methodChanged( QString ),
+    CONNECT( discOpenPanel, methodChanged( QString ),
              this, newMethod(QString) );
 
     CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());

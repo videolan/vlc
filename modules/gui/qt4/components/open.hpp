@@ -103,12 +103,12 @@ private slots:
     void updateAddress();
 };
 
-class DiskOpenPanel: public OpenPanel
+class DiscOpenPanel: public OpenPanel
 {
     Q_OBJECT;
 public:
-    DiskOpenPanel( QWidget *, intf_thread_t * );
-    virtual ~DiskOpenPanel();
+    DiscOpenPanel( QWidget *, intf_thread_t * );
+    virtual ~DiscOpenPanel();
     virtual void clear() ;
 private:
     Ui::OpenDisk ui;

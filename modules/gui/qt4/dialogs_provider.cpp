@@ -177,23 +177,23 @@ void DialogsProvider::bookmarksDialog()
 
 void DialogsProvider::openDialog()
 {
-    openDialog( 0 );
+    openDialog( OPEN_FILE_TAB );
 }
 void DialogsProvider::openFileDialog()
 {
-    openDialog( 0 );
+    openDialog( OPEN_FILE_TAB );
 }
 void DialogsProvider::openDiscDialog()
 {
-    openDialog( 1 );
+    openDialog( OPEN_DISC_TAB );
 }
 void DialogsProvider::openNetDialog()
 {
-    openDialog( 2 );
+    openDialog( OPEN_NETWORK_TAB );
 }
 void DialogsProvider::openCaptureDialog()
 {
-    openDialog( 3 );
+    openDialog( OPEN_CAPTURE_TAB );
 }
 void DialogsProvider::openDialog( int i_tab )
 {
