@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Cyril Deguet <asmax@videolan.org>
+ *          Jon Griffiths <jon_p_griffiths _At_ yahoo _DOT_ com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +21,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
+/**
+ * \file modules/audio_output/jack.c
+ * \brief JACK audio output functions
+ */
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -42,7 +46,7 @@
 struct aout_sys_t
 {
     jack_client_t *p_jack_client;
-    jack_port_t   *p_jack_port[2];
+    jack_port_t  **p_jack_ports;
     unsigned int  i_channels;
 };
 
@@ -54,16 +58,32 @@ static void Close        ( vlc_object_t * );
 static void Play         ( aout_instance_t * );
 static int Process       ( jack_nframes_t i_frames, void *p_arg );
 
+#define AUTO_CONNECT_OPTION "jack-auto-connect"
+#define AUTO_CONNECT_TEXT N_("Automatically connect to input devices")
+#define AUTO_CONNECT_LONGTEXT N_( \
+    "If enabled, this option will automatically connect output to the " \
+    "first JACK inputs found." )
+
+#define CONNECT_MATCH_OPTION "jack-connect-match"
+#define CONNECT_MATCH_TEXT N_("Connect to outputs beginning with")
+#define CONNECT_MATCH_LONGTEXT N_( \
+    "If automatic connection is enabled, only JACK inputs whose names " \
+    "begin with this prefix will be considered for connection." )
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-   set_shortname( "JACK" );
-   set_description( _("JACK audio output") );
-   set_capability( "audio output", 100 );
+    set_shortname( "JACK" );
+    set_description( _("JACK audio output") );
+    set_capability( "audio output", 100 );
     set_category( CAT_AUDIO );
     set_subcategory( SUBCAT_AUDIO_AOUT );
-   set_callbacks( Open, Close );
+    add_bool( AUTO_CONNECT_OPTION, 0, NULL, AUTO_CONNECT_TEXT,
+              AUTO_CONNECT_LONGTEXT, VLC_TRUE );
+    add_string( CONNECT_MATCH_OPTION, NULL, NULL, CONNECT_MATCH_TEXT,
+                CONNECT_MATCH_LONGTEXT, VLC_TRUE );
+    set_callbacks( Open, Close );
 vlc_module_end();
 
 /*****************************************************************************
@@ -72,16 +92,19 @@ vlc_module_end();
 static int Open( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    unsigned int i, i_in_ports;
-    const char **pp_in_ports;
-    struct aout_sys_t * p_sys;
+    struct aout_sys_t *p_sys = NULL;
+    char **pp_match_ports = NULL;
+    char *psz_prefix = NULL;
+    int status = VLC_SUCCESS;
+    unsigned int i;
 
     /* Allocate structure */
     p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
-        return VLC_ENOMEM;
+        status = VLC_ENOMEM;
+        goto error_out;
     }
     p_aout->output.p_sys = p_sys;
 
@@ -90,8 +113,8 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_jack_client == NULL )
     {
         msg_Err( p_aout, "failed to connect to JACK server" );
-        free( p_sys );
-        return VLC_EGENERIC;
+        status = VLC_EGENERIC;
+        goto error_out;
     }
 
     /* Set the process callback */
@@ -100,7 +123,7 @@ static int Open( vlc_object_t *p_this )
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit( p_aout );
 
-    /* JACK only support fl32 format */
+    /* JACK only supports fl32 format */
     p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
     // TODO add buffer size callback
     p_aout->output.i_nb_samples = jack_get_buffer_size( p_sys->p_jack_client );
@@ -108,20 +131,27 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_channels = aout_FormatNbChannels( &p_aout->output.output );
 
+    p_sys->p_jack_ports = malloc( p_sys->i_channels * sizeof(jack_port_t  *) );
+    if( p_sys->p_jack_ports == NULL )
+    {
+        msg_Err( p_aout, "out of memory" );
+        status = VLC_ENOMEM;
+        goto error_out;
+    }
+
     /* Create the output ports */
     for( i = 0; i < p_sys->i_channels; i++ )
     {
         char p_name[32];
-        snprintf( p_name, 32, "channel_%d", i + 1);
-        p_sys->p_jack_port[i] = jack_port_register( p_sys->p_jack_client,
+        snprintf( p_name, 32, "out_%d", i + 1);
+        p_sys->p_jack_ports[i] = jack_port_register( p_sys->p_jack_client,
                 p_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0 );
 
-        if( p_sys->p_jack_port[i] == NULL )
+        if( p_sys->p_jack_ports[i] == NULL )
         {
             msg_Err( p_aout, "failed to register a JACK port" );
-            jack_client_close( p_sys->p_jack_client );
-            free( p_sys );
-            return VLC_EGENERIC;
+            status = VLC_EGENERIC;
+            goto error_out;
         }
     }
 
@@ -130,40 +160,75 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_aout, "failed to activate JACK client" );
         jack_client_close( p_sys->p_jack_client );
-        free( p_sys );
-        return VLC_EGENERIC;
+        status = VLC_EGENERIC;
+        goto error_out;
     }
 
-
-    /* Find input ports to connect to */
-    pp_in_ports = jack_get_ports( p_sys->p_jack_client, NULL, NULL,
-                                  JackPortIsInput );
-    i_in_ports = 0;
-    while( pp_in_ports && pp_in_ports[i_in_ports] )
+    /* Auto connect ports if we were asked to */
+    if( config_GetInt( p_aout, AUTO_CONNECT_OPTION ) )
     {
-        i_in_ports++;
-    }
+        unsigned int i_in_ports, i_prefix_len;
+        const char **pp_in_ports;
 
-    /* Connect the output ports to input ports */
-    if( i_in_ports > 0 )
-    {
-        for( i = 0; i < p_sys->i_channels; i++ )
+        pp_in_ports = jack_get_ports( p_sys->p_jack_client, NULL, NULL,
+                                      JackPortIsInput );
+        psz_prefix = config_GetPsz( p_aout, CONNECT_MATCH_OPTION );
+        i_prefix_len = psz_prefix ? strlen(psz_prefix) : 0;
+
+        /* Find JACK input ports to connect to */
+        i = 0;
+        i_in_ports = 0;
+        while( pp_in_ports && pp_in_ports[i] )
         {
-            int i_in = i % i_in_ports;
-            if( jack_connect( p_sys->p_jack_client,
-                              jack_port_name( p_sys->p_jack_port[i] ),
-                              pp_in_ports[i_in]) )
+            if( !psz_prefix ||
+                !strncmp(psz_prefix, pp_in_ports[i], i_prefix_len) )
             {
-                msg_Err( p_aout, "failed to connect port %s to port %s",
-                         jack_port_name( p_sys->p_jack_port[i] ),
-                         pp_in_ports[i_in] );
-
+                i_in_ports++; /* Found one */
             }
-            else
+            i++;
+        }
+
+        /* Connect the output ports to input ports */
+        if( i_in_ports > 0 )
+        {
+            pp_match_ports = malloc( i_in_ports * sizeof(char*) );
+            if( pp_match_ports == NULL )
             {
-                msg_Dbg( p_aout, "connecting port %s to port %s",
-                         jack_port_name( p_sys->p_jack_port[i] ),
-                         pp_in_ports[i_in] );
+                msg_Err( p_aout, "out of memory" );
+                status = VLC_ENOMEM;
+                goto error_out;
+            }
+
+            /* populate list of matching ports */
+            i = 0;
+            i_in_ports = 0;
+            while( pp_in_ports[i] )
+            {
+                if( !psz_prefix ||
+                     !strncmp(psz_prefix, pp_in_ports[i], i_prefix_len) )
+                {
+                    pp_match_ports[i_in_ports] = pp_in_ports[i];
+                    i_in_ports++;  /* Found one */
+                }
+                i++;
+            }
+
+            /* Tie the output ports to JACK input ports */
+            for( i = 0; i < p_sys->i_channels; i++ )
+            {
+                const char* psz_in = pp_match_ports[i % i_in_ports];
+                const char* psz_out = jack_port_name( p_sys->p_jack_ports[i] );
+
+                if( jack_connect( p_sys->p_jack_client, psz_out, psz_in) )
+                {
+                    msg_Err( p_aout, "failed to connect port %s to port %s",
+                             psz_out, psz_in );
+                }
+                else
+                {
+                    msg_Dbg( p_aout, "connecting port %s to port %s",
+                             psz_out, psz_in );
+                }
             }
         }
     }
@@ -172,7 +237,23 @@ static int Open( vlc_object_t *p_this )
              "size=%d, rate=%d)", p_sys->i_channels,
              p_aout->output.i_nb_samples, p_aout->output.output.i_rate );
 
-    return VLC_SUCCESS;
+error_out:
+    /* Clean up */
+    if( psz_prefix )
+        free( psz_prefix );
+
+    if( pp_match_ports )
+        free( pp_match_ports );
+
+    if( status != VLC_SUCCESS && p_sys != NULL)
+    {
+        if( p_sys->p_jack_ports )
+            free( p_sys->p_jack_ports );
+        if( p_sys->p_jack_client )
+            jack_client_close( p_sys->p_jack_client );
+        free( p_sys );
+    }
+    return status;
 }
 
 
@@ -199,14 +280,14 @@ int Process( jack_nframes_t i_frames, void *p_arg )
     {
         /* Get an output buffer from JACK */
         p_jack_buffer = jack_port_get_buffer(
-            p_aout->output.p_sys->p_jack_port[i], i_frames );
+            p_aout->output.p_sys->p_jack_ports[i], i_frames );
 
         /* Fill the buffer with audio data */
         for( j = 0; j < i_nb_samples; j++ )
         {
             p_jack_buffer[j] = ((float*)p_buffer->p_buffer)[i_nb_channels*j+i];
         }
-        if (i_nb_samples < i_frames)
+        if( i_nb_samples < i_frames )
         {
             memset( p_jack_buffer + i_nb_samples, 0,
                     sizeof( jack_default_audio_sample_t ) *
@@ -237,8 +318,9 @@ static void Play( aout_instance_t *p_aout )
 static void Close( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    struct aout_sys_t *p_sys = p_aout->output.p_sys;
 
+    free( p_sys->p_jack_ports );
     jack_client_close( p_sys->p_jack_client );
     free( p_sys );
 }
