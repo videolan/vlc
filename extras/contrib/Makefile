@@ -104,8 +104,10 @@ package-win32: FORCE
 		cp src/live/$$i/lib$${i}.a  tmp/$(DISTDIR)/live.com/$$i; \
 	done;
 	./change_prefix.sh tmp $(PREFIX) /$(DISTDIR)
-#	Klugy kludge	
+#	Remove unused and potentially harmful files	
+	(cd tmp/$(DISTDIR)/lib; rm -f *.la)
 	(cd tmp/$(DISTDIR)/bin; rm -f *.exe; chmod a+x *)
+
 	(cd tmp; tar cf - $(DISTDIR)) | bzip2 -c > contrib-`date +%Y%m%d`-win32-bin-gcc-`$(CC) --version|head -n 1|cut -f 3 -d ' '`-only.tar.bz2
 	rm -rf tmp
 FORCE:
