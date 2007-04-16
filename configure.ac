@@ -2188,6 +2188,26 @@ AC_ARG_ENABLE(pvr,
 if test "${enable_pvr}" = "yes"
 then
   VLC_ADD_PLUGINS([pvr])
+  AC_ARG_WITH(videodev2,
+    [  --with-videodev2=FILE   Location of videodev2.h file (default /usr/include/linux/videodev2.h)],[],[])
+  if test "${with_videodev2}" != "no" -a -n "${with_videodev2}"
+  then
+    AC_DEFINE_UNQUOTED(VIDEODEV2_H_FILE, "${with_videodev2}", [Location of videodev2.h])
+  else
+    AC_DEFINE(VIDEODEV2_H_FILE, <linux/videodev2.h>, [Location of videodev2.h])
+  fi
+    
+
+  AC_CACHE_CHECK([for new linux/videodev2.h],
+      [new_linux_videodev2_h],
+      [AC_TRY_COMPILE([#include <sys/types.h>
+          #include VIDEODEV2_H_FILE],
+          [struct v4l2_ext_controls ctrls; ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG; ],
+          new_linux_videodev2_h=yes,
+          new_linux_videodev2_h=no)])
+  if test "${new_linux_videodev2_h}" != "no"; then
+    AC_DEFINE(HAVE_NEW_LINUX_VIDEODEV2_H, 1, [Define if new linux/videodev2.h present])
+  fi
 fi
 
 dnl

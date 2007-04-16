@@ -141,6 +141,7 @@ Ondrej Kuda aka Albert <kuda at natur dot cuni dot cz> - HTTP interface tips and
 Øyvind Kolbu <oyvindk at world-online.no> - FreeBSD patches
 Patrick Horn <patrickd0thorn at mindspring d0t com> - DirectShow patch
 Patrick McLean <chutzpah at gentoo d0t org> - Libcdio update patch
+Paul Corke <paul.corke at datatote dot co do uk> - pvr patch for newer ivtv drivers
 Paul Mackerras <paulus at linuxcare.com.au> - AltiVec IDCT and motion
 Pavlov Konstantin “thresh” - several Linux build system fixes
 Petr Vacek - FTP cleartext authentication
