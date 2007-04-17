@@ -86,14 +86,21 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf ) :
     CS( vBitrate ); CS( aBitrate ); CS( aChannels ); CC( vScale );
     /* Mux */
     CB( PSMux ); CB( TSMux ); CB( MPEG1Mux ); CB( OggMux ); CB( ASFMux );
-    CB( MP4Mux ); CB( MOVMux ); CB( WAVMux ); CB( RAWMux );
+    CB( MP4Mux ); CB( MOVMux ); CB( WAVMux ); CB( RAWMux ); CB( FLVMux );
     /* Misc */
     CB( soutAll ); CS( ttl ); CT( sapName ); CT( sapGroup );
 
     CONNECT( ui.fileSelectButton, clicked(), this, fileBrowse() );
 
-    BUTTONACT( ui.okButton, ok());
-    BUTTONACT( ui.cancelButton, cancel());
+    QPushButton *okButton = new QPushButton( qtr( "&Stream" ) );
+    QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ) );
+
+    okButton->setDefault( true );
+    ui.acceptButtonBox->addButton( okButton, QDialogButtonBox::AcceptRole );
+    ui.acceptButtonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
+
+    BUTTONACT( okButton, ok());
+    BUTTONACT( cancelButton, cancel());
 }
 
 void SoutDialog::fileBrowse()
@@ -153,6 +160,7 @@ void SoutDialog::updateMRL()
     SMUX( MOV, "mov" );
     SMUX( WAV, "wav" );
     SMUX( RAW, "raw" );
+    SMUX( FLV, "flv" );
 
     /* Transcode */
     pd.b_soverlay = ui.sOverlay->isChecked();

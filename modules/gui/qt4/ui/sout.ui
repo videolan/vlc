@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
-    <height>611</height>
+    <width>660</width>
+    <height>676</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -107,7 +107,10 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Port</string>
+           <string>Port:</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -168,7 +171,10 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Port</string>
+           <string>Port:</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -209,7 +215,10 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Port</string>
+           <string>Port:</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -352,6 +361,13 @@
        <widget class="QRadioButton" name="RAWMux" >
         <property name="text" >
          <string>RAW</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="FLVMux" >
+        <property name="text" >
+         <string>FLV</string>
         </property>
        </widget>
       </item>
@@ -585,6 +601,9 @@
         </item>
         <item row="1" column="4" >
          <widget class="QSpinBox" name="ttl" >
+          <property name="alignment" >
+           <set>Qt::AlignRight</set>
+          </property>
           <property name="maximum" >
            <number>255</number>
           </property>
@@ -640,8 +659,7 @@
        <number>6</number>
       </property>
       <item>
-       <widget class="QLineEdit" name="mrlEdit" >
-       </widget>
+       <widget class="QLineEdit" name="mrlEdit" />
       </item>
      </layout>
     </widget>
@@ -668,16 +686,12 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="cancelButton" >
-       <property name="text" >
-        <string>Cancel</string>
+      <widget class="QDialogButtonBox" name="acceptButtonBox" >
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="okButton" >
-       <property name="text" >
-        <string>OK</string>
+       <property name="standardButtons" >
+        <set>QDialogButtonBox::NoButton</set>
        </property>
       </widget>
      </item>
