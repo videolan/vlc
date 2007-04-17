@@ -47,6 +47,7 @@ If you want to build VLC from sources, you can do it in several ways:
     usually loses signals sent by PulseEvent() )
 
 - or on GNU/Linux, using the mingw32 cross-compiler.
+  This method is  preferred over all the others.
 
 Getting the right compiler tools
 ================================
@@ -113,13 +114,14 @@ Configuring the build
 Once you've got all the files you need in place, you need to configure the
 build with the `./configure' script.
 
-I'll assume that you are using the pre-compiled 3rd party libraries I'm
+I'll assume that you are using the pre-compiled 3rd party libraries we are
 providing and that they are in /usr/win32.
 
 If you are cross-compiling from Debian, you can use something
 along those lines:
 
   ./bootstrap && \
+  PATH=/usr/win32/bin:$PATH \
   PKG_CONFIG_LIBDIR=/usr/win32/lib/pkgconfig \
   CPPFLAGS="-I/usr/win32/include -I/usr/win32/include/ebml" \
   LDFLAGS=-L/usr/win32/lib \
@@ -146,6 +148,7 @@ hasn't been tested in about a year or so. So to build without the
 emulation layer, use something like this:
 
   ./bootstrap && \
+  PATH=/usr/win32/bin:$PATH \
   PKG_CONFIG_PATH=/usr/win32/lib/pkgconfig \
   CPPFLAGS="-I/usr/win32/include -I/usr/win32/include/ebml" \
   LDFLAGS=-L/usr/win32/lib \
@@ -173,6 +176,7 @@ If you are compiling with MSYS/MINGW, then you can use something along those
 lines:
   ./bootstrap && \
   PKG_CONFIG_PATH=/usr/win32/lib/pkgconfig \
+  PATH=/usr/win32/bin:$PATH \
   CPPFLAGS="-I/usr/win32/include -I/usr/win32/include/ebml" \
   LDFLAGS=-L/usr/win32/lib \
   ./configure \
