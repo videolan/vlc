@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.9.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-12 21:08+0100\n"
-"PO-Revision-Date: 2007-04-06 09:37+0100\n"
+"POT-Creation-Date: 2007-04-17 22:41+0100\n"
+"PO-Revision-Date: 2007-04-13 10:00+0100\n"
 "Last-Translator: Matej Urbančič <matej.urban@gmail.com>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -77,14 +77,14 @@ msgstr "Zvok"
 
 #: include/vlc_config_cat.h:59
 msgid "Audio settings"
-msgstr "Zvokovne nastavitve"
+msgstr "Nastavitve zvoka"
 
 #: include/vlc_config_cat.h:61 include/vlc_config_cat.h:62
 msgid "General audio settings"
 msgstr "Splošne nastavitve zvoka"
 
 #: include/vlc_config_cat.h:64 include/vlc_config_cat.h:89
-#: src/video_output/video_output.c:430
+#: src/video_output/video_output.c:432
 msgid "Filters"
 msgstr "Filtri"
 
@@ -136,7 +136,7 @@ msgstr "Nastavitve slike"
 
 #: include/vlc_config_cat.h:82 include/vlc_config_cat.h:83
 msgid "General video settings"
-msgstr "Splošne slikovne nastavitve"
+msgstr "Splošne nastavitve slike"
 
 #: include/vlc_config_cat.h:87
 msgid "Choose your preferred video output and configure it here."
@@ -321,7 +321,7 @@ msgstr ""
 "procesiranja. Več informacij lahko najdete v priročniku. Nastavite lahko "
 "različne možnosti za vsak serijski izhod pretoka."
 
-#: include/vlc_config_cat.h:176 modules/services_discovery/sap.c:122
+#: include/vlc_config_cat.h:176 modules/services_discovery/sap.c:120
 msgid "SAP"
 msgstr "SAP"
 
@@ -439,7 +439,7 @@ msgstr "Nastavitve kodirnikov"
 #: include/vlc_config_cat.h:222
 msgid "These are general settings for video/audio/subtitles encoding modules."
 msgstr ""
-"Splošne nastavitve kodiranja za slikovne in zvočne enote ter kodiranje "
+"Splošne nastavitve kodiranja slikovnih in zvočnih enote ter kodiranje "
 "podnapisov."
 
 #: include/vlc_config_cat.h:225
@@ -523,9 +523,9 @@ msgstr "O predvajalniku VLC ..."
 #: include/vlc_intf_strings.h:50 modules/gui/macosx/embeddedwindow.m:50
 #: modules/gui/macosx/embeddedwindow.m:95 modules/gui/macosx/intf.m:526
 #: modules/gui/macosx/intf.m:569 modules/gui/macosx/intf.m:648
-#: modules/gui/macosx/intf.m:655 modules/gui/macosx/intf.m:1519
-#: modules/gui/macosx/intf.m:1520 modules/gui/macosx/intf.m:1521
-#: modules/gui/macosx/intf.m:1522 modules/gui/macosx/playlist.m:419
+#: modules/gui/macosx/intf.m:655 modules/gui/macosx/intf.m:1535
+#: modules/gui/macosx/intf.m:1536 modules/gui/macosx/intf.m:1537
+#: modules/gui/macosx/intf.m:1538 modules/gui/macosx/playlist.m:419
 #: modules/gui/pda/pda_interface.c:262 modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:281
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:290
@@ -810,7 +810,7 @@ msgstr "Doseženo je največje dovoljeno število filtrov (%d)."
 
 #: src/audio_output/input.c:86 src/audio_output/input.c:132
 #: src/input/es_out.c:385 src/libvlc-module.c:431
-#: src/video_output/video_output.c:406 modules/codec/ffmpeg/postprocess.c:92
+#: src/video_output/video_output.c:408 modules/codec/ffmpeg/postprocess.c:92
 msgid "Disable"
 msgstr "Onemogoči"
 
@@ -856,7 +856,7 @@ msgstr "Stereo"
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
 #: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:138
 #: modules/control/gestures.c:89 modules/video_filter/logo.c:97
-#: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:200
+#: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:173
 #: modules/video_filter/osdmenu.c:75 modules/video_filter/rss.c:164
 msgid "Left"
 msgstr "Levo"
@@ -865,7 +865,7 @@ msgstr "Levo"
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
 #: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:138
 #: modules/control/gestures.c:89 modules/video_filter/logo.c:97
-#: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:200
+#: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:173
 #: modules/video_filter/osdmenu.c:75 modules/video_filter/rss.c:164
 msgid "Right"
 msgstr "Desno"
@@ -964,7 +964,7 @@ msgid ""
 "VLC probably does not support the \"%4.4s\" audio or video format. "
 "Unfortunately there is no way for you to fix this."
 msgstr ""
-"Predvajalnik VLC verjetno ne podpira \"%4.4s\" zvokovnega ali slikovnega "
+"Predvajalnik VLC verjetno ne podpira \"%4.4s\" zvočnega ali slikovnega "
 "formata. Na žalost tega trenutno ni mogoče popraviti."
 
 #: src/input/es_out.c:407 src/input/es_out.c:409 src/input/es_out.c:415
@@ -1021,7 +1021,7 @@ msgid "Bits per sample"
 msgstr "Titi na vzorec"
 
 #: src/input/es_out.c:1798 modules/access_output/shout.c:87
-#: modules/access/pvr.c:84
+#: modules/access/pvr.c:89
 msgid "Bitrate"
 msgstr "Bitna hitrost"
 
@@ -1120,13 +1120,13 @@ msgid "Chapter %i"
 msgstr "Poglavje %i"
 
 #: src/input/var.c:353 modules/gui/beos/InterfaceWindow.cpp:289
-#: modules/gui/qt4/main_interface.cpp:618
+#: modules/gui/qt4/main_interface.cpp:610
 #: modules/gui/wxwidgets/input_manager.cpp:223
 msgid "Next chapter"
 msgstr "Naslednje poglavje"
 
 #: src/input/var.c:358 modules/gui/beos/InterfaceWindow.cpp:288
-#: modules/gui/qt4/main_interface.cpp:617
+#: modules/gui/qt4/main_interface.cpp:609
 #: modules/gui/wxwidgets/input_manager.cpp:222
 msgid "Previous chapter"
 msgstr "Predhodno poglavje"
@@ -1150,33 +1150,33 @@ msgstr "Prekliči"
 msgid "Ok"
 msgstr "V redu"
 
-#: src/interface/interface.c:319
+#: src/interface/interface.c:320
 msgid "Switch interface"
 msgstr "Zamenjaj vmesnik"
 
-#: src/interface/interface.c:346 modules/gui/macosx/intf.m:544
+#: src/interface/interface.c:347 modules/gui/macosx/intf.m:544
 #: modules/gui/macosx/intf.m:545
 msgid "Add Interface"
 msgstr "Razširitve"
 
-#: src/interface/interface.c:352
+#: src/interface/interface.c:353
 msgid "Telnet Interface"
 msgstr "Vmesnik telnet"
 
-#: src/interface/interface.c:355
+#: src/interface/interface.c:356
 msgid "Web Interface"
 msgstr "Vmesnik spleta"
 
-#: src/interface/interface.c:358
+#: src/interface/interface.c:359
 msgid "Debug logging"
 msgstr "Beleženje razhroščevanja"
 
-#: src/interface/interface.c:361
+#: src/interface/interface.c:362
 msgid "Mouse Gestures"
 msgstr "Gibi miške"
 
-#: src/libvlc-common.c:281 src/libvlc-common.c:452 src/misc/modules.c:1725
-#: src/misc/modules.c:2051
+#: src/libvlc-common.c:281 src/libvlc-common.c:452 src/modules/modules.c:1715
+#: src/modules/modules.c:2045
 msgid "C"
 msgstr "C"
 
@@ -1184,15 +1184,15 @@ msgstr "C"
 msgid "Help options"
 msgstr "Možnosti pomoči"
 
-#: src/libvlc-common.c:1484 src/misc/configuration.c:1219
+#: src/libvlc-common.c:1484 src/modules/configuration.c:1268
 msgid "string"
 msgstr "niz"
 
-#: src/libvlc-common.c:1503 src/misc/configuration.c:1183
+#: src/libvlc-common.c:1503 src/modules/configuration.c:1232
 msgid "integer"
 msgstr "celo število"
 
-#: src/libvlc-common.c:1530 src/misc/configuration.c:1208
+#: src/libvlc-common.c:1530 src/modules/configuration.c:1257
 msgid "float"
 msgstr "plavajoče"
 
@@ -1697,7 +1697,7 @@ msgstr ""
 "čimer bo sproščen del procesorske moči."
 
 #: src/libvlc-module.c:245 modules/codec/fake.c:50
-#: modules/stream_out/mosaic_bridge.c:129 modules/stream_out/transcode.c:73
+#: modules/stream_out/mosaic_bridge.c:123 modules/stream_out/transcode.c:73
 #: modules/visualization/visual/visual.c:43
 msgid "Video width"
 msgstr "Širina slike"
@@ -1711,7 +1711,7 @@ msgstr ""
 "značilnostim slike."
 
 #: src/libvlc-module.c:250 modules/codec/fake.c:53
-#: modules/stream_out/mosaic_bridge.c:132 modules/stream_out/transcode.c:76
+#: modules/stream_out/mosaic_bridge.c:126 modules/stream_out/transcode.c:76
 #: modules/visualization/visual/visual.c:47
 msgid "Video height"
 msgstr "Višina slike"
@@ -1732,8 +1732,7 @@ msgstr "X koordinata slike"
 msgid ""
 "You can enforce the position of the top left corner of the video window (X "
 "coordinate)."
-msgstr ""
-"Določena vrednost lege zgornje leve točke slikovnega okna (X koordinata)."
+msgstr "Določena vrednost lege zgornje leve točke okna slike (X koordinata)."
 
 #: src/libvlc-module.c:260
 msgid "Video Y coordinate"
@@ -1743,8 +1742,7 @@ msgstr "Y koordinata slike"
 msgid ""
 "You can enforce the position of the top left corner of the video window (Y "
 "coordinate)."
-msgstr ""
-"Določena vrednost lege zgornje leve točke slikovnega okna (X koordinata)."
+msgstr "Določena vrednost lege zgornje leve točke okna slike (X koordinata)."
 
 #: src/libvlc-module.c:265
 msgid "Video title"
@@ -1775,49 +1773,49 @@ msgstr ""
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
 #: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:138
 #: modules/video_filter/logo.c:97 modules/video_filter/marq.c:126
-#: modules/video_filter/mosaic.c:200 modules/video_filter/osdmenu.c:75
+#: modules/video_filter/mosaic.c:173 modules/video_filter/osdmenu.c:75
 #: modules/video_filter/rss.c:164
 msgid "Center"
 msgstr "Sredinsko"
 
 #: src/libvlc-module.c:277 modules/codec/dvbsub.c:70
 #: modules/video_filter/logo.c:97 modules/video_filter/marq.c:126
-#: modules/video_filter/mosaic.c:200 modules/video_filter/osdmenu.c:75
+#: modules/video_filter/mosaic.c:173 modules/video_filter/osdmenu.c:75
 #: modules/video_filter/rss.c:164
 msgid "Top"
 msgstr "Na vrhu"
 
 #: src/libvlc-module.c:277 modules/codec/dvbsub.c:70
 #: modules/video_filter/logo.c:97 modules/video_filter/marq.c:126
-#: modules/video_filter/mosaic.c:200 modules/video_filter/osdmenu.c:75
+#: modules/video_filter/mosaic.c:173 modules/video_filter/osdmenu.c:75
 #: modules/video_filter/rss.c:164
 msgid "Bottom"
 msgstr "Na dnu"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:201 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:76
 #: modules/video_filter/rss.c:165
 msgid "Top-Left"
 msgstr "Zgoraj levo"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:201 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:76
 #: modules/video_filter/rss.c:165
 msgid "Top-Right"
 msgstr "Zgoraj desno"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:201 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:76
 #: modules/video_filter/rss.c:165
 msgid "Bottom-Left"
 msgstr "Spodaj levo"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:201 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:76
 #: modules/video_filter/rss.c:165
 msgid "Bottom-Right"
 msgstr "Spodaj desno"
@@ -3086,12 +3084,13 @@ msgstr ""
 "istem oknu ali pa postavitev v predvajalno vrsto."
 
 #: src/libvlc-module.c:895
+#, fuzzy
 msgid ""
 "Allowing only one running instance of VLC can sometimes be useful, for "
 "example if you associated VLC with some media types and you don't want a new "
 "instance of VLC to be opened each time you open a file in your file manager. "
 "This option will allow you to play the file with the already running "
-"instance or enqueue it.This option require the D-Bus session daemon to be "
+"instance or enqueue it. This option require the D-Bus session daemon to be "
 "active and the running instance of VLC to use D-Bus control interface."
 msgstr ""
 "Nastavitev samo enega sočasnega zagona ima lahko nekaj prednosti. V primeru, "
@@ -4106,88 +4105,87 @@ msgstr "Vstavki"
 msgid "Performance options"
 msgstr "Možnosti izvrševanja"
 
-#: src/libvlc-module.c:1771
+#: src/libvlc-module.c:1768
 msgid "Hot keys"
 msgstr "Tipkovne bližnjice"
 
-#: src/libvlc-module.c:2094
+#: src/libvlc-module.c:2091
 msgid "Jump sizes"
 msgstr "Velikost skokov"
 
-#: src/libvlc-module.c:2173
+#: src/libvlc-module.c:2170
 msgid "main program"
 msgstr "glavni program"
 
-#: src/libvlc-module.c:2183
-#, fuzzy
+#: src/libvlc-module.c:2180
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
-"izpiši pomoč predvajalnika VLC (lahko uporabite z možnostjo --advanced)"
+"izpiši pomoč predvajalnika VLC (lahko uporabite z možnostjo --advanced in --"
+"help-verbose)"
 
-#: src/libvlc-module.c:2189
-#, fuzzy
+#: src/libvlc-module.c:2186
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
 msgstr ""
 "izpiši pomoč predvajalnika VLC in vseh njegovih enot (lahko uporabite z "
-"možnostjo --advanced)"
+"možnostjo --advanced in --help-verbose)"
 
-#: src/libvlc-module.c:2194
+#: src/libvlc-module.c:2191
 msgid "print help for the advanced options"
 msgstr "izpiši pomoč predvajalnika za napredne možnosti"
 
-#: src/libvlc-module.c:2199
+#: src/libvlc-module.c:2196
 msgid "ask for extra verbosity when displaying help"
 msgstr "vprašaj za dodatno podrobnost pri izpisu pomoči"
 
-#: src/libvlc-module.c:2205
+#: src/libvlc-module.c:2202
 msgid "print a list of available modules"
 msgstr "izpiši enote, ki so na razpolago"
 
-#: src/libvlc-module.c:2210
+#: src/libvlc-module.c:2207
 #, fuzzy
 msgid "print a list of available modules with extra detail"
 msgstr "izpiši enote, ki so na razpolago"
 
-#: src/libvlc-module.c:2216
-#, fuzzy
+#: src/libvlc-module.c:2213
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose)"
 msgstr ""
-"izpiši pomoč o posamezni enoti (lahko uporabite z možnostjo --advanced)"
+"izpiši pomoč o posamezni enoti (lahko uporabite z možnostjo --advanced in --"
+"help-verbose)"
 
-#: src/libvlc-module.c:2221
+#: src/libvlc-module.c:2218
 msgid "save the current command line options in the config"
 msgstr "shrani trenutne možnosti ukazne vrstice med nastavitve"
 
-#: src/libvlc-module.c:2226
+#: src/libvlc-module.c:2223
 msgid "reset the current config to the default values"
 msgstr "obnovi trenutne nastavitve na privzete vrednosti"
 
-#: src/libvlc-module.c:2231
+#: src/libvlc-module.c:2228
 msgid "use alternate config file"
 msgstr "uporabi drugo datoteko nastavitev"
 
-#: src/libvlc-module.c:2236
+#: src/libvlc-module.c:2233
 msgid "resets the current plugins cache"
 msgstr "počisti trenutni predpomnilnik vstavkov"
 
-#: src/libvlc-module.c:2241
+#: src/libvlc-module.c:2238
 msgid "print version information"
 msgstr "izpiši podrobnosti verzije"
 
-#: src/misc/configuration.c:1183
+#: src/modules/configuration.c:1232
 msgid "boolean"
 msgstr "boolean"
 
-#: src/misc/configuration.c:1194
+#: src/modules/configuration.c:1243
 msgid "key"
 msgstr "Ključ"
 
 #: src/playlist/engine.c:127 src/playlist/engine.c:129
-#: src/playlist/loadsave.c:105
+#: src/playlist/loadsave.c:112
 msgid "Media Library"
 msgstr "Zbirka medijev"
 
@@ -4779,28 +4777,28 @@ msgstr "zulujščina"
 msgid "Unknown"
 msgstr "Neznano"
 
-#: src/video_output/video_output.c:404 modules/gui/macosx/intf.m:619
+#: src/video_output/video_output.c:406 modules/gui/macosx/intf.m:619
 #: modules/gui/macosx/intf.m:620 modules/video_filter/deinterlace.c:122
 msgid "Deinterlace"
 msgstr "Razpletanje"
 
-#: src/video_output/video_output.c:408 modules/video_filter/deinterlace.c:117
+#: src/video_output/video_output.c:410 modules/video_filter/deinterlace.c:117
 msgid "Discard"
 msgstr "Zavrzi"
 
-#: src/video_output/video_output.c:410 modules/video_filter/deinterlace.c:117
+#: src/video_output/video_output.c:412 modules/video_filter/deinterlace.c:117
 msgid "Blend"
 msgstr "Prelivanje"
 
-#: src/video_output/video_output.c:412 modules/video_filter/deinterlace.c:117
+#: src/video_output/video_output.c:414 modules/video_filter/deinterlace.c:117
 msgid "Mean"
 msgstr "Sredina"
 
-#: src/video_output/video_output.c:414 modules/video_filter/deinterlace.c:118
+#: src/video_output/video_output.c:416 modules/video_filter/deinterlace.c:118
 msgid "Bob"
 msgstr "Bob"
 
-#: src/video_output/video_output.c:416 modules/video_filter/deinterlace.c:118
+#: src/video_output/video_output.c:418 modules/video_filter/deinterlace.c:118
 msgid "Linear"
 msgstr "Linearno"
 
@@ -4845,7 +4843,7 @@ msgstr "Predvajalnik VLC ni uspel pretočiti bloka velikosti: %i."
 #: modules/access/dvdnav.c:67 modules/access/dvdread.c:64
 #: modules/access/fake.c:41 modules/access/file.c:79 modules/access/ftp.c:54
 #: modules/access/gnomevfs.c:45 modules/access/http.c:57
-#: modules/access/mms/mms.c:46 modules/access/pvr.c:47
+#: modules/access/mms/mms.c:46 modules/access/pvr.c:52
 #: modules/access/screen/screen.c:36 modules/access/smb.c:61
 #: modules/access/tcp.c:37 modules/access/udp.c:69 modules/access/v4l.c:76
 #: modules/access/vcd/vcd.c:41
@@ -5310,7 +5308,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:102 modules/access/v4l.c:84
 msgid "Audio device name"
-msgstr "Ime zvokovne naprave"
+msgstr "Ime zvočne naprave"
 
 #: modules/access/dshow/dshow.cpp:104
 msgid ""
@@ -5331,13 +5329,13 @@ msgid ""
 "don't specify anything the default size for your device will be used. You "
 "can specify a standard size (cif, d1, ...) or <width>x<height>."
 msgstr ""
-"Ime zvokovne naprave, ki bo uporabljena za prikaz DirectShow medija.V "
+"Ime zvočne naprave, ki bo uporabljena za prikaz DirectShow medija. V "
 "primeru, da ni nastavljena nobena naprava, bo program uporabil privzeto "
 "vrednost."
 
 #: modules/access/dshow/dshow.cpp:112 modules/access/v4l.c:88
 msgid "Video input chroma format"
-msgstr "Format barv slikovnega vnosa"
+msgstr "Format barv vnosa slike"
 
 #: modules/access/dshow/dshow.cpp:114
 msgid ""
@@ -5349,7 +5347,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:116
 msgid "Video input frame rate"
-msgstr "Blokovna stopnja slikovnega dovoda"
+msgstr "Blokovna stopnja dovoda slike"
 
 #: modules/access/dshow/dshow.cpp:118
 msgid ""
@@ -5406,7 +5404,7 @@ msgstr "Izberite tip uglaševala (kabel/antena)."
 
 #: modules/access/dshow/dshow.cpp:138
 msgid "Video input pin"
-msgstr "Spona slikovnega dovoda"
+msgstr "Spona dovoda slike"
 
 #: modules/access/dshow/dshow.cpp:140
 msgid ""
@@ -5422,30 +5420,30 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:144
 msgid "Audio input pin"
-msgstr "Spona zvokovnega dovoda"
+msgstr "Spona zvočnega dovoda"
 
 #: modules/access/dshow/dshow.cpp:146
 msgid "Select the audio input source. See the \"video input\" option."
 msgstr ""
-"Izberite vir zvokovnega dovoda. Več nastavitev med \"dovod slike\" možnostmi."
+"Izberite vir zvočnega dovoda. Več nastavitev med \"dovod slike\" možnostmi."
 
 #: modules/access/dshow/dshow.cpp:147
 msgid "Video output pin"
-msgstr "Spona slikovnega odvoda"
+msgstr "Spona odvoda slike"
 
 #: modules/access/dshow/dshow.cpp:149
 msgid "Select the video output type. See the \"video input\" option."
 msgstr ""
-"Izberite vir slikovnega dovoda. Več nastavitev med \"dovod slike\" možnostmi."
+"Izberite vir dovoda slike. Več nastavitev med \"dovod slike\" možnostmi."
 
 #: modules/access/dshow/dshow.cpp:150
 msgid "Audio output pin"
-msgstr "Spona zvokovnega odvoda"
+msgstr "Spona zvočnega odvoda"
 
 #: modules/access/dshow/dshow.cpp:152
 msgid "Select the audio output type. See the \"video input\" option."
 msgstr ""
-"Izberite vir zvokovnega dovoda. Več nastavitev med \"dovod slike\" možnostmi."
+"Izberite vir zvočnega dovoda. Več nastavitev med \"dovod slike\" možnostmi."
 
 #: modules/access/dshow/dshow.cpp:154
 msgid "AM Tuner mode"
@@ -5883,7 +5881,7 @@ msgid ""
 msgstr ""
 "Predpomnilna vrednost za lažne pretoke. Vrednost je določena v milisekundah."
 
-#: modules/access/fake.c:45 modules/access/pvr.c:73 modules/access/v4l.c:139
+#: modules/access/fake.c:45 modules/access/pvr.c:78 modules/access/v4l.c:139
 msgid "Framerate"
 msgstr "Hitrost sličic"
 
@@ -5892,7 +5890,7 @@ msgid "Number of frames per second (eg. 24, 25, 29.97, 30)."
 msgstr "Število sličic na sekundo (primer. 24, 25, 29.97, 30)."
 
 #: modules/access/fake.c:48 modules/stream_out/bridge.c:37
-#: modules/stream_out/mosaic_bridge.c:125
+#: modules/stream_out/mosaic_bridge.c:119
 msgid "ID"
 msgstr "ID"
 
@@ -6470,7 +6468,7 @@ msgstr "Vrednost bajtov pokritih z layer-4 nadzorno vsoto"
 msgid "UDP stream output"
 msgstr "UDP odvod pretoka"
 
-#: modules/access/pvr.c:49
+#: modules/access/pvr.c:54
 msgid ""
 "Default caching value for PVR streams. This value should be set in "
 "milliseconds."
@@ -6478,155 +6476,155 @@ msgstr ""
 "Privzet predpomnilniški prostor ta PVR valove. Vrednost je določena v "
 "milisekundah."
 
-#: modules/access/pvr.c:52
+#: modules/access/pvr.c:57
 msgid "Device"
 msgstr "Naprava"
 
-#: modules/access/pvr.c:53
+#: modules/access/pvr.c:58
 msgid "PVR video device"
 msgstr "Slikovna naprava PVR"
 
-#: modules/access/pvr.c:55
+#: modules/access/pvr.c:60
 msgid "Radio device"
 msgstr "Radijska naprava"
 
-#: modules/access/pvr.c:56
+#: modules/access/pvr.c:61
 msgid "PVR radio device"
 msgstr "Radijska naprava PVR"
 
-#: modules/access/pvr.c:58 modules/access/v4l.c:99
+#: modules/access/pvr.c:63 modules/access/v4l.c:99
 msgid "Norm"
 msgstr "Norma"
 
-#: modules/access/pvr.c:59 modules/access/v4l.c:101
+#: modules/access/pvr.c:64 modules/access/v4l.c:101
 msgid "Norm of the stream (Automatic, SECAM, PAL, or NTSC)."
 msgstr "Oblika vala (Samodejna, SECAM, PAL, ali NTSC)."
 
-#: modules/access/pvr.c:62 modules/access/v4l.c:105
-#: modules/video_filter/mosaic.c:102
+#: modules/access/pvr.c:67 modules/access/v4l.c:105
+#: modules/video_filter/mosaic.c:97
 msgid "Width"
 msgstr "Širina"
 
-#: modules/access/pvr.c:63
+#: modules/access/pvr.c:68
 msgid "Width of the stream to capture (-1 for autodetection)."
 msgstr "Širina zajetega vala (-1 za samodejno zaznavanje)."
 
-#: modules/access/pvr.c:66 modules/access/v4l.c:108
-#: modules/video_filter/mosaic.c:100
+#: modules/access/pvr.c:71 modules/access/v4l.c:108
+#: modules/video_filter/mosaic.c:95
 msgid "Height"
 msgstr "Višina"
 
-#: modules/access/pvr.c:67
+#: modules/access/pvr.c:72
 msgid "Height of the stream to capture (-1 for autodetection)."
 msgstr "Višina zajetega vala (-1 za samodejno zaznavanje)."
 
-#: modules/access/pvr.c:70 modules/access/v4l.c:92
+#: modules/access/pvr.c:75 modules/access/v4l.c:92
 msgid "Frequency"
 msgstr "Frekvenca"
 
-#: modules/access/pvr.c:71 modules/access/v4l.c:94
+#: modules/access/pvr.c:76 modules/access/v4l.c:94
 msgid "Frequency to capture (in kHz), if applicable."
 msgstr "Frekvenca zajemanja (v kHz-1)."
 
-#: modules/access/pvr.c:74 modules/access/v4l.c:140
+#: modules/access/pvr.c:79 modules/access/v4l.c:140
 msgid "Framerate to capture, if applicable (-1 for autodetect)."
 msgstr "Frekvenca zajemanja (-1 za samodejno zaznavanje)."
 
-#: modules/access/pvr.c:77
+#: modules/access/pvr.c:82
 msgid "Key interval"
 msgstr "Ključni zamik"
 
-#: modules/access/pvr.c:78
+#: modules/access/pvr.c:83
 msgid "Interval between keyframes (-1 for autodetect)."
 msgstr "Zamik med ključnimi sličicami (-1 za samodejno zaznavo)"
 
-#: modules/access/pvr.c:80
+#: modules/access/pvr.c:85
 msgid "B Frames"
 msgstr "B sličice"
 
-#: modules/access/pvr.c:81
+#: modules/access/pvr.c:86
 msgid ""
 "If this option is set, B-Frames will be used. Use this option to set the "
 "number of B-Frames."
 msgstr "Možnost dovoljuje uporabo B-sličic. Nastavitev določa njihovo število."
 
-#: modules/access/pvr.c:85
+#: modules/access/pvr.c:90
 msgid "Bitrate to use (-1 for default)."
 msgstr "Bitna stopnja (-1 za privzeto vrednost)."
 
-#: modules/access/pvr.c:87
+#: modules/access/pvr.c:92
 msgid "Bitrate peak"
 msgstr "Vrh bitne stopnje"
 
-#: modules/access/pvr.c:88
+#: modules/access/pvr.c:93
 msgid "Peak bitrate in VBR mode."
 msgstr "Vrh bitne stopnje v VBR načinu."
 
-#: modules/access/pvr.c:90
+#: modules/access/pvr.c:95
 msgid "Bitrate mode"
 msgstr "Bitni način stopnje"
 
-#: modules/access/pvr.c:91
+#: modules/access/pvr.c:96
 msgid "Bitrate mode to use (VBR or CBR)."
 msgstr "Uporaba bitnega načina (VBR ali CBR)"
 
-#: modules/access/pvr.c:93
+#: modules/access/pvr.c:98
 msgid "Audio bitmask"
 msgstr "Bitna maska zvoka"
 
-#: modules/access/pvr.c:94
+#: modules/access/pvr.c:99
 msgid "Bitmask that will get used by the audio part of the card."
 msgstr "Bitna maska za zvočni del kartice."
 
-#: modules/access/pvr.c:97 modules/access/vcdx/info.c:97
+#: modules/access/pvr.c:102 modules/access/vcdx/info.c:97
 #: modules/gui/macosx/intf.m:531 modules/gui/wxwidgets/interface.cpp:1396
 msgid "Volume"
 msgstr "Glasnost"
 
-#: modules/access/pvr.c:98
+#: modules/access/pvr.c:103
 msgid "Audio volume (0-65535)."
 msgstr "Glasnost zvoka (0-65535)."
 
-#: modules/access/pvr.c:100 modules/access/v4l.c:95
+#: modules/access/pvr.c:105 modules/access/v4l.c:95
 msgid "Channel"
 msgstr "Kanal"
 
-#: modules/access/pvr.c:101
+#: modules/access/pvr.c:106
 msgid ""
 "Channel of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)"
 msgstr ""
 "Uporabljen kanal kartice (najverjetneje, 0 = uglaševalo, 1 = združeno, 2 = "
 "svideo)"
 
-#: modules/access/pvr.c:107 modules/access/v4l.c:146
+#: modules/access/pvr.c:112 modules/access/v4l.c:146
 msgid "Automatic"
 msgstr "Samodejno"
 
-#: modules/access/pvr.c:107 modules/access/v4l.c:146
+#: modules/access/pvr.c:112 modules/access/v4l.c:146
 msgid "SECAM"
 msgstr "SECAM"
 
-#: modules/access/pvr.c:107 modules/access/v4l.c:146
+#: modules/access/pvr.c:112 modules/access/v4l.c:146
 msgid "PAL"
 msgstr "PAL"
 
-#: modules/access/pvr.c:107 modules/access/v4l.c:146
+#: modules/access/pvr.c:112 modules/access/v4l.c:146
 msgid "NTSC"
 msgstr "NTSC"
 
-#: modules/access/pvr.c:110
+#: modules/access/pvr.c:115
 msgid "vbr"
 msgstr "vbr"
 
-#: modules/access/pvr.c:110
+#: modules/access/pvr.c:115
 msgid "cbr"
 msgstr "cbr"
 
-#: modules/access/pvr.c:115
+#: modules/access/pvr.c:120
 msgid "PVR"
 msgstr "PVR"
 
-#: modules/access/pvr.c:116
+#: modules/access/pvr.c:121
 msgid "IVTV MPEG Encoding cards input"
 msgstr "IVTV MPEG kodirani dovod"
 
@@ -6878,7 +6876,7 @@ msgstr "Kontrast"
 
 #: modules/access/v4l.c:122
 msgid "Contrast of the video input."
-msgstr "Kontrast slikovnega dovoda"
+msgstr "Kontrast dovoda slike"
 
 #: modules/access/v4l.c:123
 msgid "Tuner"
@@ -7576,12 +7574,12 @@ msgstr "A/52 preko S/PDIF"
 
 #: modules/audio_output/alsa.c:325
 msgid "No Audio Device"
-msgstr "Ni zvokovne naprave"
+msgstr "Ni zvočne naprave"
 
 #: modules/audio_output/alsa.c:326
 msgid "No audio device name was given. You might want to enter \"default\"."
 msgstr ""
-"Ni določeno ime zvokovne naprave. Morda lahko vnesete vrednost \"privzeto\"."
+"Ni določeno ime zvočne naprave. Morda lahko vnesete vrednost \"privzeto\"."
 
 #: modules/audio_output/alsa.c:433 modules/audio_output/alsa.c:472
 #: modules/audio_output/alsa.c:484 modules/audio_output/auhal.c:242
@@ -7731,6 +7729,27 @@ msgid "Roku HD1000 audio output"
 msgstr "Roku HD1000 odvod zvoka"
 
 #: modules/audio_output/jack.c:62
+#, fuzzy
+msgid "Automatically connect to input devices"
+msgstr "Samodejno preverjanje posodobitev"
+
+#: modules/audio_output/jack.c:64
+msgid ""
+"If enabled, this option will automatically connect output to the first JACK "
+"inputs found."
+msgstr ""
+
+#: modules/audio_output/jack.c:68
+msgid "Connect to outputs beginning with"
+msgstr ""
+
+#: modules/audio_output/jack.c:70
+msgid ""
+"If automatic connection is enabled, only JACK inputs whose names begin with "
+"this prefix will be considered for connection."
+msgstr ""
+
+#: modules/audio_output/jack.c:78
 msgid "JACK audio output"
 msgstr "JACK odvod zvoka"
 
@@ -7914,17 +7933,17 @@ msgstr "Slikovna datoteka"
 msgid "Path of the image file for fake input."
 msgstr "Pot do dovoda ponarejene slikovne datoteke."
 
-#: modules/codec/fake.c:52 modules/stream_out/mosaic_bridge.c:131
+#: modules/codec/fake.c:52 modules/stream_out/mosaic_bridge.c:125
 #: modules/stream_out/transcode.c:75
 msgid "Output video width."
 msgstr "Odvodna širina slike."
 
-#: modules/codec/fake.c:55 modules/stream_out/mosaic_bridge.c:134
+#: modules/codec/fake.c:55 modules/stream_out/mosaic_bridge.c:128
 #: modules/stream_out/transcode.c:78
 msgid "Output video height."
 msgstr "Odvodna višina slike."
 
-#: modules/codec/fake.c:56 modules/video_filter/mosaic.c:142
+#: modules/codec/fake.c:56 modules/video_filter/mosaic.c:137
 msgid "Keep aspect ratio"
 msgstr "Ohrani razmerje velikosti"
 
@@ -7959,13 +7978,12 @@ msgid "Deinterlace module to use."
 msgstr "Enota razpletanja v uporabi."
 
 #: modules/codec/fake.c:68
-#, fuzzy
 msgid "Chroma used."
-msgstr "Barva"
+msgstr "Uporabljena Barva."
 
 #: modules/codec/fake.c:70
 msgid "Force use of a specific chroma for output. Default is I420."
-msgstr ""
+msgstr "Uporaba določene zahtevane barve za odvod. Privzeta vrednost je I420."
 
 #: modules/codec/fake.c:81
 msgid "Fake video decoder"
@@ -8322,20 +8340,22 @@ msgstr ""
 "dr     dering                                  Filter (deringing)\n"
 "al     autolevels                              samodejna svetlost / "
 "kontrast\n"
-"                       f       fullyrange      stretch luminance to "
+"                       f       fullyrange      prilagajanje osvetlitve to "
 "(0..255)\n"
-"lb     linblenddeint                           linear blend deinterlacer\n"
+"lb     linblenddeint                           linear blend razpletanje\n"
 "li     linipoldeint                            linear interpolating "
-"deinterlace\n"
+"razpletanje\n"
 "ci     cubicipoldeint                          cubic interpolating "
-"deinterlacer\n"
-"md     mediandeint                             median deinterlacer\n"
-"fd     ffmpegdeint                             ffmpeg deinterlacer\n"
+"razpletanje\n"
+"md     mediandeint                             median razpletanje\n"
+"fd     ffmpegdeint                             ffmpeg razpletanje\n"
 "de     default                                 hb:a,vb:a,dr:a,al\n"
 "fa     fast                                    h1:a,v1:a,dr:a,al\n"
-"tn     tmpnoise        (3 Thresholds)          Temporal Noise Reducer\n"
-"                       1. <= 2. <= 3.          larger -> stronger filtering\n"
-"fq     forceQuant      <quantizer>             Force quantizer\n"
+"tn     tmpnoise        (3 Thresholds)          Začasno zmanjševanje "
+"hrupnosti\n"
+"                       1. <= 2. <= 3.          večja vrednost -> močnejše "
+"filtriranje\n"
+"fq     forceQuant      <quantizer>             Vsiljena uporaba pakernika\n"
 
 #: modules/codec/ffmpeg/ffmpeg.h:189
 msgid "Ratio of key frames"
@@ -9613,7 +9633,7 @@ msgid "temporal"
 msgstr "začasno"
 
 #: modules/codec/x264.c:340 modules/gui/pda/pda_interface.c:743
-#: modules/video_filter/mosaic.c:196
+#: modules/video_filter/mosaic.c:169
 msgid "auto"
 msgstr "samodejno"
 
@@ -9941,307 +9961,307 @@ msgstr "RC"
 msgid "Remote control interface"
 msgstr "Vmesnik oddaljene povezave"
 
-#: modules/control/rc.c:332
+#: modules/control/rc.c:335
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr "Zagnan vmesnik oddaljenega nadzora. Vpišite 'help' za pomoč."
 
-#: modules/control/rc.c:797
+#: modules/control/rc.c:800
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr "Neznan ukaz `%s'. Vtipkajte `help' za pomoč."
 
-#: modules/control/rc.c:830
+#: modules/control/rc.c:833
 msgid "+----[ Remote control commands ]"
 msgstr "+----[Ukazi oddaljenega nadzora]"
 
-#: modules/control/rc.c:832
+#: modules/control/rc.c:835
 msgid "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
 msgstr "| add XYZ  . . . . . . . . . . . . dodaj XYZ na seznam predvajanja"
 
-#: modules/control/rc.c:833
+#: modules/control/rc.c:836
 msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
 msgstr ""
 "| enqueue XYZ  . . . . . . . . . postavi XYZ v vrsto na seznam predvajanja"
 
-#: modules/control/rc.c:834
+#: modules/control/rc.c:837
 msgid "| playlist . . . . .  show items currently in playlist"
 msgstr "| playlist . . . . .  pokaži predmete trenutno na seznamu predvajanja"
 
-#: modules/control/rc.c:835
+#: modules/control/rc.c:838
 msgid "| play . . . . . . . . . . . . . . . . . . play stream"
 msgstr "| play . . . . . . . . . . . . . . . . . . predvajaj pretok"
 
-#: modules/control/rc.c:836
+#: modules/control/rc.c:839
 msgid "| stop . . . . . . . . . . . . . . . . . . stop stream"
 msgstr "| stop . . . . . . . . . . . . . . . . . . zaustavi pretok"
 
-#: modules/control/rc.c:837
+#: modules/control/rc.c:840
 msgid "| next . . . . . . . . . . . . . .  next playlist item"
 msgstr ""
 "| next . . . . . . . . . . . . . .  naslednji predmet na seznamu predvajanja"
 
-#: modules/control/rc.c:838
+#: modules/control/rc.c:841
 msgid "| prev . . . . . . . . . . . .  previous playlist item"
 msgstr ""
 "| prev . . . . . . . . . . . .  predhodni predmet na seznamu predvajanja"
 
-#: modules/control/rc.c:839
+#: modules/control/rc.c:842
 msgid "| goto . . . . . . . . . . . . . .  goto item at index"
 msgstr "| goto . . . . . . . . . . . . . .  skoči na predmet kazala"
 
-#: modules/control/rc.c:840
+#: modules/control/rc.c:843
 msgid "| repeat [on|off] . . . .  toggle playlist item repeat"
 msgstr "| repeat [on|off] . . . .  preklop ponavljanja seznama predvajanja"
 
-#: modules/control/rc.c:841
+#: modules/control/rc.c:844
 msgid "| loop [on|off] . . . . . .  toggle playlist item loop"
 msgstr "| loop [on|off] . . . . . .  preklop kroženja predvajanja"
 
-#: modules/control/rc.c:842
+#: modules/control/rc.c:845
 msgid "| clear . . . . . . . . . . . . .   clear the playlist"
 msgstr "| clear . . . . . . . . . . . . . počisti seznam predvajanja"
 
-#: modules/control/rc.c:843
+#: modules/control/rc.c:846
 msgid "| status . . . . . . . . . . . current playlist status"
 msgstr "| status . . . . . . . . . . . stanje trenutnega seznama predvajanja"
 
-#: modules/control/rc.c:844
+#: modules/control/rc.c:847
 msgid "| title [X]  . . . . . . set/get title in current item"
 msgstr "| title [X]  . . . . . . nastavi/izpiši naslov trenutnega predmeta"
 
-#: modules/control/rc.c:845
+#: modules/control/rc.c:848
 msgid "| title_n  . . . . . . . .  next title in current item"
 msgstr "| title_n  . . . . . . . .  naslednji naslov trenutnega predmeta"
 
-#: modules/control/rc.c:846
+#: modules/control/rc.c:849
 msgid "| title_p  . . . . . .  previous title in current item"
 msgstr "| title_p  . . . . . .  predhodni naslov trenutnega predmeta"
 
-#: modules/control/rc.c:847
+#: modules/control/rc.c:850
 msgid "| chapter [X]  . . . . set/get chapter in current item"
 msgstr "| chapter [X]  . . . . nastavi/izpiši poglavje trenutnega predmeta"
 
-#: modules/control/rc.c:848
+#: modules/control/rc.c:851
 msgid "| chapter_n  . . . . . .  next chapter in current item"
 msgstr "| chapter_n  . . . . . .  naslednje poglavje trenutnega predmeta"
 
-#: modules/control/rc.c:849
+#: modules/control/rc.c:852
 msgid "| chapter_p  . . . .  previous chapter in current item"
 msgstr "| chapter_p  . . . .  predhodno poglavje trenutnega predmeta"
 
-#: modules/control/rc.c:851
+#: modules/control/rc.c:854
 msgid "| seek X . . . seek in seconds, for instance `seek 12'"
 msgstr "| seek X . . . iskanje v po času (primer `seek 12')"
 
-#: modules/control/rc.c:852
+#: modules/control/rc.c:855
 msgid "| pause  . . . . . . . . . . . . . . . .  toggle pause"
 msgstr "| pause  . . . . . . . . . . . . . . . .  preklop pavze"
 
-#: modules/control/rc.c:853
+#: modules/control/rc.c:856
 msgid "| fastforward  . . . . . . . .  .  set to maximum rate"
 msgstr "| fastforward  . . . . . . . . .   nastavi na največjo stopnjo"
 
-#: modules/control/rc.c:854
+#: modules/control/rc.c:857
 msgid "| rewind  . . . . . . . . . . . .  set to minimum rate"
 msgstr "| rewind  . . . . . . . . . . . .  nastavi na najmanjšo stopnjo"
 
-#: modules/control/rc.c:855
+#: modules/control/rc.c:858
 msgid "| faster . . . . . . . . . .  faster playing of stream"
 msgstr "| faster . . . . . . . . . .  hitrejše predvajanje"
 
-#: modules/control/rc.c:856
+#: modules/control/rc.c:859
 msgid "| slower . . . . . . . . . .  slower playing of stream"
 msgstr "| slower . . . . . . . . . .  počasnejše predvajanje"
 
-#: modules/control/rc.c:857
+#: modules/control/rc.c:860
 msgid "| normal . . . . . . . . . .  normal playing of stream"
 msgstr "| normal . . . . . . . . . .  običajno predvajanje pretoka"
 
-#: modules/control/rc.c:858
+#: modules/control/rc.c:861
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
 msgstr "| f [on|off] . . . . . . . . . . . . preklop celotnega zaslona"
 
-#: modules/control/rc.c:859
+#: modules/control/rc.c:862
 msgid "| info . . . . .  information about the current stream"
 msgstr "| info . . . . .  podrobnosti trenutnega pretoka"
 
-#: modules/control/rc.c:860
+#: modules/control/rc.c:863
 msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr "| get_time . . pretečeni čas predvajanja"
 
-#: modules/control/rc.c:861
+#: modules/control/rc.c:864
 msgid "| is_playing . . . .  1 if a stream plays, 0 otherwise"
 msgstr "| is_playing . . . .  1 če se predvaja, 0 ostalo"
 
-#: modules/control/rc.c:862
+#: modules/control/rc.c:865
 msgid "| get_title . . . . .  the title of the current stream"
 msgstr "| get_title . . . . . naslov trenutnega pretoka"
 
-#: modules/control/rc.c:863
+#: modules/control/rc.c:866
 msgid "| get_length . . . .  the length of the current stream"
 msgstr "| get_length . . . .  dolžina trenutnega pretoka"
 
-#: modules/control/rc.c:865
+#: modules/control/rc.c:868
 msgid "| volume [X] . . . . . . . . . .  set/get audio volume"
 msgstr "| volume [X] . . . . . . . . . .  nastavi/izpiši jakost zvoka"
 
-#: modules/control/rc.c:866
+#: modules/control/rc.c:869
 msgid "| volup [X]  . . . . . . .  raise audio volume X steps"
 msgstr "| volup [X]  . . . . . . .  povečaj jakost zvoka za X"
 
-#: modules/control/rc.c:867
+#: modules/control/rc.c:870
 msgid "| voldown [X]  . . . . . .  lower audio volume X steps"
 msgstr "| voldown [X]  . . . . . . znižaj jakost zvoka za X"
 
-#: modules/control/rc.c:868
+#: modules/control/rc.c:871
 msgid "| adev [X] . . . . . . . . . . .  set/get audio device"
 msgstr "| adev [X] . . . . . . . . . . .  nastavi/izpiši zvočno napravo"
 
-#: modules/control/rc.c:869
+#: modules/control/rc.c:872
 msgid "| achan [X]. . . . . . . . . .  set/get audio channels"
 msgstr "| achan [X]. . . . . . . . . .  nastavi/izpiši kanale zvoka"
 
-#: modules/control/rc.c:870
+#: modules/control/rc.c:873
 msgid "| atrack [X] . . . . . . . . . . . set/get audio track"
 msgstr "| atrack [X] . . . . . . . . . . . nastavi/izpiši zvočno sled"
 
-#: modules/control/rc.c:871
+#: modules/control/rc.c:874
 msgid "| vtrack [X] . . . . . . . . . . . set/get video track"
 msgstr "| vtrack [X] . . . . . . . . . . . nastavi/izpiši slikovno sled"
 
-#: modules/control/rc.c:872
+#: modules/control/rc.c:875
 msgid "| vratio [X]  . . . . . . . set/get video aspect ratio"
 msgstr "| vratio [X]  . . . . . . . nastavi/izpiši velikost slike"
 
-#: modules/control/rc.c:873
+#: modules/control/rc.c:876
 msgid "| vcrop [X]  . . . . . . . . . . .  set/get video crop"
 msgstr "| vcrop [X]  . . . . . . . . . . .  nastavi/izpiši obrezovanje slike"
 
-#: modules/control/rc.c:874
+#: modules/control/rc.c:877
 msgid "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
 msgstr "| vzoom [X]  . . . . . . . . . . .  nastavi/izpiši povečavo slike"
 
-#: modules/control/rc.c:875
+#: modules/control/rc.c:878
 msgid "| strack [X] . . . . . . . . . set/get subtitles track"
 msgstr "| strack [X] . . . . . . . . . nastavi/izpiši sled podnapisov"
 
-#: modules/control/rc.c:876
+#: modules/control/rc.c:879
 msgid "| key [hotkey name] . . . . . .  simulate hotkey press"
 msgstr "| key [ime tipke] . . . . . .  simuliraj pritist bližnjice"
 
-#: modules/control/rc.c:877
+#: modules/control/rc.c:880
 msgid "| menu . . [on|off|up|down|left|right|select] use menu"
 msgstr "| menu . . [on|off|up|down|left|right|select] uporabi menu"
 
-#: modules/control/rc.c:882
+#: modules/control/rc.c:885
 msgid "| @name marq-marquee  STRING  . . overlay STRING in video"
 msgstr "| @name marq-marquee  NIZ . . . . .  NIZ prekrivanja oznak"
 
-#: modules/control/rc.c:883
+#: modules/control/rc.c:886
 msgid "| @name marq-x X . . . . . . . . . . . .offset from left"
 msgstr "| @name marq-x X . . . . . . . . . . . .odmik z leve"
 
-#: modules/control/rc.c:884
+#: modules/control/rc.c:887
 msgid "| @name marq-y Y . . . . . . . . . . . . offset from top"
 msgstr "| @name marq-y Y . . . . . . . . . . . . odmik z vrha"
 
-#: modules/control/rc.c:885
+#: modules/control/rc.c:888
 msgid "| @name marq-position #. . .  .relative position control"
 msgstr "| @name marq-position #. . . . nadzor relativne lege"
 
-#: modules/control/rc.c:886
+#: modules/control/rc.c:889
 msgid "| @name marq-color # . . . . . . . . . . font color, RGB"
 msgstr "| @name marq-color # . . . . . . . . . . barva pisave v RGB"
 
-#: modules/control/rc.c:887
+#: modules/control/rc.c:890
 msgid "| @name marq-opacity # . . . . . . . . . . . . . opacity"
 msgstr "| @name marq-opacity # . . . . . . . . . . . . . motnost"
 
-#: modules/control/rc.c:888
+#: modules/control/rc.c:891
 msgid "| @name marq-timeout T. . . . . . . . . . timeout, in ms"
 msgstr "| @name marq-timeout T. . . . . . . . . . časovni zamik v ms"
 
-#: modules/control/rc.c:889
+#: modules/control/rc.c:892
 msgid "| @name marq-size # . . . . . . . . font size, in pixels"
 msgstr "| @name marq-size # . . . . . . . . velikost pisave v točkah"
 
-#: modules/control/rc.c:891
+#: modules/control/rc.c:894
 msgid "| @name logo-file STRING . . .the overlay file path/name"
 msgstr "| @name logo-file STRING . . .ime in pot do datoteke prekrivanja"
 
-#: modules/control/rc.c:892
+#: modules/control/rc.c:895
 msgid "| @name logo-x X . . . . . . . . . . . .offset from left"
 msgstr "| @name logo-x X . . . . . . . . . . . .odmik z leve"
 
-#: modules/control/rc.c:893
+#: modules/control/rc.c:896
 msgid "| @name logo-y Y . . . . . . . . . . . . offset from top"
 msgstr "| @name logo-y Y . . . . . . . . . . . . odmik z vrha"
 
-#: modules/control/rc.c:894
+#: modules/control/rc.c:897
 msgid "| @name logo-position #. . . . . . . . relative position"
 msgstr "| @name logo-position #. . . . . . . . relativna lega"
 
-#: modules/control/rc.c:895
+#: modules/control/rc.c:898
 msgid "| @name logo-transparency #. . . . . . . . .transparency"
 msgstr "| @name logo-transparency #. . . . . . . . .prosojnost"
 
-#: modules/control/rc.c:897
+#: modules/control/rc.c:900
 msgid "| @name mosaic-alpha # . . . . . . . . . . . . . . alpha"
 msgstr "| @name mosaic-alpha # . . . . . . . . . . . . . . alfa"
 
-#: modules/control/rc.c:898
+#: modules/control/rc.c:901
 msgid "| @name mosaic-height #. . . . . . . . . . . . . .height"
 msgstr "| @name mosaic-height #. . . . . . . . . . . . . .višina"
 
-#: modules/control/rc.c:899
+#: modules/control/rc.c:902
 msgid "| @name mosaic-width # . . . . . . . . . . . . . . width"
 msgstr "| @name mosaic-width # . . . . . . . . . . . . . . širina"
 
-#: modules/control/rc.c:900
+#: modules/control/rc.c:903
 msgid "| @name mosaic-xoffset # . . . .top left corner position"
 msgstr "| @name mosaic-xoffset # . . . .lega zgornjega levega kota"
 
-#: modules/control/rc.c:901
+#: modules/control/rc.c:904
 msgid "| @name mosaic-yoffset # . . . .top left corner position"
 msgstr "| @name mosaic-yoffset # . . . .lega zgornjega levega kota"
 
-#: modules/control/rc.c:902
+#: modules/control/rc.c:905
 msgid "| @name mosaic-offsets x,y(,x,y)*. . . . list of offsets"
 msgstr "| @name mosaic-offsets x,y(,x,y)*. . . . lega zgornjega levega kota"
 
-#: modules/control/rc.c:903
+#: modules/control/rc.c:906
 msgid "| @name mosaic-align 0..2,4..6,8..10. . .mosaic alignment"
 msgstr "| @name mosaic-align 0..2,4..6,8..10. . .urejenost mozaika"
 
-#: modules/control/rc.c:904
+#: modules/control/rc.c:907
 msgid "| @name mosaic-vborder # . . . . . . . . vertical border"
 msgstr "| @name mosaic-vborder # . . . . . . . . navpični rob"
 
-#: modules/control/rc.c:905
+#: modules/control/rc.c:908
 msgid "| @name mosaic-hborder # . . . . . . . horizontal border"
 msgstr "| @name mosaic-hborder # . . . . . . . vodoravni rob"
 
-#: modules/control/rc.c:906
+#: modules/control/rc.c:909
 msgid "| @name mosaic-position {0=auto,1=fixed} . . . .position"
 msgstr "| @name mosaic-position {0=auto,1=fixed} . . . .lega"
 
-#: modules/control/rc.c:907
+#: modules/control/rc.c:910
 msgid "| @name mosaic-rows #. . . . . . . . . . .number of rows"
 msgstr "| @name mosaic-rows #. . . . . . . . . . .število vrstic"
 
-#: modules/control/rc.c:908
+#: modules/control/rc.c:911
 msgid "| @name mosaic-cols #. . . . . . . . . . .number of cols"
 msgstr "| @name mosaic-cols #. . . . . . . . . . .število stolpcev"
 
-#: modules/control/rc.c:909
+#: modules/control/rc.c:912
 msgid "| @name mosaic-order id(,id)* . . . . order of pictures "
 msgstr "| @name mosaic-order id(,id)* . . . . vrstni red slik"
 
-#: modules/control/rc.c:910
+#: modules/control/rc.c:913
 msgid "| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"
 msgstr "| @name mosaic-keep-aspect-ratio {0,1} . . .razmerje prikaza"
 
-#: modules/control/rc.c:912
+#: modules/control/rc.c:915
 msgid ""
 "| check-updates [newer] [equal] [older]\n"
 "|               [undef] [info] [source] [binary] [plugin]"
@@ -10249,41 +10269,41 @@ msgstr ""
 "| check-updates [newer] [equal] [older]\n"
 "|               [undef] [info] [source] [binary] [plugin]"
 
-#: modules/control/rc.c:916
+#: modules/control/rc.c:919
 msgid "| help . . . . . . . . . . . . . . . this help message"
 msgstr "| help . . . . . . . . . . . . . . . to okno pomoči"
 
-#: modules/control/rc.c:917
+#: modules/control/rc.c:920
 msgid "| longhelp . . . . . . . . . . . a longer help message"
 msgstr "| longhelp . . . . . . . . . . . podrobno okno pomoči"
 
-#: modules/control/rc.c:918
+#: modules/control/rc.c:921
 msgid "| logout . . . . . . .  exit (if in socket connection)"
 msgstr "| logout . . . . . . .  izhod (v povezavi)"
 
-#: modules/control/rc.c:919
+#: modules/control/rc.c:922
 msgid "| quit . . . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr "| quit . . . . . . . . . . . . . . . . . . .  izhod iz VLC"
 
-#: modules/control/rc.c:921
+#: modules/control/rc.c:924
 msgid "+----[ end of help ]"
 msgstr "+----[ konec pomoči]"
 
-#: modules/control/rc.c:1031
+#: modules/control/rc.c:1034
 msgid "Press menu select or pause to continue."
 msgstr "Pritisnite izbor menuja ali pavzo za nadaljevanje."
 
-#: modules/control/rc.c:1269 modules/control/rc.c:1481
-#: modules/control/rc.c:1551 modules/control/rc.c:1720
-#: modules/control/rc.c:1819
+#: modules/control/rc.c:1272 modules/control/rc.c:1484
+#: modules/control/rc.c:1554 modules/control/rc.c:1723
+#: modules/control/rc.c:1822
 msgid "Type 'menu select' or 'pause' to continue."
 msgstr "Vtipkajte 'menu select' ali 'pause' za nadaljevanje."
 
-#: modules/control/rc.c:1337
+#: modules/control/rc.c:1340
 msgid "goto is deprecated"
 msgstr "goto je izrabljen"
 
-#: modules/control/rc.c:1804 modules/control/rc.c:1843
+#: modules/control/rc.c:1807 modules/control/rc.c:1846
 msgid "Please provide one of the following parameters:"
 msgstr "Prosim, vstavite enega izmed naslednjih parametrov:"
 
@@ -10346,11 +10366,11 @@ msgstr "AIFF razvijalec"
 msgid "ASF v1.0 demuxer"
 msgstr "ASF v1.0 razvijalec"
 
-#: modules/demux/asf/asf.c:169
+#: modules/demux/asf/asf.c:167
 msgid "Could not demux ASF stream"
 msgstr "Ni mogoče razviti ASF pretoka"
 
-#: modules/demux/asf/asf.c:170
+#: modules/demux/asf/asf.c:168
 msgid "VLC failed to load the ASF header."
 msgstr "Predvajalnik VLC ni uspel naložiti ASF glave."
 
@@ -10768,8 +10788,8 @@ msgstr "Prikaži shoutcast vsebino za odrasle"
 #: modules/demux/playlist/playlist.c:41
 msgid "Show NC17 rated video streams when using shoutcast video playlists."
 msgstr ""
-"Pokaži NC17 oceno slikovnega pretakanja pri uporabi shoutcast seznama "
-"predvajanja slike."
+"Pokaži NC17 oceno pretakanja slike pri uporabi shoutcast seznama predvajanja "
+"slike."
 
 #: modules/demux/playlist/playlist.c:58
 msgid "M3U playlist import"
@@ -11480,9 +11500,9 @@ msgstr "Previj"
 msgid "Fast Forward"
 msgstr "Hitro naprej"
 
-#: modules/gui/macosx/embeddedwindow.m:89 modules/gui/macosx/intf.m:1509
-#: modules/gui/macosx/intf.m:1510 modules/gui/macosx/intf.m:1511
-#: modules/gui/macosx/intf.m:1512 modules/gui/pda/pda_interface.c:250
+#: modules/gui/macosx/embeddedwindow.m:89 modules/gui/macosx/intf.m:1525
+#: modules/gui/macosx/intf.m:1526 modules/gui/macosx/intf.m:1527
+#: modules/gui/macosx/intf.m:1528 modules/gui/pda/pda_interface.c:250
 #: modules/gui/pda/pda_interface.c:251 modules/gui/wxwidgets/interface.cpp:689
 #: modules/gui/wxwidgets/interface.cpp:700
 #: modules/gui/wxwidgets/interface.cpp:1232
@@ -11685,7 +11705,7 @@ msgstr "Prikaz podrobnosti"
 msgid "VLC - Controller"
 msgstr "VLC - Nadzornik"
 
-#: modules/gui/macosx/intf.m:521 modules/gui/macosx/intf.m:1435
+#: modules/gui/macosx/intf.m:521 modules/gui/macosx/intf.m:1451
 #: modules/gui/pda/pda_interface.c:212 modules/gui/pda/pda_interface.c:1355
 #: modules/gui/qt4/ui/main_interface.ui:21
 msgid "VLC media player"
@@ -11747,7 +11767,7 @@ msgstr "Odpri omrežni vir ..."
 msgid "Open Recent"
 msgstr "Odpri nedavne"
 
-#: modules/gui/macosx/intf.m:558 modules/gui/macosx/intf.m:2073
+#: modules/gui/macosx/intf.m:558 modules/gui/macosx/intf.m:2089
 msgid "Clear Menu"
 msgstr "Počisti Menu"
 
@@ -11842,16 +11862,16 @@ msgstr "Donacija"
 msgid "Online Forum"
 msgstr "Spletni forum"
 
-#: modules/gui/macosx/intf.m:1259
+#: modules/gui/macosx/intf.m:1275
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Glasnost: %d%%"
 
-#: modules/gui/macosx/intf.m:1930
+#: modules/gui/macosx/intf.m:1946
 msgid "No CrashLog found"
 msgstr "Ne najdem dnevnika napak."
 
-#: modules/gui/macosx/intf.m:1930
+#: modules/gui/macosx/intf.m:1946
 msgid "Couldn't find any trace of a previous crash."
 msgstr "Ne najdem znakov predhodnega sesutja programa."
 
@@ -11874,7 +11894,7 @@ msgid ""
 "The screen number correspondance can be found in the video device selection "
 "menu."
 msgstr ""
-"Številka zaslona, ki jo uporablja 'celozaslonski način'. Številk oje možno "
+"Številka zaslona, ki jo uporablja 'celozaslonski način'. Številko je možno "
 "poiskati med vnosi izbire slikovne naprave."
 
 #: modules/gui/macosx/macosx.m:61
@@ -12003,7 +12023,7 @@ msgid "HTTP/FTP/MMS/RTSP"
 msgstr "HTTP/FTP/MMS/RTSP"
 
 #: modules/gui/macosx/open.m:188 modules/gui/wxwidgets/dialogs/open.cpp:819
-#: modules/services_discovery/sap.c:111
+#: modules/services_discovery/sap.c:109
 msgid "Allow timeshifting"
 msgstr "Dovoli časovni zamik"
 
@@ -12023,7 +12043,7 @@ msgstr "Razveljavi parametre"
 #: modules/gui/macosx/open.m:270
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:215
 #: modules/stream_out/bridge.c:42 modules/stream_out/display.c:42
-#: modules/video_filter/mosaic.c:162
+#: modules/video_filter/mosaic.c:157
 msgid "Delay"
 msgstr "Zamik"
 
@@ -12495,17 +12515,14 @@ msgid "Download now"
 msgstr "Prenesi takoj"
 
 #: modules/gui/macosx/update.m:89
-#, fuzzy
 msgid "Automatically check for updates"
-msgstr "Preveri za posodobitve"
+msgstr "Samodejno preverjanje posodobitev"
 
 #: modules/gui/macosx/update.m:109
-#, fuzzy
 msgid "Do you want VLC to check for updates automatically?"
 msgstr "Naj predvajalnik VLC samodejno preveri za posodobitve?"
 
 #: modules/gui/macosx/update.m:110
-#, fuzzy
 msgid "You can change this option in VLC's update window later on."
 msgstr ""
 "Nastavitev lahko spremenite kasneje v oknu posodabljanja predvajalnika."
@@ -12532,7 +12549,6 @@ msgid "This version of VLC is outdated."
 msgstr "Uporabljate zastarelo različico VLC predvajalnika."
 
 #: modules/gui/macosx/update.m:264 modules/gui/macosx/update.m:312
-#, fuzzy
 msgid "This version of VLC is the latest available."
 msgstr "Uporabljate najnovejšo različico VLC predvajalnika."
 
@@ -12900,8 +12916,7 @@ msgid ""
 "Enabling this allows to transcode the video track if one is present in the "
 "stream."
 msgstr ""
-"Izbor te nastavitve omogoča prekodiranje slikovne sledi, če v pretoku "
-"obstaja."
+"Izbor te nastavitve omogoča prekodiranje sledi slike, če v pretoku obstaja."
 
 #: modules/gui/macosx/wizard.m:432
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:148
@@ -13660,17 +13675,17 @@ msgstr "Datoteke s podnapisi"
 msgid "All Files"
 msgstr "Vse datoteke"
 
-#: modules/gui/qt4/main_interface.cpp:616
+#: modules/gui/qt4/main_interface.cpp:608
 #: modules/gui/wxwidgets/input_manager.cpp:221
 msgid "Menu"
 msgstr "Menu"
 
-#: modules/gui/qt4/main_interface.cpp:619
+#: modules/gui/qt4/main_interface.cpp:611
 #: modules/gui/wxwidgets/input_manager.cpp:224
 msgid "Previous track"
 msgstr "Predhodna sled"
 
-#: modules/gui/qt4/main_interface.cpp:620
+#: modules/gui/qt4/main_interface.cpp:612
 #: modules/gui/wxwidgets/input_manager.cpp:225
 msgid "Next track"
 msgstr "Naslednja sled"
@@ -16156,7 +16171,7 @@ msgstr "PID Slike"
 msgid ""
 "Assign a fixed PID to the video stream. The PCR PID will automatically be "
 "the video."
-msgstr "Določi PID slikovnemu valu. PCR PID bo samodejno privzet v sliki."
+msgstr "Določi PID valu slike. PCR PID bo samodejno privzet v sliki."
 
 #: modules/mux/mpeg/ts.c:87
 msgid "Audio PID"
@@ -16473,40 +16488,41 @@ msgid "IPv4 SAP"
 msgstr "IPv4 SAP"
 
 #: modules/services_discovery/sap.c:84
-msgid "Listen to IPv4 announcements on the standard address."
-msgstr "Spremljanje IPv4 objav preko standardnega naslova."
+#, fuzzy
+msgid "Listen to IPv4 announcements on the standard addresses."
+msgstr "Spremljanje IPv6 objav preko standardnega naslova."
 
-#: modules/services_discovery/sap.c:86
+#: modules/services_discovery/sap.c:85
 msgid "IPv6 SAP"
 msgstr "IPv6 SAP"
 
-#: modules/services_discovery/sap.c:88
+#: modules/services_discovery/sap.c:87
 msgid "Listen to IPv6 announcements on the standard addresses."
 msgstr "Spremljanje IPv6 objav preko standardnega naslova."
 
-#: modules/services_discovery/sap.c:90
+#: modules/services_discovery/sap.c:88
 msgid "IPv6 SAP scope"
 msgstr "IPv6 SAP območje"
 
-#: modules/services_discovery/sap.c:92
+#: modules/services_discovery/sap.c:90
 msgid "Scope for IPv6 announcements (default is 8)."
 msgstr "Območje za IPv6 objavljanje (privzeto 8)."
 
-#: modules/services_discovery/sap.c:93
+#: modules/services_discovery/sap.c:91
 msgid "SAP timeout (seconds)"
 msgstr "SAP časovna omejitev (sekunde)"
 
-#: modules/services_discovery/sap.c:95
+#: modules/services_discovery/sap.c:93
 msgid ""
 "Delay after which SAP items get deleted if no new announcement is received."
 msgstr ""
 "Časovni zamik po katerem so SAP predmeti izbrisani, če ni sprejete objave."
 
-#: modules/services_discovery/sap.c:97
+#: modules/services_discovery/sap.c:95
 msgid "Try to parse the announce"
 msgstr "Poskušaj razčleniti objavo"
 
-#: modules/services_discovery/sap.c:99
+#: modules/services_discovery/sap.c:97
 msgid ""
 "This enables actual parsing of the announces by the SAP module. Otherwise, "
 "all announcements are parsed by the \"livedotcom\" (RTP/RTSP) module."
@@ -16514,22 +16530,22 @@ msgstr ""
 "Nastavitev omogoča dejansko razčlenjevanje objav preko SAP enote. Privzeto "
 "so vse objave razčlenjene preko \"livedotcom\" (RTP/RTSP) enot."
 
-#: modules/services_discovery/sap.c:102
+#: modules/services_discovery/sap.c:100
 msgid "SAP Strict mode"
 msgstr "Omejen SAP način"
 
-#: modules/services_discovery/sap.c:104
+#: modules/services_discovery/sap.c:102
 msgid ""
 "When this is set, the SAP parser will discard some non-compliant "
 "announcements."
 msgstr ""
 "Z nastavitvijo bo SAP razčlenjevalec izpustil nekatere nekompatibilne objave."
 
-#: modules/services_discovery/sap.c:106
+#: modules/services_discovery/sap.c:104
 msgid "Use SAP cache"
 msgstr "Uporabi predpomnilnik SAP"
 
-#: modules/services_discovery/sap.c:108
+#: modules/services_discovery/sap.c:106
 msgid ""
 "This enables a SAP caching mechanism. This will result in lower SAP startup "
 "time, but you could end up with items corresponding to legacy streams."
@@ -16537,7 +16553,7 @@ msgstr ""
 "Omogoči mehanizem SAP predpomnjenja. S tem se zniža zagonski čas SAP, hkrati "
 "pa je možn, da se poveže s podedovanimi pretoki."
 
-#: modules/services_discovery/sap.c:112
+#: modules/services_discovery/sap.c:110
 msgid ""
 "This automatically enables timeshifting for streams discovered through SAP "
 "announcements."
@@ -16545,27 +16561,27 @@ msgstr ""
 "Samodejno omogoči časovni zamik za pretoke, ki so odkriti preko SAP "
 "objavljanja."
 
-#: modules/services_discovery/sap.c:123
+#: modules/services_discovery/sap.c:121
 msgid "SAP Announcements"
 msgstr "Objave SAP"
 
-#: modules/services_discovery/sap.c:150
+#: modules/services_discovery/sap.c:148
 msgid "SDP file parser for UDP"
 msgstr "Razčlenjevanje SDP datotek za UDP prenos."
 
-#: modules/services_discovery/sap.c:318
+#: modules/services_discovery/sap.c:316
 msgid "SAP sessions"
 msgstr "Seja SAP"
 
-#: modules/services_discovery/sap.c:822 modules/services_discovery/sap.c:826
+#: modules/services_discovery/sap.c:820 modules/services_discovery/sap.c:824
 msgid "Session"
 msgstr "Seja"
 
-#: modules/services_discovery/sap.c:822
+#: modules/services_discovery/sap.c:820
 msgid "Tool"
 msgstr "Orodje"
 
-#: modules/services_discovery/sap.c:827
+#: modules/services_discovery/sap.c:825
 msgid "User"
 msgstr "Uporabnik"
 
@@ -16737,7 +16753,7 @@ msgstr "Privzeti odvodni URI za zvok"
 
 #: modules/stream_out/es.c:65
 msgid "Video output URL"
-msgstr "URL slikovnega odvoda"
+msgstr "URL odvoda slike"
 
 #: modules/stream_out/es.c:67
 msgid "This is the output URI that will be used for video."
@@ -16756,25 +16772,36 @@ msgstr "Ni primerne enote za dostop do odvod pretoka \"%s/%s://%s\"."
 msgid "Gathering stream output"
 msgstr "Zbiranje odvoda pretoka"
 
-#: modules/stream_out/mosaic_bridge.c:127
+#: modules/stream_out/mosaic_bridge.c:121
 msgid "Specify an identifier string for this subpicture"
 msgstr "Določitev oznake niza nalepk."
 
-#: modules/stream_out/mosaic_bridge.c:135
+#: modules/stream_out/mosaic_bridge.c:129
 msgid "Sample aspect ratio"
 msgstr "Razmerje velikosti vzorca"
 
-#: modules/stream_out/mosaic_bridge.c:137
+#: modules/stream_out/mosaic_bridge.c:131
 msgid "Sample aspect ratio of the destination (1:1, 3:4, 2:3)."
 msgstr "Razmerje velikosti vzorca (1:1, 3:4, 2:3)."
 
-#: modules/stream_out/mosaic_bridge.c:138
-#, fuzzy
-msgid "Transparency mask"
-msgstr "Prosojnost"
+#: modules/stream_out/mosaic_bridge.c:133 modules/stream_out/transcode.c:85
+msgid "Video filter"
+msgstr "Slikovni filter"
 
-#: modules/stream_out/mosaic_bridge.c:140
-msgid "Alpha blending transparency mask. Use's a png alpha channel."
+#: modules/stream_out/mosaic_bridge.c:135
+#, fuzzy
+msgid "Video filters will be applied to the video stream."
+msgstr "Filtri slike so uporabljeni pri obdelavi pretoka slikovnega vala."
+
+#: modules/stream_out/mosaic_bridge.c:137
+#, fuzzy
+msgid "Image chroma"
+msgstr "Format slike"
+
+#: modules/stream_out/mosaic_bridge.c:139
+msgid ""
+"Force the use of a specific chroma. Use YUVA if you're planning to use the "
+"Alphamask or Bluescreen video filter."
 msgstr ""
 
 #: modules/stream_out/mosaic_bridge.c:145
@@ -17047,7 +17074,7 @@ msgstr "Zaduši zvok, ko vrednost ukaza ni 0."
 
 #: modules/stream_out/switcher.c:107
 msgid "MPEG2 video switcher stream output"
-msgstr "Stikalo MPEG2 slikovnega odvoda pretoka"
+msgstr "Stikalo MPEG2 odvoda pretoka slike"
 
 #: modules/stream_out/transcode.c:51
 msgid "Video encoder"
@@ -17075,7 +17102,7 @@ msgstr "Slikovna bitna stopnja"
 
 #: modules/stream_out/transcode.c:60
 msgid "Target bitrate of the transcoded video stream."
-msgstr "Ciljna bitna stopnja prekodiranega slikovnega vala."
+msgstr "Ciljna bitna stopnja prekodiranega vala slike."
 
 #: modules/stream_out/transcode.c:61
 msgid "Video scaling"
@@ -17117,16 +17144,12 @@ msgstr "Največja višina slike"
 msgid "Maximum output video height."
 msgstr "Največja višina slike"
 
-#: modules/stream_out/transcode.c:85
-msgid "Video filter"
-msgstr "Slikovni filter"
-
 #: modules/stream_out/transcode.c:87
 msgid ""
 "Video filters will be applied to the video streams (after overlays are "
 "applied). You must enter a comma-separated list of filters."
 msgstr ""
-"Slikovni filtri bodo uporabljeni pri predvajanju slikovnega vala (po uporabi "
+"Slikovni filtri bodo uporabljeni pri predvajanju vala slike (po uporabi "
 "prekrivanja). Določiti je potrebno listo filtrov, ki so zapisani ločeno z "
 "vejicami."
 
@@ -17196,7 +17219,7 @@ msgstr "Velikost robne obloge na desni strani slike."
 
 #: modules/stream_out/transcode.c:116
 msgid "Video canvas width"
-msgstr "Širina slikovnega platna"
+msgstr "Širina platna slike"
 
 #: modules/stream_out/transcode.c:118
 msgid "This will automatically crod and pad the video to a specified width."
@@ -17204,7 +17227,7 @@ msgstr "Samodejno obrobljanje in oblaganje slike na določeno širino."
 
 #: modules/stream_out/transcode.c:119
 msgid "Video canvas height"
-msgstr "Višina slikovnega platna"
+msgstr "Višina platna slike"
 
 #: modules/stream_out/transcode.c:121
 msgid "This will automatically crod and pad the video to a specified height."
@@ -17212,15 +17235,15 @@ msgstr "Samodejno obrobljanje in oblaganje slike na določeno višino."
 
 #: modules/stream_out/transcode.c:122
 msgid "Video canvas aspect ratio"
-msgstr "Razmerje velikosti slikovnega platna"
+msgstr "Razmerje velikosti platna slike"
 
 #: modules/stream_out/transcode.c:124
 msgid ""
 "This sets aspect (like 4:3) of the video canvas and letterbox the video "
 "accordingly."
 msgstr ""
-"Nastavi razmerje velikosti (primer: 4:3) slikovnega platna in določi "
-"primeren okvir."
+"Nastavitev razmerja velikosti (primer: 4:3) platna slike in primernega "
+"okvirja."
 
 #: modules/stream_out/transcode.c:127
 msgid "Audio encoder"
@@ -17308,9 +17331,9 @@ msgid ""
 "overlayed directly onto the video. You must specify a comma-separated list "
 "of subpicture modules"
 msgstr ""
-"Nastavitev omogoča uporabo \"nalepk\" na prekodiranem slikovnem pretoku. "
-"Nalepke bodo filtrirane neposredno na sliko. Določiti morate listo enot "
-"nalepk ločeno z vejicami."
+"Nastavitev omogoča uporabo \"nalepk\" na prekodiranem pretoku slike. Nalepke "
+"bodo filtrirane neposredno na sliko. Določiti morate listo enot nalepk "
+"ločeno z vejicami."
 
 #: modules/stream_out/transcode.c:163 modules/video_filter/osdmenu.c:116
 msgid "OSD menu"
@@ -17348,8 +17371,8 @@ msgid ""
 "This option will drop/duplicate video frames to synchronise the video track "
 "on the audio track."
 msgstr ""
-"Nastavitev omogoča izpuščanje in podvajanje sličic za usklajevanje zvočne in "
-"slikovne sledi."
+"Nastavitev omogoča izpuščanje in podvajanje sličic za usklajevanje sledi "
+"zvoka in slike."
 
 #: modules/stream_out/transcode.c:181
 msgid ""
@@ -17368,7 +17391,7 @@ msgstr "Prekrivanje/PodnapisiOverlays/Subtitles"
 
 #: modules/stream_out/transrate/transrate.c:58
 msgid "MPEG2 video transrating stream output"
-msgstr "Spreminjanje stopnje MPEG2 slikovnega odvoda pretoka"
+msgstr "Spreminjanje stopnje MPEG2 odvoda pretoka slike"
 
 #: modules/video_chroma/i420_rgb.c:67
 msgid "I420,IYUV,YV12 to RGB2,RV15,RV16,RV24,RV32 conversions"
@@ -17453,9 +17476,101 @@ msgstr "Filter lastnosti slike"
 msgid "Image adjust"
 msgstr "Prilagajanje slike"
 
+#: modules/video_filter/alphamask.c:37
+msgid "Use an image's alpha channel as a transparency mask."
+msgstr ""
+
+#: modules/video_filter/alphamask.c:39
+msgid "Transparency mask"
+msgstr "Maska prosojnosti"
+
+#: modules/video_filter/alphamask.c:41
+msgid "Alpha blending transparency mask. Use's a png alpha channel."
+msgstr "Alfa pobleditev maske prosojnosti. Uporablja png alfa kanal."
+
+#: modules/video_filter/alphamask.c:60
+#, fuzzy
+msgid "Alpha mask video filter"
+msgstr "Izbriši filter slike"
+
+#: modules/video_filter/alphamask.c:61
+#, fuzzy
+msgid "Alpha mask"
+msgstr "Maska slike"
+
 #: modules/video_filter/blend.c:95
 msgid "Video pictures blending"
 msgstr "Prelivanje slike"
+
+#: modules/video_filter/bluescreen.c:36
+#, fuzzy
+msgid ""
+"This effect, also known as \"greenscreen\" or \"chroma key\" blends the "
+"\"blue parts\" of the foreground image of the mosaic on the background (like "
+"weather forcasts). You can choose the \"key\" color for blending (blyyue by "
+"default)."
+msgstr ""
+"Učinek znan tudi kot \"zeleni zaslon\" ali \"barvni ključ\", ki pobledi "
+"\"modre dele\" osprednjih slik mozaika v ozadju (kot prikazovanje vremenske "
+"napovedi na TV). Izberete lahko \"ključ\" barve za pobleditev (modra je "
+"privzeta)."
+
+#: modules/video_filter/bluescreen.c:41
+msgid "Bluescreen U value"
+msgstr "Modri zaslon U vrednost"
+
+#: modules/video_filter/bluescreen.c:43
+msgid ""
+"\"U\" value for the bluescreen key color (in YUV values). From 0 to 255. "
+"Defaults to 120 for blue."
+msgstr ""
+"\"U\" vrednost za barvo modrega zaslona (v YUV obliki). Območje od 0 do 255. "
+"Privzeta vrednost je 120 za modro."
+
+#: modules/video_filter/bluescreen.c:45
+msgid "Bluescreen V value"
+msgstr "Modri zaslon V vrednost"
+
+#: modules/video_filter/bluescreen.c:47
+msgid ""
+"\"V\" value for the bluescreen key color (in YUV values). From 0 to 255. "
+"Defaults to 90 for blue."
+msgstr ""
+"\"V\" vrednost za barvo modrega zaslona (v YUV obliki). Območje od 0 do 255. "
+"Privzeta vrednost je 90 za modro."
+
+#: modules/video_filter/bluescreen.c:49
+msgid "Bluescreen U tolerance"
+msgstr "Modri zaslon U toleranca"
+
+#: modules/video_filter/bluescreen.c:51
+msgid ""
+"Tolerance of the bluescreen blender on color variations for the U plane. A "
+"value between 10 and 20 seems sensible."
+msgstr ""
+"Toleranca modrega osvetljevanja ob spreminjanju barv za U nabor. Vrednosti "
+"med 10 in 20 so videti smiselne."
+
+#: modules/video_filter/bluescreen.c:54
+msgid "Bluescreen V tolerance"
+msgstr "Modri zaslon V toleranca"
+
+#: modules/video_filter/bluescreen.c:56
+msgid ""
+"Tolerance of the bluescreen blender on color variations for the V plane. A "
+"value between 10 and 20 seems sensible."
+msgstr ""
+"Toleranca modrega osvetljevanja ob spreminjanju barv za V nabor. Vrednosti "
+"med 10 in 20 so videti smiselne."
+
+#: modules/video_filter/bluescreen.c:76
+#, fuzzy
+msgid "Bluescreen video filter"
+msgstr "Filter ostrenja slike"
+
+#: modules/video_filter/bluescreen.c:77
+msgid "Bluescreen"
+msgstr "Modri zaslon"
 
 #: modules/video_filter/clone.c:55
 msgid "Number of clones"
@@ -17637,37 +17752,37 @@ msgstr "Uporaba metoda razpletanja pri pretakanju."
 msgid "Deinterlacing video filter"
 msgstr "Filter razpletanja slike."
 
-#: modules/video_filter/erase.c:53
+#: modules/video_filter/erase.c:51
 msgid "Image mask"
 msgstr "Maska slike"
 
-#: modules/video_filter/erase.c:54
+#: modules/video_filter/erase.c:52
 msgid "Image mask. Pixels with an alpha value greater than 50% will be erased."
 msgstr "Masla slike. Točke z alfa vrednostmi večje od 50% bodo izbrisane."
 
-#: modules/video_filter/erase.c:56 modules/video_filter/logo.c:78
+#: modules/video_filter/erase.c:54 modules/video_filter/logo.c:78
 #: modules/video_filter/osdmenu.c:48
 msgid "X coordinate"
 msgstr "X koordinata"
 
-#: modules/video_filter/erase.c:57
+#: modules/video_filter/erase.c:55
 msgid "X coordinate of the mask."
 msgstr "Koordinata X maske."
 
-#: modules/video_filter/erase.c:58 modules/video_filter/logo.c:81
+#: modules/video_filter/erase.c:56 modules/video_filter/logo.c:81
 #: modules/video_filter/osdmenu.c:51
 msgid "Y coordinate"
 msgstr "Y koordinata"
 
-#: modules/video_filter/erase.c:59
+#: modules/video_filter/erase.c:57
 msgid "Y coordinate of the mask."
 msgstr "Koordinata Y maske."
 
-#: modules/video_filter/erase.c:64
+#: modules/video_filter/erase.c:62
 msgid "Erase video filter"
 msgstr "Izbriši filter slike"
 
-#: modules/video_filter/erase.c:65
+#: modules/video_filter/erase.c:63
 msgid "Erase"
 msgstr "Izbriši"
 
@@ -17919,11 +18034,11 @@ msgstr "Razno"
 msgid "Marquee display"
 msgstr "Prikaz oznak"
 
-#: modules/video_filter/mosaic.c:95
+#: modules/video_filter/mosaic.c:90
 msgid "Transparency"
 msgstr "Prosojnost"
 
-#: modules/video_filter/mosaic.c:97
+#: modules/video_filter/mosaic.c:92
 msgid ""
 "Transparency of the mosaic foreground pictures. 0 means transparent, 255 "
 "opaque (default)."
@@ -17931,51 +18046,51 @@ msgstr ""
 "Prosojnost osprednjih mozaičnih slik. 0 predstavlja prosojno, 255 motno "
 "(privzeto)."
 
-#: modules/video_filter/mosaic.c:101
+#: modules/video_filter/mosaic.c:96
 msgid "Total height of the mosaic, in pixels."
 msgstr "Skupna višina mozaika v točkah."
 
-#: modules/video_filter/mosaic.c:103
+#: modules/video_filter/mosaic.c:98
 msgid "Total width of the mosaic, in pixels."
 msgstr "Skupna širina mozaika v točkah."
 
-#: modules/video_filter/mosaic.c:105
+#: modules/video_filter/mosaic.c:100
 msgid "Top left corner X coordinate"
 msgstr "Točka Y osi zgornjega levega kota"
 
-#: modules/video_filter/mosaic.c:107
+#: modules/video_filter/mosaic.c:102
 msgid "X Coordinate of the top-left corner of the mosaic."
 msgstr "Točka X osi zgornjega levega kota mozaika."
 
-#: modules/video_filter/mosaic.c:108
+#: modules/video_filter/mosaic.c:103
 msgid "Top left corner Y coordinate"
 msgstr "Točka Y osi zgornjega levega kota"
 
-#: modules/video_filter/mosaic.c:110
+#: modules/video_filter/mosaic.c:105
 msgid "Y Coordinate of the top-left corner of the mosaic."
 msgstr "Točka Y osi zgornjega levega kota mozaika."
 
-#: modules/video_filter/mosaic.c:112
+#: modules/video_filter/mosaic.c:107
 msgid "Border width"
 msgstr "Širina robu"
 
-#: modules/video_filter/mosaic.c:114
+#: modules/video_filter/mosaic.c:109
 msgid "Width in pixels of the border between miniatures."
 msgstr "Širina robov med miniaturami, v točkah."
 
-#: modules/video_filter/mosaic.c:115
+#: modules/video_filter/mosaic.c:110
 msgid "Border height"
 msgstr "Višina robu"
 
-#: modules/video_filter/mosaic.c:117
+#: modules/video_filter/mosaic.c:112
 msgid "Height in pixels of the border between miniatures."
 msgstr "Višina robov med miniaturami, v točkah."
 
-#: modules/video_filter/mosaic.c:119
+#: modules/video_filter/mosaic.c:114
 msgid "Mosaic alignment"
 msgstr "Poravnav mozaika"
 
-#: modules/video_filter/mosaic.c:121
+#: modules/video_filter/mosaic.c:116
 msgid ""
 "You can enforce the mosaic alignment on the video (0=center, 1=left, "
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg "
@@ -17985,11 +18100,11 @@ msgstr ""
 "4=zgoraj, 8=spodaj) S seštevanjem lahko določite tudi kombinirane možnosti "
 "(primer 6 = zgoraj desno)."
 
-#: modules/video_filter/mosaic.c:125
+#: modules/video_filter/mosaic.c:120
 msgid "Positioning method"
 msgstr "Metoda postavitve"
 
-#: modules/video_filter/mosaic.c:127
+#: modules/video_filter/mosaic.c:122
 msgid ""
 "Positioning method for the mosaic. auto: automatically choose the best "
 "number of rows and columns. fixed: use the user-defined number of rows and "
@@ -17999,12 +18114,12 @@ msgstr ""
 "vrednost stolpcev in vrstic. določeno: uporabi uporabniško nastavitev "
 "stolpcev in vrstic. odmik: uporabi uporabniški odmik za vsako sliko."
 
-#: modules/video_filter/mosaic.c:132 modules/video_filter/panoramix.c:82
+#: modules/video_filter/mosaic.c:127 modules/video_filter/panoramix.c:82
 #: modules/video_filter/wall.c:57
 msgid "Number of rows"
 msgstr "Število vrstic"
 
-#: modules/video_filter/mosaic.c:134
+#: modules/video_filter/mosaic.c:129
 msgid ""
 "Number of image rows in the mosaic (only used if positionning method is set "
 "to \"fixed\")."
@@ -18012,12 +18127,12 @@ msgstr ""
 "Število slikovnih vrstic v mozaiku. (samo če je metoda postavitve določena z "
 "\"določeno\")."
 
-#: modules/video_filter/mosaic.c:137 modules/video_filter/panoramix.c:78
+#: modules/video_filter/mosaic.c:132 modules/video_filter/panoramix.c:78
 #: modules/video_filter/wall.c:53
 msgid "Number of columns"
 msgstr "Število stolpcev"
 
-#: modules/video_filter/mosaic.c:139
+#: modules/video_filter/mosaic.c:134
 msgid ""
 "Number of image columns in the mosaic (only used if positionning method is "
 "set to \"fixed\"."
@@ -18025,25 +18140,25 @@ msgstr ""
 "Število stolpcev slik v mozaiku. (uporabljeno samo, če je izbrana metoda "
 "postavitve \"določeno\")."
 
-#: modules/video_filter/mosaic.c:144
+#: modules/video_filter/mosaic.c:139
 msgid "Keep the original aspect ratio when resizing mosaic elements."
 msgstr ""
 "Ohrani privzeto razmerje velikosti ob prilagajanju velikosti mozaičnih "
 "elementov."
 
-#: modules/video_filter/mosaic.c:146
+#: modules/video_filter/mosaic.c:141
 msgid "Keep original size"
 msgstr "Ohrani originalno velikost"
 
-#: modules/video_filter/mosaic.c:148
+#: modules/video_filter/mosaic.c:143
 msgid "Keep the original size of mosaic elements."
 msgstr "Ohrani originalno velikost elementov mozaika"
 
-#: modules/video_filter/mosaic.c:150
+#: modules/video_filter/mosaic.c:145
 msgid "Elements order"
 msgstr "Razvrstitev elementov"
 
-#: modules/video_filter/mosaic.c:152
+#: modules/video_filter/mosaic.c:147
 msgid ""
 "You can enforce the order of the elements on the mosaic. You must give a "
 "comma-separated list of picture ID(s).These IDs are assigned in the \"mosaic-"
@@ -18052,11 +18167,11 @@ msgstr ""
 "Določite lahko red elementov v mozaiku. Določiti morate z vejico ločeno "
 "listo ID slik. ID vrednosti so povezane z enoto \"premoščanje mozaika\"."
 
-#: modules/video_filter/mosaic.c:156
+#: modules/video_filter/mosaic.c:151
 msgid "Offsets in order"
 msgstr "Odmik v razvrstitvi"
 
-#: modules/video_filter/mosaic.c:158
+#: modules/video_filter/mosaic.c:153
 msgid ""
 "You can enforce the (x,y) offsets of the elements on the mosaic (only used "
 "if positioning method is set to \"offsets\"). You must give a comma-"
@@ -18066,7 +18181,7 @@ msgstr ""
 "izbrana metoda postavitve \"odmiki\") Določiti morate z vejico ločeno listo "
 "koordinat (primer: 10,10,150,10)"
 
-#: modules/video_filter/mosaic.c:164
+#: modules/video_filter/mosaic.c:159
 msgid ""
 "Pictures coming from the mosaic elements will be delayed according to this "
 "value (in milliseconds). For high values you will need to raise caching at "
@@ -18075,91 +18190,21 @@ msgstr ""
 "Slike iz elementov mozaika bodo časovno zamaknjene na to vrednost (v "
 "milisekundah). Za večje vrednosti boste morali prilagoditi predpomnjenje."
 
-#: modules/video_filter/mosaic.c:168
-msgid "Bluescreen"
-msgstr "Modri zaslon"
-
-#: modules/video_filter/mosaic.c:170
-#, fuzzy
-msgid ""
-"This effect, also known as \"greenscreen\" or \"chroma key\" blends the "
-"\"blue parts\" of the foreground images of the mosaic on the background "
-"(like weather forecast). You can choose the \"key\" color for blending (blue "
-"by default)."
-msgstr ""
-"Učinek znan tudi kot \"zeleni zaslon\" ali \"barvni ključ\", ki pobledi "
-"\"modre dele\" osprednjih slik mozaika v ozadju (kot prikazovanje vremenske "
-"napovedi na TV). Izberete lahko \"ključ\" barve za pobleditev (modra je "
-"privzeta)."
-
-#: modules/video_filter/mosaic.c:175
-msgid "Bluescreen U value"
-msgstr "Modri zaslon U vrednost"
-
-#: modules/video_filter/mosaic.c:177
-msgid ""
-"\"U\" value for the bluescreen key color (in YUV values). From 0 to 255. "
-"Defaults to 120 for blue."
-msgstr ""
-"\"U\" vrednost za barvo modrega zaslona (v YUV obliki). Območje od 0 do 255. "
-"Privzeta vrednost je 120 za modro."
-
-#: modules/video_filter/mosaic.c:179
-msgid "Bluescreen V value"
-msgstr "Modri zaslon V vrednost"
-
-#: modules/video_filter/mosaic.c:181
-msgid ""
-"\"V\" value for the bluescreen key color (in YUV values). From 0 to 255. "
-"Defaults to 90 for blue."
-msgstr ""
-"\"V\" vrednost za barvo modrega zaslona (v YUV obliki). Območje od 0 do 255. "
-"Privzeta vrednost je 90 za modro."
-
-#: modules/video_filter/mosaic.c:183
-msgid "Bluescreen U tolerance"
-msgstr "Modri zaslon U toleranca"
-
-#: modules/video_filter/mosaic.c:185
-msgid ""
-"Tolerance of the bluescreen blender on color variations for the U plane. A "
-"value between 10 and 20 seems sensible."
-msgstr ""
-"Toleranca modrega osvetljevanja ob spreminjanju barv za U nabor. Vrednosti "
-"med 10 in 20 so videti smiselne."
-
-#: modules/video_filter/mosaic.c:188
-msgid "Bluescreen V tolerance"
-msgstr "Modri zaslon V toleranca"
-
-#: modules/video_filter/mosaic.c:190
-msgid ""
-"Tolerance of the bluescreen blender on color variations for the V plane. A "
-"value between 10 and 20 seems sensible."
-msgstr ""
-"Toleranca modrega osvetljevanja ob spreminjanju barv za V nabor. Vrednosti "
-"med 10 in 20 so videti smiselne."
-
-#: modules/video_filter/mosaic.c:196
+#: modules/video_filter/mosaic.c:169
 msgid "fixed"
 msgstr "določeno"
 
-#: modules/video_filter/mosaic.c:196
+#: modules/video_filter/mosaic.c:169
 msgid "offsets"
 msgstr "odmiki"
 
-#: modules/video_filter/mosaic.c:206
+#: modules/video_filter/mosaic.c:179
 msgid "Mosaic video sub filter"
 msgstr "Mozaični filter slike"
 
-#: modules/video_filter/mosaic.c:207
+#: modules/video_filter/mosaic.c:180
 msgid "Mosaic"
 msgstr "Mozaik"
-
-#: modules/video_filter/mosaic.c:259
-#, fuzzy
-msgid "Bluescreen effect"
-msgstr "Modri zaslon"
 
 #: modules/video_filter/motionblur.c:50
 msgid "Blur factor (1-127)"
@@ -19566,5 +19611,8 @@ msgstr "Filter ponazoritev"
 msgid "Spectrum analyser"
 msgstr "Spektralna analiza"
 
-#~ msgid "Check for VLC update automatically"
-#~ msgstr "Samodejno preveri za posodobitve"
+#~ msgid "Listen to IPv4 announcements on the standard address."
+#~ msgstr "Spremljanje IPv4 objav preko standardnega naslova."
+
+#~ msgid "Bluescreen effect"
+#~ msgstr "Učinek modrega zaslona"
