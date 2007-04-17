@@ -29,11 +29,11 @@
 #include <QWidget>
 #include <QString>
 #include <QFileDialog>
+
 #include "ui/open_file.h"
 #include "ui/open_disk.h"
 #include "ui/open_net.h"
 #include "ui/open_capture.h"
-#include <QDialogButtonBox>
 
 class QLineEdit;
 
@@ -80,7 +80,6 @@ private:
     QStringList browse( QString );
     FileOpenBox *dialogBox;
     QLineEdit *lineFileEdit;
-    QDialogButtonBox *fileDialogAcceptBox;
 public slots:
     virtual void updateMRL();
 private slots:

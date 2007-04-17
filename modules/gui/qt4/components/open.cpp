@@ -69,7 +69,8 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
 
     // But hide the two OK/Cancel buttons. Enable them for debug.
-    fileDialogAcceptBox = findChildren<QDialogButtonBox*>()[0];
+    QDialogButtonBox *fileDialogAcceptBox =
+                        findChildren<QDialogButtonBox*>()[0];
     fileDialogAcceptBox->hide();
 
     /* Ugly hacks to get the good Widget */
