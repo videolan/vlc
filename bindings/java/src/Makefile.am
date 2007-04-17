@@ -13,8 +13,6 @@ libjvlc_la_LIBADD = ../../../src/libvlc-control.la $(LIBJINCLUDES)
 
 libjvlc_a_SOURCES=$(libjvlc_la_SOURCES)
 libjvlc_a_CPPFLAGS = `$(VLC_CONFIG) --cflags pic` $(JINCLUDES)
-libjvlc_a_LIBADD = ../../../src/libvlc.a
-
 
 if BUILD_JAVA
 
@@ -30,6 +28,7 @@ LIBRARIES_libvlc = $(top_builddir)/src/libvlc.dll.a
 libjvlc_a_DEPENDENCIES = libjvlc.def $(LIBRARIES_libvlc)
 LDFLAGS_jvlc = `$(VLC_CONFIG) --libs libvlc`
 libjvlc_DATA = jvlc$(LIBEXT)
+libjvlc_a_LIBADD = ../../../src/libvlc.dll.a
 
 libjvlcdir=$(srcdir)
 
@@ -47,6 +46,10 @@ jvlc$(LIBEXT): $(libjvlc_a_OBJECTS) \
 
 
 all: libjvlc.dll.a
+
+else
+libjvlc_a_LIBADD = ../../../src/libvlc.a
+
 endif
 
 .PHONY: clean-local
