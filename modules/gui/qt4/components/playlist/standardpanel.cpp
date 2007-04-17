@@ -60,9 +60,10 @@ StandardPLPanel::StandardPLPanel( BasePlaylistWidget *_parent,
     view->header()->setClickable( true );
 
     view->setSelectionMode( QAbstractItemView::ExtendedSelection );
-    view->setDragEnabled(true);
-    view->setAcceptDrops(true);
-    view->setDropIndicatorShown(true);
+    view->setDragEnabled( true );
+    view->setAcceptDrops( true );
+    view->setDropIndicatorShown( true );
+    view->setAutoScroll( true );
 
     CONNECT( view, activated( const QModelIndex& ) ,
              model,activateItem( const QModelIndex& ) );
