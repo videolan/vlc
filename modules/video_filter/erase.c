@@ -27,8 +27,6 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <math.h>                                            /* sin(), cos() */
-
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
 #include <vlc_vout.h>
@@ -95,14 +93,23 @@ static void LoadMask( filter_t *p_filter, const char *psz_filename )
 {
     image_handler_t *p_image;
     video_format_t fmt_in, fmt_out;
+    picture_t *p_old_mask = p_filter->p_sys->p_mask;
     memset( &fmt_in, 0, sizeof( video_format_t ) );
     memset( &fmt_out, 0, sizeof( video_format_t ) );
     fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-    if( p_filter->p_sys->p_mask )
-        p_filter->p_sys->p_mask->pf_release( p_filter->p_sys->p_mask );
     p_image = image_HandlerCreate( p_filter );
     p_filter->p_sys->p_mask =
         image_ReadUrl( p_image, psz_filename, &fmt_in, &fmt_out );
+    if( p_filter->p_sys->p_mask )
+    {
+        if( p_old_mask )
+            p_old_mask->pf_release( p_old_mask );
+    }
+    else if( p_old_mask )
+    {
+        p_filter->p_sys->p_mask = p_old_mask;
+        msg_Err( p_filter, "Error while loading new mask. Keeping old mask." );
+    }
     image_HandlerDelete( p_image );
 }
 
@@ -182,6 +189,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         case VLC_FOURCC('I','Y','U','V'):
         case VLC_FOURCC('J','4','2','0'):
         case VLC_FOURCC('Y','V','1','2'):
+
+        case VLC_FOURCC('I','4','2','2'):
+        case VLC_FOURCC('J','4','2','2'):
             break;
         default:
             msg_Warn( p_filter, "Unsupported input chroma (%4s)",
@@ -232,6 +242,7 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
     for( i_plane = 0; i_plane < p_inpic->i_planes; i_plane++ )
     {
         const int i_pitch = p_inpic->p[i_plane].i_pitch;
+        const int i_2pitch = i_pitch<<1;
         const int i_visible_pitch = p_inpic->p[i_plane].i_visible_pitch;
         const int i_lines = p_inpic->p[i_plane].i_lines;
         const int i_visible_lines = p_inpic->p[i_plane].i_visible_lines;
@@ -240,50 +251,79 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
         uint8_t *p_outpix = p_outpic->p[i_plane].p_pixels;
         uint8_t *p_mask = p_sys->p_mask->A_PIXELS;
 
-        int i_x = p_sys->i_x, i_y = p_sys->i_y;
+        int i_x = p_sys->i_x,
+            i_y = p_sys->i_y;
         int x, y;
         int i_height = i_mask_visible_lines;
-        int i_width = i_mask_visible_pitch;
+        int i_width  = i_mask_visible_pitch;
+
+        const vlc_bool_t b_line_factor = ( i_plane /* U_PLANE or V_PLANE */ &&
+            !( p_inpic->format.i_chroma == VLC_FOURCC('I','4','2','2')
+            || p_inpic->format.i_chroma == VLC_FOURCC('J','4','2','2') ) );
+
         if( i_plane ) /* U_PLANE or V_PLANE */
         {
-            i_width       /= 2;
-            i_height      /= 2;
-            i_x           /= 2;
-            i_y           /= 2;
+            i_width  >>= 1;
+            i_x      >>= 1;
+        }
+        if( b_line_factor )
+        {
+            i_height >>= 1;
+            i_y      >>= 1;
         }
         i_height = __MIN( i_visible_lines - i_y, i_height );
         i_width  = __MIN( i_visible_pitch - i_x, i_width  );
 
+        /* Copy original pixel buffer */
         p_filter->p_libvlc->pf_memcpy( p_outpix, p_inpix, i_pitch * i_lines );
 
-        for( y = 0; y < i_height; y++, p_mask += i_mask_pitch )
+        /* Horizontal linear interpolation of masked areas */
+        p_outpix = p_outpic->p[i_plane].p_pixels + i_y*i_pitch + i_x;
+        for( y = 0; y < i_height;
+             y++, p_mask += i_mask_pitch, p_outpix += i_pitch )
         {
             uint8_t prev, next = 0;
             int prev_x = -1, next_x = -2;
-            p_outpix = p_outpic->p[i_plane].p_pixels + (i_y+y)*i_pitch + i_x;
+            int quot = 0;
+
+            /* Find a suitable value for the previous color to use when
+             * interpoling a masked pixel's value */
             if( i_x )
             {
+                /* There are pixels before current position on the same line.
+                 * Use those */
                 prev = *(p_outpix-1);
             }
             else if( y || i_y )
             {
+                /* This is the first pixel on a line but there other lines
+                 * above us. Use the pixel right above */
                 prev = *(p_outpix-i_pitch);
             }
             else
             {
+                /* We're in the upper left corner. This sucks. We can't use
+                 * any previous value, so we'll use a dummy one. In most
+                 * cases this dummy value will be fixed later on in the
+                 * algorithm */
                 prev = 0xff;
             }
+
             for( x = 0; x < i_width; x++ )
             {
-                if( p_mask[i_plane?2*x:x] > 127 )
+                if( p_mask[i_plane?x<<1:x] > 127 )
                 {
+                    /* This is a masked pixel */
                     if( next_x <= prev_x )
                     {
                         int x0;
+                        /* Look for the next non masked pixel on the same
+                         * line (inside the mask's bounding box) */
                         for( x0 = x; x0 < i_width; x0++ )
                         {
-                            if( p_mask[i_plane?2*x0:x0] <= 127 )
+                            if( p_mask[i_plane?x0<<1:x0] <= 127 )
                             {
+                                /* We found an unmasked pixel. Victory! */
                                 next_x = x0;
                                 next = p_outpix[x0];
                                 break;
@@ -291,26 +331,45 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
                         }
                         if( next_x <= prev_x )
                         {
+                            /* We didn't find an unmasked pixel yet. Try
+                             * harder */
                             if( x0 == x ) x0++;
-                            if( x0 >= i_visible_pitch )
+                            if( x0 < i_visible_pitch )
                             {
-                                next_x = x0;
-                                next = prev;
-                            }
-                            else
-                            {
+                                /* If we didn't find a non masked pixel on the
+                                 * same line inside the mask's bounding box,
+                                 * use the next pixel on the line (except if
+                                 * it doesn't exist) */
                                 next_x = x0;
                                 next = p_outpix[x0];
                             }
+                            else
+                            {
+                                /* The last pixel on the line is masked,
+                                 * so we'll use the "prev" value. A better
+                                 * approach would be to use unmasked pixels
+                                 * at the end of adjacent lines */
+                                next_x = x0;
+                                next = prev;
+                            }
                         }
                         if( !( i_x || y || i_y ) )
+                            /* We were unable to find a suitable value for
+                             * the previous color (which means that we are
+                             * on the first line in the upper left corner)
+                             */
                             prev = next;
+
+                        /* Divide only once instead of next_x-prev_x-1 times */
+                        quot = ((next-prev)<<16)/(next_x-prev_x);
                     }
-                    /* interpolate new value */
-                    p_outpix[x] = prev + (x-prev_x)*(next-prev)/(next_x-prev_x);
+                    /* Interpolate new value, and round correctly */
+                    p_outpix[x] = prev + (((x-prev_x)*quot+(1<<16))>>16);
                 }
                 else
                 {
+                    /* This pixel isn't masked. It's thus suitable as a
+                     * previous color for the next interpolation */
                     prev = p_outpix[x];
                     prev_x = x;
                 }
@@ -319,26 +378,31 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
 
         /* Vertical bluring */
         p_mask = p_sys->p_mask->A_PIXELS;
-        i_height = i_mask_visible_lines / (i_plane?2:1);
+        i_height = b_line_factor ? i_mask_visible_lines>>1
+                                 : i_mask_visible_lines;
+        /* Make sure that we stop at least 2 lines before the picture's end
+         * (since our bluring algorithm uses the 2 next lines) */
         i_height = __MIN( i_visible_lines - i_y - 2, i_height );
-        for( y = __MAX(i_y-2,0); y < i_height;
-             y++, p_mask += i_mask_pitch )
+        /* Make sure that we start at least 2 lines from the top (since our
+         * bluring algorithm uses the 2 previous lines) */
+        y = __MAX(i_y-2,0);
+        p_outpix = p_outpic->p[i_plane].p_pixels + (i_y+y)*i_pitch + i_x;
+        for( ; y < i_height; y++, p_mask += i_mask_pitch, p_outpix += i_pitch )
         {
-            p_outpix = p_outpic->p[i_plane].p_pixels + (i_y+y)*i_pitch + i_x;
             for( x = 0; x < i_width; x++ )
             {
-                if( p_mask[i_plane?2*x:x] > 127 )
+                if( p_mask[i_plane?x<<1:x] > 127 )
                 {
+                    /* Ugly bluring function */
                     p_outpix[x] =
-                        ( (p_outpix[x-2*i_pitch]<<1)       /* 2 */
-                        + (p_outpix[x-i_pitch]<<2)         /* 4 */
-                        + (p_outpix[x]<<2)                 /* 4 */
-                        + (p_outpix[x+i_pitch]<<2)         /* 4 */
-                        + (p_outpix[x+2*i_pitch]<<1) )>>4; /* 2 */
+                        ( (p_outpix[x-i_2pitch]<<1)       /* 2 */
+                        + (p_outpix[x-i_pitch ]<<2)       /* 4 */
+                        + (p_outpix[x         ]<<2)       /* 4 */
+                        + (p_outpix[x+i_pitch ]<<2)       /* 4 */
+                        + (p_outpix[x+i_2pitch]<<1) )>>4; /* 2 */
                 }
             }
         }
-
     }
 }
 
