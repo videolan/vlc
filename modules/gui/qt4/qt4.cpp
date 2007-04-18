@@ -128,7 +128,8 @@ static void Run( intf_thread_t *p_intf )
 
 static void Init( intf_thread_t *p_intf )
 {
-    char *argv[] = { "" };
+    char dummy[] = "";
+    char *argv[] = { dummy };
     int argc = 1;
     Q_INIT_RESOURCE( vlc );
     QApplication *app = new QApplication( argc, argv , true );
