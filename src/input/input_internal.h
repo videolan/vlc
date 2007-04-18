@@ -340,7 +340,7 @@ static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
 }
 
 #ifdef __PLUGIN__
-# warning CAN'T YOU SEE THIS IS AN INTERNAL HEADER?!
+# warning CAN'T YOU SEE THIS IS AN INTERNAL HEADER?! '
 #else
 /* Stream */
 /**
