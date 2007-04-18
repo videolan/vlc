@@ -182,7 +182,7 @@ void InputManager::sectionPrev()
 {
     if( hasInput() )
     {
-        int i_type = var_Type( p_input, "prev-chapter" );
+        int i_type = var_Type( p_input, "next-chapter" );
         vlc_value_t val; val.b_bool = VLC_TRUE;
         var_Set( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
                             "prev-chapter":"prev-title", val );
@@ -271,6 +271,21 @@ void MainInputManager::updateInput()
     vlc_mutex_unlock( &p_intf->change_lock );
 }
 
+void MainInputManager::stop()
+{
+   playlist_Stop( THEPL );
+}
+
+void MainInputManager::next()
+{
+   playlist_Next( THEPL );
+}
+
+void MainInputManager::prev()
+{
+   playlist_Prev( THEPL );
+}
+
 void MainInputManager::togglePlayPause()
 {
     if( p_input == NULL )
@@ -280,7 +295,6 @@ void MainInputManager::togglePlayPause()
     }
     getIM()->togglePlayPause();
 }
-
 
 static int ChangeAudio( vlc_object_t *p_this, const char *var, vlc_value_t o,
                         vlc_value_t n, void *param )

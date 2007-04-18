@@ -103,11 +103,15 @@ void DialogsProvider::customEvent( QEvent *event )
                bookmarksDialog(); break;
             case INTF_DIALOG_EXTENDED:
                extendedDialog(); break;
+               /* We might want to make it better with custom functions */
             case INTF_DIALOG_POPUPMENU:
+               QVLCMenu::PopupMenu( p_intf ); break;
             case INTF_DIALOG_AUDIOPOPUPMENU:
+               QVLCMenu::AudioPopupMenu( p_intf ); break;
             case INTF_DIALOG_VIDEOPOPUPMENU:
+               QVLCMenu::VideoPopupMenu( p_intf ); break;
             case INTF_DIALOG_MISCPOPUPMENU:
-               popupMenu( de->i_dialog ); break;
+               QVLCMenu::MiscPopupMenu( p_intf ); break;
             case INTF_DIALOG_INTERACTION:
                doInteraction( de->p_arg ); break;
             case INTF_DIALOG_VLM:
@@ -456,8 +460,4 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
 void DialogsProvider::switchToSkins()
 {
     var_SetString( p_intf, "intf-switch", "skins2" );
-}
-
-void DialogsProvider::popupMenu( int i_dialog )
-{
 }

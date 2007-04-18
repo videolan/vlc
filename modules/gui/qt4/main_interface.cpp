@@ -58,6 +58,11 @@
 
 #define DS(i) i.width(),i.height()
 
+/* Callback prototypes */
+static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
+                        vlc_value_t old_val, vlc_value_t new_val, void *param );
+static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
+                       vlc_value_t old_val, vlc_value_t new_val, void *param );
 static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
                              vlc_value_t, void *);
 /* Video handling */
@@ -80,6 +85,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Configuration */
     settings = new QSettings( "VideoLAN", "VLC" );
     settings->beginGroup( "MainWindow" );
+
+    setWindowIcon( QApplication::windowIcon() );
 
     need_components_update = false;
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
@@ -136,10 +143,30 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
     p_intf->b_interaction = VLC_TRUE;
+
+    /* Register callback for the intf-popupmenu variable */
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+        var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
+        var_AddCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
+        vlc_object_release( p_playlist );
+    }
 }
 
 MainInterface::~MainInterface()
 {
+    /* Unregister callback for the intf-popupmenu variable */
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+        var_DelCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
+        var_DelCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
+        vlc_object_release( p_playlist );
+    }
+
     settings->setValue( "playlist-embedded", playlistEmbeddedFlag );
     settings->setValue( "adv-controls", advControlsEnabled );
     settings->setValue( "pos", pos() );
@@ -328,6 +355,23 @@ void MainInterface::releaseVideo( void *p_win )
     need_components_update = true;
 }
 
+class SetVideoOnTopQtEvent : public QEvent
+{
+public:
+    SetVideoOnTopQtEvent( bool _onTop ) :
+      QEvent( (QEvent::Type)SetVideoOnTopEvent_Type ), onTop( _onTop)
+    {
+    }
+
+    bool OnTop() const
+    {
+        return onTop;
+    }
+
+private:
+    bool onTop;
+};
+
 int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
 {
     int i_ret = VLC_EGENERIC;
@@ -353,6 +397,12 @@ int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
             break;
         }
         case VOUT_SET_STAY_ON_TOP:
+        {
+            int i_arg = va_arg( args, int );
+            QApplication::postEvent( this, new SetVideoOnTopQtEvent( i_arg ) );
+            i_ret = VLC_SUCCESS;
+            break;
+        }
         default:
             msg_Warn( p_intf, "unsupported control query" );
             break;
@@ -487,6 +537,15 @@ void MainInterface::customEvent( QEvent *event )
                                 visualSelectorEnabled);
         playlist();
     }
+    else if ( event->type() == SetVideoOnTopEvent_Type )
+    {
+        SetVideoOnTopQtEvent* p_event = (SetVideoOnTopQtEvent*)event;
+        if( p_event->OnTop() )
+            setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+        else
+            setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);            
+        show(); /* necessary to apply window flags?? */
+    }
 }
 
 
@@ -560,7 +619,7 @@ void MainInterface::wheelEvent( QWheelEvent *e )
 
 void MainInterface::stop()
 {
-    playlist_Stop( THEPL );
+    THEMIM->stop();
 }
 void MainInterface::play()
 {
@@ -575,11 +634,11 @@ void MainInterface::play()
 }
 void MainInterface::prev()
 {
-    playlist_Prev( THEPL );
+    THEMIM->prev();
 }
 void MainInterface::next()
 {
-    playlist_Next( THEPL );
+    THEMIM->next();
 }
 
 void MainInterface::setDisplay( float pos, int time, int length )
@@ -690,5 +749,36 @@ static int InteractCallback( vlc_object_t *p_this,
     p_arg->p_dialog = (interaction_dialog_t *)(new_val.p_address);
     DialogEvent *event = new DialogEvent( INTF_DIALOG_INTERACTION, 0, p_arg );
     QApplication::postEvent( THEDP, static_cast<QEvent*>(event) );
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * PopupMenuCB: callback triggered by the intf-popupmenu playlist variable.
+ *  We don't show the menu directly here because we don't want the
+ *  caller to block for a too long time.
+ *****************************************************************************/
+static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
+                        vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)param;
+
+    if( p_intf->pf_show_dialog )
+    {
+        p_intf->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU,
+                                new_val.b_bool, 0 );
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * IntfShowCB: callback triggered by the intf-show playlist variable.
+ *****************************************************************************/
+static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
+                       vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)param;
+    //p_intf->p_sys->b_intf_show = VLC_TRUE;
+
     return VLC_SUCCESS;
 }

@@ -717,8 +717,9 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
 
     case VLC_VAR_BOOL:
         var_Get( p_object, psz_var, &val );
+        val.b_bool = !val.b_bool;
         CreateAndConnect( menu, psz_var, TEXT_OR_VAR, "", ITEM_CHECK,
-                          p_object->i_object_id, val, i_type, val.b_bool );
+                          p_object->i_object_id, val, i_type, !val.b_bool );
         break;
     }
     FREENULL( text.psz_string );

@@ -156,6 +156,8 @@ static void Init( intf_thread_t *p_intf )
         playlist_Control( THEPL, PLAYLIST_AUTOPLAY, VLC_FALSE );
     }
 
+    p_intf->pf_show_dialog = ShowDialog;
+
     app->setQuitOnLastWindowClosed( false );
     app->exec();
     MainInputManager::killInstance();

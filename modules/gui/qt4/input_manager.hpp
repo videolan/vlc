@@ -94,6 +94,9 @@ private:
     MainInputManager( intf_thread_t *);
 public slots:
     void togglePlayPause();
+    void stop();
+    void next();
+    void prev();
 private slots:
     void updateInput();
 signals:

@@ -136,7 +136,6 @@ public slots:
     void openDiscDialog();
     void PLAppendDialog();
     void MLAppendDialog();
-    void popupMenu( int );
     void doInteraction( intf_dialog_args_t * );
     void menuAction( QObject *);
     void menuUpdateAction( QObject *);

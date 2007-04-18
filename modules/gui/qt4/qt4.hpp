@@ -82,6 +82,7 @@ struct intf_sys_t
 static int DialogEvent_Type = QEvent::User + 1;
 static int PLUndockEvent_Type = QEvent::User + 2;
 static int PLDockEvent_Type = QEvent::User + 3;
+static int SetVideoOnTopEvent_Type = QEvent::User + 4;
 
 class DialogEvent : public QEvent
 {
