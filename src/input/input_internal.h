@@ -339,6 +339,9 @@ static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
     return i_result;
 }
 
+#ifdef __PLUGIN__
+# warning CAN'T YOU SEE THIS IS AN INTERNAL HEADER?!
+#else
 /* Stream */
 /**
  * stream_t definition
@@ -368,4 +371,6 @@ static inline stream_t *vlc_stream_create( vlc_object_t *obj )
     return (stream_t *)vlc_custom_create( obj, sizeof(stream_t),
                                           VLC_OBJECT_STREAM, "stream" );
 }
+#endif
+
 #endif
