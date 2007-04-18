@@ -26,10 +26,10 @@
 /*****************************************************************************
  * Includes
  *****************************************************************************/
-#define _GNU_SOURCE
-#include <stdlib.h>                                      /* malloc(), free() */
-
 #include <vlc/vlc.h>
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <assert.h>
+
 #include <vlc_playlist.h>
 #include <vlc_demux.h>
 
@@ -145,7 +145,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 
     add_submodule();
-        set_description( _("SDP file parser for UDP") );
+        set_description( _("SDP Descriptions parser") );
         add_shortcut( "sdp" );
         set_capability( "demux2", 51 );
         set_callbacks( OpenDemux, CloseDemux );
@@ -330,10 +330,9 @@ static int OpenDemux( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     uint8_t *p_peek;
-    int i_max_sdp = 1024;
-    int i_sdp = 0;
     char *psz_sdp = NULL;
     sdp_t *p_sdp = NULL;
+    int errval = VLC_EGENERIC;
 
     if( !var_CreateGetInteger( p_demux, "sap-parse" ) )
     {
@@ -341,45 +340,44 @@ static int OpenDemux( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    assert( p_demux->s ); /* this is NOT an access_demux */
+
     /* Probe for SDP */
-    if( p_demux->s )
-    {
-        if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 ) return VLC_EGENERIC;
+    if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 )
+        return VLC_EGENERIC;
 
-        if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) &&
-            strncmp( (char*)p_peek, "v=0\n", 4 ) &&
-            ( p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
-        {
-            return VLC_EGENERIC;
-        }
-    }
-
-    psz_sdp = (char *)malloc( i_max_sdp );
-    if( !psz_sdp ) return VLC_EGENERIC;
+    if( memcmp( p_peek, "v=0\r\no=", 7 ) && memcmp( p_peek, "v=0\no=", 6 ) )
+        return VLC_EGENERIC;
 
     /* Gather the complete sdp file */
-    for( ;; )
-    {
-        int i_read = stream_Read( p_demux->s,
-                                  &psz_sdp[i_sdp], i_max_sdp - i_sdp - 1 );
+    psz_sdp = NULL;
 
+#define SDP_MAX 65536
+#define OFFSET 1024
+
+    for( size_t buflen = 0; buflen < SDP_MAX; buflen += OFFSET )
+    {
+        char *psz_sdp_new = realloc( psz_sdp, buflen + 1 );
+        if( psz_sdp_new == NULL )
+        {
+            errval = VLC_ENOMEM;
+            goto error;
+        }
+        psz_sdp = psz_sdp_new;
+
+        ssize_t i_read = stream_Read( p_demux->s, psz_sdp + buflen, OFFSET );
         if( i_read < 0 )
         {
-            msg_Err( p_demux, "failed to read SDP" );
+            msg_Err( p_demux, "cannot read SDP" );
             goto error;
         }
 
-        i_sdp += i_read;
+        psz_sdp[buflen + i_read] = '\0';
 
-        if( i_read < i_max_sdp - i_sdp - 1 )
-        {
-            psz_sdp[i_sdp] = '\0';
-            break;
-        }
-
-        i_max_sdp += 1000;
-        psz_sdp = (char *)realloc( psz_sdp, i_max_sdp );
+        if( i_read < OFFSET )
+            break; // EOF
     }
+#undef OFFSET
 
     p_sdp = ParseSDP( VLC_OBJECT(p_demux), psz_sdp );
 
@@ -411,7 +409,7 @@ error:
     FREENULL( psz_sdp );
     if( p_sdp ) FreeSDP( p_sdp ); p_sdp = NULL;
     stream_Seek( p_demux->s, 0 );
-    return VLC_EGENERIC;
+    return errval;
 }
 
 /*****************************************************************************
@@ -515,7 +513,7 @@ static void Run( services_discovery_t *p_sd )
         {
             INTERFACE_INFO ifaces[10]; // Assume there will be no more than 10 IP interfaces
             size_t len = sizeof(ifaces); 
-             
+
             if( SOCKET_ERROR != WSAIoctl(s, SIO_GET_INTERFACE_LIST, NULL, 0, &ifaces, len, &len, NULL, NULL) )
             {
                 unsigned ifcount = len/sizeof(INTERFACE_INFO);
