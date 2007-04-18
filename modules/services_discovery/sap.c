@@ -307,8 +307,7 @@ static int Open( vlc_object_t *p_this )
 #endif
 
     /* Cache sap_timeshift value */
-    p_sys->b_timeshift = var_CreateGetInteger( p_sd, "sap-timeshift" )
-            ? VLC_TRUE : VLC_FALSE;
+    p_sys->b_timeshift = var_CreateGetInteger( p_sd, "sap-timeshift" );
 
     /* Create our playlist node */
     pl_Yield( p_sd );
