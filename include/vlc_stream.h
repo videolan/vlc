@@ -175,7 +175,7 @@ static inline int stream_Seek( stream_t *s, int64_t i_pos )
 
 /**
  * Read "i_size" bytes and store them in a block_t. If less than "i_size"
- * bytes are available then return what is left and if nothing is availble,
+ * bytes are available then return what is left and if nothing is available,
  * return NULL.
  */
 static inline block_t *stream_Block( stream_t *s, int i_size )
