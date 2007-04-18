@@ -58,3 +58,11 @@ for file in $files; do
     mv -f $file.tmp $file
   fi
 done
+
+files=` ls -1 *.la`
+for file in $files; do
+   echo $file
+   sed -e "s,$prefix,$new_prefix,g" < $file > $file.tmp
+   mv -f $file.tmp $file
+done
+
