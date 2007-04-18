@@ -339,4 +339,33 @@ static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
     return i_result;
 }
 
+/* Stream */
+/**
+ * stream_t definition
+ */
+struct stream_t
+{
+    VLC_COMMON_MEMBERS
+
+    block_t *(*pf_block)  ( stream_t *, int i_size );
+    int      (*pf_read)   ( stream_t *, void *p_read, int i_read );
+    int      (*pf_peek)   ( stream_t *, uint8_t **pp_peek, int i_peek );
+    int      (*pf_control)( stream_t *, int i_query, va_list );
+    void     (*pf_destroy)( stream_t *);
+
+    stream_sys_t *p_sys;
+
+    /* UTF-16 and UTF-32 file reading */
+    vlc_iconv_t     conv;
+    int             i_char_width;
+    vlc_bool_t      b_little_endian;
+};
+
+#include <libvlc.h>
+
+static inline stream_t *vlc_stream_create( vlc_object_t *obj )
+{
+    return (stream_t *)vlc_custom_create( obj, sizeof(stream_t),
+                                          VLC_OBJECT_STREAM, "stream" );
+}
 #endif

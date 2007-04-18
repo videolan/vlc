@@ -52,7 +52,7 @@ static void Delete ( stream_t * );
 stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
                               int64_t i_size, vlc_bool_t i_preserve_memory )
 {
-    stream_t *s = vlc_object_create( p_this, VLC_OBJECT_STREAM );
+    stream_t *s = vlc_stream_create( p_this );
     stream_sys_t *p_sys;
 
     if( !s ) return NULL;

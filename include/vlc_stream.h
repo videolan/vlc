@@ -64,84 +64,13 @@ enum stream_query_e
                              if access unreachable or access control answer */
 };
 
-/**
- * stream_t definition
- */
-struct stream_t
-{
-    VLC_COMMON_MEMBERS
-
-    block_t *(*pf_block)  ( stream_t *, int i_size );
-    int      (*pf_read)   ( stream_t *, void *p_read, int i_read );
-    int      (*pf_peek)   ( stream_t *, uint8_t **pp_peek, int i_peek );
-    int      (*pf_control)( stream_t *, int i_query, va_list );
-    void     (*pf_destroy)( stream_t *);
-
-    stream_sys_t *p_sys;
-
-    /* UTF-16 and UTF-32 file reading */
-    vlc_iconv_t     conv;
-    int             i_char_width;
-    vlc_bool_t      b_little_endian;
-};
-
-/**
- * Try to read "i_read" bytes into a buffer pointed by "p_read".  If
- * "p_read" is NULL then data are skipped instead of read.  The return
- * value is the real numbers of bytes read/skip. If this value is less
- * than i_read that means that it's the end of the stream.
- */
-static inline int stream_Read( stream_t *s, void *p_read, int i_read )
-{
-    return s->pf_read( s, p_read, i_read );
-}
-
-/**
- * Store in pp_peek a pointer to the next "i_peek" bytes in the stream
- * \return The real numbers of valid bytes, if it's less
- * or equal to 0, *pp_peek is invalid.
- * \note pp_peek is a pointer to internal buffer and it will be invalid as
- * soons as other stream_* functions are called.
- * \note Due to input limitation, it could be less than i_peek without meaning
- * the end of the stream (but only when you have i_peek >=
- * p_input->i_bufsize)
- */
-static inline int stream_Peek( stream_t *s, uint8_t **pp_peek, int i_peek )
-{
-    return s->pf_peek( s, pp_peek, i_peek );
-}
-
-/**
- * Use to control the "stream_t *". Look at #stream_query_e for
- * possible "i_query" value and format arguments.  Return VLC_SUCCESS
- * if ... succeed ;) and VLC_EGENERIC if failed or unimplemented
- */
-static inline int stream_vaControl( stream_t *s, int i_query, va_list args )
-{
-    return s->pf_control( s, i_query, args );
-}
-
-/**
- * Destroy a stream
- */
-static inline void stream_Delete( stream_t *s )
-{
-    s->pf_destroy( s );
-}
-
-static inline int stream_Control( stream_t *s, int i_query, ... )
-{
-    va_list args;
-    int     i_result;
-
-    if ( s == NULL )
-        return VLC_EGENERIC;
-
-    va_start( args, i_query );
-    i_result = s->pf_control( s, i_query, args );
-    va_end( args );
-    return i_result;
-}
+VLC_EXPORT( int, stream_Read, ( stream_t *s, void *p_read, int i_read ) );
+VLC_EXPORT( int, stream_Peek, ( stream_t *s, uint8_t **pp_peek, int i_peek ) );
+VLC_EXPORT( int, stream_vaControl, ( stream_t *s, int i_query, va_list args ) );
+VLC_EXPORT( void, stream_Delete, ( stream_t *s ) );
+VLC_EXPORT( int, stream_Control, ( stream_t *s, int i_query, ... ) );
+VLC_EXPORT( block_t *, stream_Block, ( stream_t *s, int i_size ) );
+VLC_EXPORT( char *, stream_ReadLine, ( stream_t * ) );
 
 /**
  * Get the current position in a stream
@@ -173,36 +102,6 @@ static inline int stream_Seek( stream_t *s, int64_t i_pos )
     return stream_Control( s, STREAM_SET_POSITION, i_pos );
 }
 
-/**
- * Read "i_size" bytes and store them in a block_t. If less than "i_size"
- * bytes are available then return what is left and if nothing is available,
- * return NULL.
- */
-static inline block_t *stream_Block( stream_t *s, int i_size )
-{
-    if( i_size <= 0 ) return NULL;
-
-    if( s->pf_block )
-    {
-        return s->pf_block( s, i_size );
-    }
-    else
-    {
-        /* emulate block read */
-        block_t *p_bk = block_New( s, i_size );
-        if( p_bk )
-        {
-            p_bk->i_buffer = stream_Read( s, p_bk->p_buffer, i_size );
-            if( p_bk->i_buffer > 0 )
-            {
-                return p_bk;
-            }
-        }
-        if( p_bk ) block_Release( p_bk );
-        return NULL;
-    }
-}
-
 VLC_EXPORT( char *, stream_ReadLine, ( stream_t * ) );
 
 /**
@@ -225,6 +124,15 @@ VLC_EXPORT( stream_t *,__stream_UrlNew, (vlc_object_t *p_this, const char *psz_u
 
 # ifdef __cplusplus
 }
+# endif
+
+# if defined (__PLUGIN__) || defined (__BUILTIN__)
+   /* FIXME UGLY HACK to keep VLC_OBJECT working */
+   /* Maybe we should make VLC_OBJECT a simple cast noawadays... */
+struct stream_t
+{
+	VLC_COMMON_MEMBERS
+};
 # endif
 
 #endif
