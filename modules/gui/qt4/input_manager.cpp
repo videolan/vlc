@@ -193,7 +193,7 @@ void InputManager::sectionNext()
 {
     if( hasInput() )
     {
-        int i_type = var_Type( p_input, "prev-chapter" );
+        int i_type = var_Type( p_input, "next-chapter" );
         vlc_value_t val; val.b_bool = VLC_TRUE;
         var_Set( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
                             "next-chapter":"next-title", val );
