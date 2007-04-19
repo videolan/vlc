@@ -621,6 +621,7 @@ void MainInterface::stop()
 {
     THEMIM->stop();
 }
+
 void MainInterface::play()
 {
     if( playlist_IsEmpty(THEPL) )
@@ -632,10 +633,12 @@ void MainInterface::play()
     }
     THEMIM->togglePlayPause();
 }
+
 void MainInterface::prev()
 {
     THEMIM->prev();
 }
+
 void MainInterface::next()
 {
     THEMIM->next();

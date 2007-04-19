@@ -165,7 +165,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
                               bool playlist, bool adv_controls_enabled,
                               bool visual_selector_enabled )
 {
-#ifndef WIN32    
+#ifndef WIN32
     /* Ugly klugde
      * Remove SIGCHLD from the ignored signal the time to initialise
      * Qt because it call gconf to get the icon theme */
@@ -195,7 +195,6 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
 QMenu *QVLCMenu::FileMenu()
 {
     QMenu *menu = new QMenu();
-/*    DP_SADD( qtr("Quick &Open File...") , "", "", simpleOpenDialog() );*/
     DP_SADD( qtr("Open &File..." ), "", "", openFileDialog(), "Ctrl+O" );
     DP_SADD( qtr("Open &Disc..." ), "", "", openDiscDialog(), "Ctrl+D" );
     DP_SADD( qtr("Open &Network..." ), "", "", openNetDialog(), "Ctrl+N" );
@@ -416,9 +415,6 @@ QMenu *QVLCMenu::HelpMenu()
 
 #define POPUP_STATIC_ENTRIES \
     vlc_value_t val; \
-    MIM_SADD( qtr("Stop"), "", "", stop() ); \
-    MIM_SADD( qtr("Previous"), "", "", prev() ); \
-    MIM_SADD( qtr("Next"), "", "", next() ); \
     if( p_input ) \
     { \
         var_Get( p_input, "state", &val ); \
@@ -428,8 +424,12 @@ QMenu *QVLCMenu::HelpMenu()
             MIM_SADD( qtr("Pause"), "", "", togglePlayPause() ) \
     } \
     else if( THEPL->items.i_size && THEPL->i_enabled ) \
-        MIM_SADD( qtr("Play"), "", "", togglePlayPause() ) \
+        MIM_SADD( qtr("Play"), "", "", togglePlayPause() );\
     \
+    MIM_SADD( qtr("Stop"), "", "", stop() ); \
+    MIM_SADD( qtr("Previous"), "", "", prev() ); \
+    MIM_SADD( qtr("Next"), "", "", next() ); \
+    menu->addSeparator(); \
     QMenu *intfmenu = InterfacesMenu( p_intf, NULL ); \
     intfmenu->setTitle( qtr("Interfaces" ) ); \
     menu->addMenu( intfmenu ); \
@@ -437,6 +437,7 @@ QMenu *QVLCMenu::HelpMenu()
     QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, false ); \
     toolsmenu->setTitle( qtr("Tools" ) ); \
     menu->addMenu( toolsmenu ); \
+    DP_SADD( qtr("Quit"), "", "", quit() , NULL );
 
 void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
 {
