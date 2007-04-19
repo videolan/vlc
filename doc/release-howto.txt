@@ -59,6 +59,10 @@
   - edit the /index.php /vlc/*.php pages
   - add a news item to news.msg
 
+ * "Check for updates" functionality
+  - add /opt/ftp/pub/videolan/vlc/X.X.X/vlc-X.X.X-announce
+  - edit update.videolan.org/vlc/status.xml
+
  * Announce on www.gnome.org
   - click on "Get more software"
   - click on "Edit an existing map entry"
