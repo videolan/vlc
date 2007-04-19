@@ -273,13 +273,17 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "16:10"; text.psz_string = "16:10";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "5:4"; text.psz_string = "5:4";
+    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "5:3"; text.psz_string = "5:3";
+    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "1.85:1"; text.psz_string = "1.85:1";
+    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "221:100"; text.psz_string = "2.21:1";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "235:100"; text.psz_string = "2.35:1";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "239:100"; text.psz_string = "2.39:1";
-    var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "5:4"; text.psz_string = "5:4";
     var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
 
     /* Add custom crop ratios */
