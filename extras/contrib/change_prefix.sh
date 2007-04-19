@@ -34,7 +34,8 @@ fi
 
 top_dir=`cd $1; pwd`
 prefix=$2
-new_prefix=$3
+new_prefix2=$3
+new_prefix=/$new_prefix2
 
 if test -z $prefix -o -z $new_prefix; then
   echo $usage
@@ -42,11 +43,14 @@ if test -z $prefix -o -z $new_prefix; then
 fi
 
 cd $top_dir
+pwd
 files=`find . -type f`
 for file in $files; do
   if test ".`file $file | grep Mach-O`" != "." ; then
     libs=`otool -L $file 2>/dev/null | grep $prefix | cut -d\  -f 1`
+    echo $libs
     for i in "" $libs; do
+    echo $i
       if ! test -z $i; then
         install_name_tool -change $i \
                           `echo $i | sed -e "s,$prefix,$new_prefix,"` \
@@ -54,11 +58,14 @@ for file in $files; do
       fi
     done
   elif test ".`file $file | grep \"text\|shell\"`" != "." ; then
+
     sed -e "s,$prefix,$new_prefix,g" < $file > $file.tmp
     mv -f $file.tmp $file
   fi
 done
 
+cd $new_prefix2/lib/
+pwd
 files=` ls -1 *.la`
 for file in $files; do
    echo $file
