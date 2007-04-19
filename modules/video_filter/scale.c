@@ -1,11 +1,12 @@
 /*****************************************************************************
- * resize.c: video scaling module for YUVP/A pictures
+ * resize.c: video scaling module for YUVP/A, I420 and RGBA pictures
  *  Uses the low quality "nearest neighbour" algorithm.
  *****************************************************************************
- * Copyright (C) 2003 the VideoLAN team
+ * Copyright (C) 2003-2007 the VideoLAN team
  * $Id$
  *
- * Author: Gildas Bazin <gbazin@videolan.org>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
+ *          Antoine Cellerier <dionoea @t videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -109,7 +110,7 @@ static void CloseFilter( vlc_object_t *p_this )
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_pic_dst;
-    int i_plane, i, j, k, l;
+    int i_plane;
 
     if( !p_pic ) return NULL;
 
@@ -127,56 +128,83 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     {
         for( i_plane = 0; i_plane < p_pic_dst->i_planes; i_plane++ )
         {
+            const int i_src_pitch    = p_pic->p[i_plane].i_pitch;
+            const int i_dst_pitch    = p_pic_dst->p[i_plane].i_pitch;
+            const int i_src_height   = p_filter->fmt_in.video.i_height;
+            const int i_src_width    = p_filter->fmt_in.video.i_width;
+            const int i_dst_height   = p_filter->fmt_out.video.i_height;
+            const int i_dst_width    = p_filter->fmt_out.video.i_width;
+            const int i_dst_visible_lines =
+                                       p_pic_dst->p[i_plane].i_visible_lines;
+            const int i_dst_visible_pitch =
+                                       p_pic_dst->p[i_plane].i_visible_pitch;
+            const int i_dst_hidden_pitch  = i_dst_pitch - i_dst_visible_pitch;
+#define SHIFT_SIZE 16
+            const int i_height_coef  = ( i_src_height << SHIFT_SIZE )
+                                       / i_dst_height;
+            const int i_width_coef   = ( i_src_width << SHIFT_SIZE )
+                                       / i_dst_width;
+            const int i_src_height_1 = i_src_height - 1;
+            const int i_src_width_1  = i_src_width - 1;
+
             uint8_t *p_src = p_pic->p[i_plane].p_pixels;
             uint8_t *p_dst = p_pic_dst->p[i_plane].p_pixels;
-            int i_src_pitch = p_pic->p[i_plane].i_pitch;
-            int i_dst_pitch = p_pic_dst->p[i_plane].i_pitch;
+            uint8_t *p_dstendline = p_dst + i_dst_visible_pitch;
+            const uint8_t *p_dstend = p_dst + i_dst_visible_lines*i_dst_pitch;
 
-            for( i = 0; i < p_pic_dst->p[i_plane].i_visible_lines; i++ )
+            int l = 1<<(SHIFT_SIZE-1);
+            for( ; p_dst < p_dstend;
+                 p_dst += i_dst_hidden_pitch,
+                 p_dstendline += i_dst_pitch, l += i_height_coef )
             {
-                l = ( p_filter->fmt_in.video.i_height * i +
-                      p_filter->fmt_out.video.i_height / 2 ) /
-                    p_filter->fmt_out.video.i_height;
+                int k = 1<<(SHIFT_SIZE-1);
+                uint8_t *p_srcl = p_src
+                       + (__MIN( i_src_height_1, l >> SHIFT_SIZE )*i_src_pitch);
 
-                l = __MIN( (int)p_filter->fmt_in.video.i_height - 1, l );
-
-                for( j = 0; j < p_pic_dst->p[i_plane].i_visible_pitch; j++ )
+                for( ; p_dst < p_dstendline; p_dst++, k += i_width_coef )
                 {
-                    k = ( p_filter->fmt_in.video.i_width * j +
-                          p_filter->fmt_out.video.i_width / 2 ) /
-                        p_filter->fmt_out.video.i_width;
-
-                    k = __MIN( (int)p_filter->fmt_in.video.i_width - 1, k );
-
-                    p_dst[i * i_dst_pitch + j] = p_src[l * i_src_pitch + k];
+                    *p_dst = p_srcl[__MIN( i_src_width_1, k >> SHIFT_SIZE )];
                 }
             }
         }
     }
     else /* RGBA */
     {
-        uint8_t *p_src = p_pic->p->p_pixels;
-        uint8_t *p_dst = p_pic_dst->p->p_pixels;
-        int i_src_pitch = p_pic->p->i_pitch;
-        int i_dst_pitch = p_pic_dst->p->i_pitch;
-        for( i = 0; i < p_pic_dst->p->i_visible_lines; i++ )
+        const int i_src_pitch = p_pic->p->i_pitch;
+        const int i_dst_pitch = p_pic_dst->p->i_pitch;
+        const int i_src_height   = p_filter->fmt_in.video.i_height;
+        const int i_src_width    = p_filter->fmt_in.video.i_width;
+        const int i_dst_height   = p_filter->fmt_out.video.i_height;
+        const int i_dst_width    = p_filter->fmt_out.video.i_width;
+        const int i_dst_visible_lines =
+                                   p_pic_dst->p->i_visible_lines;
+        const int i_dst_visible_pitch =
+                                   p_pic_dst->p->i_visible_pitch;
+        const int i_dst_hidden_pitch  = i_dst_pitch - i_dst_visible_pitch;
+        const int i_height_coef  = ( i_src_height << SHIFT_SIZE )
+                                   / i_dst_height;
+        const int i_width_coef   = ( i_src_width << SHIFT_SIZE )
+                                   / i_dst_width;
+        const int i_src_height_1 = i_src_height - 1;
+        const int i_src_width_1  = i_src_width - 1;
+
+        uint32_t *p_src = (uint32_t*)p_pic->p->p_pixels;
+        uint32_t *p_dst = (uint32_t*)p_pic_dst->p->p_pixels;
+        uint32_t *p_dstendline = p_dst + (i_dst_visible_pitch>>2);
+        const uint32_t *p_dstend = p_dst + i_dst_visible_lines*(i_dst_pitch>>2);
+
+        int l = 1<<(SHIFT_SIZE-1);
+        for( ; p_dst < p_dstend;
+             p_dst += (i_dst_hidden_pitch>>2),
+             p_dstendline += (i_dst_pitch>>2),
+             l += i_height_coef )
         {
-            l = ( p_filter->fmt_in.video.i_height * i +
-                  p_filter->fmt_out.video.i_height / 2 ) /
-                p_filter->fmt_out.video.i_height;
-
-            l = __MIN( (int)p_filter->fmt_in.video.i_height - 1, l );
-
-            for( j = 0; j < p_pic_dst->p->i_visible_pitch/4; j++ )
+            int k = 1<<(SHIFT_SIZE-1);
+            uint32_t *p_srcl = p_src
+                    + (__MIN( i_src_height_1, l >> SHIFT_SIZE )*(i_src_pitch>>2));
+            for( ; p_dst < p_dstendline; p_dst++, k += i_width_coef )
             {
-                k = ( p_filter->fmt_in.video.i_width * j +
-                      p_filter->fmt_out.video.i_width / 2 ) /
-                    p_filter->fmt_out.video.i_width;
-
-                k = __MIN( (int)p_filter->fmt_in.video.i_width - 1, k );
-
-                *(uint32_t*)(&p_dst[i * i_dst_pitch + 4*j]) =
-                    *(uint32_t*)(&p_src[l * i_src_pitch + 4*k]);
+                *p_dst = p_srcl[__MIN( i_src_width_1, k >> SHIFT_SIZE )];
             }
         }
     }
