@@ -23,7 +23,7 @@
     correctly
   - copy the tar.gz and tar.bz2 file on ftp.videolan.org in
     /opt/ftp/pub/videolan/testing/vlc-X.X.X/
-  - generate md5 hashes of these files
+  - generate md5 hashes and gpg signature of these files
 
  * Contribs
   - Put a copy of the libraries or svn snapshot in vlc-X.X.X/contrib
@@ -40,10 +40,12 @@
     don't forget to test the installer and uninstaller (the first 0.8.4 uninstaller was broken ...
     kind of suxxs)
     add the .zip and .exe files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/win32/
+   generate md5 hashes and gpg signature of these files
 
  * OS X packages
     At the moment, only FK can do them (so they can be compatible with OS X 10.2)
     Later: on the G5
+   generate md5 hashes and gpg signature of these files
 
  * Commit changes ... it never works the first time
 
@@ -62,6 +64,12 @@
  * "Check for updates" functionality
   - add /opt/ftp/pub/videolan/vlc/X.X.X/vlc-X.X.X-announce
   - edit update.videolan.org/vlc/status.xml
+
+ * Mirrors
+  - Forwarn the mirror admins
+  - Update the list of files for the mirror check (/var/www/local/mirrors.v.o/files)
+  - Disable mirrors which haven't replicated yet and possibly ganesh if enough
+    other mirrors
 
  * Announce on www.gnome.org
   - click on "Get more software"
