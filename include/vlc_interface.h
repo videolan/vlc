@@ -90,7 +90,7 @@ struct intf_thread_t
 
 /** \brief Arguments passed to a dialogs provider
  *  This describes the arguments passed to the dialogs provider. They are
- *  mainly iused with INTF_DIALOG_FILE_GENERIC
+ *  mainly used with INTF_DIALOG_FILE_GENERIC.
  */
 struct intf_dialog_args_t
 {
