@@ -110,6 +110,20 @@ void SoutDialog::fileBrowse()
     updateMRL();
 }
 
+void SoutDialog::toggleSout()
+{
+#define TGV(x) { \
+     if( (x->isHidden()) )  \
+        x->show();          \
+     else  x->hide();\
+}
+ TGV( ui.HTTPOutput ) ; TGV( ui.UDPOutput ) ; TGV( ui.MMSHOutput ) ;
+ TGV( ui.HTTPEdit ) ; TGV( ui.UDPEdit ) ; TGV( ui.MMSHEdit ) ;
+ TGV( ui.HTTPLabel ) ; TGV( ui.UDPLabel ) ; TGV( ui.MMSHLabel ) ;
+ TGV( ui.HTTPPortLabel ) ; TGV( ui.UDPPortLabel ) ; TGV( ui.MMSHPortLabel ) ;
+ TGV( ui.HTTPPort ) ; TGV( ui.UDPPort ) ; TGV( ui.MMSHPort ) ;
+}
+
 void SoutDialog::ok()
 {
     mrl = ui.mrlEdit->text();

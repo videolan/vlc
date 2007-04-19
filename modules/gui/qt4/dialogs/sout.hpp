@@ -46,6 +46,7 @@ public slots:
     void cancel();
     void updateMRL();
     void fileBrowse();
+    void toggleSout();
 };
 
 #endif
