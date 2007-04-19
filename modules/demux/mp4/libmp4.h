@@ -155,6 +155,8 @@
 
 #define FOURCC_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' )
 
+#define FOURCC_yv12 VLC_FOURCC( 'y', 'v', '1', '2' )
+#define FOURCC_yuv2 VLC_FOURCC( 'y', 'u', 'v', '2' )
 
 #define FOURCC_rmra VLC_FOURCC( 'r', 'm', 'r', 'a' )
 #define FOURCC_rmda VLC_FOURCC( 'r', 'm', 'd', 'a' )

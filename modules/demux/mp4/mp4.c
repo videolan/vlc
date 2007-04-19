@@ -1298,6 +1298,13 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_track->fmt.subs.psz_encoding = strdup( "UTF-8" );
             break;
 
+        case VLC_FOURCC('y','v','1','2'):
+            p_track->fmt.i_codec = VLC_FOURCC('Y','V','1','2');
+            break;
+        case VLC_FOURCC('y','u','v','2'):
+            p_track->fmt.i_codec = VLC_FOURCC('Y','U','Y','2');
+            break;
+
         default:
             p_track->fmt.i_codec = p_sample->i_type;
             break;

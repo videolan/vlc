@@ -2344,6 +2344,9 @@ static struct
     { FOURCC_jpeg,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_avc1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
 
+    { FOURCC_yv12,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+    { FOURCC_yuv2,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
+
     { FOURCC_mp4s,  MP4_ReadBox_sample_mp4s,    MP4_FreeBox_Common },
 
     /* XXX there is 2 box where we could find this entry stbl and tref*/

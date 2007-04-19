@@ -406,6 +406,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_FOURCC( 'h', '2', '6', '4' ):
         case VLC_FOURCC( 's', 'a', 'm', 'r' ):
         case VLC_FOURCC( 's', 'a', 'w', 'b' ):
+        case VLC_FOURCC( 'Y', 'V', '1', '2' ):
+        case VLC_FOURCC( 'Y', 'U', 'Y', '2' ):
             break;
         case VLC_FOURCC( 's', 'u', 'b', 't' ):
             msg_Warn( p_mux, "subtitle track added like in .mov (even when creating .mp4)" );
@@ -1212,6 +1214,14 @@ static bo_t *GetVideBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
 
     case VLC_FOURCC('h','2','6','4'):
         memcpy( fcc, "avc1", 4 );
+        break;
+
+    case VLC_FOURCC('Y','V','1','2'):
+        memcpy( fcc, "yv12", 4 );
+        break;
+
+    case VLC_FOURCC('Y','U','Y','2'):
+        memcpy( fcc, "yuy2", 4 );
         break;
 
     default:
