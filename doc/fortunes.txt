@@ -770,3 +770,9 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 -!- thresh [n=popa3d@unaffiliated/thresh] has quit ["j-b"]
   -- #videolan
 %
+< dionoea> w00t! police in the UK are using VLC for forsenic analisys
+< dionoea> I'll forward the email later
+< dionoea> Police Crime Bureau - Computer Crime Team UK
+< xtophe> ah i should remember to wear my vlc tshirt next time i commit a crime
+  -- #videolan
+%
