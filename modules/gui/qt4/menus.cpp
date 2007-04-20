@@ -201,7 +201,8 @@ QMenu *QVLCMenu::FileMenu()
     DP_SADD( qtr("Open &Capture Device..." ), "", "", openCaptureDialog(),
             "Ctrl+C" );
     menu->addSeparator();
-    DP_SADD( qtr("&Streaming..."), "", "", openThenStreamingDialogs(), "Ctrl+S" );
+    DP_SADD( qtr("&Streaming..."), "", "", openThenStreamingDialogs(), 
+            "Ctrl+S" );
     menu->addSeparator();
     DP_SADD( qtr("&Quit") , "", "", quit(), "Ctrl+Q");
     return menu;
@@ -437,7 +438,7 @@ QMenu *QVLCMenu::HelpMenu()
     QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, false ); \
     toolsmenu->setTitle( qtr("Tools" ) ); \
     menu->addMenu( toolsmenu ); \
-    DP_SADD( qtr("Quit"), "", "", quit() , NULL );
+    DP_SADD( qtr("Quit"), "", "", quit() , "Ctrl+Q" );
 
 void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
 {

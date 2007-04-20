@@ -43,7 +43,7 @@
 #include "ui/sprefs_interface.h"
 
 #define ICON_HEIGHT 64
-#define BUTTON_HEIGHT 76
+#define BUTTON_HEIGHT 74
 
 /*********************************************************************
  * The List of categories
