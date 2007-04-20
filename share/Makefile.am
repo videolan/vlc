@@ -13,6 +13,7 @@ dist_pkgdata_DATA = \
 	$(DIST_icons128)
 
 nobase_dist_pkgdata_DATA = \
+	utils/gnome-vlc-default.sh \
 	$(DIST_skins2) \
 	$(DIST_http) \
 	$(DIST_osdmenu_default) \
@@ -20,7 +21,6 @@ nobase_dist_pkgdata_DATA = \
 
 nobase_pkgdata_DATA = skins2/default.vlt
 nobase_data_DATA = applications/vlc.desktop
-nobase_dist_bin_SCRIPTS = applications/gnome-vlc-default.sh
 
 applications/vlc.desktop: applications/vlc.desktop.in $(top_builddir)/config.status
 	cd "$(top_builddir)" && \
