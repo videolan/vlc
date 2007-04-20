@@ -75,24 +75,26 @@ Interfaces:
 
 
 Changes between 0.8.6a and 0.8.6b:
-----------------------------------
-Various bugfixes notably:
- * out-of-bound read in demuxers
- * demuxers crashes (incl. CVE-2007-0256)
+-----------------------------------------------------------
+Various bugfixes, notably:
+ * Out-of-bound read in demuxers
+ * Demuxers crashes (incl. CVE-2007-0256)
  * Mac OS X Interface crashes
  * VP31 decoding on Windows platforms
+ * Direct3D Video Output modifications for Vista compatibility
+ * Correct behaviour for feeding streams to Icecast or Shoutcast servers
 
 Decoders:
  * Enhanced Flash Video support incl. VP61 and VP60
  * Teletext subtitles (telx) support
 
 Webbrowser plugins:
- * rectified behaviour and improved usability
+ * Rectified behaviour and improved usability
 
 Mac OS X Interface & Port:
- * diverse usability improvements
- * new wizard option to include subtitles
- * screensaver/automatic sleep mode is enabled when a video is paused
+ * Diverse usability improvements
+ * New wizard option to embed subtitles
+ * Screensaver/automatic sleep mode is enabled when a video is paused
  * Improved Delete-Preferences-Script
 
 
