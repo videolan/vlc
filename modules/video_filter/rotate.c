@@ -73,28 +73,29 @@ static const char *ppsz_filter_options[] = {
 };
 
 /*****************************************************************************
- * vout_sys_t: Distort video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the Distort specific properties of an output thread.
+ * filter_sys_t
  *****************************************************************************/
 struct filter_sys_t
 {
     int     i_angle;
     int     i_cos;
     int     i_sin;
-
-    mtime_t last_date;
 };
 
+static inline void cache_trigo( int i_angle, int *i_sin, int *i_cos )
+{
+    const double f_angle = (((double)i_angle)*M_PI)/180.;
+    *i_sin = (int)(sin( f_angle )*256.);
+    *i_cos = (int)(cos( f_angle )*256.);
+}
+
 /*****************************************************************************
- * Create: allocates Distort video thread output method
- *****************************************************************************
- * This function allocates and initializes a Distort vout method.
+ * Create: allocates Distort video filter
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
 
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -103,55 +104,41 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
+    p_sys = p_filter->p_sys;
 
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
-    var_Create( p_filter, FILTER_PREFIX "angle",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
+    p_sys->i_angle = var_CreateGetIntegerCommand( p_filter,
+                                                  FILTER_PREFIX "angle" );
+    var_AddCallback( p_filter, FILTER_PREFIX "angle", RotateCallback, p_sys );
+
+    cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
 
     p_filter->pf_video_filter = Filter;
-
-    p_filter->p_sys->i_angle = var_GetInteger( p_filter,
-                                               FILTER_PREFIX "angle" );
-    p_filter->p_sys->last_date = 0;
-
-    var_Create( p_filter->p_libvlc, "rotate_angle", VLC_VAR_INTEGER );
-    var_AddCallback( p_filter->p_libvlc,
-                     "rotate_angle", RotateCallback, p_filter->p_sys );
-    var_SetInteger( p_filter->p_libvlc, "rotate_angle",
-                    p_filter->p_sys->i_angle );
 
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * Destroy: destroy Distort video thread output method
- *****************************************************************************
- * Terminate an output method created by DistortCreateOutputMethod
+ * Destroy: destroy Distort filter
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
-    var_DelCallback( p_filter->p_libvlc,
-                     "rotate_angle", RotateCallback, p_filter->p_sys );
     free( p_filter->p_sys );
 }
 
 /*****************************************************************************
- * Render: displays previously rendered output
- *****************************************************************************
- * This function send the currently rendered image to Distort image, waits
- * until it is displayed and switch the two rendering buffers, preparing next
- * frame.
+ *
  *****************************************************************************/
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-    int i_index;
-    int i_sin = p_sys->i_sin, i_cos = p_sys->i_cos;
-    mtime_t new_date = mdate();
+    int i_plane;
+    const int i_sin = p_sys->i_sin, i_cos = p_sys->i_cos;
 
     if( !p_pic ) return NULL;
 
@@ -164,48 +151,47 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    p_sys->last_date = new_date;
-
-    for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
+    for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
-        int i_line, i_num_lines, i_line_center, i_col, i_num_cols, i_col_center;
-        uint8_t black_pixel;
-        uint8_t *p_in, *p_out;
+        const int i_visible_lines = p_pic->p[i_plane].i_visible_lines;
+        const int i_visible_pitch = p_pic->p[i_plane].i_visible_pitch;
+        const int i_pitch         = p_pic->p[i_plane].i_pitch;
+        const int i_hidden_pitch  = i_pitch - i_visible_pitch;
 
-        p_in = p_pic->p[i_index].p_pixels;
-        p_out = p_outpic->p[i_index].p_pixels;
+        const int i_line_center = i_visible_lines>>1;
+        const int i_col_center  = i_visible_pitch>>1;
 
-        i_num_lines = p_pic->p[i_index].i_visible_lines;
-        i_num_cols = p_pic->p[i_index].i_visible_pitch;
-        i_line_center = i_num_lines/2;
-        i_col_center = i_num_cols/2;
+        const uint8_t *p_in = p_pic->p[i_plane].p_pixels;
+        uint8_t *p_out = p_outpic->p[i_plane].p_pixels;
+        uint8_t *p_outendline = p_out + i_visible_pitch;
+        const uint8_t *p_outend = p_out + i_visible_lines * i_pitch;
 
-        black_pixel = ( i_index == Y_PLANE ) ? 0x00 : 0x80;
+        const uint8_t black_pixel = ( i_plane == Y_PLANE ) ? 0x00 : 0x80;
 
-        for( i_line = 0 ; i_line < i_num_lines ; i_line++ )
+        const int i_line_next =  i_cos-i_sin*i_visible_pitch;
+        const int i_col_next  = -i_sin-i_cos*i_visible_pitch;
+        int i_line_orig0 = - i_cos * i_line_center
+                           - i_sin * i_col_center + (1<<7);
+        int i_col_orig0 =    i_sin * i_line_center
+                           - i_cos * i_col_center + (1<<7);
+        for( ; p_outendline < p_outend;
+             p_out += i_hidden_pitch, p_outendline += i_pitch,
+             i_line_orig0 += i_line_next, i_col_orig0 += i_col_next )
         {
-            for( i_col = 0; i_col < i_num_cols ; i_col++ )
+            for( ; p_out < p_outendline;
+                 p_out++, i_line_orig0 += i_sin, i_col_orig0 += i_cos )
             {
-                int i_line_orig, i_col_orig;
-                i_line_orig = ( ( i_cos * (i_line-i_line_center)
-                                + i_sin * (i_col-i_col_center)
-                                + 128 )>>8 )
-                              + i_line_center;
-                i_col_orig = ( (-i_sin * (i_line-i_line_center)
-                               + i_cos * (i_col-i_col_center)
-                               + 128 )>>8 )
-                             + i_col_center;
+                const int i_line_orig = (i_line_orig0>>8) + i_line_center;
+                const int i_col_orig  = (i_col_orig0>>8)  + i_col_center;
 
-                if(    0 <= i_line_orig && i_line_orig < i_num_lines
-                    && 0 <= i_col_orig && i_col_orig < i_num_cols )
+                if(    0 <= i_line_orig && i_line_orig < i_visible_lines
+                    && 0 <= i_col_orig  && i_col_orig  < i_visible_pitch )
                 {
-
-                    p_out[i_line*i_num_cols+i_col] =
-                        p_in[i_line_orig*i_num_cols+i_col_orig];
+                    *p_out = p_in[i_line_orig*i_pitch+i_col_orig];
                 }
                 else
                 {
-                    p_out[i_line*i_num_cols+i_col] = black_pixel;
+                    *p_out = black_pixel;
                 }
             }
         }
@@ -223,21 +209,20 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     return p_outpic;
 }
 
+/*****************************************************************************
+ *
+ *****************************************************************************/
 static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *p_data )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
 
-    if( !strcmp( psz_var, "rotate_angle" ) )
+    if( !strcmp( psz_var, "rotate-angle" ) )
     {
-        double f_angle;
-
         p_sys->i_angle = newval.i_int;
 
-        f_angle = (((double)p_sys->i_angle)*M_PI)/180.;
-        p_sys->i_sin = (int)(sin( f_angle )*256.);
-        p_sys->i_cos = (int)(cos( f_angle )*256.);
+        cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
     }
     return VLC_SUCCESS;
 }

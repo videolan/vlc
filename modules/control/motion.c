@@ -120,11 +120,6 @@ int Open ( vlc_object_t *p_this )
 
     p_intf->p_sys->b_use_rotate = config_GetInt( p_intf, "motion-use-rotate" );
 
-    if( p_intf->p_sys->b_use_rotate )
-    {
-        var_Create( p_intf->p_libvlc, "rotate_angle", VLC_VAR_INTEGER );
-    }
-
     return VLC_SUCCESS;
 }
 
@@ -162,9 +157,15 @@ static void RunIntf( intf_thread_t *p_intf )
         {
             if( i_oldx != i_x )
             {
-                var_SetInteger( p_intf->p_libvlc, "rotate_angle",
-                            ((360+i_x/2)%360) );
-                i_oldx = i_x;
+                /* TODO: cache object pointer */
+                vlc_object_t *p_obj =
+                vlc_object_find_name( p_intf->p_libvlc, "rotate", FIND_CHILD );
+                if( p_obj )
+                {
+                    var_SetInteger( p_obj, "rotate-angle",((360+i_x/2)%360) );
+                    i_oldx = i_x;
+                    vlc_object_release( p_obj );
+                }
             }
             continue;
         }
