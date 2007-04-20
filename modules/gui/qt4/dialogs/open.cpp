@@ -74,6 +74,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     playButton->setMinimumSize( QSize(90, 0) );
     playButton->setPopupMode( QToolButton::MenuButtonPopup );
     playButton->setToolButtonStyle( Qt::ToolButtonTextOnly );
+    playButton->setAutoRaise( false );
 
     cancelButton = new QToolButton();
     cancelButton->setText( qtr( "&Cancel" ) );
