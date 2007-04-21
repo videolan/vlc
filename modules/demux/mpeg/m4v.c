@@ -36,6 +36,10 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define FPS_TEXT N_("Frames per Second")
+#define FPS_LONGTEXT N_("This is the desired frame rate when " \
+    "playing MPEG4 video elementary streams.")
+
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
@@ -44,6 +48,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
     add_shortcut( "m4v" );
     add_shortcut( "mp4v" );
+    add_float( "m4v-fps", 25, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -53,6 +58,7 @@ struct demux_sys_t
 {
     mtime_t     i_dts;
     es_out_id_t *p_es;
+    float       f_fps;
 
     decoder_t *p_packetizer;
 };
@@ -70,6 +76,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     uint8_t     *p_peek;
+    vlc_value_t val;
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
@@ -99,6 +106,10 @@ static int Open( vlc_object_t * p_this )
 
     /* We need to wait until we get p_extra (VOL header) from the packetizer
      * before we create the output */
+
+    var_Create( p_demux, "m4v-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "m4v-fps", &val );
+    p_sys->f_fps = val.f_float;
 
     return VLC_SUCCESS;
 }
@@ -165,7 +176,7 @@ static int Demux( demux_t *p_demux)
             p_block_out = p_next;
 
             /* FIXME FIXME FIXME FIXME */
-            p_sys->i_dts += (mtime_t)1000000 / 25;
+            p_sys->i_dts += (mtime_t)1000000 / p_sys->f_fps;
             /* FIXME FIXME FIXME FIXME */
         }
     }
