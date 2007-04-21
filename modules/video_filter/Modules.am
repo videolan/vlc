@@ -32,4 +32,5 @@ SOURCES_sharpen = sharpen.c
 SOURCES_erase = erase.c
 SOURCES_bluescreen = bluescreen.c
 SOURCES_alphamask = alphamask.c
+SOURCES_gaussianblur = gaussianblur.c
 noinst_HEADERS = filter_common.h
