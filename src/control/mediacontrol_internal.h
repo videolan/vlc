@@ -46,8 +46,8 @@ vlc_int64_t mediacontrol_position2microsecond(
     input_thread_t *p_input,
     const mediacontrol_Position *pos );
 
-#define RAISE( c, m )  exception->code = c; \
-                       exception->message = strdup(m);
+#define RAISE( c, m )  if( exception ) { exception->code = c;	\
+                                         exception->message = strdup(m); }
 
 #define RAISE_NULL( c, m ) { RAISE( c, m ); return NULL; }
 #define RAISE_VOID( c, m ) { RAISE( c, m ); return; }
