@@ -253,11 +253,6 @@ mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq* ps )
 mediacontrol_Exception*
 mediacontrol_exception_init( mediacontrol_Exception *exception )
 {
-    if( exception == NULL )
-    {
-        exception = ( mediacontrol_Exception* )malloc( sizeof( mediacontrol_Exception ) );
-    }
-
     exception->code = 0;
     exception->message = NULL;
     return exception;
