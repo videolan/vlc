@@ -929,7 +929,7 @@ package-macosx:
 	-e "       set the bounds of the container window to {50, 100, 590, 500}" \
 	-e "       update without registering applications" \
 	-e "       delay 5 -- Sync" \
-	-e "       close" \        
+	-e "       close" \
 	-e "   end tell" \
 	-e "   -- Sync" \
 	-e "   delay 5" \
