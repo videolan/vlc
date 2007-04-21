@@ -27,8 +27,6 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <math.h>                                            /* sin(), cos() */
-
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
 
@@ -140,22 +138,22 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
-        int i_line, i_num_lines, i_col, i_num_cols;
-        uint8_t *p_in, *p_out;
+        uint8_t *p_in = p_pic->p[i_index].p_pixels;
+        uint8_t *p_out = p_outpic->p[i_index].p_pixels;
 
-        p_in = p_pic->p[i_index].p_pixels;
-        p_out = p_outpic->p[i_index].p_pixels;
+        const int i_num_lines = p_pic->p[i_index].i_visible_lines;
+        const int i_num_cols = p_pic->p[i_index].i_visible_pitch;
+        const int i_pitch = p_pic->p[i_index].i_pitch;
 
-        i_num_lines = p_pic->p[i_index].i_visible_lines;
-        i_num_cols = p_pic->p[i_index].i_visible_pitch;
+        int i_line, i_col;
 
         for( i_line = 0 ; i_line < i_num_lines ; i_line++ )
         {
             if( rand()%8 )
             {
                 /* line isn't noisy */
-                p_filter->p_libvlc->pf_memcpy( p_out+i_line*i_num_cols,
-                                               p_in+i_line*i_num_cols,
+                p_filter->p_libvlc->pf_memcpy( p_out+i_line*i_pitch,
+                                               p_in+i_line*i_pitch,
                                                i_num_cols );
             }
             else
@@ -166,12 +164,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 {
                     if( rand()%noise_level )
                     {
-                        p_out[i_line*i_num_cols+i_col] =
-                            p_in[i_line*i_num_cols+i_col];
+                        p_out[i_line*i_pitch+i_col] =
+                            p_in[i_line*i_pitch+i_col];
                     }
                     else
                     {
-                        p_out[i_line*i_num_cols+i_col] = (rand()%3)*0x7f;
+                        p_out[i_line*i_pitch+i_col] = (rand()%3)*0x7f;
                     }
                 }
             }
