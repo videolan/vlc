@@ -4,6 +4,7 @@ SOURCES_flacsys = flac.c
 SOURCES_ogg = ogg.c
 SOURCES_demuxdump = demuxdump.c
 SOURCES_rawdv = rawdv.c
+SOURCES_rawvid = rawvid.c
 SOURCES_au = au.c
 SOURCES_wav = wav.c
 SOURCES_mkv = mkv.cpp mp4/libmp4.c mp4/drms.c
