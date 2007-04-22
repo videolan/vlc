@@ -1729,11 +1729,11 @@ libIDL-$(LIBIDL_VERSION).tar.gz:
 libIDL: libIDL-$(LIBIDL_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.idl: libIDL
+.IDL: libIDL
 	(cd $<; ./configure --prefix=$(PREFIX) --host=powerpc-apple-macos && make && make install )
 	touch $@
 
-CLEAN_FILE += .idl
+CLEAN_FILE += .IDL
 CLEAN_PKG += libIDL
 DISTCLEAN_PKG += libIDL-$(LIBIDL_VERSION).tar.gz
 

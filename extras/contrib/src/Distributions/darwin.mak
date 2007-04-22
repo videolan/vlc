@@ -7,6 +7,6 @@ all: .autoconf .automake .libtool .intl .pkgcfg .freetype .fribidi \
     .SDL_image .glib .gecko .mpcdec .dirac_encoder .dirac_decoder \
     .dca .tag .x264 .goom2k4 .aclocal
 # .expat .clinkcc don't work with SDK yet
-# .glib .idl .gecko are required to build the mozilla plugin
+# .glib .IDL .gecko are required to build the mozilla plugin
 # .mozilla will build an entire mozilla. it can be used if we need to create a new .gecko package
 
