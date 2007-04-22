@@ -1,10 +1,18 @@
---- mpcdec/include/Makefile.am	2005-06-18 23:23:33.000000000 +0100
-+++ mpcdec/include/Makefile.am	2005-11-02 19:51:19.000000000 +0000
-@@ -4,6 +4,7 @@
+Index: mpcdec/configure.ac
+===================================================================
+--- mpcdec/configure.ac (revision 276)
++++ mpcdec/configure.ac (revision 289)
+@@ -59,11 +59,6 @@
+ fi
+
+-AC_FUNC_MEMCMP
+-if test "x$ac_cv_func_memcmp_working" = "xno" ; then
+-	AC_MSG_ERROR([working memcmp is not available.])
+-fi
+-
+-AC_CHECK_FUNCS([memmove memset], [],
+-        AC_MSG_ERROR([memset or memmove is missing.]))
++AC_CHECK_FUNCS([memmove memset memcmp], [],
++        AC_MSG_ERROR([memmove memset or memcmp is missing.]))
  
- nobase_include_HEADERS = \
- 	mpcdec/config_types.h \
-+	mpcdec/config_win32.h \
- 	mpcdec/decoder.h \
- 	mpcdec/huffman.h \
- 	mpcdec/math.h \
+  dnl Make substitutions
