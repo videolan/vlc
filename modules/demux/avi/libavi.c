@@ -173,7 +173,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
             break;
         }
         if( p_chk->common.p_father->common.i_chunk_size > 0 &&
-           ( stream_Tell( s ) >=
+           ( stream_Tell( s ) >
               (off_t)p_chk->common.p_father->common.i_chunk_pos +
                (off_t)__EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
         {
