@@ -2109,6 +2109,9 @@ clean: clean-dots
 clean-src: clean
 	rm -rf $(DISTCLEAN_PKG)
 
+clean-svn:
+	rm -rf ffmpeg tremor libebml libmatroska x264 libdca
+
 distclean: clean-src
 
 source: $(SOURCE) $(DISTCLEAN_PKG)
