@@ -1,4 +1,4 @@
-# ***************************************************************************
+#b ***************************************************************************
 # src/packages.mak : Archive locations
 # ***************************************************************************
 # Copyright (C) 2003 - 2006 the VideoLAN team
@@ -122,8 +122,8 @@ CDIO_VERSION=0.78.2
 CDIO_URL=$(GNU)/libcdio/libcdio-$(CDIO_VERSION).tar.gz
 PNG_VERSION=1.2.16
 PNG_URL=$(SF)/libpng/libpng-$(PNG_VERSION).tar.bz2
-GPGERROR_VERSION=1.3
-GPGERROR_URL=http://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-$(GPGERROR_VERSION).tar.gz
+GPGERROR_VERSION=1.5
+GPGERROR_URL=http://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-$(GPGERROR_VERSION).tar.bz2
 #GPGERROR_URL=$(VIDEOLAN)/testing/contrib/libgpg-error-$(GPGERROR_VERSION).tar.gz
 GCRYPT_VERSION=1.2.3
 GCRYPT_URL=http://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-$(GCRYPT_VERSION).tar.bz2

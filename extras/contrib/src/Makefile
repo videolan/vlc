@@ -1604,12 +1604,11 @@ CLEAN_PKG += libdc1394
 DISTCLEAN_PKG += libdc1394-$(LIBDC1394_VERSION).tar.gz
 
 # ***************************************************************************
-libgpg-error-$(GPGERROR_VERSION).tar.gz:
+libgpg-error-$(GPGERROR_VERSION).tar.bz2:
 	$(WGET) $(GPGERROR_URL)
 
-libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	patch -p0 < Patches/libgpg-error.patch
+libgpg-error: libgpg-error-$(GPGERROR_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 ifdef HAVE_WIN32
 	patch -p0 < Patches/libgpg-error-win32.patch
 endif
@@ -1624,7 +1623,7 @@ endif
 
 CLEAN_FILE += .gpg-error
 CLEAN_PKG += libgpg-error
-DISTCLEAN_PKG += libgpg-error-$(GPGERROR_VERSION).tar.gz
+DISTCLEAN_PKG += libgpg-error-$(GPGERROR_VERSION).tar.bz2
 
 # ***************************************************************************
 # libgcrypt
