@@ -74,19 +74,19 @@ struct filter_sys_t
     double f_sigma;
     int *pi_distribution;
     int i_dim;
+    int *pi_buffer;
 };
 
 static void gaussianblur_InitDistribution( filter_sys_t *p_sys )
 {
     double f_sigma = p_sys->f_sigma;
     int i_dim = (int)(3.*f_sigma);
-    int *pi_distribution = (int*)malloc( (2*i_dim+1) * (2*i_dim+1) * sizeof( int ) );
-    int x, y;
+    int *pi_distribution = (int*)malloc( (2*i_dim+1) * sizeof( int ) );
+    int x;
     for( x = -i_dim; x <= i_dim; x++ )
-        for( y = -i_dim; y <= i_dim; y++ )
-            pi_distribution[(i_dim+y)*(2*i_dim+1)+(i_dim+x)] =
-                (int)( exp(-(x*x+y*y)/(2.*f_sigma*f_sigma))
-                       / (2.*M_PI*f_sigma*f_sigma) * (double)(1<<16) );
+        pi_distribution[i_dim+x] =
+            (int)( sqrt( exp(-(x*x)/(f_sigma*f_sigma))
+                   / (2.*M_PI*f_sigma*f_sigma) )* (double)(1<<16) );
     p_sys->i_dim = i_dim;
     p_sys->pi_distribution = pi_distribution;
 }
@@ -117,6 +117,7 @@ static int Create( vlc_object_t *p_this )
     gaussianblur_InitDistribution( p_filter->p_sys );
     msg_Dbg( p_filter, "gaussian distribution is %d pixels wide",
              p_filter->p_sys->i_dim*2+1 );
+    p_filter->p_sys->pi_buffer = NULL;
 
     return VLC_SUCCESS;
 }
@@ -133,6 +134,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
     int i_plane;
+    int *pi_buffer;
+    const int *pi_distribution = p_sys->pi_distribution;
 
     if( !p_pic ) return NULL;
 
@@ -145,6 +148,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
+    p_sys->pi_buffer = (int*)realloc( p_sys->pi_buffer,
+                                      p_pic->p[Y_PLANE].i_visible_lines
+                                      * p_pic->p[Y_PLANE].i_pitch
+                                      * sizeof( int ) );
+    pi_buffer = p_sys->pi_buffer;
+
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
 
@@ -156,36 +165,46 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         const int i_pitch = p_pic->p[i_plane].i_pitch;
 
         const int i_dim = p_sys->i_dim;
-        const int i_dim2 = 2*i_dim+1;
-        const int *pi_distribution = p_sys->pi_distribution;
 
         int i_line, i_col;
         const int factor = i_plane ? 1 : 0;
 
         for( i_line = 0 ; i_line < i_visible_lines ; i_line++ )
         {
-            uint8_t *p_o = &p_out[i_line*i_pitch];
             for( i_col = 0; i_col < i_visible_pitch ; i_col++ )
             {
                 int value = 0;
                 int scale = 0;
-                int x, y;
+                int x;
+                const int c = i_line*i_pitch+i_col;
+                for( x = __MAX( -i_dim, -i_col );
+                     x <= __MIN( i_dim, i_visible_pitch - i_col + 1 );
+                     x++ )
+                {
+                    const int weight = pi_distribution[x+i_dim];
+                    scale += weight;
+                    value += weight * p_in[c+(x>>factor)];
+                }
+                pi_buffer[c] = value/scale;
+            }
+        }
+        for( i_line = 0 ; i_line < i_visible_lines ; i_line++ )
+        {
+            for( i_col = 0; i_col < i_visible_pitch ; i_col++ )
+            {
+                int value = 0;
+                int scale = 0;
+                int y;
+                const int c = i_line*i_pitch+i_col;
                 for( y = __MAX( -i_dim, -i_line );
                      y <= __MIN( i_dim, i_visible_lines - i_line - 1 );
                      y++ )
                 {
-                    const int *pi_d = &pi_distribution[(y+i_dim)*i_dim2+i_dim];
-                    const uint8_t *p_i = &p_in[(i_line+(y>>factor))*i_pitch+(i_col)];
-                    for( x = __MAX( -i_dim, -i_col );
-                         x <= __MIN( i_dim, i_visible_pitch - i_col + 1 );
-                         x++ )
-                    {
-                         const int weight = pi_d[x];
-                         value += weight * p_i[x>>factor];
-                         scale += weight;
-                    }
+                    const int weight = pi_distribution[y+i_dim];
+                    scale += weight;
+                    value += weight * pi_buffer[c+(y>>factor)*i_pitch];
                 }
-                p_o[i_col] = value / scale;
+                p_out[c] = value/scale;
             }
         }
     }
