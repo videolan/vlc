@@ -439,6 +439,27 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     return o_window;
 }
 
+- (void)scrollWheel:(NSEvent *)theEvent
+{
+    VLCControls * o_controls = (VLCControls *)[[NSApp delegate] getControls];
+    float f_absvalue = [theEvent deltaY] > 0.0f ? [theEvent deltaY] : -[theEvent deltaY];
+    int i;
+    f_absvalue /= 2.0f;
+    f_absvalue += 1.0f;
+
+    /* Set the volume */
+    if (f_absvalue > 1.1f)
+    {
+        for (i = 0; i < (int)f_absvalue; i++)
+        {
+            if ([theEvent deltaY] < 0.0f)
+                [o_controls volumeDown: self];
+            else
+                [o_controls volumeUp: self];
+        }
+    }
+}
+
 - (void)keyDown:(NSEvent *)o_event
 {
     unichar key = 0;
