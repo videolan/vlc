@@ -1188,11 +1188,11 @@ libdca-$(LIBDCA_VERSION).tar.bz2:
 libdca: libdca-$(LIBDCA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
-.libdca: libdca
+.dca: libdca
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	touch $@
 
-CLEAN_FILE += .libdca
+CLEAN_FILE += .dca
 CLEAN_PKG += libdca
 DISTCLEAN_PKG += libdca-$(LIBDCA_VERSION).tar.bz2
 
@@ -1562,12 +1562,12 @@ libraw1394: libraw1394-$(LIBRAW1394_VERSION).tar.gz
 	$(EXTRACT_GZ)
 #endif
 
-.libraw1394: libraw1394
+.raw1394: libraw1394
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make DESTDIR=$(PRFIX) install)
 #	sed 's/^typedef u_int8_t  byte_t;/\/* typedef u_int8_t  byte_t;\*\//'
 	touch $@
 	
-CLEAN_file += .libraw1394
+CLEAN_file += .raw1394
 CLEAN_PKG += libraw1394
 DISTCLEAN_PKG += libraw1394-$(LIBRAW1394_VERSION).tar.gz
 
@@ -1593,13 +1593,13 @@ libdc1394: libdc1394-$(LIBDC1394_VERSION).tar.gz
 	$(EXTRACT_GZ)
 #endif
 
-.libdc1394: libdc1394
+.dc1394: libdc1394
 	(cd $<; ./configure --prefix=$(PREFIX) && \
 	 patch -p1 < ../Patches/libdc1394-noexamples.patch && \
 	 make && make DESTDIR=$(PRFIX) install)
 	touch $@
 	
-CLEAN_file += .libdc1394
+CLEAN_file += .dc1394
 CLEAN_PKG += libdc1394
 DISTCLEAN_PKG += libdc1394-$(LIBDC1394_VERSION).tar.gz
 
@@ -1729,11 +1729,11 @@ libIDL-$(LIBIDL_VERSION).tar.gz:
 libIDL: libIDL-$(LIBIDL_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.libidl: libIDL
+.idl: libIDL
 	(cd $<; ./configure --prefix=$(PREFIX) --host=powerpc-apple-macos && make && make install )
 	touch $@
 
-CLEAN_FILE += .libidl
+CLEAN_FILE += .idl
 CLEAN_PKG += libIDL
 DISTCLEAN_PKG += libIDL-$(LIBIDL_VERSION).tar.gz
 
