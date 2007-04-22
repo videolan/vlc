@@ -83,6 +83,7 @@
 - (BOOL) isFullscreen;
 - (IBAction)windowAction:(id)sender;
 - (BOOL)keyEvent:(NSEvent *)o_event;
+- (void)scrollWheel:(NSEvent *)theEvent;
 
 - (void)setupVarMenuItem:(NSMenuItem *)o_mi
                     target:(vlc_object_t *)p_object

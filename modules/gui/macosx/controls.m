@@ -38,6 +38,7 @@
 #import "controls.h"
 #import "playlist.h"
 #include <vlc_osd.h>
+#include <vlc_keys.h>
 
 /*****************************************************************************
  * VLCControls implementation 
@@ -462,6 +463,24 @@
         vlc_object_release( p_playlist );
     }
 
+}
+
+- (void)scrollWheel:(NSEvent *)theEvent
+{
+    intf_thread_t * p_intf = VLCIntf;
+    float f_absvalue = [theEvent deltaY] > 0.0f ? [theEvent deltaY] : -[theEvent deltaY];
+    int i, i_vlckey;
+
+    f_absvalue = f_absvalue/2.0f + 1.0f;
+
+    if ([theEvent deltaY] < 0.0f)
+        i_vlckey = KEY_MOUSEWHEELDOWN;
+    else
+        i_vlckey = KEY_MOUSEWHEELUP;
+
+    /* Send multiple key event, depending on the intensity of the event */
+    for (i = 0; i < (int)f_absvalue; i++)
+        var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlckey );
 }
 
 - (BOOL)keyEvent:(NSEvent *)o_event
