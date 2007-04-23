@@ -32,7 +32,7 @@
 
 #include "vlc_filter.h"
 
-#include <math.h>                                                  /* exp() */
+#include <math.h>                                          /* exp(), sqrt() */
 
 /*****************************************************************************
  * Local prototypes
@@ -69,26 +69,56 @@ static const char *ppsz_filter_options[] = {
     "sigma", NULL
 };
 
+/* Comment this to use floats instead of integers (faster for bigger sigma
+ * values)
+ * For sigma = 2 ints are faster
+ * For sigma = 4 floats are faster
+ */
+#define DONT_USE_FLOATS
 struct filter_sys_t
 {
     double f_sigma;
-    int *pi_distribution;
     int i_dim;
+#ifdef DONT_USE_FLOATS
+    int *pi_distribution;
     int *pi_buffer;
+    int *pi_scale;
+#else
+    float *pf_distribution;
+    float *pf_buffer;
+    float *pf_scale;
+#endif
 };
 
 static void gaussianblur_InitDistribution( filter_sys_t *p_sys )
 {
     double f_sigma = p_sys->f_sigma;
     int i_dim = (int)(3.*f_sigma);
+#ifdef DONT_USE_FLOATS
     int *pi_distribution = (int*)malloc( (2*i_dim+1) * sizeof( int ) );
+#else
+    float *pf_distribution = (float*)malloc( (2*i_dim+1) * sizeof( float ) );
+#endif
     int x;
     for( x = -i_dim; x <= i_dim; x++ )
+    {
+#ifdef DONT_USE_FLOATS
         pi_distribution[i_dim+x] =
-            (int)( sqrt( exp(-(x*x)/(f_sigma*f_sigma))
-                   / (2.*M_PI*f_sigma*f_sigma) )* (double)(1<<16) );
+            (int)( sqrt( exp(-(x*x)/(f_sigma*f_sigma) )
+                 / (2.*M_PI*f_sigma*f_sigma) )  * (double)(1<<8) );
+        printf("%d\n",pi_distribution[i_dim+x]);
+#else
+        pf_distribution[i_dim+x] = (float)
+            sqrt( exp(-(x*x)/(f_sigma*f_sigma) ) / (2.*M_PI*f_sigma*f_sigma) );
+        printf("%f\n",pf_distribution[i_dim+x]);
+#endif
+    }
     p_sys->i_dim = i_dim;
+#ifdef DONT_USE_FLOATS
     p_sys->pi_distribution = pi_distribution;
+#else
+    p_sys->pf_distribution = pf_distribution;
+#endif
 }
 
 static int Create( vlc_object_t *p_this )
@@ -117,7 +147,13 @@ static int Create( vlc_object_t *p_this )
     gaussianblur_InitDistribution( p_filter->p_sys );
     msg_Dbg( p_filter, "gaussian distribution is %d pixels wide",
              p_filter->p_sys->i_dim*2+1 );
+#ifdef DONT_USE_FLOATS
     p_filter->p_sys->pi_buffer = NULL;
+    p_filter->p_sys->pi_scale = NULL;
+#else
+    p_filter->p_sys->pf_buffer = NULL;
+    p_filter->p_sys->pf_scale = NULL;
+#endif
 
     return VLC_SUCCESS;
 }
@@ -125,7 +161,15 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+#ifdef DONT_USE_FLOATS
     free( p_filter->p_sys->pi_distribution );
+    free( p_filter->p_sys->pi_buffer );
+    free( p_filter->p_sys->pi_scale );
+#else
+    free( p_filter->p_sys->pf_distribution );
+    free( p_filter->p_sys->pf_buffer );
+    free( p_filter->p_sys->pf_scale );
+#endif
     free( p_filter->p_sys );
 }
 
@@ -134,9 +178,16 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
     int i_plane;
+    const int i_dim = p_sys->i_dim;
+#ifdef DONT_USE_FLOATS
     int *pi_buffer;
+    int *pi_scale;
     const int *pi_distribution = p_sys->pi_distribution;
-
+#else
+    float *pf_buffer;
+    float *pf_scale;
+    const float *pf_distribution = p_sys->pf_distribution;
+#endif
     if( !p_pic ) return NULL;
 
     p_outpic = p_filter->pf_vout_buffer_new( p_filter );
@@ -147,12 +198,84 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             p_pic->pf_release( p_pic );
         return NULL;
     }
-
-    p_sys->pi_buffer = (int*)realloc( p_sys->pi_buffer,
-                                      p_pic->p[Y_PLANE].i_visible_lines
-                                      * p_pic->p[Y_PLANE].i_pitch
-                                      * sizeof( int ) );
+#ifdef DONT_USE_FLOATS
+    if( !p_sys->pi_buffer )
+    {
+        p_sys->pi_buffer = (int*)realloc( p_sys->pi_buffer,
+                                          p_pic->p[Y_PLANE].i_visible_lines
+                                          * p_pic->p[Y_PLANE].i_pitch
+                                          * sizeof( int ) );
+    }
     pi_buffer = p_sys->pi_buffer;
+#else
+    if( !p_sys->pf_buffer )
+    {
+        p_sys->pf_buffer = (float*)realloc( p_sys->pf_buffer,
+                                            p_pic->p[Y_PLANE].i_visible_lines
+                                            * p_pic->p[Y_PLANE].i_pitch
+                                            * sizeof( float ) );
+    }
+    pf_buffer = p_sys->pf_buffer;
+#endif
+#ifdef DONT_USE_FLOATS
+    if( !p_sys->pi_scale )
+#else
+    if( !p_sys->pf_scale )
+#endif
+    {
+        const int i_visible_lines = p_pic->p[Y_PLANE].i_visible_lines;
+        const int i_visible_pitch = p_pic->p[Y_PLANE].i_visible_pitch;
+        const int i_pitch = p_pic->p[Y_PLANE].i_pitch;
+        int i_col, i_line;
+#ifdef DONT_USE_FLOATS
+        p_sys->pi_scale = (int*)malloc( i_visible_lines * i_pitch
+                                        * sizeof( int ) );
+        pi_scale = p_sys->pi_scale;
+#else
+        p_sys->pf_scale = (float*)malloc( i_visible_lines * i_pitch
+                                          * sizeof( float ) );
+        pf_scale = p_sys->pf_scale;
+#endif
+        for( i_line = 0 ; i_line < i_visible_lines ; i_line++ )
+        {
+            for( i_col = 0; i_col < i_visible_pitch ; i_col++ )
+            {
+                int x, y;
+#ifdef DONT_USE_FLOATS
+                int value = 0;
+#else
+                double value = 0.;
+#endif
+                for( y = __MAX( -i_dim, -i_line );
+                     y <= __MIN( i_dim, i_visible_lines - i_line - 1 );
+                     y++ )
+                {
+                    for( x = __MAX( -i_dim, -i_col );
+                         x <= __MIN( i_dim, i_visible_pitch - i_col + 1 );
+                         x++ )
+                    {
+#ifdef DONT_USE_FLOATS
+                        value += pi_distribution[y+i_dim]
+                               * pi_distribution[x+i_dim];
+#else
+                        value += ((double)pf_distribution[y+i_dim])
+                               * ((double)pf_distribution[x+i_dim]);
+#endif
+                    }
+                }
+#ifdef DONT_USE_FLOATS
+                pi_scale[i_line*i_pitch+i_col] = value;
+#else
+                pf_scale[i_line*i_pitch+i_col] = (float)(1./value);
+#endif
+            }
+        }
+    }
+#ifdef DONT_USE_FLOATS
+    pi_scale = p_sys->pi_scale;
+#else
+    pf_scale = p_sys->pf_scale;
+#endif
 
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
@@ -164,8 +287,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         const int i_visible_pitch = p_pic->p[i_plane].i_visible_pitch;
         const int i_pitch = p_pic->p[i_plane].i_pitch;
 
-        const int i_dim = p_sys->i_dim;
-
         int i_line, i_col;
         const int factor = i_plane ? 1 : 0;
 
@@ -173,38 +294,60 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         {
             for( i_col = 0; i_col < i_visible_pitch ; i_col++ )
             {
+#ifdef DONT_USE_FLOATS
                 int value = 0;
-                int scale = 0;
+#else
+                float value = 0.;
+#endif
                 int x;
                 const int c = i_line*i_pitch+i_col;
-                for( x = __MAX( -i_dim, -i_col );
-                     x <= __MIN( i_dim, i_visible_pitch - i_col + 1 );
+                for( x = __MAX( -i_dim, -i_col*(factor+1) );
+                     x <= __MIN( i_dim, (i_visible_pitch - i_col)*(factor+1) + 1 );
                      x++ )
                 {
-                    const int weight = pi_distribution[x+i_dim];
-                    scale += weight;
-                    value += weight * p_in[c+(x>>factor)];
+#ifdef DONT_USE_FLOATS
+                    value += pi_distribution[x+i_dim]
+                           * p_in[c+(x>>factor)];
+#else
+                    value += pf_distribution[x+i_dim]
+                           * (float)p_in[c+(x>>factor)];
+#endif
                 }
-                pi_buffer[c] = value/scale;
+#ifdef DONT_USE_FLOATS
+                pi_buffer[c] = value;
+#else
+                pf_buffer[c] = value;
+#endif
             }
         }
         for( i_line = 0 ; i_line < i_visible_lines ; i_line++ )
         {
             for( i_col = 0; i_col < i_visible_pitch ; i_col++ )
             {
+#ifdef DONT_USE_FLOATS
                 int value = 0;
-                int scale = 0;
+#else
+                float value = 0.;
+#endif
                 int y;
                 const int c = i_line*i_pitch+i_col;
-                for( y = __MAX( -i_dim, -i_line );
-                     y <= __MIN( i_dim, i_visible_lines - i_line - 1 );
+                for( y = __MAX( -i_dim, (-i_line)*(factor+1) );
+                     y <= __MIN( i_dim, (i_visible_lines - i_line)*(factor+1) - 1 );
                      y++ )
                 {
-                    const int weight = pi_distribution[y+i_dim];
-                    scale += weight;
-                    value += weight * pi_buffer[c+(y>>factor)*i_pitch];
+#ifdef DONT_USE_FLOATS
+                    value += pi_distribution[y+i_dim]
+                           * pi_buffer[c+(y>>factor)*i_pitch];
+#else
+                    value += pf_distribution[y+i_dim]
+                           * pf_buffer[c+(y>>factor)*i_pitch];
+#endif
                 }
-                p_out[c] = value/scale;
+#ifdef DONT_USE_FLOATS
+                p_out[c] = (uint8_t)(value/pi_scale[(i_line<<factor)*(i_pitch<<factor)+(i_col<<factor)]);
+#else
+                p_out[c] = (uint8_t)(value*pf_scale[(i_line<<factor)*(i_pitch<<factor)+(i_col<<factor)]);
+#endif
             }
         }
     }
