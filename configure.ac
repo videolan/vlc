@@ -1970,6 +1970,22 @@ then
   fi
 fi
 
+dnl
+dnl  Windows DirectShow BDA access module
+dnl
+AC_ARG_ENABLE(bda,
+  [  --enable-bda          Win32 DirectShow BDA support (default enabled on Win32)])
+if test "${enable_bda}" != "no"
+then
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
+  then
+      AC_CHECK_HEADERS(dshow.h,
+      [ VLC_ADD_PLUGINS([bda])
+        VLC_ADD_CXXFLAGS([bda],[])
+        VLC_ADD_LDFLAGS([bda],[-lole32 -loleaut32 -luuid]) ])
+  fi
+fi
+
 
 dnl
 dnl  OpenCV wrapper and example filters
@@ -5794,6 +5810,7 @@ AC_CONFIG_FILES([
 
 AC_CONFIG_FILES([
   modules/access/Makefile
+  modules/access/bda/Makefile
   modules/access/dshow/Makefile
   modules/access/dvb/Makefile
   modules/access/mms/Makefile
