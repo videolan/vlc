@@ -73,6 +73,9 @@ Interfaces:
  * Unix
    * Allow only one running instance, using D-Bus interface (experimental).
 
+Capture:
+ * new BDA device driver plugin for DVB-C/S/T capture cards on Microsoft
+   Windows
 
 Changes between 0.8.6a and 0.8.6b:
 -----------------------------------------------------------
