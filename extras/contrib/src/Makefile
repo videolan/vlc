@@ -1374,9 +1374,9 @@ qt4: qt4-$(QT4_VERSION)-win32-bin.tar.gz
 .qt4: qt4
 	(cd qt4;mkdir -p $(PREFIX)/bin; mkdir -p $(PREFIX)/include;mkdir -p $(PREFIX)/lib/pkgconfig;rm -f $(PREFIX)/lib/pkgconfig/Qt*; sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtCore.pc.in > $(PREFIX)/lib/pkgconfig/QtCore.pc;sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtGui.pc.in > $(PREFIX)/lib/pkgconfig/QtGui.pc;cp -r include/* $(PREFIX)/include;cp lib/*a $(PREFIX)/lib)
 ifeq ($(BUILD),i686-pc-cygwin)
-	(cd qt4;cp bin/rcc.exe bin/uic.exe bin/moc.exe $(PREFIX)/bin)
+	(cd qt4;cp bin/*.exe $(PREFIX)/bin)
 else
-	(cd qt4;cp bin/rcc bin/uic bin/moc $(PREFIX)/bin)
+	(cd qt4;cp bin/* $(PREFIX)/bin)
 endif
 	touch $@
 
