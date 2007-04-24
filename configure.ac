@@ -1200,6 +1200,10 @@ elif test "${SYS}" != "mingwce"; then
 else
     VLC_ADD_PLUGINS([win32text])
 fi
+if test "${SYS}" = "darwin"; then
+    VLC_ADD_PLUGINS([quartztext])
+    VLC_ADD_LDFLAGS([quartztext],[-framework Carbon -framework ApplicationServices])
+fi
 
 dnl
 dnl  Accelerated modules
