@@ -103,10 +103,15 @@ package-win32: FORCE
 		cp -r src/live/$$i/include tmp/$(DISTDIR)/live.com/$$i; \
 		cp src/live/$$i/lib$${i}.a  tmp/$(DISTDIR)/live.com/$$i; \
 	done;
+# Change Prefix.
 	./change_prefix.sh tmp $(PREFIX) $(DISTDIR)
+# Hack for qt4
+	(cd tmp/$(DISTDIR)/bin; mv uic.exe uic.ex; mv rcc.exe rcc.ex; mv moc.exe moc.ex)
 #	Remove unused and potentially harmful files	
-	(cd tmp/$(DISTDIR)/bin; rm -f *.exe; chmod a+x *)
-
+	(cd tmp/$(DISTDIR)/bin; rm -rfv *.exe; chmod a+x *)
+# Hack for qt4
+	(cd tmp/$(DISTDIR)/bin; mv uic.ex uic.exe; mv rcc.ex rcc.exe; mv moc.ex moc.exe)
+# Tar it.
 	(cd tmp; tar cf - $(DISTDIR)) | bzip2 -c > contrib-`date +%Y%m%d`-win32-bin-gcc-`$(CC) --version|head -n 1|cut -f 3 -d ' '`-only.tar.bz2
 	rm -rf tmp
 FORCE:
