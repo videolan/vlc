@@ -58,7 +58,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     // Make this QFileDialog a child of tempWidget from the ui.
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
             qfu( p_intf->p_libvlc->psz_homedir ), fileTypes );
-    dialogBox->setFileMode( QFileDialog::ExistingFiles );
+/*    dialogBox->setFileMode( QFileDialog::ExistingFiles );*/
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
 
     /* We don't want to see a grip in the middle of the window, do we? */
@@ -201,8 +201,8 @@ void FileOpenPanel::toggleSubtitleFrame()
     if (ui.subFrame->isVisible())
     {
         ui.subFrame->hide();
-//        setMinimumHeight(1);
-        resize( sizeHint());
+        updateGeometry();
+    /* FiXME Size */
     }
     else
     {
