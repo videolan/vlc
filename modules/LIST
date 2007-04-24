@@ -217,6 +217,7 @@ $Id$
  * qt4: interface module using the cross-platform Qt4 library.
  * qte: video output module for Qt Embedded.
  * qte_main: a QT Embedded GUI wrapper module.
+ * quartztext: Text renderer using native Mac OS X API
  * quicktime: Quicktime decoder that uses the QT library
  * rawdv: Raw DV demuxer
  * rawvideo: Pseudo audio-decoder for raw video
