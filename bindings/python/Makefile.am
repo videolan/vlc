@@ -10,9 +10,9 @@ EXTRA_DIST = vlcglue.h setup.py vlcwrapper.py vlcwidget.py \
 if BUILD_PYTHON
 
 if HAVE_WIN32
-	COMPILERARG = --compiler=mingw32
+	COMPILERARG=--compiler=mingw32
 else
-	COMPILERARG = 
+	COMPILERARG=
 endif
 
 all:
