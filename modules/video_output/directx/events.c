@@ -790,7 +790,24 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     }
 
     if( hwnd == p_vout->p_sys->hvideownd )
-        return DefWindowProc(hwnd, message, wParam, lParam);
+    {
+        switch( message )
+        {
+        case WM_ERASEBKGND:
+            // erase the background only if a brush is set
+            return ( 0UL == GetClassLong( hwnd, GCL_HBRBACKGROUND) ) ?
+                1 : DefWindowProc(hwnd, message, wParam, lParam);
+        case WM_PAINT:
+            if( 0UL == GetClassLong( hwnd, GCL_HBRBACKGROUND) )
+            {
+                // vout paints the whole area, no need to repaint it
+                ValidateRect(hwnd, NULL);
+            }
+            // fall through
+        default:
+            return DefWindowProc(hwnd, message, wParam, lParam);
+        }
+    }
 
     switch( message )
     {
@@ -842,8 +859,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     case WM_PAINT:
     case WM_NCPAINT:
     case WM_ERASEBKGND:
-        /* We do not want to relay these messages to the parent window
-         * because we rely on the background color for the overlay. */
         return DefWindowProc(hwnd, message, wParam, lParam);
 
     default:
