@@ -79,7 +79,7 @@ public:
     static void AudioPopupMenu( intf_thread_t * );
     static void VideoPopupMenu( intf_thread_t * );
     static void MiscPopupMenu( intf_thread_t * );
-    static void PopupMenu( intf_thread_t * );
+    static void PopupMenu( intf_thread_t *, bool );
 
     static void DoAction( intf_thread_t *, QObject * );
 private:

@@ -105,7 +105,7 @@ void DialogsProvider::customEvent( QEvent *event )
                extendedDialog(); break;
                /* We might want to make it better with custom functions */
             case INTF_DIALOG_POPUPMENU:
-               QVLCMenu::PopupMenu( p_intf ); break;
+               QVLCMenu::PopupMenu( p_intf, (de->i_arg != 0) ); break;
             case INTF_DIALOG_AUDIOPOPUPMENU:
                QVLCMenu::AudioPopupMenu( p_intf ); break;
             case INTF_DIALOG_VIDEOPOPUPMENU:
