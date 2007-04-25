@@ -27,8 +27,6 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <math.h>                                            /* sin(), cos() */
-
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
 #include <vlc_vout.h>

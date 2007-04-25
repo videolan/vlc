@@ -244,7 +244,8 @@ static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
-    video_format_t fmt = {0};
+    video_format_t fmt;
+    memset( &fmt, 0, sizeof( video_format_t ) );
 
     I_OUTPUTPICTURES = 0;
 
