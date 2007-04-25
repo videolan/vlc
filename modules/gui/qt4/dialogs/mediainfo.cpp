@@ -44,6 +44,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput ) :
     p_input = NULL;
 
     setWindowTitle( qtr( "Media information" ) );
+    resize( 500 , 450 );
 
     QGridLayout *layout = new QGridLayout(this);
     IT = new InfoTab( this, p_intf, true ) ;
@@ -59,7 +60,6 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput ) :
         ON_TIMEOUT( update() );
         var_AddCallback( THEPL, "item-change", ItemChanged, this );
     }
-    readSettings( "mediainfo" , QSize( 500, 450 ) );
 }
 
 MediaInfoDialog::~MediaInfoDialog()

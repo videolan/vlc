@@ -39,7 +39,7 @@ MessagesDialog *MessagesDialog::instance = NULL;
 MessagesDialog::MessagesDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Messages" ) );
-    resize(600, 400);
+    resize( 600, 450 );
 
     QGridLayout *layout = new QGridLayout( this );
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
