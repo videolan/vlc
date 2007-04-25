@@ -257,6 +257,18 @@ AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WINCE, test "${SYS}" = "mingwce")
 
 dnl
+dnl Sadly autoconf doesn't think about testing foo.exe when ask to test 
+dnl for program foo on win32
+
+case "${build_os}" in
+    cygwin|msys)
+        ac_executable_extensions=".exe"
+ 	;;
+    *)
+ 	;;
+esac
+
+dnl 
 dnl  Libtool
 dnl  It's very bad, but our former custom system was worst
 dnl  -- Courmisch
@@ -4915,9 +4927,10 @@ AS_IF([test "${enable_qt4}" != "no" &&
       enableqt4=true
       VLC_ADD_LDFLAGS([qt4],[$QT4_LIBS])
       VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS])
-      MOC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/moc
-      RCC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/rcc
-      UIC=`$PKG_CONFIG --variable=exec_prefix QtCore`/bin/uic],
+      AC_PATH_PROG(MOC, moc, moc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+      AC_PATH_PROG(RCC, rcc, rcc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+      AC_PATH_PROG(UIC, uic, uic,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+      ],
       AS_IF([test "${enable_qt4}" = "yes"],[
 	AC_MSG_ERROR(QT4 library not found)
       ],[
