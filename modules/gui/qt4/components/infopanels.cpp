@@ -211,7 +211,6 @@ void InputStatsPanel::clear()
 InfoPanel::InfoPanel( QWidget *parent, intf_thread_t *_p_intf ) :
                                       QWidget( parent ), p_intf( _p_intf )
 {
-//     resize(400, 500);
      QGridLayout *layout = new QGridLayout(this);
      InfoTree = new QTreeWidget(this);
      QList<QTreeWidgetItem *> items;
@@ -219,7 +218,6 @@ InfoPanel::InfoPanel( QWidget *parent, intf_thread_t *_p_intf ) :
      layout->addWidget(InfoTree, 0, 0 );
      InfoTree->setColumnCount( 1 );
      InfoTree->header()->hide();
-//     InfoTree->resize(400, 400);
 }
 
 InfoPanel::~InfoPanel()
