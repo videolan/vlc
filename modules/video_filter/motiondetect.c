@@ -221,7 +221,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
             msg_Warn( p_filter, "Not taking chroma into account" );
             break;
     }
-    format = 0;
+
+    //format = 0;
     if( format )
     {
         for( line = 0; line < i_num_lines_u; line++ )
