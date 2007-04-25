@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ *          Paul Corke <paul dot corke at datatote dot co dot uk>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +33,10 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define HURRYUP_TEXT N_( "Hurry up" )
+#define HURRYUP_LONGTEXT N_( "The demuxer will advance timestamps if the " \
+                "input can't keep up with the rate." )
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -41,6 +46,7 @@ vlc_module_begin();
     set_capability( "demux2", 2 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
+    add_bool( "rawdv-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT, VLC_FALSE );
     set_callbacks( Open, Close );
     add_shortcut( "rawdv" );
 vlc_module_end();
@@ -104,6 +110,7 @@ struct demux_sys_t
 
     /* program clock reference (in units of 90kHz) */
     mtime_t i_pcr;
+    vlc_bool_t b_hurry_up;
 };
 
 /*****************************************************************************
@@ -196,11 +203,15 @@ static int Open( vlc_object_t * p_this )
 
     p_peek += 72;                                  /* skip rest of DIF block */
 
-
     /* Set p_input field */
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+
+    p_sys->b_hurry_up = var_CreateGetBool( p_demux, "rawdv-hurry-up" );
+    msg_Dbg( p_demux, "Realtime DV Source: %s", (p_sys->b_hurry_up)?"Yes":"No" );
 
     p_sys->i_dsf = dv_header.dsf;
     p_sys->frame_size = dv_header.dsf ? 12 * 150 * 80 : 10 * 150 * 80;
@@ -264,6 +275,7 @@ static void Close( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys  = p_demux->p_sys;
 
+    var_Destroy( p_demux, "rawdv-hurry-up");
     free( p_sys );
 }
 
@@ -278,10 +290,16 @@ static int Demux( demux_t *p_demux )
     block_t     *p_block;
     vlc_bool_t  b_audio = VLC_FALSE;
 
+    if( p_sys->b_hurry_up )
+    {
+         /* 3 frames */
+        p_sys->i_pcr = mdate() + (p_sys->i_dsf ? 120000 : 90000);
+    }
+
     /* Call the pace control */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
-
-    if( ( p_block = stream_Block( p_demux->s, p_sys->frame_size ) ) == NULL )
+    p_block = stream_Block( p_demux->s, p_sys->frame_size );
+    if( p_block == NULL )
     {
         /* EOF */
         return 0;
@@ -309,7 +327,10 @@ static int Demux( demux_t *p_demux )
 
     es_out_Send( p_demux->out, p_sys->p_es_video, p_block );
 
-    p_sys->i_pcr += ( I64C(1000000) / p_sys->f_rate );
+    if( !p_sys->b_hurry_up )
+    {
+        p_sys->i_pcr += ( I64C(1000000) / p_sys->f_rate );
+    }
 
     return 1;
 }
@@ -472,5 +493,3 @@ static block_t *dv_extract_audio( demux_t *p_demux,
 
     return p_block;
 }
-
-
