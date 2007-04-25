@@ -417,6 +417,10 @@
     [o_fullscreen_anim1 setDuration: 0.2];
     [o_fullscreen_anim1 setFrameRate: 30];
     [o_fullscreen_anim2 startWhenAnimation: o_fullscreen_anim1 reachesProgress: 1.0];
+
+    /* Make sure o_fullscreen_window is the frontmost window */
+    [o_fullscreen_window orderFront: self];
+
     [o_fullscreen_anim1 startAnimation];
     /* fullscreenAnimation will be unlocked when animation ends */
 }
