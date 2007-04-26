@@ -692,6 +692,11 @@ static const char *ppsz_clock_descriptions[] =
     "This allows you to select a list of encoders that VLC will use in " \
     "priority.")
 
+#define SYSTEM_CODEC_TEXT N_("Prefer system plugins over vlc")
+#define SYSTEM_CODEC_LONGTEXT N_( \
+    "Indicates whether VLC will prefer native plugins installed " \
+    "on system over VLC owns plugins whenever a choice is available." )
+
 /*****************************************************************************
  * Sout
  ****************************************************************************/
@@ -1404,6 +1409,9 @@ vlc_module_begin();
 /* Input options */
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_GENERAL );
+
+    add_bool( "prefer-system-codecs", VLC_FALSE, NULL, SYSTEM_CODEC_TEXT,
+                                SYSTEM_CODEC_LONGTEXT, VLC_FALSE );
 
     add_bool( "france", VLC_FALSE, NULL, N_("France"), FRANCE_LONGTEXT, VLC_TRUE );
 

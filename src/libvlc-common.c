@@ -906,6 +906,23 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
         VLC_AddIntf( 0, "netsync,none", VLC_FALSE, VLC_FALSE );
     }
 
+#ifdef WIN32
+    if( config_GetInt( p_libvlc, "prefer-system-codecs") == 1 )
+    {
+        char *psz_codecs = config_GetPsz( p_playlist, "codec" );
+        if( psz_codecs )
+        {
+            char *psz_morecodecs;
+            asprintf(&psz_morecodecs, "%s,dmo,quicktime", psz_codecs);
+            if( psz_morecodecs )
+                config_PutPsz( p_libvlc, "codec", psz_morecodecs);
+        }
+        else
+            config_PutPsz( p_libvlc, "codec", "dmo,quicktime");
+        free(psz_codecs);
+    }
+#endif
+
     /*
      * FIXME: kludge to use a p_libvlc-local variable for the Mozilla plugin
      */
