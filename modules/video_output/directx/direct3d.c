@@ -57,6 +57,7 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static int  Manage    ( vout_thread_t * );
 static void Display   ( vout_thread_t *, picture_t * );
+static void FirstDisplay( vout_thread_t *, picture_t * );
 
 static int Direct3DVoutCreate     ( vout_thread_t * );
 static void Direct3DVoutRelease   ( vout_thread_t * );
@@ -164,7 +165,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->pf_end = End;
     p_vout->pf_manage = Manage;
     p_vout->pf_render = Direct3DVoutRenderScene;
-    p_vout->pf_display = Display;
+    p_vout->pf_display = FirstDisplay;
 
     p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
     p_vout->p_sys->hparent = p_vout->p_sys->hfswnd = NULL;
@@ -624,12 +625,32 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     HRESULT hr = IDirect3DDevice9_Present(p_d3ddev, NULL, NULL, NULL, NULL);
     if( FAILED(hr) )
         msg_Dbg( p_vout, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
+}
 
-    /* if set, remove the black brush to avoid flickering in repaint operations */
-    if( 0UL != GetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND) )
-    {
-        SetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND, 0UL);
-    }
+/*
+** this function is only used once when the first picture is received
+** this function will show the video window once a picture is ready
+*/
+
+static void FirstDisplay( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    /* get initial picture presented through D3D */
+    Display(p_vout, p_pic);
+
+    /*
+    ** Video window is initially hidden, show it now since we got a 
+    ** picture to show.
+    */
+    SetWindowPos( p_vout->p_sys->hvideownd, NULL, 0, 0, 0, 0, 
+        SWP_ASYNCWINDOWPOS|
+        SWP_FRAMECHANGED|
+        SWP_SHOWWINDOW|
+        SWP_NOMOVE|
+        SWP_NOSIZE|
+        SWP_NOZORDER );
+
+    /* use and restores proper display function for further pictures */
+    p_vout->pf_display = Display;
 }
 
 /*****************************************************************************

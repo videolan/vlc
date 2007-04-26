@@ -92,7 +92,7 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static int  Manage    ( vout_thread_t * );
 static void Display   ( vout_thread_t *, picture_t * );
-static void OverlayDisplay( vout_thread_t *, picture_t * );
+static void FirstDisplay( vout_thread_t *, picture_t * );
 static void SetPalette( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 
 static int  NewPictureVec  ( vout_thread_t *, picture_t *, int );
@@ -218,7 +218,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->pf_end = End;
     p_vout->pf_manage = Manage;
     p_vout->pf_render = NULL;
-    p_vout->pf_display = Display;
+    p_vout->pf_display = FirstDisplay;
 
     p_vout->p_sys->p_ddobject = NULL;
     p_vout->p_sys->p_display = NULL;
@@ -452,11 +452,6 @@ static int Init( vout_thread_t *p_vout )
         p_vout->output.i_chroma = i_chroma_backup;
         p_vout->p_sys->b_using_overlay = 0;
         NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
-    }
-
-    if( p_vout->p_sys->b_using_overlay )
-    {
-        p_vout->pf_display = OverlayDisplay;
     }
 
     /* Change the window title bar text */
@@ -829,15 +824,6 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
             msg_Warn( p_vout, "could not blit surface (error %li)", dxresult );
             return;
         }
-        else
-        {
-            /* if set, remove the black brush to avoid flickering in repaint operations */
-            if( 0UL != GetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND) )
-            {
-                SetClassLong(p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND, (ULONG)0UL);
-            }
-        }
-
     }
     else /* using overlay */
     {
@@ -870,10 +856,11 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 
 /*
 ** this function is only used once when the first picture is received
-** The overlay colorkey replaces black as the background color on the
-** video window; this will cause the overlay surface to be displayed
+** this function will show the video window once video is ready for
+** display.
 */
-static void OverlayDisplay( vout_thread_t *p_vout, picture_t *p_pic )
+
+static void FirstDisplay( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* get initial picture rendered on overlay surface */
     Display(p_vout, p_pic);
@@ -881,10 +868,23 @@ static void OverlayDisplay( vout_thread_t *p_vout, picture_t *p_pic )
     IDirectDraw_WaitForVerticalBlank(p_vout->p_sys->p_ddobject,
             DDWAITVB_BLOCKBEGIN, NULL);
 
-    /* set the colorkey as the backgound brush for the video window */
-    SetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND,
-                  (LONG)CreateSolidBrush( p_vout->p_sys->i_rgb_colorkey ) );
-    InvalidateRect( p_vout->p_sys->hvideownd, NULL, TRUE );
+    if( p_vout->p_sys->b_using_overlay )
+    {
+        /* set the colorkey as the backgound brush for the video window */
+        SetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND,
+                      (LONG)CreateSolidBrush( p_vout->p_sys->i_rgb_colorkey ) );
+    }
+    /*
+    ** Video window is initially hidden, show it now since we got a 
+    ** picture to show.
+    */
+    SetWindowPos( p_vout->p_sys->hvideownd, NULL, 0, 0, 0, 0, 
+        SWP_ASYNCWINDOWPOS|
+        SWP_FRAMECHANGED|
+        SWP_SHOWWINDOW|
+        SWP_NOMOVE|
+        SWP_NOSIZE|
+        SWP_NOZORDER );
 
     /* use and restores proper display function for further pictures */
     p_vout->pf_display = Display;
@@ -1135,12 +1135,6 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->i_rgb_colorkey =
         DirectXFindColorkey( p_vout, &p_vout->p_sys->i_colorkey );
 
-    /* use black brush as the video background color,
-       if overlay video is used, this will be replaced by the
-       colorkey when the first picture is received */
-    SetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND,
-                  (LONG)GetStockObject( BLACK_BRUSH ) );
-    InvalidateRect( p_vout->p_sys->hvideownd, NULL, TRUE );
     E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
 
     return VLC_SUCCESS;

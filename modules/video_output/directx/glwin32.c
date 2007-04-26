@@ -54,6 +54,7 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static int  Manage    ( vout_thread_t * );
 static void GLSwapBuffers( vout_thread_t * );
+static void FirstSwap( vout_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -102,7 +103,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
     p_vout->pf_manage = Manage;
-    p_vout->pf_swap = GLSwapBuffers;
+    p_vout->pf_swap = FirstSwap;
 
     p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
     p_vout->p_sys->hparent = p_vout->p_sys->hfswnd = NULL;
@@ -480,4 +481,30 @@ static int Manage( vout_thread_t *p_vout )
 static void GLSwapBuffers( vout_thread_t *p_vout )
 {
     SwapBuffers( p_vout->p_sys->hGLDC );
+}
+
+/*
+** this function is only used once when the first picture is received
+** this function will show the video window once a picture is ready
+*/
+
+static void FirstSwap( vout_thread_t *p_vout )
+{
+    /* get initial picture buffer swapped to front buffer */
+    GLSwapBuffers( p_vout );
+
+    /*
+    ** Video window is initially hidden, show it now since we got a 
+    ** picture to show.
+    */
+    SetWindowPos( p_vout->p_sys->hvideownd, NULL, 0, 0, 0, 0, 
+        SWP_ASYNCWINDOWPOS|
+        SWP_FRAMECHANGED|
+        SWP_SHOWWINDOW|
+        SWP_NOMOVE|
+        SWP_NOSIZE|
+        SWP_NOZORDER );
+
+    /* use and restores proper swap function for further pictures */
+    p_vout->pf_swap = GLSwapBuffers;
 }

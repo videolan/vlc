@@ -440,6 +440,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
     /* Register the video sub-window class */
     wc.lpszClassName = _T("VLC DirectX video"); wc.hIcon = 0;
+    wc.hbrBackground = NULL; /* no background color */
     if( !RegisterClass(&wc) )
     {
         WNDCLASS wndclass;
@@ -542,7 +543,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
      * without having them shown outside of the video area. */
     p_vout->p_sys->hvideownd =
     CreateWindow( _T("VLC DirectX video"), _T(""),   /* window class */
-        WS_CHILD | WS_VISIBLE,                   /* window style */
+        WS_CHILD,                   /* window style, not visible initially */
         0, 0,
         p_vout->render.i_width,         /* default width */
         p_vout->render.i_height,        /* default height */
@@ -551,9 +552,9 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         (LPVOID)p_vout );            /* send p_vout to WM_CREATE */
 
     if( !p_vout->p_sys->hvideownd )
-    msg_Warn( p_vout, "can't create video sub-window" );
+        msg_Warn( p_vout, "can't create video sub-window" );
     else
-    msg_Dbg( p_vout, "created video sub-window" );
+        msg_Dbg( p_vout, "created video sub-window" );
 
     /* Now display the window */
     ShowWindow( p_vout->p_sys->hwnd, SW_SHOW );
@@ -793,17 +794,38 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     {
         switch( message )
         {
+#ifdef MODULE_NAME_IS_vout_directx
         case WM_ERASEBKGND:
-            // erase the background only if a brush is set
-            return ( 0UL == GetClassLong( hwnd, GCL_HBRBACKGROUND) ) ?
+            /* For overlay, we need to erase background */
+            return !p_vout->p_sys->b_using_overlay ?
                 1 : DefWindowProc(hwnd, message, wParam, lParam);
         case WM_PAINT:
-            if( 0UL == GetClassLong( hwnd, GCL_HBRBACKGROUND) )
+        /*
+        ** For overlay, DefWindowProc() will erase dirty regions
+        ** with colorkey.
+        ** For non-overlay, vout will paint the whole window at 
+        ** regular interval, therefore dirty regions can be ignored
+        ** to minimize repaint.
+        */
+            if( !p_vout->p_sys->b_using_overlay )
             {
-                // vout paints the whole area, no need to repaint it
                 ValidateRect(hwnd, NULL);
             }
+            // fall through to default
+#else
+        /*
+        ** For OpenGL and Direct3D, vout will update the whole
+        ** window at regular interval, therefore dirty region
+        ** can be ignored to minimize repaint.
+        */
+        case WM_ERASEBKGND:
+            /* nothing to erase */
+            return 1;
+        case WM_PAINT:
+            /* nothing to repaint */
+            ValidateRect(hwnd, NULL);
             // fall through
+#endif 
         default:
             return DefWindowProc(hwnd, message, wParam, lParam);
         }
