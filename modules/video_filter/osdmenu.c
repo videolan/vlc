@@ -80,7 +80,7 @@ static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
 static subpicture_t *Filter( filter_t *, mtime_t );
 static int OSDMenuUpdateEvent( vlc_object_t *, char const *,
-                    vlc_value_t, vlc_value_t, void * );                    
+                    vlc_value_t, vlc_value_t, void * );
 static int OSDMenuVisibleEvent( vlc_object_t *, char const *,
                     vlc_value_t, vlc_value_t, void * );
 
