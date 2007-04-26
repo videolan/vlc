@@ -710,9 +710,6 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
         }
         stream_Delete( p_sub );
     }
-    // No longer need a HTML version of the text
-    free( p_region_in->psz_html );
-    p_region_in->psz_html = NULL;
 
     return rv;
 }
