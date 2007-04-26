@@ -251,7 +251,7 @@ static inline struct tm *localtime_r (const time_t *now, struct tm *res)
      * This is not thread-safe. Blame your C library.
      * On Win32 there SHOULD be _localtime_s instead, but of course
      * Cygwin and Mingw32 don't know about it. You're on your own if you
-     * this platform.
+     * use this platform.
      */
     if (unsafe == NULL)
         return NULL;
