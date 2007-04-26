@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Jean-Paul Saman <jpsaman at m2x dot nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,6 +48,9 @@ static int FakeCallback( vlc_object_t *, char const *,
 #define FILE_TEXT N_("Image file")
 #define FILE_LONGTEXT N_( \
     "Path of the image file for fake input." )
+#define RELOAD_TEXT N_("Reload image file")
+#define RELOAD_LONGTEXT N_( \
+    "Reload image file every n seconds." )
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
     "Output video width." )
@@ -85,6 +89,8 @@ vlc_module_begin();
 
     add_file( "fake-file", "", NULL, FILE_TEXT,
                 FILE_LONGTEXT, VLC_FALSE );
+    add_integer( "fake-file-reload", 0, NULL, RELOAD_TEXT,
+                RELOAD_LONGTEXT, VLC_FALSE );
     add_integer( "fake-width", 0, NULL, WIDTH_TEXT,
                  WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( "fake-height", 0, NULL, HEIGHT_TEXT,
@@ -107,6 +113,10 @@ struct decoder_sys_t
 {
     picture_t *p_image;
     vlc_mutex_t lock;
+
+    vlc_bool_t  b_reload;
+    mtime_t     i_reload;
+    mtime_t     i_next;
 };
 
 /*****************************************************************************
@@ -133,6 +143,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         return VLC_ENOMEM;
     }
+    memset( p_dec->p_sys, 0, sizeof( decoder_sys_t ) );
 
     psz_file = var_CreateGetNonEmptyStringCommand( p_dec, "fake-file" );
     if( !psz_file )
@@ -144,6 +155,15 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     memset( &fmt_in, 0, sizeof(fmt_in) );
     memset( &fmt_out, 0, sizeof(fmt_out) );
+
+    var_Create( p_dec, "fake-file-reload", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_dec, "fake-file-reload", &val );
+    if( val.i_int > 0)
+    {
+        p_dec->p_sys->b_reload = VLC_TRUE;
+        p_dec->p_sys->i_reload = (mtime_t)(val.i_int * 1000000);
+        p_dec->p_sys->i_next   = (mtime_t)(p_dec->p_sys->i_reload + mdate());
+    }
 
     psz_chroma = var_CreateGetString( p_dec, "fake-chroma" );
     if( strlen( psz_chroma ) != 4 )
@@ -313,6 +333,7 @@ static int OpenDecoder( vlc_object_t *p_this )
  ****************************************************************************/
 static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
+    decoder_sys_t *p_sys = (decoder_sys_t*) p_dec->p_sys;
     picture_t *p_pic;
 
     if( pp_block == NULL || !*pp_block ) return NULL;
@@ -323,6 +344,12 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         goto error;
     }
 
+    if( p_sys->b_reload && (mdate() >= p_sys->i_next) )
+    {
+        var_TriggerCallback( p_dec, "fake-file" );
+        /* next period */
+        p_sys->i_next = (mtime_t)(p_sys->i_reload + mdate());
+    }
     vlc_mutex_lock( &p_dec->p_sys->lock );
     vout_CopyPicture( p_dec, p_pic, p_dec->p_sys->p_image );
     vlc_mutex_unlock( &p_dec->p_sys->lock );

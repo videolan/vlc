@@ -164,6 +164,7 @@ VLC_EXPORT( int, __var_Command, ( vlc_object_t *, const char *, const char *, co
  *****************************************************************************/
 VLC_EXPORT( int, __var_AddCallback, ( vlc_object_t *, const char *, vlc_callback_t, void * ) );
 VLC_EXPORT( int, __var_DelCallback, ( vlc_object_t *, const char *, vlc_callback_t, void * ) );
+VLC_EXPORT( int, __var_TriggerCallback, ( vlc_object_t *, const char * ) );
 
 /**
  * __var_AddCallback() with automatic casting
@@ -174,6 +175,11 @@ VLC_EXPORT( int, __var_DelCallback, ( vlc_object_t *, const char *, vlc_callback
  * __var_DelCallback() with automatic casting
  */
 #define var_DelCallback(a,b,c,d) __var_DelCallback( VLC_OBJECT(a), b, c, d )
+
+/**
+ * __var_TriggerCallback() with automatic casting
+ */
+#define var_TriggerCallback(a,b) __var_TriggerCallback( VLC_OBJECT(a), b )
 
 /*****************************************************************************
  * helpers functions
