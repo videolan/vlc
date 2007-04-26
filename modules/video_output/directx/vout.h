@@ -125,13 +125,14 @@ struct vout_sys_t
 #ifdef MODULE_NAME_IS_direct3d
     // core objects
     HINSTANCE               hd3d9_dll;       /* handle of the opened d3d9 dll */
-    LPDIRECT3D9	            p_d3dobj;
-    LPDIRECT3DDEVICE9	    p_d3ddev;
-    D3DPRESENT_PARAMETERS   d3dpp;
+    LPDIRECT3D9             p_d3dobj;
+    LPDIRECT3DDEVICE9       p_d3ddev;
+    D3DFORMAT               bbFormat;
     // scene objects
     LPDIRECT3DTEXTURE9      p_d3dtex;
     LPDIRECT3DVERTEXBUFFER9 p_d3dvtc;
 #endif
+
     event_thread_t *p_event;
     vlc_mutex_t    lock;
 };
