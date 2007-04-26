@@ -2129,7 +2129,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
-        subpicture_t *p_subpic = 0;
+        subpicture_t *p_subpic = NULL;
         if( p_input )
             stats_UpdateInteger( p_input, p_input->p->counters.p_decoded_video,
                                  1, NULL );
@@ -2166,7 +2166,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
             /* Set the pts of the frame being encoded */
             p_pic->date = i_pts;
 
-            if( i_video_drift < i_master_drift - 50000 )
+            if( i_video_drift < (i_master_drift - 50000) )
             {
 #if 0
                 msg_Dbg( p_stream, "dropping frame (%i)",
@@ -2175,7 +2175,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 p_pic->pf_release( p_pic );
                 continue;
             }
-            else if( i_video_drift > i_master_drift + 50000 )
+            else if( i_video_drift > (i_master_drift + 50000) )
             {
 #if 0
                 msg_Dbg( p_stream, "adding frame (%i)",
@@ -2387,7 +2387,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
         /* Run user specified filter chain */
         for( i = 0; i < id->i_ufilter; i++ )
         {
-            p_pic = id->pp_ufilter[i]->pf_video_filter(id->pp_ufilter[i], p_pic);
+            p_pic = id->pp_ufilter[i]->pf_video_filter( id->pp_ufilter[i],
+                                                        p_pic );
         }
 
         if( p_sys->i_threads == 0 )
@@ -2413,8 +2414,8 @@ static int transcode_video_process( sout_stream_t *p_stream,
         if( p_sys->b_master_sync && i_duplicate > 1 )
         {
             mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
-            if ( p_pic->date - i_pts > MASTER_SYNC_MAX_DRIFT
-                  || p_pic->date - i_pts < -MASTER_SYNC_MAX_DRIFT )
+            if( (p_pic->date - i_pts > MASTER_SYNC_MAX_DRIFT)
+                 || ((p_pic->date - i_pts) < -MASTER_SYNC_MAX_DRIFT) )
             {
                 msg_Dbg( p_stream, "drift is too high, resetting master sync" );
                 date_Set( &id->interpolated_pts, p_pic->date );
