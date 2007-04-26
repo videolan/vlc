@@ -54,7 +54,7 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     buttonBox->addButton( gotoButton, QDialogButtonBox::AcceptRole );
     buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
-    QGroupBox *timeGroupBox = new QGroupBox( "Time" );
+    QGroupBox *timeGroupBox = new QGroupBox( qtr("Time") );
     QGridLayout *boxLayout = new QGridLayout( timeGroupBox );
 
     QLabel *timeIntro = new
@@ -73,7 +73,7 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     QSpacerItem *spacerBox = new QSpacerItem(20, 10, QSizePolicy::Minimum,
                                         QSizePolicy::Fixed);
 
-    QSpacerItem *spacerItem = new QSpacerItem(20, 5, QSizePolicy::Minimum,
+    QSpacerItem *spacerItem = new QSpacerItem(20, 3, QSizePolicy::Minimum,
                                         QSizePolicy::Expanding);
 
     boxLayout->addWidget( timeIntro, 0, 0, 1, 2 );
