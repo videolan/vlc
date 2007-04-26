@@ -47,6 +47,7 @@
 #include <QSlider>
 #include <QFileDialog>
 #include <QFontDialog>
+#include <QGroupBox>
 
 #include <vlc_keys.h>
 
@@ -226,6 +227,10 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
     label = new QLabel( qfu(p_item->psz_text) );
     text = new QLineEdit( qfu(p_item->value.psz) );
     browse = new QPushButton( qtr( "Browse..." ) );
+    QHBoxLayout *textAndButton = new QHBoxLayout();
+    textAndButton->setMargin( 0 );
+    textAndButton->addWidget( text, 2 );
+    textAndButton->addWidget( browse, 0 );
 
     BUTTONACT( browse, updateField() );
 
@@ -234,14 +239,14 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
     if( !l )
     {
         QHBoxLayout *layout = new QHBoxLayout();
-        layout->addWidget( label, 0 ); layout->addWidget( text, 1 );
-        layout->addWidget( browse, 2 );
+        layout->addWidget( label, 0 );
+        layout->addLayout( textAndButton, 1 );
         widget->setLayout( layout );
     }
     else
     {
-        l->addWidget( label, line, 0 ); l->addWidget( text, line, 1 );
-        l->addWidget( browse, line, 2 );
+        l->addWidget( label, line, 0 );
+        l->addLayout( textAndButton, line, 1 );
     }
 }
 
@@ -464,26 +469,30 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
                QGridLayout *l, int &line) :
                VStringConfigControl( _p_this, _p_item, _parent )
 {
-    label = new QLabel( qfu(p_item->psz_text) );
+    groupBox = new QGroupBox ( qfu(p_item->psz_text) );
     text = new QLineEdit();
+    QGridLayout *layoutGroupBox = new QGridLayout( groupBox );
+
     finish( bycat );
 
-    bool pom = false;
-    if( !l )
-    {
-        l = new QGridLayout();
-        line = 0;
-        pom = true;
-    }
+    int boxline = 0;
     for( QVector<QCheckBox*>::iterator it = modules.begin();
          it != modules.end(); it++ )
     {
-        l->addWidget( *it, line++, 1 );
+        layoutGroupBox->addWidget( *it, boxline++, 0 );
     }
-    l->addWidget( label, line, 0 );
-    l->addWidget( text, line, 1 );
-    if( pom )
-        widget->setLayout( l );
+    layoutGroupBox->addWidget( text, boxline, 0 );
+
+    if( !l )
+    {
+        QVBoxLayout *layout = new QVBoxLayout();
+        layout->addWidget( groupBox, line, 0 );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        l->addWidget( groupBox, line, 0, 1, -1 );
+    }
 }
 #if 0
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
@@ -503,7 +512,7 @@ ModuleListConfigControl::~ModuleListConfigControl()
     {
         delete *it;
     }
-    delete label;
+    delete groupBox;
     delete text;
 }
 
@@ -546,8 +555,8 @@ void ModuleListConfigControl::finish( bool bycat )
     }
     vlc_list_release( p_list );
     text->setToolTip( qfu(p_item->psz_longtext) );
-    if( label )
-        label->setToolTip( qfu(p_item->psz_longtext) );
+    if( groupBox )
+        groupBox->setToolTip( qfu(p_item->psz_longtext) );
 }
 
 QString ModuleListConfigControl::getValue()
@@ -562,8 +571,7 @@ void ModuleListConfigControl::hide()
     {
         (*it)->hide();
     }
-    text->hide();
-    label->hide();
+    groupBox->hide();
 }
 
 void ModuleListConfigControl::show()
@@ -573,8 +581,7 @@ void ModuleListConfigControl::show()
     {
         (*it)->show();
     }
-    text->show();
-    label->show();
+    groupBox->show();
 }
 
 
@@ -600,6 +607,7 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
 {
     label = new QLabel( qfu(p_item->psz_text) );
     spin = new QSpinBox; spin->setMinimumWidth( 80 );
+    spin->setAlignment( Qt::AlignRight );
     spin->setMaximumWidth( 90 );
     finish();
 
@@ -795,6 +803,7 @@ FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
     label = new QLabel( qfu(p_item->psz_text) );
     spin = new QDoubleSpinBox; spin->setMinimumWidth( 80 );
     spin->setMaximumWidth( 90 );
+    spin->setAlignment( Qt::AlignRight );
     finish();
 
     if( !l )

@@ -38,6 +38,7 @@
 #include <QLabel>
 #include <QFile>
 #include <QPushButton>
+#include <QGroupBox>
 
 #include "qt4.hpp"
 #include <assert.h>
@@ -342,7 +343,7 @@ public slots:
 private:
     void finish( bool );
     QVector<QCheckBox*> modules;
-    QLabel *label;
+    QGroupBox *groupBox;
     QLineEdit *text;
 };
 
