@@ -606,16 +606,23 @@ static void Run( intf_thread_t *p_intf )
             char *psz_myarg = strchr( psz_mycmd, ' ' );
             char *psz_msg;
 
-            *psz_myarg = '\0';
-            psz_myarg ++;
-
-            var_Command( p_input, psz_alias, psz_mycmd, psz_myarg, &psz_msg );
-
-
-            if( psz_msg )
+            if( !psz_myarg )
             {
-                msg_rc( psz_msg );
-                free( psz_msg );
+                msg_rc( "Not enough parameters." );
+            }
+            else
+            {
+                *psz_myarg = '\0';
+                psz_myarg ++;
+
+                var_Command( p_intf, psz_alias, psz_mycmd, psz_myarg,
+                             &psz_msg );
+
+                if( psz_msg )
+                {
+                    msg_rc( psz_msg );
+                    free( psz_msg );
+                }
             }
             free( psz_mycmd );
         }
