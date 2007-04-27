@@ -33,6 +33,8 @@ ExtendedDialog *ExtendedDialog::instance = NULL;
 
 ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
+    setWindowFlags( Qt::Tool );
+
     QHBoxLayout *l = new QHBoxLayout( this );
     QTabWidget *tab = new QTabWidget( this );
 
