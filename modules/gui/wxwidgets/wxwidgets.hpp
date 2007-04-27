@@ -91,7 +91,7 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
  * a wxString.
  *
  * Note that if you want to use non-ANSI code page characters on Windows,
- * you MUST build WxWidgets in “Unicode” mode.
+ * you MUST build WxWidgets in “Unicode” mode. wxConvUTF8
  */
 static inline char *wxFromLocale (const wxString& string)
 {
@@ -100,8 +100,8 @@ static inline char *wxFromLocale (const wxString& string)
     return FromWide ((const wchar_t *)string.c_str());
 #  define wxLocaleFree free
 # else
-    return FromLocale (string.mb_str());
-#  define wxLocaleFree LocaleFree
+    return FromLocaleDup (string.mb_str());
+#  define wxLocaleFree free
 # endif
 #else
 # warning Please use WxWidgets with Unicode.
