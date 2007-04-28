@@ -375,6 +375,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         }
     }
 
+    /* Widgets now */
     global_layout = new QVBoxLayout();
     global_layout->setMargin( 2 );
     QString head;
@@ -397,15 +398,22 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         }
     }
 
-    QLabel *label = new QLabel( head );
-    global_layout->addWidget( label );
-    QFont myFont = QApplication::font( static_cast<QWidget*>(0) );
-    myFont.setPointSize( myFont.pointSize() + 3 ); myFont.setBold( true );
-    label->setFont( myFont );
+    QLabel *titleLabel = new QLabel( head );
+    QFont titleFont = QApplication::font( static_cast<QWidget*>(0) );
+    titleFont.setPointSize( titleFont.pointSize() + 6 );
+    titleFont.setFamily( "Verdana" );
+    titleLabel->setFont( titleFont );
+
+    // Title <hr>
+    QFrame *title_line = new QFrame;
+    title_line->setFrameShape(QFrame::HLine);
+    title_line->setFrameShadow(QFrame::Sunken);
 
     QLabel *helpLabel = new QLabel( help, this );
     helpLabel->setWordWrap( true );
 
+    global_layout->addWidget( titleLabel );
+    global_layout->addWidget( title_line );
     global_layout->addWidget( helpLabel );
 
     QGroupBox *box = NULL;
