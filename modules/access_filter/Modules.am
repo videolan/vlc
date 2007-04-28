@@ -1,3 +1,4 @@
 SOURCES_access_filter_timeshift = timeshift.c
 SOURCES_access_filter_record = record.c
 SOURCES_access_filter_dump = dump.c
+SOURCES_access_filter_bandwidth = bandwidth.c
