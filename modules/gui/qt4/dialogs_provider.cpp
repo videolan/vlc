@@ -272,6 +272,9 @@ void DialogsProvider::simpleOpenDialog()
     addFromSimple( true, true );
 }
 
+/****************
+ * Playlist     *
+ ****************/
 void DialogsProvider::openPlaylist()
 {
     QStringList files = showSimpleOpen( qtr( "Open playlist file" ),
@@ -464,6 +467,11 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
         p_dialog->i_status = DESTROYED_DIALOG;
         break;
     }
+}
+
+void DialogsProvider::hideMenus()
+{
+    /* TODO */
 }
 
 void DialogsProvider::switchToSkins()

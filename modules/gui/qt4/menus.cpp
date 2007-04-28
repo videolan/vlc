@@ -240,6 +240,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     DP_SADD( qtr(I_MENU_MSG), "", "", messagesDialog(), "Ctrl+M" );
     DP_SADD( qtr(I_MENU_INFO) , "", "", mediaInfoDialog(), "Ctrl+J" );
     DP_SADD( qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog(), "Ctrl+I" );
+    DP_SADD( qtr(I_MENU_GOTOTIME), "","",gotoTimeDialog(), "Ctrl+T" );
     menu->addSeparator();
     if( mi )
     {
@@ -253,9 +254,10 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         adv->setCheckable( true );
         if( visual_selector_enabled ) adv->setChecked( true );
 #endif
+        menu->addAction ( qtr( "Playlist"), mi, SLOT( playlist() ) );
     }
     DP_SADD( qtr(I_MENU_EXT), "","",extendedDialog(), "Ctrl+E" );
-    DP_SADD( qtr(I_MENU_GOTOTIME), "","",gotoTimeDialog(), "Ctrl+T" );
+    DP_SADD( qtr("Hide Menus..."), "","",hideMenus(), "Ctrl+H" );
     menu->addSeparator();
     DP_SADD( qtr("Preferences"), "", "", prefsDialog(), "Ctrl+P" );
     return menu;

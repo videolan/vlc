@@ -154,6 +154,7 @@ public slots:
     void PLAppendDir();
     void MLAppendDir();
     void quit();
+    void hideMenus();
     void switchToSkins();
     void gotoTimeDialog();
     void helpDialog();

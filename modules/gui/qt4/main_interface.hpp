@@ -105,6 +105,7 @@ private:
     void customEvent( QEvent *);
 public slots:
     void undockPlaylist();
+    void playlist();
 private slots:
     void setNavigation( int );
     void setStatus( int );
@@ -115,7 +116,6 @@ private slots:
     void stop();
     void prev();
     void next();
-    void playlist();
     void visual();
     void advanced();
     void updateVolume( int sliderVolume );
