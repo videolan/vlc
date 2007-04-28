@@ -93,19 +93,105 @@ static int StoreString( demux_t *p_demux, char **ppsz_string,
     return VLC_SUCCESS;
 }
 
+static char *SkipBlanks(char *s, size_t i_strlen )
+{
+    while( i_strlen > 0 ) {
+        switch( *s )
+        {
+            case ' ':
+            case '\t':
+            case '\r':
+            case '\n':
+                --i_strlen;
+                ++s;
+                break;
+            default:
+                i_strlen = 0;
+        }
+    }
+    return s;
+}
+
+static int ParseTime(char *s, size_t i_strlen)
+{
+    // need to parse hour:minutes:sec.fraction string
+    int result = 0;
+    int val;
+    const char *end = s + i_strlen;
+    // skip leading spaces if any
+    s = SkipBlanks(s, i_strlen);
+
+    val = 0;
+    while( (s < end) && isdigit(*s) )
+    {
+        int newval = val*10 + (*s - '0');
+        if( newval < val )
+        {
+            // overflow
+            val = 0;
+            break;
+        }
+        val = newval;
+        ++s;
+    }
+    result = val;
+    s = SkipBlanks(s, end-s);
+    if( *s == ':' )
+    {
+        ++s;
+        s = SkipBlanks(s, end-s);
+        result = result * 60;
+        val = 0;
+        while( (s < end) && isdigit(*s) )
+        {
+            int newval = val*10 + (*s - '0');
+            if( newval < val )
+            {
+                // overflow
+                val = 0;
+                break;
+            }
+            val = newval;
+            ++s;
+        }
+        result += val;
+        s = SkipBlanks(s, end-s);
+        if( *s == ':' )
+        {
+            ++s;
+            s = SkipBlanks(s, end-s);
+            result = result * 60;
+            val = 0;
+            while( (s < end) && isdigit(*s) )
+            {
+                int newval = val*10 + (*s - '0');
+                if( newval < val )
+                {
+                    // overflow
+                    val = 0;
+                    break;
+                }
+                val = newval;
+                ++s;
+            }
+            result += val;
+            // TODO: one day, we may need to parse fraction for sub-second resolution
+        }
+    }
+    return result;
+}
+
 /*****************************************************************************
  * Import_ASX: main import function
  *****************************************************************************/
 int E_(Import_ASX)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    uint8_t *p_peek, *p_peek_stop;
+    uint8_t *p_peek;
     CHECK_PEEK( p_peek, 10 );
 
-    p_peek_stop = p_peek+6;
-
-    // skip over possible leading empty lines
-    while( (p_peek < p_peek_stop) && (*p_peek == '\n' || *p_peek == '\r')) ++p_peek;
+    // skip over possible leading empty lines and empty spaces
+    p_peek = (uint8_t *)SkipBlanks((char *)p_peek, 6);
 
     if( POKE( p_peek, "<asx", 4 ) || isExtension( p_demux, ".asx" ) ||
         isExtension( p_demux, ".wax" ) || isExtension( p_demux, ".wvx" ) ||
@@ -193,6 +279,10 @@ static int Demux( demux_t *p_demux )
         char *psz_abstract_entry = NULL;
         int i_entry_count = 0;
 
+        char *psz_href = NULL;
+        int i_starttime = 0;
+        int i_duration = 0;
+
         psz_parse = strcasestr( psz_parse, ">" );
 
         while( psz_parse && ( psz_parse = strcasestr( psz_parse, "<" ) ) )
@@ -207,7 +297,7 @@ static int Demux( demux_t *p_demux )
             else if( !strncasecmp( psz_parse, "<PARAM ", 7 ) )
             {
                 vlc_bool_t b_encoding_flag = VLC_FALSE;
-                psz_parse+=7;
+                psz_parse = SkipBlanks(psz_parse+7, (unsigned)-1);
                 if( !strncasecmp( psz_parse, "name", 4 ) )
                 {
                     if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
@@ -273,7 +363,7 @@ static int Demux( demux_t *p_demux )
             }
             else if( !strncasecmp( psz_parse, "<BASE ", 6 ) )
             {
-                psz_parse+=6;
+                psz_parse = SkipBlanks(psz_parse+6, (unsigned)-1);
                 if( !strncasecmp( psz_parse, "HREF", 4 ) )
                 {
                     if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
@@ -323,7 +413,7 @@ static int Demux( demux_t *p_demux )
             }
             else if( !strncasecmp( psz_parse, "<MoreInfo ", 10 ) )
             {
-                psz_parse+=10;
+                psz_parse = SkipBlanks(psz_parse+10, (unsigned)-1);
                 if( !strncasecmp( psz_parse, "HREF", 4 ) )
                 {
                     if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
@@ -353,7 +443,7 @@ static int Demux( demux_t *p_demux )
             }
             else if( !strncasecmp( psz_parse, "<EntryRef ", 10 ) )
             {
-                psz_parse+=10;
+                psz_parse = SkipBlanks(psz_parse+10, (unsigned)-1);
                 if( !strncasecmp( psz_parse, "HREF", 4 ) )
                 {
                     if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
@@ -385,6 +475,12 @@ static int Demux( demux_t *p_demux )
             }
             else if( !strncasecmp( psz_parse, "</Entry>", 8 ) )
             {
+                input_item_t *p_entry = NULL;
+                char *psz_name = NULL;
+
+                char * ppsz_options[2];
+                int i_options = 0;
+
                 /* add a new entry */
                 psz_parse+=8;
                 if( !b_entry )
@@ -392,7 +488,50 @@ static int Demux( demux_t *p_demux )
                     msg_Err( p_demux, "end of entry without start?" );
                     continue;
                 }
+
+                if( !psz_href )
+                {
+                    msg_Err( p_demux, "entry without href?" );
+                    continue;
+                }
+
+                if( i_starttime || i_duration )
+                {
+                    if( i_starttime ) {
+                        asprintf(ppsz_options+i_options, ":start-time=%d", i_starttime);
+                        ++i_options;
+                    }
+                    if( i_duration ) {
+                        asprintf(ppsz_options+i_options, ":stop-time=%d", i_starttime + i_duration);
+                        ++i_options;
+                    }
+                }
+
+                /* create the new entry */
+                asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : p_current->p_input->psz_name ) );
+
+                p_entry = input_ItemNewExt( p_playlist, psz_href, psz_name, i_options, (const char * const *)ppsz_options, -1 );
+                FREENULL( psz_name );
+                input_ItemCopyOptions( p_current->p_input, p_entry );
+                while( i_options )
+                {
+		    psz_name = ppsz_options[--i_options];
+                    FREENULL(psz_name);
+                }
+
+                p_entry->p_meta = vlc_meta_New();
+                if( psz_title_entry ) vlc_meta_SetTitle( p_entry->p_meta, psz_title_entry );
+                if( psz_artist_entry ) vlc_meta_SetArtist( p_entry->p_meta, psz_artist_entry );
+                if( psz_copyright_entry ) vlc_meta_SetCopyright( p_entry->p_meta, psz_copyright_entry );
+                if( psz_moreinfo_entry ) vlc_meta_SetURL( p_entry->p_meta, psz_moreinfo_entry );
+                if( psz_abstract_entry ) vlc_meta_SetDescription( p_entry->p_meta, psz_abstract_entry );
+                playlist_BothAddInput( p_playlist, p_entry,
+                                     p_item_in_category,
+                                     PLAYLIST_APPEND | PLAYLIST_SPREPARSE
+                                     , PLAYLIST_END, NULL, NULL,
+                                     VLC_FALSE );
                 /* cleanup entry */
+                FREENULL( psz_href )
                 FREENULL( psz_title_entry )
                 FREENULL( psz_base_entry )
                 FREENULL( psz_artist_entry )
@@ -412,10 +551,16 @@ static int Demux( demux_t *p_demux )
                 i_entry_count += 1;
                 b_entry = VLC_TRUE;
                 psz_parse = strcasestr( psz_parse, ">" );
+
+                // init entry details
+                FREENULL(psz_href);
+                psz_href = NULL;
+                i_starttime = 0;
+                i_duration = 0;
             }
             else if( !strncasecmp( psz_parse, "<Ref ", 5 ) )
             {
-                psz_parse+=5;
+                psz_parse = SkipBlanks(psz_parse+5, (unsigned)-1);
                 if( !b_entry )
                 {
                     msg_Err( p_demux, "A ref outside an entry section" );
@@ -429,32 +574,71 @@ static int Demux( demux_t *p_demux )
                         psz_backup = ++psz_parse;
                         if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
                         {
-                            input_item_t *p_entry = NULL;
-                            char *psz_name = NULL;
                             i_strlen = psz_parse-psz_backup;
                             if( i_strlen < 1 ) continue;
-                            psz_string = malloc( i_strlen*sizeof( char ) +1);
-                            memcpy( psz_string, psz_backup, i_strlen );
-                            psz_string[i_strlen] = '\0';
 
-                            /* create the new entry */
-                            asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : p_current->p_input->psz_name ) );
-                            p_entry = input_ItemNew( p_playlist, psz_string, psz_name );
-                            FREENULL( psz_name );
+                            FREENULL(psz_href);
+                            psz_href = malloc( i_strlen*sizeof( char ) +1);
+                            memcpy( psz_href, psz_backup, i_strlen );
+                            psz_href[i_strlen] = '\0';
+                        }
+                        else continue;
+                    }
+                    else continue;
+                }
+                if( ( psz_parse = strcasestr( psz_parse, ">" ) ) )
+                    psz_parse++;
+                else continue;
+            }
+            else if( !strncasecmp( psz_parse, "<starttime ", 11 ) )
+            {
+                psz_parse = SkipBlanks(psz_parse+11, (unsigned)-1);
+                if( !b_entry )
+                {
+                    msg_Err( p_demux, "starttime outside an entry section" );
+                    continue;
+                }
 
-                            input_ItemCopyOptions( p_current->p_input, p_entry );
-                            p_entry->p_meta = vlc_meta_New();
-                            if( psz_title_entry ) vlc_meta_SetTitle( p_entry->p_meta, psz_title_entry );
-                            if( psz_artist_entry ) vlc_meta_SetArtist( p_entry->p_meta, psz_artist_entry );
-                            if( psz_copyright_entry ) vlc_meta_SetCopyright( p_entry->p_meta, psz_copyright_entry );
-                            if( psz_moreinfo_entry ) vlc_meta_SetURL( p_entry->p_meta, psz_moreinfo_entry );
-                            if( psz_abstract_entry ) vlc_meta_SetDescription( p_entry->p_meta, psz_abstract_entry );
-                            playlist_BothAddInput( p_playlist, p_entry,
-                                                 p_item_in_category,
-                                                 PLAYLIST_APPEND | PLAYLIST_SPREPARSE
-                                                 , PLAYLIST_END, NULL, NULL,
-                                                 VLC_FALSE );
-                            free( psz_string );
+                if( !strncasecmp( psz_parse, "value", 5 ) )
+                {
+                    if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
+                    {
+                        psz_backup = ++psz_parse;
+                        if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
+                        {
+                            i_strlen = psz_parse-psz_backup;
+                            if( i_strlen < 1 ) continue;
+
+                            i_starttime = ParseTime(psz_backup, i_strlen);
+                        }
+                        else continue;
+                    }
+                    else continue;
+                }
+                if( ( psz_parse = strcasestr( psz_parse, ">" ) ) )
+                    psz_parse++;
+                else continue;
+            }
+            else if( !strncasecmp( psz_parse, "<duration ", 11 ) )
+            {
+                psz_parse = SkipBlanks(psz_parse+5, (unsigned)-1);
+                if( !b_entry )
+                {
+                    msg_Err( p_demux, "duration outside an entry section" );
+                    continue;
+                }
+
+                if( !strncasecmp( psz_parse, "value", 5 ) )
+                {
+                    if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
+                    {
+                        psz_backup = ++psz_parse;
+                        if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
+                        {
+                            i_strlen = psz_parse-psz_backup;
+                            if( i_strlen < 1 ) continue;
+
+                            i_duration = ParseTime(psz_backup, i_strlen);
                         }
                         else continue;
                     }
@@ -489,10 +673,8 @@ static int Demux( demux_t *p_demux )
             PARAM
             EVENT
             REPEAT
-            DURATION
             ENDMARK
             STARTMARK
-            STARTTIME
 #endif
     }
     HANDLE_PLAY_AND_RELEASE;
