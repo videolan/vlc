@@ -33,15 +33,14 @@
 #include "util/qvlcframe.hpp"
 
 #include "input_manager.hpp"
-#include "dialogs_provider.hpp"
 
 OpenDialog *OpenDialog::instance = NULL;
 
 OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
-                        bool _stream_after ) :  QVLCDialog( parent, _p_intf )
+                        int _action_flag )  :  QVLCDialog( parent, _p_intf )
 {
     setModal( modal );
-    b_stream_after = _stream_after;
+    i_action_flag = _action_flag;
 
     ui.setupUi( this );
     setWindowTitle( qtr("Open" ) );
@@ -68,13 +67,12 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     buttonSizePolicy.setHorizontalStretch(0);
     buttonSizePolicy.setVerticalStretch(0);
 
-    playButton = new QToolButton();
+    playButton = new QToolButton( this );
     playButton->setText( qtr( "&Play" ) );
     playButton->setSizePolicy( buttonSizePolicy );
     playButton->setMinimumSize( QSize(90, 0) );
     playButton->setPopupMode( QToolButton::MenuButtonPopup );
     playButton->setToolButtonStyle( Qt::ToolButtonTextOnly );
-    playButton->setAutoRaise( false );
 
     cancelButton = new QToolButton();
     cancelButton->setText( qtr( "&Cancel" ) );
@@ -87,12 +85,13 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
                                     QKeySequence( "Alt+P" ) );
     openButtonMenu->addAction( qtr("&Stream"), this, SLOT( stream() ) ,
                                     QKeySequence( "Alt+S" ) );
+    openButtonMenu->addAction( qtr("&Convert"), this, SLOT( transcode( ) ) ,
+                                    QKeySequence( "Alt+C" ) );
 
     playButton->setMenu( openButtonMenu );
 
     ui.buttonsBox->addButton( playButton, QDialogButtonBox::AcceptRole );
     ui.buttonsBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
-
 
     /* Force MRL update on tab change */
     CONNECT( ui.Tab, currentChanged(int), this, signalCurrent());
@@ -101,26 +100,29 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     CONNECT( netOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
     CONNECT( discOpenPanel, mrlUpdated( QString ), this, updateMRL(QString) );
     CONNECT( captureOpenPanel, mrlUpdated( QString ), this,
-            updateMRL(QString) );
+                                                         updateMRL(QString) );
 
     CONNECT( fileOpenPanel, methodChanged( QString ),
-             this, newMethod(QString) );
+                                                 this, newMethod(QString) );
     CONNECT( netOpenPanel, methodChanged( QString ),
-             this, newMethod(QString) );
+                                                 this, newMethod(QString) );
     CONNECT( discOpenPanel, methodChanged( QString ),
-             this, newMethod(QString) );
+                                                 this, newMethod(QString) );
+    /* FIXME CAPTURE */
 
+    /* Advanced frame Connects */
     CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());
     CONNECT( ui.cacheSpinBox, valueChanged(int), this, updateMRL());
     CONNECT( ui.startTimeSpinBox, valueChanged(int), this, updateMRL());
+    BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
 
     /* Buttons action */
     BUTTONACT( playButton, play());
     BUTTONACT( cancelButton, cancel());
 
-    if ( b_stream_after ) setAfter();
+    /* At creation time, modify the default buttons */
+    if ( i_action_flag ) setMenuAction();
 
-    BUTTONACT( ui.advancedCheckBox , toggleAdvancedPanel() );
 
     /* Initialize caching */
     storedMethod = "";
@@ -133,18 +135,24 @@ OpenDialog::~OpenDialog()
 {
 }
 
-void OpenDialog::setAfter()
+/* Finish the dialog and decide if you open another one after */
+void OpenDialog::setMenuAction()
 {
-    if (!b_stream_after )
+    switch ( i_action_flag )
     {
-        playButton->setText( qtr("&Play") );
-        BUTTONACT( playButton, play() );
-    }
-    else
-    {
-        playButton->setText( qtr("&Stream") );
-        BUTTONACT( playButton, stream() );
-    }
+        case OPEN_AND_STREAM:
+            playButton->setText( qtr("&Stream") );
+            BUTTONACT( playButton, stream() );
+            break;
+        case OPEN_AND_SAVE:
+            playButton->setText( qtr("&Convert / Save") );
+            BUTTONACT( playButton, stream( true ) );
+            break;
+        case OPEN_AND_PLAY:
+        default:
+            playButton->setText( qtr("&Play") );
+            BUTTONACT( playButton, play() );
+   }
 }
 
 void OpenDialog::showTab(int i_tab=0)
@@ -159,7 +167,7 @@ void OpenDialog::signalCurrent() {
     }
 }
 
-/*********** 
+/***********
  * Actions *
  ***********/
 
@@ -175,7 +183,8 @@ void OpenDialog::cancel()
 /* If EnterKey is pressed */
 void OpenDialog::close()
 {
-    if ( !b_stream_after )
+    /* FIXME */
+    if ( !i_action_flag )
     {
         play();
     }
@@ -188,22 +197,27 @@ void OpenDialog::close()
 /* Play button */
 void OpenDialog::play()
 {
-    playOrEnqueue( false );
+    finish( false );
 }
 
 void OpenDialog::enqueue()
 {
-    playOrEnqueue( true );
+    finish( true );
 }
 
-void OpenDialog::stream()
+void OpenDialog::transcode()
+{
+    stream( true );
+}
+
+void OpenDialog::stream( bool b_transcode_only )
 {
     /* not finished FIXME */
-    THEDP->streamingDialog( mrl );
+    /* Should go through the finish function */
+    THEDP->streamingDialog( mrl, b_transcode_only );
 }
 
-
-void OpenDialog::playOrEnqueue( bool b_enqueue = false )
+void OpenDialog::finish( bool b_enqueue = false )
 {
     this->toggleVisible();
     mrl = ui.advancedLineInput->text();

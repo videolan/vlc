@@ -350,9 +350,10 @@ void DialogsProvider::MLAppendDir()
  * Sout emulation
  ****************************************************************************/
 
-void DialogsProvider::streamingDialog( QString mrl)
+void DialogsProvider::streamingDialog( QString mrl, bool b_transcode_only )
 {
-    SoutDialog *s = new SoutDialog( p_intf->p_sys->p_mi, p_intf );
+    SoutDialog *s = new SoutDialog( p_intf->p_sys->p_mi, p_intf,
+                                                    b_transcode_only );
     if( s->exec() == QDialog::Accepted )
     {
         msg_Err(p_intf, "mrl %s\n", qta(s->mrl));
@@ -370,7 +371,14 @@ void DialogsProvider::streamingDialog( QString mrl)
 
 void DialogsProvider::openThenStreamingDialogs()
 {
-    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, true )->showTab( 0 );
+    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, OPEN_AND_STREAM )
+                                ->showTab( 0 );
+}
+
+void DialogsProvider::openThenTranscodingDialogs()
+{
+    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, OPEN_AND_SAVE )
+                                ->showTab( 0 );
 }
 /*
 void DialogsProvider::streamingDialog()

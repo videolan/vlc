@@ -73,6 +73,10 @@
 #define OPEN_NETWORK_TAB        0x2
 #define OPEN_CAPTURE_TAB        0x3
 
+#define OPEN_AND_PLAY           0x0
+#define OPEN_AND_STREAM         0x1
+#define OPEN_AND_SAVE           0x2
+
 class QEvent;
 class QSignalMapper;
 class QVLCMenu;
@@ -140,8 +144,9 @@ public slots:
     void menuAction( QObject *);
     void menuUpdateAction( QObject *);
     void SDMenuAction( QString );
-    void streamingDialog( QString mrl = "");
+    void streamingDialog( QString mrl = "", bool b_stream = true );
     void openThenStreamingDialogs();
+    void openThenTranscodingDialogs();
     void openPlaylist();
     void savePlaylist();
     void PLAppendDir();

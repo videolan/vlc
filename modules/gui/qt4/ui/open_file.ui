@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>435</width>
-    <height>249</height>
+    <width>436</width>
+    <height>194</height>
    </rect>
   </property>
   <property name="sizePolicy" >
    <sizepolicy>
     <hsizetype>7</hsizetype>
-    <vsizetype>3</vsizetype>
+    <vsizetype>1</vsizetype>
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -62,19 +62,6 @@
    <item row="0" column="0" colspan="3" >
     <widget class="QWidget" native="1" name="tempWidget" />
    </item>
-   <item row="5" column="0" colspan="3" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>200</width>
-       <height>2</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="2" column="2" >
     <spacer>
      <property name="orientation" >
@@ -86,7 +73,7 @@
      <property name="sizeHint" >
       <size>
        <width>273</width>
-       <height>16</height>
+       <height>14</height>
       </size>
      </property>
     </spacer>
@@ -227,6 +214,22 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item row="5" column="0" colspan="3" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::MinimumExpanding</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>200</width>
+       <height>2</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

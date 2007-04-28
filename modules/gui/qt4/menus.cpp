@@ -179,18 +179,18 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
 #ifndef WIN32 
     pthread_sigmask (SIG_BLOCK, &set, NULL);
 #endif
-    BAR_ADD( FileMenu(), qtr("Media") );
+    BAR_ADD( FileMenu(), qtr("&Media") );
     if( playlist )
     {
-        BAR_ADD( PlaylistMenu( mi,p_intf ), qtr("Playlist" ) );
+        BAR_ADD( PlaylistMenu( mi,p_intf ), qtr("&Playlist" ) );
     }
     BAR_ADD( ToolsMenu( p_intf, mi, adv_controls_enabled,
-                        visual_selector_enabled ), qtr("Tools") );
-    BAR_DADD( VideoMenu( p_intf, NULL ), qtr("Video"), 1 );
-    BAR_DADD( AudioMenu( p_intf, NULL ), qtr("Audio"), 2 );
-    BAR_DADD( NavigMenu( p_intf, NULL ), qtr("Navigation"), 3 );
+                        visual_selector_enabled ), qtr("&Tools") );
+    BAR_DADD( VideoMenu( p_intf, NULL ), qtr("&Video"), 1 );
+    BAR_DADD( AudioMenu( p_intf, NULL ), qtr("&Audio"), 2 );
+    BAR_DADD( NavigMenu( p_intf, NULL ), qtr("&Navigation"), 3 );
 
-    BAR_ADD( HelpMenu(), qtr("Help" ) );
+    BAR_ADD( HelpMenu(), qtr("&Help" ) );
 }
 QMenu *QVLCMenu::FileMenu()
 {
@@ -203,6 +203,8 @@ QMenu *QVLCMenu::FileMenu()
     menu->addSeparator();
     DP_SADD( qtr("&Streaming..."), "", "", openThenStreamingDialogs(), 
             "Ctrl+S" );
+    DP_SADD( qtr("Conve&rt / Save..."), "", "", openThenTranscodingDialogs(), 
+            "Ctrl+R" );
     menu->addSeparator();
     DP_SADD( qtr("&Quit") , "", "", quit(), "Ctrl+Q");
     return menu;
@@ -392,7 +394,7 @@ QMenu *QVLCMenu::HelpMenu()
     QMenu *menu = new QMenu();
     DP_SADD( qtr("Help") , "", "", helpDialog(), "F1" );
     menu->addSeparator();
-    DP_SADD( qtr(I_MENU_ABOUT), "", "", aboutDialog(), "Ctrl+Shift+F1");
+    DP_SADD( qtr(I_MENU_ABOUT), "", "", aboutDialog(), "Ctrl+F1");
     return menu;
 }
 

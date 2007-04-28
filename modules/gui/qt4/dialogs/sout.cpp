@@ -27,13 +27,14 @@
 
 #include <QFileDialog>
 
-SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf ) :
-                                                QVLCDialog( parent,  _p_intf )
+SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
+                     bool _transcode_only ) : QVLCDialog( parent,  _p_intf )
 {
     setWindowTitle( qtr( "Stream output") );
-    setModal( true );
+
     /* UI stuff */
     ui.setupUi( this );
+
 #define ADD_VCODEC( name, fcc) ui.vCodec->addItem( name, QVariant( fcc ) );
     ADD_VCODEC( "MPEG-1", "mp1v" );
     ADD_VCODEC( "MPEG-2", "mp2v" );
@@ -101,6 +102,8 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf ) :
 
     BUTTONACT( okButton, ok());
     BUTTONACT( cancelButton, cancel());
+
+    if( _transcode_only ) toggleSout();
 }
 
 void SoutDialog::fileBrowse()
@@ -122,6 +125,7 @@ void SoutDialog::toggleSout()
  TGV( ui.HTTPLabel ) ; TGV( ui.UDPLabel ) ; TGV( ui.MMSHLabel ) ;
  TGV( ui.HTTPPortLabel ) ; TGV( ui.UDPPortLabel ) ; TGV( ui.MMSHPortLabel ) ;
  TGV( ui.HTTPPort ) ; TGV( ui.UDPPort ) ; TGV( ui.MMSHPort ) ;
+ updateGeometry();
 }
 
 void SoutDialog::ok()

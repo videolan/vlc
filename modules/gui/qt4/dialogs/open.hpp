@@ -30,6 +30,8 @@
 #include "util/qvlcframe.hpp"
 #include "components/open.hpp"
 
+#include "dialogs_provider.hpp"
+
 #include <QTabWidget>
 #include <QBoxLayout>
 #include <QString>
@@ -41,19 +43,19 @@ class OpenDialog : public QVLCDialog
     Q_OBJECT;
 public:
     static OpenDialog * getInstance( QWidget *parent, intf_thread_t *p_intf,
-                                        bool _stream_after = false )
+                 int _action_flag = 0 )
     {
         if( !instance)
-            instance = new OpenDialog( parent, p_intf, false, _stream_after );
+            instance = new OpenDialog( parent, p_intf, false, _action_flag );
         else
         {
-            instance->b_stream_after = _stream_after;
-            instance->setAfter();
+            instance->i_action_flag = _action_flag;
+            instance->setMenuAction();
         }
         return instance;
     }
-    OpenDialog( QWidget *parent, intf_thread_t *, bool modal, 
-            bool stream_after = false);
+    OpenDialog( QWidget *parent, intf_thread_t *, bool modal,
+                int _action_flag = 0 );
     virtual ~OpenDialog();
 
     void showTab( int );
@@ -63,8 +65,9 @@ public:
 
 public slots:
     void play();
-    void stream();
+    void stream( bool b_transode_only = false );
     void enqueue();
+    void transcode();
 private:
     static OpenDialog *instance;
     input_thread_t *p_input;
@@ -78,15 +81,15 @@ private:
     QString storedMethod;
     QString mrlSub;
     int advHeight, mainHeight;
-    bool b_stream_after;
+    int i_action_flag;
     QStringList SeparateEntries( QString );
-    
+
     QToolButton *cancelButton;
     QToolButton *playButton;
-    void playOrEnqueue( bool );
+    void finish( bool );
 
 private slots:
-    void setAfter();
+    void setMenuAction();
     void cancel();
     void close();
     void toggleAdvancedPanel();
