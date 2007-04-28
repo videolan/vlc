@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Messages.hpp : Information about a stream
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2007 the VideoLAN team
  * $Id: Messages.hpp 16024 2006-07-13 13:51:05Z xtophe $
  *
  * Authors: Jean-Baptiste Kempf <jb (at) videolan.org>
@@ -18,7 +18,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. *****************************************************************************/
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. 
+ *****************************************************************************/
 
 #ifndef _MESSAGES_DIALOG_H_
 #define _MESSAGES_DIALOG_H_

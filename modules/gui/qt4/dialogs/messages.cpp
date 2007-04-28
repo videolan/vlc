@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Messages.cpp : Information about an item
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2007 the VideoLAN team
  * $Id: Messages.cpp 16024 2006-07-13 13:51:05Z xtophe $
  *
  * Authors: Jean-Baptiste Kempf <jb (at) videolan.org>

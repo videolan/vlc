@@ -910,7 +910,6 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     PLModel *p_model = (PLModel *) param;
     PLEvent *event = new PLEvent( PLUpdate_Type, 0 );
     QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
-    printf( "blabla" );
     return VLC_SUCCESS;
 }
 
@@ -922,7 +921,6 @@ static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
     QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
     event = new PLEvent( ItemUpdate_Type, nval.i_int );
     QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
-    printf( "blabla" );
     return VLC_SUCCESS;
 }
 
@@ -932,7 +930,6 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
     PLModel *p_model = (PLModel *) param;
     PLEvent *event = new PLEvent( ItemUpdate_Type, nval.i_int );
     QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
-    printf( "blabla" );
     return VLC_SUCCESS;
 }
 
@@ -942,7 +939,6 @@ static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
     PLModel *p_model = (PLModel *) param;
     PLEvent *event = new PLEvent( ItemDelete_Type, nval.i_int );
     QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
-    printf( "blabla" );
     return VLC_SUCCESS;
 }
 
@@ -960,6 +956,5 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
     }
     PLEvent *event = new PLEvent(  p_add );
     QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
-    printf( "blabla" );
     return VLC_SUCCESS;
 }
