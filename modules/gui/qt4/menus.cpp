@@ -440,9 +440,23 @@ QMenu *QVLCMenu::HelpMenu()
     intfmenu->setTitle( qtr("Interfaces" ) ); \
     menu->addMenu( intfmenu ); \
     \
-    QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, false ); \
+    QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, false, false ); \
     toolsmenu->setTitle( qtr("Tools" ) ); \
     menu->addMenu( toolsmenu ); \
+    \
+    QMenu *openmenu = new QMenu( qtr("Open") ); \
+    openmenu->addAction( qtr("Open &File..." ), THEDP, SLOT( openFileDialog() ) ); \
+    openmenu->addAction( qtr("Open &Disc..." ), THEDP, SLOT( openDiscDialog() ) ); \
+    openmenu->addAction( qtr("Open &Network..." ), THEDP, SLOT( openNetDialog() ) ); \
+    openmenu->addAction( qtr("Open &Capture Device..." ), THEDP, \
+            SLOT( openCaptureDialog() ) ); \
+    menu->addMenu( openmenu ); \
+    \
+    menu->addSeparator(); \
+    QMenu *helpmenu = HelpMenu(); \
+    helpmenu->setTitle( qtr("Help") ); \
+    menu->addMenu( helpmenu ); \
+    \
     DP_SADD( qtr("Quit"), "", "", quit() , "Ctrl+Q" );
 
 void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
@@ -513,55 +527,55 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 {
     if( show )
     {
-	// create a  popup if there is none
+    // create a  popup if there is none
         if( ! p_intf->p_sys->p_popup_menu )
-	{
-	    POPUP_BOILERPLATE;
-	    if( p_input )
-	    {
-		vlc_object_yield( p_input );
-		InputAutoMenuBuilder( VLC_OBJECT(p_input), objects, varnames );
+    {
+        POPUP_BOILERPLATE;
+        if( p_input )
+        {
+        vlc_object_yield( p_input );
+        InputAutoMenuBuilder( VLC_OBJECT(p_input), objects, varnames );
 
-		/* Video menu */
-		PUSH_SEPARATOR;
-		varnames.push_back( "video-es" );
-		objects.push_back( p_input->i_object_id );
-		varnames.push_back( "spu-es" );
-		objects.push_back( p_input->i_object_id );
-		vlc_object_t *p_vout = (vlc_object_t *)vlc_object_find( p_input,
-							VLC_OBJECT_VOUT, FIND_CHILD );
-		if( p_vout )
-		{
-		    VideoAutoMenuBuilder( p_vout, objects, varnames );
-		    vlc_object_release( p_vout );
-		}
-		/* Audio menu */
-		PUSH_SEPARATOR
-		varnames.push_back( "audio-es" );
-		objects.push_back( p_input->i_object_id );
-		vlc_object_t *p_aout = (vlc_object_t *)vlc_object_find( p_input,
-						     VLC_OBJECT_AOUT, FIND_ANYWHERE );
-		if( p_aout )
-		{
-		    AudioAutoMenuBuilder( p_aout, objects, varnames );
-		    vlc_object_release( p_aout );
-		}
-	    }
+        /* Video menu */
+        PUSH_SEPARATOR;
+        varnames.push_back( "video-es" );
+        objects.push_back( p_input->i_object_id );
+        varnames.push_back( "spu-es" );
+        objects.push_back( p_input->i_object_id );
+        vlc_object_t *p_vout = (vlc_object_t *)vlc_object_find( p_input,
+                            VLC_OBJECT_VOUT, FIND_CHILD );
+        if( p_vout )
+        {
+            VideoAutoMenuBuilder( p_vout, objects, varnames );
+            vlc_object_release( p_vout );
+        }
+        /* Audio menu */
+        PUSH_SEPARATOR
+        varnames.push_back( "audio-es" );
+        objects.push_back( p_input->i_object_id );
+        vlc_object_t *p_aout = (vlc_object_t *)vlc_object_find( p_input,
+                             VLC_OBJECT_AOUT, FIND_ANYWHERE );
+        if( p_aout )
+        {
+            AudioAutoMenuBuilder( p_aout, objects, varnames );
+            vlc_object_release( p_aout );
+        }
+        }
 
-	    QMenu *menu = new QMenu();
-	    Populate( p_intf, menu, varnames, objects );
-	    menu->addSeparator();
-	    POPUP_STATIC_ENTRIES;
+        QMenu *menu = new QMenu();
+        Populate( p_intf, menu, varnames, objects );
+        menu->addSeparator();
+        POPUP_STATIC_ENTRIES;
 
-	    p_intf->p_sys->p_popup_menu = menu;
-	}
-	p_intf->p_sys->p_popup_menu->popup( QCursor::pos() );
+        p_intf->p_sys->p_popup_menu = menu;
+    }
+    p_intf->p_sys->p_popup_menu->popup( QCursor::pos() );
     }
     else
-    {	
-	// destroy popup if there is one
-	delete p_intf->p_sys->p_popup_menu;
-	p_intf->p_sys->p_popup_menu = NULL;
+    {    
+    // destroy popup if there is one
+    delete p_intf->p_sys->p_popup_menu;
+    p_intf->p_sys->p_popup_menu = NULL;
     }
 }
 
