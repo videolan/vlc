@@ -378,6 +378,10 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     global_layout = new QVBoxLayout();
     global_layout->setMargin( 2 );
     QString head;
+    QString help;
+
+    help = QString( data->help );
+
     if( data->i_type == TYPE_SUBCATEGORY || data->i_type ==  TYPE_CATSUBCAT )
     {
         head = QString( data->name );
@@ -388,8 +392,8 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         head = QString( qfu(p_module->psz_longname) );
         if( p_module->psz_help )
         {
-            head.append( "\n" );
-            head.append( qfu( p_module->psz_help ) );
+            help.append( "\n" );
+            help.append( qfu( p_module->psz_help ) );
         }
     }
 
@@ -397,12 +401,12 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     global_layout->addWidget( label );
     QFont myFont = QApplication::font( static_cast<QWidget*>(0) );
     myFont.setPointSize( myFont.pointSize() + 3 ); myFont.setBold( true );
-
     label->setFont( myFont );
-    QLabel *help = new QLabel( data->help, this );
-    help->setWordWrap( true );
 
-    global_layout->addWidget( help );
+    QLabel *helpLabel = new QLabel( help, this );
+    helpLabel->setWordWrap( true );
+
+    global_layout->addWidget( helpLabel );
 
     QGroupBox *box = NULL;
     QGridLayout *boxlayout = NULL;
