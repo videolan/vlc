@@ -424,7 +424,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
     /* Creation of the status bar
      * Helptext for menu items and toolbar tools will automatically get
      * displayed here. */
-    int i_status_width[3] = {100, 40, -1};
+    int i_status_width[3] = {150, 55, -1};
     statusbar = CreateStatusBar( 3 );                            /* 2 fields */
     statusbar->SetStatusWidths( 3, i_status_width );
     statusbar->SetStatusText( wxString::Format(wxT("x%.2f"), 1.0), 1 );
