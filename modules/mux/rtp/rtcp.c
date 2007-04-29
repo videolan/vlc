@@ -1,7 +1,7 @@
 /*****************************************************************************
  * rtcp.c: RTP/RTCP source file
  *****************************************************************************
- * Copyright (C) 2005 M2X
+ * Copyright (C) 2005-2007 M2X
  *
  * $Id$
  *
@@ -33,15 +33,8 @@
 #include "rtp.h"
 #include "rtcp.h"
 
-static void send_RTCP( vlc_object_t *p_this, rtcp_event_t rtcp_event )
-{
-/* FIXME: higher level functions that should be in another file */
-}
-
-static void rtcp_schedule( vlc_object_t *p_this, uint64_t i_sched, rtcp_event_t rtcp_event )
-{
-/* FIXME: higher level functions that should be in another file */
-}
+void send_RTCP( vlc_object_t *p_this, rtcp_event_t );
+void rtcp_schedule( vlc_object_t *p_this, mtime_t, rtcp_event_t );
 
 /* SDES support functions */
 static int SDES_client_item_add( rtcp_client_t *p_client, int i_item, char *psz_name )
@@ -50,7 +43,7 @@ static int SDES_client_item_add( rtcp_client_t *p_client, int i_item, char *psz_
 	
     p_item = (rtcp_SDES_item_t *) malloc( sizeof( rtcp_SDES_item_t ) );
     if( !p_item )
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     p_item->u_type = i_item;
     p_item->psz_data = strdup( psz_name );
     p_item->i_index = p_client->i_items + 1;;
@@ -83,7 +76,7 @@ int rtcp_add_client( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos )
     vlc_mutex_lock( &p_rtcp->object_lock );
     p_client = (rtcp_client_t*) malloc( sizeof(rtcp_client_t) );
     if( !p_client )
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     p_client->i_index = p_rtcp->i_clients + 1;
     p_client->b_deleted = VLC_FALSE;
     *i_pos = p_client->i_index ;
@@ -109,6 +102,7 @@ int rtcp_del_client( vlc_object_t *p_this, uint32_t u_ssrc )
         p_old->i_timeout = 5 * (p_rtcp->i_date - p_rtcp->i_last_date) +
                            p_rtcp->i_next_date;
         p_rtcp->u_clients--;
+        /* BYE message is sent by rtcp_destroy_client() */
     }
     vlc_mutex_unlock( &p_rtcp->object_lock );
     return VLC_SUCCESS;
@@ -138,6 +132,39 @@ int rtcp_cleanup_clients( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+/* Close communication with clients and release allocated objects */
+int rtcp_destroy_clients( vlc_object_t *p_this )
+{
+    rtcp_t *p_rtcp = (rtcp_t *) p_this;
+    uint32_t i = 0;
+
+    for( i=0; i < p_rtcp->i_clients; i++ )
+    {
+        rtcp_pkt_t *pkt = NULL;
+        rtcp_client_t *p_old = p_rtcp->pp_clients[i];
+
+        p_rtcp->pf_del_client( p_this, p_old->u_ssrc );
+	pkt = rtcp_pkt_new( p_this, RTCP_BYE );
+	if( pkt )
+	{
+	    block_t *p_block = NULL;
+	    p_block = rtcp_encode_BYE( p_this, pkt, strdup("server is leaving") );
+            /* FIXME: 
+             * if( p_block )
+	     *    send_RTCP( p_this, p_block );
+             */
+	}
+			
+    }
+    /* wait till all clients have been signalled */
+    while( p_rtcp->i_clients != 0 )
+    {
+        p_rtcp->pf_cleanup_clients( p_this );
+        msleep( 500 );
+    }
+    return VLC_SUCCESS;
+}
+
 /*  rtcp_find_client should be called with the object lock held.
  *  vlc_mutex_lock( &p_rtcp->obj_lock );
  */
@@ -162,7 +189,7 @@ int rtcp_find_client( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos )
  * rtcp_interval - Calculate the interval in seconds for sending RTCP packets.
  *--------------------------------------------------------------------------
  */
-uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth,
+uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth, uint32_t u_ssrc,
                         vlc_bool_t b_sender, vlc_bool_t b_first )
 {
     rtcp_t *p_rtcp = (rtcp_t *) p_this;
@@ -174,8 +201,6 @@ uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth,
     double i_interval = 0;
     int n = p_rtcp->i_clients;
 
-    int u_ssrc = 0; /* FIXME: how to know which client we look for?? */
-	
     if( b_first )
         i_rtcp_min = (i_rtcp_min >> 1);
 
@@ -194,8 +219,8 @@ uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth,
     }
     /* calculate average time between reports */
     p_client = p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos );
-	if( !p_client )
-	    return -1;
+    if( !p_client )
+        return -1;
 		
 	i_interval = p_client->p_stats->u_avg_pkt_size * ( n / i_bandwidth );
     if( i_interval < i_rtcp_min )
@@ -210,23 +235,21 @@ uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth,
  * rtcp_expire - decides to sent an RTCP report or a BYE record
  *--------------------------------------------------------------------------
  */
-void rtcp_expire( vlc_object_t *p_this, rtcp_event_t rtcp_event,
-    uint64_t u_bandwidth, vlc_bool_t b_sender, vlc_bool_t *b_first )
+void rtcp_expire( vlc_object_t *p_this, rtcp_event_t rtcp_event, uint64_t u_bandwidth,
+		  uint32_t u_ssrc, vlc_bool_t b_sender, vlc_bool_t *b_first )
 {
     rtcp_t *p_rtcp = (rtcp_t *) p_this;
-	rtcp_client_t *p_client = NULL;
+    rtcp_client_t *p_client = NULL;
     rtcp_stats_t *p_stats = NULL;
     mtime_t i_interval = 0;
     uint32_t i_pos = 0;
 
-    int u_ssrc = 0; /* FIXME: how to know which client we look for?? */
-
     p_client = p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos );
-	if( !p_client )
-		return;
+    if( !p_client )
+        return;
     p_stats = (rtcp_stats_t*) p_client->p_stats;
     i_interval = (mtime_t) rtcp_interval( p_this, u_bandwidth,
-                                          b_sender, *b_first );
+                                          u_ssrc, b_sender, *b_first );
     p_rtcp->i_next_date = p_rtcp->i_last_date + i_interval;
 
     switch( rtcp_event )
@@ -254,7 +277,7 @@ void rtcp_expire( vlc_object_t *p_this, rtcp_event_t rtcp_event,
                 /* recalculate */
                 p_rtcp->i_last_date = p_rtcp->i_date;
                 i_interval = rtcp_interval( p_this, u_bandwidth,
-                                            b_sender, *b_first );
+                                            u_ssrc, b_sender, *b_first );
                 rtcp_schedule( p_this, p_rtcp->i_next_date + i_interval, rtcp_event );
                 *b_first = VLC_FALSE;
             }
@@ -989,7 +1012,7 @@ block_t *rtcp_encode_BYE( vlc_object_t *p_this, rtcp_pkt_t *p_pkt, char *psz_rea
     block_t *p_block = NULL;
     uint32_t i_count = strlen( psz_reason );
     uint8_t  u_octet = i_count / 8;  /* Octect count ??*/
-	uint32_t i_pos, i_pad, i_padding;
+    int32_t i_pos, i_pad, i_padding;
 
     if( p_pkt->u_payload_type != RTCP_BYE )
         return NULL;
@@ -1012,7 +1035,7 @@ block_t *rtcp_encode_BYE( vlc_object_t *p_this, rtcp_pkt_t *p_pkt, char *psz_rea
     /* Give reason for leaving */
     //FIXME: bs_write( s, 8, p_item->u_type );
     bs_write( s, 8, u_octet );
-
+	
     for( i_pos = 0; i_pos < i_count; i_pos++ )
     {
         /* FIXME: must be UTF 8 encoded */

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * rtcp.h: RTP/RTCP headerfile
  *****************************************************************************
- * Copyright (C) 2005 M2X
+ * Copyright (C) 2005-2007 M2X
  *
  * $Id$
  *
@@ -144,6 +144,8 @@ typedef struct
 
 typedef struct rtcp_client_t
 {
+    int fd;                        /*< socket descriptor of rtcp stream */
+
     uint32_t    i_index;
     uint32_t    u_ssrc;            /*< channel name */
     vlc_bool_t  b_deleted;         /*< channel deleted ? */
@@ -165,8 +167,6 @@ typedef struct rtcp_t
 {
     VLC_COMMON_MEMBERS
 
-    int fd;                        /*< socket descriptor of rtcp stream */
-
     uint32_t u_clients;            /*< number of clients connected */
     uint32_t u_active;             /*< number of active senders */
     uint32_t u_members;            /*< number of clients in previous interval */
@@ -182,17 +182,20 @@ typedef struct rtcp_t
     /* bitstream data pointer used for decoding */
     bs_t    *bs;                   /*< bitstream decoding data pointer */
 
+    /* functions */
     int (*pf_add_client)( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos );
     int (*pf_del_client)( vlc_object_t *p_this, uint32_t u_ssrc );
     int (*pf_find_client)( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos );
-
+	int (*pf_cleanup_clients)( vlc_object_t *p_this );
+    int (*pf_destroy_clients)( vlc_object_t *p_this );
 } rtcp_t;
 
 int rtcp_add_client( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos );
 int rtcp_del_client( vlc_object_t *p_this, uint32_t u_ssrc );
 /* Should be called with vlc_mutex_lock( &p_this->objec_lock ) held */
 int rtcp_find_client( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos );
-
+int rtcp_cleanup_clients( vlc_object_t *p_this );
+int rtcp_destroy_clients( vlc_object_t *p_this );
 
 /**
  * rtcp_cleanup_clients - Permanently remove clients from the list
@@ -221,7 +224,7 @@ int rtcp_pkt_decode( vlc_object_t *p_this, rtcp_pkt_t *p_pkt, block_t *p_block )
 /**
  * rtcp_pkt_new - Encode RTCP packet
  * Create a new RTCP packet of type 'type'
- * Arguments
+ * Arguments:
  * \param type  type of RTCP packet @see
  */
 rtcp_pkt_t *rtcp_pkt_new( vlc_object_t *p_this, int type );
@@ -240,31 +243,35 @@ block_t *rtcp_encode_BYE( vlc_object_t *p_this, rtcp_pkt_t *p_pkt, char *psz_rea
  * Arguments:
  * \param p_this        VLC_OBJECT of type rtcp_t
  * \param u_bandwith    bandwidth of RTP connection
+ * \param u_ssrc        client to sent or receive from
  * \param b_sender      are we the sender or the receiver
  * \param b_first       the first time this function is called use only half
  *                      of the initial waiting time
  */
-uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth,
+uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth, uint32_t u_ssrc,
                         vlc_bool_t b_sender, vlc_bool_t b_first );
 
 /**
  * rtcp_expire
  * Decides to sent an RTCP report or a BYE record
+ * Arguments:
  * \param p_this        VLC_OBJECT of type rtcp_t
  * \param u_bandwith    bandwidth of RTP connection
+ * \param u_ssrc        client to sent or receive from
  * \param rtcp_event    type of event received
  * \param b_sender      are we the sender or the receiver
  * \param *b_first      the first time this function is called use only half
  *                      of the initial waiting time. If b_first is VLC_TRUE, then
  *                      it will return *b_first = VLC_FALSE;
  */
-void rtcp_expire( vlc_object_t *p_this, rtcp_event_t rtcp_event,
-    uint64_t u_bandwidth, vlc_bool_t b_sender, vlc_bool_t *b_first );
+void rtcp_expire( vlc_object_t *p_this, rtcp_event_t rtcp_event, uint64_t u_bandwidth,
+				  uint32_t u_ssrc, vlc_bool_t b_sender, vlc_bool_t *b_first );
 
 /**
  * rtcp_received
  * Determine what to do on the received Sender Report, decode it
  * or leave the channel (BYE record).
+ * Arguments:
  * \param p_this        VLC_OBJECT of type rtcp_t
  * \param p_pkt         RTCP packet that was received
  * \param rtcp_event    type of event received
