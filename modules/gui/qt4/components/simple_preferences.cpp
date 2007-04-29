@@ -166,10 +166,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     {
         /* Video Panel Implementation */
         START_SPREFS_CAT( Video , "General video settings" );
-         #ifndef WIN32
-            ui.directXBox->setVisible( false );
-         #endif
-            CONFIG_GENERIC( "video", Bool, NULL, enableVideo );
+           CONFIG_GENERIC( "video", Bool, NULL, enableVideo );
 
             CONFIG_GENERIC( "fullscreen", Bool, NULL, fullscreen );
             CONFIG_GENERIC( "overlay", Bool, NULL, overlay );
@@ -182,6 +179,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "directx-wallpaper" , Bool , NULL, wallpaperMode );
             CONFIG_GENERIC( "directx-device", StringList, NULL, 
                     dXdisplayDevice );
+#else
+            ui.directXBox->setVisible( false );
 #endif
 
             CONFIG_GENERIC_FILE( "snapshot-path", Directory, NULL,
@@ -261,17 +260,26 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 #if defined( WIN32 ) || defined (__APPLE__)
             CONFIG_GENERIC( "language", StringList, NULL, language );//FIXME
+#else
+            ui.language->hide();
+            ui.languageLabel->hide();
 #endif
-#if !defined( WIN32 ) && !defined( HAVE_DBUS_3 )
-            ui.OneInterfaceBox->hide();
-#endif
-            /* interface */
+
+           /* interface */
 /*            p_config = config_FindConfig( VLC_OBJECT(p_intf), "intf" );
             if( p_config->value.psz && strcmp( p_config->value.psz, "qt4" ))
-                    ui.qt4->setChecked( true );
+            {
+                ui.qt4->setChecked( true );
+                control =  new StringConfigControl( VLC_OBJECT(p_intf),
+                                 p_config, NULL, ui.qt4 );
+                controls.append( control );
+            }
             if( p_config->value.psz && strcmp( p_config->value.psz, "skins2" ))
-                    ui.skins->setChecked( true );*/
-/*            CONFIG_GENERIC( "intf", Module, NULL, ??? ); */ //FIXME interface choice
+            {
+                    ui.skins->setChecked( true );
+            }*/
+//            CONFIG_GENERIC( "intf", Module, NULL, Interface );
+            //FIXME interface choice
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
             CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin, 
                     skinBrowse );
@@ -279,6 +287,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
             CONFIG_GENERIC( "playlist-enqueue", Bool, NULL, 
                     EnqueueOneInterfaceMode );
+#else
+            ui.OneInterfaceBox->hide();
 #endif
         END_SPREFS_CAT;
 
