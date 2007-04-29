@@ -76,15 +76,7 @@
       </item>
       <item row="1" column="1" >
        <widget class="QComboBox" name="encoding" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maxVisibleItems" >
+       <property name="maxVisibleItems" >
          <number>12</number>
         </property>
         <property name="frame" >
