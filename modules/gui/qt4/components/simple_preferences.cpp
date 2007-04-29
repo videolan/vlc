@@ -177,7 +177,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
 #ifdef WIN32
             CONFIG_GENERIC( "directx-wallpaper" , Bool , NULL, wallpaperMode );
-            CONFIG_GENERIC( "directx-device", StringList, NULL, 
+            CONFIG_GENERIC( "directx-device", StringList, NULL,
                     dXdisplayDevice );
 #else
             ui.directXBox->setVisible( false );
@@ -206,13 +206,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
          CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
 
-         CONFIG_GENERIC_NO_BOOL( "volume" ,  IntegerRangeSlider, NULL, 
+         CONFIG_GENERIC_NO_BOOL( "volume" ,  IntegerRangeSlider, NULL,
                  defaultVolume );
-         CONFIG_GENERIC( "audio-language" , StringList , NULL, 
-                    preferredAudioLanguage ); //FIXME
+         CONFIG_GENERIC( "audio-language" , String , NULL,
+                    preferredAudioLanguage );
 
          CONFIG_GENERIC( "spdif" , Bool , NULL, spdifBox );
-         CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL, 
+         CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL,
                     detectionDolby );
 
          CONFIG_GENERIC( "aout" , Module , NULL, outputModule );
@@ -220,15 +220,15 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
          CONFIG_GENERIC( "alsadev" , StringList , NULL, alsaDevice );
          CONFIG_GENERIC_FILE( "dspdev" , File , NULL, OSSDevice, OSSBrowse );
 #else
-         CONFIG_GENERIC( "directx-audio-device" , IntegerList, NULL, 
+         CONFIG_GENERIC( "directx-audio-device" , IntegerList, NULL,
                  DirectXDevice );
 #endif
-         CONFIG_GENERIC_FILE( "audiofile-file" , File , NULL, FileName, 
+         CONFIG_GENERIC_FILE( "audiofile-file" , File , NULL, FileName,
                  fileBrowseButton );
 
          CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
 //         CONFIG_GENERIC( "" , Bool, NULL, ); activation of normalizer //FIXME
-         CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL, 
+         CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL,
                  volNormalizer );
          CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
         END_SPREFS_CAT;
@@ -259,27 +259,24 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.skinsLabel->setFont( italicFont );
 
 #if defined( WIN32 ) || defined (__APPLE__)
-            CONFIG_GENERIC( "language", StringList, NULL, language );//FIXME
+            CONFIG_GENERIC( "language", StringList, NULL, language );
 #else
             ui.language->hide();
             ui.languageLabel->hide();
 #endif
 
            /* interface */
-/*            p_config = config_FindConfig( VLC_OBJECT(p_intf), "intf" );
+            p_config = config_FindConfig( VLC_OBJECT(p_intf), "intf" );
             if( p_config->value.psz && strcmp( p_config->value.psz, "qt4" ))
             {
                 ui.qt4->setChecked( true );
-                control =  new StringConfigControl( VLC_OBJECT(p_intf),
-                                 p_config, NULL, ui.qt4 );
-                controls.append( control );
             }
             if( p_config->value.psz && strcmp( p_config->value.psz, "skins2" ))
             {
                     ui.skins->setChecked( true );
-            }*/
-//            CONFIG_GENERIC( "intf", Module, NULL, Interface );
+            }
             //FIXME interface choice
+
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
             CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin, 
                     skinBrowse );
@@ -296,9 +293,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "osd", Bool, NULL, OSDBox);
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
-            CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );//FIXME
-            CONFIG_GENERIC_FILE( "freetype-font", File, NULL, font, 
-                    fontBrowse ); 
+            CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );
+            CONFIG_GENERIC_FILE( "freetype-font", File, NULL, font,
+                            fontBrowse );
             CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,
                             fontSize );
