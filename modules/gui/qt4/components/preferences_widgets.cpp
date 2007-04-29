@@ -51,6 +51,20 @@
 
 #include <vlc_keys.h>
 
+
+QString formatTooltip(const QString & tooltip)
+{
+    QString formatted =
+    "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">"
+    " p, li { white-space: pre-wrap; } </style></head><body style=\" font-family:'Sans Serif';"
+    " font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;\">"
+    "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; "
+    "-qt-block-indent:0; text-indent:0px;\">" +
+    tooltip +
+    "</p></body></html>";
+    return formatted;
+}
+
 ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
                                              module_config_t *p_item,
                                              QWidget *parent )
@@ -212,9 +226,9 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
 void StringConfigControl::finish()
 {
     text->setText( qfu(p_item->value.psz) );
-    text->setToolTip( qfu(p_item->psz_longtext) );
+    text->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( qfu(p_item->psz_longtext) );
+        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 }
 
 /*********** File **************/
@@ -277,9 +291,9 @@ void FileConfigControl::updateField()
 void FileConfigControl::finish()
 {
     text->setText( qfu(p_item->value.psz) );
-    text->setToolTip( qfu(p_item->psz_longtext) );
+    text->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( qfu(p_item->psz_longtext) );
+        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 }
 
 /********* String / Directory **********/
@@ -372,9 +386,9 @@ void StringListConfigControl::finish( bool bycat )
                                           p_item->ppsz_list[i_index] ) )
             combo->setCurrentIndex( combo->count() - 1 );
     }
-    combo->setToolTip( qfu(p_item->psz_longtext) );
+    combo->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( qfu(p_item->psz_longtext) );
+        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 }
 
 QString StringListConfigControl::getValue()
@@ -453,9 +467,9 @@ void ModuleConfigControl::finish( bool bycat )
         }
     }
     vlc_list_release( p_list );
-    combo->setToolTip( qfu(p_item->psz_longtext) );
+    combo->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( qfu(p_item->psz_longtext) );
+        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 }
 
 QString ModuleConfigControl::getValue()
@@ -540,7 +554,9 @@ void ModuleListConfigControl::finish( bool bycat )
                 {
                     QCheckBox *cb =
                         new QCheckBox( qfu( p_parser->psz_object_name ) );
-                    cb->setToolTip( qfu(p_parser->psz_longname) );
+                    CONNECT( cb, stateChanged( int ), this, onUpdate( int ) );
+                    cb->setToolTip(
+                            formatTooltip( qfu(p_parser->psz_longname)) );
                     modules.push_back( cb );
                 }
             }
@@ -549,14 +565,15 @@ void ModuleListConfigControl::finish( bool bycat )
         {
             QCheckBox *cb =
                 new QCheckBox( qfu( p_parser->psz_object_name ) );
-            cb->setToolTip( qfu(p_parser->psz_longname) );
+                    CONNECT( cb, stateChanged( int ), this, onUpdate( int ) );
+            cb->setToolTip( formatTooltip(qfu(p_parser->psz_longname)) );
             modules.push_back( cb );
         }
     }
     vlc_list_release( p_list );
-    text->setToolTip( qfu(p_item->psz_longtext) );
+    text->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
     if( groupBox )
-        groupBox->setToolTip( qfu(p_item->psz_longtext) );
+        groupBox->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 }
 
 QString ModuleListConfigControl::getValue()
@@ -585,12 +602,26 @@ void ModuleListConfigControl::show()
 }
 
 
-void ModuleListConfigControl::wakeUp_TheUserJustClickedOnSomething( int value )
+void ModuleListConfigControl::onUpdate( int value )
 {
     text->clear();
+    bool first = true;
+
     for( QVector<QCheckBox*>::iterator it = modules.begin();
          it != modules.end(); it++ )
     {
+        if( (*it)->isChecked() )
+        {
+            if( first )
+            {
+                text->setText( text->text() + (*it)->text() );
+                first = false;
+            }
+            else
+            {
+                text->setText( text->text() + ":" + (*it)->text() );
+            }
+        }
     }
 }
 
@@ -638,9 +669,9 @@ void IntegerConfigControl::finish()
     spin->setMaximum( 2000000000 );
     spin->setMinimum( -2000000000 );
     spin->setValue( p_item->value.i );
-    spin->setToolTip( qfu(p_item->psz_longtext) );
+    spin->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( qfu(p_item->psz_longtext) );
+        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 }
 
 int IntegerConfigControl::getValue()
@@ -683,9 +714,9 @@ IntegerRangeSliderConfigControl::IntegerRangeSliderConfigControl(
     slider->setMaximum( p_item->max.i );
     slider->setMinimum( p_item->min.i );
     slider->setValue( p_item->value.i );
-    slider->setToolTip( qfu(p_item->psz_longtext) );
+    slider->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( qfu(p_item->psz_longtext) );
+        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 }
 
 int IntegerRangeSliderConfigControl::getValue()
@@ -735,9 +766,9 @@ void IntegerListConfigControl::finish( bool bycat )
         if( p_item->value.i == p_item->pi_list[i_index] )
             combo->setCurrentIndex( combo->count() - 1 );
     }
-    combo->setToolTip( qfu(p_item->psz_longtext) );
+    combo->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( qfu(p_item->psz_longtext) );
+        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 }
 
 int IntegerListConfigControl::getValue()
@@ -781,7 +812,7 @@ void BoolConfigControl::finish()
 {
     checkbox->setCheckState( p_item->value.i == VLC_TRUE ? Qt::Checked
                                                         : Qt::Unchecked );
-    checkbox->setToolTip( qfu(p_item->psz_longtext) );
+    checkbox->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 }
 
 int BoolConfigControl::getValue()
@@ -836,9 +867,9 @@ void FloatConfigControl::finish()
     spin->setMinimum( -2000000000. );
     spin->setSingleStep( 0.1 );
     spin->setValue( (double)p_item->value.f );
-    spin->setToolTip( qfu(p_item->psz_longtext) );
+    spin->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( qfu(p_item->psz_longtext) );
+        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 }
 
 float FloatConfigControl::getValue()
@@ -902,7 +933,7 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 void KeySelectorControl::finish()
 {
     if( label )
-        label->setToolTip( qfu(p_item->psz_longtext) );
+        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 
     /* Fill the table */
     table->setColumnCount( 2 );

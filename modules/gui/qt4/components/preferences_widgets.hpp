@@ -339,7 +339,7 @@ public:
     virtual void hide();
     virtual void show();
 public slots:
-    void wakeUp_TheUserJustClickedOnSomething( int value );
+    void onUpdate( int value );
 private:
     void finish( bool );
     QVector<QCheckBox*> modules;
