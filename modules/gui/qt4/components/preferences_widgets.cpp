@@ -479,9 +479,9 @@ QString ModuleConfigControl::getValue()
 
 /********* Module list **********/
 ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
-               module_config_t *_p_item, QWidget *_parent, bool bycat,
-               QGridLayout *l, int &line) :
-               VStringConfigControl( _p_this, _p_item, _parent )
+        module_config_t *_p_item, QWidget *_parent, bool bycat,
+        QGridLayout *l, int &line) :
+    VStringConfigControl( _p_this, _p_item, _parent )
 {
     groupBox = new QGroupBox ( qfu(p_item->psz_text) );
     text = new QLineEdit();
@@ -491,7 +491,7 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
 
     int boxline = 0;
     for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-         it != modules.end(); it++ )
+            it != modules.end(); it++ )
     {
         layoutGroupBox->addWidget( (*it)->checkBox, boxline++, 0 );
     }
@@ -512,8 +512,8 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
 }
 #if 0
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
-                module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
-                bool bycat ) : VStringConfigControl( _p_this, _p_item )
+        module_config_t *_p_item, QLabel *_label, QComboBox *_combo,
+        bool bycat ) : VStringConfigControl( _p_this, _p_item )
 {
     combo = _combo;
     label = _label;
@@ -524,7 +524,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
 ModuleListConfigControl::~ModuleListConfigControl()
 {
     for( QVector<checkBoxListItem*>::iterator it = modules.begin();
-         it != modules.end(); it++ )
+            it != modules.end(); it++ )
     {
         delete *it;
     }
@@ -549,7 +549,7 @@ ModuleListConfigControl::~ModuleListConfigControl()
                                  : p_parser->psz_object_name ); \
        modules.push_back( cbl ); \
 }
- 
+
 
 void ModuleListConfigControl::finish( bool bycat )
 {
@@ -571,16 +571,16 @@ void ModuleListConfigControl::finish( bool bycat )
                 module_config_t *p_config = p_parser->p_config + i;
                 /* Hack: required subcategory is stored in i_min */
                 if( p_config->i_type == CONFIG_SUBCATEGORY &&
-                    p_config->value.i == p_item->min.i )
+                        p_config->value.i == p_item->min.i )
                 {
                     CHECKBOX_LISTS;
-               }
+                }
             }
         }
         else if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
         {
             CHECKBOX_LISTS;
-       }
+        }
     }
     vlc_list_release( p_list );
     text->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
