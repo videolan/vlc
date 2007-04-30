@@ -490,10 +490,10 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
     finish( bycat );
 
     int boxline = 0;
-    for( QVector<QCheckBox*>::iterator it = modules.begin();
+    for( QVector<checkBoxListItem*>::iterator it = modules.begin();
          it != modules.end(); it++ )
     {
-        layoutGroupBox->addWidget( *it, boxline++, 0 );
+        layoutGroupBox->addWidget( (*it)->checkBox, boxline++, 0 );
     }
     layoutGroupBox->addWidget( text, boxline, 0 );
 
@@ -507,6 +507,8 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
     {
         l->addWidget( groupBox, line, 0, 1, -1 );
     }
+
+    text->setToolTip( formatTooltip( qfu( p_item->psz_longtext) ) );
 }
 #if 0
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
@@ -521,7 +523,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
 
 ModuleListConfigControl::~ModuleListConfigControl()
 {
-    for( QVector<QCheckBox*>::iterator it = modules.begin();
+    for( QVector<checkBoxListItem*>::iterator it = modules.begin();
          it != modules.end(); it++ )
     {
         delete *it;
@@ -529,6 +531,25 @@ ModuleListConfigControl::~ModuleListConfigControl()
     delete groupBox;
     delete text;
 }
+
+#define CHECKBOX_LISTS \
+{ \
+       QCheckBox *cb = new QCheckBox( qfu( p_parser->psz_longname ) );\
+       checkBoxListItem *cbl = new checkBoxListItem; \
+\
+       CONNECT( cb, stateChanged( int ), this, onUpdate( int ) );\
+       cb->setToolTip( formatTooltip( qfu(p_parser->psz_longname)) );\
+       cbl->checkBox = cb; \
+\
+       int i = -1; \
+       while( p_parser->pp_shortcuts[++i] != NULL); \
+       i--; \
+\
+       cbl->psz_module = strdup( i>=0?p_parser->pp_shortcuts[i] \
+                                 : p_parser->psz_object_name ); \
+       modules.push_back( cbl ); \
+}
+ 
 
 void ModuleListConfigControl::finish( bool bycat )
 {
@@ -552,29 +573,21 @@ void ModuleListConfigControl::finish( bool bycat )
                 if( p_config->i_type == CONFIG_SUBCATEGORY &&
                     p_config->value.i == p_item->min.i )
                 {
-                    QCheckBox *cb =
-                        new QCheckBox( qfu( p_parser->psz_object_name ) );
-                    CONNECT( cb, stateChanged( int ), this, onUpdate( int ) );
-                    cb->setToolTip(
-                            formatTooltip( qfu(p_parser->psz_longname)) );
-                    modules.push_back( cb );
-                }
+                    CHECKBOX_LISTS;
+               }
             }
         }
         else if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
         {
-            QCheckBox *cb =
-                new QCheckBox( qfu( p_parser->psz_object_name ) );
-                    CONNECT( cb, stateChanged( int ), this, onUpdate( int ) );
-            cb->setToolTip( formatTooltip(qfu(p_parser->psz_longname)) );
-            modules.push_back( cb );
-        }
+            CHECKBOX_LISTS;
+       }
     }
     vlc_list_release( p_list );
     text->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
     if( groupBox )
         groupBox->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
 }
+#undef CHECKBOX_LISTS
 
 QString ModuleListConfigControl::getValue()
 {
@@ -583,20 +596,20 @@ QString ModuleListConfigControl::getValue()
 
 void ModuleListConfigControl::hide()
 {
-    for( QVector<QCheckBox*>::iterator it = modules.begin();
+    for( QVector<checkBoxListItem*>::iterator it = modules.begin();
          it != modules.end(); it++ )
     {
-        (*it)->hide();
+        (*it)->checkBox->hide();
     }
     groupBox->hide();
 }
 
 void ModuleListConfigControl::show()
 {
-    for( QVector<QCheckBox*>::iterator it = modules.begin();
+    for( QVector<checkBoxListItem*>::iterator it = modules.begin();
          it != modules.end(); it++ )
     {
-        (*it)->show();
+        (*it)->checkBox->show();
     }
     groupBox->show();
 }
@@ -607,19 +620,19 @@ void ModuleListConfigControl::onUpdate( int value )
     text->clear();
     bool first = true;
 
-    for( QVector<QCheckBox*>::iterator it = modules.begin();
+    for( QVector<checkBoxListItem*>::iterator it = modules.begin();
          it != modules.end(); it++ )
     {
-        if( (*it)->isChecked() )
+        if( (*it)->checkBox->isChecked() )
         {
             if( first )
             {
-                text->setText( text->text() + (*it)->text() );
+                text->setText( text->text() + (*it)->psz_module );
                 first = false;
             }
             else
             {
-                text->setText( text->text() + ":" + (*it)->text() );
+                text->setText( text->text() + ":" + (*it)->psz_module );
             }
         }
     }

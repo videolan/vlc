@@ -326,6 +326,11 @@ private:
     QComboBox *combo;
 };
 
+struct checkBoxListItem {
+    QCheckBox *checkBox;
+    char *psz_module;
+};
+
 class ModuleListConfigControl : public VStringConfigControl
 {
     Q_OBJECT;
@@ -342,7 +347,7 @@ public slots:
     void onUpdate( int value );
 private:
     void finish( bool );
-    QVector<QCheckBox*> modules;
+    QVector<checkBoxListItem*> modules;
     QGroupBox *groupBox;
     QLineEdit *text;
 };
