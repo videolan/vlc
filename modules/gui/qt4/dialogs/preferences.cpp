@@ -100,7 +100,14 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     tree_panel_l->setMargin( 1 );
     main_panel_l->setMargin( 3 );
 
-    setSmall();
+    if( config_GetInt( p_intf, "qt-advanced-pref") == 1 )
+    {
+        setAll();
+    }
+    else
+    {
+        setSmall();
+    }
 
     BUTTONACT( save, save() );
     BUTTONACT( cancel, cancel() );
@@ -137,6 +144,7 @@ void PrefsDialog::setAll()
     if( !advanced_panel )
          advanced_panel = new PrefsPanel( main_panel );
     main_panel_l->addWidget( advanced_panel );
+    all->setChecked( true );
     advanced_panel->show();
 }
 
@@ -165,6 +173,7 @@ void PrefsDialog::setSmall()
     if( !simple_panel )
         simple_panel = new SPrefsPanel( p_intf, main_panel, SPrefsDefaultCat );
     main_panel_l->addWidget( simple_panel );
+    small->setChecked( true );
     simple_panel->show();
 }
 

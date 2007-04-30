@@ -43,6 +43,11 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define ADVANCED_PREFS_TEXT N_("Show advanced prefs over simple")
+#define ADVANCED_PREFS_LONGTEXT N_("Show advanced preferences and not simple" \
+                                   "preferences when opening the preferences " \
+                                   "dialog.")
+
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
     set_description( (char*)_("Qt interface") );
@@ -57,7 +62,10 @@ vlc_module_begin();
     add_submodule();
         set_description( "Dialogs provider" );
         set_capability( "dialogs provider", 51 );
-        add_bool( "qt-always-video", VLC_FALSE, NULL, "FIXME", "FIXME", VLC_TRUE );
+        add_bool( "qt-always-video", VLC_FALSE, NULL, "FIXME", "FIXME",
+                VLC_TRUE );
+        add_bool( "qt-advanced-pref", VLC_FALSE, NULL, ADVANCED_PREFS_TEXT,
+                ADVANCED_PREFS_LONGTEXT, VLC_FALSE );
         set_callbacks( OpenDialogs, Close );
 vlc_module_end();
 
