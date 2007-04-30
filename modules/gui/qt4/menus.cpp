@@ -240,7 +240,10 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     DP_SADD( qtr(I_MENU_MSG), "", "", messagesDialog(), "Ctrl+M" );
     DP_SADD( qtr(I_MENU_INFO) , "", "", mediaInfoDialog(), "Ctrl+J" );
     DP_SADD( qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog(), "Ctrl+I" );
-    DP_SADD( qtr(I_MENU_GOTOTIME), "","",gotoTimeDialog(), "Ctrl+T" );
+    DP_SADD( qtr(I_MENU_GOTOTIME), "","", gotoTimeDialog(), "Ctrl+T" );
+    DP_SADD( qtr(I_MENU_BOOKMARK), "","", bookmarksDialog(), "Ctrl+B" );
+    DP_SADD( qtr(I_MENU_VLM), "","", vlmDialog(), "Ctrl+V" );
+
     menu->addSeparator();
     if( mi )
     {

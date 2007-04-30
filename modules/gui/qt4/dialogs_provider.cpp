@@ -116,6 +116,7 @@ void DialogsProvider::customEvent( QEvent *event )
             case INTF_DIALOG_INTERACTION:
                doInteraction( de->p_arg ); break;
             case INTF_DIALOG_VLM:
+               vlmDialog(); break;
             case INTF_DIALOG_WIZARD:
             case INTF_DIALOG_UPDATEVLC:
             case INTF_DIALOG_EXIT:
@@ -152,6 +153,12 @@ void DialogsProvider::gotoTimeDialog()
     GotoTimeDialog::getInstance( p_intf )->toggleVisible();
 }
 
+void DialogsProvider::vlmDialog()
+{
+    /* FIXME */
+    /*  VLMDialog::getInstance( p_intf )->toggleVisible(); */
+}
+
 void DialogsProvider::helpDialog()
 {
     HelpDialog::getInstance( p_intf )->toggleVisible();
@@ -174,6 +181,8 @@ void DialogsProvider::mediaCodecDialog()
 
 void DialogsProvider::bookmarksDialog()
 {
+    /* FIXME */
+    /*  BookmarkDialog::getInstance( p_intf )->toggleVisible(); */
 }
 
 /****************************************************************************

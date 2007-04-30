@@ -157,6 +157,7 @@ public slots:
     void hideMenus();
     void switchToSkins();
     void gotoTimeDialog();
+    void vlmDialog();
     void helpDialog();
     void aboutDialog();
 };

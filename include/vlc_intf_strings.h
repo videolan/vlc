@@ -43,6 +43,8 @@
 #define I_MENU_MSG   N_("Messages...")
 #define I_MENU_EXT   N_("Extended settings...")
 #define I_MENU_GOTOTIME N_("Go to specific time...")
+#define I_MENU_BOOKMARK N_("Bookmarks...")
+#define I_MENU_VLM N_("VLM Configuration...")
 
 #define I_MENU_ABOUT N_("About VLC media player...")
 
