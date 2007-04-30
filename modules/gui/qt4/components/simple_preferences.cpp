@@ -247,7 +247,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
           CONFIG_GENERIC_NO_BOOL( "ffmpeg-pp-q", Integer, NULL, PostProcLevel );
           CONFIG_GENERIC( "avi-index", IntegerList, NULL, AviRepair );
           CONFIG_GENERIC( "rtsp-tcp", Bool, NULL, RTSP_TCPBox );
-
+#ifdef WIN32
+          CONFIG_GENERIC( "prefer-system-codecs", Bool, NULL, systemCodecBox );
+#else
+          ui.systemCodecBox->hide();
+#endif
           CONFIG_GENERIC( "timeshift-force", Bool, NULL, timeshiftBox );
           CONFIG_GENERIC( "dump-force", Bool, NULL, DumpBox );
 //        CONFIG_GENERIC( "", Bool, NULL, RecordBox ); //FIXME activate record 

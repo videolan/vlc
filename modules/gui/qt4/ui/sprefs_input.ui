@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>422</width>
-    <height>437</height>
+    <height>478</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -132,17 +132,10 @@
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item row="2" column="0" >
-       <widget class="QCheckBox" name="RTSP_TCPBox" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_5" >
         <property name="text" >
-         <string>Use RTP over RTSP (TCP)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
-         <string>Repair AVI files</string>
+         <string>Post-Processing Quality</string>
         </property>
        </widget>
       </item>
@@ -162,13 +155,27 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>Repair AVI files</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="1" >
        <widget class="QComboBox" name="AviRepair" />
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_5" >
+      <item row="3" column="0" colspan="2" >
+       <widget class="QCheckBox" name="systemCodecBox" >
         <property name="text" >
-         <string>Post-Processing Quality</string>
+         <string>Use system codecs if available (better quality)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QCheckBox" name="RTSP_TCPBox" >
+        <property name="text" >
+         <string>Use RTP over RTSP (TCP)</string>
         </property>
        </widget>
       </item>
