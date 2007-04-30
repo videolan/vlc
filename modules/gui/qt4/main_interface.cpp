@@ -105,7 +105,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     visualSelectorEnabled= settings->value( "visual-selector", false ).toBool();
 
     /* UI */
-    setWindowTitle( qtr( "VLC media player" ) );
+    setVLCWindowsTitle();
     handleMainUi( settings );
     QVLCMenu::createMenuBar( this, p_intf, playlistEmbeddedFlag,
                              advControlsEnabled, visualSelectorEnabled );
@@ -179,6 +179,18 @@ MainInterface::~MainInterface()
     p_intf->pf_request_window = NULL;
     p_intf->pf_release_window = NULL;
     p_intf->pf_control_window = NULL;
+}
+
+void MainInterface::setVLCWindowsTitle( QString aTitle )
+{
+    if( aTitle.isEmpty() )
+    {
+        this->setWindowTitle( qtr( "VLC media player" ) );
+    }
+    else
+    {
+        this->setWindowTitle( aTitle + " - " + qtr( "VLC media player" ) );
+    }
 }
 
 void MainInterface::handleMainUi( QSettings *settings )
@@ -658,6 +670,7 @@ void MainInterface::setDisplay( float pos, int time, int length )
 void MainInterface::setName( QString name )
 {
     nameLabel->setText( " " + name+" " );
+    setVLCWindowsTitle( name );
 }
 
 void MainInterface::setStatus( int status )

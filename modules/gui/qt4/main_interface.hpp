@@ -56,6 +56,7 @@ public:
                         unsigned int *pi_height );
     void releaseVideo( void *);
     int controlVideo( void *p_window, int i_query, va_list args );
+    void setVLCWindowsTitle( QString title = "" );
 protected:
     void resizeEvent( QResizeEvent * );
     void dropEvent( QDropEvent *);
