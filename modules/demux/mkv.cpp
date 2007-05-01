@@ -1520,8 +1520,16 @@ static int Open( vlc_object_t * p_this )
 #endif
                         {
                             // test wether this file belongs to our family
+                            uint8_t *p_peek;
+                            bool file_ok = false;
                             stream_t *p_file_stream = stream_UrlNew( p_demux, s_filename.c_str());
-                            if ( p_file_stream != NULL )
+                            /* peek the begining */
+                            if( p_file_stream &&
+                                stream_Peek( p_file_stream, &p_peek, 4 ) >= 4
+                                && p_peek[0] == 0x1a && p_peek[1] == 0x45 &&
+                                p_peek[2] == 0xdf && p_peek[3] == 0xa3 ) file_ok = true;
+
+                            if ( file_ok )
                             {
                                 vlc_stream_io_callback *p_file_io = new vlc_stream_io_callback( p_file_stream, VLC_TRUE );
                                 EbmlStream *p_estream = new EbmlStream(*p_file_io);
@@ -1543,6 +1551,9 @@ static int Open( vlc_object_t * p_this )
                             }
                             else
                             {
+                                if( p_file_stream ) {
+                                    stream_Delete( p_file_stream );
+                                }
                                 msg_Dbg( p_demux, "the file '%s' cannot be opened", s_filename.c_str() );
                             }
                         }
