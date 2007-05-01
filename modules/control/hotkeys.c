@@ -750,6 +750,11 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
+    if ( !newval.i_int )
+    {
+        msg_Warn( p_this, "Received invalid key event %d", newval.i_int );
+        return VLC_EGENERIC;
+    }
     vlc_mutex_lock( &p_intf->p_sys->change_lock );
     if ( p_intf->p_sys->i_size == BUFFER_SIZE )
     {
