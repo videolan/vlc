@@ -390,9 +390,6 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err (p_access, "SAP announces not supported for access %s",
                      psz_access);
-            free (fmt);
-            free (src);
-            free (dst);
             goto nosap;
         }
 
@@ -403,8 +400,12 @@ static int Open( vlc_object_t *p_this )
         sout_AnnounceRegister( p_sout, p_session, p_method );
         p_stream->p_sys->p_session = p_session;
         sout_MethodRelease (p_method);
-    }
+
 nosap:
+        free (fmt);
+        free (src);
+        free (dst);
+    }
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;

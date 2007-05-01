@@ -193,28 +193,36 @@ session_descriptor_t * sout_AnnounceSessionCreate (vlc_object_t *obj,
 }
 
 int sout_SessionSetMedia (vlc_object_t *obj, session_descriptor_t *p_session,
-                          char *fmt, char *src, int sport,
-                          char *dst, int dport)
+                          const char *fmt, const char *src, int sport,
+                          const char *dst, int dport)
 {
-    p_session->sdpformat = fmt;
+    if ((p_session->sdpformat = strdup (fmt)) == NULL)
+        return VLC_ENOMEM;
 
     /* GRUIK. We should not convert back-and-forth from string to numbers */
     struct addrinfo *res;
     if (vlc_getaddrinfo (obj, dst, dport, NULL, &res) == 0)
     {
-        if (res->ai_addrlen <= sizeof (p_session->addr))
-            memcpy (&p_session->addr, res->ai_addr,
-                    p_session->addrlen = res->ai_addrlen);
+        if (res->ai_addrlen > sizeof (p_session->addr))
+            goto oflow;
+
+        memcpy (&p_session->addr, res->ai_addr,
+                p_session->addrlen = res->ai_addrlen);
         vlc_freeaddrinfo (res);
     }
     if (vlc_getaddrinfo (obj, src, sport, NULL, &res) == 0)
     {
-        if (res->ai_addrlen <= sizeof (p_session->orig))
-            memcpy (&p_session->orig, res->ai_addr,
-                    p_session->origlen = res->ai_addrlen);
+        if (res->ai_addrlen > sizeof (p_session->orig))
+            goto oflow;
+        memcpy (&p_session->orig, res->ai_addr,
+               p_session->origlen = res->ai_addrlen);
         vlc_freeaddrinfo (res);
     }
     return 0;
+
+oflow:
+    vlc_freeaddrinfo (res);
+    return VLC_ENOMEM;
 }
 
 /**
@@ -231,6 +239,7 @@ void sout_AnnounceSessionDestroy( session_descriptor_t *p_session )
         free (p_session->psz_group);
         free (p_session->psz_sdp);
         free (p_session->description);
+        free (p_session->sdpformat);
         free (p_session->url);
         free (p_session->email);
         free (p_session->phone);
