@@ -112,10 +112,23 @@ int announce_UnRegister( announce_handler_t *p_announce,
 sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce );
 void announce_SAPHandlerDestroy( sap_handler_t *p_sap );
 
+#include <stdarg.h>
+
 char *StartSDP (const char *name, const char *description, const char *url,
                 const char *email, const char *phone, vlc_bool_t ssm,
                 const struct sockaddr *orig, socklen_t origlen,
                 const struct sockaddr *addr, socklen_t addrlen);
+char *vMakeSDPMedia (const char *type, int dport, const char *protocol,
+                     unsigned pt, const char *rtpmap,
+                     const char *fmtp, va_list ap);
+static inline
 char *MakeSDPMedia (const char *type, int dport, const char *protocol,
-                    unsigned pt, const char *rtpmap, const char *fmtp, ...);
-
+                    unsigned pt, const char *rtpmap, const char *fmtpfmt, ...)
+{
+    va_list ap;
+    char *ret;
+    va_start (ap, fmtpfmt);
+    ret = vMakeSDPMedia (type, dport, protocol, pt, rtpmap, fmtpfmt, ap);
+    va_end (ap);
+    return ret;
+}

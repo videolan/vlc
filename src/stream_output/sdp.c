@@ -4,11 +4,9 @@
  * Copyright © 2007 Rémi Denis-Courmont
  * $Id$
  *
- * Authors: Rémi Denis-Courmont
- *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -153,8 +151,9 @@ char *StartSDP (const char *name, const char *description, const char *url,
 }
 
 
-char *MakeSDPMedia (const char *type, int dport, const char *protocol,
-                    unsigned pt, const char *rtpmap, const char *fmtpfmt, ...)
+char *vMakeSDPMedia (const char *type, int dport, const char *protocol,
+                    unsigned pt, const char *rtpmap,
+                    const char *fmtpfmt, va_list ap)
 {
     char *sdp_media = NULL;
 
@@ -176,18 +175,9 @@ char *MakeSDPMedia (const char *type, int dport, const char *protocol,
 
     /* Format parameters */
     char *fmtp = NULL;
-    if (fmtpfmt != NULL)
-    {
-        va_list ap;
-
-        va_start (ap, fmtpfmt);
-        if (vasprintf (&fmtp, fmtpfmt, ap) == -1)
-            fmtpfmt = NULL;
-        va_end (ap);
-
-        if (fmtp == NULL)
-            return NULL;
-    }
+    if ((fmtpfmt != NULL)
+     && (vasprintf (&fmtp, fmtpfmt, ap) == -1))
+        return NULL;
 
     char sdp_fmtp[fmtp ? (sizeof ("a=fmtp:123 *\r\n") + strlen (fmtp)) : 1];
     if (fmtp != NULL)
