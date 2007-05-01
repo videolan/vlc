@@ -116,4 +116,6 @@ char *StartSDP (const char *name, const char *description, const char *url,
                 const char *email, const char *phone, vlc_bool_t ssm,
                 const struct sockaddr *orig, socklen_t origlen,
                 const struct sockaddr *addr, socklen_t addrlen);
+char *MakeSDPMedia (const char *type, int dport, const char *protocol,
+                    unsigned pt, const char *rtpmap, const char *fmtp, ...);
 

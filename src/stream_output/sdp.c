@@ -24,6 +24,9 @@
 #include <vlc/vlc.h>
 
 #include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <assert.h>
 #include <vlc_network.h>
 #include <vlc_charset.h>
 
@@ -108,8 +111,8 @@ char *StartSDP (const char *name, const char *description, const char *url,
 
     if (!IsSDPString (name) || !IsSDPString (description)
      || !IsSDPString (url) || !IsSDPString (email) || !IsSDPString (phone)
-     || (AddressToSDP ((struct sockaddr *)orig, origlen, machine) == NULL)
-     || (AddressToSDP ((struct sockaddr *)addr, addrlen, conn) == NULL))
+     || (AddressToSDP (orig, origlen, machine) == NULL)
+     || (AddressToSDP (addr, addrlen, conn) == NULL))
         return NULL;
 
     if (ssm)
@@ -149,3 +152,56 @@ char *StartSDP (const char *name, const char *description, const char *url,
     return sdp;
 }
 
+
+char *MakeSDPMedia (const char *type, int dport, const char *protocol,
+                    unsigned pt, const char *rtpmap, const char *fmtpfmt, ...)
+{
+    char *sdp_media = NULL;
+
+    /* Some default values */
+    if (type == NULL)
+        type = "video";
+    if (dport == 0)
+        dport = 9;
+    if (protocol == NULL)
+        protocol = "RTP/AVP";
+    assert (pt < 128u);
+
+    /* RTP payload type map */
+    char sdp_rtpmap[rtpmap ? (sizeof ("a=rtpmap:123 *\r\n") + strlen (rtpmap)) : 1];
+    if (rtpmap != NULL)
+        sprintf (sdp_rtpmap, "a=rtpmap:%u %s\r\n", pt, rtpmap);
+    else
+        *sdp_rtpmap = '\0';
+
+    /* Format parameters */
+    char *fmtp = NULL;
+    if (fmtpfmt != NULL)
+    {
+        va_list ap;
+
+        va_start (ap, fmtpfmt);
+        if (vasprintf (&fmtp, fmtpfmt, ap) == -1)
+            fmtpfmt = NULL;
+        va_end (ap);
+
+        if (fmtp == NULL)
+            return NULL;
+    }
+
+    char sdp_fmtp[fmtp ? (sizeof ("a=fmtp:123 *\r\n") + strlen (fmtp)) : 1];
+    if (fmtp != NULL)
+    {
+        sprintf (sdp_fmtp, "a=fmtp:%u %s\r\n", pt, fmtp);
+        free (fmtp);
+    }
+    else
+        *sdp_fmtp = '\0';
+
+    if (asprintf (&sdp_media, "m=%s %u %s %d\r\n" "%s" "%s",
+                  type, dport, protocol, pt,
+                  sdp_rtpmap, sdp_fmtp) == -1)
+        return NULL;
+
+    return sdp_media;
+}
