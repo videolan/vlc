@@ -156,8 +156,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     memset( &fmt_in, 0, sizeof(fmt_in) );
     memset( &fmt_out, 0, sizeof(fmt_out) );
 
-    var_Create( p_dec, "fake-file-reload", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "fake-file-reload", &val );
+    val.i_int = var_CreateGetIntegerCommand( p_dec, "fake-file-reload" );
     if( val.i_int > 0)
     {
         p_dec->p_sys->b_reload = VLC_TRUE;
@@ -422,6 +421,19 @@ static int FakeCallback( vlc_object_t *p_this, char const *psz_var,
         p_dec->p_sys->p_image = p_new_image;
         p_image->pf_release( p_image );
         vlc_mutex_unlock( &p_dec->p_sys->lock );
+    }
+    else if( !strcmp( psz_var, "fake-file-reload" ) )
+    {
+        if( newval.i_int > 0)
+        {
+            p_dec->p_sys->b_reload = VLC_TRUE;
+            p_dec->p_sys->i_reload = (mtime_t)(newval.i_int * 1000000);
+            p_dec->p_sys->i_next   = (mtime_t)(p_dec->p_sys->i_reload + mdate());
+        }
+        else
+        {
+            p_dec->p_sys->b_reload = VLC_FALSE;
+        }
     }
 
     return VLC_SUCCESS;
