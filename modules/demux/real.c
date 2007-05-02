@@ -518,7 +518,7 @@ static int Demux( demux_t *p_demux )
             if( i_flags & 2 ) y = tk->i_subpacket = 0;
 
             if(( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) ||
-            	   tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c' ))
+               tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c' )))
             for( i = 0; i < tk->i_frame_size / tk->i_subpacket_size; i++ )
             {
                 block_t *p_block = block_New( p_demux, tk->i_subpacket_size );
