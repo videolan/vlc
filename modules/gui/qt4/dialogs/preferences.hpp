@@ -82,6 +82,7 @@ private slots:
      void setAll();
      void setSmall();
      void save();
+     void apply();
      void cancel();
      void reset();
      void close(){ save(); };
