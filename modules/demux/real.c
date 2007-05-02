@@ -508,17 +508,17 @@ static int Demux( demux_t *p_demux )
         }
         else if( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) ||
                  tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c') ||
-                 tk->fmt.i_codec == VLC_FOURCC('2','8','_','8') )
+                 tk->fmt.i_codec == VLC_FOURCC( '2', '8', '_', '8') )
         {
             uint8_t *p_buf = p_sys->buffer;
-            int y = tk->i_subpacket / (tk->i_frame_size /tk->i_subpacket_size);
+            int y = tk->i_subpacket / ( tk->i_frame_size /tk->i_subpacket_size);
             int i_index, i;
 
             /* Sanity check */
             if( i_flags & 2 ) y = tk->i_subpacket = 0;
 
-            if(( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) ||
-               tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c' )))
+            if( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) ||
+                tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c' ) )
             for( i = 0; i < tk->i_frame_size / tk->i_subpacket_size; i++ )
             {
                 block_t *p_block = block_New( p_demux, tk->i_subpacket_size );
@@ -533,7 +533,7 @@ static int Demux( demux_t *p_demux )
                 tk->i_subpacket++;
             }
 
-            if( tk->fmt.i_codec == VLC_FOURCC('2','8','_','8') )
+            if( tk->fmt.i_codec == VLC_FOURCC( '2', '8', '_', '8' ) )
             for( i = 0; i < tk->i_subpacket_h / 2; i++ )
             {
                 block_t *p_block = block_New( p_demux, tk->i_coded_frame_size);
