@@ -131,6 +131,7 @@ private slots:
     void advanced();
     void updateVolume( int sliderVolume );
     void updateSystrayMenu( int );
+    void handleSystrayClick(  QSystemTrayIcon::ActivationReason );
 };
 
 

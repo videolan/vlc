@@ -591,8 +591,8 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
  * Systray Menu                                                         *
  ************************************************************************/
 
-void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf
-                                  )
+void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf,
+                                    bool b_force_visible )
 {
     POPUP_BOILERPLATE;
     QMenu *sysMenu = mi->getSysTrayMenu();
@@ -600,7 +600,15 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf
     POPUP_PLAY_ENTRIES( sysMenu );
     sysMenu->addSeparator();
 
-    /* FIXME DP_SADD( menu, qtr("&Hide/show") , "", "", quit(), "" );*/
+    if( mi->isVisible() || b_force_visible )
+    {
+        sysMenu->addAction( qtr("Hide Interface"), mi, SLOT( hide() ) );
+    }
+    else
+    {
+        sysMenu->addAction( qtr("Show Interface"), mi, SLOT( show() ) );
+    }
+    DP_SADD( sysMenu, qtr("&Open" ), "", "", openFileDialog(), "" );
     DP_SADD( sysMenu, qtr("&Quit") , "", "", quit(), "" );
 
     mi->getSysTray()->setContextMenu( sysMenu );

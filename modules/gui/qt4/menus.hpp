@@ -84,7 +84,8 @@ public:
     static void PopupMenu( intf_thread_t *, bool );
 
     /* Systray */
-    static void updateSystrayMenu( MainInterface *,intf_thread_t  * );
+    static void updateSystrayMenu( MainInterface *,intf_thread_t  *,
+                                   bool b_force_visible = false);
 
     /* Actions */
     static void DoAction( intf_thread_t *, QObject * );

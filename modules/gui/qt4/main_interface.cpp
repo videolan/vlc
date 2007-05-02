@@ -129,11 +129,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              slider, setPosition( float,int, int ) );
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, setDisplay( float, int, int ) );
-    CONNECT( THEMIM->getIM(), nameChanged( QString ), this,setName( QString ) );
+    CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
+                                                        setName( QString ) );
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
     CONNECT( THEMIM->getIM(), statusChanged( int ), this,
              updateSystrayMenu( int ) );
-    CONNECT( THEMIM->getIM(), navigationChanged( int ), 
+    CONNECT( THEMIM->getIM(), navigationChanged( int ),
              this, setNavigation(int) );
     CONNECT( slider, sliderDragged( float ),
              THEMIM->getIM(), sliderUpdate( float ) );
@@ -273,15 +274,33 @@ void MainInterface::handleMainUi( QSettings *settings )
 
 void MainInterface::createSystrayMenu()
 {
-    sysTray = new QSystemTrayIcon( QIcon( QPixmap( ":/vlc128.png" ) ) );
+    QIcon iconVLC =  QIcon( QPixmap( ":/vlc128.png" ) );
+    sysTray = new QSystemTrayIcon( iconVLC );
     systrayMenu = new QMenu( qtr( "VLC media player" ), this );
-    QVLCMenu::updateSystrayMenu( this, p_intf );
+    systrayMenu->setIcon( iconVLC );
+    QVLCMenu::updateSystrayMenu( this, p_intf, true );
     sysTray->show();
+    CONNECT( sysTray, activated(  QSystemTrayIcon::ActivationReason ),
+            this, handleSystrayClick( QSystemTrayIcon::ActivationReason ) );
 }
 
 void MainInterface::updateSystrayMenu( int status )
 {
     QVLCMenu::updateSystrayMenu( this, p_intf ) ;
+}
+
+void MainInterface::handleSystrayClick( QSystemTrayIcon::ActivationReason reason )
+{
+    switch( reason )
+    {
+        case QSystemTrayIcon::Trigger:
+            this->show(); break;
+        case QSystemTrayIcon::MiddleClick:
+            sysTray->showMessage( qtr( "VLC media player" ),
+                    qtr( "Control menu for the player" ),
+                    QSystemTrayIcon::Information, 4000 );
+            break;
+    }
 }
 
 /**********************************************************************
