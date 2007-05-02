@@ -60,7 +60,11 @@
     </widget>
    </item>
    <item row="0" column="0" colspan="3" >
-    <widget class="QWidget" native="1" name="tempWidget" />
+    <widget class="QWidget" native="1" name="tempWidget" >
+     <property name="toolTip" >
+      <string>Choose one or more media file to open</string>
+     </property>
+    </widget>
    </item>
    <item row="2" column="2" >
     <spacer>
@@ -80,6 +84,9 @@
    </item>
    <item row="3" column="0" colspan="2" >
     <widget class="QCheckBox" name="subCheckBox" >
+     <property name="toolTip" >
+      <string>Add a subtitle file</string>
+     </property>
      <property name="text" >
       <string>Use a sub&amp;titles file</string>
      </property>
@@ -139,6 +146,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="toolTip" >
+         <string>Set subtitle alignement</string>
+        </property>
         <property name="currentIndex" >
          <number>-1</number>
         </property>
@@ -180,6 +190,9 @@
           <width>100</width>
           <height>0</height>
          </size>
+        </property>
+        <property name="toolTip" >
+         <string>Set default subtitle size</string>
         </property>
        </widget>
       </item>

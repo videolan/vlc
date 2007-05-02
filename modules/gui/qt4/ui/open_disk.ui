@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>246</height>
+    <width>475</width>
+    <height>287</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -32,6 +32,73 @@
       <property name="spacing" >
        <number>6</number>
       </property>
+      <item row="0" column="7" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="3" >
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="3" column="2" colspan="5" >
+       <widget class="QComboBox" name="deviceCombo" >
+        <property name="editable" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="7" >
+       <widget class="QToolButton" name="toolButton" >
+        <property name="text" >
+         <string>Browse...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Disk device</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6" >
+       <widget class="QRadioButton" name="audioCDRadioButton" >
+        <property name="text" >
+         <string>Audio CD</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2" >
+       <widget class="QRadioButton" name="dvdRadioButton" >
+        <property name="layoutDirection" >
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="text" >
+         <string>DVD</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="4" >
        <widget class="QRadioButton" name="vcdRadioButton" >
         <property name="text" >
@@ -52,57 +119,10 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="0" colspan="2" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>Disk device</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3" >
-       <spacer>
+      <item row="2" column="1" colspan="6" >
+       <widget class="Line" name="line" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" >
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="1" colspan="2" >
-       <widget class="QRadioButton" name="dvdRadioButton" >
-        <property name="layoutDirection" >
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text" >
-         <string>DVD</string>
-        </property>
-        <property name="checked" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2" colspan="5" >
-       <widget class="QComboBox" name="deviceCombo" >
-        <property name="editable" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="7" >
-       <widget class="QToolButton" name="toolButton" >
-        <property name="text" >
-         <string>Browse...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="6" >
-       <widget class="QRadioButton" name="audioCDRadioButton" >
-        <property name="text" >
-         <string>Audio CD</string>
         </property>
        </widget>
       </item>
@@ -119,23 +139,13 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="7" >
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
+      <item row="1" column="1" colspan="4" >
+       <widget class="QCheckBox" name="dvdsimple" >
+        <property name="toolTip" >
+         <string>Disable DVD Menus (for compatibility)</string>
         </property>
-        <property name="sizeHint" >
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="1" colspan="6" >
-       <widget class="Line" name="line" >
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
+        <property name="text" >
+         <string>No DVD Menus</string>
         </property>
        </widget>
       </item>

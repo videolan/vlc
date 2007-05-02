@@ -32,6 +32,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="advancedCheckBox" >
+     <property name="toolTip" >
+      <string>Show extended options</string>
+     </property>
      <property name="text" >
       <string>Show &amp;more options</string>
      </property>
