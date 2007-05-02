@@ -26,6 +26,7 @@
 #include "qt4.hpp"
 #include <QObject>
 #include <vector>
+#include <QSystemTrayIcon>
 
 using namespace std;
 
@@ -61,7 +62,8 @@ class QVLCMenu : public QObject
 {
     Q_OBJECT;
 public:
-    static void createMenuBar( MainInterface *mi, intf_thread_t *, bool, bool, bool );
+    static void createMenuBar( MainInterface *mi, intf_thread_t *,
+                               bool, bool, bool );
 
     /* Menus */
     static QMenu *FileMenu();
@@ -75,12 +77,16 @@ public:
     static QMenu *InterfacesMenu( intf_thread_t *p_intf, QMenu * );
     static QMenu *HelpMenu();
 
-    /* Popups */
+    /* Popups Menus */
     static void AudioPopupMenu( intf_thread_t * );
     static void VideoPopupMenu( intf_thread_t * );
     static void MiscPopupMenu( intf_thread_t * );
     static void PopupMenu( intf_thread_t *, bool );
 
+    /* Systray */
+    static void updateSystrayMenu( MainInterface *,intf_thread_t  * );
+
+    /* Actions */
     static void DoAction( intf_thread_t *, QObject * );
 private:
     /* Generic automenu methods */
@@ -92,7 +98,6 @@ private:
                                   int, int, vlc_value_t, int, bool c = false );
     static void CreateItem( QMenu *, const char *, vlc_object_t *, bool );
     static int CreateChoicesMenu( QMenu *,const char *, vlc_object_t *, bool );
-
 };
 
 class MenuFunc : public QObject

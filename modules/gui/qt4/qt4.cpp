@@ -48,6 +48,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                                    "preferences when opening the preferences " \
                                    "dialog.")
 
+#define SYSTRAY_TEXT N_("Show a systray icon to control")
+#define SYSTRAY_LONGTEXT N_("Show in the taskbar, a systray icon" \
+                            "in order to control VLC for basic actions")
+
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
     set_description( (char*)_("Qt interface") );
@@ -66,6 +70,8 @@ vlc_module_begin();
                 VLC_TRUE );
         add_bool( "qt-advanced-pref", VLC_FALSE, NULL, ADVANCED_PREFS_TEXT,
                 ADVANCED_PREFS_LONGTEXT, VLC_FALSE );
+        add_bool( "qt-system-tray", VLC_TRUE, NULL, SYSTRAY_TEXT,
+                SYSTRAY_LONGTEXT, VLC_FALSE);
         set_callbacks( OpenDialogs, Close );
 vlc_module_end();
 

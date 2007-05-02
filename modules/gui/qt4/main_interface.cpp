@@ -38,6 +38,7 @@
 #include <QStatusBar>
 #include <QKeyEvent>
 #include <QUrl>
+#include <QSystemTrayIcon>
 
 #include <assert.h>
 #include <vlc_keys.h>
@@ -130,7 +131,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              this, setDisplay( float, int, int ) );
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,setName( QString ) );
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
-    CONNECT( THEMIM->getIM(), navigationChanged( int ), this, setNavigation(int) );
+    CONNECT( THEMIM->getIM(), statusChanged( int ), this,
+             updateSystrayMenu( int ) );
+    CONNECT( THEMIM->getIM(), navigationChanged( int ), 
+             this, setNavigation(int) );
     CONNECT( slider, sliderDragged( float ),
              THEMIM->getIM(), sliderUpdate( float ) );
 
@@ -146,21 +150,24 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     p_intf->b_interaction = VLC_TRUE;
 
     /* Register callback for the intf-popupmenu variable */
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
         var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
         var_AddCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
+    if( QSystemTrayIcon::isSystemTrayAvailable() &&
+                              ( config_GetInt( p_intf, "qt-system-tray") == 1))
+            createSystrayMenu();
 }
 
 MainInterface::~MainInterface()
 {
     /* Unregister callback for the intf-popupmenu variable */
-    playlist_t *p_playlist =
-        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
         var_DelCallback( p_playlist, "intf-popupmenu", PopupMenuCB, p_intf );
@@ -262,6 +269,19 @@ void MainInterface::handleMainUi( QSettings *settings )
         p_intf->pf_control_window  = ::DoControl;
     }
     setMinimumSize( PREF_W, addSize.height() );
+}
+
+void MainInterface::createSystrayMenu()
+{
+    sysTray = new QSystemTrayIcon( QIcon( QPixmap( ":/vlc128.png" ) ) );
+    systrayMenu = new QMenu( qtr( "VLC media player" ), this );
+    QVLCMenu::updateSystrayMenu( this, p_intf );
+    sysTray->show();
+}
+
+void MainInterface::updateSystrayMenu( int status )
+{
+    QVLCMenu::updateSystrayMenu( this, p_intf ) ;
 }
 
 /**********************************************************************
@@ -556,7 +576,7 @@ void MainInterface::customEvent( QEvent *event )
         if( p_event->OnTop() )
             setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
         else
-            setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);            
+            setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
         show(); /* necessary to apply window flags?? */
     }
 }

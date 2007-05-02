@@ -27,6 +27,7 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QSignalMapper>
+#include <QSystemTrayIcon>
 
 #ifndef WIN32
 #   include <signal.h>
@@ -49,14 +50,14 @@ enum
 static QActionGroup *currentGroup;
 
 // Add static entries to menus
-#define DP_SADD( text, help, icon, slot, shortcut ) \
+#define DP_SADD( menu, text, help, icon, slot, shortcut ) \
 { \
     if( strlen(icon) > 0 ) \
     { \
         if( strlen(shortcut) > 0 ) \
         { \
             menu->addAction( QIcon(icon), text, THEDP, SLOT( slot ), \
-                    tr(shortcut) );\
+                    qtr(shortcut) );\
         } \
         else \
         { \
@@ -76,7 +77,7 @@ static QActionGroup *currentGroup;
         } \
     } \
 }
-#define MIM_SADD( text, help, icon, slot ) \
+#define MIM_SADD( menu, text, help, icon, slot ) \
 { \
     if( strlen(icon) > 0 ) \
     { \
@@ -177,7 +178,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
     pthread_sigmask (SIG_UNBLOCK, &set, NULL);
 #endif
     QMenuBar *bar = mi->menuBar();
-#ifndef WIN32 
+#ifndef WIN32
     pthread_sigmask (SIG_BLOCK, &set, NULL);
 #endif
     BAR_ADD( FileMenu(), qtr("&Media") );
@@ -196,18 +197,18 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
 QMenu *QVLCMenu::FileMenu()
 {
     QMenu *menu = new QMenu();
-    DP_SADD( qtr("Open &File..." ), "", "", openFileDialog(), "Ctrl+O" );
-    DP_SADD( qtr("Open &Disc..." ), "", "", openDiscDialog(), "Ctrl+D" );
-    DP_SADD( qtr("Open &Network..." ), "", "", openNetDialog(), "Ctrl+N" );
-    DP_SADD( qtr("Open &Capture Device..." ), "", "", openCaptureDialog(),
+    DP_SADD( menu, qtr("Open &File..." ), "", "", openFileDialog(), "Ctrl+O" );
+    DP_SADD( menu, qtr("Open &Disc..." ), "", "", openDiscDialog(), "Ctrl+D" );
+    DP_SADD( menu, qtr("Open &Network..." ), "", "", openNetDialog(), "Ctrl+N" );
+    DP_SADD( menu, qtr("Open &Capture Device..." ), "", "", openCaptureDialog(),
             "Ctrl+C" );
     menu->addSeparator();
-    DP_SADD( qtr("&Streaming..."), "", "", openThenStreamingDialogs(), 
+    DP_SADD( menu, qtr("&Streaming..."), "", "", openThenStreamingDialogs(), 
             "Ctrl+S" );
-    DP_SADD( qtr("Conve&rt / Save..."), "", "", openThenTranscodingDialogs(), 
+    DP_SADD( menu, qtr("Conve&rt / Save..."), "", "", openThenTranscodingDialogs(), 
             "Ctrl+R" );
     menu->addSeparator();
-    DP_SADD( qtr("&Quit") , "", "", quit(), "Ctrl+Q");
+    DP_SADD( menu, qtr("&Quit") , "", "", quit(), "Ctrl+Q");
     return menu;
 }
 
@@ -217,8 +218,8 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
     menu->addMenu( SDMenu( p_intf ) );
     menu->addSeparator();
 
-    DP_SADD( qtr(I_PL_LOAD), "", "", openPlaylist(), "Ctrl+L" );
-    DP_SADD( qtr(I_PL_SAVE), "", "", savePlaylist(), "Ctrl+K" );
+    DP_SADD( menu, qtr(I_PL_LOAD), "", "", openPlaylist(), "Ctrl+L" );
+    DP_SADD( menu, qtr(I_PL_SAVE), "", "", savePlaylist(), "Ctrl+K" );
     menu->addSeparator();
     menu->addAction( qtr("Undock from interface"), mi,
             SLOT( undockPlaylist() ), qtr("Ctrl+U") );
@@ -237,12 +238,12 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         menu->addMenu( intfmenu );
         menu->addSeparator();
     }
-    DP_SADD( qtr(I_MENU_MSG), "", "", messagesDialog(), "Ctrl+M" );
-    DP_SADD( qtr(I_MENU_INFO) , "", "", mediaInfoDialog(), "Ctrl+J" );
-    DP_SADD( qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog(), "Ctrl+I" );
-    DP_SADD( qtr(I_MENU_GOTOTIME), "","", gotoTimeDialog(), "Ctrl+T" );
-    DP_SADD( qtr(I_MENU_BOOKMARK), "","", bookmarksDialog(), "Ctrl+B" );
-    DP_SADD( qtr(I_MENU_VLM), "","", vlmDialog(), "Ctrl+V" );
+    DP_SADD( menu, qtr(I_MENU_MSG), "", "", messagesDialog(), "Ctrl+M" );
+    DP_SADD( menu, qtr(I_MENU_INFO) , "", "", mediaInfoDialog(), "Ctrl+J" );
+    DP_SADD( menu, qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog(), "Ctrl+I" );
+    DP_SADD( menu, qtr(I_MENU_GOTOTIME), "","", gotoTimeDialog(), "Ctrl+T" );
+    DP_SADD( menu, qtr(I_MENU_BOOKMARK), "","", bookmarksDialog(), "Ctrl+B" );
+    DP_SADD( menu, qtr(I_MENU_VLM), "","", vlmDialog(), "Ctrl+V" );
 
     menu->addSeparator();
     if( mi )
@@ -259,10 +260,10 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
 #endif
         menu->addAction ( qtr( "Playlist"), mi, SLOT( playlist() ) );
     }
-    DP_SADD( qtr(I_MENU_EXT), "","",extendedDialog(), "Ctrl+E" );
-    DP_SADD( qtr("Hide Menus..."), "","",hideMenus(), "Ctrl+H" );
+    DP_SADD( menu, qtr(I_MENU_EXT), "","",extendedDialog(), "Ctrl+E" );
+    DP_SADD( menu, qtr("Hide Menus..."), "","",hideMenus(), "Ctrl+H" );
     menu->addSeparator();
-    DP_SADD( qtr("Preferences"), "", "", prefsDialog(), "Ctrl+P" );
+    DP_SADD( menu, qtr("Preferences"), "", "", prefsDialog(), "Ctrl+P" );
     return menu;
 }
 
@@ -398,15 +399,15 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 QMenu *QVLCMenu::HelpMenu()
 {
     QMenu *menu = new QMenu();
-    DP_SADD( qtr("Help") , "", "", helpDialog(), "F1" );
+    DP_SADD( menu, qtr("Help") , "", "", helpDialog(), "F1" );
     menu->addSeparator();
-    DP_SADD( qtr(I_MENU_ABOUT), "", "", aboutDialog(), "Ctrl+F1");
+    DP_SADD( menu, qtr(I_MENU_ABOUT), "", "", aboutDialog(), "Ctrl+F1");
     return menu;
 }
 
 
 /*****************************************************************************
- * Popup menus
+ * Popup menus                                                               *
  *****************************************************************************/
 #define POPUP_BOILERPLATE \
     unsigned int i_last_separator = 0; \
@@ -422,22 +423,26 @@ QMenu *QVLCMenu::HelpMenu()
     p_intf->p_sys->p_popup_menu = NULL; \
     i_last_separator = 0;
 
-#define POPUP_STATIC_ENTRIES \
+#define POPUP_PLAY_ENTRIES( menu )\
     vlc_value_t val; \
     if( p_input ) \
     { \
         var_Get( p_input, "state", &val ); \
         if( val.i_int == PAUSE_S ) \
-            MIM_SADD( qtr("Play"), "", "", togglePlayPause() ) \
+            MIM_SADD( menu, qtr("Play"), "", "", togglePlayPause() ) \
         else \
-            MIM_SADD( qtr("Pause"), "", "", togglePlayPause() ) \
+            MIM_SADD( menu, qtr("Pause"), "", "", togglePlayPause() ) \
     } \
     else if( THEPL->items.i_size && THEPL->i_enabled ) \
-        MIM_SADD( qtr("Play"), "", "", togglePlayPause() );\
+        MIM_SADD( menu, qtr("Play"), "", "", togglePlayPause() ); \
     \
-    MIM_SADD( qtr("Stop"), "", "", stop() ); \
-    MIM_SADD( qtr("Previous"), "", "", prev() ); \
-    MIM_SADD( qtr("Next"), "", "", next() ); \
+    MIM_SADD( menu, qtr("Stop"), "", "", stop() ); \
+    MIM_SADD( menu, qtr("Previous"), "", "", prev() ); \
+    MIM_SADD( menu, qtr("Next"), "", "", next() );
+
+#define POPUP_STATIC_ENTRIES \
+    POPUP_PLAY_ENTRIES( menu ); \
+    \
     menu->addSeparator(); \
     QMenu *intfmenu = InterfacesMenu( p_intf, NULL ); \
     intfmenu->setTitle( qtr("Interfaces" ) ); \
@@ -460,7 +465,7 @@ QMenu *QVLCMenu::HelpMenu()
     helpmenu->setTitle( qtr("Help") ); \
     menu->addMenu( helpmenu ); \
     \
-    DP_SADD( qtr("Quit"), "", "", quit() , "Ctrl+Q" );
+    DP_SADD( menu, qtr("Quit"), "", "", quit() , "Ctrl+Q" );
 
 void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
 {
@@ -575,15 +580,35 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         p_intf->p_sys->p_popup_menu->popup( QCursor::pos() );
     }
     else
-    {    
+    {
         // destroy popup if there is one
         delete p_intf->p_sys->p_popup_menu;
         p_intf->p_sys->p_popup_menu = NULL;
     }
 }
 
+/************************************************************************
+ * Systray Menu                                                         *
+ ************************************************************************/
+
+void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf
+                                  )
+{
+    POPUP_BOILERPLATE;
+    QMenu *sysMenu = mi->getSysTrayMenu();
+    sysMenu->clear();
+    POPUP_PLAY_ENTRIES( sysMenu );
+    sysMenu->addSeparator();
+
+    /* FIXME DP_SADD( menu, qtr("&Hide/show") , "", "", quit(), "" );*/
+    DP_SADD( sysMenu, qtr("&Quit") , "", "", quit(), "" );
+
+    mi->getSysTray()->setContextMenu( sysMenu );
+}
+
 #undef PUSH_VAR
 #undef PUSH_SEPARATOR
+
 
 /*************************************************************************
  * Builders for automenus
@@ -899,5 +924,4 @@ void QVLCMenu::DoAction( intf_thread_t *p_intf, QObject *data )
     if( p_object == NULL ) return;
 
     var_Set( p_object, itemData->psz_var, itemData->val );
-    vlc_object_release( p_object );
-}
+    vlc_object_release( p_object );}

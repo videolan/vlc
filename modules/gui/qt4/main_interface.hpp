@@ -30,6 +30,8 @@
 #include "util/qvlcframe.hpp"
 
 #include <QSize>
+#include <QSystemTrayIcon>
+#include <QMenu>
 
 class QSettings;
 class QCloseEvent;
@@ -44,6 +46,7 @@ class PlaylistWidget;
 class VolumeClickHandler;
 class VisualSelector;
 class ControlsWidget;
+class QMenu;
 
 class MainInterface : public QVLCMW
 {
@@ -57,6 +60,9 @@ public:
     void releaseVideo( void *);
     int controlVideo( void *p_window, int i_query, va_list args );
     void setVLCWindowsTitle( QString title = "" );
+
+    QSystemTrayIcon *getSysTray() { return sysTray; };
+    QMenu *getSysTrayMenu() { return systrayMenu; };
 protected:
     void resizeEvent( QResizeEvent * );
     void dropEvent( QDropEvent *);
@@ -69,11 +75,15 @@ protected:
 private:
     QSettings *settings;
     QSize mainSize, addSize;
+    QSystemTrayIcon *sysTray;
+    QMenu *systrayMenu;
 
     bool need_components_update;
     void calculateInterfaceSize();
     void handleMainUi( QSettings* );
+    void handleSystray();
     void doComponentsUpdate();
+    void createSystrayMenu();
 
     /* Video */
     VideoWidget         *videoWidget;
@@ -120,6 +130,7 @@ private slots:
     void visual();
     void advanced();
     void updateVolume( int sliderVolume );
+    void updateSystrayMenu( int );
 };
 
 
