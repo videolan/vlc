@@ -48,9 +48,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                                    "preferences when opening the preferences " \
                                    "dialog.")
 
-#define SYSTRAY_TEXT N_("Show a systray icon to control")
+#define SYSTRAY_TEXT N_("Show a systray icon to control VLC")
 #define SYSTRAY_LONGTEXT N_("Show in the taskbar, a systray icon" \
-                            "in order to control VLC for basic actions")
+                            "in order to control VLC media player" \
+                            "for basic actions")
 
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
