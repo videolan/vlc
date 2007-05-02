@@ -404,7 +404,8 @@ static int Manage( vout_thread_t *p_vout )
 
             SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
                           rect_parent.right - rect_parent.left,
-                          rect_parent.bottom - rect_parent.top, 0 );
+                          rect_parent.bottom - rect_parent.top,
+                          SWP_NOZORDER );
         }
     }
     else
@@ -624,7 +625,9 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     LPDIRECT3DDEVICE9       p_d3ddev = p_vout->p_sys->p_d3ddev;
     // Present the back buffer contents to the display
     // stretching and filtering happens here
-    HRESULT hr = IDirect3DDevice9_Present(p_d3ddev, NULL, NULL, NULL, NULL);
+    HRESULT hr = IDirect3DDevice9_Present(p_d3ddev,
+                    &(p_vout->p_sys->rect_src_clipped),
+                    NULL, NULL, NULL);
     if( FAILED(hr) )
         msg_Dbg( p_vout, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
 }
@@ -643,7 +646,7 @@ static void FirstDisplay( vout_thread_t *p_vout, picture_t *p_pic )
     ** Video window is initially hidden, show it now since we got a 
     ** picture to show.
     */
-    SetWindowPos( p_vout->p_sys->hvideownd, NULL, 0, 0, 0, 0, 
+    SetWindowPos( p_vout->p_sys->hvideownd, 0, 0, 0, 0, 0, 
         SWP_ASYNCWINDOWPOS|
         SWP_FRAMECHANGED|
         SWP_SHOWWINDOW|
@@ -754,7 +757,7 @@ static int Direct3DFillPresentationParameters(vout_thread_t *p_vout, D3DPRESENT_
     d3dpp->hDeviceWindow          = p_vout->p_sys->hvideownd;
     d3dpp->BackBufferWidth        = p_vout->output.i_width;
     d3dpp->BackBufferHeight       = p_vout->output.i_height;
-    d3dpp->SwapEffect             = D3DSWAPEFFECT_DISCARD;
+    d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
     d3dpp->MultiSampleType        = D3DMULTISAMPLE_NONE;
     d3dpp->PresentationInterval   = D3DPRESENT_INTERVAL_DEFAULT;
     d3dpp->BackBufferFormat       = d3ddm.Format;
@@ -911,7 +914,7 @@ static D3DFORMAT Direct3DVoutSelectFormat( vout_thread_t *p_vout, D3DFORMAT targ
     return D3DFMT_UNKNOWN;
 }
 
-D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3DFORMAT target)
+static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3DFORMAT target)
 {
     if( p_vout->p_sys->b_hw_yuv && ! _got_vista_or_above )
     {

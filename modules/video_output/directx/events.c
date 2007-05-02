@@ -630,8 +630,9 @@ void E_(DirectXUpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
                        &i_x, &i_y, &i_width, &i_height );
 
     if( p_vout->p_sys->hvideownd )
-        SetWindowPos( p_vout->p_sys->hvideownd, HWND_TOP,
-                      i_x, i_y, i_width, i_height, 0 );
+        SetWindowPos( p_vout->p_sys->hvideownd, 0,
+                      i_x, i_y, i_width, i_height,
+                      SWP_NOCOPYBITS|SWP_NOZORDER|SWP_ASYNCWINDOWPOS );
 
     /* Destination image position and dimensions */
     rect_dest.left = point.x + i_x;
@@ -653,7 +654,6 @@ void E_(DirectXUpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
                 p_vout->p_sys->i_align_dest_size / 2 ) & 
                 ~p_vout->p_sys->i_align_dest_size) + rect_dest.left;
     }
-#endif
 
     /* UpdateOverlay directdraw function doesn't automatically clip to the
      * display size so we need to do it otherwise it will fail */
@@ -680,6 +680,12 @@ void E_(DirectXUpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
         SetRectEmpty( &rect_src_clipped );
         return;
     }
+#else /* MODULE_NAME_IS_vout_directx */
+
+    /* AFAIK, there are no clipping constraints in Direct3D or OpenGL */
+    rect_dest_clipped = rect_dest;
+
+#endif
 
     /* src image dimensions */
     rect_src.left = 0;
@@ -727,6 +733,7 @@ void E_(DirectXUpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
                      rect_src_clipped.right, rect_src_clipped.bottom );
 #endif
 
+#ifdef MODULE_NAME_IS_vout_directx
     /* The destination coordinates need to be relative to the current
      * directdraw primary surface (display) */
     rect_dest_clipped.left -= p_vout->p_sys->rect_display.left;
@@ -734,7 +741,6 @@ void E_(DirectXUpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
     rect_dest_clipped.top -= p_vout->p_sys->rect_display.top;
     rect_dest_clipped.bottom -= p_vout->p_sys->rect_display.top;
 
-#ifdef MODULE_NAME_IS_vout_directx
     if( p_vout->p_sys->b_using_overlay )
         E_(DirectXUpdateOverlay)( p_vout );
 #endif
@@ -796,7 +802,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         {
 #ifdef MODULE_NAME_IS_vout_directx
         case WM_ERASEBKGND:
-            /* For overlay, we need to erase background */
+        /* For overlay, we need to erase background */
             return !p_vout->p_sys->b_using_overlay ?
                 1 : DefWindowProc(hwnd, message, wParam, lParam);
         case WM_PAINT:
