@@ -1110,6 +1110,11 @@ static struct
       AUDIO_ES, "Microsoft GSM Audio" },
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
+    { VLC_FOURCC('a','t','r','c'), CODEC_ID_ATRAC3,
+      AUDIO_ES, "atrac 3" },
+#endif
+
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
       AUDIO_ES, "PCM S8" },

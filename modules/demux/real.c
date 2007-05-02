@@ -507,6 +507,7 @@ static int Demux( demux_t *p_demux )
             }
         }
         else if( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) ||
+                 tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c') ||
                  tk->fmt.i_codec == VLC_FOURCC('2','8','_','8') )
         {
             uint8_t *p_buf = p_sys->buffer;
@@ -516,7 +517,8 @@ static int Demux( demux_t *p_demux )
             /* Sanity check */
             if( i_flags & 2 ) y = tk->i_subpacket = 0;
 
-            if( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) )
+            if(( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) ||
+            	   tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c' ))
             for( i = 0; i < tk->i_frame_size / tk->i_subpacket_size; i++ )
             {
                 block_t *p_block = block_New( p_demux, tk->i_subpacket_size );
@@ -1059,6 +1061,7 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
             break;
 
         case VLC_FOURCC('c','o','o','k'):
+        case VLC_FOURCC('a','t','r','c'):
             fmt.audio.i_blockalign = i_subpacket_size;
             if( !(fmt.i_extra = GetDWBE( p_peek )) ) break;
             fmt.p_extra = malloc( fmt.i_extra );
