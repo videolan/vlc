@@ -225,6 +225,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     BUTTONACT( ui.dvdRadioButton, updateMRL());
     BUTTONACT( ui.vcdRadioButton, updateMRL());
     BUTTONACT( ui.audioCDRadioButton, updateMRL());
+    BUTTONACT( ui.dvdsimple,  updateMRL());
 
     CONNECT( ui.titleSpin, valueChanged(int), this, updateMRL());
     CONNECT( ui.chapterSpin, valueChanged(int), this, updateMRL());
@@ -244,7 +245,11 @@ void DiscOpenPanel::updateMRL()
     QString mrl = "";
     /* DVD */
     if( ui.dvdRadioButton->isChecked() ) {
-        mrl = "dvd://" + ui.deviceCombo->currentText();
+        if( !ui.dvdsimple->isChecked() )
+            mrl = "dvd://";
+        else
+            mrl = "dvdsimple://";
+        mrl += ui.deviceCombo->currentText();
         emit methodChanged( "dvdnav-caching" );
 
         if ( ui.titleSpin->value() > 0 ) {
