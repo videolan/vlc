@@ -42,7 +42,7 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowFlags( Qt::Tool );
     setWindowTitle( qtr( "Go to Time" ) );
-    resize( 250, 180 );
+    resize( 260, 160 );
 
     QGridLayout *mainLayout = new QGridLayout( this );
 
