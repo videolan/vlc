@@ -223,7 +223,7 @@ stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
 
 stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
 {
-    stream_t *s = vlc_stream_create( p_access );
+    stream_t *s = vlc_stream_create( VLC_OBJECT(p_access) );
     stream_sys_t *p_sys;
     char *psz_list;
 
@@ -287,7 +287,7 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
             if( psz_name )
             {
                 access_t *p_tmp = access2_New( p_access, p_access->psz_access,
-                                               0, psz_name, 0 );
+                                               "", psz_name, 0 );
 
                 if( !p_tmp )
                 {
@@ -1663,7 +1663,7 @@ static int AReadStream( stream_t *s, void *p_read, int i_read )
 
         msg_Dbg( s, "opening input `%s'", psz_name );
 
-        p_list_access = access2_New( s, p_access->psz_access, 0, psz_name, 0 );
+        p_list_access = access2_New( s, p_access->psz_access, "", psz_name, 0 );
 
         if( !p_list_access ) return 0;
 
@@ -1735,7 +1735,7 @@ static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof )
 
         msg_Dbg( s, "opening input `%s'", psz_name );
 
-        p_list_access = access2_New( s, p_access->psz_access, 0, psz_name, 0 );
+        p_list_access = access2_New( s, p_access->psz_access, "", psz_name, 0 );
 
         if( !p_list_access ) return 0;
 
@@ -1792,7 +1792,7 @@ static int ASeek( stream_t *s, int64_t i_pos )
         if( i != p_sys->i_list_index && i != 0 )
         {
             p_list_access =
-                access2_New( s, p_access->psz_access, 0, psz_name, 0 );
+                access2_New( s, p_access->psz_access, "", psz_name, 0 );
         }
         else if( i != p_sys->i_list_index )
         {
