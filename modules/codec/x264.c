@@ -67,6 +67,12 @@ static void Close( vlc_object_t * );
     "I-frames are inserted only every other keyint frames, which probably " \
     "leads to ugly encoding artifacts. Range 1 to 100." )
 
+#if X264_BUILD >= 55 /* r607 */
+#define PRESCENE_TEXT N_("Faster, less precise scenecut detection" )
+#define PRESCENE_LONGTEXT N_( "Faster, less precise scenecut detection. " \
+    "Required and implied by multi-threading." )
+#endif
+
 #define BFRAMES_TEXT N_("B-frames between I and P")
 #define BFRAMES_LONGTEXT N_( "Number of consecutive B-frames between I and " \
     "P-frames. Range 1 to 16." )
@@ -212,6 +218,7 @@ static void Close( vlc_object_t * );
     " - umh: uneven multi-hexagon search (better but slower)\n" \
     " - esa: exhaustive search (extremely slow, primarily for testing)\n" )
 
+#if X264_BUILD >= 24
 #define MERANGE_TEXT N_("Maximum motion vector search range")
 #define MERANGE_LONGTEXT N_( "Maximum distance to search for " \
     "motion estimation, measured from predicted position(s). " \
@@ -221,6 +228,13 @@ static void Close( vlc_object_t * );
 #define MVRANGE_TEXT N_("Maximum motion vector length")
 #define MVRANGE_LONGTEXT N_( "Maximum motion vector length in pixels. " \
     "-1 is automatic, based on level." )
+#endif
+
+#if X264_BUILD >= 55 /* r607 */
+#define MVRANGE_THREAD_TEXT N_("Minimum buffer space between threads")
+#define MVRANGE_THREAD_LONGTEXT N_( "Minimum buffer space between threads. " \
+    "-1 is automatic, based on number of threads." )
+#endif
 
 #define SUBME_TEXT N_("Subpixel motion estimation and partition decision " \
     "quality")
@@ -291,6 +305,12 @@ static void Close( vlc_object_t * );
 #endif
 
 /* Input/Output */
+
+#if X264_BUILD >= 55 /* r607 */
+#define NON_DETERMINISTIC_TEXT N_("Non-deterministic optimizations when threaded")
+#define NON_DETERMINISTIC_LONGTEXT N_( "Slightly improve quality of SMP, " \
+    "at the cost of repeatability.")
+#endif
 
 #define ASM_TEXT N_("CPU optimizations")
 #define ASM_LONGTEXT N_( "Use assembler CPU optimizations.")
@@ -364,6 +384,11 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "scenecut", 40, NULL, SCENE_TEXT,
                  SCENE_LONGTEXT, VLC_FALSE );
         change_integer_range( -1, 100 );
+
+#if X264_BUILD >= 55 /* r607 */
+    add_bool( SOUT_CFG_PREFIX "pre-scenecut", 0, NULL, PRESCENE_TEXT,
+              PRESCENE_LONGTEXT, VLC_FALSE );
+#endif
 
     add_integer( SOUT_CFG_PREFIX "bframes", 0, NULL, BFRAMES_TEXT,
                  BFRAMES_LONGTEXT, VLC_FALSE );
@@ -509,6 +534,11 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "mvrange", -1, NULL, MVRANGE_TEXT,
                  MVRANGE_LONGTEXT, VLC_FALSE );
 
+#if X264_BUILD >= 55 /* r607 */
+    add_integer( SOUT_CFG_PREFIX "mvrange-thread", -1, NULL, MVRANGE_THREAD_TEXT,
+                 MVRANGE_THREAD_LONGTEXT, VLC_FALSE );
+#endif
+
     add_integer( SOUT_CFG_PREFIX "subme", 5, NULL, SUBME_TEXT,
                  SUBME_LONGTEXT, VLC_FALSE );
         change_integer_range( 1, SUBME_MAX );
@@ -573,6 +603,11 @@ vlc_module_begin();
 
 /* Input/Output */
 
+#if X264_BUILD >= 55 /* r607 */
+    add_bool( SOUT_CFG_PREFIX "non-deterministic", 0, NULL, NON_DETERMINISTIC_TEXT,
+              NON_DETERMINISTIC_LONGTEXT, VLC_FALSE );
+#endif
+
     add_bool( SOUT_CFG_PREFIX "asm", 1, NULL, ASM_TEXT,
               ASM_LONGTEXT, VLC_FALSE );
 
@@ -616,12 +651,12 @@ static const char *ppsz_sout_options[] = {
     "cplxblur", "crf", "dct-decimate", "deadzone-inter", "deadzone-intra",
     "deblock", "direct", "direct-8x8", "filter", "fast-pskip", "frameref",
     "interlaced", "ipratio", "keyint", "keyint-min", "level", "loopfilter",
-    "me", "merange", "min-keyint", "mixed-refs", "mvrange", "nf", "nr",
-    "partitions", "pass", "pbratio", "psnr", "qblur", "qp", "qcomp",
-    "qpstep", "qpmax", "qpmin", "qp-max", "qp-min", "quiet", "ratetol",
-    "ref", "scenecut", "sps-id", "ssim", "stats", "subme", "subpel",
-    "tolerance", "trellis", "verbose", "vbv-bufsize", "vbv-init",
-    "vbv-maxrate", "weightb", NULL
+    "me", "merange", "min-keyint", "mixed-refs", "mvrange", "mvrange-thread",
+    "nf", "non-deterministic", "nr", "partitions", "pass", "pbratio",
+    "pre-scenecut", "psnr", "qblur", "qp", "qcomp", "qpstep", "qpmax",
+    "qpmin", "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut",
+    "sps-id", "ssim", "stats", "subme", "subpel", "tolerance", "trellis",
+    "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -849,6 +884,13 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_scenecut_threshold = val.i_int;
 #endif
 
+#if X264_BUILD >= 55 /* r607 */
+    var_Get( p_enc, SOUT_CFG_PREFIX "pre-scenecut", &val );
+    p_sys->param.b_pre_scenecut = val.b_bool;
+    var_Get( p_enc, SOUT_CFG_PREFIX "non-deterministic", &val );
+    p_sys->param.b_deterministic = val.b_bool;
+#endif
+
     var_Get( p_enc, SOUT_CFG_PREFIX "subme", &val );
     if( val.i_int >= 1 && val.i_int <= SUBME_MAX )
         p_sys->param.analyse.i_subpel_refine = val.i_int;
@@ -874,12 +916,17 @@ static int  Open ( vlc_object_t *p_this )
     if( val.psz_string ) free( val.psz_string );
 
     var_Get( p_enc, SOUT_CFG_PREFIX "merange", &val );
-    if( val.i_int >= 1 && val.i_int <= 64 )
+    if( val.i_int >= 0 && val.i_int <= 64 )
         p_sys->param.analyse.i_me_range = val.i_int;
-#endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "mvrange", &val );
         p_sys->param.analyse.i_mv_range = val.i_int;
+#endif
+
+#if X264_BUILD >= 55 /* r607 */
+    var_Get( p_enc, SOUT_CFG_PREFIX "mvrange-thread", &val );
+        p_sys->param.analyse.i_mv_range_thread = val.i_int;
+#endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "direct", &val );
     if( !strcmp( val.psz_string, "none" ) )
