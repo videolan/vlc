@@ -250,9 +250,28 @@ mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq* ps )
     free( ps );
 }
 
+/**
+ * Initialize a VLC exception.
+ *
+ * If given a NULL pointer, it will instanciate a new exception, which
+ * should be later freed by the caller. If given an existing
+ * exception, it will reset its code and message fields. In both
+ * cases, the exception pointer is returned.
+ *
+ * \param exception a pointer on a mediacontrol_Exception
+ * \return a pointer on a mediacontrol_Exception.
+ */
 mediacontrol_Exception*
 mediacontrol_exception_init( mediacontrol_Exception *exception )
 {
+    if( !exception )
+    {
+        exception = ( mediacontrol_Exception* )malloc( sizeof( mediacontrol_Exception ) );
+	if( !exception )
+        {
+            return NULL;
+        }
+    }
     exception->code = 0;
     exception->message = NULL;
     return exception;
