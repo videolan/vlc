@@ -135,11 +135,17 @@ mediacontrol_PlaylistSeq *mediacontrol_PlaylistSeq__alloc( int size );
 VLC_PUBLIC_API void mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq *ps );
 
 /**
- * Initialize an exception structure.
- * \param p_exception the exception to initialize. If NULL, a new exception will be created.
+ * Instanciate and initialize an exception structure.
  * \return the exception
  */
 VLC_PUBLIC_API mediacontrol_Exception *
+  mediacontrol_exception_create( void );
+
+/**
+ * Initialize an existing exception structure.
+ * \param p_exception the exception to initialize.
+ */
+VLC_PUBLIC_API void
   mediacontrol_exception_init( mediacontrol_Exception *exception );
 
 /**

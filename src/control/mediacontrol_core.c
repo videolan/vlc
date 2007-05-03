@@ -58,7 +58,7 @@ mediacontrol_Instance* mediacontrol_new( int argc, char** argv, mediacontrol_Exc
     int i_index;
 
     libvlc_exception_init( &ex );
-    exception=mediacontrol_exception_init( exception );
+    mediacontrol_exception_init( exception );
 
     retval = ( mediacontrol_Instance* )malloc( sizeof( mediacontrol_Instance ) );
     if( !retval ) 
@@ -126,7 +126,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
     vlc_int64_t pos;
     libvlc_input_t * p_input;
 
-    exception = mediacontrol_exception_init( exception );
+    mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
     retval = ( mediacontrol_Position* )malloc( sizeof( mediacontrol_Position ) );
@@ -207,7 +207,7 @@ mediacontrol_start( mediacontrol_Instance *self,
 {
     playlist_t * p_playlist = self->p_playlist;
 
-    exception = mediacontrol_exception_init( exception );
+    mediacontrol_exception_init( exception );
     if( ! p_playlist )
     {
         RAISE( mediacontrol_PlaylistException, "No available playlist" );
@@ -249,7 +249,7 @@ mediacontrol_pause( mediacontrol_Instance *self,
     input_thread_t *p_input = self->p_playlist->p_input;
 
     /* FIXME: use the a_position parameter */
-    exception=mediacontrol_exception_init( exception );
+    mediacontrol_exception_init( exception );
     if( p_input != NULL )
     {
         var_SetInteger( p_input, "state", PAUSE_S );
@@ -268,7 +268,7 @@ mediacontrol_resume( mediacontrol_Instance *self,
     input_thread_t *p_input = self->p_playlist->p_input;
 
     /* FIXME: use the a_position parameter */
-    exception=mediacontrol_exception_init( exception );
+    mediacontrol_exception_init( exception );
     if( p_input != NULL )
     {
         var_SetInteger( p_input, "state", PAUSE_S );
@@ -285,7 +285,7 @@ mediacontrol_stop( mediacontrol_Instance *self,
                    mediacontrol_Exception *exception )
 {
     /* FIXME: use the a_position parameter */
-    exception=mediacontrol_exception_init( exception );
+    mediacontrol_exception_init( exception );
     if( !self->p_playlist )
     {
         RAISE( mediacontrol_PlaylistException, "No playlist" );
@@ -347,7 +347,7 @@ mediacontrol_playlist_get_list( mediacontrol_Instance *self,
     playlist_t * p_playlist = self->p_playlist;
     int i_playlist_size;
 
-    exception=mediacontrol_exception_init( exception );
+    mediacontrol_exception_init( exception );
     if( !p_playlist )
     {
         RAISE( mediacontrol_PlaylistException, "No playlist" );
@@ -355,13 +355,13 @@ mediacontrol_playlist_get_list( mediacontrol_Instance *self,
     }
 
     vlc_mutex_lock( &p_playlist->object_lock );
-    i_playlist_size = p_playlist->items.i_size;
+    i_playlist_size = p_playlist->current.i_size;
 
     retval = mediacontrol_PlaylistSeq__alloc( i_playlist_size );
 
     for( i_index = 0 ; i_index < i_playlist_size ; i_index++ )
     {
-        retval->data[i_index] = strdup( ARRAY_VAL(p_playlist->items, i_index)->p_input->psz_uri );
+        retval->data[i_index] = strdup( ARRAY_VAL(p_playlist->current, i_index)->p_input->psz_uri );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 

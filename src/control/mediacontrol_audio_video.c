@@ -61,7 +61,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     char path[256];
     snapshot_t *p_snapshot;
 
-    exception=mediacontrol_exception_init( exception );
+    mediacontrol_exception_init( exception );
 
     p_vout = vlc_object_find( self->p_playlist, VLC_OBJECT_VOUT, FIND_CHILD );
     if( ! p_vout )
@@ -112,7 +112,7 @@ mediacontrol_RGBPicture **
 mediacontrol_all_snapshots( mediacontrol_Instance *self,
                             mediacontrol_Exception *exception )
 {
-    exception=mediacontrol_exception_init( exception );
+    mediacontrol_exception_init( exception );
 
     RAISE_NULL( mediacontrol_InternalException, "unsupported method" );
 }
