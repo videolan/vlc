@@ -46,10 +46,10 @@ typedef int Py_ssize_t;
  * Exceptions handling
  **********************************************************************/
 
-#define MC_TRY exception=mediacontrol_exception_init(exception)
+#define MC_TRY exception=mediacontrol_exception_create( )
 
 #define MC_EXCEPT  \
-  if( exception->code ) { \
+  if( exception && exception->code ) { \
     PyObject *py_exc = MediaControl_InternalException; \
     switch( exception->code ) { \
     case mediacontrol_InternalException: \
@@ -71,7 +71,7 @@ typedef int Py_ssize_t;
     PyErr_SetString( py_exc, exception->message ); \
     mediacontrol_exception_free( exception ); \
     return NULL; \
-  } else { mediacontrol_exception_free( exception ); }
+  } else if( exception ) { mediacontrol_exception_free( exception ); }
 
 PyObject *MediaControl_InternalException;
 PyObject *MediaControl_PositionKeyNotSupported;
