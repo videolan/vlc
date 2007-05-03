@@ -1410,9 +1410,6 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_GENERAL );
 
-    add_bool( "prefer-system-codecs", VLC_FALSE, NULL, SYSTEM_CODEC_TEXT,
-                                SYSTEM_CODEC_LONGTEXT, VLC_FALSE );
-
     add_bool( "france", VLC_FALSE, NULL, N_("France"), FRANCE_LONGTEXT, VLC_TRUE );
 
     set_section( N_( "Track settings" ), NULL );
@@ -1534,6 +1531,8 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_VCODEC );
     set_subcategory( SUBCAT_INPUT_ACODEC );
     set_subcategory( SUBCAT_INPUT_SCODEC );
+    add_bool( "prefer-system-codecs", VLC_FALSE, NULL, SYSTEM_CODEC_TEXT,
+                                SYSTEM_CODEC_LONGTEXT, VLC_FALSE );
 
 
 /* Stream output options */
