@@ -68,6 +68,7 @@ Enrico Gueli <e_gueli at yahoo.it> - Brightness threshold in adjust video filter
 Espen Skoglund <esk at ira.uka.de> - FreeBSD autoconf and Makefile patches
 Ethan C. Baldridge <BaldridgeE at cadmus.com> - directory browsing code
 Eurodata Computer Club <retron.info> - VLC icon design (v0.8.4)
+Farzaneh Sarafraz <farzaneh at farsiweb dot info> - Persian localisation
 François Seingier <francois.seingier at club-internet.fr> - TTL setting in the wx stream output dialog
 Frank Chao <frank0624 at gmail.com> - Chinese Traditional translation
 Fumio Nakayama <endymion at ca2.so-net.ne.jp> - Japanese translation
@@ -125,6 +126,7 @@ Mathias Kretschmer <mathias at research.att.com> - IP Multicast support
 Mats Rojestal <mats.rojestal at bredband dot net> - compilation fixes for Solaris 9
 Matthieu Lochegnies <prof at tocard dot org> - MPEG audio emphasis fix
 Max Rudberg <max_08 at mac.com> - Mac OS X controller art (v0.7.0)
+Meelad Zakaria <meelad at farsiweb dot info> - Persian localisation
 Michael Mondragon <mammon at lokmail.net> - ncurses compilation fix
 Mickael Hoerdt <hoerdt at clarinet.u-strasbg.fr> - IPv6 SSM multicast patch
 Mike Schrag <mschrag at pobox dot com> - directx device selection
