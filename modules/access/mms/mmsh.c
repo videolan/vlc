@@ -41,7 +41,6 @@
 #include "mmsh.h"
 
 /* TODO:
- *  - http_proxy
  *  - authentication
  */
 
@@ -104,6 +103,20 @@ int E_(MMSHOpen)( access_t *p_access )
     /* Check proxy */
     /* TODO reuse instead http-proxy from http access ? */
     psz_proxy = var_CreateGetString( p_access, "mmsh-proxy" );
+    if( !*psz_proxy )
+    {
+        char *psz_http_proxy = config_GetPsz( p_access, "http-proxy" );
+        if( psz_http_proxy && *psz_http_proxy )
+        {
+            free( psz_proxy );
+            psz_proxy = psz_http_proxy;
+            var_SetString( p_access, "mmsh-proxy", psz_proxy );
+        }
+        else
+        {
+            free( psz_http_proxy );
+        }
+    }
     if( *psz_proxy )
     {
         p_sys->b_proxy = VLC_TRUE;
