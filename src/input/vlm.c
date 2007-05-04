@@ -465,7 +465,22 @@ static int ExecuteControl( vlm_t *p_vlm, const char *psz_name, const int i_arg, 
         int i;
 
         if( ( psz_argument && sscanf(psz_argument, "%d", &i) == 1 ) && i > 0 && i-1 < p_media->cfg.i_input )
+        {
             i_input_index = i-1;
+        }
+        else if( psz_argument )
+        {
+            int j;
+            vlm_media_t *p_cfg = &p_media->cfg;
+            for ( j=0; j < p_cfg->i_input; j++)
+            {
+                if( !strcmp( p_cfg->ppsz_input[j], psz_argument ) )
+                {
+                    i_input_index = j;
+                    break;
+                }
+            }
+        }
 
         if( p_media->cfg.b_vod )
             i_result = vlm_ControlInternal( p_vlm, VLM_START_MEDIA_VOD_INSTANCE, p_media->cfg.id, psz_instance, i_input_index, NULL );    // we should get here now
