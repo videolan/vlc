@@ -53,6 +53,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                             "in order to control VLC media player" \
                             "for basic actions")
 
+#define MINIMIZED_TEXT N_("Start VLC only with a systray icon")
+#define MINIMIZED_LONGTEXT N_("When you launch VLC with that option" \
+                            "VLC will start just with an icon in" \
+                            "your taskbar")
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
     set_description( (char*)_("Qt interface") );
@@ -73,6 +77,8 @@ vlc_module_begin();
                 ADVANCED_PREFS_LONGTEXT, VLC_FALSE );
         add_bool( "qt-system-tray", VLC_TRUE, NULL, SYSTRAY_TEXT,
                 SYSTRAY_LONGTEXT, VLC_FALSE);
+        add_bool( "qt-start-mininimized", VLC_FALSE, NULL, MINIMIZED_TEXT,
+                MINIMIZED_LONGTEXT, VLC_TRUE);
         set_callbacks( OpenDialogs, Close );
 vlc_module_end();
 

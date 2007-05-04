@@ -160,8 +160,15 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         vlc_object_release( p_playlist );
     }
     if( QSystemTrayIcon::isSystemTrayAvailable() &&
+                        ( config_GetInt( p_intf, "qt-start-mininimized") == 1))
+    {
+        hide();
+        createSystrayMenu();
+    }
+    if( QSystemTrayIcon::isSystemTrayAvailable() &&
                               ( config_GetInt( p_intf, "qt-system-tray") == 1))
             createSystrayMenu();
+
 }
 
 MainInterface::~MainInterface()
@@ -275,7 +282,7 @@ void MainInterface::handleMainUi( QSettings *settings )
 void MainInterface::createSystrayMenu()
 {
     QIcon iconVLC =  QIcon( QPixmap( ":/vlc128.png" ) );
-    sysTray = new QSystemTrayIcon( iconVLC );
+    sysTray = new QSystemTrayIcon( iconVLC, this );
     systrayMenu = new QMenu( qtr( "VLC media player" ), this );
     systrayMenu->setIcon( iconVLC );
     QVLCMenu::updateSystrayMenu( this, p_intf, true );
@@ -289,15 +296,22 @@ void MainInterface::updateSystrayMenu( int status )
     QVLCMenu::updateSystrayMenu( this, p_intf ) ;
 }
 
+void MainInterface::toggleUpdateSystrayMenu()
+{
+    QVLCMenu::updateSystrayMenu( this, p_intf );
+    toggleVisible();
+}
+
 void MainInterface::handleSystrayClick( QSystemTrayIcon::ActivationReason reason )
 {
     switch( reason )
     {
         case QSystemTrayIcon::Trigger:
-            this->show(); break;
+            this->toggleVisible(); break;
         case QSystemTrayIcon::MiddleClick:
             sysTray->showMessage( qtr( "VLC media player" ),
-                    qtr( "Control menu for the player" ),
+                    qtr( "Control menu for the player" )
+                    + nameLabel->text() ,
                     QSystemTrayIcon::Information, 4000 );
             break;
     }

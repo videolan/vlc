@@ -600,13 +600,15 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf,
     POPUP_PLAY_ENTRIES( sysMenu );
     sysMenu->addSeparator();
 
-    if( mi->isVisible() || b_force_visible )
+    if( !mi->isVisible() || b_force_visible )
     {
-        sysMenu->addAction( qtr("Hide Interface"), mi, SLOT( hide() ) );
+        sysMenu->addAction( qtr("Hide Interface"), mi,
+                SLOT( toggleUpdateSystrayMenu() ) );
     }
     else
     {
-        sysMenu->addAction( qtr("Show Interface"), mi, SLOT( show() ) );
+        sysMenu->addAction( qtr("Show Interface"), mi,
+                SLOT( toggleUpdateSystrayMenu() ) );
     }
     DP_SADD( sysMenu, qtr("&Open" ), "", "", openFileDialog(), "" );
     DP_SADD( sysMenu, qtr("&Quit") , "", "", quit(), "" );

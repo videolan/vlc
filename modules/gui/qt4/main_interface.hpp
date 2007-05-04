@@ -117,6 +117,7 @@ private:
 public slots:
     void undockPlaylist();
     void playlist();
+    void toggleUpdateSystrayMenu();
 private slots:
     void setNavigation( int );
     void setStatus( int );
@@ -130,8 +131,8 @@ private slots:
     void visual();
     void advanced();
     void updateVolume( int sliderVolume );
-    void updateSystrayMenu( int );
     void handleSystrayClick(  QSystemTrayIcon::ActivationReason );
+    void updateSystrayMenu( int );
 };
 
 
