@@ -1373,7 +1373,13 @@ static vlm_message_t *vlm_ShowMedia( vlm_t *p_vlm, vlm_media_sys_t *p_media )
 
     p_msg_sub = vlm_MessageAdd( p_msg, vlm_MessageNew( "inputs", NULL ) );
     for( i = 0; i < p_cfg->i_input; i++ )
-        vlm_MessageAdd( p_msg_sub, vlm_MessageNew( p_cfg->ppsz_input[i], NULL ) );
+    {
+        char *psz_tmp;
+        asprintf( &psz_tmp, "%d", i+1 );
+        vlm_MessageAdd( p_msg_sub,
+                        vlm_MessageNew( psz_tmp, p_cfg->ppsz_input[i] ) );
+        free( psz_tmp );
+    }
 
     vlm_MessageAdd( p_msg,
                     vlm_MessageNew( "output", p_cfg->psz_output ? p_cfg->psz_output : "" ) );
