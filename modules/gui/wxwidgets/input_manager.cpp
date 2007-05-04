@@ -58,7 +58,7 @@ END_EVENT_TABLE()
 #define STATUS_PLAYING 1
 #define STATUS_PAUSE 2
 
-#if WIN32
+#ifdef WIN32
 
 #include <commctrl.h>
 
@@ -84,16 +84,17 @@ static LRESULT CALLBACK MovieSliderWindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
             {
                 LONG min = SendMessage(hWnd, TBM_GETRANGEMIN, 0, 0);
                 LONG max = SendMessage(hWnd, TBM_GETRANGEMAX, 0, 0);
-                LONG thumb = SendMessage(hWnd, TBM_GETTHUMBLENGTH, 0, 0);;
+                LONG thumb = tRect.right-tRect.left;
                 LONG newpos;
 
                 SendMessage(hWnd, TBM_GETCHANNELRECT, 0, (LPARAM)&tRect);
 
-                /* following is only valid for horizontal trackbar */
-                newpos = ((click.x-tRect.left-(thumb/2))*(max-min)+((tRect.right-tRect.left-thumb)/2))/(tRect.right-tRect.left-thumb);
+                /* following is only valid for horizontal a trackbar */
+                newpos = ((click.x-tRect.left-(thumb/2))*(max-min)+((tRect.right-tRect.left-thumb)/2))
+		       /(tRect.right-tRect.left-thumb);
 
                 /* set new postion */
-                SendMessage(hWnd, TBM_SETPOS, TRUE, newpos);
+                SendMessage(hWnd, TBM_SETPOS, TRUE, min+newpos);
                 /* notify parent of change */
                 SendMessage(GetParent(hWnd), WM_HSCROLL, TB_ENDTRACK, (LPARAM)hWnd);
 
@@ -127,7 +128,7 @@ InputManager::InputManager( intf_thread_t *_p_intf, Interface *_p_main_intf,
     /* Create slider */
     slider = new wxSlider( this, SliderScroll_Event, 0, 0, SLIDER_MAX_POS );
 
-#if WIN32
+#ifdef WIN32
     /* modify behaviour of WIN32 underlying control
       in order to implement proper movie slider */
     {
