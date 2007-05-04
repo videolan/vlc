@@ -566,7 +566,7 @@ static VLCTreeItem *o_root_item = nil;
                     msg_Err( p_intf, "invalid preference item found" );
                     break;
                 }
-                if( p_item < p_end )
+                if( p_item > p_end )
                     break;
                 switch(p_item->i_type)
                 {
@@ -636,7 +636,7 @@ static VLCTreeItem *o_root_item = nil;
                     msg_Err( p_intf, "invalid preference item found" );
                     break;
                 }
-                if( p_item < p_end )
+                if( p_item > p_end )
                     break;
                 switch( p_item->i_type )
                 {

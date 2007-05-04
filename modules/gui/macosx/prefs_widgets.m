@@ -1186,8 +1186,7 @@
             [[VLCMain sharedInstance]
                 localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
         if( p_item->value.psz )
-            o_textfieldString = [[VLCMain sharedInstance]
-                                    localizedString: (char *)p_item->value.psz];
+            o_textfieldString = [NSString stringWithFormat: @"%s", (char *)p_item->value.psz];
         else
             o_textfieldString = [NSString stringWithString: @""];
         ADD_TEXTFIELD( o_textfield, mainFrame, 12, 2, mainFrame.size.width -
@@ -1267,7 +1266,6 @@
         int i_index;
         vlc_list_t *p_list;
         module_t *p_parser;
-        module_config_t *p_end;
         i_view_type = CONFIG_ITEM_MODULE;
 
         /* add the label */
@@ -1296,7 +1294,7 @@
         for( i_index = 0; i_index < p_list->i_count; i_index++ )
         {
             p_parser = (module_t *)p_list->p_values[i_index].p_object;
-            p_end = p_item + p_parser->confsize;
+
             if( p_item->i_type == CONFIG_ITEM_MODULE )
             {
                 if( !strcmp( p_parser->psz_capability,
@@ -1313,13 +1311,14 @@
             }
             else
             {
-                module_config_t *p_config;
-                if( !strcmp( p_parser->psz_object_name, "main" ) )
-                      continue;
+                int i;
 
-                p_config = p_parser->p_config;
-                if( p_config ) do
+                if( !strcmp( p_parser->psz_object_name, "main" ) )
+                    continue;
+
+                for ( i = 0; i < p_parser->confsize; i++ )
                 {
+                    module_config_t *p_config = p_parser->p_config + i;
                     /* Hack: required subcategory is stored in i_min */
                     if( p_config->i_type == CONFIG_SUBCATEGORY &&
                         p_config->value.i == p_item->min.i )
@@ -1332,7 +1331,7 @@
                                                 p_parser->psz_object_name) )
                             [o_popup selectItem:[o_popup lastItem]];
                     }
-                } while( p_item < p_end && p_config++ );
+                } 
             }
         }
         vlc_list_release( p_list );
@@ -1365,16 +1364,15 @@
 {
     NSString *newval = [o_popup titleOfSelectedItem];
     char *returnval = NULL;
-    int i_index;
+    int i_module_index;
     vlc_list_t *p_list;
     module_t *p_parser;
-    module_config_t *p_end;
 
     p_list = vlc_list_find( VLCIntf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    for( i_module_index = 0; i_module_index < p_list->i_count; i_module_index++ )
     {
-        p_parser = (module_t *)p_list->p_values[i_index].p_object;
-         p_end = p_item + p_parser->confsize;
+        p_parser = (module_t *)p_list->p_values[i_module_index].p_object;
+
         if( p_item->i_type == CONFIG_ITEM_MODULE )
         {
             if( !strcmp( p_parser->psz_capability,
@@ -1391,13 +1389,14 @@
         }
         else
         {
-            module_config_t *p_config;
-            if( !strcmp( p_parser->psz_object_name, "main" ) )
-                  continue;
+            int i;
 
-            p_config = p_parser->p_config;
-            if( p_config ) do
+            if( !strcmp( p_parser->psz_object_name, "main" ) )
+                continue;
+
+            for ( i = 0; i < p_parser->confsize; i++ )
             {
+                module_config_t *p_config = p_parser->p_config + i;
                 /* Hack: required subcategory is stored in i_min */
                 if( p_config->i_type == CONFIG_SUBCATEGORY &&
                     p_config->value.i == p_item->min.i )
@@ -1410,7 +1409,7 @@
                         break;
                     }
                 }
-            } while( p_item < p_end && p_config++ );
+            }
         }
     }
     vlc_list_release( p_list );
@@ -1423,7 +1422,7 @@
            withView: (NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
-    NSString *o_labelString, *o_tooltip, *o_textfieldString;
+    NSString *o_labelString, *o_tooltip;
     mainFrame.size.height = 23;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
     mainFrame.origin.x = LEFTMARGIN;
@@ -1454,12 +1453,6 @@
         [o_stepper setAutoresizingMask:NSViewMaxXMargin ];
         [self addSubview: o_stepper];
 
-        /* build the textfield */
-        if( p_item->value.psz )
-            o_textfieldString = [[VLCMain sharedInstance]
-                                    localizedString: (char *)p_item->value.psz];
-        else
-            o_textfieldString = [NSString stringWithString: @""];
         ADD_TEXTFIELD( o_textfield, mainFrame, mainFrame.size.width - 19 - 52,
             1, 49, o_tooltip, @"" )
         [o_textfield setIntValue: p_item->value.i];
@@ -1720,7 +1713,7 @@
            withView: (NSView *)o_parent_view
 {
     NSRect mainFrame = [o_parent_view frame];
-    NSString *o_labelString, *o_tooltip, *o_textfieldString;
+    NSString *o_labelString, *o_tooltip;
     mainFrame.size.height = 23;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN + 1;
     mainFrame.origin.x = LEFTMARGIN;
@@ -1752,11 +1745,6 @@
         [self addSubview: o_stepper];
 
         /* build the textfield */
-        if( p_item->value.psz )
-            o_textfieldString = [[VLCMain sharedInstance]
-                                    localizedString: (char *)p_item->value.psz];
-        else
-            o_textfieldString = [NSString stringWithString: @""];
         ADD_TEXTFIELD( o_textfield, mainFrame, mainFrame.size.width - 19 - 52,
             1, 49, o_tooltip, @"" )
         [o_textfield setFloatValue: p_item->value.f];
@@ -2060,27 +2048,27 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 //Fill our array to know how may items we have...
     vlc_list_t *p_list;
     module_t *p_parser;
-    module_config_t *p_end;
-    int i_index;
+    int i_module_index;
     NSRect mainFrame = [o_parent_view frame];
     NSString *o_labelString, *o_textfieldString, *o_tooltip;
 
     o_modulearray = [[NSMutableArray alloc] initWithCapacity:10];
     /* build a list of available modules */
     p_list = vlc_list_find( VLCIntf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    for( i_module_index = 0; i_module_index < p_list->i_count; i_module_index++ )
     {
-        p_parser = (module_t *)p_list->p_values[i_index].p_object;
-        p_end = p_item + p_parser->confsize;
+        int i;
+        p_parser = (module_t *)p_list->p_values[i_module_index].p_object;
 
         if( !strcmp( p_parser->psz_object_name, "main" ) )
             continue;
 
-        module_config_t *p_config = p_parser->p_config;
-        if( p_config ) do
+        for ( i = 0; i < p_parser->confsize; i++ )
         {
+            module_config_t *p_config = p_parser->p_config + i;
             NSString *o_modulelongname, *o_modulename;
             NSNumber *o_moduleenabled = nil;
+
             /* Hack: required subcategory is stored in i_min */
             if( p_config->i_type == CONFIG_SUBCATEGORY &&
                 p_config->value.i == _p_item->min.i )
@@ -2100,7 +2088,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
                     arrayWithObjects: o_modulename, o_modulelongname,
                     o_moduleenabled, nil]];
             }
-        } while( p_item < p_end && p_config++ );
+        }
     }
     vlc_list_release( p_list );
 
