@@ -406,6 +406,8 @@ MediaControl_snapshot( PyObject *self, PyObject *args )
     PyDict_SetItemString( py_obj, "date",
                           Py_BuildValue( "L", p_retval->date ) );
 
+    mediacontrol_RGBPicture__free( p_retval );
+
     return py_obj;
 }
 
@@ -463,8 +465,7 @@ MediaControl_get_stream_information( PyObject *self, PyObject *args )
     PyDict_SetItemString( py_obj, "length",
                   Py_BuildValue( "L", retval->length ) );
 
-    free( retval->url );
-    free( retval );
+    mediacontrol_StreamInformation__free( retval );
 
     return py_obj;
 }
