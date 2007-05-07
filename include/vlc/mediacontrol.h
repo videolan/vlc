@@ -135,6 +135,13 @@ mediacontrol_PlaylistSeq *mediacontrol_PlaylistSeq__alloc( int size );
 VLC_PUBLIC_API void mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq *ps );
 
 /**
+ * Free a StreamInformation structure.
+ * \param pic: the StreamInformation structure
+ */
+VLC_PUBLIC_API void
+mediacontrol_StreamInformation__free( mediacontrol_StreamInformation* p_si );
+
+/**
  * Instanciate and initialize an exception structure.
  * \return the exception
  */

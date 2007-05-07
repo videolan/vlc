@@ -216,8 +216,10 @@ void
 mediacontrol_RGBPicture__free( mediacontrol_RGBPicture* pic )
 {
     if( pic )
+    {
         free( pic->data );
-    free( pic );
+        free( pic );
+    }
 }
 
 mediacontrol_PlaylistSeq*
@@ -242,10 +244,21 @@ mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq* ps )
         int i;
         for( i = 0 ; i < ps->size ; i++ )
             free( ps->data[i] );
+        free( ps->data );
+        free( ps );
     }
-    free( ps->data );
-    free( ps );
 }
+
+void
+mediacontrol_StreamInformation__free( mediacontrol_StreamInformation* p_si )
+{
+  if( p_si )
+  {
+      free( p_si->url );
+      free( p_si );
+  }
+}
+
 
 mediacontrol_Exception*
 mediacontrol_exception_create( void )
