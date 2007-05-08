@@ -224,7 +224,7 @@ static VLCsFilters *_o_sharedInstance = nil;
 
 - (void)showAsPanel
 {
-	char * psz_temp;
+    char * psz_temp;
 
     /* called from intf.m */
     [o_sfilter_win displayIfNeeded];
@@ -247,12 +247,12 @@ static VLCsFilters *_o_sharedInstance = nil;
         }
     }
     [o_marq_color_pop selectItemAtIndex: x];
-	if( psz_temp = config_GetPsz( p_intf, "time-format" ) )
-		[o_marq_marq_fld setStringValue: [NSString stringWithUTF8String: psz_temp]];
-	else
-		[o_marq_marq_fld setStringValue: _NS(@"Not Available")];
-	
-	[o_marq_opaque_sld setIntValue: config_GetInt( p_intf, "marq-opacity")];
+    if( psz_temp = config_GetPsz( p_intf, "time-format" ) )
+        [o_marq_marq_fld setStringValue: [NSString stringWithUTF8String: psz_temp]];
+    else
+        [o_marq_marq_fld setStringValue: _NS(@"Not Available")];
+    
+    [o_marq_opaque_sld setIntValue: config_GetInt( p_intf, "marq-opacity")];
     [o_marq_pos_radio selectCellWithTag: config_GetInt( p_intf, "marq-position" )];
     /* FIXME: the following line doesn't work with "-1", which is the default
      * value */
@@ -278,10 +278,10 @@ static VLCsFilters *_o_sharedInstance = nil;
         }
     }
     [o_time_color_pop selectItemAtIndex: x];
-	if( psz_temp = config_GetPsz( p_intf, "time-format" ) )
-		[o_time_stamp_fld setStringValue: [NSString stringWithUTF8String: psz_temp]];
-	else
-		[o_time_stamp_fld setStringValue: _NS(@"Not Available")];
+    if( psz_temp = config_GetPsz( p_intf, "time-format" ) )
+        [o_time_stamp_fld setStringValue: [NSString stringWithUTF8String: psz_temp]];
+    else
+        [o_time_stamp_fld setStringValue: _NS(@"Not Available")];
 
     [o_time_opaque_sld setIntValue: config_GetInt( p_intf, "time-opacity")];
     /* FIXME: the following line doesn't work with "-1", which is the default
@@ -340,8 +340,8 @@ static VLCsFilters *_o_sharedInstance = nil;
     if (returnCode == NSOKButton)
     {
         [o_logo_image_fld setStringValue: [sheet filename]];
-		/* Make sure we notice that */
-		[self propertyChanged: o_logo_image_fld];
+        /* Make sure we notice that */
+        [self propertyChanged: o_logo_image_fld];
     }
 }
 
@@ -509,15 +509,15 @@ static VLCsFilters *_o_sharedInstance = nil;
         config_PutInt( p_intf, "logo-position", val.i_int );
     }
     else if ( sender == o_logo_image_fld )
-	{
+    {
         val.psz_string = [[o_logo_image_fld stringValue] cString];
 
         if( p_input )
             var_Set( p_input->p_libvlc_global, "logo-file", val );
 
         config_PutPsz( p_intf, "logo-file", val.psz_string );
-	}
-	else
+    }
+    else
     {
         /* just in case */
         msg_Err( p_intf, "couldn't find any action for sender" );
