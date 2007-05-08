@@ -298,6 +298,21 @@ static void Run( intf_thread_t *p_intf )
                 var_Set( p_playlist, "fullscreen", val );
             }
         }
+        else if( i_action == ACTIONID_WALLPAPER )
+        {
+            if( p_vout )
+            {
+                var_Get( p_vout, "directx-wallpaper", &val );
+                val.b_bool = !val.b_bool;
+                var_Set( p_vout, "directx-wallpaper", val );
+            }
+            else
+            {
+                var_Get( p_playlist, "directx-wallpaper", &val );
+                val.b_bool = !val.b_bool;
+                var_Set( p_playlist, "directx-wallpaper", val );
+            }
+        }
         else if( i_action == ACTIONID_LOOP )
         {
             /* Toggle Normal -> Loop -> Repeat -> Normal ... */

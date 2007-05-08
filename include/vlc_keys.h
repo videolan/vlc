@@ -307,3 +307,4 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_DUMP                  80
 #define ACTIONID_RANDOM                81
 #define ACTIONID_LOOP                  82
+#define ACTIONID_WALLPAPER             83

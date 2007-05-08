@@ -1208,6 +1208,10 @@ static const char *ppsz_pltree_descriptions[] = { N_("Default"), N_("Always"), N
 #define UNCROP_RIGHT_KEY_TEXT N_("Uncrop one pixel from the right of the video")
 #define UNCROP_RIGHT_KEY_LONGTEXT N_("Uncrop one pixel from the right of the video")
 
+#define WALLPAPER_KEY_TEXT N_("Toggle wallpaper mode in video output")
+#define WALLPAPER_KEY_LONGTEXT N_( \
+    "Toggle wallpaper mode in video output. Only works with the directx " \
+    "video output for the time being." )
 
 const char vlc_usage[] = N_(
     "Usage: %s [options] [stream] ..."
@@ -1885,6 +1889,7 @@ vlc_module_begin();
 #   define KEY_HISTORY_FORWARD    KEY_MODIFIER_COMMAND|']'
 #   define KEY_RECORD             KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'r'
 #   define KEY_DUMP               KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'d'
+#   define KEY_WALLPAPER          KEY_MODIFIER_COMMAND|'w'
 
 #else
 #   define KEY_FULLSCREEN         'f'
@@ -1970,6 +1975,7 @@ vlc_module_begin();
 #   define KEY_HISTORY_FORWARD    KEY_MODIFIER_CTRL|'b'
 #   define KEY_RECORD             KEY_MODIFIER_CTRL|'r'
 #   define KEY_DUMP               KEY_MODIFIER_CTRL|KEY_MODIFIER_SHIFT|'d'
+#   define KEY_WALLPAPER          'w'
 #endif
 
     add_key( "key-fullscreen", KEY_FULLSCREEN, NULL, FULLSCREEN_KEY_TEXT,
@@ -2073,6 +2079,8 @@ vlc_module_begin();
              ZOOM_KEY_TEXT, ZOOM_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-unzoom", KEY_UNZOOM, NULL,
              UNZOOM_KEY_TEXT, UNZOOM_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-wallpaper", KEY_WALLPAPER, NULL, WALLPAPER_KEY_TEXT,
+             WALLPAPER_KEY_LONGTEXT, VLC_FALSE );
 
     add_key( "key-crop-top", KEY_CROP_TOP, NULL,
              CROP_TOP_KEY_TEXT, CROP_TOP_KEY_LONGTEXT, VLC_TRUE );
@@ -2339,6 +2347,7 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-dump", ACTIONID_DUMP, 0, 0, 0, 0 },
     { "key-random", ACTIONID_RANDOM, 0, 0, 0, 0 },
     { "key-loop", ACTIONID_LOOP, 0, 0, 0, 0 },
+    { "key-wallpaper", ACTIONID_WALLPAPER, 0, 0, 0, 0 },
     { NULL, 0, 0, 0, 0, 0 }
 };
 
