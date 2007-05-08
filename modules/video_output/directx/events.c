@@ -1056,7 +1056,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         return vout_vaControlDefault( p_vout, i_query, args );
 
     case VOUT_SET_STAY_ON_TOP:
-        if( p_vout->p_sys->hparent )
+        if( p_vout->p_sys->hparent && !var_GetBool( p_vout, "fullscreen" ) )
             return vout_ControlWindow( p_vout,
                     (void *)p_vout->p_sys->hparent, i_query, args );
 
@@ -1065,5 +1065,115 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
     default:
         return vout_vaControlDefault( p_vout, i_query, args );
+    }
+}
+
+
+/* Internal wrapper over GetWindowPlacement / SetWindowPlacement */ 
+static void SetWindowState(HWND hwnd, int nShowCmd)
+{
+    WINDOWPLACEMENT window_placement;
+    window_placement.length = sizeof(WINDOWPLACEMENT);
+    GetWindowPlacement( hwnd, &window_placement );
+    window_placement.showCmd = nShowCmd;
+    SetWindowPlacement( hwnd, &window_placement );
+    SetWindowPos( hwnd, 0, 0, 0, 0, 0,
+        SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED);
+}
+
+/* Internal wrapper to call vout_ControlWindow for hparent */
+static void ControlParentWindow( vout_thread_t *p_vout, int i_query, ... )
+{
+    va_list args;
+    va_start( args, i_query );
+    vout_ControlWindow( p_vout,
+        (void *)p_vout->p_sys->hparent, i_query, args );
+    va_end( args );
+}
+
+void Win32ToggleFullscreen( vout_thread_t *p_vout )
+{
+    HWND hwnd = (p_vout->p_sys->hparent && p_vout->p_sys->hfswnd) ?
+        p_vout->p_sys->hfswnd : p_vout->p_sys->hwnd;
+
+    p_vout->b_fullscreen = ! p_vout->b_fullscreen;
+
+    if( p_vout->b_fullscreen )
+    {
+        msg_Dbg( p_vout, "entering fullscreen mode" );
+        /* Change window style, no borders and no title bar */
+        int i_style = WS_CLIPCHILDREN | WS_VISIBLE;
+        SetWindowLong( hwnd, GWL_STYLE, i_style );
+
+        if( p_vout->p_sys->hparent )
+        {
+            /* Retrieve current window position so fullscreen will happen
+            * on the right screen */
+            POINT point = {0,0};
+            RECT rect;
+            ClientToScreen( p_vout->p_sys->hwnd, &point );
+            GetClientRect( p_vout->p_sys->hwnd, &rect );
+            SetWindowPos( hwnd, 0, point.x, point.y,
+                          rect.right, rect.bottom,
+                          SWP_NOZORDER|SWP_FRAMECHANGED );
+        }
+
+        /* Maximize window */
+        SetWindowState( hwnd, SW_SHOWMAXIMIZED );
+
+        if( p_vout->p_sys->hparent )
+        {
+            RECT rect;
+            GetClientRect( hwnd, &rect );
+            SetParent( p_vout->p_sys->hwnd, hwnd );
+            SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
+                          rect.right, rect.bottom,
+                          SWP_NOZORDER|SWP_FRAMECHANGED );
+
+            HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
+            ShowWindow( topLevelParent, SW_HIDE );
+        }
+
+        SetForegroundWindow( hwnd );
+    }
+    else
+    {
+        msg_Dbg( p_vout, "leaving fullscreen mode" );
+        /* Change window style, no borders and no title bar */
+        SetWindowLong( hwnd, GWL_STYLE, p_vout->p_sys->i_window_style );
+
+        /* Normal window */
+        SetWindowState( hwnd, SW_SHOWNORMAL );
+
+        if( p_vout->p_sys->hparent )
+        {
+            RECT rect;
+            GetClientRect( p_vout->p_sys->hparent, &rect );
+            SetParent( p_vout->p_sys->hwnd, p_vout->p_sys->hparent );
+            SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
+                          rect.right, rect.bottom,
+                          SWP_NOZORDER|SWP_FRAMECHANGED );
+
+            HWND topLevelParent = GetAncestor( p_vout->p_sys->hparent, GA_ROOT );
+            ShowWindow( topLevelParent, SW_SHOW );
+            SetForegroundWindow( p_vout->p_sys->hparent );
+            ShowWindow( hwnd, SW_HIDE );
+
+            /* Update "video-on-top" status for main interface window, it
+            needs to be updated as we were hiding VOUT_SET_STAY_ON_TOP
+            queries from it while we were in fullscreen mode */
+            int b_ontop = var_GetBool( p_vout, "video-on-top" );
+            ControlParentWindow( p_vout, VOUT_SET_STAY_ON_TOP, b_ontop );
+        }
+
+        /* Make sure the mouse cursor is displayed */
+        PostMessage( p_vout->p_sys->hwnd, WM_VLC_SHOW_MOUSE, 0, 0 );
+    }
+
+    {
+        vlc_value_t val;
+        /* Update the object variable and trigger callback */
+        val.b_bool = p_vout->b_fullscreen;
+        var_Set( p_vout, "fullscreen", val );
     }
 }

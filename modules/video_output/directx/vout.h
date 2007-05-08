@@ -147,6 +147,7 @@ int E_(DirectXUpdateOverlay)( vout_thread_t *p_vout );
  *****************************************************************************/
 void E_(DirectXEventThread) ( event_thread_t *p_event );
 void E_(DirectXUpdateRects) ( vout_thread_t *p_vout, vlc_bool_t b_force );
+void Win32ToggleFullscreen ( vout_thread_t *p_vout );
 
 /*****************************************************************************
  * Constants
