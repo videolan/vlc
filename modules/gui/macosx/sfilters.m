@@ -224,6 +224,8 @@ static VLCsFilters *_o_sharedInstance = nil;
 
 - (void)showAsPanel
 {
+	char * psz_temp;
+
     /* called from intf.m */
     [o_sfilter_win displayIfNeeded];
     [o_sfilter_win makeKeyAndOrderFront:nil];
@@ -245,9 +247,12 @@ static VLCsFilters *_o_sharedInstance = nil;
         }
     }
     [o_marq_color_pop selectItemAtIndex: x];
-    [o_marq_marq_fld setStringValue: [NSString stringWithUTF8String:
-        config_GetPsz( p_intf, "marq-marquee" )]];
-    [o_marq_opaque_sld setIntValue: config_GetInt( p_intf, "marq-opacity")];
+	if( psz_temp = config_GetPsz( p_intf, "time-format" ) )
+		[o_marq_marq_fld setStringValue: [NSString stringWithUTF8String: psz_temp]];
+	else
+		[o_marq_marq_fld setStringValue: _NS(@"Not Available")];
+	
+	[o_marq_opaque_sld setIntValue: config_GetInt( p_intf, "marq-opacity")];
     [o_marq_pos_radio selectCellWithTag: config_GetInt( p_intf, "marq-position" )];
     /* FIXME: the following line doesn't work with "-1", which is the default
      * value */
@@ -273,8 +278,11 @@ static VLCsFilters *_o_sharedInstance = nil;
         }
     }
     [o_time_color_pop selectItemAtIndex: x];
-    [o_time_stamp_fld setStringValue: [NSString stringWithUTF8String:
-        config_GetPsz( p_intf, "time-format" )]];
+	if( psz_temp = config_GetPsz( p_intf, "time-format" ) )
+		[o_time_stamp_fld setStringValue: [NSString stringWithUTF8String: psz_temp]];
+	else
+		[o_time_stamp_fld setStringValue: _NS(@"Not Available")];
+
     [o_time_opaque_sld setIntValue: config_GetInt( p_intf, "time-opacity")];
     /* FIXME: the following line doesn't work with "-1", which is the default
      * value */
@@ -286,9 +294,8 @@ static VLCsFilters *_o_sharedInstance = nil;
     /* retrieve the logo settings */
     [o_logo_opaque_sld setIntValue: config_GetInt( p_intf, "logo-transparency")];
     /* in case that no path has been saved yet */
-    if( config_GetPsz( p_intf, "logo-file" ) )
-        [o_logo_image_fld setStringValue: [NSString stringWithUTF8String:
-                                        config_GetPsz( p_intf, "logo-file" )]];
+    if( psz_temp = config_GetPsz( p_intf, "logo-file" ) )
+        [o_logo_image_fld setStringValue: [NSString stringWithUTF8String: psz_temp]];
     else
         [o_logo_image_fld setStringValue: @""];
     [o_logo_pos_radio selectCellWithTag: config_GetInt( p_intf, "logo-position" )];
