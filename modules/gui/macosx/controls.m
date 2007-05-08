@@ -468,19 +468,30 @@
 - (void)scrollWheel:(NSEvent *)theEvent
 {
     intf_thread_t * p_intf = VLCIntf;
-    float f_absvalue = [theEvent deltaY] > 0.0f ? [theEvent deltaY] : -[theEvent deltaY];
-    int i, i_vlckey;
-
-    f_absvalue = f_absvalue/2.0f + 1.0f;
+    float f_yabsvalue = [theEvent deltaY] > 0.0f ? [theEvent deltaY] : -[theEvent deltaY];
+    float f_xabsvalue = [theEvent deltaX] > 0.0f ? [theEvent deltaX] : -[theEvent deltaX];
+    int i, i_yvlckey, i_xvlckey;
 
     if ([theEvent deltaY] < 0.0f)
-        i_vlckey = KEY_MOUSEWHEELDOWN;
+        i_yvlckey = KEY_MOUSEWHEELDOWN;
     else
-        i_vlckey = KEY_MOUSEWHEELUP;
+        i_yvlckey = KEY_MOUSEWHEELUP;
+
+    if ([theEvent deltaX] < 0.0f)
+        i_xvlckey = KEY_MOUSEWHEELRIGHT;
+    else
+        i_xvlckey = KEY_MOUSEWHEELLEFT;
 
     /* Send multiple key event, depending on the intensity of the event */
-    for (i = 0; i < (int)f_absvalue; i++)
-        var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlckey );
+    for (i = 0; i < (int)(f_yabsvalue/4.+1.) && f_yabsvalue > 0.05 ; i++)
+        var_SetInteger( p_intf->p_libvlc, "key-pressed", i_yvlckey );
+
+	/* Prioritize Y event (sound volume) over X event */
+	if (f_yabsvalue < 0.05)
+	{
+		for (i = 0; i < (int)(f_xabsvalue/6.+1.) && f_xabsvalue > 0.05; i++)
+		 var_SetInteger( p_intf->p_libvlc, "key-pressed", i_xvlckey );
+	}
 }
 
 - (BOOL)keyEvent:(NSEvent *)o_event
