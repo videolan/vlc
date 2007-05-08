@@ -340,6 +340,8 @@ static VLCsFilters *_o_sharedInstance = nil;
     if (returnCode == NSOKButton)
     {
         [o_logo_image_fld setStringValue: [sheet filename]];
+		/* Make sure we notice that */
+		[self propertyChanged: o_logo_image_fld];
     }
 }
 
@@ -506,7 +508,16 @@ static VLCsFilters *_o_sharedInstance = nil;
 
         config_PutInt( p_intf, "logo-position", val.i_int );
     }
-    else
+    else if ( sender == o_logo_image_fld )
+	{
+        val.psz_string = [[o_logo_image_fld stringValue] cString];
+
+        if( p_input )
+            var_Set( p_input->p_libvlc_global, "logo-file", val );
+
+        config_PutPsz( p_intf, "logo-file", val.psz_string );
+	}
+	else
     {
         /* just in case */
         msg_Err( p_intf, "couldn't find any action for sender" );
