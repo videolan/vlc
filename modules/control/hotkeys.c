@@ -163,20 +163,45 @@ static void Run( intf_thread_t *p_intf )
         /* Sleep a bit */
 //        msleep( INTF_IDLE_SLEEP );
 
-        /* Find action triggered by hotkey */
         i_action = 0;
         i_key = GetKey( p_intf );
-        for( i = 0; i_key != -1 && p_hotkeys[i].psz_action != NULL; i++ )
-        {
-            if( p_hotkeys[i].i_key == i_key )
-            {
-                i_action = p_hotkeys[i].i_action;
-                i_times  = p_hotkeys[i].i_times;
-                /* times key pressed within max. delta time */
-                p_hotkeys[i].i_times = 0;
-                break;
-            }
-        }
+
+		/* Special action for mouse event */
+		/* FIXME: This should probably be configurable */
+		/* FIXME: rework hotkeys handling to allow more than 1 event
+		 * to trigger one same action */
+		switch (i_key & KEY_SPECIAL)
+		{
+			case KEY_MOUSEWHEELUP:
+				i_action = ACTIONID_VOL_UP;
+				break;
+			case KEY_MOUSEWHEELDOWN:
+				i_action = ACTIONID_VOL_DOWN;
+				break;
+			case KEY_MOUSEWHEELLEFT:
+				i_action = ACTIONID_JUMP_BACKWARD_EXTRASHORT;
+				break;
+			case KEY_MOUSEWHEELRIGHT:
+				i_action = ACTIONID_JUMP_FORWARD_EXTRASHORT;
+				break;
+			default: break;
+		}
+
+        /* No mouse action, find action triggered by hotkey */
+        if(!i_action)
+		{
+			for( i = 0; i_key != -1 && p_hotkeys[i].psz_action != NULL; i++ )
+			{
+				if( p_hotkeys[i].i_key == i_key )
+				{
+					i_action = p_hotkeys[i].i_action;
+					i_times  = p_hotkeys[i].i_times;
+					/* times key pressed within max. delta time */
+					p_hotkeys[i].i_times = 0;
+					break;
+				}
+			}
+		}
 
         if( !i_action )
         {

@@ -63,6 +63,8 @@
 #define KEY_BACKSPACE        0x001C0000
 #define KEY_MOUSEWHEELUP     0x001D0000
 #define KEY_MOUSEWHEELDOWN   0x001E0000
+#define KEY_MOUSEWHEELLEFT   0x001F0000
+#define KEY_MOUSEWHEELRIGHT  0x00200000
 
 /* TODO:
  * The media keys are only used in win32. Support for other OSes needs to
