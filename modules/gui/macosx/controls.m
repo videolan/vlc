@@ -486,12 +486,12 @@
     for (i = 0; i < (int)(f_yabsvalue/4.+1.) && f_yabsvalue > 0.05 ; i++)
         var_SetInteger( p_intf->p_libvlc, "key-pressed", i_yvlckey );
 
-	/* Prioritize Y event (sound volume) over X event */
-	if (f_yabsvalue < 0.05)
-	{
-		for (i = 0; i < (int)(f_xabsvalue/6.+1.) && f_xabsvalue > 0.05; i++)
-		 var_SetInteger( p_intf->p_libvlc, "key-pressed", i_xvlckey );
-	}
+    /* Prioritize Y event (sound volume) over X event */
+    if (f_yabsvalue < 0.05)
+    {
+        for (i = 0; i < (int)(f_xabsvalue/6.+1.) && f_xabsvalue > 0.05; i++)
+         var_SetInteger( p_intf->p_libvlc, "key-pressed", i_xvlckey );
+    }
 }
 
 - (BOOL)keyEvent:(NSEvent *)o_event
@@ -860,8 +860,8 @@
     else if( [[o_mi title] isEqualToString: _NS("Previous")] ||
              [[o_mi title] isEqualToString: _NS("Next")] )
     {
-	    /** \todo fix i_size use */
-            bEnabled = p_playlist->items.i_size > 1;
+        /** \todo fix i_size use */
+        bEnabled = p_playlist->items.i_size > 1;
     }
     else if( [[o_mi title] isEqualToString: _NS("Random")] )
     {
