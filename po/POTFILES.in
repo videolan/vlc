@@ -127,6 +127,7 @@ src/misc/variables.c
 src/misc/variables.h
 src/misc/win32_specific.c
 src/misc/xml.c
+src/modules/builtin.h
 src/modules/configuration.c
 src/modules/configuration_chain.c
 src/modules/configuration.h
@@ -183,6 +184,11 @@ src/video_output/vout_synchro.c
 src/vlc.c
 
 # modules
+modules/access/bda/bda.c
+modules/access/bda/bdadefs.h
+modules/access/bda/bdagraph.cpp
+modules/access/bda/bdagraph.h
+modules/access/bda/bda.h
 modules/access/cdda/access.c
 modules/access/cdda/access.h
 modules/access/cdda.c
@@ -210,6 +216,7 @@ modules/access/dvdread.c
 modules/access/eyetv.c
 modules/access/fake.c
 modules/access/file.c
+modules/access_filter/bandwidth.c
 modules/access_filter/dump.c
 modules/access_filter/record.c
 modules/access_filter/timeshift.c
@@ -456,6 +463,7 @@ modules/demux/ps.c
 modules/demux/ps.h
 modules/demux/pva.c
 modules/demux/rawdv.c
+modules/demux/rawvid.c
 modules/demux/real.c
 modules/demux/subtitle.c
 modules/demux/ts.c
@@ -961,6 +969,7 @@ modules/misc/playlist/xspf.h
 modules/misc/probe/hal.c
 modules/misc/profile_parser.c
 modules/misc/qte_main.cpp
+modules/misc/quartztext.c
 modules/misc/rtsp.c
 modules/misc/screensaver.c
 modules/misc/svg.c
@@ -1043,6 +1052,7 @@ modules/video_filter/erase.c
 modules/video_filter/extract.c
 modules/video_filter/filter_common.h
 modules/video_filter/filter_event_info.h
+modules/video_filter/gaussianblur.c
 modules/video_filter/gradient.c
 modules/video_filter/invert.c
 modules/video_filter/logo.c
