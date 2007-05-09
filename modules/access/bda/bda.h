@@ -23,6 +23,14 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <vlc/vlc.h>
+#include <vlc_input.h>
+#include <vlc_access.h>
+
 #ifndef _MSC_VER
 #   include <wtypes.h>
 #   include <unknwn.h>
@@ -69,4 +77,3 @@ struct access_sys_t
     vlc_cond_t  wait;
     BDAGraph *p_bda_module;
 };
-

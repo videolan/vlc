@@ -40,7 +40,11 @@ using namespace std;
 #   undef _X86_
 #   define _I64_MAX LONG_LONG_MAX
 #   define LONGLONG long long
+/* Work-around a bug in w32api-2.5 */
+/* #   define QACONTAINERFLAGS QACONTAINERFLAGS_SOMETHINGELSE */
 #endif
+/* Needed to call CoInitializeEx */
+#define _WIN32_DCOM
 
 #include <dshow.h>
 #include <comcat.h>
@@ -78,6 +82,7 @@ private:
 
     queue<IMediaSample*> queue_sample;
     queue<IMediaSample*> queue_buffer;
+    BOOL b_ready;
 
     IMediaControl*  p_media_control;
     IGraphBuilder*  p_filter_graph;
@@ -105,4 +110,3 @@ private:
     HRESULT Register( );
     void Deregister( );
 };
-

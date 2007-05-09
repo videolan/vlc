@@ -23,14 +23,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <vlc/vlc.h>
-#include <vlc_input.h>
-#include <vlc_access.h>
-
 #include "bda.h"
 
 /*****************************************************************************
@@ -246,14 +238,14 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     const char* psz_module  = "dvb";
-    const int   i_param_count = 8;
+    const int   i_param_count = 9;
     const char* psz_param[] = { "frequency", "bandwidth",
         "srate", "azimuth", "elevation", "longitude", "polarisation",
-        "modulation" };
+        "modulation", "caching" };
 
     const int   i_type[] = { VLC_VAR_INTEGER, VLC_VAR_INTEGER,
         VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
-        VLC_VAR_STRING, VLC_VAR_INTEGER };
+        VLC_VAR_STRING, VLC_VAR_INTEGER, VLC_VAR_INTEGER };
 
     char  psz_full_name[128];
     int i_ret;
@@ -506,8 +498,7 @@ static block_t *Block( access_t *p_access )
         return NULL;
 
     p_block = block_New( p_access, l_buffer_len );
-    if( dvb_ReadBuffer( p_access, &l_buffer_len, p_block->p_buffer )
-        < 0 )
+    if( dvb_ReadBuffer( p_access, &l_buffer_len, p_block->p_buffer ) < 0 )
         return NULL;
 
     return p_block;

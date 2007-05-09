@@ -489,3 +489,51 @@ public:
     virtual HRESULT __stdcall get_EnumTuningSpaces(
         IEnumTuningSpaces** p_p_enum )=0;
 };
+
+extern "C" {
+extern const GUID CLSID_ATSCLocator;
+extern const GUID CLSID_ATSCNetworkProvider;
+extern const GUID CLSID_DVBCLocator;
+extern const GUID CLSID_DVBCNetworkProvider;
+extern const GUID CLSID_DVBSLocator;
+extern const GUID CLSID_DVBSNetworkProvider;
+extern const GUID CLSID_DVBSTuningSpace;
+extern const GUID CLSID_DVBTLocator;
+extern const GUID CLSID_DVBTNetworkProvider;
+extern const GUID CLSID_FilterGraph;
+extern const GUID CLSID_InfTee;
+extern const GUID CLSID_MPEG2Demultiplexer;
+extern const GUID CLSID_NullRenderer;
+extern const GUID CLSID_SampleGrabber;
+extern const GUID CLSID_SystemDeviceEnum;
+extern const GUID CLSID_SystemTuningSpaces;
+
+extern const GUID IID_IATSCChannelTuneRequest;
+extern const GUID IID_IATSCLocator;
+extern const GUID IID_IBaseFilter;
+extern const GUID IID_ICreateDevEnum;
+extern const GUID IID_IDVBTLocator;
+extern const GUID IID_IDVBCLocator;
+extern const GUID IID_IDVBSLocator;
+extern const GUID IID_IDVBSTuningSpace;
+extern const GUID IID_IDVBTuneRequest;
+extern const GUID IID_IGraphBuilder;
+extern const GUID IID_IMediaControl;
+extern const GUID IID_IMpeg2Demultiplexer;
+extern const GUID IID_ISampleGrabber;
+extern const GUID IID_IScanningTuner;
+extern const GUID IID_ITuner;
+extern const GUID IID_ITuningSpace;
+extern const GUID IID_ITuningSpaceContainer;
+
+extern const GUID MEDIATYPE_MPEG2_SECTIONS;
+extern const GUID MEDIASUBTYPE_None;
+extern const GUID FORMAT_None;
+
+const GUID KSCATEGORY_BDA_TRANSPORT_INFORMATION =
+    {0xa2e3074f,0x6c3d,0x11d3,{0xb6,0x53,0x00,0xc0,0x4f,0x79,0x49,0x8e}};
+const GUID KSCATEGORY_BDA_RECEIVER_COMPONENT    =
+    {0xFD0A5AF4,0xB41D,0x11d2,{0x9c,0x95,0x00,0xc0,0x4f,0x79,0x71,0xe0}};
+const GUID KSCATEGORY_BDA_NETWORK_TUNER         =
+    {0x71985f48,0x1ca1,0x11d3,{0x9c,0xc8,0x00,0xc0,0x4f,0x79,0x71,0xe0}};
+};
