@@ -256,7 +256,8 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->i_length = var_CreateGetInteger( p_filter, CFG_PREFIX "length" );
     p_sys->i_ttl = __MAX( 0, var_CreateGetInteger( p_filter, CFG_PREFIX "ttl" ) );
     p_sys->b_images = var_CreateGetBool( p_filter, CFG_PREFIX "images" );
-    p_sys->psz_marquee = (char *)malloc( p_sys->i_length );
+    p_sys->psz_marquee = (char *)malloc( p_sys->i_length + 1 );
+    p_sys->psz_marquee[p_sys->i_length] = '\0';
 
     p_sys->p_style = malloc( sizeof( text_style_t ));
     memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ));
