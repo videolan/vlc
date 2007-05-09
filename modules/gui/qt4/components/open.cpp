@@ -61,6 +61,14 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 /*    dialogBox->setFileMode( QFileDialog::ExistingFiles );*/
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
 
+    /* retrieve last known path used in file browsing */
+    char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
+    if( psz_filepath )
+    {
+        dialogBox->setDirectory( QString::fromUtf8(psz_filepath) );
+        delete psz_filepath;
+    }
+
     /* We don't want to see a grip in the middle of the window, do we? */
     dialogBox->setSizeGripEnabled( false );
     dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ));
@@ -172,6 +180,17 @@ void FileOpenPanel::updateMRL()
         int size = ui.sizeSubComboBox->itemData( ui.sizeSubComboBox->currentIndex() ).toInt();
         mrl.append( " :freetype-rel-fontsize=" + QString().setNum( size ) );
     }
+
+    const char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
+    if( (NULL == psz_filepath)
+      || strcmp(psz_filepath,dialogBox->directory().absolutePath().toUtf8()) )
+    {
+        /* set dialog box current directory as last known path */
+        config_PutPsz( p_intf, "qt-filedialog-path",
+                       dialogBox->directory().absolutePath().toUtf8() );
+    }
+    delete psz_filepath;
+
     emit mrlUpdated( mrl );
     emit methodChanged( "file-caching" );
 }
