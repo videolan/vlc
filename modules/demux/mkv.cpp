@@ -5673,13 +5673,23 @@ void matroska_segment_c::Seek( mtime_t i_date, mtime_t i_time_offset )
 
         for( i_track = 0; i_track < tracks.size(); i_track++ )
         {
+#if LIBMATROSKA_VERSION >= 0x000800
+            if( (simpleblock && tracks[i_track]->i_number == simpleblock->TrackNum()) ||
+                (block && tracks[i_track]->i_number == block->TrackNum()) )
+#else
             if( tracks[i_track]->i_number == block->TrackNum() )
+#endif
             {
                 break;
             }
         }
 
-        sys.i_pts = (sys.i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000;
+#if LIBMATROSKA_VERSION >= 0x000800
+        if( simpleblock )
+            sys.i_pts = (sys.i_chapter_time + simpleblock->GlobalTimecode()) / (mtime_t) 1000;
+        else
+#endif
+            sys.i_pts = (sys.i_chapter_time + block->GlobalTimecode()) / (mtime_t) 1000;
 
         if( i_track < tracks.size() )
         {

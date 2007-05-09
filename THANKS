@@ -80,6 +80,7 @@ Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
 Haakon Meland Eriksen - Norwegian translation
 Han HoJoong <0demon0 at paran dot com> - Korean translation
 Hans-Peter Jansen <hpj at urpla.net> - patch for module options handling
+Harry Sintonen <sintonen@iki.fi> - fix for MKV demuxer
 Igor Helman - VLM msecseek command
 Ilkka Ollakka - SDP bitrate patch, various VLM fixes
 Jan Gerber <j at v2v dot org> - patch theora decoding aspect ratio
