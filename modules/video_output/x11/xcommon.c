@@ -48,6 +48,10 @@
 #   include <netinet/in.h>                            /* BSD: struct in_addr */
 #endif
 
+#ifdef HAVE_XSP
+#include <X11/extensions/Xsp.h>
+#endif
+
 #ifdef HAVE_SYS_SHM_H
 #   include <sys/shm.h>                                /* shmget(), shmctl() */
 #endif
@@ -148,6 +152,17 @@ static int ConvertKey( int );
 static int WindowOnTop( vout_thread_t *, vlc_bool_t );
 
 static int X11ErrorHandler( Display *, XErrorEvent * );
+
+#ifdef HAVE_XSP
+static void EnablePixelDoubling( vout_thread_t *p_vout );
+static void DisablePixelDoubling( vout_thread_t *p_vout );
+#endif
+
+#ifdef HAVE_OSSO
+static const int i_backlight_on_interval = 300;
+#endif
+
+
 
 /*****************************************************************************
  * Activate: allocate X11 video thread output method
@@ -371,6 +386,20 @@ int E_(Activate) ( vlc_object_t *p_this )
     p_vout->p_sys->last_date = 0;
 #endif
 
+#ifdef HAVE_XSP
+    p_vout->p_sys->i_hw_scale = 1;
+#endif
+    
+#ifdef HAVE_OSSO
+    p_vout->p_sys->i_backlight_on_counter = i_backlight_on_interval; 
+    p_vout->p_sys->p_octx = osso_initialize( "vlc", VERSION, 0, NULL );
+    if ( p_vout->p_sys->p_octx == NULL ) {
+        msg_Err( p_vout, "Could not get osso context" );
+    } else {
+        msg_Dbg( p_vout, "Initialized osso context" );
+    }
+#endif
+		    
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
     var_Get( p_vout, "video-on-top", &val );
@@ -428,6 +457,10 @@ void E_(Deactivate) ( vlc_object_t *p_this )
     }
 #endif
 
+#ifdef HAVE_XSP
+    DisablePixelDoubling(p_vout);
+#endif
+	    
     DestroyCursor( p_vout );
     EnableXScreenSaver( p_vout );
     DestroyWindow( p_vout, &p_vout->p_sys->original_window );
@@ -439,6 +472,13 @@ void E_(Deactivate) ( vlc_object_t *p_this )
     free_context_lock( &p_vout->p_sys->xvmc_lock );
 #endif
 
+#ifdef HAVE_OSSO
+    if ( p_vout->p_sys->p_octx != NULL ) {
+        msg_Dbg( p_vout, "Deinitializing osso context" );
+        osso_deinitialize( p_vout->p_sys->p_octx );
+    }
+#endif
+	
     free( p_vout->p_sys );
 }
 
@@ -673,6 +713,41 @@ static void RenderVideo( vout_thread_t *p_vout, picture_t *p_pic )
 }
 #endif
 
+#ifdef HAVE_XSP
+/*****************************************************************************
+ * EnablePixelDoubling: Enables pixel doubling
+ *****************************************************************************
+ * Checks if the double size image fits in current window, and enables pixel
+ * doubling accordingly. The i_hw_scale is the integer scaling factor.
+ *****************************************************************************/
+static void EnablePixelDoubling( vout_thread_t *p_vout )
+{
+    int i_hor_scale = ( p_vout->p_sys->p_win->i_width ) / p_vout->render.i_width;
+    int i_vert_scale =  ( p_vout->p_sys->p_win->i_height ) / p_vout->render.i_height;
+    if ( ( i_hor_scale > 1 ) && ( i_vert_scale > 1 ) ) {
+        p_vout->p_sys->i_hw_scale = 2;
+        msg_Dbg( p_vout, "Enabling pixel doubling, scaling factor %d", p_vout->p_sys->i_hw_scale );
+        XSPSetPixelDoubling( p_vout->p_sys->p_display, 0, 1 );
+    }
+}
+
+/*****************************************************************************
+ * DisablePixelDoubling: Disables pixel doubling
+ *****************************************************************************
+ * The scaling factor i_hw_scale is reset to the no-scaling value 1.
+ *****************************************************************************/
+static void DisablePixelDoubling( vout_thread_t *p_vout )
+{
+    if ( p_vout->p_sys->i_hw_scale > 1 ) {
+        msg_Dbg( p_vout, "Disabling pixel doubling" );
+        XSPSetPixelDoubling( p_vout->p_sys->p_display, 0, 0 );
+        p_vout->p_sys->i_hw_scale = 1;
+    }
+}
+#endif
+
+
+
 /*****************************************************************************
  * InitVideo: initialize X11 video thread output method
  *****************************************************************************
@@ -743,11 +818,19 @@ static int InitVideo( vout_thread_t *p_vout )
             return VLC_SUCCESS;
     }
 
+#ifdef HAVE_XSP
+    vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width  / p_vout->p_sys->i_hw_scale,
+                       p_vout->p_sys->p_win->i_height  / p_vout->p_sys->i_hw_scale,
+                       &i_index, &i_index,
+                       &p_vout->fmt_out.i_visible_width,
+                       &p_vout->fmt_out.i_visible_height );
+#else
     vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
                        p_vout->p_sys->p_win->i_height,
                        &i_index, &i_index,
                        &p_vout->fmt_out.i_visible_width,
                        &p_vout->fmt_out.i_visible_height );
+#endif
 
     p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
 
@@ -1421,7 +1504,22 @@ static int ManageVideo( vout_thread_t *p_vout )
 #ifdef MODULE_NAME_IS_xvmc
     xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
 #endif
-
+    
+#ifdef HAVE_OSSO
+    if ( p_vout->p_sys->p_octx != NULL ) {
+        if ( p_vout->p_sys->i_backlight_on_counter == i_backlight_on_interval ) {
+            if ( osso_display_blanking_pause( p_vout->p_sys->p_octx ) != OSSO_OK ) {
+                msg_Err( p_vout, "Could not disable backlight blanking" );
+	    } else {
+                msg_Dbg( p_vout, "Backlight blanking disabled" );
+            }
+            p_vout->p_sys->i_backlight_on_counter = 0;
+        } else {
+            p_vout->p_sys->i_backlight_on_counter ++;
+        }
+    }
+#endif
+	    
     vlc_mutex_unlock( &p_vout->p_sys->lock );
     return 0;
 }
@@ -2117,10 +2215,19 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                            p_vout->p_sys->p_win->i_y,
                            p_vout->p_sys->p_win->i_width,
                            p_vout->p_sys->p_win->i_height );
+
+#ifdef HAVE_XSP
+        EnablePixelDoubling( p_vout );
+#endif
+		
     }
     else
     {
         msg_Dbg( p_vout, "leaving fullscreen mode" );
+
+#ifdef HAVE_XSP
+        DisablePixelDoubling( p_vout );
+#endif
 
         XReparentWindow( p_vout->p_sys->p_display,
                          p_vout->p_sys->original_window.video_window,
