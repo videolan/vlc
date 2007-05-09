@@ -160,60 +160,9 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_marq_color_pop selectItemAtIndex:0];
     [o_time_color_pop selectItemAtIndex:0];
 
-    /* define the relative positions and copy them to the menues
-     * we can destroy the array afterwards, because we are saving the ints 
-     * as tags to the menu-items */
-    /*NSArray * o_cnt_cnt;
-    NSArray * o_lft_cnt;
-    NSArray * o_rht_cnt;
-    NSArray * o_cnt_top;
-    NSArray * o_lft_top;
-    NSArray * o_rht_top;
-    NSArray * o_cnt_btm;
-    NSArray * o_lft_btm;
-    NSArray * o_rht_btm;
-    NSArray * o_positions;
-    o_cnt_cnt = [NSArray arrayWithObjects: _NS("Center-Center"), @"0", nil];
-    o_lft_cnt = [NSArray arrayWithObjects: _NS("Left-Center"), @"1", nil];
-    o_rht_cnt = [NSArray arrayWithObjects: _NS("Right-Center"), @"2", nil];
-    o_cnt_top = [NSArray arrayWithObjects: _NS("Center-Top"), @"4", nil];
-    o_lft_top = [NSArray arrayWithObjects: _NS("Left-Top"), @"5", nil];
-    o_rht_top = [NSArray arrayWithObjects: _NS("Right-Top"), @"6", nil];
-    o_cnt_btm = [NSArray arrayWithObjects: _NS("Center-Bottom"), @"8", nil];
-    o_lft_btm = [NSArray arrayWithObjects: _NS("Left-Bottom"), @"9", nil];
-    o_rht_btm = [NSArray arrayWithObjects: _NS("Right-Bottom"), @"10", nil];
-    o_positions = [[NSArray alloc] initWithObjects: o_cnt_cnt, o_lft_cnt,
-        o_rht_cnt, o_cnt_top, o_lft_top, o_rht_top, o_cnt_btm, o_lft_btm,
-        o_rht_btm, nil];
-        
-    x = 0;
-    [o_time_pos_rel_pop removeAllItems];
-    [o_marq_pos_rel_pop removeAllItems];
-    [o_logo_pos_rel_pop removeAllItems];
-    
-    * we are adding a tag here, so we can easily select an item later on *
-    while ( x != [o_positions count] )
-    {
-        [o_time_pos_rel_pop addItemWithTitle: [[o_positions objectAtIndex:x]
-            objectAtIndex:0]];
-        [[o_time_pos_rel_pop lastItem] setTag: [[[o_positions objectAtIndex:x]
-            objectAtIndex:1] intValue]];
-        [o_marq_pos_rel_pop addItemWithTitle: [[o_positions objectAtIndex:x]
-            objectAtIndex:0]];
-        [[o_marq_pos_rel_pop lastItem] setTag: [[[o_positions objectAtIndex:x]
-            objectAtIndex:1] intValue]];
-        [o_logo_pos_rel_pop addItemWithTitle: [[o_positions objectAtIndex:x]
-            objectAtIndex:0]];
-        [[o_logo_pos_rel_pop lastItem] setTag: [[[o_positions objectAtIndex:x]
-            objectAtIndex:1] intValue]];
-
-        x = (x + 1);
-    }
-    [o_positions release];*/
-
     NSArray * o_sizes;
     o_sizes = [[NSArray alloc] initWithObjects: @"6", @"8", @"10", @"11", @"12",\
-        @"14", @"13", @"16", @"18", @"24", @"36", @"48", @"64", @"72", @"96",
+        @"13", @"14", @"16", @"18", @"24", @"36", @"48", @"64", @"72", @"96",
         @"144", @"288", nil];
     [o_marq_size_pop removeAllItems];
     [o_marq_size_pop addItemsWithTitles: o_sizes];
@@ -250,7 +199,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     if( psz_temp = config_GetPsz( p_intf, "time-format" ) )
         [o_marq_marq_fld setStringValue: [NSString stringWithUTF8String: psz_temp]];
     else
-        [o_marq_marq_fld setStringValue: _NS(@"Not Available")];
+        [o_marq_marq_fld setStringValue: _NS("Not Available")];
     
     [o_marq_opaque_sld setIntValue: config_GetInt( p_intf, "marq-opacity")];
     [o_marq_pos_radio selectCellWithTag: config_GetInt( p_intf, "marq-position" )];
@@ -281,7 +230,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     if( psz_temp = config_GetPsz( p_intf, "time-format" ) )
         [o_time_stamp_fld setStringValue: [NSString stringWithUTF8String: psz_temp]];
     else
-        [o_time_stamp_fld setStringValue: _NS(@"Not Available")];
+        [o_time_stamp_fld setStringValue: _NS("Not Available")];
 
     [o_time_opaque_sld setIntValue: config_GetInt( p_intf, "time-opacity")];
     /* FIXME: the following line doesn't work with "-1", which is the default
@@ -510,7 +459,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     }
     else if ( sender == o_logo_image_fld )
     {
-        val.psz_string = [[o_logo_image_fld stringValue] cString];
+        val.psz_string = (char *)[[o_logo_image_fld stringValue] UTF8String];
 
         if( p_input )
             var_Set( p_input->p_libvlc_global, "logo-file", val );
