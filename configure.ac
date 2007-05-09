@@ -2000,7 +2000,7 @@ then
       AC_CHECK_HEADERS(dshow.h,
       [ VLC_ADD_PLUGINS([bda])
         VLC_ADD_CXXFLAGS([bda],[])
-        VLC_ADD_LDFLAGS([bda],[-lole32 -loleaut32 -luuid]) ])
+        VLC_ADD_LDFLAGS([bda],[-lstrmiids -lole32 -loleaut32 -luuid]) ])
   fi
 fi
 
