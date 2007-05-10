@@ -240,14 +240,16 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 {
     ui.setupUi( this );
 
-    CONNECT( ui.deviceCombo, editTextChanged(QString ), this, updateMRL());
-    BUTTONACT( ui.dvdRadioButton, updateMRL());
-    BUTTONACT( ui.vcdRadioButton, updateMRL());
-    BUTTONACT( ui.audioCDRadioButton, updateMRL());
-    BUTTONACT( ui.dvdsimple,  updateMRL());
+    BUTTONACT( ui.dvdRadioButton, updateButtons());
+    BUTTONACT( ui.vcdRadioButton, updateButtons());
+    BUTTONACT( ui.audioCDRadioButton, updateButtons());
+    BUTTONACT( ui.dvdsimple,  updateButtons());
 
+    CONNECT( ui.deviceCombo, editTextChanged(QString ), this, updateMRL());
     CONNECT( ui.titleSpin, valueChanged(int), this, updateMRL());
     CONNECT( ui.chapterSpin, valueChanged(int), this, updateMRL());
+    CONNECT( ui.audioSpin, valueChanged(int), this, updateMRL());
+    CONNECT( ui.subtitlesSpin, valueChanged(int), this, updateMRL());
 }
 
 DiscOpenPanel::~DiscOpenPanel()
@@ -258,6 +260,34 @@ void DiscOpenPanel::clear()
     ui.titleSpin->setValue(0);
     ui.chapterSpin->setValue(0);
 }
+
+void DiscOpenPanel::updateButtons()
+{
+    if ( ui.dvdRadioButton->isChecked() )
+    {
+        ui.titleLabel->setText( qtr("Title") );
+        ui.chapterLabel->show();
+        ui.chapterSpin->show();
+        ui.diskOptionBox_2->show();
+    }
+    else if ( ui.vcdRadioButton->isChecked() )
+    {
+        ui.titleLabel->setText( qtr("Entry") );
+        ui.chapterLabel->hide();
+        ui.chapterSpin->hide();
+        ui.diskOptionBox_2->show();
+    }
+    else
+    {
+        ui.titleLabel->setText( qtr("Track") );
+        ui.chapterLabel->hide();
+        ui.chapterSpin->hide();
+        ui.diskOptionBox_2->hide();
+    }
+
+    updateMRL();
+}
+
 
 void DiscOpenPanel::updateMRL()
 {
@@ -290,6 +320,20 @@ void DiscOpenPanel::updateMRL()
     /* CDDA */
     } else {
         mrl = "cdda://" + ui.deviceCombo->currentText();
+        if( ui.titleSpin->value() > 0 ) {
+            QString("@%1").arg(ui.titleSpin->value());
+        }
+    }
+
+    if ( ui.dvdRadioButton->isChecked() || ui.vcdRadioButton->isChecked() )
+    {
+        if ( ui.audioSpin->value() >= 0 ) {
+            mrl += " :audio-track=" + QString("%1").arg(ui.audioSpin->value());
+        }
+        if ( ui.subtitlesSpin->value() >= 0 ) {
+            mrl += " :sub-track=" +
+                QString("%1").arg(ui.subtitlesSpin->value());
+        }
     }
 
     emit mrlUpdated(mrl);

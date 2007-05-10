@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>287</height>
+    <width>462</width>
+    <height>407</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -73,7 +73,7 @@
        </widget>
       </item>
       <item row="3" column="0" colspan="2" >
-       <widget class="QLabel" name="label" >
+       <widget class="QLabel" name="deviceLabel" >
         <property name="text" >
          <string>Disk device</string>
         </property>
@@ -153,7 +153,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="diskOptionGroupBox" >
+    <widget class="QGroupBox" name="diskOptionBox" >
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>5</hsizetype>
@@ -173,7 +173,7 @@
        <number>6</number>
       </property>
       <item row="1" column="0" >
-       <widget class="QLabel" name="label_3" >
+       <widget class="QLabel" name="chapterLabel" >
         <property name="text" >
          <string>Chapter</string>
         </property>
@@ -191,15 +191,15 @@
          <string/>
         </property>
         <property name="minimum" >
-         <number>-1</number>
+         <number>0</number>
         </property>
         <property name="value" >
-         <number>-1</number>
+         <number>0</number>
         </property>
        </widget>
       </item>
       <item row="0" column="0" >
-       <widget class="QLabel" name="label_2" >
+       <widget class="QLabel" name="titleLabel" >
         <property name="text" >
          <string>Title</string>
         </property>
@@ -217,6 +217,87 @@
          <string/>
         </property>
         <property name="minimum" >
+         <number>0</number>
+        </property>
+        <property name="value" >
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="diskOptionBox_2" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>5</vsizetype>
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" >
+      <string>Audio and Subtitles</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="audioLabel" >
+        <property name="text" >
+         <string>Audio track</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QSpinBox" name="audioSpin" >
+        <property name="alignment" >
+         <set>Qt::AlignRight</set>
+        </property>
+        <property name="suffix" >
+         <string/>
+        </property>
+        <property name="prefix" >
+         <string/>
+        </property>
+        <property name="maximum" >
+         <number>7</number>
+        </property>
+        <property name="minimum" >
+         <number>-1</number>
+        </property>
+        <property name="value" >
+         <number>-1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="subtitlesLabel" >
+        <property name="text" >
+         <string>Subtitles track</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QSpinBox" name="subtitlesSpin" >
+        <property name="autoFillBackground" >
+         <bool>false</bool>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignRight</set>
+        </property>
+        <property name="suffix" >
+         <string/>
+        </property>
+        <property name="maximum" >
+         <number>31</number>
+        </property>
+        <property name="minimum" >
          <number>-1</number>
         </property>
         <property name="value" >
@@ -232,10 +313,13 @@
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::MinimumExpanding</enum>
+     </property>
      <property name="sizeHint" >
       <size>
-       <width>420</width>
-       <height>16</height>
+       <width>444</width>
+       <height>10</height>
       </size>
      </property>
     </spacer>

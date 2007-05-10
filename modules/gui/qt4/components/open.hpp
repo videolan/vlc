@@ -115,6 +115,7 @@ private:
     Ui::OpenDisk ui;
 public slots:
     virtual void updateMRL() ;
+    virtual void updateButtons() ;
 };
 
 
