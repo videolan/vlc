@@ -357,6 +357,7 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.ipv6, clicked(), this, updateMRL());
 
     ui.protocolCombo->addItem("HTTP", QVariant("http"));
+    ui.protocolCombo->addItem("HTTPS", QVariant("https"));
     ui.protocolCombo->addItem("FTP", QVariant("ftp"));
     ui.protocolCombo->addItem("MMS", QVariant("mms"));
     ui.protocolCombo->addItem("RTSP", QVariant("rtsp"));
@@ -403,22 +404,23 @@ void NetOpenPanel::updateMRL() {
     } else {
         switch(proto) {
         case 0:
+        case 1:
             mrl = "http://" + addr;
             emit methodChanged("http-caching");
             break;
-        case 2:
+        case 3:
             mrl = "mms://" + addr;
             emit methodChanged("mms-caching");
             break;
-        case 1:
+        case 2:
             mrl = "ftp://" + addr;
             emit methodChanged("ftp-caching");
             break;
-        case 3: /* RTSP */
+        case 4: /* RTSP */
             mrl = "rtsp://" + addr;
             emit methodChanged("rtsp-caching");
             break;
-        case 4:
+        case 5:
             mrl = "udp://@";
             if( ui.ipv6->isEnabled() && ui.ipv6->isChecked() ) {
                 mrl += "[::]";
@@ -426,7 +428,7 @@ void NetOpenPanel::updateMRL() {
             mrl += QString(":%1").arg(ui.portSpin->value());
             emit methodChanged("udp-caching");
             break;
-        case 5: /* UDP multicast */
+        case 6: /* UDP multicast */
             mrl = "udp://@";
             /* Add [] to IPv6 */
             if ( addr.contains(':') && !addr.contains('[') ) {
