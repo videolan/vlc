@@ -237,15 +237,37 @@
 {
     id o_value = nil;
     playlist_item_t *p_item;
-    
-    if( item == nil || ![item isKindOfClass: [NSValue class]] ) return( @"error" );
-    
-    p_item = (playlist_item_t *)[item pointerValue];
-    if( p_item == NULL )
+
+    /* For error handling */
+    static BOOL attempted_reload = NO;
+
+    if( item == nil || ![item isKindOfClass: [NSValue class]] )
     {
-        return( @"error");
+        /* Attempt to fix the error by asking for a data redisplay
+         * This might cause infinite loop, so add a small check */
+        if( !attempted_reload )
+        {
+            attempted_reload = YES;
+            [outlineView reloadData];
+        }
+        return @"error" ;
     }
     
+    p_item = (playlist_item_t *)[item pointerValue];
+    if( !p_item || !p_item->p_input )
+    {
+        /* Attempt to fix the error by asking for a data redisplay
+         * This might cause infinite loop, so add a small check */
+        if( !attempted_reload )
+        {
+            attempted_reload = YES;
+            [outlineView reloadData];
+        }
+        return @"error";
+    }
+    
+    attempted_reload = NO;
+
     if( [[o_tc identifier] isEqualToString:@"1"] )
     {
         /* sanity check to prevent the NSString class from crashing */
