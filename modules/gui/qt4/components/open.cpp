@@ -314,7 +314,7 @@ void DiscOpenPanel::updateMRL()
         emit methodChanged( "vcd-caching" );
 
         if( ui.titleSpin->value() > 0 ) {
-            mrl += QString("@%1").arg(ui.titleSpin->value());
+            mrl += QString("@E%1").arg(ui.titleSpin->value());
         }
 
     /* CDDA */
