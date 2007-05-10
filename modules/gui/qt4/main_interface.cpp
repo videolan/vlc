@@ -129,8 +129,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              slider, setPosition( float,int, int ) );
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, setDisplay( float, int, int ) );
-    CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
-                                                        setName( QString ) );
+    if( config_GetInt( p_intf, "qt-name-in-title" ) )
+    {
+        CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
+                 setName( QString ) );
+    }
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
     CONNECT( THEMIM->getIM(), statusChanged( int ), this,
              updateSystrayMenu( int ) );
