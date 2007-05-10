@@ -4928,9 +4928,9 @@ AS_IF([test "${enable_qt4}" != "no" &&
       enableqt4=true
       VLC_ADD_LDFLAGS([qt4],[$QT4_LIBS])
       VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS])
-      AC_PATH_PROG(MOC, moc, moc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+      AC_PATH_PROG(MOC, moc-qt4, moc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
       AC_PATH_PROG(RCC, rcc, rcc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
-      AC_PATH_PROG(UIC, uic, uic,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+      AC_PATH_PROG(UIC, uic-qt4, uic,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
       ],
       AS_IF([test "${enable_qt4}" = "yes"],[
 	AC_MSG_ERROR(QT4 library not found)
