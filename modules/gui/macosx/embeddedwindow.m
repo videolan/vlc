@@ -249,6 +249,8 @@
     /* We are in fullscreen (and no animation is running) */
     if (b_fullscreen)
     {
+        /* Make sure we are hidden */
+        [super orderOut: self];
         b_animation_lock_alreadylocked = NO;
         [self unlockFullscreenAnimation];
         return;
@@ -319,12 +321,19 @@
     /* tell the fspanel to move itself to front next time it's triggered */
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
     
+    [super orderOut: self];
+
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
     b_fullscreen = YES;
     [self unlockFullscreenAnimation];
 }
 
 - (void)leaveFullscreen
+{
+    [self leaveFullscreenAndFadeOut: NO];
+}
+
+- (void)leaveFullscreenAndFadeOut: (BOOL)fadeout
 {
     NSMutableDictionary *dict1, *dict2;
     NSRect frame;
@@ -345,7 +354,7 @@
         return;
     }
 
-    if (![self isVisible] || MACOS_VERSION < 10.4f)
+    if (fadeout || MACOS_VERSION < 10.4f)
     {
         /* We don't animate if we are not visible or if we are running on
         * Mac OS X <10.4 which doesn't support NSAnimation, instead we
@@ -365,6 +374,9 @@
         CGReleaseDisplayFadeReservation( token);
         return;
     }
+
+    [self setAlphaValue: 0.0];
+    [self orderFront: self];
 
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setNonActive: nil];
     SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
@@ -473,7 +485,7 @@
 {
     [super orderOut: sender];
     /* Make sure we leave fullscreen */
-    [self leaveFullscreen];
+    [self leaveFullscreenAndFadeOut: YES];
 }
 
 /* Make sure setFrame gets executed on main thread especially if we are animating.

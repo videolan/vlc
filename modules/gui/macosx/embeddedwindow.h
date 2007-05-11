@@ -67,6 +67,8 @@
 
 - (void)enterFullscreen;
 - (void)leaveFullscreen;
+/* Allows to leave fullscreen by simply fading out the display */
+- (void)leaveFullscreenAndFadeOut: (BOOL)fadeout;
 
 /* private */
 - (void)hasEndedFullscreen;
