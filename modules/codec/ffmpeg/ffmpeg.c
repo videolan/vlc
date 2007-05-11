@@ -1060,6 +1060,12 @@ static struct
       VIDEO_ES, "VMware Video" },
 #endif
 
+    { VLC_FOURCC('Z','M','B','V'), CODEC_ID_ZMBV,
+      VIDEO_ES, "DosBox Capture Codec" },
+
+    { VLC_FOURCC('K','M','V','C'), CODEC_ID_KMVC,
+      VIDEO_ES, "Karl Morton's Video Codec (Worms)" },
+
 
     /*
      *  Image codecs
@@ -1076,7 +1082,10 @@ static struct
       VIDEO_ES, "PAM Image" },
     { VLC_FOURCC('M','J','L','S'), CODEC_ID_JPEGLS,
       VIDEO_ES, "PAM Image" },
-
+    { VLC_FOURCC('t','g','a',' '), CODEC_ID_TARGA,
+      VIDEO_ES, "Truevision Targa Image" },
+    { VLC_FOURCC('s','g','i',' '), CODEC_ID_SGI,
+      VIDEO_ES, "BMP Image" },
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(0<<8)+0)
     { VLC_FOURCC('b','m','p',' '), CODEC_ID_BMP,
@@ -1084,6 +1093,8 @@ static struct
 #endif
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+1)
+    { VLC_FOURCC('t','i','f','f'), CODEC_ID_TARGA,
+      VIDEO_ES, "TIFF Image" },
     { VLC_FOURCC('g','i','f',' '), CODEC_ID_GIF,
       VIDEO_ES, "GIF Image" },
 #endif
