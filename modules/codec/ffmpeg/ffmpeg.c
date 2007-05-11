@@ -763,9 +763,17 @@ static struct
     { VLC_FOURCC( 'A','V','D','J' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Motion JPEG Video" },
     { VLC_FOURCC( 'd','m','b','1' ), CODEC_ID_MJPEG,
-      VIDEO_ES, "Motion JPEG Video" },
+      VIDEO_ES, "Motion JPEG OpenDML Video" },
     { VLC_FOURCC( 'm','j','p','b' ), CODEC_ID_MJPEGB, /* for mov file */
       VIDEO_ES, "Motion JPEG B Video" },
+    { VLC_FOURCC( 'L','J','P','G' ), CODEC_ID_LJPEG,
+      VIDEO_ES, "Lead Motion JPEG Video" },
+    { VLC_FOURCC( 'L','J','P','G' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Lead Motion JPEG Video" },
+    { VLC_FOURCC( 'A','V','R','n' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Avid Motion JPEG" },
+    { VLC_FOURCC( 'A','D','J','V' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Avid Motion JPEG" },
     { VLC_FOURCC( 'S','P','5','X' ), CODEC_ID_SP5X,
       VIDEO_ES, "Sunplus Motion JPEG Video" },
 
