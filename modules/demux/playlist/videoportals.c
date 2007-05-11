@@ -27,6 +27,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
+#include <vlc_url.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 #include "playlist.h"
@@ -51,6 +52,9 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
     const char *psz_path = p_demux->psz_path;
     char *psz_cur;
     char *psz_url = NULL;
+
+    byte_t *p_peek;
+    int i_peek;
 
     /* YouTube */
     if( ( psz_cur = strstr( psz_path, "youtube.com" ) ) )
@@ -84,6 +88,31 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
                     asprintf( &psz_url, "http://www.youtube.com/"
                               "get_video.php?video_id=%s&t=%s",
                               video_id, t );
+                }
+            }
+        }
+    }
+    /* Daily motion */
+    else if( ( psz_cur = strstr( psz_path, "dailymotion.com" ) ) )
+    {
+        i_peek = stream_Peek( p_demux->s, &p_peek, strlen( "<!DOCTYPE" ) );
+        if( !strncmp( (char*)p_peek, "<!DOCTYPE", strlen( "!<DOCTYPE" ) ) )
+        {
+            /* This looks like a (daily motion) webpage */
+            char *psz_line;
+            while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
+            {
+                if( ( psz_cur = strstr( psz_line,
+                      "param name=\"flashvars\" value=\"url=" ) ) )
+                {
+                    char *psz_tmp;
+                    psz_cur += strlen( "param name=\"flashvars\" value=\"url=" );
+                    psz_tmp = strchr( psz_cur, '&' );
+                    *psz_tmp = 0;
+                    psz_url = strdup( psz_cur );
+                    decode_URI( psz_url );
+                    *psz_tmp = '&';
+                    break;
                 }
             }
         }
