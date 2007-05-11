@@ -124,21 +124,30 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Volume control */
     CONNECT( ui.volumeSlider, valueChanged(int), this, updateVolume(int) );
+
     /* Connect the input manager to the GUI elements it manages */
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              slider, setPosition( float,int, int ) );
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, setDisplay( float, int, int ) );
+
+    /* Naming in the controller */
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
              setName( QString ) );
+    if( config_GetInt( p_intf, "qt-name-in-title" ) )
+    {
+        CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
+             setVLCWindowsTitle( QString ) );
+    }
+
+    /* PLAY_STATUS */
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
-    CONNECT( THEMIM->getIM(), statusChanged( int ), this,
-             updateSystrayMenu( int ) );
     CONNECT( THEMIM->getIM(), navigationChanged( int ),
              this, setNavigation(int) );
     CONNECT( slider, sliderDragged( float ),
              THEMIM->getIM(), sliderUpdate( float ) );
 
+    /* Buttons */
     CONNECT( ui.prevSectionButton, clicked(), THEMIM->getIM(),
              sectionPrev() );
     CONNECT( ui.nextSectionButton, clicked(), THEMIM->getIM(),
@@ -723,11 +732,7 @@ void MainInterface::setDisplay( float pos, int time, int length )
 void MainInterface::setName( QString name )
 {
     nameLabel->setText( " " + name+" " );
-    
-    if( config_GetInt( p_intf, "qt-name-in-title" ) )
-    {
-        setVLCWindowsTitle( name );
-    }
+
 }
 
 void MainInterface::setStatus( int status )
@@ -736,6 +741,7 @@ void MainInterface::setStatus( int status )
         ui.playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
     else
         ui.playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
+    updateSystrayMenu( status );
 }
 
 #define HELP_MENU N_("Menu")
