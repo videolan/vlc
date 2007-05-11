@@ -56,6 +56,7 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
     byte_t *p_peek;
     int i_peek;
 
+    printf(">>> %s\n", psz_path );
     /* YouTube */
     if( ( psz_cur = strstr( psz_path, "youtube.com" ) ) )
     {
@@ -129,6 +130,31 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
             asprintf( &psz_url,
                       "http://video.google.com/videogvp?docid=%s",
                       docid );
+        }
+    }
+    /* metacafe */
+    else if( ( psz_cur = strstr( psz_path, "metacafe.com" ) ) )
+    {
+        if( strstr( psz_cur, "watch/" ) )
+        {
+            psz_cur = strstr( psz_cur, "watch/" );
+            psz_cur += strlen( "watch/" );
+            if( psz_cur[strlen(psz_cur)-1] == '/' )
+                psz_cur[strlen(psz_cur)-1] = '\0';
+            asprintf( &psz_url, "http://www.metacafe.com/fplayer/%s.swf",
+                      psz_cur );
+        }
+        else if( ( psz_cur = strstr( psz_path, "images.metacafe.com" ) ) )
+        {
+            if( ( psz_cur = strstr( psz_cur, "mediaURL=" ) ) )
+            {
+                char *psz_tmp;
+                psz_cur += strlen( "mediaURL=" );
+                psz_tmp = strchr( psz_cur, '&' );
+                *psz_tmp = 0;
+                psz_url = strdup( psz_cur );
+                *psz_tmp = '&';
+            }
         }
     }
 
