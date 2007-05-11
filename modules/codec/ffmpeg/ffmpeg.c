@@ -715,20 +715,24 @@ static struct
 
     /* h264 */
     { VLC_FOURCC('h','2','6','4'), CODEC_ID_H264,
-      VIDEO_ES, "h264" },
+      VIDEO_ES, "H264 - MPEG-4 AVC (part 10)" },
     { VLC_FOURCC('H','2','6','4'), CODEC_ID_H264,
-      VIDEO_ES, "h264" },
+      VIDEO_ES, "H264 - MPEG-4 AVC (part 10)" },
     { VLC_FOURCC('x','2','6','4'), CODEC_ID_H264,
-      VIDEO_ES, "h264" },
+      VIDEO_ES, "H264 - MPEG-4 AVC (part 10)" },
     { VLC_FOURCC('X','2','6','4'), CODEC_ID_H264,
-      VIDEO_ES, "h264" },
+      VIDEO_ES, "H264 - MPEG-4 AVC (part 10)" },
     /* avc1: special case h264 */
     { VLC_FOURCC('a','v','c','1'), CODEC_ID_H264,
-      VIDEO_ES, "h264" },
+      VIDEO_ES, "H264 - MPEG-4 AVC (part 10)" },
     { VLC_FOURCC('V','S','S','H'), CODEC_ID_H264,
-      VIDEO_ES, "h264" },
+      VIDEO_ES, "Vanguard VSS H264" },
+    { VLC_FOURCC('V','S','S','W'), CODEC_ID_H264,
+      VIDEO_ES, "Vanguard VSS H264" },
     { VLC_FOURCC('v','s','s','h'), CODEC_ID_H264,
-      VIDEO_ES, "h264" },
+      VIDEO_ES, "Vanguard VSS H264" },
+    { VLC_FOURCC('D','A','V','C'), CODEC_ID_H264,
+      VIDEO_ES, "Dicas MPEGable H.264/MPEG-4 AVC" },
 
 /* H263 and H263i */
 /* H263(+) is also known as Real Video 1.0 */
@@ -893,6 +897,8 @@ static struct
     /* Huff YUV */
     { VLC_FOURCC('H','F','Y','U'), CODEC_ID_HUFFYUV,
       VIDEO_ES, "Huff YUV Video" },
+    { VLC_FOURCC('F','F','V','H'), CODEC_ID_FFVHUFF,
+      VIDEO_ES, "Huff YUV Video" },
 
     /* Creative YUV */
     { VLC_FOURCC('C','Y','U','V'), CODEC_ID_CYUV,
@@ -980,10 +986,14 @@ static struct
     /* 4X Technologies */
     { VLC_FOURCC('4','x','m','v'), CODEC_ID_4XM,
       VIDEO_ES, "4X Technologies Video" },
+    { VLC_FOURCC('4','X','M','V'), CODEC_ID_4XM,
+      VIDEO_ES, "4X Technologies Video" },
 
     /* Duck TrueMotion */
     { VLC_FOURCC('D','U','C','K'), CODEC_ID_TRUEMOTION1,
       VIDEO_ES, "Duck TrueMotion v1 Video" },
+    { VLC_FOURCC('T','M','2','0'), CODEC_ID_TRUEMOTION2,
+      VIDEO_ES, "Duck TrueMotion v2.0 Video" },
 
     /* Interplay MVE */
     { VLC_FOURCC('i','m','v','e'), CODEC_ID_INTERPLAY_VIDEO,
@@ -1038,6 +1048,9 @@ static struct
     { VLC_FOURCC('R','T','2','1'), CODEC_ID_INDEO2,
       VIDEO_ES, "Indeo Video v2" },
 
+    { VLC_FOURCC('C','S','C','D'), CODEC_ID_CSCD,
+      VIDEO_ES, "CamStudio Screen Codec" },
+
     /* Flash Screen Video */
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(11<<8)+0)
     { VLC_FOURCC('F','S','V','1'), CODEC_ID_FLASHSV,
@@ -1047,6 +1060,7 @@ static struct
     { VLC_FOURCC('V','M','n','c'), CODEC_ID_VMNC,
       VIDEO_ES, "VMware Video" },
 #endif
+
 
     /*
      *  Image codecs
@@ -1061,6 +1075,9 @@ static struct
       VIDEO_ES, "PGM YUV Image" },
     { VLC_FOURCC('p','a','m',' '), CODEC_ID_PAM,
       VIDEO_ES, "PAM Image" },
+    { VLC_FOURCC('M','J','L','S'), CODEC_ID_JPEGLS,
+      VIDEO_ES, "PAM Image" },
+
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(0<<8)+0)
     { VLC_FOURCC('b','m','p',' '), CODEC_ID_BMP,
