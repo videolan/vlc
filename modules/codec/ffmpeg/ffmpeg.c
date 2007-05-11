@@ -852,12 +852,11 @@ static struct
     { VLC_FOURCC('W','V','C','1'), CODEC_ID_VC1,
       VIDEO_ES, "Windows Media Video VC1" },
 #endif
-#if 0
+
     /* WMVA is the VC-1 codec before the standardization proces,
        it is not bitstream compatible and deprecated  */
     { VLC_FOURCC('W','M','V','A'), CODEC_ID_VC1,
       VIDEO_ES, "Windows Media Video Advanced Profile" },
-#endif
 
     /* Microsoft Video 1 */
     { VLC_FOURCC('M','S','V','C'), CODEC_ID_MSVIDEO1,
