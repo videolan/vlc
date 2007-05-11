@@ -70,6 +70,9 @@ void E_(Close_GVP) ( vlc_object_t * );
 int E_(Import_IFO) ( vlc_object_t * );
 void E_(Close_IFO) ( vlc_object_t * );
 
+int E_(Import_VideoPortal) ( vlc_object_t * );
+void E_(Close_VideoPortal) ( vlc_object_t * );
+
 #define INIT_PLAYLIST_STUFF \
     playlist_t *p_playlist = pl_Yield( p_demux ); \
     vlc_bool_t b_play = var_CreateGetBool( p_demux, "playlist-autostart" ); \
