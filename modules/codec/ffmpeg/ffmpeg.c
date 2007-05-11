@@ -1084,8 +1084,6 @@ static struct
       VIDEO_ES, "PAM Image" },
     { VLC_FOURCC('t','g','a',' '), CODEC_ID_TARGA,
       VIDEO_ES, "Truevision Targa Image" },
-    { VLC_FOURCC('s','g','i',' '), CODEC_ID_SGI,
-      VIDEO_ES, "BMP Image" },
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(0<<8)+0)
     { VLC_FOURCC('b','m','p',' '), CODEC_ID_BMP,
@@ -1097,6 +1095,8 @@ static struct
       VIDEO_ES, "TIFF Image" },
     { VLC_FOURCC('g','i','f',' '), CODEC_ID_GIF,
       VIDEO_ES, "GIF Image" },
+    { VLC_FOURCC('s','g','i',' '), CODEC_ID_SGI,
+      VIDEO_ES, "SGI Image" },
 #endif
 
     /*
