@@ -2272,14 +2272,17 @@ static int InputSourceInit( input_thread_t *p_input,
         {
             psz_demux = in->p_access->psz_demux;
         }
-        in->p_demux = demux2_New( p_input, psz_access, psz_demux, psz_path,
+        in->p_demux = demux2_New( p_input, psz_access, psz_demux,
+                                  in->p_access->psz_path
+                                    ? in->p_access->psz_path
+                                    : psz_path,
                                   in->p_stream, p_input->p->p_es_out,
                                   p_input->b_preparsing );
         if( in->p_demux == NULL )
         {
             msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                      psz_access, psz_demux, psz_path );
-            intf_UserFatal( VLC_OBJECT( p_input), VLC_FALSE, 
+            intf_UserFatal( VLC_OBJECT( p_input ), VLC_FALSE,
                             _("Can't recognize the input's format"),
                             _("The format of '%s' can't be detected. "
                             "Have a look the log for details."), psz_mrl );
