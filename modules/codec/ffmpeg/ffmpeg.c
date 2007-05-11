@@ -526,6 +526,8 @@ static struct
     /* MPEG-1 Video */
     { VLC_FOURCC('m','p','1','v'), CODEC_ID_MPEG1VIDEO,
       VIDEO_ES, "MPEG-1 Video" },
+    { VLC_FOURCC('m','p','e','g'), CODEC_ID_MPEG1VIDEO,
+      VIDEO_ES, "MPEG-1 Video" },
 
     /* MPEG-2 Video */
     { VLC_FOURCC('m','p','2','v'), CODEC_ID_MPEG2VIDEO,
@@ -650,6 +652,10 @@ static struct
     /* Sorenson v1 */
     { VLC_FOURCC('S','V','Q','1'), CODEC_ID_SVQ1,
       VIDEO_ES, "SVQ-1 (Sorenson Video v1)" },
+    { VLC_FOURCC('s','v','q','1'), CODEC_ID_SVQ1,
+      VIDEO_ES, "SVQ-1 (Sorenson Video v1)" },
+    { VLC_FOURCC('s','v','q','i'), CODEC_ID_SVQ1,
+      VIDEO_ES, "SVQ-1 (Sorenson Video v1)" },
 
     /* Sorenson v3 */
     { VLC_FOURCC('S','V','Q','3'), CODEC_ID_SVQ3,
@@ -675,14 +681,12 @@ static struct
 /* H263 and H263i */
 /* H263(+) is also known as Real Video 1.0 */
 
-/* FIXME FOURCC_H263P exist but what fourcc ? */
-
     /* H263 */
     { VLC_FOURCC('H','2','6','3'), CODEC_ID_H263,
       VIDEO_ES, "H263" },
     { VLC_FOURCC('h','2','6','3'), CODEC_ID_H263,
       VIDEO_ES, "H263" },
-    { VLC_FOURCC('U','2','6','3'), CODEC_ID_H263,
+    { VLC_FOURCC('s','2','6','3'), CODEC_ID_H263,
       VIDEO_ES, "H263" },
     { VLC_FOURCC('M','2','6','3'), CODEC_ID_H263,
       VIDEO_ES, "H263" },
@@ -692,6 +696,16 @@ static struct
       VIDEO_ES, "I263.I" },
     { VLC_FOURCC('i','2','6','3'), CODEC_ID_H263I,
       VIDEO_ES, "I263.I" },
+
+    /* H263P */
+    { VLC_FOURCC('v','i','v','1'), CODEC_ID_H263P,
+      VIDEO_ES, "H263+" },
+    { VLC_FOURCC('v','i','v','O'), CODEC_ID_H263P,
+      VIDEO_ES, "H263+" },
+    { VLC_FOURCC('v','i','v','2'), CODEC_ID_H263P,
+      VIDEO_ES, "H263+" },
+    { VLC_FOURCC('U','2','6','3'), CODEC_ID_H263,
+      VIDEO_ES, "H263+" },
 
     /* Flash (H263) variant */
     { VLC_FOURCC('F','L','V','1'), CODEC_ID_FLV1,
@@ -718,6 +732,10 @@ static struct
       VIDEO_ES, "Motion JPEG Video" },
     { VLC_FOURCC( 'J','P','G','L' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Motion JPEG Video" },
+    { VLC_FOURCC( 'A','V','D','J' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Motion JPEG Video" },
+    { VLC_FOURCC( 'd','m','b','1' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Motion JPEG Video" },
     { VLC_FOURCC( 'm','j','p','b' ), CODEC_ID_MJPEGB, /* for mov file */
       VIDEO_ES, "Motion JPEG B Video" },
     { VLC_FOURCC( 'S','P','5','X' ), CODEC_ID_SP5X,
@@ -742,6 +760,12 @@ static struct
       VIDEO_ES, "DV Video Pro PAL" },
     { VLC_FOURCC('C','D','V','C'), CODEC_ID_DVVIDEO,
       VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','5','p'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video C Pro 50 PAL" },
+    { VLC_FOURCC('d','v','5','n'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video C Pro 50 NTSC" },
+    { VLC_FOURCC('A','V','d','v'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "AVID DV" },
 
     /* Windows Media Video */
     { VLC_FOURCC('W','M','V','1'), CODEC_ID_WMV1,
@@ -777,6 +801,8 @@ static struct
 
     /* Microsoft RLE */
     { VLC_FOURCC('m','r','l','e'), CODEC_ID_MSRLE,
+      VIDEO_ES, "Microsoft RLE Video" },
+    { VLC_FOURCC('W','R','L','E'), CODEC_ID_MSRLE,
       VIDEO_ES, "Microsoft RLE Video" },
     { VLC_FOURCC(0x1,0x0,0x0,0x0), CODEC_ID_MSRLE,
       VIDEO_ES, "Microsoft RLE Video" },
