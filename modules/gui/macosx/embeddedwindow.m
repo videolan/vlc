@@ -55,8 +55,6 @@
     o_img_pause = [NSImage imageNamed: @"pause_embedded"];
     o_img_pause_pressed = [NSImage imageNamed: @"pause_embedded_blue"];
 
-    o_saved_frame = NSMakeRect( 0.0f, 0.0f, 0.0f, 0.0f );
-
     /* Useful to save o_view frame in fullscreen mode */
     o_temp_view = [[NSView alloc] init];
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
@@ -103,24 +101,10 @@
     [o_slider setEnabled: b_seekable];
 }
 
-- (void)zoom:(id)sender
+- (BOOL)windowShouldZoom:(NSWindow *)sender toFrame:(NSRect)newFrame
 {
-    if( ![self isZoomed] )
-    {
-        NSRect zoomRect = [[self screen] frame];
-        o_saved_frame = [self frame];
-        /* we don't have to take care of the eventual menu bar and dock
-          as zoomRect will be cropped automatically by setFrame:display:
-          to the right rectangle */
-        [self setFrame: zoomRect display: YES animate: YES];
-    }
-    else
-    {
-        /* unzoom to the saved_frame if the o_saved_frame coords look sound
-           (just in case) */
-        if( o_saved_frame.size.width > 0 && o_saved_frame.size.height > 0 )
-            [self setFrame: o_saved_frame display: YES animate: YES];
-    }
+    [self setFrame: newFrame display: YES animate: YES];
+    return YES;
 }
 
 - (BOOL)windowShouldClose:(id)sender

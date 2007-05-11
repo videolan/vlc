@@ -41,8 +41,6 @@
     NSImage * o_img_play_pressed;
     NSImage * o_img_pause;
     NSImage * o_img_pause_pressed;
-    
-    NSRect o_saved_frame;
 
     VLCWindow       * o_fullscreen_window;
     NSViewAnimation * o_fullscreen_anim1;
