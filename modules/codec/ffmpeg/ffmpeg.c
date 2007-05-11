@@ -1095,6 +1095,8 @@ static struct
       VIDEO_ES, "TIFF Image" },
     { VLC_FOURCC('g','i','f',' '), CODEC_ID_GIF,
       VIDEO_ES, "GIF Image" },
+#endif
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+3)
     { VLC_FOURCC('s','g','i',' '), CODEC_ID_SGI,
       VIDEO_ES, "SGI Image" },
 #endif
