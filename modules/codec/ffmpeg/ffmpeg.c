@@ -734,14 +734,22 @@ static struct
 /* H263(+) is also known as Real Video 1.0 */
 
     /* H263 */
+    { VLC_FOURCC('D','2','6','3'), CODEC_ID_H263,
+      VIDEO_ES, "DEC H263" },
     { VLC_FOURCC('H','2','6','3'), CODEC_ID_H263,
       VIDEO_ES, "H263" },
     { VLC_FOURCC('h','2','6','3'), CODEC_ID_H263,
       VIDEO_ES, "H263" },
+    { VLC_FOURCC('L','2','6','3'), CODEC_ID_H263,
+      VIDEO_ES, "LEAD H263" },
     { VLC_FOURCC('s','2','6','3'), CODEC_ID_H263,
       VIDEO_ES, "H263" },
-    { VLC_FOURCC('M','2','6','3'), CODEC_ID_H263,
+    { VLC_FOURCC('S','2','6','3'), CODEC_ID_H263,
       VIDEO_ES, "H263" },
+    { VLC_FOURCC('M','2','6','3'), CODEC_ID_H263,
+      VIDEO_ES, "Microsoft H263" },
+    { VLC_FOURCC('X','2','6','3'), CODEC_ID_H263,
+      VIDEO_ES, "Xirlink H263" },
 
     /* H263i */
     { VLC_FOURCC('I','2','6','3'), CODEC_ID_H263I,
@@ -756,8 +764,10 @@ static struct
       VIDEO_ES, "H263+" },
     { VLC_FOURCC('v','i','v','2'), CODEC_ID_H263P,
       VIDEO_ES, "H263+" },
-    { VLC_FOURCC('U','2','6','3'), CODEC_ID_H263,
-      VIDEO_ES, "H263+" },
+    { VLC_FOURCC('U','2','6','3'), CODEC_ID_H263P,
+      VIDEO_ES, "UB H263+" },
+    { VLC_FOURCC('I','L','V','R'), CODEC_ID_H263P,
+      VIDEO_ES, "ITU H263+" },
 
     /* Flash (H263) variant */
     { VLC_FOURCC('F','L','V','1'), CODEC_ID_FLV1,
