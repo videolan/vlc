@@ -56,7 +56,6 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
     byte_t *p_peek;
     int i_peek;
 
-    printf(">>> %s\n", psz_path );
     /* YouTube */
     if( ( psz_cur = strstr( psz_path, "youtube.com" ) ) )
     {
