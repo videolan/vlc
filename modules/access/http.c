@@ -1082,25 +1082,27 @@ static int Request( access_t *p_access, int64_t i_tell )
 
             /* This does not follow RFC 2068, but yet if the url is not absolute,
              * handle it as everyone does. */
-            if( !strncmp( p, "/", 1 ) && !strncmp( p_sys->psz_location, "http", 4))
+            if( !strncmp( p, "/", 1 ) && ( !p_sys->psz_location || !strncmp( p_sys->psz_location, "http", 4) ) )
             {
                 const char *psz_http_ext;
 
-                if( p_sys->psz_location[4] == ':' )
+                if( !p_sys->psz_location )
+                    psz_http_ext = "";
+                else if( p_sys->psz_location[4] == ':' )
                     psz_http_ext = "";
                 else if( !strncmp( p_sys->psz_location+4, "s:", 2) )
                     psz_http_ext = "s";
                 else
                     psz_http_ext = NULL; /* Shouldn't happen */
-                
+
                 if( psz_http_ext )
-                {
                     asprintf(&psz_new_loc, "http%s://%s:%d%s", psz_http_ext,
                         p_sys->url.psz_host, p_sys->url.i_port, p);
-                }
             }
             else
+            {
                 psz_new_loc = strdup( p );
+            }
 
             if( p_sys->psz_location ) free( p_sys->psz_location );
             p_sys->psz_location = psz_new_loc;
@@ -1208,5 +1210,5 @@ static void Disconnect( access_t *p_access )
         net_Close(p_sys->fd);
         p_sys->fd = -1;
     }
-    
+
 }
