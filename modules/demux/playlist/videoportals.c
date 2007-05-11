@@ -117,6 +117,20 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
             }
         }
     }
+    /* Google video */
+    else if( ( psz_cur = strstr( psz_path, "video.google.com" ) )
+             && strstr( psz_cur, "videoplay" ) )
+    {
+        char *docid = strstr( psz_cur, "docid=" );
+        if( docid )
+        {
+            docid += strlen( "docid=" );
+            /* This doesn't always work ... */
+            asprintf( &psz_url,
+                      "http://video.google.com/videogvp?docid=%s",
+                      docid );
+        }
+    }
 
     if( !psz_url )
     {
