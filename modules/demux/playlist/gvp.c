@@ -83,7 +83,7 @@ int E_(Import_GVP)( vlc_object_t *p_this )
     for( i = 0; i < i_peek - (int)sizeof("gvp_version:"); i++ )
     {
         if( p_peek[i] == 'g' && p_peek[i+1] == 'v' && p_peek[i+2] == 'p' &&
-            !memcmp( p_peek, "gvp_version:", sizeof("gvp_version:") - 1 ) )
+            !memcmp( p_peek+i, "gvp_version:", sizeof("gvp_version:") - 1 ) )
         {
             b_found = VLC_TRUE;
             break;
