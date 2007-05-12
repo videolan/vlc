@@ -1314,7 +1314,7 @@ static struct
       AUDIO_ES, "Id RoQ DPCM Audio" },
 
     /* DCIN Audio */
-    { VLC_FOURCC('D','C','I','A'), CODEC_ID_CODEC_ID_DSICINAUDIO,
+    { VLC_FOURCC('D','C','I','A'), CODEC_ID_DSICINAUDIO,
       AUDIO_ES, "Delphine CIN Audio" },
 
     /* Sony Playstation XA ADPCM */
