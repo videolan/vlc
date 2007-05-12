@@ -93,6 +93,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     need_components_update = false;
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
     embeddedPlaylistWasActive = videoIsActive = false;
+ 
+    input_name = "";
 
     videoEmbeddedFlag = false;
     if( config_GetInt( p_intf, "embedded-video" ) ) videoEmbeddedFlag = true;
@@ -134,6 +136,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Naming in the controller */
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
              setName( QString ) );
+    if( config_GetInt( p_intf, "qt-system-tray" ) )
+    {
+        CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
+                 updateSystrayTooltipName(QString));
+    }
     if( config_GetInt( p_intf, "qt-name-in-title" ) )
     {
         CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
@@ -144,6 +151,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
     CONNECT( THEMIM->getIM(), navigationChanged( int ),
              this, setNavigation(int) );
+    if( config_GetInt( p_intf, "qt-system-tray" ) )
+    {
+        CONNECT( THEMIM->getIM(), statusChanged( int ), this,
+                 updateSystrayTooltipStatus(int));
+    }
     CONNECT( slider, sliderDragged( float ),
              THEMIM->getIM(), sliderUpdate( float ) );
 
@@ -294,6 +306,7 @@ void MainInterface::createSystrayMenu()
     sysTray = new QSystemTrayIcon( iconVLC, this );
     systrayMenu = new QMenu( qtr( "VLC media player" ), this );
     systrayMenu->setIcon( iconVLC );
+    sysTray->setToolTip( qtr( "VLC media player" ));
     QVLCMenu::updateSystrayMenu( this, p_intf, true );
     sysTray->show();
     CONNECT( sysTray, activated(  QSystemTrayIcon::ActivationReason ),
@@ -326,6 +339,42 @@ void MainInterface::handleSystrayClick( QSystemTrayIcon::ActivationReason reason
     }
 }
 
+
+void MainInterface::updateSystrayTooltipName( QString name )
+{
+    if( name.isEmpty() )
+    {
+        sysTray->setToolTip( qtr( "VLC media player" ) );
+    }
+    else
+    {
+        sysTray->setToolTip( name );
+    }
+}
+
+void MainInterface::updateSystrayTooltipStatus( int i_status )
+{
+    switch( i_status )
+     {
+         case  0:
+             {
+                 sysTray->setToolTip( qtr( "VLC media player" ) );
+                 break;
+             }
+         case PLAYING_S:
+             {
+                  sysTray->setToolTip( input_name );
+                  //+ " - " + qtr( "Playing" ) );
+                  break;
+             }
+         case PAUSE_S:
+             {
+                 sysTray->setToolTip( input_name + " - " 
+                                      + qtr( "Paused") );
+                 break;
+             }
+     }
+}
 /**********************************************************************
  * Handling of the components
  **********************************************************************/
@@ -731,6 +780,7 @@ void MainInterface::setDisplay( float pos, int time, int length )
 
 void MainInterface::setName( QString name )
 {
+    input_name = name;
     nameLabel->setText( " " + name+" " );
 
 }

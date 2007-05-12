@@ -59,7 +59,6 @@ public:
                         unsigned int *pi_height );
     void releaseVideo( void *);
     int controlVideo( void *p_window, int i_query, va_list args );
-    void setVLCWindowsTitle( QString title = "" );
 
     QSystemTrayIcon *getSysTray() { return sysTray; };
     QMenu *getSysTrayMenu() { return systrayMenu; };
@@ -77,6 +76,7 @@ private:
     QSize mainSize, addSize;
     QSystemTrayIcon *sysTray;
     QMenu *systrayMenu;
+    QString input_name;
 
     bool need_components_update;
     void calculateInterfaceSize();
@@ -122,6 +122,7 @@ private slots:
     void setNavigation( int );
     void setStatus( int );
     void setName( QString );
+    void setVLCWindowsTitle( QString title = "" );
     void setDisplay( float, int, int );
     void updateOnTimer();
     void play();
@@ -133,6 +134,8 @@ private slots:
     void updateVolume( int sliderVolume );
     void handleSystrayClick(  QSystemTrayIcon::ActivationReason );
     void updateSystrayMenu( int );
+    void updateSystrayTooltipName( QString );
+    void updateSystrayTooltipStatus( int );
 };
 
 

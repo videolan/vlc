@@ -38,6 +38,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
                            QObject( parent ), p_intf( _p_intf )
 {
     i_old_playing_status = END_S;
+    old_name="";
     p_input = NULL;
     ON_TIMEOUT( update() );
 }
@@ -87,6 +88,7 @@ void InputManager::update()
         emit positionUpdated( 0.0, 0, 0 );
         msg_Dbg( p_intf, "*********** NAV 0");
         emit navigationChanged( 0 );
+        i_old_playing_status = 0;
         emit statusChanged( 0 ); // 0 = STOPPED, 1 = PLAY, 2 = PAUSE
         delInput();
         return;
@@ -150,8 +152,11 @@ void InputManager::update()
     {
         text.sprintf( "%s", input_GetItem(p_input)->psz_name );
     }
-    emit nameChanged( text );
-
+    if( old_name != text )
+    {
+        emit nameChanged( text );
+        old_name=text;
+    }
     /* Update playing status */
     var_Get( p_input, "state", &val );
     val.i_int = val.i_int == PAUSE_S ? PAUSE_S : PLAYING_S;
