@@ -1474,6 +1474,13 @@
         }
     }
 
+    /* Don't allow on drop on playlist root element's child */
+    if( !item && index != NSOutlineViewDropOnItemIndex)
+    {
+        vlc_object_release( p_playlist );
+        return NSDragOperationNone;
+    }
+
     /* We refuse to drop an item in anything else than a child of the General
        Node. We still accept items that would be root nodes of the outlineview
        however, to allow drop in an empty playlist. */
