@@ -523,6 +523,10 @@ static struct
 
 } codecs_table[] =
 {
+    /*
+     * Video Codecs
+     */
+
     /* MPEG-1 Video */
     { VLC_FOURCC('m','p','1','v'), CODEC_ID_MPEG1VIDEO,
       VIDEO_ES, "MPEG-1 Video" },
@@ -934,9 +938,6 @@ static struct
     { VLC_FOURCC('i','v','3','2'), CODEC_ID_INDEO3,
       VIDEO_ES, "Indeo Video v3" },
 
-    { VLC_FOURCC('t','s','c','c'), CODEC_ID_TSCC,
-      VIDEO_ES, "TechSmith Camtasia Screen Capture Video" },
-
     /* Huff YUV */
     { VLC_FOURCC('H','F','Y','U'), CODEC_ID_HUFFYUV,
       VIDEO_ES, "Huff YUV Video" },
@@ -1031,19 +1032,35 @@ static struct
     { VLC_FOURCC('s','m','c',' '), CODEC_ID_SMC,
       VIDEO_ES, "Apple graphics" },
 
-    /* Cinepak */
+ /* CINEPAK. We have our own decoder with an higher priority,
+       but this can't harm */
+    { VLC_FOURCC('C','V','I','D'), CODEC_ID_CINEPAK,
+      VIDEO_ES, "Cinepak Video" },
     { VLC_FOURCC('c','v','i','d'), CODEC_ID_CINEPAK,
       VIDEO_ES, "Cinepak Video" },
 
-    /* Id Quake II CIN */
-    { VLC_FOURCC('I','D','C','I'), CODEC_ID_IDCIN,
-      VIDEO_ES, "Id Quake II CIN Video" },
+    /* Screen Capture Video Codecs */
+    { VLC_FOURCC('t','s','c','c'), CODEC_ID_TSCC,
+      VIDEO_ES, "TechSmith Camtasia Screen Capture Video" },
+    { VLC_FOURCC('T','S','C','C'), CODEC_ID_TSCC,
+      VIDEO_ES, "TechSmith Camtasia Screen Capture Video" },
 
-    /* 4X Technologies */
-    { VLC_FOURCC('4','x','m','v'), CODEC_ID_4XM,
-      VIDEO_ES, "4X Technologies Video" },
-    { VLC_FOURCC('4','X','M','V'), CODEC_ID_4XM,
-      VIDEO_ES, "4X Technologies Video" },
+    { VLC_FOURCC('C','S','C','D'), CODEC_ID_CSCD,
+      VIDEO_ES, "CamStudio Screen Codec" },
+    { VLC_FOURCC('c','s','c','d'), CODEC_ID_CSCD,
+      VIDEO_ES, "CamStudio Screen Codec" },
+
+    { VLC_FOURCC('Z','M','B','V'), CODEC_ID_ZMBV,
+      VIDEO_ES, "DosBox Capture Codec" },
+
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(13<<8)+0)
+    { VLC_FOURCC('V','M','n','c'), CODEC_ID_VMNC,
+      VIDEO_ES, "VMware Video" },
+#endif
+    { VLC_FOURCC('F','P','S','1'), CODEC_ID_FRAPS,
+      VIDEO_ES, "FRAPS: Realtime Video Capture" },
+    { VLC_FOURCC('f','p','s','1'), CODEC_ID_FRAPS,
+      VIDEO_ES, "FRAPS: Realtime Video Capture" },
 
     /* Duck TrueMotion */
     { VLC_FOURCC('D','U','C','K'), CODEC_ID_TRUEMOTION1,
@@ -1051,27 +1068,14 @@ static struct
     { VLC_FOURCC('T','M','2','0'), CODEC_ID_TRUEMOTION2,
       VIDEO_ES, "Duck TrueMotion v2.0 Video" },
 
-    /* Interplay MVE */
-    { VLC_FOURCC('i','m','v','e'), CODEC_ID_INTERPLAY_VIDEO,
-      VIDEO_ES, "Interplay MVE Video" },
-
-    /* Id RoQ */
-    { VLC_FOURCC('R','o','Q','v'), CODEC_ID_ROQ,
-      VIDEO_ES, "Id RoQ Video" },
-
-    /* Sony Playstation MDEC */
-    { VLC_FOURCC('M','D','E','C'), CODEC_ID_MDEC,
-      VIDEO_ES, "PSX MDEC Video" },
-
-    /* Sierra VMD */
-    { VLC_FOURCC('v','m','d','v'), CODEC_ID_VMDVIDEO,
-      VIDEO_ES, "Sierra VMD Video" },
-
     /* FFMPEG's SNOW wavelet codec */
     { VLC_FOURCC('S','N','O','W'), CODEC_ID_SNOW,
       VIDEO_ES, "FFMpeg SNOW wavelet Video" },
     { VLC_FOURCC('s','n','o','w'), CODEC_ID_SNOW,
       VIDEO_ES, "FFMpeg SNOW wavelet Video" },
+
+
+
 
     { VLC_FOURCC('r','l','e',' '), CODEC_ID_QTRLE,
       VIDEO_ES, "Apple QuickTime RLE Video" },
@@ -1108,31 +1112,14 @@ static struct
     { VLC_FOURCC('R','T','2','1'), CODEC_ID_INDEO2,
       VIDEO_ES, "Indeo Video v2" },
 
-    { VLC_FOURCC('C','S','C','D'), CODEC_ID_CSCD,
-      VIDEO_ES, "CamStudio Screen Codec" },
-
-    /* CINEPAK. We have our own decoder with an higher priority,
-       but this can't harm */
-    { VLC_FOURCC('C','V','I','D'), CODEC_ID_CINEPAK,
-      VIDEO_ES, "Cinepak Video" },
-    { VLC_FOURCC('c','v','i','d'), CODEC_ID_CINEPAK,
-      VIDEO_ES, "Cinepak Video" },
-
-    /* Flash Screen Video */
+        /* Flash Screen Video */
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(11<<8)+0)
     { VLC_FOURCC('F','S','V','1'), CODEC_ID_FLASHSV,
               VIDEO_ES, "Flash Screen Video" },
 #endif
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(13<<8)+0)
-    { VLC_FOURCC('V','M','n','c'), CODEC_ID_VMNC,
-      VIDEO_ES, "VMware Video" },
-#endif
-
-    { VLC_FOURCC('Z','M','B','V'), CODEC_ID_ZMBV,
-      VIDEO_ES, "DosBox Capture Codec" },
-
-    { VLC_FOURCC('K','M','V','C'), CODEC_ID_KMVC,
+   { VLC_FOURCC('K','M','V','C'), CODEC_ID_KMVC,
       VIDEO_ES, "Karl Morton's Video Codec (Worms)" },
+
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(13<<8)+0)
     { VLC_FOURCC('N','U','V','1'), CODEC_ID_NUV,
       VIDEO_ES, "Nuppel Video" },
@@ -1140,6 +1127,75 @@ static struct
       VIDEO_ES, "Nuppel Video" },
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(8<<8)+0)
+    /* CODEC_ID_SMACKVIDEO */
+    { VLC_FOURCC('S','M','K','2'), CODEC_ID_SMACKVIDEO,
+      VIDEO_ES, "Smacker Video" },
+    { VLC_FOURCC('S','M','K','4'), CODEC_ID_SMACKVIDEO,
+      VIDEO_ES, "Smacker Video" },
+#endif
+
+    /* Chinese AVS - Untested */
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(8<<8)+0)
+    { VLC_FOURCC('C','A','V','S'), CODEC_ID_CAVS,
+      VIDEO_ES, "Chinese AVS" },
+#endif
+
+    /* Videogames Codecs */
+
+    /* Interplay MVE */
+    { VLC_FOURCC('i','m','v','e'), CODEC_ID_INTERPLAY_VIDEO,
+      VIDEO_ES, "Interplay MVE Video" },
+    { VLC_FOURCC('I','N','P','V'), CODEC_ID_INTERPLAY_VIDEO,
+      VIDEO_ES, "Interplay MVE Video" },
+
+    /* Id Quake II CIN */
+    { VLC_FOURCC('I','D','C','I'), CODEC_ID_IDCIN,
+      VIDEO_ES, "Id Quake II CIN Video" },
+
+    /* 4X Technologies */
+    { VLC_FOURCC('4','x','m','v'), CODEC_ID_4XM,
+      VIDEO_ES, "4X Technologies Video" },
+    { VLC_FOURCC('4','X','M','V'), CODEC_ID_4XM,
+      VIDEO_ES, "4X Technologies Video" },
+
+    /* Id RoQ */
+    { VLC_FOURCC('R','o','Q','v'), CODEC_ID_ROQ,
+      VIDEO_ES, "Id RoQ Video" },
+
+    /* Sony Playstation MDEC */
+    { VLC_FOURCC('M','D','E','C'), CODEC_ID_MDEC,
+      VIDEO_ES, "PSX MDEC Video" },
+
+    /* Sierra VMD */
+    { VLC_FOURCC('v','m','d','v'), CODEC_ID_VMDVIDEO,
+      VIDEO_ES, "Sierra VMD Video" },
+    { VLC_FOURCC('V','M','D','V'), CODEC_ID_VMDVIDEO,
+      VIDEO_ES, "Sierra VMD Video" },
+
+#if 0
+/*    UNTESTED VideoGames*/
+    { VLC_FOURCC('W','C','3','V'), CODEC_ID_XAN_WC3,
+      VIDEO_ES, "XAN wc3 Video" },
+    { VLC_FOURCC('W','C','4','V'), CODEC_ID_XAN_WC4,
+      VIDEO_ES, "XAN wc4 Video" },
+    { VLC_FOURCC('S','T','3','C'), CODEC_ID_TXD,
+      VIDEO_ES, "Renderware TeXture Dictionary" },
+    { VLC_FOURCC('V','Q','A','V'), CODEC_ID_WS_VQA,
+      VIDEO_ES, "WestWood Vector Quantized Animation" },
+    { VLC_FOURCC('T','S','E','Q'), CODEC_ID_TIERTEXSEQVIDEO,
+      VIDEO_ES, "Tiertex SEQ Video" },
+    { VLC_FOURCC('D','X','A','1'), CODEC_ID_DXA,
+      VIDEO_ES, "Feeble DXA Video" },
+    { VLC_FOURCC('D','C','I','V'), CODEC_ID_DSICINVIDEO,
+      VIDEO_ES, "Delphine CIN Video" },
+    { VLC_FOURCC('T','H','P','V'), CODEC_ID_THP,
+      VIDEO_ES, "THP Video" },
+    { VLC_FOURCC('B','E','T','H'), CODEC_ID_BETHSOFTVID,
+      VIDEO_ES, "THP Video" },
+    { VLC_FOURCC('C','9','3','V'), CODEC_ID_C93,
+      VIDEO_ES, "THP Video" },
+#endif
 
     /*
      *  Image codecs
@@ -1220,6 +1276,12 @@ static struct
       AUDIO_ES, "MPEG Audio layer 1/2" },
     { VLC_FOURCC('m','p','3',' '), CODEC_ID_MP3,
       AUDIO_ES, "MPEG Audio layer 1/2/3" },
+    { VLC_FOURCC('.','m','p','3'), CODEC_ID_MP3,
+      AUDIO_ES, "MPEG Audio layer 1/2/3" },
+    { VLC_FOURCC('M','P','3',' '), CODEC_ID_MP3,
+      AUDIO_ES, "MPEG Audio layer 1/2/3" },
+    { VLC_FOURCC('L','A','M','E'), CODEC_ID_MP3,
+      AUDIO_ES, "MPEG Audio layer 1/2/3" },
 
     /* A52 Audio (aka AC3) */
     { VLC_FOURCC('a','5','2',' '), CODEC_ID_AC3,
@@ -1239,6 +1301,10 @@ static struct
     { VLC_FOURCC('4','x','m','a'), CODEC_ID_ADPCM_4XM,
       AUDIO_ES, "4X Technologies Audio" },
 
+    /* EA ADPCM */
+    { VLC_FOURCC('A','D','E','A'), CODEC_ID_ADPCM_EA,
+      AUDIO_ES, "EA ADPCM Audio" },
+
     /* Interplay DPCM */
     { VLC_FOURCC('i','d','p','c'), CODEC_ID_INTERPLAY_DPCM,
       AUDIO_ES, "Interplay DPCM Audio" },
@@ -1247,6 +1313,10 @@ static struct
     { VLC_FOURCC('R','o','Q','a'), CODEC_ID_ROQ_DPCM,
       AUDIO_ES, "Id RoQ DPCM Audio" },
 
+    /* DCIN Audio */
+    { VLC_FOURCC('D','C','I','A'), CODEC_ID_CODEC_ID_DSICINAUDIO,
+      AUDIO_ES, "Delphine CIN Audio" },
+
     /* Sony Playstation XA ADPCM */
     { VLC_FOURCC('x','a',' ',' '), CODEC_ID_ADPCM_XA,
       AUDIO_ES, "PSX XA ADPCM Audio" },
@@ -1254,6 +1324,10 @@ static struct
     /* ADX ADPCM */
     { VLC_FOURCC('a','d','x',' '), CODEC_ID_ADPCM_ADX,
       AUDIO_ES, "ADX ADPCM Audio" },
+
+    /* Westwood ADPCM */
+    { VLC_FOURCC('A','I','W','S'), CODEC_ID_ADPCM_IMA_WS,
+      AUDIO_ES, "Westwood IMA ADPCM audio" },
 
     /* Sierra VMD */
     { VLC_FOURCC('v','m','d','a'), CODEC_ID_VMDAUDIO,
@@ -1299,11 +1373,16 @@ static struct
     /* Shorten */
     { VLC_FOURCC('s','h','n',' '), CODEC_ID_SHORTEN,
       AUDIO_ES, "Shorten Lossless Audio" },
+    { VLC_FOURCC('s','h','r','n'), CODEC_ID_SHORTEN,
+      AUDIO_ES, "Shorten Lossless Audio" },
 #endif
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(16<<8)+0)
     { VLC_FOURCC('w','v','p','k'), CODEC_ID_WAVPACK,
       AUDIO_ES, "WavPack" },
+    { VLC_FOURCC('W','V','P','K'), CODEC_ID_WAVPACK,
+      AUDIO_ES, "WavPack" },
+#endif
 #endif
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(34<<8)+0)
@@ -1316,7 +1395,18 @@ static struct
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
     { VLC_FOURCC('a','t','r','c'), CODEC_ID_ATRAC3,
       AUDIO_ES, "atrac 3" },
+    { VLC_FOURCC(0x70,0x2,0x0,0x0), CODEC_ID_ATRAC3,
+      AUDIO_ES, "atrac 3" },
 #endif
+
+    { VLC_FOURCC('S','O','N','C'), CODEC_ID_SONIC,
+      AUDIO_ES, "Sonic" },
+
+    { VLC_FOURCC(0x1,0x4,0x0,0x0), CODEC_ID_IMC,
+      AUDIO_ES, "IMC" },
+
+    { VLC_FOURCC(0x22,0x0,0x0,0x0), CODEC_ID_TRUESPEECH,
+      AUDIO_ES, "TrueSpeech" },
 
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
@@ -1350,6 +1440,8 @@ static struct
     { VLC_FOURCC('a','l','a','w'), CODEC_ID_PCM_ALAW,
       AUDIO_ES, "PCM ALAW" },
     { VLC_FOURCC('u','l','a','w'), CODEC_ID_PCM_MULAW,
+      AUDIO_ES, "PCM ULAW" },
+    { VLC_FOURCC('d','a','u','d'), CODEC_ID_PCM_S24DAUD,
       AUDIO_ES, "PCM ULAW" },
 
     { 0, 0, 0, 0 }
