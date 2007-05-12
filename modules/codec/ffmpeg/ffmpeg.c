@@ -579,6 +579,7 @@ static struct
       VIDEO_ES, "MPEG-4 Video" },
     { VLC_FOURCC('m','4','s','2'), CODEC_ID_MPEG4,
       VIDEO_ES, "MPEG-4 Video" },
+    /* XVID flavours */
     { VLC_FOURCC('x','v','i','d'), CODEC_ID_MPEG4,
       VIDEO_ES, "MPEG-4 Video" },
     { VLC_FOURCC('X','V','I','D'), CODEC_ID_MPEG4,
@@ -589,10 +590,13 @@ static struct
       VIDEO_ES, "MPEG-4 Video" },
     { VLC_FOURCC('x','v','i','x'), CODEC_ID_MPEG4,
       VIDEO_ES, "MPEG-4 Video" },
+    /* DX50 */
     { VLC_FOURCC('D','X','5','0'), CODEC_ID_MPEG4,
       VIDEO_ES, "MPEG-4 Video" },
     { VLC_FOURCC('d','x','5','0'), CODEC_ID_MPEG4,
       VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('B','L','Z','0'), CODEC_ID_MPEG4,
+      VIDEO_ES, "Blizzard MPEG-4 Video" },
     { VLC_FOURCC('D','X','G','M'), CODEC_ID_MPEG4,
       VIDEO_ES, "Electronic Arts Game MPEG-4 Video" },
     { VLC_FOURCC('m','p','4','v'), CODEC_ID_MPEG4,
@@ -620,8 +624,6 @@ static struct
       VIDEO_ES, "MPEG-4 Video" },
     { VLC_FOURCC('3','i','v','2'), CODEC_ID_MPEG4,
       VIDEO_ES, "MPEG-4 Video" },
-    { VLC_FOURCC('B','L','Z','0'), CODEC_ID_MPEG4,
-      VIDEO_ES, "Blizzard MPEG-4 Video" },
     { VLC_FOURCC('U','M','P','4'), CODEC_ID_MPEG4,
       VIDEO_ES, "UB MPEG-4 Video" },
     { VLC_FOURCC('W','V','1','F'), CODEC_ID_MPEG4,
@@ -683,9 +685,14 @@ static struct
       VIDEO_ES, "MS MPEG-4 Video v3" },
     { VLC_FOURCC('d','i','v','6'), CODEC_ID_MSMPEG4V3,
       VIDEO_ES, "MS MPEG-4 Video v3" },
+    /* Cool Codec */
     { VLC_FOURCC('C','O','L','1'), CODEC_ID_MSMPEG4V3,
       VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('c','o','l','1'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
     { VLC_FOURCC('C','O','L','0'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('c','o','l','0'), CODEC_ID_MSMPEG4V3,
       VIDEO_ES, "MS MPEG-4 Video v3" },
     /* AngelPotion stuff */
     { VLC_FOURCC('A','P','4','1'), CODEC_ID_MSMPEG4V3,
@@ -725,6 +732,8 @@ static struct
     /* avc1: special case h264 */
     { VLC_FOURCC('a','v','c','1'), CODEC_ID_H264,
       VIDEO_ES, "H264 - MPEG-4 AVC (part 10)" },
+    { VLC_FOURCC('A','V','C','1'), CODEC_ID_H264,
+      VIDEO_ES, "H264 - MPEG-4 AVC (part 10)" },
     { VLC_FOURCC('V','S','S','H'), CODEC_ID_H264,
       VIDEO_ES, "Vanguard VSS H264" },
     { VLC_FOURCC('V','S','S','W'), CODEC_ID_H264,
@@ -732,6 +741,8 @@ static struct
     { VLC_FOURCC('v','s','s','h'), CODEC_ID_H264,
       VIDEO_ES, "Vanguard VSS H264" },
     { VLC_FOURCC('D','A','V','C'), CODEC_ID_H264,
+      VIDEO_ES, "Dicas MPEGable H.264/MPEG-4 AVC" },
+    { VLC_FOURCC('d','a','v','c'), CODEC_ID_H264,
       VIDEO_ES, "Dicas MPEGable H.264/MPEG-4 AVC" },
 
 /* H263 and H263i */
@@ -755,6 +766,10 @@ static struct
     { VLC_FOURCC('X','2','6','3'), CODEC_ID_H263,
       VIDEO_ES, "Xirlink H263" },
 
+    /* Zygo (partial) */
+    { VLC_FOURCC('Z','y','G','o'), CODEC_ID_H263,
+      VIDEO_ES, "ITU H263+" },
+
     /* H263i */
     { VLC_FOURCC('I','2','6','3'), CODEC_ID_H263I,
       VIDEO_ES, "I263.I" },
@@ -777,7 +792,10 @@ static struct
     { VLC_FOURCC('F','L','V','1'), CODEC_ID_FLV1,
       VIDEO_ES, "Flash Video" },
 
+    /* H261 */
     { VLC_FOURCC('H','2','6','1'), CODEC_ID_H261,
+      VIDEO_ES, "H.261" },
+    { VLC_FOURCC('h','2','6','1'), CODEC_ID_H261,
       VIDEO_ES, "H.261" },
 
     { VLC_FOURCC('F','L','I','C'), CODEC_ID_FLIC,
@@ -800,19 +818,34 @@ static struct
       VIDEO_ES, "Motion JPEG Video" },
     { VLC_FOURCC( 'A','V','D','J' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Motion JPEG Video" },
-    { VLC_FOURCC( 'd','m','b','1' ), CODEC_ID_MJPEG,
-      VIDEO_ES, "Motion JPEG OpenDML Video" },
     { VLC_FOURCC( 'm','j','p','b' ), CODEC_ID_MJPEGB, /* for mov file */
       VIDEO_ES, "Motion JPEG B Video" },
     { VLC_FOURCC( 'L','J','P','G' ), CODEC_ID_LJPEG,
       VIDEO_ES, "Lead Motion JPEG Video" },
     { VLC_FOURCC( 'L','J','P','G' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Lead Motion JPEG Video" },
+    /* AVID MJPEG */
     { VLC_FOURCC( 'A','V','R','n' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Avid Motion JPEG" },
     { VLC_FOURCC( 'A','D','J','V' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Avid Motion JPEG" },
+    { VLC_FOURCC( 'd','m','b','1' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Motion JPEG OpenDML Video" },
+
+    /* SP5x */
     { VLC_FOURCC( 'S','P','5','X' ), CODEC_ID_SP5X,
+      VIDEO_ES, "Sunplus Motion JPEG Video" },
+    { VLC_FOURCC( 'S','P','5','3' ), CODEC_ID_SP5X,
+      VIDEO_ES, "Sunplus Motion JPEG Video" },
+    { VLC_FOURCC( 'S','P','5','4' ), CODEC_ID_SP5X,
+      VIDEO_ES, "Sunplus Motion JPEG Video" },
+    { VLC_FOURCC( 'S','P','5','5' ), CODEC_ID_SP5X,
+      VIDEO_ES, "Sunplus Motion JPEG Video" },
+    { VLC_FOURCC( 'S','P','5','6' ), CODEC_ID_SP5X,
+      VIDEO_ES, "Sunplus Motion JPEG Video" },
+    { VLC_FOURCC( 'S','P','5','7' ), CODEC_ID_SP5X,
+      VIDEO_ES, "Sunplus Motion JPEG Video" },
+    { VLC_FOURCC( 'S','P','5','8' ), CODEC_ID_SP5X,
       VIDEO_ES, "Sunplus Motion JPEG Video" },
 
     /* DV */
@@ -834,6 +867,8 @@ static struct
       VIDEO_ES, "DV Video Pro PAL" },
     { VLC_FOURCC('C','D','V','C'), CODEC_ID_DVVIDEO,
       VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('c','d','v','c'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
     { VLC_FOURCC('d','v','5','p'), CODEC_ID_DVVIDEO,
       VIDEO_ES, "DV Video C Pro 50 PAL" },
     { VLC_FOURCC('d','v','5','n'), CODEC_ID_DVVIDEO,
@@ -844,19 +879,26 @@ static struct
     /* Windows Media Video */
     { VLC_FOURCC('W','M','V','1'), CODEC_ID_WMV1,
       VIDEO_ES, "Windows Media Video 1" },
+    { VLC_FOURCC('w','m','v','1'), CODEC_ID_WMV1,
+      VIDEO_ES, "Windows Media Video 1" },
     { VLC_FOURCC('W','M','V','2'), CODEC_ID_WMV2,
+      VIDEO_ES, "Windows Media Video 2" },
+    { VLC_FOURCC('w','m','v','2'), CODEC_ID_WMV2,
       VIDEO_ES, "Windows Media Video 2" },
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(10<<8)+1)
     { VLC_FOURCC('W','M','V','3'), CODEC_ID_WMV3,
       VIDEO_ES, "Windows Media Video 3" },
+    { VLC_FOURCC('w','m','v','3'), CODEC_ID_WMV3,
+      VIDEO_ES, "Windows Media Video 3" },
     { VLC_FOURCC('W','V','C','1'), CODEC_ID_VC1,
       VIDEO_ES, "Windows Media Video VC1" },
-#endif
-
+    { VLC_FOURCC('w','v','c','1'), CODEC_ID_VC1,
+      VIDEO_ES, "Windows Media Video VC1" },
     /* WMVA is the VC-1 codec before the standardization proces,
        it is not bitstream compatible and deprecated  */
     { VLC_FOURCC('W','M','V','A'), CODEC_ID_VC1,
       VIDEO_ES, "Windows Media Video Advanced Profile" },
+#endif
 
     /* Microsoft Video 1 */
     { VLC_FOURCC('M','S','V','C'), CODEC_ID_MSVIDEO1,
@@ -878,6 +920,8 @@ static struct
     { VLC_FOURCC('W','R','L','E'), CODEC_ID_MSRLE,
       VIDEO_ES, "Microsoft RLE Video" },
     { VLC_FOURCC(0x1,0x0,0x0,0x0), CODEC_ID_MSRLE,
+      VIDEO_ES, "Microsoft RLE Video" },
+    { VLC_FOURCC(0x2,0x0,0x0,0x0), CODEC_ID_MSRLE,
       VIDEO_ES, "Microsoft RLE Video" },
 
     /* Indeo Video Codecs (Quality of this decoder on ppc is not good) */
@@ -902,6 +946,8 @@ static struct
     /* Creative YUV */
     { VLC_FOURCC('C','Y','U','V'), CODEC_ID_CYUV,
       VIDEO_ES, "Creative YUV Video" },
+    { VLC_FOURCC('c','y','u','v'), CODEC_ID_CYUV,
+      VIDEO_ES, "Creative YUV Video" },
 
     /* On2 VP3 Video Codecs */
     { VLC_FOURCC('V','P','3',' '), CODEC_ID_VP3,
@@ -913,6 +959,7 @@ static struct
     { VLC_FOURCC('v','p','3','1'), CODEC_ID_VP3,
       VIDEO_ES, "On2's VP3 Video" },
 
+    /* On2  VP5, VP6 codecs */
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(14<<8)+0)
     { VLC_FOURCC('V','P','5',' '), CODEC_ID_VP5,
       VIDEO_ES, "On2's VP5 Video" },
@@ -935,6 +982,8 @@ static struct
 
     /* Xiph.org theora */
     { VLC_FOURCC('t','h','e','o'), CODEC_ID_THEORA,
+      VIDEO_ES, "Xiph.org's Theora Video" },
+    { VLC_FOURCC('T','h','r','a'), CODEC_ID_THEORA,
       VIDEO_ES, "Xiph.org's Theora Video" },
 
 #if ( !defined( WORDS_BIGENDIAN ) )
@@ -960,15 +1009,23 @@ static struct
     /* Real Video */
     { VLC_FOURCC('R','V','1','0'), CODEC_ID_RV10,
       VIDEO_ES, "Real Video 10" },
+    { VLC_FOURCC('r','v','1','0'), CODEC_ID_RV10,
+      VIDEO_ES, "Real Video 10" },
     { VLC_FOURCC('R','V','1','3'), CODEC_ID_RV10,
+      VIDEO_ES, "Real Video 13" },
+    { VLC_FOURCC('r','v','1','3'), CODEC_ID_RV10,
       VIDEO_ES, "Real Video 13" },
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(15<<8)+1)
     { VLC_FOURCC('R','V','2','0'), CODEC_ID_RV20,
+      VIDEO_ES, "Real Video 20" },
+    { VLC_FOURCC('r','v','2','0'), CODEC_ID_RV20,
       VIDEO_ES, "Real Video 20" },
 #endif
 
     /* Apple Video */
     { VLC_FOURCC('r','p','z','a'), CODEC_ID_RPZA,
+      VIDEO_ES, "Apple Video" },
+    { VLC_FOURCC('a','z','p','r'), CODEC_ID_RPZA,
       VIDEO_ES, "Apple Video" },
 
     { VLC_FOURCC('s','m','c',' '), CODEC_ID_SMC,
@@ -1013,6 +1070,8 @@ static struct
     /* FFMPEG's SNOW wavelet codec */
     { VLC_FOURCC('S','N','O','W'), CODEC_ID_SNOW,
       VIDEO_ES, "FFMpeg SNOW wavelet Video" },
+    { VLC_FOURCC('s','n','o','w'), CODEC_ID_SNOW,
+      VIDEO_ES, "FFMpeg SNOW wavelet Video" },
 
     { VLC_FOURCC('r','l','e',' '), CODEC_ID_QTRLE,
       VIDEO_ES, "Apple QuickTime RLE Video" },
@@ -1032,6 +1091,8 @@ static struct
 
     { VLC_FOURCC('V','I','X','L'), CODEC_ID_VIXL,
       VIDEO_ES, "Miro/Pinnacle VideoXL Video" },
+    { VLC_FOURCC('P','I','X','L'), CODEC_ID_VIXL,
+      VIDEO_ES, "Pinnacle VideoXL Video" },
 
     { VLC_FOURCC('L','O','C','O'), CODEC_ID_LOCO,
       VIDEO_ES, "LOCO Video" },
@@ -1050,6 +1111,13 @@ static struct
     { VLC_FOURCC('C','S','C','D'), CODEC_ID_CSCD,
       VIDEO_ES, "CamStudio Screen Codec" },
 
+    /* CINEPAK. We have our own decoder with an higher priority,
+       but this can't harm */
+    { VLC_FOURCC('C','V','I','D'), CODEC_ID_CINEPAK,
+      VIDEO_ES, "Cinepak Video" },
+    { VLC_FOURCC('c','v','i','d'), CODEC_ID_CINEPAK,
+      VIDEO_ES, "Cinepak Video" },
+
     /* Flash Screen Video */
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(11<<8)+0)
     { VLC_FOURCC('F','S','V','1'), CODEC_ID_FLASHSV,
@@ -1065,6 +1133,12 @@ static struct
 
     { VLC_FOURCC('K','M','V','C'), CODEC_ID_KMVC,
       VIDEO_ES, "Karl Morton's Video Codec (Worms)" },
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(13<<8)+0)
+    { VLC_FOURCC('N','U','V','1'), CODEC_ID_NUV,
+      VIDEO_ES, "Nuppel Video" },
+    { VLC_FOURCC('R','J','P','G'), CODEC_ID_NUV,
+      VIDEO_ES, "Nuppel Video" },
+#endif
 
 
     /*
@@ -1094,6 +1168,10 @@ static struct
     { VLC_FOURCC('g','i','f',' '), CODEC_ID_GIF,
       VIDEO_ES, "GIF Image" },
     { VLC_FOURCC('t','g','a',' '), CODEC_ID_TARGA,
+      VIDEO_ES, "Truevision Targa Image" },
+    { VLC_FOURCC('m','t','g','a'), CODEC_ID_TARGA,
+      VIDEO_ES, "Truevision Targa Image" },
+    { VLC_FOURCC('M','T','G','A'), CODEC_ID_TARGA,
       VIDEO_ES, "Truevision Targa Image" },
 #endif
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+3)
