@@ -1074,9 +1074,6 @@ static struct
     { VLC_FOURCC('s','n','o','w'), CODEC_ID_SNOW,
       VIDEO_ES, "FFMpeg SNOW wavelet Video" },
 
-
-
-
     { VLC_FOURCC('r','l','e',' '), CODEC_ID_QTRLE,
       VIDEO_ES, "Apple QuickTime RLE Video" },
 
@@ -1140,6 +1137,14 @@ static struct
     { VLC_FOURCC('C','A','V','S'), CODEC_ID_CAVS,
       VIDEO_ES, "Chinese AVS" },
 #endif
+
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+0)
+    /* Untested yet */
+    { VLC_FOURCC('A','V','D','n'), CODEC_ID_DNXHD,
+      VIDEO_ES, "DNxHD" },
+#endif
+    { VLC_FOURCC('8','B','P','S'), CODEC_ID_8BPS,
+      VIDEO_ES, "8BPS" },
 
     /* Videogames Codecs */
 
@@ -1313,9 +1318,11 @@ static struct
     { VLC_FOURCC('R','o','Q','a'), CODEC_ID_ROQ_DPCM,
       AUDIO_ES, "Id RoQ DPCM Audio" },
 
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(27<<8)+0)
     /* DCIN Audio */
     { VLC_FOURCC('D','C','I','A'), CODEC_ID_DSICINAUDIO,
       AUDIO_ES, "Delphine CIN Audio" },
+#endif
 
     /* Sony Playstation XA ADPCM */
     { VLC_FOURCC('x','a',' ',' '), CODEC_ID_ADPCM_XA,
@@ -1401,9 +1408,10 @@ static struct
     { VLC_FOURCC('S','O','N','C'), CODEC_ID_SONIC,
       AUDIO_ES, "Sonic" },
 
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(34<<8)+0)
     { VLC_FOURCC(0x1,0x4,0x0,0x0), CODEC_ID_IMC,
       AUDIO_ES, "IMC" },
-
+#endif
     { VLC_FOURCC(0x22,0x0,0x0,0x0), CODEC_ID_TRUESPEECH,
       AUDIO_ES, "TrueSpeech" },
 
