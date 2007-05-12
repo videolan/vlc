@@ -150,8 +150,18 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
                     psz_url = strdup( psz_cur );
                     decode_URI( psz_url );
                     *psz_tmp = '&';
-                    break;
                 }
+                if( ( psz_cur = strstr( psz_line, "<title>" ) ) )
+                {
+                    char *psz_tmp;
+                    psz_cur += strlen( "<title>" );
+                    psz_tmp = strchr( psz_cur, '<' );
+                    *psz_tmp = 0;
+                    psz_title = strdup( psz_cur );
+                    decode_URI( psz_title );
+                    *psz_tmp = '<';
+                }
+                if( psz_url && psz_title ) break;
             }
         }
     }
