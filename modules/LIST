@@ -10,12 +10,14 @@ $Id$
  * access_eyetv: Access module to connect to our plugin running within EyeTV
  * access_fake: Fake access to use for mosaic and other special streaming setups
  * access_file: File access module
+ * access_filter_bandwidth: Bandwidth limit module
  * access_filter_dump: Raw input Dump module
  * access_filter_record: Raw input Recording module
  * access_filter_timeshift: Timeshifting module
  * access_ftp: FTP Network access module
  * access_gnomevfs: GnomeVFS access
  * access_http: HTTP Network access module
+ * access_jack: JACK audio input module
  * access_mms: MMS over TCP, UDP and HTTP access module
  * access_output_dummy: dummy access_output module
  * access_output_file: File access_output module
@@ -29,6 +31,7 @@ $Id$
  * adjust: Contrast/Hue/saturation/Brightness adjust module
  * adpcm: ADPCM audio decoder
  * aiff: AIFF demuxer
+ * alphamask: Alpha layer mask video filter
  * alsa: audio output module using the ALSA API.
  * aout_directx: audio output module using the DirectX API.
  * aout_file: Audio output to write to a file
@@ -42,8 +45,10 @@ $Id$
  * auhal: Audio output for MacOS X based on the AUHAL API.
  * avi: AVI File stream demuxer
  * bandlimited_resampler: Bandlimited interpolation audio resampler
+ * bda: DVB support for Windows BDA drivers
  * beos: Audio output, video output and interface module for BeOS.
  * blend: a picture filter that blends two pictures
+ * bluescreen: Bluescreen (weather channel like) video filter
  * bonjour: Zeroconf services discovery
  * caca: color ASCII art video output using libcaca
  * cdda: input module to read audio CDs
@@ -98,6 +103,7 @@ $Id$
  * ftp : FTP input module
  * galaktos: a visualization module that outputs OpenGL
  * gapi: PocketPC Video output
+ * gaussianblur: gaussian blur video filter
  * gestures: mouse gestures control plugin
  * ggi: video output module using the GGI API.
  * glide: video output module using the Glide API.
@@ -220,6 +226,7 @@ $Id$
  * quartztext: Text renderer using native Mac OS X API
  * quicktime: Quicktime decoder that uses the QT library
  * rawdv: Raw DV demuxer
+ * rawvid: raw video input module for vlc
  * rawvideo: Pseudo audio-decoder for raw video
  * rc: interface module using stdio.
  * real: partial Real audio/video demuxer
