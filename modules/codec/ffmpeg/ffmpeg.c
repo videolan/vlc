@@ -1383,7 +1383,6 @@ static struct
     { VLC_FOURCC('W','V','P','K'), CODEC_ID_WAVPACK,
       AUDIO_ES, "WavPack" },
 #endif
-#endif
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(34<<8)+0)
     { VLC_FOURCC('g','s','m',' '), CODEC_ID_GSM,
