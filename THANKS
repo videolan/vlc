@@ -102,6 +102,7 @@ Johen Michael Zorko <zorko at att.net> - fix for delay issues in udp sout
 John Paul Lorenti <jpl31 at columbia.edu> - ALSA device selection patch
 Jonas Larsen <jonas at vrt.dk> - Danish translation
 Julien Blache <jb at technologeek.org> - disc ejection code
+Julien Plissonneau Duquène - JACK audio input module 
 kty0ne - WinAmp 5 skin for VLC
 Kenneth Ostby <kenneo -at- idi -dot- ntnu -dot- no> - Audioscrobbler plugin
 Kenneth Self <kens at campoz DoT. fslife _dOt co dOT- uk> - BDA capture plugin

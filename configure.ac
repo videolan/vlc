@@ -4511,16 +4511,18 @@ then
 fi
 
 dnl
-dnl  JACK module
+dnl  JACK modules
 dnl
 AC_ARG_ENABLE(jack,
- [  --enable-jack           JACK audio module (default disabled)],
- [if test "${enable_jack}" = "yes"
-  then
-    AC_CHECK_HEADERS(jack/jack.h, [
-      VLC_ADD_PLUGINS([jack])
-      VLC_ADD_LDFLAGS([jack],[-ljack]) ])
-  fi])
+ [  --enable-jack           JACK audio I/O modules (default disabled)],,
+ [enable_jack="no"])
+
+AS_IF([test "${enable_jack}" != "no"], [
+  AC_CHECK_HEADERS(jack/jack.h, [
+    VLC_ADD_PLUGINS([access_jack jack])
+    VLC_ADD_LDFLAGS([access_jack jack],[-ljack])
+  ],[AC_MSG_ERROR([cannot find JACK headers])])
+])
 
 dnl
 dnl  CyberLink for C++ UPnP stack

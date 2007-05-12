@@ -21,3 +21,4 @@ SOURCES_cdda = \
         vcd/cdrom.h \
         vcd/cdrom_internals.h \
         $(NULL)
+SOURCES_access_jack = jack.c

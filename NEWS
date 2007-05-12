@@ -37,7 +37,8 @@ Input/Demuxers:
   * UDP-Lite protocol (requires OS support) for RTP/AVP
   * DCCP protocol (requires OS support) for RTP/AVP
   * Proxy support for MMSH stream
-  * Open YouTube, DailyMotion, metacafe and Google Video urls.
+  * Open YouTube, DailyMotion, metacafe and Google Video URLs.
+  * JACK audio input support
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
