@@ -230,7 +230,10 @@ void aout_OutputDelete( aout_instance_t * p_aout )
 
     aout_FiltersDestroyPipeline( p_aout, p_aout->output.pp_filters,
                                  p_aout->output.i_nb_filters );
+
+    vlc_mutex_lock( &p_aout->output_fifo_lock );
     aout_FifoDestroy( p_aout, &p_aout->output.fifo );
+    vlc_mutex_unlock( &p_aout->output_fifo_lock );
 
     p_aout->output.b_error = VLC_TRUE;
 }
