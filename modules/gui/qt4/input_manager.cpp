@@ -138,6 +138,14 @@ void InputManager::update()
                   input_GetItem(p_input)->p_meta->psz_nowplaying,
                   input_GetItem(p_input)->psz_name );
     }
+    else if( input_GetItem(p_input)->p_meta &&
+             input_GetItem(p_input)->p_meta->psz_artist &&
+             *input_GetItem(p_input)->p_meta->psz_artist )
+    {
+        text.sprintf( "%s - %s",
+                  input_GetItem(p_input)->p_meta->psz_artist,
+                  input_GetItem(p_input)->psz_name );
+    }
     else
     {
         text.sprintf( "%s", input_GetItem(p_input)->psz_name );
