@@ -45,6 +45,32 @@ struct demux_sys_t
     char *psz_title;
 };
 
+char *get_html_meta_title( demux_t *p_demux );
+char *get_html_meta_title( demux_t *p_demux )
+{
+    char *psz_title;
+    char *psz_cur;
+    char *psz_line;
+
+    /* Retreive the stream's title from the HTML */
+    while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
+    {
+        if( ( psz_cur = strstr( psz_line,
+              "<meta name=\"title\" content=\"" ) ) )
+        {
+            char *psz_buf;
+            psz_cur += strlen( "<meta name=\"title\" content=\"" );
+            psz_buf = strchr( psz_cur, '"' );
+            if( psz_buf ) *psz_buf = '\0';
+            psz_title = strdup( psz_cur );
+            resolve_xml_special_chars( psz_title );
+            if( psz_buf ) *psz_buf = '"';
+            return psz_title;
+        }
+    }
+    return NULL;
+}
+
 /*****************************************************************************
  * Import_VideoPortal: main import function
  *****************************************************************************/
@@ -70,28 +96,12 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
             if( !strncmp( psz_cur, "watch?v=", strlen( "watch?v=" ) ) )
             {
                 /* This is the webpage's url */
-                char *psz_line;
                 char *psz_id;
                 psz_cur += strlen( "watch?v=" );
                 psz_id = psz_cur;
                 psz_cur = strchr( psz_cur, '&' );
                 if( psz_cur ) *psz_cur = '\0';
-                /* Retreive the stream's title from the HTML */
-                while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
-                {
-                    if( ( psz_cur = strstr( psz_line,
-                          "<meta name=\"title\" content=\"" ) ) )
-                    {
-                        char *psz_buf;
-                        psz_cur += strlen( "<meta name=\"title\" content=\"" );
-                        psz_buf = strchr( psz_cur, '"' );
-                        if( psz_buf ) *psz_buf = '\0';
-                        psz_title = strdup( psz_cur );
-                        resolve_xml_special_chars( psz_title );
-                        if( psz_buf ) *psz_buf = '"';
-                        break;
-                    }
-                }
+                psz_title = get_html_meta_title( p_demux );
                 asprintf( &psz_url, "http://www.youtube.com/v/%s", psz_id );
             }
             else if( !strncmp( psz_cur, "watch_fullscreen?video_id=",
@@ -190,6 +200,7 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
                 psz_cur[strlen(psz_cur)-1] = '\0';
             asprintf( &psz_url, "http://www.metacafe.com/fplayer/%s.swf",
                       psz_cur );
+            psz_title = get_html_meta_title( p_demux );
         }
         else if( ( psz_cur = strstr( psz_path, "images.metacafe.com" ) ) )
         {
