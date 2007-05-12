@@ -28,6 +28,7 @@
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 #include <vlc_url.h>
+#include <vlc_strings.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 #include "playlist.h"
@@ -41,6 +42,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 struct demux_sys_t
 {
     char *psz_url;
+    char *psz_title;
 };
 
 /*****************************************************************************
@@ -52,6 +54,7 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
     const char *psz_path = p_demux->psz_path;
     char *psz_cur;
     char *psz_url = NULL;
+    char *psz_title = NULL;
 
     byte_t *p_peek;
     int i_peek;
@@ -67,15 +70,42 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
             if( !strncmp( psz_cur, "watch?v=", strlen( "watch?v=" ) ) )
             {
                 /* This is the webpage's url */
+                char *psz_line;
+                char *psz_id;
                 psz_cur += strlen( "watch?v=" );
-                asprintf( &psz_url, "http://www.youtube.com/v/%s", psz_cur );
+                psz_id = psz_cur;
+                psz_cur = strchr( psz_cur, '&' );
+                if( psz_cur ) *psz_cur = '\0';
+                /* Retreive the stream's title from the HTML */
+                while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
+                {
+                    if( ( psz_cur = strstr( psz_line,
+                          "<meta name=\"title\" content=\"" ) ) )
+                    {
+                        char *psz_buf;
+                        psz_cur += strlen( "<meta name=\"title\" content=\"" );
+                        psz_buf = strchr( psz_cur, '"' );
+                        if( psz_buf ) *psz_buf = '\0';
+                        psz_title = strdup( psz_cur );
+                        resolve_xml_special_chars( psz_title );
+                        if( psz_buf ) *psz_buf = '"';
+                        break;
+                    }
+                }
+                asprintf( &psz_url, "http://www.youtube.com/v/%s", psz_id );
             }
-            else if( !strncmp( psz_cur, "p.swf", strlen( "p.swf" ) ) )
+            else if( !strncmp( psz_cur, "watch_fullscreen?video_id=",
+                               strlen( "watch_fullscreen?video_id=" ) )
+           || !strncmp( psz_cur, "p.swf", strlen( "p.swf" ) ) /* Normal size */
+           || !strncmp( psz_cur, "player2.swf", strlen( "player2.swf" ) )/* Fullscreen urls */ )
             {
                 /* This is the swf flv player url (which we get after a
-                 * redirect from the http://www.youtube.com/v/video_id url */
+                 * redirect from the http://www.youtube.com/v/video_id url),
+                 * or the fullscreen swf flv player url,
+                 * or the fullscreen webpage url */
                 char *video_id = strstr( psz_cur, "video_id=" );
                 char *t = strstr( psz_cur, "t=" );
+                char *title = strstr( psz_cur, "title=" );
                 if( video_id && t )
                 {
                     char *psz_buf;
@@ -88,6 +118,14 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
                     asprintf( &psz_url, "http://www.youtube.com/"
                               "get_video.php?video_id=%s&t=%s",
                               video_id, t );
+                    if( title ) /* Comes with fullscreen urls */
+                    {
+                        title += strlen( "title=" );
+                        psz_buf = strchr( title, '&' );
+                        if( psz_buf ) *psz_buf = '\0';
+                        psz_title = strdup( title );
+                        decode_URI( psz_title );
+                    }
                 }
             }
         }
@@ -166,9 +204,11 @@ int E_(Import_VideoPortal)( vlc_object_t *p_this )
     if( !p_demux->p_sys )
     {
         free( psz_url );
+        free( psz_title );
         return VLC_ENOMEM;
     }
     p_demux->p_sys->psz_url = psz_url;
+    p_demux->p_sys->psz_title = psz_title;
 
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
@@ -183,19 +223,25 @@ void E_(Close_VideoPortal)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     free( p_demux->p_sys->psz_url );
+    free( p_demux->p_sys->psz_title );
     free( p_demux->p_sys );
 }
 
 static int Demux( demux_t *p_demux )
 {
     char *psz_url = p_demux->p_sys->psz_url;
+    char *psz_title = p_demux->p_sys->psz_title;
     input_item_t *p_input;
 
     msg_Dbg( p_demux, "Redirecting %s to %s", p_demux->psz_path, psz_url );
 
     INIT_PLAYLIST_STUFF;
+    if( !psz_title )
+    {
+        psz_title = p_current_input->psz_name;
+    }
 
-    p_input = input_ItemNewExt( p_playlist, psz_url, psz_url, 0, NULL, -1 );
+    p_input = input_ItemNewExt( p_playlist, psz_url, psz_title, 0, NULL, -1 );
     playlist_BothAddInput( p_playlist, p_input,
                            p_item_in_category,
                            PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
