@@ -16,6 +16,7 @@ nobase_dist_pkgdata_DATA = \
 	utils/gnome-vlc-default.sh \
 	$(DIST_skins2) \
 	$(DIST_http) \
+	$(DIST_lua) \
 	$(DIST_osdmenu_default) \
 	$(DIST_osdmenu_dvd)
 
@@ -232,3 +233,5 @@ DIST_osdmenu_dvd = \
 	osdmenu/dvd/volume/volume04.png \
 	osdmenu/dvd/volume/volume05.png \
 	osdmenu/dvd/unselect/barroff.png
+
+DIST_lua= luaplaylist/test.lua
