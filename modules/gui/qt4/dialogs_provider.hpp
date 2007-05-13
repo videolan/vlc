@@ -78,6 +78,7 @@
 #define OPEN_AND_PLAY           0x0
 #define OPEN_AND_STREAM         0x1
 #define OPEN_AND_SAVE           0x2
+#define ENQUEUE                 0x4
 
 class QEvent;
 class QSignalMapper;

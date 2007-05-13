@@ -148,6 +148,10 @@ void OpenDialog::setMenuAction()
             playButton->setText( qtr("&Convert / Save") );
             BUTTONACT( playButton, stream( true ) );
             break;
+        case ENQUEUE:
+            playButton->setText( qtr("&Enqueue") );
+            BUTTONACT( playButton, enqueue() );
+            break;
         case OPEN_AND_PLAY:
         default:
             playButton->setText( qtr("&Play") );
