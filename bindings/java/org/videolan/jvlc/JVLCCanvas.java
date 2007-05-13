@@ -83,5 +83,13 @@ public class JVLCCanvas extends Canvas {
     public JVLC getJVLC() {
         return jvlc;
     }
+    
+    /* (non-Javadoc)
+     * @see java.awt.Component#removeNotify()
+     */
+    public void removeNotify() {
+    	super.removeNotify();
+    	jvlc.destroy();
+    }
 
 }
