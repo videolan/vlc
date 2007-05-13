@@ -91,10 +91,7 @@ public class JVLC implements Runnable {
      */
     public void destroy() {
     	beingDestroyed = true;
-    	if (!beingDestroyed)
-    	{
-    		_destroy();
-    	}
+    	_destroy();
     }
  
 
