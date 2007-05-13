@@ -17,4 +17,4 @@ SOURCES_playlist = \
 	videoportals.c \
 	$(NULL)
 
-
+SOURCES_luaplaylist = luaplaylist.c

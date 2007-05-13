@@ -1532,6 +1532,20 @@ if test "${enable_shout}" = "yes"; then
     [AC_MSG_WARN(libshout library not found)])
 fi
 
+dnl Lua playlist demux
+AC_ARG_ENABLE(luaplaylist,
+  [  --enable-lua            lua playlist demux plugin (default enabled)])
+if test "${enable_lua}" != "no"
+then
+  PKG_CHECK_MODULES(LUA, lua5.1,
+    [ AC_DEFINE(HAVE_LUA, [], [Define if you have the lua library])
+      VLC_ADD_PLUGINS([luaplaylist])
+      VLC_ADD_LDFLAGS([luaplaylist],[$LUA_LIBS])
+      VLC_ADD_CFLAGS([luaplaylist],[$LUA_CFLAGS])
+    ],
+    [AC_MSG_WARN(lua 5.0 not found)])
+fi
+
 dnl
 dnl HTTP daemon
 dnl
