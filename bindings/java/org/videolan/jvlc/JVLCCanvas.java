@@ -33,6 +33,11 @@ import java.awt.Graphics;
 
 public class JVLCCanvas extends Canvas {
 
+	/**
+	 * Serial version UID
+	 */
+	private static final long serialVersionUID = -1888309778861586426L;
+
 	public void paint(Graphics g) {
 		jvlc.video.paint(g);
 	}
