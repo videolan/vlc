@@ -69,6 +69,7 @@ Video output and filters:
  * New transparency mask video filter (for use with the mosaic_bridge module).
  * New bluescreen video filter (for use with the mosaic_bridge module). This
    was previously part of the mosaic module.
+ * Fix random characters problem in RSS filter.
 
 Stream output:
  * UDP-Lite (requires OS support) for RTP/TS encapsulation
