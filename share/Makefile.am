@@ -234,4 +234,9 @@ DIST_osdmenu_dvd = \
 	osdmenu/dvd/volume/volume05.png \
 	osdmenu/dvd/unselect/barroff.png
 
-DIST_lua= luaplaylist/test.lua
+DIST_lua= \
+	luaplaylist/README \
+	luaplaylist/dailymotion.lua \
+	luaplaylist/youtube.lua \
+	luaplaylist/metacafe.lua \
+	luaplaylist/googlevideo.lua

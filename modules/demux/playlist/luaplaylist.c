@@ -28,6 +28,7 @@
 #include <vlc_demux.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
+#include <vlc_charset.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 #include "playlist.h"
@@ -88,9 +89,8 @@ static int vlclua_peek( lua_State *p_state )
     n = lua_tonumber( p_state, 1 );
     lua_pop( p_state, i );
     i_peek = stream_Peek( p_demux->s, &p_peek, n );
-    lua_pushnumber( p_state, i_peek );
     lua_pushlstring( p_state, (const char *)p_peek, i_peek );
-    return 2;
+    return 1;
 }
 
 static int vlclua_readline( lua_State *p_state )
@@ -115,6 +115,31 @@ static int vlclua_decode_uri( lua_State *p_state )
     return 1;
 }
 
+static int vlclua_resolve_xml_special_chars( lua_State *p_state )
+{
+    int i = lua_gettop( p_state );
+    if( !i ) return 0;
+    const char *psz_cstring = lua_tostring( p_state, 1 );
+    if( !psz_cstring ) return 0;
+    char *psz_string = strdup( psz_cstring );
+    lua_pop( p_state, i );
+    resolve_xml_special_chars( psz_string );
+    lua_pushstring( p_state, psz_string );
+    free( psz_string );
+    return 1;
+}
+
+static int file_select( const char *file )
+{
+    int i = strlen( file );
+    return i > 4 && !strcmp( file+i-4, ".lua" );
+}
+
+static int file_compare( const char **a, const char **b )
+{
+    return strcmp( *a, *b );
+}
+
 /*****************************************************************************
  * Import_LuaPlaylist: main import function
  *****************************************************************************/
@@ -122,6 +147,22 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     lua_State *p_state;
+    int i_ret = VLC_EGENERIC;
+    char **ppsz_filelist = NULL;
+    char **ppsz_fileend = NULL;
+    char **ppsz_file;
+    DIR *dir;
+    char *psz_filename = NULL;
+    int i_files;
+    const char psz_dir[] = "share/luaplaylist"; /* FIXME */
+
+    static luaL_Reg p_reg[] =
+    {
+        { "readline", vlclua_readline },
+        { "peek", vlclua_peek },
+        { "decode_uri", vlclua_decode_uri },
+        { "resolve_xml_special_chars", vlclua_resolve_xml_special_chars }
+    };
 
     p_demux->p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
     if( !p_demux->p_sys )
@@ -145,13 +186,6 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
     /* Load Lua libraries */
     luaL_openlibs( p_state ); /* FIXME: Don't open all the libs? */
 
-    static luaL_Reg p_reg[] =
-    {
-        { "readline", vlclua_readline },
-        { "peek", vlclua_peek },
-        { "decode_uri", vlclua_decode_uri }
-    };
-
     luaL_register( p_state, "vlc", p_reg );
     lua_pushlightuserdata( p_state, p_demux );
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "private" );
@@ -162,45 +196,82 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
 
     lua_pop( p_state, 1 );
 
+    dir = utf8_opendir( psz_dir );
+    if( !dir ) goto error;
+    i_files = utf8_loaddir( dir, &ppsz_filelist, file_select, file_compare );
+    if( i_files < 1 ) goto error;
+    ppsz_fileend = ppsz_filelist + i_files;
+
+    for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend; ppsz_file++ )
     {
-        const char *psz_filename = "share/luaplaylist/test.lua";
-        int i_ret;
+        free( psz_filename ); psz_filename = NULL;
+        asprintf( &psz_filename, "%s/%s", psz_dir, *ppsz_file );
+        msg_Dbg( p_demux, "Trying Lua playlist script %s", psz_filename );
+
+        /* Ugly hack to delete previous versions of the probe() and parse()
+         * functions. */
+        lua_pushnil( p_state );
+        lua_pushnil( p_state );
+        lua_setglobal( p_state, "probe" );
+        lua_setglobal( p_state, "parse" );
 
         /* Load and run the script(s) */
         if( luaL_dofile( p_state, psz_filename ) )
         {
-            msg_Warn( p_demux, "Error while runing script %s: %s", psz_filename, lua_tostring( p_state, lua_gettop( p_state ) ) );
-            return VLC_EGENERIC;
+            msg_Warn( p_demux, "Error loading script %s: %s", psz_filename,
+                      lua_tostring( p_state, lua_gettop( p_state ) ) );
+            lua_pop( p_state, 1 );
+            continue;
+        }
+
+        lua_getglobal( p_state, "probe" );
+
+        if( !lua_isfunction( p_state, lua_gettop( p_state ) ) )
+        {
+            msg_Warn( p_demux, "Error while runing script %s, "
+                      "function probe() not found", psz_filename );
+            lua_pop( p_state, 1 );
+            continue;
+        }
+
+        if( lua_pcall( p_state, 0, 1, 0 ) )
+        {
+            msg_Warn( p_demux, "Error while runing script %s, "
+                      "function probe(): %s", psz_filename,
+                      lua_tostring( p_state, lua_gettop( p_state ) ) );
+            lua_pop( p_state, 1 );
+            continue;
         }
 
         if( lua_gettop( p_state ) )
         {
-            i_ret = lua_toboolean( p_state, 1 );
-            printf( "Script returned %d: %d\n", 1, i_ret );
-
-            while( lua_gettop( p_state ) != 1 )
+            if( lua_toboolean( p_state, 1 ) )
             {
-                printf( "Script returned %d: %s\n", lua_gettop( p_state ),
-                        lua_tostring( p_state, lua_gettop( p_state ) ) );
-                lua_pop( p_state, 1 );
+                msg_Dbg( p_demux, "Lua playlist script %s's "
+                         "probe() function was successful", psz_filename );
+                i_ret = VLC_SUCCESS;
             }
-
             lua_pop( p_state, 1 );
 
-            if( !i_ret )
-            {
-                E_(Close_LuaPlaylist)( p_this );
-                return VLC_EGENERIC;
-            }
-        }
-        else
-        {
-            E_(Close_LuaPlaylist)( p_this );
-            return VLC_EGENERIC;
+            if( i_ret == VLC_SUCCESS ) break;
         }
     }
 
-    return VLC_SUCCESS;
+    error:
+        free( psz_filename );
+
+        if( ppsz_filelist )
+        {
+            for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend;
+                 ppsz_file++ )
+                free( *ppsz_file );
+            free( ppsz_filelist );
+        }
+
+        if( dir ) closedir( dir );
+        if( i_ret != VLC_SUCCESS )
+            E_(Close_LuaPlaylist)( p_this );
+        return i_ret;
 }
 
 /*****************************************************************************
@@ -215,17 +286,91 @@ void E_(Close_LuaPlaylist)( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
-    /*input_item_t *p_input;*/
+    input_item_t *p_input;
+    lua_State *p_state = p_demux->p_sys->p_state;
+    char psz_filename[] = "FIXME";
 
     INIT_PLAYLIST_STUFF;
 
-#if 0
-    p_input = input_ItemNewExt( p_playlist, psz_url, psz_title, 0, NULL, -1 );
-    playlist_BothAddInput( p_playlist, p_input,
-                           p_item_in_category,
-                           PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                           PLAYLIST_END, NULL, NULL, VLC_FALSE );
-#endif
+    lua_getglobal( p_state, "parse" );
+
+    if( !lua_isfunction( p_state, lua_gettop( p_state ) ) )
+    {
+        msg_Warn( p_demux, "Error while runing script %s, "
+                  "function parse() not found", psz_filename );
+        E_(Close_LuaPlaylist)( VLC_OBJECT( p_demux ) );
+        return VLC_EGENERIC;
+    }
+
+    if( lua_pcall( p_state, 0, 1, 0 ) )
+    {
+        msg_Warn( p_demux, "Error while runing script %s, "
+                  "function parse(): %s", psz_filename,
+                  lua_tostring( p_state, lua_gettop( p_state ) ) );
+        E_(Close_LuaPlaylist)( VLC_OBJECT( p_demux ) );
+        return VLC_EGENERIC;
+    }
+
+    if( lua_gettop( p_state ) )
+    {
+        int t = lua_gettop( p_state );
+        if( lua_istable( p_state, t ) )
+        {
+            lua_pushnil( p_state );
+            while( lua_next( p_state, t ) )
+            {
+                if( lua_istable( p_state, t+2 ) )
+                {
+                    const char *psz_url = NULL;
+                    const char *psz_title = NULL;
+                    lua_getfield( p_state, t+2, "url" );
+                    if( lua_isstring( p_state, t+3 ) )
+                    {
+                        psz_url = lua_tostring( p_state, t+3 );
+                        printf("URL: %s\n", psz_url );
+                        lua_getfield( p_state, t+2, "title" );
+                        if( lua_isstring( p_state, t+4 ) )
+                        {
+                            psz_title = lua_tostring( p_state, t+4 );
+                            printf("Title: %s\n", psz_title );
+                        }
+                        else
+                        {
+                            psz_title = psz_url;
+                        }
+                        p_input = input_ItemNewExt( p_playlist, psz_url,
+                                                    psz_title, 0, NULL, -1 );
+                        playlist_BothAddInput(
+                            p_playlist, p_input,
+                            p_item_in_category,
+                            PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
+                            PLAYLIST_END, NULL, NULL, VLC_FALSE );
+                        lua_pop( p_state, 1 ); /* pop "title" */
+                    }
+                    else
+                    {
+                        printf("URL isn't a string\n");
+                    }
+                    lua_pop( p_state, 1 ); /* pop "url" */
+                }
+                else
+                {
+                    printf("This isn't a table !!!\n" );
+                }
+                lua_pop( p_state, 1 ); /* pop the value, keep the key for
+                                        * the next lua_next() call */
+            }
+            lua_pop( p_state, 1 ); /* pop the last key */
+        }
+        else
+        {
+            msg_Warn( p_demux, "Script didn't return a table" );
+        }
+    }
+    else
+    {
+        msg_Err( p_demux, "Script went completely foobar" );
+    }
 
     HANDLE_PLAY_AND_RELEASE;
 
