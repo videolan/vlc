@@ -32,12 +32,13 @@ Playlist:
     * "Live search"
     * Shoutcast TV listings
     * Audioscrobbler/last.fm support
+ * User definable Lua playlist scripts. See share/luaplaylist/README.txt
+   (Default scripts open YouTube, DailyMotion, metacafe and Google Video URLs)
 
 Input/Demuxers:
   * UDP-Lite protocol (requires OS support) for RTP/AVP
   * DCCP protocol (requires OS support) for RTP/AVP
   * Proxy support for MMSH stream
-  * Open YouTube, DailyMotion, metacafe and Google Video URLs.
   * JACK audio input support
 
 Decoders:
