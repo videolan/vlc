@@ -1470,6 +1470,9 @@ ifdef HAVE_WIN32
 	patch -p0 < Patches/xml2-win32.patch
 	rm -f xml/aclocal.m4
 endif
+ifdef HAVE_UCLIBC
+	patch -p0 < Patches/xml2-uclibc.patch
+endif
 
 .xml: xml
 	(cd xml; CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-minimal --with-catalog --with-reader --with-tree --with-push --with-xptr --with-valid --with-xpath --with-xinclude --with-sax1 --without-zlib --without-iconv --without-http --without-ftp && make && make install)
