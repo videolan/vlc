@@ -124,8 +124,8 @@ FFMPEGCONF+= --enable-mingwce --cpu=armv4l --disable-debug --disable-encoders --
 endif
 
 ifdef HAVE_UCLIBC
-FFMPEGCONF+= --enable-small --arch=armeb --disable-debug --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols
-FFMPEG_CFLAGS += --std=c99
+FFMPEGCONF+= --enable-small --arch=armeb --disable-debug --disable-encoders --disable-muxers --disable-demuxer=mpegts --disable-v4l --disable-v4l2 --disable-bktr --disable-dv1394 --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols --disable-encoders
+FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
 else
 FFMPEGCONF+= --enable-libmp3lame --enable-libfaac --enable-liba52
 endif
@@ -925,7 +925,9 @@ ifdef HAVE_BEOS
 	(cd $@; patch -p0 < ../Patches/ffmpeg-alignment.patch)
 endif
 ifdef HAVE_UCLIBC
-	(cd $@; patch -p1 < ../Patches/ffmpeg-svn-uclibc.patch)
+	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
+	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
+	patch -p0 < Patches/ffmpeg-svn-grab.patch
 endif
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
@@ -944,7 +946,7 @@ else
 .ffmpeg: ffmpeg .faac .lame
 endif
 endif
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --disable-ffplay && make && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-ffmpeg --disable-network --disable-ffplay && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
