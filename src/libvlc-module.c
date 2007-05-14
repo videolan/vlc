@@ -1021,8 +1021,10 @@ static const char *ppsz_pltree_descriptions[] = { N_("Default"), N_("Always"), N
 #define HOTKEY_CAT_LONGTEXT N_( "These settings are the global VLC key " \
     "bindings, known as \"hotkeys\"." )
 
-#define FULLSCREEN_KEY_TEXT N_("Fullscreen")
-#define FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to swap fullscreen state.")
+#define TOGGLE_FULLSCREEN_KEY_TEXT N_("Fullscreen")
+#define TOGGLE_FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to swap fullscreen state.")
+#define LEAVE_FULLSCREEN_KEY_TEXT N_("Leave fullscreen")
+#define LEAVE_FULLSCREEN_KEY_LONGTEXT N_("Select the hotkey to use to leave fullscreen state.")
 #define PLAY_PAUSE_KEY_TEXT N_("Play/Pause")
 #define PLAY_PAUSE_KEY_LONGTEXT N_("Select the hotkey to use to swap paused state.")
 #define PAUSE_KEY_TEXT N_("Pause only")
@@ -1807,7 +1809,8 @@ vlc_module_begin();
  *  show info                     KEY_MODIFIER_COMMAND|'i'
  *  help                          KEY_MODIFIER_COMMAND|'?'
  */
-#   define KEY_FULLSCREEN         KEY_MODIFIER_COMMAND|'f'
+#   define KEY_TOGGLE_FULLSCREEN  KEY_MODIFIER_COMMAND|'f'
+#   define KEY_LEAVE_FULLSCREEN   KEY_ESC
 #   define KEY_PLAY_PAUSE         KEY_MODIFIER_COMMAND|'p'
 #   define KEY_PAUSE              KEY_UNSET
 #   define KEY_PLAY               KEY_UNSET
@@ -1892,7 +1895,8 @@ vlc_module_begin();
 #   define KEY_WALLPAPER          KEY_MODIFIER_COMMAND|'w'
 
 #else
-#   define KEY_FULLSCREEN         'f'
+#   define KEY_TOGGLE_FULLSCREEN  'f'
+#   define KEY_LEAVE_FULLSCREEN   KEY_ESC
 #   define KEY_PLAY_PAUSE         KEY_SPACE
 #   define KEY_PAUSE              KEY_UNSET
 #   define KEY_PLAY               KEY_UNSET
@@ -1978,8 +1982,10 @@ vlc_module_begin();
 #   define KEY_WALLPAPER          'w'
 #endif
 
-    add_key( "key-fullscreen", KEY_FULLSCREEN, NULL, FULLSCREEN_KEY_TEXT,
-             FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-toggle-fullscreen", KEY_TOGGLE_FULLSCREEN, NULL, TOGGLE_FULLSCREEN_KEY_TEXT,
+             TOGGLE_FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-leave-fullscreen", KEY_LEAVE_FULLSCREEN, NULL, LEAVE_FULLSCREEN_KEY_TEXT,
+             LEAVE_FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-play-pause", KEY_PLAY_PAUSE, NULL, PLAY_PAUSE_KEY_TEXT,
              PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-pause", KEY_PAUSE, NULL, PAUSE_KEY_TEXT,
@@ -2285,7 +2291,8 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-next", ACTIONID_NEXT, 0, 0, 0, 0 },
     { "key-faster", ACTIONID_FASTER, 0, 0, 0, 0 },
     { "key-slower", ACTIONID_SLOWER, 0, 0, 0, 0 },
-    { "key-fullscreen", ACTIONID_FULLSCREEN, 0, 0, 0, 0 },
+    { "key-toggle-fullscreen", ACTIONID_TOGGLE_FULLSCREEN, 0, 0, 0, 0 },
+    { "key-leave-fullscreen", ACTIONID_LEAVE_FULLSCREEN, 0, 0, 0, 0 },
     { "key-vol-up", ACTIONID_VOL_UP, 0, 0, 0, 0 },
     { "key-vol-down", ACTIONID_VOL_DOWN, 0, 0, 0, 0 },
     { "key-vol-mute", ACTIONID_VOL_MUTE, 0, 0, 0, 0 },

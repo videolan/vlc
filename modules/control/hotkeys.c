@@ -283,7 +283,7 @@ static void Run( intf_thread_t *p_intf )
         {
             if( p_vout ) vout_Control( p_vout, VOUT_SNAPSHOT );
         }
-        else if( i_action == ACTIONID_FULLSCREEN )
+        else if( i_action == ACTIONID_TOGGLE_FULLSCREEN )
         {
             if( p_vout )
             {
@@ -296,6 +296,13 @@ static void Run( intf_thread_t *p_intf )
                 var_Get( p_playlist, "fullscreen", &val );
                 val.b_bool = !val.b_bool;
                 var_Set( p_playlist, "fullscreen", val );
+            }
+        }
+        else if( i_action == ACTIONID_LEAVE_FULLSCREEN )
+        {
+            if( p_vout && var_GetBool( p_vout, "fullscreen" ) )
+            {
+                var_SetBool( p_vout, "fullscreen", VLC_FALSE );
             }
         }
         else if( i_action == ACTIONID_WALLPAPER )

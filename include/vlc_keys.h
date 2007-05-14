@@ -230,7 +230,7 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_NEXT                  7
 #define ACTIONID_SLOWER                8
 #define ACTIONID_FASTER                9
-#define ACTIONID_FULLSCREEN            10
+#define ACTIONID_TOGGLE_FULLSCREEN     10
 #define ACTIONID_VOL_UP                11
 #define ACTIONID_VOL_DOWN              12
 #define ACTIONID_NAV_ACTIVATE          13
@@ -308,3 +308,4 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_RANDOM                81
 #define ACTIONID_LOOP                  82
 #define ACTIONID_WALLPAPER             83
+#define ACTIONID_LEAVE_FULLSCREEN      84
