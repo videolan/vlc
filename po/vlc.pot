@@ -8,13 +8,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-09 23:05+0100\n"
+"POT-Creation-Date: 2007-05-14 11:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: include/vlc/vlc.h:591
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute it under the terms of the GNU General Public License;\n"
+"see the file named COPYING for details.\n"
+"Written by the VideoLAN team; see the AUTHORS file.\n"
+msgstr ""
 
 #: include/vlc_config_cat.h:36
 msgid "VLC preferences"
@@ -330,7 +338,7 @@ msgstr ""
 msgid "General playlist behaviour"
 msgstr ""
 
-#: include/vlc_config_cat.h:192 modules/gui/macosx/playlist.m:427
+#: include/vlc_config_cat.h:192 modules/gui/macosx/playlist.m:449
 msgid "Services discovery"
 msgstr ""
 
@@ -479,11 +487,11 @@ msgid "About VLC media player..."
 msgstr ""
 
 #: include/vlc_intf_strings.h:52 modules/gui/macosx/embeddedwindow.m:50
-#: modules/gui/macosx/embeddedwindow.m:95 modules/gui/macosx/intf.m:526
+#: modules/gui/macosx/embeddedwindow.m:93 modules/gui/macosx/intf.m:526
 #: modules/gui/macosx/intf.m:569 modules/gui/macosx/intf.m:648
 #: modules/gui/macosx/intf.m:655 modules/gui/macosx/intf.m:1535
 #: modules/gui/macosx/intf.m:1536 modules/gui/macosx/intf.m:1537
-#: modules/gui/macosx/intf.m:1538 modules/gui/macosx/playlist.m:419
+#: modules/gui/macosx/intf.m:1538 modules/gui/macosx/playlist.m:441
 #: modules/gui/pda/pda_interface.c:262 modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:281
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:290
@@ -498,7 +506,7 @@ msgstr ""
 msgid "Fetch information"
 msgstr ""
 
-#: include/vlc_intf_strings.h:54 modules/gui/macosx/playlist.m:420
+#: include/vlc_intf_strings.h:54 modules/gui/macosx/playlist.m:442
 #: modules/gui/pda/pda_interface.c:1254
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:285
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:292
@@ -572,7 +580,7 @@ msgstr ""
 msgid "Load playlist file..."
 msgstr ""
 
-#: include/vlc_intf_strings.h:80 modules/gui/macosx/playlist.m:432
+#: include/vlc_intf_strings.h:80 modules/gui/macosx/playlist.m:454
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:330
 msgid "Search"
 msgstr ""
@@ -650,7 +658,7 @@ msgid ""
 "settings."
 msgstr ""
 
-#: include/vlc_meta.h:32 modules/gui/macosx/playlist.m:1091
+#: include/vlc_meta.h:32 modules/gui/macosx/playlist.m:1113
 msgid "Meta-information"
 msgstr ""
 
@@ -663,7 +671,7 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: include/vlc_meta.h:34 modules/gui/macosx/playlist.m:1091
+#: include/vlc_meta.h:34 modules/gui/macosx/playlist.m:1113
 msgid "Artist"
 msgstr ""
 
@@ -732,14 +740,6 @@ msgstr ""
 
 #: include/vlc_meta.h:52
 msgid "Codec Description"
-msgstr ""
-
-#: include/vlc/vlc.h:591
-msgid ""
-"This program comes with NO WARRANTY, to the extent permitted by law.\n"
-"You may redistribute it under the terms of the GNU General Public License;\n"
-"see the file named COPYING for details.\n"
-"Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
 
 #: src/audio_output/filters.c:154 src/audio_output/filters.c:201
@@ -963,8 +963,8 @@ msgstr ""
 msgid "Bits per sample"
 msgstr ""
 
-#: src/input/es_out.c:1798 modules/access_output/shout.c:87
-#: modules/access/pvr.c:89
+#: src/input/es_out.c:1798 modules/access/pvr.c:89
+#: modules/access_output/shout.c:87
 msgid "Bitrate"
 msgstr ""
 
@@ -998,11 +998,11 @@ msgstr ""
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 
-#: src/input/input.c:2283
+#: src/input/input.c:2286
 msgid "Can't recognize the input's format"
 msgstr ""
 
-#: src/input/input.c:2284
+#: src/input/input.c:2287
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
 msgstr ""
@@ -1060,13 +1060,13 @@ msgid "Chapter %i"
 msgstr ""
 
 #: src/input/var.c:353 modules/gui/beos/InterfaceWindow.cpp:289
-#: modules/gui/qt4/main_interface.cpp:739
+#: modules/gui/qt4/main_interface.cpp:799
 #: modules/gui/wxwidgets/input_manager.cpp:289
 msgid "Next chapter"
 msgstr ""
 
 #: src/input/var.c:358 modules/gui/beos/InterfaceWindow.cpp:288
-#: modules/gui/qt4/main_interface.cpp:738
+#: modules/gui/qt4/main_interface.cpp:798
 #: modules/gui/wxwidgets/input_manager.cpp:288
 msgid "Previous chapter"
 msgstr ""
@@ -4480,15 +4480,15 @@ msgid "Aspect-ratio"
 msgstr ""
 
 #: modules/access/bda/bda.c:39 modules/access/cdda.c:60
-#: modules/access/dshow/dshow.cpp:93 modules/access/dvb/access.c:73
-#: modules/access/dv.c:68 modules/access/dvdnav.c:67
+#: modules/access/dshow/dshow.cpp:93 modules/access/dv.c:68
+#: modules/access/dvb/access.c:73 modules/access/dvdnav.c:67
 #: modules/access/dvdread.c:64 modules/access/fake.c:41
 #: modules/access/file.c:79 modules/access/ftp.c:54
 #: modules/access/gnomevfs.c:45 modules/access/http.c:57
-#: modules/access/mms/mms.c:46 modules/access/pvr.c:52
-#: modules/access/screen/screen.c:36 modules/access/smb.c:61
-#: modules/access/tcp.c:37 modules/access/udp.c:69 modules/access/v4l.c:76
-#: modules/access/vcd/vcd.c:41
+#: modules/access/jack.c:58 modules/access/mms/mms.c:46
+#: modules/access/pvr.c:52 modules/access/screen/screen.c:36
+#: modules/access/smb.c:61 modules/access/tcp.c:37 modules/access/udp.c:69
+#: modules/access/v4l.c:76 modules/access/vcd/vcd.c:41
 msgid "Caching value in ms"
 msgstr ""
 
@@ -4727,15 +4727,6 @@ msgstr ""
 msgid "DirectShow DVB input"
 msgstr ""
 
-#: modules/access/cdda/access.c:294
-msgid "CD reading failed"
-msgstr ""
-
-#: modules/access/cdda/access.c:295
-#, c-format
-msgid "VLC could not get a new block of size: %i."
-msgstr ""
-
 #: modules/access/cdda.c:62
 msgid ""
 "Default caching value for Audio CDs. This value should be set in "
@@ -4779,6 +4770,15 @@ msgstr ""
 #: modules/access/cdda.c:465
 #, c-format
 msgid "Audio CD - Track %i"
+msgstr ""
+
+#: modules/access/cdda/access.c:294
+msgid "CD reading failed"
+msgstr ""
+
+#: modules/access/cdda/access.c:295
+#, c-format
+msgid "VLC could not get a new block of size: %i."
 msgstr ""
 
 #: modules/access/cdda/cdda.c:42 modules/access/directory.c:80
@@ -5282,6 +5282,18 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
 
+#: modules/access/dv.c:70
+msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
+msgstr ""
+
+#: modules/access/dv.c:74
+msgid "Digital Video (Firewire/ieee1394)  input"
+msgstr ""
+
+#: modules/access/dv.c:75
+msgid "dv"
+msgstr ""
+
 #: modules/access/dvb/access.c:127
 msgid "Modulation type for front-end device."
 msgstr ""
@@ -5383,18 +5395,6 @@ msgstr ""
 #: modules/access/dvb/access.c:774
 #, c-format
 msgid "The provided polarization \"%c\" is not valid."
-msgstr ""
-
-#: modules/access/dv.c:70
-msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
-msgstr ""
-
-#: modules/access/dv.c:74
-msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr ""
-
-#: modules/access/dv.c:75
-msgid "dv"
 msgstr ""
 
 #: modules/access/dvdnav.c:63 modules/access/dvdread.c:60
@@ -5584,90 +5584,6 @@ msgstr ""
 msgid "VLC could not open file \"%s\" (%s)."
 msgstr ""
 
-#: modules/access_filter/bandwidth.c:31
-msgid "Bandwidth limit (bytes/s)"
-msgstr ""
-
-#: modules/access_filter/bandwidth.c:33
-msgid ""
-"The bandwidth module will drop any data in excess of that many bytes per "
-"seconds."
-msgstr ""
-
-#: modules/access_filter/bandwidth.c:42
-msgid "Bandwidth"
-msgstr ""
-
-#: modules/access_filter/bandwidth.c:43
-msgid "Bandwidth limiter"
-msgstr ""
-
-#: modules/access_filter/dump.c:39
-msgid "Force use of dump module"
-msgstr ""
-
-#: modules/access_filter/dump.c:40
-msgid "Activate the dump module even for media with fast seeking."
-msgstr ""
-
-#: modules/access_filter/dump.c:43
-msgid "Maximum size of temporary file (Mb)"
-msgstr ""
-
-#: modules/access_filter/dump.c:44
-msgid ""
-"The dump module will abort dumping of the media if more than this much "
-"megabyte were performed."
-msgstr ""
-
-#: modules/access_filter/record.c:45
-msgid "Record directory"
-msgstr ""
-
-#: modules/access_filter/record.c:47
-msgid "Directory where the record will be stored."
-msgstr ""
-
-#: modules/access_filter/record.c:323
-msgid "Recording"
-msgstr ""
-
-#: modules/access_filter/record.c:325
-msgid "Recording done"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:46
-msgid "Timeshift granularity"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:48
-msgid ""
-"This is the size of the temporary files that will be used to store the "
-"timeshifted streams."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:50
-msgid "Timeshift directory"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:51
-msgid "Directory used to store the timeshift temporary files."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:53
-msgid "Force use of the timeshift module"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:54
-msgid ""
-"Force use of the timeshift module even if the access declares that it can "
-"control pace or pause."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
-msgid "Timeshift"
-msgstr ""
-
 #: modules/access/ftp.c:56
 msgid ""
 "Caching value for FTP streams. This value should be set in milliseconds."
@@ -5799,6 +5715,36 @@ msgstr ""
 msgid "Please enter a valid login name and a password."
 msgstr ""
 
+#: modules/access/jack.c:60
+msgid ""
+"Make VLC buffer audio data capturer from jack for the specified length in "
+"milliseconds."
+msgstr ""
+
+#: modules/access/jack.c:62
+msgid "Pace"
+msgstr ""
+
+#: modules/access/jack.c:64
+msgid "Read the audio stream at VLC pace rather than Jack pace."
+msgstr ""
+
+#: modules/access/jack.c:65
+msgid "Auto Connection"
+msgstr ""
+
+#: modules/access/jack.c:67
+msgid "Automatically connect VLC input ports to available output ports."
+msgstr ""
+
+#: modules/access/jack.c:70
+msgid "JACK audio input"
+msgstr ""
+
+#: modules/access/jack.c:72
+msgid "JACK Input"
+msgstr ""
+
 #: modules/access/mms/mms.c:48
 msgid ""
 "Caching value for MMS streams. This value should be set in milliseconds."
@@ -5824,239 +5770,6 @@ msgstr ""
 
 #: modules/access/mms/mms.c:68
 msgid "Microsoft Media Server (MMS) input"
-msgstr ""
-
-#: modules/access_output/dummy.c:41 modules/stream_out/dummy.c:48
-msgid "Dummy stream output"
-msgstr ""
-
-#: modules/access_output/dummy.c:42 modules/misc/dummy/dummy.c:58
-msgid "Dummy"
-msgstr ""
-
-#: modules/access_output/file.c:63
-msgid "Append to file"
-msgstr ""
-
-#: modules/access_output/file.c:64
-msgid "Append to file if it exists instead of replacing it."
-msgstr ""
-
-#: modules/access_output/file.c:68
-msgid "File stream output"
-msgstr ""
-
-#: modules/access_output/http.c:62 modules/misc/audioscrobbler.c:118
-msgid "Username"
-msgstr ""
-
-#: modules/access_output/http.c:63
-msgid "User name that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:65 modules/control/telnet.c:79
-#: modules/misc/audioscrobbler.c:120 modules/misc/notify/growl.c:61
-msgid "Password"
-msgstr ""
-
-#: modules/access_output/http.c:66
-msgid "Password that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:68
-msgid "Mime"
-msgstr ""
-
-#: modules/access_output/http.c:69
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr ""
-
-#: modules/access_output/http.c:72
-msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
-msgstr ""
-
-#: modules/access_output/http.c:75
-msgid ""
-"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
-"empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:79
-msgid ""
-"Path to the x509 PEM trusted root CA certificates (certificate authority) "
-"file that will be used for HTTPS. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:84
-msgid ""
-"Path to the x509 PEM Certificates Revocation List file that will be used for "
-"SSL. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:87
-msgid "Advertise with Bonjour"
-msgstr ""
-
-#: modules/access_output/http.c:88
-msgid "Advertise the stream with the Bonjour protocol."
-msgstr ""
-
-#: modules/access_output/http.c:92
-msgid "HTTP stream output"
-msgstr ""
-
-#: modules/access_output/shout.c:59
-msgid "Stream name"
-msgstr ""
-
-#: modules/access_output/shout.c:60
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:63
-msgid "Stream description"
-msgstr ""
-
-#: modules/access_output/shout.c:64
-msgid "Description of the stream content or information about your channel."
-msgstr ""
-
-#: modules/access_output/shout.c:67
-msgid "Stream MP3"
-msgstr ""
-
-#: modules/access_output/shout.c:68
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:77
-msgid "Genre description"
-msgstr ""
-
-#: modules/access_output/shout.c:78
-msgid "Genre of the content. "
-msgstr ""
-
-#: modules/access_output/shout.c:80
-msgid "URL description"
-msgstr ""
-
-#: modules/access_output/shout.c:81
-msgid "URL with information about the stream or your channel. "
-msgstr ""
-
-#: modules/access_output/shout.c:88
-msgid "Bitrate information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:90 modules/access/v4l.c:125
-msgid "Samplerate"
-msgstr ""
-
-#: modules/access_output/shout.c:91
-msgid "Samplerate information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:93
-msgid "Number of channels"
-msgstr ""
-
-#: modules/access_output/shout.c:94
-msgid "Number of channels information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:96
-msgid "Ogg Vorbis Quality"
-msgstr ""
-
-#: modules/access_output/shout.c:97
-msgid "Ogg Vorbis Quality information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:99
-msgid "Stream public"
-msgstr ""
-
-#: modules/access_output/shout.c:100
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-
-#: modules/access_output/shout.c:106
-msgid "IceCAST output"
-msgstr ""
-
-#: modules/access_output/udp.c:89 modules/access/rtsp/access.c:41
-#: modules/demux/live555.cpp:60
-msgid "Caching value (ms)"
-msgstr ""
-
-#: modules/access_output/udp.c:91
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-
-#: modules/access_output/udp.c:94
-msgid "Group packets"
-msgstr ""
-
-#: modules/access_output/udp.c:95
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-
-#: modules/access_output/udp.c:100
-msgid "Raw write"
-msgstr ""
-
-#: modules/access_output/udp.c:101
-msgid ""
-"Packets will be sent directly, without trying to fill the MTU (ie, without "
-"trying to make the biggest possible packets in order to improve streaming)."
-msgstr ""
-
-#: modules/access_output/udp.c:105
-msgid "RTCP destination port number"
-msgstr ""
-
-#: modules/access_output/udp.c:106
-msgid "Sends RTCP packets to this port (0 = auto)"
-msgstr ""
-
-#: modules/access_output/udp.c:107
-msgid "Automatic multicast streaming"
-msgstr ""
-
-#: modules/access_output/udp.c:108
-msgid "Allocates an outbound multicast address automatically."
-msgstr ""
-
-#: modules/access_output/udp.c:110
-msgid "UDP-Lite"
-msgstr ""
-
-#: modules/access_output/udp.c:111
-msgid "Use UDP-Lite/IP instead of normal UDP/IP"
-msgstr ""
-
-#: modules/access_output/udp.c:112
-msgid "Checksum coverage"
-msgstr ""
-
-#: modules/access_output/udp.c:113
-msgid "Payload bytes covered by layer-4 checksum"
-msgstr ""
-
-#: modules/access_output/udp.c:116
-msgid "UDP stream output"
 msgstr ""
 
 #: modules/access/pvr.c:54
@@ -6215,6 +5928,11 @@ msgstr ""
 msgid "IVTV MPEG Encoding cards input"
 msgstr ""
 
+#: modules/access/rtsp/access.c:41 modules/access_output/udp.c:89
+#: modules/demux/live555.cpp:60
+msgid "Caching value (ms)"
+msgstr ""
+
 #: modules/access/rtsp/access.c:43
 msgid ""
 "Caching value for RTSP streams. This value should be set in milliseconds."
@@ -6340,30 +6058,6 @@ msgstr ""
 msgid "UDP/RTP input"
 msgstr ""
 
-#: modules/access/v4l2.c:54 modules/gui/macosx/open.m:169
-#: modules/gui/wxwidgets/dialogs/open.cpp:719
-msgid "Device name"
-msgstr ""
-
-#: modules/access/v4l2.c:56
-msgid ""
-"Name of the device to use. If you don't specify anything, /dev/video0 will "
-"be used."
-msgstr ""
-
-#: modules/access/v4l2.c:60
-msgid ""
-"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
-msgstr ""
-
-#: modules/access/v4l2.c:65
-msgid "Video4Linux2"
-msgstr ""
-
-#: modules/access/v4l2.c:66
-msgid "Video4Linux2 input"
-msgstr ""
-
 #: modules/access/v4l.c:78
 msgid ""
 "Caching value for V4L captures. This value should be set in milliseconds."
@@ -6453,6 +6147,10 @@ msgstr ""
 msgid "Tuner to use, if there are several ones."
 msgstr ""
 
+#: modules/access/v4l.c:125 modules/access_output/shout.c:90
+msgid "Samplerate"
+msgstr ""
+
 #: modules/access/v4l.c:127
 msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100)"
@@ -6492,6 +6190,30 @@ msgstr ""
 
 #: modules/access/v4l.c:150
 msgid "Video4Linux input"
+msgstr ""
+
+#: modules/access/v4l2.c:54 modules/gui/macosx/open.m:169
+#: modules/gui/wxwidgets/dialogs/open.cpp:719
+msgid "Device name"
+msgstr ""
+
+#: modules/access/v4l2.c:56
+msgid ""
+"Name of the device to use. If you don't specify anything, /dev/video0 will "
+"be used."
+msgstr ""
+
+#: modules/access/v4l2.c:60
+msgid ""
+"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
+msgstr ""
+
+#: modules/access/v4l2.c:65
+msgid "Video4Linux2"
+msgstr ""
+
+#: modules/access/v4l2.c:66
+msgid "Video4Linux2 input"
 msgstr ""
 
 #: modules/access/vcd/vcd.c:43
@@ -6674,6 +6396,314 @@ msgstr ""
 
 #: modules/access/vcdx/vcd.c:143
 msgid "Format to use in the playlist's \"title\" field."
+msgstr ""
+
+#: modules/access_filter/bandwidth.c:31
+msgid "Bandwidth limit (bytes/s)"
+msgstr ""
+
+#: modules/access_filter/bandwidth.c:33
+msgid ""
+"The bandwidth module will drop any data in excess of that many bytes per "
+"seconds."
+msgstr ""
+
+#: modules/access_filter/bandwidth.c:42
+msgid "Bandwidth"
+msgstr ""
+
+#: modules/access_filter/bandwidth.c:43
+msgid "Bandwidth limiter"
+msgstr ""
+
+#: modules/access_filter/dump.c:39
+msgid "Force use of dump module"
+msgstr ""
+
+#: modules/access_filter/dump.c:40
+msgid "Activate the dump module even for media with fast seeking."
+msgstr ""
+
+#: modules/access_filter/dump.c:43
+msgid "Maximum size of temporary file (Mb)"
+msgstr ""
+
+#: modules/access_filter/dump.c:44
+msgid ""
+"The dump module will abort dumping of the media if more than this much "
+"megabyte were performed."
+msgstr ""
+
+#: modules/access_filter/record.c:45
+msgid "Record directory"
+msgstr ""
+
+#: modules/access_filter/record.c:47
+msgid "Directory where the record will be stored."
+msgstr ""
+
+#: modules/access_filter/record.c:323
+msgid "Recording"
+msgstr ""
+
+#: modules/access_filter/record.c:325
+msgid "Recording done"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:46
+msgid "Timeshift granularity"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:48
+msgid ""
+"This is the size of the temporary files that will be used to store the "
+"timeshifted streams."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:50
+msgid "Timeshift directory"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:51
+msgid "Directory used to store the timeshift temporary files."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:53
+msgid "Force use of the timeshift module"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:54
+msgid ""
+"Force use of the timeshift module even if the access declares that it can "
+"control pace or pause."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
+msgid "Timeshift"
+msgstr ""
+
+#: modules/access_output/dummy.c:41 modules/stream_out/dummy.c:48
+msgid "Dummy stream output"
+msgstr ""
+
+#: modules/access_output/dummy.c:42 modules/misc/dummy/dummy.c:58
+msgid "Dummy"
+msgstr ""
+
+#: modules/access_output/file.c:63
+msgid "Append to file"
+msgstr ""
+
+#: modules/access_output/file.c:64
+msgid "Append to file if it exists instead of replacing it."
+msgstr ""
+
+#: modules/access_output/file.c:68
+msgid "File stream output"
+msgstr ""
+
+#: modules/access_output/http.c:62 modules/misc/audioscrobbler.c:118
+msgid "Username"
+msgstr ""
+
+#: modules/access_output/http.c:63
+msgid "User name that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:65 modules/control/telnet.c:79
+#: modules/misc/audioscrobbler.c:120 modules/misc/notify/growl.c:61
+msgid "Password"
+msgstr ""
+
+#: modules/access_output/http.c:66
+msgid "Password that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:68
+msgid "Mime"
+msgstr ""
+
+#: modules/access_output/http.c:69
+msgid "MIME returned by the server (autodetected if not specified)."
+msgstr ""
+
+#: modules/access_output/http.c:72
+msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
+msgstr ""
+
+#: modules/access_output/http.c:75
+msgid ""
+"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
+"empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:79
+msgid ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used for HTTPS. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:84
+msgid ""
+"Path to the x509 PEM Certificates Revocation List file that will be used for "
+"SSL. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:87
+msgid "Advertise with Bonjour"
+msgstr ""
+
+#: modules/access_output/http.c:88
+msgid "Advertise the stream with the Bonjour protocol."
+msgstr ""
+
+#: modules/access_output/http.c:92
+msgid "HTTP stream output"
+msgstr ""
+
+#: modules/access_output/shout.c:59
+msgid "Stream name"
+msgstr ""
+
+#: modules/access_output/shout.c:60
+msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:63
+msgid "Stream description"
+msgstr ""
+
+#: modules/access_output/shout.c:64
+msgid "Description of the stream content or information about your channel."
+msgstr ""
+
+#: modules/access_output/shout.c:67
+msgid "Stream MP3"
+msgstr ""
+
+#: modules/access_output/shout.c:68
+msgid ""
+"You normally have to feed the shoutcast module with Ogg streams. It is also "
+"possible to stream MP3 instead, so you can forward MP3 streams to the "
+"shoutcast/icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:77
+msgid "Genre description"
+msgstr ""
+
+#: modules/access_output/shout.c:78
+msgid "Genre of the content. "
+msgstr ""
+
+#: modules/access_output/shout.c:80
+msgid "URL description"
+msgstr ""
+
+#: modules/access_output/shout.c:81
+msgid "URL with information about the stream or your channel. "
+msgstr ""
+
+#: modules/access_output/shout.c:88
+msgid "Bitrate information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:91
+msgid "Samplerate information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:93
+msgid "Number of channels"
+msgstr ""
+
+#: modules/access_output/shout.c:94
+msgid "Number of channels information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:96
+msgid "Ogg Vorbis Quality"
+msgstr ""
+
+#: modules/access_output/shout.c:97
+msgid "Ogg Vorbis Quality information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:99
+msgid "Stream public"
+msgstr ""
+
+#: modules/access_output/shout.c:100
+msgid ""
+"Make the server publicly available on the 'Yellow Pages' (directory listing "
+"of streams) on the icecast/shoutcast website. Requires the bitrate "
+"information specified for shoutcast. Requires Ogg streaming for icecast."
+msgstr ""
+
+#: modules/access_output/shout.c:106
+msgid "IceCAST output"
+msgstr ""
+
+#: modules/access_output/udp.c:91
+msgid ""
+"Default caching value for outbound UDP streams. This value should be set in "
+"milliseconds."
+msgstr ""
+
+#: modules/access_output/udp.c:94
+msgid "Group packets"
+msgstr ""
+
+#: modules/access_output/udp.c:95
+msgid ""
+"Packets can be sent one by one at the right time or by groups. You can "
+"choose the number of packets that will be sent at a time. It helps reducing "
+"the scheduling load on heavily-loaded systems."
+msgstr ""
+
+#: modules/access_output/udp.c:100
+msgid "Raw write"
+msgstr ""
+
+#: modules/access_output/udp.c:101
+msgid ""
+"Packets will be sent directly, without trying to fill the MTU (ie, without "
+"trying to make the biggest possible packets in order to improve streaming)."
+msgstr ""
+
+#: modules/access_output/udp.c:105
+msgid "RTCP destination port number"
+msgstr ""
+
+#: modules/access_output/udp.c:106
+msgid "Sends RTCP packets to this port (0 = auto)"
+msgstr ""
+
+#: modules/access_output/udp.c:107
+msgid "Automatic multicast streaming"
+msgstr ""
+
+#: modules/access_output/udp.c:108
+msgid "Allocates an outbound multicast address automatically."
+msgstr ""
+
+#: modules/access_output/udp.c:110
+msgid "UDP-Lite"
+msgstr ""
+
+#: modules/access_output/udp.c:111
+msgid "Use UDP-Lite/IP instead of normal UDP/IP"
+msgstr ""
+
+#: modules/access_output/udp.c:112
+msgid "Checksum coverage"
+msgstr ""
+
+#: modules/access_output/udp.c:113
+msgid "Payload bytes covered by layer-4 checksum"
+msgstr ""
+
+#: modules/access_output/udp.c:116
+msgid "UDP stream output"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/dolby.c:46
@@ -10057,6 +10087,14 @@ msgstr ""
 msgid "Google Video"
 msgstr ""
 
+#: modules/demux/playlist/luaplaylist.c:56
+msgid "Lua Playlist"
+msgstr ""
+
+#: modules/demux/playlist/luaplaylist.c:57
+msgid "Lua Playlist Parser Interface"
+msgstr ""
+
 #: modules/demux/playlist/playlist.c:36
 msgid "Auto start"
 msgstr ""
@@ -10119,6 +10157,10 @@ msgstr ""
 
 #: modules/demux/playlist/playlist.c:116
 msgid "Dummy ifo demux"
+msgstr ""
+
+#: modules/demux/playlist/playlist.c:120
+msgid "Video portal url converter"
 msgstr ""
 
 #: modules/demux/playlist/podcast.c:237 modules/demux/playlist/podcast.c:251
@@ -10519,7 +10561,7 @@ msgid "Edit"
 msgstr ""
 
 #: modules/gui/beos/PlayListWindow.cpp:103 modules/gui/macosx/intf.m:566
-#: modules/gui/macosx/playlist.m:422
+#: modules/gui/macosx/playlist.m:444
 msgid "Select All"
 msgstr ""
 
@@ -10574,7 +10616,7 @@ msgid "Apply"
 msgstr ""
 
 #: modules/gui/beos/PreferencesWindow.cpp:254 modules/gui/macosx/output.m:526
-#: modules/gui/macosx/playlist.m:660 modules/gui/macosx/prefs.m:121
+#: modules/gui/macosx/playlist.m:682 modules/gui/macosx/prefs.m:121
 msgid "Save"
 msgstr ""
 
@@ -10656,7 +10698,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: modules/gui/macosx/bookmarks.m:144 modules/gui/macosx/playlist.m:656
+#: modules/gui/macosx/bookmarks.m:144 modules/gui/macosx/playlist.m:678
 msgid "Untitled"
 msgstr ""
 
@@ -10777,7 +10819,7 @@ msgstr ""
 msgid "Fast Forward"
 msgstr ""
 
-#: modules/gui/macosx/embeddedwindow.m:89 modules/gui/macosx/intf.m:1525
+#: modules/gui/macosx/embeddedwindow.m:87 modules/gui/macosx/intf.m:1525
 #: modules/gui/macosx/intf.m:1526 modules/gui/macosx/intf.m:1527
 #: modules/gui/macosx/intf.m:1528 modules/gui/pda/pda_interface.c:250
 #: modules/gui/pda/pda_interface.c:251 modules/gui/wxwidgets/interface.cpp:689
@@ -11095,8 +11137,8 @@ msgid "Extended Controls"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:632 modules/gui/macosx/intf.m:665
-#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:358
-#: modules/gui/macosx/playlist.m:423 modules/gui/qt4/dialogs/help.cpp:94
+#: modules/gui/macosx/playlist.m:445 modules/gui/macosx/playlistinfo.m:55
+#: modules/gui/macosx/playlistinfo.m:358 modules/gui/qt4/dialogs/help.cpp:94
 msgid "Information"
 msgstr ""
 
@@ -11428,17 +11470,87 @@ msgstr ""
 msgid "Save File"
 msgstr ""
 
+#: modules/gui/macosx/playlist.m:129 modules/gui/macosx/playlistinfo.m:58
+#: modules/gui/macosx/wizard.m:392 modules/gui/wince/playlist.cpp:674
+#: modules/mux/asf.c:50
+msgid "Author"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:440
+msgid "Save Playlist..."
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:443
+msgid "Expand Node"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:446
+msgid "Get Stream Information"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:447
+msgid "Sort Node by Name"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:448
+msgid "Sort Node by Author"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:451 modules/gui/macosx/playlist.m:494
+#: modules/gui/macosx/playlist.m:1397
+msgid "No items in the playlist"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:456
+msgid "Search in Playlist"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:457
+msgid "Add Folder to Playlist"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:459
+msgid "File Format:"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:460
+msgid "Extended M3U"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:461
+msgid "XML Shareable Playlist Format (XSPF)"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:488 modules/gui/macosx/playlist.m:1390
+#, c-format
+msgid "%i items in the playlist"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:496 modules/gui/macosx/playlist.m:1401
+msgid "1 item in the playlist"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:681
+msgid "Save Playlist"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:1358
+msgid "New Node"
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:1359
+msgid "Please enter a name for the new node."
+msgstr ""
+
+#: modules/gui/macosx/playlist.m:1367
+msgid "Empty Folder"
+msgstr ""
+
 #: modules/gui/macosx/playlistinfo.m:56
 #: modules/gui/qt4/components/infopanels.cpp:52
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:591
 msgid "URI"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/playlist.m:129
-#: modules/gui/macosx/wizard.m:392 modules/gui/wince/playlist.cpp:674
-#: modules/mux/asf.c:50
-msgid "Author"
 msgstr ""
 
 #: modules/gui/macosx/playlistinfo.m:63
@@ -11498,76 +11610,6 @@ msgstr ""
 
 #: modules/gui/macosx/playlistinfo.m:99
 msgid "Lost buffers"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:418
-msgid "Save Playlist..."
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:421
-msgid "Expand Node"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:424
-msgid "Get Stream Information"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:425
-msgid "Sort Node by Name"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:426
-msgid "Sort Node by Author"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:429 modules/gui/macosx/playlist.m:472
-#: modules/gui/macosx/playlist.m:1375
-msgid "No items in the playlist"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:434
-msgid "Search in Playlist"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:435
-msgid "Add Folder to Playlist"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:437
-msgid "File Format:"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:438
-msgid "Extended M3U"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:439
-msgid "XML Shareable Playlist Format (XSPF)"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:466 modules/gui/macosx/playlist.m:1368
-#, c-format
-msgid "%i items in the playlist"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:474 modules/gui/macosx/playlist.m:1379
-msgid "1 item in the playlist"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:659
-msgid "Save Playlist"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:1336
-msgid "New Node"
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:1337
-msgid "Please enter a name for the new node."
-msgstr ""
-
-#: modules/gui/macosx/playlist.m:1345
-msgid "Empty Folder"
 msgstr ""
 
 #: modules/gui/macosx/prefs.m:123
@@ -12830,7 +12872,7 @@ msgstr ""
 msgid "Distribution License"
 msgstr ""
 
-#: modules/gui/qt4/dialogs_provider.cpp:342
+#: modules/gui/qt4/dialogs_provider.cpp:345
 msgid "Open directory"
 msgstr ""
 
@@ -12858,17 +12900,17 @@ msgstr ""
 msgid "All Files"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:737
+#: modules/gui/qt4/main_interface.cpp:797
 #: modules/gui/wxwidgets/input_manager.cpp:287
 msgid "Menu"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:740
+#: modules/gui/qt4/main_interface.cpp:800
 #: modules/gui/wxwidgets/input_manager.cpp:290
 msgid "Previous track"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:741
+#: modules/gui/qt4/main_interface.cpp:801
 #: modules/gui/wxwidgets/input_manager.cpp:291
 msgid "Next track"
 msgstr ""
@@ -12903,11 +12945,19 @@ msgid ""
 "taskbar"
 msgstr ""
 
-#: modules/gui/qt4/qt4.cpp:61 modules/gui/qt4/qt4.cpp:62
+#: modules/gui/qt4/qt4.cpp:61
+msgid "Show playing item name in window title"
+msgstr ""
+
+#: modules/gui/qt4/qt4.cpp:62
+msgid "Show the name of the song or video in the controler window title"
+msgstr ""
+
+#: modules/gui/qt4/qt4.cpp:65 modules/gui/qt4/qt4.cpp:66
 msgid "path to use in file dialog"
 msgstr ""
 
-#: modules/gui/qt4/qt4.cpp:66
+#: modules/gui/qt4/qt4.cpp:70
 msgid "Qt interface"
 msgstr ""
 
@@ -13081,6 +13131,11 @@ msgstr ""
 msgid "WinCE dialogs provider"
 msgstr ""
 
+#: modules/gui/wxwidgets/dialogs.cpp:439
+#: modules/gui/wxwidgets/dialogs/open.cpp:1261
+msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
+msgstr ""
+
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:75
 msgid "Edit bookmark"
 msgstr ""
@@ -13164,11 +13219,6 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:452
 msgid "Input has changed "
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs.cpp:439
-#: modules/gui/wxwidgets/dialogs/open.cpp:1261
-msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
@@ -14874,10 +14924,6 @@ msgstr ""
 msgid "Output data for RRDTool in this file."
 msgstr ""
 
-#: modules/misc/memcpy/memcpyaltivec.c:56
-msgid "AltiVec memcpy"
-msgstr ""
-
 #: modules/misc/memcpy/memcpy.c:83
 msgid "libc memcpy"
 msgstr ""
@@ -14892,6 +14938,10 @@ msgstr ""
 
 #: modules/misc/memcpy/memcpy.c:99
 msgid "MMX EXT memcpy"
+msgstr ""
+
+#: modules/misc/memcpy/memcpyaltivec.c:56
+msgid "AltiVec memcpy"
 msgstr ""
 
 #: modules/misc/notify/growl.c:57
