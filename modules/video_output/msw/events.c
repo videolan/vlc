@@ -57,6 +57,13 @@
 #include "vlc_keys.h"
 #include "vout.h"
 
+#if defined(UNDER_CE) && !defined(__PLUGIN__) /*FIXME*/
+#   define SHFS_SHOWSIPBUTTON 0x0004
+#   define SHFS_HIDESIPBUTTON 0x0008
+#   define MENU_HEIGHT 26
+    BOOL SHFullScreen(HWND hwndRequester, DWORD dwState);
+#endif
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -82,14 +89,14 @@ static void DirectXPopupMenu( event_thread_t *p_event, vlc_bool_t b_open )
 static int DirectXConvertKey( int i_key );
 
 /*****************************************************************************
- * DirectXEventThread: Create video window & handle its messages
+ * EventThread: Create video window & handle its messages
  *****************************************************************************
  * This function creates a video window and then enters an infinite loop
  * that handles the messages sent to that window.
  * The main goal of this thread is to isolate the Win32 PeekMessage function
  * because this one can block for a long time.
  *****************************************************************************/
-void E_(DirectXEventThread)( event_thread_t *p_event )
+void E_(EventThread)( event_thread_t *p_event )
 {
     MSG msg;
     POINT old_mouse_pos = {0,0}, mouse_pos;
@@ -112,6 +119,7 @@ void E_(DirectXEventThread)( event_thread_t *p_event )
     /* Signal the creation of the window */
     vlc_thread_ready( p_event );
 
+#ifndef UNDER_CE
     /* Set power management stuff */
     if( (hkernel32 = GetModuleHandle( _T("KERNEL32") ) ) )
     {
@@ -126,6 +134,7 @@ void E_(DirectXEventThread)( event_thread_t *p_event )
         else
             msg_Dbg( p_event, "no support for SetThreadExecutionState()" );
     }
+#endif
 
     /* Main loop */
     /* GetMessage will sleep if there's no message in the queue */
@@ -307,6 +316,12 @@ void E_(DirectXEventThread)( event_thread_t *p_event )
             {
                 if( val.psz_string ) free( val.psz_string );
 
+#ifdef MODULE_NAME_IS_wingdi
+                val.psz_string = strdup( VOUT_TITLE " (WinGDI output)" );
+#endif
+#ifdef MODULE_NAME_IS_wingapi
+                val.psz_string = strdup( VOUT_TITLE " (WinGAPI output)" );
+#endif
 #ifdef MODULE_NAME_IS_glwin32
                 val.psz_string = strdup( VOUT_TITLE " (OpenGL output)" );
 #endif
@@ -315,11 +330,11 @@ void E_(DirectXEventThread)( event_thread_t *p_event )
 #endif
 #ifdef MODULE_NAME_IS_vout_directx
                 if( p_event->p_vout->p_sys->b_using_overlay ) val.psz_string = 
-                strdup( VOUT_TITLE " (hardware YUV overlay DirectX output)" );
+                    strdup( VOUT_TITLE " (hardware YUV overlay DirectX output)" );
                 else if( p_event->p_vout->p_sys->b_hw_yuv ) val.psz_string = 
-                strdup( VOUT_TITLE " (hardware YUV DirectX output)" );
+                    strdup( VOUT_TITLE " (hardware YUV DirectX output)" );
                 else val.psz_string = 
-                strdup( VOUT_TITLE " (software RGB DirectX output)" );
+                    strdup( VOUT_TITLE " (software RGB DirectX output)" );
 #endif
             }
 
@@ -585,13 +600,13 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * DirectXUpdateRects: update clipping rectangles
+ * UpdateRects: update clipping rectangles
  *****************************************************************************
  * This function is called when the window position or size are changed, and
  * its job is to update the source and destination RECTs used to display the
  * picture.
  *****************************************************************************/
-void E_(DirectXUpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
+void E_(UpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
 {
 #define rect_src p_vout->p_sys->rect_src
 #define rect_src_clipped p_vout->p_sys->rect_src_clipped
@@ -682,7 +697,7 @@ void E_(DirectXUpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
     }
 #else /* MODULE_NAME_IS_vout_directx */
 
-    /* AFAIK, there are no clipping constraints in Direct3D or OpenGL */
+    /* AFAIK, there are no clipping constraints in Direct3D, OpenGL and GDI */
     rect_dest_clipped = rect_dest;
 
 #endif
@@ -742,7 +757,7 @@ void E_(DirectXUpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
     rect_dest_clipped.bottom -= p_vout->p_sys->rect_display.top;
 
     if( p_vout->p_sys->b_using_overlay )
-        E_(DirectXUpdateOverlay)( p_vout );
+        DirectDrawUpdateOverlay( p_vout );
 #endif
 
     /* Signal the change in size/position */
@@ -788,6 +803,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         }
     }
 
+#ifndef UNDER_CE
     /* Catch the screensaver and the monitor turn-off */
     if( message == WM_SYSCOMMAND &&
         ( (wParam & 0xFFF0) == SC_SCREENSAVE || (wParam & 0xFFF0) == SC_MONITORPOWER ) )
@@ -795,6 +811,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         //if( p_vout ) msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND screensaver" );
         return 0; /* this stops them from happening */
     }
+#endif
 
     if( hwnd == p_vout->p_sys->hvideownd )
     {
@@ -841,7 +858,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     {
 
     case WM_WINDOWPOSCHANGED:
-        E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
+        E_(UpdateRects)( p_vout, VLC_TRUE );
         return 0;
 
     /* the user wants to close the window */
@@ -888,6 +905,50 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     case WM_NCPAINT:
     case WM_ERASEBKGND:
         return DefWindowProc(hwnd, message, wParam, lParam);
+
+    case WM_KILLFOCUS:
+#ifdef MODULE_NAME_IS_wingapi
+        p_vout->p_sys->b_focus = VLC_FALSE;
+        if( !p_vout->p_sys->b_parent_focus ) GXSuspend();
+#endif
+#ifdef UNDER_CE
+        if( hWnd == p_vout->p_sys->hfswnd )
+        {
+            HWND htbar = FindWindow( _T("HHTaskbar"), NULL );
+            ShowWindow( htbar, SW_SHOW );
+        }
+
+        if( !p_vout->p_sys->hparent ||
+            hWnd == p_vout->p_sys->hfswnd )
+        {
+            SHFullScreen( hWnd, SHFS_SHOWSIPBUTTON );
+        }
+#endif
+        return 0;
+
+    case WM_SETFOCUS:
+#ifdef MODULE_NAME_IS_wingapi
+        p_vout->p_sys->b_focus = VLC_TRUE;
+        GXResume();
+#endif
+#ifdef UNDER_CE
+        if( p_vout->p_sys->hparent &&
+            hWnd != p_vout->p_sys->hfswnd && p_vout->b_fullscreen )
+            p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
+
+        if( hWnd == p_vout->p_sys->hfswnd )
+        {
+            HWND htbar = FindWindow( _T("HHTaskbar"), NULL );
+            ShowWindow( htbar, SW_HIDE );
+        }
+
+        if( !p_vout->p_sys->hparent ||
+            hWnd == p_vout->p_sys->hfswnd )
+        {
+            SHFullScreen( hWnd, SHFS_HIDESIPBUTTON );
+        }
+#endif
+        return 0;
 
     default:
         //msg_Dbg( p_vout, "WinProc WM Default %i", message );
@@ -1062,6 +1123,15 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
         p_vout->p_sys->b_on_top_change = VLC_TRUE;
         return VLC_SUCCESS;
+
+#ifdef MODULE_NAME_IS_wingapi
+    case VOUT_SET_FOCUS:
+        b_bool = va_arg( args, vlc_bool_t );
+        p_vout->p_sys->b_parent_focus = b_bool;
+        if( b_bool ) GXResume();
+        else if( !p_vout->p_sys->b_focus ) GXSuspend();
+        return VLC_SUCCESS;
+#endif
 
     default:
         return vout_vaControlDefault( p_vout, i_query, args );

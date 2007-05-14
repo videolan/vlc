@@ -108,7 +108,6 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
     p_vout->p_sys->hparent = p_vout->p_sys->hfswnd = NULL;
     p_vout->p_sys->i_changes = 0;
-    p_vout->p_sys->b_wallpaper = 0;
     vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
     SetRectEmpty( &p_vout->p_sys->rect_display );
     SetRectEmpty( &p_vout->p_sys->rect_parent );
@@ -122,21 +121,21 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->i_window_width = p_vout->i_window_width;
     p_vout->p_sys->i_window_height = p_vout->i_window_height;
 
-    /* Create the DirectXEventThread, this thread is created by us to isolate
+    /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
      * Windows can stay blocked inside this call for a long time, and when
      * this happens it thus blocks vlc's video_output thread.
-     * DirectXEventThread will take care of the creation of the video
+     * Vout EventThread will take care of the creation of the video
      * window (because PeekMessage has to be called from the same thread which
      * created the window). */
-    msg_Dbg( p_vout, "creating DirectXEventThread" );
+    msg_Dbg( p_vout, "creating Vout EventThread" );
     p_vout->p_sys->p_event =
         vlc_object_create( p_vout, sizeof(event_thread_t) );
     p_vout->p_sys->p_event->p_vout = p_vout;
-    if( vlc_thread_create( p_vout->p_sys->p_event, "DirectX Events Thread",
-                           E_(DirectXEventThread), 0, 1 ) )
+    if( vlc_thread_create( p_vout->p_sys->p_event, "Vout Events Thread",
+                           E_(EventThread), 0, 1 ) )
     {
-        msg_Err( p_vout, "cannot create DirectXEventThread" );
+        msg_Err( p_vout, "cannot create Vout EventThread" );
         vlc_object_destroy( p_vout->p_sys->p_event );
         p_vout->p_sys->p_event = NULL;
         goto error;
@@ -144,13 +143,13 @@ static int OpenVideo( vlc_object_t *p_this )
 
     if( p_vout->p_sys->p_event->b_error )
     {
-        msg_Err( p_vout, "DirectXEventThread failed" );
+        msg_Err( p_vout, "Vout EventThread failed" );
         goto error;
     }
 
     vlc_object_attach( p_vout->p_sys->p_event, p_vout );
 
-    msg_Dbg( p_vout, "DirectXEventThread running" );
+    msg_Dbg( p_vout, "Vout EventThread running" );
 
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
@@ -225,10 +224,10 @@ static void CloseVideo( vlc_object_t *p_this )
     {
         vlc_object_detach( p_vout->p_sys->p_event );
 
-        /* Kill DirectXEventThread */
+        /* Kill Vout EventThread */
         p_vout->p_sys->p_event->b_die = VLC_TRUE;
 
-        /* we need to be sure DirectXEventThread won't stay stuck in
+        /* we need to be sure Vout EventThread won't stay stuck in
          * GetMessage, so we send a fake message */
         if( p_vout->p_sys->hwnd )
         {
@@ -312,7 +311,7 @@ static int Manage( vout_thread_t *p_vout )
         p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
         p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
         p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;
-        E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
+        E_(UpdateRects)( p_vout, VLC_TRUE );
     }
 
     /* We used to call the Win32 PeekMessage function here to read the window

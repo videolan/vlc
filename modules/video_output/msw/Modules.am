@@ -15,3 +15,15 @@ SOURCES_glwin32 = \
 	vout.h \
 	events.c \
 	$(NULL)
+
+SOURCES_wingdi = \
+	wingdi.c \
+	vout.h \
+	events.c \
+	$(NULL)
+
+SOURCES_wingapi = \
+	windi.c \
+	vout.h \
+	events.c \
+	$(NULL)

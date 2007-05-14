@@ -264,7 +264,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->i_window_width = p_vout->i_window_width;
     p_vout->p_sys->i_window_height = p_vout->i_window_height;
 
-    /* Create the DirectXEventThread, this thread is created by us to isolate
+    /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
      * Windows can stay blocked inside this call for a long time, and when
      * this happens it thus blocks vlc's video_output thread.
@@ -275,10 +275,10 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->p_event =
         vlc_object_create( p_vout, sizeof(event_thread_t) );
     p_vout->p_sys->p_event->p_vout = p_vout;
-    if( vlc_thread_create( p_vout->p_sys->p_event, "DirectX Events Thread",
-                           E_(DirectXEventThread), 0, 1 ) )
+    if( vlc_thread_create( p_vout->p_sys->p_event, "Vout Events Thread",
+                           E_(EventThread), 0, 1 ) )
     {
-        msg_Err( p_vout, "cannot create DirectXEventThread" );
+        msg_Err( p_vout, "cannot create Vout EventThread" );
         vlc_object_destroy( p_vout->p_sys->p_event );
         p_vout->p_sys->p_event = NULL;
         goto error;
@@ -286,25 +286,25 @@ static int OpenVideo( vlc_object_t *p_this )
 
     if( p_vout->p_sys->p_event->b_error )
     {
-        msg_Err( p_vout, "DirectXEventThread failed" );
+        msg_Err( p_vout, "Vout EventThread failed" );
         goto error;
     }
 
     vlc_object_attach( p_vout->p_sys->p_event, p_vout );
 
-    msg_Dbg( p_vout, "DirectXEventThread running" );
+    msg_Dbg( p_vout, "Vout EventThread running" );
 
     /* Initialise DirectDraw */
     if( DirectXInitDDraw( p_vout ) )
     {
-        msg_Err( p_vout, "cannot initialize DirectDraw" );
+        msg_Err( p_vout, "cannot initialize DirectX DirectDraw" );
         goto error;
     }
 
     /* Create the directx display */
     if( DirectXCreateDisplay( p_vout ) )
     {
-        msg_Err( p_vout, "cannot initialize DirectDraw" );
+        msg_Err( p_vout, "cannot initialize DirectX DirectDraw" );
         goto error;
     }
 
@@ -399,7 +399,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
     p_vout->fmt_out = p_vout->fmt_in;
-    E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
+    E_(UpdateRects)( p_vout, VLC_TRUE );
 
 #define MAX_DIRECTBUFFERS 1
     /* Right now we use only 1 directbuffer because we don't want the
@@ -492,10 +492,10 @@ static void CloseVideo( vlc_object_t *p_this )
     {
         vlc_object_detach( p_vout->p_sys->p_event );
 
-        /* Kill DirectXEventThread */
+        /* Kill Vout EventThread */
         p_vout->p_sys->p_event->b_die = VLC_TRUE;
 
-        /* we need to be sure DirectXEventThread won't stay stuck in
+        /* we need to be sure Vout EventThread won't stay stuck in
          * GetMessage, so we send a fake message */
         if( p_vout->p_sys->hwnd )
         {
@@ -608,7 +608,7 @@ static int Manage( vout_thread_t *p_vout )
         p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
         p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
         p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;
-        E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
+        E_(UpdateRects)( p_vout, VLC_TRUE );
     }
 
     /* We used to call the Win32 PeekMessage function here to read the window
@@ -620,7 +620,7 @@ static int Manage( vout_thread_t *p_vout )
     {
         SwitchWallpaperMode( p_vout, !p_vout->p_sys->b_wallpaper );
         p_vout->p_sys->i_changes &= ~DX_WALLPAPER_CHANGE;
-        E_(DirectXUpdateOverlay)( p_vout );
+        DirectDrawUpdateOverlay( p_vout );
     }
 
     /*
@@ -722,7 +722,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     {
         if( IDirectDrawSurface2_Restore( p_vout->p_sys->p_display ) == DD_OK &&
             p_vout->p_sys->b_using_overlay )
-            E_(DirectXUpdateOverlay)( p_vout );
+            DirectDrawUpdateOverlay( p_vout );
     }
 
     if( !p_vout->p_sys->b_using_overlay )
@@ -1056,7 +1056,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->i_rgb_colorkey =
         DirectXFindColorkey( p_vout, &p_vout->p_sys->i_colorkey );
 
-    E_(DirectXUpdateRects)( p_vout, VLC_TRUE );
+    E_(UpdateRects)( p_vout, VLC_TRUE );
 
     return VLC_SUCCESS;
 }
@@ -1224,7 +1224,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
         /* Check the overlay is useable as some graphics cards allow creating
          * several overlays but only one can be used at one time. */
         p_vout->p_sys->p_current_surface = *pp_surface_final;
-        if( E_(DirectXUpdateOverlay)( p_vout ) != VLC_SUCCESS )
+        if( DirectDrawUpdateOverlay( p_vout ) != VLC_SUCCESS )
         {
             IDirectDrawSurface2_Release( *pp_surface_final );
             *pp_surface_final = NULL;
@@ -1237,13 +1237,13 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
 }
 
 /*****************************************************************************
- * DirectXUpdateOverlay: Move or resize overlay surface on video display.
+ * DirectDrawUpdateOverlay: Move or resize overlay surface on video display.
  *****************************************************************************
  * This function is used to move or resize an overlay surface on the screen.
  * Ususally the overlay is moved by the user and thus, by a move or resize
  * event (in Manage).
  *****************************************************************************/
-int E_(DirectXUpdateOverlay)( vout_thread_t *p_vout )
+int DirectDrawUpdateOverlay( vout_thread_t *p_vout )
 {
     DDOVERLAYFX     ddofx;
     DWORD           dwFlags;
@@ -1299,7 +1299,7 @@ int E_(DirectXUpdateOverlay)( vout_thread_t *p_vout )
 
     if(dxresult != DD_OK)
     {
-        msg_Warn( p_vout, "DirectXUpdateOverlay cannot move/resize overlay" );
+        msg_Warn( p_vout, "DirectDrawUpdateOverlay cannot move/resize overlay" );
         return VLC_EGENERIC;
     }
 
@@ -1465,7 +1465,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                 DirectXUnlockSurface( p_vout, &front_pic );
             }
 
-            E_(DirectXUpdateOverlay)( p_vout );
+            DirectDrawUpdateOverlay( p_vout );
             I_OUTPUTPICTURES = 1;
             msg_Dbg( p_vout, "YUV overlay created successfully" );
         }

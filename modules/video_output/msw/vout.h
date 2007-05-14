@@ -1,10 +1,11 @@
 /*****************************************************************************
- * vout.h: Windows DirectX video output header file
+ * vout.h: Windows video output header file
  *****************************************************************************
  * Copyright (C) 2001-2004 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
+ *          Damien Fouilleul <damienf@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +23,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * event_thread_t: DirectX event thread
+ * event_thread_t: event thread
  *****************************************************************************/
 typedef struct event_thread_t
 {
@@ -33,10 +34,10 @@ typedef struct event_thread_t
 } event_thread_t;
 
 /*****************************************************************************
- * vout_sys_t: video output DirectX method descriptor
+ * vout_sys_t: video output method descriptor
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
- * It describes the DirectX specific properties of an output thread.
+ * It describes the module specific properties of an output thread.
  *****************************************************************************/
 struct vout_sys_t
 {
@@ -75,12 +76,14 @@ struct vout_sys_t
     /* Misc */
     vlc_bool_t      b_on_top_change;
 
-    vlc_bool_t      b_wallpaper;
+#ifndef UNDER_CE
 
     /* screensaver system settings to be restored when vout is closed */
     UINT i_spi_lowpowertimeout;
     UINT i_spi_powerofftimeout;
     UINT i_spi_screensavetimeout;
+
+#endif
 
     /* Coordinates of src and dest images (used when blitting to display) */
     RECT         rect_src;
@@ -90,12 +93,15 @@ struct vout_sys_t
 
     vlc_bool_t   b_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
 
+
 #ifdef MODULE_NAME_IS_vout_directx
     /* Overlay alignment restrictions */
     int          i_align_src_boundary;
     int          i_align_src_size;
     int          i_align_dest_boundary;
     int          i_align_dest_size;
+
+    vlc_bool_t      b_wallpaper;    /* show as desktop wallpaper ? */
 
     vlc_bool_t   b_using_overlay;         /* Are we using an overlay surface */
     vlc_bool_t   b_use_sysmem;   /* Should we use system memory for surfaces */
@@ -133,20 +139,62 @@ struct vout_sys_t
     LPDIRECT3DVERTEXBUFFER9 p_d3dvtc;
 #endif
 
+#ifdef MODULE_NAME_IS_wingdi
+
+    int  i_depth;
+
+    /* Our offscreen bitmap and its framebuffer */
+    HDC        off_dc;
+    HBITMAP    off_bitmap;
+    uint8_t *  p_pic_buffer;
+    int        i_pic_pitch;
+    int        i_pic_pixel_pitch;
+
+    BITMAPINFO bitmapinfo;
+    RGBQUAD    red;
+    RGBQUAD    green;
+    RGBQUAD    blue;
+#endif
+
+#ifdef MODULE_NAME_IS_wingapi
+    int        i_depth;
+    int        render_width;
+    int        render_height;
+
+    vlc_bool_t b_focus;
+    vlc_bool_t b_parent_focus;
+
+    HINSTANCE  gapi_dll;                    /* handle of the opened gapi dll */
+
+    /* GAPI functions */
+    int (*GXOpenDisplay)( HWND hWnd, DWORD dwFlags );
+    int (*GXCloseDisplay)();
+    void *(*GXBeginDraw)();
+    int (*GXEndDraw)();
+    GXDisplayProperties (*GXGetDisplayProperties)();
+    int (*GXSuspend)();
+    int (*GXResume)();
+#endif
+
+#ifndef UNDER_CE
+    /* suspend display */
+    vlc_bool_t   b_suspend_display;
+#endif
+
     event_thread_t *p_event;
     vlc_mutex_t    lock;
 };
 
 /*****************************************************************************
- * Prototypes from vout.c
+ * Prototypes from directx.c
  *****************************************************************************/
-int E_(DirectXUpdateOverlay)( vout_thread_t *p_vout );
+int DirectDrawUpdateOverlay( vout_thread_t *p_vout );
 
 /*****************************************************************************
  * Prototypes from events.c
  *****************************************************************************/
-void E_(DirectXEventThread) ( event_thread_t *p_event );
-void E_(DirectXUpdateRects) ( vout_thread_t *p_vout, vlc_bool_t b_force );
+void E_(EventThread) ( event_thread_t *p_event );
+void E_(UpdateRects) ( vout_thread_t *p_vout, vlc_bool_t b_force );
 void Win32ToggleFullscreen ( vout_thread_t *p_vout );
 
 /*****************************************************************************

@@ -5916,7 +5916,7 @@ AC_CONFIG_FILES([
   modules/video_chroma/Makefile
   modules/video_filter/Makefile
   modules/video_output/Makefile
-  modules/video_output/directx/Makefile
+  modules/video_output/msw/Makefile
   modules/video_output/qte/Makefile
   modules/video_output/x11/Makefile
   modules/visualization/Makefile
