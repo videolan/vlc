@@ -162,7 +162,10 @@ public class JVLC implements Runnable {
 	 * @see java.lang.Object#finalize()
 	 */
 	protected void finalize() throws Throwable {
-		destroy();
+		if (!beingDestroyed)
+		{
+			destroy();
+		}
 		super.finalize();
 	}
 
