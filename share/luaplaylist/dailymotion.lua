@@ -15,8 +15,13 @@ function parse()
         if not line then break end
         if string.match( line, "param name=\"flashvars\" value=\"url=" )
         then
-            return { { url = vlc.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\"url=([^&]*).*$", "%1" ) ) } }
+            url = vlc.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\"url=([^&]*).*$", "%1" ) )
         end
+        if string.match( line, "<title>" )
+        then
+            title = vlc.decode_uri( string.gsub( line, "^.*<title>([^<]*).*$", "%1" ) )
+        end
+        if url and title then break end
     end
-    return {}
+    return { { url = url; title = title } }
 end
