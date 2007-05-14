@@ -124,7 +124,12 @@ FFMPEGCONF+= --enable-mingwce --cpu=armv4l --disable-debug --disable-encoders --
 endif
 
 ifdef HAVE_UCLIBC
-FFMPEGCONF+= --enable-small --arch=armeb --disable-debug --disable-encoders --disable-muxers --disable-demuxer=mpegts --disable-v4l --disable-v4l2 --disable-bktr --disable-dv1394 --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols --disable-encoders
+ifdef HAVE_BIGENDIAN
+FFMPEGCONF+= --arch=armeb
+else
+FFMPEGCONF+= --arch=armv4l
+endif
+FFMPEGCONF+= --enable-small --disable-debug --disable-encoders --disable-muxers --disable-demuxer=mpegts --disable-v4l --disable-v4l2 --disable-bktr --disable-dv1394 --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols --disable-encoders
 FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
 else
 FFMPEGCONF+= --enable-libmp3lame --enable-libfaac --enable-liba52
@@ -1098,6 +1103,9 @@ ifdef HAVE_DARWIN_OS
 endif
 	patch -p0 < Patches/live-starttime.patch
 	patch -p0 < Patches/live-config.patch
+ifdef HAVE_UCLIBC
+	patch -p0 < Patches/live-noapps.patch
+endif
 
 .live: live
 ifdef HAVE_WIN32 
@@ -1111,7 +1119,13 @@ ifdef HAVE_DARWIN_OS
 	(cd $<; ./genMakefiles macosx && make)
 else
 	(cd $<; sed -e 's/=/= EXTRA_CPPFLAGS/' -e 's%EXTRA_CPPFLAGS%-I/include%' -i.orig groupsock/Makefile.head)
+ifdef HAVE_UCLIBC
+ifdef HAVE_BIGENDIAN
+	(cd $<; ./genMakefiles armeb-uclibc && make $(HOSTCC))
+endif
+else
 	(cd $<; ./genMakefiles linux && make $(HOSTCC))
+endif
 endif
 endif
 endif
