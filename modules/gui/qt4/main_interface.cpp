@@ -332,8 +332,7 @@ void MainInterface::handleSystrayClick( QSystemTrayIcon::ActivationReason reason
             this->toggleVisible(); break;
         case QSystemTrayIcon::MiddleClick:
             sysTray->showMessage( qtr( "VLC media player" ),
-                    qtr( "Control menu for the player" )
-                    + nameLabel->text() ,
+                    qtr( "Control menu for the player" ),
                     QSystemTrayIcon::Information, 4000 );
             break;
     }
