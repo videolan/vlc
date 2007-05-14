@@ -178,6 +178,14 @@ case $HOST in
             EXTRA_CPPFLAGS=" -D_WIN32_WCE"
             cat src/Distributions/wince.mak >> distro.mak
         ;;
+    armeb-linux-uclibc)
+            echo "HAVE_UCLIBC = 1" >> config.mak
+            if test ! -z "${DISTRO}";  then
+                cat src/Distributions/${DISTRO}.mak >> distro.mak
+            else
+                cat src/Distributions/unix.mak >> distro.mak
+            fi
+        ;;
     *)
             if test "$HOST" = "$BUILD"; then
                 if test -d "/usr/lib/pkgconfig"; then

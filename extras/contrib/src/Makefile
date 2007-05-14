@@ -101,12 +101,12 @@ ifneq ($(BUILD),$(HOST))
     #
     ifndef HAVE_CYGWIN
         # We are REALLY cross compiling
-        FFMPEGCONF=--cross-prefix=$(HOST)-
+        FFMPEGCONF=--cross-prefix=$(HOST)- --cross-compile
         X264CONF=--crosscompile=$(HOST)
-	    PTHREADSCONF="CROSS=$(HOST)-"
+        PTHREADSCONF="CROSS=$(HOST)-"
     else
         # We are compiling for MinGW on Cygwin
-	    PTHREADSCONF=$(HOSTCC)
+        PTHREADSCONF=$(HOSTCC)
     endif
 endif
 
@@ -121,8 +121,13 @@ endif
 ifdef HAVE_WINCE
 HOSTCONF+= --without-pic --disable-shared
 FFMPEGCONF+= --enable-mingwce --cpu=armv4l --disable-debug --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols
+endif
+
+ifdef HAVE_UCLIBC
+FFMPEGCONF+= --enable-small --arch=armeb --disable-debug --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols
+FFMPEG_CFLAGS += --std=c99
 else
-FFMPEGCONF+= --enable-libmp3lame --enable-libfaac
+FFMPEGCONF+= --enable-libmp3lame --enable-libfaac --enable-liba52
 endif
 
 ifdef HAVE_BEOS
@@ -400,6 +405,7 @@ libiconv: libiconv-$(LIBICONV_VERSION).tar.gz
 ifdef HAVE_DARWIN_OS
 	patch -p0 < Patches/libiconv.patch
 endif
+	patch -p0 < Patches/libiconv-autoconf-uclibc.patch
 
 ifdef HAVE_DARWIN_OS
 .iconv:
@@ -918,6 +924,9 @@ endif
 ifdef HAVE_BEOS
 	(cd $@; patch -p0 < ../Patches/ffmpeg-alignment.patch)
 endif
+ifdef HAVE_UCLIBC
+	(cd $@; patch -p1 < ../Patches/ffmpeg-svn-uclibc.patch)
+endif
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	$(WGET) $(FFMPEG_URL)
@@ -929,9 +938,13 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 ifdef HAVE_WINCE
 .ffmpeg: ffmpeg .zlib
 else
+ifdef HAVE_UCLIBC
+.ffmpeg: ffmpeg
+else
 .ffmpeg: ffmpeg .faac .lame
 endif
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --enable-liba52 --disable-ffplay && make && make install-libs install-headers)
+endif
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-network --disable-ffplay && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN

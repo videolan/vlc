@@ -1,0 +1,24 @@
+--- libiconv/autoconf/config.sub.orig	2007-05-14 14:14:12.000000000 +0200
++++ libiconv/autoconf/config.sub	2007-05-14 14:17:36.000000000 +0200
+@@ -1102,6 +1102,9 @@
+ 	-unixware*)
+ 		os=-sysv4.2uw
+ 		;;
++	-uclibc*)
++		os=-linux
++		;;
+ 	-gnu/linux*)
+ 		os=`echo $os | sed -e 's|gnu/linux|linux-gnu|'`
+ 		;;
+--- libiconv/libcharset/autoconf/config.sub.orig	2007-05-14 14:34:11.000000000 +0200
++++ libiconv/libcharset/autoconf/config.sub	2007-05-14 14:35:09.000000000 +0200
+@@ -1102,6 +1102,9 @@
+ 	-unixware*)
+ 		os=-sysv4.2uw
+ 		;;
++	-uclibc*)
++		os=-linux
++		;;
+ 	-gnu/linux*)
+ 		os=`echo $os | sed -e 's|gnu/linux|linux-gnu|'`
+ 		;;
