@@ -295,7 +295,7 @@ static struct config_category_t categories_array[] =
     { -1, NULL, NULL }
 };
 
-static inline char *config_CategoryNameGet( int i_value )
+static inline const char *config_CategoryNameGet( int i_value )
 {
     int i = 0 ;
     while( categories_array[i].psz_name != NULL )
@@ -309,7 +309,7 @@ static inline char *config_CategoryNameGet( int i_value )
     return NULL;
 }
 
-static inline char *config_CategoryHelpGet( int i_value )
+static inline const char *config_CategoryHelpGet( int i_value )
 {
     int i = 0 ;
     while( categories_array[i].psz_help != NULL )

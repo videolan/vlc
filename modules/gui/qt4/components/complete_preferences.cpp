@@ -97,7 +97,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     for (size_t i = 0; i < p_module->confsize; i++)
     {
         const module_config_t *p_item = p_module->p_config + i;
-        char *psz_help;
+        const char *psz_help;
         QIcon icon;
         switch( p_item->i_type )
         {
