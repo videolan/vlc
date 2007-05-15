@@ -97,7 +97,15 @@ static int vlclua_readline( lua_State *p_state )
 {
     demux_t *p_demux = vlclua_get_demux( p_state );
     char *psz_line = stream_ReadLine( p_demux->s );
-    lua_pushstring( p_state, psz_line );
+    if( psz_line )
+    {
+        lua_pushstring( p_state, psz_line );
+        free( psz_line );
+    }
+    else
+    {
+        lua_pushnil( p_state );
+    }
     return 1;
 }
 
