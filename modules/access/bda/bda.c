@@ -49,7 +49,11 @@ static int Control( access_t *, int, va_list );
 #define DEVICE_LONGTEXT ""
 
 #define FREQ_TEXT N_("Transponder/multiplex frequency")
-#define FREQ_LONGTEXT N_("In kHz for DVB-S or Hz for DVB-C/T")
+#if defined(WIN32) || defined(WINCE)
+#    define FREQ_LONGTEXT N_("In kHz for DVB-S or Hz for DVB-C/T")
+#else
+#    define FREQ_LONGTEXT N_("In kHz for DVB-C/S/T")
+#endif
 
 #define INVERSION_TEXT N_("Inversion mode")
 #define INVERSION_LONGTEXT N_("Inversion mode [0=off, 1=on, 2=auto]")
@@ -495,11 +499,17 @@ static block_t *Block( access_t *p_access )
 
     l_buffer_len = dvb_GetBufferSize( p_access );
     if( l_buffer_len < 0 )
+    {
+        p_access->info.b_eof = VLC_TRUE;
         return NULL;
+    }
 
     p_block = block_New( p_access, l_buffer_len );
     if( dvb_ReadBuffer( p_access, &l_buffer_len, p_block->p_buffer ) < 0 )
+    {
+        p_access->info.b_eof = VLC_TRUE;
         return NULL;
+    }
 
     return p_block;
 }

@@ -37,38 +37,51 @@ extern "C" {
 
     void dvb_deleteBDAGraph( access_t* p_access )
     {
-        delete p_access->p_sys->p_bda_module;
+        if( p_access->p_sys->p_bda_module )
+            delete p_access->p_sys->p_bda_module;
     };
 
     int dvb_SubmitATSCTuneRequest( access_t* p_access )
     {
-        return p_access->p_sys->p_bda_module->SubmitATSCTuneRequest();
+        if( p_access->p_sys->p_bda_module )
+            return p_access->p_sys->p_bda_module->SubmitATSCTuneRequest();
+        return VLC_EGENERIC;
     };
 
     int dvb_SubmitDVBTTuneRequest( access_t* p_access )
     {
-        return p_access->p_sys->p_bda_module->SubmitDVBTTuneRequest();
+        if( p_access->p_sys->p_bda_module )
+            return p_access->p_sys->p_bda_module->SubmitDVBTTuneRequest();
+        return VLC_EGENERIC;
     };
 
     int dvb_SubmitDVBCTuneRequest( access_t* p_access )
     {
-        return p_access->p_sys->p_bda_module->SubmitDVBCTuneRequest();
+        if( p_access->p_sys->p_bda_module )
+            return p_access->p_sys->p_bda_module->SubmitDVBCTuneRequest();
+        return VLC_EGENERIC;
     };    
 
     int dvb_SubmitDVBSTuneRequest( access_t* p_access )
     {
-        return p_access->p_sys->p_bda_module->SubmitDVBSTuneRequest();
+        if( p_access->p_sys->p_bda_module )
+            return p_access->p_sys->p_bda_module->SubmitDVBSTuneRequest();
+        return VLC_EGENERIC;
     };
 
     long dvb_GetBufferSize( access_t* p_access )
     {
-        return p_access->p_sys->p_bda_module->GetBufferSize();
+        if( p_access->p_sys->p_bda_module )
+            return p_access->p_sys->p_bda_module->GetBufferSize();
+        return -1;
     };
 
     long dvb_ReadBuffer( access_t* p_access, long* l_buffer_len, BYTE* p_buff )
     {
-        return p_access->p_sys->p_bda_module->ReadBuffer( l_buffer_len, 
-            p_buff );
+        if( p_access->p_sys->p_bda_module )
+            return p_access->p_sys->p_bda_module->ReadBuffer( l_buffer_len, 
+                p_buff );
+        return -1;
     };
 };
 
@@ -460,7 +473,7 @@ int BDAGraph::SubmitDVBSTuneRequest()
     hr = CreateTuneRequest();
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
+        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
             "Cannot create Tune Request: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
@@ -469,7 +482,7 @@ int BDAGraph::SubmitDVBSTuneRequest()
         (void**)&l.p_dvbs_tune_request );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
+        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
             "Cannot QI for IDVBTuneRequest: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
@@ -481,7 +494,7 @@ int BDAGraph::SubmitDVBSTuneRequest()
         IID_IDVBSLocator, (void**)&l.p_dvbs_locator );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
+        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
             "Cannot create the DVBS Locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
@@ -503,7 +516,7 @@ int BDAGraph::SubmitDVBSTuneRequest()
         hr = l.p_dvbs_locator->put_SignalPolarisation( i_polar );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
+        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
             "Cannot set tuning parameters on Locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
@@ -511,7 +524,7 @@ int BDAGraph::SubmitDVBSTuneRequest()
     hr = p_tune_request->put_Locator( l.p_dvbs_locator );
     if( FAILED( hr ) )
     {
-        msg_Warn( p_access, "SubmitDVBCTuneRequest: "\
+        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
             "Cannot put the locator: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
