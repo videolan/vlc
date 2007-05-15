@@ -235,7 +235,7 @@ DIST_osdmenu_dvd = \
 	osdmenu/dvd/unselect/barroff.png
 
 DIST_lua= \
-	luaplaylist/README \
+	luaplaylist/README.txt \
 	luaplaylist/dailymotion.lua \
 	luaplaylist/youtube.lua \
 	luaplaylist/metacafe.lua \
