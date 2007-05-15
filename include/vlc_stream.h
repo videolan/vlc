@@ -102,8 +102,6 @@ static inline int stream_Seek( stream_t *s, int64_t i_pos )
     return stream_Control( s, STREAM_SET_POSITION, i_pos );
 }
 
-VLC_EXPORT( char *, stream_ReadLine, ( stream_t * ) );
-
 /**
  * Create a special stream and a demuxer, this allows chaining demuxers
  */
