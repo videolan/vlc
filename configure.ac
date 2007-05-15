@@ -1538,12 +1538,21 @@ AC_ARG_ENABLE(luaplaylist,
 if test "${enable_lua}" != "no"
 then
   PKG_CHECK_MODULES(LUA, lua5.1,
-    [ AC_DEFINE(HAVE_LUA, [], [Define if you have the lua library])
-      VLC_ADD_PLUGINS([luaplaylist])
-      VLC_ADD_LDFLAGS([luaplaylist],[$LUA_LIBS])
-      VLC_ADD_CFLAGS([luaplaylist],[$LUA_CFLAGS])
-    ],
-    [AC_MSG_WARN(lua 5.0 not found)])
+    [ have_lua=yes ],
+    [
+    AC_MSG_WARN([lua5.1 not found, trying lua >= 5.1 instead])
+    PKG_CHECK_MODULES(LUA, lua >= 5.1,
+      [ have_lua=yes ],
+      [ 
+       AC_MSG_WARN([lua >= 5.1 not found!])
+      ])
+    ])
+  if test "x${have_lua}" = "xyes"; then
+     AC_DEFINE(HAVE_LUA, [], [Define if you have the lua library])
+     VLC_ADD_PLUGINS([luaplaylist])
+     VLC_ADD_LDFLAGS([luaplaylist],[$LUA_LIBS])
+     VLC_ADD_CFLAGS([luaplaylist],[$LUA_CFLAGS])
+  fi
 fi
 
 dnl
