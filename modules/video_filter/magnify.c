@@ -122,8 +122,9 @@ static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
-    video_format_t fmt = {0};
+    video_format_t fmt;
 
+    memset( &fmt, 0, sizeof(video_format_t) );
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output structure */
@@ -217,10 +218,11 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     int o_zoom = p_vout->p_sys->i_zoom;
     int x,y,o_yp,o_xp;
     int v_w, v_h;
-    video_format_t fmt_out = {0};
+    video_format_t fmt_out;
     picture_t *p_converted;
     plane_t *p_oyp=NULL;
 
+    memset( &fmt_out, 0, sizeof(video_format_t) );
     /* This is a new frame. Get a structure from the video_output. */
     while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
               == NULL )
