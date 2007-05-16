@@ -472,6 +472,22 @@ ${autoconf}
 ${autoheader}
 ${automake} --add-missing --copy -Wall
 
+# patch for uclibc support on linux (remove when fixed)
+patch -s -p0 << 'EOF'
+--- autotools/config.sub.orig	2007-05-16 13:16:41.000000000 +0200
++++ autotools/config.sub	2007-05-16 13:17:34.000000000 +0200
+@@ -1110,6 +1110,9 @@
+ 	-unixware*)
+ 		os=-sysv4.2uw
+ 		;;
++	-uclibc*)
++		os=-linux
++		;;
+ 	-gnu/linux*)
+ 		os=`echo $os | sed -e 's|gnu/linux|linux-gnu|'`
+ 		;;
+EOF
+
 ##
 ##  files which need to be regenerated
 ##
