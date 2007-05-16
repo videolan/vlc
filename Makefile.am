@@ -16,7 +16,7 @@ SUBDIRS = intl po libs/loader
 if HAVE_LIBGCRYPT
 SUBDIRS += libs/srtp
 endif
-SUBDIRS = src modules . \
+SUBDIRS += src modules . \
 		mozilla bindings activex share doc
 DIST_SUBDIRS = $(SUBDIRS) m4 ipkg
 
