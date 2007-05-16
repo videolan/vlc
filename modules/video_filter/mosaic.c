@@ -391,7 +391,6 @@ static void DestroyFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
-    libvlc_global_data_t *p_libvlc_global = p_filter->p_libvlc_global;
     int i_index;
 
     vlc_mutex_lock( &p_sys->lock );
