@@ -90,8 +90,11 @@ public class JVLC implements Runnable {
      * This is unreversible.
      */
     public void destroy() {
-    	beingDestroyed = true;
-    	_destroy();
+    	if (!beingDestroyed)
+    	{
+    		beingDestroyed = true;
+    		_destroy();
+    	}
     }
  
 
@@ -162,10 +165,7 @@ public class JVLC implements Runnable {
 	 * @see java.lang.Object#finalize()
 	 */
 	protected void finalize() throws Throwable {
-		if (!beingDestroyed)
-		{
-			destroy();
-		}
+		destroy();
 		super.finalize();
 	}
 
