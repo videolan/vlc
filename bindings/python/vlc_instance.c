@@ -428,7 +428,7 @@ vlcInstance_audio_set_volume( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_audio_set_mute( LIBVLC_INSTANCE->p_instance, i_volume, &ex );
+    libvlc_audio_set_volume( LIBVLC_INSTANCE->p_instance, i_volume, &ex );
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
