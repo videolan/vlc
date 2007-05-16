@@ -23,7 +23,7 @@ SOURCES_wingdi = \
 	$(NULL)
 
 SOURCES_wingapi = \
-	windi.c \
+	wingdi.c \
 	vout.h \
 	events.c \
 	$(NULL)

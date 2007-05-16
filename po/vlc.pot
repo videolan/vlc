@@ -8,21 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-14 11:38+0200\n"
+"POT-Creation-Date: 2007-05-16 13:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: include/vlc/vlc.h:591
-msgid ""
-"This program comes with NO WARRANTY, to the extent permitted by law.\n"
-"You may redistribute it under the terms of the GNU General Public License;\n"
-"see the file named COPYING for details.\n"
-"Written by the VideoLAN team; see the AUTHORS file.\n"
-msgstr ""
 
 #: include/vlc_config_cat.h:36
 msgid "VLC preferences"
@@ -72,7 +64,7 @@ msgid "Hotkeys settings"
 msgstr ""
 
 #: include/vlc_config_cat.h:58 src/input/es_out.c:1778
-#: src/libvlc-module.c:1269 modules/gui/beos/InterfaceWindow.cpp:281
+#: src/libvlc-module.c:1271 modules/gui/beos/InterfaceWindow.cpp:281
 #: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:588
 #: modules/gui/macosx/output.m:170 modules/gui/macosx/playlistinfo.m:96
 #: modules/gui/macosx/wizard.m:420
@@ -116,7 +108,7 @@ msgstr ""
 msgid "These are general settings for audio output modules."
 msgstr ""
 
-#: include/vlc_config_cat.h:75 src/libvlc-module.c:1617
+#: include/vlc_config_cat.h:75 src/libvlc-module.c:1619
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:578
 #: modules/gui/wxwidgets/menus.cpp:282 modules/stream_out/transcode.c:290
 msgid "Miscellaneous"
@@ -127,7 +119,7 @@ msgid "Miscellaneous audio settings and modules."
 msgstr ""
 
 #: include/vlc_config_cat.h:79 src/input/es_out.c:1806
-#: src/libvlc-module.c:1304 modules/gui/macosx/extended.m:79
+#: src/libvlc-module.c:1306 modules/gui/macosx/extended.m:79
 #: modules/gui/macosx/intf.m:601 modules/gui/macosx/output.m:160
 #: modules/gui/macosx/playlistinfo.m:86 modules/gui/macosx/wizard.m:421
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:290
@@ -230,7 +222,7 @@ msgstr ""
 msgid "General input settings. Use with care."
 msgstr ""
 
-#: include/vlc_config_cat.h:135 src/libvlc-module.c:1545
+#: include/vlc_config_cat.h:135 src/libvlc-module.c:1547
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:152
 msgid "Stream output"
 msgstr ""
@@ -316,7 +308,7 @@ msgstr ""
 msgid "VLC's implementation of Video On Demand"
 msgstr ""
 
-#: include/vlc_config_cat.h:186 src/libvlc-module.c:1681
+#: include/vlc_config_cat.h:186 src/libvlc-module.c:1683
 #: src/playlist/engine.c:109 src/playlist/engine.c:111
 #: modules/demux/playlist/playlist.c:55 modules/demux/playlist/playlist.c:56
 #: modules/gui/beos/InterfaceWindow.cpp:230
@@ -348,7 +340,7 @@ msgid ""
 "playlist."
 msgstr ""
 
-#: include/vlc_config_cat.h:197 src/libvlc-module.c:1504
+#: include/vlc_config_cat.h:197 src/libvlc-module.c:1506
 #: modules/gui/macosx/prefs.m:124
 msgid "Advanced"
 msgstr ""
@@ -543,7 +535,7 @@ msgstr ""
 msgid "No repeat"
 msgstr ""
 
-#: include/vlc_intf_strings.h:67 src/libvlc-module.c:1182
+#: include/vlc_intf_strings.h:67 src/libvlc-module.c:1184
 #: modules/gui/macosx/controls.m:866 modules/gui/macosx/intf.m:575
 msgid "Random"
 msgstr ""
@@ -740,6 +732,14 @@ msgstr ""
 
 #: include/vlc_meta.h:52
 msgid "Codec Description"
+msgstr ""
+
+#: include/vlc/vlc.h:591
+msgid ""
+"This program comes with NO WARRANTY, to the extent permitted by law.\n"
+"You may redistribute it under the terms of the GNU General Public License;\n"
+"see the file named COPYING for details.\n"
+"Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
 
 #: src/audio_output/filters.c:154 src/audio_output/filters.c:201
@@ -963,8 +963,8 @@ msgstr ""
 msgid "Bits per sample"
 msgstr ""
 
-#: src/input/es_out.c:1798 modules/access/pvr.c:89
-#: modules/access_output/shout.c:87
+#: src/input/es_out.c:1798 modules/access_output/shout.c:87
+#: modules/access/pvr.c:89
 msgid "Bitrate"
 msgstr ""
 
@@ -1060,13 +1060,13 @@ msgid "Chapter %i"
 msgstr ""
 
 #: src/input/var.c:353 modules/gui/beos/InterfaceWindow.cpp:289
-#: modules/gui/qt4/main_interface.cpp:799
+#: modules/gui/qt4/main_interface.cpp:798
 #: modules/gui/wxwidgets/input_manager.cpp:289
 msgid "Next chapter"
 msgstr ""
 
 #: src/input/var.c:358 modules/gui/beos/InterfaceWindow.cpp:288
-#: modules/gui/qt4/main_interface.cpp:798
+#: modules/gui/qt4/main_interface.cpp:797
 #: modules/gui/wxwidgets/input_manager.cpp:288
 msgid "Previous chapter"
 msgstr ""
@@ -1963,7 +1963,7 @@ msgstr ""
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:275
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:325
 #: modules/video_filter/marq.c:56 modules/video_filter/rss.c:63
-#: modules/video_filter/rss.c:175 modules/video_output/directx/directx.c:158
+#: modules/video_filter/rss.c:175 modules/video_output/msw/directx.c:158
 msgid "Default"
 msgstr ""
 
@@ -2179,7 +2179,7 @@ msgstr ""
 msgid "You can completely disable the sub-picture processing."
 msgstr ""
 
-#: src/libvlc-module.c:551 src/libvlc-module.c:1384 src/text/iso-639_def.h:143
+#: src/libvlc-module.c:551 src/libvlc-module.c:1386 src/text/iso-639_def.h:143
 #: modules/stream_out/transcode.c:286
 msgid "On Screen Display"
 msgstr ""
@@ -3003,52 +3003,60 @@ msgid "Select the hotkey to use to swap fullscreen state."
 msgstr ""
 
 #: src/libvlc-module.c:1026
+msgid "Leave fullscreen"
+msgstr ""
+
+#: src/libvlc-module.c:1027
+msgid "Select the hotkey to use to leave fullscreen state."
+msgstr ""
+
+#: src/libvlc-module.c:1028
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:83
 #: modules/gui/wxwidgets/interface.cpp:1526
 msgid "Play/Pause"
 msgstr ""
 
-#: src/libvlc-module.c:1027
+#: src/libvlc-module.c:1029
 msgid "Select the hotkey to use to swap paused state."
 msgstr ""
 
-#: src/libvlc-module.c:1028
+#: src/libvlc-module.c:1030
 msgid "Pause only"
 msgstr ""
 
-#: src/libvlc-module.c:1029
+#: src/libvlc-module.c:1031
 msgid "Select the hotkey to use to pause."
 msgstr ""
 
-#: src/libvlc-module.c:1030
+#: src/libvlc-module.c:1032
 msgid "Play only"
 msgstr ""
 
-#: src/libvlc-module.c:1031
+#: src/libvlc-module.c:1033
 msgid "Select the hotkey to use to play."
 msgstr ""
 
-#: src/libvlc-module.c:1032 modules/control/hotkeys.c:666
+#: src/libvlc-module.c:1034 modules/control/hotkeys.c:673
 #: modules/gui/macosx/controls.m:840 modules/gui/macosx/intf.m:571
 #: modules/gui/wxwidgets/interface.cpp:706
 msgid "Faster"
 msgstr ""
 
-#: src/libvlc-module.c:1033
+#: src/libvlc-module.c:1035
 msgid "Select the hotkey to use for fast forward playback."
 msgstr ""
 
-#: src/libvlc-module.c:1034 modules/control/hotkeys.c:672
+#: src/libvlc-module.c:1036 modules/control/hotkeys.c:679
 #: modules/gui/macosx/controls.m:841 modules/gui/macosx/intf.m:572
 #: modules/gui/wxwidgets/interface.cpp:705
 msgid "Slower"
 msgstr ""
 
-#: src/libvlc-module.c:1035
+#: src/libvlc-module.c:1037
 msgid "Select the hotkey to use for slow motion playback."
 msgstr ""
 
-#: src/libvlc-module.c:1036 modules/control/hotkeys.c:649
+#: src/libvlc-module.c:1038 modules/control/hotkeys.c:656
 #: modules/gui/macosx/controls.m:861 modules/gui/macosx/intf.m:529
 #: modules/gui/macosx/intf.m:574 modules/gui/macosx/intf.m:650
 #: modules/gui/macosx/intf.m:658 modules/gui/macosx/wizard.m:312
@@ -3059,11 +3067,11 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: src/libvlc-module.c:1037
+#: src/libvlc-module.c:1039
 msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr ""
 
-#: src/libvlc-module.c:1038 modules/control/hotkeys.c:655
+#: src/libvlc-module.c:1040 modules/control/hotkeys.c:662
 #: modules/gui/macosx/controls.m:860 modules/gui/macosx/intf.m:524
 #: modules/gui/macosx/intf.m:573 modules/gui/macosx/intf.m:651
 #: modules/gui/macosx/intf.m:657 modules/gui/wxwidgets/interface.cpp:703
@@ -3072,11 +3080,11 @@ msgstr ""
 msgid "Previous"
 msgstr ""
 
-#: src/libvlc-module.c:1039
+#: src/libvlc-module.c:1041
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
 msgstr ""
 
-#: src/libvlc-module.c:1040 modules/gui/macosx/controls.m:852
+#: src/libvlc-module.c:1042 modules/gui/macosx/controls.m:852
 #: modules/gui/macosx/intf.m:527 modules/gui/macosx/intf.m:570
 #: modules/gui/macosx/intf.m:649 modules/gui/macosx/intf.m:656
 #: modules/gui/pda/pda_interface.c:274 modules/gui/pda/pda_interface.c:275
@@ -3088,562 +3096,562 @@ msgstr ""
 msgid "Stop"
 msgstr ""
 
-#: src/libvlc-module.c:1041
+#: src/libvlc-module.c:1043
 msgid "Select the hotkey to stop playback."
 msgstr ""
 
-#: src/libvlc-module.c:1042 modules/gui/macosx/bookmarks.m:109
+#: src/libvlc-module.c:1044 modules/gui/macosx/bookmarks.m:109
 #: modules/gui/macosx/bookmarks.m:118 modules/gui/macosx/embeddedwindow.m:51
 #: modules/gui/macosx/intf.m:532 modules/video_filter/marq.c:143
 #: modules/video_filter/rss.c:190
 msgid "Position"
 msgstr ""
 
-#: src/libvlc-module.c:1043
+#: src/libvlc-module.c:1045
 msgid "Select the hotkey to display the position."
 msgstr ""
 
-#: src/libvlc-module.c:1045
+#: src/libvlc-module.c:1047
 msgid "Very short backwards jump"
 msgstr ""
 
-#: src/libvlc-module.c:1047
+#: src/libvlc-module.c:1049
 msgid "Select the hotkey to make a very short backwards jump."
 msgstr ""
 
-#: src/libvlc-module.c:1048
+#: src/libvlc-module.c:1050
 msgid "Short backwards jump"
 msgstr ""
 
-#: src/libvlc-module.c:1050
+#: src/libvlc-module.c:1052
 msgid "Select the hotkey to make a short backwards jump."
 msgstr ""
 
-#: src/libvlc-module.c:1051
+#: src/libvlc-module.c:1053
 msgid "Medium backwards jump"
 msgstr ""
 
-#: src/libvlc-module.c:1053
+#: src/libvlc-module.c:1055
 msgid "Select the hotkey to make a medium backwards jump."
 msgstr ""
 
-#: src/libvlc-module.c:1054
+#: src/libvlc-module.c:1056
 msgid "Long backwards jump"
 msgstr ""
 
-#: src/libvlc-module.c:1056
+#: src/libvlc-module.c:1058
 msgid "Select the hotkey to make a long backwards jump."
 msgstr ""
 
-#: src/libvlc-module.c:1058
+#: src/libvlc-module.c:1060
 msgid "Very short forward jump"
 msgstr ""
 
-#: src/libvlc-module.c:1060
+#: src/libvlc-module.c:1062
 msgid "Select the hotkey to make a very short forward jump."
 msgstr ""
 
-#: src/libvlc-module.c:1061
+#: src/libvlc-module.c:1063
 msgid "Short forward jump"
 msgstr ""
 
-#: src/libvlc-module.c:1063
+#: src/libvlc-module.c:1065
 msgid "Select the hotkey to make a short forward jump."
 msgstr ""
 
-#: src/libvlc-module.c:1064
+#: src/libvlc-module.c:1066
 msgid "Medium forward jump"
 msgstr ""
 
-#: src/libvlc-module.c:1066
+#: src/libvlc-module.c:1068
 msgid "Select the hotkey to make a medium forward jump."
 msgstr ""
 
-#: src/libvlc-module.c:1067
+#: src/libvlc-module.c:1069
 msgid "Long forward jump"
 msgstr ""
 
-#: src/libvlc-module.c:1069
+#: src/libvlc-module.c:1071
 msgid "Select the hotkey to make a long forward jump."
 msgstr ""
 
-#: src/libvlc-module.c:1071
+#: src/libvlc-module.c:1073
 msgid "Very short jump length"
 msgstr ""
 
-#: src/libvlc-module.c:1072
+#: src/libvlc-module.c:1074
 msgid "Very short jump length, in seconds."
 msgstr ""
 
-#: src/libvlc-module.c:1073
+#: src/libvlc-module.c:1075
 msgid "Short jump length"
 msgstr ""
 
-#: src/libvlc-module.c:1074
+#: src/libvlc-module.c:1076
 msgid "Short jump length, in seconds."
 msgstr ""
 
-#: src/libvlc-module.c:1075
+#: src/libvlc-module.c:1077
 msgid "Medium jump length"
 msgstr ""
 
-#: src/libvlc-module.c:1076
+#: src/libvlc-module.c:1078
 msgid "Medium jump length, in seconds."
 msgstr ""
 
-#: src/libvlc-module.c:1077
+#: src/libvlc-module.c:1079
 msgid "Long jump length"
 msgstr ""
 
-#: src/libvlc-module.c:1078
+#: src/libvlc-module.c:1080
 msgid "Long jump length, in seconds."
 msgstr ""
 
-#: src/libvlc-module.c:1080 modules/control/hotkeys.c:241
+#: src/libvlc-module.c:1082 modules/control/hotkeys.c:241
 #: modules/gui/beos/InterfaceWindow.cpp:275
 msgid "Quit"
 msgstr ""
 
-#: src/libvlc-module.c:1081
+#: src/libvlc-module.c:1083
 msgid "Select the hotkey to quit the application."
 msgstr ""
 
-#: src/libvlc-module.c:1082
+#: src/libvlc-module.c:1084
 msgid "Navigate up"
 msgstr ""
 
-#: src/libvlc-module.c:1083
+#: src/libvlc-module.c:1085
 msgid "Select the key to move the selector up in DVD menus."
 msgstr ""
 
-#: src/libvlc-module.c:1084
+#: src/libvlc-module.c:1086
 msgid "Navigate down"
 msgstr ""
 
-#: src/libvlc-module.c:1085
+#: src/libvlc-module.c:1087
 msgid "Select the key to move the selector down in DVD menus."
 msgstr ""
 
-#: src/libvlc-module.c:1086
+#: src/libvlc-module.c:1088
 msgid "Navigate left"
 msgstr ""
 
-#: src/libvlc-module.c:1087
+#: src/libvlc-module.c:1089
 msgid "Select the key to move the selector left in DVD menus."
 msgstr ""
 
-#: src/libvlc-module.c:1088
+#: src/libvlc-module.c:1090
 msgid "Navigate right"
 msgstr ""
 
-#: src/libvlc-module.c:1089
+#: src/libvlc-module.c:1091
 msgid "Select the key to move the selector right in DVD menus."
 msgstr ""
 
-#: src/libvlc-module.c:1090
+#: src/libvlc-module.c:1092
 msgid "Activate"
 msgstr ""
 
-#: src/libvlc-module.c:1091
+#: src/libvlc-module.c:1093
 msgid "Select the key to activate selected item in DVD menus."
 msgstr ""
 
-#: src/libvlc-module.c:1092
+#: src/libvlc-module.c:1094
 msgid "Go to the DVD menu"
 msgstr ""
 
-#: src/libvlc-module.c:1093
+#: src/libvlc-module.c:1095
 msgid "Select the key to take you to the DVD menu"
 msgstr ""
 
-#: src/libvlc-module.c:1094
+#: src/libvlc-module.c:1096
 msgid "Select previous DVD title"
 msgstr ""
 
-#: src/libvlc-module.c:1095
+#: src/libvlc-module.c:1097
 msgid "Select the key to choose the previous title from the DVD"
 msgstr ""
 
-#: src/libvlc-module.c:1096
+#: src/libvlc-module.c:1098
 msgid "Select next DVD title"
 msgstr ""
 
-#: src/libvlc-module.c:1097
+#: src/libvlc-module.c:1099
 msgid "Select the key to choose the next title from the DVD"
 msgstr ""
 
-#: src/libvlc-module.c:1098
+#: src/libvlc-module.c:1100
 msgid "Select prev DVD chapter"
 msgstr ""
 
-#: src/libvlc-module.c:1099
+#: src/libvlc-module.c:1101
 msgid "Select the key to choose the previous chapter from the DVD"
 msgstr ""
 
-#: src/libvlc-module.c:1100
+#: src/libvlc-module.c:1102
 msgid "Select next DVD chapter"
 msgstr ""
 
-#: src/libvlc-module.c:1101
+#: src/libvlc-module.c:1103
 msgid "Select the key to choose the next chapter from the DVD"
 msgstr ""
 
-#: src/libvlc-module.c:1102
+#: src/libvlc-module.c:1104
 msgid "Volume up"
 msgstr ""
 
-#: src/libvlc-module.c:1103
+#: src/libvlc-module.c:1105
 msgid "Select the key to increase audio volume."
 msgstr ""
 
-#: src/libvlc-module.c:1104
+#: src/libvlc-module.c:1106
 msgid "Volume down"
 msgstr ""
 
-#: src/libvlc-module.c:1105
+#: src/libvlc-module.c:1107
 msgid "Select the key to decrease audio volume."
 msgstr ""
 
-#: src/libvlc-module.c:1106 modules/gui/macosx/controls.m:898
+#: src/libvlc-module.c:1108 modules/gui/macosx/controls.m:898
 #: modules/gui/macosx/intf.m:591 modules/gui/macosx/intf.m:652
 #: modules/gui/macosx/intf.m:661
 msgid "Mute"
 msgstr ""
 
-#: src/libvlc-module.c:1107
+#: src/libvlc-module.c:1109
 msgid "Select the key to mute audio."
 msgstr ""
 
-#: src/libvlc-module.c:1108
+#: src/libvlc-module.c:1110
 msgid "Subtitle delay up"
 msgstr ""
 
-#: src/libvlc-module.c:1109
+#: src/libvlc-module.c:1111
 msgid "Select the key to increase the subtitle delay."
 msgstr ""
 
-#: src/libvlc-module.c:1110
+#: src/libvlc-module.c:1112
 msgid "Subtitle delay down"
 msgstr ""
 
-#: src/libvlc-module.c:1111
+#: src/libvlc-module.c:1113
 msgid "Select the key to decrease the subtitle delay."
 msgstr ""
 
-#: src/libvlc-module.c:1112
+#: src/libvlc-module.c:1114
 msgid "Audio delay up"
 msgstr ""
 
-#: src/libvlc-module.c:1113
+#: src/libvlc-module.c:1115
 msgid "Select the key to increase the audio delay."
 msgstr ""
 
-#: src/libvlc-module.c:1114
+#: src/libvlc-module.c:1116
 msgid "Audio delay down"
 msgstr ""
 
-#: src/libvlc-module.c:1115
+#: src/libvlc-module.c:1117
 msgid "Select the key to decrease the audio delay."
 msgstr ""
 
-#: src/libvlc-module.c:1116
+#: src/libvlc-module.c:1118
 msgid "Play playlist bookmark 1"
 msgstr ""
 
-#: src/libvlc-module.c:1117
+#: src/libvlc-module.c:1119
 msgid "Play playlist bookmark 2"
 msgstr ""
 
-#: src/libvlc-module.c:1118
+#: src/libvlc-module.c:1120
 msgid "Play playlist bookmark 3"
 msgstr ""
 
-#: src/libvlc-module.c:1119
+#: src/libvlc-module.c:1121
 msgid "Play playlist bookmark 4"
 msgstr ""
 
-#: src/libvlc-module.c:1120
+#: src/libvlc-module.c:1122
 msgid "Play playlist bookmark 5"
 msgstr ""
 
-#: src/libvlc-module.c:1121
+#: src/libvlc-module.c:1123
 msgid "Play playlist bookmark 6"
 msgstr ""
 
-#: src/libvlc-module.c:1122
+#: src/libvlc-module.c:1124
 msgid "Play playlist bookmark 7"
 msgstr ""
 
-#: src/libvlc-module.c:1123
+#: src/libvlc-module.c:1125
 msgid "Play playlist bookmark 8"
 msgstr ""
 
-#: src/libvlc-module.c:1124
+#: src/libvlc-module.c:1126
 msgid "Play playlist bookmark 9"
 msgstr ""
 
-#: src/libvlc-module.c:1125
+#: src/libvlc-module.c:1127
 msgid "Play playlist bookmark 10"
 msgstr ""
 
-#: src/libvlc-module.c:1126
+#: src/libvlc-module.c:1128
 msgid "Select the key to play this bookmark."
 msgstr ""
 
-#: src/libvlc-module.c:1127
+#: src/libvlc-module.c:1129
 msgid "Set playlist bookmark 1"
 msgstr ""
 
-#: src/libvlc-module.c:1128
+#: src/libvlc-module.c:1130
 msgid "Set playlist bookmark 2"
 msgstr ""
 
-#: src/libvlc-module.c:1129
+#: src/libvlc-module.c:1131
 msgid "Set playlist bookmark 3"
 msgstr ""
 
-#: src/libvlc-module.c:1130
+#: src/libvlc-module.c:1132
 msgid "Set playlist bookmark 4"
 msgstr ""
 
-#: src/libvlc-module.c:1131
+#: src/libvlc-module.c:1133
 msgid "Set playlist bookmark 5"
 msgstr ""
 
-#: src/libvlc-module.c:1132
+#: src/libvlc-module.c:1134
 msgid "Set playlist bookmark 6"
 msgstr ""
 
-#: src/libvlc-module.c:1133
+#: src/libvlc-module.c:1135
 msgid "Set playlist bookmark 7"
 msgstr ""
 
-#: src/libvlc-module.c:1134
+#: src/libvlc-module.c:1136
 msgid "Set playlist bookmark 8"
 msgstr ""
 
-#: src/libvlc-module.c:1135
+#: src/libvlc-module.c:1137
 msgid "Set playlist bookmark 9"
 msgstr ""
 
-#: src/libvlc-module.c:1136
+#: src/libvlc-module.c:1138
 msgid "Set playlist bookmark 10"
 msgstr ""
 
-#: src/libvlc-module.c:1137
+#: src/libvlc-module.c:1139
 msgid "Select the key to set this playlist bookmark."
 msgstr ""
 
-#: src/libvlc-module.c:1139 modules/control/hotkeys.c:84
+#: src/libvlc-module.c:1141 modules/control/hotkeys.c:84
 msgid "Playlist bookmark 1"
 msgstr ""
 
-#: src/libvlc-module.c:1140 modules/control/hotkeys.c:85
+#: src/libvlc-module.c:1142 modules/control/hotkeys.c:85
 msgid "Playlist bookmark 2"
 msgstr ""
 
-#: src/libvlc-module.c:1141 modules/control/hotkeys.c:86
+#: src/libvlc-module.c:1143 modules/control/hotkeys.c:86
 msgid "Playlist bookmark 3"
 msgstr ""
 
-#: src/libvlc-module.c:1142 modules/control/hotkeys.c:87
+#: src/libvlc-module.c:1144 modules/control/hotkeys.c:87
 msgid "Playlist bookmark 4"
 msgstr ""
 
-#: src/libvlc-module.c:1143 modules/control/hotkeys.c:88
+#: src/libvlc-module.c:1145 modules/control/hotkeys.c:88
 msgid "Playlist bookmark 5"
 msgstr ""
 
-#: src/libvlc-module.c:1144 modules/control/hotkeys.c:89
+#: src/libvlc-module.c:1146 modules/control/hotkeys.c:89
 msgid "Playlist bookmark 6"
 msgstr ""
 
-#: src/libvlc-module.c:1145 modules/control/hotkeys.c:90
+#: src/libvlc-module.c:1147 modules/control/hotkeys.c:90
 msgid "Playlist bookmark 7"
 msgstr ""
 
-#: src/libvlc-module.c:1146 modules/control/hotkeys.c:91
+#: src/libvlc-module.c:1148 modules/control/hotkeys.c:91
 msgid "Playlist bookmark 8"
 msgstr ""
 
-#: src/libvlc-module.c:1147 modules/control/hotkeys.c:92
+#: src/libvlc-module.c:1149 modules/control/hotkeys.c:92
 msgid "Playlist bookmark 9"
 msgstr ""
 
-#: src/libvlc-module.c:1148 modules/control/hotkeys.c:93
+#: src/libvlc-module.c:1150 modules/control/hotkeys.c:93
 msgid "Playlist bookmark 10"
 msgstr ""
 
-#: src/libvlc-module.c:1150
+#: src/libvlc-module.c:1152
 msgid "This allows you to define playlist bookmarks."
 msgstr ""
 
-#: src/libvlc-module.c:1152
+#: src/libvlc-module.c:1154
 msgid "Go back in browsing history"
 msgstr ""
 
-#: src/libvlc-module.c:1153
+#: src/libvlc-module.c:1155
 msgid ""
 "Select the key to go back (to the previous media item) in the browsing "
 "history."
 msgstr ""
 
-#: src/libvlc-module.c:1154
+#: src/libvlc-module.c:1156
 msgid "Go forward in browsing history"
 msgstr ""
 
-#: src/libvlc-module.c:1155
+#: src/libvlc-module.c:1157
 msgid ""
 "Select the key to go forward (to the next media item) in the browsing "
 "history."
 msgstr ""
 
-#: src/libvlc-module.c:1157
+#: src/libvlc-module.c:1159
 msgid "Cycle audio track"
 msgstr ""
 
-#: src/libvlc-module.c:1158
+#: src/libvlc-module.c:1160
 msgid "Cycle through the available audio tracks(languages)."
 msgstr ""
 
-#: src/libvlc-module.c:1159
+#: src/libvlc-module.c:1161
 msgid "Cycle subtitle track"
 msgstr ""
 
-#: src/libvlc-module.c:1160
+#: src/libvlc-module.c:1162
 msgid "Cycle through the available subtitle tracks."
 msgstr ""
 
-#: src/libvlc-module.c:1161
+#: src/libvlc-module.c:1163
 msgid "Cycle source aspect ratio"
 msgstr ""
 
-#: src/libvlc-module.c:1162
+#: src/libvlc-module.c:1164
 msgid "Cycle through a predefined list of source aspect ratios."
 msgstr ""
 
-#: src/libvlc-module.c:1163
+#: src/libvlc-module.c:1165
 msgid "Cycle video crop"
 msgstr ""
 
-#: src/libvlc-module.c:1164
+#: src/libvlc-module.c:1166
 msgid "Cycle through a predefined list of crop formats."
 msgstr ""
 
-#: src/libvlc-module.c:1165
+#: src/libvlc-module.c:1167
 msgid "Cycle deinterlace modes"
 msgstr ""
 
-#: src/libvlc-module.c:1166
+#: src/libvlc-module.c:1168
 msgid "Cycle through deinterlace modes."
 msgstr ""
 
-#: src/libvlc-module.c:1167
+#: src/libvlc-module.c:1169
 msgid "Show interface"
 msgstr ""
 
-#: src/libvlc-module.c:1168
+#: src/libvlc-module.c:1170
 msgid "Raise the interface above all other windows."
 msgstr ""
 
-#: src/libvlc-module.c:1169
+#: src/libvlc-module.c:1171
 msgid "Hide interface"
 msgstr ""
 
-#: src/libvlc-module.c:1170
+#: src/libvlc-module.c:1172
 msgid "Lower the interface below all other windows."
 msgstr ""
 
-#: src/libvlc-module.c:1171
+#: src/libvlc-module.c:1173
 msgid "Take video snapshot"
 msgstr ""
 
-#: src/libvlc-module.c:1172
+#: src/libvlc-module.c:1174
 msgid "Takes a video snapshot and writes it to disk."
 msgstr ""
 
-#: src/libvlc-module.c:1174 modules/access_filter/record.c:53
+#: src/libvlc-module.c:1176 modules/access_filter/record.c:53
 #: modules/access_filter/record.c:54
 msgid "Record"
 msgstr ""
 
-#: src/libvlc-module.c:1175
+#: src/libvlc-module.c:1177
 msgid "Record access filter start/stop."
 msgstr ""
 
-#: src/libvlc-module.c:1176 modules/access_filter/dump.c:51
+#: src/libvlc-module.c:1178 modules/access_filter/dump.c:51
 #: modules/access_filter/dump.c:52
 msgid "Dump"
 msgstr ""
 
-#: src/libvlc-module.c:1177
+#: src/libvlc-module.c:1179
 msgid "Media dump access filter trigger."
 msgstr ""
 
-#: src/libvlc-module.c:1179
+#: src/libvlc-module.c:1181
 msgid "Normal/Repeat/Loop"
 msgstr ""
 
-#: src/libvlc-module.c:1180
+#: src/libvlc-module.c:1182
 msgid "Toggle Normal/Repeat/Loop playlist modes"
 msgstr ""
 
-#: src/libvlc-module.c:1183
+#: src/libvlc-module.c:1185
 msgid "Toggle random playlist playback"
 msgstr ""
 
-#: src/libvlc-module.c:1185 src/libvlc-module.c:1186
+#: src/libvlc-module.c:1187 src/libvlc-module.c:1188
 #: src/video_output/vout_intf.c:216
 msgid "Zoom"
 msgstr ""
 
-#: src/libvlc-module.c:1188 src/libvlc-module.c:1189
+#: src/libvlc-module.c:1190 src/libvlc-module.c:1191
 msgid "Un-Zoom"
 msgstr ""
 
-#: src/libvlc-module.c:1191 src/libvlc-module.c:1192
+#: src/libvlc-module.c:1193 src/libvlc-module.c:1194
 msgid "Crop one pixel from the top of the video"
 msgstr ""
 
-#: src/libvlc-module.c:1193 src/libvlc-module.c:1194
+#: src/libvlc-module.c:1195 src/libvlc-module.c:1196
 msgid "Uncrop one pixel from the top of the video"
 msgstr ""
 
-#: src/libvlc-module.c:1196 src/libvlc-module.c:1197
+#: src/libvlc-module.c:1198 src/libvlc-module.c:1199
 msgid "Crop one pixel from the left of the video"
 msgstr ""
 
-#: src/libvlc-module.c:1198 src/libvlc-module.c:1199
+#: src/libvlc-module.c:1200 src/libvlc-module.c:1201
 msgid "Uncrop one pixel from the left of the video"
 msgstr ""
 
-#: src/libvlc-module.c:1201 src/libvlc-module.c:1202
+#: src/libvlc-module.c:1203 src/libvlc-module.c:1204
 msgid "Crop one pixel from the bottom of the video"
 msgstr ""
 
-#: src/libvlc-module.c:1203 src/libvlc-module.c:1204
+#: src/libvlc-module.c:1205 src/libvlc-module.c:1206
 msgid "Uncrop one pixel from the bottom of the video"
 msgstr ""
 
-#: src/libvlc-module.c:1206 src/libvlc-module.c:1207
+#: src/libvlc-module.c:1208 src/libvlc-module.c:1209
 msgid "Crop one pixel from the right of the video"
 msgstr ""
 
-#: src/libvlc-module.c:1208 src/libvlc-module.c:1209
+#: src/libvlc-module.c:1210 src/libvlc-module.c:1211
 msgid "Uncrop one pixel from the right of the video"
 msgstr ""
 
-#: src/libvlc-module.c:1211
+#: src/libvlc-module.c:1213
 msgid "Toggle wallpaper mode in video output"
 msgstr ""
 
-#: src/libvlc-module.c:1213
+#: src/libvlc-module.c:1215
 msgid ""
 "Toggle wallpaper mode in video output. Only works with the directx video "
 "output for the time being."
 msgstr ""
 
-#: src/libvlc-module.c:1217
+#: src/libvlc-module.c:1219
 #, c-format
 msgid ""
 "Usage: %s [options] [stream] ...\n"
@@ -3680,63 +3688,63 @@ msgid ""
 "  vlc:quit                       Special item to quit VLC\n"
 msgstr ""
 
-#: src/libvlc-module.c:1329 src/video_output/vout_intf.c:433
+#: src/libvlc-module.c:1331 src/video_output/vout_intf.c:433
 #: modules/gui/macosx/controls.m:440 modules/gui/macosx/controls.m:907
 #: modules/gui/macosx/intf.m:608 modules/gui/macosx/intf.m:663
 #: modules/video_output/snapshot.c:76
 msgid "Snapshot"
 msgstr ""
 
-#: src/libvlc-module.c:1342
+#: src/libvlc-module.c:1344
 msgid "Window properties"
 msgstr ""
 
-#: src/libvlc-module.c:1385
+#: src/libvlc-module.c:1387
 msgid "Subpictures"
 msgstr ""
 
-#: src/libvlc-module.c:1392 modules/codec/subsdec.c:153
+#: src/libvlc-module.c:1394 modules/codec/subsdec.c:153
 #: modules/demux/subtitle.c:66 modules/gui/beos/InterfaceWindow.cpp:278
 msgid "Subtitles"
 msgstr ""
 
-#: src/libvlc-module.c:1409 modules/stream_out/transcode.c:156
+#: src/libvlc-module.c:1411 modules/stream_out/transcode.c:156
 msgid "Overlays"
 msgstr ""
 
-#: src/libvlc-module.c:1417
+#: src/libvlc-module.c:1419
 msgid "France"
 msgstr ""
 
-#: src/libvlc-module.c:1419
+#: src/libvlc-module.c:1421
 msgid "Track settings"
 msgstr ""
 
-#: src/libvlc-module.c:1441
+#: src/libvlc-module.c:1443
 msgid "Playback control"
 msgstr ""
 
-#: src/libvlc-module.c:1456
+#: src/libvlc-module.c:1458
 msgid "Default devices"
 msgstr ""
 
-#: src/libvlc-module.c:1465
+#: src/libvlc-module.c:1467
 msgid "Network settings"
 msgstr ""
 
-#: src/libvlc-module.c:1477
+#: src/libvlc-module.c:1479
 msgid "Socks proxy"
 msgstr ""
 
-#: src/libvlc-module.c:1486
+#: src/libvlc-module.c:1488
 msgid "Metadata"
 msgstr ""
 
-#: src/libvlc-module.c:1516
+#: src/libvlc-module.c:1518
 msgid "Decoders"
 msgstr ""
 
-#: src/libvlc-module.c:1523 modules/access/v4l2.c:58
+#: src/libvlc-module.c:1525 modules/access/v4l2.c:58
 #: modules/gui/macosx/playlistinfo.m:80
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:265
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:379
@@ -3744,88 +3752,88 @@ msgstr ""
 msgid "Input"
 msgstr ""
 
-#: src/libvlc-module.c:1561
+#: src/libvlc-module.c:1563
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:523
 msgid "VLM"
 msgstr ""
 
-#: src/libvlc-module.c:1594
+#: src/libvlc-module.c:1596
 msgid "CPU"
 msgstr ""
 
-#: src/libvlc-module.c:1616
+#: src/libvlc-module.c:1618
 msgid "Special modules"
 msgstr ""
 
-#: src/libvlc-module.c:1623
+#: src/libvlc-module.c:1625
 msgid "Plugins"
 msgstr ""
 
-#: src/libvlc-module.c:1631
+#: src/libvlc-module.c:1633
 msgid "Performance options"
 msgstr ""
 
-#: src/libvlc-module.c:1779
+#: src/libvlc-module.c:1781
 msgid "Hot keys"
 msgstr ""
 
-#: src/libvlc-module.c:2106
+#: src/libvlc-module.c:2113
 msgid "Jump sizes"
 msgstr ""
 
-#: src/libvlc-module.c:2185
+#: src/libvlc-module.c:2192
 msgid "main program"
 msgstr ""
 
-#: src/libvlc-module.c:2195
+#: src/libvlc-module.c:2202
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
 
-#: src/libvlc-module.c:2201
+#: src/libvlc-module.c:2208
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
 msgstr ""
 
-#: src/libvlc-module.c:2206
+#: src/libvlc-module.c:2213
 msgid "print help for the advanced options"
 msgstr ""
 
-#: src/libvlc-module.c:2211
+#: src/libvlc-module.c:2218
 msgid "ask for extra verbosity when displaying help"
 msgstr ""
 
-#: src/libvlc-module.c:2217
+#: src/libvlc-module.c:2224
 msgid "print a list of available modules"
 msgstr ""
 
-#: src/libvlc-module.c:2222
+#: src/libvlc-module.c:2229
 msgid "print a list of available modules with extra detail"
 msgstr ""
 
-#: src/libvlc-module.c:2228
+#: src/libvlc-module.c:2235
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose)"
 msgstr ""
 
-#: src/libvlc-module.c:2233
+#: src/libvlc-module.c:2240
 msgid "save the current command line options in the config"
 msgstr ""
 
-#: src/libvlc-module.c:2238
+#: src/libvlc-module.c:2245
 msgid "reset the current config to the default values"
 msgstr ""
 
-#: src/libvlc-module.c:2243
+#: src/libvlc-module.c:2250
 msgid "use alternate config file"
 msgstr ""
 
-#: src/libvlc-module.c:2248
+#: src/libvlc-module.c:2255
 msgid "resets the current plugins cache"
 msgstr ""
 
-#: src/libvlc-module.c:2253
+#: src/libvlc-module.c:2260
 msgid "print version information"
 msgstr ""
 
@@ -3842,8 +3850,8 @@ msgstr ""
 msgid "Media Library"
 msgstr ""
 
-#: src/playlist/tree.c:59 modules/access/bda/bda.c:100
-#: modules/access/bda/bda.c:113
+#: src/playlist/tree.c:59 modules/access/bda/bda.c:104
+#: modules/access/bda/bda.c:117
 msgid "Undefined"
 msgstr ""
 
@@ -4480,8 +4488,8 @@ msgid "Aspect-ratio"
 msgstr ""
 
 #: modules/access/bda/bda.c:39 modules/access/cdda.c:60
-#: modules/access/dshow/dshow.cpp:93 modules/access/dv.c:68
-#: modules/access/dvb/access.c:73 modules/access/dvdnav.c:67
+#: modules/access/dshow/dshow.cpp:93 modules/access/dvb/access.c:73
+#: modules/access/dv.c:68 modules/access/dvdnav.c:67
 #: modules/access/dvdread.c:64 modules/access/fake.c:41
 #: modules/access/file.c:79 modules/access/ftp.c:54
 #: modules/access/gnomevfs.c:45 modules/access/http.c:57
@@ -4515,216 +4523,229 @@ msgstr ""
 msgid "Transponder/multiplex frequency"
 msgstr ""
 
-#: modules/access/bda/bda.c:52 modules/access/dvb/access.c:85
+#: modules/access/bda/bda.c:53 modules/access/dvb/access.c:85
 msgid "In kHz for DVB-S or Hz for DVB-C/T"
 msgstr ""
 
-#: modules/access/bda/bda.c:54 modules/access/dvb/access.c:87
+#: modules/access/bda/bda.c:55
+msgid "In kHz for DVB-C/S/T"
+msgstr ""
+
+#: modules/access/bda/bda.c:58 modules/access/dvb/access.c:87
 msgid "Inversion mode"
 msgstr ""
 
-#: modules/access/bda/bda.c:55 modules/access/dvb/access.c:88
+#: modules/access/bda/bda.c:59 modules/access/dvb/access.c:88
 msgid "Inversion mode [0=off, 1=on, 2=auto]"
 msgstr ""
 
-#: modules/access/bda/bda.c:57 modules/access/dvb/access.c:90
+#: modules/access/bda/bda.c:61 modules/access/dvb/access.c:90
 msgid "Probe DVB card for capabilities"
 msgstr ""
 
-#: modules/access/bda/bda.c:58 modules/access/dvb/access.c:91
+#: modules/access/bda/bda.c:62 modules/access/dvb/access.c:91
 msgid ""
 "Some DVB cards do not like to be probed for their capabilities, you can "
 "disable this feature if you experience some trouble."
 msgstr ""
 
-#: modules/access/bda/bda.c:62 modules/access/dvb/access.c:93
+#: modules/access/bda/bda.c:66 modules/access/dvb/access.c:93
 msgid "Budget mode"
 msgstr ""
 
-#: modules/access/bda/bda.c:63 modules/access/dvb/access.c:94
+#: modules/access/bda/bda.c:67 modules/access/dvb/access.c:94
 msgid "This allows you to stream an entire transponder with a \"budget\" card."
 msgstr ""
 
-#: modules/access/bda/bda.c:67 modules/access/dvb/access.c:97
+#: modules/access/bda/bda.c:71 modules/access/dvb/access.c:97
 msgid "Satellite number in the Diseqc system"
 msgstr ""
 
-#: modules/access/bda/bda.c:68 modules/access/dvb/access.c:98
+#: modules/access/bda/bda.c:72 modules/access/dvb/access.c:98
 msgid "[0=no diseqc, 1-4=satellite number]."
 msgstr ""
 
-#: modules/access/bda/bda.c:70 modules/access/dvb/access.c:100
+#: modules/access/bda/bda.c:74 modules/access/dvb/access.c:100
 msgid "LNB voltage"
 msgstr ""
 
-#: modules/access/bda/bda.c:71 modules/access/dvb/access.c:101
+#: modules/access/bda/bda.c:75 modules/access/dvb/access.c:101
 msgid "In Volts [0, 13=vertical, 18=horizontal]."
 msgstr ""
 
-#: modules/access/bda/bda.c:73 modules/access/dvb/access.c:103
+#: modules/access/bda/bda.c:77 modules/access/dvb/access.c:103
 msgid "High LNB voltage"
 msgstr ""
 
-#: modules/access/bda/bda.c:74 modules/access/dvb/access.c:104
+#: modules/access/bda/bda.c:78 modules/access/dvb/access.c:104
 msgid ""
 "Enable high voltage if your cables are particularly long. This is not "
 "supported by all frontends."
 msgstr ""
 
-#: modules/access/bda/bda.c:77 modules/access/dvb/access.c:107
+#: modules/access/bda/bda.c:81 modules/access/dvb/access.c:107
 msgid "22 kHz tone"
 msgstr ""
 
-#: modules/access/bda/bda.c:78 modules/access/dvb/access.c:108
+#: modules/access/bda/bda.c:82 modules/access/dvb/access.c:108
 msgid "[0=off, 1=on, -1=auto]."
 msgstr ""
 
-#: modules/access/bda/bda.c:80 modules/access/dvb/access.c:110
+#: modules/access/bda/bda.c:84 modules/access/dvb/access.c:110
 msgid "Transponder FEC"
 msgstr ""
 
-#: modules/access/bda/bda.c:81 modules/access/dvb/access.c:111
+#: modules/access/bda/bda.c:85 modules/access/dvb/access.c:111
 msgid "FEC=Forward Error Correction mode [9=auto]."
 msgstr ""
 
-#: modules/access/bda/bda.c:83 modules/access/dvb/access.c:113
+#: modules/access/bda/bda.c:87 modules/access/dvb/access.c:113
 msgid "Transponder symbol rate in kHz"
 msgstr ""
 
-#: modules/access/bda/bda.c:86 modules/access/dvb/access.c:116
+#: modules/access/bda/bda.c:90 modules/access/dvb/access.c:116
 msgid "Antenna lnb_lof1 (kHz)"
 msgstr ""
 
-#: modules/access/bda/bda.c:89 modules/access/dvb/access.c:119
+#: modules/access/bda/bda.c:93 modules/access/dvb/access.c:119
 msgid "Antenna lnb_lof2 (kHz)"
 msgstr ""
 
-#: modules/access/bda/bda.c:92 modules/access/dvb/access.c:122
+#: modules/access/bda/bda.c:96 modules/access/dvb/access.c:122
 msgid "Antenna lnb_slof (kHz)"
 msgstr ""
 
-#: modules/access/bda/bda.c:96 modules/access/dvb/access.c:126
+#: modules/access/bda/bda.c:100 modules/access/dvb/access.c:126
 msgid "Modulation type"
 msgstr ""
 
-#: modules/access/bda/bda.c:97
+#: modules/access/bda/bda.c:101
 msgid "QAM constellation points [16, 32, 64, 128, 256]"
 msgstr ""
 
-#: modules/access/bda/bda.c:100
+#: modules/access/bda/bda.c:104
 msgid "16"
 msgstr ""
 
-#: modules/access/bda/bda.c:100
+#: modules/access/bda/bda.c:104
 msgid "32"
 msgstr ""
 
-#: modules/access/bda/bda.c:101
+#: modules/access/bda/bda.c:105
 msgid "64"
 msgstr ""
 
-#: modules/access/bda/bda.c:101
+#: modules/access/bda/bda.c:105
 msgid "128"
 msgstr ""
 
-#: modules/access/bda/bda.c:101
+#: modules/access/bda/bda.c:105
 msgid "256"
 msgstr ""
 
-#: modules/access/bda/bda.c:104 modules/access/dvb/access.c:130
+#: modules/access/bda/bda.c:108 modules/access/dvb/access.c:130
 msgid "Terrestrial high priority stream code rate (FEC)"
 msgstr ""
 
-#: modules/access/bda/bda.c:107 modules/access/dvb/access.c:133
+#: modules/access/bda/bda.c:111 modules/access/dvb/access.c:133
 msgid "Terrestrial low priority stream code rate (FEC)"
 msgstr ""
 
-#: modules/access/bda/bda.c:110 modules/access/dvb/access.c:136
+#: modules/access/bda/bda.c:114 modules/access/dvb/access.c:136
 msgid "Terrestrial bandwidth"
 msgstr ""
 
-#: modules/access/bda/bda.c:111 modules/access/dvb/access.c:137
+#: modules/access/bda/bda.c:115 modules/access/dvb/access.c:137
 msgid "Terrestrial bandwidth [0=auto,6,7,8 in MHz]"
 msgstr ""
 
-#: modules/access/bda/bda.c:113
+#: modules/access/bda/bda.c:117
 msgid "6"
 msgstr ""
 
-#: modules/access/bda/bda.c:113
+#: modules/access/bda/bda.c:117
 msgid "7"
 msgstr ""
 
-#: modules/access/bda/bda.c:114
+#: modules/access/bda/bda.c:118
 msgid "8"
 msgstr ""
 
-#: modules/access/bda/bda.c:116 modules/access/dvb/access.c:139
+#: modules/access/bda/bda.c:120 modules/access/dvb/access.c:139
 msgid "Terrestrial guard interval"
 msgstr ""
 
-#: modules/access/bda/bda.c:119 modules/access/dvb/access.c:142
+#: modules/access/bda/bda.c:123 modules/access/dvb/access.c:142
 msgid "Terrestrial transmission mode"
 msgstr ""
 
-#: modules/access/bda/bda.c:122 modules/access/dvb/access.c:145
+#: modules/access/bda/bda.c:126 modules/access/dvb/access.c:145
 msgid "Terrestrial hierarchy mode"
 msgstr ""
 
-#: modules/access/bda/bda.c:126
+#: modules/access/bda/bda.c:130
 msgid "Satellite Azimuth"
 msgstr ""
 
-#: modules/access/bda/bda.c:127
+#: modules/access/bda/bda.c:131
 msgid "Satellite Azimuth in tenths of degree"
 msgstr ""
 
-#: modules/access/bda/bda.c:128
+#: modules/access/bda/bda.c:132
 msgid "Satellite Elevation"
 msgstr ""
 
-#: modules/access/bda/bda.c:129
+#: modules/access/bda/bda.c:133
 msgid "Satellite Elevation in tenths of degree"
 msgstr ""
 
-#: modules/access/bda/bda.c:130
+#: modules/access/bda/bda.c:134
 msgid "Satellite Longitude"
 msgstr ""
 
-#: modules/access/bda/bda.c:132
+#: modules/access/bda/bda.c:136
 msgid "Satellite Longitude in 10ths of degree, -ve=West"
 msgstr ""
 
-#: modules/access/bda/bda.c:133
+#: modules/access/bda/bda.c:137
 msgid "Satellite Polarisation"
 msgstr ""
 
-#: modules/access/bda/bda.c:134
+#: modules/access/bda/bda.c:138
 msgid "Satellite Polarisation [H/V/L/R]"
 msgstr ""
 
-#: modules/access/bda/bda.c:136
+#: modules/access/bda/bda.c:140
 msgid "Horizontal"
 msgstr ""
 
-#: modules/access/bda/bda.c:136
+#: modules/access/bda/bda.c:140
 msgid "Vertical"
 msgstr ""
 
-#: modules/access/bda/bda.c:137
+#: modules/access/bda/bda.c:141
 msgid "Circular Left"
 msgstr ""
 
-#: modules/access/bda/bda.c:137
+#: modules/access/bda/bda.c:141
 msgid "Circular Right"
 msgstr ""
 
-#: modules/access/bda/bda.c:140 modules/access/dvb/access.c:183
+#: modules/access/bda/bda.c:144 modules/access/dvb/access.c:183
 msgid "DVB"
 msgstr ""
 
-#: modules/access/bda/bda.c:141
+#: modules/access/bda/bda.c:145
 msgid "DirectShow DVB input"
+msgstr ""
+
+#: modules/access/cdda/access.c:294
+msgid "CD reading failed"
+msgstr ""
+
+#: modules/access/cdda/access.c:295
+#, c-format
+msgid "VLC could not get a new block of size: %i."
 msgstr ""
 
 #: modules/access/cdda.c:62
@@ -4770,15 +4791,6 @@ msgstr ""
 #: modules/access/cdda.c:465
 #, c-format
 msgid "Audio CD - Track %i"
-msgstr ""
-
-#: modules/access/cdda/access.c:294
-msgid "CD reading failed"
-msgstr ""
-
-#: modules/access/cdda/access.c:295
-#, c-format
-msgid "VLC could not get a new block of size: %i."
 msgstr ""
 
 #: modules/access/cdda/cdda.c:42 modules/access/directory.c:80
@@ -5259,7 +5271,7 @@ msgid "DirectShow input"
 msgstr ""
 
 #: modules/access/dshow/dshow.cpp:177 modules/access/dshow/dshow.cpp:182
-#: modules/audio_output/alsa.c:110 modules/video_output/directx/directx.c:174
+#: modules/audio_output/alsa.c:110 modules/video_output/msw/directx.c:174
 msgid "Refresh list"
 msgstr ""
 
@@ -5280,18 +5292,6 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:946
 #, c-format
 msgid "The capture device \"%s\" does not support the required parameters."
-msgstr ""
-
-#: modules/access/dv.c:70
-msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
-msgstr ""
-
-#: modules/access/dv.c:74
-msgid "Digital Video (Firewire/ieee1394)  input"
-msgstr ""
-
-#: modules/access/dv.c:75
-msgid "dv"
 msgstr ""
 
 #: modules/access/dvb/access.c:127
@@ -5395,6 +5395,18 @@ msgstr ""
 #: modules/access/dvb/access.c:774
 #, c-format
 msgid "The provided polarization \"%c\" is not valid."
+msgstr ""
+
+#: modules/access/dv.c:70
+msgid "Caching value for DV streams. Thisvalue should be set in milliseconds."
+msgstr ""
+
+#: modules/access/dv.c:74
+msgid "Digital Video (Firewire/ieee1394)  input"
+msgstr ""
+
+#: modules/access/dv.c:75
+msgid "dv"
 msgstr ""
 
 #: modules/access/dvdnav.c:63 modules/access/dvdread.c:60
@@ -5582,6 +5594,90 @@ msgstr ""
 #: modules/access/file.c:453
 #, c-format
 msgid "VLC could not open file \"%s\" (%s)."
+msgstr ""
+
+#: modules/access_filter/bandwidth.c:31
+msgid "Bandwidth limit (bytes/s)"
+msgstr ""
+
+#: modules/access_filter/bandwidth.c:33
+msgid ""
+"The bandwidth module will drop any data in excess of that many bytes per "
+"seconds."
+msgstr ""
+
+#: modules/access_filter/bandwidth.c:42
+msgid "Bandwidth"
+msgstr ""
+
+#: modules/access_filter/bandwidth.c:43
+msgid "Bandwidth limiter"
+msgstr ""
+
+#: modules/access_filter/dump.c:39
+msgid "Force use of dump module"
+msgstr ""
+
+#: modules/access_filter/dump.c:40
+msgid "Activate the dump module even for media with fast seeking."
+msgstr ""
+
+#: modules/access_filter/dump.c:43
+msgid "Maximum size of temporary file (Mb)"
+msgstr ""
+
+#: modules/access_filter/dump.c:44
+msgid ""
+"The dump module will abort dumping of the media if more than this much "
+"megabyte were performed."
+msgstr ""
+
+#: modules/access_filter/record.c:45
+msgid "Record directory"
+msgstr ""
+
+#: modules/access_filter/record.c:47
+msgid "Directory where the record will be stored."
+msgstr ""
+
+#: modules/access_filter/record.c:323
+msgid "Recording"
+msgstr ""
+
+#: modules/access_filter/record.c:325
+msgid "Recording done"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:46
+msgid "Timeshift granularity"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:48
+msgid ""
+"This is the size of the temporary files that will be used to store the "
+"timeshifted streams."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:50
+msgid "Timeshift directory"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:51
+msgid "Directory used to store the timeshift temporary files."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:53
+msgid "Force use of the timeshift module"
+msgstr ""
+
+#: modules/access_filter/timeshift.c:54
+msgid ""
+"Force use of the timeshift module even if the access declares that it can "
+"control pace or pause."
+msgstr ""
+
+#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
+msgid "Timeshift"
 msgstr ""
 
 #: modules/access/ftp.c:56
@@ -5772,6 +5868,239 @@ msgstr ""
 msgid "Microsoft Media Server (MMS) input"
 msgstr ""
 
+#: modules/access_output/dummy.c:41 modules/stream_out/dummy.c:48
+msgid "Dummy stream output"
+msgstr ""
+
+#: modules/access_output/dummy.c:42 modules/misc/dummy/dummy.c:58
+msgid "Dummy"
+msgstr ""
+
+#: modules/access_output/file.c:63
+msgid "Append to file"
+msgstr ""
+
+#: modules/access_output/file.c:64
+msgid "Append to file if it exists instead of replacing it."
+msgstr ""
+
+#: modules/access_output/file.c:68
+msgid "File stream output"
+msgstr ""
+
+#: modules/access_output/http.c:62 modules/misc/audioscrobbler.c:118
+msgid "Username"
+msgstr ""
+
+#: modules/access_output/http.c:63
+msgid "User name that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:65 modules/control/telnet.c:79
+#: modules/misc/audioscrobbler.c:120 modules/misc/notify/growl.c:61
+msgid "Password"
+msgstr ""
+
+#: modules/access_output/http.c:66
+msgid "Password that will be requested to access the stream."
+msgstr ""
+
+#: modules/access_output/http.c:68
+msgid "Mime"
+msgstr ""
+
+#: modules/access_output/http.c:69
+msgid "MIME returned by the server (autodetected if not specified)."
+msgstr ""
+
+#: modules/access_output/http.c:72
+msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
+msgstr ""
+
+#: modules/access_output/http.c:75
+msgid ""
+"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
+"empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:79
+msgid ""
+"Path to the x509 PEM trusted root CA certificates (certificate authority) "
+"file that will be used for HTTPS. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:84
+msgid ""
+"Path to the x509 PEM Certificates Revocation List file that will be used for "
+"SSL. Leave empty if you don't have one."
+msgstr ""
+
+#: modules/access_output/http.c:87
+msgid "Advertise with Bonjour"
+msgstr ""
+
+#: modules/access_output/http.c:88
+msgid "Advertise the stream with the Bonjour protocol."
+msgstr ""
+
+#: modules/access_output/http.c:92
+msgid "HTTP stream output"
+msgstr ""
+
+#: modules/access_output/shout.c:59
+msgid "Stream name"
+msgstr ""
+
+#: modules/access_output/shout.c:60
+msgid "Name to give to this stream/channel on the shoutcast/icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:63
+msgid "Stream description"
+msgstr ""
+
+#: modules/access_output/shout.c:64
+msgid "Description of the stream content or information about your channel."
+msgstr ""
+
+#: modules/access_output/shout.c:67
+msgid "Stream MP3"
+msgstr ""
+
+#: modules/access_output/shout.c:68
+msgid ""
+"You normally have to feed the shoutcast module with Ogg streams. It is also "
+"possible to stream MP3 instead, so you can forward MP3 streams to the "
+"shoutcast/icecast server."
+msgstr ""
+
+#: modules/access_output/shout.c:77
+msgid "Genre description"
+msgstr ""
+
+#: modules/access_output/shout.c:78
+msgid "Genre of the content. "
+msgstr ""
+
+#: modules/access_output/shout.c:80
+msgid "URL description"
+msgstr ""
+
+#: modules/access_output/shout.c:81
+msgid "URL with information about the stream or your channel. "
+msgstr ""
+
+#: modules/access_output/shout.c:88
+msgid "Bitrate information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:90 modules/access/v4l.c:125
+msgid "Samplerate"
+msgstr ""
+
+#: modules/access_output/shout.c:91
+msgid "Samplerate information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:93
+msgid "Number of channels"
+msgstr ""
+
+#: modules/access_output/shout.c:94
+msgid "Number of channels information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:96
+msgid "Ogg Vorbis Quality"
+msgstr ""
+
+#: modules/access_output/shout.c:97
+msgid "Ogg Vorbis Quality information of the transcoded stream. "
+msgstr ""
+
+#: modules/access_output/shout.c:99
+msgid "Stream public"
+msgstr ""
+
+#: modules/access_output/shout.c:100
+msgid ""
+"Make the server publicly available on the 'Yellow Pages' (directory listing "
+"of streams) on the icecast/shoutcast website. Requires the bitrate "
+"information specified for shoutcast. Requires Ogg streaming for icecast."
+msgstr ""
+
+#: modules/access_output/shout.c:106
+msgid "IceCAST output"
+msgstr ""
+
+#: modules/access_output/udp.c:89 modules/access/rtsp/access.c:41
+#: modules/demux/live555.cpp:60
+msgid "Caching value (ms)"
+msgstr ""
+
+#: modules/access_output/udp.c:91
+msgid ""
+"Default caching value for outbound UDP streams. This value should be set in "
+"milliseconds."
+msgstr ""
+
+#: modules/access_output/udp.c:94
+msgid "Group packets"
+msgstr ""
+
+#: modules/access_output/udp.c:95
+msgid ""
+"Packets can be sent one by one at the right time or by groups. You can "
+"choose the number of packets that will be sent at a time. It helps reducing "
+"the scheduling load on heavily-loaded systems."
+msgstr ""
+
+#: modules/access_output/udp.c:100
+msgid "Raw write"
+msgstr ""
+
+#: modules/access_output/udp.c:101
+msgid ""
+"Packets will be sent directly, without trying to fill the MTU (ie, without "
+"trying to make the biggest possible packets in order to improve streaming)."
+msgstr ""
+
+#: modules/access_output/udp.c:105
+msgid "RTCP destination port number"
+msgstr ""
+
+#: modules/access_output/udp.c:106
+msgid "Sends RTCP packets to this port (0 = auto)"
+msgstr ""
+
+#: modules/access_output/udp.c:107
+msgid "Automatic multicast streaming"
+msgstr ""
+
+#: modules/access_output/udp.c:108
+msgid "Allocates an outbound multicast address automatically."
+msgstr ""
+
+#: modules/access_output/udp.c:110
+msgid "UDP-Lite"
+msgstr ""
+
+#: modules/access_output/udp.c:111
+msgid "Use UDP-Lite/IP instead of normal UDP/IP"
+msgstr ""
+
+#: modules/access_output/udp.c:112
+msgid "Checksum coverage"
+msgstr ""
+
+#: modules/access_output/udp.c:113
+msgid "Payload bytes covered by layer-4 checksum"
+msgstr ""
+
+#: modules/access_output/udp.c:116
+msgid "UDP stream output"
+msgstr ""
+
 #: modules/access/pvr.c:54
 msgid ""
 "Default caching value for PVR streams. This value should be set in "
@@ -5928,11 +6257,6 @@ msgstr ""
 msgid "IVTV MPEG Encoding cards input"
 msgstr ""
 
-#: modules/access/rtsp/access.c:41 modules/access_output/udp.c:89
-#: modules/demux/live555.cpp:60
-msgid "Caching value (ms)"
-msgstr ""
-
 #: modules/access/rtsp/access.c:43
 msgid ""
 "Caching value for RTSP streams. This value should be set in milliseconds."
@@ -6058,6 +6382,30 @@ msgstr ""
 msgid "UDP/RTP input"
 msgstr ""
 
+#: modules/access/v4l2.c:54 modules/gui/macosx/open.m:169
+#: modules/gui/wxwidgets/dialogs/open.cpp:719
+msgid "Device name"
+msgstr ""
+
+#: modules/access/v4l2.c:56
+msgid ""
+"Name of the device to use. If you don't specify anything, /dev/video0 will "
+"be used."
+msgstr ""
+
+#: modules/access/v4l2.c:60
+msgid ""
+"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
+msgstr ""
+
+#: modules/access/v4l2.c:65
+msgid "Video4Linux2"
+msgstr ""
+
+#: modules/access/v4l2.c:66
+msgid "Video4Linux2 input"
+msgstr ""
+
 #: modules/access/v4l.c:78
 msgid ""
 "Caching value for V4L captures. This value should be set in milliseconds."
@@ -6147,10 +6495,6 @@ msgstr ""
 msgid "Tuner to use, if there are several ones."
 msgstr ""
 
-#: modules/access/v4l.c:125 modules/access_output/shout.c:90
-msgid "Samplerate"
-msgstr ""
-
 #: modules/access/v4l.c:127
 msgid ""
 "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100)"
@@ -6190,30 +6534,6 @@ msgstr ""
 
 #: modules/access/v4l.c:150
 msgid "Video4Linux input"
-msgstr ""
-
-#: modules/access/v4l2.c:54 modules/gui/macosx/open.m:169
-#: modules/gui/wxwidgets/dialogs/open.cpp:719
-msgid "Device name"
-msgstr ""
-
-#: modules/access/v4l2.c:56
-msgid ""
-"Name of the device to use. If you don't specify anything, /dev/video0 will "
-"be used."
-msgstr ""
-
-#: modules/access/v4l2.c:60
-msgid ""
-"Input of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)."
-msgstr ""
-
-#: modules/access/v4l2.c:65
-msgid "Video4Linux2"
-msgstr ""
-
-#: modules/access/v4l2.c:66
-msgid "Video4Linux2 input"
 msgstr ""
 
 #: modules/access/vcd/vcd.c:43
@@ -6396,314 +6716,6 @@ msgstr ""
 
 #: modules/access/vcdx/vcd.c:143
 msgid "Format to use in the playlist's \"title\" field."
-msgstr ""
-
-#: modules/access_filter/bandwidth.c:31
-msgid "Bandwidth limit (bytes/s)"
-msgstr ""
-
-#: modules/access_filter/bandwidth.c:33
-msgid ""
-"The bandwidth module will drop any data in excess of that many bytes per "
-"seconds."
-msgstr ""
-
-#: modules/access_filter/bandwidth.c:42
-msgid "Bandwidth"
-msgstr ""
-
-#: modules/access_filter/bandwidth.c:43
-msgid "Bandwidth limiter"
-msgstr ""
-
-#: modules/access_filter/dump.c:39
-msgid "Force use of dump module"
-msgstr ""
-
-#: modules/access_filter/dump.c:40
-msgid "Activate the dump module even for media with fast seeking."
-msgstr ""
-
-#: modules/access_filter/dump.c:43
-msgid "Maximum size of temporary file (Mb)"
-msgstr ""
-
-#: modules/access_filter/dump.c:44
-msgid ""
-"The dump module will abort dumping of the media if more than this much "
-"megabyte were performed."
-msgstr ""
-
-#: modules/access_filter/record.c:45
-msgid "Record directory"
-msgstr ""
-
-#: modules/access_filter/record.c:47
-msgid "Directory where the record will be stored."
-msgstr ""
-
-#: modules/access_filter/record.c:323
-msgid "Recording"
-msgstr ""
-
-#: modules/access_filter/record.c:325
-msgid "Recording done"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:46
-msgid "Timeshift granularity"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:48
-msgid ""
-"This is the size of the temporary files that will be used to store the "
-"timeshifted streams."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:50
-msgid "Timeshift directory"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:51
-msgid "Directory used to store the timeshift temporary files."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:53
-msgid "Force use of the timeshift module"
-msgstr ""
-
-#: modules/access_filter/timeshift.c:54
-msgid ""
-"Force use of the timeshift module even if the access declares that it can "
-"control pace or pause."
-msgstr ""
-
-#: modules/access_filter/timeshift.c:58 modules/access_filter/timeshift.c:59
-msgid "Timeshift"
-msgstr ""
-
-#: modules/access_output/dummy.c:41 modules/stream_out/dummy.c:48
-msgid "Dummy stream output"
-msgstr ""
-
-#: modules/access_output/dummy.c:42 modules/misc/dummy/dummy.c:58
-msgid "Dummy"
-msgstr ""
-
-#: modules/access_output/file.c:63
-msgid "Append to file"
-msgstr ""
-
-#: modules/access_output/file.c:64
-msgid "Append to file if it exists instead of replacing it."
-msgstr ""
-
-#: modules/access_output/file.c:68
-msgid "File stream output"
-msgstr ""
-
-#: modules/access_output/http.c:62 modules/misc/audioscrobbler.c:118
-msgid "Username"
-msgstr ""
-
-#: modules/access_output/http.c:63
-msgid "User name that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:65 modules/control/telnet.c:79
-#: modules/misc/audioscrobbler.c:120 modules/misc/notify/growl.c:61
-msgid "Password"
-msgstr ""
-
-#: modules/access_output/http.c:66
-msgid "Password that will be requested to access the stream."
-msgstr ""
-
-#: modules/access_output/http.c:68
-msgid "Mime"
-msgstr ""
-
-#: modules/access_output/http.c:69
-msgid "MIME returned by the server (autodetected if not specified)."
-msgstr ""
-
-#: modules/access_output/http.c:72
-msgid "Path to the x509 PEM certificate file that will be used for HTTPS."
-msgstr ""
-
-#: modules/access_output/http.c:75
-msgid ""
-"Path to the x509 PEM private key file that will be used for HTTPS. Leave "
-"empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:79
-msgid ""
-"Path to the x509 PEM trusted root CA certificates (certificate authority) "
-"file that will be used for HTTPS. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:84
-msgid ""
-"Path to the x509 PEM Certificates Revocation List file that will be used for "
-"SSL. Leave empty if you don't have one."
-msgstr ""
-
-#: modules/access_output/http.c:87
-msgid "Advertise with Bonjour"
-msgstr ""
-
-#: modules/access_output/http.c:88
-msgid "Advertise the stream with the Bonjour protocol."
-msgstr ""
-
-#: modules/access_output/http.c:92
-msgid "HTTP stream output"
-msgstr ""
-
-#: modules/access_output/shout.c:59
-msgid "Stream name"
-msgstr ""
-
-#: modules/access_output/shout.c:60
-msgid "Name to give to this stream/channel on the shoutcast/icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:63
-msgid "Stream description"
-msgstr ""
-
-#: modules/access_output/shout.c:64
-msgid "Description of the stream content or information about your channel."
-msgstr ""
-
-#: modules/access_output/shout.c:67
-msgid "Stream MP3"
-msgstr ""
-
-#: modules/access_output/shout.c:68
-msgid ""
-"You normally have to feed the shoutcast module with Ogg streams. It is also "
-"possible to stream MP3 instead, so you can forward MP3 streams to the "
-"shoutcast/icecast server."
-msgstr ""
-
-#: modules/access_output/shout.c:77
-msgid "Genre description"
-msgstr ""
-
-#: modules/access_output/shout.c:78
-msgid "Genre of the content. "
-msgstr ""
-
-#: modules/access_output/shout.c:80
-msgid "URL description"
-msgstr ""
-
-#: modules/access_output/shout.c:81
-msgid "URL with information about the stream or your channel. "
-msgstr ""
-
-#: modules/access_output/shout.c:88
-msgid "Bitrate information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:91
-msgid "Samplerate information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:93
-msgid "Number of channels"
-msgstr ""
-
-#: modules/access_output/shout.c:94
-msgid "Number of channels information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:96
-msgid "Ogg Vorbis Quality"
-msgstr ""
-
-#: modules/access_output/shout.c:97
-msgid "Ogg Vorbis Quality information of the transcoded stream. "
-msgstr ""
-
-#: modules/access_output/shout.c:99
-msgid "Stream public"
-msgstr ""
-
-#: modules/access_output/shout.c:100
-msgid ""
-"Make the server publicly available on the 'Yellow Pages' (directory listing "
-"of streams) on the icecast/shoutcast website. Requires the bitrate "
-"information specified for shoutcast. Requires Ogg streaming for icecast."
-msgstr ""
-
-#: modules/access_output/shout.c:106
-msgid "IceCAST output"
-msgstr ""
-
-#: modules/access_output/udp.c:91
-msgid ""
-"Default caching value for outbound UDP streams. This value should be set in "
-"milliseconds."
-msgstr ""
-
-#: modules/access_output/udp.c:94
-msgid "Group packets"
-msgstr ""
-
-#: modules/access_output/udp.c:95
-msgid ""
-"Packets can be sent one by one at the right time or by groups. You can "
-"choose the number of packets that will be sent at a time. It helps reducing "
-"the scheduling load on heavily-loaded systems."
-msgstr ""
-
-#: modules/access_output/udp.c:100
-msgid "Raw write"
-msgstr ""
-
-#: modules/access_output/udp.c:101
-msgid ""
-"Packets will be sent directly, without trying to fill the MTU (ie, without "
-"trying to make the biggest possible packets in order to improve streaming)."
-msgstr ""
-
-#: modules/access_output/udp.c:105
-msgid "RTCP destination port number"
-msgstr ""
-
-#: modules/access_output/udp.c:106
-msgid "Sends RTCP packets to this port (0 = auto)"
-msgstr ""
-
-#: modules/access_output/udp.c:107
-msgid "Automatic multicast streaming"
-msgstr ""
-
-#: modules/access_output/udp.c:108
-msgid "Allocates an outbound multicast address automatically."
-msgstr ""
-
-#: modules/access_output/udp.c:110
-msgid "UDP-Lite"
-msgstr ""
-
-#: modules/access_output/udp.c:111
-msgid "Use UDP-Lite/IP instead of normal UDP/IP"
-msgstr ""
-
-#: modules/access_output/udp.c:112
-msgid "Checksum coverage"
-msgstr ""
-
-#: modules/access_output/udp.c:113
-msgid "Payload bytes covered by layer-4 checksum"
-msgstr ""
-
-#: modules/access_output/udp.c:116
-msgid "UDP stream output"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/dolby.c:46
@@ -9046,51 +9058,51 @@ msgstr ""
 msgid "Hotkeys management interface"
 msgstr ""
 
-#: modules/control/hotkeys.c:476
+#: modules/control/hotkeys.c:483
 #, c-format
 msgid "Audio track: %s"
 msgstr ""
 
-#: modules/control/hotkeys.c:491 modules/control/hotkeys.c:520
+#: modules/control/hotkeys.c:498 modules/control/hotkeys.c:527
 #, c-format
 msgid "Subtitle track: %s"
 msgstr ""
 
-#: modules/control/hotkeys.c:491
+#: modules/control/hotkeys.c:498
 msgid "N/A"
 msgstr ""
 
-#: modules/control/hotkeys.c:544
+#: modules/control/hotkeys.c:551
 #, c-format
 msgid "Aspect ratio: %s"
 msgstr ""
 
-#: modules/control/hotkeys.c:570
+#: modules/control/hotkeys.c:577
 #, c-format
 msgid "Crop: %s"
 msgstr ""
 
-#: modules/control/hotkeys.c:596
+#: modules/control/hotkeys.c:603
 #, c-format
 msgid "Deinterlace mode: %s"
 msgstr ""
 
-#: modules/control/hotkeys.c:626
+#: modules/control/hotkeys.c:633
 #, c-format
 msgid "Zoom mode: %s"
 msgstr ""
 
-#: modules/control/hotkeys.c:707 modules/control/hotkeys.c:717
+#: modules/control/hotkeys.c:714 modules/control/hotkeys.c:724
 #, c-format
 msgid "Subtitle delay %i ms"
 msgstr ""
 
-#: modules/control/hotkeys.c:727 modules/control/hotkeys.c:737
+#: modules/control/hotkeys.c:734 modules/control/hotkeys.c:744
 #, c-format
 msgid "Audio delay %i ms"
 msgstr ""
 
-#: modules/control/hotkeys.c:940
+#: modules/control/hotkeys.c:947
 #, c-format
 msgid "Volume %d%%"
 msgstr ""
@@ -10087,11 +10099,11 @@ msgstr ""
 msgid "Google Video"
 msgstr ""
 
-#: modules/demux/playlist/luaplaylist.c:56
+#: modules/demux/playlist/luaplaylist.c:57
 msgid "Lua Playlist"
 msgstr ""
 
-#: modules/demux/playlist/luaplaylist.c:57
+#: modules/demux/playlist/luaplaylist.c:58
 msgid "Lua Playlist Parser Interface"
 msgstr ""
 
@@ -11137,8 +11149,8 @@ msgid "Extended Controls"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:632 modules/gui/macosx/intf.m:665
-#: modules/gui/macosx/playlist.m:445 modules/gui/macosx/playlistinfo.m:55
-#: modules/gui/macosx/playlistinfo.m:358 modules/gui/qt4/dialogs/help.cpp:94
+#: modules/gui/macosx/playlistinfo.m:55 modules/gui/macosx/playlistinfo.m:358
+#: modules/gui/macosx/playlist.m:445 modules/gui/qt4/dialogs/help.cpp:94
 msgid "Information"
 msgstr ""
 
@@ -11470,10 +11482,76 @@ msgstr ""
 msgid "Save File"
 msgstr ""
 
-#: modules/gui/macosx/playlist.m:129 modules/gui/macosx/playlistinfo.m:58
+#: modules/gui/macosx/playlistinfo.m:56
+#: modules/gui/qt4/components/infopanels.cpp:52
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
+msgid "URI"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:58 modules/gui/macosx/playlist.m:129
 #: modules/gui/macosx/wizard.m:392 modules/gui/wince/playlist.cpp:674
 #: modules/mux/asf.c:50
 msgid "Author"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:63
+msgid "Advanced Information"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:81
+msgid "Read at media"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:82
+msgid "Input bitrate"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:83
+msgid "Demuxed"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:84
+msgid "Stream bitrate"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
+msgid "Decoded blocks"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:88
+msgid "Displayed frames"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:89
+msgid "Lost frames"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:403
+#: modules/gui/wxwidgets/dialogs/infopanels.cpp:314
+#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
+#: modules/video_filter/deinterlace.c:137
+msgid "Streaming"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:92
+msgid "Sent packets"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:93
+msgid "Sent bytes"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:94
+msgid "Send rate"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:98
+msgid "Played buffers"
+msgstr ""
+
+#: modules/gui/macosx/playlistinfo.m:99
+msgid "Lost buffers"
 msgstr ""
 
 #: modules/gui/macosx/playlist.m:440
@@ -11544,72 +11622,6 @@ msgstr ""
 
 #: modules/gui/macosx/playlist.m:1367
 msgid "Empty Folder"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:56
-#: modules/gui/qt4/components/infopanels.cpp:52
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:591
-msgid "URI"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:63
-msgid "Advanced Information"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:81
-msgid "Read at media"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:82
-msgid "Input bitrate"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:83
-msgid "Demuxed"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:84
-msgid "Stream bitrate"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
-msgid "Decoded blocks"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:88
-msgid "Displayed frames"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:89
-msgid "Lost frames"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:403
-#: modules/gui/wxwidgets/dialogs/infopanels.cpp:314
-#: modules/gui/wxwidgets/dialogs/wizard.cpp:139
-#: modules/video_filter/deinterlace.c:137
-msgid "Streaming"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:92
-msgid "Sent packets"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:93
-msgid "Sent bytes"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:94
-msgid "Send rate"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:98
-msgid "Played buffers"
-msgstr ""
-
-#: modules/gui/macosx/playlistinfo.m:99
-msgid "Lost buffers"
 msgstr ""
 
 #: modules/gui/macosx/prefs.m:123
@@ -12900,17 +12912,17 @@ msgstr ""
 msgid "All Files"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:797
+#: modules/gui/qt4/main_interface.cpp:796
 #: modules/gui/wxwidgets/input_manager.cpp:287
 msgid "Menu"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:800
+#: modules/gui/qt4/main_interface.cpp:799
 #: modules/gui/wxwidgets/input_manager.cpp:290
 msgid "Previous track"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:801
+#: modules/gui/qt4/main_interface.cpp:800
 #: modules/gui/wxwidgets/input_manager.cpp:291
 msgid "Next track"
 msgstr ""
@@ -13131,11 +13143,6 @@ msgstr ""
 msgid "WinCE dialogs provider"
 msgstr ""
 
-#: modules/gui/wxwidgets/dialogs.cpp:439
-#: modules/gui/wxwidgets/dialogs/open.cpp:1261
-msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
-msgstr ""
-
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:75
 msgid "Edit bookmark"
 msgstr ""
@@ -13219,6 +13226,11 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:452
 msgid "Input has changed "
+msgstr ""
+
+#: modules/gui/wxwidgets/dialogs.cpp:439
+#: modules/gui/wxwidgets/dialogs/open.cpp:1261
+msgid "All Files (*.*)|*|Sound Files (*.mp3, *.ogg, etc.)|"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:54
@@ -14924,6 +14936,10 @@ msgstr ""
 msgid "Output data for RRDTool in this file."
 msgstr ""
 
+#: modules/misc/memcpy/memcpyaltivec.c:56
+msgid "AltiVec memcpy"
+msgstr ""
+
 #: modules/misc/memcpy/memcpy.c:83
 msgid "libc memcpy"
 msgstr ""
@@ -14938,10 +14954,6 @@ msgstr ""
 
 #: modules/misc/memcpy/memcpy.c:99
 msgid "MMX EXT memcpy"
-msgstr ""
-
-#: modules/misc/memcpy/memcpyaltivec.c:56
-msgid "AltiVec memcpy"
 msgstr ""
 
 #: modules/misc/notify/growl.c:57
@@ -17785,76 +17797,6 @@ msgstr ""
 msgid "DirectFB video output http://www.directfb.org/"
 msgstr ""
 
-#: modules/video_output/directx/direct3d.c:109
-msgid "DirectX 3D video output"
-msgstr ""
-
-#: modules/video_output/directx/directx.c:128
-msgid "Use hardware YUV->RGB conversions"
-msgstr ""
-
-#: modules/video_output/directx/directx.c:130
-msgid ""
-"Try to use hardware acceleration for YUV->RGB conversions. This option "
-"doesn't have any effect when using overlays."
-msgstr ""
-
-#: modules/video_output/directx/directx.c:133
-msgid "Use video buffers in system memory"
-msgstr ""
-
-#: modules/video_output/directx/directx.c:135
-msgid ""
-"Create video buffers in system memory instead of video memory. This isn't "
-"recommended as usually using video memory allows to benefit from more "
-"hardware acceleration (like rescaling or YUV->RGB conversions). This option "
-"doesn't have any effect when using overlays."
-msgstr ""
-
-#: modules/video_output/directx/directx.c:140
-msgid "Use triple buffering for overlays"
-msgstr ""
-
-#: modules/video_output/directx/directx.c:142
-msgid ""
-"Try to use triple buffering when using YUV overlays. That results in much "
-"better video quality (no flickering)."
-msgstr ""
-
-#: modules/video_output/directx/directx.c:145
-msgid "Name of desired display device"
-msgstr ""
-
-#: modules/video_output/directx/directx.c:146
-msgid ""
-"In a multiple monitor configuration, you can specify the Windows device name "
-"of the display that you want the video window to open on. For example, \"\\"
-"\\.\\DISPLAY1\" or \"\\\\.\\DISPLAY2\"."
-msgstr ""
-
-#: modules/video_output/directx/directx.c:151
-msgid "Enable wallpaper mode "
-msgstr ""
-
-#: modules/video_output/directx/directx.c:153
-msgid ""
-"The wallpaper mode allows you to display the video as the desktop "
-"background. Note that this feature only works in overlay mode and the "
-"desktop must not already have a wallpaper."
-msgstr ""
-
-#: modules/video_output/directx/directx.c:179
-msgid "DirectX video output"
-msgstr ""
-
-#: modules/video_output/directx/directx.c:319
-msgid "Wallpaper"
-msgstr ""
-
-#: modules/video_output/directx/glwin32.c:66 modules/video_output/opengl.c:183
-msgid "OpenGL video output"
-msgstr ""
-
 #: modules/video_output/fb.c:67
 msgid "Framebuffer device"
 msgstr ""
@@ -17949,6 +17891,84 @@ msgstr ""
 
 #: modules/video_output/mga.c:59
 msgid "Matrox Graphic Array video output"
+msgstr ""
+
+#: modules/video_output/msw/direct3d.c:109
+msgid "DirectX 3D video output"
+msgstr ""
+
+#: modules/video_output/msw/directx.c:128
+msgid "Use hardware YUV->RGB conversions"
+msgstr ""
+
+#: modules/video_output/msw/directx.c:130
+msgid ""
+"Try to use hardware acceleration for YUV->RGB conversions. This option "
+"doesn't have any effect when using overlays."
+msgstr ""
+
+#: modules/video_output/msw/directx.c:133
+msgid "Use video buffers in system memory"
+msgstr ""
+
+#: modules/video_output/msw/directx.c:135
+msgid ""
+"Create video buffers in system memory instead of video memory. This isn't "
+"recommended as usually using video memory allows to benefit from more "
+"hardware acceleration (like rescaling or YUV->RGB conversions). This option "
+"doesn't have any effect when using overlays."
+msgstr ""
+
+#: modules/video_output/msw/directx.c:140
+msgid "Use triple buffering for overlays"
+msgstr ""
+
+#: modules/video_output/msw/directx.c:142
+msgid ""
+"Try to use triple buffering when using YUV overlays. That results in much "
+"better video quality (no flickering)."
+msgstr ""
+
+#: modules/video_output/msw/directx.c:145
+msgid "Name of desired display device"
+msgstr ""
+
+#: modules/video_output/msw/directx.c:146
+msgid ""
+"In a multiple monitor configuration, you can specify the Windows device name "
+"of the display that you want the video window to open on. For example, \"\\"
+"\\.\\DISPLAY1\" or \"\\\\.\\DISPLAY2\"."
+msgstr ""
+
+#: modules/video_output/msw/directx.c:151
+msgid "Enable wallpaper mode "
+msgstr ""
+
+#: modules/video_output/msw/directx.c:153
+msgid ""
+"The wallpaper mode allows you to display the video as the desktop "
+"background. Note that this feature only works in overlay mode and the "
+"desktop must not already have a wallpaper."
+msgstr ""
+
+#: modules/video_output/msw/directx.c:179
+msgid "DirectX video output"
+msgstr ""
+
+#: modules/video_output/msw/directx.c:319
+msgid "Wallpaper"
+msgstr ""
+
+#: modules/video_output/msw/glwin32.c:66 modules/video_output/opengl.c:183
+msgid "OpenGL video output"
+msgstr ""
+
+#: modules/video_output/msw/wingdi.c:137
+msgid "Windows GAPI video output"
+msgstr ""
+
+#: modules/video_output/msw/wingdi.c:141
+msgid "Windows GDI video output"
 msgstr ""
 
 #: modules/video_output/opengl.c:122 modules/video_output/opengl.c:176
@@ -18118,14 +18138,6 @@ msgstr ""
 
 #: modules/video_output/svgalib.c:56
 msgid "SVGAlib video output"
-msgstr ""
-
-#: modules/video_output/wingdi.c:221
-msgid "Windows GAPI video output"
-msgstr ""
-
-#: modules/video_output/wingdi.c:225
-msgid "Windows GDI video output"
 msgstr ""
 
 #: modules/video_output/x11/glx.c:87 modules/video_output/x11/xvideo.c:44
