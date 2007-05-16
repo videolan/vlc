@@ -116,8 +116,8 @@ struct vout_sys_t
     char        *psz_format;          /* Format */
     int         i_ratio;         /* Image ratio */
 
-    int         i_width;         /* Image width */
-    int         i_height;       /* Image height */
+    unsigned int i_width;        /* Image width */
+    unsigned int i_height;      /* Image height */
 
     int         i_current;     /* Current image */
     int         i_frames;   /* Number of frames */
@@ -288,9 +288,9 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     fmt_in.i_width = p_vout->render.i_width;
     fmt_in.i_height = p_vout->render.i_height;
 
-    fmt_out.i_width = p_vout->p_sys->i_width > 0 ? p_vout->p_sys->i_width :
+    fmt_out.i_width = (p_vout->p_sys->i_width > 0) ? p_vout->p_sys->i_width :
                                                    p_vout->render.i_width;
-    fmt_out.i_height = p_vout->p_sys->i_height > 0 ? p_vout->p_sys->i_height :
+    fmt_out.i_height = (p_vout->p_sys->i_height > 0) ? p_vout->p_sys->i_height :
                                                      p_vout->render.i_height;
 
     if( p_vout->p_sys->b_time )
