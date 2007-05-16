@@ -428,10 +428,10 @@ QMenu *QVLCMenu::HelpMenu()
     if( p_input ) \
     { \
         var_Get( p_input, "state", &val ); \
-        if( val.i_int == PAUSE_S ) \
-            MIM_SADD( menu, qtr("Play"), "", "", togglePlayPause() ) \
-        else \
+        if( val.i_int == PLAYING_S ) \
             MIM_SADD( menu, qtr("Pause"), "", "", togglePlayPause() ) \
+        else \
+            MIM_SADD( menu, qtr("Play"), "", "", togglePlayPause() ) \
     } \
     else if( THEPL->items.i_size && THEPL->i_enabled ) \
         MIM_SADD( menu, qtr("Play"), "", "", togglePlayPause() ); \
