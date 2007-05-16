@@ -167,7 +167,7 @@ FORCE:
 
 define EXTRACT_GZ
 	rm -rf $@ || true
-	gunzip $< | tar xf - --exclude='[*?:<>\|]' 
+	gunzip -c $< | tar xf - --exclude='[*?:<>\|]' 
 	mv $(patsubst %.tar.gz,%,$(patsubst %.tgz,%,$(notdir $<))) $@ || true
 	touch $@
 endef
