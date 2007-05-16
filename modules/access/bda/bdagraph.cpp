@@ -435,9 +435,13 @@ int BDAGraph::SubmitDVBSTuneRequest()
         public:
         IDVBTuneRequest* p_dvbs_tune_request;
         IDVBSLocator* p_dvbs_locator;
-        localComPtr(): p_dvbs_tune_request(NULL), p_dvbs_locator(NULL) {};
+        IDVBSTuningSpace* p_dvbs_tuning_space;
+        localComPtr(): p_dvbs_tune_request(NULL), p_dvbs_locator(NULL),
+            p_dvbs_tuning_space(NULL) {};
         ~localComPtr()
         {
+            if( p_dvbs_tuning_space )
+                p_dvbs_tuning_space->Release();
             if( p_dvbs_tune_request )
                 p_dvbs_tune_request->Release();
             if( p_dvbs_locator )
@@ -445,16 +449,21 @@ int BDAGraph::SubmitDVBSTuneRequest()
         }
     } l;
     long l_frequency, l_symbolrate, l_azimuth, l_elevation, l_longitude;
+    long l_lnb_lof1, l_lnb_lof2, l_lnb_slof;
     char* psz_polarisation;
     Polarisation i_polar;
     VARIANT_BOOL b_west;
 
     l_frequency = l_symbolrate = l_azimuth = l_elevation = l_longitude = -1;
+    l_lnb_lof1 = l_lnb_lof2 = l_lnb_slof = -1;
     l_frequency = var_GetInteger( p_access, "dvb-frequency" );
     l_symbolrate = var_GetInteger( p_access, "dvb-srate" );
     l_azimuth = var_GetInteger( p_access, "dvb-azimuth" );
     l_elevation = var_GetInteger( p_access, "dvb-elevation" );
     l_longitude = var_GetInteger( p_access, "dvb-longitude" );
+    l_lnb_lof1 = var_GetInteger( p_access, "dvb-lnb-lof1" );
+    l_lnb_lof2 = var_GetInteger( p_access, "dvb-lnb-lof2" ); 
+    l_lnb_slof = var_GetInteger( p_access, "dvb-lnb-slof" );
     psz_polarisation = var_GetString( p_access, "dvb-polarisation" );
 
     b_west = ( l_longitude < 0 ) ? TRUE : FALSE;
@@ -499,6 +508,15 @@ int BDAGraph::SubmitDVBSTuneRequest()
         return VLC_EGENERIC;
     }
 
+    hr = p_tuning_space->QueryInterface( IID_IDVBSTuningSpace,
+        (void**)&l.p_dvbs_tuning_space );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
+            "Cannot QI for IDVBSTuningSpace: hr=0x%8lx", hr );
+        return VLC_EGENERIC;
+    }
+
     hr = S_OK;
     if( l_frequency > 0 )
         hr = l.p_dvbs_locator->put_CarrierFrequency( l_frequency );
@@ -514,6 +532,12 @@ int BDAGraph::SubmitDVBSTuneRequest()
         hr = l.p_dvbs_locator->put_WestPosition( b_west );
     if( SUCCEEDED( hr ) && i_polar != BDA_POLARISATION_NOT_SET )
         hr = l.p_dvbs_locator->put_SignalPolarisation( i_polar );
+    if( SUCCEEDED( hr ) && l_lnb_lof1 > 0 )
+        hr = l.p_dvbs_tuning_space->put_LowOscillator( l_lnb_lof1 );
+    if( SUCCEEDED( hr ) && l_lnb_lof2 > 0 )
+        hr = l.p_dvbs_tuning_space->put_HighOscillator( l_lnb_lof2 );
+    if( SUCCEEDED( hr ) && l_lnb_slof > 0 )
+        hr = l.p_dvbs_tuning_space->put_HighOscillator( l_lnb_slof );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SubmitDVBSTuneRequest: "\

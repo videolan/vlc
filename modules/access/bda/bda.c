@@ -88,13 +88,14 @@ static int Control( access_t *, int, va_list );
 #define SRATE_LONGTEXT ""
 
 #define LNB_LOF1_TEXT N_("Antenna lnb_lof1 (kHz)")
-#define LNB_LOF1_LONGTEXT ""
+#define LNB_LOF1_LONGTEXT N_("Low Band Local Osc Freq in kHz usually 9.75GHz")
 
 #define LNB_LOF2_TEXT N_("Antenna lnb_lof2 (kHz)")
-#define LNB_LOF2_LONGTEXT ""
+#define LNB_LOF2_LONGTEXT N_("High Band Local Osc Freq in kHz usually 10.6GHz")
 
 #define LNB_SLOF_TEXT N_("Antenna lnb_slof (kHz)")
-#define LNB_SLOF_LONGTEXT ""
+#define LNB_SLOF_LONGTEXT N_( \
+    "Low Noise Block switch freq in kHz usually 11.7GHz")
 
 /* Cable */
 #define MODULATION_TEXT N_("Modulation type")
@@ -166,13 +167,13 @@ vlc_module_begin();
     /* DVB-S (satellite) */
 #   if defined(WIN32) || defined(WINCE)
         add_integer( "dvb-azimuth", 0, NULL, AZIMUTH_TEXT, AZIMUTH_LONGTEXT,
-            VLC_FALSE );
+            VLC_TRUE );
         add_integer( "dvb-elevation", 0, NULL, ELEVATION_TEXT,
-            ELEVATION_LONGTEXT, VLC_FALSE );
+            ELEVATION_LONGTEXT, VLC_TRUE );
         add_integer( "dvb-longitude", 0, NULL, LONGITUDE_TEXT,
-            LONGITUDE_LONGTEXT, VLC_FALSE );
+            LONGITUDE_LONGTEXT, VLC_TRUE );
         add_string( "dvb-polarisation", NULL, NULL, POLARISATION_TEXT,
-            POLARISATION_LONGTEXT, VLC_FALSE );
+            POLARISATION_LONGTEXT, VLC_TRUE );
             change_string_list( ppsz_polar_list, ppsz_polar_text, 0 );
             /* Note: Polaristion H = voltage 18; V = voltage 13; */
 #   else
@@ -184,13 +185,14 @@ vlc_module_begin();
             HIGH_VOLTAGE_LONGTEXT, VLC_TRUE );
         add_integer( "dvb-tone", -1, NULL, TONE_TEXT, TONE_LONGTEXT,
             VLC_TRUE );
-        add_integer( "dvb-lnb-lof1", 0, NULL, LNB_LOF1_TEXT,
-            LNB_LOF1_LONGTEXT, VLC_TRUE );
-        add_integer( "dvb-lnb-lof2", 0, NULL, LNB_LOF2_TEXT,
-            LNB_LOF2_LONGTEXT, VLC_TRUE );
-        add_integer( "dvb-lnb-slof", 0, NULL, LNB_SLOF_TEXT,
-            LNB_SLOF_LONGTEXT, VLC_TRUE );
 #   endif
+    add_integer( "dvb-lnb-lof1", 0, NULL, LNB_LOF1_TEXT,
+        LNB_LOF1_LONGTEXT, VLC_TRUE );
+    add_integer( "dvb-lnb-lof2", 0, NULL, LNB_LOF2_TEXT,
+        LNB_LOF2_LONGTEXT, VLC_TRUE );
+    add_integer( "dvb-lnb-slof", 0, NULL, LNB_SLOF_TEXT,
+        LNB_SLOF_LONGTEXT, VLC_TRUE );
+
     add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, VLC_TRUE );
     add_integer( "dvb-srate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT,
         VLC_FALSE );
@@ -242,14 +244,15 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     const char* psz_module  = "dvb";
-    const int   i_param_count = 9;
+    const int   i_param_count = 12;
     const char* psz_param[] = { "frequency", "bandwidth",
         "srate", "azimuth", "elevation", "longitude", "polarisation",
-        "modulation", "caching" };
+        "modulation", "caching", "lnb-lof1", "lnb-lof2", "lnb-slof" };
 
     const int   i_type[] = { VLC_VAR_INTEGER, VLC_VAR_INTEGER,
         VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
-        VLC_VAR_STRING, VLC_VAR_INTEGER, VLC_VAR_INTEGER };
+        VLC_VAR_STRING, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
+        VLC_VAR_INTEGER, VLC_VAR_INTEGER };
 
     char  psz_full_name[128];
     int i_ret;

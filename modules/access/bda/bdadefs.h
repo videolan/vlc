@@ -29,8 +29,11 @@ class IComponentType;
 class IComponentTypes;
 class IDVBCLocator;
 class IDVBSLocator;
+class IDVBSTuningSpace;
 class IDVBTLocator;
 class IDVBTuneRequest;
+class IDVBTuningSpace;
+class IDVBTuningSpace2;
 class IEnumComponents;
 class IEnumComponentTypes;
 class IEnumTuningSpaces;
@@ -75,6 +78,13 @@ typedef enum ComponentStatus
     StatusInactive,
     StatusUnavailable,
 } ComponentStatus;
+
+typedef enum DVBSystemType
+{
+    DVB_Cable,
+    DVB_Terrestrial,
+    DVB_Satellite,
+} DVBSystemType;
 
 typedef enum FECMethod
 {
@@ -149,6 +159,16 @@ typedef enum Polarisation
     BDA_POLARISATION_CIRCULAR_R  = 4,
     BDA_POLARISATION_MAX         = 5
 } Polarisation;
+
+typedef enum SpectralInversion
+{
+    BDA_SPECTRAL_INVERSION_NOT_SET = -1,
+    BDA_SPECTRAL_INVERSION_NOT_DEFINED = 0,
+    BDA_SPECTRAL_INVERSION_AUTOMATIC = 1,
+    BDA_SPECTRAL_INVERSION_NORMAL,
+    BDA_SPECTRAL_INVERSION_INVERTED,
+    BDA_SPECTRAL_INVERSION_MAX
+} SpectralInversion;
 
 typedef enum TransmissionMode
 {
@@ -453,6 +473,37 @@ public:
     virtual HRESULT __stdcall Clone( ITuningSpace** p_p_tuning_space )=0;
 };
 
+class IDVBTuningSpace : public ITuningSpace
+{
+public:
+    virtual HRESULT __stdcall get_SystemType( DVBSystemType* p_sys_type )=0;
+    virtual HRESULT __stdcall put_SystemType( DVBSystemType sys_type )=0;
+};
+
+class IDVBTuningSpace2 : public IDVBTuningSpace
+{
+public:
+    virtual HRESULT __stdcall get_NetworkID( long* p_l_network_id )=0;
+    virtual HRESULT __stdcall put_NetworkID( long l_network_id )=0;
+};
+
+class IDVBSTuningSpace : public IDVBTuningSpace2
+{
+public:
+    virtual HRESULT __stdcall get_LowOscillator( long* p_l_low_osc )=0;
+    virtual HRESULT __stdcall put_LowOscillator( long l_low_osc )=0;
+    virtual HRESULT __stdcall get_HighOscillator( long* p_l_high_osc )=0;
+    virtual HRESULT __stdcall put_HighOscillator( long l_high_osc )=0;
+    virtual HRESULT __stdcall get_LNBSwitch( long* p_l_lnb_switch )=0;
+    virtual HRESULT __stdcall put_LNBSwitch( long l_lnb_switch )=0;
+    virtual HRESULT __stdcall get_InputRange( BSTR* p_bstr_input_range )=0;
+    virtual HRESULT __stdcall put_InputRange( BSTR bstr_input_range )=0;
+    virtual HRESULT __stdcall get_SpectralInversion(
+        SpectralInversion* p_spectral_inv )=0;
+    virtual HRESULT __stdcall put_SpectralInversion(
+        SpectralInversion spectral_inv )=0;
+};
+
 class ITuningSpaceContainer : public IDispatch
 {
 public:
@@ -517,6 +568,8 @@ extern const GUID IID_IDVBCLocator;
 extern const GUID IID_IDVBSLocator;
 extern const GUID IID_IDVBSTuningSpace;
 extern const GUID IID_IDVBTuneRequest;
+extern const GUID IID_IDVBTuningSpace;
+extern const GUID IID_IDVBTuningSpace2;
 extern const GUID IID_IGraphBuilder;
 extern const GUID IID_IMediaControl;
 extern const GUID IID_IMpeg2Demultiplexer;
