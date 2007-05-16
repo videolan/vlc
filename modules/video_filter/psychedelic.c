@@ -135,7 +135,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     uint8_t u,v;
 
     picture_t *p_converted;
-    video_format_t fmt_out = {0};
+    video_format_t fmt_out;
+    memset( &fmt_out, 0, sizeof(video_format_t) );
     fmt_out.p_palette = NULL;
 
     if( !p_pic ) return NULL;

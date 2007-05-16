@@ -349,7 +349,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     picture_t *p_outpic;
 
-    //video_format_t fmt_out = {0};
+    //video_format_t fmt_out;
+    // memset( &fmt_out, 0, sizeof(video_format_t) );
     //picture_t *p_converted;
 
     int i_plane;

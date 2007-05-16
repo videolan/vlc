@@ -131,7 +131,8 @@ static int Open( vlc_object_t *p_this )
     aout_filter_sys_t *p_sys;
     goom_thread_t     *p_thread;
     vlc_value_t       width, height;
-    video_format_t    fmt = {0};
+    video_format_t    fmt;
+
 
     if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' )
          || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
@@ -160,6 +161,8 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_thread, "goom-width", &width );
     var_Create( p_thread, "goom-height", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     var_Get( p_thread, "goom-height", &height );
+
+    memset( &fmt, 0, sizeof(video_format_t) );
 
     fmt.i_width = fmt.i_visible_width = width.i_int;
     fmt.i_height = fmt.i_visible_height = height.i_int;

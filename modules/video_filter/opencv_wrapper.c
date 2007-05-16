@@ -299,11 +299,12 @@ static int Init( vout_thread_t *p_vout )
 {
     int i_index;
     picture_t *p_pic;
-    video_format_t fmt = {0};
+    video_format_t fmt;
     vout_sys_t *p_sys = p_vout->p_sys;
     I_OUTPUTPICTURES = 0;
 
     /* Initialize the output video format */
+    memset( &fmt, 0, sizeof(video_format_t) );
     p_vout->output.i_chroma = p_vout->render.i_chroma;
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
@@ -456,11 +457,13 @@ static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in )
     int planes = p_in->i_planes;    //num input video planes
     // input video size
     CvSize sz = cvSize(abs(p_in->format.i_width), abs(p_in->format.i_height));
-    video_format_t fmt_out = {0};
+    video_format_t fmt_out;
     clock_t start, finish;  //performance measures
     double  duration;
     int i = 0;
     vout_sys_t* p_sys = p_vout->p_sys;
+
+    memset( &fmt_out, 0, sizeof(video_format_t) );
 
     start = clock();
 

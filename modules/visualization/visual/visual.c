@@ -188,7 +188,8 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t        val;
 
     char *psz_effects, *psz_parser;
-    video_format_t fmt = {0};
+    video_format_t fmt;
+
 
     if( ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2') &&
           p_filter->input.i_format != VLC_FOURCC('f','i','3','2') ) )
@@ -302,6 +303,8 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Open the video output */
+    memset( &fmt, 0, sizeof(video_format_t) );
+
     fmt.i_width = fmt.i_visible_width = p_sys->i_width;
     fmt.i_height = fmt.i_visible_height = p_sys->i_height;
     fmt.i_chroma = VLC_FOURCC('I','4','2','0');
