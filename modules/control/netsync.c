@@ -148,9 +148,9 @@ static void Run( intf_thread_t *p_intf )
     }
 
     if( b_master )
-        i_socket = net_ListenUDP1( p_intf, NULL, NETSYNC_PORT );
+        i_socket = net_ListenUDP1( VLC_OBJECT(p_intf), NULL, NETSYNC_PORT );
     else
-        i_socket = net_ConnectUDP( p_intf, psz_master, NETSYNC_PORT, 0 );
+        i_socket = net_ConnectUDP( VLC_OBJECT(p_intf), psz_master, NETSYNC_PORT, 0 );
 
     if( psz_master ) free( psz_master );
 
