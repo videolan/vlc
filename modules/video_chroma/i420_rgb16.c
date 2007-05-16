@@ -54,7 +54,7 @@ static void SetOffset( int, int, int, int, vlc_bool_t *,
  *  - input: 2 lines (2 Y lines, 1 U/V line)
  *  - output: 1 line
  *****************************************************************************/
-void E_(I420_RGB16_dithering)( vout_thread_t *p_vout, picture_t *p_src,
+void E_(I420_RGB16_dither)( vout_thread_t *p_vout, picture_t *p_src,
                                                       picture_t *p_dest )
 {
     /* We got this one from the old arguments */
