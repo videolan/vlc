@@ -115,7 +115,7 @@ void var_buffer_addmemory( var_buffer_t *p_buf, void *p_mem, int i_mem )
     p_buf->i_data += i_mem;
 }
 
-void var_buffer_addUTF16( var_buffer_t *p_buf, char *p_str )
+void var_buffer_addUTF16( var_buffer_t *p_buf, const char *p_str )
 {
     unsigned int i;
     if( !p_str )
