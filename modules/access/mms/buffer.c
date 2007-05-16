@@ -128,7 +128,6 @@ void var_buffer_addUTF16( var_buffer_t *p_buf, char *p_str )
         size_t i_in = strlen( p_str );
         size_t i_out = i_in * 4;
         char *psz_out, *psz_tmp;
-        uint16_t *pw;
 
         psz_out = psz_tmp = malloc( i_out + 1 );
         iconv_handle = vlc_iconv_open( "UTF-16LE", "UTF-8" );
