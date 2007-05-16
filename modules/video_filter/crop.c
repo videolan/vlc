@@ -37,7 +37,7 @@
 
 #define BEST_AUTOCROP 1
 #ifdef BEST_AUTOCROP
-    #define RATIO_MAX 15000  // 10*4/3 for a 360°
+    #define RATIO_MAX 15000  // 10*4/3 for a 360
 #endif
 
 /*****************************************************************************
@@ -203,9 +203,10 @@ static int Init( vout_thread_t *p_vout )
     int   i_index;
     char *psz_var;
     picture_t *p_pic;
-    video_format_t fmt = {0};
+    video_format_t fmt;
 
     I_OUTPUTPICTURES = 0;
+    memset( &fmt, 0, sizeof(video_format_t) );
 
     p_vout->p_sys->i_lastchange = 0;
     p_vout->p_sys->b_changed = VLC_FALSE;
@@ -436,12 +437,14 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
-    video_format_t fmt = {0};
+    video_format_t fmt;
 
     if( !p_vout->p_sys->b_changed )
     {
         return VLC_SUCCESS;
     }
+
+    memset( &fmt, 0, sizeof(video_format_t) );
 
 #ifdef BEST_AUTOCROP
     msg_Dbg( p_vout, "cropping at %ix%i+%i+%i, %sautocropping",

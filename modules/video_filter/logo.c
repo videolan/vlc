@@ -171,7 +171,11 @@ static picture_t *LoadImage( vlc_object_t *p_this, char *psz_filename )
 {
     picture_t *p_pic;
     image_handler_t *p_image;
-    video_format_t fmt_in = {0}, fmt_out = {0};
+    video_format_t fmt_in;
+    video_format_t fmt_out;
+
+    memset( &fmt_in, 0, sizeof(video_format_t) );
+    memset( &fmt_out, 0, sizeof(video_format_t) );
 
     fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
     p_image = image_HandlerCreate( p_this );
@@ -361,11 +365,11 @@ static int Init( vout_thread_t *p_vout )
     vout_sys_t *p_sys = p_vout->p_sys;
     picture_t *p_pic;
     int i_index;
-    video_format_t fmt = {0};
-
+    video_format_t fmt;
     logo_list_t *p_logo_list = p_sys->p_logo_list;
 
     I_OUTPUTPICTURES = 0;
+    memset( &fmt, 0, sizeof(video_format_t) );
 
     /* adjust index to the next logo */
     p_logo_list->i_counter =

@@ -241,7 +241,7 @@ static int Init( vout_thread_t *p_vout )
     int i_index, i_row, i_col, i_width, i_height, i_left, i_top;
     unsigned int i_target_width,i_target_height;
     picture_t *p_pic;
-    video_format_t fmt = {0};
+    video_format_t fmt;
     int i_aspect = 4*VOUT_ASPECT_FACTOR/3;
     int i_align = 0;
     unsigned int i_hstart, i_hend, i_vstart, i_vend;
@@ -249,6 +249,8 @@ static int Init( vout_thread_t *p_vout )
     int i_xpos, i_ypos;
     int i_vstart_rounded = 0, i_hstart_rounded = 0;
     char *psz_aspect;
+
+    memset( &fmt, 0, sizeof(video_format_t) );
 
     psz_aspect = var_CreateGetNonEmptyString( p_vout,
                                               CFG_PREFIX "element-aspect" );
