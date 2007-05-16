@@ -31,7 +31,7 @@ typedef struct csa_t csa_t;
 #define csa_Decrypt E_(__csa_decrypt)
 #define csa_Encrypt E_(__csa_encrypt)
 
-csa_t *csa_New();
+csa_t *csa_New( void );
 void   csa_Delete( csa_t * );
 
 void   csa_SetCW( csa_t *, uint8_t o_ck[8], uint8_t e_ck[8] );
