@@ -2553,7 +2553,8 @@ static inline char *FixUTF8( char *p )
 static char *EITConvertToUTF8( unsigned char *psz_instring, size_t i_length )
 {
     const char *psz_encoding;
-    unsigned char *psz_stringstart, *psz_outstring, *psz_tmp;
+    const unsigned char *psz_stringstart, *psz_outstring;
+    char *psz_tmp;
     char psz_encbuf[12];
     size_t i_in, i_out;
     vlc_iconv_t iconv_handle;
