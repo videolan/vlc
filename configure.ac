@@ -1493,7 +1493,7 @@ dnl
 dnl  Test coverage
 dnl
 AC_ARG_ENABLE(coverage,
-	[  --enable-debug          build for test coverage (default disabled)],,
+	[  --enable-coverage       build for test coverage (default disabled)],,
 	[enable_coverage="no"])
 AS_IF([test "${enable_coverage}" != "no"], [
 	CFLAGS="-fprofile-arcs -ftest-coverage ${CFLAGS}"
