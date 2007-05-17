@@ -27,17 +27,17 @@ noinst_HEADERS = srtp.h
 EXTRA_PROGRAMS = srtp
 if HAVE_LIBGCRYPT
 noinst_LTLIBRARIES = libvlc_srtp.la
-check_PROGRAMS = test-aes
-TESTS = test-aes
+check_PROGRAMS = test-aes test-recv
+TESTS = $(check_PROGRAMS)
 endif
 
 libvlc_srtp_la_SOURCES = srtp.c
-test_aes_SOURCES = test-aes.c
 srtp_SOURCES = recv.c
 srtp_LDADD = libvlc_srtp.la
+test_recv_LDADD = libvlc_srtp.la
 
 lcov-run:
-	rm -f *.gcda lcov
+	rm -Rf *.gcda lcov
 	$(MAKE) $(AM_MAKEFLAGS) check
 
 lcov-pre.out:
