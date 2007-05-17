@@ -33,6 +33,10 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include "playlist.h"
 
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
 #include <lualib.h>     /* Lua libs */
@@ -90,6 +94,21 @@ static int vlclua_peek( lua_State *p_state )
     lua_pop( p_state, i );
     i_peek = stream_Peek( p_demux->s, &p_peek, n );
     lua_pushlstring( p_state, (const char *)p_peek, i_peek );
+    return 1;
+}
+
+static int vlclua_read( lua_State *p_state )
+{
+    demux_t *p_demux = vlclua_get_demux( p_state );
+    int i = lua_gettop( p_state );
+    int n;
+    byte_t *p_read;
+    int i_read;
+    if( !i ) return 0;
+    n = lua_tonumber( p_state, 1 );
+    lua_pop( p_state, i );
+    i_read = stream_Read( p_demux->s, &p_read, n );
+    lua_pushlstring( p_state, (const char *)p_read, i_read );
     return 1;
 }
 
@@ -162,12 +181,41 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
     DIR *dir;
     char *psz_filename = NULL;
     int i_files;
-    const char psz_dir[] = "share/luaplaylist"; /* FIXME */
+    char *psz_dir;
+
+#   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
+    {
+        char *psz_vlcpath = p_intf->p_libvlc_global->psz_vlcpath;
+        psz_dir = malloc( strlen( psz_vlcpath ) + strlen( "/share/luaplaylist" ) + 1 );
+        if( !psz_src ) return VLC_ENOMEM;
+#       if defined( WIN32 )
+            sprintf( psz_src, "%s/luaplaylist", psz_vlcpath );
+#       else
+            sprintf( psz_src, "%s/share/luaplaylist", psz_vlcpath );
+#       endif
+    }
+#   else
+    {
+#   ifdef HAVE_SYS_STAT_H
+        struct stat stat_info;
+        if( ( utf8_stat( "share/luaplaylist", &stat_info ) == -1 )
+            || !S_ISDIR( stat_info.st_mode ) )
+        {
+            psz_dir = strdup( DATA_PATH "/luaplaylist" );
+        }
+        else
+#   endif
+        {
+            psz_dir = strdup( "share/luaplaylist" );
+        }
+    }
+#   endif
 
     static luaL_Reg p_reg[] =
     {
-        { "readline", vlclua_readline },
         { "peek", vlclua_peek },
+        { "read", vlclua_read },
+        { "readline", vlclua_readline },
         { "decode_uri", vlclua_decode_uri },
         { "resolve_xml_special_chars", vlclua_resolve_xml_special_chars }
     };
@@ -175,6 +223,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
     p_demux->p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
     if( !p_demux->p_sys )
     {
+        free( psz_dir );
         return VLC_ENOMEM;
     }
 
@@ -186,6 +235,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
     if( !p_state )
     {
         msg_Err( p_demux, "Could not create new Lua State" );
+        free( psz_dir );
         free( p_demux->p_sys );
         return VLC_EGENERIC;
     }
@@ -277,6 +327,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
         }
 
         if( dir ) closedir( dir );
+        free( psz_dir );
         if( i_ret != VLC_SUCCESS )
             E_(Close_LuaPlaylist)( p_this );
         return i_ret;
