@@ -23,8 +23,8 @@ function parse()
         end ]]
         if string.match( line, "<meta name=\"description\"" )
         then
-            name = vlc.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"Regarder (.*) sur Dailymotion Partagez Vos Videos\..*$", "%1" ) )
-            description = vlc.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"Regarder .* sur Dailymotion Partagez Vos Videos\. ([^\"]*)\".*$", "%1" ) )
+            name = vlc.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"%w+ (.*) %w+ %w+ %w+ %w+ Videos\..*$", "%1" ) )
+            description = vlc.resolve_xml_special_chars( string.gsub( line, "^.*name=\"description\" content=\"%w+ .* %w+ %w+ %w+ %w+ Videos\. ([^\"]*)\".*$", "%1" ) )
         end
         if string.match( line, "<link rel=\"thumbnail\"" )
         then
