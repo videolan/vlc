@@ -208,7 +208,7 @@ srtp_create (int encr, int auth, unsigned tag_len, int prf, unsigned flags)
             return NULL;
     }
 
-    if (tag_len > gcry_md_get_algo_dlen (auth))
+    if (tag_len > gcry_md_get_algo_dlen (md))
         return NULL;
 
     if (prf != SRTP_PRF_AES_CM)
@@ -331,6 +331,7 @@ srtp_derive (srtp_session_t *s, const void *key, size_t keylen,
      || gcry_cipher_setkey (prf, key, keylen))
         return -1;
 
+#if 0
     /* RTP key derivation */
     if (s->kdr != 0)
     {
@@ -344,6 +345,7 @@ srtp_derive (srtp_session_t *s, const void *key, size_t keylen,
         }
     }
     else
+#endif
         memset (r, 0, sizeof (r));
 
     if (proto_derive (&s->rtp, prf, salt, saltlen, r, 6, false))
