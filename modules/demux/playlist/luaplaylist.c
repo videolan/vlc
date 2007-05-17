@@ -286,6 +286,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
         free( psz_dir );
         return VLC_ENOMEM;
     }
+    p_demux->p_sys->psz_filename = NULL;
 
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
