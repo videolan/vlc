@@ -245,7 +245,7 @@ static void *SigHandler (void *data)
         }
         else
         if (time (NULL) <= abort_time)
-	{
+        {
             /* If user asks again more than 2 seconds later, die badly */
             pthread_sigmask (SIG_UNBLOCK, set, NULL);
             fprintf (stderr, "user insisted too much, dying badly\n");
@@ -259,7 +259,7 @@ static void *SigHandler (void *data)
 
 static void KillOnce (void)
 {
-	VLC_Die (0);
+    VLC_Die (0);
 }
 
 static void Kill (void)
