@@ -651,7 +651,16 @@ srtp_recv (srtp_session_t *s, uint8_t *buf, size_t *lenp)
             rcc = roc;
 
         const uint8_t *tag = rtp_digest (s, buf, len, rcc);
-        if (memcmp (buf + len + roc_len, tag, s->tag_len))
+#if 0
+        printf ("Computed: 0x");
+        for (unsigned i = 0; i < tag_len; i++)
+            printf ("%02x", tag[i]);
+        printf ("\nReceived: 0x");
+        for (unsigned i = 0; i < tag_len; i++)
+            printf ("%02x", buf[len + roc_len + i]);
+        puts ("");
+#endif
+        if (memcmp (buf + len + roc_len, tag, tag_len))
             return EACCES;
 
         if (roc_len)
