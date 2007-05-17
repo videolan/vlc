@@ -169,6 +169,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>language</tabstop>
+  <tabstop>qt4</tabstop>
+  <tabstop>qtAlwaysVideo</tabstop>
+  <tabstop>skins</tabstop>
+  <tabstop>fileSkin</tabstop>
+  <tabstop>skinBrowse</tabstop>
+  <tabstop>OneInterfaceMode</tabstop>
+  <tabstop>EnqueueOneInterfaceMode</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

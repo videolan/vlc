@@ -245,6 +245,24 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>enableAudio</tabstop>
+  <tabstop>defaultVolume</tabstop>
+  <tabstop>spdifBox</tabstop>
+  <tabstop>detectionDolby</tabstop>
+  <tabstop>preferredAudioLanguage</tabstop>
+  <tabstop>outputModule</tabstop>
+  <tabstop>alsaDevice</tabstop>
+  <tabstop>DirectXDevice</tabstop>
+  <tabstop>OSSDevice</tabstop>
+  <tabstop>OSSBrowse</tabstop>
+  <tabstop>FileName</tabstop>
+  <tabstop>fileBrowseButton</tabstop>
+  <tabstop>headphoneEffect</tabstop>
+  <tabstop>volumeNormalizer</tabstop>
+  <tabstop>volNormalizer</tabstop>
+  <tabstop>visualisation</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

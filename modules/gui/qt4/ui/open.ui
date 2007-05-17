@@ -114,7 +114,7 @@
        </widget>
       </item>
       <item row="4" column="1" colspan="5" >
-       <widget class="Line" name="" >
+       <widget class="Line" name="line" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
@@ -155,7 +155,7 @@
        </widget>
       </item>
       <item row="1" column="1" colspan="5" >
-       <widget class="Line" name="" >
+       <widget class="Line" name="line" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
@@ -224,9 +224,15 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>cacheSpinBox</tabstop>
-  <tabstop>advancedLineInput</tabstop>
   <tabstop>Tab</tabstop>
+  <tabstop>advancedCheckBox</tabstop>
+  <tabstop>cacheSpinBox</tabstop>
+  <tabstop>startTimeSpinBox</tabstop>
+  <tabstop>slaveCheckbox</tabstop>
+  <tabstop>advancedLineInput</tabstop>
+  <tabstop>slaveText</tabstop>
+  <tabstop>slaveBrowseButton</tabstop>
+  <tabstop>buttonsBox</tabstop>
  </tabstops>
  <resources/>
  <connections>

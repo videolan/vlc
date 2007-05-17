@@ -326,6 +326,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>dvdRadioButton</tabstop>
+  <tabstop>vcdRadioButton</tabstop>
+  <tabstop>audioCDRadioButton</tabstop>
+  <tabstop>dvdsimple</tabstop>
+  <tabstop>deviceCombo</tabstop>
+  <tabstop>toolButton</tabstop>
+  <tabstop>titleSpin</tabstop>
+  <tabstop>chapterSpin</tabstop>
+  <tabstop>subtitlesSpin</tabstop>
+  <tabstop>audioSpin</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

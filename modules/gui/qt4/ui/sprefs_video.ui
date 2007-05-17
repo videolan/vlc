@@ -212,6 +212,23 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>enableVideo</tabstop>
+  <tabstop>fullscreen</tabstop>
+  <tabstop>overlay</tabstop>
+  <tabstop>alwaysOnTop</tabstop>
+  <tabstop>windowDecorations</tabstop>
+  <tabstop>skipFrames</tabstop>
+  <tabstop>overlay</tabstop>
+  <tabstop>outputModule</tabstop>
+  <tabstop>wallpaperMode</tabstop>
+  <tabstop>dXdisplayDevice</tabstop>
+  <tabstop>snapshotsDirectory</tabstop>
+  <tabstop>snapshotsDirectoryBrowse</tabstop>
+  <tabstop>snapshotsPrefix</tabstop>
+  <tabstop>snapshotsSequentialNumbering</tabstop>
+  <tabstop>snapshotsFormat</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

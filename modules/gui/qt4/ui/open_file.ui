@@ -247,6 +247,14 @@
   </layout>
  </widget>
  <layoutdefault spacing="0" margin="0" />
+ <tabstops>
+  <tabstop>fileInput</tabstop>
+  <tabstop>subCheckBox</tabstop>
+  <tabstop>subInput</tabstop>
+  <tabstop>subBrowseButton</tabstop>
+  <tabstop>sizeSubComboBox</tabstop>
+  <tabstop>alignSubComboBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

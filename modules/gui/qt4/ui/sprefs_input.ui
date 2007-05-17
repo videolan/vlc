@@ -220,6 +220,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>DVDDevice</tabstop>
+  <tabstop>DVDBrowse</tabstop>
+  <tabstop>UDPPort</tabstop>
+  <tabstop>proxy</tabstop>
+  <tabstop>networkCache</tabstop>
+  <tabstop>PostProcLevel</tabstop>
+  <tabstop>AviRepair</tabstop>
+  <tabstop>RTSP_TCPBox</tabstop>
+  <tabstop>systemCodecBox</tabstop>
+  <tabstop>timeshiftBox</tabstop>
+  <tabstop>RecordBox</tabstop>
+  <tabstop>DumpBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
