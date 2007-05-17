@@ -1025,7 +1025,7 @@ AC_CACHE_CHECK([if \$CC accepts -fvisibility=hidden],
     [CFLAGS="${CFLAGS_save} -fvisibility=hidden"
      AC_TRY_COMPILE([],,ac_cv_c_visibility_hidden=yes, ac_cv_c_visibility_hidden=no)])
 if test "${ac_cv_c_visibility_hidden}" != "no"; then
-    VLC_ADD_CFLAGS([libvlc plugin],[-fvisibility=hidden])
+    VLC_ADD_CFLAGS([plugin],[-fvisibility=hidden])
 fi
 
 dnl Check for -fvisibility-inlines-hidden (breaks x86_64 linkers)
