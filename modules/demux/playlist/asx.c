@@ -515,7 +515,7 @@ static int Demux( demux_t *p_demux )
                 input_ItemCopyOptions( p_current->p_input, p_entry );
                 while( i_options )
                 {
-		    psz_name = ppsz_options[--i_options];
+                    psz_name = ppsz_options[--i_options];
                     FREENULL(psz_name);
                 }
 
