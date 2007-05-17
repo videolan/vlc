@@ -386,12 +386,12 @@ static int Demux( demux_t *p_demux )
                     if( lua_isstring( p_state, t+3 ) )
                     {
                         psz_url = lua_tostring( p_state, t+3 );
-                        printf("Path: %s\n", psz_url );
+                        msg_Dbg( p_demux, "Path: %s", psz_url );
                         lua_getfield( p_state, t+2, "name" );
                         if( lua_isstring( p_state, t+4 ) )
                         {
                             psz_title = lua_tostring( p_state, t+4 );
-                            printf("Name: %s\n", psz_title );
+                            msg_Dbg( p_demux, "Name: %s", psz_title );
                         }
                         else
                         {
@@ -401,14 +401,14 @@ static int Demux( demux_t *p_demux )
                                                     psz_title, 0, NULL, -1 );
                         p_input->p_meta = vlc_meta_New();
 
-#define TRY_META( a, b ) \
-                        lua_getfield( p_state, t+2, a ); \
-                        if( lua_isstring( p_state, t+5 ) ) \
-                        { \
-                            psz_title = lua_tostring( p_state, t+5 ); \
-                            printf( #b ": %s\n", psz_title ); \
+#define TRY_META( a, b )                                                      \
+                        lua_getfield( p_state, t+2, a );                      \
+                        if( lua_isstring( p_state, t+5 ) )                    \
+                        {                                                     \
+                            psz_title = lua_tostring( p_state, t+5 );         \
+                            msg_Dbg( p_demux, #b ": %s", psz_title );         \
                             vlc_meta_Set ## b ( p_input->p_meta, psz_title ); \
-                        } \
+                        }                                                     \
                         lua_pop( p_state, 1 ); /* pop a */
                         TRY_META( "title", Title );
                         TRY_META( "artist", Artist );
@@ -437,13 +437,14 @@ static int Demux( demux_t *p_demux )
                     }
                     else
                     {
-                        printf("Path isn't a string\n");
+                        msg_Warn( p_demux,
+                                 "Playlist item's path should be a string" );
                     }
                     lua_pop( p_state, 1 ); /* pop "path" */
                 }
                 else
                 {
-                    printf("This isn't a table !!!\n" );
+                    msg_Warn( p_demux, "Playlist item should be a table" );
                 }
                 lua_pop( p_state, 1 ); /* pop the value, keep the key for
                                         * the next lua_next() call */
