@@ -12,11 +12,7 @@ NULL =
 #  - . should come before mozilla/bindings because the plugin needs libvlc.a
 #  - po should come before . because VLC.app needs the pofiles
 #  - loader should come before modules because some plugins need it
-SUBDIRS = intl po libs/loader
-if HAVE_LIBGCRYPT
-SUBDIRS += libs/srtp
-endif
-SUBDIRS += src modules . \
+SUBDIRS = intl po libs/loader libs/srtp src modules . \
 		mozilla bindings activex share doc
 DIST_SUBDIRS = $(SUBDIRS) m4 ipkg
 

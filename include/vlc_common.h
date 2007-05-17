@@ -481,21 +481,11 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #else
 #  if !defined (__PLUGIN__) || defined (HAVE_SHARED_LIBVLC)
 #    ifdef __cplusplus
-#      if HAVE_ATTRIBUTE_VISIBILITY
-#         define   VLC_EXPORT( type, name, args ) extern "C" __attribute__((visibility("default"))) type name args
-#         define VLC_INTERNAL( type, name, args ) extern "C" __attribute__((visibility("hidden"))) type name args
-#      else
 #         define   VLC_EXPORT( type, name, args ) extern "C" type name args
 #         define VLC_INTERNAL( type, name, args ) extern "C" type name args
-#      endif
 #    else
-#      if HAVE_ATTRIBUTE_VISIBILITY
-#         define   VLC_EXPORT( type, name, args ) __attribute__((visibility("default"))) type name args
-#         define VLC_INTERNAL( type, name, args ) __attribute__((visibility("hidden"))) type name args
-#      else
 #         define   VLC_EXPORT( type, name, args ) type name args
 #         define VLC_INTERNAL( type, name, args ) type name args
-#      endif
 #    endif
 #  else
 #    define   VLC_EXPORT( type, name, args ) struct _u_n_u_s_e_d_

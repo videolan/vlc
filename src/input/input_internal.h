@@ -364,7 +364,7 @@ struct stream_t
     vlc_bool_t      b_little_endian;
 };
 
-#include <vlc/libvlc.h>
+#include <libvlc.h>
 
 static inline stream_t *vlc_stream_create( vlc_object_t *obj )
 {
