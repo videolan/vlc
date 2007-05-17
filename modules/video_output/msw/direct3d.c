@@ -334,6 +334,7 @@ static int Init( vout_thread_t *p_vout )
     E_(UpdateRects)( p_vout, VLC_TRUE );
 
     /*  create picture pool */
+    p_vout->fmt_out.i_chroma = 0;
     i_ret = Direct3DVoutCreatePictures(p_vout, 1);
     if( VLC_SUCCESS != i_ret )
     {
@@ -913,13 +914,15 @@ static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3D
                     case D3DFMT_R8G8B8:
                     case D3DFMT_X8R8G8B8:
                     case D3DFMT_A8R8G8B8:
+                    case D3DFMT_R5G6B5:
+                    case D3DFMT_X1R5G5B5:
                         msg_Dbg( p_vout, "defaulting to adpater pixel format");
                         return Direct3DVoutSelectFormat(p_vout, target, &d3ddm.Format, 1);
                     default:
                     {
                         /* if we fall here, that probably means that we need to render some YUV format */
                         static const D3DFORMAT formats[] = 
-                            { D3DFMT_R8G8B8, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8 };
+                            { D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
                         msg_Dbg( p_vout, "defaulting to built-in pixel format");
                         return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
                     }
@@ -942,6 +945,9 @@ static int Direct3DVoutSetOutputFormat(vout_thread_t *p_vout, D3DFORMAT format)
             break;
         case D3DFMT_R8G8B8:
             p_vout->output.i_chroma = VLC_FOURCC('R', 'V', '2', '4');
+            p_vout->output.i_rmask = 0xff0000;
+            p_vout->output.i_gmask = 0x00ff00;
+            p_vout->output.i_bmask = 0x0000ff;
             break;
         case D3DFMT_X8R8G8B8:
         case D3DFMT_A8R8G8B8:
@@ -949,67 +955,18 @@ static int Direct3DVoutSetOutputFormat(vout_thread_t *p_vout, D3DFORMAT format)
             p_vout->output.i_rmask = 0x00ff0000;
             p_vout->output.i_gmask = 0x0000ff00;
             p_vout->output.i_bmask = 0x000000ff;
-#       if defined( WORDS_BIGENDIAN )
-            p_vout->output.i_rrshift = 0;
-            p_vout->output.i_lrshift = 24;
-            p_vout->output.i_rgshift = 0;
-            p_vout->output.i_lgshift = 16;
-            p_vout->output.i_rbshift = 0;
-            p_vout->output.i_lbshift = 8;
-#       else
-            p_vout->output.i_rrshift = 0;
-            p_vout->output.i_lrshift = 8;
-            p_vout->output.i_rgshift = 0;
-            p_vout->output.i_lgshift = 16;
-            p_vout->output.i_rbshift = 0;
-            p_vout->output.i_lbshift = 24;
-#       endif
             break;
         case D3DFMT_R5G6B5:
             p_vout->output.i_chroma = VLC_FOURCC('R', 'V', '1', '6');
             p_vout->output.i_rmask = (0x1fL)<<11;
             p_vout->output.i_gmask = (0x3fL)<<5;
             p_vout->output.i_bmask = (0x1fL)<<0;
-#       if defined( WORDS_BIGENDIAN )
-            p_vout->output.i_rrshift = 0;
-            p_vout->output.i_lrshift = 11;
-            p_vout->output.i_rgshift = 0;
-            p_vout->output.i_lgshift = 5;
-            p_vout->output.i_rbshift = 0;
-            p_vout->output.i_lbshift = 0;
-#       else
-            /* FIXME: since components are not byte aligned,
-                      there is no chance that this will work */
-            p_vout->output.i_rrshift = 0;
-            p_vout->output.i_lrshift = 0;
-            p_vout->output.i_rgshift = 0;
-            p_vout->output.i_lgshift = 5;
-            p_vout->output.i_rbshift = 0;
-            p_vout->output.i_lbshift = 11;
-#       endif
             break;
         case D3DFMT_X1R5G5B5:
             p_vout->output.i_chroma = VLC_FOURCC('R', 'V', '1', '5');
             p_vout->output.i_rmask = (0x1fL)<<10;
             p_vout->output.i_gmask = (0x1fL)<<5;
             p_vout->output.i_bmask = (0x1fL)<<0;
-#       if defined( WORDS_BIGENDIAN )
-            p_vout->output.i_rrshift = 0;
-            p_vout->output.i_lrshift = 10;
-            p_vout->output.i_rgshift = 0;
-            p_vout->output.i_lgshift = 5;
-            p_vout->output.i_rbshift = 0;
-            p_vout->output.i_lbshift = 0;
-#       else
-            /* FIXME: since components are not byte aligned,
-                      there is no chance that this will work */
-            p_vout->output.i_rrshift = 0;
-            p_vout->output.i_lrshift = 1;
-            p_vout->output.i_rgshift = 0;
-            p_vout->output.i_lgshift = 5;
-            p_vout->output.i_rbshift = 0;
-            p_vout->output.i_lbshift = 11;
-#       endif
             break;
         default:
             return VLC_EGENERIC;
@@ -1031,6 +988,8 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
     D3DFORMAT               format;
     HRESULT hr;
     size_t c;
+    // if vout is already running, use current chroma, otherwise choose from upstream 
+    int i_chroma = p_vout->output.i_chroma ? : p_vout->render.i_chroma;
 
     I_OUTPUTPICTURES = 0;
 
@@ -1039,7 +998,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
     ** the requested chroma which is usable by the hardware in an offscreen surface, as they
     ** typically support more formats than textures
     */ 
-    format = Direct3DVoutFindFormat(p_vout, p_vout->render.i_chroma, p_vout->p_sys->bbFormat);
+    format = Direct3DVoutFindFormat(p_vout, i_chroma, p_vout->p_sys->bbFormat);
     if( VLC_SUCCESS != Direct3DVoutSetOutputFormat(p_vout, format) )
     {
         msg_Err(p_vout, "surface pixel format is not supported.");
