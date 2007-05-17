@@ -60,7 +60,7 @@ vlc_module_begin();
 
     set_shortname( _("Lua Playlist") );
     set_description( _("Lua Playlist Parser Interface") );
-    set_capability( "demux2", 0 );
+    set_capability( "demux2", 9 );
     set_callbacks( E_(Import_LuaPlaylist), E_(Close_LuaPlaylist) );
 vlc_module_end();
 

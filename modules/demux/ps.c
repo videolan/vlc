@@ -61,7 +61,7 @@ vlc_module_begin();
 
     add_submodule();
     set_description( _("MPEG-PS demuxer") );
-    set_capability( "demux2", 9 );
+    set_capability( "demux2", 8 );
     set_callbacks( Open, Close );
 vlc_module_end();
 

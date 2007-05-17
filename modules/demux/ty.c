@@ -70,7 +70,7 @@ vlc_module_begin();
     set_description(_("TY Stream audio/video demux"));
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_capability("demux2", 8);
+    set_capability("demux2", 6);
     /* FIXME: there seems to be a segfault when using PVR access
      * and TY demux has a bigger priority than PS
      * Something must be wrong.

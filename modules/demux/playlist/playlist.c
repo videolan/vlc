@@ -116,11 +116,13 @@ vlc_module_begin();
         set_description( _("Dummy ifo demux") );
         set_capability( "demux2", 12 );
         set_callbacks( E_(Import_IFO), E_(Close_IFO) );
+#if 0
     add_submodule();
         set_description( _("Video portal url converter") );
         add_shortcut( "videoportal" );
         set_capability( "demux2", 10 );
         set_callbacks( E_(Import_VideoPortal), E_(Close_VideoPortal) );
+#endif
 vlc_module_end();
 
 

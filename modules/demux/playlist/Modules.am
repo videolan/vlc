@@ -14,7 +14,6 @@ SOURCES_playlist = \
 	qtl.c \
 	gvp.c \
 	ifo.c \
-	videoportals.c \
 	$(NULL)
 
 SOURCES_luaplaylist = luaplaylist.c
