@@ -70,8 +70,12 @@ vlc_module_end();
 struct demux_sys_t
 {
     lua_State *p_state;
+    char *psz_filename;
 };
 
+/*****************************************************************************
+ *
+ *****************************************************************************/
 static demux_t *vlclua_get_demux( lua_State *p_state )
 {
     demux_t *p_demux;
@@ -156,6 +160,71 @@ static int vlclua_resolve_xml_special_chars( lua_State *p_state )
     return 1;
 }
 
+static int vlclua_msg_dbg( lua_State *p_state )
+{
+    demux_t *p_demux = vlclua_get_demux( p_state );
+    int i = lua_gettop( p_state );
+    if( !i ) return 0;
+    const char *psz_cstring = lua_tostring( p_state, 1 );
+    if( !psz_cstring ) return 0;
+    msg_Dbg( p_demux, "%s: %s", p_demux->p_sys->psz_filename, psz_cstring );
+    return 0;
+}
+static int vlclua_msg_warn( lua_State *p_state )
+{
+    demux_t *p_demux = vlclua_get_demux( p_state );
+    int i = lua_gettop( p_state );
+    if( !i ) return 0;
+    const char *psz_cstring = lua_tostring( p_state, 1 );
+    if( !psz_cstring ) return 0;
+    msg_Warn( p_demux, "%s: %s", p_demux->p_sys->psz_filename, psz_cstring );
+    return 0;
+}
+static int vlclua_msg_err( lua_State *p_state )
+{
+    demux_t *p_demux = vlclua_get_demux( p_state );
+    int i = lua_gettop( p_state );
+    if( !i ) return 0;
+    const char *psz_cstring = lua_tostring( p_state, 1 );
+    if( !psz_cstring ) return 0;
+    msg_Err( p_demux, "%s: %s", p_demux->p_sys->psz_filename, psz_cstring );
+    return 0;
+}
+static int vlclua_msg_info( lua_State *p_state )
+{
+    demux_t *p_demux = vlclua_get_demux( p_state );
+    int i = lua_gettop( p_state );
+    if( !i ) return 0;
+    const char *psz_cstring = lua_tostring( p_state, 1 );
+    if( !psz_cstring ) return 0;
+    msg_Info( p_demux, "%s: %s", p_demux->p_sys->psz_filename, psz_cstring );
+    return 0;
+}
+
+/* Functions to register */
+static luaL_Reg p_reg[] =
+{
+    { "peek", vlclua_peek },
+    { "decode_uri", vlclua_decode_uri },
+    { "resolve_xml_special_chars", vlclua_resolve_xml_special_chars },
+    { "msg_dbg", vlclua_msg_dbg },
+    { "msg_warn", vlclua_msg_warn },
+    { "msg_err", vlclua_msg_err },
+    { "msg_info", vlclua_msg_info },
+    { NULL, NULL }
+};
+
+/* Functions to register for parse() function call only */
+static luaL_Reg p_reg_parse[] =
+{
+    { "read", vlclua_read },
+    { "readline", vlclua_readline },
+    { NULL, NULL }
+};
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
 static int file_select( const char *file )
 {
     int i = strlen( file );
@@ -211,15 +280,6 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
     }
 #   endif
 
-    static luaL_Reg p_reg[] =
-    {
-        { "peek", vlclua_peek },
-        { "read", vlclua_read },
-        { "readline", vlclua_readline },
-        { "decode_uri", vlclua_decode_uri },
-        { "resolve_xml_special_chars", vlclua_resolve_xml_special_chars }
-    };
-
     p_demux->p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
     if( !p_demux->p_sys )
     {
@@ -265,6 +325,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
         free( psz_filename ); psz_filename = NULL;
         asprintf( &psz_filename, "%s/%s", psz_dir, *ppsz_file );
         msg_Dbg( p_demux, "Trying Lua playlist script %s", psz_filename );
+        p_demux->p_sys->psz_filename = psz_filename;
 
         /* Ugly hack to delete previous versions of the probe() and parse()
          * functions. */
@@ -316,8 +377,6 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
     }
 
     error:
-        free( psz_filename );
-
         if( ppsz_filelist )
         {
             for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend;
@@ -340,6 +399,7 @@ void E_(Close_LuaPlaylist)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     lua_close( p_demux->p_sys->p_state );
+    free( p_demux->p_sys->psz_filename );
     free( p_demux->p_sys );
 }
 
@@ -347,9 +407,11 @@ static int Demux( demux_t *p_demux )
 {
     input_item_t *p_input;
     lua_State *p_state = p_demux->p_sys->p_state;
-    char psz_filename[] = "FIXME";
+    char *psz_filename = p_demux->p_sys->psz_filename;
 
     INIT_PLAYLIST_STUFF;
+
+    luaL_register( p_state, "vlc", p_reg_parse );
 
     lua_getglobal( p_state, "parse" );
 
