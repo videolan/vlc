@@ -17,12 +17,12 @@ function parse()
             line = vlc.readline()
             if not line then break end
             if string.match( line, "<meta name=\"title\"" ) then
-                title = string.gsub( line, "^.*content=\"([^\"]*).*$", "%1" )  
+                name = string.gsub( line, "^.*content=\"([^\"]*).*$", "%1" )  
                 break
             end
         end
-        return { { url = string.gsub( vlc.path, "^.*watch/(.*[^/])/?$", "http://www.metacafe.com/fplayer/%1.swf" ); title = title } }
+        return { { path = string.gsub( vlc.path, "^.*watch/(.*[^/])/?$", "http://www.metacafe.com/fplayer/%1.swf" ); name = name } }
     else -- This is the flash player's URL
-        return { { url = string.gsub( vlc.path, "^.*mediaURL=([^&]*).*$", "%1" ) } }
+        return { { path = string.gsub( vlc.path, "^.*mediaURL=([^&]*).*$", "%1" ) } }
     end
 end

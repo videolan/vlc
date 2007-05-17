@@ -382,16 +382,16 @@ static int Demux( demux_t *p_demux )
                 {
                     const char *psz_url = NULL;
                     const char *psz_title = NULL;
-                    lua_getfield( p_state, t+2, "url" );
+                    lua_getfield( p_state, t+2, "path" );
                     if( lua_isstring( p_state, t+3 ) )
                     {
                         psz_url = lua_tostring( p_state, t+3 );
-                        printf("URL: %s\n", psz_url );
-                        lua_getfield( p_state, t+2, "title" );
+                        printf("Path: %s\n", psz_url );
+                        lua_getfield( p_state, t+2, "name" );
                         if( lua_isstring( p_state, t+4 ) )
                         {
                             psz_title = lua_tostring( p_state, t+4 );
-                            printf("Title: %s\n", psz_title );
+                            printf("Name: %s\n", psz_title );
                         }
                         else
                         {
@@ -399,18 +399,47 @@ static int Demux( demux_t *p_demux )
                         }
                         p_input = input_ItemNewExt( p_playlist, psz_url,
                                                     psz_title, 0, NULL, -1 );
+                        p_input->p_meta = vlc_meta_New();
+
+#define TRY_META( a, b ) \
+                        lua_getfield( p_state, t+2, a ); \
+                        if( lua_isstring( p_state, t+5 ) ) \
+                        { \
+                            psz_title = lua_tostring( p_state, t+5 ); \
+                            printf( #b ": %s\n", psz_title ); \
+                            vlc_meta_Set ## b ( p_input->p_meta, psz_title ); \
+                        } \
+                        lua_pop( p_state, 1 ); /* pop a */
+                        TRY_META( "title", Title );
+                        TRY_META( "artist", Artist );
+                        TRY_META( "genre", Genre );
+                        TRY_META( "copyright", Copyright );
+                        TRY_META( "album", Album );
+                        TRY_META( "tracknum", Tracknum );
+                        TRY_META( "description", Description );
+                        TRY_META( "rating", Rating );
+                        TRY_META( "date", Date );
+                        TRY_META( "setting", Setting );
+                        TRY_META( "url", URL );
+                        TRY_META( "language", Language );
+                        TRY_META( "nowplaying", NowPlaying );
+                        TRY_META( "publisher", Publisher );
+                        TRY_META( "encodedby", EncodedBy );
+                        TRY_META( "arturl", ArtURL );
+                        TRY_META( "trackid", TrackID );
+
                         playlist_BothAddInput(
                             p_playlist, p_input,
                             p_item_in_category,
                             PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
                             PLAYLIST_END, NULL, NULL, VLC_FALSE );
-                        lua_pop( p_state, 1 ); /* pop "title" */
+                        lua_pop( p_state, 1 ); /* pop "name" */
                     }
                     else
                     {
-                        printf("URL isn't a string\n");
+                        printf("Path isn't a string\n");
                     }
-                    lua_pop( p_state, 1 ); /* pop "url" */
+                    lua_pop( p_state, 1 ); /* pop "path" */
                 }
                 else
                 {
