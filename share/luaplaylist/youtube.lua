@@ -62,24 +62,28 @@ end
 
 -- Parse function.
 function parse()
-    local p = {}
     if string.match( vlc.path, "watch%?v=" )
     then -- This is the HTML page's URL
-        p[1] = { path = string.gsub( vlc.path, "^(.*)watch%?v=([^&]*).*$", "http://%1v/%2" ) }
         while true do
             -- Try to find the video's title
             line = vlc.readline()
             if not line then break end
             if string.match( line, "<meta name=\"title\"" ) then
-                p[1].name = string.gsub( line, "^.*content=\"([^\"]*).*$", "%1" )
-                break
+                name = string.gsub( line, "^.*content=\"([^\"]*).*$", "%1" )
             end
+            if string.match( line, "<meta name=\"description\"" ) then
+                description = string.gsub( line, "^.*content=\"([^\"]*).*$", "%1" )
+            end
+            if string.match( line, "subscribe_to_user=" ) then
+                artist = string.gsub( line, ".*subscribe_to_user=([^&]*).*", "%1" )
+            end
+            if name and description and artist then break end
         end
+        return { { path = string.gsub( vlc.path, "^(.*)watch%?v=([^&]*).*$", "http://%1v/%2" ); name = name; description = description; artist = artist } }
     else -- This is the flash player's URL
-        p[1] = { path = "http://www.youtube.com/get_video.php?video_id="..get_url_param( vlc.path, "video_id" ).."&t="..get_url_param( vlc.patch, "t" ) }
         if string.match( vlc.path, "title=" ) then
-            p[1].name = get_url_param( vlc.path, "title" )
+            name = get_url_param( vlc.path, "title" )
         end
+        return { { path = "http://www.youtube.com/get_video.php?video_id="..get_url_param( vlc.path, "video_id" ).."&t="..get_url_param( vlc.patch, "t" ); name = name } }
     end
-    return p
 end
