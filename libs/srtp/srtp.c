@@ -90,13 +90,13 @@ static bool libgcrypt_usable = false;
 
 static void initonce_libgcrypt (void)
 {
+#ifndef WIN32
+    gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
+#endif
+
     if ((gcry_check_version ("1.1.94") == NULL)
      || gcry_control (GCRYCTL_DISABLE_SECMEM, 0)
-     || gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0)
-#ifndef WIN32
-     || gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread)
-#endif
-       )
+     || gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0))
         return;
 
     libgcrypt_usable = true;
@@ -111,13 +111,16 @@ static int init_libgcrypt (void)
 
     pthread_mutex_lock (&mutex);
     pthread_once (&once, initonce_libgcrypt);
-    retval = -libgcrypt_usable;
-    pthread_mutex_unlock (&mutex);
 #else
 # warning FIXME: This is not thread-safe.
     if (!libgcrypt_usable)
         initonce_libgcrypt ();
-    retval = -libgcrypt_usable;
+#endif
+
+    retval = libgcrypt_usable ? 0 : -1;
+
+#ifndef WIN32
+    pthread_mutex_unlock (&mutex);
 #endif
 
     return retval;

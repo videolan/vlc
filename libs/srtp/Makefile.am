@@ -36,3 +36,17 @@ test_aes_SOURCES = test-aes.c
 srtp_SOURCES = recv.c
 srtp_LDADD = libvlc_srtp.la
 
+lcov-run:
+	rm -f *.gcda lcov
+	$(MAKE) $(AM_MAKEFLAGS) check
+
+lcov-pre.out:
+	lcov -c -d . -o lcov.tmp
+
+lcov.out: lcov-pre.out
+	lcov -r lcov.tmp '*test*' > lcov.out
+
+lcov: lcov.out
+	genhtml lcov.out -o lcov
+
+.PHONY: lcov-run
