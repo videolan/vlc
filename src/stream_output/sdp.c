@@ -12,7 +12,7 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
@@ -151,7 +151,7 @@ char *StartSDP (const char *name, const char *description, const char *url,
 }
 
 
-char *vMakeSDPMedia (const char *type, int dport, const char *protocol,
+char *vAddSDPMedia (const char *type, int dport, const char *protocol,
                     unsigned pt, const char *rtpmap,
                     const char *fmtpfmt, va_list ap)
 {
@@ -194,4 +194,16 @@ char *vMakeSDPMedia (const char *type, int dport, const char *protocol,
         return NULL;
 
     return sdp_media;
+}
+
+
+char *AddSDPMedia (const char *type, int dport, const char *protocol,
+                    unsigned pt, const char *rtpmap, const char *fmtpfmt, ...)
+{
+    va_list ap;
+    char *ret;
+    va_start (ap, fmtpfmt);
+    ret = vAddSDPMedia (type, dport, protocol, pt, rtpmap, fmtpfmt, ap);
+    va_end (ap);
+    return ret;
 }

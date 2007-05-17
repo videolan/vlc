@@ -24,8 +24,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  ***************************************************************************/
 
-#include <vlc_sout.h>
-#include <vlc_network.h>
+#ifndef VLC_SRC_STREAMOUT_H
+# define VLC_SRC_STREAMOUT_H 1
+
+# include <vlc_sout.h>
+# include <vlc_network.h>
 
 /****************************************************************************
  * sout_packetizer_input_t: p_sout <-> p_packetizer
@@ -118,17 +121,12 @@ char *StartSDP (const char *name, const char *description, const char *url,
                 const char *email, const char *phone, vlc_bool_t ssm,
                 const struct sockaddr *orig, socklen_t origlen,
                 const struct sockaddr *addr, socklen_t addrlen);
-char *vMakeSDPMedia (const char *type, int dport, const char *protocol,
-                     unsigned pt, const char *rtpmap,
-                     const char *fmtp, va_list ap);
-static inline
-char *MakeSDPMedia (const char *type, int dport, const char *protocol,
-                    unsigned pt, const char *rtpmap, const char *fmtpfmt, ...)
-{
-    va_list ap;
-    char *ret;
-    va_start (ap, fmtpfmt);
-    ret = vMakeSDPMedia (type, dport, protocol, pt, rtpmap, fmtpfmt, ap);
-    va_end (ap);
-    return ret;
-}
+
+char *vAddSDPMedia (const char *type, int dport, const char *protocol,
+                    unsigned pt, const char *rtpmap,
+                    const char *fmtpfmt, va_list ap);
+char *AddSDPMedia (const char *type, int dport,
+                   const char *protocol, unsigned pt, const char *rtpmap,
+                   const char *fmtpfmt, ...);
+
+#endif
