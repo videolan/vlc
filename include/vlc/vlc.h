@@ -36,10 +36,6 @@
 #ifndef _VLC_VLC_H
 #define _VLC_VLC_H 1
 
-# ifdef __cplusplus
-extern "C" {
-# endif
-
 /*****************************************************************************
  * Our custom types
  *****************************************************************************/
@@ -160,11 +156,13 @@ struct vlc_list_t
  *****************************************************************************/
 #if defined(WIN32) && defined(DLL_EXPORT)
 #  define VLC_PUBLIC_API extern __declspec(dllexport)
-#elif HAVE_ATTRIBUTE_VISIBILITY
-#  define VLC_PUBLIC_API extern __attribute__((visibility("default")))
 #else
-#  define VLC_PUBLIC_API extern
+#  define VLC_PUBLIC_API
 #endif
+
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 /*****************************************************************************
  * Exported libvlc API
