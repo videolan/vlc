@@ -1490,6 +1490,22 @@ AH_TEMPLATE(NDEBUG,
 AS_IF([test "x${enable_debug}" = "xno"], [AC_DEFINE(NDEBUG)])
 
 dnl
+dnl  Test coverage
+dnl
+AC_ARG_ENABLE(coverage,
+	[  --enable-debug          build for test coverage (default disabled)],,
+	[enable_coverage="no"])
+AS_IF([test "${enable_coverage}" != "no"], [
+	CFLAGS="-fprofile-arcs -ftest-coverage ${CFLAGS}"
+	CXXFLAGS="-fprofile-arcs -ftest-coverage ${CXXFLAGS}"
+	LDFLAGS="-lgcov ${LDFLAGS}"
+	dnl ugly...
+	CFLAGS_save="${CFLAGS}"
+	CXXFLAGS_save="${CXXFLAGS}"
+	LDFLAGS_save="${LDFLAGS}"
+])
+
+dnl
 dnl  Enable release-specific flags
 dnl
 AC_ARG_ENABLE(release,
