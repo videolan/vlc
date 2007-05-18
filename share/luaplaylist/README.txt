@@ -1,5 +1,5 @@
 Instructions to code your own VLC Lua playlist script.
-$Id: $
+$Id$
 
 Examples: See dailymotion.lua, googlevideo.lua, metacafe.lua and youbtube.lua.
 
