@@ -86,7 +86,7 @@ static int OpenFilterEx( vlc_object_t *p_this, vlc_bool_t b_enable_croppadd )
         p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width ||
         p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height;
 
-    if ( b_enable_croppadd ) 
+    if ( b_enable_croppadd )
     {
         b_resize = b_resize ||
             p_filter->fmt_in.video.i_visible_width != p_filter->fmt_in.video.i_width ||
@@ -290,7 +290,7 @@ static int CheckInit( filter_t *p_filter )
                                       - p_filter->fmt_out.video.i_x_offset;
             }
 
-            p_sys->p_rsc = img_resample_full_init( 
+            p_sys->p_rsc = img_resample_full_init(
                                p_filter->fmt_out.video.i_width,
                                p_filter->fmt_out.video.i_height,
                                p_filter->fmt_in.video.i_width,
@@ -342,34 +342,34 @@ static int padcolor[3] = { 16, 128, 128 };
 
 /* Expects img to be yuv420 */
 static void fill_pad_region( AVPicture* img, int height, int width,
-        int padtop, int padbottom, int padleft, int padright, int *color ) 
+        int padtop, int padbottom, int padleft, int padright, int *color )
 {
     int i, y, shift;
     uint8_t *optr;
 
-    for ( i = 0; i < 3; i++ ) 
+    for ( i = 0; i < 3; i++ )
     {
         shift = ( i == 0 ) ? 0 : 1;
 
-        if ( padtop || padleft ) 
+        if ( padtop || padleft )
         {
             memset( img->data[i], color[i], ( ( ( img->linesize[i] * padtop ) +
                             padleft ) >> shift) );
         }
 
-        if ( padleft || padright ) 
+        if ( padleft || padright )
         {
             optr = img->data[i] + ( img->linesize[i] * ( padtop >> shift ) ) +
                 ( img->linesize[i] - ( padright >> shift ) );
 
-            for ( y = 0; y < ( ( height - ( padtop + padbottom ) ) >> shift ); y++ ) 
+            for ( y = 0; y < ( ( height - ( padtop + padbottom ) ) >> shift ); y++ )
             {
                 memset( optr, color[i], ( padleft + padright ) >> shift );
                 optr += img->linesize[i];
             }
         }
 
-        if (padbottom) 
+        if (padbottom)
         {
             optr = img->data[i] + ( img->linesize[i] * ( ( height - padbottom ) >> shift ) );
             memset( optr, color[i], ( ( img->linesize[i] * padbottom ) >> shift ) );
@@ -378,7 +378,7 @@ static void fill_pad_region( AVPicture* img, int height, int width,
 }
 
 /* Workaround, because old libavcodec doesnt know how to padd */
-static void img_resample_padd( ImgReSampleContext *s, AVPicture *output, 
+static void img_resample_padd( ImgReSampleContext *s, AVPicture *output,
         const AVPicture *input, int padtop, int padleft )
 {
     AVPicture nopadd_pic = *output;
@@ -503,7 +503,7 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
         p_dst = &dest_pic;
 
         img_resample( p_sys->p_rsc, p_dst, p_src );
- 
+
         if (p_sys->b_enable_croppadd)
         {
             if (p_filter->fmt_out.video.i_visible_width != p_filter->fmt_out.video.i_width ||
