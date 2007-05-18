@@ -43,7 +43,7 @@ struct libvlc_global_data_t
    /* Object structure data */
     int                    i_counter;   ///< object counter
     int                    i_objects;   ///< Attached objects count
-    vlc_object_t **        pp_objects;  ///< Array of all objects 
+    vlc_object_t **        pp_objects;  ///< Array of all objects
 
     module_bank_t *        p_module_bank; ///< The module bank
     intf_thread_t         *p_probe;       ///< Devices prober
@@ -93,7 +93,7 @@ struct libvlc_int_t
     vlc_bool_t             b_color;     ///< color messages?
 
     module_t *             p_memcpy_module;  ///< Fast memcpy plugin used
-    void* ( *pf_memcpy ) ( void *, const void *, size_t ); ///< fast memcpy 
+    void* ( *pf_memcpy ) ( void *, const void *, size_t ); ///< fast memcpy
     void* ( *pf_memset ) ( void *, int, size_t );          ///< fast memset
 
     vlc_bool_t             b_stats;       ///< Should we collect stats ?
