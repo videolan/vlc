@@ -2085,7 +2085,7 @@ static int InputSourceInit( input_thread_t *p_input,
     char *psz;
     vlc_value_t val;
 
-    strcpy (psz_dup, psz_mrl);
+    strcpy( psz_dup, psz_mrl );
 
     if( !in ) return VLC_EGENERIC;
     if( !p_input ) return VLC_EGENERIC;
@@ -2272,12 +2272,28 @@ static int InputSourceInit( input_thread_t *p_input,
         {
             psz_demux = in->p_access->psz_demux;
         }
-        in->p_demux = demux2_New( p_input, psz_access, psz_demux,
-                                  in->p_access->psz_path
-                                    ? in->p_access->psz_path
-                                    : psz_path,
-                                  in->p_stream, p_input->p->p_es_out,
-                                  p_input->b_preparsing );
+
+        {
+            /* Take access redirections into account */
+            char *psz_real_path;
+            char *psz_buf = NULL;
+            if( in->p_access->psz_path )
+            {
+                psz_buf = strdup( in->p_access->psz_path );
+                char *psz_a, *psz_d;
+                MRLSplit( p_input, psz_buf, &psz_a, &psz_d, &psz_real_path );
+            }
+            else
+            {
+                psz_real_path = psz_path;
+            }
+            in->p_demux = demux2_New( p_input, psz_access, psz_demux,
+                                      psz_real_path,
+                                      in->p_stream, p_input->p->p_es_out,
+                                      p_input->b_preparsing );
+            free( psz_buf );
+        }
+
         if( in->p_demux == NULL )
         {
             msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
