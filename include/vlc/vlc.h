@@ -158,10 +158,8 @@ struct vlc_list_t
 /*****************************************************************************
  * Shared library Export macros
  *****************************************************************************/
-#if defined(WIN32) && defined(DLL_EXPORT)
-#  define VLC_PUBLIC_API extern __declspec(dllexport)
-#else
-#  define VLC_PUBLIC_API extern __attribute__((visibility("default")))
+#ifndef VLC_PUBLIC_API
+#  define VLC_PUBLIC_API extern 
 #endif
 
 /*****************************************************************************
