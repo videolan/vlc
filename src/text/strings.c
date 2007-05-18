@@ -246,30 +246,174 @@ void resolve_xml_special_chars( char *psz_value )
 
     while ( *psz_value )
     {
-        if( !strncmp( psz_value, "&lt;", 4 ) )
+        if( *psz_value == '&' )
         {
-            *p_pos = '<';
-            psz_value += 4;
-        }
-        else if( !strncmp( psz_value, "&gt;", 4 ) )
-        {
-            *p_pos = '>';
-            psz_value += 4;
-        }
-        else if( !strncmp( psz_value, "&amp;", 5 ) )
-        {
-            *p_pos = '&';
-            psz_value += 5;
-        }
-        else if( !strncmp( psz_value, "&quot;", 6 ) )
-        {
-            *p_pos = '\"';
-            psz_value += 6;
-        }
-        else if( !strncmp( psz_value, "&#039;", 6 ) )
-        {
-            *p_pos = '\'';
-            psz_value += 6;
+#define TRY_CHAR( src, len, dst )                   \
+            if( !strncmp( psz_value, src, len ) )   \
+            {                                       \
+                *p_pos = dst;                       \
+                psz_value += len;                   \
+            }
+#define TRY_LONGCHAR( src, len, dst )                   \
+            if( !strncmp( psz_value, src, len ) )       \
+            {                                           \
+                strncpy( p_pos, dst, strlen( dst ) );   \
+                p_pos += strlen( dst ) - 1;             \
+                psz_value += len;                       \
+            }
+            TRY_CHAR( "&lt;", 4, '<' )
+            else TRY_CHAR( "&gt;", 4, '>' )
+            else TRY_CHAR( "&amp;", 5, '&' )
+            else TRY_CHAR( "&quot;", 6, '"' )
+            else TRY_CHAR( "&apos;", 6, '\'' )
+            else if( psz_value[1] == '#' )
+            {
+                char *psz_end;
+                int i = strtol( psz_value+2, &psz_end, 10 );
+                if( *psz_end == ';' )
+                {
+                    if( i >= 32 && i <= 126 )
+                    {
+                        *p_pos = (char)i;
+                        psz_value = psz_end+1;
+                    }
+                    else
+                    {
+                        /* Unhandled code, FIXME */
+                        *p_pos = *psz_value;
+                        psz_value++;
+                    }
+                }
+                else
+                {
+                    /* Invalid entity number */
+                    *p_pos = *psz_value;
+                    psz_value++;
+                }
+            }
+            else TRY_LONGCHAR( "&Agrave;", 8, "À" )
+            else TRY_LONGCHAR( "&Aacute;", 8, "Á" )
+            else TRY_LONGCHAR( "&Acirc;", 7, "Â" )
+            else TRY_LONGCHAR( "&Atilde;", 8, "Ã" )
+            else TRY_LONGCHAR( "&Auml;", 6, "Ä" )
+            else TRY_LONGCHAR( "&Aring;", 7, "Å" )
+            else TRY_LONGCHAR( "&AElig;", 7, "Æ" )
+            else TRY_LONGCHAR( "&Ccedil;", 8, "Ç" )
+            else TRY_LONGCHAR( "&Egrave;", 8, "È" )
+            else TRY_LONGCHAR( "&Eacute;", 8, "É" )
+            else TRY_LONGCHAR( "&Ecirc;", 7, "Ê" )
+            else TRY_LONGCHAR( "&Euml;", 6, "Ë" )
+            else TRY_LONGCHAR( "&Igrave;", 8, "Ì" )
+            else TRY_LONGCHAR( "&Iacute;", 8, "Í" )
+            else TRY_LONGCHAR( "&Icirc;", 7, "Î" )
+            else TRY_LONGCHAR( "&Iuml;", 6, "Ï" )
+            else TRY_LONGCHAR( "&ETH;", 5, "Ð" )
+            else TRY_LONGCHAR( "&Ntilde;", 8, "Ñ" )
+            else TRY_LONGCHAR( "&Ograve;", 8, "Ò" )
+            else TRY_LONGCHAR( "&Oacute;", 8, "Ó" )
+            else TRY_LONGCHAR( "&Ocirc;", 7, "Ô" )
+            else TRY_LONGCHAR( "&Otilde;", 8, "Õ" )
+            else TRY_LONGCHAR( "&Ouml;", 6, "Ö" )
+            else TRY_LONGCHAR( "&Oslash;", 8, "Ø" )
+            else TRY_LONGCHAR( "&Ugrave;", 8, "Ù" )
+            else TRY_LONGCHAR( "&Uacute;", 8, "Ú" )
+            else TRY_LONGCHAR( "&Ucirc;", 7, "Û" )
+            else TRY_LONGCHAR( "&Uuml;", 6, "Ü" )
+            else TRY_LONGCHAR( "&Yacute;", 8, "Ý" )
+            else TRY_LONGCHAR( "&THORN;", 7, "Þ" )
+            else TRY_LONGCHAR( "&szlig;", 7, "ß" )
+            else TRY_LONGCHAR( "&agrave;", 8, "à" )
+            else TRY_LONGCHAR( "&aacute;", 8, "á" )
+            else TRY_LONGCHAR( "&acirc;", 7, "â" )
+            else TRY_LONGCHAR( "&atilde;", 8, "ã" )
+            else TRY_LONGCHAR( "&auml;", 6, "ä" )
+            else TRY_LONGCHAR( "&aring;", 7, "å" )
+            else TRY_LONGCHAR( "&aelig;", 7, "æ" )
+            else TRY_LONGCHAR( "&ccedil;", 8, "ç" )
+            else TRY_LONGCHAR( "&egrave;", 8, "è" )
+            else TRY_LONGCHAR( "&eacute;", 8, "é" )
+            else TRY_LONGCHAR( "&ecirc;", 7, "ê" )
+            else TRY_LONGCHAR( "&euml;", 6, "ë" )
+            else TRY_LONGCHAR( "&igrave;", 8, "ì" )
+            else TRY_LONGCHAR( "&iacute;", 8, "í" )
+            else TRY_LONGCHAR( "&icirc;", 7, "î" )
+            else TRY_LONGCHAR( "&iuml;", 6, "ï" )
+            else TRY_LONGCHAR( "&eth;", 5, "ð" )
+            else TRY_LONGCHAR( "&ntilde;", 8, "ñ" )
+            else TRY_LONGCHAR( "&ograve;", 8, "ò" )
+            else TRY_LONGCHAR( "&oacute;", 8, "ó" )
+            else TRY_LONGCHAR( "&ocirc;", 7, "ô" )
+            else TRY_LONGCHAR( "&otilde;", 8, "õ" )
+            else TRY_LONGCHAR( "&ouml;", 6, "ö" )
+            else TRY_LONGCHAR( "&oslash;", 8, "ø" )
+            else TRY_LONGCHAR( "&ugrave;", 8, "ù" )
+            else TRY_LONGCHAR( "&uacute;", 8, "ú" )
+            else TRY_LONGCHAR( "&ucirc;", 7, "û" )
+            else TRY_LONGCHAR( "&uuml;", 6, "ü" )
+            else TRY_LONGCHAR( "&yacute;", 8, "ý" )
+            else TRY_LONGCHAR( "&thorn;", 7, "þ" )
+            else TRY_LONGCHAR( "&yuml;", 6, "ÿ" )
+            else TRY_LONGCHAR( "&iexcl;", 7, "¡" )
+            else TRY_LONGCHAR( "&curren;", 8, "¤" )
+            else TRY_LONGCHAR( "&cent;", 6, "¢" )
+            else TRY_LONGCHAR( "&pound;", 7, "£" )
+            else TRY_LONGCHAR( "&yen;", 5, "¥" )
+            else TRY_LONGCHAR( "&brvbar;", 8, "¦" )
+            else TRY_LONGCHAR( "&sect;", 6, "§" )
+            else TRY_LONGCHAR( "&uml;", 5, "¨" )
+            else TRY_LONGCHAR( "&copy;", 6, "©" )
+            else TRY_LONGCHAR( "&ordf;", 6, "ª" )
+            else TRY_LONGCHAR( "&laquo;", 7, "«" )
+            else TRY_LONGCHAR( "&not;", 5, "¬" )
+            else TRY_LONGCHAR( "&shy;", 5, "­" )
+            else TRY_LONGCHAR( "&reg;", 5, "®" )
+            else TRY_LONGCHAR( "&trade;", 7, "™" )
+            else TRY_LONGCHAR( "&macr;", 6, "¯" )
+            else TRY_LONGCHAR( "&deg;", 5, "°" )
+            else TRY_LONGCHAR( "&plusmn;", 8, "±" )
+            else TRY_LONGCHAR( "&sup2;", 6, "²" )
+            else TRY_LONGCHAR( "&sup3;", 6, "³" )
+            else TRY_LONGCHAR( "&acute;", 7, "´" )
+            else TRY_LONGCHAR( "&micro;", 7, "µ" )
+            else TRY_LONGCHAR( "&para;", 6, "¶" )
+            else TRY_LONGCHAR( "&middot;", 8, "·" )
+            else TRY_LONGCHAR( "&cedil;", 7, "¸" )
+            else TRY_LONGCHAR( "&sup1;", 6, "¹" )
+            else TRY_LONGCHAR( "&ordm;", 6, "º" )
+            else TRY_LONGCHAR( "&raquo;", 7, "»" )
+            else TRY_LONGCHAR( "&frac14;", 8, "¼" )
+            else TRY_LONGCHAR( "&frac12;", 8, "½" )
+            else TRY_LONGCHAR( "&frac34;", 8, "¾" )
+            else TRY_LONGCHAR( "&iquest;", 8, "¿" )
+            else TRY_LONGCHAR( "&times;", 7, "×" )
+            else TRY_LONGCHAR( "&divide;", 8, "÷" )
+            else TRY_LONGCHAR( "&OElig;", 7, "Œ" )
+            else TRY_LONGCHAR( "&oelig;", 7, "œ" )
+            else TRY_LONGCHAR( "&Scaron;", 8, "Š" )
+            else TRY_LONGCHAR( "&scaron;", 8, "š" )
+            else TRY_LONGCHAR( "&Yuml;", 6, "Ÿ" )
+            else TRY_LONGCHAR( "&circ;", 6, "ˆ" )
+            else TRY_LONGCHAR( "&tilde;", 7, "˜" )
+            else TRY_LONGCHAR( "&ndash;", 7, "–" )
+            else TRY_LONGCHAR( "&mdash;", 7, "—" )
+            else TRY_LONGCHAR( "&lsquo;", 7, "‘" )
+            else TRY_LONGCHAR( "&rsquo;", 7, "’" )
+            else TRY_LONGCHAR( "&sbquo;", 7, "‚" )
+            else TRY_LONGCHAR( "&ldquo;", 7, "“" )
+            else TRY_LONGCHAR( "&rdquo;", 7, "”" )
+            else TRY_LONGCHAR( "&bdquo;", 7, "„" )
+            else TRY_LONGCHAR( "&dagger;", 8, "†" )
+            else TRY_LONGCHAR( "&Dagger;", 8, "‡" )
+            else TRY_LONGCHAR( "&hellip;", 8, "…" )
+            else TRY_LONGCHAR( "&permil;", 8, "‰" )
+            else TRY_LONGCHAR( "&lsaquo;", 8, "‹" )
+            else TRY_LONGCHAR( "&rsaquo;", 8, "›" )
+            else TRY_LONGCHAR( "&euro;", 6, "€" )
+            else
+            {
+                *p_pos = *psz_value;
+                psz_value++;
+            }
         }
         else
         {
