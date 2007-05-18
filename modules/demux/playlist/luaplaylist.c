@@ -244,48 +244,23 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     lua_State *p_state;
     int i_ret = VLC_EGENERIC;
-    char **ppsz_filelist = NULL;
-    char **ppsz_fileend = NULL;
-    char **ppsz_file;
-    DIR *dir;
-    char *psz_filename = NULL;
-    int i_files;
-    char *psz_dir;
 
-#   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
-    {
-        char *psz_vlcpath = p_intf->p_libvlc_global->psz_vlcpath;
-        psz_dir = malloc( strlen( psz_vlcpath ) + strlen( "/share/luaplaylist" ) + 1 );
-        if( !psz_src ) return VLC_ENOMEM;
-#       if defined( WIN32 )
-            sprintf( psz_src, "%s/luaplaylist", psz_vlcpath );
-#       else
-            sprintf( psz_src, "%s/share/luaplaylist", psz_vlcpath );
-#       endif
-    }
-#   else
-    {
-#   ifdef HAVE_SYS_STAT_H
-        struct stat stat_info;
-        if( ( utf8_stat( "share/luaplaylist", &stat_info ) == -1 )
-            || !S_ISDIR( stat_info.st_mode ) )
-        {
-            psz_dir = strdup( DATA_PATH "/luaplaylist" );
-        }
-        else
-#   endif
-        {
-            psz_dir = strdup( "share/luaplaylist" );
-        }
-    }
-#   endif
+    char  *psz_filename  = NULL;
+
+    DIR   *dir           = NULL;
+    char **ppsz_filelist = NULL;
+    char **ppsz_fileend  = NULL;
+    char **ppsz_file;
+
+    char  *ppsz_dir_list[] = { NULL, NULL, NULL };
+    char **ppsz_dir;
 
     p_demux->p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
     if( !p_demux->p_sys )
     {
-        free( psz_dir );
         return VLC_ENOMEM;
     }
+
     p_demux->p_sys->psz_filename = NULL;
 
     p_demux->pf_control = Control;
@@ -296,7 +271,6 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
     if( !p_state )
     {
         msg_Err( p_demux, "Could not create new Lua State" );
-        free( psz_dir );
         free( p_demux->p_sys );
         return VLC_EGENERIC;
     }
@@ -315,82 +289,137 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
 
     lua_pop( p_state, 1 );
 
-    dir = utf8_opendir( psz_dir );
-    if( !dir ) goto error;
-    i_files = utf8_loaddir( dir, &ppsz_filelist, file_select, file_compare );
-    if( i_files < 1 ) goto error;
-    ppsz_fileend = ppsz_filelist + i_files;
+    ppsz_dir_list[0] = malloc( strlen( p_demux->p_libvlc->psz_homedir )
+                             + strlen( "/"CONFIG_DIR"/luaplaylist" ) + 1 );
+    sprintf( ppsz_dir_list[0], "%s/"CONFIG_DIR"/luaplaylist",
+             p_demux->p_libvlc->psz_homedir );
 
-    for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend; ppsz_file++ )
+#   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
     {
-        free( psz_filename ); psz_filename = NULL;
-        asprintf( &psz_filename, "%s/%s", psz_dir, *ppsz_file );
-        msg_Dbg( p_demux, "Trying Lua playlist script %s", psz_filename );
-        p_demux->p_sys->psz_filename = psz_filename;
-
-        /* Ugly hack to delete previous versions of the probe() and parse()
-         * functions. */
-        lua_pushnil( p_state );
-        lua_pushnil( p_state );
-        lua_setglobal( p_state, "probe" );
-        lua_setglobal( p_state, "parse" );
-
-        /* Load and run the script(s) */
-        if( luaL_dofile( p_state, psz_filename ) )
+        char *psz_vlcpath = p_demux->p_libvlc_global->psz_vlcpath;
+        ppsz_dir_list[1] = malloc( strlen( psz_vlcpath ) + strlen( "/share/luaplaylist" ) + 1 );
+        if( !ppsz_dir_list[1] ) return VLC_ENOMEM;
+#       if defined( WIN32 )
+            sprintf( ppsz_dir_list[1], "%s/luaplaylist", psz_vlcpath );
+#       else
+            sprintf( ppsz_dir_list[1], "%s/share/luaplaylist", psz_vlcpath );
+#       endif
+    }
+#   else
+    {
+#   ifdef HAVE_SYS_STAT_H
+        struct stat stat_info;
+        if( ( utf8_stat( "share/luaplaylist", &stat_info ) == -1 )
+            || !S_ISDIR( stat_info.st_mode ) )
         {
-            msg_Warn( p_demux, "Error loading script %s: %s", psz_filename,
-                      lua_tostring( p_state, lua_gettop( p_state ) ) );
-            lua_pop( p_state, 1 );
-            continue;
+            ppsz_dir_list[1] = strdup( DATA_PATH "/luaplaylist" );
         }
-
-        lua_getglobal( p_state, "probe" );
-
-        if( !lua_isfunction( p_state, lua_gettop( p_state ) ) )
+        else
+#   endif
         {
-            msg_Warn( p_demux, "Error while runing script %s, "
-                      "function probe() not found", psz_filename );
-            lua_pop( p_state, 1 );
-            continue;
-        }
-
-        if( lua_pcall( p_state, 0, 1, 0 ) )
-        {
-            msg_Warn( p_demux, "Error while runing script %s, "
-                      "function probe(): %s", psz_filename,
-                      lua_tostring( p_state, lua_gettop( p_state ) ) );
-            lua_pop( p_state, 1 );
-            continue;
-        }
-
-        if( lua_gettop( p_state ) )
-        {
-            if( lua_toboolean( p_state, 1 ) )
-            {
-                msg_Dbg( p_demux, "Lua playlist script %s's "
-                         "probe() function was successful", psz_filename );
-                i_ret = VLC_SUCCESS;
-            }
-            lua_pop( p_state, 1 );
-
-            if( i_ret == VLC_SUCCESS ) break;
+            ppsz_dir_list[1] = strdup( "share/luaplaylist" );
         }
     }
+#   endif
 
-    error:
+    for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
+    {
+        int i_files;
+
         if( ppsz_filelist )
         {
             for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend;
                  ppsz_file++ )
                 free( *ppsz_file );
             free( ppsz_filelist );
+            ppsz_filelist = NULL;
         }
 
-        if( dir ) closedir( dir );
-        free( psz_dir );
-        if( i_ret != VLC_SUCCESS )
-            E_(Close_LuaPlaylist)( p_this );
-        return i_ret;
+        if( dir )
+        {
+            closedir( dir );
+        }
+
+        msg_Dbg( p_demux, "Trying Lua scripts in %s", *ppsz_dir );
+        dir = utf8_opendir( *ppsz_dir );
+
+        if( !dir ) continue;
+        i_files = utf8_loaddir( dir, &ppsz_filelist, file_select, file_compare );
+        if( i_files < 1 ) continue;
+        ppsz_fileend = ppsz_filelist + i_files;
+
+        for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend; ppsz_file++ )
+        {
+            free( psz_filename ); psz_filename = NULL;
+            asprintf( &psz_filename, "%s/%s", *ppsz_dir, *ppsz_file );
+            msg_Dbg( p_demux, "Trying Lua playlist script %s", psz_filename );
+            p_demux->p_sys->psz_filename = psz_filename;
+
+            /* Ugly hack to delete previous versions of the probe() and parse()
+             * functions. */
+            lua_pushnil( p_state );
+            lua_pushnil( p_state );
+            lua_setglobal( p_state, "probe" );
+            lua_setglobal( p_state, "parse" );
+
+            /* Load and run the script(s) */
+            if( luaL_dofile( p_state, psz_filename ) )
+            {
+                msg_Warn( p_demux, "Error loading script %s: %s", psz_filename,
+                          lua_tostring( p_state, lua_gettop( p_state ) ) );
+                lua_pop( p_state, 1 );
+                continue;
+            }
+
+            lua_getglobal( p_state, "probe" );
+
+            if( !lua_isfunction( p_state, lua_gettop( p_state ) ) )
+            {
+                msg_Warn( p_demux, "Error while runing script %s, "
+                          "function probe() not found", psz_filename );
+                lua_pop( p_state, 1 );
+                continue;
+            }
+
+            if( lua_pcall( p_state, 0, 1, 0 ) )
+            {
+                msg_Warn( p_demux, "Error while runing script %s, "
+                          "function probe(): %s", psz_filename,
+                          lua_tostring( p_state, lua_gettop( p_state ) ) );
+                lua_pop( p_state, 1 );
+                continue;
+            }
+
+            if( lua_gettop( p_state ) )
+            {
+                if( lua_toboolean( p_state, 1 ) )
+                {
+                    msg_Dbg( p_demux, "Lua playlist script %s's "
+                             "probe() function was successful", psz_filename );
+                    i_ret = VLC_SUCCESS;
+                }
+                lua_pop( p_state, 1 );
+
+                if( i_ret == VLC_SUCCESS ) break;
+            }
+        }
+        if( i_ret == VLC_SUCCESS ) break;
+    }
+
+    if( ppsz_filelist )
+    {
+        for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend;
+             ppsz_file++ )
+            free( *ppsz_file );
+        free( ppsz_filelist );
+    }
+    for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
+        free( *ppsz_dir );
+
+    if( dir ) closedir( dir );
+    if( i_ret != VLC_SUCCESS )
+        E_(Close_LuaPlaylist)( p_this );
+    return i_ret;
 }
 
 /*****************************************************************************
