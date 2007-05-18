@@ -1086,8 +1086,16 @@ static int Request( access_t *p_access, int64_t i_tell )
             {
                 const char *psz_http_ext = p_sys->b_ssl ? "s" : "" ;
 
-                asprintf(&psz_new_loc, "http%s://%s:%d%s", psz_http_ext,
-                         p_sys->url.psz_host, p_sys->url.i_port, p);
+                if( p_sys->url.i_port == ( p_sys->b_ssl ? 443 : 80 ) )
+                {
+                    asprintf(&psz_new_loc, "http%s://%s%s", psz_http_ext,
+                             p_sys->url.psz_host, p);
+                }
+                else
+                {
+                    asprintf(&psz_new_loc, "http%s://%s:%d%s", psz_http_ext,
+                             p_sys->url.psz_host, p_sys->url.i_port, p);
+                }
             }
             else
             {
