@@ -44,6 +44,12 @@ typedef struct
     char *psz_buffer; /* to be freed */
 } vlc_url_t;
 
+VLC_EXPORT( char *, unescape_URI_duplicate, ( const char *psz ) );
+VLC_EXPORT( void, unescape_URI, ( char *psz ) );
+VLC_EXPORT( char *, decode_URI_duplicate, ( const char *psz ) );
+VLC_EXPORT( void, decode_URI, ( char *psz ) );
+VLC_EXPORT( char *, encode_URI_component, ( const char *psz ) );
+
 /*****************************************************************************
  * vlc_UrlParse:
  *****************************************************************************
@@ -188,11 +194,6 @@ static inline void vlc_UrlClean( vlc_url_t *url )
     url->psz_buffer   = NULL;
 }
 
-VLC_EXPORT( char *, unescape_URI_duplicate, ( const char *psz ) );
-VLC_EXPORT( void, unescape_URI, ( char *psz ) );
-VLC_EXPORT( char *, decode_URI_duplicate, ( const char *psz ) );
-VLC_EXPORT( void, decode_URI, ( char *psz ) );
-VLC_EXPORT( char *, encode_URI_component, ( const char *psz ) );
 
 static inline char *vlc_UrlEncode( const char *psz_url )
 {
