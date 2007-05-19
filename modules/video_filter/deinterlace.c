@@ -1965,7 +1965,7 @@ static void RenderX( vout_thread_t *p_vout,
             uint8_t *src = &p_pic->p[i_plane].p_pixels[8*y*i_src];
 
 #ifdef CAN_COMPILE_MMXEXT
-            if( vlc_CPU & CPU_CAPABILITY_MMXEXT )
+            if( vlc_CPU() & CPU_CAPABILITY_MMXEXT )
                 XDeintBand8x8MMXEXT( dst, i_dst, src, i_src, i_mbx, i_modx );
             else
 #endif
@@ -1992,7 +1992,7 @@ static void RenderX( vout_thread_t *p_vout,
     }
 
 #ifdef CAN_COMPILE_MMXEXT
-    if( vlc_CPU & CPU_CAPABILITY_MMXEXT )
+    if( vlc_CPU() & CPU_CAPABILITY_MMXEXT )
         emms();
 #endif
 }
