@@ -1,5 +1,5 @@
 function probe()
-    return vlc.access == "http" and ( string.match( vlc.path, "youtube.com/$" ) or string.match( vlc.path, "youtube.com/browse" ) )
+    return vlc.access == "http" and ( string.match( vlc.path, "youtube.com/?$" ) or string.match( vlc.path, "youtube.com/browse" ) )
 end
 
 function parse()

@@ -1,7 +1,8 @@
 Instructions to code your own VLC Lua playlist script.
 $Id$
 
-Examples: See dailymotion.lua, googlevideo.lua, metacafe.lua and youbtube.lua.
+Examples: See dailymotion.lua, googlevideo.lua, metacafe.lua, youbtube.lua
+          and youtube_homepage.lua .
 
 VLC Lua playlist modules should define two functions:
  * probe(): returns true if we want to handle the playlist in this script
@@ -27,6 +28,8 @@ VLC Lua playlist modules should define two functions:
                 .encodedby: the item's EncodedBy (OPTIONAL, meta data)
                 .arturl: the item's ArtURL (OPTIONAL, meta data)
                 .trackid: the item's TrackID (OPTIONAL, meta data)
+                .options: a list of VLC options (OPTIONAL)
+                          example: .options = { "fullscreen" }
             Invalid playlist items will be discarded by VLC.
 
 VLC defines a global vlc object with the following members:

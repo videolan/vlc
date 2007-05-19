@@ -472,35 +472,71 @@ static int Demux( demux_t *p_demux )
             {
                 if( lua_istable( p_state, t+2 ) )
                 {
-                    const char *psz_url = NULL;
-                    const char *psz_title = NULL;
                     lua_getfield( p_state, t+2, "path" );
                     if( lua_isstring( p_state, t+3 ) )
                     {
-                        psz_url = lua_tostring( p_state, t+3 );
-                        msg_Dbg( p_demux, "Path: %s", psz_url );
+                        const char  *psz_path     = NULL;
+                        const char  *psz_name     = NULL;
+                        char       **ppsz_options = NULL;
+                        int          i_options    = 0;
+
+                        /* Read path and name */
+                        psz_path = lua_tostring( p_state, t+3 );
+                        msg_Dbg( p_demux, "Path: %s", psz_path );
                         lua_getfield( p_state, t+2, "name" );
                         if( lua_isstring( p_state, t+4 ) )
                         {
-                            psz_title = lua_tostring( p_state, t+4 );
-                            msg_Dbg( p_demux, "Name: %s", psz_title );
+                            psz_name = lua_tostring( p_state, t+4 );
+                            msg_Dbg( p_demux, "Name: %s", psz_name );
                         }
                         else
                         {
-                            psz_title = psz_url;
+                            psz_name = psz_path;
                         }
-                        p_input = input_ItemNewExt( p_playlist, psz_url,
-                                                    psz_title, 0, NULL, -1 );
-                        p_input->p_meta = vlc_meta_New();
 
-#define TRY_META( a, b )                                                      \
-                        lua_getfield( p_state, t+2, a );                      \
-                        if( lua_isstring( p_state, t+5 ) )                    \
-                        {                                                     \
-                            psz_title = lua_tostring( p_state, t+5 );         \
-                            msg_Dbg( p_demux, #b ": %s", psz_title );         \
-                            vlc_meta_Set ## b ( p_input->p_meta, psz_title ); \
-                        }                                                     \
+                        /* Read options */
+                        lua_getfield( p_state, t+2, "options" );
+                        if( lua_istable( p_state, t+5 ) )
+                        {
+                            lua_pushnil( p_state );
+                            while( lua_next( p_state, t+5 ) )
+                            {
+                                if( lua_isstring( p_state, t+7 ) )
+                                {
+                                    char *psz_option = strdup(
+                                        lua_tostring( p_state, t+7 ) );
+                                    msg_Dbg( p_demux, "Option: %s",
+                                             psz_option );
+                                    INSERT_ELEM( ppsz_options, i_options,
+                                                 i_options, psz_option );
+                                }
+                                else
+                                {
+                                    msg_Warn( p_demux,
+                                              "Option should be a string" );
+                                }
+                                lua_pop( p_state, 1 ); /* pop option */
+                            }
+                        }
+                        lua_pop( p_state, 1 ); /* pop "options" */
+
+                        /* Create input item */
+                        p_input = input_ItemNewExt( p_playlist, psz_path,
+                                                    psz_name, i_options,
+                                                    (const char **)ppsz_options,
+                                                    -1 );
+                        lua_pop( p_state, 1 ); /* pop "name" */
+
+                        /* Read meta data */
+                        p_input->p_meta = vlc_meta_New();
+#define TRY_META( a, b )                                                     \
+                        lua_getfield( p_state, t+2, a );                     \
+                        if( lua_isstring( p_state, t+4 ) )                   \
+                        {                                                    \
+                            psz_name = lua_tostring( p_state, t+4 );         \
+                            msg_Dbg( p_demux, #b ": %s", psz_name );         \
+                            vlc_meta_Set ## b ( p_input->p_meta, psz_name ); \
+                        }                                                    \
                         lua_pop( p_state, 1 ); /* pop a */
                         TRY_META( "title", Title );
                         TRY_META( "artist", Artist );
@@ -520,12 +556,16 @@ static int Demux( demux_t *p_demux )
                         TRY_META( "arturl", ArtURL );
                         TRY_META( "trackid", TrackID );
 
+                        /* Append item to playlist */
                         playlist_BothAddInput(
                             p_playlist, p_input,
                             p_item_in_category,
                             PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
                             PLAYLIST_END, NULL, NULL, VLC_FALSE );
-                        lua_pop( p_state, 1 ); /* pop "name" */
+
+                        while( i_options > 0 )
+                            free( ppsz_options[--i_options] );
+                        free( ppsz_options );
                     }
                     else
                     {
@@ -541,7 +581,6 @@ static int Demux( demux_t *p_demux )
                 lua_pop( p_state, 1 ); /* pop the value, keep the key for
                                         * the next lua_next() call */
             }
-            lua_pop( p_state, 1 ); /* pop the last key */
         }
         else
         {

@@ -4,7 +4,7 @@
 function probe()
     return vlc.access == "http"
         and string.match( vlc.path, "dailymotion.com" ) 
-        and vlc.peek( 9 ) == "<!DOCTYPE"
+        and string.match( vlc.peek( 256 ), "<!DOCTYPE.*<title>Video " )
 end
 
 -- Parse function.
