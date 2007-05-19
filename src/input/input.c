@@ -417,7 +417,8 @@ void input_StopThread( input_thread_t *p_input )
     int i;
 
     /* Set die for input */
-    p_input->b_die = VLC_TRUE;
+    vlc_object_kill( p_input );
+    /* FIXME: seems to be duplicated in ControlPush(INPUT_CONTROL_SET_DIE) */
 
     /* We cannot touch p_input fields directly (we come from another thread),
      * so use the vlc_object_find way, it's perfectly safe */
@@ -426,7 +427,7 @@ void input_StopThread( input_thread_t *p_input )
     p_list = vlc_list_find( p_input, VLC_OBJECT_ACCESS, FIND_CHILD );
     for( i = 0; i < p_list->i_count; i++ )
     {
-        p_list->p_values[i].p_object->b_die = VLC_TRUE;
+        vlc_object_kill( p_list->p_values[i].p_object );
     }
     vlc_list_release( p_list );
 
@@ -434,7 +435,7 @@ void input_StopThread( input_thread_t *p_input )
     p_list = vlc_list_find( p_input, VLC_OBJECT_STREAM, FIND_CHILD );
     for( i = 0; i < p_list->i_count; i++ )
     {
-        p_list->p_values[i].p_object->b_die = VLC_TRUE;
+        vlc_object_kill( p_list->p_values[i].p_object );
     }
     vlc_list_release( p_list );
 
@@ -442,7 +443,7 @@ void input_StopThread( input_thread_t *p_input )
     p_list = vlc_list_find( p_input, VLC_OBJECT_DEMUX, FIND_CHILD );
     for( i = 0; i < p_list->i_count; i++ )
     {
-        p_list->p_values[i].p_object->b_die = VLC_TRUE;
+        vlc_object_kill( p_list->p_values[i].p_object );
     }
     vlc_list_release( p_list );
 
@@ -1452,12 +1453,12 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             msg_Dbg( p_input, "control: stopping input" );
             /* Mark all submodules to die */
             if( p_input->p->input.p_access )
-                p_input->p->input.p_access->b_die = VLC_TRUE;
+                vlc_object_kill( p_input->p->input.p_access );
             if( p_input->p->input.p_stream )
-                p_input->p->input.p_stream->b_die = VLC_TRUE;
-            p_input->p->input.p_demux->b_die = VLC_TRUE;
+                vlc_object_kill( p_input->p->input.p_stream );
+            vlc_object_kill( p_input->p->input.p_demux );
 
-            p_input->b_die = VLC_TRUE;
+            vlc_object_kill( p_input );
             break;
 
         case INPUT_CONTROL_SET_POSITION:

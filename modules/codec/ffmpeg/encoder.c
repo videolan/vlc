@@ -1014,7 +1014,7 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
                 (struct thread_context_t **)p_sys->p_context->thread_opaque;
         for ( i = 0; i < p_enc->i_threads; i++ )
         {
-            pp_contexts[i]->b_die = 1;
+            vlc_object_kill( pp_contexts[i] );
             vlc_cond_signal( &pp_contexts[i]->cond );
             vlc_thread_join( pp_contexts[i] );
             vlc_mutex_destroy( &pp_contexts[i]->lock );

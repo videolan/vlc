@@ -804,7 +804,7 @@ bool InterfaceWindow::QuitRequested()
 
      _StoreSettings();
 
-    p_intf->b_die = 1;
+    vlc_object_kill( p_intf );
 
     return( true );
 }

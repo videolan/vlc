@@ -857,7 +857,7 @@ void MainInterface::updateOnTimer()
 void MainInterface::closeEvent( QCloseEvent *e )
 {
     hide();
-    p_intf->b_die = VLC_TRUE;
+    vlc_object_kill( p_intf );
 }
 
 void MainInterface::updateVolume( int sliderVolume )

@@ -171,7 +171,7 @@ int intf_RunThread( intf_thread_t *p_intf )
             while( !intf_ShouldDie( p_intf ) )
                 msleep( INTF_IDLE_SLEEP * 2);
         }
-        p_intf->b_die = VLC_TRUE;
+        vlc_object_kill( p_intf );
     }
     else
 #endif
@@ -196,7 +196,7 @@ int intf_RunThread( intf_thread_t *p_intf )
             while( !intf_ShouldDie( p_intf ) )
                 msleep( INTF_IDLE_SLEEP * 2);
         }
-        p_intf->b_die = VLC_TRUE;
+        vlc_object_kill( p_intf );
     }
     else
     {
@@ -237,7 +237,7 @@ void intf_StopThread( intf_thread_t *p_intf )
     /* Tell the interface to die */
     if( !p_intf->b_block )
     {
-        p_intf->b_die = VLC_TRUE;
+        vlc_object_kill( p_intf );
         if( p_intf->pf_run )
         {
             vlc_cond_signal( &p_intf->object_wait );
@@ -385,7 +385,7 @@ static void RunInterface( intf_thread_t *p_intf )
         p_intf->psz_switch_intf = NULL;
 
         vlc_mutex_lock( &p_intf->object_lock );
-        p_intf->b_die = VLC_FALSE;
+        p_intf->b_die = VLC_FALSE; /* FIXME */
         p_intf->b_dead = VLC_FALSE;
         vlc_mutex_unlock( &p_intf->object_lock );
 
@@ -404,7 +404,7 @@ static int SwitchIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
     p_intf->psz_switch_intf =
         malloc( strlen(newval.psz_string) + sizeof(",none") );
     sprintf( p_intf->psz_switch_intf, "%s,none", newval.psz_string );
-    p_intf->b_die = VLC_TRUE;
+    vlc_object_kill( p_intf );
 
     return VLC_SUCCESS;
 }
@@ -453,7 +453,7 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 
 - (void)terminate: (id)sender
 {
-    o_libvlc->b_die = VLC_TRUE;
+    vlc_object_kill( o_libvlc );
     [super terminate: sender];
 }
 

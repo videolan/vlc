@@ -461,8 +461,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         msg_Err( p_vout, "video output creation failed" );
 
         /* Make sure the thread is destroyed */
-        p_vout->b_die = VLC_TRUE;
-
+        vlc_object_kill( p_vout );
         vlc_thread_join( p_vout );
 
         vlc_object_detach( p_vout );
@@ -487,7 +486,7 @@ void vout_Destroy( vout_thread_t *p_vout )
     playlist_t *p_playlist = pl_Yield( p_vout );
 
     /* Request thread destruction */
-    p_vout->b_die = VLC_TRUE;
+    vlc_object_kill( p_vout );
     vlc_thread_join( p_vout );
 
     var_Destroy( p_vout, "intf-change" );

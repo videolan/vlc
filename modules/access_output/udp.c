@@ -419,7 +419,7 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     int i;
 
-    p_sys->p_thread->b_die = 1;
+    vlc_object_kill( p_sys->p_thread );
     for( i = 0; i < 10; i++ )
     {
         block_t *p_dummy = block_New( p_access, p_sys->i_mtu );

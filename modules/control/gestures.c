@@ -422,7 +422,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
             case GESTURE(DOWN,LEFT,NONE,NONE):
                 /* FIXME: Should close the vout!"*/
-                p_intf->p_libvlc->b_die = VLC_TRUE;
+                vlc_object_kill( p_intf->p_libvlc );
                 break;
             case GESTURE(DOWN,LEFT,UP,RIGHT):
             case GESTURE(UP,RIGHT,DOWN,LEFT):

@@ -174,7 +174,7 @@ void vlm_Delete( vlm_t *p_vlm )
         return;
     }
 
-    p_vlm->b_die = VLC_TRUE;
+    vlc_object_kill( p_vlm );
     vlc_thread_join( p_vlm );
 
     vlc_object_detach( p_vlm );

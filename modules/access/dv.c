@@ -252,7 +252,7 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->p_ev )
     {
         /* stop the event handler */
-        p_sys->p_ev->b_die = VLC_TRUE;
+        vlc_object_kill( p_sys->p_ev );
 
         if( p_sys->p_raw1394 )
             raw1394_stop_iso_rcv( p_sys->p_raw1394, p_sys->i_channel );

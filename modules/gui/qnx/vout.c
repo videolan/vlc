@@ -299,7 +299,7 @@ static int QNXManage( vout_thread_t *p_vout )
     PhEvent_t *p_event;
     vlc_bool_t b_repos = 0;
 
-    if (p_vout->b_die == 1)
+    if (p_vout->b_die)
     {
         return ( 0 );
     }
@@ -338,7 +338,7 @@ static int QNXManage( vout_thread_t *p_vout )
                 switch( p_ev->event_f )
                 {
                 case Ph_WM_CLOSE:
-                    p_vout->p_libvlc->b_die = 1;
+                    p_vout->p_libvlc->b_die = VLC_TRUE;
                     break;
 
                 case Ph_WM_MOVE:
@@ -368,7 +368,7 @@ static int QNXManage( vout_thread_t *p_vout )
                     {
                     case Pk_q:
                     case Pk_Q:
-                        p_vout->p_libvlc->b_die = 1;
+                        p_vout->p_libvlc->b_die = VLC_TRUE;
                         break;
 
                     case Pk_f:

@@ -291,7 +291,7 @@ void bonjour_stop_service( void *_p_sys )
 
     if( p_sys->poll_thread->b_thread )
     {
-        p_sys->poll_thread->b_die = 1;
+        vlc_object_kill( p_sys->poll_thread );
         vlc_thread_join( p_sys->poll_thread );
     }
 

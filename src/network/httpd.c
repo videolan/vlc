@@ -1151,7 +1151,7 @@ void httpd_HostDelete( httpd_host_t *host )
     }
     TAB_REMOVE( httpd->i_host, httpd->host, host );
 
-    host->b_die = 1;
+    vlc_object_kill( host );
     vlc_thread_join( host );
 
     msg_Dbg( host, "HTTP host removed" );

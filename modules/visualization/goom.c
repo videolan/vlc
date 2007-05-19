@@ -384,7 +384,7 @@ static void Close( vlc_object_t *p_this )
     aout_filter_sys_t *p_sys = p_filter->p_sys;
 
     /* Stop Goom Thread */
-    p_sys->p_thread->b_die = VLC_TRUE;
+    vlc_object_kill( p_sys->p_thread );
 
     vlc_mutex_lock( &p_sys->p_thread->lock );
     vlc_cond_signal( &p_sys->p_thread->wait );

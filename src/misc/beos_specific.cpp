@@ -233,7 +233,7 @@ bool VlcApplication::QuitRequested()
 {
     if( !fReadyToQuit )
     {
-        p_this->p_libvlc->b_die = 1;
+        vlc_object_kill( p_this->p_libvlc );
         return false;
     }
 

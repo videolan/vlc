@@ -359,7 +359,7 @@ static int Manage( vout_thread_t *p_vout )
                 playlist_Stop( p_playlist );
                 vlc_object_release( p_playlist );
             }
-            p_vout->p_libvlc->b_die = VLC_TRUE;
+            vlc_object_kill( p_vout->p_libvlc );
             break;
         }
 #endif

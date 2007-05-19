@@ -179,7 +179,7 @@ static void Close( vlc_object_t *p_this )
     msg_Dbg( p_access, "plugin notified" );
     
     /* stop receiver thread */
-    p_sys->p_thread->b_die = VLC_TRUE;
+    vlc_object_kill( p_sys->p_thread );
     vlc_mutex_lock( &p_sys->p_thread->lock );
     vlc_cond_signal( &p_sys->p_thread->wait );
     vlc_mutex_unlock( &p_sys->p_thread->lock );

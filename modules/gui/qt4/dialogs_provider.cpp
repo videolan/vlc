@@ -71,7 +71,7 @@ DialogsProvider::~DialogsProvider()
 
 void DialogsProvider::quit()
 {
-    p_intf->b_die = VLC_TRUE;
+    vlc_object_kill( p_intf );
     QApplication::quit();
 }
 

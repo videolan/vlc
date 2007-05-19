@@ -242,7 +242,7 @@ void E_(CloseAudio) ( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     int i_ret;
 
-    p_aout->b_die = 1;
+    vlc_object_kill( p_aout );
     vlc_thread_join( p_aout );
 
     if( ( i_ret = snd_pcm_close( p_aout->output.p_sys->p_pcm_handle ) ) < 0 )

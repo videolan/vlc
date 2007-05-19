@@ -66,7 +66,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
             continue;
         }
         p_sd->psz_module = strdup( psz_plugin );
-        p_sd->b_die = VLC_FALSE;
+        p_sd->b_die = VLC_FALSE; /* FIXME */
 
         PL_LOCK;
         TAB_APPEND( p_playlist->i_sds, p_playlist->pp_sds, p_sd );
@@ -102,25 +102,22 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
             break;
         }
     }
+    PL_UNLOCK;
 
     if( p_sd )
     {
-        PL_UNLOCK;
-        p_sd->b_die = VLC_TRUE;
+        vlc_object_kill( p_sd );
         if( p_sd->pf_run ) vlc_thread_join( p_sd );
 
         free( p_sd->psz_module );
         module_Unneed( p_sd, p_sd->p_module );
-        PL_LOCK;
         vlc_object_destroy( p_sd );
     }
     else
     {
         msg_Warn( p_playlist, "module %s is not loaded", psz_module );
-        PL_UNLOCK;
         return VLC_EGENERIC;
     }
-    PL_UNLOCK;
     return VLC_SUCCESS;
 }
 

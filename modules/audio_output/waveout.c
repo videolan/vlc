@@ -486,7 +486,7 @@ static void Close( vlc_object_t *p_this )
     aout_sys_t *p_sys = p_aout->output.p_sys;
 
     /* Before calling waveOutClose we must reset the device */
-    p_aout->b_die = VLC_TRUE;
+    vlc_object_kill( p_aout );
 
     waveOutReset( p_sys->h_waveout );
 

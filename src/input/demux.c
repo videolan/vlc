@@ -359,8 +359,9 @@ void stream_DemuxDelete( stream_t *s )
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
     block_t *p_empty;
 
-    s->b_die = VLC_TRUE;
-    if( p_sys->p_demux ) p_sys->p_demux->b_die = VLC_TRUE;
+    vlc_object_kill( s );
+    if( p_sys->p_demux )
+        vlc_object_kill( p_sys->p_demux );
     p_empty = block_New( s, 1 ); p_empty->i_buffer = 0;
     block_FifoPut( p_sys->p_fifo, p_empty );
     vlc_thread_join( s );
@@ -534,7 +535,7 @@ static int DStreamThread( stream_t *s )
         if( p_demux->pf_demux( p_demux ) <= 0 ) break;
     }
 
-    p_demux->b_die = VLC_TRUE;
+    vlc_object_kill( p_demux );
     return VLC_SUCCESS;
 }
 

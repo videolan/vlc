@@ -191,7 +191,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
  */
 void input_DecoderDelete( decoder_t *p_dec )
 {
-    p_dec->b_die = VLC_TRUE;
+    vlc_object_kill( p_dec );
 
     if( p_dec->p_owner->b_own_thread )
     {

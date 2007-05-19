@@ -324,7 +324,7 @@ static void Close( vlc_object_t * p_this )
     vod_sys_t *p_sys = p_vod->p_sys;
 
     /* Stop command thread */
-    p_vod->b_die = VLC_TRUE;
+    vlc_object_kill( p_vod );
     CommandPush( p_vod, RTSP_CMD_TYPE_NONE, NULL, NULL, 0.0, NULL );
     vlc_thread_join( p_vod );
 

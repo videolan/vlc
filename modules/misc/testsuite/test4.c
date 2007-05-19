@@ -175,7 +175,7 @@ static int Callback( vlc_object_t *p_this, char const *psz_cmd,
 
     for( i = 0; i < 10; i++ )
     {
-        pp_objects[i]->b_die = VLC_TRUE;
+        vlc_object_kill( pp_objects[i] );
         vlc_thread_join( pp_objects[i] );
         vlc_object_detach( pp_objects[i] );
         vlc_object_destroy( pp_objects[i] );

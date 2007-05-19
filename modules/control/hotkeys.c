@@ -236,7 +236,7 @@ static void Run( intf_thread_t *p_intf )
 
         if( i_action == ACTIONID_QUIT )
         {
-            p_intf->p_libvlc->b_die = VLC_TRUE;
+            vlc_object_kill( p_intf->p_libvlc );
             ClearChannels( p_intf, p_vout );
             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Quit" ) );
             if( p_vout )

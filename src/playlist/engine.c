@@ -331,7 +331,7 @@ check_input:
                 if( b_playexit == VLC_TRUE )
                 {
                     msg_Info( p_playlist, "end of playlist, exiting" );
-                    p_playlist->p_libvlc->b_die = VLC_TRUE;
+                    vlc_object_kill( p_playlist->p_libvlc );
                 }
                 p_playlist->status.i_status = PLAYLIST_STOPPED;
                 PL_UNLOCK

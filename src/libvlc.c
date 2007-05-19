@@ -155,7 +155,7 @@ int VLC_AddIntf( int i_object, char const *psz_module,
 int VLC_Die( int i_object )
 {
     LIBVLC_FUNC;
-    p_libvlc->b_die = VLC_TRUE;
+    vlc_object_kill( p_libvlc );
     LIBVLC_FUNC_END;
     return VLC_SUCCESS;
 }

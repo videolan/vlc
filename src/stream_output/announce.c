@@ -298,7 +298,7 @@ int announce_HandlerDestroy( announce_handler_t *p_announce )
 {
     if( p_announce->p_sap )
     {
-        ((vlc_object_t *)p_announce->p_sap)->b_die = VLC_TRUE;
+        vlc_object_kill ((vlc_object_t *)p_announce->p_sap);
         /* Wait for the SAP thread to exit */
         vlc_thread_join( (vlc_object_t *)p_announce->p_sap );
         announce_SAPHandlerDestroy( p_announce->p_sap );

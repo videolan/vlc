@@ -725,7 +725,7 @@ static void Close( vlc_object_t *p_this )
     vlc_cond_signal( &p_aout->output.p_sys->wait );
     vlc_mutex_unlock( &p_aout->output.p_sys->lock );
 
-    p_aout->b_die = VLC_TRUE;
+    vlc_object_kill( p_aout );
     vlc_thread_join( p_aout );
     p_aout->b_die = VLC_FALSE;
 

@@ -589,7 +589,7 @@ static void CloseAudio( vlc_object_t *p_this )
         vlc_object_detach( p_sys->p_notif );
         if( p_sys->p_notif->b_thread )
         {
-            p_sys->p_notif->b_die = 1;
+            vlc_object_kill( p_sys->p_notif );
 
             /* wake up the audio thread if needed */
             if( !p_sys->b_playing ) SetEvent( p_sys->p_notif->event );

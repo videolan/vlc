@@ -207,7 +207,7 @@ static int Manage( vout_thread_t *p_vout )
         switch( (char)buf )
         {
         case 'q':
-            p_vout->p_libvlc->b_die = 1;
+            vlc_object_kill( p_vout->p_libvlc );
             break;
 
         default:

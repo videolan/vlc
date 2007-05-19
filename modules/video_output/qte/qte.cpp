@@ -185,7 +185,7 @@ static void Close ( vlc_object_t *p_this )
         vlc_object_detach( p_vout->p_sys->p_event );
 
         /* Kill RunQtThread */
-        p_vout->p_sys->p_event->b_die = VLC_TRUE;
+        vlc_object_kill( p_vout->p_sys->p_event );
         CloseDisplay(p_vout);
 
         vlc_thread_join( p_vout->p_sys->p_event );

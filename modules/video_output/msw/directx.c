@@ -493,7 +493,7 @@ static void CloseVideo( vlc_object_t *p_this )
         vlc_object_detach( p_vout->p_sys->p_event );
 
         /* Kill Vout EventThread */
-        p_vout->p_sys->p_event->b_die = VLC_TRUE;
+        vlc_object_kill( p_vout->p_sys->p_event );
 
         /* we need to be sure Vout EventThread won't stay stuck in
          * GetMessage, so we send a fake message */

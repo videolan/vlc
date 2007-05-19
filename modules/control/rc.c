@@ -457,7 +457,7 @@ static void Run( intf_thread_t *p_intf )
     if( p_intf->p_sys->hConsoleIn == INVALID_HANDLE_VALUE )
     {
         msg_Err( p_intf, "couldn't find user input handle" );
-        p_intf->b_die = VLC_TRUE;
+        vlc_object_kill( p_intf );
     }
 #endif
 
@@ -1447,7 +1447,7 @@ static int Quit( vlc_object_t *p_this, char const *psz_cmd,
         playlist_Stop( p_playlist );
         vlc_object_release( p_playlist );
     }
-    p_this->p_libvlc->b_die = VLC_TRUE;
+    vlc_object_kill( p_this->p_libvlc );
     return VLC_SUCCESS;
 }
 
@@ -1962,7 +1962,7 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
         }
         else
             /* Standard input closed: exit */
-            p_intf->b_die = VLC_TRUE;
+            vlc_object_kill( p_intf );
 
         p_buffer[ *pi_size ] = 0;
         return VLC_TRUE;

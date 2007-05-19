@@ -352,7 +352,7 @@ static void Close( vlc_object_t *p_this )
     int i;
 
     /* stop the event handler */
-    p_sys->p_ev->b_die = VLC_TRUE;
+    vlc_object_kill( p_sys->p_ev );
     vlc_thread_join( p_sys->p_ev );
     vlc_object_destroy( p_sys->p_ev );
 

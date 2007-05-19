@@ -119,6 +119,9 @@ VLC_EXPORT( libvlc_int_t *, vlc_current_object, ( int ) );
     __vlc_object_destroy( VLC_OBJECT(a) ); \
     (a) = NULL; } while(0)
 
+#define vlc_object_kill(a) \
+    __vlc_object_kill( VLC_OBJECT(a) )
+
 #define vlc_object_detach(a) \
     __vlc_object_detach( VLC_OBJECT(a) )
 

@@ -192,7 +192,7 @@ static void Close( vlc_object_t * p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    p_aout->b_die = VLC_TRUE;
+    vlc_object_kill( p_aout );
     vlc_thread_join( p_aout );
     p_aout->b_die = VLC_FALSE;
 

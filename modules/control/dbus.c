@@ -157,7 +157,7 @@ DBUS_METHOD( Quit )
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_Stop( p_playlist );
     pl_Release( ((vlc_object_t*) p_this) );
-    ((vlc_object_t*)p_this)->p_libvlc->b_die = VLC_TRUE;
+    vlc_object_kill(((vlc_object_t*)p_this)->p_libvlc);
     REPLY_SEND;
 }
 

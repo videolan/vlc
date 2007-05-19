@@ -1717,7 +1717,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    p_intf->b_die = VLC_TRUE;
+    vlc_object_kill( p_intf );
 
     /* Go back to Run() and make libvlc exit properly */
     longjmp( jmpbuffer, 1 );

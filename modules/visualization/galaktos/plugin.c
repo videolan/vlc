@@ -245,7 +245,7 @@ static void Thread( vlc_object_t *p_this )
         mspf = 1000 / 60;
         if( galaktos_update( p_thread ) == 1 )
         {
-            p_thread->b_die = 1;
+            vlc_object_kill( p_thread );
         }
         if( p_thread->psz_title )
         {
@@ -282,7 +282,7 @@ static void Close( vlc_object_t *p_this )
     aout_filter_sys_t *p_sys = p_filter->p_sys;
 
     /* Stop galaktos Thread */
-    p_sys->p_thread->b_die = VLC_TRUE;
+    vlc_object_kill( p_sys->p_thread );
 
     galaktos_done( p_sys->p_thread );
 

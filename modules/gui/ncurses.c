@@ -839,7 +839,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         case 'q':
         case 'Q':
         case 0x1b:  /* Esc */
-            p_intf->p_libvlc->b_die = VLC_TRUE;
+            vlc_object_kill( p_intf->p_libvlc );
             return 0;
 
         /* Box switching */

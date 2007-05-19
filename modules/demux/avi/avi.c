@@ -594,7 +594,7 @@ aviindex:
             else if( i_create == DIALOG_CANCELLED )
             {
                 /* Kill input */
-                p_demux->p_parent->b_die = VLC_TRUE;
+                vlc_object_kill( p_demux->p_parent );
                 goto error;
             }
         }

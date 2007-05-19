@@ -370,7 +370,7 @@ error:
     if( p_sys->env ) p_sys->env->reclaim();
     if( p_sys->p_timeout )
     {
-        p_sys->p_timeout->b_die = VLC_TRUE;
+        vlc_object_kill( p_sys->p_timeout );
         vlc_thread_join( p_sys->p_timeout );
         vlc_object_detach( p_sys->p_timeout );
         vlc_object_destroy( p_sys->p_timeout );
@@ -409,7 +409,7 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->env ) p_sys->env->reclaim();
     if( p_sys->p_timeout )
     {
-        p_sys->p_timeout->b_die = VLC_TRUE;
+        vlc_object_kill( p_sys->p_timeout );
         vlc_thread_join( p_sys->p_timeout );
         vlc_object_detach( p_sys->p_timeout );
         vlc_object_destroy( p_sys->p_timeout );
