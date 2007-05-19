@@ -114,8 +114,9 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
             /* We have a password */
             *psz_parse++ = '\0';
             url->psz_password = psz_parse;
+            decode_URI( url->psz_password );
         }
-
+        decode_URI( url->psz_username );
         psz_parse = p;
     }
 
