@@ -32,6 +32,11 @@ extern "C" {
 
 /** This structure is opaque. It represents a libvlc instance */
 typedef struct libvlc_instance_t libvlc_instance_t;
+
+/*****************************************************************************
+ * Exceptions
+ *****************************************************************************/
+
 /** defgroup libvlc_exception Exceptions
  * \ingroup libvlc
  * LibVLC Exceptions handling
@@ -55,7 +60,6 @@ typedef struct
  * LibVLC Playlist handling
  * @{
  */
-
 
 typedef struct {
     int i_id;

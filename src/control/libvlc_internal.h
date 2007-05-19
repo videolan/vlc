@@ -70,7 +70,6 @@ struct libvlc_instance_t
     struct libvlc_callback_entry_list_t *p_callback_list;
 };
 
-
 struct libvlc_input_t
 {
     int i_input_id;  ///< Input object id. We don't use a pointer to
