@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.9.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-16 13:53+0200\n"
+"POT-Creation-Date: 2007-05-20 01:55+0200\n"
 "PO-Revision-Date: 2007-05-08 08:01+0100\n"
 "Last-Translator: Matej Urbančič <matej.urban@gmail.com>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
@@ -793,7 +793,7 @@ msgstr "Ime kodeka"
 msgid "Codec Description"
 msgstr "Opis kodeka"
 
-#: include/vlc/vlc.h:591
+#: include/vlc/vlc.h:587
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -948,8 +948,8 @@ msgstr "Zaznamek %i"
 
 #: src/input/decoder.c:117 src/input/decoder.c:129
 #: modules/codec/ffmpeg/encoder.c:218 modules/codec/ffmpeg/encoder.c:226
-#: modules/codec/ffmpeg/encoder.c:238 modules/codec/ffmpeg/encoder.c:592
-#: modules/codec/ffmpeg/encoder.c:601 modules/stream_out/es.c:365
+#: modules/codec/ffmpeg/encoder.c:238 modules/codec/ffmpeg/encoder.c:593
+#: modules/codec/ffmpeg/encoder.c:602 modules/stream_out/es.c:365
 #: modules/stream_out/es.c:379
 msgid "Streaming / Transcoding failed"
 msgstr "Neuspešno pretakanje oz. prekodiranje"
@@ -1054,22 +1054,22 @@ msgstr "Blokovno razmerje"
 msgid "Subtitle"
 msgstr "Podnapis"
 
-#: src/input/input.c:2207
+#: src/input/input.c:2208
 msgid "Your input can't be opened"
 msgstr "Vnosa ni mogoče odpreti"
 
-#: src/input/input.c:2208
+#: src/input/input.c:2209
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 "Predvajalnik VLC ne more odpreti MRL '%s'. Podrobnosti so zabeležene v log "
 "datoteki."
 
-#: src/input/input.c:2286
+#: src/input/input.c:2303
 msgid "Can't recognize the input's format"
 msgstr "Neprepoznavna oblika vnosa"
 
-#: src/input/input.c:2287
+#: src/input/input.c:2304
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
 msgstr ""
@@ -1183,8 +1183,8 @@ msgstr "Beleženje razhroščevanja"
 msgid "Mouse Gestures"
 msgstr "Gibi miške"
 
-#: src/libvlc-common.c:281 src/libvlc-common.c:452 src/modules/modules.c:1715
-#: src/modules/modules.c:2045
+#: src/libvlc-common.c:281 src/libvlc-common.c:452 src/modules/modules.c:1719
+#: src/modules/modules.c:2049
 msgid "C"
 msgstr "C"
 
@@ -1248,7 +1248,7 @@ msgstr ""
 "\n"
 "Pritisnite tipko ENTER za nadaljevanje ...\n"
 
-#: src/libvlc-module.c:47 src/libvlc-module.c:211
+#: src/libvlc-module.c:47 src/libvlc-module.c:211 modules/access/bda/bda.c:62
 msgid "Auto"
 msgstr "Samodejno"
 
@@ -1648,11 +1648,11 @@ msgstr ""
 "Dolby Surround sistemu, lahko izbor te možnosti izboljša predvajanje, še "
 "posebej v kombinaciji z mešalcem kanalov slušalk."
 
-#: src/libvlc-module.c:211
+#: src/libvlc-module.c:211 modules/access/bda/bda.c:62
 msgid "On"
 msgstr "Vključeno"
 
-#: src/libvlc-module.c:211
+#: src/libvlc-module.c:211 modules/access/bda/bda.c:61
 msgid "Off"
 msgstr "Izključeno"
 
@@ -4232,8 +4232,11 @@ msgstr "Ključ"
 msgid "Media Library"
 msgstr "Zbirka medijev"
 
-#: src/playlist/tree.c:59 modules/access/bda/bda.c:104
-#: modules/access/bda/bda.c:117
+#: src/playlist/tree.c:59 modules/access/bda/bda.c:61
+#: modules/access/bda/bda.c:113 modules/access/bda/bda.c:121
+#: modules/access/bda/bda.c:128 modules/access/bda/bda.c:134
+#: modules/access/bda/bda.c:140 modules/access/bda/bda.c:146
+#: modules/access/bda/bda.c:152
 msgid "Undefined"
 msgstr "Nedoločeno"
 
@@ -4924,11 +4927,11 @@ msgstr "Način obračanja"
 msgid "Inversion mode [0=off, 1=on, 2=auto]"
 msgstr "Način obračanja [0=izklopljen, 1=priklopljen, 2=samodejno]"
 
-#: modules/access/bda/bda.c:61 modules/access/dvb/access.c:90
+#: modules/access/bda/bda.c:64 modules/access/dvb/access.c:90
 msgid "Probe DVB card for capabilities"
 msgstr "Preiskava zmožnosti DVB kartice"
 
-#: modules/access/bda/bda.c:62 modules/access/dvb/access.c:91
+#: modules/access/bda/bda.c:65 modules/access/dvb/access.c:91
 msgid ""
 "Some DVB cards do not like to be probed for their capabilities, you can "
 "disable this feature if you experience some trouble."
@@ -4936,36 +4939,41 @@ msgstr ""
 "Nekatere DVB kartice ne sprejemajo preiskovanja zmožnosti. Možnost lahko "
 "onemogočite, če imate težave."
 
-#: modules/access/bda/bda.c:66 modules/access/dvb/access.c:93
+#: modules/access/bda/bda.c:69 modules/access/dvb/access.c:93
 msgid "Budget mode"
 msgstr "Budget način"
 
-#: modules/access/bda/bda.c:67 modules/access/dvb/access.c:94
+#: modules/access/bda/bda.c:70 modules/access/dvb/access.c:94
 msgid "This allows you to stream an entire transponder with a \"budget\" card."
 msgstr ""
 "Nastavitev omogoča pretakanja celotnega transponderja z \"budget\" kartico."
 
-#: modules/access/bda/bda.c:71 modules/access/dvb/access.c:97
+#: modules/access/bda/bda.c:75
+#, fuzzy
+msgid "Network Identifier"
+msgstr "Nastavitve omrežja"
+
+#: modules/access/bda/bda.c:78 modules/access/dvb/access.c:97
 msgid "Satellite number in the Diseqc system"
 msgstr "Številka satelita v Diseqc sistemu"
 
-#: modules/access/bda/bda.c:72 modules/access/dvb/access.c:98
+#: modules/access/bda/bda.c:79 modules/access/dvb/access.c:98
 msgid "[0=no diseqc, 1-4=satellite number]."
 msgstr "[0=brez diseqc, 1-4=številka satelita]."
 
-#: modules/access/bda/bda.c:74 modules/access/dvb/access.c:100
+#: modules/access/bda/bda.c:82 modules/access/dvb/access.c:100
 msgid "LNB voltage"
 msgstr "LNB napetost"
 
-#: modules/access/bda/bda.c:75 modules/access/dvb/access.c:101
+#: modules/access/bda/bda.c:83 modules/access/dvb/access.c:101
 msgid "In Volts [0, 13=vertical, 18=horizontal]."
 msgstr "V voltih [0, 13=navpično, 18=vodoravno]."
 
-#: modules/access/bda/bda.c:77 modules/access/dvb/access.c:103
+#: modules/access/bda/bda.c:85 modules/access/dvb/access.c:103
 msgid "High LNB voltage"
 msgstr "Visoka LNB napetost"
 
-#: modules/access/bda/bda.c:78 modules/access/dvb/access.c:104
+#: modules/access/bda/bda.c:86 modules/access/dvb/access.c:104
 msgid ""
 "Enable high voltage if your cables are particularly long. This is not "
 "supported by all frontends."
@@ -4973,162 +4981,250 @@ msgstr ""
 "Omogoči visoko napetost, če so povezovalni kabli zelo dolgi. Nastavitve ne "
 "podpirajo vsi vmesniki."
 
-#: modules/access/bda/bda.c:81 modules/access/dvb/access.c:107
+#: modules/access/bda/bda.c:89 modules/access/dvb/access.c:107
 msgid "22 kHz tone"
 msgstr "22 kHz toni"
 
-#: modules/access/bda/bda.c:82 modules/access/dvb/access.c:108
+#: modules/access/bda/bda.c:90 modules/access/dvb/access.c:108
 msgid "[0=off, 1=on, -1=auto]."
 msgstr "[0=izklopljen, 1=vklopljen, -1=samodejno]."
 
-#: modules/access/bda/bda.c:84 modules/access/dvb/access.c:110
+#: modules/access/bda/bda.c:92 modules/access/dvb/access.c:110
 msgid "Transponder FEC"
 msgstr "Transponder FEC"
 
-#: modules/access/bda/bda.c:85 modules/access/dvb/access.c:111
+#: modules/access/bda/bda.c:93 modules/access/dvb/access.c:111
 msgid "FEC=Forward Error Correction mode [9=auto]."
 msgstr "FEC=Forward Error Correction način [9=samodejno]."
 
-#: modules/access/bda/bda.c:87 modules/access/dvb/access.c:113
+#: modules/access/bda/bda.c:95 modules/access/dvb/access.c:113
 msgid "Transponder symbol rate in kHz"
 msgstr "Simbolna stopnja transponderja v kHz"
 
-#: modules/access/bda/bda.c:90 modules/access/dvb/access.c:116
+#: modules/access/bda/bda.c:98 modules/access/dvb/access.c:116
 msgid "Antenna lnb_lof1 (kHz)"
 msgstr "Antena lnb_lof1 (kHz)"
 
-#: modules/access/bda/bda.c:93 modules/access/dvb/access.c:119
+#: modules/access/bda/bda.c:99
+msgid "Low Band Local Osc Freq in kHz usually 9.75GHz"
+msgstr ""
+
+#: modules/access/bda/bda.c:101 modules/access/dvb/access.c:119
 msgid "Antenna lnb_lof2 (kHz)"
 msgstr "Antena lnb_lof2 (kHz)"
 
-#: modules/access/bda/bda.c:96 modules/access/dvb/access.c:122
+#: modules/access/bda/bda.c:102
+msgid "High Band Local Osc Freq in kHz usually 10.6GHz"
+msgstr ""
+
+#: modules/access/bda/bda.c:104 modules/access/dvb/access.c:122
 msgid "Antenna lnb_slof (kHz)"
 msgstr "Antena lnb_slof (kHz)"
 
-#: modules/access/bda/bda.c:100 modules/access/dvb/access.c:126
+#: modules/access/bda/bda.c:106
+msgid "Low Noise Block switch freq in kHz usually 11.7GHz"
+msgstr ""
+
+#: modules/access/bda/bda.c:109 modules/access/dvb/access.c:126
 msgid "Modulation type"
 msgstr "Tip modulacije"
 
-#: modules/access/bda/bda.c:101
+#: modules/access/bda/bda.c:110
 msgid "QAM constellation points [16, 32, 64, 128, 256]"
 msgstr ""
 
-#: modules/access/bda/bda.c:104
+#: modules/access/bda/bda.c:113
 msgid "16"
 msgstr ""
 
-#: modules/access/bda/bda.c:104
+#: modules/access/bda/bda.c:113
 msgid "32"
 msgstr ""
 
-#: modules/access/bda/bda.c:105
+#: modules/access/bda/bda.c:114
 msgid "64"
 msgstr ""
 
-#: modules/access/bda/bda.c:105
+#: modules/access/bda/bda.c:114
 msgid "128"
 msgstr ""
 
-#: modules/access/bda/bda.c:105
+#: modules/access/bda/bda.c:114
 msgid "256"
 msgstr ""
 
-#: modules/access/bda/bda.c:108 modules/access/dvb/access.c:130
+#: modules/access/bda/bda.c:117 modules/access/dvb/access.c:130
 msgid "Terrestrial high priority stream code rate (FEC)"
 msgstr "Zemeljska visoko prednostna kodna stopnja pretoka (FEC)"
 
-#: modules/access/bda/bda.c:111 modules/access/dvb/access.c:133
+#: modules/access/bda/bda.c:118
+msgid "High Priority FEC Rate [Undefined,1/2,2/3,3/4,5/6,7/8]"
+msgstr ""
+
+#: modules/access/bda/bda.c:121 modules/access/bda/bda.c:128
+msgid "1/2"
+msgstr ""
+
+#: modules/access/bda/bda.c:121 modules/access/bda/bda.c:128
+msgid "2/3"
+msgstr ""
+
+#: modules/access/bda/bda.c:122 modules/access/bda/bda.c:129
+msgid "3/4"
+msgstr ""
+
+#: modules/access/bda/bda.c:122 modules/access/bda/bda.c:129
+msgid "5/6"
+msgstr ""
+
+#: modules/access/bda/bda.c:122 modules/access/bda/bda.c:129
+msgid "7/8"
+msgstr ""
+
+#: modules/access/bda/bda.c:124 modules/access/dvb/access.c:133
 msgid "Terrestrial low priority stream code rate (FEC)"
 msgstr "Zemeljska nizko prednostna kodna stopnja pretoka (FEC)"
 
-#: modules/access/bda/bda.c:114 modules/access/dvb/access.c:136
+#: modules/access/bda/bda.c:125
+msgid "Low Priority FEC Rate [Undefined,1/2,2/3,3/4,5/6,7/8]"
+msgstr ""
+
+#: modules/access/bda/bda.c:131 modules/access/dvb/access.c:136
 msgid "Terrestrial bandwidth"
 msgstr "Zemeljska podatkovna širina"
 
-#: modules/access/bda/bda.c:115 modules/access/dvb/access.c:137
+#: modules/access/bda/bda.c:132 modules/access/dvb/access.c:137
 msgid "Terrestrial bandwidth [0=auto,6,7,8 in MHz]"
 msgstr "Zemeljska podatkovna širina [0=samodejno,6,7,8 v MHz]"
 
-#: modules/access/bda/bda.c:117
+#: modules/access/bda/bda.c:134
 msgid "6"
 msgstr ""
 
-#: modules/access/bda/bda.c:117
+#: modules/access/bda/bda.c:134
 msgid "7"
 msgstr ""
 
-#: modules/access/bda/bda.c:118
+#: modules/access/bda/bda.c:135
 msgid "8"
 msgstr ""
 
-#: modules/access/bda/bda.c:120 modules/access/dvb/access.c:139
+#: modules/access/bda/bda.c:137 modules/access/dvb/access.c:139
 msgid "Terrestrial guard interval"
 msgstr "Zamik zemeljskega varovanja"
 
-#: modules/access/bda/bda.c:123 modules/access/dvb/access.c:142
+#: modules/access/bda/bda.c:138
+msgid "Guard interval [Undefined,1/4,1/8,1/16,1/32]"
+msgstr ""
+
+#: modules/access/bda/bda.c:140
+msgid "1/4"
+msgstr ""
+
+#: modules/access/bda/bda.c:140
+msgid "1/8"
+msgstr ""
+
+#: modules/access/bda/bda.c:141
+msgid "1/16"
+msgstr ""
+
+#: modules/access/bda/bda.c:141
+msgid "1/32"
+msgstr ""
+
+#: modules/access/bda/bda.c:143 modules/access/dvb/access.c:142
 msgid "Terrestrial transmission mode"
 msgstr "Zemeljski način prepuščanja"
 
-#: modules/access/bda/bda.c:126 modules/access/dvb/access.c:145
+#: modules/access/bda/bda.c:144
+msgid "Transmission mode [Undefined,2k,8k]"
+msgstr ""
+
+#: modules/access/bda/bda.c:146
+msgid "2k"
+msgstr ""
+
+#: modules/access/bda/bda.c:147
+msgid "8k"
+msgstr ""
+
+#: modules/access/bda/bda.c:149 modules/access/dvb/access.c:145
 msgid "Terrestrial hierarchy mode"
 msgstr "Zemeljski hierarhični način "
 
-#: modules/access/bda/bda.c:130
+#: modules/access/bda/bda.c:150
+msgid "Hierarchy alpha value [Undefined,1,2,4]"
+msgstr ""
+
+#: modules/access/bda/bda.c:152
+msgid "1"
+msgstr ""
+
+#: modules/access/bda/bda.c:153
+msgid "2"
+msgstr ""
+
+#: modules/access/bda/bda.c:153
+msgid "4"
+msgstr ""
+
+#: modules/access/bda/bda.c:156
 msgid "Satellite Azimuth"
 msgstr ""
 
-#: modules/access/bda/bda.c:131
+#: modules/access/bda/bda.c:157
 msgid "Satellite Azimuth in tenths of degree"
 msgstr ""
 
-#: modules/access/bda/bda.c:132
+#: modules/access/bda/bda.c:158
 msgid "Satellite Elevation"
 msgstr ""
 
-#: modules/access/bda/bda.c:133
+#: modules/access/bda/bda.c:159
 msgid "Satellite Elevation in tenths of degree"
 msgstr ""
 
-#: modules/access/bda/bda.c:134
+#: modules/access/bda/bda.c:160
 msgid "Satellite Longitude"
 msgstr ""
 
-#: modules/access/bda/bda.c:136
+#: modules/access/bda/bda.c:162
 msgid "Satellite Longitude in 10ths of degree, -ve=West"
 msgstr ""
 
-#: modules/access/bda/bda.c:137
+#: modules/access/bda/bda.c:163
 #, fuzzy
 msgid "Satellite Polarisation"
 msgstr "Neveljavna polarizacija"
 
-#: modules/access/bda/bda.c:138
+#: modules/access/bda/bda.c:164
 msgid "Satellite Polarisation [H/V/L/R]"
 msgstr ""
 
-#: modules/access/bda/bda.c:140
+#: modules/access/bda/bda.c:166
 #, fuzzy
 msgid "Horizontal"
 msgstr "Obrni vodoravno"
 
-#: modules/access/bda/bda.c:140
+#: modules/access/bda/bda.c:166
 #, fuzzy
 msgid "Vertical"
 msgstr "Navpična uskladitev"
 
-#: modules/access/bda/bda.c:141
+#: modules/access/bda/bda.c:167
 msgid "Circular Left"
 msgstr ""
 
-#: modules/access/bda/bda.c:141
+#: modules/access/bda/bda.c:167
 msgid "Circular Right"
 msgstr ""
 
-#: modules/access/bda/bda.c:144 modules/access/dvb/access.c:183
+#: modules/access/bda/bda.c:170 modules/access/dvb/access.c:183
 msgid "DVB"
 msgstr "DVB"
 
-#: modules/access/bda/bda.c:145
+#: modules/access/bda/bda.c:171
 #, fuzzy
 msgid "DirectShow DVB input"
 msgstr "DirectShow dovod"
@@ -7161,7 +7257,7 @@ msgstr "Odseki"
 
 #: modules/access/vcdx/access.c:428 modules/access/vcdx/access.c:709
 #: modules/access/vcdx/info.c:294 modules/access/vcdx/info.c:295
-#: modules/demux/mkv.cpp:5282
+#: modules/demux/mkv.cpp:5281
 msgid "Segment"
 msgstr "Odsek"
 
@@ -8208,7 +8304,7 @@ msgstr "\"%s\" ni kodirnik zvoka."
 msgid "VLC could not find encoder \"%s\"."
 msgstr "Predvajalnik VLC ne najde kodirnika \"%s\"."
 
-#: modules/codec/ffmpeg/encoder.c:593 modules/codec/ffmpeg/encoder.c:602
+#: modules/codec/ffmpeg/encoder.c:594 modules/codec/ffmpeg/encoder.c:603
 msgid "VLC could not open the encoder."
 msgstr "Predvajalnik VLC ne more odpreti kodirnika."
 
@@ -10849,19 +10945,19 @@ msgstr ""
 "Preberi in zavrzi neznane EBML elemente (ni priporočljivo za poškodovane "
 "datoteke)."
 
-#: modules/demux/mkv.cpp:3256
+#: modules/demux/mkv.cpp:3255
 msgid "---  DVD Menu"
 msgstr "--- DVD Menu"
 
-#: modules/demux/mkv.cpp:3262
+#: modules/demux/mkv.cpp:3261
 msgid "First Played"
 msgstr "Prvič predvajan"
 
-#: modules/demux/mkv.cpp:3264
+#: modules/demux/mkv.cpp:3263
 msgid "Video Manager"
 msgstr "Urejevalnik slike"
 
-#: modules/demux/mkv.cpp:3270
+#: modules/demux/mkv.cpp:3269
 msgid "----- Title"
 msgstr "----- Naslov"
 
@@ -11015,12 +11111,12 @@ msgstr "OGG razvijalec"
 msgid "Google Video"
 msgstr "Google Video"
 
-#: modules/demux/playlist/luaplaylist.c:57
+#: modules/demux/playlist/luaplaylist.c:61
 #, fuzzy
 msgid "Lua Playlist"
 msgstr "Seznam predvajanja"
 
-#: modules/demux/playlist/luaplaylist.c:58
+#: modules/demux/playlist/luaplaylist.c:62
 msgid "Lua Playlist Parser Interface"
 msgstr ""
 
@@ -11090,7 +11186,7 @@ msgstr "Uvoz Google Video seznama predvajanja"
 msgid "Dummy ifo demux"
 msgstr "Dummy razvijalec"
 
-#: modules/demux/playlist/playlist.c:120
+#: modules/demux/playlist/playlist.c:121
 msgid "Video portal url converter"
 msgstr ""
 
@@ -11320,44 +11416,44 @@ msgstr ""
 msgid "MPEG Transport Stream demuxer"
 msgstr "MPEG Transport Stream razvijalec"
 
-#: modules/demux/ts.c:3204 modules/demux/ts.c:3305
+#: modules/demux/ts.c:3205 modules/demux/ts.c:3306
 msgid "subtitles"
 msgstr "podnapisi"
 
-#: modules/demux/ts.c:3214 modules/demux/ts.c:3321 modules/demux/ts.c:3469
-#: modules/demux/ts.c:3504
+#: modules/demux/ts.c:3215 modules/demux/ts.c:3322 modules/demux/ts.c:3470
+#: modules/demux/ts.c:3505
 msgid "hearing impaired"
 msgstr "slušno omejeni"
 
-#: modules/demux/ts.c:3309
+#: modules/demux/ts.c:3310
 msgid "4:3 subtitles"
 msgstr "4:3 podnapisi"
 
-#: modules/demux/ts.c:3313
+#: modules/demux/ts.c:3314
 msgid "16:9 subtitles"
 msgstr "16:9 podnapisi"
 
-#: modules/demux/ts.c:3317
+#: modules/demux/ts.c:3318
 msgid "2.21:1 subtitles"
 msgstr "2.21:1 podnapisi"
 
-#: modules/demux/ts.c:3325
+#: modules/demux/ts.c:3326
 msgid "4:3 hearing impaired"
 msgstr "4:3 slušno omejeni"
 
-#: modules/demux/ts.c:3329
+#: modules/demux/ts.c:3330
 msgid "16:9 hearing impaired"
 msgstr "16:9 slušno omejeni"
 
-#: modules/demux/ts.c:3333
+#: modules/demux/ts.c:3334
 msgid "2.21:1 hearing impaired"
 msgstr "2.21:1 slušno omejeni"
 
-#: modules/demux/ts.c:3465 modules/demux/ts.c:3500
+#: modules/demux/ts.c:3466 modules/demux/ts.c:3501
 msgid "clean effects"
 msgstr "počisti učinke"
 
-#: modules/demux/ts.c:3473 modules/demux/ts.c:3508
+#: modules/demux/ts.c:3474 modules/demux/ts.c:3509
 msgid "visual impaired commentary"
 msgstr "vidno omejeni"
 
@@ -18061,11 +18157,11 @@ msgstr "Največja dovoljena osvetljenost črnih točk (0-255)."
 msgid "Crop video filter"
 msgstr "Filter obrezovanja slike"
 
-#: modules/video_filter/crop.c:377 modules/video_filter/crop.c:469
+#: modules/video_filter/crop.c:378 modules/video_filter/crop.c:472
 msgid "Cropping failed"
 msgstr "Neuspešno brezovanje"
 
-#: modules/video_filter/crop.c:378 modules/video_filter/crop.c:470
+#: modules/video_filter/crop.c:379 modules/video_filter/crop.c:473
 msgid "VLC could not open the video output module."
 msgstr "Ni mogoče odpreti enote odvoda posnetka."
 

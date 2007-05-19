@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-16 13:53+0200\n"
+"POT-Creation-Date: 2007-05-20 01:55+0200\n"
 "PO-Revision-Date: 2005-12-12 14:01+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -805,7 +805,7 @@ msgstr "コーデック名デバイス名"
 msgid "Codec Description"
 msgstr "コーデック説明"
 
-#: include/vlc/vlc.h:591
+#: include/vlc/vlc.h:587
 #, fuzzy
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
@@ -963,8 +963,8 @@ msgstr "ブックマーク %i"
 
 #: src/input/decoder.c:117 src/input/decoder.c:129
 #: modules/codec/ffmpeg/encoder.c:218 modules/codec/ffmpeg/encoder.c:226
-#: modules/codec/ffmpeg/encoder.c:238 modules/codec/ffmpeg/encoder.c:592
-#: modules/codec/ffmpeg/encoder.c:601 modules/stream_out/es.c:365
+#: modules/codec/ffmpeg/encoder.c:238 modules/codec/ffmpeg/encoder.c:593
+#: modules/codec/ffmpeg/encoder.c:602 modules/stream_out/es.c:365
 #: modules/stream_out/es.c:379
 #, fuzzy
 msgid "Streaming / Transcoding failed"
@@ -1069,20 +1069,20 @@ msgstr "フレームレート"
 msgid "Subtitle"
 msgstr "字幕"
 
-#: src/input/input.c:2207
+#: src/input/input.c:2208
 msgid "Your input can't be opened"
 msgstr ""
 
-#: src/input/input.c:2208
+#: src/input/input.c:2209
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 
-#: src/input/input.c:2286
+#: src/input/input.c:2303
 msgid "Can't recognize the input's format"
 msgstr ""
 
-#: src/input/input.c:2287
+#: src/input/input.c:2304
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
 msgstr ""
@@ -1199,8 +1199,8 @@ msgstr "ファイルロギングインターフェース"
 msgid "Mouse Gestures"
 msgstr "ジャンル"
 
-#: src/libvlc-common.c:281 src/libvlc-common.c:452 src/modules/modules.c:1715
-#: src/modules/modules.c:2045
+#: src/libvlc-common.c:281 src/libvlc-common.c:452 src/modules/modules.c:1719
+#: src/modules/modules.c:2049
 msgid "C"
 msgstr "ja"
 
@@ -1262,7 +1262,7 @@ msgstr ""
 "\n"
 "続けるにはEnterキーを押してください。\n"
 
-#: src/libvlc-module.c:47 src/libvlc-module.c:211
+#: src/libvlc-module.c:47 src/libvlc-module.c:211 modules/access/bda/bda.c:62
 msgid "Auto"
 msgstr "自動"
 
@@ -1668,11 +1668,11 @@ msgid ""
 "your experience, especially when combined with the Headphone Channel Mixer."
 msgstr ""
 
-#: src/libvlc-module.c:211
+#: src/libvlc-module.c:211 modules/access/bda/bda.c:62
 msgid "On"
 msgstr "オン"
 
-#: src/libvlc-module.c:211
+#: src/libvlc-module.c:211 modules/access/bda/bda.c:61
 msgid "Off"
 msgstr "オフ"
 
@@ -4222,8 +4222,11 @@ msgstr "キー"
 msgid "Media Library"
 msgstr ""
 
-#: src/playlist/tree.c:59 modules/access/bda/bda.c:104
-#: modules/access/bda/bda.c:117
+#: src/playlist/tree.c:59 modules/access/bda/bda.c:61
+#: modules/access/bda/bda.c:113 modules/access/bda/bda.c:121
+#: modules/access/bda/bda.c:128 modules/access/bda/bda.c:134
+#: modules/access/bda/bda.c:140 modules/access/bda/bda.c:146
+#: modules/access/bda/bda.c:152
 msgid "Undefined"
 msgstr "未定義"
 
@@ -4929,217 +4932,310 @@ msgstr "反転モード"
 msgid "Inversion mode [0=off, 1=on, 2=auto]"
 msgstr "反転モード [0=オフ 1=オン 2=自動]"
 
-#: modules/access/bda/bda.c:61 modules/access/dvb/access.c:90
+#: modules/access/bda/bda.c:64 modules/access/dvb/access.c:90
 msgid "Probe DVB card for capabilities"
 msgstr ""
 
-#: modules/access/bda/bda.c:62 modules/access/dvb/access.c:91
+#: modules/access/bda/bda.c:65 modules/access/dvb/access.c:91
 msgid ""
 "Some DVB cards do not like to be probed for their capabilities, you can "
 "disable this feature if you experience some trouble."
 msgstr ""
 
-#: modules/access/bda/bda.c:66 modules/access/dvb/access.c:93
+#: modules/access/bda/bda.c:69 modules/access/dvb/access.c:93
 #, fuzzy
 msgid "Budget mode"
 msgstr "ネットワーク"
 
-#: modules/access/bda/bda.c:67 modules/access/dvb/access.c:94
+#: modules/access/bda/bda.c:70 modules/access/dvb/access.c:94
 #, fuzzy
 msgid "This allows you to stream an entire transponder with a \"budget\" card."
 msgstr "VLCが選択するパケッタライザーの順序を選択します。"
 
-#: modules/access/bda/bda.c:71 modules/access/dvb/access.c:97
+#: modules/access/bda/bda.c:75
+#, fuzzy
+msgid "Network Identifier"
+msgstr "ネットワーク設定"
+
+#: modules/access/bda/bda.c:78 modules/access/dvb/access.c:97
 msgid "Satellite number in the Diseqc system"
 msgstr ""
 
-#: modules/access/bda/bda.c:72 modules/access/dvb/access.c:98
+#: modules/access/bda/bda.c:79 modules/access/dvb/access.c:98
 msgid "[0=no diseqc, 1-4=satellite number]."
 msgstr ""
 
-#: modules/access/bda/bda.c:74 modules/access/dvb/access.c:100
+#: modules/access/bda/bda.c:82 modules/access/dvb/access.c:100
 msgid "LNB voltage"
 msgstr "LNB 電圧"
 
-#: modules/access/bda/bda.c:75 modules/access/dvb/access.c:101
+#: modules/access/bda/bda.c:83 modules/access/dvb/access.c:101
 msgid "In Volts [0, 13=vertical, 18=horizontal]."
 msgstr ""
 
-#: modules/access/bda/bda.c:77 modules/access/dvb/access.c:103
+#: modules/access/bda/bda.c:85 modules/access/dvb/access.c:103
 #, fuzzy
 msgid "High LNB voltage"
 msgstr "LNB 電圧"
 
-#: modules/access/bda/bda.c:78 modules/access/dvb/access.c:104
+#: modules/access/bda/bda.c:86 modules/access/dvb/access.c:104
 msgid ""
 "Enable high voltage if your cables are particularly long. This is not "
 "supported by all frontends."
 msgstr ""
 
-#: modules/access/bda/bda.c:81 modules/access/dvb/access.c:107
+#: modules/access/bda/bda.c:89 modules/access/dvb/access.c:107
 msgid "22 kHz tone"
 msgstr "22 kHz トーン"
 
-#: modules/access/bda/bda.c:82 modules/access/dvb/access.c:108
+#: modules/access/bda/bda.c:90 modules/access/dvb/access.c:108
 #, fuzzy
 msgid "[0=off, 1=on, -1=auto]."
 msgstr "[0:オフ 1:オン -1:自動]"
 
-#: modules/access/bda/bda.c:84 modules/access/dvb/access.c:110
+#: modules/access/bda/bda.c:92 modules/access/dvb/access.c:110
 #, fuzzy
 msgid "Transponder FEC"
 msgstr "衛星 既定転送FEC"
 
-#: modules/access/bda/bda.c:85 modules/access/dvb/access.c:111
+#: modules/access/bda/bda.c:93 modules/access/dvb/access.c:111
 msgid "FEC=Forward Error Correction mode [9=auto]."
 msgstr ""
 
-#: modules/access/bda/bda.c:87 modules/access/dvb/access.c:113
+#: modules/access/bda/bda.c:95 modules/access/dvb/access.c:113
 #, fuzzy
 msgid "Transponder symbol rate in kHz"
 msgstr "衛星 既定転送シンボル・レート"
 
-#: modules/access/bda/bda.c:90 modules/access/dvb/access.c:116
+#: modules/access/bda/bda.c:98 modules/access/dvb/access.c:116
 #, fuzzy
 msgid "Antenna lnb_lof1 (kHz)"
 msgstr "アンテナ lnb_lof1 (kHz)"
 
-#: modules/access/bda/bda.c:93 modules/access/dvb/access.c:119
+#: modules/access/bda/bda.c:99
+msgid "Low Band Local Osc Freq in kHz usually 9.75GHz"
+msgstr ""
+
+#: modules/access/bda/bda.c:101 modules/access/dvb/access.c:119
 #, fuzzy
 msgid "Antenna lnb_lof2 (kHz)"
 msgstr "アンテナ lnb_lof2 (kHz)"
 
-#: modules/access/bda/bda.c:96 modules/access/dvb/access.c:122
+#: modules/access/bda/bda.c:102
+msgid "High Band Local Osc Freq in kHz usually 10.6GHz"
+msgstr ""
+
+#: modules/access/bda/bda.c:104 modules/access/dvb/access.c:122
 #, fuzzy
 msgid "Antenna lnb_slof (kHz)"
 msgstr "アンテナ lnb_slof (kHz)"
 
-#: modules/access/bda/bda.c:100 modules/access/dvb/access.c:126
+#: modules/access/bda/bda.c:106
+msgid "Low Noise Block switch freq in kHz usually 11.7GHz"
+msgstr ""
+
+#: modules/access/bda/bda.c:109 modules/access/dvb/access.c:126
 msgid "Modulation type"
 msgstr "モジュレーションタイプ"
 
-#: modules/access/bda/bda.c:101
+#: modules/access/bda/bda.c:110
 msgid "QAM constellation points [16, 32, 64, 128, 256]"
 msgstr ""
 
-#: modules/access/bda/bda.c:104
+#: modules/access/bda/bda.c:113
 msgid "16"
 msgstr ""
 
-#: modules/access/bda/bda.c:104
+#: modules/access/bda/bda.c:113
 msgid "32"
 msgstr ""
 
-#: modules/access/bda/bda.c:105
+#: modules/access/bda/bda.c:114
 msgid "64"
 msgstr ""
 
-#: modules/access/bda/bda.c:105
+#: modules/access/bda/bda.c:114
 msgid "128"
 msgstr ""
 
-#: modules/access/bda/bda.c:105
+#: modules/access/bda/bda.c:114
 msgid "256"
 msgstr ""
 
-#: modules/access/bda/bda.c:108 modules/access/dvb/access.c:130
+#: modules/access/bda/bda.c:117 modules/access/dvb/access.c:130
 msgid "Terrestrial high priority stream code rate (FEC)"
 msgstr ""
 
-#: modules/access/bda/bda.c:111 modules/access/dvb/access.c:133
+#: modules/access/bda/bda.c:118
+msgid "High Priority FEC Rate [Undefined,1/2,2/3,3/4,5/6,7/8]"
+msgstr ""
+
+#: modules/access/bda/bda.c:121 modules/access/bda/bda.c:128
+msgid "1/2"
+msgstr ""
+
+#: modules/access/bda/bda.c:121 modules/access/bda/bda.c:128
+msgid "2/3"
+msgstr ""
+
+#: modules/access/bda/bda.c:122 modules/access/bda/bda.c:129
+msgid "3/4"
+msgstr ""
+
+#: modules/access/bda/bda.c:122 modules/access/bda/bda.c:129
+msgid "5/6"
+msgstr ""
+
+#: modules/access/bda/bda.c:122 modules/access/bda/bda.c:129
+msgid "7/8"
+msgstr ""
+
+#: modules/access/bda/bda.c:124 modules/access/dvb/access.c:133
 msgid "Terrestrial low priority stream code rate (FEC)"
 msgstr ""
 
-#: modules/access/bda/bda.c:114 modules/access/dvb/access.c:136
+#: modules/access/bda/bda.c:125
+msgid "Low Priority FEC Rate [Undefined,1/2,2/3,3/4,5/6,7/8]"
+msgstr ""
+
+#: modules/access/bda/bda.c:131 modules/access/dvb/access.c:136
 msgid "Terrestrial bandwidth"
 msgstr ""
 
-#: modules/access/bda/bda.c:115 modules/access/dvb/access.c:137
+#: modules/access/bda/bda.c:132 modules/access/dvb/access.c:137
 msgid "Terrestrial bandwidth [0=auto,6,7,8 in MHz]"
 msgstr ""
 
-#: modules/access/bda/bda.c:117
+#: modules/access/bda/bda.c:134
 msgid "6"
 msgstr ""
 
-#: modules/access/bda/bda.c:117
+#: modules/access/bda/bda.c:134
 msgid "7"
 msgstr ""
 
-#: modules/access/bda/bda.c:118
+#: modules/access/bda/bda.c:135
 msgid "8"
 msgstr ""
 
-#: modules/access/bda/bda.c:120 modules/access/dvb/access.c:139
+#: modules/access/bda/bda.c:137 modules/access/dvb/access.c:139
 msgid "Terrestrial guard interval"
 msgstr ""
 
-#: modules/access/bda/bda.c:123 modules/access/dvb/access.c:142
+#: modules/access/bda/bda.c:138
+msgid "Guard interval [Undefined,1/4,1/8,1/16,1/32]"
+msgstr ""
+
+#: modules/access/bda/bda.c:140
+msgid "1/4"
+msgstr ""
+
+#: modules/access/bda/bda.c:140
+msgid "1/8"
+msgstr ""
+
+#: modules/access/bda/bda.c:141
+msgid "1/16"
+msgstr ""
+
+#: modules/access/bda/bda.c:141
+msgid "1/32"
+msgstr ""
+
+#: modules/access/bda/bda.c:143 modules/access/dvb/access.c:142
 msgid "Terrestrial transmission mode"
 msgstr ""
 
-#: modules/access/bda/bda.c:126 modules/access/dvb/access.c:145
+#: modules/access/bda/bda.c:144
+msgid "Transmission mode [Undefined,2k,8k]"
+msgstr ""
+
+#: modules/access/bda/bda.c:146
+msgid "2k"
+msgstr ""
+
+#: modules/access/bda/bda.c:147
+msgid "8k"
+msgstr ""
+
+#: modules/access/bda/bda.c:149 modules/access/dvb/access.c:145
 msgid "Terrestrial hierarchy mode"
 msgstr ""
 
-#: modules/access/bda/bda.c:130
+#: modules/access/bda/bda.c:150
+msgid "Hierarchy alpha value [Undefined,1,2,4]"
+msgstr ""
+
+#: modules/access/bda/bda.c:152
+msgid "1"
+msgstr ""
+
+#: modules/access/bda/bda.c:153
+msgid "2"
+msgstr ""
+
+#: modules/access/bda/bda.c:153
+msgid "4"
+msgstr ""
+
+#: modules/access/bda/bda.c:156
 #, fuzzy
 msgid "Satellite Azimuth"
 msgstr "衛星"
 
-#: modules/access/bda/bda.c:131
+#: modules/access/bda/bda.c:157
 msgid "Satellite Azimuth in tenths of degree"
 msgstr ""
 
-#: modules/access/bda/bda.c:132
+#: modules/access/bda/bda.c:158
 #, fuzzy
 msgid "Satellite Elevation"
 msgstr "衛星"
 
-#: modules/access/bda/bda.c:133
+#: modules/access/bda/bda.c:159
 msgid "Satellite Elevation in tenths of degree"
 msgstr ""
 
-#: modules/access/bda/bda.c:134
+#: modules/access/bda/bda.c:160
 #, fuzzy
 msgid "Satellite Longitude"
 msgstr "衛星"
 
-#: modules/access/bda/bda.c:136
+#: modules/access/bda/bda.c:162
 msgid "Satellite Longitude in 10ths of degree, -ve=West"
 msgstr ""
 
-#: modules/access/bda/bda.c:137
+#: modules/access/bda/bda.c:163
 #, fuzzy
 msgid "Satellite Polarisation"
 msgstr "ビジュアル化"
 
-#: modules/access/bda/bda.c:138
+#: modules/access/bda/bda.c:164
 #, fuzzy
 msgid "Satellite Polarisation [H/V/L/R]"
 msgstr "衛星 既定転送極"
 
-#: modules/access/bda/bda.c:140
+#: modules/access/bda/bda.c:166
 msgid "Horizontal"
 msgstr "水平"
 
-#: modules/access/bda/bda.c:140
+#: modules/access/bda/bda.c:166
 msgid "Vertical"
 msgstr "垂直"
 
-#: modules/access/bda/bda.c:141
+#: modules/access/bda/bda.c:167
 msgid "Circular Left"
 msgstr ""
 
-#: modules/access/bda/bda.c:141
+#: modules/access/bda/bda.c:167
 msgid "Circular Right"
 msgstr ""
 
-#: modules/access/bda/bda.c:144 modules/access/dvb/access.c:183
+#: modules/access/bda/bda.c:170 modules/access/dvb/access.c:183
 msgid "DVB"
 msgstr "DVB"
 
-#: modules/access/bda/bda.c:145
+#: modules/access/bda/bda.c:171
 #, fuzzy
 msgid "DirectShow DVB input"
 msgstr "DirectShow 入力"
@@ -7169,7 +7265,7 @@ msgstr "分割"
 
 #: modules/access/vcdx/access.c:428 modules/access/vcdx/access.c:709
 #: modules/access/vcdx/info.c:294 modules/access/vcdx/info.c:295
-#: modules/demux/mkv.cpp:5282
+#: modules/demux/mkv.cpp:5281
 msgid "Segment"
 msgstr "分割"
 
@@ -8255,7 +8351,7 @@ msgstr "Vorbis オーディオエンコーダー"
 msgid "VLC could not find encoder \"%s\"."
 msgstr ""
 
-#: modules/codec/ffmpeg/encoder.c:593 modules/codec/ffmpeg/encoder.c:602
+#: modules/codec/ffmpeg/encoder.c:594 modules/codec/ffmpeg/encoder.c:603
 msgid "VLC could not open the encoder."
 msgstr ""
 
@@ -10882,19 +10978,19 @@ msgstr "ダミー要素"
 msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
 
-#: modules/demux/mkv.cpp:3256
+#: modules/demux/mkv.cpp:3255
 msgid "---  DVD Menu"
 msgstr "---  DVD メニュー"
 
-#: modules/demux/mkv.cpp:3262
+#: modules/demux/mkv.cpp:3261
 msgid "First Played"
 msgstr ""
 
-#: modules/demux/mkv.cpp:3264
+#: modules/demux/mkv.cpp:3263
 msgid "Video Manager"
 msgstr "ビデオ管理"
 
-#: modules/demux/mkv.cpp:3270
+#: modules/demux/mkv.cpp:3269
 msgid "----- Title"
 msgstr "--- 題名"
 
@@ -11065,12 +11161,12 @@ msgstr "MPEG 1/2レイヤ1/2オーディオ・デコーダ"
 msgid "Google Video"
 msgstr "ビデオズーム"
 
-#: modules/demux/playlist/luaplaylist.c:57
+#: modules/demux/playlist/luaplaylist.c:61
 #, fuzzy
 msgid "Lua Playlist"
 msgstr "再生一覧"
 
-#: modules/demux/playlist/luaplaylist.c:58
+#: modules/demux/playlist/luaplaylist.c:62
 msgid "Lua Playlist Parser Interface"
 msgstr ""
 
@@ -11146,7 +11242,7 @@ msgstr "古い再生一覧をエクスポートする"
 msgid "Dummy ifo demux"
 msgstr "設定"
 
-#: modules/demux/playlist/playlist.c:120
+#: modules/demux/playlist/playlist.c:121
 msgid "Video portal url converter"
 msgstr ""
 
@@ -11365,48 +11461,48 @@ msgstr ""
 msgid "MPEG Transport Stream demuxer"
 msgstr "ストリームの再生"
 
-#: modules/demux/ts.c:3204 modules/demux/ts.c:3305
+#: modules/demux/ts.c:3205 modules/demux/ts.c:3306
 msgid "subtitles"
 msgstr "字幕"
 
-#: modules/demux/ts.c:3214 modules/demux/ts.c:3321 modules/demux/ts.c:3469
-#: modules/demux/ts.c:3504
+#: modules/demux/ts.c:3215 modules/demux/ts.c:3322 modules/demux/ts.c:3470
+#: modules/demux/ts.c:3505
 msgid "hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3309
+#: modules/demux/ts.c:3310
 #, fuzzy
 msgid "4:3 subtitles"
 msgstr "字幕"
 
-#: modules/demux/ts.c:3313
+#: modules/demux/ts.c:3314
 #, fuzzy
 msgid "16:9 subtitles"
 msgstr "字幕"
 
-#: modules/demux/ts.c:3317
+#: modules/demux/ts.c:3318
 #, fuzzy
 msgid "2.21:1 subtitles"
 msgstr "字幕"
 
-#: modules/demux/ts.c:3325
+#: modules/demux/ts.c:3326
 msgid "4:3 hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3329
+#: modules/demux/ts.c:3330
 msgid "16:9 hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3333
+#: modules/demux/ts.c:3334
 msgid "2.21:1 hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3465 modules/demux/ts.c:3500
+#: modules/demux/ts.c:3466 modules/demux/ts.c:3501
 #, fuzzy
 msgid "clean effects"
 msgstr "スコープ効果"
 
-#: modules/demux/ts.c:3473 modules/demux/ts.c:3508
+#: modules/demux/ts.c:3474 modules/demux/ts.c:3509
 msgid "visual impaired commentary"
 msgstr ""
 
@@ -18185,12 +18281,12 @@ msgstr ""
 msgid "Crop video filter"
 msgstr "ビデオ・フィルター・モジュール"
 
-#: modules/video_filter/crop.c:377 modules/video_filter/crop.c:469
+#: modules/video_filter/crop.c:378 modules/video_filter/crop.c:472
 #, fuzzy
 msgid "Cropping failed"
 msgstr "ビデオ・フィルター・モジュール"
 
-#: modules/video_filter/crop.c:378 modules/video_filter/crop.c:470
+#: modules/video_filter/crop.c:379 modules/video_filter/crop.c:473
 #, fuzzy
 msgid "VLC could not open the video output module."
 msgstr "ビデオ出力モジュール"

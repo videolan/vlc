@@ -31,6 +31,7 @@ include/vlc_interface.h
 include/vlc_intf_strings.h
 include/vlc_keys.h
 include/vlc/libvlc.h
+include/vlc/libvlc_structures.h
 include/vlc_md5.h
 include/vlc/mediacontrol.h
 include/vlc/mediacontrol_structures.h
@@ -69,6 +70,7 @@ src/audio_output/intf.c
 src/audio_output/mixer.c
 src/audio_output/output.c
 src/control/audio.c
+src/control/callback.c
 src/control/core.c
 src/control/input.c
 src/control/libvlc_internal.h
@@ -127,7 +129,6 @@ src/misc/variables.c
 src/misc/variables.h
 src/misc/win32_specific.c
 src/misc/xml.c
-src/modules/builtin.h
 src/modules/configuration.c
 src/modules/configuration_chain.c
 src/modules/configuration.h
@@ -459,7 +460,6 @@ modules/demux/playlist/podcast.c
 modules/demux/playlist/qtl.c
 modules/demux/playlist/sgimb.c
 modules/demux/playlist/shoutcast.c
-modules/demux/playlist/videoportals.c
 modules/demux/playlist/xspf.c
 modules/demux/playlist/xspf.h
 modules/demux/ps.c
