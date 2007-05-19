@@ -87,6 +87,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     AVProbeData   pd;
     AVInputFormat *fmt;
     int i;
+    vlc_bool_t b_avfmt_nofile;
 
     /* Init Probe data */
     pd.filename = p_demux->psz_path;
@@ -166,6 +167,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     init_put_byte( &p_sys->io, p_sys->io_buffer, p_sys->io_buffer_size,
                    0, &p_sys->url, IORead, NULL, IOSeek );
 
+    b_avfmt_nofile = p_sys->fmt->flags & AVFMT_NOFILE;
     p_sys->fmt->flags |= AVFMT_NOFILE; /* libavformat must not fopen/fclose */
 
     /* Open it */
@@ -173,6 +175,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
                               p_sys->fmt, NULL ) )
     {
         msg_Err( p_demux, "av_open_input_stream failed" );
+        if( !b_avfmt_nofile ) p_sys->fmt->flags ^= AVFMT_NOFILE;
         E_(CloseDemux)( p_this );
         return VLC_EGENERIC;
     }
@@ -180,9 +183,11 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     if( av_find_stream_info( p_sys->ic ) < 0 )
     {
         msg_Err( p_demux, "av_find_stream_info failed" );
+        if( !b_avfmt_nofile ) p_sys->fmt->flags ^= AVFMT_NOFILE;
         E_(CloseDemux)( p_this );
         return VLC_EGENERIC;
     }
+    if( !b_avfmt_nofile ) p_sys->fmt->flags ^= AVFMT_NOFILE;
 
     for( i = 0; i < p_sys->ic->nb_streams; i++ )
     {
@@ -261,9 +266,15 @@ void E_(CloseDemux)( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
+    vlc_bool_t b_avfmt_nofile;
 
     FREENULL( p_sys->tk );
+
+    b_avfmt_nofile = p_sys->fmt->flags & AVFMT_NOFILE;
+    p_sys->fmt->flags |= AVFMT_NOFILE; /* libavformat must not fopen/fclose */
     if( p_sys->ic ) av_close_input_file( p_sys->ic );
+    if( !b_avfmt_nofile ) p_sys->fmt->flags ^= AVFMT_NOFILE;
+
     if( p_sys->io_buffer ) free( p_sys->io_buffer );
     free( p_sys );
 }
