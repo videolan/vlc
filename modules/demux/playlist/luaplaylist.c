@@ -479,6 +479,7 @@ static int Demux( demux_t *p_demux )
                         const char  *psz_name     = NULL;
                         char       **ppsz_options = NULL;
                         int          i_options    = 0;
+                        mtime_t      i_duration   = -1;
 
                         /* Read path and name */
                         psz_path = lua_tostring( p_state, t+3 );
@@ -493,6 +494,15 @@ static int Demux( demux_t *p_demux )
                         {
                             psz_name = psz_path;
                         }
+
+                        /* Read duration */
+                        lua_getfield( p_state, t+2, "duration" );
+                        if( lua_isnumber( p_state, t+5 ) )
+                        {
+                            i_duration = (mtime_t)lua_tointeger( p_state, t+5 );
+                            i_duration *= 1000000;
+                        }
+                        lua_pop( p_state, 1 ); /* pop "duration" */
 
                         /* Read options */
                         lua_getfield( p_state, t+2, "options" );
@@ -524,7 +534,7 @@ static int Demux( demux_t *p_demux )
                         p_input = input_ItemNewExt( p_playlist, psz_path,
                                                     psz_name, i_options,
                                                     (const char **)ppsz_options,
-                                                    -1 );
+                                                    i_duration );
                         lua_pop( p_state, 1 ); /* pop "name" */
 
                         /* Read meta data */

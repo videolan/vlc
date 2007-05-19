@@ -30,6 +30,7 @@ VLC Lua playlist modules should define two functions:
                 .trackid: the item's TrackID (OPTIONAL, meta data)
                 .options: a list of VLC options (OPTIONAL)
                           example: .options = { "fullscreen" }
+                .duration: stream duration in seconds (OPTIONAL)
             Invalid playlist items will be discarded by VLC.
 
 VLC defines a global vlc object with the following members:
