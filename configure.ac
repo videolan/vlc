@@ -1565,10 +1565,13 @@ then
 	  [],  
           [ have_lua=no ] )
 	AC_CHECK_LIB(  lua5.1 , luaL_newstate, 
-          [],
-	  [ have_lua=no
-            AC_MSG_WARN([lua >= 5.1 not found!])
-	  ])
+          [LUA_LIBS="-llua5.1"],
+	  AC_CHECK_LIB(  lua , luaL_newstate, 
+            [LUA_LIBS="-llua"],
+	    [ have_lua=no
+              AC_MSG_WARN([lua >= 5.1 not found!])
+	    ])
+	  )
       ])
     ])
   if test "x${have_lua}" = "xyes" ;  then
