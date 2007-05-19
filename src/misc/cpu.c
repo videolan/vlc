@@ -60,7 +60,7 @@ static const char *psz_capability;
  *****************************************************************************
  * This function is called to list extensions the CPU may have.
  *****************************************************************************/
-static uint32_t CPUCapabilities( void )
+uint32_t CPUCapabilities( void )
 {
     volatile uint32_t i_capabilities = CPU_CAPABILITY_NONE;
 
