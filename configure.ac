@@ -1563,7 +1563,7 @@ then
        AC_MSG_WARN([lua >= 5.1 not found!])
       ])
     ])
-  if test "x${have_lua}" = "xyes"; then
+  if test "x${have_lua}" = "xyes" -o "x${enable_lua}" = "xyes";  then
      AC_DEFINE(HAVE_LUA, [], [Define if you have the lua library])
      VLC_ADD_PLUGINS([luaplaylist])
      VLC_ADD_LDFLAGS([luaplaylist],[$LUA_LIBS])
