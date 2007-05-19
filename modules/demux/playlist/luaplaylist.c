@@ -438,6 +438,7 @@ static int Demux( demux_t *p_demux )
     input_item_t *p_input;
     lua_State *p_state = p_demux->p_sys->p_state;
     char *psz_filename = p_demux->p_sys->psz_filename;
+    int t;
 
     INIT_PLAYLIST_STUFF;
 
@@ -462,9 +463,13 @@ static int Demux( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    if( lua_gettop( p_state ) )
+    /* Check that the Lua stack is big enough and grow it if needed.
+     * Should be ok since LUA_MINSTACK is 20 but we never know. */
+    lua_checkstack( p_state, 7 );
+
+    if( ( t = lua_gettop( p_state ) ) )
     {
-        int t = lua_gettop( p_state );
+
         if( lua_istable( p_state, t ) )
         {
             lua_pushnil( p_state );
