@@ -276,7 +276,7 @@ net_SockAddrIsMulticast (const struct sockaddr *addr, socklen_t len)
 #ifdef IN_MULTICAST
         case AF_INET:
         {
-            struct sockaddr_in *v4 = (struct sockaddr_in *)addr;
+            const struct sockaddr_in *v4 = (const struct sockaddr_in *)addr;
             if ((size_t)len < sizeof (*v4))
                 return VLC_FALSE;
             return IN_MULTICAST (ntohl (v4->sin_addr.s_addr)) != 0;
@@ -286,7 +286,7 @@ net_SockAddrIsMulticast (const struct sockaddr *addr, socklen_t len)
 #ifdef IN6_IS_ADDR_MULTICAST
         case AF_INET6:
         {
-            struct sockaddr_in6 *v6 = (struct sockaddr_in6 *)addr;
+            const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *)addr;
             if ((size_t)len < sizeof (*v6))
                 return VLC_FALSE;
             return IN6_IS_ADDR_MULTICAST (&v6->sin6_addr) != 0;
