@@ -146,8 +146,8 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
     else
         p_vout->p_sys->b_embedded = VLC_FALSE;
 
-    p_vout->p_sys->b_cpu_has_simd = (p_vout->p_libvlc_global->i_cpu & CPU_CAPABILITY_ALTIVEC)
-                                  | (p_vout->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT);
+    p_vout->p_sys->b_cpu_has_simd =
+        vlc_CPU() & (CPU_CAPABILITY_ALTIVEC|CPU_CAPABILITY_MMXEXT);
     msg_Dbg( p_vout, "we do%s have SIMD enabled CPU", p_vout->p_sys->b_cpu_has_simd ? "" : "n't" );
     
     /* Initialize QuickTime */

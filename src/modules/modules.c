@@ -76,6 +76,7 @@
 #endif
 
 #include "modules/configuration.h"
+#include "libvlc.h"
 
 #include "vlc_interface.h"
 #include "vlc_playlist.h"
@@ -481,6 +482,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     p_all = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
     p_list = malloc( p_all->i_count * sizeof( module_list_t ) );
     p_first = NULL;
+    unsigned i_cpu = vlc_CPU();
 
     /* Parse the module list for capabilities and probe each of them */
     for( i_which_module = 0; i_which_module < p_all->i_count; i_which_module++ )
@@ -498,7 +500,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         }
 
         /* Test if we have the required CPU */
-        if( (p_module->i_cpu & p_this->p_libvlc_global->i_cpu) != p_module->i_cpu )
+        if( (p_module->i_cpu & i_cpu) != p_module->i_cpu )
         {
             continue;
         }

@@ -326,7 +326,7 @@ static void Run( intf_thread_t *p_intf )
         /* Sleep to avoid using all CPU - since some interfaces need to
          * access keyboard events, a 100ms delay is a good compromise */
         gdk_threads_leave();
-        if (p_intf->p_libvlc_global->i_cpu & CPU_CAPABILITY_FPU)
+        if (vlc_CPU() & CPU_CAPABILITY_FPU)
             msleep( INTF_IDLE_SLEEP );
         else
             msleep( 1000 );
@@ -336,7 +336,7 @@ static void Run( intf_thread_t *p_intf )
     msg_Dbg( p_intf, "Manage GTK keyboard events using timeouts" );
     /* Sleep to avoid using all CPU - since some interfaces needs to access
      * keyboard events, a 1000ms delay is a good compromise */
-    if (p_intf->p_libvlc_global->i_cpu & CPU_CAPABILITY_FPU)
+    if (vlc_CPU() & CPU_CAPABILITY_FPU)
         i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, (GtkFunction)Manage, p_intf );
     else
         i_dummy = gtk_timeout_add( 1000, (GtkFunction)Manage, p_intf );
@@ -447,7 +447,7 @@ static int Manage( intf_thread_t *p_intf )
             i_time = var_GetTime( p_intf->p_sys->p_input, "time" );
             i_length = var_GetTime( p_intf->p_sys->p_input, "length" );
 
-            if (p_intf->p_libvlc_global->i_cpu & CPU_CAPABILITY_FPU)
+            if (vlc_CPU() & CPU_CAPABILITY_FPU)
             {
                 /* Manage the slider for CPU_CAPABILITY_FPU hardware */
                 if( p_intf->p_sys->b_playing )
