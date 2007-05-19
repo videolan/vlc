@@ -438,6 +438,23 @@ void __vlc_object_kill( vlc_object_t *p_this )
 }
 
 
+vlc_bool_t __vlc_object_dying_unlocked( vlc_object_t *p_this )
+{
+    vlc_assert_locked( &p_this->object_lock );
+    return p_this->b_die;
+}
+
+
+vlc_bool_t __vlc_object_dying( vlc_object_t *p_this )
+{
+     vlc_bool_t b;
+     vlc_mutex_lock( &p_this->object_lock );
+     b = __vlc_object_dying_unlocked( p_this );
+     vlc_mutex_unlock( &p_this->object_lock );
+     return b;
+}
+
+
 /**
  * find an object given its ID
  *

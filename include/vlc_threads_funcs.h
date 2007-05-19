@@ -122,6 +122,9 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
     }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+#   define vlc_assert_locked( m ) \
+           assert (pthread_mutex_lock (&((m)->mutex)) == EDEADLK)
+
     i_result = pthread_mutex_lock( &p_mutex->mutex );
     if ( i_result )
     {
@@ -143,6 +146,10 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
     }
     return i_result;
 }
+
+#ifndef vlc_assert_locked
+# define vlc_assert_locked( m ) (void)0
+#endif
 
 /*****************************************************************************
  * vlc_mutex_unlock: unlock a mutex

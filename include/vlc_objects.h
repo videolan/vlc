@@ -97,6 +97,8 @@ struct vlc_object_t
 VLC_EXPORT( void *, __vlc_object_create, ( vlc_object_t *, int ) );
 VLC_EXPORT( void, __vlc_object_destroy, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_kill, ( vlc_object_t * ) );
+VLC_EXPORT( vlc_bool_t, __vlc_object_dying_unlocked, ( vlc_object_t * ) );
+VLC_EXPORT( vlc_bool_t, __vlc_object_dying, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_attach, ( vlc_object_t *, vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_detach, ( vlc_object_t * ) );
 VLC_EXPORT( void *, __vlc_object_get, ( vlc_object_t *, int ) );
