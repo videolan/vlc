@@ -261,20 +261,21 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     p_context->opaque = (void *)p_this;
 
     /* Set CPU capabilities */
+    unsigned i_cpu = vlc_CPU();
     p_context->dsp_mask = 0;
-    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMX) )
+    if( !(i_cpu & CPU_CAPABILITY_MMX) )
     {
         p_context->dsp_mask |= FF_MM_MMX;
     }
-    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT) )
+    if( !(i_cpu & CPU_CAPABILITY_MMXEXT) )
     {
         p_context->dsp_mask |= FF_MM_MMXEXT;
     }
-    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_3DNOW) )
+    if( !(i_cpu & CPU_CAPABILITY_3DNOW) )
     {
         p_context->dsp_mask |= FF_MM_3DNOW;
     }
-    if( !(p_enc->p_libvlc_global->i_cpu & CPU_CAPABILITY_SSE) )
+    if( !(i_cpu & CPU_CAPABILITY_SSE) )
     {
         p_context->dsp_mask |= FF_MM_SSE;
         p_context->dsp_mask |= FF_MM_SSE2;

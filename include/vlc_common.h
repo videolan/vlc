@@ -1162,6 +1162,7 @@ VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char *const
 #define CPU_CAPABILITY_SSE2    (1<<7)
 #define CPU_CAPABILITY_ALTIVEC (1<<16)
 #define CPU_CAPABILITY_FPU     (1<<31)
+VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
 
 /*****************************************************************************
  * I18n stuff

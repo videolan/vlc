@@ -234,7 +234,8 @@ vlc_module_begin();
     add_shortcut( "ffmpeg-deinterlace" );
 #endif
 
-    var_Create( p_module->p_libvlc_global, "avcodec", VLC_VAR_MUTEX );
+    var_Create( (vlc_object_t *)p_module->p_libvlc_global, "avcodec",
+                VLC_VAR_MUTEX );
 
 vlc_module_end();
 
@@ -284,24 +285,25 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_context->opaque = (void *)p_this;
 
     /* Set CPU capabilities */
+    unsigned i_cpu = vlc_CPU();
     p_context->dsp_mask = 0;
-    if( !(p_dec->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMX) )
+    if( !(i_cpu & CPU_CAPABILITY_MMX) )
     {
         p_context->dsp_mask |= FF_MM_MMX;
     }
-    if( !(p_dec->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT) )
+    if( !(i_cpu & CPU_CAPABILITY_MMXEXT) )
     {
         p_context->dsp_mask |= FF_MM_MMXEXT;
     }
-    if( !(p_dec->p_libvlc_global->i_cpu & CPU_CAPABILITY_3DNOW) )
+    if( !(i_cpu & CPU_CAPABILITY_3DNOW) )
     {
         p_context->dsp_mask |= FF_MM_3DNOW;
     }
-    if( !(p_dec->p_libvlc_global->i_cpu & CPU_CAPABILITY_SSE) )
+    if( !(i_cpu & CPU_CAPABILITY_SSE) )
     {
         p_context->dsp_mask |= FF_MM_SSE;
     }
-    if( !(p_dec->p_libvlc_global->i_cpu & CPU_CAPABILITY_SSE2) )
+    if( !(i_cpu & CPU_CAPABILITY_SSE2) )
     {
         p_context->dsp_mask |= FF_MM_SSE2;
     }
@@ -337,7 +339,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
     vlc_value_t lockval;
 
-    var_Get( p_dec->p_libvlc_global, "avcodec", &lockval );
+    var_Get( (vlc_object_t *)p_dec->p_libvlc_global, "avcodec", &lockval );
 
     switch( p_sys->i_cat )
     {
@@ -426,7 +428,7 @@ void E_(InitLibavcodec)( vlc_object_t *p_object )
     static int b_ffmpeginit = 0;
     vlc_value_t lockval;
 
-    var_Get( p_object->p_libvlc_global, "avcodec", &lockval );
+    var_Get( (vlc_object_t *)p_object->p_libvlc_global, "avcodec", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     /* *** init ffmpeg library (libavcodec) *** */

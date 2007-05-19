@@ -352,20 +352,21 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->ff_enc_c = avcodec_alloc_context();
 
         /* Set CPU capabilities */
+        unsigned i_cpu = vlc_CPU();
         id->ff_enc_c->dsp_mask = 0;
-        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMX) )
+        if( !(i_cpu & CPU_CAPABILITY_MMX) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_MMX;
         }
-        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT) )
+        if( !(i_cpu & CPU_CAPABILITY_MMXEXT) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_MMXEXT;
         }
-        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_3DNOW) )
+        if( !(i_cpu & CPU_CAPABILITY_3DNOW) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_3DNOW;
         }
-        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_SSE) )
+        if( !(i_cpu & CPU_CAPABILITY_SSE) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_SSE;
             id->ff_enc_c->dsp_mask |= FF_MM_SSE2;
@@ -725,20 +726,21 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
         id->ff_enc_c = avcodec_alloc_context();
 
         /* Set CPU capabilities */
+        unsigned i_cpu = vlc_CPU();
         id->ff_enc_c->dsp_mask = 0;
-        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMX) )
+        if( !(i_cpu & CPU_CAPABILITY_MMX) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_MMX;
         }
-        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT) )
+        if( !(i_cpu & CPU_CAPABILITY_MMXEXT) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_MMXEXT;
         }
-        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_3DNOW) )
+        if( !(i_cpu & CPU_CAPABILITY_3DNOW) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_3DNOW;
         }
-        if( !(p_stream->p_libvlc_global->i_cpu & CPU_CAPABILITY_SSE) )
+        if( !(i_cpu & CPU_CAPABILITY_SSE) )
         {
             id->ff_enc_c->dsp_mask |= FF_MM_SSE;
             id->ff_enc_c->dsp_mask |= FF_MM_SSE2;

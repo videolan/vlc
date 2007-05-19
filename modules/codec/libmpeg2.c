@@ -148,23 +148,23 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->b_preroll = VLC_FALSE;
 
 #if defined( __i386__ ) || defined( __x86_64__ )
-    if( p_dec->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMX )
+    if( vlc_CPU() & CPU_CAPABILITY_MMX )
     {
         i_accel |= MPEG2_ACCEL_X86_MMX;
     }
 
-    if( p_dec->p_libvlc_global->i_cpu & CPU_CAPABILITY_3DNOW )
+    if( vlc_CPU() & CPU_CAPABILITY_3DNOW )
     {
         i_accel |= MPEG2_ACCEL_X86_3DNOW;
     }
 
-    if( p_dec->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT )
+    if( vlc_CPU() & CPU_CAPABILITY_MMXEXT )
     {
         i_accel |= MPEG2_ACCEL_X86_MMXEXT;
     }
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-    if( p_dec->p_libvlc_global->i_cpu & CPU_CAPABILITY_ALTIVEC )
+    if( vlc_CPU() & CPU_CAPABILITY_ALTIVEC )
     {
         i_accel |= MPEG2_ACCEL_PPC_ALTIVEC;
     }

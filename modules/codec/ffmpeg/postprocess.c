@@ -122,7 +122,7 @@ int E_(InitPostproc)( decoder_t *p_dec, void *p_data,
                       int i_width, int i_height, int pix_fmt )
 {
     video_postproc_sys_t *p_sys = (video_postproc_sys_t *)p_data;
-    int32_t i_cpu = p_dec->p_libvlc_global->i_cpu;
+    unsigned i_cpu = vlc_CPU();
     int i_flags = 0;
 
     /* Set CPU capabilities */

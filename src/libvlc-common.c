@@ -173,7 +173,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     if( !libvlc_global.b_ready )
     {
         /* Guess what CPU we have */
-        libvlc_global.i_cpu = CPUCapabilities();
+        cpu_flags = CPUCapabilities();
        /* The module bank will be initialized later */
         libvlc_global.p_module_bank = NULL;
 
@@ -728,27 +728,27 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     msg_Flush( p_libvlc );
 
     if( !config_GetInt( p_libvlc, "fpu" ) )
-        libvlc_global.i_cpu &= ~CPU_CAPABILITY_FPU;
+        cpu_flags &= ~CPU_CAPABILITY_FPU;
 
 #if defined( __i386__ ) || defined( __x86_64__ )
     if( !config_GetInt( p_libvlc, "mmx" ) )
-        libvlc_global.i_cpu &= ~CPU_CAPABILITY_MMX;
+        cpu_flags &= ~CPU_CAPABILITY_MMX;
     if( !config_GetInt( p_libvlc, "3dn" ) )
-        libvlc_global.i_cpu &= ~CPU_CAPABILITY_3DNOW;
+        cpu_flags &= ~CPU_CAPABILITY_3DNOW;
     if( !config_GetInt( p_libvlc, "mmxext" ) )
-        libvlc_global.i_cpu &= ~CPU_CAPABILITY_MMXEXT;
+        cpu_flags &= ~CPU_CAPABILITY_MMXEXT;
     if( !config_GetInt( p_libvlc, "sse" ) )
-        libvlc_global.i_cpu &= ~CPU_CAPABILITY_SSE;
+        cpu_flags &= ~CPU_CAPABILITY_SSE;
     if( !config_GetInt( p_libvlc, "sse2" ) )
-        libvlc_global.i_cpu &= ~CPU_CAPABILITY_SSE2;
+        cpu_flags &= ~CPU_CAPABILITY_SSE2;
 #endif
 #if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
     if( !config_GetInt( p_libvlc, "altivec" ) )
-        libvlc_global.i_cpu &= ~CPU_CAPABILITY_ALTIVEC;
+        cpu_flags &= ~CPU_CAPABILITY_ALTIVEC;
 #endif
 
 #define PRINT_CAPABILITY( capability, string )                              \
-    if( libvlc_global.i_cpu & capability )                                         \
+    if( vlc_CPU() & capability )                                            \
     {                                                                       \
         strncat( p_capabilities, string " ",                                \
                  sizeof(p_capabilities) - strlen(p_capabilities) );         \

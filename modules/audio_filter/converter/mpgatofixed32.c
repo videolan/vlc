@@ -313,7 +313,7 @@ static int OpenFilter( vlc_object_t *p_this )
     mad_synth_init( &p_sys->mad_synth );
     mad_stream_options( &p_sys->mad_stream, MAD_OPTION_IGNORECRC );
 
-    if( p_this->p_libvlc_global->i_cpu & CPU_CAPABILITY_FPU )
+    if( vlc_CPU() & CPU_CAPABILITY_FPU )
         p_filter->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
     else
         p_filter->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');

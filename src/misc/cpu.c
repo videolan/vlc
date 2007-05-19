@@ -51,7 +51,7 @@ static void SigHandler   ( int );
 static jmp_buf env;
 static int     i_illegal;
 #if defined( __i386__ ) || defined( __x86_64__ )
-static char   *psz_capability;
+static const char *psz_capability;
 #endif
 #endif
 
@@ -60,7 +60,7 @@ static char   *psz_capability;
  *****************************************************************************
  * This function is called to list extensions the CPU may have.
  *****************************************************************************/
-uint32_t CPUCapabilities( void )
+static uint32_t CPUCapabilities( void )
 {
     volatile uint32_t i_capabilities = CPU_CAPABILITY_NONE;
 
@@ -337,4 +337,16 @@ static void SigHandler( int i_signal )
     longjmp( env, 1 );
 }
 #endif
+
+
+extern uint32_t cpu_flags = 0;
+
+
+/*****************************************************************************
+ * vlc_CPU: get pre-computed CPU capability flags
+ ****************************************************************************/
+unsigned vlc_CPU (void)
+{
+    return cpu_flags;
+}
 

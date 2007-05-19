@@ -115,20 +115,21 @@ int E_(OpenScaler)( vlc_object_t *p_this )
     swscale_fast_memcpy = p_filter->p_libvlc->pf_memcpy;
 
     /* Set CPU capabilities */
+    unsigned i_cpu = vlc_CPU();
     p_sys->i_cpu_mask = 0;
-    if( p_filter->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMX )
+    if( i_cpu & CPU_CAPABILITY_MMX )
     {
         p_sys->i_cpu_mask |= SWS_CPU_CAPS_MMX;
     }
-    if( p_filter->p_libvlc_global->i_cpu & CPU_CAPABILITY_MMXEXT )
+    if( i_cpu & CPU_CAPABILITY_MMXEXT )
     {
         p_sys->i_cpu_mask |= SWS_CPU_CAPS_MMX2;
     }
-    if( p_filter->p_libvlc_global->i_cpu & CPU_CAPABILITY_3DNOW )
+    if( i_cpu & CPU_CAPABILITY_3DNOW )
     {
         p_sys->i_cpu_mask |= SWS_CPU_CAPS_3DNOW;
     }
-    if( p_filter->p_libvlc_global->i_cpu & CPU_CAPABILITY_ALTIVEC )
+    if( i_cpu & CPU_CAPABILITY_ALTIVEC )
     {
         p_sys->i_cpu_mask |= SWS_CPU_CAPS_ALTIVEC;
     }
