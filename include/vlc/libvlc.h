@@ -823,6 +823,7 @@ VLC_PUBLIC_API void libvlc_callback_register_for_event( libvlc_instance_t *p_ins
 VLC_PUBLIC_API void libvlc_callback_unregister_for_event( libvlc_instance_t *p_instance,
                                                           libvlc_event_type_t i_event_type,
                                                           libvlc_callback_t f_callback,
+                                                          void *p_user_data,
                                                           libvlc_exception_t *p_e );
 
 /** @} */
