@@ -45,7 +45,7 @@ static vlc_object_t *p_root;
 #elif defined( ST_INIT_IN_ST_H )
 #elif defined( UNDER_CE )
 #elif defined( WIN32 )
-static SIGNALOBJECTANDWAIT SignalObjectAndWait = NULL;
+static SIGNALOBJECTANDWAIT pf_SignalObjectAndWait = NULL;
 static vlc_bool_t          b_fast_mutex = 0;
 static int                 i_win9x_cv = 0;
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
@@ -106,7 +106,7 @@ int __vlc_threads_init( vlc_object_t *p_this )
             hInstLib = LoadLibrary( "kernel32" );
             if( hInstLib )
             {
-                SignalObjectAndWait =
+                pf_SignalObjectAndWait =
                     (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib,
                                                      "SignalObjectAndWait" );
             }
@@ -233,7 +233,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
      * function and have a 100% correct vlc_cond_wait() implementation.
      * As this function is not available on Win9x, we can use the faster
      * CriticalSections */
-    if( SignalObjectAndWait && !b_fast_mutex )
+    if( pf_SignalObjectAndWait && !b_fast_mutex )
     {
         /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
         p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
@@ -383,7 +383,7 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
 
     /* Misc init */
     p_condvar->i_win9x_cv = i_win9x_cv;
-    p_condvar->SignalObjectAndWait = SignalObjectAndWait;
+    p_condvar->SignalObjectAndWait = pf_SignalObjectAndWait;
 
     if( (p_condvar->SignalObjectAndWait && !b_fast_mutex)
         || p_condvar->i_win9x_cv == 0 )
