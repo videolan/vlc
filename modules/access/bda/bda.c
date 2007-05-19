@@ -57,6 +57,9 @@ static int Control( access_t *, int, va_list );
 
 #define INVERSION_TEXT N_("Inversion mode")
 #define INVERSION_LONGTEXT N_("Inversion mode [0=off, 1=on, 2=auto]")
+static const int i_inversion_list[] = { -1, 0, 1, 2 };
+static const char *ppsz_inversion_text[] = { N_("Undefined"), N_("Off"),
+    N_("On"), N_("Auto") };
 
 #define PROBE_TEXT N_("Probe DVB card for capabilities")
 #define PROBE_LONGTEXT N_("Some DVB cards do not like to be probed for their " \
@@ -68,8 +71,13 @@ static int Control( access_t *, int, va_list );
     "with a \"budget\" card.")
 
 /* Satellite */
-#define SATNO_TEXT N_("Satellite number in the Diseqc system")
-#define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=satellite number].")
+#if defined(WIN32) || defined(WINCE)
+#    define NETID_TEXT N_("Network Identifier")
+#    define NETID_LONGTEXT ""
+#else
+#    define SATNO_TEXT N_("Satellite number in the Diseqc system")
+#    define SATNO_LONGTEXT N_("[0=no diseqc, 1-4=satellite number].")
+#endif
 
 #define VOLTAGE_TEXT N_("LNB voltage")
 #define VOLTAGE_LONGTEXT N_("In Volts [0, 13=vertical, 18=horizontal].")
@@ -107,10 +115,18 @@ static const char *ppsz_qam_text[] = { N_("Undefined"), N_("16"), N_("32"),
 
 /* Terrestrial */
 #define CODE_RATE_HP_TEXT N_("Terrestrial high priority stream code rate (FEC)")
-#define CODE_RATE_HP_LONGTEXT ""
+#define CODE_RATE_HP_LONGTEXT N_("High Priority FEC Rate " \
+    "[Undefined,1/2,2/3,3/4,5/6,7/8]")
+static const int i_hp_fec_list[] = { -1, 1, 2, 3, 4, 5 };
+static const char *ppsz_hp_fec_text[] = { N_("Undefined"), N_("1/2"), N_("2/3"),
+    N_("3/4"), N_("5/6"), N_("7/8") };    
 
 #define CODE_RATE_LP_TEXT N_("Terrestrial low priority stream code rate (FEC)")
-#define CODE_RATE_LP_LONGTEXT ""
+#define CODE_RATE_LP_LONGTEXT N_("Low Priority FEC Rate " \
+    "[Undefined,1/2,2/3,3/4,5/6,7/8]")
+static const int i_lp_fec_list[] = { -1, 1, 2, 3, 4, 5 };
+static const char *ppsz_lp_fec_text[] = { N_("Undefined"), N_("1/2"), N_("2/3"),
+    N_("3/4"), N_("5/6"), N_("7/8") }; 
 
 #define BANDWIDTH_TEXT N_("Terrestrial bandwidth")
 #define BANDWIDTH_LONGTEXT N_("Terrestrial bandwidth [0=auto,6,7,8 in MHz]")
@@ -119,13 +135,22 @@ static const char *ppsz_band_text[] = { N_("Undefined"), N_("6"), N_("7"),
     N_("8") };
 
 #define GUARD_TEXT N_("Terrestrial guard interval")
-#define GUARD_LONGTEXT ""
+#define GUARD_LONGTEXT N_("Guard interval [Undefined,1/4,1/8,1/16,1/32]")
+static const int i_guard_list[] = { -1, 4, 8, 16, 32 };
+static const char *ppsz_guard_text[] = { N_("Undefined"), N_("1/4"), N_("1/8"),
+    N_("1/16"), N_("1/32") };
 
 #define TRANSMISSION_TEXT N_("Terrestrial transmission mode")
-#define TRANSMISSION_LONGTEXT ""
+#define TRANSMISSION_LONGTEXT N_("Transmission mode [Undefined,2k,8k]")
+static const int i_transmission_list[] = { -1, 2, 8 };
+static const char *ppsz_transmission_text[] = { N_("Undefined"), N_("2k"),
+    N_("8k") };
 
 #define HIERARCHY_TEXT N_("Terrestrial hierarchy mode")
-#define HIERARCHY_LONGTEXT ""
+#define HIERARCHY_LONGTEXT N_("Hierarchy alpha value [Undefined,1,2,4]")
+static const int i_hierarchy_list[] = { -1, 1, 2, 4 };
+static const char *ppsz_hierarchy_text[] = { N_("Undefined"), N_("1"),
+    N_("2"), N_("4") };
 
 /* BDA module additional DVB-S Parameters */
 #define AZIMUTH_TEXT N_("Satellite Azimuth")
@@ -157,24 +182,27 @@ vlc_module_begin();
                      VLC_FALSE );
         add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
                      VLC_TRUE );
-        add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT,
-            INVERSION_LONGTEXT, VLC_TRUE );
         add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, VLC_TRUE );
         add_bool( "dvb-budget-mode", 0, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
                   VLC_TRUE );
 #   endif
 
     /* DVB-S (satellite) */
+    add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT,
+        INVERSION_LONGTEXT, VLC_TRUE );
+        change_integer_list( i_inversion_list, ppsz_inversion_text, 0 );
 #   if defined(WIN32) || defined(WINCE)
+        add_string( "dvb-polarisation", NULL, NULL, POLARISATION_TEXT,
+            POLARISATION_LONGTEXT, VLC_TRUE );
+            change_string_list( ppsz_polar_list, ppsz_polar_text, 0 );
+        add_integer( "dvb-network-id", 0, NULL, NETID_TEXT, NETID_LONGTEXT,
+            VLC_TRUE );
         add_integer( "dvb-azimuth", 0, NULL, AZIMUTH_TEXT, AZIMUTH_LONGTEXT,
             VLC_TRUE );
         add_integer( "dvb-elevation", 0, NULL, ELEVATION_TEXT,
             ELEVATION_LONGTEXT, VLC_TRUE );
         add_integer( "dvb-longitude", 0, NULL, LONGITUDE_TEXT,
             LONGITUDE_LONGTEXT, VLC_TRUE );
-        add_string( "dvb-polarisation", NULL, NULL, POLARISATION_TEXT,
-            POLARISATION_LONGTEXT, VLC_TRUE );
-            change_string_list( ppsz_polar_list, ppsz_polar_text, 0 );
             /* Note: Polaristion H = voltage 18; V = voltage 13; */
 #   else
         add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
@@ -198,23 +226,28 @@ vlc_module_begin();
         VLC_FALSE );
 
     /* DVB-C (cable) */
-    add_integer( "dvb-modulation", 0, NULL, MODULATION_TEXT,
+    add_integer( "dvb-modulation", -1, NULL, MODULATION_TEXT,
         MODULATION_LONGTEXT, VLC_TRUE );
         change_integer_list( i_qam_list, ppsz_qam_text, 0 );
 
     /* DVB-T (terrestrial) */
-    add_integer( "dvb-code-rate-hp", 9, NULL, CODE_RATE_HP_TEXT,
+    add_integer( "dvb-code-rate-hp", -1, NULL, CODE_RATE_HP_TEXT,
         CODE_RATE_HP_LONGTEXT, VLC_TRUE );
-    add_integer( "dvb-code-rate-lp", 9, NULL, CODE_RATE_LP_TEXT,
+        change_integer_list( i_hp_fec_list, ppsz_hp_fec_text, 0 );
+    add_integer( "dvb-code-rate-lp", -1, NULL, CODE_RATE_LP_TEXT,
         CODE_RATE_LP_LONGTEXT, VLC_TRUE );
+        change_integer_list( i_lp_fec_list, ppsz_lp_fec_text, 0 );
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
         VLC_TRUE );
         change_integer_list( i_band_list, ppsz_band_text, 0 );
-    add_integer( "dvb-guard", 0, NULL, GUARD_TEXT, GUARD_LONGTEXT, VLC_TRUE );
-    add_integer( "dvb-transmission", 0, NULL, TRANSMISSION_TEXT,
+    add_integer( "dvb-guard", -1, NULL, GUARD_TEXT, GUARD_LONGTEXT, VLC_TRUE );
+        change_integer_list( i_guard_list, ppsz_guard_text, 0 );
+    add_integer( "dvb-transmission", -1, NULL, TRANSMISSION_TEXT,
         TRANSMISSION_LONGTEXT, VLC_TRUE );
-    add_integer( "dvb-hierarchy", 0, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
+        change_integer_list( i_transmission_list, ppsz_transmission_text, 0 );
+    add_integer( "dvb-hierarchy", -1, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
         VLC_TRUE );
+        change_integer_list( i_hierarchy_list, ppsz_hierarchy_text, 0 );
 
     set_capability( "access2", 0 );
     add_shortcut( "dvb" );      /* Generic name */
@@ -244,15 +277,19 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     const char* psz_module  = "dvb";
-    const int   i_param_count = 12;
+    const int   i_param_count = 19;
     const char* psz_param[] = { "frequency", "bandwidth",
         "srate", "azimuth", "elevation", "longitude", "polarisation",
-        "modulation", "caching", "lnb-lof1", "lnb-lof2", "lnb-slof" };
+        "modulation", "caching", "lnb-lof1", "lnb-lof2", "lnb-slof",
+        "inversion", "network-id", "code-rate-hp", "code-rate-lp",
+        "guard", "transmission", "hierarchy" };
 
     const int   i_type[] = { VLC_VAR_INTEGER, VLC_VAR_INTEGER,
         VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
         VLC_VAR_STRING, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
-        VLC_VAR_INTEGER, VLC_VAR_INTEGER };
+        VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
+        VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
+        VLC_VAR_INTEGER };
 
     char  psz_full_name[128];
     int i_ret;

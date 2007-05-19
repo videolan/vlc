@@ -235,11 +235,70 @@ int BDAGraph::SubmitDVBTTuneRequest()
                 p_dvbt_locator->Release();
         }
     } l;
-    long l_frequency, l_bandwidth;
+    long l_frequency, l_bandwidth, l_hp_fec, l_lp_fec, l_guard;
+    long l_transmission, l_hierarchy;
+    BinaryConvolutionCodeRate i_hp_fec, i_lp_fec;
+    GuardInterval             i_guard;
+    TransmissionMode          i_transmission;
+    HierarchyAlpha            i_hierarchy;
 
-    l_frequency = l_bandwidth = -1;
+    l_frequency = l_bandwidth = l_hp_fec = l_lp_fec = l_guard = -1;
+    l_transmission = l_hierarchy = -1;
     l_frequency = var_GetInteger( p_access, "dvb-frequency" );
     l_bandwidth = var_GetInteger( p_access, "dvb-bandwidth" );
+    l_hp_fec = var_GetInteger( p_access, "dvb-code-rate-hp" );
+    l_lp_fec = var_GetInteger( p_access, "dvb-code-rate-lp" );
+    l_guard = var_GetInteger( p_access, "dvb-guard" );
+    l_transmission = var_GetInteger( p_access, "dvb-transmission" );
+    l_hierarchy = var_GetInteger( p_access, "dvb-hierarchy" );
+
+    i_hp_fec = BDA_BCC_RATE_NOT_SET;
+    if( l_hp_fec == 1 )
+        i_hp_fec = BDA_BCC_RATE_1_2;
+    if( l_hp_fec == 2 )
+        i_hp_fec = BDA_BCC_RATE_2_3;
+    if( l_hp_fec == 3 )
+        i_hp_fec = BDA_BCC_RATE_3_4;
+    if( l_hp_fec == 4 )
+        i_hp_fec = BDA_BCC_RATE_5_6;
+    if( l_hp_fec == 5 )
+        i_hp_fec = BDA_BCC_RATE_7_8;
+
+    i_lp_fec = BDA_BCC_RATE_NOT_SET;
+    if( l_lp_fec == 1 )
+        i_lp_fec = BDA_BCC_RATE_1_2;
+    if( l_lp_fec == 2 )
+        i_lp_fec = BDA_BCC_RATE_2_3;
+    if( l_lp_fec == 3 )
+        i_lp_fec = BDA_BCC_RATE_3_4;
+    if( l_lp_fec == 4 )
+        i_lp_fec = BDA_BCC_RATE_5_6;
+    if( l_lp_fec == 5 )
+        i_lp_fec = BDA_BCC_RATE_7_8;
+
+    i_guard = BDA_GUARD_NOT_SET;
+    if( l_guard == 32 )
+        i_guard = BDA_GUARD_1_32;
+    if( l_guard == 16 )
+        i_guard = BDA_GUARD_1_16;
+    if( l_guard == 8 )
+        i_guard = BDA_GUARD_1_8;
+    if( l_guard == 4 )
+        i_guard = BDA_GUARD_1_4;
+
+    i_transmission = BDA_XMIT_MODE_NOT_SET;
+    if( l_transmission == 2 )
+        i_transmission = BDA_XMIT_MODE_2K;
+    if( l_transmission == 8 )
+        i_transmission = BDA_XMIT_MODE_8K;
+
+    i_hierarchy = BDA_HALPHA_NOT_SET;
+    if( l_hierarchy == 1 )
+        i_hierarchy = BDA_HALPHA_1;
+    if( l_hierarchy == 2 )
+        i_hierarchy = BDA_HALPHA_2;
+    if( l_hierarchy == 4 )
+        i_hierarchy = BDA_HALPHA_4;
 
     guid_network_type = CLSID_DVBTNetworkProvider;
     hr = CreateTuneRequest();
@@ -276,6 +335,16 @@ int BDAGraph::SubmitDVBTTuneRequest()
         hr = l.p_dvbt_locator->put_CarrierFrequency( l_frequency );
     if( SUCCEEDED( hr ) && l_bandwidth > 0 )
         hr = l.p_dvbt_locator->put_Bandwidth( l_bandwidth );
+    if( SUCCEEDED( hr ) && i_hp_fec != BDA_BCC_RATE_NOT_SET )
+        hr = l.p_dvbt_locator->put_InnerFECRate( i_hp_fec );
+    if( SUCCEEDED( hr ) && i_lp_fec != BDA_BCC_RATE_NOT_SET )
+        hr = l.p_dvbt_locator->put_LPInnerFECRate( i_lp_fec );
+    if( SUCCEEDED( hr ) && i_guard != BDA_GUARD_NOT_SET )
+        hr = l.p_dvbt_locator->put_Guard( i_guard );
+    if( SUCCEEDED( hr ) && i_transmission != BDA_XMIT_MODE_NOT_SET )
+        hr = l.p_dvbt_locator->put_Mode( i_transmission );
+    if( SUCCEEDED( hr ) && i_hierarchy != BDA_HALPHA_NOT_SET )
+        hr = l.p_dvbt_locator->put_HAlpha( i_hierarchy );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SubmitDVBTTuneRequest: "\
@@ -449,13 +518,14 @@ int BDAGraph::SubmitDVBSTuneRequest()
         }
     } l;
     long l_frequency, l_symbolrate, l_azimuth, l_elevation, l_longitude;
-    long l_lnb_lof1, l_lnb_lof2, l_lnb_slof;
+    long l_lnb_lof1, l_lnb_lof2, l_lnb_slof, l_inversion, l_network_id;
     char* psz_polarisation;
     Polarisation i_polar;
+    SpectralInversion i_inversion;
     VARIANT_BOOL b_west;
 
     l_frequency = l_symbolrate = l_azimuth = l_elevation = l_longitude = -1;
-    l_lnb_lof1 = l_lnb_lof2 = l_lnb_slof = -1;
+    l_lnb_lof1 = l_lnb_lof2 = l_lnb_slof = l_inversion = l_network_id = -1;
     l_frequency = var_GetInteger( p_access, "dvb-frequency" );
     l_symbolrate = var_GetInteger( p_access, "dvb-srate" );
     l_azimuth = var_GetInteger( p_access, "dvb-azimuth" );
@@ -465,6 +535,8 @@ int BDAGraph::SubmitDVBSTuneRequest()
     l_lnb_lof2 = var_GetInteger( p_access, "dvb-lnb-lof2" ); 
     l_lnb_slof = var_GetInteger( p_access, "dvb-lnb-slof" );
     psz_polarisation = var_GetString( p_access, "dvb-polarisation" );
+    l_inversion = var_GetInteger( p_access, "dvb-inversion" );
+    l_network_id = var_GetInteger( p_access, "dvb-network_id" );
 
     b_west = ( l_longitude < 0 ) ? TRUE : FALSE;
 
@@ -477,6 +549,14 @@ int BDAGraph::SubmitDVBSTuneRequest()
         i_polar = BDA_POLARISATION_CIRCULAR_L;
     if( *psz_polarisation == 'R' || *psz_polarisation == 'r' )
         i_polar = BDA_POLARISATION_CIRCULAR_R;
+
+    i_inversion = BDA_SPECTRAL_INVERSION_NOT_SET;
+    if( l_inversion == 0 )
+        i_inversion = BDA_SPECTRAL_INVERSION_NORMAL;
+    if( l_inversion == 1 )
+        i_inversion = BDA_SPECTRAL_INVERSION_INVERTED;
+    if( l_inversion == 2 )
+        i_inversion = BDA_SPECTRAL_INVERSION_AUTOMATIC;
 
     guid_network_type = CLSID_DVBSNetworkProvider;
     hr = CreateTuneRequest();
@@ -537,7 +617,11 @@ int BDAGraph::SubmitDVBSTuneRequest()
     if( SUCCEEDED( hr ) && l_lnb_lof2 > 0 )
         hr = l.p_dvbs_tuning_space->put_HighOscillator( l_lnb_lof2 );
     if( SUCCEEDED( hr ) && l_lnb_slof > 0 )
-        hr = l.p_dvbs_tuning_space->put_HighOscillator( l_lnb_slof );
+        hr = l.p_dvbs_tuning_space->put_LNBSwitch( l_lnb_slof );
+    if( SUCCEEDED( hr ) && i_inversion != BDA_SPECTRAL_INVERSION_NOT_SET )
+        hr = l.p_dvbs_tuning_space->put_SpectralInversion( i_inversion );
+    if( SUCCEEDED( hr ) && l_network_id > 0 )
+        hr = l.p_dvbs_tuning_space->put_NetworkID( l_network_id );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
