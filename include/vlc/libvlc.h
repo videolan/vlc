@@ -34,6 +34,7 @@
 #define _LIBVLC_H 1
 
 #include <vlc/vlc.h>
+#include <vlc/libvlc_structures.h>
 
 # ifdef __cplusplus
 extern "C" {
@@ -47,13 +48,6 @@ extern "C" {
  * LibVLC Exceptions handling
  * @{
  */
-
-typedef struct
-{
-    int b_raised;
-    int i_code;
-    char *psz_message;
-} libvlc_exception_t;
 
 /**
  * Initialize an exception structure. This can be called several times to reuse
@@ -103,9 +97,6 @@ VLC_PUBLIC_API char* libvlc_exception_get_message( libvlc_exception_t *p_excepti
  * @{
  */
 
-/** This structure is opaque. It represents a libvlc instance */
-typedef struct libvlc_instance_t libvlc_instance_t;
-
 /**
  * Create an initialized libvlc instance
  * \param argc the number of arguments
@@ -138,13 +129,6 @@ VLC_PUBLIC_API void libvlc_destroy( libvlc_instance_t *, libvlc_exception_t * );
  * LibVLC Playlist handling
  * @{
  */
-
-typedef struct {
-    int i_id;
-    char * psz_uri;
-    char * psz_name;
-
-} libvlc_playlist_item_t;
 
 /**
  * Set loop variable
@@ -307,24 +291,6 @@ VLC_PUBLIC_API int         libvlc_input_get_state      ( libvlc_input_t *, libvl
  * LibVLC Video handling
  * @{
  */
-
-/**
-* Downcast to this general type as placeholder for a platform specific one, such as:
-*  Drawable on X11,
-*  CGrafPort on MacOSX,
-*  HWND on win32
-*/
-typedef int libvlc_drawable_t;
-
-/**
-* Rectangle type for video geometry
-*/
-typedef struct
-{
-    int top, left;
-    int bottom, right;
-}
-libvlc_rectangle_t;
 
 /**
  * Does this input have a video output ?
@@ -745,22 +711,6 @@ VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
  * @{
  */
 
-/** This structure is opaque. It represents a libvlc log instance */
-typedef struct libvlc_log_t libvlc_log_t;
-
-/** This structure is opaque. It represents a libvlc log iterator */
-typedef struct libvlc_log_iterator_t libvlc_log_iterator_t;
-
-typedef struct libvlc_log_message_t
-{
-    unsigned    sizeof_msg;   /* sizeof() of message structure, must be filled in by user */
-    int         i_severity;   /* 0=INFO, 1=ERR, 2=WARN, 3=DBG */
-    const char *psz_type;     /* module type */
-    const char *psz_name;     /* module name */
-    const char *psz_header;   /* optional header */
-    const char *psz_message;  /* message */
-} libvlc_log_message_t;
-
 /**
  * Returns the VLC messaging verbosity level
  * \param p_instance libvlc instance
@@ -838,6 +788,44 @@ VLC_PUBLIC_API libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterat
                                                                libvlc_exception_t *p_e );
 
 /** @} */
+
+/*****************************************************************************
+ * Callbacks handling
+ *****************************************************************************/
+
+/** defgroup libvlc_callbacks Callbacks
+ * \ingroup libvlc
+ * LibVLC Event Callbacks
+ * @{
+ */
+
+/**
+ * Register for a callback notification
+ * \param p_instance the libvlc instance
+ * \param i_event_type the desired event mask to which we want to listen
+ * \param pf_callback function the function to call when an_Event occurs
+ * \param p_e an initialized exception pointer
+ */
+/* void libvlc_callback_register_for_eventtype( libvlc_instance_t *p_instance, */
+/*                                              libvlc_event_type_t i_event_type, */
+/*                                              libvlc_callback_t pf_callback, */
+/*                                              libvlc_exception_t *p_e ); */
+
+/**
+ * Unregister a callback notification
+ * \param p_instance the libvlc instance
+ * \param i_event_type the desired event mask to which we want to unregister
+ * \param pf_function the function to call when an_Event occurs
+ * \param p_e an initialized exception pointer
+ */
+/* void libvlc_callback_unregister_for_eventtype( libvlc_instance_t *p_instance, */
+/*                                                libvlc_event_type_t i_event_type, */
+/*                                                libvlc_callback_t pf_function, */
+/*                                                libvlc_exception_t *p_e ); */
+
+
+/** @} */
+
 
 # ifdef __cplusplus
 }

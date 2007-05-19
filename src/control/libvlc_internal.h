@@ -30,7 +30,8 @@ extern "C" {
 # endif
 
 #include <vlc/vlc.h>
-
+#include <vlc/libvlc_structures.h>
+    
 /***************************************************************************
  * Internal creation and destruction functions
  ***************************************************************************/
@@ -46,13 +47,28 @@ VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char *, vlc_boo
  * Opaque structures for libvlc API
  ***************************************************************************/
 
+struct libvlc_callback_entry_t
+{
+    libvlc_callback_t callback;
+    libvlc_event_type_t eventType;
+};
+
+struct libvlc_callback_entry_list_t
+{
+    struct libvlc_callback_entry_t *elmt;
+    struct libvlc_callback_entry_list_t *next;
+    struct libvlc_callback_entry_list_t *prev;
+};
+    
 struct libvlc_instance_t
 {
     libvlc_int_t *p_libvlc_int;
     vlm_t        *p_vlm;
     int           b_playlist_locked;
     vlc_mutex_t   instance_lock;
+    struct libvlc_callback_entry_list_t * p_callback_list;
 };
+
 
 struct libvlc_input_t
 {
