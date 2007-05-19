@@ -2,18 +2,13 @@
 # Automake targets and declarations
 ###############################################################################
 
-NULL =
-
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
-#  - intl should come before modules and . because all the code uses gettext
-#  - modules should come before . because vlc needs the builtins
-#  - . should come before mozilla/bindings because the plugin needs libvlc.a
-#  - po should come before . because VLC.app needs the pofiles
-#  - loader should come before modules because some plugins need it
-SUBDIRS = intl po libs/loader libs/srtp \
-		src modules . \
+#  - intl (gettext) is needed by src and modules
+#  - src (libvlc) is nedeed by modules, mozilla and bindings
+#  - libs/* are needed by modules
+SUBDIRS = intl po libs/loader libs/srtp src modules \
 		mozilla bindings activex share doc
 DIST_SUBDIRS = $(SUBDIRS) m4 ipkg
 
@@ -31,8 +26,7 @@ EXTRA_DIST = \
 	vlc.fedora.spec \
 	vlc.mandriva.spec \
 	vlc.altlinux.spec \
-	vlc.win32.nsi.in \
-	$(NULL)
+	vlc.win32.nsi.in
 
 BUILT_SOURCES_distclean = vlc-config compile vlc.win32.nsi
 BUILT_SOURCES_clean = macosx-sdk
@@ -203,8 +197,7 @@ EXTRA_DIST += \
 	extras/MacOSX/plugin/InstallerInfo.plist \
 	extras/MacOSX/plugin/InstallerDescription.plist \
 	extras/MacOSX/plugin/pbdevelopment.plist \
-	extras/MacOSX/plugin/English.lproj/InfoPlist.strings \
-	$(NULL)
+	extras/MacOSX/plugin/English.lproj/InfoPlist.strings
 
 ###############################################################################
 # Various utilities ( editor syntax files, D-Bus controller ... )
@@ -218,8 +211,7 @@ EXTRA_DIST += \
 	extras/valgrind.suppressions \
 	extras/m4/autoconf260.m4 \
 	extras/dbus-vlc.py \
-	extras/dbus-vlc.glade \
-	$(NULL)
+	extras/dbus-vlc.glade
 
 ###############################################################################
 # MS Visual Studio and eMbedded Visual Studio projects
@@ -238,8 +230,7 @@ EXTRA_DIST += \
 	evc/plugins.vcp.in \
 	evc/errno.h \
 	evc/config.h.in \
-	evc/modules_builtin_evc.h \
-	$(NULL)
+	evc/modules_builtin_evc.h
 
 dist-hook:
 	cd $(distdir) && srcdir=. $(SHELL) ./toolbox --update-vc
