@@ -8,11 +8,22 @@ function parse()
     do
         line = vlc.readline()
         if not line then break end
-        for path, artist, name in string.gmatch( line, "href=\"(/watch%?v=[^\"]*)\" onclick=\"_hbLink%('([^']*)','Vid[^\']*'%);\">([^<]*)</a><br/>" )
+        for _path, _artist, _name in string.gmatch( line, "href=\"(/watch%?v=[^\"]*)\" onclick=\"_hbLink%('([^']*)','Vid[^\']*'%);\">([^<]*)</a><br/>" )
         do
-            path = "http://www.youtube.com" .. path
-            name = vlc.resolve_xml_special_chars( name )
-            table.insert( p, { path = path; name = name; artist = artist } )
+            path = "http://www.youtube.com" .. _path
+            name = vlc.resolve_xml_special_chars( _name )
+            artist = _artist
+        end
+        for _min, _sec in string.gmatch( line, "<span class=\"runtime\">(%d*):(%d*)</span>" )
+        do
+            duration = 60 * _min + _sec
+        end
+        if path and name and artist and duration then
+            table.insert( p, { path = path; name = name; artist = artist; duration = duration } )
+            path = nil
+            name = nil
+            artist = nil
+            duration = nil
         end
     end
     return p
