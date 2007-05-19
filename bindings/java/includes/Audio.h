@@ -79,6 +79,14 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getVolume
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setVolume
   (JNIEnv *, jobject, jint);
 
+/*
+ * Class:     org_videolan_jvlc_Audio
+ * Method:    _install_callback
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1install_1callback
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

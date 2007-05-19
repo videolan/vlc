@@ -111,7 +111,7 @@ void libvlc_destroy( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 
     while( p_listitem )
     {
-        struct libvlc_callback_entry_list *p_nextlistitem = p_listitem->next;
+        struct libvlc_callback_entry_list_t *p_nextlistitem = p_listitem->next;
         free( p_listitem );
         p_listitem = p_nextlistitem;
     }

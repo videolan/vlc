@@ -1,6 +1,7 @@
 import org.videolan.jvlc.AudioIntf;
 import org.videolan.jvlc.JVLC;
 import org.videolan.jvlc.VLCException;
+import org.videolan.jvlc.VolumeListener;
 
 
 public class VLCExample
@@ -83,6 +84,13 @@ public class VLCExample
                 jvlc.video.setSize(300, 300);
 
             }
+            jvlc.audio.addVolumeListener(new VolumeListener()
+            {
+				public void volumeChanged() {
+					System.out.println("====> From the listener: volume changed");
+				}
+            });
+
             System.out.print("Muting...");
             jvlc.audio.setMute(true);
             Thread.sleep(3000);

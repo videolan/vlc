@@ -7,7 +7,9 @@ libjvlc_la_SOURCES = \
 	utils.cc \
 	utils.h \
 	video-jni.cc \
-	vlm-jni.cc
+	vlm-jni.cc \
+	callback-jni.cc
+
 libjvlc_la_CPPFLAGS = `$(VLC_CONFIG) --cflags pic` $(JINCLUDES)
 libjvlc_la_LIBADD = ../../../src/libvlc-control.la $(LIBJINCLUDES)
 

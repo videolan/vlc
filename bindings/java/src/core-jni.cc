@@ -70,7 +70,7 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC_createInstance (JNIEnv *env,
     res = (long) libvlc_new(argc, (char**) argv, exception );
 
     free( exception );
- 
+
     return res;
 
 }

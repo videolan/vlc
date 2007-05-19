@@ -24,6 +24,7 @@ pkgincludedir = $(includedir)/vlc
 dist_pkginclude_HEADERS = \
 	../include/vlc/vlc.h \
 	../include/vlc/libvlc.h \
+	../include/vlc/libvlc_structures.h \
 	../include/vlc/mediacontrol.h \
 	../include/vlc/mediacontrol_structures.h \
 	$(NULL)
@@ -326,6 +327,7 @@ SOURCES_libvlc_control = \
 	control/input.c \
 	control/video.c \
 	control/audio.c \
+	control/callback.c \
 	control/mediacontrol_internal.h \
 	control/mediacontrol_core.c \
 	control/mediacontrol_util.c \

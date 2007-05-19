@@ -154,8 +154,15 @@ typedef struct
     libvlc_event_type_t type;
     char reserved[8]; /* For future use */
 } libvlc_event_t;
-  
-typedef void ( *libvlc_callback_t )( struct libvlc_instance_t *, libvlc_event_t * );
+
+/**
+ * Callback function notification
+ * \param p_instance the libvlc instance
+ * \param p_event the event triggering the callback
+ * \param p_user_data user provided data
+ */
+
+typedef void ( *libvlc_callback_t )( struct libvlc_instance_t *, libvlc_event_t *, void * );
 
 /**@} */
 

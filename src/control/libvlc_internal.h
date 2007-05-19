@@ -49,8 +49,9 @@ VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char *, vlc_boo
 
 struct libvlc_callback_entry_t
 {
-    libvlc_callback_t callback;
-    libvlc_event_type_t eventType;
+    libvlc_instance_t *p_instance;
+    libvlc_callback_t f_callback;
+    libvlc_event_type_t i_event_type;
     void *p_user_data;
 };
 
@@ -76,6 +77,22 @@ struct libvlc_input_t
                      /// avoid any crash
     struct libvlc_instance_t *p_instance; ///< Parent instance
 };
+
+
+static inline void add_callback_entry( struct libvlc_callback_entry_t *entry,
+                                       struct libvlc_callback_entry_list_t **list )
+{
+    struct libvlc_callback_entry_list_t *new_listitem;
+    new_listitem = malloc( sizeof( struct libvlc_callback_entry_list_t ) );
+    new_listitem->elmt = entry;
+    new_listitem->next = *list;
+    new_listitem->prev = NULL;
+
+    if(*list)
+        (*list)->prev = new_listitem;
+
+    *list = new_listitem;
+}
 
 #define RAISENULL( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
                                 return NULL; }
