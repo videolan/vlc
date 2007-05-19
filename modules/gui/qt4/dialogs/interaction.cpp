@@ -93,6 +93,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
 
         grid->addWidget( new QLabel( qtr("Password") ), 2, 0);
         passwordEdit = new QLineEdit;
+        passwordEdit->setEchoMode( QLineEdit::Password );
         grid->addWidget( passwordEdit, 2, 1 );
 
         panel->setLayout( grid );
