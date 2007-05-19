@@ -1,10 +1,8 @@
 /*****************************************************************************
  * libvlc.h: Internal libvlc generic/misc declaration
  *****************************************************************************
- * Copyright © 2006 Rémi Denis-Courmont
+ * Copyright © 2006-2007 Rémi Denis-Courmont
  * $Id$
- *
- * Authors: Rémi Denis-Courmont <rem # videolan , org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,5 +33,47 @@ extern const size_t libvlc_hotkeys_size;
 extern vlc_object_t *
 vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
                    const char *psz_type);
+
+#if 0
+/*****************************************************************************
+ * libvlc_global_data_t (global variable)
+ *****************************************************************************
+ * This structure has an unique instance, statically allocated in main and
+ * never accessed from the outside. It stores once-initialized data such as
+ * the CPU capabilities or the global lock.
+ *****************************************************************************/
+struct libvlc_global_data_t
+{
+    VLC_COMMON_MEMBERS
+
+    vlc_bool_t             b_ready;     ///< Initialization boolean
+
+   /* Object structure data */
+    int                    i_counter;   ///< object counter
+    int                    i_objects;   ///< Attached objects count
+    vlc_object_t **        pp_objects;  ///< Array of all objects
+
+    module_bank_t *        p_module_bank; ///< The module bank
+    intf_thread_t         *p_probe;       ///< Devices prober
+
+    /* Arch-specific variables */
+#if !defined( WIN32 )
+    vlc_bool_t             b_daemon;
+#endif
+#if defined( SYS_BEOS )
+    vlc_object_t *         p_appthread;
+    char *                 psz_vlcpath;
+#elif defined( __APPLE__ )
+    char *                 psz_vlcpath;
+    vlc_iconv_t            iconv_macosx; /* for HFS+ file names */
+    vlc_mutex_t            iconv_lock;
+#elif defined( WIN32 )
+    char *                 psz_vlcpath;
+#endif
+};
+#endif
+
+
+extern uint32_t cpu_flags;
 
 #endif
