@@ -2047,7 +2047,7 @@ static void transcode_video_close( sout_stream_t *p_stream,
     if( p_stream->p_sys->i_threads >= 1 )
     {
         vlc_mutex_lock( &p_stream->p_sys->lock_out );
-        p_stream->p_sys->b_die = 1;
+        vlc_object_kill( p_stream->p_sys );
         vlc_cond_signal( &p_stream->p_sys->cond );
         vlc_mutex_unlock( &p_stream->p_sys->lock_out );
         vlc_thread_join( p_stream->p_sys );
