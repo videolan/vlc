@@ -189,7 +189,6 @@ static int Demux( demux_t *p_demux )
                                    PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
                                    PLAYLIST_END, NULL, NULL, VLC_FALSE );
             free( psz_mrl );
-            // XXX Not to be a scare monger, but I suspect options are leaked
         }
 
  error:
