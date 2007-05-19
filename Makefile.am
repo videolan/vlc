@@ -268,9 +268,7 @@ if HAVE_WINCE
 vlc_WORKAROUNDLDFLAGS = $(LIBVLC)
 endif
 
-# We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
-# old automake-1.5 bug (automake/279).
-DEPENDENCIES_vlc = src/$(LIB_libvlc) $(DATA_win32_rc)
+vlc_DEPENDENCIES = src/$(LIB_libvlc) $(DATA_win32_rc)
 
 vlc_LDADD = $(DATA_win32_rc) $(LIBVLC)
 
@@ -288,7 +286,7 @@ else
 vlc_LDFLAGS = $(vlc_WORKAROUNDLFDLAGS) `$(VLC_CONFIG) --libs vlc builtin`
 LIB_libvlc = libvlc.a
 LIBVLC = src/$(LIB_libvlc)
-DEPENDENCIES_vlc += stamp-builtin
+vlc_DEPENDENCIES += stamp-builtin
 endif
 vlc_LDADD += $(INCLUDED_LIBINTL)
 endif
@@ -306,7 +304,7 @@ core: libvlc
 
 src/$(LIB_libvlc): libvlc
 
-vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
+vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_DEPENDENCIES)
 	@rm -f vlc$(EXEEXT)
 	@case `$(VLC_CONFIG) --linkage vlc builtin` in \
 	  c++) cmd="$(CXXLINK)" ;; \
