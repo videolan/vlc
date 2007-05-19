@@ -542,6 +542,43 @@ CLEAN_FILE += .id3tag
 CLEAN_PKG += libid3tag
 DISTCLEAN_PKG += libid3tag-$(LIBID3TAG_VERSION).tar.gz
 
+
+# ***************************************************************************
+# lua
+# ***************************************************************************
+
+ifdef HAVE_WIN32
+LUA_MAKEPLATEFORM=mingw
+else
+ifdef HAVE_DARWIN_OS
+LUA_MAKEPLATEFORM=macosx
+else
+ifdef HAVE_LINUX
+LUA_MAKEPLATEFORM=linux
+else
+ifdef HAVE_BSD
+LUA_MAKEPLATEFORM=bsd
+else
+LUA_MAKEPLATEFORM=generic
+endif
+endif
+endif
+endif
+
+lua-$(LUA_VERSION).tar.gz:
+	$(WGET) $(LUA_URL)
+
+lua: lua-$(LUA_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.lua: lua
+	(cd $<; $(HOSTCC) make $(LUA_MAKEPLATEFORM) && make install INSTALL_TOP=$(PREFIX))
+	touch $@
+
+CLEAN_FILE += .lua
+CLEAN_PKG += lua
+DISTCLEAN_PKG += lua-$(LUA_VERSION).tar.gz
+
 # ***************************************************************************
 # libmad
 # ***************************************************************************

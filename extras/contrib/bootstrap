@@ -69,6 +69,26 @@ if test "$HOST" != "$BUILD"; then
     AR="${HOST}-ar"
 fi
 
+# Check the HAVE_{OS}
+case $HOST in
+    *darwin*)
+        echo "HAVE_DARWIN_OS = 1" >> config.mak
+        echo "HAVE_BSD = 1" >> config.mak
+    ;;
+    *linux*)
+        echo "HAVE_LINUX = 1" >> config.mak
+    ;;
+    *bsd*)
+        echo "HAVE_BSD = 1" >> config.mak
+    ;;
+    *wince*)
+        echo "HAVE_WINCE = 1" >> config.mak
+    ;;
+    *beos*)
+        echo "HAVE_BEOS = 1" >> config.mak
+    ;;
+esac
+
 case $HOST in
     ppc-darwin)
 # Mac OS X < 10.4
@@ -83,7 +103,6 @@ case $HOST in
 # SDK 10.2.8 requires gcc-3.3 (so we cannot use that SDK)
 	    SDK_TARGET=10.4
 	    echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
-	    echo "HAVE_DARWIN_OS = 1" >> config.mak
 	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
 	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
 	    CFLAGS_TUNING=" -arch ppc -mtune=G4"
@@ -95,7 +114,6 @@ case $HOST in
     i686-apple-darwin8)
 	    SDK_TARGET=10.4
 	    echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
-	    echo "HAVE_DARWIN_OS = 1" >> config.mak
 	    echo "HAVE_DARWIN_OS_ON_INTEL = 1" >> config.mak
 	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
 	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
@@ -108,7 +126,6 @@ case $HOST in
     powerpc-apple-darwin9)
 	    SDK_TARGET=10.4
 	    echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
-	    echo "HAVE_DARWIN_OS = 1" >> config.mak
 #	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
 #	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
 	    CFLAGS_TUNING=" -arch ppc -mtune=G4"
@@ -120,7 +137,6 @@ case $HOST in
     i686-apple-darwin9)
 	    SDK_TARGET=10.4
 	    echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
-	    echo "HAVE_DARWIN_OS = 1" >> config.mak
 	    echo "HAVE_DARWIN_OS_ON_INTEL = 1" >> config.mak
 #	    echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
 #	    echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
@@ -131,7 +147,6 @@ case $HOST in
 	    cat src/Distributions/darwin.mak >> distro.mak
         ;;
     i586-pc-beos)
-            echo "HAVE_BEOS = 1" >> config.mak
             if test -f /boot/beos/system/lib/libbind.so; then
                 EXTRA_LDFLAGS=" -lbind -lsocket"
             else
@@ -173,7 +188,6 @@ case $HOST in
             cat src/Distributions/win32.mak >> distro.mak
         ;;
     arm-wince-pe)
-            echo "HAVE_WINCE = 1" >> config.mak
             echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
             EXTRA_CPPFLAGS=" -D_WIN32_WCE"
             cat src/Distributions/wince.mak >> distro.mak

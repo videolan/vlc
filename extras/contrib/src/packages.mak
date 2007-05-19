@@ -189,3 +189,5 @@ ZVBI_VERSION=0.2.22
 ZVBI_URL=$(SF)/zapping/zvbi-$(ZVBI_VERSION).tar.bz2
 TAGLIB_VERSION=1.4
 TAGLIB_URL=http://developer.kde.org/~wheeler/files/src/taglib-$(TAGLIB_VERSION).tar.gz
+LUA_VERSION=5.1
+LUA_URL=http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz
