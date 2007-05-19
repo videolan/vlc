@@ -51,6 +51,7 @@ struct libvlc_callback_entry_t
 {
     libvlc_callback_t callback;
     libvlc_event_type_t eventType;
+    void *p_user_data;
 };
 
 struct libvlc_callback_entry_list_t
@@ -66,7 +67,7 @@ struct libvlc_instance_t
     vlm_t        *p_vlm;
     int           b_playlist_locked;
     vlc_mutex_t   instance_lock;
-    struct libvlc_callback_entry_list_t * p_callback_list;
+    struct libvlc_callback_entry_list_t *p_callback_list;
 };
 
 
