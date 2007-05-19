@@ -572,7 +572,12 @@ lua: lua-$(LUA_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .lua: lua
+ifdef HAVE_WIN32
+	( cd $<; sed -i.orig 's/lua luac/lua.exe/' Makefile ; cd src; sed -i.orig 's/gcc/$(CC)/' Makefile; cd ../..;)
+	(cd $<; $(HOSTCC) make $(LUA_MAKEPLATEFORM); cd src; $(HOSTCC) make liblua.a; cd ..;$(HOSTCC) make install INSTALL_TOP=$(PREFIX))
+else 
 	(cd $<; $(HOSTCC) make $(LUA_MAKEPLATEFORM) && make install INSTALL_TOP=$(PREFIX))
+endif
 	touch $@
 
 CLEAN_FILE += .lua
