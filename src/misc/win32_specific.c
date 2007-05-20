@@ -25,6 +25,7 @@
 #include <stdlib.h>                                                /* free() */
 
 #include <vlc/vlc.h>
+#include "../libvlc.h"
 #include <vlc_playlist.h>
 #include <vlc_charset.h>
 

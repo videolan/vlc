@@ -27,6 +27,7 @@
 #include <dirent.h>                                                /* *dir() */
 
 #include <vlc/vlc.h>
+#include "../libvlc.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 

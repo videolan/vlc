@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
+#include "../libvlc.h"
 #include "vlc_keys.h"
 #include "vlc_charset.h"
 

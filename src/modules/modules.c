@@ -25,6 +25,7 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
+#include "../libvlc.h"
 
 /* Some faulty libcs have a broken struct dirent when _FILE_OFFSET_BITS
  * is set to 64. Don't try to be cleverer. */

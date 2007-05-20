@@ -23,6 +23,7 @@
 
 #include "modules/modules.h"
 #include "libvlc.h"
+#include "../libvlc.h"
 
 static const char default_name[] = "unnamed";
 
@@ -35,7 +36,7 @@ module_t *vlc_module_create (vlc_object_t *obj)
         return NULL;
 
 #ifndef HAVE_SHARED_LIBVLC
-    module->p_symbols = &obj->p_libvlc_global->p_module_bank->symbols;
+    module->p_symbols = &vlc_global( obj )->p_module_bank->symbols;
 #endif
     module->b_reentrant = module->b_unloadable = VLC_TRUE;
     module->psz_object_name = module->psz_longname = default_name;
