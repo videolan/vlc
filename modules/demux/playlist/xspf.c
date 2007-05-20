@@ -635,6 +635,10 @@ static vlc_bool_t set_item_info SIMPLE_INTERFACE
         long i_num = atol( psz_value );
         p_input->i_duration = i_num*1000;
     }
+    else if( !strcmp( psz_name, "annotation" ) )
+    {
+        vlc_meta_SetDescription( p_input->p_meta, psz_value );
+    }
     return VLC_TRUE;
 }
 
