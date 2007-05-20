@@ -171,8 +171,7 @@ libvlc$(LIBEXT): $(libvlc_a_OBJECTS)
 	$$ld $(libvlc_a_OBJECTS) \
 		$$ldfl
 # It sucks big time, but we have to do that to link vlc properly
-# on non-PIC OSes, otherwise ld will favor builtins-less libvlc.a over
-# libvlc$(LIBEXT)
+# on non-PIC OSes, otherwise ld will favor libvlc.a over libvlc$(LIBEXT)
 	rm -f libvlc.a
 # Cygwin libtool work-around
 	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
