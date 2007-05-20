@@ -1566,10 +1566,13 @@ then
           [ have_lua=no ] )
 	AC_CHECK_LIB(  lua5.1 , luaL_newstate, 
           [LUA_LIBS="-llua5.1"],
-	  AC_CHECK_LIB(  lua , luaL_newstate, 
-            [LUA_LIBS="-llua"],
-	    [ have_lua=no
-              AC_MSG_WARN([lua >= 5.1 not found!])
+	  AC_CHECK_LIB( lua51 , luaL_newstate, 
+            [LUA_LIBS="-llua51"],
+		  AC_CHECK_LIB( lua , luaL_newstate, 
+		    [LUA_LIBS="-llua"],
+	      [ have_lua=no
+                AC_MSG_WARN([lua >= 5.1 not found!])
+              ])
 	    ])
 	  )
       ])
