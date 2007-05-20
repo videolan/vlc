@@ -26,13 +26,30 @@
  * Position
  ***********************************************************************/
 
-static int
-PyPosition_init( PyPosition *self, PyObject *args, PyObject *kwds )
+static PyObject *
+PyPosition_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 {
-    self->origin = mediacontrol_AbsolutePosition;
-    self->key    = mediacontrol_MediaTime;
-    self->value  = 0;
-    return 0;
+    PyPosition *self;
+    static char *kwlist[] = { "value", "origin", "key", NULL};
+    
+    self = PyObject_New( PyPosition, &PyPosition_Type );
+
+    self->value=0;
+    self->origin=mediacontrol_AbsolutePosition;
+    self->key=mediacontrol_MediaTime;
+
+    /* We do not care about the return value, since it will leave the fields
+       with their default value. */
+    if(! PyArg_ParseTupleAndKeywords( args, kwds, "|lii", kwlist,
+                                      &(self->value),
+                                      &(self->origin),
+                                      &(self->key) ) )
+    {
+        return NULL;        
+    }
+       
+    Py_INCREF( self );
+    return ( PyObject * )self;    
 }
 
 mediacontrol_PositionKey
@@ -167,7 +184,7 @@ static PyTypeObject PyPosition_Type =
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-    "Represent a Position with origin, key and value",  /* tp_doc */
+    "Represent a Position with value, origin and key",  /* tp_doc */
     0,                        /* tp_traverse */
     0,                        /* tp_clear */
     0,                         /* tp_richcompare */
@@ -182,7 +199,7 @@ static PyTypeObject PyPosition_Type =
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
-    ( initproc )PyPosition_init, /* tp_init */
+    0,                         /* tp_init */
     0,                         /* tp_alloc */
-    0,                         /* tp_new */
+    PyPosition_new,            /* tp_new */
 };

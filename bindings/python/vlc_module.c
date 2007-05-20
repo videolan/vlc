@@ -47,9 +47,6 @@ initvlc( void )
 {
     PyObject* p_module;
 
-    PyPosition_Type.tp_new = PyType_GenericNew;
-    PyPosition_Type.tp_alloc = PyType_GenericAlloc;
-
     vlcInput_Type.tp_new = PyType_GenericNew;
     vlcInput_Type.tp_alloc = PyType_GenericAlloc;
 
