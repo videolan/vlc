@@ -1,5 +1,5 @@
 /*****************************************************************************
- * libvlc_callback.c: New libvlc callback control API
+ * event.c: New libvlc event control API
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id $
@@ -24,9 +24,14 @@
 #include "libvlc_internal.h"
 #include <vlc/libvlc.h>
 
-static int handle_callback( vlc_object_t *p_this, char const *psz_cmd,
-                            vlc_value_t oldval, vlc_value_t newval,
-                            void *p_data )
+
+/*
+ * Private functions
+ */
+
+static int handle_event( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval,
+                         void *p_data )
 {
     struct libvlc_callback_entry_t *entry = p_data;
     libvlc_event_t event;
@@ -50,11 +55,30 @@ static int handle_callback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-void libvlc_callback_register_for_event( libvlc_instance_t *p_instance,
-                                        libvlc_event_type_t i_event_type,
-                                        libvlc_callback_t f_callback,
-                                        void *user_data,
-                                        libvlc_exception_t *p_e )
+static inline void add_callback_entry( struct libvlc_callback_entry_t *entry,
+                                       struct libvlc_callback_entry_list_t **list )
+{
+    struct libvlc_callback_entry_list_t *new_listitem;
+    new_listitem = malloc( sizeof( struct libvlc_callback_entry_list_t ) );
+    new_listitem->elmt = entry;
+    new_listitem->next = *list;
+    new_listitem->prev = NULL;
+
+    if(*list)
+        (*list)->prev = new_listitem;
+
+    *list = new_listitem;
+}
+
+/*
+ * Public libvlc functions
+ */
+
+void libvlc_event_add_callback( libvlc_instance_t *p_instance,
+                                libvlc_event_type_t i_event_type,
+                                libvlc_callback_t f_callback,
+                                void *user_data,
+                                libvlc_exception_t *p_e )
 {
 
     if ( ! &f_callback )
@@ -81,7 +105,7 @@ void libvlc_callback_register_for_event( libvlc_instance_t *p_instance,
 
     int res = var_AddCallback( p_instance->p_libvlc_int,
                                callback_name,
-                               handle_callback,
+                               handle_event,
                                entry );
     
     if (res != VLC_SUCCESS)
@@ -95,11 +119,11 @@ void libvlc_callback_register_for_event( libvlc_instance_t *p_instance,
     return;
 }
 
-void libvlc_callback_unregister_for_event( libvlc_instance_t *p_instance,
-                                           libvlc_event_type_t i_event_type,
-                                           libvlc_callback_t f_callback,
-                                           void *p_user_data,
-                                           libvlc_exception_t *p_e )
+void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
+                                   libvlc_event_type_t i_event_type,
+                                   libvlc_callback_t f_callback,
+                                   void *p_user_data,
+                                   libvlc_exception_t *p_e )
 {
     struct libvlc_callback_entry_list_t *p_listitem = p_instance->p_callback_list;
 

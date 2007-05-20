@@ -807,11 +807,11 @@ VLC_PUBLIC_API libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterat
  * \param user_data user provided data to carry with the event
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_callback_register_for_event( libvlc_instance_t *p_instance,
-                                                        libvlc_event_type_t i_event_type,
-                                                        libvlc_callback_t f_callback,
-                                                        void *user_data,
-                                                        libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_event_add_callback( libvlc_instance_t *p_instance,
+                                               libvlc_event_type_t i_event_type,
+                                               libvlc_callback_t f_callback,
+                                               void *user_data,
+                                               libvlc_exception_t *p_e );
 
 /**
  * Unregister a callback notification
@@ -820,11 +820,11 @@ VLC_PUBLIC_API void libvlc_callback_register_for_event( libvlc_instance_t *p_ins
  * \param f_callback the function to call when i_event_type occurs
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_callback_unregister_for_event( libvlc_instance_t *p_instance,
-                                                          libvlc_event_type_t i_event_type,
-                                                          libvlc_callback_t f_callback,
-                                                          void *p_user_data,
-                                                          libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
+                                                  libvlc_event_type_t i_event_type,
+                                                  libvlc_callback_t f_callback,
+                                                  void *p_user_data,
+                                                  libvlc_exception_t *p_e );
 
 /** @} */
 

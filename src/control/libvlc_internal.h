@@ -78,22 +78,6 @@ struct libvlc_input_t
     struct libvlc_instance_t *p_instance; ///< Parent instance
 };
 
-
-static inline void add_callback_entry( struct libvlc_callback_entry_t *entry,
-                                       struct libvlc_callback_entry_list_t **list )
-{
-    struct libvlc_callback_entry_list_t *new_listitem;
-    new_listitem = malloc( sizeof( struct libvlc_callback_entry_list_t ) );
-    new_listitem->elmt = entry;
-    new_listitem->next = *list;
-    new_listitem->prev = NULL;
-
-    if(*list)
-        (*list)->prev = new_listitem;
-
-    *list = new_listitem;
-}
-
 #define RAISENULL( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
                                 return NULL; }
 #define RAISEVOID( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
