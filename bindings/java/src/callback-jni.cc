@@ -59,7 +59,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1install_1callback( JNIEnv 
     libvlc_callback_register_for_event( ( libvlc_instance_t* ) instance,
 					VOLUME_CHANGED,
 					volumeChangedCallback,
-					&_this,
+					NULL,
 					exception );
     CHECK_EXCEPTION_FREE ;
 }
