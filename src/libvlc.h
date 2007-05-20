@@ -74,7 +74,8 @@ struct libvlc_global_data_t
 #endif
 };
 
-static inline libvlc_global_data_t *vlc_global( vlc_object_t *p_this )
+#define vlc_global( a ) __vlc_global( VLC_OBJECT( a ) )
+static inline libvlc_global_data_t *__vlc_global( vlc_object_t *p_this )
 {
     return (libvlc_global_data_t *)p_this->p_libvlc_global;
 }

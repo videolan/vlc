@@ -74,6 +74,8 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( ST_INIT_IN_ST_H )
 #elif defined( UNDER_CE )
 #elif defined( WIN32 )
+    b_fast_mutex = config_GetInt( p_this, "fast-mutex" );
+    i_win9x_cv = config_GetInt( p_this, "win9x-cv-method" );
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     pthread_mutex_lock( &once_mutex );

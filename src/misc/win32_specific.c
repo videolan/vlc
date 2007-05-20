@@ -121,9 +121,6 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND, UINT, WPARAM, LPARAM );
 void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
 #if !defined( UNDER_CE )
-    p_this->p_libvlc_global->b_fast_mutex = config_GetInt( p_this, "fast-mutex" );
-    p_this->p_libvlc_global->i_win9x_cv = config_GetInt( p_this, "win9x-cv-method" );
-
     /* Raise default priority of the current process */
 #ifndef ABOVE_NORMAL_PRIORITY_CLASS
 #   define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000
