@@ -125,8 +125,8 @@ static int Open( vlc_object_t *p_this )
     int           i_port       = 0;
     char          *psz_src;
 
-    var_Create(p_intf->p_libvlc_global, "http-host", VLC_VAR_STRING );
-    psz_address=var_GetString(p_intf->p_libvlc_global, "http-host");
+    var_Create(p_intf->p_libvlc, "http-host", VLC_VAR_STRING );
+    psz_address = var_GetString(p_intf->p_libvlc, "http-host");
     if( !psz_address || !*psz_address )
     {
         psz_address = config_GetPsz( p_intf, "http-host" );
@@ -281,7 +281,7 @@ static int Open( vlc_object_t *p_this )
 
         /* Ugly hack to run several HTTP servers on different ports */
         snprintf( psz_tmp, sizeof (psz_tmp), "%s:%d", psz_address, i_port + 1 );
-        var_SetString( p_intf->p_libvlc_global, "http-host", psz_tmp );
+        var_SetString( p_intf->p_libvlc, "http-host", psz_tmp );
     }
 
     p_sys->i_files  = 0;

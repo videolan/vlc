@@ -27,49 +27,6 @@
 #endif
 
 /*****************************************************************************
- * libvlc_global_data_t (global variable)
- *****************************************************************************
- * This structure has an unique instance, statically allocated in main and
- * never accessed from the outside. It stores once-initialized data such as
- * the CPU capabilities or the global lock.
- *****************************************************************************/
-struct libvlc_global_data_t
-{
-    VLC_COMMON_MEMBERS
-
-    vlc_bool_t             b_ready;     ///< Initialization boolean
-    uint32_t               i_cpu;       ///< CPU extensions
-
-   /* Object structure data */
-    int                    i_counter;   ///< object counter
-    int                    i_objects;   ///< Attached objects count
-    vlc_object_t **        pp_objects;  ///< Array of all objects
-
-    module_bank_t *        p_module_bank; ///< The module bank
-    intf_thread_t         *p_probe;       ///< Devices prober
-
-    /* Arch-specific variables */
-#if !defined( WIN32 )
-    vlc_bool_t             b_daemon;
-#endif
-#if defined( SYS_BEOS )
-    vlc_object_t *         p_appthread;
-    char *                 psz_vlcpath;
-#elif defined( __APPLE__ )
-    char *                 psz_vlcpath;
-    vlc_iconv_t            iconv_macosx; /* for HFS+ file names */
-    vlc_mutex_t            iconv_lock;
-#elif defined( WIN32 ) && !defined( UNDER_CE )
-    SIGNALOBJECTANDWAIT    SignalObjectAndWait;
-    vlc_bool_t             b_fast_mutex;
-    int                    i_win9x_cv;
-    char *                 psz_vlcpath;
-#elif defined( UNDER_CE )
-    char *                 psz_vlcpath;
-#endif
-};
-
-/*****************************************************************************
  * libvlc_internal_instance_t
  *****************************************************************************
  * This structure is a LibVLC instance, for use by libvlc core and plugins

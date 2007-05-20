@@ -127,11 +127,10 @@ typedef struct bridge_t
 #define GetBridge(a) __GetBridge( VLC_OBJECT(a) )
 static bridge_t *__GetBridge( vlc_object_t *p_object )
 {
-    libvlc_global_data_t *p_libvlc_global = p_object->p_libvlc_global;
     bridge_t *p_bridge;
     vlc_value_t val;
 
-    if( var_Get( p_libvlc_global, "bridge-struct", &val ) != VLC_SUCCESS )
+    if( var_Get( p_object->p_libvlc_global, "bridge-struct", &val ) )
     {
         p_bridge = NULL;
     }
@@ -219,7 +218,7 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_bridge = GetBridge( p_stream );
     if ( p_bridge == NULL )
     {
-        libvlc_global_data_t *p_libvlc_global = p_stream->p_libvlc_global;
+        vlc_object_t *p_libvlc_global = p_stream->p_libvlc_global;
         vlc_value_t val;
 
         p_bridge = malloc( sizeof( bridge_t ) );
@@ -519,7 +518,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     if( b_no_es )
     {
-        libvlc_global_data_t *p_libvlc_global = p_stream->p_libvlc_global;
+        vlc_object_t *p_libvlc_global = p_stream->p_libvlc_global;
         for ( i = 0; i < p_bridge->i_es_num; i++ )
             free( p_bridge->pp_es[i] );
         free( p_bridge->pp_es );

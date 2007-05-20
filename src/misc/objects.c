@@ -139,32 +139,33 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     if( i_type == VLC_OBJECT_GLOBAL )
     {
         /* If i_type is global, then p_new is actually p_libvlc_global */
-        p_new->p_libvlc_global = (libvlc_global_data_t*)p_new;
+        libvlc_global_data_t *p_libvlc_global = (libvlc_global_data_t *)p_new;
+        p_new->p_libvlc_global = p_new;
         p_new->p_libvlc = NULL;
 
-        p_new->p_libvlc_global->i_counter = 0;
+        p_libvlc_global->i_counter = 0;
         p_new->i_object_id = 0;
 
-        p_new->p_libvlc_global->i_objects = 1;
-        p_new->p_libvlc_global->pp_objects = malloc( sizeof(vlc_object_t *) );
-        p_new->p_libvlc_global->pp_objects[0] = p_new;
+        p_libvlc_global->i_objects = 1;
+        p_libvlc_global->pp_objects = malloc( sizeof(vlc_object_t *) );
+        p_libvlc_global->pp_objects[0] = p_new;
         p_new->b_attached = VLC_TRUE;
     }
     else
     {
-        p_new->p_libvlc_global = p_this->p_libvlc_global;
+        libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+        p_new->p_libvlc_global = VLC_OBJECT (p_libvlc_global);
         p_new->p_libvlc = ( i_type == VLC_OBJECT_LIBVLC ) ? (libvlc_int_t*)p_new
                                                        : p_this->p_libvlc;
 
         vlc_mutex_lock( &structure_lock );
 
-        p_new->p_libvlc_global->i_counter++;
-        p_new->i_object_id = p_new->p_libvlc_global->i_counter;
+        p_libvlc_global->i_counter++;
+        p_new->i_object_id = p_libvlc_global->i_counter;
 
         /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
          * useless to try and recover anything if pp_objects gets smashed. */
-        TAB_APPEND( p_new->p_libvlc_global->i_objects,
-                    p_new->p_libvlc_global->pp_objects,
+        TAB_APPEND( p_libvlc_global->i_objects, p_libvlc_global->pp_objects,
                     p_new );
 
         vlc_mutex_unlock( &structure_lock );
@@ -395,25 +396,27 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 
     if( p_this->i_object_type == VLC_OBJECT_GLOBAL )
     {
+        libvlc_global_data_t *p_global = (libvlc_global_data_t *)p_this;
         /* We are the global object ... no need to lock. */
-        free( p_this->p_libvlc_global->pp_objects );
-        p_this->p_libvlc_global->pp_objects = NULL;
-        p_this->p_libvlc_global->i_objects--;
+        free( p_global->pp_objects );
+        p_global->pp_objects = NULL;
+        p_global->i_objects--;
 
         vlc_mutex_destroy( &structure_lock );
     }
     else
     {
+        libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
         int i_index;
 
         vlc_mutex_lock( &structure_lock );
 
         /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
          * useless to try and recover anything if pp_objects gets smashed. */
-        i_index = FindIndex( p_this, p_this->p_libvlc_global->pp_objects,
-                             p_this->p_libvlc_global->i_objects );
-        REMOVE_ELEM( p_this->p_libvlc_global->pp_objects,
-                     p_this->p_libvlc_global->i_objects, i_index );
+        i_index = FindIndex( p_this, p_libvlc_global->pp_objects,
+                             p_libvlc_global->i_objects );
+        REMOVE_ELEM( p_libvlc_global->pp_objects,
+                     p_libvlc_global->i_objects, i_index );
 
         vlc_mutex_unlock( &structure_lock );
     }
@@ -465,13 +468,14 @@ void * __vlc_object_get( vlc_object_t *p_this, int i_id )
 {
     int i_max, i_middle;
     vlc_object_t **pp_objects;
+    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
 
     vlc_mutex_lock( &structure_lock );
 
-    pp_objects = p_this->p_libvlc_global->pp_objects;
+    pp_objects = p_libvlc_global->pp_objects;
 
     /* Perform our dichotomy */
-    for( i_max = p_this->p_libvlc_global->i_objects - 1 ; ; )
+    for( i_max = p_libvlc_global->i_objects - 1 ; ; )
     {
         i_middle = i_max / 2;
 
@@ -713,6 +717,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
     vlc_list_t *p_list;
     vlc_object_t **pp_current, **pp_end;
     int i_count = 0, i_index = 0;
+    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
 
     vlc_mutex_lock( &structure_lock );
 
@@ -720,8 +725,8 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
     switch( i_mode & 0x000f )
     {
     case FIND_ANYWHERE:
-        pp_current = p_this->p_libvlc_global->pp_objects;
-        pp_end = pp_current + p_this->p_libvlc_global->i_objects;
+        pp_current = p_libvlc_global->pp_objects;
+        pp_end = pp_current + p_libvlc_global->i_objects;
 
         for( ; pp_current < pp_end ; pp_current++ )
         {
@@ -733,7 +738,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
         }
 
         p_list = NewList( i_count );
-        pp_current = p_this->p_libvlc_global->pp_objects;
+        pp_current = p_libvlc_global->pp_objects;
 
         for( ; pp_current < pp_end ; pp_current++ )
         {
@@ -783,6 +788,8 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+
     (void)oldval; (void)p_data;
     if( *psz_cmd == 'l' )
     {
@@ -790,8 +797,8 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
 
         vlc_object_t **pp_current, **pp_end;
 
-        pp_current = p_this->p_libvlc_global->pp_objects;
-        pp_end = pp_current + p_this->p_libvlc_global->i_objects;
+        pp_current = p_libvlc_global->pp_objects;
+        pp_end = pp_current + p_libvlc_global->i_objects;
 
         for( ; pp_current < pp_end ; pp_current++ )
         {

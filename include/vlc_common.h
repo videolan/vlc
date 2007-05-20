@@ -566,7 +566,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
     variable_t *    p_vars;                                                 \
                                                                             \
     /* Stuff related to the libvlc structure */                             \
-    libvlc_global_data_t *p_libvlc_global;         /**< root of all evil */ \
+    vlc_object_t *p_libvlc_global;                 /**< root of all evil */ \
     libvlc_int_t *p_libvlc;                  /**< (root of all evil) - 1 */ \
                                                                             \
     volatile int    i_refcount;                         /**< usage count */ \

@@ -34,7 +34,6 @@ extern vlc_object_t *
 vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
                    const char *psz_type);
 
-#if 0
 /*****************************************************************************
  * libvlc_global_data_t (global variable)
  *****************************************************************************
@@ -71,8 +70,11 @@ struct libvlc_global_data_t
     char *                 psz_vlcpath;
 #endif
 };
-#endif
 
+static inline libvlc_global_data_t *vlc_global( vlc_object_t *p_this )
+{
+    return (libvlc_global_data_t *)p_this->p_libvlc_global;
+}
 
 extern uint32_t cpu_flags;
 

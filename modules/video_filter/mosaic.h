@@ -40,7 +40,7 @@ typedef struct bridge_t
 #define GetBridge(a) __GetBridge( VLC_OBJECT(a) )
 static bridge_t *__GetBridge( vlc_object_t *p_object )
 {
-    libvlc_global_data_t *p_libvlc_global = p_object->p_libvlc_global;
+    vlc_object_t *p_libvlc_global = p_object->p_libvlc_global;
     bridge_t *p_bridge;
     vlc_value_t val;
 

@@ -286,7 +286,7 @@ static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    libvlc_global_data_t *p_libvlc_global = p_filter->p_libvlc_global;
+    vlc_object_t *p_libvlc_global = p_filter->p_libvlc_global;
     char *psz_order;
     char *psz_offsets;
     int i_index;

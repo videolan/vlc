@@ -369,7 +369,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
             msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
             b_exit = VLC_TRUE;
         }
-        p_libvlc->p_libvlc_global->b_daemon = VLC_TRUE;
+        libvlc_global.b_daemon = VLC_TRUE;
 
         /* lets check if we need to write the pidfile */
         psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
@@ -416,7 +416,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
             close( STDOUT_FILENO );
             close( STDERR_FILENO );
 
-            p_libvlc->p_libvlc_global->b_daemon = VLC_TRUE;
+            libvlc_global.b_daemon = VLC_TRUE;
         }
 #endif
     }
@@ -1039,7 +1039,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
 #ifndef WIN32
     char* psz_pidfile = NULL;
 
-    if( p_libvlc->p_libvlc_global->p_module_bank )
+    if( libvlc_global.p_module_bank )
     if( config_GetInt( p_libvlc, "daemon" ) )
     {
         psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
@@ -1117,7 +1117,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
         return VLC_EGENERIC;
 
 #ifndef WIN32
-    if( p_libvlc->p_libvlc_global->b_daemon && b_block && !psz_module )
+    if( libvlc_global.b_daemon && b_block && !psz_module )
     {
         /* Daemon mode hack.
          * We prefer the dummy interface if none is specified. */
