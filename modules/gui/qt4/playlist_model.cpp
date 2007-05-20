@@ -716,6 +716,8 @@ void PLModel::UpdateTreeItem( PLItem *item, bool signal, bool force )
 void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item,
                               bool signal, bool force )
 {
+    if ( !p_item )
+        return;
     if( !force && i_depth == 1 && p_item->p_parent &&
                                  p_item->p_parent->i_id != rootItem->i_id )
         return;
