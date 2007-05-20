@@ -128,18 +128,18 @@
         }, 
         {
             ACTIONS = {
-                "adjImg_Enbl" = id; 
-                "adjImg_opaque" = id; 
-                "adjImg_rstrDefaults" = id; 
-                "adjImg_sliders" = id; 
-                "audFtls_hdphnVirt" = id; 
-                "audFtls_maxLevelSld" = id; 
-                "audFtls_vlmeNorm" = id; 
-                "extWin_exp_adjImg" = id; 
-                "extWin_exp_audFlts" = id; 
-                "extWin_exp_vidFlts" = id; 
-                vidFlts = id; 
-                "vidFlts_mrInfo" = id; 
+                enableAdjustImage = id; 
+                enableHeadphoneVirtualizer = id; 
+                enableVolumeNormalization = id; 
+                expandAdjustImage = id; 
+                expandAudioFilters = id; 
+                expandVideoFilters = id; 
+                moreInfoVideoFilters = id; 
+                opaqueSliderAction = id; 
+                restoreDefaultsForAdjustImage = id; 
+                sliderActionAdjustImage = id; 
+                sliderActionMaximumAudioLevel = id; 
+                videoFilterAction = id; 
             }; 
             CLASS = VLCExtended; 
             LANGUAGE = ObjC; 

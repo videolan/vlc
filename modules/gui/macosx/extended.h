@@ -1,10 +1,10 @@
 /*****************************************************************************
  * extended.h: MacOS X Extended interface panel
  *****************************************************************************
- * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright (C) 2005-2007 the VideoLAN team
  * $Id$
  *
- * Authors: Felix Kühne <fkuehne@users.sf.net>
+ * Authors: Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,18 +94,18 @@
     BOOL o_config_changed;
 }
 
-- (IBAction)adjImg_Enbl:(id)sender;
-- (IBAction)adjImg_rstrDefaults:(id)sender;
-- (IBAction)adjImg_sliders:(id)sender;
-- (IBAction)adjImg_opaque:(id)sender;
-- (IBAction)audFtls_hdphnVirt:(id)sender;
-- (IBAction)audFtls_maxLevelSld:(id)sender;
-- (IBAction)audFtls_vlmeNorm:(id)sender;
-- (IBAction)extWin_exp_adjImg:(id)sender;
-- (IBAction)extWin_exp_audFlts:(id)sender;
-- (IBAction)extWin_exp_vidFlts:(id)sender;
-- (IBAction)vidFlts:(id)sender;
-- (IBAction)vidFlts_mrInfo:(id)sender;
+- (IBAction)enableAdjustImage:(id)sender;
+- (IBAction)restoreDefaultsForAdjustImage:(id)sender;
+- (IBAction)sliderActionAdjustImage:(id)sender;
+- (IBAction)opaqueSliderAction:(id)sender;
+- (IBAction)enableHeadphoneVirtualizer:(id)sender;
+- (IBAction)sliderActionMaximumAudioLevel:(id)sender;
+- (IBAction)enableVolumeNormalization:(id)sender;
+- (IBAction)expandAdjustImage:(id)sender;
+- (IBAction)expandAudioFilters:(id)sender;
+- (IBAction)expandVideoFilters:(id)sender;
+- (IBAction)videoFilterAction:(id)sender;
+- (IBAction)moreInfoVideoFilters:(id)sender;
 
 + (VLCExtended *)sharedInstance;
 - (BOOL)getConfigChanged;

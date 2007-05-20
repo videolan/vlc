@@ -1,10 +1,10 @@
 /*****************************************************************************
  * extended.m: MacOS X Extended interface panel
  *****************************************************************************
- * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright (C) 2005-2007 the VideoLAN team
  * $Id$
  *
- * Authors: Felix Kühne <fkuehne@users.sf.net>
+ * Authors: Felix Paul Kühne <fkuehne@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,16 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
- *****************************************************************************/
-
-
-/*****************************************************************************
- * Note: 
- * the code used to bind with VLC's modules is heavily based upon 
- * ../wxwidgets/extrapanel.cpp, written by Clément Stenac.
- * the code used to insert/remove the views was inspired by intf.m, 
- * written by Derk-Jan Hartman and Benjamin Pracht. 
- * (all 3 are members of the VideoLAN team) 
  *****************************************************************************/
 
 
@@ -188,15 +178,15 @@ static VLCExtended *_o_sharedInstance = nil;
     /* collaps all views so Cocoa saves the window position correctly */
     if( o_adjImg_expanded )
     {
-        [self extWin_exp_adjImg: nil];
+        [self expandAdjustImage: nil];
     }
     if( o_audFlts_expanded )
     {
-        [self extWin_exp_audFlts: nil];
+        [self expandAudioFilters: nil];
     }
     if( o_vidFlts_expanded )
     {
-        [self extWin_exp_vidFlts: nil];
+        [self expandVideoFilters: nil];
     }
 }
 
@@ -258,7 +248,7 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_extended_window makeKeyAndOrderFront:nil];
 }
 
-- (IBAction)adjImg_Enbl:(id)sender
+- (IBAction)enableAdjustImage:(id)sender
 {
     /* en-/disable the sliders */
     if ([o_ckb_enblAdjustImg state] == NSOnState)
@@ -281,7 +271,7 @@ static VLCExtended *_o_sharedInstance = nil;
     }
 }
 
-- (IBAction)adjImg_rstrDefaults:(id)sender
+- (IBAction)restoreDefaultsForAdjustImage:(id)sender
 {
     /* reset the sliders */
     [o_sld_brightness setIntValue: 100];
@@ -289,16 +279,18 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_sld_gamma setIntValue: 10];
     [o_sld_hue setIntValue: 0];
     [o_sld_saturation setIntValue: 100];
+    [o_sld_opaque setIntValue: 100];
     
     /* transmit the values */
-    [self adjImg_sliders: o_sld_brightness];
-    [self adjImg_sliders: o_sld_contrast];
-    [self adjImg_sliders: o_sld_gamma];
-    [self adjImg_sliders: o_sld_hue];
-    [self adjImg_sliders: o_sld_saturation];
+    [self sliderActionAdjustImage: o_sld_brightness];
+    [self sliderActionAdjustImage: o_sld_contrast];
+    [self sliderActionAdjustImage: o_sld_gamma];
+    [self sliderActionAdjustImage: o_sld_hue];
+    [self sliderActionAdjustImage: o_sld_saturation];
+    [self opaqueSliderAction: o_sld_opaque];
 }
 
-- (IBAction)adjImg_sliders:(id)sender
+- (IBAction)sliderActionAdjustImage:(id)sender
 {
     /* read-out the sliders' values and apply them */
     intf_thread_t * p_intf = VLCIntf;
@@ -361,7 +353,7 @@ static VLCExtended *_o_sharedInstance = nil;
 }
 
 /* change the opaqueness of the vouts */
-- (IBAction)adjImg_opaque:(id)sender
+- (IBAction)opaqueSliderAction:(id)sender
 {
     vlc_value_t val;
     id o_window = [NSApp keyWindow];
@@ -400,7 +392,7 @@ static VLCExtended *_o_sharedInstance = nil;
     o_config_changed = YES;
 }
 
-- (IBAction)audFtls_hdphnVirt:(id)sender
+- (IBAction)enableHeadphoneVirtualizer:(id)sender
 {
     /* en-/disable headphone virtualisation */
     if ([o_ckb_hdphnVirt state] == NSOnState)
@@ -411,7 +403,7 @@ static VLCExtended *_o_sharedInstance = nil;
     }
 }
 
-- (IBAction)audFtls_maxLevelSld:(id)sender
+- (IBAction)sliderActionMaximumAudioLevel:(id)sender
 {
     /* read-out the slider's value and apply it */
     intf_thread_t * p_intf = VLCIntf;
@@ -427,7 +419,7 @@ static VLCExtended *_o_sharedInstance = nil;
     o_config_changed = YES;
 }
 
-- (IBAction)audFtls_vlmeNorm:(id)sender
+- (IBAction)enableVolumeNormalization:(id)sender
 {
     /* en-/disable volume normalisation */
     if ([o_ckb_vlme_norm state] == NSOnState)
@@ -438,7 +430,7 @@ static VLCExtended *_o_sharedInstance = nil;
     }
 }
 
-- (IBAction)extWin_exp_adjImg:(id)sender
+- (IBAction)expandAdjustImage:(id)sender
 {
     /* expand or collapse adjImg */
     NSRect o_win_rect = [o_extended_window frame];
@@ -487,7 +479,7 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_box_adjImg setFrameFromContentFrame: o_box_adjImg_rect];
 }
 
-- (IBAction)extWin_exp_audFlts:(id)sender
+- (IBAction)expandAudioFilters:(id)sender
 {
     /* expand or collapse audFlts */
     NSRect o_win_rect = [o_extended_window frame];
@@ -527,7 +519,7 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_box_audFlts setFrameFromContentFrame: o_box_audFlts_rect];
 }
 
-- (IBAction)extWin_exp_vidFlts:(id)sender
+- (IBAction)expandVideoFilters:(id)sender
 {
     /* expand or collapse vidFlts */
     NSRect o_win_rect = [o_extended_window frame];
@@ -538,18 +530,18 @@ static VLCExtended *_o_sharedInstance = nil;
     {
         /* move the window contents upwards (partially done through settings
          * inside the nib) and resize the window */
-        o_win_rect.size.height = o_win_rect.size.height - 188;
-        o_win_rect.origin.y = [o_extended_window frame].origin.y + 188;
-        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y + 188;
+        o_win_rect.size.height = o_win_rect.size.height - 172;
+        o_win_rect.origin.y = [o_extended_window frame].origin.y + 172;
+        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y + 172;
         
         /* remove the inserted view */
         [o_videoFilters_view removeFromSuperviewWithoutNeedingDisplay];
     }else{
     
         /* move the window contents downwards and resize the window */
-        o_win_rect.size.height = o_win_rect.size.height + 188;
-        o_win_rect.origin.y = [o_extended_window frame].origin.y - 188;
-        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y - 188;
+        o_win_rect.size.height = o_win_rect.size.height + 172;
+        o_win_rect.origin.y = [o_extended_window frame].origin.y - 172;
+        o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y - 172;
     }
     
     [o_box_audFlts setFrameFromContentFrame: o_box_audFlts_rect];
@@ -558,12 +550,12 @@ static VLCExtended *_o_sharedInstance = nil;
     
     if (o_vidFlts_expanded)
     {
-        o_box_vidFlts_rect.size.height = [o_box_vidFlts frame].size.height - 188;
+        o_box_vidFlts_rect.size.height = [o_box_vidFlts frame].size.height - 172;
         o_vidFlts_expanded = NO;
     } else {
         /* insert view */
-        o_box_vidFlts_rect.size.height = [o_box_vidFlts frame].size.height + 188;
-        [o_videoFilters_view setFrame: NSMakeRect( 20, -10, 370, 188)];
+        o_box_vidFlts_rect.size.height = [o_box_vidFlts frame].size.height + 172;
+        [o_videoFilters_view setFrame: NSMakeRect( 20, -10, 370, 172)];
         [o_videoFilters_view setNeedsDisplay:YES];
         [o_videoFilters_view setAutoresizesSubviews: YES];
         [[o_box_vidFlts contentView] addSubview: o_videoFilters_view];
@@ -572,7 +564,7 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_box_vidFlts setFrameFromContentFrame: o_box_vidFlts_rect];
 }
 
-- (IBAction)vidFlts:(id)sender
+- (IBAction)videoFilterAction:(id)sender
 {
     /* en-/disable video filters */
     if (sender == o_ckb_blur)
@@ -607,11 +599,11 @@ static VLCExtended *_o_sharedInstance = nil;
 
     else {
         /* this shouldn't happen */
-        msg_Warn (VLCIntf, "cannot find switched video-filter");
+        msg_Err( VLCIntf, "cannot find switched video-filter" );
     }
 }
 
-- (IBAction)vidFlts_mrInfo:(id)sender
+- (IBAction)moreInfoVideoFilters:(id)sender
 {
     /* show info sheet */
     NSBeginInformationalAlertSheet(_NS("About the video filters"), _NS("OK"), @"", @"",
