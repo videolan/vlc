@@ -35,6 +35,12 @@
 #include "ui/open_net.h"
 #include "ui/open_capture.h"
 
+#define V4L_DEVICE         0x0
+#define PVR_DEVICE         0x1
+#define DVB_DEVICE         0x2
+#define BDA_DEVICE         0x3
+#define DSHOW_DEVICE       0x4
+
 class QLineEdit;
 
 class OpenPanel: public QWidget
@@ -128,10 +134,13 @@ public:
     virtual void clear() ;
 private:
     Ui::OpenCapture ui;
-    QRadioButton *dvbs;
-    QRadioButton *dvbt;
-    QRadioButton *dvbc;
-    QSpinBox *dvbFreq;
+    QRadioButton *dvbs, *dvbt, *dvbc;
+    QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr ;
+    QLineEdit *v4lVideoDevice, *v4lAudioDevice;
+    QLineEdit *pvrDevice, *pvrRadioDevice;
+    QComboBox *v4lNormBox, *pvrNormBox;
+    QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
+
 
 public slots:
     virtual void updateMRL();

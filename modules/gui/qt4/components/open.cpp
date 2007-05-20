@@ -464,16 +464,16 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     QStackedLayout *stackedPropLayout = new QStackedLayout;
     ui.optionsBox->setLayout( stackedPropLayout );
 
-#define addModuleAndLayouts( name, label )                            \
+#define addModuleAndLayouts( number, name, label )                    \
     QWidget * name ## DevPage = new QWidget( this );                  \
     QWidget * name ## PropPage = new QWidget( this );                 \
-    stackedDevLayout->addWidget( name ## DevPage );                   \
-    stackedPropLayout->addWidget( name ## PropPage );                  \
+    stackedDevLayout->insertWidget( number, name ## DevPage );        \
+    stackedPropLayout->insertWidget( number, name ## PropPage );      \
     QGridLayout * name ## DevLayout = new QGridLayout;                \
     QGridLayout * name ## PropLayout = new QGridLayout;               \
     name ## DevPage->setLayout( name ## DevLayout );                  \
     name ## PropPage->setLayout( name ## PropLayout );                \
-    ui.deviceCombo->addItem( qtr( label ) );
+    ui.deviceCombo->insertItem( number, qtr( label ) );
 
 #define CuMRL( widget, slot ) CONNECT( widget , slot , this, updateMRL() );
 
@@ -481,24 +481,24 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
      * V4L *
      *******/
     /* V4l Main */
-    addModuleAndLayouts( v4l, "Video for Linux" );
+    addModuleAndLayouts( V4L_DEVICE, v4l, "Video for Linux" );
     QLabel *v4lVideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
     v4lDevLayout->addWidget( v4lVideoDeviceLabel, 0, 0 );
-    QLineEdit *v4lVideoDevice = new QLineEdit;
+    v4lVideoDevice = new QLineEdit;
     v4lDevLayout->addWidget( v4lVideoDevice, 0, 1 );
     QLabel *v4lAudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
     v4lDevLayout->addWidget( v4lAudioDeviceLabel, 1, 0 );
-    QLineEdit *v4lAudioDevice = new QLineEdit;
+    v4lAudioDevice = new QLineEdit;
     v4lDevLayout->addWidget( v4lAudioDevice, 1, 1 );
 
     /* V4l Props */
-    QComboBox *v4lNormBox = new QComboBox;
+    v4lNormBox = new QComboBox;
     v4lNormBox->insertItem( 3, qtr( "Automatic" ) );
     v4lNormBox->insertItem( 0, "SECAM" );
     v4lNormBox->insertItem( 1, "NTSC" );
     v4lNormBox->insertItem( 2, "PAL" );
 
-    QSpinBox *v4lFreq = new QSpinBox;
+    v4lFreq = new QSpinBox;
     v4lFreq->setAlignment( Qt::AlignRight );
     v4lFreq->setSuffix(" kHz");
 
@@ -520,30 +520,34 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /************
      * PVR      *
      ************/
-    addModuleAndLayouts( pvr, "PVR" );
+    addModuleAndLayouts( PVR_DEVICE, pvr, "PVR" );
 
     /* PVR Main */
-    QLabel *pvrVideoDeviceLabel = new QLabel( qtr( "Device name" ) );
-    pvrDevLayout->addWidget( pvrVideoDeviceLabel, 0, 0 );
-    QLineEdit *pvrVideoDevice = new QLineEdit;
-    pvrDevLayout->addWidget( pvrVideoDevice, 0, 1 );
-    QLabel *pvrAudioDeviceLabel = new QLabel( qtr( "Radio device name" ) );
-    pvrDevLayout->addWidget( pvrAudioDeviceLabel, 1, 0 );
-    QLineEdit *pvrAudioDevice = new QLineEdit;
-    pvrDevLayout->addWidget( pvrAudioDevice, 1, 1 );
+    QLabel *pvrDeviceLabel = new QLabel( qtr( "Device name" ) );
+    pvrDevLayout->addWidget( pvrDeviceLabel, 0, 0 );
+    pvrDevice = new QLineEdit;
+    pvrDevLayout->addWidget( pvrDevice, 0, 1 );
+    QLabel *pvrRadioDeviceLabel = new QLabel( qtr( "Radio device name" ) );
+    pvrDevLayout->addWidget( pvrRadioDeviceLabel, 1, 0 );
+    pvrRadioDevice = new QLineEdit;
+    pvrDevLayout->addWidget( pvrRadioDevice, 1, 1 );
 
     /* PVR props */
-    QComboBox *pvrNormBox = new QComboBox;
+    pvrNormBox = new QComboBox;
     pvrNormBox->insertItem( 3, qtr( "Automatic" ) );
     pvrNormBox->insertItem( 0, "SECAM" );
     pvrNormBox->insertItem( 1, "NTSC" );
     pvrNormBox->insertItem( 2, "PAL" );
 
-    QSpinBox *pvrFreq = new QSpinBox;
+    pvrFreq = new QSpinBox;
     pvrFreq->setAlignment( Qt::AlignRight );
     pvrFreq->setSuffix(" kHz");
+    pvrBitr = new QSpinBox;
+    pvrBitr->setAlignment( Qt::AlignRight );
+    pvrBitr->setSuffix(" kHz");
     QLabel *pvrNormLabel = new QLabel( qtr( "Norm" ) );
     QLabel *pvrFreqLabel = new QLabel( qtr( "Frequency" ) );
+    QLabel *pvrBitrLabel = new QLabel( qtr( "Bitrate" ) );
 
     pvrPropLayout->addWidget( pvrNormLabel, 0, 0 );
     pvrPropLayout->addWidget( pvrNormBox, 0, 1 );
@@ -551,60 +555,65 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     pvrPropLayout->addWidget( pvrFreqLabel, 1, 0 );
     pvrPropLayout->addWidget( pvrFreq, 1, 1 );
 
+    pvrPropLayout->addWidget( pvrBitrLabel, 2, 0 );
+    pvrPropLayout->addWidget( pvrBitr, 2, 1 );
+
     /* PVR CONNECTs */
-    CuMRL( pvrVideoDevice, textChanged( QString ) );
-    CuMRL( pvrAudioDevice, textChanged( QString ) );
+    CuMRL( pvrDevice, textChanged( QString ) );
+    CuMRL( pvrRadioDevice, textChanged( QString ) );
 
     CuMRL( pvrFreq, valueChanged ( int ) );
+    CuMRL( pvrBitr, valueChanged ( int ) );
     CuMRL( pvrNormBox,  currentIndexChanged ( int ) );
 
     /*********************
      * DirectShow Stuffs *
      *********************/
-    addModuleAndLayouts( dshow, "DirectShow" );
+    addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
 
 
     /**************
      * BDA Stuffs *
      **************/
-    addModuleAndLayouts( bda, "DVB / BDA" );
+    addModuleAndLayouts( BDA_DEVICE, bda, "DVB / BDA" );
 
     /**************
      * DVB Stuffs *
      **************/
-    addModuleAndLayouts( dvb, "DVB" );
+    addModuleAndLayouts( DVB_DEVICE, dvb, "DVB" );
 
     /* DVB Main */
     QLabel *dvbDeviceLabel = new QLabel( qtr( "Adapter card to tune" ) );
+    QLabel *dvbTyepLabel = new QLabel( qtr( "DVB Type:" ) );
 
-    QSpinBox *dvbCard = new QSpinBox;
+    dvbCard = new QSpinBox;
     dvbCard->setAlignment( Qt::AlignRight );
     dvbCard->setPrefix( "/dev/dvb/adapter" );
 
     dvbDevLayout->addWidget( dvbDeviceLabel, 0, 0 );
-    dvbDevLayout->addWidget( dvbCard, 0, 2 );
+    dvbDevLayout->addWidget( dvbCard, 0, 2, 1, 2 );
 
     dvbs = new QRadioButton( "DVB-S" );
     dvbs->setChecked( true );
     dvbc = new QRadioButton( "DVB-C" );
     dvbt = new QRadioButton( "DVB-T" );
 
-    dvbDevLayout->addWidget( dvbs, 1, 0 );
-    dvbDevLayout->addWidget( dvbc, 1, 1 );
-    dvbDevLayout->addWidget( dvbt, 1, 2 );
+    dvbDevLayout->addWidget( dvbTyepLabel, 1, 0 );
+    dvbDevLayout->addWidget( dvbs, 1, 1 );
+    dvbDevLayout->addWidget( dvbc, 1, 2 );
+    dvbDevLayout->addWidget( dvbt, 1, 3 );
 
     /* DVB Props */
     QLabel *dvbFreqLabel =
                     new QLabel( qtr( "Transponder/multiplex frequency" ) );
     dvbFreq = new QSpinBox;
     dvbFreq->setAlignment( Qt::AlignRight );
-    //FIXME DVB-C/T uses Hz
     dvbFreq->setSuffix(" kHz");
     dvbPropLayout->addWidget( dvbFreqLabel, 0, 0 );
     dvbPropLayout->addWidget( dvbFreq, 0, 1 );
 
     QLabel *dvbSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
-    QSpinBox *dvbSrate = new QSpinBox;
+    dvbSrate = new QSpinBox;
     dvbSrate->setAlignment( Qt::AlignRight );
     dvbSrate->setSuffix(" kHz");
     dvbPropLayout->addWidget( dvbSrateLabel, 1, 0 );
@@ -637,6 +646,38 @@ void CaptureOpenPanel::clear()
 void CaptureOpenPanel::updateMRL()
 {
     QString mrl = "";
+    int i_devicetype = ui.deviceCombo->currentIndex();
+    switch( i_devicetype )
+    {
+    case V4L_DEVICE:
+        mrl = "v4l://";
+        mrl += " :v4l-vdev=" + v4lVideoDevice->text();
+        mrl += " :v4l-adev=" + v4lAudioDevice->text();
+        mrl += " :v4l-norm=" + QString("%1").arg( v4lNormBox->currentIndex() );
+        mrl += " :v4l-frequency=" + QString("%1").arg( v4lFreq->value() );
+        break;
+    case PVR_DEVICE:
+        mrl = "pvr://";
+        mrl += " :pvr-device=" + pvrDevice->text();
+        mrl += " :pvr-radio-device=" + pvrRadioDevice->text();
+        mrl += " :pvr-norm=" + QString("%1").arg( pvrNormBox->currentIndex() );
+        if( pvrFreq->value() )
+            mrl += " :pvr-frequency=" + QString("%1").arg( pvrFreq->value() );
+        if( pvrBitr->value() )
+            mrl += " :pvr-bitrate=" + QString("%1").arg( pvrBitr->value() );
+        break;
+    case DVB_DEVICE:
+        mrl = "dvb://";
+        mrl += " :dvb-adapter=" + QString("%1").arg( dvbCard->value() );
+        mrl += " :dvb-frequency=" + QString("%1").arg( dvbFreq->value() );
+        mrl += " :dvb-srate=" + QString("%1").arg( dvbSrate->value() );
+        break;
+    case BDA_DEVICE:
+        break;
+    case DSHOW_DEVICE:
+        break;
+    }
+
     emit mrlUpdated( mrl );
 }
 
