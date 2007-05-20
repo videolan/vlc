@@ -1203,6 +1203,7 @@ VLC_EXPORT( const char *, VLC_CompileHost, ( void ) );
 VLC_EXPORT( const char *, VLC_CompileDomain, ( void ) );
 VLC_EXPORT( const char *, VLC_Compiler, ( void ) );
 VLC_EXPORT( const char *, VLC_Error, ( int ) );
+VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 
 /*****************************************************************************
  * Additional vlc stuff
@@ -1211,10 +1212,7 @@ VLC_EXPORT( const char *, VLC_Error, ( int ) );
 #   ifdef HAVE_DIRENT_H
 #   include <dirent.h>  /* for DIR typedef in vlc_symbols.h */
 #   endif
-VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 #   include "vlc_symbols.h"
-#else
-#   define VLC_Changeset( ) ("exported")
 #endif
 #include "vlc_os_specific.h"
 #include "vlc_messages.h"
