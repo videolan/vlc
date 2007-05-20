@@ -243,10 +243,10 @@ echo "EXTRA_CPPFLAGS = ${EXTRA_CPPFLAGS} -isystem \$(PREFIX)/include" >> config.
 echo "EXTRA_LDFLAGS = ${EXTRA_LDFLAGS}" >> config.mak
 echo "EXTRA_PATH = ${EXTRA_PATH}" >> config.mak
 
-if which curl >/dev/null; then
+if which wget --version >/dev/null 2>&1; then
+    echo "WGET = wget -c" >> config.mak
+elif curl >/dev/null; then
     echo "WGET = curl -L -O" >> config.mak
-elif wget --version >/dev/null 2>&1; then
-    echo "WGET = wget" >> config.mak
 else
     echo "You need at least wget or curl to fetch the packages." >&2
     exit 1
