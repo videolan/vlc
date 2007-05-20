@@ -34,7 +34,7 @@ extern vlc_object_t *
 vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
                    const char *psz_type);
 
-#if 1
+#if 0
 /*****************************************************************************
  * libvlc_global_data_t (global variable)
  *****************************************************************************
