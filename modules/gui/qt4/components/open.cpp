@@ -32,6 +32,7 @@
 #include <QFileDialog>
 #include <QDialogButtonBox>
 #include <QLineEdit>
+#include <QStackedLayout>
 
 /**************************************************************************
  * File open
@@ -53,7 +54,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ADD_FILTER_AUDIO( fileTypes );
     ADD_FILTER_PLAYLIST( fileTypes );
     ADD_FILTER_ALL( fileTypes );
-    fileTypes.replace(QString(";*"), QString(" *"));
+    fileTypes.replace( QString(";*"), QString(" *"));
 
     // Make this QFileDialog a child of tempWidget from the ui.
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
@@ -65,7 +66,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
     if( psz_filepath )
     {
-        dialogBox->setDirectory( QString::fromUtf8(psz_filepath) );
+        dialogBox->setDirectory( QString::fromUtf8( psz_filepath ) );
         delete psz_filepath;
     }
 
@@ -130,24 +131,26 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
         }
     }
 
+    /* Connects  */
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
     BUTTONACT( ui.subCheckBox, toggleSubtitleFrame());
 
-    CONNECT( ui.fileInput, editTextChanged(QString ), this, updateMRL());
-    CONNECT( ui.subInput, editTextChanged(QString ), this, updateMRL());
-    CONNECT( ui.alignSubComboBox, currentIndexChanged(int), this, updateMRL());
-    CONNECT( ui.sizeSubComboBox, currentIndexChanged(int), this, updateMRL());
+    CONNECT( ui.fileInput, editTextChanged( QString ), this, updateMRL());
+    CONNECT( ui.subInput, editTextChanged( QString ), this, updateMRL());
+    CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this, updateMRL());
+    CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this, updateMRL());
     CONNECT( lineFileEdit, textChanged( QString ), this, browseFile());
 }
 
 FileOpenPanel::~FileOpenPanel()
 {}
 
-QStringList FileOpenPanel::browse(QString help)
+QStringList FileOpenPanel::browse( QString help )
 {
     return THEDP->showSimpleOpen( help );
 }
 
+/* Unused. FIXME ? */
 void FileOpenPanel::browseFile()
 {
     QString fileString = "";
@@ -175,15 +178,17 @@ void FileOpenPanel::updateMRL()
 
     if( ui.subCheckBox->isChecked() ) {
         mrl.append( " :sub-file=" + ui.subInput->currentText() );
-        int align = ui.alignSubComboBox->itemData( ui.alignSubComboBox->currentIndex() ).toInt();
+        int align = ui.alignSubComboBox->itemData(
+                    ui.alignSubComboBox->currentIndex() ).toInt();
         mrl.append( " :subsdec-align=" + QString().setNum( align ) );
-        int size = ui.sizeSubComboBox->itemData( ui.sizeSubComboBox->currentIndex() ).toInt();
+        int size = ui.sizeSubComboBox->itemData(
+                   ui.sizeSubComboBox->currentIndex() ).toInt();
         mrl.append( " :freetype-rel-fontsize=" + QString().setNum( size ) );
     }
 
     const char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
-    if( (NULL == psz_filepath)
-      || strcmp(psz_filepath,dialogBox->directory().absolutePath().toUtf8()) )
+    if( ( NULL == psz_filepath )
+      || strcmp( psz_filepath,dialogBox->directory().absolutePath().toUtf8()) )
     {
         /* set dialog box current directory as last known path */
         config_PutPsz( p_intf, "qt-filedialog-path",
@@ -199,8 +204,8 @@ void FileOpenPanel::updateMRL()
 /* Function called by Open Dialog when clicke on Play/Enqueue */
 void FileOpenPanel::accept()
 {
-    ui.fileInput->addItem(ui.fileInput->currentText());
-    if ( ui.fileInput->count() > 8 ) ui.fileInput->removeItem(0);
+    ui.fileInput->addItem( ui.fileInput->currentText());
+    if ( ui.fileInput->count() > 8 ) ui.fileInput->removeItem( 0 );
 }
 
 void FileOpenBox::accept()
@@ -217,7 +222,7 @@ void FileOpenPanel::clear()
 
 void FileOpenPanel::toggleSubtitleFrame()
 {
-    if (ui.subFrame->isVisible())
+    if ( ui.subFrame->isVisible() )
     {
         ui.subFrame->hide();
         updateGeometry();
@@ -245,11 +250,11 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     BUTTONACT( ui.audioCDRadioButton, updateButtons());
     BUTTONACT( ui.dvdsimple,  updateButtons());
 
-    CONNECT( ui.deviceCombo, editTextChanged(QString ), this, updateMRL());
-    CONNECT( ui.titleSpin, valueChanged(int), this, updateMRL());
-    CONNECT( ui.chapterSpin, valueChanged(int), this, updateMRL());
-    CONNECT( ui.audioSpin, valueChanged(int), this, updateMRL());
-    CONNECT( ui.subtitlesSpin, valueChanged(int), this, updateMRL());
+    CONNECT( ui.deviceCombo, editTextChanged( QString ), this, updateMRL());
+    CONNECT( ui.titleSpin, valueChanged( int ), this, updateMRL());
+    CONNECT( ui.chapterSpin, valueChanged( int ), this, updateMRL());
+    CONNECT( ui.audioSpin, valueChanged( int ), this, updateMRL());
+    CONNECT( ui.subtitlesSpin, valueChanged( int ), this, updateMRL());
 }
 
 DiscOpenPanel::~DiscOpenPanel()
@@ -257,8 +262,8 @@ DiscOpenPanel::~DiscOpenPanel()
 
 void DiscOpenPanel::clear()
 {
-    ui.titleSpin->setValue(0);
-    ui.chapterSpin->setValue(0);
+    ui.titleSpin->setValue( 0 );
+    ui.chapterSpin->setValue( 0 );
 }
 
 void DiscOpenPanel::updateButtons()
@@ -302,41 +307,42 @@ void DiscOpenPanel::updateMRL()
         emit methodChanged( "dvdnav-caching" );
 
         if ( ui.titleSpin->value() > 0 ) {
-            mrl += QString("@%1").arg(ui.titleSpin->value());
+            mrl += QString("@%1").arg( ui.titleSpin->value() );
             if ( ui.chapterSpin->value() > 0 ) {
-                mrl+= QString(":%1").arg(ui.chapterSpin->value());
+                mrl+= QString(":%1").arg( ui.chapterSpin->value() );
             }
         }
 
     /* VCD */
-    } else if (ui.vcdRadioButton->isChecked() ) {
+    } else if ( ui.vcdRadioButton->isChecked() ) {
         mrl = "vcd://" + ui.deviceCombo->currentText();
         emit methodChanged( "vcd-caching" );
 
         if( ui.titleSpin->value() > 0 ) {
-            mrl += QString("@E%1").arg(ui.titleSpin->value());
+            mrl += QString("@E%1").arg( ui.titleSpin->value() );
         }
 
     /* CDDA */
     } else {
         mrl = "cdda://" + ui.deviceCombo->currentText();
         if( ui.titleSpin->value() > 0 ) {
-            QString("@%1").arg(ui.titleSpin->value());
+            QString("@%1").arg( ui.titleSpin->value() );
         }
     }
 
     if ( ui.dvdRadioButton->isChecked() || ui.vcdRadioButton->isChecked() )
     {
         if ( ui.audioSpin->value() >= 0 ) {
-            mrl += " :audio-track=" + QString("%1").arg(ui.audioSpin->value());
+            mrl += " :audio-track=" +
+                QString("%1").arg( ui.audioSpin->value() );
         }
         if ( ui.subtitlesSpin->value() >= 0 ) {
             mrl += " :sub-track=" +
-                QString("%1").arg(ui.subtitlesSpin->value());
+                QString("%1").arg( ui.subtitlesSpin->value() );
         }
     }
 
-    emit mrlUpdated(mrl);
+    emit mrlUpdated( mrl );
 }
 
 
@@ -349,10 +355,10 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 {
     ui.setupUi( this );
 
-    CONNECT( ui.protocolCombo, currentIndexChanged(int),
-             this, updateProtocol(int) );
-    CONNECT( ui.portSpin, valueChanged(int), this, updateMRL());
-    CONNECT( ui.addressText, textChanged(QString), this, updateAddress());
+    CONNECT( ui.protocolCombo, currentIndexChanged( int ),
+             this, updateProtocol( int ) );
+    CONNECT( ui.portSpin, valueChanged( int ), this, updateMRL() );
+    CONNECT( ui.addressText, textChanged( QString ), this, updateAddress());
     CONNECT( ui.timeShift, clicked(), this, updateMRL());
     CONNECT( ui.ipv6, clicked(), this, updateMRL());
 
@@ -371,11 +377,11 @@ NetOpenPanel::~NetOpenPanel()
 void NetOpenPanel::clear()
 {}
 
-void NetOpenPanel::updateProtocol(int idx) {
+void NetOpenPanel::updateProtocol( int idx ) {
     QString addr = ui.addressText->text();
-    QString proto = ui.protocolCombo->itemData(idx).toString();
+    QString proto = ui.protocolCombo->itemData( idx ).toString();
 
-    ui.timeShift->setEnabled( idx >= 4);
+    ui.timeShift->setEnabled( idx >= 4 );
     ui.ipv6->setEnabled( idx == 4 );
     ui.addressText->setEnabled( idx != 4 );
     ui.portSpin->setEnabled( idx >= 4 );
@@ -383,8 +389,8 @@ void NetOpenPanel::updateProtocol(int idx) {
     /* If we already have a protocol in the address, replace it */
     if( addr.contains( "://")) {
         msg_Err( p_intf, "replace");
-        addr.replace(QRegExp("^.*://"), proto + "://");
-        ui.addressText->setText(addr);
+        addr.replace( QRegExp("^.*://"), proto + "://");
+        ui.addressText->setText( addr );
     }
 
     updateMRL();
@@ -402,7 +408,7 @@ void NetOpenPanel::updateMRL() {
     if( addr.contains( "://") && proto != 4 ) {
         mrl = addr;
     } else {
-        switch(proto) {
+        switch( proto ) {
         case 0:
         case 1:
             mrl = "http://" + addr;
@@ -425,7 +431,7 @@ void NetOpenPanel::updateMRL() {
             if( ui.ipv6->isEnabled() && ui.ipv6->isChecked() ) {
                 mrl += "[::]";
             }
-            mrl += QString(":%1").arg(ui.portSpin->value());
+            mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("udp-caching");
             break;
         case 6: /* UDP multicast */
@@ -434,14 +440,14 @@ void NetOpenPanel::updateMRL() {
             if ( addr.contains(':') && !addr.contains('[') ) {
                 mrl += "[" + addr + "]";
             } else mrl += addr;
-            mrl += QString(":%1").arg(ui.portSpin->value());
+            mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("udp-caching");
         }
     }
     if( ui.timeShift->isEnabled() && ui.timeShift->isChecked() ) {
         mrl += " :access-filter=timeshift";
     }
-    emit mrlUpdated(mrl);
+    emit mrlUpdated( mrl );
 }
 
 /**************************************************************************
@@ -451,6 +457,175 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
+
+    QStackedLayout *stackedDevLayout = new QStackedLayout;
+    ui.cardBox->setLayout( stackedDevLayout );
+
+    QStackedLayout *stackedPropLayout = new QStackedLayout;
+    ui.optionsBox->setLayout( stackedPropLayout );
+
+#define addModuleAndLayouts( name, label )                            \
+    QWidget * name ## DevPage = new QWidget( this );                  \
+    QWidget * name ## PropPage = new QWidget( this );                 \
+    stackedDevLayout->addWidget( name ## DevPage );                   \
+    stackedPropLayout->addWidget( name ## PropPage );                  \
+    QGridLayout * name ## DevLayout = new QGridLayout;                \
+    QGridLayout * name ## PropLayout = new QGridLayout;               \
+    name ## DevPage->setLayout( name ## DevLayout );                  \
+    name ## PropPage->setLayout( name ## PropLayout );                \
+    ui.deviceCombo->addItem( qtr( label ) );
+
+#define CuMRL( widget, slot ) CONNECT( widget , slot , this, updateMRL() );
+
+    /*******
+     * V4L *
+     *******/
+    /* V4l Main */
+    addModuleAndLayouts( v4l, "Video for Linux" );
+    QLabel *v4lVideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
+    v4lDevLayout->addWidget( v4lVideoDeviceLabel, 0, 0 );
+    QLineEdit *v4lVideoDevice = new QLineEdit;
+    v4lDevLayout->addWidget( v4lVideoDevice, 0, 1 );
+    QLabel *v4lAudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
+    v4lDevLayout->addWidget( v4lAudioDeviceLabel, 1, 0 );
+    QLineEdit *v4lAudioDevice = new QLineEdit;
+    v4lDevLayout->addWidget( v4lAudioDevice, 1, 1 );
+
+    /* V4l Props */
+    QComboBox *v4lNormBox = new QComboBox;
+    v4lNormBox->insertItem( 3, qtr( "Automatic" ) );
+    v4lNormBox->insertItem( 0, "SECAM" );
+    v4lNormBox->insertItem( 1, "NTSC" );
+    v4lNormBox->insertItem( 2, "PAL" );
+
+    QSpinBox *v4lFreq = new QSpinBox;
+    v4lFreq->setAlignment( Qt::AlignRight );
+    v4lFreq->setSuffix(" kHz");
+
+    QLabel *v4lNormLabel = new QLabel( qtr( "Norm" ) );
+    QLabel *v4lFreqLabel = new QLabel( qtr( "Frequency" ) );
+
+    v4lPropLayout->addWidget( v4lNormLabel, 0 , 0 );
+    v4lPropLayout->addWidget( v4lNormBox, 0 , 1 );
+
+    v4lPropLayout->addWidget( v4lFreqLabel, 1 , 0 );
+    v4lPropLayout->addWidget( v4lFreq, 1 , 1 );
+
+    /* v4l CONNECTs */
+    CuMRL( v4lVideoDevice, textChanged( QString ) );
+    CuMRL( v4lAudioDevice, textChanged( QString ) );
+    CuMRL( v4lFreq, valueChanged ( int ) );
+    CuMRL( v4lNormBox,  currentIndexChanged ( int ) );
+
+    /************
+     * PVR      *
+     ************/
+    addModuleAndLayouts( pvr, "PVR" );
+
+    /* PVR Main */
+    QLabel *pvrVideoDeviceLabel = new QLabel( qtr( "Device name" ) );
+    pvrDevLayout->addWidget( pvrVideoDeviceLabel, 0, 0 );
+    QLineEdit *pvrVideoDevice = new QLineEdit;
+    pvrDevLayout->addWidget( pvrVideoDevice, 0, 1 );
+    QLabel *pvrAudioDeviceLabel = new QLabel( qtr( "Radio device name" ) );
+    pvrDevLayout->addWidget( pvrAudioDeviceLabel, 1, 0 );
+    QLineEdit *pvrAudioDevice = new QLineEdit;
+    pvrDevLayout->addWidget( pvrAudioDevice, 1, 1 );
+
+    /* PVR props */
+    QComboBox *pvrNormBox = new QComboBox;
+    pvrNormBox->insertItem( 3, qtr( "Automatic" ) );
+    pvrNormBox->insertItem( 0, "SECAM" );
+    pvrNormBox->insertItem( 1, "NTSC" );
+    pvrNormBox->insertItem( 2, "PAL" );
+
+    QSpinBox *pvrFreq = new QSpinBox;
+    pvrFreq->setAlignment( Qt::AlignRight );
+    pvrFreq->setSuffix(" kHz");
+    QLabel *pvrNormLabel = new QLabel( qtr( "Norm" ) );
+    QLabel *pvrFreqLabel = new QLabel( qtr( "Frequency" ) );
+
+    pvrPropLayout->addWidget( pvrNormLabel, 0, 0 );
+    pvrPropLayout->addWidget( pvrNormBox, 0, 1 );
+
+    pvrPropLayout->addWidget( pvrFreqLabel, 1, 0 );
+    pvrPropLayout->addWidget( pvrFreq, 1, 1 );
+
+    /* PVR CONNECTs */
+    CuMRL( pvrVideoDevice, textChanged( QString ) );
+    CuMRL( pvrAudioDevice, textChanged( QString ) );
+
+    CuMRL( pvrFreq, valueChanged ( int ) );
+    CuMRL( pvrNormBox,  currentIndexChanged ( int ) );
+
+    /*********************
+     * DirectShow Stuffs *
+     *********************/
+    addModuleAndLayouts( dshow, "DirectShow" );
+
+
+    /**************
+     * BDA Stuffs *
+     **************/
+    addModuleAndLayouts( bda, "DVB / BDA" );
+
+    /**************
+     * DVB Stuffs *
+     **************/
+    addModuleAndLayouts( dvb, "DVB" );
+
+    /* DVB Main */
+    QLabel *dvbDeviceLabel = new QLabel( qtr( "Adapter card to tune" ) );
+
+    QSpinBox *dvbCard = new QSpinBox;
+    dvbCard->setAlignment( Qt::AlignRight );
+    dvbCard->setPrefix( "/dev/dvb/adapter" );
+
+    dvbDevLayout->addWidget( dvbDeviceLabel, 0, 0 );
+    dvbDevLayout->addWidget( dvbCard, 0, 2 );
+
+    dvbs = new QRadioButton( "DVB-S" );
+    dvbs->setChecked( true );
+    dvbc = new QRadioButton( "DVB-C" );
+    dvbt = new QRadioButton( "DVB-T" );
+
+    dvbDevLayout->addWidget( dvbs, 1, 0 );
+    dvbDevLayout->addWidget( dvbc, 1, 1 );
+    dvbDevLayout->addWidget( dvbt, 1, 2 );
+
+    /* DVB Props */
+    QLabel *dvbFreqLabel =
+                    new QLabel( qtr( "Transponder/multiplex frequency" ) );
+    dvbFreq = new QSpinBox;
+    dvbFreq->setAlignment( Qt::AlignRight );
+    //FIXME DVB-C/T uses Hz
+    dvbFreq->setSuffix(" kHz");
+    dvbPropLayout->addWidget( dvbFreqLabel, 0, 0 );
+    dvbPropLayout->addWidget( dvbFreq, 0, 1 );
+
+    QLabel *dvbSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
+    QSpinBox *dvbSrate = new QSpinBox;
+    dvbSrate->setAlignment( Qt::AlignRight );
+    dvbSrate->setSuffix(" kHz");
+    dvbPropLayout->addWidget( dvbSrateLabel, 1, 0 );
+    dvbPropLayout->addWidget( dvbSrate, 1, 1 );
+
+    /* DVB CONNECTs */
+    CuMRL( dvbCard, valueChanged ( int ) );
+    CuMRL( dvbFreq, valueChanged ( int ) );
+    CuMRL( dvbSrate, valueChanged ( int ) );
+    BUTTONACT( dvbs, updateButtons() );
+    BUTTONACT( dvbt, updateButtons() );
+    BUTTONACT( dvbc, updateButtons() );
+
+    /* General connects */
+    connect( ui.deviceCombo, SIGNAL( activated( int ) ),
+                     stackedDevLayout, SLOT( setCurrentIndex( int ) ) );
+    connect( ui.deviceCombo, SIGNAL( activated( int ) ),
+                     stackedPropLayout, SLOT( setCurrentIndex( int ) ) );
+    CONNECT( ui.deviceCombo, activated( int ), this, updateMRL() );
+
+#undef addModule
 }
 
 CaptureOpenPanel::~CaptureOpenPanel()
@@ -462,5 +637,11 @@ void CaptureOpenPanel::clear()
 void CaptureOpenPanel::updateMRL()
 {
     QString mrl = "";
-    emit mrlUpdated(mrl);
+    emit mrlUpdated( mrl );
+}
+
+void CaptureOpenPanel::updateButtons()
+{
+    if( dvbs->isChecked() ) dvbFreq->setSuffix(" kHz");
+    if( dvbc->isChecked() || dvbt->isChecked() ) dvbFreq->setSuffix(" Hz");
 }

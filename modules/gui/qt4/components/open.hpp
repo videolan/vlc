@@ -128,8 +128,15 @@ public:
     virtual void clear() ;
 private:
     Ui::OpenCapture ui;
+    QRadioButton *dvbs;
+    QRadioButton *dvbt;
+    QRadioButton *dvbc;
+    QSpinBox *dvbFreq;
+
 public slots:
     virtual void updateMRL();
+private slots:
+    void updateButtons();
 };
 
 #endif
