@@ -296,7 +296,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
 
 #   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
     {
-        char *psz_vlcpath = p_demux->p_libvlc_global->psz_vlcpath;
+        char *psz_vlcpath = vlc_path( p_demux );
         ppsz_dir_list[1] = malloc( strlen( psz_vlcpath ) + strlen( "/share/luaplaylist" ) + 1 );
         if( !ppsz_dir_list[1] ) return VLC_ENOMEM;
 #       if defined( WIN32 )

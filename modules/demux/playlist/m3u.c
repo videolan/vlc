@@ -232,7 +232,7 @@ static void parseEXTINF(char *psz_string, char **ppsz_artist,
     end = psz_string + strlen( psz_string );
 
     /* ignore whitespaces */
-    for (; psz_string < end && ( *psz_string == '\t' || *psz_string == ' ' ); 
+    for (; psz_string < end && ( *psz_string == '\t' || *psz_string == ' ' );
          psz_string++ );
 
     /* duration: read to next comma */
