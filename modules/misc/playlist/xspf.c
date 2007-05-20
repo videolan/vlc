@@ -210,6 +210,18 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
         free( psz );
     }
 
+    /* -> the description */
+    psz = p_item->p_input->p_meta->psz_description ?
+                        strdup( p_item->p_input->p_meta->psz_description ):
+                        strdup( "" );
+    psz_temp = convert_xml_special_chars( psz );
+    if( psz ) free( psz );
+    if( *psz_temp )
+    {
+        fprintf( p_file, "\t\t\t<annotation>%s</annotation>\n", psz_temp );
+    }
+    free( psz_temp );
+
 xspfexportitem_end:
     /* -> the duration */
     if( p_item->p_input->i_duration > 0 )
