@@ -69,13 +69,11 @@ DECLARE_VLC_VERSION( CompileHost, COMPILE_HOST );
 DECLARE_VLC_VERSION( CompileDomain, COMPILE_DOMAIN );
 DECLARE_VLC_VERSION( Compiler, COMPILER );
 
-#ifndef HAVE_SHARED_LIBVLC
 extern const char psz_vlc_changeset[];
-char const * VLC_Changeset( void )
+const char* VLC_Changeset( void )
 {
     return psz_vlc_changeset;
 }
-#endif
 
 /*****************************************************************************
  * VLC_Error: strerror() equivalent

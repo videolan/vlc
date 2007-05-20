@@ -1830,11 +1830,9 @@ static void Version( void )
     utf8_fprintf( stdout, _("Compiled by %s@%s.%s\n"),
              VLC_CompileBy(), VLC_CompileHost(), VLC_CompileDomain() );
     utf8_fprintf( stdout, _("Compiler: %s\n"), VLC_Compiler() );
-#ifndef HAVE_SHARED_LIBVLC
     if( strcmp( VLC_Changeset(), "exported" ) )
         utf8_fprintf( stdout, _("Based upon svn changeset [%s]\n"),
                  VLC_Changeset() );
-#endif
     utf8_fprintf( stdout, LICENSE_MSG );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
