@@ -110,6 +110,18 @@ int libvlc_private_handle_callback( vlc_object_t *p_this, char const *psz_cmd,
     struct libvlc_callback_entry_t *entry = p_data;
     libvlc_event_t event;
     event.type = entry->i_event_type;
+    switch ( event.type )
+    {
+        case VOLUME_CHANGED:
+            event.value_type = BOOLEAN_EVENT;
+            break;
+        case INPUT_POSITION_CHANGED:
+            break;
+        default:
+            break;
+    }
+    event.old_value = oldval;
+    event.new_value = newval;
 
     /* Call the client entry */
     entry->f_callback( entry->p_instance, &event, entry->p_user_data );
