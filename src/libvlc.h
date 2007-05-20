@@ -1,8 +1,11 @@
 /*****************************************************************************
  * libvlc.h: Internal libvlc generic/misc declaration
  *****************************************************************************
+ * Copyright (C) 1999, 2000, 2001, 2002 the VideoLAN team
  * Copyright © 2006-2007 Rémi Denis-Courmont
  * $Id$
+ *
+ * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
