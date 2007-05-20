@@ -24,9 +24,31 @@
 #include "libvlc_internal.h"
 #include <vlc/libvlc.h>
 
-int libvlc_private_handle_callback( vlc_object_t *p_this, char const *psz_cmd,
-                                    vlc_value_t oldval, vlc_value_t newval,
-                                    void *p_data );
+static int handle_callback( vlc_object_t *p_this, char const *psz_cmd,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
+{
+    struct libvlc_callback_entry_t *entry = p_data;
+    libvlc_event_t event;
+    event.type = entry->i_event_type;
+    switch ( event.type )
+    {
+        case VOLUME_CHANGED:
+            event.value_type = BOOLEAN_EVENT;
+            break;
+        case INPUT_POSITION_CHANGED:
+            break;
+        default:
+            break;
+    }
+    event.old_value = oldval;
+    event.new_value = newval;
+
+    /* Call the client entry */
+    entry->f_callback( entry->p_instance, &event, entry->p_user_data );
+
+    return VLC_SUCCESS;
+}
 
 void libvlc_callback_register_for_event( libvlc_instance_t *p_instance,
                                         libvlc_event_type_t i_event_type,
@@ -59,7 +81,7 @@ void libvlc_callback_register_for_event( libvlc_instance_t *p_instance,
 
     int res = var_AddCallback( p_instance->p_libvlc_int,
                                callback_name,
-                               libvlc_private_handle_callback,
+                               handle_callback,
                                entry );
     
     if (res != VLC_SUCCESS)
@@ -100,31 +122,4 @@ void libvlc_callback_unregister_for_event( libvlc_instance_t *p_instance,
         }
         p_listitem = p_listitem->next;
     }
-}
-
-
-int libvlc_private_handle_callback( vlc_object_t *p_this, char const *psz_cmd,
-                                     vlc_value_t oldval, vlc_value_t newval,
-                                     void *p_data )
-{
-    struct libvlc_callback_entry_t *entry = p_data;
-    libvlc_event_t event;
-    event.type = entry->i_event_type;
-    switch ( event.type )
-    {
-        case VOLUME_CHANGED:
-            event.value_type = BOOLEAN_EVENT;
-            break;
-        case INPUT_POSITION_CHANGED:
-            break;
-        default:
-            break;
-    }
-    event.old_value = oldval;
-    event.new_value = newval;
-
-    /* Call the client entry */
-    entry->f_callback( entry->p_instance, &event, entry->p_user_data );
-
-    return VLC_SUCCESS;
 }
