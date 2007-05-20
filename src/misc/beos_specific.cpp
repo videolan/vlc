@@ -105,7 +105,7 @@ void system_End( libvlc_int_t *p_this )
     vlc_thread_join( p_this->p_libvlc_global->p_appthread );
     vlc_object_destroy( p_this->p_libvlc_global->p_appthread );
 
-    free( p_this->p_libvlc_global->psz_vlcpath );
+    free( vlc_global( p_this )->psz_vlcpath );
 }
 
 /* following functions are local */
@@ -172,7 +172,7 @@ void VlcApplication::ReadyToRun( )
     BEntry entry( &info.ref );
     entry.GetPath( &path );
     path.GetParent( &path );
-    p_this->p_libvlc_global->psz_vlcpath = strdup( path.Path() );
+    vlc_global( p_this )->psz_vlcpath = strdup( path.Path() );
 
     /* Tell the main thread we are finished initializing the BApplication */
     vlc_thread_ready( p_this );

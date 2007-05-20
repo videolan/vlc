@@ -110,10 +110,6 @@ VLC_EXPORT( vlc_list_t *, __vlc_list_find, ( vlc_object_t *, int, int ) );
 VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
 VLC_EXPORT( libvlc_int_t *, vlc_current_object, ( int ) );
 
-#if defined( WIN32 ) || defined( SYS_BEOS ) || defined( __APPLE__ )
-VLC_EXPORT( const char *, vlc_path, ( vlc_object_t * ) );
-#endif
-
 /*}@*/
 
 #define vlc_object_create(a,b) \

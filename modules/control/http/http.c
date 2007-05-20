@@ -290,14 +290,10 @@ static int Open( vlc_object_t *p_this )
 #if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
     if ( ( psz_src = config_GetPsz( p_intf, "http-src" )) == NULL )
     {
-        char * psz_vlcpath = vlc_path( p_intf );
-        psz_src = malloc( strlen(psz_vlcpath) + strlen("/share/http" ) + 1 );
+        char * psz_vlcpath = config_GetDataDir( p_intf );
+        psz_src = malloc( strlen(psz_vlcpath) + strlen("/http" ) + 1 );
         if( !psz_src ) return VLC_ENOMEM;
-#if defined(WIN32)
         sprintf( psz_src, "%s/http", psz_vlcpath );
-#else
-        sprintf( psz_src, "%s/share/http", psz_vlcpath );
-#endif
     }
 #else
     psz_src = config_GetPsz( p_intf, "http-src" );

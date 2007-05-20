@@ -1370,11 +1370,3 @@ static void ListChildren( vlc_list_t *p_list, vlc_object_t *p_this, int i_type )
         }
     }
 }
-
-
-#if defined( WIN32 ) || defined( SYS_BEOS ) || defined( __APPLE__ )
-const char *vlc_path( vlc_object_t *p_this )
-{
-    return vlc_global( p_this )->psz_vlcpath;
-}
-#endif

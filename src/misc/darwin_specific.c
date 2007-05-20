@@ -70,7 +70,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
     char *p_char, *p_oldchar = &i_dummy;
 
     /* Get the full program path and name */
-    p_char = p_this->p_libvlc_global->psz_vlcpath = strdup( ppsz_argv[ 0 ] );
+    p_char = vlc_global( p_this )->psz_vlcpath = strdup( ppsz_argv[ 0 ] );
 
     /* Remove trailing program name */
     for( ; *p_char ; )
@@ -116,8 +116,8 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
         CFRelease( all_locales );
     }
 
-    vlc_mutex_init( p_this, &p_this->p_libvlc_global->iconv_lock );
-    p_this->p_libvlc_global->iconv_macosx = vlc_iconv_open( "UTF-8", "UTF-8-MAC" );
+    vlc_mutex_init( p_this, &vlc_global( p_this )->iconv_lock );
+    vlc_global( p_this )->iconv_macosx = vlc_iconv_open( "UTF-8", "UTF-8-MAC" );
 }
 
 /*****************************************************************************
@@ -133,10 +133,10 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
  *****************************************************************************/
 void system_End( libvlc_int_t *p_this )
 {
-    free( p_this->p_libvlc_global->psz_vlcpath );
+    free( vlc_global( p_this )->psz_vlcpath );
 
-    if ( p_this->p_libvlc_global->iconv_macosx != (vlc_iconv_t)-1 )
-        vlc_iconv_close( p_this->p_libvlc_global->iconv_macosx );
-    vlc_mutex_destroy( &p_this->p_libvlc_global->iconv_lock );
+    if ( vlc_global( p_this )->iconv_macosx != (vlc_iconv_t)-1 )
+        vlc_iconv_close( vlc_global( p_this )->iconv_macosx );
+    vlc_mutex_destroy( &vlc_global( p_this )->iconv_lock );
 }
 

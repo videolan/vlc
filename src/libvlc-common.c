@@ -1196,7 +1196,7 @@ static inline int LoadMessages (void)
 #else
     char psz_path[1024];
     if (snprintf (psz_path, sizeof (psz_path), "%s/%s",
-                  libvlc_global.psz_vlcpath, "locale")
+                  vlc_global( &libvlc_global )->psz_vlcpath, "locale")
                      >= (int)sizeof (psz_path))
         return -1;
 

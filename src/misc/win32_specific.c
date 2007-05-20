@@ -72,7 +72,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 
     if( (psz_vlc = strrchr( psz_path, '\\' )) ) *psz_vlc = '\0';
 
-    p_this->p_libvlc_global->psz_vlcpath = strdup( psz_path );
+    vlc_global( p_this )->psz_vlcpath = strdup( psz_path );
 
     /* Set the default file-translation mode */
 #if !defined( UNDER_CE )
@@ -351,10 +351,10 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
  *****************************************************************************/
 void system_End( libvlc_int_t *p_this )
 {
-    if( p_this && p_this->p_libvlc_global && p_this->p_libvlc_global->psz_vlcpath )
+    if( p_this && p_this->p_libvlc_global && vlc_global( p_this )->psz_vlcpath )
     {
-        free( p_this->p_libvlc_global->psz_vlcpath );
-        p_this->p_libvlc_global->psz_vlcpath = NULL;
+        free( vlc_global( p_this )->psz_vlcpath );
+        vlc_global( p_this )->psz_vlcpath = NULL;
     }
 
     WSACleanup();
