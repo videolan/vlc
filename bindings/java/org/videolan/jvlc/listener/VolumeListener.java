@@ -1,4 +1,5 @@
-package org.videolan.jvlc;
+package org.videolan.jvlc.listener;
+
 
 public interface VolumeListener {
 

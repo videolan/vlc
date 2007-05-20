@@ -1,7 +1,7 @@
 import org.videolan.jvlc.AudioIntf;
 import org.videolan.jvlc.JVLC;
 import org.videolan.jvlc.VLCException;
-import org.videolan.jvlc.VolumeListener;
+import org.videolan.jvlc.listener.VolumeListener;
 
 
 public class VLCExample
@@ -87,7 +87,7 @@ public class VLCExample
             jvlc.audio.addVolumeListener(new VolumeListener()
             {
 				public void volumeChanged() {
-					System.out.println("====> From the listener: volume changed");
+					System.out.println("====> From the listener: volume changed.");
 				}
             });
 

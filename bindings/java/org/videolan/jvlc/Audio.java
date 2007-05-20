@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.videolan.jvlc.listener.VolumeListener;
+
 public class Audio implements AudioIntf {
 
 	private long libvlcInstance;
