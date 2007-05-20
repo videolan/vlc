@@ -165,7 +165,7 @@ int subtitles_Filter( const char *psz_dir_content )
         tmp++;
 
         for( i = 0; sub_exts[i]; i++ )
-            if( strcmp( sub_exts[i], tmp ) == 0 )
+            if( strcasecmp( sub_exts[i], tmp ) == 0 )
                 return 1;
     }
     return 0;
