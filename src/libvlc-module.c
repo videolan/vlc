@@ -1750,7 +1750,7 @@ vlc_module_begin();
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT,
                     VLC_FALSE );
         change_need_restart();
-    add_bool( "interact", VLC_FALSE, NULL, INTERACTION_TEXT,
+    add_bool( "interact", VLC_TRUE, NULL, INTERACTION_TEXT,
               INTERACTION_LONGTEXT, VLC_FALSE );
 
     add_bool( "show-intf", VLC_FALSE, NULL, SHOWINTF_TEXT, SHOWINTF_LONGTEXT,
