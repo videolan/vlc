@@ -322,7 +322,7 @@ SOURCES_libvlc_control = \
 	control/input.c \
 	control/video.c \
 	control/audio.c \
-	control/callback.c \
+	control/event.c \
 	control/mediacontrol_internal.h \
 	control/mediacontrol_core.c \
 	control/mediacontrol_util.c \
