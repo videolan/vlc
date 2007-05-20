@@ -802,8 +802,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         if( (*ppsz_path)[0] != '/' )
 #endif
         {
-            if( 0>= asprintf(&psz_fullpath, "%s"DIR_SEP"%s",
-                          p_this->p_libvlc_global->psz_vlcpath, *ppsz_path) )
+            if( 0>= asprintf( &psz_fullpath, "%s"DIR_SEP"%s",
+                              vlc_global( p_this )->psz_vlcpath, *ppsz_path) )
                 psz_fullpath = NULL;
         }
         else
