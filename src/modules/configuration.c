@@ -1713,7 +1713,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
  *
  * @return a string (always succeeds).
  */
-const char *config_GetDataDir( const vlc_object_t *p_this )
+const char *__config_GetDataDir( const vlc_object_t *p_this )
 {
 #if defined (WIN32) || defined (UNDER_CE)
     return vlc_global( p_this )->psz_vlcpath;

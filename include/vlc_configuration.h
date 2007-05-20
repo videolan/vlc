@@ -210,7 +210,8 @@ VLC_EXPORT( module_t *, config_FindModule,( vlc_object_t *, const char * ) );
 
 VLC_EXPORT( int, config_Duplicate,( module_t *, const module_config_t *, size_t ));
 
-VLC_EXPORT(const char *, config_GetDataDir, ( const vlc_object_t * ));
+#define config_GetDataDir( a ) __config_GetDataDir( VLC_OBJECT( a ) )
+VLC_EXPORT(const char *, __config_GetDataDir, ( const vlc_object_t * ));
 
 #define config_GetType(a,b) __config_GetType(VLC_OBJECT(a),b)
 #define config_GetInt(a,b) __config_GetInt(VLC_OBJECT(a),b)
