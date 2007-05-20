@@ -60,7 +60,8 @@ int E_(Import_xspf)( vlc_object_t *p_this )
 void E_(Close_xspf)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    FREENULL( p_demux->p_sys->psz_base);
+    FREENULL( p_demux->p_sys->pp_tracklist );
+    FREENULL( p_demux->p_sys->psz_base );
     free( p_demux->p_sys );
 }
 
@@ -77,7 +78,7 @@ int Demux( demux_t *p_demux )
     p_demux->p_sys->p_item_in_category = p_item_in_category;
     p_demux->p_sys->pp_tracklist = NULL;
     p_demux->p_sys->i_tracklist_entries = 0;
-    p_demux->p_sys->i_identifier = -1;
+    p_demux->p_sys->i_identifier = 0;
     p_demux->p_sys->psz_base = NULL;
 
     /* create new xml parser from stream */
@@ -152,7 +153,7 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
     xml_elem_hnd_t pl_elements[] =
         { {"title",        SIMPLE_CONTENT,  {.smpl = set_item_info} },
           {"creator",      SIMPLE_CONTENT,  {.smpl = set_item_info} },
-          {"annotation",   SIMPLE_CONTENT,  {NULL} },
+          {"annotation",   SIMPLE_CONTENT,  {.smpl = set_item_info} },
           {"info",         SIMPLE_CONTENT,  {NULL} },
           {"location",     SIMPLE_CONTENT,  {NULL} },
           {"identifier",   SIMPLE_CONTENT,  {NULL} },
@@ -385,7 +386,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
           {"identifier",   SIMPLE_CONTENT,  {NULL} },
           {"title",        SIMPLE_CONTENT,  {.smpl = set_item_info} },
           {"creator",      SIMPLE_CONTENT,  {.smpl = set_item_info} },
-          {"annotation",   SIMPLE_CONTENT,  {NULL} },
+          {"annotation",   SIMPLE_CONTENT,  {.smpl = set_item_info} },
           {"info",         SIMPLE_CONTENT,  {NULL} },
           {"image",        SIMPLE_CONTENT,  {NULL} },
           {"album",        SIMPLE_CONTENT,  {.smpl = set_item_info} },
@@ -529,18 +530,18 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
 
                     if( psz_uri )
                     {
-                        if( p_demux->p_sys->psz_base && 
+                        if( p_demux->p_sys->psz_base &&
                             !strstr( psz_uri, "://" ) )
                         {
-                           char* psz_tmp = malloc( 
-                                   strlen(p_demux->p_sys->psz_base) + 
+                           char* psz_tmp = malloc(
+                                   strlen(p_demux->p_sys->psz_base) +
                                    strlen(psz_uri) +1 );
                            if( !psz_tmp )
                            {
                                msg_Err( p_demux, "out of memory");
                                return VLC_FALSE;
                            }
-                           sprintf( psz_tmp, "%s%s", 
+                           sprintf( psz_tmp, "%s%s",
                                     p_demux->p_sys->psz_base, psz_uri );
                            free( psz_uri );
                            psz_uri = psz_tmp;
