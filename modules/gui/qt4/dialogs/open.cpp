@@ -42,6 +42,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     setModal( modal );
     i_action_flag = _action_flag;
 
+    /* Basic Creation of the Window */
     ui.setupUi( this );
     setWindowTitle( qtr("Open" ) );
     resize( 410, 300);
@@ -52,6 +53,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     netOpenPanel = new NetOpenPanel( ui.Tab, p_intf );
     captureOpenPanel = new CaptureOpenPanel( ui.Tab, p_intf );
 
+    /* Insert the tabs */
     ui.Tab->insertTab( OPEN_FILE_TAB, fileOpenPanel, qtr( "&File" ) );
     ui.Tab->insertTab( OPEN_DISC_TAB, discOpenPanel, qtr( "&Disc" ) );
     ui.Tab->insertTab( OPEN_NETWORK_TAB, netOpenPanel, qtr( "&Network" ) );
@@ -59,7 +61,10 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
                                 qtr( "Capture &Device" ) );
 
     /* Hide the advancedPanel */
-    ui.advancedFrame->hide();
+    if(! config_GetInt( p_intf, "qt-adv-options") )
+    {
+        ui.advancedFrame->hide();
+    }
 
     /* Buttons Creation */
     QSizePolicy buttonSizePolicy( static_cast<QSizePolicy::Policy>(7),
@@ -108,7 +113,8 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
                                                  this, newMethod(QString) );
     CONNECT( discOpenPanel, methodChanged( QString ),
                                                  this, newMethod(QString) );
-    /* FIXME CAPTURE */
+    CONNECT( captureOpenPanel, methodChanged( QString ),
+                                                 this, newMethod(QString) );
 
     /* Advanced frame Connects */
     CONNECT( ui.slaveText, textChanged(QString), this, updateMRL());
