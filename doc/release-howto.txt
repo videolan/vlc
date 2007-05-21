@@ -71,6 +71,9 @@
   - Disable mirrors which haven't replicated yet and possibly ganesh if enough
     other mirrors
 
+ * Update wiki
+  - edit http://wiki.videolan.org/Template:VLC:latest_version
+
  * Announce on www.gnome.org
   - click on "Get more software"
   - click on "Edit an existing map entry"
