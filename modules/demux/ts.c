@@ -73,7 +73,9 @@
 #       include "tables/eit.h"
 #   endif
 #endif
-
+#ifdef HAVE_TIME_H
+#   include <time.h> 
+#endif
 #undef TS_DEBUG
 
 /* TODO:
@@ -82,7 +84,6 @@
  *  - ...
  */
 
-#define vlc_meta_Add(a,b,c) fprintf(stderr, "FIXME: TS demuxer meta is broken\n" )
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -331,6 +332,8 @@ struct demux_sys_t
 
     vlc_bool_t  b_dvb_control;
     int         i_dvb_program;
+    int64_t     i_dvb_start;
+    int64_t     i_dvb_length;
     vlc_list_t  *p_programs_list;
 
     /* TS dump */
@@ -590,6 +593,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_meta = VLC_TRUE;
     p_sys->b_dvb_control = VLC_TRUE;
     p_sys->i_dvb_program = 0;
+    p_sys->i_dvb_start = 0;;
+    p_sys->i_dvb_length = 0;
+
     for( i = 0; i < 8192; i++ )
     {
         ts_pid_t *pid = &p_sys->pid[i];
@@ -626,10 +632,11 @@ static int Open( vlc_object_t *p_this )
                                 p_demux );
         if( p_sys->b_dvb_control )
         {
-            stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                            ACCESS_SET_PRIVATE_ID_STATE, 0x11, VLC_TRUE );
-            stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                            ACCESS_SET_PRIVATE_ID_STATE, 0x12, VLC_TRUE );
+            if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                ACCESS_SET_PRIVATE_ID_STATE, 0x11, VLC_TRUE ) ||
+                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                ACCESS_SET_PRIVATE_ID_STATE, 0x12, VLC_TRUE ) )
+                p_sys->b_dvb_control = VLC_FALSE;
         }
     }
 #endif
@@ -1162,6 +1169,32 @@ static int Demux( demux_t *p_demux )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
+static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_length )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    if( pi_length )
+        *pi_length = 0;
+    if( pi_time )
+        *pi_time = 0;
+
+#ifdef HAVE_TIME_H
+    if( p_sys->b_dvb_control && p_sys->i_dvb_length > 0 )
+    {
+        /* FIXME we should not use time() but read the date from the tdt */
+        const time_t t = time( NULL );
+        if( p_sys->i_dvb_start <= t && t < p_sys->i_dvb_start + p_sys->i_dvb_length )
+        {
+            if( pi_length )
+                *pi_length = p_sys->i_dvb_length * I64C(1000000);
+            if( pi_time )
+                *pi_time   = (t - p_sys->i_dvb_start) * I64C(1000000);
+            return VLC_SUCCESS;
+        }
+    }
+#endif
+    return VLC_EGENERIC;
+}
+
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -1184,7 +1217,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else
             {
-                *pf = 0.0;
+                int64_t i_time, i_length;
+                if( !DVBEventInformation( p_demux, &i_time, &i_length ) && i_length > 0 )
+                    *pf = (double)i_time/(double)i_length;
+                else
+                    *pf = 0.0;
             }
             return VLC_SUCCESS;
         case DEMUX_SET_POSITION:
@@ -1221,9 +1258,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 #else
         case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( DVBEventInformation( p_demux, pi64, NULL ) )
+                *pi64 = 0;
+            return VLC_SUCCESS;
+
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = 0;
+            if( DVBEventInformation( p_demux, NULL, pi64 ) )
+                *pi64 = 0;
             return VLC_SUCCESS;
 #endif
         case DEMUX_SET_GROUP:
@@ -2768,7 +2811,20 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
         free( psz_extra );
     }
     if( p_epg->i_event > 0 )
+    {
+        if( p_eit->i_service_id == p_sys->i_dvb_program )
+        {
+            p_sys->i_dvb_length = 0;
+            p_sys->i_dvb_start = 0;
+
+            if( p_epg->p_current )
+            {
+                p_sys->i_dvb_start = p_epg->p_current->i_start;
+                p_sys->i_dvb_length = p_epg->p_current->i_duration;
+            }
+        }
         es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG, p_eit->i_service_id, p_epg );
+    }
     vlc_epg_Delete( p_epg );
 
     dvbpsi_DeleteEIT( p_eit );
