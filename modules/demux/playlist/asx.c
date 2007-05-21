@@ -45,6 +45,7 @@ struct demux_sys_t
     char    *psz_data;
     int64_t i_data_len;
     vlc_bool_t b_utf8;
+    vlc_bool_t b_skip_ads;
 };
 
 /*****************************************************************************
@@ -207,6 +208,7 @@ int E_(Import_ASX)( vlc_object_t *p_this )
     p_demux->p_sys->psz_data = NULL;
     p_demux->p_sys->i_data_len = -1;
     p_demux->p_sys->b_utf8 = VLC_FALSE;
+    p_demux->p_sys->b_skip_ads = config_GetInt( p_demux, "playlist-skip-ads" );
 
     return VLC_SUCCESS;
 }
@@ -278,6 +280,7 @@ static int Demux( demux_t *p_demux )
         char *psz_moreinfo_entry = NULL;
         char *psz_abstract_entry = NULL;
         int i_entry_count = 0;
+        vlc_bool_t b_skip_entry = VLC_FALSE;
 
         char *psz_href = NULL;
         int i_starttime = 0;
@@ -495,41 +498,50 @@ static int Demux( demux_t *p_demux )
                     continue;
                 }
 
-                if( i_starttime || i_duration )
+                if( p_sys->b_skip_ads && b_skip_entry )
                 {
-                    if( i_starttime ) {
-                        asprintf(ppsz_options+i_options, ":start-time=%d", i_starttime);
-                        ++i_options;
+                    msg_Dbg( p_demux, "skipped entry %d %s (%s)",
+                    i_entry_count, ( psz_title_entry ? psz_title_entry : p_current->p_input->psz_name ), psz_href );
+                }
+                else
+                {
+                    if( i_starttime || i_duration )
+                    {
+                        if( i_starttime ) {
+                            asprintf(ppsz_options+i_options, ":start-time=%d", i_starttime);
+                            ++i_options;
+                        }
+                        if( i_duration ) {
+                            asprintf(ppsz_options+i_options, ":stop-time=%d", i_starttime + i_duration);
+                            ++i_options;
+                        }
                     }
-                    if( i_duration ) {
-                        asprintf(ppsz_options+i_options, ":stop-time=%d", i_starttime + i_duration);
-                        ++i_options;
+
+                    /* create the new entry */
+                    asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : p_current->p_input->psz_name ) );
+
+                    p_entry = input_ItemNewExt( p_playlist, psz_href, psz_name, i_options, (const char * const *)ppsz_options, -1 );
+                    FREENULL( psz_name );
+                    input_ItemCopyOptions( p_current->p_input, p_entry );
+                    while( i_options )
+                    {
+                        psz_name = ppsz_options[--i_options];
+                        FREENULL(psz_name);
                     }
+
+                    p_entry->p_meta = vlc_meta_New();
+                    if( psz_title_entry ) vlc_meta_SetTitle( p_entry->p_meta, psz_title_entry );
+                    if( psz_artist_entry ) vlc_meta_SetArtist( p_entry->p_meta, psz_artist_entry );
+                    if( psz_copyright_entry ) vlc_meta_SetCopyright( p_entry->p_meta, psz_copyright_entry );
+                    if( psz_moreinfo_entry ) vlc_meta_SetURL( p_entry->p_meta, psz_moreinfo_entry );
+                    if( psz_abstract_entry ) vlc_meta_SetDescription( p_entry->p_meta, psz_abstract_entry );
+                    playlist_BothAddInput( p_playlist, p_entry,
+                                         p_item_in_category,
+                                         PLAYLIST_APPEND | PLAYLIST_SPREPARSE
+                                         , PLAYLIST_END, NULL, NULL,
+                                         VLC_FALSE );
                 }
 
-                /* create the new entry */
-                asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : p_current->p_input->psz_name ) );
-
-                p_entry = input_ItemNewExt( p_playlist, psz_href, psz_name, i_options, (const char * const *)ppsz_options, -1 );
-                FREENULL( psz_name );
-                input_ItemCopyOptions( p_current->p_input, p_entry );
-                while( i_options )
-                {
-                    psz_name = ppsz_options[--i_options];
-                    FREENULL(psz_name);
-                }
-
-                p_entry->p_meta = vlc_meta_New();
-                if( psz_title_entry ) vlc_meta_SetTitle( p_entry->p_meta, psz_title_entry );
-                if( psz_artist_entry ) vlc_meta_SetArtist( p_entry->p_meta, psz_artist_entry );
-                if( psz_copyright_entry ) vlc_meta_SetCopyright( p_entry->p_meta, psz_copyright_entry );
-                if( psz_moreinfo_entry ) vlc_meta_SetURL( p_entry->p_meta, psz_moreinfo_entry );
-                if( psz_abstract_entry ) vlc_meta_SetDescription( p_entry->p_meta, psz_abstract_entry );
-                playlist_BothAddInput( p_playlist, p_entry,
-                                     p_item_in_category,
-                                     PLAYLIST_APPEND | PLAYLIST_SPREPARSE
-                                     , PLAYLIST_END, NULL, NULL,
-                                     VLC_FALSE );
                 /* cleanup entry */
                 FREENULL( psz_href )
                 FREENULL( psz_title_entry )
@@ -542,6 +554,7 @@ static int Demux( demux_t *p_demux )
             }
             else if( !strncasecmp( psz_parse, "<Entry", 6 ) )
             {
+                char *psz_clientskip;
                 psz_parse+=6;
                 if( b_entry )
                 {
@@ -550,7 +563,12 @@ static int Demux( demux_t *p_demux )
                 }
                 i_entry_count += 1;
                 b_entry = VLC_TRUE;
+                psz_clientskip = strcasestr( psz_parse, "clientskip=\"no\"" );
                 psz_parse = strcasestr( psz_parse, ">" );
+
+                /* If clientskip was enabled ... this is an ad */
+                if( psz_clientskip < psz_parse ) b_skip_entry = VLC_TRUE;
+                else b_skip_entry = VLC_FALSE;
 
                 // init entry details
                 FREENULL(psz_href);

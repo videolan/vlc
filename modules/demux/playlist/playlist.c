@@ -41,6 +41,10 @@
 #define SHOW_ADULT_LONGTEXT N_( "Show NC17 rated video streams when " \
                 "using shoutcast video playlists." )
 
+#define SKIP_ADS_TEXT N_( "Skip ads" )
+#define SKIP_ADS_LONGTEXT N_( "Use playlist options usually used to prevent " \
+    "ads skipping to detect ads and prevent adding them to the playlist." )
+
 vlc_module_begin();
     add_shortcut( "playlist" );
     set_category( CAT_INPUT );
@@ -51,6 +55,9 @@ vlc_module_begin();
 
     add_integer( "parent-item", 0, NULL, NULL, NULL, VLC_TRUE );
         change_internal();
+
+    add_bool( "playlist-skip-ads", 1, NULL,
+              SKIP_ADS_TEXT, SKIP_ADS_LONGTEXT, VLC_FALSE );
 
     set_shortname( _("Playlist") );
     set_description( _("Playlist") );
@@ -116,13 +123,6 @@ vlc_module_begin();
         set_description( _("Dummy ifo demux") );
         set_capability( "demux2", 12 );
         set_callbacks( E_(Import_IFO), E_(Close_IFO) );
-#if 0
-    add_submodule();
-        set_description( _("Video portal url converter") );
-        add_shortcut( "videoportal" );
-        set_capability( "demux2", 10 );
-        set_callbacks( E_(Import_VideoPortal), E_(Close_VideoPortal) );
-#endif
 vlc_module_end();
 
 
