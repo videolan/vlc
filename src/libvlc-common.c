@@ -94,7 +94,7 @@
  * The evil global variable. We handle it with care, don't worry.
  *****************************************************************************/
 static libvlc_global_data_t   libvlc_global;
-static libvlc_global_data_t * p_libvlc_global = NULL;
+#define p_libvlc_global (&libvlc_global)
 static libvlc_int_t *    p_static_vlc = NULL;
 static volatile unsigned int i_instances = 0;
 
@@ -153,9 +153,11 @@ libvlc_int_t * libvlc_InternalCreate( void )
     vlc_value_t lockval;
     char *psz_env = NULL;
 
+#if 0
     /* &libvlc_global never changes,
      * so we can safely call this multiple times. */
     p_libvlc_global = &libvlc_global;
+#endif
 
     /* vlc_threads_init *must* be the first internal call! No other call is
      * allowed before the thread system has been initialized. */
@@ -1196,7 +1198,7 @@ static inline int LoadMessages (void)
 #else
     char psz_path[1024];
     if (snprintf (psz_path, sizeof (psz_path), "%s/%s",
-                  vlc_global( &libvlc_global )->psz_vlcpath, "locale")
+                  libvlc_global.psz_vlcpath, "locale")
                      >= (int)sizeof (psz_path))
         return -1;
 
