@@ -63,6 +63,7 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
     char *psz_dup;
     char *psz_parse;
     char *p;
+    char *p2;
 
     url->psz_protocol = NULL;
     url->psz_username = NULL;
@@ -108,7 +109,8 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
         psz_parse = p;
     }
     p = strchr( psz_parse, '@' );
-    if( p != NULL )
+    p2 = strchr( psz_parse, '/' );
+    if( p != NULL && ( p2 != NULL ? p < p2 : 1 ) )
     {
         /* We have a login */
         url->psz_username = psz_parse;
