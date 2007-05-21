@@ -38,8 +38,8 @@
 #define V4L_DEVICE         0x0
 #define PVR_DEVICE         0x1
 #define DVB_DEVICE         0x2
-#define BDA_DEVICE         0x3
-#define DSHOW_DEVICE       0x4
+#define BDA_DEVICE         0x4
+#define DSHOW_DEVICE       0x8
 
 class QLineEdit;
 
@@ -135,12 +135,15 @@ public:
 private:
     Ui::OpenCapture ui;
     QRadioButton *dvbs, *dvbt, *dvbc;
+    QRadioButton *bdas, *bdat, *bdac;
     QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr ;
     QLineEdit *v4lVideoDevice, *v4lAudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
     QComboBox *v4lNormBox, *pvrNormBox;
     QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
+    QSpinBox *bdaCard, *bdaFreq, *bdaSrate;
 
+    QLabel *bdaSrateLabel;
 
 public slots:
     virtual void updateMRL();

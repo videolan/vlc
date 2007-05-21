@@ -467,13 +467,13 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 #define addModuleAndLayouts( number, name, label )                    \
     QWidget * name ## DevPage = new QWidget( this );                  \
     QWidget * name ## PropPage = new QWidget( this );                 \
-    stackedDevLayout->insertWidget( number, name ## DevPage );        \
-    stackedPropLayout->insertWidget( number, name ## PropPage );      \
+    stackedDevLayout->addWidget( name ## DevPage );        \
+    stackedPropLayout->addWidget( name ## PropPage );      \
     QGridLayout * name ## DevLayout = new QGridLayout;                \
     QGridLayout * name ## PropLayout = new QGridLayout;               \
     name ## DevPage->setLayout( name ## DevLayout );                  \
     name ## PropPage->setLayout( name ## PropLayout );                \
-    ui.deviceCombo->insertItem( number, qtr( label ) );
+    ui.deviceCombo->addItem( qtr( label ), QVariant( number ) );
 
 #define CuMRL( widget, slot ) CONNECT( widget , slot , this, updateMRL() );
 
@@ -575,7 +575,54 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /**************
      * BDA Stuffs *
      **************/
-    addModuleAndLayouts( BDA_DEVICE, bda, "DVB / BDA" );
+    addModuleAndLayouts( BDA_DEVICE, bda, "DVB DirectShow" );
+
+    /* bda Main */
+    QLabel *bdaDeviceLabel = new QLabel( qtr( "Adapter card to tune" ) );
+    QLabel *bdaTypeLabel = new QLabel( qtr( "DVB Type:" ) );
+
+    bdaCard = new QSpinBox;
+    bdaCard->setAlignment( Qt::AlignRight );
+
+    bdaDevLayout->addWidget( bdaDeviceLabel, 0, 0 );
+    bdaDevLayout->addWidget( bdaCard, 0, 2, 1, 2 );
+
+    bdas = new QRadioButton( "DVB-S" );
+    bdas->setChecked( true );
+    bdac = new QRadioButton( "DVB-C" );
+    bdat = new QRadioButton( "DVB-T" );
+
+    bdaDevLayout->addWidget( bdaTypeLabel, 1, 0 );
+    bdaDevLayout->addWidget( bdas, 1, 1 );
+    bdaDevLayout->addWidget( bdac, 1, 2 );
+    bdaDevLayout->addWidget( bdat, 1, 3 );
+
+    /* bda Props */
+    QLabel *bdaFreqLabel =
+                    new QLabel( qtr( "Transponder/multiplex frequency" ) );
+    bdaFreq = new QSpinBox;
+    bdaFreq->setAlignment( Qt::AlignRight );
+    bdaFreq->setSuffix(" kHz");
+    bdaPropLayout->addWidget( bdaFreqLabel, 0, 0 );
+    bdaPropLayout->addWidget( bdaFreq, 0, 1 );
+
+    bdaSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
+    bdaSrate = new QSpinBox;
+    bdaSrate->setAlignment( Qt::AlignRight );
+    bdaSrate->setSuffix(" kHz");
+    bdaPropLayout->addWidget( bdaSrateLabel, 1, 0 );
+    bdaPropLayout->addWidget( bdaSrate, 1, 1 );
+
+    /* bda CONNECTs */
+    CuMRL( bdaCard, valueChanged ( int ) );
+    CuMRL( bdaFreq, valueChanged ( int ) );
+    CuMRL( bdaSrate, valueChanged ( int ) );
+    BUTTONACT( bdas, updateButtons() );
+    BUTTONACT( bdat, updateButtons() );
+    BUTTONACT( bdac, updateButtons() );
+    BUTTONACT( bdas, updateMRL() );
+    BUTTONACT( bdat, updateMRL() );
+    BUTTONACT( bdac, updateMRL() );
 
     /**************
      * DVB Stuffs *
@@ -584,7 +631,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* DVB Main */
     QLabel *dvbDeviceLabel = new QLabel( qtr( "Adapter card to tune" ) );
-    QLabel *dvbTyepLabel = new QLabel( qtr( "DVB Type:" ) );
+    QLabel *dvbTypeLabel = new QLabel( qtr( "DVB Type:" ) );
 
     dvbCard = new QSpinBox;
     dvbCard->setAlignment( Qt::AlignRight );
@@ -598,7 +645,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dvbc = new QRadioButton( "DVB-C" );
     dvbt = new QRadioButton( "DVB-T" );
 
-    dvbDevLayout->addWidget( dvbTyepLabel, 1, 0 );
+    dvbDevLayout->addWidget( dvbTypeLabel, 1, 0 );
     dvbDevLayout->addWidget( dvbs, 1, 1 );
     dvbDevLayout->addWidget( dvbc, 1, 2 );
     dvbDevLayout->addWidget( dvbt, 1, 3 );
@@ -646,7 +693,9 @@ void CaptureOpenPanel::clear()
 void CaptureOpenPanel::updateMRL()
 {
     QString mrl = "";
-    int i_devicetype = ui.deviceCombo->currentIndex();
+    int i_devicetype = ui.deviceCombo->itemData(
+            ui.deviceCombo->currentIndex() ).toInt();
+    msg_Dbg( p_intf, "Capture Type: %i", i_devicetype );
     switch( i_devicetype )
     {
     case V4L_DEVICE:
@@ -673,8 +722,15 @@ void CaptureOpenPanel::updateMRL()
         mrl += " :dvb-srate=" + QString("%1").arg( dvbSrate->value() );
         break;
     case BDA_DEVICE:
+        if( bdas->isChecked() ) mrl = "dvb-s://";
+        else if(  bdat->isChecked() ) mrl = "dvb-t://";
+        else if(  bdac->isChecked() ) mrl = "dvb-c://";
+        else return;
+        mrl += " :dvb-adapter=" + QString("%1").arg( bdaCard->value() );
+        mrl += " :dvb-frequency=" + QString("%1").arg( bdaFreq->value() );
+        mrl += " :dvb-srate=" + QString("%1").arg( bdaSrate->value() );
         break;
-    case DSHOW_DEVICE:
+  case DSHOW_DEVICE:
         break;
     }
 
@@ -683,6 +739,28 @@ void CaptureOpenPanel::updateMRL()
 
 void CaptureOpenPanel::updateButtons()
 {
-    if( dvbs->isChecked() ) dvbFreq->setSuffix(" kHz");
-    if( dvbc->isChecked() || dvbt->isChecked() ) dvbFreq->setSuffix(" Hz");
+    int i_devicetype = ui.deviceCombo->itemData(
+            ui.deviceCombo->currentIndex() ).toInt();
+    msg_Dbg( p_intf, "Capture Type: %i", i_devicetype );
+    switch( i_devicetype )
+    {
+    case DVB_DEVICE:
+        if( dvbs->isChecked() ) dvbFreq->setSuffix(" kHz");
+        if( dvbc->isChecked() || dvbt->isChecked() ) dvbFreq->setSuffix(" Hz");
+        break;
+    case BDA_DEVICE:
+        if( bdas->isChecked() ) bdaFreq->setSuffix(" kHz");
+        if( bdac->isChecked() || bdat->isChecked() ) bdaFreq->setSuffix(" Hz");
+        if( bdas->isChecked() || bdac->isChecked() )
+        {
+            bdaSrate->hide();
+            bdaSrateLabel->hide();
+        }
+        else
+        {
+            bdaSrate->show();
+            bdaSrateLabel->show();
+        }
+        break;
+    }
 }
