@@ -483,20 +483,6 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
         if( _b_autoloop )
             ppsz_argv[ppsz_argc++] = "--loop";
 
-        if( IsDebuggerPresent() )
-        {
-            /*
-            ** VLC default threading mechanism is designed to be as compatible
-            ** with POSIX as possible. However when debugged on win32, threads
-            ** lose signals and eventually VLC get stuck during initialization.
-            ** threading support can be configured to be more debugging friendly
-            ** but it will be less compatible with POSIX.
-            ** This is done by initializing with the following options:
-            */
-            ppsz_argv[ppsz_argc++] = "--fast-mutex";
-            ppsz_argv[ppsz_argc++] = "--win9x-cv-method=1";
-        }
-
         _p_libvlc = libvlc_new(ppsz_argc, ppsz_argv, NULL);
         if( NULL == _p_libvlc )
         {

@@ -74,8 +74,17 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( ST_INIT_IN_ST_H )
 #elif defined( UNDER_CE )
 #elif defined( WIN32 )
-    b_fast_mutex = config_GetInt( p_this, "fast-mutex" );
-    i_win9x_cv = config_GetInt( p_this, "win9x-cv-method" );
+    if( IsDebuggerPresent() )
+    {
+        /* SignalObjectAndWait() API is problematic under a debugger */
+        b_fast_mutex = VLC_TRUE;
+        i_win9x_cv = 0;
+    }
+    else
+    {
+        b_fast_mutex = VLC_FALSE;
+        i_win9x_cv = 1;
+    }
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     pthread_mutex_lock( &once_mutex );
@@ -508,7 +517,7 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
  *****************************************************************************/
 int __vlc_threadvar_create( vlc_object_t *p_this, vlc_threadvar_t *p_tls )
 {
-    int i_ret;
+    int i_ret = -1;
     (void)p_this;
 #if defined( PTH_INIT_IN_PTH_H )
     i_ret = pth_key_create( &p_tls->handle, NULL );
