@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>448</width>
-    <height>300</height>
+    <width>450</width>
+    <height>350</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -25,6 +25,14 @@
    </property>
    <item>
     <widget class="QTabWidget" name="Tab" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>1</hsizetype>
+       <vsizetype>1</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="currentIndex" >
       <number>-1</number>
      </property>
@@ -60,14 +68,14 @@
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item row="0" column="4" >
+      <item row="0" column="2" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
          <string>Start Time</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="5" colspan="2" >
+      <item row="0" column="3" colspan="2" >
        <widget class="QSpinBox" name="startTimeSpinBox" >
         <property name="sizePolicy" >
          <sizepolicy>
@@ -103,17 +111,17 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="1" colspan="7" >
+      <item row="5" column="1" colspan="4" >
        <widget class="QLineEdit" name="advancedLineInput" />
       </item>
-      <item row="2" column="0" colspan="8" >
+      <item row="2" column="0" colspan="5" >
        <widget class="QCheckBox" name="slaveCheckbox" >
         <property name="text" >
          <string>Play another media synchronously (extra audio file, ...)</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1" colspan="5" >
+      <item row="4" column="1" colspan="4" >
        <widget class="Line" name="line" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
@@ -128,33 +136,23 @@
        </widget>
       </item>
       <item row="3" column="0" >
-       <widget class="QLabel" name="label_2" >
-        <property name="enabled" >
-         <bool>false</bool>
-        </property>
+       <widget class="QLabel" name="slaveLabel" >
         <property name="text" >
          <string>Extra media</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1" colspan="5" >
-       <widget class="QLineEdit" name="slaveText" >
-        <property name="enabled" >
-         <bool>false</bool>
-        </property>
-       </widget>
+      <item row="3" column="1" colspan="3" >
+       <widget class="QLineEdit" name="slaveText" />
       </item>
-      <item row="3" column="6" colspan="2" >
+      <item row="3" column="4" >
        <widget class="QToolButton" name="slaveBrowseButton" >
-        <property name="enabled" >
-         <bool>false</bool>
-        </property>
         <property name="text" >
          <string>Browse...</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="5" >
+      <item row="1" column="1" colspan="4" >
        <widget class="Line" name="line" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
@@ -184,6 +182,19 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>1</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" >
@@ -239,8 +250,8 @@
   <connection>
    <sender>slaveCheckbox</sender>
    <signal>clicked(bool)</signal>
-   <receiver>label_2</receiver>
-   <slot>setEnabled(bool)</slot>
+   <receiver>slaveLabel</receiver>
+   <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
      <x>54</x>
@@ -256,7 +267,7 @@
    <sender>slaveCheckbox</sender>
    <signal>clicked(bool)</signal>
    <receiver>slaveText</receiver>
-   <slot>setEnabled(bool)</slot>
+   <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
      <x>127</x>
@@ -272,7 +283,7 @@
    <sender>slaveCheckbox</sender>
    <signal>clicked(bool)</signal>
    <receiver>slaveBrowseButton</receiver>
-   <slot>setEnabled(bool)</slot>
+   <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
      <x>219</x>
