@@ -566,7 +566,7 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
             p_dst_pic->p->i_pitch *
             ( i_y_offset + p_filter->fmt_out.video.i_y_offset );
 
-    i_src1_pitch = p_dst_orig->p[Y_PLANE].i_pitch;
+    i_src1_pitch = p_dst_orig->p->i_pitch;
     p_src1 = p_dst_orig->p->p_pixels + i_x_offset * i_pix_pitch +
                p_filter->fmt_out.video.i_x_offset * i_pix_pitch +
                p_dst_orig->p->i_pitch *
@@ -590,47 +590,195 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
 #define MAX_TRANS 255
 #define TRANS_BITS  8
 
-    /* Draw until we reach the bottom of the subtitle */
-    for( i_y = 0; i_y < i_height; i_y++, p_trans += i_src2_pitch,
-         p_dst += i_dst_pitch, p_src1 += i_src1_pitch,
-         p_src2_y += i_src2_pitch, p_src2_u += i_src2_pitch,
-         p_src2_v += i_src2_pitch )
+    if( (i_pix_pitch == 4)
+     && (((((int)p_dst)|((int)p_src1)|i_dst_pitch|i_src1_pitch) & 3) == 0) )
     {
-        /* Draw until we reach the end of the line */
-        for( i_x = 0; i_x < i_width; i_x++ )
+        /*
+        ** if picture pixels are 32 bits long and lines addresses are 32 bit aligned,
+        ** optimize rendering
+        */
+        uint32_t *p32_dst = (uint32_t *)p_dst;
+        uint32_t i32_dst_pitch = (uint32_t)(i_dst_pitch>>2);
+        uint32_t *p32_src1 = (uint32_t *)p_src1;
+        uint32_t i32_src1_pitch = (uint32_t)(i_src1_pitch>>2);
+
+        int i_rshift, i_gshift, i_bshift;
+        uint32_t i_rmask, i_gmask, i_bmask;
+
+        if( p_dst_pic->p_heap )
         {
-            if( p_trans )
-                i_trans = ( p_trans[i_x] * i_alpha ) / 255;
-            if( !i_trans )
+            i_rmask = p_dst_pic->p_heap->i_rmask;
+            i_gmask = p_dst_pic->p_heap->i_gmask;
+            i_bmask = p_dst_pic->p_heap->i_bmask;
+            i_rshift = p_dst_pic->p_heap->i_lrshift;
+            i_gshift = p_dst_pic->p_heap->i_lgshift;
+            i_bshift = p_dst_pic->p_heap->i_lbshift;
+        }
+        else
+        {
+            i_rmask = p_dst_pic->format.i_rmask;
+            i_gmask = p_dst_pic->format.i_gmask;
+            i_bmask = p_dst_pic->format.i_bmask;
+
+            if( (i_rmask == 0x00FF0000)
+             && (i_gmask == 0x0000FF00)
+             && (i_bmask == 0x000000FF) )
             {
-                /* Completely transparent. Don't change pixel */
-                continue;
+                /* X8R8G8B8 pixel layout */
+                i_rshift = 16;
+                i_bshift = 8;
+                i_gshift = 0;
             }
-            else if( i_trans == MAX_TRANS )
+            else if( (i_rmask == 0xFF000000)
+                  && (i_gmask == 0x00FF0000)
+                  && (i_bmask == 0x0000FF00) )
             {
-                /* Completely opaque. Completely overwrite underlying pixel */
-                yuv_to_rgb( &r, &g, &b,
-                            p_src2_y[i_x], p_src2_u[i_x], p_src2_v[i_x] );
-
-                p_dst[i_x * i_pix_pitch]     = r;
-                p_dst[i_x * i_pix_pitch + 1] = g;
-                p_dst[i_x * i_pix_pitch + 2] = b;
-                continue;
+                /* R8G8B8X8 pixel layout */
+                i_rshift = 24;
+                i_bshift = 16;
+                i_gshift = 8;
             }
+            else
+            {
+                goto slower;
+            }
+        }
+        /* Draw until we reach the bottom of the subtitle */
+        for( i_y = 0; i_y < i_height; i_y++, p_trans += i_src2_pitch,
+             p32_dst += i32_dst_pitch, p32_src1 += i32_src1_pitch,
+             p_src2_y += i_src2_pitch, p_src2_u += i_src2_pitch,
+             p_src2_v += i_src2_pitch )
+        {
+            /* Draw until we reach the end of the line */
+            for( i_x = 0; i_x < i_width; i_x++ )
+            {
+                if( p_trans )
+                    i_trans = ( p_trans[i_x] * i_alpha ) / 255;
+                if( !i_trans )
+                {
+                    /* Completely transparent. Don't change pixel */
+                    continue;
+                }
+                else if( i_trans == MAX_TRANS )
+                {
+                    /* Completely opaque. Completely overwrite underlying pixel */
+                    yuv_to_rgb( &r, &g, &b,
+                                p_src2_y[i_x], p_src2_u[i_x], p_src2_v[i_x] );
 
-            /* Blending */
-            yuv_to_rgb( &r, &g, &b,
-                        p_src2_y[i_x], p_src2_u[i_x], p_src2_v[i_x] );
+                    p32_dst[i_x] = (r<<i_rshift)
+                                 + (g<<i_gshift)
+                                 + (b<<i_bshift);
+                }
+                else
+                {
+                    /* Blending */
+                    uint32_t i_pix_src1 = p32_src1[i_x];
+                    yuv_to_rgb( &r, &g, &b,
+                                p_src2_y[i_x], p_src2_u[i_x], p_src2_v[i_x] );
 
-            p_dst[i_x * i_pix_pitch]     = ( r * i_trans +
-                (uint16_t)p_src1[i_x * i_pix_pitch] *
-                (MAX_TRANS - i_trans) ) >> TRANS_BITS;
-            p_dst[i_x * i_pix_pitch + 1] = ( g * i_trans +
-                (uint16_t)p_src1[i_x * i_pix_pitch + 1] *
-                (MAX_TRANS - i_trans) ) >> TRANS_BITS;
-            p_dst[i_x * i_pix_pitch + 2] = ( b * i_trans +
-                (uint16_t)p_src1[i_x * i_pix_pitch + 2] *
-                (MAX_TRANS - i_trans) ) >> TRANS_BITS;
+                    p32_dst[i_x] = ( ( r * i_trans +
+                                     (uint16_t)((i_pix_src1 & i_rmask)>>i_rshift) *
+                                     (MAX_TRANS - i_trans) ) >> TRANS_BITS) << i_rshift
+                                 | ( ( g * i_trans +
+                                     (uint16_t)((i_pix_src1 & i_gmask)>>i_gshift) *
+                                     (MAX_TRANS - i_trans) ) >> TRANS_BITS) << i_gshift
+                                 | ( ( b * i_trans +
+                                     (uint16_t)((i_pix_src1 & i_bmask)>>i_bshift) *
+                                     (MAX_TRANS - i_trans) ) >> TRANS_BITS) << i_bshift;
+                }
+            }
+        }
+    }
+    else
+    {
+        int i_rindex, i_bindex, i_gindex;
+        uint32_t i_rmask, i_gmask, i_bmask;
+
+        slower:
+
+        i_rmask = p_dst_pic->format.i_rmask;
+        i_gmask = p_dst_pic->format.i_gmask;
+        i_bmask = p_dst_pic->format.i_bmask;
+
+        /*
+        ** quick and dirty way to get byte index from mask
+        ** will only work correctly if mask are 8 bit aligned
+        ** and are 8 bit long
+        */
+#ifdef WORDS_BIGENDIAN
+        i_rindex = ((i_rmask>>16) & 1)
+                 | ((i_rmask>>8) & 2)
+                 | ((i_rmask) & 3);
+        i_gindex = ((i_gmask>>16) & 1)
+                 | ((i_gmask>>8) & 2)
+                 | ((i_gmask) & 3);
+        i_bindex = ((i_bmask>>16) & 1)
+                 | ((i_bmask>>8) & 2)
+                 | ((i_bmask) & 3);
+#else
+        i_rindex = ((i_rmask>>24) & 3)
+                 | ((i_rmask>>16) & 2)
+                 | ((i_rmask>>8) & 1);
+        i_gindex = ((i_gmask>>24) & 3)
+                 | ((i_gmask>>16) & 2)
+                 | ((i_gmask>>8) & 1);
+        i_bindex = ((i_bmask>>24) & 3)
+                 | ((i_bmask>>16) & 2)
+                 | ((i_bmask>>8) & 1);
+#endif
+
+        /* Draw until we reach the bottom of the subtitle */
+        for( i_y = 0; i_y < i_height; i_y++, p_trans += i_src2_pitch,
+             p_dst += i_dst_pitch, p_src1 += i_src1_pitch,
+             p_src2_y += i_src2_pitch, p_src2_u += i_src2_pitch,
+             p_src2_v += i_src2_pitch )
+        {
+            /* Draw until we reach the end of the line */
+            for( i_x = 0; i_x < i_width; i_x++ )
+            {
+                if( p_trans )
+                    i_trans = ( p_trans[i_x] * i_alpha ) / 255;
+                if( !i_trans )
+                {
+                    /* Completely transparent. Don't change pixel */
+                    continue;
+                }
+                else 
+                {
+                    int i_pos = i_x * i_pix_pitch;
+                    if( i_trans == MAX_TRANS )
+                    {
+
+                        /* Completely opaque. Completely overwrite underlying pixel */
+                        yuv_to_rgb( &r, &g, &b,
+                                    p_src2_y[i_x], p_src2_u[i_x], p_src2_v[i_x] );
+
+                        p_dst[i_pos + i_rindex ] = r;
+                        p_dst[i_pos + i_gindex ] = g;
+                        p_dst[i_pos + i_bindex ] = b;
+                    }
+                    else
+                    {
+                        int i_rpos = i_pos + i_rindex;
+                        int i_gpos = i_pos + i_gindex;
+                        int i_bpos = i_pos + i_bindex;
+
+                        /* Blending */
+                        yuv_to_rgb( &r, &g, &b,
+                                    p_src2_y[i_x], p_src2_u[i_x], p_src2_v[i_x] );
+
+                        p_dst[i_rpos] = ( r * i_trans +
+                                        (uint16_t)p_src1[i_rpos] *
+                                        (MAX_TRANS - i_trans) ) >> TRANS_BITS;
+                        p_dst[i_gpos] = ( r * i_trans +
+                                        (uint16_t)p_src1[i_gpos] *
+                                        (MAX_TRANS - i_trans) ) >> TRANS_BITS;
+                        p_dst[i_bpos] = ( r * i_trans +
+                                        (uint16_t)p_src1[i_gpos] *
+                                        (MAX_TRANS - i_trans) ) >> TRANS_BITS;
+                    }
+                }
+            }
         }
     }
 
