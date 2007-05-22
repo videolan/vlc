@@ -343,12 +343,16 @@ static void openDirectory( intf_thread_t* p_intf, bool pl, bool go )
 {
     QString dir = QFileDialog::getExistingDirectory ( 0,
                                                      _("Open directory") );
-    input_item_t *p_input = input_ItemNewExt( THEPL, qtu(dir), NULL,
+
+    if (!dir.isEmpty()) {
+        input_item_t *p_input = input_ItemNewExt( THEPL, qtu(dir), NULL,
                                                0, NULL, -1 );
-    playlist_AddInput( THEPL, p_input,
+	
+        playlist_AddInput( THEPL, p_input,
                        go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
                        PLAYLIST_END, pl, VLC_FALSE );
-    input_Read( THEPL, p_input, VLC_FALSE );
+        input_Read( THEPL, p_input, VLC_FALSE );
+    }
 }
 
 void DialogsProvider::PLAppendDir()
