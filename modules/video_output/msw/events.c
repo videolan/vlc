@@ -688,6 +688,13 @@ void E_(UpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
                      rect_dest_clipped.right, rect_dest_clipped.bottom );
 #endif
 
+#else /* MODULE_NAME_IS_vout_directx */
+
+    /* AFAIK, there are no clipping constraints in Direct3D, OpenGL and GDI */
+    rect_dest_clipped = rect_dest;
+
+#endif
+
     /* the 2 following lines are to fix a bug when clicking on the desktop */
     if( (rect_dest_clipped.right - rect_dest_clipped.left)==0 ||
         (rect_dest_clipped.bottom - rect_dest_clipped.top)==0 )
@@ -695,12 +702,6 @@ void E_(UpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
         SetRectEmpty( &rect_src_clipped );
         return;
     }
-#else /* MODULE_NAME_IS_vout_directx */
-
-    /* AFAIK, there are no clipping constraints in Direct3D, OpenGL and GDI */
-    rect_dest_clipped = rect_dest;
-
-#endif
 
     /* src image dimensions */
     rect_src.left = 0;

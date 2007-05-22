@@ -334,7 +334,7 @@ static int Init( vout_thread_t *p_vout )
     E_(UpdateRects)( p_vout, VLC_TRUE );
 
     /*  create picture pool */
-    p_vout->fmt_out.i_chroma = 0;
+    p_vout->output.i_chroma = 0;
     i_ret = Direct3DVoutCreatePictures(p_vout, 1);
     if( VLC_SUCCESS != i_ret )
     {
