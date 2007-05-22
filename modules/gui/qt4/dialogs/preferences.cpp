@@ -59,9 +59,6 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     /* Choice for types */
     types = new QGroupBox( "Show settings" );
     types->setAlignment( Qt::AlignHCenter );
-    types->setToolTip( qtr("You have to apply the preferences before\n"
-                            "switching settings details if you want\n"
-                            "to keep them") );
     QHBoxLayout *types_l = new QHBoxLayout(0);
     types_l->setSpacing( 3 ); types_l->setMargin( 3 );
     small = new QRadioButton( "Basic", types ); types_l->addWidget( small );
@@ -78,12 +75,10 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     /* Buttons */
     QDialogButtonBox *buttonsBox = new QDialogButtonBox();
     QPushButton *save = new QPushButton( qtr( "&Save" ) );
-    QPushButton *apply = new QPushButton( qtr( "&Apply" ) );
     QPushButton *cancel = new QPushButton( qtr( "&Cancel" ) );
     QPushButton *reset = new QPushButton( qtr( "&Reset Preferences" ) );
 
     buttonsBox->addButton( save, QDialogButtonBox::AcceptRole );
-    buttonsBox->addButton( apply, QDialogButtonBox::AcceptRole );
     buttonsBox->addButton( cancel, QDialogButtonBox::RejectRole );
     buttonsBox->addButton( reset, QDialogButtonBox::ActionRole );
 
@@ -115,7 +110,6 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     }
 
     BUTTONACT( save, save() );
-    BUTTONACT( apply, apply() );
     BUTTONACT( cancel, cancel() );
     BUTTONACT( reset, reset() );
     BUTTONACT( small, setSmall() );
@@ -267,11 +261,16 @@ void PrefsDialog::apply()
 
     /* Delete the other panel in order to force its reload after clicking 
        on apply - UGLY but will work for now. */
-    if( simple_panel->isVisible() )
+    if( simple_panel && simple_panel->isVisible() && advanced_panel )
+    {
         delete advanced_panel;
-    if( advanced_panel->isVisible() )
+        advanced_panel = NULL;
+    }
+    if( advanced_panel && advanced_panel->isVisible() && simple_panel )
+    {
         delete simple_panel;
-
+        simple_panel = NULL;
+    }
 }
 
 void PrefsDialog::cancel()
