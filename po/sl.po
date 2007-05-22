@@ -1,10 +1,18 @@
+# Slovenian translation of VLC.
+# Copyright (C) 2005-2007 the VideoLAN team.
+# This file is distributed under the same license as the program package.
+#
+# Slovenian maintainer: Matej Urbančič <matej.urban@gmail.com>.
+#
+# Translators:
+# Matej Urbančič <matej.urban@gmail.com>, 2005 - 2007.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.9.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-20 01:55+0200\n"
-"PO-Revision-Date: 2007-05-08 08:01+0100\n"
+"POT-Creation-Date: 2007-05-22 23:37+0100\n"
+"PO-Revision-Date: 2007-05-21 08:05+0100\n"
 "Last-Translator: Matej Urbančič <matej.urban@gmail.com>\n"
 "Language-Team: Slovenian <sl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +74,7 @@ msgstr "Nastavitve hitrih tipk"
 
 #: include/vlc_config_cat.h:58 src/input/es_out.c:1778
 #: src/libvlc-module.c:1271 modules/gui/beos/InterfaceWindow.cpp:281
-#: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:588
+#: modules/gui/macosx/extended.m:70 modules/gui/macosx/intf.m:588
 #: modules/gui/macosx/output.m:170 modules/gui/macosx/playlistinfo.m:96
 #: modules/gui/macosx/wizard.m:420
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:336
@@ -120,7 +128,7 @@ msgid "Miscellaneous audio settings and modules."
 msgstr "Različne nastavitve zvoka in enot"
 
 #: include/vlc_config_cat.h:79 src/input/es_out.c:1806
-#: src/libvlc-module.c:1306 modules/gui/macosx/extended.m:79
+#: src/libvlc-module.c:1306 modules/gui/macosx/extended.m:69
 #: modules/gui/macosx/intf.m:601 modules/gui/macosx/output.m:160
 #: modules/gui/macosx/playlistinfo.m:86 modules/gui/macosx/wizard.m:421
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:290
@@ -344,7 +352,7 @@ msgstr "Dopolnilo VLC programa za predvajanje Videa na zahtevo"
 
 #: include/vlc_config_cat.h:186 src/libvlc-module.c:1683
 #: src/playlist/engine.c:109 src/playlist/engine.c:111
-#: modules/demux/playlist/playlist.c:55 modules/demux/playlist/playlist.c:56
+#: modules/demux/playlist/playlist.c:62 modules/demux/playlist/playlist.c:63
 #: modules/gui/beos/InterfaceWindow.cpp:230
 #: modules/gui/beos/InterfaceWindow.cpp:324 modules/gui/macosx/intf.m:533
 #: modules/gui/macosx/intf.m:631 modules/gui/pda/pda_interface.c:1264
@@ -644,7 +652,7 @@ msgstr ""
 "Nekatere možnosti so na voljo, vendar niso prikazane. Izberite \"Podrobni "
 "pogled\" za prikaz vseh možnosti."
 
-#: include/vlc_intf_strings.h:92 modules/gui/macosx/extended.m:93
+#: include/vlc_intf_strings.h:92 modules/gui/macosx/extended.m:83
 #: modules/gui/wxwidgets/extrapanel.cpp:147
 msgid "Image clone"
 msgstr "Podvajanje slike"
@@ -841,7 +849,7 @@ msgid "Equalizer"
 msgstr "Uravnavanje zvoka"
 
 #: src/audio_output/input.c:151 src/libvlc-module.c:214
-#: modules/gui/macosx/extended.m:81 modules/gui/wxwidgets/extrapanel.cpp:390
+#: modules/gui/macosx/extended.m:71 modules/gui/wxwidgets/extrapanel.cpp:390
 msgid "Audio filters"
 msgstr "Filtri zvoka"
 
@@ -1183,51 +1191,51 @@ msgstr "Beleženje razhroščevanja"
 msgid "Mouse Gestures"
 msgstr "Gibi miške"
 
-#: src/libvlc-common.c:281 src/libvlc-common.c:452 src/modules/modules.c:1719
-#: src/modules/modules.c:2049
+#: src/libvlc-common.c:283 src/libvlc-common.c:454 src/modules/modules.c:1715
+#: src/modules/modules.c:2046
 msgid "C"
 msgstr "C"
 
-#: src/libvlc-common.c:297
+#: src/libvlc-common.c:299
 msgid "Help options"
 msgstr "Možnosti pomoči"
 
-#: src/libvlc-common.c:1504 src/modules/configuration.c:1268
+#: src/libvlc-common.c:1506 src/modules/configuration.c:1269
 msgid "string"
 msgstr "niz"
 
-#: src/libvlc-common.c:1523 src/modules/configuration.c:1232
+#: src/libvlc-common.c:1525 src/modules/configuration.c:1233
 msgid "integer"
 msgstr "celo število"
 
-#: src/libvlc-common.c:1550 src/modules/configuration.c:1257
+#: src/libvlc-common.c:1552 src/modules/configuration.c:1258
 msgid "float"
 msgstr "plavajoče"
 
-#: src/libvlc-common.c:1563
+#: src/libvlc-common.c:1565
 msgid " (default enabled)"
 msgstr " (privzeto omogočeno)"
 
-#: src/libvlc-common.c:1564
+#: src/libvlc-common.c:1566
 msgid " (default disabled)"
 msgstr " (privzeto onemogočeno)"
 
-#: src/libvlc-common.c:1829
+#: src/libvlc-common.c:1831
 #, c-format
 msgid "VLC version %s\n"
 msgstr "VLC različica %s\n"
 
-#: src/libvlc-common.c:1830
+#: src/libvlc-common.c:1832
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
 msgstr "Kodno prevedel %s@%s.%s\n"
 
-#: src/libvlc-common.c:1832
+#: src/libvlc-common.c:1834
 #, c-format
 msgid "Compiler: %s\n"
 msgstr "Kodni prevajalnik: %s\n"
 
-#: src/libvlc-common.c:1835
+#: src/libvlc-common.c:1836
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
 msgstr "Na podlagi svn zbirke sprememb [%s]\n"
@@ -2156,7 +2164,7 @@ msgid "Default"
 msgstr "Privzeto"
 
 #: src/libvlc-module.c:431 modules/gui/macosx/equalizer.m:143
-#: modules/gui/macosx/extended.m:112 modules/gui/macosx/wizard.m:394
+#: modules/gui/macosx/extended.m:102 modules/gui/macosx/wizard.m:394
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:620
 #: modules/gui/wxwidgets/extrapanel.cpp:216
 #: modules/gui/wxwidgets/extrapanel.cpp:465
@@ -3343,14 +3351,12 @@ msgid "Select the hotkey to use to swap fullscreen state."
 msgstr "Izbor hitre tipke za izmenjavo celozaslonskega predvajanja."
 
 #: src/libvlc-module.c:1026
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Celozaslonski način"
+msgstr "Zapusti celozaslonski način"
 
 #: src/libvlc-module.c:1027
-#, fuzzy
 msgid "Select the hotkey to use to leave fullscreen state."
-msgstr "Izbor hitre tipke za izmenjavo celozaslonskega predvajanja."
+msgstr "Izbor hitre tipke za izhod iz celozaslonskega predvajanja."
 
 #: src/libvlc-module.c:1028
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:83
@@ -3985,15 +3991,16 @@ msgid "Uncrop one pixel from the right of the video"
 msgstr "Prilepi eno vrsto točk z desne strani slike"
 
 #: src/libvlc-module.c:1213
-#, fuzzy
 msgid "Toggle wallpaper mode in video output"
-msgstr "Omogoči način slike ozadja"
+msgstr "Preklop način ozadja slike pri skikovnem odvodu"
 
 #: src/libvlc-module.c:1215
 msgid ""
 "Toggle wallpaper mode in video output. Only works with the directx video "
 "output for the time being."
 msgstr ""
+"Preklop načina ozadja v odvodu slike. Trenutno deluje samo z directx "
+"slikovnim odvodom."
 
 #: src/libvlc-module.c:1219
 #, c-format
@@ -4219,11 +4226,11 @@ msgstr "počisti trenutni predpomnilnik vstavkov"
 msgid "print version information"
 msgstr "izpiši podrobnosti verzije"
 
-#: src/modules/configuration.c:1232
+#: src/modules/configuration.c:1233
 msgid "boolean"
 msgstr "boolean"
 
-#: src/modules/configuration.c:1243
+#: src/modules/configuration.c:1244
 msgid "key"
 msgstr "Ključ"
 
@@ -4915,9 +4922,8 @@ msgid "In kHz for DVB-S or Hz for DVB-C/T"
 msgstr "V kHz za DVB-S ali Hz za DVB-C/T"
 
 #: modules/access/bda/bda.c:55
-#, fuzzy
 msgid "In kHz for DVB-C/S/T"
-msgstr "V kHz za DVB-S ali Hz za DVB-C/T"
+msgstr "V kHz za DVB-C/S/T"
 
 #: modules/access/bda/bda.c:58 modules/access/dvb/access.c:87
 msgid "Inversion mode"
@@ -4949,9 +4955,8 @@ msgstr ""
 "Nastavitev omogoča pretakanja celotnega transponderja z \"budget\" kartico."
 
 #: modules/access/bda/bda.c:75
-#, fuzzy
 msgid "Network Identifier"
-msgstr "Nastavitve omrežja"
+msgstr "Določevanje omrežja"
 
 #: modules/access/bda/bda.c:78 modules/access/dvb/access.c:97
 msgid "Satellite number in the Diseqc system"
@@ -5007,7 +5012,7 @@ msgstr "Antena lnb_lof1 (kHz)"
 
 #: modules/access/bda/bda.c:99
 msgid "Low Band Local Osc Freq in kHz usually 9.75GHz"
-msgstr ""
+msgstr "Nizka stopnja oscilacijske frekvence v kHz; običajno 9.75GHz"
 
 #: modules/access/bda/bda.c:101 modules/access/dvb/access.c:119
 msgid "Antenna lnb_lof2 (kHz)"
@@ -5015,7 +5020,7 @@ msgstr "Antena lnb_lof2 (kHz)"
 
 #: modules/access/bda/bda.c:102
 msgid "High Band Local Osc Freq in kHz usually 10.6GHz"
-msgstr ""
+msgstr "Visoka stopnja oscilacijske frekvence v kHz; običajno 10.6GHz"
 
 #: modules/access/bda/bda.c:104 modules/access/dvb/access.c:122
 msgid "Antenna lnb_slof (kHz)"
@@ -5023,7 +5028,7 @@ msgstr "Antena lnb_slof (kHz)"
 
 #: modules/access/bda/bda.c:106
 msgid "Low Noise Block switch freq in kHz usually 11.7GHz"
-msgstr ""
+msgstr "Blok nizke hrupnosti preklopa frekvence v kHz; običajno 11.7GHz"
 
 #: modules/access/bda/bda.c:109 modules/access/dvb/access.c:126
 msgid "Modulation type"
@@ -5031,27 +5036,27 @@ msgstr "Tip modulacije"
 
 #: modules/access/bda/bda.c:110
 msgid "QAM constellation points [16, 32, 64, 128, 256]"
-msgstr ""
+msgstr "QAM točke [16, 32, 64, 128, 256]"
 
 #: modules/access/bda/bda.c:113
 msgid "16"
-msgstr ""
+msgstr "16"
 
 #: modules/access/bda/bda.c:113
 msgid "32"
-msgstr ""
+msgstr "32"
 
 #: modules/access/bda/bda.c:114
 msgid "64"
-msgstr ""
+msgstr "64"
 
 #: modules/access/bda/bda.c:114
 msgid "128"
-msgstr ""
+msgstr "128"
 
 #: modules/access/bda/bda.c:114
 msgid "256"
-msgstr ""
+msgstr "256"
 
 #: modules/access/bda/bda.c:117 modules/access/dvb/access.c:130
 msgid "Terrestrial high priority stream code rate (FEC)"
@@ -5059,27 +5064,27 @@ msgstr "Zemeljska visoko prednostna kodna stopnja pretoka (FEC)"
 
 #: modules/access/bda/bda.c:118
 msgid "High Priority FEC Rate [Undefined,1/2,2/3,3/4,5/6,7/8]"
-msgstr ""
+msgstr "Visoko prednostna FEC stopnja [nedoločeno,1/2,2/3,3/4,5/6,7/8]"
 
 #: modules/access/bda/bda.c:121 modules/access/bda/bda.c:128
 msgid "1/2"
-msgstr ""
+msgstr "1/2"
 
 #: modules/access/bda/bda.c:121 modules/access/bda/bda.c:128
 msgid "2/3"
-msgstr ""
+msgstr "2/3"
 
 #: modules/access/bda/bda.c:122 modules/access/bda/bda.c:129
 msgid "3/4"
-msgstr ""
+msgstr "3/4"
 
 #: modules/access/bda/bda.c:122 modules/access/bda/bda.c:129
 msgid "5/6"
-msgstr ""
+msgstr "5/6"
 
 #: modules/access/bda/bda.c:122 modules/access/bda/bda.c:129
 msgid "7/8"
-msgstr ""
+msgstr "7/8"
 
 #: modules/access/bda/bda.c:124 modules/access/dvb/access.c:133
 msgid "Terrestrial low priority stream code rate (FEC)"
@@ -5087,7 +5092,7 @@ msgstr "Zemeljska nizko prednostna kodna stopnja pretoka (FEC)"
 
 #: modules/access/bda/bda.c:125
 msgid "Low Priority FEC Rate [Undefined,1/2,2/3,3/4,5/6,7/8]"
-msgstr ""
+msgstr "Nizko prednostna FEC stopnja [nedoločeno,1/2,2/3,3/4,5/6,7/8]"
 
 #: modules/access/bda/bda.c:131 modules/access/dvb/access.c:136
 msgid "Terrestrial bandwidth"
@@ -5099,15 +5104,15 @@ msgstr "Zemeljska podatkovna širina [0=samodejno,6,7,8 v MHz]"
 
 #: modules/access/bda/bda.c:134
 msgid "6"
-msgstr ""
+msgstr "6"
 
 #: modules/access/bda/bda.c:134
 msgid "7"
-msgstr ""
+msgstr "7"
 
 #: modules/access/bda/bda.c:135
 msgid "8"
-msgstr ""
+msgstr "8"
 
 #: modules/access/bda/bda.c:137 modules/access/dvb/access.c:139
 msgid "Terrestrial guard interval"
@@ -5115,23 +5120,23 @@ msgstr "Zamik zemeljskega varovanja"
 
 #: modules/access/bda/bda.c:138
 msgid "Guard interval [Undefined,1/4,1/8,1/16,1/32]"
-msgstr ""
+msgstr "Guard razmik [nedoločeno,1/4,1/8,1/16,1/32]"
 
 #: modules/access/bda/bda.c:140
 msgid "1/4"
-msgstr ""
+msgstr "1/4"
 
 #: modules/access/bda/bda.c:140
 msgid "1/8"
-msgstr ""
+msgstr "1/8"
 
 #: modules/access/bda/bda.c:141
 msgid "1/16"
-msgstr ""
+msgstr "1/16"
 
 #: modules/access/bda/bda.c:141
 msgid "1/32"
-msgstr ""
+msgstr "1/32"
 
 #: modules/access/bda/bda.c:143 modules/access/dvb/access.c:142
 msgid "Terrestrial transmission mode"
@@ -5139,15 +5144,15 @@ msgstr "Zemeljski način prepuščanja"
 
 #: modules/access/bda/bda.c:144
 msgid "Transmission mode [Undefined,2k,8k]"
-msgstr ""
+msgstr "Način prenosa [nedoločeno,2k,8k]"
 
 #: modules/access/bda/bda.c:146
 msgid "2k"
-msgstr ""
+msgstr "2k"
 
 #: modules/access/bda/bda.c:147
 msgid "8k"
-msgstr ""
+msgstr "8k"
 
 #: modules/access/bda/bda.c:149 modules/access/dvb/access.c:145
 msgid "Terrestrial hierarchy mode"
@@ -5155,79 +5160,75 @@ msgstr "Zemeljski hierarhični način "
 
 #: modules/access/bda/bda.c:150
 msgid "Hierarchy alpha value [Undefined,1,2,4]"
-msgstr ""
+msgstr "Stopenjska alfa vrednost [nedoločeno,1,2,4]"
 
 #: modules/access/bda/bda.c:152
 msgid "1"
-msgstr ""
+msgstr "1"
 
 #: modules/access/bda/bda.c:153
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: modules/access/bda/bda.c:153
 msgid "4"
-msgstr ""
+msgstr "4"
 
 #: modules/access/bda/bda.c:156
 msgid "Satellite Azimuth"
-msgstr ""
+msgstr "Azimut satelita"
 
 #: modules/access/bda/bda.c:157
 msgid "Satellite Azimuth in tenths of degree"
-msgstr ""
+msgstr "Azimut satelita v desetinah stopinje"
 
 #: modules/access/bda/bda.c:158
 msgid "Satellite Elevation"
-msgstr ""
+msgstr "Višina satelita"
 
 #: modules/access/bda/bda.c:159
 msgid "Satellite Elevation in tenths of degree"
-msgstr ""
+msgstr "Višina satelita v desetinah stopinje"
 
 #: modules/access/bda/bda.c:160
 msgid "Satellite Longitude"
-msgstr ""
+msgstr "Geografska dolžina satelita"
 
 #: modules/access/bda/bda.c:162
 msgid "Satellite Longitude in 10ths of degree, -ve=West"
-msgstr ""
+msgstr "Geografska dolžina satelita v desetinah stopinje, -ve=Zahod"
 
 #: modules/access/bda/bda.c:163
-#, fuzzy
 msgid "Satellite Polarisation"
-msgstr "Neveljavna polarizacija"
+msgstr "Satelitska polarizacija"
 
 #: modules/access/bda/bda.c:164
 msgid "Satellite Polarisation [H/V/L/R]"
-msgstr ""
+msgstr "Polarizacija satelita [H/V/L/R]"
 
 #: modules/access/bda/bda.c:166
-#, fuzzy
 msgid "Horizontal"
-msgstr "Obrni vodoravno"
+msgstr "Vodoravno"
 
 #: modules/access/bda/bda.c:166
-#, fuzzy
 msgid "Vertical"
-msgstr "Navpična uskladitev"
+msgstr "Navpično"
 
 #: modules/access/bda/bda.c:167
 msgid "Circular Left"
-msgstr ""
+msgstr "Krožno levo"
 
 #: modules/access/bda/bda.c:167
 msgid "Circular Right"
-msgstr ""
+msgstr "Krožno desno"
 
 #: modules/access/bda/bda.c:170 modules/access/dvb/access.c:183
 msgid "DVB"
 msgstr "DVB"
 
 #: modules/access/bda/bda.c:171
-#, fuzzy
 msgid "DirectShow DVB input"
-msgstr "DirectShow dovod"
+msgstr "DirectShow DVB dovod"
 
 #: modules/access/cdda/access.c:294
 msgid "CD reading failed"
@@ -6212,22 +6213,21 @@ msgstr "Datoteke \"%s\" (%s) ni mogoče odpreti."
 
 #: modules/access_filter/bandwidth.c:31
 msgid "Bandwidth limit (bytes/s)"
-msgstr ""
+msgstr "Omejitev prenosa (bajti/s)"
 
 #: modules/access_filter/bandwidth.c:33
 msgid ""
 "The bandwidth module will drop any data in excess of that many bytes per "
 "seconds."
-msgstr ""
+msgstr "Prenos bo omejen na določeno vrednost bajtov na sekundo."
 
 #: modules/access_filter/bandwidth.c:42
-#, fuzzy
 msgid "Bandwidth"
-msgstr "Širina robu"
+msgstr "Hitrost prenosa"
 
 #: modules/access_filter/bandwidth.c:43
 msgid "Bandwidth limiter"
-msgstr ""
+msgstr "Omejevalec hitrosti prenosa"
 
 #: modules/access_filter/dump.c:39
 msgid "Force use of dump module"
@@ -6448,36 +6448,32 @@ msgid ""
 "Make VLC buffer audio data capturer from jack for the specified length in "
 "milliseconds."
 msgstr ""
+"Ustvari zajem predpomnilnika predvajalnika VLC preko jack priklopa za "
+"določeno dolžino v milisekundah."
 
 #: modules/access/jack.c:62
-#, fuzzy
 msgid "Pace"
-msgstr "Dance"
+msgstr "Ritem"
 
 #: modules/access/jack.c:64
-#, fuzzy
 msgid "Read the audio stream at VLC pace rather than Jack pace."
-msgstr "Uporabi kot cev namesto datoteke"
+msgstr "Branje zvočnega vala v VLC ritmu in ne v Jack ritmu."
 
 #: modules/access/jack.c:65
-#, fuzzy
 msgid "Auto Connection"
-msgstr "Samodejno ponovno poveži"
+msgstr "Samodejno povezovanje"
 
 #: modules/access/jack.c:67
-#, fuzzy
 msgid "Automatically connect VLC input ports to available output ports."
-msgstr "Samodejna povezava z uporabniki"
+msgstr "Samodejna povezava predvajalnika VLC s prostimi odvodnimi vrati."
 
 #: modules/access/jack.c:70
-#, fuzzy
 msgid "JACK audio input"
-msgstr "JACK odvod zvoka"
+msgstr "JACK zvočni vnos"
 
 #: modules/access/jack.c:72
-#, fuzzy
 msgid "JACK Input"
-msgstr "Datoteka"
+msgstr "JACK vnos"
 
 #: modules/access/mms/mms.c:48
 msgid ""
@@ -7130,7 +7126,7 @@ msgstr "Širina pretoka za zajem (-1 za samodejno zaznavo)."
 msgid "Height of the stream to capture (-1 for autodetect)."
 msgstr "Višina pretoka za zajem (-1 za samodejno zaznavo)."
 
-#: modules/access/v4l.c:111 modules/gui/macosx/extended.m:113
+#: modules/access/v4l.c:111 modules/gui/macosx/extended.m:103
 #: modules/gui/wxwidgets/extrapanel.cpp:234
 msgid "Brightness"
 msgstr "Svetlost"
@@ -7139,7 +7135,7 @@ msgstr "Svetlost"
 msgid "Brightness of the video input."
 msgstr "Svetlost posnetka."
 
-#: modules/access/v4l.c:114 modules/gui/macosx/extended.m:116
+#: modules/access/v4l.c:114 modules/gui/macosx/extended.m:106
 #: modules/gui/wxwidgets/extrapanel.cpp:224
 msgid "Hue"
 msgstr "Odtenek"
@@ -7158,7 +7154,7 @@ msgstr "Barva"
 msgid "Color of the video input."
 msgstr "Barva posnetka."
 
-#: modules/access/v4l.c:120 modules/gui/macosx/extended.m:114
+#: modules/access/v4l.c:120 modules/gui/macosx/extended.m:104
 #: modules/gui/wxwidgets/extrapanel.cpp:229
 msgid "Contrast"
 msgstr "Kontrast"
@@ -11077,7 +11073,7 @@ msgstr "MPEG-4 razvijalec zvoka"
 msgid ""
 "This is the desired frame rate when playing MPEG4 video elementary streams."
 msgstr ""
-"Zaželena stopnja okvirjev ob predvajanju MPEG4 osnovnik slikovnih pretokov."
+"Zaželena stopnja okvirjev ob predvajanju MPEG4 osnovnih slikovnih pretokov."
 
 #: modules/demux/mpeg/m4v.c:46
 msgid "MPEG-4 video demuxer"
@@ -11112,13 +11108,12 @@ msgid "Google Video"
 msgstr "Google Video"
 
 #: modules/demux/playlist/luaplaylist.c:61
-#, fuzzy
 msgid "Lua Playlist"
-msgstr "Seznam predvajanja"
+msgstr "Lua seznam predvajanja"
 
 #: modules/demux/playlist/luaplaylist.c:62
 msgid "Lua Playlist Parser Interface"
-msgstr ""
+msgstr "Razčlenjevalec Lua vmesnika seznama predvajanja"
 
 #: modules/demux/playlist/playlist.c:36
 msgid "Auto start"
@@ -11138,57 +11133,64 @@ msgstr ""
 "Pokaži NC17 oceno pretakanja slike pri uporabi shoutcast seznama predvajanja "
 "slike."
 
-#: modules/demux/playlist/playlist.c:58
+#: modules/demux/playlist/playlist.c:44
+#, fuzzy
+msgid "Skip ads"
+msgstr "Preskoči sličice"
+
+#: modules/demux/playlist/playlist.c:45
+msgid ""
+"Use playlist options usually used to prevent ads skipping to detect ads and "
+"prevent adding them to the playlist."
+msgstr ""
+
+#: modules/demux/playlist/playlist.c:65
 msgid "M3U playlist import"
 msgstr "Uvoz M3U seznama"
 
-#: modules/demux/playlist/playlist.c:63
+#: modules/demux/playlist/playlist.c:70
 msgid "PLS playlist import"
 msgstr "Uvoz PLS seznama"
 
-#: modules/demux/playlist/playlist.c:68
+#: modules/demux/playlist/playlist.c:75
 msgid "B4S playlist import"
 msgstr "Uvoz B45 seznama"
 
-#: modules/demux/playlist/playlist.c:74
+#: modules/demux/playlist/playlist.c:81
 msgid "DVB playlist import"
 msgstr "Uvoz DVB seznama"
 
-#: modules/demux/playlist/playlist.c:79
+#: modules/demux/playlist/playlist.c:86
 msgid "Podcast parser"
 msgstr "Razčlenjevanje Podcast"
 
-#: modules/demux/playlist/playlist.c:84
+#: modules/demux/playlist/playlist.c:91
 msgid "XSPF playlist import"
 msgstr "Uvoz XSPF seznama"
 
-#: modules/demux/playlist/playlist.c:89
+#: modules/demux/playlist/playlist.c:96
 msgid "New winamp 5.2 shoutcast import"
 msgstr "Uvoz winamp 5.2 shoutcast"
 
-#: modules/demux/playlist/playlist.c:96
+#: modules/demux/playlist/playlist.c:103
 msgid "ASX playlist import"
 msgstr "Uvoz ASX seznama"
 
-#: modules/demux/playlist/playlist.c:101
+#: modules/demux/playlist/playlist.c:108
 msgid "Kasenna MediaBase parser"
 msgstr "Kasenna MediaBase razčlenjevalec"
 
-#: modules/demux/playlist/playlist.c:106
+#: modules/demux/playlist/playlist.c:113
 msgid "QuickTime Media Link importer"
 msgstr "Uvoz QuickTime Media povezave"
 
-#: modules/demux/playlist/playlist.c:111
+#: modules/demux/playlist/playlist.c:118
 msgid "Google Video Playlist importer"
 msgstr "Uvoz Google Video seznama predvajanja"
 
-#: modules/demux/playlist/playlist.c:116
+#: modules/demux/playlist/playlist.c:123
 msgid "Dummy ifo demux"
 msgstr "Dummy razvijalec"
-
-#: modules/demux/playlist/playlist.c:121
-msgid "Video portal url converter"
-msgstr ""
 
 #: modules/demux/playlist/podcast.c:237 modules/demux/playlist/podcast.c:251
 #: modules/demux/playlist/podcast.c:276 modules/demux/playlist/podcast.c:288
@@ -11241,25 +11243,20 @@ msgid "DV (Digital Video) demuxer"
 msgstr "DV (Digital Video) razvijalec"
 
 #: modules/demux/rawvid.c:39
-#, fuzzy
 msgid "This is the desired frame rate when playing raw video streams."
-msgstr ""
-"Zaželena stopnja okvirjev ob predvajanju MPEG4 osnovnik slikovnih pretokov."
+msgstr "Zaželena stopnja okvirjev ob predvajanju raw slikovnih pretokov."
 
 #: modules/demux/rawvid.c:43
-#, fuzzy
 msgid "This specifies the width in pixels of the raw video stream."
-msgstr "Filtri slike bodo uporabljeni med predvajanjem slikovnega vala."
+msgstr "Določa širino točk pri raw slikovnem pretoku."
 
 #: modules/demux/rawvid.c:47
-#, fuzzy
 msgid "This specifies the height in pixels of the raw video stream."
-msgstr "Filtri slike bodo uporabljeni med predvajanjem slikovnega vala."
+msgstr "Določa višino točk raw slikovnega pretoka."
 
 #: modules/demux/rawvid.c:52
-#, fuzzy
 msgid "Raw video demuxer"
-msgstr "VC1 razvijalec slike"
+msgstr "Raw razvijalec slike"
 
 #: modules/demux/real.c:43
 msgid "Real demuxer"
@@ -11305,20 +11302,20 @@ msgstr "Zamik podnapisov"
 msgid "Subtitles format"
 msgstr "Format podnapisov"
 
-#: modules/demux/ts.c:92
+#: modules/demux/ts.c:93
 msgid "Extra PMT"
 msgstr "Dodatni PMT"
 
-#: modules/demux/ts.c:94
+#: modules/demux/ts.c:95
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])."
 msgstr ""
 "Dovoljuje uporabniku določitev dodatnega PMT (pmt_pid=pid:stream_tip[,...])."
 
-#: modules/demux/ts.c:96
+#: modules/demux/ts.c:97
 msgid "Set id of ES to PID"
 msgstr "Določitev ID ES v PID"
 
-#: modules/demux/ts.c:97
+#: modules/demux/ts.c:98
 msgid ""
 "Set the internal ID of each elementary stream handled by VLC to the same "
 "value as the PID in the TS stream, instead of 1, 2, 3, etc. Useful to do "
@@ -11328,51 +11325,51 @@ msgstr ""
 "vrednost, kot je PID v TS pretoku, namesto 1, 2, 3, ... (uporabno pri "
 "podvojevanju '#duplicate{..., select=\"es=<pid>\"}'."
 
-#: modules/demux/ts.c:102
+#: modules/demux/ts.c:103
 msgid "Fast udp streaming"
 msgstr "Hitro UDP pretakanje"
 
-#: modules/demux/ts.c:104
+#: modules/demux/ts.c:105
 msgid "Sends TS to specific ip:port by udp (you must know what you are doing)."
 msgstr "Pošiljanje TS na določena IP:VRATA preko UDP protokola."
 
-#: modules/demux/ts.c:106
+#: modules/demux/ts.c:107
 msgid "MTU for out mode"
 msgstr "MTU za odvodni način"
 
-#: modules/demux/ts.c:107
+#: modules/demux/ts.c:108
 msgid "MTU for out mode."
 msgstr "MTU za odvodni način"
 
-#: modules/demux/ts.c:109
+#: modules/demux/ts.c:110
 msgid "CSA ck"
 msgstr "CSA ck"
 
-#: modules/demux/ts.c:110
+#: modules/demux/ts.c:111
 msgid "Control word for the CSA encryption algorithm"
 msgstr "Nadzorna beseda za CSA algoritem šifriranja"
 
-#: modules/demux/ts.c:112
+#: modules/demux/ts.c:113
 msgid "Silent mode"
 msgstr "Tihi način"
 
-#: modules/demux/ts.c:113
+#: modules/demux/ts.c:114
 msgid "Do not complain on encrypted PES."
 msgstr "Ne opozarjaj na šifriran PES."
 
-#: modules/demux/ts.c:115
+#: modules/demux/ts.c:116
 msgid "CAPMT System ID"
 msgstr "ID CAPMT Sistema"
 
-#: modules/demux/ts.c:116
+#: modules/demux/ts.c:117
 msgid "Only forward descriptors from this SysID to the CAM."
 msgstr "Pošiljanje opisovalcev preko določenega SysID na CAM."
 
-#: modules/demux/ts.c:118
+#: modules/demux/ts.c:119
 msgid "Packet size in bytes to decrypt"
 msgstr "Velikost paketov za dešifriranje"
 
-#: modules/demux/ts.c:119
+#: modules/demux/ts.c:120
 msgid ""
 "Specify the size of the TS packet to decrypt. The decryption routines "
 "subtract the TS-header from the value before decrypting. "
@@ -11380,19 +11377,19 @@ msgstr ""
 "Določitev velikosti TS paketov za dešifriranje. Dešifriranje oddeli TS-glavo "
 "iz vrednosti pred samim dešifriranjem."
 
-#: modules/demux/ts.c:123
+#: modules/demux/ts.c:124
 msgid "Filename of dump"
 msgstr "Ime datoteke odlaganja"
 
-#: modules/demux/ts.c:124
+#: modules/demux/ts.c:125
 msgid "Specify a filename where to dump the TS in."
 msgstr "Določitev datoteke za odlaganje TS."
 
-#: modules/demux/ts.c:126
+#: modules/demux/ts.c:127
 msgid "Append"
 msgstr "Pripni"
 
-#: modules/demux/ts.c:128
+#: modules/demux/ts.c:129
 msgid ""
 "If the file exists and this option is selected, the existing file will not "
 "be overwritten."
@@ -11400,11 +11397,11 @@ msgstr ""
 "Če datoteka obstaja in je možnost izbrana, obstoječa datoteka ne bo "
 "izbrisana."
 
-#: modules/demux/ts.c:131
+#: modules/demux/ts.c:132
 msgid "Dump buffer size"
 msgstr "Velikost izravnalnika odlaganja"
 
-#: modules/demux/ts.c:133
+#: modules/demux/ts.c:134
 msgid ""
 "Tweak the buffer size for reading and writing an integer number of packets."
 "Specify the size of the buffer here and not the number of packets."
@@ -11412,48 +11409,48 @@ msgstr ""
 "Nastavi velikost izravnalnika za branje in pisanje s celoštevilčno "
 "vrednostjo paketov. Tu določite velikosti izravnalnika in ne števila paketov."
 
-#: modules/demux/ts.c:137
+#: modules/demux/ts.c:138
 msgid "MPEG Transport Stream demuxer"
 msgstr "MPEG Transport Stream razvijalec"
 
-#: modules/demux/ts.c:3205 modules/demux/ts.c:3306
+#: modules/demux/ts.c:3261 modules/demux/ts.c:3362
 msgid "subtitles"
 msgstr "podnapisi"
 
-#: modules/demux/ts.c:3215 modules/demux/ts.c:3322 modules/demux/ts.c:3470
-#: modules/demux/ts.c:3505
+#: modules/demux/ts.c:3271 modules/demux/ts.c:3378 modules/demux/ts.c:3526
+#: modules/demux/ts.c:3561
 msgid "hearing impaired"
 msgstr "slušno omejeni"
 
-#: modules/demux/ts.c:3310
+#: modules/demux/ts.c:3366
 msgid "4:3 subtitles"
 msgstr "4:3 podnapisi"
 
-#: modules/demux/ts.c:3314
+#: modules/demux/ts.c:3370
 msgid "16:9 subtitles"
 msgstr "16:9 podnapisi"
 
-#: modules/demux/ts.c:3318
+#: modules/demux/ts.c:3374
 msgid "2.21:1 subtitles"
 msgstr "2.21:1 podnapisi"
 
-#: modules/demux/ts.c:3326
+#: modules/demux/ts.c:3382
 msgid "4:3 hearing impaired"
 msgstr "4:3 slušno omejeni"
 
-#: modules/demux/ts.c:3330
+#: modules/demux/ts.c:3386
 msgid "16:9 hearing impaired"
 msgstr "16:9 slušno omejeni"
 
-#: modules/demux/ts.c:3334
+#: modules/demux/ts.c:3390
 msgid "2.21:1 hearing impaired"
 msgstr "2.21:1 slušno omejeni"
 
-#: modules/demux/ts.c:3466 modules/demux/ts.c:3501
+#: modules/demux/ts.c:3522 modules/demux/ts.c:3557
 msgid "clean effects"
 msgstr "počisti učinke"
 
-#: modules/demux/ts.c:3474 modules/demux/ts.c:3509
+#: modules/demux/ts.c:3530 modules/demux/ts.c:3565
 msgid "visual impaired commentary"
 msgstr "vidno omejeni"
 
@@ -11571,7 +11568,7 @@ msgstr "Okno"
 #: modules/gui/beos/InterfaceWindow.cpp:403 modules/gui/macosx/bookmarks.m:114
 #: modules/gui/macosx/bookmarks.m:237 modules/gui/macosx/bookmarks.m:245
 #: modules/gui/macosx/bookmarks.m:294 modules/gui/macosx/bookmarks.m:304
-#: modules/gui/macosx/controls.m:59 modules/gui/macosx/extended.m:617
+#: modules/gui/macosx/controls.m:59 modules/gui/macosx/extended.m:609
 #: modules/gui/macosx/interaction.m:143 modules/gui/macosx/interaction.m:144
 #: modules/gui/macosx/interaction.m:184 modules/gui/macosx/open.m:159
 #: modules/gui/macosx/open.m:280 modules/gui/macosx/output.m:138
@@ -11904,136 +11901,136 @@ msgstr "Omogoči uravnavanje. Kanale lahko nastavite ročno ali pa s predlogo."
 msgid "Preamp"
 msgstr "Predojačanje"
 
-#: modules/gui/macosx/extended.m:78 modules/gui/wxwidgets/extrapanel.cpp:1210
+#: modules/gui/macosx/extended.m:68 modules/gui/wxwidgets/extrapanel.cpp:1210
 msgid "Extended controls"
 msgstr "Razširjen pregled"
 
-#: modules/gui/macosx/extended.m:82 modules/gui/wxwidgets/extrapanel.cpp:300
+#: modules/gui/macosx/extended.m:72 modules/gui/wxwidgets/extrapanel.cpp:300
 msgid "Video filters"
 msgstr "Slikovni filtri"
 
-#: modules/gui/macosx/extended.m:83 modules/gui/wxwidgets/extrapanel.cpp:204
+#: modules/gui/macosx/extended.m:73 modules/gui/wxwidgets/extrapanel.cpp:204
 msgid "Image adjustment"
 msgstr "Prilagajanje slike"
 
-#: modules/gui/macosx/extended.m:84
+#: modules/gui/macosx/extended.m:74
 msgid "Shows more information about the available video filters."
 msgstr "Prikaz podrobnosti slikovnih filtrov na voljo."
 
-#: modules/gui/macosx/extended.m:85 modules/video_filter/wave.c:51
+#: modules/gui/macosx/extended.m:75 modules/video_filter/wave.c:51
 msgid "Wave"
 msgstr "Valovanje"
 
-#: modules/gui/macosx/extended.m:86 modules/video_filter/ripple.c:50
+#: modules/gui/macosx/extended.m:76 modules/video_filter/ripple.c:50
 msgid "Ripple"
 msgstr "Kodranje"
 
-#: modules/gui/macosx/extended.m:87 modules/meta_engine/id3genres.h:95
+#: modules/gui/macosx/extended.m:77 modules/meta_engine/id3genres.h:95
 #: modules/video_filter/psychedelic.c:51
 msgid "Psychedelic"
 msgstr "Psychedelic"
 
-#: modules/gui/macosx/extended.m:88 modules/video_filter/gradient.c:71
+#: modules/gui/macosx/extended.m:78 modules/video_filter/gradient.c:71
 #: modules/video_filter/gradient.c:77
 msgid "Gradient"
 msgstr "Gradient"
 
-#: modules/gui/macosx/extended.m:89
+#: modules/gui/macosx/extended.m:79
 msgid "General editing filters"
 msgstr "Splošni filtri urejanja"
 
-#: modules/gui/macosx/extended.m:90
+#: modules/gui/macosx/extended.m:80
 msgid "Distortion filters"
 msgstr "Filtri popačenja slike"
 
-#: modules/gui/macosx/extended.m:91
+#: modules/gui/macosx/extended.m:81
 msgid "Blur"
 msgstr "Zameglitev"
 
-#: modules/gui/macosx/extended.m:92 modules/gui/wxwidgets/extrapanel.cpp:150
+#: modules/gui/macosx/extended.m:82 modules/gui/wxwidgets/extrapanel.cpp:150
 msgid "Adds motion blurring to the image"
 msgstr "Dodajanje učinka zameglitve na sliko."
 
-#: modules/gui/macosx/extended.m:94
+#: modules/gui/macosx/extended.m:84
 msgid "Creates several copies of the Video output window"
 msgstr "Ustvari več kopij slike v različnih oknih."
 
-#: modules/gui/macosx/extended.m:96
+#: modules/gui/macosx/extended.m:86
 msgid "Image cropping"
 msgstr "Obrezovanje slike"
 
-#: modules/gui/macosx/extended.m:97
+#: modules/gui/macosx/extended.m:87
 msgid "Crops a defined part of the image"
 msgstr "Obrezovanje določenega dela slike."
 
-#: modules/gui/macosx/extended.m:98
+#: modules/gui/macosx/extended.m:88
 msgid "Invert colors"
 msgstr "Obračanje barv"
 
-#: modules/gui/macosx/extended.m:99 modules/gui/wxwidgets/extrapanel.cpp:149
+#: modules/gui/macosx/extended.m:89 modules/gui/wxwidgets/extrapanel.cpp:149
 msgid "Inverts the colors of the image"
 msgstr "Obrne barvno skalo slike. Fotografski negativ."
 
-#: modules/gui/macosx/extended.m:100 modules/gui/wxwidgets/extrapanel.cpp:151
+#: modules/gui/macosx/extended.m:90 modules/gui/wxwidgets/extrapanel.cpp:151
 #: modules/video_filter/transform.c:69
 msgid "Transformation"
 msgstr "Preoblikovanje"
 
-#: modules/gui/macosx/extended.m:101 modules/gui/wxwidgets/extrapanel.cpp:151
+#: modules/gui/macosx/extended.m:91 modules/gui/wxwidgets/extrapanel.cpp:151
 msgid "Rotates or flips the image"
 msgstr "Obračanje slike"
 
-#: modules/gui/macosx/extended.m:102
+#: modules/gui/macosx/extended.m:92
 msgid "Interactive Zoom"
 msgstr "Interaktivno povečevanje"
 
-#: modules/gui/macosx/extended.m:103
+#: modules/gui/macosx/extended.m:93
 msgid "Enables an interactive Zoom feature"
 msgstr "Omogočanje interaktivnega spreminjanja povečevanja."
 
-#: modules/gui/macosx/extended.m:104 modules/gui/wxwidgets/extrapanel.cpp:401
+#: modules/gui/macosx/extended.m:94 modules/gui/wxwidgets/extrapanel.cpp:401
 msgid "Volume normalization"
 msgstr "Normalizacija jakosti"
 
-#: modules/gui/macosx/extended.m:105
+#: modules/gui/macosx/extended.m:95
 msgid "Prevents the audio output from going over a predefined value."
 msgstr "Preprečuje prekoračitev določene vrednosti odvoda zvoka."
 
-#: modules/gui/macosx/extended.m:107 modules/gui/wxwidgets/extrapanel.cpp:396
+#: modules/gui/macosx/extended.m:97 modules/gui/wxwidgets/extrapanel.cpp:396
 msgid "Headphone virtualization"
 msgstr "Učinek navideznosti slušalk"
 
-#: modules/gui/macosx/extended.m:108 modules/gui/wxwidgets/extrapanel.cpp:397
+#: modules/gui/macosx/extended.m:98 modules/gui/wxwidgets/extrapanel.cpp:397
 msgid "Imitates the effect of surround sound when using headphones."
 msgstr "Posnemanje učinka prostorskega zvoka pri uporabi slušalk"
 
-#: modules/gui/macosx/extended.m:110 modules/gui/wxwidgets/extrapanel.cpp:406
+#: modules/gui/macosx/extended.m:100 modules/gui/wxwidgets/extrapanel.cpp:406
 msgid "Maximum level"
 msgstr "Največja izravnava"
 
-#: modules/gui/macosx/extended.m:111 modules/gui/wxwidgets/extrapanel.cpp:221
+#: modules/gui/macosx/extended.m:101 modules/gui/wxwidgets/extrapanel.cpp:221
 #: modules/gui/wxwidgets/extrapanel.cpp:481
 msgid "Restore Defaults"
 msgstr "Obnovitev privzetih nastavitev"
 
-#: modules/gui/macosx/extended.m:115 modules/gui/wxwidgets/extrapanel.cpp:244
+#: modules/gui/macosx/extended.m:105 modules/gui/wxwidgets/extrapanel.cpp:244
 msgid "Gamma"
 msgstr "Barva"
 
-#: modules/gui/macosx/extended.m:117 modules/gui/wxwidgets/extrapanel.cpp:239
+#: modules/gui/macosx/extended.m:107 modules/gui/wxwidgets/extrapanel.cpp:239
 msgid "Saturation"
 msgstr "Nasičenost"
 
-#: modules/gui/macosx/extended.m:118 modules/gui/macosx/macosx.m:59
+#: modules/gui/macosx/extended.m:108 modules/gui/macosx/macosx.m:59
 #: modules/gui/macosx/sfilters.m:79 modules/gui/macosx/sfilters.m:90
 msgid "Opaqueness"
 msgstr "Prosojnost"
 
-#: modules/gui/macosx/extended.m:617
+#: modules/gui/macosx/extended.m:609
 msgid "About the video filters"
 msgstr "O filtrih slike"
 
-#: modules/gui/macosx/extended.m:618
+#: modules/gui/macosx/extended.m:610
 msgid ""
 "This panel allows on-the-fly selection of various video effects.\n"
 "These filters can be configured individually in the Preferences, in the "
@@ -12885,9 +12882,8 @@ msgid "Aqua"
 msgstr "Cijano"
 
 #: modules/gui/macosx/sfilters.m:202 modules/gui/macosx/sfilters.m:233
-#, fuzzy
 msgid "Not Available"
-msgstr "Na voljo ni pomoči"
+msgstr "Ni na voljo"
 
 #: modules/gui/macosx/update.m:86
 msgid "Check for Updates"
@@ -14108,17 +14104,28 @@ msgstr ""
 
 #: modules/gui/qt4/qt4.cpp:61
 msgid "Show playing item name in window title"
-msgstr ""
+msgstr "Prikaži ime skladbe ali posnetka v naslovu okna."
 
 #: modules/gui/qt4/qt4.cpp:62
 msgid "Show the name of the song or video in the controler window title"
-msgstr ""
+msgstr "Prikaži ime skladbe ali posnetka v naslovu nadzornega okna."
 
 #: modules/gui/qt4/qt4.cpp:65 modules/gui/qt4/qt4.cpp:66
 msgid "path to use in file dialog"
+msgstr "pot določena za okno izmire datoteke"
+
+#: modules/gui/qt4/qt4.cpp:68 modules/gui/wxwidgets/dialogs/open.cpp:261
+#: modules/gui/wxwidgets/dialogs/open.cpp:272
+#: modules/gui/wxwidgets/dialogs/open.cpp:416
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:217
+msgid "Advanced options"
+msgstr "Podrobni pogled"
+
+#: modules/gui/qt4/qt4.cpp:69
+msgid "Activate by default all theAdvanced options for geeks"
 msgstr ""
 
-#: modules/gui/qt4/qt4.cpp:70
+#: modules/gui/qt4/qt4.cpp:74
 msgid "Qt interface"
 msgstr "Vmesnik Qt"
 
@@ -14453,13 +14460,6 @@ msgstr "Shrani sporočila kot ..."
 #: modules/gui/wxwidgets/dialogs/open.cpp:256
 msgid "Advanced options..."
 msgstr "Podrobni pogled ..."
-
-#: modules/gui/wxwidgets/dialogs/open.cpp:261
-#: modules/gui/wxwidgets/dialogs/open.cpp:272
-#: modules/gui/wxwidgets/dialogs/open.cpp:416
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:217
-msgid "Advanced options"
-msgstr "Podrobni pogled"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:276
 msgid "Options:"
@@ -16412,14 +16412,12 @@ msgid "video"
 msgstr "slika"
 
 #: modules/misc/quartztext.c:78
-#, fuzzy
 msgid "Mac Text renderer"
-msgstr "Upodabljanje besedila"
+msgstr "Mac upodabljanje besedila"
 
 #: modules/misc/quartztext.c:79
-#, fuzzy
 msgid "Quartz font renderer"
-msgstr "Freetype2 upodabljanje pisave"
+msgstr "Quartz upodabljanje pisave"
 
 #: modules/misc/rtsp.c:51
 msgid "RTSP host address"
@@ -18238,23 +18236,23 @@ msgstr "slika-filter-dogodek"
 
 #: modules/video_filter/gaussianblur.c:45
 msgid "Gaussian's std deviation"
-msgstr ""
+msgstr "Gauss običajno odstopanje"
 
 #: modules/video_filter/gaussianblur.c:47
 msgid ""
 "Gaussian's standard deviation. The bluring will take into account pixels up "
 "to 3*sigma away in any direction."
 msgstr ""
+"Gauss običajno odstopanje. Zameglevanje uporablja točke, ki so 3*sigma "
+"oddaljene v vseh smereh."
 
 #: modules/video_filter/gaussianblur.c:56
-#, fuzzy
 msgid "Gaussian blur video filter"
-msgstr "Filter prehoda slike"
+msgstr "Filter Gaussove zamglitve slike"
 
 #: modules/video_filter/gaussianblur.c:57
-#, fuzzy
 msgid "Gaussian Blur"
-msgstr "ruščina"
+msgstr "Gauss zameglevanje"
 
 #: modules/video_filter/gradient.c:59
 msgid "Distort mode"
@@ -20063,3 +20061,6 @@ msgstr "Filter ponazoritev"
 #: modules/visualization/visual/visual.c:120
 msgid "Spectrum analyser"
 msgstr "Spektralna analiza"
+
+#~ msgid "Video portal url converter"
+#~ msgstr "Pretvornik video naslovov portala"

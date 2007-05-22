@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-20 01:55+0200\n"
+"POT-Creation-Date: 2007-05-22 23:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,7 +65,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:58 src/input/es_out.c:1778
 #: src/libvlc-module.c:1271 modules/gui/beos/InterfaceWindow.cpp:281
-#: modules/gui/macosx/extended.m:80 modules/gui/macosx/intf.m:588
+#: modules/gui/macosx/extended.m:70 modules/gui/macosx/intf.m:588
 #: modules/gui/macosx/output.m:170 modules/gui/macosx/playlistinfo.m:96
 #: modules/gui/macosx/wizard.m:420
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:336
@@ -119,7 +119,7 @@ msgid "Miscellaneous audio settings and modules."
 msgstr ""
 
 #: include/vlc_config_cat.h:79 src/input/es_out.c:1806
-#: src/libvlc-module.c:1306 modules/gui/macosx/extended.m:79
+#: src/libvlc-module.c:1306 modules/gui/macosx/extended.m:69
 #: modules/gui/macosx/intf.m:601 modules/gui/macosx/output.m:160
 #: modules/gui/macosx/playlistinfo.m:86 modules/gui/macosx/wizard.m:421
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:290
@@ -310,7 +310,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:186 src/libvlc-module.c:1683
 #: src/playlist/engine.c:109 src/playlist/engine.c:111
-#: modules/demux/playlist/playlist.c:55 modules/demux/playlist/playlist.c:56
+#: modules/demux/playlist/playlist.c:62 modules/demux/playlist/playlist.c:63
 #: modules/gui/beos/InterfaceWindow.cpp:230
 #: modules/gui/beos/InterfaceWindow.cpp:324 modules/gui/macosx/intf.m:533
 #: modules/gui/macosx/intf.m:631 modules/gui/pda/pda_interface.c:1264
@@ -592,7 +592,7 @@ msgid ""
 "them."
 msgstr ""
 
-#: include/vlc_intf_strings.h:92 modules/gui/macosx/extended.m:93
+#: include/vlc_intf_strings.h:92 modules/gui/macosx/extended.m:83
 #: modules/gui/wxwidgets/extrapanel.cpp:147
 msgid "Image clone"
 msgstr ""
@@ -778,7 +778,7 @@ msgid "Equalizer"
 msgstr ""
 
 #: src/audio_output/input.c:151 src/libvlc-module.c:214
-#: modules/gui/macosx/extended.m:81 modules/gui/wxwidgets/extrapanel.cpp:390
+#: modules/gui/macosx/extended.m:71 modules/gui/wxwidgets/extrapanel.cpp:390
 msgid "Audio filters"
 msgstr ""
 
@@ -1115,51 +1115,51 @@ msgstr ""
 msgid "Mouse Gestures"
 msgstr ""
 
-#: src/libvlc-common.c:281 src/libvlc-common.c:452 src/modules/modules.c:1719
-#: src/modules/modules.c:2049
+#: src/libvlc-common.c:283 src/libvlc-common.c:454 src/modules/modules.c:1715
+#: src/modules/modules.c:2046
 msgid "C"
 msgstr ""
 
-#: src/libvlc-common.c:297
+#: src/libvlc-common.c:299
 msgid "Help options"
 msgstr ""
 
-#: src/libvlc-common.c:1504 src/modules/configuration.c:1268
+#: src/libvlc-common.c:1506 src/modules/configuration.c:1269
 msgid "string"
 msgstr ""
 
-#: src/libvlc-common.c:1523 src/modules/configuration.c:1232
+#: src/libvlc-common.c:1525 src/modules/configuration.c:1233
 msgid "integer"
 msgstr ""
 
-#: src/libvlc-common.c:1550 src/modules/configuration.c:1257
+#: src/libvlc-common.c:1552 src/modules/configuration.c:1258
 msgid "float"
 msgstr ""
 
-#: src/libvlc-common.c:1563
+#: src/libvlc-common.c:1565
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc-common.c:1564
+#: src/libvlc-common.c:1566
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc-common.c:1829
+#: src/libvlc-common.c:1831
 #, c-format
 msgid "VLC version %s\n"
 msgstr ""
 
-#: src/libvlc-common.c:1830
+#: src/libvlc-common.c:1832
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
 msgstr ""
 
-#: src/libvlc-common.c:1832
+#: src/libvlc-common.c:1834
 #, c-format
 msgid "Compiler: %s\n"
 msgstr ""
 
-#: src/libvlc-common.c:1835
+#: src/libvlc-common.c:1836
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
 msgstr ""
@@ -1968,7 +1968,7 @@ msgid "Default"
 msgstr ""
 
 #: src/libvlc-module.c:431 modules/gui/macosx/equalizer.m:143
-#: modules/gui/macosx/extended.m:112 modules/gui/macosx/wizard.m:394
+#: modules/gui/macosx/extended.m:102 modules/gui/macosx/wizard.m:394
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:620
 #: modules/gui/wxwidgets/extrapanel.cpp:216
 #: modules/gui/wxwidgets/extrapanel.cpp:465
@@ -3837,11 +3837,11 @@ msgstr ""
 msgid "print version information"
 msgstr ""
 
-#: src/modules/configuration.c:1232
+#: src/modules/configuration.c:1233
 msgid "boolean"
 msgstr ""
 
-#: src/modules/configuration.c:1243
+#: src/modules/configuration.c:1244
 msgid "key"
 msgstr ""
 
@@ -6545,7 +6545,7 @@ msgstr ""
 msgid "Height of the stream to capture (-1 for autodetect)."
 msgstr ""
 
-#: modules/access/v4l.c:111 modules/gui/macosx/extended.m:113
+#: modules/access/v4l.c:111 modules/gui/macosx/extended.m:103
 #: modules/gui/wxwidgets/extrapanel.cpp:234
 msgid "Brightness"
 msgstr ""
@@ -6554,7 +6554,7 @@ msgstr ""
 msgid "Brightness of the video input."
 msgstr ""
 
-#: modules/access/v4l.c:114 modules/gui/macosx/extended.m:116
+#: modules/access/v4l.c:114 modules/gui/macosx/extended.m:106
 #: modules/gui/wxwidgets/extrapanel.cpp:224
 msgid "Hue"
 msgstr ""
@@ -6573,7 +6573,7 @@ msgstr ""
 msgid "Color of the video input."
 msgstr ""
 
-#: modules/access/v4l.c:120 modules/gui/macosx/extended.m:114
+#: modules/access/v4l.c:120 modules/gui/macosx/extended.m:104
 #: modules/gui/wxwidgets/extrapanel.cpp:229
 msgid "Contrast"
 msgstr ""
@@ -10218,56 +10218,62 @@ msgstr ""
 msgid "Show NC17 rated video streams when using shoutcast video playlists."
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:58
+#: modules/demux/playlist/playlist.c:44
+msgid "Skip ads"
+msgstr ""
+
+#: modules/demux/playlist/playlist.c:45
+msgid ""
+"Use playlist options usually used to prevent ads skipping to detect ads and "
+"prevent adding them to the playlist."
+msgstr ""
+
+#: modules/demux/playlist/playlist.c:65
 msgid "M3U playlist import"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:63
+#: modules/demux/playlist/playlist.c:70
 msgid "PLS playlist import"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:68
+#: modules/demux/playlist/playlist.c:75
 msgid "B4S playlist import"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:74
+#: modules/demux/playlist/playlist.c:81
 msgid "DVB playlist import"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:79
+#: modules/demux/playlist/playlist.c:86
 msgid "Podcast parser"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:84
+#: modules/demux/playlist/playlist.c:91
 msgid "XSPF playlist import"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:89
+#: modules/demux/playlist/playlist.c:96
 msgid "New winamp 5.2 shoutcast import"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:96
+#: modules/demux/playlist/playlist.c:103
 msgid "ASX playlist import"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:101
+#: modules/demux/playlist/playlist.c:108
 msgid "Kasenna MediaBase parser"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:106
+#: modules/demux/playlist/playlist.c:113
 msgid "QuickTime Media Link importer"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:111
+#: modules/demux/playlist/playlist.c:118
 msgid "Google Video Playlist importer"
 msgstr ""
 
-#: modules/demux/playlist/playlist.c:116
+#: modules/demux/playlist/playlist.c:123
 msgid "Dummy ifo demux"
-msgstr ""
-
-#: modules/demux/playlist/playlist.c:121
-msgid "Video portal url converter"
 msgstr ""
 
 #: modules/demux/playlist/podcast.c:237 modules/demux/playlist/podcast.c:251
@@ -10369,145 +10375,145 @@ msgstr ""
 msgid "Subtitles format"
 msgstr ""
 
-#: modules/demux/ts.c:92
+#: modules/demux/ts.c:93
 msgid "Extra PMT"
 msgstr ""
 
-#: modules/demux/ts.c:94
+#: modules/demux/ts.c:95
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])."
 msgstr ""
 
-#: modules/demux/ts.c:96
+#: modules/demux/ts.c:97
 msgid "Set id of ES to PID"
 msgstr ""
 
-#: modules/demux/ts.c:97
+#: modules/demux/ts.c:98
 msgid ""
 "Set the internal ID of each elementary stream handled by VLC to the same "
 "value as the PID in the TS stream, instead of 1, 2, 3, etc. Useful to do "
 "'#duplicate{..., select=\"es=<pid>\"}'."
 msgstr ""
 
-#: modules/demux/ts.c:102
+#: modules/demux/ts.c:103
 msgid "Fast udp streaming"
 msgstr ""
 
-#: modules/demux/ts.c:104
+#: modules/demux/ts.c:105
 msgid "Sends TS to specific ip:port by udp (you must know what you are doing)."
 msgstr ""
 
-#: modules/demux/ts.c:106
+#: modules/demux/ts.c:107
 msgid "MTU for out mode"
 msgstr ""
 
-#: modules/demux/ts.c:107
+#: modules/demux/ts.c:108
 msgid "MTU for out mode."
 msgstr ""
 
-#: modules/demux/ts.c:109
+#: modules/demux/ts.c:110
 msgid "CSA ck"
 msgstr ""
 
-#: modules/demux/ts.c:110
+#: modules/demux/ts.c:111
 msgid "Control word for the CSA encryption algorithm"
 msgstr ""
 
-#: modules/demux/ts.c:112
+#: modules/demux/ts.c:113
 msgid "Silent mode"
 msgstr ""
 
-#: modules/demux/ts.c:113
+#: modules/demux/ts.c:114
 msgid "Do not complain on encrypted PES."
 msgstr ""
 
-#: modules/demux/ts.c:115
+#: modules/demux/ts.c:116
 msgid "CAPMT System ID"
 msgstr ""
 
-#: modules/demux/ts.c:116
+#: modules/demux/ts.c:117
 msgid "Only forward descriptors from this SysID to the CAM."
 msgstr ""
 
-#: modules/demux/ts.c:118
+#: modules/demux/ts.c:119
 msgid "Packet size in bytes to decrypt"
 msgstr ""
 
-#: modules/demux/ts.c:119
+#: modules/demux/ts.c:120
 msgid ""
 "Specify the size of the TS packet to decrypt. The decryption routines "
 "subtract the TS-header from the value before decrypting. "
 msgstr ""
 
-#: modules/demux/ts.c:123
+#: modules/demux/ts.c:124
 msgid "Filename of dump"
 msgstr ""
 
-#: modules/demux/ts.c:124
+#: modules/demux/ts.c:125
 msgid "Specify a filename where to dump the TS in."
 msgstr ""
 
-#: modules/demux/ts.c:126
+#: modules/demux/ts.c:127
 msgid "Append"
 msgstr ""
 
-#: modules/demux/ts.c:128
+#: modules/demux/ts.c:129
 msgid ""
 "If the file exists and this option is selected, the existing file will not "
 "be overwritten."
 msgstr ""
 
-#: modules/demux/ts.c:131
+#: modules/demux/ts.c:132
 msgid "Dump buffer size"
 msgstr ""
 
-#: modules/demux/ts.c:133
+#: modules/demux/ts.c:134
 msgid ""
 "Tweak the buffer size for reading and writing an integer number of packets."
 "Specify the size of the buffer here and not the number of packets."
 msgstr ""
 
-#: modules/demux/ts.c:137
+#: modules/demux/ts.c:138
 msgid "MPEG Transport Stream demuxer"
 msgstr ""
 
-#: modules/demux/ts.c:3205 modules/demux/ts.c:3306
+#: modules/demux/ts.c:3261 modules/demux/ts.c:3362
 msgid "subtitles"
 msgstr ""
 
-#: modules/demux/ts.c:3215 modules/demux/ts.c:3322 modules/demux/ts.c:3470
-#: modules/demux/ts.c:3505
+#: modules/demux/ts.c:3271 modules/demux/ts.c:3378 modules/demux/ts.c:3526
+#: modules/demux/ts.c:3561
 msgid "hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3310
+#: modules/demux/ts.c:3366
 msgid "4:3 subtitles"
 msgstr ""
 
-#: modules/demux/ts.c:3314
+#: modules/demux/ts.c:3370
 msgid "16:9 subtitles"
 msgstr ""
 
-#: modules/demux/ts.c:3318
+#: modules/demux/ts.c:3374
 msgid "2.21:1 subtitles"
 msgstr ""
 
-#: modules/demux/ts.c:3326
+#: modules/demux/ts.c:3382
 msgid "4:3 hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3330
+#: modules/demux/ts.c:3386
 msgid "16:9 hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3334
+#: modules/demux/ts.c:3390
 msgid "2.21:1 hearing impaired"
 msgstr ""
 
-#: modules/demux/ts.c:3466 modules/demux/ts.c:3501
+#: modules/demux/ts.c:3522 modules/demux/ts.c:3557
 msgid "clean effects"
 msgstr ""
 
-#: modules/demux/ts.c:3474 modules/demux/ts.c:3509
+#: modules/demux/ts.c:3530 modules/demux/ts.c:3565
 msgid "visual impaired commentary"
 msgstr ""
 
@@ -10625,7 +10631,7 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:403 modules/gui/macosx/bookmarks.m:114
 #: modules/gui/macosx/bookmarks.m:237 modules/gui/macosx/bookmarks.m:245
 #: modules/gui/macosx/bookmarks.m:294 modules/gui/macosx/bookmarks.m:304
-#: modules/gui/macosx/controls.m:59 modules/gui/macosx/extended.m:617
+#: modules/gui/macosx/controls.m:59 modules/gui/macosx/extended.m:609
 #: modules/gui/macosx/interaction.m:143 modules/gui/macosx/interaction.m:144
 #: modules/gui/macosx/interaction.m:184 modules/gui/macosx/open.m:159
 #: modules/gui/macosx/open.m:280 modules/gui/macosx/output.m:138
@@ -10952,136 +10958,136 @@ msgstr ""
 msgid "Preamp"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:78 modules/gui/wxwidgets/extrapanel.cpp:1210
+#: modules/gui/macosx/extended.m:68 modules/gui/wxwidgets/extrapanel.cpp:1210
 msgid "Extended controls"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:82 modules/gui/wxwidgets/extrapanel.cpp:300
+#: modules/gui/macosx/extended.m:72 modules/gui/wxwidgets/extrapanel.cpp:300
 msgid "Video filters"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:83 modules/gui/wxwidgets/extrapanel.cpp:204
+#: modules/gui/macosx/extended.m:73 modules/gui/wxwidgets/extrapanel.cpp:204
 msgid "Image adjustment"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:84
+#: modules/gui/macosx/extended.m:74
 msgid "Shows more information about the available video filters."
 msgstr ""
 
-#: modules/gui/macosx/extended.m:85 modules/video_filter/wave.c:51
+#: modules/gui/macosx/extended.m:75 modules/video_filter/wave.c:51
 msgid "Wave"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:86 modules/video_filter/ripple.c:50
+#: modules/gui/macosx/extended.m:76 modules/video_filter/ripple.c:50
 msgid "Ripple"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:87 modules/meta_engine/id3genres.h:95
+#: modules/gui/macosx/extended.m:77 modules/meta_engine/id3genres.h:95
 #: modules/video_filter/psychedelic.c:51
 msgid "Psychedelic"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:88 modules/video_filter/gradient.c:71
+#: modules/gui/macosx/extended.m:78 modules/video_filter/gradient.c:71
 #: modules/video_filter/gradient.c:77
 msgid "Gradient"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:89
+#: modules/gui/macosx/extended.m:79
 msgid "General editing filters"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:90
+#: modules/gui/macosx/extended.m:80
 msgid "Distortion filters"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:91
+#: modules/gui/macosx/extended.m:81
 msgid "Blur"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:92 modules/gui/wxwidgets/extrapanel.cpp:150
+#: modules/gui/macosx/extended.m:82 modules/gui/wxwidgets/extrapanel.cpp:150
 msgid "Adds motion blurring to the image"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:94
+#: modules/gui/macosx/extended.m:84
 msgid "Creates several copies of the Video output window"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:96
+#: modules/gui/macosx/extended.m:86
 msgid "Image cropping"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:97
+#: modules/gui/macosx/extended.m:87
 msgid "Crops a defined part of the image"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:98
+#: modules/gui/macosx/extended.m:88
 msgid "Invert colors"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:99 modules/gui/wxwidgets/extrapanel.cpp:149
+#: modules/gui/macosx/extended.m:89 modules/gui/wxwidgets/extrapanel.cpp:149
 msgid "Inverts the colors of the image"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:100 modules/gui/wxwidgets/extrapanel.cpp:151
+#: modules/gui/macosx/extended.m:90 modules/gui/wxwidgets/extrapanel.cpp:151
 #: modules/video_filter/transform.c:69
 msgid "Transformation"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:101 modules/gui/wxwidgets/extrapanel.cpp:151
+#: modules/gui/macosx/extended.m:91 modules/gui/wxwidgets/extrapanel.cpp:151
 msgid "Rotates or flips the image"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:102
+#: modules/gui/macosx/extended.m:92
 msgid "Interactive Zoom"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:103
+#: modules/gui/macosx/extended.m:93
 msgid "Enables an interactive Zoom feature"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:104 modules/gui/wxwidgets/extrapanel.cpp:401
+#: modules/gui/macosx/extended.m:94 modules/gui/wxwidgets/extrapanel.cpp:401
 msgid "Volume normalization"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:105
+#: modules/gui/macosx/extended.m:95
 msgid "Prevents the audio output from going over a predefined value."
 msgstr ""
 
-#: modules/gui/macosx/extended.m:107 modules/gui/wxwidgets/extrapanel.cpp:396
+#: modules/gui/macosx/extended.m:97 modules/gui/wxwidgets/extrapanel.cpp:396
 msgid "Headphone virtualization"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:108 modules/gui/wxwidgets/extrapanel.cpp:397
+#: modules/gui/macosx/extended.m:98 modules/gui/wxwidgets/extrapanel.cpp:397
 msgid "Imitates the effect of surround sound when using headphones."
 msgstr ""
 
-#: modules/gui/macosx/extended.m:110 modules/gui/wxwidgets/extrapanel.cpp:406
+#: modules/gui/macosx/extended.m:100 modules/gui/wxwidgets/extrapanel.cpp:406
 msgid "Maximum level"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:111 modules/gui/wxwidgets/extrapanel.cpp:221
+#: modules/gui/macosx/extended.m:101 modules/gui/wxwidgets/extrapanel.cpp:221
 #: modules/gui/wxwidgets/extrapanel.cpp:481
 msgid "Restore Defaults"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:115 modules/gui/wxwidgets/extrapanel.cpp:244
+#: modules/gui/macosx/extended.m:105 modules/gui/wxwidgets/extrapanel.cpp:244
 msgid "Gamma"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:117 modules/gui/wxwidgets/extrapanel.cpp:239
+#: modules/gui/macosx/extended.m:107 modules/gui/wxwidgets/extrapanel.cpp:239
 msgid "Saturation"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:118 modules/gui/macosx/macosx.m:59
+#: modules/gui/macosx/extended.m:108 modules/gui/macosx/macosx.m:59
 #: modules/gui/macosx/sfilters.m:79 modules/gui/macosx/sfilters.m:90
 msgid "Opaqueness"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:617
+#: modules/gui/macosx/extended.m:609
 msgid "About the video filters"
 msgstr ""
 
-#: modules/gui/macosx/extended.m:618
+#: modules/gui/macosx/extended.m:610
 msgid ""
 "This panel allows on-the-fly selection of various video effects.\n"
 "These filters can be configured individually in the Preferences, in the "
@@ -13064,7 +13070,18 @@ msgstr ""
 msgid "path to use in file dialog"
 msgstr ""
 
-#: modules/gui/qt4/qt4.cpp:70
+#: modules/gui/qt4/qt4.cpp:68 modules/gui/wxwidgets/dialogs/open.cpp:261
+#: modules/gui/wxwidgets/dialogs/open.cpp:272
+#: modules/gui/wxwidgets/dialogs/open.cpp:416
+#: modules/gui/wxwidgets/dialogs/preferences.cpp:217
+msgid "Advanced options"
+msgstr ""
+
+#: modules/gui/qt4/qt4.cpp:69
+msgid "Activate by default all theAdvanced options for geeks"
+msgstr ""
+
+#: modules/gui/qt4/qt4.cpp:74
 msgid "Qt interface"
 msgstr ""
 
@@ -13376,13 +13393,6 @@ msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:256
 msgid "Advanced options..."
-msgstr ""
-
-#: modules/gui/wxwidgets/dialogs/open.cpp:261
-#: modules/gui/wxwidgets/dialogs/open.cpp:272
-#: modules/gui/wxwidgets/dialogs/open.cpp:416
-#: modules/gui/wxwidgets/dialogs/preferences.cpp:217
-msgid "Advanced options"
 msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:276

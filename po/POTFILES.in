@@ -70,8 +70,8 @@ src/audio_output/intf.c
 src/audio_output/mixer.c
 src/audio_output/output.c
 src/control/audio.c
-src/control/callback.c
 src/control/core.c
+src/control/event.c
 src/control/input.c
 src/control/libvlc_internal.h
 src/control/log.c
@@ -129,6 +129,7 @@ src/misc/variables.c
 src/misc/variables.h
 src/misc/win32_specific.c
 src/misc/xml.c
+src/modules/builtin.h
 src/modules/configuration.c
 src/modules/configuration_chain.c
 src/modules/configuration.h
