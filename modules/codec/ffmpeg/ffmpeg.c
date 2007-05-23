@@ -85,6 +85,10 @@ static const char *ppsz_mode_descriptions[] =
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define MODULE_DESCRIPTION N_( "Various audio and video decoders/encoders" \
+        "delivered by the FFmpeg library. This includes (MS)MPEG4, DivX, SV1,"\
+        "H261, H263, H264, WMV, WMA, AAC, AMR, DV, MJPEG and other codecs")
+
 vlc_module_begin();
     set_shortname( "FFmpeg");
     set_category( CAT_INPUT );
@@ -96,11 +100,13 @@ vlc_module_begin();
     /*add_requirement( ALTIVEC );*/
     set_capability( "decoder", 71 );
 #else
-    set_description( _("FFmpeg audio/video decoder/encoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
+    set_description( _("FFmpeg audio/video decoders/encoders") );
+    set_help( MODULE_DESCRIPTION );
     set_capability( "decoder", 70 );
 #endif
     set_section( N_("Decoding") , NULL );
     set_callbacks( OpenDecoder, CloseDecoder );
+
 
     add_bool( "ffmpeg-dr", 1, NULL, DR_TEXT, DR_TEXT, VLC_TRUE );
     add_integer ( "ffmpeg-error-resilience", 1, NULL, ERROR_TEXT,
