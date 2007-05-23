@@ -131,7 +131,7 @@ int main( int i_argc, char *ppsz_argv[] )
         int si = { 0 };
         __wgetmainargs(&i_wargc, &wargv, &wenvp, 0, &si);
 
-        for( i = 1; i < i_wargc; i++ )
+        for( i = 0; i < i_wargc; i++ )
         {
             int len = WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, NULL, 0, NULL, NULL);
             if( len > 0 )
