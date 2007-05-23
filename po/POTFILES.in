@@ -127,7 +127,6 @@ src/misc/threads.c
 src/misc/update.c
 src/misc/variables.c
 src/misc/variables.h
-src/misc/version.c
 src/misc/win32_specific.c
 src/misc/xml.c
 src/modules/configuration.c
