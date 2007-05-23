@@ -34,6 +34,10 @@
 #include <QLineEdit>
 #include <QStackedLayout>
 
+#ifdef HAVE_LIMITS_H
+#   include <limits.h>
+#endif
+
 /**************************************************************************
  * File open
  **************************************************************************/
@@ -477,6 +481,8 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 #define CuMRL( widget, slot ) CONNECT( widget , slot , this, updateMRL() );
 
+#define setMaxBound( spinbox ) spinbox->setRange ( 0, INT_MAX );
+
     /*******
      * V4L *
      *******/
@@ -542,9 +548,11 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     pvrFreq = new QSpinBox;
     pvrFreq->setAlignment( Qt::AlignRight );
     pvrFreq->setSuffix(" kHz");
+    setMaxBound( pvrFreq );
     pvrBitr = new QSpinBox;
     pvrBitr->setAlignment( Qt::AlignRight );
     pvrBitr->setSuffix(" kHz");
+    setMaxBound( pvrBitr );
     QLabel *pvrNormLabel = new QLabel( qtr( "Norm" ) );
     QLabel *pvrFreqLabel = new QLabel( qtr( "Frequency" ) );
     QLabel *pvrBitrLabel = new QLabel( qtr( "Bitrate" ) );
@@ -603,6 +611,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     bdaFreq = new QSpinBox;
     bdaFreq->setAlignment( Qt::AlignRight );
     bdaFreq->setSuffix(" kHz");
+    setMaxBound( bdaFreq )
     bdaPropLayout->addWidget( bdaFreqLabel, 0, 0 );
     bdaPropLayout->addWidget( bdaFreq, 0, 1 );
 
@@ -610,6 +619,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     bdaSrate = new QSpinBox;
     bdaSrate->setAlignment( Qt::AlignRight );
     bdaSrate->setSuffix(" kHz");
+    setMaxBound( bdaSrate );
     bdaPropLayout->addWidget( bdaSrateLabel, 1, 0 );
     bdaPropLayout->addWidget( bdaSrate, 1, 1 );
 
@@ -656,6 +666,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dvbFreq = new QSpinBox;
     dvbFreq->setAlignment( Qt::AlignRight );
     dvbFreq->setSuffix(" kHz");
+    setMaxBound( dvbFreq  );
     dvbPropLayout->addWidget( dvbFreqLabel, 0, 0 );
     dvbPropLayout->addWidget( dvbFreq, 0, 1 );
 
@@ -663,6 +674,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dvbSrate = new QSpinBox;
     dvbSrate->setAlignment( Qt::AlignRight );
     dvbSrate->setSuffix(" kHz");
+    setMaxBound( dvbSrate );
     dvbPropLayout->addWidget( dvbSrateLabel, 1, 0 );
     dvbPropLayout->addWidget( dvbSrate, 1, 1 );
 
