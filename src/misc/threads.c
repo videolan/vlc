@@ -45,9 +45,27 @@ static vlc_object_t *p_root;
 #elif defined( ST_INIT_IN_ST_H )
 #elif defined( UNDER_CE )
 #elif defined( WIN32 )
+
+/* following is only available on NT/2000/XP and above */
 static SIGNALOBJECTANDWAIT pf_SignalObjectAndWait = NULL;
-static vlc_bool_t          b_fast_mutex = 0;
-static int                 i_win9x_cv = 0;
+
+/*
+** On Windows NT/2K/XP we use a slow mutex implementation but which
+** allows us to correctly implement condition variables.
+** You can also use the faster Win9x implementation but you might
+** experience problems with it.
+*/
+static vlc_bool_t          b_fast_mutex = VLC_FALSE;
+/*
+** On Windows 9x/Me you can use a fast but incorrect condition variables
+** implementation (more precisely there is a possibility for a race
+** condition to happen).
+** However it is possible to use slower alternatives which are more robust.
+** Currently you can choose between implementation 0 (which is the
+** fastest but slightly incorrect), 1 (default) and 2.
+*/
+static int i_win9x_cv = 1;
+
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -76,13 +94,8 @@ int __vlc_threads_init( vlc_object_t *p_this )
 #elif defined( WIN32 )
     if( IsDebuggerPresent() )
     {
-        /* SignalObjectAndWait() API is problematic under a debugger */
+        /* SignalObjectAndWait() is problematic under a debugger */
         b_fast_mutex = VLC_TRUE;
-        i_win9x_cv = 0;
-    }
-    else
-    {
-        b_fast_mutex = VLC_FALSE;
         i_win9x_cv = 1;
     }
 #elif defined( HAVE_KERNEL_SCHEDULER_H )

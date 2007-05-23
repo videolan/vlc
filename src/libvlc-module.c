@@ -923,24 +923,6 @@ static const char *ppsz_clock_descriptions[] =
     "all the processor time and render the whole system unresponsive which " \
     "might require a reboot of your machine.")
 
-#define FAST_MUTEX_TEXT N_("Fast mutex on NT/2K/XP (developers only)")
-#define FAST_MUTEX_LONGTEXT N_( \
-    "On Windows NT/2K/XP we use a slow mutex implementation but which " \
-    "allows us to correctly implement condition variables. " \
-    "You can also use the faster Win9x implementation but you might " \
-    "experience problems with it.")
-
-#define WIN9X_CV_TEXT N_("Condition variables implementation for Win9x " \
-    "(developers only)")
-#define WIN9X_CV_LONGTEXT N_( \
-    "On Windows 9x/Me you can use a fast but incorrect condition variables " \
-    "implementation (more precisely there is a possibility for a race " \
-    "condition to happen). " \
-    "However it is possible to use slower alternatives which are more " \
-    "robust. " \
-    "Currently you can choose between implementation 0 (which is the " \
-    "fastest but slightly incorrect), 1 (default) and 2.")
-
 #define PLAYLISTENQUEUE_TEXT N_( \
     "Enqueue items to playlist when in one instance mode")
 #define PLAYLISTENQUEUE_LONGTEXT N_( \
@@ -1668,12 +1650,6 @@ vlc_module_begin();
               PLAYLISTENQUEUE_LONGTEXT, VLC_TRUE );
     add_bool( "high-priority", 0, NULL, HPRIORITY_TEXT,
               HPRIORITY_LONGTEXT, VLC_FALSE );
-        change_need_restart();
-    add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT,
-              FAST_MUTEX_LONGTEXT, VLC_TRUE );
-        change_need_restart();
-    add_integer( "win9x-cv-method", 1, NULL, WIN9X_CV_TEXT,
-                  WIN9X_CV_LONGTEXT, VLC_TRUE );
         change_need_restart();
 #endif
 
