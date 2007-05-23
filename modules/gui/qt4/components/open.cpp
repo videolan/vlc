@@ -765,13 +765,13 @@ void CaptureOpenPanel::updateButtons()
         if( bdac->isChecked() || bdat->isChecked() ) bdaFreq->setSuffix(" Hz");
         if( bdas->isChecked() || bdac->isChecked() )
         {
-            bdaSrate->hide();
-            bdaSrateLabel->hide();
+            bdaSrate->show();
+            bdaSrateLabel->show();
         }
         else
         {
             bdaSrate->show();
-            bdaSrateLabel->show();
+            bdaSrateLabel->hide();
         }
         break;
     }
