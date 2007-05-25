@@ -152,15 +152,15 @@ static void bo_add_16be ( bo_t *, uint16_t );
 static void bo_add_24be ( bo_t *, uint32_t );
 static void bo_add_32be ( bo_t *, uint32_t );
 static void bo_add_64be ( bo_t *, uint64_t );
-static void bo_add_fourcc(bo_t *, char * );
+static void bo_add_fourcc(bo_t *, const char * );
 static void bo_add_bo   ( bo_t *, bo_t * );
 static void bo_add_mem  ( bo_t *, int , uint8_t * );
 static void bo_add_descr( bo_t *, uint8_t , uint32_t );
 
 static void bo_fix_32be ( bo_t *, int , uint32_t );
 
-static bo_t *box_new     ( char *fcc );
-static bo_t *box_full_new( char *fcc, uint8_t v, uint32_t f );
+static bo_t *box_new     ( const char *fcc );
+static bo_t *box_full_new( const char *fcc, uint8_t v, uint32_t f );
 static void  box_fix     ( bo_t *box );
 static void  box_free    ( bo_t *box );
 static void  box_gather  ( bo_t *box, bo_t *box2 );
@@ -1528,7 +1528,7 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     return stbl;
 }
 
-static int64_t get_timestamp();
+static int64_t get_timestamp(void);
 
 static uint32_t mvhd_matrix[9] =
     { 0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000 };
@@ -2003,7 +2003,7 @@ static void bo_add_64be( bo_t *p_bo, uint64_t i )
     bo_add_32be( p_bo, i &0xffffffff );
 }
 
-static void bo_add_fourcc( bo_t *p_bo, char *fcc )
+static void bo_add_fourcc( bo_t *p_bo, const char *fcc )
 {
     bo_add_8( p_bo, fcc[0] );
     bo_add_8( p_bo, fcc[1] );
@@ -2071,7 +2071,7 @@ static void bo_add_bo( bo_t *p_bo, bo_t *p_bo2 )
     }
 }
 
-static bo_t * box_new( char *fcc )
+static bo_t * box_new( const char *fcc )
 {
     bo_t *box;
 
@@ -2086,7 +2086,7 @@ static bo_t * box_new( char *fcc )
     return box;
 }
 
-static bo_t * box_full_new( char *fcc, uint8_t v, uint32_t f )
+static bo_t * box_full_new( const char *fcc, uint8_t v, uint32_t f )
 {
     bo_t *box;
 
@@ -2152,7 +2152,7 @@ static void box_send( sout_mux_t *p_mux,  bo_t *box )
     sout_AccessOutWrite( p_mux->p_access, p_buf );
 }
 
-static int64_t get_timestamp()
+static int64_t get_timestamp(void)
 {
     int64_t i_timestamp = 0;
 

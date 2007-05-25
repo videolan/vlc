@@ -546,7 +546,7 @@ static void bo_AddLWordBE( buffer_out_t *p_bo, uint64_t i )
 }
 #endif
 
-static void bo_AddFCC( buffer_out_t *p_bo, char *fcc )
+static void bo_AddFCC( buffer_out_t *p_bo, const char *fcc )
 {
     bo_AddByte( p_bo, fcc[0] );
     bo_AddByte( p_bo, fcc[1] );
