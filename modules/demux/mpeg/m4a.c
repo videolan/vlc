@@ -28,6 +28,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
+#include <vlc_meta.h>
 #include "vlc_codec.h"
 
 /*****************************************************************************
@@ -54,6 +55,7 @@ struct demux_sys_t
 {
     vlc_bool_t  b_start;
     es_out_id_t *p_es;
+    vlc_meta_t  *meta;
 
     decoder_t   *p_packetizer;
 
@@ -76,6 +78,7 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
+    module_t    *p_id3;
     uint8_t     *p_peek;
     int         b_forced = VLC_FALSE;
 
@@ -121,6 +124,13 @@ static int Open( vlc_object_t * p_this )
     es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
     LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "mp4 audio" );
 
+    /* Parse possible id3 header */
+    if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
+    {
+        p_sys->meta = (vlc_meta_t *)p_demux->p_private;
+        p_demux->p_private = NULL;
+        module_Unneed( p_demux, p_id3 );
+    }
     return VLC_SUCCESS;
 }
 
@@ -193,11 +203,18 @@ static int Demux( demux_t *p_demux)
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    vlc_meta_t *p_meta;
+
     int64_t *pi64;
     int i_ret;
 
     switch( i_query )
     {
+    case DEMUX_GET_META:
+        p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
+        vlc_meta_Merge( p_meta, p_sys->meta );
+        return VLC_SUCCESS;
+
     case DEMUX_GET_TIME:
         pi64 = (int64_t*)va_arg( args, int64_t * );
         *pi64 = p_sys->i_pts + p_sys->i_time_offset;
