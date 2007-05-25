@@ -190,8 +190,8 @@ VLC_EXPORT(int, input_ItemAddInfo, ( input_item_t *p_i, const char *psz_cat, con
 
 #define input_ItemNew( a,b,c ) input_ItemNewExt( a, b, c, 0, NULL, -1 )
 #define input_ItemNewExt(a,b,c,d,e,f) __input_ItemNewExt( VLC_OBJECT(a),b,c,d,e,f)
-VLC_EXPORT( input_item_t *, __input_ItemNewExt, (vlc_object_t *, const char *, const char*, int, const char *const *, int)  );
-VLC_EXPORT( input_item_t *, input_ItemNewWithType, ( vlc_object_t *, const char *, const char *e, int, const char *const *, int, int ) );
+VLC_EXPORT( input_item_t *, __input_ItemNewExt, (vlc_object_t *, const char *, const char*, int, const char *const *, mtime_t i_duration )  );
+VLC_EXPORT( input_item_t *, input_ItemNewWithType, ( vlc_object_t *, const char *, const char *e, int, const char *const *, mtime_t i_duration, int ) );
 
 VLC_EXPORT( input_item_t *, input_ItemGetById, (playlist_t *, int ) );
 

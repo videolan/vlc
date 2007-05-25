@@ -199,8 +199,10 @@ input_item_t *input_ItemGetById( playlist_t *p_playlist, int i_id )
 }
 
 input_item_t *__input_ItemNewExt( vlc_object_t *p_obj, const char *psz_uri,
-                                  const char *psz_name, int i_options,
-                                  const char *const *ppsz_options, int i_duration )
+                                  const char *psz_name,
+                                  int i_options,
+                                  const char *const *ppsz_options,
+                                  mtime_t i_duration )
 {
     return input_ItemNewWithType( p_obj, psz_uri, psz_name,
                                   i_options, ppsz_options,
@@ -209,8 +211,10 @@ input_item_t *__input_ItemNewExt( vlc_object_t *p_obj, const char *psz_uri,
 
 
 input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
-                                const char *psz_name, int i_options,
-                                const char *const *ppsz_options, int i_duration,
+                                const char *psz_name,
+                                int i_options,
+                                const char *const *ppsz_options,
+                                mtime_t i_duration,
                                 int i_type )
 {
     playlist_t *p_playlist = pl_Yield( p_obj );
