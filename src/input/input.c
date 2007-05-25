@@ -2280,9 +2280,10 @@ static int InputSourceInit( input_thread_t *p_input,
             char *psz_buf = NULL;
             if( in->p_access->psz_path )
             {
+                const char *psz_a, *psz_d;
                 psz_buf = strdup( in->p_access->psz_path );
-                char *psz_a, *psz_d;
-                MRLSplit( p_input, psz_buf, &psz_a, &psz_d, &psz_real_path );
+                MRLSplit( VLC_OBJECT(p_input), psz_buf,
+                          &psz_a, &psz_d, &psz_real_path );
             }
             else
             {
