@@ -599,14 +599,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     addModuleAndLayouts( BDA_DEVICE, bda, "DVB DirectShow" );
 
     /* bda Main */
-    QLabel *bdaDeviceLabel = new QLabel( qtr( "Adapter card to tune" ) );
     QLabel *bdaTypeLabel = new QLabel( qtr( "DVB Type:" ) );
-
-    bdaCard = new QSpinBox;
-    bdaCard->setAlignment( Qt::AlignRight );
-
-    bdaDevLayout->addWidget( bdaDeviceLabel, 0, 0 );
-    bdaDevLayout->addWidget( bdaCard, 0, 2, 1, 2 );
 
     bdas = new QRadioButton( "DVB-S" );
     bdas->setChecked( true );
@@ -637,7 +630,6 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     bdaPropLayout->addWidget( bdaSrate, 1, 1 );
 
     /* bda CONNECTs */
-    CuMRL( bdaCard, valueChanged ( int ) );
     CuMRL( bdaFreq, valueChanged ( int ) );
     CuMRL( bdaSrate, valueChanged ( int ) );
     BUTTONACT( bdas, updateButtons() );
@@ -751,9 +743,9 @@ void CaptureOpenPanel::updateMRL()
         else if(  bdat->isChecked() ) mrl = "dvb-t://";
         else if(  bdac->isChecked() ) mrl = "dvb-c://";
         else return;
-        mrl += " :dvb-adapter=" + QString("%1").arg( bdaCard->value() );
         mrl += " :dvb-frequency=" + QString("%1").arg( bdaFreq->value() );
-        mrl += " :dvb-srate=" + QString("%1").arg( bdaSrate->value() );
+        if( bdas->isChecked() || bdac->isChecked() )
+            mrl += " :dvb-srate=" + QString("%1").arg( bdaSrate->value() );
         break;
   case DSHOW_DEVICE:
         break;
@@ -774,8 +766,6 @@ void CaptureOpenPanel::updateButtons()
         if( dvbc->isChecked() || dvbt->isChecked() ) dvbFreq->setSuffix(" Hz");
         break;
     case BDA_DEVICE:
-        if( bdas->isChecked() ) bdaFreq->setSuffix(" kHz");
-        if( bdac->isChecked() || bdat->isChecked() ) bdaFreq->setSuffix(" Hz");
         if( bdas->isChecked() || bdac->isChecked() )
         {
             bdaSrate->show();
@@ -783,7 +773,7 @@ void CaptureOpenPanel::updateButtons()
         }
         else
         {
-            bdaSrate->show();
+            bdaSrate->hide();
             bdaSrateLabel->hide();
         }
         break;
