@@ -413,7 +413,7 @@ VLMAddStreamPanel::VLMAddStreamPanel( intf_thread_t *_p_intf,
                          0 , wxEXPAND | wxALL , 5 );
     }
     lower_sizer->Add( new wxButton( this, Create_Event,
-                          wxU( _( b_edit ? "OK" : "Create" ) ) ),
+                          wxU( _( b_edit ? "OK" : N_("Create") ) ) ),
                       0 , wxEXPAND | wxALL , 5 );
 
 

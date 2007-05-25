@@ -483,12 +483,12 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
     top_sizer->Add( 0, 0, 1, wxALL, 2 );
 
     smooth_text = new wxStaticText( panel, -1, wxU( _("Smooth :") ));
-    smooth_text->SetToolTip( wxU( SMOOTH_TIP ) );
+    smooth_text->SetToolTip( wxU( _(SMOOTH_TIP) ) );
     top_sizer->Add( smooth_text, 0, wxALL, 2 );
 
     smooth_slider =new wxSlider( panel, Smooth_Event, 0, 0, 10 ,
                     wxDefaultPosition, wxSize( 100, -1 ) );
-    smooth_slider->SetToolTip( wxU( SMOOTH_TIP ) );
+    smooth_slider->SetToolTip( wxU( _(SMOOTH_TIP) ) );
     top_sizer->Add( smooth_slider, 0, wxALL, 2 );
     i_smooth = 0;
 
