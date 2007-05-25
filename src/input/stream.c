@@ -1875,9 +1875,9 @@ int stream_Control( stream_t *s, int i_query, ... )
 }
 
 /**
- * Read "i_size" bytes and store them in a block_t. If less than "i_size"
- * bytes are available then return what is left and if nothing is available,
- * return NULL.
+ * Read "i_size" bytes and store them in a block_t.
+ * It always read i_size bytes unless you are at the end of the stream
+ * where it return what is available.
  */
 block_t *stream_Block( stream_t *s, int i_size )
 {
