@@ -43,7 +43,7 @@ Carsten Gottbehüt <gottbehuet at active-elements dot de> - v4l hotplug fix
 Cédric Cocquebert - Misc opengl effects for the OpenGL Video Output. "Panoramix" video filter for image walls with automatic attenuation. Fix on sharpen filter.
 Chris Clepper - OpenGL fix
 Christian Henz - libupnp service discovery plugin, CyberLink UPnP fixes
-Cristian Secară <christi at secarica dot ro> - Romanian l10n
+Cristian Secară <cristi at secarica dot ro> - Romanian l10n
 Christof Baumgaertner - dbox web intf
 Christophe Burgalat <c.burgalat _at_ broadcastavenue _dot_ com> - XVMC (cle266) patch for VIA boards
 Christopher Johnson <cjohnson at mint.net> - Qt fix in vlc.spec
