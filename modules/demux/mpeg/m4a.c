@@ -56,12 +56,18 @@ struct demux_sys_t
     es_out_id_t *p_es;
 
     decoder_t   *p_packetizer;
+
+    mtime_t     i_pts;
+    int64_t     i_bytes;
+    mtime_t     i_time_offset;
+    int         i_bitrate_avg;
 };
 
 static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
 
 #define M4A_PACKET_SIZE 4096
+#define M4A_PTS_START 1
 
 /*****************************************************************************
  * Open: initializes demux structures
@@ -105,6 +111,10 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys     = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_es        = NULL;
     p_sys->b_start     = VLC_TRUE;
+    p_sys->i_pts       = 0;
+    p_sys->i_bytes     = 0;
+    p_sys->i_time_offset = 0;
+    p_sys->i_bitrate_avg = 0;
 
     /* Load the mpeg 4 audio packetizer */
     INIT_APACKETIZER( p_sys->p_packetizer,  'm', 'p', '4', 'a'  );
@@ -142,7 +152,7 @@ static int Demux( demux_t *p_demux)
         return 0;
     }
 
-    p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start ? 1 : 0;
+    p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start ? M4A_PTS_START : 0;
     p_sys->b_start = VLC_FALSE;
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize(
@@ -162,6 +172,13 @@ static int Demux( demux_t *p_demux)
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
 
             p_block_out->p_next = NULL;
+
+            p_sys->i_pts = p_block_out->i_pts;
+            if( p_sys->i_pts > M4A_PTS_START + I64C(500000) )
+                p_sys->i_bitrate_avg =
+                    8*I64C(1000000)*p_sys->i_bytes/(p_sys->i_pts-M4A_PTS_START);
+
+            p_sys->i_bytes += p_block_out->i_buffer;
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
             p_block_out = p_next;
@@ -175,7 +192,32 @@ static int Demux( demux_t *p_demux)
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    if( i_query == DEMUX_SET_TIME ) return VLC_EGENERIC;
-    else return demux2_vaControlHelper( p_demux->s, 0, -1,
-                                        0, 1, i_query, args );
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int64_t *pi64;
+    int i_ret;
+
+    switch( i_query )
+    {
+    case DEMUX_GET_TIME:
+        pi64 = (int64_t*)va_arg( args, int64_t * );
+        *pi64 = p_sys->i_pts + p_sys->i_time_offset;
+        return VLC_SUCCESS;
+
+    case DEMUX_SET_TIME: /* TODO high precision seek for multi-input */
+    default:
+        i_ret = demux2_vaControlHelper( p_demux->s, 0, -1,
+                                        p_sys->i_bitrate_avg, 1, i_query, args);
+        /* Fix time_offset */
+        if( (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME ) &&
+            i_ret == VLC_SUCCESS && p_sys->i_bitrate_avg > 0 )
+        {
+            int64_t i_time = I64C(8000000) * stream_Tell(p_demux->s) /
+                p_sys->i_bitrate_avg;
+
+            if( i_time >= 0 )
+                p_sys->i_time_offset = i_time - p_sys->i_pts;
+        }
+        return i_ret;
+    }
 }
+
