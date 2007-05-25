@@ -100,13 +100,17 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* Change the text that was uncool in the usual box */
     listLabel[5]->setText( qtr( "Filter:" ) );
 
+#if WIN32
+    /* QFileDialog is quite buggy make it brerable on win32 by tweaking 
+       the followin */
     QListView *fileListView = findChildren<QListView*>().first();
+    fileListView->setLayoutMode(QListView::Batched);
     fileListView->setViewMode(QListView::ListMode);
     fileListView->setResizeMode(QListView::Adjust);
-    fileListView->setWrapping(true);
-    fileListView->setFlow(QListView::TopToBottom);
     fileListView->setUniformItemSizes(false);
-    fileListView->setLayoutMode(QListView::Batched);
+    fileListView->setFlow(QListView::TopToBottom);
+    fileListView->setWrapping(true);
+#endif
 
     // Hide the subtitles control by default.
     ui.subFrame->hide();
