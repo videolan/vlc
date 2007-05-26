@@ -131,8 +131,8 @@ static const char *ppsz_lp_fec_text[] = { N_("Undefined"), N_("1/2"), N_("2/3"),
 #define BANDWIDTH_TEXT N_("Terrestrial bandwidth")
 #define BANDWIDTH_LONGTEXT N_("Terrestrial bandwidth [0=auto,6,7,8 in MHz]")
 static const int i_band_list[] = { -1, 6, 7, 8 };
-static const char *ppsz_band_text[] = { N_("Undefined"), N_("6"), N_("7"),
-    N_("8") };
+static const char *ppsz_band_text[] = { N_("Undefined"), N_("6 MHz"),
+    N_("7 MHz"), N_("8 MHz") };
 
 #define GUARD_TEXT N_("Terrestrial guard interval")
 #define GUARD_LONGTEXT N_("Guard interval [Undefined,1/4,1/8,1/16,1/32]")
