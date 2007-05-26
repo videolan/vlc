@@ -92,4 +92,10 @@ int qtEventToVLCKey( QKeyEvent *e );
 int qtWheelEventToVLCKey( QWheelEvent *e );
 QString VLCKeyToString( int val );
 
+#include "qt4.hpp"
+#include <vlc/vlc.h>
+class QComboBox;
+void setfillVLCConfigCombo(const char *configname, intf_thread_t *p_intf,
+                        QComboBox *combo, QWidget *parent = 0 );
+
 #endif

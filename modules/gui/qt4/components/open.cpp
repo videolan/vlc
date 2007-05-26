@@ -40,7 +40,7 @@
 #endif
 
 /**************************************************************************
- * File open
+ * Open Files and subtitles                                               *
  **************************************************************************/
 FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
@@ -65,7 +65,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
             qfu( p_intf->p_libvlc->psz_homedir ), fileTypes );
 /*    dialogBox->setFileMode( QFileDialog::ExistingFiles );*/
-    dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
+/*    dialogBox->setAcceptMode( QFileDialog::AcceptOpen );*/
 
     /* retrieve last known path used in file browsing */
     char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
@@ -77,6 +77,8 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* We don't want to see a grip in the middle of the window, do we? */
     dialogBox->setSizeGripEnabled( false );
+
+    /* Add a tooltip */
     dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ));
 
     // Add it to the layout
@@ -84,7 +86,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     // But hide the two OK/Cancel buttons. Enable them for debug.
     QDialogButtonBox *fileDialogAcceptBox =
-                        findChildren<QDialogButtonBox*>()[0];
+                                        findChildren<QDialogButtonBox*>()[0];
     fileDialogAcceptBox->hide();
 
     /* Ugly hacks to get the good Widget */
@@ -116,47 +118,23 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.subFrame->hide();
 
     /* Build the subs size combo box */
-    module_config_t *p_item =
-        config_FindConfig( VLC_OBJECT(p_intf), "freetype-rel-fontsize" );
-    if( p_item )
-    {
-        for( int i_index = 0; i_index < p_item->i_list; i_index++ )
-        {
-            ui.sizeSubComboBox->addItem(
-                qfu( p_item->ppsz_list_text[i_index] ),
-                QVariant( p_item->pi_list[i_index] ) );
-            if( p_item->value.i == p_item->pi_list[i_index] )
-            {
-                ui.sizeSubComboBox->setCurrentIndex( i_index );
-            }
-        }
-    }
+    setfillVLCConfigCombo( "freetype-rel-fontsize" , p_intf,
+             ui.sizeSubComboBox );
 
     /* Build the subs align combo box */
-    p_item = config_FindConfig( VLC_OBJECT(p_intf), "subsdec-align" );
-    if( p_item )
-    {
-        for( int i_index = 0; i_index < p_item->i_list; i_index++ )
-        {
-            ui.alignSubComboBox->addItem(
-                qfu( p_item->ppsz_list_text[i_index] ),
-                QVariant( p_item->pi_list[i_index] ) );
-            if( p_item->value.i == p_item->pi_list[i_index] )
-            {
-                ui.alignSubComboBox->setCurrentIndex( i_index );
-            }
-        }
-    }
+    setfillVLCConfigCombo( "subsdec-align", p_intf, ui.alignSubComboBox );
 
     /* Connects  */
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
     BUTTONACT( ui.subCheckBox, toggleSubtitleFrame());
 
-    CONNECT( ui.fileInput, editTextChanged( QString ), this, updateMRL());
-    CONNECT( ui.subInput, editTextChanged( QString ), this, updateMRL());
-    CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this, updateMRL());
-    CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this, updateMRL());
-    CONNECT( lineFileEdit, textChanged( QString ), this, browseFile());
+    CONNECT( ui.fileInput, editTextChanged( QString ), this, updateMRL() );
+    CONNECT( ui.subInput, editTextChanged( QString ), this, updateMRL() );
+    CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this,
+                                                            updateMRL() );
+    CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this,
+                                                            updateMRL() );
+    CONNECT( lineFileEdit, textChanged( QString ), this, browseFile() );
 }
 
 FileOpenPanel::~FileOpenPanel()
@@ -255,13 +233,14 @@ void FileOpenPanel::toggleSubtitleFrame()
 }
 
 /**************************************************************************
- * Disk open
+ * Open Discs ( DVD, CD, VCD and similar devices )                        *
  **************************************************************************/
 DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
 
+    /* CONNECTs */
     BUTTONACT( ui.dvdRadioButton, updateButtons());
     BUTTONACT( ui.vcdRadioButton, updateButtons());
     BUTTONACT( ui.audioCDRadioButton, updateButtons());
@@ -358,20 +337,20 @@ void DiscOpenPanel::updateMRL()
                 QString("%1").arg( ui.subtitlesSpin->value() );
         }
     }
-
     emit mrlUpdated( mrl );
 }
 
 
 
 /**************************************************************************
- * Net open
+ * Open Network streams and URL pages                                     *
  **************************************************************************/
 NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
 
+    /* CONNECTs */
     CONNECT( ui.protocolCombo, currentIndexChanged( int ),
              this, updateProtocol( int ) );
     CONNECT( ui.portSpin, valueChanged( int ), this, updateMRL() );
@@ -409,7 +388,6 @@ void NetOpenPanel::updateProtocol( int idx ) {
         addr.replace( QRegExp("^.*://"), proto + "://");
         ui.addressText->setText( addr );
     }
-
     updateMRL();
 }
 
@@ -468,19 +446,21 @@ void NetOpenPanel::updateMRL() {
 }
 
 /**************************************************************************
- * Capture open
+ * Open Capture device ( DVB, PVR, V4L, and similar )                     *
  **************************************************************************/
 CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
 
+    /* Create two stacked layouts in the main comboBoxes */
     QStackedLayout *stackedDevLayout = new QStackedLayout;
     ui.cardBox->setLayout( stackedDevLayout );
 
     QStackedLayout *stackedPropLayout = new QStackedLayout;
     ui.optionsBox->setLayout( stackedPropLayout );
 
+    /* Creation and connections of the WIdgets in the stacked layout */
 #define addModuleAndLayouts( number, name, label )                    \
     QWidget * name ## DevPage = new QWidget( this );                  \
     QWidget * name ## PropPage = new QWidget( this );                 \
@@ -499,36 +479,36 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /*******
      * V4L *
      *******/
-    /* V4l Main */
     addModuleAndLayouts( V4L_DEVICE, v4l, "Video for Linux" );
+
+    /* V4l Main panel */
     QLabel *v4lVideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
     v4lDevLayout->addWidget( v4lVideoDeviceLabel, 0, 0 );
+
     v4lVideoDevice = new QLineEdit;
     v4lDevLayout->addWidget( v4lVideoDevice, 0, 1 );
+
     QLabel *v4lAudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
     v4lDevLayout->addWidget( v4lAudioDeviceLabel, 1, 0 );
+
     v4lAudioDevice = new QLineEdit;
     v4lDevLayout->addWidget( v4lAudioDevice, 1, 1 );
 
-    /* V4l Props */
+    /* V4l Props panel */
     v4lNormBox = new QComboBox;
-    v4lNormBox->insertItem( 3, qtr( "Automatic" ) );
-    v4lNormBox->insertItem( 0, "SECAM" );
-    v4lNormBox->insertItem( 1, "NTSC" );
-    v4lNormBox->insertItem( 2, "PAL" );
+    setfillVLCConfigCombo( "v4l-norm", p_intf, v4lNormBox );
+    v4lPropLayout->addWidget( v4lNormBox, 0 , 1 );
 
     v4lFreq = new QSpinBox;
     v4lFreq->setAlignment( Qt::AlignRight );
     v4lFreq->setSuffix(" kHz");
+    v4lPropLayout->addWidget( v4lFreq, 1 , 1 );
 
     QLabel *v4lNormLabel = new QLabel( qtr( "Norm" ) );
-    QLabel *v4lFreqLabel = new QLabel( qtr( "Frequency" ) );
-
     v4lPropLayout->addWidget( v4lNormLabel, 0 , 0 );
-    v4lPropLayout->addWidget( v4lNormBox, 0 , 1 );
 
+    QLabel *v4lFreqLabel = new QLabel( qtr( "Frequency" ) );
     v4lPropLayout->addWidget( v4lFreqLabel, 1 , 0 );
-    v4lPropLayout->addWidget( v4lFreq, 1 , 1 );
 
     /* v4l CONNECTs */
     CuMRL( v4lVideoDevice, textChanged( QString ) );
@@ -541,43 +521,44 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
      ************/
     addModuleAndLayouts( PVR_DEVICE, pvr, "PVR" );
 
-    /* PVR Main */
+    /* PVR Main panel */
     QLabel *pvrDeviceLabel = new QLabel( qtr( "Device name" ) );
     pvrDevLayout->addWidget( pvrDeviceLabel, 0, 0 );
+
     pvrDevice = new QLineEdit;
     pvrDevLayout->addWidget( pvrDevice, 0, 1 );
+
     QLabel *pvrRadioDeviceLabel = new QLabel( qtr( "Radio device name" ) );
     pvrDevLayout->addWidget( pvrRadioDeviceLabel, 1, 0 );
+
     pvrRadioDevice = new QLineEdit;
     pvrDevLayout->addWidget( pvrRadioDevice, 1, 1 );
 
-    /* PVR props */
+    /* PVR props panel */
     pvrNormBox = new QComboBox;
-    pvrNormBox->insertItem( 3, qtr( "Automatic" ) );
-    pvrNormBox->insertItem( 0, "SECAM" );
-    pvrNormBox->insertItem( 1, "NTSC" );
-    pvrNormBox->insertItem( 2, "PAL" );
+    setfillVLCConfigCombo( "pvr-norm", p_intf, pvrNormBox );
+    pvrPropLayout->addWidget( pvrNormBox, 0, 1 );
+
+    QLabel *pvrNormLabel = new QLabel( qtr( "Norm" ) );
+    pvrPropLayout->addWidget( pvrNormLabel, 0, 0 );
 
     pvrFreq = new QSpinBox;
     pvrFreq->setAlignment( Qt::AlignRight );
     pvrFreq->setSuffix(" kHz");
     setMaxBound( pvrFreq );
+    pvrPropLayout->addWidget( pvrFreq, 1, 1 );
+
     pvrBitr = new QSpinBox;
     pvrBitr->setAlignment( Qt::AlignRight );
     pvrBitr->setSuffix(" kHz");
     setMaxBound( pvrBitr );
-    QLabel *pvrNormLabel = new QLabel( qtr( "Norm" ) );
-    QLabel *pvrFreqLabel = new QLabel( qtr( "Frequency" ) );
-    QLabel *pvrBitrLabel = new QLabel( qtr( "Bitrate" ) );
-
-    pvrPropLayout->addWidget( pvrNormLabel, 0, 0 );
-    pvrPropLayout->addWidget( pvrNormBox, 0, 1 );
-
-    pvrPropLayout->addWidget( pvrFreqLabel, 1, 0 );
-    pvrPropLayout->addWidget( pvrFreq, 1, 1 );
-
-    pvrPropLayout->addWidget( pvrBitrLabel, 2, 0 );
     pvrPropLayout->addWidget( pvrBitr, 2, 1 );
+
+    QLabel *pvrFreqLabel = new QLabel( qtr( "Frequency" ) );
+    pvrPropLayout->addWidget( pvrFreqLabel, 1, 0 );
+
+    QLabel *pvrBitrLabel = new QLabel( qtr( "Bitrate" ) );
+    pvrPropLayout->addWidget( pvrBitrLabel, 2, 0 );
 
     /* PVR CONNECTs */
     CuMRL( pvrDevice, textChanged( QString ) );
@@ -591,7 +572,6 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
      * DirectShow Stuffs *
      *********************/
     addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
-
 
     /**************
      * BDA Stuffs *
@@ -614,29 +594,30 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* bda Props */
     QLabel *bdaFreqLabel =
                     new QLabel( qtr( "Transponder/multiplex frequency" ) );
+    bdaPropLayout->addWidget( bdaFreqLabel, 0, 0 );
+
     bdaFreq = new QSpinBox;
     bdaFreq->setAlignment( Qt::AlignRight );
     bdaFreq->setSuffix(" kHz");
     setMaxBound( bdaFreq )
-    bdaPropLayout->addWidget( bdaFreqLabel, 0, 0 );
     bdaPropLayout->addWidget( bdaFreq, 0, 1 );
 
     bdaSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
+    bdaPropLayout->addWidget( bdaSrateLabel, 1, 0 );
+
     bdaSrate = new QSpinBox;
     bdaSrate->setAlignment( Qt::AlignRight );
     bdaSrate->setSuffix(" kHz");
     setMaxBound( bdaSrate );
-    bdaPropLayout->addWidget( bdaSrateLabel, 1, 0 );
     bdaPropLayout->addWidget( bdaSrate, 1, 1 );
 
     bdaBandLabel = new QLabel( qtr( "Bandwidth" ) );
-    bdaBandBox = new QComboBox;
-    bdaBandBox->insertItem( 0, qtr( "Automatic" ), QVariant( -1 ) );
-    bdaBandBox->insertItem( 1, "6 MHz", QVariant( 6 ) );
-    bdaBandBox->insertItem( 2, "7 MHz", QVariant( 7 ) );
-    bdaBandBox->insertItem( 3, "8 MHz", QVariant( 8 ) );
     bdaPropLayout->addWidget( bdaBandLabel, 2, 0 );
+
+    bdaBandBox = new QComboBox;
+    setfillVLCConfigCombo( "dvb-bandwidth", p_intf, bdaBandBox );
     bdaPropLayout->addWidget( bdaBandBox, 2, 1 );
+
     bdaBandLabel->hide();
     bdaBandBox->hide();
 
@@ -677,28 +658,31 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dvbDevLayout->addWidget( dvbc, 1, 2 );
     dvbDevLayout->addWidget( dvbt, 1, 3 );
 
-    /* DVB Props */
+    /* DVB Props panel */
     QLabel *dvbFreqLabel =
                     new QLabel( qtr( "Transponder/multiplex frequency" ) );
+    dvbPropLayout->addWidget( dvbFreqLabel, 0, 0 );
+
     dvbFreq = new QSpinBox;
     dvbFreq->setAlignment( Qt::AlignRight );
     dvbFreq->setSuffix(" kHz");
     setMaxBound( dvbFreq  );
-    dvbPropLayout->addWidget( dvbFreqLabel, 0, 0 );
     dvbPropLayout->addWidget( dvbFreq, 0, 1 );
 
     QLabel *dvbSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
+    dvbPropLayout->addWidget( dvbSrateLabel, 1, 0 );
+
     dvbSrate = new QSpinBox;
     dvbSrate->setAlignment( Qt::AlignRight );
     dvbSrate->setSuffix(" kHz");
     setMaxBound( dvbSrate );
-    dvbPropLayout->addWidget( dvbSrateLabel, 1, 0 );
     dvbPropLayout->addWidget( dvbSrate, 1, 1 );
 
     /* DVB CONNECTs */
     CuMRL( dvbCard, valueChanged ( int ) );
     CuMRL( dvbFreq, valueChanged ( int ) );
     CuMRL( dvbSrate, valueChanged ( int ) );
+
     BUTTONACT( dvbs, updateButtons() );
     BUTTONACT( dvbt, updateButtons() );
     BUTTONACT( dvbc, updateButtons() );
@@ -759,14 +743,13 @@ void CaptureOpenPanel::updateMRL()
         if( bdas->isChecked() || bdac->isChecked() )
             mrl += " :dvb-srate=" + QString("%1").arg( bdaSrate->value() );
         else
-            mrl += " :dvb-bandwidth=" + 
-                QString("%1").arg( bdaBandBox->itemData( 
+            mrl += " :dvb-bandwidth=" +
+                QString("%1").arg( bdaBandBox->itemData(
                     bdaBandBox->currentIndex() ).toInt() );
         break;
   case DSHOW_DEVICE:
         break;
     }
-
     emit mrlUpdated( mrl );
 }
 
