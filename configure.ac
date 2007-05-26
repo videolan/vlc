@@ -4896,9 +4896,9 @@ then
   AC_PATH_PROG(WX_CONFIG, ${WXWIDGETS_NAME}, no, ${WXWIDGETS_PATH})
   if test "${WX_CONFIG}" != "no" -a "${CXX}" != ""
   then
-    if expr 2.6.0 \> `${WX_CONFIG} --version` >/dev/null ||  expr 2.7.0 \<= `${WX_CONFIG} --version` >/dev/null
+    if expr 2.6.0 \> `${WX_CONFIG} --version` >/dev/null
     then
-      AC_MSG_ERROR([You need wxWidgets of the 2.6 branch. Please upgrade/downgrade and try again. Better yet, you can configure with --disable-wxwidgets.])
+      AC_MSG_ERROR([You need wxWidgets version 2.6.0 or upwards. Please upgrade and try again.])
     fi
     AC_LANG_PUSH(C++)
     # Turn this error:
