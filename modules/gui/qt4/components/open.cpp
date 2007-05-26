@@ -629,9 +629,21 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     bdaPropLayout->addWidget( bdaSrateLabel, 1, 0 );
     bdaPropLayout->addWidget( bdaSrate, 1, 1 );
 
+    bdaBandLabel = new QLabel( qtr( "Bandwidth" ) );
+    bdaBandBox = new QComboBox;
+    bdaBandBox->insertItem( 0, qtr( "Automatic" ), QVariant( -1 ) );
+    bdaBandBox->insertItem( 1, "6 MHz", QVariant( 6 ) );
+    bdaBandBox->insertItem( 2, "7 MHz", QVariant( 7 ) );
+    bdaBandBox->insertItem( 3, "8 MHz", QVariant( 8 ) );
+    bdaPropLayout->addWidget( bdaBandLabel, 2, 0 );
+    bdaPropLayout->addWidget( bdaBandBox, 2, 1 );
+    bdaBandLabel->hide();
+    bdaBandBox->hide();
+
     /* bda CONNECTs */
     CuMRL( bdaFreq, valueChanged ( int ) );
     CuMRL( bdaSrate, valueChanged ( int ) );
+    CuMRL( bdaBandBox,  currentIndexChanged ( int ) );
     BUTTONACT( bdas, updateButtons() );
     BUTTONACT( bdat, updateButtons() );
     BUTTONACT( bdac, updateButtons() );
@@ -746,6 +758,10 @@ void CaptureOpenPanel::updateMRL()
         mrl += " :dvb-frequency=" + QString("%1").arg( bdaFreq->value() );
         if( bdas->isChecked() || bdac->isChecked() )
             mrl += " :dvb-srate=" + QString("%1").arg( bdaSrate->value() );
+        else
+            mrl += " :dvb-bandwidth=" + 
+                QString("%1").arg( bdaBandBox->itemData( 
+                    bdaBandBox->currentIndex() ).toInt() );
         break;
   case DSHOW_DEVICE:
         break;
@@ -770,11 +786,15 @@ void CaptureOpenPanel::updateButtons()
         {
             bdaSrate->show();
             bdaSrateLabel->show();
+            bdaBandBox->hide();
+            bdaBandLabel->hide();
         }
         else
         {
             bdaSrate->hide();
             bdaSrateLabel->hide();
+            bdaBandBox->show();
+            bdaBandLabel->show();
         }
         break;
     }

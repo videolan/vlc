@@ -139,11 +139,11 @@ private:
     QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr ;
     QLineEdit *v4lVideoDevice, *v4lAudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
-    QComboBox *v4lNormBox, *pvrNormBox;
+    QComboBox *v4lNormBox, *pvrNormBox, *bdaBandBox;
     QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
     QSpinBox *bdaCard, *bdaFreq, *bdaSrate;
 
-    QLabel *bdaSrateLabel;
+    QLabel *bdaSrateLabel, *bdaBandLabel;
 
 public slots:
     virtual void updateMRL();
