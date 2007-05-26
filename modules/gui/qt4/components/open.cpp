@@ -599,6 +599,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     bdaFreq = new QSpinBox;
     bdaFreq->setAlignment( Qt::AlignRight );
     bdaFreq->setSuffix(" kHz");
+    bdaFreq->setSingleStep( 1000 );
     setMaxBound( bdaFreq )
     bdaPropLayout->addWidget( bdaFreq, 0, 1 );
 
