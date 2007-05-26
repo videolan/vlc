@@ -362,7 +362,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     if( i_index < p_list->i_count )
     {
         wxTreeItemId current_item;
-        char *psz_help;
+        const char *psz_help;
         /* We found the main module */
 
         /* Enumerate config categories and store a reference so we can
@@ -434,7 +434,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                     cd->psz_name = strdup(  config_CategoryNameGet(
                                                       p_item->value.i ) );
                     if( cd->psz_help ) free( cd->psz_help );
-                    char *psz_help = config_CategoryHelpGet( p_item->value.i );
+                    const char *psz_help = config_CategoryHelpGet( p_item->value.i );
                     if( psz_help )
                     {
                         cd->psz_help = wraptext( strdup( psz_help ), 72 );
@@ -953,7 +953,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         }
 
         /* Add a head title to the panel */
-        char *psz_head;
+        const char *psz_head;
         if( config_data->i_type == TYPE_SUBCATEGORY ||
             config_data->i_type == TYPE_CATSUBCAT )
         {

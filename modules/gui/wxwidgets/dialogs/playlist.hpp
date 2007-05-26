@@ -180,7 +180,7 @@ private:
     int i_update_counter;
 
     vlc_bool_t b_changed_view;
-    char **pp_sds;
+    const char **pp_sds;
 
 protected:
     intf_thread_t *p_intf;

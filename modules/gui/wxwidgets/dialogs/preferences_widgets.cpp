@@ -281,7 +281,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
         if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
         {
             combo->Append( wxU(p_parser->psz_longname),
-                           p_parser->psz_object_name );
+                           (char *)p_parser->psz_object_name );
             if( p_item->value.psz && !strcmp(p_item->value.psz,
                                              p_parser->psz_object_name) )
                 combo->SetValue( wxU(p_parser->psz_longname) );
@@ -344,7 +344,7 @@ ModuleCatConfigControl::ModuleCatConfigControl( vlc_object_t *p_this,
                 p_config->value.i == p_item->min.i )
             {
                 combo->Append( wxU(p_parser->psz_longname),
-                                   p_parser->psz_object_name );
+                               (char *)p_parser->psz_object_name );
                 if( p_item->value.psz && !strcmp(p_item->value.psz,
                                         p_parser->psz_object_name) )
                 combo->SetValue( wxU(p_parser->psz_longname) );
@@ -559,7 +559,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *p_this,
                                                   wxWindow *parent )
   : ConfigControl( p_this, p_item, parent )
 {
-    psz_default_value = p_item->value.psz;
+    psz_default_value = (char *)p_item->value.psz;
     if( psz_default_value ) psz_default_value = strdup( psz_default_value );
 
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));

@@ -111,8 +111,8 @@ private:
                 "on the toolbar (or both)." )
 
 static int pi_playlist_views[] = { 0,1,2 };
-static char *psz_playlist_views[] = { N_("Normal" ), N_("Embedded" ) ,
-                                      N_("Both") };
+static const char *psz_playlist_views[] = { N_("Normal" ), N_("Embedded" ) ,
+                                            N_("Both") };
 
 vlc_module_begin();
     int i_score = 150;

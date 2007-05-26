@@ -1442,7 +1442,7 @@ wxMenu *Playlist::SDMenu()
         if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
             i_number++;
     }
-    if( i_number ) pp_sds = (char **)calloc( i_number, sizeof(void *) );
+    if( i_number ) pp_sds = (const char **)calloc( i_number, sizeof(void *) );
 
     i_number = 0;
     for( int i_index = 0; i_index < p_list->i_count; i_index++ )

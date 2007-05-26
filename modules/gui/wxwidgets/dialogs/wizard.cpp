@@ -208,7 +208,7 @@ class wizInputPage : public wxWizardPage
 {
     public:
         wizInputPage( wxWizard *, wxWizardPage *, intf_thread_t *);
-        wizInputPage::~wizInputPage();
+        ~wizInputPage();
         void OnWizardPageChanging(wxWizardEvent& event);
         void OnInputChange( wxCommandEvent& event );
         void OnEnablePartial(wxCommandEvent& event);
@@ -262,7 +262,7 @@ class wizTranscodeCodecPage : public wxWizardPage
 public:
     wizTranscodeCodecPage( wxWizard *parent, wxWizardPage *next);
     ~wizTranscodeCodecPage();
-    void wizTranscodeCodecPage::OnWizardPageChanging(wxWizardEvent& event);
+    void OnWizardPageChanging(wxWizardEvent& event);
     virtual wxWizardPage *GetPrev() const;
     virtual wxWizardPage *GetNext() const;
     void SetPrev( wxWizardPage *page);
@@ -339,7 +339,7 @@ class wizEncapPage : public wxWizardPage
 {
 public:
     wizEncapPage( wxWizard *parent);
-    wizEncapPage::~wizEncapPage();
+    ~wizEncapPage();
     void OnWizardPageChanging(wxWizardEvent& event);
     virtual wxWizardPage *GetPrev() const;
     virtual wxWizardPage *GetNext() const;
@@ -387,7 +387,7 @@ public:
     void OnWizardPageChanging( wxWizardEvent& event );
 protected:
     DECLARE_EVENT_TABLE()
-    void wizTranscodeExtraPage::OnSelectFile(wxCommandEvent&);
+    void OnSelectFile(wxCommandEvent&);
     wxTextCtrl *file_text;
     WizardDialog *p_parent;
     wxWizardPage *p_prev;
