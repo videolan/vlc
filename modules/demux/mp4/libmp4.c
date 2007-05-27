@@ -39,44 +39,40 @@
  *  *look* at the code.
  *
  *****************************************************************************/
-#define MP4_BOX_HEADERSIZE( p_box ) \
-  ( 8 + ( p_box->i_shortsize == 1 ? 8 : 0 ) \
+#define MP4_BOX_HEADERSIZE( p_box )             \
+  ( 8 + ( p_box->i_shortsize == 1 ? 8 : 0 )     \
       + ( p_box->i_type == FOURCC_uuid ? 16 : 0 ) )
 
-#define MP4_GET1BYTE( dst ) \
-    dst = *p_peek; p_peek++; i_read--
+#define MP4_GETX_PRIVATE(dst, code, size) do { \
+    if( (i_read) >= (size) ) { dst = (code); p_peek += (size); } \
+    else { dst = 0; }   \
+    i_read -= (size);   \
+  } while(0)
 
-#define MP4_GET2BYTES( dst ) \
-    dst = GetWBE( p_peek ); p_peek += 2; i_read -= 2
-
-#define MP4_GET3BYTES( dst ) \
-    dst = Get24bBE( p_peek ); p_peek += 3; i_read -= 3
-
-#define MP4_GET4BYTES( dst ) \
-    dst = GetDWBE( p_peek ); p_peek += 4; i_read -= 4
-
-#define MP4_GETFOURCC( dst ) \
-    dst = VLC_FOURCC( p_peek[0], p_peek[1], p_peek[2], p_peek[3] ); \
-    p_peek += 4; i_read -= 4
-
-#define MP4_GET8BYTES( dst ) \
-    dst = GetQWBE( p_peek ); p_peek += 8; i_read -= 8
+#define MP4_GET1BYTE( dst )  MP4_GETX_PRIVATE( dst, *p_peek, 1 )
+#define MP4_GET2BYTES( dst ) MP4_GETX_PRIVATE( dst, GetWBE(p_peek), 2 )
+#define MP4_GET3BYTES( dst ) MP4_GETX_PRIVATE( dst, Get24bBE(p_peek), 3 )
+#define MP4_GET4BYTES( dst ) MP4_GETX_PRIVATE( dst, GetDWBE(p_peek), 4 )
+#define MP4_GET8BYTES( dst ) MP4_GETX_PRIVATE( dst, GetQWBE(p_peek), 8 )
+#define MP4_GETFOURCC( dst ) MP4_GETX_PRIVATE( dst, \
+                VLC_FOURCC(p_peek[0],p_peek[1],p_peek[2],p_peek[3]), 4)
 
 #define MP4_GETVERSIONFLAGS( p_void ) \
     MP4_GET1BYTE( p_void->i_version ); \
     MP4_GET3BYTES( p_void->i_flags )
 
-#define MP4_GETSTRINGZ( p_str ) \
-    if( ( i_read > 0 )&&(p_peek[0] ) ) \
-    { \
-        p_str = calloc( sizeof( char ), __MIN( strlen( (char*)p_peek ), i_read )+1);\
-        memcpy( p_str, p_peek, __MIN( strlen( (char*)p_peek ), i_read ) ); \
-        p_str[__MIN( strlen( (char*)p_peek ), i_read )] = 0; \
-        p_peek += strlen( (char *)p_str ) + 1; \
-        i_read -= strlen( (char *)p_str ) + 1; \
-    } \
-    else \
-    { \
+#define MP4_GETSTRINGZ( p_str )         \
+    if( (i_read > 0) && (p_peek[0]) )   \
+    {       \
+        const int __i_copy__ = strnlen( (char*)p_peek, i_read-1 );  \
+        p_str = calloc( sizeof(char), __i_copy__+1 );               \
+        if( __i_copy__ > 0 ) memcpy( p_str, p_peek, __i_copy__ );   \
+        p_str[__i_copy__] = 0;      \
+        p_peek += __i_copy__ + 1;   \
+        i_read -= __i_copy__ + 1;   \
+    }       \
+    else    \
+    {       \
         p_str = NULL; \
     }
 
@@ -820,7 +816,7 @@ static void MP4_FreeBox_ctts( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_ctts->i_sample_offset );
 }
 
-static int MP4_ReadLengthDescriptor( uint8_t **pp_peek, uint64_t  *i_read )
+static int MP4_ReadLengthDescriptor( uint8_t **pp_peek, int64_t  *i_read )
 {
     unsigned int i_b;
     unsigned int i_len = 0;
@@ -2155,6 +2151,76 @@ static void MP4_FreeBox_0xa9xxx( MP4_Box_t *p_box )
     FREENULL( p_box->data.p_0xa9xxx->psz_text );
 }
 
+/* Chapter support */
+static int MP4_ReadBox_chpl( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_Box_data_chpl_t *p_chpl;
+    uint32_t i_dummy;
+    int i;
+    MP4_READBOX_ENTER( MP4_Box_data_chpl_t );
+
+    p_chpl = p_box->data.p_chpl;
+
+    MP4_GETVERSIONFLAGS( p_chpl );
+
+    MP4_GET4BYTES( i_dummy );
+
+    MP4_GET1BYTE( p_chpl->i_chapter );
+
+    for( i = 0; i < p_chpl->i_chapter; i++ )
+    {
+        uint64_t i_start;
+        uint8_t i_len;
+        int i_copy;
+        MP4_GET8BYTES( i_start );
+        MP4_GET1BYTE( i_len );
+
+        p_chpl->chapter[i].psz_name = malloc( i_len + 1 );
+        i_copy = __MIN( i_len, i_read );
+        if( i_copy > 0 )
+            memcpy( p_chpl->chapter[i].psz_name, p_peek, i_copy );
+        p_chpl->chapter[i].psz_name[i_copy] = '\0';
+        p_chpl->chapter[i].i_start = i_start;
+
+        p_peek += i_copy;
+        i_read -= i_copy;
+    }
+    /* Bubble sort by increasing start date */
+    do
+    {
+        for( i = 0; i < p_chpl->i_chapter - 1; i++ )
+        {
+            if( p_chpl->chapter[i].i_start > p_chpl->chapter[i+1].i_start )
+            {
+                char *psz = p_chpl->chapter[i+1].psz_name;
+                int64_t i64 = p_chpl->chapter[i+1].i_start;
+
+                p_chpl->chapter[i+1].psz_name = p_chpl->chapter[i].psz_name;
+                p_chpl->chapter[i+1].i_start = p_chpl->chapter[i].i_start;
+
+                p_chpl->chapter[i].psz_name = psz;
+                p_chpl->chapter[i].i_start = i64;
+
+                i = -1;
+                break;
+            }
+        }
+    } while( i == -1 );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream, "read box: \"chpl\" %d chapters",
+                       p_chpl->i_chapter );
+#endif
+    MP4_READBOX_EXIT( 1 );
+}
+static void MP4_FreeBox_chpl( MP4_Box_t *p_box )
+{
+    MP4_Box_data_chpl_t *p_chpl = p_box->data.p_chpl;
+    int i;
+    for( i = 0; i < p_chpl->i_chapter; i++ )
+        free( p_chpl->chapter[i].psz_name );
+}
+
 static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
 {
     uint8_t meta_data[8];
@@ -2401,6 +2467,8 @@ static struct
     { FOURCC_0xa9url,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9ope,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
     { FOURCC_0xa9com,MP4_ReadBox_0xa9xxx,       MP4_FreeBox_0xa9xxx },
+
+    { FOURCC_chpl,   MP4_ReadBox_chpl,          MP4_FreeBox_chpl },
 
     /* iTunes/Quicktime meta info */
     { FOURCC_meta,  MP4_ReadBox_meta,       MP4_FreeBox_Common },

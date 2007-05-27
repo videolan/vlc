@@ -209,6 +209,7 @@
 #define FOURCC_0xa9wrt VLC_FOURCC( 0xa9, 'w', 'r', 't' )
 #define FOURCC_0xa9com VLC_FOURCC( 0xa9, 'c', 'o', 'm' )
 #define FOURCC_0xa9gen VLC_FOURCC( 0xa9, 'g', 'e', 'n' )
+#define FOURCC_chpl VLC_FOURCC( 'c', 'h', 'p', 'l' )
 #define FOURCC_WLOC VLC_FOURCC( 'W', 'L', 'O', 'C' )
 
 #define FOURCC_meta VLC_FOURCC( 'm', 'e', 't', 'a' )
@@ -792,6 +793,19 @@ typedef struct
 
 typedef struct
 {
+    uint8_t  i_version;
+    uint32_t i_flags;
+
+    uint8_t i_chapter;
+    struct
+    {
+        char    *psz_name;
+        int64_t  i_start;
+    } chapter[256];
+} MP4_Box_data_chpl_t;
+
+typedef struct
+{
     uint8_t i_version;
     uint8_t i_profile;
     uint8_t i_profile_compatibility;
@@ -872,6 +886,7 @@ typedef union MP4_Box_data_s
     MP4_Box_data_rmvc_t *p_rmvc;
 
     MP4_Box_data_0xa9xxx_t *p_0xa9xxx;
+    MP4_Box_data_chpl_t *p_chpl;
 
     void                *p_data; /* for unknow type */
 } MP4_Box_data_t;

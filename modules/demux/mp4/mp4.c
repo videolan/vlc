@@ -151,6 +151,9 @@ struct demux_sys_t
     uint64_t     i_duration;    /* movie duration */
     unsigned int i_tracks;      /* number of tracks */
     mp4_track_t *track;    /* array of track */
+
+    /* */
+    input_title_t *p_title;
 };
 
 /*****************************************************************************
@@ -168,6 +171,8 @@ static uint64_t MP4_TrackGetPos    ( mp4_track_t * );
 static int      MP4_TrackSampleSize( mp4_track_t * );
 static int      MP4_TrackNextSample( demux_t *, mp4_track_t * );
 static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
+
+static void     MP4_UpdateSeekpoint( demux_t * );
 
 /* Return time in s of a track */
 static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
@@ -263,6 +268,7 @@ static int Open( vlc_object_t * p_this )
     MP4_Box_t       *p_rmra;
     MP4_Box_t       *p_mvhd;
     MP4_Box_t       *p_trak;
+    MP4_Box_t       *p_chpl;
 
     unsigned int    i;
     vlc_bool_t      b_seekable;
@@ -515,6 +521,21 @@ static int Open( vlc_object_t * p_this )
         }
 
     }
+
+    /* Process chapter if any */
+    if( ( p_chpl = MP4_BoxGet( p_sys->p_root, "/moov/udta/chpl" ) ) && p_chpl->data.p_chpl->i_chapter > 0 )
+    {
+        int i;
+        p_sys->p_title = vlc_input_title_New();
+        for( i = 0; i < p_chpl->data.p_chpl->i_chapter; i++ )
+        {
+            seekpoint_t *s = vlc_seekpoint_New();
+
+            s->psz_name = strdup( p_chpl->data.p_chpl->chapter[i].psz_name );
+            s->i_time_offset = p_chpl->data.p_chpl->chapter[i].i_start / 10;
+            TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
+        }
+    }
     return VLC_SUCCESS;
 
 error:
@@ -585,6 +606,9 @@ static int Demux( demux_t *p_demux )
         msg_Warn( p_demux, "no track selected, exiting..." );
         return 0;
     }
+
+    /* */
+    MP4_UpdateSeekpoint( p_demux );
 
     /* first wait for the good time to read a packet */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr + 1 );
@@ -694,6 +718,28 @@ static int Demux( demux_t *p_demux )
 
     return 1;
 }
+
+static void MP4_UpdateSeekpoint( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int64_t i_time;
+    int i;
+    if( !p_sys->p_title )
+        return;
+    i_time = MP4_GetMoviePTS( p_sys );
+    for( i = 0; i < p_sys->p_title->i_seekpoint; i++ )
+    {
+        if( i_time < p_sys->p_title->seekpoint[i]->i_time_offset )
+            break;
+    }
+    i--;
+
+    if( i != p_demux->info.i_seekpoint && i >= 0 )
+    {
+        p_demux->info.i_seekpoint = i;
+        p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
+    }
+}
 /*****************************************************************************
  * Seek: Got to i_date
 ******************************************************************************/
@@ -712,6 +758,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date )
         mp4_track_t *tk = &p_sys->track[i_track];
         MP4_TrackSeek( p_demux, tk, i_date );
     }
+    MP4_UpdateSeekpoint( p_demux );
     return VLC_SUCCESS;
 }
 
@@ -798,43 +845,43 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             for( p_0xa9xxx = p_udta->p_first; p_0xa9xxx != NULL;
                  p_0xa9xxx = p_0xa9xxx->p_next )
             {
-                char *psz_utf;
 
                 if( !p_0xa9xxx || !p_0xa9xxx->data.p_0xa9xxx )
                     continue;
-                psz_utf = strdup( p_0xa9xxx->data.p_0xa9xxx->psz_text );
-                if( psz_utf == NULL )
-                    continue;
+
                 /* FIXME FIXME: should convert from whatever the character
                  * encoding of MP4 meta data is to UTF-8. */
-                EnsureUTF8( psz_utf );
+#define SET(fct) do { char *psz_utf = strdup( p_0xa9xxx->data.p_0xa9xxx->psz_text ? p_0xa9xxx->data.p_0xa9xxx->psz_text : "" ); \
+    if( psz_utf ) { EnsureUTF8( psz_utf );  \
+                    fct( p_meta, psz_utf ); free( psz_utf ); } } while(0)
 
+                /* XXX Becarefull p_udta can have box that are not 0xa9xx */
                 switch( p_0xa9xxx->i_type )
                 {
                 case FOURCC_0xa9nam: /* Full name */
-                    vlc_meta_SetTitle( p_meta, psz_utf );
+                    SET( vlc_meta_SetTitle );
                     break;
                 case FOURCC_0xa9aut:
-                    vlc_meta_SetArtist( p_meta, psz_utf );
+                    SET( vlc_meta_SetArtist );
                     break;
                 case FOURCC_0xa9ART:
-                    vlc_meta_SetArtist( p_meta, psz_utf );
+                    SET( vlc_meta_SetArtist );
                     break;
                 case FOURCC_0xa9cpy:
-                    vlc_meta_SetCopyright( p_meta, psz_utf );
+                    SET( vlc_meta_SetCopyright );
                     break;
                 case FOURCC_0xa9day: /* Creation Date */
-                    vlc_meta_SetDate( p_meta, psz_utf );
+                    SET( vlc_meta_SetDate );
                     break;
                 case FOURCC_0xa9des: /* Description */
-                    vlc_meta_SetDescription( p_meta, psz_utf );
+                    SET( vlc_meta_SetDescription );
                     break;
                 case FOURCC_0xa9gen: /* Genre */
-                    vlc_meta_SetGenre( p_meta, psz_utf );
+                    SET( vlc_meta_SetGenre );
                     break;
 
                 case FOURCC_0xa9alb: /* Album */
-                    vlc_meta_SetAlbum( p_meta, psz_utf );
+                    SET( vlc_meta_SetAlbum );
                     break;
 
                 case FOURCC_0xa9swr:
@@ -858,16 +905,47 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 case FOURCC_WLOC:    /* Window Location */
                     /* TODO one day, but they aren't really meaningfull */
                     break;
+#undef SET
 
                 default:
                     break;
                 }
-                free( psz_utf );
             }
             return VLC_SUCCESS;
         }
 
         case DEMUX_GET_TITLE_INFO:
+        {
+            input_title_t ***ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
+            int *pi_int    = (int*)va_arg( args, int* );
+            int *pi_title_offset = (int*)va_arg( args, int* );
+            int *pi_seekpoint_offset = (int*)va_arg( args, int* );
+
+            if( !p_sys->p_title )
+                return VLC_EGENERIC;
+
+            *pi_int = 1;
+            *ppp_title = malloc( sizeof( input_title_t**) );
+            (*ppp_title)[0] = vlc_input_title_Duplicate( p_sys->p_title );
+            *pi_title_offset = 0;
+            *pi_seekpoint_offset = 0;
+            return VLC_SUCCESS;
+        }
+        case DEMUX_SET_TITLE:
+        {
+            const int i_title = (int)va_arg( args, int );
+            if( !p_sys->p_title || i_title != 0 )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case DEMUX_SET_SEEKPOINT:
+        {
+            const int i_seekpoint = (int)va_arg( args, int );
+            if( !p_sys->p_title )
+                return VLC_EGENERIC;
+            return Seek( p_demux, p_sys->p_title->seekpoint[i_seekpoint]->i_time_offset );
+        }
+
         case DEMUX_SET_NEXT_DEMUX_TIME:
         case DEMUX_SET_GROUP:
             return VLC_EGENERIC;
@@ -895,6 +973,9 @@ static void Close ( vlc_object_t * p_this )
         MP4_TrackDestroy( p_demux, &p_sys->track[i_track] );
     }
     FREENULL( p_sys->track );
+
+    if( p_sys->p_title )
+        vlc_input_title_Delete( p_sys->p_title );
 
     free( p_sys );
 }
