@@ -134,7 +134,8 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                                             updateMRL() );
     CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this,
                                                             updateMRL() );
-    CONNECT( lineFileEdit, textChanged( QString ), this, browseFile() );
+
+/*    CONNECT( lineFileEdit, textChanged( QString ), this, browseFile() );*/
 }
 
 FileOpenPanel::~FileOpenPanel()
