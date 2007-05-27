@@ -87,8 +87,6 @@ static int Control( demux_t *, int, va_list );
 static int ProbeDev( demux_t * );
 static int OpenVideoDev( demux_t * );
 
-static block_t *GrabVideo( demux_t * );
-
 struct demux_sys_t
 {
     char *psz_device;
@@ -123,7 +121,6 @@ static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    demux_sys_t sys;
 
     /* Only when selected */
     if( *p_demux->psz_access == '\0' )
@@ -171,6 +168,7 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -178,6 +176,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  *****************************************************************************/
 static int DemuxMMAP( demux_t *p_demux )
 {
+    msleep( 40000 );
+    return 1;
 }
 
 
@@ -196,9 +196,9 @@ int OpenVideoDev( demux_t *p_demux )
     }
 
     p_sys->i_fd_video = i_fd;
+    p_sys->i_selected_input = var_CreateGetInteger( p_demux, "v4l2-input" );
 
-    if( p_sys->i_selected_input = var_CreateGetInteger( p_demux, "v4l2-input" )
-        > p_sys->i_input )
+    if( p_sys->i_selected_input > p_sys->i_input )
     {
         msg_Warn( p_demux, "invalid input. Using the default one" );
         p_sys->i_selected_input = 0;
@@ -355,8 +355,9 @@ int ProbeDev( demux_t *p_demux )
 
     if( p_sys->dev_cap.capabilities & V4L2_CAP_TUNER )
     {
-        struct v4l2_tuner tuner = {};
+        struct v4l2_tuner tuner;
 
+        memset( &tuner, 0, sizeof(tuner) );
         while( ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) >= 0 )
         {
             p_sys->i_tuner++;
@@ -398,9 +399,10 @@ int ProbeDev( demux_t *p_demux )
     /* Probe for available chromas */
     if( p_sys->dev_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
     {
-        struct v4l2_fmtdesc codec = {};
+        struct v4l2_fmtdesc codec;
 
         i_index = 0;
+        memset( &codec, 0, sizeof(codec) );
         codec.index = i_index;
         codec.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 

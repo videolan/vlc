@@ -492,7 +492,7 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
                     div = lldiv( eqz_preset_10b[i]->f_amp[j] * 10000000,
                                  10000000 );
                     sprintf( psz_newbands, "%s "I64Fd".%07u", psz_newbands,
-                                      div.quot, (unsigned int) div.rem );
+                                      (int64_t)div.quot, (unsigned int) div.rem );
                 }
                 if( p_sys->b_first == VLC_FALSE )
                 {

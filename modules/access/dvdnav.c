@@ -159,7 +159,7 @@ static void ButtonUpdate( demux_t *, vlc_bool_t );
 static void ESNew( demux_t *, int );
 static int ProbeDVD( demux_t *, char * );
 
-static char *DemuxGetLanguageCode( demux_t *p_demux, char *psz_var );
+static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var );
 
 /*****************************************************************************
  * DemuxOpen:
@@ -815,7 +815,7 @@ static int Demux( demux_t *p_demux )
 /* Get a 2 char code
  * FIXME: partiallyy duplicated from src/input/es_out.c
  */
-static char *DemuxGetLanguageCode( demux_t *p_demux, char *psz_var )
+static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var )
 {
     const iso639_lang_t *pl;
     char *psz_lang;
