@@ -146,9 +146,6 @@
           <height>0</height>
          </size>
         </property>
-        <property name="toolTip" >
-         <string>Set subtitle alignement</string>
-        </property>
         <property name="currentIndex" >
          <number>-1</number>
         </property>
@@ -191,9 +188,6 @@
           <height>0</height>
          </size>
         </property>
-        <property name="toolTip" >
-         <string>Set default subtitle size</string>
-        </property>
        </widget>
       </item>
       <item row="1" column="1" >
@@ -220,6 +214,9 @@
       </item>
       <item row="0" column="6" colspan="2" >
        <widget class="QPushButton" name="subBrowseButton" >
+        <property name="toolTip" >
+         <string>Select the subtitle file</string>
+        </property>
         <property name="text" >
          <string>Browse...</string>
         </property>

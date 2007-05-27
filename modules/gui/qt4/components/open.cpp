@@ -79,7 +79,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dialogBox->setSizeGripEnabled( false );
 
     /* Add a tooltip */
-    dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ));
+    dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ) );
 
     // Add it to the layout
     ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
@@ -119,7 +119,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* Build the subs size combo box */
     setfillVLCConfigCombo( "freetype-rel-fontsize" , p_intf,
-             ui.sizeSubComboBox );
+                            ui.sizeSubComboBox );
 
     /* Build the subs align combo box */
     setfillVLCConfigCombo( "subsdec-align", p_intf, ui.alignSubComboBox );
@@ -145,6 +145,7 @@ QStringList FileOpenPanel::browse( QString help )
     return THEDP->showSimpleOpen( help );
 }
 
+#if 0
 /* Unused. FIXME ? */
 void FileOpenPanel::browseFile()
 {
@@ -155,6 +156,7 @@ void FileOpenPanel::browseFile()
     ui.fileInput->setEditText( fileString );
     updateMRL();
 }
+#endif
 
 void FileOpenPanel::browseFileSub()
 {
@@ -183,11 +185,11 @@ void FileOpenPanel::updateMRL()
 
     const char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
     if( ( NULL == psz_filepath )
-      || strcmp( psz_filepath,dialogBox->directory().absolutePath().toUtf8()) )
+      || strcmp( psz_filepath, qtu( dialogBox->directory().absolutePath() )) )
     {
         /* set dialog box current directory as last known path */
         config_PutPsz( p_intf, "qt-filedialog-path",
-                       dialogBox->directory().absolutePath().toUtf8() );
+                       qtu( dialogBox->directory().absolutePath() ) );
     }
     delete psz_filepath;
 
@@ -239,6 +241,8 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
                                 OpenPanel( _parent, _p_intf )
 {
     ui.setupUi( this );
+
+    /*Win 32 Probe  as in WX ? */
 
     /* CONNECTs */
     BUTTONACT( ui.dvdRadioButton, updateButtons());
@@ -293,6 +297,8 @@ void DiscOpenPanel::updateButtons()
 void DiscOpenPanel::updateMRL()
 {
     QString mrl = "";
+
+    /* CDDAX and VCDX not implemented. FIXME ? */
     /* DVD */
     if( ui.dvdRadioButton->isChecked() ) {
         if( !ui.dvdsimple->isChecked() )

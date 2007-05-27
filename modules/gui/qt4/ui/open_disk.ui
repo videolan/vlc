@@ -67,6 +67,9 @@
       </item>
       <item row="3" column="7" >
        <widget class="QToolButton" name="toolButton" >
+        <property name="toolTip" >
+         <string>Select the device</string>
+        </property>
         <property name="text" >
          <string>Browse...</string>
         </property>

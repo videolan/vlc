@@ -93,6 +93,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip" >
+         <string>Change the start time for the media</string>
+        </property>
         <property name="alignment" >
          <set>Qt::AlignRight</set>
         </property>
@@ -120,7 +123,11 @@
        </widget>
       </item>
       <item row="5" column="1" colspan="4" >
-       <widget class="QLineEdit" name="advancedLineInput" />
+       <widget class="QLineEdit" name="advancedLineInput" >
+        <property name="toolTip" >
+         <string>Complete MRL for VLC internal</string>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0" colspan="5" >
        <widget class="QCheckBox" name="slaveCheckbox" >
@@ -155,6 +162,9 @@
       </item>
       <item row="3" column="4" >
        <widget class="QToolButton" name="slaveBrowseButton" >
+        <property name="toolTip" >
+         <string>Select the file</string>
+        </property>
         <property name="text" >
          <string>Browse...</string>
         </property>
@@ -176,6 +186,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip" >
+         <string>Change the caching for the media</string>
         </property>
         <property name="alignment" >
          <set>Qt::AlignRight</set>

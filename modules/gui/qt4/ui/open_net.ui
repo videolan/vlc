@@ -48,6 +48,9 @@
       </item>
       <item row="1" column="2" >
        <widget class="QSpinBox" name="portSpin" >
+        <property name="toolTip" >
+         <string>Set the port used</string>
+        </property>
         <property name="maximum" >
          <number>65535</number>
         </property>
@@ -110,6 +113,9 @@
       </property>
       <item>
        <widget class="QCheckBox" name="timeShift" >
+        <property name="toolTip" >
+         <string/>
+        </property>
         <property name="text" >
          <string>Allow timeshifting</string>
         </property>

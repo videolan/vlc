@@ -46,6 +46,9 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="toolTip" >
+      <string>Select the capture device type</string>
+     </property>
     </widget>
    </item>
    <item row="0" column="0" >
@@ -87,6 +90,9 @@
    </item>
    <item row="3" column="0" >
     <widget class="QPushButton" name="advancedButton" >
+     <property name="toolTip" >
+      <string>Access advanced options to tweak the device</string>
+     </property>
      <property name="text" >
       <string>Advanced options...</string>
      </property>
