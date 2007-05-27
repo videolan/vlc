@@ -24,7 +24,7 @@
 
 #define NUM_GENRES 80
 
-static char *ppsz_genres[] = {
+static const char *ppsz_genres[] = {
     N_("Blues"),
     N_("Classic rock"),
     N_("Country"),

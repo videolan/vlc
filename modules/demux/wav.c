@@ -103,7 +103,7 @@ static int Open( vlc_object_t * p_this )
 
     uint8_t     *p_peek;
     unsigned int i_size, i_extended;
-    char        *psz_name;
+    const char        *psz_name;
 
     WAVEFORMATEXTENSIBLE *p_wf_ext;
     WAVEFORMATEX         *p_wf;

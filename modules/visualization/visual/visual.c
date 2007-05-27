@@ -166,7 +166,7 @@ static int FilterCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static struct
 {
-    char *psz_name;
+    const char *psz_name;
     int  (*pf_run)( visual_effect_t *, aout_instance_t *,
                     aout_buffer_t *, picture_t *);
 } pf_effect_run[]=

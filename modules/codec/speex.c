@@ -641,7 +641,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_sys_t *p_sys;
     const SpeexMode *p_speex_mode = &speex_nb_mode;
     int i_quality, i;
-    char *pp_header[2];
+    const char *pp_header[2];
     int pi_header[2];
     uint8_t *p_extra;
 

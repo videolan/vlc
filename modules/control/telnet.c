@@ -116,7 +116,7 @@ typedef struct
 } telnet_client_t;
 
 static char *MessageToString( vlm_message_t *, int );
-static void Write_message( telnet_client_t *, vlm_message_t *, char *, int );
+static void Write_message( telnet_client_t *, vlm_message_t *, const char *, int );
 
 struct intf_sys_t
 {
@@ -500,7 +500,7 @@ static void Run( intf_thread_t *p_intf )
 }
 
 static void Write_message( telnet_client_t *client, vlm_message_t *message,
-                           char *string_message, int i_mode )
+                           const char *string_message, int i_mode )
 {
     char *psz_message;
 

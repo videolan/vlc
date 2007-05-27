@@ -82,7 +82,7 @@ static void Redraw         ( intf_thread_t *, time_t * );
 
 static playlist_item_t *PlaylistGetRoot( intf_thread_t * );
 static void PlaylistRebuild( intf_thread_t * );
-static void PlaylistAddNode( intf_thread_t *, playlist_item_t *, int, char *);
+static void PlaylistAddNode( intf_thread_t *, playlist_item_t *, int, const char *);
 static void PlaylistDestroy( intf_thread_t * );
 static int  PlaylistChanged( vlc_object_t *, const char *, vlc_value_t,
                              vlc_value_t, void * );
@@ -1666,7 +1666,7 @@ static void PlaylistRebuild( intf_thread_t *p_intf )
 }
 
 static void PlaylistAddNode( intf_thread_t *p_intf, playlist_item_t *p_node,
-                             int i, char *c )
+                             int i, const char *c )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
     playlist_item_t *p_child;
@@ -1903,7 +1903,7 @@ static void ReadDir( intf_thread_t *p_intf )
 
     if( p_sys->psz_current_dir && *p_sys->psz_current_dir )
     {
-        const char *psz_entry;
+        char *psz_entry;
 
         /* Open the dir */
         p_current_dir = utf8_opendir( p_sys->psz_current_dir );
