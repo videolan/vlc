@@ -1278,7 +1278,15 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
 
     /* We don't try to reselect */
     if( es->p_dec )
+    {
+        while( !out->p_sys->p_input->b_die && es->p_dec )
+        {
+            if( input_DecoderEmpty( es->p_dec ) )
+                break;
+            msleep( 20*1000 );
+        }
         EsUnselect( out, es, es->p_pgrm == p_sys->p_pgrm );
+    }
 
     if( es->p_pgrm == p_sys->p_pgrm )
         EsOutESVarUpdate( out, es, VLC_TRUE );
