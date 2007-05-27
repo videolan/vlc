@@ -226,9 +226,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     p_view_menu = NULL;
     p_sd_menu = SDMenu();
 
-//    i_current_view = VIEW_ONELEVEL;
-    p_current_viewroot = p_playlist->p_root_onelevel;
-    p_current_treeroot = p_playlist->p_local_onelevel;
+    p_current_viewroot = p_playlist->p_root_category;
+    p_current_treeroot = p_playlist->p_local_category;
 
     i_title_sorted = 0;
     i_group_sorted = 0;
