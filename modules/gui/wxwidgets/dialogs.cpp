@@ -382,8 +382,8 @@ void DialogsProvider::OnOpenFileGeneric( wxCommandEvent& event )
     {
         p_file_generic_dialog->SetMessage( wxU(p_arg->psz_title) );
         p_file_generic_dialog->SetWildcard( wxU(p_arg->psz_extensions) );
-        p_file_generic_dialog->SetStyle( (p_arg->b_save ? wxSAVE : wxOPEN) |
-                                         (p_arg->b_multiple ? wxMULTIPLE:0) );
+        p_file_generic_dialog->SetWindowStyle( (p_arg->b_save ? wxSAVE : wxOPEN) |
+                                               (p_arg->b_multiple ? wxMULTIPLE:0) );
     }
 
     if( p_file_generic_dialog &&

@@ -227,7 +227,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     p_sd_menu = SDMenu();
 
     p_current_viewroot = p_playlist->p_root_category;
-    p_current_treeroot = p_playlist->p_local_category;
+    p_current_treeroot = NULL;
 
     i_title_sorted = 0;
     i_group_sorted = 0;
@@ -366,8 +366,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     p_images->Add( wxIcon( type_node_xpm ) );
     treectrl->AssignImageList( p_images );
 
-    treectrl->AddRoot( wxU(_("root" )), -1, -1, NULL );
-
     /* Reduce font size */
     wxFont font= treectrl->GetFont();
     font.SetPointSize(9);
@@ -407,8 +405,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
 
     /* Update the playlist */
+    p_current_treeroot = p_playlist->p_local_category;
     Rebuild( VLC_TRUE );
-
 }
 
 Playlist::~Playlist()
@@ -798,19 +796,8 @@ void Playlist::Rebuild( vlc_bool_t b_root )
 {
     i_items_to_append = 0;
 
-    /* We can remove the callbacks before locking, anyway, we won't
-     * miss anything */
-    if( b_root )
-    {
-        var_DelCallback( p_playlist, "item-change", ItemChanged, this );
-        var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
-        var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
-        var_DelCallback( p_playlist, "item-append", ItemAppended, this );
-        var_DelCallback( p_playlist, "item-deleted", ItemDeleted, this );
+    LockPlaylist( p_intf->p_sys, p_playlist );
 
-        /* ...and rebuild it */
-        LockPlaylist( p_intf->p_sys, p_playlist );
-    }
     /* Invalidate cache */
     i_saved_id = -1;
     i_saved_input_id = -1;
@@ -833,8 +820,6 @@ void Playlist::Rebuild( vlc_bool_t b_root )
                          new PlaylistItem( p_current_treeroot ) );
 
     wxTreeItemId root = treectrl->GetRootItem();
-    //UpdateNode( p_current_treeroot, root );
-    //CreateNode( p_current_treeroot, root );
     UpdateNodeChildren( p_current_treeroot, root );
 
     int i_count = CountItems( treectrl->GetRootItem() );
@@ -842,17 +827,7 @@ void Playlist::Rebuild( vlc_bool_t b_root )
     statusbar->SetStatusText( wxString::Format( wxU(_(
                               "%i items in playlist")), i_count ), 0 );
 
-    if( b_root )
-    {
-        /* Put callbacks back online */
-        var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
-        var_AddCallback( p_playlist, "playlist-current", PlaylistNext, this );
-        var_AddCallback( p_playlist, "item-change", ItemChanged, this );
-        var_AddCallback( p_playlist, "item-append", ItemAppended, this );
-        var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
-
-        UnlockPlaylist( p_intf->p_sys, p_playlist );
-    }
+    UnlockPlaylist( p_intf->p_sys, p_playlist );
 }
 
 void Playlist::ShowPlaylist( bool show )
@@ -1647,7 +1622,7 @@ void Playlist::OnSourceSelected( wxListEvent &event )
 {
    int i_id = event.GetData();
 
-   if( p_current_treeroot && i_id != p_current_treeroot->i_id )
+   if( !p_current_treeroot || i_id != p_current_treeroot->i_id )
    {
        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id,
                                                        VLC_TRUE );

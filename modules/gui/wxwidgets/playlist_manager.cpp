@@ -87,8 +87,15 @@ END_EVENT_TABLE()
 class PlaylistItem : public wxTreeItemData
 {
 public:
-    PlaylistItem( playlist_item_t *p_item ) : i_id(p_item->p_input->i_id) {}
+    PlaylistItem( playlist_item_t *p_item ) : wxTreeItemData()
+    {
+        i_id = p_item->i_id;
+        i_input_id = p_item->p_input->i_id;
+    }
+protected:
+    int i_input_id;
     int i_id;
+friend class PlaylistManager;
 };
 
 /*****************************************************************************
@@ -291,9 +298,15 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
 
     wxString msg;
     wxString duration = wxU( "" );
-    char *psz_artist = p_item->p_input->p_meta->psz_artist ?
-                        strdup( p_item->p_input->p_meta->psz_artist ) :
-                        strdup( "" );
+
+    char *psz_artist;
+    if( p_item->p_input->p_meta &&
+        p_item->p_input->p_meta->psz_artist )
+    {
+        psz_artist = strdup( p_item->p_input->p_meta->psz_artist );
+    }
+    else psz_artist = strdup( "" );
+
     if( !psz_artist )
     {
         UnlockPlaylist( p_intf->p_sys, p_playlist );
