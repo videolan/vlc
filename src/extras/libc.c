@@ -113,6 +113,17 @@ char *vlc_strndup( const char *string, size_t n )
 #endif
 
 /*****************************************************************************
+ * strnlen: 
+ *****************************************************************************/
+#if !defined( HAVE_STRNLEN )
+size_t vlc_strnlen( const char *psz, size_t n )
+{
+    const char *psz_end = memchr( psz, 0, n );
+    return psz_end ? ( psz_end - psz ) : n;
+}
+#endif
+
+/*****************************************************************************
  * strcasecmp: compare two strings ignoring case
  *****************************************************************************/
 #if !defined( HAVE_STRCASECMP ) && !defined( HAVE_STRICMP )

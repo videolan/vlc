@@ -871,6 +871,13 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define vlc_strndup NULL
 #endif
 
+#ifndef HAVE_STRNLEN
+#   define strnlen vlc_strnlen
+    VLC_EXPORT( size_t, vlc_strnlen, ( const char *, size_t ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_strnlen NULL
+#endif
+
 #ifndef HAVE_STRLCPY
 #   define strlcpy vlc_strlcpy
     VLC_EXPORT( size_t, vlc_strlcpy, ( char *, const char *, size_t ) );

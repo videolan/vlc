@@ -61,17 +61,18 @@
     MP4_GET1BYTE( p_void->i_version ); \
     MP4_GET3BYTES( p_void->i_flags )
 
-#define MP4_GETSTRINGZ( p_str ) \
-    if( ( i_read > 0 )&&(p_peek[0] ) ) \
-    { \
-        p_str = calloc( sizeof( char ), __MIN( strlen( (char*)p_peek ), i_read )+1);\
-        memcpy( p_str, p_peek, __MIN( strlen( (char*)p_peek ), i_read ) ); \
-        p_str[__MIN( strlen( (char*)p_peek ), i_read )] = 0; \
-        p_peek += strlen( (char *)p_str ) + 1; \
-        i_read -= strlen( (char *)p_str ) + 1; \
-    } \
-    else \
-    { \
+#define MP4_GETSTRINGZ( p_str )         \
+    if( (i_read > 0) && (p_peek[0]) )   \
+    {       \
+        const int __i_copy__ = strnlen( (char*)p_peek, i_read-1 );  \
+        p_str = calloc( sizeof(char), __i_copy__+1 );               \
+        if( __i_copy__ > 0 ) memcpy( p_str, p_peek, __i_copy__ );   \
+        p_str[__i_copy__] = 0;      \
+        p_peek += __i_copy__ + 1;   \
+        i_read -= __i_copy__ + 1;   \
+    }       \
+    else    \
+    {       \
         p_str = NULL; \
     }
 
