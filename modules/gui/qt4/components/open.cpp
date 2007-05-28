@@ -64,7 +64,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     // Make this QFileDialog a child of tempWidget from the ui.
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
             qfu( p_intf->p_libvlc->psz_homedir ), fileTypes );
-/*    dialogBox->setFileMode( QFileDialog::ExistingFiles );*/
+    dialogBox->setFileMode( QFileDialog::ExistingFiles );
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
 
     /* retrieve last known path used in file browsing */
@@ -79,7 +79,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dialogBox->setSizeGripEnabled( false );
 
     /* Add a tooltip */
-//  dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ) );
+    dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ) );
 
     // Add it to the layout
     ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
