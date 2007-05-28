@@ -173,6 +173,48 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([mkv mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_CFLAGS([libvlc vlc],[-x objective-c])
     VLC_ADD_LDFLAGS([vlc],[-undefined dynamic_lookup])
+    AC_ARG_ENABLE(macosx-defaults,
+        [  --enable-macosx-defaults Build the default configuration on Mac OS X (default enabled)])
+    if test "x${enable_macosx_defaults}" != "xno"
+    then
+        echo ""
+        echo "Building with Mac OS X defaults:"
+        enable_faad="yes"
+        echo "  Assuming --enable-faad"
+        enable_flac="yes"
+        echo "  Assuming --enable-flac"
+        enable_theora="yes"
+        echo "  Assuming --enable-theora"
+        enable_shout="yes"
+        echo "  Assuming --enable-shout"
+        enable_cddax="yes"
+        echo "  Assuming --enable-cddax"
+        enable_vcdx="yes"
+        echo "  Assuming --enable-vcdx"
+        enable_caca="yes"
+        echo "  Assuming --enable-caca"
+        enable_goom="yes"
+        echo "  Assuming --enable-goom"
+        enable_ncurses="yes"
+        echo "  Assuming --enable-ncurses"
+        enable_twolame="yes"
+        echo "  Assuming --enable-twolame"
+        enable_realrtsp="yes"
+        echo "  Assuming --enable-realrtsp"
+
+        enable_skins2="no"
+        echo "  Assuming --disable-skins2"
+        enable_x11="no"
+        echo "  Assuming --disable-x11"
+        enable_glx="no"
+        echo "  Assuming --disable-glx"
+        enable_xvideo="no"
+        echo "  Assuming --disable-xvideo"
+
+        enable_libtool="no"
+        echo "  Assuming --disable-libtool"
+        echo ""
+    fi
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
     AC_CHECK_TOOL(WINDRES, windres, :)
@@ -282,7 +324,7 @@ AC_PROG_LIBTOOL
 
 AC_ARG_ENABLE(libtool,
     [  --enable-libtool        use libtool (default enabled)])
-AM_CONDITIONAL(USE_LIBTOOL, [test "x${enable_libtool}" != "xno"])
+AM_CONDITIONAL(USE_LIBTOOL, [test "x${enable_libtool}" != "xno"] )
 
 
 dnl
