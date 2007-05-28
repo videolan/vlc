@@ -65,7 +65,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
             qfu( p_intf->p_libvlc->psz_homedir ), fileTypes );
 /*    dialogBox->setFileMode( QFileDialog::ExistingFiles );*/
-/*    dialogBox->setAcceptMode( QFileDialog::AcceptOpen );*/
+    dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
 
     /* retrieve last known path used in file browsing */
     char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
@@ -79,7 +79,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dialogBox->setSizeGripEnabled( false );
 
     /* Add a tooltip */
-    dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ) );
+//  dialogBox->setToolTip( qtr( "Select one or multiple files, or a folder" ) );
 
     // Add it to the layout
     ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
@@ -135,7 +135,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this,
                                                             updateMRL() );
 
-/*    CONNECT( lineFileEdit, textChanged( QString ), this, browseFile() );*/
+    CONNECT( lineFileEdit, textChanged( QString ), this, browseFile() );
 }
 
 FileOpenPanel::~FileOpenPanel()
@@ -146,8 +146,6 @@ QStringList FileOpenPanel::browse( QString help )
     return THEDP->showSimpleOpen( help );
 }
 
-#if 0
-/* Unused. FIXME ? */
 void FileOpenPanel::browseFile()
 {
     QString fileString = "";
@@ -157,7 +155,6 @@ void FileOpenPanel::browseFile()
     ui.fileInput->setEditText( fileString );
     updateMRL();
 }
-#endif
 
 void FileOpenPanel::browseFileSub()
 {
@@ -502,20 +499,20 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     v4lDevLayout->addWidget( v4lAudioDevice, 1, 1 );
 
     /* V4l Props panel */
+    QLabel *v4lNormLabel = new QLabel( qtr( "Norm" ) );
+    v4lPropLayout->addWidget( v4lNormLabel, 0 , 0 );
+
     v4lNormBox = new QComboBox;
     setfillVLCConfigCombo( "v4l-norm", p_intf, v4lNormBox );
     v4lPropLayout->addWidget( v4lNormBox, 0 , 1 );
+
+    QLabel *v4lFreqLabel = new QLabel( qtr( "Frequency" ) );
+    v4lPropLayout->addWidget( v4lFreqLabel, 1 , 0 );
 
     v4lFreq = new QSpinBox;
     v4lFreq->setAlignment( Qt::AlignRight );
     v4lFreq->setSuffix(" kHz");
     v4lPropLayout->addWidget( v4lFreq, 1 , 1 );
-
-    QLabel *v4lNormLabel = new QLabel( qtr( "Norm" ) );
-    v4lPropLayout->addWidget( v4lNormLabel, 0 , 0 );
-
-    QLabel *v4lFreqLabel = new QLabel( qtr( "Frequency" ) );
-    v4lPropLayout->addWidget( v4lFreqLabel, 1 , 0 );
 
     /* v4l CONNECTs */
     CuMRL( v4lVideoDevice, textChanged( QString ) );
@@ -542,12 +539,15 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     pvrDevLayout->addWidget( pvrRadioDevice, 1, 1 );
 
     /* PVR props panel */
+    QLabel *pvrNormLabel = new QLabel( qtr( "Norm" ) );
+    pvrPropLayout->addWidget( pvrNormLabel, 0, 0 );
+
     pvrNormBox = new QComboBox;
     setfillVLCConfigCombo( "pvr-norm", p_intf, pvrNormBox );
     pvrPropLayout->addWidget( pvrNormBox, 0, 1 );
 
-    QLabel *pvrNormLabel = new QLabel( qtr( "Norm" ) );
-    pvrPropLayout->addWidget( pvrNormLabel, 0, 0 );
+    QLabel *pvrFreqLabel = new QLabel( qtr( "Frequency" ) );
+    pvrPropLayout->addWidget( pvrFreqLabel, 1, 0 );
 
     pvrFreq = new QSpinBox;
     pvrFreq->setAlignment( Qt::AlignRight );
@@ -555,17 +555,14 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     setMaxBound( pvrFreq );
     pvrPropLayout->addWidget( pvrFreq, 1, 1 );
 
+    QLabel *pvrBitrLabel = new QLabel( qtr( "Bitrate" ) );
+    pvrPropLayout->addWidget( pvrBitrLabel, 2, 0 );
+
     pvrBitr = new QSpinBox;
     pvrBitr->setAlignment( Qt::AlignRight );
     pvrBitr->setSuffix(" kHz");
     setMaxBound( pvrBitr );
     pvrPropLayout->addWidget( pvrBitr, 2, 1 );
-
-    QLabel *pvrFreqLabel = new QLabel( qtr( "Frequency" ) );
-    pvrPropLayout->addWidget( pvrFreqLabel, 1, 0 );
-
-    QLabel *pvrBitrLabel = new QLabel( qtr( "Bitrate" ) );
-    pvrPropLayout->addWidget( pvrBitrLabel, 2, 0 );
 
     /* PVR CONNECTs */
     CuMRL( pvrDevice, textChanged( QString ) );
@@ -580,6 +577,45 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
      *********************/
     addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
 
+    /* dshow Main */
+
+    QLabel *dshowVDeviceLabel = new QLabel( qtr( "Video Device Name " ) );
+    dshowDevLayout->addWidget( dshowVDeviceLabel, 0, 0 );
+
+    QLabel *dshowADeviceLabel = new QLabel( qtr( "Audio Device Name " ) );
+    dshowDevLayout->addWidget( dshowADeviceLabel, 1, 0 );
+
+    QComboBox *dshowVDevice = new QComboBox;
+    dshowDevLayout->addWidget( dshowVDevice, 0, 1 );
+
+    QComboBox *dshowADevice = new QComboBox;
+    dshowDevLayout->addWidget( dshowADevice, 1, 1 );
+
+    QPushButton *dshowVRefresh = new QPushButton( qtr( "Update List" ) );
+    dshowDevLayout->addWidget( dshowVRefresh, 0, 2 );
+
+    QPushButton *dshowARefresh = new QPushButton( qtr( "Update List" ) );
+    dshowDevLayout->addWidget( dshowARefresh, 1, 2 );
+
+    QPushButton *dshowVConfig = new QPushButton( qtr( "Configure" ) );
+    dshowDevLayout->addWidget( dshowVConfig, 0, 3 );
+
+    QPushButton *dshowAConfig = new QPushButton( qtr( "Configure" ) );
+    dshowDevLayout->addWidget( dshowAConfig, 1, 3 );
+
+    /* dshow Properties */
+
+    QLabel *dshowVSizeLabel = new QLabel( qtr( "Video size" ) );
+    dshowPropLayout->addWidget( dshowVSizeLabel, 0, 0 );
+
+    QLineEdit *dshowVSizeLine = new QLineEdit;
+    dshowPropLayout->addWidget( dshowVSizeLine, 0, 1);
+
+    /* dshow CONNECTs */
+    CuMRL( dshowVDevice, currentIndexChanged ( int ) );
+    CuMRL( dshowADevice, currentIndexChanged ( int ) );
+    CuMRL( dshowVSizeLine, textChanged( QString ) );
+
     /**************
      * BDA Stuffs *
      **************/
@@ -593,10 +629,10 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     bdac = new QRadioButton( "DVB-C" );
     bdat = new QRadioButton( "DVB-T" );
 
-    bdaDevLayout->addWidget( bdaTypeLabel, 1, 0 );
-    bdaDevLayout->addWidget( bdas, 1, 1 );
-    bdaDevLayout->addWidget( bdac, 1, 2 );
-    bdaDevLayout->addWidget( bdat, 1, 3 );
+    bdaDevLayout->addWidget( bdaTypeLabel, 0, 0 );
+    bdaDevLayout->addWidget( bdas, 0, 1 );
+    bdaDevLayout->addWidget( bdac, 0, 2 );
+    bdaDevLayout->addWidget( bdat, 0, 3 );
 
     /* bda Props */
     QLabel *bdaFreqLabel =

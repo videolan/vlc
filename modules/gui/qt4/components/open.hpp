@@ -89,9 +89,7 @@ private:
 public slots:
     virtual void updateMRL();
 private slots:
-#if 0
     void browseFile();
-#endif
     void browseFileSub();
     void toggleSubtitleFrame();
 };
