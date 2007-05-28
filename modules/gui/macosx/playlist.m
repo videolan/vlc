@@ -271,7 +271,16 @@
     if( [[o_tc identifier] isEqualToString:@"1"] )
     {
         /* sanity check to prevent the NSString class from crashing */
-        if( p_item->p_input->psz_name != NULL )
+        if( p_item->p_input->p_meta && p_item->p_input->p_meta->psz_title && 
+            *p_item->p_input->p_meta->psz_title )
+        {
+            o_value = [NSString stringWithUTF8String:
+                p_item->p_input->p_meta->psz_title];
+            if( o_value == NULL )
+                o_value = [NSString stringWithCString:
+                    p_item->p_input->p_meta->psz_title];
+        } 
+        else if( p_item->p_input->psz_name != NULL )
         {
             o_value = [NSString stringWithUTF8String:
                 p_item->p_input->psz_name];
