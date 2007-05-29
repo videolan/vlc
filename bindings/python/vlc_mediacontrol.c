@@ -42,7 +42,6 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 
     if( PyArg_ParseTuple( args, "O", &py_param ) )
     {
-        Py_INCREF( py_param );
         if( PyObject_TypeCheck( py_param, &vlcInstance_Type ) == 1 )
         {
             p_instance = ((vlcInstance*)py_param)->p_instance;
@@ -51,6 +50,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
         {
             Py_ssize_t i_index;
 
+            Py_INCREF( py_param );
             if( ! PySequence_Check( py_param ) )
             {
                 PyErr_SetString( PyExc_TypeError, "Parameter must be a vlc.Instance or a sequence of strings." );
@@ -74,8 +74,8 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
                                                                        i_index ) ) ) );
             }
             ppsz_args[i_size] = NULL;
+            Py_DECREF( py_param );
         }
-        Py_DECREF( py_param );
     }
     else
     {
@@ -89,10 +89,14 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
     if( p_instance )
     {
         self->mc = mediacontrol_new_from_instance( p_instance, exception );
+        Py_INCREF( py_param );
+        self->vlc_instance = py_param;
     }
     else
     {
         self->mc = mediacontrol_new( i_size, ppsz_args, exception );
+        self->vlc_instance = PyObject_New( vlcInstance, &vlcInstance_Type );
+        self->vlc_instance->p_instance = mediacontrol_get_libvlc_instance( SELF->mc );
     }
     MC_EXCEPT;
     Py_END_ALLOW_THREADS
@@ -104,7 +108,8 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 static void
 MediaControl_dealloc( PyObject *self )
 {
-    PyMem_DEL( self );
+    Py_DECREF( SELF->vlc_instance );
+    PyObject_DEL( self );
 }
 
 static PyObject *
@@ -112,10 +117,8 @@ MediaControl_get_vlc_instance( PyObject *self, PyObject *args )
 {
     vlcInstance *p_ret;
 
-    p_ret = PyObject_New( vlcInstance, &vlcInstance_Type );
-    if( !p_ret )
-        return NULL;
-    p_ret->p_instance = mediacontrol_get_libvlc_instance( SELF->mc );
+    p_ret = SELF->vlc_instance;
+    Py_INCREF( p_ret );
     return ( PyObject * )p_ret;
 }
 
