@@ -66,7 +66,7 @@
 
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
-static void Run        ( intf_thread_t * );
+static void Run     ( intf_thread_t * );
 
 
 static int TrackChange( vlc_object_t *p_this, const char *psz_var,
@@ -178,8 +178,8 @@ DBUS_METHOD( PositionGet )
         var_Get( p_input, "position", &position );
         i_pos = position.f_float * 1000 ;
     }
-    ADD_INT32( &i_pos );
     pl_Release( ((vlc_object_t*) p_this) );
+    ADD_INT32( &i_pos );
     REPLY_SEND;
 }
 
@@ -188,6 +188,7 @@ DBUS_METHOD( PositionSet )
 
     REPLY_INIT;
     vlc_value_t position;
+    playlist_t* p_playlist = NULL;
     dbus_int32_t i_pos;
 
     DBusError error;
@@ -204,7 +205,7 @@ DBUS_METHOD( PositionSet )
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
-    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
+    p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
     input_thread_t *p_input = p_playlist->p_input;
 
     if( p_input )
@@ -329,6 +330,18 @@ DBUS_METHOD( Play )
     REPLY_SEND;
 }
 
+DBUS_METHOD( GetCurrentMetadata )
+{
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+    playlist_t* p_playlist = pl_Yield( (vlc_object_t*) p_this );
+
+    GetInputMeta( p_playlist->status.p_item->p_input, &args );
+
+    pl_Release( p_playlist );
+    REPLY_SEND;
+}
+
 /* Media Player information */
 
 DBUS_METHOD( Identity )
@@ -350,6 +363,7 @@ DBUS_METHOD( AddTrack )
 
     DBusError error;
     dbus_error_init( &error );
+    playlist_t* p_playlist = NULL;
 
     char *psz_mrl;
     dbus_bool_t b_play;
@@ -367,10 +381,10 @@ DBUS_METHOD( AddTrack )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_Add( p_playlist, psz_mrl, NULL, PLAYLIST_APPEND |
-            ( ( b_play == TRUE ) ? PLAYLIST_GO : 0 ) , 
-	    PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+            ( ( b_play == TRUE ) ? PLAYLIST_GO : 0 ) ,
+            PLAYLIST_END, VLC_TRUE, VLC_FALSE );
     pl_Release( p_playlist );
 
     REPLY_SEND;
@@ -383,8 +397,8 @@ DBUS_METHOD( GetCurrentTrack )
     dbus_int32_t i_position = 0;
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
-    
-    while ( p_tested_item->p_input->i_id != 
+
+    while ( p_tested_item->p_input->i_id !=
                     p_playlist->status.p_item->p_input->i_id )
     {
         i_position++;
@@ -398,14 +412,14 @@ DBUS_METHOD( GetCurrentTrack )
 }
 
 DBUS_METHOD( GetMetadata )
-{ 
+{
     REPLY_INIT;
     OUT_ARGUMENTS;
     DBusError error;
     dbus_error_init( &error );
 
     dbus_int32_t i_position, i_count = 0;
-    
+
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
 
@@ -496,6 +510,69 @@ DBUS_METHOD( DelTrack )
     REPLY_SEND;
 }
 
+DBUS_METHOD( Loop )
+{
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    DBusError error;
+    dbus_bool_t b_loop;
+    vlc_value_t val;
+    playlist_t* p_playlist = NULL;
+    
+    dbus_error_init( &error );
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_BOOLEAN, &b_loop,
+            DBUS_TYPE_INVALID );
+    
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+                error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    val.b_bool = ( b_loop == TRUE ) ? VLC_TRUE : VLC_FALSE ;
+    p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    var_Set ( p_playlist, "loop", val );
+    pl_Release( ((vlc_object_t*) p_this) );
+
+    REPLY_SEND;
+}
+
+DBUS_METHOD( Repeat )
+{
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    DBusError error;
+    dbus_bool_t b_repeat;
+    vlc_value_t val;
+    playlist_t* p_playlist = NULL;
+    
+    dbus_error_init( &error );
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_BOOLEAN, &b_repeat,
+            DBUS_TYPE_INVALID );
+    
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+                error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    val.b_bool = ( b_repeat == TRUE ) ? VLC_TRUE : VLC_FALSE ;
+    
+    p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    var_Set ( p_playlist, "repeat", val );
+    pl_Release( ((vlc_object_t*) p_this) );
+
+    REPLY_SEND;
+}
+
 /*****************************************************************************
  * Introspection method
  *****************************************************************************/
@@ -566,6 +643,7 @@ DBUS_METHOD( handle_player )
     METHOD_FUNC( "PositionSet",             PositionSet );
     METHOD_FUNC( "PositionGet",             PositionGet );
     METHOD_FUNC( "GetStatus",               GetStatus );
+    METHOD_FUNC( "GetMetadata",             GetCurrentMetadata );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
@@ -583,6 +661,8 @@ DBUS_METHOD( handle_tracklist )
     METHOD_FUNC( "GetLength",               GetLength );
     METHOD_FUNC( "AddTrack",                AddTrack );
     METHOD_FUNC( "DelTrack",                DelTrack );
+    METHOD_FUNC( "Loop",                    Loop );
+    METHOD_FUNC( "Repeat",                  Repeat );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
@@ -752,9 +832,12 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
 static int GetInputMeta( input_item_t* p_input, 
                         DBusMessageIter *args )
 { /*FIXME: Works only for already read metadata. */ 
-  /*FIXME: Should return the length in seconds rather than milliseconds */
   
     DBusMessageIter dict, dict_entry, variant;
+    /* We need the track length to be expressed in seconds
+     * instead of milliseconds */
+    dbus_int64_t i_length = (p_input->i_duration / 1000);
+
 
     const char* ppsz_meta_items[] = 
     {
@@ -787,7 +870,7 @@ static int GetInputMeta( input_item_t* p_input,
 
     ADD_META( 17, DBUS_TYPE_INT32, p_input->p_meta->i_status );
     ADD_META( 18, DBUS_TYPE_STRING, p_input->psz_uri ); 
-    ADD_META( 19, DBUS_TYPE_INT64, p_input->i_duration ); 
+    ADD_META( 19, DBUS_TYPE_INT64, i_length ); 
 
     dbus_message_iter_close_container( args, &dict );
     return VLC_SUCCESS;

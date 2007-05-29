@@ -4,7 +4,8 @@
  * Copyright (C) 2006 Rafaël Carré
  * $Id$
  *
- * Author:    Rafaël Carré <funman at videolanorg>
+ * Authors:    Rafaël Carré <funman at videolanorg>
+ *             Mirsal ENNAIME <mirsal dot ennaime at gmail dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -138,6 +139,9 @@ const char* psz_introspection_xml_data_player =
 "    <method name=\"PositionGet\">\n"
 "      <arg type=\"i\" direction=\"out\" />\n"
 "    </method>\n"
+"    <method name=\"GetMetadata\">\n"
+"      <arg type=\"a{sv}\" direction=\"out\" />\n"
+"    </method>\n"
 "  </interface>\n"
 "</node>\n"
 ;
@@ -168,6 +172,12 @@ const char* psz_introspection_xml_data_tracklist =
 "    </method>\n"
 "    <method name=\"GetLength\">\n"
 "      <arg type=\"i\" direction=\"out\" />\n"
+"    </method>\n"
+"    <method name=\"Loop\">\n"
+"      <arg type=\"b\" direction=\"in\" />\n"
+"    </method>\n"
+"    <method name=\"Repeat\">\n"
+"      <arg type=\"b\" direction=\"in\" />\n"
 "    </method>\n"
 "  </interface>\n"
 "</node>\n"
