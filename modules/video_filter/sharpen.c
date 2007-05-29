@@ -84,6 +84,7 @@ static const char *ppsz_filter_options[] = {
 struct filter_sys_t
 {
     float f_sigma;
+    int tab_precalc[512];
 };
 
 /*****************************************************************************
@@ -92,6 +93,16 @@ struct filter_sys_t
 inline static int32_t clip( int32_t a )
 {
     return (a > 255) ? 255 : (a < 0) ? 0 : a;
+}
+
+static void init_precalc_table(filter_sys_t *p_filter)
+{
+    float sigma = p_filter->f_sigma;
+    
+    for(int i = 0; i < 512; ++i)
+    {
+        p_filter->tab_precalc[i] = (i - 256) * sigma;
+    }
 }
 
 /*****************************************************************************
@@ -120,6 +131,8 @@ static int Create( vlc_object_t *p_this )
         var_CreateGetFloatCommand( p_filter, FILTER_PREFIX "sigma" );
     var_AddCallback( p_filter, FILTER_PREFIX "sigma",
                      SharpenCallback, p_filter->p_sys );
+
+    init_precalc_table(p_filter->p_sys);
 
     return VLC_SUCCESS;
 }
@@ -207,8 +220,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                   (p_src[(i + 1) * i_src_pitch + j    ] * v1) +
                   (p_src[(i + 1) * i_src_pitch + j + 1] * v1);
 
-            p_out[i * i_src_pitch + j] =  clip( p_src[i * i_src_pitch + j] +
-                        (p_filter->p_sys->f_sigma * pix) );
+	    pix = pix >= 0 ? clip(pix) : -clip(pix * -1);
+	    p_out[i * i_src_pitch + j] = clip( p_src[i * i_src_pitch + j] + 
+			p_filter->p_sys->tab_precalc[pix + 256] );
         }
     }
 
@@ -241,5 +255,6 @@ static int SharpenCallback( vlc_object_t *p_this, char const *psz_var,
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
     if( !strcmp( psz_var, FILTER_PREFIX "sigma" ) )
         p_sys->f_sigma = __MIN( 2., __MAX( 0., newval.f_float ) );
+    init_precalc_table(p_sys);
     return VLC_SUCCESS;
 }
