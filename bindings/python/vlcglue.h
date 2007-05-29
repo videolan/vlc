@@ -81,12 +81,24 @@ PyObject *MediaControl_PlaylistException;
 PyObject *vlcInstance_Exception;
 
 /**********************************************************************
+ * vlc.Instance Object
+ **********************************************************************/
+typedef struct
+{
+    PyObject_HEAD
+    libvlc_instance_t* p_instance;
+} vlcInstance;
+
+#define LIBVLC_INSTANCE ((vlcInstance*)self)
+
+/**********************************************************************
  * MediaControl Object
  **********************************************************************/
 typedef struct
 {
     PyObject_HEAD
     mediacontrol_Instance* mc;
+    vlcInstance *vlc_instance;
 } MediaControl;
 
 /**********************************************************************
@@ -99,17 +111,6 @@ typedef struct
     int key;
     PY_LONG_LONG value;
 } PyPosition;
-
-/**********************************************************************
- * vlc.Instance Object
- **********************************************************************/
-typedef struct
-{
-    PyObject_HEAD
-    libvlc_instance_t* p_instance;
-} vlcInstance;
-
-#define LIBVLC_INSTANCE ((vlcInstance*)self)
 
 /**********************************************************************
  * vlc.Input Object
