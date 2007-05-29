@@ -190,7 +190,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         p_dec->fmt_out.video.i_frame_rate =
             p_dec->fmt_in.video.i_frame_rate;
         p_dec->fmt_out.video.i_frame_rate_base =
-            p_dec->fmt_out.video.i_frame_rate_base;
+            p_dec->fmt_in.video.i_frame_rate_base;
     }
     else if( p_context->time_base.num > 0 && p_context->time_base.den > 0 )
     {
