@@ -90,7 +90,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
     {
         self->mc = mediacontrol_new_from_instance( p_instance, exception );
         Py_INCREF( py_param );
-        self->vlc_instance = py_param;
+        self->vlc_instance = ( vlcInstance* ) py_param;
     }
     else
     {
