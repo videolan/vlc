@@ -82,9 +82,6 @@ vlcInstance_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
     char** ppsz_args = NULL;
     int i_size = 0;
 
-    self = PyObject_New( vlcInstance, &vlcInstance_Type );
-
-
     if( PyArg_ParseTuple( args, "O", &py_list ) )
     {
         i_size = pyoptions_to_args( py_list, &ppsz_args );
@@ -97,6 +94,8 @@ vlcInstance_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
            by PyArg_ParseTuple. */
         PyErr_Clear( );
     }
+
+    self = PyObject_New( vlcInstance, &vlcInstance_Type );
 
     Py_BEGIN_ALLOW_THREADS
     LIBVLC_TRY
@@ -114,7 +113,7 @@ vlcInstance_dealloc( PyObject *self )
 {
     libvlc_exception_t ex;
     libvlc_destroy( LIBVLC_INSTANCE->p_instance, &ex );
-    PyMem_DEL( self );
+    PyObject_DEL( self );
 }
 
 static PyObject *
