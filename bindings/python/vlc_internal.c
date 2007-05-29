@@ -122,7 +122,7 @@ static void
 vlcObject_dealloc( PyObject *self )
 {
     vlcObject_release( self, NULL );
-    PyMem_DEL( self );
+    PyObject_DEL( self );
 }
 
 static PyObject *
