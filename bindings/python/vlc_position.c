@@ -38,8 +38,6 @@ PyPosition_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
     self->origin=mediacontrol_AbsolutePosition;
     self->key=mediacontrol_MediaTime;
 
-    /* We do not care about the return value, since it will leave the fields
-       with their default value. */
     if(! PyArg_ParseTupleAndKeywords( args, kwds, "|lii", kwlist,
                                       &(self->value),
                                       &(self->origin),
@@ -47,7 +45,23 @@ PyPosition_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
     {
         return NULL;        
     }
-       
+
+    if( self->key != mediacontrol_MediaTime 
+	&& self->key != mediacontrol_ByteCount
+	&& self->key != mediacontrol_SampleCount ) 
+    {
+        PyErr_SetString ( MediaControl_InternalException, "Invalid key value" );
+        return NULL;
+    }
+
+    if( self->origin != mediacontrol_AbsolutePosition 
+	&& self->origin != mediacontrol_RelativePosition
+	&& self->origin != mediacontrol_ModuloPosition ) 
+    {
+        PyErr_SetString ( MediaControl_InternalException, "Invalid origin value" );
+        return NULL;
+    }
+
     Py_INCREF( self );
     return ( PyObject * )self;    
 }
