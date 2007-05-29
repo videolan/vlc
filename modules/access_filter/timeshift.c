@@ -34,6 +34,7 @@
 
 #include <vlc_access.h>
 #include <vlc_charset.h>
+#include <vlc_input.h>
 
 #include <unistd.h>
 
@@ -108,6 +109,8 @@ struct access_sys_t
 
     char *psz_filename_base;
     char *psz_filename;
+
+    int64_t i_data;
 };
 
 /*****************************************************************************
@@ -120,17 +123,16 @@ static int Open( vlc_object_t *p_this )
     access_sys_t *p_sys;
     vlc_bool_t b_bool;
 
-    var_Create( p_access, "timeshift-force",
-                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    if( var_GetBool( p_access, "timeshift-force" ) == VLC_TRUE )
+    var_Create( p_access, "timeshift-force", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    if( var_GetBool( p_access, "timeshift-force" ) )
     {
         msg_Dbg( p_access, "Forcing use of timeshift even if access can control pace or pause" );
     }
     else
     {
         /* Only work with not pace controled access */
-        if( access2_Control( p_src, ACCESS_CAN_CONTROL_PACE, &b_bool )
-            || b_bool )
+        if( access2_Control( p_src, ACCESS_CAN_CONTROL_PACE, &b_bool ) ||
+            b_bool )
         {
             msg_Dbg( p_src, "ACCESS_CAN_CONTROL_PACE: timeshift useless" );
             return VLC_EGENERIC;
@@ -156,6 +158,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_fifo = block_FifoNew( p_access );
     p_sys->i_write_size = 0;
     p_sys->i_files = 0;
+    p_sys->i_data = 0;
 
     p_sys->p_read_list = NULL;
     p_sys->pp_read_last = &p_sys->p_read_list;
@@ -229,17 +232,31 @@ static void Close( vlc_object_t *p_this )
 static block_t *Block( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    block_t *p_block;
+    access_t *p_src = p_access->p_source;
+    block_t *p_block = NULL;
 
-    if( p_access->b_die )
+    /* Update info (we probably ought to be time caching that as well) */
+    if( p_src->info.i_update & INPUT_UPDATE_META )
     {
-        p_access->info.b_eof = VLC_TRUE;
-        return NULL;
+        p_src->info.i_update &= ~INPUT_UPDATE_META;
+        p_access->info.i_update |= INPUT_UPDATE_META;
     }
 
-    p_block = block_FifoGet( p_sys->p_fifo );
-    //p_access->info.i_size -= p_block->i_buffer;
-    return p_block;
+    /* Get data from timeshift fifo */
+    if( !p_access->info.b_eof )
+        p_block = block_FifoGet( p_sys->p_fifo );
+
+    if( p_block && !p_block->i_buffer ) /* Used to signal EOF */
+    { block_Release( p_block ); p_block = 0; }
+
+    if( p_block )
+    {
+        p_sys->i_data -= p_block->i_buffer;
+        return p_block;
+    }
+
+    p_access->info.b_eof = p_src->info.b_eof;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -249,23 +266,14 @@ static void Thread( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     access_t     *p_src = p_access->p_source;
-    int i;
+    block_t      *p_block;
 
     while( !p_access->b_die )
     {
-        block_t *p_block;
-
         /* Get a new block from the source */
         if( p_src->pf_block )
         {
             p_block = p_src->pf_block( p_src );
-
-            if( p_block == NULL )
-            {
-                if( p_src->info.b_eof ) break;
-                msleep( 1000 );
-                continue;
-            }
         }
         else
         {
@@ -274,14 +282,21 @@ static void Thread( access_t *p_access )
             p_block->i_buffer =
                 p_src->pf_read( p_src, p_block->p_buffer, 2048 );
 
-            if( p_block->i_buffer < 0 )
+            if( p_block->i_buffer <= 0 )
             {
-                block_Release( p_block );
-                if( p_block->i_buffer == 0 ) break;
-                msleep( 1000 );
-                continue;
+              block_Release( p_block );
+              p_block = NULL;
             }
         }
+
+        if( p_block == NULL )
+        {
+          if( p_src->info.b_eof ) break;
+          msleep( 10000 );
+          continue;
+        }
+
+        p_sys->i_data += p_block->i_buffer;
 
         /* Write block */
         if( !p_sys->p_write_list && !p_sys->p_read_list &&
@@ -290,11 +305,6 @@ static void Thread( access_t *p_access )
             /* If there isn't too much timeshifted data,
              * write directly to FIFO */
             block_FifoPut( p_sys->p_fifo, p_block );
-
-            //p_access->info.i_size += p_block->i_buffer;
-            //p_access->info.i_update |= INPUT_UPDATE_SIZE;
-
-            /* Nothing else to do */
             continue;
         }
 
@@ -307,20 +317,34 @@ static void Thread( access_t *p_access )
         {
             p_block = ReadBlockFromFile( p_access );
             if( !p_block ) break;
+
             block_FifoPut( p_sys->p_fifo, p_block );
         }
     }
 
-    msg_Dbg( p_access, "timeshift: EOF" );
+    msg_Dbg( p_access, "timeshift: no more input data" );
 
-    /* Send dummy packet to avoid deadlock in TShiftBlock */
-    for( i = 0; i < 2; i++ )
+    while( !p_access->b_die &&
+           (p_sys->p_read_list || p_sys->p_fifo->i_size) )
     {
-        block_t *p_dummy = block_New( p_access, 128 );
-        p_dummy->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-        memset( p_dummy->p_buffer, 0, p_dummy->i_buffer );
-        block_FifoPut( p_sys->p_fifo, p_dummy );
+        /* Read from file to fill up the fifo */
+        while( p_sys->p_fifo->i_size < TIMESHIFT_FIFO_MIN &&
+               !p_access->b_die && p_sys->p_read_list )
+        {
+            p_block = ReadBlockFromFile( p_access );
+            if( !p_block ) break;
+
+            block_FifoPut( p_sys->p_fifo, p_block );
+        }
+
+        msleep( 100000 );
     }
+
+    msg_Dbg( p_access, "timeshift: EOF" );
+    p_src->info.b_eof = VLC_TRUE;
+
+    /* Send dummy packet to avoid deadlock in Block() */
+    block_FifoPut( p_sys->p_fifo, block_New( p_access, 0 ) );
 }
 
 /*****************************************************************************
@@ -493,11 +517,8 @@ static int Seek( access_t *p_access, int64_t i_pos )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    access_t     *p_src = p_access->p_source;
-
     vlc_bool_t   *pb_bool;
     int          *pi_int;
-    int64_t      *pi_64;
 
     switch( i_query )
     {
@@ -518,27 +539,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *pi_int = 0;
             break;
 
-        case ACCESS_GET_PTS_DELAY:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            return access2_Control( p_src, ACCESS_GET_PTS_DELAY, pi_64 );
-
-        case ACCESS_SET_PAUSE_STATE:
-            return VLC_SUCCESS;
-
-        case ACCESS_GET_TITLE_INFO:
-        case ACCESS_SET_TITLE:
-        case ACCESS_SET_SEEKPOINT:
-        case ACCESS_GET_META:
-            return VLC_EGENERIC;
-
-        case ACCESS_SET_PRIVATE_ID_STATE:
-        case ACCESS_GET_PRIVATE_ID_STATE:
-        case ACCESS_SET_PRIVATE_ID_CA:
-            return access2_vaControl( p_src, i_query, args );
-
+        /* Forward everything else to the source access */
         default:
-            msg_Warn( p_access, "unimplemented query in control" );
-            return VLC_EGENERIC;
+            return access2_vaControl( p_access->p_source, i_query, args );
 
     }
     return VLC_SUCCESS;
