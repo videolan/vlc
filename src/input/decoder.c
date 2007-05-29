@@ -447,6 +447,74 @@ static int DecoderThread( decoder_t * p_dec )
  * \param p_block the block to decode
  * \return VLC_SUCCESS or an error code
  */
+static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
+{
+    if( p->i_pts > 0 )
+        *pi_preroll = __MIN( *pi_preroll, p->i_pts );
+    else if( p->i_dts > 0 )
+        *pi_preroll = __MIN( *pi_preroll, p->i_dts );
+}
+static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
+{
+    input_thread_t *p_input = p_dec->p_owner->p_input;
+    aout_buffer_t *p_aout_buf;
+
+    //DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
+    while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
+    {
+        vlc_mutex_lock( &p_input->p->counters.counters_lock );
+        stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_audio, 1, NULL );
+        vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+
+        /* FIXME the best would be to handle the case
+         * start_date < preroll < end_date
+         * but that's not easy with non raw audio stream */
+//        if( p_dec->p_owner->i_preroll_end > 0 )
+//            msg_Err( p_dec, "Prerolling %lld - %lld", p_dec->p_owner->i_preroll_end, p_aout_buf->start_date );
+
+        if( p_dec->p_owner->i_preroll_end > 0 &&
+            p_aout_buf->start_date < p_dec->p_owner->i_preroll_end )
+        {
+            aout_DecDeleteBuffer( p_dec->p_owner->p_aout,
+                                  p_dec->p_owner->p_aout_input, p_aout_buf );
+        }
+        else
+        {
+            p_dec->p_owner->i_preroll_end = -1;
+            aout_DecPlay( p_dec->p_owner->p_aout,
+                          p_dec->p_owner->p_aout_input,
+                          p_aout_buf );
+        }
+    }
+}
+static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
+{
+    input_thread_t *p_input = p_dec->p_owner->p_input;
+    picture_t *p_pic;
+
+    //DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
+    while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
+    {
+        vlc_mutex_lock( &p_input->p->counters.counters_lock );
+        stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_video, 1, NULL );
+        vlc_mutex_unlock( &p_input->p->counters.counters_lock );
+
+        if( p_dec->p_owner->i_preroll_end > 0 &&
+            p_pic->date < p_dec->p_owner->i_preroll_end )
+        {
+            vout_DestroyPicture( p_dec->p_owner->p_vout, p_pic );
+        }
+        else
+        {
+            p_dec->p_owner->i_preroll_end = -1;
+            vout_DatePicture( p_dec->p_owner->p_vout, p_pic,
+                              p_pic->date );
+            vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
+        }
+    }
+}
+
+
 static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 {
     int i_rate = p_block ? p_block->i_rate : 1000;
@@ -528,8 +596,6 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
     }
     else if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
-        aout_buffer_t *p_aout_buf;
-
         if( p_dec->p_owner->p_packetizer )
         {
             block_t *p_packetized_block;
@@ -550,64 +616,19 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                     p_packetized_block->p_next = NULL;
                     p_packetized_block->i_rate = i_rate;
 
-                    while( (p_aout_buf = p_dec->pf_decode_audio( p_dec,
-                                                       &p_packetized_block )) )
-                    {
-                        input_thread_t *p_i =(input_thread_t*)(p_dec->p_parent);
-                        vlc_mutex_lock( &p_i->p->counters.counters_lock );
-                        stats_UpdateInteger( p_dec,
-                               p_i->p->counters.p_decoded_audio, 1, NULL );
-                        vlc_mutex_unlock( &p_i->p->counters.counters_lock );
-
-                        /* FIXME the best would be to handle the case
-                         * start_date < preroll < end_date
-                         * but that's not easy with non raw audio stream */
-                        if( p_dec->p_owner->i_preroll_end > 0 &&
-                            p_aout_buf->start_date < p_dec->p_owner->i_preroll_end )
-                        {
-                            aout_DecDeleteBuffer( p_dec->p_owner->p_aout,
-                                                  p_dec->p_owner->p_aout_input, p_aout_buf );
-                        }
-                        else
-                        {
-                            p_dec->p_owner->i_preroll_end = -1;
-                            aout_DecPlay( p_dec->p_owner->p_aout,
-                                          p_dec->p_owner->p_aout_input,
-                                          p_aout_buf );
-                        }
-                    }
+                    DecoderDecodeAudio( p_dec, p_packetized_block );
 
                     p_packetized_block = p_next;
                 }
             }
         }
-        else while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
+        else
         {
-            input_thread_t *p_i = (input_thread_t*)(p_dec->p_parent);
-            vlc_mutex_lock( &p_i->p->counters.counters_lock );
-            stats_UpdateInteger( p_dec,
-                               p_i->p->counters.p_decoded_audio, 1, NULL );
-            vlc_mutex_unlock( &p_i->p->counters.counters_lock );
-
-            if( p_dec->p_owner->i_preroll_end > 0 &&
-                p_aout_buf->start_date < p_dec->p_owner->i_preroll_end )
-            {
-                aout_DecDeleteBuffer( p_dec->p_owner->p_aout,
-                                      p_dec->p_owner->p_aout_input, p_aout_buf );
-            }
-            else
-            {
-                p_dec->p_owner->i_preroll_end = -1;
-                aout_DecPlay( p_dec->p_owner->p_aout,
-                              p_dec->p_owner->p_aout_input,
-                              p_aout_buf );
-            }
+            DecoderDecodeAudio( p_dec, p_block );
         }
     }
     else if( p_dec->fmt_in.i_cat == VIDEO_ES )
     {
-        picture_t *p_pic;
-
         if( p_dec->p_owner->p_packetizer )
         {
             block_t *p_packetized_block;
@@ -628,65 +649,28 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                     p_packetized_block->p_next = NULL;
                     p_packetized_block->i_rate = i_rate;
 
-                    while( (p_pic = p_dec->pf_decode_video( p_dec,
-                                                       &p_packetized_block )) )
-                    {
-                        input_thread_t *p_i =(input_thread_t*)(p_dec->p_parent);
-                        vlc_mutex_lock( &p_i->p->counters.counters_lock );
-                        stats_UpdateInteger( p_dec,
-                               p_i->p->counters.p_decoded_video, 1, NULL );
-                        vlc_mutex_unlock( &p_i->p->counters.counters_lock );
-
-                        if( p_dec->p_owner->i_preroll_end > 0 &&
-                            p_pic->date < p_dec->p_owner->i_preroll_end )
-                        {
-                            vout_DestroyPicture( p_dec->p_owner->p_vout, p_pic );
-                        }
-                        else
-                        {
-                            p_dec->p_owner->i_preroll_end = -1;
-                            vout_DatePicture( p_dec->p_owner->p_vout, p_pic,
-                                              p_pic->date );
-                            vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
-                        }
-                    }
+                    DecoderDecodeVideo( p_dec, p_packetized_block );
 
                     p_packetized_block = p_next;
                 }
             }
         }
-        else while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
+        else
         {
-            input_thread_t *p_i = (input_thread_t*)(p_dec->p_parent);
-            vlc_mutex_lock( &p_i->p->counters.counters_lock );
-            stats_UpdateInteger( p_dec,
-                               p_i->p->counters.p_decoded_video, 1, NULL );
-            vlc_mutex_unlock( &p_i->p->counters.counters_lock );
-
-            if( p_dec->p_owner->i_preroll_end > 0 &&
-                p_pic->date < p_dec->p_owner->i_preroll_end )
-            {
-                vout_DestroyPicture( p_dec->p_owner->p_vout, p_pic );
-            }
-            else
-            {
-                p_dec->p_owner->i_preroll_end = -1;
-                vout_DatePicture( p_dec->p_owner->p_vout, p_pic, p_pic->date );
-                vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
-            }
+            DecoderDecodeVideo( p_dec, p_block );
         }
     }
     else if( p_dec->fmt_in.i_cat == SPU_ES )
     {
+        input_thread_t *p_input = p_dec->p_owner->p_input;
         vout_thread_t *p_vout;
         subpicture_t *p_spu;
+        //DecoderUpdatePreroll( &p_dec->p_owner->i_preroll_end, p_block );
         while( (p_spu = p_dec->pf_decode_sub( p_dec, &p_block ) ) )
         {
-            input_thread_t *p_i = (input_thread_t*)(p_dec->p_parent);
-            vlc_mutex_lock( &p_i->p->counters.counters_lock );
-            stats_UpdateInteger( p_dec,
-                               p_i->p->counters.p_decoded_sub, 1, NULL );
-            vlc_mutex_unlock( &p_i->p->counters.counters_lock );
+            vlc_mutex_lock( &p_input->p->counters.counters_lock );
+            stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_sub, 1, NULL );
+            vlc_mutex_unlock( &p_input->p->counters.counters_lock );
 
             if( p_dec->p_owner->i_preroll_end > 0 &&
                 p_spu->i_start < p_dec->p_owner->i_preroll_end &&
