@@ -1609,9 +1609,11 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 p_input->i_state = val.i_int;
                 var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
 
+#if 0 /* This will need modifications to decoders to work properly. */
                 /* Send discontinuity to decoders (it will allow them to flush
                  * if implemented */
                 input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE );
+#endif
             }
             else if( val.i_int == PAUSE_S && !p_input->p->b_can_pause )
             {
