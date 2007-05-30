@@ -216,7 +216,6 @@ void DialogsProvider::openDialog( int i_tab )
 
 void DialogsProvider::PLAppendDialog()
 {
-    
     OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, ENQUEUE )
         ->showTab(0);
 }

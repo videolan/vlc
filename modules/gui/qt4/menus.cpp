@@ -597,7 +597,12 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf,
     POPUP_BOILERPLATE;
     QMenu *sysMenu = mi->getSysTrayMenu();
     sysMenu->clear();
+    DP_SADD( sysMenu, qtr("&About VLC media player" ), "", "",
+            aboutDialog(), "" );
+    sysMenu->addSeparator();
     POPUP_PLAY_ENTRIES( sysMenu );
+    sysMenu->addSeparator();
+    DP_SADD( sysMenu, qtr("&Open" ), "", "", openFileDialog(), "" );
     sysMenu->addSeparator();
 
     if( !mi->isVisible() || b_force_visible )
@@ -610,7 +615,6 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf,
         sysMenu->addAction( qtr("Show Interface"), mi,
                 SLOT( toggleUpdateSystrayMenu() ) );
     }
-    DP_SADD( sysMenu, qtr("&Open" ), "", "", openFileDialog(), "" );
     DP_SADD( sysMenu, qtr("&Quit") , "", "", quit(), "" );
 
     mi->getSysTray()->setContextMenu( sysMenu );
