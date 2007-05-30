@@ -389,7 +389,7 @@ int E_(Activate) ( vlc_object_t *p_this )
 #ifdef HAVE_XSP
     p_vout->p_sys->i_hw_scale = 1;
 #endif
-    
+
 #ifdef HAVE_OSSO
     p_vout->p_sys->i_backlight_on_counter = i_backlight_on_interval; 
     p_vout->p_sys->p_octx = osso_initialize( "vlc", VERSION, 0, NULL );
@@ -399,7 +399,7 @@ int E_(Activate) ( vlc_object_t *p_this )
         msg_Dbg( p_vout, "Initialized osso context" );
     }
 #endif
-		    
+
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
     var_Get( p_vout, "video-on-top", &val );
@@ -478,7 +478,7 @@ void E_(Deactivate) ( vlc_object_t *p_this )
         osso_deinitialize( p_vout->p_sys->p_octx );
     }
 #endif
-	
+
     free( p_vout->p_sys );
 }
 
