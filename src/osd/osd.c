@@ -65,7 +65,8 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
     var_Get( p_this->p_libvlc, "osd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
-    if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
+    p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE );
+    if( p_osd == NULL )
     {
         vlc_value_t val;
 
@@ -88,11 +89,14 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
         p_osd->i_width  = p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch;
         p_osd->i_height = p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_lines;
 
-        /* Update the volume state images to match the current volume */
-        i_volume = config_GetInt( p_this, "volume" );
-        i_steps = osd_VolumeStep( p_this, i_volume, p_osd->p_state->p_volume->i_ranges );
-        p_osd->p_state->p_volume->p_current_state = osd_VolumeStateChange( p_osd->p_state->p_volume->p_states, i_steps );
-
+        if( p_osd->p_state->p_volume )
+        {
+            /* Update the volume state images to match the current volume */
+            i_volume = config_GetInt( p_this, "volume" );
+            i_steps = osd_VolumeStep( p_this, i_volume, p_osd->p_state->p_volume->i_ranges );
+            p_osd->p_state->p_volume->p_current_state = osd_VolumeStateChange(
+                                    p_osd->p_state->p_volume->p_states, i_steps );
+        }
         /* Initialize OSD state */
         osd_UpdateState( p_osd->p_state, p_osd->i_x, p_osd->i_y,
                          p_osd->i_width, p_osd->i_height, NULL );
@@ -198,7 +202,8 @@ void __osd_MenuShow( vlc_object_t *p_this )
     osd_button_t *p_button = NULL;
     vlc_value_t lockval;
 
-    if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
+    p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE );
+    if( p_osd == NULL )
     {
         msg_Err( p_this, "osd_MenuNext failed" );
         return;
@@ -239,7 +244,8 @@ void __osd_MenuHide( vlc_object_t *p_this )
     osd_menu_t *p_osd = NULL;
     vlc_value_t lockval;
 
-    if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
+    p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE );
+    if( p_osd == NULL )
     {
         msg_Err( p_this, "osd_MenuNext failed" );
         return;
@@ -266,7 +272,8 @@ void __osd_MenuActivate( vlc_object_t *p_this )
     osd_button_t *p_button = NULL;
     vlc_value_t lockval;
 
-    if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
+    p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE );
+    if( p_osd == NULL )
     {
         msg_Err( p_this, "osd_MenuNext failed" );
         return;
@@ -328,7 +335,8 @@ void __osd_MenuNext( vlc_object_t *p_this )
     osd_button_t *p_button = NULL;
     vlc_value_t lockval;
 
-    if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
+    p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE );
+    if( p_osd == NULL )
     {
         msg_Err( p_this, "osd_MenuNext failed" );
         return;
@@ -378,7 +386,8 @@ void __osd_MenuPrev( vlc_object_t *p_this )
     osd_button_t *p_button = NULL;
     vlc_value_t lockval;
 
-    if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
+    p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE );
+    if( p_osd == NULL )
     {
         msg_Err( p_this, "osd_MenuPrev failed" );
         return;
@@ -430,8 +439,8 @@ void __osd_MenuUp( vlc_object_t *p_this )
 #if defined(OSD_MENU_DEBUG)
     vlc_value_t val;
 #endif
-
-    if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
+    p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE );
+    if( p_osd == NULL )
     {
         msg_Err( p_this, "osd_MenuDown failed" );
         return;
@@ -502,7 +511,8 @@ void __osd_MenuDown( vlc_object_t *p_this )
     vlc_value_t val;
 #endif
 
-    if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
+    p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE );
+    if( p_osd == NULL )
     {
         msg_Err( p_this, "osd_MenuDown failed" );
         return;
@@ -587,33 +597,37 @@ void __osd_Volume( vlc_object_t *p_this )
     int i_volume = 0;
     int i_steps = 0;
 
-    if( ( p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE ) ) == NULL )
+    p_osd = vlc_object_find( p_this, VLC_OBJECT_OSDMENU, FIND_ANYWHERE );
+    if( p_osd == NULL )
     {
         msg_Err( p_this, "OSD menu volume update failed" );
         return;
     }
 
-    var_Get( p_this->p_libvlc, "osd_mutex", &lockval );
-    vlc_mutex_lock( lockval.p_address );
-
-    p_button = p_osd->p_state->p_volume;
-    if( p_osd->p_state->p_volume ) 
-        p_osd->p_state->p_visible = p_osd->p_state->p_volume;
-    if( p_button && p_button->b_range )
+    if( p_osd->p_state && p_osd->p_state->p_volume )
     {
-        /* Update the volume state images to match the current volume */
-        i_volume = config_GetInt( p_this, "volume" );
-        i_steps = osd_VolumeStep( p_this, i_volume, p_button->i_ranges );
-        p_button->p_current_state = osd_VolumeStateChange( p_button->p_states, i_steps );
+        var_Get( p_this->p_libvlc, "osd_mutex", &lockval );
+        vlc_mutex_lock( lockval.p_address );
 
-        osd_UpdateState( p_osd->p_state,
-                p_button->i_x, p_button->i_y,
-                p_button->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
-                p_button->p_current_state->p_pic->p[Y_PLANE].i_visible_lines,
-                p_button->p_current_state->p_pic );
-        osd_SetMenuUpdate( p_osd, VLC_TRUE );
-        osd_SetMenuVisible( p_osd, VLC_TRUE );
+        p_button = p_osd->p_state->p_volume;
+        if( p_osd->p_state->p_volume ) 
+            p_osd->p_state->p_visible = p_osd->p_state->p_volume;
+        if( p_button && p_button->b_range )
+        {
+            /* Update the volume state images to match the current volume */
+            i_volume = config_GetInt( p_this, "volume" );
+            i_steps = osd_VolumeStep( p_this, i_volume, p_button->i_ranges );
+            p_button->p_current_state = osd_VolumeStateChange( p_button->p_states, i_steps );
+
+            osd_UpdateState( p_osd->p_state,
+                    p_button->i_x, p_button->i_y,
+                    p_button->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
+                    p_button->p_current_state->p_pic->p[Y_PLANE].i_visible_lines,
+                    p_button->p_current_state->p_pic );
+            osd_SetMenuUpdate( p_osd, VLC_TRUE );
+            osd_SetMenuVisible( p_osd, VLC_TRUE );
+        }
+        vlc_object_release( (vlc_object_t*) p_osd );
+        vlc_mutex_unlock( lockval.p_address );
     }
-    vlc_object_release( (vlc_object_t*) p_osd );
-    vlc_mutex_unlock( lockval.p_address );
 }
