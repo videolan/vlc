@@ -376,6 +376,9 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_late_frames = 0;
 
         block_Release( p_block );
+
+        //if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+            //avcodec_flush_buffers( p_sys->p_context );
         return NULL;
     }
 
@@ -433,16 +436,11 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
     }
     else
     {
-        if (!(p_block->i_flags & BLOCK_FLAG_PREROLL))
-        {
+        p_sys->p_context->hurry_up = 0;
+        if( !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
             b_drawpicture = 1;
-            p_sys->p_context->hurry_up = 0;
-        }
         else
-        {
             b_drawpicture = 0;
-            p_sys->p_context->hurry_up = 1;
-        }
     }
 
 
@@ -540,6 +538,9 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         if( !b_drawpicture || !p_sys->p_ff_pic->linesize[0] )
         {
             /* Do not display the picture */
+            p_pic = (picture_t *)p_sys->p_ff_pic->opaque;
+            if( !b_drawpicture && p_pic )
+                p_dec->pf_vout_buffer_del( p_dec, p_pic );
             continue;
         }
 

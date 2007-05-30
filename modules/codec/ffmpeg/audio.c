@@ -203,7 +203,14 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
 
     p_block = *pp_block;
 
-    if( p_block->i_buffer <= 0 && p_sys->i_samples > 0 )
+    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    {
+        block_Release( p_block );
+        avcodec_flush_buffers( p_sys->p_context );
+        return NULL;
+    }
+
+    if( p_sys->i_samples > 0 )
     {
         /* More data */
         p_buffer = SplitBuffer( p_dec );
@@ -218,20 +225,25 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( p_block->i_buffer <= 0 ||
-        (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED)) )
+    if( p_block->i_buffer <= 0 )
     {
         block_Release( p_block );
         return NULL;
     }
-
     if( p_block->i_buffer > AVCODEC_MAX_AUDIO_FRAME_SIZE )
     {
         /* Grow output buffer if necessary (eg. for PCM data) */
         p_sys->p_output = realloc(p_sys->p_output, p_block->i_buffer);
     }
 
-    i_used = avcodec_decode_audio( p_sys->p_context,
+    *pp_block = p_block = block_Realloc( p_block, 0, p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
+    if( !p_block )
+        return NULL;
+    p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
+    memset( &p_block->p_buffer[p_block->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE );
+
+    i_output = __MAX( AVCODEC_MAX_AUDIO_FRAME_SIZE, p_block->i_buffer );
+    i_used = avcodec_decode_audio2( p_sys->p_context,
                                    (int16_t*)p_sys->p_output, &i_output,
                                    p_block->p_buffer, p_block->i_buffer );
 
