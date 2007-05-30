@@ -73,9 +73,6 @@ static picture_t *osd_LoadImage( vlc_object_t *p_this, const char *psz_filename 
     {
         p_pic = image_ReadUrl( p_image, psz_filename, &fmt_in, &fmt_out );
         image_HandlerDelete( p_image );
-#if 0
-        p_pic = osd_YuvaYuvp( p_this, p_pic );
-#endif
     }
     else msg_Err( p_this, "unable to handle this chroma" );
 
