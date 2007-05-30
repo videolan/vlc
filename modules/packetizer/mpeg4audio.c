@@ -218,6 +218,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
+        //aout_DateSet( &p_sys->end_date, 0 );
         block_Release( *pp_block );
         return NULL;
     }
@@ -257,15 +258,21 @@ static block_t *ADTSPacketizeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( !pp_block || !*pp_block ) return NULL;
 
-    if( !aout_DateGet( &p_sys->end_date ) && !(*pp_block)->i_pts )
+    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        /* We've just started the stream, wait for the first PTS. */
+        if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
+        {
+            p_sys->i_state = STATE_NOSYNC;
+            block_BytestreamFlush( &p_sys->bytestream );
+        }
+        //aout_DateSet( &p_sys->end_date, 0 );
         block_Release( *pp_block );
         return NULL;
     }
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+
+    if( !aout_DateGet( &p_sys->end_date ) && !(*pp_block)->i_pts )
     {
-        p_sys->i_state = STATE_NOSYNC;
+        /* We've just started the stream, wait for the first PTS. */
         block_Release( *pp_block );
         return NULL;
     }

@@ -376,6 +376,18 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( !pp_block || !*pp_block ) return NULL;
 
+    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    {
+        if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
+        {
+            p_sys->i_state = STATE_NOSYNC;
+            block_BytestreamFlush( &p_sys->bytestream );
+        }
+//        aout_DateSet( &p_sys->end_date, 0 );
+        block_Release( *pp_block );
+        return NULL;
+    }
+
     if( !p_sys->b_stream_info ) ProcessHeader( p_dec );
 
     if( p_sys->stream_info.channels > 6 )
@@ -394,11 +406,6 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         /* The first PTS is as good as anything else. */
         aout_DateSet( &p_sys->end_date, (*pp_block)->i_pts );
-    }
-
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
-    {
-        p_sys->i_state = STATE_NOSYNC;
     }
 
     block_BytestreamPush( &p_sys->bytestream, *pp_block );

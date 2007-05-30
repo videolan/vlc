@@ -313,9 +313,20 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
     if( !pp_block || !*pp_block )
         return NULL;
+
     if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        p_sys->i_state = STATE_NOSYNC;
+        if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
+        {
+            p_sys->i_state = STATE_NOSYNC;
+            block_BytestreamFlush( &p_sys->bytestream );
+
+            if( p_sys->p_frame )
+                block_ChainRelease( p_sys->p_frame );
+            p_sys->p_frame = NULL;
+            p_sys->slice.i_frame_type = 0;
+            p_sys->b_slice = VLC_FALSE;
+        }
         block_Release( *pp_block );
         return NULL;
     }

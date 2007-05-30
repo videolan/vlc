@@ -115,7 +115,6 @@ struct decoder_sys_t
     int i_progressive_frame;
 
     mtime_t i_interpolated_dts;
-    mtime_t i_old_duration;
     mtime_t i_last_ref_pts;
     vlc_bool_t b_second_field;
 
@@ -183,7 +182,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_inited = 0;
 
     p_sys->i_interpolated_dts = 0;
-    p_sys->i_old_duration = 0;
     p_sys->i_last_ref_pts = 0;
     p_sys->b_second_field = 0;
 
@@ -236,18 +234,27 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( (*pp_block)->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        p_sys->i_state = STATE_NOSYNC;
-        p_sys->b_discontinuity = VLC_TRUE;
-        if( p_sys->p_frame )
-            block_ChainRelease( p_sys->p_frame );
-        p_sys->p_frame = NULL;
-        p_sys->pp_last = &p_sys->p_frame;
-        p_sys->b_frame_slice = VLC_FALSE;
+        if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
+        {
+            p_sys->i_state = STATE_NOSYNC;
+            block_BytestreamFlush( &p_sys->bytestream );
+
+            p_sys->b_discontinuity = VLC_TRUE;
+            if( p_sys->p_frame )
+                block_ChainRelease( p_sys->p_frame );
+            p_sys->p_frame = NULL;
+            p_sys->pp_last = &p_sys->p_frame;
+            p_sys->b_frame_slice = VLC_FALSE;
+        }
+//        p_sys->i_interpolated_dts = 
+//        p_sys->i_last_ref_pts = 0;
+
         block_Release( *pp_block );
         return NULL;
     }
+
 
     block_BytestreamPush( &p_sys->bytestream, *pp_block );
 
