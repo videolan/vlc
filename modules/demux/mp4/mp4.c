@@ -532,6 +532,7 @@ static int Open( vlc_object_t * p_this )
             seekpoint_t *s = vlc_seekpoint_New();
 
             s->psz_name = strdup( p_chpl->data.p_chpl->chapter[i].psz_name );
+            EnsureUTF8( s->psz_name );
             s->i_time_offset = p_chpl->data.p_chpl->chapter[i].i_start / 10;
             TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
         }
