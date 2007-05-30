@@ -70,9 +70,6 @@ struct es_out_id_t
     int       i_id;
     es_out_pgrm_t *p_pgrm;
 
-    /* Signal a discontinuity in the timeline for every PID */
-    vlc_bool_t b_discontinuity;
-
     /* Misc. */
     int64_t i_preroll_end;
 
@@ -302,7 +299,7 @@ es_out_id_t *input_EsOutGetFromID( es_out_t *out, int i_id )
     return NULL;
 }
 
-void input_EsOutDiscontinuity( es_out_t *out, vlc_bool_t b_audio )
+void input_EsOutDiscontinuity( es_out_t *out, vlc_bool_t b_flush, vlc_bool_t b_audio )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     int i;
@@ -310,14 +307,11 @@ void input_EsOutDiscontinuity( es_out_t *out, vlc_bool_t b_audio )
     for( i = 0; i < p_sys->i_es; i++ )
     {
         es_out_id_t *es = p_sys->es[i];
-        es->b_discontinuity = VLC_TRUE; /* signal discontinuity */
 
         /* Send a dummy block to let decoder know that
          * there is a discontinuity */
         if( es->p_dec && ( !b_audio || es->fmt.i_cat == AUDIO_ES ) )
-        {
-            input_DecoderDiscontinuity( es->p_dec );
-        }
+            input_DecoderDiscontinuity( es->p_dec, b_flush );
     }
 }
 
@@ -851,7 +845,6 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     es->p_pgrm = p_pgrm;
     es_format_Copy( &es->fmt, fmt );
     es->i_preroll_end = -1;
-    es->b_discontinuity = VLC_FALSE;
 
     switch( fmt->i_cat )
     {
@@ -1225,13 +1218,21 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     }
 
     /* +11 -> avoid null value with non null dts/pts */
-    if( p_block->i_dts > 0 )
+    if( p_block->i_dts > 0 && (p_block->i_flags&BLOCK_FLAG_PREROLL) )
+    {
+        p_block->i_dts += i_delay;
+    }
+    else if( p_block->i_dts > 0 )
     {
         p_block->i_dts =
             input_ClockGetTS( p_input, &p_pgrm->clock,
                               ( p_block->i_dts + 11 ) * 9 / 100 ) + i_delay;
     }
-    if( p_block->i_pts > 0 )
+    if( p_block->i_pts > 0 && (p_block->i_flags&BLOCK_FLAG_PREROLL) )
+    {
+        p_block->i_pts += i_delay;
+    }
+    else if( p_block->i_pts > 0 )
     {
         p_block->i_pts =
             input_ClockGetTS( p_input, &p_pgrm->clock,
@@ -1607,8 +1608,10 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             if( !es || !es->p_dec )
                 return VLC_EGENERIC;
 
+            /* XXX We should call input_ClockGetTS but PCR has been reseted
+             * and it will return 0, so we won't call input_ClockGetTS on all preroll samples
+             * but that's ugly(more time discontinuity), it need to be improved -- fenrir */
             es->i_preroll_end = i_date;
-            input_DecoderPreroll( es->p_dec, i_date );
 
             return VLC_SUCCESS;
         }

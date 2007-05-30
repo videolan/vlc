@@ -1480,7 +1480,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             if( f_pos > 1.0 ) f_pos = 1.0;
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
-            input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE );
+            input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
             if( demux2_Control( p_input->p->input.p_demux, DEMUX_SET_POSITION,
                                 f_pos ) )
             {
@@ -1518,7 +1518,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
-            input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE );
+            input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
 
             i_ret = demux2_Control( p_input->p->input.p_demux,
                                     DEMUX_SET_TIME, i_time );
@@ -1609,11 +1609,9 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 p_input->i_state = val.i_int;
                 var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
 
-#if 0 /* This will need modifications to decoders to work properly. */
                 /* Send discontinuity to decoders (it will allow them to flush
                  * if implemented */
-                input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE );
-#endif
+                input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE, VLC_FALSE );
             }
             else if( val.i_int == PAUSE_S && !p_input->p->b_can_pause )
             {
@@ -1666,7 +1664,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 /* We will not send audio data if new rate != default */
                 if( i_rate != INPUT_RATE_DEFAULT && p_input->p->i_rate == INPUT_RATE_DEFAULT )
-                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE );
+                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_TRUE );
 
                 p_input->p->i_rate  = i_rate;
 
@@ -1726,8 +1724,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 if( i_title >= 0 && i_title < p_input->p->input.i_title )
                 {
-                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE );
                     es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
+                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
 
                     demux2_Control( p_demux, DEMUX_SET_TITLE, i_title );
                     input_ControlVarTitle( p_input, i_title );
@@ -1747,8 +1745,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 if( i_title >= 0 && i_title < p_input->p->input.i_title )
                 {
-                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE );
                     es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
+                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
 
                     access2_Control( p_access, ACCESS_SET_TITLE, i_title );
                     stream_AccessReset( p_input->p->input.p_stream );
@@ -1788,8 +1786,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( i_seekpoint >= 0 && i_seekpoint <
                     p_input->p->input.title[p_demux->info.i_title]->i_seekpoint )
                 {
-                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE );
                     es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
+                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
 
                     demux2_Control( p_demux, DEMUX_SET_SEEKPOINT, i_seekpoint );
                 }
@@ -1824,8 +1822,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( i_seekpoint >= 0 && i_seekpoint <
                     p_input->p->input.title[p_access->info.i_title]->i_seekpoint )
                 {
-                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE );
                     es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
+                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
 
                     access2_Control( p_access, ACCESS_SET_SEEKPOINT,
                                     i_seekpoint );
