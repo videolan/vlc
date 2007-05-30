@@ -138,6 +138,7 @@ static int Create( vlc_object_t *p_this )
     if( !p_sys->psz_template )
     {
         msg_Err( p_filter, "out of memory" );
+        free( p_sys );
         return VLC_ENOMEM;
     }
 
@@ -162,7 +163,7 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
     FILE *file;
 
     psz_filename = config_GetPsz( p_filter, "svg-template-file" );
-    if( !psz_filename || psz_filename[0] == 0 )
+    if( !psz_filename || (psz_filename[0] == 0) )
     {
         /* No filename. Use a default value. */
         psz_template = NULL;
