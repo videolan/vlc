@@ -405,6 +405,7 @@ static int Open( vlc_object_t * p_this )
                 fmt.i_bitrate               = p_auds->p_wf->nAvgBytesPerSec*8;
                 fmt.audio.i_blockalign      = p_auds->p_wf->nBlockAlign;
                 fmt.audio.i_bitspersample   = p_auds->p_wf->wBitsPerSample;
+                fmt.b_packetized            = !tk->i_blocksize;
                 fmt.i_extra = __MIN( p_auds->p_wf->cbSize,
                     p_auds->i_chunk_size - sizeof(WAVEFORMATEX) );
                 fmt.p_extra = &p_auds->p_wf[1];
@@ -1272,41 +1273,18 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
             msg_Dbg( p_demux, "estimate date "I64Fd, i_date );
         }
 
-#define p_stream    p_sys->track[i_stream]
-        p_sys->i_time = 0;
-        /* seek for chunk based streams */
+        /* */
         for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
         {
-            if( p_stream->b_activated && !p_stream->i_samplesize )
-/*            if( p_stream->b_activated ) */
-            {
-                AVI_TrackSeek( p_demux, i_stream, i_date );
-                p_sys->i_time = __MAX( AVI_GetPTS( p_stream ),
-                                        p_sys->i_time );
-            }
+            avi_track_t *p_stream = p_sys->track[i_stream];
+
+            if( !p_stream->b_activated )
+                continue;
+
+            AVI_TrackSeek( p_demux, i_stream, i_date );
         }
-#if 1
-        if( p_sys->i_time )
-        {
-            i_date = p_sys->i_time;
-        }
-        /* seek for bytes based streams */
-        for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
-        {
-            if( p_stream->b_activated && p_stream->i_samplesize )
-            {
-                AVI_TrackSeek( p_demux, i_stream, i_date );
-/*                p_sys->i_time = __MAX( AVI_GetPTS( p_stream ), p_sys->i_time );*/
-            }
-        }
+        p_sys->i_time = i_date;
         msg_Dbg( p_demux, "seek: "I64Fd" seconds", p_sys->i_time /1000000 );
-        /* set true movie time */
-#endif
-        if( !p_sys->i_time )
-        {
-            p_sys->i_time = i_date;
-        }
-#undef p_stream
         return VLC_SUCCESS;
     }
     else
@@ -1722,7 +1700,7 @@ static int AVI_TrackSeek( demux_t *p_demux,
         if( p_stream->i_cat == VIDEO_ES )
         {
             /* search key frame */
-            if( i_date < i_oldpts )
+            //if( i_date < i_oldpts || 1 )
             {
                 while( p_stream->i_idxposc > 0 &&
                    !( p_stream->p_index[p_stream->i_idxposc].i_flags &
@@ -1735,7 +1713,10 @@ static int AVI_TrackSeek( demux_t *p_demux,
                         return VLC_EGENERIC;
                     }
                 }
+                if( p_stream->p_es )
+                    es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, p_stream->p_es, i_date );
             }
+#if 0
             else
             {
                 while( p_stream->i_idxposc < p_stream->i_idxnb &&
@@ -1750,6 +1731,7 @@ static int AVI_TrackSeek( demux_t *p_demux,
                     }
                 }
             }
+#endif
         }
     }
     else
