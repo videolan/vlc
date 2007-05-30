@@ -26,12 +26,12 @@
 #include "qt4.hpp"
 #include <QObject>
 #include <vector>
-#include <QSystemTrayIcon>
 
 using namespace std;
 
 class QMenu;
 class QMenuBar;
+class QSystemTrayIcon;
 
 class MenuItemData : public QObject
 {

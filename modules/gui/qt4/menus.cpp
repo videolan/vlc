@@ -22,13 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <QMenu>
-#include <QMenuBar>
-#include <QAction>
-#include <QActionGroup>
-#include <QSignalMapper>
-#include <QSystemTrayIcon>
-
 #ifndef WIN32
 #   include <signal.h>
 #endif
@@ -39,6 +32,13 @@
 #include "menus.hpp"
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp"
+
+#include <QMenu>
+#include <QMenuBar>
+#include <QAction>
+#include <QActionGroup>
+#include <QSignalMapper>
+#include <QSystemTrayIcon>
 
 enum
 {
@@ -597,24 +597,20 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf,
     POPUP_BOILERPLATE;
     QMenu *sysMenu = mi->getSysTrayMenu();
     sysMenu->clear();
-    DP_SADD( sysMenu, qtr("&About VLC media player" ), "", "",
-            aboutDialog(), "" );
-    sysMenu->addSeparator();
-    POPUP_PLAY_ENTRIES( sysMenu );
-    sysMenu->addSeparator();
-    DP_SADD( sysMenu, qtr("&Open" ), "", "", openFileDialog(), "" );
-    sysMenu->addSeparator();
-
-    if( !mi->isVisible() || b_force_visible )
+    if( mi->isVisible() || b_force_visible )
     {
-        sysMenu->addAction( qtr("Hide Interface"), mi,
+        sysMenu->addAction( qtr("Hide VLC media player"), mi,
                 SLOT( toggleUpdateSystrayMenu() ) );
     }
     else
     {
-        sysMenu->addAction( qtr("Show Interface"), mi,
+        sysMenu->addAction( qtr("Show VLC media player"), mi,
                 SLOT( toggleUpdateSystrayMenu() ) );
     }
+    sysMenu->addSeparator();
+    POPUP_PLAY_ENTRIES( sysMenu );
+    sysMenu->addSeparator();
+    DP_SADD( sysMenu, qtr("&Open Media" ), "", "", openFileDialog(), "" );
     DP_SADD( sysMenu, qtr("&Quit") , "", "", quit(), "" );
 
     mi->getSysTray()->setContextMenu( sysMenu );
