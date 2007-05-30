@@ -54,7 +54,8 @@ block_t *__block_New( vlc_object_t *p_obj, int i_size )
     block_t *p_block =
         malloc( sizeof( block_t ) + sizeof( block_sys_t ) + i_alloc );
 
-    if( p_block == NULL ) return NULL;
+    if( p_block == NULL )
+        return NULL;
 
     /* Fill opaque data */
     p_sys = (block_sys_t*)( (uint8_t*)p_block + sizeof( block_t ) );
@@ -93,13 +94,19 @@ block_t *block_Realloc( block_t *p_block, int i_prebody, int i_body )
          * TODO if used one day, them implement it in a smarter way */
         block_t *p_dup = block_Duplicate( p_block );
         block_Release( p_block );
+        if( !p_dup )
+            return NULL;
 
         p_block = p_dup;
     }
 
     i_buffer_size = i_prebody + i_body;
 
-    if( i_body < 0 || i_buffer_size <= 0 ) return NULL;
+    if( i_body < 0 || i_buffer_size <= 0 )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
 
     if( p_block->p_buffer - i_prebody > p_block->p_sys->p_allocated_buffer &&
         p_block->p_buffer - i_prebody < p_block->p_sys->p_allocated_buffer +
@@ -120,15 +127,18 @@ block_t *block_Realloc( block_t *p_block, int i_prebody, int i_body )
     {
         block_t *p_rea = block_New( p_block->p_manager, i_buffer_size );
 
-        p_rea->i_dts     = p_block->i_dts;
-        p_rea->i_pts     = p_block->i_pts;
-        p_rea->i_flags   = p_block->i_flags;
-        p_rea->i_length  = p_block->i_length;
-        p_rea->i_rate    = p_block->i_rate;
-        p_rea->i_samples = p_block->i_samples;
+        if( p_rea )
+        {
+            p_rea->i_dts     = p_block->i_dts;
+            p_rea->i_pts     = p_block->i_pts;
+            p_rea->i_flags   = p_block->i_flags;
+            p_rea->i_length  = p_block->i_length;
+            p_rea->i_rate    = p_block->i_rate;
+            p_rea->i_samples = p_block->i_samples;
 
-        memcpy( p_rea->p_buffer + i_prebody, p_block->p_buffer,
-                __MIN( p_block->i_buffer, p_rea->i_buffer - i_prebody ) );
+            memcpy( p_rea->p_buffer + i_prebody, p_block->p_buffer,
+                    __MIN( p_block->i_buffer, p_rea->i_buffer - i_prebody ) );
+        }
 
         block_Release( p_block );
 
