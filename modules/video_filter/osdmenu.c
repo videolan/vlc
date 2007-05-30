@@ -201,18 +201,18 @@ static int CreateFilter ( vlc_object_t *p_this )
 
     /* Check if menu position was overridden */
     p_filter->p_sys->b_absolute = VLC_TRUE;
-    if( i_posx < 0 || i_posy < 0)
+    if( (i_posx < 0) || (i_posy < 0) )
     {
         p_filter->p_sys->b_absolute = VLC_FALSE;
         p_filter->p_sys->p_menu->i_x = 0;
         p_filter->p_sys->p_menu->i_y = 0;
     }
-    else if( i_posx >= 0 || i_posy >= 0 )
+    else if( (i_posx >= 0) || (i_posy >= 0) )
     {
         p_filter->p_sys->p_menu->i_x = i_posx;
         p_filter->p_sys->p_menu->i_y = i_posy;
     }
-    else if( p_filter->p_sys->p_menu->i_x < 0 || p_filter->p_sys->p_menu->i_y < 0 )
+    else if( (p_filter->p_sys->p_menu->i_x < 0) || (p_filter->p_sys->p_menu->i_y < 0) )
     {
         p_filter->p_sys->b_absolute = VLC_FALSE;
         p_filter->p_sys->p_menu->i_x = 0;
@@ -226,8 +226,8 @@ static int CreateFilter ( vlc_object_t *p_this )
     p_filter->p_sys->b_update  = VLC_FALSE;
     p_filter->p_sys->b_visible = VLC_FALSE;
 
-    var_AddCallback( p_filter->p_sys->p_menu, "osd-menu-update", OSDMenuUpdateEvent, p_filter );        
-    var_AddCallback( p_filter->p_sys->p_menu, "osd-menu-visible", OSDMenuVisibleEvent, p_filter );        
+    var_AddCallback( p_filter->p_sys->p_menu, "osd-menu-update", OSDMenuUpdateEvent, p_filter );
+    var_AddCallback( p_filter->p_sys->p_menu, "osd-menu-visible", OSDMenuVisibleEvent, p_filter );
 
     /* Attach subpicture filter callback */
     p_filter->pf_sub_filter = Filter;
@@ -235,7 +235,7 @@ static int CreateFilter ( vlc_object_t *p_this )
     es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
     p_filter->fmt_out.i_priority = 0;
 
-    msg_Dbg( p_filter, "successfully loaded osdmenu filter" );    
+    msg_Dbg( p_filter, "successfully loaded osdmenu filter" );
     return VLC_SUCCESS;
 
 error:
@@ -248,7 +248,7 @@ error:
     }
     if( p_filter->p_sys->psz_file ) free( p_filter->p_sys->psz_file );
     if( p_filter->p_sys ) free( p_filter->p_sys );
-    return VLC_EGENERIC;    
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -394,12 +394,12 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
 
     if( !p_sys->b_update )
             return NULL;
-            
+
     /* Am I too early? */
     if( ( ( p_sys->i_last_date + p_sys->i_update ) > i_date ) &&
         ( p_sys->i_end_date > 0 ) )
         return NULL; /* we are too early, so wait */
-    
+
     /* Allocate the subpicture internal data. */
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
@@ -422,7 +422,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
         p_spu->i_stop = i_date + p_sys->i_timeout;
         p_sys->i_end_date = p_spu->i_stop;
     }
-    
+
     p_sys->i_last_date = i_date;
     p_spu->i_start = p_sys->i_last_date = i_date;
 
