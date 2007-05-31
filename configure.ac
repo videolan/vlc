@@ -1269,22 +1269,14 @@ MMXEXT_MODULES="memcpymmxext"
 #MMXEXT_MODULES="${MMXEXT_MODULES} idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn"
 SSE_MODULES=""
+SSE2_MODULES=""
 ALTIVEC_MODULES="memcpyaltivec i420_yuy2_altivec"
 #ALTIVEC_MODULES="${ALTIVEC_MODULES} idctaltivec motionaltivec"
 
 if test "${enable_gprof}" != "yes" -a "${enable_debug}" != "yes"
 then
   MMX_MODULES="${MMX_MODULES} i420_yuy2_mmx"
-fi
-
-AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
-    [ac_cv_mmx_inline],
-    [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));],
-                    ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
-if test "${ac_cv_mmx_inline}" != "no"; then
-  AC_DEFINE(CAN_COMPILE_MMX, 1, Define if \$CC groks MMX inline assembly.)
-  ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
+  SSE2_MODULES="${SSE2_MODULES} i420_yuy2_sse2"
 fi
 
 dnl  Check for fully workin MMX intrinsics
@@ -1310,6 +1302,41 @@ AC_CACHE_CHECK([if \$CC groks MMX intrinsics],
 if test "${ac_cv_c_mmx_intrinsics}" != "no"; then
   AC_DEFINE(HAVE_MMX_INTRINSICS, 1, Define if MMX intrinsics are available.)
   VLC_ADD_CFLAGS([i420_rgb_mmx],[-mmmx])
+fi
+
+dnl  Check for fully workin SSE2 intrinsics
+dnl  We need support for -mmmx, we need <emmintrin.h>, and we also need a
+dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
+AC_CACHE_CHECK([if \$CC groks SSE2 intrinsics],
+    [ac_cv_c_sse2_intrinsics],
+    [CFLAGS="${CFLAGS_save} -O -msse2"
+     AC_TRY_COMPILE([#include <emmintrin.h>
+                     #include <stdint.h>
+                     uint64_t frobzor;],
+                    [__m128i a, b, c;
+                     a = b = c = _mm_set1_epi64((__m64)frobzor);
+                     a = _mm_slli_epi16(a, 3);
+                     a = _mm_adds_epi16(a, b);
+                     c = _mm_srli_epi16(c, 8);
+                     c = _mm_slli_epi16(c, 3);
+                     b = _mm_adds_epi16(b, c);
+                     a = _mm_unpacklo_epi8(a, b);
+                     frobzor = (uint64_t)_mm_movepi64_pi64(a);],
+                    [ac_cv_c_sse2_intrinsics=yes],
+                    [ac_cv_c_sse2_intrinsics=no])])
+if test "${ac_cv_c_sse2_intrinsics}" != "no"; then
+  AC_DEFINE(HAVE_SSE2_INTRINSICS, 1, Define if SSE2 intrinsics are available.)
+  dnl VLC_ADD_CFLAGS([i420_rgb_sse2],[-msse2])
+fi
+
+AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
+    [ac_cv_mmx_inline],
+    [CFLAGS="${CFLAGS_save}"
+     AC_TRY_COMPILE(,[void *p;asm volatile("packuswb %%mm1,%%mm2"::"r"(p));],
+                    ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
+if test "${ac_cv_mmx_inline}" != "no"; then
+  AC_DEFINE(CAN_COMPILE_MMX, 1, Define if \$CC groks MMX inline assembly.)
+  ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
 fi
 
 AC_CACHE_CHECK([if \$CC groks MMX EXT inline assembly],
@@ -1340,6 +1367,16 @@ AC_CACHE_CHECK([if \$CC groks SSE inline assembly],
 if test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "solaris"; then
   AC_DEFINE(CAN_COMPILE_SSE, 1, Define if \$CC groks SSE inline assembly.)
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
+fi
+
+AC_CACHE_CHECK([if \$CC groks SSE2 inline assembly],
+    [ac_cv_sse2_inline],
+    [CFLAGS="${CFLAGS_save}"
+     AC_TRY_COMPILE(,[void *p;asm volatile("punpckhqdq %%xmm1,%%xmm2"::"r"(p));],
+                    ac_cv_sse2_inline=yes, ac_cv_sse2_inline=no)])
+if test "${ac_cv_sse2_inline}" != "no" -a "${SYS}" != "solaris"; then
+  AC_DEFINE(CAN_COMPILE_SSE2, 1, Define if \$CC groks SSE2 inline assembly.)
+  ACCEL_MODULES="${ACCEL_MODULES} ${SSE2_MODULES}"
 fi
 
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
@@ -1492,6 +1529,11 @@ dnl
 if test "${host_cpu}" = "i686" -o "${host_cpu}" = "i586" -o "${host_cpu}" = "x86" -o "${host_cpu}" = "i386" -o "${host_cpu}"="i486" -o "${host_cpu}" = "x86_64"
 then
     ARCH="${ARCH} mmx"
+    VLC_ADD_BUILTINS([${ACCEL_MODULES}])
+fi
+if test "${host_cpu}" = "i686" -o "${host_cpu}" = "x86_64"
+then
+    ARCH="${ARCH} sse sse2"
     VLC_ADD_BUILTINS([${ACCEL_MODULES}])
 fi
 

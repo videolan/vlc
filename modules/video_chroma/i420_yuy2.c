@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Damien Fouilleul <damien@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,6 +43,8 @@
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv,Y211"
 #elif defined (MODULE_NAME_IS_i420_yuy2_mmx)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv"
+#elif defined (MODULE_NAME_IS_i420_yuy2_sse2)
+#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,IUYV,cyuv"
 #elif defined (MODULE_NAME_IS_i420_yuy2_altivec)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422"
 #endif
@@ -63,8 +66,9 @@ static void I420_Y211           ( vout_thread_t *, picture_t *, picture_t * );
 #endif
 
 #ifdef MODULE_NAME_IS_i420_yuy2_mmx
-static uint64_t i_00ffw;
-static uint64_t i_80w;
+/* Initialize MMX-specific constants */
+static const uint64_t i_00ffw = 0x00ff00ff00ff00ffULL;
+static const uint64_t i_80w   = 0x0000000080808080ULL;
 #endif
 
 /*****************************************************************************
@@ -78,9 +82,10 @@ vlc_module_begin();
     set_description( _("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "chroma", 100 );
     add_requirement( MMX );
-    /* Initialize MMX-specific constants */
-    i_00ffw = 0x00ff00ff00ff00ffULL;
-    i_80w   = 0x0000000080808080ULL;
+#elif defined (MODULE_NAME_IS_i420_yuy2_sse2)
+    set_description( _("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+    set_capability( "chroma", 120 );
+    add_requirement( SSE2 );
 #elif defined (MODULE_NAME_IS_i420_yuy2_altivec)
     set_description(
             _("AltiVec conversions from " SRC_FOURCC " to " DEST_FOURCC) );
@@ -125,7 +130,6 @@ static int Activate( vlc_object_t *p_this )
                 case VLC_FOURCC('Y','4','2','2'):
                     p_vout->chroma.pf_convert = I420_UYVY;
                     break;
-
 #if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
                 case VLC_FOURCC('I','U','Y','V'):
                     p_vout->chroma.pf_convert = I420_IUYV;
@@ -256,6 +260,7 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
     const int i_dest_margin = p_dest->p->i_pitch
                                - p_dest->p->i_visible_pitch;
 
+#if !defined(MODULE_NAME_IS_i420_yuy2_sse2)
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
         p_line1 = p_line2;
@@ -265,8 +270,11 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
         p_y2 += p_source->p[Y_PLANE].i_pitch;
 
 #if !defined (MODULE_NAME_IS_i420_yuy2_mmx)
-        for( i_x = p_vout->render.i_width / 2 ; i_x-- ; )
+        for( i_x = p_vout->render.i_width / 8; i_x-- ; )
         {
+            C_YUV420_YUYV( );
+            C_YUV420_YUYV( );
+            C_YUV420_YUYV( );
             C_YUV420_YUYV( );
         }
 #else
@@ -274,11 +282,11 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
         {
             MMX_CALL( MMX_YUV420_YUYV );
         }
+#endif
         for( i_x = ( p_vout->render.i_width % 8 ) / 2; i_x-- ; )
         {
             C_YUV420_YUYV( );
         }
-#endif
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
@@ -288,9 +296,77 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
         p_line2 += i_dest_margin;
     }
 
+#if defined (MODULE_NAME_IS_i420_yuy2_mmx)
+    __asm__ __volatile__("emms" :: );
+#endif
+
 #if defined (MODULE_NAME_IS_i420_yuy2_altivec)
     }
 #endif
+
+#else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
+    /*
+    ** SSE2 128 bytes fetch/store instructions are faster 
+    ** if memory access is 16 bytes aligned
+    */
+    if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
+        ((int)p_line2|(int)p_y2))) )
+    {
+        /* use faster SSE2 aligned fetch and store */
+        for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
+        {
+            p_line1 = p_line2;
+            p_line2 += p_dest->p->i_pitch;
+
+            p_y1 = p_y2;
+            p_y2 += p_source->p[Y_PLANE].i_pitch;
+
+            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            {
+                SSE2_CALL( SSE2_YUV420_YUYV_ALIGNED );
+            }
+            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            {
+                C_YUV420_YUYV( );
+            }
+
+            p_y1 += i_source_margin;
+            p_y2 += i_source_margin;
+            p_u += i_source_margin_c;
+            p_v += i_source_margin_c;
+            p_line1 += i_dest_margin;
+            p_line2 += i_dest_margin;
+        }
+    }
+    else
+    {
+        /* use slower SSE2 unaligned fetch and store */
+        for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
+        {
+            p_line1 = p_line2;
+            p_line2 += p_dest->p->i_pitch;
+
+            p_y1 = p_y2;
+            p_y2 += p_source->p[Y_PLANE].i_pitch;
+
+            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            {
+                SSE2_CALL( SSE2_YUV420_YUYV_UNALIGNED );
+            }
+            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            {
+                C_YUV420_YUYV( );
+            }
+
+            p_y1 += i_source_margin;
+            p_y2 += i_source_margin;
+            p_u += i_source_margin_c;
+            p_v += i_source_margin_c;
+            p_line1 += i_dest_margin;
+            p_line2 += i_dest_margin;
+        }
+    }
+#endif // defined(MODULE_NAME_IS_i420_yuy2_sse2)
 }
 
 /*****************************************************************************
@@ -393,6 +469,7 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
     const int i_dest_margin = p_dest->p->i_pitch
                                - p_dest->p->i_visible_pitch;
 
+#if !defined(MODULE_NAME_IS_i420_yuy2_sse2)
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
         p_line1 = p_line2;
@@ -420,9 +497,78 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
         p_line1 += i_dest_margin;
         p_line2 += i_dest_margin;
     }
+
+#if defined (MODULE_NAME_IS_i420_yuy2_mmx)
+    __asm__ __volatile__("emms" :: );
+#endif
+
 #if defined (MODULE_NAME_IS_i420_yuy2_altivec)
     }
 #endif
+
+#else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
+    /*
+    ** SSE2 128 bytes fetch/store instructions are faster 
+    ** if memory access is 16 bytes aligned
+    */
+    if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
+        ((int)p_line2|(int)p_y2))) )
+    {
+        /* use faster SSE2 aligned fetch and store */
+        for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
+        {
+            p_line1 = p_line2;
+            p_line2 += p_dest->p->i_pitch;
+
+            p_y1 = p_y2;
+            p_y2 += p_source->p[Y_PLANE].i_pitch;
+
+            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            {
+                SSE2_CALL( SSE2_YUV420_YVYU_ALIGNED );
+            }
+            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            {
+                C_YUV420_YVYU( );
+            }
+
+            p_y1 += i_source_margin;
+            p_y2 += i_source_margin;
+            p_u += i_source_margin_c;
+            p_v += i_source_margin_c;
+            p_line1 += i_dest_margin;
+            p_line2 += i_dest_margin;
+        }
+    }
+    else
+    {
+        /* use slower SSE2 unaligned fetch and store */
+        for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
+        {
+            p_line1 = p_line2;
+            p_line2 += p_dest->p->i_pitch;
+
+            p_y1 = p_y2;
+            p_y2 += p_source->p[Y_PLANE].i_pitch;
+
+            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            {
+                SSE2_CALL( SSE2_YUV420_YVYU_UNALIGNED );
+            }
+            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            {
+                C_YUV420_YVYU( );
+            }
+
+            p_y1 += i_source_margin;
+            p_y2 += i_source_margin;
+            p_u += i_source_margin_c;
+            p_v += i_source_margin_c;
+            p_line1 += i_dest_margin;
+            p_line2 += i_dest_margin;
+        }
+    }
+#endif // defined(MODULE_NAME_IS_i420_yuy2_sse2)
 }
 
 /*****************************************************************************
@@ -525,6 +671,7 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
     const int i_dest_margin = p_dest->p->i_pitch
                                - p_dest->p->i_visible_pitch;
 
+#if !defined(MODULE_NAME_IS_i420_yuy2_sse2)
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
         p_line1 = p_line2;
@@ -564,6 +711,70 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
 #if defined (MODULE_NAME_IS_i420_yuy2_altivec)
     }
 #endif
+
+#else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
+    /*
+    ** SSE2 128 bytes fetch/store instructions are faster 
+    ** if memory access is 16 bytes aligned
+    */
+    if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
+        ((int)p_line2|(int)p_y2))) )
+    {
+        /* use faster SSE2 aligned fetch and store */
+        for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
+        {
+            p_line1 = p_line2;
+            p_line2 += p_dest->p->i_pitch;
+
+            p_y1 = p_y2;
+            p_y2 += p_source->p[Y_PLANE].i_pitch;
+
+            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            {
+                SSE2_CALL( SSE2_YUV420_UYVY_ALIGNED );
+            }
+            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            {
+                C_YUV420_UYVY( );
+            }
+
+            p_y1 += i_source_margin;
+            p_y2 += i_source_margin;
+            p_u += i_source_margin_c;
+            p_v += i_source_margin_c;
+            p_line1 += i_dest_margin;
+            p_line2 += i_dest_margin;
+        }
+    }
+    else
+    {
+        /* use slower SSE2 unaligned fetch and store */
+        for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
+        {
+            p_line1 = p_line2;
+            p_line2 += p_dest->p->i_pitch;
+
+            p_y1 = p_y2;
+            p_y2 += p_source->p[Y_PLANE].i_pitch;
+
+            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            {
+                SSE2_CALL( SSE2_YUV420_UYVY_UNALIGNED );
+            }
+            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            {
+                C_YUV420_UYVY( );
+            }
+
+            p_y1 += i_source_margin;
+            p_y2 += i_source_margin;
+            p_u += i_source_margin_c;
+            p_v += i_source_margin_c;
+            p_line1 += i_dest_margin;
+            p_line2 += i_dest_margin;
+        }
+    }
+#endif // defined(MODULE_NAME_IS_i420_yuy2_sse2)
 }
 
 #if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
@@ -601,6 +812,7 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
     const int i_dest_margin = p_dest->p->i_pitch
                                - p_dest->p->i_visible_pitch;
 
+#if !defined(MODULE_NAME_IS_i420_yuy2_sse2)
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
         p_line1 -= 3 * p_dest->p->i_pitch;
@@ -611,7 +823,7 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
 
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
-#if defined (MODULE_NAME_IS_i420_yuy2)
+#if !defined (MODULE_NAME_IS_i420_yuy2_mmx)
             C_YUV420_UYVY( );
             C_YUV420_UYVY( );
             C_YUV420_UYVY( );
@@ -628,6 +840,74 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
         p_line1 += i_dest_margin;
         p_line2 += i_dest_margin;
     }
+
+#if defined (MODULE_NAME_IS_i420_yuy2_mmx)
+    __asm__ __volatile__("emms" :: );
+#endif
+
+#else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
+    /*
+    ** SSE2 128 bytes fetch/store instructions are faster 
+    ** if memory access is 16 bytes aligned
+    */
+    if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
+        ((int)p_line2|(int)p_y2))) )
+    {
+        /* use faster SSE2 aligned fetch and store */
+        for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
+        {
+            p_line1 = p_line2;
+            p_line2 += p_dest->p->i_pitch;
+
+            p_y1 = p_y2;
+            p_y2 += p_source->p[Y_PLANE].i_pitch;
+
+            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            {
+                SSE2_CALL( SSE2_YUV420_UYVY_ALIGNED );
+            }
+            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            {
+                C_YUV420_UYVY( );
+            }
+
+            p_y1 += i_source_margin;
+            p_y2 += i_source_margin;
+            p_u += i_source_margin_c;
+            p_v += i_source_margin_c;
+            p_line1 += i_dest_margin;
+            p_line2 += i_dest_margin;
+        }
+    }
+    else
+    {
+        /* use slower SSE2 unaligned fetch and store */
+        for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
+        {
+            p_line1 = p_line2;
+            p_line2 += p_dest->p->i_pitch;
+
+            p_y1 = p_y2;
+            p_y2 += p_source->p[Y_PLANE].i_pitch;
+
+            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            {
+                SSE2_CALL( SSE2_YUV420_UYVY_UNALIGNED );
+            }
+            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            {
+                C_YUV420_UYVY( );
+            }
+
+            p_y1 += i_source_margin;
+            p_y2 += i_source_margin;
+            p_u += i_source_margin_c;
+            p_v += i_source_margin_c;
+            p_line1 += i_dest_margin;
+            p_line2 += i_dest_margin;
+        }
+    }
+#endif // defined(MODULE_NAME_IS_i420_yuy2_sse2)
 }
 #endif // !defined (MODULE_NAME_IS_i420_yuy2_altivec)
 
@@ -675,4 +955,3 @@ static void I420_Y211( vout_thread_t *p_vout, picture_t *p_source,
     }
 }
 #endif
-
