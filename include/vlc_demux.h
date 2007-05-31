@@ -85,8 +85,8 @@ enum demux_query_e
     DEMUX_SET_TIME,             /* arg1= int64_t        res=can fail    */
 
     /* TITLE_INFO only if more than 1 title or 1 chapter */
-    DEMUX_GET_TITLE_INFO,       /* arg1=input_title_t*** arg2=int* can fail */
-
+    DEMUX_GET_TITLE_INFO,       /* arg1=input_title_t*** arg2=int* 
+                                   arg3=int*pi_title_offset(0), arg4=int*pi_seekpoint_offset(0) can fail */
     /* TITLE/SEEKPOINT, only when TITLE_INFO succeed */
     DEMUX_SET_TITLE,            /* arg1= int            can fail */
     DEMUX_SET_SEEKPOINT,        /* arg1= int            can fail */
@@ -105,16 +105,18 @@ enum demux_query_e
     DEMUX_SET_NEXT_DEMUX_TIME,  /* arg1= int64_t *      can fail */
     /* FPS for correct subtitles handling */
     DEMUX_GET_FPS,              /* arg1= float *        res=can fail    */
+
     /* Meta data */
     DEMUX_GET_META,             /* arg1= vlc_meta_t **  res=can fail    */
 
+    /* Attachments */
+    DEMUX_GET_ATTACHMENTS,      /* arg1=input_attachment_t***, int* res=can fail */
 
     /* II. Specific access_demux queries */
     DEMUX_CAN_PAUSE,            /* arg1= vlc_bool_t*    cannot fail */
     DEMUX_CAN_CONTROL_PACE,     /* arg1= vlc_bool_t*    cannot fail */
     DEMUX_GET_PTS_DELAY,        /* arg1= int64_t*       cannot fail */
-    DEMUX_SET_PAUSE_STATE,      /* arg1= vlc_bool_t     can fail */
-    DEMUX_GET_ATTACHMENTS       /* arg1= int, arg2= attachment_t***   can fail */
+    DEMUX_SET_PAUSE_STATE       /* arg1= vlc_bool_t     can fail */
 };
 
 VLC_EXPORT( int,       demux2_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args ) );
@@ -123,17 +125,17 @@ VLC_EXPORT( int,       demux2_vaControlHelper, ( stream_t *, int64_t i_start, in
  * Miscellaneous helpers for demuxers
  *************************************************************************/
 
-static inline vlc_bool_t isExtension( demux_t *p_demux, const char *psz_requested )
+static inline vlc_bool_t demux2_IsPathExtension( demux_t *p_demux, const char *psz_extension )
 {
     const char *psz_ext = strrchr ( p_demux->psz_path, '.' );
-    if( !psz_ext || strcmp( psz_ext, psz_requested ) )
+    if( !psz_ext || strcmp( psz_ext, psz_extension ) )
         return VLC_FALSE;
     return VLC_TRUE;
 }
 
-static inline vlc_bool_t isDemux( demux_t *p_demux, const char *psz_requested )
+static inline vlc_bool_t demux2_IsForced( demux_t *p_demux, const char *psz_name )
 {
-   if( !p_demux->psz_demux || strcmp( p_demux->psz_demux, psz_requested ) )
+   if( !p_demux->psz_demux || strcmp( p_demux->psz_demux, psz_name ) )
         return VLC_FALSE;
     return VLC_TRUE;
 }
@@ -153,25 +155,25 @@ static inline vlc_bool_t isDemux( demux_t *p_demux, const char *psz_requested )
 
 #define DEMUX_BY_EXTENSION( ext ) \
     demux_t *p_demux = (demux_t *)p_this; \
-    if( !isExtension( p_demux, ext ) ) \
+    if( !demux2_IsPathExtension( p_demux, ext ) ) \
         return VLC_EGENERIC; \
     STANDARD_DEMUX_INIT;
 
 #define DEMUX_BY_EXTENSION_MSG( ext, msg ) \
     demux_t *p_demux = (demux_t *)p_this; \
-    if( !isExtension( p_demux, ext ) ) \
+    if( !demux2_IsPathExtension( p_demux, ext ) ) \
         return VLC_EGENERIC; \
     STANDARD_DEMUX_INIT_MSG( msg );
 
 #define DEMUX_BY_EXTENSION_OR_FORCED( ext, module ) \
     demux_t *p_demux = (demux_t *)p_this; \
-    if( !isExtension( p_demux, ext ) && !isDemux( p_demux, module ) ) \
+    if( !demux2_IsPathExtension( p_demux, ext ) && !demux2_IsForced( p_demux, module ) ) \
         return VLC_EGENERIC; \
     STANDARD_DEMUX_INIT;
 
 #define DEMUX_BY_EXTENSION_OR_FORCED_MSG( ext, module, msg ) \
     demux_t *p_demux = (demux_t *)p_this; \
-    if( !isExtension( p_demux, ext ) && !isDemux( p_demux, module ) ) \
+    if( !demux2_IsPathExtension( p_demux, ext ) && !demux2_IsForced( p_demux, module ) ) \
         return VLC_EGENERIC; \
     STANDARD_DEMUX_INIT_MSG( msg );
 
