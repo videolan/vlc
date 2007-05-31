@@ -269,6 +269,7 @@ int demux2_vaControlHelper( stream_t *s,
         case DEMUX_SET_NEXT_DEMUX_TIME:
         case DEMUX_GET_TITLE_INFO:
         case DEMUX_SET_GROUP:
+        case DEMUX_GET_ATTACHMENTS:
             return VLC_EGENERIC;
 
         default:

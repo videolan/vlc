@@ -546,6 +546,51 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             }
             return VLC_SUCCESS;
 
+        case INPUT_GET_ATTACHMENTS: /* arg1=input_attachment_t***, arg2=int*  res=can fail */
+        {
+            input_attachment_t ***ppp_attachment = (input_attachment_t***)va_arg( args, input_attachment_t *** );
+            int *pi_attachment = (int*)va_arg( args, int * );
+            int i;
+
+            vlc_mutex_lock( &p_input->p->input.p_item->lock );
+            if( p_input->p->i_attachment <= 0 )
+            {
+                vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+                *ppp_attachment = NULL;
+                *pi_attachment = 0;
+                return VLC_EGENERIC;
+            }
+            *pi_attachment = p_input->p->i_attachment;
+            *ppp_attachment = malloc( sizeof(input_attachment_t**) * p_input->p->i_attachment );
+            for( i = 0; i < p_input->p->i_attachment; i++ )
+                (*ppp_attachment)[i] = vlc_input_attachment_Duplicate( p_input->p->attachment[i] );
+
+            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+            return VLC_EGENERIC;
+        }
+
+        case INPUT_GET_ATTACHMENT:  /* arg1=input_attachment_t**, arg2=char*  res=can fail */
+        {
+            input_attachment_t **pp_attachment = (input_attachment_t**)va_arg( args, input_attachment_t ** );
+            const char *psz_name = (const char*)va_arg( args, const char * );
+            int i;
+
+            vlc_mutex_lock( &p_input->p->input.p_item->lock );
+            for( i = 0; i < p_input->p->i_attachment; i++ )
+            {
+                if( !strcmp( p_input->p->attachment[i]->psz_name, psz_name ) )
+                {
+                    *pp_attachment = vlc_input_attachment_Duplicate( p_input->p->attachment[i] );
+                    vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+                    return VLC_SUCCESS;
+                }
+            }
+            *pp_attachment = NULL;
+            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+            return VLC_EGENERIC;
+        }
+
+
         default:
             msg_Err( p_input, "unknown query in input_vaControl" );
             return VLC_EGENERIC;

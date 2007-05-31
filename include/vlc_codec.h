@@ -142,4 +142,6 @@ struct encoder_t
  * @}
  */
 
+VLC_EXPORT( input_attachment_t *, decoder_GetInputAttachment, ( decoder_t *, const char *psz_name ) );
+
 #endif /* _VLC_CODEC_H */

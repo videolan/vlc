@@ -92,6 +92,15 @@ struct decoder_owner_sys_t
     block_fifo_t *p_fifo;
 };
 
+/* decoder_GetInputAttachment:
+ */
+input_attachment_t *decoder_GetInputAttachment( decoder_t *p_dec, const char *psz_name )
+{
+    input_attachment_t *p_attachment;
+    if( input_Control( p_dec->p_owner->p_input, INPUT_GET_ATTACHMENT, &p_attachment, psz_name ) )
+        return NULL;
+    return p_attachment;
+}
 
 /**
  * Spawns a new decoder thread

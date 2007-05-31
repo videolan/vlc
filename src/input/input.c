@@ -150,8 +150,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->i_title_offset = p_input->p->i_seekpoint_offset = 0;
     p_input->i_state = INIT_S;
     p_input->p->i_rate  = INPUT_RATE_DEFAULT;
-    p_input->p->i_bookmark = 0;
-    p_input->p->bookmark = NULL;
+    TAB_INIT( p_input->p->i_bookmark, p_input->p->bookmark );
+    TAB_INIT( p_input->p->i_attachment, p_input->p->attachment );
     p_input->p->p_meta  = NULL;
     p_input->p->p_es_out = NULL;
     p_input->p->p_sout  = NULL;
@@ -1292,6 +1292,13 @@ static void End( input_thread_t * p_input )
 #undef CL_CO
     }
 
+    if( p_input->p->i_attachment > 0 )
+    {
+        for( i = 0; i < p_input->p->i_attachment; i++ )
+            vlc_input_attachment_Delete( p_input->p->attachment[i] );
+        TAB_CLEAN( p_input->p->i_attachment, p_input->p->attachment );
+    }
+
     vlc_mutex_destroy( &p_input->p->counters.counters_lock );
 
     /* Tell we're dead */
@@ -2062,8 +2069,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input )
     in->p_stream = NULL;
     in->p_demux  = NULL;
     in->b_title_demux = VLC_FALSE;
-    in->i_title  = 0;
-    in->title    = NULL;
+    TAB_INIT( in->i_title, in->title );
     in->b_can_pace_control = VLC_TRUE;
     in->b_eof = VLC_FALSE;
     in->i_cr_average = 0;
@@ -2307,19 +2313,37 @@ static int InputSourceInit( input_thread_t *p_input,
             goto error;
         }
 
-        /* TODO get title from demux */
+        /* Get title from demux */
         if( !p_input->b_preparsing && in->i_title <= 0 )
         {
             if( demux2_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
                                 &in->title, &in->i_title,
                                 &in->i_title_offset, &in->i_seekpoint_offset ))
             {
-                in->i_title = 0;
-                in->title   = NULL;
+                TAB_INIT( in->i_title, in->title );
             }
             else
             {
                 in->b_title_demux = VLC_TRUE;
+            }
+        }
+        /* get attachment */
+        if( !p_input->b_preparsing )
+        {
+            int i_attachment;
+            input_attachment_t **attachment;
+            if( !demux2_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
+                                 &attachment, &i_attachment ) )
+            {
+                int i;
+                vlc_mutex_lock( &p_input->p->input.p_item->lock );
+                p_input->p->attachment = realloc( p_input->p->attachment,
+                        sizeof(input_attachment_t**) * ( p_input->p->i_attachment + i_attachment ) );
+                for( i = 0; i < i_attachment; i++ )
+                    p_input->p->attachment[p_input->p->i_attachment++] = attachment[i];
+                if( attachment )
+                    free( attachment );
+                vlc_mutex_unlock( &p_input->p->input.p_item->lock );
             }
         }
     }
@@ -2349,6 +2373,8 @@ error:
  *****************************************************************************/
 static void InputSourceClean( input_source_t *in )
 {
+    int i;
+
     if( in->p_demux )
         demux2_Delete( in->p_demux );
 
@@ -2360,12 +2386,9 @@ static void InputSourceClean( input_source_t *in )
 
     if( in->i_title > 0 )
     {
-        int i;
         for( i = 0; i < in->i_title; i++ )
-        {
             vlc_input_title_Delete( in->title[i] );
-        }
-        free( in->title );
+        TAB_CLEAN( in->i_title, in->title );
     }
 }
 

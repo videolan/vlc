@@ -87,6 +87,10 @@ struct input_thread_private_t
     int         i_bookmark;
     seekpoint_t **bookmark;
 
+    /* Input attachment */
+    int i_attachment;
+    input_attachment_t **attachment;
+
     /* Global meta datas FIXME move to input_item_t ? */
     vlc_meta_t  *p_meta;
 

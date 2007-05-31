@@ -272,6 +272,7 @@ typedef struct es_descriptor_t es_descriptor_t;
 typedef struct seekpoint_t seekpoint_t;
 typedef struct info_t info_t;
 typedef struct info_category_t info_category_t;
+typedef struct input_attachment_t input_attachment_t;
 
 /* Format */
 typedef struct audio_format_t audio_format_t;

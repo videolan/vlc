@@ -303,7 +303,57 @@ static inline input_title_t *vlc_input_title_Duplicate( input_title_t *t )
 
     return dup;
 }
+/*****************************************************************************
+ * Attachments
+ *****************************************************************************/
+struct input_attachment_t
+{
+    char *psz_name;
+    char *psz_mime;
+    char *psz_description;
 
+    int  i_data;
+    void *p_data;
+};
+static inline input_attachment_t *vlc_input_attachment_New( const char *psz_name,
+                                                            const char *psz_mime,
+                                                            const char *psz_description,
+                                                            const void *p_data,
+                                                            int i_data )
+{
+    input_attachment_t *a =
+        (input_attachment_t*)malloc( sizeof(input_attachment_t) );
+    if( !a )
+        return NULL;
+    a->psz_name = strdup( psz_name ? psz_name : "" );
+    a->psz_mime = strdup( psz_mime ? psz_mime : "" );
+    a->psz_description = strdup( psz_description ? psz_description : "" );
+    a->i_data = i_data;
+    a->p_data = NULL;
+    if( i_data > 0 )
+    {
+        a->p_data = malloc( i_data );
+        if( a->p_data && p_data )
+            memcpy( a->p_data, p_data, i_data );
+    }
+    return a;
+}
+static inline input_attachment_t *vlc_input_attachment_Duplicate( const input_attachment_t *a )
+{
+    return vlc_input_attachment_New( a->psz_name, a->psz_mime, a->psz_description,
+                                     a->p_data, a->i_data );
+}
+static inline void vlc_input_attachment_Delete( input_attachment_t *a )
+{
+    if( !a )
+        return;
+    free( a->psz_name );
+    free( a->psz_mime );
+    free( a->psz_description );
+    if( a->p_data )
+        free( a->p_data );
+    free( a );
+}
 /*****************************************************************************
  * input defines/constants.
  *****************************************************************************/
@@ -427,6 +477,10 @@ enum input_query_e
     INPUT_CHANGE_BOOKMARK, /* arg1= seekpoint_t * arg2= int * res=can fail   */
     INPUT_DEL_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */
     INPUT_SET_BOOKMARK,    /* arg1= int  res=can fail    */
+
+    /* Attachments */
+    INPUT_GET_ATTACHMENTS, /* arg1=input_attachment_t***, arg2=int*  res=can fail */
+    INPUT_GET_ATTACHMENT,  /* arg1=input_attachment_t**, arg2=char*  res=can fail */
 
     /* On the fly input slave */
     INPUT_ADD_SLAVE        /* arg1= char * */

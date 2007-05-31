@@ -62,6 +62,7 @@
 #include "ebml/StdIOCallback.h"
 
 #include "matroska/KaxAttachments.h"
+#include "matroska/KaxAttached.h"
 #include "matroska/KaxBlock.h"
 #include "matroska/KaxBlockData.h"
 #include "matroska/KaxChapters.h"
@@ -1154,6 +1155,7 @@ public:
     bool Preload( );
     bool PreloadFamily( const matroska_segment_c & segment );
     void ParseInfo( KaxInfo *info );
+    void ParseAttachments( KaxAttachments *attachments );
     void ParseChapters( KaxChapters *chapters );
     void ParseSeekHead( KaxSeekHead *seekhead );
     void ParseTracks( KaxTracks *tracks );
@@ -1298,6 +1300,25 @@ typedef struct
 
 } event_thread_t;
 
+
+class attachment_c
+{
+public:
+    attachment_c()
+        :p_data(NULL)
+        ,i_size(0)
+    {}
+    virtual ~attachment_c()
+    {
+        if( p_data ) free( p_data );
+    }
+
+    std::string    psz_file_name;
+    std::string    psz_mime_type;
+    void          *p_data;
+    int            i_size;
+};
+
 class demux_sys_t
 {
 public:
@@ -1329,6 +1350,8 @@ public:
             delete opened_segments[i];
         for ( i=0; i<used_segments.size(); i++ )
             delete used_segments[i];
+        for ( i=0; i<stored_attachments.size(); i++ )
+            delete stored_attachments[i];
         if( meta ) vlc_meta_Delete( meta );
 
         while( titles.size() )
@@ -1350,6 +1373,7 @@ public:
     size_t                           i_current_title;
 
     std::vector<matroska_stream_c*>  streams;
+    std::vector<attachment_c*>       stored_attachments;
     std::vector<matroska_segment_c*> opened_segments;
     std::vector<virtual_segment_c*>  used_segments;
     virtual_segment_c                *p_current_segment;
@@ -1607,9 +1631,30 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     size_t      i_idx;
 
     vlc_meta_t *p_meta;
+    input_attachment_t ***ppp_attach;
+    int *pi_int;
+    int i;
 
     switch( i_query )
     {
+        case DEMUX_GET_ATTACHMENTS:
+            ppp_attach = (input_attachment_t***)va_arg( args, input_attachment_t*** );
+            pi_int = (int*)va_arg( args, int * );
+
+            if( p_sys->stored_attachments.size() <= 0 )
+                return VLC_EGENERIC;
+
+            *pi_int = p_sys->stored_attachments.size();
+            *ppp_attach = (input_attachment_t**)malloc( sizeof(input_attachment_t**) *
+                                                        p_sys->stored_attachments.size() );
+            for( i = 0; i < p_sys->stored_attachments.size(); i++ )
+            {
+                attachment_c *a = p_sys->stored_attachments[i];
+                *(ppp_attach)[i] = vlc_input_attachment_New( a->psz_file_name.c_str(), a->psz_mime_type.c_str(), NULL,
+                                                             a->p_data, a->i_size );
+            }
+            return VLC_SUCCESS;
+
         case DEMUX_GET_META:
             p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
             vlc_meta_Merge( p_meta, p_sys->meta );
@@ -4911,6 +4956,44 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
 }
 
 /*****************************************************************************
+ * ParseAttachments:
+ *****************************************************************************/
+void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
+{
+    EbmlElement *el;
+    int i_upper_level = 0;
+
+    attachments->Read( es, attachments->Generic().Context, i_upper_level, el, true );
+
+    KaxAttached *attachedFile = FindChild<KaxAttached>( *attachments );
+
+    while( attachedFile && ( attachedFile->GetSize() > 0 ) )
+    {
+        std::string psz_mime_type  = GetChild<KaxMimeType>( *attachedFile );
+        KaxFileName  &file_name    = GetChild<KaxFileName>( *attachedFile );
+        KaxFileData  &img_data     = GetChild<KaxFileData>( *attachedFile );
+
+        attachment_c *new_attachment = new attachment_c();
+
+        if( new_attachment )
+        {
+            new_attachment->psz_file_name  = ToUTF8( UTFstring( file_name ) );
+            new_attachment->psz_mime_type  = psz_mime_type;
+            new_attachment->i_size         = img_data.GetSize();
+            new_attachment->p_data         = malloc( img_data.GetSize() );
+
+            if( new_attachment->p_data )
+            {
+                memcpy( new_attachment->p_data, img_data.GetBuffer(), img_data.GetSize() );
+                sys.stored_attachments.push_back( new_attachment );
+            }
+        }
+
+        attachedFile = &GetNextChild<KaxAttached>( *attachments, *attachedFile );
+    }
+}
+
+/*****************************************************************************
  * ParseChapters:
  *****************************************************************************/
 void matroska_segment_c::ParseChapters( KaxChapters *chapters )
@@ -5441,7 +5524,8 @@ bool matroska_segment_c::Preload( )
         }
         else if( MKV_IS_ID( el, KaxAttachments ) )
         {
-            msg_Dbg( &sys.demuxer, "|   + Attachments FIXME (but probably never supported)" );
+            msg_Dbg( &sys.demuxer, "|   + Attachments" );
+            ParseAttachments( static_cast<KaxAttachments*>( el ) );
         }
         else if( MKV_IS_ID( el, KaxChapters ) )
         {
