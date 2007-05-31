@@ -85,6 +85,7 @@
 #include "vlc_stream.h"
 #include "vlc_access.h"
 #include "vlc_demux.h"
+#include "vlc_codec.h"
 
 #include "vlc_vout.h"
 #include "vlc_vout_synchro.h"
