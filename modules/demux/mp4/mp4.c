@@ -363,10 +363,7 @@ static int Open( vlc_object_t * p_this )
 
         msg_Dbg( p_demux, "detected playlist mov file (%d ref)", i_count );
 
-        p_playlist =
-            (playlist_t *)vlc_object_find( p_demux,
-                                           VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
+        p_playlist = pl_Yield( p_demux );
         if( p_playlist )
         {
             b_play = FindItem( p_demux, p_playlist, &p_current );
