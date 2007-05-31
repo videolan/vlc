@@ -320,8 +320,8 @@ void MainInterface::updateSystrayMenu( int status )
 
 void MainInterface::toggleUpdateSystrayMenu()
 {
-    QVLCMenu::updateSystrayMenu( this, p_intf );
     toggleVisible();
+    QVLCMenu::updateSystrayMenu( this, p_intf );
 }
 
 void MainInterface::handleSystrayClick( QSystemTrayIcon::ActivationReason reason )
@@ -329,7 +329,8 @@ void MainInterface::handleSystrayClick( QSystemTrayIcon::ActivationReason reason
     switch( reason )
     {
         case QSystemTrayIcon::Trigger:
-            this->toggleVisible(); break;
+            toggleUpdateSystrayMenu();
+            break;
         case QSystemTrayIcon::MiddleClick:
             sysTray->showMessage( qtr( "VLC media player" ),
                     qtr( "Control menu for the player" ),
