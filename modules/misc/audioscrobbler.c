@@ -394,6 +394,16 @@ static void Run( intf_thread_t *p_this )
             i_post_socket = net_ConnectTCP( p_this,
                 p_sys->psz_submit_host, p_sys->i_submit_port);
 
+            if ( i_post_socket == -1 )
+            {
+                /* If connection fails, we assume we must handshake again */
+                time( &p_sys->time_next_exchange );
+                p_sys->time_next_exchange += DEFAULT_INTERVAL;
+                p_sys->b_handshaked = VLC_FALSE;
+                vlc_mutex_unlock( &p_sys->lock );
+                continue;
+            }
+
             /* we transmit the data */
             i_net_ret = net_Printf(
                 VLC_OBJECT(p_this), i_post_socket, NULL,
