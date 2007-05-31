@@ -113,7 +113,8 @@ enum demux_query_e
     DEMUX_CAN_PAUSE,            /* arg1= vlc_bool_t*    cannot fail */
     DEMUX_CAN_CONTROL_PACE,     /* arg1= vlc_bool_t*    cannot fail */
     DEMUX_GET_PTS_DELAY,        /* arg1= int64_t*       cannot fail */
-    DEMUX_SET_PAUSE_STATE       /* arg1= vlc_bool_t     can fail */
+    DEMUX_SET_PAUSE_STATE,      /* arg1= vlc_bool_t     can fail */
+    DEMUX_GET_ATTACHMENTS       /* arg1= int, arg2= attachment_t***   can fail */
 };
 
 VLC_EXPORT( int,       demux2_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args ) );
