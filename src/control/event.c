@@ -188,7 +188,7 @@ void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
                     RAISEVOID( "Unsupported event." );
             }
 
-            res = var_RemoveCallback( p_instance->p_libvlc_int,
+            res = var_DelCallback( p_instance->p_libvlc_int,
                                       callback_name,
                                       p_listitem->elmt );
             if (res != VLC_SUCCESS)
