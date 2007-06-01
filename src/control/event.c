@@ -189,8 +189,9 @@ void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
             }
 
             res = var_DelCallback( p_instance->p_libvlc_int,
-                                      callback_name,
-                                      p_listitem->elmt );
+                                   callback_name, handle_event,
+                                   p_listitem->elmt );
+
             if (res != VLC_SUCCESS)
             {
                 RAISEVOID("Internal callback unregistration was not successful. Callback not unregistered.");
