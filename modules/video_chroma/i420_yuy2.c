@@ -158,8 +158,17 @@ static int Activate( vlc_object_t *p_this )
     return 0;
 }
 
-/* Following functions are local */
+#if 0
+static inline unsigned long long read_cycles(void)
+{
+    unsigned long long v;
+    __asm__ __volatile__("rdtsc" : "=A" (v): );
 
+    return v;
+}
+#endif
+
+/* Following functions are local */
 /*****************************************************************************
  * I420_YUY2: planar YUV 4:2:0 to packed YUYV 4:2:2
  *****************************************************************************/
@@ -306,9 +315,10 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 
 #else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
     /*
-    ** SSE2 128 bytes fetch/store instructions are faster 
+    ** SSE2 128 bits fetch/store instructions are faster 
     ** if memory access is 16 bytes aligned
     */
+
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
         ((int)p_line2|(int)p_y2))) )
     {
@@ -366,6 +376,7 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
             p_line2 += i_dest_margin;
         }
     }
+
 #endif // defined(MODULE_NAME_IS_i420_yuy2_sse2)
 }
 
@@ -489,6 +500,10 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV420_YVYU );
 #endif
         }
+        for( i_x = ( p_vout->render.i_width % 8 ) / 2; i_x-- ; )
+        {
+            C_YUV420_YVYU( );
+        }
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
@@ -508,7 +523,7 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
 
 #else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
     /*
-    ** SSE2 128 bytes fetch/store instructions are faster 
+    ** SSE2 128 bits fetch/store instructions are faster 
     ** if memory access is 16 bytes aligned
     */
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
@@ -714,7 +729,7 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
 
 #else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
     /*
-    ** SSE2 128 bytes fetch/store instructions are faster 
+    ** SSE2 128 bits fetch/store instructions are faster 
     ** if memory access is 16 bytes aligned
     */
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
@@ -832,6 +847,10 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV420_UYVY );
 #endif
         }
+        for( i_x = ( p_vout->render.i_width % 8 ) / 2; i_x-- ; )
+        {
+            C_YUV420_UYVY( );
+        }
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
@@ -847,7 +866,7 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
 
 #else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
     /*
-    ** SSE2 128 bytes fetch/store instructions are faster 
+    ** SSE2 128 bits fetch/store instructions are faster 
     ** if memory access is 16 bytes aligned
     */
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|

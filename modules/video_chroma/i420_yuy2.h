@@ -36,46 +36,46 @@
     } while(0)
 
 #define MMX_YUV420_YUYV "                                                 \n\
-movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
 movd       (%4), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
 movd       (%5), %%mm2  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
+movq       (%3), %%mm3  # Load 8 Y            Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 punpcklbw %%mm2, %%mm1  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 movq      %%mm0, %%mm2  #                     y7 y6 y5 y4 y3 y2 y1 y0     \n\
 punpcklbw %%mm1, %%mm2  #                     v1 y3 u1 y2 v0 y1 u0 y0     \n\
 movq      %%mm2, (%0)   # Store low YUYV                                  \n\
 punpckhbw %%mm1, %%mm0  #                     v3 y7 u3 y6 v2 y5 u2 y4     \n\
 movq      %%mm0, 8(%0)  # Store high YUYV                                 \n\
-movq       (%3), %%mm0  # Load 8 Y            Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-movq      %%mm0, %%mm2  #                     Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-punpcklbw %%mm1, %%mm2  #                     v1 Y3 u1 Y2 v0 Y1 u0 Y0     \n\
-movq      %%mm2, (%1)   # Store low YUYV                                  \n\
-punpckhbw %%mm1, %%mm0  #                     v3 Y7 u3 Y6 v2 Y5 u2 Y4     \n\
-movq      %%mm0, 8(%1)  # Store high YUYV                                 \n\
+movq      %%mm3, %%mm4  #                     Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
+punpcklbw %%mm1, %%mm4  #                     v1 Y3 u1 Y2 v0 Y1 u0 Y0     \n\
+movq      %%mm4, (%1)   # Store low YUYV                                  \n\
+punpckhbw %%mm1, %%mm3  #                     v3 Y7 u3 Y6 v2 Y5 u2 Y4     \n\
+movq      %%mm3, 8(%1)  # Store high YUYV                                 \n\
 "
 
 #define MMX_YUV420_YVYU "                                                 \n\
-movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
 movd       (%4), %%mm2  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
 movd       (%5), %%mm1  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
+movq       (%3), %%mm3  # Load 8 Y            Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 punpcklbw %%mm2, %%mm1  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
 movq      %%mm0, %%mm2  #                     y7 y6 y5 y4 y3 y2 y1 y0     \n\
 punpcklbw %%mm1, %%mm2  #                     u1 y3 v1 y2 u0 y1 v0 y0     \n\
 movq      %%mm2, (%0)   # Store low YUYV                                  \n\
 punpckhbw %%mm1, %%mm0  #                     u3 y7 v3 y6 u2 y5 v2 y4     \n\
 movq      %%mm0, 8(%0)  # Store high YUYV                                 \n\
-movq       (%3), %%mm0  # Load 8 Y            Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-movq      %%mm0, %%mm2  #                     Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-punpcklbw %%mm1, %%mm2  #                     u1 Y3 v1 Y2 u0 Y1 v0 Y0     \n\
-movq      %%mm2, (%1)   # Store low YUYV                                  \n\
-punpckhbw %%mm1, %%mm0  #                     u3 Y7 v3 Y6 u2 Y5 v2 Y4     \n\
-movq      %%mm0, 8(%1)  # Store high YUYV                                 \n\
+movq      %%mm3, %%mm4  #                     Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
+punpcklbw %%mm1, %%mm4  #                     u1 Y3 v1 Y2 u0 Y1 v0 Y0     \n\
+movq      %%mm4, (%1)   # Store low YUYV                                  \n\
+punpckhbw %%mm1, %%mm3  #                     u3 Y7 v3 Y6 u2 Y5 v2 Y4     \n\
+movq      %%mm3, 8(%1)  # Store high YUYV                                 \n\
 "
 
 #define MMX_YUV420_UYVY "                                                 \n\
-movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
-movq       (%3), %%mm3  # Load 8 Y            Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 movd       (%4), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
 movd       (%5), %%mm2  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
+movq       (%3), %%mm3  # Load 8 Y            Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 punpcklbw %%mm2, %%mm1  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 movq      %%mm1, %%mm2  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 punpcklbw %%mm0, %%mm2  #                     y3 v1 y2 u1 y1 v0 y0 u0     \n\
@@ -83,9 +83,9 @@ movq      %%mm2, (%0)   # Store low UYVY                                  \n\
 movq      %%mm1, %%mm2  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
 punpckhbw %%mm0, %%mm2  #                     y3 v1 y2 u1 y1 v0 y0 u0     \n\
 movq      %%mm2, 8(%0)  # Store high UYVY                                 \n\
-movq      %%mm1, %%mm2  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
-punpcklbw %%mm3, %%mm2  #                     Y3 v1 Y2 u1 Y1 v0 Y0 u0     \n\
-movq      %%mm2, (%1)   # Store low UYVY                                  \n\
+movq      %%mm1, %%mm4  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
+punpcklbw %%mm3, %%mm4  #                     Y3 v1 Y2 u1 Y1 v0 Y0 u0     \n\
+movq      %%mm4, (%1)   # Store low UYVY                                  \n\
 punpckhbw %%mm3, %%mm1  #                     Y7 v3 Y6 u3 Y5 v2 Y4 u2     \n\
 movq      %%mm1, 8(%1)  # Store high UYVY                                 \n\
 "
@@ -129,82 +129,82 @@ movq      %%mm1, (%1)   # Store YUYV                                      \n\
     } while(0)
 
 #define SSE2_YUV420_YUYV_ALIGNED "                                        \n\
-movdqa      (%2), %%xmm0  # Load 16 Y         y15 y14 y13 .. y2 y1 y0     \n\
 movq        (%4), %%xmm1  # Load 8 Cb         u7 u6 u5 u4 u3 u2 u1 u0     \n\
 movq        (%5), %%xmm2  # Load 8 Cr         v7 06 v5 v4 v3 v2 v1 v0     \n\
+movdqa      (%2), %%xmm0  # Load 16 Y         y15 y14 y13 .. y2 y1 y0     \n\
+movdqa      (%3), %%xmm3  # Load 16 Y         Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 punpcklbw %%xmm2, %%xmm1  #                   v7 u7 v6 u6 .. u1 v0 u0     \n\
 movdqa    %%xmm0, %%xmm2  #                   y15 y14 y13 .. y2 y1 y0     \n\
 punpcklbw %%xmm1, %%xmm2  #                   v3 y7 u3 .. v0 y1 u0 y0     \n\
 movdqa    %%xmm2, (%0)    # Store low YUYV                                \n\
 punpckhbw %%xmm1, %%xmm0  #                   v3 y7 u3 y6 v2 y5 u2 y4     \n\
 movdqa    %%xmm0, 16(%0)  # Store high YUYV                               \n\
-movdqa      (%3), %%xmm0  # Load 8 Y          Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-movdqa    %%xmm0, %%xmm2  #                   Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-punpcklbw %%xmm1, %%xmm2  #                   v1 Y3 u1 Y2 v0 Y1 u0 Y0     \n\
-movdqa    %%xmm2, (%1)    # Store low YUYV                                \n\
-punpckhbw %%xmm1, %%xmm0  #                   v3 Y7 u3 Y6 v2 Y5 u2 Y4     \n\
-movdqa    %%xmm0, 16(%1)  # Store high YUYV                               \n\
+movdqa    %%xmm3, %%xmm4  #                   Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
+punpcklbw %%xmm1, %%xmm4  #                   v1 Y3 u1 Y2 v0 Y1 u0 Y0     \n\
+movdqa    %%xmm4, (%1)    # Store low YUYV                                \n\
+punpckhbw %%xmm1, %%xmm3  #                   v3 Y7 u3 Y6 v2 Y5 u2 Y4     \n\
+movdqa    %%xmm3, 16(%1)  # Store high YUYV                               \n\
 "
 
 #define SSE2_YUV420_YUYV_UNALIGNED "                                      \n\
-movdqu      (%2), %%xmm0  # Load 16 Y         y7 y6 y5 y4 y3 y2 y1 y0     \n\
 movq        (%4), %%xmm1  # Load 8 Cb         00 00 00 00 u3 u2 u1 u0     \n\
 movq        (%5), %%xmm2  # Load 8 Cr         00 00 00 00 v3 v2 v1 v0     \n\
+movdqu      (%2), %%xmm0  # Load 16 Y         y7 y6 y5 y4 y3 y2 y1 y0     \n\
+movdqu      (%3), %%xmm3  # Load 16 Y         Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 punpcklbw %%xmm2, %%xmm1  #                   v3 u3 v2 u2 v1 u1 v0 u0     \n\
 movdqa    %%xmm0, %%xmm2  #                   y7 y6 y5 y4 y3 y2 y1 y0     \n\
 punpcklbw %%xmm1, %%xmm2  #                   v1 y3 u1 y2 v0 y1 u0 y0     \n\
 movdqu    %%xmm2, (%0)    # Store low YUYV                                \n\
 punpckhbw %%xmm1, %%xmm0  #                   v3 y7 u3 y6 v2 y5 u2 y4     \n\
 movdqu    %%xmm0, 16(%0)  # Store high YUYV                               \n\
-movdqu      (%3), %%xmm0  # Load 16 Y         Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-movdqa    %%xmm0, %%xmm2  #                   Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-punpcklbw %%xmm1, %%xmm2  #                   v1 Y3 u1 Y2 v0 Y1 u0 Y0     \n\
-movdqu    %%xmm2, (%1)    # Store low YUYV                                \n\
-punpckhbw %%xmm1, %%xmm0  #                   v3 Y7 u3 Y6 v2 Y5 u2 Y4     \n\
-movdqu    %%xmm0, 16(%1)  # Store high YUYV                               \n\
+movdqa    %%xmm3, %%xmm4  #                   Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
+punpcklbw %%xmm1, %%xmm4  #                   v1 Y3 u1 Y2 v0 Y1 u0 Y0     \n\
+movdqu    %%xmm4, (%1)    # Store low YUYV                                \n\
+punpckhbw %%xmm1, %%xmm3  #                   v3 Y7 u3 Y6 v2 Y5 u2 Y4     \n\
+movdqu    %%xmm3, 16(%1)  # Store high YUYV                               \n\
 "
 
 #define SSE2_YUV420_YVYU_ALIGNED "                                          \n\
-movdqa      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0     \n\
 movq        (%4), %%xmm2  # Load 8 Cb           00 00 00 00 u3 u2 u1 u0     \n\
 movq        (%5), %%xmm1  # Load 8 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movdqa      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0     \n\
+movdqa      (%3), %%xmm3  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 punpcklbw %%xmm2, %%xmm1  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
 movdqa    %%xmm0, %%xmm2  #                     y7 y6 y5 y4 y3 y2 y1 y0     \n\
 punpcklbw %%xmm1, %%xmm2  #                     u1 y3 v1 y2 u0 y1 v0 y0     \n\
 movdqa    %%xmm2, (%0)    # Store low YUYV                                  \n\
 punpckhbw %%xmm1, %%xmm0  #                     u3 y7 v3 y6 u2 y5 v2 y4     \n\
 movdqa    %%xmm0, 16(%0)  # Store high YUYV                                 \n\
-movdqa      (%3), %%xmm0  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-movdqa    %%xmm0, %%xmm2  #                     Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-punpcklbw %%xmm1, %%xmm2  #                     u1 Y3 v1 Y2 u0 Y1 v0 Y0     \n\
-movdqa    %%xmm2, (%1)    # Store low YUYV                                  \n\
-punpckhbw %%xmm1, %%xmm0  #                     u3 Y7 v3 Y6 u2 Y5 v2 Y4     \n\
-movdqa    %%xmm0, 16(%1)  # Store high YUYV                                 \n\
+movdqa    %%xmm3, %%xmm4  #                     Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
+punpcklbw %%xmm1, %%xmm4  #                     u1 Y3 v1 Y2 u0 Y1 v0 Y0     \n\
+movdqa    %%xmm4, (%1)    # Store low YUYV                                  \n\
+punpckhbw %%xmm1, %%xmm3  #                     u3 Y7 v3 Y6 u2 Y5 v2 Y4     \n\
+movdqa    %%xmm3, 16(%1)  # Store high YUYV                                 \n\
 "
 
 #define SSE2_YUV420_YVYU_UNALIGNED "                                        \n\
-movdqu      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0     \n\
 movq        (%4), %%xmm2  # Load 8 Cb           00 00 00 00 u3 u2 u1 u0     \n\
 movq        (%5), %%xmm1  # Load 8 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movdqu      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0     \n\
+movdqu      (%3), %%xmm3  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 punpcklbw %%xmm2, %%xmm1  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
 movdqu    %%xmm0, %%xmm2  #                     y7 y6 y5 y4 y3 y2 y1 y0     \n\
 punpcklbw %%xmm1, %%xmm2  #                     u1 y3 v1 y2 u0 y1 v0 y0     \n\
 movdqu    %%xmm2, (%0)    # Store low YUYV                                  \n\
 punpckhbw %%xmm1, %%xmm0  #                     u3 y7 v3 y6 u2 y5 v2 y4     \n\
 movdqu    %%xmm0, 16(%0)  # Store high YUYV                                 \n\
-movdqu      (%3), %%xmm0  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-movdqu    %%xmm0, %%xmm2  #                     Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-punpcklbw %%xmm1, %%xmm2  #                     u1 Y3 v1 Y2 u0 Y1 v0 Y0     \n\
-movdqu    %%xmm2, (%1)    # Store low YUYV                                  \n\
-punpckhbw %%xmm1, %%xmm0  #                     u3 Y7 v3 Y6 u2 Y5 v2 Y4     \n\
-movdqu    %%xmm0, 16(%1)  # Store high YUYV                                 \n\
+movdqu    %%xmm3, %%xmm4  #                     Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
+punpcklbw %%xmm1, %%xmm4  #                     u1 Y3 v1 Y2 u0 Y1 v0 Y0     \n\
+movdqu    %%xmm4, (%1)    # Store low YUYV                                  \n\
+punpckhbw %%xmm1, %%xmm3  #                     u3 Y7 v3 Y6 u2 Y5 v2 Y4     \n\
+movdqu    %%xmm3, 16(%1)  # Store high YUYV                                 \n\
 "
 
 #define SSE2_YUV420_UYVY_ALIGNED "                                          \n\
-movdqa      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0     \n\
-movdqa      (%3), %%xmm3  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 movq        (%4), %%xmm1  # Load 8 Cb           00 00 00 00 u3 u2 u1 u0     \n\
 movq        (%5), %%xmm2  # Load 8 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movdqa      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0     \n\
+movdqa      (%3), %%xmm3  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 punpcklbw %%xmm2, %%xmm1  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 movdqa    %%xmm1, %%xmm2  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 punpcklbw %%xmm0, %%xmm2  #                     y3 v1 y2 u1 y1 v0 y0 u0     \n\
@@ -212,18 +212,18 @@ movdqa    %%xmm2, (%0)    # Store low UYVY                                  \n\
 movdqa    %%xmm1, %%xmm2  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
 punpckhbw %%xmm0, %%xmm2  #                     y3 v1 y2 u1 y1 v0 y0 u0     \n\
 movdqa    %%xmm2, 16(%0)  # Store high UYVY                                 \n\
-movdqa    %%xmm1, %%xmm2  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
-punpcklbw %%xmm3, %%xmm2  #                     Y3 v1 Y2 u1 Y1 v0 Y0 u0     \n\
-movdqa    %%xmm2, (%1)    # Store low UYVY                                  \n\
+movdqa    %%xmm1, %%xmm4  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
+punpcklbw %%xmm3, %%xmm4  #                     Y3 v1 Y2 u1 Y1 v0 Y0 u0     \n\
+movdqa    %%xmm4, (%1)    # Store low UYVY                                  \n\
 punpckhbw %%xmm3, %%xmm1  #                     Y7 v3 Y6 u3 Y5 v2 Y4 u2     \n\
 movdqa    %%xmm1, 16(%1)  # Store high UYVY                                 \n\
 "
 
 #define SSE2_YUV420_UYVY_UNALIGNED "                                        \n\
-movdqu      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0     \n\
-movdqu      (%3), %%xmm3  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 movq        (%4), %%xmm1  # Load 8 Cb           00 00 00 00 u3 u2 u1 u0     \n\
 movq        (%5), %%xmm2  # Load 8 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movdqu      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0     \n\
+movdqu      (%3), %%xmm3  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 punpcklbw %%xmm2, %%xmm1  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 movdqu    %%xmm1, %%xmm2  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 punpcklbw %%xmm0, %%xmm2  #                     y3 v1 y2 u1 y1 v0 y0 u0     \n\
@@ -231,9 +231,9 @@ movdqu    %%xmm2, (%0)    # Store low UYVY                                  \n\
 movdqu    %%xmm1, %%xmm2  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
 punpckhbw %%xmm0, %%xmm2  #                     y3 v1 y2 u1 y1 v0 y0 u0     \n\
 movdqu    %%xmm2, 16(%0)  # Store high UYVY                                 \n\
-movdqu    %%xmm1, %%xmm2  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
-punpcklbw %%xmm3, %%xmm2  #                     Y3 v1 Y2 u1 Y1 v0 Y0 u0     \n\
-movdqu    %%xmm2, (%1)    # Store low UYVY                                  \n\
+movdqu    %%xmm1, %%xmm4  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
+punpcklbw %%xmm3, %%xmm4  #                     Y3 v1 Y2 u1 Y1 v0 Y0 u0     \n\
+movdqu    %%xmm4, (%1)    # Store low UYVY                                  \n\
 punpckhbw %%xmm3, %%xmm1  #                     Y7 v3 Y6 u3 Y5 v2 Y4 u2     \n\
 movdqu    %%xmm1, 16(%1)  # Store high UYVY                                 \n\
 "
