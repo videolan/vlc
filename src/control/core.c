@@ -101,6 +101,7 @@ libvlc_instance_t * libvlc_new( int argc, char **argv,
     p_new->b_playlist_locked = 0;
     p_new->p_callback_list = NULL;
     vlc_mutex_init(p_libvlc_int, &p_new->instance_lock);
+    vlc_mutex_init(p_libvlc_int, &p_new->event_callback_lock);
 
     return p_new;
 }
@@ -108,6 +109,8 @@ libvlc_instance_t * libvlc_new( int argc, char **argv,
 void libvlc_destroy( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
     libvlc_event_remove_all_callbacks( p_instance, p_e /* current implementation never triggers it */);
+    vlc_mutex_destroy( &p_instance->instance_lock );
+    vlc_mutex_destroy( &p_instance->event_callback_lock);
     libvlc_InternalCleanup( p_instance->p_libvlc_int );
     libvlc_InternalDestroy( p_instance->p_libvlc_int, VLC_FALSE );
 }

@@ -33,7 +33,9 @@ static int handle_event( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval,
                          void *p_data )
 {
-    struct libvlc_callback_entry_t *entry = p_data; /* FIXME: we need some locking here */
+    /* This is thread safe, as the var_*Callback already provide the locking
+     * facility for p_data */
+    struct libvlc_callback_entry_t *entry = p_data;
     libvlc_event_t event;
     event.type = entry->i_event_type;
     switch ( event.type )
@@ -55,8 +57,8 @@ static int handle_event( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static inline void add_callback_entry( struct libvlc_callback_entry_t *entry,
-                                       struct libvlc_callback_entry_list_t **list )
+static inline void add_callback_to_list( struct libvlc_callback_entry_t *entry,
+                                         struct libvlc_callback_entry_list_t **list )
 {
     struct libvlc_callback_entry_list_t *new_listitem;
 
@@ -77,6 +79,30 @@ static inline void add_callback_entry( struct libvlc_callback_entry_t *entry,
     *list = new_listitem;
 }
 
+static int remove_variable_callback( libvlc_instance_t *p_instance, 
+                                     struct libvlc_callback_entry_t * p_entry )
+{
+    const char * callback_name = NULL;
+    
+    /* Note: Appropriate lock should be held by the caller */
+
+    switch ( p_entry->i_event_type )
+    {
+        case VOLUME_CHANGED:
+            callback_name = "volume-change";
+            break;
+        case INPUT_POSITION_CHANGED:
+            break;
+    }
+
+    if (!callback_name)
+        return VLC_EGENERIC;
+
+    return var_DelCallback( p_instance->p_libvlc_int,
+                            callback_name, handle_event,
+                            p_entry );
+}
+
 /*
  * Public libvlc functions
  */
@@ -88,7 +114,7 @@ void libvlc_event_add_callback( libvlc_instance_t *p_instance,
                                 libvlc_exception_t *p_e )
 {
     struct libvlc_callback_entry_t *entry;
-    const char *callback_name = NULL;
+    const char * callback_name = NULL;
     int res;
 
     if ( !f_callback )
@@ -129,7 +155,9 @@ void libvlc_event_add_callback( libvlc_instance_t *p_instance,
         RAISEVOID("Internal callback registration was not successful. Callback not registered.");
     }
     
-    add_callback_entry( entry, &p_instance->p_callback_list );
+    vlc_mutex_lock( &p_instance->instance_lock );
+    add_callback_to_list( entry, &p_instance->p_callback_list );
+    vlc_mutex_unlock( &p_instance->instance_lock );
 
     return;
 }
@@ -137,18 +165,21 @@ void libvlc_event_add_callback( libvlc_instance_t *p_instance,
 void libvlc_event_remove_all_callbacks( libvlc_instance_t *p_instance,
                                        libvlc_exception_t *p_e )
 {
-    struct libvlc_callback_entry_list_t *p_listitem = p_instance->p_callback_list;
+    struct libvlc_callback_entry_list_t *p_listitem;
+
+    vlc_mutex_lock( &p_instance->instance_lock );
+
+    p_listitem = p_instance->p_callback_list;
 
     while( p_listitem )
     {
-        libvlc_event_remove_callback( p_instance,
-            p_listitem->elmt->i_event_type,
-            p_listitem->elmt->f_callback,
-            p_listitem->elmt->p_user_data,
-            p_e);
-        /* libvlc_event_remove_callback will reset the p_callback_list */
-        p_listitem = p_instance->p_callback_list;
+        remove_variable_callback( p_instance, p_listitem->elmt ); /* FIXME: We could warn on error */
+        p_listitem = p_listitem->next;
+
     }
+    p_instance->p_callback_list = NULL;
+
+    vlc_mutex_unlock( &p_instance->instance_lock );
 }
 
 void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
@@ -157,7 +188,11 @@ void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
                                    void *p_user_data,
                                    libvlc_exception_t *p_e )
 {
-    struct libvlc_callback_entry_list_t *p_listitem = p_instance->p_callback_list;
+    struct libvlc_callback_entry_list_t *p_listitem;
+
+    vlc_mutex_lock( &p_instance->instance_lock );
+
+    p_listitem = p_instance->p_callback_list;
 
     while( p_listitem )
     {
@@ -167,40 +202,23 @@ void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
         
         )
         {
-            const char * callback_name = NULL;
-            int res;
+            remove_variable_callback( p_instance, p_listitem->elmt ); /* FIXME: We should warn on error */
 
             if( p_listitem->prev )
                 p_listitem->prev->next = p_listitem->next;
             else
                 p_instance->p_callback_list = p_listitem->next;
 
+
             p_listitem->next->prev = p_listitem->prev;
 
-            switch ( i_event_type )
-            {
-                case VOLUME_CHANGED:
-                    callback_name = "volume-change";
-                    break;
-                case INPUT_POSITION_CHANGED:
-                    break;
-                default:
-                    RAISEVOID( "Unsupported event." );
-            }
+            free( p_listitem->elmt );
 
-            res = var_DelCallback( p_instance->p_libvlc_int,
-                                   callback_name, handle_event,
-                                   p_listitem->elmt );
-
-            if (res != VLC_SUCCESS)
-            {
-                RAISEVOID("Internal callback unregistration was not successful. Callback not unregistered.");
-            }
-
-            free( p_listitem->elmt ); /* FIXME: need some locking here */
             free( p_listitem );
             break;
         }
+        
         p_listitem = p_listitem->next;
     }
+    vlc_mutex_unlock( &p_instance->instance_lock );
 }
