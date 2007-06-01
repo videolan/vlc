@@ -89,6 +89,7 @@ void libvlc_event_add_callback( libvlc_instance_t *p_instance,
 {
     struct libvlc_callback_entry_t *entry;
     const char *callback_name = NULL;
+    int res;
 
     if ( !f_callback )
         RAISEVOID (" Callback function is null ");
@@ -117,10 +118,10 @@ void libvlc_event_add_callback( libvlc_instance_t *p_instance,
             RAISEVOID( "Unsupported event." );
     }
 
-    int res = var_AddCallback( p_instance->p_libvlc_int,
-                               callback_name,
-                               handle_event,
-                               entry );
+    res = var_AddCallback( p_instance->p_libvlc_int,
+                           callback_name,
+                           handle_event,
+                           entry );
     
     if (res != VLC_SUCCESS)
     {
@@ -166,12 +167,35 @@ void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
         
         )
         {
+            const char * callback_name = NULL;
+            int res;
+
             if( p_listitem->prev )
                 p_listitem->prev->next = p_listitem->next;
             else
                 p_instance->p_callback_list = p_listitem->next;
 
             p_listitem->next->prev = p_listitem->prev;
+
+            switch ( i_event_type )
+            {
+                case VOLUME_CHANGED:
+                    callback_name = "volume-change";
+                    break;
+                case INPUT_POSITION_CHANGED:
+                    break;
+                default:
+                    RAISEVOID( "Unsupported event." );
+            }
+
+            res = var_RemoveCallback( p_instance->p_libvlc_int,
+                                      callback_name,
+                                      p_listitem->elmt );
+            if (res != VLC_SUCCESS)
+            {
+                RAISEVOID("Internal callback unregistration was not successful. Callback not unregistered.");
+            }
+
             free( p_listitem->elmt ); /* FIXME: need some locking here */
             free( p_listitem );
             break;
