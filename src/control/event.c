@@ -59,6 +59,12 @@ static inline void add_callback_entry( struct libvlc_callback_entry_t *entry,
                                        struct libvlc_callback_entry_list_t **list )
 {
     struct libvlc_callback_entry_list_t *new_listitem;
+
+    /* malloc/free strategy:
+     *  - alloc-ded in add_callback_entry
+     *  - free-ed by libvlc_event_remove_callback
+     *  - free-ed in libvlc_destroy when entry is destroyed
+     */
     new_listitem = malloc( sizeof( struct libvlc_callback_entry_list_t ) );
     new_listitem->elmt = entry;
     new_listitem->next = *list;
@@ -80,16 +86,22 @@ void libvlc_event_add_callback( libvlc_instance_t *p_instance,
                                 void *user_data,
                                 libvlc_exception_t *p_e )
 {
+    struct libvlc_callback_entry_t *entry;
+    const char *callback_name = NULL;
 
-    if ( ! &f_callback )
+    if ( !f_callback )
         RAISEVOID (" Callback function is null ");
-    
-    struct libvlc_callback_entry_t *entry = malloc( sizeof( struct libvlc_callback_entry_t ) );
+
+    /* malloc/free strategy:
+     *  - alloc-ded in libvlc_event_add_callback
+     *  - free-ed by libvlc_event_add_callback on error
+     *  - Not free-ed by libvlc_event_remove_callback  (FIXME leaks)
+     *  - Not free-ed in libvlc_destroy when entry is destroyed (FIXME leaks)
+     */
+    entry = malloc( sizeof( struct libvlc_callback_entry_t ) );
     entry->f_callback = f_callback;
     entry->i_event_type = i_event_type;
     entry->p_user_data = user_data;
-
-    const char *callback_name;
     
     switch ( i_event_type )
     {
