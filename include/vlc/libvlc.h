@@ -814,6 +814,14 @@ VLC_PUBLIC_API void libvlc_event_add_callback( libvlc_instance_t *p_instance,
                                                libvlc_exception_t *p_e );
 
 /**
+ * Unregister all callbacks notification from an instance
+ * \param p_instance the libvlc instance
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_event_remove_all_callbacks( libvlc_instance_t *p_instance,
+                                                       libvlc_exception_t *p_e );
+
+/**
  * Unregister a callback notification
  * \param p_instance the libvlc instance
  * \param i_event_type the desired event mask to which we want to unregister

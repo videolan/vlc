@@ -33,7 +33,7 @@ static int handle_event( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval,
                          void *p_data )
 {
-    struct libvlc_callback_entry_t *entry = p_data;
+    struct libvlc_callback_entry_t *entry = p_data; /* FIXME: we need some locking here */
     libvlc_event_t event;
     event.type = entry->i_event_type;
     switch ( event.type )
@@ -63,7 +63,8 @@ static inline void add_callback_entry( struct libvlc_callback_entry_t *entry,
     /* malloc/free strategy:
      *  - alloc-ded in add_callback_entry
      *  - free-ed by libvlc_event_remove_callback
-     *  - free-ed in libvlc_destroy when entry is destroyed
+     *  - free-ed in libvlc_destroy threw libvlc_event_remove_callback
+     *    when entry is destroyed
      */
     new_listitem = malloc( sizeof( struct libvlc_callback_entry_list_t ) );
     new_listitem->elmt = entry;
@@ -95,8 +96,9 @@ void libvlc_event_add_callback( libvlc_instance_t *p_instance,
     /* malloc/free strategy:
      *  - alloc-ded in libvlc_event_add_callback
      *  - free-ed by libvlc_event_add_callback on error
-     *  - Not free-ed by libvlc_event_remove_callback  (FIXME leaks)
-     *  - Not free-ed in libvlc_destroy when entry is destroyed (FIXME leaks)
+     *  - free-ed by libvlc_event_remove_callback
+     *  - free-ed in libvlc_destroy threw libvlc_event_remove_callback
+     *    when entry is destroyed
      */
     entry = malloc( sizeof( struct libvlc_callback_entry_t ) );
     entry->f_callback = f_callback;
@@ -131,6 +133,23 @@ void libvlc_event_add_callback( libvlc_instance_t *p_instance,
     return;
 }
 
+void libvlc_event_remove_all_callbacks( libvlc_instance_t *p_instance,
+                                       libvlc_exception_t *p_e )
+{
+    struct libvlc_callback_entry_list_t *p_listitem = p_instance->p_callback_list;
+
+    while( p_listitem )
+    {
+        libvlc_event_remove_callback( p_instance,
+            p_listitem->elmt->i_event_type,
+            p_listitem->elmt->f_callback,
+            p_listitem->elmt->p_user_data,
+            p_e);
+        /* libvlc_event_remove_callback will reset the p_callback_list */
+        p_listitem = p_instance->p_callback_list;
+    }
+}
+
 void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
                                    libvlc_event_type_t i_event_type,
                                    libvlc_callback_t f_callback,
@@ -151,8 +170,9 @@ void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
                 p_listitem->prev->next = p_listitem->next;
             else
                 p_instance->p_callback_list = p_listitem->next;
-            
+
             p_listitem->next->prev = p_listitem->prev;
+            free( p_listitem->elmt ); /* FIXME: need some locking here */
             free( p_listitem );
             break;
         }
