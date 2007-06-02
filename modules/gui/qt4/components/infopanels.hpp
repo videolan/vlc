@@ -30,10 +30,22 @@
 
 #include <QWidget>
 #include <QTabWidget>
-#include <QLabel>
+
+#ifdef HAVE_LIMITS_H
+#   include <limits.h>
+#endif
+
+#define setSpinBounds( spinbox ) {               \
+    spinbox->setRange( 0, INT_MAX );             \
+    spinbox->setAccelerated( true ) ;            \
+    spinbox->setAlignment( Qt::AlignRight );     \
+    spinbox->setSpecialValueText(""); }
 
 class QTreeWidget;
 class QTreeWidgetItem;
+class QTreeView;
+class QSpinBox;
+class QLineEdit;
 
 class MetaPanel: public QWidget
 {
@@ -43,26 +55,39 @@ public:
     virtual ~MetaPanel();
 private:
     intf_thread_t *p_intf;
-    QLabel *uri_text;
-    QLabel *name_text;
-    QLabel *artist_text;
-    QLabel *genre_text;
-    QLabel *copyright_text;
-    QLabel *collection_text;
-    QLabel *seqnum_text;
-    QLabel *description_text;
-    QLabel *rating_text;
-    QLabel *date_text;
-    QLabel *setting_text;
-    QLabel *language_text;
-    QLabel *nowplaying_text;
-    QLabel *publisher_text;
+    QLineEdit *uri_text;
+    QLineEdit *title_text;
+    QLineEdit *artist_text;
+    QLineEdit *genre_text;
+    QLineEdit *copyright_text;
+    QLineEdit *collection_text;
+    QSpinBox *seqnum_text;
+    QLineEdit *description_text;
+    QSpinBox *rating_text;
+    QSpinBox *date_text;
+    QLineEdit *setting_text;
+    QLineEdit *language_text;
+    QLineEdit *nowplaying_text;
+    QLineEdit *publisher_text;
 
 public slots:
     void update( input_item_t * );
     void clear();
 };
 
+class ExtraMetaPanel: public QWidget
+{
+    Q_OBJECT;
+public:
+    ExtraMetaPanel( QWidget *, intf_thread_t * );
+    virtual  ~ExtraMetaPanel() {};
+private:
+    intf_thread_t *p_intf;
+    QTreeWidget *extraMetaTree;
+public slots:
+    void update( input_item_t * );
+    void clear();
+};
 
 class InputStatsPanel: public QWidget
 {
@@ -128,6 +153,7 @@ private:
     InputStatsPanel *ISP;
     MetaPanel *MP;
     InfoPanel *IP;
+    ExtraMetaPanel *EMP;
     int i_runs;
 };
 
