@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef _QVLC_H_
@@ -64,20 +64,20 @@ struct intf_sys_t
 #define BUTTONACT( b, a ) connect( b, SIGNAL( clicked() ), this, SLOT(a) )
 #define ON_TIMEOUT( act ) CONNECT( THEDP->fixed_timer, timeout(), this, act )
 
-#define BUTTON_SET( button, text, tooltip ) \
-    button->setText( text ); \
+#define BUTTON_SET( button, text, tooltip )  \
+    button->setText( text );                 \
     button->setToolTip( tooltip );
 
 #define BUTTON_SET_ACT( button, text, tooltip, thisslot ) \
-    BUTTON_SET( button, text, tooltip ); \
+    BUTTON_SET( button, text, tooltip );                  \
     BUTTONACT( button, thisslot );
 
-#define BUTTON_SET_IMG( button, text, image, tooltip ) \
-    BUTTON_SET( button, text, tooltip ); \
+#define BUTTON_SET_IMG( button, text, image, tooltip )    \
+    BUTTON_SET( button, text, tooltip );                  \
     button->setIcon( QIcon( ":/pixmaps/"#image ) );
 
 #define BUTTON_SET_ACT_I( button, text, image, tooltip, thisslot ) \
-    BUTTON_SET_IMG( button, text, image, tooltip ); \
+    BUTTON_SET_IMG( button, text, image, tooltip );                \
     BUTTONACT( button, thisslot );
 
 static int DialogEvent_Type = QEvent::User + 1;
