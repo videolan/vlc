@@ -1056,8 +1056,8 @@ AC_CACHE_CHECK([if \$CC accepts -fomit-frame-pointer],
      AC_TRY_COMPILE([],,ac_cv_c_omit_frame_pointer=yes, ac_cv_c_omit_frame_pointer=no)])
 if test "${ac_cv_c_omit_frame_pointer}" != "no"; then
     CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
-    # this plugin does not compile without -fomit-frame-pointer, damn gcc!
-    VLC_ADD_CFLAGS([i420_yuy2_mmx],[-fomit-frame-pointer])
+    # these plugins do not compile without -fomit-frame-pointer, damn gcc!
+    VLC_ADD_CFLAGS([i420_yuy2_mmx i420_yuy2_sse2],[-fomit-frame-pointer])
 fi
 
 dnl Check for -fvisibility=hidden
@@ -1262,21 +1262,15 @@ fi
 dnl
 dnl  Accelerated modules
 dnl
-MMX_MODULES="memcpymmx i420_rgb_mmx i422_yuy2_mmx i420_ymga_mmx"
+MMX_MODULES="memcpymmx i420_rgb_mmx i420_yuy2_mmx i422_yuy2_mmx i420_ymga_mmx"
 #MMX_MODULES="${MMX_MODULES} idctmmx motionmmx"
 MMXEXT_MODULES="memcpymmxext"
 #MMXEXT_MODULES="${MMXEXT_MODULES} idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn"
 SSE_MODULES=""
-SSE2_MODULES=""
+SSE2_MODULES="i420_yuy2_sse2"
 ALTIVEC_MODULES="memcpyaltivec i420_yuy2_altivec"
 #ALTIVEC_MODULES="${ALTIVEC_MODULES} idctaltivec motionaltivec"
-
-if test "${enable_gprof}" != "yes" -a "${enable_debug}" != "yes"
-then
-  MMX_MODULES="${MMX_MODULES} i420_yuy2_mmx"
-  SSE2_MODULES="${SSE2_MODULES} i420_yuy2_sse2"
-fi
 
 dnl  Check for fully workin MMX intrinsics
 dnl  We need support for -mmmx, we need <mmintrin.h>, and we also need a
