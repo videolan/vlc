@@ -26,6 +26,7 @@
 #define _MEDIAINFO_DIALOG_H_
 
 #include "util/qvlcframe.hpp"
+#include "components/infopanels.hpp"
 
 class QTabWidget;
 class InfoTab;
@@ -34,11 +35,12 @@ class MediaInfoDialog : public QVLCFrame
 {
     Q_OBJECT;
 public:
-    MediaInfoDialog( intf_thread_t *, bool mainInput = false );
+    MediaInfoDialog( intf_thread_t *, bool stats = true,
+                    bool mainInput = false );
     static MediaInfoDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new MediaInfoDialog( p_intf, true);
+            instance = new MediaInfoDialog( p_intf, true, true );
         return instance;
     }
     static void killInstance()
@@ -53,13 +55,20 @@ public:
     void setInput( input_item_t * );
 private:
     input_thread_t *p_input;
-    InfoTab *IT;
+    QTabWidget *IT;
     static MediaInfoDialog *instance;
     int i_runs;
     bool mainInput;
+    bool stats;
+    InputStatsPanel *ISP;
+    MetaPanel *MP;
+    InfoPanel *IP;
+    ExtraMetaPanel *EMP;
 public slots:
     void update();
+    void update( input_item_t *, bool, bool );
     void close();
+    void clear();
 };
 
 #endif

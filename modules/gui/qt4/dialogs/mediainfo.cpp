@@ -37,8 +37,10 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param );
 MediaInfoDialog *MediaInfoDialog::instance = NULL;
 
-MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput ) :
-                                    QVLCFrame( _p_intf ), mainInput(_mainInput)
+MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
+                                  bool _stats ) :
+                                  QVLCFrame( _p_intf ), mainInput(_mainInput),
+                                  stats( _stats )
 {
     i_runs = 0;
     p_input = NULL;
@@ -47,17 +49,30 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput ) :
     resize( 600 , 450 );
 
     QGridLayout *layout = new QGridLayout(this);
-    IT = new InfoTab( this, p_intf, true ) ;
+
+    IT = new QTabWidget;
+    MP = new MetaPanel( IT, p_intf );
+    IT->addTab( MP, qtr( "&General" ) );
+    EMP = new ExtraMetaPanel( IT, p_intf );
+    IT->addTab( EMP, qtr( "&Extra Metadata" ) );
+    IP = new InfoPanel( IT, p_intf);
+    IT->addTab( IP, qtr("&Codec Details"));
+    if( stats )
+    {
+        ISP = new InputStatsPanel( IT, p_intf );
+        IT->addTab(ISP, qtr("&Stats"));
+    }
+
     QPushButton *closeButton = new QPushButton(qtr("&Close"));
     closeButton->setDefault( true );
 
-    layout->addWidget(IT,0,0,1,3);
+    layout->addWidget( IT, 0, 0, 1, 3);
     layout->addWidget(closeButton,1,2);
 
     BUTTONACT( closeButton, close() );
+    ON_TIMEOUT( update() );
 
     if( mainInput ) {
-        ON_TIMEOUT( update() );
         var_AddCallback( THEPL, "item-change", ItemChanged, this );
     }
 }
@@ -86,35 +101,60 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
 
 void MediaInfoDialog::setInput(input_item_t *p_input)
 {
-    IT->clear();
+    clear();
     vlc_mutex_lock( &p_input->lock );
-    IT->update( p_input, true, true );
+    update( p_input, true, true );
     vlc_mutex_unlock( &p_input->lock );
 }
 
 void MediaInfoDialog::update()
 {
+    msg_Dbg( p_intf, "updating" );
     /* Timer runs at 150 ms, dont' update more than 2 times per second */
     if( i_runs % 3 != 0 ) return;
     i_runs++;
 
+    /* Get Input and clear if non-existant */
     input_thread_t *p_input =
              MainInputManager::getInstance( p_intf )->getInput();
     if( !p_input || p_input->b_dead )
     {
-        IT->clear();
+        clear();
         return;
     }
 
     vlc_object_yield( p_input );
     vlc_mutex_lock( &input_GetItem(p_input)->lock );
 
-    IT->update( input_GetItem(p_input), need_update, need_update );
+    update( input_GetItem(p_input), need_update, need_update );
     need_update = false;
 
     vlc_mutex_unlock( &input_GetItem(p_input)->lock );
     vlc_object_release( p_input );
 }
+
+void MediaInfoDialog::update( input_item_t *p_item, bool update_info,
+        bool update_meta )
+{
+    if( update_info )
+        IP->update( p_item );
+    if( update_meta )
+    {
+        MP->update( p_item );
+        EMP->update( p_item );
+    }
+    if( stats )
+        ISP->update( p_item );
+}
+
+void MediaInfoDialog::clear()
+{
+    IP->clear();
+    MP->clear();
+    EMP->clear();
+    if( stats ) ISP->clear();
+}
+
 
 void MediaInfoDialog::close()
 {
