@@ -48,8 +48,8 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     widget = new QLabel( "" );                                  \
     l->addWidget( widget, line, 1 );                            \
     line++;            }
-    ADD_META( qtr( "Name" ), name_text );
-    ADD_META( qtr( "URI" ), uri_text );
+    ADD_META( "Name", name_text );
+    ADD_META( "URI", uri_text );
     ADD_META( VLC_META_ARTIST, artist_text );
     ADD_META( VLC_META_GENRE, genre_text );
     ADD_META( VLC_META_COPYRIGHT, copyright_text );

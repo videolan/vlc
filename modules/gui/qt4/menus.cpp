@@ -281,7 +281,7 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     {
         menu->addSeparator();
         menu->addAction( qtr("Switch to skins"), THEDP, SLOT(switchToSkins()),
-                "Ctrl+Z" );
+                QString("Ctrl+Z") );
     }
 
     CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() );
