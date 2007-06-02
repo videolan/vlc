@@ -27,6 +27,7 @@
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
+
 #include <QEvent>
 
 class QApplication;

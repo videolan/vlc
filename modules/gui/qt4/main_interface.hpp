@@ -18,20 +18,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef _MAIN_INTERFACE_H_
 #define _MAIN_INTERFACE_H_
 
+
 #include "qt4.hpp"
-#include <vlc_aout.h>
 #include "ui/main_interface.h"
 #include "util/qvlcframe.hpp"
 
-#include <QSize>
+#include <vlc_aout.h>
+
 #include <QSystemTrayIcon>
-#include <QMenu>
 
 class QSettings;
 class QCloseEvent;
@@ -47,6 +47,7 @@ class VolumeClickHandler;
 class VisualSelector;
 class ControlsWidget;
 class QMenu;
+class QSize;
 
 class MainInterface : public QVLCMW
 {

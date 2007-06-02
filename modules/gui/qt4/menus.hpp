@@ -24,6 +24,7 @@
 #define _MENUS_H_
 
 #include "qt4.hpp"
+
 #include <QObject>
 #include <vector>
 

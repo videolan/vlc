@@ -36,21 +36,16 @@
 #include "util/customwidgets.hpp"
 #include "qt4.hpp"
 
-#include <QLineEdit>
+#include <vlc_keys.h>
+
 #include <QString>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
 #include <QVariant>
-#include <QComboBox>
 #include <QGridLayout>
-#include <QPushButton>
 #include <QSlider>
 #include <QFileDialog>
 #include <QFontDialog>
 #include <QGroupBox>
-
-#include <vlc_keys.h>
-
+#include <QTreeWidgetItem>
 
 QString formatTooltip(const QString & tooltip)
 {

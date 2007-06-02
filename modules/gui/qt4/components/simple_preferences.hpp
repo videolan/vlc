@@ -24,10 +24,10 @@
 #ifndef _SIMPLEPREFS_H_
 #define _SIMPLEPREFS_H_
 
-#include <QListWidget>
-#include <QVBoxLayout>
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
+
+#include <QWidget>
 
 enum {
     SPrefsInterface = 0,

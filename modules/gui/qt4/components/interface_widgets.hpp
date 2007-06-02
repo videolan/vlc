@@ -31,10 +31,10 @@
 
 #include <QWidget>
 #include <QFrame>
-#include <QPalette>
-#include <QResizeEvent>
-#include <QPixmap>
 
+class ResizeEvent;
+class QPalette;
+class QPixmap;
 class QLabel;
 class QHBoxLayout;
 

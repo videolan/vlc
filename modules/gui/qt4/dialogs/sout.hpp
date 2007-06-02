@@ -23,7 +23,9 @@
 
 #ifndef _SOUT_DIALOG_H_
 #define _SOUT_DIALOG_H_
+
 #include <vlc/vlc.h>
+
 #include "ui/sout.h"
 #include "util/qvlcframe.hpp"
 

@@ -25,24 +25,30 @@
 
 #ifndef _INFOPANELS_H_
 #define _INFOPANELS_H_
+
 #include <vlc/vlc.h>
-#include <QWidget>
-#include <QTreeWidget>
-#include <QLineEdit>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QVector>
-#include <QDialog>
-#include <QLabel>
-#include <QFile>
-#include <QPushButton>
-#include <QGroupBox>
 
 #include "qt4.hpp"
 #include <assert.h>
 
+#include <QWidget>
+
+#include <QCheckBox>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QTreeWidget>
+#include <QSpinBox>
+#include <QLabel>
+#include <QDoubleSpinBox>
+#include <QPushButton>
+#include <QVector>
+#include <QDialog>
+
+
+class QFile;
+class QTreeWidget;
+class QTreeWidgetItem;
+class QGroupBox;
 class QGridLayout;
 
 class ConfigControl : public QObject

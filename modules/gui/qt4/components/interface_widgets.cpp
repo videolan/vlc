@@ -35,6 +35,8 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QMenu>
+#include <QPalette>
+#include <QResizeEvent>
 
 #define ICON_SIZE 128
 

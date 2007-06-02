@@ -26,6 +26,7 @@
 #define _OPENPANELS_H_
 
 #include <vlc/vlc.h>
+
 #include <QFileDialog>
 
 #include "ui/open_file.h"

@@ -25,15 +25,15 @@
 #ifndef _DIALOGS_PROVIDER_H_
 #define _DIALOGS_PROVIDER_H_
 
-#include <QObject>
-#include <QTimer>
-#include <QApplication>
-
-#include "dialogs/interaction.hpp"
-
 #include <assert.h>
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
+
+#include "dialogs/interaction.hpp"
+
+#include <QObject>
+#include <QTimer>
+#include <QApplication>
 
 #define EXT_FILTER_MEDIA        0x01
 #define EXT_FILTER_VIDEO        0x02

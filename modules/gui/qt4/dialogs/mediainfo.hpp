@@ -26,9 +26,8 @@
 #define _MEDIAINFO_DIALOG_H_
 
 #include "util/qvlcframe.hpp"
-#include <QTabWidget>
-#include <QBoxLayout>
 
+class QTabWidget;
 class InfoTab;
 
 class MediaInfoDialog : public QVLCFrame

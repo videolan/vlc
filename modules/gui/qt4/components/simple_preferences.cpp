@@ -23,17 +23,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <QString>
-#include <QFont>
-#include <QToolButton>
-#include <QButtonGroup>
-#include <QUrl>
-
 #include "components/simple_preferences.hpp"
 #include "components/preferences_widgets.hpp"
 #include "qt4.hpp"
-
-#include <vlc_config_cat.h>
 
 #include "ui/sprefs_audio.h"
 #include "ui/sprefs_input.h"
@@ -41,6 +33,15 @@
 #include "ui/sprefs_subtitles.h"
 #include "ui/sprefs_hotkeys.h"
 #include "ui/sprefs_interface.h"
+
+#include <vlc_config_cat.h>
+
+#include <QString>
+#include <QFont>
+#include <QToolButton>
+#include <QButtonGroup>
+#include <QUrl>
+#include <QVBoxLayout>
 
 #define ICON_HEIGHT 64
 #define BUTTON_HEIGHT 74

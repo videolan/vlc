@@ -21,14 +21,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <QTabWidget>
-#include <QBoxLayout>
-
+#include "qt4.hpp"
 #include "dialogs/extended.hpp"
 #include "dialogs_provider.hpp"
 #include "util/qvlcframe.hpp"
 #include "components/extended_panels.hpp"
-#include "qt4.hpp"
+
+#include <QTabWidget>
+#include <QBoxLayout>
+#include <QHBoxLayout>
 
 ExtendedDialog *ExtendedDialog::instance = NULL;
 

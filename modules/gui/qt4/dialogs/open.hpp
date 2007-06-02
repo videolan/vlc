@@ -28,7 +28,6 @@
 
 #include "util/qvlcframe.hpp"
 #include "dialogs_provider.hpp"
-
 #include "ui/open.h"
 #include "components/open.hpp"
 

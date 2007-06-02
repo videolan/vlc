@@ -24,9 +24,10 @@
 #ifndef _PREFSTREE_H_
 #define _PREFSTREE_H_
 
-#include <QTreeWidget>
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
+
+#include <QTreeWidget>
 
 enum
 {

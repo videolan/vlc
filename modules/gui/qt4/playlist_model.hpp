@@ -24,14 +24,14 @@
 #ifndef _PLAYLIST_MODEL_H_
 #define _PLAYLIST_MODEL_H_
 
+#include <vlc/vlc.h>
+#include <vlc_input.h>
+#include <vlc_playlist.h>
+
 #include <QModelIndex>
 #include <QObject>
 #include <QEvent>
 #include <QMimeData>
-
-#include <vlc/vlc.h>
-#include <vlc_input.h>
-#include <vlc_playlist.h>
 
 class PLModel;
 
