@@ -48,31 +48,31 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
     setWindowTitle( qtr( "Media information" ) );
     resize( 600 , 450 );
 
-    QGridLayout *layout = new QGridLayout(this);
+    QGridLayout *layout = new QGridLayout( this );
 
     IT = new QTabWidget;
     MP = new MetaPanel( IT, p_intf );
     IT->addTab( MP, qtr( "&General" ) );
     EMP = new ExtraMetaPanel( IT, p_intf );
     IT->addTab( EMP, qtr( "&Extra Metadata" ) );
-    IP = new InfoPanel( IT, p_intf);
-    IT->addTab( IP, qtr("&Codec Details"));
+    IP = new InfoPanel( IT, p_intf );
+    IT->addTab( IP, qtr( "&Codec Details" ) );
     if( stats )
     {
         ISP = new InputStatsPanel( IT, p_intf );
-        IT->addTab(ISP, qtr("&Stats"));
+        IT->addTab( ISP, qtr( "&Stats" ) );
     }
 
-    QPushButton *closeButton = new QPushButton(qtr("&Close"));
+    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     closeButton->setDefault( true );
 
-    layout->addWidget( IT, 0, 0, 1, 3);
-    layout->addWidget(closeButton,1,2);
+    layout->addWidget( IT, 0, 0, 1, 3 );
+    layout->addWidget( closeButton, 1, 2 );
 
     BUTTONACT( closeButton, close() );
-    ON_TIMEOUT( update() );
 
     if( mainInput ) {
+        ON_TIMEOUT( update() );
         var_AddCallback( THEPL, "item-change", ItemChanged, this );
     }
 }
@@ -88,11 +88,11 @@ MediaInfoDialog::~MediaInfoDialog()
 void MediaInfoDialog::showTab(int i_tab=0)
 {
     this->show();
-    IT->setCurrentIndex(i_tab);
+    IT->setCurrentIndex( i_tab );
 }
 
 static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
-                        vlc_value_t oldval, vlc_value_t newval, void *param )
+        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     MediaInfoDialog *p_d = (MediaInfoDialog *)param;
     p_d->need_update = VLC_TRUE;
@@ -109,14 +109,14 @@ void MediaInfoDialog::setInput(input_item_t *p_input)
 
 void MediaInfoDialog::update()
 {
-    msg_Dbg( p_intf, "updating" );
+    msg_Dbg( p_intf, "updating MetaData Info" );
     /* Timer runs at 150 ms, dont' update more than 2 times per second */
     if( i_runs % 3 != 0 ) return;
     i_runs++;
 
     /* Get Input and clear if non-existant */
     input_thread_t *p_input =
-             MainInputManager::getInstance( p_intf )->getInput();
+                     MainInputManager::getInstance( p_intf )->getInput();
     if( !p_input || p_input->b_dead )
     {
         clear();
@@ -134,7 +134,7 @@ void MediaInfoDialog::update()
 }
 
 void MediaInfoDialog::update( input_item_t *p_item, bool update_info,
-        bool update_meta )
+                                                    bool update_meta )
 {
     if( update_info )
         IP->update( p_item );
@@ -154,7 +154,6 @@ void MediaInfoDialog::clear()
     EMP->clear();
     if( stats ) ISP->clear();
 }
-
 
 void MediaInfoDialog::close()
 {

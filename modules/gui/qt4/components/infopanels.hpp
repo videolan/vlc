@@ -29,7 +29,6 @@
 #include <vlc_meta.h>
 
 #include <QWidget>
-#include <QTabWidget>
 
 #ifdef HAVE_LIMITS_H
 #   include <limits.h>

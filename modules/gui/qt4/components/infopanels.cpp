@@ -365,4 +365,3 @@ void InfoPanel::clear()
 {
     InfoTree->clear();
 }
-
