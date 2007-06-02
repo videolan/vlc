@@ -44,12 +44,12 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     int line = 0;
     QGridLayout *l = new QGridLayout( this );
 #define ADD_META( string, widget ) {                            \
-    l->addWidget( new QLabel( qfu( string ) ), line, 0 );       \
+    l->addWidget( new QLabel( qtr( string ) ), line, 0 );       \
     widget = new QLabel( "" );                                  \
     l->addWidget( widget, line, 1 );                            \
     line++;            }
-    ADD_META( _( "Name" ), name_text );
-    ADD_META( _( "URI" ), uri_text );
+    ADD_META( qtr( "Name" ), name_text );
+    ADD_META( qtr( "URI" ), uri_text );
     ADD_META( VLC_META_ARTIST, artist_text );
     ADD_META( VLC_META_GENRE, genre_text );
     ADD_META( VLC_META_COPYRIGHT, copyright_text );

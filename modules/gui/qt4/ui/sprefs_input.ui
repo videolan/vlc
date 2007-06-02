@@ -23,7 +23,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
-      <string>Disk Devices</string>
+      <string>_("Disk Devices")</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -35,7 +35,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>Disk Device</string>
+         <string>_("Disk Device")</string>
         </property>
        </widget>
       </item>
@@ -45,7 +45,7 @@
       <item row="0" column="2" >
        <widget class="QPushButton" name="DVDBrowse" >
         <property name="text" >
-         <string>Browse...</string>
+         <string>_("Browse...")</string>
         </property>
        </widget>
       </item>
@@ -55,7 +55,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2" >
      <property name="title" >
-      <string>Network</string>
+      <string>_("Network")</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -67,14 +67,14 @@
       <item row="2" column="0" colspan="2" >
        <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>Default Network caching in ms</string>
+         <string>_("Default Network caching in ms")</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0" >
        <widget class="QLabel" name="label_7" >
         <property name="text" >
-         <string>HTTP Proxy</string>
+         <string>_("HTTP Proxy")</string>
         </property>
        </widget>
       </item>
@@ -113,7 +113,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
-         <string>Server Default Port</string>
+         <string>_("Server Default Port")</string>
         </property>
        </widget>
       </item>
@@ -123,7 +123,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="title" >
-      <string>Codecs / Muxers</string>
+      <string>_("Codecs / Muxers")</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -135,7 +135,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label_5" >
         <property name="text" >
-         <string>Post-Processing Quality</string>
+         <string>_("Post-Processing Quality")</string>
         </property>
        </widget>
       </item>
@@ -158,7 +158,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="label_6" >
         <property name="text" >
-         <string>Repair AVI files</string>
+         <string>_("Repair AVI files")</string>
         </property>
        </widget>
       </item>
@@ -168,14 +168,14 @@
       <item row="3" column="0" colspan="2" >
        <widget class="QCheckBox" name="systemCodecBox" >
         <property name="text" >
-         <string>Use system codecs if available (better quality)</string>
+         <string>_("Use system codecs if available (better quality)")</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0" colspan="2" >
        <widget class="QCheckBox" name="RTSP_TCPBox" >
         <property name="text" >
-         <string>Use RTP over RTSP (TCP)</string>
+         <string>_("Use RTP over RTSP (TCP)")</string>
         </property>
        </widget>
       </item>
@@ -185,7 +185,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_4" >
      <property name="title" >
-      <string>Access Filter</string>
+      <string>_("Access Filter")</string>
      </property>
      <layout class="QHBoxLayout" >
       <property name="margin" >
@@ -197,21 +197,21 @@
       <item>
        <widget class="QCheckBox" name="timeshiftBox" >
         <property name="text" >
-         <string>Timeshift</string>
+         <string>_("Timeshift")</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="RecordBox" >
         <property name="text" >
-         <string>Record</string>
+         <string>_("Record")</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="DumpBox" >
         <property name="text" >
-         <string>Dump</string>
+         <string>_("Dump")</string>
         </property>
        </widget>
       </item>

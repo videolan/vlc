@@ -23,7 +23,7 @@
    <item>
     <widget class="QCheckBox" name="enableAudio" >
      <property name="text" >
-      <string>Enable audio</string>
+      <string>_("Enable audio")</string>
      </property>
      <property name="checked" >
       <bool>true</bool>
@@ -33,7 +33,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="title" >
-      <string>General Audio</string>
+      <string>_("General Audio")</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -45,7 +45,7 @@
       <item row="2" column="0" >
        <widget class="QLabel" name="label_8" >
         <property name="text" >
-         <string>Force detection of Dolby Surround</string>
+         <string>_("Force detection of Dolby Surround")</string>
         </property>
        </widget>
       </item>
@@ -73,14 +73,14 @@
       <item row="1" column="0" colspan="2" >
        <widget class="QCheckBox" name="spdifBox" >
         <property name="text" >
-         <string>Use S/PDIF when available</string>
+         <string>_("Use S/PDIF when available")</string>
         </property>
        </widget>
       </item>
       <item row="3" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>Preferred audio language</string>
+         <string>_("Preferred audio language")</string>
         </property>
        </widget>
       </item>
@@ -108,7 +108,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
-         <string>Default volume</string>
+         <string>_("Default volume")</string>
         </property>
        </widget>
       </item>
@@ -136,21 +136,21 @@
       <item row="4" column="2" >
        <widget class="QPushButton" name="fileBrowseButton" >
         <property name="text" >
-         <string>Browse...</string>
+         <string>_("Browse...")</string>
         </property>
        </widget>
       </item>
       <item row="4" column="0" >
        <widget class="QLabel" name="label_7" >
         <property name="text" >
-         <string>File</string>
+         <string>_("File")</string>
         </property>
        </widget>
       </item>
       <item row="3" column="2" >
        <widget class="QPushButton" name="OSSBrowse" >
         <property name="text" >
-         <string>Browse...</string>
+         <string>_("Browse...")</string>
         </property>
        </widget>
       </item>
@@ -160,14 +160,14 @@
       <item row="3" column="0" >
        <widget class="QLabel" name="OSSLabel" >
         <property name="text" >
-         <string>OSS Device</string>
+         <string>_("OSS Device")</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0" >
        <widget class="QLabel" name="DirectXLabel" >
         <property name="text" >
-         <string>DirectX Device</string>
+         <string>_("DirectX Device")</string>
         </property>
        </widget>
       </item>
@@ -177,7 +177,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="alsaLabel" >
         <property name="text" >
-         <string>Alsa Device</string>
+         <string>_("Alsa Device")</string>
         </property>
        </widget>
       </item>
@@ -190,7 +190,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
-         <string>Type</string>
+         <string>_("Type")</string>
         </property>
        </widget>
       </item>
@@ -200,7 +200,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
-      <string>Effects</string>
+      <string>_("Effects")</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -215,21 +215,21 @@
       <item row="0" column="0" >
        <widget class="QCheckBox" name="headphoneEffect" >
         <property name="text" >
-         <string>Headphone surround effect</string>
+         <string>_("Headphone surround effect")</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0" >
        <widget class="QCheckBox" name="volumeNormalizer" >
         <property name="text" >
-         <string>Volume normalizer</string>
+         <string>_("Volume normalizer")</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0" >
        <widget class="QLabel" name="label_5" >
         <property name="text" >
-         <string>Visualisation</string>
+         <string>_("Visualisation")</string>
         </property>
        </widget>
       </item>
