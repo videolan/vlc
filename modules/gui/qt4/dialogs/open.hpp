@@ -26,17 +26,15 @@
 
 #include <vlc/vlc.h>
 
-#include "ui/open.h"
 #include "util/qvlcframe.hpp"
-#include "components/open.hpp"
-
 #include "dialogs_provider.hpp"
 
-#include <QTabWidget>
-#include <QBoxLayout>
-#include <QString>
+#include "ui/open.h"
+#include "components/open.hpp"
 
+class QString;
 class QToolButton;
+class QTabWidget;
 
 class OpenDialog : public QVLCDialog
 {

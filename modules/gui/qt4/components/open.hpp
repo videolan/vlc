@@ -26,8 +26,6 @@
 #define _OPENPANELS_H_
 
 #include <vlc/vlc.h>
-#include <QWidget>
-#include <QString>
 #include <QFileDialog>
 
 #include "ui/open_file.h"
@@ -35,13 +33,21 @@
 #include "ui/open_net.h"
 #include "ui/open_capture.h"
 
+#ifdef HAVE_LIMITS_H
+#   include <limits.h>
+#endif
+
+#define setMaxBound( spinbox ) spinbox->setRange ( 0, INT_MAX );
+
 #define V4L_DEVICE         0x0
 #define PVR_DEVICE         0x1
 #define DVB_DEVICE         0x2
 #define BDA_DEVICE         0x4
 #define DSHOW_DEVICE       0x8
 
+class QWidget;
 class QLineEdit;
+class QString;
 
 class OpenPanel: public QWidget
 {

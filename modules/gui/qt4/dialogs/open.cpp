@@ -21,18 +21,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "qt4.hpp"
+#include "util/qvlcframe.hpp"
+#include "input_manager.hpp"
+
+#include "dialogs/open.hpp"
+#include "components/open.hpp"
+
 #include <QTabWidget>
 #include <QGridLayout>
 #include <QFileDialog>
 #include <QRegExp>
 #include <QMenu>
-#include "dialogs/open.hpp"
-#include "components/open.hpp"
-
-#include "qt4.hpp"
-#include "util/qvlcframe.hpp"
-
-#include "input_manager.hpp"
 
 OpenDialog *OpenDialog::instance = NULL;
 

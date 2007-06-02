@@ -35,10 +35,6 @@
 #include <QStackedLayout>
 #include <QListView>
 
-#ifdef HAVE_LIMITS_H
-#   include <limits.h>
-#endif
-
 /**************************************************************************
  * Open Files and subtitles                                               *
  **************************************************************************/
@@ -478,7 +474,6 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 #define CuMRL( widget, slot ) CONNECT( widget , slot , this, updateMRL() );
 
-#define setMaxBound( spinbox ) spinbox->setRange ( 0, INT_MAX );
 
     /*******
      * V4L *
@@ -643,6 +638,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     bdaFreq->setAlignment( Qt::AlignRight );
     bdaFreq->setSuffix(" kHz");
     bdaFreq->setSingleStep( 1000 );
+    bdaFreq->setAccelerated( true );
     setMaxBound( bdaFreq )
     bdaPropLayout->addWidget( bdaFreq, 0, 1 );
 
