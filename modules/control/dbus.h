@@ -179,6 +179,9 @@ const char* psz_introspection_xml_data_tracklist =
 "    <method name=\"Repeat\">\n"
 "      <arg type=\"b\" direction=\"in\" />\n"
 "    </method>\n"
+"    <method name=\"Random\">\n"
+"      <arg type=\"b\" direction=\"in\" />\n"
+"    </method>\n"
 "  </interface>\n"
 "</node>\n"
 ;

@@ -573,6 +573,37 @@ DBUS_METHOD( Repeat )
     REPLY_SEND;
 }
 
+DBUS_METHOD( Random )
+{
+    REPLY_INIT;
+    OUT_ARGUMENTS;
+
+    DBusError error;
+    dbus_bool_t b_random;
+    vlc_value_t val;
+    playlist_t* p_playlist = NULL;
+    
+    dbus_error_init( &error );
+    dbus_message_get_args( p_from, &error,
+            DBUS_TYPE_BOOLEAN, &b_random,
+            DBUS_TYPE_INVALID );
+    
+    if( dbus_error_is_set( &error ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+                error.message );
+        dbus_error_free( &error );
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
+    val.b_bool = ( b_random == TRUE ) ? VLC_TRUE : VLC_FALSE ;
+    
+    p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    var_Set ( p_playlist, "random", val );
+    pl_Release( ((vlc_object_t*) p_this) );
+
+    REPLY_SEND;
+}
 /*****************************************************************************
  * Introspection method
  *****************************************************************************/
@@ -663,6 +694,7 @@ DBUS_METHOD( handle_tracklist )
     METHOD_FUNC( "DelTrack",                DelTrack );
     METHOD_FUNC( "Loop",                    Loop );
     METHOD_FUNC( "Repeat",                  Repeat );
+    METHOD_FUNC( "Random",                  Random );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
