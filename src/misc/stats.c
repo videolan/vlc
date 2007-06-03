@@ -135,6 +135,20 @@ int __stats_Get( vlc_object_t *p_this, counter_t *p_counter, vlc_value_t *val )
     return VLC_SUCCESS;;
 }
 
+input_stats_t *stats_NewInputStats( input_thread_t *p_input )
+{
+    input_stats_t *p_stats = malloc( sizeof(input_stats_t) );
+
+    if( !p_stats )
+        return NULL;
+
+    memset( p_stats, 0, sizeof(*p_stats) );
+    vlc_mutex_init( p_input, &p_stats->lock );
+    stats_ReinitInputStats( p_stats );
+
+    return p_stats;
+}
+
 void stats_ComputeInputStats( input_thread_t *p_input, input_stats_t *p_stats )
 {
     if( !p_input->p_libvlc->b_stats ) return;

@@ -452,14 +452,17 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_WHEN_PLAYED )
     {
-        if( p_input->p_meta && EMPTY_STR( p_input->p_meta->psz_arturl ) )
+        vlc_bool_t b_has_art;
+
+        vlc_mutex_lock( &p_input->lock );
+        /* p_input->p_meta should not be null after a successfull CreateThread */
+        b_has_art = p_input->p_meta && !EMPTY_STR( p_input->p_meta->psz_arturl );
+        vlc_mutex_unlock( &p_input->lock );
+
+        if( !b_has_art )
         {
             PL_DEBUG( "requesting art for %s", p_input->psz_name );
             playlist_AskForArtEnqueue( p_playlist, p_input );
-        }
-        else if( !p_input->p_meta )
-        {
-            PL_DEBUG2( "unable to request art for %s, no meta", p_input->psz_name );
         }
     }
 

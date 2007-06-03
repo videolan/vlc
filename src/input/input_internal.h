@@ -91,9 +91,6 @@ struct input_thread_private_t
     int i_attachment;
     input_attachment_t **attachment;
 
-    /* Global meta datas FIXME move to input_item_t ? */
-    vlc_meta_t  *p_meta;
-
     /* Output */
     es_out_t    *p_es_out;
     sout_instance_t *p_sout;            /* XXX Move it to es_out ? */
@@ -131,7 +128,8 @@ struct input_thread_private_t
     int i_control;
     struct
     {
-        /* XXX: val isn't duplicated so it won't works with string */
+        /* XXX for string value you have to allocate it before calling
+         * input_ControlPush */
         int         i_type;
         vlc_value_t val;
     } control[INPUT_CONTROL_FIFO_SIZE];
@@ -225,9 +223,15 @@ vlc_bool_t  input_MetaSatisfied ( playlist_t*, input_item_t*,
                                   uint32_t*, uint32_t* );
 int         input_DownloadAndCacheArt ( playlist_t *, input_item_t * );
 
+/* Becarefull; p_item lock HAS to be taken */
+void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input );
+
 /***************************************************************************
  * Internal prototypes
  ***************************************************************************/
+
+/* misc/stats.c */
+input_stats_t *stats_NewInputStats( input_thread_t *p_input );
 
 /* input.c */
 #define input_CreateThreadExtended(a,b,c,d) __input_CreateThreadExtended(VLC_OBJECT(a),b,c,d)

@@ -498,9 +498,13 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 b_preparsed = VLC_TRUE;
                 stats_TimerStart( p_playlist, "Preparse run",
                                   STATS_TIMER_PREPARSE );
-                PL_UNLOCK;
-                input_Preparse( p_playlist, p_current );
-                PL_LOCK;
+                /* Do not preparse if it is already done (like by playing it) */
+                if( !p_current->p_meta || !(p_current->p_meta->i_status & ITEM_PREPARSED ) )
+                {
+                    PL_UNLOCK;
+                    input_Preparse( p_playlist, p_current );
+                    PL_LOCK;
+                }
                 stats_TimerStop( p_playlist, STATS_TIMER_PREPARSE );
             }
             PL_UNLOCK;
@@ -621,7 +625,24 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
             }
             else
             {
-                int i_ret = input_ArtFind( p_playlist, p_item );
+                int i_ret;
+
+                /* Check if it is not yet preparsed and if so wait for it (at most 0.5s)
+                 * (This can happen if we fetch art on play)
+                 * FIXME this doesn't work if we need to fetch meta before art ... */
+                for( i_ret = 0; i_ret < 10 && !(p_item->p_meta->i_status & ITEM_PREPARSED ); i_ret++ )
+                {
+                    vlc_bool_t b_break;
+                    PL_LOCK;
+                    b_break = ( !p_playlist->p_input || input_GetItem(p_playlist->p_input) != p_item  ||
+                                p_playlist->p_input->b_die || p_playlist->p_input->b_eof || p_playlist->p_input->b_error );
+                    PL_UNLOCK;
+                    if( b_break )
+                        break;
+                    msleep( 50000 );
+                }
+                
+                i_ret = input_ArtFind( p_playlist, p_item );
                 if( i_ret == 1 )
                 {
                     PL_DEBUG("downloading art for %s", p_item->psz_name );

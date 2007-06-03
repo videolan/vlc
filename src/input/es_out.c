@@ -478,10 +478,12 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     }
 
     /* Update now playing */
+    vlc_mutex_lock( &p_input->p->input.p_item->lock );
     vlc_meta_SetNowPlaying( p_input->p->input.p_item->p_meta,
                             p_pgrm->psz_now_playing );
     vlc_meta_SetPublisher( p_input->p->input.p_item->p_meta,
                            p_pgrm->psz_publisher );
+    vlc_mutex_unlock( &p_input->p->input.p_item->lock );
 
     var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
 }
@@ -658,7 +660,11 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
     if( psz_provider )
     {
         if( p_sys->p_pgrm == p_pgrm )
+        {
+            vlc_mutex_lock( &p_input->p->input.p_item->lock );
             vlc_meta_SetPublisher( p_input->p->input.p_item->p_meta, psz_provider );
+            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+        }
         input_Control( p_input, INPUT_ADD_INFO, psz_cat, _(VLC_META_PUBLISHER), psz_provider );
     }
     for( i = 0; i < p_meta->i_extra; i++ )
@@ -666,20 +672,6 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
 
     free( psz_cat );
 }
-#define TAB_INSERT_CAST( cast, count, tab, p, index ) do { \
-    if( (count) > 0 )                                                     \
-        (tab) = cast realloc( tab, sizeof( void ** ) * ( (count) + 1 ) ); \
-    else                                                \
-        (tab) = cast malloc( sizeof( void ** ) );       \
-    if( (count) - (index) > 0 )                         \
-        memmove( (void**)(tab) + (index) + 1,           \
-                 (void**)(tab) + (index),               \
-                 ((count) - (index)) * sizeof(*(tab)) );\
-    (tab)[(index)] = (p);                               \
-    (count)++;                                          \
-} while(0)
-
-#define TAB_INSERT( count, tab, p, index ) TAB_INSERT_CAST( , count, tab, p, index )
 
 static void vlc_epg_Merge( vlc_epg_t *p_dst, const vlc_epg_t *p_src )
 {
@@ -785,20 +777,19 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
     if( p_pgrm->psz_now_playing )
         free( p_pgrm->psz_now_playing );
     p_pgrm->psz_now_playing = NULL;
-
     if( p_epg->p_current && p_epg->p_current->psz_name && *p_epg->p_current->psz_name )
-    {
         p_pgrm->psz_now_playing = strdup( p_epg->p_current->psz_name );
-        if( p_pgrm == p_sys->p_pgrm )
-            vlc_meta_SetNowPlaying( p_input->p->input.p_item->p_meta, p_pgrm->psz_now_playing );
+
+    vlc_mutex_lock( &p_input->p->input.p_item->lock );
+    if( p_pgrm == p_sys->p_pgrm )
+        vlc_meta_SetNowPlaying( p_input->p->input.p_item->p_meta, p_pgrm->psz_now_playing );
+    vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+
+    if( p_pgrm->psz_now_playing )
         input_Control( p_input, INPUT_ADD_INFO, psz_cat, _(VLC_META_NOW_PLAYING), p_pgrm->psz_now_playing );
-    }
     else
-    {
-        if( p_pgrm == p_sys->p_pgrm )
-            vlc_meta_SetNowPlaying( p_input->p->input.p_item->p_meta, NULL );
         input_Control( p_input, INPUT_DEL_INFO, psz_cat, _(VLC_META_NOW_PLAYING) );
-    }
+
     free( psz_cat );
 }
 

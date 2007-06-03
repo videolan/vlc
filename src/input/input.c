@@ -65,7 +65,6 @@ static vlc_bool_t Control( input_thread_t *, int, vlc_value_t );
 
 static int  UpdateFromAccess( input_thread_t * );
 static int  UpdateFromDemux( input_thread_t * );
-static int  UpdateMeta( input_thread_t * );
 
 static void UpdateItemLength( input_thread_t *, int64_t i_length );
 
@@ -75,11 +74,14 @@ static input_source_t *InputSourceNew( input_thread_t *);
 static int  InputSourceInit( input_thread_t *, input_source_t *,
                              const char *, const char *psz_forced_demux );
 static void InputSourceClean( input_source_t * );
+/* TODO */
+//static void InputGetAttachments( input_thread_t *, input_source_t * );
 
 static void SlaveDemux( input_thread_t *p_input );
 static void SlaveSeek( input_thread_t *p_input );
 
-static void InputMetaUser( input_thread_t *p_input );
+static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta );
+static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta );
 
 static sout_instance_t *SoutFind( vlc_object_t *p_parent, input_item_t *p_item, vlc_bool_t * );
 static void SoutKeep( sout_instance_t * );
@@ -152,7 +154,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->i_rate  = INPUT_RATE_DEFAULT;
     TAB_INIT( p_input->p->i_bookmark, p_input->p->bookmark );
     TAB_INIT( p_input->p->i_attachment, p_input->p->attachment );
-    p_input->p->p_meta  = NULL;
     p_input->p->p_es_out = NULL;
     p_input->p->p_sout  = NULL;
     p_input->p->b_sout_keep  = VLC_FALSE;
@@ -172,15 +173,13 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->input.b_eof = VLC_FALSE;
     p_input->p->input.i_cr_average = 0;
 
+    vlc_mutex_lock( &p_item->lock );
     if( !p_input->p->input.p_item->p_meta )
         p_input->p->input.p_item->p_meta = vlc_meta_New();
 
     if( !p_item->p_stats )
-    {
-        p_item->p_stats = (input_stats_t*)malloc( sizeof( input_stats_t ) );
-        vlc_mutex_init( p_input, &p_item->p_stats->lock );
-        stats_ReinitInputStats( p_item->p_stats );
-    }
+        p_item->p_stats = stats_NewInputStats( p_input );
+    vlc_mutex_unlock( &p_item->lock );
 
     /* No slave */
     p_input->p->i_slave = 0;
@@ -254,7 +253,9 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* Remove 'Now playing' info as it is probably outdated */
     input_Control( p_input, INPUT_DEL_INFO, _(VLC_META_INFO_CAT), VLC_META_NOW_PLAYING );
+    vlc_mutex_lock( &p_item->lock );
     vlc_meta_SetNowPlaying( p_item->p_meta, NULL );
+    vlc_mutex_unlock( &p_item->lock );
 
     /* */
     if( p_input->b_preparsing )
@@ -898,7 +899,6 @@ static int Init( input_thread_t * p_input )
     {
         var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
         UpdateItemLength( p_input, val.i_time );
-        p_input->p->input.p_item->i_duration = val.i_time;
     }
 
     /* Start title/chapter */
@@ -1120,9 +1120,10 @@ static int Init( input_thread_t * p_input )
         }
     }
 
-    p_meta = p_input->p->input.p_item->p_meta;
+    p_meta = vlc_meta_New();
     /* Get meta data from users */
-    InputMetaUser( p_input );
+    InputMetaUser( p_input, p_meta );
+
     /* Get meta data from master input */
     demux2_Control( p_input->p->input.p_demux, DEMUX_GET_META, p_meta );
 
@@ -1146,7 +1147,7 @@ static int Init( input_thread_t * p_input )
         }
     }
 
-    UpdateMeta( p_input );
+    InputUpdateMeta( p_input, p_meta );
 
     if( !p_input->b_preparsing )
     {
@@ -1846,7 +1847,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 if( !InputSourceInit( p_input, slave, val.psz_string, NULL ) )
                 {
-                    vlc_meta_t *p_meta = p_input->p->input.p_item->p_meta;
+                    vlc_meta_t *p_meta;
                     int64_t i_time;
 
                     /* Add the slave */
@@ -1872,10 +1873,11 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                     }
 
                     /* Get meta (access and demux) */
+                    p_meta = vlc_meta_New();
                     access2_Control( slave->p_access, ACCESS_GET_META,
                                      p_meta );
                     demux2_Control( slave->p_demux, DEMUX_GET_META, p_meta );
-                    UpdateMeta( p_input );
+                    InputUpdateMeta( p_input, p_meta );
 
                     TAB_APPEND( p_input->p->i_slave, p_input->p->slave, slave );
                 }
@@ -1980,9 +1982,9 @@ static int UpdateFromAccess( input_thread_t *p_input )
     if( p_access->info.i_update & INPUT_UPDATE_META )
     {
         /* TODO maybe multi - access ? */
-        vlc_meta_t *p_meta = p_input->p->input.p_item->p_meta;
+        vlc_meta_t *p_meta = vlc_meta_New();
         access2_Control( p_input->p->input.p_access,ACCESS_GET_META, p_meta );
-        UpdateMeta( p_input );
+        InputUpdateMeta( p_input, p_meta );
         var_SetBool( p_input, "item-change", p_input->p->input.p_item->i_id );
         p_access->info.i_update &= ~INPUT_UPDATE_META;
     }
@@ -2014,23 +2016,6 @@ static int UpdateFromAccess( input_thread_t *p_input )
     }
 
     return 1;
-}
-
-/*****************************************************************************
- * UpdateMeta:
- *****************************************************************************/
-static int  UpdateMeta( input_thread_t *p_input )
-{
-    vlc_meta_t *p_meta = p_input->p->input.p_item->p_meta;
-    if( !p_meta )
-        return VLC_SUCCESS;
-
-    if( p_meta->psz_title && !p_input->p->input.p_item->b_fixed_name )
-        input_Control( p_input, INPUT_SET_NAME, p_meta->psz_title );
-
-    /** \todo handle sout meta */
-
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -2327,8 +2312,9 @@ static int InputSourceInit( input_thread_t *p_input,
                 in->b_title_demux = VLC_TRUE;
             }
         }
-        /* get attachment */
-        if( !p_input->b_preparsing )
+        /* get attachment
+         * FIXME improve for b_preparsing: move it after GET_META and check psz_arturl */
+        if( 1 || !p_input->b_preparsing )
         {
             int i_attachment;
             input_attachment_t **attachment;
@@ -2472,9 +2458,8 @@ static void SlaveSeek( input_thread_t *p_input )
 /*****************************************************************************
  * InputMetaUser:
  *****************************************************************************/
-static void InputMetaUser( input_thread_t *p_input )
+static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
 {
-    vlc_meta_t *p_meta = p_input->p->input.p_item->p_meta;
     vlc_value_t val;
 
     if( !p_meta ) return;
@@ -2496,6 +2481,60 @@ static void InputMetaUser( input_thread_t *p_input )
     GET_META( date, "meta-date" );
     GET_META( url, "meta-url" );
 #undef GET_META
+}
+
+/*****************************************************************************
+ * InputUpdateMeta: merge p_item meta data with p_meta taking care of
+ * arturl and locking issue.
+ *****************************************************************************/
+static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
+{
+    input_item_t *p_item = p_input->p->input.p_item;
+    char *psz_title = NULL;
+
+    if( !p_meta )
+        return;
+
+    vlc_mutex_lock( &p_item->lock );
+    if( p_meta->psz_title && !p_item->b_fixed_name )
+        psz_title = strdup( p_meta->psz_title );
+
+    if( p_item->p_meta )
+    {
+        char *psz_arturl = p_item->p_meta->psz_arturl;
+        p_item->p_meta->psz_arturl = NULL;
+
+        vlc_meta_Merge( p_item->p_meta, p_meta );
+
+        if( psz_arturl && *psz_arturl )
+            vlc_meta_SetArtURL( p_item->p_meta, psz_arturl );
+
+        vlc_meta_Delete( p_meta );
+    }
+    else
+    {
+        p_item->p_meta = p_meta;
+    }
+    if( p_item->p_meta->psz_arturl && !strncmp( p_item->p_meta->psz_arturl, "attachment://", strlen("attachment") ) )
+    {
+        /* Don't look for art cover if sout
+         * XXX It can change when sout has meta data support */
+        if( p_input->p->p_sout && !p_input->b_preparsing )
+            vlc_meta_SetArtURL( p_item->p_meta, "" );
+        else
+            input_ExtractAttachmentAndCacheArt( p_input );
+    }
+
+    p_item->p_meta->i_status |= ITEM_PREPARSED;
+    vlc_mutex_unlock( &p_item->lock );
+
+    if( psz_title )
+    {
+        input_Control( p_input, INPUT_SET_NAME, psz_title );
+        free( psz_title );
+    }
+
+    /** \todo handle sout meta */
 }
 
 /*****************************************************************************
@@ -2524,8 +2563,6 @@ void MRLSplit( vlc_object_t *p_input, char *psz_dup,
         psz_path = psz_dup;
     }
     else
-#else
-    (void)p_input;
 #endif
 
     if( psz )
