@@ -90,23 +90,23 @@ struct vlc_meta_t
     if( meta->psz_##var ) free( meta->psz_##var ); \
     meta->psz_##var = str ? strdup( str ) : NULL; } while(0)
 
-#define vlc_meta_SetTitle( meta, b ) vlc_meta_Set( meta, title, b );
-#define vlc_meta_SetArtist( meta, b ) vlc_meta_Set( meta, artist, b );
-#define vlc_meta_SetGenre( meta, b ) vlc_meta_Set( meta, genre, b );
-#define vlc_meta_SetCopyright( meta, b ) vlc_meta_Set( meta, copyright, b );
-#define vlc_meta_SetAlbum( meta, b ) vlc_meta_Set( meta, album, b );
-#define vlc_meta_SetTracknum( meta, b ) vlc_meta_Set( meta, tracknum, b );
-#define vlc_meta_SetDescription( meta, b ) vlc_meta_Set( meta, description, b );
-#define vlc_meta_SetRating( meta, b ) vlc_meta_Set( meta, rating, b );
-#define vlc_meta_SetDate( meta, b ) vlc_meta_Set( meta, date, b );
-#define vlc_meta_SetSetting( meta, b ) vlc_meta_Set( meta, setting, b );
-#define vlc_meta_SetURL( meta, b ) vlc_meta_Set( meta, url, b );
-#define vlc_meta_SetLanguage( meta, b ) vlc_meta_Set( meta, language, b );
-#define vlc_meta_SetNowPlaying( meta, b ) vlc_meta_Set( meta, nowplaying, b );
-#define vlc_meta_SetPublisher( meta, b ) vlc_meta_Set( meta, publisher, b );
-#define vlc_meta_SetEncodedBy( meta, b ) vlc_meta_Set( meta, encodedby, b );
-#define vlc_meta_SetArtURL( meta, b ) vlc_meta_Set( meta, arturl, b );
-#define vlc_meta_SetTrackID( meta, b ) vlc_meta_Set( meta, trackid, b );
+#define vlc_meta_SetTitle( meta, b ) vlc_meta_Set( meta, title, b )
+#define vlc_meta_SetArtist( meta, b ) vlc_meta_Set( meta, artist, b )
+#define vlc_meta_SetGenre( meta, b ) vlc_meta_Set( meta, genre, b )
+#define vlc_meta_SetCopyright( meta, b ) vlc_meta_Set( meta, copyright, b )
+#define vlc_meta_SetAlbum( meta, b ) vlc_meta_Set( meta, album, b )
+#define vlc_meta_SetTracknum( meta, b ) vlc_meta_Set( meta, tracknum, b )
+#define vlc_meta_SetDescription( meta, b ) vlc_meta_Set( meta, description, b )
+#define vlc_meta_SetRating( meta, b ) vlc_meta_Set( meta, rating, b )
+#define vlc_meta_SetDate( meta, b ) vlc_meta_Set( meta, date, b )
+#define vlc_meta_SetSetting( meta, b ) vlc_meta_Set( meta, setting, b )
+#define vlc_meta_SetURL( meta, b ) vlc_meta_Set( meta, url, b )
+#define vlc_meta_SetLanguage( meta, b ) vlc_meta_Set( meta, language, b )
+#define vlc_meta_SetNowPlaying( meta, b ) vlc_meta_Set( meta, nowplaying, b )
+#define vlc_meta_SetPublisher( meta, b ) vlc_meta_Set( meta, publisher, b )
+#define vlc_meta_SetEncodedBy( meta, b ) vlc_meta_Set( meta, encodedby, b )
+#define vlc_meta_SetArtURL( meta, b ) vlc_meta_Set( meta, arturl, b )
+#define vlc_meta_SetTrackID( meta, b ) vlc_meta_Set( meta, trackid, b )
 
 static inline vlc_meta_t *vlc_meta_New( void )
 {

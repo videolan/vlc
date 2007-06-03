@@ -136,6 +136,22 @@
         }                                       \
   } while(0)
 
+#define TAB_INSERT_CAST( cast, count, tab, p, index ) do { \
+    if( (count) > 0 )                           \
+        (tab) = cast realloc( tab, sizeof( void ** ) * ( (count) + 1 ) ); \
+    else                                        \
+        (tab) = cast malloc( sizeof( void ** ) );       \
+    if( (count) - (index) > 0 )                 \
+        memmove( (void**)(tab) + (index) + 1,   \
+                 (void**)(tab) + (index),       \
+                 ((count) - (index)) * sizeof(*(tab)) );\
+    (tab)[(index)] = (p);                       \
+    (count)++;                                  \
+} while(0)
+
+#define TAB_INSERT( count, tab, p, index )      \
+    TAB_INSERT_CAST( , count, tab, p, index )
+
 /**
  * Binary search in a sorted array. The key must be comparable by < and >
  * \param entries array of entries

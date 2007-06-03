@@ -94,12 +94,22 @@ struct decoder_owner_sys_t
 
 /* decoder_GetInputAttachment:
  */
-input_attachment_t *decoder_GetInputAttachment( decoder_t *p_dec, const char *psz_name )
+input_attachment_t *decoder_GetInputAttachment( decoder_t *p_dec,
+                                                const char *psz_name )
 {
     input_attachment_t *p_attachment;
     if( input_Control( p_dec->p_owner->p_input, INPUT_GET_ATTACHMENT, &p_attachment, psz_name ) )
         return NULL;
     return p_attachment;
+}
+/* decoder_GetInputAttachments:
+ */
+int decoder_GetInputAttachments( decoder_t *p_dec,
+                                 input_attachment_t ***ppp_attachment,
+                                 int *pi_attachment )
+{
+    return input_Control( p_dec->p_owner->p_input, INPUT_GET_ATTACHMENTS,
+                          ppp_attachment, pi_attachment );
 }
 
 /**
