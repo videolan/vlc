@@ -342,7 +342,7 @@ static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
     return i_result;
 }
 
-#ifdef __PLUGIN__
+#if defined(__PLUGIN__) || defined(__BUILTIN__)
 # warning CAN'T YOU SEE THIS IS AN INTERNAL HEADER?! '
 #else
 /* Stream */
