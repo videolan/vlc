@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ne\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-02 00:55+0100\n"
+"POT-Creation-Date: 2007-06-03 22:51+0100\n"
 "PO-Revision-Date: 2006-11-27 10:28+0545\n"
 "Last-Translator: Shiva Prasad Pokharel <pokharelshiva@hotmail.com>\n"
 "Language-Team: Nepali <info@mpp.org.np>\n"
@@ -40,7 +40,7 @@ msgid "General"
 msgstr "साधारण"
 
 #: include/vlc_config_cat.h:43
-#: modules/gui/qt4/components/simple_preferences.cpp:74
+#: modules/gui/qt4/components/simple_preferences.cpp:75
 #: modules/misc/dummy/dummy.c:65
 msgid "Interface"
 msgstr "इन्टरफेस"
@@ -78,8 +78,9 @@ msgstr "हटकुञ्जी सेटिङ"
 #: modules/gui/macosx/extended.m:70 modules/gui/macosx/intf.m:588
 #: modules/gui/macosx/output.m:170 modules/gui/macosx/playlistinfo.m:96
 #: modules/gui/macosx/wizard.m:420
-#: modules/gui/qt4/components/infopanels.cpp:137
-#: modules/gui/qt4/components/simple_preferences.cpp:76
+#: modules/gui/qt4/components/infopanels.cpp:234
+#: modules/gui/qt4/components/simple_preferences.cpp:77
+#: modules/gui/qt4/ui/sout.ui:449
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:336
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:850
 #: modules/gui/wxwidgets/extrapanel.cpp:178 modules/stream_out/transcode.c:258
@@ -121,6 +122,7 @@ msgid "These are general settings for audio output modules."
 msgstr "अडियो निर्गत मोड्युका लागि ति साधारण सेटिङ हुन्"
 
 #: include/vlc_config_cat.h:75 src/libvlc-module.c:1601
+#: modules/gui/qt4/ui/sout.ui:574
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:578
 #: modules/gui/wxwidgets/menus.cpp:282 modules/stream_out/transcode.c:290
 msgid "Miscellaneous"
@@ -134,8 +136,9 @@ msgstr "विविध अडियो सेटिङ र मोड्यु�
 #: src/libvlc-module.c:1288 modules/gui/macosx/extended.m:69
 #: modules/gui/macosx/intf.m:601 modules/gui/macosx/output.m:160
 #: modules/gui/macosx/playlistinfo.m:86 modules/gui/macosx/wizard.m:421
-#: modules/gui/qt4/components/infopanels.cpp:135
-#: modules/gui/qt4/components/simple_preferences.cpp:77
+#: modules/gui/qt4/components/infopanels.cpp:232
+#: modules/gui/qt4/components/simple_preferences.cpp:78
+#: modules/gui/qt4/ui/sout.ui:442
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:290
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:811
 #: modules/gui/wxwidgets/extrapanel.cpp:176 modules/misc/dummy/dummy.c:95
@@ -541,7 +544,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:1536 modules/gui/macosx/intf.m:1537
 #: modules/gui/macosx/intf.m:1538 modules/gui/macosx/playlist.m:450
 #: modules/gui/pda/pda_interface.c:262 modules/gui/pda/pda_interface.c:263
-#: modules/gui/qt4/main_interface.cpp:248 modules/gui/qt4/menus.cpp:434
+#: modules/gui/qt4/main_interface.cpp:250 modules/gui/qt4/menus.cpp:434
 #: modules/gui/qt4/menus.cpp:437
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:280
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:289
@@ -557,7 +560,7 @@ msgid "Fetch information"
 msgstr ""
 
 #: include/vlc_intf_strings.h:54 modules/gui/macosx/playlist.m:451
-#: modules/gui/pda/pda_interface.c:1254
+#: modules/gui/pda/pda_interface.c:1254 modules/gui/qt4/ui/streampanel.ui:50
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:284
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:291
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:106
@@ -718,7 +721,7 @@ msgstr "मेटा सूचना"
 #: modules/gui/beos/MediaControlView.cpp:1234 modules/gui/macosx/intf.m:583
 #: modules/gui/macosx/intf.m:584 modules/gui/macosx/open.m:170
 #: modules/gui/macosx/playlistinfo.m:57 modules/gui/macosx/wizard.m:390
-#: modules/gui/qt4/components/open.cpp:271
+#: modules/gui/qt4/components/open.cpp:267 modules/gui/qt4/ui/open_disk.ui:207
 #: modules/gui/wxwidgets/dialogs/open.cpp:756
 #: modules/gui/wxwidgets/dialogs/open.cpp:1657 modules/mux/asf.c:48
 msgid "Title"
@@ -840,7 +843,7 @@ msgstr "स्पेकट्रम"
 
 #: src/audio_output/input.c:129 modules/audio_filter/equalizer.c:69
 #: modules/gui/macosx/equalizer.m:139 modules/gui/macosx/equalizer.m:153
-#: modules/gui/macosx/intf.m:628 modules/gui/qt4/dialogs/extended.cpp:47
+#: modules/gui/macosx/intf.m:628 modules/gui/qt4/dialogs/extended.cpp:48
 #: modules/gui/wxwidgets/extrapanel.cpp:177
 msgid "Equalizer"
 msgstr "समकारी"
@@ -1014,7 +1017,7 @@ msgid "Type"
 msgstr "प्रकार"
 
 #: src/input/es_out.c:1792 modules/codec/faad.c:334
-#: modules/gui/macosx/output.m:176
+#: modules/gui/macosx/output.m:176 modules/gui/qt4/ui/sout.ui:496
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:857
 msgid "Channels"
 msgstr "च्यानल"
@@ -1033,7 +1036,7 @@ msgid "Bits per sample"
 msgstr "प्रति नमूना बिट"
 
 #: src/input/es_out.c:1809 modules/access_output/shout.c:87
-#: modules/access/pvr.c:89 modules/gui/qt4/components/open.cpp:558
+#: modules/access/pvr.c:89 modules/gui/qt4/components/open.cpp:553
 msgid "Bitrate"
 msgstr "बिटदर"
 
@@ -1086,7 +1089,8 @@ msgstr "कार्यक्रम"
 
 #: src/input/var.c:145 modules/gui/beos/MediaControlView.cpp:1235
 #: modules/gui/macosx/intf.m:585 modules/gui/macosx/intf.m:586
-#: modules/gui/macosx/open.m:171 modules/gui/wxwidgets/dialogs/open.cpp:761
+#: modules/gui/macosx/open.m:171 modules/gui/qt4/ui/open_disk.ui:181
+#: modules/gui/wxwidgets/dialogs/open.cpp:761
 msgid "Chapter"
 msgstr "अध्याय"
 
@@ -1129,13 +1133,13 @@ msgid "Chapter %i"
 msgstr "अध्याय %i"
 
 #: src/input/var.c:353 modules/gui/beos/InterfaceWindow.cpp:289
-#: modules/gui/qt4/main_interface.cpp:799
+#: modules/gui/qt4/main_interface.cpp:801
 #: modules/gui/wxwidgets/input_manager.cpp:289
 msgid "Next chapter"
 msgstr "पछिल्लो अध्याय"
 
 #: src/input/var.c:358 modules/gui/beos/InterfaceWindow.cpp:288
-#: modules/gui/qt4/main_interface.cpp:798
+#: modules/gui/qt4/main_interface.cpp:800
 #: modules/gui/wxwidgets/input_manager.cpp:288
 msgid "Previous chapter"
 msgstr "अघिल्लो अध्याय"
@@ -1152,7 +1156,7 @@ msgstr "मिडिया: %s"
 #: modules/gui/macosx/interaction.m:145 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/playlistinfo.m:60 modules/gui/macosx/prefs.m:122
 #: modules/gui/macosx/prefs.m:142 modules/gui/macosx/wizard.m:362
-#: modules/gui/qt4/components/preferences_widgets.cpp:1033
+#: modules/gui/qt4/components/preferences_widgets.cpp:1028
 msgid "Cancel"
 msgstr "रद्द गर्नुहोस्"
 
@@ -2141,7 +2145,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:81 modules/access/dshow/dshow.cpp:87
 #: modules/audio_output/alsa.c:101 modules/gui/macosx/prefs_widgets.m:1288
 #: modules/gui/macosx/sfilters.m:120 modules/gui/macosx/vout.m:202
-#: modules/gui/qt4/components/preferences_widgets.cpp:438
+#: modules/gui/qt4/components/preferences_widgets.cpp:433
 #: modules/gui/qt4/ui/sprefs_interface.ui:110
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:275
 #: modules/gui/wxwidgets/dialogs/preferences_widgets.cpp:325
@@ -2152,6 +2156,7 @@ msgstr "पूर्वनिर्धारित"
 
 #: src/libvlc-module.c:431 modules/gui/macosx/equalizer.m:143
 #: modules/gui/macosx/extended.m:102 modules/gui/macosx/wizard.m:394
+#: modules/gui/qt4/ui/equalizer.ui:36
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:620
 #: modules/gui/wxwidgets/extrapanel.cpp:216
 #: modules/gui/wxwidgets/extrapanel.cpp:465
@@ -2237,7 +2242,8 @@ msgstr ""
 "यदि तपाईँले बहुविध कार्यक्रम प्रवाह (उदाहरणका लागि DVB प्रवाह) पढ्न चाहनुहुन्छ भने मात्र "
 "यो विकल्प  प्रयोग गर्नुहोस् ।"
 
-#: src/libvlc-module.c:476 modules/gui/wxwidgets/dialogs/open.cpp:775
+#: src/libvlc-module.c:476 modules/gui/qt4/ui/open_disk.ui:256
+#: modules/gui/wxwidgets/dialogs/open.cpp:775
 msgid "Audio track"
 msgstr "अडियो ट्रयाक"
 
@@ -2245,7 +2251,8 @@ msgstr "अडियो ट्रयाक"
 msgid "Stream number of the audio track to use (from 0 to n)."
 msgstr "प्रयोग गर्नका लागि अडियो ट्रयाकको प्रवाह नम्बर (0 बाट n सम्म)"
 
-#: src/libvlc-module.c:481 modules/gui/wxwidgets/dialogs/open.cpp:767
+#: src/libvlc-module.c:481 modules/gui/qt4/ui/open_disk.ui:285
+#: modules/gui/wxwidgets/dialogs/open.cpp:767
 msgid "Subtitles track"
 msgstr "उपशीर्षक ट्रयाक"
 
@@ -2387,6 +2394,7 @@ msgid "You can completely disable the sub-picture processing."
 msgstr "तपाईँले सहायक तस्विर प्रक्रियालाई सम्पूर्ण रूपमा अक्षम पार्न सक्नुहुन्छ ।"
 
 #: src/libvlc-module.c:551 src/libvlc-module.c:1368 src/text/iso-639_def.h:143
+#: modules/gui/qt4/ui/sprefs_subtitles.ui:25
 #: modules/stream_out/transcode.c:286
 msgid "On Screen Display"
 msgstr "स्क्रिन प्रर्दशनमा"
@@ -2528,7 +2536,8 @@ msgstr ""
 msgid "This is the default Audio CD device to use."
 msgstr "यो प्रयोग गर्नका लागि पूर्वनिर्धारित अडियो CD यन्त्र हो ।"
 
-#: src/libvlc-module.c:620 modules/gui/wxwidgets/dialogs/open.cpp:837
+#: src/libvlc-module.c:620 modules/gui/qt4/ui/open_net.ui:127
+#: modules/gui/wxwidgets/dialogs/open.cpp:837
 msgid "Force IPv6"
 msgstr "IPv6 बल गर्नुहोस्"
 
@@ -3282,7 +3291,7 @@ msgstr "ति सेटिङहरू विश्वव्यापी VLC �
 #: modules/gui/macosx/controls.m:938 modules/gui/macosx/embeddedwindow.m:49
 #: modules/gui/macosx/intf.m:530 modules/gui/macosx/intf.m:606
 #: modules/gui/macosx/intf.m:662
-#: modules/gui/qt4/components/interface_widgets.cpp:228
+#: modules/gui/qt4/components/interface_widgets.cpp:230
 #: modules/gui/qt4/ui/sprefs_video.ui:61
 msgid "Fullscreen"
 msgstr "पूरापर्दा"
@@ -3329,7 +3338,7 @@ msgstr "बजाउनका लागि प्रयोग गरिने �
 
 #: src/libvlc-module.c:1016 modules/control/hotkeys.c:673
 #: modules/gui/macosx/controls.m:840 modules/gui/macosx/intf.m:571
-#: modules/gui/qt4/components/interface_widgets.cpp:215
+#: modules/gui/qt4/components/interface_widgets.cpp:217
 #: modules/gui/wxwidgets/interface.cpp:706
 msgid "Faster"
 msgstr "छिटो"
@@ -3340,7 +3349,7 @@ msgstr "छिटो अगाडि बढाउने प्लेब्या
 
 #: src/libvlc-module.c:1018 modules/control/hotkeys.c:679
 #: modules/gui/macosx/controls.m:841 modules/gui/macosx/intf.m:572
-#: modules/gui/qt4/components/interface_widgets.cpp:205
+#: modules/gui/qt4/components/interface_widgets.cpp:207
 #: modules/gui/wxwidgets/interface.cpp:705
 msgid "Slower"
 msgstr "ढिलो"
@@ -3354,7 +3363,8 @@ msgstr "ढिलो गतिमा प्लेब्याकका लाग
 #: modules/gui/macosx/intf.m:574 modules/gui/macosx/intf.m:650
 #: modules/gui/macosx/intf.m:658 modules/gui/macosx/wizard.m:312
 #: modules/gui/macosx/wizard.m:363 modules/gui/macosx/wizard.m:1628
-#: modules/gui/qt4/main_interface.cpp:247 modules/gui/qt4/menus.cpp:441
+#: modules/gui/qt4/main_interface.cpp:249 modules/gui/qt4/menus.cpp:441
+#: modules/gui/qt4/ui/streampanel.ui:129
 #: modules/gui/wxwidgets/interface.cpp:704
 #: modules/gui/wxwidgets/interface.cpp:1531
 #: modules/gui/wxwidgets/menus.cpp:261
@@ -3368,7 +3378,7 @@ msgstr "बजाउने सूचीमा पछिल्लो वस्त
 #: src/libvlc-module.c:1022 modules/control/hotkeys.c:662
 #: modules/gui/macosx/controls.m:860 modules/gui/macosx/intf.m:524
 #: modules/gui/macosx/intf.m:573 modules/gui/macosx/intf.m:651
-#: modules/gui/macosx/intf.m:657 modules/gui/qt4/main_interface.cpp:246
+#: modules/gui/macosx/intf.m:657 modules/gui/qt4/main_interface.cpp:248
 #: modules/gui/qt4/menus.cpp:440 modules/gui/wxwidgets/interface.cpp:703
 #: modules/gui/wxwidgets/interface.cpp:1530
 #: modules/gui/wxwidgets/menus.cpp:260
@@ -3383,7 +3393,8 @@ msgstr "बजाउने सूचीमा अघिल्लो वस्त
 #: modules/gui/macosx/intf.m:527 modules/gui/macosx/intf.m:570
 #: modules/gui/macosx/intf.m:649 modules/gui/macosx/intf.m:656
 #: modules/gui/pda/pda_interface.c:274 modules/gui/pda/pda_interface.c:275
-#: modules/gui/qt4/main_interface.cpp:249 modules/gui/qt4/menus.cpp:439
+#: modules/gui/qt4/main_interface.cpp:251 modules/gui/qt4/menus.cpp:439
+#: modules/gui/qt4/ui/streampanel.ui:122
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:88
 #: modules/gui/wxwidgets/interface.cpp:687
 #: modules/gui/wxwidgets/interface.cpp:698
@@ -3610,7 +3621,7 @@ msgstr "अडियो भोल्युम घटाउन कुञ्जी
 
 #: src/libvlc-module.c:1090 modules/gui/macosx/controls.m:898
 #: modules/gui/macosx/intf.m:591 modules/gui/macosx/intf.m:652
-#: modules/gui/macosx/intf.m:661 modules/gui/qt4/main_interface.cpp:254
+#: modules/gui/macosx/intf.m:661 modules/gui/qt4/main_interface.cpp:256
 msgid "Mute"
 msgstr "मौन"
 
@@ -4036,7 +4047,8 @@ msgstr "सहायक तस्विर"
 
 #: src/libvlc-module.c:1376 modules/codec/subsdec.c:153
 #: modules/demux/subtitle.c:66 modules/gui/beos/InterfaceWindow.cpp:278
-#: modules/gui/qt4/components/simple_preferences.cpp:78
+#: modules/gui/qt4/components/simple_preferences.cpp:79
+#: modules/gui/qt4/ui/sout.ui:513
 msgid "Subtitles"
 msgstr "उपशीर्षक"
 
@@ -4078,7 +4090,7 @@ msgstr "असङ्केतक"
 
 #: src/libvlc-module.c:1507 modules/access/v4l2.c:58
 #: modules/gui/macosx/playlistinfo.m:80
-#: modules/gui/qt4/components/infopanels.cpp:134
+#: modules/gui/qt4/components/infopanels.cpp:231
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:265
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:379
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:106
@@ -4845,7 +4857,7 @@ msgid ""
 msgstr "DVB प्रवाहका लागि क्यासिङ मान । यो मानलाई मिलिसेकेन्डमा सेट गर्नु पर्दछ ।"
 
 #: modules/access/bda/bda.c:44 modules/access/dvb/access.c:78
-#: modules/gui/qt4/components/open.cpp:685
+#: modules/gui/qt4/components/open.cpp:681
 msgid "Adapter card to tune"
 msgstr "ट्युन गर्न अनुकूलक कार्ड"
 
@@ -4861,8 +4873,8 @@ msgid "Device number to use on adapter"
 msgstr "अनुकूलकमा प्रयोग गर्नलाई यन्त्र नम्बर"
 
 #: modules/access/bda/bda.c:51 modules/access/dvb/access.c:84
-#: modules/gui/qt4/components/open.cpp:639
-#: modules/gui/qt4/components/open.cpp:707
+#: modules/gui/qt4/components/open.cpp:634
+#: modules/gui/qt4/components/open.cpp:703
 msgid "Transponder/multiplex frequency"
 msgstr "ट्रान्सपोन्डर/मल्टिप्लेक्स आवृत्ति"
 
@@ -5204,6 +5216,7 @@ msgstr ""
 
 #: modules/access/cdda.c:66 modules/gui/macosx/open.m:178
 #: modules/gui/macosx/open.m:527 modules/gui/macosx/open.m:618
+#: modules/gui/qt4/ui/open_disk.ui:88
 #: modules/gui/wxwidgets/dialogs/open.cpp:695
 msgid "Audio CD"
 msgstr "अडियो CD"
@@ -5527,7 +5540,7 @@ msgstr "ट्रयाक"
 #: modules/access/cdda/info.c:393 modules/access/cdda/info.c:815
 #: modules/access/cdda/info.c:856 modules/access/vcdx/access.c:472
 #: modules/access/vcdx/info.c:286 modules/access/vcdx/info.c:287
-#: modules/gui/qt4/components/open.cpp:285
+#: modules/gui/qt4/components/open.cpp:281
 #: modules/gui/wxwidgets/dialogs/open.cpp:1704
 #: modules/gui/wxwidgets/dialogs/open.cpp:1722
 msgid "Track"
@@ -5595,7 +5608,7 @@ msgstr "मानक फाइलप्रणाली डाइरेक्ट�
 
 #: modules/access/dshow/dshow.cpp:76 modules/access/dshow/dshow.cpp:78
 #: modules/codec/ffmpeg/ffmpeg.c:73 modules/demux/mpc.c:56
-#: modules/gui/qt4/components/interface_widgets.cpp:161
+#: modules/gui/qt4/components/interface_widgets.cpp:163
 #: modules/video_output/opengl.c:122 modules/video_output/opengl.c:176
 msgid "None"
 msgstr "कुनै होइन"
@@ -5632,7 +5645,7 @@ msgstr ""
 "प्रत्यक्ष प्रर्दशन प्रवाहका लागि क्यासिङ मान । यो मानलाई मिलिसेकेन्डमा सेट गर्नु पर्दछ ।"
 
 #: modules/access/dshow/dshow.cpp:97 modules/access/v4l.c:80
-#: modules/gui/qt4/components/open.cpp:489
+#: modules/gui/qt4/components/open.cpp:484
 msgid "Video device name"
 msgstr "भिडियो यन्त्र नाम"
 
@@ -5645,7 +5658,7 @@ msgstr ""
 "निर्दिष्ट गर्नु भएन भने पूर्वनिर्धारित यन्त्र प्रयोग गरिन्छ ।"
 
 #: modules/access/dshow/dshow.cpp:102 modules/access/v4l.c:84
-#: modules/gui/qt4/components/open.cpp:495
+#: modules/gui/qt4/components/open.cpp:490
 msgid "Audio device name"
 msgstr "अडियो यन्त्र नाम"
 
@@ -5658,7 +5671,7 @@ msgstr ""
 "प्रत्यक्ष प्रर्दशन प्लगइनद्वारा प्रयोग गर्ने भिडियो यन्त्रको नाम । यदि तपाईँले केहि पनि "
 "निर्दिष्ट गर्नु भएन भने पूर्वनिर्धारित यन्त्र प्रयोग गरिन्छ ।"
 
-#: modules/access/dshow/dshow.cpp:107 modules/gui/qt4/components/open.cpp:608
+#: modules/access/dshow/dshow.cpp:107 modules/gui/qt4/components/open.cpp:603
 msgid "Video size"
 msgstr "भिडियो साइज"
 
@@ -5800,8 +5813,8 @@ msgid "Refresh list"
 msgstr "ताजा पार्ने सूची"
 
 #: modules/access/dshow/dshow.cpp:178 modules/access/dshow/dshow.cpp:183
-#: modules/gui/qt4/components/open.cpp:600
-#: modules/gui/qt4/components/open.cpp:603
+#: modules/gui/qt4/components/open.cpp:595
+#: modules/gui/qt4/components/open.cpp:598
 msgid "Configure"
 msgstr "कन्फिगर गर्नुहोस्"
 
@@ -6119,7 +6132,8 @@ msgstr "फाइल आगत"
 #: modules/gui/beos/PlayListWindow.cpp:85 modules/gui/macosx/open.m:162
 #: modules/gui/macosx/open.m:402 modules/gui/macosx/output.m:142
 #: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
-#: modules/gui/pda/pda_interface.c:366 modules/gui/qt4/ui/sprefs_audio.ui:146
+#: modules/gui/pda/pda_interface.c:366 modules/gui/qt4/ui/sout.ui:74
+#: modules/gui/qt4/ui/sprefs_audio.ui:146
 #: modules/gui/wxwidgets/dialogs/open.cpp:498
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:471
 msgid "File"
@@ -6156,7 +6170,7 @@ msgid ""
 msgstr ""
 
 #: modules/access_filter/bandwidth.c:42
-#: modules/gui/qt4/components/open.cpp:658
+#: modules/gui/qt4/components/open.cpp:654
 #, fuzzy
 msgid "Bandwidth"
 msgstr "किनारा चौडाइ"
@@ -6717,8 +6731,8 @@ msgid "PVR radio device"
 msgstr "PVR रेडियो यन्त्र"
 
 #: modules/access/pvr.c:63 modules/access/v4l.c:99
-#: modules/gui/qt4/components/open.cpp:502
-#: modules/gui/qt4/components/open.cpp:542
+#: modules/gui/qt4/components/open.cpp:497
+#: modules/gui/qt4/components/open.cpp:537
 msgid "Norm"
 msgstr "ढाँचा"
 
@@ -6745,8 +6759,8 @@ msgid "Height of the stream to capture (-1 for autodetection)."
 msgstr "समात्नका लागि प्रवाहको उचाइ (स्वत: पत्ताका लागि -1)"
 
 #: modules/access/pvr.c:75 modules/access/v4l.c:92
-#: modules/gui/qt4/components/open.cpp:509
-#: modules/gui/qt4/components/open.cpp:549
+#: modules/gui/qt4/components/open.cpp:504
+#: modules/gui/qt4/components/open.cpp:544
 msgid "Frequency"
 msgstr "आवृत्ति"
 
@@ -6989,7 +7003,7 @@ msgid "UDP/RTP input"
 msgstr "UDP/RTP आगत"
 
 #: modules/access/v4l2.c:54 modules/gui/macosx/open.m:169
-#: modules/gui/qt4/components/open.cpp:529
+#: modules/gui/qt4/components/open.cpp:524
 #: modules/gui/wxwidgets/dialogs/open.cpp:719
 msgid "Device name"
 msgstr "यन्त्र नाम"
@@ -7180,7 +7194,7 @@ msgstr "माथिका सन्देशमा अज्ञात vcdimager
 
 #: modules/access/vcdx/access.c:281 modules/access/vcdx/access.c:364
 #: modules/access/vcdx/access.c:690 modules/access/vcdx/info.c:290
-#: modules/access/vcdx/info.c:291 modules/gui/qt4/components/open.cpp:278
+#: modules/access/vcdx/info.c:291 modules/gui/qt4/components/open.cpp:274
 msgid "Entry"
 msgstr "प्रविष्टि"
 
@@ -9777,6 +9791,7 @@ msgid "Quiet mode."
 msgstr "शान्त मोड"
 
 #: modules/codec/x264.c:332 modules/gui/macosx/playlistinfo.m:64
+#: modules/gui/qt4/ui/streampanel.ui:31
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:85
 msgid "Statistics"
 msgstr "तथ्याङ्क"
@@ -9897,7 +9912,7 @@ msgid "Define playlist bookmarks."
 msgstr "बजाउने सूची पुस्तकचिनो परिभाषित गर्नुहोस्"
 
 #: modules/control/hotkeys.c:97
-#: modules/gui/qt4/components/simple_preferences.cpp:82
+#: modules/gui/qt4/components/simple_preferences.cpp:83
 msgid "Hotkeys"
 msgstr "हटकुञ्जी"
 
@@ -10611,6 +10626,7 @@ msgstr ""
 
 #: modules/control/telnet.c:75 modules/gui/macosx/open.m:180
 #: modules/gui/macosx/open.m:182 modules/gui/macosx/output.m:147
+#: modules/gui/qt4/ui/open_net.ui:80
 #: modules/gui/wxwidgets/dialogs/open.cpp:826
 #: modules/gui/wxwidgets/dialogs/open.cpp:853
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:531 modules/stream_out/rtp.c:83
@@ -11498,7 +11514,7 @@ msgstr "सन्देश"
 #: modules/gui/beos/InterfaceWindow.cpp:264
 #: modules/gui/beos/PlayListWindow.cpp:87 modules/gui/macosx/open.m:470
 #: modules/gui/macosx/open.m:777 modules/gui/macosx/open.m:903
-#: modules/gui/wxwidgets/dialogs.cpp:436
+#: modules/gui/qt4/ui/open_file.ui:22 modules/gui/wxwidgets/dialogs.cpp:436
 #: modules/gui/wxwidgets/dialogs/open.cpp:1258
 msgid "Open File"
 msgstr "फाइल खोल्नुहोस्"
@@ -11555,7 +11571,7 @@ msgstr "सञ्झ्याल"
 #: modules/gui/macosx/wizard.m:1186 modules/gui/macosx/wizard.m:1683
 #: modules/gui/macosx/wizard.m:1691 modules/gui/macosx/wizard.m:1871
 #: modules/gui/macosx/wizard.m:1882 modules/gui/macosx/wizard.m:1895
-#: modules/gui/qt4/components/preferences_widgets.cpp:1031
+#: modules/gui/qt4/components/preferences_widgets.cpp:1026
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:205
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:416
 msgid "OK"
@@ -11630,9 +11646,7 @@ msgid "Path"
 msgstr "मार्ग"
 
 #: modules/gui/beos/PlayListWindow.cpp:147 modules/gui/macosx/bookmarks.m:116
-#: modules/gui/macosx/playlist.m:128
-#: modules/gui/qt4/components/infopanels.cpp:51
-#: modules/gui/qt4/playlist_model.cpp:661
+#: modules/gui/macosx/playlist.m:128 modules/gui/qt4/playlist_model.cpp:661
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:97
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:72
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_panel.cpp:373
@@ -11876,11 +11890,11 @@ msgid "Enable the equalizer. Bands can be set manually or using a preset."
 msgstr ""
 "तुल्यकारक सक्षम पार्नुहोस् । ब्यान्डलाई प्रिसेटको प्रयोग गरेर वा म्यानुअलि सेट गर्न सकिन्छ ।"
 
-#: modules/gui/macosx/equalizer.m:146
+#: modules/gui/macosx/equalizer.m:146 modules/gui/qt4/ui/equalizer.ui:90
 msgid "Preamp"
 msgstr "प्रिएम्ब"
 
-#: modules/gui/macosx/extended.m:68 modules/gui/qt4/dialogs/extended.cpp:44
+#: modules/gui/macosx/extended.m:68 modules/gui/qt4/dialogs/extended.cpp:45
 #: modules/gui/wxwidgets/extrapanel.cpp:1210
 msgid "Extended controls"
 msgstr "विस्तारित नियन्त्रण"
@@ -12080,13 +12094,13 @@ msgstr "VLC - नियन्त्रक"
 
 #: modules/gui/macosx/intf.m:521 modules/gui/macosx/intf.m:1451
 #: modules/gui/pda/pda_interface.c:212 modules/gui/pda/pda_interface.c:1355
-#: modules/gui/qt4/main_interface.cpp:224
-#: modules/gui/qt4/main_interface.cpp:228
-#: modules/gui/qt4/main_interface.cpp:307
+#: modules/gui/qt4/main_interface.cpp:226
+#: modules/gui/qt4/main_interface.cpp:230
 #: modules/gui/qt4/main_interface.cpp:309
-#: modules/gui/qt4/main_interface.cpp:335
-#: modules/gui/qt4/main_interface.cpp:347
-#: modules/gui/qt4/main_interface.cpp:361
+#: modules/gui/qt4/main_interface.cpp:311
+#: modules/gui/qt4/main_interface.cpp:337
+#: modules/gui/qt4/main_interface.cpp:349
+#: modules/gui/qt4/main_interface.cpp:363
 #: modules/gui/qt4/ui/main_interface.ui:21
 msgid "VLC media player"
 msgstr "VLC मिडिया प्लेयर"
@@ -12360,11 +12374,14 @@ msgstr "मिडिया संसाधन सूचक (MRL)"
 #: modules/gui/macosx/open.m:166 modules/gui/macosx/open.m:172
 #: modules/gui/macosx/open.m:268 modules/gui/macosx/output.m:145
 #: modules/gui/macosx/prefs_widgets.m:1180 modules/gui/macosx/sfilters.m:75
-#: modules/gui/qt4/components/preferences_widgets.cpp:243
+#: modules/gui/qt4/components/preferences_widgets.cpp:238
+#: modules/gui/qt4/ui/open_disk.ui:74 modules/gui/qt4/ui/open_file.ui:221
+#: modules/gui/qt4/ui/open.ui:169 modules/gui/qt4/ui/sout.ui:163
 #: modules/gui/qt4/ui/sprefs_audio.ui:139
 #: modules/gui/qt4/ui/sprefs_audio.ui:153
 #: modules/gui/qt4/ui/sprefs_input.ui:48
 #: modules/gui/qt4/ui/sprefs_interface.ui:74
+#: modules/gui/qt4/ui/sprefs_subtitles.ui:145
 #: modules/gui/qt4/ui/sprefs_video.ui:168
 #: modules/gui/wince/preferences_widgets.cpp:512
 #: modules/gui/wxwidgets/dialogs/open.cpp:627
@@ -12393,6 +12410,8 @@ msgid "DVD"
 msgstr "DVD"
 
 #: modules/gui/macosx/open.m:181 modules/gui/macosx/output.m:146
+#: modules/gui/qt4/ui/open_net.ui:73 modules/gui/qt4/ui/sout.ui:139
+#: modules/gui/qt4/ui/sout.ui:180 modules/gui/qt4/ui/sout.ui:224
 #: modules/gui/wxwidgets/dialogs/open.cpp:845
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:520
 msgid "Address"
@@ -12407,7 +12426,8 @@ msgstr "UDP/RTP मल्टिकास्ट"
 msgid "HTTP/FTP/MMS/RTSP"
 msgstr "HTTP/FTP/MMS/RTSP"
 
-#: modules/gui/macosx/open.m:188 modules/gui/wxwidgets/dialogs/open.cpp:819
+#: modules/gui/macosx/open.m:188 modules/gui/qt4/ui/open_net.ui:120
+#: modules/gui/wxwidgets/dialogs/open.cpp:819
 #: modules/services_discovery/sap.c:109
 msgid "Allow timeshifting"
 msgstr "समय परिवर्तनलाई अनुमति दिनुहोस्"
@@ -12440,7 +12460,7 @@ msgstr "FPS"
 msgid "Subtitles encoding"
 msgstr "उपशीर्षक सङ्केतन"
 
-#: modules/gui/macosx/open.m:276
+#: modules/gui/macosx/open.m:276 modules/gui/qt4/ui/sprefs_subtitles.ui:138
 msgid "Font size"
 msgstr "फन्ट साइज"
 
@@ -12486,7 +12506,7 @@ msgstr "स्थानिय रूपमा प्रवाह प्रर्
 msgid "Stream"
 msgstr "प्रवाह"
 
-#: modules/gui/macosx/output.m:144
+#: modules/gui/macosx/output.m:144 modules/gui/qt4/ui/sout.ui:109
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:510
 msgid "Dump raw input"
 msgstr "डम्प कच्चा आगत"
@@ -12502,7 +12522,8 @@ msgid "Transcoding options"
 msgstr "ट्रान्सकोडिङ विकल्प"
 
 #: modules/gui/macosx/output.m:163 modules/gui/macosx/output.m:173
-#: modules/gui/macosx/wizard.m:424
+#: modules/gui/macosx/wizard.m:424 modules/gui/qt4/ui/sout.ui:435
+#: modules/gui/qt4/ui/sout.ui:459
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:776
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:851
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:834
@@ -12510,7 +12531,7 @@ msgstr "ट्रान्सकोडिङ विकल्प"
 msgid "Bitrate (kb/s)"
 msgstr "बिटदर (kb/s)"
 
-#: modules/gui/macosx/output.m:166
+#: modules/gui/macosx/output.m:166 modules/gui/qt4/ui/sout.ui:506
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:782
 msgid "Scale"
 msgstr "मापन गर्नुहोस्"
@@ -12519,7 +12540,7 @@ msgstr "मापन गर्नुहोस्"
 msgid "Stream Announcing"
 msgstr "प्रवाह घोषणा"
 
-#: modules/gui/macosx/output.m:181
+#: modules/gui/macosx/output.m:181 modules/gui/qt4/ui/sout.ui:597
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:590
 msgid "SAP announce"
 msgstr "SAP घोषणा"
@@ -12549,7 +12570,6 @@ msgid "Save File"
 msgstr "फाइल बचत गर्नुहोस्"
 
 #: modules/gui/macosx/playlistinfo.m:56
-#: modules/gui/qt4/components/infopanels.cpp:52
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:63
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:591
 msgid "URI"
@@ -12566,43 +12586,43 @@ msgid "Advanced Information"
 msgstr "उन्नत जानकारी"
 
 #: modules/gui/macosx/playlistinfo.m:81
-#: modules/gui/qt4/components/infopanels.cpp:140
+#: modules/gui/qt4/components/infopanels.cpp:236
 msgid "Read at media"
 msgstr "मिडियामा पढ्नुहोस्"
 
 #: modules/gui/macosx/playlistinfo.m:82
-#: modules/gui/qt4/components/infopanels.cpp:141
+#: modules/gui/qt4/components/infopanels.cpp:238
 msgid "Input bitrate"
 msgstr "आगत बिटदर"
 
 #: modules/gui/macosx/playlistinfo.m:83
-#: modules/gui/qt4/components/infopanels.cpp:142
+#: modules/gui/qt4/components/infopanels.cpp:240
 msgid "Demuxed"
 msgstr "डुमुक्स गरिएको"
 
 #: modules/gui/macosx/playlistinfo.m:84
-#: modules/gui/qt4/components/infopanels.cpp:143
+#: modules/gui/qt4/components/infopanels.cpp:241
 msgid "Stream bitrate"
 msgstr "प्रवाह बिटदर"
 
 #: modules/gui/macosx/playlistinfo.m:87 modules/gui/macosx/playlistinfo.m:97
-#: modules/gui/qt4/components/infopanels.cpp:145
-#: modules/gui/qt4/components/infopanels.cpp:153
+#: modules/gui/qt4/components/infopanels.cpp:244
+#: modules/gui/qt4/components/infopanels.cpp:257
 msgid "Decoded blocks"
 msgstr "असङ्केतन गरिएको खण्ड"
 
 #: modules/gui/macosx/playlistinfo.m:88
-#: modules/gui/qt4/components/infopanels.cpp:146
+#: modules/gui/qt4/components/infopanels.cpp:246
 msgid "Displayed frames"
 msgstr "प्रर्दशन गरिएको फ्रेम"
 
 #: modules/gui/macosx/playlistinfo.m:89
-#: modules/gui/qt4/components/infopanels.cpp:147
+#: modules/gui/qt4/components/infopanels.cpp:248
 msgid "Lost frames"
 msgstr "हराएको फ्रेम"
 
 #: modules/gui/macosx/playlistinfo.m:91 modules/gui/macosx/wizard.m:403
-#: modules/gui/qt4/components/infopanels.cpp:136
+#: modules/gui/qt4/components/infopanels.cpp:233
 #: modules/gui/wxwidgets/dialogs/infopanels.cpp:314
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:139
 #: modules/video_filter/deinterlace.c:137
@@ -12610,12 +12630,12 @@ msgid "Streaming"
 msgstr "प्रवाह"
 
 #: modules/gui/macosx/playlistinfo.m:92
-#: modules/gui/qt4/components/infopanels.cpp:149
+#: modules/gui/qt4/components/infopanels.cpp:251
 msgid "Sent packets"
 msgstr "पठाइएको प्याकेट"
 
 #: modules/gui/macosx/playlistinfo.m:93
-#: modules/gui/qt4/components/infopanels.cpp:150
+#: modules/gui/qt4/components/infopanels.cpp:252
 msgid "Sent bytes"
 msgstr "पठाइएको बाइट"
 
@@ -12624,12 +12644,12 @@ msgid "Send rate"
 msgstr "पठाउने दर"
 
 #: modules/gui/macosx/playlistinfo.m:98
-#: modules/gui/qt4/components/infopanels.cpp:154
+#: modules/gui/qt4/components/infopanels.cpp:259
 msgid "Played buffers"
 msgstr "बजाइएको बफर"
 
 #: modules/gui/macosx/playlistinfo.m:99
-#: modules/gui/qt4/components/infopanels.cpp:155
+#: modules/gui/qt4/components/infopanels.cpp:261
 msgid "Lost buffers"
 msgstr "हराएको बफर"
 
@@ -12784,7 +12804,7 @@ msgid "Timestamp:"
 msgstr "समय परिवर्तन"
 
 #: modules/gui/macosx/sfilters.m:82 modules/gui/macosx/sfilters.m:94
-#: modules/gui/pda/pda_interface.c:611
+#: modules/gui/pda/pda_interface.c:611 modules/gui/qt4/ui/open_file.ui:196
 msgid "Size:"
 msgstr "साइज:"
 
@@ -13351,6 +13371,7 @@ msgid "In this page, a few additional streaming parameters can be set."
 msgstr "यो पृष्ठमा, केहि थप प्रवाह परिमितिहरू सेट गर्न सकिन्छ ।"
 
 #: modules/gui/macosx/wizard.m:441 modules/gui/macosx/wizard.m:1870
+#: modules/gui/qt4/ui/sout.ui:648
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:610
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:1326
 msgid "Time-To-Live (TTL)"
@@ -13618,6 +13639,7 @@ msgid "PDA Linux Gtk2+ interface"
 msgstr "PDA लिनक्स Gtk2+ इन्टरफेस"
 
 #: modules/gui/pda/pda.c:220 modules/gui/pda/pda.c:275
+#: modules/gui/qt4/ui/sout.ui:64
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:497
 msgid "Filename"
 msgstr "फाइलनाम"
@@ -13659,7 +13681,8 @@ msgstr "बजाउने सूचीमा थप्नुहोस्"
 msgid "MRL:"
 msgstr "MRL:"
 
-#: modules/gui/pda/pda_interface.c:423
+#: modules/gui/pda/pda_interface.c:423 modules/gui/qt4/ui/sout.ui:126
+#: modules/gui/qt4/ui/sout.ui:190 modules/gui/qt4/ui/sout.ui:234
 msgid "Port:"
 msgstr "पोर्ट:"
 
@@ -14056,84 +14079,90 @@ msgstr "प्रिएम्ब"
 msgid "dB"
 msgstr ""
 
-#: modules/gui/qt4/components/infopanels.cpp:151
+#: modules/gui/qt4/components/infopanels.cpp:75
+#, fuzzy
+msgid "Track number/Position"
+msgstr "ट्रयाक नम्बर/सेटमा स्थान"
+
+#: modules/gui/qt4/components/infopanels.cpp:167
+msgid "Extra metadata and other information are shown in this list.\n"
+msgstr ""
+
+#: modules/gui/qt4/components/infopanels.cpp:208
+msgid ""
+"Various statistics about the current media or stream.\n"
+" Played and streamed info are shown."
+msgstr ""
+
+#: modules/gui/qt4/components/infopanels.cpp:254
 #, fuzzy
 msgid "Sent bitrates"
 msgstr "पठाइएको बाइट"
 
-#: modules/gui/qt4/components/infopanels.cpp:268
-#, fuzzy
-msgid "&General"
-msgstr "साधारण"
+#: modules/gui/qt4/components/infopanels.cpp:327
+msgid ""
+"Information about what your media or stream is made of.\n"
+" Muxer, Audio and Video Codecs, Subtitles are shown."
+msgstr ""
 
-#: modules/gui/qt4/components/infopanels.cpp:270
-#, fuzzy
-msgid "&Details"
-msgstr "पूर्वनिर्धारित"
-
-#: modules/gui/qt4/components/infopanels.cpp:274
-#, fuzzy
-msgid "&Stats"
-msgstr "सेटिङ"
-
-#: modules/gui/qt4/components/interface_widgets.cpp:159
+#: modules/gui/qt4/components/interface_widgets.cpp:161
 #, fuzzy
 msgid "Current visualization:"
 msgstr "अडियो भिज्युलाइजेसन"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:210
+#: modules/gui/qt4/components/interface_widgets.cpp:212
 #, fuzzy
 msgid "Normal rate"
 msgstr "साधारण साइज"
 
-#: modules/gui/qt4/components/interface_widgets.cpp:223
+#: modules/gui/qt4/components/interface_widgets.cpp:225
 #, fuzzy
 msgid "Take a snapshot"
 msgstr "भिडियो स्न्यापशट खिच्नुहोस्"
 
-#: modules/gui/qt4/components/open.cpp:82
+#: modules/gui/qt4/components/open.cpp:78
 msgid "Select one or multiple files, or a folder"
 msgstr ""
 
-#: modules/gui/qt4/components/open.cpp:103
+#: modules/gui/qt4/components/open.cpp:99
 #, fuzzy
 msgid "Filter:"
 msgstr "फिल्टर"
 
-#: modules/gui/qt4/components/open.cpp:162
+#: modules/gui/qt4/components/open.cpp:158
 #: modules/gui/wxwidgets/dialogs/open.cpp:1291
 msgid "Open subtitles file"
 msgstr "उपशीर्षक फाइल खोल्नुहोस्"
 
-#: modules/gui/qt4/components/open.cpp:535
+#: modules/gui/qt4/components/open.cpp:530
 #, fuzzy
 msgid "Radio device name"
 msgstr "अडियो यन्त्र नाम"
 
-#: modules/gui/qt4/components/open.cpp:582
+#: modules/gui/qt4/components/open.cpp:577
 #, fuzzy
 msgid "Video Device Name "
 msgstr "भिडियो यन्त्र नाम"
 
-#: modules/gui/qt4/components/open.cpp:585
+#: modules/gui/qt4/components/open.cpp:580
 #, fuzzy
 msgid "Audio Device Name "
 msgstr "अडियो यन्त्र नाम"
 
-#: modules/gui/qt4/components/open.cpp:594
-#: modules/gui/qt4/components/open.cpp:597
+#: modules/gui/qt4/components/open.cpp:589
+#: modules/gui/qt4/components/open.cpp:592
 #, fuzzy
 msgid "Update List"
 msgstr "अद्यावधिक"
 
-#: modules/gui/qt4/components/open.cpp:625
-#: modules/gui/qt4/components/open.cpp:686
+#: modules/gui/qt4/components/open.cpp:620
+#: modules/gui/qt4/components/open.cpp:682
 #, fuzzy
 msgid "DVB Type:"
 msgstr "प्रकार"
 
-#: modules/gui/qt4/components/open.cpp:649
-#: modules/gui/qt4/components/open.cpp:716
+#: modules/gui/qt4/components/open.cpp:645
+#: modules/gui/qt4/components/open.cpp:712
 #, fuzzy
 msgid "Transponder symbol rate"
 msgstr "kHz मा ट्रान्सपोन्डर प्रतीक दर"
@@ -14158,34 +14187,34 @@ msgstr ""
 msgid "NRND"
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:286
+#: modules/gui/qt4/components/preferences_widgets.cpp:281
 #, fuzzy
 msgid "Select File"
 msgstr "फाइल चयन गर्नुहोस्"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:315
+#: modules/gui/qt4/components/preferences_widgets.cpp:310
 #, fuzzy
 msgid "Select Directory"
 msgstr "डाइरेक्टरी चयन गर्नुहोस्"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:929
+#: modules/gui/qt4/components/preferences_widgets.cpp:924
 msgid "Select an action to change the associated hotkey"
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1022
+#: modules/gui/qt4/components/preferences_widgets.cpp:1017
 #, fuzzy
 msgid "Hotkey for "
 msgstr "हटकुञ्जी"
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1025
+#: modules/gui/qt4/components/preferences_widgets.cpp:1020
 msgid "Press the new keys for "
 msgstr ""
 
-#: modules/gui/qt4/components/preferences_widgets.cpp:1059
+#: modules/gui/qt4/components/preferences_widgets.cpp:1054
 msgid "Warning: the  key is already assigned to \""
 msgstr ""
 
-#: modules/gui/qt4/components/simple_preferences.cpp:80
+#: modules/gui/qt4/components/simple_preferences.cpp:81
 #, fuzzy
 msgid "Input and Codecs"
 msgstr "आगत / कोडेक"
@@ -14196,7 +14225,7 @@ msgstr "त्रुटि"
 
 #: modules/gui/qt4/dialogs/errors.cpp:43 modules/gui/qt4/dialogs/help.cpp:44
 #: modules/gui/qt4/dialogs/help.cpp:71
-#: modules/gui/qt4/dialogs/mediainfo.cpp:51
+#: modules/gui/qt4/dialogs/mediainfo.cpp:67
 #: modules/gui/qt4/dialogs/messages.cpp:45
 #: modules/gui/wxwidgets/dialogs/fileinfo.cpp:93
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:192
@@ -14219,7 +14248,7 @@ msgstr "खाली गर्नुहोस्"
 msgid "Don't show further errors"
 msgstr "अब त्रुटि नदेखाउनुहोस्"
 
-#: modules/gui/qt4/dialogs/extended.cpp:50
+#: modules/gui/qt4/dialogs/extended.cpp:51
 #, fuzzy
 msgid "Video effects"
 msgstr "भिडियो कोडेक"
@@ -14236,7 +14265,7 @@ msgstr "होइन"
 
 #: modules/gui/qt4/dialogs/gototime.cpp:50 modules/gui/qt4/dialogs/open.cpp:87
 #: modules/gui/qt4/dialogs/preferences.cpp:78
-#: modules/gui/qt4/dialogs/sout.cpp:97
+#: modules/gui/qt4/dialogs/sout.cpp:98
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:108
 #: modules/gui/wxwidgets/dialogs/interaction.cpp:179
 #: modules/gui/wxwidgets/dialogs/iteminfo.cpp:81
@@ -14272,10 +14301,35 @@ msgstr "वर्णन फाइल"
 msgid "Login"
 msgstr "लगइन"
 
-#: modules/gui/qt4/dialogs/mediainfo.cpp:46
+#: modules/gui/qt4/dialogs/mediainfo.cpp:49
 #, fuzzy
 msgid "Media information"
 msgstr "मेटा सूचना"
+
+#: modules/gui/qt4/dialogs/mediainfo.cpp:56
+#, fuzzy
+msgid "&General"
+msgstr "साधारण"
+
+#: modules/gui/qt4/dialogs/mediainfo.cpp:58
+#, fuzzy
+msgid "&Extra Metadata"
+msgstr "मेटाडाटा"
+
+#: modules/gui/qt4/dialogs/mediainfo.cpp:60
+#, fuzzy
+msgid "&Codec Details"
+msgstr "पूर्वनिर्धारित"
+
+#: modules/gui/qt4/dialogs/mediainfo.cpp:64
+#, fuzzy
+msgid "&Stats"
+msgstr "सेटिङ"
+
+#: modules/gui/qt4/dialogs/mediainfo.cpp:71
+#, fuzzy
+msgid "Location"
+msgstr "ल्याटिन"
 
 #: modules/gui/qt4/dialogs/messages.cpp:47
 #, fuzzy
@@ -14328,7 +14382,7 @@ msgid "&Enqueue"
 msgstr ""
 
 #: modules/gui/qt4/dialogs/open.cpp:95 modules/gui/qt4/dialogs/open.cpp:154
-#: modules/gui/qt4/dialogs/sout.cpp:96
+#: modules/gui/qt4/dialogs/sout.cpp:97
 #, fuzzy
 msgid "&Stream"
 msgstr "प्रवाह"
@@ -14436,49 +14490,49 @@ msgstr "उपशीर्षक फाइल"
 msgid "All Files"
 msgstr "_फाइल"
 
-#: modules/gui/qt4/dialogs/sout.cpp:71
+#: modules/gui/qt4/dialogs/sout.cpp:72
 msgid ""
 "Stream output string.\n"
 " This is automatically generated when you change the above settings,\n"
 " but you can update it manually."
 msgstr ""
 
-#: modules/gui/qt4/dialogs/sout.cpp:111
+#: modules/gui/qt4/dialogs/sout.cpp:112
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:1011
 msgid "Save file"
 msgstr "फाइल बचत गर्नुहोस्"
 
-#: modules/gui/qt4/main_interface.cpp:260
+#: modules/gui/qt4/main_interface.cpp:262
 #, fuzzy
 msgid "Show playlist"
 msgstr "बजाउने सूची बचत गर्नुहोस्"
 
-#: modules/gui/qt4/main_interface.cpp:261
+#: modules/gui/qt4/main_interface.cpp:263
 #: modules/gui/skins2/src/dialogs.cpp:230
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:950
 msgid "Open playlist"
 msgstr "बजाउने सूची खोल्नुहोस्"
 
-#: modules/gui/qt4/main_interface.cpp:336
+#: modules/gui/qt4/main_interface.cpp:338
 msgid "Control menu for the player"
 msgstr ""
 
-#: modules/gui/qt4/main_interface.cpp:373
+#: modules/gui/qt4/main_interface.cpp:375
 #: modules/gui/wxwidgets/input_manager.cpp:272
 msgid "Paused"
 msgstr "पज गरिएको"
 
-#: modules/gui/qt4/main_interface.cpp:797
+#: modules/gui/qt4/main_interface.cpp:799
 #: modules/gui/wxwidgets/input_manager.cpp:287
 msgid "Menu"
 msgstr "मेनु"
 
-#: modules/gui/qt4/main_interface.cpp:800
+#: modules/gui/qt4/main_interface.cpp:802
 #: modules/gui/wxwidgets/input_manager.cpp:290
 msgid "Previous track"
 msgstr "अघिल्लो ट्रयाक"
 
-#: modules/gui/qt4/main_interface.cpp:801
+#: modules/gui/qt4/main_interface.cpp:803
 #: modules/gui/wxwidgets/input_manager.cpp:291
 msgid "Next track"
 msgstr "पछिल्लो ट्रयाक"
@@ -14661,9 +14715,227 @@ msgstr ""
 msgid "Qt interface"
 msgstr ""
 
+#: modules/gui/qt4/ui/equalizer.ui:43
+#, fuzzy
+msgid "2 pass"
+msgstr "२ पास"
+
 #: modules/gui/qt4/ui/equalizer.ui:63
 msgid "Preset"
 msgstr ""
+
+#: modules/gui/qt4/ui/open_capture.ui:50
+#, fuzzy
+msgid "Select the capture device type"
+msgstr "यसमा बचत गर्न डाइरेक्टरी चयन गर्नुहोस्"
+
+#: modules/gui/qt4/ui/open_capture.ui:57
+#, fuzzy
+msgid "Capture Mode"
+msgstr "अध्याय कोडेक"
+
+#: modules/gui/qt4/ui/open_capture.ui:72 modules/gui/qt4/ui/open_net.ui:105
+#: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
+msgid "Options"
+msgstr "विकल्प"
+
+#: modules/gui/qt4/ui/open_capture.ui:87
+#, fuzzy
+msgid "Card Selection"
+msgstr "चयन"
+
+#: modules/gui/qt4/ui/open_capture.ui:94
+msgid "Access advanced options to tweak the device"
+msgstr ""
+
+#: modules/gui/qt4/ui/open_capture.ui:97
+#: modules/gui/wxwidgets/dialogs/open.cpp:256
+msgid "Advanced options..."
+msgstr "उन्नत विकल्प..."
+
+#: modules/gui/qt4/ui/open_disk.ui:26
+#, fuzzy
+msgid "Disc selection"
+msgstr "अवैध चयन"
+
+#: modules/gui/qt4/ui/open_disk.ui:71
+#, fuzzy
+msgid "Select the device"
+msgstr "फाइल चयन गर्नुहोस्"
+
+#: modules/gui/qt4/ui/open_disk.ui:81
+#, fuzzy
+msgid "Disk device"
+msgstr "यन्त्र"
+
+#: modules/gui/qt4/ui/open_disk.ui:148
+msgid "Disable DVD Menus (for compatibility)"
+msgstr ""
+
+#: modules/gui/qt4/ui/open_disk.ui:151
+#, fuzzy
+msgid "No DVD Menus"
+msgstr "DVD मेनु प्रयोग गर्नुहोस्"
+
+#: modules/gui/qt4/ui/open_disk.ui:169
+#, fuzzy
+msgid "Starting position"
+msgstr "सहायक तस्विर स्थान"
+
+#: modules/gui/qt4/ui/open_disk.ui:244
+#, fuzzy
+msgid "Audio and Subtitles"
+msgstr "ढाँचाबद्ध गरिएको उपशीर्षक"
+
+#: modules/gui/qt4/ui/open_file.ui:58
+#, fuzzy
+msgid "File Names:"
+msgstr "फाइलनाम"
+
+#: modules/gui/qt4/ui/open_file.ui:65
+msgid "Choose one or more media file to open"
+msgstr ""
+
+#: modules/gui/qt4/ui/open_file.ui:88
+#, fuzzy
+msgid "Add a subtitle file"
+msgstr "उपशीर्षक फाइल प्रयोग गर्नुहोस्"
+
+#: modules/gui/qt4/ui/open_file.ui:91
+#, fuzzy
+msgid "Use a sub&amp;titles file"
+msgstr "उपशीर्षक फाइल प्रयोग गर्नुहोस्"
+
+#: modules/gui/qt4/ui/open_file.ui:163
+#, fuzzy
+msgid "Alignment:"
+msgstr "लगत पङ्क्तिबद्धता"
+
+#: modules/gui/qt4/ui/open_file.ui:218
+#, fuzzy
+msgid "Select the subtitle file"
+msgstr "स्वत: पत्ता उपशीर्षक फाइल"
+
+#: modules/gui/qt4/ui/open_net.ui:26
+#, fuzzy
+msgid "Network Protocol"
+msgstr "सञ्जाल समक्रमण"
+
+#: modules/gui/qt4/ui/open_net.ui:38
+msgid "Set the protocol for the URL"
+msgstr ""
+
+#: modules/gui/qt4/ui/open_net.ui:45
+#, fuzzy
+msgid "Protocol"
+msgstr "पोर्टोकल:"
+
+#: modules/gui/qt4/ui/open_net.ui:52
+msgid "Set the port used"
+msgstr ""
+
+#: modules/gui/qt4/ui/open_net.ui:87
+msgid ""
+"Enter the URL of the network stream here,\n"
+"with or without the protocol."
+msgstr ""
+
+#: modules/gui/qt4/ui/open.ui:52
+#, fuzzy
+msgid "Show extended options"
+msgstr "उन्नत विकल्प देखाउनुहोस्"
+
+#: modules/gui/qt4/ui/open.ui:55
+#, fuzzy
+msgid "Show &amp;more options"
+msgstr "उन्नत विकल्प देखाउनुहोस्"
+
+#: modules/gui/qt4/ui/open.ui:82
+#, fuzzy
+msgid "Start Time"
+msgstr "सुरु समय"
+
+#: modules/gui/qt4/ui/open.ui:97
+#, fuzzy
+msgid "Change the start time for the media"
+msgstr "सेवाको प्रर्दशन नाम परिवर्तन गर्नुहोस्"
+
+#: modules/gui/qt4/ui/open.ui:121 modules/gui/wxwidgets/dialogs/open.cpp:453
+msgid "Caching"
+msgstr "क्यासिङ"
+
+#: modules/gui/qt4/ui/open.ui:128
+msgid "Complete MRL for VLC internal"
+msgstr ""
+
+#: modules/gui/qt4/ui/open.ui:135
+msgid "Play another media synchronously (extra audio file, ...)"
+msgstr ""
+
+#: modules/gui/qt4/ui/open.ui:149
+#, fuzzy
+msgid "Customize"
+msgstr "अनुकूलन गर्नुहोस्:"
+
+#: modules/gui/qt4/ui/open.ui:156
+#, fuzzy
+msgid "Extra media"
+msgstr "मेटाडाटा"
+
+#: modules/gui/qt4/ui/open.ui:166
+#, fuzzy
+msgid "Select the file"
+msgstr "फाइल चयन गर्नुहोस्"
+
+#: modules/gui/qt4/ui/open.ui:191
+#, fuzzy
+msgid "Change the caching for the media"
+msgstr "सेवाको प्रर्दशन नाम परिवर्तन गर्नुहोस्"
+
+#: modules/gui/qt4/ui/sout.ui:21
+#, fuzzy
+msgid "Stream Output"
+msgstr "प्रवाह निर्गत"
+
+#: modules/gui/qt4/ui/sout.ui:41
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:462
+msgid "Outputs"
+msgstr "निर्गत"
+
+#: modules/gui/qt4/ui/sout.ui:146
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:470
+msgid "Play locally"
+msgstr "स्थानिय रूपमा बजाउनुहोस्"
+
+#: modules/gui/qt4/ui/sout.ui:308
+#, fuzzy
+msgid "Encapsulation"
+msgstr "इनक्याप्सुलेसन विधि"
+
+#: modules/gui/qt4/ui/sout.ui:396
+#, fuzzy
+msgid "Transcoding"
+msgstr "ट्रान्सकोड"
+
+#: modules/gui/qt4/ui/sout.ui:530
+#, fuzzy
+msgid "Overlay subtitles on the video"
+msgstr "ओभरले/उपशीर्षक"
+
+#: modules/gui/qt4/ui/sout.ui:607
+#: modules/gui/wxwidgets/dialogs/streamout.cpp:592
+msgid "Group name"
+msgstr "समूह नाम"
+
+#: modules/gui/qt4/ui/sout.ui:641
+#, fuzzy
+msgid "Stream all elementary streams"
+msgstr "सबै तत्व प्रवाह चयन गर्नुहोस्"
+
+#: modules/gui/qt4/ui/sout.ui:668
+#, fuzzy
+msgid "Generated stream output string"
+msgstr "साधारण प्रवाह निर्गत सेटिङ"
 
 #: modules/gui/qt4/ui/sprefs_audio.ui:36
 #, fuzzy
@@ -14801,6 +15073,47 @@ msgstr "केबल चलिरहेको एउटा मात्र द�
 msgid "Enqueue files in playlist when in one interface mode"
 msgstr "दृष्टान्त मोडको बजाउने सूचीमा वस्तुको लाम लगाउनुहोस्"
 
+#: modules/gui/qt4/ui/sprefs_subtitles.ui:37
+#, fuzzy
+msgid "Enable OSD"
+msgstr "सक्षम पार्नुहोस्"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.ui:61
+#, fuzzy
+msgid "Subtitles languages"
+msgstr "उपशीर्षक भाषा"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.ui:73
+#, fuzzy
+msgid "Subtitles preferred language"
+msgstr "उपशीर्षक भाषा"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.ui:93
+#, fuzzy
+msgid "Default Encoding"
+msgstr "असङ्केतन"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.ui:103
+#, fuzzy
+msgid "Display Settings"
+msgstr "रिज्योलुसन प्रर्दशन गर्नुहोस्"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.ui:118
+#: modules/video_output/opengl.c:168
+msgid "Effect"
+msgstr "प्रभाव"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.ui:128
+#, fuzzy
+msgid "Font Color"
+msgstr "रङ"
+
+#: modules/gui/qt4/ui/sprefs_subtitles.ui:155 modules/misc/freetype.c:103
+#: modules/misc/notify/xosd.c:78 modules/misc/win32text.c:54
+#: modules/video_filter/marq.c:148 modules/video_filter/rss.c:196
+msgid "Font"
+msgstr "फन्ट"
+
 #: modules/gui/qt4/ui/sprefs_video.ui:36 modules/stream_out/display.c:51
 #: modules/video_filter/deinterlace.c:127
 msgid "Display"
@@ -14858,6 +15171,58 @@ msgstr "VCD ढाँचा"
 #: modules/gui/qt4/ui/sprefs_video.ui:206
 msgid "Sequential numbering"
 msgstr ""
+
+#: modules/gui/qt4/ui/streampanel.ui:57
+#, fuzzy
+msgid "Edit settings"
+msgstr "अडियो सेटिङ"
+
+#: modules/gui/qt4/ui/streampanel.ui:67
+#, fuzzy
+msgid "Control"
+msgstr "नियन्त्रक"
+
+#: modules/gui/qt4/ui/streampanel.ui:79
+msgid "Run manually"
+msgstr ""
+
+#: modules/gui/qt4/ui/streampanel.ui:86
+msgid "Setup schedule"
+msgstr ""
+
+#: modules/gui/qt4/ui/streampanel.ui:93
+msgid "Run on schedule"
+msgstr ""
+
+#: modules/gui/qt4/ui/streampanel.ui:103
+#, fuzzy
+msgid "Status"
+msgstr "सेटिङ"
+
+#: modules/gui/qt4/ui/streampanel.ui:115
+#, fuzzy
+msgid "P/P"
+msgstr "UDP/RTP"
+
+#: modules/gui/qt4/ui/streampanel.ui:136
+#, fuzzy
+msgid "Prev"
+msgstr "अघिल्लो"
+
+#: modules/gui/qt4/ui/streampanel.ui:153
+#, fuzzy
+msgid "Add input"
+msgstr "आगत होइन"
+
+#: modules/gui/qt4/ui/streampanel.ui:160
+#, fuzzy
+msgid "Edit input"
+msgstr "फाइल आगत"
+
+#: modules/gui/qt4/ui/streampanel.ui:167
+#, fuzzy
+msgid "Clear list"
+msgstr "बजाउने सूची"
 
 #: modules/gui/qt4/ui/video_effects.ui:25
 #, fuzzy
@@ -15303,10 +15668,6 @@ msgstr "यस रूपमा बचत गर्नुहोस्..."
 msgid "Save Messages As..."
 msgstr "यस रूपमा सन्देश बचत गर्नुहोस्..."
 
-#: modules/gui/wxwidgets/dialogs/open.cpp:256
-msgid "Advanced options..."
-msgstr "उन्नत विकल्प..."
-
 #: modules/gui/wxwidgets/dialogs/open.cpp:276
 msgid "Options:"
 msgstr "विकल्प:"
@@ -15323,10 +15684,6 @@ msgstr "प्रवाह/बचत गर्नुहोस्"
 #: modules/gui/wxwidgets/dialogs/open.cpp:427
 msgid "Use VLC as a stream server"
 msgstr "प्रवाह सर्भरको रूपमा VLC प्रयोग गर्नुहोस्"
-
-#: modules/gui/wxwidgets/dialogs/open.cpp:453
-msgid "Caching"
-msgstr "क्यासिङ"
 
 #: modules/gui/wxwidgets/dialogs/open.cpp:454
 msgid "Change the default caching value (in milliseconds)"
@@ -15639,14 +15996,6 @@ msgstr ""
 "MRL निर्दिष्ट गर्दछ । यसलाई प्रवाह सेटिङ समायोजन गरेर स्वचालित रूपमा भर्न वा प्रत्यक्ष "
 "रूपमा निर्दिष्ट गर्न सकिन्छ ।"
 
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:462
-msgid "Outputs"
-msgstr "निर्गत"
-
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:470
-msgid "Play locally"
-msgstr "स्थानिय रूपमा बजाउनुहोस्"
-
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:473
 msgid "MMSH"
 msgstr "MMSH"
@@ -15659,10 +16008,6 @@ msgstr "RTP"
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:475
 msgid "UDP"
 msgstr "UDP"
-
-#: modules/gui/wxwidgets/dialogs/streamout.cpp:592
-msgid "Group name"
-msgstr "समूह नाम"
 
 #: modules/gui/wxwidgets/dialogs/streamout.cpp:599
 msgid "Channel name"
@@ -15695,10 +16040,6 @@ msgstr "उपशीर्षक विकल्प"
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:73
 msgid "Subtitles file"
 msgstr "उपशीर्षक फाइल"
-
-#: modules/gui/wxwidgets/dialogs/subtitles.cpp:129
-msgid "Options"
-msgstr "विकल्प"
 
 #: modules/gui/wxwidgets/dialogs/subtitles.cpp:208
 msgid ""
@@ -16777,12 +17118,6 @@ msgstr "डम्मी भिडियो निर्गत"
 #: modules/misc/dummy/dummy.c:98
 msgid "Dummy font renderer function"
 msgstr "डम्मी फन्ट रेन्डरर प्रकार्य"
-
-#: modules/misc/freetype.c:103 modules/misc/notify/xosd.c:78
-#: modules/misc/win32text.c:54 modules/video_filter/marq.c:148
-#: modules/video_filter/rss.c:196
-msgid "Font"
-msgstr "फन्ट"
 
 #: modules/misc/freetype.c:104 modules/misc/win32text.c:55
 msgid "Filename for the font you want to use"
@@ -20309,10 +20644,6 @@ msgstr "खुलाGL क्युव परिक्रमण गति"
 #: modules/video_output/opengl.c:166
 msgid "Rotation speed of the OpenGL cube effect, if enabled."
 msgstr "यदि सक्षम पारिएमा, खुलाGL क्युब प्रभावको परिक्रमण गति "
-
-#: modules/video_output/opengl.c:168
-msgid "Effect"
-msgstr "प्रभाव"
 
 #: modules/video_output/opengl.c:170
 msgid "Several visual OpenGL effects are available."
