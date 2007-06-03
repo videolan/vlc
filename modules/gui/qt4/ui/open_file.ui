@@ -19,7 +19,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle" >
-   <string>Open File</string>
+   <string>_("Open File")</string>
   </property>
   <layout class="QGridLayout" >
    <property name="margin" >
@@ -55,14 +55,14 @@
       </size>
      </property>
      <property name="text" >
-      <string>File Names:</string>
+      <string>_("File Names:")</string>
      </property>
     </widget>
    </item>
    <item row="0" column="0" colspan="3" >
     <widget class="QWidget" native="1" name="tempWidget" >
      <property name="toolTip" >
-      <string>Choose one or more media file to open</string>
+      <string>_("Choose one or more media file to open")</string>
      </property>
     </widget>
    </item>
@@ -85,10 +85,10 @@
    <item row="3" column="0" colspan="2" >
     <widget class="QCheckBox" name="subCheckBox" >
      <property name="toolTip" >
-      <string>Add a subtitle file</string>
+      <string>_("Add a subtitle file")</string>
      </property>
      <property name="text" >
-      <string>Use a sub&amp;titles file</string>
+      <string>_("Use a sub&amp;titles file")</string>
      </property>
     </widget>
    </item>
@@ -160,7 +160,7 @@
       <item row="1" column="4" >
        <widget class="QLabel" name="alignSubLabel" >
         <property name="text" >
-         <string>Alignment:</string>
+         <string>_("Alignment:")</string>
         </property>
         <property name="buddy" >
          <cstring>alignSubLabel</cstring>
@@ -193,7 +193,7 @@
       <item row="1" column="1" >
        <widget class="QLabel" name="sizeSubLabel" >
         <property name="text" >
-         <string>Size:</string>
+         <string>_("Size:")</string>
         </property>
        </widget>
       </item>
@@ -215,10 +215,10 @@
       <item row="0" column="6" colspan="2" >
        <widget class="QPushButton" name="subBrowseButton" >
         <property name="toolTip" >
-         <string>Select the subtitle file</string>
+         <string>_("Select the subtitle file")</string>
         </property>
         <property name="text" >
-         <string>Browse...</string>
+         <string>_("Browse...")</string>
         </property>
        </widget>
       </item>

@@ -28,7 +28,7 @@
    <item rowspan="2" row="2" column="3" >
     <widget class="QGroupBox" name="statsBox" >
      <property name="title" >
-      <string>Statistics</string>
+      <string>_("Statistics")</string>
      </property>
     </widget>
    </item>
@@ -47,14 +47,14 @@
       <item>
        <widget class="QPushButton" name="deleteButton" >
         <property name="text" >
-         <string>Delete</string>
+         <string>_("Delete")</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="editStreamingButton" >
         <property name="text" >
-         <string>Edit settings</string>
+         <string>_("Edit settings")</string>
         </property>
        </widget>
       </item>
@@ -64,7 +64,7 @@
    <item row="1" column="3" >
     <widget class="QGroupBox" name="controlBox" >
      <property name="title" >
-      <string>Control</string>
+      <string>_("Control")</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -76,21 +76,21 @@
       <item row="0" column="0" >
        <widget class="QRadioButton" name="manualRadio" >
         <property name="text" >
-         <string>Run manually</string>
+         <string>_("Run manually")</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1" >
        <widget class="QPushButton" name="doScheduleButton" >
         <property name="text" >
-         <string>Setup schedule</string>
+         <string>_("Setup schedule")</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0" >
        <widget class="QRadioButton" name="scheduleRadio" >
         <property name="text" >
-         <string>Run on schedule</string>
+         <string>_("Run on schedule")</string>
         </property>
        </widget>
       </item>
@@ -100,7 +100,7 @@
    <item row="4" column="0" colspan="4" >
     <widget class="QGroupBox" name="statusBox" >
      <property name="title" >
-      <string>Status</string>
+      <string>_("Status")</string>
      </property>
      <layout class="QHBoxLayout" >
       <property name="margin" >
@@ -112,28 +112,28 @@
       <item>
        <widget class="QPushButton" name="playPauseButton" >
         <property name="text" >
-         <string>P/P</string>
+         <string>_("P/P")</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="stopButton" >
         <property name="text" >
-         <string>Stop</string>
+         <string>_("Stop")</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="nextButton" >
         <property name="text" >
-         <string>Next</string>
+         <string>_("Next")</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="prevButton" >
         <property name="text" >
-         <string>Prev</string>
+         <string>_("Prev")</string>
         </property>
        </widget>
       </item>
@@ -150,21 +150,21 @@
    <item row="3" column="0" >
     <widget class="QPushButton" name="addInputButton" >
      <property name="text" >
-      <string>Add input</string>
+      <string>_("Add input")</string>
      </property>
     </widget>
    </item>
    <item row="3" column="1" >
     <widget class="QPushButton" name="editInputButton" >
      <property name="text" >
-      <string>Edit input</string>
+      <string>_("Edit input")</string>
      </property>
     </widget>
    </item>
    <item row="3" column="2" >
     <widget class="QPushButton" name="clearInputsButton" >
      <property name="text" >
-      <string>Clear list</string>
+      <string>_("Clear list")</string>
      </property>
     </widget>
    </item>

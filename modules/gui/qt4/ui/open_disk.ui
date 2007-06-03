@@ -23,7 +23,7 @@
    <item>
     <widget class="QGroupBox" name="diskGroupBox" >
      <property name="title" >
-      <string>Disc selection</string>
+      <string>_("Disc selection")</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -68,24 +68,24 @@
       <item row="3" column="7" >
        <widget class="QToolButton" name="toolButton" >
         <property name="toolTip" >
-         <string>Select the device</string>
+         <string>_("Select the device")</string>
         </property>
         <property name="text" >
-         <string>Browse...</string>
+         <string>_("Browse...")</string>
         </property>
        </widget>
       </item>
       <item row="3" column="0" colspan="2" >
        <widget class="QLabel" name="deviceLabel" >
         <property name="text" >
-         <string>Disk device</string>
+         <string>_("Disk device")</string>
         </property>
        </widget>
       </item>
       <item row="0" column="6" >
        <widget class="QRadioButton" name="audioCDRadioButton" >
         <property name="text" >
-         <string>Audio CD</string>
+         <string>_("Audio CD")</string>
         </property>
        </widget>
       </item>
@@ -145,10 +145,10 @@
       <item row="1" column="1" colspan="4" >
        <widget class="QCheckBox" name="dvdsimple" >
         <property name="toolTip" >
-         <string>Disable DVD Menus (for compatibility)</string>
+         <string>_("Disable DVD Menus (for compatibility)")</string>
         </property>
         <property name="text" >
-         <string>No DVD Menus</string>
+         <string>_("No DVD Menus")</string>
         </property>
        </widget>
       </item>
@@ -166,7 +166,7 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>Starting position</string>
+      <string>_("Starting position")</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -178,7 +178,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="chapterLabel" >
         <property name="text" >
-         <string>Chapter</string>
+         <string>_("Chapter")</string>
         </property>
        </widget>
       </item>
@@ -204,7 +204,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="titleLabel" >
         <property name="text" >
-         <string>Title</string>
+         <string>_("Title")</string>
         </property>
        </widget>
       </item>
@@ -217,7 +217,7 @@
          <set>Qt::AlignRight</set>
         </property>
         <property name="suffix" >
-         <string/>
+<string/>
         </property>
         <property name="minimum" >
          <number>0</number>
@@ -241,7 +241,7 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>Audio and Subtitles</string>
+<string>_("Audio and Subtitles")</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -253,7 +253,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="audioLabel" >
         <property name="text" >
-         <string>Audio track</string>
+         <string>_("Audio track")</string>
         </property>
        </widget>
       </item>
@@ -282,7 +282,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="subtitlesLabel" >
         <property name="text" >
-         <string>Subtitles track</string>
+         <string>_("Subtitles track")</string>
         </property>
        </widget>
       </item>

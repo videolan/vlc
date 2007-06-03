@@ -64,12 +64,12 @@
      </property>
      <column>
       <property name="text" >
-       <string>Action</string>
+       <string>_("Action")</string>
       </property>
      </column>
      <column>
       <property name="text" >
-       <string>Shortcut</string>
+       <string>_("Shortcut")</string>
       </property>
      </column>
     </widget>
@@ -77,7 +77,7 @@
    <item row="0" column="0" >
     <widget class="QLabel" name="label" >
      <property name="text" >
-      <string>Search</string>
+      <string>_("Search")</string>
      </property>
     </widget>
    </item>

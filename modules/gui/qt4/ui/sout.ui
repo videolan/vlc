@@ -18,7 +18,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle" >
-   <string>Stream Output</string>
+   <string>_("Stream Output")</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
@@ -38,7 +38,7 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>Outputs</string>
+      <string>_("Outputs")</string>
      </property>
      <layout class="QHBoxLayout" >
       <property name="margin" >
@@ -61,7 +61,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Filename</string>
+           <string>_("Filename")</string>
           </property>
          </widget>
         </item>
@@ -71,7 +71,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="text" >
-           <string>File</string>
+           <string>_("File")</string>
           </property>
          </widget>
         </item>
@@ -106,7 +106,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Dump raw input</string>
+           <string>_("Dump raw input")</string>
           </property>
          </widget>
         </item>
@@ -123,7 +123,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Port:</string>
+           <string>_("Port:")</string>
           </property>
           <property name="alignment" >
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -136,14 +136,14 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Address</string>
+           <string>_("Address")</string>
           </property>
          </widget>
         </item>
         <item row="0" column="0" >
          <widget class="QCheckBox" name="localOutput" >
           <property name="text" >
-           <string>Play locally</string>
+           <string>_("Play locally")</string>
           </property>
          </widget>
         </item>
@@ -160,7 +160,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Browse...</string>
+           <string>_("Browse...")</string>
           </property>
          </widget>
         </item>
@@ -177,7 +177,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Address</string>
+           <string>_("Address")</string>
           </property>
          </widget>
         </item>
@@ -187,7 +187,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Port:</string>
+           <string>_("Port:")</string>
           </property>
           <property name="alignment" >
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -221,7 +221,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Address</string>
+           <string>_("Address")</string>
           </property>
          </widget>
         </item>
@@ -231,7 +231,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Port:</string>
+           <string>_("Port:")</string>
           </property>
           <property name="alignment" >
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -305,7 +305,7 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>Encapsulation</string>
+      <string>_("Encapsulation")</string>
      </property>
      <layout class="QHBoxLayout" >
       <property name="margin" >
@@ -393,7 +393,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2" >
      <property name="title" >
-      <string>Transcoding</string>
+      <string>_("Transcoding")</string>
      </property>
      <layout class="QHBoxLayout" >
       <property name="margin" >
@@ -432,21 +432,21 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Bitrate (kb/s)</string>
+           <string>_("Bitrate (kb/s)")</string>
           </property>
          </widget>
         </item>
         <item row="0" column="0" >
          <widget class="QCheckBox" name="transcodeVideo" >
           <property name="text" >
-           <string>Video</string>
+           <string>_("Video")</string>
           </property>
          </widget>
         </item>
         <item row="1" column="0" >
          <widget class="QCheckBox" name="transcodeAudio" >
           <property name="text" >
-           <string>Audio</string>
+           <string>_("Audio")</string>
           </property>
          </widget>
         </item>
@@ -456,7 +456,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Bitrate (kb/s)</string>
+           <string>_("Bitrate (kb/s)")</string>
           </property>
          </widget>
         </item>
@@ -493,7 +493,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Channels</string>
+           <string>_("Channels")</string>
           </property>
          </widget>
         </item>
@@ -503,14 +503,14 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Scale</string>
+           <string>_("Scale")</string>
           </property>
          </widget>
         </item>
         <item row="2" column="0" >
          <widget class="QCheckBox" name="transcodeSubs" >
           <property name="text" >
-           <string>Subtitles</string>
+           <string>_("Subtitles")</string>
           </property>
          </widget>
         </item>
@@ -527,7 +527,7 @@
            <bool>true</bool>
           </property>
           <property name="text" >
-           <string>Overlay subtitles on the video</string>
+           <string>_("Overlay subtitles on the video")</string>
           </property>
          </widget>
         </item>
@@ -571,7 +571,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="title" >
-      <string>Miscellaneous</string>
+      <string>_("Miscellaneous")</string>
      </property>
      <layout class="QHBoxLayout" >
       <property name="margin" >
@@ -594,7 +594,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>SAP announce</string>
+           <string>_("SAP announce")</string>
           </property>
          </widget>
         </item>
@@ -604,7 +604,7 @@
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>Group name</string>
+           <string>_("Group name")</string>
           </property>
          </widget>
         </item>
@@ -638,14 +638,14 @@
         <item row="1" column="0" colspan="2" >
          <widget class="QCheckBox" name="soutAll" >
           <property name="text" >
-           <string>Stream all elementary streams</string>
+           <string>_("Stream all elementary streams")</string>
           </property>
          </widget>
         </item>
         <item row="1" column="3" >
          <widget class="QLabel" name="label_10" >
           <property name="text" >
-           <string>Time-To-Live (TTL)</string>
+           <string>_("Time-To-Live (TTL)")</string>
           </property>
          </widget>
         </item>
@@ -665,7 +665,7 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>Generated stream output string</string>
+      <string>_("Generated stream output string")</string>
      </property>
      <layout class="QHBoxLayout" >
       <property name="margin" >

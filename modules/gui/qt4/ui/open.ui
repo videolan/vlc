@@ -49,10 +49,10 @@
    <item>
     <widget class="QCheckBox" name="advancedCheckBox" >
      <property name="toolTip" >
-      <string>Show extended options</string>
+      <string>_("Show extended options")</string>
      </property>
      <property name="text" >
-      <string>Show &amp;more options</string>
+      <string>_("Show &amp;more options")</string>
      </property>
     </widget>
    </item>
@@ -79,7 +79,7 @@
       <item row="0" column="2" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
-         <string>Start Time</string>
+         <string>_("Start Time")</string>
         </property>
        </widget>
       </item>
@@ -94,7 +94,7 @@
          </sizepolicy>
         </property>
         <property name="toolTip" >
-         <string>Change the start time for the media</string>
+         <string>_("Change the start time for the media")</string>
         </property>
         <property name="alignment" >
          <set>Qt::AlignRight</set>
@@ -118,21 +118,21 @@
          </sizepolicy>
         </property>
         <property name="text" >
-         <string>Caching</string>
+         <string>_("Caching")</string>
         </property>
        </widget>
       </item>
       <item row="5" column="1" colspan="4" >
        <widget class="QLineEdit" name="advancedLineInput" >
         <property name="toolTip" >
-         <string>Complete MRL for VLC internal</string>
+         <string>_("Complete MRL for VLC internal")</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0" colspan="5" >
        <widget class="QCheckBox" name="slaveCheckbox" >
         <property name="text" >
-         <string>Play another media synchronously (extra audio file, ...)</string>
+         <string>_("Play another media synchronously (extra audio file, ...)")</string>
         </property>
        </widget>
       </item>
@@ -146,14 +146,14 @@
       <item row="5" column="0" >
        <widget class="QLabel" name="advancedLabel" >
         <property name="text" >
-         <string>Customize</string>
+         <string>_("Customize")</string>
         </property>
        </widget>
       </item>
       <item row="3" column="0" >
        <widget class="QLabel" name="slaveLabel" >
         <property name="text" >
-         <string>Extra media</string>
+         <string>_("Extra media")</string>
         </property>
        </widget>
       </item>
@@ -163,10 +163,10 @@
       <item row="3" column="4" >
        <widget class="QToolButton" name="slaveBrowseButton" >
         <property name="toolTip" >
-         <string>Select the file</string>
+         <string>_("Select the file")</string>
         </property>
         <property name="text" >
-         <string>Browse...</string>
+         <string>_("Browse...")</string>
         </property>
        </widget>
       </item>
@@ -188,7 +188,7 @@
          </sizepolicy>
         </property>
         <property name="toolTip" >
-         <string>Change the caching for the media</string>
+         <string>_("Change the caching for the media")</string>
         </property>
         <property name="alignment" >
          <set>Qt::AlignRight</set>

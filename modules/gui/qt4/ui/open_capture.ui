@@ -47,14 +47,14 @@
       </sizepolicy>
      </property>
      <property name="toolTip" >
-      <string>Select the capture device type</string>
+      <string>_("Select the capture device type")</string>
      </property>
     </widget>
    </item>
    <item row="0" column="0" >
     <widget class="QLabel" name="label" >
      <property name="text" >
-      <string>Capture Mode</string>
+      <string>_("Capture Mode")</string>
      </property>
     </widget>
    </item>
@@ -69,7 +69,7 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>Options</string>
+      <string>_("Options")</string>
      </property>
     </widget>
    </item>
@@ -84,17 +84,17 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>Card Selection</string>
+      <string>_("Card Selection")</string>
      </property>
     </widget>
    </item>
    <item row="3" column="0" >
     <widget class="QPushButton" name="advancedButton" >
      <property name="toolTip" >
-      <string>Access advanced options to tweak the device</string>
+      <string>_("Access advanced options to tweak the device")</string>
      </property>
      <property name="text" >
-      <string>Advanced options...</string>
+      <string>_("Advanced options...")</string>
      </property>
     </widget>
    </item>

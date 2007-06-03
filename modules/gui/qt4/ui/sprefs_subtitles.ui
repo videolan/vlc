@@ -22,7 +22,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="title" >
-      <string>On Screen Display</string>
+      <string>_("On Screen Display")</string>
      </property>
      <layout class="QVBoxLayout" >
       <property name="margin" >
@@ -34,7 +34,7 @@
       <item>
        <widget class="QCheckBox" name="OSDBox" >
         <property name="text" >
-         <string>Enable OSD</string>
+         <string>_("Enable OSD")</string>
         </property>
         <property name="checked" >
          <bool>true</bool>
@@ -58,7 +58,7 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>Subtitles languages</string>
+      <string>_("Subtitles languages")</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -70,7 +70,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>Subtitles preferred language</string>
+         <string>_("Subtitles preferred language")</string>
         </property>
        </widget>
       </item>
@@ -90,7 +90,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
-         <string>Default Encoding</string>
+         <string>_("Default Encoding")</string>
         </property>
        </widget>
       </item>
@@ -100,7 +100,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
-      <string>Display Settings</string>
+      <string>_("Display Settings")</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -115,7 +115,7 @@
       <item row="3" column="0" >
        <widget class="QLabel" name="label_6" >
         <property name="text" >
-         <string>Effect</string>
+         <string>_("Effect")</string>
         </property>
        </widget>
       </item>
@@ -125,7 +125,7 @@
       <item row="2" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
-         <string>Font Color</string>
+         <string>_("Font Color")</string>
         </property>
        </widget>
       </item>
@@ -135,14 +135,14 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
-         <string>Font size</string>
+         <string>_("Font size")</string>
         </property>
        </widget>
       </item>
       <item row="0" column="2" >
        <widget class="QPushButton" name="fontBrowse" >
         <property name="text" >
-         <string>Browse...</string>
+         <string>_("Browse...")</string>
         </property>
        </widget>
       </item>
@@ -152,7 +152,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="label_5" >
         <property name="text" >
-         <string>Font</string>
+         <string>_("Font")</string>
         </property>
        </widget>
       </item>
