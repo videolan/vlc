@@ -30,6 +30,7 @@
 
 class QTabWidget;
 class InfoTab;
+class QLineEdit;
 
 class MediaInfoDialog : public QVLCFrame
 {
@@ -53,6 +54,7 @@ public:
     void showTab( int );
     bool need_update;
     void setInput( input_item_t * );
+    QLineEdit *uriLine;
 private:
     input_thread_t *p_input;
     QTabWidget *IT;

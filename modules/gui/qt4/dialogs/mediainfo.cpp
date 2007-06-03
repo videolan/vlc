@@ -22,9 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  ******************************************************************************/
 
-#include <QTabWidget>
-#include <QGridLayout>
-
 #include "dialogs/mediainfo.hpp"
 #include "input_manager.hpp"
 #include "dialogs_provider.hpp"
@@ -32,6 +29,10 @@
 #include "components/infopanels.hpp"
 #include "qt4.hpp"
 
+#include <QTabWidget>
+#include <QGridLayout>
+#include <QLineEdit>
+#include <QLabel>
 
 static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param );
@@ -66,10 +67,16 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     closeButton->setDefault( true );
 
+    uriLine = new QLineEdit;
+    QLabel *uriLabel = new QLabel( qtr( "Location" ) );
+
     layout->addWidget( IT, 0, 0, 1, 3 );
-    layout->addWidget( closeButton, 1, 2 );
+    layout->addWidget( closeButton, 2, 2 );
+    layout->addWidget( uriLine, 1, 1, 1, 2 );
+    layout->addWidget( uriLabel, 1, 0, 1, 1 );
 
     BUTTONACT( closeButton, close() );
+    CONNECT( MP, uriSet( QString ), uriLine, setText( QString ) );
 
     if( mainInput ) {
         ON_TIMEOUT( update() );
@@ -109,7 +116,6 @@ void MediaInfoDialog::setInput(input_item_t *p_input)
 
 void MediaInfoDialog::update()
 {
-    msg_Dbg( p_intf, "updating MetaData Info" );
     /* Timer runs at 150 ms, dont' update more than 2 times per second */
     if( i_runs % 3 != 0 ) return;
     i_runs++;

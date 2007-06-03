@@ -176,7 +176,7 @@ void DialogsProvider::mediaInfoDialog()
 
 void DialogsProvider::mediaCodecDialog()
 {
-    MediaInfoDialog::getInstance( p_intf )->showTab( 1 );
+    MediaInfoDialog::getInstance( p_intf )->showTab( 2 );
 }
 
 void DialogsProvider::bookmarksDialog()

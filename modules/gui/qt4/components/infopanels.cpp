@@ -100,10 +100,10 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     ADD_META( VLC_META_DESCRIPTION, description_text ); // Comment Two lines?
 
     /*  ADD_META( TRACKID)  DO NOT SHOW it */
+    /*  ADD_URI - DO not show it, done outside */
 
-    // ADD_META( _( "URI" ), uri_text ); // FIXME URI outside
-    //    ADD_META( VLC_META_URL, setting_text );
     /* ART_URL */
+    //    ADD_META( VLC_META_URL, setting_text );
 }
 
 MetaPanel::~MetaPanel()
@@ -123,7 +123,7 @@ void MetaPanel::update( input_item_t *p_item )
 #define UPDATE_META_INT( meta, widget ) {           \
     psz_meta = p_item->p_meta->psz_##meta;          \
     if( !EMPTY_STR( psz_meta ) )                    \
-        widget->setValue( atoi( psz_meta ) ); }/*FIXME Atoi ?*/
+        widget->setValue( atoi( psz_meta ) ); }
 
     /* Name / Title */
     psz_meta = p_item->p_meta->psz_title;
@@ -133,10 +133,14 @@ void MetaPanel::update( input_item_t *p_item )
         title_text->setText( qfu( p_item->psz_name ) );
     else title_text->setText( "" );
 
-  /*  if( !EMPTY_STR( p_item->psz_uri ) )
-        uri_text->setText( qfu( p_item->psz_uri ) );*/
-///    else uri_text->setText( "" );
+    /* URL / URI */
+    psz_meta = p_item->p_meta->psz_url;
+    if( !EMPTY_STR( psz_meta ) )
+        emit uriSet( QString( psz_meta ) );
+    else if( !EMPTY_STR( p_item->psz_uri ) )
+        emit uriSet( QString( p_item->psz_uri ) );
 
+    /* Other classic though */
     UPDATE_META( artist, artist_text );
     UPDATE_META( genre, genre_text );
     UPDATE_META( copyright, copyright_text );

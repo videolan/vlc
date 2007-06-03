@@ -72,6 +72,8 @@ private:
 public slots:
     void update( input_item_t * );
     void clear();
+signals:
+    void uriSet( QString );
 };
 
 class ExtraMetaPanel: public QWidget
