@@ -271,7 +271,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 #ifdef USE_LIBFLAC
     p_dec->pf_decode_audio = DecodeBlock;
 #endif
-    p_dec->pf_packetize    = PacketizeBlock;
 
     return VLC_SUCCESS;
 }
@@ -286,6 +285,8 @@ static int OpenPacketizer( vlc_object_t *p_this )
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
     i_ret = OpenDecoder( p_this );
+    p_dec->pf_decode_audio = NULL;
+    p_dec->pf_packetize    = PacketizeBlock;
 
     /* Set output properties */
     p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','a','c');
@@ -646,19 +647,22 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
     decoder_t *p_dec = (decoder_t *)client_data;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    switch( metadata->data.stream_info.bits_per_sample )
+    if( p_dec->pf_decode_audio )
     {
-    case 8:
-        p_dec->fmt_out.i_codec = VLC_FOURCC('s','8',' ',' ');
-        break;
-    case 16:
-        p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
-        break;
-    default:
-        msg_Dbg( p_dec, "strange bit/sample value: %d",
-                 metadata->data.stream_info.bits_per_sample );
-        p_dec->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
-        break;
+        switch( metadata->data.stream_info.bits_per_sample )
+        {
+        case 8:
+            p_dec->fmt_out.i_codec = VLC_FOURCC('s','8',' ',' ');
+            break;
+        case 16:
+            p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+            break;
+        default:
+            msg_Dbg( p_dec, "strange bit/sample value: %d",
+                     metadata->data.stream_info.bits_per_sample );
+            p_dec->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
+            break;
+        }
     }
 
     /* Setup the format */
