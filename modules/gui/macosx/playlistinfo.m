@@ -298,7 +298,7 @@
 
         p_item->p_input->psz_uri = strdup( [[o_uri_txt stringValue] UTF8String] );
         p_item->p_input->psz_name = strdup( [[o_title_txt stringValue] UTF8String] );
-        vlc_meta_SetArtist( p_item->p_input->p_meta, [[o_author_txt stringValue] UTF8String] )
+        vlc_meta_SetArtist( p_item->p_input->p_meta, [[o_author_txt stringValue] UTF8String] );
         vlc_mutex_unlock( &p_item->p_input->lock );
 
         val.b_bool = VLC_TRUE;
