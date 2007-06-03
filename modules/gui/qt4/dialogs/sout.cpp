@@ -53,11 +53,12 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     ADD_ACODEC( "MPEG Audio", "mpga" );
     ADD_ACODEC( "MP3", "mp3" );
     ADD_ACODEC( "MPEG 4 Audio (AAC)", "mp4a");
-    ADD_ACODEC( "A52/AC3", "a52");
+    ADD_ACODEC( "A52/AC-3", "a52");
     ADD_ACODEC( "Vorbis", "vorb" );
     ADD_ACODEC( "Flac", "flac" );
     ADD_ACODEC( "Speex", "spx" );
     ADD_ACODEC( "WAV", "s16l" );
+    ADD_ACODEC( "WMA", "wma" );
 
     ui.vScale->addItem( "0.25" );
     ui.vScale->addItem( "0.5" );
