@@ -302,3 +302,10 @@ N_("<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...
 #define MUX_TEXT N_("Ffmpeg mux")
 #define MUX_LONGTEXT N_("Force use of ffmpeg muxer.")
 
+#define FFMPEG_COMMON_MEMBERS   \
+    int i_cat;                  \
+    int i_codec_id;             \
+    char *psz_namecodec;        \
+    AVCodecContext *p_context;  \
+    AVCodec        *p_codec;
+

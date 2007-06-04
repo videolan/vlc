@@ -56,12 +56,7 @@ static unsigned int pi_channels_maps[7] =
  *****************************************************************************/
 struct decoder_sys_t
 {
-    /* Common part between video and audio decoder */
-    int i_cat;
-    int i_codec_id;
-    const char *psz_namecodec;
-    AVCodecContext      *p_context;
-    AVCodec             *p_codec;
+    FFMPEG_COMMON_MEMBERS
 
     /* Temporary buffer for libavcodec */
     uint8_t *p_output;
@@ -77,6 +72,9 @@ struct decoder_sys_t
      */
     uint8_t *p_samples;
     int     i_samples;
+
+    /* */
+    int     i_reject_count;
 };
 
 /*****************************************************************************
@@ -147,6 +145,7 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_output = malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE );
     p_sys->p_samples = NULL;
     p_sys->i_samples = 0;
+    p_sys->i_reject_count = 0;
 
     aout_DateSet( &p_sys->end_date, 0 );
     if( p_dec->fmt_in.audio.i_rate )
@@ -207,6 +206,9 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
     {
         block_Release( p_block );
         avcodec_flush_buffers( p_sys->p_context );
+
+        if( p_sys->i_codec_id == CODEC_ID_MP2 || p_sys->i_codec_id == CODEC_ID_MP3 )
+            p_sys->i_reject_count = 3;
         return NULL;
     }
 
@@ -293,8 +295,15 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
     p_block->i_pts = 0;
 
     /* **** Now we can output these samples **** */
-    p_sys->i_samples = i_output / 2 / p_sys->p_context->channels;
+    p_sys->i_samples = i_output / sizeof(int16_t) / p_sys->p_context->channels;
     p_sys->p_samples = p_sys->p_output;
+
+    /* Silent unwanted samples */
+    if( p_sys->i_reject_count > 0 )
+    {
+        memset( p_sys->p_output, 0, i_output );
+        p_sys->i_reject_count--;
+    }
 
     p_buffer = SplitBuffer( p_dec );
     if( !p_buffer ) block_Release( p_block );

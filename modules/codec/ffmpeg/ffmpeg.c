@@ -54,12 +54,7 @@
 struct decoder_sys_t
 {
     /* Common part between video and audio decoder */
-    int i_cat;
-    int i_codec_id;
-    char *psz_namecodec;
-
-    AVCodecContext *p_context;
-    AVCodec        *p_codec;
+    FFMPEG_COMMON_MEMBERS
 };
 
 /****************************************************************************
