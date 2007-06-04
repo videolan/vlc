@@ -74,6 +74,12 @@ struct demux_sys_t
     /* */
     int         i_seekpoint;
     seekpoint_t **seekpoint;
+
+    /* */
+    int                i_attachment;
+    input_attachment_t **attachment;
+    int                i_cover_idx;
+    int                i_cover_score;
 };
 
 #define STREAMINFO_SIZE 38
@@ -114,6 +120,9 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_pts_start = 0;
     p_sys->p_es = NULL;
     TAB_INIT( p_sys->i_seekpoint, p_sys->seekpoint );
+    TAB_INIT( p_sys->i_attachment, p_sys->attachment );
+    p_sys->i_cover_idx = 0;
+    p_sys->i_cover_score = 0;
 
     /* We need to read and store the STREAMINFO metadata */
     if( ReadMeta( p_demux, &p_streaminfo, &i_streaminfo ) )
@@ -160,6 +169,15 @@ static int Open( vlc_object_t * p_this )
         module_Unneed( p_demux, p_id3 );
     }
 
+    if( p_sys->i_cover_idx < p_sys->i_attachment )
+    {
+        char psz_url[128];
+        if( !p_sys->p_meta )
+            p_sys->p_meta = vlc_meta_New();
+        snprintf( psz_url, sizeof(psz_url), "attachment://%s",
+                  p_sys->attachment[p_sys->i_cover_idx]->psz_name );
+        vlc_meta_SetArtURL( p_sys->p_meta, psz_url );
+    }
     return VLC_SUCCESS;
 }
 
@@ -363,6 +381,22 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pf= 0.0;
         return VLC_SUCCESS;
     }
+    else if( i_query == DEMUX_GET_ATTACHMENTS )
+    {
+        input_attachment_t ***ppp_attach =
+            (input_attachment_t***)va_arg( args, input_attachment_t*** );
+        int *pi_int = (int*)va_arg( args, int * );
+        int i;
+
+        if( p_sys->i_attachment <= 0 )
+            return VLC_EGENERIC;
+
+        *pi_int = p_sys->i_attachment;;
+        *ppp_attach = malloc( sizeof(input_attachment_t**) * p_sys->i_attachment );
+        for( i = 0; i < p_sys->i_attachment; i++ )
+            *(ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachment[i] );
+        return VLC_SUCCESS;
+    }
 
     return demux2_vaControlHelper( p_demux->s, p_sys->i_data_pos, -1,
                                    8*0, 1, i_query, args );
@@ -373,6 +407,7 @@ enum
     META_STREAMINFO = 0,
     META_SEEKTABLE = 3,
     META_COMMENT = 4,
+    META_PICTURE = 6,
 };
 
 static inline int Get24bBE( uint8_t *p )
@@ -383,6 +418,7 @@ static inline int Get24bBE( uint8_t *p )
 static void ParseStreamInfo( demux_t *p_demux, int *pi_rate, int64_t *pi_count, uint8_t *p_data, int i_data );
 static void ParseSeekTable( demux_t *p_demux, uint8_t *p_data, int i_data, int i_sample_rate );
 static void ParseComment( demux_t *, uint8_t *p_data, int i_data );
+static void ParsePicture( demux_t *, uint8_t *p_data, int i_data );
 
 static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streaminfo )
 {
@@ -456,6 +492,12 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
             i_peek = stream_Peek( p_demux->s, &p_peek, 4+i_len );
             if( i_peek == 4+i_len )
                 ParseComment( p_demux, p_peek, i_peek );
+        }
+        else if( i_type == META_PICTURE )
+        {
+            i_peek = stream_Peek( p_demux->s, &p_peek, 4+i_len );
+            if( i_peek == 4+i_len )
+                ParsePicture( p_demux, p_peek, i_peek );
         }
 
         if( stream_Read( p_demux->s, NULL, 4+i_len ) < 4+i_len )
@@ -532,6 +574,7 @@ static inline void astrcat( char **ppsz_dst, const char *psz_src )
     }
 }
 
+#define RM(x) do { i_data -= (x); p_data += (x); } while(0)
 static void ParseComment( demux_t *p_demux, uint8_t *p_data, int i_data )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -541,7 +584,6 @@ static void ParseComment( demux_t *p_demux, uint8_t *p_data, int i_data )
     if( i_data < 8 )
         return;
 
-#define RM(x) do { i_data -= (x); p_data += (x); } while(0)
     RM(4);
 
     n = GetDWLE(p_data); RM(4);
@@ -604,4 +646,73 @@ static void ParseComment( demux_t *p_demux, uint8_t *p_data, int i_data )
     }
 #undef RM
 }
+
+static void ParsePicture( demux_t *p_demux, uint8_t *p_data, int i_data )
+{
+    static const int pi_cover_score[] = {
+        0,      /* other */
+        2, 1,   /* icons */
+        10,     /* front cover */
+        9,      /* back cover */
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        6,      /* movie/video screen capture */
+        0,
+        7,      /* Illustration */
+        8,      /* Band/Artist logotype */
+        0,      /* Publisher/Studio */
+    };
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int i_type;
+    int i_len;
+    char *psz_mime = NULL;
+    char *psz_description = NULL;
+    input_attachment_t *p_attachment;
+    char psz_name[128];
+
+    if( i_data < 4 + 3*4 )
+        return;
+#define RM(x) do { i_data -= (x); p_data += (x); } while(0)
+    RM(4);
+
+    i_type = GetDWBE( p_data ); RM(4);
+    i_len = GetDWBE( p_data ); RM(4);
+    if( i_data < i_len + 4 )
+        goto error;
+    psz_mime = strndup( p_data, i_len ); RM(i_len);
+    i_len = GetDWBE( p_data ); RM(4);
+    if( i_data < i_len + 4*4 + 4)
+        goto error;
+    psz_description = strndup( p_data, i_len ); RM(i_len);
+    EnsureUTF8( psz_description );
+    RM(4*4);
+    i_len = GetDWBE( p_data ); RM(4);
+    if( i_len > i_data )
+        goto error;
+
+    msg_Dbg( p_demux, "FLAC: Picture type=%d mime=%s description='%s' file length=%d",
+             i_type, psz_mime, psz_description, i_len );
+
+    snprintf( psz_name, sizeof(psz_name), "picture%d", p_sys->i_attachment );
+    if( !strcasecmp( psz_mime, "image/jpeg" ) )
+        strcat( psz_name, ".jpg" );
+    else if( !strcasecmp( psz_mime, "image/png" ) )
+        strcat( psz_name, ".png" );
+
+    p_attachment = vlc_input_attachment_New( psz_name, psz_mime, psz_description,
+                                             p_data, i_data );
+    TAB_APPEND( p_sys->i_attachment, p_sys->attachment, p_attachment );
+
+    if( i_type >= 0 && i_type < sizeof(pi_cover_score)/sizeof(pi_cover_score[0]) &&
+        p_sys->i_cover_score < pi_cover_score[i_type] )
+    {
+        p_sys->i_cover_idx = p_sys->i_attachment-1;
+        p_sys->i_cover_score = pi_cover_score[i_type];
+    }
+error:
+    if( psz_mime )
+        free( psz_mime );
+    if( psz_description )
+        free( psz_description );
+}
+#undef RM
 
