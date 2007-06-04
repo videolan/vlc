@@ -144,6 +144,7 @@ struct aout_buffer_t
     size_t                  i_size, i_nb_bytes;
     unsigned int            i_nb_samples;
     mtime_t                 start_date, end_date;
+    vlc_bool_t              b_discontinuity; /* Set on discontinuity (for non pcm stream) */
 
     struct aout_buffer_t *  p_next;
 
@@ -155,12 +156,12 @@ struct aout_buffer_t
     void (*pf_release)( aout_buffer_t * );
 };
 
-#define aout_BufferFree( p_buffer )                                         \
+#define aout_BufferFree( p_buffer ) do {                                    \
     if( p_buffer != NULL && (p_buffer)->i_alloc_type == AOUT_ALLOC_HEAP )   \
     {                                                                       \
         free( p_buffer );                                                   \
     }                                                                       \
-    p_buffer = NULL;
+    p_buffer = NULL; } while(0)
 
 /* Size of a frame for S/PDIF output. */
 #define AOUT_SPDIF_SIZE 6144

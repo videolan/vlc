@@ -59,6 +59,7 @@
             (p_new_buffer)->i_size = i_alloc_size;                          \
             (p_new_buffer)->p_buffer = (byte_t *)(p_new_buffer)             \
                                          + sizeof(aout_buffer_t);           \
+            (p_new_buffer)->b_discontinuity = VLC_FALSE;                    \
             if ( (p_previous_buffer) != NULL )                              \
             {                                                               \
                 (p_new_buffer)->start_date =                                \

@@ -54,8 +54,10 @@ static block_t *Convert( filter_t *, block_t * );
 struct filter_sys_t
 {
     struct mad_stream mad_stream;
-    struct mad_frame mad_frame;
-    struct mad_synth mad_synth;
+    struct mad_frame  mad_frame;
+    struct mad_synth  mad_synth;
+
+    int               i_reject_count;
 };
 
 /*****************************************************************************
@@ -109,6 +111,7 @@ static int Create( vlc_object_t *p_this )
     mad_frame_init( &p_sys->mad_frame );
     mad_synth_init( &p_sys->mad_synth );
     mad_stream_options( &p_sys->mad_stream, MAD_OPTION_IGNORECRC );
+    p_sys->i_reject_count = 0;
 
     p_filter->pf_do_work = DoWork;
     p_filter->b_in_place = 0;
@@ -135,6 +138,15 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     {
         msg_Dbg( p_aout, "libmad error: %s",
                   mad_stream_errorstr( &p_sys->mad_stream ) );
+        p_sys->i_reject_count = 3;
+    }
+    else if( p_in_buf->b_discontinuity )
+    {
+        p_sys->i_reject_count = 3;
+    }
+
+    if( p_sys->i_reject_count > 0 )
+    {
         if( p_filter->output.i_format == VLC_FOURCC('f','l','3','2') )
         {
             int i;
@@ -148,8 +160,10 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         {
             memset( p_out_buf->p_buffer, 0, p_out_buf->i_nb_bytes );
         }
+        p_sys->i_reject_count--;
         return;
     }
+
 
     mad_synth_frame( &p_sys->mad_synth, &p_sys->mad_frame );
 

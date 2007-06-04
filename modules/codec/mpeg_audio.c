@@ -60,6 +60,8 @@ struct decoder_sys_t
     unsigned int i_channels_conf, i_channels;
     unsigned int i_rate, i_max_frame_size, i_frame_length;
     unsigned int i_layer, i_bit_rate;
+
+    vlc_bool_t   b_discontinuity;
 };
 
 enum {
@@ -152,6 +154,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_state = STATE_NOSYNC;
     aout_DateSet( &p_sys->end_date, 0 );
     p_sys->bytestream = block_BytestreamInit( p_dec );
+    p_sys->b_discontinuity = VLC_FALSE;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
@@ -205,6 +208,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
 //        aout_DateSet( &p_sys->end_date, 0 );
         block_Release( *pp_block );
+        p_sys->b_discontinuity = VLC_TRUE;
         return NULL;
     }
 
@@ -281,6 +285,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 msg_Dbg( p_dec, "emulated startcode" );
                 block_SkipByte( &p_sys->bytestream );
                 p_sys->i_state = STATE_NOSYNC;
+                p_sys->b_discontinuity = VLC_TRUE;
                 break;
             }
 
@@ -355,6 +360,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     msg_Dbg( p_dec, "emulated startcode on next frame" );
                     block_SkipByte( &p_sys->bytestream );
                     p_sys->i_state = STATE_NOSYNC;
+                    p_sys->b_discontinuity = VLC_TRUE;
                     break;
                 }
 
@@ -530,6 +536,8 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
     p_buf->start_date = aout_DateGet( &p_sys->end_date );
     p_buf->end_date =
         aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length );
+    p_buf->b_discontinuity = p_sys->b_discontinuity;
+    p_sys->b_discontinuity = VLC_FALSE;
 
     /* Hack for libmad filter */
     p_buf->i_nb_bytes = p_sys->i_frame_size + MAD_BUFFER_GUARD;
