@@ -18,5 +18,9 @@
   <file>pixmaps/spref_cone_Hotkeys_64.png</file>
   <file>pixmaps/spref_cone_Subtitles_64.png</file>
   <file>pixmaps/spref_cone_Interface_64.png</file>
+  <file>pixmaps/vlc_help_16px.png</file>
+  <file>pixmaps/vlc_info_16px.png</file>
+  <file>pixmaps/vlc_next_16px.png</file>
+  <file>pixmaps/vlc_previous_16px.png</file>
  </qresource>
 </RCC>

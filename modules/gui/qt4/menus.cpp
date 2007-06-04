@@ -399,7 +399,7 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 QMenu *QVLCMenu::HelpMenu()
 {
     QMenu *menu = new QMenu();
-    DP_SADD( menu, qtr("Help") , "", "", helpDialog(), "F1" );
+    DP_SADD( menu, qtr("Help") , "", ":/pixmaps/vlc_help_16px.png", helpDialog(), "F1" );
     menu->addSeparator();
     DP_SADD( menu, qtr(I_MENU_ABOUT), "", "", aboutDialog(), "Ctrl+F1");
     return menu;
@@ -437,8 +437,9 @@ QMenu *QVLCMenu::HelpMenu()
         MIM_SADD( menu, qtr("Play"), "", "", togglePlayPause() ); \
     \
     MIM_SADD( menu, qtr("Stop"), "", "", stop() ); \
-    MIM_SADD( menu, qtr("Previous"), "", "", prev() ); \
-    MIM_SADD( menu, qtr("Next"), "", "", next() );
+    MIM_SADD( menu, qtr("Previous"), "", ":/pixmaps/vlc_previous_16px.png", \
+            prev() ); \
+    MIM_SADD( menu, qtr("Next"), "", ":/pixmaps/vlc_next_16px.png", next() );
 
 #define POPUP_STATIC_ENTRIES \
     POPUP_PLAY_ENTRIES( menu ); \
