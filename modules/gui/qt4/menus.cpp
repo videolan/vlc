@@ -239,7 +239,8 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         menu->addSeparator();
     }
     DP_SADD( menu, qtr(I_MENU_MSG), "", "", messagesDialog(), "Ctrl+M" );
-    DP_SADD( menu, qtr(I_MENU_INFO) , "", "", mediaInfoDialog(), "Ctrl+J" );
+    DP_SADD( menu, qtr(I_MENU_INFO) , "", ":/pixmaps/vlc_info_16px.png", 
+             mediaInfoDialog(), "Ctrl+J" );
     DP_SADD( menu, qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog(), "Ctrl+I" );
     DP_SADD( menu, qtr(I_MENU_GOTOTIME), "","", gotoTimeDialog(), "Ctrl+T" );
     DP_SADD( menu, qtr(I_MENU_BOOKMARK), "","", bookmarksDialog(), "Ctrl+B" );
