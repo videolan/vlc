@@ -507,6 +507,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     v4lFreq = new QSpinBox;
     v4lFreq->setAlignment( Qt::AlignRight );
     v4lFreq->setSuffix(" kHz");
+    setSpinBoxFreq( v4lFreq );
     v4lPropLayout->addWidget( v4lFreq, 1 , 1 );
 
     /* v4l CONNECTs */
@@ -547,7 +548,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     pvrFreq = new QSpinBox;
     pvrFreq->setAlignment( Qt::AlignRight );
     pvrFreq->setSuffix(" kHz");
-    setMaxBound( pvrFreq );
+    setSpinBoxFreq( pvrFreq );
     pvrPropLayout->addWidget( pvrFreq, 1, 1 );
 
     QLabel *pvrBitrLabel = new QLabel( qtr( "Bitrate" ) );
@@ -556,7 +557,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     pvrBitr = new QSpinBox;
     pvrBitr->setAlignment( Qt::AlignRight );
     pvrBitr->setSuffix(" kHz");
-    setMaxBound( pvrBitr );
+    setSpinBoxFreq( pvrBitr );
     pvrPropLayout->addWidget( pvrBitr, 2, 1 );
 
     /* PVR CONNECTs */
@@ -638,8 +639,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     bdaFreq->setAlignment( Qt::AlignRight );
     bdaFreq->setSuffix(" kHz");
     bdaFreq->setSingleStep( 1000 );
-    bdaFreq->setAccelerated( true );
-    setMaxBound( bdaFreq )
+    setSpinBoxFreq( bdaFreq )
     bdaPropLayout->addWidget( bdaFreq, 0, 1 );
 
     bdaSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
@@ -648,7 +648,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     bdaSrate = new QSpinBox;
     bdaSrate->setAlignment( Qt::AlignRight );
     bdaSrate->setSuffix(" kHz");
-    setMaxBound( bdaSrate );
+    setSpinBoxFreq( bdaSrate );
     bdaPropLayout->addWidget( bdaSrate, 1, 1 );
 
     bdaBandLabel = new QLabel( qtr( "Bandwidth" ) );
@@ -706,7 +706,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dvbFreq = new QSpinBox;
     dvbFreq->setAlignment( Qt::AlignRight );
     dvbFreq->setSuffix(" kHz");
-    setMaxBound( dvbFreq  );
+    setSpinBoxFreq( dvbFreq  );
     dvbPropLayout->addWidget( dvbFreq, 0, 1 );
 
     QLabel *dvbSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
@@ -715,7 +715,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     dvbSrate = new QSpinBox;
     dvbSrate->setAlignment( Qt::AlignRight );
     dvbSrate->setSuffix(" kHz");
-    setMaxBound( dvbSrate );
+    setSpinBoxFreq( dvbSrate );
     dvbPropLayout->addWidget( dvbSrate, 1, 1 );
 
     /* DVB CONNECTs */

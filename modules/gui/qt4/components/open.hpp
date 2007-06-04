@@ -38,7 +38,8 @@
 #   include <limits.h>
 #endif
 
-#define setMaxBound( spinbox ) spinbox->setRange ( 0, INT_MAX );
+#define setSpinBoxFreq( spinbox ){ spinbox->setRange ( 0, INT_MAX ); \
+    spinbox->setAccelerated( true ); }
 
 #define V4L_DEVICE         0x0
 #define PVR_DEVICE         0x1
