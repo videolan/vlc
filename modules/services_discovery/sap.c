@@ -332,6 +332,7 @@ static int OpenDemux( vlc_object_t *p_this )
     char *psz_sdp = NULL;
     sdp_t *p_sdp = NULL;
     int errval = VLC_EGENERIC;
+    size_t i_len;
 
     if( !var_CreateGetInteger( p_demux, "sap-parse" ) )
     {
@@ -349,14 +350,11 @@ static int OpenDemux( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Gather the complete sdp file */
-    psz_sdp = NULL;
-
-#define SDP_MAX 65536
-#define OFFSET 1024
-
-    for( size_t buflen = 0; buflen < SDP_MAX; buflen += OFFSET )
+    for( i_len = 0, psz_sdp = NULL; i_len < 65536; )
     {
-        char *psz_sdp_new = realloc( psz_sdp, buflen + 1 );
+        const int i_read_max = 1024;
+        char *psz_sdp_new = realloc( psz_sdp, i_len + i_read_max );
+        size_t i_read;
         if( psz_sdp_new == NULL )
         {
             errval = VLC_ENOMEM;
@@ -364,19 +362,19 @@ static int OpenDemux( vlc_object_t *p_this )
         }
         psz_sdp = psz_sdp_new;
 
-        ssize_t i_read = stream_Read( p_demux->s, psz_sdp + buflen, OFFSET );
+        i_read = stream_Read( p_demux->s, &psz_sdp[i_len], i_read_max );
         if( i_read < 0 )
         {
             msg_Err( p_demux, "cannot read SDP" );
             goto error;
         }
+        i_len += i_read;
 
-        psz_sdp[buflen + i_read] = '\0';
+        psz_sdp[i_len] = '\0';
 
-        if( i_read < OFFSET )
+        if( i_read < i_read_max )
             break; // EOF
     }
-#undef OFFSET
 
     p_sdp = ParseSDP( VLC_OBJECT(p_demux), psz_sdp );
 
