@@ -1328,7 +1328,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
     demux_sys_t    *p_sys = p_demux->p_sys;
     block_t        *p_block;
 
-    msg_Dbg( p_demux, "pts: %d", pts.tv_sec );
+    //msg_Dbg( p_demux, "pts: %d", pts.tv_sec );
 
     int64_t i_pts = (uint64_t)pts.tv_sec * UI64C(1000000) +
         (uint64_t)pts.tv_usec;
@@ -1482,13 +1482,13 @@ static void StreamRead( void *p_private, unsigned int i_size,
     {
         p_sys->i_npt += __MAX( 0, i_pts - p_sys->i_pcr );
         p_sys->i_pcr = i_pts;
-        msg_Dbg( p_demux, "npt update" );
+        //msg_Dbg( p_demux, "npt update" );
     }
-    else if( (tk->fmt.i_cat == VIDEO_ES) && (p_sys->i_pcr < i_pts) )
+    else if( /*tk->fmt.i_cat == VIDEO_ES &&*/ p_sys->i_pcr < i_pts )
     {
         p_sys->i_pcr = i_pts;
     }
-    msg_Dbg( p_demux, "npt %lld", p_sys->i_npt );
+    //msg_Dbg( p_demux, "npt %lld", p_sys->i_npt );
 
     if( (i_pts != tk->i_pts) && (!tk->b_muxed) )
     {
