@@ -238,8 +238,9 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         menu->addMenu( intfmenu );
         menu->addSeparator();
     }
-    DP_SADD( menu, qtr(I_MENU_MSG), "", "", messagesDialog(), "Ctrl+M" );
-    DP_SADD( menu, qtr(I_MENU_INFO) , "", ":/pixmaps/vlc_info_16px.png", 
+    DP_SADD( menu, qtr(I_MENU_MSG), "", ":/pixmaps/vlc_messages_16px.png",
+             messagesDialog(), "Ctrl+M" );
+    DP_SADD( menu, qtr(I_MENU_INFO) , "", ":/pixmaps/vlc_info_16px.png",
              mediaInfoDialog(), "Ctrl+J" );
     DP_SADD( menu, qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog(), "Ctrl+I" );
     DP_SADD( menu, qtr(I_MENU_GOTOTIME), "","", gotoTimeDialog(), "Ctrl+T" );
@@ -430,14 +431,17 @@ QMenu *QVLCMenu::HelpMenu()
     { \
         var_Get( p_input, "state", &val ); \
         if( val.i_int == PLAYING_S ) \
-            MIM_SADD( menu, qtr("Pause"), "", "", togglePlayPause() ) \
+            MIM_SADD( menu, qtr("Pause"), "", ":/pixmaps/vlc_pause_16px.png", \
+                    togglePlayPause() ) \
         else \
-            MIM_SADD( menu, qtr("Play"), "", "", togglePlayPause() ) \
+            MIM_SADD( menu, qtr("Play"), "", ":/pixmaps/vlc_play_16px.png", \
+                    togglePlayPause() ) \
     } \
     else if( THEPL->items.i_size && THEPL->i_enabled ) \
-        MIM_SADD( menu, qtr("Play"), "", "", togglePlayPause() ); \
+        MIM_SADD( menu, qtr("Play"), "", ":/pixmaps/vlc_play_16px.png", \
+                togglePlayPause() ); \
     \
-    MIM_SADD( menu, qtr("Stop"), "", "", stop() ); \
+    MIM_SADD( menu, qtr("Stop"), "", ":/pixmaps/vlc_stop_16px.png", stop() ); \
     MIM_SADD( menu, qtr("Previous"), "", ":/pixmaps/vlc_previous_16px.png", \
             prev() ); \
     MIM_SADD( menu, qtr("Next"), "", ":/pixmaps/vlc_next_16px.png", next() );

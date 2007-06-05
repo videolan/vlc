@@ -22,5 +22,9 @@
   <file>pixmaps/vlc_info_16px.png</file>
   <file>pixmaps/vlc_next_16px.png</file>
   <file>pixmaps/vlc_previous_16px.png</file>
+  <file>pixmaps/vlc_stop_16px.png</file>
+  <file>pixmaps/vlc_pause_16px.png</file>
+  <file>pixmaps/vlc_messages_16px.png</file>
+  <file>pixmaps/vlc_play_16px.png</file>
  </qresource>
 </RCC>
