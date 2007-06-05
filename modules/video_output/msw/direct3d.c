@@ -836,7 +836,8 @@ static D3DFORMAT Direct3DVoutSelectFormat( vout_thread_t *p_vout, D3DFORMAT targ
 
 static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3DFORMAT target)
 {
-    if( p_vout->p_sys->b_hw_yuv && ! _got_vista_or_above )
+    //if( p_vout->p_sys->b_hw_yuv && ! _got_vista_or_above )
+    if( p_vout->p_sys->b_hw_yuv )
     {
 	/* it sounds like vista does not support YUV surfaces at all */
         switch( i_chroma )
