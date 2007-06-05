@@ -1619,6 +1619,7 @@ static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
     }
 
     p_buffer = malloc( sizeof(aout_buffer_t) );
+    p_buffer->b_discontinuity = VLC_FALSE;
     p_buffer->pf_release = audio_release_buffer;
     p_buffer->p_sys = p_block = block_New( p_dec, i_size );
 
