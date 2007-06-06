@@ -566,7 +566,8 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     p_sys->p_packet = NULL;
     E_( GenerateGuid )( &p_sys->guid );
 
-    OpenConnection( p_access );
+    if( OpenConnection( p_access ) )
+        return VLC_EGENERIC;
 
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                 "Accept: */*\r\n"
@@ -711,6 +712,7 @@ error:
     }
     return VLC_EGENERIC;
 }
+
 static void GetHeader( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -765,7 +767,8 @@ static int Start( access_t *p_access, off_t i_pos )
         return VLC_EGENERIC;
     }
 
-    OpenConnection( p_access );
+    if( OpenConnection( p_access ) )
+        return VLC_EGENERIC;
 
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                 "Accept: */*\r\n"
