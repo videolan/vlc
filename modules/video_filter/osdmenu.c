@@ -614,6 +614,6 @@ static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
     else if( !strncmp( psz_var, OSD_CFG"alpha", 13) )
         p_sys->i_alpha = newval.i_int % 256;
 
-    p_sys->b_update = VLC_TRUE;
+    p_sys->b_update = p_sys->b_visible ? VLC_TRUE : VLC_FALSE;
     return VLC_SUCCESS;
 }
