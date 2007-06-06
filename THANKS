@@ -9,7 +9,7 @@ Michel Lespinasse <walken at zoy.org> - AC3 decoder, MPEG audio and video decode
 The VideoLAN team would like to thank the following contributors:
 
 Adam Sampson <ats @t offog d0t org> - libFLAC >= 1.1.3 API support
-Alex Antropoff <alant at transtelecom dot md> - RFC3016 (LATM) RTP packetizer extension
+Alex Antropoff <alant at transtelecom dot md> - RFC3016 (LATM) RTP packetizer extension, MMS fixes
 Alexander Didebulidze <alexander.didebulidze at stusta dot mhn dot de> - Georgian localization
 Alexander Gall <gall at switch dot ch> - Solaris fixes and CDDB fixes
 Alexis Ballier <aballlier at gentoo dot org> - Additional options in configure
