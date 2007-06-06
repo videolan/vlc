@@ -146,6 +146,12 @@ VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  video_format_t *, picture_t
  *  --sout='#transcode{osd}:std{access=udp,mux=ts,dst=dest_ipaddr}'
  *  --osdmenu-file=share/osdmenu/dvd.cfg
  *
+ * An example for local usage of the OSD menu is:
+ *
+ *  vlc dvdsimple:///dev/dvd --extraintf rc
+ *  --sub-filter osdmenu
+ *  --osdmenu-file=share/osdmenu/dvd.cfg
+ *
  * Each OSD menu element, called "action", defines a hotkey action. Each action
  * can have several states (unselect, select, pressed). Each state has an image
  * that represents the state visually. The commands "menu right", "menu left",
@@ -177,8 +183,9 @@ VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  video_format_t *, picture_t
  *
  * CONFIG_FILE = FILENAME '.cfg'
  * WS = [ ' ' | '\t' ]+
- * OSDMEN_PATH = PATHNAME
+ * OSDMENU_PATH = PATHNAME
  * DIR = 'dir' WS OSDMENU_PATH '\n'
+ * STYLE = 'style' [ 'default' | 'concat' ] '\n'
  * STATE = [ 'unselect' | 'select' | 'pressed' ]
  * HOTKEY_ACTION = 'key-' [ 'a' .. 'z', 'A' .. 'Z', '-' ]+
  *
@@ -326,6 +333,20 @@ struct osd_button_t
 };
 
 /**
+ * OSD Menu Style
+ *
+ * The images that make up an OSD menu can be created in such away that
+ * they contain all buttons in the same picture, with the selected one
+ * highlighted or being a concatenation of all the seperate images. The
+ * first case is the default.
+ *
+ * To change the default style the keyword 'style' should be set to 'concat'.
+ */
+
+#define OSD_MENU_STYLE_SIMPLE 0x0
+#define OSD_MENU_STYLE_CONCAT 0x1
+
+/**
  * OSD Menu State object
  *
  * Represents the current state as displayed.
@@ -363,6 +384,7 @@ struct osd_menu_t
     int     i_y;        /*< y-position of OSD Menu on the video screen */
     int     i_width;    /*< width of OSD Menu on the video screen */
     int     i_height;   /*< height of OSD Menu on the video screen */
+    int     i_style;    /*< style of spu region generation */
 
     char             *psz_path;  /*< directory where OSD menu images are stored */
     osd_button_t     *p_button;  /*< doubly linked list of buttons */

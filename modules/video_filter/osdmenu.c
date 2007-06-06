@@ -1,7 +1,7 @@
 /*****************************************************************************
  * osdmenu.c: osd filter module
  *****************************************************************************
- * Copyright (C) 2004-2005 M2X
+ * Copyright (C) 2004-2007 M2X
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
@@ -70,6 +70,13 @@
     "Be careful with this option as encoding OSD menu pictures is very " \
     "computing intensive. The range is 0 - 1000 ms." )
 
+#define OSD_ALPHA_TEXT N_("Alpha transparency value (default 255)")
+#define OSD_ALPHA_LONGTEXT N_( \
+    "The transparency of the OSD menu can be changed by giving a value " \
+    "between 0 and 255. A lower value specifies more transparency a higher " \
+    "means less transparency. The default is being not transparent " \
+    "(value 255) the minimum is fully transparent (value 0)." )
+
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -83,6 +90,8 @@ static int OSDMenuUpdateEvent( vlc_object_t *, char const *,
                     vlc_value_t, vlc_value_t, void * );
 static int OSDMenuVisibleEvent( vlc_object_t *, char const *,
                     vlc_value_t, vlc_value_t, void * );
+static int OSDMenuCallback( vlc_object_t *, char const *,
+                            vlc_value_t, vlc_value_t, void * );
 
 #define OSD_CFG "osdmenu-"
 
@@ -99,7 +108,8 @@ static int OSDMenuVisibleEvent( vlc_object_t *, char const *,
 vlc_module_begin();
     add_integer( OSD_CFG "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( OSD_CFG "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
-    add_integer( OSD_CFG "position", 8, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+    add_integer( OSD_CFG "position", 8, NULL, POS_TEXT, POS_LONGTEXT,
+                 VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_string( OSD_CFG "file", OSD_DEFAULT_CFG, NULL, OSD_FILE_TEXT,
         OSD_FILE_LONGTEXT, VLC_FALSE );
@@ -110,6 +120,9 @@ vlc_module_begin();
     add_integer_with_range( OSD_CFG "update", OSD_UPDATE_DEFAULT,
         OSD_UPDATE_MIN, OSD_UPDATE_MAX, NULL, OSD_UPDATE_TEXT,
         OSD_UPDATE_LONGTEXT, VLC_TRUE );
+
+    add_integer_with_range( OSD_CFG "alpha", 255, 0, 255, NULL,
+        OSD_ALPHA_TEXT, OSD_ALPHA_LONGTEXT, VLC_TRUE );
 
     set_capability( "sub filter", 100 );
     set_description( _("On Screen Display menu") );
@@ -131,9 +144,9 @@ vlc_module_end();
  *****************************************************************************/
 struct filter_sys_t
 {
-    vlc_mutex_t  lock;
-
     int          position;      /* relative positioning of SPU images */
+    int          i_x;           /* absolute positioning of SPU images */
+    int          i_y;           /* absolute positioning of SPU images */
     mtime_t      i_last_date;   /* last mdate SPU object has been sent to SPU subsytem */
     mtime_t      i_timeout;     /* duration SPU object is valid on the video output in seconds */
 
@@ -142,6 +155,7 @@ struct filter_sys_t
     vlc_bool_t   b_visible;     /* OSD Menu is visible */
     mtime_t      i_update;      /* Update the OSD menu every n ms */
     mtime_t      i_end_date;    /* End data of display OSD menu */
+    int          i_alpha;       /* alpha transparency value */
 
     char        *psz_file;      /* OSD Menu configuration file */
     osd_menu_t  *p_menu;        /* pointer to OSD Menu object */
@@ -153,81 +167,87 @@ struct filter_sys_t
 static int CreateFilter ( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = NULL;
     vlc_value_t val;
-    int i_posx, i_posy;
 
-    p_filter->p_sys = (filter_sys_t *) malloc( sizeof( filter_sys_t ) );
+    p_filter->p_sys = p_sys = (filter_sys_t *) malloc( sizeof(filter_sys_t) );
     if( !p_filter->p_sys )
     {
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
+    memset( p_sys, 0, sizeof(filter_sys_t) );
 
     /* Populating struct */
     p_filter->p_sys->p_menu = NULL;
     p_filter->p_sys->psz_file = NULL;
 
-    vlc_mutex_init( p_filter, &p_filter->p_sys->lock );
-
     p_filter->p_sys->psz_file = config_GetPsz( p_filter, OSD_CFG "file" );
-    if( p_filter->p_sys->psz_file == NULL || *p_filter->p_sys->psz_file == '\0' ) 
+    if( (p_filter->p_sys->psz_file == NULL) ||
+        (*p_filter->p_sys->psz_file == '\0') )
     {
         msg_Err( p_filter, "unable to get filename" );
         goto error;
     }
 
-    var_Create( p_this, OSD_CFG "position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, OSD_CFG "position", &val );
-    p_filter->p_sys->position = val.i_int;
-    var_Create( p_this, OSD_CFG "x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, OSD_CFG "x", &val );
-    i_posx = val.i_int;
-    var_Create( p_this, OSD_CFG "y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, OSD_CFG "y", &val );
-    i_posy = val.i_int;
+    p_sys->i_x = var_CreateGetIntegerCommand( p_this, OSD_CFG "x" );
+    p_sys->i_y = var_CreateGetIntegerCommand( p_this, OSD_CFG "y" );
+    p_sys->position = var_CreateGetIntegerCommand( p_this, OSD_CFG "position" );
+    p_sys->i_alpha = var_CreateGetIntegerCommand( p_this, OSD_CFG "alpha" );
 
     /* in micro seconds - divide by 2 to match user expectations */
-    var_Create( p_this, OSD_CFG "timeout", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, OSD_CFG "timeout",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_Get( p_this, OSD_CFG "timeout", &val );
-    p_filter->p_sys->i_timeout = (mtime_t)(val.i_int * 1000000) >> 2; 
-    var_Create( p_this, OSD_CFG "update", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    p_sys->i_timeout = (mtime_t)(val.i_int * 1000000) >> 2;
+    var_Create( p_this, OSD_CFG "update",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_Get( p_this, OSD_CFG "update", &val );
-    p_filter->p_sys->i_update = (mtime_t)(val.i_int * 1000); /* in micro seconds */
+    p_sys->i_update = (mtime_t)(val.i_int * 1000); /* in micro seconds */
+
+    var_AddCallback( p_filter, OSD_CFG "position", OSDMenuCallback, p_sys );
+    var_AddCallback( p_filter, OSD_CFG "timeout", OSDMenuCallback, p_sys );
+    var_AddCallback( p_filter, OSD_CFG "update", OSDMenuCallback, p_sys );
+    var_AddCallback( p_filter, OSD_CFG "alpha", OSDMenuCallback, p_sys );
 
     /* Load the osd menu subsystem */
-    p_filter->p_sys->p_menu = osd_MenuCreate( p_this, p_filter->p_sys->psz_file );
-    if( p_filter->p_sys->p_menu == NULL )
+    p_sys->p_menu = osd_MenuCreate( p_this, p_sys->psz_file );
+    if( p_sys->p_menu == NULL )
         goto error;
 
     /* Check if menu position was overridden */
-    p_filter->p_sys->b_absolute = VLC_TRUE;
-    if( (i_posx < 0) || (i_posy < 0) )
+    p_sys->b_absolute = VLC_TRUE;
+    if( (p_sys->i_x < 0) || (p_sys->i_y < 0) )
     {
-        p_filter->p_sys->b_absolute = VLC_FALSE;
-        p_filter->p_sys->p_menu->i_x = 0;
-        p_filter->p_sys->p_menu->i_y = 0;
+        p_sys->b_absolute = VLC_FALSE;
+        p_sys->p_menu->i_x = 0;
+        p_sys->p_menu->i_y = 0;
     }
-    else if( (i_posx >= 0) || (i_posy >= 0) )
+    else if( (p_sys->i_x >= 0) || (p_sys->i_y >= 0) )
     {
-        p_filter->p_sys->p_menu->i_x = i_posx;
-        p_filter->p_sys->p_menu->i_y = i_posy;
+        p_sys->p_menu->i_x = p_sys->i_x;
+        p_sys->p_menu->i_y = p_sys->i_y;
     }
-    else if( (p_filter->p_sys->p_menu->i_x < 0) || (p_filter->p_sys->p_menu->i_y < 0) )
+    else if( (p_sys->p_menu->i_x < 0) ||
+             (p_sys->p_menu->i_y < 0) )
     {
-        p_filter->p_sys->b_absolute = VLC_FALSE;
-        p_filter->p_sys->p_menu->i_x = 0;
-        p_filter->p_sys->p_menu->i_y = 0;
+        p_sys->b_absolute = VLC_FALSE;
+        p_sys->p_menu->i_x = 0;
+        p_sys->p_menu->i_y = 0;
     }
 
     /* Set up p_filter */
-    p_filter->p_sys->i_last_date = mdate();
+    p_sys->i_last_date = mdate();
 
     /* Keep track of OSD Events */
-    p_filter->p_sys->b_update  = VLC_FALSE;
-    p_filter->p_sys->b_visible = VLC_FALSE;
+    p_sys->b_update  = VLC_FALSE;
+    p_sys->b_visible = VLC_FALSE;
 
-    var_AddCallback( p_filter->p_sys->p_menu, "osd-menu-update", OSDMenuUpdateEvent, p_filter );
-    var_AddCallback( p_filter->p_sys->p_menu, "osd-menu-visible", OSDMenuVisibleEvent, p_filter );
+    /* Listen to osd menu core updates/visible settings. */
+    var_AddCallback( p_sys->p_menu, "osd-menu-update",
+                     OSDMenuUpdateEvent, p_filter );
+    var_AddCallback( p_sys->p_menu, "osd-menu-visible",
+                     OSDMenuVisibleEvent, p_filter );
 
     /* Attach subpicture filter callback */
     p_filter->pf_sub_filter = Filter;
@@ -240,7 +260,6 @@ static int CreateFilter ( vlc_object_t *p_this )
 
 error:
     msg_Err( p_filter, "osdmenu filter discarded" );
-    vlc_mutex_destroy( &p_filter->p_sys->lock );
     if( p_filter->p_sys->p_menu )
     {
         osd_MenuDelete( p_this, p_filter->p_sys->p_menu );
@@ -259,19 +278,26 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_t     *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    var_DelCallback( p_filter, OSD_CFG "position", OSDMenuCallback, p_sys );
+    var_DelCallback( p_filter, OSD_CFG "timeout", OSDMenuCallback, p_sys );
+    var_DelCallback( p_filter, OSD_CFG "update", OSDMenuCallback, p_sys );
+    var_DelCallback( p_filter, OSD_CFG "alpha", OSDMenuCallback, p_sys );
+
+    var_DelCallback( p_sys->p_menu, "osd-menu-update",
+                     OSDMenuUpdateEvent, p_filter );
+    var_DelCallback( p_sys->p_menu, "osd-menu-visible",
+                     OSDMenuVisibleEvent, p_filter );
+
     var_Destroy( p_this, OSD_CFG "file" );
     var_Destroy( p_this, OSD_CFG "x" );
     var_Destroy( p_this, OSD_CFG "y" );
     var_Destroy( p_this, OSD_CFG "position" );
     var_Destroy( p_this, OSD_CFG "timeout" );
     var_Destroy( p_this, OSD_CFG "update" );
-
-    var_DelCallback( p_sys->p_menu, "osd-menu-update", OSDMenuUpdateEvent, p_filter );
-    var_DelCallback( p_sys->p_menu, "osd-menu-visible", OSDMenuVisibleEvent, p_filter );
+    var_Destroy( p_this, OSD_CFG "alpha" );
 
     osd_MenuDelete( p_filter, p_sys->p_menu );
 
-    vlc_mutex_destroy( &p_filter->p_sys->lock );
     if( p_sys->psz_file) free( p_sys->psz_file );
     if( p_sys ) free( p_sys );
 
@@ -329,7 +355,7 @@ static subpicture_region_t *create_text_region( filter_t *p_filter, subpicture_t
     p_region->i_y = 40;
 #if 1
     msg_Dbg( p_filter, "SPU text region position (%d,%d) (%d,%d) [%s]", 
-        p_region->i_x, p_region->i_y, 
+        p_region->i_x, p_region->i_y,
         p_region->fmt.i_width, p_region->fmt.i_height, p_region->psz_text );
 #endif
     return p_region;
@@ -342,7 +368,7 @@ static subpicture_region_t *create_text_region( filter_t *p_filter, subpicture_t
 static subpicture_region_t *create_picture_region( filter_t *p_filter, subpicture_t *p_spu,
     int i_width, int i_height, picture_t *p_pic )
 {
-    subpicture_region_t *p_region;
+    subpicture_region_t *p_region = NULL;
     video_format_t       fmt;
 
     if( !p_spu ) return NULL;
@@ -355,6 +381,7 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
+
     p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
     if( !p_region )
     {
@@ -368,11 +395,12 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
         p_region->fmt.i_width = p_region->fmt.i_visible_width = 0;
         p_region->fmt.i_height = p_region->fmt.i_visible_height = 0;
     }
-    if( p_pic != NULL )
+    if( p_pic )
         vout_CopyPicture( p_filter, &p_region->picture, p_pic );
 
     p_region->i_x = 0;
     p_region->i_y = 0;
+    p_region->i_align = SUBPICTURE_ALIGN_LEFT;
 #if 0
     msg_Dbg( p_filter, "SPU picture region position (%d,%d) (%d,%d) [%p]",
         p_region->i_x, p_region->i_y,
@@ -389,13 +417,14 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
 static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    subpicture_t *p_spu;
-    subpicture_region_t *p_region;
+    subpicture_t *p_spu = NULL;
+    subpicture_region_t *p_region = NULL;
 
     if( !p_sys->b_update )
             return NULL;
 
-    /* Am I too early? */
+    /* Am I too early?
+    */
     if( ( ( p_sys->i_last_date + p_sys->i_update ) > i_date ) &&
         ( p_sys->i_end_date > 0 ) )
         return NULL; /* we are too early, so wait */
@@ -403,9 +432,13 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     /* Allocate the subpicture internal data. */
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
+
     p_spu->b_ephemer = VLC_TRUE;
-    p_spu->b_fade = VLC_TRUE;    
-    p_spu->b_absolute = p_sys->b_absolute;
+    p_spu->b_fade = VLC_TRUE;
+    if( p_filter->p_sys->p_menu->i_style == OSD_MENU_STYLE_CONCAT )
+        p_spu->b_absolute = VLC_TRUE;
+    else
+        p_spu->b_absolute = p_sys->b_absolute;
     p_spu->i_flags = p_sys->position;
 
     /* Determine the duration of the subpicture */
@@ -442,24 +475,145 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
         p_spu->i_x = p_filter->p_sys->p_menu->p_state->i_x;
         p_spu->i_y = p_filter->p_sys->p_menu->p_state->i_y;
         p_spu->p_region = p_region;
-        p_spu->i_alpha = 0xFF; /* Picture is completely transparent. */
+        p_spu->i_alpha = 0xFF; /* Picture is completely non transparent. */
         return p_spu;
     }
 
-    /* Create new spu regions */
+    /* Create new spu regions
+    */
     p_region = create_picture_region( p_filter, p_spu,
         p_filter->p_sys->p_menu->p_state->i_width,
         p_filter->p_sys->p_menu->p_state->i_height,
         p_filter->p_sys->p_menu->p_state->p_pic );
+
+    if( !p_region )
+    {
+        p_filter->pf_sub_buffer_del( p_filter, p_spu );
+        return NULL;
+    }
+
+    p_spu->i_width = p_region->fmt.i_visible_width;
+    p_spu->i_height = p_region->fmt.i_visible_height;
+    p_spu->i_alpha = p_filter->p_sys->i_alpha;
+
+    /* proper positioning of OSD menu image */
+    if( p_filter->p_sys->p_menu->i_style == OSD_MENU_STYLE_CONCAT )
+    {
+        p_spu->i_x = p_filter->p_sys->p_menu->p_button->i_x;
+        p_spu->i_y = p_filter->p_sys->p_menu->p_button->i_y;
+    }
+    else
+    {
+        p_spu->i_x = p_filter->p_sys->p_menu->p_state->i_x;
+        p_spu->i_y = p_filter->p_sys->p_menu->p_state->i_y;
+    }
+
+    if( p_filter->p_sys->p_menu->i_style == OSD_MENU_STYLE_CONCAT )
+    {
+        subpicture_region_t *p_region_list = NULL;
+        subpicture_region_t *p_region_tail = NULL;
+        osd_menu_t *p_osd = p_filter->p_sys->p_menu;
+        osd_button_t *p_button = p_osd->p_button;
+
+        /* Construct the entire OSD from individual images */
+        while( p_button != NULL )
+        {
+            osd_button_t *p_tmp = NULL;
+            subpicture_region_t *p_new = NULL;
+
+            p_new = create_picture_region( p_filter, p_spu,
+                    p_button->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
+                    p_button->p_current_state->p_pic->p[Y_PLANE].i_visible_lines,
+                    p_button->p_current_state->p_pic );
+            if( !p_new )
+            {
+                /* Cleanup when bailing out */
+                subpicture_region_t *p_tmp = NULL;
+                while( p_region_list )
+                {
+                    p_tmp = p_region_list->p_next;
+                    p_spu->pf_destroy_region( VLC_OBJECT(p_filter), p_region_list );
+                };
+                p_spu->pf_destroy_region( VLC_OBJECT(p_filter), p_region );
+                p_filter->pf_sub_buffer_del( p_filter, p_spu );
+                return NULL;
+            }
+
+            p_spu->i_width += p_new->fmt.i_visible_width;
+            p_spu->i_height += p_new->fmt.i_visible_height;
+
+            if( !p_region_list )
+            {
+                p_region_list = p_new;
+                p_region_tail = p_new;
+            }
+            else
+            {
+                p_new->i_x = p_region_tail->fmt.i_visible_width;
+                p_new->i_y = p_button->i_y;
+                p_region_tail->p_next = p_new;
+                p_region_tail = p_new;
+            }
+            p_tmp = p_button->p_next;
+            p_button = p_tmp;
+        };
+        p_region->p_next = p_region_list;
+    }
 #if 0
     p_region->p_next = create_text_region( p_filter, p_spu,
         p_filter->p_sys->p_menu->p_state->i_width, p_filter->p_sys->p_menu->p_state->i_height,
         p_filter->p_sys->p_menu->p_state->p_visible->psz_action );
 #endif
-
-    /* proper positioning of OSD menu image */
-    p_spu->i_x = p_filter->p_sys->p_menu->p_state->i_x;
-    p_spu->i_y = p_filter->p_sys->p_menu->p_state->i_y;
     p_spu->p_region = p_region;
     return p_spu;
+}
+
+static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *) p_data;
+
+    if( !p_sys )
+        return VLC_SUCCESS;
+
+    if( !strncmp( psz_var, OSD_CFG"position", 16) )
+    {
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+        unsigned int i;
+        for( i=0; i < ARRAY_SIZE(pi_pos_values); i++ )
+        {
+            if( newval.i_int == pi_pos_values[i] )
+            {
+                p_sys->position = newval.i_int % 11;
+                break;
+            }
+        }
+#undef ARRAY_SIZE
+    }
+    else if( !strncmp( psz_var, OSD_CFG"x", 9) ||
+             !strncmp( psz_var, OSD_CFG"y", 9))
+    {
+        p_sys->b_absolute = VLC_TRUE;
+        if( (p_sys->i_x < 0) || (p_sys->i_y < 0) )
+        {
+            p_sys->b_absolute = VLC_FALSE;
+            p_sys->p_menu->i_x = 0;
+            p_sys->p_menu->i_y = 0;
+        }
+        else if( (p_sys->i_x >= 0) || (p_sys->i_y >= 0) )
+        {
+            p_sys->p_menu->i_x = p_sys->i_x;
+            p_sys->p_menu->i_y = p_sys->i_y;
+        }
+    }
+    else if( !strncmp( psz_var, OSD_CFG"update", 14) )
+        p_sys->i_update = newval.i_int;
+    else if( !strncmp( psz_var, OSD_CFG"timeout", 15) )
+        p_sys->i_update = newval.i_int % 1000;
+    else if( !strncmp( psz_var, OSD_CFG"alpha", 13) )
+        p_sys->i_alpha = newval.i_int % 256;
+
+    p_sys->b_update = VLC_TRUE;
+    return VLC_SUCCESS;
 }

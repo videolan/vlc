@@ -100,6 +100,7 @@ static osd_menu_t *osd_MenuNew( osd_menu_t *p_menu, const char *psz_path, int i_
         p_menu->psz_path = NULL;
     p_menu->i_x = i_x;
     p_menu->i_y = i_y;
+    p_menu->i_style = OSD_MENU_STYLE_SIMPLE;
 
     return p_menu;
 }
@@ -323,11 +324,11 @@ int osd_ConfigLoader( vlc_object_t *p_this, const char *psz_file,
     FILE       *fd = NULL;
     int        result = 0;
 
-    msg_Dbg( p_this, "opening osd definition file %s", psz_file );
+    msg_Dbg( p_this, "opening osdmenu definition file %s", psz_file );
     fd = utf8_fopen( psz_file, "r" );
     if( !fd )
     {
-        msg_Err( p_this, "failed to open OSD definition file %s", psz_file );
+        msg_Err( p_this, "failed to open osdmenu definition file %s", psz_file );
         return VLC_EGENERIC;
     }
 
@@ -335,9 +336,11 @@ int osd_ConfigLoader( vlc_object_t *p_this, const char *psz_file,
     if( !feof( fd ) )
     {
         char action[25] = "";
+        char cmd[25] = "";
         char path[MAX_FILE_PATH] = "";
         char *psz_path = NULL;
         size_t i_len = 0;
+        long pos = 0;
 
         /* override images path ? */
         psz_path = config_GetPsz( p_this, "osdmenu-file-path" );
@@ -369,12 +372,40 @@ int osd_ConfigLoader( vlc_object_t *p_this, const char *psz_file,
         path[i_len+1] = '\0';
         if( result == 0 || result == EOF )
             goto error;
-        msg_Dbg( p_this, "%s=%s", &action[0], &path[0] );
+        msg_Dbg( p_this, "osdmenu dir %s", &path[0] );
 
         if( i_len == 0 )
             *p_menu = osd_MenuNew( *p_menu, NULL, 0, 0 );
         else
             *p_menu = osd_MenuNew( *p_menu, &path[0], 0, 0 );
+
+        /* Peek for 'style' argument */
+        pos = ftell( fd );
+        if( pos < 0 )
+                goto error;
+
+        result = fscanf(fd, "%24s %24s", &cmd[0], &action[0] );
+        if( result == 0 || result == EOF )
+            goto error;
+
+        msg_Dbg( p_this, "osdmenu %s %s", &cmd[0], &action[0] );
+        if( strncmp( &cmd[0], "style", 5 ) == 0 )
+        {
+            if( strncmp( &action[0], "default", 7) == 0 )
+            {
+                (*p_menu)->i_style = OSD_MENU_STYLE_SIMPLE;
+            }
+            else if( strncmp( &action[0], "concat", 6) == 0 )
+            {
+                (*p_menu)->i_style = OSD_MENU_STYLE_CONCAT;
+            }
+        }
+        else
+        {
+            result = fseek( fd, pos, SEEK_SET );
+            if( result < 0 )
+                goto error;
+        }
     }
 
     if( !*p_menu )
@@ -698,6 +729,7 @@ int osd_ConfigLoader( vlc_object_t *p_this, const char *psz_file,
 #undef MAX_FILE_PATH
 error:
     msg_Err( p_this, "parsing file failed (returned %d)", result );
+    osd_MenuFree( p_this, *p_menu );
     fclose( fd );
     return 1;
 }
