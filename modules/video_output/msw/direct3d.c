@@ -917,7 +917,7 @@ static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3D
                     case D3DFMT_A8R8G8B8:
                     case D3DFMT_R5G6B5:
                     case D3DFMT_X1R5G5B5:
-                        msg_Dbg( p_vout, "defaulting to adpater pixel format");
+                        msg_Dbg( p_vout, "defaulting to adapter pixel format");
                         return Direct3DVoutSelectFormat(p_vout, target, &d3ddm.Format, 1);
                     default:
                     {
