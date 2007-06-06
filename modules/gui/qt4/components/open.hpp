@@ -46,6 +46,7 @@
 #define DVB_DEVICE         0x2
 #define BDA_DEVICE         0x4
 #define DSHOW_DEVICE       0x8
+#define SCREEN_DEVICE      0x16
 
 class QWidget;
 class QLineEdit;

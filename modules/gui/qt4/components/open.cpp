@@ -474,7 +474,6 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 #define CuMRL( widget, slot ) CONNECT( widget , slot , this, updateMRL() );
 
-
     /*******
      * V4L *
      *******/
@@ -727,12 +726,24 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     BUTTONACT( dvbt, updateButtons() );
     BUTTONACT( dvbc, updateButtons() );
 
+    /**********
+     * Screen *
+     **********/
+
+    addModuleAndLayouts( SCREEN_DEVICE, screen, "Desktop" );
+    QLabel *screenLabel = new QLabel( "This option will open your own "
+            "desktop in order to save or stream it.");
+    screenLabel->setWordWrap( true );
+    screenDevLayout->addWidget( screenLabel, 0, 0 );
+
+
     /* General connects */
     connect( ui.deviceCombo, SIGNAL( activated( int ) ),
                      stackedDevLayout, SLOT( setCurrentIndex( int ) ) );
     connect( ui.deviceCombo, SIGNAL( activated( int ) ),
                      stackedPropLayout, SLOT( setCurrentIndex( int ) ) );
     CONNECT( ui.deviceCombo, activated( int ), this, updateMRL() );
+    CONNECT( ui.deviceCombo, activated( int ), this, updateButtons() );
 
 #undef addModule
 }
@@ -787,16 +798,29 @@ void CaptureOpenPanel::updateMRL()
                 QString("%1").arg( bdaBandBox->itemData(
                     bdaBandBox->currentIndex() ).toInt() );
         break;
-  case DSHOW_DEVICE:
+    case DSHOW_DEVICE:
+        break;
+    case SCREEN_DEVICE:
+        mrl = "screen://";
+        updateButtons();
         break;
     }
     emit mrlUpdated( mrl );
 }
 
+/**
+ * Update the Buttons (show/hide) for the GUI as all device type don't 
+ * use the same ui. elements.
+ **/
 void CaptureOpenPanel::updateButtons()
 {
+    /*  Be sure to display the ui Elements in case they were hidden by
+     *  some Device Type (like Screen://) */
+    ui.optionsBox->show();
+    ui.advancedButton->show();
+    /* Get the current Device Number */
     int i_devicetype = ui.deviceCombo->itemData(
-            ui.deviceCombo->currentIndex() ).toInt();
+                                ui.deviceCombo->currentIndex() ).toInt();
     msg_Dbg( p_intf, "Capture Type: %i", i_devicetype );
     switch( i_devicetype )
     {
@@ -819,6 +843,10 @@ void CaptureOpenPanel::updateButtons()
             bdaBandBox->show();
             bdaBandLabel->show();
         }
+        break;
+    case SCREEN_DEVICE:
+        ui.optionsBox->hide();
+        ui.advancedButton->hide();
         break;
     }
 }
