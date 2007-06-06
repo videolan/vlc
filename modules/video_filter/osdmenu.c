@@ -102,7 +102,7 @@ static int OSDMenuCallback( vlc_object_t *, char const *,
 #endif
 
 #define OSD_UPDATE_MIN     0
-#define OSD_UPDATE_DEFAULT 0
+#define OSD_UPDATE_DEFAULT 300
 #define OSD_UPDATE_MAX     1000
 
 vlc_module_begin();
@@ -313,6 +313,7 @@ static int OSDMenuVisibleEvent( vlc_object_t *p_this, char const *psz_var,
     filter_t *p_filter = (filter_t *) p_data;
 
     p_filter->p_sys->b_visible = VLC_TRUE;
+    p_filter->p_sys->b_update = VLC_TRUE;
     return VLC_SUCCESS;
 }
 
@@ -320,9 +321,10 @@ static int OSDMenuUpdateEvent( vlc_object_t *p_this, char const *psz_var,
                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     filter_t *p_filter = (filter_t *) p_data;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    p_filter->p_sys->b_update = VLC_TRUE;
-    p_filter->p_sys->i_end_date = (mtime_t) 0;
+    p_sys->b_update = p_sys->b_visible ? VLC_TRUE : VLC_FALSE;
+    p_sys->i_end_date = (mtime_t) 0;
     return VLC_SUCCESS;
 }
 
