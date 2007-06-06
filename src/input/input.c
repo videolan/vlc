@@ -2537,6 +2537,25 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
     /** \todo handle sout meta */
 }
 
+
+static inline vlc_bool_t IsValidAccess( const char *psz )
+{
+    unsigned char c;
+
+    while( ( c = *psz ) != '\0' )
+    {
+        if( c == ':' )
+            return VLC_TRUE;
+
+        if( !isascii( c ) || !isalnum( c ) || ( c != '/' ) )
+            return VLC_FALSE;
+
+        psz++;
+    }
+    return VLC_FALSE; /* should not happen though */
+}
+
+
 /*****************************************************************************
  * MRLSplit: parse the access, demux and url part of the
  *           Media Resource Locator.
@@ -2548,24 +2567,26 @@ void MRLSplit( vlc_object_t *p_input, char *psz_dup,
     const char *psz_access = "";
     const char *psz_demux  = "";
     char *psz_path;
-    char *psz, *psz_check;
+    char *psz;
 
     psz = strchr( psz_dup, ':' );
 
-    /* '@' not allowed in access/demux part */
-    psz_check = strchr( psz_dup, '@' );
-    if( psz_check && psz_check < psz ) psz = 0;
-
-#if defined( WIN32 ) || defined( UNDER_CE )
-    if( psz - psz_dup == 1 )
+    if( psz != NULL )
     {
-        msg_Dbg( p_input, "drive letter %c: found in source", *psz_dup );
-        psz_path = psz_dup;
-    }
-    else
+        /* Guess whether ':' is part of a local filename, or separates
+         * access/demux from path */
+        if( !IsValidAccess( psz_dup ) )
+            psz = NULL;
+#if defined( WIN32 ) || defined( UNDER_CE )
+        else if( ( psz - psz_dup == 1 ) && isalpha( psz_dup[0] ) )
+        {
+            msg_Dbg( p_input, "drive letter %c: found in source", *psz_dup );
+            psz = NULL;
+        }
 #endif
+    }
 
-    if( psz )
+    if( psz != NULL )
     {
         *psz++ = '\0';
         if( psz[0] == '/' && psz[1] == '/' ) psz += 2;
