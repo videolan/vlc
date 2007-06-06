@@ -420,7 +420,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
     subpicture_t *p_spu = NULL;
     subpicture_region_t *p_region = NULL;
 
-    if( !p_sys->b_update )
+    if( !p_sys->b_update || (p_sys->i_update <= 0) )
             return NULL;
 
     /* Am I too early?
@@ -608,7 +608,7 @@ static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
         }
     }
     else if( !strncmp( psz_var, OSD_CFG"update", 14) )
-        p_sys->i_update = newval.i_int;
+        p_sys->i_update =  (mtime_t)(newval.i_int * 1000);
     else if( !strncmp( psz_var, OSD_CFG"timeout", 15) )
         p_sys->i_update = newval.i_int % 1000;
     else if( !strncmp( psz_var, OSD_CFG"alpha", 13) )
