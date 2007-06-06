@@ -295,14 +295,14 @@ void __osd_MenuActivate( vlc_object_t *p_this )
     /*
      * Is there a menu item above or below? If so, then select it.
      */
-    if( p_button && p_button->p_up)
+    if( p_button && p_button->p_up )
     {
         vlc_object_release( (vlc_object_t*) p_osd );
         vlc_mutex_unlock( lockval.p_address );
         __osd_MenuUp( p_this );   /* "menu select" means go to menu item above. */
         return;
     }
-    if( p_button && p_button->p_down)
+    if( p_button && p_button->p_down )
     {
         vlc_object_release( (vlc_object_t*) p_osd );
         vlc_mutex_unlock( lockval.p_address );
@@ -361,11 +361,11 @@ void __osd_MenuNext( vlc_object_t *p_this )
         else
             p_osd->p_state->p_visible = p_osd->p_button;
 
-        if( !p_osd->p_state->p_visible->b_range ) 
+        if( !p_osd->p_state->p_visible->b_range )
             p_osd->p_state->p_visible->p_current_state =
                 osd_StateChange( p_osd->p_state->p_visible->p_states, OSD_BUTTON_SELECT );
 
-        osd_UpdateState( p_osd->p_state, 
+        osd_UpdateState( p_osd->p_state,
                 p_osd->p_state->p_visible->i_x, p_osd->p_state->p_visible->i_y,
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_lines,
@@ -405,18 +405,18 @@ void __osd_MenuPrev( vlc_object_t *p_this )
     p_button = p_osd->p_state->p_visible;
     if( p_button )
     {
-        if( !p_button->b_range ) 
+        if( !p_button->b_range )
             p_button->p_current_state = osd_StateChange( p_button->p_states, OSD_BUTTON_UNSELECT );
         if( p_button->p_prev )
             p_osd->p_state->p_visible = p_button->p_prev;
         else
             p_osd->p_state->p_visible = p_osd->p_last_button;
 
-        if( !p_osd->p_state->p_visible->b_range ) 
+        if( !p_osd->p_state->p_visible->b_range )
             p_osd->p_state->p_visible->p_current_state =
                 osd_StateChange( p_osd->p_state->p_visible->p_states, OSD_BUTTON_SELECT );
 
-        osd_UpdateState( p_osd->p_state, 
+        osd_UpdateState( p_osd->p_state,
                 p_osd->p_state->p_visible->i_x, p_osd->p_state->p_visible->i_y,
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_lines,
@@ -458,14 +458,14 @@ void __osd_MenuUp( vlc_object_t *p_this )
     p_button = p_osd->p_state->p_visible;
     if( p_button )
     {
-        if( !p_button->b_range ) 
+        if( !p_button->b_range )
         {
             p_button->p_current_state = osd_StateChange( p_button->p_states, OSD_BUTTON_SELECT );
             if( p_button->p_up )
                 p_osd->p_state->p_visible = p_button->p_up;
         }
 
-        if( p_button->b_range && p_osd->p_state->p_visible->b_range ) 
+        if( p_button->b_range && p_osd->p_state->p_visible->b_range )
         {
             osd_state_t *p_temp = p_osd->p_state->p_visible->p_current_state;
             if( p_temp && p_temp->p_next )
@@ -477,7 +477,7 @@ void __osd_MenuUp( vlc_object_t *p_this )
                 osd_StateChange( p_osd->p_state->p_visible->p_states, OSD_BUTTON_SELECT );
         }
 
-        osd_UpdateState( p_osd->p_state, 
+        osd_UpdateState( p_osd->p_state,
                 p_osd->p_state->p_visible->i_x, p_osd->p_state->p_visible->i_y,
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_lines,
@@ -486,7 +486,7 @@ void __osd_MenuUp( vlc_object_t *p_this )
         /* If this is a range style action with associated images of only one state, 
             * then perform "menu select" on every menu navigation
             */
-        if( p_button->b_range ) 
+        if( p_button->b_range )
         {
             osd_SetKeyPressed( VLC_OBJECT(p_osd->p_libvlc), config_GetInt(p_osd, p_button->psz_action) );
 #if defined(OSD_MENU_DEBUG)
@@ -530,14 +530,14 @@ void __osd_MenuDown( vlc_object_t *p_this )
     p_button = p_osd->p_state->p_visible;
     if( p_button )
     {
-        if( !p_button->b_range ) 
+        if( !p_button->b_range )
         {
             p_button->p_current_state = osd_StateChange( p_button->p_states, OSD_BUTTON_SELECT );
             if( p_button->p_down )
                 p_osd->p_state->p_visible = p_button->p_down;
         }
 
-        if( p_button->b_range && p_osd->p_state->p_visible->b_range ) 
+        if( p_button->b_range && p_osd->p_state->p_visible->b_range )
         {
             osd_state_t *p_temp = p_osd->p_state->p_visible->p_current_state;
             if( p_temp && p_temp->p_prev )
@@ -549,7 +549,7 @@ void __osd_MenuDown( vlc_object_t *p_this )
                 osd_StateChange( p_osd->p_state->p_visible->p_states, OSD_BUTTON_SELECT );
         }
 
-        osd_UpdateState( p_osd->p_state, 
+        osd_UpdateState( p_osd->p_state,
                 p_osd->p_state->p_visible->i_x, p_osd->p_state->p_visible->i_y,
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_pitch,
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_lines,
@@ -558,7 +558,7 @@ void __osd_MenuDown( vlc_object_t *p_this )
         /* If this is a range style action with associated images of only one state,
          * then perform "menu select" on every menu navigation
          */
-        if( p_button->b_range ) 
+        if( p_button->b_range )
         {
             osd_SetKeyPressed( VLC_OBJECT(p_osd->p_libvlc), config_GetInt(p_osd, p_button->psz_action_down) );
 #if defined(OSD_MENU_DEBUG)
@@ -610,7 +610,7 @@ void __osd_Volume( vlc_object_t *p_this )
         vlc_mutex_lock( lockval.p_address );
 
         p_button = p_osd->p_state->p_volume;
-        if( p_osd->p_state->p_volume ) 
+        if( p_osd->p_state->p_volume )
             p_osd->p_state->p_visible = p_osd->p_state->p_volume;
         if( p_button && p_button->b_range )
         {
