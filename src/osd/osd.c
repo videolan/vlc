@@ -222,7 +222,7 @@ void __osd_MenuShow( vlc_object_t *p_this )
             p_button->p_current_state = osd_StateChange( p_button->p_states, OSD_BUTTON_UNSELECT );
         p_osd->p_state->p_visible = p_osd->p_button;
 
-        if( !p_osd->p_state->p_visible->b_range ) 
+        if( !p_osd->p_state->p_visible->b_range )
             p_osd->p_state->p_visible->p_current_state =
                 osd_StateChange( p_osd->p_state->p_visible->p_states, OSD_BUTTON_SELECT );
 
