@@ -1,13 +1,16 @@
-# Copyright (c) (c) 2006 Canonical Ltd, and Rosetta Contributors 2006
+#Arabic translations of VLC
+# $Id$
+# Copyright (c) 2006 Canonical Ltd, and Rosetta Contributors
+#           (c) 2006-2007 the VideoLAN team 
 # This file is distributed under the same license as the vlc package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2006.
-# 
+#Translators:  Fouzai Bourai <bouraifouzia@hotmail.com>
+
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-05 22:22+0100\n"
-"PO-Revision-Date: 2007-06-05 09:31+0100\n"
+"POT-Creation-Date: 2007-06-06 21:02+0100\n"
+"PO-Revision-Date: 2007-06-06 15:24+0100\n"
 "Last-Translator: bourai <bouraifouzia@hotmail.com>\n"
 "Language-Team: Arabic <ar@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -205,7 +208,7 @@ msgstr "Demuxers"
 
 #: include/vlc_config_cat.h:120
 msgid "Demuxers are used to separate audio and video streams."
-msgstr ""
+msgstr "Demuxers تسمح بفصل تدفق السمعي و الفديو"
 
 #: include/vlc_config_cat.h:122
 msgid "Video codecs"
@@ -258,7 +261,7 @@ msgstr "اعدادات عامة لمخرجات التيار"
 
 #: include/vlc_config_cat.h:147
 msgid "Muxers"
-msgstr ""
+msgstr "Muxers"
 
 #: include/vlc_config_cat.h:149
 msgid ""
@@ -282,7 +285,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:162
 msgid "Packetizers"
-msgstr ""
+msgstr " المُحَزَّمْ."
 
 #: include/vlc_config_cat.h:164
 msgid ""
@@ -321,7 +324,7 @@ msgstr "بث شريط الفيديو عند الحاجة"
 
 #: include/vlc_config_cat.h:182
 msgid "VLC's implementation of Video On Demand"
-msgstr ""
+msgstr "فديو على الطلب"
 
 #: include/vlc_config_cat.h:186 src/libvlc-module.c:1659
 #: src/playlist/engine.c:109 src/playlist/engine.c:111
@@ -329,7 +332,7 @@ msgstr ""
 #: modules/gui/beos/InterfaceWindow.cpp:230
 #: modules/gui/beos/InterfaceWindow.cpp:324 modules/gui/macosx/intf.m:533
 #: modules/gui/macosx/intf.m:631 modules/gui/pda/pda_interface.c:1264
-#: modules/gui/qt4/dialogs/playlist.cpp:46 modules/gui/qt4/menus.cpp:262
+#: modules/gui/qt4/dialogs/playlist.cpp:46 modules/gui/qt4/menus.cpp:263
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:208
 #: modules/gui/wxwidgets/interface.cpp:690
 #: modules/gui/wxwidgets/interface.cpp:701
@@ -405,7 +408,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:216
 msgid "Packetizer modules settings"
-msgstr ""
+msgstr "إعدادات وحدات التحزيم."
 
 #: include/vlc_config_cat.h:220
 msgid "Encoders settings"
@@ -413,7 +416,7 @@ msgstr "إعدادت الترميز"
 
 #: include/vlc_config_cat.h:222
 msgid "These are general settings for video/audio/subtitles encoding modules."
-msgstr ""
+msgstr "هذه هي إعدادات وحدات الترميز."
 
 #: include/vlc_config_cat.h:225
 msgid "Dialog providers settings"
@@ -421,17 +424,19 @@ msgstr "إعدادات مقدمي الحوار"
 
 #: include/vlc_config_cat.h:227
 msgid "Dialog providers can be configured here."
-msgstr ""
+msgstr "مجهزون الحوار يمكن أن يشكلون هنا."
 
 #: include/vlc_config_cat.h:229
 msgid "Subtitle demuxer settings"
-msgstr ""
+msgstr "إعدادات العناوين الثانوية"
 
 #: include/vlc_config_cat.h:231
 msgid ""
 "In this section you can force the behavior of the subtitle demuxer, for "
 "example by setting the subtitles type or file name."
 msgstr ""
+"في هذا القسم،  تستطيع إجبار تصرفات قارئ العاوين الثانوية، مثل  تعديل نوع و "
+"إسم ملف العناوين الثانوية."
 
 #: include/vlc_config_cat.h:238
 #, fuzzy
@@ -440,7 +445,7 @@ msgstr "لاتتوفر مساعدة"
 
 #: include/vlc_config_cat.h:239
 msgid "There is no help available for these modules."
-msgstr ""
+msgstr "لا تتوفر أي مساعدة لهذه الوحدات."
 
 #: include/vlc_interface.h:146
 msgid ""
@@ -513,8 +518,8 @@ msgstr "VLC حول مشغل الوسائط "
 #: modules/gui/macosx/intf.m:1536 modules/gui/macosx/intf.m:1537
 #: modules/gui/macosx/intf.m:1538 modules/gui/macosx/playlist.m:450
 #: modules/gui/pda/pda_interface.c:262 modules/gui/pda/pda_interface.c:263
-#: modules/gui/qt4/main_interface.cpp:250 modules/gui/qt4/menus.cpp:435
-#: modules/gui/qt4/menus.cpp:438
+#: modules/gui/qt4/main_interface.cpp:250 modules/gui/qt4/menus.cpp:437
+#: modules/gui/qt4/menus.cpp:441
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:280
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:289
 #: modules/gui/wxwidgets/interface.cpp:688
@@ -863,7 +868,7 @@ msgstr "ستيريو"
 #: modules/control/gestures.c:89 modules/gui/qt4/ui/video_effects.ui:207
 #: modules/gui/qt4/ui/video_effects.ui:272 modules/video_filter/logo.c:97
 #: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:173
-#: modules/video_filter/osdmenu.c:75 modules/video_filter/rss.c:164
+#: modules/video_filter/osdmenu.c:82 modules/video_filter/rss.c:164
 msgid "Left"
 msgstr "يسار"
 
@@ -872,7 +877,7 @@ msgstr "يسار"
 #: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:138
 #: modules/control/gestures.c:89 modules/video_filter/logo.c:97
 #: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:173
-#: modules/video_filter/osdmenu.c:75 modules/video_filter/rss.c:164
+#: modules/video_filter/osdmenu.c:82 modules/video_filter/rss.c:164
 msgid "Right"
 msgstr "يمين"
 
@@ -954,11 +959,11 @@ msgstr ""
 
 #: src/input/decoder.c:137
 msgid "VLC could not open the packetizer module."
-msgstr ""
+msgstr "لا يستطيع فتح وحدة التحزيم."
 
 #: src/input/decoder.c:149
 msgid "VLC could not open the decoder module."
-msgstr ""
+msgstr "لا يستطيع فتح وحدة كشف الرموز."
 
 #: src/input/decoder.c:159
 msgid "No suitable decoder module for format"
@@ -1227,13 +1232,15 @@ msgstr "المؤلف: %s\n"
 #: src/libvlc-common.c:1836
 #, c-format
 msgid "Based upon svn changeset [%s]\n"
-msgstr ""
+msgstr "يعتمد على تغيُّرات svn [%s]\n"
 
 #: src/libvlc-common.c:1867
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
+"\n"
+" محتوى محوّل إلى الملف  vlc-help.txt\n"
 
 #: src/libvlc-common.c:1887
 #, fuzzy
@@ -1407,6 +1414,8 @@ msgid ""
 "This is the verbosity level (0=only errors and standard messages, "
 "1=warnings, 2=debug)."
 msgstr ""
+"هذا الخيار يحدد مستوى الإسهاب( 0 = فقط لأخطاء الرسائل القياسية, 1 = إنذار, 2 "
+"= تنقيح)."
 
 #: src/libvlc-module.c:98
 msgid "Be quiet"
@@ -1423,7 +1432,7 @@ msgstr "تيار افتراضي"
 
 #: src/libvlc-module.c:104
 msgid "This stream will always be opened at VLC startup."
-msgstr ""
+msgstr "هذا التدفق سيفتح دائماً عند بدء VLC ."
 
 #: src/libvlc-module.c:107
 msgid ""
@@ -1507,7 +1516,7 @@ msgstr "أجبر الخرْج السمعي"
 
 #: src/libvlc-module.c:157
 msgid "This will force a mono audio output."
-msgstr ""
+msgstr "هذا الخيار يجبر الخرج السمعي الأحادي"
 
 #: src/libvlc-module.c:159
 msgid "Default audio volume"
@@ -1516,7 +1525,7 @@ msgstr "حجم الصوت الإفتراضي"
 #: src/libvlc-module.c:161
 msgid ""
 "You can set the default audio output volume here, in a range from 0 to 1024."
-msgstr ""
+msgstr "حدد هنا شِّدة الخرج السمعي، من 0 إلى 1024 ."
 
 #: src/libvlc-module.c:164
 msgid "Audio output saved volume"
@@ -1527,6 +1536,8 @@ msgid ""
 "This saves the audio output volume when you use the mute function. You "
 "should not change this option manually."
 msgstr ""
+"الشِّدة الحالية مسجَّلة في هذا المتغيِّر عندما تختارون اكتم. يجب  أن لا تغيِّرو هذه "
+"القيمة يدوياً."
 
 #: src/libvlc-module.c:169
 msgid "Audio output volume step"
@@ -1536,7 +1547,7 @@ msgstr "لا تعديل لشدة صوت"
 msgid ""
 "The step size of the volume is adjustable using this option, in a range from "
 "0 to 1024."
-msgstr ""
+msgstr "هذا الخيار يسمح بتعديل شِّدة السمعي،  من 0 إلى 1024."
 
 #: src/libvlc-module.c:174
 msgid "Audio output frequency (Hz)"
@@ -1561,7 +1572,7 @@ msgstr ""
 
 #: src/libvlc-module.c:187
 msgid "Audio desynchronization compensation"
-msgstr ""
+msgstr "تعويض فك التزامن السمعي"
 
 #: src/libvlc-module.c:189
 msgid ""
@@ -1620,7 +1631,7 @@ msgstr "مشاهدة  السمعي"
 
 #: src/libvlc-module.c:221
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
-msgstr ""
+msgstr "أضف وحدات التصور السمعي (محلل الطيف، إلخ)."
 
 #: src/libvlc-module.c:229
 msgid ""
@@ -1720,7 +1731,7 @@ msgstr ""
 #: src/libvlc-module.c:277 modules/audio_filter/channel_mixer/mono.c:99
 #: modules/codec/dvbsub.c:70 modules/codec/subsdec.c:138
 #: modules/video_filter/logo.c:97 modules/video_filter/marq.c:126
-#: modules/video_filter/mosaic.c:173 modules/video_filter/osdmenu.c:75
+#: modules/video_filter/mosaic.c:173 modules/video_filter/osdmenu.c:82
 #: modules/video_filter/rss.c:164
 msgid "Center"
 msgstr "وسط"
@@ -1729,41 +1740,41 @@ msgstr "وسط"
 #: modules/gui/qt4/ui/video_effects.ui:200
 #: modules/gui/qt4/ui/video_effects.ui:279 modules/video_filter/logo.c:97
 #: modules/video_filter/marq.c:126 modules/video_filter/mosaic.c:173
-#: modules/video_filter/osdmenu.c:75 modules/video_filter/rss.c:164
+#: modules/video_filter/osdmenu.c:82 modules/video_filter/rss.c:164
 msgid "Top"
 msgstr "أعلى"
 
 #: src/libvlc-module.c:277 modules/codec/dvbsub.c:70
 #: modules/video_filter/logo.c:97 modules/video_filter/marq.c:126
-#: modules/video_filter/mosaic.c:173 modules/video_filter/osdmenu.c:75
+#: modules/video_filter/mosaic.c:173 modules/video_filter/osdmenu.c:82
 #: modules/video_filter/rss.c:164
 msgid "Bottom"
 msgstr "أسفل"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:83
 #: modules/video_filter/rss.c:165
 msgid "Top-Left"
 msgstr "أعلى يسار"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:83
 #: modules/video_filter/rss.c:165
 msgid "Top-Right"
 msgstr "أعلى يمين"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:83
 #: modules/video_filter/rss.c:165
 msgid "Bottom-Left"
 msgstr "أسفل يسار"
 
 #: src/libvlc-module.c:278 modules/codec/dvbsub.c:71
 #: modules/video_filter/logo.c:98 modules/video_filter/marq.c:127
-#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:76
+#: modules/video_filter/mosaic.c:174 modules/video_filter/osdmenu.c:83
 #: modules/video_filter/rss.c:165
 msgid "Bottom-Right"
 msgstr "أسفل يمين"
@@ -1867,11 +1878,11 @@ msgstr ""
 
 #: src/libvlc-module.c:326
 msgid "Video snapshot directory (or filename)"
-msgstr ""
+msgstr "دليل الإلتقاط"
 
 #: src/libvlc-module.c:328
 msgid "Directory where the video snapshots will be stored."
-msgstr ""
+msgstr "الدليل الذي تخزن فيه إلتقاطات الشاشة."
 
 #: src/libvlc-module.c:330 src/libvlc-module.c:332
 msgid "Video snapshot file prefix"
@@ -1883,7 +1894,7 @@ msgstr "صيغة لقطة الفيديو"
 
 #: src/libvlc-module.c:336
 msgid "Image format which will be used to store the video snapshots"
-msgstr ""
+msgstr "صيغة الصورة للإستعمال في تخزين إلتقاطات الشاشة"
 
 #: src/libvlc-module.c:338
 msgid "Display video snapshot preview"
@@ -1895,11 +1906,11 @@ msgstr "إعرض مشاهدة مسبقة لإلتقاط الشاشة على ال
 
 #: src/libvlc-module.c:342
 msgid "Use sequential numbers instead of timestamps"
-msgstr ""
+msgstr "إستعمل ترقيم متسلسل في مكان التاريخ و الساعة"
 
 #: src/libvlc-module.c:344
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
-msgstr ""
+msgstr "إستعمل ترقيم متسلسل في مكان التاريخ و الساعة لتخزين إلتقاطات الشاشة"
 
 #: src/libvlc-module.c:346
 msgid "Video cropping"
@@ -2069,7 +2080,7 @@ msgstr "منفذ UDP"
 
 #: src/libvlc-module.c:435
 msgid "This is the default port used for UDP streams. Default is 1234."
-msgstr ""
+msgstr "المنفذ المستعمل إفتراضياً للتدفقات UDP . المنفذ بالإفتراض هو 1234"
 
 #: src/libvlc-module.c:437
 msgid "MTU of the network interface"
@@ -2080,6 +2091,7 @@ msgid ""
 "This is the maximum packet size that can be transmitted over the network "
 "interface. On Ethernet it is usually 1500 bytes."
 msgstr ""
+"أقصى حجم للحزم التي يمكن أن ترسل على الشبكة. على الإيثرنت هي عادةً 1500 بايت."
 
 #: src/libvlc-module.c:442 modules/stream_out/rtp.c:93
 msgid "Hop limit (TTL)"
@@ -2268,7 +2280,7 @@ msgstr ""
 
 #: src/libvlc-module.c:547
 msgid "Enable sub-pictures"
-msgstr ""
+msgstr "شغِّل الصور الفرعية"
 
 #: src/libvlc-module.c:549
 msgid "You can completely disable the sub-picture processing."
@@ -2298,7 +2310,7 @@ msgstr ""
 
 #: src/libvlc-module.c:560
 msgid "Subpictures filter module"
-msgstr ""
+msgstr "وحدة ترشيح الصور الفرعيّة"
 
 #: src/libvlc-module.c:562
 msgid ""
@@ -2318,7 +2330,7 @@ msgstr ""
 
 #: src/libvlc-module.c:570
 msgid "Subtitle autodetection fuzziness"
-msgstr ""
+msgstr "تقريب الكشف الآلي للعناوين الثانوية"
 
 #: src/libvlc-module.c:572
 msgid ""
@@ -2364,7 +2376,7 @@ msgstr ""
 
 #: src/libvlc-module.c:597
 msgid "This is the default DVD device to use."
-msgstr ""
+msgstr "هذا جهاز DVD للإستعمال إفتراضياً."
 
 #: src/libvlc-module.c:600
 msgid "VCD device"
@@ -2405,7 +2417,7 @@ msgstr "قوة IPv6"
 
 #: src/libvlc-module.c:622
 msgid "IPv6 will be used by default for all connections."
-msgstr ""
+msgstr "إستعمل IPv6  إفتراضيا لكل الإرتباطات."
 
 #: src/libvlc-module.c:624
 msgid "Force IPv4"
@@ -2413,7 +2425,7 @@ msgstr "IPv4 قوة إستعمال  "
 
 #: src/libvlc-module.c:626
 msgid "IPv4 will be used by default for all connections."
-msgstr ""
+msgstr "إستعمل IPv4  إفتراضيا لكل الإرتباطات."
 
 #: src/libvlc-module.c:628
 msgid "TCP connection timeout"
@@ -2421,7 +2433,7 @@ msgstr "TCP زمن إنتهاء"
 
 #: src/libvlc-module.c:630
 msgid "Default TCP connection timeout (in milliseconds). "
-msgstr ""
+msgstr "المهلة الإفتراضية للإرتباطات (بالملي ثانية)."
 
 #: src/libvlc-module.c:632
 msgid "SOCKS server"
@@ -2432,6 +2444,8 @@ msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
 msgstr ""
+"خادم SOCKS للإستعمال. يجب أن يكون  عل صيغة address:port. سيستعمل لكل "
+"الإرتباطات TCP"
 
 #: src/libvlc-module.c:637
 msgid "SOCKS user name"
@@ -2439,7 +2453,7 @@ msgstr "SOCKS إسم مستعمل"
 
 #: src/libvlc-module.c:639
 msgid "User name to be used for connection to the SOCKS proxy."
-msgstr ""
+msgstr "إسم المستخدم للإستعمال في الإرتباطات مع الخادم  SOCKS."
 
 #: src/libvlc-module.c:641
 msgid "SOCKS password"
@@ -2447,7 +2461,7 @@ msgstr "SOCKS كلمة السر "
 
 #: src/libvlc-module.c:643
 msgid "Password to be used for connection to the SOCKS proxy."
-msgstr ""
+msgstr "كلمة السر للإستعمال في الإرتباطات مع الخادم  SOCKS."
 
 #: src/libvlc-module.c:645
 msgid "Title metadata"
@@ -2455,7 +2469,7 @@ msgstr "العنوان"
 
 #: src/libvlc-module.c:647
 msgid "Allows you to specify a \"title\" metadata for an input."
-msgstr ""
+msgstr "يسمح بتحديد  «عنوان» لدخل."
 
 #: src/libvlc-module.c:649
 msgid "Author metadata"
@@ -2463,7 +2477,7 @@ msgstr "المؤلف"
 
 #: src/libvlc-module.c:651
 msgid "Allows you to specify an \"author\" metadata for an input."
-msgstr ""
+msgstr "يسمح بتحديد  «مؤلّف» لدخل."
 
 #: src/libvlc-module.c:653
 msgid "Artist metadata"
@@ -2471,7 +2485,7 @@ msgstr "الفنان "
 
 #: src/libvlc-module.c:655
 msgid "Allows you to specify an \"artist\" metadata for an input."
-msgstr ""
+msgstr "يسمح بتحديد  «فنان» لدخل."
 
 #: src/libvlc-module.c:657
 msgid "Genre metadata"
@@ -2479,7 +2493,7 @@ msgstr "النوع "
 
 #: src/libvlc-module.c:659
 msgid "Allows you to specify a \"genre\" metadata for an input."
-msgstr ""
+msgstr "يسمح بتحديد  « نوع» لدخل."
 
 #: src/libvlc-module.c:661
 msgid "Copyright metadata"
@@ -2487,7 +2501,7 @@ msgstr "حقوق الطبع"
 
 #: src/libvlc-module.c:663
 msgid "Allows you to specify a \"copyright\" metadata for an input."
-msgstr ""
+msgstr "يسمح بتحديد  « حقوق الطبع » لدخل."
 
 #: src/libvlc-module.c:665
 msgid "Description metadata"
@@ -2495,7 +2509,7 @@ msgstr "الوصف"
 
 #: src/libvlc-module.c:667
 msgid "Allows you to specify a \"description\" metadata for an input."
-msgstr ""
+msgstr "يسمح بتحديد  « وصف» لدخل."
 
 #: src/libvlc-module.c:669
 msgid "Date metadata"
@@ -2503,7 +2517,7 @@ msgstr "التاريخ "
 
 #: src/libvlc-module.c:671
 msgid "Allows you to specify a \"date\" metadata for an input."
-msgstr ""
+msgstr "يسمح بتحديد  « تاريخ» لدخل."
 
 #: src/libvlc-module.c:673
 msgid "URL metadata"
@@ -2511,7 +2525,7 @@ msgstr "URL"
 
 #: src/libvlc-module.c:675
 msgid "Allows you to specify a \"url\" metadata for an input."
-msgstr ""
+msgstr "يسمح بتحديد  « url» لدخل."
 
 #: src/libvlc-module.c:679
 msgid ""
@@ -2538,7 +2552,7 @@ msgstr "قائمة أدواة الترميز المفضلة"
 #: src/libvlc-module.c:692
 msgid ""
 "This allows you to select a list of encoders that VLC will use in priority."
-msgstr ""
+msgstr "قائمة المرمزين الذين يختارهم  VLC بالأولوية ."
 
 #: src/libvlc-module.c:695
 msgid "Prefer system plugins over vlc"
@@ -2554,7 +2568,7 @@ msgstr ""
 msgid ""
 "These options allow you to set default global options for the stream output "
 "subsystem."
-msgstr ""
+msgstr "هذه الخيارات تسمح بتعديل مجمل الخيارات الإفتراضيّة لنظام تدفق الخرج."
 
 #: src/libvlc-module.c:709
 msgid "Default stream output chain"
@@ -2566,6 +2580,8 @@ msgid ""
 "to learn how to build such chains.Warning: this chain will be enabled for "
 "all streams."
 msgstr ""
+"تستطيعون هنا إدخال سلسلة تدفق الخرج بالإفتراض. أنظر في التوثيق  لمعرفة كيف "
+"تُكون هذه السلاسل. تحذير: هذه السلاسل تشغل لكل التدفقات."
 
 #: src/libvlc-module.c:715
 msgid "Enable streaming of all ES"
@@ -2581,7 +2597,7 @@ msgstr "إعرض أثناء النشر"
 
 #: src/libvlc-module.c:721
 msgid "Play locally the stream while streaming it."
-msgstr ""
+msgstr "إعرض التدفق أثناء النشر."
 
 #: src/libvlc-module.c:723
 msgid "Enable video stream output"
@@ -2626,7 +2642,7 @@ msgstr ""
 
 #: src/libvlc-module.c:744
 msgid "Preferred packetizer list"
-msgstr ""
+msgstr "قائمة المحزمون المفضلة."
 
 #: src/libvlc-module.c:746
 msgid ""
@@ -2784,7 +2800,7 @@ msgstr ""
 
 #: src/libvlc-module.c:833
 msgid "Demux module"
-msgstr ""
+msgstr "وحدة Demux"
 
 #: src/libvlc-module.c:835
 msgid ""
@@ -2855,23 +2871,23 @@ msgstr "جمع الإحصائيات"
 
 #: src/libvlc-module.c:872
 msgid "Collect miscellaneous statistics."
-msgstr ""
+msgstr "تجميع مختلف الإحصائيات."
 
 #: src/libvlc-module.c:874
 msgid "Run as daemon process"
-msgstr ""
+msgstr "تشغل ك daemon process"
 
 #: src/libvlc-module.c:876
 msgid "Runs VLC as a background daemon process."
-msgstr ""
+msgstr "هذا يسمح بتشغيل VLC ك  daemon process."
 
 #: src/libvlc-module.c:878
 msgid "Write process id to file"
-msgstr ""
+msgstr "أكتب مُعرف العملية للملف"
 
 #: src/libvlc-module.c:880
 msgid "Writes process id into specified file."
-msgstr ""
+msgstr "أكتب مُعرف العملية الى ملف محدد."
 
 #: src/libvlc-module.c:882
 msgid "Log to file"
@@ -2879,19 +2895,19 @@ msgstr "سجل في ملف"
 
 #: src/libvlc-module.c:884
 msgid "Log all VLC messages to a text file."
-msgstr ""
+msgstr "سجل كل رسائل VLC في نص ملف."
 
 #: src/libvlc-module.c:886
 msgid "Log to syslog"
-msgstr ""
+msgstr "سجل إلى syslog"
 
 #: src/libvlc-module.c:888
 msgid "Log all VLC messages to syslog (UNIX systems)."
-msgstr ""
+msgstr "سجل كل رسائل VLC إلى syslog ، في أنظمة UNIX ."
 
 #: src/libvlc-module.c:890
 msgid "Allow only one running instance"
-msgstr ""
+msgstr "لا تسمح إلا بإقتراح واحد"
 
 #: src/libvlc-module.c:892
 msgid ""
@@ -2914,23 +2930,23 @@ msgstr ""
 
 #: src/libvlc-module.c:908
 msgid "VLC is started from file association"
-msgstr ""
+msgstr "VLC بدأ بفتح ملف تابع. "
 
 #: src/libvlc-module.c:910
 msgid "Tell VLC that it is being launched due to a file association in the OS"
-msgstr ""
+msgstr "أخبر VLC أنه إنطلق بسبب تجمع ملف في نظام التشغيل."
 
 #: src/libvlc-module.c:913
 msgid "One instance when started from file"
-msgstr ""
+msgstr "إقتراح واحد عندما ينطلق  من ملف"
 
 #: src/libvlc-module.c:915
 msgid "Allow only one running instance when started from file."
-msgstr ""
+msgstr "لا تسمح إلا بإقتراح واحد عندما ينطلق  من ملف."
 
 #: src/libvlc-module.c:917
 msgid "Increase the priority of the process"
-msgstr ""
+msgstr "الزيادة في أولوية العمليّة"
 
 #: src/libvlc-module.c:919
 msgid ""
@@ -2944,7 +2960,7 @@ msgstr ""
 
 #: src/libvlc-module.c:927
 msgid "Enqueue items to playlist when in one instance mode"
-msgstr ""
+msgstr "وضع في الأخير بنمط إقتراح وحيد"
 
 #: src/libvlc-module.c:929
 msgid ""
@@ -2960,21 +2976,21 @@ msgstr ""
 
 #: src/libvlc-module.c:941
 msgid "Automatically preparse files"
-msgstr ""
+msgstr "بحث  دلائل المعلومات"
 
 #: src/libvlc-module.c:943
 msgid ""
 "Automatically preparse files added to the playlist (to retrieve some "
 "metadata)."
-msgstr ""
+msgstr "بحث آلي عن دلائل المعلومات للملفات المضافة إلى قائمة القراءة."
 
 #: src/libvlc-module.c:946
 msgid "Album art policy"
-msgstr ""
+msgstr "ألبوم   art policy"
 
 #: src/libvlc-module.c:948
 msgid "Choose how album art will be downloaded."
-msgstr ""
+msgstr "إختر أي ألبوم فن و سيتم تنزيله."
 
 #: src/libvlc-module.c:954
 msgid "Manual download only"
@@ -2982,11 +2998,11 @@ msgstr "تنزيل يدوي فقط"
 
 #: src/libvlc-module.c:955
 msgid "When track starts playing"
-msgstr ""
+msgstr "عندما يبدأ مسار اللعب "
 
 #: src/libvlc-module.c:956
 msgid "As soon as track is added"
-msgstr ""
+msgstr "في القريب يضاف المسار"
 
 #: src/libvlc-module.c:958
 msgid "Services discovery modules"
@@ -3004,11 +3020,11 @@ msgstr "تشغيل الملفات بشكل عشوائي للأبد"
 
 #: src/libvlc-module.c:965
 msgid "VLC will randomly play files in the playlist until interrupted."
-msgstr ""
+msgstr "لعب ملفات قائمة القراءة بترتيب عشوائي."
 
 #: src/libvlc-module.c:969
 msgid "VLC will keep playing the playlist indefinitely."
-msgstr ""
+msgstr "لعب ملفات قائمة القراءة بشكل غير محدد "
 
 #: src/libvlc-module.c:971
 msgid "Repeat current item"
@@ -3016,7 +3032,7 @@ msgstr "اعادة تشغيل العنصر الحالي"
 
 #: src/libvlc-module.c:973
 msgid "VLC will keep playing the current playlist item."
-msgstr ""
+msgstr "اللعب دوريا للعنصر الحالي لقائمة القراءة."
 
 #: src/libvlc-module.c:975
 msgid "Play and stop"
@@ -3024,7 +3040,7 @@ msgstr "تشغيل وايقاف"
 
 #: src/libvlc-module.c:977
 msgid "Stop the playlist after each played playlist item."
-msgstr ""
+msgstr "أوقف قائمة القراءة بعد كل عنصر."
 
 #: src/libvlc-module.c:979
 #, fuzzy
@@ -3069,7 +3085,7 @@ msgstr "أبدا "
 
 #: src/libvlc-module.c:1003
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
-msgstr ""
+msgstr "إعداد الإختصارات (« hotkeys »)."
 
 #: src/libvlc-module.c:1006 src/video_output/vout_intf.c:421
 #: modules/gui/beos/VideoOutput.cpp:1057 modules/gui/macosx/controls.m:402
@@ -3084,7 +3100,7 @@ msgstr "ملئ الشاشة"
 
 #: src/libvlc-module.c:1007
 msgid "Select the hotkey to use to swap fullscreen state."
-msgstr ""
+msgstr "حدد  hotkey للإستعمال للتنقل إلى الشاشة الكاملة."
 
 #: src/libvlc-module.c:1008
 #, fuzzy
@@ -3094,7 +3110,7 @@ msgstr "ملئ الشاشة"
 #: src/libvlc-module.c:1009
 #, fuzzy
 msgid "Select the hotkey to use to leave fullscreen state."
-msgstr "اختيار المفتاح لتحديد هذه المفضلة"
+msgstr "حدد  hotkey للإستعمال للتنقل إلى الشاشة الكاملة."
 
 #: src/libvlc-module.c:1010
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:83
@@ -3104,7 +3120,7 @@ msgstr "تشغيل/ايقاف مؤقت"
 
 #: src/libvlc-module.c:1011
 msgid "Select the hotkey to use to swap paused state."
-msgstr ""
+msgstr "حدد  hotkey  للإستعمال ل تنشيط أو إلغاء تنشيط التوقف المؤقت."
 
 #: src/libvlc-module.c:1012
 msgid "Pause only"
@@ -3112,7 +3128,7 @@ msgstr "ايقاف مؤقت فقط"
 
 #: src/libvlc-module.c:1013
 msgid "Select the hotkey to use to pause."
-msgstr ""
+msgstr "حدد  hotkey  للإستعمال للإنتقال إلى التوقف المؤقت."
 
 #: src/libvlc-module.c:1014
 msgid "Play only"
@@ -3120,7 +3136,7 @@ msgstr "تشغيل فقط"
 
 #: src/libvlc-module.c:1015
 msgid "Select the hotkey to use to play."
-msgstr ""
+msgstr "حدد  hotkey  للإستعمال  للعب."
 
 #: src/libvlc-module.c:1016 modules/control/hotkeys.c:673
 #: modules/gui/macosx/controls.m:840 modules/gui/macosx/intf.m:571
@@ -3131,7 +3147,7 @@ msgstr "أسرع"
 
 #: src/libvlc-module.c:1017
 msgid "Select the hotkey to use for fast forward playback."
-msgstr ""
+msgstr "حدد  hotkey  للإستعمال  للتقدم السريع."
 
 #: src/libvlc-module.c:1018 modules/control/hotkeys.c:679
 #: modules/gui/macosx/controls.m:841 modules/gui/macosx/intf.m:572
@@ -3142,14 +3158,14 @@ msgstr "أبطأ"
 
 #: src/libvlc-module.c:1019
 msgid "Select the hotkey to use for slow motion playback."
-msgstr ""
+msgstr " حدد  hotkey  للإستعمال  لإبطائه."
 
 #: src/libvlc-module.c:1020 modules/control/hotkeys.c:656
 #: modules/gui/macosx/controls.m:861 modules/gui/macosx/intf.m:529
 #: modules/gui/macosx/intf.m:574 modules/gui/macosx/intf.m:650
 #: modules/gui/macosx/intf.m:658 modules/gui/macosx/wizard.m:312
 #: modules/gui/macosx/wizard.m:363 modules/gui/macosx/wizard.m:1628
-#: modules/gui/qt4/main_interface.cpp:249 modules/gui/qt4/menus.cpp:443
+#: modules/gui/qt4/main_interface.cpp:249 modules/gui/qt4/menus.cpp:447
 #: modules/gui/qt4/ui/streampanel.ui:129
 #: modules/gui/wxwidgets/interface.cpp:704
 #: modules/gui/wxwidgets/interface.cpp:1531
@@ -3159,13 +3175,13 @@ msgstr "التالي"
 
 #: src/libvlc-module.c:1021
 msgid "Select the hotkey to use to skip to the next item in the playlist."
-msgstr ""
+msgstr " حدد  hotkey  للإستعمال للإنتقال إلى العنصر الموالي في قائمة القراءة."
 
 #: src/libvlc-module.c:1022 modules/control/hotkeys.c:662
 #: modules/gui/macosx/controls.m:860 modules/gui/macosx/intf.m:524
 #: modules/gui/macosx/intf.m:573 modules/gui/macosx/intf.m:651
 #: modules/gui/macosx/intf.m:657 modules/gui/qt4/main_interface.cpp:248
-#: modules/gui/qt4/menus.cpp:441 modules/gui/wxwidgets/interface.cpp:703
+#: modules/gui/qt4/menus.cpp:445 modules/gui/wxwidgets/interface.cpp:703
 #: modules/gui/wxwidgets/interface.cpp:1530
 #: modules/gui/wxwidgets/menus.cpp:260
 msgid "Previous"
@@ -3173,13 +3189,13 @@ msgstr "السابق"
 
 #: src/libvlc-module.c:1023
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
-msgstr ""
+msgstr "حدد  hotkey  للإستعمال للإنتقال إلى العنصر السابق في قائمة القراءة."
 
 #: src/libvlc-module.c:1024 modules/gui/macosx/controls.m:852
 #: modules/gui/macosx/intf.m:527 modules/gui/macosx/intf.m:570
 #: modules/gui/macosx/intf.m:649 modules/gui/macosx/intf.m:656
 #: modules/gui/pda/pda_interface.c:274 modules/gui/pda/pda_interface.c:275
-#: modules/gui/qt4/main_interface.cpp:251 modules/gui/qt4/menus.cpp:440
+#: modules/gui/qt4/main_interface.cpp:251 modules/gui/qt4/menus.cpp:444
 #: modules/gui/qt4/ui/streampanel.ui:122
 #: modules/gui/wxwidgets/dialogs/vlm/vlm_streampanel.cpp:88
 #: modules/gui/wxwidgets/interface.cpp:687
@@ -3191,7 +3207,7 @@ msgstr "ايقاف"
 
 #: src/libvlc-module.c:1025
 msgid "Select the hotkey to stop playback."
-msgstr ""
+msgstr "لإيقاف  حدد  hotkey  للإستعمال لإيقاف القراءة."
 
 #: src/libvlc-module.c:1026 modules/gui/macosx/bookmarks.m:109
 #: modules/gui/macosx/bookmarks.m:118 modules/gui/macosx/embeddedwindow.m:51
@@ -3301,7 +3317,7 @@ msgid "Long jump length, in seconds."
 msgstr "طول القفزة الطويلة إلى الأمام، بالثانية  "
 
 #: src/libvlc-module.c:1064 modules/control/hotkeys.c:241
-#: modules/gui/beos/InterfaceWindow.cpp:275 modules/gui/qt4/menus.cpp:470
+#: modules/gui/beos/InterfaceWindow.cpp:275 modules/gui/qt4/menus.cpp:474
 msgid "Quit"
 msgstr "اغلاق"
 
@@ -7553,8 +7569,9 @@ msgid "Roku HD1000 audio output"
 msgstr "خرج سمعي Roku HD1000"
 
 #: modules/audio_output/jack.c:65
+#, fuzzy
 msgid "Automatically connect to writable clients"
-msgstr ""
+msgstr "بحث  دلائل المعلومات"
 
 #: modules/audio_output/jack.c:67
 msgid ""
@@ -7621,7 +7638,7 @@ msgstr "محلَل A/52"
 
 #: modules/codec/a52.c:98
 msgid "A/52 audio packetizer"
-msgstr ""
+msgstr "المحزَّم السمعي A/52"
 
 #: modules/codec/adpcm.c:43
 msgid "ADPCM audio decoder"
@@ -7649,7 +7666,7 @@ msgstr "كاشف الرموز للعنوان الثانوي CVD"
 
 #: modules/codec/cvdsub.c:51
 msgid "Chaoji VCD subtitle packetizer"
-msgstr ""
+msgstr "محزَّم العناوين الثانوية ل Chaoji VCD"
 
 #: modules/codec/dirac.c:67 modules/codec/theora.c:90
 #: modules/codec/twolame.c:50 modules/codec/vorbis.c:156
@@ -7682,7 +7699,7 @@ msgstr "محلل DTS"
 
 #: modules/codec/dts.c:100
 msgid "DTS audio packetizer"
-msgstr ""
+msgstr "المحزَّم السمعي DTS"
 
 #: modules/codec/dvbsub.c:51
 msgid "Decoding X coordinate"
@@ -8171,7 +8188,7 @@ msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:216
 msgid "Rate control buffer size"
-msgstr ""
+msgstr "حجم صوان مراقبة التدفق"
 
 #: modules/codec/ffmpeg/ffmpeg.h:217
 msgid ""
@@ -8181,11 +8198,11 @@ msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:221
 msgid "Rate control buffer aggressiveness"
-msgstr ""
+msgstr "قدرة مراقبة التدفق"
 
 #: modules/codec/ffmpeg/ffmpeg.h:222
 msgid "Rate control buffer aggressiveness."
-msgstr ""
+msgstr "قدرة مراقبة التدفق."
 
 #: modules/codec/ffmpeg/ffmpeg.h:225
 msgid "I quantization factor"
@@ -8239,62 +8256,64 @@ msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.h:253
 msgid "Minimum video quantizer scale"
-msgstr ""
+msgstr "أدنى سلم لتقسيم الفديو إلى كميات صغيرة"
 
 #: modules/codec/ffmpeg/ffmpeg.h:254
 msgid "Minimum video quantizer scale."
-msgstr ""
+msgstr "أدنى سلم لتقسيم الفديو إلى كميات صغيرة."
 
 #: modules/codec/ffmpeg/ffmpeg.h:257
 msgid "Maximum video quantizer scale"
-msgstr ""
+msgstr "أقصى سلم لتقسيم الفديو إلى كميات صغيرة"
 
 #: modules/codec/ffmpeg/ffmpeg.h:258
 msgid "Maximum video quantizer scale."
-msgstr ""
+msgstr "أقصى سلم لتقسيم الفديو إلى كميات صغيرة."
 
 #: modules/codec/ffmpeg/ffmpeg.h:261
 msgid "Trellis quantization"
-msgstr ""
+msgstr "التقسيم إلى كميّات صغيرة  ل Trellis"
 
 #: modules/codec/ffmpeg/ffmpeg.h:262
 msgid "Enable trellis quantization (rate distortion for block coefficients)."
 msgstr ""
+"شغِّل التقسيم إلى كميّات صغيرة  ل  trellis ( تشويه معدّل البت لمعاملات الكتل)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:265
 msgid "Fixed quantizer scale"
-msgstr ""
+msgstr " تحديد سلم التقسيم إلى كميّات صغيرة "
 
 #: modules/codec/ffmpeg/ffmpeg.h:266
 msgid ""
 "A fixed video quantizer scale for VBR encoding (accepted values: 0.01 to "
 "255.0)."
 msgstr ""
+"سلم التقسيم إلى كميّات صغيرة ثابت للترميز (القيم المقبولة من0.01 إلى 255.0)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:269
 msgid "Strict standard compliance"
-msgstr ""
+msgstr "إلتزام صارم للمعايير"
 
 #: modules/codec/ffmpeg/ffmpeg.h:270
 msgid ""
 "Force a strict standard compliance when encoding (accepted values: -1, 0, 1)."
-msgstr ""
+msgstr "أجبر الإلتزام صارم للمعايير عند الترميز (القيم المقبولة: -1، 0، 1)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:273
 msgid "Luminance masking"
-msgstr ""
+msgstr "إخفاء الإضاءة"
 
 #: modules/codec/ffmpeg/ffmpeg.h:274
 msgid "Raise the quantizer for very bright macroblocks (default: 0.0)."
-msgstr ""
+msgstr "رفع التقسيم إلى كميّات صغيرة للماكرو كتل المضيئة جداً( إفتراضياً:0.0)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:277
 msgid "Darkness masking"
-msgstr ""
+msgstr "إخفاء الظلام"
 
 #: modules/codec/ffmpeg/ffmpeg.h:278
 msgid "Raise the quantizer for very dark macroblocks (default: 0.0)."
-msgstr ""
+msgstr "رفع التقسيم إلى كميّات صغيرة للماكرو كتل المظلمة جداً( إفتراضياً:0.0)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:281
 msgid "Motion masking"
@@ -8305,6 +8324,7 @@ msgid ""
 "Raise the quantizer for macroblocks with a high temporal complexity "
 "(default: 0.0)."
 msgstr ""
+"رفع التقسيم إلى كميّات صغيرة للماكرو كتل التي تشكل حركة مهمة( إفتراضياً:0.0)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:285
 msgid "Border masking"
@@ -8346,11 +8366,11 @@ msgstr "نمط القياس."
 
 #: modules/codec/ffmpeg/ffmpeg.h:302
 msgid "Ffmpeg mux"
-msgstr ""
+msgstr "Ffmpeg mux"
 
 #: modules/codec/ffmpeg/ffmpeg.h:303
 msgid "Force use of ffmpeg muxer."
-msgstr ""
+msgstr "أجبر إستعمال  ffmpeg muxer."
 
 #: modules/codec/ffmpeg/postprocess.c:86 modules/gui/macosx/intf.m:621
 #: modules/gui/macosx/intf.m:622
@@ -8375,11 +8395,11 @@ msgstr " المرمز السمعي Flac"
 
 #: modules/codec/flac.c:189
 msgid "Flac audio packetizer"
-msgstr ""
+msgstr "المحزَّم السمعي Flac"
 
 #: modules/codec/libmpeg2.c:97
 msgid "MPEG I/II video decoder (using libmpeg2)"
-msgstr ""
+msgstr "كاشف الرموز للفديو MPEG I/II ( يستعمل libmpeg2 )"
 
 #: modules/codec/lpcm.c:83
 msgid "Linear PCM audio decoder"
@@ -8387,11 +8407,11 @@ msgstr "كاشف الرموز السمعي ل  PCM الخطي"
 
 #: modules/codec/lpcm.c:88
 msgid "Linear PCM audio packetizer"
-msgstr ""
+msgstr "المحزَّم السمعي ل Flac  الخطي "
 
 #: modules/codec/mash.cpp:66
 msgid "Video decoder using openmash"
-msgstr ""
+msgstr "كاشف الرموز للفديو مستعملاً   openmash"
 
 #: modules/codec/mpeg_audio.c:108
 msgid "MPEG audio layer I/II/III decoder"
@@ -8399,7 +8419,7 @@ msgstr ""
 
 #: modules/codec/mpeg_audio.c:119
 msgid "MPEG audio layer I/II/III packetizer"
-msgstr ""
+msgstr "المحزَّم MPEG السمعي  layer I/II/III "
 
 #: modules/codec/png.c:54
 msgid "PNG video decoder"
@@ -8415,7 +8435,7 @@ msgstr ""
 
 #: modules/codec/rawvideo.c:75
 msgid "Pseudo raw video packetizer"
-msgstr ""
+msgstr "شبه محزَّم الفديو الخام "
 
 #: modules/codec/realaudio.c:60
 msgid "RealAudio library decoder"
@@ -8427,15 +8447,15 @@ msgstr ""
 
 #: modules/codec/speex.c:106
 msgid "Speex audio decoder"
-msgstr ""
+msgstr "كاشف الرموز السمعي Speex"
 
 #: modules/codec/speex.c:111
 msgid "Speex audio packetizer"
-msgstr ""
+msgstr "المحزَّم السمعي Speex"
 
 #: modules/codec/speex.c:116
 msgid "Speex audio encoder"
-msgstr ""
+msgstr "المرمِّز السمعي Speex"
 
 #: modules/codec/speex.c:560 modules/codec/speex.c:577
 msgid "Speex comment"
@@ -8447,11 +8467,11 @@ msgstr "النمط"
 
 #: modules/codec/spudec/spudec.c:41
 msgid "DVD subtitles decoder"
-msgstr ""
+msgstr "كاشف الرموز للعناوين الثانوية ل DVD"
 
 #: modules/codec/spudec/spudec.c:48
 msgid "DVD subtitles packetizer"
-msgstr ""
+msgstr "محزِّم العناوين الثانوية ل DVD"
 
 #: modules/codec/subsdec.c:140
 msgid "Subtitles text encoding"
@@ -8459,7 +8479,7 @@ msgstr "تشفير نص الترجمة"
 
 #: modules/codec/subsdec.c:141
 msgid "Set the encoding used in text subtitles"
-msgstr ""
+msgstr "غيِّر الترميز المستعمل بنص العناوين الثانوية"
 
 #: modules/codec/subsdec.c:142
 msgid "Subtitles justification"
@@ -8471,16 +8491,16 @@ msgstr "تحديد موضع الترجمة "
 
 #: modules/codec/subsdec.c:144
 msgid "UTF-8 subtitles autodetection"
-msgstr ""
+msgstr "كشف آلي للعناوين الثانوية  UTF-8"
 
 #: modules/codec/subsdec.c:145
 msgid ""
 "This enables automatic detection of UTF-8 encoding within subtitles files."
-msgstr ""
+msgstr "شغل الكشف الآلي للترميز  UTF-8 في ملفات العناوين الثانوية"
 
 #: modules/codec/subsdec.c:147
 msgid "Formatted Subtitles"
-msgstr ""
+msgstr "تصاغ العناوين الثانوية"
 
 #: modules/codec/subsdec.c:148
 msgid ""
@@ -8512,7 +8532,7 @@ msgstr ""
 
 #: modules/codec/svcdsub.c:50
 msgid "Philips OGT (SVCD subtitle) decoder"
-msgstr ""
+msgstr "كاشف الرموز للعناوين الثانوية  Philips OGT(العنوان الثانوي SVCD )"
 
 #: modules/codec/svcdsub.c:51
 msgid "SVCD subtitles"
@@ -8520,7 +8540,7 @@ msgstr "عناوين ثانوية SVCD"
 
 #: modules/codec/svcdsub.c:61
 msgid "Philips OGT (SVCD subtitle) packetizer"
-msgstr ""
+msgstr "محزِّم العناوين الثانوية  Philips OGT(العنوان الثانوي SVCD )"
 
 #: modules/codec/tarkin.c:75
 msgid "Tarkin decoder module"
@@ -8574,7 +8594,7 @@ msgstr "كاشف رموز الفديو Theora"
 
 #: modules/codec/theora.c:105
 msgid "Theora video packetizer"
-msgstr ""
+msgstr "محزِّم الفديو Theora "
 
 #: modules/codec/theora.c:111
 msgid "Theora video encoder"
@@ -8596,7 +8616,7 @@ msgstr "نمط ستيريو"
 
 #: modules/codec/twolame.c:56
 msgid "Handling mode for stereo streams"
-msgstr ""
+msgstr "نمط تسيير تدفقات ستريو"
 
 #: modules/codec/twolame.c:57
 msgid "VBR mode"
@@ -8604,7 +8624,7 @@ msgstr "النمط VBR"
 
 #: modules/codec/twolame.c:59
 msgid "Use Variable BitRate. Default is to use Constant BitRate (CBR)."
-msgstr ""
+msgstr "إستعمل معدّل بت متغيِّر. إفتراضياً، يستعمل معدّل بت ثابت  (CBR)."
 
 #: modules/codec/twolame.c:60
 msgid "Psycho-acoustic model"
@@ -8632,7 +8652,7 @@ msgstr "أقصى معدل بت للترميز"
 
 #: modules/codec/vorbis.c:162
 msgid "Maximum bitrate in kbps. This is useful for streaming applications."
-msgstr ""
+msgstr "أقصى معدّل بت بالكيلوبت. صالح في تطبيقات النشر."
 
 #: modules/codec/vorbis.c:163
 msgid "Minimum encoding bitrate"
@@ -8642,7 +8662,7 @@ msgstr "أدنى معدل بت للترميز"
 msgid ""
 "Minimum bitrate in kbps. This is useful for encoding for a fixed-size "
 "channel."
-msgstr ""
+msgstr "أقصى معدّل بت بالكيلوبت. صالح لقناة بحجم ثابت."
 
 #: modules/codec/vorbis.c:166
 msgid "CBR encoding"
@@ -8650,7 +8670,7 @@ msgstr "الترميز CBR"
 
 #: modules/codec/vorbis.c:168
 msgid "Force a constant bitrate encoding (CBR)."
-msgstr ""
+msgstr "أجبر الترميز بمعدّل بت ثابت  (CBR)."
 
 #: modules/codec/vorbis.c:172
 msgid "Vorbis audio decoder"
@@ -8658,7 +8678,7 @@ msgstr "كاشف الرموز السمعي Vorbis"
 
 #: modules/codec/vorbis.c:183
 msgid "Vorbis audio packetizer"
-msgstr ""
+msgstr "المحزِّم السمعي Vorbis"
 
 #: modules/codec/vorbis.c:190
 msgid "Vorbis audio encoder"
@@ -8785,7 +8805,7 @@ msgstr "تخطى مرشح الحلقة"
 
 #: modules/codec/x264.c:105
 msgid "Deactivate the deblocking loop filter (decreases quality)."
-msgstr ""
+msgstr "بطّل مرشح الدورة. هذا ينقص الجودة."
 
 #: modules/codec/x264.c:107
 msgid "Loop filter AlphaC0 and Beta parameters alpha:beta"
@@ -10071,8 +10091,9 @@ msgid ""
 "A single administration password is used to protect this interface. The "
 "default value is \"admin\"."
 msgstr ""
+"كلمة المرور الإدارية هي الوحيدة التي تستعمل لحماية الواجهة. القيمة "
+"الافتراضية هي \"اداري\"."
 
-# msgstr "."/كلمة المرور الإدارية هي الوحيدة التي تستعمل لحماية الواجهة. القيمة الافتراضية هي /"اداري"
 #: modules/control/telnet.c:94
 msgid "VLM remote control interface"
 msgstr "التحكم عن بعد للواجهة VLM"
@@ -10524,7 +10545,7 @@ msgstr "التشغيل التلقائي"
 #: modules/demux/playlist/playlist.c:37
 #, fuzzy
 msgid "Automatically start playing the playlist content once it's loaded."
-msgstr "بدء تلقائي للتشغيل ،قائمة التشغيل يحوي على واحد انه محمّل"
+msgstr "بدء تلقائي لتشغيل قائمة التشغيل عندما تكون محمّلة. \n"
 
 #: modules/demux/playlist/playlist.c:40
 msgid "Show shoutcast adult content"
@@ -10729,8 +10750,8 @@ msgid ""
 "'#duplicate{..., select=\"es=<pid>\"}'."
 msgstr ""
 "الداخلية تحدد هوية كل تيار الابتدائي فلك يتولاها الى نفس القيمه كما pid في "
-"TS السيل ، بدلا من 1 ، 2 ، 3 ، الخ المفيد ان يفعل '# المكرره {...،اختيار = "
-"\" <pid>= ES \")'."
+"TS السيل ، بدلا من 1 ، 2 ، 3 ، الخ .المفيد ان يفعل '# المكرره {...،اختيار = "
+"\" <pid>= ES > \"}'."
 
 #: modules/demux/ts.c:103
 msgid "Fast udp streaming"
@@ -10909,7 +10930,7 @@ msgstr "ملفات مفتوحة من جميع الملفات الفرعية كذ
 #: modules/gui/beos/InterfaceWindow.cpp:158 modules/gui/macosx/open.m:471
 #: modules/gui/macosx/open.m:665 modules/gui/macosx/open.m:778
 #: modules/gui/macosx/open.m:904 modules/gui/qt4/dialogs/open.cpp:47
-#: modules/gui/qt4/menus.cpp:457 modules/gui/wxwidgets/interface.cpp:686
+#: modules/gui/qt4/menus.cpp:461 modules/gui/wxwidgets/interface.cpp:686
 #: modules/gui/wxwidgets/interface.cpp:697 modules/gui/wxwidgets/menus.cpp:351
 #: modules/gui/wxwidgets/menus.cpp:407
 msgid "Open"
@@ -10917,7 +10938,7 @@ msgstr "فتح"
 
 #: modules/gui/beos/InterfaceWindow.cpp:224
 #: modules/gui/beos/InterfaceWindow.cpp:329 modules/gui/macosx/prefs.m:120
-#: modules/gui/qt4/dialogs/preferences.cpp:48 modules/gui/qt4/menus.cpp:267
+#: modules/gui/qt4/dialogs/preferences.cpp:48 modules/gui/qt4/menus.cpp:268
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:184
 msgid "Preferences"
 msgstr "التفضيلات"
@@ -11184,8 +11205,8 @@ msgid ""
 "Input has changed, unable to save bookmark. Suspending playback with \"Pause"
 "\" while editing bookmarks to ensure to keep the same input."
 msgstr ""
-"المدخلات قد تغيرت ، قادرة على انقاذ كتاب. تعليق يديو مع \"توقف \" بينما كتب "
-"لضمان تحرير الابقاء على نفس المدخلات"
+"المدخلات قد تغيرت ، قادرة على انقاذ كتاب. تعليق يديو مع  \"توقف \"  بينما "
+"كتب لضمان تحرير الابقاء على نفس المدخلات"
 
 #: modules/gui/macosx/bookmarks.m:294 modules/gui/macosx/wizard.m:1094
 #: modules/gui/wxwidgets/dialogs/bookmarks.cpp:348
@@ -11287,7 +11308,7 @@ msgstr "تقديم للأمام"
 #: modules/gui/macosx/embeddedwindow.m:87 modules/gui/macosx/intf.m:1525
 #: modules/gui/macosx/intf.m:1526 modules/gui/macosx/intf.m:1527
 #: modules/gui/macosx/intf.m:1528 modules/gui/pda/pda_interface.c:250
-#: modules/gui/pda/pda_interface.c:251 modules/gui/qt4/menus.cpp:433
+#: modules/gui/pda/pda_interface.c:251 modules/gui/qt4/menus.cpp:434
 #: modules/gui/wxwidgets/interface.cpp:689
 #: modules/gui/wxwidgets/interface.cpp:700
 #: modules/gui/wxwidgets/interface.cpp:1232
@@ -11486,7 +11507,7 @@ msgstr "الخطأ"
 #: modules/gui/macosx/interaction.m:229 modules/gui/macosx/interaction.m:295
 #, c-format
 msgid "Remaining time: %i seconds"
-msgstr "الوقت المتبقي : %i ثانية"
+msgstr "الوقت المتبقي: %i  iثانية"
 
 #: modules/gui/macosx/interaction.m:399 modules/gui/macosx/intf.m:634
 msgid "Errors and Warnings"
@@ -11638,7 +11659,7 @@ msgid "Bring All to Front"
 msgstr "اظهار الجميع في المقدمة"
 
 #: modules/gui/macosx/intf.m:638 modules/gui/qt4/dialogs/help.cpp:39
-#: modules/gui/qt4/menus.cpp:403 modules/gui/qt4/menus.cpp:467
+#: modules/gui/qt4/menus.cpp:404 modules/gui/qt4/menus.cpp:471
 msgid "Help"
 msgstr "المساعدة"
 
@@ -12159,7 +12180,7 @@ msgstr ""
 
 #: modules/gui/macosx/prefs.m:731
 msgid "Some options are hidden. Check \"Advanced\" to display them."
-msgstr "بعض الخيارات خفية. إختر \"المتطوره \" لعرضها. "
+msgstr "بعض الخيارات خفية. إختر  \"المتطوره \" لعرضها. "
 
 #: modules/gui/macosx/prefs_widgets.m:1218
 #: modules/gui/wxwidgets/dialogs.cpp:480
@@ -12834,7 +12855,7 @@ msgid ""
 "This page lists all the settings.Click \"Finish\" to start streaming or "
 "transcoding."
 msgstr ""
-"هذه الصفحة قوائم  بجميع سيتينغس.أنقر \"انهاء \" لبدء المتتابعه او التشفير."
+"هذه الصفحة قوائم  بجميع سيتينغس.أنقر  \"انهاء \" لبدء المتتابعه او التشفير."
 
 #: modules/gui/macosx/wizard.m:466
 msgid "Summary"
@@ -12930,7 +12951,7 @@ msgstr "الملف الذي سيحفظ السيل قد يتم اختياره"
 #: modules/gui/macosx/wizard.m:1189
 msgid ""
 "Enter either a valid path or use the \"Choose\" button to select a location."
-msgstr "إدخال أيضًا الطريق الصالح او استخدام \"اختيار \" زر اختيار الموقع."
+msgstr "إدخال أيضًا الطريق الصالح او استخدام  \"اختيار \" زر اختيار الموقع."
 
 #: modules/gui/macosx/wizard.m:1386
 msgid "Finish"
@@ -13326,7 +13347,7 @@ msgstr ":دخول"
 
 #: modules/gui/pda/pda_interface.c:987
 msgid "Muxer:"
-msgstr "Muxer:"
+msgstr "موكسر:"
 
 #: modules/gui/pda/pda_interface.c:996
 msgid "URL:"
@@ -13478,7 +13499,7 @@ msgstr "(c) 1996-2006- فريق  فريق فيديولان"
 #: modules/gui/pda/pda_support.c:90 modules/gui/pda/pda_support.c:114
 #, c-format
 msgid "Couldn't find pixmap file: %s"
-msgstr "لم يجد pixmap الملف : %s"
+msgstr "لم يجد pixmap الملف:  %s"
 
 #: modules/gui/qnx/qnx.c:44
 msgid "QNX RTOS video and audio output"
@@ -13983,22 +14004,22 @@ msgstr "تشغيل"
 msgid "&Help"
 msgstr "مساعدة&"
 
-#: modules/gui/qt4/menus.cpp:200 modules/gui/qt4/menus.cpp:458
+#: modules/gui/qt4/menus.cpp:200 modules/gui/qt4/menus.cpp:462
 #: modules/gui/wxwidgets/menus.cpp:127
 msgid "Open &File..."
 msgstr "فتح &ملف..."
 
-#: modules/gui/qt4/menus.cpp:201 modules/gui/qt4/menus.cpp:459
+#: modules/gui/qt4/menus.cpp:201 modules/gui/qt4/menus.cpp:463
 #: modules/gui/wxwidgets/menus.cpp:129
 msgid "Open &Disc..."
 msgstr "فتح قرص..."
 
-#: modules/gui/qt4/menus.cpp:202 modules/gui/qt4/menus.cpp:460
+#: modules/gui/qt4/menus.cpp:202 modules/gui/qt4/menus.cpp:464
 #, fuzzy
 msgid "Open &Network..."
 msgstr "فتح الشبكة..."
 
-#: modules/gui/qt4/menus.cpp:203 modules/gui/qt4/menus.cpp:461
+#: modules/gui/qt4/menus.cpp:203 modules/gui/qt4/menus.cpp:465
 #: modules/gui/wxwidgets/menus.cpp:131
 msgid "Open &Capture Device..."
 msgstr "فتح أداة التقاط..."
@@ -14012,7 +14033,7 @@ msgstr "التيار"
 msgid "Conve&rt / Save..."
 msgstr ""
 
-#: modules/gui/qt4/menus.cpp:211 modules/gui/qt4/menus.cpp:616
+#: modules/gui/qt4/menus.cpp:211 modules/gui/qt4/menus.cpp:620
 #, fuzzy
 msgid "&Quit"
 msgstr "اغلاق"
@@ -14022,51 +14043,51 @@ msgstr "اغلاق"
 msgid "Undock from interface"
 msgstr "واجهات السيطرة"
 
-#: modules/gui/qt4/menus.cpp:237 modules/gui/qt4/menus.cpp:450
+#: modules/gui/qt4/menus.cpp:237 modules/gui/qt4/menus.cpp:454
 #, fuzzy
 msgid "Interfaces"
 msgstr "الواجهة"
 
-#: modules/gui/qt4/menus.cpp:252
+#: modules/gui/qt4/menus.cpp:253
 #, fuzzy
 msgid "Advanced controls"
 msgstr "خيارت متقدمة "
 
-#: modules/gui/qt4/menus.cpp:257
+#: modules/gui/qt4/menus.cpp:258
 #, fuzzy
 msgid "Visualizations selector"
 msgstr " اعرض أشعة الحركة"
 
-#: modules/gui/qt4/menus.cpp:265
+#: modules/gui/qt4/menus.cpp:266
 msgid "Hide Menus..."
 msgstr ""
 
-#: modules/gui/qt4/menus.cpp:284
+#: modules/gui/qt4/menus.cpp:285
 #, fuzzy
 msgid "Switch to skins"
 msgstr "اختيار الواجهة"
 
-#: modules/gui/qt4/menus.cpp:454
+#: modules/gui/qt4/menus.cpp:458
 #, fuzzy
 msgid "Tools"
 msgstr "أداة "
 
-#: modules/gui/qt4/menus.cpp:604
+#: modules/gui/qt4/menus.cpp:608
 #, fuzzy
 msgid "Hide VLC media player"
 msgstr "مشغل الوسائط  VLC"
 
-#: modules/gui/qt4/menus.cpp:609
+#: modules/gui/qt4/menus.cpp:613
 #, fuzzy
 msgid "Show VLC media player"
 msgstr "مشغل الوسائط  VLC"
 
-#: modules/gui/qt4/menus.cpp:615
+#: modules/gui/qt4/menus.cpp:619
 #, fuzzy
 msgid "&Open Media"
 msgstr "فتح ملف"
 
-#: modules/gui/qt4/menus.cpp:644 modules/gui/wxwidgets/menus.cpp:575
+#: modules/gui/qt4/menus.cpp:648 modules/gui/wxwidgets/menus.cpp:575
 #: modules/gui/wxwidgets/menus.cpp:602
 msgid "Empty"
 msgstr "فاضي"
@@ -14200,7 +14221,7 @@ msgstr "Subpicture position"
 #: modules/gui/qt4/ui/open_disk.ui:244
 #, fuzzy
 msgid "Audio and Subtitles"
-msgstr "فتح الترجمة"
+msgstr "تصاغ العناوين الثانوية"
 
 #: modules/gui/qt4/ui/open_file.ui:58
 #, fuzzy
@@ -14481,12 +14502,14 @@ msgid "Instances"
 msgstr "الواجهة"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:156
+#, fuzzy
 msgid "Allow only one instance"
-msgstr ""
+msgstr "لا تسمح إلا بإقتراح واحد"
 
 #: modules/gui/qt4/ui/sprefs_interface.ui:163
+#, fuzzy
 msgid "Enqueue files in playlist when in one interface mode"
-msgstr ""
+msgstr "وضع في الأخير بنمط إقتراح وحيد"
 
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:37
 #, fuzzy
@@ -14564,7 +14587,6 @@ msgstr "المسار"
 msgid "Display Device"
 msgstr "عرض"
 
-# msgstr "في رصد تشكيلات متعددة ، يمكنك ان تحدد اسم جهاز نوافذ العرض التي تريدون لفيديو النافذة ان يفتحها  على سبيل المثال ، \"\ \ \ \. \ \ ديسبلاي1 \ \"او \"  \ \ \. \ \ ديسبلاي2  \". "
 #: modules/gui/qt4/ui/sprefs_video.ui:143
 #, fuzzy
 msgid "Enable Wallpaper Mode"
@@ -15344,9 +15366,8 @@ msgstr "اضيف العقده"
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:828
 #, c-format
 msgid "%i items in playlist"
-msgstr ""
+msgstr "%i البنود بقائمة التشغيل "
 
-# msgstr "%البنود بقائمة التشغيل "
 #: modules/gui/wxwidgets/dialogs/playlist.cpp:819
 #: modules/gui/wxwidgets/playlist_manager.cpp:436
 msgid "root"
@@ -15594,8 +15615,9 @@ msgid ""
 msgstr ""
 "إستخدام هذه القراءة ليست الا جزأ من تيار. استخدام ،الدخول الى البدء "
 "والانتهاء وقت(ثانية). \n"
-" ملاحظه : عليك ان تكون قادر على مراقبة الوافدين للتيار (على سبيل المثال ، "
-"ملف او اسطوانة ، ولكن ليس RTP/UDP شبكة الرافد) \n"
+" \n"
+"ملاحظه : عليك ان تكون قادر على مراقبة الوافدين للتيار (على سبيل المثال ، ملف "
+"او اسطوانة ، ولكن ليس RTP/UDP شبكة الرافد).\n"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:126
 msgid ""
@@ -16236,7 +16258,7 @@ msgstr "نشاط+ ذعر"
 
 #: modules/meta_engine/id3genres.h:58
 msgid "Fusion"
-msgstr "إسالة"
+msgstr "إِذَابَة"
 
 #: modules/meta_engine/id3genres.h:59
 msgid "Trance"
@@ -16747,7 +16769,7 @@ msgstr ""
 msgid ""
 "Specify the log format. Available choices are \"text\" (default) and \"html"
 "\"."
-msgstr "\"HTML \"يحدد شكل السجل. الخيارات المتاحة \"النص \" (التقصير) و  ."
+msgstr "\"HTML \"يحدد شكل السجل. الخيارات المتاحة  \"النص \" (التقصير) و  ."
 
 #: modules/misc/logger.c:130
 msgid "Logging"
@@ -17547,15 +17569,15 @@ msgstr "الوصف"
 msgid "SAP sessions"
 msgstr "SAP دورة "
 
-#: modules/services_discovery/sap.c:817 modules/services_discovery/sap.c:821
+#: modules/services_discovery/sap.c:815 modules/services_discovery/sap.c:819
 msgid "Session"
 msgstr "الجلسة "
 
-#: modules/services_discovery/sap.c:817
+#: modules/services_discovery/sap.c:815
 msgid "Tool"
 msgstr "أداة "
 
-#: modules/services_discovery/sap.c:822
+#: modules/services_discovery/sap.c:820
 msgid "User"
 msgstr "مستخدم"
 
@@ -17888,7 +17910,7 @@ msgid ""
 "multicast packets sent by the stream output (0 = use operating system built-"
 "in default)."
 msgstr ""
-"هذا هو الحد الوثبة (المعروف أيضا باسم \"الوقت الى العيش \" او TTL) المتعدد "
+"هذا هو الحد الوثبة (المعروف أيضا باسم  \"الوقت الى العيش \" او TTL) المتعدد "
 "الرزم ارسلها تيار ناتج(= 0 استخدام نظام تشغيل مدمج التقصير). "
 
 #: modules/stream_out/rtp.c:99
@@ -18035,7 +18057,7 @@ msgstr "المقسم الى كميات صغيرة الحجم "
 
 #: modules/stream_out/switcher.c:101
 msgid "Fixed quantizer scale to use."
-msgstr "تحديد نطاق التمقسيم الى كميات صغيرة   لاستخدامها."
+msgstr "تحديد نطاق المقسم الى كميات صغيرة   لاستخدامها."
 
 #: modules/stream_out/switcher.c:102
 msgid "Mute audio"
@@ -18294,7 +18316,6 @@ msgid "This is the subtitles codec that will be used."
 msgstr "هذا هو ترميز العناوين الفرعية التي ستستخدم. "
 
 #: modules/stream_out/transcode.c:158
-#, fuzzy
 msgid ""
 "This allows you to add overlays (also known as \"subpictures\" on the "
 "transcoded video stream. The subpictures produced by the filters will be "
@@ -18305,7 +18326,7 @@ msgstr ""
 "transcoded الفيديو. في subpictures تنتجها المصافي ستكون وفيرلاييد مباشرة على "
 "الفيديو. عليك ان تحدد فاصلة ء فصل وحدات قائمة subpictures "
 
-#: modules/stream_out/transcode.c:163 modules/video_filter/osdmenu.c:116
+#: modules/stream_out/transcode.c:163 modules/video_filter/osdmenu.c:129
 msgid "OSD menu"
 msgstr "OSD  قائمة"
 
@@ -18603,7 +18624,7 @@ msgid ""
 "4/3."
 msgstr ""
 "الصورة النسبه القصوى. المحاصيل plugin لن المحاصيل تلقائيا إلى نسبة اعلى (أي "
-"الى أكثر \"موحد \" الصورة). القيمه x1000 : 1333 يعنى  4/3"
+"الى أكثر \"موحد\" الصورة). القيمه x1000 : 1333 يعنى  4/3"
 
 #: modules/video_filter/crop.c:80
 msgid "Manual ratio"
@@ -18784,7 +18805,7 @@ msgstr "نمط التشويش"
 
 #: modules/video_filter/gradient.c:60
 msgid "Distort mode, one of \"gradient\", \"edge\" and \"hough\"."
-msgstr "تشويه واسطة احد \"معامل \" \"طرف \" و \"هوغ \". "
+msgstr "\"تشويه واسطة احد \"معامل \",\"طرف \" و \"هوغ . "
 
 #: modules/video_filter/gradient.c:62
 msgid "Gradient image type"
@@ -19360,7 +19381,19 @@ msgstr ""
 "تجربة بيئات ارسال الاخطاء. كن حذرا مع هذا الخيار ترميز قائمة الصور OSD  جدا  "
 "مكثفة الحوسبه . هذه المجموعة 0 - 1000 مملي ثا."
 
-#: modules/video_filter/osdmenu.c:115
+#: modules/video_filter/osdmenu.c:73
+msgid "Alpha transparency value (default 255)"
+msgstr ""
+
+#: modules/video_filter/osdmenu.c:75
+msgid ""
+"The transparency of the OSD menu can be changed by giving a value between 0 "
+"and 255. A lower value specifies more transparency a higher means less "
+"transparency. The default is being not transparent (value 255) the minimum "
+"is fully transparent (value 0)."
+msgstr ""
+
+#: modules/video_filter/osdmenu.c:128
 msgid "On Screen Display menu"
 msgstr "على الشاشه قائمة العرض"
 
@@ -19857,8 +19890,9 @@ msgid ""
 "X11 hardware display to use.\n"
 "By default, VLC will use the value of the DISPLAY environment variable."
 msgstr ""
+"X11 استخدام أجهزة العرض.\n"
+"الافتراضي ، فلك ستستخدم قيمة DISPLAY  بيئة متغيرة. "
 
-# msgstr "X11 استخدام أجهزة العرض. \ ن غيابي VLC ستستخدم قيمة العرض بيئة متغيرة."
 #: modules/video_output/glide.c:64
 msgid "3dfx Glide video output"
 msgstr "3dfx انتظار  الناتج  بالفيديو "
@@ -19913,7 +19947,7 @@ msgid ""
 "Prefix of the output images filenames. Output filenames will have the "
 "\"prefixNUMBER.format\" form."
 msgstr ""
-"بادئة من الناتج صور اسماء الملفات. الناتج الملفات سوف يكون \"prefixNUMBER."
+"بادئة من الناتج صور اسماء الملفات. الناتج الملفات سوف يكون  \"prefixNUMBER."
 "format.فورمات \" الشكل. "
 
 #: modules/video_output/image.c:71
@@ -19990,8 +20024,10 @@ msgid ""
 "of the display that you want the video window to open on. For example, \"\\"
 "\\.\\DISPLAY1\" or \"\\\\.\\DISPLAY2\"."
 msgstr ""
+"في رصد تشكيلات متعددة ، يمكنك ان تحدد اسم جهاز نوافذ العرض التي تريدون "
+"لفيديو النافذة ان يفتحها  على سبيل المثال ، \"\\\\.\\DISPLAY1\" or \"\\\\."
+"\\DISPLAY2\"."
 
-# msgstr "في رصد تشكيلات متعددة ، يمكنك ان تحدد اسم جهاز نوافذ العرض التي تريدون لفيديو النافذة ان يفتحها  على سبيل المثال ، \"\ \ \ \. \ \ ديسبلاي1 \ \"او \"  \ \ \. \ \ ديسبلاي2  \". "
 #: modules/video_output/msw/directx.c:151
 msgid "Enable wallpaper mode "
 msgstr "تمكين نمط الخلفية"
@@ -20515,6 +20551,12 @@ msgstr "مُتَصفِح فلتر"
 #: modules/visualization/visual/visual.c:120
 msgid "Spectrum analyser"
 msgstr "محلل طيف"
+
+#~ msgid "Fast mutex on NT/2K/XP (developers only)"
+#~ msgstr "mutex سريع ل  NT/2K/XP (المطورين فقط)"
+
+#~ msgid "Condition variables implementation for Win9x (developers only)"
+#~ msgstr "تطبيق المتغيرات الشرطية ل Win9x (المطورين فقط)"
 
 #~ msgid "Type 'pause' to continue."
 #~ msgstr "النوع 'التوقف' للمتابعة"
