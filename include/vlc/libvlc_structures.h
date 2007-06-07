@@ -141,34 +141,29 @@ typedef struct libvlc_log_message_t
     
 /**
  * Available events:
- * - VOLUME_CHANGED
- * - INPUT_POSITION_CHANGED
+ * - libvlc_VolumeChanged
+ * - libvlc_InputPositionChanged
  */
 
 typedef enum {
-    VOLUME_CHANGED,
-    INPUT_POSITION_CHANGED,
+    libvlc_VolumeChanged,
+    libvlc_InputPositionChanged,
 } libvlc_event_type_t;
-
-typedef enum {
-    INT_EVENT,
-    BOOLEAN_EVENT,
-    FLOAT_EVENT,
-    STRING_EVENT,
-    ADDRESS_EVENT,
-    OBJECT_EVENT,
-    LIST_EVENT,
-    TIME_EVENT,
-    VAR_EVENT,
-} libvlc_event_value_type_t;
 
 typedef struct 
 {
     libvlc_event_type_t type;
-    libvlc_event_value_type_t value_type;
-    vlc_value_t old_value;
-    vlc_value_t new_value;
-    char reserved[8]; /* For future use */
+    union
+    {
+        struct
+        {
+            int new_volume;
+        } volume_changed;
+        struct
+        {
+            uint64_t new_position;
+        } input_position_changed;
+    } u;
 } libvlc_event_t;
 
 /**
