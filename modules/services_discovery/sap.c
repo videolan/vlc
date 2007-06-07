@@ -812,12 +812,13 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     psz_value = GetAttribute( p_sap->p_sdp->pp_attributes, p_sap->p_sdp->i_attributes, "tool" );
     if( psz_value != NULL )
     {
-        input_ItemAddInfo( p_input, _("Session"),_("Tool"), psz_value );
+        input_ItemAddInfo( p_input, _("Session"), _("Tool"), "%s",
+                           psz_value );
     }
     if( strcmp( p_sdp->username, "-" ) )
     {
-        input_ItemAddInfo( p_input, _("Session"),
-                                _("User"), p_sdp->username );
+        input_ItemAddInfo( p_input, _("Session"), _("User"), "%s",
+                           p_sdp->username );
     }
 
     /* Handle group */
