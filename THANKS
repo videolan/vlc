@@ -55,6 +55,7 @@ Daniel Stränger <vlc at schmaller d0t de> - M3U, xtag and playlist improvements
 David Kennedy <dkennedy at tinytoad.com> - X11 fullscreen patch
 Daniel Dreibrodt, aka aLtgLasS <daniel d.t dreibrodt -@t- gmx d0t de> - VLC 0.8.5 default skin
 Daniel Nylander <info@danielnylander at se> - Swedish translation
+David Thiel - security audit and report
 David Weber <david_weber at gmx.de> - Mac OS X interface design & graphics (v0.5.0)
 Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons
 Dennis van Amerongen <Dennis dot vanAmerongen at nob dot nl> - x264 options unification
