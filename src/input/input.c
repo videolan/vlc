@@ -2540,19 +2540,19 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
 
 static inline vlc_bool_t IsValidAccess( const char *psz )
 {
-    unsigned char c;
+    char c;
 
     while( ( c = *psz ) != '\0' )
     {
         if( c == ':' )
             return VLC_TRUE;
 
-        if( !isascii( c ) || !isalnum( c ) || ( c != '/' ) )
+        if( !isascii( c ) && !isalnum( c ) && c != '/' )
             return VLC_FALSE;
-
         psz++;
     }
-    return VLC_FALSE; /* should not happen though */
+    /* should not happen though */
+    return VLC_FALSE;
 }
 
 
