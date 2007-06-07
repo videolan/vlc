@@ -39,7 +39,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 static void CalcPeakEQCoeffs( float, float, float, float, float * );
 static void CalcShelfEQCoeffs( float, float, float, int, float, float * );
-static void ProcessEQ( float *, float *, float *, int, int, float *, int );
+static void ProcessEQ( float *, float *, float *, unsigned, unsigned, float *, unsigned );
 static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );
 
@@ -301,10 +301,10 @@ static void CalcShelfEQCoeffs( float f0, float slope, float gainDB, int high,
   size of coeffs is 5*eqCount
 */
 void ProcessEQ( float *src, float *dest, float *state, 
-                int channels, int samples, float *coeffs, 
-                int eqCount )
+                unsigned channels, unsigned samples, float *coeffs, 
+                unsigned eqCount )
 {
-    int i, chn, eq;
+    unsigned i, chn, eq;
     float   b0, b1, b2, a1, a2;
     float   x, y = 0;
     float   *src1, *dest1;
