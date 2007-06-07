@@ -627,7 +627,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
             *psz_value = '\0';
             psz_value++;
             input_Control( p_input, INPUT_ADD_INFO, _("Vorbis comment"),
-                           psz_name, psz_value );
+                           psz_name, "%s", psz_value );
             if( !strcasecmp( psz_name, "artist" ) )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
