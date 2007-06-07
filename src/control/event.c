@@ -5,6 +5,7 @@
  * $Id $
  *
  * Authors: Filippo Carone <filippo@carone.org>
+ *          Pierre d'Herbemont <pdherbemont # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +24,7 @@
 
 #include "libvlc_internal.h"
 #include <vlc/libvlc.h>
+#include <vlc_playlist.h>
 
 
 /*
@@ -57,6 +59,50 @@ static int handle_event( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
+/* Utility function: Object should be released by vlc_object_release afterwards */
+static input_thread_t * get_input(libvlc_instance_t * p_instance)
+{
+    libvlc_exception_t p_e_unused; /* FIXME: error checking here */
+    libvlc_input_t * p_libvlc_input = libvlc_playlist_get_input( p_instance, &p_e_unused );
+    input_thread_t * p_input;
+
+    if( !p_libvlc_input )
+        return NULL;
+    
+    p_input = libvlc_get_input_thread( p_libvlc_input, &p_e_unused );
+
+    libvlc_input_free(p_libvlc_input);
+
+    return p_input;
+}
+
+static int install_input_event( vlc_object_t *p_this, char const *psz_cmd,
+                                vlc_value_t oldval, vlc_value_t newval,
+                                void *p_data )
+{
+    libvlc_instance_t * p_instance = p_data;
+    struct libvlc_callback_entry_list_t *p_listitem;
+    input_thread_t * p_input = get_input( p_instance );
+
+    vlc_mutex_lock( &p_instance->instance_lock );
+
+    p_listitem = p_instance->p_callback_list;
+
+    for( ; p_listitem ; p_listitem = p_listitem->next )
+    {
+        if (p_listitem->elmt->i_event_type == INPUT_POSITION_CHANGED)
+        {
+            /* FIXME: here we shouldn't listen on intf-change, we have to provide
+             * in vlc core a more accurate callback */
+            var_AddCallback( p_input, "intf-change", handle_event, p_listitem->elmt );
+        }
+    }
+
+    vlc_mutex_unlock( &p_instance->instance_lock );
+    vlc_object_release( p_input );
+    return VLC_SUCCESS;
+}
+
 static inline void add_callback_to_list( struct libvlc_callback_entry_t *entry,
                                          struct libvlc_callback_entry_list_t **list )
 {
@@ -82,25 +128,59 @@ static inline void add_callback_to_list( struct libvlc_callback_entry_t *entry,
 static int remove_variable_callback( libvlc_instance_t *p_instance, 
                                      struct libvlc_callback_entry_t * p_entry )
 {
-    const char * callback_name = NULL;
-    
+    input_thread_t * p_input = get_input( p_instance );
+    int res = VLC_SUCCESS;
+
     /* Note: Appropriate lock should be held by the caller */
 
     switch ( p_entry->i_event_type )
     {
         case VOLUME_CHANGED:
-            callback_name = "volume-change";
+            res = var_DelCallback( p_instance->p_libvlc_int, "volume-change",
+                             handle_event, p_entry );
             break;
         case INPUT_POSITION_CHANGED:
+            /* We may not be deleting the right p_input callback, in this case this
+             * will be a no-op */
+            var_DelCallback( p_input, "intf-change",
+                             handle_event, p_entry );
             break;
     }
+    
+    if (p_input)
+        vlc_object_release( p_input );
 
-    if (!callback_name)
-        return VLC_EGENERIC;
+    return res;
+}
 
-    return var_DelCallback( p_instance->p_libvlc_int,
-                            callback_name, handle_event,
-                            p_entry );
+/*
+ * Internal libvlc functions
+ */
+void libvlc_event_init( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
+{
+    playlist_t *p_playlist = p_instance->p_libvlc_int->p_playlist;
+
+    if( !p_playlist )
+        RAISEVOID ("Can't listen to input event");
+
+    /* Install a Callback for input changes, so
+     * so we can track input event */
+     var_AddCallback( p_playlist, "playlist-current",
+                      install_input_event, p_instance );
+}
+
+void libvlc_event_fini( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
+{
+    playlist_t *p_playlist = p_instance->p_libvlc_int->p_playlist;
+    libvlc_exception_t p_e_unused;
+
+    libvlc_event_remove_all_callbacks( p_instance, &p_e_unused );
+
+    if( !p_playlist )
+        RAISEVOID ("Can't unregister input events");
+
+    var_DelCallback( p_playlist, "playlist-current",
+                     install_input_event, p_instance );
 }
 
 /*
@@ -114,8 +194,8 @@ void libvlc_event_add_callback( libvlc_instance_t *p_instance,
                                 libvlc_exception_t *p_e )
 {
     struct libvlc_callback_entry_t *entry;
-    const char * callback_name = NULL;
-    int res;
+    vlc_value_t unused1, unused2;
+    int res = VLC_SUCCESS;
 
     if ( !f_callback )
         RAISEVOID (" Callback function is null ");
@@ -135,20 +215,17 @@ void libvlc_event_add_callback( libvlc_instance_t *p_instance,
     switch ( i_event_type )
     {
         case VOLUME_CHANGED:
-            callback_name = "volume-change";
+            res = var_AddCallback( p_instance->p_libvlc_int, "volume-change",
+                           handle_event, entry );
             break;
         case INPUT_POSITION_CHANGED:
+            install_input_event( NULL, NULL, unused1, unused2, p_instance);
             break;
         default:
             free( entry );
             RAISEVOID( "Unsupported event." );
     }
 
-    res = var_AddCallback( p_instance->p_libvlc_int,
-                           callback_name,
-                           handle_event,
-                           entry );
-    
     if (res != VLC_SUCCESS)
     {
         free ( entry );

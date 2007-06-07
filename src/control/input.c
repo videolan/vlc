@@ -34,9 +34,9 @@ void libvlc_input_free( libvlc_input_t *p_input )
 
 /*
  * Retrieve the input thread. Be sure to release the object
- * once you are done with it.
+ * once you are done with it. (libvlc Internal)
  */
-static input_thread_t *libvlc_get_input_thread( libvlc_input_t *p_input,
+input_thread_t *libvlc_get_input_thread( libvlc_input_t *p_input,
                                          libvlc_exception_t *p_e ) 
 {
     input_thread_t *p_input_thread;

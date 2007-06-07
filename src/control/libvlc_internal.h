@@ -43,6 +43,9 @@ VLC_EXPORT (int, libvlc_InternalDestroy, ( libvlc_int_t *, vlc_bool_t ) );
 VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char *, vlc_bool_t,
                             vlc_bool_t, int, const char *const * ) );
 
+VLC_EXPORT (void, libvlc_event_init, ( libvlc_instance_t *, libvlc_exception_t * ) );
+VLC_EXPORT (void, libvlc_event_fini, ( libvlc_instance_t *, libvlc_exception_t * ) );
+
 /***************************************************************************
  * Opaque structures for libvlc API
  ***************************************************************************/
@@ -78,6 +81,12 @@ struct libvlc_input_t
                      /// avoid any crash
     struct libvlc_instance_t *p_instance; ///< Parent instance
 };
+
+/***************************************************************************
+ * Other internal functions
+ ***************************************************************************/
+VLC_EXPORT (input_thread_t *, libvlc_get_input_thread,
+                        ( struct libvlc_input_t *, libvlc_exception_t * ) );
 
 #define RAISENULL( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
                                 return NULL; }
