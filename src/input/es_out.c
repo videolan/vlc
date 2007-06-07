@@ -1781,24 +1781,24 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
 
         if( fmt->audio.i_channels > 0 )
             input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Channels"),
-                           "%d", fmt->audio.i_channels );
+                           "%u", fmt->audio.i_channels );
 
         if( fmt->audio.i_rate > 0 )
         {
             input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Sample rate"),
-                           _("%d Hz"), fmt->audio.i_rate );
+                           _("%u Hz"), fmt->audio.i_rate );
             var_SetInteger( p_input, "sample-rate", fmt->audio.i_rate );
         }
 
         if( fmt->audio.i_bitspersample > 0 )
             input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                           _("Bits per sample"), "%d",
+                           _("Bits per sample"), "%u",
                            fmt->audio.i_bitspersample );
 
         if( fmt->i_bitrate > 0 )
         {
             input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Bitrate"),
-                           _("%d kb/s"), fmt->i_bitrate / 1000 );
+                           _("%u kb/s"), fmt->i_bitrate / 1000 );
             var_SetInteger( p_input, "bit-rate", fmt->i_bitrate );
         }
         break;
@@ -1809,13 +1809,13 @@ static void EsOutAddInfo( es_out_t *out, es_out_id_t *es )
 
         if( fmt->video.i_width > 0 && fmt->video.i_height > 0 )
             input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                           _("Resolution"), "%dx%d",
+                           _("Resolution"), "%ux%u",
                            fmt->video.i_width, fmt->video.i_height );
 
         if( fmt->video.i_visible_width > 0 &&
             fmt->video.i_visible_height > 0 )
             input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                           _("Display resolution"), "%dx%d",
+                           _("Display resolution"), "%ux%u",
                            fmt->video.i_visible_width,
                            fmt->video.i_visible_height);
        if( fmt->video.i_frame_rate > 0 &&
