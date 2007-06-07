@@ -414,12 +414,10 @@ static int GetTracks( access_t *p_access,
     }
 
     p_item_in_category = playlist_ItemToNode( p_playlist, p_parent, VLC_FALSE );
-    psz_name = strdup( "Audio CD" );
     vlc_mutex_lock( &p_playlist->object_lock );
-    playlist_ItemSetName( p_parent, psz_name );
+    playlist_ItemSetName( p_parent, "Audio CD" );
     vlc_mutex_unlock( &p_playlist->object_lock );
     var_SetInteger( p_playlist, "item-change", p_parent->p_input->i_id );
-    free( psz_name );
 
 #ifdef HAVE_LIBCDDB
     GetCDDBInfo( p_access, i_titles, p_sys->p_sectors );
@@ -427,13 +425,12 @@ static int GetTracks( access_t *p_access,
     {
         if( cddb_disc_get_title( p_sys->p_disc ) )
         {
-            asprintf( &psz_name, "%s", cddb_disc_get_title( p_sys->p_disc ) );
+            const char *psz_name = cddb_disc_get_title( p_sys->p_disc );
             vlc_mutex_lock( &p_playlist->object_lock );
             playlist_ItemSetName( p_parent, psz_name );
             vlc_mutex_unlock( &p_playlist->object_lock );
             var_SetInteger( p_playlist, "item-change",
                             p_parent->p_input->i_id );
-            free( psz_name );
         }
     }
 #endif
@@ -484,17 +481,16 @@ static int GetTracks( access_t *p_access,
                 {
                     input_ItemAddInfo( p_input_item, _(VLC_META_INFO_CAT),
                                             _(VLC_META_TITLE),
-                                            cddb_track_get_title( t ) );
+                                            "%s", cddb_track_get_title( t ) );
                     if( p_input_item->psz_name )
                         free( p_input_item->psz_name );
-                    asprintf( &p_input_item->psz_name, "%s",
-                              cddb_track_get_title( t ) );
+                    p_input_item->psz_name = strdup( cddb_track_get_title( t ) );
                 }
                 psz_result = cddb_track_get_artist( t );
                 if( psz_result )
                 {
                     input_ItemAddInfo( p_input_item, _(VLC_META_INFO_CAT),
-                                            _(VLC_META_ARTIST), psz_result );
+                                       _(VLC_META_ARTIST), "%s", psz_result );
                 }
             }
         }
