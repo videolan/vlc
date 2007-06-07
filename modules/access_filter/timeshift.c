@@ -522,27 +522,29 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
     switch( i_query )
     {
-        case ACCESS_CAN_SEEK:
-        case ACCESS_CAN_FASTSEEK:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;
-            break;
+    case ACCESS_CAN_SEEK:
+    case ACCESS_CAN_FASTSEEK:
+        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+        *pb_bool = VLC_TRUE;
+        break;
 
-        case ACCESS_CAN_CONTROL_PACE:   /* Not really true */
-        case ACCESS_CAN_PAUSE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;
-            break;
+    case ACCESS_CAN_CONTROL_PACE:   /* Not really true */
+    case ACCESS_CAN_PAUSE:
+        pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+        *pb_bool = VLC_TRUE;
+        break;
 
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = 0;
-            break;
+    case ACCESS_GET_MTU:
+        pi_int = (int*)va_arg( args, int * );
+        *pi_int = 0;
+        break;
 
-        /* Forward everything else to the source access */
-        default:
-            return access2_vaControl( p_access->p_source, i_query, args );
+    case ACCESS_SET_PAUSE_STATE: 
+        break;
 
+    /* Forward everything else to the source access */
+    default:
+        return access2_vaControl( p_access->p_source, i_query, args );
     }
     return VLC_SUCCESS;
 }
