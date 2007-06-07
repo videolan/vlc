@@ -2547,7 +2547,7 @@ static inline vlc_bool_t IsValidAccess( const char *psz )
         if( c == ':' )
             return VLC_TRUE;
 
-        if( !isascii( c ) && !isalnum( c ) && c != '/' )
+        if( ( !isascii( c ) || !isalnum( c ) ) && ( c != '/' ) )
             return VLC_FALSE;
         psz++;
     }
