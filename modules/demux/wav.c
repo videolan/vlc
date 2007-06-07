@@ -221,7 +221,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     msg_Dbg( p_demux, "format: 0x%4.4x, fourcc: %4.4s, channels: %d, "
-             "freq: %d Hz, bitrate: %dKo/s, blockalign: %d, bits/samples: %d, "
+             "freq: %u Hz, bitrate: %uKo/s, blockalign: %d, bits/samples: %d, "
              "extra size: %d",
              GetWLE( &p_wf->wFormatTag ), (char *)&p_sys->fmt.i_codec,
              p_sys->fmt.audio.i_channels, p_sys->fmt.audio.i_rate,
