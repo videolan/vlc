@@ -39,19 +39,23 @@ static int handle_event( vlc_object_t *p_this, char const *psz_cmd,
      * facility for p_data */
     struct libvlc_callback_entry_t *entry = p_data;
     libvlc_event_t event;
+
     event.type = entry->i_event_type;
-    switch ( event.type )
+
+    if (event.type == INPUT_POSITION_CHANGED && !strcmp(psz_cmd, "intf-change"))
     {
-        case VOLUME_CHANGED:
-            event.value_type = BOOLEAN_EVENT;
-            break;
-        case INPUT_POSITION_CHANGED:
-            break;
-        default:
-            break;
+        input_thread_t * p_input = (input_thread_t *)p_this;
+        vlc_value_t val;
+        var_Get( p_input, "position", &val );
+
+        /* Only send event at a reasonable time precision (500ms) */
+        /* (FIXME: this should be configurable) */
+        if ((val.i_time % I64C(500000)) != 0)
+        {
+            /* Don't send this event */
+            return VLC_SUCCESS;
+        }
     }
-    event.old_value = oldval;
-    event.new_value = newval;
 
     /* Call the client entry */
     entry->f_callback( entry->p_instance, &event, entry->p_user_data );
@@ -95,6 +99,7 @@ static int install_input_event( vlc_object_t *p_this, char const *psz_cmd,
             /* FIXME: here we shouldn't listen on intf-change, we have to provide
              * in vlc core a more accurate callback */
             var_AddCallback( p_input, "intf-change", handle_event, p_listitem->elmt );
+            var_AddCallback( p_input, "position", handle_event, p_listitem->elmt );
         }
     }
 
@@ -143,6 +148,8 @@ static int remove_variable_callback( libvlc_instance_t *p_instance,
             /* We may not be deleting the right p_input callback, in this case this
              * will be a no-op */
             var_DelCallback( p_input, "intf-change",
+                             handle_event, p_entry );
+            var_DelCallback( p_input, "position",
                              handle_event, p_entry );
             break;
     }
