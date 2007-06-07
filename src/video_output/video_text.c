@@ -97,6 +97,7 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
     p_spu->i_stop = i_stop;
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_absolute = VLC_FALSE;
+    p_spu->b_fade = VLC_TRUE;
 
     p_spu->i_x = i_hmargin;
     p_spu->i_y = i_vmargin;
