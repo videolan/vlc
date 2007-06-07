@@ -91,7 +91,7 @@ void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
         return NULL;
     }
     p_vout = p_nvout;
-    setMinimumSize( 0, 0 );
+    setMinimumSize( 16, 16 );
     return (void*)winId();
 }
 
