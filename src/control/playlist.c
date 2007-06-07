@@ -211,8 +211,6 @@ void libvlc_playlist_unlock( libvlc_instance_t *p_instance )
     vlc_mutex_unlock( &PL->object_lock );
 }
 
-
-
 libvlc_input_t * libvlc_playlist_get_input( libvlc_instance_t *p_instance,
                                             libvlc_exception_t *p_e )
 {
