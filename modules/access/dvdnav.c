@@ -1123,9 +1123,12 @@ static void ESNew( demux_t *p_demux, int i_id )
     /* Add a new ES */
     if( tk->fmt.i_cat == VIDEO_ES )
     {
-        if( p_sys->i_aspect >= 0 )
+        switch( p_sys->i_aspect )
         {
-            tk->fmt.video.i_aspect = p_sys->i_aspect;
+            /* TODO Any docs somewhere ? */
+        default:
+            tk->fmt.video.i_aspect = 0;
+            break;
         }
         b_select = VLC_TRUE;
     }
