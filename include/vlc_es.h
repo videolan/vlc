@@ -75,7 +75,7 @@ struct audio_format_t
     /* FIXME ? (used by the codecs) */
     unsigned     i_bitspersample;
     unsigned     i_blockalign;
-    uint8_t      i_channels; /* must be <32 */
+    uint8_t      i_channels; /* must be <=32 */
 };
 
 #ifdef WORDS_BIGENDIAN
