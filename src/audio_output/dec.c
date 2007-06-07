@@ -58,14 +58,14 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     if ( p_aout->i_nb_inputs >= AOUT_MAX_INPUTS )
     {
         msg_Err( p_aout, "too many inputs already (%d)", p_aout->i_nb_inputs );
-        return NULL;
+        goto error;
     }
 
     p_input = malloc(sizeof(aout_input_t));
     if ( p_input == NULL )
     {
         msg_Err( p_aout, "out of memory" );
-        return NULL;
+        goto error;
     }
 
     vlc_mutex_init( p_aout, &p_input->lock );
@@ -116,14 +116,12 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     if ( aout_MixerNew( p_aout ) == -1 )
     {
         aout_OutputDelete( p_aout );
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-        return NULL;
+        goto error;
     }
 
     aout_InputNew( p_aout, p_input );
 
     vlc_mutex_unlock( &p_aout->mixer_lock );
-
     var_Create( p_this, "audio-desync", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_this, "audio-desync", &val );
     p_input->i_desync = val.i_int * 1000;
@@ -145,6 +143,10 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     }
 
     return p_input;
+
+error:
+    vlc_mutex_unlock( &p_aout->mixer_lock );
+    return NULL;
 }
 
 aout_input_t * __aout_DecNew( vlc_object_t * p_this,
