@@ -3080,7 +3080,8 @@ dnl Trying with pkg-config
      PKG_CHECK_MODULES(SWSCALE, libswscale,[
        VLC_ADD_CFLAGS([ffmpeg],[${SWSCALE_CFLAGS}]) 
        VLC_ADD_LDFLAGS([ffmpeg],[${SWSCALE_LIBS}]) 
-       AC_CHECK_HEADERS(ffmpeg/swscale.h)
+       AC_CHECK_LIB(swscale, sws_getContext,
+         [AC_CHECK_HEADERS(ffmpeg/swscale.h)],[])
        ],[ true ])
      VLC_RESTORE_FLAGS
     ],[
