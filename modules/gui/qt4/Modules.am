@@ -191,4 +191,12 @@ EXTRA_DIST += \
 	pixmaps/spref_cone_Video_64.png \
 	pixmaps/stop.png \
 	pixmaps/volume-high.png \
-	pixmaps/volume-low.png
+	pixmaps/volume-low.png \
+	pixmaps/vlc_help_16px.png \
+	pixmaps/vlc_stop_16px.png \
+	pixmaps/vlc_play_16px.png \
+	pixmaps/vlc_pause_16px.png \
+	pixmaps/vlc_messages_16px.png \
+	pixmaps/vlc_previous_16px.png \
+	pixmaps/vlc_info_16px.png \
+	pixmaps/vlc_next_16px.png
