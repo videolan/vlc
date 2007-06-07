@@ -510,7 +510,7 @@ static void ParseTheoraComments( decoder_t *p_dec )
             *psz_value = '\0';
             psz_value++;
             input_Control( p_input, INPUT_ADD_INFO, _("Theora comment"),
-                           psz_name, psz_value );
+                           psz_name, "%s", psz_value );
         }
         free( psz_comment );
         i++;
