@@ -51,6 +51,21 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     input_thread_t * p_input_thread;
     vlc_value_t val;
 
+    /* Sanitize audio format */
+    if( p_format->i_channels > 32 )
+    {
+        msg_Err( p_aout, "too many audio channels (%u)",
+                 p_format->i_channels );
+        goto error;
+    }
+
+    if( p_format->i_rate > 192000 )
+    {
+        msg_Err( p_aout, "excessive audio sample frequency (%u)",
+                 p_format->i_rate );
+        goto error;
+    }
+
     /* We can only be called by the decoder, so no need to lock
      * p_input->lock. */
     vlc_mutex_lock( &p_aout->mixer_lock );
