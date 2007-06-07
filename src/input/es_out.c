@@ -314,6 +314,14 @@ void input_EsOutDiscontinuity( es_out_t *out, vlc_bool_t b_flush, vlc_bool_t b_a
             input_DecoderDiscontinuity( es->p_dec, b_flush );
     }
 }
+void input_EsOutSetRate( es_out_t *out )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+    int i;
+
+    for( i = 0; i < p_sys->i_pgrm; i++ )
+        input_ClockSetRate( p_sys->p_input, &p_sys->pgrm[i]->clock );
+}
 
 void input_EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
 {
@@ -507,7 +515,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->psz_now_playing = NULL;
     p_pgrm->psz_publisher = NULL;
     p_pgrm->p_epg = NULL;
-    input_ClockInit( &p_pgrm->clock, VLC_FALSE, p_input->p->input.i_cr_average );
+    input_ClockInit( p_input, &p_pgrm->clock, VLC_FALSE, p_input->p->input.i_cr_average );
 
     /* Append it */
     TAB_APPEND( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
@@ -1216,8 +1224,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     else if( p_block->i_dts > 0 )
     {
         p_block->i_dts =
-            input_ClockGetTS( p_input, &p_pgrm->clock,
-                              ( p_block->i_dts + 11 ) * 9 / 100 ) + i_delay;
+            input_ClockGetTS( p_input, &p_pgrm->clock, p_block->i_dts ) + i_delay;
     }
     if( p_block->i_pts > 0 && (p_block->i_flags&BLOCK_FLAG_PREROLL) )
     {
@@ -1226,8 +1233,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     else if( p_block->i_pts > 0 )
     {
         p_block->i_pts =
-            input_ClockGetTS( p_input, &p_pgrm->clock,
-                              ( p_block->i_pts + 11 ) * 9 / 100 ) + i_delay;
+            input_ClockGetTS( p_input, &p_pgrm->clock, p_block->i_pts ) + i_delay;
     }
     if ( es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
     {
@@ -1506,8 +1512,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             i_pcr = (int64_t)va_arg( args, int64_t );
             /* search program */
             /* 11 is a vodoo trick to avoid non_pcr*9/100 to be null */
-            input_ClockSetPCR( p_sys->p_input, &p_pgrm->clock,
-                               (i_pcr + 11 ) * 9 / 100);
+            input_ClockSetPCR( p_sys->p_input, &p_pgrm->clock, i_pcr );
             return VLC_SUCCESS;
         }
 
@@ -1525,8 +1530,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 int64_t i_ts = (int64_t)va_arg( args, int64_t );
                 int64_t *pi_ts = (int64_t *)va_arg( args, int64_t * );
                 *pi_ts = input_ClockGetTS( p_sys->p_input,
-                                           &p_sys->p_pgrm->clock,
-                                           ( i_ts + 11 ) * 9 / 100 );
+                                           &p_sys->p_pgrm->clock, i_ts );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;

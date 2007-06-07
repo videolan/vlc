@@ -263,6 +263,7 @@ void       input_EsOutDelete( es_out_t * );
 es_out_id_t *input_EsOutGetFromID( es_out_t *, int i_id );
 void       input_EsOutDiscontinuity( es_out_t *, vlc_bool_t b_flush, vlc_bool_t b_audio );
 void       input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
+void       input_EsOutSetRate( es_out_t * );
 vlc_bool_t input_EsOutDecodersEmpty( es_out_t * );
 
 /* clock.c */
@@ -282,18 +283,22 @@ typedef struct
     mtime_t                 last_cr; /* reference to detect unexpected stream
                                       * discontinuities                      */
     mtime_t                 last_pts;
+    mtime_t                 last_update;
     int                     i_synchro_state;
 
     vlc_bool_t              b_master;
+
+    int                     i_rate;
 
     /* Config */
     int                     i_cr_average;
     int                     i_delta_cr_residue;
 } input_clock_t;
 
-void input_ClockInit( input_clock_t *, vlc_bool_t b_master, int i_cr_average );
+void    input_ClockInit( input_thread_t *, input_clock_t *, vlc_bool_t b_master, int i_cr_average );
 void    input_ClockSetPCR( input_thread_t *, input_clock_t *, mtime_t );
 mtime_t input_ClockGetTS( input_thread_t *, input_clock_t *, mtime_t );
+void    input_ClockSetRate( input_thread_t *, input_clock_t *cl );
 
 /* Subtitles */
 char **subtitles_Detect( input_thread_t *, char* path, const char *fname );

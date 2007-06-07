@@ -1672,12 +1672,11 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 /* We will not send audio data if new rate != default */
                 if( i_rate != INPUT_RATE_DEFAULT && p_input->p->i_rate == INPUT_RATE_DEFAULT )
-                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_TRUE );
+                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE, VLC_TRUE );
 
                 p_input->p->i_rate  = i_rate;
 
-                /* Reset clock */
-                es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
+                input_EsOutSetRate( p_input->p->p_es_out );
 
                 b_force_update = VLC_TRUE;
             }
