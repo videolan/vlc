@@ -161,7 +161,7 @@ typedef struct
         } volume_changed;
         struct
         {
-            uint64_t new_position;
+            vlc_int64_t new_position;
         } input_position_changed;
     } u;
 } libvlc_event_t;
