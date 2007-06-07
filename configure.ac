@@ -3315,7 +3315,7 @@ dnl
 dnl skins2 module
 dnl
 AC_ARG_ENABLE(libtar,
-  [  --enable libtar support for skins2 (default enabled)])
+  [  --enable-libtar support for skins2 (default enabled)])
 
 AS_IF([test "${enable_libtar}" != "no"],[
   AC_CHECK_HEADERS(libtar.h, [
