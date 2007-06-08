@@ -1647,10 +1647,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pi_int = p_sys->stored_attachments.size();
             *ppp_attach = (input_attachment_t**)malloc( sizeof(input_attachment_t**) *
                                                         p_sys->stored_attachments.size() );
+            if( !(*ppp_attach) )
+                return VLC_ENOMEM;
             for( i = 0; i < p_sys->stored_attachments.size(); i++ )
             {
                 attachment_c *a = p_sys->stored_attachments[i];
-                *(ppp_attach)[i] = vlc_input_attachment_New( a->psz_file_name.c_str(), a->psz_mime_type.c_str(), NULL,
+                (*ppp_attach)[i] = vlc_input_attachment_New( a->psz_file_name.c_str(), a->psz_mime_type.c_str(), NULL,
                                                              a->p_data, a->i_size );
             }
             return VLC_SUCCESS;
@@ -4986,6 +4988,10 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
             {
                 memcpy( new_attachment->p_data, img_data.GetBuffer(), img_data.GetSize() );
                 sys.stored_attachments.push_back( new_attachment );
+            }
+            else
+            {
+                delete new_attachment;
             }
         }
 
