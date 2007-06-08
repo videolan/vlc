@@ -339,7 +339,7 @@ static void SigHandler( int i_signal )
 #endif
 
 
-extern uint32_t cpu_flags = 0;
+uint32_t cpu_flags = 0;
 
 
 /*****************************************************************************

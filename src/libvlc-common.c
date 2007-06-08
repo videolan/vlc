@@ -122,9 +122,6 @@ static int  VerboseCallback( vlc_object_t *, char const *,
 
 static void InitDeviceValues( libvlc_int_t * );
 
-/* Refs misc/cpu.c */
-uint32_t CPUCapabilities( void );
-
 /*****************************************************************************
  * vlc_current_object: return the current object.
  *****************************************************************************

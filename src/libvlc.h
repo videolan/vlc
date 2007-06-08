@@ -81,5 +81,6 @@ static inline libvlc_global_data_t *__vlc_global( vlc_object_t *p_this )
 }
 
 extern uint32_t cpu_flags;
+uint32_t CPUCapabilities( void );
 
 #endif
