@@ -1156,9 +1156,6 @@ endif
 ifdef HAVE_WIN32 
 	(cd $<;./genMakefiles mingw && make $(HOSTCC))
 else
-ifeq ($(HOST),ppc-darwin)
-	(cd $<; ./genMakefiles macosx-before-version-10.4 && make )
-else
 ifdef HAVE_DARWIN_OS
 	(cd $<; sed -e 's%EXTRA_CFLAGS%$(EXTRA_CFLAGS)%' -e 's%EXTRA_LDFLAGS%$(EXTRA_LDFLAGS)%' -i.orig  config.macosx)
 	(cd $<; ./genMakefiles macosx && make)
@@ -1170,7 +1167,6 @@ ifdef HAVE_BIGENDIAN
 endif
 else
 	(cd $<; ./genMakefiles linux && make $(HOSTCC))
-endif
 endif
 endif
 endif
