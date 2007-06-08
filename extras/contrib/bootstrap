@@ -244,9 +244,9 @@ echo "EXTRA_LDFLAGS = ${EXTRA_LDFLAGS}" >> config.mak
 echo "EXTRA_PATH = ${EXTRA_PATH}" >> config.mak
 
 if wget --version >/dev/null 2>&1; then
-    echo "WGET = wget -c" >> config.mak
+    echo "WGET = `which wget` -c" >> config.mak
 elif which curl >/dev/null; then
-    echo "WGET = curl -L -O" >> config.mak
+    echo "WGET = `which curl` -L -O" >> config.mak
 else
     echo "You need at least wget or curl to fetch the packages." >&2
     exit 1
@@ -261,7 +261,7 @@ elif test -f /usr/bin/svn; then
 elif test -f /opt/local/bin/svn; then
     echo "SVN = /opt/local/bin/svn" >> config.mak
 elif svn help >/dev/null 2>&1; then
-        echo "SVN = svn" >> config.mak
+        echo "SVN = `which svn`" >> config.mak
 else
         echo "You do not have a subversion client installed." >&2
 fi
