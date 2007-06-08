@@ -757,13 +757,13 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)enterFullscreen
 {
-    [[o_view class] resetVout: p_vout];
+    [[o_view class] performSelectorOnMainThread:@selector(resetVout:) withObject:[NSValue valueWithPointer:p_vout] waitUntilDone:YES];
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
 }
 
 - (void)leaveFullscreen
 {
-    [[o_view class] resetVout: p_vout];
+    [[o_view class] performSelectorOnMainThread:@selector(resetVout:) withObject:[NSValue valueWithPointer:p_vout] waitUntilDone:YES];
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setNonActive: nil];
 }
 

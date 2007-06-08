@@ -171,19 +171,15 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     {
         p_vout->p_sys->b_embedded = VLC_FALSE;
 
-        p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
+        [VLCGLView performSelectorOnMainThread:@selector(initVout:) withObject:[NSValue valueWithPointer:p_vout] waitUntilDone:YES];
 
-        /* Create the GL view */
-        p_vout->p_sys->o_glview = [[VLCGLView alloc] initWithVout: p_vout];
-        [p_vout->p_sys->o_glview autorelease];
+        /* Check to see if fillVoutWithNewView: was successfull */
 
-        /* Spawn the window */
-
-        if( !(p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
-                        subView: p_vout->p_sys->o_glview frame: nil]) )
+        if( !p_vout->p_sys->o_vout_view )
         {
             return VLC_EGENERIC;
         }
+
         p_vout->pf_init   = Init;
         p_vout->pf_end    = End;
         p_vout->pf_manage = Manage;
@@ -209,7 +205,7 @@ void E_(CloseVideoGL) ( vlc_object_t * p_this )
         NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
         /* Close the window */
-        [p_vout->p_sys->o_vout_view closeVout];
+        [p_vout->p_sys->o_vout_view performSelectorOnMainThread:@selector(closeVout) withObject:NULL waitUntilDone:YES];
 
         [o_pool release];
     }
@@ -307,10 +303,24 @@ static void Unlock( vout_thread_t * p_vout )
  * VLCGLView implementation
  *****************************************************************************/
 @implementation VLCGLView
++ (void)initVout:(NSValue *)arg
+{
+    vout_thread_t * p_vout = [arg pointerValue];
+
+    /* Create the GL view */
+    p_vout->p_sys->o_glview = [[VLCGLView alloc] initWithVout: p_vout];
+    [p_vout->p_sys->o_glview autorelease];
+
+    /* Spawn the window */
+    p_vout->p_sys->o_vout_view = [VLCVoutView getVoutView: p_vout
+                        subView: p_vout->p_sys->o_glview frame: nil];
+}
 
 /* This function will reset the o_vout_view. It's useful to go fullscreen. */
-+ (void)resetVout: (vout_thread_t *)p_vout
++ (void)resetVout:(NSData *)arg
 {
+    vout_thread_t * p_vout = [arg pointerValue];
+
     if( p_vout->b_fullscreen )
     {
         /* Save window size and position */
@@ -344,6 +354,13 @@ static void Unlock( vout_thread_t * p_vout )
 
 - (id) initWithVout: (vout_thread_t *) vout
 {
+    /* Must be called from main thread:
+     * "The NSView class is generally thread-safe, with a few exceptions. You
+     * should create, destroy, resize, move, and perform other operations on NSView
+     * objects only from the main thread of an application. Drawing from secondary
+     * threads is thread-safe as long as you bracket drawing calls with calls to
+     * lockFocusIfCanDraw and unlockFocus." Cocoa Thread Safety */
+
     p_vout = vout;
 
     NSOpenGLPixelFormatAttribute attribs[] =
@@ -418,6 +435,8 @@ static void Unlock( vout_thread_t * p_vout )
     glViewport( ( bounds.size.width - x ) / 2,
                 ( bounds.size.height - y ) / 2, x, y );
 
+    [super reshape];
+
     if( p_vout->p_sys->b_got_frame )
     {
         /* Ask the opengl module to redraw */
@@ -434,7 +453,6 @@ static void Unlock( vout_thread_t * p_vout )
         glClear( GL_COLOR_BUFFER_BIT );
         Unlock( p_vout );
     }
-    [super reshape];
 }
 
 - (void) update
