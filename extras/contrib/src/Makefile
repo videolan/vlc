@@ -140,7 +140,7 @@ FFMPEGCONF+= --cpu=x86 --disable-debug --disable-audio-beos
 endif
 
 ifdef HAVE_DARWIN_OS_ON_INTEL
-FFMPEGCONF += --enable-memalign-hack
+FFMPEGCONF += --enable-memalign-hack --cpu=pentium-m
 endif
 
 ifdef HAVE_DARWIN_OS

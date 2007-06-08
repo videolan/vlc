@@ -86,6 +86,7 @@ Hans-Peter Jansen <hpj at urpla.net> - patch for module options handling
 Harry Sintonen <sintonen@iki.fi> - fix for MKV demuxer
 Igor Helman - VLM msecseek command
 Ilkka Ollakka - SDP bitrate patch, various VLM fixes
+Jan David Mol <jjdmol at gmail.com> - Suggested some flags for ffmpeg building
 Jan Gerber <j at v2v dot org> - patch theora decoding aspect ratio
 Jan Van Boghout <vlc at macrabbit.com> - iTunes like slider for OSX intf
 Javier Varela <tonxabar at hotmail.com> - Spanish translation
