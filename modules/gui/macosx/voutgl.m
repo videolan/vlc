@@ -177,7 +177,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 
         [o_pool release];
 
-        /* Check to see if fillVoutWithNewView: was successfull */
+        /* Check to see if initVout: was successfull */
 
         if( !p_vout->p_sys->o_vout_view )
         {
