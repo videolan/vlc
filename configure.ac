@@ -324,6 +324,9 @@ AC_PROG_LIBTOOL
 
 AC_ARG_ENABLE(libtool,
     [  --enable-libtool        use libtool (default enabled)])
+AS_IF([test "x{enable_libtool}" = "xno"], [
+	AC_MSG_WARN([Disabling libtool is strongly discouraged. There are known bugs.])
+])
 AM_CONDITIONAL(USE_LIBTOOL, [test "x${enable_libtool}" != "xno"] )
 
 
