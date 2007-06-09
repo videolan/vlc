@@ -83,6 +83,9 @@ int vout_Snapshot( vout_thread_t *, picture_t * );
 static int ParseVideoFilter2Chain( vout_thread_t *, char * );
 static void RemoveVideoFilters2( vout_thread_t *p_vout );
 
+/* Display media title in OSD */
+static void DisplayTitleOnOSD( vout_thread_t *p_vout );
+
 /*****************************************************************************
  * Video Filter2 functions
  *****************************************************************************/
@@ -427,7 +430,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     }
     var_AddCallback( p_vout, "deinterlace", DeinterlaceCallback, NULL );
 
-
     var_Create( p_vout, "vout-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     text.psz_string = _("Filters");
     var_Change( p_vout, "vout-filter", VLC_VAR_SETTEXT, &text, NULL );
@@ -755,6 +757,8 @@ static void RunThread( vout_thread_t *p_vout)
         DestroyThread( p_vout );
         return;
     }
+
+    DisplayTitleOnOSD( p_vout );
 
     /*
      * Main loop - it is not executed if an error occurred during
@@ -1626,4 +1630,68 @@ static void RemoveVideoFilters2( vout_thread_t *p_vout )
         vlc_object_destroy( p_vout->pp_vfilters[i] );
     }
     p_vout->i_vfilters = 0;
+}
+
+static void DisplayTitleOnOSD( vout_thread_t *p_vout )
+{
+    input_thread_t *p_input;
+    mtime_t i_now, i_stop;
+
+    p_input = (input_thread_t *)vlc_object_find( p_vout,
+              VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( p_input )
+    {
+        i_now = mdate();
+        i_stop = i_now + (mtime_t)(15000000);
+        if( input_GetItem(p_input)->p_meta &&
+            input_GetItem(p_input)->p_meta->psz_nowplaying &&
+            *input_GetItem(p_input)->p_meta->psz_nowplaying )
+        {
+            vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
+                                   input_GetItem(p_input)->p_meta->psz_nowplaying, NULL,
+                                   OSD_ALIGN_BOTTOM,
+                                   30 + p_vout->fmt_in.i_width
+                                      - p_vout->fmt_in.i_visible_width
+                                      - p_vout->fmt_in.i_x_offset,
+                                   20 + p_vout->fmt_in.i_y_offset,
+                                   i_now, i_stop );
+        }
+        else if( input_GetItem(p_input)->p_meta &&
+                 input_GetItem(p_input)->p_meta->psz_artist &&
+                 *input_GetItem(p_input)->p_meta->psz_artist )
+        {
+            char *psz_string = NULL;
+
+            psz_string = malloc( strlen(input_GetItem(p_input)->psz_name) +
+                    strlen(input_GetItem(p_input)->p_meta->psz_artist) );
+            if( psz_string )
+            {
+                sprintf( psz_string, "%s - %s",
+                         input_GetItem(p_input)->psz_name,
+                         input_GetItem(p_input)->p_meta->psz_artist );
+
+                vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
+                                       psz_string, NULL,
+                                       OSD_ALIGN_BOTTOM,
+                                       30 + p_vout->fmt_in.i_width
+                                          - p_vout->fmt_in.i_visible_width
+                                          - p_vout->fmt_in.i_x_offset,
+                                       20 + p_vout->fmt_in.i_y_offset,
+                                       i_now, i_stop );
+                free( psz_string );
+            }
+        }
+        else
+        {
+            vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
+                                   input_GetItem(p_input)->psz_name, NULL,
+                                   OSD_ALIGN_BOTTOM,
+                                   30 + p_vout->fmt_in.i_width
+                                      - p_vout->fmt_in.i_visible_width
+                                      - p_vout->fmt_in.i_x_offset,
+                                   20 + p_vout->fmt_in.i_y_offset,
+                                   i_now, i_stop );
+        }
+        vlc_object_release( p_input );
+    }
 }
