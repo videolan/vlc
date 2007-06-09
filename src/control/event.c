@@ -31,6 +31,11 @@
  * Private functions
  */
 
+/**************************************************************************
+ *       handle_event (private)
+ *
+ * Callback from the vlc variables
+ **************************************************************************/
 static int handle_event( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval,
                          void *p_data )
@@ -76,7 +81,12 @@ static int handle_event( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-/* Utility function: Object should be released by vlc_object_release afterwards */
+/**************************************************************************
+ *       get_input (private) :
+ *
+ * Utility function, Object should be released by vlc_object_release
+ * afterwards
+ **************************************************************************/
 static input_thread_t * get_input(libvlc_instance_t * p_instance)
 {
     libvlc_exception_t p_e_unused; /* FIXME: error checking here */
@@ -93,6 +103,12 @@ static input_thread_t * get_input(libvlc_instance_t * p_instance)
     return p_input;
 }
 
+/**************************************************************************
+ *       install_input_event (private) :
+ *
+ * vlc variables callback, used to install input event.
+ * Can be called manually though.
+ **************************************************************************/
 static int install_input_event( vlc_object_t *p_this, char const *psz_cmd,
                                 vlc_value_t oldval, vlc_value_t newval,
                                 void *p_data )
@@ -121,6 +137,11 @@ static int install_input_event( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
+/**************************************************************************
+ *       add_callback_to_list (private) :
+ *
+ * callback list utility function.
+ **************************************************************************/
 static inline void add_callback_to_list( struct libvlc_callback_entry_t *entry,
                                          struct libvlc_callback_entry_list_t **list )
 {
@@ -143,6 +164,11 @@ static inline void add_callback_to_list( struct libvlc_callback_entry_t *entry,
     *list = new_listitem;
 }
 
+/**************************************************************************
+ *       remove_variable_callback (private) :
+ *
+ * Delete the appropriate vlc variables callback for an event.
+ **************************************************************************/
 static int remove_variable_callback( libvlc_instance_t *p_instance, 
                                      struct libvlc_callback_entry_t * p_entry )
 {
@@ -174,6 +200,12 @@ static int remove_variable_callback( libvlc_instance_t *p_instance,
 /*
  * Internal libvlc functions
  */
+
+/**************************************************************************
+ *       libvlc_event_init (internal) :
+ *
+ * initialization function.
+ **************************************************************************/
 void libvlc_event_init( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
     playlist_t *p_playlist = p_instance->p_libvlc_int->p_playlist;
@@ -187,6 +219,11 @@ void libvlc_event_init( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
                       install_input_event, p_instance );
 }
 
+/**************************************************************************
+ *       libvlc_event_fini (internal) :
+ *
+ * finalization function.
+ **************************************************************************/
 void libvlc_event_fini( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
     playlist_t *p_playlist = p_instance->p_libvlc_int->p_playlist;
@@ -205,6 +242,11 @@ void libvlc_event_fini( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
  * Public libvlc functions
  */
 
+/**************************************************************************
+ *       libvlc_event_add_callback (public) :
+ *
+ * Add a callback for an event.
+ **************************************************************************/
 void libvlc_event_add_callback( libvlc_instance_t *p_instance,
                                 libvlc_event_type_t i_event_type,
                                 libvlc_callback_t f_callback,
@@ -257,26 +299,11 @@ void libvlc_event_add_callback( libvlc_instance_t *p_instance,
     return;
 }
 
-void libvlc_event_remove_all_callbacks( libvlc_instance_t *p_instance,
-                                       libvlc_exception_t *p_e )
-{
-    struct libvlc_callback_entry_list_t *p_listitem;
-
-    vlc_mutex_lock( &p_instance->instance_lock );
-
-    p_listitem = p_instance->p_callback_list;
-
-    while( p_listitem )
-    {
-        remove_variable_callback( p_instance, p_listitem->elmt ); /* FIXME: We could warn on error */
-        p_listitem = p_listitem->next;
-
-    }
-    p_instance->p_callback_list = NULL;
-
-    vlc_mutex_unlock( &p_instance->instance_lock );
-}
-
+/**************************************************************************
+ *       libvlc_event_remove_callback (public) :
+ *
+ * Remove a callback for an event.
+ **************************************************************************/
 void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
                                    libvlc_event_type_t i_event_type,
                                    libvlc_callback_t f_callback,
@@ -315,5 +342,30 @@ void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
         
         p_listitem = p_listitem->next;
     }
+    vlc_mutex_unlock( &p_instance->instance_lock );
+}
+
+/**************************************************************************
+ *       libvlc_event_remove_all_callbacks (public) :
+ *
+ * Remove all callbacks for all events.
+ **************************************************************************/
+void libvlc_event_remove_all_callbacks( libvlc_instance_t *p_instance,
+                                       libvlc_exception_t *p_e )
+{
+    struct libvlc_callback_entry_list_t *p_listitem;
+
+    vlc_mutex_lock( &p_instance->instance_lock );
+
+    p_listitem = p_instance->p_callback_list;
+
+    while( p_listitem )
+    {
+        remove_variable_callback( p_instance, p_listitem->elmt ); /* FIXME: We could warn on error */
+        p_listitem = p_listitem->next;
+
+    }
+    p_instance->p_callback_list = NULL;
+
     vlc_mutex_unlock( &p_instance->instance_lock );
 }
