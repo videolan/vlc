@@ -169,9 +169,13 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     }
     else
     {
+        NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
         p_vout->p_sys->b_embedded = VLC_FALSE;
 
         [VLCGLView performSelectorOnMainThread:@selector(initVout:) withObject:[NSValue valueWithPointer:p_vout] waitUntilDone:YES];
+
+        [o_pool release];
 
         /* Check to see if fillVoutWithNewView: was successfull */
 
