@@ -153,10 +153,8 @@ void input_ClockSetPCR( input_thread_t *p_input,
 
         if( !b_synchronize )
         {
-            cl->last_cr = 0;
             cl->delta_cr = 0;
             cl->i_delta_cr_residue = 0;
-            cl->last_sysdate = 0;
             cl->last_update = 0;
         }
     }
@@ -224,12 +222,10 @@ mtime_t input_ClockGetTS( input_thread_t * p_input,
  *****************************************************************************/
 void input_ClockSetRate( input_thread_t *p_input, input_clock_t *cl )
 {
+    /* Move the reference point */
     if( cl->i_synchro_state == SYNCHRO_OK )
-    {
-        /* Move the reference point */
-        cl->cr_ref = cl->last_cr;
-        cl->sysdate_ref = cl->last_sysdate;
-    }
+        ClockNewRef( cl, cl->last_cr, cl->last_sysdate );
+
     cl->i_rate = p_input->p->i_rate;
 }
 
