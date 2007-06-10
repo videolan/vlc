@@ -44,6 +44,7 @@
 #include "input/input_internal.h"
 
 static void inputFailure( aout_instance_t *, aout_input_t *, const char * );
+static void inputDrop( aout_instance_t *, aout_input_t * );
 static int VisualizationCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 static int EqualizerCallback( vlc_object_t *, char const *,
@@ -448,12 +449,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             p_input->pp_resamplers[0]->b_continuity = VLC_FALSE;
         }
         start_date = 0;
-        if( p_input->p_input_thread )
-        {
-            vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
-            stats_UpdateInteger( p_aout, p_input->p_input_thread->p->counters.p_lost_abuffers, 1, NULL );
-            vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
-        }
+        inputDrop( p_aout, p_input );
     }
 
     if ( p_buffer->start_date < mdate() + AOUT_MIN_PREPARE_TIME )
@@ -462,12 +458,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          * can't present it anyway, so drop the buffer. */
         msg_Warn( p_aout, "PTS is out of range ("I64Fd"), dropping buffer",
                   mdate() - p_buffer->start_date );
-        if( p_input->p_input_thread )
-        {
-            vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
-            stats_UpdateInteger( p_aout, p_input->p_input_thread->p->counters.p_lost_abuffers, 1, NULL );
-            vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
-        }
+
+        inputDrop( p_aout, p_input );
         aout_BufferFree( p_buffer );
         p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
         if ( p_input->i_nb_resamplers != 0 )
@@ -505,12 +497,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "audio drift is too big ("I64Fd"), dropping buffer",
                   start_date - p_buffer->start_date );
         aout_BufferFree( p_buffer );
-        if( p_input->p_input_thread )
-        {
-            vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
-            stats_UpdateInteger( p_aout, p_input->p_input_thread->p->counters.p_lost_abuffers, 1, NULL );
-            vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
-        }
+        inputDrop( p_aout, p_input );
         return 0;
     }
 
@@ -643,6 +630,16 @@ static void inputFailure( aout_instance_t * p_aout, aout_input_t * p_input,
 
     /* error flag */
     p_input->b_error = 1;
+}
+
+static void inputDrop( aout_instance_t *p_aout, aout_input_t *p_input )
+{
+    if( !p_input->p_input_thread )
+        return;
+
+    vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
+    stats_UpdateInteger( p_aout, p_input->p_input_thread->p->counters.p_lost_abuffers, 1, NULL );
+    vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
 }
 
 static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variable,

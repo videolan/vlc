@@ -341,7 +341,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     }
 
     p_buffer->end_date = p_buffer->start_date
-                            + (mtime_t)(p_buffer->i_nb_samples * 1000000)
+                            + (mtime_t)p_buffer->i_nb_samples * 1000000
                                 / p_input->input.i_rate;
 
     vlc_mutex_lock( &p_input->lock );
