@@ -178,23 +178,26 @@ void playlist_Destroy( playlist_t *p_playlist )
 }
 
 /* Destroy remaining objects */
-static void ObjectGarbageCollector( playlist_t *p_playlist )
+static void ObjectGarbageCollector( playlist_t *p_playlist, vlc_bool_t b_force )
 {
     vlc_object_t *p_obj;
 
-    if( mdate() - p_playlist->gc_date < 1000000 )
+    if( !b_force )
     {
-        p_playlist->b_cant_sleep = VLC_TRUE;
-        return;
+        if( mdate() - p_playlist->gc_date < 1000000 )
+        {
+            p_playlist->b_cant_sleep = VLC_TRUE;
+            return;
+        }
+        else if( p_playlist->gc_date == 0 )
+            return;
     }
-    else if( p_playlist->gc_date == 0 )
-        return;
 
     vlc_mutex_lock( &p_playlist->gc_lock );
     while( ( p_obj = vlc_object_find( p_playlist, VLC_OBJECT_VOUT,
                                                   FIND_CHILD ) ) )
     {
-        if( p_obj->p_parent != (vlc_object_t*)p_playlist )
+        if( p_obj->p_parent != VLC_OBJECT(p_playlist) )
         {
             vlc_object_release( p_obj );
             break;
@@ -207,7 +210,7 @@ static void ObjectGarbageCollector( playlist_t *p_playlist )
     while( ( p_obj = vlc_object_find( p_playlist, VLC_OBJECT_SOUT,
                                                   FIND_CHILD ) ) )
     {
-        if( p_obj->p_parent != (vlc_object_t*)p_playlist )
+        if( p_obj->p_parent != VLC_OBJECT(p_playlist) )
         {
             vlc_object_release( p_obj );
             break;
@@ -305,7 +308,7 @@ check_input:
         else if( p_playlist->p_input->i_state != INIT_S )
         {
             PL_UNLOCK;
-            ObjectGarbageCollector( p_playlist );
+            ObjectGarbageCollector( p_playlist, VLC_FALSE );
             PL_LOCK;
         }
     }
@@ -335,12 +338,16 @@ check_input:
                 }
                 p_playlist->status.i_status = PLAYLIST_STOPPED;
                 PL_UNLOCK
+
+                ObjectGarbageCollector( p_playlist, VLC_TRUE );
                 return;
              }
              playlist_PlayItem( p_playlist, p_item );
          }
          else
          {
+            const vlc_bool_t b_gc_forced = p_playlist->status.i_status != PLAYLIST_STOPPED;
+
             p_playlist->status.i_status = PLAYLIST_STOPPED;
             if( p_playlist->status.p_item &&
                 p_playlist->status.p_item->i_flags & PLAYLIST_REMOVE_FLAG )
@@ -352,7 +359,7 @@ check_input:
 
             /* Collect garbage */
             PL_UNLOCK;
-            ObjectGarbageCollector( p_playlist );
+            ObjectGarbageCollector( p_playlist, b_gc_forced );
             PL_LOCK;
         }
     }
