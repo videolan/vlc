@@ -199,16 +199,19 @@ QMenu *QVLCMenu::FileMenu()
     QMenu *menu = new QMenu();
     DP_SADD( menu, qtr("Open &File..." ), "", "", openFileDialog(), "Ctrl+O" );
     DP_SADD( menu, qtr("Open &Disc..." ), "", "", openDiscDialog(), "Ctrl+D" );
-    DP_SADD( menu, qtr("Open &Network..." ), "", "", openNetDialog(), "Ctrl+N" );
-    DP_SADD( menu, qtr("Open &Capture Device..." ), "", "", openCaptureDialog(),
+    DP_SADD( menu, qtr("Open &Network..." ), "",
+                ":/pixmaps/vlc_network_16px.png", openNetDialog(), "Ctrl+N" );
+    DP_SADD( menu, qtr("Open &Capture Device..." ), "",
+            ":/pixmaps/vlc_capture-card_16px.png", openCaptureDialog(),
             "Ctrl+C" );
     menu->addSeparator();
-    DP_SADD( menu, qtr("&Streaming..."), "", "", openThenStreamingDialogs(), 
-            "Ctrl+S" );
+    DP_SADD( menu, qtr("&Streaming..."), "", ":/pixmaps/vlc_stream_16px.png",
+            openThenStreamingDialogs(), "Ctrl+S" );
     DP_SADD( menu, qtr("Conve&rt / Save..."), "", "", openThenTranscodingDialogs(), 
             "Ctrl+R" );
     menu->addSeparator();
-    DP_SADD( menu, qtr("&Quit") , "", "", quit(), "Ctrl+Q");
+    DP_SADD( menu, qtr("&Quit") , "", ":/pixmaps/vlc_quit_16px.png", quit(), 
+            "Ctrl+Q");
     return menu;
 }
 
@@ -240,9 +243,9 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     }
     DP_SADD( menu, qtr(I_MENU_MSG), "", ":/pixmaps/vlc_messages_16px.png",
              messagesDialog(), "Ctrl+M" );
-    DP_SADD( menu, qtr(I_MENU_INFO) , "", ":/pixmaps/vlc_info_16px.png",
-             mediaInfoDialog(), "Ctrl+J" );
-    DP_SADD( menu, qtr(I_MENU_CODECINFO) , "", "", mediaCodecDialog(), "Ctrl+I" );
+    DP_SADD( menu, qtr(I_MENU_INFO) , "", "", mediaInfoDialog(), "Ctrl+J" );
+    DP_SADD( menu, qtr(I_MENU_CODECINFO) , "", ":/pixmaps/vlc_info_16px.png",
+             mediaCodecDialog(), "Ctrl+I" );
     DP_SADD( menu, qtr(I_MENU_GOTOTIME), "","", gotoTimeDialog(), "Ctrl+T" );
     DP_SADD( menu, qtr(I_MENU_BOOKMARK), "","", bookmarksDialog(), "Ctrl+B" );
     DP_SADD( menu, qtr(I_MENU_VLM), "","", vlmDialog(), "Ctrl+V" );

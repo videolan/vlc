@@ -26,5 +26,9 @@
   <file>pixmaps/vlc_pause_16px.png</file>
   <file>pixmaps/vlc_messages_16px.png</file>
   <file>pixmaps/vlc_play_16px.png</file>
+  <file>pixmaps/vlc_network_16px.png</file>
+  <file>pixmaps/vlc_quit_16px.png</file>
+  <file>pixmaps/vlc_capture-card_16px.png</file>
+  <file>pixmaps/vlc_stream_16px.png</file>
  </qresource>
 </RCC>

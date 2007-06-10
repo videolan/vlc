@@ -162,13 +162,6 @@ EXTRA_DIST += \
 	pixmaps/type_net.xpm \
 	pixmaps/type_playlist.xpm \
 	pixmaps/video.xpm \
-	pixmaps/hotkeys_50x50.xpm \
-	pixmaps/audio_50x50.xpm \
-	pixmaps/input_and_codecs_50x50.xpm \
-	pixmaps/interface_50x50.xpm \
-	pixmaps/playlist_50x50.xpm \
-	pixmaps/subtitles_50x50.xpm \
-	pixmaps/video_50x50.xpm \
 	pixmaps/type_unknown.xpm \
 	pixmaps/type_afile.xpm \
 	pixmaps/type_vfile.xpm \
@@ -197,6 +190,10 @@ EXTRA_DIST += \
 	pixmaps/vlc_play_16px.png \
 	pixmaps/vlc_pause_16px.png \
 	pixmaps/vlc_messages_16px.png \
-	pixmaps/vlc_previous_16px.png \
+	pixmaps/vlc_network_16px.png \
+	pixmaps/vlc_stream_16px.png \
+	pixmaps/vlc_quit_16px.png \
+	pixmaps/vlc_network_16px.png \
+	pixmaps/vlc_capture-card_16px.png \
 	pixmaps/vlc_info_16px.png \
 	pixmaps/vlc_next_16px.png
