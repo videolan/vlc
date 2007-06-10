@@ -10,6 +10,7 @@
   <file>pixmaps/go-next.png</file>
   <file alias="vlc128.png">../../../share/vlc128x128.png</file>
   <file alias="vlc48.png">../../../share/vlc48x48.png</file>
+  <file alias="vlc16.png">../../../share/vlc16x16.png</file>
   <file alias="noart.png">pixmaps/noart.png</file>
   <file>pixmaps/playlist_icon.png</file>
   <file>pixmaps/spref_cone_Audio_64.png</file>

@@ -207,10 +207,10 @@ QMenu *QVLCMenu::FileMenu()
     menu->addSeparator();
     DP_SADD( menu, qtr("&Streaming..."), "", ":/pixmaps/vlc_stream_16px.png",
             openThenStreamingDialogs(), "Ctrl+S" );
-    DP_SADD( menu, qtr("Conve&rt / Save..."), "", "", openThenTranscodingDialogs(), 
-            "Ctrl+R" );
+    DP_SADD( menu, qtr("Conve&rt / Save..."), "", "",
+            openThenTranscodingDialogs(), "Ctrl+R" );
     menu->addSeparator();
-    DP_SADD( menu, qtr("&Quit") , "", ":/pixmaps/vlc_quit_16px.png", quit(), 
+    DP_SADD( menu, qtr("&Quit") , "", ":/pixmaps/vlc_quit_16px.png", quit(),
             "Ctrl+Q");
     return menu;
 }
@@ -608,19 +608,22 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf,
     sysMenu->clear();
     if( mi->isVisible() || b_force_visible )
     {
-        sysMenu->addAction( qtr("Hide VLC media player"), mi,
+        sysMenu->addAction( QIcon( ":/vlc16.png" ),
+                qtr("Hide VLC media player"), mi,
                 SLOT( toggleUpdateSystrayMenu() ) );
     }
     else
     {
-        sysMenu->addAction( qtr("Show VLC media player"), mi,
+        sysMenu->addAction( QIcon( ":/vlc16.png" ),
+                qtr("Show VLC media player"), mi,
                 SLOT( toggleUpdateSystrayMenu() ) );
     }
     sysMenu->addSeparator();
     POPUP_PLAY_ENTRIES( sysMenu );
     sysMenu->addSeparator();
     DP_SADD( sysMenu, qtr("&Open Media" ), "", "", openFileDialog(), "" );
-    DP_SADD( sysMenu, qtr("&Quit") , "", "", quit(), "" );
+    DP_SADD( sysMenu, qtr("&Quit") , "", ":/pixmaps/vlc_quit_16px.png",
+             quit(), "" );
 
     mi->getSysTray()->setContextMenu( sysMenu );
 }
