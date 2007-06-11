@@ -272,14 +272,14 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
   except the submux sample code and a couple of samples of dubious
   origin. Thus, this is the result of reading some code whose
   correctness is not known and some experimentation.
-  
+
   CVD subtitles are different in several ways from SVCD OGT subtitles.
   Image comes first and metadata is at the end.  So that the metadata
   can be found easily, the subtitle packet starts with two bytes
   (everything is big-endian again) that give the total size of the
   subtitle data and the offset to the metadata - i.e. size of the
   image data plus the four bytes at the beginning.
- 
+
   Image data comes interlaced is run-length encoded.  Each field is a
   four-bit nibble. Each nibble contains a two-bit repeat count and a
   two-bit color number so that up to three pixels can be described in
@@ -306,15 +306,14 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
 
     p_sys->i_image_offset = 4;
     p_sys->i_image_length = p_sys->metadata_offset - p_sys->i_image_offset;
-  
+
 #ifdef DEBUG_CVDSUB
     msg_Dbg( p_dec, "total size: %d  image size: %d",
              p_sys->i_spu_size, p_sys->i_image_length );
 #endif
-
 }
 
-/* 
+/*
   We parse the metadata information here. 
 
   Although metadata information does not have to come in a fixed field
@@ -333,7 +332,7 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t       *p     = p_spu->p_buffer + p_sys->metadata_offset;
     uint8_t       *p_end = p + p_sys->metadata_length;
-  
+
     for( ; p < p_end; p += 4 )
     {
         switch( p[0] )
@@ -347,14 +346,14 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
 #endif
             p_sys->i_duration *= 100 / 9;
             break;
-      
+
         case 0x0c: /* unknown */
 #ifdef DEBUG_CVDSUB
             msg_Dbg( p_dec, "subtitle command unknown 0x%0x 0x%0x 0x%0x 0x%0x",
                      (int)p[0], (int)p[1], (int)p[2], (int)p[3] );
 #endif
             break;
-      
+
         case 0x17: /* coordinates of subtitle upper left x, y position */
             ExtractXY(p_sys->i_x_start, p_sys->i_y_start);
 
@@ -363,7 +362,7 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
                      p_sys->i_x_start, p_sys->i_y_start );
 #endif
             break;
-      
+
         case 0x1f: /* coordinates of subtitle bottom right x, y position */
         {
             int lastx;
@@ -378,7 +377,7 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
 #endif
             break;
         }
-      
+
         case 0x24:
         case 0x25:
         case 0x26:
@@ -431,7 +430,7 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
                      (int)p_sys->p_palette[2][3], (int)p_sys->p_palette[3][3]);
 #endif
             break;
-      
+
         case 0x3f:
             /* transparency for highlight palette */
             p_sys->p_palette_highlight[0][3] = (p[2] & 0x0f) << 4;
