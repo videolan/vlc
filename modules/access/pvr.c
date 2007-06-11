@@ -428,7 +428,7 @@ static int ConfigureV4L2( access_t * p_access )
     controls.controls    = calloc( sizeof( struct v4l2_ext_control ),
                                    MAX_V4L2_CTRLS );
 
-    if( controls.control == NULL )
+    if( controls.controls == NULL )
         return VLC_ENOMEM;
 
     /* Note: Ignore frame rate.  Doesn't look like it can be changed. */
@@ -524,7 +524,7 @@ static int ConfigureV4L2( access_t * p_access )
         msg_Err( p_access, "Failed to write %u new capture card settings.",
                             controls.error_idx );
     }
-    free( control.controls );
+    free( controls.controls );
     return VLC_SUCCESS;
 }
 
@@ -1018,9 +1018,9 @@ static int Open( vlc_object_t * p_this )
         {
 #ifdef HAVE_NEW_LINUX_VIDEODEV2_H
             result = ConfigureV4L2( p_access );
-            if( !result )
+            if( result != VLC_SUCCESS )
             {
-                Close( p_access );
+                Close( VLC_OBJECT(p_access) );
                 return result;
             }
 #else
@@ -1031,7 +1031,7 @@ static int Open( vlc_object_t * p_this )
         else
         {
             result = ConfigureIVTV( p_access );
-            if( !result )
+            if( result != VLC_SUCCESS )
             {
                 Close( VLC_OBJECT(p_access) );
                 return result;
