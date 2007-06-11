@@ -106,8 +106,10 @@ case $HOST in
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
         echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
-        EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-        EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
+        EXTRA_CFLAGS=" -D\${ENVP} -mmacosx-version-min=\${SDK_TARGET}"
+        CC="gcc -isysroot \${MACOSX_SDK}"
+        CXX="g++ -isysroot \${MACOSX_SDK}"
+        LD="ld -arch ppc -syslibroot \${MACOSX_SDK}"
         echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak
         ;;
