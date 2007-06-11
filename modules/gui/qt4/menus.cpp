@@ -52,24 +52,24 @@ static QActionGroup *currentGroup;
 // Add static entries to menus
 #define DP_SADD( menu, text, help, icon, slot, shortcut ) \
 { \
-    if( strlen(icon) > 0 ) \
+    if( strlen( icon ) > 0 ) \
     { \
-        if( strlen(shortcut) > 0 ) \
+        if( strlen( shortcut ) > 0 ) \
         { \
-            menu->addAction( QIcon(icon), text, THEDP, SLOT( slot ), \
-                    qtr(shortcut) );\
+            menu->addAction( QIcon( icon ), text, THEDP, SLOT( slot ), \
+                    qtr( shortcut ) );\
         } \
         else \
         { \
-            menu->addAction( QIcon(icon), text, THEDP, SLOT( slot ) );\
+            menu->addAction( QIcon( icon ), text, THEDP, SLOT( slot ) );\
         } \
     } \
     else \
     { \
-        if( strlen(shortcut) > 0 ) \
+        if( strlen( shortcut ) > 0 ) \
         { \
             menu->addAction( text, THEDP, SLOT( slot ), \
-                    qtr(shortcut) ); \
+                    qtr( shortcut ) ); \
         } \
         else \
         { \
@@ -79,10 +79,10 @@ static QActionGroup *currentGroup;
 }
 #define MIM_SADD( menu, text, help, icon, slot ) \
 { \
-    if( strlen(icon) > 0 ) \
+    if( strlen( icon ) > 0 ) \
     { \
         QAction *action = menu->addAction( text, THEMIM, SLOT( slot ) ); \
-        action->setIcon(QIcon(icon)); \
+        action->setIcon( QIcon( icon ) ); \
     } \
     else \
     { \
@@ -175,11 +175,11 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
 
     sigemptyset( &set );
     sigaddset( &set, SIGCHLD );
-    pthread_sigmask (SIG_UNBLOCK, &set, NULL);
+    pthread_sigmask( SIG_UNBLOCK, &set, NULL );
 #endif
     QMenuBar *bar = mi->menuBar();
 #ifndef WIN32
-    pthread_sigmask (SIG_BLOCK, &set, NULL);
+    pthread_sigmask( SIG_BLOCK, &set, NULL );
 #endif
     BAR_ADD( FileMenu(), qtr("&Media") );
     if( playlist )
@@ -221,8 +221,8 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
     menu->addMenu( SDMenu( p_intf ) );
     menu->addSeparator();
 
-    DP_SADD( menu, qtr(I_PL_LOAD), "", "", openPlaylist(), "Ctrl+L" );
-    DP_SADD( menu, qtr(I_PL_SAVE), "", "", savePlaylist(), "Ctrl+K" );
+    DP_SADD( menu, qtr( I_PL_LOAD ), "", "", openPlaylist(), "Ctrl+L" );
+    DP_SADD( menu, qtr( I_PL_SAVE ), "", "", savePlaylist(), "Ctrl+K" );
     menu->addSeparator();
     menu->addAction( qtr("Undock from interface"), mi,
             SLOT( undockPlaylist() ), qtr("Ctrl+U") );
@@ -241,14 +241,14 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         menu->addMenu( intfmenu );
         menu->addSeparator();
     }
-    DP_SADD( menu, qtr(I_MENU_MSG), "", ":/pixmaps/vlc_messages_16px.png",
+    DP_SADD( menu, qtr( I_MENU_MSG ), "", ":/pixmaps/vlc_messages_16px.png",
              messagesDialog(), "Ctrl+M" );
-    DP_SADD( menu, qtr(I_MENU_INFO) , "", "", mediaInfoDialog(), "Ctrl+J" );
-    DP_SADD( menu, qtr(I_MENU_CODECINFO) , "", ":/pixmaps/vlc_info_16px.png",
+    DP_SADD( menu, qtr( I_MENU_INFO ) , "", "", mediaInfoDialog(), "Ctrl+J" );
+    DP_SADD( menu, qtr( I_MENU_CODECINFO ) , "", ":/pixmaps/vlc_info_16px.png",
              mediaCodecDialog(), "Ctrl+I" );
-    DP_SADD( menu, qtr(I_MENU_GOTOTIME), "","", gotoTimeDialog(), "Ctrl+T" );
-    DP_SADD( menu, qtr(I_MENU_BOOKMARK), "","", bookmarksDialog(), "Ctrl+B" );
-    DP_SADD( menu, qtr(I_MENU_VLM), "","", vlmDialog(), "Ctrl+V" );
+    DP_SADD( menu, qtr( I_MENU_GOTOTIME ), "","", gotoTimeDialog(), "Ctrl+T" );
+    DP_SADD( menu, qtr( I_MENU_BOOKMARK ), "","", bookmarksDialog(), "Ctrl+B" );
+    DP_SADD( menu, qtr( I_MENU_VLM ), "","", vlmDialog(), "Ctrl+V" );
 
     menu->addSeparator();
     if( mi )
@@ -265,8 +265,8 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
 #endif
         menu->addAction ( qtr( "Playlist"), mi, SLOT( playlist() ) );
     }
-    DP_SADD( menu, qtr(I_MENU_EXT), "","",extendedDialog(), "Ctrl+E" );
-    DP_SADD( menu, qtr("Hide Menus..."), "","",hideMenus(), "Ctrl+H" );
+    DP_SADD( menu, qtr( I_MENU_EXT ), "","",extendedDialog(), "Ctrl+E" );
+    DP_SADD( menu, qtr( "Hide Menus..." ), "","",hideMenus(), "Ctrl+H" );
     menu->addSeparator();
     DP_SADD( menu, qtr("Preferences"), "", "", prefsDialog(), "Ctrl+P" );
     return menu;
@@ -285,7 +285,7 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     if( !p_intf->pf_show_dialog )
     {
         menu->addSeparator();
-        menu->addAction( qtr("Switch to skins"), THEDP, SLOT(switchToSkins()),
+        menu->addAction( qtr("Switch to skins"), THEDP, SLOT( switchToSkins() ),
                 QString("Ctrl+Z") );
     }
 
@@ -365,7 +365,7 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *current )
 QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 {
     QMenu *menu = new QMenu();
-    menu->setTitle( qtr(I_PL_SD) );
+    menu->setTitle( qtr( I_PL_SD ) );
     vlc_list_t *p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
             FIND_ANYWHERE );
     int i_num = 0;
@@ -406,7 +406,7 @@ QMenu *QVLCMenu::HelpMenu()
     QMenu *menu = new QMenu();
     DP_SADD( menu, qtr("Help") , "", ":/pixmaps/vlc_help_16px.png", helpDialog(), "F1" );
     menu->addSeparator();
-    DP_SADD( menu, qtr(I_MENU_ABOUT), "", "", aboutDialog(), "Ctrl+F1");
+    DP_SADD( menu, qtr( I_MENU_ABOUT ), "", "", aboutDialog(), "Ctrl+F1");
     return menu;
 }
 
@@ -923,7 +923,7 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
     {
         action->setCheckable( true );
         if( !currentGroup )
-            currentGroup = new QActionGroup(menu);
+            currentGroup = new QActionGroup( menu );
         currentGroup->addAction( action );
     }
 
