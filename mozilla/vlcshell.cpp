@@ -709,7 +709,7 @@ static LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpa
         }
         default:
             /* delegate to default handler */
-            return p_plugin->getWindowProc()( p_hwnd, i_msg, wpar, lpar );
+            return CallWindowProc(p_plugin->getWindowProc(), p_hwnd, i_msg, wpar, lpar );
     }
 }
 #endif /* XP_WIN */
