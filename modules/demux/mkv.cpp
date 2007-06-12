@@ -2190,7 +2190,10 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
                 p_stream1->segments.push_back( p_segment1 );
             }
             else
+            {
+                p_segment1->segment = NULL;
                 delete p_segment1;
+            }
         }
         if (p_l0->IsFiniteSize() )
         {
