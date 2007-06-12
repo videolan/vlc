@@ -95,8 +95,22 @@ Capture:
 Localisations:
  * Persian
 
+Changes between 0.8.6b and 0.8.6c:
+----------------------------------
+Various bugfixes, notably:
+ * Windows Vista compatibility
+ * Cropping in Direct3D
+ * Fullscreen change crash on Mac OS X
+ * RSS filter string overflow
+ * Few memory leaks
+ * Embedded subtitles (GAB2 format) in AVI
+ * MKV demuxer crash (related to seeking)
+
+ CDDA / Vorbis / Theora / SAP plugins:
+ * Security updates (VideoLAN-SA-0702)
+
 Changes between 0.8.6a and 0.8.6b:
------------------------------------------------------------
+----------------------------------
 Various bugfixes, notably:
  * Out-of-bound read in demuxers
  * Demuxers crashes (incl. CVE-2007-0256)
