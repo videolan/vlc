@@ -325,10 +325,12 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
      * --Gibalou
      */
     {
+        const mtime_t i_delta = p_buffer->start_date - start_date;
         vlc_mutex_unlock( &p_aout->output_fifo_lock );
+
         if ( !p_aout->output.b_starving )
             msg_Dbg( p_aout, "audio output is starving ("I64Fd"), "
-                     "playing silence", p_buffer->start_date - start_date );
+                     "playing silence", i_delta );
         p_aout->output.b_starving = 1;
         return NULL;
     }
