@@ -44,7 +44,9 @@
 #include "input/input_internal.h"
 
 static void inputFailure( aout_instance_t *, aout_input_t *, const char * );
-static void inputDrop( aout_instance_t *, aout_input_t * );
+static void inputDrop( aout_instance_t *, aout_input_t *, aout_buffer_t * );
+static void inputResamplingStop( aout_input_t *p_input );
+
 static int VisualizationCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 static int EqualizerCallback( vlc_object_t *, char const *,
@@ -364,10 +366,10 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                                     (int)(p_input->input.i_bytes_per_frame
                                      * p_input->input.i_rate
                                      / p_input->input.i_frame_length) );
-
     /* Success */
     p_input->b_error = VLC_FALSE;
     p_input->b_restart = VLC_FALSE;
+    p_input->i_last_input_rate = INPUT_RATE_DEFAULT;
 
     return 0;
 }
@@ -397,8 +399,10 @@ int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
  *****************************************************************************
  * This function must be entered with the input lock.
  *****************************************************************************/
+/* XXX Do not activate it !! */
+//#define AOUT_PROCESS_BEFORE_CHEKS
 int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
-                    aout_buffer_t * p_buffer )
+                    aout_buffer_t * p_buffer, int i_input_rate )
 {
     mtime_t start_date;
 
@@ -422,6 +426,38 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         vlc_mutex_unlock( &p_aout->mixer_lock );
     }
 
+#ifdef AOUT_PROCESS_BEFORE_CHEKS
+    /* Run pre-filters. */
+    aout_FiltersPlay( p_aout, p_input->pp_filters, p_input->i_nb_filters,
+                      &p_buffer );
+
+    /* Actually run the resampler now. */
+    if ( p_input->i_nb_resamplers > 0 )
+    {
+        const mtime_t i_date = p_buffer->start_date;
+        aout_FiltersPlay( p_aout, p_input->pp_resamplers,
+                          p_input->i_nb_resamplers,
+                          &p_buffer );
+    }
+
+    if( p_buffer->i_nb_samples <= 0 )
+    {
+        aout_BufferFree( p_buffer );
+        return 0;
+    }
+#endif
+
+    /* Handle input rate change by modifying resampler input rate */
+    if( i_input_rate != p_input->i_last_input_rate )
+    {
+        unsigned int * const pi_rate = &p_input->pp_resamplers[0]->input.i_rate;
+#define F(r,ir) ( INPUT_RATE_DEFAULT * (r) / (ir) )
+        const int i_delta = *pi_rate - F(p_input->input.i_rate,p_input->i_last_input_rate);
+        *pi_rate = F(p_input->input.i_rate + i_delta, i_input_rate);
+#undef F
+        p_input->i_last_input_rate = i_input_rate;
+    }
+
     /* We don't care if someone changes the start date behind our back after
      * this. We'll deal with that when pushing the buffer, and compensate
      * with the next incoming buffer. */
@@ -442,14 +478,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         vlc_mutex_unlock( &p_aout->input_fifos_lock );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
-        p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
-        if ( p_input->i_nb_resamplers != 0 )
-        {
-            p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
-            p_input->pp_resamplers[0]->b_continuity = VLC_FALSE;
-        }
+        inputResamplingStop( p_input );
         start_date = 0;
-        inputDrop( p_aout, p_input );
     }
 
     if ( p_buffer->start_date < mdate() + AOUT_MIN_PREPARE_TIME )
@@ -459,14 +489,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "PTS is out of range ("I64Fd"), dropping buffer",
                   mdate() - p_buffer->start_date );
 
-        inputDrop( p_aout, p_input );
-        aout_BufferFree( p_buffer );
-        p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
-        if ( p_input->i_nb_resamplers != 0 )
-        {
-            p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
-            p_input->pp_resamplers[0]->b_continuity = VLC_FALSE;
-        }
+        inputDrop( p_aout, p_input, p_buffer );
+        inputResamplingStop( p_input );
         return 0;
     }
 
@@ -483,12 +507,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         vlc_mutex_unlock( &p_aout->input_fifos_lock );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
-        p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
-        if ( p_input->i_nb_resamplers != 0 )
-        {
-            p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
-            p_input->pp_resamplers[0]->b_continuity = VLC_FALSE;
-        }
+        inputResamplingStop( p_input );
         start_date = 0;
     }
     else if ( start_date != 0 &&
@@ -496,17 +515,17 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     {
         msg_Warn( p_aout, "audio drift is too big ("I64Fd"), dropping buffer",
                   start_date - p_buffer->start_date );
-        aout_BufferFree( p_buffer );
-        inputDrop( p_aout, p_input );
+        inputDrop( p_aout, p_input, p_buffer );
         return 0;
     }
 
     if ( start_date == 0 ) start_date = p_buffer->start_date;
 
+#ifndef AOUT_PROCESS_BEFORE_CHEKS
     /* Run pre-filters. */
-
     aout_FiltersPlay( p_aout, p_input->pp_filters, p_input->i_nb_filters,
                       &p_buffer );
+#endif
 
     /* Run the resampler if needed.
      * We first need to calculate the output rate of this resampler. */
@@ -555,8 +574,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
         /* Check if everything is back to normal, in which case we can stop the
          * resampling */
-        if( p_input->pp_resamplers[0]->input.i_rate ==
-              p_input->input.i_rate )
+        if( p_input->pp_resamplers[0]->input.i_rate == 1000 * p_input->input.i_rate / i_input_rate )
         {
             p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
             msg_Warn( p_aout, "resampling stopped after "I64Fi" usec "
@@ -582,16 +600,11 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             /* If the drift is increasing and not decreasing, than something
              * is bad. We'd better stop the resampling right now. */
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
-            p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
-            p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
+            inputResamplingStop( p_input );
         }
     }
 
-    /* Adding the start date will be managed by aout_FifoPush(). */
-    p_buffer->end_date = start_date +
-        (p_buffer->end_date - p_buffer->start_date);
-    p_buffer->start_date = start_date;
-
+#ifndef AOUT_PROCESS_BEFORE_CHEKS
     /* Actually run the resampler now. */
     if ( p_input->i_nb_resamplers > 0 )
     {
@@ -600,10 +613,21 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                           &p_buffer );
     }
 
+    if( p_buffer->i_nb_samples <= 0 )
+    {
+        aout_BufferFree( p_buffer );
+        return 0;
+    }
+#endif
+
+    /* Adding the start date will be managed by aout_FifoPush(). */
+    p_buffer->end_date = start_date +
+        (p_buffer->end_date - p_buffer->start_date);
+    p_buffer->start_date = start_date;
+
     vlc_mutex_lock( &p_aout->input_fifos_lock );
     aout_FifoPush( p_aout, &p_input->fifo, p_buffer );
     vlc_mutex_unlock( &p_aout->input_fifos_lock );
-
     return 0;
 }
 
@@ -632,14 +656,27 @@ static void inputFailure( aout_instance_t * p_aout, aout_input_t * p_input,
     p_input->b_error = 1;
 }
 
-static void inputDrop( aout_instance_t *p_aout, aout_input_t *p_input )
+static void inputDrop( aout_instance_t *p_aout, aout_input_t *p_input, aout_buffer_t *p_buffer )
 {
+    aout_BufferFree( p_buffer );
+
     if( !p_input->p_input_thread )
         return;
 
     vlc_mutex_lock( &p_input->p_input_thread->p->counters.counters_lock);
     stats_UpdateInteger( p_aout, p_input->p_input_thread->p->counters.p_lost_abuffers, 1, NULL );
     vlc_mutex_unlock( &p_input->p_input_thread->p->counters.counters_lock);
+}
+
+static void inputResamplingStop( aout_input_t *p_input )
+{
+    p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
+    if( p_input->i_nb_resamplers != 0 )
+    {
+        p_input->pp_resamplers[0]->input.i_rate = INPUT_RATE_DEFAULT *
+                            p_input->input.i_rate / p_input->i_last_input_rate;
+        p_input->pp_resamplers[0]->b_continuity = VLC_FALSE;
+    }
 }
 
 static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variable,

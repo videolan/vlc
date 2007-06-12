@@ -30,6 +30,7 @@
 #include <vlc/vlc.h>
 #include <vlc_codec.h>
 #include <vlc_aout.h>
+#include <vlc_input.h>
 
 #include <vlc_block_helper.h>
 
@@ -62,6 +63,8 @@ struct decoder_sys_t
     unsigned int i_layer, i_bit_rate;
 
     vlc_bool_t   b_discontinuity;
+
+    int i_input_rate;
 };
 
 enum {
@@ -155,6 +158,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     aout_DateSet( &p_sys->end_date, 0 );
     p_sys->bytestream = block_BytestreamInit( p_dec );
     p_sys->b_discontinuity = VLC_FALSE;
+    p_sys->i_input_rate = INPUT_RATE_DEFAULT;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
@@ -219,6 +223,9 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         block_Release( *pp_block );
         return NULL;
     }
+
+    if( (*pp_block)->i_rate > 0 )
+        p_sys->i_input_rate = (*pp_block)->i_rate;
 
     block_BytestreamPush( &p_sys->bytestream, *pp_block );
 
@@ -535,7 +542,8 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
 
     p_buf->start_date = aout_DateGet( &p_sys->end_date );
     p_buf->end_date =
-        aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length );
+        aout_DateIncrement( &p_sys->end_date,
+                            p_sys->i_frame_length * p_sys->i_input_rate / INPUT_RATE_DEFAULT );
     p_buf->b_discontinuity = p_sys->b_discontinuity;
     p_sys->b_discontinuity = VLC_FALSE;
 
@@ -559,8 +567,9 @@ static block_t *GetSoutBuffer( decoder_t *p_dec )
     p_block->i_pts = p_block->i_dts = aout_DateGet( &p_sys->end_date );
 
     p_block->i_length =
-        aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length ) -
-            p_block->i_pts;
+        aout_DateIncrement( &p_sys->end_date,
+                            p_sys->i_frame_length * p_sys->i_input_rate / INPUT_RATE_DEFAULT ) -
+                                p_block->i_pts;
 
     return p_block;
 }

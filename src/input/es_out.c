@@ -33,6 +33,7 @@
 #include <vlc_input.h>
 #include <vlc_es_out.h>
 #include <vlc_block.h>
+#include <vlc_aout.h>
 
 #include "input_internal.h"
 
@@ -1216,7 +1217,6 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
             es->i_preroll_end = -1;
     }
 
-    /* +11 -> avoid null value with non null dts/pts */
     if( p_block->i_dts > 0 && (p_block->i_flags&BLOCK_FLAG_PREROLL) )
     {
         p_block->i_dts += i_delay;
@@ -1252,8 +1252,10 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     p_block->i_rate = p_input->p->i_rate;
 
     /* TODO handle mute */
-    if( es->p_dec && ( es->fmt.i_cat != AUDIO_ES ||
-        p_input->p->i_rate == INPUT_RATE_DEFAULT ) )
+    if( es->p_dec &&
+        ( es->fmt.i_cat != AUDIO_ES ||
+          ( p_input->p->i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE &&
+            p_input->p->i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE ) ) )
     {
         input_DecoderDecode( es->p_dec, p_block );
     }
@@ -1511,7 +1513,6 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
 
             i_pcr = (int64_t)va_arg( args, int64_t );
             /* search program */
-            /* 11 is a vodoo trick to avoid non_pcr*9/100 to be null */
             input_ClockSetPCR( p_sys->p_input, &p_pgrm->clock, i_pcr );
             return VLC_SUCCESS;
         }

@@ -34,6 +34,7 @@
 #include <vlc_block.h>
 #include <vlc_sout.h>
 #include <vlc_codecs.h>
+#include <vlc_input.h>
 
 #include "vlc_block_helper.h"
 
@@ -72,6 +73,8 @@ struct decoder_sys_t
     unsigned int i_raw_blocks;
     unsigned int i_channels;
     unsigned int i_rate, i_frame_length, i_header_size;
+
+    int i_input_rate;
 };
 
 enum {
@@ -146,6 +149,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
     p_sys->i_state = STATE_NOSYNC;
     aout_DateSet( &p_sys->end_date, 0 );
     p_sys->bytestream = block_BytestreamInit( p_dec );
+    p_sys->i_input_rate = INPUT_RATE_DEFAULT;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
@@ -241,7 +245,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
     p_block->i_pts = p_block->i_dts = aout_DateGet( &p_sys->end_date );
 
     p_block->i_length = aout_DateIncrement( &p_sys->end_date,
-        p_dec->fmt_out.audio.i_frame_length ) - p_block->i_pts;
+        p_dec->fmt_out.audio.i_frame_length * p_sys->i_input_rate / INPUT_RATE_DEFAULT ) - p_block->i_pts;
 
     return p_block;
 }
@@ -276,6 +280,9 @@ static block_t *ADTSPacketizeBlock( decoder_t *p_dec, block_t **pp_block )
         block_Release( *pp_block );
         return NULL;
     }
+
+    if( (*pp_block)->i_rate > 0 )
+        p_sys->i_input_rate = (*pp_block)->i_rate;
 
     block_BytestreamPush( &p_sys->bytestream, *pp_block );
 
@@ -443,7 +450,8 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
     p_block->i_pts = p_block->i_dts = aout_DateGet( &p_sys->end_date );
 
     p_block->i_length = aout_DateIncrement( &p_sys->end_date,
-                            p_sys->i_frame_length ) - p_block->i_pts;
+                            p_sys->i_frame_length * p_sys->i_input_rate / INPUT_RATE_DEFAULT ) -
+                                p_block->i_pts;
 
     *pp_out_buffer = p_block;
     return p_block->p_buffer;

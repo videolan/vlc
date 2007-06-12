@@ -78,6 +78,8 @@ struct decoder_sys_t
     audio_date_t end_date;
     int          i_last_block_size;
 
+    int i_input_rate;
+
     /*
     ** Channel reordering
     */
@@ -237,6 +239,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_last_block_size = 0;
     p_sys->b_packetizer = VLC_FALSE;
     p_sys->i_headers = 0;
+    p_sys->i_input_rate = INPUT_RATE_DEFAULT;
 
     /* Take care of vorbis init */
     vorbis_info_init( &p_sys->vi );
@@ -291,6 +294,9 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* Block to Ogg packet */
         oggpacket.packet = (*pp_block)->p_buffer;
         oggpacket.bytes = (*pp_block)->i_buffer;
+
+        if( (*pp_block)->i_rate > 0 )
+            p_sys->i_input_rate = (*pp_block)->i_rate;
     }
     else
     {
@@ -563,7 +569,7 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
         /* Date management */
         p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );
         p_aout_buffer->end_date = aout_DateIncrement( &p_sys->end_date,
-                                                      i_samples );
+                                                      i_samples * p_sys->i_input_rate / INPUT_RATE_DEFAULT );
         return p_aout_buffer;
     }
     else
@@ -590,8 +596,9 @@ static block_t *SendPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     p_block->i_dts = p_block->i_pts = aout_DateGet( &p_sys->end_date );
 
     if( p_sys->i_headers >= 3 )
-        p_block->i_length = aout_DateIncrement( &p_sys->end_date, i_samples ) -
-            p_block->i_pts;
+        p_block->i_length = aout_DateIncrement( &p_sys->end_date,
+            i_samples * p_sys->i_input_rate / INPUT_RATE_DEFAULT ) -
+                p_block->i_pts;
     else
         p_block->i_length = 0;
 

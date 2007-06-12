@@ -79,7 +79,7 @@
 int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input );
 int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input );
 int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
-                    aout_buffer_t * p_buffer );
+                    aout_buffer_t * p_buffer, int i_input_rate );
 
 /* From filters.c : */
 int aout_FiltersCreatePipeline ( aout_instance_t * p_aout, aout_filter_t ** pp_filters, int * pi_nb_filters, const audio_sample_format_t * p_input_format, const audio_sample_format_t * p_output_format );
@@ -129,5 +129,5 @@ aout_input_t * __aout_DecNew( vlc_object_t *, aout_instance_t **, audio_sample_f
 int aout_DecDelete ( aout_instance_t *, aout_input_t * );
 aout_buffer_t * aout_DecNewBuffer( aout_instance_t *, aout_input_t *, size_t );
 void aout_DecDeleteBuffer( aout_instance_t *, aout_input_t *, aout_buffer_t * );
-int aout_DecPlay( aout_instance_t *, aout_input_t *, aout_buffer_t * );
+int aout_DecPlay( aout_instance_t *, aout_input_t *, aout_buffer_t *, int i_input_rate );
 

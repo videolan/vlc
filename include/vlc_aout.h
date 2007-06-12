@@ -169,6 +169,9 @@ struct aout_buffer_t
 /* Number of samples in an A/52 frame. */
 #define A52_FRAME_NB 1536
 
+/* Max input rate factor (1/4 -> 4) */
+#define AOUT_MAX_INPUT_RATE (4)
+
 /** date incrementation helper structure without long-term
  * rounding errors
  */
@@ -277,6 +280,8 @@ struct aout_input_t
     /* Did we just change the output format? (expect buffer inconsistencies) */
     vlc_bool_t              b_changed;
 
+    /* last rate from input */
+    int                     i_last_input_rate;
     /* internal caching delay from input */
     int                     i_pts_delay;
     /* desynchronisation delay request by the user */

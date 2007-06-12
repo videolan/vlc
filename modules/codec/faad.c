@@ -69,6 +69,8 @@ struct decoder_sys_t
     uint32_t pi_channel_positions[MAX_CHANNEL_POSITIONS];
 
     vlc_bool_t b_sbr, b_ps;
+
+    int i_input_rate;
 };
 
 static const uint32_t pi_channels_in[MAX_CHANNEL_POSITIONS] =
@@ -166,6 +168,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_buffer = p_sys->i_buffer_size = 0;
     p_sys->p_buffer = 0;
 
+    p_sys->i_input_rate = INPUT_RATE_DEFAULT;
+
     /* Faad2 can't deal with truncated data (eg. from MPEG TS) */
     p_dec->b_need_packetized = VLC_TRUE;
 
@@ -190,6 +194,9 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         block_Release( p_block );
         return NULL;
     }
+
+    if( p_block->i_rate > 0 )
+        p_sys->i_input_rate = p_block->i_rate;
 
     /* Append the block to the temporary buffer */
     if( p_sys->i_buffer_size < p_sys->i_buffer + p_block->i_buffer )
@@ -374,7 +381,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         p_out->start_date = aout_DateGet( &p_sys->date );
         p_out->end_date = aout_DateIncrement( &p_sys->date,
-                                              frame.samples / frame.channels );
+            (frame.samples / frame.channels) * p_sys->i_input_rate / INPUT_RATE_DEFAULT );
 
         DoReordering( p_dec, (uint32_t *)p_out->p_buffer, samples,
                       frame.samples / frame.channels, frame.channels,

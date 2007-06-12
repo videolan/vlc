@@ -293,10 +293,10 @@ void aout_FiltersHintBuffers( aout_instance_t * p_aout,
         aout_filter_t * p_filter = pp_filters[i];
 
         int i_output_size = p_filter->output.i_bytes_per_frame
-                             * p_filter->output.i_rate
+                             * p_filter->output.i_rate * AOUT_MAX_INPUT_RATE
                              / p_filter->output.i_frame_length;
         int i_input_size = p_filter->input.i_bytes_per_frame
-                             * p_filter->input.i_rate
+                             * p_filter->input.i_rate * AOUT_MAX_INPUT_RATE
                              / p_filter->input.i_frame_length;
 
         p_first_alloc->i_bytes_per_sec = __MAX( p_first_alloc->i_bytes_per_sec,
@@ -357,6 +357,9 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
             aout_BufferFree( *pp_input_buffer );
             *pp_input_buffer = p_output_buffer;
         }
+
+        if( p_output_buffer->i_nb_samples <= 0 )
+            break;
     }
 }
 

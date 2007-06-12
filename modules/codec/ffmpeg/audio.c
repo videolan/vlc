@@ -28,6 +28,7 @@
 #include <vlc/vlc.h>
 #include <vlc_aout.h>
 #include <vlc_codec.h>
+#include <vlc_input.h>
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H
@@ -75,6 +76,8 @@ struct decoder_sys_t
 
     /* */
     int     i_reject_count;
+
+    int i_input_rate;
 };
 
 /*****************************************************************************
@@ -146,6 +149,7 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_samples = NULL;
     p_sys->i_samples = 0;
     p_sys->i_reject_count = 0;
+    p_sys->i_input_rate = INPUT_RATE_DEFAULT;
 
     aout_DateSet( &p_sys->end_date, 0 );
     if( p_dec->fmt_in.audio.i_rate )
@@ -178,7 +182,8 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
     }
 
     p_buffer->start_date = aout_DateGet( &p_sys->end_date );
-    p_buffer->end_date = aout_DateIncrement( &p_sys->end_date, i_samples );
+    p_buffer->end_date = aout_DateIncrement( &p_sys->end_date,
+                                             i_samples * p_sys->i_input_rate / INPUT_RATE_DEFAULT );
 
     memcpy( p_buffer->p_buffer, p_sys->p_samples, p_buffer->i_nb_bytes );
 
@@ -201,6 +206,9 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
     if( !pp_block || !*pp_block ) return NULL;
 
     p_block = *pp_block;
+
+    if( p_block->i_rate > 0 )
+        p_sys->i_input_rate = p_block->i_rate;
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {

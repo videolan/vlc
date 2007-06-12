@@ -468,6 +468,7 @@ static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
 static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
 {
     input_thread_t *p_input = p_dec->p_owner->p_input;
+    const int i_rate = p_block->i_rate;
     aout_buffer_t *p_aout_buf;
 
     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
@@ -491,7 +492,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
         }
         aout_DecPlay( p_dec->p_owner->p_aout,
                       p_dec->p_owner->p_aout_input,
-                      p_aout_buf );
+                      p_aout_buf, i_rate );
     }
 }
 static void VoutDisplayedPicture( vout_thread_t *p_vout, picture_t *p_pic )
@@ -523,7 +524,8 @@ static void VoutFlushPicture( vout_thread_t *p_vout )
     {
         picture_t *p_pic = p_vout->render.pp_picture[i];
 
-        if( p_pic->i_status != READY_PICTURE )
+        if( p_pic->i_status == READY_PICTURE ||
+            p_pic->i_status == DISPLAYED_PICTURE )
         {
             /* We cannot change picture status if it is in READY_PICTURE state,
              * Just make sure they won't be displayed */

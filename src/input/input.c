@@ -1670,9 +1670,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 val.i_int = i_rate;
                 var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
 
-                /* We will not send audio data if new rate != default */
-                if( i_rate != INPUT_RATE_DEFAULT && p_input->p->i_rate == INPUT_RATE_DEFAULT )
-                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE, VLC_TRUE );
+                input_EsOutDiscontinuity( p_input->p->p_es_out,
+                                          VLC_FALSE, VLC_FALSE );
 
                 p_input->p->i_rate  = i_rate;
 

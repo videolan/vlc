@@ -310,13 +310,20 @@ void aout_DecDeleteBuffer( aout_instance_t * p_aout, aout_input_t * p_input,
  * aout_DecPlay : filter & mix the decoded buffer
  *****************************************************************************/
 int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
-                  aout_buffer_t * p_buffer )
+                  aout_buffer_t * p_buffer, int i_input_rate )
 {
     if ( p_buffer->start_date == 0 )
     {
         msg_Warn( p_aout, "non-dated buffer received" );
         aout_BufferFree( p_buffer );
         return -1;
+    }
+
+    if( i_input_rate > INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE ||
+        i_input_rate < INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE )
+    {
+        aout_BufferFree( p_buffer );
+        return 0;
     }
 
     /* Apply the desynchronisation requested by the user */
@@ -375,7 +382,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* If the buffer is too early, wait a while. */
     mwait( p_buffer->start_date - AOUT_MAX_PREPARE_TIME );
 
-    if ( aout_InputPlay( p_aout, p_input, p_buffer ) == -1 )
+    if ( aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate ) == -1 )
     {
         vlc_mutex_unlock( &p_input->lock );
         return -1;
