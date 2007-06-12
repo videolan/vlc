@@ -758,7 +758,8 @@ static void RunThread( vout_thread_t *p_vout)
         return;
     }
 
-    DisplayTitleOnOSD( p_vout );
+    if( p_vout->b_title_show )
+        DisplayTitleOnOSD( p_vout );
 
     /*
      * Main loop - it is not executed if an error occurred during
@@ -1642,14 +1643,14 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
     if( p_input )
     {
         i_now = mdate();
-        i_stop = i_now + (mtime_t)(15000000);
+        i_stop = i_now + (mtime_t)(p_vout->i_title_timeout * 1000);
         if( input_GetItem(p_input)->p_meta &&
             input_GetItem(p_input)->p_meta->psz_nowplaying &&
             *input_GetItem(p_input)->p_meta->psz_nowplaying )
         {
             vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
                                    input_GetItem(p_input)->p_meta->psz_nowplaying, NULL,
-                                   OSD_ALIGN_BOTTOM,
+                                   p_vout->i_title_position,
                                    30 + p_vout->fmt_in.i_width
                                       - p_vout->fmt_in.i_visible_width
                                       - p_vout->fmt_in.i_x_offset,
@@ -1672,7 +1673,7 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
 
                 vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
                                        psz_string, NULL,
-                                       OSD_ALIGN_BOTTOM,
+                                       p_vout->i_title_position,
                                        30 + p_vout->fmt_in.i_width
                                           - p_vout->fmt_in.i_visible_width
                                           - p_vout->fmt_in.i_x_offset,
@@ -1685,7 +1686,7 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
         {
             vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
                                    input_GetItem(p_input)->psz_name, NULL,
-                                   OSD_ALIGN_BOTTOM,
+                                   p_vout->i_title_position,
                                    30 + p_vout->fmt_in.i_width
                                       - p_vout->fmt_in.i_visible_width
                                       - p_vout->fmt_in.i_x_offset,

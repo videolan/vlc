@@ -62,6 +62,8 @@ static int FullscreenCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static int SnapshotCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
+static int TitleCallback( vlc_object_t *, char const *,
+                       vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * vout_RequestWindow: Create/Get a video window if possible.
@@ -208,6 +210,18 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     var_Create( p_vout, "video-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "video-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
+    var_Create( p_vout, "video-title-show", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-title-timeout", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-title-position", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
+    p_vout->b_title_show = var_GetBool( p_vout, "video-title-show" );
+    p_vout->i_title_timeout = (mtime_t) var_GetInteger( p_vout, "video-title-timeout" );
+    p_vout->i_title_position = var_GetInteger( p_vout, "video-title-position" );
+
+    var_AddCallback( p_vout, "video-title-show", TitleCallback, NULL );
+    var_AddCallback( p_vout, "video-title-timeout", TitleCallback, NULL );
+    var_AddCallback( p_vout, "video-title-position", TitleCallback, NULL );
 
     /* Zoom object var */
     var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_ISCOMMAND |
@@ -1166,4 +1180,17 @@ static int SnapshotCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_Control( p_vout, VOUT_SNAPSHOT );
     (void)psz_cmd; (void)oldval; (void)newval; (void)p_data;
     return VLC_SUCCESS;
+}
+
+static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+    if( !strncmp( psz_cmd, "video-title-show", 16 ) )
+        p_vout->b_title_show = newval.b_bool;
+    else if( !strncmp( psz_cmd, "video-title-timeout", 19 ) )
+        p_vout->i_title_timeout = (mtime_t) newval.i_int;
+    else if( !strncmp( psz_cmd, "video-title-position", 20 ) )
+        p_vout->i_title_position = newval.i_int;
 }

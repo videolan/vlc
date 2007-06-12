@@ -303,6 +303,23 @@ static const char *ppsz_align_descriptions[] =
 #define VIDEO_ON_TOP_LONGTEXT N_( \
     "Always place the video window on top of other windows." )
 
+#define VIDEO_TITLE_SHOW_TEXT N_("Show media title on video.")
+#define VIDEO_TITLE_SHOW_LONGTEXT N_( \
+    "Display the title of the video on top of the movie.")
+
+#define VIDEO_TITLE_TIMEOUT_TEXT N_("Show video title for x miliseconds.")
+#define VIDEO_TITLE_TIMEOUT_LONGTEXT N_( \
+    "Show the video title for n miliseconds, default is 5000 ms (5 sec.)")
+
+#define VIDEO_TITLE_POSITION_TEXT N_("Position of video title.")
+#define VIDEO_TITLE_POSITION_LONGTEXT N_( \
+    "Place on video where to display the title (default bottom center).")
+
+static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const char *ppsz_pos_descriptions[] =
+{ N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
+  N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
+
 #define SS_TEXT N_("Disable screensaver")
 #define SS_LONGTEXT N_("Disable the screensaver during video playback." )
 
@@ -1309,6 +1326,14 @@ vlc_module_begin();
               VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
     add_bool( "disable-screensaver", VLC_TRUE, NULL, SS_TEXT, SS_LONGTEXT,
               VLC_TRUE );
+
+    add_bool( "video-title-show", 1, NULL, VIDEO_TITLE_SHOW_TEXT,
+              VIDEO_TITLE_SHOW_LONGTEXT, VLC_FALSE );
+    add_integer( "video-title-timeout", 5000, NULL, VIDEO_TITLE_TIMEOUT_TEXT,
+                 VIDEO_TITLE_TIMEOUT_LONGTEXT, VLC_FALSE );
+    add_integer( "video-title-position", 8, NULL, VIDEO_TITLE_POSITION_TEXT,
+                 VIDEO_TITLE_POSITION_LONGTEXT, VLC_FALSE );
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     set_section( N_("Snapshot") , NULL );
     add_directory( "snapshot-path", NULL, NULL, SNAP_PATH_TEXT,

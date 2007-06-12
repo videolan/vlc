@@ -496,6 +496,11 @@ struct vout_thread_t
 
     /* Video output configuration */
     config_chain_t *p_cfg;
+
+    /* Show media title on videoutput */
+    vlc_bool_t      b_title_show;
+    mtime_t         i_title_timeout;
+    int             i_title_position;
 };
 
 #define I_OUTPUTPICTURES p_vout->output.i_pictures
