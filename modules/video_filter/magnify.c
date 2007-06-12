@@ -153,6 +153,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->p_sys->i_y = 0;
 #define ZOOM_FACTOR 100
     p_vout->p_sys->i_zoom = 200;
+    p_vout->p_sys->b_visible = VLC_TRUE;
 
     var_AddCallback( p_vout->p_sys->p_vout, "mouse-x", MouseEvent, p_vout );
     var_AddCallback( p_vout->p_sys->p_vout, "mouse-y", MouseEvent, p_vout );
