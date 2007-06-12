@@ -208,6 +208,8 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
             /* This video output is cool! Hijack it. */
             spu_Attach( p_vout->p_spu, p_this, VLC_TRUE );
             vlc_object_attach( p_vout, p_this );
+            if( p_vout->b_title_show )
+                DisplayTitleOnOSD( p_vout );
             vlc_object_release( p_vout );
         }
     }
