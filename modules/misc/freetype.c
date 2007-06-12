@@ -295,6 +295,11 @@ static int Create( vlc_object_t *p_this )
     {
         if( psz_fontfile ) free( psz_fontfile );
         psz_fontfile = (char *)malloc( PATH_MAX + 1 );
+        if( !psz_fontfile )
+        {
+            msg_Err( p_filter, "out of memory" );
+            goto error;
+        }
 #ifdef WIN32
         GetWindowsDirectory( psz_fontfile, PATH_MAX + 1 );
         strcat( psz_fontfile, "\\fonts\\arial.ttf" );
@@ -861,9 +866,9 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
                        subpicture_region_t *p_region_in )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    line_desc_t  *p_lines = 0, *p_line = 0, *p_next = 0, *p_prev = 0;
+    line_desc_t  *p_lines = NULL, *p_line = NULL, *p_next = NULL, *p_prev = NULL;
     int i, i_pen_y, i_pen_x, i_error, i_glyph_index, i_previous;
-    uint32_t *psz_unicode, *psz_unicode_orig = 0, i_char, *psz_line_start;
+    uint32_t *psz_unicode, *psz_unicode_orig = NULL, i_char, *psz_line_start;
     int i_string_length;
     char *psz_string;
     vlc_iconv_t iconv_handle = (vlc_iconv_t)(-1);
@@ -950,6 +955,11 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         int start_pos, pos = 0;
 
         p_fribidi_string = malloc( (i_string_length + 1) * sizeof(uint32_t) );
+        if( !p_fribidi_string )
+        {
+            msg_Err( p_filter, "out of memory" );
+            goto error;
+        }
 
         /* Do bidi conversion line-by-line */
         while(pos < i_string_length)
@@ -1149,6 +1159,9 @@ static int PushFont( font_stack_t **p_font, const char *psz_name, int i_size,
         return VLC_EGENERIC;
 
     p_new = malloc( sizeof( font_stack_t ) );
+    if( !p_new )
+        return VLC_ENOMEM;
+
     p_new->p_next = NULL;
 
     if( psz_name )
@@ -1279,6 +1292,12 @@ static uint32_t *IconvText( filter_t *p_filter, char *psz_string )
         uint32_t *p_fribidi_string;
 
         p_fribidi_string = malloc( (i_string_length + 1) * sizeof(uint32_t) );
+        if( !p_fribidi_string )
+        {
+            msg_Err( p_filter, "out of memory" );
+            free( psz_unicode );
+            return NULL;
+        }
 
         /* Do bidi conversion line-by-line */
         FriBidiCharType base_dir = FRIBIDI_TYPE_LTR;
