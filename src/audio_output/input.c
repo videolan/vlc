@@ -426,6 +426,12 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         vlc_mutex_unlock( &p_aout->mixer_lock );
     }
 
+    if( i_input_rate != INPUT_RATE_DEFAULT && p_input->i_nb_resamplers <= 0 )
+    {
+        inputDrop( p_aout, p_input, p_buffer );
+        return 0;
+    }
+
 #ifdef AOUT_PROCESS_BEFORE_CHEKS
     /* Run pre-filters. */
     aout_FiltersPlay( p_aout, p_input->pp_filters, p_input->i_nb_filters,
