@@ -125,10 +125,10 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 {
     char psz_duration[MSTRTIME_MAX_SIZE];
     assert( p_item->p_input->i_id == i_input_id );
-    strings[0] = QString::fromUtf8( p_item->p_input->psz_name );
+    strings[0] = qfu( p_item->p_input->psz_name );
     if( p_item->p_input->p_meta )
     {
-        strings[1] = QString::fromUtf8( p_item->p_input->p_meta->psz_artist );
+        strings[1] = qfu( p_item->p_input->p_meta->psz_artist );
     }
     secstotimestr( psz_duration, p_item->p_input->i_duration / 1000000 );
     strings[2] = QString( psz_duration );
