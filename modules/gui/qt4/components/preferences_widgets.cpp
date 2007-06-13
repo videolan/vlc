@@ -192,7 +192,7 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
                                           int &line, bool pwd ) :
                            VStringConfigControl( _p_this, _p_item, _parent )
 {
-    label = new QLabel( qfu(p_item->psz_text) );
+    label = new QLabel( qtr(p_item->psz_text) );
     text = new QLineEdit( qfu(p_item->value.psz) );
     finish();
 
@@ -221,9 +221,9 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
 void StringConfigControl::finish()
 {
     text->setText( qfu(p_item->value.psz) );
-    text->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+    text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 /*********** File **************/
@@ -233,7 +233,7 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
                                           int &line, bool pwd ) :
                            VStringConfigControl( _p_this, _p_item, _parent )
 {
-    label = new QLabel( qfu(p_item->psz_text) );
+    label = new QLabel( qtr(p_item->psz_text) );
     text = new QLineEdit( qfu(p_item->value.psz) );
     browse = new QPushButton( qtr( "Browse..." ) );
     QHBoxLayout *textAndButton = new QHBoxLayout();
@@ -286,9 +286,9 @@ void FileConfigControl::updateField()
 void FileConfigControl::finish()
 {
     text->setText( qfu(p_item->value.psz) );
-    text->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+    text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 /********* String / Directory **********/
@@ -343,7 +343,7 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
                QGridLayout *l, int &line) :
                VStringConfigControl( _p_this, _p_item, _parent )
 {
-    label = new QLabel( qfu(p_item->psz_text) );
+    label = new QLabel( qtr(p_item->psz_text) );
     combo = new QComboBox();
     finish( bycat );
     if( !l )
@@ -381,9 +381,9 @@ void StringListConfigControl::finish( bool bycat )
                                           p_item->ppsz_list[i_index] ) )
             combo->setCurrentIndex( combo->count() - 1 );
     }
-    combo->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+    combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 QString StringListConfigControl::getValue()
@@ -397,7 +397,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
                QGridLayout *l, int &line) :
                VStringConfigControl( _p_this, _p_item, _parent )
 {
-    label = new QLabel( qfu(p_item->psz_text) );
+    label = new QLabel( qtr(p_item->psz_text) );
     combo = new QComboBox();
     finish( bycat );
     if( !l )
@@ -445,7 +445,7 @@ void ModuleConfigControl::finish( bool bycat )
                 /* Hack: required subcategory is stored in i_min */
                 if( p_config->i_type == CONFIG_SUBCATEGORY &&
                     p_config->value.i == p_item->min.i )
-                    combo->addItem( qfu(p_parser->psz_longname),
+                    combo->addItem( qtr(p_parser->psz_longname),
                                     QVariant( p_parser->psz_object_name ) );
                 if( p_item->value.psz && !strcmp( p_item->value.psz,
                                                   p_parser->psz_object_name) )
@@ -454,7 +454,7 @@ void ModuleConfigControl::finish( bool bycat )
         }
         else if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
         {
-            combo->addItem( qfu(p_parser->psz_longname),
+            combo->addItem( qtr(p_parser->psz_longname),
                             QVariant( p_parser->psz_object_name ) );
             if( p_item->value.psz && !strcmp( p_item->value.psz,
                                               p_parser->psz_object_name) )
@@ -462,9 +462,9 @@ void ModuleConfigControl::finish( bool bycat )
         }
     }
     vlc_list_release( p_list );
-    combo->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+    combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 QString ModuleConfigControl::getValue()
@@ -478,7 +478,7 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
         QGridLayout *l, int &line) :
     VStringConfigControl( _p_this, _p_item, _parent )
 {
-    groupBox = new QGroupBox ( qfu(p_item->psz_text) );
+    groupBox = new QGroupBox ( qtr(p_item->psz_text) );
     text = new QLineEdit();
     QGridLayout *layoutGroupBox = new QGridLayout( groupBox );
 
@@ -503,7 +503,7 @@ ModuleListConfigControl::ModuleListConfigControl( vlc_object_t *_p_this,
         l->addWidget( groupBox, line, 0, 1, -1 );
     }
 
-    text->setToolTip( formatTooltip( qfu( p_item->psz_longtext) ) );
+    text->setToolTip( formatTooltip( qtr( p_item->psz_longtext) ) );
 }
 #if 0
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
@@ -529,11 +529,11 @@ ModuleListConfigControl::~ModuleListConfigControl()
 
 #define CHECKBOX_LISTS \
 { \
-       QCheckBox *cb = new QCheckBox( qfu( p_parser->psz_longname ) );\
+       QCheckBox *cb = new QCheckBox( qtr( p_parser->psz_longname ) );\
        checkBoxListItem *cbl = new checkBoxListItem; \
 \
        CONNECT( cb, stateChanged( int ), this, onUpdate( int ) );\
-       cb->setToolTip( formatTooltip( qfu(p_parser->psz_longname)) );\
+       cb->setToolTip( formatTooltip( qtr(p_parser->psz_longname)) );\
        cbl->checkBox = cb; \
 \
        int i = -1; \
@@ -578,9 +578,9 @@ void ModuleListConfigControl::finish( bool bycat )
         }
     }
     vlc_list_release( p_list );
-    text->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+    text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( groupBox )
-        groupBox->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+        groupBox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 #undef CHECKBOX_LISTS
 
@@ -644,7 +644,7 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *_p_this,
                                             int &line ) :
                            VIntConfigControl( _p_this, _p_item, _parent )
 {
-    label = new QLabel( qfu(p_item->psz_text) );
+    label = new QLabel( qtr(p_item->psz_text) );
     spin = new QSpinBox; spin->setMinimumWidth( 80 );
     spin->setAlignment( Qt::AlignRight );
     spin->setMaximumWidth( 90 );
@@ -677,9 +677,9 @@ void IntegerConfigControl::finish()
     spin->setMaximum( 2000000000 );
     spin->setMinimum( -2000000000 );
     spin->setValue( p_item->value.i );
-    spin->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+    spin->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 int IntegerConfigControl::getValue()
@@ -722,9 +722,9 @@ IntegerRangeSliderConfigControl::IntegerRangeSliderConfigControl(
     slider->setMaximum( p_item->max.i );
     slider->setMinimum( p_item->min.i );
     slider->setValue( p_item->value.i );
-    slider->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+    slider->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 int IntegerRangeSliderConfigControl::getValue()
@@ -739,7 +739,7 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
                QGridLayout *l, int &line) :
                VIntConfigControl( _p_this, _p_item, _parent )
 {
-    label = new QLabel( qfu(p_item->psz_text) );
+    label = new QLabel( qtr(p_item->psz_text) );
     combo = new QComboBox();
     finish( bycat );
     if( !l )
@@ -769,14 +769,14 @@ void IntegerListConfigControl::finish( bool bycat )
 
     for( int i_index = 0; i_index < p_item->i_list; i_index++ )
     {
-        combo->addItem( qfu(p_item->ppsz_list_text[i_index] ),
+        combo->addItem( qtr(p_item->ppsz_list_text[i_index] ),
                         QVariant( p_item->pi_list[i_index] ) );
         if( p_item->value.i == p_item->pi_list[i_index] )
             combo->setCurrentIndex( combo->count() - 1 );
     }
-    combo->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+    combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 int IntegerListConfigControl::getValue()
@@ -791,7 +791,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
                                       int &line ) :
                     VIntConfigControl( _p_this, _p_item, _parent )
 {
-    checkbox = new QCheckBox( qfu(p_item->psz_text) );
+    checkbox = new QCheckBox( qtr(p_item->psz_text) );
     finish();
 
     if( !l )
@@ -820,7 +820,7 @@ void BoolConfigControl::finish()
 {
     checkbox->setCheckState( p_item->value.i == VLC_TRUE ? Qt::Checked
                                                         : Qt::Unchecked );
-    checkbox->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+    checkbox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 int BoolConfigControl::getValue()
@@ -839,7 +839,7 @@ FloatConfigControl::FloatConfigControl( vlc_object_t *_p_this,
                                         int &line ) :
                     VFloatConfigControl( _p_this, _p_item, _parent )
 {
-    label = new QLabel( qfu(p_item->psz_text) );
+    label = new QLabel( qtr(p_item->psz_text) );
     spin = new QDoubleSpinBox; spin->setMinimumWidth( 80 );
     spin->setMaximumWidth( 90 );
     spin->setAlignment( Qt::AlignRight );
@@ -875,9 +875,9 @@ void FloatConfigControl::finish()
     spin->setMinimum( -2000000000. );
     spin->setSingleStep( 0.1 );
     spin->setValue( (double)p_item->value.f );
-    spin->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+    spin->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
-        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 float FloatConfigControl::getValue()
@@ -941,7 +941,7 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
 void KeySelectorControl::finish()
 {
     if( label )
-        label->setToolTip( formatTooltip(qfu(p_item->psz_longtext)) );
+        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 
     /* Fill the table */
     table->setColumnCount( 2 );
@@ -958,7 +958,7 @@ void KeySelectorControl::finish()
             strstr( p_item->psz_name , "key-" ) )
         {
             QTreeWidgetItem *treeItem = new QTreeWidgetItem();
-            treeItem->setText( 0, qfu( p_item->psz_text ) );
+            treeItem->setText( 0, qtr( p_item->psz_text ) );
             treeItem->setText( 1, VLCKeyToString( p_item->value.i ) );
             treeItem->setData( 0, Qt::UserRole,
                                   QVariant::fromValue( (void*)p_item ) );

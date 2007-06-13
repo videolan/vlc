@@ -93,8 +93,8 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     /* add the tabs to the Tabwidget */
     tab->addTab( NULL, _( "Information" ) );
     tab->addTab( NULL, _( "Authors" ) );
-    tab->addTab( thanksEdit, _("Thanks") );
-    tab->addTab( licenseEdit, _("Distribution License") );
+    tab->addTab( thanksEdit, qtr("Thanks") );
+    tab->addTab( licenseEdit, qtr("Distribution License") );
 
     BUTTONACT( closeButton, close() );
 }

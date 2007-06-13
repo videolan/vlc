@@ -104,11 +104,11 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         case CONFIG_CATEGORY:
             if( p_item->value.i == -1 ) break;
             data = new PrefsItemData();
-            data->name = QString( qfu( config_CategoryNameGet
+            data->name = QString( qtr( config_CategoryNameGet
                                            ( p_item->value.i ) ) );
             psz_help = config_CategoryHelpGet( p_item->value.i );
             if( psz_help )
-                data->help = QString( qfu(psz_help) );
+                data->help = QString( qtr(psz_help) );
             else
                 data->help.clear();
             data->i_type = TYPE_CATEGORY;
@@ -149,11 +149,11 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                 // Data still contains the correct thing
                 data->i_type = TYPE_CATSUBCAT;
                 data->i_subcat_id = p_item->value.i;
-                data->name = QString( qfu( config_CategoryNameGet(
+                data->name = QString( qtr( config_CategoryNameGet(
                                             p_item->value.i )) );
                 psz_help = config_CategoryHelpGet( p_item->value.i );
                 if( psz_help )
-                    data->help = QString( qfu(psz_help) );
+                    data->help = QString( qtr(psz_help) );
                 else
                     data->help.clear();
                 current_item->setData( 0, Qt::UserRole,
@@ -161,11 +161,11 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
                 continue;
             }
             data = new PrefsItemData();
-            data->name = QString( qfu( config_CategoryNameGet(
+            data->name = QString( qtr( config_CategoryNameGet(
                                                         p_item->value.i)) );
             psz_help = config_CategoryHelpGet( p_item->value.i );
             if( psz_help )
-                data->help = QString( qfu(psz_help) );
+                data->help = QString( qtr(psz_help) );
             else
                 data->help.clear();
             data->i_type = TYPE_SUBCATEGORY;
@@ -259,7 +259,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         module_data->help.clear();
         // TODO image
         QTreeWidgetItem *module_item = new QTreeWidgetItem();
-        module_item->setText( 0, qfu( p_module->psz_shortname ?
+        module_item->setText( 0, qtr( p_module->psz_shortname ?
                       p_module->psz_shortname : p_module->psz_object_name) );
         //item->setIcon( 0 , XXX );
         module_item->setData( 0, Qt::UserRole,
@@ -390,11 +390,11 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
     else
     {
-        head = QString( qfu(p_module->psz_longname) );
+        head = QString( qtr(p_module->psz_longname) );
         if( p_module->psz_help )
         {
             help.append( "\n" );
-            help.append( qfu( p_module->psz_help ) );
+            help.append( qtr( p_module->psz_help ) );
         }
     }
 
@@ -446,7 +446,7 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 layout->addWidget( box, i_line, 0, 1, 2 );
                 i_line++;
             }
-            box = new QGroupBox( qfu(p_item->psz_text) );
+            box = new QGroupBox( qtr(p_item->psz_text) );
             boxlayout = new QGridLayout();
         }
         /* Only one hotkey control */

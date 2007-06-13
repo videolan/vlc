@@ -42,32 +42,32 @@
 #define EXT_FILTER_SUBTITLE     0x10
 
 #define ADD_FILTER_MEDIA( string )   \
-    string += _("Media Files");      \
+    string += qtr("Media Files");      \
     string += " ( ";                 \
     string += EXTENSIONS_MEDIA;      \
     string += ");;";
 #define ADD_FILTER_VIDEO( string )   \
-    string += _("Video Files");      \
+    string += qtr("Video Files");      \
     string += " ( ";                 \
     string += EXTENSIONS_VIDEO;      \
     string += ");;";
 #define ADD_FILTER_AUDIO( string )   \
-    string += _("Audio Files");      \
+    string += qtr("Audio Files");      \
     string += " ( ";                 \
     string += EXTENSIONS_AUDIO;      \
     string += ");;";
 #define ADD_FILTER_PLAYLIST( string )\
-    string += _("Playlist Files");   \
+    string += qtr("Playlist Files");   \
     string += " ( ";                 \
     string += EXTENSIONS_PLAYLIST;   \
     string += ");;";
 #define ADD_FILTER_SUBTITLE( string )\
-    string += _("Subtitles Files");   \
+    string += qtr("Subtitles Files");   \
     string += " ( ";                 \
     string += EXTENSIONS_SUBTITLE;   \
     string += ");;";
 #define ADD_FILTER_ALL( string )     \
-    string += _("All Files");        \
+    string += qtr("All Files");        \
     string += " (*.*)";
 
 #define OPEN_FILE_TAB           0x0
