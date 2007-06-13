@@ -1617,7 +1617,7 @@ then
 fi
 
 AC_ARG_ENABLE(switcher,
-  [  --enable-switcher       Stream-out switcher plugin (default disabled)])    
+  [  --enable-switcher       Stream-out switcher plugin (default disabled)])
 
 dnl Check for libshout
 AC_ARG_ENABLE(shout,
@@ -5409,13 +5409,21 @@ AS_IF([test "${enable_gnutls}" != "no"], [
   ])
 ])
 
-dnl Workaround for cross-compiling since AM_PATH_LIBGRYPT doesn't dectect
-dnl it and looks for libgcrypt headers in the wrong place.
-if test "${host_cpu}" = "${build_cpu}"
+dnl
+dnl libgcrypt
+dnl
+AC_ARG_ENABLE(libgcrypt,
+  [  --enable-libgcrypt      libgcrypts support (default enabled)])
+if test "${enable_libgcrypt}" != "no" -a "${enable_gnutls}" != "no"i
 then
-  AM_PATH_LIBGCRYPT([1:1.1.94], [have_libgcrypt="yes"], [have_libgcrypt="no"])
-else
-  AC_CHECK_HEADERS(gcrypt.h,have_libgcrypt="yes",have_libgcrypt="no")
+  dnl Workaround for cross-compiling since AM_PATH_LIBGRYPT doesn't dectect
+  dnl it and looks for libgcrypt headers in the wrong place.
+  if test "${host_cpu}" = "${build_cpu}"
+  then
+    AM_PATH_LIBGCRYPT([1:1.1.94], [have_libgcrypt="yes"], [have_libgcrypt="no"])
+  else
+    AC_CHECK_HEADERS(gcrypt.h,have_libgcrypt="yes",have_libgcrypt="no")
+  fi
 fi
 AM_CONDITIONAL([HAVE_LIBGCRYPT], [test "${have_libgcrypt}" = "yes"])
 
