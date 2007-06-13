@@ -47,7 +47,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
     p_input = NULL;
 
     setWindowTitle( qtr( "Media information" ) );
-    resize( 600 , 450 );
+    resize( 700 , 450 );
 
     QGridLayout *layout = new QGridLayout( this );
 
@@ -68,12 +68,12 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
     closeButton->setDefault( true );
 
     uriLine = new QLineEdit;
-    QLabel *uriLabel = new QLabel( qtr( "Location" ) );
+    QLabel *uriLabel = new QLabel( qtr( "Location :" ) );
 
-    layout->addWidget( IT, 0, 0, 1, 3 );
-    layout->addWidget( closeButton, 2, 2 );
-    layout->addWidget( uriLine, 1, 1, 1, 2 );
+    layout->addWidget( IT, 0, 0, 1, 7 );
+    layout->addWidget( closeButton, 2, 6 );
     layout->addWidget( uriLabel, 1, 0, 1, 1 );
+    layout->addWidget( uriLine, 1, 1, 1, 6 );
 
     BUTTONACT( closeButton, close() );
     CONNECT( MP, uriSet( QString ), uriLine, setText( QString ) );

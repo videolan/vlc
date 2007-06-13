@@ -47,39 +47,36 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
 {
     int line = 0;
     QGridLayout *l = new QGridLayout( this );
-    l->setColumnStretch( 2, 5 );
-    l->setColumnStretch( 5, 3 );
 
 #define ADD_META( string, widget ) {                             \
     l->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
     widget = new QLineEdit;                                      \
-    l->addWidget( widget, line, 1, 1, 7 );                       \
+    l->addWidget( widget, line, 1, 1, 9 );                       \
     line++;            }
 
     ADD_META( VLC_META_TITLE, title_text ); /* OK */
     ADD_META( VLC_META_ARTIST, artist_text ); /* OK */
-    ADD_META( VLC_META_GENRE, genre_text ); /* FIXME List id3genres.h is not
-                                               includable yet ? */
+    ADD_META( VLC_META_COLLECTION, collection_text ); /* OK */
 
-    /* Album Name */
-    l->addWidget( new QLabel( qfu( VLC_META_COLLECTION ) + " :" ), line, 0 );
-    collection_text = new QLineEdit;
-    l->addWidget( collection_text, line, 1, 1, 5 );
-    l->addWidget( new QLabel( qfu( VLC_META_DATE ) + " :" ), line, 6 );
+    /* Genre Name */ /* FIXME List id3genres.h is not includable yet ? */
+    genre_text = new QLineEdit;
+    l->addWidget( new QLabel( qtr( VLC_META_GENRE ) + " :" ), line, 0 );
+    l->addWidget( genre_text, line, 1, 1, 6 );
     /* Date (Should be in years) */
     date_text = new QSpinBox; setSpinBounds( date_text );
-    l->addWidget( date_text, line, 7 );
+    l->addWidget( new QLabel( qfu( VLC_META_DATE ) + " :" ), line, 7 );
+    l->addWidget( date_text, line, 8, 1, 2 );
     line++;
 
     /* Number and Rating */
     l->addWidget( new QLabel( qfu( _("Track number/Position" ) ) + " :" ),
                   line, 0 );
     seqnum_text = new QSpinBox; setSpinBounds( seqnum_text );
-    l->addWidget( seqnum_text, line, 1, 1, 3 );
+    l->addWidget( seqnum_text, line, 1, 1, 4 );
 
-    l->addWidget( new QLabel( qfu( VLC_META_RATING ) + " :" ), line, 4 );
+    l->addWidget( new QLabel( qfu( VLC_META_RATING ) + " :" ), line, 5 );
     rating_text = new QSpinBox; setSpinBounds( rating_text) ;
-    l->addWidget( rating_text, line, 5, 1, 3 );
+    l->addWidget( rating_text, line, 6, 1, 4 );
     line++;
 
     ADD_META( VLC_META_NOW_PLAYING, nowplaying_text );
@@ -87,23 +84,43 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     /* Language and settings */
     l->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 0 );
     language_text = new QLineEdit;
-    l->addWidget( language_text, line, 1, 1, 3 );
-    l->addWidget( new QLabel( qfu( VLC_META_SETTING ) + " :" ), line, 4 );
+    l->addWidget( language_text, line, 1, 1, 4 );
+    l->addWidget( new QLabel( qfu( VLC_META_SETTING ) + " :" ), line, 5 );
     setting_text = new QLineEdit;
-    l->addWidget( setting_text, line, 5, 1, 3 );
+    l->addWidget( setting_text, line, 6, 1, 4 );
     line++;
 
-    ADD_META( VLC_META_COPYRIGHT, copyright_text );
-    ADD_META( VLC_META_PUBLISHER, publisher_text );
+    /* ART_URL */
+    //    ADD_META( VLC_META_URL, setting_text );
+    art_cover = new QLabel( "" );
+    art_cover->setMinimumHeight( 128 );
+    art_cover->setMinimumWidth( 128 );
+    art_cover->setMaximumHeight( 128 );
+    art_cover->setMaximumWidth( 128 );
+    art_cover->setScaledContents( true );
+    art_cover->setPixmap( QPixmap( ":/noart.png" ) );
 
-    ADD_META( VLC_META_ENCODED_BY, publisher_text );
-    ADD_META( VLC_META_DESCRIPTION, description_text ); // Comment Two lines?
+    l->addWidget( art_cover, line, 8, 4, 2 );
+
+#define ADD_META_B( string, widget ) {                             \
+    l->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
+    widget = new QLineEdit;                                      \
+    l->addWidget( widget, line, 1, 1, 7 );                       \
+    line++;            }
+
+    ADD_META_B( VLC_META_COPYRIGHT, copyright_text );
+    ADD_META_B( VLC_META_PUBLISHER, publisher_text );
+
+    ADD_META_B( VLC_META_ENCODED_BY, publisher_text );
+    ADD_META_B( VLC_META_DESCRIPTION, description_text ); // Comment Two lines?
 
     /*  ADD_META( TRACKID)  DO NOT SHOW it */
     /*  ADD_URI - DO not show it, done outside */
 
-    /* ART_URL */
-    //    ADD_META( VLC_META_URL, setting_text );
+#undef ADD_META
+#undef ADD_META_B
+
+//  CONNECT( model,  artSet( QString ) , this, setArt( QString ) );
 }
 
 MetaPanel::~MetaPanel()
@@ -156,6 +173,15 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META_INT( rating, rating_text );
 
 #undef UPDATE_META
+}
+
+void MetaPanel::setArt( QString artUrl )
+{
+    msg_Dbg( p_intf, "Trying to update art" );
+    if( artUrl.isNull() )
+        art_cover->setPixmap( QPixmap( ":/noart.png" ) );
+    else
+        art_cover->setPixmap( QPixmap( artUrl ) );
 }
 
 void MetaPanel::clear(){}
