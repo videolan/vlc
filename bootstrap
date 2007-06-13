@@ -64,7 +64,7 @@ fi
 
 # Check for autoconf
 rm -f m4/autoconf260.m4
-case "$(autoconf --version|head -1)" in
+case "$(autoconf --version|head -n 1)" in
   *2.5[012345678]*)
     echo "Hey, your autoconf is quite old. Update it." >&2
     exit 1
