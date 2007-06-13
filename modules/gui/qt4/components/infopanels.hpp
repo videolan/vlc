@@ -74,8 +74,6 @@ private:
 public slots:
     void update( input_item_t * );
     void clear();
-private slots:
-    void setArt( QString );
 signals:
     void uriSet( QString );
 };

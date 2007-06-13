@@ -173,15 +173,14 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META_INT( rating, rating_text );
 
 #undef UPDATE_META
-}
-
-void MetaPanel::setArt( QString artUrl )
-{
-    msg_Dbg( p_intf, "Trying to update art" );
-    if( artUrl.isNull() )
-        art_cover->setPixmap( QPixmap( ":/noart.png" ) );
-    else
+    psz_meta = p_item->p_meta->psz_arturl;
+    if( psz_meta && !strncmp( psz_meta, "file://", 7 ) )
+    {
+        QString artUrl = qfu( psz_meta ).replace( "file://",QString("" ) );
         art_cover->setPixmap( QPixmap( artUrl ) );
+    }
+    else
+        art_cover->setPixmap( QPixmap( ":/noart.png" ) );
 }
 
 void MetaPanel::clear(){}

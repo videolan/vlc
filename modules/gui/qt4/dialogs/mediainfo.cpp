@@ -92,7 +92,7 @@ MediaInfoDialog::~MediaInfoDialog()
     writeSettings( "mediainfo" );
 }
 
-void MediaInfoDialog::showTab(int i_tab=0)
+void MediaInfoDialog::showTab( int i_tab = 0 )
 {
     this->show();
     IT->setCurrentIndex( i_tab );
@@ -106,7 +106,7 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
-void MediaInfoDialog::setInput(input_item_t *p_input)
+void MediaInfoDialog::setInput( input_item_t *p_input )
 {
     clear();
     vlc_mutex_lock( &p_input->lock );
@@ -117,7 +117,7 @@ void MediaInfoDialog::setInput(input_item_t *p_input)
 void MediaInfoDialog::update()
 {
     /* Timer runs at 150 ms, dont' update more than 2 times per second */
-    if( i_runs % 3 != 0 ) return;
+    if( i_runs % 4 != 0 ) return;
     i_runs++;
 
     /* Get Input and clear if non-existant */
