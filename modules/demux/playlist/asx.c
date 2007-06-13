@@ -567,8 +567,7 @@ static int Demux( demux_t *p_demux )
                 psz_parse = strcasestr( psz_parse, ">" );
 
                 /* If clientskip was enabled ... this is an ad */
-                if( psz_clientskip < psz_parse ) b_skip_entry = VLC_TRUE;
-                else b_skip_entry = VLC_FALSE;
+                b_skip_entry = (NULL != psz_clientskip) && (psz_clientskip < psz_parse);
 
                 // init entry details
                 FREENULL(psz_href);
