@@ -60,7 +60,7 @@
 
 #define SIGNAL_SEND \
     if( !dbus_connection_send( p_conn, p_msg, NULL ) ) \
-    return DBUS_HANDLER_RESULT_NEED_MEMORY; \
+        return DBUS_HANDLER_RESULT_NEED_MEMORY; \
     dbus_message_unref( p_msg ); \
     dbus_connection_flush( p_conn ); \
     return DBUS_HANDLER_RESULT_HANDLED

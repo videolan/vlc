@@ -59,7 +59,6 @@
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 
-
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -67,7 +66,6 @@
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
-
 
 static int TrackChange( vlc_object_t *p_this, const char *psz_var,
                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
@@ -434,11 +432,11 @@ DBUS_METHOD( GetMetadata )
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
-    
+
     while ( i_count < i_position ) 
     {
         i_count++;
-	    TEST_NEXT;
+        TEST_NEXT;
     }
 
     GetInputMeta ( p_tested_item->p_input, &args );
@@ -448,24 +446,24 @@ DBUS_METHOD( GetMetadata )
 }
 
 DBUS_METHOD( GetLength )
-{ 
+{
     REPLY_INIT;
     OUT_ARGUMENTS;
 
     dbus_int32_t i_elements = 0;
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
-    playlist_item_t* p_last_item = playlist_GetLastLeaf( p_playlist, 
+    playlist_item_t* p_last_item = playlist_GetLastLeaf( p_playlist,
                     p_playlist->p_root_onelevel ); 
 
     while ( p_tested_item->p_input->i_id != p_last_item->p_input->i_id )
     {
         i_elements++;
-	TEST_NEXT;
+        TEST_NEXT;
     }
 
     pl_Release( p_playlist );
-    
+
     ADD_INT32( &i_elements );
     REPLY_SEND;
 }
@@ -492,7 +490,7 @@ DBUS_METHOD( DelTrack )
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
-    
+
     while ( i_count < i_position ) 
     {
         i_count++;
@@ -500,13 +498,13 @@ DBUS_METHOD( DelTrack )
     }
 
     PL_LOCK; 
-    playlist_DeleteFromInput( p_playlist, 
-		    p_tested_item->p_input->i_id, 
-		    VLC_TRUE );
+    playlist_DeleteFromInput( p_playlist,
+        p_tested_item->p_input->i_id,
+        VLC_TRUE );
     PL_UNLOCK;
 
     pl_Release( p_playlist );
-    
+
     REPLY_SEND;
 }
 
@@ -519,12 +517,12 @@ DBUS_METHOD( Loop )
     dbus_bool_t b_loop;
     vlc_value_t val;
     playlist_t* p_playlist = NULL;
-    
+
     dbus_error_init( &error );
     dbus_message_get_args( p_from, &error,
             DBUS_TYPE_BOOLEAN, &b_loop,
             DBUS_TYPE_INVALID );
-    
+
     if( dbus_error_is_set( &error ) )
     {
         msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
@@ -550,12 +548,12 @@ DBUS_METHOD( Repeat )
     dbus_bool_t b_repeat;
     vlc_value_t val;
     playlist_t* p_playlist = NULL;
-    
+
     dbus_error_init( &error );
     dbus_message_get_args( p_from, &error,
             DBUS_TYPE_BOOLEAN, &b_repeat,
             DBUS_TYPE_INVALID );
-    
+
     if( dbus_error_is_set( &error ) )
     {
         msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
@@ -565,7 +563,7 @@ DBUS_METHOD( Repeat )
     }
 
     val.b_bool = ( b_repeat == TRUE ) ? VLC_TRUE : VLC_FALSE ;
-    
+
     p_playlist = pl_Yield( (vlc_object_t*) p_this );
     var_Set ( p_playlist, "repeat", val );
     pl_Release( ((vlc_object_t*) p_this) );
@@ -849,7 +847,7 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
                 NULL, &dict_entry ); \
         dbus_message_iter_append_basic( &dict_entry, DBUS_TYPE_STRING, \
                 &ppsz_meta_items[entry] ); \
-	dbus_message_iter_open_container( &dict_entry, DBUS_TYPE_VARIANT, \
+        dbus_message_iter_open_container( &dict_entry, DBUS_TYPE_VARIANT, \
                 type##_AS_STRING, &variant ); \
         dbus_message_iter_append_basic( &variant, \
                 type, \
@@ -861,10 +859,10 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
         ADD_META( entry, DBUS_TYPE_STRING, \
                 p_input->p_meta->psz_##item );
 
-static int GetInputMeta( input_item_t* p_input, 
+static int GetInputMeta( input_item_t* p_input,
                         DBusMessageIter *args )
-{ /*FIXME: Works only for already read metadata. */ 
-  
+{ /*FIXME: Works only for already read metadata. */
+
     DBusMessageIter dict, dict_entry, variant;
     /* We need the track length to be expressed in seconds
      * instead of milliseconds */
@@ -879,7 +877,7 @@ static int GetInputMeta( input_item_t* p_input,
     "status", "URI", "length", "video-codec", "audio-codec",
     "video-bitrate", "audio-bitrate", "audio-samplerate"
     };
-    
+
     dbus_message_iter_open_container( args, DBUS_TYPE_ARRAY, "{sv}", &dict );
 
     ADD_VLC_META_STRING( 0, title );
@@ -901,8 +899,8 @@ static int GetInputMeta( input_item_t* p_input,
     ADD_VLC_META_STRING( 16, trackid ); 
 
     ADD_META( 17, DBUS_TYPE_INT32, p_input->p_meta->i_status );
-    ADD_META( 18, DBUS_TYPE_STRING, p_input->psz_uri ); 
-    ADD_META( 19, DBUS_TYPE_INT64, i_length ); 
+    ADD_META( 18, DBUS_TYPE_STRING, p_input->psz_uri );
+    ADD_META( 19, DBUS_TYPE_INT64, i_length );
 
     dbus_message_iter_close_container( args, &dict );
     return VLC_SUCCESS;
