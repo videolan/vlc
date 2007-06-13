@@ -147,6 +147,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->i_start = 0;
     p_input->i_time  = 0;
     p_input->p->i_stop  = 0;
+    p_input->p->i_run  = 0;
     p_input->p->i_title = 0;
     p_input->p->title   = NULL;
     p_input->p->i_title_offset = p_input->p->i_seekpoint_offset = 0;
@@ -573,6 +574,7 @@ exit:
  *****************************************************************************/
 static void MainLoop( input_thread_t *p_input )
 {
+    int64_t i_start_mdate = mdate();
     int64_t i_intf_update = 0;
     int i_updates = 0;
 
@@ -586,10 +588,11 @@ static void MainLoop( input_thread_t *p_input )
         /* Do the read */
         if( p_input->i_state != PAUSE_S  )
         {
-            if( p_input->p->i_stop <= 0 || p_input->i_time < p_input->p->i_stop )
-                i_ret=p_input->p->input.p_demux->pf_demux(p_input->p->input.p_demux);
+            if( ( p_input->p->i_stop > 0 && p_input->i_time >= p_input->p->i_stop ) ||
+                ( p_input->p->i_run > 0 && i_start_mdate+p_input->p->i_run < mdate() ) )
+                i_ret = 0; /* EOF */
             else
-                i_ret = 0;  /* EOF */
+                i_ret = p_input->p->input.p_demux->pf_demux(p_input->p->input.p_demux);
 
             if( i_ret > 0 )
             {
@@ -659,6 +662,9 @@ static void MainLoop( input_thread_t *p_input )
                         input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION,
                                            &val );
                     }
+
+                    /* */
+                    i_start_mdate = mdate();
                 }
             }
             else if( i_ret < 0 )
@@ -915,10 +921,14 @@ static int Init( input_thread_t * p_input )
 
         /* Start time*/
         /* Set start time */
-        p_input->p->i_start = (int64_t)var_GetInteger( p_input, "start-time" ) *
-                           I64C(1000000);
-        p_input->p->i_stop  = (int64_t)var_GetInteger( p_input, "stop-time" ) *
-                           I64C(1000000);
+        p_input->p->i_start = I64C(1000000) * var_GetInteger( p_input, "start-time" );
+        p_input->p->i_stop  = I64C(1000000) * var_GetInteger( p_input, "stop-time" );
+        p_input->p->i_run   = I64C(1000000) * var_GetInteger( p_input, "run-time" );
+        if( p_input->p->i_run < 0 )
+        {
+            msg_Warn( p_input, "invalid run-time ignored" );
+            p_input->p->i_run = 0;
+        }
 
         if( p_input->p->i_start > 0 )
         {

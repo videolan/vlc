@@ -75,6 +75,7 @@ struct input_thread_private_t
     /* */
     int64_t     i_start;    /* :start-time,0 by default */
     int64_t     i_stop;     /* :stop-time, 0 if none */
+    int64_t     i_run;      /* :run-time, 0 if none */
 
     /* Title infos FIXME multi-input (not easy) ? */
     int          i_title;

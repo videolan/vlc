@@ -531,6 +531,10 @@ static const char *ppsz_clock_descriptions[] =
 #define STOP_TIME_LONGTEXT N_( \
     "The stream will stop at this position (in seconds)." )
 
+#define RUN_TIME_TEXT N_("Run time")
+#define RUN_TIME_LONGTEXT N_( \
+    "The stream will run this duration (in seconds)." )
+
 #define INPUT_LIST_TEXT N_("Input list")
 #define INPUT_LIST_LONGTEXT N_( \
     "You can give a comma-separated list " \
@@ -1454,6 +1458,8 @@ vlc_module_begin();
                  START_TIME_TEXT, START_TIME_LONGTEXT, VLC_TRUE );
     add_integer( "stop-time", 0, NULL,
                  STOP_TIME_TEXT, STOP_TIME_LONGTEXT, VLC_TRUE );
+    add_integer( "run-time", 0, NULL,
+                 RUN_TIME_TEXT, RUN_TIME_LONGTEXT, VLC_TRUE );
     add_string( "input-list", NULL, NULL,
                  INPUT_LIST_TEXT, INPUT_LIST_LONGTEXT, VLC_TRUE );
     add_string( "input-slave", NULL, NULL,
