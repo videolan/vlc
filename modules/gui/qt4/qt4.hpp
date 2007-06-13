@@ -54,7 +54,7 @@ struct intf_sys_t
 #define QPL_UNLOCK vlc_mutex_unlock( &THEPL->object_lock );
 
 #define THEDP DialogsProvider::getInstance()
-#define THEMIM MainInputManager::getInstance( NULL )
+#define THEMIM MainInputManager::getInstance( p_intf )
 
 #define qfu( i ) QString::fromUtf8( i )
 #define qtr( i ) QString::fromUtf8( _(i) )

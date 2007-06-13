@@ -261,27 +261,40 @@ MainInputManager::~MainInputManager()
 
 void MainInputManager::updateInput()
 {
-    vlc_mutex_lock( &p_intf->change_lock );
-    if( p_input && p_input->b_dead )
+    if( VLC_OBJECT_INTF == p_intf->i_object_type )
     {
-        vlc_object_release( p_input );
-        getIM()->delInput();
-        p_input = NULL;
-        emit inputChanged( NULL );
-    }
-
-    if( !p_input )
-    {
-        QPL_LOCK;
-        p_input = THEPL->p_input;
-        if( p_input )
+        vlc_mutex_lock( &p_intf->change_lock );
+        if( p_input && p_input->b_dead )
         {
-            vlc_object_yield( p_input );
+            vlc_object_release( p_input );
+            getIM()->delInput();
+            p_input = NULL;
+            emit inputChanged( NULL );
+        }
+
+        if( !p_input )
+        {
+            QPL_LOCK;
+            p_input = THEPL->p_input;
+            if( p_input )
+            {
+                vlc_object_yield( p_input );
+                emit inputChanged( p_input );
+            }
+            QPL_UNLOCK;
+        }
+        vlc_mutex_unlock( &p_intf->change_lock );
+    }
+    else {
+        /* we are working as a dialogs provider */
+        playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_intf, 
+                                              VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        if( p_playlist )
+        {
+            p_input = p_playlist->p_input;
             emit inputChanged( p_input );
         }
-        QPL_UNLOCK;
     }
-    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 void MainInputManager::stop()
