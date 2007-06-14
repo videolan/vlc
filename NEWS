@@ -98,6 +98,7 @@ Localisations:
 
 Changes between 0.8.6b and 0.8.6c:
 ----------------------------------
+
 Various bugfixes, notably:
  * Windows Vista compatibility
  * Cropping in Direct3D
@@ -118,6 +119,7 @@ Localisation:
 
 Changes between 0.8.6a and 0.8.6b:
 ----------------------------------
+
 Various bugfixes, notably:
  * Out-of-bound read in demuxers
  * Demuxers crashes (incl. CVE-2007-0256)
