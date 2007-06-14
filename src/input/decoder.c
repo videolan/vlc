@@ -575,6 +575,7 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
  */
 static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 {
+    decoder_owner_sys_t *p_sys = (decoder_owner_sys_t *)p_dec->p_owner;
     const int i_rate = p_block ? p_block->i_rate : INPUT_RATE_DEFAULT;
 
     if( p_block && p_block->i_buffer <= 0 )
@@ -736,19 +737,22 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             stats_UpdateInteger( p_dec, p_input->p->counters.p_decoded_sub, 1, NULL );
             vlc_mutex_unlock( &p_input->p->counters.counters_lock );
 
-            if( p_spu->i_start < p_dec->p_owner->i_preroll_end &&
-                ( p_spu->i_stop <= 0 || p_spu->i_stop <= p_dec->p_owner->i_preroll_end ) )
-            {
-                spu_DestroySubpicture( p_dec->p_owner->p_vout->p_spu, p_spu );
-                continue;
-            }
-
             p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-            if( p_vout )
+            if( p_vout && p_sys->p_spu_vout == p_vout )
             {
-                spu_DisplaySubpicture( p_vout->p_spu, p_spu );
-                vlc_object_release( p_vout );
+                /* Prerool does not work very well with subtitle */
+                if( p_spu->i_start < p_dec->p_owner->i_preroll_end &&
+                    ( p_spu->i_stop <= 0 || p_spu->i_stop < p_dec->p_owner->i_preroll_end ) )
+                    spu_DestroySubpicture( p_vout->p_spu, p_spu );
+                else
+                    spu_DisplaySubpicture( p_vout->p_spu, p_spu );
             }
+            else
+            {
+                msg_Warn( p_dec, "no vout found, leaking subpicture" );
+            }
+            if( p_vout )
+                vlc_object_release( p_vout );
         }
     }
     else
