@@ -277,6 +277,8 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
                                          video_format_t *p_fmt )
 {
     subpicture_region_t *p_region = malloc( sizeof(subpicture_region_t) );
+    if( !p_region ) return NULL;
+
     memset( p_region, 0, sizeof(subpicture_region_t) );
     p_region->p_next = 0;
     p_region->p_cache = 0;
@@ -299,7 +301,7 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     if( !p_region->picture.i_planes )
     {
         free( p_region );
-        free( p_fmt->p_palette );
+        if( p_fmt->p_palette ) free( p_fmt->p_palette );
         return NULL;
     }
 
@@ -675,8 +677,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             }
 
             /* Force palette if requested */
-            if( p_spu->b_force_palette && VLC_FOURCC('Y','U','V','P') ==
-                p_region->fmt.i_chroma )
+            if( p_spu->b_force_palette &&
+                (VLC_FOURCC('Y','U','V','P') == p_region->fmt.i_chroma) )
             {
                 memcpy( p_region->fmt.p_palette->palette,
                         p_spu->palette, 16 );
