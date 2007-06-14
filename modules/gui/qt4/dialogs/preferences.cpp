@@ -61,8 +61,9 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     types->setAlignment( Qt::AlignHCenter );
     QHBoxLayout *types_l = new QHBoxLayout(0);
     types_l->setSpacing( 3 ); types_l->setMargin( 3 );
-    small = new QRadioButton( "Basic", types ); types_l->addWidget( small );
-    all = new QRadioButton( "All", types ); types_l->addWidget( all );
+    small = new QRadioButton( qtr("Basic"), types ); 
+    types_l->addWidget( small );
+    all = new QRadioButton( qtr("All"), types ); types_l->addWidget( all );
     types->setLayout( types_l );
     small->setChecked( true );
 

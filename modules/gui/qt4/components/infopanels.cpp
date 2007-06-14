@@ -64,17 +64,17 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     l->addWidget( genre_text, line, 1, 1, 6 );
     /* Date (Should be in years) */
     date_text = new QSpinBox; setSpinBounds( date_text );
-    l->addWidget( new QLabel( qfu( VLC_META_DATE ) + " :" ), line, 7 );
+    l->addWidget( new QLabel( qtr( VLC_META_DATE ) + " :" ), line, 7 );
     l->addWidget( date_text, line, 8, 1, 2 );
     line++;
 
     /* Number and Rating */
-    l->addWidget( new QLabel( qfu( _("Track number/Position" ) ) + " :" ),
+    l->addWidget( new QLabel( qtr( "Track number/Position" )  + " :" ),
                   line, 0 );
     seqnum_text = new QSpinBox; setSpinBounds( seqnum_text );
     l->addWidget( seqnum_text, line, 1, 1, 4 );
 
-    l->addWidget( new QLabel( qfu( VLC_META_RATING ) + " :" ), line, 5 );
+    l->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 5 );
     rating_text = new QSpinBox; setSpinBounds( rating_text) ;
     l->addWidget( rating_text, line, 6, 1, 4 );
     line++;
@@ -85,7 +85,7 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     l->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 0 );
     language_text = new QLineEdit;
     l->addWidget( language_text, line, 1, 1, 4 );
-    l->addWidget( new QLabel( qfu( VLC_META_SETTING ) + " :" ), line, 5 );
+    l->addWidget( new QLabel( qtr( VLC_META_SETTING ) + " :" ), line, 5 );
     setting_text = new QLineEdit;
     l->addWidget( setting_text, line, 6, 1, 4 );
     line++;

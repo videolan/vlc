@@ -138,7 +138,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         {                                   \
             Ui::SPrefs ## name ui;          \
             ui.setupUi( panel );            \
-            panel_label->setText( qtr( label ) );
+            panel_label->setText( label );
 
 #define END_SPREFS_CAT      \
             break;          \
@@ -166,7 +166,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     switch( number )
     {
         /* Video Panel Implementation */
-        START_SPREFS_CAT( Video , "General video settings" );
+        START_SPREFS_CAT( Video , qtr("General video settings") );
            CONFIG_GENERIC( "video", Bool, NULL, enableVideo );
 
             CONFIG_GENERIC( "fullscreen", Bool, NULL, fullscreen );
@@ -195,7 +195,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
          END_SPREFS_CAT;
 
          /* Audio Panel Implementation */
-        START_SPREFS_CAT( Audio,  "General audio settings" );
+        START_SPREFS_CAT( Audio, qtr("General audio settings") );
 #ifdef WIN32
             ui.OSSBrowse->hide();
             ui.OSSDevice->hide();
@@ -236,7 +236,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         END_SPREFS_CAT;
 
         /* Input and Codecs Panel Implementation */
-        START_SPREFS_CAT( InputAndCodecs, "Input & Codecs settings"  );
+        START_SPREFS_CAT( InputAndCodecs, qtr("Input & Codecs settings") );
           /* Disk Devices */
 /*          CONFIG_GENERIC( );*/ //FIXME
 
@@ -260,7 +260,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         END_SPREFS_CAT;
 
         /* Interface Panel */
-        START_SPREFS_CAT( Interface, "Interface settings" );
+        START_SPREFS_CAT( Interface, qtr("Interface settings") );
             ui.defaultLabel->setFont( italicFont );
             ui.skinsLabel->setFont( italicFont );
 
@@ -295,7 +295,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
         END_SPREFS_CAT;
 
-        START_SPREFS_CAT( Subtitles, "Subtitles & OSD settings" );
+        START_SPREFS_CAT( Subtitles, qtr("Subtitles & OSD settings") );
             CONFIG_GENERIC( "osd", Bool, NULL, OSDBox);
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
