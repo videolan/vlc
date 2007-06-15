@@ -39,7 +39,7 @@ msgstr "Rozhranie"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for VLC's interfaces"
-msgstr "Nastavenia rozhrania programu VLC"
+msgstr "Nastavenia rozhraní programu VLC"
 
 #: include/vlc_config_cat.h:46
 msgid "General interface settings"
