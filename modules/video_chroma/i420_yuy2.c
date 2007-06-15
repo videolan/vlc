@@ -306,7 +306,8 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
     }
 
 #if defined (MODULE_NAME_IS_i420_yuy2_mmx)
-    __asm__ __volatile__("emms" :: );
+    /* re-enable FPU registers */
+    __asm__ __volatile__ ( "emms" );
 #endif
 
 #if defined (MODULE_NAME_IS_i420_yuy2_altivec)
@@ -347,6 +348,8 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
             p_line1 += i_dest_margin;
             p_line2 += i_dest_margin;
         }
+        /* make sure all SSE2 stores are visible thereafter */
+        __asm__ __volatile__ ( "sfence" );
     }
     else
     {
@@ -514,7 +517,8 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
     }
 
 #if defined (MODULE_NAME_IS_i420_yuy2_mmx)
-    __asm__ __volatile__("emms" :: );
+    /* re-enable FPU registers */
+    __asm__ __volatile__ ( "emms" );
 #endif
 
 #if defined (MODULE_NAME_IS_i420_yuy2_altivec)
@@ -554,6 +558,8 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
             p_line1 += i_dest_margin;
             p_line2 += i_dest_margin;
         }
+        /* make sure all SSE2 stores are visible thereafter */
+        __asm__ __volatile__ ( "sfence" );
     }
     else
     {
@@ -720,7 +726,8 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
     }
 
 #if defined (MODULE_NAME_IS_i420_yuy2_mmx)
-    __asm__ __volatile__("emms" :: );
+    /* re-enable FPU registers */
+    __asm__ __volatile__ ( "emms" );
 #endif
 
 #if defined (MODULE_NAME_IS_i420_yuy2_altivec)
@@ -760,6 +767,8 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
             p_line1 += i_dest_margin;
             p_line2 += i_dest_margin;
         }
+        /* make sure all SSE2 stores are visible thereafter */
+        __asm__ __volatile__ ( "sfence" );
     }
     else
     {
@@ -861,7 +870,8 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
     }
 
 #if defined (MODULE_NAME_IS_i420_yuy2_mmx)
-    __asm__ __volatile__("emms" :: );
+    /* re-enable FPU registers */
+    __asm__ __volatile__ ( "emms" );
 #endif
 
 #else // defined(MODULE_NAME_IS_i420_yuy2_sse2)
@@ -897,6 +907,8 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
             p_line1 += i_dest_margin;
             p_line2 += i_dest_margin;
         }
+        /* make sure all SSE2 stores are visible thereafter */
+        __asm__ __volatile__ ( "sfence" );
     }
     else
     {

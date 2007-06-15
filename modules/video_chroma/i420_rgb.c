@@ -4,7 +4,8 @@
  * Copyright (C) 2000, 2001, 2004 the VideoLAN team
  * $Id$
  *
- * Author: Sam Hocevar <sam@zoy.org>
+ * Authors: Sam Hocevar <sam@zoy.org>
+ *          Damien Fouilleul <damienf@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,6 +73,11 @@ vlc_module_begin();
                         "RV15,RV16,RV24,RV32 conversions") );
     set_capability( "chroma", 100 );
     add_requirement( MMX );
+#elif defined (MODULE_NAME_IS_i420_rgb_sse2)
+    set_description( _( "SSE2 I420,IYUV,YV12 to "
+                        "RV15,RV16,RV24,RV32 conversions") );
+    set_capability( "chroma", 120 );
+    add_requirement( SSE2 );
 #endif
     set_callbacks( Activate, Deactivate );
 vlc_module_end();
@@ -107,19 +113,30 @@ static int Activate( vlc_object_t *p_this )
 #endif
                 case VLC_FOURCC('R','V','1','5'):
                 case VLC_FOURCC('R','V','1','6'):
-#if defined (MODULE_NAME_IS_i420_rgb_mmx)
+#if ! defined (MODULE_NAME_IS_i420_rgb)
                     /* If we don't have support for the bitmasks, bail out */
-                    if( ( p_vout->output.i_rmask != 0x7c00
-                           || p_vout->output.i_gmask != 0x03e0
-                           || p_vout->output.i_bmask != 0x001f )
-                     && ( p_vout->output.i_rmask != 0xf800
-                           || p_vout->output.i_gmask != 0x07e0
-                           || p_vout->output.i_bmask != 0x001f ) )
+                    if( ( p_vout->output.i_rmask == 0x7c00
+                       && p_vout->output.i_gmask == 0x03e0
+                       && p_vout->output.i_bmask == 0x001f ) )
                     {
-                        return -1;
+                        /* R5G5B6 pixel format */
+                        msg_Dbg(p_this, "RGB pixel format is R5G5B5");
+                        p_vout->chroma.pf_convert = E_(I420_R5G5B5);
                     }
-#endif
+                    else if( ( p_vout->output.i_rmask == 0xf800
+                            && p_vout->output.i_gmask == 0x07e0
+                            && p_vout->output.i_bmask == 0x001f ) )
+                    {
+                        /* R5G6B5 pixel format */
+                        msg_Dbg(p_this, "RGB pixel format is R5G6B5");
+                        p_vout->chroma.pf_convert = E_(I420_R5G6B5);
+                    }
+                    else
+                        return -1;
+#else
+                    // generic C chroma converter */
                     p_vout->chroma.pf_convert = E_(I420_RGB16);
+#endif
                     break;
 
 #if 0
@@ -128,16 +145,30 @@ static int Activate( vlc_object_t *p_this )
 #endif
 
                 case VLC_FOURCC('R','V','3','2'):
-#if defined (MODULE_NAME_IS_i420_rgb_mmx)
+#if ! defined (MODULE_NAME_IS_i420_rgb)
                     /* If we don't have support for the bitmasks, bail out */
-                    if( p_vout->output.i_rmask != 0x00ff0000
-                         || p_vout->output.i_gmask != 0x0000ff00
-                         || p_vout->output.i_bmask != 0x000000ff )
+                    if( p_vout->output.i_rmask == 0x00ff0000
+                     && p_vout->output.i_gmask == 0x0000ff00
+                     && p_vout->output.i_bmask == 0x000000ff )
                     {
-                        return -1;
+                        /* A8R8G8B8 pixel format */
+                        msg_Dbg(p_this, "RGB pixel format is A8R8G8B8");
+                        p_vout->chroma.pf_convert = E_(I420_A8R8G8B8);
                     }
-#endif
+                    else if( p_vout->output.i_rmask == 0x0000ff00
+                          && p_vout->output.i_gmask == 0x00ff0000
+                          && p_vout->output.i_bmask == 0xff000000 )
+                    {
+                        /* B8G8R8A8 pixel format */
+                        msg_Dbg(p_this, "RGB pixel format is B8G8R8A8");
+                        p_vout->chroma.pf_convert = E_(I420_B8G8R8A8);
+                    }
+                    else
+                        return -1;
+#else
+                    // generic C chroma converter */
                     p_vout->chroma.pf_convert = E_(I420_RGB32);
+#endif
                     break;
 
                 default:

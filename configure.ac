@@ -1274,7 +1274,7 @@ MMXEXT_MODULES="memcpymmxext"
 #MMXEXT_MODULES="${MMXEXT_MODULES} idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn"
 SSE_MODULES=""
-SSE2_MODULES="i420_yuy2_sse2"
+SSE2_MODULES="i420_rgb_sse2 i420_yuy2_sse2"
 ALTIVEC_MODULES="memcpyaltivec i420_yuy2_altivec"
 #ALTIVEC_MODULES="${ALTIVEC_MODULES} idctaltivec motionaltivec"
 
@@ -1325,7 +1325,7 @@ AC_CACHE_CHECK([if \$CC groks SSE2 intrinsics],
                     [ac_cv_c_sse2_intrinsics=no])])
 if test "${ac_cv_c_sse2_intrinsics}" != "no"; then
   AC_DEFINE(HAVE_SSE2_INTRINSICS, 1, Define if SSE2 intrinsics are available.)
-  dnl VLC_ADD_CFLAGS([i420_rgb_sse2],[-msse2])
+  VLC_ADD_CFLAGS([i420_rgb_sse2],[-msse2])
 fi
 
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
