@@ -215,6 +215,8 @@
 #define FOURCC_meta VLC_FOURCC( 'm', 'e', 't', 'a' )
 #define FOURCC_ilst VLC_FOURCC( 'i', 'l', 's', 't' )
 
+#define FOURCC_chap VLC_FOURCC( 'c', 'h', 'a', 'p' )
+
 /* Do you want some debug information on all read boxes ? */
 #define MP4_VERBOSE  1
 
@@ -793,6 +795,13 @@ typedef struct
 
 typedef struct
 {
+    uint32_t i_entry_count;
+    uint32_t *i_track_ID;
+
+} MP4_Box_data_tref_generic_t;
+
+typedef struct
+{
     uint8_t  i_version;
     uint32_t i_flags;
 
@@ -887,6 +896,7 @@ typedef union MP4_Box_data_s
 
     MP4_Box_data_0xa9xxx_t *p_0xa9xxx;
     MP4_Box_data_chpl_t *p_chpl;
+    MP4_Box_data_tref_generic_t *p_tref_generic;
 
     void                *p_data; /* for unknow type */
 } MP4_Box_data_t;

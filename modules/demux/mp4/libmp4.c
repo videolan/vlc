@@ -238,11 +238,14 @@ static int MP4_NextBox( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( p_box->p_father )
     {
+        const int i_box_end = p_box->i_size + p_box->i_pos;
+        const int i_father_end = p_box->p_father->i_size + p_box->p_father->i_pos;
+
         /* check if it's within p-father */
-        if( p_box->i_size + p_box->i_pos >=
-            p_box->p_father->i_size + p_box->p_father->i_pos )
+        if( i_box_end >= i_father_end )
         {
-            msg_Dbg( p_stream, "out of bound child" );
+            if( i_box_end > i_father_end )
+                msg_Dbg( p_stream, "out of bound child" );
             return 0; /* out of bound */
         }
     }
@@ -2220,6 +2223,32 @@ static void MP4_FreeBox_chpl( MP4_Box_t *p_box )
         free( p_chpl->chapter[i].psz_name );
 }
 
+static int MP4_ReadBox_tref_generic( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    unsigned int i;
+    MP4_READBOX_ENTER( MP4_Box_data_tref_generic_t );
+
+    p_box->data.p_tref_generic->i_track_ID = NULL;
+    p_box->data.p_tref_generic->i_entry_count = i_read / sizeof(uint32_t);
+    if( p_box->data.p_tref_generic->i_entry_count > 0 )
+        p_box->data.p_tref_generic->i_track_ID = malloc( p_box->data.p_tref_generic->i_entry_count * sizeof(uint32_t) );
+
+    for( i = 0; i < p_box->data.p_tref_generic->i_entry_count; i++ )
+    {
+        MP4_GET4BYTES( p_box->data.p_tref_generic->i_track_ID[i] );
+    }
+#ifdef MP4_VERBOSE
+        msg_Dbg( p_stream, "read box: \"chap\" %d references",
+                 p_box->data.p_tref_generic->i_entry_count );
+#endif
+
+    MP4_READBOX_EXIT( 1 );
+}
+static void MP4_FreeBox_tref_generic( MP4_Box_t *p_box )
+{
+    FREENULL( p_box->data.p_tref_generic->i_track_ID );
+}
+
 static int MP4_ReadBox_meta( stream_t *p_stream, MP4_Box_t *p_box )
 {
     uint8_t meta_data[8];
@@ -2421,6 +2450,7 @@ static struct
     { FOURCC_dpnd,  MP4_ReadBox_default,   NULL },
     { FOURCC_ipir,  MP4_ReadBox_default,   NULL },
     { FOURCC_mpod,  MP4_ReadBox_default,   NULL },
+    { FOURCC_chap,  MP4_ReadBox_tref_generic,   MP4_FreeBox_tref_generic },
 
     /* found in hnti */
     { FOURCC_rtp,   MP4_ReadBox_default,   NULL },
