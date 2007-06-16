@@ -52,6 +52,7 @@ Damian Ivereigh <damian at cisco.com> - ac3dec uninitialized data structure fix
 Damien Fouilleul <damien.fouilleul at laposte.net> - DirectShow input improvements
 Daniel Fischer <dan at subsignal dot org> - Shoutcast output support
 Daniel Stränger <vlc at schmaller d0t de> - M3U, xtag and playlist improvements. Meta information core fixes. XSPF playlist support
+Danko Dolch <info at dolchonline d0t net> - Icons and Design for Qt4 Interface
 David Kennedy <dkennedy at tinytoad.com> - X11 fullscreen patch
 Daniel Dreibrodt, aka aLtgLasS <daniel d.t dreibrodt -@t- gmx d0t de> - VLC 0.8.5 default skin
 Daniel Nylander <info@danielnylander at se> - Swedish translation

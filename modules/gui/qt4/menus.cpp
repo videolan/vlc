@@ -197,7 +197,8 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
 QMenu *QVLCMenu::FileMenu()
 {
     QMenu *menu = new QMenu();
-    DP_SADD( menu, qtr("Open &File..." ), "", "", openFileDialog(), "Ctrl+O" );
+    DP_SADD( menu, qtr("Open &File..." ), "",
+            ":/pixmaps/vlc_file-asym_16px.png", openFileDialog(), "Ctrl+O" );
     DP_SADD( menu, qtr("Open &Disc..." ), "", "", openDiscDialog(), "Ctrl+D" );
     DP_SADD( menu, qtr("Open &Network..." ), "",
                 ":/pixmaps/vlc_network_16px.png", openNetDialog(), "Ctrl+N" );
@@ -621,7 +622,8 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf,
     sysMenu->addSeparator();
     POPUP_PLAY_ENTRIES( sysMenu );
     sysMenu->addSeparator();
-    DP_SADD( sysMenu, qtr("&Open Media" ), "", "", openFileDialog(), "" );
+    DP_SADD( sysMenu, qtr("&Open Media" ), "",
+            ":/pixmaps/vlc_file-wide_16px.png", openFileDialog(), "" );
     DP_SADD( sysMenu, qtr("&Quit") , "", ":/pixmaps/vlc_quit_16px.png",
              quit(), "" );
 
