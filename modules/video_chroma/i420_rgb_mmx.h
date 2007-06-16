@@ -61,7 +61,6 @@ movq       (%0), %%mm6      # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
 "
 
 #define SSE2_INIT_16_ALIGNED "                                              \n\
-prefetcht1  (%3)            # cache preload for image                       \n\
 movq        (%1), %%xmm0    # Load 8 Cb       00 00 00 00 u3 u2 u1 u0       \n\
 movq        (%2), %%xmm1    # Load 8 Cr       00 00 00 00 v3 v2 v1 v0       \n\
 pxor      %%xmm4, %%xmm4    # zero mm4                                      \n\
@@ -69,11 +68,11 @@ movdqa      (%0), %%xmm6    # Load 16 Y       Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
 "
 
 #define SSE2_INIT_16_UNALIGNED "                                            \n\
-prefetcht1  (%3)            # cache preload for image                       \n\
 movq        (%1), %%xmm0    # Load 8 Cb       00 00 00 00 u3 u2 u1 u0       \n\
 movq        (%2), %%xmm1    # Load 8 Cr       00 00 00 00 v3 v2 v1 v0       \n\
 pxor      %%xmm4, %%xmm4    # zero mm4                                      \n\
 movdqu      (%0), %%xmm6    # Load 16 Y       Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
+prefetchnta (%3)            # Tell CPU not to cache output RGB data         \n\
 "
 
 #define MMX_INTRINSICS_INIT_16      \
@@ -91,11 +90,11 @@ movdqu      (%0), %%xmm6    # Load 16 Y       Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
     xmm6 = _mm_load_si128((__m128i *)p_y);  \
 
 #define SSE2_INTRINSICS_INIT_16_UNALIGNED   \
-    _mm_prefetch(p_buffer, _MM_HINT_T1);    \
     xmm0 = _mm_loadl_epi64((__m128i *)p_u); \
     xmm1 = _mm_loadl_epi64((__m128i *)p_v); \
     xmm4 = _mm_setzero_si128();             \
     xmm6 = _mm_loadu_si128((__m128i *)p_y); \
+    _mm_prefetch(p_buffer, _MM_HINT_NTA);    \
 
 #define MMX_INIT_16_GRAY "                                                  \n\
 movq      (%0), %%mm6       # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
@@ -118,11 +117,11 @@ movdqa      (%0), %%xmm6    # Load 16 Y       Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
 "
 
 #define SSE2_INIT_32_UNALIGNED "                                            \n\
-prefetcht1  (%3)            # cache preload for image                       \n\
 movq        (%1), %%xmm0    # Load 8 Cb       00 00 00 00 u3 u2 u1 u0       \n\
 movq        (%2), %%xmm1    # Load 8 Cr       00 00 00 00 v3 v2 v1 v0       \n\
 pxor      %%xmm4, %%xmm4    # zero mm4                                      \n\
 movdqu      (%0), %%xmm6    # Load 16 Y       Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
+prefetchnta (%3)            # Tell CPU not to cache output RGB data         \n\
 "
 
 #define MMX_INTRINSICS_INIT_32      \
@@ -141,11 +140,11 @@ movdqu      (%0), %%xmm6    # Load 16 Y       Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
     xmm6 = _mm_load_si128((__m128i *)p_y);  \
 
 #define SSE2_INTRINSICS_INIT_32_UNALIGNED    \
-    _mm_prefetch(p_buffer, _MM_HINT_T1);     \
     xmm0 = _mm_loadl_epi64((__m128i *)p_u); \
     xmm1 = _mm_loadl_epi64((__m128i *)p_v); \
     xmm4 = _mm_setzero_si128();             \
     xmm6 = _mm_loadu_si128((__m128i *)p_y); \
+    _mm_prefetch(p_buffer, _MM_HINT_NTA); \
 
 /*
  * Do the multiply part of the conversion for even and odd pixels,
@@ -260,7 +259,7 @@ pmulhw    %%xmm5, %%xmm7        # Mul 8 Y odd     00 y7 00 y5 00 y3 00 y1   \n\
 #define SSE2_INTRINSICS_YUV_MUL \
     xmm0 = _mm_unpacklo_epi8(xmm0, xmm4); \
     xmm1 = _mm_unpacklo_epi8(xmm1, xmm4); \
-    xmm5 = _mm_set1_epi32(0x80808080UL); \
+    xmm5 = _mm_set1_epi32(0x00800080UL); \
     xmm0 = _mm_subs_epi16(xmm0, xmm5); \
     xmm1 = _mm_subs_epi16(xmm1, xmm5); \
     xmm0 = _mm_slli_epi16(xmm0, 3); \
@@ -1001,7 +1000,7 @@ movdqu    %%xmm5, 24(%3)  # Store BGRA15 BGRA14 BGRA13 BGRA12               \n\
     xmm5 = xmm3; \
     xmm3 = _mm_unpacklo_epi16(xmm3, xmm1); \
     _mm_stream_si128((__m128i*)(p_buffer+8), xmm3); \
-    xmm5 = _xmm_unpackhi_pi16(xmm5, xmm4); \
+    xmm5 = _mm_unpackhi_epi16(xmm5, xmm4); \
     _mm_stream_si128((__m128i*)(p_buffer+12), xmm5); \
 
 #define SSE2_INTRINSICS_UNPACK_32_BGRA_UNALIGNED \
@@ -1021,6 +1020,6 @@ movdqu    %%xmm5, 24(%3)  # Store BGRA15 BGRA14 BGRA13 BGRA12               \n\
     xmm5 = xmm3; \
     xmm3 = _mm_unpacklo_epi16(xmm3, xmm1); \
     _mm_storeu_si128((__m128i*)(p_buffer+8), xmm3); \
-    xmm5 = _xmm_unpackhi_pi16(xmm5, xmm4); \
+    xmm5 = _mm_unpackhi_epi16(xmm5, xmm4); \
     _mm_storeu_si128((__m128i*)(p_buffer+12), xmm5); \
 

@@ -448,12 +448,6 @@ void E_(I420_R5G5B5)( vout_thread_t *p_vout, picture_t *p_src,
             }
             p_buffer = b_hscale ? p_buffer_start : p_pic;
         }
-        /* make sure all SSE2 stores are visible thereafter */
-#if defined (CAN_COMPILE_SSE2)
-        __asm__ __volatile__ ( "sfence" );
-#else
-        _mm_sfence();
-#endif
     }
     else
     {
@@ -526,6 +520,14 @@ void E_(I420_R5G5B5)( vout_thread_t *p_vout, picture_t *p_src,
             p_buffer = b_hscale ? p_buffer_start : p_pic;
         }
     }
+
+    /* make sure all SSE2 stores are visible thereafter */
+#if defined (CAN_COMPILE_SSE2)
+    __asm__ __volatile__ ( "sfence" ::: "memory" );
+#else
+    _mm_sfence();
+#endif
+
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx)
 
     if( p_vout->render.i_width & 7 )
@@ -755,12 +757,6 @@ void E_(I420_R5G6B5)( vout_thread_t *p_vout, picture_t *p_src,
             }
             p_buffer = b_hscale ? p_buffer_start : p_pic;
         }
-        /* make sure all SSE2 stores are visible thereafter */
-#if defined (CAN_COMPILE_SSE2)
-        __asm__ __volatile__ ( "sfence" );
-#else
-        _mm_sfence();
-#endif
     }
     else
     {
@@ -833,6 +829,14 @@ void E_(I420_R5G6B5)( vout_thread_t *p_vout, picture_t *p_src,
             p_buffer = b_hscale ? p_buffer_start : p_pic;
         }
     }
+
+    /* make sure all SSE2 stores are visible thereafter */
+#if defined (CAN_COMPILE_SSE2)
+    __asm__ __volatile__ ( "sfence" ::: "memory" );
+#else
+    _mm_sfence();
+#endif
+
 #else // defined (MODULE_NAME_IS_i420_rgb_mmx)
 
     if( p_vout->render.i_width & 7 )
@@ -1179,12 +1183,6 @@ void E_(I420_A8R8G8B8)( vout_thread_t *p_vout, picture_t *p_src,
             }
             p_buffer = b_hscale ? p_buffer_start : p_pic;
         }
-        /* make sure all SSE2 stores are visible thereafter */
-#if defined (CAN_COMPILE_SSE2)
-        __asm__ __volatile__ ( "sfence" );
-#else
-        _mm_sfence();
-#endif
     }
     else
     {
@@ -1263,7 +1261,14 @@ void E_(I420_A8R8G8B8)( vout_thread_t *p_vout, picture_t *p_src,
         }
     }
 
+    /* make sure all SSE2 stores are visible thereafter */
+#if defined (CAN_COMPILE_SSE2)
+    __asm__ __volatile__ ( "sfence" ::: "memory" );
 #else
+    _mm_sfence();
+#endif
+
+#else // defined (MODULE_NAME_IS_i420_rgb_mmx)
 
     if( p_vout->render.i_width & 7 )
     {
@@ -1500,12 +1505,6 @@ void E_(I420_B8G8R8A8)( vout_thread_t *p_vout, picture_t *p_src,
             }
             p_buffer = b_hscale ? p_buffer_start : p_pic;
         }
-        /* make sure all SSE2 stores are visible thereafter */
-#if defined (CAN_COMPILE_SSE2)
-        __asm__ __volatile__ ( "sfence" );
-#else
-        _mm_sfence();
-#endif
     }
     else
     {
