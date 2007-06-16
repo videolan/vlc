@@ -113,6 +113,12 @@ CDDA / Vorbis / Theora / SAP plugins:
 Demuxers:
  * Fixed a problem with detecting embedded subtitles (GAB2 format) in AVI
 
+Decoders:
+ * Updated FLAC API compatibility
+
+Input:
+ * Support for new v4l2 encoder API
+
 Localisation:
  * New localisation: Arabic, Persian
 
