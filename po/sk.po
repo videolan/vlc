@@ -489,9 +489,9 @@ msgid ""
 "to the directory where you installed VLC and run \"vlc -I wx\"\n"
 msgstr ""
 "\n"
-"Upozornenie: Ak sa nemozete dostat k uzivatelskemu rozhraniu programu, "
-"pouzite prosim prikazovy riadok, prejdite do priecinka kde je nainstalovany "
-"program VLC a zadajte prikaz  \"vlc -I wx\"\n"
+"Upozornenie: Ak sa nemôžete dostať k užívateľskému rozhraniu programu, "
+"použite prosím príkazový riadok, prejdite do priečinka kde je nainštalovaný "
+"program VLC a zadajte príkaz  \"vlc -I wx\"\n"
 
 #: include/vlc_intf_strings.h:33 modules/gui/wxwidgets/menus.cpp:126
 msgid "Quick &Open File..."
