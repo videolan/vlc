@@ -126,14 +126,10 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
     SETUP_VFILTER_OPTION( brightnessThresholdCheck, stateChanged(int) )
 
     SETUP_VFILTER( extract )
-    SETUP_VFILTER_OPTION( extractRedSlider, valueChanged(int) )
-    SETUP_VFILTER_OPTION( extractGreenSlider, valueChanged(int) )
-    SETUP_VFILTER_OPTION( extractBlueSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( extractComponentText, textChanged(QString) )
 
     SETUP_VFILTER( colorthres )
-    SETUP_VFILTER_OPTION( colorthresRedSlider, valueChanged(int) )
-    SETUP_VFILTER_OPTION( colorthresGreenSlider, valueChanged(int) )
-    SETUP_VFILTER_OPTION( colorthresBlueSlider, valueChanged(int) )
+    SETUP_VFILTER_OPTION( colorthresColorText, textChanged(QString) )
     SETUP_VFILTER_OPTION( colorthresSaturationthresSlider, valueChanged(int) )
     SETUP_VFILTER_OPTION( colorthresSimilaritythresSlider, valueChanged(int) )
 
@@ -165,6 +161,8 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     SETUP_VFILTER( rotate )
     SETUP_VFILTER_OPTION( rotateAngleDial, valueChanged(int) )
+    ui.rotateAngleDial->setWrapping( true );
+    ui.rotateAngleDial->setNotchesVisible( true );
 
     SETUP_VFILTER( puzzle )
     SETUP_VFILTER_OPTION( puzzleRowsSpin, valueChanged(int) )
@@ -379,7 +377,13 @@ void ExtVideo::setWidgetValue( QObject *widget )
         else if( checkbox ) checkbox->setCheckState( val.i_int? Qt::Checked
                                                               : Qt::Unchecked );
         else if( spinbox )  spinbox->setValue( val.i_int );
-        else if( dial )     dial->setValue( val.i_int );
+        else if( dial )     dial->setValue( (540-val.i_int)%360 );
+        else if( lineedit )
+        {
+            char str[30];
+            sprintf( str, "%06X", val.i_int );
+            lineedit->setText( str );
+        }
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
     }
     else if( i_type == VLC_VAR_FLOAT )
@@ -448,8 +452,8 @@ void ExtVideo::updateFilterOptions()
         if( slider )        i_int = slider->value();
         else if( checkbox ) i_int = checkbox->checkState() == Qt::Checked;
         else if( spinbox )  i_int = spinbox->value();
-        else if( dial )     i_int = dial->value();
-        else if( lineedit ) i_int = lineedit->text().toInt();
+        else if( dial )     i_int = (540-dial->value())%360;
+        else if( lineedit ) i_int = lineedit->text().toInt(NULL,16);
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
         config_PutInt( p_intf, option.toStdString().c_str(), i_int );
         if( i_type == VLC_VAR_INTEGER )
