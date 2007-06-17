@@ -286,42 +286,58 @@ VLC_PUBLIC_API int libvlc_playlist_add_extended( libvlc_instance_t *, const char
 VLC_PUBLIC_API int libvlc_playlist_delete_item( libvlc_instance_t *, int,
                                                 libvlc_exception_t * );
 
-typedef struct libvlc_input_t libvlc_input_t;
-
 /* Get the input that is currently being played by the playlist
  * \param p_instance the instance to use
  * \param p_exception an initialized excecption
  * \return an input object
  */
-VLC_PUBLIC_API libvlc_input_t *libvlc_playlist_get_input( libvlc_instance_t *,
-                                                          libvlc_exception_t * );
+VLC_PUBLIC_API libvlc_media_instance_t * libvlc_playlist_get_media_instance(
+                                libvlc_instance_t *, libvlc_exception_t * );
 
 /** @}*/
 
 /*****************************************************************************
- * Input
+ * Media Instance
  *****************************************************************************/
-/** defgroup libvlc_input Input
+/** defgroup libvlc_media_instance Media Instance
  * \ingroup libvlc
- * LibVLC Input handling
+ * LibVLC Media Instance
  * @{
  */
 
-/** Free an input object
- * \param p_input the input to free
+/** Create a Media Instance object from a Media Descriptor
+ * \param p_md the Media Descriptor from which the Media Instance should be
+ * created. The p_md can then be destroyed if needed.
  */
-VLC_PUBLIC_API void libvlc_input_free( libvlc_input_t * );
+VLC_PUBLIC_API libvlc_media_instance_t * libvlc_media_instance_new( libvlc_media_descriptor_t * );
+
+/** Destroy a Media Instance object
+ * \param p_mi the Media Instance to free
+ */
+VLC_PUBLIC_API void libvlc_media_instance_destroy( libvlc_media_instance_t * );
+
+VLC_PUBLIC_API void libvlc_media_instance_play ( libvlc_media_instance_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_media_instance_pause ( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /// \bug This might go away ... to be replaced by a broader system
-VLC_PUBLIC_API vlc_int64_t libvlc_input_get_length     ( libvlc_input_t *, libvlc_exception_t *);
-VLC_PUBLIC_API vlc_int64_t libvlc_input_get_time       ( libvlc_input_t *, libvlc_exception_t *);
-VLC_PUBLIC_API void        libvlc_input_set_time       ( libvlc_input_t *, vlc_int64_t, libvlc_exception_t *);
-VLC_PUBLIC_API float       libvlc_input_get_position   ( libvlc_input_t *, libvlc_exception_t *);
-VLC_PUBLIC_API void        libvlc_input_set_position   ( libvlc_input_t *, float, libvlc_exception_t *);
-VLC_PUBLIC_API vlc_bool_t  libvlc_input_will_play      ( libvlc_input_t *, libvlc_exception_t *);
-VLC_PUBLIC_API float       libvlc_input_get_rate       ( libvlc_input_t *, libvlc_exception_t *);
-VLC_PUBLIC_API void        libvlc_input_set_rate       ( libvlc_input_t *, float, libvlc_exception_t *);
-VLC_PUBLIC_API int         libvlc_input_get_state      ( libvlc_input_t *, libvlc_exception_t *);
+VLC_PUBLIC_API vlc_int64_t libvlc_media_instance_get_length     ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API vlc_int64_t libvlc_media_instance_get_time       ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void        libvlc_media_instance_set_time       ( libvlc_media_instance_t *, vlc_int64_t, libvlc_exception_t *);
+VLC_PUBLIC_API float       libvlc_media_instance_get_position   ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void        libvlc_media_instance_set_position   ( libvlc_media_instance_t *, float, libvlc_exception_t *);
+VLC_PUBLIC_API vlc_bool_t  libvlc_media_instance_will_play      ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API float       libvlc_media_instance_get_rate       ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void        libvlc_media_instance_set_rate       ( libvlc_media_instance_t *, float, libvlc_exception_t *);
+VLC_PUBLIC_API int         libvlc_media_instance_get_state      ( libvlc_media_instance_t *, libvlc_exception_t *);
+
+/**
+ * Does this input have a video output ?
+ * \param p_input the input
+ * \param p_exception an initialized exception
+ */
+VLC_PUBLIC_API vlc_bool_t  libvlc_media_instance_has_vout( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API float       libvlc_media_instance_get_fps( libvlc_media_instance_t *, libvlc_exception_t *);
+
 
 /** @} */
 
@@ -336,15 +352,15 @@ VLC_PUBLIC_API int         libvlc_input_get_state      ( libvlc_input_t *, libvl
  * \param p_input the input
  * \param p_exception an initialized exception
  */
-VLC_PUBLIC_API vlc_bool_t  libvlc_input_has_vout( libvlc_input_t *, libvlc_exception_t *);
-VLC_PUBLIC_API float       libvlc_input_get_fps( libvlc_input_t *, libvlc_exception_t *);
+VLC_PUBLIC_API vlc_bool_t  libvlc_input_has_vout( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API float       libvlc_input_get_fps( libvlc_media_instance_t *, libvlc_exception_t *);
 
 /**
  * Toggle fullscreen status on video output
  * \param p_input the input
  * \param p_exception an initialized exception
  */
-VLC_PUBLIC_API void libvlc_toggle_fullscreen( libvlc_input_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_toggle_fullscreen( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /**
  * Enable or disable fullscreen on a video output
@@ -352,7 +368,7 @@ VLC_PUBLIC_API void libvlc_toggle_fullscreen( libvlc_input_t *, libvlc_exception
  * \param b_fullscreen boolean for fullscreen status
  * \param p_exception an initialized exception
  */
-VLC_PUBLIC_API void libvlc_set_fullscreen( libvlc_input_t *, int, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_set_fullscreen( libvlc_media_instance_t *, int, libvlc_exception_t * );
 
 /**
  * Get current fullscreen status
@@ -360,7 +376,7 @@ VLC_PUBLIC_API void libvlc_set_fullscreen( libvlc_input_t *, int, libvlc_excepti
  * \param p_exception an initialized exception
  * \return the fullscreen status (boolean)
  */
-VLC_PUBLIC_API int libvlc_get_fullscreen( libvlc_input_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_get_fullscreen( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /**
  * Get current video height
@@ -368,7 +384,7 @@ VLC_PUBLIC_API int libvlc_get_fullscreen( libvlc_input_t *, libvlc_exception_t *
  * \param p_exception an initialized exception
  * \return the video height
  */
-VLC_PUBLIC_API int libvlc_video_get_height( libvlc_input_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_get_height( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /**
  * Get current video width
@@ -376,7 +392,7 @@ VLC_PUBLIC_API int libvlc_video_get_height( libvlc_input_t *, libvlc_exception_t
  * \param p_exception an initialized exception
  * \return the video width
  */
-VLC_PUBLIC_API int libvlc_video_get_width( libvlc_input_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_get_width( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /**
  * Get current video aspect ratio
@@ -384,7 +400,7 @@ VLC_PUBLIC_API int libvlc_video_get_width( libvlc_input_t *, libvlc_exception_t 
  * \param p_exception an initialized exception
  * \return the video aspect ratio
  */
-VLC_PUBLIC_API char *libvlc_video_get_aspect_ratio( libvlc_input_t *, libvlc_exception_t * );
+VLC_PUBLIC_API char *libvlc_video_get_aspect_ratio( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /**
  * Set new video aspect ratio
@@ -392,7 +408,7 @@ VLC_PUBLIC_API char *libvlc_video_get_aspect_ratio( libvlc_input_t *, libvlc_exc
  * \param psz_aspect new video aspect-ratio
  * \param p_exception an initialized exception
  */
-VLC_PUBLIC_API void libvlc_video_set_aspect_ratio( libvlc_input_t *, char *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_set_aspect_ratio( libvlc_media_instance_t *, char *, libvlc_exception_t * );
 
 /**
  * Get current video subtitle
@@ -400,7 +416,7 @@ VLC_PUBLIC_API void libvlc_video_set_aspect_ratio( libvlc_input_t *, char *, lib
  * \param p_exception an initialized exception
  * \return the video subtitle selected
  */
-VLC_PUBLIC_API int libvlc_video_get_spu( libvlc_input_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_get_spu( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /**
  * Set new video subtitle
@@ -408,7 +424,7 @@ VLC_PUBLIC_API int libvlc_video_get_spu( libvlc_input_t *, libvlc_exception_t * 
  * \param i_spu new video subtitle to select
  * \param p_exception an initialized exception
  */
-VLC_PUBLIC_API void libvlc_video_set_spu( libvlc_input_t *, int , libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_set_spu( libvlc_media_instance_t *, int , libvlc_exception_t * );
 
 /**
  * Get current crop filter geometry
@@ -416,7 +432,7 @@ VLC_PUBLIC_API void libvlc_video_set_spu( libvlc_input_t *, int , libvlc_excepti
  * \param p_exception an initialized exception
  * \return the crop filter geometry
  */
-VLC_PUBLIC_API char *libvlc_video_get_crop_geometry( libvlc_input_t *, libvlc_exception_t * );
+VLC_PUBLIC_API char *libvlc_video_get_crop_geometry( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /**
  * Set new crop filter geometry
@@ -424,7 +440,7 @@ VLC_PUBLIC_API char *libvlc_video_get_crop_geometry( libvlc_input_t *, libvlc_ex
  * \param psz_geometry new crop filter geometry
  * \param p_exception an initialized exception
  */
-VLC_PUBLIC_API void libvlc_video_set_crop_geometry( libvlc_input_t *, char *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_set_crop_geometry( libvlc_media_instance_t *, char *, libvlc_exception_t * );
 
 /**
  * Take a snapshot of the current video window
@@ -432,9 +448,9 @@ VLC_PUBLIC_API void libvlc_video_set_crop_geometry( libvlc_input_t *, char *, li
  * \param psz_filepath the path where to save the screenshot to
  * \param p_exception an initialized exception
  */
-VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_input_t *, char *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_media_instance_t *, char *, libvlc_exception_t * );
 
-VLC_PUBLIC_API int libvlc_video_destroy( libvlc_input_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int libvlc_video_destroy( libvlc_media_instance_t *, libvlc_exception_t *);
 
 /**
  * Resize the current video output window
@@ -444,7 +460,7 @@ VLC_PUBLIC_API int libvlc_video_destroy( libvlc_input_t *, libvlc_exception_t *)
  * \param p_exception an initialized exception
  * \return the success status (boolean)
  */
-VLC_PUBLIC_API void libvlc_video_resize( libvlc_input_t *, int, int, libvlc_exception_t *);
+VLC_PUBLIC_API void libvlc_video_resize( libvlc_media_instance_t *, int, int, libvlc_exception_t *);
 
 /**
  * change the parent for the current the video output
@@ -453,7 +469,7 @@ VLC_PUBLIC_API void libvlc_video_resize( libvlc_input_t *, int, int, libvlc_exce
  * \param p_exception an initialized exception
  * \return the success status (boolean)
  */
-VLC_PUBLIC_API int libvlc_video_reparent( libvlc_input_t *, libvlc_drawable_t, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_reparent( libvlc_media_instance_t *, libvlc_drawable_t, libvlc_exception_t * );
 
 /**
  * Tell windowless video output to redraw rectangular area (MacOS X only)
@@ -461,7 +477,7 @@ VLC_PUBLIC_API int libvlc_video_reparent( libvlc_input_t *, libvlc_drawable_t, l
  * \param area coordinates within video drawable
  * \param p_exception an initialized exception
  */
-VLC_PUBLIC_API void libvlc_video_redraw_rectangle( libvlc_input_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_redraw_rectangle( libvlc_media_instance_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
 
 /**
  * Set the default video output parent
@@ -563,7 +579,7 @@ VLC_PUBLIC_API void libvlc_audio_set_volume( libvlc_instance_t *, int, libvlc_ex
 +  * \param p_exception an initialized exception
 +  * \return the audio track (int)
 +  */
-VLC_PUBLIC_API int libvlc_audio_get_track( libvlc_input_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_audio_get_track( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /**
  * Set current audio track
@@ -571,7 +587,7 @@ VLC_PUBLIC_API int libvlc_audio_get_track( libvlc_input_t *, libvlc_exception_t 
  * \param i_track the track (int)
  * \param p_exception an initialized exception
  */
-VLC_PUBLIC_API void libvlc_audio_set_track( libvlc_input_t *, int, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_audio_set_track( libvlc_media_instance_t *, int, libvlc_exception_t * );
 
 /**
  * Get current audio channel

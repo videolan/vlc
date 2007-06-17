@@ -124,7 +124,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
     mediacontrol_Position* retval = NULL;
     libvlc_exception_t ex;
     vlc_int64_t pos;
-    libvlc_input_t * p_input;
+    libvlc_media_instance_t * p_mi;
 
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
@@ -133,19 +133,19 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
     retval->origin = an_origin;
     retval->key = a_key;
 
-    p_input = libvlc_playlist_get_input( self->p_instance, &ex);
+    p_mi = libvlc_playlist_get_media_instance( self->p_instance, &ex);
     HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
 
     if(  an_origin != mediacontrol_AbsolutePosition )
     {
-        libvlc_input_free( p_input );
+        libvlc_media_instance_destroy_and_detach( p_mi );
         /* Relative or ModuloPosition make no sense */
         RAISE_NULL( mediacontrol_PositionOriginNotSupported,
                     "Only absolute position is valid." );
     }
 
     /* We are asked for an AbsolutePosition. */
-    pos = libvlc_input_get_time( p_input, &ex );
+    pos = libvlc_media_instance_get_time( p_mi, &ex );
 
     if( a_key == mediacontrol_MediaTime )
     {
@@ -155,7 +155,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
     {
         if( ! self->p_playlist->p_input )
         {
-            libvlc_input_free( p_input );
+            libvlc_media_instance_destroy_and_detach( p_mi );
             RAISE_NULL( mediacontrol_InternalException,
                         "No input" );
         }
@@ -164,7 +164,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
                                                    a_key,
                                                    pos );
     }
-    libvlc_input_free( p_input );
+    libvlc_media_instance_destroy_and_detach( p_mi );
     return retval;
 }
 
@@ -174,19 +174,19 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
                                  const mediacontrol_Position * a_position,
                                  mediacontrol_Exception *exception )
 {
-    libvlc_input_t * p_input;
+    libvlc_media_instance_t * p_mi;
     libvlc_exception_t ex;
     vlc_int64_t i_pos;
 
     libvlc_exception_init( &ex );
     mediacontrol_exception_init( exception );
 
-    p_input = libvlc_playlist_get_input( self->p_instance, &ex);
+    p_mi = libvlc_playlist_get_media_instance( self->p_instance, &ex);
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
     i_pos = mediacontrol_position2microsecond( self->p_playlist->p_input, a_position );
-    libvlc_input_set_time( p_input, i_pos / 1000, &ex );
-    libvlc_input_free( p_input );
+    libvlc_media_instance_set_time( p_mi, i_pos / 1000, &ex );
+    libvlc_media_instance_destroy_and_detach( p_mi );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 

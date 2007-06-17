@@ -31,6 +31,8 @@ extern "C" {
 
 #include <vlc/vlc.h>
 #include <vlc/libvlc_structures.h>
+
+#include <vlc_input.h>
     
 /***************************************************************************
  * Internal creation and destruction functions
@@ -82,18 +84,31 @@ struct libvlc_media_descriptor_t
     libvlc_instance_t *p_libvlc_instance;
 };
 
-struct libvlc_input_t
+struct libvlc_media_instance_t
 {
-    int i_input_id;  ///< Input object id. We don't use a pointer to
-                     /// avoid any crash
-    struct libvlc_instance_t *p_instance; ///< Parent instance
+    int i_input_id;  /* Input object id. We don't use a pointer to
+                        avoid any crash */
+    struct libvlc_instance_t  *p_libvlc_instance; /* Parent instance */
+    libvlc_media_descriptor_t *p_md; /* current media descriptor */
 };
 
 /***************************************************************************
  * Other internal functions
  ***************************************************************************/
 VLC_EXPORT (input_thread_t *, libvlc_get_input_thread,
-                        ( struct libvlc_input_t *, libvlc_exception_t * ) );
+                        ( struct libvlc_media_instance_t *, libvlc_exception_t * ) );
+
+VLC_EXPORT (libvlc_media_instance_t *, libvlc_media_instance_new_from_input_thread,
+                        ( struct libvlc_instance_t *, input_thread_t * ) );
+
+VLC_EXPORT (void, libvlc_media_instance_destroy_and_detach,
+                        ( libvlc_media_instance_t * ) );
+
+VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_new_from_input_item,
+                        ( struct libvlc_instance_t *, input_item_t * ) );
+
+VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_duplicate,
+                        ( libvlc_media_descriptor_t * ) );
 
 #define RAISENULL( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
                                 return NULL; }

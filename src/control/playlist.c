@@ -211,29 +211,17 @@ void libvlc_playlist_unlock( libvlc_instance_t *p_instance )
     vlc_mutex_unlock( &PL->object_lock );
 }
 
-libvlc_input_t * libvlc_playlist_get_input( libvlc_instance_t *p_instance,
-                                            libvlc_exception_t *p_e )
+libvlc_media_instance_t * libvlc_playlist_get_media_instance(
+                                libvlc_instance_t *p_instance,
+                                libvlc_exception_t *p_e )
 {
-    libvlc_input_t *p_input;
+    libvlc_media_instance_t *p_mi;
     assert( PL );
 
     vlc_mutex_lock( &PL->object_lock );
-    if( PL->p_input == NULL )
-    {
-        libvlc_exception_raise( p_e, "No active input" );
-        vlc_mutex_unlock( &PL->object_lock );
-        return NULL;
-    }
-    p_input = (libvlc_input_t *)malloc( sizeof( libvlc_input_t ) );
-    if( !p_input )
-    {
-        libvlc_exception_raise( p_e, "out of memory" );
-        vlc_mutex_unlock( &PL->object_lock );
-        return NULL;
-    }
-    p_input->i_input_id = PL->p_input->i_object_id;
-    p_input->p_instance = p_instance;
+    p_mi = libvlc_media_instance_new_from_input_thread(
+                        p_instance, PL->p_input );
     vlc_mutex_unlock( &PL->object_lock );
 
-    return p_input;
+    return p_mi;
 }

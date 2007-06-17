@@ -58,7 +58,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
     if (!p_input_item)
         return NULL; /* XXX: throw an exception */
 
-    p_media_desc = malloc( sizeof(libvlc_input_t) );
+    p_media_desc = malloc( sizeof(libvlc_media_descriptor_t) );
     p_media_desc->p_libvlc_instance = p_instance;
     p_media_desc->p_input_item      = p_input_item;
     p_media_desc->b_preparsed       = VLC_FALSE;
@@ -67,21 +67,56 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
 }
 
 /**************************************************************************
- * Delete a media descriptor object
+ * Create a new media descriptor object from an input_item
+ * (libvlc internal)
  **************************************************************************/
-void libvlc_media_descriptor_destroy( libvlc_media_descriptor_t *p_meta_desc )
+libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
+                                   libvlc_instance_t *p_instance,
+                                   input_item_t *p_input_item )
 {
-    if (!p_meta_desc)
-        return;
+    libvlc_media_descriptor_t * p_media_desc;
 
-    /* XXX: locking */
-    input_ItemClean( p_meta_desc->p_input_item );
+    if (!p_input_item)
+        return NULL; /* XXX: throw an exception */
 
-    free( p_meta_desc );
+    p_media_desc = malloc( sizeof(libvlc_media_descriptor_t) );
+    p_media_desc->p_libvlc_instance = p_instance;
+    p_media_desc->p_input_item      = p_input_item;
+    p_media_desc->b_preparsed       = VLC_TRUE;
+
+    return p_media_desc;
 }
 
 /**************************************************************************
- * Getters for meta information
+ * Delete a media descriptor object
+ **************************************************************************/
+void libvlc_media_descriptor_destroy( libvlc_media_descriptor_t *p_md )
+{
+    if (!p_md)
+        return;
+
+    /* XXX: locking */
+    input_ItemClean( p_md->p_input_item );
+
+    free( p_md );
+}
+
+/**************************************************************************
+ * Delete a media descriptor object
+ **************************************************************************/
+libvlc_media_descriptor_t *
+libvlc_media_descriptor_duplicate( libvlc_media_descriptor_t *p_md_orig )
+{
+    libvlc_media_descriptor_t * p_md;
+
+    p_md = malloc( sizeof(libvlc_media_descriptor_t) );
+    bcopy( p_md_orig, p_md, sizeof(libvlc_media_descriptor_t) );
+
+    return p_md;
+}
+
+/**************************************************************************
+ * Getter for meta information
  **************************************************************************/
 static const int meta_conversion[] =
 {

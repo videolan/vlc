@@ -79,6 +79,19 @@ typedef struct libvlc_media_descriptor_t libvlc_media_descriptor_t;
 
 /**@} */
 
+/*****************************************************************************
+ * Media Instance
+ *****************************************************************************/
+/** defgroup libvlc_media_instance MediaInstance
+ * \ingroup libvlc
+ * LibVLC Media Instance handling
+ * @{
+ */
+
+typedef struct libvlc_media_instance_t libvlc_media_instance_t;
+
+/**@} */
+
 
 /*****************************************************************************
  * Playlist

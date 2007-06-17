@@ -283,17 +283,17 @@ mediacontrol_get_rate( mediacontrol_Instance *self,
 		       mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
-    libvlc_input_t* p_input;
+    libvlc_media_instance_t* p_mi;
     int i_ret;
 
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
-    p_input = libvlc_playlist_get_input( self->p_instance, &ex );
+    p_mi = libvlc_playlist_get_media_instance( self->p_instance, &ex );
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
 
-    i_ret = libvlc_input_get_rate( p_input, &ex );
-    libvlc_input_free( p_input );
+    i_ret = libvlc_media_instance_get_rate( p_mi, &ex );
+    libvlc_media_instance_destroy_and_detach( p_mi );
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
 
     return i_ret / 10;
@@ -305,16 +305,16 @@ mediacontrol_set_rate( mediacontrol_Instance *self,
 		       mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
-    libvlc_input_t* p_input;
+    libvlc_media_instance_t* p_mi;
 
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
-    p_input = libvlc_playlist_get_input( self->p_instance, &ex );
+    p_mi = libvlc_playlist_get_media_instance( self->p_instance, &ex );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
-    libvlc_input_set_rate( p_input, rate * 10, &ex );
-    libvlc_input_free( p_input );
+    libvlc_media_instance_set_rate( p_mi, rate * 10, &ex );
+    libvlc_media_instance_destroy_and_detach( p_mi );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
@@ -323,17 +323,17 @@ mediacontrol_get_fullscreen( mediacontrol_Instance *self,
 			     mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
-    libvlc_input_t* p_input;
+    libvlc_media_instance_t* p_mi;
     int i_ret;
 
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
-    p_input = libvlc_playlist_get_input( self->p_instance, &ex );
+    p_mi = libvlc_playlist_get_media_instance( self->p_instance, &ex );
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
 
-    i_ret = libvlc_get_fullscreen( p_input, &ex );
-    libvlc_input_free( p_input );
+    i_ret = libvlc_get_fullscreen( p_mi, &ex );
+    libvlc_media_instance_destroy_and_detach( p_mi );
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
 
     return i_ret;
@@ -345,15 +345,15 @@ mediacontrol_set_fullscreen( mediacontrol_Instance *self,
 			     mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
-    libvlc_input_t* p_input;
+    libvlc_media_instance_t* p_mi;
 
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
 
-    p_input = libvlc_playlist_get_input( self->p_instance, &ex );
+    p_mi = libvlc_playlist_get_media_instance( self->p_instance, &ex );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
-    libvlc_set_fullscreen( p_input, b_fullscreen, &ex );
-    libvlc_input_free( p_input );
+    libvlc_set_fullscreen( p_mi, b_fullscreen, &ex );
+    libvlc_media_instance_destroy_and_detach( p_mi );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }

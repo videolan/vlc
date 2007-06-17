@@ -29,33 +29,6 @@
 #include <vlc_aout.h>
 
 /*
- * Remember to release the returned input_thread_t since it is locked at
- * the end of this function.
- */
-static input_thread_t *GetInput( libvlc_input_t *p_input,
-                                 libvlc_exception_t *p_exception )
-{
-    input_thread_t *p_input_thread = NULL;
-
-    if( !p_input )
-    {
-        libvlc_exception_raise( p_exception, "Input is NULL" );
-        return NULL;
-    }
-
-    p_input_thread = (input_thread_t*)vlc_object_get(
-                                 p_input->p_instance->p_libvlc_int,
-                                 p_input->i_input_id );
-    if( !p_input_thread )
-    {
-        libvlc_exception_raise( p_exception, "Input does not exist" );
-        return NULL;
-    }
-
-    return p_input_thread;
-}
-
-/*
  * Remember to release the returned aout_instance_t since it is locked at
  * the end of this function.
  */
@@ -142,10 +115,10 @@ void libvlc_audio_set_volume( libvlc_instance_t *p_instance, int i_volume,
 /*****************************************************************************
  * libvlc_audio_get_track : Get the current audio track
  *****************************************************************************/
-int libvlc_audio_get_track( libvlc_input_t *p_input,
+int libvlc_audio_get_track( libvlc_media_instance_t *p_mi,
                             libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = GetInput( p_input, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
     vlc_value_t val_list;
     vlc_value_t val;
     int i_track = -1;
@@ -180,10 +153,10 @@ int libvlc_audio_get_track( libvlc_input_t *p_input,
 /*****************************************************************************
  * libvlc_audio_set_track : Set the current audio track
  *****************************************************************************/
-void libvlc_audio_set_track( libvlc_input_t *p_input, int i_track,
+void libvlc_audio_set_track( libvlc_media_instance_t *p_mi, int i_track,
                              libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = GetInput( p_input, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
     vlc_value_t val_list;
     int i_ret = -1;
     int i;
