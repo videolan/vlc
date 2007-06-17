@@ -29,7 +29,7 @@
 
 
 /**************************************************************************
- * Create a new media descriptor object (Private)
+ * Preparse if not already done (Private)
  **************************************************************************/
 static void preparse_if_needed( libvlc_media_descriptor_t *p_media_desc )
 {
