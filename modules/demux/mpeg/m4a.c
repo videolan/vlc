@@ -28,7 +28,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
-#include <vlc_meta.h>
+#include <vlc_input.h>
 #include "vlc_codec.h"
 
 /*****************************************************************************
@@ -175,6 +175,8 @@ static int Demux( demux_t *p_demux)
             if( p_sys->p_es == NULL )
             {
                 p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
+                vlc_audio_replay_gain_MergeFromMeta( &p_sys->p_packetizer->fmt_out.audio_replay_gain,
+                                                     p_sys->meta );
                 p_sys->p_es = es_out_Add( p_demux->out,
                                           &p_sys->p_packetizer->fmt_out);
             }

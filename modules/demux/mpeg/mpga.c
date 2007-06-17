@@ -30,7 +30,7 @@
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 #include <vlc_codec.h>
-#include <vlc_meta.h>
+#include <vlc_input.h>
 
 #define MPGA_PACKET_SIZE 1024
 
@@ -245,9 +245,6 @@ static int Open( vlc_object_t * p_this )
     else
         p_sys->b_initial_sync_failed = VLC_FALSE;
 
-    p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
-    p_sys->p_es = es_out_Add( p_demux->out,
-                              &p_sys->p_packetizer->fmt_out);
     p_sys->i_bitrate_avg = p_sys->p_packetizer->fmt_out.i_bitrate;
 
     if( p_sys->i_xing_bytes && p_sys->i_xing_frames &&
@@ -269,6 +266,12 @@ static int Open( vlc_object_t * p_this )
         module_Unneed( p_demux, p_id3 );
     }
 
+    /* */
+    p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
+    vlc_audio_replay_gain_MergeFromMeta( &p_sys->p_packetizer->fmt_out.audio_replay_gain,
+                                         p_sys->meta );
+    p_sys->p_es = es_out_Add( p_demux->out,
+                              &p_sys->p_packetizer->fmt_out);
     return VLC_SUCCESS;
 }
 

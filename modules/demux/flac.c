@@ -63,6 +63,7 @@ struct demux_sys_t
     /* Packetizer */
     decoder_t *p_packetizer;
     vlc_meta_t *p_meta;
+    audio_replay_gain_t replay_gain;
 
     int64_t i_time_offset;
     int64_t i_pts;
@@ -114,6 +115,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->b_start = VLC_TRUE;
     p_sys->p_meta = NULL;
+    memset( &p_sys->replay_gain, 0, sizeof(p_sys->replay_gain) );
     p_sys->i_length = 0;
     p_sys->i_time_offset = 0;
     p_sys->i_pts = 0;
@@ -178,6 +180,7 @@ static int Open( vlc_object_t * p_this )
                   p_sys->attachment[p_sys->i_cover_idx]->psz_name );
         vlc_meta_SetArtURL( p_sys->p_meta, psz_url );
     }
+    vlc_audio_replay_gain_MergeFromMeta( &p_sys->replay_gain, p_sys->p_meta );
     return VLC_SUCCESS;
 }
 
@@ -230,6 +233,7 @@ static int Demux( demux_t *p_demux )
             if( p_sys->p_es == NULL )
             {
                 p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
+                p_sys->p_packetizer->fmt_out.audio_replay_gain = p_sys->replay_gain;
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
             }
 
@@ -245,7 +249,6 @@ static int Demux( demux_t *p_demux )
             p_block_out = p_next;
         }
     }
-
     return 1;
 }
 
@@ -636,7 +639,9 @@ static void ParseComment( demux_t *p_demux, uint8_t *p_data, int i_data )
         else IF_EXTRACT("DATE=", psz_date )
         else if( strchr( psz, '=' ) )
         {
-            /* generic (PERFORMER/LICENSE/ORGANIZATION/LOCATION/CONTACT/ISRC and undocumented tags) */
+            /* generic (PERFORMER/LICENSE/ORGANIZATION/LOCATION/CONTACT/ISRC,
+             * undocumented tags and replay gain ) */
+            audio_replay_gain_t *r = &p_sys->replay_gain;
             char *p = strchr( psz, '=' );
             *p++ = '\0';
             vlc_meta_AddExtra( p_sys->p_meta, psz, p );

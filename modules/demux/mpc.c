@@ -26,7 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
-#include <vlc_meta.h>
+#include <vlc_input.h>
 #include <vlc_codec.h>
 #include <math.h>
 
@@ -52,19 +52,11 @@
 static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
 
-static int  pi_replaygain_type[] = { 0, 1, 2 };
-static const char *ppsz_replaygain_type[] = { N_("None"), N_("Title"), N_("Album") };
-
 vlc_module_begin();
-    set_shortname( "MPC" );
-    set_description( _("MusePack demuxer") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
+    set_description( _("MusePack demuxer") );
     set_capability( "demux2", 145 );
-
-    add_integer( "mpc-replaygain-type", 2, NULL,
-                REPLAYGAIN_TYPE_TEXT, REPLAYGAIN_TYPE_LONGTEXT, VLC_FALSE );
-        change_integer_list( pi_replaygain_type, ppsz_replaygain_type, 0 );
 
     set_callbacks( Open, Close );
     add_shortcut( "mpc" );
@@ -104,7 +96,6 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    char        psz_info[4096];
     es_format_t fmt;
     uint8_t     *p_peek;
     module_t    *p_id3;
@@ -167,41 +158,6 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    /* Handle reaply gain */
-    if( p_sys->info.peak_title != 32767 )
-    {
-        int i_type = var_CreateGetInteger( p_demux, "mpc-replaygain-type" );
-        int gain;
-        int peak;
-
-        if( i_type == 2 )       // album
-        {
-            gain = p_sys->info.gain_album;
-            peak = p_sys->info.peak_album;
-        }
-        else if( i_type == 1 )  // title
-        {
-            gain = p_sys->info.gain_title;
-            peak = p_sys->info.peak_title;
-        }
-        else
-        {
-            gain = 0;
-            peak = 0;
-        }
-
-        if( gain )
-        {
-            double g = pow( 10, (double)gain / 2000.0 );
-            double gmax = (double)32767.0 / (peak+1);
-            if( g > gmax )
-                g = gmax;
-
-            msg_Dbg( p_demux, "Using reaply gain factor %f", g );
-            mpc_decoder_scale_output( &p_sys->decoder, g );
-        }
-    }
-
     /* Fill p_demux fields */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
@@ -223,8 +179,20 @@ static int Open( vlc_object_t * p_this )
     fmt.audio.i_bitspersample = 32;
     fmt.i_bitrate = fmt.i_bitrate * fmt.audio.i_channels *
                     fmt.audio.i_bitspersample;
-    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
-
+    if( p_sys->info.peak_title > 0 )
+    {
+        fmt.audio_replay_gain.pb_peak[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+        fmt.audio_replay_gain.pf_peak[AUDIO_REPLAY_GAIN_TRACK] = (float)p_sys->info.peak_title / 32767.0;
+        fmt.audio_replay_gain.pb_gain[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+        fmt.audio_replay_gain.pf_gain[AUDIO_REPLAY_GAIN_TRACK] = (float)p_sys->info.gain_title / 100.0;
+    }
+    if( p_sys->info.peak_album > 0 )
+    {
+        fmt.audio_replay_gain.pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+        fmt.audio_replay_gain.pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = (float)p_sys->info.peak_album / 32767.0;
+        fmt.audio_replay_gain.pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+        fmt.audio_replay_gain.pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = (float)p_sys->info.gain_album / 100.0;
+    }
 
     /* Parse possible id3 header */
     if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
@@ -237,10 +205,8 @@ static int Open( vlc_object_t * p_this )
     if( !p_sys->p_meta )
         p_sys->p_meta = vlc_meta_New();
 
-    sprintf( psz_info, "Musepack v%d", p_sys->info.stream_version );
-    //vlc_meta_SetCodecName( p_sys->p_meta, psz_info );
-    //   ^^ doesn't exist (yet?) to set VLC_META_CODEC_NAME, so...
-    fprintf( stderr, "***** WARNING: Unhandled child meta\n"); 
+    vlc_audio_replay_gain_MergeFromMeta( &fmt.audio_replay_gain, p_sys->p_meta );
+    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
     return VLC_SUCCESS;
 }

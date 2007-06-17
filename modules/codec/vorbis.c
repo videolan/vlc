@@ -672,6 +672,37 @@ static void ParseVorbisComments( decoder_t *p_dec )
                                     psz_value );
                 }
             }
+            else if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_GAIN" ) ||
+                     !strcasecmp( psz_name, "RG_RADIO" ) )
+            {
+                audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
+
+                r->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+                r->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = atof( psz_value );
+            }
+            else if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_PEAK" ) ||
+                     !strcasecmp( psz_name, "RG_PEAK" ) )
+            {
+                audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
+
+                r->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+                r->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = atof( psz_value );
+            }
+            else if( !strcasecmp( psz_name, "REPLAYGAIN_ALBUM_GAIN" ) ||
+                     !strcasecmp( psz_name, "RG_AUDIOPHILE" ) )
+            {
+                audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
+
+                r->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+                r->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
+            }
+            else if( !strcasecmp( psz_name, "REPLAYGAIN_ALBUM_PEAK" ) )
+            {
+                audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
+
+                r->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+                r->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
+            }
 #if 0 //not used
             else if( !strcasecmp( psz_name, "musicbrainz_artistid" ) )
             {
