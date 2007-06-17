@@ -166,7 +166,7 @@ static int Create( vlc_object_t *p_this )
         }
         else
         {
-            msg_Err( p_filter, "no valid gradient mode provided" );
+            msg_Err( p_filter, "no valid gradient mode provided (%s)", psz_method );
             p_filter->p_sys->i_mode = GRADIENT;
         }
     }
@@ -761,7 +761,7 @@ static int GradientCallback( vlc_object_t *p_this, char const *psz_var,
         }
         else
         {
-            msg_Err( p_this, "no valid gradient mode provided" );
+            msg_Err( p_this, "no valid gradient mode provided (%s)", newval.psz_string );
             p_sys->i_mode = GRADIENT;
         }
     }
