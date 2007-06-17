@@ -429,6 +429,125 @@ void E_(Close_LuaPlaylist)( vlc_object_t *p_this )
     free( p_demux->p_sys );
 }
 
+static inline void read_options( demux_t *p_demux, lua_State *p_state,
+                                 int o, int t, int *pi_options,
+                                 char ***pppsz_options )
+{
+    lua_getfield( p_state, o, "options" );
+    if( lua_istable( p_state, t ) )
+    {
+        lua_pushnil( p_state );
+        while( lua_next( p_state, t ) )
+        {
+            if( lua_isstring( p_state, t+2 ) )
+            {
+                char *psz_option = strdup( lua_tostring( p_state, t+2 ) );
+                msg_Dbg( p_demux, "Option: %s", psz_option );
+                INSERT_ELEM( *pppsz_options, *pi_options, *pi_options,
+                             psz_option );
+            }
+            else
+            {
+                msg_Warn( p_demux, "Option should be a string" );
+            }
+            lua_pop( p_state, 1 ); /* pop option */
+        }
+    }
+    lua_pop( p_state, 1 ); /* pop "options" */
+}
+
+static inline void read_meta_data( demux_t *p_demux,
+                                   lua_State *p_state, int o, int t,
+                                   input_item_t *p_input )
+{
+    const char *psz_value;
+#define TRY_META( a, b )                                    \
+    lua_getfield( p_state, o, a );                          \
+    if( lua_isstring( p_state, t ) )                        \
+    {                                                       \
+        psz_value = lua_tostring( p_state, t );             \
+        msg_Dbg( p_demux, #b ": %s", psz_value );           \
+        vlc_meta_Set ## b ( p_input->p_meta, psz_value );   \
+    }                                                       \
+    lua_pop( p_state, 1 ); /* pop a */
+    TRY_META( "title", Title );
+    TRY_META( "artist", Artist );
+    TRY_META( "genre", Genre );
+    TRY_META( "copyright", Copyright );
+    TRY_META( "album", Album );
+    TRY_META( "tracknum", Tracknum );
+    TRY_META( "description", Description );
+    TRY_META( "rating", Rating );
+    TRY_META( "date", Date );
+    TRY_META( "setting", Setting );
+    TRY_META( "url", URL );
+    TRY_META( "language", Language );
+    TRY_META( "nowplaying", NowPlaying );
+    TRY_META( "publisher", Publisher );
+    TRY_META( "encodedby", EncodedBy );
+    TRY_META( "arturl", ArtURL );
+    TRY_META( "trackid", TrackID );
+}
+
+static inline void read_custom_meta_data( demux_t *p_demux,
+                                          lua_State *p_state, int o, int t,
+                                          input_item_t *p_input )
+{
+    lua_getfield( p_state, o, "meta" );
+    if( lua_istable( p_state, t ) )
+    {
+        lua_pushnil( p_state );
+        while( lua_next( p_state, t ) )
+        {
+            if( !lua_isstring( p_state, t+1 ) )
+            {
+                msg_Warn( p_demux, "Custom meta data category name must be "
+                                   "a string" );
+            }
+            else if( !lua_istable( p_state, t+2 ) )
+            {
+                msg_Warn( p_demux, "Custom meta data category contents "
+                                   "must be a table" );
+            }
+            else
+            {
+                const char *psz_meta_category = lua_tostring( p_state, t+1 );
+                msg_Dbg( p_demux, "Found custom meta data category: %s",
+                         psz_meta_category );
+                lua_pushnil( p_state );
+                while( lua_next( p_state, t+2 ) )
+                {
+                    if( !lua_isstring( p_state, t+3 ) )
+                    {
+                        msg_Warn( p_demux, "Custom meta category item name "
+                                           "must be a string." );
+                    }
+                    else if( !lua_isstring( p_state, t+4 ) )
+                    {
+                        msg_Warn( p_demux, "Custom meta category item value "
+                                           "must be a string." );
+                    }
+                    else
+                    {
+                        const char *psz_meta_name =
+                            lua_tostring( p_state, t+3 );
+                        const char *psz_meta_value =
+                            lua_tostring( p_state, t+4 );
+                        msg_Dbg( p_demux, "Custom meta %s, %s: %s",
+                                 psz_meta_category, psz_meta_name,
+                                 psz_meta_value );
+                        input_ItemAddInfo( p_input, psz_meta_category,
+                                           psz_meta_name, psz_meta_value );
+                    }
+                    lua_pop( p_state, 1 ); /* pop item */
+                }
+            }
+            lua_pop( p_state, 1 ); /* pop category */
+        }
+    }
+    lua_pop( p_state, 1 ); /* pop "meta" */
+}
+
 static int Demux( demux_t *p_demux )
 {
     input_item_t *p_input;
@@ -461,7 +580,7 @@ static int Demux( demux_t *p_demux )
 
     /* Check that the Lua stack is big enough and grow it if needed.
      * Should be ok since LUA_MINSTACK is 20 but we never know. */
-    lua_checkstack( p_state, 7 );
+    lua_checkstack( p_state, 8 );
 
     if( ( t = lua_gettop( p_state ) ) )
     {
@@ -506,30 +625,8 @@ static int Demux( demux_t *p_demux )
                         lua_pop( p_state, 1 ); /* pop "duration" */
 
                         /* Read options */
-                        lua_getfield( p_state, t+2, "options" );
-                        if( lua_istable( p_state, t+5 ) )
-                        {
-                            lua_pushnil( p_state );
-                            while( lua_next( p_state, t+5 ) )
-                            {
-                                if( lua_isstring( p_state, t+7 ) )
-                                {
-                                    char *psz_option = strdup(
-                                        lua_tostring( p_state, t+7 ) );
-                                    msg_Dbg( p_demux, "Option: %s",
-                                             psz_option );
-                                    INSERT_ELEM( ppsz_options, i_options,
-                                                 i_options, psz_option );
-                                }
-                                else
-                                {
-                                    msg_Warn( p_demux,
-                                              "Option should be a string" );
-                                }
-                                lua_pop( p_state, 1 ); /* pop option */
-                            }
-                        }
-                        lua_pop( p_state, 1 ); /* pop "options" */
+                        read_options( p_demux, p_state, t+2, t+5,
+                                      &i_options, &ppsz_options );
 
                         /* Create input item */
                         p_input = input_ItemNewExt( p_playlist, psz_path,
@@ -540,32 +637,11 @@ static int Demux( demux_t *p_demux )
 
                         /* Read meta data */
                         p_input->p_meta = vlc_meta_New();
-#define TRY_META( a, b )                                                     \
-                        lua_getfield( p_state, t+2, a );                     \
-                        if( lua_isstring( p_state, t+4 ) )                   \
-                        {                                                    \
-                            psz_name = lua_tostring( p_state, t+4 );         \
-                            msg_Dbg( p_demux, #b ": %s", psz_name );         \
-                            vlc_meta_Set ## b ( p_input->p_meta, psz_name ); \
-                        }                                                    \
-                        lua_pop( p_state, 1 ); /* pop a */
-                        TRY_META( "title", Title );
-                        TRY_META( "artist", Artist );
-                        TRY_META( "genre", Genre );
-                        TRY_META( "copyright", Copyright );
-                        TRY_META( "album", Album );
-                        TRY_META( "tracknum", Tracknum );
-                        TRY_META( "description", Description );
-                        TRY_META( "rating", Rating );
-                        TRY_META( "date", Date );
-                        TRY_META( "setting", Setting );
-                        TRY_META( "url", URL );
-                        TRY_META( "language", Language );
-                        TRY_META( "nowplaying", NowPlaying );
-                        TRY_META( "publisher", Publisher );
-                        TRY_META( "encodedby", EncodedBy );
-                        TRY_META( "arturl", ArtURL );
-                        TRY_META( "trackid", TrackID );
+                        read_meta_data( p_demux, p_state, t+2, t+4, p_input );
+
+                        /* Read custom meta data */
+                        read_custom_meta_data( p_demux, p_state, t+2, t+4,
+                                               p_input );
 
                         /* Append item to playlist */
                         playlist_BothAddInput(
