@@ -144,10 +144,10 @@ vlc_module_begin();
     add_integer( CFG_PREFIX "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_TRUE );
     add_integer( CFG_PREFIX "position", 5, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 
     set_section( N_("Font"), NULL );
     /* 5 sets the default to top [1] left [4] */
-    change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
     add_integer( CFG_PREFIX "color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
