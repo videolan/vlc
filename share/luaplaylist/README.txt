@@ -31,6 +31,10 @@ VLC Lua playlist modules should define two functions:
                 .options: a list of VLC options (OPTIONAL)
                           example: .options = { "fullscreen" }
                 .duration: stream duration in seconds (OPTIONAL)
+                .meta: custom meta data (OPTIONAL, meta data)
+                       A .meta field is a table of custom meta categories which
+                       each have custom meta properties.
+                       example: .meta = { ["Google video"] = { ["docid"] = "-5784010886294950089"; ["GVP version"] = "1.1" }; ["misc"] = { "Hello" = "World!" } }
             Invalid playlist items will be discarded by VLC.
 
 VLC defines a global vlc object with the following members:
