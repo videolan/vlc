@@ -114,6 +114,7 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
     } \
     CONNECT( ui.widget##Enable, clicked(), this, updateFilters() );
 #define SETUP_VFILTER_OPTION( widget, signal ) \
+    initComboBoxItems( ui.widget ); \
     setWidgetValue( ui.widget ); \
     CONNECT( ui.widget, signal, this, updateFilterOptions() );
 
@@ -140,7 +141,7 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
     SETUP_VFILTER_OPTION( gradientTypeCheck, stateChanged(int) )
     SETUP_VFILTER_OPTION( gradientCartoonCheck, stateChanged(int) )
 
-    SETUP_VFILTER( blur )
+    SETUP_VFILTER( motionblur )
     SETUP_VFILTER_OPTION( blurFactorSlider, valueChanged(int) )
 
     SETUP_VFILTER( motiondetect )
@@ -211,7 +212,7 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
         vlc_object_find_name( p_intf->p_libvlc_global, psz_name, FIND_CHILD );
     if( !p_obj )
     {
-        msg_Err( p_intf, "Unable to find filter module." );
+        msg_Err( p_intf, "Unable to find filter module \"%s\n.", psz_name );
         return;
     }
 
@@ -319,6 +320,32 @@ void ExtVideo::updateFilters()
                                    : groupbox->isChecked() );
 }
 
+void ExtVideo::initComboBoxItems( QObject *widget )
+{
+    QComboBox *combobox = qobject_cast<QComboBox*>(widget);
+    if( !combobox ) return;
+    QString option = OptionFromWidgetName( widget );
+    module_config_t *p_item = config_FindConfig( VLC_OBJECT(p_intf),
+                                                 option.toStdString().c_str() );
+    if( p_item )
+    {
+        int i_type = p_item->i_type & CONFIG_ITEM;
+        for( int i_index = 0; i_index < p_item->i_list; i_index++ )
+        {
+            if( i_type == CONFIG_ITEM_INTEGER
+             || i_type == CONFIG_ITEM_BOOL )
+                combobox->addItem( qfu( p_item->ppsz_list_text[i_index] ), p_item->pi_list[i_index] );
+            else if( i_type == CONFIG_ITEM_STRING )
+                combobox->addItem( qfu( p_item->ppsz_list_text[i_index] ), p_item->ppsz_list[i_index] );
+        }
+    }
+    else
+    {
+        msg_Err( p_intf, "Couldn't find option \"%s\".",
+                 option.toStdString().c_str() );
+    }
+}
+
 void ExtVideo::setWidgetValue( QObject *widget )
 {
     QString module = ModuleFromWidgetName( widget->parent() );
@@ -384,6 +411,8 @@ void ExtVideo::setWidgetValue( QObject *widget )
             sprintf( str, "%06X", val.i_int );
             lineedit->setText( str );
         }
+        else if( combobox ) combobox->setCurrentIndex(
+                            combobox->findData( val.i_int ) );
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
     }
     else if( i_type == VLC_VAR_FLOAT )
@@ -397,6 +426,8 @@ void ExtVideo::setWidgetValue( QObject *widget )
     {
         const char *psz_string = NULL;
         if( lineedit ) lineedit->setText( qfu(val.psz_string) );
+        else if( combobox ) combobox->setCurrentIndex(
+                            combobox->findData( qfu( val.psz_string ) ) );
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
         free( val.psz_string );
     }
@@ -426,13 +457,13 @@ void ExtVideo::updateFilterOptions()
     }
 
     int i_type = var_Type( p_obj, option.toStdString().c_str() );
-    if( !( i_type & VLC_VAR_ISCOMMAND ) )
+    bool b_is_command = ( i_type & VLC_VAR_ISCOMMAND );
+    if( !b_is_command )
     {
-        vlc_object_release( p_obj );
-        msg_Err( p_intf, "Module %s's %s variable isn't a command.",
+        msg_Warn( p_intf, "Module %s's %s variable isn't a command. You'll need to restart the filter to take change into account.",
                  module.toStdString().c_str(),
                  option.toStdString().c_str() );
-        return;
+        /* FIXME: restart automatically somewhere near the end of this function */
     }
 
     /* Try to cast to all the widgets we're likely to encounter. Only
@@ -454,12 +485,16 @@ void ExtVideo::updateFilterOptions()
         else if( spinbox )  i_int = spinbox->value();
         else if( dial )     i_int = (540-dial->value())%360;
         else if( lineedit ) i_int = lineedit->text().toInt(NULL,16);
+        else if( combobox ) i_int = combobox->itemData(combobox->currentIndex()).toInt();
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
         config_PutInt( p_intf, option.toStdString().c_str(), i_int );
-        if( i_type == VLC_VAR_INTEGER )
-            var_SetInteger( p_obj, option.toStdString().c_str(), i_int );
-        else
-            var_SetBool( p_obj, option.toStdString().c_str(), i_int );
+        if( b_is_command )
+        {
+            if( i_type == VLC_VAR_INTEGER )
+                var_SetInteger( p_obj, option.toStdString().c_str(), i_int );
+            else
+                var_SetBool( p_obj, option.toStdString().c_str(), i_int );
+        }
     }
     else if( i_type == VLC_VAR_FLOAT )
     {
@@ -470,15 +505,21 @@ void ExtVideo::updateFilterOptions()
         else if( lineedit ) f_float = lineedit->text().toDouble();
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
         config_PutFloat( p_intf, option.toStdString().c_str(), f_float );
-        var_SetFloat( p_obj, option.toStdString().c_str(), f_float );
+        if( b_is_command )
+            var_SetFloat( p_obj, option.toStdString().c_str(), f_float );
     }
     else if( i_type == VLC_VAR_STRING )
     {
         char *psz_string = NULL;
         if( lineedit ) psz_string = qtu(lineedit->text());
+        else if( combobox ) psz_string = qtu(combobox->itemData(
+                                         combobox->currentIndex()).toString());
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
+        psz_string = strdup( psz_string );
         config_PutPsz( p_intf, option.toStdString().c_str(), psz_string );
-        var_SetString( p_obj, option.toStdString().c_str(), psz_string );
+        if( b_is_command )
+            var_SetString( p_obj, option.toStdString().c_str(), psz_string );
+        free( psz_string );
     }
     else
         msg_Err( p_intf,

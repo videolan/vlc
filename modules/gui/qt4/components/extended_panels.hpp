@@ -45,6 +45,7 @@ private:
     Ui::ExtVideoWidget ui;
     QSignalMapper* filterMapper;
     intf_thread_t *p_intf;
+    void initComboBoxItems( QObject* );
     void setWidgetValue( QObject* );
     void ChangeVFiltersString( char *psz_name, vlc_bool_t b_add );
 private slots:

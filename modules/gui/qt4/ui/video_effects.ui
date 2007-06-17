@@ -86,8 +86,23 @@
           </item>
           <item row="0" column="1" >
            <widget class="QSlider" name="sharpenSigmaSlider" >
+            <property name="maximum" >
+             <number>200</number>
+            </property>
+            <property name="singleStep" >
+             <number>1</number>
+            </property>
+            <property name="pageStep" >
+             <number>10</number>
+            </property>
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="tickPosition" >
+             <enum>QSlider::TicksBothSides</enum>
+            </property>
+            <property name="tickInterval" >
+             <number>100</number>
             </property>
            </widget>
           </item>
@@ -123,6 +138,12 @@
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>
             </property>
+            <property name="tickPosition" >
+             <enum>QSlider::TicksBothSides</enum>
+            </property>
+            <property name="tickInterval" >
+             <number>60</number>
+            </property>
            </widget>
           </item>
           <item row="4" column="1" >
@@ -132,6 +153,9 @@
             </property>
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="tickPosition" >
+             <enum>QSlider::TicksBothSides</enum>
             </property>
             <property name="tickInterval" >
              <number>50</number>
@@ -146,6 +170,9 @@
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>
             </property>
+            <property name="tickPosition" >
+             <enum>QSlider::TicksBothSides</enum>
+            </property>
             <property name="tickInterval" >
              <number>100</number>
             </property>
@@ -159,6 +186,9 @@
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>
             </property>
+            <property name="tickPosition" >
+             <enum>QSlider::TicksBothSides</enum>
+            </property>
             <property name="tickInterval" >
              <number>100</number>
             </property>
@@ -171,6 +201,9 @@
             </property>
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="tickPosition" >
+             <enum>QSlider::TicksBothSides</enum>
             </property>
             <property name="tickInterval" >
              <number>100</number>
@@ -521,7 +554,7 @@
         </widget>
        </item>
        <item row="0" column="1" >
-        <widget class="QGroupBox" name="blurEnable" >
+        <widget class="QGroupBox" name="motionblurEnable" >
          <property name="title" >
           <string>_("Motion blur")</string>
          </property>
@@ -547,8 +580,23 @@
           </item>
           <item row="0" column="1" >
            <widget class="QSlider" name="blurFactorSlider" >
+            <property name="minimum" >
+             <number>1</number>
+            </property>
+            <property name="maximum" >
+             <number>127</number>
+            </property>
+            <property name="value" >
+             <number>80</number>
+            </property>
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="tickPosition" >
+             <enum>QSlider::TicksBothSides</enum>
+            </property>
+            <property name="tickInterval" >
+             <number>16</number>
             </property>
            </widget>
           </item>
@@ -852,8 +900,17 @@
           </item>
           <item row="3" column="1" colspan="2" >
            <widget class="QSlider" name="logoTransparencySlider" >
+            <property name="maximum" >
+             <number>255</number>
+            </property>
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="tickPosition" >
+             <enum>QSlider::TicksBothSides</enum>
+            </property>
+            <property name="tickInterval" >
+             <number>32</number>
             </property>
            </widget>
           </item>
