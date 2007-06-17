@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
+#include <math.h>
 
 #include <vlc_input.h>                 /* for input_thread_t and i_pts_delay */
 
@@ -51,7 +52,9 @@ static int VisualizationCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 static int EqualizerCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
-
+static int ReplayGainCallback( vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void * );
+static void ReplayGainSelect( aout_instance_t *, aout_input_t * );
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
@@ -160,6 +163,47 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                     VLC_VAR_STRING | VLC_VAR_DOINHERIT );
         text.psz_string = _("Audio visualizations");
         var_Change( p_aout, "audio-visual", VLC_VAR_SETTEXT, &text, NULL );
+    }
+
+    if( var_Type( p_aout, "audio-replay-gain-mode" ) == 0 )
+    {
+        module_config_t *p_config;
+        int i;
+
+        p_config = config_FindConfig( VLC_OBJECT(p_aout), "audio-replay-gain-mode" );
+        if( p_config && p_config->i_list )
+        {
+            var_Create( p_aout, "audio-replay-gain-mode",
+                        VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+
+            text.psz_string = _("Replay gain");
+            var_Change( p_aout, "audio-replay-gain-mode", VLC_VAR_SETTEXT, &text, NULL );
+
+            for( i = 0; i < p_config->i_list; i++ )
+            {
+                val.psz_string = (char *)p_config->ppsz_list[i];
+                text.psz_string = (char *)p_config->ppsz_list_text[i];
+                var_Change( p_aout, "audio-replay-gain-mode", VLC_VAR_ADDCHOICE,
+                            &val, &text );
+            }
+
+            var_AddCallback( p_aout, "audio-replay-gain-mode", ReplayGainCallback, NULL );
+        }
+    }
+    if( var_Type( p_aout, "audio-replay-gain-preamp" ) == 0 )
+    {
+        var_Create( p_aout, "audio-replay-gain-preamp",
+                    VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    }
+    if( var_Type( p_aout, "audio-replay-gain-default" ) == 0 )
+    {
+        var_Create( p_aout, "audio-replay-gain-default",
+                    VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    }
+    if( var_Type( p_aout, "audio-replay-gain-peak-protection" ) == 0 )
+    {
+        var_Create( p_aout, "audio-replay-gain-peak-protection",
+                    VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     }
 
     var_Get( p_aout, "audio-filter", &val );
@@ -366,6 +410,9 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                                     (int)(p_input->input.i_bytes_per_frame
                                      * p_input->input.i_rate
                                      / p_input->input.i_frame_length) );
+
+    ReplayGainSelect( p_aout, p_input );
+
     /* Success */
     p_input->b_error = VLC_FALSE;
     p_input->b_restart = VLC_FALSE;
@@ -658,6 +705,11 @@ static void inputFailure( aout_instance_t * p_aout, aout_input_t * p_input,
     var_Destroy( p_aout, "audio-filter" );
     var_Destroy( p_aout, "audio-visual" );
 
+    var_Destroy( p_aout, "audio-replay-gain-mode" );
+    var_Destroy( p_aout, "audio-replay-gain-default" );
+    var_Destroy( p_aout, "audio-replay-gain-preamp" );
+    var_Destroy( p_aout, "audio-replay-gain-peak-protection" );
+
     /* error flag */
     p_input->b_error = 1;
 }
@@ -817,3 +869,69 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     return VLC_SUCCESS;
 }
+
+static int ReplayGainCallback( vlc_object_t *p_this, char const *psz_cmd,
+                               vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    int i;
+
+    vlc_mutex_lock( &p_aout->mixer_lock );
+    for( i = 0; i < p_aout->i_nb_inputs; i++ )
+        ReplayGainSelect( p_aout, p_aout->pp_inputs[i] );
+    vlc_mutex_unlock( &p_aout->mixer_lock );
+
+    return VLC_SUCCESS;
+}
+
+static void ReplayGainSelect( aout_instance_t *p_aout, aout_input_t *p_input )
+{
+    char *psz_replay_gain = var_GetString( p_aout, "audio-replay-gain-mode" );
+    int i_mode;
+    int i_use;
+    float f_gain;
+
+    p_input->f_multiplier = 1.0;
+
+    if( !psz_replay_gain )
+        return;
+
+    /* Find select mode */
+    if( !strcmp( psz_replay_gain, "track" ) )
+        i_mode = AUDIO_REPLAY_GAIN_TRACK;
+    else if( !strcmp( psz_replay_gain, "album" ) )
+        i_mode = AUDIO_REPLAY_GAIN_ALBUM;
+    else
+        i_mode = AUDIO_REPLAY_GAIN_MAX;
+
+    /* If the select mode is not available, prefer the other one */
+    i_use = i_mode;
+    if( i_use != AUDIO_REPLAY_GAIN_MAX && !p_input->replay_gain.pb_gain[i_use] )
+    {
+        for( i_use = 0; i_use < AUDIO_REPLAY_GAIN_MAX; i_use++ )
+        {
+            if( p_input->replay_gain.pb_gain[i_use] )
+                break;
+        }
+    }
+
+    /* */
+    if( i_use != AUDIO_REPLAY_GAIN_MAX )
+        f_gain = p_input->replay_gain.pf_gain[i_use] + var_GetFloat( p_aout, "audio-replay-gain-preamp" );
+    else if( i_mode != AUDIO_REPLAY_GAIN_MAX )
+        f_gain = var_GetFloat( p_aout, "audio-replay-gain-default" );
+    else
+        f_gain = 0.0;
+    p_input->f_multiplier = pow( 10.0, f_gain / 20.0 );
+
+    /* */
+    if( p_input->replay_gain.pb_peak[i_use] &&
+        var_GetBool( p_aout, "audio-replay-gain-peak-protection" ) &&
+        p_input->replay_gain.pf_peak[i_use] * p_input->f_multiplier > 1.0 )
+    {
+        p_input->f_multiplier = 1.0f / p_input->replay_gain.pf_peak[i_use];
+    }
+
+    free( psz_replay_gain );
+}
+

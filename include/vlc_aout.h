@@ -270,6 +270,8 @@ struct aout_input_t
 
     /* Mixer information */
     byte_t *                p_first_byte_to_mix;
+    audio_replay_gain_t     replay_gain;
+    float                   f_multiplier;
 
     /* If b_restart == 1, the input pipeline will be re-created. */
     vlc_bool_t              b_restart;

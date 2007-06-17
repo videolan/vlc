@@ -60,14 +60,20 @@ static int Create( vlc_object_t *p_this )
         return -1;
     }
 
+    /* Use the trivial mixer when we can */
     if ( p_aout->i_nb_inputs == 1 && p_aout->mixer.f_multiplier == 1.0 )
     {
-        /* Tell the trivial mixer to go for it. */
-        return -1;
+        int i;
+        for( i = 0; i < p_aout->i_nb_inputs; i++ )
+        {
+            if( p_aout->pp_inputs[i]->f_multiplier != 1.0 )
+                break;
+        }
+        if( i >= p_aout->i_nb_inputs )
+            return -1;
     }
 
     p_aout->mixer.pf_do_work = DoWork;
-
     return 0;
 }
 
@@ -109,15 +115,17 @@ static void MeanWords( float * p_out, const float * p_in, size_t i_nb_words,
  *****************************************************************************/
 static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
-    int i_nb_inputs = p_aout->i_nb_inputs;
-    float f_multiplier = p_aout->mixer.f_multiplier;
+    const int i_nb_inputs = p_aout->i_nb_inputs;
+    const float f_multiplier_global = p_aout->mixer.f_multiplier;
+    const int i_nb_channels = aout_FormatNbChannels( &p_aout->mixer.mixer );
     int i_input;
-    int i_nb_channels = aout_FormatNbChannels( &p_aout->mixer.mixer );
 
     for ( i_input = 0; i_input < i_nb_inputs; i_input++ )
     {
         int i_nb_words = p_buffer->i_nb_samples * i_nb_channels;
         aout_input_t * p_input = p_aout->pp_inputs[i_input];
+        float f_multiplier = f_multiplier_global * p_input->f_multiplier;
+
         float * p_out = (float *)p_buffer->p_buffer;
         float * p_in = (float *)p_input->p_first_byte_to_mix;
 

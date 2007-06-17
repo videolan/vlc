@@ -220,6 +220,28 @@ static const char *ppsz_force_dolby_descriptions[] = { N_("Auto"), N_("On"), N_(
 #define AUDIO_VISUAL_LONGTEXT N_( \
     "This adds visualization modules (spectrum analyzer, etc.).")
 
+
+#define AUDIO_REPLAY_GAIN_MODE_TEXT N_( \
+    "Replay gain mode" )
+#define AUDIO_REPLAY_GAIN_MODE_LONGTEXT N_( \
+    "Select the replay gain mode" )
+#define AUDIO_REPLAY_GAIN_PREAMP_TEXT N_( \
+    "Replay preamp" )
+#define AUDIO_REPLAY_GAIN_PREAMP_LONGTEXT N_( \
+    "This allows you to change the default target level (89 dB) " \
+    "for stream with replay gain information" )
+#define AUDIO_REPLAY_GAIN_DEFAULT_TEXT N_( \
+    "Default replay gain" )
+#define AUDIO_REPLAY_GAIN_DEFAULT_LONGTEXT N_( \
+    "This is the gain used for stream without replay gain information" )
+#define AUDIO_REPLAY_GAIN_PEAK_PROTECTION_TEXT N_( \
+    "Peak protection" )
+#define AUDIO_REPLAY_GAIN_PEAK_PROTECTION_LONGTEXT N_( \
+    "Protect against sound clipping" )
+
+static const char *ppsz_replay_gain_mode[] = { "none", "track", "album" };
+static const char *ppsz_replay_gain_mode_text[] = { N_("None"), N_("Track"), N_("Album") };
+
 /*****************************************************************************
  * Video
  ****************************************************************************/
@@ -1292,6 +1314,18 @@ vlc_module_begin();
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions, 0 );
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
                  DESYNC_LONGTEXT, VLC_TRUE );
+
+    /* FIXME TODO create a subcat replay gain ? */
+    add_string( "audio-replay-gain-mode", ppsz_replay_gain_mode[0], NULL, AUDIO_REPLAY_GAIN_MODE_TEXT,
+                AUDIO_REPLAY_GAIN_MODE_LONGTEXT, VLC_FALSE );
+        change_string_list( ppsz_replay_gain_mode, ppsz_replay_gain_mode_text, 0 );
+    add_float( "audio-replay-gain-preamp", 0.0, NULL,
+               AUDIO_REPLAY_GAIN_PREAMP_TEXT, AUDIO_REPLAY_GAIN_PREAMP_LONGTEXT, VLC_FALSE );
+    add_float( "audio-replay-gain-default", -7.0, NULL,
+               AUDIO_REPLAY_GAIN_DEFAULT_TEXT, AUDIO_REPLAY_GAIN_DEFAULT_LONGTEXT, VLC_FALSE );
+    add_bool( "audio-replay-gain-peak-protection", VLC_TRUE, NULL,
+              AUDIO_REPLAY_GAIN_PEAK_PROTECTION_TEXT, AUDIO_REPLAY_GAIN_PEAK_PROTECTION_LONGTEXT, VLC_TRUE );
+
     set_subcategory( SUBCAT_AUDIO_AOUT );
     add_module( "aout", "audio output", NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT,
                 VLC_TRUE );

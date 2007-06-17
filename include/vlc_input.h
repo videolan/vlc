@@ -196,6 +196,47 @@ VLC_EXPORT( input_item_t *, input_ItemNewWithType, ( vlc_object_t *, const char 
 VLC_EXPORT( input_item_t *, input_ItemGetById, (playlist_t *, int ) );
 
 /*****************************************************************************
+ * Meta data helpers
+ *****************************************************************************/
+static inline void vlc_audio_replay_gain_MergeFromMeta( audio_replay_gain_t *p_dst,
+                                                        const vlc_meta_t *p_meta )
+{
+    int i;
+    if( !p_meta )
+        return;
+
+    for( i = 0; i < p_meta->i_extra; i++ )
+    {
+        const char *psz_name = p_meta->ppsz_extra_name[i];
+        const char *psz_value = p_meta->ppsz_extra_value[i];
+
+        if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_GAIN" ) ||
+            !strcasecmp( psz_name, "RG_RADIO" ) )
+        {
+            p_dst->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+            p_dst->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = atof( psz_value );
+        }
+        else if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_PEAK" ) ||
+                 !strcasecmp( psz_name, "RG_PEAK" ) )
+        {
+            p_dst->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = VLC_TRUE;
+            p_dst->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = atof( psz_value );
+        }
+        else if( !strcasecmp( psz_name, "REPLAYGAIN_ALBUM_GAIN" ) ||
+                 !strcasecmp( psz_name, "RG_AUDIOPHILE" ) )
+        {
+            p_dst->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+            p_dst->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
+        }
+        else if( !strcasecmp( psz_name, "REPLAYGAIN_ALBUM_PEAK" ) )
+        {
+            p_dst->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
+            p_dst->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
+        }
+    }
+}
+
+/*****************************************************************************
  * Seek point: (generalisation of chapters)
  *****************************************************************************/
 struct seekpoint_t

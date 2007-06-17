@@ -45,7 +45,8 @@
  * aout_DecNew : create a decoder
  *****************************************************************************/
 static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
-                              audio_sample_format_t * p_format )
+                              audio_sample_format_t *p_format,
+                              audio_replay_gain_t *p_replay_gain )
 {
     aout_input_t * p_input;
     input_thread_t * p_input_thread;
@@ -82,6 +83,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
         msg_Err( p_aout, "out of memory" );
         goto error;
     }
+    memset( p_input, 0, sizeof(aout_input_t) );
 
     vlc_mutex_init( p_aout, &p_input->lock );
 
@@ -90,6 +92,8 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     aout_FormatPrepare( p_format );
     memcpy( &p_input->input, p_format,
             sizeof(audio_sample_format_t) );
+    if( p_replay_gain )
+        p_input->replay_gain = *p_replay_gain;
 
     p_aout->pp_inputs[p_aout->i_nb_inputs] = p_input;
     p_aout->i_nb_inputs++;
@@ -166,7 +170,8 @@ error:
 
 aout_input_t * __aout_DecNew( vlc_object_t * p_this,
                               aout_instance_t ** pp_aout,
-                              audio_sample_format_t * p_format )
+                              audio_sample_format_t * p_format,
+                              audio_replay_gain_t *p_replay_gain )
 {
     if ( *pp_aout == NULL )
     {
@@ -191,7 +196,7 @@ aout_input_t * __aout_DecNew( vlc_object_t * p_this,
         }
     }
 
-    return DecNew( p_this, *pp_aout, p_format );
+    return DecNew( p_this, *pp_aout, p_format, p_replay_gain );
 }
 
 /*****************************************************************************

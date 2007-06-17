@@ -415,6 +415,24 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
         }
     }
 
+    /* Copy ourself the input replay gain */
+    if( fmt->i_cat == AUDIO_ES )
+    {
+        int i;
+        for( i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
+        {
+            if( !p_dec->fmt_out.audio_replay_gain.pb_peak[i] )
+            {
+                p_dec->fmt_out.audio_replay_gain.pb_peak[i] = fmt->audio_replay_gain.pb_peak[i];
+                p_dec->fmt_out.audio_replay_gain.pf_peak[i] = fmt->audio_replay_gain.pf_peak[i];
+            }
+            if( !p_dec->fmt_out.audio_replay_gain.pb_gain[i] )
+            {
+                p_dec->fmt_out.audio_replay_gain.pb_gain[i] = fmt->audio_replay_gain.pb_gain[i];
+                p_dec->fmt_out.audio_replay_gain.pf_gain[i] = fmt->audio_replay_gain.pf_gain[i];
+            }
+        }
+    }
     return p_dec;
 }
 
@@ -886,7 +904,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         }
 
         p_sys->p_aout_input =
-            aout_DecNew( p_dec, &p_sys->p_aout, &format );
+            aout_DecNew( p_dec, &p_sys->p_aout, &format, &p_dec->fmt_out.audio_replay_gain );
         if( p_sys->p_aout_input == NULL )
         {
             msg_Err( p_dec, "failed to create audio output" );

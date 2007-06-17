@@ -45,6 +45,25 @@ struct video_palette_t
 };
 
 /**
+ * audio replay gain description
+ */
+#define AUDIO_REPLAY_GAIN_MAX (2)
+#define AUDIO_REPLAY_GAIN_TRACK (0)
+#define AUDIO_REPLAY_GAIN_ALBUM (1)
+typedef struct
+{
+    /* true if we have the peak value */
+    vlc_bool_t pb_peak[AUDIO_REPLAY_GAIN_MAX];
+    /* peak value where 1.0 means full sample value */
+    float      pf_peak[AUDIO_REPLAY_GAIN_MAX];
+
+    /* true if we have the gain value */
+    vlc_bool_t pb_gain[AUDIO_REPLAY_GAIN_MAX];
+    /* gain value in dB */
+    float      pf_gain[AUDIO_REPLAY_GAIN_MAX];
+} audio_replay_gain_t;
+
+/**
  * audio format description
  */
 struct audio_format_t
@@ -173,7 +192,8 @@ struct es_format_t
     int             i_extra_languages;
     extra_languages_t *p_extra_languages;
 
-    audio_format_t audio;
+    audio_format_t  audio;
+    audio_replay_gain_t audio_replay_gain;
     video_format_t video;
     subs_format_t  subs;
 
@@ -208,6 +228,7 @@ static inline void es_format_Init( es_format_t *fmt,
     fmt->p_extra_languages      = NULL;
 
     memset( &fmt->audio, 0, sizeof(audio_format_t) );
+    memset( &fmt->audio_replay_gain, 0, sizeof(audio_replay_gain_t) );
     memset( &fmt->video, 0, sizeof(video_format_t) );
     memset( &fmt->subs, 0, sizeof(subs_format_t) );
 
@@ -267,34 +288,30 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
 static inline void es_format_Clean( es_format_t *fmt )
 {
     if( fmt->psz_language ) free( fmt->psz_language );
-    fmt->psz_language = NULL;
 
     if( fmt->psz_description ) free( fmt->psz_description );
-    fmt->psz_description = NULL;
 
     if( fmt->i_extra > 0 ) free( fmt->p_extra );
-    fmt->i_extra = 0;
-    fmt->p_extra = NULL;
 
     if( fmt->video.p_palette )
         free( fmt->video.p_palette );
-    fmt->video.p_palette = NULL;
 
     if( fmt->subs.psz_encoding ) free( fmt->subs.psz_encoding );
-    fmt->subs.psz_encoding = NULL;
 
-    if( fmt->i_extra_languages && fmt->p_extra_languages ) {
-        int i = 0;
-        while( i < fmt->i_extra_languages ) {
+    if( fmt->i_extra_languages > 0 && fmt->p_extra_languages )
+    {
+        int i;
+        for( i = 0; i < fmt->i_extra_languages; i++ )
+        {
             if( fmt->p_extra_languages[i].psz_language )
                 free( fmt->p_extra_languages[i].psz_language );
             if( fmt->p_extra_languages[i].psz_description )
                 free( fmt->p_extra_languages[i].psz_description );
-            i++;
         }
         free(fmt->p_extra_languages);
     }
-    fmt->i_extra_languages = 0;
-    fmt->p_extra_languages = NULL;
+
+    /* es_format_Clean can be called multiple times */
+    memset( fmt, 0, sizeof(*fmt) );
 }
 #endif

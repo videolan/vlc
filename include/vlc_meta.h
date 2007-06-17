@@ -209,15 +209,15 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
         int j;
         for( j = 0; j < dst->i_extra; j++ )
         {
-            if( !strcmp( dst->ppsz_extra_name[i], src->ppsz_extra_name[i] ) )
+            if( !strcmp( dst->ppsz_extra_name[j], src->ppsz_extra_name[i] ) )
             {
-                free( dst->ppsz_extra_value[i] );
-                dst->ppsz_extra_value[i] = strdup( src->ppsz_extra_value[i] );
+                free( dst->ppsz_extra_value[j] );
+                dst->ppsz_extra_value[j] = strdup( src->ppsz_extra_value[i] );
                 break;
             }
-            if( j >= dst->i_extra )
-                vlc_meta_AddExtra( dst, src->ppsz_extra_name[i], src->ppsz_extra_value[i] );
         }
+        if( j >= dst->i_extra )
+            vlc_meta_AddExtra( dst, src->ppsz_extra_name[i], src->ppsz_extra_value[i] );
     }
 }
 
