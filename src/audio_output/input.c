@@ -879,6 +879,9 @@ static int ReplayGainCallback( vlc_object_t *p_this, char const *psz_cmd,
     vlc_mutex_lock( &p_aout->mixer_lock );
     for( i = 0; i < p_aout->i_nb_inputs; i++ )
         ReplayGainSelect( p_aout, p_aout->pp_inputs[i] );
+
+    /* Restart the mixer (a trivial mixer may be in use) */
+    aout_MixerMultiplierSet( p_aout, p_aout->mixer.f_multiplier );
     vlc_mutex_unlock( &p_aout->mixer_lock );
 
     return VLC_SUCCESS;
