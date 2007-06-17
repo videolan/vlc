@@ -106,7 +106,7 @@ static int pi_channels_maps[7] =
 
 /* recommended vorbis channel order for 6 channels */
 static const uint32_t pi_6channels_in[] =
-{ AOUT_CHAN_LEFT, AOUT_CHAN_CENTER, AOUT_CHAN_RIGHT,  
+{ AOUT_CHAN_LEFT, AOUT_CHAN_CENTER, AOUT_CHAN_RIGHT,
   AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,AOUT_CHAN_LFE,0 };
 
 /* recommended vorbis channel order for 4 channels */
@@ -192,7 +192,7 @@ vlc_module_begin();
     set_description( _("Vorbis audio encoder") );
     set_capability( "encoder", 100 );
 #if defined(HAVE_VORBIS_VORBISENC_H)
-	set_callbacks( OpenEncoder, CloseEncoder );
+    set_callbacks( OpenEncoder, CloseEncoder );
 #endif
 
     add_integer( ENC_CFG_PREFIX "quality", 0, NULL, ENC_QUALITY_TEXT,
