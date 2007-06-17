@@ -75,11 +75,11 @@ struct libvlc_instance_t
     struct libvlc_callback_entry_list_t *p_callback_list;
 };
 
-typedef struct {
+struct libvlc_media_descriptor_t {
     bool                b_preparsed;
     input_item_t      * p_input_item;
     libvlc_instance_t * p_libvlc_instance;
-} libvlc_media_descriptor_t;
+};
 
 struct libvlc_input_t
 {
