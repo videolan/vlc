@@ -53,6 +53,39 @@ typedef struct
 /**@} */
 
 /*****************************************************************************
+ * Media Descriptor
+ *****************************************************************************/
+/** defgroup libvlc_media_descriptor MediaDescriptor
+ * \ingroup libvlc
+ * LibVLC Media Descriptor handling
+ * @{
+ */
+
+/* Meta Handling */
+/** defgroup libvlc_meta Meta
+ * \ingroup libvlc_media_descriptor
+ * LibVLC Media Meta
+ * @{
+ */
+
+typedef enum {
+    libvlc_meta_Title,
+    libvlc_meta_Artist
+} libvlc_meta_t;
+
+/**@} */
+
+
+typedef struct {
+    bool                b_preparsed;
+    input_item_t      * p_input_item;
+    libvlc_instance_t * p_libvlc_instance;
+} libvlc_media_descriptor_t;
+
+/**@} */
+
+
+/*****************************************************************************
  * Playlist
  *****************************************************************************/
 /** defgroup libvlc_playlist Playlist

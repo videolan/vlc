@@ -121,6 +121,45 @@ VLC_PUBLIC_API void libvlc_destroy( libvlc_instance_t *, libvlc_exception_t * );
 
 /** @}*/
 
+
+/*****************************************************************************
+ * Media descriptor
+ *****************************************************************************/
+/** defgroup libvlc_media_descriptor Media Descriptor
+ * \ingroup libvlc
+ * LibVLC Media Descriptor
+ * @{
+ */
+ 
+/**
+ * Create a media descriptor with the given mrl.
+ * \param p_instance the instance
+ * \param psz_mrl the mrl to read
+ */
+VLC_PUBLIC_API libvlc_media_descriptor_t * libvlc_media_descriptor_new(
+                                   libvlc_instance_t *p_instance,
+                                   const char * psz_mrl,
+                                   libvlc_exception_t *p_e );
+
+/**
+ * Destroy a media descriptor object.
+ * \param p_meta_desc the md to destroy
+ */
+VLC_PUBLIC_API void libvlc_media_descriptor_destroy(
+                                   libvlc_media_descriptor_t *p_meta_desc );
+
+/**
+ * Read the meta of the media descriptor.
+ * \param p_meta_desc the media descriptor to read
+ * \param p_meta_desc the meta to read
+ */
+VLC_PUBLIC_API char * libvlc_media_descriptor_get_meta(
+                                   libvlc_media_descriptor_t *p_meta_desc,
+                                   libvlc_meta_t e_meta,
+                                   libvlc_exception_t *p_e );
+
+/** @}*/
+
 /*****************************************************************************
  * Playlist
  *****************************************************************************/
