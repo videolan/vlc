@@ -2499,6 +2499,7 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
 {
     input_item_t *p_item = p_input->p->input.p_item;
     char *psz_title = NULL;
+    int i;
 
     if( !p_meta )
         return;
@@ -2534,12 +2535,28 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
     }
 
     p_item->p_meta->i_status |= ITEM_PREPARSED;
+
+    /* A bit ugly */
+    p_meta = NULL;
+    if( p_item->p_meta->i_extra > 0 )
+    {
+        p_meta = vlc_meta_New();
+        vlc_meta_Merge( p_meta, p_item->p_meta );
+    }
     vlc_mutex_unlock( &p_item->lock );
 
     if( psz_title )
     {
         input_Control( p_input, INPUT_SET_NAME, psz_title );
         free( psz_title );
+    }
+
+    if( p_meta )
+    {
+        for( i = 0; i < p_meta->i_extra; i++ )
+            input_Control( p_input, INPUT_ADD_INFO, _(VLC_META_INFO_CAT),
+                           _(p_meta->ppsz_extra_name[i]), "%s", p_meta->ppsz_extra_value[i] );
+        vlc_meta_Delete( p_meta );
     }
 
     /** \todo handle sout meta */
