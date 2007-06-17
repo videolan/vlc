@@ -75,12 +75,7 @@ typedef enum {
 
 /**@} */
 
-
-typedef struct {
-    bool                b_preparsed;
-    input_item_t      * p_input_item;
-    libvlc_instance_t * p_libvlc_instance;
-} libvlc_media_descriptor_t;
+typedef struct libvlc_media_descriptor_t libvlc_media_descriptor_t;
 
 /**@} */
 
