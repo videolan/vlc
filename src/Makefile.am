@@ -319,11 +319,11 @@ SOURCES_libvlc_control = \
 	control/log.c \
 	control/playlist.c \
 	control/vlm.c \
-	control/input.c \
 	control/video.c \
 	control/audio.c \
 	control/event.c \
 	control/media_descriptor.c \
+	control/media_instance.c \
 	control/mediacontrol_internal.h \
 	control/mediacontrol_core.c \
 	control/mediacontrol_util.c \
