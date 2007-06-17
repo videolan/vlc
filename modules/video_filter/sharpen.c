@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sharpen.c: Sharpen video filter
  *****************************************************************************
- * Copyright (C) 2003 the VideoLAN team
+ * Copyright (C) 2003-2007 the VideoLAN team
  * $Id: sharpen.c 18062 2006-11-26 14:20:34Z zorglub $
  *
  * Author: Jérémy DEMEULE <dj_mulder at djduron dot no-ip dot org>
