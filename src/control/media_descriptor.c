@@ -38,7 +38,7 @@ static void preparse_if_needed( libvlc_media_descriptor_t *p_media_desc )
     {
         input_Preparse( p_media_desc->p_libvlc_instance->p_libvlc_int,
                         p_media_desc->p_input_item );
-        p_media_desc->b_preparsed = TRUE;
+        p_media_desc->b_preparsed = VLC_TRUE;
     }
 }
 
@@ -61,7 +61,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
     p_media_desc = malloc( sizeof(libvlc_input_t) );
     p_media_desc->p_libvlc_instance = p_instance;
     p_media_desc->p_input_item      = p_input_item;
-    p_media_desc->b_preparsed       = FALSE;
+    p_media_desc->b_preparsed       = VLC_FALSE;
 
     return p_media_desc;
 }
