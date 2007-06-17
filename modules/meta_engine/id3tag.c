@@ -1,5 +1,5 @@
 /*****************************************************************************
- * id3tag.c: id3 tag parser/skipper based on libid3tag
+ * id3tag.c: id3/ape tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2002-2004 the VideoLAN team
  * $Id$
@@ -44,20 +44,16 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  ParseID3Tags ( vlc_object_t * );
+static int  ParseTags ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("ID3 tags parser" ) );
+    set_description( _("ID3v1/2 and APEv1/2 tags parser" ) );
     set_capability( "meta reader", 70 );
-    set_callbacks( ParseID3Tags, NULL );
+    set_callbacks( ParseTags, NULL );
 vlc_module_end();
-
-/*****************************************************************************
- * Definitions of structures  and functions used by this plugins
- *****************************************************************************/
 
 /*****************************************************************************
  * ParseID3Tag : parse an id3tag into the info structures
@@ -66,20 +62,24 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
 {
     struct id3_tag   *p_id3_tag;
     struct id3_frame *p_frame;
-    int i = 0;
+    vlc_meta_t *p_meta = (vlc_meta_t *)p_demux->p_private;
+    int i;
 
     p_id3_tag = id3_tag_parse( p_data, i_size );
-    if( !p_id3_tag ) return;
+    if( !p_id3_tag )
+        return;
 
-    if( !p_demux->p_private ) p_demux->p_private = (void *)vlc_meta_New();
+    if( !p_meta )
+        p_demux->p_private = p_meta = vlc_meta_New();
 
-    vlc_meta_t *p_meta = (vlc_meta_t *)(p_demux->p_private);
 #define ID_IS( a ) (!strcmp(  p_frame->id, a ))
 #define DESCR_IS( a) strstr( (char*)p_frame->description, a )
+#define GET_STRING(frame,fidx) id3_ucs4_latin1duplicate( id3_field_getstring( &(frame)->fields[fidx] ) )
 
-    while ( ( p_frame = id3_tag_findframe( p_id3_tag, "UFID", i ) ) )
+    /* */
+    for( i = 0; (p_frame = id3_tag_findframe( p_id3_tag, "UFID", i )) != NULL; i++ )
     {
-        char *psz_owner = id3_field_getlatin1( &p_frame->fields[0] );
+        const char *psz_owner = id3_field_getlatin1( &p_frame->fields[0] );
 
         if( !strncmp( psz_owner, "http://musicbrainz.org", 22 ) )
         {
@@ -95,42 +95,73 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
             vlc_meta_SetTrackID( p_meta, psz_ufid );
             free( psz_ufid );
         }
-        i++;
     }
-#if 0 //not used
-    i = 0;
 
-    while( ( p_frame = id3_tag_findframe( p_id3_tag, "TXXX", i ) ) )
+    /* User defined text (TXXX) */
+    for( i = 0; (p_frame = id3_tag_findframe( p_id3_tag, "TXXX", i )) != NULL; i++ )
     {
-        char *psz_desc = id3_ucs4_latin1duplicate(
-                id3_field_getstring( &p_frame->fields[1] ) );
+        /* 3 fields: 'encoding', 'description', 'value' */
+        char *psz_name = GET_STRING( p_frame, 1 );
+        char *psz_value = GET_STRING( p_frame, 2 );
 
-        if ( ! strncmp( psz_desc, "MusicBrainz Artist Id", 21 ) )
-        {
-            char *psz_artistid = id3_ucs4_latin1duplicate(
-                    id3_field_getstring( &p_frame->fields[2] ) );
-            vlc_meta_SetArtistID( p_meta, psz_artistid );
-            free( psz_artistid );
-        }
-
-        if ( ! strncmp( psz_desc, "MusicBrainz Album Id", 20 ) )
-        {
-            char *psz_albumid = id3_ucs4_latin1duplicate(
-                    id3_field_getstring( &p_frame->fields[2] ) );
-            vlc_meta_SetAlbumID( p_meta, psz_albumid );
-            free( psz_albumid );
-        }
-
-        free( psz_desc );
-        i++;
-    }
+        vlc_meta_AddExtra( p_meta, psz_name, psz_value );
+#if 0
+        if( !strncmp( psz_name, "MusicBrainz Artist Id", 21 ) )
+            vlc_meta_SetArtistID( p_meta, psz_value );
+        if( !strncmp( psz_desc, "MusicBrainz Album Id", 20 ) )
+            vlc_meta_SetAlbumID( p_meta, psz_value );
 #endif
-    i = 0;
+        free( psz_name );
+        free( psz_value );
+    }
 
-    while( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
+    /* Relative volume adjustment */
+    for( i = 0; (p_frame = id3_tag_findframe( p_id3_tag, "RVA2", i )) != NULL; i++ )
     {
-        int i_strings = id3_field_getnstrings( &p_frame->fields[1] );
+        /* 2 fields: 'latin1', 'binary' */
+        const char *psz_type = id3_field_getlatin1( &p_frame->fields[0] );
+        if( !strcasecmp( psz_type, "track" ) || !strcasecmp( psz_type, "album" ) ||
+            !strcasecmp( psz_type, "normalize" ) )
+        {
+            id3_byte_t const * p_data;
+            id3_length_t i_data;
 
+            p_data = id3_field_getbinarydata( &p_frame->fields[1], &i_data );
+            while( i_data >= 4 )
+            {
+                const unsigned int i_peak_size = p_data[3];
+                const float f_gain = (float)GetWBE( &p_data[1] ) / 512.0;
+                char psz_value[32];
+
+                if( i_data < i_peak_size + 4 )
+                    break;
+                /* only master volume */
+                if( p_data[0] == 0x01 )
+                {
+                    snprintf( psz_value, sizeof(psz_value), "%f", f_gain );
+                    if( !strcasecmp( psz_type, "album" ) )
+                        vlc_meta_AddExtra( p_meta, "REPLAYGAIN_ALBUM_GAIN", psz_value );
+                    else
+                        vlc_meta_AddExtra( p_meta, "REPLAYGAIN_TRACK_GAIN", psz_value );
+                    /* XXX I have no idea what peak unit is ... */
+                }
+                i_data -= 4+i_peak_size;
+            }
+        }
+    }
+
+    /* TODO 'RGAD' if it is used somewhere */
+
+    /* T--- Text informations */
+    for( i = 0; (p_frame = id3_tag_findframe( p_id3_tag, "T", i )) != NULL; i++ )
+    {
+        int i_strings;
+        
+        /* Special case TXXX is not the same beast */
+        if( ID_IS( "TXXX" ) )
+            continue;
+
+        i_strings = id3_field_getnstrings( &p_frame->fields[1] );
         while( i_strings > 0 )
         {
             char *psz_temp = id3_ucs4_utf8duplicate(
@@ -193,92 +224,285 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
                 msg_Dbg( p_demux, "** Has APIC **" );
             }
             else if( p_frame->description )
-            { /* Unhandled meta*/
-                msg_Warn( p_demux, "Fixme: unhandled ID3 metatag, %s", p_frame->description );
+            {
+                /* Unhandled meta */
+                vlc_meta_AddExtra( p_meta, (char*)p_frame->description, psz_temp );
             }
             free( psz_temp );
         }
-        i++;
     }
     id3_tag_delete( p_id3_tag );
+#undef GET_STRING
+#undef DESCR_IS
+#undef ID_IS
+}
+/*****************************************************************************
+ * APEv1/2
+ *****************************************************************************/
+#define APE_TAG_HEADERSIZE (32)
+static int GetAPEvXSize( const uint8_t *p_data, int i_data )
+{
+    uint32_t flags;
+    int i_body;
+
+    if( i_data < APE_TAG_HEADERSIZE ||
+        ( GetDWLE( &p_data[8] ) != 1000 && GetDWLE( &p_data[8] ) != 2000 ) || /* v1/v2 only */
+        strncmp( (char*)p_data, "APETAGEX", 8 ) ||
+        GetDWLE( &p_data[8+4+4] ) <= 0 )
+        return 0;
+
+    i_body = GetDWLE( &p_data[8+4] );
+    flags = GetDWLE( &p_data[8+4+4] );
+
+    /* is it the header */
+    if( flags & (1<<29) )
+        return i_body + ( (flags&(1<<30)) ? APE_TAG_HEADERSIZE : 0 );
+
+    /* it is the footer */
+    return i_body + ( (flags&(1<<31)) ? APE_TAG_HEADERSIZE : 0 );
+}
+static void ParseAPEvXTag( demux_t *p_demux, uint8_t *p_data, int i_data )
+{
+    vlc_meta_t *p_meta = (vlc_meta_t *)p_demux->p_private;
+    vlc_bool_t b_start;
+    vlc_bool_t b_end;
+    uint8_t *p_header = NULL;
+    int i_entry;
+
+    if( i_data < APE_TAG_HEADERSIZE )
+        return;
+
+    b_start = !strncmp( (char*)&p_data[0], "APETAGEX", 8 );
+    b_end = !strncmp( (char*)&p_data[i_data-APE_TAG_HEADERSIZE], "APETAGEX", 8 );
+    if( !b_end && !b_start )
+        return;
+
+    if( b_start )
+    {
+        p_header = &p_data[0];
+        p_data += APE_TAG_HEADERSIZE;
+        i_data -= APE_TAG_HEADERSIZE;
+    }
+    if( b_end )
+    {
+        p_header = &p_data[i_data-APE_TAG_HEADERSIZE];
+        i_data -= APE_TAG_HEADERSIZE;
+    }
+    if( i_data <= 0 )
+        return;
+
+    i_entry = GetDWLE( &p_header[8+4+4] );
+    if( i_entry <= 0 )
+        return;
+
+    if( !p_meta )
+        p_demux->p_private = p_meta = vlc_meta_New();
+
+    while( i_entry > 0 && i_data >= 10 )
+    {
+        const int i_size = GetDWLE( &p_data[0] );
+        const uint32_t flags = GetDWLE( &p_data[4] );
+        char psz_name[256];
+        int n;
+
+        strlcpy( psz_name, (char*)&p_data[8], sizeof(psz_name) );
+        n = strlen( psz_name );
+        if( n <= 0 )
+            break;
+
+        p_data += 8+n+1;
+        i_data -= 8+n+1;
+        if( i_data < i_size )
+            break;
+
+        /* Retreive UTF-8 fields only */
+        if( ((flags>>1) & 0x03) == 0x00 )
+        {
+            /* FIXME list are separated by '\0' */
+            char *psz_value = strndup( (char*)&p_data[0], i_size );
+
+            EnsureUTF8( psz_name );
+            EnsureUTF8( psz_value );
+#define IS(s) (!strcasecmp( psz_name, s ) )
+            if( IS( "Title" ) )
+                vlc_meta_SetTitle( p_meta, psz_value );
+            else  if( IS( "Artist" ) )
+                vlc_meta_SetArtist( p_meta, psz_value );
+            else  if( IS( "Album" ) )
+                vlc_meta_SetAlbum( p_meta, psz_value );
+            else  if( IS( "Publisher" ) )
+                vlc_meta_SetPublisher( p_meta, psz_value );
+            else  if( IS( "Track" ) )
+            {
+                char *p = strchr( psz_value, '/' );
+                if( p )
+                    *p++ = '\0';
+                vlc_meta_SetTracknum( p_meta, psz_value );
+            }
+            else  if( IS( "Comment" ) )
+                vlc_meta_SetDescription( p_meta, psz_value );
+            else  if( IS( "Copyright" ) )
+                vlc_meta_SetCopyright( p_meta, psz_value );
+            else  if( IS( "Year" ) )
+                vlc_meta_SetDate( p_meta, psz_value );
+            else  if( IS( "Genre" ) )
+                vlc_meta_SetGenre( p_meta, psz_value );
+            else  if( IS( "Language" ) )
+                vlc_meta_SetLanguage( p_meta, psz_value );
+            else
+                vlc_meta_AddExtra( p_meta, psz_name, psz_value );
+#undef IS
+            free( psz_value );
+        }
+
+        p_data += i_size;
+        i_data -= i_size;
+        i_entry--;
+    }
 }
 
 /*****************************************************************************
- * ParseID3Tags: check if ID3 tags at common locations. Parse them and skip it
- * if it's at the start of the file
+ * CheckFooter: check for ID3/APE at the end of the file
+ * CheckHeader: check for ID3/APE at the begining of the file
+ *****************************************************************************/
+static void CheckFooter( demux_t *p_demux )
+{
+    const int64_t i_pos = stream_Size( p_demux->s );
+    const int i_peek = 128+APE_TAG_HEADERSIZE;
+    uint8_t *p_peek;
+    uint8_t *p_peek_id3;
+    int64_t i_id3v2_pos = -1;
+    int64_t i_apevx_pos = -1;
+    int i_id3v2_size;
+    int i_apevx_size;
+    int i_id3v1_size;
+
+    if( i_pos < i_peek )
+        return;
+    if( stream_Seek( p_demux->s, i_pos - i_peek ) )
+        return;
+
+    if( stream_Peek( p_demux->s, &p_peek, i_peek ) < i_peek )
+        return;
+    p_peek_id3 = &p_peek[APE_TAG_HEADERSIZE];
+
+    /* Check/Parse ID3v1 */
+    i_id3v1_size = id3_tag_query( p_peek_id3, ID3_TAG_QUERYSIZE );
+    if( i_id3v1_size == 128 )
+    {
+        msg_Dbg( p_demux, "found ID3v1 tag" );
+        ParseID3Tag( p_demux, p_peek_id3, i_id3v1_size );
+    }
+
+    /* Compute ID3v2 position */
+    i_id3v2_size = -id3_tag_query( &p_peek_id3[128-ID3_TAG_QUERYSIZE], ID3_TAG_QUERYSIZE );
+    if( i_id3v2_size > 0 )
+        i_id3v2_pos = i_pos - i_id3v2_size;
+
+    /* Compute APE2v2 position */
+    i_apevx_size = GetAPEvXSize( &p_peek[128+0], APE_TAG_HEADERSIZE );
+    if( i_apevx_size > 0 )
+    {
+        i_apevx_pos = i_pos - i_apevx_size;
+    }
+    else if( i_id3v1_size > 0 )
+    {
+        /* it can be before ID3v1 */
+        i_apevx_size = GetAPEvXSize( p_peek, APE_TAG_HEADERSIZE );
+        if( i_apevx_size > 0 )
+            i_apevx_pos = i_pos - 128 - i_apevx_size;
+    }
+
+    if( i_id3v2_pos > 0 && i_apevx_pos > 0 )
+    {
+        msg_Warn( p_demux,
+                  "Both ID3v2 and APEv1/2 at the end of file, ignoring APEv1/2" );
+        i_apevx_pos = -1;
+    }
+
+    /* Parse ID3v2.4 */
+    if( i_id3v2_pos > 0 )
+    {
+        if( !stream_Seek( p_demux->s, i_id3v2_pos ) &&
+            stream_Peek( p_demux->s, &p_peek, i_id3v2_size ) == i_id3v2_size )
+        {
+            msg_Dbg( p_demux, "found ID3v2 tag at end of file" );
+            ParseID3Tag( p_demux, p_peek, i_id3v2_size );
+        }
+    }
+
+    /* Parse APEv1/2 */
+    if( i_apevx_pos > 0 )
+    {
+        if( !stream_Seek( p_demux->s, i_apevx_pos ) &&
+            stream_Peek( p_demux->s, &p_peek, i_apevx_size ) == i_apevx_size )
+        {
+            msg_Dbg( p_demux, "found APEvx tag at end of file" );
+            ParseAPEvXTag( p_demux, p_peek, i_apevx_size );
+        }
+    }
+}
+static void CheckHeader( demux_t *p_demux )
+{
+    uint8_t *p_peek;
+    int i_size;
+
+    if( stream_Seek( p_demux->s, 0 ) )
+        return;
+
+    /* Test ID3v2 first */
+    if( stream_Peek( p_demux->s, &p_peek, ID3_TAG_QUERYSIZE ) != ID3_TAG_QUERYSIZE )
+        return;
+    i_size = id3_tag_query( p_peek, ID3_TAG_QUERYSIZE );
+    if( i_size > 0 &&
+        stream_Peek( p_demux->s, &p_peek, i_size ) == i_size )
+    {
+        msg_Dbg( p_demux, "found ID3v2 tag" );
+        ParseID3Tag( p_demux, p_peek, i_size );
+        return;
+    }
+
+    /* Test APEv1 */
+    if( stream_Peek( p_demux->s, &p_peek, APE_TAG_HEADERSIZE ) != APE_TAG_HEADERSIZE )
+        return;
+    i_size = GetAPEvXSize( p_peek, APE_TAG_HEADERSIZE );
+    if( i_size > 0 &&
+        stream_Peek( p_demux->s, &p_peek, i_size ) == i_size )
+    {
+        msg_Dbg( p_demux, "found APEv1/2 tag" );
+        ParseAPEvXTag( p_demux, p_peek, i_size );
+    }
+}
+
+/*****************************************************************************
+ * ParseTags: check if ID3/APE tags at common locations.
  ****************************************************************************/
-static int ParseID3Tags( vlc_object_t *p_this )
+static int ParseTags( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    uint8_t *p_peek;
     vlc_bool_t b_seekable;
-    int64_t i_init, i_pos;
-    int i_size;
+    int64_t i_init;
 
     p_demux->p_private = NULL;
 
-    msg_Dbg( p_demux, "checking for ID3 tag" );
+    msg_Dbg( p_demux, "checking for ID3v1/2 and APEv1/2 tags" );
 
     stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
-    if( !b_seekable ) return VLC_SUCCESS;
+    if( !b_seekable )
+        return VLC_SUCCESS;
 
     i_init = stream_Tell( p_demux->s );
 
-    /*
-     * Look for a ID3v1 tag at the end of the file
+    /* */
+    CheckFooter( p_demux );
+
+    /* */
+    CheckHeader( p_demux );
+
+    /* Restore position
+     *  Demuxer will not see tags at the start as src/input/demux.c skips it
+     *  for them
      */
-    i_init = stream_Tell( p_demux->s );
-    i_pos = stream_Size( p_demux->s );
-
-    while( i_pos > 128 ) /* while used so we can break; */
-    {
-        stream_Seek( p_demux->s, i_pos - 128 );
-
-        /* get 10 byte id3 header */
-        if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) break;
-
-        i_size = id3_tag_query( p_peek, 10 );
-        if( i_size == 128 )
-        {
-            /* peek the entire tag */
-            if( stream_Peek( p_demux->s, &p_peek, i_size ) < i_size ) break;
-
-            msg_Dbg( p_demux, "found ID3v1 tag" );
-            ParseID3Tag( p_demux, p_peek, i_size );
-        }
-
-        /* look for ID3v2.4 tag at end of file */
-        /* get 10 byte ID3 footer */
-        if( stream_Peek( p_demux->s, &p_peek, 128 ) < 128 ) break;
-
-        i_size = id3_tag_query( p_peek + 118, 10 );
-        if( i_size < 0  && i_pos > -i_size )
-        {
-            /* id3v2.4 footer found */
-            stream_Seek( p_demux->s , i_pos + i_size );
-            /* peek the entire tag */
-            if( stream_Peek( p_demux->s, &p_peek, i_size ) < i_size ) break;
-
-            msg_Dbg( p_demux, "found ID3v2 tag at end of file" );
-            ParseID3Tag( p_demux, p_peek, i_size );
-        }
-        break;
-    }
-
-    /*
-     * Get 10 byte id3 header
-     */
-    stream_Seek( p_demux->s, 0 );
-    if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) goto end;
-
-    if( (i_size = id3_tag_query( p_peek, 10 )) <= 0 ) goto end;
-
-    if( stream_Peek( p_demux->s, &p_peek, i_size ) < i_size ) goto end;
-
-    msg_Dbg( p_demux, "found ID3v2 tag" );
-    ParseID3Tag( p_demux, p_peek, i_size );
-
- end:
     stream_Seek( p_demux->s, i_init );
     return VLC_SUCCESS;
 }
