@@ -118,7 +118,7 @@ typedef struct
 typedef struct
 {
     PyObject_HEAD
-    libvlc_input_t* p_input;
+    libvlc_media_instance_t* p_md;
 } vlcInput;
 
 /* Forward declarations */
