@@ -798,6 +798,15 @@ static void Close( vlc_object_t * p_this )
 
     sout_StreamDelete( p_sys->p_out );
 
+    while( p_sys->i_afilters )
+    {
+        p_sys->i_afilters--;
+        if( p_sys->psz_afilters[p_sys->i_afilters] )
+            free( p_sys->psz_afilters[p_sys->i_afilters] );
+        if( p_sys->p_afilters_cfg[p_sys->i_afilters] )
+            free( p_sys->p_afilters_cfg[p_sys->i_afilters] );
+    }
+
     while( p_sys->p_audio_cfg != NULL )
     {
         config_chain_t *p_next = p_sys->p_audio_cfg->p_next;
@@ -811,6 +820,15 @@ static void Close( vlc_object_t * p_this )
         p_sys->p_audio_cfg = p_next;
     }
     if( p_sys->psz_aenc ) free( p_sys->psz_aenc );
+
+    while( p_sys->i_vfilters )
+    {
+        p_sys->i_vfilters--;
+        if( p_sys->psz_vfilters[p_sys->i_vfilters] )
+            free( p_sys->psz_vfilters[p_sys->i_vfilters] );
+        if( p_sys->p_vfilters_cfg[p_sys->i_vfilters] )
+            free( p_sys->p_vfilters_cfg[p_sys->i_vfilters] );
+    }
 
     while( p_sys->p_video_cfg != NULL )
     {
