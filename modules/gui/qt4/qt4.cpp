@@ -136,7 +136,10 @@ static int Open( vlc_object_t *p_this )
 static int OpenDialogs( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    Open( p_this );
+    int val = Open( p_this );
+    if( val )
+        return val;
+
     p_intf->pf_show_dialog = ShowDialog;
     return VLC_SUCCESS;
 }
