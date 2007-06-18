@@ -2897,7 +2897,7 @@ static int X11ErrorHandler( Display * display, XErrorEvent * event )
     switch( event->request_code )
     {
     case X_SetInputFocus:
-        /* Ingnore errors on XSetInputFocus()
+        /* Ignore errors on XSetInputFocus()
          * (they happen when a window is not yet mapped) */
         return 0;
 
