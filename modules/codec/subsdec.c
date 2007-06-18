@@ -448,7 +448,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         p_dec->fmt_in.i_codec != VLC_FOURCC('u','s','f',' ') )
     {
         /* Normal text subs, easy markup */
-        p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
+        p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
         p_spu->i_x = p_sys->i_align ? 20 : 0;
         p_spu->i_y = 10;
 
@@ -574,7 +574,7 @@ static void ParseUSFString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
 
     if( p_style == NULL )
     {
-        p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
+        p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
         p_spu->i_x = p_sys->i_align ? 20 : 0;
         p_spu->i_y = 10;
     }
@@ -582,7 +582,7 @@ static void ParseUSFString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
     {
         msg_Dbg( p_dec, "style is: %s", p_style->psz_stylename);
         p_spu->p_region->p_style = &p_style->font_style;
-        p_spu->i_flags = p_style->i_align;
+        p_spu->p_region->i_align = p_style->i_align;
     }
 }
 
@@ -678,7 +678,7 @@ static void ParseSSAString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
     p_spu->p_region->psz_text = psz_new_subtitle;
     if( p_style == NULL )
     {
-        p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
+        p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
         p_spu->i_x = p_sys->i_align ? 20 : 0;
         p_spu->i_y = 10;
     }
@@ -686,7 +686,7 @@ static void ParseSSAString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
     {
         msg_Dbg( p_dec, "style is: %s", p_style->psz_stylename);
         p_spu->p_region->p_style = &p_style->font_style;
-        p_spu->i_flags = p_style->i_align;
+        p_spu->p_region->i_align = p_style->i_align;
         if( p_style->i_align & SUBPICTURE_ALIGN_LEFT )
         {
             p_spu->i_x = (i_margin_l) ? i_margin_l : p_style->i_margin_h;
@@ -1147,7 +1147,7 @@ static void ParseSSAHeader( decoder_t *p_dec )
                     //p_style->font_style.f_angle = f_angle;
 
                     p_style->i_align = 0;
-                    if( i_align == 0x1 || i_align == 0x4 || i_align == 0x1 ) p_style->i_align |= SUBPICTURE_ALIGN_LEFT;
+                    if( i_align == 0x1 || i_align == 0x4 || i_align == 0x7 ) p_style->i_align |= SUBPICTURE_ALIGN_LEFT;
                     if( i_align == 0x3 || i_align == 0x6 || i_align == 0x9 ) p_style->i_align |= SUBPICTURE_ALIGN_RIGHT;
                     if( i_align == 0x7 || i_align == 0x8 || i_align == 0x9 ) p_style->i_align |= SUBPICTURE_ALIGN_TOP;
                     if( i_align == 0x1 || i_align == 0x2 || i_align == 0x3 ) p_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;

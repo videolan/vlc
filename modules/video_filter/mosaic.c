@@ -710,6 +710,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                     + ( i_row * p_sys->i_borderh ) / p_sys->i_rows
                     + ( row_inner_height - fmt_out.i_height ) / 2;
         }
+        p_region->i_align = p_sys->i_align;
 
         if( p_region_prev == NULL )
         {

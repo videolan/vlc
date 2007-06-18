@@ -661,8 +661,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             {
                 if( p_spu->p_text && p_spu->p_text->p_module )
                 {
-                    p_region->i_align = p_subpic->i_flags;
-
                     if( p_spu->p_text->pf_render_html && p_region->psz_html )
                     {
                         p_spu->p_text->pf_render_html( p_spu->p_text,
@@ -728,6 +726,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_region->p_cache->fmt = p_spu->p_scale->fmt_out.video;
                 p_region->p_cache->i_x = p_region->i_x * i_scale_width / 1000;
                 p_region->p_cache->i_y = p_region->i_y * i_scale_height / 1000;
+                p_region->p_cache->i_align = p_region->i_align;
 
                 p_pic = p_spu->p_scale->pf_video_filter(
                                  p_spu->p_scale, &p_region->p_cache->picture );
@@ -745,22 +744,22 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_region = p_region->p_cache;
             }
 
-            if( p_subpic->i_flags & SUBPICTURE_ALIGN_BOTTOM )
+            if( p_region->i_align & SUBPICTURE_ALIGN_BOTTOM )
             {
                 i_y_offset = p_fmt->i_height - p_region->fmt.i_height -
-                    p_subpic->i_y;
+                    p_subpic->i_y - p_region->i_y;
             }
-            else if ( !(p_subpic->i_flags & SUBPICTURE_ALIGN_TOP) )
+            else if ( !(p_region->i_align & SUBPICTURE_ALIGN_TOP) )
             {
                 i_y_offset = p_fmt->i_height / 2 - p_region->fmt.i_height / 2;
             }
 
-            if( p_subpic->i_flags & SUBPICTURE_ALIGN_RIGHT )
+            if( p_region->i_align & SUBPICTURE_ALIGN_RIGHT )
             {
                 i_x_offset = p_fmt->i_width - p_region->fmt.i_width -
-                    i_subpic_x;
+                    i_subpic_x - p_region->i_x;
             }
-            else if ( !(p_subpic->i_flags & SUBPICTURE_ALIGN_LEFT) )
+            else if ( !(p_region->i_align & SUBPICTURE_ALIGN_LEFT) )
             {
                 i_x_offset = p_fmt->i_width / 2 - p_region->fmt.i_width / 2;
             }

@@ -711,7 +711,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* Normal text subs, easy markup */
-    p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
+    p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
     p_spu->i_x = p_sys->i_align ? 20 : 0;
     p_spu->i_y = 10;
 

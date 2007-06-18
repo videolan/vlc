@@ -306,6 +306,8 @@ struct subpicture_t
 #define SUBPICTURE_ALIGN_RIGHT 0x2
 #define SUBPICTURE_ALIGN_TOP 0x4
 #define SUBPICTURE_ALIGN_BOTTOM 0x8
+#define SUBPICTURE_ALIGN_MASK ( SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT| \
+                                SUBPICTURE_ALIGN_TOP |SUBPICTURE_ALIGN_BOTTOM )
 
 /*****************************************************************************
  * Prototypes

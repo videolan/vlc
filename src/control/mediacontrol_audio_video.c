@@ -146,6 +146,7 @@ int mediacontrol_showtext( vout_thread_t *p_vout, int i_channel,
     }
 
     p_spu->p_region->psz_text = strdup( psz_string );
+    p_spu->p_region->i_align = i_flags & SUBPICTURE_ALIGN_MASK;
     p_spu->i_start = i_start;
     p_spu->i_stop = i_stop;
     p_spu->b_ephemer = VLC_FALSE;
@@ -153,7 +154,7 @@ int mediacontrol_showtext( vout_thread_t *p_vout, int i_channel,
 
     p_spu->i_x = i_hmargin;
     p_spu->i_y = i_vmargin;
-    p_spu->i_flags = i_flags;
+    p_spu->i_flags = i_flags & ~SUBPICTURE_ALIGN_MASK;
     p_spu->i_channel = i_channel;
 
     spu_DisplaySubpicture( p_vout->p_spu, p_spu );
