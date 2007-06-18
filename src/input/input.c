@@ -228,7 +228,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                      *psz_end = 0;
                      if( !strncmp( psz_start, "name=", 5 ) )
                      {
-                         p_seekpoint->psz_name = psz_start + 5;
+                         p_seekpoint->psz_name = strdup(psz_start + 5);
                      }
                      else if( !strncmp( psz_start, "bytes=", 6 ) )
                      {
