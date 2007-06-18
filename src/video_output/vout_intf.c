@@ -1193,4 +1193,6 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
         p_vout->i_title_timeout = (mtime_t) newval.i_int;
     else if( !strncmp( psz_cmd, "video-title-position", 20 ) )
         p_vout->i_title_position = newval.i_int;
+    return VLC_SUCCESS;
 }
+
