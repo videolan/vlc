@@ -269,7 +269,8 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     DP_SADD( menu, qtr( I_MENU_EXT ), "","",extendedDialog(), "Ctrl+E" );
     DP_SADD( menu, qtr( "Hide Menus..." ), "","",hideMenus(), "Ctrl+H" );
     menu->addSeparator();
-    DP_SADD( menu, qtr("Preferences"), "", "", prefsDialog(), "Ctrl+P" );
+    DP_SADD( menu, qtr("Preferences"), "", ":/pixmaps/vlc_preferences_16px.png",
+             prefsDialog(), "Ctrl+P" );
     return menu;
 }
 
