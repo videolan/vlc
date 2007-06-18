@@ -742,6 +742,10 @@ static int SessionsSetup( demux_t *p_demux )
                 {
                     tk->b_quicktime = VLC_TRUE;
                 }
+                else if( !strcmp( sub->codecName(), "SPEEX" ) )
+                {
+                    tk->fmt.i_codec = VLC_FOURCC( 's', 'p', 'x', ' ' );
+                }
             }
             else if( !strcmp( sub->mediumName(), "video" ) )
             {
