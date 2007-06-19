@@ -165,11 +165,11 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_fullscreen: /* deprecated */
                 if( argCount == 0 )
                 {
-                    libvlc_input_t *p_input = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
-                    if( p_input )
+                    libvlc_media_instance_t *p_md = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
+                    if( p_md )
                     {
-                        libvlc_toggle_fullscreen(p_input, &ex);
-                        libvlc_input_free(p_input);
+                        libvlc_toggle_fullscreen(p_md, &ex);
+                        libvlc_media_instance_destroy_and_detach(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
                             NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -529,11 +529,11 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_get_length: /* deprecated */
                 if( argCount == 0 )
                 {
-                    libvlc_input_t *p_input = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
-                    if( p_input )
+                    libvlc_media_instance_t *p_md = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
+                    if( p_md )
                     {
-                        vlc_int64_t val = libvlc_input_get_length(p_input, &ex);
-                        libvlc_input_free(p_input);
+                        vlc_int64_t val = libvlc_media_instance_get_length(p_md, &ex);
+                        libvlc_media_instance_destroy_and_detach(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
                             NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -561,11 +561,11 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_get_position: /* deprecated */
                 if( argCount == 0 )
                 {
-                    libvlc_input_t *p_input = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
-                    if( p_input )
+                    libvlc_media_instance_t *p_md = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
+                    if( p_md )
                     {
-                        float val = libvlc_input_get_position(p_input, &ex);
-                        libvlc_input_free(p_input);
+                        float val = libvlc_media_instance_get_position(p_md, &ex);
+                        libvlc_media_instance_destroy_and_detach(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
                             NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -593,11 +593,11 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_get_time: /* deprecated */
                 if( argCount == 0 )
                 {
-                    libvlc_input_t *p_input = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
-                    if( p_input )
+                    libvlc_media_instance_t *p_md = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
+                    if( p_md )
                     {
-                        vlc_int64_t val = libvlc_input_get_time(p_input, &ex);
-                        libvlc_input_free(p_input);
+                        vlc_int64_t val = libvlc_media_instance_get_time(p_md, &ex);
+                        libvlc_media_instance_destroy_and_detach(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
                             NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -627,8 +627,8 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                   && isNumberValue(args[0])
                   && NPVARIANT_IS_BOOLEAN(args[1]) )
                 {
-                    libvlc_input_t *p_input = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
-                    if( p_input )
+                    libvlc_media_instance_t *p_md = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
+                    if( p_md )
                     {
                         vlc_int64_t pos = 0;
                         if( NPVARIANT_IS_INT32(args[0]) )
@@ -639,10 +639,10 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         if( NPVARIANT_TO_BOOLEAN(args[1]) )
                         {
                             /* relative seek */
-                            vlc_int64_t from = libvlc_input_get_time(p_input, &ex);
+                            vlc_int64_t from = libvlc_media_instance_get_time(p_md, &ex);
                             if( libvlc_exception_raised(&ex) )
                             {
-                                libvlc_input_free(p_input);
+                                libvlc_media_instance_destroy_and_detach(p_md);
                                 NPN_SetException(this, libvlc_exception_get_message(&ex));
                                 libvlc_exception_clear(&ex);
                                 return INVOKERESULT_GENERIC_ERROR;
@@ -650,8 +650,8 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                             pos += from;
                         }
                         /* jump to time */
-                        libvlc_input_set_time(p_input, pos, &ex);
-                        libvlc_input_free(p_input);
+                        libvlc_media_instance_set_time(p_md, pos, &ex);
+                        libvlc_media_instance_destroy_and_detach(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
                             NPN_SetException(this, libvlc_exception_get_message(&ex));
