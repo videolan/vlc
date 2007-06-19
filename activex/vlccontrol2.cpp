@@ -213,9 +213,9 @@ STDMETHODIMP VLCAudio::get_track(long* track)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
-        *track = libvlc_audio_get_track(p_input, &ex);
-        libvlc_input_free(p_input);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
+        *track = libvlc_audio_get_track(p_md, &ex);
+        libvlc_media_instance_destroy_and_detach(p_md);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCAudio,
@@ -237,9 +237,9 @@ STDMETHODIMP VLCAudio::put_track(long track)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
-        libvlc_audio_set_track(p_input, track, &ex);
-        libvlc_input_free(p_input);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
+        libvlc_audio_set_track(p_md, track, &ex);
+        libvlc_media_instance_destroy_and_detach(p_md);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCAudio,
@@ -412,11 +412,11 @@ STDMETHODIMP VLCInput::get_length(double* length)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *length = (double)libvlc_input_get_length(p_input, &ex);
-            libvlc_input_free(p_input);
+            *length = (double)libvlc_media_instance_get_length(p_md, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -441,11 +441,11 @@ STDMETHODIMP VLCInput::get_position(double* position)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *position = libvlc_input_get_position(p_input, &ex);
-            libvlc_input_free(p_input);
+            *position = libvlc_media_instance_get_position(p_md, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -467,11 +467,11 @@ STDMETHODIMP VLCInput::put_position(double position)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_input_set_position(p_input, position, &ex);
-            libvlc_input_free(p_input);
+            libvlc_media_instance_set_position(p_md, position, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -496,11 +496,11 @@ STDMETHODIMP VLCInput::get_time(double* time)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *time = (double)libvlc_input_get_time(p_input, &ex);
-            libvlc_input_free(p_input);
+            *time = (double)libvlc_media_instance_get_time(p_md, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -522,11 +522,11 @@ STDMETHODIMP VLCInput::put_time(double time)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_input_set_time(p_input, (vlc_int64_t)time, &ex);
-            libvlc_input_free(p_input);
+            libvlc_media_instance_set_time(p_md, (vlc_int64_t)time, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -551,11 +551,11 @@ STDMETHODIMP VLCInput::get_state(long* state)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *state = libvlc_input_get_state(p_input, &ex);
-            libvlc_input_free(p_input);
+            *state = libvlc_media_instance_get_state(p_md, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -581,11 +581,11 @@ STDMETHODIMP VLCInput::get_rate(double* rate)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *rate = libvlc_input_get_rate(p_input, &ex);
-            libvlc_input_free(p_input);
+            *rate = libvlc_media_instance_get_rate(p_md, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -607,11 +607,11 @@ STDMETHODIMP VLCInput::put_rate(double rate)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_input_set_rate(p_input, rate, &ex);
-            libvlc_input_free(p_input);
+            libvlc_media_instance_set_rate(p_md, rate, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -637,11 +637,11 @@ STDMETHODIMP VLCInput::get_fps(double* fps)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *fps = libvlc_input_get_fps(p_input, &ex);
-            libvlc_input_free(p_input);
+            *fps = libvlc_media_instance_get_fps(p_md, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -666,11 +666,11 @@ STDMETHODIMP VLCInput::get_hasVout(VARIANT_BOOL* hasVout)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *hasVout = libvlc_input_has_vout(p_input, &ex) ? VARIANT_TRUE : VARIANT_FALSE;
-            libvlc_input_free(p_input);
+            *hasVout = libvlc_media_instance_has_vout(p_md, &ex) ? VARIANT_TRUE : VARIANT_FALSE;
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -2043,11 +2043,11 @@ STDMETHODIMP VLCVideo::get_fullscreen(VARIANT_BOOL* fullscreen)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *fullscreen = libvlc_get_fullscreen(p_input, &ex) ? VARIANT_TRUE : VARIANT_FALSE;
-            libvlc_input_free(p_input);
+            *fullscreen = libvlc_get_fullscreen(p_md, &ex) ? VARIANT_TRUE : VARIANT_FALSE;
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -2069,11 +2069,11 @@ STDMETHODIMP VLCVideo::put_fullscreen(VARIANT_BOOL fullscreen)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_set_fullscreen(p_input, VARIANT_FALSE != fullscreen, &ex);
-            libvlc_input_free(p_input);
+            libvlc_set_fullscreen(p_md, VARIANT_FALSE != fullscreen, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -2098,11 +2098,11 @@ STDMETHODIMP VLCVideo::get_width(long* width)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *width = libvlc_video_get_width(p_input, &ex);
-            libvlc_input_free(p_input);
+            *width = libvlc_video_get_width(p_md, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -2127,11 +2127,11 @@ STDMETHODIMP VLCVideo::get_height(long* height)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *height = libvlc_video_get_height(p_input, &ex);
-            libvlc_input_free(p_input);
+            *height = libvlc_video_get_height(p_md, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -2156,12 +2156,12 @@ STDMETHODIMP VLCVideo::get_aspectRatio(BSTR* aspect)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            char *psz_aspect = libvlc_video_get_aspect_ratio(p_input, &ex);
+            char *psz_aspect = libvlc_video_get_aspect_ratio(p_md, &ex);
 
-            libvlc_input_free(p_input);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 if( NULL == psz_aspect )
@@ -2197,7 +2197,7 @@ STDMETHODIMP VLCVideo::put_aspectRatio(BSTR aspect)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
             char *psz_aspect = CStrFromBSTR(CP_UTF8, aspect);
@@ -2206,10 +2206,10 @@ STDMETHODIMP VLCVideo::put_aspectRatio(BSTR aspect)
                 return E_OUTOFMEMORY;
             }
 
-            libvlc_video_set_aspect_ratio(p_input, psz_aspect, &ex);
+            libvlc_video_set_aspect_ratio(p_md, psz_aspect, &ex);
 
             CoTaskMemFree(psz_aspect);
-            libvlc_input_free(p_input);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( libvlc_exception_raised(&ex) )
             {
                 _p_instance->setErrorInfo(IID_IVLCVideo,
@@ -2235,11 +2235,11 @@ STDMETHODIMP VLCVideo::get_subtitle(long* spu)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *spu = libvlc_video_get_spu(p_input, &ex);
-            libvlc_input_free(p_input);
+            *spu = libvlc_video_get_spu(p_md, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
@@ -2261,9 +2261,9 @@ STDMETHODIMP VLCVideo::put_subtitle(long spu)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
-        libvlc_video_set_spu(p_input, spu, &ex);
-        libvlc_input_free(p_input);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
+        libvlc_video_set_spu(p_md, spu, &ex);
+        libvlc_media_instance_destroy_and_detach(p_md);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
@@ -2287,12 +2287,12 @@ STDMETHODIMP VLCVideo::get_crop(BSTR* geometry)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            char *psz_geometry = libvlc_video_get_crop_geometry(p_input, &ex);
+            char *psz_geometry = libvlc_video_get_crop_geometry(p_md, &ex);
 
-            libvlc_input_free(p_input);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 if( NULL == psz_geometry )
@@ -2328,7 +2328,7 @@ STDMETHODIMP VLCVideo::put_crop(BSTR geometry)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
             char *psz_geometry = CStrFromBSTR(CP_UTF8, geometry);
@@ -2337,10 +2337,10 @@ STDMETHODIMP VLCVideo::put_crop(BSTR geometry)
                 return E_OUTOFMEMORY;
             }
 
-            libvlc_video_set_crop_geometry(p_input, psz_geometry, &ex);
+            libvlc_video_set_crop_geometry(p_md, psz_geometry, &ex);
 
             CoTaskMemFree(psz_geometry);
-            libvlc_input_free(p_input);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( libvlc_exception_raised(&ex) )
             {
                 _p_instance->setErrorInfo(IID_IVLCVideo,
@@ -2366,7 +2366,7 @@ STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
             static int uniqueId = 0;
@@ -2427,8 +2427,8 @@ STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
                 return E_FAIL;
 
             /* take snapshot into file */
-            libvlc_video_take_snapshot(p_input, psz_filepath, &ex);
-            libvlc_input_free(p_input);
+            libvlc_video_take_snapshot(p_md, psz_filepath, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 hr = E_FAIL;
@@ -2470,11 +2470,11 @@ STDMETHODIMP VLCVideo::toggleFullscreen()
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_libvlc, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_toggle_fullscreen(p_input, &ex);
-            libvlc_input_free(p_input);
+            libvlc_toggle_fullscreen(p_md, &ex);
+            libvlc_media_instance_destroy_and_detach(p_md);
             if( ! libvlc_exception_raised(&ex) )
             {
                 return NOERROR;
