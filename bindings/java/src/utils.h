@@ -30,6 +30,6 @@ jlong getInstance ( JNIEnv* , jobject );
     instance = getInstance( env, _this );
 
 #define GET_INPUT_THREAD \
-    libvlc_input_t *input; \
-    input = libvlc_playlist_get_input( ( libvlc_instance_t *) instance, exception ); \
+    libvlc_media_instance_t *input; \
+    input = libvlc_playlist_get_media_instance( ( libvlc_instance_t *) instance, exception ); \
     CHECK_EXCEPTION ;
