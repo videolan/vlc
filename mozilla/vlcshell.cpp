@@ -184,11 +184,11 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                 {
                     if( libvlc_playlist_isplaying(p_vlc, NULL) )
                     {
-                        libvlc_media_instance_t *p_mp = libvlc_playlist_get_media_instance(p_vlc, NULL);
+                        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_vlc, NULL);
                         if( p_md )
                         {
-                            libvlc_toggle_fullscreen(p_mp, NULL);
-                            libvlc_media_instance_destroy_and_release(p_mp);
+                            libvlc_toggle_fullscreen(p_md, NULL);
+                            libvlc_media_instance_destroy_and_detach(p_md);
                         }
                     }
                 }
