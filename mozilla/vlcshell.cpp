@@ -184,11 +184,11 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                 {
                     if( libvlc_playlist_isplaying(p_vlc, NULL) )
                     {
-                        libvlc_input_t *p_input = libvlc_playlist_get_input(p_vlc, NULL);
-                        if( p_input )
+                        libvlc_media_instance_t *p_mp = libvlc_playlist_get_media_instance(p_vlc, NULL);
+                        if( p_md )
                         {
-                            libvlc_toggle_fullscreen(p_input, NULL);
-                            libvlc_input_free(p_input);
+                            libvlc_toggle_fullscreen(p_mp, NULL);
+                            libvlc_media_instance_destroy_and_release(p_mp);
                         }
                     }
                 }
@@ -214,10 +214,10 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                 {
                     if( libvlc_playlist_isplaying(p_vlc, NULL) )
                     {
-                        libvlc_input_t *p_input = libvlc_playlist_get_input(p_vlc, NULL);
-                        if( p_input )
+                        libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_vlc, NULL);
+                        if( p_md )
                         {
-                            hasVout = libvlc_input_has_vout(p_input, NULL);
+                            hasVout = libvlc_media_instance_has_vout(p_md, NULL);
                             if( hasVout )
                             {
                                 libvlc_rectangle_t area;
@@ -225,9 +225,9 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                                 area.top = 0;
                                 area.right = npwindow.width;
                                 area.bottom = npwindow.height;
-                                libvlc_video_redraw_rectangle(p_input, &area, NULL);
+                                libvlc_video_redraw_rectangle(p_md, &area, NULL);
                             }
-                            libvlc_input_free(p_input);
+                            libvlc_media_instance_destroy_and_detach(p_md);
                         }
                     }
                 }
