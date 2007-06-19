@@ -38,7 +38,7 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_Input__1getLength (JNIEnv *env, j
 
     GET_INPUT_THREAD ;
 
-    res = libvlc_input_get_length( input, exception );
+    res = libvlc_media_instance_get_length( input, exception );
     CHECK_EXCEPTION_FREE;
 
     return res;
@@ -51,7 +51,7 @@ JNIEXPORT jfloat JNICALL Java_org_videolan_jvlc_Input__1getPosition (JNIEnv *env
     
     GET_INPUT_THREAD ;
 
-    res = libvlc_input_get_position( input, exception );
+    res = libvlc_media_instance_get_position( input, exception );
     CHECK_EXCEPTION_FREE;
 
     return res;
@@ -64,7 +64,7 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_Input__1getTime (JNIEnv *env, job
 
     GET_INPUT_THREAD ;
 
-    res = libvlc_input_get_time( input, exception );
+    res = libvlc_media_instance_get_time( input, exception );
     CHECK_EXCEPTION_FREE ;
 
     return res;
@@ -77,7 +77,7 @@ JNIEXPORT jfloat JNICALL Java_org_videolan_jvlc_Input__1getFPS (JNIEnv *env, job
 
     GET_INPUT_THREAD ;
 
-    res = libvlc_input_get_fps( input, exception );
+    res = libvlc_media_instance_get_fps( input, exception );
     CHECK_EXCEPTION_FREE ;
 
     return res;
@@ -89,7 +89,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Input__1setTime (JNIEnv *env, jobj
 
     GET_INPUT_THREAD ;
 
-    libvlc_input_set_time( input, time, exception );
+    libvlc_media_instance_set_time( input, time, exception );
     CHECK_EXCEPTION_FREE;
         
 }
@@ -100,7 +100,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Input__1setPosition (JNIEnv *env, 
 
     GET_INPUT_THREAD ;
 
-    libvlc_input_set_position( input, position, exception );
+    libvlc_media_instance_set_position( input, position, exception );
     CHECK_EXCEPTION_FREE;
 }
 
@@ -111,7 +111,7 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Input__1isPlaying (JNIEnv *env
     
     GET_INPUT_THREAD ;
     
-    res = libvlc_input_will_play( input, exception );
+    res = libvlc_media_instance_will_play( input, exception );
     CHECK_EXCEPTION_FREE ;
     
     return res;
@@ -124,7 +124,7 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Input__1hasVout (JNIEnv *env, 
     
     GET_INPUT_THREAD ;
     
-    res = libvlc_input_has_vout( input, exception );
+    res = libvlc_media_instance_has_vout( input, exception );
     CHECK_EXCEPTION_FREE ;
     
     return res;
