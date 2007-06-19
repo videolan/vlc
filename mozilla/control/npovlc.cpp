@@ -165,7 +165,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_fullscreen: /* deprecated */
                 if( argCount == 0 )
                 {
-                    libvlc_media_instance_t *p_md = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
+                    libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_plugin->getVLC(), &ex);
                     if( p_md )
                     {
                         libvlc_toggle_fullscreen(p_md, &ex);
@@ -529,7 +529,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_get_length: /* deprecated */
                 if( argCount == 0 )
                 {
-                    libvlc_media_instance_t *p_md = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
+                    libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_plugin->getVLC(), &ex);
                     if( p_md )
                     {
                         vlc_int64_t val = libvlc_media_instance_get_length(p_md, &ex);
@@ -561,7 +561,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_get_position: /* deprecated */
                 if( argCount == 0 )
                 {
-                    libvlc_media_instance_t *p_md = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
+                    libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_plugin->getVLC(), &ex);
                     if( p_md )
                     {
                         float val = libvlc_media_instance_get_position(p_md, &ex);
@@ -593,7 +593,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
             case ID_get_time: /* deprecated */
                 if( argCount == 0 )
                 {
-                    libvlc_media_instance_t *p_md = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
+                    libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_plugin->getVLC(), &ex);
                     if( p_md )
                     {
                         vlc_int64_t val = libvlc_media_instance_get_time(p_md, &ex);
@@ -627,7 +627,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                   && isNumberValue(args[0])
                   && NPVARIANT_IS_BOOLEAN(args[1]) )
                 {
-                    libvlc_media_instance_t *p_md = libvlc_playlist_get_input(p_plugin->getVLC(), &ex);
+                    libvlc_media_instance_t *p_md = libvlc_playlist_get_media_instance(p_plugin->getVLC(), &ex);
                     if( p_md )
                     {
                         vlc_int64_t pos = 0;
