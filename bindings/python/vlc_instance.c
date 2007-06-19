@@ -318,15 +318,15 @@ static PyObject *
 vlcInstance_playlist_get_input( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
-    libvlc_input_t *p_input;
+    libvlc_media_instance_t *p_md;
     vlcInput *p_ret;
 
     LIBVLC_TRY;
-    p_input = libvlc_playlist_get_input( LIBVLC_INSTANCE->p_instance, &ex );
+    p_md = libvlc_playlist_get_media_instance( LIBVLC_INSTANCE->p_instance, &ex );
     LIBVLC_EXCEPT;
 
     p_ret = PyObject_New( vlcInput, &vlcInput_Type );
-    p_ret->p_input = p_input;
+    p_ret->p_md = p_md;
     Py_INCREF( p_ret ); /* Ah bon ? */
     return ( PyObject * )p_ret;
 }
