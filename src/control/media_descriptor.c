@@ -110,7 +110,7 @@ libvlc_media_descriptor_duplicate( libvlc_media_descriptor_t *p_md_orig )
     libvlc_media_descriptor_t * p_md;
 
     p_md = malloc( sizeof(libvlc_media_descriptor_t) );
-    bcopy( p_md_orig, p_md, sizeof(libvlc_media_descriptor_t) );
+    memcpy( p_md_orig, p_md, sizeof(libvlc_media_descriptor_t) );
 
     return p_md;
 }
