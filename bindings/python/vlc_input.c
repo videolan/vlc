@@ -32,7 +32,7 @@ vlcInput_get_length( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     vlc_int64_t i_ret;
     LIBVLC_TRY;
-    i_ret = libvlc_media_instance_get_length( libvlc_media_instance->p_md, &ex);
+    i_ret = libvlc_media_instance_get_length( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "L", i_ret );
 }
@@ -43,7 +43,7 @@ vlcInput_get_time( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     vlc_int64_t i_ret;
     LIBVLC_TRY;
-    i_ret = libvlc_media_instance_get_time( libvlc_media_instance->p_md, &ex);
+    i_ret = libvlc_media_instance_get_time( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "L", i_ret );
 }
@@ -58,7 +58,7 @@ vlcInput_set_time( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_media_instance_set_time( libvlc_media_instance->p_md, i_time, &ex);
+    libvlc_media_instance_set_time( LIBVLC_INPUT->p_md, i_time, &ex);
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
@@ -70,7 +70,7 @@ vlcInput_get_position( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     float f_ret;
     LIBVLC_TRY;
-    f_ret = libvlc_media_instance_get_position( libvlc_media_instance->p_md, &ex);
+    f_ret = libvlc_media_instance_get_position( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "f", f_ret );
 }
@@ -85,7 +85,7 @@ vlcInput_set_position( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_media_instance_set_position( libvlc_media_instance->p_md, f_pos, &ex);
+    libvlc_media_instance_set_position( LIBVLC_INPUT->p_md, f_pos, &ex);
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
@@ -97,7 +97,7 @@ vlcInput_will_play( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     int i_ret;
     LIBVLC_TRY;
-    i_ret = libvlc_media_instance_will_play( libvlc_media_instance->p_md, &ex);
+    i_ret = libvlc_media_instance_will_play( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "i", i_ret );
 }
@@ -108,7 +108,7 @@ vlcInput_get_rate( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     float f_ret;
     LIBVLC_TRY;
-    f_ret = libvlc_media_instance_get_rate( libvlc_media_instance->p_md, &ex);
+    f_ret = libvlc_media_instance_get_rate( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "f", f_ret );
 }
@@ -123,7 +123,7 @@ vlcInput_set_rate( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_media_instance_set_rate( libvlc_media_instance->p_md, f_rate, &ex);
+    libvlc_media_instance_set_rate( LIBVLC_INPUT->p_md, f_rate, &ex);
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
@@ -135,7 +135,7 @@ vlcInput_get_state( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     int i_ret;
     LIBVLC_TRY;
-    i_ret = libvlc_media_instance_get_state( libvlc_media_instance->p_md, &ex);
+    i_ret = libvlc_media_instance_get_state( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "i", i_ret );
 }
@@ -146,7 +146,7 @@ vlcInput_has_vout( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     int i_ret;
     LIBVLC_TRY;
-    i_ret = libvlc_media_instance_has_vout( libvlc_media_instance->p_md, &ex);
+    i_ret = libvlc_media_instance_has_vout( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "i", i_ret );
 }
@@ -157,7 +157,7 @@ vlcInput_get_fps( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     float f_ret;
     LIBVLC_TRY;
-    f_ret = libvlc_media_instance_get_fps( libvlc_media_instance->p_md, &ex);
+    f_ret = libvlc_media_instance_get_fps( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "f", f_ret );
 }
@@ -169,7 +169,7 @@ vlcInput_audio_get_track( PyObject *self, PyObject *args )
     int i_ret;
 
     LIBVLC_TRY;
-    i_ret = libvlc_audio_get_track( libvlc_media_instance->p_md, &ex );
+    i_ret = libvlc_audio_get_track( LIBVLC_INPUT->p_md, &ex );
     LIBVLC_EXCEPT;
     return Py_BuildValue( "i", i_ret );
 }
@@ -184,7 +184,7 @@ vlcInput_audio_set_track( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_audio_set_track( libvlc_media_instance->p_md, i_track, &ex );
+    libvlc_audio_set_track( LIBVLC_INPUT->p_md, i_track, &ex );
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
@@ -196,7 +196,7 @@ vlcInput_toggle_fullscreen( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
 
     LIBVLC_TRY;
-    libvlc_toggle_fullscreen( libvlc_media_instance->p_md, &ex);
+    libvlc_toggle_fullscreen( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;    
@@ -212,7 +212,7 @@ vlcInput_set_fullscreen( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_set_fullscreen( libvlc_media_instance->p_md, i_fullscreen, &ex);
+    libvlc_set_fullscreen( LIBVLC_INPUT->p_md, i_fullscreen, &ex);
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
@@ -225,7 +225,7 @@ vlcInput_get_fullscreen( PyObject *self, PyObject *args )
     int i_ret;
 
     LIBVLC_TRY;
-    i_ret = libvlc_get_fullscreen( libvlc_media_instance->p_md, &ex);
+    i_ret = libvlc_get_fullscreen( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "i", i_ret );
 }
@@ -237,7 +237,7 @@ vlcInput_get_height( PyObject *self, PyObject *args )
     int i_ret;
 
     LIBVLC_TRY;
-    i_ret = libvlc_video_get_height( libvlc_media_instance->p_md, &ex);
+    i_ret = libvlc_video_get_height( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "i", i_ret );
 }
@@ -249,7 +249,7 @@ vlcInput_get_width( PyObject *self, PyObject *args )
     int i_ret;
 
     LIBVLC_TRY;
-    i_ret = libvlc_video_get_width( libvlc_media_instance->p_md, &ex);
+    i_ret = libvlc_video_get_width( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "i", i_ret );
 }
@@ -262,7 +262,7 @@ vlcInput_get_aspect_ratio( PyObject *self, PyObject *args )
     PyObject* o_ret;
 
     LIBVLC_TRY;
-    psz_ret = libvlc_video_get_aspect_ratio( libvlc_media_instance->p_md, &ex);
+    psz_ret = libvlc_video_get_aspect_ratio( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     o_ret=Py_BuildValue( "s", psz_ret );
     free( psz_ret );
@@ -279,7 +279,7 @@ vlcInput_set_aspect_ratio( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_video_set_aspect_ratio( libvlc_media_instance->p_md, psz_ratio, &ex);
+    libvlc_video_set_aspect_ratio( LIBVLC_INPUT->p_md, psz_ratio, &ex);
     LIBVLC_EXCEPT;
     free( psz_ratio );
     Py_INCREF( Py_None );
@@ -296,7 +296,7 @@ vlcInput_video_take_snapshot( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_video_take_snapshot( libvlc_media_instance->p_md, psz_filename, &ex);
+    libvlc_video_take_snapshot( LIBVLC_INPUT->p_md, psz_filename, &ex);
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
@@ -313,7 +313,7 @@ vlcInput_video_resize( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_video_resize( libvlc_media_instance->p_md, i_width, i_height, &ex);
+    libvlc_video_resize( LIBVLC_INPUT->p_md, i_width, i_height, &ex);
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
@@ -330,7 +330,7 @@ vlcInput_video_reparent( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    i_ret = libvlc_video_reparent( libvlc_media_instance->p_md, i_visual, &ex);
+    i_ret = libvlc_video_reparent( LIBVLC_INPUT->p_md, i_visual, &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "i", i_ret );
 }
