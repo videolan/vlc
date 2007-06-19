@@ -591,6 +591,7 @@ static int Demux( demux_t *p_demux )
                         psz_backup = ++psz_parse;
                         if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
                         {
+                            char *psz_tmp;
                             i_strlen = psz_parse-psz_backup;
                             if( i_strlen < 1 ) continue;
 
@@ -598,6 +599,13 @@ static int Demux( demux_t *p_demux )
                             psz_href = malloc( i_strlen*sizeof( char ) +1);
                             memcpy( psz_href, psz_backup, i_strlen );
                             psz_href[i_strlen] = '\0';
+                            psz_tmp = psz_href + (i_strlen-1);
+                            while( psz_tmp >= psz_href &&
+                                 ( *psz_tmp == '\r' || *psz_tmp == '\n' ) )
+                            {
+                                *psz_tmp = '\0';
+                                psz_tmp++;
+                            }
                         }
                         else continue;
                     }
