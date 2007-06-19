@@ -589,6 +589,7 @@ static int Demux( demux_t *p_demux )
                     if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
                     {
                         psz_backup = ++psz_parse;
+                        psz_backup = SkipBlanks(psz_backup, (unsigned)-1);
                         if( ( psz_parse = strcasestr( psz_parse, "\"" ) ) )
                         {
                             char *psz_tmp;
