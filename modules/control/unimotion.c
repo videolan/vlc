@@ -260,10 +260,10 @@ int read_sms(int type, int *x, int *y, int *z)
     if ( !ret )
         return 0;
 
-	static CFStringRef app = CFSTR("com.ramsayl.UniMotion");
-	static CFStringRef xoffstr = CFSTR("x_offset");
-	static CFStringRef yoffstr = CFSTR("y_offset");
-	static CFStringRef zoffstr = CFSTR("z_offset");
+	CFStringRef app = CFSTR("com.ramsayl.UniMotion");
+	CFStringRef xoffstr = CFSTR("x_offset");
+	CFStringRef yoffstr = CFSTR("y_offset");
+	CFStringRef zoffstr = CFSTR("z_offset");
 	xoff = CFPreferencesGetAppIntegerValue(xoffstr, app, &ok);
 	if ( ok ) _x += xoff;
 	yoff = CFPreferencesGetAppIntegerValue(yoffstr, app, &ok);

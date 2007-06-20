@@ -79,6 +79,7 @@ Video output and filters:
  * New bluescreen video filter (for use with the mosaic_bridge module). This
    was previously part of the mosaic module.
  * Fix random characters problem in RSS filter.
+ * Add rotate-deciangle for more precision on rotate filter
 
 Audio output
  * Replay gain support.
@@ -99,6 +100,7 @@ Interfaces:
      (Media Player Remote Interfacing specification), a common dbus control 
      interface for media players that intends to become an xdg standard when 
      finished.
+   * Motion module use disk accelerometers to keep video horizontal
 
 Capture:
  * new BDA device driver plugin for DVB-C/S/T capture cards on Microsoft

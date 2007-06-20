@@ -47,8 +47,9 @@
 struct intf_sys_t
 {
     enum { NO_SENSOR, HDAPS_SENSOR, AMS_SENSOR, UNIMOTION_SENSOR } sensor;
+#ifdef __APPLE__
     enum sms_hardware unimotion_hw;
-
+#endif
     int i_calibrate;
 
     vlc_bool_t b_use_rotate;
@@ -238,8 +239,10 @@ static void RunIntf( intf_thread_t *p_intf )
 static int GetOrientation( intf_thread_t *p_intf )
 {
     FILE *f;
-    int i_x, i_y, i_z;
-
+    int i_x, i_y;
+#ifdef __APPLE__
+    int i_z;
+#endif
     switch( p_intf->p_sys->sensor )
     {
     case HDAPS_SENSOR:
@@ -279,9 +282,9 @@ static int GetOrientation( intf_thread_t *p_intf )
             else
                 return 3600 + asin(d_x)*3600/3.141;
         }
-#endif
         else
             return 0;
+#endif
     default:
         return 0;
     }
