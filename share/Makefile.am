@@ -18,7 +18,8 @@ nobase_dist_pkgdata_DATA = \
 	$(DIST_http) \
 	$(DIST_lua) \
 	$(DIST_osdmenu_default) \
-	$(DIST_osdmenu_dvd)
+	$(DIST_osdmenu_dvd) \
+	$(DIST_osdmenu_minimal)
 
 nobase_pkgdata_DATA = skins2/default.vlt
 nobase_data_DATA = applications/vlc.desktop
@@ -233,6 +234,18 @@ DIST_osdmenu_dvd = \
 	osdmenu/dvd/volume/volume04.png \
 	osdmenu/dvd/volume/volume05.png \
 	osdmenu/dvd/unselect/barroff.png
+
+DIST_osdmenu_minimal = \
+	osdmenu/menu.cfg \
+	osdmenu/minimal/fs_panel_simple.xcf \
+	osdmenu/minimal/fs_panel_skip_next.png \
+	osdmenu/minimal/fs_panel_simple.png \
+	osdmenu/minimal/fs_panel_volume_max.png \
+	osdmenu/minimal/fs_panel.xcf \
+	osdmenu/minimal/fs_panel_skip_previous.png \
+	osdmenu/minimal/fs_panel_volume_min.png \
+	osdmenu/minimal/fs_panel.png \
+	osdmenu/minimal/fs_panel_mockup.png
 
 DIST_lua= \
 	luaplaylist/README.txt \
