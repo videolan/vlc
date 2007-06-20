@@ -47,20 +47,17 @@ if test -d extras/contrib/bin; then
     export BELIBRARIES=./extras/contrib/lib:$BELIBRARIES
   fi
 elif test ".`uname -s`" = ".Darwin"; then
-  # Make sure contrib has been built
-  if test ! -e ./extras/contrib/config.mak; then
-    set +x
-    echo ""
-    echo "ERR: Contribs haven't been built"
-    echo "ERR: Please run:"
-    echo "ERR: "
-    echo "ERR:    'cd extras/contrib && ./bootstrap && make && cd ../..'"
-    echo "ERR: "
-    echo "ERR: Make sure fink has been disabled too."
-    echo ""
-    set -x
-    exit 1
-  fi
+  set +x
+  echo ""
+  echo "ERR: Contribs haven't been built"
+  echo "ERR: Please run:"
+  echo "ERR: "
+  echo "ERR:    'cd extras/contrib && ./bootstrap && make && cd ../..'"
+  echo "ERR: "
+  echo "ERR: Make sure fink has been disabled too."
+  echo ""
+  set -x
+  exit 1
 fi
 
 # Check for autoconf
