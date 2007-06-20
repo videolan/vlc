@@ -173,6 +173,7 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([mkv mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_CFLAGS([libvlc vlc],[-x objective-c])
     VLC_ADD_LDFLAGS([vlc],[-undefined dynamic_lookup])
+    VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
     VLC_ADD_LDFLAGS([motion],[-framework IOKit -framework CoreFoundation])
     AC_ARG_ENABLE(macosx-defaults,
         [  --enable-macosx-defaults Build the default configuration on Mac OS X (default enabled)])
