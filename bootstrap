@@ -40,25 +40,26 @@ if test -d extras/contrib/bin; then
     ACLOCAL_ARGS="${ACLOCAL_ARGS} -I extras/contrib/share/aclocal"
   fi
   if test ".`uname -s`" = ".Darwin"; then
-    # Make sure contrib has been built
-    if test ! -e ./extras/contrib/config.mak; then
-        set +x
-        echo ""
-        echo "ERR: Contribs haven't been built"
-        echo "ERR: Please run:"
-        echo ""
-        echo "ERR:    'cd extras/contrib && ./bootstrap && make && cd ../..'"
-        echo ""
-        echo "ERR: Make sure fink has been disabled too"
-        echo ""
-        set -x
-        exit 1
-    fi
     export LD_LIBRARY_PATH=./extras/contrib/lib:$LD_LIBRARY_PATH
     export DYLD_LIBRARY_PATH=./extras/contrib/lib:$DYLD_LIBRARY_PATH
   elif test ".`uname -s`" = ".BeOS"; then
     export LIBRARY_PATH=./extras/contrib/lib:$LIBRARY_PATH
     export BELIBRARIES=./extras/contrib/lib:$BELIBRARIES
+  fi
+elif test ".`uname -s`" = ".Darwin"; then
+  # Make sure contrib has been built
+  if test ! -e ./extras/contrib/config.mak; then
+    set +x
+    echo ""
+    echo "ERR: Contribs haven't been built"
+    echo "ERR: Please run:"
+    echo "ERR: "
+    echo "ERR:    'cd extras/contrib && ./bootstrap && make && cd ../..'"
+    echo "ERR: "
+    echo "ERR: Make sure fink has been disabled too."
+    echo ""
+    set -x
+    exit 1
   fi
 fi
 
