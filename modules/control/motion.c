@@ -1,10 +1,11 @@
 /*****************************************************************************
  * motion.c: control VLC with laptop built-in motion sensors
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006 - 2007 the VideoLAN team
  * $Id$
  *
  * Author: Sam Hocevar <sam@zoy.org>
+ *         Jérôme Decoodt <djc@videolan.org> (unimotion integration)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +27,7 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
+#include <math.h>
 
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
@@ -35,12 +37,17 @@
 #    include <unistd.h>
 #endif
 
+#ifdef __APPLE__
+#include "unimotion.h"
+#endif
+
 /*****************************************************************************
  * intf_sys_t: description and status of interface
  *****************************************************************************/
 struct intf_sys_t
 {
-    enum { NO_SENSOR, HDAPS_SENSOR, AMS_SENSOR } sensor;
+    enum { NO_SENSOR, HDAPS_SENSOR, AMS_SENSOR, UNIMOTION_SENSOR } sensor;
+    enum sms_hardware unimotion_hw;
 
     int i_calibrate;
 
@@ -110,6 +117,10 @@ int Open ( vlc_object_t *p_this )
         /* Apple Motion Sensor support */
         p_intf->p_sys->sensor = AMS_SENSOR;
     }
+#ifdef __APPLE__
+    else if( p_intf->p_sys->unimotion_hw = detect_sms() )
+        p_intf->p_sys->sensor = UNIMOTION_SENSOR;
+#endif
     else
     {
         /* No motion sensor support */
@@ -136,14 +147,17 @@ void Close ( vlc_object_t *p_this )
 /*****************************************************************************
  * RunIntf: main loop
  *****************************************************************************/
+#define FILTER_LENGTH 16
+#define LOW_THRESHOLD 800
+#define HIGH_THRESHOLD 1000
 static void RunIntf( intf_thread_t *p_intf )
 {
-    int i_x, i_oldx = 0;
+    int i_x, i_oldx = 0, i_sum = 0, i = 0;
+    int p_oldx[FILTER_LENGTH];
+    memset( p_oldx, 0, FILTER_LENGTH * sizeof( int ) );
 
     while( !intf_ShouldDie( p_intf ) )
     {
-#define LOW_THRESHOLD 80
-#define HIGH_THRESHOLD 100
         vout_thread_t *p_vout;
         const char *psz_filter, *psz_type;
         vlc_bool_t b_change = VLC_FALSE;
@@ -152,6 +166,10 @@ static void RunIntf( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
 
         i_x = GetOrientation( p_intf );
+        i_sum += i_x - p_oldx[i];
+        p_oldx[i++] = i_x;
+        if( i == FILTER_LENGTH ) i = 0;
+        i_x = i_sum / FILTER_LENGTH;
 
         if( p_intf->p_sys->b_use_rotate )
         {
@@ -162,7 +180,8 @@ static void RunIntf( intf_thread_t *p_intf )
                 vlc_object_find_name( p_intf->p_libvlc, "rotate", FIND_CHILD );
                 if( p_obj )
                 {
-                    var_SetInteger( p_obj, "rotate-angle",((360+i_x/2)%360) );
+                    var_SetInteger( p_obj, "rotate-deciangle",
+                            ((3600+i_x/2)%3600) );
                     i_oldx = i_x;
                     vlc_object_release( p_obj );
                 }
@@ -209,14 +228,17 @@ static void RunIntf( intf_thread_t *p_intf )
         i_oldx = i_x;
     }
 }
+#undef FILTER_LENGTH
+#undef LOW_THRESHOLD
+#undef HIGH_THRESHOLD
 
 /*****************************************************************************
- * GetOrientation: get laptop orientation, range -180 / +180
+ * GetOrientation: get laptop orientation, range -1800 / +1800
  *****************************************************************************/
 static int GetOrientation( intf_thread_t *p_intf )
 {
     FILE *f;
-    int i_x, i_y;
+    int i_x, i_y, i_z;
 
     switch( p_intf->p_sys->sensor )
     {
@@ -231,7 +253,7 @@ static int GetOrientation( intf_thread_t *p_intf )
         fscanf( f, "(%d,%d)", &i_x, &i_y );
         fclose( f );
 
-        return i_x - p_intf->p_sys->i_calibrate;
+        return ( i_x - p_intf->p_sys->i_calibrate ) * 10;
 
     case AMS_SENSOR:
         f = fopen( "/sys/devices/ams/x", "r" );
@@ -243,8 +265,23 @@ static int GetOrientation( intf_thread_t *p_intf )
         fscanf( f, "%d", &i_x);
         fclose( f );
 
-        return - i_x * 3; /* FIXME: arbitrary */
-
+        return - i_x * 30; /* FIXME: arbitrary */
+#ifdef __APPLE__
+    case UNIMOTION_SENSOR:
+        if( read_sms_raw( p_intf->p_sys->unimotion_hw, &i_x, &i_y, &i_z ) )
+        {
+            double d_norm = sqrt( i_x*i_x+i_z*i_z );
+            if( d_norm < 100 )
+                return 0;
+            double d_x = i_x / d_norm;
+            if( i_z > 0 )
+                return -asin(d_x)*3600/3.141;
+            else
+                return 3600 + asin(d_x)*3600/3.141;
+        }
+#endif
+        else
+            return 0;
     default:
         return 0;
     }

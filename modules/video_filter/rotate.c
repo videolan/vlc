@@ -46,6 +46,10 @@ static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *p_data );
 
+static int PreciseRotateCallback( vlc_object_t *p_this, char const *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data );
+
 #define ANGLE_TEXT N_("Angle in degrees")
 #define ANGLE_LONGTEXT N_("Angle in degrees (0 to 359)")
 
@@ -84,7 +88,7 @@ struct filter_sys_t
 
 static inline void cache_trigo( int i_angle, int *i_sin, int *i_cos )
 {
-    const double f_angle = (((double)i_angle)*M_PI)/180.;
+    const double f_angle = (((double)i_angle)*M_PI)/1800.;
     *i_sin = (int)(sin( f_angle )*256.);
     *i_cos = (int)(cos( f_angle )*256.);
 }
@@ -110,8 +114,10 @@ static int Create( vlc_object_t *p_this )
                        p_filter->p_cfg );
 
     p_sys->i_angle = var_CreateGetIntegerCommand( p_filter,
-                                                  FILTER_PREFIX "angle" );
+                                                  FILTER_PREFIX "angle" ) * 10;
+    var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "deciangle" );
     var_AddCallback( p_filter, FILTER_PREFIX "angle", RotateCallback, p_sys );
+    var_AddCallback( p_filter, FILTER_PREFIX "deciangle", PreciseRotateCallback, p_sys );
 
     cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
 
@@ -219,6 +225,20 @@ static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
 
     if( !strcmp( psz_var, "rotate-angle" ) )
+    {
+        p_sys->i_angle = newval.i_int*10;
+
+        cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
+    }
+    return VLC_SUCCESS;
+}
+static int PreciseRotateCallback( vlc_object_t *p_this, char const *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval,
+                           void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *)p_data;
+
+    if( !strcmp( psz_var, "rotate-deciangle" ) )
     {
         p_sys->i_angle = newval.i_int;
 

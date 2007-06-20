@@ -173,6 +173,7 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([mkv mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_CFLAGS([libvlc vlc],[-x objective-c])
     VLC_ADD_LDFLAGS([vlc],[-undefined dynamic_lookup])
+    VLC_ADD_LDFLAGS([motion],[-framework IOKit -framework CoreFoundation])
     AC_ARG_ENABLE(macosx-defaults,
         [  --enable-macosx-defaults Build the default configuration on Mac OS X (default enabled)])
     if test "x${enable_macosx_defaults}" != "xno"
@@ -3329,7 +3330,6 @@ AS_IF([test "${enable_libtar}" != "no"],[
     VLC_ADD_LDFLAGS([skins2],[-ltar])
   ] )
 ])
-
 
 dnl
 dnl A52/AC3 decoder plugin
