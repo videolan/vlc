@@ -353,10 +353,10 @@ static subpicture_region_t *create_text_region( filter_t *p_filter, subpicture_t
         return NULL;
     }
     p_region->psz_text = strdup( psz_text );
-    p_region->i_x = 0; 
+    p_region->i_x = 0;
     p_region->i_y = 40;
-#if 1
-    msg_Dbg( p_filter, "SPU text region position (%d,%d) (%d,%d) [%s]", 
+#if 0
+    msg_Dbg( p_filter, "SPU text region position (%d,%d) (%d,%d) [%s]",
         p_region->i_x, p_region->i_y,
         p_region->fmt.i_width, p_region->fmt.i_height, p_region->psz_text );
 #endif
