@@ -2397,6 +2397,13 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-random", ACTIONID_RANDOM, 0, 0, 0, 0 },
     { "key-loop", ACTIONID_LOOP, 0, 0, 0, 0 },
     { "key-wallpaper", ACTIONID_WALLPAPER, 0, 0, 0, 0 },
+    { "key-menu-on", ACTIONID_MENU_ON, 0, 0, 0, 0 },
+    { "key-menu-off", ACTIONID_MENU_OFF, 0, 0, 0, 0 },
+    { "key-menu-right", ACTIONID_MENU_RIGHT, 0, 0, 0, 0 },
+    { "key-menu-left", ACTIONID_MENU_LEFT, 0, 0, 0, 0 },
+    { "key-menu-up", ACTIONID_MENU_UP, 0, 0, 0, 0 },
+    { "key-menu-down", ACTIONID_MENU_DOWN, 0, 0, 0, 0 },
+    { "key-menu-select", ACTIONID_MENU_SELECT, 0, 0, 0, 0 },
     { NULL, 0, 0, 0, 0, 0 }
 };
 

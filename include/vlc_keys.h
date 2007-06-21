@@ -309,3 +309,10 @@ static inline int StringToKey( char *psz_key )
 #define ACTIONID_LOOP                  82
 #define ACTIONID_WALLPAPER             83
 #define ACTIONID_LEAVE_FULLSCREEN      84
+#define ACTIONID_MENU_ON               85
+#define ACTIONID_MENU_OFF              86
+#define ACTIONID_MENU_RIGHT            87
+#define ACTIONID_MENU_LEFT             88
+#define ACTIONID_MENU_UP               89
+#define ACTIONID_MENU_DOWN             90
+#define ACTIONID_MENU_SELECT           91

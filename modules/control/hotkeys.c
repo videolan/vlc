@@ -760,6 +760,34 @@ static void Run( intf_thread_t *p_intf )
                     playlist_Play( p_playlist );
                 }
             }
+            else if( i_action == ACTIONID_MENU_ON )
+            {
+                osd_MenuShow( VLC_OBJECT(p_intf) );
+            }
+            else if( i_action == ACTIONID_MENU_OFF )
+            {
+                osd_MenuHide( VLC_OBJECT(p_intf) );
+            }
+            else if( i_action == ACTIONID_MENU_LEFT )
+            {
+                osd_MenuPrev( VLC_OBJECT(p_intf) );
+            }
+            else if( i_action == ACTIONID_MENU_RIGHT )
+            {
+                osd_MenuNext( VLC_OBJECT(p_intf) );
+            }
+            else if( i_action == ACTIONID_MENU_UP )
+            {
+                osd_MenuUp( VLC_OBJECT(p_intf) );
+            }
+            else if( i_action == ACTIONID_MENU_DOWN )
+            {
+                osd_MenuDown( VLC_OBJECT(p_intf) );
+            }
+            else if( i_action == ACTIONID_MENU_SELECT )
+            {
+                osd_MenuActivate( VLC_OBJECT(p_intf) );
+            }
         }
         if( p_vout )
             vlc_object_release( p_vout );

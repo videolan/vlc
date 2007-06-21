@@ -31,6 +31,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
+#include <vlc_osd.h>
 
 #include <lirc/lirc_client.h>
 
@@ -53,6 +54,7 @@ static void Run     ( intf_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
+    set_shortname( _("Infrared") );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     set_description( _("Infrared remote control interface") );
@@ -137,20 +139,47 @@ static void Run( intf_thread_t *p_intf )
         }
 
         while( !intf_ShouldDie( p_intf )
-                && lirc_code2char( p_intf->p_sys->config, code, &c ) == 0
-                && c != NULL )
+                && (lirc_code2char( p_intf->p_sys->config, code, &c ) == 0)
+                && (c != NULL) )
         {
             vlc_value_t keyval;
 
-            if( strncmp( "key-", c, 4 ) )
+            if( !strncmp( "key-", c, 4 ) )
+            {
+                keyval.i_int = config_GetInt( p_intf, c );
+                var_Set( p_intf->p_libvlc, "key-pressed", keyval );
+            }
+            else if( !strncmp( "menu ", c, 5)  )
+            {
+                if( !strncmp( c, "menu on", 7 ) ||
+                    !strncmp( c, "menu show", 9 ))
+                    osd_MenuShow( VLC_OBJECT(p_intf) );
+                else if( !strncmp( c, "menu off", 8 ) ||
+                         !strncmp( c, "menu hide", 9 ) )
+                    osd_MenuHide( VLC_OBJECT(p_intf) );
+                else if( !strncmp( c, "menu up", 7 ) )
+                    osd_MenuUp( VLC_OBJECT(p_intf) );
+                else if( !strncmp( c, "menu down", 9 ) )
+                    osd_MenuDown( VLC_OBJECT(p_intf) );
+                else if( !stnrcmp( c, "menu left", 9 ) )
+                    osd_MenuPrev( VLC_OBJECT(p_intf) );
+                else if( !strncmp( c, "menu right", 10 ) )
+                    osd_MenuNext( VLC_OBJECT(p_intf) );
+                else if( !strncmp( c, "menu select", 11 ) )
+                    osd_MenuActivate( VLC_OBJECT(p_intf) );
+                else
+                {
+                    msg_Err( p_intf, _("Please provide one of the following parameters:") );
+                    msg_Err( p_intf, "[on|off|up|down|left|right|select]" );
+                    break;
+                }
+            }
+            else
             {
                 msg_Err( p_intf, "this doesn't appear to be a valid keycombo lirc sent us. Please look at the doc/lirc/example.lirc file in VLC" );
                 break;
             }
-            keyval.i_int = config_GetInt( p_intf, c );
-            var_Set( p_intf->p_libvlc, "key-pressed", keyval );
         }
         free( code );
     }
 }
-
