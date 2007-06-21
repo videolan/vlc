@@ -440,11 +440,12 @@ static int panned=0;
          * some other app might have played with the framebuffer */
         p_vout->p_sys->var_info.xoffset = 0;
 
-if(panned < 0) {
-        ioctl( p_vout->p_sys->i_fd,
-               FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );
-panned++;
-}
+        if( panned < 0 )
+        {
+                ioctl( p_vout->p_sys->i_fd,
+                       FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );
+                panned++;
+        }
     }
 }
 
@@ -699,4 +700,3 @@ static void GfxMode( int i_tty )
         /*msg_Err( p_vout, "failed ioctl KDSETMODE KD_GRAPHICS" );*/
     }
 }
-
