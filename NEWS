@@ -122,7 +122,7 @@ Various bugfixes, notably:
  * MKV demuxer crash (related to seeking)
 
 CDDA / Vorbis / Theora / SAP plugins:
- * Security updates (VideoLAN-SA-0702)
+ * Security updates (VideoLAN-SA-0702, CVE-2007-3316)
 
 Demuxers:
  * Fixed a problem with detecting embedded subtitles (GAB2 format) in AVI
