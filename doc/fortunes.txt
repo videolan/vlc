@@ -776,3 +776,9 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 < xtophe> ah i should remember to wear my vlc tshirt next time i commit a crime
   -- #videolan
 %
+<spaceman_spiff> si, la 0.9 est utilisable
+<spaceman_spiff> ça dépend pour quoi
+<spaceman_spiff> pour faire croire à un naïf qu'un dvd est pété par
+                 exemple
+<spaceman_spiff> "regarde il fait planter mon vlc"
+%
