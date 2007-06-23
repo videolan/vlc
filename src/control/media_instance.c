@@ -83,6 +83,9 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
     p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->i_input_id = p_input->i_object_id;
 
+    /* will be released in media_instance_release() */
+    vlc_object_retain( p_input );
+
     return p_mi;
 }
 
@@ -113,12 +116,34 @@ void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
 }
 
 /**************************************************************************
- * Free a Media Instance object (libvlc internal)
+ * Release a Media Instance object
  **************************************************************************/
-void libvlc_media_instance_destroy_and_detach( libvlc_media_instance_t *p_mi )
+void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
 {
+    input_thread_t *p_input_thread;
+    libvlc_exception_t p_e;
+
+    /* XXX: locking */
+    libvlc_exception_init( &p_e );
+
     if( !p_mi )
         return;
+
+    p_input_thread = libvlc_get_input_thread( p_mi, &p_e );
+
+    if( !libvlc_exception_raised( &p_e ) )
+    {
+        /* release for previous libvlc_get_input_thread */
+        vlc_object_release( p_input_thread );
+
+        /* release for initial p_input_thread yield (see _new()) */
+        vlc_object_release( p_input_thread );
+
+        /* No one is tracking this input_thread appart us. Destroy it */
+        if( p_input_thread->i_refcount <= 0 )
+            input_DestroyThread( p_input_thread );
+        /* btw, we still have an XXX locking here */
+    }
 
     libvlc_media_descriptor_destroy( p_mi->p_md );
 
@@ -145,12 +170,16 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
             return;
 
         input_Control( p_input_thread, INPUT_CONTROL_SET_STATE, PLAYING_S );
+        vlc_object_release( p_input_thread );
         return;
     }
 
     p_input_thread = input_CreateThread( p_mi->p_libvlc_instance->p_libvlc_int,
                                          p_mi->p_md->p_input_item );
     p_mi->i_input_id = p_input_thread->i_object_id;
+
+    /* will be released in media_instance_release() */
+    vlc_object_yield( p_input_thread );
 }
 
 /**************************************************************************
@@ -169,6 +198,7 @@ void libvlc_media_instance_pause( libvlc_media_instance_t *p_mi,
         return;
 
     input_Control( p_input_thread, INPUT_CONTROL_SET_STATE, val );
+    vlc_object_release( p_input_thread );
 }
 
 /**************************************************************************

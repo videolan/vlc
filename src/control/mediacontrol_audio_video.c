@@ -294,7 +294,7 @@ mediacontrol_get_rate( mediacontrol_Instance *self,
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
 
     i_ret = libvlc_media_instance_get_rate( p_mi, &ex );
-    libvlc_media_instance_destroy_and_detach( p_mi );
+    libvlc_media_instance_release( p_mi );
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
 
     return i_ret / 10;
@@ -315,7 +315,7 @@ mediacontrol_set_rate( mediacontrol_Instance *self,
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
     libvlc_media_instance_set_rate( p_mi, rate * 10, &ex );
-    libvlc_media_instance_destroy_and_detach( p_mi );
+    libvlc_media_instance_release( p_mi );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
@@ -334,7 +334,7 @@ mediacontrol_get_fullscreen( mediacontrol_Instance *self,
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
 
     i_ret = libvlc_get_fullscreen( p_mi, &ex );
-    libvlc_media_instance_destroy_and_detach( p_mi );
+    libvlc_media_instance_release( p_mi );
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
 
     return i_ret;
@@ -355,6 +355,6 @@ mediacontrol_set_fullscreen( mediacontrol_Instance *self,
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
     libvlc_set_fullscreen( p_mi, b_fullscreen, &ex );
-    libvlc_media_instance_destroy_and_detach( p_mi );
+    libvlc_media_instance_release( p_mi );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }

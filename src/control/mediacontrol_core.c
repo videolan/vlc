@@ -138,7 +138,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
 
     if(  an_origin != mediacontrol_AbsolutePosition )
     {
-        libvlc_media_instance_destroy_and_detach( p_mi );
+        libvlc_media_instance_release( p_mi );
         /* Relative or ModuloPosition make no sense */
         RAISE_NULL( mediacontrol_PositionOriginNotSupported,
                     "Only absolute position is valid." );
@@ -155,7 +155,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
     {
         if( ! self->p_playlist->p_input )
         {
-            libvlc_media_instance_destroy_and_detach( p_mi );
+            libvlc_media_instance_release( p_mi );
             RAISE_NULL( mediacontrol_InternalException,
                         "No input" );
         }
@@ -164,7 +164,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
                                                    a_key,
                                                    pos );
     }
-    libvlc_media_instance_destroy_and_detach( p_mi );
+    libvlc_media_instance_release( p_mi );
     return retval;
 }
 
@@ -186,7 +186,7 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
 
     i_pos = mediacontrol_position2microsecond( self->p_playlist->p_input, a_position );
     libvlc_media_instance_set_time( p_mi, i_pos / 1000, &ex );
-    libvlc_media_instance_destroy_and_detach( p_mi );
+    libvlc_media_instance_release( p_mi );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 }
 
