@@ -20,6 +20,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#include <stdlib.h>
+
 #include <vlc/vlc.h>
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
@@ -175,6 +177,16 @@ static int WriteMeta( vlc_object_t *p_this )
     {
         TagLib::Tag *tag = f.tag();
         tag->setArtist( p_item->p_meta->psz_artist );
+        if( p_item->p_meta->psz_title )
+            tag->setTitle( p_item->p_meta->psz_title );
+        else
+            tag->setTitle( p_item->psz_name );
+        tag->setAlbum( p_item->p_meta->psz_album );
+        tag->setGenre( p_item->p_meta->psz_genre );
+        if( p_item->p_meta->psz_date )
+            tag->setYear( atoi( p_item->p_meta->psz_date ) );
+        if( p_item->p_meta->psz_tracknum )
+            tag->setTrack( atoi( p_item->p_meta->psz_tracknum ) );
         f.save();
         return VLC_SUCCESS;
     }
