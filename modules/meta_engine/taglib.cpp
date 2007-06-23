@@ -168,11 +168,17 @@ static int ReadMeta( vlc_object_t *p_this )
 
 static int WriteMeta( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist = (playlist_t *)p_this;
-    meta_export_t *p_export = (meta_export_t *)p_playlist->p_private;
-    input_item_t *p_item = p_export->p_item;
+    input_item_t *p_item = (input_item_t *)p_this;
 
-    TagLib::FileRef f( p_export->psz_file );
+    char *psz_uri = p_item->psz_uri;
+    /* we can write meta data only in a file */
+    if( !strncmp( psz_uri, "file://", 7 ) )
+        psz_uri += 7;
+    /* if the file is specified with its path, not prefixed with file:// */
+    else if( strncmp( psz_uri, "/", 1 ) )
+        return VLC_EGENERIC;
+
+    TagLib::FileRef f( psz_uri );
     if( !f.isNull() && f.tag() )
     {
         TagLib::Tag *tag = f.tag();
