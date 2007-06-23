@@ -228,8 +228,8 @@
         return;
     }
     if( [self alphaValue] > 0.0 )
-        [self setAlphaValue:[self alphaValue]-0.1];
-    if( [self alphaValue] <= 0.1 )
+        [self setAlphaValue:[self alphaValue]-0.05];
+    if( [self alphaValue] <= 0.05 )
     {
         b_displayed = NO;
         [self setAlphaValue:0.0];
@@ -280,7 +280,7 @@
     if( ( [self alphaValue] > 0.0 ) )
     {
         if (![self fadeTimer])
-            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(unfocus:) userInfo:[NSNumber numberWithShort:0] repeats:YES]];
+            [self setFadeTimer:[NSTimer scheduledTimerWithTimeInterval:0.05 target:self selector:@selector(unfocus:) userInfo:[NSNumber numberWithShort:0] repeats:YES]];
         else if ([[[self fadeTimer] userInfo] shortValue]==1)
             b_fadeQueued=YES;
     }
