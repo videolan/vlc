@@ -169,7 +169,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     if( p_md )
                     {
                         libvlc_toggle_fullscreen(p_md, &ex);
-                        libvlc_media_instance_destroy_and_detach(p_md);
+                        libvlc_media_instance_release(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
                             NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -533,7 +533,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     if( p_md )
                     {
                         vlc_int64_t val = libvlc_media_instance_get_length(p_md, &ex);
-                        libvlc_media_instance_destroy_and_detach(p_md);
+                        libvlc_media_instance_release(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
                             NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -565,7 +565,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     if( p_md )
                     {
                         float val = libvlc_media_instance_get_position(p_md, &ex);
-                        libvlc_media_instance_destroy_and_detach(p_md);
+                        libvlc_media_instance_release(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
                             NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -597,7 +597,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                     if( p_md )
                     {
                         vlc_int64_t val = libvlc_media_instance_get_time(p_md, &ex);
-                        libvlc_media_instance_destroy_and_detach(p_md);
+                        libvlc_media_instance_release(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
                             NPN_SetException(this, libvlc_exception_get_message(&ex));
@@ -642,7 +642,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                             vlc_int64_t from = libvlc_media_instance_get_time(p_md, &ex);
                             if( libvlc_exception_raised(&ex) )
                             {
-                                libvlc_media_instance_destroy_and_detach(p_md);
+                                libvlc_media_instance_release(p_md);
                                 NPN_SetException(this, libvlc_exception_get_message(&ex));
                                 libvlc_exception_clear(&ex);
                                 return INVOKERESULT_GENERIC_ERROR;
@@ -651,7 +651,7 @@ RuntimeNPObject::InvokeResult VlcNPObject::invoke(int index, const NPVariant *ar
                         }
                         /* jump to time */
                         libvlc_media_instance_set_time(p_md, pos, &ex);
-                        libvlc_media_instance_destroy_and_detach(p_md);
+                        libvlc_media_instance_release(p_md);
                         if( libvlc_exception_raised(&ex) )
                         {
                             NPN_SetException(this, libvlc_exception_get_message(&ex));

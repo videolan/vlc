@@ -188,7 +188,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                         if( p_md )
                         {
                             libvlc_toggle_fullscreen(p_md, NULL);
-                            libvlc_media_instance_destroy_and_detach(p_md);
+                            libvlc_media_instance_release(p_md);
                         }
                     }
                 }
@@ -227,7 +227,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                                 area.bottom = npwindow.height;
                                 libvlc_video_redraw_rectangle(p_md, &area, NULL);
                             }
-                            libvlc_media_instance_destroy_and_detach(p_md);
+                            libvlc_media_instance_release(p_md);
                         }
                     }
                 }
