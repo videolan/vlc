@@ -796,7 +796,7 @@ void VLCPlugin::setTime(int seconds)
             if( NULL != p_md )
             {
                 libvlc_media_instance_set_time(p_md, _i_time, NULL);
-                libvlc_media_instance_destroy_and_detach(p_md);
+                libvlc_media_instance_release(p_md);
             }
         }
     }
