@@ -43,7 +43,7 @@ typedef struct libvlc_instance_t libvlc_instance_t;
  * @{
  */
 
-typedef struct
+typedef struct libvlc_exception_t
 {
     int b_raised;
     int i_code;
@@ -68,7 +68,7 @@ typedef struct
  * @{
  */
 
-typedef enum {
+typedef enum libvlc_meta_t {
     libvlc_meta_Title,
     libvlc_meta_Artist
 } libvlc_meta_t;
@@ -102,7 +102,8 @@ typedef struct libvlc_media_instance_t libvlc_media_instance_t;
  * @{
  */
 
-typedef struct {
+typedef struct libvlc_playlist_item_t
+{
     int i_id;
     char * psz_uri;
     char * psz_name;
@@ -132,7 +133,7 @@ typedef int libvlc_drawable_t;
 /**
 * Rectangle type for video geometry
 */
-typedef struct
+typedef struct libvlc_rectangle_t
 {
     int top, left;
     int bottom, right;
@@ -186,12 +187,12 @@ typedef struct libvlc_log_message_t
  * - libvlc_InputPositionChanged
  */
 
-typedef enum {
+typedef enum libvlc_event_type_t {
     libvlc_VolumeChanged,
     libvlc_InputPositionChanged,
 } libvlc_event_type_t;
 
-typedef struct 
+typedef struct libvlc_event_t
 {
     libvlc_event_type_t type;
     union
