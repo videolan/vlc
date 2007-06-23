@@ -317,7 +317,7 @@ VLC_PUBLIC_API libvlc_media_instance_t * libvlc_media_instance_new( libvlc_media
 VLC_PUBLIC_API void libvlc_media_instance_destroy( libvlc_media_instance_t * );
 
 /* Will be renamed to libvlc_media_instance_release */
-VLC_PUBLIC_API void libvlc_media_instance_destroy_and_detach( libvlc_media_instance_t * );
+VLC_PUBLIC_API void libvlc_media_instance_release( libvlc_media_instance_t * );
 
 VLC_PUBLIC_API void libvlc_media_instance_play ( libvlc_media_instance_t *, libvlc_exception_t * );
 VLC_PUBLIC_API void libvlc_media_instance_pause ( libvlc_media_instance_t *, libvlc_exception_t * );
