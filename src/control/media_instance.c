@@ -84,7 +84,7 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
     p_mi->i_input_id = p_input->i_object_id;
 
     /* will be released in media_instance_release() */
-    vlc_object_retain( p_input );
+    vlc_object_yield( p_input );
 
     return p_mi;
 }
