@@ -30,6 +30,7 @@
 #include <QPushButton>
 #include <QHeaderView>
 #include <QList>
+#include <QStringList>
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QLabel>
@@ -40,13 +41,16 @@
  * Single panels
  ************************************************************************/
 
-/* First Panel - Meta Info */
-
-MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
-                                    QWidget( parent ), p_intf( _p_intf )
+/**
+ * First Panel - Meta Info
+ * All the usual MetaData are displayed and can be changed.
+ **/
+MetaPanel::MetaPanel( QWidget *parent,
+                      intf_thread_t *_p_intf )
+                      : QWidget( parent ), p_intf( _p_intf )
 {
-    int line = 0;
     QGridLayout *l = new QGridLayout( this );
+    int line = 0; /* Counter for GridLayout */
     p_input = NULL;
 
 #define ADD_META( string, widget ) {                             \
@@ -55,14 +59,17 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     l->addWidget( widget, line, 1, 1, 9 );                       \
     line++;            }
 
+    /* Title, artist and album*/
     ADD_META( VLC_META_TITLE, title_text ); /* OK */
     ADD_META( VLC_META_ARTIST, artist_text ); /* OK */
     ADD_META( VLC_META_COLLECTION, collection_text ); /* OK */
 
-    /* Genre Name */ /* FIXME List id3genres.h is not includable yet ? */
+    /* Genre Name */
+    /* FIXME List id3genres.h is not includable yet ? */
     genre_text = new QLineEdit;
     l->addWidget( new QLabel( qtr( VLC_META_GENRE ) + " :" ), line, 0 );
     l->addWidget( genre_text, line, 1, 1, 6 );
+
     /* Date (Should be in years) */
     date_text = new QSpinBox; setSpinBounds( date_text );
     l->addWidget( new QLabel( qtr( VLC_META_DATE ) + " :" ), line, 7 );
@@ -80,6 +87,7 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     l->addWidget( rating_text, line, 6, 1, 4 );
     line++;
 
+    /* Now Playing ? */
     ADD_META( VLC_META_NOW_PLAYING, nowplaying_text );
 
     /* Language and settings */
@@ -92,7 +100,6 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     line++;
 
     /* ART_URL */
-    //    ADD_META( VLC_META_URL, setting_text );
     art_cover = new QLabel( "" );
     art_cover->setMinimumHeight( 128 );
     art_cover->setMinimumWidth( 128 );
@@ -100,34 +107,32 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     art_cover->setMaximumWidth( 128 );
     art_cover->setScaledContents( true );
     art_cover->setPixmap( QPixmap( ":/noart.png" ) );
-
     l->addWidget( art_cover, line, 8, 4, 2 );
 
-#define ADD_META_B( string, widget ) {                             \
+#define ADD_META_2( string, widget ) {                             \
     l->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
     widget = new QLineEdit;                                      \
     l->addWidget( widget, line, 1, 1, 7 );                       \
     line++;            }
 
-    ADD_META_B( VLC_META_COPYRIGHT, copyright_text );
-    ADD_META_B( VLC_META_PUBLISHER, publisher_text );
+    ADD_META_2( VLC_META_COPYRIGHT, copyright_text );
+    ADD_META_2( VLC_META_PUBLISHER, publisher_text );
 
-    ADD_META_B( VLC_META_ENCODED_BY, publisher_text );
-    ADD_META_B( VLC_META_DESCRIPTION, description_text ); // Comment Two lines?
+    ADD_META_2( VLC_META_ENCODED_BY, publisher_text );
+    ADD_META_2( VLC_META_DESCRIPTION, description_text );
 
-    /*  ADD_META( TRACKID)  DO NOT SHOW it */
+    /*  ADD_META( TRACKID )  Useless ? */
     /*  ADD_URI - DO not show it, done outside */
 
 #undef ADD_META
-#undef ADD_META_B
-
-//  CONNECT( model,  artSet( QString ) , this, setArt( QString ) );
+#undef ADD_META_2
 }
 
-MetaPanel::~MetaPanel()
-{
-}
+MetaPanel::~MetaPanel(){}
 
+/**
+ * Save the MetaData, triggered by parent->save Button
+ **/
 void MetaPanel::saveMeta()
 {
     playlist_t *p_playlist;
@@ -154,11 +159,11 @@ void MetaPanel::saveMeta()
 
     /* now we read the modified meta data */
     free( p_input->p_meta->psz_artist );
-    p_input->p_meta->psz_artist = strdup( artist_text->text().toUtf8() );
+    p_input->p_meta->psz_artist = strdup( qtu( artist_text->text() ) );
     free( p_input->p_meta->psz_album );
-    p_input->p_meta->psz_album = strdup( collection_text->text().toUtf8() );
+    p_input->p_meta->psz_album = strdup( qtu( collection_text->text() ) );
     free( p_input->p_meta->psz_genre );
-    p_input->p_meta->psz_genre = strdup( genre_text->text().toUtf8() );
+    p_input->p_meta->psz_genre = strdup( qtu( genre_text->text() ) );
     free( p_input->p_meta->psz_date );
     p_input->p_meta->psz_date = (char*) malloc(5);
     snprintf( p_input->p_meta->psz_date, 5, "%d", date_text->value() );
@@ -166,7 +171,7 @@ void MetaPanel::saveMeta()
     p_input->p_meta->psz_tracknum = (char*) malloc(5);
     snprintf( p_input->p_meta->psz_tracknum, 5, "%d", seqnum_text->value() );
     free( p_input->p_meta->psz_title );
-    p_input->p_meta->psz_title = strdup(  title_text->text().toUtf8() );
+    p_input->p_meta->psz_title = strdup( qtu( title_text->text() ) );
 
     p_playlist = pl_Yield( p_intf );
 
@@ -180,6 +185,9 @@ void MetaPanel::saveMeta()
     pl_Release( p_playlist );
 }
 
+/**
+ * Update all the MetaData and art on an "item-changed" event
+ **/
 void MetaPanel::update( input_item_t *p_item )
 {
     char *psz_meta;
@@ -188,7 +196,7 @@ void MetaPanel::update( input_item_t *p_item )
     if( !EMPTY_STR( psz_meta ) )                    \
         widget->setText( qfu( psz_meta ) );         \
     else                                            \
-        widget->setText( "" );          }
+        widget->setText( "" ); }
 
 #define UPDATE_META_INT( meta, widget ) {           \
     psz_meta = p_item->p_meta->psz_##meta;          \
@@ -226,6 +234,8 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META_INT( rating, rating_text );
 
 #undef UPDATE_META
+
+    /* Art Urls */
     psz_meta = p_item->p_meta->psz_arturl;
     if( psz_meta && !strncmp( psz_meta, "file://", 7 ) )
     {
@@ -236,12 +246,21 @@ void MetaPanel::update( input_item_t *p_item )
         art_cover->setPixmap( QPixmap( ":/noart.png" ) );
 }
 
+/*
+ * Clear all the metadata widgets
+ * Unused yet
+ */
 void MetaPanel::clear(){}
 
-ExtraMetaPanel::ExtraMetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
-                                        QWidget( parent ), p_intf( _p_intf )
+/**
+ * Second Panel - Shows the extra metadata in a tree, non editable.
+ **/
+ExtraMetaPanel::ExtraMetaPanel( QWidget *parent,
+                                intf_thread_t *_p_intf )
+                                : QWidget( parent ), p_intf( _p_intf )
 {
      QGridLayout *layout = new QGridLayout(this);
+
      QLabel *topLabel = new QLabel( qtr( "Extra metadata and other information"
                  " are shown in this list.\n" ) );
      topLabel->setWordWrap( true );
@@ -250,14 +269,18 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
      extraMetaTree = new QTreeWidget( this );
      extraMetaTree->setAlternatingRowColors( true );
      extraMetaTree->setColumnCount( 2 );
-
      extraMetaTree->header()->hide();
-/*     QStringList *treeHeaders;
-     treeHeaders << qtr( "Test1" ) << qtr( "Test2" ); */
+/*     QStringList headerList = ( QStringList() << qtr( "Type" )
+ *                                             << qtr( "Value" ) );
+ * Useless, add this header if you think it would help the user          **
+ */
 
      layout->addWidget( extraMetaTree, 1, 0 );
 }
 
+/**
+ * Update the Extra Metadata from p_meta->i_extras 
+ **/
 void ExtraMetaPanel::update( input_item_t *p_item )
 {
     vlc_meta_t *p_meta = p_item->p_meta;
@@ -273,21 +296,108 @@ void ExtraMetaPanel::update( input_item_t *p_item )
     extraMetaTree->addTopLevelItems( items );
 }
 
-void ExtraMetaPanel::clear(){}
+/**
+ * Clear the ExtraMetaData Tree
+ **/
+void ExtraMetaPanel::clear()
+{
+    extraMetaTree->clear();
+}
 
-/* Second Panel - Stats */
-
-InputStatsPanel::InputStatsPanel( QWidget *parent, intf_thread_t *_p_intf ) :
-                                  QWidget( parent ), p_intf( _p_intf )
+/**
+ * Third panel - Stream info
+ * Display all codecs and muxers info that we could gather.
+ **/
+InfoPanel::InfoPanel( QWidget *parent,
+                      intf_thread_t *_p_intf )
+                      : QWidget( parent ), p_intf( _p_intf )
 {
      QGridLayout *layout = new QGridLayout(this);
-     StatsTree = new QTreeWidget(this);
+
      QList<QTreeWidgetItem *> items;
+
+     QLabel *topLabel = new QLabel( qtr( "Information about what your media or"
+              " stream is made of.\n Muxer, Audio and Video Codecs, Subtitles "
+              "are shown." ) );
+     topLabel->setWordWrap( true );
+     layout->addWidget( topLabel, 0, 0 );
+
+     InfoTree = new QTreeWidget(this);
+     InfoTree->setColumnCount( 1 );
+     InfoTree->header()->hide();
+     layout->addWidget(InfoTree, 1, 0 );
+}
+
+InfoPanel::~InfoPanel()
+{
+}
+
+/**
+ * Update the Codecs information on parent->update()
+ **/
+void InfoPanel::update( input_item_t *p_item)
+{
+    InfoTree->clear();
+    QTreeWidgetItem *current_item = NULL;
+    QTreeWidgetItem *child_item = NULL;
+
+    for( int i = 0; i< p_item->i_categories ; i++)
+    {
+        current_item = new QTreeWidgetItem();
+        current_item->setText( 0, qfu(p_item->pp_categories[i]->psz_name) );
+        InfoTree->addTopLevelItem( current_item );
+
+        for( int j = 0 ; j < p_item->pp_categories[i]->i_infos ; j++ )
+        {
+            child_item = new QTreeWidgetItem ();
+            child_item->setText( 0,
+                    qfu(p_item->pp_categories[i]->pp_infos[j]->psz_name)
+                    + ": "
+                    + qfu(p_item->pp_categories[i]->pp_infos[j]->psz_value));
+
+            current_item->addChild(child_item);
+        }
+         InfoTree->setItemExpanded( current_item, true);
+    }
+}
+
+/**
+ * Clear the tree
+ **/
+void InfoPanel::clear()
+{
+    InfoTree->clear();
+}
+
+/**
+ * Save all the information to a file
+ * Not yet implemented.
+ **/
+/*
+void InfoPanel::saveCodecsInfo()
+{
+
+}
+*/
+
+/**
+ * Fourth Panel - Stats
+ * Displays the Statistics for reading/streaming/encoding/displaying in a tree
+ */
+InputStatsPanel::InputStatsPanel( QWidget *parent,
+                                  intf_thread_t *_p_intf )
+                                  : QWidget( parent ), p_intf( _p_intf )
+{
+     QGridLayout *layout = new QGridLayout(this);
+
+     QList<QTreeWidgetItem *> items;
+
      QLabel *topLabel = new QLabel( qtr( "Various statistics about the current"
                  " media or stream.\n Played and streamed info are shown." ) );
      topLabel->setWordWrap( true );
      layout->addWidget( topLabel, 0, 0 );
 
+     StatsTree = new QTreeWidget(this);
      StatsTree->setColumnCount( 3 );
      StatsTree->header()->hide();
 
@@ -353,6 +463,9 @@ InputStatsPanel::~InputStatsPanel()
 {
 }
 
+/**
+ * Update the Statistics
+ **/
 void InputStatsPanel::update( input_item_t *p_item )
 {
     vlc_mutex_lock( &p_item->p_stats->lock );
@@ -393,57 +506,4 @@ void InputStatsPanel::clear()
 {
 }
 
-/* Third panel - Stream info */
 
-InfoPanel::InfoPanel( QWidget *parent, intf_thread_t *_p_intf ) :
-                                      QWidget( parent ), p_intf( _p_intf )
-{
-     QGridLayout *layout = new QGridLayout(this);
-     InfoTree = new QTreeWidget(this);
-     QList<QTreeWidgetItem *> items;
-
-     QLabel *topLabel = new QLabel( qtr( "Information about what your media or"
-              " stream is made of.\n Muxer, Audio and Video Codecs, Subtitles "
-              "are shown." ) );
-     topLabel->setWordWrap( true );
-     layout->addWidget( topLabel, 0, 0 );
-
-     InfoTree->setColumnCount( 1 );
-     InfoTree->header()->hide();
-     layout->addWidget(InfoTree, 1, 0 );
-}
-
-InfoPanel::~InfoPanel()
-{
-}
-
-void InfoPanel::update( input_item_t *p_item)
-{
-    InfoTree->clear();
-    QTreeWidgetItem *current_item = NULL;
-    QTreeWidgetItem *child_item = NULL;
-
-    for( int i = 0; i< p_item->i_categories ; i++)
-    {
-        current_item = new QTreeWidgetItem();
-        current_item->setText( 0, qfu(p_item->pp_categories[i]->psz_name) );
-        InfoTree->addTopLevelItem( current_item );
-
-        for( int j = 0 ; j < p_item->pp_categories[i]->i_infos ; j++ )
-        {
-            child_item = new QTreeWidgetItem ();
-            child_item->setText( 0,
-                    qfu(p_item->pp_categories[i]->pp_infos[j]->psz_name)
-                    + ": "
-                    + qfu(p_item->pp_categories[i]->pp_infos[j]->psz_value));
-
-            current_item->addChild(child_item);
-        }
-         InfoTree->setItemExpanded( current_item, true);
-    }
-}
-
-void InfoPanel::clear()
-{
-    InfoTree->clear();
-}
