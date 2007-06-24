@@ -99,10 +99,10 @@ VLC_EXPORT (input_thread_t *, libvlc_get_input_thread,
                         ( struct libvlc_media_instance_t *, libvlc_exception_t * ) );
 
 VLC_EXPORT (libvlc_media_instance_t *, libvlc_media_instance_new_from_input_thread,
-                        ( struct libvlc_instance_t *, input_thread_t * ) );
+                        ( struct libvlc_instance_t *, input_thread_t *, libvlc_exception_t * ) );
 
 VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_new_from_input_item,
-                        ( struct libvlc_instance_t *, input_item_t * ) );
+                        ( struct libvlc_instance_t *, input_item_t *, libvlc_exception_t * ) );
 
 VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_duplicate,
                         ( libvlc_media_descriptor_t * ) );

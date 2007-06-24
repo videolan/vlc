@@ -72,14 +72,22 @@ libvlc_media_instance_new( libvlc_media_descriptor_t *p_md )
  **************************************************************************/
 libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
                                    struct libvlc_instance_t *p_libvlc_instance,
-                                   input_thread_t *p_input )
+                                   input_thread_t *p_input,
+                                   libvlc_exception_t *p_e )
 {
     libvlc_media_instance_t * p_mi;
 
     p_mi = malloc( sizeof(libvlc_media_instance_t) );
     p_mi->p_md = libvlc_media_descriptor_new_from_input_item(
                     p_libvlc_instance,
-                    p_input->p->input.p_item );
+                    p_input->p->input.p_item, p_e );
+
+    if( libvlc_exception_raised( p_e ) )
+    {
+        free( p_mi );
+        return NULL;
+    }
+
     p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->i_input_id = p_input->i_object_id;
 

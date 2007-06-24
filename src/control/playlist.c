@@ -220,7 +220,7 @@ libvlc_media_instance_t * libvlc_playlist_get_media_instance(
 
     vlc_mutex_lock( &PL->object_lock );
     p_mi = libvlc_media_instance_new_from_input_thread(
-                        p_instance, PL->p_input );
+                        p_instance, PL->p_input, p_e );
     vlc_mutex_unlock( &PL->object_lock );
 
     return p_mi;

@@ -75,7 +75,8 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
  **************************************************************************/
 libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
                                    libvlc_instance_t *p_instance,
-                                   input_item_t *p_input_item )
+                                   input_item_t *p_input_item,
+                                   libvlc_exception_t *p_e )
 {
     libvlc_media_descriptor_t * p_media_desc;
 
