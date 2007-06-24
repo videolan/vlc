@@ -161,7 +161,7 @@ static void Run( intf_thread_t *p_intf )
                     osd_MenuUp( VLC_OBJECT(p_intf) );
                 else if( !strncmp( c, "menu down", 9 ) )
                     osd_MenuDown( VLC_OBJECT(p_intf) );
-                else if( !stnrcmp( c, "menu left", 9 ) )
+                else if( !strncmp( c, "menu left", 9 ) )
                     osd_MenuPrev( VLC_OBJECT(p_intf) );
                 else if( !strncmp( c, "menu right", 10 ) )
                     osd_MenuNext( VLC_OBJECT(p_intf) );
