@@ -667,6 +667,7 @@ DBUS_METHOD( handle_player )
     METHOD_FUNC( "Stop",                    Stop );
     METHOD_FUNC( "Play",                    Play );
     METHOD_FUNC( "Pause",                   Pause );
+    METHOD_FUNC( "Repeat",                  Repeat );
     METHOD_FUNC( "VolumeSet",               VolumeSet );
     METHOD_FUNC( "VolumeGet",               VolumeGet );
     METHOD_FUNC( "PositionSet",             PositionSet );
@@ -691,7 +692,6 @@ DBUS_METHOD( handle_tracklist )
     METHOD_FUNC( "AddTrack",                AddTrack );
     METHOD_FUNC( "DelTrack",                DelTrack );
     METHOD_FUNC( "Loop",                    Loop );
-    METHOD_FUNC( "Repeat",                  Repeat );
     METHOD_FUNC( "Random",                  Random );
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
