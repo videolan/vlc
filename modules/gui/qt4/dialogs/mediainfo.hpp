@@ -66,11 +66,13 @@ private:
     MetaPanel *MP;
     InfoPanel *IP;
     ExtraMetaPanel *EMP;
+    QPushButton *saveMetaButton;
 public slots:
     void update();
     void update( input_item_t *, bool, bool );
     void close();
     void clear();
+    void updateButtons( int i_tab );
 };
 
 #endif

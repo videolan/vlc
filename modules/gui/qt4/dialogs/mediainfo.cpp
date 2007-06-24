@@ -49,8 +49,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
     setWindowTitle( qtr( "Media information" ) );
     resize( 700 , 450 );
 
-    QGridLayout *layout = new QGridLayout( this );
-
+    /* TabWidgets and Tabs creation */
     IT = new QTabWidget;
     MP = new MetaPanel( IT, p_intf );
     IT->addTab( MP, qtr( "&General" ) );
@@ -64,6 +63,10 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
         IT->addTab( ISP, qtr( "&Stats" ) );
     }
 
+    QGridLayout *layout = new QGridLayout( this );
+
+    /* FIXME GNOME/KDE ? */
+    saveMetaButton = new QPushButton( qtr( "&Save Metadata" ) );
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     closeButton->setDefault( true );
 
@@ -72,12 +75,22 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
 
     layout->addWidget( IT, 0, 0, 1, 7 );
     layout->addWidget( closeButton, 2, 6 );
+    layout->addWidget( saveMetaButton, 2, 5 );
     layout->addWidget( uriLabel, 1, 0, 1, 1 );
     layout->addWidget( uriLine, 1, 1, 1, 6 );
 
     BUTTONACT( closeButton, close() );
+
+    /* The tabs buttons are shown in the main dialog for space and cosmetics */
+    CONNECT( saveMetaButton, clicked(), MP, saveMeta() );
+
+    /* Let the MetaData Panel update the URI */
     CONNECT( MP, uriSet( QString ), uriLine, setText( QString ) );
 
+    CONNECT( IT, currentChanged ( int ), this, updateButtons( int ) );
+
+
+    /* Create the main Update function with a time (150ms) */
     if( mainInput ) {
         ON_TIMEOUT( update() );
         var_AddCallback( THEPL, "item-change", ItemChanged, this );
@@ -169,4 +182,12 @@ void MediaInfoDialog::close()
     if( mainInput == false ) {
         deleteLater();
     }
+}
+
+void MediaInfoDialog::updateButtons( int i_tab )
+{
+    msg_Dbg( p_intf, "Coin Coin, Tab number: %i", i_tab );
+
+    if( i_tab == 0 ) saveMetaButton->show();
+    else saveMetaButton->hide();
 }

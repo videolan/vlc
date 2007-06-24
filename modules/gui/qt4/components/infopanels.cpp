@@ -115,11 +115,6 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     ADD_META_B( VLC_META_ENCODED_BY, publisher_text );
     ADD_META_B( VLC_META_DESCRIPTION, description_text ); // Comment Two lines?
 
-    QPushButton *write = new QPushButton( qtr( "&Write" ) );
-    l->addWidget( write, line, 0 );
-
-    BUTTONACT( write, saveMeta() );
-
     /*  ADD_META( TRACKID)  DO NOT SHOW it */
     /*  ADD_URI - DO not show it, done outside */
 
