@@ -190,7 +190,9 @@ void MetaPanel::saveMeta()
  **/
 void MetaPanel::update( input_item_t *p_item )
 {
-    char *psz_meta;
+    if( !p_item->p_meta )
+        return;
+    char *psz_meta; 
 #define UPDATE_META( meta, widget ) {               \
     psz_meta = p_item->p_meta->psz_##meta;          \
     if( !EMPTY_STR( psz_meta ) )                    \
@@ -284,6 +286,8 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent,
 void ExtraMetaPanel::update( input_item_t *p_item )
 {
     vlc_meta_t *p_meta = p_item->p_meta;
+    if( !p_meta )
+        return;
     QStringList tempItem;
 
     QList<QTreeWidgetItem *> items;
