@@ -173,10 +173,17 @@ static int WriteMeta( vlc_object_t *p_this )
     playlist_t *p_playlist = (playlist_t *)p_this;
     meta_export_t *p_export = (meta_export_t *)p_playlist->p_private;
     input_item_t *p_item = p_export->p_item;
+    
+    if( p_item == NULL )
+    {
+        msg_Err( p_this, "Can't save meta data of an empty input" );
+        return VLC_EGENERIC;
+    }
 
     TagLib::FileRef f( p_export->psz_file );
     if( !f.isNull() && f.tag() )
     {
+        msg_Dbg( p_this, "Updating metadata for %s", p_export->psz_file );
         TagLib::Tag *tag = f.tag();
         SET( Artist, p_item->p_meta->psz_artist );
         if( p_item->p_meta->psz_title )

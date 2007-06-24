@@ -47,6 +47,7 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
 {
     int line = 0;
     QGridLayout *l = new QGridLayout( this );
+    p_input = NULL;
 
 #define ADD_META( string, widget ) {                             \
     l->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
@@ -138,6 +139,9 @@ void MetaPanel::saveMeta()
 
     meta_export_t p_export;
     p_export.p_item = p_input;
+
+    if( p_input == NULL )
+        return;
 
     /* we can write meta data only in a file */
     if( ( p_input->i_type == ITEM_TYPE_AFILE ) || \
