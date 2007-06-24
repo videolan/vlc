@@ -136,12 +136,17 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_meta_desc,
                                          libvlc_exception_t *p_e )
 {
     char ** ppsz_meta;
+    char *ppz_meta;
 
     /* XXX: locking */
 
     preparse_if_needed( p_meta_desc );
 
     ppsz_meta = (char**)p_meta_desc->p_input_item->p_meta;
+    ppz_meta = ppsz_meta[ meta_conversion[e_meta] ];
 
-    return strdup( ppsz_meta[ meta_conversion[e_meta] ] );
+    if( !ppz_meta )
+        return NULL;
+
+    return strdup( ppz_meta );
 }
