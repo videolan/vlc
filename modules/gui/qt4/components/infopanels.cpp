@@ -114,6 +114,11 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
     ADD_META_B( VLC_META_ENCODED_BY, publisher_text );
     ADD_META_B( VLC_META_DESCRIPTION, description_text ); // Comment Two lines?
 
+    QPushButton *write = new QPushButton( qtr( "&Write" ) );
+    l->addWidget( write, line, 0 );
+
+    BUTTONACT( write, saveMeta() );
+
     /*  ADD_META( TRACKID)  DO NOT SHOW it */
     /*  ADD_URI - DO not show it, done outside */
 
@@ -125,6 +130,55 @@ MetaPanel::MetaPanel( QWidget *parent, intf_thread_t *_p_intf ) :
 
 MetaPanel::~MetaPanel()
 {
+}
+
+void MetaPanel::saveMeta()
+{
+    playlist_t *p_playlist;
+
+    meta_export_t p_export;
+    p_export.p_item = p_input;
+
+    /* we can write meta data only in a file */
+    if( ( p_input->i_type == ITEM_TYPE_AFILE ) || \
+        ( p_input->i_type == ITEM_TYPE_VFILE ) )
+        /* some audio files are detected as video files */
+    {
+        char *psz_uri = p_input->psz_uri;
+        if( !strncmp( psz_uri, "file://", 7 ) )
+            psz_uri += 7; /* strlen("file://") = 7 */
+
+        p_export.psz_file = strndup( psz_uri, PATH_MAX );
+    }
+    else
+        return;
+
+    /* now we read the modified meta data */
+    free( p_input->p_meta->psz_artist );
+    p_input->p_meta->psz_artist = strdup( artist_text->text().toUtf8() );
+    free( p_input->p_meta->psz_album );
+    p_input->p_meta->psz_album = strdup( collection_text->text().toUtf8() );
+    free( p_input->p_meta->psz_genre );
+    p_input->p_meta->psz_genre = strdup( genre_text->text().toUtf8() );
+    free( p_input->p_meta->psz_date );
+    p_input->p_meta->psz_date = (char*) malloc(5);
+    snprintf( p_input->p_meta->psz_date, 5, "%d", date_text->value() );
+    free( p_input->p_meta->psz_tracknum );
+    p_input->p_meta->psz_tracknum = (char*) malloc(5);
+    snprintf( p_input->p_meta->psz_tracknum, 5, "%d", seqnum_text->value() );
+    free( p_input->p_meta->psz_title );
+    p_input->p_meta->psz_title = strdup(  title_text->text().toUtf8() );
+
+    p_playlist = pl_Yield( p_intf );
+
+    PL_LOCK;
+    p_playlist->p_private = &p_export;
+
+    module_t *p_mod = module_Need( p_playlist, "meta writer", NULL, 0 );
+    if( p_mod )
+        module_Unneed( p_playlist, p_mod );
+    PL_UNLOCK;
+    pl_Release( p_playlist );
 }
 
 void MetaPanel::update( input_item_t *p_item )

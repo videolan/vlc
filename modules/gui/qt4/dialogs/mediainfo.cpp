@@ -142,6 +142,7 @@ void MediaInfoDialog::update()
 void MediaInfoDialog::update( input_item_t *p_item, bool update_info,
                                                     bool update_meta )
 {
+    MP->p_input = p_item;
     if( update_info )
         IP->update( p_item );
     if( update_meta )

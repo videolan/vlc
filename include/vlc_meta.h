@@ -227,6 +227,12 @@ enum {
     ALBUM_ART_ALL
 };
 
+struct meta_export_t
+{
+    input_item_t *p_item;
+    const char *psz_file;
+};
+
 #define VLC_META_ENGINE_TITLE           0x00000001
 #define VLC_META_ENGINE_ARTIST          0x00000004
 #define VLC_META_ENGINE_GENRE           0x00000008

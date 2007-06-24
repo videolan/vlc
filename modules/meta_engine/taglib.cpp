@@ -166,29 +166,25 @@ static int ReadMeta( vlc_object_t *p_this )
     return VLC_EGENERIC;
 }
 
+#define SET(a,b) if(b) tag->set##a( b );
+
 static int WriteMeta( vlc_object_t *p_this )
 {
-    input_item_t *p_item = (input_item_t *)p_this;
+    playlist_t *p_playlist = (playlist_t *)p_this;
+    meta_export_t *p_export = (meta_export_t *)p_playlist->p_private;
+    input_item_t *p_item = p_export->p_item;
 
-    char *psz_uri = p_item->psz_uri;
-    /* we can write meta data only in a file */
-    if( !strncmp( psz_uri, "file://", 7 ) )
-        psz_uri += 7;
-    /* if the file is specified with its path, not prefixed with file:// */
-    else if( strncmp( psz_uri, "/", 1 ) )
-        return VLC_EGENERIC;
-
-    TagLib::FileRef f( psz_uri );
+    TagLib::FileRef f( p_export->psz_file );
     if( !f.isNull() && f.tag() )
     {
         TagLib::Tag *tag = f.tag();
-        tag->setArtist( p_item->p_meta->psz_artist );
+        SET( Artist, p_item->p_meta->psz_artist );
         if( p_item->p_meta->psz_title )
             tag->setTitle( p_item->p_meta->psz_title );
         else
             tag->setTitle( p_item->psz_name );
-        tag->setAlbum( p_item->p_meta->psz_album );
-        tag->setGenre( p_item->p_meta->psz_genre );
+        SET( Album, p_item->p_meta->psz_album );
+        SET( Genre, p_item->p_meta->psz_genre );
         if( p_item->p_meta->psz_date )
             tag->setYear( atoi( p_item->p_meta->psz_date ) );
         if( p_item->p_meta->psz_tracknum )
@@ -196,6 +192,8 @@ static int WriteMeta( vlc_object_t *p_this )
         f.save();
         return VLC_SUCCESS;
     }
+    msg_Err( p_this, "File %s can't be opened for tag writing\n",
+        p_export->psz_file );
     return VLC_EGENERIC;
 }
 
