@@ -28,6 +28,38 @@
 #include "input/input_internal.h"
 
 /*
+ * Release the associated input thread
+ */
+static void release_input_thread( libvlc_media_instance_t *p_mi ) 
+{
+    input_thread_t *p_input_thread;
+    vlc_bool_t should_destroy;
+    libvlc_exception_t p_e;
+
+    /* XXX: locking */
+    libvlc_exception_init( &p_e );
+
+    p_input_thread = libvlc_get_input_thread( p_mi, &p_e );
+
+    p_mi->i_input_id = -1;
+
+    if( libvlc_exception_raised( &p_e ) )
+        return;
+
+    /* release for previous libvlc_get_input_thread */
+    vlc_object_release( p_input_thread );
+
+    should_destroy = p_input_thread->i_refcount == 1;
+
+    /* release for initial p_input_thread yield (see _new()) */
+    vlc_object_release( p_input_thread );
+
+    /* No one is tracking this input_thread appart us. Destroy it */
+    if( should_destroy )
+        input_DestroyThread( p_input_thread );
+}
+
+/*
  * Retrieve the input thread. Be sure to release the object
  * once you are done with it. (libvlc Internal)
  */
@@ -48,16 +80,45 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_instance_t *p_mi,
     return p_input_thread;
 }
 
+
 /**************************************************************************
  * Create a Media Instance object
  **************************************************************************/
 libvlc_media_instance_t *
-libvlc_media_instance_new( libvlc_media_descriptor_t *p_md )
+libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
+                           libvlc_exception_t *p_e )
+{
+    libvlc_media_instance_t * p_mi;
+
+    if( !p_libvlc_instance )
+    {
+        libvlc_exception_raise( p_e, "invalid libvlc instance" );
+        return NULL;
+    }
+
+    p_mi = malloc( sizeof(libvlc_media_instance_t) );
+    p_mi->p_md = NULL;
+    p_mi->p_libvlc_instance = p_libvlc_instance;
+    p_mi->i_input_id = -1;
+
+    return p_mi;
+}
+
+/**************************************************************************
+ * Create a Media Instance object with a media descriptor
+ **************************************************************************/
+libvlc_media_instance_t *
+libvlc_media_instance_new_from_media_descriptor(
+                                    libvlc_media_descriptor_t * p_md,
+                                    libvlc_exception_t *p_e )
 {
     libvlc_media_instance_t * p_mi;
 
     if( !p_md )
+    {
+        libvlc_exception_raise( p_e, "invalid media descriptor" );
         return NULL;
+    }
 
     p_mi = malloc( sizeof(libvlc_media_instance_t) );
     p_mi->p_md = libvlc_media_descriptor_duplicate( p_md );
@@ -128,34 +189,65 @@ void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
  **************************************************************************/
 void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
 {
-    input_thread_t *p_input_thread;
-    libvlc_exception_t p_e;
-
     /* XXX: locking */
-    libvlc_exception_init( &p_e );
 
     if( !p_mi )
         return;
 
-    p_input_thread = libvlc_get_input_thread( p_mi, &p_e );
-
-    if( !libvlc_exception_raised( &p_e ) )
-    {
-        /* release for previous libvlc_get_input_thread */
-        vlc_object_release( p_input_thread );
-
-        /* release for initial p_input_thread yield (see _new()) */
-        vlc_object_release( p_input_thread );
-
-        /* No one is tracking this input_thread appart us. Destroy it */
-        if( p_input_thread->i_refcount <= 0 )
-            input_DestroyThread( p_input_thread );
-        /* btw, we still have an XXX locking here */
-    }
+    release_input_thread( p_mi );
 
     libvlc_media_descriptor_destroy( p_mi->p_md );
 
     free( p_mi );
+}
+
+/**************************************************************************
+ * Set the Media descriptor associated with the instance
+ **************************************************************************/
+void libvlc_media_instance_set_media_descriptor(
+                            libvlc_media_instance_t *p_mi,
+                            libvlc_media_descriptor_t *p_md,
+                            libvlc_exception_t *p_e )
+{
+    (void)p_e;
+
+    /* XXX : lock */
+
+    if( !p_mi )
+        return;
+
+    release_input_thread( p_mi );
+
+    libvlc_media_descriptor_destroy( p_mi->p_md );
+
+    if( !p_md )
+    {
+        p_mi->p_md = NULL;
+        return; /* It is ok to pass a NULL md */
+    }
+
+    p_mi->p_md = libvlc_media_descriptor_duplicate( p_md );
+    
+    /* The policy here is to ignore that we were created using a different
+     * libvlc_instance, because we don't really care */
+    p_mi->p_libvlc_instance = p_md->p_libvlc_instance;
+
+}
+
+/**************************************************************************
+ * Set the Media descriptor associated with the instance
+ **************************************************************************/
+libvlc_media_descriptor_t *
+libvlc_media_instance_get_media_descriptor(
+                            libvlc_media_instance_t *p_mi,
+                            libvlc_exception_t *p_e )
+{
+    (void)p_e;
+
+    if( !p_mi->p_md )
+        return NULL;
+
+    return libvlc_media_descriptor_duplicate( p_mi->p_md );
 }
 
 /**************************************************************************
@@ -179,6 +271,12 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
 
         input_Control( p_input_thread, INPUT_CONTROL_SET_STATE, PLAYING_S );
         vlc_object_release( p_input_thread );
+        return;
+    }
+
+    if( !p_mi->p_md )
+    {
+        libvlc_exception_raise( p_e, "no associated media descriptor" );
         return;
     }
 

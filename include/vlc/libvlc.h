@@ -305,19 +305,44 @@ VLC_PUBLIC_API libvlc_media_instance_t * libvlc_playlist_get_media_instance(
  * @{
  */
 
-/** Create a Media Instance object from a Media Descriptor
- * \param p_md the Media Descriptor from which the Media Instance should be
- * created. The p_md can then be destroyed if needed.
+/** Create an empty Media Instance object
+ * \param p_libvlc_instance the libvlc instance in which the Media Instance
+ * should be (not used for now).
  */
-VLC_PUBLIC_API libvlc_media_instance_t * libvlc_media_instance_new( libvlc_media_descriptor_t * );
+VLC_PUBLIC_API libvlc_media_instance_t * libvlc_media_instance_new( libvlc_instance_t *, libvlc_exception_t * );
 
-/** Destroy a Media Instance object
+/** Create a Media Instance object from a Media Descriptor
+ * \param p_md the media descriptor. Afterwards the p_md can safely be
+ * destroyed.
+ */
+VLC_PUBLIC_API libvlc_media_instance_t * libvlc_media_instance_new_from_media_descriptor( libvlc_media_descriptor_t *, libvlc_exception_t * );
+
+/** Destroy a Media Instance object (going private)
  * \param p_mi the Media Instance to free
  */
 VLC_PUBLIC_API void libvlc_media_instance_destroy( libvlc_media_instance_t * );
 
-/* Will be renamed to libvlc_media_instance_release */
+/** Release a media_instance after use
+ * \param p_mi the Media Instance to free
+ */
 VLC_PUBLIC_API void libvlc_media_instance_release( libvlc_media_instance_t * );
+
+/** Set the media descriptor that will be used by the media_instance. If any,
+ * previous md will be released.
+ * \param p_mi the Media Instance 
+ * \param p_md the Media Descriptor. Afterwards the p_md can safely be
+ * destroyed.
+ */
+VLC_PUBLIC_API void libvlc_media_instance_set_media_descriptor( libvlc_media_instance_t *, libvlc_media_descriptor_t *, libvlc_exception_t * );
+
+/** Get the media descriptor used by the media_instance (if any). A copy of
+ * the md is returned. NULL is returned if no media instance is associated.
+ * \param p_mi the Media Instance 
+ * \param p_md the Media Descriptor. Afterwards the p_md can safely be
+ * destroyed.
+ */
+VLC_PUBLIC_API libvlc_media_descriptor_t * libvlc_media_instance_get_media_descriptor( libvlc_media_instance_t *, libvlc_exception_t * );
+
 
 VLC_PUBLIC_API void libvlc_media_instance_play ( libvlc_media_instance_t *, libvlc_exception_t * );
 VLC_PUBLIC_API void libvlc_media_instance_pause ( libvlc_media_instance_t *, libvlc_exception_t * );
