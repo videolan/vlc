@@ -56,7 +56,10 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
     p_input_item = input_ItemNew( p_instance->p_libvlc_int, psz_mrl, psz_mrl );
 
     if (!p_input_item)
-        return NULL; /* XXX: throw an exception */
+    {
+        libvlc_exception_raise( ex, "Can't create md's input_item" );
+        return NULL;
+    }
 
     p_media_desc = malloc( sizeof(libvlc_media_descriptor_t) );
     p_media_desc->p_libvlc_instance = p_instance;
@@ -77,7 +80,10 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
     libvlc_media_descriptor_t * p_media_desc;
 
     if (!p_input_item)
-        return NULL; /* XXX: throw an exception */
+    {
+        libvlc_exception_raise( ex, "No input item given" );
+        return NULL;
+    }
 
     p_media_desc = malloc( sizeof(libvlc_media_descriptor_t) );
     p_media_desc->p_libvlc_instance = p_instance;
