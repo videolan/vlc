@@ -57,7 +57,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
 
     if (!p_input_item)
     {
-        libvlc_exception_raise( ex, "Can't create md's input_item" );
+        libvlc_exception_raise( p_e, "Can't create md's input_item" );
         return NULL;
     }
 
@@ -81,7 +81,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
 
     if (!p_input_item)
     {
-        libvlc_exception_raise( ex, "No input item given" );
+        libvlc_exception_raise( p_e, "No input item given" );
         return NULL;
     }
 
