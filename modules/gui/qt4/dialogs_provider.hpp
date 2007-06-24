@@ -125,6 +125,11 @@ private:
     void addFromSimple( bool, bool );
 
 public slots:
+    void doInteraction( intf_dialog_args_t * );
+    void menuAction( QObject *);
+    void menuUpdateAction( QObject *);
+    void SDMenuAction( QString );
+
     void playlistDialog();
     void bookmarksDialog();
     void mediaInfoDialog();
@@ -132,35 +137,38 @@ public slots:
     void prefsDialog();
     void extendedDialog();
     void messagesDialog();
-    void simplePLAppendDialog();
-    void simpleMLAppendDialog();
-    void simpleOpenDialog();
-    void openDialog();
-    void openDialog(int );
-    void openFileDialog();
-    void openNetDialog();
-    void openCaptureDialog();
-    void openDiscDialog();
-    void PLAppendDialog();
-    void MLAppendDialog();
-    void doInteraction( intf_dialog_args_t * );
-    void menuAction( QObject *);
-    void menuUpdateAction( QObject *);
-    void SDMenuAction( QString );
-    void streamingDialog( QString mrl = "", bool b_stream = true );
-    void openThenStreamingDialogs();
-    void openThenTranscodingDialogs();
-    void openPlaylist();
-    void savePlaylist();
-    void PLAppendDir();
-    void MLAppendDir();
-    void quit();
-    void hideMenus();
-    void switchToSkins();
-    void gotoTimeDialog();
     void vlmDialog();
     void helpDialog();
     void aboutDialog();
+    void gotoTimeDialog();
+
+    void simpleOpenDialog();
+    void simplePLAppendDialog();
+    void simpleMLAppendDialog();
+
+    void openDialog();
+    void openDialog( int );
+    void openDiscDialog();
+    void openFileDialog();
+    void openNetDialog();
+    void openCaptureDialog();
+    void openDirDialog();
+
+    void PLAppendDialog();
+    void MLAppendDialog();
+    void PLAppendDir();
+    void MLAppendDir();
+
+    void streamingDialog( QString mrl = "", bool b_stream = true );
+    void openThenStreamingDialogs();
+    void openThenTranscodingDialogs();
+
+    void openPlaylist();
+    void savePlaylist();
+
+    void hideMenus();
+    void switchToSkins();
+    void quit();
 };
 
 #endif

@@ -152,6 +152,7 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
 
 /*****************************************************************************
  * All normal menus
+ * Simple Code
  *****************************************************************************/
 
 #define BAR_ADD( func, title ) { \
@@ -163,6 +164,9 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
     CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() ); \
     THEDP->menusUpdateMapper->setMapping( menu, f ); }
 
+/**
+ * Main Menu Bar Creation
+ **/
 void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
         bool playlist, bool adv_controls_enabled,
         bool visual_selector_enabled )
@@ -176,11 +180,11 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
     sigemptyset( &set );
     sigaddset( &set, SIGCHLD );
     pthread_sigmask( SIG_UNBLOCK, &set, NULL );
-#endif
+#endif /* WIN32 */
     QMenuBar *bar = mi->menuBar();
 #ifndef WIN32
     pthread_sigmask( SIG_BLOCK, &set, NULL );
-#endif
+#endif /* WIN32 */
     BAR_ADD( FileMenu(), qtr("&Media") );
     if( playlist )
     {
@@ -194,11 +198,26 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
 
     BAR_ADD( HelpMenu(), qtr("&Help" ) );
 }
+
+/**
+ * Media (File) Menu
+ * Opening, streaming and quit
+ **/
 QMenu *QVLCMenu::FileMenu()
 {
     QMenu *menu = new QMenu();
     DP_SADD( menu, qtr("Open &File..." ), "",
             ":/pixmaps/vlc_file-asym_16px.png", openFileDialog(), "Ctrl+O" );
+
+    /* Folder vs. Directory */
+#ifdef WIN32
+    DP_SADD( menu, qtr( "Open Folder..." ), "",
+            ":/pixmaps/vlc_folder-grey_16px.png", openDirDialog(), "Ctrl+F" );
+#else
+    DP_SADD( menu, qtr( "Open Directory..." ), "",
+            ":/pixmaps/vlc_folder-grey_16px.png", openDirDialog(), "Ctrl+F" );
+#endif /* WIN32 */
+
     DP_SADD( menu, qtr("Open &Disc..." ), "", "", openDiscDialog(), "Ctrl+D" );
     DP_SADD( menu, qtr("Open &Network..." ), "",
                 ":/pixmaps/vlc_network_16px.png", openNetDialog(), "Ctrl+N" );
@@ -216,6 +235,7 @@ QMenu *QVLCMenu::FileMenu()
     return menu;
 }
 
+/* Playlist Menu, undocked when playlist is undocked */
 QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
 {
     QMenu *menu = new QMenu();
@@ -230,6 +250,11 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
     return menu;
 }
 
+/**
+ * Tools/View Menu
+ * This is kept in the same menu for now, but could change if it gets much 
+ * longer.
+ **/
 QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         bool adv_controls_enabled,
         bool visual_selector_enabled, bool with_intf )
@@ -248,8 +273,10 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     DP_SADD( menu, qtr( I_MENU_CODECINFO ) , "", ":/pixmaps/vlc_info_16px.png",
              mediaCodecDialog(), "Ctrl+I" );
     DP_SADD( menu, qtr( I_MENU_GOTOTIME ), "","", gotoTimeDialog(), "Ctrl+T" );
+#if 0 /* Not Implemented yet */
     DP_SADD( menu, qtr( I_MENU_BOOKMARK ), "","", bookmarksDialog(), "Ctrl+B" );
     DP_SADD( menu, qtr( I_MENU_VLM ), "","", vlmDialog(), "Ctrl+V" );
+#endif
 
     menu->addSeparator();
     if( mi )
@@ -258,7 +285,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
                 mi, SLOT( advanced() ) );
         adv->setCheckable( true );
         if( adv_controls_enabled ) adv->setChecked( true );
-#if 0
+#if 0 /* For Visualisations. Not yet working */
         adv = menu->addAction( qtr("Visualizations selector" ),
                 mi, SLOT( visual() ) );
         adv->setCheckable( true );
@@ -268,12 +295,16 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     }
     DP_SADD( menu, qtr( I_MENU_EXT ), "","",extendedDialog(), "Ctrl+E" );
     DP_SADD( menu, qtr( "Hide Menus..." ), "","",hideMenus(), "Ctrl+H" );
+
     menu->addSeparator();
     DP_SADD( menu, qtr("Preferences"), "", ":/pixmaps/vlc_preferences_16px.png",
              prefsDialog(), "Ctrl+P" );
     return menu;
 }
 
+/**
+ * Interface Sub-Menu, to list extras interface and skins
+ **/
 QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
 {
     vector<int> objects;
@@ -296,6 +327,9 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     return menu;
 }
 
+/**
+ * Main Audio Menu
+ */
 QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 {
     vector<int> objects;
@@ -319,7 +353,10 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     return Populate( p_intf, current, varnames, objects );
 }
 
-
+/**
+ * Main Video Menu
+ * Subtitles are part of Video.
+ **/
 QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 {
     vlc_object_t *p_object;
@@ -345,6 +382,10 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     return Populate( p_intf, current, varnames, objects );
 }
 
+/**
+ * Navigation Menu
+ * For DVD, MP4, MOV and other chapter based format
+ **/
 QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *current )
 {
     vlc_object_t *p_object;
@@ -364,6 +405,9 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *current )
     return Populate( p_intf, current, varnames, objects );
 }
 
+/**
+ * Service Discovery Menu
+ **/
 QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 {
     QMenu *menu = new QMenu();
@@ -389,7 +433,8 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
             while( p_parser->pp_shortcuts[++i] != NULL );
             i--;
             if( playlist_IsServicesDiscoveryLoaded( THEPL,
-                        i>=0?p_parser->pp_shortcuts[i] : p_parser->psz_object_name ) )
+                        i>=0?p_parser->pp_shortcuts[i]
+                        : p_parser->psz_object_name ) )
             {
                 a->setChecked( true );
             }
@@ -402,11 +447,14 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
     vlc_list_release( p_list );
     return menu;
 }
-
+/**
+ * Help/About Menu
+**/
 QMenu *QVLCMenu::HelpMenu()
 {
     QMenu *menu = new QMenu();
-    DP_SADD( menu, qtr("Help") , "", ":/pixmaps/vlc_help_16px.png", helpDialog(), "F1" );
+    DP_SADD( menu, qtr("Help") , "", ":/pixmaps/vlc_help_16px.png",
+             helpDialog(), "F1" );
     menu->addSeparator();
     DP_SADD( menu, qtr( I_MENU_ABOUT ), "", "", aboutDialog(), "Ctrl+F1");
     return menu;
@@ -414,7 +462,7 @@ QMenu *QVLCMenu::HelpMenu()
 
 
 /*****************************************************************************
- * Popup menus                                                               *
+ * Popup menus - Right Click menus                                           *
  *****************************************************************************/
 #define POPUP_BOILERPLATE \
     unsigned int i_last_separator = 0; \
@@ -478,6 +526,7 @@ QMenu *QVLCMenu::HelpMenu()
     \
     DP_SADD( menu, qtr("Quit"), "", "", quit() , "Ctrl+Q" );
 
+/* Video Tracks and Subtitles tracks */
 void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
 {
     POPUP_BOILERPLATE;
@@ -500,6 +549,7 @@ void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
     CREATE_POPUP;
 }
 
+/* Audio Tracks */
 void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
 {
     POPUP_BOILERPLATE;
@@ -520,7 +570,7 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
     CREATE_POPUP;
 }
 
-/* Navigation stuff, and general */
+/* Navigation stuff, and general menus (open) */
 void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
 {
     POPUP_BOILERPLATE;
@@ -542,6 +592,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
     p_intf->p_sys->p_popup_menu = NULL;
 }
 
+/* Main Menu that sticks everything together  */
 void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 {
     if( show )
@@ -602,12 +653,17 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
  * Systray Menu                                                         *
  ************************************************************************/
 
-void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf,
-                                    bool b_force_visible )
+void QVLCMenu::updateSystrayMenu( MainInterface *mi,
+                                  intf_thread_t *p_intf,
+                                  bool b_force_visible )
 {
     POPUP_BOILERPLATE;
+
+    /* Get the systray menu and clean it */
     QMenu *sysMenu = mi->getSysTrayMenu();
     sysMenu->clear();
+
+    /* Hide / Show VLC and cone */
     if( mi->isVisible() || b_force_visible )
     {
         sysMenu->addAction( QIcon( ":/vlc16.png" ),
@@ -620,14 +676,17 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi, intf_thread_t *p_intf,
                 qtr("Show VLC media player"), mi,
                 SLOT( toggleUpdateSystrayMenu() ) );
     }
+
     sysMenu->addSeparator();
     POPUP_PLAY_ENTRIES( sysMenu );
+
     sysMenu->addSeparator();
     DP_SADD( sysMenu, qtr("&Open Media" ), "",
             ":/pixmaps/vlc_file-wide_16px.png", openFileDialog(), "" );
     DP_SADD( sysMenu, qtr("&Quit") , "", ":/pixmaps/vlc_quit_16px.png",
              quit(), "" );
 
+    /* Set the menu */
     mi->getSysTray()->setContextMenu( sysMenu );
 }
 

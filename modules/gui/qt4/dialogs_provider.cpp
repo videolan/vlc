@@ -155,7 +155,7 @@ void DialogsProvider::gotoTimeDialog()
 
 void DialogsProvider::vlmDialog()
 {
-    /* FIXME */
+    /* FIXME - Implement me */
     /*  VLMDialog::getInstance( p_intf )->toggleVisible(); */
 }
 
@@ -181,14 +181,19 @@ void DialogsProvider::mediaCodecDialog()
 
 void DialogsProvider::bookmarksDialog()
 {
-    /* FIXME */
+    /* FIXME - Implement me */
     /*  BookmarkDialog::getInstance( p_intf )->toggleVisible(); */
 }
 
 /****************************************************************************
  * All the open/add stuff
+ * Open Dialog first - Simple Open then
  ****************************************************************************/
 
+void DialogsProvider::openDialog( int i_tab )
+{
+    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf )->showTab( i_tab );
+}
 void DialogsProvider::openDialog()
 {
     openDialog( OPEN_FILE_TAB );
@@ -209,22 +214,25 @@ void DialogsProvider::openCaptureDialog()
 {
     openDialog( OPEN_CAPTURE_TAB );
 }
-void DialogsProvider::openDialog( int i_tab )
-{
-    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf )->showTab( i_tab );
-}
 
+/* Same as the open one, but force the enqueue */
 void DialogsProvider::PLAppendDialog()
 {
-    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, ENQUEUE )
-        ->showTab(0);
+    OpenDialog::getInstance( p_intf->p_sys->p_mi , p_intf, ENQUEUE)->showTab(0);
 }
+
+/* Unimplemmented yet - Usefull ? */
 void DialogsProvider::MLAppendDialog()
 {
 }
 
-/**** Simple open ****/
-QStringList DialogsProvider::showSimpleOpen( QString help, int filters,
+/**
+ * Simple open
+ * Not used anymore. Let the code until we are sure we don't want it
+ * Two opens make it confusing for the user.
+ ***/
+QStringList DialogsProvider::showSimpleOpen( QString help,
+                                             int filters,
                                              QString path )
 {
     QString fileTypes = "";
@@ -283,6 +291,42 @@ void DialogsProvider::simpleOpenDialog()
     addFromSimple( true, true );
 }
 
+/* Directory */
+
+/**
+ * Open a directory,
+ * pl helps you to choose from playlist or media library,
+ * go to start or enqueue
+ **/
+static void openDirectory( intf_thread_t* p_intf, bool pl, bool go )
+{
+    QString dir = QFileDialog::getExistingDirectory ( 0, _("Open directory") );
+    if (!dir.isEmpty()) {
+        input_item_t *p_input = input_ItemNewExt( THEPL, qtu(dir), NULL,
+                                               0, NULL, -1 );
+
+        playlist_AddInput( THEPL, p_input,
+                       go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
+                       PLAYLIST_END, pl, VLC_FALSE );
+        input_Read( THEPL, p_input, VLC_FALSE );
+    }
+}
+
+void DialogsProvider::openDirDialog()
+{
+    openDirectory( p_intf, true, true );
+}
+
+void DialogsProvider::PLAppendDir()
+{
+    openDirectory( p_intf, true, false );
+}
+
+void DialogsProvider::MLAppendDir()
+{
+    openDirectory( p_intf, false , false );
+}
+
 /****************
  * Playlist     *
  ****************/
@@ -338,37 +382,12 @@ void DialogsProvider::savePlaylist()
     delete qfd;
 }
 
-static void openDirectory( intf_thread_t* p_intf, bool pl, bool go )
-{
-    QString dir = QFileDialog::getExistingDirectory ( 0,
-                                                     _("Open directory") );
-
-    if (!dir.isEmpty()) {
-        input_item_t *p_input = input_ItemNewExt( THEPL, qtu(dir), NULL,
-                                               0, NULL, -1 );
-	
-        playlist_AddInput( THEPL, p_input,
-                       go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
-                       PLAYLIST_END, pl, VLC_FALSE );
-        input_Read( THEPL, p_input, VLC_FALSE );
-    }
-}
-
-void DialogsProvider::PLAppendDir()
-{
-    openDirectory( p_intf, true, false );
-}
-
-void DialogsProvider::MLAppendDir()
-{
-    openDirectory( p_intf, false , false );
-}
-
 
 /****************************************************************************
  * Sout emulation
  ****************************************************************************/
 
+//FIXME !!
 void DialogsProvider::streamingDialog( QString mrl, bool b_transcode_only )
 {
     SoutDialog *s = new SoutDialog( p_intf->p_sys->p_mi, p_intf,
@@ -447,10 +466,8 @@ void DialogsProvider::SDMenuAction( QString data )
         playlist_ServicesDiscoveryAdd( THEPL, psz_sd );
     else
         playlist_ServicesDiscoveryRemove( THEPL, psz_sd );
-
     free( psz_sd );
 }
-
 
 void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
 {
@@ -486,7 +503,9 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
 
 void DialogsProvider::hideMenus()
 {
-    /* TODO */
+    /* TODO
+     * Simplify the main Interface
+     */
 }
 
 void DialogsProvider::switchToSkins()

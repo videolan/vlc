@@ -73,11 +73,11 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
     uriLine = new QLineEdit;
     QLabel *uriLabel = new QLabel( qtr( "Location :" ) );
 
-    layout->addWidget( IT, 0, 0, 1, 7 );
-    layout->addWidget( closeButton, 2, 6 );
-    layout->addWidget( saveMetaButton, 2, 5 );
+    layout->addWidget( IT, 0, 0, 1, 8 );
     layout->addWidget( uriLabel, 1, 0, 1, 1 );
-    layout->addWidget( uriLine, 1, 1, 1, 6 );
+    layout->addWidget( uriLine, 1, 1, 1, 7 );
+    layout->addWidget( saveMetaButton, 2, 6 );
+    layout->addWidget( closeButton, 2, 7 );
 
     BUTTONACT( closeButton, close() );
 
