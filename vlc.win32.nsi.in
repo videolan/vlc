@@ -96,6 +96,7 @@ InstType "Full"
   !insertmacro MUI_LANGUAGE "Russian"
   !insertmacro MUI_LANGUAGE "Portuguese"
   !insertmacro MUI_LANGUAGE "Arabic"
+  !insertmacro MUI_LANGUAGE "Polish"
 
 !insertmacro MUI_RESERVEFILE_LANGDLL
 
