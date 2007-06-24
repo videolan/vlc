@@ -317,11 +317,6 @@ VLC_PUBLIC_API libvlc_media_instance_t * libvlc_media_instance_new( libvlc_insta
  */
 VLC_PUBLIC_API libvlc_media_instance_t * libvlc_media_instance_new_from_media_descriptor( libvlc_media_descriptor_t *, libvlc_exception_t * );
 
-/** Destroy a Media Instance object (going private)
- * \param p_mi the Media Instance to free
- */
-VLC_PUBLIC_API void libvlc_media_instance_destroy( libvlc_media_instance_t * );
-
 /** Release a media_instance after use
  * \param p_mi the Media Instance to free
  */

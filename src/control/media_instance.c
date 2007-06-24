@@ -159,7 +159,7 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
 }
 
 /**************************************************************************
- * Destroy a Media Instance object
+ * Destroy a Media Instance object (libvlc internal)
  **************************************************************************/
 void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
 {
