@@ -91,8 +91,8 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     thanksEdit->setReadOnly( true );
 
     /* add the tabs to the Tabwidget */
-    tab->addTab( NULL, _( "Information" ) );
-    tab->addTab( NULL, _( "Authors" ) );
+    tab->addTab( NULL, qtr( "Information" ) );
+    tab->addTab( NULL, qtr( "Authors" ) );
     tab->addTab( thanksEdit, qtr("Thanks") );
     tab->addTab( licenseEdit, qtr("Distribution License") );
 
