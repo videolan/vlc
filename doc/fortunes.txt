@@ -3,7 +3,7 @@
 
   -- #videolan
 %
-<Stef> bon j'ai trouvé d'où venait les trashs d'images
+<Stef> bon j'ai trouvÃ© d'oÃ¹ venait les trashs d'images
 <sam> t'es un dieu
 <Stef> bin justement ct de ma faute :)
 <sam> t'es une merde
@@ -16,7 +16,7 @@
 
   -- #videolan
 %
-<Stef> xav - AZRTYUUUUOP"'(-È
+<Stef> xav - AZRTYUUUUOP"'(-Ãˆ
 <Stef> oups je devrais pas nettoyer mon clavier par ici :)
 
   -- #videolan
@@ -53,15 +53,15 @@
 
   -- #livid
 %
-<stef> héhé, mais j'ai acheté une voiture :)
+<stef> hÃ©hÃ©, mais j'ai achetÃ© une voiture :)
 <Meuuh> ouaaah oh, quoi ?
 <stef> une petite 206 toute noire
 <reno> ce qu'il dit pas c'est que c'est une s16 ;)
-<Meuuh> ah 16 bits signés ?
+<Meuuh> ah 16 bits signÃ©s ?
 
   -- #videolan
 %
-<Meuuh> je l'ai pas testé, hein, faut pas déconner non plus
+<Meuuh> je l'ai pas testÃ©, hein, faut pas dÃ©conner non plus
 <Meuuh> c le boulot des users de tester
 
   -- #videolan
@@ -135,7 +135,7 @@
 
   -- #videolan
 %
-<alexis> c'est bon, Jérôme m'a envoyé le truc sans virus cette fois
+<alexis> c'est bon, JÃ©rÃ´me m'a envoyÃ© le truc sans virus cette fois
 
   -- #videolan
 %
@@ -170,7 +170,7 @@
 
   -- #videolan
 %
-<Meuuh> BTW, there is "Jeanne et le garçon formidable" on M6
+<Meuuh> BTW, there is "Jeanne et le garÃ§on formidable" on M6
 <Meuuh> this movie is so great
 <Meuuh> jlj you debug the http plug-in ? :p
 <jlj> well, you're so busy with Virginie Ledoyen, so I had to do it :)
@@ -261,26 +261,26 @@ the Boston strangler is to the woman home alone.
   -- #videolan
 %
 <sam> bah oui tu peux faire de la doc sur n'importe quoi hein
-<Meuuh> je fais bien une doc développeur vlc
-<Meuuh> comme si y'avait des développeurs vlc à part sam et moi !
+<Meuuh> je fais bien une doc dÃ©veloppeur vlc
+<Meuuh> comme si y'avait des dÃ©veloppeurs vlc Ã  part sam et moi !
 
   -- #videolan
 %
-<deepmind> pis comme ca je me tiens au courant de où va vlc :)
+<deepmind> pis comme ca je me tiens au courant de oÃ¹ va vlc :)
 <Meuuh> dans le mur ?
 <Meuuh> y'a sam qui rajoute du charbon, moi je m'agrippe au frein
 
   -- #videolan
 %
 <tooney> $grut Dnumgis 
-<gally> Dnumgis: tiår ditt og nødhavn klikk ?
+<gally> Dnumgis: tiÃ¥r ditt og nÃ¸dhavn klikk ?
 <Dnumgis> gally: og hva skulle det bety?
 <Dnumgis> gally: what was that supposed to mean?
 
   -- #videolan
 %
 <sam> $grut
-<gally> vekt yrer gøten øke utgjøre kan 
+<gally> vekt yrer gÃ¸ten Ã¸ke utgjÃ¸re kan 
 <Dnumgis> sam: you're insane
 <Dnumgis> someone have too much spare time
 <sam> definitely
@@ -289,7 +289,7 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-<Meuuh> mais putain de bordel de chiottes de bite à cul de merde de sa race
+<Meuuh> mais putain de bordel de chiottes de bite Ã  cul de merde de sa race
 <Dnumgis> I think it may be a good thing that i don't understand that
           sentence fully
 
@@ -381,9 +381,9 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-<bbp> et de toute façon ca sert a rien de coder sur vlc, ils changent tout a
-      chaque fois entre le moment ou on commence a écrire sa première ligne
-      de code et celui où on écrit la deuxième
+<bbp> et de toute faÃ§on ca sert a rien de coder sur vlc, ils changent tout a
+      chaque fois entre le moment ou on commence a Ã©crire sa premiÃ¨re ligne
+      de code et celui oÃ¹ on Ã©crit la deuxiÃ¨me
 
   -- #c00lz
 %
@@ -407,13 +407,13 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-<sam> p_input->stream.pp_areas ça commence à 0 ou à 1 ?
+<sam> p_input->stream.pp_areas Ã§a commence Ã  0 ou Ã  1 ?
 <sam> aaaah /* We start from 1 here since the default area 0 is reserved for
       video_ts.vob */
-<Meuuh> si c pas du code de porc ça mon bon monsieur
-<sam> mais alors l'area 0 elle sert à rien ou quoi ? :)
-<jobi> ben pour le vcd à rien du tout, si je me souviens bien
-<fenrir_> à ben voila ma piste qui disparaissait pour les cda...
+<Meuuh> si c pas du code de porc Ã§a mon bon monsieur
+<sam> mais alors l'area 0 elle sert Ã  rien ou quoi ? :)
+<jobi> ben pour le vcd Ã  rien du tout, si je me souviens bien
+<fenrir_> Ã  ben voila ma piste qui disparaissait pour les cda...
 
   -- #videolan, du code de pro
 %
@@ -431,10 +431,10 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-<sam> kali: j'ai raté mon train ...
+<sam> kali: j'ai ratÃ© mon train ...
 <sam> ben je voulais partir en belgique ce matin
 <ka|i> sam : a cause de la greve ou tu te reveilles ?
-<sam> mais ç'aurait été une mauvaise idée ...
+<sam> mais Ã§'aurait Ã©tÃ© une mauvaise idÃ©e ...
 <sam> vu qu'en fait c'est la semaine prochaine le fosdem !
 
   -- #videolan
@@ -442,7 +442,7 @@ the Boston strangler is to the woman home alone.
 <bbpig> tiens au fait y a des mauvais signal handlers dans le vlc ;P
 <Ipkiss> je crois qu'il n'y a pas de bons ou de mauvais signal handlers
 <bbpig> Ipkiss: ah ?
-<Ipkiss> si je devais résumer le vlc aujourd'hui...
+<Ipkiss> si je devais rÃ©sumer le vlc aujourd'hui...
 <tooney> c'est un effort commun de gens qui aiment, qui dansent l'opensource
 <tooney> qui chantent l'opensource
 
@@ -469,7 +469,7 @@ the Boston strangler is to the woman home alone.
     how to access Italian pay TVs, so don't ask"
 *** [MaDog] (MaDog@host41-156.pool80180.interbusiness.it) has joined channel
     #videolan
-<[MaDog]> c'è qualcuno ?????????
+<[MaDog]> c'Ã¨ qualcuno ?????????
 <Meuuh> read the topic
 <[MaDog]> :)
 <[MaDog]> xcuse me
@@ -498,7 +498,7 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
-<sam> pour votre punition, ça sera un bootstrap chacun :P
+<sam> pour votre punition, Ã§a sera un bootstrap chacun :P
 <titer> c'est reparti pour 20 min
 <gibalou> c'est reparti pour 3 x 20 min
 <sam> c'est reparti pour une modif de Makefile.am d'ici 20 min
@@ -519,7 +519,7 @@ the Boston strangler is to the woman home alone.
 <sam> 168K    ChangeLog-2001
 <sam> 304K    ChangeLog-2002
 <sam> 488K    ChangeLog-2003
-<zorglub> conclusion: les dévs pipotent de plus en plus dans les messages de
+<zorglub> conclusion: les dÃ©vs pipotent de plus en plus dans les messages de
           commit
 
   -- #videolan
@@ -586,16 +586,16 @@ the Boston strangler is to the woman home alone.
           demuxer de mplayer ?
 <gibalou> zorglub: la meilleure doc c'est le code de mplayer/xine
 <zorglub> c'est bien ce que je craignais :)
-<zorglub> j'ai pas regardé xine ceci dit
-<zorglub> c'est plus agréable à lire que mplayer
+<zorglub> j'ai pas regardÃ© xine ceci dit
+<zorglub> c'est plus agrÃ©able Ã  lire que mplayer
 <sam> mouahaha
 <sam> non rien.
-<zorglub> ah bah si quand même
-<bigben> tu veux dire que les variables ont un nom qui reflète ce qu'elles
+<zorglub> ah bah si quand mÃªme
+<bigben> tu veux dire que les variables ont un nom qui reflÃ¨te ce qu'elles
          font ?
-<sam> avoir des noms de variables qu'on peut prononcer nuit fortement à la
-      lisibilité car cela détourne l'attention du vrai code, constitué des
-      mots-clés du langage et des divers opérateurs
+<sam> avoir des noms de variables qu'on peut prononcer nuit fortement Ã  la
+      lisibilitÃ© car cela dÃ©tourne l'attention du vrai code, constituÃ© des
+      mots-clÃ©s du langage et des divers opÃ©rateurs
 <sam> j'appelle mes variables Illl, lIll, lIlI, IllI, IlII, etc.
   -- #videolan
 %
@@ -761,7 +761,7 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 < Dnumgis> Bond493: we keep this information secret in order to keep ahead of the competition
   -- #videolan
 %
- < pdherbemont> :p j'aimerai bien être un peu plus polard parfois *sigh*
+ < pdherbemont> :p j'aimerai bien Ãªtre un peu plus polard parfois *sigh*
   -- #videolan
 %
 < DiDjCodt> dionoea: /leave xxx ?
@@ -777,8 +777,8 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
   -- #videolan
 %
 <spaceman_spiff> si, la 0.9 est utilisable
-<spaceman_spiff> ça dépend pour quoi
-<spaceman_spiff> pour faire croire à un naïf qu'un dvd est pété par
+<spaceman_spiff> Ã§a dÃ©pend pour quoi
+<spaceman_spiff> pour faire croire Ã  un naÃ¯f qu'un dvd est pÃ©tÃ© par
                  exemple
 <spaceman_spiff> "regarde il fait planter mon vlc"
 %
