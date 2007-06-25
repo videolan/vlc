@@ -89,18 +89,17 @@ static int handle_event( vlc_object_t *p_this, char const *psz_cmd,
  **************************************************************************/
 static input_thread_t * get_input(libvlc_instance_t * p_instance)
 {
-    libvlc_exception_t p_e_unused; /* FIXME: error checking here */
     libvlc_media_instance_t * p_mi;
     input_thread_t * p_input;
 
-    p_mi = libvlc_playlist_get_media_instance( p_instance, &p_e_unused );
+    p_mi = libvlc_playlist_get_media_instance( p_instance, NULL );
 
     if( !p_mi )
         return NULL;
 
-    p_input = libvlc_get_input_thread( p_mi, &p_e_unused );
+    p_input = libvlc_get_input_thread( p_mi, NULL );
 
-    libvlc_media_instance_destroy( p_mi );
+    libvlc_media_instance_release( p_mi );
 
     return p_input;
 }
@@ -118,6 +117,9 @@ static int install_input_event( vlc_object_t *p_this, char const *psz_cmd,
     libvlc_instance_t * p_instance = p_data;
     struct libvlc_callback_entry_list_t *p_listitem;
     input_thread_t * p_input = get_input( p_instance );
+
+    if( !p_input )
+        return;
 
     vlc_mutex_lock( &p_instance->instance_lock );
 
