@@ -145,6 +145,8 @@ const char* psz_introspection_xml_data_player =
 "    <method name=\"GetMetadata\">\n"
 "      <arg type=\"a{sv}\" direction=\"out\" />\n"
 "    </method>\n"
+"    <method name=\"Disconnect\">\n"
+"    </method>\n"
 "  </interface>\n"
 "</node>\n"
 ;

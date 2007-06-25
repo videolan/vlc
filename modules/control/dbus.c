@@ -27,18 +27,10 @@
  *      http://dbus.freedesktop.org/doc/dbus-specification.html
  * D-Bus low-level C API (libdbus)
  *      http://dbus.freedesktop.org/doc/dbus/api/html/index.html
- */
-
-/*
- * TODO:
- *  properties ?
- *
- *  macros to read incoming arguments
- *
- *  explore different possible types (arrays..)
- *
- *  what must we do if org.videolan.vlc already exist on the bus ?
- *  ( there is more than one vlc instance )
+ *  extract:
+    "If you use this low-level API directly, you're signing up for some pain."
+ * MPRIS Specification (still drafting on June, 25 of 2007):
+ *      http://wiki.xmms2.xmms.se/index.php/Media_Player_Interfaces
  */
 
 /*****************************************************************************
@@ -325,6 +317,22 @@ DBUS_METHOD( Play )
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_Play( p_playlist );
     pl_Release( p_playlist );
+    REPLY_SEND;
+}
+
+DBUS_METHOD( Disconnect )
+{
+    REPLY_INIT;
+    DBusError error;
+    int i;
+    dbus_error_init( &error );
+    i = dbus_bus_release_name( p_conn, "org.freedesktop.MediaPlayer", &error );
+    if( ( i == -1 ) && ( dbus_error_is_set( &error ) ) )
+    {
+        msg_Err( (vlc_object_t*) p_this, "D-Bus disconnection failed : %s\n",
+            error.message );
+        dbus_error_free( &error );
+    }
     REPLY_SEND;
 }
 
@@ -668,6 +676,7 @@ DBUS_METHOD( handle_player )
     METHOD_FUNC( "Play",                    Play );
     METHOD_FUNC( "Pause",                   Pause );
     METHOD_FUNC( "Repeat",                  Repeat );
+    METHOD_FUNC( "Disconnect",              Disconnect );
     METHOD_FUNC( "VolumeSet",               VolumeSet );
     METHOD_FUNC( "VolumeGet",               VolumeGet );
     METHOD_FUNC( "PositionSet",             PositionSet );
