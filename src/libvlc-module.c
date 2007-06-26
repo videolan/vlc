@@ -1240,6 +1240,26 @@ static const char *ppsz_pltree_descriptions[] = { N_("Default"), N_("Always"), N
     "Toggle wallpaper mode in video output. Only works with the directx " \
     "video output for the time being." )
 
+#define MENU_ON_KEY_TEXT N_("Display OSD menu on top of video output")
+#define MENU_ON_KEY_LONGTEXT N_("Display OSDmenu on top of video output")
+#define MENU_OFF_KEY_TEXT N_("Do not display OSD menu on video output")
+#define MENU_OFF_KEY_LONGTEXT N_("Do not display OSDmenu on top of video output")
+#define MENU_RIGHT_KEY_TEXT N_("Highlight widget on the right")
+#define MENU_RIGHT_KEY_LONGTEXT N_( \
+        "Move OSD menu highlight to the widget on the right")
+#define MENU_LEFT_KEY_TEXT N_("Highlight widget on the left")
+#define MENU_LEFT_KEY_LONGTEXT N_( \
+        "Move OSD menu highlight to the widget on the left")
+#define MENU_UP_KEY_TEXT N_("Highlight widget on top")
+#define MENU_UP_KEY_LONGTEXT N_( \
+        "Move OSD menu highlight to the widget on top")
+#define MENU_DOWN_KEY_TEXT N_("Highlight widget below")
+#define MENU_DOWN_KEY_LONGTEXT N_( \
+        "Move OSD menu highlight to the widget below")
+#define MENU_SELECT_KEY_TEXT N_("Select current widget")
+#define MENU_SELECT_KEY_LONGTEXT N_( \
+        "Selecting current widget performs the associated action.")
+
 const char vlc_usage[] = N_(
     "Usage: %s [options] [stream] ..."
     "\nYou can specify multiple streams on the commandline. They will be enqueued in the playlist."
@@ -1935,6 +1955,14 @@ vlc_module_begin();
 #   define KEY_DUMP               KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'d'
 #   define KEY_WALLPAPER          KEY_MODIFIER_COMMAND|'w'
 
+#   define KEY_MENU_ON            KEY_MODIFIER_ALT|'m'
+#   define KEY_MENU_OFF           KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'m'
+#   define KEY_MENU_RIGHT         KEY_MODIFIER_ALT|KEY_RIGHT
+#   define KEY_MENU_LEFT          KEY_MODIFIER_ALT|KEY_LEFT
+#   define KEY_MENU_UP            KEY_MODIFIER_ALT|KEY_UP
+#   define KEY_MENU_DOWN          KEY_MODIFIER_ALT|KEY_DOWN
+#   define KEY_MENU_SELECT        KEY_MODIFIER_ALT|KEY_ENTER
+
 #else
 #   define KEY_TOGGLE_FULLSCREEN  'f'
 #   define KEY_LEAVE_FULLSCREEN   KEY_ESC
@@ -2021,6 +2049,14 @@ vlc_module_begin();
 #   define KEY_RECORD             KEY_MODIFIER_CTRL|'r'
 #   define KEY_DUMP               KEY_MODIFIER_CTRL|KEY_MODIFIER_SHIFT|'d'
 #   define KEY_WALLPAPER          'w'
+
+#   define KEY_MENU_ON            KEY_MODIFIER_ALT|'m'
+#   define KEY_MENU_OFF           KEY_MODIFIER_ALT|KEY_MODIFIER_SHIFT|'m'
+#   define KEY_MENU_RIGHT         KEY_MODIFIER_ALT|KEY_RIGHT
+#   define KEY_MENU_LEFT          KEY_MODIFIER_ALT|KEY_LEFT
+#   define KEY_MENU_UP            KEY_MODIFIER_ALT|KEY_UP
+#   define KEY_MENU_DOWN          KEY_MODIFIER_ALT|KEY_DOWN
+#   define KEY_MENU_SELECT        KEY_MODIFIER_ALT|KEY_ENTER
 #endif
 
     add_key( "key-toggle-fullscreen", KEY_TOGGLE_FULLSCREEN, NULL, TOGGLE_FULLSCREEN_KEY_TEXT,
@@ -2129,6 +2165,21 @@ vlc_module_begin();
              UNZOOM_KEY_TEXT, UNZOOM_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-wallpaper", KEY_WALLPAPER, NULL, WALLPAPER_KEY_TEXT,
              WALLPAPER_KEY_LONGTEXT, VLC_FALSE );
+
+    add_key( "key-menu-on", KEY_MENU_ON, NULL,
+             MENU_ON_KEY_TEXT, MENU_ON_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-menu-off", KEY_MENU_OFF, NULL,
+             MENU_OFF_KEY_TEXT, MENU_OFF_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-menu-right", KEY_MENU_RIGHT, NULL,
+             MENU_RIGHT_KEY_TEXT, MENU_RIGHT_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-menu-left", KEY_MENU_LEFT, NULL,
+             MENU_LEFT_KEY_TEXT, MENU_LEFT_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-menu-up", KEY_MENU_UP, NULL,
+             MENU_UP_KEY_TEXT, MENU_UP_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-menu-down", KEY_MENU_DOWN, NULL,
+             MENU_DOWN_KEY_TEXT, MENU_DOWN_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-menu-select", KEY_MENU_SELECT, NULL,
+             MENU_SELECT_KEY_TEXT, MENU_SELECT_KEY_LONGTEXT, VLC_TRUE );
 
     add_key( "key-crop-top", KEY_CROP_TOP, NULL,
              CROP_TOP_KEY_TEXT, CROP_TOP_KEY_LONGTEXT, VLC_TRUE );
