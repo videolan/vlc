@@ -491,10 +491,10 @@ VLC-release.app: vlc
 	      $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
 	  ln -sf ../English.lproj/MainMenu.nib \
 	      $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
-	  ln -sf ../English.lproj/vlc.scriptTerminology \
-	      $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC-release.app/Contents/PkgInfo
+	find $(top_builddir)/VLC-release.app -type d -exec chmod ugo+rx '{}' \;
+	find $(top_builddir)/VLC-release.app -type f -exec chmod ugo+r '{}' \;
 
 VLC.app: vlc
 	@if test -e "$(top_builddir)/tmp"; then \
