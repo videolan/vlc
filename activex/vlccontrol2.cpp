@@ -2715,6 +2715,21 @@ STDMETHODIMP VLCControl2::put_Volume(long volume)
     return NOERROR;
 };
 
+STDMETHODIMP VLCControl2::get_BackColor(OLE_COLOR *backcolor)
+{
+    if( NULL == backcolor )
+        return E_POINTER;
+
+    *backcolor  = _p_instance->getBackColor();
+    return NOERROR;
+};
+
+STDMETHODIMP VLCControl2::put_BackColor(OLE_COLOR backcolor)
+{
+    _p_instance->setBackColor(backcolor);
+    return NOERROR;
+};
+
 STDMETHODIMP VLCControl2::get_audio(IVLCAudio** obj)
 {
     if( NULL == obj )

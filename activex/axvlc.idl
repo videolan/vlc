@@ -63,6 +63,8 @@ library AXVLC
     const int VLCPlayListEnd    = -666;
 
     // DISPID definitions
+    const int DISPID_BackColor  = -501;
+
     const int DISPID_Visible    = 100;
     const int DISPID_Playing    = 101;
     const int DISPID_Position   = 102;
@@ -485,6 +487,11 @@ library AXVLC
         HRESULT Volume([out, retval] long* volume);
         [id(DISPID_Volume), propput, helpstring("Returns/sets default audio volume.")]
         HRESULT Volume([in] long volume);
+
+        [id(DISPID_BackColor), propget, helpstring("Returns/sets background color.")]
+        HRESULT BackColor([out, retval] OLE_COLOR* backcolor);
+        [id(DISPID_BackColor), propput, helpstring("Returns/sets background color.")]
+        HRESULT BackColor([in] OLE_COLOR backcolor);
 
         [propget, helpstring("Returns the audio object.")]
         HRESULT audio([out, retval] IVLCAudio** obj);

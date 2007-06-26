@@ -182,6 +182,29 @@ STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErr
         VariantClear(&value);
     }
 
+    V_VT(&value) = VT_I4;
+    if( S_OK == pPropBag->Read(OLESTR("backcolor"), &value, pErrorLog) )
+    {
+        _p_instance->setBackColor(V_I4(&value));
+        VariantClear(&value);
+    }
+    else
+    {
+        /*
+        ** try alternative syntax
+        */
+        V_VT(&value) = VT_BSTR;
+        if( S_OK == pPropBag->Read(OLESTR("bgcolor"), &value, pErrorLog) )
+        {
+            long backcolor;
+            if( swscanf(V_BSTR(&value), L"#%lX", &backcolor) )
+            {
+                _p_instance->setBackColor(backcolor);
+            }
+            VariantClear(&value);
+        }
+    }
+
     return _p_instance->onLoad();
 };
 
@@ -236,6 +259,11 @@ STDMETHODIMP VLCPersistPropertyBag::Save(LPPROPERTYBAG pPropBag, BOOL fClearDirt
     V_BSTR(&value) = SysAllocStringLen(_p_instance->getBaseURL(),
                             SysStringLen(_p_instance->getBaseURL()));
     pPropBag->Write(OLESTR("BaseURL"), &value);
+    VariantClear(&value);
+
+    V_VT(&value) = VT_I4;
+    V_I4(&value) = _p_instance->getBackColor();
+    pPropBag->Write(OLESTR("BackColor"), &value);
     VariantClear(&value);
 
     if( fClearDirty )

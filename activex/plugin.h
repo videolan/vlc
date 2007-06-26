@@ -114,6 +114,9 @@ public:
     void setVolume(int volume);
     int getVolume(void) { return _i_volume; };
 
+    void setBackColor(OLE_COLOR backcolor);
+    OLE_COLOR getBackColor(void) { return _i_backcolor; };
+
     void setVisible(BOOL fVisible);
     BOOL getVisible(void) { return _b_visible; };
     BOOL isVisible(void) { return _b_visible || (! _b_usermode); };
@@ -251,6 +254,7 @@ private:
     UINT _i_codepage;
     BOOL _b_usermode;
     RECT _posRect;
+    LPPICTURE _p_pict;
 
     // persistable properties
     BSTR _bstr_baseurl;
@@ -262,7 +266,7 @@ private:
     int  _i_volume;
     int  _i_time;
     SIZEL _extent;
-    LPPICTURE _p_pict;
+    OLE_COLOR _i_backcolor;
     // indicates whether properties needs persisting
     BOOL _b_dirty;
 };

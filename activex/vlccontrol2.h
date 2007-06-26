@@ -586,6 +586,8 @@ public:
     STDMETHODIMP put_Visible(VARIANT_BOOL visible);
     STDMETHODIMP get_Volume(long *volume);
     STDMETHODIMP put_Volume(long volume);
+    STDMETHODIMP get_BackColor(OLE_COLOR *backcolor);
+    STDMETHODIMP put_BackColor(OLE_COLOR backcolor);
 
     STDMETHODIMP get_audio(IVLCAudio**);
     STDMETHODIMP get_input(IVLCInput**);

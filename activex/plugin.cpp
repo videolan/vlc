@@ -351,6 +351,7 @@ HRESULT VLCPlugin::onInit(void)
         _b_mute = FALSE;
         _i_volume = 50;
         _i_time   = 0;
+        _i_backcolor = 0;
         // set default/preferred size (320x240) pixels in HIMETRIC
         HDC hDC = CreateDevDC(NULL);
         _extent.cx = 320;
@@ -559,6 +560,12 @@ HRESULT VLCPlugin::onAmbientChanged(LPUNKNOWN pContainer, DISPID dispID)
     switch( dispID )
     {
         case DISPID_AMBIENT_BACKCOLOR:
+            VariantInit(&v);
+            V_VT(&v) = VT_I4;
+            if( SUCCEEDED(GetObjectProperty(pContainer, dispID, v)) )
+            {
+                setBackColor(V_I4(&v));
+            }
             break;
         case DISPID_AMBIENT_DISPLAYNAME:
             break;
@@ -782,6 +789,19 @@ void VLCPlugin::setVolume(int volume)
     }
 };
 
+void VLCPlugin::setBackColor(OLE_COLOR backcolor)
+{
+    if( _i_backcolor != backcolor )
+    {
+        _i_backcolor = backcolor;
+        if( isInPlaceActive() )
+        {
+
+        }
+        setDirty(TRUE);
+    }
+};
+
 void VLCPlugin::setTime(int seconds)
 {
     if( seconds < 0 )
@@ -822,57 +842,80 @@ void VLCPlugin::onDraw(DVTARGETDEVICE * ptd, HDC hicTargetDev,
         long height = lprcBounds->bottom-lprcBounds->top;
 
         RECT bounds = { lprcBounds->left, lprcBounds->top, lprcBounds->right, lprcBounds->bottom };
-        FillRect(hdcDraw, &bounds, (HBRUSH)GetStockObject(WHITE_BRUSH));
 
-        LPPICTURE pict = getPicture();
-        if( NULL != pict )
+        if( isUserMode() )
         {
-            OLE_XSIZE_HIMETRIC picWidth;
-            OLE_YSIZE_HIMETRIC picHeight;
-
-            pict->get_Width(&picWidth);
-            pict->get_Height(&picHeight);
-
-            SIZEL picSize = { picWidth, picHeight };
-
-            if( NULL != hicTargetDev )
+            /* VLC is in user mode, just draw background color */
+            COLORREF colorref = RGB(0, 0, 0);
+            OleTranslateColor(_i_backcolor, (HPALETTE)GetStockObject(DEFAULT_PALETTE), &colorref);
+            if( colorref != RGB(0, 0, 0) )
             {
-                DPFromHimetric(hicTargetDev, (LPPOINT)&picSize, 1);
+                /* custom background */
+                HBRUSH colorbrush = CreateSolidBrush(colorref);
+                FillRect(hdcDraw, &bounds, colorbrush);
+                DeleteObject((HANDLE)colorbrush);
             }
-            else if( NULL != (hicTargetDev = CreateDevDC(ptd)) )
+            else
             {
-                DPFromHimetric(hicTargetDev, (LPPOINT)&picSize, 1);
-                DeleteDC(hicTargetDev);
+                /* black background */
+                FillRect(hdcDraw, &bounds, (HBRUSH)GetStockObject(BLACK_BRUSH));
             }
-
-            if( picSize.cx > width-4 )
-                picSize.cx = width-4;
-            if( picSize.cy > height-4 )
-                picSize.cy = height-4;
-
-            LONG dstX = lprcBounds->left+(width-picSize.cx)/2;
-            LONG dstY = lprcBounds->top+(height-picSize.cy)/2;
-
-            if( NULL != lprcWBounds )
-            {
-                RECT wBounds = { lprcWBounds->left, lprcWBounds->top, lprcWBounds->right, lprcWBounds->bottom };
-                pict->Render(hdcDraw, dstX, dstY, picSize.cx, picSize.cy,
-                        0L, picHeight, picWidth, -picHeight, &wBounds);
-            }
-            else 
-                pict->Render(hdcDraw, dstX, dstY, picSize.cx, picSize.cy,
-                        0L, picHeight, picWidth, -picHeight, NULL);
-
-            pict->Release();
         }
+        else
+        {
+            /* VLC is in design mode, draw the VLC logo */
+            FillRect(hdcDraw, &bounds, (HBRUSH)GetStockObject(WHITE_BRUSH));
 
-        SelectObject(hdcDraw, GetStockObject(BLACK_BRUSH));
+            LPPICTURE pict = getPicture();
+            if( NULL != pict )
+            {
+                OLE_XSIZE_HIMETRIC picWidth;
+                OLE_YSIZE_HIMETRIC picHeight;
 
-        MoveToEx(hdcDraw, bounds.left, bounds.top, NULL);
-        LineTo(hdcDraw, bounds.left+width-1, bounds.top);
-        LineTo(hdcDraw, bounds.left+width-1, bounds.top+height-1);
-        LineTo(hdcDraw, bounds.left, bounds.top+height-1);
-        LineTo(hdcDraw, bounds.left, bounds.top);
+                pict->get_Width(&picWidth);
+                pict->get_Height(&picHeight);
+
+                SIZEL picSize = { picWidth, picHeight };
+
+                if( NULL != hicTargetDev )
+                {
+                    DPFromHimetric(hicTargetDev, (LPPOINT)&picSize, 1);
+                }
+                else if( NULL != (hicTargetDev = CreateDevDC(ptd)) )
+                {
+                    DPFromHimetric(hicTargetDev, (LPPOINT)&picSize, 1);
+                    DeleteDC(hicTargetDev);
+                }
+
+                if( picSize.cx > width-4 )
+                    picSize.cx = width-4;
+                if( picSize.cy > height-4 )
+                    picSize.cy = height-4;
+
+                LONG dstX = lprcBounds->left+(width-picSize.cx)/2;
+                LONG dstY = lprcBounds->top+(height-picSize.cy)/2;
+
+                if( NULL != lprcWBounds )
+                {
+                    RECT wBounds = { lprcWBounds->left, lprcWBounds->top, lprcWBounds->right, lprcWBounds->bottom };
+                    pict->Render(hdcDraw, dstX, dstY, picSize.cx, picSize.cy,
+                            0L, picHeight, picWidth, -picHeight, &wBounds);
+                }
+                else 
+                    pict->Render(hdcDraw, dstX, dstY, picSize.cx, picSize.cy,
+                            0L, picHeight, picWidth, -picHeight, NULL);
+
+                pict->Release();
+            }
+
+            SelectObject(hdcDraw, GetStockObject(BLACK_BRUSH));
+
+            MoveToEx(hdcDraw, bounds.left, bounds.top, NULL);
+            LineTo(hdcDraw, bounds.left+width-1, bounds.top);
+            LineTo(hdcDraw, bounds.left+width-1, bounds.top+height-1);
+            LineTo(hdcDraw, bounds.left, bounds.top+height-1);
+            LineTo(hdcDraw, bounds.left, bounds.top);
+        }
     }
 };
 
@@ -880,8 +923,7 @@ void VLCPlugin::onPaint(HDC hdc, const RECT &bounds, const RECT &clipRect)
 {
     if( isVisible() )
     {
-        /** if VLC is playing, it may not display any VIDEO content 
-        ** hence, draw control logo*/
+        /* if VLC is in design mode, draw control logo */
         HDC hdcDraw = CreateCompatibleDC(hdc);
         if( NULL != hdcDraw )
         {
