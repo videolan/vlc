@@ -143,9 +143,9 @@ D: VOC files demultiplexer
 S: Finland
 
 N: Colin Delacroix
-E: colin@zoy.org
+E: colin#zoy.org
 C: colin
-D: MacOS X sound support
+D: initial MacOS X sound support
 S: France
 
 N: Boris Dorès
