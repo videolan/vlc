@@ -218,7 +218,8 @@ QMenu *QVLCMenu::FileMenu()
             ":/pixmaps/vlc_folder-grey_16px.png", openDirDialog(), "Ctrl+F" );
 #endif /* WIN32 */
 
-    DP_SADD( menu, qtr("Open &Disc..." ), "", "", openDiscDialog(), "Ctrl+D" );
+    DP_SADD( menu, qtr("Open &Disc..." ), "", ":/pixmaps/vlc_disc_16px.png",
+             openDiscDialog(), "Ctrl+D" );
     DP_SADD( menu, qtr("Open &Network..." ), "",
                 ":/pixmaps/vlc_network_16px.png", openNetDialog(), "Ctrl+N" );
     DP_SADD( menu, qtr("Open &Capture Device..." ), "",
@@ -291,9 +292,15 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         adv->setCheckable( true );
         if( visual_selector_enabled ) adv->setChecked( true );
 #endif
-        menu->addAction ( qtr( "Playlist"), mi, SLOT( playlist() ) );
+        QAction *plAction = menu->addAction ( qtr( "Playlist"), mi,
+                SLOT( playlist() ) );
+        plAction->setCheckable( true );
+
     }
-    DP_SADD( menu, qtr( I_MENU_EXT ), "","",extendedDialog(), "Ctrl+E" );
+    QAction *extAction = menu->addAction( qtr( I_MENU_EXT ), THEDP,
+                SLOT( extendedDialog() ), qtr( "Ctrl+E" ) );
+    extAction->setCheckable( true );
+
     DP_SADD( menu, qtr( "Hide Menus..." ), "","",hideMenus(), "Ctrl+H" );
 
     menu->addSeparator();

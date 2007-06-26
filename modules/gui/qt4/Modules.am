@@ -193,6 +193,7 @@ EXTRA_DIST += \
 	pixmaps/vlc_network_16px.png \
 	pixmaps/vlc_stream_16px.png \
 	pixmaps/vlc_quit_16px.png \
+	pixmaps/vlc_disc_16px.png \
 	pixmaps/vlc_network_16px.png \
 	pixmaps/vlc_capture-card_16px.png \
 	pixmaps/vlc_preferences_16px.png \
