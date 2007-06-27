@@ -910,8 +910,8 @@ then
       VLC_ADD_LDFLAGS([screensaver libvlc],[$DBUS_LIBS])
       VLC_ADD_CFLAGS([screensaver libvlc],[$DBUS_CFLAGS])
       dnl Check for dbus control interface
-        AC_ARG_ENABLE(dbus-control, [  --enable-dbus-control   D-BUS control interface (default disabled)])
-        if test "${enable_dbus_control}" = "yes"
+        AC_ARG_ENABLE(dbus-control, [  --disable-dbus-control   D-BUS control interface (default enabled)])
+        if test "${enable_dbus_control}" != "no"
         then
           VLC_ADD_PLUGINS([dbus])
           VLC_ADD_LDFLAGS([dbus],[$DBUS_LIBS])
