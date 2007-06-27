@@ -29,6 +29,7 @@
 
 #include <fileref.h>
 #include <tag.h>
+#include <tstring.h>
 #include <id3v2tag.h>
 #include <mpegfile.h>
 #include <flacfile.h>
@@ -166,7 +167,12 @@ static int ReadMeta( vlc_object_t *p_this )
     return VLC_EGENERIC;
 }
 
-#define SET(a,b) if(b) tag->set##a( b );
+#define SET(a,b) if(b) { \
+        TagLib::String *psz_##a = new TagLib::String( b, \
+            TagLib::String::UTF8 ); \
+        tag->set##a( *psz_##a ); \
+        delete psz_##a; \
+    }
 
 static int WriteMeta( vlc_object_t *p_this )
 {
@@ -184,18 +190,26 @@ static int WriteMeta( vlc_object_t *p_this )
     if( !f.isNull() && f.tag() )
     {
         msg_Dbg( p_this, "Updating metadata for %s", p_export->psz_file );
+
         TagLib::Tag *tag = f.tag();
+
         SET( Artist, p_item->p_meta->psz_artist );
-        if( p_item->p_meta->psz_title )
-            tag->setTitle( p_item->p_meta->psz_title );
-        else
-            tag->setTitle( p_item->psz_name );
+
+        char *psz_titlec = ( p_item->p_meta->psz_title ?
+            p_item->p_meta->psz_title : p_item->psz_name );
+        TagLib::String *psz_title = new TagLib::String( psz_titlec,
+            TagLib::String::UTF8 );
+        tag->setTitle( *psz_title );
+        delete psz_title;
+
         SET( Album, p_item->p_meta->psz_album );
         SET( Genre, p_item->p_meta->psz_genre );
+
         if( p_item->p_meta->psz_date )
             tag->setYear( atoi( p_item->p_meta->psz_date ) );
         if( p_item->p_meta->psz_tracknum )
             tag->setTrack( atoi( p_item->p_meta->psz_tracknum ) );
+
         f.save();
         return VLC_SUCCESS;
     }
