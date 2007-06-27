@@ -174,7 +174,6 @@ static int Open( vlc_object_t *p_this )
     free( p_sys ); \
     return VLC_ENOMEM;
 
-
     if( !p_sys )
     {
         MEM_ERROR
@@ -1053,17 +1052,11 @@ static int ReadMetaData( intf_thread_t *p_this )
 
     i_status = input_GetItem(p_input)->p_meta->i_status;
 
-    b_waiting = VLC_TRUE;
-/*  TODO: meta data fetching doesn't work atm
     vlc_mutex_lock( &p_sys->lock );
     b_waiting = p_sys->b_waiting_meta;
     vlc_mutex_unlock( &p_sys->lock );
-*/
 
-    /* TODO: item preparsing is buggy on drag&drop and command line arguments
     if( i_status & ( !b_waiting ? ITEM_PREPARSED : ITEM_META_FETCHED ) )
-    */
-    if( 1 )
     {
         ALLOC_ITEM_META( psz_artist, p_meta->psz_artist )
         else
