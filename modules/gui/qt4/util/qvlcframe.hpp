@@ -41,43 +41,6 @@
 class QVLCFrame : public QWidget
 {
 public:
-    static QHBoxLayout* doButtons( QWidget *w, QBoxLayout *l,
-                               QPushButton **defaul, char *psz_default,
-                               QPushButton **alt, char *psz_alt,
-                               QPushButton **other, char *psz_other )
-    {
-#ifdef QT42
-#else
-        QHBoxLayout *buttons_layout = new QHBoxLayout;
-        QSpacerItem *spacerItem = new QSpacerItem( 40, 20,
-                               QSizePolicy::Expanding, QSizePolicy::Minimum);
-        buttons_layout->addItem( spacerItem );
-
-        if( psz_default )
-        {
-            *defaul = new QPushButton(0);
-            (*defaul)->setFocus();
-            buttons_layout->addWidget( *defaul );
-            (*defaul)->setText( qfu( psz_default ) );
-        }
-        if( psz_alt )
-        {
-            *alt = new QPushButton(0);
-            buttons_layout->addWidget( *alt );
-            (*alt)->setText( qfu( psz_alt ) );
-        }
-        if( psz_other )
-        {
-            *other = new QPushButton( 0 );
-            buttons_layout->addWidget( *other );
-            (*other)->setText( qfu( psz_other ) );
-        }
-        if( l )
-            l->addLayout( buttons_layout );
-#endif
-        return buttons_layout;
-    };
-
     QVLCFrame( intf_thread_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )
     {    };
     virtual ~QVLCFrame()   {};

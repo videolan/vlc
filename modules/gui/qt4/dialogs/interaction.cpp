@@ -31,6 +31,7 @@
 #include <QPushButton>
 #include <QProgressBar>
 #include <QMessageBox>
+#include <QDialogButtonBox>
 
 #include <assert.h>
 
@@ -136,10 +137,27 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     else
     /* Custom box, finish it */
     {
-        QVLCFrame::doButtons( dialog, layout,
-                              &defaultButton, p_dialog->psz_default_button,
-                              &altButton, p_dialog->psz_alternate_button,
-                              &otherButton, p_dialog->psz_other_button );
+        QDialogButtonBox *buttonBox = new QDialogButtonBox;
+
+        if( p_dialog->psz_default_button )
+        {
+            defaultButton = new QPushButton;
+            defaultButton->setFocus();
+            defaultButton->setText( qfu( p_dialog->psz_default_button ) );
+            buttonBox->addButton( defaultButton, QDialogButtonBox::AcceptRole );
+        }
+        if( p_dialog->psz_alternate_button )
+        {
+            altButton = new QPushButton;
+            altButton->setText( qfu( p_dialog->psz_alternate_button ) );
+            buttonBox->addButton( altButton, QDialogButtonBox::RejectRole );
+        }
+        if( p_dialog->psz_other_button )
+        {
+            otherButton = new QPushButton;
+            otherButton->setText( qfu( p_dialog->psz_other_button ) );
+            buttonBox->addButton( otherButton, QDialogButtonBox::ActionRole );
+        }
         if( p_dialog->psz_default_button )
             BUTTONACT( defaultButton, defaultB() );
         if( p_dialog->psz_alternate_button )
