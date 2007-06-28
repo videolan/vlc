@@ -203,4 +203,5 @@ EXTRA_DIST += \
 	pixmaps/vlc_file-asym_16px.png \
 	pixmaps/vlc_file-wide_16px.png \
 	pixmaps/vlc_info_16px.png \
+	pixmaps/vlc_previous_16px.png \
 	pixmaps/vlc_next_16px.png
