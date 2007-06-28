@@ -889,10 +889,12 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
 
         if( p_sys->i_offsets_length != 0 )
         {
+            p_sys->i_offsets_length = 0;
             free( p_sys->pi_x_offsets );
             free( p_sys->pi_y_offsets );
+            p_sys->pi_x_offsets = NULL;
+            p_sys->pi_y_offsets = NULL;
         }
-        p_sys->i_offsets_length = 0;
 
         mosaic_ParseSetOffsets( p_this, p_sys, newval.psz_string );
 
