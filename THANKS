@@ -47,6 +47,7 @@ Cristian Secară <cristi at secarica dot ro> - Romanian l10n
 Christof Baumgaertner - dbox web intf
 Christophe Burgalat <c.burgalat _at_ broadcastavenue _dot_ com> - XVMC (cle266) patch for VIA boards
 Christopher Johnson <cjohnson at mint.net> - Qt fix in vlc.spec
+Cian Duffy <cian at rapturetv.com> - BeOS builds and maintener
 Colin Simmonds <colin_simmonds at Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian at cisco.com> - ac3dec uninitialized data structure fix
 Damien Fouilleul <damien.fouilleul at laposte.net> - DirectShow input improvements
