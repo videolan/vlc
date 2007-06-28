@@ -87,7 +87,11 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* Ugly hacks to get the good Widget */
     //This lineEdit is the normal line in the fileDialog.
+#if QT_VERSION >= 0x040300
+    lineFileEdit = findChildren<QLineEdit*>()[2];
+#else
     lineFileEdit = findChildren<QLineEdit*>()[3];
+#endif
     lineFileEdit->hide();
 
     /* Make a list of QLabel inside the QFileDialog to access the good ones */
