@@ -41,7 +41,7 @@ GotoTimeDialog *GotoTimeDialog::instance = NULL;
 GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 {
     setWindowFlags( Qt::Tool );
-    setWindowTitle( qtr( "Go to Time" ) );
+    setWindowTitle( qtr( "Go to time" ) );
     resize( 260, 160 );
 
     QGridLayout *mainLayout = new QGridLayout( this );
@@ -54,11 +54,11 @@ GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     buttonBox->addButton( gotoButton, QDialogButtonBox::AcceptRole );
     buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
-    QGroupBox *timeGroupBox = new QGroupBox( qtr("Time") );
+    QGroupBox *timeGroupBox = new QGroupBox;
     QGridLayout *boxLayout = new QGridLayout( timeGroupBox );
 
     QLabel *timeIntro = new
-        QLabel( "Enter below the desired time you want to go in the media." );
+        QLabel( "Go to time:" );
     timeIntro->setWordWrap( true );
     timeIntro->setAlignment( Qt::AlignCenter );
 

@@ -45,7 +45,7 @@ ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     messages = new QTextEdit();
     messages->setReadOnly( true );
     messages->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    stopShowing = new QCheckBox( qtr( "Don't show further errors") );
+    stopShowing = new QCheckBox( qtr( "Hide future errors") );
 
     layout->addWidget( messages, 0, 0, 1, 3 );
     layout->addWidget( stopShowing, 1, 0 );
