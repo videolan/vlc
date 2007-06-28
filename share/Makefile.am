@@ -171,7 +171,8 @@ DIST_http = \
 	http/style.css \
 	http/iehacks.css \
 	http/vlm.html \
-	http/vlm_export.html
+	http/vlm_export.html \
+	http/flash.html
 
 DIST_osdmenu_default = \
 	osdmenu/default.cfg \
