@@ -1190,6 +1190,8 @@ static int ParseMPL2( demux_t *p_demux, subtitle_t *p_subtitle )
             return VLC_EGENERIC;
 
         psz_text = malloc( strlen(s) + 1 );
+        if( !psz_text )
+            return VLC_ENOMEM;
 
         i_start = 0;
         i_stop  = 0;
