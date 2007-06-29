@@ -514,6 +514,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_FPS:
         case DEMUX_GET_META:
+        case DEMUX_GET_ATTACHMENTS:
         case DEMUX_GET_TITLE_INFO:
             return VLC_EGENERIC;
 
@@ -695,273 +696,186 @@ static void TextPreviousLine( text_t *txt )
 /*****************************************************************************
  * Specific Subtitle function
  *****************************************************************************/
-#define MAX_LINE 8192
+/* ParseMicroDvd:
+ *  Format:
+ *      {n1}{n2}Line1|Line2|Line3....
+ *  where n1 and n2 are the video frame number (n2 can be empty)
+ */
 static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
-    /*
-     * each line:
-     *  {n1}{n2}Line1|Line2|Line3....
-     * where n1 and n2 are the video frame number...
-     * {n2} can also be {}
-     */
-    char *s;
+    char *psz_text;
+    int  i_start;
+    int  i_stop;
+    int  i;
 
-    char buffer_text[MAX_LINE + 1];
-    int    i_start;
-    int    i_stop;
-    unsigned int i;
-
-    p_subtitle->i_start = 0;
-    p_subtitle->i_stop  = 0;
-    p_subtitle->psz_text = NULL;
-
-next:
     for( ;; )
     {
-        if( ( s = TextGetLine( txt ) ) == NULL )
-        {
-            return( VLC_EGENERIC );
-        }
+        const char *s = TextGetLine( txt );
+        if( !s )
+            return VLC_EGENERIC;
+
+        psz_text = malloc( strlen(s) + 1 );
+        if( !psz_text )
+            return VLC_ENOMEM;
+
         i_start = 0;
         i_stop  = 0;
-
-        memset( buffer_text, '\0', MAX_LINE );
-        if( sscanf( s, "{%d}{}%[^\r\n]", &i_start, buffer_text ) == 2 ||
-            sscanf( s, "{%d}{%d}%[^\r\n]", &i_start, &i_stop, buffer_text ) == 3)
+        if( sscanf( s, "{%d}{}%[^\r\n]", &i_start, psz_text ) == 2 ||
+            sscanf( s, "{%d}{%d}%[^\r\n]", &i_start, &i_stop, psz_text ) == 3)
         {
-            break;
+            float f_fps;
+            if( i_start != 1 || i_stop != 1 )
+                break;
+
+            /* We found a possible setting of the framerate "{1}{1}23.976" */
+            /* Check if it's usable, and if the sub-fps is not set */
+            f_fps = us_strtod( psz_text, NULL );
+            if( f_fps > 0.0 && var_GetFloat( p_demux, "sub-fps" ) <= 0.0 )
+                p_sys->i_microsecperframe = (int64_t)((float)1000000 / f_fps);
         }
-    }
-    if( i_start == 1 && i_stop == 1 )
-    {
-        /* We found a possible setting of the framerate "{1}{1}23.976" */
-        /* Check if it's usable, and if the sub-fps is not set */
-        float tmp = us_strtod( buffer_text, NULL );
-        if( tmp > 0.0 && var_GetFloat( p_demux, "sub-fps" ) <= 0.0 )
-            p_sys->i_microsecperframe = (int64_t)( (float)1000000 / tmp );
-        goto next;
+        free( psz_text );
     }
 
     /* replace | by \n */
-    for( i = 0; i < strlen( buffer_text ); i++ )
+    for( i = 0; psz_text[i] != '\0'; i++ )
     {
-        if( buffer_text[i] == '|' )
+        if( psz_text[i] == '|' )
+            psz_text[i] = '\n';
+    }
+
+    /* */
+    p_subtitle->i_start  = i_start * p_sys->i_microsecperframe;
+    p_subtitle->i_stop   = i_stop  * p_sys->i_microsecperframe;
+    p_subtitle->psz_text = psz_text;
+    return VLC_SUCCESS;
+}
+
+/* ParseSubRipSubViewer
+ *  Format SubRip
+ *      n
+ *      h1:m1:s1,d1 --> h2:m2:s2,d2
+ *      Line1
+ *      Line2
+ *      ....
+ *      [Empty line]
+ *  Format SubViewer v1/v2
+ *      h1:m1:s1.d1,h2:m2:s2.d2
+ *      Line1[br]Line2
+ *      Line3
+ *      ...
+ *      [empty line]
+ *  We ignore line number for SubRip
+ */
+static int ParseSubRipSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
+                                 const char *psz_fmt,
+                                 vlc_bool_t b_replace_br )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    text_t      *txt = &p_sys->txt;
+    char    *psz_text;
+
+    for( ;; )
+    {
+        const char *s = TextGetLine( txt );
+        int h1, m1, s1, d1, h2, m2, s2, d2;
+
+        if( !s )
+            return VLC_EGENERIC;
+
+        if( sscanf( s, psz_fmt,
+                    &h1, &m1, &s1, &d1,
+                    &h2, &m2, &s2, &d2 ) == 8 )
         {
-            buffer_text[i] = '\n';
+            p_subtitle->i_start = ( (int64_t)h1 * 3600*1000 +
+                                    (int64_t)m1 * 60*1000 +
+                                    (int64_t)s1 * 1000 +
+                                    (int64_t)d1 ) * 1000;
+
+            p_subtitle->i_stop  = ( (int64_t)h2 * 3600*1000 +
+                                    (int64_t)m2 * 60*1000 +
+                                    (int64_t)s2 * 1000 +
+                                    (int64_t)d2 ) * 1000;
+            break;
         }
     }
 
-    p_subtitle->i_start = (int64_t)i_start * p_sys->i_microsecperframe;
-    p_subtitle->i_stop  = (int64_t)i_stop  * p_sys->i_microsecperframe;
-    p_subtitle->psz_text = strndup( buffer_text, MAX_LINE );
-    return( 0 );
-}
+    /* Now read text until an empty line */
+    psz_text = strdup("");
+    if( !psz_text )
+        return VLC_ENOMEM;
+    for( ;; )
+    {
+        const char *s = TextGetLine( txt );
+        int i_len;
+        int i_old;
 
+        if( !s )
+        {
+            free( psz_text );
+            return VLC_EGENERIC;
+        }
+
+        i_len = strlen( s );
+        if( i_len <= 0 )
+        {
+            p_subtitle->psz_text = psz_text;
+            return VLC_SUCCESS;
+        }
+
+        i_old = strlen( psz_text );
+        psz_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        if( !psz_text )
+            return VLC_ENOMEM;
+        strcat( psz_text, s );
+        strcat( psz_text, "\n" );
+
+        /* replace [br] by \n */
+        if( b_replace_br )
+        {
+            char *p;
+            
+            while( ( p = strstr( psz_text, "[br]" ) ) )
+            {
+                *p++ = '\n';
+                memmove( p, &p[3], strlen(&p[3])+1 );
+            }
+        }
+    }
+}
+/* ParseSubRip
+ */
 static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-    text_t      *txt = &p_sys->txt;
-
-    /*
-     * n
-     * h1:m1:s1,d1 --> h2:m2:s2,d2
-     * Line1
-     * Line2
-     * ...
-     * [empty line]
-     *
-     */
-    char *s;
-    char buffer_text[ 10 * MAX_LINE];
-    int  i_buffer_text;
-    int64_t     i_start;
-    int64_t     i_stop;
-
-    p_subtitle->i_start = 0;
-    p_subtitle->i_stop  = 0;
-    p_subtitle->psz_text = NULL;
-
-    for( ;; )
-    {
-        int h1, m1, s1, d1, h2, m2, s2, d2;
-        if( ( s = TextGetLine( txt ) ) == NULL )
-        {
-            return( VLC_EGENERIC );
-        }
-        if( sscanf( s,
-                    "%d:%d:%d,%d --> %d:%d:%d,%d",
-                    &h1, &m1, &s1, &d1,
-                    &h2, &m2, &s2, &d2 ) == 8 )
-        {
-            i_start = ( (int64_t)h1 * 3600*1000 +
-                        (int64_t)m1 * 60*1000 +
-                        (int64_t)s1 * 1000 +
-                        (int64_t)d1 ) * 1000;
-
-            i_stop  = ( (int64_t)h2 * 3600*1000 +
-                        (int64_t)m2 * 60*1000 +
-                        (int64_t)s2 * 1000 +
-                        (int64_t)d2 ) * 1000;
-
-            /* Now read text until an empty line */
-            for( i_buffer_text = 0;; )
-            {
-                int i_len;
-                if( ( s = TextGetLine( txt ) ) == NULL )
-                {
-                    return( VLC_EGENERIC );
-                }
-
-                i_len = strlen( s );
-                if( i_len <= 0 )
-                {
-                    /* empty line -> end of this subtitle */
-                    buffer_text[__MAX( i_buffer_text - 1, 0 )] = '\0';
-                    p_subtitle->i_start = i_start;
-                    p_subtitle->i_stop = i_stop;
-                    p_subtitle->psz_text = strdup( buffer_text );
-                    return 0;
-                }
-                else
-                {
-                    if( i_buffer_text + i_len + 1 < 10 * MAX_LINE )
-                    {
-                        memcpy( buffer_text + i_buffer_text,
-                                s,
-                                i_len );
-                        i_buffer_text += i_len;
-
-                        buffer_text[i_buffer_text] = '\n';
-                        i_buffer_text++;
-                    }
-                }
-            }
-        }
-    }
+    return ParseSubRipSubViewer( p_demux, p_subtitle,
+                                 "%d:%d:%d,%d --> %d:%d:%d,%d",
+                                 VLC_FALSE );
 }
-
+/* ParseSubViewer
+ */
 static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-    text_t      *txt = &p_sys->txt;
-
-    /*
-     * h1:m1:s1.d1,h2:m2:s2.d2
-     * Line1[br]Line2
-     * Line3
-     * ...
-     * [empty line]
-     * ( works with subviewer and subviewer v2 )
-     */
-    char *s;
-    char buffer_text[ 10 * MAX_LINE];
-    int  i_buffer_text;
-    int64_t     i_start;
-    int64_t     i_stop;
-
-    p_subtitle->i_start = 0;
-    p_subtitle->i_stop  = 0;
-    p_subtitle->psz_text = NULL;
-
-    for( ;; )
-    {
-        int h1, m1, s1, d1, h2, m2, s2, d2;
-        if( ( s = TextGetLine( txt ) ) == NULL )
-        {
-            return( VLC_EGENERIC );
-        }
-        if( sscanf( s,
-                    "%d:%d:%d.%d,%d:%d:%d.%d",
-                    &h1, &m1, &s1, &d1,
-                    &h2, &m2, &s2, &d2 ) == 8 )
-        {
-            i_start = ( (int64_t)h1 * 3600*1000 +
-                        (int64_t)m1 * 60*1000 +
-                        (int64_t)s1 * 1000 +
-                        (int64_t)d1 ) * 1000;
-
-            i_stop  = ( (int64_t)h2 * 3600*1000 +
-                        (int64_t)m2 * 60*1000 +
-                        (int64_t)s2 * 1000 +
-                        (int64_t)d2 ) * 1000;
-
-            /* Now read text until an empty line */
-            for( i_buffer_text = 0;; )
-            {
-                int i_len, i;
-                if( ( s = TextGetLine( txt ) ) == NULL )
-                {
-                    return( VLC_EGENERIC );
-                }
-
-                i_len = strlen( s );
-                if( i_len <= 0 )
-                {
-                    /* empty line -> end of this subtitle */
-                    buffer_text[__MAX( i_buffer_text - 1, 0 )] = '\0';
-                    p_subtitle->i_start = i_start;
-                    p_subtitle->i_stop = i_stop;
-
-                    /* replace [br] by \n */
-                    for( i = 0; i < i_buffer_text - 3; i++ )
-                    {
-                        if( buffer_text[i] == '[' && buffer_text[i+1] == 'b' &&
-                            buffer_text[i+2] == 'r' && buffer_text[i+3] == ']' )
-                        {
-                            char *temp = buffer_text + i + 1;
-                            buffer_text[i] = '\n';
-                            memmove( temp, temp+3, strlen( temp ) -3 );
-                            temp[strlen( temp )-3] = '\0';
-                        }
-                    }
-                    p_subtitle->psz_text = strdup( buffer_text );
-                    return( 0 );
-                }
-                else
-                {
-                    if( i_buffer_text + i_len + 1 < 10 * MAX_LINE )
-                    {
-                        memcpy( buffer_text + i_buffer_text,
-                                s,
-                                i_len );
-                        i_buffer_text += i_len;
-
-                        buffer_text[i_buffer_text] = '\n';
-                        i_buffer_text++;
-                    }
-                }
-            }
-        }
-    }
+    return ParseSubRipSubViewer( p_demux, p_subtitle,
+                                 "%d:%d:%d.%d,%d:%d:%d.%d",
+                                 VLC_TRUE );
 }
 
-
+/* ParseSSA
+ */
 static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
 
-    char buffer_text[ 10 * MAX_LINE];
-    char buffer_text2[ 10 * MAX_LINE];
-    char *s;
-    int64_t     i_start;
-    int64_t     i_stop;
-
-    p_subtitle->i_start = 0;
-    p_subtitle->i_stop  = 0;
-    p_subtitle->psz_text = NULL;
-
     for( ;; )
     {
+        const char *s = TextGetLine( txt );
         int h1, m1, s1, c1, h2, m2, s2, c2;
+        char *psz_text;
 
-        if( ( s = TextGetLine( txt ) ) == NULL )
-        {
-            return( VLC_EGENERIC );
-        }
-        p_subtitle->psz_text = malloc( strlen( s ) );
+        if( !s )
+            return VLC_EGENERIC;
 
         /* We expect (SSA2-4):
          * Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -974,376 +888,334 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle )
          * Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
          * Dialogue: Layer#,0:02:40.65,0:02:41.79,Wolf main,Cher,0000,0000,0000,,Et les enregistrements de ses ondes delta ?
          */
+        psz_text = malloc( 2 + strlen( s ) + 1 );
+        if( !psz_text )
+            return VLC_ENOMEM;
+
         if( sscanf( s,
-                    "Dialogue: %[^,],%d:%d:%d.%d,%d:%d:%d.%d,%[^\r\n]",
-                    buffer_text2,
+                    "Dialogue: %*[^,],%d:%d:%d.%d,%d:%d:%d.%d,%[^\r\n]",
                     &h1, &m1, &s1, &c1,
                     &h2, &m2, &s2, &c2,
-                    buffer_text ) == 10 )
+                    psz_text ) == 9 )
         {
-            i_start = ( (int64_t)h1 * 3600*1000 +
-                        (int64_t)m1 * 60*1000 +
-                        (int64_t)s1 * 1000 +
-                        (int64_t)c1 * 10 ) * 1000;
-
-            i_stop  = ( (int64_t)h2 * 3600*1000 +
-                        (int64_t)m2 * 60*1000 +
-                        (int64_t)s2 * 1000 +
-                        (int64_t)c2 * 10 ) * 1000;
-
             /* The dec expects: ReadOrder, Layer, Style, Name, MarginL, MarginR, MarginV, Effect, Text */
             /* (Layer comes from ASS specs ... it's empty for SSA.) */
             if( p_sys->i_type == SUB_TYPE_SSA1 )
             {
-                sprintf( p_subtitle->psz_text,
-                         ",%s", strdup( buffer_text) ); /* SSA1 has only 8 commas before the text starts, not 9 */
+                /* SSA1 has only 8 commas before the text starts, not 9 */
+                memmove( &psz_text[1], psz_text, strlen(psz_text)+1 );
+                psz_text[0] = ',';
             }
             else
             {
-                sprintf( p_subtitle->psz_text,
-                         ",,%s", strdup( buffer_text) ); /* ReadOrder, Layer, %s(rest of fields) */
+                /* ReadOrder, Layer, %s(rest of fields) */
+                memmove( &psz_text[2], psz_text, strlen(psz_text)+1 );
+                psz_text[0] = ',';
+                psz_text[1] = ',';
             }
-            p_subtitle->i_start = i_start;
-            p_subtitle->i_stop = i_stop;
-            return 0;
+
+            p_subtitle->i_start = ( (int64_t)h1 * 3600*1000 +
+                                    (int64_t)m1 * 60*1000 +
+                                    (int64_t)s1 * 1000 +
+                                    (int64_t)c1 * 10 ) * 1000;
+            p_subtitle->i_stop  = ( (int64_t)h2 * 3600*1000 +
+                                    (int64_t)m2 * 60*1000 +
+                                    (int64_t)s2 * 1000 +
+                                    (int64_t)c2 * 10 ) * 1000;
+            p_subtitle->psz_text = psz_text;
+            return VLC_SUCCESS;
         }
-        else
-        {
-            /* All the other stuff we add to the header field */
-            if( p_sys->psz_header != NULL )
-            {
-                if( !( p_sys->psz_header = realloc( p_sys->psz_header,
-                          strlen( p_sys->psz_header ) + 1 + strlen( s ) + 2 ) ) )
-                {
-                    msg_Err( p_demux, "out of memory");
-                    return VLC_ENOMEM;
-                }
-                p_sys->psz_header = strcat( p_sys->psz_header,  s );
-                p_sys->psz_header = strcat( p_sys->psz_header, "\n" );
-            }
-            else
-            {
-                if( !( p_sys->psz_header = malloc( strlen( s ) + 2 ) ) )
-                {
-                    msg_Err( p_demux, "out of memory");
-                    return VLC_ENOMEM;
-                }
-                p_sys->psz_header = s;
-                p_sys->psz_header = strcat( p_sys->psz_header, "\n" );
-            }
-        }
+        free( psz_text );
+
+        /* All the other stuff we add to the header field */
+        if( !p_sys->psz_header )
+            p_sys->psz_header = strdup( "" );
+        if( !p_sys->psz_header )
+            return VLC_ENOMEM;
+
+        p_sys->psz_header =
+            realloc( p_sys->psz_header,
+                     strlen( p_sys->psz_header ) + strlen( s ) + 2 );
+        strcat( p_sys->psz_header,  s );
+        strcat( p_sys->psz_header, "\n" );
     }
 }
 
+/* ParseVplayer
+ *  Format
+ *      h:m:s:Line1|Line2|Line3....
+ *  or
+ *      h:m:s Line1|Line2|Line3....
+ */
 static int  ParseVplayer( demux_t *p_demux, subtitle_t *p_subtitle )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
-
-    /*
-     * each line:
-     *  h:m:s:Line1|Line2|Line3....
-     *  or
-     *  h:m:s Line1|Line2|Line3....
-     *
-     */
-    char *p;
-    char buffer_text[MAX_LINE + 1];
-    int64_t    i_start;
-    unsigned int i;
-
-    p_subtitle->i_start = 0;
-    p_subtitle->i_stop  = 0;
-    p_subtitle->psz_text = NULL;
+    char *psz_text;
+    int i;
 
     for( ;; )
     {
-        int h, m, s;
-        char c;
+        const char *s = TextGetLine( txt );
+        int h1, m1, s1;
 
-        if( ( p = TextGetLine( txt ) ) == NULL )
+        if( !s )
+            return VLC_EGENERIC;
+
+        psz_text = malloc( strlen( s ) + 1 );
+        if( !psz_text )
+            return VLC_ENOMEM;
+
+        if( sscanf( s, "%d:%d:%d%*c%[^\r\n]",
+                    &h1, &m1, &s1, psz_text ) == 4 )
         {
-            return( VLC_EGENERIC );
-        }
-
-        i_start = 0;
-
-        memset( buffer_text, '\0', MAX_LINE );
-        if( sscanf( p, "%d:%d:%d%[ :]%[^\r\n]", &h, &m, &s, &c, buffer_text ) == 5 )
-        {
-            i_start = ( (int64_t)h * 3600*1000 +
-                        (int64_t)m * 60*1000 +
-                        (int64_t)s * 1000 ) * 1000;
+            p_subtitle->i_start = ( (int64_t)h1 * 3600*1000 +
+                                    (int64_t)m1 * 60*1000 +
+                                    (int64_t)s1 * 1000 ) * 1000;
+            p_subtitle->i_stop  = 0;
             break;
         }
+        free( psz_text );
     }
 
     /* replace | by \n */
-    for( i = 0; i < strlen( buffer_text ); i++ )
+    for( i = 0; psz_text[i] != '\0'; i++ )
     {
-        if( buffer_text[i] == '|' )
-        {
-            buffer_text[i] = '\n';
-        }
+        if( psz_text[i] == '|' )
+            psz_text[i] = '\n';
     }
-    p_subtitle->i_start = i_start;
-
-    p_subtitle->i_stop  = 0;
-    p_subtitle->psz_text = strndup( buffer_text, MAX_LINE );
-    return( 0 );
+    p_subtitle->psz_text = psz_text;
+    return VLC_SUCCESS;
 }
 
-static char *ParseSamiSearch( text_t *txt, char *psz_start, const char *psz_str )
+/* ParseSami
+ */
+static char *ParseSamiSearch( text_t *txt,
+                              char *psz_start, const char *psz_str )
 {
-    if( psz_start )
+    if( psz_start && strcasestr( psz_start, psz_str ) )
     {
-        if( strcasestr( psz_start, psz_str ) )
-        {
-            char *s = strcasestr( psz_start, psz_str );
-
-            s += strlen( psz_str );
-
-            return( s );
-        }
+        char *s = strcasestr( psz_start, psz_str );
+        return &s[strlen( psz_str )];
     }
+
     for( ;; )
     {
-        char *p;
-        if( ( p = TextGetLine( txt ) ) == NULL )
-        {
+        char *p = TextGetLine( txt );
+        if( !p )
             return NULL;
-        }
+
         if( strcasestr( p, psz_str ) )
         {
             char *s = strcasestr( p, psz_str );
-
-            s += strlen( psz_str );
-
-            return(  s);
+            return &s[strlen( psz_str )];
         }
     }
 }
-
 static int  ParseSami( demux_t *p_demux, subtitle_t *p_subtitle )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
 
-    char *p;
+    char *s;
     int64_t i_start;
 
-    int  i_text;
-    char buffer_text[10*MAX_LINE + 1];
-
-    p_subtitle->i_start = 0;
-    p_subtitle->i_stop  = 0;
-    p_subtitle->psz_text = NULL;
-
-#define ADDC( c ) \
-    if( i_text < 10*MAX_LINE )      \
-    {                               \
-        buffer_text[i_text++] = c;  \
-        buffer_text[i_text] = '\0'; \
-    }
+    unsigned int i_text;
+    char text[8192]; /* Arbitrary but should be long enough */
 
     /* search "Start=" */
-    if( !( p = ParseSamiSearch( txt, NULL, "Start=" ) ) )
-    {
+    if( !( s = ParseSamiSearch( txt, NULL, "Start=" ) ) )
         return VLC_EGENERIC;
-    }
 
     /* get start value */
-    i_start = strtol( p, &p, 0 );
+    i_start = strtol( s, &s, 0 );
 
     /* search <P */
-    if( !( p = ParseSamiSearch( txt, p, "<P" ) ) )
-    {
+    if( !( s = ParseSamiSearch( txt, s, "<P" ) ) )
         return VLC_EGENERIC;
-    }
+
     /* search > */
-    if( !( p = ParseSamiSearch( txt, p, ">" ) ) )
-    {
+    if( !( s = ParseSamiSearch( txt, s, ">" ) ) )
         return VLC_EGENERIC;
-    }
 
     i_text = 0;
-    buffer_text[0] = '\0';
+    text[0] = '\0';
     /* now get all txt until  a "Start=" line */
     for( ;; )
     {
-        if( *p )
+        char c = '\0';
+        /* Search non empty line */
+        while( s && *s == '\0' )
+            s = TextGetLine( txt );
+        if( !s )
+            break;
+
+        if( *s == '<' )
         {
-            if( *p == '<' )
+            if( !strncasecmp( s, "<br", 3 ) )
             {
-                if( !strncasecmp( p, "<br", 3 ) )
-                {
-                    ADDC( '\n' );
-                }
-                else if( strcasestr( p, "Start=" ) )
-                {
-                    TextPreviousLine( txt );
-                    break;
-                }
-                p = ParseSamiSearch( txt, p, ">" );
+                c = '\n';
             }
-            else if( !strncmp( p, "&nbsp;", 6 ) )
+            else if( strcasestr( s, "Start=" ) )
             {
-                ADDC( ' ' );
-                p += 6;
+                TextPreviousLine( txt );
+                break;
             }
-            else if( *p == '\t' )
-            {
-                ADDC( ' ' );
-                p++;
-            }
-            else
-            {
-                ADDC( *p );
-                p++;
-            }
+            s = ParseSamiSearch( txt, s, ">" );
+        }
+        else if( !strncmp( s, "&nbsp;", 6 ) )
+        {
+            c = ' ';
+            s += 6;
+        }
+        else if( *s == '\t' )
+        {
+            c = ' ';
+            s++;
         }
         else
         {
-            p = TextGetLine( txt );
+            c = *s;
+            s++;
         }
-
-        if( p == NULL )
+        if( c != '\0' && i_text+1 < sizeof(text) )
         {
-            break;
+            text[i_text++] = c;
+            text[i_text] = '\0';
         }
     }
 
     p_subtitle->i_start = i_start * 1000;
     p_subtitle->i_stop  = 0;
-    p_subtitle->psz_text = strndup( buffer_text, 10*MAX_LINE );
+    p_subtitle->psz_text = strdup( text );
 
-    return( VLC_SUCCESS );
-#undef ADDC
+    return VLC_SUCCESS;
 }
 
+/* ParseDVDSubtitle
+ *  Format
+ *      {T h1:m1:s1:c1
+ *      Line1
+ *      Line2
+ *      ...
+ *      }
+ * TODO it can have a header
+ *      { HEAD
+ *          ...
+ *          CODEPAGE=...
+ *          FORMAT=...
+ *          LANG=English
+ *      }
+ *      LANG support would be cool
+ *      CODEPAGE is probably mandatory FIXME
+ */
 static int ParseDVDSubtitle( demux_t *p_demux, subtitle_t *p_subtitle )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
-
-    /*
-     * {T h1:m1:s1:c1
-     * Line1
-     * Line2
-     * ...
-     * }
-     *
-     */
-    char *s;
-    char buffer_text[ 10 * MAX_LINE];
-    int  i_buffer_text;
-    int64_t     i_start;
-
-    p_subtitle->i_start = 0;
-    p_subtitle->i_stop  = 0;
-    p_subtitle->psz_text = NULL;
+    char *psz_text;
 
     for( ;; )
     {
+        const char *s = TextGetLine( txt );
         int h1, m1, s1, c1;
-        if( ( s = TextGetLine( txt ) ) == NULL )
-        {
-            return( VLC_EGENERIC );
-        }
+
+        if( !s )
+            return VLC_EGENERIC;
+
         if( sscanf( s,
                     "{T %d:%d:%d:%d",
                     &h1, &m1, &s1, &c1 ) == 4 )
         {
-            i_start = ( (int64_t)h1 * 3600*1000 +
-                        (int64_t)m1 * 60*1000 +
-                        (int64_t)s1 * 1000 +
-                        (int64_t)c1 * 10) * 1000;
-
-            /* Now read text until a line containing "}" */
-            for( i_buffer_text = 0;; )
-            {
-                int i_len;
-                if( ( s = TextGetLine( txt ) ) == NULL )
-                {
-                    return( VLC_EGENERIC );
-                }
-
-                i_len = strlen( s );
-                if( i_len == 1 && s[0] == '}' )
-                {
-                    /* "}" -> end of this subtitle */
-                    buffer_text[__MAX( i_buffer_text - 1, 0 )] = '\0';
-                    p_subtitle->i_start = i_start;
-                    p_subtitle->i_stop  = 0;
-                    p_subtitle->psz_text = strdup( buffer_text );
-                    return 0;
-                }
-                else
-                {
-                    if( i_buffer_text + i_len + 1 < 10 * MAX_LINE )
-                    {
-                        memcpy( buffer_text + i_buffer_text,
-                                s,
-                                i_len );
-                        i_buffer_text += i_len;
-
-                        buffer_text[i_buffer_text] = '\n';
-                        i_buffer_text++;
-                    }
-                }
-            }
-        }
-    }
-}
-
-static int ParseMPL2( demux_t *p_demux, subtitle_t *p_subtitle )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    text_t      *txt = &p_sys->txt;
-    /*
-     * each line:
-     *  [n1][n2]Line1|Line2|Line3....
-     * where n1 and n2 are the video frame number...
-     * [n2] can also be []
-     */
-    char *s;
-
-    char buffer_text[MAX_LINE + 1];
-    int    i_start;
-    int    i_stop;
-    unsigned int i;
-
-    p_subtitle->i_start = 0;
-    p_subtitle->i_stop  = 0;
-    p_subtitle->psz_text = NULL;
-
-    for( ;; )
-    {
-        if( ( s = TextGetLine( txt ) ) == NULL )
-        {
-            return( VLC_EGENERIC );
-        }
-        i_start = 0;
-        i_stop  = 0;
-
-        memset( buffer_text, '\0', MAX_LINE );
-        if( sscanf( s, "[%d][]%[^\r\n]", &i_start, buffer_text ) == 2 ||
-            sscanf( s, "[%d][%d]%[^\r\n]", &i_start, &i_stop, buffer_text ) == 3)
-        {
+            p_subtitle->i_start = ( (int64_t)h1 * 3600*1000 +
+                                    (int64_t)m1 * 60*1000 +
+                                    (int64_t)s1 * 1000 +
+                                    (int64_t)c1 * 10) * 1000;
+            p_subtitle->i_stop = 0;
             break;
         }
     }
 
-    /* replace | by \n */
-    for( i = 0; i < strlen( buffer_text ); i++ )
+    /* Now read text until a line containing "}" */
+    psz_text = strdup("");
+    if( !psz_text )
+        return VLC_ENOMEM;
+    for( ;; )
     {
-        if( buffer_text[i] == '|' )
+        const char *s = TextGetLine( txt );
+        int i_len;
+        int i_old;
+
+        if( !s )
         {
-            buffer_text[i] = '\n';
+            free( psz_text );
+            return VLC_EGENERIC;
         }
+
+        i_len = strlen( s );
+        if( i_len == 1 && s[0] == '}')
+        {
+            p_subtitle->psz_text = psz_text;
+            return VLC_SUCCESS;
+        }
+
+        i_old = strlen( psz_text );
+        psz_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        if( !psz_text )
+            return VLC_ENOMEM;
+        strcat( psz_text, s );
+        strcat( psz_text, "\n" );
     }
-    p_subtitle->i_start = (int64_t)i_start * 100000;
-    p_subtitle->i_stop  = (int64_t)i_stop  * 100000;
-    p_subtitle->psz_text = strndup( buffer_text, MAX_LINE );
-    return( 0 );
 }
+
+/* ParseMPL2
+ *  Format
+ *     [n1][n2]Line1|Line2|Line3...
+ *  where n1 and n2 are the video frame number (n2 can be empty)
+ */
+static int ParseMPL2( demux_t *p_demux, subtitle_t *p_subtitle )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    text_t      *txt = &p_sys->txt;
+    char *psz_text;
+    int i;
+
+    for( ;; )
+    {
+        const char *s = TextGetLine( txt );
+        int i_start;
+        int i_stop;
+
+        if( !s )
+            return VLC_EGENERIC;
+
+        psz_text = malloc( strlen(s) + 1 );
+
+        i_start = 0;
+        i_stop  = 0;
+        if( sscanf( s, "[%d][] %[^\r\n]", &i_start, psz_text ) == 2 ||
+            sscanf( s, "[%d][%d] %[^\r\n]", &i_start, &i_stop, psz_text ) == 3)
+        {
+            p_subtitle->i_start = (int64_t)i_start * 100000;
+            p_subtitle->i_stop  = (int64_t)i_stop  * 100000;
+            break;
+        }
+        free( psz_text );
+    }
+
+    /* replace | by \n */
+    for( i = 0; psz_text[i] != '\0'; )
+    {
+        if( psz_text[i] == '|' )
+            psz_text[i] = '\n';
+
+        /* Remove italic */
+        if( psz_text[i] == '/' && ( i == 0 || psz_text[i-1] == '\n' ) )
+            memmove( &psz_text[i], &psz_text[i+1], strlen(&psz_text[i+1])+1 );
+        else
+            i++;
+    }
+    p_subtitle->psz_text = psz_text;
+    return VLC_SUCCESS;
+}
+
