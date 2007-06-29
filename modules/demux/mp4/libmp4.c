@@ -2099,8 +2099,8 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
         msg_Dbg( p_stream,
-                 "read box: \"%4.4s\" text=`%s'",
-                 (char*)&p_box->i_type,
+                 "read box: \"c%3.3s\" text=`%s'",
+                 ((char*)&p_box->i_type + 1),
                  p_box->data.p_0xa9xxx->psz_text );
 #endif
     }
@@ -2134,8 +2134,8 @@ static int MP4_ReadBox_0xa9xxx( stream_t *p_stream, MP4_Box_t *p_box )
                 p_box->data.p_0xa9xxx->psz_text[i_data_len] = '\0';
 #ifdef MP4_VERBOSE
         msg_Dbg( p_stream,
-                 "read box: \"%4.4s\" text=`%s'",
-                 (char*)&p_box->i_type,
+                 "read box: \"c%3.3s\" text=`%s'",
+                 ((char*)&p_box->i_type+1),
                  p_box->data.p_0xa9xxx->psz_text );
 #endif
             }
