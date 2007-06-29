@@ -566,7 +566,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 (*ppp_attachment)[i] = vlc_input_attachment_Duplicate( p_input->p->attachment[i] );
 
             vlc_mutex_unlock( &p_input->p->input.p_item->lock );
-            return VLC_EGENERIC;
+            return VLC_SUCCESS;
         }
 
         case INPUT_GET_ATTACHMENT:  /* arg1=input_attachment_t**, arg2=char*  res=can fail */
