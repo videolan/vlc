@@ -66,8 +66,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1install_1callback( JNIEnv 
 
 void volumeChangedCallback( struct libvlc_instance_t *p_instance, libvlc_event_t *event, void *user_data )
 {
-    JNIEnv *env;
-    jvm->AttachCurrentThread( ( void ** ) &env, NULL );
+    ATTACH_JVM;
 
     env->CallStaticVoidMethod( audioClass, wakeupListenersMethod);
 }
