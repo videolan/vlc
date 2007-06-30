@@ -30,6 +30,7 @@
 #include <vlc_interface.h>
 #include <vlc_meta.h>
 #include <vlc_playlist.h>
+#include <vlc_strings.h>
 
 /*****************************************************************************
  * intf_sys_t: description and status of log interface
