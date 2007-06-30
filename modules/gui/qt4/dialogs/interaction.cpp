@@ -158,6 +158,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
             otherButton->setText( qfu( p_dialog->psz_other_button ) );
             buttonBox->addButton( otherButton, QDialogButtonBox::ActionRole );
         }
+        layout->addWidget( buttonBox );
         if( p_dialog->psz_default_button )
             BUTTONACT( defaultButton, defaultB() );
         if( p_dialog->psz_alternate_button )
