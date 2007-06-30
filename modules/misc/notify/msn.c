@@ -134,6 +134,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char *psz_title = NULL;
     char *psz_artist = NULL;
     char *psz_album = NULL;
+    char *psz_buf = NULL;
     input_thread_t *p_input;
     playlist_t *p_playlist = pl_Yield( p_this );
 
@@ -162,13 +163,17 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( psz_title == NULL ) psz_title = strdup( N_("(no title)") );
     if( psz_artist == NULL ) psz_artist = strdup( N_("(no artist)") );
     if( psz_album == NULL ) psz_album = strdup( N_("(no album)") );
+
+    psz_buf = str_format_meta( p_this, p_intf->p_sys->psz_format );
+
     snprintf( psz_tmp,
               MSN_MAX_LENGTH,
               "\\0Music\\01\\0%s\\0%s\\0%s\\0%s\\0\\0\\0",
-              p_intf->p_sys->psz_format,
+              psz_buf,
               psz_artist,
               psz_title,
               psz_album );
+    free( psz_buf );
     free( psz_title );
     free( psz_artist );
     free( psz_album );
