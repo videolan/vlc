@@ -57,7 +57,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1install_1callback( JNIEnv 
     }
 
     libvlc_event_add_callback( ( libvlc_instance_t* ) instance,
-			       VOLUME_CHANGED,
+			       libvlc_VolumeChanged,
 			       volumeChangedCallback,
 			       NULL,
 			       exception );
