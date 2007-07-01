@@ -657,6 +657,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
     char *dst = malloc( 1000 );
     char *d = dst;
     int b_is_format = 0;
+    int b_empty_if_na = 0;
     char buf[10];
     int i_size = strlen( string );
 
@@ -729,7 +730,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     else
                     {
-                        lang = strdup( "-" );
+                        lang = strdup( b_empty_if_na ? "" : "-" );
                     }
                     INSERT_STRING( 1, lang );
                     free( lang );
@@ -755,7 +756,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     else
                     {
-                        sprintf( buf, "-" );
+                        sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
                     INSERT_STRING( 1, buf );
                     break;
@@ -767,7 +768,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     else
                     {
-                        sprintf( buf, "-" );
+                        sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
                     INSERT_STRING( 1, buf );
                     break;
@@ -781,7 +782,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     else
                     {
-                        sprintf( buf, "--:--:--" );
+                        sprintf( buf, b_empty_if_na ? "" : "--:--:--" );
                     }
                     INSERT_STRING( 1, buf );
                     break;
@@ -796,7 +797,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     else
                     {
-                        sprintf( buf, "-" );
+                        sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
                     INSERT_STRING( 1, buf );
                     break;
@@ -810,7 +811,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     else
                     {
-                        sprintf( buf, "--:--:--" );
+                        sprintf( buf, b_empty_if_na ? "" : "--:--:--" );
                     }
                     INSERT_STRING( 1, buf );
                     break;
@@ -826,7 +827,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     else
                     {
-                        lang = strdup( "-" );
+                        lang = strdup( b_empty_if_na ? "" : "-" );
                     }
                     INSERT_STRING( 1, lang );
                     free( lang );
@@ -840,7 +841,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     else
                     {
-                        sprintf( buf, "--.-%%" );
+                        sprintf( buf, b_empty_if_na ? "" : "--.-%%" );
                     }
                     INSERT_STRING( 1, buf );
                     break;
@@ -852,7 +853,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     else
                     {
-                        sprintf( buf, "-" );
+                        sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
                     INSERT_STRING( 1, buf );
                     break;
@@ -864,7 +865,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     else
                     {
-                        sprintf( buf, "-" );
+                        sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
                     INSERT_STRING( 1, buf );
                     break;
@@ -878,7 +879,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     }
                     else
                     {
-                        sprintf( buf, "--:--:--" );
+                        sprintf( buf, b_empty_if_na ? "" :  "--:--:--" );
                     }
                     INSERT_STRING( 1, buf );
                     break;
@@ -899,16 +900,22 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     d++;
                     break;
 
+                case ' ':
+                    b_empty_if_na = 1;
+                    break;
+
                 default:
                     *d = *s;
                     d++;
                     break;
             }
-            b_is_format = 0;
+            if( *s != ' ' )
+                b_is_format = 0;
         }
         else if( *s == '$' )
         {
             b_is_format = 1;
+            b_empty_if_na = 0;
         }
         else
         {
