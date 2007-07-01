@@ -253,13 +253,18 @@ vlc_module_begin();
     add_shortcut( "dvb" );      /* Generic name */
 
     add_shortcut( "dvb-s" );    /* Satellite */
+    add_shortcut( "dvbs" );
     add_shortcut( "qpsk" );
     add_shortcut( "satellite" );
 
     add_shortcut( "dvb-c" );    /* Cable */
+    add_shortcut( "dvbc" );
+    add_shortcut( "qam" );
     add_shortcut( "cable" );
 
-    add_shortcut( "dvb-t" );    /* Terrestrial */
+    add_shortcut( "dvbt" );    /* Terrestrial */
+    add_shortcut( "dvb-t" );
+    add_shortcut( "ofdm" );
     add_shortcut( "terrestrial" );
 
     add_shortcut( "atsc" );     /* Atsc */
@@ -336,17 +341,22 @@ static int Open( vlc_object_t *p_this )
 
     if( strncmp( p_access->psz_access, "qpsk", 4 ) == 0 ||
         strncmp( p_access->psz_access, "dvb-s", 5 ) == 0 ||
+        strncmp( p_access->psz_access, "dvbs", 4 ) == 0 ||
         strncmp( p_access->psz_access, "satellite", 9 ) == 0 )
     {
         i_ret = dvb_SubmitDVBSTuneRequest( p_access );
     }
     if( strncmp( p_access->psz_access, "cable", 5 ) == 0 ||
-        strncmp( p_access->psz_access, "dvb-c", 5 ) == 0 )
+        strncmp( p_access->psz_access, "dvb-c", 5 ) == 0  ||
+        strncmp( p_access->psz_access, "dvbc", 4 ) == 0  ||
+        strncmp( p_access->psz_access, "qam", 3 ) == 0 )
     {
         i_ret = dvb_SubmitDVBCTuneRequest( p_access );
     }
     if( strncmp( p_access->psz_access, "terrestrial", 11 ) == 0 ||
-        strncmp( p_access->psz_access, "dvb-t", 5 ) == 0 )
+        strncmp( p_access->psz_access, "dvb-t", 5 ) == 0 ||
+        strncmp( p_access->psz_access, "ofdm", 4 ) == 0 ||
+        strncmp( p_access->psz_access, "dvbt", 4 ) == 0 )
     {
         i_ret = dvb_SubmitDVBTTuneRequest( p_access );
     }

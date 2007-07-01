@@ -1270,6 +1270,7 @@ HRESULT BDAGraph::Start()
         return hr;
 
     /* The Graph is not running so stop it and return an error */
+    msg_Warn( p_access, "Start: Graph not started: %d", i_state );
     hr = p_media_control->Stop();
     if( FAILED( hr ) )
     {
