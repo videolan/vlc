@@ -326,7 +326,7 @@ DBUS_METHOD( Disconnect )
     DBusError error;
     int i;
     dbus_error_init( &error );
-    i = dbus_bus_release_name( p_conn, "org.freedesktop.MediaPlayer", &error );
+    i = dbus_bus_release_name( p_conn, "org.mpris.vlc", &error );
     if( ( i == -1 ) && ( dbus_error_is_set( &error ) ) )
     {
         msg_Err( (vlc_object_t*) p_this, "D-Bus disconnection failed : %s\n",
@@ -737,10 +737,10 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* register a well-known name on the bus */
-    dbus_bus_request_name( p_conn, "org.freedesktop.MediaPlayer", 0, &error );
+    dbus_bus_request_name( p_conn, "org.mpris.vlc", 0, &error );
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( p_this, "Error requesting org.freedesktop.MediaPlayer service:"                " %s\n", error.message );
+        msg_Err( p_this, "Error requesting org.mpris.vlc service:"                " %s\n", error.message );
         dbus_error_free( &error );
         free( p_sys );
         return VLC_EGENERIC;

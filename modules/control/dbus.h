@@ -25,7 +25,7 @@
 /* DBUS IDENTIFIERS */
 
 /* name registered on the session bus */
-#define VLC_DBUS_SERVICE        "org.freedesktop.MediaPlayer"
+#define VLC_DBUS_SERVICE        "org.mpris.vlc"
 #define VLC_DBUS_INTERFACE      "org.freedesktop.MediaPlayer"
 #define VLC_DBUS_ROOT_PATH      "/"
 #define VLC_DBUS_PLAYER_PATH    "/Player"
