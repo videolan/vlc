@@ -460,6 +460,7 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
     {
         block_t *p_next;
         int i_packets = 0;
+        mtime_t now = mdate();
 
         if( !p_sys->b_mtu_warning && p_buffer->i_buffer > p_sys->i_mtu )
         {
@@ -472,10 +473,10 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
         if( p_sys->p_buffer &&
             p_sys->p_buffer->i_buffer + p_buffer->i_buffer > p_sys->i_mtu )
         {
-            if( p_sys->p_buffer->i_dts + p_sys->p_thread->i_caching < mdate() )
+            if( p_sys->p_buffer->i_dts + p_sys->p_thread->i_caching < now )
             {
                 msg_Dbg( p_access, "late packet for UDP input (" I64Fd ")",
-                         mdate() - p_sys->p_buffer->i_dts
+                         now - p_sys->p_buffer->i_dts
                           - p_sys->p_thread->i_caching );
             }
             block_FifoPut( p_sys->p_thread->p_fifo, p_sys->p_buffer );
@@ -515,8 +516,7 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
             if( p_sys->p_buffer->i_buffer == p_sys->i_mtu || i_packets > 1 )
             {
                 /* Flush */
-                if( p_sys->p_buffer->i_dts + p_sys->p_thread->i_caching
-                      < mdate() )
+                if( p_sys->p_buffer->i_dts + p_sys->p_thread->i_caching < now )
                 {
                     msg_Dbg( p_access, "late packet for udp input (" I64Fd ")",
                              mdate() - p_sys->p_buffer->i_dts
