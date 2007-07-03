@@ -1,21 +1,17 @@
 %set_verify_elf_method textrel=relaxed
 
-%define trunk 1
-%define revision 16525
-
-%ifndef trunk
-%undefine test
-%endif
+%define svnrevision 20348
 
 %def_disable debug
 
 %def_disable ggi
 %def_disable svg
-%def_disable quicktime
 %def_disable upnp
+%def_disable gnomevfs
 %def_enable smb
 %def_enable dirac
-
+%def_disable dca
+%def_disable libid3tag
 %def_disable java_bindings
 %def_disable mediacontrol_python_bindings
 
@@ -24,51 +20,24 @@
 %endif
 
 Name: vlc
-Version: 0.8.6
+Version: 0.9.0
 
-%ifndef trunk
-%ifndef test
-Release: alt1
-%else
-Release: alt0.test%test
-%endif
-%else
-Release: alt0.%revision
-%endif
+Release: alt0.svn%svnrevision
 
-Summary: VideoLAN is a free multimedia software solution
+Summary: VLC Media Player
 License: GPL
 
 Group: Video
 Url: http://www.videolan.org
 Packager: Pavlov Konstantin <thresh@altlinux.ru>
 
-%ifndef trunk
-%ifndef test
-Source: %url/pub/%name/%version/%name-%version.tar.bz2
-%else
-Source: %name-%version-test%test.tar
-%endif
-%else
-Source: vlc-trunk-%version-%revision.tar.bz2
-%endif
-
-Source1: vlc.desktop
-
-Patch3: vlc-0.8.5-modules-wxwidgets-wxnoupdates.patch
-Patch4: vlc-0.8.5-modules-osdmenu.patch
-Patch8: vlc-0.8.5-modules-freetype-font.patch
-
-Patch9: vlc-0.8.5-configure-plugins-accel.patch
-Patch11: vlc-0.8.6-configure-pic-matroska.patch
-Patch12: vlc-0.8.6-configure-pic-dts.patch
-Patch14: vlc-trunk-0.8.6-configure-plugins-livemedia.patch
+Source: vlc-%version.tar.bz2
 
 Obsoletes: %name-mad
 Provides: %name-interface = %version-%release
 
 %define libdvdcss_ver 1.2.8
-%define ffmpeg_ver 0.5.0-alt1.svn5935
+%define ffmpeg_ver 0.5.0-alt1.svn6729
 %define mpeg2dec_ver 0.4.0
 %define libvcd_ver 0.7.23
 %define faad_ver 2.0-alt2.20040923
@@ -77,19 +46,17 @@ Provides: %name-interface = %version-%release
 %define matroska_ver 0.8.0
 %define cddb_ver 1.2.1-alt1
 %define seamonkey_ver 1.0.4-alt4
-%define dirac_ver 0.5.4-alt1
+%define dirac_ver 0.7.0-alt1
 
-#Requires: libffmpeg >= %ffmpeg_ver
-#Requires: libdvdcss >= %libdvdcss_ver
-#Requires: libmpeg2 >= %mpeg2dec_ver
 Requires: lib%name = %version-%release
 
 BuildPreReq: cvs
-BuildPreReq: linux-libc-headers
+BuildPreReq: glibc-kernheaders
 BuildPreReq: libdvdcss-devel >= %libdvdcss_ver
 BuildPreReq: libavcodec-devel >= %ffmpeg_ver
 BuildPreReq: libpostproc-devel >= %ffmpeg_ver
 BuildPreReq: libavformat-devel >= %ffmpeg_ver
+BuildPreReq: libswscale-devel >= %ffmpeg_ver
 BuildPreReq: libmpeg2-devel >= %mpeg2dec_ver
 BuildPreReq: libfaad-devel >= %faad_ver
 BuildPreReq: libfaac-devel >= %faac_ver
@@ -101,12 +68,10 @@ BuildPreReq: libcddb-devel >= %cddb_ver
 BuildPreReq: python-devel >= 2.4
 %endif
 BuildPreReq: rpm-build-python
-BuildPreReq: liblive-devel >= 0.0.0-alt0.2006.05.17
+BuildPreReq: liblive-devel >= 0.0.0-alt0.2006.10.18a
 
-# Automatically added by buildreq on Tue Dec 13 2005
 BuildRequires: ORBit2-devel aalib-devel esound-devel freetype2-devel gcc-c++
-BuildRequires: glib2-devel gnome-mime-data gnome-vfs2 gnome-vfs2-devel 
-BuildRequires: libGConf2-devel libSDL-devel libtwolame-devel
+BuildRequires: glib2-devel libSDL-devel libtwolame-devel
 BuildRequires: libSDL_image-devel liba52-devel libalsa-devel libarts-devel
 BuildRequires: libaudiofile-devel libbonobo2-devel libcaca-devel
 BuildRequires: libcdio-devel libdvbpsi-devel libdvdnav-devel
@@ -114,19 +79,33 @@ BuildRequires: libdvdread-devel libflac-devel libgcrypt-devel
 %{?_enable_ggi:BuildRequires: libggi-devel libgii-devel}
 %{?_enable_svg:BuildRequires: librsvg2-devel}
 BuildRequires: libgnutls-devel libgpg-error-devel libgtk+2-devel
-BuildRequires: libid3tag-devel libjpeg-devel liblirc-devel
+BuildRequires: libjpeg-devel liblirc-devel
 BuildRequires: libmad-devel libmodplug-devel libslang-devel libspeex-devel
-BuildRequires: libmpcdec-devel libmpeg2-devel libncurses-devel libogg-devel
+BuildRequires: libmpcdec-devel libncurses-devel libogg-devel
 BuildRequires: libpango-devel libpng-devel libshout2-devel
 BuildRequires: libstdc++-devel libsysfs-devel libtheora-devel libtiff-devel
 BuildRequires: libtinfo-devel libvcd-devel libvorbis-devel libxml2-devel
-BuildRequires: libxosd-devel pkg-config wxGTK2u-devel
+BuildRequires: libxosd-devel wxGTK2u-devel
 BuildRequires: libnspr-devel libnss-devel libgoom-devel
 BuildRequires: libhal-devel libx264-devel subversion vim-devel 
 BuildRequires: jackit-devel liblame-devel xvid-devel zlib-devel
-BuildRequires: libdts-devel libavahi-devel libopendaap-devel
-BuildRequires: libqt4-devel libnotify-devel libdbus-glib-devel
+BuildRequires: libavahi-devel
+BuildRequires: libnotify-devel libdbus-glib-devel
 BuildRequires: fortune-mod >= 1.0-ipl33mdk
+BuildRequires: libraw1394-devel libdc1394-devel libavc1394-devel
+BuildRequires: browser-plugins-npapi-devel
+
+%if_enabled libid3tag
+BuildRequires: libid3tag-devel
+%endif
+
+%if_enabled dca
+BuildRequires: libdca-devel
+%endif
+
+%if_enabled gnomevfs
+BuildRequires: gnome-vfs2-devel gnome-vfs2 gnome-mime-data libGConf2-devel
+%endif
 
 %if_enabled java_bindings
 BuildRequires: j2se1.5-sun-devel
@@ -144,18 +123,19 @@ BuildRequires: libsmbclient-devel
 BuildPreReq: libdirac-devel = %dirac_ver
 %endif
 
-#xorg7 section
-BuildRequires: libX11-devel libXv-devel libmesa-devel libXext-devel
+BuildRequires: libX11-devel libXv-devel libmesa-devel libXext-devel 
+BuildRequires: libXt-devel
+
+BuildRequires: libqt4-devel liblua5-devel
 
 %description
-VideoLAN is a free network-aware MPEG1, MPEG2, MPEG4 (aka DivX)
-and DVD player.
+VLC Media Player is a free network-aware MPEG1, MPEG2, MPEG4 (aka DivX),
+DVD and many-many-more-player-and-streamer.
 
-The VideoLAN Client allows to play MPEG2 Transport Streams from the
+The VLC Media Player allows to play MPEG2 Transport Streams from the
 network or from a file, as well as direct DVD playback.
-VideoLAN is a project of students from the Ecole Centrale Paris.
 
-This version add MPEG1 support, direct DVD support, DVD decryption,
+This version includes MPEG1 support, direct DVD support, DVD decryption,
 arbitrary, seeking in the stream, pause, fast forward and slow motion,
 hardware YUV acceleration and a few new interface features including
 drag'n'drop... and more more more. :)
@@ -164,801 +144,661 @@ If you want a GUI interface for VLC, install one of interface packages,
 the best one is wxwidgets interface.
 
 %package interface-http
-Summary: HTTP interface plugin for the VideoLAN client
+Summary: HTTP interface plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 Provides: %name-interface = %version-%release
 Provides: %name-plugin-http = %version-%release
 
 %description interface-http
-VideoLAN is a free multimedia software solution.
 
-This package is an http interface for VLC, the VideoLAN Client.
+This package is an http interface for VLC Media Player.
 
 %package interface-lirc
-Summary: Lirc inteface plugin for the VideoLAN client
+Summary: Lirc inteface plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 Provides: %name-interface = %version-%release
 Provides: vlc-plugin-lirc = %version-%release
 Obsoletes: vlc-plugin-lirc
 
 %description interface-lirc
-VideoLAN is a free multimedia software solution.
 
-This package is an infrared lirc interface for VLC, the
-VideoLAN Client. To activate it, use the `--intf lirc' flag.
+This package is an infrared lirc interface for
+VLC Media Player. To activate it, use the `--intf lirc' flag.
 
 %package interface-ncurses
-Summary: ncurses plugin for the VideoLAN client
+Summary: ncurses plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 Provides: %name-plugin-ncurses = %version-%release
 Provides: %name-interface = %version-%release
 
 %description interface-ncurses
-VideoLAN is a free multimedia software solution.
-
-This package is an ncurses interface for VLC, the VideoLAN Client.
-
-%package interface-qt4
-Summary: QT4 interface plugin for the VideoLAN client
-Group: Video
-Requires: %name = %version-%release
-Provides: %name-plugin-qt4 = %version-%release
-Provides: %name-interface = %version-%release
-
-%description interface-qt4
-VideoLAN is a free multimedia software solution.
-
-This package is an QT4 interface for VLC, the VideoLAN Client.
+This package is an ncurses interface for VLC Media Player.
 
 %package interface-skins2
-Summary: Skins2 plugin for the VideoLAN client
+Summary: Skins2 plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 Provides: %name-interface = %version-%release
 Requires: %name-interface-wxwidgets = %version-%release
 
 %description interface-skins2
-VideoLAN is a free multimedia software solution.
-
-This package is an skins2 interface for VLC, the VideoLAN Client.
+This package is an skins2 interface for VLC Media Player.
 
 %package interface-telnet
-Summary: Telnet interface plugin for the VideoLAN client
+Summary: Telnet interface plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 Provides: %name-interface = %version-%release
 
 %description interface-telnet
-VideoLAN is a free multimedia software solution.
-
-This package is a telnet interface for VLC, the VideoLAN Client.
+This package is a telnet interface for VLC Media Player.
 
 %package interface-wxwidgets
-Summary: WXWidgets plugin for the VideoLAN client
+Summary: WXWidgets plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 Provides: %name-interface = %version-%release
 Provides: %name-plugin-wxwidgets = %version-%release
 
 %description interface-wxwidgets
-VideoLAN is a free multimedia software solution.
+This package is an wxwidgets interface for VLC Media Player.
 
-This package is an wxwidgets interface for VLC, the VideoLAN Client.
+%package interface-qt4
+Summary: QT4 interface plugin for VLC Media Player
+Group: Video
+Requires: lib%name = %version-%release
+Provides: %name-interface = %version-%release
+Provides: %name-plugin-qt4 = %version-%release
+
+%description interface-qt4
+This package is an qt4 interface for VLC Media Player.
 
 %package plugin-a52
-Summary: a52 input/decoder plugin for the VideoLAN client
+Summary: a52 input/decoder plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-a52
-VideoLAN is a free multimedia software solution.
-
-This package contains A52 decoder plugin for VLC.
+This package contains A52 decoder plugin for VLC Media Player.
 
 %package plugin-aa
-Summary: ASCII art video output plugin for the VideoLAN client
+Summary: ASCII art video output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-aa
-VideoLAN is a free multimedia software solution.
-
-This is an ASCII art video output plugin for VLC, the VideoLAN
-Client. To activate it, use the `--vout aa' flag or select the `aa'
+This is an ASCII art video output plugin for VLC Media Player.
+To activate it, use the `--vout aa' flag or select the `aa'
 vout plugin from the preferences menu.
 
 %package plugin-alsa
-Summary: ALSA audio output plugin for the VideoLAN client
+Summary: ALSA audio output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-alsa
-VideoLAN is a free multimedia software solution.
-
-This package adds support for the Advanced Linux Sound Architecture to
-vlc, the VideoLAN Client. To activate it, use the `--aout alsa' flag or
+This package adds support for Advanced Linux Sound Architecture to
+VLC Media Player. To activate it, use the `--aout alsa' flag or
 select the `alsa' aout plugin from the preferences menu.
 
 %package plugin-arts
-Summary: aRts audio output plugin for the VideoLAN client
+Summary: aRts audio output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-arts
-VideoLAN is a free multimedia software solution.
-
-This package adds support for the aRts Sound System to vlc, the
-VideoLAN Client. To activate it, use the `--aout arts' flag or
+This package adds support for aRts Sound System to VLC Media Player.
+To activate it, use the `--aout arts' flag or
 select the `arts' aout plugin from the preferences menu.
 
 %package plugin-audiocd
-Summary: AudioCD access plugin for the VideoLAN client
+Summary: AudioCD access plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-audiocd
-VideoLAN is a free multimedia software solution.
-
-This package contains AudioCD access plugin for VLC.
+This package contains AudioCD access plugin for VLC Media Player.
 
 %package plugin-caca
-Summary: Colored ASCII art video output plugin for the VideoLAN client
+Summary: Colored ASCII art video output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-caca
-VideoLAN is a free multimedia software solution.
-
-This is an colored ASCII art video output plugin for VLC, the VideoLAN
-Client. To activate it, use the `--vout caca' flag or select the `caca'
+This is an colored ASCII art video output plugin for VLC Media Player.
+To activate it, use the `--vout caca' flag or select the `caca'
 vout plugin from the preferences menu.
 
 %package plugin-bonjour
-Summary: Bonjour (avahi) services discovery plugin for the VideoLAN client
+Summary: Bonjour (avahi) services discovery plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-bonjour
-VideoLAN is a free multimedia software solution.
-
-This package contains Bonjour (avahi) service discovery plugin for VLC.
+This package contains Bonjour (avahi) service discovery plugin for VLC Media Player.
 
 %package plugin-cmml
-Summary: CMML input/codec plugin for the VideoLAN client
+Summary: CMML input/codec plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-cmml
-VideoLAN is a free multimedia software solution.
+This package contains CMML codec plugin for VLC Media Player.
 
-This package contains CMML codec plugin for VLC.
-
-%package plugin-daap
-Summary: OpenDAAP SDP plugin for the VideoLAN client
+%package plugin-dv
+Summary: DC1394/DV (firewire) plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
-%description plugin-daap
-VideoLAN is a free multimedia software solution.
-
-This package contains OpenDAAP services discovery plugin for VLC.
+%description plugin-dv
+This package contains DC1394/DV (firewire) access plugin for VLC Media Player.
 
 %if_enabled dirac
 %package plugin-dirac
-Summary: Dirac codec plugin for the VideoLAN client
+Summary: Dirac codec plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-dirac
-VideoLAN is a free multimedia software solution.
-
-This package contains DIRAC codec plugin for VLC.
+This package contains DIRAC codec plugin for VLC Media Player.
 %endif
 
-%package plugin-dts
-Summary: DTS demuxer plugin for the VideoLAN client
+%if_enabled dca
+%package plugin-dca
+Summary: DTS demuxer plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
+Provides: vlc-plugin-dts = %version-%release
+Obsoletes: vlc-plugin-dts < %version-%release
 
-%description plugin-dts
-VideoLAN is a free multimedia software solution.
-
-This package contains DTS demuxer plugin for VLC.
+%description plugin-dca
+This package contains DTS demuxer plugin for VLC Media Player.
+%endif
 
 %package plugin-dvb
-Summary: DVB plugin for the VideoLAN client
+Summary: DVB plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 Requires: %name-plugin-ts = %version-%release
 
 %description plugin-dvb
-VideoLAN is a free multimedia software solution.
-
-This package adds capability of demultiplexing a satellite
-DVB stream to VLC.
+This package adds capability of demultiplexing a satellite DVB stream to VLC Media Player.
 
 %package plugin-dvdnav
-Summary: DVDNAV input plugin for the VideoLAN client
+Summary: DVDNav input plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-dvdnav
-VideoLAN is a free multimedia software solution.
-
-This package adds capability of DVDnav (DVD with menu ) input to vlc,
-the VideoLAN Client.
+This package adds capability of DVDNav (DVD w/ menu) input to VLC Media Player.
 
 %package plugin-dvdread
-Summary: DVDRead input (DVD without a menu) plugin for the VideoLAN client
+Summary: DVDRead input (DVD without a menu) plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-dvdread
-VideoLAN is a free multimedia software solution.
-
-This package adds capability of DVDread (DVD without a menu) input to vlc, 
-the VideoLAN Client.
+This package adds support of DVDRead (DVD w/o menu) input to VLC Media Player.
 
 %package plugin-esd
-Summary: ESD audio plugin for the VideoLAN client
+Summary: ESD audio plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-esd
-VideoLAN is a free multimedia software solution.
-
-This package adds support for the Enlightened Sound Daemon to vlc, the
-VideoLAN Client. To activate it, use the `--aout esd' flag or select
-the `esd' aout plugin from the preferences menu.
+This package adds support for Enlightened Sound Daemon to VLC Media Player. 
+To activate it, use the `--aout esd' flag or select the `esd' aout plugin
+from the preferences menu.
 
 %package plugin-faad
-Summary: FAAD input plugin for the VideoLAN client
+Summary: FAAD input plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-faad
-VideoLAN is a free multimedia software solution.
-
-This package adds support for FAAD codec in VLC.
+This package adds support for FAAD codec in VLC Media Player.
 
 %package plugin-ffmpeg
-Summary: FFMPeg plugin for the VideoLAN client
+Summary: FFMPeg plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
+Requires: libavcodec >= 0.5.0-alt1.svn8045
 
 %description plugin-ffmpeg
-VideoLAN is a free multimedia software solution.
-
-This package adds support for ffmpeg codecs/encoders/demuxers in VLC.
+This package adds support for ffmpeg decoders, encoders and demuxers
+in VLC Media Player.
 
 %package plugin-framebuffer
-Summary: Framebuffer output plugin for the VideoLAN client
+Summary: Framebuffer output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-framebuffer
-VideoLAN is a free multimedia software solution.
-
-This package adds support for framebuffer video output in VLC.
+This package adds support for framebuffer video output in VLC Media Player.
 
 %package plugin-flac
-Summary: FLAC codec plugin for the VideoLAN client
+Summary: FLAC codec plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-flac
-VideoLAN is a free multimedia software solution.
-
-This package contains FLAC codec plugin for VLC.
+This package contains FLAC codec plugin for VLC Media Player.
 
 %package plugin-freetype
-Summary: FreeType OSD plugin for the VideoLAN client
+Summary: FreeType OSD plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 Requires: fonts-ttf-dejavu
 
 %description plugin-freetype
-VideoLAN is a free multimedia software solution.
-
-This package contains freetype subtitles/osd text output plugin to VLC.
+This package contains freetype subtitles and OSD text output plugin 
+to VLC Media Player.
 
 %package plugin-galaktos
-Summary: Galaktos visualization plugin for the VideoLAN client
+Summary: Galaktos visualization plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-galaktos
-VideoLAN is a free multimedia software solution.
-
-This package contains Galaktos visualization plugin for VLC.
+This package contains Galaktos visualization plugin for VLC Media Player.
 
 %if_enabled ggi
 %package plugin-ggi
-Summary: GGI video output plugin for the VideoLAN client
+Summary: GGI video output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-ggi
-VideoLAN is a free multimedia software solution.
-
-This is a GGI plugin for VLC, the VideoLAN Client.  To activate it, use
-the `--vout ggi' flag or select the `ggi' vout plugin from the preferences
-menu.
+This is a GGI plugin for VLC Media Player.  To activate it, use the 
+`--vout ggi' flag or select the `ggi' vout plugin from the preferences menu.
 %endif
 
 %package plugin-glx
-Summary: GLX video output plugin for the VideoLAN client
+Summary: GLX video output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-glx
-VideoLAN is a free multimedia software solution.
-
-This is an GLX video output plugin for VLC, the VideoLAN
-Client. To activate it, use the `--vout glx' flag or select the `glx'
+This is an GLX video output plugin for VLC Media Player.
+To activate it, use the `--vout glx' flag or select the `glx'
 vout plugin from the preferences menu.
 
+%if_enabled gnomevfs
 %package plugin-gnomevfs
-Summary: Gnome VFS 2 access plugin for the VideoLAN client
+Summary: Gnome VFS 2 access plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-gnomevfs
-VideoLAN is a free multimedia software solution.
-
-This package contains Gnome VFS 2 access plugin for VLC.
+This package contains Gnome VFS 2 access plugin for VLC Media Player.
+%endif
 
 %package plugin-gnutls
-Summary: GNU TLS plugin for the VideoLAN client
+Summary: GNU TLS plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-gnutls
-VideoLAN is a free multimedia software solution.
-
-This package contains GNU TLS plugin for VLC.
+This package contains GNU TLS plugin for VLC Media Player.
 
 %package plugin-goom
-Summary: GOOM plugin for the VideoLAN client
+Summary: GOOM plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-goom
-VideoLAN is a free multimedia software solution.
-
-This package contains GOOM visualization plugin for VLC.
+This package contains GOOM visualization plugin for VLC Media Player.
 
 %package plugin-h264
-Summary: h264 output plugin for the VideoLAN client
+Summary: h264 output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-h264
-VideoLAN is a free multimedia software solution.
-
-This package contains h264 codec/demuxer/packetizer plugin for VLC.
+This package contains h264 coder/packetizer plugin for VLC Media Player.
 
 %package plugin-hal
-Summary: HAL services discovery plugin for the VideoLAN client
+Summary: HAL services discovery plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-hal
-VideoLAN is a free multimedia software solution.
-
-This package contains HAL service discovery plugin for VLC.
+This package contains HAL service discovery plugin for VLC Media Player.
 
 %package plugin-jack
-Summary: Jack audio output plugin for the VideoLAN client
+Summary: Jack audio output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-jack
-VideoLAN is a free multimedia software solution.
-
-This package contains Jack audio output plugin for VLC.
+This package contains Jack audio output plugin for VLC Media Player.
 
 %package plugin-image
-Summary: Image video output plugin for the VideoLAN client
+Summary: Image video output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-image
-VideoLAN is a free multimedia software solution.
-
-This is a image video output plugin for VLC, the VideoLAN
-Client. To activate it, use the `--vout image' flag or select the `image'
+This is a image video output plugin for VLC Media Player.
+To activate it, use the `--vout image' flag or select the `image'
 vout plugin from the preferences menu.
 
 %package plugin-live555
-Summary: LiveMedia (RTSP) demuxing support for the VideoLAN client
+Summary: LiveMedia (RTSP) demuxing support for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-live555
-VideoLAN is a free multimedia software solution.
-
-This package contains LiveMedia (RTSP) demuxer support for VLC.
+This package contains LiveMedia (RTSP) demuxer support for VLC Media Player.
 
 %ifnarch x86_64
 %package plugin-loader
-Summary: DLL Loader plugin for the VideoLAN client
+Summary: DLL Loader plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 Provides: %name-plugin-realaudio = %version-%release
 Obsoletes: %name-plugin-realaudio
 
 %description plugin-loader
-VideoLAN is a free multimedia software solution.
-
-This package contains windows DLL loader plugin to vlc as well
-as support for quicktime and realaudio via those DLL.
+This package contains windows DLL loader plugin to VLC Media Player as well
+as support for realaudio via those DLL.
 %endif
 
 %package plugin-mad
-Summary: MAD (MP3/ID3) demuxer plugin for the VideoLAN client
+Summary: MAD (MP3/ID3) demuxer plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-mad
-VideoLAN is a free multimedia software solution.
-
-This package contains MAD (MP3 demux/ID3 tag) plugin for VLC.
+This package contains MAD (MP3 demux/ID3 tag) plugin for VLC Media Player.
 
 %package plugin-matroska
-Summary: Matroska Video demuxer plugin for the VideoLAN client
+Summary: Matroska Video demuxer plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-matroska
-VideoLAN is a free multimedia software solution.
-
-This package contains Matroska Video demuxing plugin for VLC.
+This package contains Matroska Video demuxing plugin for VLC Media Player.
 
 %package plugin-mga
-Summary: MGA Matrox video output plugin for the VideoLAN client
+Summary: MGA Matrox video output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-mga
-VideoLAN is a free multimedia software solution.
-
-This package contains MGA Matrox output plugin for VLC.
+This package contains MGA Matrox output plugin for VLC Media Player.
 
 %package plugin-modplug
-Summary: modplug demuxer plugin for the VideoLAN client
+Summary: modplug demuxer plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-modplug
-VideoLAN is a free multimedia software solution.
-
-This package contains modplug demuxing plugin for VLC.
+This package contains modplug demuxing plugin for VLC Media Player.
 
 %package plugin-mpeg2
-Summary: MPEG1/2 codec plugin for the VideoLAN client
+Summary: MPEG1/2 codec plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-mpeg2
-VideoLAN is a free multimedia software solution.
-
-This package contains MPEG1/2 decoder plugin for VLC.
+This package contains MPEG1/2 decoder plugin for VLC Media Player.
 
 %package plugin-musepack
-Summary: Musepack demuxer plugin for the VideoLAN client
+Summary: Musepack demuxer plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-musepack
-VideoLAN is a free multimedia software solution.
-
-This package contains musepack demuxer plugin for VLC.
+This package contains musepack demuxer plugin for VLC Media Player.
 
 %package plugin-notify
-Summary: Notify SDP plugin for the VideoLAN client
+Summary: Notify SDP plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-notify
-VideoLAN is a free multimedia software solution.
-
-This package contains notify plugin for VLC.
+This package contains notify plugin for VLC Media Player.
 
 %package plugin-ogg
-Summary: OGG codec plugin for the VideoLAN client
+Summary: OGG codec plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-ogg
-VideoLAN is a free multimedia software solution.
-
-This package contains OGG codec and Vorbis muxer/demuxer plugin for VLC.
+This package contains OGG codec and Vorbis muxer/demuxer
+plugin for VLC Media Player.
 
 %package plugin-opengl
-Summary: OpenGL video output plugin for the VideoLAN client
+Summary: OpenGL video output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-opengl
-VideoLAN is a free multimedia software solution.
-
-This is an OpenGL video output plugin for VLC, the VideoLAN
-Client. To activate it, use the `--vout opengl' flag or select the `opengl'
+This is an OpenGL video output plugin for VLC Media Player.
+To activate it, use the `--vout opengl' flag or select the `opengl'
 vout plugin from the preferences menu.
 
 %package plugin-osd
-Summary: OSD plugin for the VideoLAN client
+Summary: OSD plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-osd
-VideoLAN is a free multimedia software solution.
-
-This package adds support for OSD visualization for VLC.
+This package adds support for OSD visualization for VLC Media Player.
 
 %package plugin-oss
-Summary: OSS audio output plugin for the VideoLAN client
+Summary: OSS audio output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-oss
-VideoLAN is a free multimedia software solution.
-
-This package adds support for the OSS to vlc, the VideoLAN Client.
+This package adds support for OSS to VLC Media Player.
 To activate it, use the `--aout oss' flag or select the `oss'
 aout plugin from the preferences menu.
 
 %package plugin-png
-Summary: PNG plugin for the VideoLAN client
+Summary: PNG plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-png
-VideoLAN is a free multimedia software solution.
-
-This package contains PNG codec plugin for VLC.
+This package contains PNG codec plugin for VLC Media Player.
 
 %package plugin-podcast
-Summary: Podcast SDP plugin for the VideoLAN client
+Summary: Podcast SDP plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-podcast
-VideoLAN is a free multimedia software solution.
-
-This package contains podcast discovery plugin for VLC.
+This package contains podcast discovery plugin for VLC Media Player.
 
 %package plugin-realrtsp
-Summary: REAL RTSP access plugin for VideoLAN client
+Summary: REAL RTSP access plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-realrtsp
-VideoLAN is a free multimedia software solution.
-
-This package contains REAL RTSP access plugin for VLC.
+This package contains REAL RTSP access plugin for VLC Media Player.
 
 %package plugin-screen
-Summary: Screen capture plugin for the VideoLAN client
+Summary: Screen capture plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-screen
-VideoLAN is a free multimedia software solution.
-
-This package contains screen capture plugin for VLC.
+This package contains screen capture plugin for VLC Media Player.
 
 %package plugin-sdl
-Summary: Simple DirectMedia Layer video output plugin for the VideoLAN client
+Summary: Simple DirectMedia Layer video output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-sdl
-VideoLAN is a free multimedia software solution.
-
-This package adds support for the Simple DirectMedia Layer library to
-vlc, the VideoLAN Client. To activate it, use the `--vout sdl' or
+This package adds support for Simple DirectMedia Layer library to 
+VLC Media Player. To activate it, use the `--vout sdl' or
 `--aout sdl' flags or select the `sdl' vout or aout plugin from the
 preferences menu.
 
 %package plugin-sdlimage
-Summary: SDL Image codec plugin for the VideoLAN client
+Summary: SDL Image codec plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-sdlimage
-VideoLAN is a free multimedia software solution.
-
-This package contains SDL Image codec plugin for VLC.
+This package contains SDL Image codec plugin for VLC Media Player.
 
 %package plugin-shout
-Summary: SHOUT access output plugin for the VideoLAN client
+Summary: SHOUT access output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-shout
-VideoLAN is a free multimedia software solution.
-
-This package adds support for the SHOUT output access/services 
-discovery to vlc, the VideoLAN Client.
+This package adds support for SHOUT output access/services 
+discovery to VLC Media Player.
 
 %if_enabled smb
 %package plugin-smb
-Summary: SMB access plugin for the VideoLAN client
+Summary: SMB access plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-smb
-VideoLAN is a free multimedia software solution.
-
-This package contains SMB access plugin to VLC.
+This package contains SMB access plugin to VLC Media Player.
 %endif
 
 %package plugin-snapshot
-Summary: Snapshot video output plugin for the VideoLAN client
+Summary: Snapshot video output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-snapshot
-VideoLAN is a free multimedia software solution.
-
-This package contains snapshot video output plugin to VLC.
+This package contains snapshot video output plugin to VLC Media Player.
 
 %package plugin-speex
-Summary: speex codec support plugin for the VideoLAN client
+Summary: speex codec support plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-speex
-VideoLAN is a free multimedia software solution.
-
-This package contains SPEEX plugin for VLC.
+This package contains SPEEX plugin for VLC Media Player.
 
 %if_enabled svg
 %package plugin-svg
-Summary: SVG plugin plugin for the VideoLAN client
+Summary: SVG plugin plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-svg
-VideoLAN is a free multimedia software solution.
-
-This package contains SVG plugin for VLC.
+This package contains SVG plugin for VLC Media Player.
 %endif
 
 %package plugin-theora
-Summary: Theora codec plugin for the VideoLAN client
+Summary: Theora codec plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-theora
-VideoLAN is a free multimedia software solution.
-
-This package contains Theora codec support for VLC.
+This package contains Theora codec support for VLC Media Player.
 
 %package plugin-ts
-Summary: TS mux/demux plugin for the VideoLAN client
+Summary: TS mux/demux plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-ts
-VideoLAN is a free multimedia software solution.
-
-This package contains TS mux/demux support for VLC.
+This package contains TS mux/demux support for VLC Media Player.
 
 One of the essential plugins.
 
 %package plugin-twolame
-Summary: TwoLAME encoding plugin for the VideoLAN client
+Summary: TwoLAME encoding plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-twolame
-VideoLAN is a free multimedia software solution.
-
-This package contains TwoLAME mpeg2 encoder plugin for VLC.
+This package contains TwoLAME mpeg2 encoder plugin for VLC Media Player.
 
 %package plugin-v4l
-Summary: Video4Linux input plugin for the VideoLAN client
+Summary: Video4Linux input plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-v4l
-VideoLAN is a free multimedia software solution.
-
-This package adds support for Video4Linux to VLC.
+This package adds support for Video4Linux to VLC Media Player.
 
 %package plugin-videocd
-Summary: VideoCD input plugin for the VideoLAN client
+Summary: VideoCD input plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-videocd
-VideoLAN is a free multimedia software solution.
-
-This package contains VideoCD access plugin for VLC.
+This package contains VideoCD access plugin for VLC Media Player.
 
 %package plugin-x11
-Summary: X11 output plugin for the VideoLAN client
+Summary: X11 output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-x11
-VideoLAN is a free multimedia software solution. 
-
-This package adds support for X11 video output to VideoLAN client.
+This package adds support for X11 video output to VLC Media Player.
 
 %package plugin-xml
-Summary: XML plugin for the VideoLAN client
+Summary: XML plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-xml
-VideoLAN is a free multimedia software solution.
-
-This package contains XML plugin to VLC.
+This package contains XML plugin to VLC Media Player.
 
 %package plugin-xvideo
-Summary: XVideo output plugin for the VideoLAN client
+Summary: XVideo output plugin for VLC Media Player
 Group: Video
-Requires: %name = %version-%release
+Requires: lib%name = %version-%release
 
 %description plugin-xvideo
-VideoLAN is a free multimedia software solution.
-
-This package adds support for XVideo output to VLC.
+This package adds support for XVideo output to VLC Media Player.
 
 %package -n lib%name
-Summary: VideoLAN client library
+Summary: VLC Media Player library
 Group: System/Libraries
 
 %description -n lib%name
-VideoLAN is a free multimedia software solution.
-
 This is a base VLC library. EXPERIMENTAL!!!
 
 %package -n lib%name-devel
-Summary: Development files for VideoLAN client
+Summary: Development files for VLC Media Player
 Group: Development/C
 Requires: lib%name = %version-%release
 
 %description -n lib%name-devel
-VideoLAN is a free multimedia software solution.
-
-This package provides files needed to develop plugins for VLC.
+This package provides files needed to develop plugins for VLC Media Player.
 
 %package -n mozilla-plugin-vlc
 Summary: VLC plugin for mozilla-based browsers
 Group: Video
 
 %description -n mozilla-plugin-vlc
-VideoLAN is a free multimedia software solution.
-
-This package contains mozilla plugin for VLC.
+This package contains mozilla plugin for VLC Media Player.
 
 %if_enabled mediacontrol_python_bindings
 %package -n python-module-vlc
-Summary: Python bindings for the VideoLAN client
+Summary: Python bindings for VLC Media Player
 Group: Video
 
 %description -n python-module-vlc
-VideoLAN is a free multimedia software solution.
-
-This package contains python bindings for VLC.
+This package contains python bindings for VLC Media Player.
 %endif
 
 %package -n vim-plugin-vlc-syntax
-Summary: VIm syntax for the VideoLAN client
+Summary: VIm syntax for VLC Media Player
 Group: Video
 
 %description -n vim-plugin-vlc-syntax
-VideoLAN is a free multimedia software solution.
-
-This package contains VIm syntax for VLC.
+This package contains VIm syntax for VLC Media Player.
 
 %package -n fortunes-vlc
 Summary: VLC fortunes
@@ -966,14 +806,13 @@ Group: Video
 PreReq: fortune-mod >= 1.0-ipl33mdk
 
 %description -n fortunes-vlc
-VideoLAN is a free multimedia software solution.
-
-This package contains fortunes from VLC.
+This package contains fortunes from VLC Media Player.
 
 %package maxi
-Summary: Maxi package for VideoLAN Client
+Summary: Maxi package for VLC Media Player
 Group: Video
-Requires: vlc vlc-interface-ncurses vlc-interface-skins2 vlc-interface-wxwidgets vlc-interface-lirc vlc-interface-telnet vlc-interface-http vlc-plugin-a52 vlc-plugin-aa vlc-plugin-alsa vlc-plugin-arts vlc-plugin-audiocd vlc-plugin-caca vlc-plugin-cmml vlc-plugin-dvb vlc-plugin-dvdnav vlc-plugin-dvdread vlc-plugin-esd vlc-plugin-faad vlc-plugin-ffmpeg vlc-plugin-framebuffer vlc-plugin-flac vlc-plugin-freetype vlc-plugin-galaktos vlc-plugin-glx vlc-plugin-gnomevfs vlc-plugin-gnutls vlc-plugin-goom vlc-plugin-h264 vlc-plugin-hal vlc-plugin-jack vlc-plugin-image vlc-plugin-mad vlc-plugin-mga vlc-plugin-modplug vlc-plugin-mpeg2 vlc-plugin-musepack vlc-plugin-ogg vlc-plugin-opengl vlc-plugin-osd vlc-plugin-oss vlc-plugin-png vlc-plugin-podcast vlc-plugin-realrtsp vlc-plugin-screen vlc-plugin-sdl vlc-plugin-sdlimage vlc-plugin-shout vlc-plugin-snapshot vlc-plugin-speex vlc-plugin-theora vlc-plugin-v4l vlc-plugin-videocd vlc-plugin-x11 vlc-plugin-xml vlc-plugin-xvideo libvlc mozilla-plugin-vlc vim-plugin-vlc-syntax vlc-plugin-bonjour vlc-plugin-matroska vlc-plugin-dts vlc-plugin-daap vlc-plugin-ts vlc-interface-qt4 vlc-plugin-notify vlc-plugin-live555 vlc-plugin-twolame
+Requires: vlc vlc-interface-ncurses vlc-interface-skins2 vlc-interface-wxwidgets vlc-interface-lirc vlc-interface-telnet vlc-interface-http vlc-plugin-a52 vlc-plugin-aa vlc-plugin-alsa vlc-plugin-arts vlc-plugin-audiocd vlc-plugin-caca vlc-plugin-cmml vlc-plugin-dvb vlc-plugin-dvdnav vlc-plugin-dvdread vlc-plugin-esd vlc-plugin-faad vlc-plugin-ffmpeg vlc-plugin-framebuffer vlc-plugin-flac vlc-plugin-freetype vlc-plugin-galaktos vlc-plugin-glx vlc-plugin-gnutls vlc-plugin-goom vlc-plugin-h264 vlc-plugin-hal vlc-plugin-jack vlc-plugin-image vlc-plugin-mad vlc-plugin-mga vlc-plugin-modplug vlc-plugin-mpeg2 vlc-plugin-musepack vlc-plugin-ogg vlc-plugin-opengl vlc-plugin-osd vlc-plugin-oss vlc-plugin-png vlc-plugin-podcast vlc-plugin-realrtsp vlc-plugin-screen vlc-plugin-sdl vlc-plugin-sdlimage vlc-plugin-shout vlc-plugin-snapshot vlc-plugin-speex vlc-plugin-theora vlc-plugin-v4l vlc-plugin-videocd vlc-plugin-x11 vlc-plugin-xml vlc-plugin-xvideo libvlc mozilla-plugin-vlc vim-plugin-vlc-syntax vlc-plugin-bonjour vlc-plugin-matroska vlc-plugin-ts vlc-plugin-notify vlc-plugin-live555 vlc-plugin-twolame vlc-plugin-dv
+%{?_enable_dca:Requires: vlc-plugin-dca}
 %{?_enable_svg:Requires: vlc-plugin-svg}
 %{?_enable_ggi:Requires: vlc-plugin-ggi}
 %ifnarch x86_64
@@ -985,23 +824,22 @@ Requires: vlc-plugin-smb
 %if_enabled dirac
 Requires: vlc-plugin-dirac
 %endif
+%if_enabled gnomevfs
+Requires: vlc-plugin-gnomevfs
+%endif
 
 %description maxi
-VideoLAN is a free multimedia software solution.
-
-This is a virtual package with every plugin of VLC.
+This is a virtual package with every plugin of VLC Media Player.
 
 %package normal
-Summary: Normal package for VideoLAN Client
+Summary: Normal package for VLC Media Player
 Group: Video
-Requires: vlc vlc-interface-wxwidgets vlc-plugin-a52 vlc-plugin-alsa vlc-plugin-dvdread vlc-plugin-ffmpeg vlc-plugin-xvideo vlc-plugin-x11 libvlc vlc-plugin-ts vlc-plugin-live555
+Requires: vlc vlc-interface-wxwidgets vlc-plugin-a52 vlc-plugin-alsa vlc-plugin-dvdread vlc-plugin-ffmpeg vlc-plugin-xvideo vlc-plugin-x11 libvlc vlc-plugin-ts vlc-plugin-live555 vlc-plugin-xml
 Provides: %name-common = %version-%release
 Obsoletes: %name-common < %version-%release
 
 %description normal
-VideoLAN is a free multimedia software solution.
-
-This is a virtual 'common' package with most useable plugins of VLC.
+This is a virtual 'common' package with most useable plugins of VLC Media Player.
 It comes with wxWidgets interface, alsa audio output, full DVD read 
 support, all of the ffmpeg capabilities to read and decode files 
 and Xvideo/X11 video output plugins.
@@ -1009,29 +847,11 @@ and Xvideo/X11 video output plugins.
 %define _vlc_pluginsdir %_libdir/%name
 
 %prep
-%ifndef trunk
-%ifndef test
 %setup -q -n %name-%version
-%else
-%setup -q -n %name-%version-test%test
-%endif
-%else
-%setup -q -n %name-trunk
-%endif
-
-%patch3 -p1
-%patch4 -p1
-%patch8 -p1
-
-%patch9 -p1
-%patch11 -p1
-%patch12 -p1
-%patch14 -p0
 
 %build
-%ifdef trunk
+
 ./bootstrap
-%endif
 
 %if_enabled java_bindings
 export JAVA_HOME=%_libdir/j2se1.5-sun
@@ -1046,20 +866,22 @@ export JAVA_HOME=%_libdir/j2se1.5-sun
 	--enable-aa \
 	--enable-alsa \
 	--enable-arts \
+	--enable-audioscrobbler \
 	--enable-caca \
 	--enable-cdda \
 	--disable-cddax \
 	--enable-cmml \
-	--enable-daap \
+	--enable-dc1394 \
 	%{subst_enable dirac} \
 	--enable-dmo \
+	--enable-dv \
 	--enable-dvb \
 	--enable-dvbpsi \
 	--enable-dvd \
 	--enable-dvdnav \
 	--enable-dvdplay \
 	--enable-dvdread \
-	--enable-dts \
+	%{subst_enable dca} \
 	--enable-esd \
 	--enable-faad \
 	--enable-fb \
@@ -1070,6 +892,7 @@ export JAVA_HOME=%_libdir/j2se1.5-sun
 	--enable-galaktos \
 	%{subst_enable ggi} \
 	--enable-glx \
+	%{subst_enable gnomevfs} \
 	--enable-gnutls \
 	--enable-goom \
 	--enable-hal \
@@ -1101,8 +924,6 @@ export JAVA_HOME=%_libdir/j2se1.5-sun
 	--enable-opengl \
 	--enable-oss \
 	--enable-png \
-	--enable-qt4 \
-	%{subst_enable quicktime} \
 	--enable-realrtsp \
 	--enable-release \
 	--enable-screen \
@@ -1131,9 +952,11 @@ export JAVA_HOME=%_libdir/j2se1.5-sun
 	--enable-xosd \
 	--enable-xvideo \
 	--with-ffmpeg-faac \
+	--with-ffmpeg-mp3lame \
+	--with-ffmpeg-vorbis \
+	--with-ffmpeg-theora \
+	--with-ffmpeg-ogg \
 	--with-ffmpeg-zlib
-
-./toolbox --update-includes
 
 %make_build
 
@@ -1146,11 +969,15 @@ install -pD -m644 doc/vlc.1 %buildroot/%_man1dir/vlc.1
 
 # freedesktop menu
 mkdir -p %buildroot%_datadir/applications 
-install -pm644 %SOURCE1 %buildroot%_datadir/applications/vlc.desktop
+install -pm644 share/applications/vlc.desktop %buildroot%_datadir/applications/vlc.desktop
 
 # icons
 mkdir -p %buildroot/{%_miconsdir,%_liconsdir}
 install -m644 %buildroot/%_datadir/vlc/vlc32x32.png %buildroot/%_iconsdir/vlc.png
+
+# fix installation of mozilloids plugin
+mkdir -p %buildroot%browser_plugins_path
+mv %buildroot%_libdir/mozilla/plugins/* %buildroot%browser_plugins_path
 
 # remove non-packaged files
 rm -f %buildroot%_libdir/*.a
@@ -1206,34 +1033,26 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %dir %_vlc_pluginsdir/access_filter
 %_vlc_pluginsdir/access_filter/libaccess_filter_record_plugin.so*
 %_vlc_pluginsdir/access_filter/libaccess_filter_timeshift_plugin.so*
+%_vlc_pluginsdir/access_filter/libaccess_filter_dump_plugin.so*
+%_vlc_pluginsdir/access_filter/libaccess_filter_bandwidth_plugin.so*
 
 %dir %_vlc_pluginsdir/audio_filter
 %_vlc_pluginsdir/audio_filter/libbandlimited_resampler_plugin.so*
 %_vlc_pluginsdir/audio_filter/libdolby_surround_decoder_plugin.so*
 %_vlc_pluginsdir/audio_filter/libdtstospdif_plugin.so*
-%_vlc_pluginsdir/audio_filter/libfixed32tofloat32_plugin.so*
-%_vlc_pluginsdir/audio_filter/libfixed32tos16_plugin.so*
-%_vlc_pluginsdir/audio_filter/libfloat32tos16_plugin.so*
-%_vlc_pluginsdir/audio_filter/libfloat32tos8_plugin.so*
-%_vlc_pluginsdir/audio_filter/libfloat32tou16_plugin.so*
-%_vlc_pluginsdir/audio_filter/libfloat32tou8_plugin.so*
 %_vlc_pluginsdir/audio_filter/libheadphone_channel_mixer_plugin.so*
 %_vlc_pluginsdir/audio_filter/liblinear_resampler_plugin.so*
-%_vlc_pluginsdir/audio_filter/libs16tofixed32_plugin.so*
-%_vlc_pluginsdir/audio_filter/libs16tofloat32_plugin.so*
-%_vlc_pluginsdir/audio_filter/libs16tofloat32swab_plugin.so*
-%_vlc_pluginsdir/audio_filter/libs8tofloat32_plugin.so*
 %_vlc_pluginsdir/audio_filter/libtrivial_channel_mixer_plugin.so*
 %_vlc_pluginsdir/audio_filter/libtrivial_resampler_plugin.so*
-%_vlc_pluginsdir/audio_filter/libu8tofixed32_plugin.so*
-%_vlc_pluginsdir/audio_filter/libu8tofloat32_plugin.so*
 %_vlc_pluginsdir/audio_filter/libugly_resampler_plugin.so*
 %_vlc_pluginsdir/audio_filter/libaudio_format_plugin.so*
 %_vlc_pluginsdir/audio_filter/libequalizer_plugin.so*
 %_vlc_pluginsdir/audio_filter/libnormvol_plugin.so*
 %_vlc_pluginsdir/audio_filter/libsimple_channel_mixer_plugin.so*
 %_vlc_pluginsdir/audio_filter/libparam_eq_plugin.so*
-%_vlc_pluginsdir/audio_filter/libmono_plugin.so
+%_vlc_pluginsdir/audio_filter/libconverter_fixed_plugin.so*
+%_vlc_pluginsdir/audio_filter/libconverter_float_plugin.so*
+%_vlc_pluginsdir/audio_filter/libmono_plugin.so*
 
 %dir %_vlc_pluginsdir/audio_mixer
 %_vlc_pluginsdir/audio_mixer/libfloat32_mixer_plugin.so*
@@ -1256,6 +1075,7 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/codec/libfake_plugin.so*
 %_vlc_pluginsdir/codec/libsubsdec_plugin.so*
 %_vlc_pluginsdir/codec/libcvdsub_plugin.so*
+%_vlc_pluginsdir/codec/libtelx_plugin.so*
 
 %dir %_vlc_pluginsdir/control
 %_vlc_pluginsdir/control/librc_plugin.so*
@@ -1302,12 +1122,19 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/demux/libvobsub_plugin.so*
 %_vlc_pluginsdir/demux/libvoc_plugin.so*
 %_vlc_pluginsdir/demux/libxa_plugin.so*
+%_vlc_pluginsdir/demux/libtta_plugin.so
+%_vlc_pluginsdir/demux/libh264_plugin.so*
+%_vlc_pluginsdir/demux/libvc1_plugin.so*
+%_vlc_pluginsdir/demux/libluaplaylist_plugin.so*
+%_vlc_pluginsdir/demux/librawvid_plugin.so*
+
+%dir %_vlc_pluginsdir/gui
 
 %dir %_vlc_pluginsdir/misc
 %_vlc_pluginsdir/misc/libdummy_plugin.so*
 #%_vlc_pluginsdir/misc/libhttpd_plugin.so*
-%_vlc_pluginsdir/misc/libipv4_plugin.so*
-%_vlc_pluginsdir/misc/libipv6_plugin.so*
+#%_vlc_pluginsdir/misc/libipv4_plugin.so*
+#%_vlc_pluginsdir/misc/libipv6_plugin.so*
 %_vlc_pluginsdir/misc/liblogger_plugin.so*
 %_vlc_pluginsdir/misc/libvod_rtsp_plugin.so*
 %_vlc_pluginsdir/misc/libmemcpy_plugin.so*
@@ -1317,7 +1144,10 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/misc/libmemcpy3dn_plugin.so*
 %_vlc_pluginsdir/misc/libmemcpymmx_plugin.so*
 %_vlc_pluginsdir/misc/libmemcpymmxext_plugin.so*
-%_vlc_pluginsdir/misc/libprofile_parser_plugin.so
+%_vlc_pluginsdir/misc/libaudioscrobbler_plugin.so*
+%_vlc_pluginsdir/misc/libprobe_hal_plugin.so*
+%_vlc_pluginsdir/misc/libprofile_parser_plugin.so*
+
 
 %dir %_vlc_pluginsdir/services_discovery
 %_vlc_pluginsdir/services_discovery/libsap_plugin.so*
@@ -1341,6 +1171,8 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/packetizer/libpacketizer_mpeg4video_plugin.so*
 #%_vlc_pluginsdir/packetizer/libpacketizer_mpegaudio_plugin.so*
 %_vlc_pluginsdir/packetizer/libpacketizer_mpegvideo_plugin.so*
+%_vlc_pluginsdir/packetizer/libpacketizer_vc1_plugin.so*
+
 
 %dir %_vlc_pluginsdir/stream_out
 %_vlc_pluginsdir/stream_out/libstream_out_display_plugin.so*
@@ -1355,6 +1187,7 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/stream_out/libstream_out_rtp_plugin.so*
 #%_vlc_pluginsdir/stream_out/libstream_out_switcher_plugin.so*
 %_vlc_pluginsdir/stream_out/libstream_out_transcode_plugin.so*
+%_vlc_pluginsdir/stream_out/libstream_out_autodel_plugin.so*
 
 %dir %_vlc_pluginsdir/video_chroma
 %_vlc_pluginsdir/video_chroma/libi420_rgb_plugin.so*
@@ -1386,17 +1219,31 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/video_filter/librss_plugin.so*
 %_vlc_pluginsdir/video_filter/librv32_plugin.so*
 %_vlc_pluginsdir/video_filter/libscale_plugin.so*
-%_vlc_pluginsdir/video_filter/libtime_plugin.so*
+#%_vlc_pluginsdir/video_filter/libtime_plugin.so*
 %_vlc_pluginsdir/video_filter/libmagnify_plugin.so*
-%_vlc_pluginsdir/video_filter/libgradient_plugin.so
-%_vlc_pluginsdir/video_filter/libpsychedelic_plugin.so
-%_vlc_pluginsdir/video_filter/libripple_plugin.so
-%_vlc_pluginsdir/video_filter/libwave_plugin.so
+%_vlc_pluginsdir/video_filter/libalphamask_plugin.so*
+%_vlc_pluginsdir/video_filter/libbluescreen_plugin.so*
+%_vlc_pluginsdir/video_filter/libcolorthres_plugin.so*
+%_vlc_pluginsdir/video_filter/liberase_plugin.so*
+%_vlc_pluginsdir/video_filter/libextract_plugin.so*
+%_vlc_pluginsdir/video_filter/libgaussianblur_plugin.so*
+%_vlc_pluginsdir/video_filter/libgradient_plugin.so*
+%_vlc_pluginsdir/video_filter/libnoise_plugin.so*
+%_vlc_pluginsdir/video_filter/libpanoramix_plugin.so*
+%_vlc_pluginsdir/video_filter/libpsychedelic_plugin.so*
+%_vlc_pluginsdir/video_filter/libpuzzle_plugin.so*
+%_vlc_pluginsdir/video_filter/libripple_plugin.so*
+%_vlc_pluginsdir/video_filter/librotate_plugin.so*
+%_vlc_pluginsdir/video_filter/libsharpen_plugin.so*
+%_vlc_pluginsdir/video_filter/libwave_plugin.so*
 
 %dir %_vlc_pluginsdir/video_output
 
 %dir %_vlc_pluginsdir/visualization
 %_vlc_pluginsdir/visualization/libvisual_plugin.so*
+
+%dir %_vlc_pluginsdir/meta_engine
+%_vlc_pluginsdir/meta_engine/libfolder_plugin.so*
 
 %doc AUTHORS README MAINTAINERS NEWS THANKS
 
@@ -1407,10 +1254,6 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/gui/libwxwidgets_plugin.so*
 %_datadir/applications/vlc.desktop
 %_bindir/wxvlc
-
-%files interface-qt4
-%_bindir/qvlc
-%_vlc_pluginsdir/gui/libqt4_plugin.so*
 
 %files interface-skins2
 %_vlc_pluginsdir/gui/libskins2_plugin.so*
@@ -1426,12 +1269,17 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %files interface-lirc
 %_vlc_pluginsdir/control/liblirc_plugin.so*
 
+%files interface-qt4
+%_bindir/qvlc
+%_vlc_pluginsdir/gui/libqt4_plugin.so*
+
 %files plugin-sdl
 %_vlc_pluginsdir/audio_output/libaout_sdl_plugin.so*
 %_vlc_pluginsdir/video_output/libvout_sdl_plugin.so*
 
 %files plugin-jack
 %_vlc_pluginsdir/audio_output/libjack_plugin.so*
+%_vlc_pluginsdir/access/libaccess_jack_plugin.so*
 
 %files plugin-snapshot
 %_vlc_pluginsdir/video_output/libsnapshot_plugin.so*
@@ -1453,16 +1301,15 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %ifnarch x86_64
 %files plugin-loader
 %_vlc_pluginsdir/codec/libdmo_plugin.so*
-%_vlc_pluginsdir/codec/libquicktime_plugin.so*
 %_vlc_pluginsdir/codec/librealaudio_plugin.so*
 %endif
 
 %files plugin-osd
-%_vlc_pluginsdir/visualization/libxosd_plugin.so*
+%_vlc_pluginsdir/misc/libxosd_plugin.so*
 
 %files plugin-mad
 %_vlc_pluginsdir/audio_filter/libmpgatofixed32_plugin.so*
-%_vlc_pluginsdir/demux/libid3tag_plugin.so*
+#%_vlc_pluginsdir/demux/libid3tag_plugin.so*
 
 %files plugin-matroska
 %_vlc_pluginsdir/demux/libmkv_plugin.so*
@@ -1500,12 +1347,10 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 
 %files plugin-h264
 %_vlc_pluginsdir/codec/libx264_plugin.so*
-%_vlc_pluginsdir/demux/libh264_plugin.so*
 %_vlc_pluginsdir/packetizer/libpacketizer_h264_plugin.so*
 
 %files plugin-hal
 %_vlc_pluginsdir/services_discovery/libhal_plugin.so*
-%_vlc_pluginsdir/misc/libprobe_hal_plugin.so*
 
 %files plugin-bonjour
 %_vlc_pluginsdir/services_discovery/libbonjour_plugin.so*
@@ -1539,7 +1384,7 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 
 %files plugin-ffmpeg
 %_vlc_pluginsdir/codec/libffmpeg_plugin.so*
-%_vlc_pluginsdir/stream_out/libstream_out_switcher_plugin.so*
+#%_vlc_pluginsdir/stream_out/libstream_out_switcher_plugin.so*
 
 %files plugin-framebuffer
 %_vlc_pluginsdir/video_output/libfb_plugin.so*
@@ -1576,8 +1421,9 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %files plugin-cmml
 %_vlc_pluginsdir/codec/libcmml_plugin.so*
 
-%files plugin-daap
-%_vlc_pluginsdir/services_discovery/libdaap_plugin.so*
+%files plugin-dv
+%_vlc_pluginsdir/access/libdc1394_plugin.so*
+%_vlc_pluginsdir/access/libaccess_dv_plugin.so*
 
 %files plugin-ts
 %_vlc_pluginsdir/mux/libmux_ts_plugin.so*
@@ -1601,11 +1447,15 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/codec/libdirac_plugin.so*
 %endif
 
-%files plugin-dts
+%if_enabled dca
+%files plugin-dca
 %_vlc_pluginsdir/audio_filter/libdtstofloat32_plugin.so*
+%endif
 
+%if_enabled gnomevfs
 %files plugin-gnomevfs
 %_vlc_pluginsdir/access/libaccess_gnomevfs_plugin.so*
+%endif
 
 %files plugin-galaktos
 %_vlc_pluginsdir/visualization/libgalaktos_plugin.so*
@@ -1633,7 +1483,7 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %endif
 
 %files -n mozilla-plugin-vlc
-%_libdir/mozilla/plugins/*
+%browser_plugins_path/*
 
 %files plugin-videocd
 %_vlc_pluginsdir/access/libvcd_plugin.so*
@@ -1644,11 +1494,14 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %_vlc_pluginsdir/access/libcdda_plugin.so*
 
 %files -n lib%name
-%_libdir/libvlc.so
+%_libdir/libvlc.so.*
+%_libdir/libvlc-control.so.*
 
 %files -n lib%name-devel
 %_bindir/%name-config
 %_includedir/*
+%_libdir/libvlc.so
+%_libdir/libvlc-control.so
 
 %if_enabled python-bindings
 %files -n python-module-vlc
@@ -1667,6 +1520,104 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %files normal
 
 %changelog
+* Wed May 30 2007 Pavlov Konstantin <thresh@altlinux.ru> 0.9.0-alt0.svn20348
+- 20348 revision.
+- Fixed packaging issues.
+
+* Tue May 29 2007 Pavlov Konstantin <thresh@altlinux.ru> 0.9.0-alt0.svn20336
+- 20336 revision of 0.9.0 trunk.
+
+* Fri May 18 2007 Pavlov Konstantin <thresh@altlinux.ru> 0.9.0-alt0.svn20165
+- First build of 0.9.0 trunk snapshot.
+
+* Tue May 15 2007 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6b-alt2
+- Fix mozilloids plugin installation.
+- Backport ffmpeg.c from trunk: lots of new fourccs.
+- Backport fix seeking in mkv from trunk.
+- Backport atrac support in rm files from trunk.
+- Some tweaks to WX interface.
+- Backport RSS fixes from trunk.
+- Build with dirac = 0.7
+
+* Thu Apr 19 2007 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6b-alt1
+- 0.8.6b release.
+
+* Fri Mar 30 2007 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6a-alt5
+- Backported dirac 0.6 support from trunk.
+- Applied numerous fixes from 0.8.6-bugfix branch.
+
+* Fri Mar 23 2007 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6a-alt4
+- Revert patch for build with wxgtk-2.8. It sucks.
+
+* Wed Feb 21 2007 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6a-alt3
+- Added strict requires for libavcodec >= 0.5.0-alt1.svn8045
+  to ffmpeg plugin due to dirac DE support.
+- Removed dirac plugin.
+- Added a patch fixing build with libflac8.
+- Added a patch fixing build with wxgtk-2.8, BR changed accordingly.
+- Fixed BuildRequires a bit.
+- Added vlc-plugin-xml to vlc-normal subpackage (apparently, vlc stores
+  playlist in xml-based format...).
+- Made plugins require libvlc instead of vlc package - this could help
+  using libvlc+plugins with bindings without vlc package. Even interface
+  plugins now require libvlc, though i have no idea if you could use them
+  via bindings. :)
+
+* Sun Jan 21 2007 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6a-alt2
+- Spec cleanup, we're VLC Media Player, not VideoLAN Client.
+- Moved h264 demuxer to main vlc package.
+- Made vlc package own %%_libdir/vlc/gui directory.
+- Proper packaging of libvlc/libvlc-devel.
+- Use glibc-kernheaders instead of linux-libc-headers.
+
+* Sat Jan 06 2007 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6a-alt1
+- 0.8.6a bugfix release (well i fixed the bug in -alt3, but anyway...).
+
+* Wed Jan 03 2007 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt3
+- Added fix for udp format string vulnerability (affects VCD/CDDAX modules)
+
+* Wed Dec 27 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt2
+- Rebuild with new dbus.
+
+* Tue Dec 12 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt1
+- 0.8.6 release.
+
+* Fri Dec 01 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.18182
+- 0.8.6-rc1.
+
+* Thu Nov 30 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.18168
+- 18168, yeah, it's almost test3, i swear!
+- gnomevfs -> def_disable, it doesn't work at all.
+- New plugin : dv/dc1394.
+
+* Wed Nov 29 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.18153
+- 18153, almost test3.
+
+* Thu Nov 16 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.17817
+- 17817 revision.
+
+* Thu Nov 16 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.17797
+- 17797 revision.
+- 0.8.6-test2.
+
+* Tue Nov 07 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.17528
+- 17528 revision.
+
+* Tue Oct 31 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.17389
+- 17389 revision.
+
+* Wed Oct 18 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.17132
+- 17132, almost -test1.
+
+* Thu Oct 05 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.16948
+- 16948 revision.
+
+* Tue Sep 26 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.16876
+- 16876 revision.
+
+* Mon Sep 18 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.16724
+- 16724 revision of 0.8.6 stable branch.
+
 * Sun Sep 03 2006 Pavlov Konstantin <thresh@altlinux.ru> 0.8.6-alt0.16525
 - 16525 revision.
 - Removed patch10, patch13 as they moved upstream (theora, mux_ts -> plugins).
@@ -2088,7 +2039,7 @@ font from dejavu by default (suggestions on default font are welcome).
 
 * Thu Mar 22 2001 Yves Duret <yduret@mandrakesoft.com> 0.2.63-1mdk
 - version 0.2.63 : Bugfixes, bugfixes, and bugfixes again, a Gtk+
-  interface for the Gnome-impaired, an even better DVD support
+  interface for Gnome-impaired, an even better DVD support
 
 * Fri Feb 16 2001 Yves Duret <yduret@mandrakesoft.com> 0.2.61-1mdk
 - new version for all the DVD fans (add MPEG1 support, direct DVD support,
