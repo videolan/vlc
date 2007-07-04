@@ -192,9 +192,28 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 int i_line_percent = (i_line_orig0>>4) & 255;
                 int i_col_percent  = (i_col_orig0 >>4) & 255;
 
-                if(    0 < i_line_orig && i_line_orig < i_visible_lines - 1
-                    && 0 < i_col_orig  && i_col_orig  < i_visible_pitch - 1)
+                if(    0 <= i_line_orig && i_line_orig < i_visible_lines
+                    && 0 <= i_col_orig  && i_col_orig  < i_visible_pitch )
                 {
+                    uint8_t i_curpix = black_pixel;
+                    uint8_t i_colpix = black_pixel;
+                    uint8_t i_linpix = black_pixel;
+                    uint8_t i_nexpix = black_pixel;
+                    if( ( 0 < i_line_orig ) && ( 0 < i_col_orig ) )
+                        i_curpix = p_in[i_line_orig*i_pitch+i_col_orig];
+                    if( i_line_orig < i_visible_lines - 1)
+                    {
+                        i_linpix=p_in[(i_line_orig+1)*i_pitch+i_col_orig];
+
+                    }
+                    if( i_col_orig < i_visible_pitch - 1)
+                    {
+                        i_colpix=p_in[i_line_orig*i_pitch+i_col_orig+1];
+                    }
+                    if( ( i_line_orig < i_visible_lines - 1)
+                     && ( i_col_orig  < i_visible_pitch - 1) )
+                        i_nexpix = p_in[(i_line_orig+1)*i_pitch+i_col_orig+1];
+
                 #define test 1
                 #undef test
                 #ifdef test
@@ -202,13 +221,13 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 #endif
                     {
                         unsigned int temp = 0;
-                        temp+= p_in[i_line_orig*i_pitch+i_col_orig] *
+                        temp+= i_curpix *
                             (256 - i_line_percent) * ( 256 - i_col_percent );
-                        temp+= p_in[(i_line_orig+1)*i_pitch+i_col_orig] *
+                        temp+= i_linpix *
                             i_line_percent * (256 - i_col_percent );
-                        temp+= p_in[(i_line_orig+1)*i_pitch+i_col_orig+1] *
+                        temp+= i_nexpix *
                             ( i_col_percent) * ( i_line_percent);
-                        temp+= p_in[i_line_orig*i_pitch+i_col_orig+1] *
+                        temp+= i_colpix *
                             i_col_percent * (256 - i_line_percent );
                         *p_out = temp >> 16;
                     }
