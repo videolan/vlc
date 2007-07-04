@@ -13,6 +13,23 @@ if not top_builddir:
     top_builddir = os.path.join( '..', '..' )
     os.environ['top_builddir'] = top_builddir
 
+# Determine the extra link args. Normally, vlc-config should take care
+# of this and return the right path values, from a development tree or
+# an installed version.
+libtool=False
+linkargs=[]
+d=os.path.join(top_builddir, 'src', '.libs')
+if os.path.exists(d):
+    # We are in a development tree, which was compiled with libtool
+    libtool=True
+    linkargs=[ '-L' + d ]
+else:
+    d=os.path.join(top_builddir, 'src')
+    # We are in a development tree, which was compiled without libtool
+    if os.path.exists(d):
+        linkargs=[ '-L' + d ]
+
+# For out-of-tree compilations
 try:
     srcdir=os.environ['srcdir']
 except KeyError:
@@ -59,10 +76,14 @@ def get_ldflags():
 	ldflags = []
 	if os.sys.platform == 'darwin':
 	    ldflags = "-read_only_relocs warning".split()
-        ldflags.extend(os.popen('%s --libs vlc external' % vlcconfig,
+        ldflags.extend(os.popen('%s --libs external' % vlcconfig,
 				'r').readline().rstrip().split())
 	if os.sys.platform == 'darwin':
 	    ldflags.append('-lstdc++')
+        if not libtool:
+            # vlc-config is broken and gives a -lvlc-control which
+            # does not exist if libtool is disabled.
+            ldflags.remove('-lvlc-control')
         return ldflags
 
 #source_files = [ 'vlc_module.c', 'vlc_mediacontrol.c',
@@ -78,7 +99,7 @@ vlclocal = Extension('vlc',
                                       '/usr/win32/include' ],
                 extra_objects = [ ],
                 extra_compile_args = get_cflags(),
-		extra_link_args = [ '-L' + os.path.join(top_builddir, 'src', '.libs') ]  + get_ldflags(),
+		extra_link_args = linkargs + get_ldflags(),
                 )
 
 setup (name = 'VLC Bindings',
