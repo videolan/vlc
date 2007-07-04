@@ -12374,7 +12374,7 @@ msgstr "Sortera nod efter upphovsman"
 #: modules/gui/macosx/playlist.m:460 modules/gui/macosx/playlist.m:503
 #: modules/gui/macosx/playlist.m:1406
 msgid "No items in the playlist"
-msgstr "%i objekt i spellistan"
+msgstr ""
 
 #: modules/gui/macosx/playlist.m:465
 msgid "Search in Playlist"
@@ -15673,7 +15673,7 @@ msgstr "Du måste välja en ström"
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:113
 msgid "Unable to find playlist"
-msgstr "%i objekt i spellistan"
+msgstr ""
 
 #: modules/gui/wxwidgets/dialogs/wizard.cpp:115
 msgid ""
@@ -21804,7 +21804,7 @@ msgstr "Spektrumanalysator"
 
 #, fuzzy
 #~ msgid "Enable skinned playlist"
-#~ msgstr "%i objekt i spellistan"
+#~ msgstr ""
 
 #, fuzzy
 #~ msgid "Playlist stress tests"
