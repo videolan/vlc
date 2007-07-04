@@ -89,8 +89,8 @@ struct filter_sys_t
 static inline void cache_trigo( int i_angle, int *i_sin, int *i_cos )
 {
     const double f_angle = (((double)i_angle)*M_PI)/1800.;
-    *i_sin = (int)(sin( f_angle )*256.);
-    *i_cos = (int)(cos( f_angle )*256.);
+    *i_sin = (int)(sin( f_angle )*4096.);
+    *i_cos = (int)(cos( f_angle )*4096.);
 }
 
 /*****************************************************************************
@@ -177,9 +177,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         const int i_line_next =  i_cos-i_sin*i_visible_pitch;
         const int i_col_next  = -i_sin-i_cos*i_visible_pitch;
         int i_line_orig0 = - i_cos * i_line_center
-                           - i_sin * i_col_center + (1<<7);
+                           - i_sin * i_col_center + (1<<11);
         int i_col_orig0 =    i_sin * i_line_center
-                           - i_cos * i_col_center + (1<<7);
+                           - i_cos * i_col_center + (1<<11);
         for( ; p_outendline < p_outend;
              p_out += i_hidden_pitch, p_outendline += i_pitch,
              i_line_orig0 += i_line_next, i_col_orig0 += i_col_next )
@@ -187,13 +187,39 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             for( ; p_out < p_outendline;
                  p_out++, i_line_orig0 += i_sin, i_col_orig0 += i_cos )
             {
-                const int i_line_orig = (i_line_orig0>>8) + i_line_center;
-                const int i_col_orig  = (i_col_orig0>>8)  + i_col_center;
+                const int i_line_orig = (i_line_orig0>>12) + i_line_center;
+                const int i_col_orig  = (i_col_orig0>>12)  + i_col_center;
+                int i_line_percent = (i_line_orig0>>4) & 255;
+                int i_col_percent  = (i_col_orig0 >>4) & 255;
 
-                if(    0 <= i_line_orig && i_line_orig < i_visible_lines
-                    && 0 <= i_col_orig  && i_col_orig  < i_visible_pitch )
+                if(    0 < i_line_orig && i_line_orig < i_visible_lines - 1
+                    && 0 < i_col_orig  && i_col_orig  < i_visible_pitch - 1)
                 {
-                    *p_out = p_in[i_line_orig*i_pitch+i_col_orig];
+                #define test 1
+                #undef test
+                #ifdef test
+                    if( ( i_col_orig > i_visible_pitch/2 ) )
+                #endif
+                    {
+                        unsigned int temp = 0;
+                        temp+= p_in[i_line_orig*i_pitch+i_col_orig] *
+                            (256 - i_line_percent) * ( 256 - i_col_percent );
+                        temp+= p_in[(i_line_orig+1)*i_pitch+i_col_orig] *
+                            i_line_percent * (256 - i_col_percent );
+                        temp+= p_in[(i_line_orig+1)*i_pitch+i_col_orig+1] *
+                            ( i_col_percent) * ( i_line_percent);
+                        temp+= p_in[i_line_orig*i_pitch+i_col_orig+1] *
+                            i_col_percent * (256 - i_line_percent );
+                        *p_out = temp >> 16;
+                    }
+                #ifdef test
+                    else if (i_col_orig == i_visible_pitch/2 )
+                    {   *p_out = black_pixel;
+                    }
+                    else
+                        *p_out = p_in[i_line_orig*i_pitch+i_col_orig];
+                #endif
+                #undef test
                 }
                 else
                 {
