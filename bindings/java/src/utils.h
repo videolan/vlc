@@ -34,7 +34,7 @@ jlong getInstance ( JNIEnv* , jobject );
     input = libvlc_playlist_get_media_instance( ( libvlc_instance_t *) instance, exception ); \
     CHECK_EXCEPTION ;
 
-#define ATTACH_JVM
+#define ATTACH_JVM \
     JNIEnv *env; \
     jvm->AttachCurrentThread( ( void ** ) &env, NULL );
 
