@@ -192,21 +192,23 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 int i_line_percent = (i_line_orig0>>4) & 255;
                 int i_col_percent  = (i_col_orig0 >>4) & 255;
 
-                if(    0 <= i_line_orig && i_line_orig < i_visible_lines
-                    && 0 <= i_col_orig  && i_col_orig  < i_visible_pitch )
+                if(    -1 <= i_line_orig && i_line_orig < i_visible_lines
+                    && -1 <= i_col_orig  && i_col_orig  < i_visible_pitch )
                 {
                     uint8_t i_curpix = black_pixel;
                     uint8_t i_colpix = black_pixel;
                     uint8_t i_linpix = black_pixel;
                     uint8_t i_nexpix = black_pixel;
-                    if( ( 0 < i_line_orig ) && ( 0 < i_col_orig ) )
+                    if( ( 0 <= i_line_orig ) && ( 0 <= i_col_orig ) )
                         i_curpix = p_in[i_line_orig*i_pitch+i_col_orig];
-                    if( i_line_orig < i_visible_lines - 1)
+                    if(  ( i_line_orig < i_visible_lines - 1)
+                      && ( i_col_orig >= 0 ) )
                     {
                         i_linpix=p_in[(i_line_orig+1)*i_pitch+i_col_orig];
 
                     }
-                    if( i_col_orig < i_visible_pitch - 1)
+                    if(  ( i_col_orig < i_visible_pitch - 1)
+                      && ( i_line_orig >= 0 ) )
                     {
                         i_colpix=p_in[i_line_orig*i_pitch+i_col_orig+1];
                     }
@@ -286,7 +288,6 @@ static int PreciseRotateCallback( vlc_object_t *p_this, char const *psz_var,
     if( !strcmp( psz_var, "rotate-deciangle" ) )
     {
         p_sys->i_angle = newval.i_int;
-
         cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
     }
     return VLC_SUCCESS;
