@@ -1659,6 +1659,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
         /* */
         i_skip += 2;
     }
+    else if( pid->es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
+        i_skip = 0; /* FIXME temporary hack for zvbi support */
 
     /* skip header */
     while( p_pes && i_skip > 0 )
@@ -3258,7 +3260,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                                 {
                                 case 0x2:
                                     p_es->fmt.psz_description =
-                                        strdup(_("subtitles"));
+                                        strdup(_("Teletext subtitles"));
                                     msg_Dbg( p_demux,
                                              "    * sub lan=%s page=%d%x",
                                              p_es->fmt.psz_language,
@@ -3268,7 +3270,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
                                 case 0x5:
                                     p_es->fmt.psz_description =
-                                        strdup(_("hearing impaired"));
+                                        strdup(_("Teletext hearing impaired subtitles"));
                                     msg_Dbg( p_demux,
                                              "    * hearing impaired lan=%s page=%d%x",
                                              p_es->fmt.psz_language,
