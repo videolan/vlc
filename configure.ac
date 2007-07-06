@@ -3791,6 +3791,8 @@ if test "${enable_zvbi}" != "no"; then
   PKG_CHECK_MODULES(ZVBI,
         zvbi-0.2 >= 0.2.25,
         [
+          AC_DEFINE(HAVE_ZVBI_H, 1,
+                Define if Teletext decoder based on zvbi lib is used.)
           VLC_ADD_LDFLAGS([zvbi],[$ZVBI_LIBS])
           VLC_ADD_CFLAGS([zvbi],[$ZVBI_CFLAGS])
           VLC_ADD_PLUGINS([zvbi]) ],
