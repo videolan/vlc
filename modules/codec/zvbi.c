@@ -1,6 +1,7 @@
 /*****************************************************************************
  * zvbi.c : VBI and Teletext PES demux and decoder using libzvbi
  *****************************************************************************
+ * Copyright (C) 2007, M2X
  * $Id$
  *
  * Authors: Derk-Jan Hartman <djhartman at m2x dot nl> for M2X
@@ -143,8 +144,10 @@ static int Open( vlc_object_t *p_this )
                                 event_handler, p_dec );
 
     /* Create the var on vlc_global. */
-    p_sys->i_wanted_page = var_CreateGetInteger( p_dec->p_libvlc_global, "vbi-page" );
-    var_AddCallback( p_dec->p_libvlc_global, "vbi-page", RequestPage, p_sys );
+    p_sys->i_wanted_page = var_CreateGetInteger( p_dec->p_libvlc_global,
+                                                 "vbi-page" );
+    var_AddCallback( p_dec->p_libvlc_global, "vbi-page",
+                     RequestPage, p_sys );
     return VLC_SUCCESS;
 }
 
@@ -177,7 +180,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     uint8_t         *p_pos;
     unsigned int    i_left;
 
-    if( pp_block == NULL || *pp_block == NULL ) return NULL;
+    if( (pp_block == NULL) || (*pp_block == NULL) )
+        return NULL;
     p_block = *pp_block;
     *pp_block = NULL;
 
@@ -190,7 +194,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         unsigned int    i_lines = 0;
         int64_t         i_pts;
 
-        i_lines = vbi_dvb_demux_cor( p_sys->p_dvb_demux, p_sliced, MAX_SLICES, &i_pts, &p_pos, &i_left );
+        i_lines = vbi_dvb_demux_cor( p_sys->p_dvb_demux, p_sliced,
+                                     MAX_SLICES, &i_pts, &p_pos, &i_left );
 
         if( i_lines > 0 )
             vbi_decode( p_sys->p_vbi_dec, p_sliced, i_lines, i_pts / 90000.0 );
@@ -198,16 +203,22 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
 stop_decode:
     /* Try to see if the page we want is in the cache yet */
-    b_cached = vbi_fetch_vt_page( p_sys->p_vbi_dec, &p_page, vbi_dec2bcd( p_sys->i_wanted_page ), VBI_ANY_SUBNO, VBI_WST_LEVEL_3p5, 25, FALSE );
+    b_cached = vbi_fetch_vt_page( p_sys->p_vbi_dec, &p_page,
+                                  vbi_dec2bcd( p_sys->i_wanted_page ),
+                                  VBI_ANY_SUBNO, VBI_WST_LEVEL_3p5,
+                                  25, FALSE );
 
-    if( !b_cached ) goto error;
+    if( !b_cached )
+        goto error;
 
-    if( p_sys->i_wanted_page == p_sys->i_last_page && p_sys->b_update != VLC_TRUE )
+    if( (p_sys->i_wanted_page == p_sys->i_last_page) &&
+         (p_sys->b_update != VLC_TRUE) )
         goto error;
 
     p_sys->i_last_page = p_sys->i_wanted_page;
     p_sys->b_update = VLC_FALSE;
-    msg_Dbg( p_dec, "we now have page: %d ready for display", p_sys->i_wanted_page );
+    msg_Dbg( p_dec, "we now have page: %d ready for display",
+             p_sys->i_wanted_page );
 
     /* If there is a page or sub to render, then we do that here */
     /* Create the subpicture unit */
@@ -249,7 +260,8 @@ stop_decode:
     p_spu->i_original_picture_width = p_page.columns * 12;
     p_spu->i_original_picture_height = p_page.rows * 10;
 
-    vbi_draw_vt_page( &p_page, VBI_PIXFMT_RGBA32_LE, p_spu->p_region->picture.p->p_pixels, 1, 1 );
+    vbi_draw_vt_page( &p_page, VBI_PIXFMT_RGBA32_LE,
+                      p_spu->p_region->picture.p->p_pixels, 1, 1 );
     p_spu->p_region->picture.p->i_lines = p_page.rows * 10;
     p_spu->p_region->picture.p->i_pitch = p_page.columns * 12 * 4;
 
@@ -316,7 +328,7 @@ static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
 {
     decoder_sys_t   *p_sys = p_data;
 
-    if( newval.i_int > 0 && newval.i_int < 999 )
+    if( (newval.i_int > 0) && (newval.i_int < 999) )
         p_sys->i_wanted_page = newval.i_int;
 
     return VLC_SUCCESS;
