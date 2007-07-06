@@ -143,7 +143,7 @@ static int Open( vlc_object_t *p_this )
     if( (p_sys->p_vbi_dec == NULL) || (p_sys->p_dvb_demux == NULL) )
     {
         msg_Err( p_dec, "VBI decoder/demux could not be created." );
-        free( p_sys );
+        Close( p_this );
         return VLC_ENOMEM;
     }
 
