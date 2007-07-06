@@ -1217,7 +1217,7 @@ dnl  default modules
 dnl
 VLC_ADD_PLUGINS([dummy logger memcpy])
 VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 vc1 ps pva avi asf mp4 rawdv rawvid nsv real aiff mjpeg demuxdump flacsys tta])
-VLC_ADD_PLUGINS([cvdsub svcdsub spudec telx subsdec dvbsub mpeg_audio lpcm a52 dts cinepak flac])
+VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak flac])
 VLC_ADD_PLUGINS([deinterlace invert adjust transform wave ripple psychedelic gradient motionblur rv32 rotate noise extract sharpen])
 VLC_ADD_PLUGINS([converter_fixed mono])
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler])
@@ -3791,8 +3791,6 @@ if test "${enable_zvbi}" != "no"; then
   PKG_CHECK_MODULES(ZVBI,
         zvbi-0.2 >= 0.2.25,
         [
-          AC_DEFINE(HAVE_ZVBI_H, 1,
-                Define if Teletext decoder based on zvbi lib is used.)
           VLC_ADD_LDFLAGS([zvbi],[$ZVBI_LIBS])
           VLC_ADD_CFLAGS([zvbi],[$ZVBI_CFLAGS])
           VLC_ADD_PLUGINS([zvbi]) ],
