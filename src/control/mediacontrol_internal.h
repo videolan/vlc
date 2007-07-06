@@ -38,11 +38,11 @@ struct mediacontrol_Instance {
     playlist_t    *p_playlist;
 };
 
-vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
+VLC_PRIVATE_API vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
                                        mediacontrol_PositionKey from,
                                        mediacontrol_PositionKey to,
                                        vlc_int64_t value );
-vlc_int64_t mediacontrol_position2microsecond(
+VLC_PRIVATE_API vlc_int64_t mediacontrol_position2microsecond(
     input_thread_t *p_input,
     const mediacontrol_Position *pos );
 

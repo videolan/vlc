@@ -173,7 +173,10 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([mkv mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_CFLAGS([libvlc vlc],[-x objective-c])
     VLC_ADD_LDFLAGS([vlc],[-Wl,-undefined,dynamic_lookup])
+    VLC_ADD_LDFLAGS([libvlc_control],[-Wl,dynamic_lookup])
+    VLC_ADD_LDFLAGS([ffmpeg i420_rgb_mmx],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
+    VLC_ADD_LDFLAGS([libvlc],[-Wl,-framework,Cocoa,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([motion],[-Wl,-framework,IOKit,-framework,CoreFoundation])
     AC_ARG_ENABLE(macosx-defaults,
         [  --enable-macosx-defaults Build the default configuration on Mac OS X (default enabled)])
@@ -4628,7 +4631,7 @@ if test "${enable_macosx-audio}" != "no" &&
 then
   AC_CHECK_HEADERS(CoreAudio/CoreAudio.h, 
     [ VLC_ADD_BUILTINS([auhal])
-      VLC_ADD_LDFLAGS([auhal],[-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox])
+      VLC_ADD_LDFLAGS([auhal],[-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox,-framework,Carbon])
     ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
 fi
 
