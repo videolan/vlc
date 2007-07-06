@@ -126,6 +126,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
+
     }
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
@@ -135,6 +136,7 @@ static int Open( vlc_object_t *p_this )
     if( (p_sys->p_vbi_dec == NULL) || (p_sys->p_dvb_demux == NULL) )
     {
         msg_Err( p_dec, "VBI decoder/demux could not be created." );
+        free( p_sys );
         return VLC_ENOMEM;
     }
 
@@ -159,8 +161,10 @@ static void Close( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*) p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->p_vbi_dec ) vbi_decoder_delete( p_sys->p_vbi_dec );
-    if( p_sys->p_dvb_demux ) vbi_dvb_demux_delete( p_sys->p_dvb_demux );
+    if( p_sys->p_vbi_dec )
+        vbi_decoder_delete( p_sys->p_vbi_dec );
+    if( p_sys->p_dvb_demux )
+        vbi_dvb_demux_delete( p_sys->p_dvb_demux );
     free( p_sys );
 }
 
@@ -201,7 +205,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             vbi_decode( p_sys->p_vbi_dec, p_sliced, i_lines, i_pts / 90000.0 );
     }
 
-stop_decode:
     /* Try to see if the page we want is in the cache yet */
     b_cached = vbi_fetch_vt_page( p_sys->p_vbi_dec, &p_page,
                                   vbi_dec2bcd( p_sys->i_wanted_page ),
@@ -269,22 +272,21 @@ stop_decode:
     unsigned int i_total, i_textsize = 7000;
     char p_text[7000];
 
-    i_total =  vbi_print_page_region( &p_page, p_text, i_textsize, "ISO-8859-1", 0, 0, 0, 0, p_page.columns, p_page.rows );
+    i_total =  vbi_print_page_region( &p_page, p_text, i_textsize,
+                        "ISO-8859-1", 0, 0, 0, 0, p_page.columns,
+                        p_page.rows );
     p_text[i_total] = '\0';
 
     msg_Dbg( p_dec, "page %x-%x\n%s", p_page.pgno, p_page.subno, p_text );
 #endif
 
-    //if( p_page != NULL)
-        vbi_unref_page( &p_page );
-
+    vbi_unref_page( &p_page );
     block_Release( p_block );
     return p_spu;
 
 error:
-    //if( p_page != NULL)
-        vbi_unref_page( &p_page );
-    if ( p_spu != NULL )
+    vbi_unref_page( &p_page );
+    if( p_spu != NULL )
     {
         p_dec->pf_spu_buffer_del( p_dec, p_spu );
         p_spu = NULL;
