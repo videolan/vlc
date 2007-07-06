@@ -3783,6 +3783,21 @@ if test "${enable_x264}" != "no"; then
 fi
 
 dnl
+dnl vbi decoder plugin (using libzbvi)
+dnl
+AC_ARG_ENABLE(zvbi,
+  [  --enable-zvbi          VBI decoding support with libzvbi (default enabled)])
+if test "${enable_zvbi}" != "no"; then
+  PKG_CHECK_MODULES(ZVBI,
+        zvbi-0.2 >= 0.2.25,
+        [
+          VLC_ADD_LDFLAGS([zvbi],[$ZVBI_LIBS])
+          VLC_ADD_CFLAGS([zvbi],[$ZVBI_CFLAGS])
+          VLC_ADD_PLUGINS([zvbi]) ],
+        [AC_MSG_WARN(ZVBI library not found)])
+fi
+
+dnl
 dnl  CMML plugin
 dnl
 AC_ARG_ENABLE(cmml,

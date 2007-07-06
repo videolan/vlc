@@ -1115,10 +1115,10 @@ DISTCLEAN_PKG += libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2
 # libdvbpsi
 # ***************************************************************************
 
-libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz:
+libdvbpsi4-$(LIBDVBPSI_VERSION).tar.gz:
 	$(WGET) $(LIBDVBPSI_URL)
 
-libdvbpsi: libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
+libdvbpsi: libdvbpsi4-$(LIBDVBPSI_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .dvbpsi: libdvbpsi
@@ -1603,7 +1603,7 @@ zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .zvbi: zvbi
-	(cd $<; ./configure --prefix=$(PREFIX) && make)
+	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -fnested-functions" && make && make install)
 	touch $@
 
 CLEAN_FILE += .zvbi
