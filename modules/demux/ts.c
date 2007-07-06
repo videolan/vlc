@@ -429,7 +429,7 @@ static int Open( vlc_object_t *p_this )
         /* Check next 3 sync bytes */
         i_peek = TS_PACKET_SIZE_MAX * 3 + i_sync + 1;
     }
-    
+
     if( ( stream_Peek( p_demux->s, &p_peek, i_peek ) ) < i_peek )
     {
         msg_Err( p_demux, "cannot peek" );
@@ -879,7 +879,9 @@ static void Close( vlc_object_t *p_this )
         if( p_sys->b_dvb_control && pid->i_pid > 0 )
         {
             /* too much */
-            stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, pid->i_pid, VLC_FALSE );
+            stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                            ACCESS_SET_PRIVATE_ID_STATE, pid->i_pid,
+                            VLC_FALSE );
         }
 
     }
@@ -906,8 +908,8 @@ static void Close( vlc_object_t *p_this )
     /* If in dump mode, then close the file */
     if( p_sys->b_file_out )
     {
-        msg_Info( p_demux ,"closing %s ("I64Fd" Kbytes dumped)", p_sys->psz_file,
-                  p_sys->i_write / 1024 );
+        msg_Info( p_demux ,"closing %s ("I64Fd" Kbytes dumped)",
+                  p_sys->psz_file, p_sys->i_write / 1024 );
 
         if( p_sys->p_file != stdout )
         {
@@ -1660,7 +1662,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
         i_skip += 2;
     }
     else if( pid->es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
-        i_skip = 0; /* FIXME temporary hack for zvbi support */
+        i_skip = 0; /* FIXME hack for zvbi support, breaks telx decoder */
 
     /* skip header */
     while( p_pes && i_skip > 0 )
@@ -2011,6 +2013,7 @@ static int  IODDescriptorLength( int *pi_data, uint8_t **pp_data )
 
     return( i_len );
 }
+
 static int IODGetByte( int *pi_data, uint8_t **pp_data )
 {
     if( *pi_data > 0 )
@@ -2022,12 +2025,14 @@ static int IODGetByte( int *pi_data, uint8_t **pp_data )
     }
     return( 0 );
 }
+
 static int IODGetWord( int *pi_data, uint8_t **pp_data )
 {
     const int i1 = IODGetByte( pi_data, pp_data );
     const int i2 = IODGetByte( pi_data, pp_data );
     return( ( i1 << 8 ) | i2 );
 }
+
 static int IODGet3Bytes( int *pi_data, uint8_t **pp_data )
 {
     const int i1 = IODGetByte( pi_data, pp_data );
@@ -2770,7 +2775,8 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
 
                     for( i = 0; i < pE->i_entry_count; i++ )
                     {
-                        char *psz_dsc = EITConvertToUTF8( pE->i_item_description[i], pE->i_item_description_length[i] );
+                        char *psz_dsc = EITConvertToUTF8( pE->i_item_description[i],
+                                                          pE->i_item_description_length[i] );
                         char *psz_itm = EITConvertToUTF8( pE->i_item[i], pE->i_item_length[i] );
 
                         if( psz_dsc && psz_itm )
@@ -3867,4 +3873,3 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
 
     dvbpsi_DeletePAT( p_pat );
 }
-
