@@ -101,6 +101,10 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
         {
             es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('c','v','d',' ') );
         }
+        else if( ( i_id&0xff ) == 0x10 )
+        {
+            es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('t','e','l','x') );
+        }
         else
         {
             es_format_Init( &tk->fmt, UNKNOWN_ES, 0 );
