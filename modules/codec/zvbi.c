@@ -103,7 +103,7 @@ struct decoder_sys_t
    unsigned int            i_last_page;
    vlc_bool_t              b_update;
    vlc_bool_t              b_opaque;
-}
+};
 
 static void event_handler( vbi_event *ev, void *user_data );
 static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
