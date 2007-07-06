@@ -1603,7 +1603,11 @@ zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .zvbi: zvbi
+ifdef HAVE_DARWIN_OS
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -fnested-functions" && make && make install)
+else
+	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make && make install)
+endif
 	touch $@
 
 CLEAN_FILE += .zvbi
