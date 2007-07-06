@@ -466,6 +466,22 @@ VLC_PUBLIC_API char *libvlc_video_get_crop_geometry( libvlc_media_instance_t *, 
 VLC_PUBLIC_API void libvlc_video_set_crop_geometry( libvlc_media_instance_t *, char *, libvlc_exception_t * );
 
 /**
+ * Get current teletext page requested.
+ * \param p_input the input
+ * \param p_exception an initialized exception
+ * \return the current teletext page requested.
+ */
+VLC_PUBLIC_API int libvlc_video_get_teletext( libvlc_media_instance_t *, libvlc_exception_t * );
+
+/**
+ * Set new teletext page to retrieve
+ * \param p_input the input
+ * \param i_page teletex page number requested
+ * \param p_exception an initialized exception
+ */
+VLC_PUBLIC_API void libvlc_video_set_teletext( libvlc_media_instance_t *, int, libvlc_exception_t * );
+
+/**
  * Take a snapshot of the current video window
  * \param p_input the input
  * \param psz_filepath the path where to save the screenshot to

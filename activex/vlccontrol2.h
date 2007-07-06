@@ -526,6 +526,8 @@ public:
     STDMETHODIMP put_subtitle(long);
     STDMETHODIMP get_crop(BSTR*);
     STDMETHODIMP put_crop(BSTR);
+    STDMETHODIMP get_teletext(long*);
+    STDMETHODIMP put_teletext(long);
     STDMETHODIMP takeSnapshot(LPPICTUREDISP*);
     STDMETHODIMP toggleFullscreen();
 

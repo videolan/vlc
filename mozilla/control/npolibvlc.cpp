@@ -1789,7 +1789,8 @@ const NPUTF8 * const LibvlcVideoNPObject::propertyNames[] =
     "width",
     "aspectRatio",
     "subtitle",
-    "crop"
+    "crop",
+    "teletext"
 };
 
 enum LibvlcVideoNPObjectPropertyIds
@@ -1799,7 +1800,8 @@ enum LibvlcVideoNPObjectPropertyIds
     ID_video_width,
     ID_video_aspectratio,
     ID_video_subtitle,
-    ID_video_crop
+    ID_video_crop,
+    ID_video_teletext
 };
 
 const int LibvlcVideoNPObject::propertyCount = sizeof(LibvlcVideoNPObject::propertyNames)/sizeof(NPUTF8 *);
@@ -1905,6 +1907,19 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::getProperty(int index, NPVari
                     return INVOKERESULT_GENERIC_ERROR;
 
                 STRINGZ_TO_NPVARIANT(psz_geometry, result);
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_video_teletext:
+            {
+                int i_page = libvlc_video_get_teletext(p_md, &ex);
+                libvlc_media_instance_release(p_md);
+                if( libvlc_exception_raised(&ex) )
+                {
+                    NPN_SetException(this, libvlc_exception_get_message(&ex));
+                    libvlc_exception_clear(&ex);
+                    return INVOKERESULT_GENERIC_ERROR;
+                }
+                INT32_TO_NPVARIANT(i_page, result);
                 return INVOKERESULT_NO_ERROR;
             }
         }
@@ -2027,6 +2042,24 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::setProperty(int index, const 
                     return INVOKERESULT_GENERIC_ERROR;
                 }
                 return INVOKERESULT_NO_ERROR;
+            }
+            case ID_video_teletext:
+            {
+                if( isNumberValue(value) )
+                {
+                    libvlc_video_set_teletext(p_md,
+                                         numberValue(value), &ex);
+                    libvlc_media_instance_release(p_md);
+                    if( libvlc_exception_raised(&ex) )
+                    {
+                        NPN_SetException(this, libvlc_exception_get_message(&ex));
+                        libvlc_exception_clear(&ex);
+                        return INVOKERESULT_GENERIC_ERROR;
+                    }
+                    return INVOKERESULT_NO_ERROR;
+                }
+                libvlc_media_instance_release(p_md);
+                return INVOKERESULT_INVALID_VALUE;
             }
         }
         libvlc_media_instance_release(p_md);

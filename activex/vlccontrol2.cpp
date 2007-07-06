@@ -2354,6 +2354,58 @@ STDMETHODIMP VLCVideo::put_crop(BSTR geometry)
     return hr;
 };
 
+STDMETHODIMP VLCVideo::get_teletext(long* page)
+{
+    if( NULL == page )
+        return E_POINTER;
+
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        if( ! libvlc_exception_raised(&ex) )
+        {
+            *page = libvlc_video_get_teletext(p_input, &ex);
+            libvlc_input_free(p_input);
+            if( ! libvlc_exception_raised(&ex) )
+            {
+                return NOERROR;
+            }
+        }
+        _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCVideo::put_teletext(long page)
+{
+    libvlc_instance_t* p_libvlc;
+    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_input_t *p_input = libvlc_playlist_get_input(p_libvlc, &ex);
+        libvlc_video_set_teletext(p_input, page, &ex);
+        libvlc_input_free(p_input);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
 STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
 {
     if( NULL == picture )

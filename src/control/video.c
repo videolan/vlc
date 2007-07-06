@@ -479,6 +479,36 @@ void libvlc_video_set_crop_geometry( libvlc_media_instance_t *p_mi,
     vlc_object_release( p_vout );
 }
 
+int libvlc_video_get_teletext( libvlc_media_instance_t *p_mi,
+                               libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_mi, p_e );
+    int i_ret = -1;
+
+    if( !p_vout )
+        return i_ret;
+
+    i_ret = var_GetInteger( p_vout, "vbi-page" );
+    vlc_object_release( p_vout );
+    return i_ret;
+}
+
+void libvlc_video_set_teletext( libvlc_media_instance_t *p_mi, int i_page,
+                                libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_mi, p_e );
+    int i_ret = -1;
+
+    if( !p_vout )
+        return;
+
+    i_ret = var_SetInteger( p_vout, "vbi-page", i_page );
+    if( i_ret )
+        libvlc_exception_raise( p_e,
+                        "Unexpected error while setting teletext page" );
+    vlc_object_release( p_vout );
+}
+
 int libvlc_video_destroy( libvlc_media_instance_t *p_mi,
                           libvlc_exception_t *p_e )
 {
