@@ -3235,7 +3235,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                                 else
                                 {
                                     p_es = malloc( sizeof( ts_es_t ) );
-                                    
+
                                     es_format_Copy( &p_es->fmt, &pid->es->fmt );
                                     free( p_es->fmt.psz_language ); p_es->fmt.psz_language = NULL;
                                     free( p_es->fmt.psz_description ); p_es->fmt.psz_description = NULL;
