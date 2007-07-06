@@ -169,12 +169,12 @@ case "${host_os}" in
     CFLAGS_save="${CFLAGS_save} -D_INTL_REDIRECT_MACROS"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS -std=gnu99"; OBJCFLAGS="${OBJCFLAGS_save}"
-    VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
-    VLC_ADD_LDFLAGS([mkv mp4], [-framework IOKit -framework CoreFoundation])
+    VLC_ADD_LDFLAGS([mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
+    VLC_ADD_LDFLAGS([mkv mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_CFLAGS([libvlc vlc],[-x objective-c])
-    VLC_ADD_LDFLAGS([vlc],[-undefined dynamic_lookup])
+    VLC_ADD_LDFLAGS([vlc],[-Wl,-undefined,dynamic_lookup])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
-    VLC_ADD_LDFLAGS([motion],[-framework IOKit -framework CoreFoundation])
+    VLC_ADD_LDFLAGS([motion],[-Wl,-framework,IOKit,-framework,CoreFoundation])
     AC_ARG_ENABLE(macosx-defaults,
         [  --enable-macosx-defaults Build the default configuration on Mac OS X (default enabled)])
     if test "x${enable_macosx_defaults}" != "xno"
@@ -1264,7 +1264,7 @@ else
 fi
 if test "${SYS}" = "darwin"; then
     VLC_ADD_PLUGINS([quartztext])
-    VLC_ADD_LDFLAGS([quartztext],[-framework Carbon -framework ApplicationServices])
+    VLC_ADD_LDFLAGS([quartztext],[-Wl,-framework,Carbon,-framework,ApplicationServices])
 fi
 
 dnl
@@ -1474,12 +1474,12 @@ AS_IF( test "${enable_altivec}" != "no",
 
 AC_CACHE_CHECK([if linker needs -framework vecLib],
     [ac_cv_ld_altivec],
-    [LDFLAGS="${LDFLAGS_vlc} -framework vecLib"
+    [LDFLAGS="${LDFLAGS_vlc} -Wl,-framework,vecLib"
      AC_TRY_LINK([],,ac_cv_ld_altivec=yes,ac_cv_ld_altivec=no)
      LDFLAGS="${LDFLAGS_save}"
     ])
 if test "${ac_cv_ld_altivec}" != "no"; then
-  VLC_ADD_LDFLAGS([libvlc idctaltivec motionaltivec memcpyaltivec],[-framework vecLib])
+  VLC_ADD_LDFLAGS([libvlc idctaltivec motionaltivec memcpyaltivec],[-Wl,-framework,vecLib])
 fi
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
@@ -2518,7 +2518,7 @@ then
   if test "${SYS}" = "darwin"
   then
     VLC_ADD_PLUGINS([vcd cdda])
-    VLC_ADD_LDFLAGS([vcd vcdx cdda cddax],[-framework IOKit -framework CoreFoundation])
+    VLC_ADD_LDFLAGS([vcd vcdx cdda cddax],[-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([vcdx cddax cdda],[-liconv])
   fi
 
@@ -2569,7 +2569,7 @@ if test "${enable_screen}" != "no"; then
   if test "${SYS}" = "darwin"; then
     AC_CHECK_HEADERS(ApplicationServices/ApplicationServices.h, [
       VLC_ADD_PLUGINS([screen])
-      VLC_ADD_LDFLAGS([screen],[-framework ApplicationServices])
+      VLC_ADD_LDFLAGS([screen],[-Wl,-framework,ApplicationServices])
     ])
   elif test "${SYS}" = "mingw32"; then
     VLC_ADD_PLUGINS([screen])
@@ -3286,7 +3286,7 @@ then
   else
   AC_CHECK_HEADERS(QuickTime/QuickTime.h,
     [ VLC_ADD_BUILTINS([quicktime])
-      VLC_ADD_LDFLAGS([quicktime],[-framework QuickTime -framework Carbon])
+      VLC_ADD_LDFLAGS([quicktime],[-Wl,-framework,QuickTime,-framework,Carbon])
     ], [ AC_MSG_ERROR([cannot find QuickTime headers]) ])
   fi
 fi
@@ -3999,7 +3999,7 @@ if test "${enable_opengl}" != "no" &&
   else
     dnl OS X special case (no GL/gl.h but OpenGL/gl.h)
     VLC_ADD_PLUGINS([opengl])
-    VLC_ADD_LDFLAGS([opengl],[-framework OpenGL])
+    VLC_ADD_LDFLAGS([opengl],[-Wl,-framework,OpenGL])
   fi
 fi
 
@@ -4123,7 +4123,7 @@ then
       [VLC_ADD_CFLAGS([freetype],[-DHAVE_FONTCONFIG])
        VLC_ADD_LDFLAGS([freetype],[-lfontconfig])])
     AC_CHECK_HEADERS(Carbon/Carbon.h,
-      [VLC_ADD_LDFLAGS([freetype],[-framework Carbon])])
+      [VLC_ADD_LDFLAGS([freetype],[-Wl,-framework,Carbon])])
   elif test "${enable_freetype}" =  "yes"
   then
     AC_MSG_ERROR([I couldn't find the freetype package. You can download libfreetype2
@@ -4628,7 +4628,7 @@ if test "${enable_macosx-audio}" != "no" &&
 then
   AC_CHECK_HEADERS(CoreAudio/CoreAudio.h, 
     [ VLC_ADD_BUILTINS([auhal])
-      VLC_ADD_LDFLAGS([auhal],[-framework CoreAudio -framework AudioUnit -framework AudioToolbox])
+      VLC_ADD_LDFLAGS([auhal],[-Wl,-framework,CoreAudio,-framework,AudioUnit,-framework,AudioToolbox])
     ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
 fi
 
@@ -4805,7 +4805,7 @@ if test "${enable_skins2}" = "yes" ||
     ALIASES="${ALIASES} svlc"
     VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -DMACOSX_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
-    VLC_ADD_LDFLAGS([skins2],[-framework Carbon])
+    VLC_ADD_LDFLAGS([skins2],[-Wl,-framework,Carbon])
 
   else if test "${skins2_missing_lib}" = "no"; then
     VLC_ADD_PLUGINS([skins2])
@@ -5212,15 +5212,15 @@ AC_ARG_ENABLE(macosx,
   [if test "${enable_macosx}" = "yes"
    then
      VLC_ADD_PLUGINS([access_eyetv])
-     VLC_ADD_LDFLAGS([access_eyetv], [-framework CoreFoundation])
-     VLC_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC -framework OpenGL -framework AGL -framework QTKit])
+     VLC_ADD_LDFLAGS([access_eyetv], [-Wl,-framework,CoreFoundation])
+     VLC_ADD_LDFLAGS([macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL,-framework,QTKit])
      VLC_ADD_OBJCFLAGS( [macosx],[-fobjc-exceptions] )
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
      VLC_ADD_PLUGINS([access_eyetv])
-     VLC_ADD_LDFLAGS([access_eyetv], [-framework CoreFoundation])
+     VLC_ADD_LDFLAGS([access_eyetv], [-Wl,-framework,CoreFoundation])
      VLC_ADD_BUILTINS([macosx])
-     VLC_ADD_LDFLAGS([macosx],[-framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC -framework OpenGL -framework AGL -framework QTKit])
+     VLC_ADD_LDFLAGS([macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL,-framework,QTKit])
      VLC_ADD_OBJCFLAGS( [macosx],[-fobjc-exceptions] )
    )])
 CFLAGS=$ORIGCFLAGS
