@@ -73,6 +73,10 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
 #define PAGE_LONGTEXT N_("Open the indicated Teletext page." \
         "Default page is index 100")
 
+#define OPAQUE_TEXT N_("Text is always opaque")
+#define OPAQUE_LONGTEXT N_("Setting vbi-opaque to false " \
+        "makes the boxed text transparent." )
+
 vlc_module_begin();
     set_description( _("VBI and Teletext decoder") );
     set_shortname( "VBI & Teletext" );
@@ -83,6 +87,8 @@ vlc_module_begin();
 
     add_integer( "vbi-page", 100, NULL,
                  PAGE_TEXT, PAGE_LONGTEXT, VLC_FALSE );
+    add_bool( "vbi-opaque", VLC_TRUE, NULL,
+                 OPAQUE_TEXT, OPAQUE_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
 /****************************************************************************
@@ -96,11 +102,14 @@ struct decoder_sys_t
    unsigned int            i_wanted_page;
    unsigned int            i_last_page;
    vlc_bool_t              b_update;
+   vlc_bool_t              b_opaque;
 }
 
 static void event_handler( vbi_event *ev, void *user_data );
 static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data );
+static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
+                   vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
 /*****************************************************************************
  * Open: probe the decoder and return score
@@ -112,8 +121,6 @@ static int Open( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t *) p_this;
     decoder_sys_t *p_sys = NULL;
-    vlc_value_t    val;
-    int            i;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('t','e','l','x') )
     {
@@ -150,6 +157,9 @@ static int Open( vlc_object_t *p_this )
                                                  "vbi-page" );
     var_AddCallback( p_dec->p_libvlc_global, "vbi-page",
                      RequestPage, p_sys );
+
+    p_sys->b_opaque = var_CreateGetBool( p_dec, "vbi-opaque" );
+    var_AddCallback( p_dec, "vbi-opaque", Opaque, p_sys );
     return VLC_SUCCESS;
 }
 
@@ -183,6 +193,12 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     vbi_page        p_page;
     uint8_t         *p_pos;
     unsigned int    i_left;
+
+    /* part of kludge */
+    uint32_t        *p_begin, *p_end;
+    unsigned        int x = 0, y = 0;
+    vbi_opacity opacity;
+    /* end part of kludge */
 
     if( (pp_block == NULL) || (*pp_block == NULL) )
         return NULL;
@@ -268,6 +284,44 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->p_region->picture.p->i_lines = p_page.rows * 10;
     p_spu->p_region->picture.p->i_pitch = p_page.columns * 12 * 4;
 
+    /* Kludge since zvbi doesn't provide an option to specify opacity. */
+    p_begin = (uint32_t *)p_spu->p_region->picture.p->p_pixels;
+    p_end   = (uint32_t *)p_spu->p_region->picture.p->p_pixels+(fmt.i_width * fmt.i_height);
+
+    for( ; p_begin < p_end; p_begin++ )
+    {
+        opacity = p_page.text[ y / 10 * p_page.columns + x / 12 ].opacity;
+        switch( opacity )
+        {
+            /* Show video instead of this character */
+            case VBI_TRANSPARENT_SPACE:
+                *p_begin = 0;
+                break;
+            /* To make the boxed text "closed captioning" transparent
+             * change VLC_TRUE to VLC_FALSE.
+             */
+            case VBI_OPAQUE:
+                if( p_sys->b_opaque )
+                    break;
+            /* Full text transparency. only foreground color is show */
+            case VBI_TRANSPARENT_FULL:
+            /* Transparency for boxed text */
+            case VBI_SEMI_TRANSPARENT:
+                if( (*p_begin & 0xffffff00) == 0xff  )
+                    *p_begin = 0;
+                break;
+            default:
+                break;
+        }
+        x++;
+        if( x >= fmt.i_width )
+        {
+            x = 0;
+            y++;
+        }
+    }
+    /* end of kludge */
+
 #if 0
     unsigned int i_total, i_textsize = 7000;
     char p_text[7000];
@@ -333,5 +387,15 @@ static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
     if( (newval.i_int > 0) && (newval.i_int < 999) )
         p_sys->i_wanted_page = newval.i_int;
 
+    return VLC_SUCCESS;
+}
+
+static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
+                   vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    decoder_sys_t *p_sys = p_data;
+
+    if( p_sys )
+        p_sys->b_opaque = newval.b_bool;
     return VLC_SUCCESS;
 }
