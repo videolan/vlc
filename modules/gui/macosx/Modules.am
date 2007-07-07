@@ -1,3 +1,8 @@
+# Automake forgets to add a proper tag to libtool with Objective-C files.
+# Moreovcer Libtool should default tag to CC when none is specified but
+# obviously does not. Here is a fix for that.
+LIBTOOL=@LIBTOOL@ --tag=CC
+
 SOURCES_macosx = \
 	AppleRemote.h \
 	AppleRemote.m \
