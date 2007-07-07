@@ -249,10 +249,13 @@ struct text_style_t
     int        i_background_alpha;/**< The transparency of the background.
                                        0x00 is fully opaque,
                                        0xFF fully transparent */
+    int        i_karaoke_background_color;/**< Background color for karaoke 0xRRGGBB */
+    int        i_karaoke_background_alpha;/**< The transparency of the karaoke bg.
+                                       0x00 is fully opaque,
+                                       0xFF fully transparent */
     int        i_outline_width;   /**< The width of the outline in pixels */
     int        i_shadow_width;    /**< The width of the shadow in pixels */
     int        i_spacing;         /**< The spaceing between glyphs in pixels */
-    int        i_text_align;      /**< An alignment hint for the text */
 };
 
 /* Style flags for \ref text_style_t */
@@ -265,7 +268,7 @@ struct text_style_t
 #define STYLE_STRIKEOUT   64
 
 static const text_style_t default_text_style = { NULL, 22, 0xffffff, 0xff, STYLE_OUTLINE,
-                0x000000, 0xff, 0x000000, 0xff, 0xffffff, 0x80, 1, 0, -1, 0 };
+                0x000000, 0xff, 0x000000, 0xff, 0xffffff, 0x80, 0xffffff, 0xff, 1, 0, -1 };
 
 
 

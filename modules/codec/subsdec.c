@@ -30,14 +30,33 @@
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
 #include <vlc_codec.h>
+#include <vlc_input.h>
 
 #include <vlc_osd.h>
 #include <vlc_filter.h>
+#include <vlc_image.h>
 #include <vlc_charset.h>
 #include <vlc_stream.h>
 #include <vlc_xml.h>
 #include <errno.h>
 #include <string.h>
+
+#define NO_BREAKING_SPACE  "&#160;"
+
+enum
+{
+    ATTRIBUTE_ALIGNMENT = (1 << 0),
+    ATTRIBUTE_X         = (1 << 1),
+    ATTRIBUTE_X_PERCENT = (1 << 2),
+    ATTRIBUTE_Y         = (1 << 3),
+    ATTRIBUTE_Y_PERCENT = (1 << 4),
+};
+
+typedef struct
+{
+    char       *psz_filename;
+    picture_t  *p_pic;
+} image_attach_t;
 
 typedef struct
 {
@@ -46,6 +65,8 @@ typedef struct
     int             i_align;
     int             i_margin_h;
     int             i_margin_v;
+    int             i_margin_percent_h;
+    int             i_margin_percent_v;
 }  ssa_style_t;
 
 /*****************************************************************************
@@ -62,6 +83,9 @@ struct decoder_sys_t
 
     ssa_style_t         **pp_ssa_styles;
     int                 i_ssa_styles;
+
+    image_attach_t      **pp_images;
+    int                 i_images;
 };
 
 /*****************************************************************************
@@ -74,12 +98,15 @@ static subpicture_t *DecodeBlock   ( decoder_t *, block_t ** );
 static subpicture_t *ParseText     ( decoder_t *, block_t * );
 static void         ParseSSAHeader ( decoder_t * );
 static void         ParseUSFHeader ( decoder_t * );
-static void         ParseUSFHeaderTags( decoder_sys_t *, xml_reader_t * );
+static void         ParseUSFHeaderTags( decoder_t *, xml_reader_t * );
 static void         ParseSSAString ( decoder_t *, char *, subpicture_t * );
-static void         ParseUSFString ( decoder_t *, char *, subpicture_t * );
+static subpicture_region_t *ParseUSFString ( decoder_t *, char *, subpicture_t * );
 static void         ParseColor     ( decoder_t *, char *, int *, int * );
 static char        *StripTags      ( char * );
 static char        *CreateHtmlSubtitle ( char * );
+static char        *CreatePlainText( char * );
+static int          ParseImageAttachments( decoder_t *p_dec );
+static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, subpicture_t *p_spu, const char *psz_filename, int i_transparent_color );
 
 #define DEFAULT_NAME "Default"
 #define MAX_LINE 8192
@@ -205,8 +232,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->b_ass = VLC_FALSE;
     p_sys->i_original_height = -1;
     p_sys->i_original_width = -1;
-    p_sys->pp_ssa_styles = NULL;
-    p_sys->i_ssa_styles = 0;
+    TAB_INIT( p_sys->i_ssa_styles, p_sys->pp_ssa_styles );
+    TAB_INIT( p_sys->i_images, p_sys->pp_images );
 
     char *psz_charset = NULL;
     /* First try demux-specified encoding */
@@ -271,6 +298,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     var_Get( p_dec, "subsdec-align", &val );
     p_sys->i_align = val.i_int;
 
+    ParseImageAttachments( p_dec );
+
     if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','s','a',' ') && var_CreateGetBool( p_dec, "subsdec-formatted" ) )
     {
         if( p_dec->fmt_in.i_extra > 0 )
@@ -313,22 +342,41 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( p_sys->iconv_handle != (vlc_iconv_t)-1 )
-    {
         vlc_iconv_close( p_sys->iconv_handle );
-    }
 
     if( p_sys->pp_ssa_styles )
     {
         int i;
         for( i = 0; i < p_sys->i_ssa_styles; i++ )
         {
-            if( p_sys->pp_ssa_styles[i]->psz_stylename ) free( p_sys->pp_ssa_styles[i]->psz_stylename );
-            p_sys->pp_ssa_styles[i]->psz_stylename = NULL;
-            if( p_sys->pp_ssa_styles[i]->font_style.psz_fontname ) free( p_sys->pp_ssa_styles[i]->font_style.psz_fontname );
-            p_sys->pp_ssa_styles[i]->font_style.psz_fontname = NULL;
-            if( p_sys->pp_ssa_styles[i] ) free( p_sys->pp_ssa_styles[i] ); p_sys->pp_ssa_styles[i] = NULL;
+            if( !p_sys->pp_ssa_styles[i] )
+                continue;
+
+            if( p_sys->pp_ssa_styles[i]->psz_stylename )
+                free( p_sys->pp_ssa_styles[i]->psz_stylename );
+            if( p_sys->pp_ssa_styles[i]->font_style.psz_fontname )
+                free( p_sys->pp_ssa_styles[i]->font_style.psz_fontname );
+            if( p_sys->pp_ssa_styles[i] )
+                free( p_sys->pp_ssa_styles[i] );
         }
-        free( p_sys->pp_ssa_styles ); p_sys->pp_ssa_styles = NULL;
+        TAB_CLEAN( p_sys->i_ssa_styles, p_sys->pp_ssa_styles );
+    }
+    if( p_sys->pp_images )
+    {
+        int i;
+        for( i = 0; i < p_sys->i_images; i++ )
+        {
+            if( !p_sys->pp_images[i] )
+                continue;
+
+            if( p_sys->pp_images[i]->p_pic )
+                p_sys->pp_images[i]->p_pic->pf_release( p_sys->pp_images[i]->p_pic );
+            if( p_sys->pp_images[i]->psz_filename )
+                free( p_sys->pp_images[i]->psz_filename );
+
+            free( p_sys->pp_images[i] );
+        }
+        TAB_CLEAN( p_sys->i_images, p_sys->pp_images );
     }
 
     free( p_sys );
@@ -468,7 +516,10 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','s','a',' ') )
             ParseSSAString( p_dec, psz_subtitle, p_spu );
         else
-            ParseUSFString( p_dec, psz_subtitle, p_spu );
+        {
+            p_spu->pf_destroy_region( VLC_OBJECT(p_dec), p_spu->p_region );
+            p_spu->p_region = ParseUSFString( p_dec, psz_subtitle, p_spu );
+        }
 
         p_spu->i_start = p_block->i_pts;
         p_spu->i_stop = p_block->i_pts + p_block->i_length;
@@ -482,108 +533,357 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     return p_spu;
 }
 
-static void ParseUSFString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *p_spu_in )
+static char *GrabAttributeValue( const char *psz_attribute,
+                                 const char *psz_tag_start )
 {
-    decoder_sys_t   *p_sys = p_dec->p_sys;
-    subpicture_t    *p_spu = p_spu_in;
-    char            *psz_text;
-    char            *psz_text_start;
-    ssa_style_t     *p_style = NULL;
-    int              i;
-
-    /* Create a text only copy of the subtitle (for legacy implementations) and copy
-     * the rich html version across as is - for parsing by a rendering engine capable
-     * of understanding it.
-     */
-    p_spu->p_region->psz_text = NULL;
-    p_spu->p_region->psz_html = strdup( psz_subtitle );
-
-    for( i = 0; i < p_sys->i_ssa_styles; i++ )
+    if( psz_attribute && psz_tag_start )
     {
-        if( !strcasecmp( p_sys->pp_ssa_styles[i]->psz_stylename, "Default" ) )
-            p_style = p_sys->pp_ssa_styles[i];
+        char *psz_tag_end = strchr( psz_tag_start, '>' );
+        char *psz_found   = strcasestr( psz_tag_start, psz_attribute );
+
+        if( psz_found )
+        {
+            psz_found += strlen( psz_attribute );
+
+            if(( *(psz_found++) == '=' ) &&
+               ( *(psz_found++) == '\"' ))
+            {
+                if( psz_found < psz_tag_end )
+                {
+                    int   i_len = strcspn( psz_found, "\"" );
+                    return strndup( psz_found, i_len );
+                }
+            }
+        }
     }
+    return NULL;
+}
 
-    /* The StripTags() function doesn't do everything we need (eg. <br/> tag )
-     * so do it here ourselves.
+static ssa_style_t *ParseStyle( decoder_sys_t *p_sys, char *psz_subtitle )
+{
+    ssa_style_t *p_style   = NULL;
+    char        *psz_style = GrabAttributeValue( "style", psz_subtitle );
+
+    if( psz_style )
+    {
+        int i;
+
+        for( i = 0; i < p_sys->i_ssa_styles; i++ )
+        {
+            if( !strcmp( p_sys->pp_ssa_styles[i]->psz_stylename, psz_style ) )
+                p_style = p_sys->pp_ssa_styles[i];
+        }
+        free( psz_style );
+    }
+    return p_style;
+}
+
+static int ParsePositionAttributeList( char *psz_subtitle, int *i_align, int *i_x, int *i_y )
+{
+    int   i_mask = 0;
+
+    char *psz_align    = GrabAttributeValue( "alignment", psz_subtitle );
+    char *psz_margin_x = GrabAttributeValue( "horizontal-margin", psz_subtitle );
+    char *psz_margin_y = GrabAttributeValue( "vertical-margin", psz_subtitle );
+    /* -- UNSUPPORTED
+    char *psz_relative = GrabAttributeValue( "relative-to", psz_subtitle );
+    char *psz_rotate_x = GrabAttributeValue( "rotate-x", psz_subtitle );
+    char *psz_rotate_y = GrabAttributeValue( "rotate-y", psz_subtitle );
+    char *psz_rotate_z = GrabAttributeValue( "rotate-z", psz_subtitle );
+    */
+
+    *i_align = SUBPICTURE_ALIGN_BOTTOM;
+    *i_x = 0;
+    *i_y = 0;
+
+    if( psz_align )
+    {
+        if( !strcasecmp( "TopLeft", psz_align ) )
+            *i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
+        else if( !strcasecmp( "TopCenter", psz_align ) )
+            *i_align = SUBPICTURE_ALIGN_TOP;
+        else if( !strcasecmp( "TopRight", psz_align ) )
+            *i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT;
+        else if( !strcasecmp( "MiddleLeft", psz_align ) )
+            *i_align = SUBPICTURE_ALIGN_LEFT;
+        else if( !strcasecmp( "MiddleCenter", psz_align ) )
+            *i_align = 0;
+        else if( !strcasecmp( "MiddleRight", psz_align ) )
+            *i_align = SUBPICTURE_ALIGN_RIGHT;
+        else if( !strcasecmp( "BottomLeft", psz_align ) )
+            *i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
+        else if( !strcasecmp( "BottomCenter", psz_align ) )
+            *i_align = SUBPICTURE_ALIGN_BOTTOM;
+        else if( !strcasecmp( "BottomRight", psz_align ) )
+            *i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
+
+        i_mask |= ATTRIBUTE_ALIGNMENT;
+        free( psz_align );
+    }
+    if( psz_margin_x )
+    {
+        *i_x = atoi( psz_margin_x );
+        if( strchr( psz_margin_x, '%' ) )
+            i_mask |= ATTRIBUTE_X_PERCENT;
+        else
+            i_mask |= ATTRIBUTE_X;
+
+        free( psz_margin_x );
+    }
+    if( psz_margin_y )
+    {
+        *i_y = atoi( psz_margin_y );
+        if( strchr( psz_margin_y, '%' ) )
+            i_mask |= ATTRIBUTE_Y_PERCENT;
+        else
+            i_mask |= ATTRIBUTE_Y;
+
+        free( psz_margin_y );
+    }
+    return i_mask;
+}
+
+static void SetupPositions( subpicture_region_t *p_region, char *psz_subtitle )
+{
+    int           i_mask = 0;
+    int           i_align;
+    int           i_x, i_y;
+
+    i_mask = ParsePositionAttributeList( psz_subtitle, &i_align, &i_x, &i_y );
+
+    if( i_mask & ATTRIBUTE_ALIGNMENT )
+        p_region->i_align = i_align;
+    
+    /* TODO: Setup % based offsets properly, without adversely affecting
+     *       everything else in vlc. Will address with separate patch, to
+     *       prevent this one being any more complicated.
      */
-    psz_text_start = malloc( strlen( psz_subtitle ));
+    if( i_mask & ATTRIBUTE_X )
+        p_region->i_x = i_x;
+    else if( i_mask & ATTRIBUTE_X_PERCENT )
+        p_region->i_x = 0;
 
-    psz_text = psz_text_start;
+    if( i_mask & ATTRIBUTE_Y )
+        p_region->i_y = i_y;
+    else if( i_mask & ATTRIBUTE_Y_PERCENT )
+        p_region->i_y = 0;
+}
+
+static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
+                                              subpicture_t *p_spu,
+                                              char *psz_subtitle,
+                                              int i_len,
+                                              int i_sys_align )
+{
+    decoder_sys_t        *p_sys = p_dec->p_sys;
+    subpicture_region_t  *p_text_region;
+    video_format_t        fmt;
+
+    /* Create a new subpicture region */
+    memset( &fmt, 0, sizeof(video_format_t) );
+    fmt.i_chroma = VLC_FOURCC('T','E','X','T');
+    fmt.i_aspect = 0;
+    fmt.i_width = fmt.i_height = 0;
+    fmt.i_x_offset = fmt.i_y_offset = 0;
+    p_text_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
+
+    if( p_text_region != NULL )
+    {
+        ssa_style_t  *p_style = NULL;
+
+        p_text_region->psz_text = NULL;
+        p_text_region->psz_html = strndup( psz_subtitle, i_len );
+        if( ! p_text_region->psz_html )
+        {
+            msg_Err( p_dec, "out of memory" );
+            p_spu->pf_destroy_region( VLC_OBJECT(p_dec), p_text_region );
+            return NULL;
+        }
+
+        p_style = ParseStyle( p_sys, p_text_region->psz_html );
+        if( !p_style )
+        {
+            int i;
+
+            for( i = 0; i < p_sys->i_ssa_styles; i++ )
+            {
+                if( !strcasecmp( p_sys->pp_ssa_styles[i]->psz_stylename, "Default" ) )
+                    p_style = p_sys->pp_ssa_styles[i];
+            }
+        }
+
+        if( p_style )
+        {
+            msg_Dbg( p_dec, "style is: %s", p_style->psz_stylename );
+
+            p_text_region->p_style = &p_style->font_style;
+            p_text_region->i_align = p_style->i_align;
+
+            /* TODO: Setup % based offsets properly, without adversely affecting
+             *       everything else in vlc. Will address with separate patch,
+             *       to prevent this one being any more complicated.
+
+                     * p_style->i_margin_percent_h;
+                     * p_style->i_margin_percent_v;
+             */
+            p_text_region->i_x         = p_style->i_margin_h;
+            p_text_region->i_y         = p_style->i_margin_v;
+            
+        }
+        else
+        {
+            p_text_region->i_align = SUBPICTURE_ALIGN_BOTTOM | i_sys_align;
+            p_text_region->i_x = i_sys_align ? 20 : 0;
+            p_text_region->i_y = 10;
+        }
+        /* Look for position arguments which may override the style-based
+         * defaults.
+         */
+        SetupPositions( p_text_region, psz_subtitle );
+        
+        p_text_region->p_next = NULL;
+    }
+    return p_text_region;
+}
+
+static subpicture_region_t *ParseUSFString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *p_spu_in )
+{
+    decoder_sys_t        *p_sys = p_dec->p_sys;
+    subpicture_t         *p_spu = p_spu_in;
+    subpicture_region_t  *p_region_first = NULL;
+    subpicture_region_t  *p_region_upto  = p_region_first;
+
     while( *psz_subtitle )
     {
         if( *psz_subtitle == '<' )
         {
-            if( !strncasecmp( psz_subtitle, "<br/>", 5 ))
-                *psz_text++ = '\n';
-            else if( !strncasecmp( psz_subtitle, "<text ", 6 ))
+            char *psz_end = NULL;
+
+            if(( !strncasecmp( psz_subtitle, "<text ", 6 )) ||
+               ( !strncasecmp( psz_subtitle, "<text>", 6 )))
             {
-                char *psz_style = strcasestr( psz_subtitle, "style=\"" );
-
-                if( psz_style && ( psz_style < strchr( psz_subtitle, '>' ) ))
+                psz_end = strcasestr( psz_subtitle, "</text>" );
+                
+                if( psz_end )
                 {
-                    int i_len;
+                    subpicture_region_t  *p_text_region;
 
-                    psz_style += strspn( psz_style, "\"" ) + 1;
-                    i_len = strcspn( psz_style, "\"" );
+                    psz_end += strcspn( psz_end, ">" ) + 1;
 
-                    psz_style[ i_len ] = '\0';
+                    p_text_region = CreateTextRegion( p_dec,
+                                                      p_spu,
+                                                      psz_subtitle,
+                                                      psz_end - psz_subtitle,
+                                                      p_sys->i_align );
+                
+                    if( p_text_region )
+                        p_text_region->psz_text = CreatePlainText( p_text_region->psz_html );
 
-                    for( i = 0; i < p_sys->i_ssa_styles; i++ )
+                    if( !p_region_first )
                     {
-                        if( !strcmp( p_sys->pp_ssa_styles[i]->psz_stylename, psz_style ) )
-                            p_style = p_sys->pp_ssa_styles[i];
+                        p_region_first = p_region_upto = p_text_region;
                     }
-
-                    psz_style[ i_len ] = '\"';
+                    else if( p_text_region )
+                    {
+                        p_region_upto->p_next = p_text_region;
+                        p_region_upto = p_region_upto->p_next;
+                    }
                 }
             }
+            else if(( !strncasecmp( psz_subtitle, "<karaoke ", 9 )) ||
+                    ( !strncasecmp( psz_subtitle, "<karaoke>", 9 )))
+            {
+                psz_end = strcasestr( psz_subtitle, "</karaoke>" );
+                
+                if( psz_end )
+                {
+                    subpicture_region_t  *p_text_region;
+
+                    psz_end += strcspn( psz_end, ">" ) + 1;
+
+                    p_text_region = CreateTextRegion( p_dec,
+                                                      p_spu,
+                                                      psz_subtitle,
+                                                      psz_end - psz_subtitle,
+                                                      p_sys->i_align );
+                
+                    if( !p_region_first )
+                    {
+                        p_region_first = p_region_upto = p_text_region;
+                    }
+                    else if( p_text_region )
+                    {
+                        p_region_upto->p_next = p_text_region;
+                        p_region_upto = p_region_upto->p_next;
+                    }
+                }
+            }
+            else if(( !strncasecmp( psz_subtitle, "<image ", 7 )) ||
+                    ( !strncasecmp( psz_subtitle, "<image>", 7 )))
+            {
+                subpicture_region_t *p_image_region = NULL;
+
+                char *psz_end = strcasestr( psz_subtitle, "</image>" );
+                char *psz_content = strchr( psz_subtitle, '>' );
+                int   i_transparent = -1;
+                
+                /* If a colorkey parameter is specified, then we have to map
+                 * that index in the picture through as transparent (it is
+                 * required by the USF spec but is also recommended that if the
+                 * creator really wants a transparent colour that they use a
+                 * type like PNG that properly supports it; this goes doubly
+                 * for VLC because the pictures are stored internally in YUV
+                 * and the resulting colour-matching may not produce the
+                 * desired results.)
+                 */
+                char *psz_tmp = GrabAttributeValue( "colorkey", psz_subtitle );
+                if( psz_tmp )
+                {
+                    if( *psz_tmp == '#' )
+                        i_transparent = strtol( psz_tmp + 1, NULL, 16 ) & 0x00ffffff;
+                    free( psz_tmp );
+                }
+                if( psz_content && ( psz_content < psz_end ) )
+                {
+                    char *psz_filename = strndup( &psz_content[1], psz_end - &psz_content[1] );
+                    if( psz_filename )
+                    {
+                        p_image_region = LoadEmbeddedImage( p_dec, p_spu, psz_filename, i_transparent );
+                        free( psz_filename );
+                    }
+                }
+
+                if( psz_end ) psz_end += strcspn( psz_end, ">" ) + 1;
+
+                if( p_image_region )
+                {
+                    SetupPositions( p_image_region, psz_subtitle );
+
+                    p_image_region->p_next   = NULL;
+                    p_image_region->psz_text = NULL;
+                    p_image_region->psz_html = NULL;
+
+                }
+                if( !p_region_first )
+                {
+                    p_region_first = p_region_upto = p_image_region;
+                }
+                else if( p_image_region )
+                {
+                    p_region_upto->p_next = p_image_region;
+                    p_region_upto = p_region_upto->p_next;
+                }
+            }
+            if( psz_end )
+                psz_subtitle = psz_end - 1;
             
             psz_subtitle += strcspn( psz_subtitle, ">" );
         }
-        else if( *psz_subtitle == '&' )
-        {
-            if( !strncasecmp( psz_subtitle, "&lt;", 4 ))
-                *psz_text++ = '<';
-            else if( !strncasecmp( psz_subtitle, "&gt;", 4 ))
-                *psz_text++ = '>';
-            else if( !strncasecmp( psz_subtitle, "&amp;", 5 ))
-                *psz_text++ = '&';
-
-            psz_subtitle += strcspn( psz_subtitle, ";" );
-        }
-        else if( ( *psz_subtitle == '\t' ) ||
-                 ( *psz_subtitle == '\r' ) ||
-                 ( *psz_subtitle == '\n' ) ||
-                 ( *psz_subtitle == ' ' ) )
-        {
-            if( ( psz_text_start < psz_text ) &&
-                ( *(psz_text-1) != ' ' ) )
-            {
-                *psz_text++ = ' ';
-            }
-        }
-        else
-            *psz_text++ = *psz_subtitle;
 
         psz_subtitle++;
     }
-    *psz_text = '\0';
-    p_spu->p_region->psz_text = strdup( psz_text_start );
-    free( psz_text_start );
 
-    if( p_style == NULL )
-    {
-        p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-        p_spu->i_x = p_sys->i_align ? 20 : 0;
-        p_spu->i_y = 10;
-    }
-    else
-    {
-        msg_Dbg( p_dec, "style is: %s", p_style->psz_stylename);
-        p_spu->p_region->p_style = &p_style->font_style;
-        p_spu->p_region->i_align = p_style->i_align;
-    }
+    return p_region_first;
 }
 
 static void ParseSSAString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *p_spu_in )
@@ -612,11 +912,16 @@ static void ParseSSAString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
         if( *psz_buffer_sub == ',' )
         {
             i_comma++;
-            if( i_comma == 2 ) psz_style_start = &psz_buffer_sub[1];
-            if( i_comma == 3 ) psz_style_end = &psz_buffer_sub[0];
-            if( i_comma == 4 ) i_margin_l = (int)strtol( psz_buffer_sub+1, NULL, 10 );
-            if( i_comma == 5 ) i_margin_r = (int)strtol( psz_buffer_sub+1, NULL, 10 );
-            if( i_comma == 6 ) i_margin_v = (int)strtol( psz_buffer_sub+1, NULL, 10 );
+            if( i_comma == 2 )
+                psz_style_start = &psz_buffer_sub[1];
+            else if( i_comma == 3 )
+                psz_style_end = &psz_buffer_sub[0];
+            else if( i_comma == 4 )
+                i_margin_l = (int)strtol( &psz_buffer_sub[1], NULL, 10 );
+            else if( i_comma == 5 )
+                i_margin_r = (int)strtol( &psz_buffer_sub[1], NULL, 10 );
+            else if( i_comma == 6 )
+                i_margin_v = (int)strtol( &psz_buffer_sub[1], NULL, 10 );
         }
         psz_buffer_sub++;
     }
@@ -664,9 +969,7 @@ static void ParseSSAString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
     psz_new_subtitle[i_text] = '\0';
 
     i_strlen = __MAX( psz_style_end - psz_style_start, 0);
-    psz_style = (char *)malloc( i_strlen + 1);
-    psz_style = memcpy( psz_style, psz_style_start, i_strlen );
-    psz_style[i_strlen] = '\0';
+    psz_style = strndup( psz_style_start, i_strlen );
 
     for( i = 0; i < p_sys->i_ssa_styles; i++ )
     {
@@ -740,12 +1043,122 @@ static void ParseColor( decoder_t *p_dec, char *psz_color, int *pi_color, int *p
         *pi_alpha = ( i_color & 0xFF000000 ) >> 24;
 }
 
+static int ParseImageAttachments( decoder_t *p_dec )
+{
+    decoder_sys_t        *p_sys = p_dec->p_sys;
+    input_attachment_t  **pp_attachments;
+    int                   i_attachments_cnt;
+    int                   k = 0;
+
+    if( VLC_SUCCESS != decoder_GetInputAttachments( p_dec, &pp_attachments, &i_attachments_cnt ))
+        return VLC_EGENERIC;
+
+    for( k = 0; k < i_attachments_cnt; k++ )
+    {
+        input_attachment_t *p_attach = pp_attachments[k];
+
+        vlc_fourcc_t  type  = 0;
+
+        if( ( !strcmp( p_attach->psz_mime, "image/bmp" ) )      || /* BMP */
+            ( !strcmp( p_attach->psz_mime, "image/x-bmp" ) )    ||
+            ( !strcmp( p_attach->psz_mime, "image/x-bitmap" ) ) ||
+            ( !strcmp( p_attach->psz_mime, "image/x-ms-bmp" ) ) )
+        {
+             type = VLC_FOURCC('b','m','p',' ');
+        }
+        else if( ( !strcmp( p_attach->psz_mime, "image/x-portable-anymap" ) )  || /* PNM */
+                 ( !strcmp( p_attach->psz_mime, "image/x-portable-bitmap" ) )  || /* PBM */
+                 ( !strcmp( p_attach->psz_mime, "image/x-portable-graymap" ) ) || /* PGM */
+                 ( !strcmp( p_attach->psz_mime, "image/x-portable-pixmap" ) ) )   /* PPM */
+        {
+            type = VLC_FOURCC('p','n','m',' ');
+        }
+        else if ( !strcmp( p_attach->psz_mime, "image/gif" ) )         /* GIF */
+            type = VLC_FOURCC('g','i','f',' ');
+        else if ( !strcmp( p_attach->psz_mime, "image/jpeg" ) )        /* JPG, JPEG */
+            type = VLC_FOURCC('j','p','e','g');
+        else if ( !strcmp( p_attach->psz_mime, "image/pcx" ) )         /* PCX */
+            type = VLC_FOURCC('p','c','x',' ');
+        else if ( !strcmp( p_attach->psz_mime, "image/png" ) )         /* PNG */
+            type = VLC_FOURCC('p','n','g',' ');
+        else if ( !strcmp( p_attach->psz_mime, "image/tiff" ) )        /* TIF, TIFF */
+            type = VLC_FOURCC('t','i','f','f');
+        else if ( !strcmp( p_attach->psz_mime, "image/x-tga" ) )       /* TGA */
+            type = VLC_FOURCC('t','g','a',' ');
+        else if ( !strcmp( p_attach->psz_mime, "image/x-xpixmap") )    /* XPM */
+            type = VLC_FOURCC('x','p','m',' ');
+
+        if( ( type != 0 ) &&
+            ( p_attach->i_data > 0 ) &&
+            ( p_attach->p_data != NULL ) )
+        {
+            picture_t         *p_pic = NULL;
+            image_handler_t   *p_image;
+
+            p_image = image_HandlerCreate( p_dec );
+            if( p_image != NULL )
+            {
+                block_t   *p_block;
+               
+                p_block = block_New( p_image->p_parent, p_attach->i_data );
+
+                if( p_block != NULL )
+                {
+                    video_format_t     fmt_in;
+                    video_format_t     fmt_out;
+
+                    memcpy( p_block->p_buffer, p_attach->p_data, p_attach->i_data );
+
+                    memset( &fmt_in,  0, sizeof( video_format_t));
+                    memset( &fmt_out, 0, sizeof( video_format_t));
+
+                    fmt_in.i_chroma  = type;
+                    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+
+                    /* Find a suitable decoder module */
+                    if( module_Exists( p_dec, "SDL Image decoder" ) )
+                    {
+                        /* ffmpeg thinks it can handle bmp properly but it can't (at least
+                         * not all of them), so use sdl_image if it is available */
+
+                        vlc_value_t val;
+
+                        var_Create( p_dec, "codec", VLC_VAR_MODULE | VLC_VAR_DOINHERIT );
+                        val.psz_string = (char*) "sdl_image";
+                        var_Set( p_dec, "codec", val );
+                    }
+
+                    p_pic = image_Read( p_image, p_block, &fmt_in, &fmt_out );
+                    var_Destroy( p_dec, "codec" );
+                }
+
+                image_HandlerDelete( p_image );
+            }
+            if( p_pic )
+            {
+                image_attach_t *p_picture = malloc( sizeof(image_attach_t) );
+
+                if( p_picture )
+                {
+                    p_picture->psz_filename = strdup( p_attach->psz_name );
+                    p_picture->p_pic = p_pic;
+
+                    TAB_APPEND( p_sys->i_images, p_sys->pp_images, p_picture );
+                }
+            }
+        }
+        vlc_input_attachment_Delete( pp_attachments[ k ] );
+    }
+    free( pp_attachments );        
+
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * ParseUSFHeader: Retrieve global formatting information etc
  *****************************************************************************/
 static void ParseUSFHeader( decoder_t *p_dec )
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
     stream_t      *p_sub = NULL;
     xml_t         *p_xml = NULL;
     xml_reader_t  *p_xml_reader = NULL;
@@ -754,35 +1167,36 @@ static void ParseUSFHeader( decoder_t *p_dec )
                               p_dec->fmt_in.p_extra,
                               p_dec->fmt_in.i_extra,
                               VLC_TRUE );
-    if( p_sub )
+    if( !p_sub )
+        return;
+
+    p_xml = xml_Create( p_dec );
+    if( p_xml )
     {
-        p_xml = xml_Create( p_dec );
-        if( p_xml )
+        p_xml_reader = xml_ReaderCreate( p_xml, p_sub );
+        if( p_xml_reader )
         {
-            p_xml_reader = xml_ReaderCreate( p_xml, p_sub );
-            if( p_xml_reader )
+            /* Look for Root Node */
+            if( xml_ReaderRead( p_xml_reader ) == 1 )
             {
-                /* Look for Root Node */
-                if( xml_ReaderRead( p_xml_reader ) == 1 )
-                {
-                    char *psz_node = xml_ReaderName( p_xml_reader );
+                char *psz_node = xml_ReaderName( p_xml_reader );
 
-                    if( !strcasecmp( "usfsubtitles", psz_node ) )
-                        ParseUSFHeaderTags( p_sys, p_xml_reader );
+                if( !strcasecmp( "usfsubtitles", psz_node ) )
+                    ParseUSFHeaderTags( p_dec, p_xml_reader );
 
-                    free( psz_node );
-                }
-
-                xml_ReaderDelete( p_xml, p_xml_reader );
+                free( psz_node );
             }
-            xml_Delete( p_xml );
+
+            xml_ReaderDelete( p_xml, p_xml_reader );
         }
-        stream_Delete( p_sub );
+        xml_Delete( p_xml );
     }
+    stream_Delete( p_sub );
 }
 
-static void ParseUSFHeaderTags( decoder_sys_t *p_sys, xml_reader_t *p_xml_reader )
+static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     char *psz_node;
     ssa_style_t *p_style = NULL;
     int i_style_level = 0;
@@ -798,212 +1212,277 @@ static void ParseUSFHeaderTags( decoder_sys_t *p_sys, xml_reader_t *p_xml_reader
             case XML_READER_ENDELEM:
                 psz_node = xml_ReaderName( p_xml_reader );
                 
-                if( psz_node )
+                if( !psz_node )
+                    break;
+                switch (i_style_level)
                 {
-                    switch (i_style_level)
-                    {
-                        case 0:
-                            if( !strcasecmp( "metadata", psz_node ) && (i_metadata_level == 1) )
-                            {
-                                i_metadata_level--;
-                            }
-                            break;
-                        case 1:
-                            if( !strcasecmp( "styles", psz_node ) )
-                            {
-                                i_style_level--;
-                            }
-                            break;
-                        case 2:
-                            if( !strcasecmp( "style", psz_node ) )
-                            {
-                                p_style->font_style.i_text_align = p_style->i_align;
+                    case 0:
+                        if( !strcasecmp( "metadata", psz_node ) && (i_metadata_level == 1) )
+                        {
+                            i_metadata_level--;
+                        }
+                        break;
+                    case 1:
+                        if( !strcasecmp( "styles", psz_node ) )
+                        {
+                            i_style_level--;
+                        }
+                        break;
+                    case 2:
+                        if( !strcasecmp( "style", psz_node ) )
+                        {
+                            TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_style );
 
-                                TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_style );
-
-                                p_style = NULL;
-                                i_style_level--;
-                            }
-                            break;
-                    }
-                    
-                    free( psz_node );
+                            p_style = NULL;
+                            i_style_level--;
+                        }
+                        break;
                 }
+                
+                free( psz_node );
                 break;
             case XML_READER_STARTELEM:
                 psz_node = xml_ReaderName( p_xml_reader );
 
-                if( psz_node )
+                if( !psz_node )
+                    break;
+
+                if( !strcasecmp( "metadata", psz_node ) && (i_style_level == 0) )
                 {
-                    if( !strcasecmp( "metadata", psz_node ) && (i_style_level == 0) )
-                    {
-                        i_metadata_level++;
-                    }
-                    else if( !strcasecmp( "resolution", psz_node ) && (i_metadata_level == 1) )
-                    {
-                        while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
-                        {
-                            char *psz_name = xml_ReaderName ( p_xml_reader );
-                            char *psz_value = xml_ReaderValue ( p_xml_reader );
-
-                            if( psz_name && psz_value )
-                            {
-                                if( !strcasecmp( "x", psz_name ) )
-                                    p_sys->i_original_width = atoi( psz_value );
-                                else if( !strcasecmp( "y", psz_name ) )
-                                    p_sys->i_original_height = atoi( psz_value );
-                            }
-                            if( psz_name )  free( psz_name );
-                            if( psz_value ) free( psz_value );
-                        }
-                    }
-                    else if( !strcasecmp( "styles", psz_node ) && (i_style_level == 0) )
-                    {
-                        i_style_level++;
-                    }
-                    else if( !strcasecmp( "style", psz_node ) && (i_style_level == 1) )
-                    {
-                        i_style_level++;
-
-                        p_style = calloc( 1, sizeof(ssa_style_t) );
-
-                        while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
-                        {
-                            char *psz_name = xml_ReaderName ( p_xml_reader );
-                            char *psz_value = xml_ReaderValue ( p_xml_reader );
-
-                            if( psz_name && psz_value )
-                            {
-                                if( !strcasecmp( "name", psz_name ) )
-                                    p_style->psz_stylename = strdup( psz_value);
-                            }
-                            if( psz_name )  free( psz_name );
-                            if( psz_value ) free( psz_value );
-                        }
-                    }
-                    else if( !strcasecmp( "fontstyle", psz_node ) && (i_style_level == 2) )
-                    {
-                        while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
-                        {
-                            char *psz_name = xml_ReaderName ( p_xml_reader );
-                            char *psz_value = xml_ReaderValue ( p_xml_reader );
-
-                            if( psz_name && psz_value )
-                            {
-                                if( !strcasecmp( "face", psz_name ) )
-                                    p_style->font_style.psz_fontname = strdup( psz_value);
-                                else if( !strcasecmp( "size", psz_name ) )
-                                    p_style->font_style.i_font_size = atoi( psz_value);
-                                else if( !strcasecmp( "italic", psz_name ) )
-                                {
-                                    if( !strcasecmp( "yes", psz_value ))
-                                        p_style->font_style.i_style_flags |= STYLE_ITALIC;
-                                }
-                                else if( !strcasecmp( "weight", psz_name ) )
-                                {
-                                    if( !strcasecmp( "bold", psz_value ))
-                                        p_style->font_style.i_style_flags |= STYLE_BOLD;
-                                }
-                                else if( !strcasecmp( "underline", psz_name ) )
-                                {
-                                    if( !strcasecmp( "yes", psz_value ))
-                                        p_style->font_style.i_style_flags |= STYLE_UNDERLINE;
-                                }
-                                else if( !strcasecmp( "color", psz_name ) )
-                                {
-                                    if( *psz_value == '#' )
-                                    {
-                                        unsigned long col = strtol(psz_value+1, NULL, 16);
-                                        p_style->font_style.i_font_color = (col & 0x00ffffff);
-                                        /* From DTD: <!-- alpha range = 0..100 --> */
-                                        p_style->font_style.i_font_alpha = ((col >> 24) & 0xff) * 255 / 100;
-                                    }
-                                }
-                                else if( !strcasecmp( "outline-color", psz_name ) )
-                                {
-                                    if( *psz_value == '#' )
-                                    {
-                                        unsigned long col = strtol(psz_value+1, NULL, 16);
-                                        p_style->font_style.i_outline_color = (col & 0x00ffffff);
-                                        /* From DTD: <!-- alpha range = 0..100 --> */
-                                        p_style->font_style.i_outline_alpha = ((col >> 24) & 0xff) * 255 / 100;
-                                    }
-                                } 
-                                else if( !strcasecmp( "shadow-color", psz_name ) )
-                                {
-                                    if( *psz_value == '#' )
-                                    {
-                                        unsigned long col = strtol(psz_value+1, NULL, 16);
-                                        p_style->font_style.i_shadow_color = (col & 0x00ffffff);
-                                        /* From DTD: <!-- alpha range = 0..100 --> */
-                                        p_style->font_style.i_shadow_alpha = ((col >> 24) & 0xff) * 255 / 100;
-                                    }
-                                }
-                            }
-                            if( psz_name )  free( psz_name );
-                            if( psz_value ) free( psz_value );
-                        }
-                    }
-                    else if( !strcasecmp( "position", psz_node ) && (i_style_level == 2) )
-                    {
-                        while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
-                        {
-                            char *psz_name = xml_ReaderName ( p_xml_reader );
-                            char *psz_value = xml_ReaderValue ( p_xml_reader );
-
-                            if( psz_name && psz_value )
-                            {
-                                if( !strcasecmp( "alignment", psz_name ) )
-                                {
-                                    if( !strcasecmp( "TopLeft", psz_value ) )
-                                    {
-                                        p_style->i_align |= SUBPICTURE_ALIGN_TOP;
-                                        p_style->i_align |= SUBPICTURE_ALIGN_LEFT;
-                                    }
-                                    else if( !strcasecmp( "TopCenter", psz_value ) )
-                                    {
-                                        p_style->i_align |= SUBPICTURE_ALIGN_TOP;
-                                    }
-                                    else if( !strcasecmp( "TopRight", psz_value ) )
-                                    {
-                                        p_style->i_align |= SUBPICTURE_ALIGN_TOP;
-                                        p_style->i_align |= SUBPICTURE_ALIGN_RIGHT;
-                                    }
-                                    else if( !strcasecmp( "MiddleLeft", psz_value ) )
-                                    {
-                                        p_style->i_align |= SUBPICTURE_ALIGN_LEFT;
-                                    }
-                                    else if( !strcasecmp( "MiddleCenter", psz_value ) )
-                                    {
-                                        p_style->i_align = 0;
-                                    }
-                                    else if( !strcasecmp( "MiddleRight", psz_value ) )
-                                    {
-                                        p_style->i_align |= SUBPICTURE_ALIGN_RIGHT;
-                                    }
-                                    else if( !strcasecmp( "BottomLeft", psz_value ) )
-                                    {
-                                        p_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;
-                                        p_style->i_align |= SUBPICTURE_ALIGN_LEFT;
-                                    }
-                                    else if( !strcasecmp( "BottomCenter", psz_value ) )
-                                    {
-                                        p_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;
-                                    }
-                                    else if( !strcasecmp( "BottomRight", psz_value ) )
-                                    {
-                                        p_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;
-                                        p_style->i_align |= SUBPICTURE_ALIGN_RIGHT;
-                                    }
-                                }
-                            }
-                            if( psz_name )  free( psz_name );
-                            if( psz_value ) free( psz_value );
-                        }
-                    }
-                    
-                    free( psz_node );
+                    i_metadata_level++;
                 }
+                else if( !strcasecmp( "resolution", psz_node ) && (i_metadata_level == 1) )
+                {
+                    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                    {
+                        char *psz_name = xml_ReaderName ( p_xml_reader );
+                        char *psz_value = xml_ReaderValue ( p_xml_reader );
+
+                        if( psz_name && psz_value )
+                        {
+                            if( !strcasecmp( "x", psz_name ) )
+                                p_sys->i_original_width = atoi( psz_value );
+                            else if( !strcasecmp( "y", psz_name ) )
+                                p_sys->i_original_height = atoi( psz_value );
+                        }
+                        if( psz_name )  free( psz_name );
+                        if( psz_value ) free( psz_value );
+                    }
+                }
+                else if( !strcasecmp( "styles", psz_node ) && (i_style_level == 0) )
+                {
+                    i_style_level++;
+                }
+                else if( !strcasecmp( "style", psz_node ) && (i_style_level == 1) )
+                {
+                    i_style_level++;
+
+                    p_style = calloc( 1, sizeof(ssa_style_t) );
+                    if( ! p_style )
+                    {
+                        msg_Err( p_dec, "out of memory" );
+                        free( psz_node );
+                        break;
+                    }
+                    /* All styles are supposed to default to Default, and then
+                     * one or more settings are over-ridden. 
+                     * At the moment this only effects styles defined AFTER
+                     * Default in the XML
+                     */
+                    int i;
+                    for( i = 0; i < p_sys->i_ssa_styles; i++ )
+                    {
+                        if( !strcasecmp( p_sys->pp_ssa_styles[i]->psz_stylename, "Default" ) )
+                        {
+                            ssa_style_t *p_default_style = p_sys->pp_ssa_styles[i];
+
+                            memcpy( p_style, p_default_style, sizeof( ssa_style_t ) );
+                            p_style->font_style.psz_fontname = strdup( p_style->font_style.psz_fontname );
+                            p_style->psz_stylename = NULL;
+                        }
+                    }
+
+                    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                    {
+                        char *psz_name = xml_ReaderName ( p_xml_reader );
+                        char *psz_value = xml_ReaderValue ( p_xml_reader );
+
+                        if( psz_name && psz_value )
+                        {
+                            if( !strcasecmp( "name", psz_name ) )
+                                p_style->psz_stylename = strdup( psz_value);
+                        }
+                        if( psz_name )  free( psz_name );
+                        if( psz_value ) free( psz_value );
+                    }
+                }
+                else if( !strcasecmp( "fontstyle", psz_node ) && (i_style_level == 2) )
+                {
+                    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                    {
+                        char *psz_name = xml_ReaderName ( p_xml_reader );
+                        char *psz_value = xml_ReaderValue ( p_xml_reader );
+
+                        if( psz_name && psz_value )
+                        {
+                            if( !strcasecmp( "face", psz_name ) )
+                            {
+                                if( p_style->font_style.psz_fontname ) free( p_style->font_style.psz_fontname );
+                                p_style->font_style.psz_fontname = strdup( psz_value );
+                            }
+                            else if( !strcasecmp( "size", psz_name ) )
+                            {
+                                if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
+                                {
+                                    int i_value = atoi( psz_value );
+
+                                    if( ( i_value >= -5 ) && ( i_value <= 5 ) )
+                                        p_style->font_style.i_font_size  += ( i_value * p_style->font_style.i_font_size ) / 10;
+                                    else if( i_value < -5 )
+                                        p_style->font_style.i_font_size  = - i_value;
+                                    else if( i_value > 5 )
+                                        p_style->font_style.i_font_size  = i_value;
+                                }
+                                else
+                                    p_style->font_style.i_font_size  = atoi( psz_value );
+                            }
+                            else if( !strcasecmp( "italic", psz_name ) )
+                            {
+                                if( !strcasecmp( "yes", psz_value ))
+                                    p_style->font_style.i_style_flags |= STYLE_ITALIC;
+                                else
+                                    p_style->font_style.i_style_flags &= ~STYLE_ITALIC;
+                            }
+                            else if( !strcasecmp( "weight", psz_name ) )
+                            {
+                                if( !strcasecmp( "bold", psz_value ))
+                                    p_style->font_style.i_style_flags |= STYLE_BOLD;
+                                else
+                                    p_style->font_style.i_style_flags &= ~STYLE_BOLD;
+                            }
+                            else if( !strcasecmp( "underline", psz_name ) )
+                            {
+                                if( !strcasecmp( "yes", psz_value ))
+                                    p_style->font_style.i_style_flags |= STYLE_UNDERLINE;
+                                else
+                                    p_style->font_style.i_style_flags &= ~STYLE_UNDERLINE;
+                            }
+                            else if( !strcasecmp( "color", psz_name ) )
+                            {
+                                if( *psz_value == '#' )
+                                {
+                                    unsigned long col = strtol(psz_value+1, NULL, 16);
+                                    p_style->font_style.i_font_color = (col & 0x00ffffff);
+                                    p_style->font_style.i_font_alpha = (col >> 24) & 0xff;
+                                }
+                            }
+                            else if( !strcasecmp( "outline-color", psz_name ) )
+                            {
+                                if( *psz_value == '#' )
+                                {
+                                    unsigned long col = strtol(psz_value+1, NULL, 16);
+                                    p_style->font_style.i_outline_color = (col & 0x00ffffff);
+                                    p_style->font_style.i_outline_alpha = (col >> 24) & 0xff;
+                                }
+                            } 
+                            else if( !strcasecmp( "outline-level", psz_name ) )
+                            {
+                                p_style->font_style.i_outline_width = atoi( psz_value );
+                            } 
+                            else if( !strcasecmp( "shadow-color", psz_name ) )
+                            {
+                                if( *psz_value == '#' )
+                                {
+                                    unsigned long col = strtol(psz_value+1, NULL, 16);
+                                    p_style->font_style.i_shadow_color = (col & 0x00ffffff);
+                                    p_style->font_style.i_shadow_alpha = (col >> 24) & 0xff;
+                                }
+                            }
+                            else if( !strcasecmp( "shadow-level", psz_name ) )
+                            {
+                                p_style->font_style.i_shadow_width = atoi( psz_value );
+                            } 
+                            else if( !strcasecmp( "back-color", psz_name ) )
+                            {
+                                if( *psz_value == '#' )
+                                {
+                                    unsigned long col = strtol(psz_value+1, NULL, 16);
+                                    p_style->font_style.i_karaoke_background_color = (col & 0x00ffffff);
+                                    p_style->font_style.i_karaoke_background_alpha = (col >> 24) & 0xff;
+                                }
+                            }
+                            else if( !strcasecmp( "spacing", psz_name ) )
+                            {
+                                p_style->font_style.i_spacing = atoi( psz_value );
+                            } 
+                        }
+                        if( psz_name )  free( psz_name );
+                        if( psz_value ) free( psz_value );
+                    }
+                }
+                else if( !strcasecmp( "position", psz_node ) && (i_style_level == 2) )
+                {
+                    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                    {
+                        char *psz_name = xml_ReaderName ( p_xml_reader );
+                        char *psz_value = xml_ReaderValue ( p_xml_reader );
+
+                        if( psz_name && psz_value )
+                        {
+                            if( !strcasecmp( "alignment", psz_name ) )
+                            {
+                                if( !strcasecmp( "TopLeft", psz_value ) )
+                                    p_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
+                                else if( !strcasecmp( "TopCenter", psz_value ) )
+                                    p_style->i_align = SUBPICTURE_ALIGN_TOP;
+                                else if( !strcasecmp( "TopRight", psz_value ) )
+                                    p_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT;
+                                else if( !strcasecmp( "MiddleLeft", psz_value ) )
+                                    p_style->i_align = SUBPICTURE_ALIGN_LEFT;
+                                else if( !strcasecmp( "MiddleCenter", psz_value ) )
+                                    p_style->i_align = 0;
+                                else if( !strcasecmp( "MiddleRight", psz_value ) )
+                                    p_style->i_align = SUBPICTURE_ALIGN_RIGHT;
+                                else if( !strcasecmp( "BottomLeft", psz_value ) )
+                                    p_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
+                                else if( !strcasecmp( "BottomCenter", psz_value ) )
+                                    p_style->i_align = SUBPICTURE_ALIGN_BOTTOM;
+                                else if( !strcasecmp( "BottomRight", psz_value ) )
+                                    p_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
+                            }
+                            else if( !strcasecmp( "horizontal-margin", psz_name ) )
+                            {
+                                if( strchr( psz_value, '%' ) )
+                                {
+                                    p_style->i_margin_h = 0;
+                                    p_style->i_margin_percent_h = atoi( psz_value );
+                                }
+                                else
+                                {
+                                    p_style->i_margin_h = atoi( psz_value );
+                                    p_style->i_margin_percent_h = 0;
+                                }
+                            }
+                            else if( !strcasecmp( "vertical-margin", psz_name ) )
+                            {
+                                if( strchr( psz_value, '%' ) )
+                                {
+                                    p_style->i_margin_v = 0;
+                                    p_style->i_margin_percent_v = atoi( psz_value );
+                                }
+                                else
+                                {
+                                    p_style->i_margin_v = atoi( psz_value );
+                                    p_style->i_margin_percent_v = 0;
+                                }
+                            }
+                        }
+                        if( psz_name )  free( psz_name );
+                        if( psz_value ) free( psz_value );
+                    }
+                }
+                
+                free( psz_node );
                 break;
         }
     }
@@ -1102,6 +1581,11 @@ static void ParseSSAHeader( decoder_t *p_dec )
 
                     p_style->i_margin_h = ( p_style->i_align & SUBPICTURE_ALIGN_RIGHT ) ? i_margin_r : i_margin_l;
                     p_style->i_margin_v = i_margin_v;
+                    p_style->i_margin_percent_h = 0;
+                    p_style->i_margin_percent_v = 0;
+
+                    p_style->font_style.i_karaoke_background_color = 0xffffff;
+                    p_style->font_style.i_karaoke_background_alpha = 0xff;
 
                     TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_style );
                 }
@@ -1153,6 +1637,11 @@ static void ParseSSAHeader( decoder_t *p_dec )
                     if( i_align == 0x1 || i_align == 0x2 || i_align == 0x3 ) p_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;
                     p_style->i_margin_h = ( p_style->i_align & SUBPICTURE_ALIGN_RIGHT ) ? i_margin_r : i_margin_l;
                     p_style->i_margin_v = i_margin_v;
+                    p_style->i_margin_percent_h = 0;
+                    p_style->i_margin_percent_v = 0;
+
+                    p_style->font_style.i_karaoke_background_color = 0xffffff;
+                    p_style->font_style.i_karaoke_background_alpha = 0xff;
 
                     /*TODO: Ignored: angle i_scale_x|y (fontscaling), i_encoding */
                     TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_style );
@@ -1175,52 +1664,59 @@ eof:
 static char *StripTags( char *psz_subtitle )
 {
     char *psz_text_start;
+    char *psz_text;
 
-    psz_text_start = malloc( strlen( psz_subtitle ) + 1 );
+    psz_text = psz_text_start = malloc( strlen( psz_subtitle ) + 1 );
+    if( !psz_text_start )
+        return NULL;
 
-    if( psz_text_start != NULL )
+    while( *psz_subtitle )
     {
-        char *psz_text = psz_text_start;
-
-        while( *psz_subtitle )
+        if( *psz_subtitle == '<' )
         {
-            if( *psz_subtitle == '<' )
+            if( strncasecmp( psz_subtitle, "<br/>", 5 ) == 0 )
+                *psz_text++ = '\n';
+
+            psz_subtitle += strcspn( psz_subtitle, ">" );
+        }
+        else if( *psz_subtitle == '&' )
+        {
+            if( !strncasecmp( psz_subtitle, "&lt;", 4 ))
             {
-                psz_subtitle += strcspn( psz_subtitle, ">" );
+                *psz_text++ = '<';
+                psz_subtitle += strcspn( psz_subtitle, ";" );
             }
-            else if( *psz_subtitle == '&' )
+            else if( !strncasecmp( psz_subtitle, "&gt;", 4 ))
             {
-                if( !strncasecmp( psz_subtitle, "&lt;", 4 ))
-                {
-                    *psz_text++ = '<';
-                    psz_subtitle += strcspn( psz_subtitle, ";" );
-                }
-                else if( !strncasecmp( psz_subtitle, "&gt;", 4 ))
-                {
-                    *psz_text++ = '>';
-                    psz_subtitle += strcspn( psz_subtitle, ";" );
-                }
-                else if( !strncasecmp( psz_subtitle, "&amp;", 5 ))
-                {
-                    *psz_text++ = '&';
-                    psz_subtitle += strcspn( psz_subtitle, ";" );
-                }
-                else
-                {
-                    /* Assume it is just a normal ampersand */
-                    *psz_text++ = '&';
-                }
+                *psz_text++ = '>';
+                psz_subtitle += strcspn( psz_subtitle, ";" );
+            }
+            else if( !strncasecmp( psz_subtitle, "&amp;", 5 ))
+            {
+                *psz_text++ = '&';
+                psz_subtitle += strcspn( psz_subtitle, ";" );
+            }
+            else if( !strncasecmp( psz_subtitle, "&quot;", 6 ))
+            {
+                *psz_text++ = '\"';
+                psz_subtitle += strcspn( psz_subtitle, ";" );
             }
             else
             {
-                *psz_text++ = *psz_subtitle;
+                /* Assume it is just a normal ampersand */
+                *psz_text++ = '&';
             }
-
-            psz_subtitle++;
         }
-        *psz_text = '\0';
-        psz_text_start = realloc( psz_text_start, strlen( psz_text_start ) + 1 );
+        else
+        {
+            *psz_text++ = *psz_subtitle;
+        }
+
+        psz_subtitle++;
     }
+    *psz_text = '\0';
+    psz_text_start = realloc( psz_text_start, strlen( psz_text_start ) + 1 );
+
     return psz_text_start;
 }
 
@@ -1428,7 +1924,21 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
             }
             else
             {
-                *psz_html++ = *psz_subtitle++;
+                *psz_html = *psz_subtitle;
+                if( psz_html > psz_html_start )
+                {
+                    /* Check for double whitespace */
+                    if((( *psz_html == ' ' ) ||
+                        ( *psz_html == '\t' )) &&
+                       (( *(psz_html-1) == ' ' ) ||
+                        ( *(psz_html-1) == '\t' )))
+                    {
+                        strcpy( psz_html, NO_BREAKING_SPACE );
+                        psz_html += strlen( NO_BREAKING_SPACE ) - 1;
+                    }
+                }
+                psz_html++;
+                psz_subtitle++;
             }
 
             if( ( size_t )( psz_html - psz_html_start ) > i_buf_size - 10 )
@@ -1457,4 +1967,130 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
         }
     }
     return psz_html_start;
+}
+
+/* The reverse of the above function - given a HTML subtitle, turn it
+ * into a plain-text version, complete with sensible whitespace compaction
+ */
+
+static char *CreatePlainText( char *psz_subtitle )
+{
+    char *psz_text = StripTags( psz_subtitle );
+    char *s;
+
+    if( !psz_text )
+        return NULL;
+
+    s = strpbrk( psz_text, "\t\r\n " );
+    while( s )
+    {
+        int   k;
+        char  spc = ' ';
+        int   i_whitespace = strspn( s, "\t\r\n " );
+
+        /* Favour '\n' over other whitespaces - if one of these
+         * occurs in the whitespace use a '\n' as our value,
+         * otherwise just use a ' '
+         */
+        for( k = 0; k < i_whitespace; k++ )
+            if( s[k] == '\n' ) spc = '\n';
+
+        if( i_whitespace > 1 )
+        {
+            memmove( &s[1],
+                     &s[i_whitespace],
+                     strlen( s ) - i_whitespace + 1 );
+        }
+        *s++ = spc;
+
+        s = strpbrk( s, "\t\r\n " );
+    }
+    return psz_text;
+}
+
+/****************************************************************************
+ * download and resize image located at psz_url
+ ***************************************************************************/
+static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, subpicture_t *p_spu, const char *psz_filename, int i_transparent_color )
+{
+    decoder_sys_t         *p_sys = p_dec->p_sys;
+    subpicture_region_t   *p_region;
+    video_format_t         fmt_out;
+    int                    k;
+    picture_t             *p_pic = NULL;
+
+    for( k = 0; k < p_sys->i_images; k++ )
+    {
+        if( p_sys->pp_images &&
+            !strcmp( p_sys->pp_images[k]->psz_filename, psz_filename ) )
+        {
+            p_pic = p_sys->pp_images[k]->p_pic;
+            break;
+        }
+    }
+
+    if( !p_pic )
+    {
+        msg_Err( p_dec, "Unable to read image %s", psz_filename );
+        return NULL;
+    }
+    
+    /* Display the feed's image */
+    memset( &fmt_out, 0, sizeof( video_format_t));
+
+    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt_out.i_aspect = VOUT_ASPECT_FACTOR;
+    fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
+    fmt_out.i_width =
+        fmt_out.i_visible_width = p_pic->p[Y_PLANE].i_visible_pitch;
+    fmt_out.i_height =
+        fmt_out.i_visible_height = p_pic->p[Y_PLANE].i_visible_lines;
+
+    p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt_out );
+    if( !p_region )
+    {
+        msg_Err( p_dec, "cannot allocate SPU region" );
+        return NULL;
+    }
+    vout_CopyPicture( p_dec, &p_region->picture, p_pic );
+
+    /* This isn't the best way to do this - if you really want transparency, then
+     * you're much better off using an image type that supports it like PNG. The
+     * spec requires this support though.
+     */
+    if( i_transparent_color > 0 )
+    {
+        uint8_t i_r = ( i_transparent_color >> 16 ) & 0xff;
+        uint8_t i_g = ( i_transparent_color >>  8 ) & 0xff;
+        uint8_t i_b = ( i_transparent_color       ) & 0xff;
+        uint8_t i_y = ( ( (  66 * i_r + 129 * i_g +  25 * i_b + 128 ) >> 8 ) + 16 );
+        uint8_t i_u =   ( ( -38 * i_r -  74 * i_g + 112 * i_b + 128 ) >> 8 ) + 128 ;
+        uint8_t i_v =   ( ( 112 * i_r -  94 * i_g -  18 * i_b + 128 ) >> 8 ) + 128 ;
+
+        if( ( p_region->picture.Y_PITCH == p_region->picture.U_PITCH ) &&
+            ( p_region->picture.Y_PITCH == p_region->picture.V_PITCH ) &&
+            ( p_region->picture.Y_PITCH == p_region->picture.A_PITCH ) )
+        {
+            int i_lines = p_region->picture.p[ Y_PLANE ].i_lines;
+            if( i_lines > p_region->picture.p[ U_PLANE ].i_lines )
+                i_lines = p_region->picture.p[ U_PLANE ].i_lines;
+            if( i_lines > p_region->picture.p[ V_PLANE ].i_lines )
+                i_lines = p_region->picture.p[ V_PLANE ].i_lines;
+            if( i_lines > p_region->picture.p[ A_PLANE ].i_lines )
+                i_lines = p_region->picture.p[ A_PLANE ].i_lines;
+
+            int   i;
+
+            for( i = 0; i < p_region->picture.A_PITCH * i_lines; i++ )
+            {
+                if(( p_region->picture.Y_PIXELS[ i ] == i_y ) &&
+                   ( p_region->picture.U_PIXELS[ i ] == i_u ) &&
+                   ( p_region->picture.V_PIXELS[ i ] == i_v ) )
+                {
+                    p_region->picture.A_PIXELS[ i ] = 1;
+                }
+            }
+        }
+    }
+    return p_region;
 }

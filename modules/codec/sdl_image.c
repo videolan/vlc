@@ -52,6 +52,7 @@ static picture_t *DecodeBlock  ( decoder_t *, block_t ** );
 vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_VCODEC );
+    set_shortname( _("SDL Image decoder"));
     set_description( _("SDL_image video decoder") );
     set_capability( "decoder", 60 );
     set_callbacks( OpenDecoder, CloseDecoder );

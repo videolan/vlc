@@ -653,6 +653,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
         while( p_region && p_spu->p_blend && p_spu->p_blend->pf_video_blend )
         {
+            video_format_t orig_fmt = p_region->fmt;
+            vlc_bool_t b_rerender_text = VLC_FALSE;
             int i_fade_alpha = 255;
             int i_x_offset = p_region->i_x + i_subpic_x;
             int i_y_offset = p_region->i_y + p_subpic->i_y;
@@ -661,6 +663,36 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             {
                 if( p_spu->p_text && p_spu->p_text->p_module )
                 {
+                    vlc_value_t  val;
+
+                    /* Setup 3 variables which can be used to render time-dependent
+                     * text (and effects). The first indicates the total amount of
+                     * time the text will be on screen, the second the amount of time
+                     * it has already been on screen (can be a negative value as text
+                     * is layed out before it is rendered) and the third is a feedback
+                     * variable from the renderer - if the renderer sets it then this
+                     * particular text is time-dependent, eg. the visual progress bar
+                     * inside the text in karaoke and the text needs to be rendered
+                     * multiple times in order for the effect to work - we therefore
+                     * need to return the region to its original state at the end of
+                     * the loop, instead of leaving it in YUVA or YUVP
+                     * Any renderer which is unaware of how to render time-dependent
+                     * text can happily ignore the variables and render the text the
+                     * same as usual - it should at least show up on screen, but the
+                     * effect won't change the text over time.
+                     */
+
+                    var_Create( p_spu->p_text, "spu-duration", VLC_VAR_TIME );
+                    val.i_time = p_subpic->i_stop - p_subpic->i_start;
+                    var_Set( p_spu->p_text, "spu-duration", val );
+
+                    var_Create( p_spu->p_text, "spu-elapsed", VLC_VAR_TIME );
+                    val.i_time = mdate() - p_subpic->i_start;
+                    var_Set( p_spu->p_text, "spu-elapsed", val );
+
+                    var_Create( p_spu->p_text, "text-rerender", VLC_VAR_BOOL );
+                    var_SetBool( p_spu->p_text, "text-rerender", VLC_FALSE );
+
                     if( p_spu->p_text->pf_render_html && p_region->psz_html )
                     {
                         p_spu->p_text->pf_render_html( p_spu->p_text,
@@ -671,6 +703,12 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                         p_spu->p_text->pf_render_text( p_spu->p_text,
                                                        p_region, p_region );
                     }
+                    b_rerender_text = var_GetBool( p_spu->p_text, "text-rerender" );
+
+                    var_Destroy( p_spu->p_text, "spu-duration" );
+                    var_Destroy( p_spu->p_text, "spu-elapsed" );
+                    var_Destroy( p_spu->p_text, "text-rerender" );
+
                 }
             }
 
@@ -855,6 +893,16 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_pic_src, &p_region->picture, i_x_offset, i_y_offset,
                 i_fade_alpha * p_subpic->i_alpha / 255 );
 
+            if( b_rerender_text )
+            {
+                /* Some forms of subtitles need to be re-rendered more than once,
+                 * eg. karaoke. We therefore restore the region to its pre-rendered
+                 * state, so the next time through everything is calculated again.
+                 */
+                p_region->picture.pf_release( &p_region->picture );
+                memset( &p_region->picture, 0, sizeof( picture_t ) );
+                p_region->fmt = orig_fmt;
+            }
             p_region = p_region->p_next;
         }
 

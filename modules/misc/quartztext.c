@@ -559,7 +559,19 @@ static void ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
                                 }
                                 else if( !strcasecmp( "size", psz_name ) )
                                 {
-                                    i_font_size = atoi( psz_value );
+                                    if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
+                                    {
+                                        int i_value = atoi( psz_value );
+
+                                        if( ( i_value >= -5 ) && ( i_value <= 5 ) )
+                                            i_font_size += ( i_value * i_font_size ) / 10;
+                                        else if( i_value < -5 )
+                                            i_font_size = - i_value;
+                                        else if( i_value > 5 )
+                                            i_font_size = i_value;
+                                    }
+                                    else
+                                        i_font_size = atoi( psz_value );
                                 }
                                 else if( !strcasecmp( "color", psz_name )  &&
                                          ( psz_value[0] == '#' ) )
@@ -623,6 +635,21 @@ static void ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
                 if( psz_node )
                 {
                     uint32_t i_string_length;
+
+                    // Turn any multiple-whitespaces into single spaces
+                    char *s = strpbrk( psz_node, "\t\r\n " );
+                    while( s )
+                    {
+                        int i_whitespace = strspn( s, "\t\r\n " );
+
+                        if( i_whitespace > 1 )
+                            memmove( &s[1],
+                                     &s[i_whitespace],
+                                     strlen( s ) - i_whitespace + 1 );
+                        *s++ = ' ';
+
+                        s = strpbrk( s, "\t\r\n " );
+                    }
 
                     ConvertToUTF16( psz_node, &i_string_length, &psz_text );
                     psz_text += i_string_length;
@@ -881,12 +908,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region, UniCha
 
     if( psz_utf16_str != NULL )
     {
-        int i_text_align = 0;
-
-        if( p_region->p_style )
-            i_text_align = p_region->p_style->i_text_align;
-        else
-            i_text_align = p_region->i_align & 0x3;
+        int i_text_align = p_region->i_align & 0x3;
 
         p_offScreen = Compose( i_text_align, psz_utf16_str, i_text_len,
                                i_runs, pi_run_lengths, pp_styles,

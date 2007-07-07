@@ -486,13 +486,11 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
 
         if( p_line->i_width < i_width )
         {
-            if( ( p_region->p_style && p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT ) ||
-                ( !p_region->p_style && (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT ) )
+            if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
             {
                 i_align_offset = i_width - p_line->i_width;
             }
-            else if( ( p_region->p_style && p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT ) ||
-                ( !p_region->p_style && (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT ) )
+            else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
             {
                 i_align_offset = ( i_width - p_line->i_width ) / 2;
             }
@@ -637,13 +635,11 @@ static void DrawBlack( line_desc_t *p_line, int i_width, subpicture_region_t *p_
 
         if( p_line->i_width < i_width )
         {
-            if( ( p_region->p_style && p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT ) ||
-                ( !p_region->p_style && (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT ) )
+            if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
             {
                 i_align_offset = i_width - p_line->i_width;
             }
-            else if( ( p_region->p_style && p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT ) ||
-                ( !p_region->p_style && (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT ) )
+            else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
             {
                 i_align_offset = ( i_width - p_line->i_width ) / 2;
             }
@@ -789,13 +785,11 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
 
         if( p_line->i_width < i_width )
         {
-            if( ( p_region->p_style && p_region->p_style->i_text_align == SUBPICTURE_ALIGN_RIGHT ) ||
-                ( !p_region->p_style && (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT ) )
+            if( (p_region->i_align & 0x3) == SUBPICTURE_ALIGN_RIGHT )
             {
                 i_align_offset = i_width - p_line->i_width;
             }
-            else if( ( p_region->p_style && p_region->p_style->i_text_align != SUBPICTURE_ALIGN_LEFT ) ||
-                ( !p_region->p_style && (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT ) )
+            else if( (p_region->i_align & 0x3) != SUBPICTURE_ALIGN_LEFT )
             {
                 i_align_offset = ( i_width - p_line->i_width ) / 2;
             }
@@ -1784,12 +1778,12 @@ static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
                         int i_whitespace = strspn( s, "\t\r\n " );
 
                         if( i_whitespace > 1 )
-                            memmove( s + 1,
-                                     s + i_whitespace,
+                            memmove( &s[1],
+                                     &s[i_whitespace],
                                      strlen( s ) - i_whitespace + 1 );
-                        *s = ' ';
+                        *s++ = ' ';
 
-                        s = strpbrk( s+1, "\t\r\n " );
+                        s = strpbrk( s, "\t\r\n " );
                     }
                     SetupLine( p_filter, psz_node, &psz_text,
                                pi_runs, ppi_run_lengths, ppp_styles,
