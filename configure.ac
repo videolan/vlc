@@ -3783,19 +3783,36 @@ if test "${enable_x264}" != "no"; then
 fi
 
 dnl
+dnl Teletext Modules
 dnl vbi decoder plugin (using libzbvi)
+dnl telx module
+dnl uncompatible
 dnl
 AC_ARG_ENABLE(zvbi,
-  [  --enable-zvbi          VBI decoding support with libzvbi (default enabled)])
-if test "${enable_zvbi}" != "no"; then
-  PKG_CHECK_MODULES(ZVBI,
-        zvbi-0.2 >= 0.2.25,
-        [
-          VLC_ADD_LDFLAGS([zvbi],[$ZVBI_LIBS])
-          VLC_ADD_CFLAGS([zvbi],[$ZVBI_CFLAGS])
-          VLC_ADD_PLUGINS([zvbi]) ],
-        [AC_MSG_WARN(ZVBI library not found)])
-fi
+  [  --enable-zvbi           VBI (inc. Teletext) decoding support with libzvbi (default enabled)])
+AC_ARG_ENABLE(telx,
+  [  --enable-telx,          Teletext decoding module (conflicting with zvbi) (default disabled)])
+
+AS_IF( [test "${enable_zvbi}" != "no"],[
+  AS_IF( [test "${enable_telx}" = "yes"],[
+    AC_MSG_ERROR([The zvbi and telx modules are uncompatibles. Disable the other if you enable one.])
+  ],[
+    PKG_CHECK_MODULES(ZVBI,
+    	zvbi-0.2 >= 0.2.25,
+    	[
+    	  VLC_ADD_LDFLAGS([zvbi],[$ZVBI_LIBS])
+    	  VLC_ADD_CFLAGS([zvbi],[$ZVBI_CFLAGS])
+    	  VLC_ADD_PLUGINS([zvbi])
+	  AC_DEFINE(ZVBI_COMPILED, 1, [Define if the zvbi module is built]) 
+	],[
+	  AC_MSG_WARN(ZVBI library not found. Enabling the telx module instead)
+	  enable_telx="yes"
+	])
+    ])  
+  ])
+AS_IF( [test "${enable_telx}" = "yes"],[
+  VLC_ADD_PLUGINS([telx])
+  ])
 
 dnl
 dnl  CMML plugin
