@@ -86,6 +86,8 @@ struct libvlc_media_descriptor_t
 
 struct libvlc_media_instance_t
 {
+    int                i_refcount;
+    vlc_mutex_t        object_lock;
     int i_input_id;  /* Input object id. We don't use a pointer to
                         avoid any crash */
     struct libvlc_instance_t  *p_libvlc_instance; /* Parent instance */

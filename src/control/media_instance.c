@@ -29,6 +29,8 @@
 
 /*
  * Release the associated input thread
+ *
+ * Object lock is NOT held.
  */
 static void release_input_thread( libvlc_media_instance_t *p_mi ) 
 {
@@ -36,7 +38,6 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
     vlc_bool_t should_destroy;
     libvlc_exception_t p_e;
 
-    /* XXX: locking */
     libvlc_exception_init( &p_e );
 
     p_input_thread = libvlc_get_input_thread( p_mi, &p_e );
@@ -62,21 +63,32 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
 /*
  * Retrieve the input thread. Be sure to release the object
  * once you are done with it. (libvlc Internal)
+ *
+ * Object lock is held.
  */
 input_thread_t *libvlc_get_input_thread( libvlc_media_instance_t *p_mi,
                                          libvlc_exception_t *p_e ) 
 {
     input_thread_t *p_input_thread;
 
+    vlc_mutex_lock( &p_mi->object_lock );
+
     if( !p_mi || p_mi->i_input_id == -1 )
+    {
+        vlc_mutex_unlock( &p_mi->object_lock );
         RAISENULL( "Input is NULL" );
+    }
 
     p_input_thread = (input_thread_t*)vlc_object_get(
                                              p_mi->p_libvlc_instance->p_libvlc_int,
                                              p_mi->i_input_id );
     if( !p_input_thread )
+    {
+        vlc_mutex_unlock( &p_mi->object_lock );
         RAISENULL( "Input does not exist" );
+    }
 
+    vlc_mutex_unlock( &p_mi->object_lock );
     return p_input_thread;
 }
 
@@ -100,6 +112,18 @@ libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
     p_mi->p_md = NULL;
     p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->i_input_id = -1;
+    /* refcount strategy:
+     * - All items created by _new start with a refcount set to 1
+     * - Accessor _release decrease the refcount by 1, if after that
+     *   operation the refcount is 0, the object is destroyed.
+     * - Accessor _retain increase the refcount by 1 (XXX: to implement) */
+    p_mi->i_refcount = 1;
+    /* object_lock strategy:
+     * - No lock held in constructor
+     * - Lock when accessing all variable this lock is held
+     * - Lock when attempting to destroy the object the lock is also held */
+    vlc_mutex_init( p_mi->p_libvlc_instance->p_libvlc_int,
+                    &p_mi->object_lock );
 
     return p_mi;
 }
@@ -124,6 +148,11 @@ libvlc_media_instance_new_from_media_descriptor(
     p_mi->p_md = libvlc_media_descriptor_duplicate( p_md );
     p_mi->p_libvlc_instance = p_mi->p_md->p_libvlc_instance;
     p_mi->i_input_id = -1;
+    /* same strategy as before */
+    p_mi->i_refcount = 1;
+    /* same strategy as before */
+    vlc_mutex_init( p_mi->p_libvlc_instance->p_libvlc_int,
+                    &p_mi->object_lock );
 
     return p_mi;
 }
@@ -166,13 +195,14 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
 
 /**************************************************************************
  * Destroy a Media Instance object (libvlc internal)
+ *
+ * Warning: No lock held here, but hey, this is internal.
  **************************************************************************/
 void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
 {
     input_thread_t *p_input_thread;
     libvlc_exception_t p_e;
 
-    /* XXX: locking */
     libvlc_exception_init( &p_e );
 
     if( !p_mi )
@@ -195,15 +225,23 @@ void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
  **************************************************************************/
 void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
 {
-    /* XXX: locking */
-
     if( !p_mi )
         return;
+
+    vlc_mutex_lock( &p_mi->object_lock );
+    
+    p_mi->i_refcount--;
+    if( p_mi->i_refcount > 0 )
+    {
+        vlc_mutex_unlock( &p_mi->object_lock );
+        return;
+    }
 
     release_input_thread( p_mi );
 
     libvlc_media_descriptor_destroy( p_mi->p_md );
 
+    vlc_mutex_unlock( &p_mi->object_lock );
     free( p_mi );
 }
 
@@ -217,11 +255,11 @@ void libvlc_media_instance_set_media_descriptor(
 {
     (void)p_e;
 
-    /* XXX : lock */
-
     if( !p_mi )
         return;
 
+    vlc_mutex_lock( &p_mi->object_lock );
+    
     release_input_thread( p_mi );
 
     libvlc_media_descriptor_destroy( p_mi->p_md );
@@ -229,6 +267,7 @@ void libvlc_media_instance_set_media_descriptor(
     if( !p_md )
     {
         p_mi->p_md = NULL;
+        vlc_mutex_unlock( &p_mi->object_lock );
         return; /* It is ok to pass a NULL md */
     }
 
@@ -238,6 +277,7 @@ void libvlc_media_instance_set_media_descriptor(
      * libvlc_instance, because we don't really care */
     p_mi->p_libvlc_instance = p_md->p_libvlc_instance;
 
+    vlc_mutex_unlock( &p_mi->object_lock );
 }
 
 /**************************************************************************
@@ -264,25 +304,25 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
 {
     input_thread_t * p_input_thread;
 
-    if( p_mi->i_input_id != -1) 
+    vlc_mutex_lock( &p_mi->object_lock );
+
+    if( p_input_thread = libvlc_get_input_thread( p_mi, p_e ) ) 
     {
+        /* A thread alread exists, send it a play message */        
         vlc_value_t val;
         val.i_int = PLAYING_S;
-
-        /* A thread alread exists, send it a play message */
-        p_input_thread = libvlc_get_input_thread( p_mi, p_e );
-
-        if( !p_input_thread )
-            return;
 
         input_Control( p_input_thread, INPUT_CONTROL_SET_STATE, PLAYING_S );
         vlc_object_release( p_input_thread );
         return;
     }
 
+    vlc_mutex_lock( &p_mi->object_lock );
+    
     if( !p_mi->p_md )
     {
         libvlc_exception_raise( p_e, "no associated media descriptor" );
+        vlc_mutex_unlock( &p_mi->object_lock );
         return;
     }
 
@@ -292,6 +332,8 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
 
     /* will be released in media_instance_release() */
     vlc_object_yield( p_input_thread );
+
+    vlc_mutex_unlock( &p_mi->object_lock );
 }
 
 /**************************************************************************
