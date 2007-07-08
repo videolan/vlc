@@ -819,13 +819,13 @@
     NSMenuItem *o_mi = (NSMenuItem *)sender;
     NSString *o_string = [o_mi representedObject];
     playlist_t * p_playlist = pl_Yield( VLCIntf );
-    if( !playlist_IsServicesDiscoveryLoaded( p_playlist, [o_string cString] ) )
-        playlist_ServicesDiscoveryAdd( p_playlist, [o_string cString] );
+    if( !playlist_IsServicesDiscoveryLoaded( p_playlist, [o_string UTF8String] ) )
+        playlist_ServicesDiscoveryAdd( p_playlist, [o_string UTF8String] );
     else
-        playlist_ServicesDiscoveryRemove( p_playlist, [o_string cString] );
+        playlist_ServicesDiscoveryRemove( p_playlist, [o_string UTF8String] );
 
     [o_mi setState: playlist_IsServicesDiscoveryLoaded( p_playlist,
-                                          [o_string cString] ) ? YES : NO];
+                                          [o_string UTF8String] ) ? YES : NO];
 
     vlc_object_release( p_playlist );
     [self playlistUpdated];

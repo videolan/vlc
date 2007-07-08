@@ -2215,7 +2215,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 
 - (char *)stringValue
 {
-    return strdup( [[o_textfield stringValue] cString] );
+    return strdup( [[o_textfield stringValue] UTF8String] );
 }
 
 @end
