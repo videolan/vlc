@@ -214,6 +214,8 @@ void libvlc_event_init( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
     playlist_t *p_playlist = p_instance->p_libvlc_int->p_playlist;
 
+    p_instance->p_callback_list = NULL;
+
     if( !p_playlist )
         RAISEVOID ("Can't listen to input event");
 
