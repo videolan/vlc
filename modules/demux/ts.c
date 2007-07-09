@@ -1661,8 +1661,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
         /* */
         i_skip += 2;
     }
-    else if( pid->es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
 #ifdef ZVBI_COMPILED
+    else if( pid->es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
         i_skip = 0; /*hack for zvbi support */
 #endif
     /* skip header */
