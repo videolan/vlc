@@ -31,14 +31,14 @@
 /**************************************************************************
  * Preparse if not already done (Private)
  **************************************************************************/
-static void preparse_if_needed( libvlc_media_descriptor_t *p_media_desc )
+static void preparse_if_needed( libvlc_media_descriptor_t *p_md )
 {
     /* XXX: need some locking here */
-    if (!p_media_desc->b_preparsed)
+    if (!p_md->b_preparsed)
     {
-        input_Preparse( p_media_desc->p_libvlc_instance->p_libvlc_int,
-                        p_media_desc->p_input_item );
-        p_media_desc->b_preparsed = VLC_TRUE;
+        input_Preparse( p_md->p_libvlc_instance->p_libvlc_int,
+                        p_md->p_input_item );
+        p_md->b_preparsed = VLC_TRUE;
     }
 }
 
@@ -51,7 +51,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
                                    libvlc_exception_t *p_e )
 {
     input_item_t * p_input_item;
-    libvlc_media_descriptor_t * p_media_desc;
+    libvlc_media_descriptor_t * p_md;
 
     p_input_item = input_ItemNew( p_instance->p_libvlc_int, psz_mrl, psz_mrl );
 
@@ -61,12 +61,14 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
         return NULL;
     }
 
-    p_media_desc = malloc( sizeof(libvlc_media_descriptor_t) );
-    p_media_desc->p_libvlc_instance = p_instance;
-    p_media_desc->p_input_item      = p_input_item;
-    p_media_desc->b_preparsed       = VLC_FALSE;
+    p_md = malloc( sizeof(libvlc_media_descriptor_t) );
+    p_md->p_libvlc_instance = p_instance;
+    p_md->p_input_item      = p_input_item;
+    p_md->b_preparsed       = VLC_FALSE;
+ 
+    vlc_gc_incref( p_md->p_input_item );
 
-    return p_media_desc;
+    return p_md;
 }
 
 /**************************************************************************
@@ -78,7 +80,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
                                    input_item_t *p_input_item,
                                    libvlc_exception_t *p_e )
 {
-    libvlc_media_descriptor_t * p_media_desc;
+    libvlc_media_descriptor_t * p_md;
 
     if (!p_input_item)
     {
@@ -86,12 +88,14 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
         return NULL;
     }
 
-    p_media_desc = malloc( sizeof(libvlc_media_descriptor_t) );
-    p_media_desc->p_libvlc_instance = p_instance;
-    p_media_desc->p_input_item      = p_input_item;
-    p_media_desc->b_preparsed       = VLC_TRUE;
+    p_md = malloc( sizeof(libvlc_media_descriptor_t) );
+    p_md->p_libvlc_instance = p_instance;
+    p_md->p_input_item      = p_input_item;
+    p_md->b_preparsed       = VLC_TRUE;
 
-    return p_media_desc;
+    vlc_gc_incref( p_md->p_input_item );
+
+    return p_md;
 }
 
 /**************************************************************************
@@ -103,11 +107,8 @@ void libvlc_media_descriptor_destroy( libvlc_media_descriptor_t *p_md )
         return;
 
     /* XXX: locking */
+    vlc_gc_decref( p_md->p_input_item );
     
-    /* XXX: here we don't clean the item, because we can't properly track
-     * if it is needed by some other object. This is a leak(!). */
-    /* input_ItemClean( p_md->p_input_item ); */
-
     free( p_md );
 }
 
@@ -122,6 +123,8 @@ libvlc_media_descriptor_duplicate( libvlc_media_descriptor_t *p_md_orig )
     p_md = malloc( sizeof(libvlc_media_descriptor_t) );
     memcpy( p_md, p_md_orig, sizeof(libvlc_media_descriptor_t) );
 
+    vlc_gc_incref( p_md->p_input_item );
+
     return p_md;
 }
 
@@ -134,7 +137,7 @@ static const int meta_conversion[] =
     [libvlc_meta_Artist] = 1
 };
 
-char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_meta_desc,
+char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
                                          libvlc_meta_t e_meta,
                                          libvlc_exception_t *p_e )
 {
@@ -143,9 +146,9 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_meta_desc,
 
     /* XXX: locking */
 
-    preparse_if_needed( p_meta_desc );
+    preparse_if_needed( p_md );
 
-    ppsz_meta = (char**)p_meta_desc->p_input_item->p_meta;
+    ppsz_meta = (char**)p_md->p_input_item->p_meta;
     ppz_meta = ppsz_meta[ meta_conversion[e_meta] ];
 
     if( !ppz_meta )
@@ -153,3 +156,4 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_meta_desc,
 
     return strdup( ppz_meta );
 }
+
