@@ -103,7 +103,10 @@ void libvlc_media_descriptor_destroy( libvlc_media_descriptor_t *p_md )
         return;
 
     /* XXX: locking */
-    input_ItemClean( p_md->p_input_item );
+    
+    /* XXX: here we don't clean the item, because we can't properly track
+     * if it is needed by some other object. This is a leak(!). */
+    /* input_ItemClean( p_md->p_input_item ); */
 
     free( p_md );
 }
