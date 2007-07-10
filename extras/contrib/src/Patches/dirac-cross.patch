@@ -79,12 +79,12 @@ diff -ruN dirac-0.6.0.old/configure.ac dirac-0.6.0/configure.ac
  dnl -----------------------------------------------
 --- dirac/libdirac_common/band_codec.cpp    2007-07-06 23:20:51.000000000 +0200
 +++ dirac/libdirac_common/band_codec.cpp    2007-03-27 18:29:13.000000000 +0200
-
 @@ -433,7 +433,7 @@
          }
  
      }
--    return 0; // Avoid warning
-+
+-
++    return 0; // avoid warning
  }
-
+ 
+ inline int BandCodec::ChooseInfoContext() const 7
