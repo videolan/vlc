@@ -231,11 +231,15 @@ void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
     vlc_mutex_lock( &p_mi->object_lock );
     
     p_mi->i_refcount--;
+
+    /* We hold the mutex, as a waiter to make sure pending operations
+     * are finished. We can't hold it longer as the get_input_thread
+     * function holds a lock.  */
+
+    vlc_mutex_unlock( &p_mi->object_lock );
+    
     if( p_mi->i_refcount > 0 )
-    {
-        vlc_mutex_unlock( &p_mi->object_lock );
         return;
-    }
 
     release_input_thread( p_mi );
 
