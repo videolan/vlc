@@ -310,7 +310,7 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
 
     vlc_mutex_lock( &p_mi->object_lock );
 
-    if( p_input_thread = libvlc_get_input_thread( p_mi, p_e ) ) 
+    if( (p_input_thread = libvlc_get_input_thread( p_mi, p_e )) ) 
     {
         /* A thread alread exists, send it a play message */        
         vlc_value_t val;
