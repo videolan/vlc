@@ -96,6 +96,8 @@ static char *FontConfig_Select( FcConfig *, const char *,
 static line_desc_t *NewLine( int );
 
 static int SetFontSize( filter_t *, int );
+static void YUVFromRGB( uint32_t i_argb,
+                        uint8_t *pi_y, uint8_t *pi_u, uint8_t *pi_v );
 
 /*****************************************************************************
  * Module descriptor
@@ -193,7 +195,9 @@ struct line_desc_t
      * -- if the rendering mode supports it (RenderYUVA) and
      *  b_new_color_mode is set, then it becomes possible to
      *  have multicoloured text within the subtitles. */
-    uint32_t       *p_rgb;
+    uint32_t       *p_fg_rgb;
+    uint32_t       *p_bg_rgb;
+    uint8_t        *p_fg_bg_ratio; /* 0x00=100% FG --> 0x7F=100% BG */
     vlc_bool_t      b_new_color_mode;
     /** underline information -- only supplied if text should be underlined */
     uint16_t       *pi_underline_offset;
@@ -212,8 +216,8 @@ struct font_stack_t
 {
     char          *psz_name;
     int            i_size;
-    int            i_color;
-    int            i_alpha;
+    uint32_t       i_color;            /* ARGB */
+    uint32_t       i_karaoke_bg_color; /* ARGB */
 
     font_stack_t  *p_next;
 };
@@ -221,7 +225,8 @@ struct font_stack_t
 typedef struct
 {
     int         i_font_size;
-    uint32_t    i_font_color; /* ARGB */
+    uint32_t    i_font_color;         /* ARGB */
+    uint32_t    i_karaoke_bg_color;   /* ARGB */
     vlc_bool_t  b_italic;
     vlc_bool_t  b_bold;
     vlc_bool_t  b_underline;
@@ -711,12 +716,10 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     free( p_region_tmp );
 
     /* Calculate text color components */
-    i_y = (uint8_t)__MIN(abs( 2104 * p_line->i_red  + 4130 * p_line->i_green +
-                      802 * p_line->i_blue + 4096 + 131072 ) >> 13, 235);
-    i_u = (uint8_t)__MIN(abs( -1214 * p_line->i_red  + -2384 * p_line->i_green +
-                     3598 * p_line->i_blue + 4096 + 1048576) >> 13, 240);
-    i_v = (uint8_t)__MIN(abs( 3598 * p_line->i_red + -3013 * p_line->i_green +
-                      -585 * p_line->i_blue + 4096 + 1048576) >> 13, 240);
+    YUVFromRGB( (p_line->i_red   << 16) |
+                (p_line->i_green <<  8) |
+                (p_line->i_blue       ),
+                &i_y, &i_u, &i_v);
     i_alpha = p_line->i_alpha;
 
     p_dst_y = p_region->picture.Y_PIXELS;
@@ -807,22 +810,29 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
             if( p_line->b_new_color_mode )
             {
                 /* Every glyph can (and in fact must) have its own color */
-                int i_red   = ( p_line->p_rgb[ i ] & 0x00ff0000 ) >> 16;
-                int i_green = ( p_line->p_rgb[ i ] & 0x0000ff00 ) >>  8;
-                int i_blue  = ( p_line->p_rgb[ i ] & 0x000000ff );
-
-                i_y = (uint8_t)__MIN(abs( 2104 * i_red  + 4130 * i_green +
-                                  802 * i_blue + 4096 + 131072 ) >> 13, 235);
-                i_u = (uint8_t)__MIN(abs( -1214 * i_red  + -2384 * i_green +
-                                 3598 * i_blue + 4096 + 1048576) >> 13, 240);
-                i_v = (uint8_t)__MIN(abs( 3598 * i_red + -3013 * i_green +
-                                  -585 * i_blue + 4096 + 1048576) >> 13, 240);
+                YUVFromRGB( p_line->p_fg_rgb[ i ], &i_y, &i_u, &i_v );
             }
 
             for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
                 {
+                    uint8_t i_y_local = i_y;
+                    uint8_t i_u_local = i_u;
+                    uint8_t i_v_local = i_v;
+
+                    if( p_line->p_fg_bg_ratio != 0x00 )
+                    {
+                        int i_split = p_glyph->bitmap.width *
+                                      p_line->p_fg_bg_ratio[ i ] / 0x7f;
+
+                        if( x > i_split )
+                        {
+                            YUVFromRGB( p_line->p_bg_rgb[ i ],
+                                        &i_y_local, &i_u_local, &i_v_local );
+                        }
+                    }
+
                     if( p_glyph->bitmap.buffer[i_bitmap_offset] )
                     {
                         p_dst_y[i_offset+x] = ((p_dst_y[i_offset+x] *(255-(int)p_glyph->bitmap.buffer[i_bitmap_offset])) +
@@ -1154,23 +1164,20 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
 #ifdef HAVE_FONTCONFIG
 static ft_style_t *CreateStyle( char *psz_fontname, int i_font_size,
-        int i_font_color, int i_font_alpha, vlc_bool_t b_bold,
+        uint32_t i_font_color, uint32_t i_karaoke_bg_color, vlc_bool_t b_bold,
         vlc_bool_t b_italic, vlc_bool_t b_uline )
 {
     ft_style_t  *p_style = malloc( sizeof( ft_style_t ));
 
     if( p_style )
     {
-        p_style->i_font_size  = i_font_size;
-        p_style->i_font_color = ( i_font_color & 0x00ffffff )
-                                | (( i_font_alpha & 0xff ) << 24 );
-        p_style->b_italic     = b_italic;
-        p_style->b_bold       = b_bold;
-        p_style->b_underline  = b_uline;
-        /* p_style has just been malloc'ed in this function -
-         * it CAN'T have a previous assignment, and hence we
-         * don't need to do a free() for any previous value -
-         * which will in fact be undefined. */
+        p_style->i_font_size        = i_font_size;
+        p_style->i_font_color       = i_font_color;
+        p_style->i_karaoke_bg_color = i_karaoke_bg_color;
+        p_style->b_italic           = b_italic;
+        p_style->b_bold             = b_bold;
+        p_style->b_underline        = b_uline;
+
         p_style->psz_fontname = strdup( psz_fontname );
     }
     return p_style;
@@ -1206,7 +1213,7 @@ static vlc_bool_t StyleEquals( ft_style_t *s1, ft_style_t *s2 )
 }
 
 static int PushFont( font_stack_t **p_font, const char *psz_name, int i_size,
-                     int i_color, int i_alpha )
+                     uint32_t i_color, uint32_t i_karaoke_bg_color )
 {
     font_stack_t *p_new;
 
@@ -1224,9 +1231,9 @@ static int PushFont( font_stack_t **p_font, const char *psz_name, int i_size,
     else
         p_new->psz_name = NULL;
 
-    p_new->i_size   = i_size;
-    p_new->i_color  = i_color;
-    p_new->i_alpha  = i_alpha;
+    p_new->i_size              = i_size;
+    p_new->i_color             = i_color;
+    p_new->i_karaoke_bg_color  = i_karaoke_bg_color;
 
     if( !*p_font )
     {
@@ -1273,7 +1280,7 @@ static int PopFont( font_stack_t **p_font )
 }
 
 static int PeekFont( font_stack_t **p_font, char **psz_name, int *i_size,
-                     int *i_color, int *i_alpha )
+                     uint32_t *i_color, uint32_t *i_karaoke_bg_color )
 {
     font_stack_t *p_last;
 
@@ -1285,10 +1292,10 @@ static int PeekFont( font_stack_t **p_font, char **psz_name, int *i_size,
          p_last=p_last->p_next )
     ;
 
-    *psz_name = p_last->psz_name;
-    *i_size   = p_last->i_size;
-    *i_color  = p_last->i_color;
-    *i_alpha  = p_last->i_alpha;
+    *psz_name            = p_last->psz_name;
+    *i_size              = p_last->i_size;
+    *i_color             = p_last->i_color;
+    *i_karaoke_bg_color  = p_last->i_karaoke_bg_color;
 
     return VLC_SUCCESS;
 }
@@ -1354,24 +1361,25 @@ static ft_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
 {
     ft_style_t   *p_style = NULL;
 
-    char  *psz_fontname = NULL;
-    int    i_font_color = p_sys->i_font_color;
-    int    i_font_alpha = 0;
-    int    i_font_size  = p_sys->i_font_size;
+    char       *psz_fontname = NULL;
+    uint32_t    i_font_color = p_sys->i_font_color & 0x00ffffff;
+    uint32_t    i_karaoke_bg_color = i_font_color;
+    int         i_font_size  = p_sys->i_font_size;
 
     if( VLC_SUCCESS == PeekFont( p_fonts, &psz_fontname, &i_font_size,
-                                 &i_font_color, &i_font_alpha ) )
+                                 &i_font_color, &i_karaoke_bg_color ))
     {
         p_style = CreateStyle( psz_fontname, i_font_size, i_font_color,
-                i_font_alpha, b_bold, b_italic, b_uline );
+                i_karaoke_bg_color, b_bold, b_italic, b_uline );
     }
     return p_style;
 }
 
 static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
-                      vlc_bool_t b_uline, line_desc_t *p_line,
-                      uint32_t *psz_unicode, int *pi_pen_x, int i_pen_y,
-                      int *pi_start, FT_Vector *p_result )
+                      vlc_bool_t b_uline, int i_karaoke_bgcolor,
+                      line_desc_t *p_line, uint32_t *psz_unicode,
+                      int *pi_pen_x, int i_pen_y, int *pi_start,
+                      FT_Vector *p_result )
 {
     FT_BBox      line;
     int          i_yMin, i_yMax;
@@ -1458,7 +1466,9 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
                                        ( aSize < 0 ) ? -aSize   : aSize;
         }
         p_line->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
-        p_line->p_rgb[ i ] = i_font_color & 0x00ffffff;
+        p_line->p_fg_rgb[ i ] = i_font_color & 0x00ffffff;
+        p_line->p_bg_rgb[ i ] = i_karaoke_bgcolor & 0x00ffffff;
+        p_line->p_fg_bg_ratio[ i ] = 0x00;
 
         line.xMax = p_line->p_glyph_pos[i].x + glyph_size.xMax -
                     glyph_size.xMin + ((FT_BitmapGlyph)tmp_glyph)->left;
@@ -1547,11 +1557,12 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
 static int HandleFontAttributes( xml_reader_t *p_xml_reader,
                                   font_stack_t **p_fonts )
 {
-    int   rv;
-    char *psz_fontname = NULL;
-    int   i_font_color = 0xffffff;
-    int   i_font_alpha = 0;
-    int   i_font_size  = 24;
+    int        rv;
+    char      *psz_fontname = NULL;
+    uint32_t   i_font_color = 0xffffff;
+    int        i_font_alpha = 0;
+    uint32_t   i_karaoke_bg_color = 0x00ffffff;
+    int        i_font_size  = 24;
 
     /* Default all attributes to the top font in the stack -- in case not
      * all attributes are specified in the sub-font
@@ -1560,15 +1571,17 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
                                  &psz_fontname,
                                  &i_font_size,
                                  &i_font_color,
-                                 &i_font_alpha ))
+                                 &i_karaoke_bg_color ))
     {
         psz_fontname = strdup( psz_fontname );
     }
+    i_font_alpha = (i_font_color >> 24) & 0xff;
+    i_font_color &= 0x00ffffff;
 
     while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
     {
-        char *psz_name = xml_ReaderName ( p_xml_reader );
-        char *psz_value = xml_ReaderValue ( p_xml_reader );
+        char *psz_name = xml_ReaderName( p_xml_reader );
+        char *psz_value = xml_ReaderValue( p_xml_reader );
 
         if( psz_name && psz_value )
         {
@@ -1612,8 +1625,8 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     rv = PushFont( p_fonts,
                    psz_fontname,
                    i_font_size,
-                   i_font_color,
-                   i_font_alpha );
+                   (i_font_color & 0xffffff) | ((i_font_alpha & 0xff) << 24),
+                   i_karaoke_bg_color );
 
     free( psz_fontname );
 
@@ -1676,10 +1689,98 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
     if( p_style ) DeleteStyle( p_style );
 }
 
-static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
-                         text_style_t *p_font_style, uint32_t *psz_text,
-                         int *pi_len, uint32_t *pi_runs,
-                         uint32_t **ppi_run_lengths, ft_style_t ***ppp_styles)
+static void SetKaraokeLen( uint32_t i_runs, uint32_t *pi_run_lengths,
+                           uint32_t i_k_runs, uint32_t *pi_k_run_lengths )
+{
+    /* Karaoke tags _PRECEDE_ the text they specify a duration
+     * for, therefore we are working out the length for the
+     * previous tag, and first time through we have nothing
+     */
+    if( pi_k_run_lengths )
+    {
+        int i_chars = 0;
+        uint32_t i;
+
+        /* Work out how many characters are presently in the string
+         */
+        for( i = 0; i < i_runs; i++ )
+            i_chars += pi_run_lengths[ i ];
+
+        /* Subtract away those we've already allocated to other
+         * karaoke tags
+         */
+        for( i = 0; i < i_k_runs; i++ )
+            i_chars -= pi_k_run_lengths[ i ];
+
+        pi_k_run_lengths[ i_k_runs - 1 ] = i_chars;
+    }
+}
+
+static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
+                          uint32_t **ppi_k_run_lengths,
+                          uint32_t **ppi_k_durations )
+{
+    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+    {
+        char *psz_name = xml_ReaderName( p_xml_reader );
+        char *psz_value = xml_ReaderValue( p_xml_reader );
+
+        if( psz_name && psz_value &&
+            !strcasecmp( "t", psz_name ) )
+        {
+            if( ppi_k_durations && ppi_k_run_lengths )
+            {
+                (*pi_k_runs)++;
+
+                if( *ppi_k_durations )
+                {
+                    *ppi_k_durations = (uint32_t *)
+                        realloc( *ppi_k_durations,
+                                 *pi_k_runs * sizeof( uint32_t ) );
+                }
+                else if( *pi_k_runs == 1 )
+                {
+                    *ppi_k_durations = (uint32_t *)
+                        malloc( *pi_k_runs * sizeof( uint32_t ) );
+                }
+
+                if( *ppi_k_run_lengths )
+                {
+                    *ppi_k_run_lengths = (uint32_t *)
+                        realloc( *ppi_k_run_lengths,
+                                 *pi_k_runs * sizeof( uint32_t ) );
+                }
+                else if( *pi_k_runs == 1 )
+                {
+                    *ppi_k_run_lengths = (uint32_t *)
+                        malloc( *pi_k_runs * sizeof( uint32_t ) );
+                }
+                if( *ppi_k_durations )
+                    (*ppi_k_durations)[ *pi_k_runs - 1 ] = atoi( psz_value );
+                
+                if( *ppi_k_run_lengths )
+                    (*ppi_k_run_lengths)[ *pi_k_runs - 1 ] = 0;
+            }
+        }
+        if( psz_name )  free( psz_name );
+        if( psz_value ) free( psz_value );
+    }
+}
+
+static int ProcessNodes( filter_t *p_filter,
+                         xml_reader_t *p_xml_reader,
+                         text_style_t *p_font_style,
+                         uint32_t *psz_text,
+                         int *pi_len,
+
+                         uint32_t *pi_runs,
+                         uint32_t **ppi_run_lengths,
+                         ft_style_t ***ppp_styles,
+
+                         vlc_bool_t b_karaoke,
+                         uint32_t *pi_k_runs,
+                         uint32_t **ppi_k_run_lengths,
+                         uint32_t **ppi_k_durations )
 {
     int           rv             = VLC_SUCCESS;
     filter_sys_t *p_sys          = p_filter->p_sys;
@@ -1695,10 +1796,12 @@ static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
     if( p_font_style )
     {
         rv = PushFont( &p_fonts,
-                       p_font_style->psz_fontname,
-                       p_font_style->i_font_size,
-                       p_font_style->i_font_color,
-                       p_font_style->i_font_alpha );
+               p_font_style->psz_fontname,
+               p_font_style->i_font_size,
+               (p_font_style->i_font_color & 0xffffff) |
+                   ((p_font_style->i_font_alpha & 0xff) << 24),
+               (p_font_style->i_karaoke_background_color & 0xffffff) |
+                   ((p_font_style->i_karaoke_background_alpha & 0xff) << 24));
 
         if( p_font_style->i_style_flags & STYLE_BOLD )
             b_bold = VLC_TRUE;
@@ -1712,8 +1815,8 @@ static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
         rv = PushFont( &p_fonts,
                        FC_DEFAULT_FONT,
                        p_sys->i_font_size,
-                       0xffffff,
-                       0 );
+                       0x00ffffff,
+                       0x00ffffff );
     }
     if( rv != VLC_SUCCESS )
         return rv;
@@ -1763,6 +1866,20 @@ static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
                                                           b_italic,
                                                           b_uline ) );
                     }
+                    else if( !strcasecmp( "k", psz_node ) )
+                    {
+                        /* Only valid in karaoke */
+                        if( b_karaoke )
+                        {
+                            if( *pi_k_runs > 0 )
+                            {
+                                SetKaraokeLen( *pi_runs, *ppi_run_lengths,
+                                               *pi_k_runs, *ppi_k_run_lengths );
+                            }
+                            SetupKaraoke( p_xml_reader, pi_k_runs,
+                                          ppi_k_run_lengths, ppi_k_durations );
+                        }
+                    }
 
                     free( psz_node );
                 }
@@ -1802,6 +1919,11 @@ static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
             break;
         }
     }
+    if( b_karaoke )
+    {
+        SetKaraokeLen( *pi_runs, *ppi_run_lengths,
+                       *pi_k_runs, *ppi_k_run_lengths );
+    }
 
     *pi_len = psz_text - psz_text_orig;
 
@@ -1810,13 +1932,27 @@ static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
     return rv;
 }
 
-static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
-                         int i_len, uint32_t i_runs,
-                         uint32_t *pi_run_lengths, ft_style_t **pp_styles,
-                         line_desc_t **pp_lines, FT_Vector *p_result )
+static int ProcessLines( filter_t *p_filter,
+                         uint32_t *psz_text,
+                         int i_len,
+
+                         uint32_t i_runs,
+                         uint32_t *pi_run_lengths,
+                         ft_style_t **pp_styles,
+                         line_desc_t **pp_lines,
+                         
+                         FT_Vector *p_result,
+
+                         vlc_bool_t b_karaoke,
+                         uint32_t i_k_runs,
+                         uint32_t *pi_k_run_lengths,
+                         uint32_t *pi_k_durations ) 
 {
     filter_sys_t   *p_sys = p_filter->p_sys;
-    ft_style_t     **pp_char_styles;
+    ft_style_t    **pp_char_styles;
+    int            *p_new_positions = NULL;
+    int8_t         *p_levels = NULL;
+    uint8_t        *pi_karaoke_bar = NULL;
     uint32_t        i, j, k;
     int             i_prev;
 
@@ -1828,6 +1964,15 @@ static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
     if( !pp_char_styles )
         return VLC_ENOMEM;
 
+    if( b_karaoke )
+    {
+        pi_karaoke_bar = (uint8_t *) malloc( i_len * sizeof( uint8_t ));
+        /* If we can't allocate sufficient memory for karaoke, continue anyway -
+         * we just won't be able to display the progress bar; at least we'll
+         * get the text.
+         */
+    }
+
     i = 0;
     for( j = 0; j < i_runs; j++ )
         for( k = 0; k < pi_run_lengths[ j ]; k++ )
@@ -1836,32 +1981,36 @@ static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
 #if defined(HAVE_FRIBIDI)
     {
         ft_style_t  **pp_char_styles_new;
-        int         *p_positions;
+        int         *p_old_positions;
         uint32_t    *p_fribidi_string;
         int start_pos, pos = 0;
 
-        p_fribidi_string = malloc( (i_len + 1) * sizeof(uint32_t) );
-        if(! p_fribidi_string )
-        {
-            msg_Err( p_filter, "out of memory" );
-            free( pp_char_styles );
-            return VLC_ENOMEM;
-        }
         pp_char_styles_new  = (ft_style_t **)
-                                       malloc( i_len * sizeof( ft_style_t * ));
-        if(! pp_char_styles_new )
+            malloc( i_len * sizeof( ft_style_t * ));
+
+        p_fribidi_string = (uint32_t *)
+            malloc( (i_len + 1) * sizeof(uint32_t) );
+        p_old_positions = (int *)
+            malloc( (i_len + 1) * sizeof( int ) );
+        p_new_positions = (int *)
+            malloc( (i_len + 1) * sizeof( int ) );
+        p_levels = (int8_t *)
+            malloc( (i_len + 1) * sizeof( int8_t ) );
+
+        if( ! pp_char_styles_new ||
+            ! p_fribidi_string ||
+            ! p_old_positions ||
+            ! p_new_positions ||
+            ! p_levels )
         {
             msg_Err( p_filter, "out of memory" );
-            free( p_fribidi_string );
-            free( pp_char_styles );
-            return VLC_ENOMEM;
-        }
-        p_positions = (int *) malloc( (i_len + 1) * sizeof( int ) );
-        if(! p_positions )
-        {
-            msg_Err( p_filter, "out of memory" );
-            free( pp_char_styles_new );
-            free( p_fribidi_string );
+            if( p_levels )           free( p_levels );
+            if( p_old_positions )    free( p_old_positions );
+            if( p_new_positions )    free( p_new_positions );
+            if( p_fribidi_string )   free( p_fribidi_string );
+            if( pp_char_styles_new ) free( pp_char_styles_new );
+            if( pi_karaoke_bar )     free( pi_karaoke_bar );
+
             free( pp_char_styles );
             return VLC_ENOMEM;
         }
@@ -1874,6 +2023,8 @@ static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
                     break;
                 p_fribidi_string[pos] = psz_text[pos];
                 pp_char_styles_new[pos] = pp_char_styles[pos];
+                p_new_positions[pos] = pos;
+                p_levels[pos] = 0;
                 ++pos;
             }
             start_pos = pos;
@@ -1888,23 +2039,87 @@ static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
                 fribidi_log2vis((FriBidiChar*)psz_text + start_pos,
                         pos - start_pos, &base_dir,
                         (FriBidiChar*)p_fribidi_string + start_pos,
-                        0,
-                        p_positions, 0);
-
+                        p_new_positions + start_pos,
+                        p_old_positions,
+                        p_levels + start_pos );
                 for( j = (uint32_t) start_pos; j < (uint32_t) pos; j++ )
                 {
                     pp_char_styles_new[ j ] = pp_char_styles[ start_pos +
-                                                p_positions[ j - start_pos ] ];
+                                                p_old_positions[ j - start_pos ] ];
+                    p_new_positions[ j ] += start_pos;
                 }
             }
         }
-        free( p_positions );
+        free( p_old_positions );
         free( pp_char_styles );
         pp_char_styles = pp_char_styles_new;
         psz_text = p_fribidi_string;
         p_fribidi_string[ i_len ] = 0;
     }
 #endif
+    /* Work out the karaoke */
+    if( pi_karaoke_bar )
+    {
+        int64_t i_last_duration = 0;
+        int64_t i_duration = 0;
+        int64_t i_start_pos = 0;
+        int64_t i_elapsed  = var_GetTime( p_filter, "spu-elapsed" ) / 1000;
+        
+        for( k = 0; k< i_k_runs; k++ )
+        {
+             double fraction = 0.0;
+
+             i_duration += pi_k_durations[ k ];
+
+             if( i_duration < i_elapsed )
+             {
+                 /* Completely finished this run-length -
+                  * let it render normally */
+
+                 fraction = 1.0;
+             }
+             else if( i_elapsed < i_last_duration )
+             {
+                 /* Haven't got up to this segment yet -
+                  * render it completely in karaoke BG mode */
+
+                 fraction = 0.0;
+             }
+             else
+             {
+                 /* Partway through this run */
+
+                 fraction = (double)(i_elapsed - i_last_duration) /
+                            (double)pi_k_durations[ k ];
+             }
+             for( i = 0; i < pi_k_run_lengths[ k ]; i++ )
+             {
+                 double shade = pi_k_run_lengths[ k ] * fraction;
+
+                 if( p_new_positions )
+                     j = p_new_positions[ i_start_pos + i ];
+                 else
+                     j = i_start_pos + i;
+
+                 if( i < (uint32_t)shade )
+                     pi_karaoke_bar[ j ] = 0xff;
+                 else if( (double)i > shade )
+                     pi_karaoke_bar[ j ] = 0x00;
+                 else
+                 {
+                     shade -= (int)shade;
+                     pi_karaoke_bar[ j ] = ((int)(shade * 128.0) & 0x7f) |
+                                   ((p_levels ? (p_levels[ j ] % 2) : 0 ) << 7);
+                 }
+             }
+             
+             i_last_duration = i_duration;
+             i_start_pos += pi_k_run_lengths[ k ];
+        }
+    }
+    if( p_levels )         free( p_levels );
+    if( p_new_positions )  free( p_new_positions );
+
     FT_Vector tmp_result;
 
     line_desc_t *p_line = NULL;
@@ -1944,6 +2159,8 @@ static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
 #if defined(HAVE_FRIBIDI)
                     free( psz_text );
 #endif
+                    if( pi_karaoke_bar )
+                        free( pi_karaoke_bar );
                     return VLC_EGENERIC;
                 }
                 free( psz_fontfile );
@@ -1959,6 +2176,8 @@ static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
 #if defined(HAVE_FRIBIDI)
                 free( psz_text );
 #endif
+                if( pi_karaoke_bar )
+                    free( pi_karaoke_bar );
                 return VLC_EGENERIC;
             }
             p_sys->i_use_kerning =
@@ -1976,6 +2195,8 @@ static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
 #if defined(HAVE_FRIBIDI)
                 free( psz_text );
 #endif
+                if( pi_karaoke_bar )
+                    free( pi_karaoke_bar );
                 return VLC_ENOMEM;
             }
             memcpy( psz_unicode, psz_text + i_prev,
@@ -1994,6 +2215,8 @@ static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
 #if defined(HAVE_FRIBIDI)
                         free( psz_text );
 #endif
+                        if( pi_karaoke_bar )
+                            free( pi_karaoke_bar );
                         return VLC_ENOMEM;
                     }
                     /* New Color mode only works in YUVA rendering mode --
@@ -2014,8 +2237,10 @@ static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
                     if( p_prev ) p_prev->p_next = p_line;
                     else *pp_lines = p_line;
                 }
+
                 if( RenderTag( p_filter, p_face ? p_face : p_sys->p_face,
                                p_style->i_font_color, p_style->b_underline,
+                               p_style->i_karaoke_bg_color,
                                p_line, psz_unicode, &i_pen_x, i_pen_y, &i_posn,
                                &tmp_result ) != VLC_SUCCESS )
                 {
@@ -2025,8 +2250,11 @@ static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
 #if defined(HAVE_FRIBIDI)
                     free( psz_text );
 #endif
+                    if( pi_karaoke_bar )
+                        free( pi_karaoke_bar );
                     return VLC_EGENERIC;
                 }
+
                 if( *psz_unicode )
                 {
                     p_result->x = __MAX( p_result->x, tmp_result.x );
@@ -2045,12 +2273,52 @@ static int ProcessLines( filter_t *p_filter, uint32_t *psz_text,
 #if defined(HAVE_FRIBIDI)
     free( psz_text );
 #endif
-
     if( p_line )
     {
         p_result->x = __MAX( p_result->x, tmp_result.x );
         p_result->y += tmp_result.y;
     }
+
+    if( pi_karaoke_bar )
+    {
+        int i = 0;
+        for( p_line = *pp_lines; p_line; p_line=p_line->p_next )
+        {
+            for( k = 0; p_line->pp_glyphs[ k ]; k++, i++ )
+            {
+                if( (pi_karaoke_bar[ i ] & 0x7f) == 0x7f)
+                {
+                    /* do nothing */
+                }
+                else if( (pi_karaoke_bar[ i ] & 0x7f) == 0x00)
+                {
+                    /* 100% BG colour will render faster if we
+                     * instead make it 100% FG colour, so leave
+                     * the ratio alone and copy the value across
+                     */
+                    p_line->p_fg_rgb[ k ] = p_line->p_bg_rgb[ k ];
+                }
+                else
+                {
+                    if( pi_karaoke_bar[ i ] & 0x80 )
+                    {
+                        /* Swap Left and Right sides over for Right aligned
+                         * language text (eg. Arabic, Hebrew)
+                         */
+                        uint32_t i_tmp = p_line->p_fg_rgb[ k ];
+
+                        p_line->p_fg_rgb[ k ] = p_line->p_bg_rgb[ k ];
+                        p_line->p_bg_rgb[ k ] = i_tmp;
+                    }
+                    p_line->p_fg_bg_ratio[ k ] = (pi_karaoke_bar[ i ] & 0x7f);
+                }
+            }
+            /* Jump over the '\n' at the line-end */
+            i++;
+        }
+        free( pi_karaoke_bar );
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -2074,13 +2342,49 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
         p_xml = xml_Create( p_filter );
         if( p_xml )
         {
+            vlc_bool_t b_karaoke = VLC_FALSE;
+
             p_xml_reader = xml_ReaderCreate( p_xml, p_sub );
+            if( p_xml_reader )
+            {
+                /* Look for Root Node */
+                if( xml_ReaderRead( p_xml_reader ) == 1 )
+                {
+                    char *psz_node = xml_ReaderName( p_xml_reader );
+
+                    if( !strcasecmp( "karaoke", psz_node ) )
+                    {
+                        /* We're going to have to render the text a number
+                         * of times to show the progress marker on the text.
+                         */
+                        var_SetBool( p_filter, "text-rerender", VLC_TRUE );
+                        b_karaoke = VLC_TRUE;
+                    }
+                    else if( !strcasecmp( "text", psz_node ) )
+                    {
+                        b_karaoke = VLC_FALSE;
+                    }
+                    else
+                    {
+                        /* Only text and karaoke tags are supported */
+                        xml_ReaderDelete( p_xml, p_xml_reader );
+                        p_xml_reader = NULL;
+                        rv = VLC_EGENERIC;
+                    }
+
+                    free( psz_node );
+                }
+            }
+
             if( p_xml_reader )
             {
                 uint32_t   *psz_text;
                 int         i_len;
                 uint32_t    i_runs = 0;
+                uint32_t    i_k_runs = 0;
                 uint32_t   *pi_run_lengths = NULL;
+                uint32_t   *pi_k_run_lengths = NULL;
+                uint32_t   *pi_k_durations = NULL;
                 ft_style_t  **pp_styles = NULL;
                 FT_Vector    result;
                 line_desc_t  *p_lines = NULL;
@@ -2093,7 +2397,9 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
 
                     rv = ProcessNodes( p_filter, p_xml_reader,
                                   p_region_in->p_style, psz_text, &i_len,
-                                  &i_runs, &pi_run_lengths, &pp_styles );
+                                  &i_runs, &pi_run_lengths, &pp_styles,
+                                  b_karaoke, &i_k_runs, &pi_k_run_lengths,
+                                  &pi_k_durations );
 
                     p_region_out->i_x = p_region_in->i_x;
                     p_region_out->i_y = p_region_in->i_y;
@@ -2101,7 +2407,9 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                     if( rv == VLC_SUCCESS )
                     {
                         rv = ProcessLines( p_filter, psz_text, i_len, i_runs,
-                                pi_run_lengths, pp_styles, &p_lines, &result );
+                                pi_run_lengths, pp_styles, &p_lines, &result,
+                                b_karaoke, i_k_runs, pi_k_run_lengths,
+                                pi_k_durations );
                     }
 
                     for( k=0; k<i_runs; k++)
@@ -2211,7 +2519,9 @@ static void FreeLine( line_desc_t *p_line )
     }
     free( p_line->pp_glyphs );
     free( p_line->p_glyph_pos );
-    free( p_line->p_rgb );
+    free( p_line->p_fg_rgb );
+    free( p_line->p_bg_rgb );
+    free( p_line->p_fg_bg_ratio );
     free( p_line->pi_underline_offset );
     free( p_line->pi_underline_thickness );
     free( p_line );
@@ -2241,19 +2551,25 @@ static line_desc_t *NewLine( int i_count )
 
     p_line->pp_glyphs = malloc( sizeof(FT_BitmapGlyph) * ( i_count + 1 ) );
     p_line->p_glyph_pos = malloc( sizeof( FT_Vector ) * ( i_count + 1 ) );
-    p_line->p_rgb = malloc( sizeof( uint32_t ) * ( i_count + 1 ) );
+    p_line->p_fg_rgb = malloc( sizeof( uint32_t ) * ( i_count + 1 ) );
+    p_line->p_bg_rgb = malloc( sizeof( uint32_t ) * ( i_count + 1 ) );
+    p_line->p_fg_bg_ratio = calloc( i_count + 1, sizeof( uint8_t ) );
     p_line->pi_underline_offset = calloc( i_count + 1, sizeof( uint16_t ) );
     p_line->pi_underline_thickness = calloc( i_count + 1, sizeof( uint16_t ) );
     if( ( p_line->pp_glyphs == NULL ) ||
         ( p_line->p_glyph_pos == NULL ) ||
-        ( p_line->p_rgb == NULL ) ||
+        ( p_line->p_fg_rgb == NULL ) ||
+        ( p_line->p_bg_rgb == NULL ) ||
+        ( p_line->p_fg_bg_ratio == NULL ) ||
         ( p_line->pi_underline_offset == NULL ) ||
         ( p_line->pi_underline_thickness == NULL ) )
     {
         if( p_line->pi_underline_thickness )
             free( p_line->pi_underline_thickness );
         if( p_line->pi_underline_offset ) free( p_line->pi_underline_offset );
-        if( p_line->p_rgb ) free( p_line->p_rgb );
+        if( p_line->p_fg_rgb ) free( p_line->p_fg_rgb );
+        if( p_line->p_bg_rgb ) free( p_line->p_bg_rgb );
+        if( p_line->p_fg_bg_ratio ) free( p_line->p_fg_bg_ratio );
         if( p_line->p_glyph_pos ) free( p_line->p_glyph_pos );
         if( p_line->pp_glyphs ) free( p_line->pp_glyphs );
         free( p_line );
@@ -2308,4 +2624,19 @@ static int SetFontSize( filter_t *p_filter, int i_size )
     }
 
     return VLC_SUCCESS;
+}
+
+static void YUVFromRGB( uint32_t i_argb,
+                    uint8_t *pi_y, uint8_t *pi_u, uint8_t *pi_v )
+{
+    int i_red   = ( i_argb & 0x00ff0000 ) >> 16;
+    int i_green = ( i_argb & 0x0000ff00 ) >>  8;
+    int i_blue  = ( i_argb & 0x000000ff );
+
+    *pi_y = (uint8_t)__MIN(abs( 2104 * i_red  + 4130 * i_green +
+                      802 * i_blue + 4096 + 131072 ) >> 13, 235);
+    *pi_u = (uint8_t)__MIN(abs( -1214 * i_red  + -2384 * i_green +
+                     3598 * i_blue + 4096 + 1048576) >> 13, 240);
+    *pi_v = (uint8_t)__MIN(abs( 3598 * i_red + -3013 * i_green +
+                      -585 * i_blue + 4096 + 1048576) >> 13, 240);
 }
