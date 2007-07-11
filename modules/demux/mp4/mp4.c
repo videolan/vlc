@@ -1477,6 +1477,17 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_track->fmt.i_codec = VLC_FOURCC('Y','U','Y','2');
             break;
 
+        case VLC_FOURCC('i','n','2','4'):
+            /* in in24/in32 there's enda-atom to tell it's little-endian (if present) */
+            if( ( MP4_BoxGet( p_sample, "wave/enda" ) ) ||
+                ( MP4_BoxGet( p_sample, "enda" ) ) )
+            {
+                p_track->fmt.i_codec = VLC_FOURCC('4','2','n','i');
+            } else {
+                p_track->fmt.i_codec = p_sample->i_type;
+            }
+            break;
+
         default:
             p_track->fmt.i_codec = p_sample->i_type;
             break;
