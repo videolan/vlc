@@ -65,6 +65,10 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     {
         ui.advancedFrame->hide();
     }
+    else
+    {
+        ui.advancedCheckBox->setCheckState( Qt::Checked );
+    }
 
     ui.slaveLabel->hide();
     ui.slaveText->hide();
@@ -278,18 +282,23 @@ void OpenDialog::toggleAdvancedPanel()
     //FIXME does not work under Windows
     if (ui.advancedFrame->isVisible()) {
         ui.advancedFrame->hide();
+#ifndef WIN32
         setMinimumHeight(1);
         resize( width(), mainHeight );
-
+#endif
     } else {
+#ifndef WIN32
         if( mainHeight == 0 )
             mainHeight = height();
+#endif
 
         ui.advancedFrame->show();
+#ifndef WIN32
         if( advHeight == 0 ) {
             advHeight = height() - mainHeight;
         }
         resize( width(), mainHeight + advHeight );
+#endif
     }
 }
 
