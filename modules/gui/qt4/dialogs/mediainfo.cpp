@@ -45,6 +45,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
 {
     i_runs = 0;
     p_input = NULL;
+    need_update = true;
 
     setWindowTitle( qtr( "Media information" ) );
     resize( 700 , 450 );
