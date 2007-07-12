@@ -118,7 +118,7 @@ typedef struct {
  * Allocate a RGBPicture structure.
  * \param datasize: the size of the data
  */
-VLC_PRIVATE_API mediacontrol_RGBPicture *mediacontrol_RGBPicture__alloc( int datasize );
+mediacontrol_RGBPicture *mediacontrol_RGBPicture__alloc( int datasize );
 
 /**
  * Free a RGBPicture structure.
@@ -126,11 +126,10 @@ VLC_PRIVATE_API mediacontrol_RGBPicture *mediacontrol_RGBPicture__alloc( int dat
  */
 VLC_PUBLIC_API void mediacontrol_RGBPicture__free( mediacontrol_RGBPicture *pic );
 
-VLC_PRIVATE_API mediacontrol_RGBPicture *
-  _mediacontrol_createRGBPicture( int, int, long, vlc_int64_t l_date,
+mediacontrol_RGBPicture *_mediacontrol_createRGBPicture( int, int, long, vlc_int64_t l_date,
                                   char *, int);
 
-VLC_PRIVATE_API mediacontrol_PlaylistSeq *mediacontrol_PlaylistSeq__alloc( int size );
+mediacontrol_PlaylistSeq *mediacontrol_PlaylistSeq__alloc( int size );
 
 VLC_PUBLIC_API void mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq *ps );
 
