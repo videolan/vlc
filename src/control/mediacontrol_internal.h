@@ -46,6 +46,18 @@ vlc_int64_t mediacontrol_position2microsecond(
     input_thread_t *p_input,
     const mediacontrol_Position *pos );
 
+/**
+ * Allocate a RGBPicture structure.
+ * \param datasize: the size of the data
+ */
+mediacontrol_RGBPicture *private_mediacontrol_RGBPicture__alloc( int datasize );
+
+mediacontrol_RGBPicture *private_mediacontrol_createRGBPicture( int, int, long, vlc_int64_t l_date,
+                                  char *, int);
+
+mediacontrol_PlaylistSeq *private_mediacontrol_PlaylistSeq__alloc( int size );
+
+
 #define RAISE( c, m )  if( exception ) { exception->code = c;	\
                                          exception->message = strdup(m); }
 

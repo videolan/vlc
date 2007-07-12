@@ -357,7 +357,7 @@ mediacontrol_playlist_get_list( mediacontrol_Instance *self,
     vlc_mutex_lock( &p_playlist->object_lock );
     i_playlist_size = p_playlist->current.i_size;
 
-    retval = mediacontrol_PlaylistSeq__alloc( i_playlist_size );
+    retval = private_mediacontrol_PlaylistSeq__alloc( i_playlist_size );
 
     for( i_index = 0 ; i_index < i_playlist_size ; i_index++ )
     {

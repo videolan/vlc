@@ -46,90 +46,20 @@ extern "C" {
 #include <vlc/mediacontrol_structures.h>
 
 /**
- * RGBPicture structure
- * This generic structure holds a picture in an encoding specified by type.
- */
-typedef struct {
-    int  width;
-    int  height;
-    long type;
-    vlc_int64_t date;
-    int  size;
-    char *data;
-} mediacontrol_RGBPicture;
-
-/**
- * Playlist sequence
- * A simple list of strings.
- */
-typedef struct {
-    int size;
-    char **data;
-} mediacontrol_PlaylistSeq;
-
-typedef struct {
-    int code;
-    char *message;
-} mediacontrol_Exception;
-
-/**
- * Exception codes
- */
-#define mediacontrol_PositionKeyNotSupported    1
-#define mediacontrol_PositionOriginNotSupported 2
-#define mediacontrol_InvalidPosition            3
-#define mediacontrol_PlaylistException          4
-#define mediacontrol_InternalException          5
-
-/**
  * mediacontrol_Instance is an opaque structure, defined in
  * mediacontrol_internal.h. API users do not have to mess with it. 
  */
 typedef struct mediacontrol_Instance mediacontrol_Instance;
-
-/**
- * Possible player status
- */
-enum mediacontrol_PlayerStatusList
-{
-    mediacontrol_PlayingStatus, mediacontrol_PauseStatus,
-    mediacontrol_ForwardStatus, mediacontrol_BackwardStatus,
-    mediacontrol_InitStatus,    mediacontrol_EndStatus,
-    mediacontrol_UndefinedStatus
-};
-typedef enum mediacontrol_PlayerStatusList mediacontrol_PlayerStatus;
-
-/**
- * Stream information
- * This structure allows to quickly get various informations about the stream.
- */
-typedef struct {
-    mediacontrol_PlayerStatus streamstatus;
-    char *url;         /* The URL of the current media stream */
-    vlc_int64_t position;     /* actual location in the stream (in ms) */
-    vlc_int64_t length;         /* total length of the stream (in ms) */
-} mediacontrol_StreamInformation;
 
 /**************************************************************************
  *  Helper functions
  ***************************************************************************/
 
 /**
- * Allocate a RGBPicture structure.
- * \param datasize: the size of the data
- */
-mediacontrol_RGBPicture *mediacontrol_RGBPicture__alloc( int datasize );
-
-/**
  * Free a RGBPicture structure.
  * \param pic: the RGBPicture structure
  */
 VLC_PUBLIC_API void mediacontrol_RGBPicture__free( mediacontrol_RGBPicture *pic );
-
-mediacontrol_RGBPicture *_mediacontrol_createRGBPicture( int, int, long, vlc_int64_t l_date,
-                                  char *, int);
-
-mediacontrol_PlaylistSeq *mediacontrol_PlaylistSeq__alloc( int size );
 
 VLC_PUBLIC_API void mediacontrol_PlaylistSeq__free( mediacontrol_PlaylistSeq *ps );
 

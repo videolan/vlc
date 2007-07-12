@@ -88,12 +88,12 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 
     if( p_snapshot )
     {
-        p_pic = _mediacontrol_createRGBPicture( p_snapshot->i_width,
-                                                p_snapshot->i_height,
-                                                VLC_FOURCC( 'p','n','g',' ' ),
-                                                p_snapshot->date,
-                                                p_snapshot->p_data,
-                                                p_snapshot->i_datasize );
+        p_pic = private_mediacontrol_createRGBPicture( p_snapshot->i_width,
+						       p_snapshot->i_height,
+						       VLC_FOURCC( 'p','n','g',' ' ),
+						       p_snapshot->date,
+						       p_snapshot->p_data,
+						       p_snapshot->i_datasize );
         if( !p_pic )
         {
             free( p_snapshot->p_data );

@@ -199,7 +199,7 @@ mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_P
 }
 
 mediacontrol_RGBPicture*
-mediacontrol_RGBPicture__alloc( int datasize )
+private_mediacontrol_RGBPicture__alloc( int datasize )
 {
     mediacontrol_RGBPicture* pic;
 
@@ -223,7 +223,7 @@ mediacontrol_RGBPicture__free( mediacontrol_RGBPicture* pic )
 }
 
 mediacontrol_PlaylistSeq*
-mediacontrol_PlaylistSeq__alloc( int size )
+private_mediacontrol_PlaylistSeq__alloc( int size )
 {
     mediacontrol_PlaylistSeq* ps;
 
@@ -291,12 +291,12 @@ mediacontrol_exception_free( mediacontrol_Exception *exception )
 }
 
 mediacontrol_RGBPicture*
-_mediacontrol_createRGBPicture( int i_width, int i_height, long i_chroma, vlc_int64_t l_date,
+private_mediacontrol_createRGBPicture( int i_width, int i_height, long i_chroma, vlc_int64_t l_date,
                                 char* p_data, int i_datasize )
 {
     mediacontrol_RGBPicture *retval;
 
-    retval = mediacontrol_RGBPicture__alloc( i_datasize );
+    retval = private_mediacontrol_RGBPicture__alloc( i_datasize );
     if( retval )
     {
         retval->width  = i_width;
