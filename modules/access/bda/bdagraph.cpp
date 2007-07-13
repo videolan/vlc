@@ -1419,7 +1419,7 @@ HRESULT BDAGraph::Destroy()
         p_media_control->Release();
         p_media_control = NULL;
     }
-    if( p_scanning_tuner )
+    if( p_filter_graph )
     {
         p_filter_graph->Release();
         p_filter_graph = NULL;
