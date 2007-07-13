@@ -188,6 +188,11 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
 
     p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->i_input_id = p_input->i_object_id;
+    /* same strategy as before */
+    p_mi->i_refcount = 1;
+    /* same strategy as before */
+    vlc_mutex_init( p_mi->p_libvlc_instance->p_libvlc_int,
+                    &p_mi->object_lock );
 
     /* will be released in media_instance_release() */
     vlc_object_yield( p_input );
