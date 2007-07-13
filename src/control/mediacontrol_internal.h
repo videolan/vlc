@@ -38,13 +38,12 @@ struct mediacontrol_Instance {
     playlist_t    *p_playlist;
 };
 
-vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
-                       mediacontrol_PositionKey from,
-                       mediacontrol_PositionKey to,
-                       vlc_int64_t value );
-vlc_int64_t mediacontrol_position2microsecond(
-    input_thread_t *p_input,
-    const mediacontrol_Position *pos );
+vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
+					       mediacontrol_PositionKey from,
+					       mediacontrol_PositionKey to,
+					       vlc_int64_t value );
+vlc_int64_t private_mediacontrol_position2microsecond( input_thread_t *p_input,
+						       const mediacontrol_Position *pos );
 
 /**
  * Allocate a RGBPicture structure.
@@ -52,8 +51,7 @@ vlc_int64_t mediacontrol_position2microsecond(
  */
 mediacontrol_RGBPicture *private_mediacontrol_RGBPicture__alloc( int datasize );
 
-mediacontrol_RGBPicture *private_mediacontrol_createRGBPicture( int, int, long, vlc_int64_t l_date,
-                                  char *, int);
+mediacontrol_RGBPicture *private_mediacontrol_createRGBPicture( int, int, long, vlc_int64_t l_date, char *, int);
 
 mediacontrol_PlaylistSeq *private_mediacontrol_PlaylistSeq__alloc( int size );
 

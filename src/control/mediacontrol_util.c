@@ -52,7 +52,7 @@
 /* FIXME: Need to stop accessing private input structures !! */
 #include "input/input_internal.h"
 
-vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
+vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
                                        mediacontrol_PositionKey from,
                                        mediacontrol_PositionKey to,
                                        vlc_int64_t value )
@@ -142,12 +142,12 @@ vlc_int64_t mediacontrol_unit_convert( input_thread_t *p_input,
 /* Converts a mediacontrol_Position into a time in microseconds in
    movie clock time */
 vlc_int64_t
-mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_Position * pos )
+private_mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_Position * pos )
 {
     switch( pos->origin )
     {
     case mediacontrol_AbsolutePosition:
-        return ( 1000 * mediacontrol_unit_convert( p_input,
+        return ( 1000 * private_mediacontrol_unit_convert( p_input,
                                                    pos->key, /* from */
                                                    mediacontrol_MediaTime,  /* to */
                                                    pos->value ) );
@@ -163,7 +163,7 @@ mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_P
             var_Get( p_input, "time", &val );
         }
 
-        l_pos = 1000 * mediacontrol_unit_convert( p_input,
+        l_pos = 1000 * private_mediacontrol_unit_convert( p_input,
                                                   pos->key,
                                                   mediacontrol_MediaTime,
                                                   pos->value );
@@ -183,7 +183,7 @@ mediacontrol_position2microsecond( input_thread_t* p_input, const mediacontrol_P
 
         if( val.i_time > 0)
         {
-            l_pos = ( 1000 * mediacontrol_unit_convert( p_input,
+            l_pos = ( 1000 * private_mediacontrol_unit_convert( p_input,
                                                         pos->key,
                                                         mediacontrol_MediaTime,
                                                         pos->value ) );

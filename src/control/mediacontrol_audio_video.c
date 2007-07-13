@@ -193,7 +193,7 @@ mediacontrol_display_text( mediacontrol_Instance *self,
         mtime_t i_duration = 0;
         mtime_t i_now = mdate();
 
-        i_duration = 1000 * mediacontrol_unit_convert(
+        i_duration = 1000 * private_mediacontrol_unit_convert(
                                                 self->p_playlist->p_input,
                                                 end->key,
                                                 mediacontrol_MediaTime,
@@ -218,11 +218,11 @@ mediacontrol_display_text( mediacontrol_Instance *self,
         /* i_now = input_ClockGetTS( p_input, NULL, 0 ); */
         i_now = mdate();
 
-        i_debut = mediacontrol_position2microsecond( p_input,
+        i_debut = private_mediacontrol_position2microsecond( p_input,
                                             ( mediacontrol_Position* ) begin );
         i_debut += i_now;
 
-        i_fin = mediacontrol_position2microsecond( p_input,
+        i_fin = private_mediacontrol_position2microsecond( p_input,
                                           ( mediacontrol_Position * ) end );
         i_fin += i_now;
 

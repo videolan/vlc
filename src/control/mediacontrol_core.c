@@ -159,7 +159,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
             RAISE_NULL( mediacontrol_InternalException,
                         "No input" );
         }
-        retval->value = mediacontrol_unit_convert( self->p_playlist->p_input,
+        retval->value = private_mediacontrol_unit_convert( self->p_playlist->p_input,
                                                    mediacontrol_MediaTime,
                                                    a_key,
                                                    pos );
@@ -184,7 +184,7 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
     p_mi = libvlc_playlist_get_media_instance( self->p_instance, &ex);
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
-    i_pos = mediacontrol_position2microsecond( self->p_playlist->p_input, a_position );
+    i_pos = private_mediacontrol_position2microsecond( self->p_playlist->p_input, a_position );
     libvlc_media_instance_set_time( p_mi, i_pos / 1000, &ex );
     libvlc_media_instance_release( p_mi );
     HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
@@ -223,7 +223,7 @@ mediacontrol_start( mediacontrol_Instance *self,
         psz_from = ( char * )malloc( 20 * sizeof( char ) );
         if( psz_from && p_playlist->status.p_item )
         {
-            i_from = mediacontrol_position2microsecond( p_playlist->p_input, a_position ) / 1000000;
+            i_from = private_mediacontrol_position2microsecond( p_playlist->p_input, a_position ) / 1000000;
 
             /* Set start time */
             snprintf( psz_from, 20, "start-time=%i", i_from );
@@ -427,10 +427,10 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
         var_Get( p_input, "length", &val);
         retval->length = val.i_time / 1000;
 
-        retval->position = mediacontrol_unit_convert( p_input,
+        retval->position = private_mediacontrol_unit_convert( p_input,
                                          mediacontrol_MediaTime, a_key,
                                          retval->position );
-        retval->length   = mediacontrol_unit_convert( p_input,
+        retval->length   = private_mediacontrol_unit_convert( p_input,
                                          mediacontrol_MediaTime, a_key,
                                          retval->length );
     }
