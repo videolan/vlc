@@ -60,6 +60,13 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
     /* No one is tracking this input_thread appart us. Destroy it */
     if( should_destroy )
         input_DestroyThread( p_input_thread );
+    else
+    {
+        /* XXX: hack the playlist doesn't retain the input thread,
+         * so we did it for the playlist (see _new_from_input_thread),
+         * revert that here. */
+        vlc_object_release( p_input_thread );
+    }
 }
 
 /*
@@ -195,6 +202,10 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
                     &p_mi->object_lock );
 
     /* will be released in media_instance_release() */
+    vlc_object_yield( p_input );
+
+    /* XXX: Hack as the playlist doesn't yield the input thread we retain
+     * the input for the playlist. (see corresponding hack in _release) */
     vlc_object_yield( p_input );
 
     return p_mi;
