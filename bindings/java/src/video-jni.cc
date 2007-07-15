@@ -42,6 +42,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1toggleFullscreen (JNIEnv *
     
     libvlc_toggle_fullscreen( input, exception );
 
+    libvlc_media_instance_release(input);
+
     CHECK_EXCEPTION_FREE ;
 }
 
@@ -53,6 +55,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1setFullscreen (JNIEnv *env
 
     libvlc_set_fullscreen( input, value, exception );
 
+    libvlc_media_instance_release(input);
     CHECK_EXCEPTION_FREE ;
 }
 
@@ -65,6 +68,7 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Video__1getFullscreen (JNIEnv 
 
     res = libvlc_get_fullscreen( input, exception );
 
+    libvlc_media_instance_release(input);
     CHECK_EXCEPTION_FREE ;
     
     return res;
@@ -79,6 +83,7 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Video__1getHeight (JNIEnv *env, jo
 
     res = libvlc_video_get_height( input, exception );
 
+    libvlc_media_instance_release(input);
     CHECK_EXCEPTION_FREE ;
 
     return res;
@@ -93,6 +98,7 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Video__1getWidth (JNIEnv *env, job
 
     res = libvlc_video_get_width( input, exception );
 
+    libvlc_media_instance_release(input);
     CHECK_EXCEPTION_FREE ;
 
     return res;
@@ -108,6 +114,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1getSnapshot (JNIEnv *env, 
 
     libvlc_video_take_snapshot( input, (char *) psz_filepath, exception );
 
+    libvlc_media_instance_release(input);
     CHECK_EXCEPTION_FREE ;
     
     if (psz_filepath != NULL) {
@@ -124,6 +131,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1destroyVideo (JNIEnv *env,
 
     libvlc_video_destroy( input, exception );
 
+    libvlc_media_instance_release(input);
     CHECK_EXCEPTION_FREE;
 }
 
@@ -150,6 +158,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
     awt.version = JAWT_VERSION_1_3;
     if (JAWT_GetAWT(env, &awt) == JNI_FALSE) {
         printf("AWT Not found\n");
+    	libvlc_media_instance_release(input);
         return;
     }
 
@@ -157,6 +166,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
     ds = awt.GetDrawingSurface(env, canvas);
     if (ds == NULL) {
         printf("NULL drawing surface\n");
+    	libvlc_media_instance_release(input);
         return;
     }
 
@@ -165,6 +175,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
     if((lock & JAWT_LOCK_ERROR) != 0) {
         printf("Error locking surface\n");
         awt.FreeDrawingSurface(ds);
+    	libvlc_media_instance_release(input);
         return;
     }
 
@@ -174,6 +185,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
         printf("Error getting surface info\n");
         ds->Unlock(ds);
         awt.FreeDrawingSurface(ds);
+    	libvlc_media_instance_release(input);
         return;
     }
 
@@ -184,6 +196,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
     drawable = reinterpret_cast<int>(dsi_win->hwnd);
 
     libvlc_video_set_parent((libvlc_instance_t *) instance, drawable, exception );
+    libvlc_media_instance_release(input);
 
     CHECK_EXCEPTION_FREE ;
     
@@ -311,5 +324,6 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1setSize (JNIEnv *env, jobj
     
     libvlc_video_resize( input, width, height, exception );
 
+    libvlc_media_instance_release(input);
     CHECK_EXCEPTION_FREE ;
 }

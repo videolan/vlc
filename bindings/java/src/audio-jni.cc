@@ -41,7 +41,8 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getTrack (JNIEnv *env, job
     jint res = 0;
     
     res = libvlc_audio_get_track( input, exception );
-    
+ 
+    libvlc_media_instance_release(input);   
     CHECK_EXCEPTION_FREE;
     
     return res;
@@ -54,6 +55,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setTrack (JNIEnv *env, job
 
     libvlc_audio_set_track( input, value, exception );
 
+    libvlc_media_instance_release(input);   
     CHECK_EXCEPTION_FREE;
 }
 
