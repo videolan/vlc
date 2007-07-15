@@ -503,7 +503,10 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         /* Remove formatting from string */
 
         p_spu->p_region->psz_text = StripTags( psz_subtitle );
-        p_spu->p_region->psz_html = CreateHtmlSubtitle( psz_subtitle );
+        if( var_CreateGetBool( p_dec, "subsdec-formatted" ) )
+        {
+            p_spu->p_region->psz_html = CreateHtmlSubtitle( psz_subtitle );
+        }
 
         p_spu->i_start = p_block->i_pts;
         p_spu->i_stop = p_block->i_pts + p_block->i_length;
@@ -777,7 +780,15 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec, char *psz_subtitle
                                                       p_sys->i_align );
                 
                     if( p_text_region )
+                    {
                         p_text_region->psz_text = CreatePlainText( p_text_region->psz_html );
+
+                        if( ! var_CreateGetBool( p_dec, "subsdec-formatted" ) )
+                        {
+                            free( p_text_region->psz_html );
+                            p_text_region->psz_html = NULL;
+                        }
+                    }
 
                     if( !p_region_first )
                     {
@@ -807,6 +818,14 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec, char *psz_subtitle
                                                       psz_end - psz_subtitle,
                                                       p_sys->i_align );
                 
+                    if( p_text_region )
+                    {
+                        if( ! var_CreateGetBool( p_dec, "subsdec-formatted" ) )
+                        {
+                            free( p_text_region->psz_html );
+                            p_text_region->psz_html = NULL;
+                        }
+                    }
                     if( !p_region_first )
                     {
                         p_region_first = p_region_upto = p_text_region;
