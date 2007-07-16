@@ -353,7 +353,7 @@ static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
 }
 
 #if defined(__PLUGIN__) || defined(__BUILTIN__)
-# warning This is an internal header. Please don't relay on it unless you really know what you are doing.
+# warning This is an internal header, please don't rely on it.
 #else
 /* Stream */
 /**
