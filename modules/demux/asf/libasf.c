@@ -268,7 +268,7 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
     int      i_peek;
     uint8_t  *p_peek;
 
-    if( ( i_peek = stream_Peek( s, &p_peek,  92) ) < 92 )
+    if( ( i_peek = stream_Peek( s, &p_peek,  104) ) < 104 )
     {
        return VLC_EGENERIC;
     }
