@@ -241,6 +241,8 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
 {
     QMenu *menu = new QMenu();
     menu->addMenu( SDMenu( p_intf ) );
+    menu->addAction ( QIcon(":/pixmaps/vlc_playlist_16px.png"),
+                      qtr( "Playlist"), mi, SLOT( playlist() ) );
     menu->addSeparator();
 
     DP_SADD( menu, qtr( I_PL_LOAD ), "", "", openPlaylist(), "Ctrl+L" );
@@ -287,8 +289,8 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         adv->setCheckable( true );
         if( adv_controls_enabled ) adv->setChecked( true );
 
-	DP_SADD( menu, qtr( "Hide Menus..." ), "","",hideMenus(), "Ctrl+H" );
-    	menu->addSeparator();
+        DP_SADD( menu, qtr( "Hide Menus..." ), "","",hideMenus(), "Ctrl+H" );
+        menu->addSeparator();
 
 #if 0 /* For Visualisations. Not yet working */
         adv = menu->addAction( qtr("Visualizations selector" ),
@@ -296,8 +298,8 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         adv->setCheckable( true );
         if( visual_selector_enabled ) adv->setChecked( true );
 #endif
-  	menu->addAction ( QIcon(":/pixmaps/vlc_playlist_16px.png"),
-	   		  qtr( "Playlist"), mi, SLOT( playlist() ) );
+        menu->addAction ( QIcon(":/pixmaps/vlc_playlist_16px.png"),
+                          qtr( "Playlist"), mi, SLOT( playlist() ) );
     }
     DP_SADD( menu, qtr( I_MENU_EXT ), "", ":/pixmaps/vlc_settings_16px.png",
                  extendedDialog() ,  "Ctrl+E"  );

@@ -95,7 +95,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     need_components_update = false;
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
     embeddedPlaylistWasActive = videoIsActive = false;
- 
+
     input_name = "";
 
     videoEmbeddedFlag = false;
@@ -122,6 +122,18 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setFocusPolicy( Qt::StrongFocus );
     setAcceptDrops(true);
 
+    /* Systray */
+    systray = NULL;
+    if( QSystemTrayIcon::isSystemTrayAvailable() &&
+                  ( config_GetInt( p_intf, "qt-start-mininimized") == 1) )
+    {
+        hide();
+        createSystrayMenu();
+    }
+    if( QSystemTrayIcon::isSystemTrayAvailable() &&
+                  ( config_GetInt( p_intf, "qt-system-tray") == 1) )
+            createSystrayMenu();
+
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
     ON_TIMEOUT( updateOnTimer() );
@@ -138,10 +150,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Naming in the controller */
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
              setName( QString ) );
-    if( config_GetInt( p_intf, "qt-system-tray" ) )
+    if( config_GetInt( p_intf, "qt-system-tray" ) && systray )
     {
         CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
-                 updateSystrayTooltipName(QString));
+                 updateSystrayTooltipName( QString ) );
     }
     if( config_GetInt( p_intf, "qt-name-in-title" ) )
     {
@@ -153,10 +165,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
     CONNECT( THEMIM->getIM(), navigationChanged( int ),
              this, setNavigation(int) );
-    if( config_GetInt( p_intf, "qt-system-tray" ) )
+    if( config_GetInt( p_intf, "qt-system-tray" ) && systray )
     {
         CONNECT( THEMIM->getIM(), statusChanged( int ), this,
-                 updateSystrayTooltipStatus(int));
+                 updateSystrayTooltipStatus( int ) );
     }
     CONNECT( slider, sliderDragged( float ),
              THEMIM->getIM(), sliderUpdate( float ) );
@@ -182,15 +194,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         var_AddCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
-    if( QSystemTrayIcon::isSystemTrayAvailable() &&
-                        ( config_GetInt( p_intf, "qt-start-mininimized") == 1))
-    {
-        hide();
-        createSystrayMenu();
-    }
-    if( QSystemTrayIcon::isSystemTrayAvailable() &&
-                              ( config_GetInt( p_intf, "qt-system-tray") == 1))
-            createSystrayMenu();
 
 }
 
@@ -292,7 +295,7 @@ void MainInterface::handleMainUi( QSettings *settings )
     {
         videoWidget = new VideoWidget( p_intf );
         videoWidget->widgetSize = QSize( 1, 1 );
-        videoWidget->resize( videoWidget->widgetSize );
+        //videoWidget->resize( videoWidget->widgetSize );
         ui.vboxLayout->insertWidget( 0, videoWidget );
 
         p_intf->pf_request_window  = ::DoRequest;
@@ -302,19 +305,30 @@ void MainInterface::handleMainUi( QSettings *settings )
     setMinimumSize( PREF_W, addSize.height() );
 }
 
-void MainInterface::createSystrayMenu()
+/**
+ * Create a SystemTray icon and a menu that would go with it.
+ * Connects to a click handler on the icon.
+ **/
+void MainInterface::createSystray()
 {
     QIcon iconVLC =  QIcon( QPixmap( ":/vlc128.png" ) );
     sysTray = new QSystemTrayIcon( iconVLC, this );
+    sysTray->setToolTip( qtr( "VLC media player" ));
+
     systrayMenu = new QMenu( qtr( "VLC media player" ), this );
     systrayMenu->setIcon( iconVLC );
-    sysTray->setToolTip( qtr( "VLC media player" ));
+
     QVLCMenu::updateSystrayMenu( this, p_intf, true );
     sysTray->show();
+
     CONNECT( sysTray, activated(  QSystemTrayIcon::ActivationReason ),
             this, handleSystrayClick( QSystemTrayIcon::ActivationReason ) );
 }
 
+/**
+ * Update the menu of the Systray Icon.
+ * May be unneedded, since it just calls QVLCMenu::update
+ **/
 void MainInterface::updateSystrayMenu( int status )
 {
     QVLCMenu::updateSystrayMenu( this, p_intf ) ;
@@ -341,7 +355,10 @@ void MainInterface::handleSystrayClick( QSystemTrayIcon::ActivationReason reason
     }
 }
 
-
+/**
+ * Updates the name of the systray Icon tooltip.
+ * Doesn't check if the systray exists, check before you call it.
+ **/
 void MainInterface::updateSystrayTooltipName( QString name )
 {
     if( name.isEmpty() )
@@ -354,29 +371,34 @@ void MainInterface::updateSystrayTooltipName( QString name )
     }
 }
 
+/**
+ * Updates the status of the systray Icon tooltip.
+ * Doesn't check if the systray exists, check before you call it.
+ **/
 void MainInterface::updateSystrayTooltipStatus( int i_status )
 {
     switch( i_status )
-     {
-         case  0:
-             {
-                 sysTray->setToolTip( qtr( "VLC media player" ) );
-                 break;
-             }
-         case PLAYING_S:
-             {
-                  sysTray->setToolTip( input_name );
-                  //+ " - " + qtr( "Playing" ) );
-                  break;
-             }
-         case PAUSE_S:
-             {
-                 sysTray->setToolTip( input_name + " - " 
-                                      + qtr( "Paused") );
-                 break;
-             }
-     }
+    {
+        case  0:
+            {
+                sysTray->setToolTip( qtr( "VLC media player" ) );
+                break;
+            }
+        case PLAYING_S:
+            {
+                sysTray->setToolTip( input_name );
+                //+ " - " + qtr( "Playing" ) );
+                break;
+            }
+        case PAUSE_S:
+            {
+                sysTray->setToolTip( input_name + " - "
+                        + qtr( "Paused") );
+                break;
+            }
+    }
 }
+
 /**********************************************************************
  * Handling of the components
  **********************************************************************/
@@ -793,7 +815,8 @@ void MainInterface::setStatus( int status )
         ui.playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
     else
         ui.playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
-    updateSystrayMenu( status );
+    if( systrayMenu )
+        updateSystrayMenu( status );
 }
 
 #define HELP_MENU N_("Menu")
