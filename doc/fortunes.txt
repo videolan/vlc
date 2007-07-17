@@ -782,3 +782,15 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
                  exemple
 <spaceman_spiff> "regarde il fait planter mon vlc"
 %
+< funman> {1} Active Tickets (490 matches)
+< funman> i disconnect before 500 is reached
+-!- FoX_ [i=FoX@nat/ecp/x-1a0545f92a4d3c50] has quit [Remote closed the connection]
+-!- zorglub [i=zorglub@nat/ecp/x-61892e92340285ff] has quit [Remote closed the connection]
+-!- bigben [i=bigben@nat/ecp/x-1e86f79de0c1cdc9] has quit [Remote closed the connection]
+-!- ipkiss [i=ipkiss@nat/ecp/x-31e3605240c16dc6] has quit [Remote closed the connection]
+-!- Dimar [i=Dimar@nat/ecp/x-d24991bac9f169c9] has quit [Remote closed the connection]
+< whyz> were those your fakenicks funman?
+< funman> i hit the wrong button sorry
+< whyz> :O
+  -- #videolan
+%
