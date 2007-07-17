@@ -84,7 +84,7 @@ private:
     void handleMainUi( QSettings* );
     void handleSystray();
     void doComponentsUpdate();
-    void createSystrayMenu();
+    void createSystray();
 
     /* Video */
     VideoWidget         *videoWidget;

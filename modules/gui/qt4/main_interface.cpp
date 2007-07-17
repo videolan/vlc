@@ -123,16 +123,16 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setAcceptDrops(true);
 
     /* Systray */
-    systray = NULL;
+    sysTray = NULL;
     if( QSystemTrayIcon::isSystemTrayAvailable() &&
                   ( config_GetInt( p_intf, "qt-start-mininimized") == 1) )
     {
         hide();
-        createSystrayMenu();
+        createSystray();
     }
     if( QSystemTrayIcon::isSystemTrayAvailable() &&
                   ( config_GetInt( p_intf, "qt-system-tray") == 1) )
-            createSystrayMenu();
+            createSystray();
 
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
@@ -150,7 +150,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Naming in the controller */
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
              setName( QString ) );
-    if( config_GetInt( p_intf, "qt-system-tray" ) && systray )
+    if( config_GetInt( p_intf, "qt-system-tray" ) && sysTray )
     {
         CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
                  updateSystrayTooltipName( QString ) );
@@ -165,7 +165,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
     CONNECT( THEMIM->getIM(), navigationChanged( int ),
              this, setNavigation(int) );
-    if( config_GetInt( p_intf, "qt-system-tray" ) && systray )
+    if( config_GetInt( p_intf, "qt-system-tray" ) && sysTray )
     {
         CONNECT( THEMIM->getIM(), statusChanged( int ), this,
                  updateSystrayTooltipStatus( int ) );
