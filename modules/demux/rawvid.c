@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
+ *          Antoine Cellerier <dionoea at videolan d.t org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +29,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
+#include <vlc_vout.h>                                     /* vout_InitFormat */
 
 /*****************************************************************************
  * Module descriptor
@@ -47,6 +49,13 @@ static void Close( vlc_object_t * );
 #define HEIGHT_LONGTEXT N_("This specifies the height in pixels of the raw " \
     "video stream.")
 
+#define CHROMA_TEXT N_("Force chroma (Use carefully)")
+#define CHROMA_LONGTEXT N_("Force chroma. This is a four character string.")
+
+#define ASPECT_RATIO_TEXT N_("Aspect ratio")
+#define ASPECT_RATIO_LONGTEXT N_( \
+    "Aspect ratio (4:3, 16:9). Default is square pixels." )
+
 vlc_module_begin();
     set_shortname( "Raw Video" );
     set_description( _("Raw video demuxer") );
@@ -58,6 +67,10 @@ vlc_module_begin();
     add_float( "rawvid-fps", 25, 0, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
     add_integer( "rawvid-width", 176, 0, WIDTH_TEXT, WIDTH_LONGTEXT, 0 );
     add_integer( "rawvid-height", 144, 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, 0 );
+    add_string( "rawvid-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
+                VLC_TRUE );
+    add_string( "rawvid-aspect-ratio", NULL, NULL,
+                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -88,8 +101,11 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     int i_width, i_height;
-    vlc_value_t val;
     char *psz_ext;
+    char *psz_chroma;
+    uint32_t i_chroma;
+    char *psz_aspect_ratio;
+    unsigned int i_aspect;
 
     /* Check for YUV file extension */
     psz_ext = strrchr( p_demux->psz_path, '.' );
@@ -105,21 +121,66 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->i_pcr = 1;
 
-    var_Create( p_demux, "rawvid-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "rawvid-fps", &val );
-    p_sys->f_fps = val.f_float;
-    var_Create( p_demux, "rawvid-width", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "rawvid-width", &val );
-    i_width = val.i_int;
-    var_Create( p_demux, "rawvid-height", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
-    var_Get( p_demux, "rawvid-height", &val );
-    i_height = val.i_int;
+    p_sys->f_fps = var_CreateGetFloat( p_demux, "rawvid-fps" );
 
-    /* Only handle YV12 for now */
-    es_format_Init( &p_sys->fmt_video, VIDEO_ES, VLC_FOURCC('Y','V','1','2') );
-    p_sys->fmt_video.video.i_width  = i_width;
-    p_sys->fmt_video.video.i_height = i_height;
-    p_sys->frame_size = i_width * i_height * 3 / 2;
+    i_width = var_CreateGetInteger( p_demux, "rawvid-width" );
+    i_height = var_CreateGetInteger( p_demux, "rawvid-height" );
+    if( i_width <= 0 || i_height <= 0 )
+    {
+        msg_Err( p_demux, "width and height must be strictly positive." );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    psz_chroma = var_CreateGetString( p_demux, "rawvid-chroma" );
+    psz_aspect_ratio = var_CreateGetString( p_demux, "rawvid-aspect-ratio" );
+
+    if( psz_aspect_ratio && *psz_aspect_ratio )
+    {
+        char *psz_parser = strchr( psz_aspect_ratio, ':' );
+        if( psz_parser )
+        {
+            *psz_parser++ = '\0';
+            i_aspect = atoi( psz_aspect_ratio ) * VOUT_ASPECT_FACTOR
+                       / atoi( psz_parser );
+        }
+        else
+        {
+            i_aspect = atof( psz_aspect_ratio ) * VOUT_ASPECT_FACTOR;
+        }
+    }
+    else
+    {
+        i_aspect = i_width * VOUT_ASPECT_FACTOR / i_height;
+    }
+    free( psz_aspect_ratio );
+
+    if( psz_chroma && strlen( psz_chroma ) >= 4 )
+    {
+        memcpy( &i_chroma, psz_chroma, 4 );
+        msg_Dbg( p_demux, "Forcing chroma to 0x%.8x (%4.4s)", i_chroma,
+                 (char*)&i_chroma );
+    }
+    else
+    {
+        i_chroma = VLC_FOURCC('Y','V','1','2');
+        msg_Dbg( p_demux, "Using default chroma 0x%.8x (%4.4s)", i_chroma,
+                 (char*)&i_chroma );
+    }
+    free( psz_chroma );
+
+    es_format_Init( &p_sys->fmt_video, VIDEO_ES, i_chroma );
+    vout_InitFormat( &p_sys->fmt_video.video, i_chroma, i_width, i_height,
+                     i_aspect );
+    if( !p_sys->fmt_video.video.i_bits_per_pixel )
+    {
+        msg_Err( p_demux, "Unsupported chroma 0x%.8x (%4.4s)", i_chroma,
+                 (char*)&i_chroma );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+    p_sys->frame_size = i_width * i_height
+                        * p_sys->fmt_video.video.i_bits_per_pixel / 8;
     p_sys->p_es_video = es_out_Add( p_demux->out, &p_sys->fmt_video );
 
     return VLC_SUCCESS;
