@@ -222,6 +222,9 @@ MainInterface::~MainInterface()
     p_intf->pf_control_window = NULL;
 }
 
+/*****************************
+ *   Main UI handling        *
+ *****************************/
 void MainInterface::setVLCWindowsTitle( QString aTitle )
 {
     if( aTitle.isEmpty() )
@@ -305,6 +308,10 @@ void MainInterface::handleMainUi( QSettings *settings )
     setMinimumSize( PREF_W, addSize.height() );
 }
 
+/*****************************************************************************
+ * Systray Icon and Systray Menu
+ *****************************************************************************/
+
 /**
  * Create a SystemTray icon and a menu that would go with it.
  * Connects to a click handler on the icon.
@@ -328,19 +335,24 @@ void MainInterface::createSystray()
 /**
  * Update the menu of the Systray Icon.
  * May be unneedded, since it just calls QVLCMenu::update
+ * FIXME !!!
  **/
 void MainInterface::updateSystrayMenu( int status )
 {
     QVLCMenu::updateSystrayMenu( this, p_intf ) ;
 }
 
+/**
+ * Updates the Systray Icon's menu and toggle the main interface
+ */
 void MainInterface::toggleUpdateSystrayMenu()
 {
     toggleVisible();
     QVLCMenu::updateSystrayMenu( this, p_intf );
 }
 
-void MainInterface::handleSystrayClick( QSystemTrayIcon::ActivationReason reason )
+void MainInterface::handleSystrayClick(
+                                    QSystemTrayIcon::ActivationReason reason )
 {
     switch( reason )
     {
@@ -358,6 +370,7 @@ void MainInterface::handleSystrayClick( QSystemTrayIcon::ActivationReason reason
 /**
  * Updates the name of the systray Icon tooltip.
  * Doesn't check if the systray exists, check before you call it.
+ * FIXME !!! Fusion with next function ?
  **/
 void MainInterface::updateSystrayTooltipName( QString name )
 {
@@ -806,7 +819,6 @@ void MainInterface::setName( QString name )
 {
     input_name = name;
     nameLabel->setText( " " + name+" " );
-
 }
 
 void MainInterface::setStatus( int status )
