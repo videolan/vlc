@@ -1004,38 +1004,50 @@ AC_CACHE_CHECK([if \$CC accepts -Os],
     [ac_cv_c_os],
     [CFLAGS="${CFLAGS_save} -Os"
      AC_TRY_COMPILE([],,ac_cv_c_os=yes, ac_cv_c_os=no)])
-if test "${ac_cv_c_os}" != "no" -a "${host_cpu}" = "mipsel"; then
-    CFLAGS_OPTIM="${CFLAGS_OPTIM} -Os"
+if test "${ac_cv_c_os}" != "no"; then
+    CFLAGS_OPTIM_SIZE="${CFLAGS_OPTIM_SIZE} -Os"
+else 
+    AC_CACHE_CHECK([if \$CC accepts -O],
+        [ac_cv_c_o],
+        [CFLAGS="${CFLAGS_save} -O"
+         AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
+    if test "${ac_cv_c_o}" != "no"; then
+        if test "${ac_cv_c_o3}" = "no"; then
+            CFLAGS_OPTIM_SIZE="${CFLAGS_OPTIM_SIZE} -O"
+        fi
+    fi
 fi
 
 AC_CACHE_CHECK([if \$CC accepts -O3],
     [ac_cv_c_o3],
     [CFLAGS="${CFLAGS_save} -O3"
      AC_TRY_COMPILE([],,ac_cv_c_o3=yes, ac_cv_c_o3=no)])
-if test "${ac_cv_c_o3}" != "no" -a "${host_cpu}" != "mipsel"; then
-    CFLAGS_OPTIM="${CFLAGS_OPTIM} -O3"
+if test "${ac_cv_c_o3}" != "no"; then
+    CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O3"
+else
+    AC_CACHE_CHECK([if \$CC accepts -O2],
+        [ac_cv_c_o2],
+        [CFLAGS="${CFLAGS_save} -O2"
+         AC_TRY_COMPILE([],,ac_cv_c_o2=yes, ac_cv_c_o2=no)])
+    if test "${ac_cv_c_o2}" != "no"; then
+        CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O2"
+    else
+        AC_CACHE_CHECK([if \$CC accepts -O],
+            [ac_cv_c_o],
+            [CFLAGS="${CFLAGS_save} -O"
+             AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
+        if test "${ac_cv_c_o}" != "no"; then
+            CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O"
+        fi
+    fi
 fi
 
-AC_CACHE_CHECK([if \$CC accepts -O2],
-    [ac_cv_c_o2],
-    [CFLAGS="${CFLAGS_save} -O2"
-     AC_TRY_COMPILE([],,ac_cv_c_o2=yes, ac_cv_c_o2=no)])
-if test "${ac_cv_c_o2}" != "no" -a "${host_cpu}" != "mipsel"; then
-    if test "${ac_cv_c_o3}" = "no"; then
-        CFLAGS_OPTIM="${CFLAGS_OPTIM} -O2"
-    fi
-    CFLAGS_NOOPTIM="${CFLAGS_NOOPTIM} -O2"
-else 
-    AC_CACHE_CHECK([if \$CC accepts -O],
-        [ac_cv_c_o],
-        [CFLAGS="${CFLAGS_save} -O"
-         AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
-    if test "${ac_cv_c_o}" != "no" -a "${host_cpu}" != "mipsel"; then
-        if test "${ac_cv_c_o3}" = "no"; then
-            CFLAGS_OPTIM="${CFLAGS_OPTIM} -O"
-	fi
-        CFLAGS_NOOPTIM="${CFLAGS_NOOPTIM} -O"
-    fi
+AC_CACHE_CHECK([if \$CC accepts -O0],
+    [ac_cv_c_o0],
+    [CFLAGS="${CFLAGS_save} -O0"
+     AC_TRY_COMPILE([],,ac_cv_c_o0=yes, ac_cv_c_o0=no)])
+if test "${ac_cv_c_o0}" != "no"; then
+    CFLAGS_NOOPTIM="${CFLAGS_NOOPTIM} -O0"
 fi
 
 dnl Check for -ffast-math
@@ -1044,7 +1056,7 @@ AC_CACHE_CHECK([if \$CC accepts -ffast-math],
     [CFLAGS="${CFLAGS_save} -ffast-math"
      AC_TRY_COMPILE([],,ac_cv_c_fast_math=yes, ac_cv_c_fast_math=no)])
 if test "${ac_cv_c_fast_math}" != "no"; then
-    CFLAGS_OPTIM="${CFLAGS_OPTIM} -ffast-math"
+    CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -ffast-math"
 fi
 
 dnl Check for -funroll-loops
@@ -1056,7 +1068,7 @@ then
       [CFLAGS="${CFLAGS_save} -funroll-loops"
        AC_TRY_COMPILE([],,ac_cv_c_unroll_loops=yes, ac_cv_c_unroll_loops=no)])
   if test "${ac_cv_c_unroll_loops}" != "no"; then
-      CFLAGS_OPTIM="${CFLAGS_OPTIM} -funroll-loops"
+      CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -funroll-loops"
   fi
 fi
 
@@ -1555,7 +1567,13 @@ dnl  Enable/disable optimizations
 dnl
 AC_ARG_ENABLE(optimizations,
 [  --disable-optimizations disable compiler optimizations (default enabled)])
-test "${enable_optimizations}" != "no" && enable_optimizations="yes"
+if test "${enable_optimizations}" != "no"; then
+   if test "${enable_optimize_memory}" = "yes"; then
+      enable_optimizations="size"
+   else
+      enable_optimizations="speed"
+   fi
+fi
 
 dnl
 dnl  AltiVec acceleration

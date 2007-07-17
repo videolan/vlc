@@ -21,7 +21,8 @@ objcflags=""
 ldflags=""
 
 cflags_tuning="@CFLAGS_TUNING@"
-cflags_optim="@CFLAGS_OPTIM@"
+cflags_optim_size="@CFLAGS_OPTIM_SIZE@"
+cflags_optim_speed="@CFLAGS_OPTIM_SPEED@"
 cflags_optim_nodebug="@CFLAGS_OPTIM_NODEBUG@"
 cflags_nooptim="@CFLAGS_NOOPTIM@"
 
@@ -130,8 +131,13 @@ fi
 if [ "${release}" = yes ]; then
   cppflags="${cppflags} -DHAVE_RELEASE"
 fi
-if [ "${optim}" = yes ]; then
-  cppflags="${cppflags} ${cflags_optim} ${cflags_tuning}"
+if [ "${optim}" = size ]; then
+  cppflags="${cppflags} ${cflags_optim_size} ${cflags_tuning}"
+  if [ "${debug}" != yes -a "${gprof}" != yes -a "${cprof}" != yes ]; then
+    cppflags="${cppflags} ${cflags_optim_nodebug}"
+  fi
+elif [ "${optim}" = speed ]; then
+  cppflags="${cppflags} ${cflags_optim_speed} ${cflags_tuning}"
   if [ "${debug}" != yes -a "${gprof}" != yes -a "${cprof}" != yes ]; then
     cppflags="${cppflags} ${cflags_optim_nodebug}"
   fi
