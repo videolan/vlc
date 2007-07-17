@@ -418,3 +418,12 @@ D: Win32 interface
 D: skins module (core and win32 port)
 D: skins2 module (core and win32 port)
 S: France
+
+N: Pavlov Konstantin
+E: thresh@videolan.org
+C: thresh
+D: Build system/linkage fixes
+D: Pidfile creation on daemon mode
+D: Parts of Russian translation
+D: ALTLinux VLC maintainer
+S: Russia
