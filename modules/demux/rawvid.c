@@ -64,9 +64,9 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_callbacks( Open, Close );
     add_shortcut( "rawvideo" );
-    add_float( "rawvid-fps", 25, 0, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
-    add_integer( "rawvid-width", 176, 0, WIDTH_TEXT, WIDTH_LONGTEXT, 0 );
-    add_integer( "rawvid-height", 144, 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, 0 );
+    add_float( "rawvid-fps", 0, 0, FPS_TEXT, FPS_LONGTEXT, VLC_FALSE );
+    add_integer( "rawvid-width", 0, 0, WIDTH_TEXT, WIDTH_LONGTEXT, 0 );
+    add_integer( "rawvid-height", 0, 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, 0 );
     add_string( "rawvid-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 VLC_TRUE );
     add_string( "rawvid-aspect-ratio", NULL, NULL,
@@ -93,6 +93,27 @@ struct demux_sys_t
 static int Demux( demux_t * );
 static int Control( demux_t *, int i_query, va_list args );
 
+struct preset_t
+{
+    const char *psz_ext;
+    int i_width;
+    int i_height;
+    double f_fps;
+    const char *psz_aspect_ratio;
+    const char *psz_chroma;
+};
+
+static struct preset_t p_presets[] =
+{
+    { "sqcif", 128, 96, 29.97, "4:3", "YV12" },
+    { "qcif", 176, 144, 29.97, "4:3", "YV12" },
+    { "cif", 352, 288, 29.97, "4:3", "YV12" },
+    { "4cif", 704, 576, 29.97, "4:3", "YV12" },
+    { "16cif", 1408, 1152, 29.97, "4:3", "YV12" },
+    { "yuv", 176, 144, 25, "4:3", "YV12" },
+    { "", 0, 0, 0., "", "" }
+};
+
 /*****************************************************************************
  * Open: initializes raw DV demux structures
  *****************************************************************************/
@@ -106,10 +127,19 @@ static int Open( vlc_object_t * p_this )
     uint32_t i_chroma;
     char *psz_aspect_ratio;
     unsigned int i_aspect;
+    struct preset_t *p_preset = NULL;
 
     /* Check for YUV file extension */
     psz_ext = strrchr( p_demux->psz_path, '.' );
-    if( ( !psz_ext || strcasecmp( psz_ext, ".yuv") ) &&
+
+    if( psz_ext )
+    {
+        psz_ext++;
+        for( p_preset = p_presets; *p_preset->psz_ext; p_preset++ )
+            if( !strcasecmp( psz_ext, p_preset->psz_ext ) )
+                break;
+    }
+    if( ( !p_preset || !*p_preset->psz_ext ) &&
         strcmp(p_demux->psz_demux, "rawvid") )
     {
         return VLC_EGENERIC;
@@ -122,18 +152,36 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_pcr = 1;
 
     p_sys->f_fps = var_CreateGetFloat( p_demux, "rawvid-fps" );
-
     i_width = var_CreateGetInteger( p_demux, "rawvid-width" );
     i_height = var_CreateGetInteger( p_demux, "rawvid-height" );
+    psz_chroma = var_CreateGetString( p_demux, "rawvid-chroma" );
+    psz_aspect_ratio = var_CreateGetString( p_demux, "rawvid-aspect-ratio" );
+
+    if( p_preset && *p_preset->psz_ext )
+    {
+        if( !i_width ) i_width = p_preset->i_width;
+        if( !i_height ) i_height = p_preset->i_height;
+        if( !p_sys->f_fps ) p_sys->f_fps = p_preset->f_fps;
+        if( !*psz_aspect_ratio )
+        {
+            free( psz_aspect_ratio );
+            psz_aspect_ratio = strdup( psz_aspect_ratio );
+        }
+        if( !*psz_chroma )
+        {
+            free( psz_chroma );
+            psz_chroma = strdup( psz_chroma );
+        }
+    }
+
     if( i_width <= 0 || i_height <= 0 )
     {
         msg_Err( p_demux, "width and height must be strictly positive." );
+        free( psz_aspect_ratio );
+        free( psz_chroma );
         free( p_sys );
         return VLC_EGENERIC;
     }
-
-    psz_chroma = var_CreateGetString( p_demux, "rawvid-chroma" );
-    psz_aspect_ratio = var_CreateGetString( p_demux, "rawvid-aspect-ratio" );
 
     if( psz_aspect_ratio && *psz_aspect_ratio )
     {
