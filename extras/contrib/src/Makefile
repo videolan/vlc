@@ -1602,7 +1602,11 @@ zvbi-$(ZVBI_VERSION).tar.bz2:
 zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
+ifdef HAVE_WIN32
+.zvbi: zvbi .pthreads
+else
 .zvbi: zvbi
+endif
 ifdef HAVE_DARWIN_OS
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -fnested-functions" && make && make install)
 else
@@ -2167,7 +2171,7 @@ pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 	$(EXTRACT_GZ)
 
 .pthreads: pthreads
-	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC-inlined; cp pthread.h ../../include/; cp *.dll *.a ../../lib/)
+	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC-static && cp pthread.h sched.h semaphore.h $(PREFIX)/include/ && cp *.a $(PREFIX)/lib/)
 	$(INSTALL_NAME)
 	touch $@
 
