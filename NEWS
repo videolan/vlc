@@ -48,6 +48,7 @@ Input/Demuxers:
   * AAC tags support
   * APEv1/2 tags support
   * Improved ID3v2 tags support
+  * Raw video support
 
 Decoders:
  * VP60/VP61/VP6F/VP62 support
