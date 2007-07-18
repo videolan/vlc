@@ -59,7 +59,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_shortname( "Raw Video" );
     set_description( _("Raw video demuxer") );
-    set_capability( "demux2", 2 );
+    set_capability( "demux2", 3 );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
     set_callbacks( Open, Close );
@@ -85,6 +85,8 @@ struct demux_sys_t
     es_format_t  fmt_video;
 
     mtime_t i_pcr;
+
+    vlc_bool_t b_y4m;
 };
 
 /*****************************************************************************
@@ -126,21 +128,34 @@ static int Open( vlc_object_t * p_this )
     char *psz_chroma;
     uint32_t i_chroma;
     char *psz_aspect_ratio;
-    unsigned int i_aspect;
+    unsigned int i_aspect = 0;
     struct preset_t *p_preset = NULL;
+    uint8_t *p_peek;
+    vlc_bool_t b_valid = VLC_FALSE;
+    vlc_bool_t b_y4m = VLC_FALSE;
 
-    /* Check for YUV file extension */
+    if( stream_Peek( p_demux->s, &p_peek, 9 ) == 9 )
+    {
+        /* http://wiki.multimedia.cx/index.php?title=YUV4MPEG2 */
+        if( !strncmp( (char *)p_peek, "YUV4MPEG2", 9 ) )
+        {
+            b_valid = VLC_TRUE;
+            b_y4m = VLC_TRUE;
+        }
+    }
+
     psz_ext = strrchr( p_demux->psz_path, '.' );
-
     if( psz_ext )
     {
         psz_ext++;
         for( p_preset = p_presets; *p_preset->psz_ext; p_preset++ )
             if( !strcasecmp( psz_ext, p_preset->psz_ext ) )
+            {
+                b_valid = VLC_TRUE;
                 break;
+            }
     }
-    if( ( !p_preset || !*p_preset->psz_ext ) &&
-        strcmp(p_demux->psz_demux, "rawvid") )
+    if( ( !b_valid ) && strcmp(p_demux->psz_demux, "rawvid") )
     {
         return VLC_EGENERIC;
     }
@@ -151,11 +166,86 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->i_pcr = 1;
 
+    p_sys->b_y4m = b_y4m;
     p_sys->f_fps = var_CreateGetFloat( p_demux, "rawvid-fps" );
     i_width = var_CreateGetInteger( p_demux, "rawvid-width" );
     i_height = var_CreateGetInteger( p_demux, "rawvid-height" );
     psz_chroma = var_CreateGetString( p_demux, "rawvid-chroma" );
     psz_aspect_ratio = var_CreateGetString( p_demux, "rawvid-aspect-ratio" );
+
+    if( b_y4m )
+    {
+        char *psz;
+        char *buf;
+        int a, b;
+        psz = stream_ReadLine( p_demux->s );
+
+        /* TODO: handle interlacing */
+
+#define READ_FRAC( key, num, den ) \
+        buf = strchr( psz+9, key );\
+        if( buf )\
+        {\
+            char *end = strchr( buf, ' ' );\
+            char *sep;\
+            if( end ) *end = '\0';\
+            sep = strchr( buf, ':' );\
+            if( sep )\
+            {\
+                *sep = '\0';\
+                den = atoi( sep+1 );\
+            }\
+            else\
+            {\
+                den = 1;\
+            }\
+            num = atoi( buf+1 );\
+            if( sep ) *sep = ':';\
+            if( end ) *end = ' ';\
+        }
+        READ_FRAC( 'W', i_width, a )
+        READ_FRAC( 'H', i_height, a )
+        READ_FRAC( 'F', a, b )
+        p_sys->f_fps = (double)a/(double)b;
+        READ_FRAC( 'A', a, b )
+        if( b != 0 ) i_aspect = a * VOUT_ASPECT_FACTOR / b;
+
+        buf = strchr( psz+9, 'C' );
+        if( buf )
+        {
+            char *end = strchr( buf, ' ' );
+            if( end ) *end = '\0';
+            buf++;
+            if( !strncmp( buf, "C420jpeg", 8 ) )
+            {
+                psz_chroma = strdup( "I420" );
+            }
+            else if( !strncmp( buf, "C420paldv", 9 ) )
+            {
+                psz_chroma = strdup( "I420" );
+            }
+            else if( !strncmp( buf, "C420", 4 ) )
+            {
+                psz_chroma = strdup( "I420" );
+            }
+            else if( !strncmp( buf, "C422", 4 ) )
+            {
+                psz_chroma = strdup( "I422" );
+            }
+            else if( !strncmp( buf, "C444", 4 ) )
+            {
+                psz_chroma = strdup( "I444" );
+            }
+            else
+            {
+                msg_Warn( p_demux, "Unknown YUV4MPEG2 chroma type \"%s\"",
+                          buf );
+            }
+            if( end ) *end = ' ';
+        }
+
+        free( psz );
+    }
 
     if( p_preset && *p_preset->psz_ext )
     {
@@ -183,23 +273,26 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    if( psz_aspect_ratio && *psz_aspect_ratio )
+    if( !i_aspect )
     {
-        char *psz_parser = strchr( psz_aspect_ratio, ':' );
-        if( psz_parser )
+        if( psz_aspect_ratio && *psz_aspect_ratio )
         {
-            *psz_parser++ = '\0';
-            i_aspect = atoi( psz_aspect_ratio ) * VOUT_ASPECT_FACTOR
-                       / atoi( psz_parser );
+            char *psz_parser = strchr( psz_aspect_ratio, ':' );
+            if( psz_parser )
+            {
+                *psz_parser++ = '\0';
+                i_aspect = atoi( psz_aspect_ratio ) * VOUT_ASPECT_FACTOR
+                           / atoi( psz_parser );
+            }
+            else
+            {
+                i_aspect = atof( psz_aspect_ratio ) * VOUT_ASPECT_FACTOR;
+            }
         }
         else
         {
-            i_aspect = atof( psz_aspect_ratio ) * VOUT_ASPECT_FACTOR;
+            i_aspect = i_width * VOUT_ASPECT_FACTOR / i_height;
         }
-    }
-    else
-    {
-        i_aspect = i_width * VOUT_ASPECT_FACTOR / i_height;
     }
     free( psz_aspect_ratio );
 
@@ -256,6 +349,19 @@ static int Demux( demux_t *p_demux )
 
     /* Call the pace control */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
+
+    if( p_sys->b_y4m )
+    {
+        /* Skip the frame header */
+        unsigned char psz_buf[10];
+        psz_buf[9] = '\0';
+        stream_Read( p_demux->s, psz_buf, strlen( "FRAME" ) );
+        while( psz_buf[0] != 0x0a )
+        {
+            if( stream_Read( p_demux->s, psz_buf, 1 ) < 1 )
+                return 0;
+        }
+    }
 
     if( ( p_block = stream_Block( p_demux->s, p_sys->frame_size ) ) == NULL )
     {
