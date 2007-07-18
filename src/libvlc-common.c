@@ -605,13 +605,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
         }
         else
         {
-            /* check if a Media Player is available
+            /* check if VLC is available on the bus
              * if not: D-Bus control is not enabled on the other
              * instance and we can't pass MRLs to it */
             DBusMessage *p_test_msg = NULL;
             DBusMessage *p_test_reply = NULL;
             p_test_msg =  dbus_message_new_method_call(
-                    "org.freedesktop.MediaPlayer", "/",
+                    "org.mpris.vlc", "/",
                     "org.freedesktop.MediaPlayer", "Identity" );
             /* block until a reply arrives */
             p_test_reply = dbus_connection_send_with_reply_and_block(
@@ -640,7 +640,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
                             ppsz_argv[i_input] );
 
                     p_dbus_msg = dbus_message_new_method_call(
-                            "org.freedesktop.MediaPlayer", "/TrackList",
+                            "org.mpris.vlc", "/TrackList",
                             "org.freedesktop.MediaPlayer", "AddTrack" );
 
                     if ( NULL == p_dbus_msg )
