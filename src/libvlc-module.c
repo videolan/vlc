@@ -1992,26 +1992,27 @@ vlc_module_begin();
 #   define KEY_VOL_UP             KEY_MODIFIER_CTRL|KEY_UP
 #   define KEY_VOL_DOWN           KEY_MODIFIER_CTRL|KEY_DOWN
 #   define KEY_VOL_MUTE           'm'
-#   define KEY_SUBDELAY_UP        KEY_MODIFIER_CTRL|'h'
-#   define KEY_SUBDELAY_DOWN      KEY_MODIFIER_CTRL|'j'
-#   define KEY_AUDIODELAY_UP      KEY_MODIFIER_CTRL|'k'
-#   define KEY_AUDIODELAY_DOWN    KEY_MODIFIER_CTRL|'l'
+#   define KEY_SUBDELAY_UP        'h'
+#   define KEY_SUBDELAY_DOWN      'g'
+#   define KEY_AUDIODELAY_UP      'k'
+#   define KEY_AUDIODELAY_DOWN    'j'
 #   define KEY_RANDOM             'r'
-#   define KEY_LOOP               KEY_MODIFIER_SHIFT|'l'
+#   define KEY_LOOP               'l'
 
-#   define KEY_AUDIO_TRACK        'l'
-#   define KEY_SUBTITLE_TRACK     'k'
+#   define KEY_AUDIO_TRACK        'b'
+#   define KEY_SUBTITLE_TRACK     'v'
 #   define KEY_ASPECT_RATIO       'a'
 #   define KEY_CROP               'c'
 #   define KEY_DEINTERLACE        'd'
 #   define KEY_INTF_SHOW          'i'
 #   define KEY_INTF_HIDE          'I'
-#   define KEY_DISC_MENU          KEY_MODIFIER_CTRL|'m'
-#   define KEY_TITLE_PREV         KEY_MODIFIER_CTRL|'p'
-#   define KEY_TITLE_NEXT         KEY_MODIFIER_CTRL|'f'
-#   define KEY_CHAPTER_PREV       KEY_MODIFIER_CTRL|'u'
-#   define KEY_CHAPTER_NEXT       KEY_MODIFIER_CTRL|'d'
+#   define KEY_DISC_MENU          KEY_MODIFIER_ALT|'r'
+#   define KEY_TITLE_PREV         KEY_MODIFIER_ALT|'o'
+#   define KEY_TITLE_NEXT         KEY_MODIFIER_ALT|'b'
+#   define KEY_CHAPTER_PREV       KEY_MODIFIER_ALT|'p'
+#   define KEY_CHAPTER_NEXT       KEY_MODIFIER_ALT|'n'
 #   define KEY_SNAPSHOT           KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|'s'
+
 #   define KEY_ZOOM               'z'
 #   define KEY_UNZOOM             KEY_MODIFIER_SHIFT|'z'
 
@@ -2044,9 +2045,9 @@ vlc_module_begin();
 #   define KEY_PLAY_BOOKMARK8     KEY_F8
 #   define KEY_PLAY_BOOKMARK9     KEY_F9
 #   define KEY_PLAY_BOOKMARK10    KEY_F10
-#   define KEY_HISTORY_BACK       KEY_MODIFIER_CTRL|'v'
-#   define KEY_HISTORY_FORWARD    KEY_MODIFIER_CTRL|'b'
-#   define KEY_RECORD             KEY_MODIFIER_CTRL|'r'
+#   define KEY_HISTORY_BACK       KEY_MODIFIER_ALT|'g'
+#   define KEY_HISTORY_FORWARD    KEY_MODIFIER_ALT|'h'
+#   define KEY_RECORD             KEY_MODIFIER_CTRL|KEY_MODIFIER_SHIFT|'r'
 #   define KEY_DUMP               KEY_MODIFIER_CTRL|KEY_MODIFIER_SHIFT|'d'
 #   define KEY_WALLPAPER          'w'
 
