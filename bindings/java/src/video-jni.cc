@@ -40,11 +40,11 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1toggleFullscreen (JNIEnv *
 
     GET_INPUT_THREAD ;
     
-    libvlc_toggle_fullscreen( input, exception );
+    libvlc_toggle_fullscreen( input, &exception );
 
     libvlc_media_instance_release(input);
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 }
 
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1setFullscreen (JNIEnv *env, jobject _this, jboolean value) 
@@ -53,10 +53,10 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1setFullscreen (JNIEnv *env
 
     GET_INPUT_THREAD ;
 
-    libvlc_set_fullscreen( input, value, exception );
+    libvlc_set_fullscreen( input, value, &exception );
 
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 }
 
 JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Video__1getFullscreen (JNIEnv *env, jobject _this) 
@@ -66,10 +66,10 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Video__1getFullscreen (JNIEnv 
 
     GET_INPUT_THREAD ;
 
-    res = libvlc_get_fullscreen( input, exception );
+    res = libvlc_get_fullscreen( input, &exception );
 
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
     
     return res;
 }
@@ -81,10 +81,10 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Video__1getHeight (JNIEnv *env, jo
 
     GET_INPUT_THREAD ;
 
-    res = libvlc_video_get_height( input, exception );
+    res = libvlc_video_get_height( input, &exception );
 
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 
     return res;
 }
@@ -96,10 +96,10 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Video__1getWidth (JNIEnv *env, job
 
     GET_INPUT_THREAD ;
 
-    res = libvlc_video_get_width( input, exception );
+    res = libvlc_video_get_width( input, &exception );
 
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 
     return res;
 }
@@ -112,10 +112,10 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1getSnapshot (JNIEnv *env, 
 
     GET_INPUT_THREAD ;
 
-    libvlc_video_take_snapshot( input, (char *) psz_filepath, exception );
+    libvlc_video_take_snapshot( input, (char *) psz_filepath, &exception );
 
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
     
     if (psz_filepath != NULL) {
         env->ReleaseStringUTFChars( filepath, psz_filepath );
@@ -129,10 +129,10 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1destroyVideo (JNIEnv *env,
      
     GET_INPUT_THREAD ;
 
-    libvlc_video_destroy( input, exception );
+    libvlc_video_destroy( input, &exception );
 
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 }
 
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, jobject _this, jobject canvas) 
@@ -195,10 +195,10 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
     dsi_win = (JAWT_Win32DrawingSurfaceInfo*)dsi->platformInfo;
     drawable = reinterpret_cast<int>(dsi_win->hwnd);
 
-    libvlc_video_set_parent((libvlc_instance_t *) instance, drawable, exception );
+    libvlc_video_set_parent((libvlc_instance_t *) instance, drawable, &exception );
     libvlc_media_instance_release(input);
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
     
 #else // UNIX
     /* Get the platform-specific drawing info */
@@ -211,9 +211,9 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1reparent (JNIEnv *env, job
 
     /* and reparent */
     drawable = dsi_x11->drawable;
-    libvlc_video_set_parent( (libvlc_instance_t *) instance, drawable, exception );
+    libvlc_video_set_parent( (libvlc_instance_t *) instance, drawable, &exception );
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 
     XFreeGC(dsi_x11->display, gc);
 
@@ -282,9 +282,9 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1paint (JNIEnv *env, jobjec
     dsi_win = (JAWT_Win32DrawingSurfaceInfo*)dsi->platformInfo;
     drawable = reinterpret_cast<int>(dsi_win->hwnd);
 
-    libvlc_video_set_parent( (libvlc_instance_t *) instance, drawable, exception );
+    libvlc_video_set_parent( (libvlc_instance_t *) instance, drawable, &exception );
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
     
 #else // UNIX
     /* Get the platform-specific drawing info */
@@ -297,9 +297,9 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1paint (JNIEnv *env, jobjec
 
     /* and reparent */
     drawable = dsi_x11->drawable;
-    libvlc_video_set_parent( (libvlc_instance_t *) instance, drawable, exception );
+    libvlc_video_set_parent( (libvlc_instance_t *) instance, drawable, &exception );
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 
     XFreeGC(dsi_x11->display, gc);
 
@@ -322,8 +322,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Video__1setSize (JNIEnv *env, jobj
 
     GET_INPUT_THREAD ;
     
-    libvlc_video_resize( input, width, height, exception );
+    libvlc_video_resize( input, width, height, &exception );
 
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 }

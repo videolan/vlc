@@ -40,10 +40,10 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getTrack (JNIEnv *env, job
     
     jint res = 0;
     
-    res = libvlc_audio_get_track( input, exception );
+    res = libvlc_audio_get_track( input, &exception );
  
     libvlc_media_instance_release(input);   
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
     
     return res;
 }
@@ -53,19 +53,19 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setTrack (JNIEnv *env, job
     INIT_FUNCTION;
     GET_INPUT_THREAD;
 
-    libvlc_audio_set_track( input, value, exception );
+    libvlc_audio_set_track( input, value, &exception );
 
     libvlc_media_instance_release(input);   
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 }
 
 JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getChannel (JNIEnv *env, jobject _this)
 {
     INIT_FUNCTION;
 
-    int res = libvlc_audio_get_channel( ( libvlc_instance_t * ) instance, exception);
+    int res = libvlc_audio_get_channel( ( libvlc_instance_t * ) instance, &exception);
 
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 
     return res;
 }
@@ -74,9 +74,9 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setChannel (JNIEnv *env, j
 {
     INIT_FUNCTION;
 
-    libvlc_audio_set_channel( (libvlc_instance_t *) instance, channel, exception);
+    libvlc_audio_set_channel( (libvlc_instance_t *) instance, channel, &exception);
 
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 }
 
 
@@ -85,9 +85,9 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Audio__1getMute (JNIEnv *env, 
     INIT_FUNCTION;
     jboolean res;
 
-    res = (jboolean) libvlc_audio_get_mute( ( libvlc_instance_t * ) instance, exception );
+    res = (jboolean) libvlc_audio_get_mute( ( libvlc_instance_t * ) instance, &exception );
 
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 
     return res;
     
@@ -97,18 +97,18 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setMute (JNIEnv *env, jobj
 {
     INIT_FUNCTION;
 
-    libvlc_audio_set_mute( ( libvlc_instance_t * ) instance, value, exception );
+    libvlc_audio_set_mute( ( libvlc_instance_t * ) instance, value, &exception );
   
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 }
 
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1toggleMute (JNIEnv *env, jobject _this) 
 {
     INIT_FUNCTION;
 
-    libvlc_audio_get_mute( ( libvlc_instance_t * ) instance, exception );
+    libvlc_audio_get_mute( ( libvlc_instance_t * ) instance, &exception );
     
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 }
 
 JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getVolume (JNIEnv *env, jobject _this)
@@ -116,9 +116,9 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Audio__1getVolume (JNIEnv *env, jo
     INIT_FUNCTION;
     jint res = 0;
 
-    res = libvlc_audio_get_volume( ( libvlc_instance_t * ) instance, exception );
+    res = libvlc_audio_get_volume( ( libvlc_instance_t * ) instance, &exception );
 
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 
     return res;
 }
@@ -127,7 +127,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1setVolume (JNIEnv *env, jo
 {
     INIT_FUNCTION;
 
-    libvlc_audio_set_volume( ( libvlc_instance_t * ) instance, volume, exception );
+    libvlc_audio_set_volume( ( libvlc_instance_t * ) instance, volume, &exception );
 
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 }

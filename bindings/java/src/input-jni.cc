@@ -38,10 +38,10 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_Input__1getLength (JNIEnv *env, j
 
     GET_INPUT_THREAD ;
 
-    res = libvlc_media_instance_get_length( input, exception );
+    res = libvlc_media_instance_get_length( input, &exception );
 
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 
     return res;
 }
@@ -53,9 +53,9 @@ JNIEXPORT jfloat JNICALL Java_org_videolan_jvlc_Input__1getPosition (JNIEnv *env
     
     GET_INPUT_THREAD ;
 
-    res = libvlc_media_instance_get_position( input, exception );
+    res = libvlc_media_instance_get_position( input, &exception );
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 
     return res;
 }
@@ -67,9 +67,9 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_Input__1getTime (JNIEnv *env, job
 
     GET_INPUT_THREAD ;
 
-    res = libvlc_media_instance_get_time( input, exception );
+    res = libvlc_media_instance_get_time( input, &exception );
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 
     return res;
 }
@@ -81,9 +81,9 @@ JNIEXPORT jfloat JNICALL Java_org_videolan_jvlc_Input__1getFPS (JNIEnv *env, job
 
     GET_INPUT_THREAD ;
 
-    res = libvlc_media_instance_get_fps( input, exception );
+    res = libvlc_media_instance_get_fps( input, &exception );
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 
     return res;
 }
@@ -94,9 +94,9 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Input__1setTime (JNIEnv *env, jobj
 
     GET_INPUT_THREAD ;
 
-    libvlc_media_instance_set_time( input, time, exception );
+    libvlc_media_instance_set_time( input, time, &exception );
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
         
 }
 
@@ -106,9 +106,9 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Input__1setPosition (JNIEnv *env, 
 
     GET_INPUT_THREAD ;
 
-    libvlc_media_instance_set_position( input, position, exception );
+    libvlc_media_instance_set_position( input, position, &exception );
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 }
 
 JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Input__1isPlaying (JNIEnv *env, jobject _this) 
@@ -118,9 +118,9 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Input__1isPlaying (JNIEnv *env
     
     GET_INPUT_THREAD ;
     
-    res = libvlc_media_instance_will_play( input, exception );
+    res = libvlc_media_instance_will_play( input, &exception );
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
     
     return res;
 }
@@ -132,9 +132,9 @@ JNIEXPORT jboolean JNICALL Java_org_videolan_jvlc_Input__1hasVout (JNIEnv *env, 
     
     GET_INPUT_THREAD ;
     
-    res = libvlc_media_instance_has_vout( input, exception );
+    res = libvlc_media_instance_has_vout( input, &exception );
     libvlc_media_instance_release(input);
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
     
     return res;
 }

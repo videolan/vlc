@@ -60,14 +60,14 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1playlist_1add (JNIEnv *
             ppsz_options[ i+1 ] =
                 env->GetStringUTFChars( ( jstring ) env->GetObjectArrayElement( options, i ), 0 );
         }
-        res = libvlc_playlist_add_extended( ( libvlc_instance_t * ) instance, psz_uri, psz_name, i_options, ppsz_options, exception );
+        res = libvlc_playlist_add_extended( ( libvlc_instance_t * ) instance, psz_uri, psz_name, i_options, ppsz_options, &exception );
 
-        CHECK_EXCEPTION_FREE;
+        CHECK_EXCEPTION;
         
     } else {
-        res = libvlc_playlist_add( ( libvlc_instance_t * ) instance, psz_uri, psz_name, exception );
+        res = libvlc_playlist_add( ( libvlc_instance_t * ) instance, psz_uri, psz_name, &exception );
         
-        CHECK_EXCEPTION_FREE;
+        CHECK_EXCEPTION;
     }
     
     if (psz_uri != NULL) {
@@ -99,16 +99,16 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1play (JNIEnv *env, jobj
        }
     }
 
-    libvlc_playlist_play( ( libvlc_instance_t * ) instance, id, i_options, ( char **  ) ppsz_options, exception );
+    libvlc_playlist_play( ( libvlc_instance_t * ) instance, id, i_options, ( char **  ) ppsz_options, &exception );
 
     CHECK_EXCEPTION;
     
-    while (! libvlc_playlist_isplaying( (libvlc_instance_t*) instance, exception ) )
+    while (! libvlc_playlist_isplaying( (libvlc_instance_t*) instance, &exception ) )
     {
         usleep(100);
     }
 
-    CHECK_EXCEPTION_FREE;
+    CHECK_EXCEPTION;
 }
 
 
@@ -116,60 +116,60 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1pause (JNIEnv *env, job
 {
     INIT_FUNCTION ;
 
-    libvlc_playlist_pause( ( libvlc_instance_t* ) instance, exception );
+    libvlc_playlist_pause( ( libvlc_instance_t* ) instance, &exception );
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 }
 
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1stop (JNIEnv *env, jobject _this)
 {
     INIT_FUNCTION ;
 
-    libvlc_playlist_stop( ( libvlc_instance_t* ) instance, exception );
+    libvlc_playlist_stop( ( libvlc_instance_t* ) instance, &exception );
     
-    while ( libvlc_playlist_isplaying( (libvlc_instance_t*) instance, exception ) )
+    while ( libvlc_playlist_isplaying( (libvlc_instance_t*) instance, &exception ) )
     {
         usleep(100);
     }
     
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 }
 
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1next (JNIEnv *env, jobject _this)
 {
     INIT_FUNCTION ;
     
-    libvlc_playlist_next( ( libvlc_instance_t* ) instance, exception );
+    libvlc_playlist_next( ( libvlc_instance_t* ) instance, &exception );
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 }
 
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1prev (JNIEnv *env, jobject _this)
 {
     INIT_FUNCTION ;
     
-    libvlc_playlist_prev( (libvlc_instance_t*) instance, exception );
+    libvlc_playlist_prev( (libvlc_instance_t*) instance, &exception );
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 }
 
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1clear (JNIEnv *env, jobject _this)
 {
     INIT_FUNCTION ;
 
-    libvlc_playlist_clear( (libvlc_instance_t*) instance, exception );
+    libvlc_playlist_clear( (libvlc_instance_t*) instance, &exception );
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 }
 
 JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1deleteItem (JNIEnv *env, jobject _this, jint itemID)
 {
     INIT_FUNCTION ;
 
-    libvlc_playlist_delete_item( ( libvlc_instance_t * ) instance, itemID, exception );
+    libvlc_playlist_delete_item( ( libvlc_instance_t * ) instance, itemID, &exception );
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 }
 
 
@@ -178,9 +178,9 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1itemsCount (JNIEnv *env
     INIT_FUNCTION ;
     int res = 0;
 
-    res = libvlc_playlist_items_count( (libvlc_instance_t*) instance, exception );
+    res = libvlc_playlist_items_count( (libvlc_instance_t*) instance, &exception );
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 
     return res;
 
@@ -191,9 +191,9 @@ JNIEXPORT jint JNICALL Java_org_videolan_jvlc_Playlist__1isRunning (JNIEnv *env,
     INIT_FUNCTION ;
     int res = 0;
 
-    res = libvlc_playlist_isplaying( (libvlc_instance_t*) instance, exception );
+    res = libvlc_playlist_isplaying( (libvlc_instance_t*) instance, &exception );
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 
     return res;
 }
@@ -203,8 +203,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Playlist__1setLoop
 {
    INIT_FUNCTION ;
 
-   libvlc_playlist_loop( (libvlc_instance_t*) instance, loop, exception );
+   libvlc_playlist_loop( (libvlc_instance_t*) instance, loop, &exception );
 
-   CHECK_EXCEPTION_FREE ;
+   CHECK_EXCEPTION ;
    
 }   

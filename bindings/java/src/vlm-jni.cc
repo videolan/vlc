@@ -51,9 +51,9 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1addBroadcast (JNIEnv *env, j
     }
 
     libvlc_vlm_add_broadcast( (libvlc_instance_t *) instance, (char*)psz_name, (char*)psz_inputmrl, (char*)psz_outputmrl ,
-                              i_options, (char**)ppsz_options, enable, loop, exception );
+                              i_options, (char**)ppsz_options, enable, loop, &exception );
 
-    CHECK_EXCEPTION_FREE ;
+    CHECK_EXCEPTION ;
 
     
     if (psz_name != NULL) {
@@ -72,8 +72,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1deleteMedia (JNIEnv *env, jo
     INIT_FUNCTION ;
     const char* psz_name = env->GetStringUTFChars( name, 0 );
 
-    libvlc_vlm_del_media( (libvlc_instance_t *) instance, (char*)psz_name, exception);    
-    CHECK_EXCEPTION_FREE ;
+    libvlc_vlm_del_media( (libvlc_instance_t *) instance, (char*)psz_name, &exception);    
+    CHECK_EXCEPTION ;
 
     if (psz_name != NULL) {
         env->ReleaseStringUTFChars( name, psz_name );
@@ -85,8 +85,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1setEnabled (JNIEnv *env, job
     INIT_FUNCTION ;
     const char* psz_name = env->GetStringUTFChars( name, 0 );
 
-    libvlc_vlm_set_enabled( (libvlc_instance_t *) instance, (char*)psz_name, newStatus, exception);
-    CHECK_EXCEPTION_FREE ;
+    libvlc_vlm_set_enabled( (libvlc_instance_t *) instance, (char*)psz_name, newStatus, &exception);
+    CHECK_EXCEPTION ;
 
     if (psz_name != NULL) {
         env->ReleaseStringUTFChars( name, psz_name );
@@ -99,8 +99,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1setOutput (JNIEnv *env, jobj
     const char* psz_name = env->GetStringUTFChars( name, 0 );
     const char* psz_mrl = env->GetStringUTFChars( mrl, 0 );    
 
-    libvlc_vlm_set_output((libvlc_instance_t *) instance, (char*)psz_name, (char*)psz_mrl, exception);
-    CHECK_EXCEPTION_FREE ;
+    libvlc_vlm_set_output((libvlc_instance_t *) instance, (char*)psz_name, (char*)psz_mrl, &exception);
+    CHECK_EXCEPTION ;
 
     if (psz_name != NULL) {
         env->ReleaseStringUTFChars( name, psz_name );
@@ -117,8 +117,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1setInput (JNIEnv *env, jobje
     const char* psz_name = env->GetStringUTFChars( name, 0 );
     const char* psz_mrl = env->GetStringUTFChars( mrl, 0 );    
 
-    libvlc_vlm_set_input((libvlc_instance_t *) instance, (char*)psz_name, (char*)psz_mrl, exception);
-    CHECK_EXCEPTION_FREE ;
+    libvlc_vlm_set_input((libvlc_instance_t *) instance, (char*)psz_name, (char*)psz_mrl, &exception);
+    CHECK_EXCEPTION ;
 
     if (psz_name != NULL) {
         env->ReleaseStringUTFChars( name, psz_name );
@@ -133,8 +133,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1setLoop (JNIEnv *env, jobjec
     INIT_FUNCTION;
     const char* psz_name = env->GetStringUTFChars( name, 0 );
 
-    libvlc_vlm_set_loop((libvlc_instance_t *) instance, (char*)psz_name, newStatus, exception);
-    CHECK_EXCEPTION_FREE ;
+    libvlc_vlm_set_loop((libvlc_instance_t *) instance, (char*)psz_name, newStatus, &exception);
+    CHECK_EXCEPTION ;
 
     if (psz_name != NULL) {
         env->ReleaseStringUTFChars( name, psz_name );
@@ -161,8 +161,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1changeMedia (JNIEnv *env, jo
     }
 
     libvlc_vlm_change_media( (libvlc_instance_t *) instance, (char*)psz_name, (char*)psz_inputmrl, (char*)psz_outputmrl ,
-                              i_options, (char**)ppsz_options, enablenewbroadcast, broadcast, exception );
-    CHECK_EXCEPTION_FREE ;
+                              i_options, (char**)ppsz_options, enablenewbroadcast, broadcast, &exception );
+    CHECK_EXCEPTION ;
     
     if (psz_name != NULL) {
         env->ReleaseStringUTFChars( name, psz_name );
@@ -182,8 +182,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1playMedia (JNIEnv *env, jobj
     INIT_FUNCTION;
     const char* psz_name = env->GetStringUTFChars( name, 0 );
 
-    libvlc_vlm_play_media( (libvlc_instance_t *) instance, (char*)psz_name, exception );
-    CHECK_EXCEPTION_FREE ;
+    libvlc_vlm_play_media( (libvlc_instance_t *) instance, (char*)psz_name, &exception );
+    CHECK_EXCEPTION ;
 
     if (psz_name != NULL) {
         env->ReleaseStringUTFChars( name, psz_name );
@@ -196,8 +196,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1stopMedia (JNIEnv *env, jobj
     const char* psz_name = env->GetStringUTFChars( name, 0 );
 
 
-    libvlc_vlm_stop_media( (libvlc_instance_t *) instance, (char*)psz_name, exception );
-    CHECK_EXCEPTION_FREE ;
+    libvlc_vlm_stop_media( (libvlc_instance_t *) instance, (char*)psz_name, &exception );
+    CHECK_EXCEPTION ;
 
     if (psz_name != NULL) {
         env->ReleaseStringUTFChars( name, psz_name );
@@ -209,8 +209,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1pauseMedia (JNIEnv *env, job
     INIT_FUNCTION;
     const char* psz_name = env->GetStringUTFChars( name, 0 );
    
-    libvlc_vlm_pause_media( (libvlc_instance_t *) instance, (char*)psz_name, exception );
-    CHECK_EXCEPTION_FREE ;
+    libvlc_vlm_pause_media( (libvlc_instance_t *) instance, (char*)psz_name, &exception );
+    CHECK_EXCEPTION ;
 
     if (psz_name != NULL) {
         env->ReleaseStringUTFChars( name, psz_name );
@@ -222,8 +222,8 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_VLM__1seekMedia (JNIEnv *env, jobj
     INIT_FUNCTION;
     const char* psz_name = env->GetStringUTFChars( name, 0 );
 
-    libvlc_vlm_seek_media( (libvlc_instance_t *) instance, (char*)psz_name, (float)percentage, exception );
-    CHECK_EXCEPTION_FREE ;
+    libvlc_vlm_seek_media( (libvlc_instance_t *) instance, (char*)psz_name, (float)percentage, &exception );
+    CHECK_EXCEPTION ;
 
     if (psz_name != NULL) {
         env->ReleaseStringUTFChars( name, psz_name );
@@ -237,8 +237,8 @@ JNIEXPORT jstring JNICALL Java_org_videolan_jvlc_VLM__1showMedia (JNIEnv *env, j
     char *psz_response;
     jstring js_response;
    
-    psz_response = libvlc_vlm_show_media( (libvlc_instance_t *) instance, (char*)psz_name, exception );
-    CHECK_EXCEPTION_FREE ;
+    psz_response = libvlc_vlm_show_media( (libvlc_instance_t *) instance, (char*)psz_name, &exception );
+    CHECK_EXCEPTION ;
 
     if (psz_name != NULL) {
         env->ReleaseStringUTFChars( name, psz_name );
@@ -257,8 +257,8 @@ JNIEXPORT j ## returnType JNICALL Java_org_videolan_jvlc_VLM__1getMedia ## attr(
     const char* psz_name = env->GetStringUTFChars( name, 0 ); \
     returnType response; \
     \
-    response = libvlc_vlm_get_media_ ## attr( (libvlc_instance_t *) instance, (char*)psz_name, (int)index, exception ); \
-    CHECK_EXCEPTION_FREE ; \
+    response = libvlc_vlm_get_media_ ## attr( (libvlc_instance_t *) instance, (char*)psz_name, (int)index, &exception ); \
+    CHECK_EXCEPTION ; \
     \
     if (psz_name != NULL) { \
         env->ReleaseStringUTFChars( name, psz_name ); \
