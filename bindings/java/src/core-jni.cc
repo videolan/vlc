@@ -54,9 +54,9 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC_createInstance (JNIEnv *env,
     int argc;
     const char **argv;
 
-    libvlc_exception_t *exception = ( libvlc_exception_t * ) malloc( sizeof( libvlc_exception_t ) );
+    libvlc_exception_t exception;
 
-    libvlc_exception_init( exception );
+    libvlc_exception_init( &exception );
   
     argc = (int) env->GetArrayLength((jarray) args);
     argv = (const char **) malloc(argc * sizeof(char*));
@@ -67,9 +67,9 @@ JNIEXPORT jlong JNICALL Java_org_videolan_jvlc_JVLC_createInstance (JNIEnv *env,
         );
     }
 
-    res = (long) libvlc_new(argc, (char**) argv, exception );
-
-    free( exception );
+    res = (long) libvlc_new(argc, (char**) argv, &exception );
+ 
+    CHECK_EXCEPTION ;
 
     return res;
 
