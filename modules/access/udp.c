@@ -474,7 +474,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
         i_tmp = i_new - (uint16_t) p->i_dts;
 
         if( !i_tmp )   /* trash duplicate */
-            break; 
+            break;
 
         if ( i_tmp < 32768 )
         {   /* insert after this block ( i_new > p->i_dts ) */
