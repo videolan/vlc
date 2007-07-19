@@ -9,8 +9,8 @@ SUBDIRS =
 
 EXTRA_DIST = extras/COPYING modules/builtin.h.in libvlc.sym
 
-BUILT_SOURCES = $(CLEANFILES)
-CLEANFILES = modules/builtin.h misc/revision.c
+BUILT_SOURCES = modules/builtin.h misc/revision.c
+CLEANFILES = $(BUILT_SOURCES)
 MOSTLYCLEANFILES = $(DATA_noinst_libvlc)
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
