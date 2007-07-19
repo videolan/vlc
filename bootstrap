@@ -351,7 +351,7 @@ lib${mod}_plugin_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags plugin ${mod}\`
 lib${mod}_plugin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags plugin ${mod}\`
 lib${mod}_plugin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs plugin ${mod}\` \\
 	-rpath '\$(libvlcdir)' -avoid-version -module -shrext \$(LIBEXT) \\
-	-export-symbol-regex ^\$(VLC_ENTRY)\$\$ -no-undefined
+	-export-symbol-regex ^\$(VLC_ENTRY)\$\$ -no-undefined \$(LIBADD)
 EOF
   done
 done
