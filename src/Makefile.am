@@ -330,9 +330,6 @@ SOURCES_libvlc_control = \
 	control/mediacontrol_audio_video.c
 
 if !USE_LIBTOOL
-if !HAVE_WIN32
-endif
-
 # Install shared libvlc
 install-exec-local:
 	test -z "$(DATA_noinst_libvlc)" || $(INSTALL_PROGRAM) "$(DATA_noinst_libvlc)" "$(DESTDIR)$(libdir)"
