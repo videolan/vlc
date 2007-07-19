@@ -484,10 +484,10 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
             if (p_prev)
             {
                 p_prev->p_prev = p_block;
-                msg_Dbg(p_access, "RTP reordering: insert after %d, new %d", 
-                    (uint16_t) p->i_dts, i_new );
+                msg_Dbg(p_access, "RTP reordering: insert after %d, new %d",
+                        (uint16_t) p->i_dts, i_new );
             }
-            else 
+            else
             {
                 p_sys->p_end = p_block;
             }
@@ -498,7 +498,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
             i_tmp = p_sys->i_last_seqno - i_new;
             if( !p_access->info.b_prebuffered || (i_tmp > 32767) )
             {
-                msg_Dbg(p_access, "RTP reordering: prepend %d before %d", 
+                msg_Dbg(p_access, "RTP reordering: prepend %d before %d",
                         i_new, (uint16_t) p->i_dts );
                 p_block->p_next = p;
                 p->p_prev = p_block;
@@ -511,7 +511,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
 
             /* reordering failed - append the packet to the end of queue */
             msg_Dbg(p_access, "RTP: sequence changed (or buffer too small) "
-                "new: %d, buffer %d...%d", i_new, (uint16_t) p->i_dts, 
+                    "new: %d, buffer %d...%d", i_new, (uint16_t) p->i_dts,
                 (uint16_t) p_sys->p_end->i_dts);
             p_sys->p_end->p_next = p_block;
             p_block->p_prev = p_sys->p_end;
