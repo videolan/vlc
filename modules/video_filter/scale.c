@@ -114,6 +114,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     if( !p_pic ) return NULL;
 
+    if( (p_filter->fmt_in.video.i_height == 0) ||
+        (p_filter->fmt_in.video.i_width == 0) )
+        return NULL;
+
+    if( (p_filter->fmt_out.video.i_height == 0) ||
+        (p_filter->fmt_out.video.i_width == 0) )
+        return NULL;
+
     /* Request output picture */
     p_pic_dst = p_filter->pf_vout_buffer_new( p_filter );
     if( !p_pic_dst )
