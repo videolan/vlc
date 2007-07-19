@@ -119,7 +119,7 @@ static int install_input_event( vlc_object_t *p_this, char const *psz_cmd,
     input_thread_t * p_input = get_input( p_instance );
 
     if( !p_input )
-        return;
+        return VLC_SUCCESS;
 
     vlc_mutex_lock( &p_instance->instance_lock );
 
