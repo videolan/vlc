@@ -121,7 +121,7 @@ libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_control_la_LIBADD = libvlc.la
 libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 libvlc_control_la_LDFLAGS = $(AM_LDFLAGS) \
-	-no-undefined -export-symbols-regex '_?(libvlc|mediacontrol)_.*' \
+	-no-undefined -export-symbols-regex '^_?(libvlc|mediacontrol)_.*' \
 	-version-info 0:0:0
 
 EXTRA_libvlc_la_SOURCES = \
