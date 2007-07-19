@@ -11,7 +11,7 @@ EXTRA_DIST = extras/COPYING modules/builtin.h.in libvlc.sym
 
 BUILT_SOURCES = modules/builtin.h misc/revision.c
 CLEANFILES = $(BUILT_SOURCES)
-MOSTLYCLEANFILES = $(DATA_noinst_libvlc)
+MOSTLYCLEANFILES = $(hacklib_DATA) $(noinst_DATA)
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
 
@@ -30,7 +30,6 @@ dist_pkginclude_HEADERS = \
 	$(NULL)
 
 noinst_HEADERS = $(HEADERS_include)
-noinst_DATA = $(DATA_noinst_libvlc)
 
 HEADERS_include = \
 	../include/iso_lang.h \
@@ -101,11 +100,12 @@ modules/modules.c: modules/builtin.h
 # Building libvlc
 ###############################################################################
 
-libvlc_a_SOURCES = $(SOURCES_libvlc) $(SOURCES_libvlc_control)
-nodist_libvlc_a_SOURCES = misc/revision.c
-libvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags libvlc pic` -DUSE_BUILTINS
-libvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc pic`
-libvlc_a_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc pic`
+lib_LTLIBRARIES = libvlc.la libvlc-control.la
+
+AM_LDFLAGS =
+if HAVE_WIN32
+AM_LDFLAGS += -static
+endif
 
 libvlc_la_SOURCES = $(SOURCES_libvlc)
 nodist_libvlc_la_SOURCES = misc/revision.c
@@ -113,73 +113,70 @@ libvlc_la_LIBADD = $(INCLUDED_LIBINTL)
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
-libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs libvlc` \
+libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs libvlc` $(AM_LDFLAGS) \
 	-no-undefined -export-symbols $(srcdir)/libvlc.sym -version-info 1:0:0
 libvlc_la_DEPENDENCIES = libvlc.sym
 
 libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_control_la_LIBADD = libvlc.la
 libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
-libvlc_control_la_LDFLAGS = \
+libvlc_control_la_LDFLAGS = $(AM_LDFLAGS) \
 	-no-undefined -export-symbols-regex '_?(libvlc|mediacontrol)_.*' \
 	-version-info 0:0:0
 
-if HAVE_BEOS
-OPT_SOURCES_libvlc_beos = $(SOURCES_libvlc_beos)
-endif
-if HAVE_DARWIN
-OPT_SOURCES_libvlc_darwin = $(SOURCES_libvlc_darwin)
-endif
-if HAVE_WIN32
-OPT_SOURCES_libvlc_win32 = $(SOURCES_libvlc_win32)
-endif
-if HAVE_WINCE
-OPT_SOURCES_libvlc_win32 = $(SOURCES_libvlc_win32)
-endif
-if BUILD_DIRENT
-OPT_SOURCES_libvlc_dirent = $(SOURCES_libvlc_dirent)
-endif
-if BUILD_GETOPT
-OPT_SOURCES_libvlc_getopt = $(SOURCES_libvlc_getopt)
-endif
-
-# Build libvlc as a shared library
-if USE_LIBTOOL
-lib_LTLIBRARIES = libvlc.la libvlc-control.la
-else
-lib_LIBRARIES = libvlc.a
-endif
-
-if HAVE_WIN32
-DATA_noinst_libvlc = libvlc$(LIBEXT) libvlc$(LIBEXT).a
-
-libvlc.dll.a libvlc.def: libvlc$(LIBEXT)
-	$(DLLTOOL) -z libvlc.def -l libvlc.dll.a -D $< $(libvlc_a_OBJECTS)
-
-libvlc$(LIBEXT): $(libvlc_a_OBJECTS)
-	@ldfl="`$(VLC_CONFIG) --libs plugin libvlc pic` $(INCLUDED_LIBINTL)" ; \
-	case `$(VLC_CONFIG) --linkage libvlc` in \
-	  c++)  ld="$(CXXLINK)" ;; \
-	  objc) ld="$(OBJCLINK)" ;; \
-	  c|*)  ld="$(LINK)" ;; \
-	esac ; \
-	echo $$ld $(libvlc_a_OBJECTS) $$ldfl; \
-	$$ld $(libvlc_a_OBJECTS) \
-		$$ldfl
-# It sucks big time, but we have to do that to link vlc properly
-# on non-PIC OSes, otherwise ld will favor libvlc.a over libvlc$(LIBEXT)
-	rm -f libvlc.a
-# Cygwin libtool work-around
-	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
-endif
-
-EXTRA_DIST += \
+EXTRA_libvlc_la_SOURCES = \
 	$(SOURCES_libvlc_beos) \
 	$(SOURCES_libvlc_darwin) \
 	$(SOURCES_libvlc_win32) \
 	$(SOURCES_libvlc_dirent) \
 	$(SOURCES_libvlc_getopt) \
 	$(NULL)
+if HAVE_BEOS
+libvlc_la_SOURCES += $(SOURCES_libvlc_beos)
+endif
+if HAVE_DARWIN
+libvlc_la_SOURCES += $(SOURCES_libvlc_darwin)
+endif
+if HAVE_WIN32
+libvlc_la_SOURCES += $(SOURCES_libvlc_win32)
+endif
+if HAVE_WINCE
+libvlc_la_SOURCES += $(SOURCES_libvlc_win32)
+endif
+if BUILD_DIRENT
+libvlc_la_SOURCES += $(SOURCES_libvlc_dirent)
+endif
+if BUILD_GETOPT
+libvlc_la_SOURCES += $(SOURCES_libvlc_getopt)
+endif
+
+if HAVE_WIN32
+# Überhack. Needs fixing.
+hacklibdir = $(libdir)
+hacklib_DATA = libvlc.dll libvlc.dll.a
+noinst_DATA = libvlc.def
+
+libvlc.dll.a libvlc.def: libvlc.dll
+	$(DLLTOOL) -z libvlc.def -l libvlc.dll.a -D $< $(libvlc_a_OBJECTS)
+
+libvlc.dll: $(libvlc_la_OBJECTS)
+
+.la.dll:
+	@ldfl="`$(VLC_CONFIG) --libs plugin libvlc pic`" ; \
+	objs="" ; \
+	for s in $^; do \
+		test "$$s" = "$<" || \
+		objs="$$objs $$(dirname "$$s")/.libs/$$(basename $${s%.lo}).o" ; \
+	done ; \
+	case `$(VLC_CONFIG) --linkage libvlc` in \
+	  c++)  ld="$(CXXLINK)" ;; \
+	  c|*)  ld="$(LINK)" ;; \
+	esac ; \
+	echo $$ld $$objs$ldfl; \
+	$$ld $$objs $$ldfl 
+# Cygwin libtool work-around
+	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
+endif
 
 SOURCES_libvlc_beos = \
 	misc/beos_specific.cpp \
@@ -328,16 +325,6 @@ SOURCES_libvlc_control = \
 	control/mediacontrol_core.c \
 	control/mediacontrol_util.c \
 	control/mediacontrol_audio_video.c
-
-if !USE_LIBTOOL
-# Install shared libvlc
-install-exec-local:
-	test -z "$(DATA_noinst_libvlc)" || $(INSTALL_PROGRAM) "$(DATA_noinst_libvlc)" "$(DESTDIR)$(libdir)"
-
-# the opposite of install-{data,exec}-local
-uninstall-local:
-	test -z "$(DATA_noinst_libvlc)" || rm -f "$(DESTDIR)$(libdir)/$(DATA_noinst_libvlc)"
-endif
 
 ###############################################################################
 # Stamp rules
