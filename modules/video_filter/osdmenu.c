@@ -144,7 +144,7 @@ vlc_module_end();
  *****************************************************************************/
 struct filter_sys_t
 {
-    int          position;      /* relative positioning of SPU images */
+    int          i_position;    /* relative positioning of SPU images */
     int          i_x;           /* absolute positioning of SPU images */
     int          i_y;           /* absolute positioning of SPU images */
     mtime_t      i_last_date;   /* last mdate SPU object has been sent to SPU subsytem */
@@ -192,7 +192,7 @@ static int CreateFilter ( vlc_object_t *p_this )
 
     p_sys->i_x = var_CreateGetIntegerCommand( p_this, OSD_CFG "x" );
     p_sys->i_y = var_CreateGetIntegerCommand( p_this, OSD_CFG "y" );
-    p_sys->position = var_CreateGetIntegerCommand( p_this, OSD_CFG "position" );
+    p_sys->i_position = var_CreateGetIntegerCommand( p_this, OSD_CFG "position" );
     p_sys->i_alpha = var_CreateGetIntegerCommand( p_this, OSD_CFG "alpha" );
 
     /* in micro seconds - divide by 2 to match user expectations */
@@ -402,7 +402,7 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
 
     p_region->i_x = 0;
     p_region->i_y = 0;
-    p_region->i_align = SUBPICTURE_ALIGN_LEFT;
+    p_region->i_align = p_filter->p_sys->i_position;
 #if 0
     msg_Dbg( p_filter, "SPU picture region position (%d,%d) (%d,%d) [%p]",
         p_region->i_x, p_region->i_y,
@@ -441,7 +441,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t i_date )
         p_spu->b_absolute = VLC_TRUE;
     else
         p_spu->b_absolute = p_sys->b_absolute;
-    p_spu->i_flags = p_sys->position;
+    p_spu->i_flags = p_sys->i_position;
 
     /* Determine the duration of the subpicture */
     if( p_sys->i_end_date > 0 )
@@ -587,7 +587,7 @@ static int OSDMenuCallback( vlc_object_t *p_this, char const *psz_var,
         {
             if( newval.i_int == pi_pos_values[i] )
             {
-                p_sys->position = newval.i_int % 11;
+                p_sys->i_position = newval.i_int % 11;
                 break;
             }
         }
