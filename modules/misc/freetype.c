@@ -2404,7 +2404,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                     p_region_out->i_x = p_region_in->i_x;
                     p_region_out->i_y = p_region_in->i_y;
 
-                    if( rv == VLC_SUCCESS )
+                    if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
                     {
                         rv = ProcessLines( p_filter, psz_text, i_len, i_runs,
                                 pi_run_lengths, pp_styles, &p_lines, &result,
@@ -2421,7 +2421,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                     /* Don't attempt to render text that couldn't be layed out
                      * properly.
                      */
-                    if( rv == VLC_SUCCESS )
+                    if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
                     {
                         if( config_GetInt( p_filter, "freetype-yuvp" ) )
                         {
