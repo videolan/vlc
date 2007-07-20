@@ -221,12 +221,15 @@ include Modules.am
 
 LTLIBVLC = \$(top_builddir)/src/libvlc.la
 
+AM_LDFLAGS = -rpath '\$(libvlcdir)' -avoid-version \\
+	-module -no-undefined -shrext \$(LIBEXT) \\
+	-export-symbol-regex ^\$(VLC_ENTRY)\$\$
+
 if USE_LIBTOOL
-LIBADD = \$(LTLIBVLC)
+AM_LIBADD = \$(LTLIBVLC)
 endif
 if HAVE_WIN32
 LIBVLC = \$(top_builddir)/src/libvlc.dll
-LIBADD = \$(LIBVLC)
 endif
 
 all: all-modules
@@ -252,7 +255,7 @@ endif
 # Build a plugin with the adequate linker and linker's flags
 _plugin.la_plugin\$(LIBEXT):
 	@mod="\$*" ; mod=\$\${mod#lib} ; \
-	ldfl="\`\$(VLC_CONFIG) --libs plugin \$\$mod\` \$(LIBADD) -u \$(SYMPREF)\$(VLC_ENTRY)" ; \
+	ldfl="\`\$(VLC_CONFIG) --libs plugin \$\$mod\` \$(LIBVLC) -u \$(SYMPREF)\$(VLC_ENTRY)" ; \
 	case \`\$(VLC_CONFIG) --linkage \$\$mod\` in \\
 	  c++)  ld="\$(CXXLINK)" ;; \
 	  objc) ld="\$(OBJCLINK)" ;; \
@@ -349,9 +352,8 @@ EOF
 lib${mod}_plugin_la_CFLAGS = \`\$(VLC_CONFIG) --cflags plugin ${mod}\`
 lib${mod}_plugin_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags plugin ${mod}\`
 lib${mod}_plugin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags plugin ${mod}\`
-lib${mod}_plugin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs plugin ${mod}\` \\
-	-rpath '\$(libvlcdir)' -avoid-version -module -shrext \$(LIBEXT) \\
-	-export-symbol-regex ^\$(VLC_ENTRY)\$\$ -no-undefined \$(LIBADD)
+lib${mod}_plugin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs plugin ${mod}\` \$(AM_LDFLAGS)
+lib${mod}_plugin_la_LIBADD = $\(AM_LIBADD)
 EOF
   done
 done
