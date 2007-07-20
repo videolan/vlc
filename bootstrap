@@ -34,7 +34,7 @@ INSTALLSUCKS=no
 ACLOCAL_ARGS="-I m4 ${ACLOCAL_ARGS}"
 
 # Check for contrib directory
-if test -d extras/contrib/bin; then
+if then
   export PATH="`pwd`/extras/contrib/bin:$PATH"
   if test -d extras/contrib/share/aclocal; then
     ACLOCAL_ARGS="${ACLOCAL_ARGS} -I extras/contrib/share/aclocal"
@@ -99,7 +99,9 @@ esac
 
 # Check for libtool
 libtoolize="no"
-if glibtoolize --version >/dev/null 2>&1; then
+if test -x extras/contrib/bin/libtoolize --version > /dev/null 2>&1; then
+  libtoolize="extras/contrib/bin/libtoolize"
+elif glibtoolize --version >/dev/null 2>&1; then
   libtoolize="glibtoolize"
 elif libtoolize --version >/dev/null 2>&1; then
   libtoolize="libtoolize"
