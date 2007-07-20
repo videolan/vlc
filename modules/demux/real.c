@@ -1,7 +1,7 @@
 /*****************************************************************************
  * real.c: Real demuxer.
  *****************************************************************************
- * Copyright (C) 2004, 2006 the VideoLAN team
+ * Copyright (C) 2004, 2006-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -113,10 +113,10 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
 
     if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) return VLC_EGENERIC;
-    if( strncmp( (char *)p_peek, ".RMF", 4 ) ) return VLC_EGENERIC;
+    if( memcmp( p_peek, ".RMF", 4 ) ) return VLC_EGENERIC;
 
     /* Fill p_demux field */
     p_demux->pf_demux = Demux;
@@ -927,12 +927,12 @@ static int ReadCodecSpecificData( demux_t *p_demux, int i_len, int i_num )
     demux_sys_t *p_sys = p_demux->p_sys;
     es_format_t fmt;
     real_track_t *tk;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
 
     msg_Dbg( p_demux, "    - specific data len=%d", i_len );
     if( stream_Peek(p_demux->s, &p_peek, i_len) < i_len ) return VLC_EGENERIC;
 
-    if( !strncmp( (char *)&p_peek[4], "VIDO", 4 ) )
+    if( ( i_len >= 8 ) && !memcmp( &p_peek[4], "VIDO", 4 ) )
     {
         es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( p_peek[8], p_peek[9],
                         p_peek[10], p_peek[11] ) );

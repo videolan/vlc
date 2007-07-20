@@ -222,11 +222,11 @@ static int  Open ( vlc_object_t *p_this )
     {
         /* See if it looks like a SDP
            v, o, s fields are mandatory and in this order */
-        uint8_t *p_peek;
+        const uint8_t *p_peek;
         if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 ) return VLC_EGENERIC;
 
-        if( memcmp( (char*)p_peek, "v=0\r\n", 5 ) &&
-            memcmp( (char*)p_peek, "v=0\n", 4 ) &&
+        if( memcmp( p_peek, "v=0\r\n", 5 ) &&
+            memcmp( p_peek, "v=0\n", 4 ) &&
             ( p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
         {
             return VLC_EGENERIC;

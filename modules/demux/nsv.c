@@ -1,7 +1,7 @@
 /*****************************************************************************
  * nsv.c: NullSoft Video demuxer.
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -86,13 +86,12 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
 
     if( stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
         return VLC_EGENERIC;
 
-    if( strncmp( (char *)p_peek, "NSVf", 4 )
-            && strncmp( (char *)p_peek, "NSVs", 4 ))
+    if( memcmp( p_peek, "NSVf", 4 ) && memcmp( p_peek, "NSVs", 4 ) )
     {
        /* In case we had force this demuxer we try to resynch */
         if( strcmp( p_demux->psz_demux, "nsv" ) || ReSynch( p_demux ) )
@@ -142,7 +141,7 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     uint8_t     header[5];
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
 
     int         i_size;
     block_t     *p_frame;
@@ -155,14 +154,14 @@ static int Demux( demux_t *p_demux )
             return 0;
         }
 
-        if( !strncmp( (char *)p_peek, "NSVf", 4 ) )
+        if( !memcmp( p_peek, "NSVf", 4 ) )
         {
             if( ReadNSVf( p_demux ) )
             {
                 return -1;
             }
         }
-        else if( !strncmp( (char *)p_peek, "NSVs", 4 ) )
+        else if( !memcmp( p_peek, "NSVs", 4 ) )
         {
             if( ReadNSVs( p_demux ) )
             {
@@ -182,7 +181,7 @@ static int Demux( demux_t *p_demux )
         }
         else
         {
-            msg_Err( p_demux, "invalid signature 0x%x (%4.4s)", *(uint32_t*)p_peek, (char*)p_peek );
+            msg_Err( p_demux, "invalid signature 0x%x (%4.4s)", GetDWLE( p_peek ), (const char*)p_peek );
             if( ReSynch( p_demux ) )
             {
                 return -1;
@@ -382,7 +381,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  *****************************************************************************/
 static int ReSynch( demux_t *p_demux )
 {
-    uint8_t  *p_peek;
+    const uint8_t *p_peek;
     int      i_skip;
     int      i_peek;
 
@@ -396,8 +395,8 @@ static int ReSynch( demux_t *p_demux )
 
         while( i_skip < i_peek - 4 )
         {
-            if( !strncmp( (char *)p_peek, "NSVf", 4 )
-                    || !strncmp( (char *)p_peek, "NSVs", 4 ) )
+            if( !memcmp( p_peek, "NSVf", 4 )
+             || !memcmp( p_peek, "NSVs", 4 ) )
             {
                 if( i_skip > 0 )
                 {
@@ -420,7 +419,7 @@ static int ReSynch( demux_t *p_demux )
 static int ReadNSVf( demux_t *p_demux )
 {
     /* demux_sys_t *p_sys = p_demux->p_sys; */
-    uint8_t     *p;
+    const uint8_t     *p;
     int         i_size;
 
     msg_Dbg( p_demux, "new NSVf chunk" );

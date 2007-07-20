@@ -1,7 +1,7 @@
 /*****************************************************************************
  * au.c : au file input module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2003 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -101,7 +101,7 @@ static int Open( vlc_object_t *p_this )
     demux_sys_t *p_sys;
 
     uint8_t      hdr[20];
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
     int          i_cat;
     int          i_samples, i_modulo;
 

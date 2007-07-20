@@ -1,7 +1,7 @@
 /*****************************************************************************
  * a52.c : raw A/52 stream input module for vlc
  *****************************************************************************
- * Copyright (C) 2001 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -65,7 +65,7 @@ struct demux_sys_t
     vlc_bool_t b_big_endian;
 };
 
-static int CheckSync( uint8_t *p_peek, vlc_bool_t *p_big_endian );
+static int CheckSync( const uint8_t *p_peek, vlc_bool_t *p_big_endian );
 
 #define PCM_FRAME_SIZE (1536 * 4)
 #define A52_PACKET_SIZE (4 * PCM_FRAME_SIZE)
@@ -79,7 +79,7 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    byte_t      *p_peek;
+    const byte_t*p_peek;
     int         i_peek = 0;
     vlc_bool_t  b_big_endian = 0; /* Arbitrary initialisation */
 
@@ -257,7 +257,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /*****************************************************************************
  * CheckSync: Check if buffer starts with an A52 sync code
  *****************************************************************************/
-static int CheckSync( uint8_t *p_peek, vlc_bool_t *p_big_endian )
+static int CheckSync( const uint8_t *p_peek, vlc_bool_t *p_big_endian )
 {
     /* Little endian version of the bitstream */
     if( p_peek[0] == 0x77 && p_peek[1] == 0x0b &&

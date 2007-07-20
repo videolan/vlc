@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dts.c : raw DTS stream input module for vlc
  *****************************************************************************
- * Copyright (C) 2001 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -60,7 +60,7 @@ struct demux_sys_t
     int i_mux_rate;
 };
 
-static int CheckSync( uint8_t *p_peek );
+static int CheckSync( const uint8_t *p_peek );
 
 #define DTS_PACKET_SIZE 16384
 #define DTS_PROBE_SIZE (DTS_PACKET_SIZE * 4)
@@ -73,7 +73,7 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    byte_t *     p_peek;
+    const byte_t *p_peek;
     int          i_peek = 0;
 
     /* Check if we are dealing with a WAV file */
@@ -237,7 +237,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /*****************************************************************************
  * CheckSync: Check if buffer starts with a DTS sync code
  *****************************************************************************/
-static int CheckSync( uint8_t *p_peek )
+static int CheckSync( const uint8_t *p_peek )
 {
     /* 14 bits, little endian version of the bitstream */
     if( p_peek[0] == 0xff && p_peek[1] == 0x1f &&

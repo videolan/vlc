@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ogg.c : ogg stream demux module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2003 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -181,7 +181,7 @@ static int Open( vlc_object_t * p_this )
     demux_t *p_demux = (demux_t *)p_this;
     input_thread_t *p_input;
     demux_sys_t    *p_sys;
-    uint8_t        *p_peek;
+    const uint8_t  *p_peek;
 
 
     /* Check if we are dealing with an ogg stream */

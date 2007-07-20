@@ -130,7 +130,7 @@ static int Open( vlc_object_t * p_this )
     char *psz_aspect_ratio;
     unsigned int i_aspect = 0;
     struct preset_t *p_preset = NULL;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     vlc_bool_t b_valid = VLC_FALSE;
     vlc_bool_t b_y4m = VLC_FALSE;
 

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wav.c : wav file input module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2003 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -101,7 +101,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
     unsigned int i_size, i_extended;
     const char        *psz_name;
 
@@ -375,7 +375,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  *****************************************************************************/
 static int ChunkFind( demux_t *p_demux, const char *fcc, unsigned int *pi_size )
 {
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
 
     for( ;; )
     {

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * flac.c : FLAC demux module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2003 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -31,6 +31,7 @@
 #include <vlc_input.h>
 #include <vlc_codec.h>
 #include <assert.h>
+#include <vlc_charset.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -94,7 +95,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     module_t    *p_id3;
     demux_sys_t *p_sys;
-    byte_t      *p_peek;
+    const byte_t *p_peek;
     uint8_t     *p_streaminfo;
     int         i_streaminfo;
 
@@ -280,11 +281,13 @@ static int64_t ControlGetLength( demux_t *p_demux )
     }
     return i_length;
 }
+
 static int64_t ControlGetTime( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     return __MAX(p_sys->i_pts, p_sys->i_pts_start) + p_sys->i_time_offset;
 }
+
 static int ControlSetTime( demux_t *p_demux, int64_t i_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -413,21 +416,22 @@ enum
     META_PICTURE = 6,
 };
 
-static inline int Get24bBE( uint8_t *p )
+static inline int Get24bBE( const uint8_t *p )
 {
     return (p[0] << 16)|(p[1] << 8)|(p[2]);
 }
 
 static void ParseStreamInfo( demux_t *p_demux, int *pi_rate, int64_t *pi_count, uint8_t *p_data, int i_data );
-static void ParseSeekTable( demux_t *p_demux, uint8_t *p_data, int i_data, int i_sample_rate );
-static void ParseComment( demux_t *, uint8_t *p_data, int i_data );
-static void ParsePicture( demux_t *, uint8_t *p_data, int i_data );
+static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
+                            int i_sample_rate );
+static void ParseComment( demux_t *, const uint8_t *p_data, int i_data );
+static void ParsePicture( demux_t *, const uint8_t *p_data, int i_data );
 
 static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streaminfo )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int     i_peek;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     vlc_bool_t b_last;
     int i_sample_rate;
     int64_t i_sample_count;
@@ -519,7 +523,9 @@ static void ParseStreamInfo( demux_t *p_demux, int *pi_rate, int64_t *pi_count, 
     *pi_rate = GetDWBE(&p_data[i_skip+4+6]) >> 12;
     *pi_count = GetQWBE(&p_data[i_skip+4+6]) &  ((I64C(1)<<36)-1);
 }
-static void ParseSeekTable( demux_t *p_demux, uint8_t *p_data, int i_data, int i_sample_rate )
+
+static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
+                            int i_sample_rate )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     seekpoint_t *s;
@@ -559,6 +565,7 @@ static void ParseSeekTable( demux_t *p_demux, uint8_t *p_data, int i_data, int i
     }
     /* TODO sort it by size and remove wrong seek entry (time not increasing) */
 }
+
 static inline void astrcat( char **ppsz_dst, const char *psz_src )
 {
     char *psz_old = *ppsz_dst;
@@ -568,7 +575,8 @@ static inline void astrcat( char **ppsz_dst, const char *psz_src )
 
     if( psz_old )
     {
-        asprintf( ppsz_dst, "%s,%s", psz_old, psz_src );
+        if( asprintf( ppsz_dst, "%s,%s", psz_old, psz_src ) == -1 )
+            *ppsz_dst = NULL;
         free( psz_old );
     }
     else
@@ -578,7 +586,7 @@ static inline void astrcat( char **ppsz_dst, const char *psz_src )
 }
 
 #define RM(x) do { i_data -= (x); p_data += (x); } while(0)
-static void ParseComment( demux_t *p_demux, uint8_t *p_data, int i_data )
+static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int n;
@@ -652,7 +660,7 @@ static void ParseComment( demux_t *p_demux, uint8_t *p_data, int i_data )
 #undef RM
 }
 
-static void ParsePicture( demux_t *p_demux, uint8_t *p_data, int i_data )
+static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
 {
     static const int pi_cover_score[] = {
         0,      /* other */

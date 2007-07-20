@@ -1,7 +1,7 @@
 /*****************************************************************************
  * rawdv.c : raw DV input module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -130,7 +130,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    byte_t      *p_peek, *p_peek_backup;
+    const byte_t *p_peek, *p_peek_backup;
 
     uint32_t    i_dword;
     dv_header_t dv_header;
