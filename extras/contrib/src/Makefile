@@ -286,16 +286,18 @@ DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.bz2
 # ***************************************************************************
 
 ifdef HAVE_DARWIN_OS
-.libtool:
-	if test -x /usr/bin/glibtoolize; then \
-		mkdir -p $(PREFIX)/bin ; \
-		ln -sf /usr/bin/glibtoolize $(PREFIX)/bin/libtoolize ; \
-	fi
-	if test -f /usr/share/aclocal/libtool.m4; then \
-		mkdir -p $(PREFIX)/share/aclocal ; \
-		ln -sf /usr/share/aclocal/libtool.m4 $(PREFIX)/share/aclocal ; \
-	fi
+libtool-$(LIBTOOL_VERSION).tar.gz:
+	$(WGET) $(LIBTOOL_URL)
+
+libtool: libtool-$(LIBTOOL_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.libtool: libtool
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
+
+CLEAN_PKG += libtool
+DISTCLEAN_PKG += libtool-$(LIBTOOL_VERSION).tar.gz
 endif
 
 ifeq ($(BUILD),i586-pc-beos)
