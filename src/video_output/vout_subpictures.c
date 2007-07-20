@@ -567,8 +567,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
         if( p_spu->p_text )
         {
-            if( p_subpic->i_original_picture_height > 0 &&
-                p_subpic->i_original_picture_width  > 0 )
+            if( (p_subpic->i_original_picture_height > 0) &&
+                (p_subpic->i_original_picture_width  > 0) )
             {
                 p_spu->p_text->fmt_out.video.i_width =
                     p_spu->p_text->fmt_out.video.i_visible_width =
@@ -591,8 +591,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         i_scale_width = i_scale_width_orig;
         i_scale_height = i_scale_height_orig;
 
-        if( p_subpic->i_original_picture_height > 0 &&
-            p_subpic->i_original_picture_width  > 0 )
+        if( (p_subpic->i_original_picture_height > 0) &&
+            (p_subpic->i_original_picture_width  > 0) )
         {
             i_scale_width = i_scale_width * p_fmt->i_width /
                              p_subpic->i_original_picture_width;
@@ -631,8 +631,9 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         /* Load the scaling module */
-        if( !p_spu->p_scale && (i_scale_width != 1000 ||
-            i_scale_height != 1000) )
+        if( !p_spu->p_scale &&
+            ((i_scale_width > 0) || (i_scale_height > 0)) &&
+            ((i_scale_width != 1000) || (i_scale_height != 1000)) )
         {
             p_spu->p_scale = vlc_object_create( p_spu, VLC_OBJECT_FILTER );
             vlc_object_attach( p_spu->p_scale, p_spu );
@@ -734,7 +735,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 }
             }
 
-            if( (i_scale_width != 1000 || i_scale_height != 1000) &&
+            if( ((i_scale_width != 1000) || (i_scale_height != 1000)) &&
+                ((i_scale_width > 0) || (i_scale_height > 0)) &&
                 p_spu->p_scale && !p_region->p_cache )
             {
                 picture_t *p_pic;
@@ -776,7 +778,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     free( p_pic );
                 }
             }
-            if( (i_scale_width != 1000 || i_scale_height != 1000) &&
+            if( ((i_scale_width != 1000) || (i_scale_height != 1000)) &&
+                ((i_scale_width > 0) || (i_scale_height > 0)) &&
                 p_spu->p_scale && p_region->p_cache )
             {
                 p_region = p_region->p_cache;
