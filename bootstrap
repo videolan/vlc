@@ -99,7 +99,7 @@ esac
 
 # Check for libtool
 libtoolize="no"
-if test -x extras/contrib/bin/libtoolize --version > /dev/null 2>&1; then
+if test -x extras/contrib/bin/libtoolize; then
   libtoolize="extras/contrib/bin/libtoolize"
 elif glibtoolize --version >/dev/null 2>&1; then
   libtoolize="glibtoolize"
