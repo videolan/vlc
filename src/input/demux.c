@@ -297,7 +297,7 @@ typedef struct
 } d_stream_sys_t;
 
 static int DStreamRead   ( stream_t *, void *p_read, int i_read );
-static int DStreamPeek   ( stream_t *, uint8_t **pp_peek, int i_peek );
+static int DStreamPeek   ( stream_t *, const uint8_t **pp_peek, int i_peek );
 static int DStreamControl( stream_t *, int i_query, va_list );
 static int DStreamThread ( stream_t * );
 
@@ -419,7 +419,7 @@ static int DStreamRead( stream_t *s, void *p_read, int i_read )
     return i_out;
 }
 
-static int DStreamPeek( stream_t *s, uint8_t **pp_peek, int i_peek )
+static int DStreamPeek( stream_t *s, const uint8_t **pp_peek, int i_peek )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
     block_t **pp_block = &p_sys->p_block;
@@ -545,7 +545,7 @@ static int DStreamThread( stream_t *s )
  ****************************************************************************/
 static void SkipID3Tag( demux_t *p_demux )
 {
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     uint8_t version, revision;
     int i_size;
     int b_footer;

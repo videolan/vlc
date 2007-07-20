@@ -167,14 +167,14 @@ struct stream_sys_t
 
 /* Method 1: */
 static int  AStreamReadBlock( stream_t *s, void *p_read, int i_read );
-static int  AStreamPeekBlock( stream_t *s, uint8_t **p_peek, int i_read );
+static int  AStreamPeekBlock( stream_t *s, const uint8_t **p_peek, int i_read );
 static int  AStreamSeekBlock( stream_t *s, int64_t i_pos );
 static void AStreamPrebufferBlock( stream_t *s );
 static block_t *AReadBlock( stream_t *s, vlc_bool_t *pb_eof );
 
 /* Method 2 */
 static int  AStreamReadStream( stream_t *s, void *p_read, int i_read );
-static int  AStreamPeekStream( stream_t *s, uint8_t **pp_peek, int i_read );
+static int  AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, int i_read );
 static int  AStreamSeekStream( stream_t *s, int64_t i_pos );
 static void AStreamPrebufferStream( stream_t *s );
 static int  AReadStream( stream_t *s, void *p_read, int i_read );
@@ -705,7 +705,7 @@ static int AStreamReadBlock( stream_t *s, void *p_read, int i_read )
     return i_data;
 }
 
-static int AStreamPeekBlock( stream_t *s, uint8_t **pp_peek, int i_read )
+static int AStreamPeekBlock( stream_t *s, const uint8_t **pp_peek, int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     uint8_t *p_data;
@@ -1046,7 +1046,7 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
     return i_data;
 }
 
-static int AStreamPeekStream( stream_t *s, uint8_t **pp_peek, int i_read )
+static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
@@ -1401,7 +1401,7 @@ char * stream_ReadLine( stream_t *s )
     while( i_read < STREAM_LINE_MAX )
     {
         char *psz_eol;
-        uint8_t *p_data;
+        const uint8_t *p_data;
         int i_data;
         int64_t i_pos;
 
@@ -1504,8 +1504,8 @@ char * stream_ReadLine( stream_t *s )
         }
         else
         {
-            uint8_t *p = p_data;
-            uint8_t *p_last = p + i_data - s->i_char_width;
+            const uint8_t *p = p_data;
+            const uint8_t *p_last = p + i_data - s->i_char_width;
 
             if( s->i_char_width == 2 )
             {
@@ -1837,7 +1837,7 @@ int stream_Read( stream_t *s, void *p_read, int i_read )
  * the end of the stream (but only when you have i_peek >=
  * p_input->i_bufsize)
  */
-int stream_Peek( stream_t *s, uint8_t **pp_peek, int i_peek )
+int stream_Peek( stream_t *s, const uint8_t **pp_peek, int i_peek )
 {
     return s->pf_peek( s, pp_peek, i_peek );
 }

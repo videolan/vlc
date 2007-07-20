@@ -365,7 +365,7 @@ struct stream_t
 
     block_t *(*pf_block)  ( stream_t *, int i_size );
     int      (*pf_read)   ( stream_t *, void *p_read, int i_read );
-    int      (*pf_peek)   ( stream_t *, uint8_t **pp_peek, int i_peek );
+    int      (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, int i_peek );
     int      (*pf_control)( stream_t *, int i_query, va_list );
     void     (*pf_destroy)( stream_t *);
 

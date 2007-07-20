@@ -36,7 +36,7 @@ struct stream_sys_t
 };
 
 static int  Read   ( stream_t *, void *p_read, int i_read );
-static int  Peek   ( stream_t *, uint8_t **pp_peek, int i_read );
+static int  Peek   ( stream_t *, const uint8_t **pp_peek, int i_read );
 static int  Control( stream_t *, int i_query, va_list );
 static void Delete ( stream_t * );
 
@@ -149,7 +149,7 @@ static int Read( stream_t *s, void *p_read, int i_read )
     return i_res;
 }
 
-static int Peek( stream_t *s, uint8_t **pp_peek, int i_read )
+static int Peek( stream_t *s, const uint8_t **pp_peek, int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     int i_res = __MIN( i_read, p_sys->i_size - p_sys->i_pos );

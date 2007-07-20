@@ -65,7 +65,7 @@ enum stream_query_e
 };
 
 VLC_EXPORT( int, stream_Read, ( stream_t *s, void *p_read, int i_read ) );
-VLC_EXPORT( int, stream_Peek, ( stream_t *s, uint8_t **pp_peek, int i_peek ) );
+VLC_EXPORT( int, stream_Peek, ( stream_t *s, const uint8_t **pp_peek, int i_peek ) );
 VLC_EXPORT( int, stream_vaControl, ( stream_t *s, int i_query, va_list args ) );
 VLC_EXPORT( void, stream_Delete, ( stream_t *s ) );
 VLC_EXPORT( int, stream_Control, ( stream_t *s, int i_query, ... ) );
