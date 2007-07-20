@@ -12,6 +12,8 @@ EXTRA_DIST = \
 	glibc21.m4 \
 	iconv.m4 \
 	intdiv0.m4 \
+	intl.m4 \
+	intldir.m4 \
 	inttypes-pri.m4 \
 	inttypes.m4 \
 	inttypes_h.m4 \
@@ -20,11 +22,13 @@ EXTRA_DIST = \
 	lib-ld.m4 \
 	lib-link.m4 \
 	lib-prefix.m4 \
+	lock.m4
 	private.m4 \
 	progtest.m4 \
 	stdint_h.m4 \
 	uintmax_t.m4 \
 	ulonglong.m4 \
+	visibility.m4 \
 	vlc.m4 \
 	flags.m4 \
 	$(NULL)

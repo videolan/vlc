@@ -356,7 +356,7 @@ dnl
 dnl Gettext stuff
 dnl
 ALL_LINGUAS="af ar bn ca co cs da de el en_GB es eu fa fr fur gl he hi hu it ja ka ko lt lv ms my ne nl no oc pa pl ps pt_BR pt_PT ro ru sk sl sq sv tet th tl tr zh_CN zh_TW"
-AM_GNU_GETTEXT_VERSION(0.11.5)
+AM_GNU_GETTEXT_VERSION(0.16.1)
 AM_GNU_GETTEXT
 AS_IF([test "${nls_cv_force_use_gnu_gettext}" = "yes"], [
   AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, [Define if we use the local libintl])
@@ -821,7 +821,7 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
   AC_MSG_RESULT(no)])
 
 dnl Check for headers
-AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h stdbool.h getopt.h strings.h inttypes.h sys/int_types.h wchar.h)
+AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h stdbool.h getopt.h strings.h inttypes.h sys/int_types.h wchar.h locale.h)
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat.h)
 AC_CHECK_HEADERS([arpa/inet.h net/if.h netinet/in.h sys/socket.h netinet/udplite.h])
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
