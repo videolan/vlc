@@ -1444,8 +1444,8 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t        *p_sys;
     matroska_stream_c  *p_stream;
     matroska_segment_c *p_segment;
-    uint8_t            *p_peek;
-    std::string        s_path, s_filename;
+    const uint8_t      *p_peek;
+    std::string         s_path, s_filename;
     vlc_stream_io_callback *p_io_callback;
     EbmlStream         *p_io_stream;
 
@@ -1544,9 +1544,11 @@ static int Open( vlc_object_t * p_this )
 #endif
                         {
                             // test wether this file belongs to our family
-                            uint8_t *p_peek;
-                            bool file_ok = false;
-                            stream_t *p_file_stream = stream_UrlNew( p_demux, s_filename.c_str());
+                            const uint8_t *p_peek;
+                            bool          file_ok = false;
+                            stream_t      *p_file_stream = stream_UrlNew( 
+                                                            p_demux, 
+                                                            s_filename.c_str());
                             /* peek the begining */
                             if( p_file_stream &&
                                 stream_Peek( p_file_stream, &p_peek, 4 ) >= 4

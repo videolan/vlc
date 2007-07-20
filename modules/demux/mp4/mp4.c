@@ -268,7 +268,7 @@ static int Open( vlc_object_t * p_this )
     demux_t  *p_demux = (demux_t *)p_this;
     demux_sys_t     *p_sys;
 
-    uint8_t         *p_peek;
+    const uint8_t   *p_peek;
 
     MP4_Box_t       *p_ftyp;
     MP4_Box_t       *p_rmra;
