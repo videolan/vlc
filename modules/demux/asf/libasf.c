@@ -50,7 +50,7 @@ static int ASF_ReadObject( stream_t *, asf_object_t *,  asf_object_t * );
 /****************************************************************************
  * GUID functions
  ****************************************************************************/
-void ASF_GetGUID( guid_t *p_guid, uint8_t *p_data )
+void ASF_GetGUID( guid_t *p_guid, const uint8_t *p_data )
 {
     p_guid->v1 = GetDWLE( p_data );
     p_guid->v2 = GetWLE( p_data + 4);
@@ -76,7 +76,7 @@ int ASF_CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 )
 static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_common_t *p_common = (asf_object_common_t*)p_obj;
-    uint8_t             *p_peek;
+    const uint8_t *p_peek;
 
     if( stream_Peek( s, &p_peek, 24 ) < 24 )
     {
@@ -140,7 +140,7 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
     asf_object_header_t *p_hdr = (asf_object_header_t*)p_obj;
     asf_object_t        *p_subobj;
     int                 i_peek;
-    uint8_t             *p_peek;
+    const uint8_t       *p_peek;
 
     if( ( i_peek = stream_Peek( s, &p_peek, 30 ) ) < 30 )
     {
@@ -186,7 +186,7 @@ static int ASF_ReadObject_Data( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_data_t *p_data = (asf_object_data_t*)p_obj;
     int               i_peek;
-    uint8_t           *p_peek;
+    const uint8_t     *p_peek;
 
     if( ( i_peek = stream_Peek( s, &p_peek, 50 ) ) < 50 )
     {
@@ -211,8 +211,8 @@ static int ASF_ReadObject_Data( stream_t *s, asf_object_t *p_obj )
 static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_index_t *p_index = (asf_object_index_t*)p_obj;
-    uint8_t            *p_peek;
-    int                i;
+    const uint8_t      *p_peek;
+    int                 i;
 
     if( stream_Peek( s, &p_peek, p_index->i_object_size ) <
         (int)p_index->i_object_size )
@@ -265,8 +265,8 @@ static void ASF_FreeObject_Index( asf_object_t *p_obj )
 static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_file_properties_t *p_fp = (asf_object_file_properties_t*)p_obj;
-    int      i_peek;
-    uint8_t  *p_peek;
+    int           i_peek;
+    const uint8_t *p_peek;
 
     if( ( i_peek = stream_Peek( s, &p_peek,  104) ) < 104 )
     {
@@ -322,7 +322,7 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
         (asf_object_metadata_t *)p_obj;
 
     int i_peek, i_entries, i;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
 #ifdef ASF_DEBUG
     unsigned int j;
 #endif
@@ -444,7 +444,7 @@ static int ASF_ReadObject_header_extension( stream_t *s, asf_object_t *p_obj )
     asf_object_header_extension_t *p_he =
         (asf_object_header_extension_t *)p_obj;
     int     i_peek;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_he->i_object_size ) ) <  46)
     {
@@ -508,8 +508,8 @@ static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_stream_properties_t *p_sp =
                     (asf_object_stream_properties_t*)p_obj;
-    size_t   i_peek;
-    uint8_t *p_peek;
+    size_t        i_peek;
+    const uint8_t *p_peek;
 
     if( ( i_peek = stream_Peek( s, &p_peek,  p_sp->i_object_size ) ) < 78 )
     {
@@ -601,7 +601,7 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
 {
     asf_object_codec_list_t *p_cl = (asf_object_codec_list_t*)p_obj;
     int     i_peek;
-    uint8_t *p_peek, *p_data;
+    const uint8_t *p_peek, *p_data;
 
     unsigned int i_codec;
 
@@ -710,7 +710,7 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
 {
     asf_object_content_description_t *p_cd =
         (asf_object_content_description_t *)p_obj;
-    uint8_t *p_peek, *p_data;
+    const uint8_t *p_peek, *p_data;
     int i_peek, i_title, i_artist, i_copyright, i_description, i_rating;
     vlc_iconv_t cd = (vlc_iconv_t)-1;
     const char *ib = NULL;
@@ -784,7 +784,7 @@ static int ASF_ReadObject_language_list(stream_t *s, asf_object_t *p_obj)
 {
     asf_object_language_list_t *p_ll =
         (asf_object_language_list_t*)p_obj;
-    uint8_t *p_peek, *p_data;
+    const uint8_t *p_peek, *p_data;
     int i_peek;
     int i;
 
@@ -843,7 +843,7 @@ static int ASF_ReadObject_stream_bitrate_properties( stream_t *s,
 {
     asf_object_stream_bitrate_properties_t *p_sb =
         (asf_object_stream_bitrate_properties_t *)p_obj;
-    uint8_t *p_peek, *p_data;
+    const uint8_t *p_peek, *p_data;
     int i_peek;
     int i;
 
@@ -882,7 +882,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
 {
     asf_object_extended_stream_properties_t *p_esp =
         (asf_object_extended_stream_properties_t*)p_obj;
-    uint8_t *p_peek, *p_data;
+    const uint8_t *p_peek, *p_data;
     int i_peek, i;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_esp->i_object_size ) ) < 88 )
@@ -1007,7 +1007,7 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
 {
     asf_object_advanced_mutual_exclusion_t *p_ae =
         (asf_object_advanced_mutual_exclusion_t *)p_obj;
-    uint8_t *p_peek, *p_data;
+    const uint8_t *p_peek, *p_data;
     int i_peek;
     int i;
 
@@ -1049,7 +1049,7 @@ static int ASF_ReadObject_stream_prioritization( stream_t *s,
 {
     asf_object_stream_prioritization_t *p_sp =
         (asf_object_stream_prioritization_t *)p_obj;
-    uint8_t *p_peek, *p_data;
+    const uint8_t *p_peek, *p_data;
     int i_peek;
     int i;
 
@@ -1094,7 +1094,7 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
 {
     asf_object_extended_content_description_t *p_ec =
         (asf_object_extended_content_description_t *)p_obj;
-    uint8_t *p_peek, *p_data;
+    const uint8_t *p_peek, *p_data;
     int i_peek;
     int i;
 
@@ -1204,7 +1204,8 @@ static int ASF_ReadObject_XXX(stream_t *s, asf_object_t *p_obj)
 {
     asf_object_XXX_t *p_XX =
         (asf_object_XXX_t *)p_obj;
-    uint8_t *p_peek, *p_data;
+    const uint8_t *p_peek;
+    uint8_t *p_data;
     int i_peek;
 
     if( ( i_peek = stream_Peek( s, &p_peek, p_XX->i_object_size ) ) < XXX )

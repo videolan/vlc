@@ -112,12 +112,12 @@
 
 */
 
-static uint32_t Get24bBE( uint8_t *p )
+static uint32_t Get24bBE( const uint8_t *p )
 {
     return( ( p[0] <<16 ) + ( p[1] <<8 ) + p[2] );
 }
 
-static void GetUUID( UUID_t *p_uuid, uint8_t *p_buff )
+static void GetUUID( UUID_t *p_uuid, const uint8_t *p_buff )
 {
     memcpy( p_uuid, p_buff, 16 );
 }
@@ -165,7 +165,7 @@ static MP4_Box_t *MP4_ReadBox( stream_t *p_stream, MP4_Box_t *p_father );
 int MP4_ReadBoxCommon( stream_t *p_stream, MP4_Box_t *p_box )
 {
     int      i_read;
-    uint8_t  *p_peek;
+    const uint8_t  *p_peek;
 
     if( ( ( i_read = stream_Peek( p_stream, &p_peek, 32 ) ) < 8 ) )
     {
@@ -315,7 +315,7 @@ static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
         p_box->p_father->i_type == VLC_FOURCC( 'r', 'o', 'o', 't' ) &&
         p_box->i_type == FOURCC_free )
     {
-        uint8_t *p_peek;
+        const uint8_t *p_peek;
         int     i_read;
         vlc_fourcc_t i_fcc;
 

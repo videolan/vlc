@@ -108,7 +108,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys;
     guid_t      guid;
-    uint8_t     *p_peek;
+    const uint8_t     *p_peek;
 
     /* A little test to see if it could be a asf stream */
     if( stream_Peek( p_demux->s, &p_peek, 16 ) < 16 ) return VLC_EGENERIC;
@@ -141,7 +141,7 @@ static int Demux( demux_t *p_demux )
 
     for( ;; )
     {
-        uint8_t *p_peek;
+        const uint8_t *p_peek;
         mtime_t i_length;
         mtime_t i_time_begin = GetMoviePTS( p_sys );
         int i_result;
@@ -355,7 +355,7 @@ static int DemuxPacket( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int         i_data_packet_min = p_sys->p_fp->i_min_data_packet_size;
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
     int         i_skip;
 
     int         i_packet_size_left;
