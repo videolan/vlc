@@ -155,6 +155,7 @@ if HAVE_WIN32
 hacklibdir = $(libdir)
 hacklib_DATA = libvlc.dll libvlc.dll.a
 noinst_DATA = libvlc.def
+endif
 
 libvlc.dll.a libvlc.def: libvlc.dll
 	$(DLLTOOL) -z libvlc.def -l libvlc.dll.a -D $< $(libvlc_a_OBJECTS)
@@ -162,7 +163,7 @@ libvlc.dll.a libvlc.def: libvlc.dll
 libvlc.dll: $(libvlc_la_OBJECTS)
 
 .la.dll:
-	@ldfl="`$(VLC_CONFIG) --libs plugin libvlc pic`" ; \
+	@ldfl="`$(VLC_CONFIG) --libs plugin libvlc pic` $(INCLUDED_LIBINTL)" ; \
 	objs="" ; \
 	for s in $^; do \
 		test "$$s" = "$<" || \
@@ -173,10 +174,8 @@ libvlc.dll: $(libvlc_la_OBJECTS)
 	  c|*)  ld="$(LINK)" ;; \
 	esac ; \
 	echo $$ld $$objs$ldfl; \
-	$$ld $$objs $$ldfl 
-# Cygwin libtool work-around
+	$$ld $$objs $$ldfl
 	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
-endif
 
 SOURCES_libvlc_beos = \
 	misc/beos_specific.cpp \
