@@ -34,7 +34,7 @@ INSTALLSUCKS=no
 ACLOCAL_ARGS="-I m4 ${ACLOCAL_ARGS}"
 
 # Check for contrib directory
-if then
+if test -d extras/contrib/bin; then
   export PATH="`pwd`/extras/contrib/bin:$PATH"
   if test -d extras/contrib/share/aclocal; then
     ACLOCAL_ARGS="${ACLOCAL_ARGS} -I extras/contrib/share/aclocal"
