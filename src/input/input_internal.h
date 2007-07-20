@@ -353,7 +353,7 @@ static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
 }
 
 #if defined(__PLUGIN__) || defined(__BUILTIN__)
-# warning This is an internal header, please don't rely on it.
+# warning This is an internal header, something is wrong if you see this message.
 #else
 /* Stream */
 /**
@@ -363,7 +363,7 @@ struct stream_t
 {
     VLC_COMMON_MEMBERS
 
-    block_t *(*pf_block)  ( stream_t *, int i_size );
+    /*block_t *(*pf_block)  ( stream_t *, int i_size );*/
     int      (*pf_read)   ( stream_t *, void *p_read, int i_read );
     int      (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, int i_peek );
     int      (*pf_control)( stream_t *, int i_query, va_list );

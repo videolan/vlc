@@ -312,7 +312,6 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     if( psz_demux == NULL || *psz_demux == '\0' ) return NULL;
 
     s = vlc_stream_create( p_obj );
-    s->pf_block  = NULL;
     s->pf_read   = DStreamRead;
     s->pf_peek   = DStreamPeek;
     s->pf_control= DStreamControl;

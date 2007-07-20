@@ -232,7 +232,6 @@ stream_t *stream_AccessNew( access_t *p_access, vlc_bool_t b_quick )
     /* Attach it now, needed for b_die */
     vlc_object_attach( s, p_access );
 
-    s->pf_block  = NULL;
     s->pf_read   = NULL;    /* Set up later */
     s->pf_peek   = NULL;
     s->pf_control = AStreamControl;
@@ -1883,23 +1882,16 @@ block_t *stream_Block( stream_t *s, int i_size )
 {
     if( i_size <= 0 ) return NULL;
 
-    if( s->pf_block )
+    /* emulate block read */
+    block_t *p_bk = block_New( s, i_size );
+    if( p_bk )
     {
-        return s->pf_block( s, i_size );
-    }
-    else
-    {
-        /* emulate block read */
-        block_t *p_bk = block_New( s, i_size );
-        if( p_bk )
+        p_bk->i_buffer = stream_Read( s, p_bk->p_buffer, i_size );
+        if( p_bk->i_buffer > 0 )
         {
-            p_bk->i_buffer = stream_Read( s, p_bk->p_buffer, i_size );
-            if( p_bk->i_buffer > 0 )
-            {
-                return p_bk;
-            }
+            return p_bk;
         }
-        if( p_bk ) block_Release( p_bk );
-        return NULL;
     }
+    if( p_bk ) block_Release( p_bk );
+    return NULL;
 }

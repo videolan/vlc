@@ -63,7 +63,6 @@ stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
     p_sys->p_buffer = p_buffer;
     p_sys->i_preserve_memory = i_preserve_memory;
 
-    s->pf_block   = NULL;
     s->pf_read    = Read;
     s->pf_peek    = Peek;
     s->pf_control = Control;
