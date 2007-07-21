@@ -38,7 +38,11 @@
 #include <sys/ioctl.h>
 #include <sys/poll.h>
 #ifdef HAVE_NEW_LINUX_VIDEODEV2_H
-#include VIDEODEV2_H_FILE
+#   ifdef VIDEODEV2_H_FILE
+#   include VIDEODEV2_H_FILE
+#   else
+#   include <linux/videodev2.h>
+#   endif
 #else
 #include "videodev2.h"
 #endif

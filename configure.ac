@@ -2369,15 +2369,21 @@ then
   if test "${with_videodev2}" != "no" -a -n "${with_videodev2}"
   then
     AC_DEFINE_UNQUOTED(VIDEODEV2_H_FILE, "${with_videodev2}", [Location of videodev2.h])
-  else
-    AC_DEFINE(VIDEODEV2_H_FILE, "linux/videodev2.h", [Location of videodev2.h])
+  dnl else
+  dnl AC_DEFINE(VIDEODEV2_H_FILE, "linux/videodev2.h", [Location of videodev2.h])
   fi
     
 
   AC_CACHE_CHECK([for new linux/videodev2.h],
       [new_linux_videodev2_h],
-      [AC_TRY_COMPILE([#include <sys/types.h>
-          #include VIDEODEV2_H_FILE],
+      [AC_TRY_COMPILE([
+          #include <sys/types.h>
+          #   ifdef VIDEODEV2_H_FILE
+	  #   include VIDEODEV2_H_FILE
+	  #   else
+	  #   include <linux/videodev2.h>
+	  #   endif
+	  ],
           [struct v4l2_ext_controls ctrls; ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG; ],
           new_linux_videodev2_h=yes,
           new_linux_videodev2_h=no)])
