@@ -216,9 +216,6 @@ case "${host_os}" in
         enable_xvideo="no"
         echo "  Assuming --disable-xvideo"
 
-        enable_libtool="no"
-        echo "  Assuming --disable-libtool"
-        echo ""
     fi
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
