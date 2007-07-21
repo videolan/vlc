@@ -431,14 +431,20 @@ VLC-release.app: vlc
 	          $(top_builddir)/VLC-release.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS
-	$(INSTALL) $(top_builddir)/vlc \
-		   $(top_builddir)/VLC-release.app/Contents/MacOS/VLC
-	ln -sf ./VLC $(top_builddir)/VLC-release.app/Contents/MacOS/clivlc
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/modules
+	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/lib
+	$(INSTALL) $(top_builddir)/.libs/vlc \
+		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
+	$(INSTALL) $(top_builddir)/src/.libs/libvlc.1.dylib \
+		   $(top_builddir)/VLC.app/Contents/MacOS/lib/libvlc.dylib
+	install_name_tool -change /usr/local/lib/libvlc.1.dylib \
+	       @executable_path/lib/libvlc.dylib \
+		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
+	ln -sf ./VLC $(top_builddir)/VLC.app/Contents/MacOS/clivlc
+	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; \
-	    then $(INSTALL) "$$i$(LIBEXT)" \
-			   "$(top_builddir)/VLC-release.app/Contents/MacOS/modules" ; \
+	    then ln -sfn "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" \
+			   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done
 	if test -d $(srcdir)/extras/contrib/vlc-lib; then \
 	  mkdir -p $(top_builddir)/VLC-release.app/Contents/MacOS/lib ; \
@@ -572,7 +578,9 @@ VLC.app: vlc
 		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	$(INSTALL) $(top_builddir)/src/.libs/libvlc.1.dylib \
 		   $(top_builddir)/VLC.app/Contents/MacOS/lib/libvlc.dylib
-	install_name_tool -change /usr/local/lib/libvlc.1.dylib @executable_path/lib/libvlc.dylib $(top_builddir)/VLC.app/Contents/MacOS/VLC
+	install_name_tool -change /usr/local/lib/libvlc.1.dylib \
+	       @executable_path/lib/libvlc.dylib \
+		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	ln -sf ./VLC $(top_builddir)/VLC.app/Contents/MacOS/clivlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
