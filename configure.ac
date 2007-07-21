@@ -2369,8 +2369,6 @@ then
   if test "${with_videodev2}" != "no" -a -n "${with_videodev2}"
   then
     AC_DEFINE_UNQUOTED(VIDEODEV2_H_FILE, "${with_videodev2}", [Location of videodev2.h])
-  dnl else
-  dnl AC_DEFINE(VIDEODEV2_H_FILE, "linux/videodev2.h", [Location of videodev2.h])
   fi
     
 
