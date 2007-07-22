@@ -999,7 +999,7 @@ else
 endif
 endif
 # Update svn if needed
-	test -s ffmpeg/.svn && $(SVN) update ffmpeg || 1
+	test -s ffmpeg/.svn && $(SVN) update ffmpeg || true
 	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-pp --disable-vhook --disable-ffserver --disable-ffmpeg --disable-network --disable-ffplay && make && make install-libs install-headers)
 	touch $@
 
