@@ -437,13 +437,13 @@ VLC-release.app: vlc
 	$(INSTALL) $(top_builddir)/src/.libs/libvlc.1.dylib \
 		   $(top_builddir)/VLC.app/Contents/MacOS/lib/libvlc.dylib
 	install_name_tool -change /usr/local/lib/libvlc.1.dylib \
-	       @executable_path/lib/libvlc.dylib \
-		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
+		   @executable_path/lib/libvlc.dylib \
+	       $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	ln -sf ./VLC $(top_builddir)/VLC.app/Contents/MacOS/clivlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; \
-	    then ln -sfn "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" \
+	    then $(INSTALL) "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" \
 			   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done
 	if test -d $(srcdir)/extras/contrib/vlc-lib; then \
@@ -579,8 +579,8 @@ VLC.app: vlc
 	$(INSTALL) $(top_builddir)/src/.libs/libvlc.1.dylib \
 		   $(top_builddir)/VLC.app/Contents/MacOS/lib/libvlc.dylib
 	install_name_tool -change /usr/local/lib/libvlc.1.dylib \
-	       @executable_path/lib/libvlc.dylib \
-		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
+		   @executable_path/lib/libvlc.dylib \
+	       $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	ln -sf ./VLC $(top_builddir)/VLC.app/Contents/MacOS/clivlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
