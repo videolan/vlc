@@ -136,6 +136,7 @@ httpd_UrlNewUnique
 __image_HandlerCreate
 image_HandlerDelete
 InitMD5
+decoder_GetInputAttachments
 input_AddSubtitles
 input_Control
 __input_CreateThread
@@ -173,6 +174,7 @@ __intf_UserYesNo
 IsUTF8
 LocaleFree
 mdate
+__module_Exists
 __module_Need
 __module_Unneed
 __msg_Dbg
