@@ -221,7 +221,11 @@ EXTRA_LTLIBRARIES = ${extra_ltlibs}
 
 include Modules.am
 
-LTLIBVLC = \$(top_builddir)/src/libvlc.la
+if HAVE_WIN32
+LTLIBVLC = -L\$(top_builddir)/src -lvlc.dll
+else
+LTLIBVLC = -L\$(top_builddir)/src -lvlc
+endif
 
 AM_LDFLAGS = -rpath '\$(libvlcdir)' -avoid-version \\
 	-module -no-undefined -shrext \$(LIBEXT) \\
@@ -229,9 +233,8 @@ AM_LDFLAGS = -rpath '\$(libvlcdir)' -avoid-version \\
 
 if USE_LIBTOOL
 AM_LIBADD = \$(LTLIBVLC)
-endif
-if HAVE_WIN32
-LIBVLC = \$(top_builddir)/src/libvlc.dll
+else
+LIBVLC = -l\$(top_builddir) -lvlc
 endif
 
 all: all-modules
