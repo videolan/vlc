@@ -11,7 +11,7 @@ EXTRA_DIST = extras/COPYING modules/builtin.h.in libvlc.sym
 
 BUILT_SOURCES = modules/builtin.h misc/revision.c
 CLEANFILES = $(BUILT_SOURCES)
-MOSTLYCLEANFILES = $(hacklib_DATA) $(noinst_DATA)
+MOSTLYCLEANFILES = $(dist_dllimport_DATA) $(noinst_DATA)
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
 
@@ -151,31 +151,32 @@ libvlc_la_SOURCES += $(SOURCES_libvlc_getopt)
 endif
 
 if HAVE_WIN32
-# Überhack. Needs fixing.
-hacklibdir = $(libdir)
-hacklib_DATA = libvlc.dll libvlc.dll.a
+dllimportdir = $(libdir)
+dist_dllimport_DATA = libvlc.dll libvlc.dll.a
 noinst_DATA = libvlc.def
 endif
 
-libvlc.dll.a libvlc.def: libvlc.dll
-	$(DLLTOOL) -z libvlc.def -l libvlc.dll.a -D $< $(libvlc_a_OBJECTS)
+OBJECTS_libvlc_dll = $(libvlc_la_OBJECTS) $(libvlc_control_la_OBJECTS)
 
-libvlc.dll: $(libvlc_la_OBJECTS)
+libvlc.dll.a libvlc.def: libvlc.dll
+	@objs=""; \
+	for s in $(OBJECTS_libvlc_dll); do \
+	   objs="$$objs $$(dirname "$$s")/.libs/$$(basename $${s%.lo}).o" ; \
+	done ; \
+	echo $(DLLTOOL) --output-def libvlc.def --output-lib libvlc.dll.a -D $< $$objs ; \
+	$(DLLTOOL) --output-def libvlc.def --output-lib libvlc.dll.a -D $< $$objs
+
+libvlc.dll: $(OBJECTS_libvlc_dll)
 
 .la.dll:
 	@ldfl="`$(VLC_CONFIG) --libs plugin libvlc pic` $(INCLUDED_LIBINTL)" ; \
-	objs="" ; \
-	for s in $^; do \
-		test "$$s" = "$<" || \
-		objs="$$objs $$(dirname "$$s")/.libs/$$(basename $${s%.lo}).o" ; \
-	done ; \
+	objs="$^"; \
 	case `$(VLC_CONFIG) --linkage libvlc` in \
 	  c++)  ld="$(CXXLINK)" ;; \
 	  c|*)  ld="$(LINK)" ;; \
 	esac ; \
-	echo $$ld $$objs$ldfl; \
+	echo $$ld $$objs $$ldfl; \
 	$$ld $$objs $$ldfl
-	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
 
 SOURCES_libvlc_beos = \
 	misc/beos_specific.cpp \
