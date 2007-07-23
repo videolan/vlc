@@ -21,7 +21,7 @@ nobase_dist_pkgdata_DATA = \
 	$(DIST_osdmenu_minimal)
 
 nobase_pkgdata_DATA = skins2/default.vlt
-nobase_dist_DATA = applications/vlc.desktop
+nobase_dist_data_DATA = applications/vlc.desktop
 
 
 DIST_rsrc = \
