@@ -220,7 +220,6 @@ case "${host_os}" in
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
     AC_CHECK_TOOL(WINDRES, windres, :)
-    enable_libtool="no"
 
     case "${host_os}" in
       *mingw32*)
@@ -242,7 +241,6 @@ case "${host_os}" in
 
     if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
-        CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
         VLC_ADD_LDFLAGS([libvlc],[-lws2_32 -lnetapi32 -lwinmm])
         VLC_ADD_LDFLAGS([vlc activex mozilla],[-mwindows])
         VLC_ADD_LDFLAGS([cdda vcdx cddax],[-lwinmm])
@@ -250,7 +248,6 @@ case "${host_os}" in
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
-        CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
         VLC_ADD_CPPFLAGS([libvlc vlc],[-Dmain(a,b)=maince(a,b)])
         VLC_ADD_LDFLAGS([libvlc vlc],[-lws2 -e WinMainCRTStartup])
         VLC_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp access_output_udp sap http netsync],[-lws2])
@@ -317,12 +314,24 @@ dnl  Libtool
 dnl  It's very bad, but our former custom system was worst
 dnl  -- Courmisch
 dnl
+
+dnl override platform specific check for dependent libraries
+dnl otherwise libtool linking of shared libraries will
+dnl fail on anything other than pass_all.
+AC_CACHE_CHECK([how to recognize dependent libraries],
+   lt_cv_deplibs_check_method,
+   [lt_cv_deplibs_check_method=pass_all
+])
+
 AC_DISABLE_STATIC
 AC_LIBTOOL_DLOPEN
-dnl AC_LIBTOOL_WIN32_DLL - couldn't get libtool to work on Win32 so far
+AC_LIBTOOL_WIN32_DLL
 m4_undefine([AC_PROG_F77])
 m4_defun([AC_PROG_F77],[])
 AC_PROG_LIBTOOL
+
+m4_undefine([AC_DEPLIBS_CHECK_METHOD])
+m4_defun([AC_DEPLIBS_CHECK_METHOD],[])
 
 AC_ARG_ENABLE(libtool,
     [  --enable-libtool        use libtool (default enabled)])
@@ -330,6 +339,8 @@ AS_IF([test "x{enable_libtool}" = "xno"], [
 	AC_MSG_WARN([Disabling libtool is strongly discouraged. There are known bugs.])
 ])
 AM_CONDITIONAL(USE_LIBTOOL, [test "x${enable_libtool}" != "xno"] )
+
+lt_cv_deplibs_check_method=pass_all
 
 
 dnl
@@ -5942,17 +5953,17 @@ AS_IF([${plugin_support}], [
 dnl
 dnl Pic and shared libvlc stuff
 dnl
-AS_IF([test "${SYS}" = "mingw32" || test "${enable_libtool}" != "no"], [
+AS_IF([test "${enable_libtool}" != "no"], [
   AC_DEFINE(HAVE_SHARED_LIBVLC, 1, [Define to 1 if libvlc is built as a shared library.])
   VLC_ADD_PLUGINS([${BUILTINS}])
   AS_IF([test "${SYS}" = "mingw32"], [
     FILE_LIBVLC_DLL="!define LIBVLC_DLL libvlc.dll"
-    VLC_ADD_CPPFLAGS([libvlc],[-DDLL_EXPORT])
   ])
   BUILTINS=""
 ], [
   LDFLAGS_vlc="${LDFLAGS_vlc} ${LDFLAGS_libvlc}"
   FILE_LIBVLC_DLL=""
+  VLC_ADD_CPPFLAGS([libvlc],[-DDLL_EXPORT])
 ])
 
 dnl
