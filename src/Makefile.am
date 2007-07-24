@@ -11,7 +11,7 @@ EXTRA_DIST = extras/COPYING modules/builtin.h.in libvlc.sym
 
 BUILT_SOURCES = modules/builtin.h misc/revision.c
 CLEANFILES = $(BUILT_SOURCES)
-MOSTLYCLEANFILES = $(dist_dllimport_DATA) $(noinst_DATA)
+MOSTLYCLEANFILES = 
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
 
@@ -102,9 +102,9 @@ modules/modules.c: modules/builtin.h
 
 lib_LTLIBRARIES = libvlc.la libvlc-control.la
 
-AM_LDFLAGS =
+AM_LDFLAGS = -no-undefined
 if HAVE_WIN32
-AM_LDFLAGS += -static
+AM_LDFLAGS += -avoid-version
 endif
 
 libvlc_la_SOURCES = $(SOURCES_libvlc)
@@ -113,15 +113,14 @@ libvlc_la_LIBADD = $(INCLUDED_LIBINTL)
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
-libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs libvlc` $(AM_LDFLAGS) \
-	-no-undefined -export-symbols $(srcdir)/libvlc.sym -version-info 1:0:0
+libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs libvlc` \
+	-export-symbols $(srcdir)/libvlc.sym -version-info 1:0:0
 libvlc_la_DEPENDENCIES = libvlc.sym
 
 libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_control_la_LIBADD = libvlc.la
 libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
-libvlc_control_la_LDFLAGS = $(AM_LDFLAGS) \
-	-no-undefined -export-symbols-regex '^_?(libvlc|mediacontrol)_.*' \
+libvlc_control_la_LDFLAGS = -export-symbols-regex '^_?(libvlc|mediacontrol)_.*' \
 	-version-info 0:0:0
 
 EXTRA_libvlc_la_SOURCES = \
@@ -149,34 +148,6 @@ endif
 if BUILD_GETOPT
 libvlc_la_SOURCES += $(SOURCES_libvlc_getopt)
 endif
-
-if HAVE_WIN32
-dllimportdir = $(libdir)
-dist_dllimport_DATA = libvlc.dll libvlc.dll.a
-noinst_DATA = libvlc.def
-endif
-
-OBJECTS_libvlc_dll = $(libvlc_la_OBJECTS) $(libvlc_control_la_OBJECTS)
-
-libvlc.dll.a libvlc.def: libvlc.dll
-	@objs=""; \
-	for s in $(OBJECTS_libvlc_dll); do \
-	   objs="$$objs $$(dirname "$$s")/.libs/$$(basename $${s%.lo}).o" ; \
-	done ; \
-	echo $(DLLTOOL) --output-def libvlc.def --output-lib libvlc.dll.a -D $< $$objs ; \
-	$(DLLTOOL) --output-def libvlc.def --output-lib libvlc.dll.a -D $< $$objs
-
-libvlc.dll: $(OBJECTS_libvlc_dll)
-
-.la.dll:
-	@ldfl="`$(VLC_CONFIG) --libs plugin libvlc pic` $(INCLUDED_LIBINTL)" ; \
-	objs="$^"; \
-	case `$(VLC_CONFIG) --linkage libvlc` in \
-	  c++)  ld="$(CXXLINK)" ;; \
-	  c|*)  ld="$(LINK)" ;; \
-	esac ; \
-	echo $$ld $$objs $$ldfl; \
-	$$ld $$objs $$ldfl
 
 SOURCES_libvlc_beos = \
 	misc/beos_specific.cpp \
