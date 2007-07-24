@@ -243,7 +243,7 @@ case "${host_os}" in
         # add ws2_32 for closesocket, select, recv
         VLC_ADD_LDFLAGS([libvlc],[-lws2_32 -lnetapi32 -lwinmm])
         VLC_ADD_LDFLAGS([vlc activex mozilla],[-mwindows])
-        VLC_ADD_LDFLAGS([cdda vcdx cddax],[-lwinmm])
+        VLC_ADD_LDFLAGS([cdda vcdx cddax sdl-image],[-lwinmm])
         VLC_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp access_output_udp access_output_shout sap slp http stream_out_standard stream_out_rtp vod_rtsp access_realrtsp telnet rc netsync growl flac ts audioscrobbler],[-lws2_32])
     fi
     if test "${SYS}" = "mingwce"; then
