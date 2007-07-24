@@ -368,12 +368,12 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     /* Create user specified video filters */
     psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
-    printf("psz_chain: [33;1m%s[0m\n", psz_chain );
+    msg_Dbg( p_stream, "psz_chain: %s\n", psz_chain );
     {
         config_chain_t *p_cfg;
         for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
         {
-            printf(" - %s\n", p_cfg->psz_value );
+            msg_Dbg( p_stream, " - %s\n", p_cfg->psz_value );
         }
     }
     p_sys->i_vfilters = 0;
@@ -419,8 +419,6 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             vlc_object_destroy( *pp_vfilter );
             p_sys->i_vfilters--;
         }
-        //if( psz_parser && *psz_parser ) psz_parser++;
-        printf("\n\npsz_parser: %s\n\n", psz_parser );
     }
     free( psz_chain );
 
@@ -598,11 +596,27 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         }
         else
         {
-            p_new_pic = (picture_t*)malloc( sizeof(picture_t) );
             /* TODO: chroma conversion if needed */
-            vout_AllocatePicture( p_stream, p_new_pic, p_pic->format.i_chroma,
+
+            p_new_pic = (picture_t*)malloc( sizeof(picture_t) );
+            if( p_new_pic == NULL )
+            {
+                msg_Err( p_stream, "image conversion failed" );
+                continue;
+            }
+
+            if( vout_AllocatePicture(
+                                  p_stream, p_new_pic, p_pic->format.i_chroma,
                                   p_pic->format.i_width, p_pic->format.i_height,
-                                  p_sys->p_decoder->fmt_out.video.i_aspect );
+                                  p_sys->p_decoder->fmt_out.video.i_aspect )
+                != VLC_SUCCESS )
+            {
+                free( p_new_pic );
+                msg_Err( p_stream, "image allocation failed" );
+                continue;
+            }
+
+            p_new_pic->pf_release = (pf_release_t)free;
 
             vout_CopyPicture( p_stream, p_new_pic, p_pic );
         }
