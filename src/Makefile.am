@@ -113,14 +113,14 @@ libvlc_la_LIBADD = $(INCLUDED_LIBINTL)
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
-libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs libvlc` \
+libvlc_la_LDFLAGS = $(AM_LDFLAGS) `$(VLC_CONFIG) --libs libvlc` \
 	-export-symbols $(srcdir)/libvlc.sym -version-info 1:0:0
 libvlc_la_DEPENDENCIES = libvlc.sym
 
 libvlc_control_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_control_la_LIBADD = libvlc.la
 libvlc_control_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
-libvlc_control_la_LDFLAGS = -export-symbols-regex '^_?(libvlc|mediacontrol)_.*' \
+libvlc_control_la_LDFLAGS = $(AM_LDFLAGS) -export-symbols-regex '^_?(libvlc|mediacontrol)_.*' \
 	-version-info 0:0:0
 
 EXTRA_libvlc_la_SOURCES = \
