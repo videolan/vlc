@@ -616,8 +616,6 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                 continue;
             }
 
-            p_new_pic->pf_release = (pf_release_t)free;
-
             vout_CopyPicture( p_stream, p_new_pic, p_pic );
         }
 
