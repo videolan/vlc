@@ -5462,16 +5462,24 @@ AS_IF([test "${enable_gnutls}" != "no"], [
   AS_IF([test "${have_gnutls}" = "yes"], [
     VLC_ADD_PLUGINS([gnutls])
     VLC_ADD_CFLAGS([gnutls], [$GNUTLS_CFLAGS])
+    AS_IF([test "${SYS}" = "mingw32"], [
+      dnl pkg-config --libs gnutls ignores these
+      VLC_ADD_LDFLAGS([gnutls], [-lz])
+      AS_IF([test "${enable_libtool}" != "no"], [
+        VLC_ADD_LDFLAGS([gnutls], [${LTLIBINTL}])
+      ], [
+        VLC_ADD_LDFLAGS([gnutls], [${LIBINTL}])
+      ])
+    ])
+    AC_CHECK_LIB([gcrypt], [gcry_control], [
+      VLC_ADD_LDFLAGS([gnutls], [-lgcrypt -lgpg-error])
+    ], [], [-lgpg-error])
     VLC_ADD_LDFLAGS([gnutls], [$GNUTLS_LIBS])
   ], [
     AS_IF([test "${enable_gnutls}" = "yes"], [
       AC_MSG_ERROR([gnutls not present or too old (version 1.2.9 required)])
     ])
   ])
-  VLC_ADD_LDFLAGS([gnutls], [-lintl -lz])
-  AC_CHECK_LIB([gcrypt], [gcry_control], [
-    VLC_ADD_LDFLAGS([gnutls], [-lgcrypt -lgpg-error])
-  ], [], [-lgpg-error])
 ])
 
 dnl
