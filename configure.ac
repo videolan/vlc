@@ -318,10 +318,8 @@ dnl
 dnl override platform specific check for dependent libraries
 dnl otherwise libtool linking of shared libraries will
 dnl fail on anything other than pass_all.
-AC_CACHE_CHECK([how to recognize dependent libraries],
-   lt_cv_deplibs_check_method,
-   [lt_cv_deplibs_check_method=pass_all
-])
+AC_CACHE_VAL(lt_cv_deplibs_check_method,
+    [lt_cv_deplibs_check_method=pass_all])
 
 AC_DISABLE_STATIC
 AC_LIBTOOL_DLOPEN
@@ -5471,8 +5469,8 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     ])
   ])
   AC_CHECK_LIB([gcrypt], [gcry_control], [
-    VLC_ADD_LDFLAGS([gnutls], [-lgcrypt])
-  ])
+    VLC_ADD_LDFLAGS([gnutls], [-lgcrypt -lgpg-error])
+  ], [], [-lgpg-error])
 ])
 
 dnl
