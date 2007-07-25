@@ -244,7 +244,7 @@ case "${host_os}" in
         VLC_ADD_LDFLAGS([libvlc],[-lws2_32 -lnetapi32 -lwinmm])
         VLC_ADD_LDFLAGS([vlc activex mozilla],[-mwindows])
         VLC_ADD_LDFLAGS([cdda vcdx cddax sdl_image],[-lwinmm])
-        VLC_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp access_output_udp access_output_shout sap slp http stream_out_standard stream_out_rtp vod_rtsp access_realrtsp telnet rc netsync growl flac ts audioscrobbler],[-lws2_32])
+        VLC_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp access_output_udp access_output_shout sap slp http stream_out_standard stream_out_rtp vod_rtsp access_realrtsp telnet rc netsync gnutls growl flac ts audioscrobbler],[-lws2_32])
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
@@ -5468,6 +5468,7 @@ AS_IF([test "${enable_gnutls}" != "no"], [
       AC_MSG_ERROR([gnutls not present or too old (version 1.2.9 required)])
     ])
   ])
+  VLC_ADD_LDFLAGS([gnutls], [-lintl -lz])
   AC_CHECK_LIB([gcrypt], [gcry_control], [
     VLC_ADD_LDFLAGS([gnutls], [-lgcrypt -lgpg-error])
   ], [], [-lgpg-error])
