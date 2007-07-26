@@ -503,22 +503,22 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         }
         else if( !strcmp( s, "vlc_stop" ) )
         {
-            playlist_Control( p_sys->p_playlist, VLC_TRUE, PLAYLIST_STOP );
+            playlist_Control( p_sys->p_playlist, PLAYLIST_STOP, VLC_TRUE );
             msg_Dbg( p_intf, "requested playlist stop" );
         }
         else if( !strcmp( s, "vlc_pause" ) )
         {
-            playlist_Control( p_sys->p_playlist, VLC_TRUE, PLAYLIST_PAUSE );
+            playlist_Control( p_sys->p_playlist, PLAYLIST_PAUSE, VLC_TRUE );
             msg_Dbg( p_intf, "requested playlist pause" );
         }
         else if( !strcmp( s, "vlc_next" ) )
         {
-            playlist_Control( p_sys->p_playlist, VLC_TRUE, PLAYLIST_SKIP, 1 );
+            playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, VLC_TRUE, 1 );
             msg_Dbg( p_intf, "requested playlist next" );
         }
         else if( !strcmp( s, "vlc_previous" ) )
         {
-            playlist_Control( p_sys->p_playlist, VLC_TRUE, PLAYLIST_SKIP, -1 );
+            playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, VLC_TRUE, -1 );
             msg_Dbg( p_intf, "requested playlist previous" );
         }
         else if( !strcmp( s, "vlc_seek" ) )
