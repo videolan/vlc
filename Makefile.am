@@ -585,6 +585,9 @@ VLC.app: vlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; \
+        install_name_tool -change /usr/local/lib/libvlc.1.dylib \
+                                  @executable_path/lib/libvlc.dylib \
+                          "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)";
 	    then ln -sfn "`pwd`/`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" \
 			   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done
