@@ -64,19 +64,19 @@ DIST_misc = \
 
 if BUILD_ACTIVEX
 
-lib_LTLIBRARIES = libaxvlc.la
+lib_LTLIBRARIES = axvlc.la
 
 LIBRARIES_libvlc = $(top_builddir)/src/libvlc-control.la \
 				   $(top_builddir)/src/libvlc.la
 
-libaxvlc_la_SOURCES = $(SOURCES_activex)
-libaxvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags activex`
-libaxvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags activex`
-libaxvlc_la_DEPENDENCIES = axvlc.def $(DATA_axvlc_rc) $(LIBRARIES_libvlc)
-libaxvlc_la_LDFLAGS = $(srcdir)/axvlc.def -Wl,$(DATA_axvlc_rc) \
+axvlc_la_SOURCES = $(SOURCES_activex)
+axvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags activex`
+axvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags activex`
+axvlc_la_DEPENDENCIES = axvlc.def $(DATA_axvlc_rc) $(LIBRARIES_libvlc)
+axvlc_la_LDFLAGS = $(srcdir)/axvlc.def -Wl,$(DATA_axvlc_rc) \
     -no-undefined -avoid-version $(LIBRARIES_libvlc) \
     `$(VLC_CONFIG) --libs activex libvlc` \
-	-Wl,--output,axvlc$(LIBEXT)
+	-module
 
 DATA_axvlc_rc = $(noinst_axvlc_rc_DATA)
 noinst_axvlc_rc_DATA = axvlc_rc.$(OBJEXT)
@@ -123,7 +123,6 @@ endif
 ###############################################################################
 
 clean-local: clean-tlb
-	rm -f axvlc$(LIBEXT)
 
 ###############################################################################
 # Force rules
