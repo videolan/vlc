@@ -2,9 +2,7 @@
 # Building the Activex plugin
 ###############################################################################
 
-noinst_LIBRARIES = $(noinst_LIBRARIES_activex)
-
-MOSTLYCLEANFILES = $(LIBRARIES_activex)
+MOSTLYCLEANFILES = 
 EXTRA_DIST = $(SOURCES_activex) $(DIST_rsrc) $(DIST_misc)
 BUILT_SOURCES = $(BUILT_SOURCES_activex)
 
@@ -64,30 +62,27 @@ DIST_misc = \
     test.html \
     $(NULL)
 
-LIBRARIES_libvlc = $(top_builddir)/src/libvlc.dll.a
-
 if BUILD_ACTIVEX
 
-noinst_LIBRARIES_activex = libaxvlc.a
-axvlc_DATA = axvlc$(LIBEXT)
-axvlcdir = $(libdir)
+lib_LTLIBRARIES = libaxvlc.la
 
-LDFLAGS_activex = `$(VLC_CONFIG) --libs activex libvlc`
+LIBRARIES_libvlc = $(top_builddir)/src/libvlc-control.la \
+				   $(top_builddir)/src/libvlc.la
 
-libaxvlc_a_SOURCES = $(SOURCES_activex) $(SOURCE_dll)
-libaxvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags activex`
-libaxvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags activex`
-libaxvlc_a_DEPENDENCIES = axvlc.def $(DATA_axvlc_rc) $(LIBRARIES_libvlc)
+libaxvlc_la_SOURCES = $(SOURCES_activex)
+libaxvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags activex`
+libaxvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags activex`
+libaxvlc_la_DEPENDENCIES = axvlc.def $(DATA_axvlc_rc) $(LIBRARIES_libvlc)
+libaxvlc_la_LDFLAGS = $(srcdir)/axvlc.def -Wl,$(DATA_axvlc_rc) \
+    -no-undefined -avoid-version $(LIBRARIES_libvlc) \
+    `$(VLC_CONFIG) --libs activex libvlc` \
+	-Wl,--output,axvlc$(LIBEXT)
 
-axvlc$(LIBEXT): $(libaxvlc_a_OBJECTS) \
-	              $(libaxvlc_a_DEPENDENCIES)
-	$(CXXLINK) $(libaxvlc_a_OBJECTS) $(DATA_axvlc_rc) \
-	$(srcdir)/axvlc.def \
-	  $(LIBRARIES_libvlc) -shared $(LIBRARIES_libvlc) $(LDFLAGS_activex) \
-	  $(INCLUDED_LIBINTL)
-# Cygwin work-around
-	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
-
+DATA_axvlc_rc = $(noinst_axvlc_rc_DATA)
+noinst_axvlc_rc_DATA = axvlc_rc.$(OBJEXT)
+noinst_axvlc_rcdir = $(libdir)
+axvlc_rc.$(OBJEXT): axvlc_rc.rc inplace.bmp axvlc.tlb
+	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/[^0-9]*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(srcdir) -i $< -o $@
 
 DATA_axvlc_tlb = $(axvlc_tlb_DATA)
 noinst_axvlc_tlb_DATA = axvlc.tlb
@@ -116,12 +111,6 @@ clean-tlb:
 
 endif
 endif
-
-DATA_axvlc_rc = $(noinst_axvlc_rc_DATA)
-noinst_axvlc_rc_DATA = axvlc_rc.$(OBJEXT)
-noinst_axvlc_rcdir = $(libdir)
-axvlc_rc.$(OBJEXT): axvlc_rc.rc inplace.bmp axvlc.tlb
-	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/[^0-9]*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(srcdir) -i $< -o $@
 
 else
 

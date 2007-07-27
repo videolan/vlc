@@ -5463,7 +5463,7 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     VLC_ADD_PLUGINS([gnutls])
     VLC_ADD_CFLAGS([gnutls], [$GNUTLS_CFLAGS])
     AS_IF([test "${SYS}" = "mingw32"], [
-      dnl pkg-config --libs gnutls ignores these
+      dnl pkg-config --libs gnutls omits these
       VLC_ADD_LDFLAGS([gnutls], [-lz])
       AS_IF([test "${enable_libtool}" != "no"], [
         VLC_ADD_LDFLAGS([gnutls], [${LTLIBINTL}])
@@ -5602,7 +5602,7 @@ then
       [AC_CHECK_HEADERS(olectl.h,
         [ VLC_ADD_CPPFLAGS([activex],[-DUNICODE -D_UNICODE -D_MIDL_USE_GUIDDEF_])
           VLC_ADD_CXXFLAGS([activex],[-fno-exceptions])
-          VLC_ADD_LDFLAGS([activex],[-lole32 -loleaut32 -luuid -lshlwapi]) 
+          VLC_ADD_LDFLAGS([activex],[-lole32 -loleaut32 -luuid -lshlwapi -lgdi32]) 
           AC_CHECK_HEADERS(objsafe.h,
             VLC_ADD_CXXFLAGS([activex],[-DHAVE_OBJSAFE_HEADER]),,
             [
