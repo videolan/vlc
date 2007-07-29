@@ -373,16 +373,10 @@ AS_IF([test "${nls_cv_force_use_gnu_gettext}" = "yes"], [
 dnl
 dnl Iconv stuff
 dnl
-if test "${SYS}" != "mingwce"; then
 AS_IF([test "$am_cv_func_iconv" != "yes"],
 	[AC_MSG_ERROR([libiconv is needed for VLC to work properly])])
-fi
 VLC_ADD_CFLAGS([libvlc],[${INCICONV}])
-AS_IF([test "${enable_libtool}" != "no"], [
-  VLC_ADD_LDFLAGS([libvlc vlc],[${LIBICONV}])
-],[
-  VLC_ADD_LDFLAGS([libvlc vlc],[${LTLIBICONV}])
-])
+VLC_ADD_LDFLAGS([libvlc],[${LTLIBICONV}])
 
 dnl Check for the need to include the mingwex lib for mingw32
 if test "${SYS}" = "mingw32"
