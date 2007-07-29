@@ -94,11 +94,6 @@ struct module_t
 
     vlc_bool_t          b_builtin;  /* Set to true if the module is built in */
     vlc_bool_t          b_loaded;        /* Set to true if the dll is loaded */
-
-#ifndef HAVE_SHARED_LIBVLC
-    /* Legacy symbols table */
-    module_symbols_t *p_symbols;
-#endif
 };
 
 /*****************************************************************************

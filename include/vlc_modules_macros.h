@@ -64,14 +64,6 @@
 #   define __VLC_SYMBOL( symbol  ) CONCATENATE( symbol, MODULE_SYMBOL )
 #endif
 
-#if defined( __BUILTIN__ ) || defined( HAVE_SHARED_LIBVLC )
-#   define DECLARE_SYMBOLS         struct _u_n_u_s_e_d_
-#   define STORE_SYMBOLS           struct _u_n_u_s_e_d_
-#else
-#   define DECLARE_SYMBOLS         module_symbols_t* p_symbols = NULL
-#   define STORE_SYMBOLS           p_symbols = p_module->p_symbols
-#endif
-
 #if defined( __PLUGIN__ ) && ( defined( WIN32 ) || defined( UNDER_CE ) )
 #   define DLL_SYMBOL              __declspec(dllexport)
 #   define CDECL_SYMBOL            __cdecl
@@ -109,14 +101,12 @@ E_(vlc_entry) ( module_t *p_module );
 #endif
 
 #define vlc_module_begin( )                                                   \
-    DECLARE_SYMBOLS;                                                          \
     EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \
     __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
         int i_shortcut = 1, res;                                              \
         size_t i_config = (size_t)(-1);                                       \
         module_config_t *p_config = NULL;                                     \
-        STORE_SYMBOLS;                                                        \
         if (vlc_module_set (p_module, VLC_MODULE_NAME,                        \
                             (void *)(MODULE_STRING)))                         \
             goto error;                                                       \

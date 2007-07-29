@@ -484,37 +484,29 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #    define VLC_INTERNAL( type, name, args ) type name args
 #  endif
 #else
-#  if !defined (__PLUGIN__) || defined (HAVE_SHARED_LIBVLC)
-#    ifdef __cplusplus
-#      if HAVE_ATTRIBUTE_VISIBILITY
-#         define VLC_PUBLIC_API __attribute__((visibility("default")))
-#         define VLC_PRIVATE_API __attribute__((visibility("default")))
-#         define   VLC_EXPORT( type, name, args ) extern "C" __attribute__((visibility("default"))) type name args
-#         define VLC_INTERNAL( type, name, args ) extern "C" __attribute__((visibility("hidden"))) type name args
-#      else
-#         define VLC_PUBLIC_API
-#         define   VLC_EXPORT( type, name, args ) extern "C" type name args
-#         define VLC_INTERNAL( type, name, args ) extern "C" type name args
-#      endif
+#  ifdef __cplusplus
+#    if HAVE_ATTRIBUTE_VISIBILITY
+#      define VLC_PUBLIC_API __attribute__((visibility("default")))
+#      define VLC_PRIVATE_API __attribute__((visibility("default")))
+#      define   VLC_EXPORT( type, name, args ) extern "C" __attribute__((visibility("default"))) type name args
+#      define VLC_INTERNAL( type, name, args ) extern "C" __attribute__((visibility("hidden"))) type name args
 #    else
-#      if HAVE_ATTRIBUTE_VISIBILITY
-#         define VLC_PUBLIC_API extern __attribute__((visibility("default")))
-#         define VLC_PRIVATE_API extern __attribute__((visibility("default")))
-#         define   VLC_EXPORT( type, name, args ) __attribute__((visibility("default"))) type name args
-#         define VLC_INTERNAL( type, name, args ) __attribute__((visibility("hidden"))) type name args
-#      else
-#         define VLC_PUBLIC_API extern 
-#         define VLC_PRIVATE_API extern
-#         define   VLC_EXPORT( type, name, args ) type name args
-#         define VLC_INTERNAL( type, name, args ) type name args
-#      endif
+#      define VLC_PUBLIC_API
+#      define   VLC_EXPORT( type, name, args ) extern "C" type name args
+#      define VLC_INTERNAL( type, name, args ) extern "C" type name args
 #    endif
 #  else
-#    define VLC_PUBLIC_API 
-#    define VLC_PRIVATE_API 
-#    define   VLC_EXPORT( type, name, args ) struct _u_n_u_s_e_d_
-#    define VLC_INTERNAL( type, name, args ) struct _u_n_u_s_e_d_
-     extern module_symbols_t* p_symbols;
+#    if HAVE_ATTRIBUTE_VISIBILITY
+#      define VLC_PUBLIC_API extern __attribute__((visibility("default")))
+#      define VLC_PRIVATE_API extern __attribute__((visibility("default")))
+#      define   VLC_EXPORT( type, name, args ) __attribute__((visibility("default"))) type name args
+#      define VLC_INTERNAL( type, name, args ) __attribute__((visibility("hidden"))) type name args
+#    else
+#      define VLC_PUBLIC_API extern 
+#      define VLC_PRIVATE_API extern
+#      define   VLC_EXPORT( type, name, args ) type name args
+#      define VLC_INTERNAL( type, name, args ) type name args
+#    endif
 #  endif
 #endif
 
@@ -1180,7 +1172,7 @@ VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-#if defined (WIN32) || !defined (HAVE_SHARED_LIBVLC)
+#ifdef WIN32
 VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 #endif
 
@@ -1196,7 +1188,7 @@ VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 #       include <libintl.h>
 #   endif
 #   undef _
-#   if defined (WIN32) || !defined (HAVE_SHARED_LIBVLC)
+#   ifdef WIN32
 #       define _(String) vlc_dgettext (PACKAGE_NAME, String)
 #   else
 #       define _(String) dgettext(PACKAGE_NAME, String)
