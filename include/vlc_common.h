@@ -1016,7 +1016,6 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
     VLC_INTERNAL( void, vlc_seekdir, ( void *, long ) );
     VLC_INTERNAL( long, vlc_telldir, ( void * ) );
 #else
-    struct dirent;  /* forward declaration for vlc_symbols.h */
 #   if !defined(__PLUGIN__)
 #       define vlc_opendir  NULL
 #       define vlc_readdir  NULL
@@ -1222,12 +1221,6 @@ VLC_EXPORT( const char *, VLC_Changeset, ( void ) );
 /*****************************************************************************
  * Additional vlc stuff
  *****************************************************************************/
-#ifndef HAVE_SHARED_LIBVLC
-#   ifdef HAVE_DIRENT_H
-#   include <dirent.h>  /* for DIR typedef in vlc_symbols.h */
-#   endif
-#   include "vlc_symbols.h"
-#endif
 #include "vlc_os_specific.h"
 #include "vlc_messages.h"
 #include "vlc_variables.h"

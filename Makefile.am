@@ -21,7 +21,6 @@ EXTRA_DIST = \
 	README.MacOSX.rtf \
 	bootstrap \
 	toolbox \
-	vlc-api.pl \
 	vlc-config.in.in \
 	vlc.fedora.spec \
 	vlc.mandriva.spec \
@@ -1029,7 +1028,7 @@ update-po:
 	  echo "" ; \
 	  echo "# main sources" ; \
 	  find include src -name '*.[chm]' -o -name '*.[ch]pp' \
-	    | grep -v '\(vlc_symbols\|misc/modules_\|src/misc/revision.c\|modules/builtin.h\)' \
+	    | grep -v '\(misc/modules_\|src/misc/revision.c\|modules/builtin.h\)' \
 	    | sort ; \
 	  echo "" ; \
 	  echo "# modules" ; \
@@ -1058,7 +1057,7 @@ stamp-builtin: FORCE
 ###############################################################################
 # Enforce Mac OS X deployment target environment variable
 ###############################################################################
-macosx-sdk: Makefile.in $(HEADERS_include) vlc-config vlc-api.pl
+macosx-sdk: Makefile.in $(HEADERS_include) vlc-config
 	export MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET)
 
 ###############################################################################
