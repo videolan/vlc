@@ -32,8 +32,8 @@ jvlc$(LIBEXT): $(libjvlc_a_OBJECTS) \
                       $(libjvlc_a_DEPENDENCIES)
 		  $(CXXLINK) $(libjvlc_a_OBJECTS) -Wl,--kill-at \
 		        $(srcdir)/libjvlc.def \
-		        $(LIBRARIES_libvlc) -shared $(LIBRARIES_libvlc) $(LIBJINCLUDES) $(LDFLAGS_jvlc) \
-		        $(INCLUDED_LIBINTL)
+		        $(LIBRARIES_libvlc) -shared $(LIBRARIES_libvlc) $(LIBJINCLUDES) \
+				$(LDFLAGS_jvlc) $(LTLIBINTL)
 # Cygwin work-around, copied by other makefiles
 			@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
 

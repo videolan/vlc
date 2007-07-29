@@ -105,7 +105,7 @@ endif
 
 libvlc_la_SOURCES = $(SOURCES_libvlc)
 nodist_libvlc_la_SOURCES = misc/revision.c
-libvlc_la_LIBADD = $(INCLUDED_LIBINTL)
+libvlc_la_LIBADD = $(LTLIBINTL)
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`

@@ -366,19 +366,9 @@ AM_GNU_GETTEXT
 AS_IF([test "${nls_cv_force_use_gnu_gettext}" = "yes"], [
   AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, [Define if we use the local libintl])
   AM_CPPFLAGS="${AM_CPPFLAGS} -I\$(top_builddir)/intl"
-  AS_IF([test "${enable_libtool}" != "no"], [
-    INCLUDED_LIBINTL="${LTLIBINTL}"
-  ],[
-    INCLUDED_LIBINTL="${LIBINTL}"
-  ])
 ], [
-  AS_IF([test "${enable_libtool}" != "no"], [
-    VLC_ADD_LDFLAGS([libvlc vlc], [${LTLIBINTL}])
-  ], [
-    VLC_ADD_LDFLAGS([libvlc vlc], [${LIBINTL}])
-  ])
+  VLC_ADD_LDFLAGS([libvlc vlc], [${LTLIBINTL}])
 ])
-AC_SUBST(INCLUDED_LIBINTL)
 
 dnl
 dnl Iconv stuff
