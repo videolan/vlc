@@ -465,6 +465,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [self manageVolumeSlider];
     [o_window setDelegate: self];
     
+    b_restore_size = false;
     if( [o_window frame].size.height <= 200 )
     {
         b_small_window = YES;
@@ -1986,6 +1987,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     /*First, check if the playlist is visible*/
     if( o_rect.size.height <= 200 )
     {
+        o_restore_rect = o_rect;
+        b_restore_size = true;
         b_small_window = YES; /* we know we are small, make sure this is actually set (see case below) */
         /* make large */
         if ( o_size_with_playlist.height > 200 )
@@ -2007,10 +2010,20 @@ static VLCMain *_o_sharedMainInstance = nil;
         o_rect.origin.x = [o_window frame].origin.x;
         o_rect.origin.y = [o_window frame].origin.y - o_rect.size.height +
                                                 [o_window minSize].height;
+
+        NSRect screenRect = [[o_window screen] visibleFrame];
+        if ( !NSContainsRect( screenRect, o_rect ) ) {
+            if ( NSMaxX(o_rect) > NSMaxX(screenRect) )
+                o_rect.origin.x = ( NSMaxX(screenRect) - o_rect.size.width );
+            if ( NSMinY(o_rect) < NSMinY(screenRect) )
+                o_rect.origin.y = ( NSMinY(screenRect) );
+        }
+
         [o_btn_playlist setState: YES];
     }
     else
     {
+        NSSize curSize = o_rect.size;
         /* make small */
         o_rect.size.height = [o_window minSize].height;
         o_rect.size.width = [o_window minSize].width;
@@ -2018,6 +2031,9 @@ static VLCMain *_o_sharedMainInstance = nil;
         /* Calculate the position of the lower right corner after resize */
         o_rect.origin.y = [o_window frame].origin.y +
             [o_window frame].size.height - [o_window minSize].height;
+
+        if ( b_restore_size ) 
+            o_rect = o_restore_rect;
 
         [o_playlist_view setAutoresizesSubviews: NO];
         [o_playlist_view removeFromSuperview];
@@ -2060,6 +2076,11 @@ static VLCMain *_o_sharedMainInstance = nil;
         return NSMakeSize( proposedFrameSize.width, [o_window minSize].height);
     }
     return proposedFrameSize;
+}
+
+- (void)windowDidMove:(NSNotification *)notif
+{
+    b_restore_size = false;
 }
 
 - (void)windowDidResize:(NSNotification *)notif

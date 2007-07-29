@@ -283,6 +283,9 @@ struct intf_sys_t
 
     bool b_small_window;
 
+    bool b_restore_size;
+    NSRect o_restore_rect;
+
     mtime_t i_end_scroll;
 
     NSSize o_size_with_playlist;
