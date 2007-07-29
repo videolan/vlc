@@ -5913,7 +5913,6 @@ AS_IF([${plugin_support}], [
 dnl
 dnl Pic and shared libvlc stuff
 dnl
-AC_DEFINE(HAVE_SHARED_LIBVLC, 1, [Define to 1 if libvlc is built as a shared library.])
 VLC_ADD_PLUGINS([${BUILTINS}])
 AS_IF([test "${SYS}" = "mingw32"], [
   FILE_LIBVLC_DLL="!define LIBVLC_DLL libvlc.dll"
