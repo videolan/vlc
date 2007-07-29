@@ -318,6 +318,8 @@ EOF
   done
 done
 
+printf "\n"
+
 cat >> m4/private.m4 << EOF
 BLAH
 ])
