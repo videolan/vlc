@@ -5,13 +5,10 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 NULL =
-SUBDIRS =
-
 EXTRA_DIST = extras/COPYING modules/builtin.h.in libvlc.sym
 
 BUILT_SOURCES = modules/builtin.h misc/revision.c
 CLEANFILES = $(BUILT_SOURCES)
-MOSTLYCLEANFILES = 
 
 TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
 
@@ -78,7 +75,6 @@ HEADERS_include = \
 	../include/vlc_playlist.h \
 	../include/vlc_stream.h \
 	../include/vlc_strings.h \
-	../include/vlc_symbols.h \
 	../include/vlc_threads_funcs.h \
 	../include/vlc_threads.h \
 	../include/vlc_update.h \
@@ -300,17 +296,6 @@ SOURCES_libvlc_control = \
 ###############################################################################
 # Stamp rules
 ###############################################################################
-
-if !USE_LIBTOOL
-if !HAVE_WIN32
-stamp-api: Makefile.in $(HEADERS_include) ../vlc-api.pl
-	( cd $(srcdir) && cat $(HEADERS_include) ) | \
-	  top_srcdir="$(top_srcdir)" perl $(top_srcdir)/vlc-api.pl
-	touch stamp-api
-
-CLEANFILES += stamp-api
-endif
-endif
 
 misc/revision.c:
 	rm -f $@ $@.tmp
