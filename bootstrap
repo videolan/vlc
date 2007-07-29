@@ -226,12 +226,7 @@ LTLIBVLC = -L\$(top_builddir)/src -lvlc
 AM_LDFLAGS = -rpath '\$(libvlcdir)' -avoid-version \\
 	-module -no-undefined -shrext \$(LIBEXT) \\
 	-export-symbol-regex ^\$(VLC_ENTRY)\$\$
-
-if USE_LIBTOOL
 AM_LIBADD = \$(LTLIBVLC)
-else
-LIBVLC = -l\$(top_builddir) -lvlc
-endif
 
 all: all-modules
 
@@ -240,18 +235,10 @@ nice:
 
 # Find out which modules were enabled and tell make to build them
 all-modules:
-if USE_LIBTOOL
 	@set fnord \$\$MAKEFLAGS; amf=\$\$2; targets=\`\\
 	z=\$\$(\$(VLC_CONFIG) --list plugin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin.la;; esac; done; \\
 	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
 	test -z "\$\$fail"
-else
-	@set fnord \$\$MAKEFLAGS; amf=\$\$2; targets=\`\\
-	z=\$\$(\$(VLC_CONFIG) --list plugin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin\$(LIBEXT);; esac; done; \\
-	z=\$\$(\$(VLC_CONFIG) --list builtin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}.a;; esac; done; \\
-	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
-	test -z "\$\$fail"
-endif
 
 # Build a plugin with the adequate linker and linker's flags
 _plugin.la_plugin\$(LIBEXT):
@@ -272,53 +259,25 @@ if MAINTAINER_MODE
 endif
 
 mostlyclean-local:
-	-rm -f *.la
-if !USE_LIBTOOL
-	-rm -f *\$(LIBEXT)
-endif
+	-rm -f -- *.la
 
 ### automake creates libvlcdir after running install-*-local
 ### so we have to create it ourselves first
 install-exec-local: all-modules
-if USE_LIBTOOL
 	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
 	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
 	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
 	  test -z "\$\$m" || \
   	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" install-libvlcLTLIBRARIES || exit \$\$? ; \
 	fi
-else
-	mkdir -p -- "\$(DESTDIR)\$(libvlcdir)"
-	@z=\$\$(\$(VLC_CONFIG) --list plugin); \
-	for mod in \$(mods); do \
-	  case "\$\$z " \
-	    in *\ \$\${mod}\ *) \
-	      echo \$(INSTALL_PROGRAM) "lib\$\${mod}_plugin\$(LIBEXT)" "\$(DESTDIR)\$(libvlcdir)/" ; \
-	      \$(INSTALL_PROGRAM) "lib\$\${mod}_plugin\$(LIBEXT)" "\$(DESTDIR)\$(libvlcdir)/" || exit \$\$?; \
-	      ;; \
-	  esac; \
-	done
-endif
 
 uninstall-local:
-if USE_LIBTOOL
 	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
 	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
 	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
 	  test -z "\$\$m" || \
 	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" uninstall-libvlcLTLIBRARIES || exit \$\$?; \
 	fi
-else
-	@z=\$\$(\$(VLC_CONFIG) --list plugin); \
-	for mod in \$(mods); do \
-	  case "\$\$z " \
-	    in *\ \$\${mod}\ *) \
-	      echo rm -f "\$(DESTDIR)\$(libvlcdir)/lib\$\${mod}_plugin\$(LIBEXT)" ; \
-	      rm -f "\$(DESTDIR)\$(libvlcdir)/lib\$\${mod}_plugin\$(LIBEXT)" || true; \
-	      ;; \
-	  esac; \
-	done
-endif
 
 EOF
   for mod in $mods

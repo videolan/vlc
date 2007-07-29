@@ -307,10 +307,8 @@ misc/revision.c:
 ###############################################################################
 # Unit/regression test
 ###############################################################################
-if USE_LIBTOOL
 check_PROGRAMS = test_i18n_atof test_url test_utf8
 TESTS = $(check_PROGRAMS)
-endif
 
 CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
 

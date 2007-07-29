@@ -138,13 +138,8 @@ endif
 
 noinst_LIBRARIES_mozilla = libnpvlc.a
 
-if USE_LIBTOOL
 # FIXME: name is incorrect on Win32 & Darwin
 npvlc_LTLIBRARIES = libvlcplugin.la
-else
-npvlc_DATA = $(npvlc)
-EXTRA_LIBRARIES = libnpvlc.a
-endif
 endif
 
 if HAVE_WIN32

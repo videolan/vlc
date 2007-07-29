@@ -269,26 +269,11 @@ endif
 
 vlc_DEPENDENCIES = src/$(LIB_libvlc) $(DATA_win32_rc)
 
-vlc_LDADD = $(DATA_win32_rc) $(LIBVLC)
+vlc_LDADD = $(DATA_win32_rc) $(LIBVLC) $(LTLIBINTL)
 
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
-if USE_LIBTOOL
 LIB_libvlc = libvlc.la
 LIBVLC = src/$(LIB_libvlc)
-vlc_LDFLAGS =
-else
-if HAVE_WIN32
-vlc_LDFLAGS = -L$(top_builddir)/src -lvlc `$(VLC_CONFIG) --libs vlc`
-LIB_libvlc = libvlc.dll.a
-LIBVLC =
-else
-vlc_LDFLAGS = $(vlc_WORKAROUNDLFDLAGS) `$(VLC_CONFIG) --libs vlc builtin`
-LIB_libvlc = libvlc.a
-LIBVLC = src/$(LIB_libvlc)
-vlc_DEPENDENCIES += stamp-builtin
-endif
-vlc_LDADD += $(INCLUDED_LIBINTL)
-endif
 
 # Shortcut for developpers to rebuild the core (libvlc + vlc)
 # Don't use it if you don't know what it is about.
@@ -310,7 +295,7 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_DEPENDENCIES)
 	  objc) cmd="$(OBJCLINK)" ;; \
 	  c|*) cmd="$(LINK)" ;; \
 	esac ; \
-	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS)" ; \
+	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDADD)" ; \
 	echo $$cmd ; \
 	eval $$cmd
 

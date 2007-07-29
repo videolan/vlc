@@ -336,7 +336,6 @@ AC_ARG_ENABLE(libtool,
 AS_IF([test "x{enable_libtool}" = "xno"], [
 	AC_MSG_WARN([Disabling libtool is strongly discouraged. There are known bugs.])
 ])
-AM_CONDITIONAL(USE_LIBTOOL, [test "x${enable_libtool}" != "xno"] )
 
 lt_cv_deplibs_check_method=pass_all
 
