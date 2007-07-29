@@ -419,6 +419,7 @@ fi
 
 # Do the rest
 ${autopoint} -f
+rm -f po/Makevars.template
 ${aclocal} ${ACLOCAL_ARGS}
 ${autoconf}
 ${autoheader}
