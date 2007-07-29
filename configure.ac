@@ -5448,11 +5448,7 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     AS_IF([test "${SYS}" = "mingw32"], [
       dnl pkg-config --libs gnutls omits these
       VLC_ADD_LDFLAGS([gnutls], [-lz])
-      AS_IF([test "${enable_libtool}" != "no"], [
-        VLC_ADD_LDFLAGS([gnutls], [${LTLIBINTL}])
-      ], [
-        VLC_ADD_LDFLAGS([gnutls], [${LIBINTL}])
-      ])
+      VLC_ADD_LDFLAGS([gnutls], [${LTLIBINTL}])
     ])
     AC_CHECK_LIB([gcrypt], [gcry_control], [
       VLC_ADD_LDFLAGS([gnutls], [-lgcrypt -lgpg-error])
