@@ -331,12 +331,6 @@ AC_PROG_LIBTOOL
 m4_undefine([AC_DEPLIBS_CHECK_METHOD])
 m4_defun([AC_DEPLIBS_CHECK_METHOD],[])
 
-AC_ARG_ENABLE(libtool,
-    [  --enable-libtool        use libtool (default enabled)])
-AS_IF([test "x{enable_libtool}" = "xno"], [
-	AC_MSG_WARN([Disabling libtool is strongly discouraged. There are known bugs.])
-])
-
 lt_cv_deplibs_check_method=pass_all
 
 
@@ -434,24 +428,6 @@ VLC_LIBRARY_SUFFIX
 
 VLC_SYMBOL_PREFIX
 AC_SUBST(SYMPREF)
-
-AS_IF([test "${enable_libtool}" = "no"], [
-case "${SYS}" in
-  mingw32|cygwin)
-    VLC_ADD_CFLAGS([pic plugin mozilla activex],[${CFLAGS_mingw32_special}])
-    VLC_ADD_CXXFLAGS([pic plugin mozilla activex],[${CFLAGS_mingw32_special} ${CXXFLAGS_mingw32_special}])
-    VLC_ADD_OBJCFLAGS([pic plugin mozilla activex],[${CFLAGS_mingw32_special}])
-    ;;
-  mingwce)
-    ;;
-  *)
-    VLC_ADD_CFLAGS([pic plugin mozilla],[-fpic -fPIC])
-    VLC_ADD_CXXFLAGS([pic plugin mozilla],[-fpic -fPIC])
-    VLC_ADD_OBJCFLAGS([pic plugin mozilla],[-fpic -fPIC])
-    VLC_ADD_LDFLAGS([plugin mozilla],[-fpic -fPIC])
-    ;;
-esac
-])
 
 dnl The -DSYS_FOO flag
 CPPFLAGS_save="${CPPFLAGS_save} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"; CPPFLAGS="${CPPFLAGS_save}"
@@ -1094,14 +1070,14 @@ dnl     CXXFLAGS="${CXXFLAGS_save}"
 dnl AC_LANG_POP(C++)
 
 dnl Check for -mdynamic-no-pic
-AC_CACHE_CHECK([if \$CC accepts -mdynamic-no-pic],
-    [ac_cv_c_dynamic_no_pic],
-    [CFLAGS="${CFLAGS_save} -mdynamic-no-pic"
-     AC_TRY_COMPILE([],,ac_cv_c_dynamic_no_pic=yes, ac_cv_c_dynamic_no_pic=no)])
-AS_IF([test "${enable_libtool}" = "no" && test "${ac_cv_c_dynamic_no_pic}" != "no"], [
-    VLC_ADD_CFLAGS([builtin],[-mdynamic-no-pic])
-    VLC_ADD_CFLAGS([libvlc],[-mdynamic-no-pic])
-])
+dnl AC_CACHE_CHECK([if \$CC accepts -mdynamic-no-pic],
+dnl     [ac_cv_c_dynamic_no_pic],
+dnl     [CFLAGS="${CFLAGS_save} -mdynamic-no-pic"
+dnl      AC_TRY_COMPILE([],,ac_cv_c_dynamic_no_pic=yes, ac_cv_c_dynamic_no_pic=no)])
+dnl AS_IF([test "${ac_cv_c_dynamic_no_pic}" != "no"], [
+dnl     VLC_ADD_CFLAGS([builtin],[-mdynamic-no-pic])
+dnl     VLC_ADD_CFLAGS([libvlc],[-mdynamic-no-pic])
+dnl ])
 
 dnl Check for Darwin plugin linking flags
 AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error],
@@ -1114,19 +1090,17 @@ fi
 
 dnl Check for standard plugin linking flags
 dnl BeOS' gcc needs -nostart instead of -shared, even if -shared isn't harmful (just a warning)
-AS_IF([test "${enable_libtool}" = "no"], [
-  AS_IF([test "${SYS}" = "beos"], [
-    VLC_ADD_LDFLAGS([plugin mozilla],[-nostart])
-  ], [
-    AC_CACHE_CHECK([if \$CC accepts -shared],
-          [ac_cv_ld_plugins],
-          [CFLAGS="${CFLAGS_save} -shared"
-         AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
-    AS_IF([test "${ac_cv_ld_plugins}" != "no"], [
-      VLC_ADD_LDFLAGS([plugin mozilla],[-shared])
-    ])
-  ])
-])
+dnl AS_IF([test "${SYS}" = "beos"], [
+dnl   VLC_ADD_LDFLAGS([plugin mozilla],[-nostart])
+dnl ], [
+dnl   AC_CACHE_CHECK([if \$CC accepts -shared],
+dnl         [ac_cv_ld_plugins],
+dnl         [CFLAGS="${CFLAGS_save} -shared"
+dnl        AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
+dnl   AS_IF([test "${ac_cv_ld_plugins}" != "no"], [
+dnl     VLC_ADD_LDFLAGS([plugin mozilla],[-shared])
+dnl   ])
+dnl ])
 
 dnl Check for variadic macros
 AC_CACHE_CHECK([for variadic cpp macros],
@@ -5939,18 +5913,12 @@ AS_IF([${plugin_support}], [
 dnl
 dnl Pic and shared libvlc stuff
 dnl
-AS_IF([test "${enable_libtool}" != "no"], [
-  AC_DEFINE(HAVE_SHARED_LIBVLC, 1, [Define to 1 if libvlc is built as a shared library.])
-  VLC_ADD_PLUGINS([${BUILTINS}])
-  AS_IF([test "${SYS}" = "mingw32"], [
-    FILE_LIBVLC_DLL="!define LIBVLC_DLL libvlc.dll"
-  ])
-  BUILTINS=""
-], [
-  LDFLAGS_vlc="${LDFLAGS_vlc} ${LDFLAGS_libvlc}"
-  FILE_LIBVLC_DLL=""
-  VLC_ADD_CPPFLAGS([libvlc],[-DDLL_EXPORT])
+AC_DEFINE(HAVE_SHARED_LIBVLC, 1, [Define to 1 if libvlc is built as a shared library.])
+VLC_ADD_PLUGINS([${BUILTINS}])
+AS_IF([test "${SYS}" = "mingw32"], [
+  FILE_LIBVLC_DLL="!define LIBVLC_DLL libvlc.dll"
 ])
+BUILTINS=""
 
 dnl
 dnl  Stuff used by the program
