@@ -602,7 +602,7 @@ int vlc_scandir( const char *name, struct dirent ***namelist,
 }
 #endif
 
-#if defined (WIN32) || !defined (HAVE_SHARED_LIBVLC)
+#ifdef WIN32
 /*****************************************************************************
  * dgettext: gettext for plugins.
  *****************************************************************************/

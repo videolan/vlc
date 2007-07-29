@@ -196,13 +196,6 @@ void __module_InitBank( vlc_object_t *p_this )
     p_bank->b_cache = p_bank->b_cache_dirty =
         p_bank->b_cache_delete = VLC_FALSE;
 
-    /*
-     * Store the symbols to be exported
-     */
-#if defined (HAVE_DYNAMIC_PLUGINS) && !defined (HAVE_SHARED_LIBVLC)
-    STORE_SYMBOLS( &p_bank->symbols );
-#endif
-
     /* Everything worked, attach the object */
     p_libvlc_global->p_module_bank = p_bank;
     vlc_object_attach( p_bank, p_libvlc_global );
@@ -2207,9 +2200,6 @@ static void CacheMerge( vlc_object_t *p_this, module_t *p_cache,
 
     p_cache->pf_activate = p_module->pf_activate;
     p_cache->pf_deactivate = p_module->pf_deactivate;
-#ifndef HAVE_SHARED_LIBVLC
-    p_cache->p_symbols = p_module->p_symbols;
-#endif
     p_cache->handle = p_module->handle;
 
     for( i_submodule = 0; i_submodule < p_module->i_children; i_submodule++ )
@@ -2218,9 +2208,6 @@ static void CacheMerge( vlc_object_t *p_this, module_t *p_cache,
         module_t *p_cchild = (module_t*)p_cache->pp_children[i_submodule];
         p_cchild->pf_activate = p_child->pf_activate;
         p_cchild->pf_deactivate = p_child->pf_deactivate;
-#ifndef HAVE_SHARED_LIBVLC
-        p_cchild->p_symbols = p_child->p_symbols;
-#endif
     }
 
     p_cache->b_loaded = VLC_TRUE;

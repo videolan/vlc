@@ -35,9 +35,6 @@ module_t *vlc_module_create (vlc_object_t *obj)
     if (module == NULL)
         return NULL;
 
-#ifndef HAVE_SHARED_LIBVLC
-    module->p_symbols = &vlc_global( obj )->p_module_bank->symbols;
-#endif
     module->b_reentrant = module->b_unloadable = VLC_TRUE;
     module->psz_object_name = module->psz_longname = default_name;
     module->pp_shortcuts[0] = default_name;
