@@ -267,7 +267,7 @@ if HAVE_WINCE
 vlc_WORKAROUNDLDFLAGS = $(LIBVLC)
 endif
 
-vlc_DEPENDENCIES = src/$(LIB_libvlc) $(DATA_win32_rc)
+vlc_DEPENDENCIES = $(LIBVLC) $(DATA_win32_rc)
 
 vlc_LDADD = $(DATA_win32_rc) $(LIBVLC) $(LTLIBINTL)
 
@@ -288,7 +288,7 @@ core: libvlc
 
 src/$(LIB_libvlc): libvlc
 
-vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_DEPENDENCIES)
+vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
 	@rm -f vlc$(EXEEXT)
 	@case `$(VLC_CONFIG) --linkage vlc builtin` in \
 	  c++) cmd="$(CXXLINK)" ;; \
