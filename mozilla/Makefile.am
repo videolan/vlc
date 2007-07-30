@@ -2,10 +2,8 @@
 # Building the Mozilla plugin
 ###############################################################################
 
-noinst_LIBRARIES = $(noinst_LIBRARIES_mozilla)
-
-MOSTLYCLEANFILES = $(npvlc_DATA)
-CLEANFILES = stamp-pic $(BUILT_SOURCES)
+MOSTLYCLEANFILES = 
+CLEANFILES = $(BUILT_SOURCES)
 EXTRA_DIST = $(DIST_sources) install.js npvlc_rc.rc vlc.r
 
 SOURCES_mozilla_common = \
@@ -23,24 +21,30 @@ SOURCES_mozilla_common = \
 DIST_sources = $(SOURCES_mozilla_common) \
 	support/npwin.cpp support/npmac.cpp support/npunix.c
 
-LIBRARIES_libvlc_pic = -L$(top_builddir)/src -lvlc
-LIBRARIES_libvlc_nopic = $(LIBRARIES_libvlc_pic)
-
 if BUILD_MOZILLA
+
+LIBRARIES_libvlc = $(top_builddir)/src/libvlc-control.la \
+				   $(top_builddir)/src/libvlc.la
+
+if HAVE_WIN32
 
 # Under Win32, Mozilla plugins need to be named NP******.DLL, but under Unix
 # the common naming scheme is lib******plugin.so. Also, we need npwin.cpp
 # under Win32 and npunix.c under Unix.
-if HAVE_WIN32
-
-LIBRARIES_libvlc = $(LIBRARIES_libvlc_nopic)
-npvlc = npvlc$(LIBEXT)
-npvlcdir = $(libdir)
-noinst_DATA = npvlc_rc.$(OBJEXT)
+#
+lib_LTLIBRARIES = npvlc.la
 
 SOURCES_support = support/npwin.cpp
 CPPFLAGS_mozilla_EXTRA = -DXP_WIN -DXP_WIN32
-LDFLAGS_npvlc = -shared -Wl,--kill-at $(LIBRARIES_libvlc)
+LDFLAGS_mozilla_EXTRA = -no-undefined -Wl,--kill-at -Wl,$(DATA_npvlc_rc)
+
+npvlc_la_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
+npvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags mozilla` $(CPPFLAGS_mozilla_extra)
+npvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla` $(CPPFLAGS_mozilla_extra)
+npvlc_la_DEPENDENCIES = $(DATA_npvlc_rc) $(LIBRARIES_libvlc)
+npvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs mozilla` -module -avoid-version \
+				   $(LDFLAGS_mozilla_EXTRA)
+npvlc_la_LIBADD = $(LIBRARIES_libvlc)
 
 DATA_npvlc_rc = $(noinst_npvlc_rc_DATA)
 noinst_npvlc_rc_DATA = npvlc_rc.$(OBJEXT)
@@ -54,12 +58,11 @@ npvlc_rc.$(OBJEXT): npvlc_rc.rc
 else
 if HAVE_DARWIN
 
-LIBRARIES_libvlc = $(LIBRARIES_libvlc_nopic)
-npvlc = npvlc$(LIBEXT)
-npvlcdir = $(libdir)
-noinst_DATA = npvlc.rsrc VLC\ Plugin.plugin
-MOSTLYCLEANFILES += npvlc.rsrc
-CLEANFILES += VLC\ Plugin.plugin
+#
+# MacOS X
+#
+
+lib_LTLIBRARIES = npvlc.la
 
 SOURCES_support = support/npmac.cpp
 CPPFLAGS_mozilla_EXTRA = -I. -I$(top_builddir) -I$(srcdir)/../include -c \
@@ -68,8 +71,20 @@ CPPFLAGS_mozilla_EXTRA = -I. -I$(top_builddir) -I$(srcdir)/../include -c \
 	-Wmost -Wno-four-char-constants -Wno-unknown-pragmas -DXP_MACOSX=1 \
 	-DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 \
 	-include mozilla-config.h
-LDFLAGS_npvlc = -bundle -read_only_relocs suppress \
-	$(LIBRARIES_libvlc) -dylib -headerpad_max_install_names 
+LDFLAGS_mozilla_EXTRA = -no-undefined -bundle -read_only_relocs suppress \
+	-dylib -headerpad_max_install_names -shrext $(LIBEXT)
+
+npvlc_la_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
+npvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags mozilla` $(CPPFLAGS_mozilla_EXTRA)
+npvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla` $(CPPFLAGS_mozilla_EXTRA) 
+npvlc_la_DEPENDENCIES = $(LIBRARIES_libvlc)
+npvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs mozilla` -module -avoid-version \
+				   $(LDFLAGS_mozilla_EXTRA)
+npvlc_la_LIBADD = $(LIBRARIES_libvlc)
+
+noinst_DATA = npvlc.rsrc VLC\ Plugin.plugin
+MOSTLYCLEANFILES += npvlc.rsrc
+CLEANFILES += VLC\ Plugin.plugin
 
 npvlc.rsrc: $(srcdir)/vlc.r
 	/Developer/Tools/Rez -useDF /Developer/Headers/FlatCarbon/Types.r $< -o $@
@@ -90,7 +105,7 @@ define FIXEXECPATH
 	}' | sh -x
 endef
 
-VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
+VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	rm -Rf "$@"
 	$(INSTALL) -d "./$@/Contents/MacOS"
 	$(INSTALL) npvlc.dylib "./$@/Contents/MacOS/VLC Plugin"
@@ -126,61 +141,23 @@ VLC\ Plugin.plugin: npvlc.rsrc npvlc.dylib
 
 else
 
-LIBRARIES_libvlc = -Wl,-rpath '$(libdir)' $(LIBRARIES_libvlc_pic)
+#
+# UNIX/Others platforms
+#
+
+npvlc_LTLIBRARIES = libvlcplugin.la
+
 npvlc = libvlcplugin$(LIBEXT)
 npvlcdir = $(libdir)/mozilla/plugins
 SOURCES_support = support/npunix.c
-noinst_DATA =
-
-LDFLAGS_npvlc = -shared $(LIBRARIES_libvlc)
-endif
-endif
-
-noinst_LIBRARIES_mozilla = libnpvlc.a
-
-# FIXME: name is incorrect on Win32 & Darwin
-npvlc_LTLIBRARIES = libvlcplugin.la
-endif
-
-if HAVE_WIN32
-pic =
-else
-pic = pic
-endif
 
 libvlcplugin_la_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
 libvlcplugin_la_CFLAGS = `$(VLC_CONFIG) --cflags mozilla`
 libvlcplugin_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla`
 libvlcplugin_la_LDFLAGS = `$(VLC_CONFIG) --libs mozilla` -module -avoid-version -shrext $(LIBEXT)
-libvlcplugin_la_LIBADD = ../src/libvlc-control.la
+libvlcplugin_la_LIBADD = $(LIBRARIES_libvlc)
 
-libnpvlc_a_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
-libnpvlc_a_CFLAGS = `$(VLC_CONFIG) --cflags mozilla pic` \
-	             $(CPPFLAGS_mozilla_EXTRA)
-libnpvlc_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla pic` \
-	               $(CPPFLAGS_mozilla_EXTRA)
-LDFLAGS_libnpvlc = $(LDFLAGS_npvlc) `$(VLC_CONFIG) --libs mozilla libvlc builtin pic`
-libnpvlc_a_DEPENDENCIES = $(DATA_npvlc_rc)
+endif
+endif
+endif
 
-$(npvlc): $(libnpvlc_a_OBJECTS) $(libnpvlc_a_DEPENDENCIES) stamp-pic
-	$(CXXLINK) $(libnpvlc_a_OBJECTS) $(DATA_npvlc_rc) \
-	 $(LDFLAGS_libnpvlc)
-# Cygwin work-around
-	@if test -f "$@.exe"; then mv -f "$@.exe" "$@"; fi
-
-###############################################################################
-# Stamp rules
-###############################################################################
-stamp-pic:
-	@for dep in "" `$(VLC_CONFIG) --target builtin pic`; do \
-	  if test "$${dep}" -nt "$(LIBRARIES_mozilla)"; then \
-	    rm -f $@; \
-	    break; \
-	  fi; \
-	done
-	@if test ! -f $@; then printf "" > $@; fi
-
-###############################################################################
-# Force rule
-###############################################################################
-.PHONY: stamp-pic
