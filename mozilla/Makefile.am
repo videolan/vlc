@@ -71,8 +71,8 @@ CPPFLAGS_mozilla_EXTRA = -I. -I$(top_builddir) -I$(srcdir)/../include -c \
 	-Wmost -Wno-four-char-constants -Wno-unknown-pragmas -DXP_MACOSX=1 \
 	-DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 \
 	-include mozilla-config.h
-LDFLAGS_mozilla_EXTRA = -no-undefined -bundle -read_only_relocs suppress \
-	-dylib -headerpad_max_install_names -shrext $(LIBEXT)
+LDFLAGS_mozilla_EXTRA = -no-undefined -bundle -Wl,-read_only_relocs -Wl,suppress \
+	-Wl,-headerpad_max_install_names -shrext $(LIBEXT) -framework Carbon
 
 npvlc_la_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
 npvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags mozilla` $(CPPFLAGS_mozilla_EXTRA)
@@ -108,7 +108,7 @@ endef
 VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	rm -Rf "$@"
 	$(INSTALL) -d "./$@/Contents/MacOS"
-	$(INSTALL) npvlc.dylib "./$@/Contents/MacOS/VLC Plugin"
+	$(INSTALL) .libs/npvlc.dylib "./$@/Contents/MacOS/VLC Plugin"
 	dylib="./$@/Contents/MacOS/VLC Plugin"; $(FIXEXECPATH) ;
 	$(INSTALL) -d "./$@/Contents/Resources"
 	$(INSTALL) npvlc.rsrc "./$@/Contents/Resources/VLC Plugin.rsrc"

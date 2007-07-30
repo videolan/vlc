@@ -353,6 +353,8 @@ VLC_AddIntf
 VLC_CleanUp
 VLC_Destroy
 VLC_Die
+VLC_VariableGet
+VLC_VariableSet
 __vlc_cond_destroy
 __vlc_cond_init
 vlc_current_object
