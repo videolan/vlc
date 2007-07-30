@@ -242,7 +242,8 @@ case "${host_os}" in
     if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
         VLC_ADD_LDFLAGS([libvlc],[-lws2_32 -lnetapi32 -lwinmm])
-        VLC_ADD_LDFLAGS([vlc activex mozilla],[-mwindows])
+        VLC_ADD_LDFLAGS([vlc],[-mwindows])
+        VLC_ADD_LDFLAGS([activex mozilla],[-lgdi32])
         VLC_ADD_LDFLAGS([cdda vcdx cddax sdl_image],[-lwinmm])
         VLC_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp access_output_udp access_output_shout sap slp http stream_out_standard stream_out_rtp vod_rtsp access_realrtsp telnet rc netsync gnutls growl flac ts audioscrobbler],[-lws2_32])
     fi
@@ -5555,7 +5556,7 @@ then
       [AC_CHECK_HEADERS(olectl.h,
         [ VLC_ADD_CPPFLAGS([activex],[-DUNICODE -D_UNICODE -D_MIDL_USE_GUIDDEF_])
           VLC_ADD_CXXFLAGS([activex],[-fno-exceptions])
-          VLC_ADD_LDFLAGS([activex],[-lole32 -loleaut32 -luuid -lshlwapi -lgdi32]) 
+          VLC_ADD_LDFLAGS([activex],[-lole32 -loleaut32 -luuid -lshlwapi]) 
           AC_CHECK_HEADERS(objsafe.h,
             VLC_ADD_CXXFLAGS([activex],[-DHAVE_OBJSAFE_HEADER]),,
             [
@@ -5743,7 +5744,7 @@ then
         dnl latest gecko sdk does not have embedstring
         if test -d "${real_mozilla_sdk}/embedstring/bin"
         then
-          VLC_ADD_LDFLAGS([mozilla],[-lembedstring -Wl,--kill-at])
+          VLC_ADD_LDFLAGS([mozilla],[-lembedstring])
         fi
       fi
     fi
