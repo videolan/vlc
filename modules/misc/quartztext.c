@@ -4,7 +4,7 @@
  * Copyright (C) 2007 the VideoLAN team
  * $Id$
  *
- * Authors: Bernie Purcell <b dot purcell at adbglobal dot com>
+ * Authors: Bernie Purcell <bitmap@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 #include <vlc_filter.h>
 #include <vlc_stream.h>
 #include <vlc_xml.h>
+#include <vlc_input.h>
 
 #include <math.h>
 
@@ -51,6 +52,8 @@
 //////////////////////////////////////////////////////////////////////////////
 static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
+
+static int LoadFontsFromAttachments( filter_t *p_filter );
 
 static int RenderText( filter_t *, subpicture_region_t *,
                        subpicture_region_t * );
@@ -118,6 +121,9 @@ struct filter_sys_t
     uint8_t        i_font_opacity;
     int            i_font_color;
     int            i_font_size;
+
+    ATSFontContainerRef    *p_fonts;
+    int                     i_fonts;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -145,6 +151,11 @@ static int Create( vlc_object_t *p_this )
     p_filter->pf_render_text = RenderText;
     p_filter->pf_render_html = RenderHtml;
 
+    p_sys->p_fonts = NULL;
+    p_sys->i_fonts = 0;
+
+    LoadFontsFromAttachments( p_filter );
+
     return VLC_SUCCESS;
 }
 
@@ -158,8 +169,78 @@ static void Destroy( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    free( p_sys->psz_font_name );
+    if( p_sys->p_fonts )
+    {
+        int   k;
+
+        for( k = 0; k < p_sys->i_fonts; k++ )
+        {
+            ATSFontDeactivate( p_sys->p_fonts[k], NULL, kATSOptionFlagsDefault );
+        }
+
+        free( p_sys->p_fonts );
+    }
+
+    if( p_sys->psz_font_name ) free( p_sys->psz_font_name );
+
     free( p_sys );
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Make any TTF/OTF fonts present in the attachments of the media file
+// available to the Quartz engine for text rendering
+//////////////////////////////////////////////////////////////////////////////
+static int LoadFontsFromAttachments( filter_t *p_filter )
+{
+    filter_sys_t         *p_sys = p_filter->p_sys;
+    input_thread_t       *p_input;
+    input_attachment_t  **pp_attachments;
+    int                   i_attachments_cnt;
+    int                   k;
+    int                   rv = VLC_SUCCESS;
+
+    p_input = (input_thread_t *)vlc_object_find( p_filter, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( ! p_input )
+        return VLC_EGENERIC;
+    
+    if( VLC_SUCCESS != input_Control( p_input, INPUT_GET_ATTACHMENTS, &pp_attachments, &i_attachments_cnt ))
+        return VLC_EGENERIC;
+
+    p_sys->i_fonts = 0;
+    p_sys->p_fonts = malloc( i_attachments_cnt * sizeof( ATSFontContainerRef ) );
+    if(! p_sys->p_fonts )
+        rv = VLC_ENOMEM;
+
+    for( k = 0; k < i_attachments_cnt; k++ )
+    {
+        input_attachment_t *p_attach = pp_attachments[k];
+
+        if( p_sys->p_fonts )
+        {
+            if(( !strcmp( p_attach->psz_mime, "application/x-truetype-font" ) || // TTF
+                 !strcmp( p_attach->psz_mime, "application/x-font-otf" ) ) &&    // OTF
+               ( p_attach->i_data > 0 ) &&
+               ( p_attach->p_data != NULL ) )
+            {
+                ATSFontContainerRef  container;
+
+                if( noErr == ATSFontActivateFromMemory( p_attach->p_data,
+                                                        p_attach->i_data,
+                                                        kATSFontContextLocal,
+                                                        kATSFontFormatUnspecified,
+                                                        NULL,
+                                                        kATSOptionFlagsDefault,
+                                                        &container ))
+                {
+                    p_sys->p_fonts[ p_sys->i_fonts++ ] = container;
+                }
+            }
+        }
+        vlc_input_attachment_Delete( p_attach );
+    }
+    free( pp_attachments );        
+
+    return rv;
 }
 
 #if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_4
