@@ -99,3 +99,6 @@
 
 /* Palettized YUV with palette element Y:U:V:A */
 #define FOURCC_YUVP         VLC_FOURCC('Y','U','V','P')
+
+/* Planar 8-bit grayscale */
+#define FOURCC_GREY         VLC_FOURCC('G','R','E','Y')

@@ -573,7 +573,6 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
         case FOURCC_UYVY:
         case FOURCC_J422:
             p_format->i_bits_per_pixel = 16;
-            p_format->i_bits_per_pixel = 16;
             break;
         case FOURCC_I411:
         case FOURCC_YV12:
@@ -607,6 +606,11 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
         case FOURCC_RGB2:
             p_format->i_bits_per_pixel = 8;
             break;
+
+        case FOURCC_GREY:
+            p_format->i_bits_per_pixel = 8;
+            break;
+
         default:
             p_format->i_bits_per_pixel = 0;
             break;
@@ -829,6 +833,15 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->p->i_pitch = i_width_aligned * 4;
             p_pic->p->i_visible_pitch = i_width * 4;
             p_pic->p->i_pixel_pitch = 4;
+            p_pic->i_planes = 1;
+            break;
+
+        case FOURCC_GREY:
+            p_pic->p->i_lines = i_height_aligned;
+            p_pic->p->i_visible_lines = i_height;
+            p_pic->p->i_pitch = i_width_aligned;
+            p_pic->p->i_visible_pitch = i_width;
+            p_pic->p->i_pixel_pitch = 1;
             p_pic->i_planes = 1;
             break;
 
