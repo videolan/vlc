@@ -74,13 +74,13 @@ axvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags activex`
 axvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags activex`
 axvlc_la_DEPENDENCIES = axvlc.def $(DATA_axvlc_rc) $(LIBRARIES_libvlc)
 axvlc_la_LDFLAGS = $(srcdir)/axvlc.def -Wl,$(DATA_axvlc_rc) \
-    -no-undefined -avoid-version $(LIBRARIES_libvlc) \
-    `$(VLC_CONFIG) --libs activex libvlc` \
-	-module
+    -no-undefined -avoid-version -module \
+    `$(VLC_CONFIG) --libs activex libvlc`
+axvlc_la_LIBADD = $(LIBRARIES_libvlc)
 
 DATA_axvlc_rc = $(noinst_axvlc_rc_DATA)
 noinst_axvlc_rc_DATA = axvlc_rc.$(OBJEXT)
-noinst_axvlc_rcdir = $(libdir)
+noinst_axvlc_rcdir = 
 axvlc_rc.$(OBJEXT): axvlc_rc.rc inplace.bmp axvlc.tlb
 	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/[^0-9]*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(srcdir) -i $< -o $@
 

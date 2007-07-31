@@ -255,7 +255,6 @@ _plugin.la_plugin\$(LIBEXT):
 	esac ; \
 	echo \$\$ld \$< \$\$ldfl ; \
 	\$\$ld \$< \$\$ldfl
-	@if test -f "\$@.exe"; then mv -f -- "\$@.exe" "\$@"; fi
 
 if MAINTAINER_MODE
 \$(srcdir)/Makefile.am: \$(srcdir)/Modules.am \$(top_srcdir)/bootstrap
