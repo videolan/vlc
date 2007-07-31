@@ -224,8 +224,12 @@ include Modules.am
 LTLIBVLC = -L\$(top_builddir)/src -lvlc
 
 AM_LDFLAGS = -rpath '\$(libvlcdir)' -avoid-version \\
-	-module -no-undefined -shrext \$(LIBEXT) \\
-	-export-symbol-regex ^\$(VLC_ENTRY)\$\$
+	-module -no-undefined -shrext \$(LIBEXT) 
+if HAVE_COMPILER_EXPORT
+AM_LDFLAGS += -export-dynamic
+else
+AM_LDFLAGS += -export-symbol-regex ^\$(VLC_ENTRY)\$\$
+endif
 AM_LIBADD = \$(LTLIBVLC)
 
 all: all-modules
