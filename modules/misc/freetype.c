@@ -6,7 +6,7 @@
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
- *          Bernie Purcell <b dot purcell at adbglobal dot com>
+ *          Bernie Purcell <bitmap@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@
 #include <vlc_filter.h>
 #include <vlc_stream.h>
 #include <vlc_xml.h>
+#include <vlc_input.h>
 
 #include <math.h>
 
@@ -83,6 +84,8 @@ typedef struct line_desc_t line_desc_t;
  *****************************************************************************/
 static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
+
+static int LoadFontsFromAttachments( filter_t *p_filter );
 
 /* The RenderText call maps to pf_render_string, defined in vlc_filter.h */
 static int RenderText( filter_t *, subpicture_region_t *,
@@ -258,6 +261,9 @@ struct filter_sys_t
 #ifdef HAVE_FONTCONFIG
     FcConfig      *p_fontconfig;
 #endif
+
+    input_attachment_t **pp_font_attachments;
+    int                  i_font_attachments;
 };
 
 /*****************************************************************************
@@ -365,12 +371,19 @@ static int Create( vlc_object_t *p_this )
     if( SetFontSize( p_filter, 0 ) != VLC_SUCCESS ) goto error;
 
     if( psz_fontfile ) free( psz_fontfile );
+
+    p_sys->pp_font_attachments = NULL;
+    p_sys->i_font_attachments = 0;
+
     p_filter->pf_render_text = RenderText;
 #ifdef HAVE_FONTCONFIG
     p_filter->pf_render_html = RenderHtml;
 #else
     p_filter->pf_render_html = NULL;
 #endif
+
+    LoadFontsFromAttachments( p_filter );
+
     return VLC_SUCCESS;
 
  error:
@@ -391,6 +404,18 @@ static void Destroy( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    if( p_sys->pp_font_attachments )
+    {
+        int   k;
+
+        for( k = 0; k < p_sys->i_font_attachments; k++ )
+        {
+            vlc_input_attachment_Delete( p_sys->pp_font_attachments[k] );
+        }
+
+        free( p_sys->pp_font_attachments );
+    }
+
 #ifdef HAVE_FONTCONFIG
     FcConfigDestroy( p_sys->p_fontconfig );
     p_sys->p_fontconfig = NULL;
@@ -401,6 +426,59 @@ static void Destroy( vlc_object_t *p_this )
     FT_Done_Face( p_sys->p_face );
     FT_Done_FreeType( p_sys->p_library );
     free( p_sys );
+}
+
+/*****************************************************************************
+ * Make any TTF/OTF fonts present in the attachments of the media file
+ * and store them for later use by the FreeType Engine
+ *****************************************************************************/
+static int LoadFontsFromAttachments( filter_t *p_filter )
+{
+    filter_sys_t         *p_sys = p_filter->p_sys;
+    input_thread_t       *p_input;
+    input_attachment_t  **pp_attachments;
+    int                   i_attachments_cnt;
+    int                   k;
+    int                   rv = VLC_SUCCESS;
+
+    p_input = (input_thread_t *)vlc_object_find( p_filter, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( ! p_input )
+        return VLC_EGENERIC;
+    
+    if( VLC_SUCCESS != input_Control( p_input, INPUT_GET_ATTACHMENTS, &pp_attachments, &i_attachments_cnt ))
+        return VLC_EGENERIC;
+
+    p_sys->i_font_attachments = 0;
+    p_sys->pp_font_attachments = malloc( i_attachments_cnt * sizeof( input_attachment_t * ));
+    if(! p_sys->pp_font_attachments )
+        rv = VLC_ENOMEM;
+
+    for( k = 0; k < i_attachments_cnt; k++ )
+    {
+        input_attachment_t *p_attach = pp_attachments[k];
+
+        if( p_sys->pp_font_attachments )
+        {
+            if(( !strcmp( p_attach->psz_mime, "application/x-truetype-font" ) || // TTF
+                 !strcmp( p_attach->psz_mime, "application/x-font-otf" ) ) &&    // OTF
+               ( p_attach->i_data > 0 ) &&
+               ( p_attach->p_data != NULL ) )
+            {
+                p_sys->pp_font_attachments[ p_sys->i_font_attachments++ ] = p_attach;
+            }
+            else
+            {
+                vlc_input_attachment_Delete( p_attach );
+            }
+        }
+        else
+        {
+            vlc_input_attachment_Delete( p_attach );
+        }
+    }
+    free( pp_attachments );        
+
+    return rv;
 }
 
 /*****************************************************************************
@@ -1932,6 +2010,51 @@ static int ProcessNodes( filter_t *p_filter,
     return rv;
 }
 
+static int CheckForEmbeddedFont( filter_sys_t *p_sys, FT_Face *pp_face, ft_style_t *p_style )
+{
+    int k;
+
+    for( k=0; k < p_sys->i_font_attachments; k++ )
+    {
+        input_attachment_t *p_attach   = p_sys->pp_font_attachments[k];
+        int                 i_font_idx = 0;
+        FT_Face             p_face = NULL;
+
+        while( 0 == FT_New_Memory_Face( p_sys->p_library,
+                                        p_attach->p_data,
+                                        p_attach->i_data,
+                                        i_font_idx,
+                                        &p_face ))
+        {
+            if( p_face )
+            {
+                vlc_bool_t match = !strcasecmp( p_face->family_name,
+                                                p_style->psz_fontname );
+
+                if( p_face->style_flags & FT_STYLE_FLAG_BOLD )
+                    match = match && p_style->b_bold;
+                else
+                    match = match && !p_style->b_bold;
+
+                if( p_face->style_flags & FT_STYLE_FLAG_ITALIC )
+                    match = match && p_style->b_italic;
+                else
+                    match = match && !p_style->b_italic;
+
+                if(  match )
+                {
+                    *pp_face = p_face;
+                    return VLC_SUCCESS;
+                }
+                
+                FT_Done_Face( p_face );
+            }
+            i_font_idx++;
+        }
+    }
+    return VLC_EGENERIC;
+}
+
 static int ProcessLines( filter_t *p_filter,
                          uint32_t *psz_text,
                          int i_len,
@@ -2144,26 +2267,42 @@ static int ProcessLines( filter_t *p_filter,
             /* End of the current style run */
             FT_Face p_face = NULL;
             int      i_idx = 0;
-            char *psz_fontfile = FontConfig_Select( p_sys->p_fontconfig,
-                                                    p_style->psz_fontname,
-                                                    p_style->b_bold,
-                                                    p_style->b_italic,
-                                                    &i_idx );
-            if( psz_fontfile )
+
+            /* Look for a match amongst our attachments first */
+            CheckForEmbeddedFont( p_sys, &p_face, p_style );
+
+            if( ! p_face )
             {
-                if( FT_New_Face( p_sys->p_library,
-                            psz_fontfile ? psz_fontfile : "", i_idx, &p_face ) )
+                char *psz_fontfile = FontConfig_Select( p_sys->p_fontconfig,
+                                                        p_style->psz_fontname,
+                                                        p_style->b_bold,
+                                                        p_style->b_italic,
+                                                        &i_idx );
+                if( psz_fontfile )
                 {
-                    free( psz_fontfile );
-                    free( pp_char_styles );
+                    if( FT_New_Face( p_sys->p_library,
+                                psz_fontfile ? psz_fontfile : "", i_idx, &p_face ) )
+                    {
+                        free( psz_fontfile );
+                        free( pp_char_styles );
 #if defined(HAVE_FRIBIDI)
-                    free( psz_text );
+                        free( psz_text );
 #endif
-                    if( pi_karaoke_bar )
-                        free( pi_karaoke_bar );
-                    return VLC_EGENERIC;
+                        if( pi_karaoke_bar )
+                            free( pi_karaoke_bar );
+                        return VLC_EGENERIC;
+                    }
+                    free( psz_fontfile );
                 }
-                free( psz_fontfile );
+            }
+            if( p_face &&
+                FT_Select_Charmap( p_face, ft_encoding_unicode ) )
+            {
+                /* We've loaded a font face which is unhelpful for actually
+                 * rendering text - fallback to the default one.
+                 */
+                 FT_Done_Face( p_face );
+                 p_face = NULL;
             }
 
             if( FT_Select_Charmap( p_face ? p_face : p_sys->p_face,
