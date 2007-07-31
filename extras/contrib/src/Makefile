@@ -654,7 +654,7 @@ libvorbis-$(VORBIS_VERSION).tar.gz:
 
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p0 < Patches/libvorbis-1.1.patch
+	patch -p0 < Patches/libvorbis.patch
 	(cd $@; autoconf)
 
 .vorbis: libvorbis .ogg
