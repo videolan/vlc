@@ -286,7 +286,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
 
     /* Source Selector */
     selector = new PLSelector( this, p_intf, THEPL );
-    selector->setMaximumWidth( 130 );
     left->addWidget( selector );
 
     /* Art label */
@@ -324,7 +323,12 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
     addWidget( leftW );
     addWidget( rightPanel );
 
-    /* FIXME Sizing to do */
+    leftW->setMaximumWidth( 250 );
+    setCollapsible( 1, false );
+
+    QList<int> sizeList;
+    sizeList << 180 << 520 ;
+    setSizes( sizeList );
 }
 
 void PlaylistWidget::setArt( QString url )
