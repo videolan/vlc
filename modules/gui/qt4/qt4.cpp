@@ -92,7 +92,7 @@ vlc_module_begin();
                 ADVANCED_PREFS_LONGTEXT, VLC_FALSE );
         add_bool( "qt-system-tray", VLC_TRUE, NULL, SYSTRAY_TEXT,
                 SYSTRAY_LONGTEXT, VLC_FALSE);
-        add_bool( "qt-start-mininimized", VLC_FALSE, NULL, MINIMIZED_TEXT,
+        add_bool( "qt-start-minimized", VLC_FALSE, NULL, MINIMIZED_TEXT,
                 MINIMIZED_LONGTEXT, VLC_TRUE);
         add_bool( "qt-name-in-title", VLC_TRUE, NULL, TITLE_TEXT, 
                   TITLE_LONGTEXT, VLC_FALSE );
