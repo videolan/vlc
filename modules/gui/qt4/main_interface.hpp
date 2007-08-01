@@ -112,6 +112,7 @@ private:
     input_thread_t      *p_input;    ///< Main input associated to the playlist
 
     QLabel              *timeLabel;
+    QLabel              *speedLabel;
     QLabel              *nameLabel;
 
     void customEvent( QEvent *);

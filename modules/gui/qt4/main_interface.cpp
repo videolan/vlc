@@ -138,11 +138,14 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                              advControlsEnabled, visualSelectorEnabled );
 
     /* Status Bar */
-    timeLabel = new QLabel( 0 );
-    nameLabel = new QLabel( 0 );
+    timeLabel = new QLabel;
+    nameLabel = new QLabel;
+    speedLabel = new QLabel( "1.0x" );
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
-    statusBar()->addWidget( nameLabel, 4 );
-    statusBar()->addPermanentWidget( timeLabel, 1 );
+    speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
+    statusBar()->addWidget( nameLabel, 8 );
+    statusBar()->addPermanentWidget( speedLabel, 0 );
+    statusBar()->addPermanentWidget( timeLabel, 2 );
 
     /* Systray */
     sysTray = NULL;
