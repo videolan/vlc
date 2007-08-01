@@ -92,27 +92,29 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     need_components_update = false;
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
     embeddedPlaylistWasActive = videoIsActive = false;
-    bool b_createSystray = false;
 
+    bool b_createSystray = false;
     input_name = "";
 
     /**
-     *  Configuration
+     *  Configuration and settings
      **/
     settings = new QSettings( "VideoLAN", "VLC" );
     settings->beginGroup( "MainWindow" );
 
+    /* Main settings */
+    setFocusPolicy( Qt::StrongFocus );
+    setAcceptDrops(true);
     setWindowIcon( QApplication::windowIcon() );
 
     /* Set The Video In emebedded Mode or not */
     videoEmbeddedFlag = false;
-    if( config_GetInt( p_intf, "embedded-video" ) ) videoEmbeddedFlag = true;
+    if( config_GetInt( p_intf, "embedded-video" ) )
+        videoEmbeddedFlag = true;
 
     alwaysVideoFlag = false;
     if( videoEmbeddedFlag && config_GetInt( p_intf, "qt-always-video" ) )
-    {
         alwaysVideoFlag = true;
-    }
 
     /* Set the other interface settings */
     playlistEmbeddedFlag = settings->value("playlist-embedded", true).toBool();
@@ -124,10 +126,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     palette2.setColor(this->backgroundRole(), Qt::magenta);
     setPalette(palette2);
 #endif
-
-    /* Main settings */
-    setFocusPolicy( Qt::StrongFocus );
-    setAcceptDrops(true);
 
     /**
      *  UI design
@@ -283,13 +281,8 @@ void MainInterface::handleMainUi( QSettings *settings )
     mainLayout->setMargin( 0 );
 
     /* CONTROLS */
-    QWidget *controls = new QWidget( main );
+    QWidget *controls = new QWidget;
     ui.setupUi( controls );
-
-#if DEBUG_COLOR
-/*    QLabel *test = new QLabel("heheh");
-    mainLayout->addWidget( test );*/
-#endif
 
     /* Configure the UI */
     slider = new InputSlider( Qt::Horizontal, NULL );
@@ -370,6 +363,59 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* Finish the sizing */
     setMinimumSize( PREF_W, addSize.height() );
+}
+
+/**********************************************************************
+ * Handling of the components
+ **********************************************************************/
+void MainInterface::calculateInterfaceSize()
+{
+    int width = 0, height = 0;
+    if( VISIBLE( bgWidget ) )
+    {
+        width = bgWidget->widgetSize.width();
+        height = bgWidget->widgetSize.height();
+        assert( !(playlistWidget && playlistWidget->isVisible() ) );
+    }
+    else if( VISIBLE( playlistWidget ) )
+    {
+        width = playlistWidget->widgetSize.width();
+        height = playlistWidget->widgetSize.height();
+    }
+    else if( videoIsActive )
+    {
+        width =  videoWidget->widgetSize.width() ;
+        height = videoWidget->widgetSize.height();
+    }
+    else
+    {
+        width = PREF_W - addSize.width();
+        height = PREF_H - addSize.height();
+    }
+    if( VISIBLE( visualSelector ) )
+        height += visualSelector->height();
+    if( VISIBLE( advControls) )
+    {
+        height += advControls->sizeHint().height();
+    }
+    mainSize = QSize( width + addSize.width(), height + addSize.height() );
+}
+
+void MainInterface::resizeEvent( QResizeEvent *e )
+{
+    videoWidget->widgetSize.setWidth(  e->size().width() - addSize.width() );
+    if( videoWidget && videoIsActive && videoWidget->widgetSize.height() > 1 )
+    {
+        SET_WH( videoWidget, e->size().width() - addSize.width(),
+                             e->size().height()  - addSize.height() );
+        videoWidget->updateGeometry();
+    }
+    if( VISIBLE( playlistWidget ) )
+    {
+        SET_WH( playlistWidget , e->size().width() - addSize.width(),
+                                 e->size().height() - addSize.height() );
+        playlistWidget->updateGeometry();
+    }
 }
 
 /*****************************************************************************
@@ -475,60 +521,6 @@ void MainInterface::updateSystrayTooltipStatus( int i_status )
             }
     }
 }
-
-/**********************************************************************
- * Handling of the components
- **********************************************************************/
-void MainInterface::calculateInterfaceSize()
-{
-    int width = 0, height = 0;
-    if( VISIBLE( bgWidget ) )
-    {
-        width = bgWidget->widgetSize.width();
-        height = bgWidget->widgetSize.height();
-        assert( !(playlistWidget && playlistWidget->isVisible() ) );
-    }
-    else if( VISIBLE( playlistWidget ) )
-    {
-        width = playlistWidget->widgetSize.width();
-        height = playlistWidget->widgetSize.height();
-    }
-    else if( videoIsActive )
-    {
-        width =  videoWidget->widgetSize.width() ;
-        height = videoWidget->widgetSize.height();
-    }
-    else
-    {
-        width = PREF_W - addSize.width();
-        height = PREF_H - addSize.height();
-    }
-    if( VISIBLE( visualSelector ) )
-        height += visualSelector->height();
-    if( VISIBLE( advControls) )
-    {
-        height += advControls->sizeHint().height();
-    }
-    mainSize = QSize( width + addSize.width(), height + addSize.height() );
-}
-
-void MainInterface::resizeEvent( QResizeEvent *e )
-{
-    videoWidget->widgetSize.setWidth(  e->size().width() - addSize.width() );
-    if( videoWidget && videoIsActive && videoWidget->widgetSize.height() > 1 )
-    {
-        SET_WH( videoWidget, e->size().width() - addSize.width(),
-                             e->size().height()  - addSize.height() );
-        videoWidget->updateGeometry();
-    }
-    if( VISIBLE( playlistWidget ) )
-    {
-        SET_WH( playlistWidget , e->size().width() - addSize.width(),
-                                 e->size().height() - addSize.height() );
-        playlistWidget->updateGeometry();
-    }
-}
-
 void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                    int *pi_y, unsigned int *pi_width,
                                    unsigned int *pi_height )
