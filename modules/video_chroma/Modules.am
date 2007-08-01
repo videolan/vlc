@@ -58,3 +58,7 @@ SOURCES_i420_ymga_mmx = \
 	i420_ymga.c \
 	$(NULL)
 
+SOURCES_grey_yuv = \
+	grey_yuv.c \
+	$(NULL)
+
