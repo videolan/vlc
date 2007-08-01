@@ -62,6 +62,8 @@
 
 #define DS(i) i.width(),i.height()
 
+#define DEBUG_COLOR 0
+
 /* Callback prototypes */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param );
@@ -86,57 +88,83 @@ static int DoControl( intf_thread_t *p_intf, void *p_win, int i_q, va_list a )
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
-    /* Configuration */
+    /* Variables initialisation */
+    need_components_update = false;
+    bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
+    embeddedPlaylistWasActive = videoIsActive = false;
+    bool b_createSystray = false;
+
+    input_name = "";
+
+    /**
+     *  Configuration
+     **/
     settings = new QSettings( "VideoLAN", "VLC" );
     settings->beginGroup( "MainWindow" );
 
     setWindowIcon( QApplication::windowIcon() );
 
-    need_components_update = false;
-    bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
-    embeddedPlaylistWasActive = videoIsActive = false;
-
-    input_name = "";
-
+    /* Set The Video In emebedded Mode or not */
     videoEmbeddedFlag = false;
     if( config_GetInt( p_intf, "embedded-video" ) ) videoEmbeddedFlag = true;
 
     alwaysVideoFlag = false;
-    if( videoEmbeddedFlag && config_GetInt( p_intf, "qt-always-video" ))
+    if( videoEmbeddedFlag && config_GetInt( p_intf, "qt-always-video" ) )
+    {
         alwaysVideoFlag = true;
+    }
 
+    /* Set the other interface settings */
     playlistEmbeddedFlag = settings->value("playlist-embedded", true).toBool();
     advControlsEnabled= settings->value( "adv-controls", false ).toBool();
     visualSelectorEnabled= settings->value( "visual-selector", false ).toBool();
 
-    /* UI */
-    setVLCWindowsTitle();
-    handleMainUi( settings );
-    QVLCMenu::createMenuBar( this, p_intf, playlistEmbeddedFlag,
-                             advControlsEnabled, visualSelectorEnabled );
-    timeLabel = new QLabel( 0 );
-    nameLabel = new QLabel( 0 );
-    statusBar()->addWidget( nameLabel, 4 );
-    statusBar()->addPermanentWidget( timeLabel, 1 );
+#if DEBUG_COLOR
+    QPalette palette2;
+    palette2.setColor(this->backgroundRole(), Qt::magenta);
+    setPalette(palette2);
+#endif
 
+    /* Main settings */
     setFocusPolicy( Qt::StrongFocus );
     setAcceptDrops(true);
 
+    /**
+     *  UI design
+     **/
+    setVLCWindowsTitle();
+    handleMainUi( settings );
+
+    /* Menu Bar */
+    QVLCMenu::createMenuBar( this, p_intf, playlistEmbeddedFlag,
+                             advControlsEnabled, visualSelectorEnabled );
+
+    /* Status Bar */
+    timeLabel = new QLabel( 0 );
+    nameLabel = new QLabel( 0 );
+    timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
+    statusBar()->addWidget( nameLabel, 4 );
+    statusBar()->addPermanentWidget( timeLabel, 1 );
+
     /* Systray */
     sysTray = NULL;
-    if( QSystemTrayIcon::isSystemTrayAvailable() &&
-                  ( config_GetInt( p_intf, "qt-start-mininimized") == 1) )
+    if( config_GetInt( p_intf, "qt-start-minimized") )
     {
         hide();
-        createSystray();
+        b_createSystray = true;
     }
-    if( QSystemTrayIcon::isSystemTrayAvailable() &&
-                  ( config_GetInt( p_intf, "qt-system-tray") == 1) )
+    if( config_GetInt( p_intf, "qt-system-tray") )
+        b_createSystray = true;
+    if (QSystemTrayIcon::isSystemTrayAvailable() && b_createSystray )
             createSystray();
 
     /* Init input manager */
     MainInputManager::getInstance( p_intf );
     ON_TIMEOUT( updateOnTimer() );
+
+    /**
+     * CONNECTs
+     **/
 
     /* Volume control */
     CONNECT( ui.volumeSlider, valueChanged(int), this, updateVolume(int) );
@@ -181,6 +209,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( ui.menuButton, clicked(), THEMIM->getIM(),
              sectionMenu() );
 
+    /**
+     * Callbacks
+     **/
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
     p_intf->b_interaction = VLC_TRUE;
@@ -194,7 +225,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         var_AddCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
-
 }
 
 MainInterface::~MainInterface()
@@ -225,27 +255,47 @@ MainInterface::~MainInterface()
 /*****************************
  *   Main UI handling        *
  *****************************/
+
+/**
+ * Give the decorations of the Main Window a correct Name.
+ * If nothing is given, set it to VLC...
+ **/
 void MainInterface::setVLCWindowsTitle( QString aTitle )
 {
     if( aTitle.isEmpty() )
     {
-        this->setWindowTitle( qtr( "VLC media player" ) );
+        setWindowTitle( qtr( "VLC media player" ) );
     }
     else
     {
-        this->setWindowTitle( aTitle + " - " + qtr( "VLC media player" ) );
+        setWindowTitle( aTitle + " - " + qtr( "VLC media player" ) );
     }
 }
 
 void MainInterface::handleMainUi( QSettings *settings )
 {
     QWidget *main = new QWidget( this );
+    QVBoxLayout *mainLayout = new QVBoxLayout( main );
     setCentralWidget( main );
-    ui.setupUi( centralWidget() );
 
+    /* Margins, spacing */
+    main->setContentsMargins( 0, 0, 0, 0 );
+    mainLayout->setMargin( 0 );
+
+    /* CONTROLS */
+    QWidget *controls = new QWidget( main );
+    ui.setupUi( controls );
+
+#if DEBUG_COLOR
+/*    QLabel *test = new QLabel("heheh");
+    mainLayout->addWidget( test );*/
+#endif
+
+    /* Configure the UI */
     slider = new InputSlider( Qt::Horizontal, NULL );
     ui.vboxLayout->insertWidget( 0, slider );
     ui.discFrame->hide();
+
     BUTTON_SET_IMG( ui.prevSectionButton, "", previous.png, "" );
     BUTTON_SET_IMG( ui.nextSectionButton, "", next.png, "" );
     BUTTON_SET_IMG( ui.menuButton, "", previous.png, "" );
@@ -269,29 +319,41 @@ void MainInterface::handleMainUi( QSettings *settings )
                                                 qtr( "Open playlist" ) );
     BUTTONACT( ui.playlistButton, playlist() );
 
+#if DEBUG_COLOR
+    QPalette palette;
+    palette.setColor(main->backgroundRole(), Qt::green);
+    main->setPalette(palette);
+#endif
+
+    /* Add the controls Widget */
+    mainLayout->addWidget( controls );
+
     /* Set initial size */
     resize ( PREF_W, PREF_H );
 
-    addSize = QSize( ui.vboxLayout->margin() * 2, PREF_H );
+    addSize = QSize( mainLayout->margin() * 2, PREF_H );
 
+    /* advanced Controls handling */
     advControls = new ControlsWidget( p_intf );
-    ui.vboxLayout->insertWidget( 0, advControls );
+    mainLayout->insertWidget( 0, advControls );
     advControls->updateGeometry();
     if( !advControlsEnabled ) advControls->hide();
     need_components_update = true;
 
+    /* Visualisation */
     visualSelector = new VisualSelector( p_intf );
-    ui.vboxLayout->insertWidget( 0, visualSelector );
+    mainLayout->insertWidget( 0, visualSelector );
     visualSelector->hide();
 
-    if( alwaysVideoFlag )
+    /* And video Outputs */
+    if(  alwaysVideoFlag )
     {
         bgWidget = new BackgroundWidget( p_intf );
         bgWidget->widgetSize = settings->value( "backgroundSize",
-                                                QSize( 200, 200 ) ).toSize();
+                                           QSize( 200, 200 ) ).toSize();
         bgWidget->resize( bgWidget->widgetSize );
         bgWidget->updateGeometry();
-        ui.vboxLayout->insertWidget( 0, bgWidget );
+        mainLayout->insertWidget( 0, bgWidget );
     }
 
     if( videoEmbeddedFlag )
@@ -299,12 +361,14 @@ void MainInterface::handleMainUi( QSettings *settings )
         videoWidget = new VideoWidget( p_intf );
         videoWidget->widgetSize = QSize( 1, 1 );
         //videoWidget->resize( videoWidget->widgetSize );
-        ui.vboxLayout->insertWidget( 0, videoWidget );
+        mainLayout->insertWidget( 0, videoWidget );
 
         p_intf->pf_request_window  = ::DoRequest;
         p_intf->pf_release_window  = ::DoRelease;
         p_intf->pf_control_window  = ::DoControl;
     }
+
+    /* Finish the sizing */
     setMinimumSize( PREF_W, addSize.height() );
 }
 
