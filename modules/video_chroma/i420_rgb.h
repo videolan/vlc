@@ -65,6 +65,7 @@ void E_(I420_R5G5B5)       ( vout_thread_t *, picture_t *, picture_t * );
 void E_(I420_R5G6B5)       ( vout_thread_t *, picture_t *, picture_t * );
 void E_(I420_A8R8G8B8)     ( vout_thread_t *, picture_t *, picture_t * );
 void E_(I420_B8G8R8A8)     ( vout_thread_t *, picture_t *, picture_t * );
+void E_(I420_A8B8G8R8)     ( vout_thread_t *, picture_t *, picture_t * );
 #endif
 
 /*****************************************************************************

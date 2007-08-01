@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Damien Fouilleul <damienf@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +23,24 @@
  *****************************************************************************/
 
 #ifdef MODULE_NAME_IS_i422_yuy2_mmx
+
+#if defined(CAN_COMPILE_MMX)
+
+/* MMX assembly */
+ 
+#define MMX_CALL(MMX_INSTRUCTIONS)          \
+    do {                                    \
+    __asm__ __volatile__(                   \
+        ".p2align 3 \n\t"                   \
+        MMX_INSTRUCTIONS                    \
+        :                                   \
+        : "r" (p_line), "r" (p_y),          \
+          "r" (p_u), "r" (p_v) );           \
+        p_line += 16; p_y += 8;             \
+        p_u += 4; p_v += 4;                 \
+    } while(0)
+
+#define MMX_END __asm__ __volatile__ ( "emms" )
 
 #define MMX_YUV422_YUYV "                                                 \n\
 movq       (%1), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
@@ -62,7 +81,36 @@ movq      %%mm1, 8(%0)  # Store high UYVY                                 \n\
 #define MMX_YUV422_Y211 "                                                 \n\
 "
 
-#else
+#elif defined(HAVE_MMX_INTRINSICS)
+
+/* MMX intrinsics */
+
+#include <mmintrin.h>
+
+#define MMX_END _mm_empty()
+
+#endif
+ 
+#elif defined( MODULE_NAME_IS_i422_yuy2_sse2 )
+
+#if defined(CAN_COMPILE_SSE2)
+
+/* SSE2 assembly */
+
+#define SSE2_END  __asm__ __volatile__ ( "sfence" ::: "memory" )
+
+#elif defined(HAVE_SSE2_INTRINSICS)
+
+/* SSE2 intrinsics */
+
+#include <emmintrin.h>
+
+
+#define SSE2_END  _mm_sfence()
+
+#endif
+
+#elif defined (MODULE_NAME_IS_i422_yuy2)
 
 #define C_YUV422_YUYV( p_line, p_y, p_u, p_v )                              \
     *(p_line)++ = *(p_y)++;                                                 \

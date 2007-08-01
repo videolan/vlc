@@ -155,6 +155,15 @@ static int Activate( vlc_object_t *p_this )
                         msg_Dbg(p_this, "RGB pixel format is A8R8G8B8");
                         p_vout->chroma.pf_convert = E_(I420_A8R8G8B8);
                     }
+                    else if( p_vout->output.i_rmask == 0xff000000
+                          && p_vout->output.i_gmask == 0x00ff0000
+                          && p_vout->output.i_bmask == 0x0000ff00 )
+                    {
+                        /* R8G8B8A8 pixel format */
+                        msg_Dbg(p_this, "RGB pixel format is R8G8B8A8");
+                        //p_vout->chroma.pf_convert = E_(I420_B8G8R8A8);
+                        return -1;
+                    }
                     else if( p_vout->output.i_rmask == 0x0000ff00
                           && p_vout->output.i_gmask == 0x00ff0000
                           && p_vout->output.i_bmask == 0xff000000 )
@@ -163,10 +172,18 @@ static int Activate( vlc_object_t *p_this )
                         msg_Dbg(p_this, "RGB pixel format is B8G8R8A8");
                         p_vout->chroma.pf_convert = E_(I420_B8G8R8A8);
                     }
+                    else if( p_vout->output.i_rmask == 0x000000ff
+                          && p_vout->output.i_gmask == 0x0000ff00
+                          && p_vout->output.i_bmask == 0x00ff0000 )
+                    {
+                        /* A8B8G8R8 pixel format */
+                        msg_Dbg(p_this, "RGB pixel format is A8B8G8R8");
+                        p_vout->chroma.pf_convert = E_(I420_A8B8G8R8);
+                    }
                     else
                         return -1;
 #else
-                    // generic C chroma converter */
+                    /* generic C chroma converter */
                     p_vout->chroma.pf_convert = E_(I420_RGB32);
 #endif
                     break;
