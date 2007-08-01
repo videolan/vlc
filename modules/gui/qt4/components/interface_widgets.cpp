@@ -278,30 +278,35 @@ void ControlsWidget::fullscreen()
 #include "components/playlist/selector.hpp"
 
 PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
-                                BasePlaylistWidget ( _p_intf)
+                                p_intf ( _p_intf)
 {
-    QVBoxLayout *left = new QVBoxLayout( );
+    /* Left Part and design */
+    QWidget *leftW = new QWidget( this );
+    QVBoxLayout *left = new QVBoxLayout( leftW );
 
+    /* Source Selector */
     selector = new PLSelector( this, p_intf, THEPL );
     selector->setMaximumWidth( 130 );
     left->addWidget( selector );
 
+    /* Art label */
     art = new QLabel( "" );
     art->setMinimumHeight( 128 );
     art->setMinimumWidth( 128 );
     art->setMaximumHeight( 128 );
     art->setMaximumWidth( 128 );
     art->setScaledContents( true );
-
     art->setPixmap( QPixmap( ":/noart.png" ) );
     left->addWidget( art );
 
+    /* Initialisation of the playlist */
     playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
                                                 THEPL->p_local_category );
 
     rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( this,
                               p_intf, THEPL, p_root ) );
 
+    /* Connects */
     CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
 
     CONNECT( qobject_cast<StandardPLPanel *>(rightPanel)->model,
@@ -315,10 +320,11 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
              this, SIGNAL( rootChanged( int ) ) );
     emit rootChanged( p_root->i_id );
 
-    QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->addLayout( left, 0 );
-    layout->addWidget( rightPanel, 10 );
-    setLayout( layout );
+    /* Add the two sides of the QSplitter */
+    addWidget( leftW );
+    addWidget( rightPanel );
+
+    /* FIXME Sizing to do */
 }
 
 void PlaylistWidget::setArt( QString url )

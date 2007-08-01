@@ -43,7 +43,7 @@
 
 #include <assert.h>
 
-StandardPLPanel::StandardPLPanel( BasePlaylistWidget *_parent,
+StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
                                   playlist_item_t *p_root ):

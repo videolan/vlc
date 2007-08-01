@@ -27,6 +27,7 @@
 #include <vlc/vlc.h>
 
 #include "qt4.hpp"
+#include "../interface_widgets.hpp"
 
 #include <QModelIndex>
 #include <QWidget>
@@ -42,7 +43,7 @@ class PLPanel: public QWidget
 {
     Q_OBJECT;
 public:
-    PLPanel( BasePlaylistWidget *p, intf_thread_t *_p_intf ) : QWidget( p )
+    PLPanel( PlaylistWidget *p, intf_thread_t *_p_intf ) : QWidget( p )
     {
         p_intf = _p_intf;
         parent = p;
@@ -50,7 +51,7 @@ public:
     virtual ~PLPanel() {};
 protected:
     intf_thread_t *p_intf;
-    BasePlaylistWidget *parent;
+    QFrame *parent;
 public slots:
     virtual void setRoot( int ) = 0;
 };
@@ -61,7 +62,7 @@ class StandardPLPanel: public PLPanel
 {
     Q_OBJECT;
 public:
-    StandardPLPanel( BasePlaylistWidget *, intf_thread_t *,
+    StandardPLPanel( PlaylistWidget *, intf_thread_t *,
                      playlist_t *,playlist_item_t * );
     virtual ~StandardPLPanel();
 protected:

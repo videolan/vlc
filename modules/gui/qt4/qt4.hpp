@@ -108,6 +108,7 @@ public:
 };
 
 /* Ugly to put it here, but don't want more files ... */
+#if 0
 #include <QFrame>
 class BasePlaylistWidget : public QFrame
 {
@@ -117,5 +118,5 @@ public:
 protected:
     intf_thread_t *p_intf;
 };
-
+#endif
 #endif
