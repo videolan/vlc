@@ -30,6 +30,11 @@
 
 #include <QEvent>
 
+/* Add define for duration, VLC_META_ENGINE doesn't include it */
+#define VLC_META_ENGINE_DURATION   0x00000002
+#define VLC_META_DURATION          N_("Duration")
+
+
 class QApplication;
 class QMenu;
 class MainInterface;
