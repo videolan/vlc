@@ -43,6 +43,12 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define ALWAYS_VIDEO_TEXT N_("Always show a video screen, with a cone " \
+                                "when there is audio only.")
+#define ALWAYS_VIDEO_LONGTEXT N_("Start VLC with a cone image, and display it" \
+                                   " when there is no video track. " \
+                                    "Visualisations are enabled." )
+
 #define ADVANCED_PREFS_TEXT N_("Show advanced prefs over simple")
 #define ADVANCED_PREFS_LONGTEXT N_("Show advanced preferences and not simple" \
                                    "preferences when opening the preferences " \
@@ -86,8 +92,8 @@ vlc_module_begin();
     add_submodule();
         set_description( "Dialogs provider" );
         set_capability( "dialogs provider", 51 );
-        add_bool( "qt-always-video", VLC_FALSE, NULL, "FIXME", "FIXME",
-                VLC_TRUE );
+        add_bool( "qt-always-video", VLC_FALSE, NULL, ALWAYS_VIDEO_TEXT, 
+                ALWAYS_VIDEO_LONGTEXT, VLC_TRUE );
         add_bool( "qt-advanced-pref", VLC_FALSE, NULL, ADVANCED_PREFS_TEXT,
                 ADVANCED_PREFS_LONGTEXT, VLC_FALSE );
         add_bool( "qt-system-tray", VLC_TRUE, NULL, SYSTRAY_TEXT,
