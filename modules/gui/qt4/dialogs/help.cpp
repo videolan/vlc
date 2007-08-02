@@ -72,7 +72,8 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     closeButton->setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
     closeButton->setDefault( true );
 
-    QLabel *introduction = new QLabel( qtr( "Infos about VLC media player" ) );
+    QLabel *introduction = new QLabel(
+            qtr( "Information about VLC media player" ) );
 
     layout->addWidget( introduction, 0, 0, 1, 2 );
     layout->addWidget( tab, 1, 0, 1, 2 );
@@ -91,7 +92,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     thanksEdit->setReadOnly( true );
 
     /* add the tabs to the Tabwidget */
-    tab->addTab( NULL, qtr( "Information" ) );
+    tab->addTab( NULL, qtr( "General Info" ) );
     tab->addTab( NULL, qtr( "Authors" ) );
     tab->addTab( thanksEdit, qtr("Thanks") );
     tab->addTab( licenseEdit, qtr("Distribution License") );

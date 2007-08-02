@@ -176,7 +176,7 @@ void InteractionDialog::update()
     {
         assert( progressBar );
         progressBar->setValue( (int)(p_dialog->val.f_float*1000) );
-        fprintf (stderr, "Setting progress to %i\n", progressBar->value() );
+        msg_Err( p_intf, "Setting progress to %i\n", progressBar->value() );
     }
 }
 
