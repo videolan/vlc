@@ -86,7 +86,7 @@ void PLItem::updateview( void )
 {
     strings.clear();
 
-    for( int i_index=1; i_index <= VLC_META_ENGINE_MB_TRM_ID; i_index = i_index*2 ) 
+    for( int i_index=1; i_index <= VLC_META_ENGINE_MB_TRM_ID; i_index = i_index*2 )
     {
         if( i_showflags & i_index )
         {
@@ -94,16 +94,16 @@ void PLItem::updateview( void )
             {
                 case VLC_META_ENGINE_ARTIST:
                     strings.append( qtr( VLC_META_ARTIST ) );
-                    break; 
+                    break;
                 case VLC_META_ENGINE_TITLE:
                     strings.append( qtr( VLC_META_TITLE ) );
-                    break; 
+                    break;
                 case VLC_META_ENGINE_DESCRIPTION:
                     strings.append( qtr( VLC_META_DESCRIPTION ) );
-                    break; 
+                    break;
                 case VLC_META_ENGINE_DURATION:
                     strings.append( qtr( "Duration" ) );
-                    break; 
+                    break;
                 case VLC_META_ENGINE_GENRE:
                     strings.append( qtr( VLC_META_GENRE ) );
                     break;
@@ -186,8 +186,8 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     {
         strings.append( p_item->p_input->psz_name );
         return;
-    } 
-    
+    }
+
 
 #define ADD_META( meta ) {             \
    if( p_item->p_input->p_meta )       \
@@ -195,7 +195,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
    else                                \
       strings.append( qtr( "" ) ); }
 
-    for( int i_index=1; i_index <= VLC_META_ENGINE_MB_TRM_ID; i_index = i_index * 2 ) 
+    for( int i_index=1; i_index <= VLC_META_ENGINE_MB_TRM_ID; i_index = i_index * 2 )
     {
         if( parentItem->i_showflags & i_index )
         {
@@ -203,7 +203,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
             {
                 case VLC_META_ENGINE_ARTIST:
                     ADD_META( p_item->p_input->p_meta->psz_artist );
-                    break; 
+                    break;
                 case VLC_META_ENGINE_TITLE:
                     if( p_item->p_input->p_meta && p_item->p_input->p_meta->psz_title )
                     {
@@ -211,14 +211,14 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
                     } else {
                         ADD_META( p_item->p_input->psz_name );
                     }
-                    break; 
+                    break;
                 case VLC_META_ENGINE_DESCRIPTION:
                     ADD_META( p_item->p_input->p_meta->psz_description );
-                    break; 
+                    break;
                 case VLC_META_ENGINE_DURATION:
                     secstotimestr( psz_duration, p_item->p_input->i_duration / 1000000 );
                     strings.append( QString( psz_duration ) );
-                    break; 
+                    break;
                 case VLC_META_ENGINE_GENRE:
                     ADD_META( p_item->p_input->p_meta->psz_genre );
                     break;
@@ -232,7 +232,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
                     ADD_META( p_item->p_input->p_meta->psz_rating );
                 default:
                     break;
-            } 
+            }
         }
 
     }
@@ -959,12 +959,14 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
 
         ContextUpdateMapper = new QSignalMapper(this);
 
+        QMenu *selectColMenu = new QMenu( qtr("Show columns") );
+
 #define ADD_META_ACTION( meta ) { \
-   QAction* option = menu->addAction( qfu(VLC_META_##meta) );                   \
-   option->setCheckable( true );                                                \
-   option->setChecked( rootItem->i_showflags & VLC_META_ENGINE_##meta );        \
-   ContextUpdateMapper->setMapping( option, VLC_META_ENGINE_##meta );           \
-   CONNECT( option, triggered(), ContextUpdateMapper, map() );     \
+   QAction* option = selectColMenu->addAction( qfu(VLC_META_##meta) );     \
+   option->setCheckable( true );                                           \
+   option->setChecked( rootItem->i_showflags & VLC_META_ENGINE_##meta );   \
+   ContextUpdateMapper->setMapping( option, VLC_META_ENGINE_##meta );      \
+   CONNECT( option, triggered(), ContextUpdateMapper, map() );             \
    }
         CONNECT(ContextUpdateMapper, mapped( int ), this, viewchanged( int ) );
 
@@ -978,7 +980,7 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
         ADD_META_ACTION( DESCRIPTION );
 
 #undef ADD_META_ACTION
-
+        menu->addMenu( selectColMenu );
         menu->popup( point );
     }
     else
