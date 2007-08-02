@@ -75,8 +75,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define ADVANCED_OPTIONS_LONGTEXT N_("Activate by default all the" \
                                      "Advanced options for geeks")
 
-#define SHOWFLAGS_TEXT N_("Define what titles to show in playlist window")
-#define SHOWFLAGS_LONGTEXT N_(" ")
+#define SHOWFLAGS_TEXT N_("Define what columns to show in playlist window")
+#define SHOWFLAGS_LONGTEXT N_("Enter the sum of the options that you want:\n" \
+        "Title: 1\nDuration: 2\nArtist: 4\nGenre: 8\nCopyright: 10\n"         \
+        "Collection/album: 20\nRating: 100\n")
 
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
