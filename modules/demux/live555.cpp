@@ -441,7 +441,8 @@ createnew:
     if( var_CreateGetBool( p_demux, "rtsp-http" ) )
         i_http_port = var_CreateGetInteger( p_demux, "rtsp-http-port" );
 
-    if( ( p_sys->rtsp = RTSPClient::createNew(*p_sys->env, 1 /*verbose*/,
+    if( ( p_sys->rtsp = RTSPClient::createNew(*p_sys->env,
+          p_demux->p_libvlc->i_verbose > 1,
           "VLC media player", i_http_port ) ) == NULL )
     {
         msg_Err( p_demux, "RTSPClient::createNew failed (%s)",
