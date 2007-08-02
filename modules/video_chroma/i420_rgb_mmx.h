@@ -300,6 +300,26 @@ punpckhwd %%mm1, %%mm0  #                 00 R7 B7 G7 00 R6 B6 G6           \n\
 movq      %%mm0, 24(%3) # Store ARGB7 ARGB6                                 \n\
 "
 
+#define MMX_UNPACK_32_RGBA "                                                \n\
+pxor      %%mm3, %%mm3  # zero mm3                                          \n\
+movq      %%mm2, %%mm4  #                 G7 G6 G5 G4 G3 G2 G1 G0           \n\
+punpcklbw %%mm1, %%mm4  #                 R3 G3 R2 G2 R1 G1 R0 G0           \n\
+punpcklbw %%mm0, %%mm3  #                 B3 00 B2 00 B1 00 B0 00           \n\
+movq      %%mm3, %%mm5  #                 R3 00 R2 00 R1 00 R0 00           \n\
+punpcklwd %%mm4, %%mm3  #                 R1 G1 B1 00 R0 G0 B0 00           \n\
+movq      %%mm3, (%3)   # Store RGBA1 RGBA0                                 \n\
+punpckhwd %%mm4, %%mm5  #                 R3 G3 B3 00 R2 G2 B2 00           \n\
+movq      %%mm5, 8(%3)  # Store RGBA3 RGBA2                                 \n\
+pxor      %%mm6, %%mm6  # zero mm6                                          \n\
+punpckhbw %%mm1, %%mm2  #                 R7 G7 R6 G6 R5 G5 R4 G4           \n\
+punpckhbw %%mm0, %%mm6  #                 B7 00 B6 00 B5 00 B4 00           \n\
+movq      %%mm6, %%mm0  #                 B7 00 B6 00 B5 00 B4 00           \n\
+punpcklwd %%mm2, %%mm6  #                 R5 G5 B5 00 R4 G4 B4 00           \n\
+movq      %%mm6, 16(%3) # Store RGBA5 RGBA4                                 \n\
+punpckhwd %%mm2, %%mm0  #                 R7 G7 B7 00 R6 G6 B6 00           \n\
+movq      %%mm0, 24(%3) # Store RGBA7 RGBA6                                 \n\
+"
+
 #define MMX_UNPACK_32_BGRA "                                                \n\
 pxor      %%mm3, %%mm3  # zero mm3                                          \n\
 movq      %%mm2, %%mm4  #                 G7 G6 G5 G4 G3 G2 G1 G0           \n\
@@ -356,15 +376,15 @@ movq      %%mm2, 24(%3) # Store ABGR7 ABGR6                                 \n\
 #define MMX_END _mm_empty()
     
 #define MMX_INIT_16                     \
-    mm0 = _mm_cvtsi32_si64((int)*p_u);  \
-    mm1 = _mm_cvtsi32_si64((int)*p_v);  \
+    mm0 = _mm_cvtsi32_si64(*(int*)p_u); \
+    mm1 = _mm_cvtsi32_si64(*(int*)p_v); \
     mm4 = _mm_setzero_si64();           \
-    mm6 = (__m64)*(uint64_t *)p_y
+    mm6 = (__m64)*(uint64_t *)p_y;
 
 #define MMX_INIT_32                     \
-    mm0 = _mm_cvtsi32_si64((int)*p_u);  \
+    mm0 = _mm_cvtsi32_si64(*(int*)p_u); \
     *(uint16_t *)p_buffer = 0;          \
-    mm1 = _mm_cvtsi32_si64((int)*p_v);  \
+    mm1 = _mm_cvtsi32_si64(*(int*)p_v); \
     mm4 = _mm_setzero_si64();           \
     mm6 = (__m64)*(uint64_t *)p_y;
 
@@ -483,6 +503,25 @@ movq      %%mm2, 24(%3) # Store ABGR7 ABGR6                                 \n\
     mm0 = _mm_unpackhi_pi16(mm0, mm1);          \
     *(uint64_t *)(p_buffer + 6) = (uint64_t)mm0;
 
+#define MMX_UNPACK_32_RGBA                      \
+    mm3 = _mm_setzero_si64();                   \
+    mm4 = mm2;                                  \
+    mm4 = _mm_unpacklo_pi8(mm4, mm1);           \
+    mm3 = _mm_unpacklo_pi8(mm3, mm0);           \
+    mm5 = mm3;                                  \
+    mm3 = _mm_unpacklo_pi16(mm3, mm4);          \
+    *(uint64_t *)p_buffer = (uint64_t)mm3;      \
+    mm5 = _mm_unpackhi_pi16(mm5, mm4);          \
+    *(uint64_t *)(p_buffer + 2) = (uint64_t)mm5;\
+    mm6 = _mm_setzero_si64();                   \
+    mm2 = _mm_unpackhi_pi8(mm2, mm1);           \
+    mm6 = _mm_unpackhi_pi8(mm6, mm0);           \
+    mm0 = mm6;                                  \
+    mm6 = _mm_unpacklo_pi16(mm6, mm2);          \
+    *(uint64_t *)(p_buffer + 4) = (uint64_t)mm6;\
+    mm0 = _mm_unpackhi_pi16(mm0, mm2);          \
+    *(uint64_t *)(p_buffer + 6) = (uint64_t)mm0;
+
 #define MMX_UNPACK_32_BGRA                      \
     mm3 = _mm_setzero_si64();                   \
     mm4 = mm2;                                  \
@@ -503,7 +542,23 @@ movq      %%mm2, 24(%3) # Store ABGR7 ABGR6                                 \n\
     *(uint64_t *)(p_buffer + 6) = (uint64_t)mm0;
 
 #define MMX_UNPACK_32_ABGR                      \
-    ;
+    mm3 = _mm_setzero_si64();                   \
+    mm4 = mm1;                                  \
+    mm4 = _mm_unpacklo_pi8(mm4, mm2);           \
+    mm5 = mm0;                                  \
+    mm5 = _mm_unpacklo_pi8(mm5, mm3);           \
+    mm6 = mm4;                                  \
+    mm4 = _mm_unpacklo_pi16(mm4, mm5);          \
+    *(uint64_t *)p_buffer = (uint64_t)mm4;      \
+    mm6 = _mm_unpackhi_pi16(mm6, mm5);          \
+    *(uint64_t *)(p_buffer + 2) = (uint64_t)mm6;\
+    mm1 = _mm_unpackhi_pi8(mm1, mm2);           \
+    mm0 = _mm_unpackhi_pi8(mm0, mm3);           \
+    mm2 = mm1;                                  \
+    mm1 = _mm_unpacklo_pi16(mm1, mm0);          \
+    *(uint64_t *)(p_buffer + 4) = (uint64_t)mm1;\
+    mm2 = _mm_unpackhi_pi16(mm2, mm0);          \
+    *(uint64_t *)(p_buffer + 6) = (uint64_t)mm2;
 
 #endif
 
@@ -795,6 +850,46 @@ punpckhwd %%xmm1, %%xmm0  #               00 R7 B7 G7 00 R6 B6 G6           \n\
 movdqu    %%xmm0, 48(%3)  # Store ARGB15 ARGB14 ARGB13 ARGB12               \n\
 "
 
+#define SSE2_UNPACK_32_RGBA_ALIGNED "                                       \n\
+pxor      %%xmm3, %%xmm3  # zero mm3                                        \n\
+movdqa    %%xmm2, %%xmm4  #                 G7 G6 G5 G4 G3 G2 G1 G0         \n\
+punpcklbw %%xmm1, %%xmm4  #                 R3 G3 R2 G2 R1 G1 R0 G0         \n\
+punpcklbw %%xmm0, %%xmm3  #                 B3 00 B2 00 B1 00 B0 00         \n\
+movdqa    %%xmm3, %%xmm5  #                 R3 00 R2 00 R1 00 R0 00         \n\
+punpcklwd %%xmm4, %%xmm3  #                 R1 G1 B1 00 R0 B0 G0 00         \n\
+movntdq   %%xmm3, (%3)    # Store RGBA3 RGBA2 RGBA1 RGBA0                   \n\
+punpckhwd %%xmm4, %%xmm5  #                 R3 G3 B3 00 R2 G2 B2 00         \n\
+movntdq   %%xmm5, 16(%3)  # Store RGBA7 RGBA6 RGBA5 RGBA4                   \n\
+pxor      %%xmm6, %%xmm6  # zero mm6                                        \n\
+punpckhbw %%xmm1, %%xmm2  #                 R7 G7 R6 G6 R5 G5 R4 G4         \n\
+punpckhbw %%xmm0, %%xmm6  #                 B7 00 B6 00 B5 00 B4 00         \n\
+movdqa    %%xmm6, %%xmm0  #                 B7 00 B6 00 B5 00 B4 00         \n\
+punpcklwd %%xmm2, %%xmm6  #                 R5 G5 B5 00 R4 G4 B4 00         \n\
+movntdq   %%xmm6, 32(%3)  # Store BGRA11 BGRA10 BGRA9 RGBA8                 \n\
+punpckhwd %%xmm2, %%xmm0  #                 R7 G7 B7 00 R6 G6 B6 00         \n\
+movntdq   %%xmm0, 48(%3)  # Store RGBA15 RGBA14 RGBA13 RGBA12               \n\
+"
+
+#define SSE2_UNPACK_32_RGBA_UNALIGNED "                                     \n\
+pxor      %%xmm3, %%xmm3  # zero mm3                                        \n\
+movdqa    %%xmm2, %%xmm4  #                 G7 G6 G5 G4 G3 G2 G1 G0         \n\
+punpcklbw %%xmm1, %%xmm4  #                 R3 G3 R2 G2 R1 G1 R0 G0         \n\
+punpcklbw %%xmm0, %%xmm3  #                 B3 00 B2 00 B1 00 B0 00         \n\
+movdqa    %%xmm3, %%xmm5  #                 R3 00 R2 00 R1 00 R0 00         \n\
+punpcklwd %%xmm4, %%xmm3  #                 R1 G1 B1 00 R0 B0 G0 00         \n\
+movdqu    %%xmm3, (%3)    # Store RGBA3 RGBA2 RGBA1 RGBA0                   \n\
+punpckhwd %%xmm4, %%xmm5  #                 R3 G3 B3 00 R2 G2 B2 00         \n\
+movdqu    %%xmm5, 16(%3)  # Store RGBA7 RGBA6 RGBA5 RGBA4                   \n\
+pxor      %%xmm6, %%xmm6  # zero mm6                                        \n\
+punpckhbw %%xmm1, %%xmm2  #                 R7 G7 R6 G6 R5 G5 R4 G4         \n\
+punpckhbw %%xmm0, %%xmm6  #                 B7 00 B6 00 B5 00 B4 00         \n\
+movdqa    %%xmm6, %%xmm0  #                 B7 00 B6 00 B5 00 B4 00         \n\
+punpcklwd %%xmm2, %%xmm6  #                 R5 G5 B5 00 R4 G4 B4 00         \n\
+movdqu    %%xmm6, 32(%3)  # Store RGBA11 RGBA10 RGBA9 RGBA8                 \n\
+punpckhwd %%xmm2, %%xmm0  #                 R7 G7 B7 00 R6 G6 B6 00         \n\
+movdqu    %%xmm0, 48(%3)  # Store RGBA15 RGBA14 RGBA13 RGBA12               \n\
+"
+
 #define SSE2_UNPACK_32_BGRA_ALIGNED "                                       \n\
 pxor      %%xmm3, %%xmm3  # zero mm3                                        \n\
 movdqa    %%xmm2, %%xmm4  #                 G7 G6 G5 G4 G3 G2 G1 G0         \n\
@@ -881,11 +976,11 @@ movdqu    %%xmm2, 48(%3)  # Store ABGR15 ABGR14 ABGR13 ABGR12               \n\
 
 #include <emmintrin.h>
 
-#define SSE2_CALL(SSE2_INSTRUCTIONS)            \
-    do {                                        \
-        __m128i xmm0, xmm1, xmm2, xmm3,         \
-                xmm4, xmm5, xmm6, xmm7;         \
-        SSE2_INSTRUCTIONS                       \
+#define SSE2_CALL(SSE2_INSTRUCTIONS)        \
+    do {                                    \
+        __m128i xmm0, xmm1, xmm2, xmm3,     \
+                xmm4, xmm5, xmm6, xmm7;     \
+        SSE2_INSTRUCTIONS                   \
     } while(0)
 
 #define SSE2_END  _mm_sfence()
@@ -971,179 +1066,249 @@ movdqu    %%xmm2, 48(%3)  # Store ABGR15 ABGR14 ABGR13 ABGR12               \n\
     xmm1 = _mm_unpacklo_epi8(xmm1, xmm4);   \
     xmm2 = _mm_unpacklo_epi8(xmm2, xmm5);
 
-#define SSE2_UNPACK_15_ALIGNED              \
-    xmm5 = _mm_set1_epi32(0xf8f8f8f8UL);    \
-    xmm0 = _mm_and_si128(xmm0, xmm5);       \
-    xmm0 = _mm_srli_epi16(xmm0, 3);         \
-    xmm2 = _mm_and_si128(xmm2, xmm5);       \
-    xmm1 = _mm_and_si128(xmm1, xmm5);       \
-    xmm1 = _mm_srli_epi16(xmm1, 1);         \
-    xmm4 = _mm_setzero_si128();             \
-    xmm5 = xmm0;                            \
-    xmm7 = xmm2;                            \
+#define SSE2_UNPACK_15_ALIGNED                      \
+    xmm5 = _mm_set1_epi32(0xf8f8f8f8UL);            \
+    xmm0 = _mm_and_si128(xmm0, xmm5);               \
+    xmm0 = _mm_srli_epi16(xmm0, 3);                 \
+    xmm2 = _mm_and_si128(xmm2, xmm5);               \
+    xmm1 = _mm_and_si128(xmm1, xmm5);               \
+    xmm1 = _mm_srli_epi16(xmm1, 1);                 \
+    xmm4 = _mm_setzero_si128();                     \
+    xmm5 = xmm0;                                    \
+    xmm7 = xmm2;                                    \
     \
-    xmm2 = _mm_unpacklo_epi8(xmm2, xmm4);   \
-    xmm0 = _mm_unpacklo_epi8(xmm0, xmm1);   \
-    xmm2 = _mm_slli_epi16(xmm2, 2);         \
-    xmm0 = _mm_or_si128(xmm0, xmm2);        \
-    _mm_stream_si128((__m128i*)p_buffer, xmm0); \
+    xmm2 = _mm_unpacklo_epi8(xmm2, xmm4);           \
+    xmm0 = _mm_unpacklo_epi8(xmm0, xmm1);           \
+    xmm2 = _mm_slli_epi16(xmm2, 2);                 \
+    xmm0 = _mm_or_si128(xmm0, xmm2);                \
+    _mm_stream_si128((__m128i*)p_buffer, xmm0);     \
     \
-    xmm7 = _mm_unpackhi_epi8(xmm7, xmm4);   \
-    xmm5 = _mm_unpackhi_epi8(xmm5, xmm1);   \
-    xmm7 = _mm_slli_epi16(xmm7, 2);         \
-    xmm5 = _mm_or_si128(xmm5, xmm7);        \
+    xmm7 = _mm_unpackhi_epi8(xmm7, xmm4);           \
+    xmm5 = _mm_unpackhi_epi8(xmm5, xmm1);           \
+    xmm7 = _mm_slli_epi16(xmm7, 2);                 \
+    xmm5 = _mm_or_si128(xmm5, xmm7);                \
     _mm_stream_si128((__m128i*)(p_buffer+8), xmm5);
 
-#define SSE2_UNPACK_15_UNALIGNED            \
-    xmm5 = _mm_set1_epi32(0xf8f8f8f8UL);    \
-    xmm0 = _mm_and_si128(xmm0, xmm5);       \
-    xmm0 = _mm_srli_epi16(xmm0, 3);         \
-    xmm2 = _mm_and_si128(xmm2, xmm5);       \
-    xmm1 = _mm_and_si128(xmm1, xmm5);       \
-    xmm1 = _mm_srli_epi16(xmm1, 1);         \
-    xmm4 = _mm_setzero_si128();             \
-    xmm5 = xmm0;                            \
-    xmm7 = xmm2;                            \
+#define SSE2_UNPACK_15_UNALIGNED                    \
+    xmm5 = _mm_set1_epi32(0xf8f8f8f8UL);            \
+    xmm0 = _mm_and_si128(xmm0, xmm5);               \
+    xmm0 = _mm_srli_epi16(xmm0, 3);                 \
+    xmm2 = _mm_and_si128(xmm2, xmm5);               \
+    xmm1 = _mm_and_si128(xmm1, xmm5);               \
+    xmm1 = _mm_srli_epi16(xmm1, 1);                 \
+    xmm4 = _mm_setzero_si128();                     \
+    xmm5 = xmm0;                                    \
+    xmm7 = xmm2;                                    \
     \
-    xmm2 = _mm_unpacklo_epi8(xmm2, xmm4);   \
-    xmm0 = _mm_unpacklo_epi8(xmm0, xmm1);   \
-    xmm2 = _mm_slli_epi16(xmm2, 2);         \
-    xmm0 = _mm_or_si128(xmm0, xmm2);        \
-    _mm_storeu_si128((__m128i*)p_buffer, xmm0); \
+    xmm2 = _mm_unpacklo_epi8(xmm2, xmm4);           \
+    xmm0 = _mm_unpacklo_epi8(xmm0, xmm1);           \
+    xmm2 = _mm_slli_epi16(xmm2, 2);                 \
+    xmm0 = _mm_or_si128(xmm0, xmm2);                \
+    _mm_storeu_si128((__m128i*)p_buffer, xmm0);     \
     \
-    xmm7 = _mm_unpackhi_epi8(xmm7, xmm4);   \
-    xmm5 = _mm_unpackhi_epi8(xmm5, xmm1);   \
-    xmm7 = _mm_slli_epi16(xmm7, 2);         \
-    xmm5 = _mm_or_si128(xmm5, xmm7);        \
+    xmm7 = _mm_unpackhi_epi8(xmm7, xmm4);           \
+    xmm5 = _mm_unpackhi_epi8(xmm5, xmm1);           \
+    xmm7 = _mm_slli_epi16(xmm7, 2);                 \
+    xmm5 = _mm_or_si128(xmm5, xmm7);                \
     _mm_storeu_si128((__m128i*)(p_buffer+16), xmm5);
 
-#define SSE2_UNPACK_16_ALIGNED              \
-    xmm5 = _mm_set1_epi32(0xf8f8f8f8UL);    \
-    xmm0 = _mm_and_si128(xmm0, xmm5);       \
-    xmm1 = _mm_and_si128(xmm1, xmm5);       \
-    xmm5 = _mm_set1_epi32(0xfcfcfcfcUL);    \
-    xmm2 = _mm_and_si128(xmm2, xmm5);       \
-    xmm0 = _mm_srli_epi16(xmm0, 3);         \
-    xmm4 = _mm_setzero_si128();             \
-    xmm5 = xmm0;                            \
-    xmm7 = xmm2;                            \
+#define SSE2_UNPACK_16_ALIGNED                      \
+    xmm5 = _mm_set1_epi32(0xf8f8f8f8UL);            \
+    xmm0 = _mm_and_si128(xmm0, xmm5);               \
+    xmm1 = _mm_and_si128(xmm1, xmm5);               \
+    xmm5 = _mm_set1_epi32(0xfcfcfcfcUL);            \
+    xmm2 = _mm_and_si128(xmm2, xmm5);               \
+    xmm0 = _mm_srli_epi16(xmm0, 3);                 \
+    xmm4 = _mm_setzero_si128();                     \
+    xmm5 = xmm0;                                    \
+    xmm7 = xmm2;                                    \
     \
-    xmm2 = _mm_unpacklo_epi8(xmm2, xmm4);   \
-    xmm0 = _mm_unpacklo_epi8(xmm0, xmm1);   \
-    xmm2 = _mm_slli_epi16(xmm2, 3);         \
-    xmm0 = _mm_or_si128(xmm0, xmm2);        \
-    _mm_stream_si128((__m128i*)p_buffer, xmm0); \
+    xmm2 = _mm_unpacklo_epi8(xmm2, xmm4);           \
+    xmm0 = _mm_unpacklo_epi8(xmm0, xmm1);           \
+    xmm2 = _mm_slli_epi16(xmm2, 3);                 \
+    xmm0 = _mm_or_si128(xmm0, xmm2);                \
+    _mm_stream_si128((__m128i*)p_buffer, xmm0);     \
     \
-    xmm7 = _mm_unpackhi_epi8(xmm7, xmm4);   \
-    xmm5 = _mm_unpackhi_epi8(xmm5, xmm1);   \
-    xmm7 = _mm_slli_epi16(xmm7, 3);         \
-    xmm5 = _mm_or_si128(xmm5, xmm7);        \
+    xmm7 = _mm_unpackhi_epi8(xmm7, xmm4);           \
+    xmm5 = _mm_unpackhi_epi8(xmm5, xmm1);           \
+    xmm7 = _mm_slli_epi16(xmm7, 3);                 \
+    xmm5 = _mm_or_si128(xmm5, xmm7);                \
     _mm_stream_si128((__m128i*)(p_buffer+8), xmm5);
 
-#define SSE2_UNPACK_16_UNALIGNED            \
-    xmm5 = _mm_set1_epi32(0xf8f8f8f8UL);    \
-    xmm0 = _mm_and_si128(xmm0, xmm5);       \
-    xmm1 = _mm_and_si128(xmm1, xmm5);       \
-    xmm5 = _mm_set1_epi32(0xfcfcfcfcUL);    \
-    xmm2 = _mm_and_si128(xmm2, xmm5);       \
-    xmm0 = _mm_srli_epi16(xmm0, 3);         \
-    xmm4 = _mm_setzero_si128();             \
-    xmm5 = xmm0;                            \
-    xmm7 = xmm2;                            \
+#define SSE2_UNPACK_16_UNALIGNED                    \
+    xmm5 = _mm_set1_epi32(0xf8f8f8f8UL);            \
+    xmm0 = _mm_and_si128(xmm0, xmm5);               \
+    xmm1 = _mm_and_si128(xmm1, xmm5);               \
+    xmm5 = _mm_set1_epi32(0xfcfcfcfcUL);            \
+    xmm2 = _mm_and_si128(xmm2, xmm5);               \
+    xmm0 = _mm_srli_epi16(xmm0, 3);                 \
+    xmm4 = _mm_setzero_si128();                     \
+    xmm5 = xmm0;                                    \
+    xmm7 = xmm2;                                    \
     \
-    xmm2 = _mm_unpacklo_epi8(xmm2, xmm4);   \
-    xmm0 = _mm_unpacklo_epi8(xmm0, xmm1);   \
-    xmm2 = _mm_slli_epi16(xmm2, 3);         \
-    xmm0 = _mm_or_si128(xmm0, xmm2);        \
-    _mm_storeu_si128((__m128i*)p_buffer, xmm0); \
+    xmm2 = _mm_unpacklo_epi8(xmm2, xmm4);           \
+    xmm0 = _mm_unpacklo_epi8(xmm0, xmm1);           \
+    xmm2 = _mm_slli_epi16(xmm2, 3);                 \
+    xmm0 = _mm_or_si128(xmm0, xmm2);                \
+    _mm_storeu_si128((__m128i*)p_buffer, xmm0);     \
     \
-    xmm7 = _mm_unpackhi_epi8(xmm7, xmm4);   \
-    xmm5 = _mm_unpackhi_epi8(xmm5, xmm1);   \
-    xmm7 = _mm_slli_epi16(xmm7, 3);         \
-    xmm5 = _mm_or_si128(xmm5, xmm7);        \
+    xmm7 = _mm_unpackhi_epi8(xmm7, xmm4);           \
+    xmm5 = _mm_unpackhi_epi8(xmm5, xmm1);           \
+    xmm7 = _mm_slli_epi16(xmm7, 3);                 \
+    xmm5 = _mm_or_si128(xmm5, xmm7);                \
     _mm_storeu_si128((__m128i*)(p_buffer+8), xmm5);
 
-#define SSE2_UNPACK_32_ARGB_ALIGNED         \
-    xmm3 = _mm_setzero_si128();             \
-    xmm4 = xmm0;                            \
-    xmm4 = _mm_unpacklo_epi8(xmm4, xmm2);   \
-    xmm5 = xmm1;                            \
-    xmm5 = _mm_unpacklo_epi8(xmm5, xmm3);   \
-    xmm6 = xmm4;                            \
-    xmm4 = _mm_unpacklo_epi16(xmm4, xmm5);  \
-    _mm_stream_si128((__m128i*)(p_buffer), xmm4); \
-    xmm6 = _mm_unpackhi_epi16(xmm6, xmm5);  \
+#define SSE2_UNPACK_32_ARGB_ALIGNED                 \
+    xmm3 = _mm_setzero_si128();                     \
+    xmm4 = xmm0;                                    \
+    xmm4 = _mm_unpacklo_epi8(xmm4, xmm2);           \
+    xmm5 = xmm1;                                    \
+    xmm5 = _mm_unpacklo_epi8(xmm5, xmm3);           \
+    xmm6 = xmm4;                                    \
+    xmm4 = _mm_unpacklo_epi16(xmm4, xmm5);          \
+    _mm_stream_si128((__m128i*)(p_buffer), xmm4);   \
+    xmm6 = _mm_unpackhi_epi16(xmm6, xmm5);          \
     _mm_stream_si128((__m128i*)(p_buffer+4), xmm6); \
-    xmm0 = _mm_unpackhi_epi8(xmm0, xmm2);   \
-    xmm1 = _mm_unpackhi_epi8(xmm1, xmm3);   \
-    xmm5 = xmm0;                            \
-    xmm5 = _mm_unpacklo_epi16(xmm5, xmm1);  \
+    xmm0 = _mm_unpackhi_epi8(xmm0, xmm2);           \
+    xmm1 = _mm_unpackhi_epi8(xmm1, xmm3);           \
+    xmm5 = xmm0;                                    \
+    xmm5 = _mm_unpacklo_epi16(xmm5, xmm1);          \
     _mm_stream_si128((__m128i*)(p_buffer+8), xmm5); \
-    xmm0 = _mm_unpackhi_epi16(xmm0, xmm1);  \
+    xmm0 = _mm_unpackhi_epi16(xmm0, xmm1);          \
     _mm_stream_si128((__m128i*)(p_buffer+12), xmm0);
 
-#define SSE2_UNPACK_32_ARGB_UNALIGNED       \
-    xmm3 = _mm_setzero_si128();             \
-    xmm4 = xmm0;                            \
-    xmm4 = _mm_unpacklo_epi8(xmm4, xmm2);   \
-    xmm5 = xmm1;                            \
-    xmm5 = _mm_unpacklo_epi8(xmm5, xmm3);   \
-    xmm6 = xmm4;                            \
-    xmm4 = _mm_unpacklo_epi16(xmm4, xmm5);  \
-    _mm_storeu_si128((__m128i*)(p_buffer), xmm4); \
-    xmm6 = _mm_unpackhi_epi16(xmm6, xmm5);  \
+#define SSE2_UNPACK_32_ARGB_UNALIGNED               \
+    xmm3 = _mm_setzero_si128();                     \
+    xmm4 = xmm0;                                    \
+    xmm4 = _mm_unpacklo_epi8(xmm4, xmm2);           \
+    xmm5 = xmm1;                                    \
+    xmm5 = _mm_unpacklo_epi8(xmm5, xmm3);           \
+    xmm6 = xmm4;                                    \
+    xmm4 = _mm_unpacklo_epi16(xmm4, xmm5);          \
+    _mm_storeu_si128((__m128i*)(p_buffer), xmm4);   \
+    xmm6 = _mm_unpackhi_epi16(xmm6, xmm5);          \
     _mm_storeu_si128((__m128i*)(p_buffer+4), xmm6); \
-    xmm0 = _mm_unpackhi_epi8(xmm0, xmm2);   \
-    xmm1 = _mm_unpackhi_epi8(xmm1, xmm3);   \
-    xmm5 = xmm0;                            \
-    xmm5 = _mm_unpacklo_epi16(xmm5, xmm1);  \
+    xmm0 = _mm_unpackhi_epi8(xmm0, xmm2);           \
+    xmm1 = _mm_unpackhi_epi8(xmm1, xmm3);           \
+    xmm5 = xmm0;                                    \
+    xmm5 = _mm_unpacklo_epi16(xmm5, xmm1);          \
     _mm_storeu_si128((__m128i*)(p_buffer+8), xmm5); \
-    xmm0 = _mm_unpackhi_epi16(xmm0, xmm1);  \
+    xmm0 = _mm_unpackhi_epi16(xmm0, xmm1);          \
     _mm_storeu_si128((__m128i*)(p_buffer+12), xmm0);
 
-#define SSE2_UNPACK_32_BGRA_ALIGNED         \
-    xmm3 = _mm_setzero_si128();             \
-    xmm4 = xmm2;                            \
-    xmm4 = _mm_unpacklo_epi8(xmm4, xmm0);   \
-    xmm3 = _mm_unpacklo_epi8(xmm3, xmm1);   \
-    xmm5 = xmm3;                            \
-    xmm3 = _mm_unpacklo_epi16(xmm3, xmm4);  \
-    _mm_stream_si128((__m128i*)(p_buffer), xmm3); \
-    xmm5 = _mm_unpackhi_epi16(xmm5, xmm4);  \
+#define SSE2_UNPACK_32_RGBA_ALIGNED                 \
+    xmm3 = _mm_setzero_si128();                     \
+    xmm4 = xmm2;                                    \
+    xmm4 = _mm_unpacklo_epi8(xmm4, xmm1);           \
+    xmm3 = _mm_unpacklo_epi8(xmm3, xmm0);           \
+    xmm5 = xmm3;                                    \
+    xmm3 = _mm_unpacklo_epi16(xmm3, xmm4);          \
+    _mm_stream_si128((__m128i*)(p_buffer), xmm3);   \
+    xmm5 = _mm_unpackhi_epi16(xmm5, xmm4);          \
     _mm_stream_si128((__m128i*)(p_buffer+4), xmm5); \
-    xmm6 = _mm_setzero_si128();             \
-    xmm2 = _mm_unpackhi_epi8(xmm2, xmm0);   \
-    xmm6 = _mm_unpackhi_epi8(xmm6, xmm1);   \
-    xmm0 = xmm6;                            \
-    xmm6 = _mm_unpacklo_epi16(xmm6, xmm2);  \
+    xmm6 = _mm_setzero_si128();                     \
+    xmm2 = _mm_unpackhi_epi8(xmm2, xmm1);           \
+    xmm6 = _mm_unpackhi_epi8(xmm6, xmm0);           \
+    xmm0 = xmm6;                                    \
+    xmm6 = _mm_unpacklo_epi16(xmm6, xmm2);          \
     _mm_stream_si128((__m128i*)(p_buffer+8), xmm6); \
-    xmm0 = _mm_unpackhi_epi16(xmm0, xmm2);  \
+    xmm0 = _mm_unpackhi_epi16(xmm0, xmm2);          \
     _mm_stream_si128((__m128i*)(p_buffer+12), xmm0);
 
-#define SSE2_UNPACK_32_BGRA_UNALIGNED       \
-    xmm3 = _mm_setzero_si128();             \
-    xmm4 = xmm2;                            \
-    xmm4 = _mm_unpacklo_epi8(xmm4, xmm0);   \
-    xmm3 = _mm_unpacklo_epi8(xmm3, xmm1);   \
-    xmm5 = xmm3;                            \
-    xmm3 = _mm_unpacklo_epi16(xmm3, xmm4);  \
-    _mm_storeu_si128((__m128i*)(p_buffer), xmm3); \
-    xmm5 = _mm_unpackhi_epi16(xmm5, xmm4);  \
+#define SSE2_UNPACK_32_RGBA_UNALIGNED               \
+    xmm3 = _mm_setzero_si128();                     \
+    xmm4 = xmm2;                                    \
+    xmm4 = _mm_unpacklo_epi8(xmm4, xmm1);           \
+    xmm3 = _mm_unpacklo_epi8(xmm3, xmm0);           \
+    xmm5 = xmm3;                                    \
+    xmm3 = _mm_unpacklo_epi16(xmm3, xmm4);          \
+    _mm_storeu_si128((__m128i*)(p_buffer), xmm3);   \
+    xmm5 = _mm_unpackhi_epi16(xmm5, xmm4);          \
     _mm_storeu_si128((__m128i*)(p_buffer+4), xmm5); \
-    xmm6 = _mm_setzero_si128();             \
-    xmm2 = _mm_unpackhi_epi8(xmm2, xmm0);   \
-    xmm6 = _mm_unpackhi_epi8(xmm6, xmm1);   \
-    xmm0 = xmm6;                            \
-    xmm6 = _mm_unpacklo_epi16(xmm6, xmm2);  \
+    xmm6 = _mm_setzero_si128();                     \
+    xmm2 = _mm_unpackhi_epi8(xmm2, xmm1);           \
+    xmm6 = _mm_unpackhi_epi8(xmm6, xmm0);           \
+    xmm0 = xmm6;                                    \
+    xmm6 = _mm_unpacklo_epi16(xmm6, xmm2);          \
     _mm_storeu_si128((__m128i*)(p_buffer+8), xmm6); \
-    xmm0 = _mm_unpackhi_epi16(xmm0, xmm2);  \
+    xmm0 = _mm_unpackhi_epi16(xmm0, xmm2);          \
     _mm_storeu_si128((__m128i*)(p_buffer+12), xmm0);
 
-#define SSE2_UNPACK_32_ABGR_ALIGNED         \
-    ;
+#define SSE2_UNPACK_32_BGRA_ALIGNED                 \
+    xmm3 = _mm_setzero_si128();                     \
+    xmm4 = xmm2;                                    \
+    xmm4 = _mm_unpacklo_epi8(xmm4, xmm0);           \
+    xmm3 = _mm_unpacklo_epi8(xmm3, xmm1);           \
+    xmm5 = xmm3;                                    \
+    xmm3 = _mm_unpacklo_epi16(xmm3, xmm4);          \
+    _mm_stream_si128((__m128i*)(p_buffer), xmm3);   \
+    xmm5 = _mm_unpackhi_epi16(xmm5, xmm4);          \
+    _mm_stream_si128((__m128i*)(p_buffer+4), xmm5); \
+    xmm6 = _mm_setzero_si128();                     \
+    xmm2 = _mm_unpackhi_epi8(xmm2, xmm0);           \
+    xmm6 = _mm_unpackhi_epi8(xmm6, xmm1);           \
+    xmm0 = xmm6;                                    \
+    xmm6 = _mm_unpacklo_epi16(xmm6, xmm2);          \
+    _mm_stream_si128((__m128i*)(p_buffer+8), xmm6); \
+    xmm0 = _mm_unpackhi_epi16(xmm0, xmm2);          \
+    _mm_stream_si128((__m128i*)(p_buffer+12), xmm0);
 
-#define SSE2_UNPACK_32_ABGR_UNALIGNED       \
-    ;
+#define SSE2_UNPACK_32_BGRA_UNALIGNED               \
+    xmm3 = _mm_setzero_si128();                     \
+    xmm4 = xmm2;                                    \
+    xmm4 = _mm_unpacklo_epi8(xmm4, xmm0);           \
+    xmm3 = _mm_unpacklo_epi8(xmm3, xmm1);           \
+    xmm5 = xmm3;                                    \
+    xmm3 = _mm_unpacklo_epi16(xmm3, xmm4);          \
+    _mm_storeu_si128((__m128i*)(p_buffer), xmm3);   \
+    xmm5 = _mm_unpackhi_epi16(xmm5, xmm4);          \
+    _mm_storeu_si128((__m128i*)(p_buffer+4), xmm5); \
+    xmm6 = _mm_setzero_si128();                     \
+    xmm2 = _mm_unpackhi_epi8(xmm2, xmm0);           \
+    xmm6 = _mm_unpackhi_epi8(xmm6, xmm1);           \
+    xmm0 = xmm6;                                    \
+    xmm6 = _mm_unpacklo_epi16(xmm6, xmm2);          \
+    _mm_storeu_si128((__m128i*)(p_buffer+8), xmm6); \
+    xmm0 = _mm_unpackhi_epi16(xmm0, xmm2);          \
+    _mm_storeu_si128((__m128i*)(p_buffer+12), xmm0);
+
+#define SSE2_UNPACK_32_ABGR_ALIGNED                 \
+    xmm3 = _mm_setzero_si128();                     \
+    xmm4 = xmm1;                                    \
+    xmm4 = _mm_unpacklo_epi8(xmm4, xmm2);           \
+    xmm5 = xmm0;                                    \
+    xmm5 = _mm_unpacklo_epi8(xmm5, xmm3);           \
+    xmm6 = xmm4;                                    \
+    xmm4 = _mm_unpacklo_epi16(xmm4, xmm5);          \
+    _mm_stream_si128((__m128i*)(p_buffer), xmm4);   \
+    xmm6 = _mm_unpackhi_epi16(xmm6, xmm5);          \
+    _mm_stream_si128((__m128i*)(p_buffer+4), xmm6); \
+    xmm1 = _mm_unpackhi_epi8(xmm1, xmm2);           \
+    xmm0 = _mm_unpackhi_epi8(xmm0, xmm3);           \
+    xmm2 = xmm1;                                    \
+    xmm1 = _mm_unpacklo_epi16(xmm1, xmm0);          \
+    _mm_stream_si128((__m128i*)(p_buffer+8), xmm1); \
+    xmm2 = _mm_unpackhi_epi16(xmm2, xmm0);          \
+    _mm_stream_si128((__m128i*)(p_buffer+12), xmm2);
+
+#define SSE2_UNPACK_32_ABGR_UNALIGNED               \
+    xmm3 = _mm_setzero_si128();                     \
+    xmm4 = xmm1;                                    \
+    xmm4 = _mm_unpacklo_epi8(xmm4, xmm2);           \
+    xmm5 = xmm0;                                    \
+    xmm5 = _mm_unpacklo_epi8(xmm5, xmm3);           \
+    xmm6 = xmm4;                                    \
+    xmm4 = _mm_unpacklo_epi16(xmm4, xmm5);          \
+    _mm_storeu_si128((__m128i*)(p_buffer), xmm4);   \
+    xmm6 = _mm_unpackhi_epi16(xmm6, xmm5);          \
+    _mm_storeu_si128((__m128i*)(p_buffer+4), xmm6); \
+    xmm1 = _mm_unpackhi_epi8(xmm1, xmm2);           \
+    xmm0 = _mm_unpackhi_epi8(xmm0, xmm3);           \
+    xmm2 = xmm1;                                    \
+    xmm1 = _mm_unpacklo_epi16(xmm1, xmm0);          \
+    _mm_storeu_si128((__m128i*)(p_buffer+8), xmm1); \
+    xmm2 = _mm_unpackhi_epi16(xmm2, xmm0);          \
+    _mm_storeu_si128((__m128i*)(p_buffer+12), xmm2);
 
 #endif
 

@@ -161,8 +161,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* R8G8B8A8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R8G8B8A8");
-                        //p_vout->chroma.pf_convert = E_(I420_B8G8R8A8);
-                        return -1;
+                        p_vout->chroma.pf_convert = E_(I420_R8G8B8A8);
                     }
                     else if( p_vout->output.i_rmask == 0x0000ff00
                           && p_vout->output.i_gmask == 0x00ff0000

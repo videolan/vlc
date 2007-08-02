@@ -138,56 +138,56 @@ movq      %%mm1, (%1)   # Store YUYV                                      \n\
 #define MMX_END _mm_empty()
     
 #define MMX_YUV420_YUYV                     \
-    mm1 = _mm_cvtsi32_si64((int)*p_u);      \
-    mm2 = _mm_cvtsi32_si64((int)*p_v);      \
+    mm1 = _mm_cvtsi32_si64(*(int*)p_u);     \
+    mm2 = _mm_cvtsi32_si64(*(int*)p_v);     \
     mm0 = (__m64)*(uint64_t*)p_y1;          \
     mm3 = (__m64)*(uint64_t*)p_y2;          \
     mm1 = _mm_unpacklo_pi8(mm1, mm2);       \
     mm2 = mm0;                              \
     mm2 = _mm_unpacklo_pi8(mm2, mm1);       \
-    *(uin64_t)p_line1 = (uint64)mm2;        \
+    *(uint64_t*)p_line1 = (uint64_t)mm2;    \
     mm0 = _mm_unpackhi_pi8(mm0, mm1);       \
-    *(uin64_t)(p_line1 + 4) = (uint64)mm0;  \
+    *(uint64_t*)(p_line1+8) = (uint64_t)mm0;\
     mm4 = mm3;                              \
     mm4 = _mm_unpacklo_pi8(mm4, mm1);       \
-    *(uin64_t)p_line2 = (uint64)mm4;        \
+    *(uint64_t*)p_line2 = (uint64_t)mm4;    \
     mm3 = _mm_unpackhi_pi8(mm3, mm1);       \
-    *(uin64_t)(p_line2 + 4) = (uint64)mm4;
+    *(uint64_t*)(p_line2+8) = (uint64_t)mm3;
 
 #define MMX_YUV420_YVYU                     \
-    mm2 = _mm_cvtsi32_si64((int)*p_u);      \
-    mm1 = _mm_cvtsi32_si64((int)*p_v);      \
+    mm2 = _mm_cvtsi32_si64(*(int*)p_u);     \
+    mm1 = _mm_cvtsi32_si64(*(int*)p_v);     \
     mm0 = (__m64)*(uint64_t*)p_y1;          \
     mm3 = (__m64)*(uint64_t*)p_y2;          \
     mm1 = _mm_unpacklo_pi8(mm1, mm2);       \
     mm2 = mm0;                              \
     mm2 = _mm_unpacklo_pi8(mm2, mm1);       \
-    *(uin64_t)p_line1 = (uint64)mm2;        \
+    *(uint64_t*)p_line1 = (uint64_t)mm2;    \
     mm0 = _mm_unpackhi_pi8(mm0, mm1);       \
-    *(uin64_t)(p_line1 + 4) = (uint64)mm0;  \
+    *(uint64_t*)(p_line1+8) = (uint64_t)mm0;\
     mm4 = mm3;                              \
     mm4 = _mm_unpacklo_pi8(mm4, mm1);       \
-    *(uin64_t)p_line2 = (uint64)mm4;        \
+    *(uint64_t*)p_line2 = (uint64_t)mm4;    \
     mm3 = _mm_unpackhi_pi8(mm3, mm1);       \
-    *(uin64_t)(p_line2 + 4) = (uint64)mm4;
+    *(uint64_t*)(p_line2+8) = (uint64_t)mm3;
 
 #define MMX_YUV420_UYVY                     \
-    mm1 = _mm_cvtsi32_si64((int)*p_u);      \
-    mm2 = _mm_cvtsi32_si64((int)*p_v);      \
+    mm1 = _mm_cvtsi32_si64(*(int*)p_u);     \
+    mm2 = _mm_cvtsi32_si64(*(int*)p_v);     \
     mm0 = (__m64)*(uint64_t*)p_y1;          \
     mm3 = (__m64)*(uint64_t*)p_y2;          \
     mm1 = _mm_unpacklo_pi8(mm1, mm2);       \
     mm2 = mm1;                              \
     mm2 = _mm_unpacklo_pi8(mm2, mm0);       \
-    *(uin64_t)p_line1 = (uint64)mm2;        \
+    *(uint64_t*)p_line1 = (uint64_t)mm2;    \
     mm2 = mm1;                              \
     mm2 = _mm_unpackhi_pi8(mm2, mm0);       \
-    *(uin64_t)(p_line1 + 4) = (uint64)mm2;  \
+    *(uint64_t*)(p_line1+8) = (uint64_t)mm2;\
     mm4 = mm1;                              \
     mm4 = _mm_unpacklo_pi8(mm4, mm3);       \
-    *(uin64_t)p_line2 = (uint64)mm4;        \
+    *(uint64_t*)p_line2 = (uint64_t)mm4;    \
     mm1 = _mm_unpackhi_pi8(mm1, mm3);       \
-    *(uin64_t)(p_line2 + 4) = (uint64)mm1;
+    *(uint64_t*)(p_line2+8) = (uint64_t)mm1;
 
 #endif
 
