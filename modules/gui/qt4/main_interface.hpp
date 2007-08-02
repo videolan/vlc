@@ -118,6 +118,7 @@ private:
     void customEvent( QEvent *);
 public slots:
     void undockPlaylist();
+    void toggleMenus();
     void playlist();
     void toggleUpdateSystrayMenu();
 private slots:

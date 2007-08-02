@@ -501,13 +501,6 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
     }
 }
 
-void DialogsProvider::hideMenus()
-{
-    /* TODO
-     * Simplify the main Interface
-     */
-}
-
 void DialogsProvider::switchToSkins()
 {
     var_SetString( p_intf, "intf-switch", "skins2" );

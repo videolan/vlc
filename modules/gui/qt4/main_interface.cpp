@@ -747,6 +747,13 @@ void MainInterface::undockPlaylist()
     }
 }
 
+void MainInterface::toggleMenus()
+{
+    if( menuBar()->isVisible() ) menuBar()->hide();
+        else menuBar()->show();
+    msg_Dbg( p_intf, "I was there: \\_o<~~ coin coin" );
+}
+
 void MainInterface::customEvent( QEvent *event )
 {
     if( event->type() == PLDockEvent_Type )

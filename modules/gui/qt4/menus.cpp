@@ -289,7 +289,8 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         adv->setCheckable( true );
         if( adv_controls_enabled ) adv->setChecked( true );
 
-        DP_SADD( menu, qtr( "Hide Menus..." ), "","",hideMenus(), "Ctrl+H" );
+        menu->addAction( qtr( "Hide Menus..." ), mi, SLOT( toggleMenus() ),
+                qtr( "Ctrl+H") );
         menu->addSeparator();
 
 #if 0 /* For Visualisations. Not yet working */

@@ -166,7 +166,6 @@ public slots:
     void openPlaylist();
     void savePlaylist();
 
-    void hideMenus();
     void switchToSkins();
     void quit();
 };
