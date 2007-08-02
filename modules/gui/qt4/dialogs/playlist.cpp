@@ -63,10 +63,10 @@ void PlaylistDialog::createPlMenuBar( QMenuBar *bar, intf_thread_t *p_intf )
 {
     QMenu *manageMenu = new QMenu();
     manageMenu->setTitle( qtr("Manage") );
-    manageMenu->addAction( qtr("Open playlist file"), THEDP, SLOT( openPlaylist() ),
-            qtr( "Ctrl+L") );
+    manageMenu->addAction( qtr("Open playlist file"), THEDP,
+            SLOT( openPlaylist() ), qtr( "Ctrl+X") );
     manageMenu->addSeparator();
-    manageMenu->addAction( qtr("Dock playlist"), this, SLOT( dock() ), 
+    manageMenu->addAction( qtr("Dock playlist"), this, SLOT( dock() ),
             qtr( "Ctrl+U" ) );
     bar->addMenu( manageMenu );
     bar->addMenu( QVLCMenu::SDMenu( p_intf ) );
