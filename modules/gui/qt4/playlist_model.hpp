@@ -32,8 +32,10 @@
 #include <QObject>
 #include <QEvent>
 #include <QMimeData>
+#include <QSignalMapper>
 
 class PLModel;
+class QSignalMapper;
 
 class PLItem
 {
@@ -63,6 +65,8 @@ protected:
     int type;
     int i_id;
     int i_input_id;
+    int i_showflags;
+    void updateview( void );
     friend class PLModel;
 private:
     void init( int, int, PLItem *, PLModel * );
@@ -165,6 +169,7 @@ private:
     /* Popup */
     int i_popup_item, i_popup_parent;
     QModelIndexList current_selection;
+    QSignalMapper *ContextUpdateMapper;
 
     /* Lookups */
     PLItem *FindById( PLItem *, int );
@@ -189,6 +194,7 @@ private slots:
     void popupInfo();
     void popupStream();
     void popupSave();
+    void viewchanged( int );
 friend class PLItem;
 };
 

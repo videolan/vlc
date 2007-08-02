@@ -73,11 +73,56 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m)
     parentItem = parent;
     i_id = _i_id; i_input_id = _i_input_id;
     model = m;
-    strings.append( "" );
-    strings.append( "" );
-    strings.append( "" );
-    strings.append( "" );
+
+
+    if( parentItem == NULL )
+    {
+        i_showflags = config_GetInt( model->p_intf , "qt-pl-showflags" );
+        updateview();
+    }
 }
+
+void PLItem::updateview( void )
+{
+    strings.clear();
+
+    for( int i_index=1; i_index <= VLC_META_ENGINE_MB_TRM_ID; i_index = i_index*2 ) 
+    {
+        if( i_showflags & i_index )
+        {
+            switch( i_index )
+            {
+                case VLC_META_ENGINE_ARTIST:
+                    strings.append( qtr( VLC_META_ARTIST ) );
+                    break; 
+                case VLC_META_ENGINE_TITLE:
+                    strings.append( qtr( VLC_META_TITLE ) );
+                    break; 
+                case VLC_META_ENGINE_DESCRIPTION:
+                    strings.append( qtr( VLC_META_DESCRIPTION ) );
+                    break; 
+                case VLC_META_ENGINE_DURATION:
+                    strings.append( qtr( "Duration" ) );
+                    break; 
+                case VLC_META_ENGINE_GENRE:
+                    strings.append( qtr( VLC_META_GENRE ) );
+                    break;
+                case VLC_META_ENGINE_COLLECTION:
+                    strings.append( qtr( VLC_META_COLLECTION ) );
+                    break;
+                case VLC_META_ENGINE_SEQ_NUM:
+                    strings.append( qtr( VLC_META_SEQ_NUM ) );
+                    break;
+                case VLC_META_ENGINE_RATING:
+                    strings.append( qtr( VLC_META_RATING ) );
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
 
 PLItem::PLItem( int _i_id, int _i_input_id, PLItem *parent, PLModel *m)
 {
@@ -125,13 +170,8 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 {
     char psz_duration[MSTRTIME_MAX_SIZE];
     assert( p_item->p_input->i_id == i_input_id );
-    strings[0] = qfu( p_item->p_input->psz_name );
-    if( p_item->p_input->p_meta )
-    {
-        strings[1] = qfu( p_item->p_input->p_meta->psz_artist );
-    }
-    secstotimestr( psz_duration, p_item->p_input->i_duration / 1000000 );
-    strings[2] = QString( psz_duration );
+    strings.clear();
+
     type = p_item->p_input->i_type;
     current = iscurrent;
 
@@ -141,6 +181,63 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
         model->sendArt( qfu( p_item->p_input->p_meta->psz_arturl ) );
     else if( current )
         model->removeArt();
+
+    if( model->i_depth == 1 )  //left window for playlist etc.
+    {
+        strings.append( p_item->p_input->psz_name );
+        return;
+    } 
+    
+
+#define ADD_META( meta ) {             \
+   if( p_item->p_input->p_meta )       \
+      strings.append( qfu( meta ) );   \
+   else                                \
+      strings.append( qtr( "" ) ); }
+
+    for( int i_index=1; i_index <= VLC_META_ENGINE_MB_TRM_ID; i_index = i_index * 2 ) 
+    {
+        if( parentItem->i_showflags & i_index )
+        {
+            switch( i_index )
+            {
+                case VLC_META_ENGINE_ARTIST:
+                    ADD_META( p_item->p_input->p_meta->psz_artist );
+                    break; 
+                case VLC_META_ENGINE_TITLE:
+                    if( p_item->p_input->p_meta && p_item->p_input->p_meta->psz_title )
+                    {
+                        ADD_META( p_item->p_input->p_meta->psz_title );
+                    } else {
+                        ADD_META( p_item->p_input->psz_name );
+                    }
+                    break; 
+                case VLC_META_ENGINE_DESCRIPTION:
+                    ADD_META( p_item->p_input->p_meta->psz_description );
+                    break; 
+                case VLC_META_ENGINE_DURATION:
+                    secstotimestr( psz_duration, p_item->p_input->i_duration / 1000000 );
+                    strings.append( QString( psz_duration ) );
+                    break; 
+                case VLC_META_ENGINE_GENRE:
+                    ADD_META( p_item->p_input->p_meta->psz_genre );
+                    break;
+                case VLC_META_ENGINE_COLLECTION:
+                    ADD_META( p_item->p_input->p_meta->psz_album );
+                    break;
+                case VLC_META_ENGINE_SEQ_NUM:
+                    ADD_META( p_item->p_input->p_meta->psz_tracknum);
+                    break;
+                case VLC_META_ENGINE_RATING:
+                    ADD_META( p_item->p_input->p_meta->psz_rating );
+                default:
+                    break;
+            } 
+        }
+
+    }
+#undef ADD_META
+
 }
 
 /*************************************************************************
@@ -447,7 +544,7 @@ QModelIndex PLModel::parent(const QModelIndex &index) const
 int PLModel::columnCount( const QModelIndex &i) const
 {
     if( i_depth == 1 ) return 1;
-    return 3;
+    return rootItem->strings.count();
 }
 
 int PLModel::childrenCount(const QModelIndex &parent) const
@@ -658,9 +755,6 @@ void PLModel::rebuild( playlist_item_t *p_root )
     {
         //if( rootItem ) delete rootItem;
         rootItem = new PLItem( p_root, NULL, this );
-        rootItem->strings[0] = qtr("Name");
-        rootItem->strings[1] = qtr("Artist");
-        rootItem->strings[2] = qtr("Duration");
     }
     assert( rootItem );
     /* Recreate from root */
@@ -861,10 +955,92 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
             menu->addAction( qfu(I_POP_SORT), this, SLOT( popupSort() ) );
             menu->addAction( qfu(I_POP_ADD), this, SLOT( popupAdd() ) );
         }
+        menu->addSeparator();
+
+        ContextUpdateMapper = new QSignalMapper(this);
+
+#define ADD_META_ACTION( meta ) { \
+   QAction* option = menu->addAction( qfu(VLC_META_##meta) );                   \
+   option->setCheckable( true );                                                \
+   option->setChecked( rootItem->i_showflags & VLC_META_ENGINE_##meta );        \
+   ContextUpdateMapper->setMapping( option, VLC_META_ENGINE_##meta );           \
+   CONNECT( option, triggered(), ContextUpdateMapper, map() );     \
+   }
+        CONNECT(ContextUpdateMapper, mapped( int ), this, viewchanged( int ) );
+
+        ADD_META_ACTION( TITLE );
+        ADD_META_ACTION( ARTIST );
+        ADD_META_ACTION( DURATION );
+        ADD_META_ACTION( COLLECTION );
+        ADD_META_ACTION( GENRE );
+        ADD_META_ACTION( SEQ_NUM );
+        ADD_META_ACTION( RATING );
+        ADD_META_ACTION( DESCRIPTION );
+
+#undef ADD_META_ACTION
+
         menu->popup( point );
     }
     else
         PL_UNLOCK;
+}
+
+
+void PLModel::viewchanged( int meta )
+{
+   if( rootItem )
+   {
+       int index=0;
+       switch( meta )
+       {
+           case VLC_META_ENGINE_TITLE:
+               index=0;
+               break;
+           case VLC_META_ENGINE_DURATION:
+               index=1;
+               break;
+           case VLC_META_ENGINE_ARTIST:
+               index=2;
+               break;
+           case VLC_META_ENGINE_GENRE:
+               index=3;
+               break;
+           case VLC_META_ENGINE_COPYRIGHT:
+               index=4;
+               break;
+           case VLC_META_ENGINE_COLLECTION:
+               index=5;
+               break;
+           case VLC_META_ENGINE_SEQ_NUM:
+               index=6;
+               break;
+           case VLC_META_ENGINE_DESCRIPTION:
+               index=7;
+               break;
+           default:
+               break;
+       }
+       emit layoutAboutToBeChanged();
+       index = __MIN( index , rootItem->strings.count() );
+       QModelIndex parent = createIndex( 0, 0, rootItem );
+       if( rootItem->i_showflags & meta )
+       {
+           beginRemoveColumns( parent , index, index+1 );
+           rootItem->i_showflags &= ~( meta );
+           rootItem->updateview();
+           endRemoveColumns();
+       }
+       else
+       {
+           beginInsertColumns( createIndex( 0, 0, rootItem), index, index+1 );
+           rootItem->i_showflags |= meta;
+           rootItem->updateview();
+           endInsertColumns();
+       }
+       rebuild();
+       config_PutInt( p_intf, "qt-pl-showflags", rootItem->i_showflags );
+       config_SaveConfigFile( p_intf, NULL );
+   }
 }
 
 void PLModel::popupDel()
