@@ -242,11 +242,11 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
     QMenu *menu = new QMenu();
     menu->addMenu( SDMenu( p_intf ) );
     menu->addAction ( QIcon(":/pixmaps/vlc_playlist_16px.png"),
-                      qtr( "Playlist"), mi, SLOT( playlist() ) );
+                      qtr( "Show Playlist"), mi, SLOT( playlist() ) );
     menu->addSeparator();
 
-    DP_SADD( menu, qtr( I_PL_LOAD ), "", "", openPlaylist(), "Ctrl+L" );
-    DP_SADD( menu, qtr( I_PL_SAVE ), "", "", savePlaylist(), "Ctrl+K" );
+    DP_SADD( menu, qtr( I_PL_LOAD ), "", "", openPlaylist(), "Ctrl+X" );
+    DP_SADD( menu, qtr( I_PL_SAVE ), "", "", savePlaylist(), "Ctrl+Y" );
     menu->addSeparator();
     menu->addAction( qtr("Undock from interface"), mi,
             SLOT( undockPlaylist() ), qtr("Ctrl+U") );
@@ -300,7 +300,8 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         if( visual_selector_enabled ) adv->setChecked( true );
 #endif
         menu->addAction ( QIcon(":/pixmaps/vlc_playlist_16px.png"),
-                          qtr( "Playlist"), mi, SLOT( playlist() ) );
+                          qtr( "Playlist"), mi, SLOT( playlist() ),
+                          qtr( "Ctrl+L") );
     }
     DP_SADD( menu, qtr( I_MENU_EXT ), "", ":/pixmaps/vlc_settings_16px.png",
                  extendedDialog() ,  "Ctrl+E"  );
