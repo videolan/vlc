@@ -294,8 +294,8 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 
 .libtool: libtool
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-	ln -s libtool $(PREFIX)/bin/glibtool
-	ln -s libtoolize $(PREFIX)/bin/glibtoolize
+	ln -sf libtool $(PREFIX)/bin/glibtool
+	ln -sf libtoolize $(PREFIX)/bin/glibtoolize
 	touch $@
 
 CLEAN_PKG += libtool
