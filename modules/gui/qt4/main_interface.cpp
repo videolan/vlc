@@ -342,7 +342,7 @@ void MainInterface::handleMainUi( QSettings *settings )
     visualSelector->hide();
 
     /* And video Outputs */
-    if(  alwaysVideoFlag )
+    if( alwaysVideoFlag )
     {
         bgWidget = new BackgroundWidget( p_intf );
         bgWidget->widgetSize = settings->value( "backgroundSize",
@@ -696,6 +696,7 @@ void MainInterface::playlist()
             videoWidget->resize( videoWidget->widgetSize );
             videoWidget->updateGeometry();
         }
+        if( bgWidget ) bgWidget->show();
     }
     else
     {
