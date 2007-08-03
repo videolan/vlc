@@ -307,7 +307,7 @@ lib${mod}_plugin_la_SOURCES = \$(SOURCES_${mod})
 EOF
     if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
 nodist_lib${mod}_plugin_la_SOURCES = \$(nodist_SOURCES_${mod})
-CLEANFILES += "\$(nodist_SOURCES_${mod})"
+CLEANFILES += \$(nodist_SOURCES_${mod})
 BUILT_SOURCES += \$(B${mod})
 EOF
     fi
