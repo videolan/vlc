@@ -228,37 +228,36 @@ void config_ChainDestroy( config_chain_t *p_cfg )
 void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                           const char *const *ppsz_options, config_chain_t *cfg )
 {
-    char *psz_name;
-    int  i_type;
-    int  i;
+    if( psz_prefix == NULL ) psz_prefix = "";
+    size_t plen = 1 + strlen( psz_prefix );
 
     /* First, var_Create all variables */
-    for( i = 0; ppsz_options[i] != NULL; i++ )
+    for( size_t i = 0; ppsz_options[i] != NULL; i++ )
     {
-        asprintf( &psz_name, "%s%s", psz_prefix,
-                  *ppsz_options[i] == '*' ? &ppsz_options[i][1] : ppsz_options[i] );
+        const char *optname = ppsz_options[i];
+        if (optname[0] == '*')
+            optname++;
 
-        i_type = config_GetType( p_this, psz_name );
-
-        var_Create( p_this, psz_name, i_type | VLC_VAR_DOINHERIT );
-        free( psz_name );
+        char name[plen + strlen( optname )];
+        snprintf( name, sizeof (name), "%s%s", psz_prefix, optname );
+        if( var_Create( p_this, name,
+                        config_GetType( p_this, name ) | VLC_VAR_DOINHERIT ) )
+            return /* VLC_xxx */; 
     }
 
     /* Now parse options and set value */
-    if( psz_prefix == NULL ) psz_prefix = "";
-
-    while( cfg )
+    for(; cfg; cfg = cfg->p_next )
     {
         vlc_value_t val;
         vlc_bool_t b_yes = VLC_TRUE;
         vlc_bool_t b_once = VLC_FALSE;
         module_config_t *p_conf;
+        int i_type;
+        size_t i;
 
         if( cfg->psz_name == NULL || *cfg->psz_name == '\0' )
-        {
-            cfg = cfg->p_next;
             continue;
-        }
+
         for( i = 0; ppsz_options[i] != NULL; i++ )
         {
             if( !strcmp( ppsz_options[i], cfg->psz_name ) )
@@ -282,68 +281,62 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
             }
 
         }
+
         if( ppsz_options[i] == NULL )
         {
             msg_Warn( p_this, "option %s is unknown", cfg->psz_name );
-            cfg = cfg->p_next;
             continue;
         }
 
         /* create name */
-        asprintf( &psz_name, "%s%s", psz_prefix, b_once ? &ppsz_options[i][1] : ppsz_options[i] );
+        char name[plen + strlen( ppsz_options[i] )];
+        const char *psz_name = name;
+        snprintf( name, sizeof (name), "%s%s", psz_prefix,
+                  b_once ? (ppsz_options[i] + 1) : ppsz_options[i] );
 
         /* Check if the option is deprecated */
-        p_conf = config_FindConfig( p_this, psz_name );
+        p_conf = config_FindConfig( p_this, name );
 
         /* This is basically cut and paste from src/misc/configuration.c
          * with slight changes */
         if( p_conf && p_conf->psz_current )
         {
-            if( !strcmp( p_conf->psz_current, "SUPPRESSED" ) )
+            if( p_conf->b_strict )
             {
-                msg_Err( p_this, "Option %s is no longer used.",
+                msg_Err( p_this, "Option %s is not supported anymore.",
                          p_conf->psz_name );
-                goto next;
-            }
-            else if( p_conf->b_strict )
-            {
-                msg_Err( p_this, "Option %s is deprecated. Use %s instead.",
-                         p_conf->psz_name, p_conf->psz_current );
                 /* TODO: this should return an error and end option parsing
                  * ... but doing this would change the VLC API and all the
                  * modules so i'll do it later */
-                goto next;
+                continue;
             }
-            else
-            {
-                msg_Warn( p_this, "Option %s is deprecated. You should use "
-                        "%s instead.", p_conf->psz_name, p_conf->psz_current );
-                free( psz_name );
-                psz_name = strdup( p_conf->psz_current );
-            }
+            msg_Warn( p_this, "Option %s is obsolete. Use %s instead.",
+                      p_conf->psz_name, p_conf->psz_current );
+            psz_name = p_conf->psz_current;
         }
         /* </Check if the option is deprecated> */
 
         /* get the type of the variable */
+        msg_Err( p_this, "name = %s", name );
         i_type = config_GetType( p_this, psz_name );
         if( !i_type )
         {
             msg_Warn( p_this, "unknown option %s (value=%s)",
                       cfg->psz_name, cfg->psz_value );
-            goto next;
+            continue;
         }
 
-        i_type &= 0x00f0;
+        i_type &= CONFIG_ITEM;
 
         if( i_type != VLC_VAR_BOOL && cfg->psz_value == NULL )
         {
             msg_Warn( p_this, "missing value for option %s", cfg->psz_name );
-            goto next;
+            continue;
         }
         if( i_type != VLC_VAR_STRING && b_once )
         {
             msg_Warn( p_this, "*option_name need to be a string option" );
-            goto next;
+            continue;
         }
 
         switch( i_type )
@@ -376,15 +369,11 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
             {
                 free( val2.psz_string );
                 msg_Dbg( p_this, "ignoring option %s (not first occurrence)", psz_name );
-                goto next;
+                continue;
             }
             free( val2.psz_string );
         }
         var_Set( p_this, psz_name, val );
         msg_Dbg( p_this, "set config option: %s to %s", psz_name, cfg->psz_value );
-
-    next:
-        free( psz_name );
-        cfg = cfg->p_next;
     }
 }
