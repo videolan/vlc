@@ -80,7 +80,6 @@ vlc_module_begin();
     set_description( _("Dirac video encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
-    add_shortcut( "dirac" );
     add_float( ENC_CFG_PREFIX "quality", 7.0, NULL, ENC_QUALITY_TEXT,
                ENC_QUALITY_LONGTEXT, VLC_FALSE );
 

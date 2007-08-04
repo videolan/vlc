@@ -173,6 +173,7 @@ vlc_module_begin();
 
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACODEC );
+    add_shortcut( "flac" );
 
 #ifdef USE_LIBFLAC
     set_description( _("Flac audio decoder") );
@@ -190,7 +191,6 @@ vlc_module_begin();
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, CloseDecoder );
 
-    add_shortcut( "flac" );
 vlc_module_end();
 
 /*****************************************************************************

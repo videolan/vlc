@@ -228,7 +228,6 @@ vlc_module_begin();
 
     add_submodule();
     set_description( _("DirectShow input") );
-    add_shortcut( "dshow" );
     set_capability( "access2", 0 );
     set_callbacks( AccessOpen, AccessClose );
 

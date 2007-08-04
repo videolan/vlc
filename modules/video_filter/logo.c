@@ -122,7 +122,6 @@ vlc_module_begin();
     set_capability( "sub filter", 0 );
     set_callbacks( CreateFilter, DestroyFilter );
     set_description( _("Logo sub filter") );
-    add_shortcut( "logo" );
 vlc_module_end();
 
 static const char *ppsz_filter_options[] = {

@@ -106,7 +106,6 @@ vlc_module_begin();
     add_submodule();
         set_description( "Directory EOF");
         set_capability( "demux2", 0 );
-        add_shortcut( "directory" );
         set_callbacks( DemuxOpen, NULL );
 vlc_module_end();
 
@@ -268,7 +267,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
 }
 
 /*****************************************************************************
- * DemuxOpen:
+ * Control:
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
