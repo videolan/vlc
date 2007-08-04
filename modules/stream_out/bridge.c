@@ -82,7 +82,6 @@ vlc_module_begin();
                  ID_OFFSET_LONGTEXT, VLC_FALSE );
     set_callbacks( OpenIn, CloseIn );
 
-    var_Create( p_module->p_libvlc_global, "bridge-lock", VLC_VAR_MUTEX );
 vlc_module_end();
 
 
@@ -170,6 +169,7 @@ static int OpenOut( vlc_object_t *p_this )
     p_sys          = malloc( sizeof( out_sout_stream_sys_t ) );
     p_sys->b_inited = VLC_FALSE;
 
+    var_Create( p_this->p_libvlc_global, "bridge-lock", VLC_VAR_MUTEX );
     var_Get( p_this->p_libvlc_global, "bridge-lock", &val );
     p_sys->p_lock = val.p_address;
 
@@ -354,6 +354,7 @@ static int OpenIn( vlc_object_t *p_this )
     config_ChainParse( p_stream, SOUT_CFG_PREFIX_IN, ppsz_sout_options_in,
                    p_stream->p_cfg );
 
+    var_Create( p_this->p_libvlc_global, "bridge-lock", VLC_VAR_MUTEX );
     var_Get( p_this->p_libvlc_global, "bridge-lock", &val );
     p_sys->p_lock = val.p_address;
 

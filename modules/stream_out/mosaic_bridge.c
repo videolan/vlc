@@ -162,8 +162,6 @@ vlc_module_begin();
                      NULL, NULL, VFILTER_TEXT, VFILTER_LONGTEXT, VLC_FALSE );
 
     set_callbacks( Open, Close );
-
-    var_Create( p_module->p_libvlc_global, "mosaic-lock", VLC_VAR_MUTEX );
 vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
@@ -192,6 +190,7 @@ static int Open( vlc_object_t *p_this )
     p_stream->p_sys = p_sys;
     p_sys->b_inited = VLC_FALSE;
 
+    var_Create( p_libvlc_global, "mosaic-lock", VLC_VAR_MUTEX );
     var_Get( p_libvlc_global, "mosaic-lock", &val );
     p_sys->p_lock = val.p_address;
 

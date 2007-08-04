@@ -228,8 +228,6 @@ vlc_module_begin();
 
     add_integer( CFG_PREFIX "delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,
                  VLC_FALSE );
-
-    var_Create( p_module->p_libvlc_global, "mosaic-lock", VLC_VAR_MUTEX );
 vlc_module_end();
 
 static const char *ppsz_filter_options[] = {
@@ -308,6 +306,7 @@ static int CreateFilter( vlc_object_t *p_this )
     vlc_mutex_init( p_filter, &p_sys->lock );
     vlc_mutex_lock( &p_sys->lock );
 
+    var_Create( p_libvlc_global, "mosaic-lock", VLC_VAR_MUTEX );
     var_Get( p_libvlc_global, "mosaic-lock", &val );
     p_sys->p_lock = val.p_address;
 
