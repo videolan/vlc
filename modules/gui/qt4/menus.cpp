@@ -444,7 +444,8 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
         while( p_parser->pp_shortcuts[++i] != NULL );
         i--;
         if( playlist_IsServicesDiscoveryLoaded( THEPL,
-                    p_parser->pp_shortcuts[i] ?: module_GetObjName( p_parser ) ) )
+                    i>=0?p_parser->pp_shortcuts[i]
+                    : module_GetObjName( p_parser ) ) )
             a->setChecked( true );
         CONNECT( a , triggered(), THEDP->SDMapper, map() );
         THEDP->SDMapper->setMapping( a, i>=0? p_parser->pp_shortcuts[i] :
