@@ -412,7 +412,8 @@ VLC_EXPORT( playlist_item_t *, playlist_GetLastLeaf, ( playlist_t *p_playlist, p
  * Inline functions
  ***********************************************************************/
 /** Open a playlist file, add its content to the current playlist */
-static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file){
+static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
+{
     char psz_uri[256+10];
     input_item_t *p_input;
     snprintf( psz_uri, 256+9, "file/://%s", psz_file );
