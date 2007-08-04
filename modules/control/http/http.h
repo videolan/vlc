@@ -1,7 +1,7 @@
 /*****************************************************************************
  * http.h: Headers for the HTTP interface
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -208,7 +208,7 @@ void     E_(mvar_AppendNewVar)( mvar_t *vars, const char *name,
 mvar_t *E_(mvar_IntegerSetNew)( const char *name, const char *arg );
 
 /** This function creates a set variable with a list of VLC objects */
-mvar_t *E_(mvar_ObjectSetNew)( intf_thread_t *p_intf, char *name, char *arg );
+mvar_t *E_(mvar_ObjectSetNew)( intf_thread_t *p_intf, char *name, const char *arg );
 
 /** This function creates a set variable with the contents of the playlist */
 mvar_t *E_(mvar_PlaylistSetNew)( intf_thread_t *p_intf, char *name,
@@ -224,7 +224,7 @@ mvar_t *E_(mvar_InputVarSetNew)( intf_thread_t *p_intf, char *name,
 /** This function creates a set variable representing the files of the psz_dir
  * directory */
 mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
-                             char *psz_dir );
+                             const char *psz_dir );
 /** This function creates a set variable representing the VLM streams */
 mvar_t *E_(mvar_VlmSetNew)( char *name, vlm_t *vlm );
 

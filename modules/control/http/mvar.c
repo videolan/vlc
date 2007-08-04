@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mvar.c : Variables handling for the HTTP Interface
  *****************************************************************************
- * Copyright (C) 2001-2006 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -127,24 +127,25 @@ void E_(mvar_RemoveVar)( mvar_t *v, mvar_t *f )
 mvar_t *E_(mvar_GetVar)( mvar_t *s, const char *name )
 {
     /* format: name[index].field */
-    char *field = strchr( name, '.' );
-    int i = 1 + ((field != NULL) ? (field - name) : strlen( name ));
-    char base[i];
+    const char *field = strchr( name, '.' );
+    char base[1 + (field ? (size_t)(field - name) : strlen( name ))];
     char *p;
-    int i_index;
+    int i_index, i;
 
-    strlcpy( base, name, i );
+    strlcpy( base, name, sizeof (base) );
     if( field != NULL )
         field++;
 
     if( ( p = strchr( base, '[' ) ) != NULL )
     {
-        *p++ = '\0';
-        sscanf( p, "%d]", &i_index );
-        if( i_index < 0 )
-        {
+        char *end;
+        unsigned long l = strtoul( p, &end, 0 );
+
+        if( ( l > INT_MAX ) || strcmp( "]", end ) )
             return NULL;
-        }
+
+        *p++ = '\0';
+        i_index = (int)l;
     }
     else
     {
@@ -334,7 +335,7 @@ mvar_t *E_(mvar_InfoSetNew)( intf_thread_t *p_intf, char *name,
 }
 
 mvar_t *E_(mvar_ObjectSetNew)( intf_thread_t *p_intf, char *psz_name,
-                               char *psz_capability )
+                               const char *psz_capability )
 {
     mvar_t *s = E_(mvar_New)( psz_name, "set" );
     int i;
@@ -506,7 +507,7 @@ mvar_t *E_(mvar_HttpdInfoSetNew)( char *name, httpd_t *p_httpd, int i_type )
 #endif
 
 mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
-                             char *psz_dir )
+                             const char *value )
 {
     mvar_t *s = E_(mvar_New)( name, "set" );
 #ifdef HAVE_SYS_STAT_H
@@ -514,14 +515,7 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
 #endif
     char        **ppsz_dir_content;
     int           i_dir_content, i;
-    /* convert all / to native separator */
-#if defined( WIN32 )
-    const char sep = '\\';
-#else
-    const char sep = '/';
-#endif
-
-    psz_dir = E_(RealPath)( p_intf, psz_dir );
+    char         *psz_dir = E_(RealPath)( p_intf, psz_dir );
 
 #ifdef HAVE_SYS_STAT_H
     if( (utf8_stat( psz_dir, &stat_info ) == -1 )
@@ -561,7 +555,7 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
         else
 #endif
         {
-            sprintf( psz_tmp, "%s%c%s", psz_dir, sep, psz_dir_content );
+            sprintf( psz_tmp, "%s"DIR_SEP"%s", psz_dir, psz_dir_content );
 
 #ifdef HAVE_SYS_STAT_H
             if( utf8_stat( psz_tmp, &stat_info ) == -1 )
@@ -601,7 +595,7 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
             char psz_ctime[26];
             char psz_tmp[strlen( psz_dir ) + 1 + strlen( psz_name ) + 1];
 
-            sprintf( psz_tmp, "%s%c%s", psz_dir, sep, psz_name );
+            sprintf( psz_tmp, "%s"DIR_SEP"%s", psz_dir, psz_name );
             E_(mvar_AppendNewVar)( f, "name", psz_tmp );
             E_(mvar_AppendNewVar)( f, "basename", psz_name );
 
