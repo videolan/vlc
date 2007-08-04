@@ -853,8 +853,8 @@ faac-$(FAAC_VERSION).tar.gz:
 
 faac: faac-$(FAAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	sed -i 's/\r$//' bootstrap configure.in Makefile.am
 	patch -p0 < Patches/faac.patch
+	cd $@; perl -pi -e 's/\r$$//' bootstrap configure.in Makefile.am; cd ..
 
 .faac: faac
 	(cd $<; ./bootstrap && $(HOSTCC) ./configure $(HOSTCONF) --without-mp4v2 --prefix=$(PREFIX) --disable-shared && make && make install)
