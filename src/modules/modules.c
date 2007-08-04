@@ -402,12 +402,17 @@ const char *module_GetObjName( const module_t *m )
 /*****************************************************************************
  * module_GetName: human-friendly name of a module.
  *****************************************************************************/
-const char *module_GetName(const module_t *m, vlc_bool_t long_name )
+const char *module_GetName( const module_t *m, vlc_bool_t long_name )
 {
     if( long_name && ( m->psz_longname != NULL) )
         return m->psz_longname;
     
     return m->psz_shortname ?: m->psz_object_name;
+}
+
+const char *module_GetHelp( const module_t *m )
+{
+    return m->psz_help;
 }
 
 /*****************************************************************************

@@ -180,6 +180,7 @@ __module_Unneed
 module_IsCapable
 module_GetObjName
 module_GetName
+module_GetHelp
 __msg_Dbg
 __msg_Err
 __msg_Generic
