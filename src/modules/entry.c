@@ -37,8 +37,6 @@ module_t *vlc_module_create (vlc_object_t *obj)
 
     module->b_reentrant = module->b_unloadable = VLC_TRUE;
     module->psz_object_name = module->psz_longname = default_name;
-    module->pp_shortcuts[0] = default_name;
-    module->i_cpu = 0;
     module->psz_capability = "";
     module->i_score = 1;
     return module;
