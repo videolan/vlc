@@ -217,7 +217,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     vlc_value_t lockval;
     vlc_value_t val;
 
-    var_Create( p_object->p_libvlc_global, "avcodec", VLC_VAR_MUTEX );
+    var_Create( p_dec->p_libvlc_global, "avcodec", VLC_VAR_MUTEX );
     var_Get( p_dec->p_libvlc_global, "avcodec", &lockval );
 
     /* Allocate the memory needed to store the decoder's structure */
