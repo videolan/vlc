@@ -69,7 +69,7 @@ TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
  * it only contains "real" items, not nodes
  * For example, if you open a directory, you will have
  *\verbatim
- * Category tree:               Onevelel tree:
+ * Category tree:               Onelevel tree:
  * Playlist                     Playlist
  *  - Dir                         - item1
  *    - Subdir                    - item2
@@ -93,7 +93,7 @@ TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
  *  - input 1 -> name = foo 1 uri = ...
  *  - input 2 -> name = foo 2 uri = ...
  *
- * Category tree                        Onlevel tree
+ * Category tree                        Onelevel tree
  * - playlist (id 1)                    - playlist (id 3)
  *    - category 1 (id 2)                - foo 2 (id 8 - input 2)
  *      - foo 2 (id 6 - input 2)       - media library (id 4)
