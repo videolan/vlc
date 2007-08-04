@@ -67,7 +67,7 @@ vlc_module_begin();
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
-    add_suppressed_integer( "shoutcast-limit" );
+    add_obsolete_integer( "shoutcast-limit" );
 
     set_capability( "services_discovery", 0 );
     set_callbacks( OpenRadio, Close );

@@ -379,7 +379,7 @@ vlc_module_begin();
 
     add_integer( SOUT_CFG_PREFIX "min-keyint", 25, NULL, MIN_KEYINT_TEXT,
                  MIN_KEYINT_LONGTEXT, VLC_FALSE );
-        add_deprecated( SOUT_CFG_PREFIX "keyint-min", VLC_FALSE ); /* Deprecated since 0.8.5 */
+        add_deprecated_alias( SOUT_CFG_PREFIX "keyint-min" ); /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "scenecut", 40, NULL, SCENE_TEXT,
                  SCENE_LONGTEXT, VLC_FALSE );
@@ -412,15 +412,15 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "ref", 1, NULL, REF_TEXT,
                  REF_LONGTEXT, VLC_FALSE );
         change_integer_range( 1, 16 );
-        add_deprecated( SOUT_CFG_PREFIX "frameref", VLC_FALSE ); /* Deprecated since 0.8.5 */
+        add_deprecated_alias( SOUT_CFG_PREFIX "frameref" ); /* Deprecated since 0.8.5 */
 
     add_bool( SOUT_CFG_PREFIX "nf", 0, NULL, NF_TEXT,
               NF_LONGTEXT, VLC_FALSE );
-        add_deprecated( SOUT_CFG_PREFIX "loopfilter", VLC_FALSE ); /* Deprecated since 0.8.5 */
+        add_deprecated_alias( SOUT_CFG_PREFIX "loopfilter" ); /* Deprecated since 0.8.5 */
 
     add_string( SOUT_CFG_PREFIX "deblock", "0:0", NULL, FILTER_TEXT,
                  FILTER_LONGTEXT, VLC_FALSE );
-        add_deprecated( SOUT_CFG_PREFIX "filter", VLC_FALSE ); /* Deprecated since 0.8.6 */
+        add_deprecated_alias( SOUT_CFG_PREFIX "filter" ); /* Deprecated since 0.8.6 */
 
     add_string( SOUT_CFG_PREFIX "level", "5.1", NULL, LEVEL_TEXT,
                LEVEL_LONGTEXT, VLC_FALSE );
@@ -445,12 +445,12 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "qpmin", 10, NULL, QPMIN_TEXT,
                  QPMIN_LONGTEXT, VLC_FALSE );
         change_integer_range( 0, 51 );
-    	add_deprecated( SOUT_CFG_PREFIX "qp-min", VLC_FALSE ); /* Deprecated since 0.8.5 */
+    	add_deprecated_alias( SOUT_CFG_PREFIX "qp-min" ); /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "qpmax", 51, NULL, QPMAX_TEXT,
                  QPMAX_LONGTEXT, VLC_FALSE );
         change_integer_range( 0, 51 );
-    	add_deprecated( SOUT_CFG_PREFIX "qp-max", VLC_FALSE ); /* Deprecated since 0.8.5 */
+    	add_deprecated_alias( SOUT_CFG_PREFIX "qp-max" ); /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "qpstep", 4, NULL, QPSTEP_TEXT,
                  QPSTEP_LONGTEXT, VLC_FALSE );
@@ -459,7 +459,7 @@ vlc_module_begin();
     add_float( SOUT_CFG_PREFIX "ratetol", 1.0, NULL, RATETOL_TEXT,
                RATETOL_LONGTEXT, VLC_FALSE );
         change_float_range( 0, 100 );
-    	add_deprecated( SOUT_CFG_PREFIX "tolerance", VLC_FALSE ); /* Deprecated since 0.8.5 */
+    	add_deprecated_alias( SOUT_CFG_PREFIX "tolerance" ); /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "vbv-maxrate", 0, NULL, VBV_MAXRATE_TEXT,
                  VBV_MAXRATE_LONGTEXT, VLC_FALSE );
@@ -504,7 +504,7 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "partitions", "normal", NULL, ANALYSE_TEXT,
                 ANALYSE_LONGTEXT, VLC_FALSE );
         change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
-    	add_deprecated( SOUT_CFG_PREFIX "analyse", VLC_FALSE ); /* Deprecated since 0.8.6 */
+    	add_deprecated_alias( SOUT_CFG_PREFIX "analyse" ); /* Deprecated since 0.8.6 */
 
     add_string( SOUT_CFG_PREFIX "direct", "spatial", NULL, DIRECT_PRED_TEXT,
                 DIRECT_PRED_LONGTEXT, VLC_FALSE );
@@ -542,7 +542,7 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "subme", 5, NULL, SUBME_TEXT,
                  SUBME_LONGTEXT, VLC_FALSE );
         change_integer_range( 1, SUBME_MAX );
-    	add_deprecated( SOUT_CFG_PREFIX "subpel", VLC_FALSE ); /* Deprecated since 0.8.5 */
+    	add_deprecated_alias( SOUT_CFG_PREFIX "subpel" ); /* Deprecated since 0.8.5 */
 
 #if X264_BUILD >= 41 /* r368 */
     add_bool( SOUT_CFG_PREFIX "b-rdo", 0, NULL, B_RDO_TEXT,

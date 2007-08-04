@@ -90,10 +90,10 @@ vlc_module_begin( );
     change_string_list( psz_format_list, psz_format_list_text, 0 );
     add_integer( CFG_PREFIX "width", -1, NULL,
                  WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
-        add_deprecated( "image-width", VLC_FALSE ); /* since 0.9.0 */
+        add_deprecated_alias( "image-width" ); /* since 0.9.0 */
     add_integer( CFG_PREFIX "height", -1, NULL,
                  HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
-        add_deprecated( "image-height", VLC_FALSE ); /* since 0.9.0 */
+        add_deprecated_alias( "image-height" ); /* since 0.9.0 */
     add_integer( CFG_PREFIX "ratio", 3, NULL,
                  RATIO_TEXT, RATIO_LONGTEXT, VLC_FALSE );
     add_string(  CFG_PREFIX "prefix", "img", NULL,

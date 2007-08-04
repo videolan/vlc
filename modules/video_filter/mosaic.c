@@ -202,10 +202,10 @@ vlc_module_begin();
 
     add_integer( CFG_PREFIX "borderw", 0, NULL,
                  BORDERW_TEXT, BORDERW_LONGTEXT, VLC_TRUE );
-        add_deprecated( CFG_PREFIX "vborder", VLC_FALSE );
+        add_deprecated_alias( CFG_PREFIX "vborder" );
     add_integer( CFG_PREFIX "borderh", 0, NULL,
                  BORDERH_TEXT, BORDERH_LONGTEXT, VLC_TRUE );
-        add_deprecated( CFG_PREFIX "hborder", VLC_FALSE );
+        add_deprecated_alias( CFG_PREFIX "hborder" );
 
     add_integer( CFG_PREFIX "position", 0, NULL,
                  POS_TEXT, POS_LONGTEXT, VLC_FALSE );

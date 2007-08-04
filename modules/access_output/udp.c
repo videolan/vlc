@@ -120,7 +120,7 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "group", 1, NULL, GROUP_TEXT, GROUP_LONGTEXT,
                                  VLC_TRUE );
-    add_suppressed_integer( SOUT_CFG_PREFIX "late" );
+    add_obsolete_integer( SOUT_CFG_PREFIX "late" );
     add_bool( SOUT_CFG_PREFIX "raw",  VLC_FALSE, NULL, RAW_TEXT, RAW_LONGTEXT,
                                  VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "rtcp",  0, NULL, RTCP_TEXT, RTCP_LONGTEXT,
@@ -140,7 +140,7 @@ vlc_module_end();
  * Exported prototypes
  *****************************************************************************/
 
-static const char *ppsz_sout_options[] = {
+static const char *const ppsz_sout_options[] = {
     "auto-mcast",
     "caching",
     "group",
@@ -152,7 +152,7 @@ static const char *ppsz_sout_options[] = {
 };
 
 /* Options handled by the libvlc network core */
-static const char *ppsz_core_options[] = {
+static const char *const ppsz_core_options[] = {
     "dscp",
     "ttl",
     "miface",

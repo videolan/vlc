@@ -91,8 +91,8 @@ vlc_module_begin();
               RECONNECT_LONGTEXT, VLC_TRUE );
     add_bool( "http-continuous", 0, NULL, CONTINUOUS_TEXT,
               CONTINUOUS_LONGTEXT, VLC_TRUE );
-    add_suppressed_string("http-user");
-    add_suppressed_string("http-pwd");
+    add_obsolete_string("http-user");
+    add_obsolete_string("http-pwd");
     add_shortcut( "http" );
     add_shortcut( "https" );
     add_shortcut( "unsv" );

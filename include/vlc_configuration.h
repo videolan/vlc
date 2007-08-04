@@ -340,32 +340,32 @@ VLC_EXPORT(const char *, __config_GetDataDir, ( const vlc_object_t * ));
     p_config[i_config].value.i = v
 
 /* For renamed option */
-#define add_deprecated( name, strict ) \
+#define add_deprecated_alias( name ) \
     add_config_inner( ); \
     p_config[ i_config ].i_type = p_config[ i_config -1 ].i_type; \
     p_config[ i_config ].psz_name = name; \
-    p_config[i_config].b_strict = strict; \
-    p_config[ i_config ].psz_current = p_config[ i_config-1].psz_current \
+    p_config[i_config].b_strict = VLC_FALSE; \
+    p_config[ i_config ].psz_current = p_config[ i_config-1 ].psz_current \
         ? p_config[ i_config-1 ].psz_current \
         : p_config[ i_config-1 ].psz_name;
 
 /* For removed option */
-#define add_suppressed_inner( name, type ) \
+#define add_obsolete_inner( name, type ) \
     add_type_inner( type ); \
     p_config[ i_config ].psz_name = name; \
     p_config[ i_config ].psz_current = "SUPPRESSED";
 
-#define add_suppressed_bool( name ) \
-        add_suppressed_inner( name, CONFIG_ITEM_BOOL )
+#define add_obsolete_bool( name ) \
+        add_obsolete_inner( name, CONFIG_ITEM_BOOL )
 
-#define add_suppressed_integer( name ) \
-        add_suppressed_inner( name, CONFIG_ITEM_INTEGER )
+#define add_obsolete_integer( name ) \
+        add_obsolete_inner( name, CONFIG_ITEM_INTEGER )
 
-#define add_suppressed_float( name ) \
-        add_suppressed_inner( name, CONFIG_ITEM_FLOAT )
+#define add_obsolete_float( name ) \
+        add_obsolete_inner( name, CONFIG_ITEM_FLOAT )
 
-#define add_suppressed_string( name ) \
-        add_suppressed_inner( name, CONFIG_ITEM_STRING )
+#define add_obsolete_string( name ) \
+        add_obsolete_inner( name, CONFIG_ITEM_STRING )
 
 /* Modifier macros for the config options (used for fine tuning) */
 #define change_short( ch ) \
@@ -428,7 +428,7 @@ struct config_chain_t
 };
 
 #define config_ChainParse( a, b, c, d ) __config_ChainParse( VLC_OBJECT(a), b, c, d )
-VLC_EXPORT( void,   __config_ChainParse, ( vlc_object_t *, const char *psz_prefix, const char **ppsz_options, config_chain_t * ) );
+VLC_EXPORT( void,   __config_ChainParse, ( vlc_object_t *, const char *psz_prefix, const char *const *ppsz_options, config_chain_t * ) );
 VLC_EXPORT( char *, config_ChainCreate, ( char **, config_chain_t **, const char * ) );
 VLC_EXPORT( void, config_ChainDestroy, ( config_chain_t * ) );
 

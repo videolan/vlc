@@ -226,7 +226,7 @@ void config_ChainDestroy( config_chain_t *p_cfg )
 }
 
 void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
-                          const char **ppsz_options, config_chain_t *cfg )
+                          const char *const *ppsz_options, config_chain_t *cfg )
 {
     char *psz_name;
     int  i_type;

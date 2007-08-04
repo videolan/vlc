@@ -112,7 +112,7 @@ vlc_module_begin();
                                         VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "phone", "", NULL, PHONE_TEXT, PHONE_LONGTEXT,
                                         VLC_TRUE );
-    add_suppressed_bool( SOUT_CFG_PREFIX "sap-ipv6" );
+    add_obsolete_bool( SOUT_CFG_PREFIX "sap-ipv6" );
 
     set_callbacks( Open, Close );
 vlc_module_end();

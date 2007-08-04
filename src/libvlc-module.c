@@ -1438,8 +1438,8 @@ vlc_module_begin();
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     add_module_list_cat( "video-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                 VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, VLC_FALSE );
-       add_deprecated( "filter", VLC_FALSE ); /*deprecated since 0.8.2 */
-//       add_deprecated( "vout-filter", VLC_FALSE ); /* deprecated since 0.8.6 *// While the "video-filter" chain isn't parsed for both vfilter and vfilter2, keep both options
+       add_deprecated_alias( "filter" ); /*deprecated since 0.8.2 */
+//       add_deprecated_alias( "vout-filter" ); /* deprecated since 0.8.6 *// While the "video-filter" chain isn't parsed for both vfilter and vfilter2, keep both options
     add_module_list_cat( "vout-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                         NULL, NULL, VLC_FALSE );
 #if 0
@@ -1472,7 +1472,7 @@ vlc_module_begin();
                  SUB_PATH_TEXT, SUB_PATH_LONGTEXT, VLC_TRUE );
     add_integer( "sub-margin", 0, NULL, SUB_MARGIN_TEXT,
                  SUB_MARGIN_LONGTEXT, VLC_TRUE );
-        add_deprecated( "spu-margin", VLC_FALSE ); /*Deprecated since 0.8.2 */
+        add_deprecated_alias( "spu-margin" ); /*Deprecated since 0.8.2 */
     set_section( N_( "Overlays" ) , NULL );
     add_module_list_cat( "sub-filter", SUBCAT_VIDEO_SUBPIC, NULL, NULL,
                 SUB_FILTER_TEXT, SUB_FILTER_LONGTEXT, VLC_FALSE );
@@ -1490,10 +1490,10 @@ vlc_module_begin();
                 INPUT_PROGRAMS_TEXT, INPUT_PROGRAMS_LONGTEXT, VLC_TRUE );
     add_integer( "audio-track", -1, NULL,
                  INPUT_AUDIOTRACK_TEXT, INPUT_AUDIOTRACK_LONGTEXT, VLC_TRUE );
-       add_deprecated( "audio-channel", VLC_FALSE ); /*deprecated since 0.8.2 */
+       add_deprecated_alias( "audio-channel" ); /*deprecated since 0.8.2 */
     add_integer( "sub-track", -1, NULL,
                  INPUT_SUBTRACK_TEXT, INPUT_SUBTRACK_LONGTEXT, VLC_TRUE );
-       add_deprecated("spu-channel",VLC_FALSE); /*deprecated since 0.8.2*/
+       add_deprecated_alias("spu-channel" ); /*deprecated since 0.8.2*/
     add_string( "audio-language", "", NULL,
                  INPUT_AUDIOTRACK_LANG_TEXT, INPUT_AUDIOTRACK_LANG_LONGTEXT,
                   VLC_FALSE );
@@ -2062,7 +2062,7 @@ vlc_module_begin();
 
     add_key( "key-toggle-fullscreen", KEY_TOGGLE_FULLSCREEN, NULL, TOGGLE_FULLSCREEN_KEY_TEXT,
              TOGGLE_FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
-       add_deprecated( "key-fullscreen", VLC_FALSE ); /*deprecated since 0.9.0 */
+       add_deprecated_alias( "key-fullscreen" ); /*deprecated since 0.9.0 */
     add_key( "key-leave-fullscreen", KEY_LEAVE_FULLSCREEN, NULL, LEAVE_FULLSCREEN_KEY_TEXT,
              LEAVE_FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-play-pause", KEY_PLAY_PAUSE, NULL, PLAY_PAUSE_KEY_TEXT,

@@ -130,30 +130,30 @@ vlc_module_begin();
 
     add_bool( "wx-embed", 1, NULL,
               EMBED_TEXT, EMBED_LONGTEXT, VLC_FALSE );
-    add_deprecated( "wxwin-enbed", VLC_FALSE); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-enbed" ); /*Deprecated since 0.8.4*/
     add_bool( "wx-bookmarks", 0, NULL,
               BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_FALSE );
-    add_deprecated( "wxwin-bookmarks", VLC_FALSE); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-bookmarks" ); /*Deprecated since 0.8.4*/
     add_bool( "wx-taskbar", 1, NULL,
               TASKBAR_TEXT, TASKBAR_LONGTEXT, VLC_FALSE );
-    add_deprecated( "wxwin-taskbar", VLC_FALSE); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-taskbar" ); /*Deprecated since 0.8.4*/
     add_bool( "wx-extended", 0, NULL,
               EXTENDED_TEXT, EXTENDED_LONGTEXT, VLC_FALSE );
     add_bool( "wx-minimal", 0, NULL,
               MINIMAL_TEXT, MINIMAL_LONGTEXT, VLC_TRUE );
-    add_deprecated( "wxwin-minimal", VLC_FALSE); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-minimal" ); /*Deprecated since 0.8.4*/
     add_bool( "wx-autosize", 1, NULL,
               SIZE_TO_VIDEO_TEXT, SIZE_TO_VIDEO_LONGTEXT, VLC_TRUE );
+        add_deprecated_alias( "wxwin-autosize" ); /*Deprecated since 0.8.4*/
     add_integer( "wx-playlist-view", 0, NULL, PLAYLIST_TEXT, PLAYLIST_LONGTEXT,
              VLC_FALSE );
         change_integer_list( pi_playlist_views, psz_playlist_views, 0 );
-    add_deprecated( "wxwin-autosize", VLC_FALSE); /*Deprecated since 0.8.4*/
 /* wxCocoa pretends to support this, but at least 2.6.x doesn't */
 #ifndef __APPLE__
 #ifdef wxHAS_TASK_BAR_ICON
     add_bool( "wx-systray", 0, NULL,
               SYSTRAY_TEXT, SYSTRAY_LONGTEXT, VLC_FALSE );
-    add_deprecated( "wxwin-systray", VLC_FALSE); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-systray" ); /*Deprecated since 0.8.4*/
 #endif
 #endif
     add_bool( "wx-labels", 0, NULL, LABEL_TEXT, LABEL_LONGTEXT, VLC_TRUE);
@@ -161,7 +161,7 @@ vlc_module_begin();
                 N_("last config"), N_("last config"), VLC_TRUE );
         change_autosave();
         change_internal();
-    add_deprecated( "wxwin-config-last", VLC_FALSE); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-config-last" ); /*Deprecated since 0.8.4*/
 
     add_submodule();
     set_description( _("wxWidgets dialogs provider") );

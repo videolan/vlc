@@ -91,7 +91,7 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    add_deprecated( "file-cat", VLC_TRUE );
+    add_obsolete_string( "file-cat" );
     set_capability( "access2", 50 );
     add_shortcut( "file" );
     add_shortcut( "stream" );
