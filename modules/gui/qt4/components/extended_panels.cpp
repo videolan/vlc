@@ -216,15 +216,15 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
         return;
     }
 
-    if( !strcmp( ((module_t*)p_obj)->psz_capability, "video filter2" ) )
+    if( module_IsCapable( (module_t*)p_obj, "video filter2" ) )
     {
         psz_filter_type = "video-filter";
     }
-    else if( !strcmp( ((module_t*)p_obj)->psz_capability, "video filter" ) )
+    else if( module_IsCapable( (module_t*)p_obj, "video filter" ) )
     {
         psz_filter_type = "vout-filter";
     }
-    else if( !strcmp( ((module_t*)p_obj)->psz_capability, "sub filter" ) )
+    else if( module_IsCapable( (module_t*)p_obj, "sub filter" ) )
     {
         psz_filter_type = "sub-filter";
     }

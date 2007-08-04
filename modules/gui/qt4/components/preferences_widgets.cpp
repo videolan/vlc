@@ -452,7 +452,7 @@ void ModuleConfigControl::finish( bool bycat )
                     combo->setCurrentIndex( combo->count() - 1 );
             }
         }
-        else if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
+        else if( module_IsCapable( p_parser, p_item->psz_type ) )
         {
             combo->addItem( qtr(p_parser->psz_longname),
                             QVariant( p_parser->psz_object_name ) );
@@ -572,7 +572,7 @@ void ModuleListConfigControl::finish( bool bycat )
                 }
             }
         }
-        else if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
+        else if( module_IsCapable( p_parser, p_item->psz_type ) )
         {
             CHECKBOX_LISTS;
         }

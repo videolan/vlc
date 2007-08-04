@@ -428,31 +428,29 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
     for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
     {
         module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
-        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
+        if( module_IsCapable( p_parser, "services_discovery" ) )
             i_num++;
     }
     for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
     {
         module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object;
-        if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
-        {
-            QAction *a = new QAction( qfu( p_parser->psz_longname ), menu );
-            a->setCheckable( true );
-            /* hack to handle submodules properly */
-            int i = -1;
-            while( p_parser->pp_shortcuts[++i] != NULL );
-            i--;
-            if( playlist_IsServicesDiscoveryLoaded( THEPL,
-                        i>=0?p_parser->pp_shortcuts[i]
-                        : p_parser->psz_object_name ) )
-            {
-                a->setChecked( true );
-            }
-            CONNECT( a , triggered(), THEDP->SDMapper, map() );
-            THEDP->SDMapper->setMapping( a, i>=0? p_parser->pp_shortcuts[i] :
-                    p_parser->psz_object_name );
-            menu->addAction( a );
-        }
+        if( !module_IsCapable( p_parser, "services_discovery" ) )
+            continue;
+
+        QAction *a = new QAction( qfu( p_parser->psz_longname ), menu );
+        a->setCheckable( true );
+        /* hack to handle submodules properly */
+        int i = -1;
+        while( p_parser->pp_shortcuts[++i] != NULL );
+        i--;
+        if( playlist_IsServicesDiscoveryLoaded( THEPL,
+                    i>=0?p_parser->pp_shortcuts[i]
+                    : p_parser->psz_object_name ) )
+            a->setChecked( true );
+        CONNECT( a , triggered(), THEDP->SDMapper, map() );
+        THEDP->SDMapper->setMapping( a, i>=0? p_parser->pp_shortcuts[i] :
+                                              p_parser->psz_object_name );
+        menu->addAction( a );
     }
     vlc_list_release( p_list );
     return menu;
