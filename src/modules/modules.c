@@ -384,6 +384,14 @@ void __module_LoadPlugins( vlc_object_t * p_this )
 }
 
 /*****************************************************************************
+ * module_IsCapable: checks whether a module implements a capability.
+ *****************************************************************************/
+vlc_bool_t module_IsCapable( const module_t *m, const char *cap )
+{
+    return !strcmp( m->psz_capability, cap );
+}
+
+/*****************************************************************************
  * module_Need: return the best module function, given a capability list.
  *****************************************************************************
  * This function returns the module that best fits the asked capabilities.
@@ -479,7 +487,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         p_module = (module_t *)p_all->p_values[i_which_module].p_object;
 
         /* Test that this module can do what we need */
-        if( strcmp( p_module->psz_capability, psz_capability ) )
+        if( !module_IsCapable( p_module, psz_capability ) )
         {
             /* Don't recurse through the sub-modules because vlc_list_find()
              * will list them anyway. */
@@ -1199,7 +1207,7 @@ static void UndupModule( module_t *p_module )
     }
 
     free( (void*)p_module->psz_object_name );
-    free( (void*)p_module->psz_capability );
+    free( p_module->psz_capability );
     free( (void*)p_module->psz_shortname );
     free( (void*)p_module->psz_longname );
     free( (void*)p_module->psz_help );

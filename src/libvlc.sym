@@ -177,6 +177,7 @@ mdate
 __module_Exists
 __module_Need
 __module_Unneed
+module_IsCapable
 __msg_Dbg
 __msg_Err
 __msg_Generic

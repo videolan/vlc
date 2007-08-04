@@ -46,6 +46,7 @@ typedef shl_t module_handle_t;
 /**
  * Module descriptor
  */
+/* FIXME: scheduled for privatization */
 struct module_t
 {
     VLC_COMMON_MEMBERS
@@ -65,7 +66,7 @@ struct module_t
     /** Shortcuts to the module */
     const char *pp_shortcuts[ MODULE_SHORTCUT_MAX ];
 
-    const char    *psz_capability;                           /**< Capability */
+    char    *psz_capability;                                 /**< Capability */
     int      i_score;                          /**< Score for the capability */
     uint32_t i_cpu;                           /**< Required CPU capabilities */
 
@@ -110,7 +111,7 @@ VLC_EXPORT( module_t *, vlc_module_create, ( vlc_object_t * ) );
 VLC_EXPORT( module_t *, vlc_submodule_create, ( module_t * ) );
 VLC_EXPORT( int, vlc_module_set, (module_t *module, int propid, void *value) );
 
-enum
+enum vlc_module_properties
 {
     /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
      * Append new items at the end ONLY. */
@@ -128,3 +129,4 @@ enum
     VLC_MODULE_NAME
 };
 
+VLC_EXPORT( vlc_bool_t, module_IsCapable, ( const module_t *, const char *cap ) );
