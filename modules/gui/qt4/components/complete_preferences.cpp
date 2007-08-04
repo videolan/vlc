@@ -88,7 +88,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         assert (i < (unsigned)p_list->i_count);
 
         const module_t *p_main = (module_t *)p_list->p_values[i].p_object;
-        if( strcmp( p_main->psz_object_name, "main" ) == 0 )
+        if( strcmp( module_GetObjName( p_main ), "main" ) == 0 )
             p_module = p_main;
     }
 
@@ -191,7 +191,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         p_module = (module_t *)p_list->p_values[i_index].p_object;
 
         // Main module excluded
-        if( !strcmp( p_module->psz_object_name, "main" ) ) continue;
+        if( !strcmp( module_GetObjName( p_module ), "main" ) ) continue;
 
         /* Exclude submodules; they have no config options of their own */
         if( p_module->b_submodule ) continue;
@@ -252,15 +252,14 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         PrefsItemData *module_data = new PrefsItemData();
         module_data->b_submodule = p_module->b_submodule;
         module_data->i_type = TYPE_MODULE;
-        module_data->psz_name = strdup( p_module->psz_object_name );
+        module_data->psz_name = strdup( module_GetObjName( p_module ) );
         module_data->i_object_id = p_module->b_submodule ?
                          ((module_t *)p_module->p_parent)->i_object_id :
                          p_module->i_object_id;
         module_data->help.clear();
         // TODO image
         QTreeWidgetItem *module_item = new QTreeWidgetItem();
-        module_item->setText( 0, qtr( p_module->psz_shortname ?
-                      p_module->psz_shortname : p_module->psz_object_name) );
+        module_item->setText( 0, qtr( module_GetName( p_module, VLC_FALSE ) ) );
         //item->setIcon( 0 , XXX );
         module_item->setData( 0, Qt::UserRole,
                               QVariant::fromValue( module_data) );
@@ -390,11 +389,11 @@ PrefsPanel::PrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
     else
     {
-        head = QString( qtr(p_module->psz_longname) );
+        head = QString( qtr( module_GetLongName( p_module ) ) );
         if( p_module->psz_help )
         {
             help.append( "\n" );
-            help.append( qtr( p_module->psz_help ) );
+            help.append( qtr( module_GetHelp( p_module ) ) );
         }
     }
 

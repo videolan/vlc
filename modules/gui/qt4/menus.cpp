@@ -4,7 +4,7 @@
  * Copyright (C) 2006-2007 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
+ * Authors: ClÃ©ment Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -437,19 +437,18 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
         if( !module_IsCapable( p_parser, "services_discovery" ) )
             continue;
 
-        QAction *a = new QAction( qfu( p_parser->psz_longname ), menu );
+        QAction *a = new QAction( qfu( module_GetLongName( p_parser ) ), menu );
         a->setCheckable( true );
         /* hack to handle submodules properly */
         int i = -1;
         while( p_parser->pp_shortcuts[++i] != NULL );
         i--;
         if( playlist_IsServicesDiscoveryLoaded( THEPL,
-                    i>=0?p_parser->pp_shortcuts[i]
-                    : p_parser->psz_object_name ) )
+                    p_parser->pp_shortcuts[i] ?: module_GetObjName( p_parser ) ) )
             a->setChecked( true );
         CONNECT( a , triggered(), THEDP->SDMapper, map() );
         THEDP->SDMapper->setMapping( a, i>=0? p_parser->pp_shortcuts[i] :
-                                              p_parser->psz_object_name );
+                                              module_GetObjName( p_parser ) );
         menu->addAction( a );
     }
     vlc_list_release( p_list );

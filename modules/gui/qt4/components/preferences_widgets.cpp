@@ -437,7 +437,7 @@ void ModuleConfigControl::finish( bool bycat )
 
         if( bycat )
         {
-            if( !strcmp( p_parser->psz_object_name, "main" ) ) continue;
+            if( !strcmp( module_GetObjName( p_parser ), "main" ) ) continue;
 
             for (size_t i = 0; i < p_parser->confsize; i++)
             {
@@ -445,19 +445,19 @@ void ModuleConfigControl::finish( bool bycat )
                 /* Hack: required subcategory is stored in i_min */
                 if( p_config->i_type == CONFIG_SUBCATEGORY &&
                     p_config->value.i == p_item->min.i )
-                    combo->addItem( qtr(p_parser->psz_longname),
-                                    QVariant( p_parser->psz_object_name ) );
+                    combo->addItem( qtr( module_GetLongName( p_parser )),
+                                    QVariant( module_GetObjName( p_parser ) ) );
                 if( p_item->value.psz && !strcmp( p_item->value.psz,
-                                                  p_parser->psz_object_name) )
+                                                  module_GetObjName( p_parser ) ) )
                     combo->setCurrentIndex( combo->count() - 1 );
             }
         }
         else if( module_IsCapable( p_parser, p_item->psz_type ) )
         {
-            combo->addItem( qtr(p_parser->psz_longname),
-                            QVariant( p_parser->psz_object_name ) );
+            combo->addItem( qtr(module_GetLongName( p_parser ) ),
+                            QVariant( module_GetObjName( p_parser ) ) );
             if( p_item->value.psz && !strcmp( p_item->value.psz,
-                                              p_parser->psz_object_name) )
+                                              module_GetObjName( p_parser ) ) )
                 combo->setCurrentIndex( combo->count() - 1 );
         }
     }
@@ -529,11 +529,11 @@ ModuleListConfigControl::~ModuleListConfigControl()
 
 #define CHECKBOX_LISTS \
 { \
-       QCheckBox *cb = new QCheckBox( qtr( p_parser->psz_longname ) );\
+       QCheckBox *cb = new QCheckBox( qtr( module_GetLongName( p_parser ) ) );\
        checkBoxListItem *cbl = new checkBoxListItem; \
 \
        CONNECT( cb, stateChanged( int ), this, onUpdate( int ) );\
-       cb->setToolTip( formatTooltip( qtr(p_parser->psz_longname)) );\
+       cb->setToolTip( formatTooltip( qtr( module_GetLongName( p_parser ))));\
        cbl->checkBox = cb; \
 \
        int i = -1; \
@@ -541,7 +541,7 @@ ModuleListConfigControl::~ModuleListConfigControl()
        i--; \
 \
        cbl->psz_module = strdup( i>=0?p_parser->pp_shortcuts[i] \
-                                 : p_parser->psz_object_name ); \
+                                 : module_GetObjName( p_parser ) ); \
        modules.push_back( cbl ); \
 }
 
@@ -559,7 +559,7 @@ void ModuleListConfigControl::finish( bool bycat )
 
         if( bycat )
         {
-            if( !strcmp( p_parser->psz_object_name, "main" ) ) continue;
+            if( !strcmp( module_GetObjName( p_parser ), "main" ) ) continue;
 
             for (size_t i = 0; i < p_parser->confsize; i++)
             {
