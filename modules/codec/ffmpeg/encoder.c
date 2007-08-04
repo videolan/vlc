@@ -197,6 +197,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     vlc_value_t val;
     vlc_value_t lockval;
 
+    var_Create( p_object->p_libvlc_global, "avcodec", VLC_VAR_MUTEX );
     var_Get( p_enc->p_libvlc_global, "avcodec", &lockval );
 
     if( !E_(GetFfmpegCodec)( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
