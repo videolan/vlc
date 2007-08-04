@@ -87,7 +87,7 @@ int vlc_module_set (module_t *module, int propid, void *value)
         {
             unsigned i;
             for (i = 0; module->pp_shortcuts[i] != NULL; i++);
-            if (i >= MODULE_SHORTCUT_MAX)
+            if (i >= (MODULE_SHORTCUT_MAX - 1))
                 return VLC_ENOMEM;
 
             module->pp_shortcuts[i] = (char *)value;
