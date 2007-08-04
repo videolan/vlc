@@ -197,13 +197,13 @@ struct playlist_t
     playlist_item_t *     p_local_category; /** < "Playlist" in CATEGORY view */
     playlist_item_t *     p_ml_category; /** < "Library" in CATEGORY view */
     playlist_item_t *     p_local_onelevel; /** < "Playlist" in ONELEVEL view */
-    playlist_item_t *     p_ml_onelevel; /** < "Library" in ONELEVEL iew */
+    playlist_item_t *     p_ml_onelevel; /** < "Library" in ONELEVEL view */
 
     vlc_bool_t            b_always_tree;/**< Always display as tree */
     vlc_bool_t            b_never_tree;/**< Never display as tree */
 
-    vlc_bool_t            b_doing_ml; /**< Doing media library stuff, */
-                                      /*get quicker */
+    vlc_bool_t            b_doing_ml; /**< Doing media library stuff,
+                                       * get quicker */
     vlc_bool_t            b_auto_preparse;
 
     /* Runtime */
