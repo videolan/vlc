@@ -848,20 +848,21 @@ DISTCLEAN_PKG += faad2-$(FAAD2_VERSION).tar.bz2
 # faac
 # ***************************************************************************
 
-faac-$(FAAC_VERSION).tar.bz2:
+faac-$(FAAC_VERSION).tar.gz:
 	$(WGET) $(FAAC_URL)
 
-faac: faac-$(FAAC_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
+faac: faac-$(FAAC_VERSION).tar.gz
+	$(EXTRACT_GZ)
+	sed -i 's/\r$//' bootstrap configure.in Makefile.am
 	patch -p0 < Patches/faac.patch
 
 .faac: faac
-	(cd $<; rm -f install-sh mkinstalldirs missing && ./bootstrap && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install)
+	(cd $<; ./bootstrap && $(HOSTCC) ./configure $(HOSTCONF) --without-mp4v2 --prefix=$(PREFIX) --disable-shared && make && make install)
 	touch $@
 
 CLEAN_FILE += .faac
 CLEAN_PKG += faac
-DISTCLEAN_PKG += faac-$(FAAC_VERSION).tar.bz2
+DISTCLEAN_PKG += faac-$(FAAC_VERSION).tar.gz
 
 # ***************************************************************************
 # lame
