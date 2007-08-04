@@ -346,13 +346,11 @@ mvar_t *E_(mvar_ObjectSetNew)( intf_thread_t *p_intf, char *psz_name,
     for( i = 0; i < p_list->i_count; i++ )
     {
         module_t *p_parser = (module_t *)p_list->p_values[i].p_object;
-        if( !strcmp( p_parser->psz_capability, psz_capability ) )
+        if( module_IsCapable( p_parser, psz_capability ) )
         {
-            mvar_t *sd = E_(mvar_New)( "sd", p_parser->psz_object_name );
+            mvar_t *sd = E_(mvar_New)( "sd", module_GetObjName( p_parser ) );
             E_(mvar_AppendNewVar)( sd, "name",
-                p_parser->psz_longname ? p_parser->psz_longname
-                : ( p_parser->psz_shortname ? p_parser->psz_shortname
-                : p_parser->psz_object_name ) );
+                                   module_GetName( p_parser, VLC_TRUE ) );
             E_(mvar_AppendVar)( s, sd );
         }
     }
