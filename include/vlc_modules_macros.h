@@ -155,7 +155,7 @@ E_(vlc_entry) ( module_t *p_module );
 
 #define set_description( desc ) \
     if (vlc_module_set (p_submodule, VLC_MODULE_DESCRIPTION, (void*)(desc))) \
-        goto error;
+        goto error
 
 #define set_help( help ) \
     if (vlc_module_set (p_submodule, VLC_MODULE_HELP, (void*)(help))) \
