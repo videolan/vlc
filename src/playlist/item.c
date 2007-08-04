@@ -641,7 +641,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
     /* Remove the item from its parent */
     playlist_NodeRemoveItem( p_playlist, p_item, p_item->p_parent );
 
-    if( b_delay_deletion == VLC_FALSE )
+    if( !b_delay_deletion )
         playlist_ItemDelete( p_item );
     else
     {
