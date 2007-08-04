@@ -212,27 +212,7 @@ EXTRA_DIST += \
 	extras/dbus-vlc.py \
 	extras/dbus-vlc.glade
 
-###############################################################################
-# MS Visual Studio and eMbedded Visual Studio projects
-###############################################################################
-
-EXTRA_DIST += \
-	msvc/vlc.dsw \
-	msvc/libvlc.dsp.in \
-	msvc/plugins.dsp.in \
-	msvc/vlc.dsp.in \
-	msvc/config.h.in \
-	msvc/modules_builtin_msvc.h \
-	evc/vlc.vcw \
-	evc/libvlc.vcp.in \
-	evc/vlc.vcp.in \
-	evc/plugins.vcp.in \
-	evc/errno.h \
-	evc/config.h.in \
-	evc/modules_builtin_evc.h
-
 dist-hook:
-	cd $(distdir) && srcdir=. $(SHELL) ./toolbox --update-vc
 	distdir=$(distdir) srcdir=$(srcdir) $(SHELL) $(srcdir)/toolbox --dist-contrib
 
 ###############################################################################
