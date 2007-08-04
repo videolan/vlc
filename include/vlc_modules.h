@@ -46,6 +46,7 @@ typedef shl_t module_handle_t;
 /**
  * Module descriptor
  */
+#ifndef __PLUGIN__
 /* FIXME: scheduled for privatization */
 struct module_t
 {
@@ -96,6 +97,7 @@ struct module_t
     vlc_bool_t          b_builtin;  /* Set to true if the module is built in */
     vlc_bool_t          b_loaded;        /* Set to true if the dll is loaded */
 };
+#endif
 
 /*****************************************************************************
  * Exported functions.
@@ -129,4 +131,7 @@ enum vlc_module_properties
     VLC_MODULE_NAME
 };
 
-VLC_EXPORT( vlc_bool_t, module_IsCapable, ( const module_t *, const char *cap ) );
+VLC_EXPORT( vlc_bool_t, module_IsCapable, ( const module_t *m, const char *cap ) );
+VLC_EXPORT( const char *, module_GetObjName, ( const module_t *m ) );
+VLC_EXPORT( const char *, module_GetName, ( const module_t *m, vlc_bool_t long_name ) );
+

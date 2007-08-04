@@ -178,6 +178,8 @@ __module_Exists
 __module_Need
 __module_Unneed
 module_IsCapable
+module_GetObjName
+module_GetName
 __msg_Dbg
 __msg_Err
 __msg_Generic
