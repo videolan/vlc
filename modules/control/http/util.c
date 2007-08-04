@@ -947,13 +947,7 @@ char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src )
     char *psz_dir;
     char *p;
     int i_len = strlen(psz_src);
-    char sep;
-
-#if defined( WIN32 )
-    sep = '\\';
-#else
-    sep = '/';
-#endif
+    const char sep = DIR_SEP_CHAR;
 
     psz_dir = malloc( i_len + 2 );
     strcpy( psz_dir, psz_src );
@@ -962,7 +956,7 @@ char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src )
     psz_dir[i_len] = sep;
     psz_dir[i_len + 1] = '\0';
 
-#ifdef WIN32
+#if (DIR_SEP_CHAR != '/')
     /* Convert all / to native separator */
     p = psz_dir;
     while( (p = strchr( p, '/' )) != NULL )
