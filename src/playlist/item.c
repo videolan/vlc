@@ -607,7 +607,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
 {
     int i;
     int i_id = p_item->i_id;
-    vlc_bool_t b_flag = VLC_FALSE;
+    vlc_bool_t b_delay_deletion = VLC_FALSE;
 
     if( p_item->i_children > -1 )
     {
@@ -633,7 +633,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
             msg_Info( p_playlist, "stopping playback" );
             vlc_cond_signal( &p_playlist->object_wait );
         }
-        b_flag = VLC_TRUE;
+        b_delay_deletion = VLC_TRUE;
     }
 
     PL_DEBUG( "deleting item `%s'", p_item->p_input->psz_name );
@@ -641,7 +641,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
     /* Remove the item from its parent */
     playlist_NodeRemoveItem( p_playlist, p_item, p_item->p_parent );
 
-    if( b_flag == VLC_FALSE )
+    if( b_delay_deletion == VLC_FALSE )
         playlist_ItemDelete( p_item );
     else
     {
