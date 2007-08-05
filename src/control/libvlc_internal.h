@@ -32,6 +32,7 @@ extern "C" {
 #include <vlc/vlc.h>
 #include <vlc/libvlc_structures.h>
 
+#include <vlc_arrays.h>
 #include <vlc_input.h>
     
 /***************************************************************************
@@ -52,21 +53,6 @@ VLC_EXPORT (void, libvlc_event_fini, ( libvlc_instance_t *, libvlc_exception_t *
  * Opaque structures for libvlc API
  ***************************************************************************/
 
-struct libvlc_callback_entry_t
-{
-    libvlc_instance_t *p_instance;
-    libvlc_callback_t f_callback;
-    libvlc_event_type_t i_event_type;
-    void *p_user_data;
-};
-
-struct libvlc_callback_entry_list_t
-{
-    struct libvlc_callback_entry_t *elmt;
-    struct libvlc_callback_entry_list_t *next;
-    struct libvlc_callback_entry_list_t *prev;
-};
-    
 struct libvlc_instance_t
 {
     libvlc_int_t *p_libvlc_int;
@@ -94,23 +80,102 @@ struct libvlc_media_instance_t
     libvlc_media_descriptor_t *p_md; /* current media descriptor */
 };
 
+
+/* 
+ * Event Handling
+ */
+/* Example usage
+ *
+ * struct libvlc_cool_object_t
+ * {
+ *		...
+ *		libvlc_event_manager_t * p_event_manager;
+ *		...
+ * }
+ *
+ * libvlc_my_cool_object_new()
+ * {
+ *		...
+ *		p_self->p_event_manager = libvlc_event_manager_init( p_self,
+ *		                                           p_self->p_libvlc_instance, p_e);
+ *		libvlc_event_manager_register_event_type(p_self->p_event_manager,
+ *				libvlc_MyCoolObjectDidSomething, p_e)
+ *		...
+ * }
+ *
+ * libvlc_my_cool_object_release()
+ * {
+ * 		...
+ * 		libvlc_event_manager_release( p_self->p_event_manager );
+ * 		...
+ * }
+ *
+ * libvlc_my_cool_object_do_something()
+ * {
+ *	    ...
+ *	    libvlc_event_t event;
+ *	    event.type = libvlc_MyCoolObjectDidSomething;
+ *	    event.my_cool_object_did_something.what_it_did = kSomething;
+ *	    libvlc_event_send( p_self->p_event_manager, &event );
+ * }
+ * */
+
+typedef struct libvlc_event_listener_t
+{
+	libvlc_event_type_t event_type;
+	void *              p_user_data;
+	libvlc_callback_t   pf_callback;
+} libvlc_event_listener_t;
+
+typedef struct libvlc_event_listeners_group_t
+{
+	libvlc_event_type_t event_type;
+	DECL_ARRAY(libvlc_event_listener_t *) listeners;
+} libvlc_event_listeners_group_t;
+
+typedef struct libvlc_event_manager_t
+{
+	void * p_obj;
+	struct libvlc_instance_t * p_libvlc_instance;
+	DECL_ARRAY(libvlc_event_listeners_group_t *) listeners_groups;
+} libvlc_event_sender_t;
+
+
 /***************************************************************************
  * Other internal functions
  ***************************************************************************/
 VLC_EXPORT (input_thread_t *, libvlc_get_input_thread,
                         ( struct libvlc_media_instance_t *, libvlc_exception_t * ) );
 
+/* Media instance */
 VLC_EXPORT (libvlc_media_instance_t *, libvlc_media_instance_new_from_input_thread,
                         ( struct libvlc_instance_t *, input_thread_t *, libvlc_exception_t * ) );
 
 VLC_EXPORT (void, libvlc_media_instance_destroy,
                         ( libvlc_media_instance_t * ) );
 
+/* Media Descriptor */
 VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_new_from_input_item,
                         ( struct libvlc_instance_t *, input_item_t *, libvlc_exception_t * ) );
 
 VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_duplicate,
                         ( libvlc_media_descriptor_t * ) );
+
+/* Events */
+VLC_EXPORT (void, libvlc_event_init, ( libvlc_instance_t *p_instance, libvlc_exception_t *p_e ) );
+
+VLC_EXPORT (void, libvlc_event_fini, ( libvlc_instance_t *p_instance, libvlc_exception_t *p_e ) );
+
+VLC_EXPORT (libvlc_event_manager_t *, libvlc_event_manager_init, ( void * p_obj, libvlc_instance_t * p_libvlc_inst, libvlc_exception_t *p_e ) );
+
+VLC_EXPORT (void, libvlc_event_manager_release, ( libvlc_event_manager_t * p_em ) );
+
+VLC_EXPORT (void, libvlc_event_manager_register_event_type, ( libvlc_event_manager_t * p_em, libvlc_event_type_t event_type, libvlc_exception_t * p_e ) );
+
+VLC_EXPORT (void, libvlc_event_send, ( libvlc_event_manager_t * p_em, libvlc_event_t * p_event ) );
+
+
+/* Exception shorcuts */
 
 #define RAISENULL( psz,a... ) { libvlc_exception_raise( p_e, psz,##a ); \
                                 return NULL; }

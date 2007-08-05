@@ -884,49 +884,50 @@ VLC_PUBLIC_API libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterat
 /** @} */
 
 /*****************************************************************************
- * Callbacks handling
+ * Event handling
  *****************************************************************************/
 
 /** defgroup libvlc_callbacks Callbacks
  * \ingroup libvlc
- * LibVLC Event Callbacks
+ * LibVLC Events
  * @{
  */
 
 /**
- * Register for a callback notification
- * \param p_instance the libvlc instance
- * \param i_event_type the desired event mask to which we want to listen
+ * Register for an event notification
+ * \param p_event_manager the event manager to which you want to attach to
+ * Generally it is obtained by vlc_my_object_event_manager() where my_object
+ * Is the object you want to listen to.
+ * \param i_event_type the desired event to which we want to listen
  * \param f_callback the function to call when i_event_type occurs
  * \param user_data user provided data to carry with the event
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_event_add_callback( libvlc_instance_t *p_instance,
-                                               libvlc_event_type_t i_event_type,
-                                               libvlc_callback_t f_callback,
-                                               void *user_data,
-                                               libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_event_attach( libvlc_event_manager_t *p_event_manager,
+                                         libvlc_event_type_t i_event_type,
+                                         libvlc_callback_t f_callback,
+                                         void *user_data,
+                                         libvlc_exception_t *p_e );
 
 /**
- * Unregister all callbacks notification from an instance
- * \param p_instance the libvlc instance
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_event_remove_all_callbacks( libvlc_instance_t *p_instance,
-                                                       libvlc_exception_t *p_e );
-
-/**
- * Unregister a callback notification
- * \param p_instance the libvlc instance
- * \param i_event_type the desired event mask to which we want to unregister
+ * Unregister an event notification
+ * \param p_event_manager the event manager
+ * \param i_event_type the desired event to which we want to unregister
  * \param f_callback the function to call when i_event_type occurs
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_event_remove_callback( libvlc_instance_t *p_instance,
-                                                  libvlc_event_type_t i_event_type,
-                                                  libvlc_callback_t f_callback,
-                                                  void *p_user_data,
-                                                  libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
+                                         libvlc_event_type_t i_event_type,
+                                         libvlc_callback_t f_callback,
+                                         void *p_user_data,
+                                         libvlc_exception_t *p_e );
+
+
+/**
+ * Get an event type name 
+ * \param i_event_type the desired event
+ */
+#define libvlc_event_type_name(a) #a
 
 /** @} */
 

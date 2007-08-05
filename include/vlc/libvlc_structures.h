@@ -182,7 +182,7 @@ typedef struct libvlc_log_message_t
  */
     
 /**
- * Available events:
+ * Available events: (XXX: being reworked)
  * - libvlc_VolumeChanged
  * - libvlc_InputPositionChanged
  */
@@ -192,9 +192,17 @@ typedef enum libvlc_event_type_t {
     libvlc_InputPositionChanged,
 } libvlc_event_type_t;
 
+/**
+ * An Event
+ * \param type the even type
+ * \param p_obj the sender object
+ * \param u Event dependent content
+ */
+
 typedef struct libvlc_event_t
 {
     libvlc_event_type_t type;
+	void * p_obj;
     union
     {
         struct
@@ -209,13 +217,18 @@ typedef struct libvlc_event_t
 } libvlc_event_t;
 
 /**
- * Callback function notification
- * \param p_instance the libvlc instance
- * \param p_event the event triggering the callback
- * \param p_user_data user provided data
+ * Event manager that belongs to a libvlc object, and from whom events can
+ * be received.
  */
 
-typedef void ( *libvlc_callback_t )( struct libvlc_instance_t *, libvlc_event_t *, void * );
+typedef struct libvlc_event_manager_t libvlc_event_manager_t;
+
+/**
+ * Callback function notification
+ * \param p_event the event triggering the callback
+ */
+
+typedef void ( *libvlc_callback_t )( const libvlc_event_t * );
 
 /**@} */
 
