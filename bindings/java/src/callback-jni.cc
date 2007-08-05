@@ -56,11 +56,7 @@ JNIEXPORT void JNICALL Java_org_videolan_jvlc_Audio__1install_1callback( JNIEnv 
 	wakeupListenersMethod = env->GetStaticMethodID(audioClass, "wakeupListeners", "()V");
     }
 
-    libvlc_event_add_callback( ( libvlc_instance_t* ) instance,
-			       libvlc_VolumeChanged,
-			       volumeChangedCallback,
-			       NULL,
-			       &exception );
+    libvlc_exception_raise( &exception, "not implemented" );
     CHECK_EXCEPTION ;
 }
 
