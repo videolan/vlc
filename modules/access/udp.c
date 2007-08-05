@@ -186,7 +186,7 @@ static int Open( vlc_object_t *p_this )
         *psz_parser++ = '\0';
         psz_bind_addr = psz_parser;
 
-        if( *psz_parser == '[' )
+        if( psz_bind_addr[0] == '[' )
             /* skips bracket'd IPv6 address */
             psz_parser = strchr( psz_parser, ']' );
 
@@ -202,9 +202,9 @@ static int Open( vlc_object_t *p_this )
     }
 
     psz_server_addr = psz_name;
-    if( *psz_server_addr == '[' )
-        /* skips bracket'd IPv6 address */
-        psz_parser = strchr( psz_name, ']' );
+    psz_parser = ( psz_server_addr[0] == '[' )
+        ? strchr( psz_name, ']' ) /* skips bracket'd IPv6 address */
+        : psz_name;
 
     if( psz_parser != NULL )
     {
