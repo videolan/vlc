@@ -470,7 +470,8 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
     if( p_sys->i_frame_in_packet < p_sys->p_header->frames_per_packet )
     {
         aout_buffer_t *p_aout_buffer;
-        int i_ret;
+        if( p_sys->p_header->frame_size == 0 )
+            return NULL;
 
         p_aout_buffer =
             p_dec->pf_aout_buffer_new( p_dec, p_sys->p_header->frame_size );
@@ -479,18 +480,13 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
             return NULL;
         }
 
-        i_ret = speex_decode_int( p_sys->p_state, &p_sys->bits,
-                                  (int16_t *)p_aout_buffer->p_buffer );
-        if( i_ret == -1 )
+        switch( speex_decode_int( p_sys->p_state, &p_sys->bits,
+                                  (int16_t *)p_aout_buffer->p_buffer ) )
         {
-            /* End of stream */
-            return NULL;
-        }
-
-        if( i_ret== -2 )
-        {
-            msg_Warn( p_dec, "decoding error: corrupted stream?" );
-            return NULL;
+            case -2:
+                msg_Warn( p_dec, "decoding error: corrupted stream?" );
+            case -1: /* End of stream */
+                return NULL;
         }
 
         if( speex_bits_remaining( &p_sys->bits ) < 0 )
