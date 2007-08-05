@@ -280,24 +280,20 @@ aout_buffer_t * aout_DecNewBuffer( aout_instance_t * p_aout,
 
     /* This necessarily allocates in the heap. */
     aout_BufferAlloc( &p_input->input_alloc, duration, NULL, p_buffer );
-    p_buffer->i_nb_samples = i_nb_samples;
-    p_buffer->i_nb_bytes = i_nb_samples * p_input->input.i_bytes_per_frame
-                              / p_input->input.i_frame_length;
+    if( p_buffer != NULL )
+        p_buffer->i_nb_bytes = i_nb_samples * p_input->input.i_bytes_per_frame
+                                  / p_input->input.i_frame_length;
 
     /* Suppose the decoder doesn't have more than one buffered buffer */
     p_input->b_changed = 0;
 
     vlc_mutex_unlock( &p_input->lock );
 
-    if ( p_buffer == NULL )
-    {
-        msg_Err( p_aout, "NULL buffer !" );
-    }
-    else
-    {
-        p_buffer->start_date = p_buffer->end_date = 0;
-    }
+    if( p_buffer == NULL )
+        return NULL;
 
+    p_buffer->i_nb_samples = i_nb_samples;
+    p_buffer->start_date = p_buffer->end_date = 0;
     return p_buffer;
 }
 
