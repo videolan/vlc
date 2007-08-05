@@ -656,7 +656,7 @@ static void SetupPositions( subpicture_region_t *p_region, char *psz_subtitle )
 
     if( i_mask & ATTRIBUTE_ALIGNMENT )
         p_region->i_align = i_align;
-    
+
     /* TODO: Setup % based offsets properly, without adversely affecting
      *       everything else in vlc. Will address with separate patch, to
      *       prevent this one being any more complicated.
@@ -731,7 +731,7 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
              */
             p_text_region->i_x         = p_style->i_margin_h;
             p_text_region->i_y         = p_style->i_margin_v;
-            
+
         }
         else
         {
@@ -743,7 +743,7 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
          * defaults.
          */
         SetupPositions( p_text_region, psz_subtitle );
-        
+
         p_text_region->p_next = NULL;
     }
     return p_text_region;
@@ -766,7 +766,7 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec, char *psz_subtitle
                ( !strncasecmp( psz_subtitle, "<text>", 6 )))
             {
                 psz_end = strcasestr( psz_subtitle, "</text>" );
-                
+
                 if( psz_end )
                 {
                     subpicture_region_t  *p_text_region;
@@ -778,7 +778,7 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec, char *psz_subtitle
                                                       psz_subtitle,
                                                       psz_end - psz_subtitle,
                                                       p_sys->i_align );
-                
+
                     if( p_text_region )
                     {
                         p_text_region->psz_text = CreatePlainText( p_text_region->psz_html );
@@ -805,7 +805,7 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec, char *psz_subtitle
                     ( !strncasecmp( psz_subtitle, "<karaoke>", 9 )))
             {
                 psz_end = strcasestr( psz_subtitle, "</karaoke>" );
-                
+
                 if( psz_end )
                 {
                     subpicture_region_t  *p_text_region;
@@ -817,7 +817,7 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec, char *psz_subtitle
                                                       psz_subtitle,
                                                       psz_end - psz_subtitle,
                                                       p_sys->i_align );
-                
+
                     if( p_text_region )
                     {
                         if( ! var_CreateGetBool( p_dec, "subsdec-formatted" ) )
@@ -845,7 +845,7 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec, char *psz_subtitle
                 char *psz_end = strcasestr( psz_subtitle, "</image>" );
                 char *psz_content = strchr( psz_subtitle, '>' );
                 int   i_transparent = -1;
-                
+
                 /* If a colorkey parameter is specified, then we have to map
                  * that index in the picture through as transparent (it is
                  * required by the USF spec but is also recommended that if the
@@ -895,7 +895,7 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec, char *psz_subtitle
             }
             if( psz_end )
                 psz_subtitle = psz_end - 1;
-            
+
             psz_subtitle += strcspn( psz_subtitle, ">" );
         }
 
@@ -1013,7 +1013,7 @@ static void ParseSSAString( decoder_t *p_dec, char *psz_subtitle, subpicture_t *
         {
             p_spu->i_x = (i_margin_l) ? i_margin_l : p_style->i_margin_h;
         }
-        else if( p_style->i_align & SUBPICTURE_ALIGN_RIGHT ) 
+        else if( p_style->i_align & SUBPICTURE_ALIGN_RIGHT )
         {
             p_spu->i_x = (i_margin_r) ? i_margin_r : p_style->i_margin_h;
         }
@@ -1118,7 +1118,7 @@ static int ParseImageAttachments( decoder_t *p_dec )
             if( p_image != NULL )
             {
                 block_t   *p_block;
-               
+
                 p_block = block_New( p_image->p_parent, p_attach->i_data );
 
                 if( p_block != NULL )
@@ -1168,7 +1168,7 @@ static int ParseImageAttachments( decoder_t *p_dec )
         }
         vlc_input_attachment_Delete( pp_attachments[ k ] );
     }
-    free( pp_attachments );        
+    free( pp_attachments );
 
     return VLC_SUCCESS;
 }
@@ -1230,7 +1230,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                 break;
             case XML_READER_ENDELEM:
                 psz_node = xml_ReaderName( p_xml_reader );
-                
+
                 if( !psz_node )
                     break;
                 switch (i_style_level)
@@ -1257,7 +1257,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         }
                         break;
                 }
-                
+
                 free( psz_node );
                 break;
             case XML_READER_STARTELEM:
@@ -1304,7 +1304,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         break;
                     }
                     /* All styles are supposed to default to Default, and then
-                     * one or more settings are over-ridden. 
+                     * one or more settings are over-ridden.
                      * At the moment this only effects styles defined AFTER
                      * Default in the XML
                      */
@@ -1403,11 +1403,11 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                                     p_style->font_style.i_outline_color = (col & 0x00ffffff);
                                     p_style->font_style.i_outline_alpha = (col >> 24) & 0xff;
                                 }
-                            } 
+                            }
                             else if( !strcasecmp( "outline-level", psz_name ) )
                             {
                                 p_style->font_style.i_outline_width = atoi( psz_value );
-                            } 
+                            }
                             else if( !strcasecmp( "shadow-color", psz_name ) )
                             {
                                 if( *psz_value == '#' )
@@ -1420,7 +1420,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                             else if( !strcasecmp( "shadow-level", psz_name ) )
                             {
                                 p_style->font_style.i_shadow_width = atoi( psz_value );
-                            } 
+                            }
                             else if( !strcasecmp( "back-color", psz_name ) )
                             {
                                 if( *psz_value == '#' )
@@ -1433,7 +1433,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                             else if( !strcasecmp( "spacing", psz_name ) )
                             {
                                 p_style->font_style.i_spacing = atoi( psz_value );
-                            } 
+                            }
                         }
                         if( psz_name )  free( psz_name );
                         if( psz_value ) free( psz_value );
@@ -1500,7 +1500,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         if( psz_value ) free( psz_value );
                     }
                 }
-                
+
                 free( psz_node );
                 break;
         }
@@ -1596,7 +1596,7 @@ static void ParseSSAHeader( decoder_t *p_dec )
                     if( i_align == 1 || i_align == 5 || i_align == 9 ) p_style->i_align |= SUBPICTURE_ALIGN_LEFT;
                     if( i_align == 3 || i_align == 7 || i_align == 11 ) p_style->i_align |= SUBPICTURE_ALIGN_RIGHT;
                     if( i_align < 4 ) p_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;
-                    else if( i_align < 8 ) p_style->i_align |= SUBPICTURE_ALIGN_TOP; 
+                    else if( i_align < 8 ) p_style->i_align |= SUBPICTURE_ALIGN_TOP;
 
                     p_style->i_margin_h = ( p_style->i_align & SUBPICTURE_ALIGN_RIGHT ) ? i_margin_r : i_margin_l;
                     p_style->i_margin_v = i_margin_v;
@@ -1843,7 +1843,7 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
                         {
                             int i_len = strlen( psz_attribs[ k ] );
 
-                            if( !strncasecmp( psz_subtitle, psz_attribs[ k ], i_len )) 
+                            if( !strncasecmp( psz_subtitle, psz_attribs[ k ], i_len ))
                             {
                                 i_len += strcspn( psz_subtitle + i_len, "\"" ) + 1;
 
@@ -2053,7 +2053,7 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, subpicture_t *p
         msg_Err( p_dec, "Unable to read image %s", psz_filename );
         return NULL;
     }
-    
+
     /* Display the feed's image */
     memset( &fmt_out, 0, sizeof( video_format_t));
 
