@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #include "http.h"
+#include <limits.h>
 
 /* Utility function for scandir */
 static int Filter( const char *foo )
