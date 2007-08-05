@@ -35,6 +35,8 @@
 #include <speex/speex_stereo.h>
 #include <speex/speex_callbacks.h>
 
+#include <assert.h>
+
 /*****************************************************************************
  * decoder_sys_t : speex decoder descriptor
  *****************************************************************************/
@@ -341,6 +343,8 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
     }
 
     p_mode = speex_mode_list[p_header->mode];
+    if( p_mode == NULL )
+        return VLC_EGENERIC;
 
     if( p_header->speex_version_id > 1 )
     {
@@ -555,7 +559,10 @@ static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
     if( p_input->i_object_type != VLC_OBJECT_INPUT ) return;
 
+    assert( p_sys->p_header->mode < SPEEX_NB_MODES );
+
     p_mode = speex_mode_list[p_sys->p_header->mode];
+    assert( p_mode != NULL );
 
     input_Control( p_input, INPUT_ADD_INFO, _("Speex comment"), _("Mode"),
                    "%s%s", p_mode->modeName,
