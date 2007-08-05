@@ -529,6 +529,11 @@ difficulty to understand how VLC skins work.</para>
     <para>Action executed when the button is clicked. See <link linkend="actions">Actions</link> for a list of possible actions.</para>
     <para>Default value: none</para>
   </sect3>
+  <sect3 id="buttontooltiptext">
+    <title>tooltiptext</title>
+    <para>Tooltip associated with the button. See also <link linkend="textvars">Text variables</link>.</para>
+    <para>Default value: </para>
+  </sect3>
 </sect2>
 
 <sect2 id="Checkbox">
