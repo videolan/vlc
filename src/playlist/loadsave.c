@@ -136,7 +136,7 @@ error:
 
 int playlist_MLDump( playlist_t *p_playlist )
 {
-    char *psz_uri, *psz_homedir = p_playlist->p_libvlc->psz_homedir;
+    char *psz_homedir = p_playlist->p_libvlc->psz_homedir;
     if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
     if( !psz_homedir )
     {
@@ -144,19 +144,20 @@ int playlist_MLDump( playlist_t *p_playlist )
         return VLC_EGENERIC;
     }
 
-    char psz_dirname[ strlen( psz_homedir ) + sizeof( DIR_SEP CONFIG_DIR ) ];
+    char psz_dirname[ strlen( psz_homedir )
+                      + sizeof( DIR_SEP CONFIG_DIR DIR_SEP "ml.xsl")];
     sprintf( psz_dirname, "%s" DIR_SEP CONFIG_DIR, psz_homedir );
     if( config_CreateDir( (vlc_object_t *)p_playlist, psz_dirname ) )
     {
         return VLC_EGENERIC;
     }
 
-    asprintf( &psz_uri, "%s" DIR_SEP "%s", psz_dirname, "ml.xsp" );
+    strcat( psz_dirname, DIR_SEP "ml.xsp" );
+    
     stats_TimerStart( p_playlist, "ML Dump", STATS_TIMER_ML_DUMP );
-    playlist_Export( p_playlist, psz_uri, p_playlist->p_ml_category,
+    playlist_Export( p_playlist, psz_dirname, p_playlist->p_ml_category,
                      "export-xspf" );
     stats_TimerStop( p_playlist, STATS_TIMER_ML_DUMP );
 
-    free( psz_uri );
     return VLC_SUCCESS;
 }
