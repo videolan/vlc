@@ -460,7 +460,21 @@ void MainInterface::updateSystrayMenu( int status )
  */
 void MainInterface::toggleUpdateSystrayMenu()
 {
-    toggleVisible();
+    if( isHidden() )
+    {
+        show();
+    }
+    else
+    {
+        if( isActiveWindow() )
+        {
+            hide();
+        }
+        else
+        {
+            activateWindow();
+        }
+    }
     QVLCMenu::updateSystrayMenu( this, p_intf );
 }
 
