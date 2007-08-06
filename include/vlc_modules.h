@@ -46,7 +46,7 @@ typedef shl_t module_handle_t;
 /**
  * Module descriptor
  */
-#ifndef __PLUGIN__
+#ifndef __PLUGIN__FIXME___
 /* FIXME: scheduled for privatization */
 struct module_t
 {
