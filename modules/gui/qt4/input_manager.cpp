@@ -287,8 +287,8 @@ void MainInputManager::updateInput()
     }
     else {
         /* we are working as a dialogs provider */
-        playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_intf, 
-                                              VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        playlist_t *p_playlist = (playlist_t *) vlc_object_find( p_intf,
+                                       VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
         if( p_playlist )
         {
             p_input = p_playlist->p_input;

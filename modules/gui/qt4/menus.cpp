@@ -255,7 +255,7 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
 
 /**
  * Tools/View Menu
- * This is kept in the same menu for now, but could change if it gets much 
+ * This is kept in the same menu for now, but could change if it gets much
  * longer.
  **/
 QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
