@@ -1556,37 +1556,29 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                 /* Check if the option is deprecated */
                 if( p_conf->psz_current )
                 {
-                    if( !strcmp(p_conf->psz_current,"SUPPRESSED") )
+                    if( p_conf->b_strict )
                     {
-                        if( !b_ignore_errors )
-                        {
-                            fprintf(stderr,
-                                    "Warning: option --%s is no longer used.\n",
-                                    p_conf->psz_name);
-                        }
+                        fprintf(stderr,
+                                "Warning: option --%s no longer exists.\n",
+                                p_conf->psz_name);
                        continue;
                     }
+
+                    fprintf( stderr,
+                             "%s: option --%s is deprecated. Use --%s instead.\n",
+                             b_ignore_errors ? "Warning" : "Error",
+                             p_conf->psz_name, p_conf->psz_current);
                     if( !b_ignore_errors )
                     {
-                        if( p_conf->b_strict )
-                        {
-                            fprintf( stderr,
-                                     "Error: option --%s is deprecated. "
-                                     "Use --%s instead.\n",
-                                     p_conf->psz_name, p_conf->psz_current);
-                            /*free */
-                            for( i_index = 0; p_longopts[i_index].name; i_index++ )
-                                free( (char *)p_longopts[i_index].name );
+                        /*free */
+                        for( i_index = 0; p_longopts[i_index].name; i_index++ )
+                             free( (char *)p_longopts[i_index].name );
 
-                            free( p_longopts );
-                            free( psz_shortopts );
-                            return -1;
-                        }
-                        fprintf(stderr,
-                                "Warning: option --%s is deprecated. "
-                                "You should use --%s instead.\n",
-                                p_conf->psz_name, p_conf->psz_current);
+                        free( p_longopts );
+                        free( psz_shortopts );
+                        return -1;
                     }
+  
                     psz_name = (char *)p_conf->psz_current;
                     p_conf = config_FindConfig( p_this, psz_name );
                 }
