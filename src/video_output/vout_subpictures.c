@@ -534,7 +534,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         }
 
         /* Load the text rendering module */
-        if( !p_spu->p_text && p_region && p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
+        if( !p_spu->p_text && p_region
+         && p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') )
         {
             char *psz_modulename = NULL;
 
@@ -666,21 +667,24 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 {
                     vlc_value_t  val;
 
-                    /* Setup 3 variables which can be used to render time-dependent
-                     * text (and effects). The first indicates the total amount of
-                     * time the text will be on screen, the second the amount of time
-                     * it has already been on screen (can be a negative value as text
-                     * is layed out before it is rendered) and the third is a feedback
-                     * variable from the renderer - if the renderer sets it then this
-                     * particular text is time-dependent, eg. the visual progress bar
-                     * inside the text in karaoke and the text needs to be rendered
-                     * multiple times in order for the effect to work - we therefore
-                     * need to return the region to its original state at the end of
-                     * the loop, instead of leaving it in YUVA or YUVP
-                     * Any renderer which is unaware of how to render time-dependent
-                     * text can happily ignore the variables and render the text the
-                     * same as usual - it should at least show up on screen, but the
-                     * effect won't change the text over time.
+                    /* Setup 3 variables which can be used to render
+                     * time-dependent text (and effects). The first indicates
+                     * the total amount of time the text will be on screen,
+                     * the second the amount of time it has already been on
+                     * screen (can be a negative value as text is layed out
+                     * before it is rendered) and the third is a feedback
+                     * variable from the renderer - if the renderer sets it
+                     * then this particular text is time-dependent, eg. the
+                     * visual progress bar inside the text in karaoke and the
+                     * text needs to be rendered multiple times in order for
+                     * the effect to work - we therefore need to return the
+                     * region to its original state at the end of the loop,
+                     * instead of leaving it in YUVA or YUVP.
+                     * Any renderer which is unaware of how to render
+                     * time-dependent text can happily ignore the variables
+                     * and render the text the same as usual - it should at
+                     * least show up on screen, but the effect won't change
+                     * the text over time.
                      */
 
                     var_Create( p_spu->p_text, "spu-duration", VLC_VAR_TIME );
@@ -821,11 +825,14 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             {
                 int i_diff = 0;
                 int i_low = i_y_offset - p_spu->i_margin;
-                int i_high = i_y_offset + p_region->fmt.i_height - p_spu->i_margin;
+                int i_high = i_y_offset + p_region->fmt.i_height
+                             - p_spu->i_margin;
 
                 /* crop extra margin to keep within bounds */
-                if( i_low < 0 ) i_diff = i_low;
-                if( i_high > (int)p_fmt->i_height ) i_diff = i_high - p_fmt->i_height;
+                if( i_low < 0 )
+                    i_diff = i_low;
+                if( i_high > (int)p_fmt->i_height )
+                    i_diff = i_high - p_fmt->i_height;
                 i_y_offset -= ( p_spu->i_margin + i_diff );
             }
 
@@ -898,9 +905,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
             if( b_rerender_text )
             {
-                /* Some forms of subtitles need to be re-rendered more than once,
-                 * eg. karaoke. We therefore restore the region to its pre-rendered
-                 * state, so the next time through everything is calculated again.
+                /* Some forms of subtitles need to be re-rendered more than
+                 * once, eg. karaoke. We therefore restore the region to its
+                 * pre-rendered state, so the next time through everything is
+                 * calculated again.
                  */
                 p_region->picture.pf_release( &p_region->picture );
                 memset( &p_region->picture, 0, sizeof( picture_t ) );
