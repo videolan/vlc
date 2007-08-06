@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA. 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #include <QApplication>
@@ -94,7 +94,7 @@ vlc_module_begin();
     add_submodule();
         set_description( "Dialogs provider" );
         set_capability( "dialogs provider", 51 );
-        add_bool( "qt-always-video", VLC_FALSE, NULL, ALWAYS_VIDEO_TEXT, 
+        add_bool( "qt-always-video", VLC_FALSE, NULL, ALWAYS_VIDEO_TEXT,
                 ALWAYS_VIDEO_LONGTEXT, VLC_TRUE );
         add_bool( "qt-advanced-pref", VLC_FALSE, NULL, ADVANCED_PREFS_TEXT,
                 ADVANCED_PREFS_LONGTEXT, VLC_FALSE );
@@ -102,7 +102,7 @@ vlc_module_begin();
                 SYSTRAY_LONGTEXT, VLC_FALSE);
         add_bool( "qt-start-minimized", VLC_FALSE, NULL, MINIMIZED_TEXT,
                 MINIMIZED_LONGTEXT, VLC_TRUE);
-        add_bool( "qt-name-in-title", VLC_TRUE, NULL, TITLE_TEXT, 
+        add_bool( "qt-name-in-title", VLC_TRUE, NULL, TITLE_TEXT,
                   TITLE_LONGTEXT, VLC_FALSE );
         add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
                 FILEDIALOG_PATH_LONGTEXT, VLC_TRUE);
