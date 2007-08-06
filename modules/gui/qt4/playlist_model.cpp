@@ -745,11 +745,14 @@ void PLModel::rebuild( playlist_item_t *p_root )
     /* Clear the tree */
     if( rootItem )
     {
-        beginRemoveRows( index( rootItem, 0 ), 0,
-                         rootItem->children.size() -1 );
-        qDeleteAll( rootItem->children );
-        rootItem->children.clear();
-        endRemoveRows();
+        if( rootItem->children.size() )
+        {
+            beginRemoveRows( index( rootItem, 0 ), 0,
+                    rootItem->children.size() -1 );
+            qDeleteAll( rootItem->children );
+            rootItem->children.clear();
+            endRemoveRows();
+        }
     }
     if( p_root )
     {
