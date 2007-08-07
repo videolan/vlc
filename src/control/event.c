@@ -61,7 +61,7 @@ void libvlc_event_fini( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
  * Init an object's event manager.
  **************************************************************************/
 libvlc_event_manager_t *
-libvlc_event_manager_init( void * p_obj, libvlc_instance_t * p_libvlc_inst,
+libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst,
                            libvlc_exception_t *p_e )
 {
     libvlc_event_manager_t * p_em;
@@ -221,7 +221,7 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
             FOREACH_END()
         }
     FOREACH_END()
-    
+
     libvlc_exception_raise( p_e,
             "This object event manager doesn't know about '%i,%p,%p' event observer",
             event_type, pf_callback, p_user_data );
