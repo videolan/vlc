@@ -57,7 +57,7 @@ Daniel Stränger <vlc at schmaller d0t de> - M3U, xtag and playlist improvements
 Danko Dolch <info at dolchonline d0t net> - Icons and Design for Qt4 Interface
 David Kennedy <dkennedy at tinytoad.com> - X11 fullscreen patch
 Daniel Dreibrodt, aka aLtgLasS <daniel d.t dreibrodt -@t- gmx d0t de> - VLC 0.8.5 default skin
-Daniel Nylander <info@danielnylander at se> - Swedish translation
+Daniel Nylander <info @t danielnylander at se> - Swedish translation
 David J LaBarre "DJ" - Forum help, moderation and support
 David Thiel - security audit and report
 David Weber <david_weber at gmx.de> - Mac OS X interface design & graphics (v0.5.0)
@@ -87,7 +87,8 @@ Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
 Haakon Meland Eriksen - Norwegian translation
 Han HoJoong <0demon0 at paran dot com> - Korean translation
 Hans-Peter Jansen <hpj at urpla.net> - patch for module options handling
-Harry Sintonen <sintonen@iki.fi> - fix for MKV demuxer
+Hannes Domani <ssbssa at yahoo dot de> - Qt4 interfaces patches
+Harry Sintonen <sintonen at iki.fi> - fix for MKV demuxer
 Igor Helman - VLM msecseek command
 Ilkka Ollakka - SDP bitrate patch, various VLM fixes, transcode afilter/vfilter fix
 Jan David Mol <jjdmol at gmail.com> - Suggested some flags for ffmpeg building
@@ -194,8 +195,8 @@ Udo Richter <udo underscore richter at gmx dot de> - Trancode padding / cropping
 Valek Filippov <frob at df.ru> - Russian translation
 Vicente Jimenez Aguilar <vice at v1ce.net> - Spanish translation
 Vincent Dimar - WxWidgets online help patch
-Vincent van den Heuvel <heuvel@mac.com> - OSX about window artwork (v0.8.4)
-Vincenzo Reale <smart2128 @ baslug.org> - Italian translation
+Vincent van den Heuvel <heuvel @t mac.com> - OSX about window artwork (v0.8.4)
+Vincenzo Reale <smart2128 @t baslug.org> - Italian translation
 Vitalijus Slavinskas <Vitalijus.Slavinskas at stud.ktu dot lt> - nsv patches
 Vitaly V. Bursov <vitalyvb at ukr dot net>
 Vladimir Chernyshov - MMX motion optimizations

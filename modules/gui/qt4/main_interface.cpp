@@ -289,7 +289,7 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* Configure the UI */
     slider = new InputSlider( Qt::Horizontal, NULL );
-    ui.vboxLayout->insertWidget( 0, slider );
+    mainLayout->insertWidget( 0, slider );
     ui.discFrame->hide();
 
     BUTTON_SET_IMG( ui.prevSectionButton, "", previous.png, "" );
