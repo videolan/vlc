@@ -932,37 +932,41 @@ static int Request( access_t *p_access, int64_t i_tell )
     }
 
     /* Authentication */
-    if( p_sys->url.psz_username && *p_sys->url.psz_username )
+    if( p_sys->url.psz_username || p_sys->url.psz_password )
     {
-        char *buf;
+        char buf[strlen( p_sys->url.psz_username ?: "" )
+                  + strlen( p_sys->url.psz_password ?: "" ) + 2];
         char *b64;
 
-        asprintf( &buf, "%s:%s", p_sys->url.psz_username,
-                   p_sys->url.psz_password ? p_sys->url.psz_password : "" );
-
+        snprintf( buf, sizeof( buf ), "%s:%s", p_sys->url.psz_username ?: "",
+                  p_sys->url.psz_password ?: "" );
         b64 = vlc_b64_encode( buf );
-        free( buf );
 
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
-                    "Authorization: Basic %s\r\n", b64 );
-        free( b64 );
+        if( b64 != NULL )
+        {
+             net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
+                         "Authorization: Basic %s\r\n", b64 );
+             free( b64 );
+        }
     }
 
     /* Proxy Authentication */
-    if( p_sys->proxy.psz_username && *p_sys->proxy.psz_username )
+    if( p_sys->proxy.psz_username || p_sys->proxy.psz_password )
     {
-        char *buf;
+        char buf[strlen( p_sys->proxy.psz_username ?: "" )
+                  + strlen( p_sys->proxy.psz_password ?: "" )];
         char *b64;
 
-        asprintf( &buf, "%s:%s", p_sys->proxy.psz_username,
-                   p_sys->proxy.psz_password ? p_sys->proxy.psz_password : "" );
-
+        snprintf( buf, sizeof( buf ), "%s:%s", p_sys->proxy.psz_username ?: "",
+                  p_sys->proxy.psz_password ?: "" );
         b64 = vlc_b64_encode( buf );
-        free( buf );
 
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
-                    "Proxy-Authorization: Basic %s\r\n", b64 );
-        free( b64 );
+        if( b64 != NULL)
+        {
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
+                        "Proxy-Authorization: Basic %s\r\n", b64 );
+            free( b64 );
+        }
     }
 
     /* ICY meta data request */
