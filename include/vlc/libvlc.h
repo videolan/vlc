@@ -333,11 +333,13 @@ VLC_PUBLIC_API void libvlc_media_instance_set_media_descriptor( libvlc_media_ins
 /** Get the media descriptor used by the media_instance (if any). A copy of
  * the md is returned. NULL is returned if no media instance is associated.
  * \param p_mi the Media Instance 
- * \param p_md the Media Descriptor. Afterwards the p_md can safely be
- * destroyed.
  */
 VLC_PUBLIC_API libvlc_media_descriptor_t * libvlc_media_instance_get_media_descriptor( libvlc_media_instance_t *, libvlc_exception_t * );
 
+/** Get the Event Manager from which the media instance send event.
+ * \param p_mi the Media Instance 
+ */
+VLC_PUBLIC_API libvlc_event_manager_t * libvlc_media_instance_event_manager ( libvlc_media_instance_t *, libvlc_exception_t * );
 
 VLC_PUBLIC_API void libvlc_media_instance_play ( libvlc_media_instance_t *, libvlc_exception_t * );
 VLC_PUBLIC_API void libvlc_media_instance_pause ( libvlc_media_instance_t *, libvlc_exception_t * );

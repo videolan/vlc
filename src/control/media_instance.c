@@ -101,6 +101,33 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_instance_t *p_mi,
     return p_input_thread;
 }
 
+/*
+ * input_state_changed (Private) (input var "state" Callback)
+ */
+static int
+input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval,
+                     void * p_userdata )
+{
+    libvlc_media_instance_t * p_mi = p_userdata;
+    libvlc_event_t event;
+
+    if( newval.i_int == oldval.i_int )
+        return VLC_SUCCESS; /* No change since last time, don't propagate */
+
+    switch ( newval.i_int )
+    {
+        case END_S:
+            event.type = libvlc_MediaInstanceReachedEnd;
+            break;
+        default:
+            return VLC_SUCCESS;
+    }
+
+    libvlc_event_send( p_mi->p_event_manager, &event );
+    return VLC_SUCCESS;
+}
+
 /**************************************************************************
  * Create a Media Instance object
  **************************************************************************/
@@ -132,6 +159,16 @@ libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
      * - Lock when attempting to destroy the object the lock is also held */
     vlc_mutex_init( p_mi->p_libvlc_instance->p_libvlc_int,
                     &p_mi->object_lock );
+    p_mi->p_event_manager = libvlc_event_manager_new( p_mi,
+            p_libvlc_instance, p_e );
+    if( libvlc_exception_raised( p_e ) )
+    {
+        free( p_mi );
+        return NULL;
+    }
+    
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+            libvlc_MediaInstanceReachedEnd, p_e );
 
     return p_mi;
 }
@@ -217,6 +254,7 @@ void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
 
     if( libvlc_exception_raised( &p_e ) )
     {
+        libvlc_event_manager_release( p_mi->p_event_manager );
         free( p_mi );
         return; /* no need to worry about no input thread */
     }
@@ -249,6 +287,8 @@ void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
     if( p_mi->i_refcount > 0 )
         return;
 
+    libvlc_event_manager_release( p_mi->p_event_manager );
+    
     release_input_thread( p_mi );
 
     libvlc_media_descriptor_destroy( p_mi->p_md );
@@ -292,7 +332,7 @@ void libvlc_media_instance_set_media_descriptor(
 }
 
 /**************************************************************************
- * Set the Media descriptor associated with the instance
+ * Get the Media descriptor associated with the instance
  **************************************************************************/
 libvlc_media_descriptor_t *
 libvlc_media_instance_get_media_descriptor(
@@ -305,6 +345,22 @@ libvlc_media_instance_get_media_descriptor(
         return NULL;
 
     return libvlc_media_descriptor_duplicate( p_mi->p_md );
+}
+
+/**************************************************************************
+ * Get the event Manager
+ **************************************************************************/
+libvlc_event_manager_t *
+libvlc_media_instance_event_manager(
+                            libvlc_media_instance_t *p_mi,
+                            libvlc_exception_t *p_e )
+{
+    (void)p_e;
+
+    if( !p_mi->p_md )
+        return NULL;
+
+    return p_mi->p_event_manager;
 }
 
 /**************************************************************************

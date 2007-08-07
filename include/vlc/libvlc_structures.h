@@ -183,13 +183,11 @@ typedef struct libvlc_log_message_t
     
 /**
  * Available events: (XXX: being reworked)
- * - libvlc_VolumeChanged
- * - libvlc_InputPositionChanged
+ * - libvlc_MediaInstanceReachedEnd
  */
 
 typedef enum libvlc_event_type_t {
-    libvlc_VolumeChanged,
-    libvlc_InputPositionChanged,
+    libvlc_MediaInstanceReachedEnd,
 } libvlc_event_type_t;
 
 /**
@@ -208,11 +206,7 @@ typedef struct libvlc_event_t
         struct
         {
             int new_volume;
-        } volume_changed;
-        struct
-        {
-            vlc_int64_t new_position;
-        } input_position_changed;
+        } volume_changed; /* Scheduled for deletion */
     } u;
 } libvlc_event_t;
 
