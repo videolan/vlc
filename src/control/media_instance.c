@@ -48,7 +48,7 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
 
     if( !p_input_thread )
         return;
-
+    
     /* release for previous vlc_object_get */
     vlc_object_release( p_input_thread );
 
@@ -101,13 +101,12 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_instance_t *p_mi,
     return p_input_thread;
 }
 
-
 /**************************************************************************
  * Create a Media Instance object
  **************************************************************************/
 libvlc_media_instance_t *
 libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
-                           libvlc_exception_t *p_e )
+                           libvlc_exception_t * p_e )
 {
     libvlc_media_instance_t * p_mi;
 
@@ -146,22 +145,12 @@ libvlc_media_instance_new_from_media_descriptor(
                                     libvlc_exception_t *p_e )
 {
     libvlc_media_instance_t * p_mi;
+    p_mi = libvlc_media_instance_new( p_md->p_libvlc_instance, p_e );
 
-    if( !p_md )
-    {
-        libvlc_exception_raise( p_e, "invalid media descriptor" );
+    if( !p_mi )
         return NULL;
-    }
 
-    p_mi = malloc( sizeof(libvlc_media_instance_t) );
     p_mi->p_md = libvlc_media_descriptor_duplicate( p_md );
-    p_mi->p_libvlc_instance = p_mi->p_md->p_libvlc_instance;
-    p_mi->i_input_id = -1;
-    /* same strategy as before */
-    p_mi->i_refcount = 1;
-    /* same strategy as before */
-    vlc_mutex_init( p_mi->p_libvlc_instance->p_libvlc_int,
-                    &p_mi->object_lock );
 
     return p_mi;
 }
@@ -182,25 +171,23 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
         return NULL;
     }
 
-    p_mi = malloc( sizeof(libvlc_media_instance_t) );
+    p_mi = libvlc_media_instance_new( p_libvlc_instance, p_e );
+
+    if( !p_mi )
+        return NULL;
+
     p_mi->p_md = libvlc_media_descriptor_new_from_input_item(
                     p_libvlc_instance,
                     p_input->p->input.p_item, p_e );
 
     if( !p_mi->p_md )
     {
-        free( p_mi );
+        libvlc_media_instance_destroy( p_mi );
         return NULL;
     }
 
-    p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->i_input_id = p_input->i_object_id;
-    /* same strategy as before */
-    p_mi->i_refcount = 1;
-    /* same strategy as before */
-    vlc_mutex_init( p_mi->p_libvlc_instance->p_libvlc_int,
-                    &p_mi->object_lock );
-
+    
     /* will be released in media_instance_release() */
     vlc_object_yield( p_input );
 
@@ -229,8 +216,11 @@ void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
     p_input_thread = libvlc_get_input_thread( p_mi, &p_e );
 
     if( libvlc_exception_raised( &p_e ) )
+    {
+        free( p_mi );
         return; /* no need to worry about no input thread */
-    
+    }
+
     input_DestroyThread( p_input_thread );
 
     libvlc_media_descriptor_destroy( p_mi->p_md );
