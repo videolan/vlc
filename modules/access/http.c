@@ -925,7 +925,7 @@ static int Request( access_t *p_access, int64_t i_tell )
     net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "User-Agent: %s\r\n",
                 p_sys->psz_user_agent );
     /* Offset */
-    if( p_sys->i_version == 1 )
+    if( ( p_sys->i_version == 1 ) && ( i_tell > 0 ) )
     {
         net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
                     "Range: bytes="I64Fd"-\r\n", i_tell );
