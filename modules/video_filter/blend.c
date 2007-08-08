@@ -1472,7 +1472,7 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
                 /* Completely opaque. Completely overwrite underlying pixel */
                 p_dst_y[i_x] = p_pal[p_src2[i_x]][0];
 
-                if( b_even_scanline && i_x % 2 == 0 )
+                if( b_even_scanline && ((i_x % 2) == 0) )
                 {
                     p_dst_u[i_x/2] = p_pal[p_src2[i_x]][1];
                     p_dst_v[i_x/2] = p_pal[p_src2[i_x]][2];
@@ -1485,7 +1485,7 @@ static void BlendPalI420( filter_t *p_filter, picture_t *p_dst,
                 (uint16_t)p_src1_y[i_x] * (MAX_TRANS - i_trans) )
                 >> TRANS_BITS;
 
-            if( b_even_scanline && i_x % 2 == 0 )
+            if( b_even_scanline && ((i_x % 2) == 0) )
             {
                 p_dst_u[i_x/2] = ( (uint16_t)p_pal[p_src2[i_x]][1] * i_trans +
                     (uint16_t)p_src1_u[i_x/2] * (MAX_TRANS - i_trans) )
