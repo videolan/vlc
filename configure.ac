@@ -6036,6 +6036,7 @@ AC_CONFIG_FILES([
   modules/codec/cmml/Makefile
   modules/codec/dmo/Makefile
   modules/codec/ffmpeg/Makefile
+  modules/codec/subtitles/Makefile
   modules/codec/spudec/Makefile
   modules/codec/xvmc/Makefile
   modules/control/Makefile
