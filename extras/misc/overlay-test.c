@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <string.h>
 #include <math.h>
 
@@ -41,9 +42,13 @@
 #define WIDTH 128
 #define HEIGHT 128
 
-char *p_imageRGBA;
+#define TEXT "Hello world!"
+#define TEXTSIZE sizeof( TEXT )
 
-void ImagesCreate( void ) {
+char *p_imageRGBA;
+char *p_text;
+
+void DataCreate( void ) {
     char *p_data = p_imageRGBA;
     for( size_t i = 0; i < HEIGHT; ++i ) {
         for( size_t j = 0; j < HEIGHT; ++j ) {
@@ -53,6 +58,8 @@ void ImagesCreate( void ) {
             *(p_data++) = j * 4 & 0xFF;
         }
     }
+
+    memcpy( p_text, TEXT, TEXTSIZE );
 }
 
 /*****************************************************************************
@@ -61,6 +68,116 @@ void ImagesCreate( void ) {
 
 int IsFailure( char *psz_text ) {
     return strncmp( psz_text, "SUCCESS:", 8 );
+}
+
+void CheckResult( FILE *p_res ) {
+    char psz_resp[9];
+
+    fscanf( p_res, "%8s", &psz_resp );
+    if( IsFailure( psz_resp ) ) {
+        printf( " failed\n" );
+        exit( -1 );
+    }
+}
+
+void CheckedCommand( FILE *p_cmd, FILE *p_res, char *p_format, ... ) {
+    va_list ap;
+    va_start( ap, p_format );
+
+    vfprintf( p_cmd, p_format, ap );
+    fflush( p_cmd );
+    if( p_res != NULL ) {
+        CheckResult( p_res );
+    }
+    va_end( ap );
+}
+
+int GenImage( FILE *p_cmd, FILE *p_res ) {
+    int i_overlay;
+
+    printf( "Getting an overlay..." );
+    CheckedCommand( p_cmd, p_res, "GenImage\n" );
+    fscanf( p_res, "%d", &i_overlay );
+    printf( " done. Overlay is %d\n", i_overlay );
+
+    return i_overlay;
+}
+
+void DeleteImage( FILE *p_cmd, FILE *p_res, int i_overlay ) {
+    printf( "Removing image..." );
+    CheckedCommand( p_cmd, p_res, "DeleteImage %d\n", i_overlay );
+    printf( " done\n" );
+}
+
+void StartAtomic( FILE *p_cmd, FILE *p_res ) {
+    CheckedCommand( p_cmd, p_res, "StartAtomic\n" );
+}
+
+void EndAtomic( FILE *p_cmd, FILE *p_res ) {
+    CheckedCommand( p_cmd, p_res, "EndAtomic\n" );
+}
+
+void DataSharedMem( FILE *p_cmd, FILE *p_res, int i_overlay, int i_width,
+                    int i_height, char *psz_format, int i_shmid ) {
+
+    printf( "Sending data via shared memory..." );
+    CheckedCommand( p_cmd, p_res, "DataSharedMem %d %d %d %s %d\n", i_overlay,
+                    i_width, i_height, psz_format, i_shmid );
+    printf( " done\n" );
+}
+
+void SetAlpha( FILE *p_cmd, FILE *p_res, int i_overlay, int i_alpha ) {
+    CheckedCommand( p_cmd, p_res, "SetAlpha %d %d\n", i_overlay, i_alpha );
+}
+
+void SetPosition( FILE *p_cmd, FILE *p_res, int i_overlay, int i_x, int i_y ) {
+    CheckedCommand( p_cmd, p_res, "SetPosition %d %d %d\n", i_overlay, i_x,
+                    i_y );
+}
+
+void SetVisibility( FILE *p_cmd, FILE *p_res, int i_overlay, int i_visible ) {
+    CheckedCommand( p_cmd, p_res, "SetVisibility %d %d\n", i_overlay,
+                    i_visible );
+}
+
+/*****************************************************************************
+ * Test Routines
+ *****************************************************************************/
+
+void BasicTest( FILE *p_cmd, FILE *p_res, int i_overlay ) {
+    printf( "Activating overlay..." );
+    SetVisibility( p_cmd, p_res, i_overlay, 1 );
+    printf( " done\n" );
+
+    printf( "Sweeping alpha..." );
+    for( int i_alpha = 0xFF; i_alpha >= -0xFF ; i_alpha -= 8 ) {
+        SetAlpha( p_cmd, p_res, i_overlay, abs( i_alpha ) );
+        usleep( 20000 );
+    }
+    SetAlpha( p_cmd, p_res, i_overlay, 255 );
+    printf( " done\n" );
+
+    printf( "Circle motion..." );
+    for( float f_theta = 0; f_theta <= 2 * M_PI ; f_theta += M_PI / 64.0 ) {
+        SetPosition( p_cmd, p_res, i_overlay,
+                     (int)( - cos( f_theta ) * 100.0 + 100.0 ),
+                     (int)( - sin( f_theta ) * 100.0 + 100.0 ) );
+        usleep( 20000 );
+    }
+    SetPosition( p_cmd, p_res, i_overlay, 0, 100 );
+    printf( " done\n" );
+
+    printf( "Atomic motion..." );
+    StartAtomic( p_cmd, p_res );
+    SetPosition( p_cmd, NULL, i_overlay, 200, 50 );
+    sleep( 1 );
+    SetPosition( p_cmd, NULL, i_overlay, 0, 0 );
+    EndAtomic( p_cmd, p_res );
+    CheckResult( p_res );
+    CheckResult( p_res );
+    printf( " done\n" );
+
+    sleep( 5 );
 }
 
 /*****************************************************************************
@@ -74,31 +191,48 @@ int main( int i_argc, char *ppsz_argv[] ) {
         exit( -2 );
     }
 
-    printf( "Creating shared memory..." );
+    printf( "Creating shared memory for RGBA..." );
     int i_shmRGBA = shmget( IPC_PRIVATE, WIDTH * HEIGHT * 4, S_IRWXU );
     if( i_shmRGBA == -1 ) {
         printf( " failed\n" );
         exit( -1 );
     }
-    printf( " done. ID is %d\n", i_shmRGBA );
+    printf( " done, ID is %d. Text...", i_shmRGBA );
+    int i_shmText = shmget( IPC_PRIVATE, TEXTSIZE, S_IRWXU );
+    if( i_shmText == -1 ) {
+        printf( " failed\n" );
+        exit( -1 );
+    }
+    printf( " done, ID is %d\n", i_shmText );
 
-    printf( "Attaching shared memory..." );
+    printf( "Attaching shared memory for RGBA..." );
     p_imageRGBA = shmat( i_shmRGBA, NULL, 0 );
     if( p_imageRGBA == -1 ) {
         printf( " failed\n" );
         exit( -1 );
     }
-    printf( " done\n" );
-
-    printf( "Queueing shared memory for destruction..." );
-    if( shmctl( i_shmRGBA, IPC_RMID, 0 ) == -1 ) {
+    printf( " done. Text..." );
+    p_text = shmat( i_shmText, NULL, 0 );
+    if( p_text == -1 ) {
         printf( " failed\n" );
         exit( -1 );
     }
     printf( " done\n" );
 
-    printf( "Generating images..." );
-    ImagesCreate();
+    printf( "Queueing shared memory for destruction, RGBA..." );
+    if( shmctl( i_shmRGBA, IPC_RMID, 0 ) == -1 ) {
+        printf( " failed\n" );
+        exit( -1 );
+    }
+    printf( " done. Text..." );
+    if( shmctl( i_shmText, IPC_RMID, 0 ) == -1 ) {
+        printf( " failed\n" );
+        exit( -1 );
+    }
+    printf( " done\n" );
+
+    printf( "Generating data..." );
+    DataCreate();
     printf( " done\n" );
 
     printf( "Please make sure vlc is running.\n"
@@ -107,101 +241,28 @@ int main( int i_argc, char *ppsz_argv[] ) {
             ppsz_argv[1], ppsz_argv[2] );
 
     printf( "Opening FIFOs..." );
-    FILE *f_cmd = fopen( ppsz_argv[1], "w" );
-    if( f_cmd == NULL ) {
+    FILE *p_cmd = fopen( ppsz_argv[1], "w" );
+    if( p_cmd == NULL ) {
         printf( " failed\n" );
         exit( -1 );
     }
-    FILE *f_res = fopen( ppsz_argv[2], "r" );
-    if( f_res == NULL ) {
-        printf( " failed\n" );
-        exit( -1 );
-    }
-    printf( " done\n" );
-
-    printf( "Getting an overlay..." );
-    int i_overlay;
-    char psz_resp[9];
-    fprintf( f_cmd, "GenImage\n" );
-    fflush( f_cmd );
-    fscanf( f_res, "%8s", &psz_resp );
-    if( IsFailure( psz_resp ) ) {
-        printf( " failed\n" );
-        exit( -1 );
-    }
-    fscanf( f_res, "%d", &i_overlay );
-    printf( " done. Overlay is %d\n", i_overlay );
-
-    printf( "Sending data..." );
-    fprintf( f_cmd, "DataSharedMem %d %d %d RGBA %d\n", i_overlay, WIDTH,
-             HEIGHT, i_shmRGBA );
-    fflush( f_cmd );
-    fscanf( f_res, "%8s", &psz_resp );
-    if( IsFailure( psz_resp ) ) {
+    FILE *p_res = fopen( ppsz_argv[2], "r" );
+    if( p_res == NULL ) {
         printf( " failed\n" );
         exit( -1 );
     }
     printf( " done\n" );
 
-    printf( "Activating overlay..." );
-    fprintf( f_cmd, "SetVisibility %d 1\n", i_overlay );
-    fflush( f_cmd );
-    fscanf( f_res, "%8s", &psz_resp );
-    if( IsFailure( psz_resp ) ) {
-        printf( " failed\n" );
-        exit( -1 );
-    }
-    printf( " done\n" );
+    int i_overlay_image = GenImage( p_cmd, p_res );
+    int i_overlay_text = GenImage( p_cmd, p_res );
+    DataSharedMem( p_cmd, p_res, i_overlay_image, WIDTH, HEIGHT, "RGBA",
+                   i_shmRGBA );
+    DataSharedMem( p_cmd, p_res, i_overlay_text, TEXTSIZE, 1, "TEXT",
+                   i_shmText );
 
-    printf( "Sweeping alpha..." );
-    for( int i_alpha = 0xFF; i_alpha >= -0xFF ; i_alpha -= 8 ) {
-        fprintf( f_cmd, "SetAlpha %d %d\n", i_overlay, abs( i_alpha ) );
-        fflush( f_cmd );
-        fscanf( f_res, "%8s", &psz_resp );
-        if( IsFailure( psz_resp ) ) {
-            printf( " failed\n" );
-            exit( -1 );
-        }
-        usleep( 20000 );
-    }
-    fprintf( f_cmd, "SetAlpha %d 255\n", i_overlay );
-    fflush( f_cmd );
-    fscanf( f_res, "%8s", &psz_resp );
-    if( IsFailure( psz_resp ) ) {
-        printf( " failed\n" );
-        exit( -1 );
-    }
-    printf( " done\n" );
+    BasicTest( p_cmd, p_res, i_overlay_image );
+    BasicTest( p_cmd, p_res, i_overlay_text );
 
-    printf( "Circle motion..." );
-    for( float f_theta = 0; f_theta <= 2 * M_PI ; f_theta += M_PI / 64.0 ) {
-        fprintf( f_cmd, "SetPosition %d %d %d\n", i_overlay,
-                 (int)( - cos( f_theta ) * 100.0 + 100.0 ),
-                 (int)( - sin( f_theta ) * 100.0 + 100.0 ) );
-        fflush( f_cmd );
-        fscanf( f_res, "%8s", &psz_resp );
-        if( IsFailure( psz_resp ) ) {
-            printf( " failed\n" );
-            exit( -1 );
-        }
-        usleep( 20000 );
-    }
-    fprintf( f_cmd, "SetPosition %d 0 0\n", i_overlay );
-    fflush( f_cmd );
-    fscanf( f_res, "%8s", &psz_resp );
-    if( IsFailure( psz_resp ) ) {
-        printf( " failed\n" );
-        exit( -1 );
-    }
-    printf( " done\n" );
-
-    printf( "Removing image..." );
-    fprintf( f_cmd, "DeleteImage %d\n", i_overlay );
-    fflush( f_cmd );
-    fscanf( f_res, "%8s", &psz_resp );
-    if( IsFailure( psz_resp ) ) {
-        printf( " failed\n" );
-        exit( -1 );
-    }
-    printf( " done\n" );
+    DeleteImage( p_cmd, p_res, i_overlay_image );
+    DeleteImage( p_cmd, p_res, i_overlay_text );
 }
