@@ -166,7 +166,7 @@ libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
         free( p_mi );
         return NULL;
     }
-    
+ 
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaInstanceReachedEnd, p_e );
 
@@ -394,6 +394,8 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
     p_input_thread = input_CreateThread( p_mi->p_libvlc_instance->p_libvlc_int,
                                          p_mi->p_md->p_input_item );
     p_mi->i_input_id = p_input_thread->i_object_id;
+
+    var_AddCallback( p_input_thread, "state", input_state_changed, p_mi );
 
     /* will be released in media_instance_release() */
     vlc_object_yield( p_input_thread );
