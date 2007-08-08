@@ -89,7 +89,7 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->pf_run = Run;
 
-    p_intf->p_sys->psz_file = var_CreateGetString( p_intf, "lirc-file" );
+    p_intf->p_sys->psz_file = var_CreateGetNonEmptyString( p_intf, "lirc-file" );
 
     i_fd = lirc_init( "vlc", 1 );
     if( i_fd == -1 )
