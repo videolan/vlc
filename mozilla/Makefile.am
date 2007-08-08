@@ -72,7 +72,7 @@ CPPFLAGS_mozilla_EXTRA = -I. -I$(top_builddir) -I$(srcdir)/../include -c \
 	-DNO_X11=1 -DUSE_SYSTEM_CONSOLE=1 -pipe -fmessage-length=0 \
 	-include mozilla-config.h
 LDFLAGS_mozilla_EXTRA = -no-undefined -bundle -Wl,-read_only_relocs -Wl,suppress \
-	-Wl,-headerpad_max_install_names -shrext $(LIBEXT) -framework Carbon
+	-Wl,-headerpad_max_install_names -shrext $(LIBEXT) -Wl,-framework,Carbon -Wl,-framework,System
 
 npvlc_la_SOURCES = $(SOURCES_mozilla_common) $(SOURCES_support)
 npvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags mozilla` $(CPPFLAGS_mozilla_EXTRA)
@@ -107,25 +107,42 @@ endef
 
 VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	rm -Rf "$@"
-	$(INSTALL) -d "./$@/Contents/MacOS"
-	$(INSTALL) .libs/npvlc.dylib "./$@/Contents/MacOS/VLC Plugin"
-	dylib="./$@/Contents/MacOS/VLC Plugin"; $(FIXEXECPATH) ;
-	$(INSTALL) -d "./$@/Contents/Resources"
-	$(INSTALL) npvlc.rsrc "./$@/Contents/Resources/VLC Plugin.rsrc"
-	cp -r "$(top_srcdir)/extras/MacOSX/plugin/English.lproj" "./$@/Contents/Resources/"
-	$(INSTALL) "$(top_srcdir)/extras/MacOSX/plugin/Info.plist" "./$@/Contents/Info.plist"
-	$(INSTALL) -d "./$@/Contents/MacOS/modules"
+	$(INSTALL) -d "$(srcdir)/$@/Contents/MacOS"
+	$(INSTALL) "$(srcdir)/.libs/npvlc.dylib" "$(srcdir)/$@/Contents/MacOS/VLC Plugin"
+	$(INSTALL) -d "$(srcdir)/$@/Contents/MacOS/lib"; \
+	install_name_tool -change "$(libdir)/libvlc.1.dylib" \
+	    "@executable_path/lib/libvlc.dylib" \
+	    "$(srcdir)/$@/Contents/MacOS/VLC Plugin"
+	install_name_tool -change "$(libdir)/libvlc-control.0.dylib" \
+	    "@executable_path/lib/libvlc-control.dylib" \
+	    "$(srcdir)/$@/Contents/MacOS/VLC Plugin"
+	$(INSTALL) "$(top_builddir)/src/.libs/libvlc.1.dylib" \
+	    "$(srcdir)/$@/Contents/MacOS/lib/libvlc.dylib"
+	$(INSTALL) "$(top_builddir)/src/.libs/libvlc-control.0.dylib" \
+	    "$(srcdir)/$@/Contents/MacOS/lib/libvlc-control.dylib"
+	install_name_tool -change "$(libdir)/libvlc.1.dylib" \
+	    "@executable_path/lib/libvlc.dylib" \
+	    "$(srcdir)/$@/Contents/MacOS/lib/libvlc-control.dylib"
+	dylib="$(srcdir)/$@/Contents/MacOS/VLC Plugin"; $(FIXEXECPATH) ;
+	dylib="$(srcdir)/$@/Contents/MacOS/lib/libvlc.dylib"; $(FIXEXECPATH) ;
+	dylib="$(srcdir)/$@/Contents/MacOS/lib/libvlc-control.dylib"; $(FIXEXECPATH) ;
+	$(INSTALL) -d "$(srcdir)/$@/Contents/Resources"
+	$(INSTALL) npvlc.rsrc "$(srcdir)/$@/Contents/Resources/VLC Plugin.rsrc"
+	cp -r "$(top_srcdir)/extras/MacOSX/plugin/English.lproj" "$(srcdir)/$@/Contents/Resources/"
+	$(INSTALL) "$(top_srcdir)/extras/MacOSX/plugin/Info.plist" "$(srcdir)/$@/Contents/Info.plist"
+	$(INSTALL) -d "$(srcdir)/$@/Contents/MacOS/modules"
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; then \
-	    dylib="./$@/Contents/MacOS/modules/`basename $$i$(LIBEXT)`"; \
-	    $(INSTALL) "$$i$(LIBEXT)" "$$dylib"; \
+	    dylib="$(srcdir)/$@/Contents/MacOS/modules/`basename $$i$(LIBEXT)`"; \
+	    $(INSTALL) "`dirname $$i`/.libs/`basename $$i`$(LIBEXT)" "$$dylib"; \
+	    install_name_tool -change "$(libdir)/libvlc.1.dylib" \
+	        "@executable_path/lib/libvlc.dylib" "$$dylib"; \
 	    $(FIXEXECPATH) ; \
 	  fi ; \
 	done
 	if test -d $(top_srcdir)/extras/contrib/vlc-lib; then \
-	  $(INSTALL) -d "./$@/Contents/MacOS/lib"; \
 	  for i in $(top_srcdir)/extras/contrib/vlc-lib/*.dylib ; do \
-	    dylib="./$@/Contents/MacOS/lib/`basename $${i}`" ; \
+	    dylib="$(srcdir)/$@/Contents/MacOS/lib/`basename $${i}`" ; \
 	    $(INSTALL) -m 644 "$${i}" "$$dylib" ; \
 	    $(FIXEXECPATH); \
 	  done ; \
@@ -133,7 +150,7 @@ VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 # uncomment if dependencies on XPCOM libs is sought
 #	if test -d "$(MOZILLA_SDK_PATH)/lib"; then \
 #	  for i in "$(MOZILLA_SDK_PATH)"/lib/*.dylib ; do \
-#	    dylib="./$@/Contents/MacOS/`basename $${i}`" ; \
+#	    dylib="$(srcdir)/$@/Contents/MacOS/`basename $${i}`" ; \
 #	    $(INSTALL) -m 644 "$${i}" "$$dylib" ; \
 #	    $(FIXEXECPATH); \
 #	  done ; \
