@@ -160,12 +160,15 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             uint8_t *p_dstendline = p_dst + i_dst_visible_pitch;
             const uint8_t *p_dstend = p_dst + i_dst_visible_lines*i_dst_pitch;
 
-            int l = 1<<(SHIFT_SIZE-1);
+            const int i_shift_height = i_dst_height / i_src_height;
+            const int i_shift_width = i_dst_width / i_src_width;
+
+            int l = 1<<(SHIFT_SIZE-i_shift_height);
             for( ; p_dst < p_dstend;
                  p_dst += i_dst_hidden_pitch,
                  p_dstendline += i_dst_pitch, l += i_height_coef )
             {
-                int k = 1<<(SHIFT_SIZE-1);
+                int k = 1<<(SHIFT_SIZE-i_shift_width);
                 uint8_t *p_srcl = p_src
                        + (__MIN( i_src_height_1, l >> SHIFT_SIZE )*i_src_pitch);
 
@@ -201,13 +204,16 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         uint32_t *p_dstendline = p_dst + (i_dst_visible_pitch>>2);
         const uint32_t *p_dstend = p_dst + i_dst_visible_lines*(i_dst_pitch>>2);
 
-        int l = 1<<(SHIFT_SIZE-1);
+        const int i_shift_height = i_dst_height / i_src_height;
+        const int i_shift_width = i_dst_width / i_src_width;
+
+        int l = 1<<(SHIFT_SIZE-i_shift_height);
         for( ; p_dst < p_dstend;
              p_dst += (i_dst_hidden_pitch>>2),
              p_dstendline += (i_dst_pitch>>2),
              l += i_height_coef )
         {
-            int k = 1<<(SHIFT_SIZE-1);
+            int k = 1<<(SHIFT_SIZE-i_shift_width);
             uint32_t *p_srcl = p_src
                     + (__MIN( i_src_height_1, l >> SHIFT_SIZE )*(i_src_pitch>>2));
             for( ; p_dst < p_dstendline; p_dst++, k += i_width_coef )
