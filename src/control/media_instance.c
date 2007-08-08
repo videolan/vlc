@@ -261,7 +261,7 @@ void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
 
     input_DestroyThread( p_input_thread );
 
-    libvlc_media_descriptor_destroy( p_mi->p_md );
+    libvlc_media_descriptor_release( p_mi->p_md );
 
     free( p_mi );
 }
@@ -278,24 +278,32 @@ void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
     
     p_mi->i_refcount--;
 
-    /* We hold the mutex, as a waiter to make sure pending operations
-     * are finished. We can't hold it longer as the get_input_thread
-     * function holds a lock.  */
-
-    vlc_mutex_unlock( &p_mi->object_lock );
-    
     if( p_mi->i_refcount > 0 )
+    {
+        vlc_mutex_unlock( &p_mi->object_lock );
         return;
+    }
+    vlc_mutex_unlock( &p_mi->object_lock );
 
     libvlc_event_manager_release( p_mi->p_event_manager );
     
     release_input_thread( p_mi );
 
-    libvlc_media_descriptor_destroy( p_mi->p_md );
+    libvlc_media_descriptor_release( p_mi->p_md );
 
     free( p_mi );
 }
 
+/**************************************************************************
+ * Retain a Media Instance object
+ **************************************************************************/
+void libvlc_media_instance_retain( libvlc_media_instance_t *p_mi )
+{
+    if( !p_mi )
+        return;
+
+    p_mi->i_refcount++;
+}
 /**************************************************************************
  * Set the Media descriptor associated with the instance
  **************************************************************************/
@@ -313,7 +321,7 @@ void libvlc_media_instance_set_media_descriptor(
     
     release_input_thread( p_mi );
 
-    libvlc_media_descriptor_destroy( p_mi->p_md );
+    libvlc_media_descriptor_release( p_mi->p_md );
 
     if( !p_md )
     {
@@ -420,6 +428,15 @@ void libvlc_media_instance_pause( libvlc_media_instance_t *p_mi,
 
     input_Control( p_input_thread, INPUT_CONTROL_SET_STATE, val );
     vlc_object_release( p_input_thread );
+}
+
+/**************************************************************************
+ * Stop
+ **************************************************************************/
+void libvlc_media_instance_stop( libvlc_media_instance_t *p_mi,
+                                 libvlc_exception_t *p_e )
+{
+    libvlc_exception_raise( p_mi, "Not implemented" );
 }
 
 /**************************************************************************

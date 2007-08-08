@@ -67,7 +67,26 @@ struct libvlc_media_descriptor_t
 {
     int                b_preparsed;
     input_item_t      *p_input_item;
+    int                i_refcount;
     libvlc_instance_t *p_libvlc_instance;
+};
+
+struct libvlc_tag_query_t
+{
+    struct libvlc_instance_t  *p_libvlc_instance; /* Parent instance */
+    int                i_refcount;
+};
+
+
+struct libvlc_media_list_t
+{
+    libvlc_event_manager_t * p_event_manager;
+    libvlc_instance_t *      p_libvlc_instance;
+    int                      i_refcount;
+    vlc_mutex_t              object_lock;
+    libvlc_media_list_t *    p_media_provider; /* For dynamic sublist */
+    libvlc_tag_query_t *     p_query;              /* For dynamic sublist */
+    DECL_ARRAY(void *) items;
 };
 
 struct libvlc_media_instance_t
@@ -80,6 +99,19 @@ struct libvlc_media_instance_t
     libvlc_media_descriptor_t *p_md; /* current media descriptor */
     libvlc_event_manager_t * p_event_manager;
 };
+
+struct libvlc_media_list_player_t
+{
+    libvlc_event_manager_t * p_event_manager;
+    libvlc_instance_t *      p_libvlc_instance;
+    int                      i_refcount;
+    vlc_mutex_t              object_lock;
+    int                      i_current_playing_index;
+    libvlc_media_descriptor_t * p_current_playing_item;
+    libvlc_media_list_t *    p_mlist;
+    libvlc_media_instance_t *  p_mi;
+};
+
 
 
 /* 

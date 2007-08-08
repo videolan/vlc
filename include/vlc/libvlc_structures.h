@@ -53,6 +53,19 @@ typedef struct libvlc_exception_t
 /**@} */
 
 /*****************************************************************************
+ * Tag Query
+ *****************************************************************************/
+/** defgroup libvlc_tag_query Tag Query
+ * \ingroup libvlc
+ * LibVLC Tag Query support in media descriptor
+ * @{
+ */
+
+typedef struct libvlc_tag_query_t libvlc_tag_query_t;
+
+/**@} */
+
+/*****************************************************************************
  * Media Descriptor
  *****************************************************************************/
 /** defgroup libvlc_media_descriptor MediaDescriptor
@@ -79,6 +92,7 @@ typedef struct libvlc_media_descriptor_t libvlc_media_descriptor_t;
 
 /**@} */
 
+
 /*****************************************************************************
  * Media Instance
  *****************************************************************************/
@@ -92,6 +106,31 @@ typedef struct libvlc_media_instance_t libvlc_media_instance_t;
 
 /**@} */
 
+/*****************************************************************************
+ * Media List
+ *****************************************************************************/
+/** defgroup libvlc_media_list MediaList
+ * \ingroup libvlc
+ * LibVLC Media List handling
+ * @{
+ */
+
+typedef struct libvlc_media_list_t libvlc_media_list_t;
+
+/**@} */
+
+/*****************************************************************************
+ * Media List Player
+ *****************************************************************************/
+/** defgroup libvlc_media_list_player MediaListPlayer
+ * \ingroup libvlc
+ * LibVLC Media List Player handling
+ * @{
+ */
+
+typedef struct libvlc_media_list_player_t libvlc_media_list_player_t;
+
+/**@} */
 
 /*****************************************************************************
  * Playlist
@@ -188,6 +227,9 @@ typedef struct libvlc_log_message_t
 
 typedef enum libvlc_event_type_t {
     libvlc_MediaInstanceReachedEnd,
+    libvlc_MediaListItemAdded,
+    libvlc_MediaListItemDeleted,
+    libvlc_MediaListItemChanged,
 } libvlc_event_type_t;
 
 /**
@@ -200,13 +242,24 @@ typedef enum libvlc_event_type_t {
 typedef struct libvlc_event_t
 {
     libvlc_event_type_t type;
-	void * p_obj;
-    union
+    void * p_obj;
+    union event_type_specific
     {
         struct
         {
-            int new_volume;
-        } volume_changed; /* Scheduled for deletion */
+            libvlc_media_descriptor_t * item;
+            int index;
+        } media_list_item_added;
+        struct
+        {
+            libvlc_media_descriptor_t * item;
+            int index;
+        } media_list_item_deleted;
+        struct
+        {
+            libvlc_media_descriptor_t * item;
+            int index;
+        } media_list_item_changed;
     } u;
 } libvlc_event_t;
 
@@ -222,7 +275,7 @@ typedef struct libvlc_event_manager_t libvlc_event_manager_t;
  * \param p_event the event triggering the callback
  */
 
-typedef void ( *libvlc_callback_t )( const libvlc_event_t * );
+typedef void ( *libvlc_callback_t )( const libvlc_event_t *, void * );
 
 /**@} */
 

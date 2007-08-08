@@ -65,6 +65,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
     p_md->p_libvlc_instance = p_instance;
     p_md->p_input_item      = p_input_item;
     p_md->b_preparsed       = VLC_FALSE;
+    p_md->i_refcount        = 1;
  
     vlc_gc_incref( p_md->p_input_item );
 
@@ -92,6 +93,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
     p_md->p_libvlc_instance = p_instance;
     p_md->p_input_item      = p_input_item;
     p_md->b_preparsed       = VLC_TRUE;
+    p_md->i_refcount        = 1;
 
     vlc_gc_incref( p_md->p_input_item );
 
@@ -101,19 +103,38 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
 /**************************************************************************
  * Delete a media descriptor object
  **************************************************************************/
-void libvlc_media_descriptor_destroy( libvlc_media_descriptor_t *p_md )
+void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
 {
     if (!p_md)
         return;
 
+    p_md->i_refcount--;
+
     /* XXX: locking */
     vlc_gc_decref( p_md->p_input_item );
+
+    if( p_md->i_refcount > 0 )
+        return;
     
     free( p_md );
 }
 
 /**************************************************************************
- * Delete a media descriptor object
+ * Retain a media descriptor object
+ **************************************************************************/
+void libvlc_media_descriptor_retain( libvlc_media_descriptor_t *p_md )
+{
+    if (!p_md)
+        return;
+
+    p_md->i_refcount++;
+
+    /* XXX: locking */
+    vlc_gc_incref( p_md->p_input_item );
+}
+
+/**************************************************************************
+ * Duplicate a media descriptor object
  **************************************************************************/
 libvlc_media_descriptor_t *
 libvlc_media_descriptor_duplicate( libvlc_media_descriptor_t *p_md_orig )

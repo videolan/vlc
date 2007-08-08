@@ -141,7 +141,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
         {
             /* We found the group, now send every one the event */
             FOREACH_ARRAY( listener, listeners_group->listeners )
-                listener->pf_callback( p_event );
+                listener->pf_callback( p_event, listener->p_user_data );
             FOREACH_END()
             break;
         }
