@@ -35,11 +35,17 @@
 
 #include <lirc/lirc_client.h>
 
+#define LIRC_TEXT N_("Change the lirc configuration file.")
+#define LIRC_LONGTEXT N_( \
+    "Tell lirc to read this configuration file. By default it " \
+    "searches in the users home directory." )
+
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
  *****************************************************************************/
 struct intf_sys_t
 {
+    char *psz_file;
     struct lirc_config *config;
 };
 
@@ -60,6 +66,9 @@ vlc_module_begin();
     set_description( _("Infrared remote control interface") );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
+
+    add_string( "lirc-file", NULL, NULL,
+                LIRC_TEXT, LIRC_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -80,6 +89,8 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->pf_run = Run;
 
+    p_intf->p_sys->psz_file = var_CreateGetString( p_intf, "lirc-file" );
+
     i_fd = lirc_init( "vlc", 1 );
     if( i_fd == -1 )
     {
@@ -91,7 +102,7 @@ static int Open( vlc_object_t *p_this )
     /* We want polling */
     fcntl( i_fd, F_SETFL, fcntl( i_fd, F_GETFL ) | O_NONBLOCK );
 
-    if( lirc_readconfig( NULL, &p_intf->p_sys->config, NULL ) != 0 )
+    if( lirc_readconfig( p_intf->p_sys->psz_file, &p_intf->p_sys->config, NULL ) != 0 )
     {
         msg_Err( p_intf, "failure while reading lirc config" );
         lirc_deinit();
@@ -110,6 +121,8 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     /* Destroy structure */
+    if( p_intf->p_sys->psz_file )
+        free( p_intf->p_sys->psz_file );
     lirc_freeconfig( p_intf->p_sys->config );
     lirc_deinit();
     free( p_intf->p_sys );
