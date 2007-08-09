@@ -185,8 +185,10 @@
  * Dictionaries
  ************************************************************************/
 
+#ifdef __cplus_plus__
 extern "C"
 {
+#endif
 /* This function is not intended to be crypto-secure, we only want it to be
  * fast and not suck too much. This one is pretty fast and did 0 collisions
  * in wenglish's dictionary.
@@ -321,8 +323,9 @@ vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p
     p_dict->p_entries[i_new].psz_key = strdup( psz_key );
     p_dict->p_entries[i_new].p_value = p_value;
 }
-
+#ifdef __cplus_plus__
 } /* extern "C" */
+#endif
 /************************************************************************
  * Dynamic arrays with progressive allocation
  ************************************************************************/
