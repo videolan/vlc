@@ -150,6 +150,17 @@ libvlc_media_descriptor_duplicate( libvlc_media_descriptor_t *p_md_orig )
 }
 
 /**************************************************************************
+ * Retain a media descriptor object
+ **************************************************************************/
+char *
+libvlc_media_descriptor_get_mrl( libvlc_media_descriptor_t * p_md,
+                                 libvlc_exception_t * p_e )
+{
+    (void)p_e;
+    return strdup( p_md->p_input_item->psz_uri );
+}
+
+/**************************************************************************
  * Getter for meta information
  **************************************************************************/
 static const int meta_conversion[] =
