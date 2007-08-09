@@ -185,10 +185,6 @@
  * Dictionaries
  ************************************************************************/
 
-#ifdef __cplusplus__
-extern "C"
-{
-#endif
 /* This function is not intended to be crypto-secure, we only want it to be
  * fast and not suck too much. This one is pretty fast and did 0 collisions
  * in wenglish's dictionary.
@@ -208,14 +204,16 @@ static inline uint64_t DictHash( const char *psz_string )
     return i_hash;
 }
 
+struct vlc_dictionary_entries_t
+{
+    char *   psz_key;
+    uint64_t i_hash;
+    void *   p_value;
+};
+
 typedef struct vlc_dictionary_t
 {
-    struct vlc_dictionary_entries_t
-    {
-        char *   psz_key;
-        uint64_t i_hash;
-        void *   p_value;
-    } * p_entries;
+    struct vlc_dictionary_entries_t * p_entries;
     int i_entries;
 } vlc_dictionary_t;
 
@@ -309,8 +307,9 @@ vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p
         else
             i_new = i_low;
     }
-    p_dict->p_entries = realloc( p_dict->p_entries, (p_dict->i_entries + 1) *
-        sizeof(struct vlc_dictionary_entries_t) );
+    p_dict->p_entries = (struct vlc_dictionary_entries_t *)realloc(
+            p_dict->p_entries, (p_dict->i_entries + 1) *
+            sizeof(struct vlc_dictionary_entries_t) );
     p_dict->i_entries++;
     if( i_new != p_dict->i_entries -1 )
     {
@@ -323,9 +322,7 @@ vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p
     p_dict->p_entries[i_new].psz_key = strdup( psz_key );
     p_dict->p_entries[i_new].p_value = p_value;
 }
-#ifdef __cplusplus__
-} /* extern "C" */
-#endif
+
 /************************************************************************
  * Dynamic arrays with progressive allocation
  ************************************************************************/
