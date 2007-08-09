@@ -185,7 +185,7 @@
  * Dictionaries
  ************************************************************************/
 
-#ifdef __cplus_plus__
+#ifdef __cplusplus__
 extern "C"
 {
 #endif
@@ -323,7 +323,7 @@ vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p
     p_dict->p_entries[i_new].psz_key = strdup( psz_key );
     p_dict->p_entries[i_new].p_value = p_value;
 }
-#ifdef __cplus_plus__
+#ifdef __cplusplus__
 } /* extern "C" */
 #endif
 /************************************************************************
