@@ -145,6 +145,7 @@ libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
 
     p_mi = malloc( sizeof(libvlc_media_instance_t) );
     p_mi->p_md = NULL;
+    p_mi->drawable = 0;
     p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->i_input_id = -1;
     /* refcount strategy:
@@ -403,6 +404,12 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
                                          p_mi->p_md->p_input_item );
     p_mi->i_input_id = p_input_thread->i_object_id;
 
+    if( p_mi->drawable )
+    {
+        vlc_value_t val;
+        val.i_int = p_mi->drawable;
+        var_Set( p_input_thread, "drawable", val );
+    }
     var_AddCallback( p_input_thread, "state", input_state_changed, p_mi );
 
     /* will be released in media_instance_release() */
@@ -436,7 +443,17 @@ void libvlc_media_instance_pause( libvlc_media_instance_t *p_mi,
 void libvlc_media_instance_stop( libvlc_media_instance_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
-    libvlc_exception_raise( p_mi, "Not implemented" );
+    libvlc_exception_raise( p_e, "Not implemented" );
+}
+
+/**************************************************************************
+ * Set Drawable
+ **************************************************************************/
+void libvlc_media_instance_set_drawable( libvlc_media_instance_t *p_mi,
+                                         libvlc_drawable_t drawable,
+                                         libvlc_exception_t *p_e )
+{
+    p_mi->drawable = drawable;
 }
 
 /**************************************************************************
