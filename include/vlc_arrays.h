@@ -185,6 +185,8 @@
  * Dictionaries
  ************************************************************************/
 
+extern "C"
+{
 /* This function is not intended to be crypto-secure, we only want it to be
  * fast and not suck too much. This one is pretty fast and did 0 collisions
  * in wenglish's dictionary.
@@ -306,7 +308,7 @@ vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p
             i_new = i_low;
     }
     p_dict->p_entries = realloc( p_dict->p_entries, (p_dict->i_entries + 1) *
-        sizeof( struct vlc_dictionary_entries_t ) );
+        sizeof(struct vlc_dictionary_entries_t) );
     p_dict->i_entries++;
     if( i_new != p_dict->i_entries -1 )
     {
@@ -320,7 +322,7 @@ vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p
     p_dict->p_entries[i_new].p_value = p_value;
 }
 
-
+} /* extern "C" */
 /************************************************************************
  * Dynamic arrays with progressive allocation
  ************************************************************************/
