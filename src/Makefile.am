@@ -298,10 +298,13 @@ SOURCES_libvlc_control = \
 	control/event.c \
 	control/media_descriptor.c \
 	control/media_instance.c \
+	control/media_list.c \
+	control/media_list_player.c \
 	control/mediacontrol_internal.h \
 	control/mediacontrol_core.c \
 	control/mediacontrol_util.c \
 	control/mediacontrol_audio_video.c
+	control/tag_query.c
 
 ###############################################################################
 # Stamp rules
