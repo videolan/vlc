@@ -384,8 +384,6 @@ vlc_dictionary_all_keys( const vlc_dictionary_t * p_dict )
     struct vlc_dictionary_entry_t * p_entry;
     char ** ppsz_ret;
     int i, count = vlc_dictionary_keys_count( p_dict );
-    if( !count )
-        return NULL;
 
     ppsz_ret = malloc(sizeof(char *) * (count + 1));
     assert( ppsz_ret );
