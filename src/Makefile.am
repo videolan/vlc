@@ -303,7 +303,7 @@ SOURCES_libvlc_control = \
 	control/mediacontrol_internal.h \
 	control/mediacontrol_core.c \
 	control/mediacontrol_util.c \
-	control/mediacontrol_audio_video.c
+	control/mediacontrol_audio_video.c \
 	control/tag_query.c
 
 ###############################################################################
