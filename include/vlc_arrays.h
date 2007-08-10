@@ -318,7 +318,7 @@ static void * const kVLCDictionaryNotFound = NULL;
 
 static inline void vlc_dictionary_init( vlc_dictionary_t * p_dict, int i_size )
 {
-    p_dict->p_entries = malloc(sizeof(struct vlc_dictionary_entry_t *) * i_size);
+    p_dict->p_entries = (struct vlc_dictionary_entry_t **)malloc(sizeof(struct vlc_dictionary_entry_t *) * i_size);
     assert( p_dict->p_entries );
     memset( p_dict->p_entries, 0, sizeof(struct vlc_dictionary_entry_t *) * i_size );
     p_dict->i_size = i_size;
@@ -385,7 +385,7 @@ vlc_dictionary_all_keys( const vlc_dictionary_t * p_dict )
     char ** ppsz_ret;
     int i, count = vlc_dictionary_keys_count( p_dict );
 
-    ppsz_ret = malloc(sizeof(char *) * (count + 1));
+    ppsz_ret = (char**)malloc(sizeof(char *) * (count + 1));
     assert( ppsz_ret );
     
     count = 0;
@@ -410,7 +410,8 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
 
     if( !p_entry )
     {
-        p_entry = p_dict->p_entries[i_pos] = malloc(sizeof(struct vlc_dictionary_entry_t));
+        p_entry = p_dict->p_entries[i_pos] = (struct vlc_dictionary_entry_t *)malloc(
+                sizeof(struct vlc_dictionary_entry_t));
         assert( p_entry );
 
         p_entry->psz_key = strdup( psz_key );
@@ -428,7 +429,7 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
     }
 
     /* Hash collision here */
-    p_entry = malloc(sizeof(struct vlc_dictionary_entry_t));
+    p_entry = (struct vlc_dictionary_entry_t *)malloc(sizeof(struct vlc_dictionary_entry_t));
     assert( p_entry );
     p_entry->psz_key = strdup( psz_key );
     p_entry->p_value = p_value;
