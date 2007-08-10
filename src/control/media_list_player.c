@@ -165,7 +165,8 @@ libvlc_media_list_player_new( libvlc_instance_t * p_instance,
     libvlc_media_list_player_t * p_mlp;
     p_mlp = malloc(sizeof(libvlc_media_list_player_t));
 	p_mlp->i_current_playing_index = -1;
-
+    p_mlp->p_mi = NULL;
+    p_mlp->p_mlist = NULL;
     vlc_mutex_init( p_instance->p_libvlc_int, &p_mlp->object_lock );
     
 	return p_mlp;
