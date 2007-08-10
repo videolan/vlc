@@ -191,7 +191,7 @@ void libvlc_media_list_player_set_media_instance(
 
 	if( p_mlp->p_mi )
 	{
-		uninstall_playlist_observer( p_mlp );
+		uninstall_media_instance_observer( p_mlp );
 		libvlc_media_instance_release( p_mlp->p_mi );
 	}
 	libvlc_media_instance_retain( p_mi );
