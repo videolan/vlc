@@ -181,147 +181,6 @@
     } \
  } while(0)
 
-/************************************************************************
- * Dictionaries
- ************************************************************************/
-
-/* This function is not intended to be crypto-secure, we only want it to be
- * fast and not suck too much. This one is pretty fast and did 0 collisions
- * in wenglish's dictionary.
- */
-static inline uint64_t DictHash( const char *psz_string )
-{
-    uint64_t i_hash = 0;
-    if( psz_string )
-    {
-        while( *psz_string )
-        {
-            i_hash += *psz_string++;
-            i_hash += i_hash << 10;
-            i_hash ^= i_hash >> 8;
-        }
-    }
-    return i_hash;
-}
-
-struct vlc_dictionary_entries_t
-{
-    char *   psz_key;
-    uint64_t i_hash;
-    void *   p_value;
-};
-
-typedef struct vlc_dictionary_t
-{
-    struct vlc_dictionary_entries_t * p_entries;
-    int i_entries;
-} vlc_dictionary_t;
-
-static void * const kVLCDictionaryNotFound = (void *)-1;
-
-static inline void vlc_dictionary_init( vlc_dictionary_t * p_dict )
-{
-    p_dict->i_entries = 0;
-    p_dict->p_entries = NULL;
-}
-
-static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict )
-{
-    int i;
-    for ( i = 0; i < p_dict->i_entries; i++ )
-    {
-        free( p_dict->p_entries[i].psz_key );
-    }
-    free( p_dict->p_entries );
-    p_dict->i_entries = 0;
-    p_dict->p_entries = NULL;
-}
-
-
-static inline void *
-vlc_dictionary_value_for_key( vlc_dictionary_t * p_dict, const char * psz_key )
-{
-    uint64_t i_hash;
-    int i, i_pos;
-    
-    if( p_dict->i_entries == 0 )
-        return kVLCDictionaryNotFound;
-
-    i_hash = DictHash( psz_key );
-    BSEARCH( p_dict->p_entries, p_dict->i_entries, .i_hash, uint64_t,
-             i_hash, i_pos );
-    if( i_pos == -1 )
-        return kVLCDictionaryNotFound;
-
-    /* Hash found, let's check it looks like the entry */
-    if( !strcmp( psz_key, p_dict->p_entries[i_pos].psz_key ) )
-        return p_dict->p_entries[i_pos].p_value;
-
-    /* Hash collision! This should be very rare, but we cannot guarantee
-     * it will never happen. Just do an exhaustive search amongst all
-     * entries with the same hash. */
-    for( i = i_pos - 1 ; i > 0 && i_hash == p_dict->p_entries[i].i_hash ; i-- )
-    {
-        if( !strcmp( psz_key, p_dict->p_entries[i].psz_key ) )
-            return p_dict->p_entries[i_pos].p_value;
-    }
-    for( i = i_pos + 1 ; i < p_dict->i_entries &&
-                         i_hash == p_dict->p_entries[i].i_hash ; i++ )
-    {
-         if( !strcmp( psz_key, p_dict->p_entries[i].psz_key ))
-            return p_dict->p_entries[i_pos].p_value;
-    }
-    /* Hash found, but entry not found (shouldn't happen!) */
-    return kVLCDictionaryNotFound;
-}
-
-static inline void
-vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p_value )
-{
-    uint64_t i_hash = DictHash( psz_key );
-    int i_new;
-
-    /* First, caller should take care not to insert twice the same key */
-    /* This could be removed for optimization */
-    assert( vlc_dictionary_value_for_key( p_dict, psz_key ) == kVLCDictionaryNotFound );
-
-    /* Find a free slot */
-    if( p_dict->i_entries == 0 || i_hash <= p_dict->p_entries[0].i_hash )
-        i_new = 0;
-    else if( i_hash >= p_dict->p_entries[p_dict->i_entries-1].i_hash )
-        i_new = p_dict->i_entries;
-    else
-    {
-        int i_low = 0, i_high = p_dict->i_entries - 1;
-        while( i_high - i_low > 1 )
-        {
-            int i_mid = (i_low + i_high)/2;
-            if( p_dict->p_entries[i_mid].i_hash < i_hash ) {
-                i_low = i_mid;
-            } else if( p_dict->p_entries[i_mid].i_hash > i_hash ) {
-                i_high = i_mid;
-            }
-        }
-        if( p_dict->p_entries[i_low].i_hash < i_hash )
-            i_new = i_high;
-        else
-            i_new = i_low;
-    }
-    p_dict->p_entries = (struct vlc_dictionary_entries_t *)realloc(
-            p_dict->p_entries, (p_dict->i_entries + 1) *
-            sizeof(struct vlc_dictionary_entries_t) );
-    p_dict->i_entries++;
-    if( i_new != p_dict->i_entries -1 )
-    {
-        memmove( &p_dict->p_entries[i_new+1], &p_dict->p_entries[i_new],
-         ( p_dict->i_entries - i_new - 1 ) *
-         sizeof(struct vlc_dictionary_entries_t) );
-    }
-
-    p_dict->p_entries[i_new].i_hash  = i_hash;
-    p_dict->p_entries[i_new].psz_key = strdup( psz_key );
-    p_dict->p_entries[i_new].p_value = p_value;
-}
 
 /************************************************************************
  * Dynamic arrays with progressive allocation
@@ -418,5 +277,238 @@ vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p
         item = array.p_elems[fe_idx];
 
 #define FOREACH_END() } }
+
+/************************************************************************
+ * Dictionaries
+ ************************************************************************/
+
+/* This function is not intended to be crypto-secure, we only want it to be
+ * fast and not suck too much. This one is pretty fast and did 0 collisions
+ * in wenglish's dictionary.
+ */
+static inline uint64_t DictHash( const char *psz_string, int hashsize )
+{
+    uint64_t i_hash = 0;
+    if( psz_string )
+    {
+        while( *psz_string )
+        {
+            i_hash += *psz_string++;
+            i_hash += i_hash << 10;
+            i_hash ^= i_hash >> 8;
+        }
+    }
+    return i_hash % hashsize;
+}
+
+struct vlc_dictionary_entry_t
+{
+    char *   psz_key;
+    void *   p_value;
+    struct vlc_dictionary_entry_t * p_next;
+};
+
+typedef struct vlc_dictionary_t
+{
+    int i_size;
+    struct vlc_dictionary_entry_t ** p_entries;
+} vlc_dictionary_t;
+
+static void * const kVLCDictionaryNotFound = NULL;
+
+static inline void vlc_dictionary_init( vlc_dictionary_t * p_dict, int i_size )
+{
+    p_dict->p_entries = malloc(sizeof(struct vlc_dictionary_entry_t *) * i_size);
+    assert( p_dict->p_entries );
+    memset( p_dict->p_entries, 0, sizeof(struct vlc_dictionary_entry_t *) * i_size );
+    p_dict->i_size = i_size;
+}
+
+static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict )
+{
+    int i;
+    struct vlc_dictionary_entry_t * p_current, * p_next;
+    for( i = 0; i < p_dict->i_size; i++ )
+    {
+        p_current = p_dict->p_entries[i];
+        while( p_current )
+        {
+            p_next = p_dict->p_entries[i]->p_next;
+            free( p_dict->p_entries[i]->psz_key );
+            free( p_current );
+            p_current = p_next;
+        }
+    }
+    free( p_dict->p_entries );
+    p_dict->i_size = 0;
+}
+
+
+
+static inline void *
+vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_key )
+{
+    int i_pos = DictHash( psz_key, p_dict->i_size );
+    struct vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
+
+    if( p_entry && !p_entry->p_next )
+        return p_entry->p_value;
+
+    if( !p_entry )
+        return kVLCDictionaryNotFound;
+
+    /* Hash collision */        
+    do {
+        if( !strcmp( psz_key, p_entry->psz_key ) )
+            return p_entry->p_value;
+        p_entry = p_entry->p_next;
+    } while( p_entry );
+
+}
+
+static inline int
+vlc_dictionary_keys_count( const vlc_dictionary_t * p_dict )
+{
+    struct vlc_dictionary_entry_t * p_entry;    
+    int i, count = 0;
+    for( i = 0; i < p_dict->i_size; i++ )
+    {
+        for( p_entry = p_dict->p_entries[i]; p_entry; p_entry = p_entry->p_next ) count++;
+    }
+    return count;
+}
+
+static inline char **
+vlc_dictionary_all_keys( const vlc_dictionary_t * p_dict )
+{
+    struct vlc_dictionary_entry_t * p_entry;
+    char ** ppsz_ret;
+    int i, count = vlc_dictionary_keys_count( p_dict );
+    if( !count )
+        return NULL;
+
+    ppsz_ret = malloc(sizeof(char *) * (count + 1));
+    assert( ppsz_ret );
+    
+    count = 0;
+    for( i = 0; i < p_dict->i_size; i++ )
+    {
+        for( p_entry = p_dict->p_entries[i]; p_entry; p_entry = p_entry->p_next )
+        {
+            ppsz_ret[count++] = strdup( p_entry->psz_key );
+            assert( ppsz_ret );
+        }
+    }
+    ppsz_ret[count] = NULL;
+    return ppsz_ret;
+}
+
+static inline void
+__vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
+                         void * p_value, vlc_bool_t rebuild )
+{
+    int i_pos = DictHash( psz_key, p_dict->i_size );
+    struct vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
+
+    if( !p_entry )
+    {
+        p_entry = p_dict->p_entries[i_pos] = malloc(sizeof(struct vlc_dictionary_entry_t));
+        assert( p_entry );
+
+        p_entry->psz_key = strdup( psz_key );
+        assert( p_entry->psz_key );
+        p_entry->p_value = p_value;
+        p_dict->p_entries[i_pos]->p_next = NULL;
+        return;
+    }
+    if( p_entry->p_value == kVLCDictionaryNotFound )
+    {
+        /* This one is fine, just high jack */
+        p_entry->psz_key = strdup( psz_key );
+        p_entry->p_value = p_value;
+        return;
+    }
+
+    /* Hash collision here */
+    p_entry = malloc(sizeof(struct vlc_dictionary_entry_t));
+    assert( p_entry );
+    p_entry->psz_key = strdup( psz_key );
+    p_entry->p_value = p_value;
+    p_entry->p_next = p_dict->p_entries[i_pos];
+    p_dict->p_entries[i_pos] = p_entry;
+
+    if( rebuild )
+    {
+        /* Count how many items there was */
+        int count;
+        for( count = 1; p_entry->p_next; count++ ) p_entry = p_entry->p_next;
+        if( count > 3 ) /* XXX: this need tuning */
+        {
+            /* Here it starts to be not good, rebuild a bigger dictionary */
+            struct vlc_dictionary_t new_dict;
+            int i_new_size = ( p_dict->i_size * 3) / 2; /* XXX: this need tuning */
+            int i;
+ 
+            vlc_dictionary_init( &new_dict, i_new_size );
+            for( i = 0; i < p_dict->i_size; i++ )
+            {
+                p_entry = p_dict->p_entries[i];
+                while( p_entry );
+                {
+                    __vlc_dictionary_insert( &new_dict, p_entry->psz_key,
+                                             p_entry->p_value,
+                                             0 /* To avoid multiple rebuild loop */);
+                    p_entry = p_entry->p_next;
+                } 
+            }
+            vlc_dictionary_clear( p_dict );
+            p_dict->i_size = new_dict.i_size;
+            p_dict->p_entries= new_dict.p_entries;
+        }
+    }
+}
+
+static inline void
+vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p_value )
+{
+    __vlc_dictionary_insert( p_dict, psz_key, p_value, 1 );
+}
+
+static inline void
+vlc_dictionary_remove_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_key )
+{
+    int i_pos = DictHash( psz_key, p_dict->i_size );
+    struct vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
+    struct vlc_dictionary_entry_t * p_prev;
+
+    if( !p_entry )
+        return; /* Not found, nothing to do */
+
+    if( !p_entry->p_next )
+    {
+        free( p_entry->psz_key );
+        free( p_entry );
+        p_dict->p_entries[i_pos] = NULL;
+    }
+
+    /* Hash collision */
+    p_prev = NULL;
+    do {
+        if( !strcmp( psz_key, p_entry->psz_key ) )
+        {
+            if( !p_prev )
+                p_dict->p_entries[i_pos] = p_entry->p_next;
+            else
+                p_prev->p_next = p_entry->p_next;
+            free( p_entry->psz_key );
+            free( p_entry );
+            return;
+        }
+        p_prev = p_entry;
+        p_entry = p_entry->p_next;
+    } while( p_entry );
+
+    /* No key was found */
+}
 
 #endif
