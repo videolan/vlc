@@ -165,8 +165,23 @@ libvlc_media_descriptor_get_mrl( libvlc_media_descriptor_t * p_md,
  **************************************************************************/
 static const int meta_conversion[] =
 {
-    [libvlc_meta_Title]  = 0, /* Offset in the vlc_meta_t structure */
-    [libvlc_meta_Artist] = 1
+    [libvlc_meta_Title]        = 0, /* Offset in the vlc_meta_t structure */
+    [libvlc_meta_Artist]       = 1,
+    [libvlc_meta_Genre]        = 2,
+    [libvlc_meta_Copyright]    = 3,
+    [libvlc_meta_Album]        = 4,
+    [libvlc_meta_TrackNumber]  = 5,
+    [libvlc_meta_Description]  = 6,
+    [libvlc_meta_Rating]       = 7,
+    [libvlc_meta_Date]         = 8,
+    [libvlc_meta_Settings]     = 9,
+    [libvlc_meta_URL]          = 10,
+    [libvlc_meta_Language]     = 11,
+    [libvlc_meta_NowPlaying]   = 12,
+    [libvlc_meta_Publisher]    = 13,
+    [libvlc_meta_EncodedBy]    = 14,
+    [libvlc_meta_ArtworkURL]   = 15,
+    [libvlc_meta_TrackID]      = 16
 };
 
 char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
