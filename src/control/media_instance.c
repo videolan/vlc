@@ -366,9 +366,6 @@ libvlc_media_instance_event_manager(
 {
     (void)p_e;
 
-    if( !p_mi->p_md )
-        return NULL;
-
     return p_mi->p_event_manager;
 }
 
