@@ -28,7 +28,11 @@ EXTRA_DIST = \
 	vlc.win32.nsi.in
 
 BUILT_SOURCES_distclean = vlc-config compile vlc.win32.nsi
+if HAVE_DARWIN
 BUILT_SOURCES_clean = macosx-sdk
+else
+BUILT_SOURCES_clean =
+endif
 
 BUILT_SOURCES = $(BUILT_SOURCES_distclean) $(BUILT_SOURCES_clean)
 
@@ -624,6 +628,7 @@ package-win-common:
 	cp "$(top_builddir)/.libs/vlc$(EXEEXT)" "$(top_builddir)/vlc-${VERSION}/"
 	cp "$(top_srcdir)/vlc.exe.manifest" "$(top_builddir)/vlc-${VERSION}/"
 	cp "$(top_builddir)/src/.libs/libvlc$(LIBEXT)" "vlc-${VERSION}/"
+	cp "$(top_builddir)/src/.libs/libvlc-control$(LIBEXT)" "vlc-${VERSION}/"
 
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
 	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(top_builddir)/vlc-${VERSION}/$${file}.txt" ; \
@@ -678,7 +683,7 @@ package-win-common:
 
 if BUILD_MOZILLA
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/mozilla"
-	cp $(top_builddir)/mozilla/.libs/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/mozilla/ ;
+	cp $(top_builddir)/mozilla/.libs/npvlc$(LIBEXT) $(top_builddir)/vlc-${VERSION}/mozilla/ ;
 endif
 
 if BUILD_ACTIVEX
@@ -687,7 +692,7 @@ if BUILD_ACTIVEX
 	cp $(srcdir)/activex/test.html  $(top_builddir)/vlc-${VERSION}/activex/ ;
 	unix2dos $(top_builddir)/vlc-${VERSION}/activex/* ;
 
-	cp $(top_builddir)/activex/.libs/*$(LIBEXT) $(top_builddir)/vlc-${VERSION}/activex/ ;
+	cp $(top_builddir)/activex/.libs/axvlc$(LIBEXT) $(top_builddir)/vlc-${VERSION}/activex/ ;
 endif
 # Rebase all those DLLs to speed up loading (need cygwin rebase)
 	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
@@ -697,11 +702,12 @@ endif
 package-win-common-strip:
 	$(STRIP) "$(top_builddir)/vlc-${VERSION}/vlc$(EXEEXT)"
 	$(STRIP) "vlc-${VERSION}/libvlc$(LIBEXT)"
+	$(STRIP) "vlc-${VERSION}/libvlc-control$(LIBEXT)"
 if BUILD_MOZILLA
-	$(STRIP) $(top_builddir)/vlc-${VERSION}/mozilla/*$(LIBEXT);
+	$(STRIP) $(top_builddir)/vlc-${VERSION}/mozilla/npvlc$(LIBEXT);
 endif
 if BUILD_ACTIVEX
-	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/*$(LIBEXT);
+	$(STRIP) $(top_builddir)/vlc-${VERSION}/activex/axvlc$(LIBEXT);
 endif
 
 package-win32-base-debug: package-win-common
