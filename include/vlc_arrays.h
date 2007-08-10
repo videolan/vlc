@@ -364,6 +364,7 @@ vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_
         p_entry = p_entry->p_next;
     } while( p_entry );
 
+    return kVLCDictionaryNotFound;
 }
 
 static inline int
