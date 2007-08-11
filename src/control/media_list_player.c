@@ -271,10 +271,13 @@ void libvlc_media_list_player_set_media_list(
 void libvlc_media_list_player_play( libvlc_media_list_player_t * p_mlp,
                                   libvlc_exception_t * p_e )
 {
-	libvlc_media_list_player_next( p_mlp, p_e );
+    if( p_mlp->i_current_playing_index < 0 )
+    {
+        libvlc_media_list_player_next( p_mlp, p_e );
 
-	if( libvlc_exception_raised( p_e ) )
-		return;
+        if( libvlc_exception_raised( p_e ) )
+            return;
+    }
 
 	libvlc_media_instance_play( p_mlp->p_mi, p_e );
 }
