@@ -463,10 +463,24 @@ void MainInterface::toggleUpdateSystrayMenu()
     if( isHidden() )
     {
         show();
+        activateWindow();
     }
     else
     {
+#ifdef WIN32
+        /* check if any visible window is above vlc in the z-order,
+         * but ignore the ones always on top */
+        WINDOWINFO wi;
+        HWND hwnd;
+        wi.cbSize = sizeof( WINDOWINFO );
+        for( hwnd = GetNextWindow( internalWinId(), GW_HWNDPREV );
+                hwnd && !IsWindowVisible( hwnd );
+                hwnd = GetNextWindow( hwnd, GW_HWNDPREV ) );
+        if( !hwnd || !GetWindowInfo( hwnd, &wi ) ||
+                (wi.dwExStyle&WS_EX_TOPMOST) )
+#else
         if( isActiveWindow() )
+#endif
         {
             hide();
         }
