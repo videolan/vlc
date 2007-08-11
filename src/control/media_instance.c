@@ -388,6 +388,9 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
         return;
     }
 
+    /* Ignore previous exception */
+    libvlc_exception_clear( p_e );
+
     vlc_mutex_lock( &p_mi->object_lock );
     
     if( !p_mi->p_md )
