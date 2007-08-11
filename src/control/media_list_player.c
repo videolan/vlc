@@ -38,7 +38,7 @@ static int get_next_index( libvlc_media_list_player_t * p_mlp )
 	
 	int next = p_mlp->i_current_playing_index + 1;
 
-	if( libvlc_media_list_count( p_mlp->p_mlist, NULL ) >= next )
+	if( next >= libvlc_media_list_count( p_mlp->p_mlist, NULL ) )
 		return -1; /* no more to play */
 
 	return next;
