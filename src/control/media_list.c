@@ -316,7 +316,9 @@ libvlc_media_list_item_at_index( libvlc_media_list_t * p_mlist,
                                  int index,
                                  libvlc_exception_t * p_e )
 {
-    return ARRAY_VAL( p_mlist->items, index );
+    libvlc_media_descriptor_t * p_md =  ARRAY_VAL( p_mlist->items, index );
+    libvlc_media_descriptor_retain( p_md );
+    return p_md;
 }
 
 /**************************************************************************
