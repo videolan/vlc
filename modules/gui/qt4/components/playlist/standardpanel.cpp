@@ -86,14 +86,14 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     buttons->addWidget( addButton );
 
     repeatButton = new QPushButton( 0 ); buttons->addWidget( repeatButton );
-    if( model->hasRepeat() ) repeatButton->setText( qtr( "R1" ) );
-    else if( model->hasLoop() ) repeatButton->setText( qtr( "RA" ) );
-    else repeatButton->setText( qtr( "NR" ) );
+    if( model->hasRepeat() ) repeatButton->setText( qtr( I_PL_REPEAT ) );
+    else if( model->hasLoop() ) repeatButton->setText( qtr( I_PL_LOOP ) );
+    else repeatButton->setText( qtr( I_PL_NOREPEAT ) );
     BUTTONACT( repeatButton, toggleRepeat() );
 
     randomButton = new QPushButton( 0 ); buttons->addWidget( randomButton );
-    if( model->hasRandom() ) randomButton->setText( qtr( " RND" ) );
-    else randomButton->setText( qtr( "NRND" ) );
+    randomButton->setText( model->hasRandom() ? qtr( I_PL_RANDOM )
+                                              : qtr( I_PL_NORANDOM) );
     BUTTONACT( randomButton, toggleRandom() );
 
     QSpacerItem *spacer = new QSpacerItem( 10, 20 );buttons->addItem( spacer );
