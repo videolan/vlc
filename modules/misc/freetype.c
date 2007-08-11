@@ -964,6 +964,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     char *psz_string;
     vlc_iconv_t iconv_handle = (vlc_iconv_t)(-1);
     int i_font_color, i_font_alpha, i_font_size, i_red, i_green, i_blue;
+    vlc_value_t val;
+    int i_scale = 1000;
 
     FT_BBox line;
     FT_BBox glyph_size;
@@ -975,17 +977,20 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     psz_string = p_region_in->psz_text;
     if( !psz_string || !*psz_string ) return VLC_EGENERIC;
 
+    if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
+        i_scale = val.i_int;
+ 
     if( p_region_in->p_style )
     {
         i_font_color = __MAX( __MIN( p_region_in->p_style->i_font_color, 0xFFFFFF ), 0 );
         i_font_alpha = __MAX( __MIN( p_region_in->p_style->i_font_alpha, 255 ), 0 );
-        i_font_size  = __MAX( __MIN( p_region_in->p_style->i_font_size, 255 ), 0 );
+        i_font_size  = __MAX( __MIN( p_region_in->p_style->i_font_size, 255 ), 0 ) * i_scale / 1000;
     }
     else
     {
         i_font_color = p_sys->i_font_color;
         i_font_alpha = 255 - p_sys->i_font_opacity;
-        i_font_size  = p_sys->i_default_font_size;
+        i_font_size  = p_sys->i_default_font_size * i_scale / 1000;
     }
 
     if( i_font_color == 0xFFFFFF ) i_font_color = p_sys->i_font_color;
@@ -1633,7 +1638,7 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
 }
 
 static int HandleFontAttributes( xml_reader_t *p_xml_reader,
-                                  font_stack_t **p_fonts )
+                                  font_stack_t **p_fonts, int i_scale )
 {
     int        rv;
     char      *psz_fontname = NULL;
@@ -1652,6 +1657,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
                                  &i_karaoke_bg_color ))
     {
         psz_fontname = strdup( psz_fontname );
+        i_font_size = i_font_size * 1000 / i_scale;
     }
     i_font_alpha = (i_font_color >> 24) & 0xff;
     i_font_color &= 0x00ffffff;
@@ -1702,7 +1708,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     }
     rv = PushFont( p_fonts,
                    psz_fontname,
-                   i_font_size,
+                   i_font_size * i_scale / 1000,
                    (i_font_color & 0xffffff) | ((i_font_alpha & 0xff) << 24),
                    i_karaoke_bg_color );
 
@@ -1864,6 +1870,8 @@ static int ProcessNodes( filter_t *p_filter,
     filter_sys_t *p_sys          = p_filter->p_sys;
     uint32_t     *psz_text_orig  = psz_text;
     font_stack_t *p_fonts        = NULL;
+    vlc_value_t   val;
+    int           i_scale        = 1000;
 
     char *psz_node  = NULL;
 
@@ -1871,11 +1879,14 @@ static int ProcessNodes( filter_t *p_filter,
     vlc_bool_t b_bold   = VLC_FALSE;
     vlc_bool_t b_uline  = VLC_FALSE;
 
+    if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
+        i_scale = val.i_int;
+ 
     if( p_font_style )
     {
         rv = PushFont( &p_fonts,
                p_font_style->psz_fontname,
-               p_font_style->i_font_size,
+               p_font_style->i_font_size * i_scale / 1000,
                (p_font_style->i_font_color & 0xffffff) |
                    ((p_font_style->i_font_alpha & 0xff) << 24),
                (p_font_style->i_karaoke_background_color & 0xffffff) |
@@ -1892,7 +1903,7 @@ static int ProcessNodes( filter_t *p_filter,
     {
         rv = PushFont( &p_fonts,
                        FC_DEFAULT_FONT,
-                       p_sys->i_font_size,
+                       p_sys->i_font_size * i_scale / 1000,
                        0x00ffffff,
                        0x00ffffff );
     }
@@ -1927,7 +1938,7 @@ static int ProcessNodes( filter_t *p_filter,
                 if( psz_node )
                 {
                     if( !strcasecmp( "font", psz_node ) )
-                        rv = HandleFontAttributes( p_xml_reader, &p_fonts );
+                        rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
                     else if( !strcasecmp( "b", psz_node ) )
                         b_bold = VLC_TRUE;
                     else if( !strcasecmp( "i", psz_node ) )
@@ -2736,7 +2747,10 @@ static int SetFontSize( filter_t *p_filter, int i_size )
 
         if( p_sys->i_default_font_size )
         {
-            i_size = p_sys->i_default_font_size;
+            if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
+                i_size = p_sys->i_default_font_size * val.i_int / 1000;
+            else
+                i_size = p_sys->i_default_font_size;
         }
         else
         {
@@ -2748,7 +2762,10 @@ static int SetFontSize( filter_t *p_filter, int i_size )
         if( i_size <= 0 )
         {
             msg_Warn( p_filter, "invalid fontsize, using 12" );
-            i_size = 12;
+            if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
+                i_size = 12 * val.i_int / 1000;
+            else
+                i_size = 12;
         }
 
         msg_Dbg( p_filter, "using fontsize: %i", i_size );
