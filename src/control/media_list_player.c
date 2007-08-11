@@ -149,6 +149,42 @@ libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp,
     return 0;
 }
 
+/**************************************************************************
+ *       Next (private)
+ *
+ * Playlist lock should be held
+ **************************************************************************/
+static void
+media_list_player_set_next( libvlc_media_list_player_t * p_mlp, int index,
+                            libvlc_exception_t * p_e )
+{
+	libvlc_media_descriptor_t * p_md;
+	
+	p_md = libvlc_media_list_item_at_index( p_mlp->p_mlist, index, p_e );
+	if( !p_md )
+	{
+		libvlc_media_list_unlock( p_mlp->p_mlist );		
+		if( !libvlc_exception_raised( p_e ) )
+			libvlc_exception_raise( p_e, "Can't obtain a media" );
+		return;
+	}
+
+    vlc_mutex_lock( &p_mlp->object_lock );
+	
+    p_mlp->i_current_playing_index = index;
+
+	/* We are not interested in getting media_descriptor stop event now */
+	uninstall_media_instance_observer( p_mlp );
+    libvlc_media_instance_set_media_descriptor( p_mlp->p_mi, p_md, NULL );
+//	wait_playing_state(); /* If we want to be synchronous */
+	install_media_instance_observer( p_mlp );
+
+    vlc_mutex_unlock( &p_mlp->object_lock );
+
+	libvlc_media_list_unlock( p_mlp->p_mlist );		
+	
+	libvlc_media_descriptor_release( p_md ); /* for libvlc_media_list_item_at_index */
+}
 
 /*
  * Public libvlc functions
@@ -244,6 +280,25 @@ void libvlc_media_list_player_play( libvlc_media_list_player_t * p_mlp,
 }
 
 /**************************************************************************
+ *        Play item at index (Public)
+ *
+ * Playlist lock should be help
+ **************************************************************************/
+void libvlc_media_list_player_play_item_at_index(
+                        libvlc_media_list_player_t * p_mlp,
+                        int i_index,
+                        libvlc_exception_t * p_e )
+{
+	media_list_player_set_next( p_mlp, i_index, p_e );
+
+	if( libvlc_exception_raised( p_e ) )
+		return;
+
+	libvlc_media_instance_play( p_mlp->p_mi, p_e );
+}
+
+
+/**************************************************************************
  *       Stop (Public)
  **************************************************************************/
 void libvlc_media_list_player_stop( libvlc_media_list_player_t * p_mlp,
@@ -261,9 +316,7 @@ void libvlc_media_list_player_stop( libvlc_media_list_player_t * p_mlp,
  **************************************************************************/
 void libvlc_media_list_player_next( libvlc_media_list_player_t * p_mlp,
                                     libvlc_exception_t * p_e )
-{
-	libvlc_media_descriptor_t * p_md;
-	
+{	
 	int index;
 	
 	libvlc_media_list_lock( p_mlp->p_mlist );
@@ -278,29 +331,8 @@ void libvlc_media_list_player_next( libvlc_media_list_player_t * p_mlp,
 		return;
 	}
 
-	p_md = libvlc_media_list_item_at_index( p_mlp->p_mlist, index, p_e );
-	if( !p_md )
-	{
-		libvlc_media_list_unlock( p_mlp->p_mlist );		
-		if( !libvlc_exception_raised( p_e ) )
-			libvlc_exception_raise( p_e, "Can't obtain a media" );
-		return;
-	}
-
-    vlc_mutex_lock( &p_mlp->object_lock );
+	media_list_player_set_next( p_mlp, index, p_e );
 	
-    p_mlp->i_current_playing_index = index;
-
-	/* We are not interested in getting media_descriptor stop event now */
-	uninstall_media_instance_observer( p_mlp );
-    libvlc_media_instance_set_media_descriptor( p_mlp->p_mi, p_md, NULL );
-//	wait_playing_state(); /* If we want to be synchronous */
-	install_media_instance_observer( p_mlp );
-
-    vlc_mutex_unlock( &p_mlp->object_lock );
-
-	libvlc_media_list_unlock( p_mlp->p_mlist );		
-	
-	libvlc_media_descriptor_release( p_md ); /* for libvlc_media_list_item_at_index */
+    libvlc_media_list_unlock( p_mlp->p_mlist );
 }
 
