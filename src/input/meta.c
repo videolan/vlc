@@ -96,8 +96,8 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     if( !p_item->p_meta )
         return VLC_EGENERIC;
 
-    if( !p_item->psz_name && !p_item->p_meta->psz_title &&
-        !p_item->p_meta->psz_artist && !p_item->p_meta->psz_album )
+    if(  !p_item->psz_name && !p_item->p_meta->psz_title &&
+        (!p_item->p_meta->psz_artist || !p_item->p_meta->psz_album) )
         return VLC_EGENERIC;
 
     /* If we already checked this album in this session, skip */
@@ -268,7 +268,7 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
     psz_title = p_item->p_meta->psz_title;
     if( !psz_title ) psz_title = p_item->psz_name;
 
-    if( !psz_artist && !psz_album && !psz_title ) return VLC_EGENERIC;
+    if( (!psz_artist || !psz_album) && !psz_title ) return VLC_EGENERIC;
 
     for( i = 0; i < 5; i++ )
     {
@@ -307,7 +307,7 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     else if( p_item->psz_name )
         psz_title = ArtCacheCreateString( p_item->psz_name );
 
-    if( !psz_title && !psz_album && !psz_artist )
+    if( (!psz_title || !psz_album) && !psz_artist )
     {
         free( psz_title );
         free( psz_album );
@@ -429,7 +429,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     else if( p_item->psz_name )
         psz_title = ArtCacheCreateString( p_item->psz_name );
 
-    if( !psz_artist && !psz_album && !psz_title )
+    if( (!psz_artist || !psz_album ) && !psz_title )
         goto end;
 
     /* */
