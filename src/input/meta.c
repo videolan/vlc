@@ -92,30 +92,37 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
 {
     int i_ret = VLC_EGENERIC;
     module_t *p_module;
-    if( !p_item->p_meta || !p_item->p_meta->psz_album ||
-                           !p_item->p_meta->psz_artist )
+
+    if( !p_item->p_meta )
+        return VLC_EGENERIC;
+
+    if( !p_item->psz_name && !p_item->p_meta->psz_title &&
+        !p_item->p_meta->psz_artist && !p_item->p_meta->psz_album )
         return VLC_EGENERIC;
 
     /* If we already checked this album in this session, skip */
-    FOREACH_ARRAY( playlist_album_t album, p_playlist->p_fetcher->albums )
-        if( !strcmp( album.psz_artist, p_item->p_meta->psz_artist ) &&
-            !strcmp( album.psz_album, p_item->p_meta->psz_album ) )
-        {
-            msg_Dbg( p_playlist, " %s - %s has already been searched",
-                     p_item->p_meta->psz_artist,  p_item->p_meta->psz_album );
-    /* TODO-fenrir if we cache art filename too, we can go faster */
-            if( album.b_found )
+    if( p_item->p_meta->psz_artist && p_item->p_meta->psz_album )
+    {
+        FOREACH_ARRAY( playlist_album_t album, p_playlist->p_fetcher->albums )
+            if( !strcmp( album.psz_artist, p_item->p_meta->psz_artist ) &&
+                !strcmp( album.psz_album, p_item->p_meta->psz_album ) )
             {
-                /* Actually get URL from cache */
-                input_FindArtInCache( p_playlist, p_item );
-                return 0;
+                msg_Dbg( p_playlist, " %s - %s has already been searched",
+                         p_item->p_meta->psz_artist,  p_item->p_meta->psz_album );
+        /* TODO-fenrir if we cache art filename too, we can go faster */
+                if( album.b_found )
+                {
+                    /* Actually get URL from cache */
+                    input_FindArtInCache( p_playlist, p_item );
+                    return 0;
+                }
+                else
+                {
+                    return VLC_EGENERIC;
+                }
             }
-            else
-            {
-                return VLC_EGENERIC;
-            }
-        }
-    FOREACH_END();
+        FOREACH_END();
+    }
 
     input_FindArtInCache( p_playlist, p_item );
     if( !EMPTY_STR( p_item->p_meta->psz_arturl ) )
@@ -123,8 +130,17 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
 
     PL_LOCK;
     p_playlist->p_private = p_item;
-    msg_Dbg( p_playlist, "searching art for %s - %s",
+    if( p_item->p_meta->psz_artist && p_item->p_meta->psz_album )
+    {
+        msg_Dbg( p_playlist, "searching art for %s - %s",
              p_item->p_meta->psz_artist,  p_item->p_meta->psz_album );
+    }
+    else
+    {
+        msg_Dbg( p_playlist, "searching art for %s",
+             p_item->p_meta->psz_title ? p_item->p_meta->psz_title : p_item->psz_name );
+    }
+
     p_module = module_Need( p_playlist, "art finder", 0, VLC_FALSE );
 
     if( p_module )
@@ -133,11 +149,14 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
         msg_Dbg( p_playlist, "unable to find art" );
 
     /* Record this album */
-    playlist_album_t a;
-    a.psz_artist = strdup( p_item->p_meta->psz_artist );
-    a.psz_album = strdup( p_item->p_meta->psz_album );
-    a.b_found = (i_ret == VLC_EGENERIC ? VLC_FALSE : VLC_TRUE );
-    ARRAY_APPEND( p_playlist->p_fetcher->albums, a );
+    if( p_item->p_meta->psz_artist && p_item->p_meta->psz_album )
+    {
+        playlist_album_t a;
+        a.psz_artist = strdup( p_item->p_meta->psz_artist );
+        a.psz_album = strdup( p_item->p_meta->psz_album );
+        a.b_found = (i_ret == VLC_EGENERIC ? VLC_FALSE : VLC_TRUE );
+        ARRAY_APPEND( p_playlist->p_fetcher->albums, a );
+    }
 
     if( p_module )
         module_Unneed( p_playlist, p_module );
@@ -150,20 +169,34 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
 #ifndef MAX_PATH
 #   define MAX_PATH 250
 #endif
-#define ArtCacheCreateName( a,b,c,d,e) __ArtCacheCreateName(VLC_OBJECT(a),b,c,d,e)
+#define ArtCacheCreateName(a,b,c,d,e,f) __ArtCacheCreateName(VLC_OBJECT(a),b,c,d,e,f)
 static void __ArtCacheCreateName( vlc_object_t *p_obj,
                                   char psz_filename[MAX_PATH+1],
+                                  const char *psz_title,
                                   const char *psz_artist, const char *psz_album,
                                   const char *psz_extension )
 {
-    snprintf( psz_filename, MAX_PATH,
-              "file://%s" DIR_SEP CONFIG_DIR DIR_SEP "art"
+    if( psz_artist && psz_artist )
+    {
+        snprintf( psz_filename, MAX_PATH,
+              "file://%s" DIR_SEP CONFIG_DIR DIR_SEP "art" DIR_SEP "artistalbum"
               DIR_SEP "%s" DIR_SEP "%s" DIR_SEP "art%s",
               p_obj->p_libvlc->psz_homedir,
               psz_artist, psz_album, psz_extension ? psz_extension : "" );
+    }
+    else
+    {
+        /* We will use the psz_title name to store the art */
+        snprintf( psz_filename, MAX_PATH,
+              "file://%s" DIR_SEP CONFIG_DIR DIR_SEP "art" DIR_SEP "title"
+              DIR_SEP "%s" DIR_SEP "art%s",
+              p_obj->p_libvlc->psz_homedir,
+              psz_title, psz_extension ? psz_extension : "" );
+    }
 }
-#define ArtCacheCreatePath(a,b,c) __ArtCacheCreatePath(VLC_OBJECT(a),b,c)
+#define ArtCacheCreatePath(a,b,c,d) __ArtCacheCreatePath(VLC_OBJECT(a),b,c,d)
 static void __ArtCacheCreatePath( vlc_object_t *p_obj,
+                                  const char *psz_title,
                                   const char *psz_artist, const char *psz_album )
 {
     char psz_dir[MAX_PATH+1];
@@ -173,15 +206,34 @@ static void __ArtCacheCreatePath( vlc_object_t *p_obj,
     snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP "art",
               p_obj->p_libvlc->psz_homedir );
     utf8_mkdir( psz_dir );
-    snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
-              "art" DIR_SEP "%s",
-                 p_obj->p_libvlc->psz_homedir, psz_artist );
-    utf8_mkdir( psz_dir );
-    snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
-              "art" DIR_SEP "%s" DIR_SEP "%s",
+
+    if( psz_artist && psz_artist )
+    {
+        snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
+                  "art" DIR_SEP "artistalbum",
+                       p_obj->p_libvlc->psz_homedir );
+        utf8_mkdir( psz_dir );
+        snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
+                  "art" DIR_SEP "artistalbum" DIR_SEP "%s",
+                      p_obj->p_libvlc->psz_homedir, psz_artist );
+        utf8_mkdir( psz_dir );
+        snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
+                  "art" DIR_SEP "artistalbum" DIR_SEP "%s" DIR_SEP "%s",
                       p_obj->p_libvlc->psz_homedir,
                       psz_artist, psz_album );
-    utf8_mkdir( psz_dir );
+        utf8_mkdir( psz_dir );
+    }
+    else
+    {
+        snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
+                  "art" DIR_SEP "title",
+                      p_obj->p_libvlc->psz_homedir );
+        utf8_mkdir( psz_dir );
+        snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
+                  "art" DIR_SEP "title" DIR_SEP "%s",
+                      p_obj->p_libvlc->psz_homedir, psz_title );
+        utf8_mkdir( psz_dir );
+    }
 }
 static char *ArtCacheCreateString( const char *psz )
 {
@@ -203,6 +255,7 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
 {
     char *psz_artist;
     char *psz_album;
+    char *psz_title;
     char psz_filename[MAX_PATH+1];
     int i;
     struct stat a;
@@ -212,10 +265,15 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
 
     psz_artist = p_item->p_meta->psz_artist;
     psz_album = p_item->p_meta->psz_album;
+    psz_title = p_item->p_meta->psz_title;
+    if( !psz_title ) psz_title = p_item->psz_name;
+
+    if( !psz_artist && !psz_album && !psz_title ) return VLC_EGENERIC;
 
     for( i = 0; i < 5; i++ )
     {
-        ArtCacheCreateName( p_obj, psz_filename, psz_artist, psz_album, ppsz_type[i] );
+        ArtCacheCreateName( p_obj, psz_filename, psz_title /* Used if none artist nor album is defined */,
+                            psz_artist, psz_album, ppsz_type[i] );
 
         /* Check if file exists */
         if( utf8_stat( psz_filename+7, &a ) == 0 )
@@ -238,34 +296,40 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     char psz_filename[MAX_PATH+1];
     char *psz_artist = NULL;
     char *psz_album = NULL;
+    char *psz_title = NULL;
     char *psz_type;
     if( p_item->p_meta->psz_artist )
         psz_artist = ArtCacheCreateString( p_item->p_meta->psz_artist );
     if( p_item->p_meta->psz_album )
         psz_album = ArtCacheCreateString( p_item->p_meta->psz_album );
+    if( p_item->p_meta->psz_title )
+        psz_title = ArtCacheCreateString( p_item->p_meta->psz_title );
+    else if( p_item->psz_name )
+        psz_title = ArtCacheCreateString( p_item->psz_name );
 
-    assert( p_item->p_meta && !EMPTY_STR(p_item->p_meta->psz_arturl) );
-
-    /* FIXME: use an alternate saving filename scheme if we don't have
-     * the artist or album name */
-    if( !psz_artist || !psz_album )
+    if( !psz_title && !psz_album && !psz_artist )
     {
-        if( psz_artist ) free( psz_artist );
-        if( psz_album ) free( psz_album );
+        free( psz_title );
+        free( psz_album );
+        free( psz_artist );
         return VLC_EGENERIC;
     }
+
+    assert( p_item->p_meta && !EMPTY_STR(p_item->p_meta->psz_arturl) );
 
     psz_type = strrchr( p_item->p_meta->psz_arturl, '.' );
 
     /* */
-    ArtCacheCreateName( p_playlist, psz_filename, psz_artist, psz_album, psz_type );
+    ArtCacheCreateName( p_playlist, psz_filename, psz_title /* Used only if needed*/,
+                        psz_artist, psz_album, psz_type );
 
     /* */
-    ArtCacheCreatePath( p_playlist, psz_artist, psz_album );
+    ArtCacheCreatePath( p_playlist, psz_title, psz_artist, psz_album );
 
     /* */
     free( psz_artist );
     free( psz_album );
+    free( psz_title );
 
     if( !strncmp( p_item->p_meta->psz_arturl , "APIC", 4 ) )
     {
@@ -310,6 +374,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     char *psz_arturl;
     char *psz_artist = NULL;
     char *psz_album = NULL;
+    char *psz_title = NULL;
     char *psz_type = NULL;
     char psz_filename[MAX_PATH+1];
     FILE *f;
@@ -359,19 +424,23 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
         psz_artist = ArtCacheCreateString( p_item->p_meta->psz_artist );
     if( p_item->p_meta->psz_album )
         psz_album = ArtCacheCreateString( p_item->p_meta->psz_album );
+    if( p_item->p_meta->psz_title )
+        psz_title = ArtCacheCreateString( p_item->p_meta->psz_title );
+    else if( p_item->psz_name )
+        psz_title = ArtCacheCreateString( p_item->psz_name );
 
-    if( !psz_artist || !psz_album )
+    if( !psz_artist && !psz_album && !psz_title )
         goto end;
 
     /* */
     psz_type = strrchr( psz_arturl, '.' );
-    ArtCacheCreateName( p_input, psz_filename, psz_artist, psz_album, psz_type );
+    ArtCacheCreateName( p_input, psz_filename, psz_title, psz_artist, psz_album, psz_type );
 
     /* Check if we already dumped it */
     if( !utf8_stat( psz_filename+7, &s ) )
         goto end;
 
-    ArtCacheCreatePath( p_input, psz_artist, psz_album );
+    ArtCacheCreatePath( p_input, psz_title, psz_artist, psz_album );
 
     f = utf8_fopen( psz_filename+7, "w" );
     if( f )
@@ -386,6 +455,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
 end:
     if( psz_artist ) free( psz_artist );
     if( psz_album ) free( psz_album );
+    if( psz_title ) free( psz_title );
     if( psz_arturl ) free( psz_arturl );
 }
 
