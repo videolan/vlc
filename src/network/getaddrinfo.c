@@ -402,34 +402,10 @@ getaddrinfo (const char *node, const char *service,
         char *end;
 
         d = strtoul (service, &end, 0);
-        if (end[0] /* service is not a number */
-         || (d > 65535))
-        {
-            struct servent *entry;
-            const char *protoname;
+        if (end[0] || (d > 65535u))
+            return EAI_SERVICE;
 
-            switch (protocol)
-            {
-                case IPPROTO_TCP:
-                    protoname = "tcp";
-                    break;
-
-                case IPPROTO_UDP:
-                    protoname = "udp";
-                    break;
-
-                default:
-                    protoname = NULL;
-            }
-
-            entry = getservbyname (service, protoname);
-            if (entry == NULL)
-                return EAI_SERVICE;
-
-            port = entry->s_port;
-        }
-        else
-            port = htons ((u_short)d);
+        port = htons ((u_short)d);
     }
 
     /* building results... */
