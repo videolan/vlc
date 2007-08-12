@@ -211,6 +211,9 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
             case SOCK_STREAM:
             case SOCK_RDM:
             case SOCK_SEQPACKET:
+#ifdef SOCK_DCCP
+            case SOCK_DCCP:
+#endif
                 if (listen (fd, INT_MAX))
                 {
                     msg_Err (p_this, "socket listen error (%s)",
