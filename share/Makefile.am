@@ -245,6 +245,8 @@ DIST_osdmenu_minimal = \
 	osdmenu/minimal/fs_panel_mockup.png
 
 DIST_lua= \
+	luameta/README.txt \
+	luameta/googleimage.lua \
 	luaplaylist/README.txt \
 	luaplaylist/dailymotion.lua \
 	luaplaylist/youtube.lua \

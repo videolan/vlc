@@ -424,6 +424,10 @@ VLC-release.app: vlc
 	for i in $(srcdir)/share/luaplaylist/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luaplaylist/`basename $${i}` ; \
 	done ; \
+	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/luameta
+	for i in $(srcdir)/share/luameta/*.* ; do \
+	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/luameta/`basename $${i}` ; \
+	done ; \
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/dialogs
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/js
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old
