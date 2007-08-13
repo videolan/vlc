@@ -295,8 +295,8 @@ void ExtraMetaPanel::update( input_item_t *p_item )
     char ** ppsz_allkey = vlc_dictionary_all_keys( p_dict );
     for (int i = 0; ppsz_allkey[i] ; i++ )
     {
-        const char * psz_value =
-            vlc_dictionary_value_for_key( p_dict, ppsz_allkey[i] );
+        const char * psz_value = (const char *)vlc_dictionary_value_for_key(
+                p_dict, ppsz_allkey[i] );
         tempItem.append( qfu( ppsz_allkey[i] ) + " : ");
         tempItem.append( qfu( psz_value ) );
         items.append( new QTreeWidgetItem ( extraMetaTree, tempItem ) );
