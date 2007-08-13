@@ -615,7 +615,7 @@ DBUS_METHOD( Random )
  *****************************************************************************/
 
 DBUS_METHOD( handle_introspect_root )
-{ /* handles introspection of /org/videolan/vlc */
+{ /* handles introspection of root object */
     REPLY_INIT;
     OUT_ARGUMENTS;
     ADD_STRING( &psz_introspection_xml_data_root );
