@@ -732,7 +732,7 @@ package-win32-base-debug: package-win-common
         $(INSTALL) -d $(top_builddir)/vlc-${VERSION}/share/luaplaylist
         for i in $(srcdir)/share/luaplaylist/*.* ; do \
           $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-${VERSION}/share/luaplaylist/`basename $${i}` ; \
-        done ; \
+        done ;
 
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu"
 	cp $(srcdir)/share/osdmenu/*.* "$(top_builddir)/vlc-${VERSION}/osdmenu"
