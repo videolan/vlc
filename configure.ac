@@ -1735,11 +1735,11 @@ dnl
 dnl Taglibplugin
 dnl
 AC_ARG_ENABLE(taglib,
-  [  --enable-taglib Taglib support (default disabled) ])
-  AS_IF([test "${enable_taglib}" = "yes"],[
+  [  --disable-taglib Taglib support (default enabled) ])
+  AS_IF([test "${enable_taglib}" != "no"],[
     PKG_CHECK_MODULES(TAGLIB, taglib,
       [ VLC_ADD_PLUGINS([taglib])
-        VLC_ADD_LDFLAGS([taglib],[$TAGLIB_LIBS])
+        VLC_ADD_LDFLAGS([taglib],[$TAGLIB_LIBS -lz])
        VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS]) ],
       [AC_MSG_WARN(TagLib library not found)])
   ])
