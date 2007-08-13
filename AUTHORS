@@ -105,6 +105,14 @@ E: filippo[dontspam]@carone.org
 D: Java bindings
 S: Italy
 
+N: Rafaël Carré
+E: funman@videolanorg
+C: funman
+P: C0AFF10F
+D: D-Bus control
+D: Audioscrobbler
+S: France
+
 N: Tony Castley
 E: tony@castley.net
 C: tcastley
@@ -260,6 +268,15 @@ D: audio output
 D: AC3 decoder
 D: MPEG audio decoder
 S: France
+
+N: Pavlov Konstantin
+E: thresh@videolan.org
+C: thresh
+D: Build system/linkage fixes
+D: Pidfile creation on daemon mode
+D: Parts of Russian translation
+D: ALTLinux VLC maintainer
+S: Russia
 
 N: Felix Paul Kühne
 E: fkuehne@videolan.org
@@ -419,11 +436,3 @@ D: skins module (core and win32 port)
 D: skins2 module (core and win32 port)
 S: France
 
-N: Pavlov Konstantin
-E: thresh@videolan.org
-C: thresh
-D: Build system/linkage fixes
-D: Pidfile creation on daemon mode
-D: Parts of Russian translation
-D: ALTLinux VLC maintainer
-S: Russia
