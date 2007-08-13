@@ -131,7 +131,7 @@ static inline vlc_meta_t *vlc_meta_New( void )
     m->psz_trackid = NULL;
 
     m->i_status = 0;
-    vlc_dictionary_init( &m->extra_tags, 32 /* "ought to be enough for anybody" */ );
+    vlc_dictionary_init( &m->extra_tags, 0 );
     return m;
 }
 
