@@ -291,13 +291,14 @@ void ExtraMetaPanel::update( input_item_t *p_item )
     QStringList tempItem;
 
     QList<QTreeWidgetItem *> items;
-    char ** ppsz_allkey = vlc_dictionary_all_keys( p_meta->extra_meta );
+    vlc_dictionary_t * p_dict = &p_meta->extra_tags;
+    char ** ppsz_allkey = vlc_dictionary_all_keys( p_dict );
     for (int i = 0; ppsz_allkey[i] ; i++ )
     {
         const char * psz_value =
-            vlc_dictionary_value_for_key( p_meta->extra_meta, ppsz_allkey[i] );
+            vlc_dictionary_value_for_key( p_dict, ppsz_allkey[i] );
         tempItem.append( qfu( ppsz_allkey[i] ) + " : ");
-        tempItem.append( qfu( psz_value );
+        tempItem.append( qfu( psz_value ) );
         items.append( new QTreeWidgetItem ( extraMetaTree, tempItem ) );
         free( ppsz_allkey[i] );
     }
