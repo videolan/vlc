@@ -729,6 +729,11 @@ package-win32-base-debug: package-win-common
 	  cp $$i $(top_builddir)/vlc-${VERSION}/skins/ || true ; \
 	done
 
+        $(INSTALL) -d $(top_builddir)/vlc-${VERSION}/share/luaplaylist
+        for i in $(srcdir)/share/luaplaylist/*.* ; do \
+          $(INSTALL) -m 644 $${i} $(top_builddir)/vlc-${VERSION}/share/luaplaylist/`basename $${i}` ; \
+        done ; \
+
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu"
 	cp $(srcdir)/share/osdmenu/*.* "$(top_builddir)/vlc-${VERSION}/osdmenu"
 	for dir in dvd dvd/selected dvd/unselect dvd/selection dvd/volume default default/selected default/selection default/volume;do \
