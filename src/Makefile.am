@@ -265,6 +265,7 @@ SOURCES_libvlc_common = \
 	modules/configuration.h \
 	modules/configuration.c \
 	modules/configuration_chain.c \
+	misc/events.c \
 	misc/image.c \
 	misc/messages.c \
 	misc/objects.c \
