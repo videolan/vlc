@@ -1619,6 +1619,26 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                            CWBackingStore | CWBackPixel | CWEventMask,
                            &xwindow_attributes );
 
+        var_Get( p_vout, "video-title", &val );
+        if( !val.psz_string || !*val.psz_string )
+        {
+            XStoreName( p_vout->p_sys->p_display, p_win->base_window,
+#ifdef MODULE_NAME_IS_x11
+                        VOUT_TITLE " (X11 output)"
+#elif defined(MODULE_NAME_IS_glx)
+                        VOUT_TITLE " (GLX output)"
+#else
+                        VOUT_TITLE " (XVideo output)"
+#endif
+              );
+        }
+        else
+        {
+            XStoreName( p_vout->p_sys->p_display,
+                        p_win->base_window, val.psz_string );
+        }
+        if( val.psz_string ) free( val.psz_string );
+
         if( !p_vout->b_fullscreen )
         {
             /* Set window manager hints and properties: size hints, command,
@@ -1644,28 +1664,6 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                                  prop, prop, 32, PropModeReplace,
                                  (unsigned char *)&mwmhints,
                                  PROP_MWM_HINTS_ELEMENTS );
-            }
-            else
-            {
-                 var_Get( p_vout, "video-title", &val );
-                 if( !val.psz_string || !*val.psz_string )
-                 {
-                    XStoreName( p_vout->p_sys->p_display, p_win->base_window,
-#ifdef MODULE_NAME_IS_x11
-                                VOUT_TITLE " (X11 output)"
-#elif defined(MODULE_NAME_IS_glx)
-                                VOUT_TITLE " (GLX output)"
-#else
-                                VOUT_TITLE " (XVideo output)"
-#endif
-                      );
-                }
-                else
-                {
-                    XStoreName( p_vout->p_sys->p_display,
-                               p_win->base_window, val.psz_string );
-                }
-                if( val.psz_string ) free( val.psz_string );
             }
         }
     }
