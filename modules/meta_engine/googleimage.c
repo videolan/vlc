@@ -1,7 +1,7 @@
 /*****************************************************************************
  * googleimage.c
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2007 the VideoLAN team
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
