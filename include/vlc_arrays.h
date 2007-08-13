@@ -318,9 +318,14 @@ static void * const kVLCDictionaryNotFound = NULL;
 
 static inline void vlc_dictionary_init( vlc_dictionary_t * p_dict, int i_size )
 {
-    p_dict->p_entries = (struct vlc_dictionary_entry_t **)malloc(sizeof(struct vlc_dictionary_entry_t *) * i_size);
-    assert( p_dict->p_entries );
-    memset( p_dict->p_entries, 0, sizeof(struct vlc_dictionary_entry_t *) * i_size );
+    if( i_size > 0 )
+    {
+        p_dict->p_entries = (struct vlc_dictionary_entry_t **)malloc(sizeof(struct vlc_dictionary_entry_t *) * i_size);
+        assert( p_dict->p_entries );
+        memset( p_dict->p_entries, 0, sizeof(struct vlc_dictionary_entry_t *) * i_size );
+    }
+    else
+        p_dict->p_entries = NULL;
     p_dict->i_size = i_size;
 }
 
@@ -348,6 +353,9 @@ static inline void vlc_dictionary_clear( vlc_dictionary_t * p_dict )
 static inline void *
 vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_key )
 {
+    if( !p_dict->p_entries )
+        return kVLCDictionaryNotFound;
+
     int i_pos = DictHash( psz_key, p_dict->i_size );
     struct vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
 
@@ -406,6 +414,9 @@ static inline void
 __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
                          void * p_value, vlc_bool_t rebuild )
 {
+    if( !p_dict->p_entries )
+        vlc_dictionary_init( p_dict, 1 );
+
     int i_pos = DictHash( psz_key, p_dict->i_size );
     struct vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
 
@@ -446,7 +457,7 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
         {
             /* Here it starts to be not good, rebuild a bigger dictionary */
             struct vlc_dictionary_t new_dict;
-            int i_new_size = ( p_dict->i_size * 3) / 2; /* XXX: this need tuning */
+            int i_new_size = ( (p_dict->i_size+2) * 3) / 2; /* XXX: this need tuning */
             int i;
  
             vlc_dictionary_init( &new_dict, i_new_size );
@@ -477,6 +488,9 @@ vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key, void * p
 static inline void
 vlc_dictionary_remove_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_key )
 {
+    if( !p_dict->p_entries )
+        return;
+
     int i_pos = DictHash( psz_key, p_dict->i_size );
     struct vlc_dictionary_entry_t * p_entry = p_dict->p_entries[i_pos];
     struct vlc_dictionary_entry_t * p_prev;
