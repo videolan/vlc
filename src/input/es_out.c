@@ -612,7 +612,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
     msg_Dbg( p_input, "EsOutProgramMeta: number=%d", i_group );
 
     /* Check against empty meta data (empty for what we handle) */
-    if( !p_meta->psz_title && !p_meta->psz_nowplaying && !p_meta->psz_publisher && p_meta->i_extra <= 0 )
+    if( !p_meta->psz_title && !p_meta->psz_nowplaying && !p_meta->psz_publisher && vlc_dictionary_keys_count( &p_meta->extra_tags ) <= 0 )
         return;
     /* Find program */
     for( i = 0; i < p_sys->i_pgrm; i++ )
@@ -676,8 +676,14 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
         }
         input_Control( p_input, INPUT_ADD_INFO, psz_cat, _(VLC_META_PUBLISHER), psz_provider );
     }
-    for( i = 0; i < p_meta->i_extra; i++ )
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _(p_meta->ppsz_extra_name[i]), p_meta->ppsz_extra_value[i] );
+    char ** ppsz_all_keys = vlc_dictionary_all_keys( &p_meta->extra_tags );
+    for( i = 0; ppsz_all_keys[i]; i++ )
+    {
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _(ppsz_all_keys[i]),
+                       vlc_dictionary_value_for_key( &p_meta->extra_tags, ppsz_all_keys[i] ) );
+        free( ppsz_all_keys[i] );
+    }
+    free( ppsz_all_keys );
 
     free( psz_cat );
 }

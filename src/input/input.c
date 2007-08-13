@@ -2547,7 +2547,7 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
 
     /* A bit ugly */
     p_meta = NULL;
-    if( p_item->p_meta->i_extra > 0 )
+    if( vlc_dictionary_keys_count( &p_item->p_meta->extra_tags ) > 0 )
     {
         p_meta = vlc_meta_New();
         vlc_meta_Merge( p_meta, p_item->p_meta );
@@ -2562,9 +2562,14 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
 
     if( p_meta )
     {
-        for( i = 0; i < p_meta->i_extra; i++ )
-            input_Control( p_input, INPUT_ADD_INFO, _(VLC_META_INFO_CAT),
-                           _(p_meta->ppsz_extra_name[i]), "%s", p_meta->ppsz_extra_value[i] );
+        char ** ppsz_all_keys = vlc_dictionary_all_keys( &p_meta->extra_tags );
+        for( i = 0; ppsz_all_keys[i]; i++ )
+        {
+            input_Control( p_input, INPUT_ADD_INFO, _(VLC_META_INFO_CAT), _(ppsz_all_keys[i]),
+                    vlc_dictionary_value_for_key( &p_meta->extra_tags, ppsz_all_keys[i] ) );
+            free( ppsz_all_keys[i] );
+        }
+        free( ppsz_all_keys );
         vlc_meta_Delete( p_meta );
     }
 
