@@ -1,10 +1,11 @@
 /*****************************************************************************
- * googleimage.c
+ * luameta.c: Get meta/artwork using lua scripts
  *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
  *
- * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
+ * Authors: Antoine Cellerier <dionoea at videolan tod org>
+ *          Pierre d'Herbemont <pdherbemont # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
