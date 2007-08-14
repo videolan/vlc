@@ -162,8 +162,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                   strdup( "" );
     psz_title = strdup( input_GetItem(p_input)->psz_name );
     if( psz_title == NULL ) psz_title = strdup( N_("(no title)") );
-    if( psz_artist == NULL ) psz_artist = strdup( N_("(no artist)") );
-    if( psz_album == NULL ) psz_album = strdup( N_("(no album)") );
 
     psz_buf = str_format_meta( p_this, p_intf->p_sys->psz_format );
 
