@@ -135,7 +135,6 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
         {
             socklen_t i_val_size = sizeof( i_val );
             div_t d;
-            struct timeval tv;
             vlc_value_t timeout;
 
             if( net_errno != EINPROGRESS )
@@ -162,7 +161,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
             msg_Dbg( p_this, "connection in progress" );
             for (;;)
             {
-                fd_set fds;
+                struct pollfd ufd = { .fd = fd, .events = POLLOUT };
                 int i_ret;
 
                 if( p_this->b_die )
@@ -174,19 +173,12 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
                     return -1;
                 }
 
-                /* Initialize file descriptor set */
-                FD_ZERO( &fds );
-                FD_SET( fd, &fds );
-
                 /*
                  * We'll wait 0.1 second if nothing happens
                  * NOTE:
                  * time out will be shortened if we catch a signal (EINTR)
                  */
-                tv.tv_sec = 0;
-                tv.tv_usec = (d.quot > 0) ? 100000 : (1000 * d.rem);
-
-                i_ret = select( fd + 1, NULL, &fds, NULL, &tv );
+                i_ret = poll (&ufd, 1, (d.quot > 0) ? 100 : d.rem);
                 if( i_ret == 1 )
                     break;
 
