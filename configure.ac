@@ -1209,7 +1209,6 @@ VLC_ADD_PLUGINS([access_filter_bandwidth])
 VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
 VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
 VLC_ADD_PLUGINS([packetizer_vc1])
-VLC_ADD_PLUGINS([googleimage])
 
 
 if test "${SYS}" != "mingwce"; then
