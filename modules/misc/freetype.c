@@ -98,6 +98,7 @@ static char *FontConfig_Select( FcConfig *, const char *,
 #endif
 static line_desc_t *NewLine( int );
 
+static int GetFontSize( filter_t *p_filter );
 static int SetFontSize( filter_t *, int );
 static void YUVFromRGB( uint32_t i_argb,
                         uint8_t *pi_y, uint8_t *pi_u, uint8_t *pi_v );
@@ -1903,7 +1904,7 @@ static int ProcessNodes( filter_t *p_filter,
     {
         rv = PushFont( &p_fonts,
                        FC_DEFAULT_FONT,
-                       p_sys->i_font_size * i_scale / 1000,
+                       p_sys->i_font_size,
                        0x00ffffff,
                        0x00ffffff );
     }
@@ -2483,6 +2484,9 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( !p_region_in || !p_region_in->psz_html )
         return VLC_EGENERIC;
 
+    /* Reset the default fontsize in case screen metrics have changed */
+    p_filter->p_sys->i_font_size = GetFontSize( p_filter );
+
     p_sub = stream_MemoryNew( VLC_OBJECT(p_filter),
                               (uint8_t *) p_region_in->psz_html,
                               strlen( p_region_in->psz_html ),
@@ -2731,42 +2735,44 @@ static line_desc_t *NewLine( int i_count )
     return p_line;
 }
 
+static int GetFontSize( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    vlc_value_t   val;
+    int           i_size = 0;
+
+    if( p_sys->i_default_font_size )
+    {
+        if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
+            i_size = p_sys->i_default_font_size * val.i_int / 1000;
+        else
+            i_size = p_sys->i_default_font_size;
+    }
+    else
+    {
+        var_Get( p_filter, "freetype-rel-fontsize", &val );
+        i_size = (int)p_filter->fmt_out.video.i_height / val.i_int;
+        p_filter->p_sys->i_display_height =
+            p_filter->fmt_out.video.i_height;
+    }
+    if( i_size <= 0 )
+    {
+        msg_Warn( p_filter, "invalid fontsize, using 12" );
+        if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
+            i_size = 12 * val.i_int / 1000;
+        else
+            i_size = 12;
+    }
+    return i_size;
+}
+
 static int SetFontSize( filter_t *p_filter, int i_size )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( i_size && i_size == p_sys->i_font_size ) return VLC_SUCCESS;
-
     if( !i_size )
     {
-        vlc_value_t val;
-
-        if( !p_sys->i_default_font_size &&
-            p_sys->i_display_height == (int)p_filter->fmt_out.video.i_height )
-            return VLC_SUCCESS;
-
-        if( p_sys->i_default_font_size )
-        {
-            if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
-                i_size = p_sys->i_default_font_size * val.i_int / 1000;
-            else
-                i_size = p_sys->i_default_font_size;
-        }
-        else
-        {
-            var_Get( p_filter, "freetype-rel-fontsize", &val );
-            i_size = (int)p_filter->fmt_out.video.i_height / val.i_int;
-            p_filter->p_sys->i_display_height =
-                p_filter->fmt_out.video.i_height;
-        }
-        if( i_size <= 0 )
-        {
-            msg_Warn( p_filter, "invalid fontsize, using 12" );
-            if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
-                i_size = 12 * val.i_int / 1000;
-            else
-                i_size = 12;
-        }
+        i_size = GetFontSize( p_filter );
 
         msg_Dbg( p_filter, "using fontsize: %i", i_size );
     }
