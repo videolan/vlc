@@ -1,5 +1,6 @@
-SOURCES_musicbrainz = musicbrainz.c
 SOURCES_folder = folder.c
-SOURCES_taglib = taglib.cpp
 SOURCES_googleimage = googleimage.c
 SOURCES_id3tag = id3tag.c id3genres.h $(NULL)
+SOURCES_luameta = luameta.c
+SOURCES_musicbrainz = musicbrainz.c
+SOURCES_taglib = taglib.cpp
