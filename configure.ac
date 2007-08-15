@@ -5874,42 +5874,36 @@ fi
 dnl
 dnl  Plugin and builtin checks
 dnl
-builtin_support=false
-plugin_support=:
-
-dnl Support for plugins - this must be AT THE END
-AC_ARG_ENABLE(plugins,
-  [  --disable-plugins       make all plugins built-in (default plugins enabled)],
-  [if test "${enable_plugins}" = "no"
-   then
-     plugin_support=false
-   fi])
+plugin_support=yes
 
 dnl Automagically disable plugins if there is no system support for
 dnl dynamically loadable files (.so, .dll, .dylib).
 dnl don't forget vlc-win32 still can load .dll as plugins
-if test "${ac_cv_have_plugins}" = "no"
-then
-  echo "*** Your system doesn't have plugin support. All plugins will be built"
-  echo "statically."
-  plugin_support=false
-fi
-
-AS_IF([${plugin_support}], [
-  AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1, Define if we have support for dynamic plugins)
-], [
-  VLC_ADD_BUILTINS([${PLUGINS}])
-  PLUGINS=""
+AS_IF([test "${ac_cv_have_plugins}" = "no"], [
+  AC_MSG_WARN([*** No plugin support! Building statically! ***])
+  plugin_support=no
 ])
+
+AS_IF([test "${enable_shared}" = "no"], [
+  plugin_support=no
+])
+
+AS_IF([test "${plugin_support}" != "no"], [
+  AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1, Define if we have support for dynamic plugins)
+])
+
+AM_CONDITIONAL(HAVE_PLUGINS, [test "${plugin_support}" != "no"])
+
+dnl Temporary(?) hack for plugins/builtins transition
+VLC_ADD_PLUGINS([${BUILTINS}])
+BUILTINS=""
 
 dnl
 dnl Pic and shared libvlc stuff
 dnl
-VLC_ADD_PLUGINS([${BUILTINS}])
 AS_IF([test "${SYS}" = "mingw32"], [
   FILE_LIBVLC_DLL="!define LIBVLC_DLL libvlc.dll"
 ])
-BUILTINS=""
 
 dnl
 dnl  Stuff used by the program

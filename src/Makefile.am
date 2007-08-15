@@ -10,8 +10,6 @@ EXTRA_DIST = extras/COPYING modules/builtin.h.in libvlc.sym
 BUILT_SOURCES = modules/builtin.h misc/revision.c
 CLEANFILES = $(BUILT_SOURCES)
 
-TOOLBOX = srcdir=$(top_srcdir) builddir=$(top_builddir) $(top_srcdir)/toolbox
-
 ###############################################################################
 # Headers
 ###############################################################################
@@ -86,9 +84,28 @@ HEADERS_include = \
 	../include/vlc_vout_synchro.h \
 	$(NULL)
 
-modules/builtin.h: modules/builtin.h.in
-	$(TOOLBOX) --update-includes
-	touch $@
+modules/builtin.h: modules/builtin.h.in ../vlc-config Makefile.am
+	rm -f -- "$@.tmp"
+	cat "$<" > "$@.tmp"
+if !HAVE_PLUGINS
+	plugins="$$($(VLC_CONFIG) --list plugin)" ; \
+	test -n "$${plugins}" && \
+	for p in $${plugins}; do \
+		echo "int vlc_entry__$$p (module_t *);" ; \
+	done >> "$@.tmp"
+endif
+	echo "#define ALLOCATE_ALL_BUILTINS() \\" >> "$@.tmp"
+	echo "    do \\" >> "$@.tmp"
+	echo "    { \\" >> "$@.tmp"
+if !HAVE_PLUGINS
+	plugins="$$($(VLC_CONFIG) --list plugin)" ; \
+	test -n "$${plugins}" && \
+	for p in $${plugins}; do \
+		echo "        ALLOCATE_BUILTIN($$p); \\" ; \
+	done >> "$@.tmp"
+endif
+	echo '    } while( 0 );' >> "$@.tmp"
+	mv -f -- "$@.tmp" "$@"
 
 modules/modules.c: modules/builtin.h
 
@@ -109,7 +126,7 @@ libvlc_la_LIBADD = $(LTLIBINTL)
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 libvlc_la_CXXFLAGS = `$(VLC_CONFIG) --cxxflags libvlc`
 libvlc_la_OBJCFLAGS = `$(VLC_CONFIG) --objcflags libvlc`
-libvlc_la_LDFLAGS = $(AM_LDFLAGS) `$(VLC_CONFIG) --libs libvlc` \
+libvlc_la_LDFLAGS = `$(VLC_CONFIG) --libs libvlc` $(AM_LDFLAGS) \
 	-version-info 1:0:0
 if HAVE_COMPILER_EXPORT
 libvlc_la_LDFLAGS += -export-dynamic

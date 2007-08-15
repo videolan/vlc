@@ -249,6 +249,10 @@ nodist_EXTRA_vlc_SOURCES = extras/zsh.cpp src/misc/darwin_specific.m
 vlc_DEPENDENCIES = $(LIBVLC) $(DATA_win32_rc)
 
 vlc_LDADD = $(DATA_win32_rc) $(LIBVLC) $(LTLIBINTL)
+vlc_LDFLAGS =
+if !HAVE_PLUGINS
+vlc_LDFLAGS += `$(VLC_CONFIG) --target plugin | sed -e 's/\_plugin /_plugin.la /g'`
+endif
 
 vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 LIB_libvlc = libvlc.la
@@ -274,7 +278,7 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
 	  objc) cmd="$(OBJCLINK)" ;; \
 	  c|*) cmd="$(LINK)" ;; \
 	esac ; \
-	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDADD)" ; \
+	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDFLAGS) $(vlc_LDADD)" ; \
 	echo $$cmd ; \
 	eval $$cmd
 
@@ -1020,22 +1024,18 @@ update-po:
 ###############################################################################
 # Stamp rules
 ###############################################################################
-stamp-builtin: FORCE
-	@for dep in "" `$(VLC_CONFIG) --target builtin`; do \
-	  if test "$${dep}" -nt "$(top_builddir)/vlc$(EXEEXT)"; then \
-	    rm -f $@; \
+stamp-builtin:
+	@for dep in "" `$(VLC_CONFIG) --target plugin`; do \
+	  if test "$${dep}.la" -nt "$(top_builddir)/vlc$(EXEEXT)"; then \
+	    touch "$@"; \
 	    break; \
 	  fi; \
 	done
-	@if test ! -f $@; then printf "" > $@; fi
+
+.PHONY: stamp-builtin
 
 ###############################################################################
 # Enforce Mac OS X deployment target environment variable
 ###############################################################################
 macosx-sdk: Makefile.in $(HEADERS_include) vlc-config
 	export MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET)
-
-###############################################################################
-# Force rule
-###############################################################################
-FORCE:
