@@ -136,7 +136,7 @@ MetaPanel::~MetaPanel(){}
 void MetaPanel::saveMeta()
 {
     playlist_t *p_playlist;
-    char * psz;
+    char psz[5];
 
     meta_export_t p_export;
     p_export.p_item = p_input;
@@ -162,14 +162,12 @@ void MetaPanel::saveMeta()
     input_item_SetArtist( p_input, qtu( artist_text->text() ) );
     input_item_SetAlbum(  p_input, qtu( collection_text->text() ) );
     input_item_SetGenre(  p_input, qtu( genre_text->text() ) );
-    
-    asnprintf( &psz, 5, "%d", date_text->value() );
-    input_item_SetDate(  p_input, psz );
-    free( psz );
 
-    asnprintf( &psz, 5, "%d", seqnum_text->value() );
+    snprintf( psz, sizeof(psz), "%d", date_text->value() );
+    input_item_SetDate(  p_input, psz );
+
+    snprintf( psz, sizeof(psz), "%d", seqnum_text->value() );
     input_item_SetTrackNum(  p_input, psz );
-    free( psz );
 
     input_item_SetTitle(  p_input, qtu( title_text->text() ) );
 
@@ -190,7 +188,7 @@ void MetaPanel::saveMeta()
  **/
 void MetaPanel::update( input_item_t *p_item )
 {
-    char *psz_meta; 
+    const char *psz_meta; 
 #define UPDATE_META( meta, widget ) {               \
     psz_meta = input_item_Get##meta( p_item );      \
     if( !EMPTY_STR( psz_meta ) )                    \
@@ -230,7 +228,7 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META( Setting, setting_text );
 
     UPDATE_META_INT( Date, date_text );
-    UPDATE_META_INT( Tracknum, seqnum_text );
+    UPDATE_META_INT( TrackNum, seqnum_text );
     UPDATE_META_INT( Rating, rating_text );
 
 #undef UPDATE_META_INT
