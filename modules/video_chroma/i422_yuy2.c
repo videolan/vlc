@@ -135,8 +135,7 @@ static int Activate( vlc_object_t *p_this )
         default:
             return -1;
     }
-    
-    return 0; 
+    return 0;
 }
 
 /* Following functions are local */
