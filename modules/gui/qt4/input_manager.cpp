@@ -138,10 +138,10 @@ void InputManager::update()
                   input_item_GetNowPlaying( input_GetItem(p_input) ),
                   input_GetItem(p_input)->psz_name );
     }
-    else if( !EMPTY_STR(input_item_GetNowPlaying( input_GetArtist(p_input) )) )
+    else if( !EMPTY_STR(input_item_GetArtist( input_GetItem(p_input) )) )
     {
         text.sprintf( "%s - %s",
-                  input_item_GetNowPlaying( input_GetArtist(p_input) ),
+                  input_item_GetArtist( input_GetItem(p_input) ),
                   input_GetItem(p_input)->psz_name );
     }
     else
