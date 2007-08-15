@@ -165,6 +165,7 @@ libvlc_media_descriptor_get_mrl( libvlc_media_descriptor_t * p_md,
  **************************************************************************/
 static const vlc_meta_type_t meta_conversion[] =
 {
+    [libvlc_meta_Title]        = vlc_meta_Title,
     [libvlc_meta_Artist]       = vlc_meta_Artist,
     [libvlc_meta_Genre]        = vlc_meta_Genre,
     [libvlc_meta_Copyright]    = vlc_meta_Copyright,
@@ -194,6 +195,10 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
     preparse_if_needed( p_md );
 
     psz_meta = input_item_GetMeta( p_md->p_input_item, meta_conversion[e_meta] );
+
+    /* Should be integrated in core */
+    if( !psz_meta && e_meta == libvlc_meta_Title && p_md->p_input_item->psz_name )
+        return strdup( p_md->p_input_item->psz_name );
 
     if( !psz_meta )
         return NULL;
