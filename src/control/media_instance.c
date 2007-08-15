@@ -59,7 +59,11 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
 
     /* No one is tracking this input_thread appart us. Destroy it */
     if( should_destroy )
+    {
+        /* We owned this one */
+        var_Destroy( p_input_thread, "drawable" );
         input_DestroyThread( p_input_thread );
+    }
     else
     {
         /* XXX: hack the playlist doesn't retain the input thread,
@@ -408,6 +412,7 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
     {
         vlc_value_t val;
         val.i_int = p_mi->drawable;
+        var_Create( p_input_thread, "drawable", VLC_VAR_DOINHERIT );
         var_Set( p_input_thread, "drawable", val );
     }
     var_AddCallback( p_input_thread, "state", input_state_changed, p_mi );
@@ -443,7 +448,7 @@ void libvlc_media_instance_pause( libvlc_media_instance_t *p_mi,
 void libvlc_media_instance_stop( libvlc_media_instance_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
-    libvlc_exception_raise( p_e, "Not implemented" );
+    //libvlc_exception_raise( p_e, "Not implemented" );
 }
 
 /**************************************************************************
@@ -640,4 +645,3 @@ int libvlc_media_instance_get_state(
 
     return val.i_int;
 }
-
