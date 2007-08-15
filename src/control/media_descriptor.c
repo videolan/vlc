@@ -27,6 +27,88 @@
 
 #include "libvlc_internal.h"
 
+static const vlc_meta_type_t libvlc_to_vlc_meta[] =
+{
+    [libvlc_meta_Title]        = vlc_meta_Title,
+    [libvlc_meta_Artist]       = vlc_meta_Artist,
+    [libvlc_meta_Genre]        = vlc_meta_Genre,
+    [libvlc_meta_Copyright]    = vlc_meta_Copyright,
+    [libvlc_meta_Album]        = vlc_meta_Album,
+    [libvlc_meta_TrackNumber]  = vlc_meta_TrackNumber,
+    [libvlc_meta_Description]  = vlc_meta_Description,
+    [libvlc_meta_Rating]       = vlc_meta_Rating,
+    [libvlc_meta_Date]         = vlc_meta_Date,
+    [libvlc_meta_Setting]      = vlc_meta_Setting,
+    [libvlc_meta_URL]          = vlc_meta_URL,
+    [libvlc_meta_Language]     = vlc_meta_Language,
+    [libvlc_meta_NowPlaying]   = vlc_meta_NowPlaying,
+    [libvlc_meta_Publisher]    = vlc_meta_Publisher,
+    [libvlc_meta_EncodedBy]    = vlc_meta_EncodedBy,
+    [libvlc_meta_ArtworkURL]   = vlc_meta_ArtworkURL,
+    [libvlc_meta_TrackID]      = vlc_meta_TrackID
+};
+
+static const libvlc_meta_t vlc_to_libvlc_meta[] =
+{
+    [vlc_meta_Title]        = libvlc_meta_Title,
+    [vlc_meta_Artist]       = libvlc_meta_Artist,
+    [vlc_meta_Genre]        = libvlc_meta_Genre,
+    [vlc_meta_Copyright]    = libvlc_meta_Copyright,
+    [vlc_meta_Album]        = libvlc_meta_Album,
+    [vlc_meta_TrackNumber]  = libvlc_meta_TrackNumber,
+    [vlc_meta_Description]  = libvlc_meta_Description,
+    [vlc_meta_Rating]       = libvlc_meta_Rating,
+    [vlc_meta_Date]         = libvlc_meta_Date,
+    [vlc_meta_Setting]      = libvlc_meta_Setting,
+    [vlc_meta_URL]          = libvlc_meta_URL,
+    [vlc_meta_Language]     = libvlc_meta_Language,
+    [vlc_meta_NowPlaying]   = libvlc_meta_NowPlaying,
+    [vlc_meta_Publisher]    = libvlc_meta_Publisher,
+    [vlc_meta_EncodedBy]    = libvlc_meta_EncodedBy,
+    [vlc_meta_ArtworkURL]   = libvlc_meta_ArtworkURL,
+    [vlc_meta_TrackID]      = libvlc_meta_TrackID
+};
+
+/**************************************************************************
+ * input_item_meta_changed (Private) (vlc event Callback)
+ **************************************************************************/
+static void input_item_meta_changed( const vlc_event_t *p_event,
+                                     void * user_data )
+{
+    libvlc_media_descriptor_t * p_md = user_data;
+    libvlc_event_t event;
+
+    /* Construct the event */
+    event.type = libvlc_MediaDescriptorMetaChanged;
+    event.u.media_descriptor_meta_changed.meta_type =
+        vlc_to_libvlc_meta[p_event->u.input_item_meta_changed.meta_type];
+
+    /* Send the event */
+    libvlc_event_send( p_md->p_event_manager, &event );
+}
+
+
+/**************************************************************************
+ * Install event handler (Private)
+ **************************************************************************/
+static void install_input_item_observer( libvlc_media_descriptor_t *p_md )
+{
+    vlc_event_attach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemMetaChanged,
+                      input_item_meta_changed,
+                      p_md );
+}
+
+/**************************************************************************
+ * Uninstall event handler (Private)
+ **************************************************************************/
+static void uninstall_input_item_observer( libvlc_media_descriptor_t *p_md )
+{
+    vlc_event_detach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemMetaChanged,
+                      input_item_meta_changed,
+                      p_md );
+}
 
 /**************************************************************************
  * Preparse if not already done (Private)
@@ -40,6 +122,39 @@ static void preparse_if_needed( libvlc_media_descriptor_t *p_md )
                         p_md->p_input_item );
         p_md->b_preparsed = VLC_TRUE;
     }
+}
+
+/**************************************************************************
+ * Create a new media descriptor object from an input_item
+ * (libvlc internal)
+ * That's the generic constructor
+ **************************************************************************/
+libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
+                                   libvlc_instance_t *p_instance,
+                                   input_item_t *p_input_item,
+                                   libvlc_exception_t *p_e )
+{
+    libvlc_media_descriptor_t * p_md;
+
+    if (!p_input_item)
+    {
+        libvlc_exception_raise( p_e, "No input item given" );
+        return NULL;
+    }
+
+    p_md = malloc( sizeof(libvlc_media_descriptor_t) );
+    p_md->p_libvlc_instance = p_instance;
+    p_md->p_input_item      = p_input_item;
+    p_md->b_preparsed       = VLC_TRUE;
+    p_md->i_refcount        = 1;
+    p_md->p_event_manager = libvlc_event_manager_new( p_md, p_instance, p_e );
+    libvlc_event_manager_register_event_type( p_md->p_event_manager, 
+        libvlc_MediaDescriptorMetaChanged, p_e );
+    vlc_gc_incref( p_md->p_input_item );
+
+    install_input_item_observer( p_md );
+
+    return p_md;
 }
 
 /**************************************************************************
@@ -61,41 +176,8 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
         return NULL;
     }
 
-    p_md = malloc( sizeof(libvlc_media_descriptor_t) );
-    p_md->p_libvlc_instance = p_instance;
-    p_md->p_input_item      = p_input_item;
-    p_md->b_preparsed       = VLC_FALSE;
-    p_md->i_refcount        = 1;
- 
-    vlc_gc_incref( p_md->p_input_item );
-
-    return p_md;
-}
-
-/**************************************************************************
- * Create a new media descriptor object from an input_item
- * (libvlc internal)
- **************************************************************************/
-libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
-                                   libvlc_instance_t *p_instance,
-                                   input_item_t *p_input_item,
-                                   libvlc_exception_t *p_e )
-{
-    libvlc_media_descriptor_t * p_md;
-
-    if (!p_input_item)
-    {
-        libvlc_exception_raise( p_e, "No input item given" );
-        return NULL;
-    }
-
-    p_md = malloc( sizeof(libvlc_media_descriptor_t) );
-    p_md->p_libvlc_instance = p_instance;
-    p_md->p_input_item      = p_input_item;
-    p_md->b_preparsed       = VLC_TRUE;
-    p_md->i_refcount        = 1;
-
-    vlc_gc_incref( p_md->p_input_item );
+    p_md = libvlc_media_descriptor_new_from_input_item( p_instance,
+                p_input_item, p_e );
 
     return p_md;
 }
@@ -110,12 +192,12 @@ void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
 
     p_md->i_refcount--;
 
-    /* XXX: locking */
-    vlc_gc_decref( p_md->p_input_item );
-
     if( p_md->i_refcount > 0 )
         return;
-    
+
+    uninstall_input_item_observer( p_md );
+    vlc_gc_decref( p_md->p_input_item );
+
     free( p_md );
 }
 
@@ -128,9 +210,6 @@ void libvlc_media_descriptor_retain( libvlc_media_descriptor_t *p_md )
         return;
 
     p_md->i_refcount++;
-
-    /* XXX: locking */
-    vlc_gc_incref( p_md->p_input_item );
 }
 
 /**************************************************************************
@@ -140,7 +219,7 @@ libvlc_media_descriptor_t *
 libvlc_media_descriptor_duplicate( libvlc_media_descriptor_t *p_md_orig )
 {
     return libvlc_media_descriptor_new_from_input_item(
-        p_md->p_libvlc_instance, p_md_orig->p_input_item );
+        p_md_orig->p_libvlc_instance, p_md_orig->p_input_item, NULL );
 }
 
 /**************************************************************************
@@ -157,26 +236,6 @@ libvlc_media_descriptor_get_mrl( libvlc_media_descriptor_t * p_md,
 /**************************************************************************
  * Getter for meta information
  **************************************************************************/
-static const vlc_meta_type_t meta_conversion[] =
-{
-    [libvlc_meta_Title]        = vlc_meta_Title,
-    [libvlc_meta_Artist]       = vlc_meta_Artist,
-    [libvlc_meta_Genre]        = vlc_meta_Genre,
-    [libvlc_meta_Copyright]    = vlc_meta_Copyright,
-    [libvlc_meta_Album]        = vlc_meta_Album,
-    [libvlc_meta_TrackNumber]  = vlc_meta_TrackNumber,
-    [libvlc_meta_Description]  = vlc_meta_Description,
-    [libvlc_meta_Rating]       = vlc_meta_Rating,
-    [libvlc_meta_Date]         = vlc_meta_Date,
-    [libvlc_meta_Settings]     = vlc_meta_Setting,
-    [libvlc_meta_URL]          = vlc_meta_URL,
-    [libvlc_meta_Language]     = vlc_meta_Language,
-    [libvlc_meta_NowPlaying]   = vlc_meta_NowPlaying,
-    [libvlc_meta_Publisher]    = vlc_meta_Publisher,
-    [libvlc_meta_EncodedBy]    = vlc_meta_EncodedBy,
-    [libvlc_meta_ArtworkURL]   = vlc_meta_ArtworkURL,
-    [libvlc_meta_TrackID]      = vlc_meta_TrackID
-};
 
 char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
                                          libvlc_meta_t e_meta,
@@ -188,7 +247,8 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
 
     preparse_if_needed( p_md );
 
-    psz_meta = input_item_GetMeta( p_md->p_input_item, meta_conversion[e_meta] );
+    psz_meta = input_item_GetMeta( p_md->p_input_item,
+                                   libvlc_to_vlc_meta[e_meta] );
 
     /* Should be integrated in core */
     if( !psz_meta && e_meta == libvlc_meta_Title && p_md->p_input_item->psz_name )

@@ -65,6 +65,7 @@ struct libvlc_instance_t
 
 struct libvlc_media_descriptor_t
 {
+    libvlc_event_manager_t * p_event_manager;
     int                b_preparsed;
     input_item_t      *p_input_item;
     int                i_refcount;
