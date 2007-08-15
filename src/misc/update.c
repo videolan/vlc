@@ -1209,7 +1209,7 @@ void update_download_for_real( download_thread_t *p_this );
  * \param psz_dest destination file path
  * \return nothing
  */
-void update_download( update_iterator_t *p_uit, char *psz_dest )
+void update_download( update_iterator_t *p_uit, const char *psz_dest )
 {
     download_thread_t *p_dt =
         vlc_object_create( p_uit->p_u->p_libvlc, sizeof( download_thread_t ) );

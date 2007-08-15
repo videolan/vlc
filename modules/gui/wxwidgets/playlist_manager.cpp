@@ -299,17 +299,10 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
     wxString msg;
     wxString duration = wxU( "" );
 
-    char *psz_artist;
-    if( input_item_GetArtist( o_item->p_input ) )
+    const char *psz_artist = input_item_GetArtist( p_item->p_input );
+    if( ! psz_artist )
     {
-        psz_artist = strdup( input_item_GetArtist( o_item->p_input ) );
-    }
-    else psz_artist = strdup( "" );
-
-    if( !psz_artist )
-    {
-        UnlockPlaylist( p_intf->p_sys, p_playlist );
-        return;
+        psz_artist = "";
     }
 
     char psz_duration[MSTRTIME_MAX_SIZE];
@@ -331,7 +324,6 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
         msg = wxString(wxU( psz_artist )) + wxT(" - ") +
                     wxString(wxU(p_item->p_input->psz_name)) + duration;
     }
-    free( psz_artist );
     treectrl->SetItemText( item , msg );
     treectrl->SetItemImage( item, p_item->p_input->i_type );
 

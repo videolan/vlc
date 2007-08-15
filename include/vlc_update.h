@@ -176,7 +176,7 @@ VLC_EXPORT( update_iterator_t *, update_iterator_New, ( update_t * ) );
 VLC_EXPORT( void, update_iterator_Delete, ( update_iterator_t * ) );
 VLC_EXPORT( unsigned int, update_iterator_Action, ( update_iterator_t *, int ) );
 VLC_EXPORT( unsigned int, update_iterator_ChooseMirrorAndFile, ( update_iterator_t *, int, int, int ) );
-VLC_EXPORT( void, update_download, ( update_iterator_t *, char * ) );
+VLC_EXPORT( void, update_download, ( update_iterator_t *, const char * ) );
 
 /**
  * @}

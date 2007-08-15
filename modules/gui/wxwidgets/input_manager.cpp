@@ -210,10 +210,7 @@ void InputManager::UpdateInput()
 
 void InputManager::UpdateNowPlaying()
 {
-    const char *psz_now_playing = 
-        input_item_GetNowPlaying( input_GetItem(p_input) ) ?
-                    strdup( input_GetItem(p_input)->p_meta->psz_nowplaying ):
-                    strdup( "" );
+    const char *psz_now_playing = input_item_GetNowPlaying( input_GetItem(p_input) );
     if( psz_now_playing && *psz_now_playing )
     {
         p_main_intf->statusbar->SetStatusText(
@@ -225,7 +222,6 @@ void InputManager::UpdateNowPlaying()
         p_main_intf->statusbar->SetStatusText(
                    wxU(input_GetItem(p_input)->psz_name), 2 );
     }
-    free( psz_now_playing );
 }
 
 void InputManager::UpdateButtons( vlc_bool_t b_play )
