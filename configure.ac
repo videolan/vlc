@@ -1223,16 +1223,6 @@ if test "${SYS}" != "mingwce"; then
 fi
 
 dnl
-dnl  Switch to enable a version of VLC where most modules will be builtin
-dnl
-AC_ARG_ENABLE(mostly-builtin,
-[  --enable-mostly-builtin most modules will be built-in (default disabled)])
-if test "${enable_mostly_builtin}" = "yes"; then
-  VLC_ADD_BUILTINS([${PLUGINS}])
-  PLUGINS=""
-fi
-
-dnl
 dnl Some plugins aren't useful on some platforms
 dnl
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
@@ -1511,12 +1501,12 @@ dnl
 if test "${host_cpu}" = "i686" -o "${host_cpu}" = "i586" -o "${host_cpu}" = "x86" -o "${host_cpu}" = "i386" -o "${host_cpu}"="i486" -o "${host_cpu}" = "x86_64"
 then
     ARCH="${ARCH} mmx"
-    VLC_ADD_BUILTINS([${ACCEL_MODULES}])
+    VLC_ADD_PLUGINS([${ACCEL_MODULES}])
 fi
 if test "${host_cpu}" = "i686" -o "${host_cpu}" = "x86_64"
 then
     ARCH="${ARCH} sse sse2"
-    VLC_ADD_BUILTINS([${ACCEL_MODULES}])
+    VLC_ADD_PLUGINS([${ACCEL_MODULES}])
 fi
 
 dnl
@@ -1547,9 +1537,9 @@ dnl
 AC_ARG_ENABLE(altivec,
 [  --disable-altivec       disable AltiVec optimizations (default enabled on PPC)],
 [ if test "${enable_altivec}" = "yes"; then ARCH="${ARCH} altivec";
-    VLC_ADD_BUILTINS([${ACCEL_MODULES}]) fi ],
+    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ],
 [ if test "${host_cpu}" = "powerpc"; then ARCH="${ARCH} altivec";
-    VLC_ADD_BUILTINS([${ACCEL_MODULES}]) fi ])
+    VLC_ADD_PLUGINS([${ACCEL_MODULES}]) fi ])
 
 dnl
 dnl  Debugging mode
@@ -5824,7 +5814,6 @@ then
   VLC_ADD_LDFLAGS([test3],[-lobjc])
 
   VLC_ADD_PLUGINS([${TESTS}])
-  #VLC_ADD_BUILTINS([${TESTS}])
 fi
 
 dnl
@@ -5939,11 +5928,6 @@ AC_DEFINE_UNQUOTED(VLC_COMPILE_BY, "`whoami`", [user who ran configure])
 AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname`", [host which ran configure]) 
 AC_DEFINE_UNQUOTED(VLC_COMPILE_DOMAIN, "`dnsdomainname 2>/dev/null || domainname 2>/dev/null || echo unknown`", [domain of the host which ran configure]) 
 AC_DEFINE_UNQUOTED(VLC_COMPILER, "`$CC -v 2>&1 | tail -n 1`", [compiler]) 
-
-dnl Old definitions for version-dependant plugins
-dnl VLC_SYMBOL="`echo ${VERSION} | sed -e 'y/.-+/___/'`"
-dnl AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__${VLC_SYMBOL}", [String suffix for module functions])
-dnl AC_DEFINE_UNQUOTED(MODULE_SYMBOL, ${VLC_SYMBOL}, [Symbol suffix for module functions])
 
 dnl New definitions with value matching 0.9.0 release
 module_symbol="0_9_0b"
