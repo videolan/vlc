@@ -81,6 +81,8 @@ Video output and filters:
    was previously part of the mosaic module.
  * Fix random characters problem in RSS filter.
  * Add rotate-deciangle for more precision on rotate filter
+ * Support for Intel SSE2 intruction set in chroma converters
+ * Improved use of Intel MMX intruction set in chroma converters
 
 Audio output
  * Replay gain support.

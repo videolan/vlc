@@ -233,8 +233,81 @@ movdqu    %%xmm1, 16(%0)  # Store high UYVY                               \n\
 
 #include <emmintrin.h>
 
+#define SSE2_CALL(SSE2_INSTRUCTIONS)    \
+    do {                                \
+        __m128i xmm0, xmm1, xmm2;        \
+        SSE2_INSTRUCTIONS               \
+        p_line += 32; p_y += 16;        \
+        p_u += 8; p_v += 8;             \
+    } while(0)
 
 #define SSE2_END  _mm_sfence()
+
+#define SSE2_YUV422_YUYV_ALIGNED                \
+    xmm0 = _mm_load_si128((__m128i *)p_y);      \
+    xmm1 = _mm_loadl_epi64((__m128i *)p_u);     \
+    xmm2 = _mm_loadl_epi64((__m128i *)p_v);     \
+    xmm1 = _mm_unpacklo_epi8(xmm1, xmm2);       \
+    xmm2 = xmm0;                                \
+    xmm2 = _mm_unpacklo_epi8(xmm2, xmm1);       \
+    _mm_stream_si128((__m128i*)(p_line), xmm2); \
+    xmm0 = _mm_unpackhi_epi8(xmm0, xmm1);       \
+    _mm_stream_si128((__m128i*)(p_line+16), xmm0);
+ 
+#define SSE2_YUV422_YUYV_UNALIGNED              \
+    xmm0 = _mm_loadu_si128((__m128i *)p_y);     \
+    xmm1 = _mm_loadl_epi64((__m128i *)p_u);     \
+    xmm2 = _mm_loadl_epi64((__m128i *)p_v);     \
+    xmm1 = _mm_unpacklo_epi8(xmm1, xmm2);       \
+    xmm2 = xmm0;                                \
+    xmm2 = _mm_unpacklo_epi8(xmm2, xmm1);       \
+    _mm_storeu_si128((__m128i*)(p_line), xmm2); \
+    xmm0 = _mm_unpackhi_epi8(xmm0, xmm1);       \
+    _mm_storeu_si128((__m128i*)(p_line+16), xmm0);
+ 
+#define SSE2_YUV422_YVYU_ALIGNED                \
+    xmm0 = _mm_load_si128((__m128i *)p_y);      \
+    xmm2 = _mm_loadl_epi64((__m128i *)p_u);     \
+    xmm1 = _mm_loadl_epi64((__m128i *)p_v);     \
+    xmm1 = _mm_unpacklo_epi8(xmm1, xmm2);       \
+    xmm2 = xmm0;                                \
+    xmm2 = _mm_unpacklo_epi8(xmm2, xmm1);       \
+    _mm_stream_si128((__m128i*)(p_line), xmm2); \
+    xmm0 = _mm_unpackhi_epi8(xmm0, xmm1);       \
+    _mm_stream_si128((__m128i*)(p_line+16), xmm0);
+
+#define SSE2_YUV422_YVYU_UNALIGNED              \
+    xmm0 = _mm_loadu_si128((__m128i *)p_y);     \
+    xmm2 = _mm_loadl_epi64((__m128i *)p_u);     \
+    xmm1 = _mm_loadl_epi64((__m128i *)p_v);     \
+    xmm1 = _mm_unpacklo_epi8(xmm1, xmm2);       \
+    xmm2 = xmm0;                                \
+    xmm2 = _mm_unpacklo_epi8(xmm2, xmm1);       \
+    _mm_storeu_si128((__m128i*)(p_line), xmm2); \
+    xmm0 = _mm_unpackhi_epi8(xmm0, xmm1);       \
+    _mm_storeu_si128((__m128i*)(p_line+16), xmm0);
+
+#define SSE2_YUV422_UYVY_ALIGNED                \
+    xmm0 = _mm_load_si128((__m128i *)p_y);      \
+    xmm1 = _mm_loadl_epi64((__m128i *)p_u);     \
+    xmm2 = _mm_loadl_epi64((__m128i *)p_v);     \
+    xmm1 = _mm_unpacklo_epi8(xmm1, xmm2);       \
+    xmm2 = xmm1;                                \
+    xmm2 = _mm_unpacklo_epi8(xmm2, xmm0);       \
+    _mm_stream_si128((__m128i*)(p_line), xmm2); \
+    xmm1 = _mm_unpackhi_epi8(xmm1, xmm0);       \
+    _mm_stream_si128((__m128i*)(p_line+16), xmm1);
+
+#define SSE2_YUV422_UYVY_UNALIGNED              \
+    xmm0 = _mm_loadu_si128((__m128i *)p_y);     \
+    xmm1 = _mm_loadl_epi64((__m128i *)p_u);     \
+    xmm2 = _mm_loadl_epi64((__m128i *)p_v);     \
+    xmm1 = _mm_unpacklo_epi8(xmm1, xmm2);       \
+    xmm2 = xmm1;                                \
+    xmm2 = _mm_unpacklo_epi8(xmm2, xmm0);       \
+    _mm_storeu_si128((__m128i*)(p_line), xmm2); \
+    xmm1 = _mm_unpackhi_epi8(xmm1, xmm0);       \
+    _mm_storeu_si128((__m128i*)(p_line+16), xmm1);
 
 #endif
 

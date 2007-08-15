@@ -190,6 +190,9 @@ E: Damien.Fouilleul@laposte.net
 C: Quovodis
 D: ActiveX control
 D: Safari/Firefox plugin for MacOS X
+D: Direct3D Video output
+D: SSE2 chroma converters
+D: improved MMX chroma converters
 S: Ireland
 
 N: Alexis Guillard

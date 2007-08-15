@@ -366,8 +366,8 @@ movdqu    %%xmm1, 16(%1)  # Store high UYVY                               \n\
 #define SSE2_YUV420_YUYV_UNALIGNED                  \
     xmm1 = _mm_loadl_epi64((__m128i *)p_u);         \
     xmm2 = _mm_loadl_epi64((__m128i *)p_v);         \
-    xmm0 = _mm_load_si128((__m128i *)p_y1);         \
-    xmm3 = _mm_load_si128((__m128i *)p_y2);         \
+    xmm0 = _mm_loadu_si128((__m128i *)p_y1);        \
+    xmm3 = _mm_loadu_si128((__m128i *)p_y2);        \
     _mm_prefetch(p_line1, _MM_HINT_NTA);            \
     _mm_prefetch(p_line2, _MM_HINT_NTA);            \
     xmm1 = _mm_unpacklo_epi8(xmm1, xmm2);           \
@@ -402,8 +402,8 @@ movdqu    %%xmm1, 16(%1)  # Store high UYVY                               \n\
 #define SSE2_YUV420_YVYU_UNALIGNED                  \
     xmm1 = _mm_loadl_epi64((__m128i *)p_v);         \
     xmm2 = _mm_loadl_epi64((__m128i *)p_u);         \
-    xmm0 = _mm_load_si128((__m128i *)p_y1);         \
-    xmm3 = _mm_load_si128((__m128i *)p_y2);         \
+    xmm0 = _mm_loadu_si128((__m128i *)p_y1);        \
+    xmm3 = _mm_loadu_si128((__m128i *)p_y2);        \
     _mm_prefetch(p_line1, _MM_HINT_NTA);            \
     _mm_prefetch(p_line2, _MM_HINT_NTA);            \
     xmm1 = _mm_unpacklo_epi8(xmm1, xmm2);           \
@@ -439,8 +439,8 @@ movdqu    %%xmm1, 16(%1)  # Store high UYVY                               \n\
 #define SSE2_YUV420_UYVY_UNALIGNED                  \
     xmm1 = _mm_loadl_epi64((__m128i *)p_u);         \
     xmm2 = _mm_loadl_epi64((__m128i *)p_v);         \
-    xmm0 = _mm_load_si128((__m128i *)p_y1);         \
-    xmm3 = _mm_load_si128((__m128i *)p_y2);         \
+    xmm0 = _mm_loadu_si128((__m128i *)p_y1);        \
+    xmm3 = _mm_loadu_si128((__m128i *)p_y2);        \
     _mm_prefetch(p_line1, _MM_HINT_NTA);            \
     _mm_prefetch(p_line2, _MM_HINT_NTA);            \
     xmm1 = _mm_unpacklo_epi8(xmm1, xmm2);           \

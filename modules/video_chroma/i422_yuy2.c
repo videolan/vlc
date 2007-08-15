@@ -442,6 +442,61 @@ static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
+    const int i_source_margin = p_source->p[0].i_pitch
+                                 - p_source->p[0].i_visible_pitch;
+    const int i_source_margin_c = p_source->p[1].i_pitch
+                                 - p_source->p[1].i_visible_pitch;
+    const int i_dest_margin = p_dest->p->i_pitch
+                               - p_dest->p->i_visible_pitch;
+
+#if defined (MODULE_NAME_IS_i422_yuy2_sse2)
+
+    if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
+        ((int)p_line|(int)p_y))) )
+    {
+        /* use faster SSE2 aligned fetch and store */
+        for( i_y = p_vout->render.i_height ; i_y-- ; )
+        {
+            p_line -= 2 * p_dest->p->i_pitch;
+
+            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            {
+                SSE2_CALL( SSE2_YUV422_UYVY_ALIGNED );
+            }
+            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            {
+                C_YUV422_UYVY( p_line, p_y, p_u, p_v );
+            }
+            p_y += i_source_margin;
+            p_u += i_source_margin_c;
+            p_v += i_source_margin_c;
+            p_line += i_dest_margin;
+        }
+    }
+    else {
+        /* use slower SSE2 unaligned fetch and store */
+        for( i_y = p_vout->render.i_height ; i_y-- ; )
+        {
+            p_line -= 2 * p_dest->p->i_pitch;
+
+            for( i_x = p_vout->render.i_width / 16 ; i_x-- ; )
+            {
+                SSE2_CALL( SSE2_YUV422_UYVY_UNALIGNED );
+            }
+            for( i_x = ( p_vout->render.i_width % 16 ) / 2; i_x-- ; )
+            {
+                C_YUV422_UYVY( p_line, p_y, p_u, p_v );
+            }
+            p_y += i_source_margin;
+            p_u += i_source_margin_c;
+            p_v += i_source_margin_c;
+            p_line += i_dest_margin;
+        }
+    }
+    SSE2_END;
+
+#else
+
     for( i_y = p_vout->render.i_height ; i_y-- ; )
     {
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
@@ -457,11 +512,17 @@ static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
             MMX_CALL( MMX_YUV422_UYVY );
 #endif
         }
+        p_y += i_source_margin;
+        p_u += i_source_margin_c;
+        p_v += i_source_margin_c;
+        p_line += i_dest_margin;
     }
 #if defined (MODULE_NAME_IS_i422_yuy2_mmx)
     MMX_END;
 #elif defined (MODULE_NAME_IS_i422_yuy2_sse2)
     SSE2_END;
+#endif
+
 #endif
 }
 
