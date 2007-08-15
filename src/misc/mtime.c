@@ -129,8 +129,10 @@ static inline unsigned mprec( void )
 
 static unsigned prec = 0;
 static volatile mtime_t cached_time = 0;
-#if (_POSIX_MONOTONIC_CLOCK - 0 < 0)
-# define CLOCK_MONOTONIC CLOCK_REALTIME
+#if defined( HAVE_CLOCK_NANOSLEEP ) 
+#  if (_POSIX_MONOTONIC_CLOCK - 0 < 0)
+#    define CLOCK_MONOTONIC CLOCK_REALTIME
+#  endif
 #endif
 
 /**
@@ -430,7 +432,10 @@ mtime_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
     return p_date->date;
 }
 
+#ifndef HAVE_GETTIMEOFDAY
+
 #ifdef WIN32
+
 /*
  * Number of micro-seconds between the beginning of the Windows epoch
  * (Jan. 1, 1601) and the Unix epoch (Jan. 1, 1970).
@@ -467,9 +472,10 @@ static int gettimeofday (struct timeval *tv, void *tz )
     tv->tv_usec = (long) (tim % 1000000L);
     return (0);
 }
+
 #endif
 
-
+#endif
 
 /**
  * @return NTP 64-bits timestamp in host byte order.
