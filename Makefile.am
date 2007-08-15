@@ -278,7 +278,7 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
 	  objc) cmd="$(OBJCLINK)" ;; \
 	  c|*) cmd="$(LINK)" ;; \
 	esac ; \
-	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDFLAGS) $(vlc_LDADD)" ; \
+	cmd="$$cmd $(vlc_OBJECTS) $(vlc_LDADD) $(vlc_LDFLAGS)" ; \
 	echo $$cmd ; \
 	eval $$cmd
 

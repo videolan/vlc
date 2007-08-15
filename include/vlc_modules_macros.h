@@ -41,7 +41,7 @@
  * if user has #defined MODULE_NAME foo, then we will need:
  * #define MODULE_STRING "foo"
  *
- * and, if __BUILTIN__ is set, we will also need:
+ * and, if HAVE_DYNAMIC_PLUGINS is NOT set, we will also need:
  * #define MODULE_FUNC( zog ) module_foo_zog
  *
  * this can't easily be done with the C preprocessor, thus a few ugly hacks.
@@ -56,12 +56,12 @@
 
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
-#if defined( __BUILTIN__ )
-#   define E_( function )          CONCATENATE( function, MODULE_NAME )
-#   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
-#elif defined( __PLUGIN__ )
+#if defined (HAVE_DYNAMIC_PLUGINS)
 #   define E_( function )          CONCATENATE( function, MODULE_SYMBOL )
 #   define __VLC_SYMBOL( symbol  ) CONCATENATE( symbol, MODULE_SYMBOL )
+#else
+#   define E_( function )          CONCATENATE( function, MODULE_NAME )
+#   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
 #endif
 
 #if defined( __PLUGIN__ ) && ( defined( WIN32 ) || defined( UNDER_CE ) )

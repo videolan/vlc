@@ -221,6 +221,7 @@ EXTRA_LTLIBRARIES = ${extra_ltlibs}
 
 include Modules.am
 
+if HAVE_PLUGINS
 LTLIBVLC = -L\$(top_builddir)/src -lvlc
 
 AM_LDFLAGS = -rpath '\$(libvlcdir)' -avoid-version \\
@@ -231,6 +232,7 @@ else
 AM_LDFLAGS += -export-symbol-regex ^\$(VLC_ENTRY)\$\$
 endif
 AM_LIBADD = \$(LTLIBVLC)
+endif
 
 all: all-modules
 
