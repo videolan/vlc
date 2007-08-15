@@ -270,8 +270,8 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->p_sys->i_height;
 
     /* Assume we have square pixels */
-    p_vout->output.i_aspect = p_vout->p_sys->i_width
-                               * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
+    p_vout->output.i_aspect = (p_vout->p_sys->i_width
+                               * VOUT_ASPECT_FACTOR) / p_vout->p_sys->i_height;
 
     /* Clear the screen */
     memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size );
