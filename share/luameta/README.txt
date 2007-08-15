@@ -1,5 +1,5 @@
 Instructions to code your own VLC Lua meta script.
-$$
+$Id$
 
 Examples: See googleimage.lua .
 
