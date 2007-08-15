@@ -296,8 +296,8 @@ static int vlclua_scripts_batch_execute( vlc_object_t *p_this,
     char **ppsz_dir;
 
     ppsz_dir_list[0] = malloc( strlen( p_this->p_libvlc->psz_homedir )
-                             + strlen( "/"CONFIG_DIR"/" ) + strlen( luadirname ) + 1 );
-    sprintf( ppsz_dir_list[0], "%s/"CONFIG_DIR"/%s",
+                             + strlen( DIR_SEP CONFIG_DIR DIR_SEP ) + strlen( luadirname ) + 1 );
+    sprintf( ppsz_dir_list[0], "%s" DIR_SEP CONFIG_DIR DIR_SEP "%s",
              p_this->p_libvlc->psz_homedir, luadirname );
 
 #   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
@@ -305,7 +305,7 @@ static int vlclua_scripts_batch_execute( vlc_object_t *p_this,
         const char *psz_vlcpath = config_GetDataDir( p_this );
         ppsz_dir_list[1] = malloc( strlen( psz_vlcpath ) + strlen( luadirname ) + 1 );
         if( !ppsz_dir_list[1] ) return VLC_ENOMEM;
-        sprintf( ppsz_dir_list[1], "%s/%s", psz_vlcpath, luadirname );
+        sprintf( ppsz_dir_list[1], "%s" DIR_SEP "%s", psz_vlcpath, luadirname );
     }
 #   endif
 
@@ -338,7 +338,7 @@ static int vlclua_scripts_batch_execute( vlc_object_t *p_this,
         for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend; ppsz_file++ )
         {
             char  *psz_filename;
-            asprintf( &psz_filename, "%s/%s", *ppsz_dir, *ppsz_file );
+            asprintf( &psz_filename, "%s" DIR_SEP "%s", *ppsz_dir, *ppsz_file );
             msg_Dbg( p_this, "Trying Lua playlist script %s", psz_filename );
             
             i_ret = func( p_this, psz_filename, p_state, user_data );

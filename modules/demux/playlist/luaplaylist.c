@@ -290,8 +290,8 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
     lua_pop( p_state, 1 );
 
     ppsz_dir_list[0] = malloc( strlen( p_demux->p_libvlc->psz_homedir )
-                             + strlen( "/"CONFIG_DIR"/luaplaylist" ) + 1 );
-    sprintf( ppsz_dir_list[0], "%s/"CONFIG_DIR"/luaplaylist",
+                             + strlen( DIR_SEP CONFIG_DIR DIR_SEP "luaplaylist" ) + 1 );
+    sprintf( ppsz_dir_list[0], "%s" DIR_SEP CONFIG_DIR DIR_SEP "luaplaylist",
              p_demux->p_libvlc->psz_homedir );
 
 #   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
@@ -299,7 +299,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
         char *psz_vlcpath = config_GetDataDir( p_demux );
         ppsz_dir_list[1] = malloc( strlen( psz_vlcpath ) + strlen( "luaplaylist" ) + 1 );
         if( !ppsz_dir_list[1] ) return VLC_ENOMEM;
-        sprintf( ppsz_dir_list[1], "%s/luaplaylist", psz_vlcpath );
+        sprintf( ppsz_dir_list[1], "%s" DIR_SEP "luaplaylist", psz_vlcpath );
     }
 #   else
     {
