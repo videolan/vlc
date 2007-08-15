@@ -310,6 +310,7 @@ static inline void input_item_MetaMerge( input_item_t *p_i, const vlc_meta_t * p
 #define input_item_GetEncodedBy( item )      input_item_GetMeta( item, vlc_meta_EncodedBy )
 #define input_item_GetArtURL( item )         input_item_GetMeta( item, vlc_meta_ArtworkURL )
 #define input_item_GetTrackID( item )        input_item_GetMeta( item, vlc_meta_TrackID )
+#define input_item_GetSetting( item )        input_item_GetMeta( item, vlc_meta_Setting )
 
 VLC_EXPORT( char *, input_ItemGetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) );
 VLC_EXPORT(int, input_ItemAddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) );

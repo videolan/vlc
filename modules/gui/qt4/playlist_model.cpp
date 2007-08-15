@@ -184,9 +184,9 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     type = p_item->p_input->i_type;
     current = iscurrent;
 
-    if( current && input_item_GetArtURL( p_item ) &&
-        !strncmp( input_item_GetArtURL( p_item ), "file://", 7 ) )
-        model->sendArt( qfu( input_item_GetArtURL( p_item ) ) );
+    if( current && input_item_GetArtURL( p_item->p_input ) &&
+        !strncmp( input_item_GetArtURL( p_item->p_input ), "file://", 7 ) )
+        model->sendArt( qfu( input_item_GetArtURL( p_item->p_input ) ) );
     else if( current )
         model->removeArt();
 
@@ -199,8 +199,8 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     }
 
 
-#define ADD_META( item, meta ) {             \
-      strings.append( qfu( input_item_Get ## meta ( item->p_input ) ) );   \
+#define ADD_META( item, meta ) \
+      strings.append( qfu( input_item_Get ## meta ( item->p_input ) ) )
 
     for( int i_index=1; i_index <= VLC_META_ENGINE_MB_TRM_ID; i_index = i_index * 2 )
     {
