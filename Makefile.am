@@ -19,13 +19,13 @@ EXTRA_DIST = \
 	vlc.exe.manifest \
 	MAINTAINERS \
 	README.MacOSX.rtf \
-	bootstrap \
-	toolbox \
 	vlc-config.in.in \
 	vlc.fedora.spec \
 	vlc.mandriva.spec \
 	vlc.altlinux.spec \
 	vlc.win32.nsi.in
+
+dist_noinst_SCRIPTS = bootstrap toolbox
 
 BUILT_SOURCES_distclean = vlc-config compile vlc.win32.nsi
 if HAVE_DARWIN
