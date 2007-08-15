@@ -246,11 +246,6 @@ vlc_SOURCES = src/vlc.c
 # Ugly kludge so that automake defines $(CXXLINK)
 nodist_EXTRA_vlc_SOURCES = extras/zsh.cpp src/misc/darwin_specific.m
 
-# Work around a bug in the arm-wince-pe linker
-if HAVE_WINCE
-vlc_WORKAROUNDLDFLAGS = $(LIBVLC)
-endif
-
 vlc_DEPENDENCIES = $(LIBVLC) $(DATA_win32_rc)
 
 vlc_LDADD = $(DATA_win32_rc) $(LIBVLC) $(LTLIBINTL)
