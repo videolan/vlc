@@ -39,6 +39,9 @@ VLC defines a global vlc object with the following members:
  * vlc.stream_delete
  * vlc.stream_readline
  * vlc.stream_read
+ * vlc.decode_uri( <string> ): decode %xy characters in a string.
+ * vlc.resolve_xml_special_chars( <string> ): decode &abc; characters in a
+					      string.
  * vlc.msg_dbg( <string> ): print a debug message.
  * vlc.msg_warn( <string> ): print a warning message.
  * vlc.msg_err( <string> ): print an error message.

@@ -31,6 +31,8 @@
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
+#include <vlc_url.h>
+#include <vlc_strings.h>
 #include <vlc_stream.h>
 #include <vlc_charset.h>
 
@@ -139,6 +141,34 @@ static int vlclua_stream_delete( lua_State *p_state )
     return 1;
 }
 
+static int vlclua_decode_uri( lua_State *p_state )
+{
+    int i = lua_gettop( p_state );
+    if( !i ) return 0;
+    const char *psz_cstring = lua_tostring( p_state, 1 );
+    if( !psz_cstring ) return 0;
+    char *psz_string = strdup( psz_cstring );
+    lua_pop( p_state, i );
+    decode_URI( psz_string );
+    lua_pushstring( p_state, psz_string );
+    free( psz_string );
+    return 1;
+}
+
+static int vlclua_resolve_xml_special_chars( lua_State *p_state )
+{
+    int i = lua_gettop( p_state );
+    if( !i ) return 0;
+    const char *psz_cstring = lua_tostring( p_state, 1 );
+    if( !psz_cstring ) return 0;
+    char *psz_string = strdup( psz_cstring );
+    lua_pop( p_state, i );
+    resolve_xml_special_chars( psz_string );
+    lua_pushstring( p_state, psz_string );
+    free( psz_string );
+    return 1;
+}
+
 static int vlclua_msg_dbg( lua_State *p_state )
 {
     vlc_object_t *p_this = vlclua_get_this( p_state );
@@ -187,6 +217,8 @@ static luaL_Reg p_reg[] =
     { "stream_read", vlclua_stream_read },
     { "stream_readline", vlclua_stream_readline },
     { "stream_delete", vlclua_stream_delete },
+    { "decode_uri", vlclua_decode_uri },
+    { "resolve_xml_special_chars", vlclua_resolve_xml_special_chars },
     { "msg_dbg", vlclua_msg_dbg },
     { "msg_warn", vlclua_msg_warn },
     { "msg_err", vlclua_msg_err },
