@@ -33,6 +33,7 @@
 #include <vlc_es.h>
 #include <vlc_meta.h>
 #include <vlc_epg.h>
+#include <vlc_events.h>
 
 struct vlc_meta_t;
 
@@ -79,7 +80,9 @@ struct input_item_t
     int           i_nb_played;       /**< Number of times played */
 
     vlc_meta_t *p_meta;
-    
+
+    vlc_event_manager_t event_manager;
+
     vlc_mutex_t lock;                 /**< Lock for the item */
 };
 
@@ -111,6 +114,9 @@ static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
     p_i->p_meta = NULL;
 
     vlc_mutex_init( p_o, &p_i->lock );
+    vlc_event_manager_init( &p_i->event_manager, p_i );
+    vlc_event_manager_register_event_type( &p_i->event_manager,
+        vlc_InputItemMetaChanged );
 }
 
 static inline void input_ItemCopyOptions( input_item_t *p_parent,
@@ -134,6 +140,8 @@ VLC_EXPORT( void, input_ItemAddOptionNoDup,( input_item_t *, const char * ) );
 static inline void input_ItemClean( input_item_t *p_i )
 {
     int i;
+
+    vlc_event_manager_fini( &p_i->event_manager );
 
     free( p_i->psz_name );
     free( p_i->psz_uri );
@@ -187,9 +195,15 @@ static inline void input_ItemClean( input_item_t *p_i )
 
 static inline void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz_val )
 {
+    vlc_event_t event;
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
     vlc_meta_Set( p_i->p_meta, meta_type, psz_val );
+
+    /* Notify interested third parties */
+    event.type = vlc_InputItemMetaChanged;
+    event.u.input_item_meta_changed.meta_type = meta_type;
+    vlc_event_send( &p_i->event_manager, &event );
 }
 
 static inline const char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type )

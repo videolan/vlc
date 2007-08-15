@@ -68,7 +68,7 @@ typedef struct vlc_event_listeners_group_t
  * necessarily a vlc_object_t (an input_item_t is not a vlc_object_t
  * for instance).
  */
-int event_manager_Create( vlc_event_manager_t * p_em, void * p_obj )
+int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj )
 {
     p_em->p_obj = p_obj;
     ARRAY_INIT( p_em->listeners_groups );
@@ -78,7 +78,7 @@ int event_manager_Create( vlc_event_manager_t * p_em, void * p_obj )
 /**
  * Destroy the event manager
  */
-void event_manager_Destroy( vlc_event_manager_t * p_em )
+void vlc_event_manager_fini( vlc_event_manager_t * p_em )
 {
     struct vlc_event_listeners_group_t * listeners_group;
     struct vlc_event_listener_t * listener;
@@ -95,7 +95,7 @@ void event_manager_Destroy( vlc_event_manager_t * p_em )
 /**
  * Destroy the event manager
  */
-int event_manager_RegisterEventType(
+int vlc_event_manager_register_event_type(
         vlc_event_manager_t * p_em,
         vlc_event_type_t event_type )
 {
@@ -116,8 +116,8 @@ int event_manager_RegisterEventType(
 /**
  * Send an event to the listener attached to this p_em.
  */
-void event_Send( vlc_event_manager_t * p_em,
-                 vlc_event_t * p_event )
+void vlc_event_send( vlc_event_manager_t * p_em,
+                     vlc_event_t * p_event )
 {
     vlc_event_listeners_group_t * listeners_group;
     vlc_event_listener_t * listener;
@@ -140,10 +140,10 @@ void event_Send( vlc_event_manager_t * p_em,
 /**
  * Add a callback for an event.
  */
-int event_Attach( vlc_event_manager_t * p_event_manager,
-                  vlc_event_type_t event_type,
-                  vlc_event_callback_t pf_callback,
-                  void *p_user_data )
+int vlc_event_attach( vlc_event_manager_t * p_event_manager,
+                      vlc_event_type_t event_type,
+                      vlc_event_callback_t pf_callback,
+                      void *p_user_data )
 {
     vlc_event_listeners_group_t * listeners_group;
     vlc_event_listener_t * listener;
@@ -169,10 +169,10 @@ int event_Attach( vlc_event_manager_t * p_event_manager,
 /**
  * Remove a callback for an event.
  */
-int event_Detach( vlc_event_manager_t *p_event_manager,
-                   vlc_event_type_t event_type,
-                   vlc_event_callback_t pf_callback,
-                   void *p_user_data )
+int vlc_event_detach( vlc_event_manager_t *p_event_manager,
+                      vlc_event_type_t event_type,
+                      vlc_event_callback_t pf_callback,
+                      void *p_user_data )
 {
     vlc_event_listeners_group_t * listeners_group;
     struct vlc_event_listener_t * listener;
