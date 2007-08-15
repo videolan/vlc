@@ -163,8 +163,8 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     }
 
     /* -> the artist/creator */
-    psz = p_item->p_input->p_meta->psz_artist ?
-                        strdup( p_item->p_input->p_meta->psz_artist ):
+    psz = input_item_GetArtist( p_item->p_input ) ?
+                        strdup( input_item_GetArtist( p_item->p_input ) ):
                         strdup( "" );
     psz_temp = convert_xml_special_chars( psz );
     if( psz ) free( psz );
@@ -175,8 +175,8 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     free( psz_temp );
 
     /* -> the album */
-    psz = p_item->p_input->p_meta->psz_album ?
-                        strdup( p_item->p_input->p_meta->psz_album ):
+    psz = input_item_GetAlbum( p_item->p_input ) ?
+                        strdup( input_item_GetAlbum( p_item->p_input ) ):
                         strdup( "" );
     psz_temp = convert_xml_special_chars( psz );
     if( psz ) free( psz );
@@ -187,8 +187,8 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     free( psz_temp );
 
     /* -> the track number */
-    psz = p_item->p_input->p_meta->psz_tracknum ?
-                        strdup( p_item->p_input->p_meta->psz_tracknum ):
+    psz = input_item_GetTrackNum( p_item->p_input ) ?
+                        strdup( input_item_GetTrackNum( p_item->p_input ) ):
                         strdup( "" );
     if( psz )
     {
@@ -200,8 +200,8 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     }
 
     /* -> the description */
-    psz = p_item->p_input->p_meta->psz_description ?
-                        strdup( p_item->p_input->p_meta->psz_description ):
+    psz = input_item_GetDescription( p_item->p_input ) ?
+                        strdup( input_item_GetDescription( p_item->p_input ) ):
                         strdup( "" );
     psz_temp = convert_xml_special_chars( psz );
     if( psz ) free( psz );

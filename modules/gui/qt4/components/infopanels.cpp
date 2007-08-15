@@ -136,6 +136,7 @@ MetaPanel::~MetaPanel(){}
 void MetaPanel::saveMeta()
 {
     playlist_t *p_playlist;
+    char * psz;
 
     meta_export_t p_export;
     p_export.p_item = p_input;
@@ -158,20 +159,19 @@ void MetaPanel::saveMeta()
         return;
 
     /* now we read the modified meta data */
-    free( p_input->p_meta->psz_artist );
-    p_input->p_meta->psz_artist = strdup( qtu( artist_text->text() ) );
-    free( p_input->p_meta->psz_album );
-    p_input->p_meta->psz_album = strdup( qtu( collection_text->text() ) );
-    free( p_input->p_meta->psz_genre );
-    p_input->p_meta->psz_genre = strdup( qtu( genre_text->text() ) );
-    free( p_input->p_meta->psz_date );
-    p_input->p_meta->psz_date = (char*) malloc(5);
-    snprintf( p_input->p_meta->psz_date, 5, "%d", date_text->value() );
-    free( p_input->p_meta->psz_tracknum );
-    p_input->p_meta->psz_tracknum = (char*) malloc(5);
-    snprintf( p_input->p_meta->psz_tracknum, 5, "%d", seqnum_text->value() );
-    free( p_input->p_meta->psz_title );
-    p_input->p_meta->psz_title = strdup( qtu( title_text->text() ) );
+    input_item_SetArtist( p_input, qtu( artist_text->text() ) );
+    input_item_SetAlbum(  p_input, qtu( collection_text->text() ) );
+    input_item_SetGenre(  p_input, qtu( genre_text->text() ) );
+    
+    asnprintf( &psz, 5, "%d", date_text->value() );
+    input_item_SetDate(  p_input, psz );
+    free( psz );
+
+    asnprintf( &psz, 5, "%d", seqnum_text->value() );
+    input_item_SetTrackNum(  p_input, psz );
+    free( psz );
+
+    input_item_SetTitle(  p_input, qtu( title_text->text() ) );
 
     p_playlist = pl_Yield( p_intf );
 
@@ -190,23 +190,21 @@ void MetaPanel::saveMeta()
  **/
 void MetaPanel::update( input_item_t *p_item )
 {
-    if( !p_item->p_meta )
-        return;
     char *psz_meta; 
 #define UPDATE_META( meta, widget ) {               \
-    psz_meta = p_item->p_meta->psz_##meta;          \
+    psz_meta = input_item_Get##meta( p_item );      \
     if( !EMPTY_STR( psz_meta ) )                    \
         widget->setText( qfu( psz_meta ) );         \
     else                                            \
         widget->setText( "" ); }
 
 #define UPDATE_META_INT( meta, widget ) {           \
-    psz_meta = p_item->p_meta->psz_##meta;          \
+    psz_meta = input_item_Get##meta( p_item );      \
     if( !EMPTY_STR( psz_meta ) )                    \
         widget->setValue( atoi( psz_meta ) ); }
 
     /* Name / Title */
-    psz_meta = p_item->p_meta->psz_title;
+    psz_meta = input_item_GetTitle( p_item );
     if( !EMPTY_STR( psz_meta ) )
         title_text->setText( qfu( psz_meta ) );
     else if( !EMPTY_STR( p_item->psz_name ) )
@@ -214,31 +212,32 @@ void MetaPanel::update( input_item_t *p_item )
     else title_text->setText( "" );
 
     /* URL / URI */
-    psz_meta = p_item->p_meta->psz_url;
+    psz_meta = input_item_GetURL( p_item );
     if( !EMPTY_STR( psz_meta ) )
         emit uriSet( QString( psz_meta ) );
     else if( !EMPTY_STR( p_item->psz_uri ) )
         emit uriSet( QString( p_item->psz_uri ) );
 
     /* Other classic though */
-    UPDATE_META( artist, artist_text );
-    UPDATE_META( genre, genre_text );
-    UPDATE_META( copyright, copyright_text );
-    UPDATE_META( album, collection_text );
-    UPDATE_META( description, description_text );
-    UPDATE_META( language, language_text );
-    UPDATE_META( nowplaying, nowplaying_text );
-    UPDATE_META( publisher, publisher_text );
-    UPDATE_META( setting, setting_text );
+    UPDATE_META( Artist, artist_text );
+    UPDATE_META( Genre, genre_text );
+    UPDATE_META( Copyright, copyright_text );
+    UPDATE_META( Album, collection_text );
+    UPDATE_META( Description, description_text );
+    UPDATE_META( Language, language_text );
+    UPDATE_META( NowPlaying, nowplaying_text );
+    UPDATE_META( Publisher, publisher_text );
+    UPDATE_META( Setting, setting_text );
 
-    UPDATE_META_INT( date, date_text );
-    UPDATE_META_INT( tracknum, seqnum_text );
-    UPDATE_META_INT( rating, rating_text );
+    UPDATE_META_INT( Date, date_text );
+    UPDATE_META_INT( Tracknum, seqnum_text );
+    UPDATE_META_INT( Rating, rating_text );
 
+#undef UPDATE_META_INT
 #undef UPDATE_META
 
     /* Art Urls */
-    psz_meta = p_item->p_meta->psz_arturl;
+    psz_meta = input_item_GetArtURL( p_item );
     if( psz_meta && !strncmp( psz_meta, "file://", 7 ) )
     {
         QString artUrl = qfu( psz_meta ).replace( "file://",QString("" ) );

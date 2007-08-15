@@ -548,7 +548,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( (NULL != title_name) && ('\0' != title_name[0]) )
             {
                 vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
-                vlc_meta_SetTitle( p_meta, title_name );
+                vlc_meta_Set( p_meta, vlc_meta_Title, title_name );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;

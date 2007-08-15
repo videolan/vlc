@@ -121,7 +121,7 @@ void MetaDataPanel::Update( input_item_t *p_item )
     name_text->SetValue( wxU( p_item->psz_name ) );
 
 #define UPDATE_META( meta, widget ) {                                       \
-    char *psz_meta = p_item->p_meta->psz_##meta;                            \
+    const char *psz_meta = input_item_Get##meta( p_item );                  \
     if( psz_meta != NULL && *psz_meta)                                      \
     {                                                                       \
         widget->SetLabel( wxU( psz_meta ) );                                \
@@ -129,18 +129,18 @@ void MetaDataPanel::Update( input_item_t *p_item )
     else { widget->SetLabel( wxU( "-" ) ); }                                \
     }
 
-    UPDATE_META( artist, artist_text );
-    UPDATE_META( genre, genre_text );
-    UPDATE_META( copyright, copyright_text );
-    UPDATE_META( album, collection_text );
-    UPDATE_META( tracknum, seqnum_text );
-    UPDATE_META( description, description_text );
-    UPDATE_META( rating, rating_text );
-    UPDATE_META( date, date_text );
-    UPDATE_META( language, language_text );
-    UPDATE_META( nowplaying, nowplaying_text );
-    UPDATE_META( publisher, publisher_text );
-    UPDATE_META( setting, setting_text );
+    UPDATE_META( Artist, artist_text );
+    UPDATE_META( Genre, genre_text );
+    UPDATE_META( Copyright, copyright_text );
+    UPDATE_META( Album, collection_text );
+    UPDATE_META( TrackNum, seqnum_text );
+    UPDATE_META( Description, description_text );
+    UPDATE_META( Rating, rating_text );
+    UPDATE_META( Date, date_text );
+    UPDATE_META( Language, language_text );
+    UPDATE_META( NowPlaying, nowplaying_text );
+    UPDATE_META( Publisher, publisher_text );
+    UPDATE_META( Setting, setting_text );
 
 #undef UPDATE_META
 }

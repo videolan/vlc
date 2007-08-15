@@ -257,11 +257,10 @@ static int Demux( demux_t *p_demux )
                 {
                     p_input = input_ItemNewExt( p_playlist, psz_mrl, psz_name,
                                                 0, NULL, -1 );
-                    p_input->p_meta = vlc_meta_New();
                     if( psz_now )
-                        vlc_meta_SetNowPlaying( p_input->p_meta, psz_now );
+                        input_item_SetNowPlaying( p_input, psz_now );
                     if( psz_genre )
-                        vlc_meta_SetGenre( p_input->p_meta, psz_genre );
+                        input_item_SetGenre( p_input, psz_genre );
                     if( psz_listeners )
                         msg_Err( p_playlist, "Unsupported meta listeners" );
                     if( psz_bitrate )

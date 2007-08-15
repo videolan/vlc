@@ -1053,24 +1053,24 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
     {
 #define ADD_META_BOX( type, box_string ) { \
         bo_t *box = NULL;  \
-        if( p_meta->psz_##type ) box = box_new( "\251" box_string ); \
+        if( vlc_meta_Get( p_meta, vlc_meta_##type ) ) box = box_new( "\251" box_string ); \
         if( box ) \
         { \
-            bo_add_16be( box, strlen( p_meta->psz_##type ) ); \
+            bo_add_16be( box, strlen( vlc_meta_Get( p_meta, vlc_meta_##type ) )); \
             bo_add_16be( box, 0 ); \
-            bo_add_mem( box, strlen( p_meta->psz_##type ), \
-                        (uint8_t*)(p_meta->psz_##type ) ); \
+            bo_add_mem( box, strlen( vlc_meta_Get( p_meta, vlc_meta_##type ) ), \
+                        (uint8_t*)(vlc_meta_Get( p_meta, vlc_meta_##type ) ) ); \
             box_fix( box ); \
             box_gather( udta, box ); \
         } }
 
-        ADD_META_BOX( title, "nam" );
-        ADD_META_BOX( artist, "ART" );
-        ADD_META_BOX( genre, "gen" );
-        ADD_META_BOX( copyright, "cpy" );
-        ADD_META_BOX( description, "des" );
-        ADD_META_BOX( date, "day" );
-        ADD_META_BOX( url, "url" );
+        ADD_META_BOX( Title, "nam" );
+        ADD_META_BOX( Artist, "ART" );
+        ADD_META_BOX( Genre, "gen" );
+        ADD_META_BOX( Copyright, "cpy" );
+        ADD_META_BOX( Description, "des" );
+        ADD_META_BOX( Date, "day" );
+        ADD_META_BOX( URL, "url" );
 #undef ADD_META_BOX
     }
 

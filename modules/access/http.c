@@ -740,11 +740,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
             p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
 
             if( p_sys->psz_icy_name )
-                vlc_meta_SetTitle( p_meta, p_sys->psz_icy_name );
+                vlc_meta_Set( p_meta, vlc_meta_Title, p_sys->psz_icy_name );
             if( p_sys->psz_icy_genre )
-                vlc_meta_SetGenre( p_meta, p_sys->psz_icy_genre );
+                vlc_meta_Set( p_meta, vlc_meta_Genre, p_sys->psz_icy_genre );
             if( p_sys->psz_icy_title )
-                vlc_meta_SetNowPlaying( p_meta, p_sys->psz_icy_title );
+                vlc_meta_Set( p_meta, vlc_meta_NowPlaying, p_sys->psz_icy_title );
             break;
 
         case ACCESS_GET_TITLE_INFO:

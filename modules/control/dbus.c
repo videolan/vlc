@@ -866,7 +866,7 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
 
 #define ADD_VLC_META_STRING( entry, item ) \
         ADD_META( entry, DBUS_TYPE_STRING, \
-                p_input->p_meta->psz_##item );
+                input_item_Get##item( p_input );
 
 static int GetInputMeta( input_item_t* p_input,
                         DBusMessageIter *args )
@@ -889,23 +889,23 @@ static int GetInputMeta( input_item_t* p_input,
 
     dbus_message_iter_open_container( args, DBUS_TYPE_ARRAY, "{sv}", &dict );
 
-    ADD_VLC_META_STRING( 0, title );
-    ADD_VLC_META_STRING( 1, artist );
-    ADD_VLC_META_STRING( 2, genre );
-    ADD_VLC_META_STRING( 3, copyright );
-    ADD_VLC_META_STRING( 4, album );
-    ADD_VLC_META_STRING( 5, tracknum );
-    ADD_VLC_META_STRING( 6, description );
-    ADD_VLC_META_STRING( 7, rating );
-    ADD_VLC_META_STRING( 8, date );
-    ADD_VLC_META_STRING( 9, setting );
-    ADD_VLC_META_STRING( 10, url );
-    ADD_VLC_META_STRING( 11, language );
-    ADD_VLC_META_STRING( 12, nowplaying );
-    ADD_VLC_META_STRING( 13, publisher );
-    ADD_VLC_META_STRING( 14, encodedby );
-    ADD_VLC_META_STRING( 15, arturl );
-    ADD_VLC_META_STRING( 16, trackid ); 
+    ADD_VLC_META_STRING( 0,  Title );
+    ADD_VLC_META_STRING( 1,  Artist );
+    ADD_VLC_META_STRING( 2,  Genre );
+    ADD_VLC_META_STRING( 3,  Copyright );
+    ADD_VLC_META_STRING( 4,  Album );
+    ADD_VLC_META_STRING( 5,  TrackNum );
+    ADD_VLC_META_STRING( 6,  Description );
+    ADD_VLC_META_STRING( 7,  Rating );
+    ADD_VLC_META_STRING( 8,  Date );
+    ADD_VLC_META_STRING( 9,  Setting );
+    ADD_VLC_META_STRING( 10, URL );
+    ADD_VLC_META_STRING( 11, Language );
+    ADD_VLC_META_STRING( 12, NowPlaying );
+    ADD_VLC_META_STRING( 13, Publisher );
+    ADD_VLC_META_STRING( 14, EncodedBy );
+    ADD_VLC_META_STRING( 15, ArtURL );
+    ADD_VLC_META_STRING( 16, TrackID ); 
 
     ADD_META( 17, DBUS_TYPE_INT32, p_input->p_meta->i_status );
     ADD_META( 18, DBUS_TYPE_STRING, p_input->psz_uri );

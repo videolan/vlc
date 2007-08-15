@@ -193,22 +193,22 @@ static int WriteMeta( vlc_object_t *p_this )
 
         TagLib::Tag *tag = f.tag();
 
-        SET( Artist, p_item->p_meta->psz_artist );
+        SET( Artist, input_item_GetArtist( p_item ) );
 
-        char *psz_titlec = ( p_item->p_meta->psz_title ?
-            p_item->p_meta->psz_title : p_item->psz_name );
+        const char *psz_titlec = ( input_item_GetTitle( p_item ) ?
+            input_item_GetTitle( p_item ) : p_item->psz_name );
         TagLib::String *psz_title = new TagLib::String( psz_titlec,
             TagLib::String::UTF8 );
         tag->setTitle( *psz_title );
         delete psz_title;
 
-        SET( Album, p_item->p_meta->psz_album );
-        SET( Genre, p_item->p_meta->psz_genre );
+        SET( Album, input_item_GetAlbum( p_item ) );
+        SET( Genre, input_item_GetGenre( p_item ) );
 
-        if( p_item->p_meta->psz_date )
-            tag->setYear( atoi( p_item->p_meta->psz_date ) );
-        if( p_item->p_meta->psz_tracknum )
-            tag->setTrack( atoi( p_item->p_meta->psz_tracknum ) );
+        if( input_item_GetDate( p_item ) )
+            tag->setYear( atoi( input_item_GetDate( p_item ) ) );
+        if( input_item_GetTrackNum( p_item ) )
+            tag->setTrack( atoi( input_item_GetTrackNum( p_item ) ) );
 
         f.save();
         return VLC_SUCCESS;

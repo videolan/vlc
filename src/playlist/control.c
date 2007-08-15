@@ -456,7 +456,7 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
         vlc_mutex_lock( &p_input->lock );
         /* p_input->p_meta should not be null after a successfull CreateThread */
-        b_has_art = p_input->p_meta && !EMPTY_STR( p_input->p_meta->psz_arturl );
+        b_has_art = !EMPTY_STR( input_item_GetArtURL( p_input ) );
         vlc_mutex_unlock( &p_input->lock );
 
         if( !b_has_art )

@@ -423,13 +423,12 @@ static int DemuxStation( demux_t *p_demux )
                     SADD_INFO( "Bitrate", psz_br );
                     SADD_INFO( "Listeners", psz_lc );
                     SADD_INFO( "Load", psz_load );
-                    p_input->p_meta = vlc_meta_New();
                     if( psz_genre )
-                        vlc_meta_SetGenre( p_input->p_meta, psz_genre );
+                        input_item_SetGenre( p_input, psz_genre );
                     if( psz_ct )
-                        vlc_meta_SetNowPlaying( p_input->p_meta, psz_ct );
+                        input_item_SetNowPlaying( p_input, psz_ct );
                     if( psz_rt )
-                        vlc_meta_SetRating( p_input->p_meta, psz_rt );
+                        input_item_SetRating( p_input, psz_rt );
 
                     playlist_BothAddInput( p_sys->p_playlist, p_input,
                                            p_sys->p_item_in_category,

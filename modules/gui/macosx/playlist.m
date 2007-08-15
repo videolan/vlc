@@ -271,32 +271,24 @@
     if( [[o_tc identifier] isEqualToString:@"1"] )
     {
         /* sanity check to prevent the NSString class from crashing */
-        if( p_item->p_input->p_meta && p_item->p_input->p_meta->psz_title && 
-            *p_item->p_input->p_meta->psz_title )
+        if( !EMPTY_STR( input_item_GetTitle( p_item->p_input ) ) )
         {
-            o_value = [NSString stringWithUTF8String:
-                p_item->p_input->p_meta->psz_title];
+            o_value = [NSString stringWithUTF8String: input_item_GetTitle( p_item->p_input )];
             if( o_value == NULL )
-                o_value = [NSString stringWithCString:
-                    p_item->p_input->p_meta->psz_title];
+                o_value = [NSString stringWithCString: input_item_GetTitle( p_item->p_input )];
         } 
         else if( p_item->p_input->psz_name != NULL )
         {
-            o_value = [NSString stringWithUTF8String:
-                p_item->p_input->psz_name];
+            o_value = [NSString stringWithUTF8String: p_item->p_input->psz_name];
             if( o_value == NULL )
-                o_value = [NSString stringWithCString:
-                    p_item->p_input->psz_name];
+                o_value = [NSString stringWithCString: p_item->p_input->psz_name];
         }
     }
-    else if( [[o_tc identifier] isEqualToString:@"2"] && p_item->p_input->p_meta &&
-        p_item->p_input->p_meta->psz_artist && *p_item->p_input->p_meta->psz_artist )
+    else if( [[o_tc identifier] isEqualToString:@"2"] && !EMPTY_STR( input_item_GetArtist( p_item->p_input ) ) )
     {
-        o_value = [NSString stringWithUTF8String:
-            p_item->p_input->p_meta->psz_artist];
+        o_value = [NSString stringWithUTF8String: input_item_GetArtist( p_item->p_input )];
         if( o_value == NULL )
-            o_value = [NSString stringWithCString:
-                p_item->p_input->p_meta->psz_artist];
+            o_value = [NSString stringWithCString: input_item_GetArtist( p_item->p_input )];
     }
     else if( [[o_tc identifier] isEqualToString:@"3"] )
     {

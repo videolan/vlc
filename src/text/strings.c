@@ -682,44 +682,34 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
             switch( *s )
             {
                 case 'a':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_artist );
+                    INSERT_STRING( p_item, input_item_GetArtist(p_item) );
                     break;
                 case 'b':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_album );
+                    INSERT_STRING( p_item, input_item_GetAlbum(p_item) );
                     break;
                 case 'c':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_copyright );
+                    INSERT_STRING( p_item, input_item_GetCopyright(p_item) );
                     break;
                 case 'd':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_description );
+                    INSERT_STRING( p_item, input_item_GetDescription(p_item) );
                     break;
                 case 'e':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_encodedby );
+                    INSERT_STRING( p_item, input_item_GetEncodedBy(p_item) );
                     break;
                 case 'g':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_genre );
+                    INSERT_STRING( p_item, input_item_GetGenre(p_item) );
                     break;
                 case 'l':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_language );
+                    INSERT_STRING( p_item, input_item_GetLanguage(p_item) );
                     break;
                 case 'n':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_tracknum );
+                    INSERT_STRING( p_item, input_item_GetTrackNum(p_item) );
                     break;
                 case 'p':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_nowplaying );
+                    INSERT_STRING( p_item, input_item_GetNowPlaying(p_item) );
                     break;
                 case 'r':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_rating );
+                    INSERT_STRING( p_item, input_item_GetRating(p_item) );
                     break;
                 case 's':
                 {
@@ -737,16 +727,13 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     break;
                 }
                 case 't':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_title );
+                    INSERT_STRING( p_item, input_item_GetTitle(p_item) );
                     break;
                 case 'u':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_url );
+                    INSERT_STRING( p_item, input_item_GetURL(p_item) );
                     break;
                 case 'A':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_date );
+                    INSERT_STRING( p_item, input_item_GetDate(p_item) );
                     break;
                 case 'B':
                     if( p_input )
@@ -884,8 +871,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     INSERT_STRING( 1, buf );
                     break;
                 case 'U':
-                    INSERT_STRING( p_item && p_item->p_meta,
-                                   p_item->p_meta->psz_publisher );
+                    INSERT_STRING( p_item, input_item_GetPublisher(p_item) );
                     break;
                 case 'V':
                 {

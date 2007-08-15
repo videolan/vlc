@@ -179,7 +179,7 @@ static int Open( vlc_object_t * p_this )
             p_sys->p_meta = vlc_meta_New();
         snprintf( psz_url, sizeof(psz_url), "attachment://%s",
                   p_sys->attachment[p_sys->i_cover_idx]->psz_name );
-        vlc_meta_SetArtURL( p_sys->p_meta, psz_url );
+        vlc_meta_Set( p_sys->p_meta, vlc_meta_ArtworkURL, psz_url );
     }
     vlc_audio_replay_gain_MergeFromMeta( &p_sys->replay_gain, p_sys->p_meta );
     return VLC_SUCCESS;
@@ -566,25 +566,6 @@ static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, int i_data,
     /* TODO sort it by size and remove wrong seek entry (time not increasing) */
 }
 
-static inline void astrcat( char **ppsz_dst, const char *psz_src )
-{
-    char *psz_old = *ppsz_dst;
-
-    if( !psz_src || !psz_src[0] )
-        return;
-
-    if( psz_old )
-    {
-        if( asprintf( ppsz_dst, "%s,%s", psz_old, psz_src ) == -1 )
-            *ppsz_dst = NULL;
-        free( psz_old );
-    }
-    else
-    {
-        *ppsz_dst = strdup( psz_src );
-    }
-}
-
 #define RM(x) do { i_data -= (x); p_data += (x); } while(0)
 static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
 {
@@ -636,15 +617,28 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
 
         EnsureUTF8( psz );
 
-#define IF_EXTRACT(txt,var) if( !strncasecmp(psz, txt, strlen(txt)) ) { astrcat( &p_sys->p_meta->var, &psz[strlen(txt)] ); }
-        IF_EXTRACT("TITLE=", psz_title )
-        else IF_EXTRACT("ALBUM=", psz_album )
-        else IF_EXTRACT("TRACKNUMBER=", psz_tracknum )
-        else IF_EXTRACT("ARTIST=", psz_artist )
-        else IF_EXTRACT("COPYRIGHT=", psz_copyright )
-        else IF_EXTRACT("DESCRIPTION=", psz_description )
-        else IF_EXTRACT("GENRE=", psz_genre )
-        else IF_EXTRACT("DATE=", psz_date )
+#define IF_EXTRACT(txt,var) \
+    if( !strncasecmp(psz, txt, strlen(txt)) ) \
+    { \
+        const char * oldval = vlc_meta_Get( p_sys->p_meta, vlc_meta_ ## var ); \
+        if( oldval ) \
+        { \
+            char * newval; \
+            asprintf( &newval, "%s,%s", oldval, &psz[strlen(txt)] ); \
+            vlc_meta_Set( p_sys->p_meta, vlc_meta_ ## var, newval ); \
+            free( newval ); \
+        } \
+        else \
+            vlc_meta_Set( p_sys->p_meta, vlc_meta_ ## var, &psz[strlen(txt)] ); \
+    }
+        IF_EXTRACT("TITLE=", Title )
+        else IF_EXTRACT("ALBUM=", Album )
+        else IF_EXTRACT("TRACKNUMBER=", TrackNumber )
+        else IF_EXTRACT("ARTIST=", Artist )
+        else IF_EXTRACT("COPYRIGHT=", Copyright )
+        else IF_EXTRACT("DESCRIPTION=", Description )
+        else IF_EXTRACT("GENRE=", Genre )
+        else IF_EXTRACT("DATE=", Date )
         else if( strchr( psz, '=' ) )
         {
             /* generic (PERFORMER/LICENSE/ORGANIZATION/LOCATION/CONTACT/ISRC,

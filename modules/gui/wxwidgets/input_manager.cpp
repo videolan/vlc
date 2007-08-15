@@ -210,7 +210,8 @@ void InputManager::UpdateInput()
 
 void InputManager::UpdateNowPlaying()
 {
-    char *psz_now_playing = input_GetItem(p_input)->p_meta->psz_nowplaying ?
+    const char *psz_now_playing = 
+        input_item_GetNowPlaying( input_GetItem(p_input) ) ?
                     strdup( input_GetItem(p_input)->p_meta->psz_nowplaying ):
                     strdup( "" );
     if( psz_now_playing && *psz_now_playing )

@@ -175,8 +175,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->input.i_cr_average = 0;
 
     vlc_mutex_lock( &p_item->lock );
-    if( !p_input->p->input.p_item->p_meta )
-        p_input->p->input.p_item->p_meta = vlc_meta_New();
 
     if( !p_item->p_stats )
         p_item->p_stats = stats_NewInputStats( p_input );
@@ -253,9 +251,11 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     }
 
     /* Remove 'Now playing' info as it is probably outdated */
-    input_Control( p_input, INPUT_DEL_INFO, _(VLC_META_INFO_CAT), VLC_META_NOW_PLAYING );
+    input_Control( p_input, INPUT_DEL_INFO,
+        _(VLC_META_INFO_CAT),
+        _(VLC_META_NOW_PLAYING) );
     vlc_mutex_lock( &p_item->lock );
-    vlc_meta_SetNowPlaying( p_item->p_meta, NULL );
+    input_item_SetNowPlaying( p_item, NULL );
     vlc_mutex_unlock( &p_item->lock );
 
     /* */
@@ -2484,19 +2484,17 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
     /* Get meta information from user */
 #define GET_META( field, s ) \
     var_Get( p_input, (s), &val );  \
-    if( *val.psz_string ) { \
-        if( p_meta->psz_ ## field ) free ( p_meta->psz_ ## field ); \
-        p_meta->psz_ ## field = strdup( val.psz_string ); \
-    } \
+    if( *val.psz_string ) \
+        vlc_meta_Set( p_meta, vlc_meta_ ## field, val.psz_string ); \
     free( val.psz_string )
 
-    GET_META( title, "meta-title" );
-    GET_META( artist, "meta-artist" );
-    GET_META( genre, "meta-genre" );
-    GET_META( copyright, "meta-copyright" );
-    GET_META( description, "meta-description" );
-    GET_META( date, "meta-date" );
-    GET_META( url, "meta-url" );
+    GET_META( Title, "meta-title" );
+    GET_META( Artist, "meta-artist" );
+    GET_META( Genre, "meta-genre" );
+    GET_META( Copyright, "meta-copyright" );
+    GET_META( Description, "meta-description" );
+    GET_META( Date, "meta-date" );
+    GET_META( URL, "meta-url" );
 #undef GET_META
 }
 
@@ -2507,6 +2505,8 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
 static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
 {
     input_item_t *p_item = p_input->p->input.p_item;
+    char * psz_saved_arturl = NULL;
+    const char * psz_arturl = NULL;
     char *psz_title = NULL;
     int i;
 
@@ -2514,43 +2514,39 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
         return;
 
     vlc_mutex_lock( &p_item->lock );
-    if( p_meta->psz_title && !p_item->b_fixed_name )
-        psz_title = strdup( p_meta->psz_title );
+    if( vlc_meta_Get( p_meta, vlc_meta_Title ) && !p_item->b_fixed_name )
+        psz_title = strdup( vlc_meta_Get( p_meta, vlc_meta_Title ) );
 
-    if( p_item->p_meta )
-    {
-        char *psz_arturl = p_item->p_meta->psz_arturl;
-        p_item->p_meta->psz_arturl = NULL;
+    if( input_item_GetArtURL( p_item ) )
+        psz_saved_arturl = strdup( input_item_GetArtURL( p_item ) );
 
-        vlc_meta_Merge( p_item->p_meta, p_meta );
+    vlc_meta_Merge( p_item->p_meta, p_meta );
 
-        if( psz_arturl && *psz_arturl )
-            vlc_meta_SetArtURL( p_item->p_meta, psz_arturl );
+    if( psz_saved_arturl && *psz_saved_arturl )
+        input_item_SetArtURL( p_item, psz_saved_arturl );
 
-        vlc_meta_Delete( p_meta );
-    }
-    else
-    {
-        p_item->p_meta = p_meta;
-    }
-    if( p_item->p_meta->psz_arturl && !strncmp( p_item->p_meta->psz_arturl, "attachment://", strlen("attachment") ) )
+    free( psz_saved_arturl );
+    vlc_meta_Delete( p_meta );
+
+    psz_arturl = input_item_GetArtURL( p_item );
+    if( psz_arturl && !strncmp( psz_arturl, "attachment://", strlen("attachment") ) )
     {
         /* Don't look for art cover if sout
          * XXX It can change when sout has meta data support */
         if( p_input->p->p_sout && !p_input->b_preparsing )
-            vlc_meta_SetArtURL( p_item->p_meta, "" );
+            input_item_SetArtURL( p_item, "" );
         else
             input_ExtractAttachmentAndCacheArt( p_input );
     }
-
-    p_item->p_meta->i_status |= ITEM_PREPARSED;
+    
+    input_item_SetPreparsed( p_item, VLC_TRUE );
 
     /* A bit ugly */
     p_meta = NULL;
     if( vlc_dictionary_keys_count( &p_item->p_meta->extra_tags ) > 0 )
     {
         p_meta = vlc_meta_New();
-        vlc_meta_Merge( p_meta, p_item->p_meta );
+        vlc_meta_Merge( p_meta, input_item_GetMetaObject( p_item ) );
     }
     vlc_mutex_unlock( &p_item->lock );
 

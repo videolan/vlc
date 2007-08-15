@@ -163,44 +163,41 @@ libvlc_media_descriptor_get_mrl( libvlc_media_descriptor_t * p_md,
 /**************************************************************************
  * Getter for meta information
  **************************************************************************/
-static const int meta_conversion[] =
+static const vlc_meta_type_t meta_conversion[] =
 {
-    [libvlc_meta_Title]        = 0, /* Offset in the vlc_meta_t structure */
-    [libvlc_meta_Artist]       = 1,
-    [libvlc_meta_Genre]        = 2,
-    [libvlc_meta_Copyright]    = 3,
-    [libvlc_meta_Album]        = 4,
-    [libvlc_meta_TrackNumber]  = 5,
-    [libvlc_meta_Description]  = 6,
-    [libvlc_meta_Rating]       = 7,
-    [libvlc_meta_Date]         = 8,
-    [libvlc_meta_Settings]     = 9,
-    [libvlc_meta_URL]          = 10,
-    [libvlc_meta_Language]     = 11,
-    [libvlc_meta_NowPlaying]   = 12,
-    [libvlc_meta_Publisher]    = 13,
-    [libvlc_meta_EncodedBy]    = 14,
-    [libvlc_meta_ArtworkURL]   = 15,
-    [libvlc_meta_TrackID]      = 16
+    [libvlc_meta_Artist]       = vlc_meta_Artist,
+    [libvlc_meta_Genre]        = vlc_meta_Genre,
+    [libvlc_meta_Copyright]    = vlc_meta_Copyright,
+    [libvlc_meta_Album]        = vlc_meta_Album,
+    [libvlc_meta_TrackNumber]  = vlc_meta_TrackNumber,
+    [libvlc_meta_Description]  = vlc_meta_Description,
+    [libvlc_meta_Rating]       = vlc_meta_Rating,
+    [libvlc_meta_Date]         = vlc_meta_Date,
+    [libvlc_meta_Settings]     = vlc_meta_Setting,
+    [libvlc_meta_URL]          = vlc_meta_URL,
+    [libvlc_meta_Language]     = vlc_meta_Language,
+    [libvlc_meta_NowPlaying]   = vlc_meta_NowPlaying,
+    [libvlc_meta_Publisher]    = vlc_meta_Publisher,
+    [libvlc_meta_EncodedBy]    = vlc_meta_EncodedBy,
+    [libvlc_meta_ArtworkURL]   = vlc_meta_ArtworkURL,
+    [libvlc_meta_TrackID]      = vlc_meta_TrackID
 };
 
 char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
                                          libvlc_meta_t e_meta,
                                          libvlc_exception_t *p_e )
 {
-    char ** ppsz_meta;
-    char *ppz_meta;
+    const char * psz_meta;
 
     /* XXX: locking */
 
     preparse_if_needed( p_md );
 
-    ppsz_meta = (char**)p_md->p_input_item->p_meta;
-    ppz_meta = ppsz_meta[ meta_conversion[e_meta] ];
+    psz_meta = input_item_GetMeta( p_md->p_input_item, meta_conversion[e_meta] );
 
-    if( !ppz_meta )
+    if( !psz_meta )
         return NULL;
 
-    return strdup( ppz_meta );
+    return strdup( psz_meta );
 }
 

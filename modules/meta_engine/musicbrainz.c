@@ -81,9 +81,8 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
     char *psz_artist;
     char *psz_album;
 
-    if( !p_item->p_meta ) return VLC_EGENERIC;
-    psz_artist = p_item->p_meta->psz_artist;
-    psz_album = p_item->p_meta->psz_album;
+    psz_artist = input_item_GetArtist( p_item );
+    psz_album = input_item_GetAlbum( p_item );
     psz_title = p_item->psz_name;
 
     if( !psz_artist || !psz_album )
@@ -143,7 +142,7 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
             snprintf( psz_data, 255,
                     "http://images.amazon.com/images/P/%s.01._SCLZZZZZZZ_.jpg",
                     psz_buf );
-            vlc_meta_SetArtURL( p_item->p_meta, psz_data );
+            input_item_SetArtURL( p_item, psz_data );
             break;
         }
     }
@@ -155,7 +154,7 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
     if( !b_art )
         return VLC_SUCCESS;
     else
-        return p_item->p_meta->psz_arturl && *p_item->p_meta->psz_arturl ?
+        return EMPTY_STR( input_item_GetArtURL( p_item ) ) ?
                VLC_SUCCESS : VLC_EGENERIC;
 }
 
@@ -168,7 +167,7 @@ static int FindMetaMBId( vlc_object_t *p_this )
 
     if( !i_ret )
     {
-        uint32_t i_meta = input_CurrentMetaFlags( p_item->p_meta );
+        uint32_t i_meta = input_CurrentMetaFlags( input_item_GetMetaObject( p_item ) );
         p_me->i_mandatory &= ~i_meta;
         p_me->i_optional &= ~i_meta;
         return p_me->i_mandatory ? VLC_EGENERIC : VLC_SUCCESS;

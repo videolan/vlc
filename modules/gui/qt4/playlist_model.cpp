@@ -184,10 +184,9 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     type = p_item->p_input->i_type;
     current = iscurrent;
 
-    if( current && p_item->p_input->p_meta &&
-        p_item->p_input->p_meta->psz_arturl &&
-        !strncmp( p_item->p_input->p_meta->psz_arturl, "file://", 7 ) )
-        model->sendArt( qfu( p_item->p_input->p_meta->psz_arturl ) );
+    if( current && input_item_GetArtURL( p_item ) &&
+        !strncmp( input_item_GetArtURL( p_item ), "file://", 7 ) )
+        model->sendArt( qfu( input_item_GetArtURL( p_item ) ) );
     else if( current )
         model->removeArt();
 
@@ -200,11 +199,8 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     }
 
 
-#define ADD_META( meta ) {             \
-   if( p_item->p_input->p_meta )       \
-      strings.append( qfu( meta ) );   \
-   else                                \
-      strings.append( qtr( "" ) ); }
+#define ADD_META( item, meta ) {             \
+      strings.append( qfu( input_item_Get ## meta ( item->p_input ) ) );   \
 
     for( int i_index=1; i_index <= VLC_META_ENGINE_MB_TRM_ID; i_index = i_index * 2 )
     {
@@ -213,34 +209,34 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
             switch( i_index )
             {
                 case VLC_META_ENGINE_ARTIST:
-                    ADD_META( p_item->p_input->p_meta->psz_artist );
+                    ADD_META( p_item, Artist );
                     break;
                 case VLC_META_ENGINE_TITLE:
-                    if( p_item->p_input->p_meta && p_item->p_input->p_meta->psz_title )
+                    if( input_item_GetTitle( p_item->p_input ) )
                     {
-                        ADD_META( p_item->p_input->p_meta->psz_title );
+                        ADD_META( p_item, Title );
                     } else {
                         strings.append( qfu( p_item->p_input->psz_name ) );
                     }
                     break;
                 case VLC_META_ENGINE_DESCRIPTION:
-                    ADD_META( p_item->p_input->p_meta->psz_description );
+                    ADD_META( p_item, Description );
                     break;
                 case VLC_META_ENGINE_DURATION:
                     secstotimestr( psz_duration, p_item->p_input->i_duration / 1000000 );
                     strings.append( QString( psz_duration ) );
                     break;
                 case VLC_META_ENGINE_GENRE:
-                    ADD_META( p_item->p_input->p_meta->psz_genre );
+                    ADD_META( p_item, Genre );
                     break;
                 case VLC_META_ENGINE_COLLECTION:
-                    ADD_META( p_item->p_input->p_meta->psz_album );
+                    ADD_META( p_item, Album );
                     break;
                 case VLC_META_ENGINE_SEQ_NUM:
-                    ADD_META( p_item->p_input->p_meta->psz_tracknum);
+                    ADD_META( p_item, TrackNum );
                     break;
                 case VLC_META_ENGINE_RATING:
-                    ADD_META( p_item->p_input->p_meta->psz_rating );
+                    ADD_META( p_item, Rating );
                 default:
                     break;
             }

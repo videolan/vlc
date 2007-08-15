@@ -1646,12 +1646,10 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
     {
         i_now = mdate();
         i_stop = i_now + (mtime_t)(p_vout->i_title_timeout * 1000);
-        if( input_GetItem(p_input)->p_meta &&
-            input_GetItem(p_input)->p_meta->psz_nowplaying &&
-            *input_GetItem(p_input)->p_meta->psz_nowplaying )
+        if( !EMPTY_STR(input_item_GetNowPlaying(input_GetItem(p_input))) )
         {
             vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
-                                   input_GetItem(p_input)->p_meta->psz_nowplaying, NULL,
+                                   input_item_GetNowPlaying(input_GetItem(p_input)), NULL,
                                    p_vout->i_title_position,
                                    30 + p_vout->fmt_in.i_width
                                       - p_vout->fmt_in.i_visible_width
@@ -1659,19 +1657,17 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
                                    20 + p_vout->fmt_in.i_y_offset,
                                    i_now, i_stop );
         }
-        else if( input_GetItem(p_input)->p_meta &&
-                 input_GetItem(p_input)->p_meta->psz_artist &&
-                 *input_GetItem(p_input)->p_meta->psz_artist )
+        else if( !EMPTY_STR(input_item_GetArtist(input_GetItem(p_input))) )
         {
             char *psz_string = NULL;
 
-            psz_string = malloc( strlen(input_GetItem(p_input)->psz_name) +
-                    strlen(input_GetItem(p_input)->p_meta->psz_artist) );
+            psz_string = malloc( strlen(input_GetItem(p_input)->psz_name) ) +
+                    strlen( input_item_GetArtist(input_GetItem(p_input)) );
             if( psz_string )
             {
                 sprintf( psz_string, "%s - %s",
                          input_GetItem(p_input)->psz_name,
-                         input_GetItem(p_input)->p_meta->psz_artist );
+                         input_item_GetArtist(input_GetItem(p_input)) );
 
                 vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
                                        psz_string, NULL,

@@ -132,20 +132,16 @@ void InputManager::update()
 
     /* Update text */
     QString text;
-    if( input_GetItem(p_input)->p_meta &&
-        input_GetItem(p_input)->p_meta->psz_nowplaying &&
-        *input_GetItem(p_input)->p_meta->psz_nowplaying )
+    if( !EMPTY_STR(input_item_GetNowPlaying( input_GetItem(p_input) )) )
     {
         text.sprintf( "%s - %s",
-                  input_GetItem(p_input)->p_meta->psz_nowplaying,
+                  input_item_GetNowPlaying( input_GetItem(p_input) ),
                   input_GetItem(p_input)->psz_name );
     }
-    else if( input_GetItem(p_input)->p_meta &&
-             input_GetItem(p_input)->p_meta->psz_artist &&
-             *input_GetItem(p_input)->p_meta->psz_artist )
+    else if( !EMPTY_STR(input_item_GetNowPlaying( input_GetArtist(p_input) )) )
     {
         text.sprintf( "%s - %s",
-                  input_GetItem(p_input)->p_meta->psz_artist,
+                  input_item_GetNowPlaying( input_GetArtist(p_input) ),
                   input_GetItem(p_input)->psz_name );
     }
     else

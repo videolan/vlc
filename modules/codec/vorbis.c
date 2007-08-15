@@ -639,8 +639,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetArtist( p_item->p_meta,
-                                        psz_value );
+                    input_item_SetArtist( p_item, psz_value );
                     input_ItemAddInfo( p_item,
                                         _(VLC_META_INFO_CAT),
                                         _(VLC_META_ARTIST),
@@ -651,8 +650,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetTitle( p_item->p_meta,
-                                    psz_value );
+                    input_item_SetTitle( p_item, psz_value );
                     p_item->psz_name = strdup( psz_value );
                 }
             }
@@ -660,16 +658,14 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetAlbum( p_item->p_meta,
-                                    psz_value );
+                    input_item_SetAlbum( p_item, psz_value );
                 }
             }
             else if( !strcasecmp( psz_name, "musicbrainz_trackid" ) )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetTrackID( p_item->p_meta,
-                                    psz_value );
+                    input_item_SetTrackID( p_item, psz_value );
                 }
             }
             else if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_GAIN" ) ||
@@ -708,16 +704,14 @@ static void ParseVorbisComments( decoder_t *p_dec )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetArtistID( p_item->p_meta,
-                                    psz_value );
+                    vlc_meta_SetArtistID( p_item, psz_value );
                 }
             }
             else if( !strcasecmp( psz_name, "musicbrainz_albumid" ) )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
                 {
-                    vlc_meta_SetAlbumID( p_item->p_meta,
-                                    psz_value );
+                    input_item_SetAlbumID( p_item, psz_value );
                 }
             }
 #endif

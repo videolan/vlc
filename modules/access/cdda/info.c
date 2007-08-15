@@ -156,11 +156,12 @@ cddb_end: ;
 }
 #endif /*HAVE_LIBCDDB*/
 
-#define add_meta_val(VLC_META, VAL)					\
-  if ( p_cdda->p_meta && VAL) {                                         \
-    /*vlc_meta_Add( p_cdda->p_meta, VLC_META, VAL );*/                      \
-    dbg_print( INPUT_DBG_META, "field %s: %s\n", VLC_META, VAL );       \
-  }                                                                     \
+#define add_meta_val(VLC_META, VAL)                           \
+  if ( p_cdda->p_meta && VAL) {                               \
+    /*vlc_meta_Add( p_cdda->p_meta, VLC_META, VAL );*/        \
+    dbg_print( INPUT_DBG_META, "field %s: %s\n",              \
+            input_MetaTypeToLocalizedString(VLC_META), VAL ); \
+  }                                                           \
 
 #define add_cddb_meta(FIELD, VLC_META)			                \
   add_meta_val(VLC_META, cddb_disc_get_##FIELD(p_cdda->cddb.disc));
@@ -289,9 +290,9 @@ CDDAMetaInfo( access_t *p_access, track_t i_track )
 	    psz_meta_artist = (char *)cddb_disc_get_artist(p_cdda->cddb.disc);
 	    if ( cddb_disc_get_genre(p_cdda->cddb.disc) && 
 		     strlen(cddb_disc_get_genre(p_cdda->cddb.disc)) )
-	        add_cddb_meta(genre, VLC_META_GENRE);
+	        add_cddb_meta(genre, vlc_meta_Genre);
 	    if ( 0 != cddb_disc_get_year(p_cdda->cddb.disc))
-	        add_cddb_meta_fmt(year, "%d", VLC_META_DATE );
+	        add_cddb_meta_fmt(year, "%d", vlc_meta_Date );
 	}
 	else
 	{
@@ -300,11 +301,11 @@ CDDAMetaInfo( access_t *p_access, track_t i_track )
 	  {
 	      if( cddb_track_get_title(t) != NULL && ! p_cdda->b_nav_mode )
 	      {
-		  add_meta_val( VLC_META_TITLE, cddb_track_get_title(t) );
+            add_meta_val( vlc_meta_Title, cddb_track_get_title(t) );
 	      }
 	      if( cddb_track_get_artist(t) != NULL )
 	      {
-		add_meta_val( VLC_META_ARTIST, cddb_track_get_artist(t) );
+            add_meta_val( vlc_meta_Artist, cddb_track_get_artist(t) );
 	      }
 	  }
 	}
@@ -454,14 +455,14 @@ CDDAMetaInfo( access_t *p_access, track_t i_track )
 	{
 	    char *psz_name = CDDAFormatTitle( p_access, i_track ) ;
 	    if ( !p_cdda->b_nav_mode ) {
-	        add_meta_val( VLC_META_TITLE, psz_name );
+	        add_meta_val( vlc_meta_Title, psz_name );
 	    } else 
 	    { 
 	        input_Control( p_cdda->p_input, INPUT_SET_NAME, psz_name );
 	        free(psz_name);
 	    }
 	    if (psz_meta_artist) 
-	      add_meta_val( VLC_META_ARTIST, psz_meta_artist );
+	      add_meta_val( vlc_meta_Artist, psz_meta_artist );
 	}
 	
     }

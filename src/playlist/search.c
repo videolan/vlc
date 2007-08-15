@@ -120,13 +120,12 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
         {
             playlist_LiveSearchUpdate( p_playlist, p_item, psz_string );
         }
-#define META_MATCHES( field ) ( p_item->p_input->p_meta && \
-                                p_item->p_input->p_meta->psz_##field && \
-                                strcasestr( p_item->p_input->p_meta->psz_##field, psz_string ) )
+#define META_MATCHES( field ) ( input_item_GetMeta( p_item->p_input, vlc_meta_##field ) && \
+                                strcasestr( input_item_GetMeta( p_item->p_input, vlc_meta_##field ), psz_string ) )
         else
         {
             if( strcasestr( p_item->p_input->psz_name, psz_string ) ||
-                META_MATCHES( artist ) || META_MATCHES( album ) )
+                META_MATCHES( Artist ) || META_MATCHES( Album ) )
                 p_item->i_flags &= ~PLAYLIST_DBL_FLAG;
             else
                 p_item->i_flags |= PLAYLIST_DBL_FLAG;

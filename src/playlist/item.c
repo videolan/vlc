@@ -556,18 +556,14 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
     if( p_playlist->b_auto_preparse &&
           (i_mode & PLAYLIST_PREPARSE ||
           ( i_mode & PLAYLIST_SPREPARSE &&
-            ( !p_item_cat->p_input->p_meta || (p_item_cat->p_input->p_meta &&
-              ( EMPTY_STR( p_item_cat->p_input->p_meta->psz_artist ) ||
-                EMPTY_STR( p_item_cat->p_input->p_meta->psz_album ) )
-              )
-            )
+            ( EMPTY_STR( input_item_GetArtist( p_item_cat->p_input ) ) ||
+            ( EMPTY_STR( input_item_GetAlbum( p_item_cat->p_input ) ) ) )
           ) ) )
         playlist_PreparseEnqueue( p_playlist, p_item_cat->p_input );
     /* If we already have it, signal it */
-    else if( p_item_cat->p_input->p_meta &&
-             !EMPTY_STR( p_item_cat->p_input->p_meta->psz_artist ) &&
-             !EMPTY_STR( p_item_cat->p_input->p_meta->psz_album ) )
-        p_item_cat->p_input->p_meta->i_status = ITEM_PREPARSED;
+    else if( !EMPTY_STR( input_item_GetArtist( p_item_cat->p_input ) ) &&
+             !EMPTY_STR( input_item_GetAlbum( p_item_cat->p_input ) ) )
+        input_item_SetPreparsed( p_item_cat->p_input, VLC_TRUE );
 }
 
 /* Add the playlist item to the requested node and fire a notification */

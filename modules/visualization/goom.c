@@ -416,10 +416,9 @@ static char *TitleGet( vlc_object_t *p_this )
 
     if( p_input )
     {
-        if( input_GetItem(p_input)->p_meta->psz_title &&
-                *input_GetItem(p_input)->p_meta->psz_title )
+        if( !EMPTY_STR( input_item_GetTitle( input_GetItem(p_input) ) ) )
         {
-            psz_title = strdup( input_GetItem(p_input)->p_meta->psz_title );
+            psz_title = strdup( input_item_GetTitle( input_GetItem(p_input) ) );
         }
         else
         {

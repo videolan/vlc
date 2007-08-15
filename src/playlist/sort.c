@@ -105,10 +105,8 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     }
 
 #define DO_META_SORT( node ) { \
-    char *psz_a = pp_items[i]->p_input->p_meta ?  \
-                       pp_items[i]->p_input->p_meta->psz_##node : NULL ; \
-    char *psz_b = pp_items[i_small]->p_input->p_meta ?  \
-                       pp_items[i_small]->p_input->p_meta->psz_##node : NULL; \
+    const char *psz_a = input_item_GetMeta( pp_items[i]->p_input, vlc_meta_##node ); \
+    const char *psz_b = input_item_GetMeta( pp_items[i_small]->p_input, vlc_meta_##node ); \
     /* Nodes go first */ \
     if( pp_items[i]->i_children == -1 && pp_items[i_small]->i_children >= 0 ) \
         i_test = 1;\
@@ -163,11 +161,11 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
             }
             else if( i_mode == SORT_ARTIST )
             {
-                DO_META_SORT( artist );
+                DO_META_SORT( Artist );
             }
             else if( i_mode == SORT_ALBUM )
             {
-                DO_META_SORT( album );
+                DO_META_SORT( Album );
             }
             else if( i_mode == SORT_TITLE_NODES_FIRST )
             {

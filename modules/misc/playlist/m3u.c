@@ -69,8 +69,8 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
              strcmp( p_current->p_input->psz_uri,
                      p_current->p_input->psz_name ) )
         {
-            char *psz_artist = p_current->p_input->p_meta->psz_artist ?
-                               strdup( p_current->p_input->p_meta->psz_artist ):
+            char *psz_artist = input_item_GetArtist( p_current->p_input ) ?
+                               strdup( input_item_GetArtist( p_current->p_input ) ):
                                strdup( "" );
             if( psz_artist && *psz_artist )
             {

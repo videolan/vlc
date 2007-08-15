@@ -37,6 +37,33 @@
 
 // FIXME be sure to not touch p_meta without lock on p_item
 
+static const char * meta_type_to_string[VLC_META_TYPE_COUNT] =
+{
+    [vlc_meta_Title]            = N_("Title"),
+    [vlc_meta_Artist]           = N_("Artist"),
+    [vlc_meta_Genre]            = N_("Genre"),
+    [vlc_meta_Copyright]        = N_("Copyright"),
+    [vlc_meta_Album]            = N_("Album/movie/show title"),
+    [vlc_meta_TrackNumber]      = N_("Track number/position in set"),
+    [vlc_meta_Description]      = N_("Description"),
+    [vlc_meta_Rating]           = N_("Rating"),
+    [vlc_meta_Date]             = N_("Date"),
+    [vlc_meta_Setting]          = N_("Setting"),
+    [vlc_meta_URL]              = N_("URL"),
+    [vlc_meta_Language]         = N_("Language"),
+    [vlc_meta_NowPlaying]       = N_("Language"),
+    [vlc_meta_Publisher]        = N_("Publisher"),
+    [vlc_meta_EncodedBy]        = N_("Encoded by"),
+    [vlc_meta_ArtworkURL]       = N_("Artwork URL"),
+    [vlc_meta_TrackID]          = N_("Track ID"),
+};
+
+const char *
+input_MetaTypeToLocalizedString( vlc_meta_type_t meta_type )
+{
+    return _(meta_type_to_string[meta_type]);
+}
+
 #define input_FindArtInCache(a,b) __input_FindArtInCache(VLC_OBJECT(a),b)
 static int __input_FindArtInCache( vlc_object_t *, input_item_t *p_item );
 
@@ -80,6 +107,9 @@ int input_MetaFetch( playlist_t *p_playlist, input_item_t *p_item )
     }
     module_Unneed( p_me, p_me->p_module );
     vlc_object_destroy( p_me );
+
+    input_item_SetMetaFetched( p_item, VLC_TRUE );
+
     return VLC_SUCCESS;
 }
 
@@ -96,19 +126,19 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     if( !p_item->p_meta )
         return VLC_EGENERIC;
 
-    if(  !p_item->psz_name && !p_item->p_meta->psz_title &&
-        (!p_item->p_meta->psz_artist || !p_item->p_meta->psz_album) )
+    if(  !p_item->psz_name && !input_item_GetTitle( p_item ) &&
+        (!input_item_GetArtist( p_item ) || !input_item_GetAlbum( p_item )) )
         return VLC_EGENERIC;
 
     /* If we already checked this album in this session, skip */
-    if( p_item->p_meta->psz_artist && p_item->p_meta->psz_album )
+    if( input_item_GetArtist( p_item ) && input_item_GetAlbum( p_item ) )
     {
         FOREACH_ARRAY( playlist_album_t album, p_playlist->p_fetcher->albums )
-            if( !strcmp( album.psz_artist, p_item->p_meta->psz_artist ) &&
-                !strcmp( album.psz_album, p_item->p_meta->psz_album ) )
+            if( !strcmp( album.psz_artist, input_item_GetArtist( p_item ) ) &&
+                !strcmp( album.psz_album, input_item_GetAlbum( p_item ) ) )
             {
                 msg_Dbg( p_playlist, " %s - %s has already been searched",
-                         p_item->p_meta->psz_artist,  p_item->p_meta->psz_album );
+                         input_item_GetArtist( p_item ),  input_item_GetAlbum( p_item ) );
         /* TODO-fenrir if we cache art filename too, we can go faster */
                 if( album.b_found )
                 {
@@ -125,20 +155,20 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     }
 
     input_FindArtInCache( p_playlist, p_item );
-    if( !EMPTY_STR( p_item->p_meta->psz_arturl ) )
+    if( !EMPTY_STR(input_item_GetArtURL( p_item )) )
         return 0;
 
     PL_LOCK;
     p_playlist->p_private = p_item;
-    if( p_item->p_meta->psz_artist && p_item->p_meta->psz_album )
+    if( input_item_GetAlbum( p_item ) && input_item_GetArtist( p_item ) )
     {
         msg_Dbg( p_playlist, "searching art for %s - %s",
-             p_item->p_meta->psz_artist,  p_item->p_meta->psz_album );
+             input_item_GetArtist( p_item ),  input_item_GetAlbum( p_item ) );
     }
     else
     {
         msg_Dbg( p_playlist, "searching art for %s",
-             p_item->p_meta->psz_title ? p_item->p_meta->psz_title : p_item->psz_name );
+             input_item_GetTitle( p_item ) ? input_item_GetTitle( p_item ) : p_item->psz_name );
     }
 
     p_module = module_Need( p_playlist, "art finder", 0, VLC_FALSE );
@@ -149,11 +179,11 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
         msg_Dbg( p_playlist, "unable to find art" );
 
     /* Record this album */
-    if( p_item->p_meta->psz_artist && p_item->p_meta->psz_album )
+    if( input_item_GetArtist( p_item ) && input_item_GetAlbum( p_item ) )
     {
         playlist_album_t a;
-        a.psz_artist = strdup( p_item->p_meta->psz_artist );
-        a.psz_album = strdup( p_item->p_meta->psz_album );
+        a.psz_artist = strdup( input_item_GetArtist( p_item ) );
+        a.psz_album = strdup( input_item_GetAlbum( p_item ) );
         a.b_found = (i_ret == VLC_EGENERIC ? VLC_FALSE : VLC_TRUE );
         ARRAY_APPEND( p_playlist->p_fetcher->albums, a );
     }
@@ -253,9 +283,9 @@ static char *ArtCacheCreateString( const char *psz )
 
 static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
 {
-    char *psz_artist;
-    char *psz_album;
-    char *psz_title;
+    const char *psz_artist;
+    const char *psz_album;
+    const char *psz_title;
     char psz_filename[MAX_PATH+1];
     int i;
     struct stat a;
@@ -263,9 +293,9 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
 
     if( !p_item->p_meta ) return VLC_EGENERIC;
 
-    psz_artist = p_item->p_meta->psz_artist;
-    psz_album = p_item->p_meta->psz_album;
-    psz_title = p_item->p_meta->psz_title;
+    psz_artist = input_item_GetArtist( p_item );
+    psz_album = input_item_GetAlbum( p_item );
+    psz_title = input_item_GetTitle( p_item );
     if( !psz_title ) psz_title = p_item->psz_name;
 
     if( (!psz_artist || !psz_album) && !psz_title ) return VLC_EGENERIC;
@@ -278,7 +308,7 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
         /* Check if file exists */
         if( utf8_stat( psz_filename+7, &a ) == 0 )
         {
-            vlc_meta_SetArtURL( p_item->p_meta, psz_filename );
+            input_item_SetArtURL( p_item, psz_filename );
             return VLC_SUCCESS;
         }
     }
@@ -298,12 +328,12 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     char *psz_album = NULL;
     char *psz_title = NULL;
     char *psz_type;
-    if( p_item->p_meta->psz_artist )
-        psz_artist = ArtCacheCreateString( p_item->p_meta->psz_artist );
-    if( p_item->p_meta->psz_album )
-        psz_album = ArtCacheCreateString( p_item->p_meta->psz_album );
-    if( p_item->p_meta->psz_title )
-        psz_title = ArtCacheCreateString( p_item->p_meta->psz_title );
+    if( input_item_GetArtist( p_item ) )
+        psz_artist = ArtCacheCreateString( input_item_GetArtist( p_item ) );
+    if( input_item_GetAlbum( p_item ) )
+        psz_album = ArtCacheCreateString( input_item_GetAlbum( p_item ) );
+    if( input_item_GetTitle( p_item ) )
+        psz_title = ArtCacheCreateString( input_item_GetTitle( p_item ) );
     else if( p_item->psz_name )
         psz_title = ArtCacheCreateString( p_item->psz_name );
 
@@ -315,9 +345,9 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
         return VLC_EGENERIC;
     }
 
-    assert( p_item->p_meta && !EMPTY_STR(p_item->p_meta->psz_arturl) );
+    assert( !EMPTY_STR(input_item_GetArtURL( p_item )) );
 
-    psz_type = strrchr( p_item->p_meta->psz_arturl, '.' );
+    psz_type = strrchr( input_item_GetArtURL( p_item ), '.' );
 
     /* */
     ArtCacheCreateName( p_playlist, psz_filename, psz_title /* Used only if needed*/,
@@ -331,13 +361,13 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     free( psz_album );
     free( psz_title );
 
-    if( !strncmp( p_item->p_meta->psz_arturl , "APIC", 4 ) )
+    if( !strncmp( input_item_GetArtURL( p_item ) , "APIC", 4 ) )
     {
         msg_Warn( p_playlist, "APIC fetch not supported yet" );
         return VLC_EGENERIC;
     }
 
-    p_stream = stream_UrlNew( p_playlist, p_item->p_meta->psz_arturl );
+    p_stream = stream_UrlNew( p_playlist, input_item_GetArtURL( p_item ) );
     if( p_stream )
     {
         uint8_t p_buffer[65536];
@@ -355,14 +385,13 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
         if( fclose( p_file ) && !err )
             err = errno;
         stream_Delete( p_stream );
-        free( p_item->p_meta->psz_arturl );
 
         if( err )
             msg_Err( p_playlist, "%s: %s", psz_filename, strerror( err ) );
         else
             msg_Dbg( p_playlist, "album art saved to %s\n", psz_filename );
 
-        p_item->p_meta->psz_arturl = strdup( psz_filename );
+        input_item_SetArtURL( p_item, psz_filename );
         i_status = VLC_SUCCESS;
     }
     return i_status;
@@ -385,16 +414,15 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     /* TODO-fenrir merge input_ArtFind with download and make it set the flags FETCH
      * and then set it here to to be faster */
 
-    assert( p_item->p_meta );
-    psz_arturl = p_item->p_meta->psz_arturl;
+    psz_arturl = strdup( input_item_GetArtURL( p_item ) );
     if( !psz_arturl || strncmp( psz_arturl, "attachment://", strlen("attachment://") ) )
     {
         msg_Err( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
         return;
     }
-    p_item->p_meta->psz_arturl = NULL;
+    input_item_SetArtURL( p_item, NULL );
 
-    if( p_item->p_meta->i_status & ITEM_ART_FETCHED )
+    if( input_item_IsArtFetched( p_item ) )
     {
         /* XXX Weird, we should not have end up with attachment:// art url unless there is a race
          * condition */
@@ -420,12 +448,12 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
         goto end;
     }
 
-    if( p_item->p_meta->psz_artist )
-        psz_artist = ArtCacheCreateString( p_item->p_meta->psz_artist );
-    if( p_item->p_meta->psz_album )
-        psz_album = ArtCacheCreateString( p_item->p_meta->psz_album );
-    if( p_item->p_meta->psz_title )
-        psz_title = ArtCacheCreateString( p_item->p_meta->psz_title );
+    if( input_item_GetArtist( p_item ) )
+        psz_artist = ArtCacheCreateString( input_item_GetArtist( p_item ) );
+    if( input_item_GetAlbum( p_item ) )
+        psz_album = ArtCacheCreateString( input_item_GetAlbum( p_item ) );
+    if( input_item_GetTitle( p_item ) )
+        psz_title = ArtCacheCreateString( input_item_GetTitle( p_item ) );
     else if( p_item->psz_name )
         psz_title = ArtCacheCreateString( p_item->psz_name );
 
@@ -465,25 +493,25 @@ uint32_t input_CurrentMetaFlags( vlc_meta_t *p_meta )
     uint32_t i_meta = 0;
 
 #define CHECK( a, b ) \
-    if( p_meta->psz_ ## a && *p_meta->psz_ ## a ) \
+    if( !EMPTY_STR( vlc_meta_Get( p_meta, vlc_meta_ ## a ) ) ) \
         i_meta |= VLC_META_ENGINE_ ## b;
 
-    CHECK( title, TITLE )
-    CHECK( artist, ARTIST )
-    CHECK( album, COLLECTION )
+    CHECK( Title, TITLE )
+    CHECK( Artist, ARTIST )
+    CHECK( Album, COLLECTION )
 #if 0
     /* As this is not used at the moment, don't uselessly check for it.
      * Re-enable this when it is used */
-    CHECK( genre, GENRE )
-    CHECK( copyright, COPYRIGHT )
-    CHECK( tracknum, SEQ_NUM )
-    CHECK( description, DESCRIPTION )
-    CHECK( rating, RATING )
-    CHECK( date, DATE )
-    CHECK( url, URL )
-    CHECK( language, LANGUAGE )
+    CHECK( Genre, GENRE )
+    CHECK( Copyright, COPYRIGHT )
+    CHECK( Tracknum, SEQ_NUM )
+    CHECK( Description, DESCRIPTION )
+    CHECK( Rating, RATING )
+    CHECK( Date, DATE )
+    CHECK( URL, URL )
+    CHECK( Language, LANGUAGE )
 #endif
-    CHECK( arturl, ART_URL )
+    CHECK( ArtworkURL, ART_URL )
 
     return i_meta;
 }

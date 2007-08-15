@@ -199,19 +199,18 @@
     }
 
     /* fill the other fields */
-#define p_m p_item->p_input->p_meta
-    [self setMeta: p_m->psz_title forLabel: o_title_txt];
-    [self setMeta: p_m->psz_artist forLabel: o_author_txt];
-    [self setMeta: p_m->psz_album forLabel: o_collection_txt];
-    [self setMeta: p_m->psz_tracknum forLabel: o_seqNum_txt];
-    [self setMeta: p_m->psz_genre forLabel: o_genre_txt];
-    [self setMeta: p_m->psz_copyright forLabel: o_copyright_txt];
-    [self setMeta: p_m->psz_rating forLabel: o_rating_txt];
-    [self setMeta: p_m->psz_publisher forLabel: o_publisher_txt];
-    [self setMeta: p_m->psz_nowplaying forLabel: o_nowPlaying_txt];
-    [self setMeta: p_m->psz_language forLabel: o_language_txt];
-    [self setMeta: p_m->psz_date forLabel: o_date_txt];
-#undef p_m
+    [self setMeta: input_item_GetTitle( p_item->p_input )      forLabel: o_title_txt];
+    [self setMeta: input_item_GetArtist( p_item->p_input )     forLabel: o_author_txt];
+    [self setMeta: input_item_GetAlbum( p_item->p_input )      forLabel: o_collection_txt];
+    [self setMeta: input_item_GetTrackNum( p_item->p_input )   forLabel: o_seqNum_txt];
+    [self setMeta: input_item_GetGenre( p_item->p_input )      forLabel: o_genre_txt];
+    [self setMeta: input_item_GetCopyright( p_item->p_input )  forLabel: o_copyright_txt];
+    [self setMeta: input_item_GetRating( p_item->p_input )     forLabel: o_rating_txt];
+    [self setMeta: input_item_GetPublisher( p_item->p_input )  forLabel: o_publisher_txt];
+    [self setMeta: input_item_GetNowPlaying( p_item->p_input ) forLabel: o_nowPlaying_txt];
+    [self setMeta: input_item_GetLanguage( p_item->p_input )   forLabel: o_language_txt];
+    [self setMeta: input_item_GetDate( p_item->p_input )       forLabel: o_date_txt];
+
     vlc_mutex_unlock( &p_item->p_input->lock );
 
     /* reload the advanced table */
@@ -298,7 +297,7 @@
 
         p_item->p_input->psz_uri = strdup( [[o_uri_txt stringValue] UTF8String] );
         p_item->p_input->psz_name = strdup( [[o_title_txt stringValue] UTF8String] );
-        vlc_meta_SetArtist( p_item->p_input->p_meta, [[o_author_txt stringValue] UTF8String] );
+        input_item_SetArtist( p_item->p_input, [[o_author_txt stringValue] UTF8String] );
         vlc_mutex_unlock( &p_item->p_input->lock );
 
         val.b_bool = VLC_TRUE;

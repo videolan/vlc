@@ -230,13 +230,13 @@ static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item
     lua_pushstring( p_state, p_item->psz_name );
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "name" );
     
-    lua_pushstring( p_state, p_item->p_meta->psz_title );
+    lua_pushstring( p_state, input_item_GetTitle( p_item ) );
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "title" );
     
-    lua_pushstring( p_state, p_item->p_meta->psz_album );
+    lua_pushstring( p_state, input_item_GetAlbum( p_item ) );
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "album" );
 
-    lua_pushstring( p_state, p_item->p_meta->psz_arturl );
+    lua_pushstring( p_state, input_item_GetArtURL( p_item ) );
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "arturl" );
     /* XXX: all should be passed */
 
@@ -347,7 +347,7 @@ static inline void read_meta_data( vlc_object_t *p_this,
     {                                                       \
         psz_value = lua_tostring( p_state, t );             \
         msg_Dbg( p_this, #b ": %s", psz_value );           \
-        vlc_meta_Set ## b ( p_input->p_meta, psz_value );   \
+        input_item_Set ## b ( p_input, psz_value );   \
     }                                                       \
     lua_pop( p_state, 1 ); /* pop a */
     TRY_META( "title", Title );
@@ -355,7 +355,7 @@ static inline void read_meta_data( vlc_object_t *p_this,
     TRY_META( "genre", Genre );
     TRY_META( "copyright", Copyright );
     TRY_META( "album", Album );
-    TRY_META( "tracknum", Tracknum );
+    TRY_META( "tracknum", TrackNum );
     TRY_META( "description", Description );
     TRY_META( "rating", Rating );
     TRY_META( "date", Date );
@@ -482,7 +482,7 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
             if( psz_value && *psz_value != 0 )
             {
                 msg_Dbg( p_this, "setting arturl: %s", psz_value );
-                vlc_meta_SetArtURL ( p_input->p_meta, psz_value );
+                input_item_SetArtURL ( p_input, psz_value );
                 i_ret = VLC_SUCCESS;
             }
         }

@@ -73,7 +73,6 @@ static int FindMeta( vlc_object_t *p_this )
     char *psz_dir = strdup( p_item->psz_uri );
     char *psz_buf = strrchr( psz_dir, '/' );
 
-    if( !p_item->p_meta ) return VLC_EGENERIC;
     if( psz_buf )
     {
         psz_buf++;
@@ -113,7 +112,7 @@ static int FindMeta( vlc_object_t *p_this )
 
         if( utf8_stat( psz_filename+7, &a ) != -1 )
         {
-            vlc_meta_SetArtURL( p_item->p_meta, psz_filename );
+            input_item_SetArtURL( p_item, psz_filename );
             b_have_art = VLC_TRUE;
         }
     }

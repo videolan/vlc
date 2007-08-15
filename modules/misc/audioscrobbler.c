@@ -1039,10 +1039,10 @@ static int ReadMetaData( intf_thread_t *p_this )
         }
 
     #define ALLOC_ITEM_META( a, b ) \
-        if ( input_GetItem(p_input)->b ) \
+        if ( input_item_Get##b( input_GetItem(p_input) ) ) \
         { \
             a = encode_URI_component( \
-                input_GetItem(p_input)->b ); \
+                input_item_Get##b( input_GetItem(p_input) )); \
             if( !a ) \
             { \
                 FREE_INPUT_AND_CHARS \
@@ -1058,25 +1058,33 @@ static int ReadMetaData( intf_thread_t *p_this )
 
     if( i_status & ( !b_waiting ? ITEM_PREPARSED : ITEM_META_FETCHED ) )
     {
-        ALLOC_ITEM_META( psz_artist, p_meta->psz_artist )
+        ALLOC_ITEM_META( psz_artist, Artist )
         else
         {
             msg_Dbg( p_this, "No artist.." );
             WAIT_METADATA_FETCHING( psz_artist )
         }
 
-        ALLOC_ITEM_META( psz_title, psz_name )
+        if( input_GetItem(p_input)->psz_name )
+        {
+            psz_title = encode_URI_component( input_GetItem(p_input)->psz_name );
+            if( !psz_title )
+            {
+                FREE_INPUT_AND_CHARS
+                return VLC_ENOMEM;
+            }
+        }
         else
         {
             msg_Dbg( p_this, "No track name.." );
             WAIT_METADATA_FETCHING( psz_title );
         }
 
-        ALLOC_ITEM_META( psz_album, p_meta->psz_album )
+        ALLOC_ITEM_META( psz_album, Album )
         else
             psz_album = calloc( 1, 1 );
 
-        ALLOC_ITEM_META( psz_trackid, p_meta->psz_trackid )
+        ALLOC_ITEM_META( psz_trackid, TrackID )
         else
             psz_trackid = calloc( 1, 1 );
 

@@ -548,7 +548,6 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
                         }
                         p_new_input = input_ItemNewExt( p_playlist, psz_uri,
                                                         NULL, 0, NULL, -1 );
-                        p_new_input->p_meta = vlc_meta_New();
                         free( psz_uri );
                         input_ItemCopyOptions( p_item->p_input, p_new_input );
                         psz_uri = NULL;
@@ -620,16 +619,16 @@ static vlc_bool_t set_item_info SIMPLE_INTERFACE
     }
     else if( !strcmp( psz_name, "creator" ) )
     {
-        vlc_meta_SetArtist( p_input->p_meta, psz_value );
+        input_item_SetArtist( p_input, psz_value );
     }
     else if( !strcmp( psz_name, "album" ) )
     {
-        vlc_meta_SetAlbum( p_input->p_meta, psz_value );
+        input_item_SetAlbum( p_input, psz_value );
 
     }
     else if( !strcmp( psz_name, "trackNum" ) )
     {
-        vlc_meta_SetTracknum( p_input->p_meta, psz_value );
+        input_item_SetTrackNum( p_input, psz_value );
     }
     else if( !strcmp( psz_name, "duration" ) )
     {
@@ -638,7 +637,7 @@ static vlc_bool_t set_item_info SIMPLE_INTERFACE
     }
     else if( !strcmp( psz_name, "annotation" ) )
     {
-        vlc_meta_SetDescription( p_input->p_meta, psz_value );
+        input_item_SetDescription( p_input, psz_value );
     }
     return VLC_TRUE;
 }

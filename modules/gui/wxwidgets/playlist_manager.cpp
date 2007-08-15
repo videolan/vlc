@@ -300,10 +300,9 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
     wxString duration = wxU( "" );
 
     char *psz_artist;
-    if( p_item->p_input->p_meta &&
-        p_item->p_input->p_meta->psz_artist )
+    if( input_item_GetArtist( o_item->p_input ) )
     {
-        psz_artist = strdup( p_item->p_input->p_meta->psz_artist );
+        psz_artist = strdup( input_item_GetArtist( o_item->p_input ) );
     }
     else psz_artist = strdup( "" );
 

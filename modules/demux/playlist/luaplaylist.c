@@ -467,7 +467,7 @@ static inline void read_meta_data( demux_t *p_demux,
     {                                                       \
         psz_value = lua_tostring( p_state, t );             \
         msg_Dbg( p_demux, #b ": %s", psz_value );           \
-        vlc_meta_Set ## b ( p_input->p_meta, psz_value );   \
+        input_item_Set ## b ( p_input, psz_value );   \
     }                                                       \
     lua_pop( p_state, 1 ); /* pop a */
     TRY_META( "title", Title );
@@ -475,7 +475,7 @@ static inline void read_meta_data( demux_t *p_demux,
     TRY_META( "genre", Genre );
     TRY_META( "copyright", Copyright );
     TRY_META( "album", Album );
-    TRY_META( "tracknum", Tracknum );
+    TRY_META( "tracknum", TrackNum );
     TRY_META( "description", Description );
     TRY_META( "rating", Rating );
     TRY_META( "date", Date );
@@ -636,7 +636,6 @@ static int Demux( demux_t *p_demux )
                         lua_pop( p_state, 1 ); /* pop "name" */
 
                         /* Read meta data */
-                        p_input->p_meta = vlc_meta_New();
                         read_meta_data( p_demux, p_state, t+2, t+4, p_input );
 
                         /* Read custom meta data */
