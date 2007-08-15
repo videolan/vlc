@@ -1662,8 +1662,8 @@ static void CacheLoad( vlc_object_t *p_this )
         return;
     }
 
-    i_size = asprintf( &psz_filename, "%s/%s/%s/%s", psz_homedir, CONFIG_DIR,
-                       PLUGINSCACHE_DIR, CacheName() );
+    i_size = asprintf( &psz_filename, "%s"DIR_SEP"%s"DIR_SEP"%s"DIR_SEP"%s",
+            psz_homedir, CONFIG_DIR, PLUGINSCACHE_DIR, CacheName() );
     if( i_size <= 0 )
     {
         msg_Err( p_this, "out of memory" );
@@ -2016,7 +2016,7 @@ static void CacheSave( vlc_object_t *p_this )
         return;
     }
     psz_filename =
-       (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_DIR "/" ) +
+       (char *)malloc( sizeof(DIR_SEP CONFIG_DIR DIR_SEP PLUGINSCACHE_DIR DIR_SEP ) +
                        strlen(psz_homedir) + strlen(CacheName()) );
 
     if( !psz_filename )
@@ -2025,15 +2025,15 @@ static void CacheSave( vlc_object_t *p_this )
         return;
     }
 
-    sprintf( psz_filename, "%s/%s", psz_homedir, CONFIG_DIR );
+    sprintf( psz_filename, "%s"DIR_SEP"%s", psz_homedir, CONFIG_DIR );
 
     config_CreateDir( p_this, psz_filename );
 
-    strcat( psz_filename, "/" PLUGINSCACHE_DIR );
+    strcat( psz_filename, DIR_SEP PLUGINSCACHE_DIR );
 
     config_CreateDir( p_this, psz_filename );
 
-    strcat( psz_filename, "/CACHEDIR.TAG" );
+    strcat( psz_filename, DIR_SEP"CACHEDIR.TAG" );
 
     file = utf8_fopen( psz_filename, "wb" );
     if( file )
@@ -2042,7 +2042,7 @@ static void CacheSave( vlc_object_t *p_this )
         fclose( file );
     }
 
-    sprintf( psz_filename, "%s/%s/%s/%s", psz_homedir, CONFIG_DIR,
+    sprintf( psz_filename, "%s"DIR_SEP"%s"DIR_SEP"%s"DIR_SEP"%s", psz_homedir, CONFIG_DIR,
              PLUGINSCACHE_DIR, CacheName() );
 
     msg_Dbg( p_this, "saving plugins cache file %s", psz_filename );
