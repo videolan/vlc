@@ -139,14 +139,8 @@ void libvlc_media_descriptor_retain( libvlc_media_descriptor_t *p_md )
 libvlc_media_descriptor_t *
 libvlc_media_descriptor_duplicate( libvlc_media_descriptor_t *p_md_orig )
 {
-    libvlc_media_descriptor_t * p_md;
-
-    p_md = malloc( sizeof(libvlc_media_descriptor_t) );
-    memcpy( p_md, p_md_orig, sizeof(libvlc_media_descriptor_t) );
-
-    vlc_gc_incref( p_md->p_input_item );
-
-    return p_md;
+    return libvlc_media_descriptor_new_from_input_item(
+        p_md->p_libvlc_instance, p_md_orig->p_input_item );
 }
 
 /**************************************************************************
