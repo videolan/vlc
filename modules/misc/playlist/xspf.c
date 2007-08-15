@@ -166,17 +166,6 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     psz = p_item->p_input->p_meta->psz_artist ?
                         strdup( p_item->p_input->p_meta->psz_artist ):
                         strdup( "" );
-    if( psz && !*psz )
-    {
-        free( psz );
-        psz = NULL;
-    }
-    if( !psz )
-    {
-        psz = p_item->p_input->p_meta->psz_artist ?
-                        strdup( p_item->p_input->p_meta->psz_artist ):
-                        strdup( "" );
-    }
     psz_temp = convert_xml_special_chars( psz );
     if( psz ) free( psz );
     if( *psz_temp )
