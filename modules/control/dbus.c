@@ -862,11 +862,11 @@ static int TrackChange( vlc_object_t *p_this, const char *psz_var,
                 type, \
                 & data ); \
         dbus_message_iter_close_container( &dict_entry, &variant ); \
-        dbus_message_iter_close_container( &dict, &dict_entry ); }\
+        dbus_message_iter_close_container( &dict, &dict_entry ); }
 
 #define ADD_VLC_META_STRING( entry, item ) \
         ADD_META( entry, DBUS_TYPE_STRING, \
-                input_item_Get##item( p_input );
+                input_item_Get##item( p_input ) );
 
 static int GetInputMeta( input_item_t* p_input,
                         DBusMessageIter *args )
