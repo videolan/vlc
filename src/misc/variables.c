@@ -834,14 +834,14 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
  */
 vlc_mutex_t *var_GetGlobalMutex( const char *name )
 {
-    libvlc_global_data_t *p_global = vlc_global_object();
+    vlc_object_t *p_global = vlc_global_object();
     vlc_value_t val;
 
     if( var_Create( p_global, name, VLC_VAR_MUTEX ) )
         return NULL;
 
-    var_Get( p_global, &val );
-    return val.p_lockval;
+    var_Get( p_global, name, &val );
+    return val.p_address;
 }
 
 
