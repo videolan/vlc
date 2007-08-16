@@ -242,6 +242,7 @@ typedef struct libvlc_log_message_t
 
 typedef enum libvlc_event_type_t {
     libvlc_MediaDescriptorMetaChanged,
+    libvlc_MediaDescriptorSubItemAdded,
     libvlc_MediaInstanceReachedEnd,
     libvlc_MediaListItemAdded,
     libvlc_MediaListItemDeleted,
@@ -265,6 +266,10 @@ typedef struct libvlc_event_t
         {
             libvlc_meta_t meta_type;
         } media_descriptor_meta_changed;
+        struct
+        {
+            libvlc_media_descriptor_t * new_child;
+        } media_descriptor_subitem_added;
         struct
         {
             libvlc_media_descriptor_t * item;

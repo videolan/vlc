@@ -70,6 +70,29 @@ static const libvlc_meta_t vlc_to_libvlc_meta[] =
 };
 
 /**************************************************************************
+ * input_item_subitem_added (Private) (vlc event Callback)
+ **************************************************************************/
+static void input_item_subitem_added( const vlc_event_t *p_event,
+                                     void * user_data )
+{
+    libvlc_media_descriptor_t * p_md = user_data;
+    libvlc_media_descriptor_t * p_md_child;
+    libvlc_event_t event;
+
+    p_md_child = libvlc_media_descriptor_new_from_input_item(
+                p_md->p_libvlc_instance, 
+                p_event->u.input_item_subitem_added.p_new_child, NULL );
+
+    /* Construct the event */
+    event.type = libvlc_MediaDescriptorSubItemAdded;
+    event.u.media_descriptor_subitem_added.new_child = p_md_child;
+
+    /* Send the event */
+    libvlc_event_send( p_md->p_event_manager, &event );
+    libvlc_media_descriptor_release( p_md_child );
+}
+
+/**************************************************************************
  * input_item_meta_changed (Private) (vlc event Callback)
  **************************************************************************/
 static void input_item_meta_changed( const vlc_event_t *p_event,
@@ -94,6 +117,10 @@ static void input_item_meta_changed( const vlc_event_t *p_event,
 static void install_input_item_observer( libvlc_media_descriptor_t *p_md )
 {
     vlc_event_attach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemSubItemAdded,
+                      input_item_subitem_added,
+                      p_md );
+    vlc_event_attach( &p_md->p_input_item->event_manager,
                       vlc_InputItemMetaChanged,
                       input_item_meta_changed,
                       p_md );
@@ -104,6 +131,10 @@ static void install_input_item_observer( libvlc_media_descriptor_t *p_md )
  **************************************************************************/
 static void uninstall_input_item_observer( libvlc_media_descriptor_t *p_md )
 {
+    vlc_event_detach( &p_md->p_input_item->event_manager,
+                      vlc_InputItemSubItemAdded,
+                      input_item_subitem_added,
+                      p_md );
     vlc_event_detach( &p_md->p_input_item->event_manager,
                       vlc_InputItemMetaChanged,
                       input_item_meta_changed,
@@ -148,8 +179,12 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
     p_md->b_preparsed       = VLC_TRUE;
     p_md->i_refcount        = 1;
     p_md->p_event_manager = libvlc_event_manager_new( p_md, p_instance, p_e );
+
     libvlc_event_manager_register_event_type( p_md->p_event_manager, 
         libvlc_MediaDescriptorMetaChanged, p_e );
+    libvlc_event_manager_register_event_type( p_md->p_event_manager, 
+        libvlc_MediaDescriptorSubItemAdded, p_e );
+
     vlc_gc_incref( p_md->p_input_item );
 
     install_input_item_observer( p_md );
