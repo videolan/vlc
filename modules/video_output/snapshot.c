@@ -324,12 +324,12 @@ static void Destroy( vlc_object_t *p_this )
     vout_thread_t *p_vout = ( vout_thread_t * )p_this;
     int i_index;
 
+    var_Destroy( p_vout->p_sys->p_input, "snapshot-id" );
+
     vlc_object_release( p_vout->p_sys->p_input );
     var_Destroy( p_this, "snapshot-width" );
     var_Destroy( p_this, "snapshot-height" );
     var_Destroy( p_this, "snapshot-datasize" );
-
-    var_Destroy( p_this->p_libvlc_global, "snapshot-id" );
 
     for( i_index = 0 ; i_index < p_vout->p_sys->i_size ; i_index++ )
     {
