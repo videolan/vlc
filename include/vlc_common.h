@@ -568,7 +568,6 @@ typedef struct vlc_object_internals_t vlc_object_internals_t;
     variable_t *    p_vars;                                                 \
                                                                             \
     /* Stuff related to the libvlc structure */                             \
-    vlc_object_t *p_libvlc_global;                 /**< root of all evil */ \
     libvlc_int_t *p_libvlc;                  /**< (root of all evil) - 1 */ \
                                                                             \
     volatile int    i_refcount;                         /**< usage count */ \
