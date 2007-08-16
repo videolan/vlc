@@ -56,7 +56,7 @@
 
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
-#if defined (HAVE_DYNAMIC_PLUGINS) && !defined (__LIBVLC__)
+#if defined (HAVE_DYNAMIC_PLUGINS) && !defined (__BUILTIN__)
 #   define E_( function )          CONCATENATE( function, MODULE_SYMBOL )
 #   define __VLC_SYMBOL( symbol  ) CONCATENATE( symbol, MODULE_SYMBOL )
 #else
