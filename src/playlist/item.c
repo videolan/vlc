@@ -117,7 +117,6 @@ playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
 {
     DECMALLOC_NULL( p_item, playlist_item_t );
     playlist_t *p_playlist = p_obj->p_libvlc->p_playlist;
-    vlc_object_yield( p_playlist );
 
     p_item->p_input = p_input;
     vlc_gc_incref( p_item->p_input );
@@ -144,7 +143,6 @@ int playlist_ItemDelete( playlist_item_t *p_item )
 {
     uninstall_input_item_observer( p_item->p_playlist, p_item->p_input );
 
-    vlc_object_release( p_item->p_playlist );
     vlc_gc_decref( p_item->p_input );
     free( p_item );
     return VLC_SUCCESS;
