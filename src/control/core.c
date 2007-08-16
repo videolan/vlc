@@ -29,7 +29,7 @@
 /*************************************************************************
  * Exceptions handling
  *************************************************************************/
-inline void libvlc_exception_init( libvlc_exception_t *p_exception )
+void libvlc_exception_init( libvlc_exception_t *p_exception )
 {
     p_exception->b_raised = 0;
     p_exception->psz_message = NULL;
@@ -43,12 +43,12 @@ void libvlc_exception_clear( libvlc_exception_t *p_exception )
     p_exception->b_raised = 0;
 }
 
-inline int libvlc_exception_raised( libvlc_exception_t *p_exception )
+int libvlc_exception_raised( libvlc_exception_t *p_exception )
 {
     return (NULL != p_exception) && p_exception->b_raised;
 }
 
-inline char* libvlc_exception_get_message( libvlc_exception_t *p_exception )
+char *libvlc_exception_get_message( libvlc_exception_t *p_exception )
 {
     if( p_exception->b_raised == 1 && p_exception->psz_message )
     {
@@ -57,8 +57,8 @@ inline char* libvlc_exception_get_message( libvlc_exception_t *p_exception )
     return NULL;
 }
 
-inline void libvlc_exception_raise( libvlc_exception_t *p_exception,
-                                    const char *psz_format, ... )
+void libvlc_exception_raise( libvlc_exception_t *p_exception,
+                                           const char *psz_format, ... )
 {
     va_list args;
 
@@ -67,13 +67,11 @@ inline void libvlc_exception_raise( libvlc_exception_t *p_exception,
 
     /* remove previous exception if it wasn't cleared */
     if( p_exception->b_raised && p_exception->psz_message )
-    {
         free(p_exception->psz_message);
-        p_exception->psz_message = NULL;
-    }
 
     va_start( args, psz_format );
-    vasprintf( &p_exception->psz_message, psz_format, args );
+    if( vasprintf( &p_exception->psz_message, psz_format, args ) == -1)
+        p_exception->psz_message = NULL;
     va_end( args );
 
     p_exception->b_raised = 1;
