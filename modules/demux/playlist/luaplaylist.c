@@ -252,7 +252,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
     char **ppsz_fileend  = NULL;
     char **ppsz_file;
 
-    char  *ppsz_dir_list[] = { NULL, NULL, NULL };
+    char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
     char **ppsz_dir;
 
     p_demux->p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
@@ -289,17 +289,17 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
 
     lua_pop( p_state, 1 );
 
-    ppsz_dir_list[0] = malloc( strlen( p_demux->p_libvlc->psz_homedir )
-                             + strlen( DIR_SEP CONFIG_DIR DIR_SEP "luaplaylist" ) + 1 );
-    sprintf( ppsz_dir_list[0], "%s" DIR_SEP CONFIG_DIR DIR_SEP "luaplaylist",
-             p_demux->p_libvlc->psz_homedir );
+    if( asprintf( &ppsz_dir_list[0], "%s" DIR_SEP CONFIG_DIR DIR_SEP "luaplaylist",
+             p_demux->p_libvlc->psz_homedir ) < -1 )
+        return VLC_ENOMEM;
 
 #   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
     {
         char *psz_vlcpath = config_GetDataDir( p_demux );
-        ppsz_dir_list[1] = malloc( strlen( psz_vlcpath ) + strlen( "luaplaylist" ) + 1 );
-        if( !ppsz_dir_list[1] ) return VLC_ENOMEM;
-        sprintf( ppsz_dir_list[1], "%s" DIR_SEP "luaplaylist", psz_vlcpath );
+        if( asprintf( &ppsz_dir_list[1], "%s" DIR_SEP "luaplaylist", psz_vlcpath ) < 0 )
+            return VLC_ENOMEM;
+        if( asprintf( &ppsz_dir_list[2], "%s" DIR_SEP "share" DIR_SEP "luaplaylist", psz_vlcpath ) < 0 )
+            return VLC_ENOMEM;
     }
 #   else
     {
@@ -347,7 +347,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
         for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend; ppsz_file++ )
         {
             free( psz_filename ); psz_filename = NULL;
-            asprintf( &psz_filename, "%s/%s", *ppsz_dir, *ppsz_file );
+            asprintf( &psz_filename, "%s" DIR_SEP "%s", *ppsz_dir, *ppsz_file );
             msg_Dbg( p_demux, "Trying Lua playlist script %s", psz_filename );
             p_demux->p_sys->psz_filename = psz_filename;
 
