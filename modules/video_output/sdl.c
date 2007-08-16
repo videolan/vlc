@@ -115,8 +115,6 @@ vlc_module_begin();
     add_shortcut( "sdl" );
     add_string( "sdl-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
-    /* XXX: check for conflicts with the SDL audio output */
-    var_Create( p_module->p_libvlc_global, "sdl", VLC_VAR_MUTEX );
 #if defined( __i386__ ) || defined( __x86_64__ )
     /* On i386, SDL is linked against svgalib */
     linked_with_a_crap_library_which_uses_atexit();
@@ -133,29 +131,30 @@ vlc_module_end();
 static int Open ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
-    vlc_value_t lockval;
+    /* XXX: check for conflicts with the SDL audio output */
+    vlc_mutex_t *lock = var_GetGlobalMutex( "sdl" );
 
 #ifdef HAVE_SETENV
     char *psz_method;
 #endif
 
-    var_Get( p_this->p_libvlc_global, "sdl", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
+    if( p_vout->p_sys == NULL )
+    {
+        vlc_mutex_unlock( lock );
+        return VLC_ENOMEM;
+    }
+
+    vlc_mutex_lock( lock );
 
     if( SDL_WasInit( SDL_INIT_VIDEO ) != 0 )
     {
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( lock );
+        free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
 
     /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
-    {
-        msg_Err( p_vout, "out of memory" );
-        vlc_mutex_unlock( lockval.p_address );
-        return VLC_ENOMEM;
-    }
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
@@ -194,11 +193,11 @@ static int Open ( vlc_object_t *p_this )
     {
         msg_Err( p_vout, "cannot initialize SDL (%s)", SDL_GetError() );
         free( p_vout->p_sys );
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( lock );
         return VLC_EGENERIC;
     }
 
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( lock );
 
     p_vout->p_sys->b_cursor = 1;
     p_vout->p_sys->b_cursor_autohidden = 0;
