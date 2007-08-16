@@ -986,14 +986,22 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region, UniCha
 
     int i_width = p_filter->fmt_out.video.i_visible_width;
     int i_height = p_filter->fmt_out.video.i_visible_height;
+    int i_text_align = p_region->i_align & 0x3;
 
-    if( psz_utf16_str != NULL )
+    if( !psz_utf16_str )
     {
-        int i_text_align = p_region->i_align & 0x3;
+        msg_Err( p_filter, "Invalid argument to RenderYUVA" );
+        return VLC_EGENERIC;
+    }
 
-        p_offScreen = Compose( i_text_align, psz_utf16_str, i_text_len,
-                               i_runs, pi_run_lengths, pp_styles,
-                               i_width, i_height, &i_textblock_height );
+    p_offScreen = Compose( i_text_align, psz_utf16_str, i_text_len,
+                           i_runs, pi_run_lengths, pp_styles,
+                           i_width, i_height, &i_textblock_height );
+
+    if( !p_offScreen )
+    {
+        msg_Err( p_filter, "No offscreen buffer" );
+        return VLC_EGENERIC;
     }
 
     uint8_t *p_dst_y,*p_dst_u,*p_dst_v,*p_dst_a;
