@@ -153,9 +153,8 @@ static int Open( vlc_object_t *p_this )
                                 event_handler, p_dec );
 
     /* Create the var on vlc_global. */
-    p_sys->i_wanted_page = var_CreateGetInteger( p_dec->p_libvlc_global,
-                                                 "vbi-page" );
-    var_AddCallback( p_dec->p_libvlc_global, "vbi-page",
+    p_sys->i_wanted_page = var_CreateGetInteger( p_dec->p_libvlc, "vbi-page" );
+    var_AddCallback( p_dec->p_libvlc, "vbi-page",
                      RequestPage, p_sys );
 
     p_sys->b_opaque = var_CreateGetBool( p_dec, "vbi-opaque" );
