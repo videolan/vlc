@@ -390,9 +390,7 @@ vlc_strndup
 __vlc_thread_create
 __vlc_thread_join
 __vlc_thread_ready
-__vlc_threads_end
 __vlc_thread_set_priority
-__vlc_threads_init
 vlc_ureduce
 vlc_vasprintf
 VLC_Version

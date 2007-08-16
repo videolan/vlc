@@ -35,8 +35,6 @@
 /*****************************************************************************
  * Function definitions
  *****************************************************************************/
-VLC_EXPORT( int,  __vlc_threads_init,  ( vlc_object_t * ) );
-VLC_EXPORT( int,  __vlc_threads_end,   ( vlc_object_t * ) );
 VLC_EXPORT( int,  __vlc_mutex_init,    ( vlc_object_t *, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_mutex_destroy, ( const char *, int, vlc_mutex_t * ) );
 VLC_EXPORT( int,  __vlc_cond_init,     ( vlc_object_t *, vlc_cond_t * ) );

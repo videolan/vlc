@@ -33,6 +33,24 @@ extern const size_t libvlc_config_count;
 extern const struct hotkey libvlc_hotkeys[];
 extern const size_t libvlc_hotkeys_size;
 
+
+/*
+ * Threads subsystem
+ */
+int __vlc_threads_init( vlc_object_t * );
+int __vlc_threads_end( vlc_object_t * );
+
+/*
+ * CPU capabilities
+ */
+extern uint32_t cpu_flags;
+uint32_t CPUCapabilities( void );
+
+
+/*
+ * LibVLC objects stuff
+ */
+
 extern vlc_object_t *
 vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
                    const char *psz_type);
@@ -75,9 +93,6 @@ struct libvlc_global_data_t
 };
 
 libvlc_global_data_t *vlc_global (void);
-
-extern uint32_t cpu_flags;
-uint32_t CPUCapabilities( void );
 
 /* Private LibVLC data for each objects */
 struct vlc_object_internals_t
