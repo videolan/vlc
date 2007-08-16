@@ -202,7 +202,7 @@ typedef struct
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 /* This is the BeOS implementation of the vlc threads, note that the mutex is
  * not a real mutex and the cond_var is not like a pthread cond_var but it is
- * enough for what wee need */
+ * enough for what we need */
 
 typedef thread_id vlc_thread_t;
 
