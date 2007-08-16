@@ -72,7 +72,6 @@ vlc_bool_t input_MetaSatisfied( playlist_t *p_playlist, input_item_t *p_item,
 {
     (void)p_playlist;
     *pi_mandatory = VLC_META_ENGINE_TITLE | VLC_META_ENGINE_ARTIST;
-    assert( p_item->p_meta );
 
     uint32_t i_meta = input_CurrentMetaFlags( p_item->p_meta );
     *pi_mandatory &= ~i_meta;
@@ -84,8 +83,6 @@ int input_MetaFetch( playlist_t *p_playlist, input_item_t *p_item )
 {
     struct meta_engine_t *p_me;
     uint32_t i_mandatory, i_optional;
-
-    assert( p_item->p_meta );
 
     input_MetaSatisfied( p_playlist, p_item, &i_mandatory, &i_optional );
     // Meta shouldn't magically appear
@@ -491,6 +488,9 @@ end:
 uint32_t input_CurrentMetaFlags( vlc_meta_t *p_meta )
 {
     uint32_t i_meta = 0;
+
+    if( !p_meta )
+        return 0;
 
 #define CHECK( a, b ) \
     if( !EMPTY_STR( vlc_meta_Get( p_meta, vlc_meta_ ## a ) ) ) \
