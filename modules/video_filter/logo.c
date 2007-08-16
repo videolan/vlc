@@ -778,13 +778,13 @@ static void DestroyFilter( vlc_object_t *p_this )
     free( p_sys );
 
     /* Delete the logo variables from INPUT */
-    var_Destroy( p_filter->p_libvlc_global , "logo-file" );
-    var_Destroy( p_filter->p_libvlc_global , "logo-x" );
-    var_Destroy( p_filter->p_libvlc_global , "logo-y" );
-    var_Destroy( p_filter->p_libvlc_global , "logo-delay" );
-    var_Destroy( p_filter->p_libvlc_global , "logo-repeat" );
-    var_Destroy( p_filter->p_libvlc_global , "logo-position" );
-    var_Destroy( p_filter->p_libvlc_global , "logo-transparency" );
+    var_Destroy( p_filter->p_libvlc, "logo-file" );
+    var_Destroy( p_filter->p_libvlc, "logo-x" );
+    var_Destroy( p_filter->p_libvlc, "logo-y" );
+    var_Destroy( p_filter->p_libvlc, "logo-delay" );
+    var_Destroy( p_filter->p_libvlc, "logo-repeat" );
+    var_Destroy( p_filter->p_libvlc, "logo-position" );
+    var_Destroy( p_filter->p_libvlc, "logo-transparency" );
 }
 
 /*****************************************************************************

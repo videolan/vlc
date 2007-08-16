@@ -321,58 +321,58 @@ static VLCsFilters *_o_sharedInstance = nil;
         }
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "marq-marquee", val );
+            var_Set( p_input->p_libvlc, "marq-marquee", val );
 
         config_PutPsz( p_intf, "marq-marquee", val.psz_string );
     }
-    
+
     else if( sender == o_marq_pos_radio )
     {
         val.i_int = [[o_marq_pos_radio selectedCell] tag];
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "marq-position", val );
+            var_Set( p_input->p_libvlc, "marq-position", val );
 
         config_PutInt( p_intf, "marq-position", val.i_int );
     }
-    
+
     else if( sender == o_marq_color_pop )
     {
         val.i_int = strtol( [[[o_colors objectAtIndex: [o_marq_color_pop
             indexOfSelectedItem]] objectAtIndex: 1] UTF8String], NULL, 0 );
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "marq-color", val );
+            var_Set( p_input->p_libvlc, "marq-color", val );
 
         config_PutInt( p_intf, "marq-color", val.i_int );
     }
-    
+
     else if( sender == o_marq_opaque_sld )
     {
         val.i_int = [o_marq_opaque_sld intValue];
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "marq-opacity", val );
+            var_Set( p_input->p_libvlc, "marq-opacity", val );
 
         config_PutInt( p_intf, "marq-opacity", val.i_int );
     }
-    
+
     else if( sender == o_marq_size_pop )
     {
         val.i_int = [[o_marq_size_pop titleOfSelectedItem] intValue];
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "marq-size", val );
+            var_Set( p_input->p_libvlc, "marq-size", val );
 
         config_PutInt( p_intf, "marq-size", val.i_int );
     }
-    
+
     else if( sender == o_marq_tmOut_fld && [[sender stringValue] length] > 0 )
     {
         val.i_int = [o_marq_tmOut_fld intValue];
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "marq-timeout", val );
+            var_Set( p_input->p_libvlc, "marq-timeout", val );
 
         config_PutInt( p_intf, "marq-timeout", val.i_int );
     }
@@ -391,7 +391,7 @@ static VLCsFilters *_o_sharedInstance = nil;
         }
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "time-format", val );
+            var_Set( p_input->p_libvlc, "time-format", val );
 
         config_PutPsz( p_intf, "time-format", val.psz_string );
     }
@@ -401,38 +401,38 @@ static VLCsFilters *_o_sharedInstance = nil;
         val.i_int = [[o_time_pos_radio selectedCell] tag];
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "time-position", val );
+            var_Set( p_input->p_libvlc, "time-position", val );
 
         config_PutInt( p_intf, "time-position", val.i_int );
     }
-    
+
     else if( sender == o_time_color_pop )
     {
         val.i_int = strtol( [[[o_colors objectAtIndex: [o_time_color_pop
             indexOfSelectedItem]] objectAtIndex: 1] UTF8String], NULL, 0 );
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "time-color", val );
+            var_Set( p_input->p_libvlc, "time-color", val );
 
         config_PutInt( p_intf, "time-color", val.i_int );
     }
-    
+
     else if( sender == o_time_opaque_sld )
     {
         val.i_int = [o_time_opaque_sld intValue];
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "time-opacity", val );
+            var_Set( p_input->p_libvlc, "time-opacity", val );
 
         config_PutInt( p_intf, "time-opacity", val.i_int );
     }
-    
+
     else if( sender == o_time_size_pop )
     {
         val.i_int = [[o_time_size_pop titleOfSelectedItem] intValue];
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "time-size", val );
+            var_Set( p_input->p_libvlc, "time-size", val );
 
         config_PutInt( p_intf, "time-size", val.i_int );
     }
@@ -443,17 +443,17 @@ static VLCsFilters *_o_sharedInstance = nil;
         val.i_int = [o_logo_opaque_sld intValue];
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "logo-transparency", val );
+            var_Set( p_input->p_libvlc, "logo-transparency", val );
 
         config_PutInt( p_intf, "logo-transparency", val.i_int );
     }
-    
+
     else if( sender == o_logo_pos_radio )
     {
         val.i_int = [[o_logo_pos_radio selectedCell] tag];
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "logo-position", val );
+            var_Set( p_input->p_libvlc, "logo-position", val );
 
         config_PutInt( p_intf, "logo-position", val.i_int );
     }
@@ -462,7 +462,7 @@ static VLCsFilters *_o_sharedInstance = nil;
         val.psz_string = (char *)[[o_logo_image_fld stringValue] UTF8String];
 
         if( p_input )
-            var_Set( p_input->p_libvlc_global, "logo-file", val );
+            var_Set( p_input->p_libvlc, "logo-file", val );
 
         config_PutPsz( p_intf, "logo-file", val.psz_string );
     }

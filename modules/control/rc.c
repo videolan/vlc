@@ -638,15 +638,15 @@ static void Run( intf_thread_t *p_intf )
                     psz_cmd, i_ret, vlc_error( i_ret ) );
         }
         /* Or maybe it's a global command */
-        else if( var_Type( p_intf->p_libvlc_global, psz_cmd ) & VLC_VAR_ISCOMMAND )
+        else if( var_Type( p_intf->p_libvlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
         {
             vlc_value_t val;
             int i_ret;
 
             val.psz_string = psz_arg;
             /* FIXME: it's a global command, but we should pass the
-             * local object as an argument, not p_intf->p_libvlc_global. */
-            i_ret = var_Set( p_intf->p_libvlc_global, psz_cmd, val );
+             * local object as an argument, not p_intf->p_libvlc. */
+            i_ret = var_Set( p_intf->p_libvlc, psz_cmd, val );
             if( i_ret != 0 )
             {
                 msg_rc( "%s: returned %i (%s)",
