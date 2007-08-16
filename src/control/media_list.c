@@ -99,6 +99,23 @@ media_descriptor_changed( const libvlc_event_t * p_event, void * user_data )
 }
 
 /**************************************************************************
+ *       media_descriptor_subitem_added (private) (libvlc Event Callback )
+ *
+ * An item (which is a playlist) has gained sub child.
+ **************************************************************************/
+static void
+media_descriptor_subitem_added( const libvlc_event_t * p_event, void * user_data )
+{
+    libvlc_media_list_t * p_mlist = user_data;
+    libvlc_media_descriptor_t * p_new_md;
+
+    p_new_md = p_event->u.media_descriptor_subitem_added.new_child;
+
+    /* For now, just add the new item to this media list */
+    libvlc_media_list_add_media_descriptor( p_mlist, p_new_md, NULL );
+}
+
+/**************************************************************************
  *       install_media_descriptor_observer (private)
  *
  * Do the appropriate action when an item is deleted.
@@ -109,6 +126,10 @@ install_media_descriptor_observer( libvlc_media_list_t * p_mlist,
 {
     libvlc_event_attach( p_md->p_event_manager,
                          libvlc_MediaDescriptorMetaChanged,
+                         media_descriptor_changed,
+                         p_mlist, NULL );
+    libvlc_event_attach( p_md->p_event_manager,
+                         libvlc_MediaDescriptorSubItemAdded,
                          media_descriptor_changed,
                          p_mlist, NULL );
 }
@@ -124,6 +145,10 @@ uninstall_media_descriptor_observer( libvlc_media_list_t * p_mlist,
 {
     libvlc_event_detach( p_md->p_event_manager,
                          libvlc_MediaDescriptorMetaChanged,
+                         media_descriptor_changed,
+                         p_mlist, NULL );
+    libvlc_event_detach( p_md->p_event_manager,
+                         libvlc_MediaDescriptorSubItemAdded,
                          media_descriptor_changed,
                          p_mlist, NULL );
 }
