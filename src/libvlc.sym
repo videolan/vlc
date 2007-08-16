@@ -342,6 +342,7 @@ __var_Create
 __var_DelCallback
 __var_Destroy
 __var_Get
+var_GetGlobalMutex
 __var_OptionParse
 __var_Set
 __var_Type
@@ -362,7 +363,6 @@ VLC_VariableSet
 __vlc_cond_destroy
 __vlc_cond_init
 vlc_current_object
-vlc_global_object
 vlc_error
 VLC_Error
 __vlc_execve
