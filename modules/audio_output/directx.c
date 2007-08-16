@@ -241,7 +241,7 @@ static int OpenAudio( vlc_object_t *p_this )
     if( p_aout->output.p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     /* Initialize some variables */
@@ -373,7 +373,7 @@ static int OpenAudio( vlc_object_t *p_this )
         msg_Err( p_aout, "cannot create DirectSoundThread" );
         CloseHandle( p_aout->output.p_sys->p_notif->event );
         vlc_object_destroy( p_aout->output.p_sys->p_notif );
-        p_aout->output.p_sys->p_notif = 0;
+        p_aout->output.p_sys->p_notif = NULL;
         goto error;
     }
 
@@ -587,15 +587,11 @@ static void CloseAudio( vlc_object_t *p_this )
     if( p_sys->p_notif )
     {
         vlc_object_detach( p_sys->p_notif );
-        if( p_sys->p_notif->b_thread )
-        {
-            vlc_object_kill( p_sys->p_notif );
+        vlc_object_kill( p_sys->p_notif );
+        /* wake up the audio thread if needed */
+        if( !p_sys->b_playing ) SetEvent( p_sys->p_notif->event );
 
-            /* wake up the audio thread if needed */
-            if( !p_sys->b_playing ) SetEvent( p_sys->p_notif->event );
-
-            vlc_thread_join( p_sys->p_notif );
-        }
+        vlc_thread_join( p_sys->p_notif );
         vlc_object_destroy( p_sys->p_notif );
     }
 
@@ -608,9 +604,7 @@ static void CloseAudio( vlc_object_t *p_this )
     /* free DSOUND.DLL */
     if( p_sys->hdsound_dll ) FreeLibrary( p_sys->hdsound_dll );
 
-    if( p_aout->output.p_sys->p_device_guid )
-        free( p_aout->output.p_sys->p_device_guid );
-
+    free( p_aout->output.p_sys->p_device_guid );
     free( p_sys );
 }
 
