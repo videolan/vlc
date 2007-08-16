@@ -525,6 +525,8 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 
 #include "vlc_threads.h"
 
+typedef struct vlc_object_internals_t vlc_object_internals_t;
+
 /*****************************************************************************
  * Common structure members
  *****************************************************************************/
@@ -535,6 +537,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
  * these members are common for all vlc objects                             \
  */                                                                         \
 /**@{*/                                                                     \
+    vlc_object_internals_t *p_internals;                                    \
     int   i_object_id;                                                      \
     int   i_object_type;                                                    \
     const char *psz_object_type;                                            \

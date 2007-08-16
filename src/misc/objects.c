@@ -88,23 +88,30 @@ static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
  * Local structure lock
  *****************************************************************************/
 static vlc_mutex_t    structure_lock;
+static vlc_object_internals_t global_internals;
 
 vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
                                  int i_type, const char *psz_type )
 {
-    vlc_object_t * p_new = NULL;
+    vlc_object_t *p_new;
+    vlc_object_internals_t *p_priv;
 
     if( i_type == VLC_OBJECT_GLOBAL )
     {
         p_new = p_this;
+        p_priv = &global_internals;
+        memset( p_priv, 0, sizeof( *p_priv ) );
     }
     else
     {
-        p_new = malloc( i_size );
-        if( !p_new ) return NULL;
-        memset( p_new, 0, i_size );
+        p_priv = calloc( 1, sizeof( *p_priv ) + i_size );
+        if( p_priv == NULL )
+            return NULL;
+
+        p_new = (vlc_object_t *)(p_priv + 1);
     }
 
+    p_new->p_internals = p_priv;
     p_new->i_object_type = i_type;
     p_new->psz_object_type = psz_type;
 
@@ -132,7 +139,7 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     if( !p_new->p_vars )
     {
         if( i_type != VLC_OBJECT_GLOBAL )
-            free( p_new );
+            free( p_priv );
         return NULL;
     }
 
@@ -336,6 +343,7 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
  *****************************************************************************/
 void __vlc_object_destroy( vlc_object_t *p_this )
 {
+    vlc_object_internals_t *p_priv = vlc_internals( p_this );
     int i_delay = 0;
 
     if( p_this->i_children )
@@ -426,10 +434,7 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 
     /* global is not dynamically allocated by vlc_object_create */
     if( p_this->i_object_type != VLC_OBJECT_GLOBAL )
-    {
-        free( p_this );
-        p_this = NULL;
-    }
+        free( p_priv );
 }
 
 
