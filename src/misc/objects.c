@@ -147,7 +147,6 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     {
         /* If i_type is global, then p_new is actually p_libvlc_global */
         libvlc_global_data_t *p_libvlc_global = (libvlc_global_data_t *)p_new;
-        p_new->p_libvlc_global = p_new;
         p_new->p_libvlc = NULL;
 
         p_libvlc_global->i_counter = 0;
@@ -161,7 +160,6 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     else
     {
         libvlc_global_data_t *p_libvlc_global = vlc_global();
-        p_new->p_libvlc_global = VLC_OBJECT (p_libvlc_global);
         p_new->p_libvlc = ( i_type == VLC_OBJECT_LIBVLC ) ? (libvlc_int_t*)p_new
                                                        : p_this->p_libvlc;
 
