@@ -4,7 +4,7 @@
  * Copyright (C) 1998-2004 the VideoLAN team
  * $Id: cpu.c 14103 2006-02-01 12:44:16Z sam $
  *
- * Authors: Cl√ment Stenac <zorglub@videolan.org>
+ * Authors: Cl√©ment Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
