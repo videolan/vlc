@@ -155,7 +155,7 @@ static int Demux( demux_t *p_demux )
         }
         else if( !strcmp( psz_name, "label" ) )
         {
-            playlist_ItemSetName( p_current, psz_value );
+            input_ItemSetName( p_current_input, psz_value );
         }
         else
         {
@@ -266,10 +266,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_bitrate )
                         msg_Err( p_playlist, "Unsupported meta bitrate" );
 
-                    playlist_BothAddInput( p_playlist, p_input,
-                                           p_item_in_category,
-                                           PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                                           PLAYLIST_END, NULL, NULL, VLC_FALSE );
+                    input_ItemAddSubItem( p_current_input, p_input );
                     FREENULL( psz_name );
                     FREENULL( psz_mrl );
                     FREENULL( psz_genre );

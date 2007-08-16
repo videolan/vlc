@@ -58,8 +58,7 @@ volume - 0 (mute) - 100 (max)
 struct demux_sys_t
 {
     playlist_t *p_playlist;
-    playlist_item_t *p_current;
-    playlist_item_t *p_item_in_category;
+    input_item_t *p_current_input;
 
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
@@ -138,8 +137,7 @@ static int Demux( demux_t *p_demux )
     INIT_PLAYLIST_STUFF;
 
     p_sys->p_playlist = p_playlist;
-    p_sys->p_current = p_current;
-    p_sys->p_item_in_category = p_item_in_category;
+    p_sys->p_current_input = p_current_input;
 
     p_xml = p_sys->p_xml = xml_Create( p_demux );
     if( !p_xml ) return -1;
@@ -359,18 +357,12 @@ static int Demux( demux_t *p_demux )
                     p_input, "QuickTime Media Link", _(type), "%s", field ) ; }
         SADD_INFO( "href", psz_href );
         SADD_INFO( "mime type", psz_mimetype );
-        playlist_BothAddInput( p_sys->p_playlist, p_input,
-                               p_sys->p_item_in_category,
-                               PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                               PLAYLIST_END, NULL, NULL, VLC_FALSE );
+        input_ItemAddSubItem( p_current_input, p_input );
         if( psz_qtnext )
         {
             p_input = input_ItemNewExt( p_sys->p_playlist,
                                         psz_qtnext, NULL, 0, NULL, -1 );
-            playlist_BothAddInput( p_sys->p_playlist, p_input,
-                                   p_sys->p_item_in_category,
-                                   PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                                   PLAYLIST_END, NULL, NULL, VLC_FALSE );
+            input_ItemAddSubItem( p_current_input, p_input );
         }
     }
 

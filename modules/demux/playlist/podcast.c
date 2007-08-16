@@ -229,12 +229,12 @@ static int Demux( demux_t *p_demux )
                 else if( b_item == VLC_FALSE && b_image == VLC_FALSE
                          && !strcmp( psz_elname, "title" ) )
                 {
-                    playlist_ItemSetName( p_current, psz_text );
+                    input_ItemSetName( p_current_input, psz_text );
                 }
 #define ADD_GINFO( info, name ) \
     else if( !b_item && !b_image && !strcmp( psz_elname, name ) ) \
     { \
-        input_ItemAddInfo( p_current->p_input, _("Podcast Info"), \
+        input_ItemAddInfo( p_current_input, _("Podcast Info"), \
                                 _( info ), "%s", psz_text ); \
     }
                 ADD_GINFO( "Podcast Link", "link" )
@@ -247,7 +247,7 @@ static int Demux( demux_t *p_demux )
                          && ( !strcmp( psz_elname, "itunes:summary" )
                             ||!strcmp( psz_elname, "description" ) ) )
                 { /* <description> isn't standard iTunes podcast stuff */
-                    input_ItemAddInfo( p_current->p_input,
+                    input_ItemAddInfo( p_current_input,
                              _( "Podcast Info" ), _( "Podcast Summary" ),
                              "%s", psz_text );
                 }
@@ -290,10 +290,7 @@ static int Demux( demux_t *p_demux )
                                                 "%s bytes",
                                                 psz_item_size );
                     }
-                    playlist_BothAddInput( p_playlist, p_input,
-                                           p_item_in_category,
-                                           PLAYLIST_APPEND | PLAYLIST_SPREPARSE
-                                           , PLAYLIST_END, NULL, NULL, VLC_FALSE );
+                    input_ItemAddSubItem( p_current_input, p_input );
                     FREENULL( psz_item_name );
                     FREENULL( psz_item_mrl );
                     FREENULL( psz_item_size );

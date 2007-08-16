@@ -37,8 +37,7 @@
 struct demux_sys_t
 {
     playlist_t *p_playlist;
-    playlist_item_t *p_current;
-    playlist_item_t *p_item_in_category;
+    input_item_t *p_current_input;
 
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
@@ -108,8 +107,7 @@ static int Demux( demux_t *p_demux )
     char *psz_eltname = NULL;
     INIT_PLAYLIST_STUFF;
     p_sys->p_playlist = p_playlist;
-    p_sys->p_current = p_current;
-    p_sys->p_item_in_category = p_item_in_category;
+    p_sys->p_current_input = p_current_input;
 
     p_xml = p_sys->p_xml = xml_Create( p_demux );
     if( !p_xml ) return -1;
@@ -236,13 +234,10 @@ static int DemuxGenre( demux_t *p_demux )
                              psz_name );
                     p_input = input_ItemNewExt( p_sys->p_playlist, psz_mrl,
                                                 psz_name, 0, NULL, -1 );
-                    input_ItemCopyOptions( p_sys->p_current->p_input,
+                    input_ItemCopyOptions( p_sys->p_current_input,
                                                 p_input );
                     free( psz_mrl );
-                    playlist_BothAddInput( p_sys->p_playlist, p_input,
-                                           p_sys->p_item_in_category,
-                                           PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                                           PLAYLIST_END, NULL, NULL, VLC_FALSE );
+                    input_ItemAddSubItem( p_sys->p_current_input, p_input );
                     FREENULL( psz_name );
                 }
                 FREENULL( psz_eltname );
@@ -414,7 +409,7 @@ static int DemuxStation( demux_t *p_demux )
                                                 psz_name , 0, NULL, -1 );
                     free( psz_mrl );
 
-                    input_ItemCopyOptions( p_sys->p_current->p_input,
+                    input_ItemCopyOptions( p_sys->p_current_input,
                                                 p_input );
 
 #define SADD_INFO( type, field ) if( field ) { input_ItemAddInfo( \
@@ -429,11 +424,7 @@ static int DemuxStation( demux_t *p_demux )
                         input_item_SetNowPlaying( p_input, psz_ct );
                     if( psz_rt )
                         input_item_SetRating( p_input, psz_rt );
-
-                    playlist_BothAddInput( p_sys->p_playlist, p_input,
-                                           p_sys->p_item_in_category,
-                                           PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                                           PLAYLIST_END, NULL, NULL, VLC_FALSE );
+                    input_ItemAddSubItem( p_sys->p_current_input, p_input );
 
                     FREENULL( psz_name );
                     FREENULL( psz_mt )

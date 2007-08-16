@@ -94,10 +94,7 @@ static int Demux( demux_t *p_demux )
     snprintf( psz_url, len+1, "dvd://%s", p_demux->psz_path );
 
     p_input = input_ItemNewExt( p_playlist, psz_url, psz_url, 0, NULL, -1 );
-    playlist_BothAddInput( p_playlist, p_input,
-                           p_item_in_category,
-                           PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                           PLAYLIST_END, NULL, NULL, VLC_FALSE );
+    input_ItemAddSubItem( p_current_input, p_input );
 
     HANDLE_PLAY_AND_RELEASE;
 

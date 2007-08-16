@@ -382,7 +382,7 @@ static int Demux ( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    input_ItemCopyOptions( p_current->p_input, p_child );
+    input_ItemCopyOptions( p_current_input, p_child );
     if( p_sys->i_packet_size && p_sys->psz_mcast_ip )
     {
         char *psz_option;
@@ -406,9 +406,7 @@ static int Demux ( demux_t *p_demux )
         free( psz_option );
     }
 
-    playlist_BothAddInput( p_playlist, p_child, p_item_in_category,
-                           PLAYLIST_APPEND | PLAYLIST_SPREPARSE, PLAYLIST_END,
-                           NULL, NULL, VLC_FALSE );
+    input_ItemAddSubItem( p_current_input, p_child );
     HANDLE_PLAY_AND_RELEASE
     return -1; /* Needed for correct operation of go back */
 }

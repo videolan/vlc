@@ -59,8 +59,7 @@ description:The now infamous Apple Macintosh commercial aired during the 1984 Su
 struct demux_sys_t
 {
     playlist_t *p_playlist;
-    playlist_item_t *p_current;
-    playlist_item_t *p_item_in_category;
+    input_item_t *p_current_input;
 };
 
 /*****************************************************************************
@@ -132,8 +131,7 @@ static int Demux( demux_t *p_demux )
     INIT_PLAYLIST_STUFF;
 
     p_sys->p_playlist = p_playlist;
-    p_sys->p_current = p_current;
-    p_sys->p_item_in_category = p_item_in_category;
+    p_sys->p_current_input = p_current_input;
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
@@ -212,10 +210,7 @@ static int Demux( demux_t *p_demux )
         SADD_INFO( "gvp_version", psz_version );
         SADD_INFO( "docid", psz_docid );
         SADD_INFO( "description", psz_description );
-        playlist_BothAddInput( p_sys->p_playlist, p_input,
-                               p_sys->p_item_in_category,
-                               PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                               PLAYLIST_END, NULL, NULL, VLC_FALSE );
+        input_ItemAddSubItem( p_current_input, p_input );
     }
 
     HANDLE_PLAY_AND_RELEASE;

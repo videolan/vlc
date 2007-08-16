@@ -295,7 +295,7 @@ int E_(Import_LuaPlaylist)( vlc_object_t *p_this )
 
 #   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
     {
-        const char *psz_vlcpath = config_GetDataDir();
+        const char *psz_vlcpath = NULL;//config_GetDataDir();
         if( asprintf( &ppsz_dir_list[1], "%s" DIR_SEP "luaplaylist", psz_vlcpath ) < 0 )
             return VLC_ENOMEM;
         if( asprintf( &ppsz_dir_list[2], "%s" DIR_SEP "share" DIR_SEP "luaplaylist", psz_vlcpath ) < 0 )
@@ -643,11 +643,7 @@ static int Demux( demux_t *p_demux )
                                                p_input );
 
                         /* Append item to playlist */
-                        playlist_BothAddInput(
-                            p_playlist, p_input,
-                            p_item_in_category,
-                            PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                            PLAYLIST_END, NULL, NULL, VLC_FALSE );
+                        input_ItemAddSubItem( p_current_input, p_input );
 
                         while( i_options > 0 )
                             free( ppsz_options[--i_options] );

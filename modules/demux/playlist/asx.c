@@ -460,12 +460,8 @@ static int Demux( demux_t *p_demux )
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
                             p_input = input_ItemNew( p_playlist, psz_string, psz_title_asx );
-                            input_ItemCopyOptions( p_current->p_input, p_input );
-                            playlist_BothAddInput( p_playlist, p_input,
-                                                   p_item_in_category,
-                                            PLAYLIST_APPEND|PLAYLIST_SPREPARSE,
-                                            PLAYLIST_END, NULL, NULL,
-                                            VLC_FALSE);
+                            input_ItemCopyOptions( p_current_input, p_input );
+                            input_ItemAddSubItem( p_current_input, p_input );
                             free( psz_string );
                         }
                         else continue;
@@ -501,7 +497,7 @@ static int Demux( demux_t *p_demux )
                 if( p_sys->b_skip_ads && b_skip_entry )
                 {
                     msg_Dbg( p_demux, "skipped entry %d %s (%s)",
-                    i_entry_count, ( psz_title_entry ? psz_title_entry : p_current->p_input->psz_name ), psz_href );
+                    i_entry_count, ( psz_title_entry ? psz_title_entry : p_current_input->psz_name ), psz_href );
                 }
                 else
                 {
@@ -518,11 +514,11 @@ static int Demux( demux_t *p_demux )
                     }
 
                     /* create the new entry */
-                    asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : p_current->p_input->psz_name ) );
+                    asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : p_current_input->psz_name ) );
 
                     p_entry = input_ItemNewExt( p_playlist, psz_href, psz_name, i_options, (const char * const *)ppsz_options, -1 );
                     FREENULL( psz_name );
-                    input_ItemCopyOptions( p_current->p_input, p_entry );
+                    input_ItemCopyOptions( p_current_input, p_entry );
                     while( i_options )
                     {
                         psz_name = ppsz_options[--i_options];
@@ -534,11 +530,7 @@ static int Demux( demux_t *p_demux )
                     if( psz_copyright_entry ) input_item_SetCopyright( p_entry, psz_copyright_entry );
                     if( psz_moreinfo_entry ) input_item_SetURL( p_entry, psz_moreinfo_entry );
                     if( psz_abstract_entry ) input_item_SetDescription( p_entry, psz_abstract_entry );
-                    playlist_BothAddInput( p_playlist, p_entry,
-                                         p_item_in_category,
-                                         PLAYLIST_APPEND | PLAYLIST_SPREPARSE
-                                         , PLAYLIST_END, NULL, NULL,
-                                         VLC_FALSE );
+                    input_ItemAddSubItem( p_current_input, p_entry );
                 }
 
                 /* cleanup entry */
@@ -675,13 +667,13 @@ static int Demux( demux_t *p_demux )
             }
             else if( !strncasecmp( psz_parse, "</ASX", 5 ) )
             {
-                vlc_mutex_lock( &p_current->p_input->lock );
-                if( psz_title_asx ) input_item_SetTitle( p_current->p_input, psz_title_asx );
-                if( psz_artist_asx ) input_item_SetArtist( p_current->p_input, psz_artist_asx );
-                if( psz_copyright_asx ) input_item_SetCopyright( p_current->p_input, psz_copyright_asx );
-                if( psz_moreinfo_asx ) input_item_SetURL( p_current->p_input, psz_moreinfo_asx );
-                if( psz_abstract_asx ) input_item_SetDescription( p_current->p_input, psz_abstract_asx );
-                vlc_mutex_unlock( &p_current->p_input->lock );
+                vlc_mutex_lock( &p_current_input->lock );
+                if( psz_title_asx ) input_item_SetTitle( p_current_input, psz_title_asx );
+                if( psz_artist_asx ) input_item_SetArtist( p_current_input, psz_artist_asx );
+                if( psz_copyright_asx ) input_item_SetCopyright( p_current_input, psz_copyright_asx );
+                if( psz_moreinfo_asx ) input_item_SetURL( p_current_input, psz_moreinfo_asx );
+                if( psz_abstract_asx ) input_item_SetDescription( p_current_input, psz_abstract_asx );
+                vlc_mutex_unlock( &p_current_input->lock );
                 FREENULL( psz_base_asx );
                 FREENULL( psz_title_asx );
                 FREENULL( psz_artist_asx );

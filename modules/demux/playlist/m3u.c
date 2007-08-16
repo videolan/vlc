@@ -185,9 +185,7 @@ static int Demux( demux_t *p_demux )
             if ( psz_artist && *psz_artist )
                 input_ItemAddInfo( p_input, _(VLC_META_INFO_CAT),
                                    _(VLC_META_ARTIST), "%s", psz_artist );
-            playlist_BothAddInput( p_playlist, p_input, p_item_in_category,
-                                   PLAYLIST_APPEND | PLAYLIST_SPREPARSE,
-                                   PLAYLIST_END, NULL, NULL, VLC_FALSE );
+            input_ItemAddSubItem( p_current_input, p_input );
             free( psz_mrl );
         }
 
