@@ -209,7 +209,7 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
 
     char *psz_filter_type;
     vlc_object_t *p_obj = (vlc_object_t *)
-        vlc_object_find_name( p_intf->p_libvlc_global, psz_name, FIND_CHILD );
+        vlc_object_find_name( p_intf->p_libvlc, psz_name, FIND_CHILD );
     if( !p_obj )
     {
         msg_Err( p_intf, "Unable to find filter module \"%s\n.", psz_name );
