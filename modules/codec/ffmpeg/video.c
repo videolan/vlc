@@ -214,18 +214,18 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
                       AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
-    vlc_value_t lockval;
+    vlc_mutex_t *lock = var_GetGlobalMutex( "avcodec" );
     vlc_value_t val;
 
-    var_Create( p_dec->p_libvlc_global, "avcodec", VLC_VAR_MUTEX );
-    var_Get( p_dec->p_libvlc_global, "avcodec", &lockval );
+    if( lock == NULL )
+        return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
           (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
     {
         msg_Err( p_dec, "out of memory" );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     p_dec->p_sys->p_context = p_context;
@@ -330,15 +330,15 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->p_context->palctrl = &palette_control;
 
     /* ***** Open the codec ***** */
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_lock( lock );
     if( avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0 )
     {
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( lock );
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
         free( p_sys );
         return VLC_EGENERIC;
     }
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( lock );
     msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 
 

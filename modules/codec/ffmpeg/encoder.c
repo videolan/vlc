@@ -195,10 +195,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     int i_codec_id, i_cat;
     const char *psz_namecodec;
     vlc_value_t val;
-    vlc_value_t lockval;
-
-    var_Create( p_enc->p_libvlc_global, "avcodec", VLC_VAR_MUTEX );
-    var_Get( p_enc->p_libvlc_global, "avcodec", &lockval );
+    vlc_mutex_t *lock = var_GetGlobalMutex( "avcodec" );
 
     if( !E_(GetFfmpegCodec)( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
@@ -533,10 +530,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     p_context->extradata = NULL;
     p_context->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_lock( lock );
     if( avcodec_open( p_context, p_codec ) )
     {
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( lock );
         if( p_enc->fmt_in.i_cat == AUDIO_ES &&
              (p_context->channels > 2 || i_codec_id == CODEC_ID_MP2
                || i_codec_id == CODEC_ID_MP3) )
@@ -586,10 +583,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             }
 
             p_context->codec = NULL;
-            vlc_mutex_lock( lockval.p_address );
+            vlc_mutex_lock( lock );
             if( avcodec_open( p_context, p_codec ) )
             {
-                vlc_mutex_unlock( lockval.p_address );
+                vlc_mutex_unlock( lock );
                 msg_Err( p_enc, "cannot open encoder" );
                 intf_UserFatal( p_enc, VLC_FALSE, _("Streaming / Transcoding failed"),
                                 _("VLC could not open the encoder.") );
@@ -606,7 +603,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
     }
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( lock);
 
     p_enc->fmt_out.i_extra = p_context->extradata_size;
     if( p_enc->fmt_out.i_extra )
@@ -1005,9 +1002,7 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
-    vlc_value_t lockval;
-
-    var_Get( p_enc->p_libvlc_global, "avcodec", &lockval );
+    vlc_mutex_t *lock = var_GetGlobalMutex( "avcodec" );
 
     if ( p_sys->b_inited && p_enc->i_threads >= 1 )
     {
@@ -1027,9 +1022,9 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
         free( pp_contexts );
     }
 
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_lock( lock );
     avcodec_close( p_sys->p_context );
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( lock );
     av_free( p_sys->p_context );
 
     if( p_sys->p_buffer ) free( p_sys->p_buffer );
