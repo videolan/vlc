@@ -352,7 +352,7 @@ int aout_VolumeNoneSet( aout_instance_t * p_aout, audio_volume_t i_volume )
  * This function is used whenever the parameters of the output plug-in are
  * changed (eg. selecting S/PDIF or PCM).
  *****************************************************************************/
-int aout_Restart( aout_instance_t * p_aout )
+static int aout_Restart( aout_instance_t * p_aout )
 {
     int i;
     vlc_bool_t b_error = 0;
