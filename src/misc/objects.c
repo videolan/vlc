@@ -125,7 +125,6 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     p_new->psz_header = NULL;
 
-    p_new->i_flags = 0;
     if( p_this->i_flags & OBJECT_FLAGS_NODBG )
         p_new->i_flags |= OBJECT_FLAGS_NODBG;
     if( p_this->i_flags & OBJECT_FLAGS_QUIET )
@@ -133,10 +132,9 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
         p_new->i_flags |= OBJECT_FLAGS_NOINTERACT;
 
-    p_new->i_vars = 0;
-    p_new->p_vars = (variable_t *)malloc( 16 * sizeof( variable_t ) );
+    p_priv->p_vars = calloc( sizeof( variable_t ), 16 );
 
-    if( !p_new->p_vars )
+    if( !p_priv->p_vars )
     {
         if( i_type != VLC_OBJECT_GLOBAL )
             free( p_priv );
@@ -186,7 +184,7 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     /* Initialize mutexes and condvars */
     vlc_mutex_init( p_new, &p_new->object_lock );
     vlc_cond_init( p_new, &p_new->object_wait );
-    vlc_mutex_init( p_new, &p_new->var_lock );
+    vlc_mutex_init( p_new, &p_priv->var_lock );
 
     if( i_type == VLC_OBJECT_GLOBAL )
     {
@@ -390,13 +388,13 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 
     /* Destroy the associated variables, starting from the end so that
      * no memmove calls have to be done. */
-    while( p_this->i_vars )
+    while( p_priv->i_vars )
     {
-        var_Destroy( p_this, p_this->p_vars[p_this->i_vars - 1].psz_name );
+        var_Destroy( p_this, p_priv->p_vars[p_priv->i_vars - 1].psz_name );
     }
 
-    free( p_this->p_vars );
-    vlc_mutex_destroy( &p_this->var_lock );
+    free( p_priv->p_vars );
+    vlc_mutex_destroy( &p_priv->var_lock );
 
     if( p_this->psz_header ) free( p_this->psz_header );
 
@@ -877,11 +875,11 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
 
             PrintObject( p_object, "" );
 
-            if( !p_object->i_vars )
+            if( !p_object->p_internals->i_vars )
                 printf( " `-o No variables\n" );
-            for( i = 0; i < p_object->i_vars; i++ )
+            for( i = 0; i < p_object->p_internals->i_vars; i++ )
             {
-                variable_t *p_var = p_object->p_vars + i;
+                variable_t *p_var = p_object->p_internals->p_vars + i;
 
                 const char *psz_type = "unknown";
                 switch( p_var->i_type & VLC_VAR_TYPE )
@@ -907,7 +905,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
 #undef MYCASE
                 }
                 printf( " %c-o \"%s\" (%s",
-                        i + 1 == p_object->i_vars ? '`' : '|',
+                        i + 1 == p_object->p_internals->i_vars ? '`' : '|',
                         p_var->psz_name, psz_type );
                 if( p_var->psz_text )
                     printf( ", %s", p_var->psz_text );

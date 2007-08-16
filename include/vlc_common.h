@@ -562,11 +562,6 @@ typedef struct vlc_object_internals_t vlc_object_internals_t;
     volatile vlc_bool_t b_attached;               /**< set by the object */ \
     vlc_bool_t b_force;      /**< set by the outside (eg. module_Need()) */ \
                                                                             \
-    /* Object variables */                                                  \
-    vlc_mutex_t     var_lock;                                               \
-    int             i_vars;                                                 \
-    variable_t *    p_vars;                                                 \
-                                                                            \
     /* Stuff related to the libvlc structure */                             \
     libvlc_int_t *p_libvlc;                  /**< (root of all evil) - 1 */ \
                                                                             \

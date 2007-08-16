@@ -82,8 +82,12 @@ uint32_t CPUCapabilities( void );
 /* Private LibVLC data for each objects */
 struct vlc_object_internals_t
 {
-
+    /* Object variables */
+    vlc_mutex_t     var_lock;
+    int             i_vars;
+    variable_t *    p_vars;
 };
+
 
 static inline vlc_object_internals_t *vlc_internals( vlc_object_t *obj )
 {
