@@ -1705,22 +1705,21 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
  *
  * @return a string (always succeeds).
  */
-const char *__config_GetDataDir( const vlc_object_t *p_this )
+const char *config_GetDataDir( void )
 {
 #if defined (WIN32) || defined (UNDER_CE)
-    return vlc_global( p_this )->psz_vlcpath;
+    return vlc_global()->psz_vlcpath;
 #elif defined(__APPLE__) || defined (SYS_BEOS)
     static char path[PATH_MAX] = "";
 
     if( *path == '\0' )
     {
         snprintf( path, sizeof( path ), "%s/share",
-                  vlc_global( p_this )->psz_vlcpath );
+                  vlc_global()->psz_vlcpath );
         path[sizeof( path ) - 1] = '\0';
     }
     return path;
 #else
-    (void)p_this;
     return DATA_PATH;
 #endif
 }

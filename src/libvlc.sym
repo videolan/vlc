@@ -4,7 +4,7 @@ sout_SessionSetMedia
 vlc_b64_encode_binary
 vlc_strnlen
 stream_Block
-__config_GetDataDir
+config_GetDataDir
 __vlc_object_find_name
 __var_Command
 net_Listen

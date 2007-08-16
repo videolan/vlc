@@ -290,7 +290,7 @@ void __stats_TimerStart( vlc_object_t *p_obj, const char *psz_name,
     if( !p_counter )
     {
         counter_sample_t *p_sample;
-        p_counter = stats_CounterCreate( p_obj->p_libvlc_global, VLC_VAR_TIME,
+        p_counter = stats_CounterCreate( p_obj->p_libvlc, VLC_VAR_TIME,
                                          STATS_TIMER );
         if( !p_counter )
         {

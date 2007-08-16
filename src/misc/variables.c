@@ -30,6 +30,7 @@
 #ifdef HAVE_STDLIB_H
 #   include <stdlib.h>                                          /* realloc() */
 #endif
+#include "libvlc.h"
 
 /*****************************************************************************
  * Private types
@@ -834,7 +835,7 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
  */
 vlc_mutex_t *var_GetGlobalMutex( const char *name )
 {
-    vlc_object_t *p_global = vlc_global_object();
+    libvlc_global_data_t *p_global = vlc_global();
     vlc_value_t val;
 
     if( var_Create( p_global, name, VLC_VAR_MUTEX ) )

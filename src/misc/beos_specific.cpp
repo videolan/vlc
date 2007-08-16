@@ -80,11 +80,11 @@ static void AppThread( vlc_object_t *p_appthread );
  *****************************************************************************/
 void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
-    vlc_global( p_this )->p_appthread =
+    vlc_global()->p_appthread =
             (vlc_object_t *)vlc_object_create( p_this, sizeof(vlc_object_t) );
 
     /* Create the BApplication thread and wait for initialization */
-    vlc_thread_create( vlc_global( p_this )->p_appthread, "app thread", AppThread,
+    vlc_thread_create( vlc_global()->p_appthread, "app thread", AppThread,
                        VLC_THREAD_PRIORITY_LOW, VLC_TRUE );
 }
 
@@ -103,10 +103,10 @@ void system_End( libvlc_int_t *p_this )
     /* Tell the BApplication to die */
     be_app->PostMessage( REALLY_QUIT );
 
-    vlc_thread_join( vlc_global( p_this )->p_appthread );
-    vlc_object_destroy( vlc_global( p_this )->p_appthread );
+    vlc_thread_join( vlc_global()->p_appthread );
+    vlc_object_destroy( vlc_global()->p_appthread );
 
-    free( vlc_global( p_this )->psz_vlcpath );
+    free( vlc_global()->psz_vlcpath );
 }
 
 /* following functions are local */
@@ -173,7 +173,7 @@ void VlcApplication::ReadyToRun( )
     BEntry entry( &info.ref );
     entry.GetPath( &path );
     path.GetParent( &path );
-    vlc_global( p_this )->psz_vlcpath = strdup( path.Path() );
+    vlc_global()->psz_vlcpath = strdup( path.Path() );
 
     /* Tell the main thread we are finished initializing the BApplication */
     vlc_thread_ready( p_this );

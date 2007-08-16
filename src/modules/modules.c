@@ -171,7 +171,7 @@ void __module_InitBank( vlc_object_t *p_this )
 {
     module_bank_t *p_bank = NULL;
     vlc_value_t  lockval;
-    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
     var_Get( p_libvlc_global, "libvlc", &lockval );
@@ -214,7 +214,7 @@ void __module_EndBank( vlc_object_t *p_this )
 {
     module_t * p_next = NULL;
     vlc_value_t lockval;
-    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
     var_Get( p_libvlc_global, "libvlc", &lockval );
@@ -302,7 +302,7 @@ void __module_EndBank( vlc_object_t *p_this )
 static void module_LoadMain( vlc_object_t *p_this )
 {
     vlc_value_t lockval;
-    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
     var_Get( p_libvlc_global, "libvlc", &lockval );
@@ -328,7 +328,7 @@ static void module_LoadMain( vlc_object_t *p_this )
 void __module_LoadBuiltins( vlc_object_t * p_this )
 {
     vlc_value_t lockval;
-    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
     var_Get( p_libvlc_global, "libvlc", &lockval );
@@ -356,7 +356,7 @@ void __module_LoadPlugins( vlc_object_t * p_this )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
     vlc_value_t lockval;
-    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     var_Create( p_libvlc_global, "libvlc", VLC_VAR_MUTEX );
     var_Get( p_libvlc_global, "libvlc", &lockval );
@@ -830,7 +830,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 #endif
         {
             if( 0>= asprintf( &psz_fullpath, "%s"DIR_SEP"%s",
-                              vlc_global( p_this )->psz_vlcpath, *ppsz_path) )
+                              vlc_global()->psz_vlcpath, *ppsz_path) )
                 psz_fullpath = NULL;
         }
         else
@@ -1092,7 +1092,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
 
     if( p_module )
     {
-        libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+        libvlc_global_data_t *p_libvlc_global = vlc_global();
 
         /* Everything worked fine !
          * The module is ready to be added to the list. */
@@ -1277,7 +1277,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
     /* msg_Dbg( p_this, "builtin \"%s\", %s",
                 p_module->psz_object_name, p_module->psz_longname ); */
 
-    vlc_object_attach( p_module, vlc_global( p_this )->p_module_bank );
+    vlc_object_attach( p_module, vlc_global()->p_module_bank );
 
     return 0;
 }
@@ -1653,7 +1653,7 @@ static void CacheLoad( vlc_object_t *p_this )
     int i_cache;
     module_cache_t **pp_cache = 0;
     int32_t i_file_size, i_marker;
-    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     psz_homedir = p_this->p_libvlc->psz_homedir;
     if( !psz_homedir )
@@ -2007,7 +2007,7 @@ static void CacheSave( vlc_object_t *p_this )
     int i, j, i_cache;
     module_cache_t **pp_cache;
     int32_t i_file_size = 0;
-    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     psz_homedir = p_this->p_libvlc->psz_homedir;
     if( !psz_homedir )
@@ -2254,7 +2254,7 @@ static module_cache_t *CacheFind( vlc_object_t *p_this, char *psz_file,
 {
     module_cache_t **pp_cache;
     int i_cache, i;
-    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     pp_cache = p_libvlc_global->p_module_bank->pp_loaded_cache;
     i_cache = p_libvlc_global->p_module_bank->i_loaded_cache;

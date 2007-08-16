@@ -90,8 +90,8 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     char *psz_vlmconf;
 
     /* Avoid multiple creation */
-    if( var_Create( p_this->p_libvlc_global, "vlm_mutex", VLC_VAR_MUTEX ) ||
-        var_Get( p_this->p_libvlc_global, "vlm_mutex", &lockval ) )
+    if( var_Create( p_this->p_libvlc, "vlm_mutex", VLC_VAR_MUTEX ) ||
+        var_Get( p_this->p_libvlc, "vlm_mutex", &lockval ) )
         return NULL;
 
     vlc_mutex_lock( lockval.p_address );
@@ -163,7 +163,7 @@ void vlm_Delete( vlm_t *p_vlm )
 {
     vlc_value_t lockval;
 
-    var_Get( p_vlm->p_libvlc_global, "vlm_mutex", &lockval );
+    var_Get( p_vlm->p_libvlc, "vlm_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     vlc_object_release( p_vlm );

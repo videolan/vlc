@@ -704,7 +704,7 @@ gnutls_ClientCreate( tls_t *p_tls )
     vlc_object_attach( p_session, p_tls );
 
     const char *homedir = p_tls->p_libvlc->psz_homedir,
-               *datadir = config_GetDataDir ((vlc_object_t *)p_session);
+               *datadir = config_GetDataDir ();
     size_t l1 = strlen (homedir), l2 = strlen (datadir);
     char path[((l1 > l2) ? l1 : l2) + sizeof ("/"CONFIG_DIR"/ssl/private")];
     //                              > sizeof ("/"CONFIG_DIR"/ssl/certs")

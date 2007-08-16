@@ -160,7 +160,7 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     }
     else
     {
-        libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+        libvlc_global_data_t *p_libvlc_global = vlc_global();
         p_new->p_libvlc_global = VLC_OBJECT (p_libvlc_global);
         p_new->p_libvlc = ( i_type == VLC_OBJECT_LIBVLC ) ? (libvlc_int_t*)p_new
                                                        : p_this->p_libvlc;
@@ -414,7 +414,7 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     }
     else
     {
-        libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+        libvlc_global_data_t *p_libvlc_global = vlc_global();
         int i_index;
 
         vlc_mutex_lock( &structure_lock );
@@ -473,7 +473,7 @@ void * __vlc_object_get( vlc_object_t *p_this, int i_id )
 {
     int i_max, i_middle;
     vlc_object_t **pp_objects;
-    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     vlc_mutex_lock( &structure_lock );
 
@@ -722,7 +722,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
     vlc_list_t *p_list;
     vlc_object_t **pp_current, **pp_end;
     int i_count = 0, i_index = 0;
-    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     vlc_mutex_lock( &structure_lock );
 
@@ -793,7 +793,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    libvlc_global_data_t *p_libvlc_global = vlc_global( p_this );
+    libvlc_global_data_t *p_libvlc_global = vlc_global();
 
     (void)oldval; (void)p_data;
     if( *psz_cmd == 'l' )

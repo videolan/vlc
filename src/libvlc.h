@@ -74,11 +74,7 @@ struct libvlc_global_data_t
 #endif
 };
 
-#define vlc_global( a ) __vlc_global( VLC_OBJECT( a ) )
-static inline libvlc_global_data_t *__vlc_global( vlc_object_t *p_this )
-{
-    return (libvlc_global_data_t *)p_this->p_libvlc_global;
-}
+libvlc_global_data_t *vlc_global (void);
 
 extern uint32_t cpu_flags;
 uint32_t CPUCapabilities( void );

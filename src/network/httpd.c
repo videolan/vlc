@@ -996,8 +996,8 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     }
 
     /* to be sure to avoid multiple creation */
-    var_Create( p_this->p_libvlc_global, "httpd_mutex", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc_global, "httpd_mutex", &lockval );
+    var_Create( p_this->p_libvlc, "httpd_mutex", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc, "httpd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     if( !(httpd = vlc_object_find( p_this, VLC_OBJECT_HTTPD, FIND_ANYWHERE )) )
@@ -1138,7 +1138,7 @@ void httpd_HostDelete( httpd_host_t *host )
     vlc_value_t lockval;
     int i;
 
-    var_Get( httpd->p_libvlc_global, "httpd_mutex", &lockval );
+    var_Get( httpd->p_libvlc, "httpd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
     host->i_ref--;
