@@ -1214,22 +1214,19 @@ static struct gcry_thread_cbs gcry_threads_vlc =
 /*****************************************************************************
  * Module initialization
  *****************************************************************************/
+static unsigned refs = 0;
+
 static int
 Open( vlc_object_t *p_this )
 {
     tls_t *p_tls = (tls_t *)p_this;
+    vlc_mutex_t *lock;
 
-    vlc_value_t lock, count;
-
-    var_Create( p_this->p_libvlc_global, "gnutls_mutex", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc_global, "gnutls_mutex", &lock );
-    vlc_mutex_lock( lock.p_address );
+    lock = var_GetGlobalMutex( "gnutls_mutex" );
+    vlc_mutex_lock( lock );
 
     /* Initialize GnuTLS only once */
-    var_Create( p_this->p_libvlc_global, "gnutls_count", VLC_VAR_INTEGER );
-    var_Get( p_this->p_libvlc_global, "gnutls_count", &count);
-
-    if( count.i_int == 0)
+    if( refs == 0 )
     {
 #ifdef NEED_THREAD_CONTEXT
         __p_gcry_data = VLC_OBJECT( p_this->p_libvlc );
@@ -1239,7 +1236,7 @@ Open( vlc_object_t *p_this )
         if( gnutls_global_init( ) )
         {
             msg_Warn( p_this, "cannot initialize GnuTLS" );
-            vlc_mutex_unlock( lock.p_address );
+            vlc_mutex_unlock( lock );
             return VLC_EGENERIC;
         }
 
@@ -1247,16 +1244,15 @@ Open( vlc_object_t *p_this )
         if( psz_version == NULL )
         {
             gnutls_global_deinit( );
-            vlc_mutex_unlock( lock.p_address );
+            vlc_mutex_unlock( lock );
             msg_Err( p_this, "unsupported GnuTLS version" );
             return VLC_EGENERIC;
         }
         msg_Dbg( p_this, "GnuTLS v%s initialized", psz_version );
     }
 
-    count.i_int++;
-    var_Set( p_this->p_libvlc_global, "gnutls_count", count);
-    vlc_mutex_unlock( lock.p_address );
+    refs++;
+    vlc_mutex_unlock( lock );
 
     p_tls->pf_server_create = gnutls_ServerCreate;
     p_tls->pf_client_create = gnutls_ClientCreate;
@@ -1273,22 +1269,16 @@ Close( vlc_object_t *p_this )
     /*tls_t *p_tls = (tls_t *)p_this;
     tls_sys_t *p_sys = (tls_sys_t *)(p_this->p_sys);*/
 
-    vlc_value_t lock, count;
+    vlc_mutex_t *lock;
 
-    var_Create( p_this->p_libvlc_global, "gnutls_mutex", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc_global, "gnutls_mutex", &lock );
-    vlc_mutex_lock( lock.p_address );
+    lock = var_GetGlobalMutex( "gnutls_mutex" );
+    vlc_mutex_lock( lock );
 
-    var_Create( p_this->p_libvlc_global, "gnutls_count", VLC_VAR_INTEGER );
-    var_Get( p_this->p_libvlc_global, "gnutls_count", &count);
-    count.i_int--;
-    var_Set( p_this->p_libvlc_global, "gnutls_count", count);
-
-    if( count.i_int == 0 )
+    if( --refs == 0 )
     {
         gnutls_global_deinit( );
         msg_Dbg( p_this, "GnuTLS deinitialized" );
     }
 
-    vlc_mutex_unlock( lock.p_address );
+    vlc_mutex_unlock( lock );
 }

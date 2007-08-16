@@ -83,18 +83,16 @@ vlc_module_end();
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    vlc_value_t lockval;
+    vlc_mutex_t *lock;
 
     /* FIXME: put this in the module (de)initialization ASAP */
-    var_Create( p_this->p_libvlc_global, "gtk", VLC_VAR_MUTEX );
-
-    var_Get( p_this->p_libvlc_global, "gtk", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+    lock = var_GetGlobalCreate( "gtk" );
+    vlc_mutex_lock( lock );
 
     if( i_refcount > 0 )
     {
         i_refcount++;
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( lock );
 
         return VLC_SUCCESS;
     }
@@ -114,13 +112,12 @@ static int Open( vlc_object_t *p_this )
     {
         vlc_object_destroy( p_gtk_main );
         i_refcount--;
-        vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_this->p_libvlc_global, "gtk" );
+        vlc_mutex_unlock( lock );
         return VLC_ETHREAD;
     }
 
     i_refcount++;
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( lock );
 
     return VLC_SUCCESS;
 }
@@ -130,17 +127,16 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    vlc_value_t lockval;
+    vlc_mutex_t *lock;
 
-    var_Get( p_this->p_libvlc_global, "gtk", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+    lock = var_GetGlobalMutex( "gtk" );
+    vlc_mutex_lock( lock );
 
     i_refcount--;
 
     if( i_refcount > 0 )
     {
-        vlc_mutex_unlock( lockval.p_address );
-        var_Destroy( p_this->p_libvlc_global, "gtk" );
+        vlc_mutex_unlock( lock );
         return;
     }
 
@@ -150,8 +146,7 @@ static void Close( vlc_object_t *p_this )
     vlc_object_destroy( p_gtk_main );
     p_gtk_main = NULL;
 
-    vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_this->p_libvlc_global, "gtk" );
+    vlc_mutex_unlock( lock );
 }
 
 static gint foo( gpointer bar ) { return TRUE; }
