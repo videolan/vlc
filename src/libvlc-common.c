@@ -1387,6 +1387,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_module_name )
                     break;
                 pp_shortcut ++;
             }
+            if( !*pp_shortcut )
+                continue;
         }
 
         /* Ignore modules without config options */
@@ -1771,7 +1773,7 @@ static void ListModules( libvlc_int_t *p_this, vlc_bool_t b_verbose )
 
         if( b_verbose )
         {
-            const char **pp_shortcut = p_parser->pp_shortcuts;
+            const char *const *pp_shortcut = p_parser->pp_shortcuts;
             while( *pp_shortcut )
             {
                 if( strcmp( *pp_shortcut, p_parser->psz_object_name ) )
