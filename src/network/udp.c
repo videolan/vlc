@@ -549,7 +549,7 @@ int net_Subscribe (vlc_object_t *obj, int fd,
 }
 
 
-int net_SetDSCP( int fd, uint8_t dscp )
+static int net_SetDSCP( int fd, uint8_t dscp )
 {
     struct sockaddr_storage addr;
     if( getsockname( fd, (struct sockaddr *)&addr, &(socklen_t){ sizeof (addr) }) )

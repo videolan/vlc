@@ -197,7 +197,6 @@ net_ListenClose
 net_Printf
 __net_Read
 __net_Select
-net_SetDSCP
 __net_vaPrintf
 __net_Write
 osd_ConfigLoader

@@ -113,7 +113,6 @@ static inline int net_ListenUDP1 (vlc_object_t *obj, const char *host, int port)
 
 VLC_EXPORT( void, net_ListenClose, ( int *fd ) );
 
-VLC_EXPORT( int, net_SetDSCP, ( int fd, uint8_t dscp ) );
 int net_Subscribe (vlc_object_t *obj, int fd, const struct sockaddr *addr,
                    socklen_t addrlen);
 
