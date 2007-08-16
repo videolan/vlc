@@ -263,6 +263,7 @@ void libvlc_media_instance_destroy( libvlc_media_instance_t *p_mi )
         free( p_mi );
         return; /* no need to worry about no input thread */
     }
+    vlc_mutex_destroy( &p_mi->object_lock );
 
     input_DestroyThread( p_input_thread );
 
@@ -289,6 +290,7 @@ void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
         return;
     }
     vlc_mutex_unlock( &p_mi->object_lock );
+    vlc_mutex_destroy( &p_mi->object_lock );
 
     libvlc_event_manager_release( p_mi->p_event_manager );
     
@@ -323,7 +325,7 @@ void libvlc_media_instance_set_media_descriptor(
         return;
 
     vlc_mutex_lock( &p_mi->object_lock );
-    
+
     release_input_thread( p_mi );
 
     libvlc_media_descriptor_release( p_mi->p_md );
