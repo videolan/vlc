@@ -89,7 +89,6 @@ void vlc_event_manager_fini( vlc_event_manager_t * p_em )
         FOREACH_END()
         free( listeners_group );
     FOREACH_END()
-    free( p_em );
 }
 
 /**
