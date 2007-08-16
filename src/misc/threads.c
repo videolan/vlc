@@ -662,7 +662,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
             vlc_cond_wait( &p_this->object_wait, &p_this->object_lock );
         }
 
-        p_this->b_thread = 1;
+        p_this->b_thread = VLC_TRUE;
 
         msg_Dbg( p_this, "thread %u (%s) created at priority %d (%s:%d)",
                  (unsigned int)p_this->thread_id, psz_name, i_priority,
@@ -827,6 +827,6 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
                          (unsigned int)p_this->thread_id, psz_file, i_line );
     }
 
-    p_this->b_thread = 0;
+    p_this->b_thread = VLC_FALSE;
 }
 
