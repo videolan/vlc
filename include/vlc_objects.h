@@ -109,6 +109,7 @@ VLC_EXPORT( void, __vlc_object_release, ( vlc_object_t * ) );
 VLC_EXPORT( vlc_list_t *, __vlc_list_find, ( vlc_object_t *, int, int ) );
 VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
 VLC_EXPORT( libvlc_int_t *, vlc_current_object, ( int ) );
+VLC_EXPORT( vlc_object_t *, vlc_global_object, ( void ) );
 
 /*}@*/
 

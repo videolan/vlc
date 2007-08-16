@@ -122,6 +122,11 @@ static int  VerboseCallback( vlc_object_t *, char const *,
 
 static void InitDeviceValues( libvlc_int_t * );
 
+vlc_object_t * vlc_global_object( void )
+{
+    return VLC_OBJECT( &libvlc_global );
+}
+
 /*****************************************************************************
  * vlc_current_object: return the current object.
  *****************************************************************************
