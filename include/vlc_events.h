@@ -108,20 +108,25 @@ typedef struct vlc_event_manager_t
 
 /* List of event */
 typedef enum vlc_event_type_t {
-    vlc_InputItemMetaChanged
+    vlc_InputItemMetaChanged,
+    vlc_InputItemSubItemAdded
 } vlc_event_type_t;
 
 /* Event definition */
 typedef struct vlc_event_t
 {
     vlc_event_type_t type;
-    void * p_obj; /* Sender object, automatically filled by event_Send() */
+    void * p_obj; /* Sender object, automatically filled by vlc_event_send() */
     union vlc_event_type_specific
     {
         struct vlc_input_item_meta_changed
         {
             vlc_meta_type_t meta_type;
         } input_item_meta_changed;
+        struct vlc_input_item_subitem_added
+        {
+            input_item_t * p_new_child;
+        } input_item_subitem_added;
     } u;
 } vlc_event_t;
 

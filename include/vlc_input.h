@@ -117,6 +117,8 @@ static inline void input_ItemInit( vlc_object_t *p_o, input_item_t *p_i )
     vlc_event_manager_init( &p_i->event_manager, p_i );
     vlc_event_manager_register_event_type( &p_i->event_manager,
         vlc_InputItemMetaChanged );
+    vlc_event_manager_register_event_type( &p_i->event_manager,
+        vlc_InputItemSubItemAdded );
 }
 
 static inline void input_ItemCopyOptions( input_item_t *p_parent,
@@ -132,6 +134,29 @@ static inline void input_ItemCopyOptions( input_item_t *p_parent,
                                                   sizeof( char * ) );
         p_child->ppsz_options[p_child->i_options-1] = psz_option;
     }
+}
+
+static inline void input_ItemSetName( input_item_t *p_item, const char *psz_name )
+{
+    if( p_item->psz_name ) free( p_item->psz_name );
+    p_item->psz_name = strdup( psz_name );
+}
+
+/* This won't hold the item, but can tell to interested third parties
+ * Like the playlist, that there is a new sub item. With this design
+ * It is not the input item's responsability to keep all the ref of
+ * the input item children. */
+static inline void input_ItemAddSubItem( input_item_t *p_parent,
+                                         input_item_t *p_child )
+{
+    vlc_event_t event;
+
+    p_parent->i_type = ITEM_TYPE_PLAYLIST;
+
+    /* Notify interested third parties */
+    event.type = vlc_InputItemSubItemAdded;
+    event.u.input_item_subitem_added.p_new_child = p_child;
+    vlc_event_send( &p_parent->event_manager, &event );
 }
 
 VLC_EXPORT( void, input_ItemAddOption,( input_item_t *, const char * ) );
