@@ -83,9 +83,13 @@ uint32_t CPUCapabilities( void );
 struct vlc_object_internals_t
 {
     /* Object variables */
+    variable_t *    p_vars;
     vlc_mutex_t     var_lock;
     int             i_vars;
-    variable_t *    p_vars;
+
+    /* Thread properties, if any */
+    vlc_thread_t thread_id;
+    vlc_bool_t   b_thread;
 };
 
 

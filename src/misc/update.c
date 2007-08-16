@@ -1338,7 +1338,7 @@ void update_download_for_real( download_thread_t *p_this )
     free( p_this->psz_status );
 
 #ifdef WIN32
-    CloseHandle( p_this->thread_id );
+    CloseHandle( p_this->p_internals->thread_id );
 #endif
 
     vlc_object_destroy( p_this );

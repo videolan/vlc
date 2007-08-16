@@ -193,7 +193,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
         i_instances--;
         return NULL;
     }
-    p_libvlc->thread_id = 0;
     p_libvlc->p_playlist = NULL;
     p_libvlc->psz_object_name = "libvlc";
 

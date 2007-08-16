@@ -1207,8 +1207,9 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
         snprintf( psz_refcount, 19, ", refcount %i", p_this->i_refcount );
 
     psz_thread[0] = '\0';
-    if( p_this->b_thread )
-        snprintf( psz_thread, 29, " (thread %d)", (int)p_this->thread_id );
+    if( p_this->p_internals->b_thread )
+        snprintf( psz_thread, 29, " (thread %u)",
+                  (unsigned)p_this->p_internals->thread_id );
 
     psz_parent[0] = '\0';
     if( p_this->p_parent )

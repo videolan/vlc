@@ -547,10 +547,6 @@ typedef struct vlc_object_internals_t vlc_object_internals_t;
     char *psz_header;                                                       \
     int  i_flags;                                                           \
                                                                             \
-    /* Thread properties, if any */                                         \
-    vlc_bool_t   b_thread;                                                  \
-    vlc_thread_t thread_id;                                                 \
-                                                                            \
     /* Object access lock */                                                \
     vlc_mutex_t  object_lock;                                               \
     vlc_cond_t   object_wait;                                               \
