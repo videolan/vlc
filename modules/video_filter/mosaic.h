@@ -40,11 +40,11 @@ typedef struct bridge_t
 #define GetBridge(a) __GetBridge( VLC_OBJECT(a) )
 static bridge_t *__GetBridge( vlc_object_t *p_object )
 {
-    vlc_object_t *p_libvlc_global = p_object->p_libvlc_global;
+    vlc_object_t *p_libvlc = p_object->p_libvlc;
     bridge_t *p_bridge;
     vlc_value_t val;
 
-    if( var_Get( p_libvlc_global, "mosaic-struct", &val ) != VLC_SUCCESS )
+    if( var_Get( p_libvlc, "mosaic-struct", &val ) != VLC_SUCCESS )
     {
         p_bridge = NULL;
     }

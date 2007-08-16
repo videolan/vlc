@@ -284,7 +284,7 @@ static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    vlc_object_t *p_libvlc_global = p_filter->p_libvlc_global;
+    vlc_object_t *p_libvlc = p_filter->p_libvlc;
     char *psz_order;
     char *psz_offsets;
     int i_index;
@@ -306,8 +306,8 @@ static int CreateFilter( vlc_object_t *p_this )
     vlc_mutex_init( p_filter, &p_sys->lock );
     vlc_mutex_lock( &p_sys->lock );
 
-    var_Create( p_libvlc_global, "mosaic-lock", VLC_VAR_MUTEX );
-    var_Get( p_libvlc_global, "mosaic-lock", &val );
+    var_Create( p_libvlc, "mosaic-lock", VLC_VAR_MUTEX );
+    var_Get( p_libvlc, "mosaic-lock", &val );
     p_sys->p_lock = val.p_address;
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
