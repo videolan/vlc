@@ -327,7 +327,6 @@ us_strtod
 utf8_fopen
 utf8_fprintf
 utf8_lstat
-utf8_mkdir
 utf8_open
 utf8_opendir
 utf8_readdir
@@ -361,7 +360,6 @@ VLC_VariableGet
 VLC_VariableSet
 __vlc_cond_destroy
 __vlc_cond_init
-vlc_current_object
 vlc_error
 VLC_Error
 __vlc_execve

@@ -46,6 +46,11 @@ int __vlc_threads_end( vlc_object_t * );
 extern uint32_t cpu_flags;
 uint32_t CPUCapabilities( void );
 
+/*
+ * Unicode stuff
+ */
+int utf8_mkdir( const char *filename );
+
 
 /*
  * LibVLC objects stuff
@@ -92,7 +97,9 @@ struct libvlc_global_data_t
 #endif
 };
 
+
 libvlc_global_data_t *vlc_global (void);
+libvlc_int_t *vlc_current_object (int i_object);
 
 /* Private LibVLC data for each objects */
 struct vlc_object_internals_t
