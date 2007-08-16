@@ -147,7 +147,7 @@ int input_ItemAddInfo( input_item_t *p_i,
         if( !(p_cat = (info_category_t *)malloc( sizeof(info_category_t) )) )
         {
             vlc_mutex_unlock( &p_i->lock );
-            return VLC_EGENERIC;
+            return VLC_ENOMEM;
         }
         p_cat->psz_name = strdup( psz_cat );
         p_cat->i_infos = 0;
@@ -170,23 +170,24 @@ int input_ItemAddInfo( input_item_t *p_i,
         if( ( p_info = (info_t *)malloc( sizeof( info_t ) ) ) == NULL )
         {
             vlc_mutex_unlock( &p_i->lock );
-            return VLC_EGENERIC;
+            return VLC_ENOMEM;
         }
         INSERT_ELEM( p_cat->pp_infos, p_cat->i_infos, p_cat->i_infos, p_info );
         p_info->psz_name = strdup( psz_name );
     }
     else
     {
-        if( p_info->psz_value ) free( p_info->psz_value );
+        free( p_info->psz_value );
     }
 
     va_start( args, psz_format );
-    vasprintf( &p_info->psz_value, psz_format, args);
+    if( vasprintf( &p_info->psz_value, psz_format, args) )
+        p_info->psz_value = NULL;
     va_end( args );
 
     vlc_mutex_unlock( &p_i->lock );
 
-    return VLC_SUCCESS;
+    return p_info->psz_value ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
 input_item_t *input_ItemGetById( playlist_t *p_playlist, int i_id )
