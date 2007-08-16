@@ -73,6 +73,19 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 
     if( (psz_vlc = strrchr( psz_path, '\\' )) ) *psz_vlc = '\0';
 
+#ifndef HAVE_RELEASE
+    {
+        /* remove trailing \.libs from executable dir path if seen, 
+           we assume we are running vlc through libtool wrapper in build dir */
+        int offset  = strlen(psz_path)-sizeof("\\.libs")+1;
+        if( offset > 0 )
+        {
+            psz_vlc = psz_path+offset;
+            if( ! strcmp(psz_vlc, "\\.libs") ) *psz_vlc = '\0';
+        }
+    }
+#endif
+
     vlc_global( p_this )->psz_vlcpath = strdup( psz_path );
 
     /* Set the default file-translation mode */
