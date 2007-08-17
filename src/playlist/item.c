@@ -50,12 +50,11 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
     p_child = p_event->u.input_item_subitem_added.p_new_child;
 
     p_current = playlist_ItemGetByInput( p_playlist, p_parent, VLC_FALSE );
-    if( p_current->i_children == -1 )
-        p_item_in_category = playlist_ItemToNode( p_playlist, p_current,
+    p_item_in_category = playlist_ItemToNode( p_playlist, p_current,
                                               VLC_FALSE );
-    else
+    if(!p_item_in_category)
         p_item_in_category = p_current;
-    p_item_in_category = p_current;
+
     b_play = b_play && p_current == p_playlist->status.p_item;
 
     playlist_NodeAddInput( p_playlist, p_child, p_item_in_category, 
