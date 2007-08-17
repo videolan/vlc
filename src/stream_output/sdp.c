@@ -188,7 +188,7 @@ char *vAddSDPMedia (const char *type, int dport, const char *protocol,
     else
         *sdp_fmtp = '\0';
 
-    if (asprintf (&sdp_media, "m=%s %u %s %d\r\n" "%s" "%s",
+    if (asprintf (&sdp_media, "m=%s %u %s %d\r\n" "b=RR:0\r\n" "%s" "%s",
                   type, dport, protocol, pt,
                   sdp_rtpmap, sdp_fmtp) == -1)
         return NULL;
