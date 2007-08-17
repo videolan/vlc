@@ -203,9 +203,10 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
  /* A new item has been removed from a certain sd */
 static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_data )
 {
-    playlist_item_t * p_child = user_data;
-
-    msg_Err( p_child->p_playlist, "Service Discovery item deletion not handled" );
+    input_item_t * p_input = p_event->u.services_discovery_item_removed.p_item;
+    playlist_item_t * p_parent = user_data;
+    playlist_DeleteInputInParent( p_parent->p_playlist, p_input->i_id,
+                                  p_parent, VLC_FALSE );
 }
 
 int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modules )
