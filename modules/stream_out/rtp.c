@@ -785,6 +785,7 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
              sizeof( "u=*\r\n" ) + strlen( p_sys->psz_session_url ) +
              sizeof( "e=*\r\n" ) + strlen( p_sys->psz_session_email ) +
              sizeof( "t=0 0\r\n" ) + /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
+             sizeof( "b=RR:0\r\n" ) +
              sizeof( "a=tool:"PACKAGE_STRING"\r\n" ) +
              sizeof( "c=IN IP4 */*\r\n" ) + 20 + 10 +
              strlen( psz_destination ) ;
@@ -866,6 +867,7 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         {
             p += sprintf(p,"b=AS:%d\r\n",id->i_bitrate);
         }
+        p += sprintf( p, "b=RR:0\r\n" );
         if( id->psz_rtpmap )
         {
             p += sprintf( p, "a=rtpmap:%d %s\r\n", id->i_payload_type,
