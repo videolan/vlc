@@ -552,6 +552,29 @@ int __vlc_threadvar_create( vlc_object_t *p_this, vlc_threadvar_t *p_tls )
     return i_ret;
 }
 
+#if defined( WIN32 ) || defined( UNDER_CE )
+
+/*
+** Use a wrapper function which will make sure that 
+** thread handle is closed
+*/
+struct _vlc_win32_init_thread_data {
+    void * ( *func ) (void * );
+    void *p_data;
+};
+
+static unsigned WINAPI __vlc_win32_thread_start(void* p_data) {
+    struct _vlc_win32_init_thread_data *p_win32data =
+        (struct _vlc_win32_init_thread_data *)p_data;
+    vlc_object_t *p_this = (vlc_object_t *)p_win32data->p_data;
+    HANDLE hThread = (HANDLE)p_this->p_internals->thread_id;
+    void *retval = (*p_win32data->func)((LPVOID)p_this);
+    CloseHandle(hThread);
+    return (unsigned)retval;
+}
+
+#endif
+
 /*****************************************************************************
  * vlc_thread_create: create a thread, inner version
  *****************************************************************************
@@ -565,6 +588,9 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     int i_ret;
     void *p_data = (void *)p_this;
     vlc_object_internals_t *p_priv = p_this->p_internals;
+#if defined( WIN32 ) || defined( UNDER_CE )
+    struct _vlc_win32_init_thread_data win32data = { func, p_data };
+#endif
 
     vlc_mutex_lock( &p_this->object_lock );
 
@@ -583,14 +609,14 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
          * function instead of CreateThread, otherwise you'll end up with
          * memory leaks and the signal functions not working (see Microsoft
          * Knowledge Base, article 104641) */
-        p_priv->thread_id =
 #if defined( UNDER_CE )
-                (HANDLE)CreateThread( NULL, 0, (PTHREAD_START) func,
-                                      p_data, 0, &threadID );
+        HANDLE hThread = CreateThread( NULL, 0, __vlc_win32_thread_start,
+                                      (LPVOID)&win32data, 0, &threadID );
 #else
-                (HANDLE)_beginthreadex( NULL, 0, (PTHREAD_START) func,
-                                        p_data, 0, &threadID );
+        uintptr_t hThread = _beginthreadex( NULL, 0, __vlc_win32_thread_start,
+                                            (void*)&win32data, 0, &threadID );
 #endif
+        p_priv->thread_id = (HANDLE)hThread;
     }
 
     if( p_priv->thread_id && i_priority )
@@ -688,16 +714,18 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
 int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
                                int i_line, int i_priority )
 {
+    vlc_object_internals_t *p_priv = p_this->p_internals;
 #if defined( PTH_INIT_IN_PTH_H ) || defined( ST_INIT_IN_ST_H )
 #elif defined( WIN32 ) || defined( UNDER_CE )
-    if( !SetThreadPriority(GetCurrentThread(), i_priority) )
+    if( !p_priv->thread_id )
+        p_priv->thread_id = GetCurrentThread();
+    if( !SetThreadPriority((HANDLE)p_priv->thread_id, i_priority) )
     {
         msg_Warn( p_this, "couldn't set a faster priority" );
         return 1;
     }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    vlc_object_internals_t *p_priv = p_this->p_internals;
 # ifndef __APPLE__
     if( config_GetInt( p_this, "rt-priority" ) > 0 )
 # endif
@@ -765,8 +793,25 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
                                       FILETIME*, FILETIME* );
     FILETIME create_ft, exit_ft, kernel_ft, user_ft;
     int64_t real_time, kernel_time, user_time;
+    HANDLE hThread;
+   
+    /* thread will destroy its own handle on exit, duplicate it here */
+    if( ! DuplicateHandle(GetCurrentProcess(),
+            (HANDLE)p_priv->thread_id,
+            GetCurrentProcess(),
+            &hThread,
+            0,
+            FALSE,
+            DUPLICATE_SAME_ACCESS) )
+    {
+        msg_Err( p_this, "thread_join(%u) failed at %s:%d (%s)",
+                         (unsigned int)p_priv->thread_id, psz_file, i_line,
+                         GetLastError() );
+        p_priv->b_thread = VLC_FALSE;
+        return;
+    }
 
-    WaitForSingleObject( p_priv->thread_id, INFINITE );
+    WaitForSingleObject( hThread, INFINITE );
 
 #if defined( UNDER_CE )
     hmodule = GetModuleHandle( _T("COREDLL") );
@@ -778,7 +823,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
         GetProcAddress( hmodule, _T("GetThreadTimes") );
 
     if( OurGetThreadTimes &&
-        OurGetThreadTimes( p_priv->thread_id,
+        OurGetThreadTimes( hThread,
                            &create_ft, &exit_ft, &kernel_ft, &user_ft ) )
     {
         real_time =
@@ -803,7 +848,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
                  user_time/60/1000000,
                  (double)((user_time%(60*1000000))/1000000.0) );
     }
-    CloseHandle( p_priv->thread_id );
+    CloseHandle( hThread );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     int32_t exit_value;
