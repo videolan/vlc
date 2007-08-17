@@ -103,13 +103,15 @@ struct vlc_event_listeners_group_t;
 typedef struct vlc_event_manager_t
 {
     void * p_obj;
+    vlc_mutex_t object_lock;
     DECL_ARRAY(struct vlc_event_listeners_group_t *) listeners_groups;
 } vlc_event_manager_t;
 
 /* List of event */
 typedef enum vlc_event_type_t {
+    /* Input item events */
     vlc_InputItemMetaChanged,
-    vlc_InputItemSubItemAdded
+    vlc_InputItemSubItemAdded,
 } vlc_event_type_t;
 
 /* Event definition */
@@ -119,6 +121,7 @@ typedef struct vlc_event_t
     void * p_obj; /* Sender object, automatically filled by vlc_event_send() */
     union vlc_event_type_specific
     {
+        /* Input item events */
         struct vlc_input_item_meta_changed
         {
             vlc_meta_type_t meta_type;
@@ -140,9 +143,10 @@ typedef void ( *vlc_event_callback_t )( const vlc_event_t *, void * );
 /*
  * p_obj points to the object that owns the event manager, and from
  * which events are sent
+ * p_obj is here to give us a libvlc instance
  */
 VLC_EXPORT(int, vlc_event_manager_init, ( vlc_event_manager_t * p_em,
-                                          void * p_obj ));
+                                          void * p_obj, vlc_object_t * ));
 
 /*
  * Destroy
@@ -175,6 +179,6 @@ VLC_EXPORT(int, vlc_event_attach, ( vlc_event_manager_t * p_event_manager,
 VLC_EXPORT(int, vlc_event_detach, ( vlc_event_manager_t *p_event_manager,
                                     vlc_event_type_t event_type,
                                     vlc_event_callback_t pf_callback,
-                                     void *p_user_data ));
+                                    void *p_user_data ));
 
 #endif /* VLC_EVENTS_H */
