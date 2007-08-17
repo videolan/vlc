@@ -22,9 +22,191 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include "vlc_playlist.h"
+#include "vlc_events.h"
 #include "playlist_internal.h"
 
 static void RunSD( services_discovery_t *p_sd );
+
+/*
+ * Services discovery
+ * Basically you just listen to Service discovery event through the
+ * sd's event manager.
+ * That's how the playlist get's Service Discovery information
+ */
+ 
+/***********************************************************************
+ * Create
+ ***********************************************************************/
+services_discovery_t *
+services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name )
+{
+    services_discovery_t *p_sd = vlc_object_create( p_super, VLC_OBJECT_SD );
+    if( !p_sd )
+        return NULL;
+    
+    p_sd->pf_run = NULL;
+    p_sd->psz_localized_name = NULL;
+
+    vlc_event_manager_init( &p_sd->event_manager, p_sd, (vlc_object_t *)p_sd );
+    vlc_event_manager_register_event_type( &p_sd->event_manager, 
+            vlc_ServicesDiscoveryItemAdded );
+    vlc_event_manager_register_event_type( &p_sd->event_manager, 
+            vlc_ServicesDiscoveryItemRemoved );
+
+    p_sd->p_module = module_Need( p_sd, "services_discovery", psz_module_name, 0 );
+    
+    if( p_sd->p_module == NULL )
+    {
+        msg_Err( p_super, "no suitable services discovery module" );
+        vlc_object_destroy( p_sd );
+        return NULL;
+    }
+    p_sd->psz_module = strdup( psz_module_name );
+    p_sd->b_die = VLC_FALSE; /* FIXME */
+
+    return p_sd;
+}
+
+/***********************************************************************
+ * Destroy
+ ***********************************************************************/
+void services_discovery_Destroy ( services_discovery_t * p_sd )
+{
+    vlc_object_kill( p_sd );
+    if( p_sd->pf_run ) vlc_thread_join( p_sd );
+
+    free( p_sd->psz_module );
+    module_Unneed( p_sd, p_sd->p_module );
+
+    vlc_event_manager_fini( &p_sd->event_manager );
+    free( p_sd->psz_localized_name );
+
+    vlc_object_destroy( p_sd );
+}
+
+/***********************************************************************
+ * Start
+ ***********************************************************************/
+int services_discovery_Start ( services_discovery_t * p_sd )
+{
+    if ((p_sd->pf_run != NULL)
+        && vlc_thread_create( p_sd, "services_discovery", RunSD,
+                              VLC_THREAD_PRIORITY_LOW, VLC_FALSE))
+    {
+        msg_Err( p_sd, "cannot create services discovery thread" );
+        vlc_object_destroy( p_sd );
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
+/***********************************************************************
+ * GetLocalizedName
+ ***********************************************************************/
+const char *
+services_discovery_GetLocalizedName ( services_discovery_t * p_sd )
+{
+    return p_sd->psz_localized_name ? strdup( p_sd->psz_localized_name ) : NULL;
+}
+
+/***********************************************************************
+ * SetLocalizedName
+ ***********************************************************************/
+void
+services_discovery_SetLocalizedName ( services_discovery_t * p_sd, const char *psz )
+{
+    if(p_sd->psz_localized_name) free( p_sd->psz_localized_name );
+    p_sd->psz_localized_name = strdup(psz);
+}
+
+/***********************************************************************
+ * EventManager
+ ***********************************************************************/
+vlc_event_manager_t *
+services_discovery_EventManager ( services_discovery_t * p_sd )
+{
+    return &p_sd->event_manager;
+}
+
+/***********************************************************************
+ * AddItem
+ ***********************************************************************/
+void
+services_discovery_AddItem ( services_discovery_t * p_sd, input_item_t * p_item,
+                             const char * psz_category )
+{
+    vlc_event_t event;
+    event.type = vlc_ServicesDiscoveryItemAdded;
+    event.u.services_discovery_item_added.p_new_item = p_item;
+    event.u.services_discovery_item_added.psz_category = psz_category;
+
+    vlc_event_send( &p_sd->event_manager, &event );
+}
+
+/***********************************************************************
+ * RemoveItem
+ ***********************************************************************/
+void
+services_discovery_RemoveItem ( services_discovery_t * p_sd, input_item_t * p_item )
+{
+    vlc_event_t event;
+    event.type = vlc_ServicesDiscoveryItemRemoved;
+    event.u.services_discovery_item_removed.p_item = p_item;
+
+    vlc_event_send( &p_sd->event_manager, &event );
+}
+
+/***********************************************************************
+ * RunSD (Private)
+ ***********************************************************************/
+static void RunSD( services_discovery_t *p_sd )
+{
+    p_sd->pf_run( p_sd );
+    return;
+}
+
+/*
+ * Playlist - Services discovery bridge
+ */
+ 
+ /* A new item has been added to a certain sd */
+static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_data )
+{
+    input_item_t * p_input = p_event->u.services_discovery_item_added.p_new_item;
+    const char * psz_cat = p_event->u.services_discovery_item_added.psz_category;
+    playlist_item_t *p_new_item, * p_parent = user_data;
+
+    msg_Dbg( p_parent->p_playlist, "Adding %s in %s", p_input->psz_name, psz_cat );
+
+    /* If p_child is in root category (this is clearly a hack) and we have a cat*/
+    if( !EMPTY_STR(psz_cat) &&
+        p_parent == playlist_ItemToNode( p_parent->p_playlist, p_parent, VLC_FALSE ) )
+    {
+        /* */
+        playlist_item_t * p_cat;
+        p_cat = playlist_ChildSearchName( p_parent, psz_cat );
+        if( !p_cat )
+        {
+            p_cat = playlist_NodeCreate( p_parent->p_playlist, psz_cat,
+                                         p_parent, 0 );
+            p_cat->i_flags &= ~PLAYLIST_SKIP_FLAG;
+        }
+        p_parent = p_cat;
+    }
+        
+    p_new_item = playlist_NodeAddInput( p_parent->p_playlist, p_input, p_parent,
+                                        PLAYLIST_APPEND, PLAYLIST_END, VLC_FALSE );
+    p_new_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
+    p_new_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
+}
+
+ /* A new item has been removed from a certain sd */
+static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_data )
+{
+    playlist_item_t * p_child = user_data;
+
+    msg_Err( p_child->p_playlist, "Service Discovery item deletion not handled" );
+}
 
 int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modules )
 {
@@ -33,6 +215,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
 
     for (;;)
     {
+        playlist_item_t * p_cat, * p_one;
         while( *psz_parser == ' ' || *psz_parser == ':' || *psz_parser == ',' )
             psz_parser++;
 
@@ -50,37 +233,51 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
 
         /* Perform the addition */
         msg_Dbg( p_playlist, "Add services_discovery %s", psz_plugin );
-        services_discovery_t *p_sd = vlc_object_create( p_playlist,
-                                                        VLC_OBJECT_SD );
-        if( p_sd == NULL )
-            return VLC_ENOMEM;
+        services_discovery_t *p_sd;
 
-        p_sd->pf_run = NULL;
-        p_sd->p_module = module_Need( p_sd, "services_discovery", psz_plugin, 0 );
-
-        if( p_sd->p_module == NULL )
-        {
-            msg_Err( p_playlist, "no suitable services discovery module" );
-            vlc_object_destroy( p_sd );
-            retval = VLC_EGENERIC;
+        p_sd = services_discovery_Create( (vlc_object_t*)p_playlist, psz_plugin );
+        if( !p_sd )
             continue;
+
+        char * psz = services_discovery_GetLocalizedName( p_sd );
+        if( psz )
+        {
+            playlist_NodesPairCreate( p_playlist, psz,
+                    &p_cat, &p_one, VLC_FALSE );
+            free( psz );
         }
-        p_sd->psz_module = strdup( psz_plugin );
-        p_sd->b_die = VLC_FALSE; /* FIXME */
+        else
+        {
+            /* No name, just add at the top of the playlist */
+            p_cat = p_playlist->p_root_category;
+            p_one = p_playlist->p_root_onelevel;
+        }
+
+        vlc_event_attach( services_discovery_EventManager( p_sd ),
+                          vlc_ServicesDiscoveryItemAdded,
+                          playlist_sd_item_added,
+                          p_one );
+
+        vlc_event_attach( services_discovery_EventManager( p_sd ),
+                          vlc_ServicesDiscoveryItemAdded,
+                          playlist_sd_item_added,
+                          p_cat );
+
+        vlc_event_attach( services_discovery_EventManager( p_sd ),
+                          vlc_ServicesDiscoveryItemRemoved,
+                          playlist_sd_item_removed,
+                          p_one );
+
+        vlc_event_attach( services_discovery_EventManager( p_sd ),
+                          vlc_ServicesDiscoveryItemRemoved,
+                          playlist_sd_item_removed,
+                          p_cat );
+
+        services_discovery_Start( p_sd );
 
         PL_LOCK;
         TAB_APPEND( p_playlist->i_sds, p_playlist->pp_sds, p_sd );
         PL_UNLOCK;
-
-        if ((p_sd->pf_run != NULL)
-         && vlc_thread_create( p_sd, "services_discovery", RunSD,
-                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE))
-        {
-            msg_Err( p_sd, "cannot create services discovery thread" );
-            vlc_object_destroy( p_sd );
-            retval = VLC_EGENERIC;
-            continue;
-        }
     }
 
     return retval;
@@ -106,12 +303,7 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
 
     if( p_sd )
     {
-        vlc_object_kill( p_sd );
-        if( p_sd->pf_run ) vlc_thread_join( p_sd );
-
-        free( p_sd->psz_module );
-        module_Unneed( p_sd, p_sd->p_module );
-        vlc_object_destroy( p_sd );
+        services_discovery_Destroy( p_sd );
     }
     else
     {
@@ -139,8 +331,3 @@ vlc_bool_t playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
     return VLC_FALSE;
 }
 
-static void RunSD( services_discovery_t *p_sd )
-{
-    p_sd->pf_run( p_sd );
-    return;
-}

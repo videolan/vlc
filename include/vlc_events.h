@@ -112,6 +112,10 @@ typedef enum vlc_event_type_t {
     /* Input item events */
     vlc_InputItemMetaChanged,
     vlc_InputItemSubItemAdded,
+
+    /* Service Discovery event */
+    vlc_ServicesDiscoveryItemAdded,
+    vlc_ServicesDiscoveryItemRemoved
 } vlc_event_type_t;
 
 /* Event definition */
@@ -130,6 +134,18 @@ typedef struct vlc_event_t
         {
             input_item_t * p_new_child;
         } input_item_subitem_added;
+        
+        /* Service discovery events */
+        struct vlc_services_discovery_item_added
+        {
+            input_item_t * p_new_item;
+            const char * psz_category;
+        } services_discovery_item_added;
+        struct vlc_services_discovery_item_removed
+        {
+            input_item_t * p_item;
+        } services_discovery_item_removed;
+
     } u;
 } vlc_event_t;
 
