@@ -30,58 +30,59 @@ HEADERS_include = \
 	../include/iso_lang.h \
 	../include/main.h \
 	../include/mmx.h \
-	../include/vlc_modules.h \
-	../include/vlc_modules_macros.h \
-	../include/vlc_os_specific.h \
-	../include/vlc_mtime.h \
-	../include/vlc_network.h \
-	../include/vlc_codecs.h \
-	../include/vlc_configuration.h \
-	../include/vlc_charset.h \
-	../include/vlc_sout.h \
-	../include/vlc_streaming.h \
-	../include/vlc_variables.h \
-	../include/vlc_aout.h \
 	../include/vlc_access.h \
-	../include/vlc_arrays.h \
 	../include/vlc_acl.h \
+	../include/vlc_aout.h \
+	../include/vlc_arrays.h \
 	../include/vlc_bits.h \
 	../include/vlc_block.h \
 	../include/vlc_block_helper.h \
+	../include/vlc_charset.h \
 	../include/vlc_codec.h \
+	../include/vlc_codecs.h \
 	../include/vlc_common.h \
 	../include/vlc_config.h \
+	../include/vlc_config_cat.h \
+	../include/vlc_configuration.h \
 	../include/vlc_demux.h \
+	../include/vlc_devices.h \
+	../include/vlc_epg.h \
 	../include/vlc_es.h \
 	../include/vlc_es_out.h \
-	../include/vlc_epg.h \
+	../include/vlc_events.h \
 	../include/vlc_filter.h \
-	../include/vlc_config_cat.h \
 	../include/vlc_httpd.h \
-	../include/vlc_tls.h \
-	../include/vlc_md5.h \
-	../include/vlc_devices.h \
 	../include/vlc_image.h \
 	../include/vlc_input.h \
 	../include/vlc_interface.h \
 	../include/vlc_intf_strings.h \
 	../include/vlc_keys.h \
+	../include/vlc_md5.h \
 	../include/vlc_messages.h \
 	../include/vlc_meta.h \
+	../include/vlc_modules.h \
+	../include/vlc_modules_macros.h \
+	../include/vlc_mtime.h \
+	../include/vlc_network.h \
 	../include/vlc_objects.h \
+	../include/vlc_os_specific.h \
 	../include/vlc_osd.h \
 	../include/vlc_playlist.h \
+	../include/vlc_sout.h \
 	../include/vlc_stream.h \
+	../include/vlc_streaming.h \
 	../include/vlc_strings.h \
-	../include/vlc_threads_funcs.h \
 	../include/vlc_threads.h \
+	../include/vlc_threads_funcs.h \
+	../include/vlc_tls.h \
 	../include/vlc_update.h \
 	../include/vlc_url.h \
-	../include/vlc_vout.h \
+	../include/vlc_variables.h \
 	../include/vlc_vlm.h \
 	../include/vlc_vod.h \
-	../include/vlc_xml.h \
+	../include/vlc_vout.h \
 	../include/vlc_vout_synchro.h \
+	../include/vlc_xml.h \
 	$(NULL)
 
 modules/builtin.h: modules/builtin.h.in ../vlc-config Makefile.am
