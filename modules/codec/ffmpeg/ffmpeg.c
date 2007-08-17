@@ -422,7 +422,7 @@ void E_(LibavcodecCallback)( void *p_opaque, int i_level,
 void E_(InitLibavcodec)( vlc_object_t *p_object )
 {
     static int b_ffmpeginit = 0;
-    vlc_mutex_t *lock;
+    vlc_mutex_t *lock = var_GetGlobalMutex( "avcodec" );
 
     vlc_mutex_lock( lock );
 
