@@ -116,7 +116,7 @@ playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
                                               input_item_t *p_input )
 {
     DECMALLOC_NULL( p_item, playlist_item_t );
-    playlist_t *p_playlist = p_obj->p_libvlc->p_playlist;
+    playlist_t *p_playlist = pl_Yield( p_obj );
 
     p_item->p_input = p_input;
     vlc_gc_incref( p_item->p_input );
@@ -130,6 +130,8 @@ playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
     p_item->p_playlist = p_playlist;
 
     install_input_item_observer( p_playlist, p_input );
+
+    pl_Release( p_item->p_playlist );
 
     return p_item;
 }
