@@ -64,7 +64,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
     if( b_play )
     {
         playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                          VLC_TRUE, p_item_in_category, NULL );
+                          VLC_FALSE, p_item_in_category, NULL );
         vlc_object_release( p_playlist );
     }
 }
