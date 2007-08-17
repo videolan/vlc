@@ -128,7 +128,7 @@ void vlc_event_send( vlc_event_manager_t * p_em,
     vlc_event_listeners_group_t * listeners_group;
     vlc_event_listener_t * listener;
     vlc_event_callback_t func = NULL;
-    void * user_data;
+    void * user_data = NULL;
 
     /* Fill event with the sending object now */
     p_event->p_obj = p_em->p_obj;
