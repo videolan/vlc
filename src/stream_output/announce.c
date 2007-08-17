@@ -31,7 +31,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
-#include <vlc_network.h> /* FIXME: fix RegisterSDP() and remove this */
 #include "stream_output.h"
 
 struct announce_method_t
