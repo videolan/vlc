@@ -141,13 +141,17 @@ void vlc_event_send( vlc_event_manager_t * p_em,
             FOREACH_ARRAY( listener, listeners_group->listeners )
                 func = listener->pf_callback;
                 user_data = listener->p_user_data;
+                /* This is safe to do that because we are sure 
+                 * that there will be no object owned references
+                 * used after the lock. */
+                vlc_mutex_unlock( &p_em->object_lock );
+                func( p_event, user_data );
+                vlc_mutex_lock( &p_em->object_lock );
             FOREACH_END()
             break;
         }
     FOREACH_END()
     vlc_mutex_unlock( &p_em->object_lock );
-    if( func )
-        func( p_event, user_data );
 }
 
 /**
