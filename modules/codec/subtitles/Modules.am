@@ -1,1 +1,1 @@
-SOURCES_subsdec = subsass.c subsusf.c subsdec.c
+SOURCES_subsdec = subsass.c subsusf.c subsdec.c subsdec.h
