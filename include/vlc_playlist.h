@@ -425,7 +425,7 @@ VLC_EXPORT( void,                   services_discovery_Destroy, ( services_disco
 VLC_EXPORT( int,                    services_discovery_Start, ( services_discovery_t * p_this ) );
 
 /* Read info from discovery object */
-VLC_EXPORT( const char *,           services_discovery_GetLocalizedName, ( services_discovery_t * p_this ) );
+VLC_EXPORT( char *,                 services_discovery_GetLocalizedName, ( services_discovery_t * p_this ) );
 
 /* Receive event notification (prefered way to get new items) */
 VLC_EXPORT( vlc_event_manager_t *,  services_discovery_EventManager, ( services_discovery_t * p_this ) );

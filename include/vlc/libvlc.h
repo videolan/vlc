@@ -692,13 +692,6 @@ VLC_PUBLIC_API void libvlc_video_set_viewport( libvlc_instance_t *, const libvlc
 
 /** @} */
 
-/**
- * defgroup libvlc_vlm VLM
- * \ingroup libvlc
- * LibVLC VLM handling
- * @{
- */
-
 /** defgroup libvlc_audio Audio
  * \ingroup libvlc
  * LibVLC Audio handling
@@ -780,6 +773,34 @@ VLC_PUBLIC_API void libvlc_audio_set_channel( libvlc_instance_t *, int, libvlc_e
 
 /** @} */
 
+/*****************************************************************************
+ * Services/Media Discovery
+ *****************************************************************************/
+/** defgroup libvlc_media_discoverer Media Discoverer
+ * \ingroup libvlc
+ * LibVLC Media Discoverer
+ * @{
+ */
+
+VLC_PUBLIC_API libvlc_media_discoverer_t *
+libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
+                                       const char * psz_name,
+                                       libvlc_exception_t * p_e );
+VLC_PUBLIC_API void   libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis );
+VLC_PUBLIC_API char * libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis );
+
+VLC_PUBLIC_API libvlc_media_list_t * libvlc_media_discoverer_media_list( );
+
+/**@} */
+
+/*****************************************************************************
+ * VLM
+ *****************************************************************************/
+/** defgroup libvlc_vlm VLM
+ * \ingroup libvlc
+ * LibVLC VLM
+ * @{
+ */
 
 /**
  * Add a broadcast, with one input
@@ -926,7 +947,6 @@ VLC_PUBLIC_API LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( seekable, int, Bool, 0);
 
 #undef LIBVLC_VLM_GET_MEDIA_ATTRIBUTE
 
-/** @} */
 /** @} */
 
 /*****************************************************************************

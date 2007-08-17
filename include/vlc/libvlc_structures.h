@@ -198,6 +198,19 @@ libvlc_rectangle_t;
 
 
 /*****************************************************************************
+ * Services/Media Discovery
+ *****************************************************************************/
+/** defgroup libvlc_media_discoverer Media Discoverer
+ * \ingroup libvlc
+ * LibVLC Media Discoverer
+ * @{
+ */
+
+typedef struct libvlc_media_discoverer_t libvlc_media_discoverer_t;
+
+/**@} */
+
+/*****************************************************************************
  * Message log handling
  *****************************************************************************/
 

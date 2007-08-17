@@ -114,7 +114,13 @@ struct libvlc_media_list_player_t
     libvlc_media_instance_t *  p_mi;
 };
 
-
+struct libvlc_media_discoverer_t
+{
+    libvlc_event_manager_t * p_event_manager;
+    libvlc_instance_t *      p_libvlc_instance;
+    services_discovery_t *   p_sd;
+    libvlc_media_list_t *    p_mlist;
+};
 
 /* 
  * Event Handling

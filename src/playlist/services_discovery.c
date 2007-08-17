@@ -103,7 +103,7 @@ int services_discovery_Start ( services_discovery_t * p_sd )
 /***********************************************************************
  * GetLocalizedName
  ***********************************************************************/
-const char *
+char *
 services_discovery_GetLocalizedName ( services_discovery_t * p_sd )
 {
     return p_sd->psz_localized_name ? strdup( p_sd->psz_localized_name ) : NULL;
