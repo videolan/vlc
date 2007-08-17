@@ -127,7 +127,7 @@ void vlc_event_send( vlc_event_manager_t * p_em,
 {
     vlc_event_listeners_group_t * listeners_group;
     vlc_event_listener_t * listener;
-    vlc_event_callback_t func;
+    vlc_event_callback_t func = NULL;
     void * user_data;
 
     /* Fill event with the sending object now */
@@ -146,8 +146,8 @@ void vlc_event_send( vlc_event_manager_t * p_em,
         }
     FOREACH_END()
     vlc_mutex_unlock( &p_em->object_lock );
-    
-    func( p_event, user_data );
+    if( func )
+        func( p_event, user_data );
 }
 
 /**
