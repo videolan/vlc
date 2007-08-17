@@ -367,6 +367,7 @@ VLC_EXPORT( playlist_item_t *, __playlist_ItemNewFromInput, ( vlc_object_t *p_ob
 
 /*************************** Item deletion **************************/
 VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, int, vlc_bool_t ) );
+VLC_EXPORT( int,  playlist_DeleteInputInParent, ( playlist_t *, int, playlist_item_t *, vlc_bool_t ) );
 
 /*************************** Item fields accessors **************************/
 VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *, const char * ) );

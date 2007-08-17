@@ -172,6 +172,18 @@ static int DeleteFromInput( playlist_t *p_playlist, int i_input_id,
     return VLC_EGENERIC;
 }
 
+/** Remove an input item when it appears from a root playlist item */
+int playlist_DeleteInputInParent( playlist_t *p_playlist, int i_input_id,
+                                  playlist_item_t *p_root, vlc_bool_t b_locked )
+{
+    int i_ret;
+    if( !b_locked ) PL_LOCK;
+    i_ret = DeleteFromInput( p_playlist, i_input_id,
+                             p_root, VLC_TRUE );
+    if( !b_locked ) PL_UNLOCK;
+    return i_ret;
+}
+
 /** Remove an input item from ONELEVEL and CATEGORY */
 int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
                               vlc_bool_t b_locked )
