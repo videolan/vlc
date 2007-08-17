@@ -417,7 +417,10 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
         ChangeToNode( p_playlist, p_item_in_category );
 
         if( !p_item_in_one )
+        {
+            if( !b_locked ) PL_UNLOCK;
             return p_item_in_category;
+        }
 
         /* Item in one is a root, change it to node */
         if( p_item_in_one->p_parent == p_playlist->p_root_onelevel )
