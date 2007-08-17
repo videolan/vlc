@@ -130,7 +130,7 @@ install_media_descriptor_observer( libvlc_media_list_t * p_mlist,
                          p_mlist, NULL );
     libvlc_event_attach( p_md->p_event_manager,
                          libvlc_MediaDescriptorSubItemAdded,
-                         media_descriptor_changed,
+                         media_descriptor_subitem_added,
                          p_mlist, NULL );
 }
 
@@ -149,7 +149,7 @@ uninstall_media_descriptor_observer( libvlc_media_list_t * p_mlist,
                          p_mlist, NULL );
     libvlc_event_detach( p_md->p_event_manager,
                          libvlc_MediaDescriptorSubItemAdded,
-                         media_descriptor_changed,
+                         media_descriptor_subitem_added,
                          p_mlist, NULL );
 }
 
@@ -526,4 +526,3 @@ libvlc_media_list_dynamic_sublist( libvlc_media_list_t * p_mlist,
 
     return p_submlist;
 }
-
