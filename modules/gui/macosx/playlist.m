@@ -1046,13 +1046,13 @@
         {
             playlist_item_t *p_item;
             p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, NULL, p_item );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_item );
         }
         else
         {
             playlist_item_t *p_item;
             p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
-            playlist_Control( p_playlist, PLAYLIST_PREPARSE, VLC_TRUE, p_item );
+            playlist_Control( p_playlist, PLAYLIST_SKIP, VLC_TRUE, p_item );
         }
     }
     [self playlistUpdated];
@@ -1088,13 +1088,13 @@
         {
             playlist_item_t *p_item;
             p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
-            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, NULL, p_item );
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE, p_item );
         }
         else
         {
             playlist_item_t *p_item;
             p_item = playlist_ItemGetByInput( p_playlist, p_input, VLC_TRUE );
-            playlist_Control( p_playlist, PLAYLIST_PREPARSE, VLC_TRUE, p_item );
+            playlist_Control( p_playlist, PLAYLIST_SKIP, VLC_TRUE, p_item );
         }
     }
     [self playlistUpdated];
