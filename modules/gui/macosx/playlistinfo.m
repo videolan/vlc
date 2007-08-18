@@ -198,6 +198,8 @@
             [NSString stringWithUTF8String:p_item->p_input->psz_uri]];
     }
 
+    vlc_mutex_unlock( &p_item->p_input->lock );
+
     /* fill the other fields */
     [self setMeta: input_item_GetTitle( p_item->p_input )      forLabel: o_title_txt];
     [self setMeta: input_item_GetArtist( p_item->p_input )     forLabel: o_author_txt];
@@ -210,8 +212,6 @@
     [self setMeta: input_item_GetNowPlaying( p_item->p_input ) forLabel: o_nowPlaying_txt];
     [self setMeta: input_item_GetLanguage( p_item->p_input )   forLabel: o_language_txt];
     [self setMeta: input_item_GetDate( p_item->p_input )       forLabel: o_date_txt];
-
-    vlc_mutex_unlock( &p_item->p_input->lock );
 
     /* reload the advanced table */
     [[VLCInfoTreeItem rootItem] refresh];
@@ -297,8 +297,8 @@
 
         p_item->p_input->psz_uri = strdup( [[o_uri_txt stringValue] UTF8String] );
         p_item->p_input->psz_name = strdup( [[o_title_txt stringValue] UTF8String] );
-        input_item_SetArtist( p_item->p_input, [[o_author_txt stringValue] UTF8String] );
         vlc_mutex_unlock( &p_item->p_input->lock );
+        input_item_SetArtist( p_item->p_input, [[o_author_txt stringValue] UTF8String] );
 
         val.b_bool = VLC_TRUE;
         var_Set( p_playlist, "intf-change", val );
