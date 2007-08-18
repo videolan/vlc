@@ -119,9 +119,6 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
 {
     int i_ret = VLC_EGENERIC;
     module_t *p_module;
-    char * psz_album = input_item_GetAlbum( p_item );
-    char * psz_artist = input_item_GetArtist( p_item );
-    char * psz_title = input_item_GetAlbum( p_item );
 
     if( !p_item->p_meta )
         return VLC_EGENERIC;
