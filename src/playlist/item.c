@@ -40,55 +40,83 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
 static void input_item_subitem_added( const vlc_event_t * p_event,
                                       void * user_data )
 {
-    playlist_t * p_playlist = user_data;
+    playlist_item_t *p_parent_playlist_item = user_data;
+    playlist_t * p_playlist = p_parent_playlist_item->p_playlist;
     input_item_t * p_parent, * p_child;
-    vlc_bool_t b_play = var_CreateGetBool( p_playlist, "playlist-autostart" );
-    playlist_item_t *p_item_in_category;
-    playlist_item_t *p_current;
+    playlist_item_t * p_child_in_category;
+    playlist_item_t * p_item_in_category;
+    vlc_bool_t b_play;
 
     p_parent = p_event->p_obj;
     p_child = p_event->u.input_item_subitem_added.p_new_child;
 
-    p_current = playlist_ItemGetByInput( p_playlist, p_parent, VLC_FALSE );
-    p_item_in_category = playlist_ItemToNode( p_playlist, p_current,
-                                              VLC_FALSE );
-    if(!p_item_in_category)
-        p_item_in_category = p_current;
+    PL_LOCK;
+    b_play = var_CreateGetBool( p_playlist, "playlist-autostart" );
 
-    b_play = b_play && p_current == p_playlist->status.p_item;
+    /* This part is really hakish, but this playlist system isn't simple */
+    /* First check if we haven't already added the item as we are 
+     * listening using the onelevel and the category representent 
+     * (Because of the playlist design) */
+    p_child_in_category = playlist_ItemFindFromInputAndRoot(
+                            p_playlist, p_child->i_id,
+                            p_playlist->p_root_category,
+                            VLC_FALSE /* Only non-node */ );
 
-    playlist_NodeAddInput( p_playlist, p_child, p_item_in_category, 
-        PLAYLIST_APPEND | PLAYLIST_SPREPARSE , PLAYLIST_END,
-        VLC_FALSE );
-
-    if( b_play )
+    if( !p_child_in_category )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                          VLC_FALSE, p_item_in_category, NULL );
+        b_play = b_play && p_item_in_category == p_playlist->status.p_item;
+
+        /* Then, transform to a node if needed */
+        p_item_in_category = playlist_ItemFindFromInputAndRoot(
+                                p_playlist, p_parent->i_id,
+                                p_playlist->p_root_category,
+                                VLC_FALSE /* Only non-node */ );
+        if( !p_item_in_category )
+        {
+            /* Item may have been removed */
+            PL_UNLOCK;
+            return
+        }
+
+        /* If this item is already a node don't transform it */
+        if( p_item_in_category->i_children == -1 )
+        {
+            p_item_in_category = playlist_ItemToNode( p_playlist,
+                    p_item_in_category, VLC_TRUE );
+        }
+        
+        playlist_BothAddInput( p_playlist, p_child, p_item_in_category, 
+                PLAYLIST_APPEND | PLAYLIST_SPREPARSE , PLAYLIST_END,
+                NULL, NULL,  VLC_TRUE );
+
+        if( b_play )
+        {
+            playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                          VLC_TRUE, p_item_in_category, NULL );
+        }
     }
+    
+    PL_UNLOCK;
+
 }
 
 /*****************************************************************************
  * Listen to vlc_InputItemAddSubItem event
  *****************************************************************************/
-static void install_input_item_observer( playlist_t * p_playlist,
+static void install_input_item_observer( playlist_item_t * p_item,
                                          input_item_t * p_input )
 {
-    msg_Dbg( p_playlist, "Listening to %s with %p", p_input->psz_name, p_playlist);
-
     vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                       input_item_subitem_added,
-                      p_playlist );
+                      p_item );
 }
 
-static void uninstall_input_item_observer( playlist_t * p_playlist,
+static void uninstall_input_item_observer( playlist_item_t * p_item,
                                            input_item_t * p_input )
 {
-    msg_Dbg( p_playlist, "Not Listening to %s with %p", p_input->psz_name, p_playlist);
-
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                       input_item_subitem_added,
-                      p_playlist );
+                      p_item );
                       
 }
 
@@ -127,7 +155,7 @@ playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
     p_item->i_flags = 0;
     p_item->p_playlist = p_playlist;
 
-    install_input_item_observer( p_playlist, p_input );
+    install_input_item_observer( p_item, p_input );
 
     pl_Release( p_item->p_playlist );
 
@@ -423,14 +451,10 @@ playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
                                             p_playlist, p_item->p_input->i_id,
                                             p_playlist->p_root_onelevel,
                                             VLC_TRUE );
+        assert( p_item_in_one );
+
         /* We already have it, and there is nothing more to do */
         ChangeToNode( p_playlist, p_item_in_category );
-
-        if( !p_item_in_one )
-        {
-            if( !b_locked ) PL_UNLOCK;
-            return p_item_in_category;
-        }
 
         /* Item in one is a root, change it to node */
         if( p_item_in_one->p_parent == p_playlist->p_root_onelevel )
