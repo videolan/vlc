@@ -148,6 +148,7 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
             snprintf( psz_data, 255,
                     "http://images.amazon.com/images/P/%s.01._SCLZZZZZZZ_.jpg",
                     psz_buf );
+            msg_Dbg( p_obj, "Album art URL: %s", psz_data );
             input_item_SetArtURL( p_item, psz_data );
             break;
         }
