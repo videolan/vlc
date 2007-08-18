@@ -192,8 +192,12 @@ struct playlist_t
     int                   i_last_playlist_id; /**< Last id to an item */
     int                   i_last_input_id ; /**< Last id on an input */
 
-    services_discovery_t **pp_sds; /**< Loaded service discovery modules */
-    int                   i_sds;   /**< Number of service discovery modules */
+    struct playlist_archived_services_discovery_t {
+        services_discovery_t * p_sd; /* The service discovery module */
+        playlist_item_t      * p_cat;/* Corresponding item in the category view */
+        playlist_item_t      * p_one;/* Corresponding item in the one level view */
+    }                   **pp_asds; /**< Loaded service discovery modules */
+    int                   i_asds;   /**< Number of service discovery modules */
 
     /* Predefined items */
     playlist_item_t *     p_root_category; /**< Root of category tree */

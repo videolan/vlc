@@ -434,10 +434,10 @@ void playlist_LastLoop( playlist_t *p_playlist )
         vout_Destroy( (vout_thread_t *)p_obj );
     }
 
-    while( p_playlist->i_sds )
+    while( p_playlist->i_asds )
     {
         playlist_ServicesDiscoveryRemove( p_playlist,
-                                          p_playlist->pp_sds[0]->psz_module );
+                                          p_playlist->pp_asds[0]->p_sd->psz_module );
     }
 
     playlist_MLDump( p_playlist );
