@@ -620,7 +620,7 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
 #define IF_EXTRACT(txt,var) \
     if( !strncasecmp(psz, txt, strlen(txt)) ) \
     { \
-        const char * oldval = vlc_meta_Get( p_sys->p_meta, vlc_meta_ ## var ); \
+        char * oldval = vlc_meta_Get( p_sys->p_meta, vlc_meta_ ## var ); \
         if( oldval ) \
         { \
             char * newval; \
@@ -630,6 +630,7 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
         } \
         else \
             vlc_meta_Set( p_sys->p_meta, vlc_meta_ ## var, &psz[strlen(txt)] ); \
+        free( oldval ); \
     }
         IF_EXTRACT("TITLE=", Title )
         else IF_EXTRACT("ALBUM=", Album )

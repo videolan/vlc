@@ -299,7 +299,7 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
     wxString msg;
     wxString duration = wxU( "" );
 
-    const char *psz_artist = input_item_GetArtist( p_item->p_input );
+    char *psz_artist = input_item_GetArtist( p_item->p_input );
     if( ! psz_artist )
     {
         psz_artist = "";
@@ -324,6 +324,7 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
         msg = wxString(wxU( psz_artist )) + wxT(" - ") +
                     wxString(wxU(p_item->p_input->psz_name)) + duration;
     }
+    free( psz_artist );
     treectrl->SetItemText( item , msg );
     treectrl->SetItemImage( item, p_item->p_input->i_type );
 

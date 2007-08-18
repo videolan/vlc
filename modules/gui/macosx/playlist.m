@@ -271,38 +271,50 @@
     if( [[o_tc identifier] isEqualToString:@"1"] )
     {
         /* sanity check to prevent the NSString class from crashing */
-        if( !EMPTY_STR( input_item_GetTitle( p_item->p_input ) ) )
+        char *psz_title =  input_item_GetTitle( p_item->p_input );
+        if( !EMPTY_STR( psz_title ) ) )
         {
-            o_value = [NSString stringWithUTF8String: input_item_GetTitle( p_item->p_input )];
+            o_value = [NSString stringWithUTF8String: psz_title )];
             if( o_value == NULL )
-                o_value = [NSString stringWithCString: input_item_GetTitle( p_item->p_input )];
+                o_value = [NSString stringWithCString: psz_title )];
         } 
-        else if( p_item->p_input->psz_name != NULL )
-        {
-            o_value = [NSString stringWithUTF8String: p_item->p_input->psz_name];
-            if( o_value == NULL )
-                o_value = [NSString stringWithCString: p_item->p_input->psz_name];
-        }
-    }
-    else if( [[o_tc identifier] isEqualToString:@"2"] && !EMPTY_STR( input_item_GetArtist( p_item->p_input ) ) )
-    {
-        o_value = [NSString stringWithUTF8String: input_item_GetArtist( p_item->p_input )];
-        if( o_value == NULL )
-            o_value = [NSString stringWithCString: input_item_GetArtist( p_item->p_input )];
-    }
-    else if( [[o_tc identifier] isEqualToString:@"3"] )
-    {
-        char psz_duration[MSTRTIME_MAX_SIZE];
-        mtime_t dur = p_item->p_input->i_duration;
-        if( dur != -1 )
-        {
-            secstotimestr( psz_duration, dur/1000000 );
-            o_value = [NSString stringWithUTF8String: psz_duration];
-        }
         else
         {
-            o_value = @"-:--:--";
+            char *psz_name = input_item_GetName( p_item->p_input );
+            if( psz_name != NULL )
+            {
+                o_value = [NSString stringWithUTF8String: psz_name];
+                if( o_value == NULL )
+                    o_value = [NSString stringWithCString: psz_name];
+            }
         }
+        free( psz_title );
+        free( psz_name );
+    }
+    else
+    {
+        char *psz_artist = input_item_GetArtist( p_item->p_input );
+        if( [[o_tc identifier] isEqualToString:@"2"] && !EMPTY_STR( psz_artist ) )
+        {
+            o_value = [NSString stringWithUTF8String: psz_artist )];
+            if( o_value == NULL )
+                o_value = [NSString stringWithCString: psz_artist )];
+        }
+        else if( [[o_tc identifier] isEqualToString:@"3"] )
+        {
+            char psz_duration[MSTRTIME_MAX_SIZE];
+            mtime_t dur = p_item->p_input->i_duration;
+            if( dur != -1 )
+            {
+                secstotimestr( psz_duration, dur/1000000 );
+                o_value = [NSString stringWithUTF8String: psz_duration];
+            }
+            else
+            {
+                o_value = @"-:--:--";
+            }
+        }
+        free( psz_artist );
     }
 
     return( o_value );

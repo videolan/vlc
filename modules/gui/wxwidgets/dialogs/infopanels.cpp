@@ -121,13 +121,14 @@ void MetaDataPanel::Update( input_item_t *p_item )
     name_text->SetValue( wxU( p_item->psz_name ) );
 
 #define UPDATE_META( meta, widget ) {                                       \
-    const char *psz_meta = input_item_Get##meta( p_item );                  \
+    char *psz_meta = input_item_Get##meta( p_item );                        \
     if( psz_meta != NULL && *psz_meta)                                      \
     {                                                                       \
         widget->SetLabel( wxU( psz_meta ) );                                \
     }                                                                       \
     else { widget->SetLabel( wxU( "-" ) ); }                                \
-    }
+    }                                                                       \
+    free( psz_meta );
 
     UPDATE_META( Artist, artist_text );
     UPDATE_META( Genre, genre_text );

@@ -77,16 +77,20 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
     char i_album_count, i;
     char *ppsz_args[4];
 
-    char *psz_title;
     char *psz_artist;
     char *psz_album;
 
     psz_artist = input_item_GetArtist( p_item );
     psz_album = input_item_GetAlbum( p_item );
-    psz_title = p_item->psz_name;
 
     if( !psz_artist || !psz_album )
+    {
+        free( psz_artist );
+        free( psz_album );
         return VLC_EGENERIC;
+    }
+    free( psz_artist );
+    free( psz_album );
 
     musicbrainz_t p_mb;
 
@@ -154,8 +158,13 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
     if( !b_art )
         return VLC_SUCCESS;
     else
-        return EMPTY_STR( input_item_GetArtURL( p_item ) ) ?
-               VLC_SUCCESS : VLC_EGENERIC;
+    {
+        char *psz_arturl;
+        psz_arturl = input_item_GetArtURL( p_item );
+        int i_ret;
+        i_ret = EMPTY_STR( psz_arturl ) ? VLC_SUCCESS : VLC_EGENERIC ;
+        free( psz_arturl );
+        return i_ret;
 }
 
 static int FindMetaMBId( vlc_object_t *p_this )

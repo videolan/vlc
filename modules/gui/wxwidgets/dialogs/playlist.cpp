@@ -513,9 +513,7 @@ void Playlist::UpdateTreeItem( wxTreeItemId item )
     wxString duration = wxU( "" );
 
     char *psz_artist;
-    psz_artist = input_item_GetArtist( p_item->p_input ) ?
-                    strdup( input_item_GetArtist( p_item->p_input ) ) :
-                    strdup("");
+    psz_artist = input_item_GetArtist( p_item->p_input );
 
     char psz_duration[MSTRTIME_MAX_SIZE];
     mtime_t dur = p_item->p_input->i_duration;

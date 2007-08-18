@@ -630,8 +630,10 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     p_sys->p_current_song->psz_i = encode_URI_component( psz_date );
     p_sys->p_current_song->time_playing = epoch;
 
-    p_sys->b_paused = ( p_input->b_dead || !input_GetItem(p_input)->psz_name )
+    char *psz_name = input_item_GetName( input_GetItem( p_input ) );
+    p_sys->b_paused = ( p_input->b_dead || !psz_name )
                       ? VLC_TRUE : VLC_FALSE;
+    free( psz_name );
 
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -1003,7 +1005,7 @@ static int ReadMetaData( intf_thread_t *p_this )
 
     var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &video_val, NULL );
     if( ( video_val.i_int > 0 ) || \
-        ( input_GetItem(p_input)->i_type == ITEM_TYPE_NET ) )
+        ( input_GetItem( p_input )->i_type == ITEM_TYPE_NET ) )
     {
         msg_Dbg( p_this, "Not an audio only local file -> no submission");
         vlc_object_release( p_input );
@@ -1038,16 +1040,19 @@ static int ReadMetaData( intf_thread_t *p_this )
             return VLC_SUCCESS; \
         }
 
+    char *psz_meta;
     #define ALLOC_ITEM_META( a, b ) \
-        if ( input_item_Get##b( input_GetItem(p_input) ) ) \
+        psz_meta = input_item_Get##b( input_GetItem( p_input ) ) \
+        if( psz_meta ) \
         { \
-            a = encode_URI_component( \
-                input_item_Get##b( input_GetItem(p_input) )); \
+            a = encode_URI_component( psz_meta ); \
             if( !a ) \
             { \
+                free( psz_meta ); \
                 FREE_INPUT_AND_CHARS \
                 return VLC_ENOMEM; \
             } \
+            free( psz_meta ); \
         }
 
     i_status = input_GetItem(p_input)->p_meta->i_status;
@@ -1064,15 +1069,17 @@ static int ReadMetaData( intf_thread_t *p_this )
             msg_Dbg( p_this, "No artist.." );
             WAIT_METADATA_FETCHING( psz_artist )
         }
-
-        if( input_GetItem(p_input)->psz_name )
+        psz_meta = input_item_GetName( input_GetItem( p_input ) );
+        if( psz_meta )
         {
-            psz_title = encode_URI_component( input_GetItem(p_input)->psz_name );
+            psz_title = encode_URI_component( psz_meta );
             if( !psz_title )
             {
+                free( psz_meta );
                 FREE_INPUT_AND_CHARS
                 return VLC_ENOMEM;
             }
+            free( psz_meta );
         }
         else
         {

@@ -20,7 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#define PLI_NAME( p ) p ? p->p_input->psz_name : "null"
 
 #include <assert.h>
 #include <QIcon>
@@ -184,11 +183,13 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     type = p_item->p_input->i_type;
     current = iscurrent;
 
-    if( current && input_item_GetArtURL( p_item->p_input ) &&
-        !strncmp( input_item_GetArtURL( p_item->p_input ), "file://", 7 ) )
-        model->sendArt( qfu( input_item_GetArtURL( p_item->p_input ) ) );
+    char *psz_arturl = input_item_GetArtURL( p_item->p_input );
+    if( current && psz_arturl ) &&
+        !strncmp( psz_arturl, "file://", 7 ) )
+        model->sendArt( qfu( psz_arturl ) ) );
     else if( current )
         model->removeArt();
+    free( psz_arturl );
 
     strings.clear();
 
@@ -198,9 +199,11 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
         return;
     }
 
-
+    char *psz_meta;
 #define ADD_META( item, meta ) \
-      strings.append( qfu( input_item_Get ## meta ( item->p_input ) ) )
+      psz_meta = input_item_Get ## meta ( item->p_input ); \
+      strings.append( qfu( psz_meta ) ); \
+      free( psz_meta );
 
     for( int i_index=1; i_index <= VLC_META_ENGINE_MB_TRM_ID; i_index = i_index * 2 )
     {
@@ -212,12 +215,17 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
                     ADD_META( p_item, Artist );
                     break;
                 case VLC_META_ENGINE_TITLE:
-                    if( input_item_GetTitle( p_item->p_input ) )
+                    char *psz_title;
+                    psz_title = input_item_GetTile( p_item->p_input );
+                    psz_name = input_item_GetName( p_item->p_input );
+                    if( psz_title )
                     {
                         ADD_META( p_item, Title );
                     } else {
-                        strings.append( qfu( p_item->p_input->psz_name ) );
+                        strings.append( qfu( psz_name ) );
                     }
+                    free( psz_title );
+                    free( psz_name );
                     break;
                 case VLC_META_ENGINE_DESCRIPTION:
                     ADD_META( p_item, Description );

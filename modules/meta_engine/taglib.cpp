@@ -193,22 +193,35 @@ static int WriteMeta( vlc_object_t *p_this )
 
         TagLib::Tag *tag = f.tag();
 
-        SET( Artist, input_item_GetArtist( p_item ) );
+        char *psz_meta;
 
-        const char *psz_titlec = ( input_item_GetTitle( p_item ) ?
-            input_item_GetTitle( p_item ) : p_item->psz_name );
-        TagLib::String *psz_title = new TagLib::String( psz_titlec,
+        psz_meta = input_item_GetArtist( p_item );
+        SET( Artist, psz_meta );
+        free( psz_meta );
+
+        psz_meta = input_item_GetTitle( p_item );
+        if( !psz_meta ) psz_meta = input_item_GetName( p_item );
+        TagLib::String *psz_title = new TagLib::String( psz_meta,
             TagLib::String::UTF8 );
         tag->setTitle( *psz_title );
         delete psz_title;
+        free( psz_meta );
 
-        SET( Album, input_item_GetAlbum( p_item ) );
-        SET( Genre, input_item_GetGenre( p_item ) );
+        psz_meta = input_item_GetAlbum( p_item );
+        SET( Album, psz_meta );
+        free( psz_meta );
 
-        if( input_item_GetDate( p_item ) )
-            tag->setYear( atoi( input_item_GetDate( p_item ) ) );
-        if( input_item_GetTrackNum( p_item ) )
-            tag->setTrack( atoi( input_item_GetTrackNum( p_item ) ) );
+        psz_meta = input_item_GetGenre( p_item );
+        SET( Genre, psz_meta );
+        free( psz_meta );
+
+        psz_meta = input_item_GetDate( p_item );
+        if( psz_meta ) tag->setYear( atoi( psz_meta ) );
+        free( psz_meta );
+
+        psz_meta = input_item_GetTrackNum( p_item );
+        if( psz_meta ) tag->setTrack( atoi( psz_meta ) );
+        free( psz_meta );
 
         f.save();
         return VLC_SUCCESS;

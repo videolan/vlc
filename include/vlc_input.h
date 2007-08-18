@@ -221,9 +221,11 @@ static inline void input_ItemClean( input_item_t *p_i )
 static inline void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz_val )
 {
     vlc_event_t event;
+    vlc_mutex_lock( &p_i->p_lock );
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
     vlc_meta_Set( p_i->p_meta, meta_type, psz_val );
+    vlc_mutex_unlock( &p_i->p_lock ); 
 
     /* Notify interested third parties */
     event.type = vlc_InputItemMetaChanged;
@@ -231,11 +233,25 @@ static inline void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_t
     vlc_event_send( &p_i->event_manager, &event );
 }
 
-static inline const char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type )
+static inline char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type )
 {
+    vlc_mutex_lock( &p_i->p_lock );
     if( !p_i->p_meta )
+    {
+        vlc_mutex_unlock( &p_i->p_lock );
         return NULL;
-    return vlc_meta_Get( p_i->p_meta, meta_type );
+    }
+    char *psz_s = strdup( vlc_meta_Get( p_i->p_meta, meta_type ) );
+    vlc_mutex_unlock( &p_i->p_lock );
+    return psz_s;
+}
+
+static inline char * input_item_GetName( input_item_t *p_i )
+{
+    vlc_mutex_lock( &p_i->p_lock );
+    char *psz_s = strdup( p_i->psz_name );
+    vlc_mutex_unlock( &p_i->p_lock );
+    return psz_s;
 }
 
 static inline void input_item_SetPreparsed( input_item_t *p_i, vlc_bool_t preparsed )

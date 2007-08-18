@@ -132,22 +132,24 @@ void InputManager::update()
 
     /* Update text */
     QString text;
-    if( !EMPTY_STR(input_item_GetNowPlaying( input_GetItem(p_input) )) )
+    char *psz_name = input_GetName( input_GetItem( p_input ) );
+    char *psz_nowplaying = input_item_GetNowPlaying( input_GetItem( p_input );
+    char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
+    if( !EMPTY_STR( psz_nowplaying ) )
     {
-        text.sprintf( "%s - %s",
-                  input_item_GetNowPlaying( input_GetItem(p_input) ),
-                  input_GetItem(p_input)->psz_name );
+        text.sprintf( "%s - %s", psz_now_playing, psz_name );
     }
-    else if( !EMPTY_STR(input_item_GetArtist( input_GetItem(p_input) )) )
+    else if( !EMPTY_STR( psz_artist ) )
     {
-        text.sprintf( "%s - %s",
-                  input_item_GetArtist( input_GetItem(p_input) ),
-                  input_GetItem(p_input)->psz_name );
+        text.sprintf( "%s - %s", psz_artist, psz_name );
     }
     else
     {
-        text.sprintf( "%s", input_GetItem(p_input)->psz_name );
+        text.sprintf( "%s", psz_name );
     }
+    free( psz_name );
+    free( psz_nowplaying );
+    free( psz_artist );
     if( old_name != text )
     {
         emit nameChanged( text );

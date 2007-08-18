@@ -105,8 +105,8 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     }
 
 #define DO_META_SORT( node ) { \
-    const char *psz_a = input_item_GetMeta( pp_items[i]->p_input, vlc_meta_##node ); \
-    const char *psz_b = input_item_GetMeta( pp_items[i_small]->p_input, vlc_meta_##node ); \
+    char *psz_a = input_item_GetMeta( pp_items[i]->p_input, vlc_meta_##node ); \
+    char *psz_b = input_item_GetMeta( pp_items[i_small]->p_input, vlc_meta_##node ); \
     /* Nodes go first */ \
     if( pp_items[i]->i_children == -1 && pp_items[i_small]->i_children >= 0 ) \
         i_test = 1;\
@@ -198,5 +198,7 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
         pp_items[i_position] = pp_items[i_small];
         pp_items[i_small] = p_temp;
     }
+    free( psz_a );
+    free( psz_b );
     return VLC_SUCCESS;
 }

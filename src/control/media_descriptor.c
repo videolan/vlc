@@ -276,7 +276,7 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
                                          libvlc_meta_t e_meta,
                                          libvlc_exception_t *p_e )
 {
-    const char * psz_meta;
+    char * psz_meta;
 
     /* XXX: locking */
 
@@ -287,11 +287,17 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
 
     /* Should be integrated in core */
     if( !psz_meta && e_meta == libvlc_meta_Title && p_md->p_input_item->psz_name )
+    {
+        free( psz_meta );
         return strdup( p_md->p_input_item->psz_name );
+    }
 
     if( !psz_meta )
-        return NULL;
+    {
+        free( psz_meta );
+        return NULL
+    }
 
-    return strdup( psz_meta );
+    return psz_meta;
 }
 

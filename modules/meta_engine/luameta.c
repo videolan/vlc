@@ -250,6 +250,7 @@ static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item
         msg_Err( p_this, "Could not create new Lua State" );
         return NULL;
     }
+    char *psz_meta;
 
     /* Load Lua libraries */
     luaL_openlibs( p_state ); /* XXX: Don't open all the libs? */
@@ -258,19 +259,27 @@ static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item
     
     lua_pushlightuserdata( p_state, p_this );
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "private" );
-    
-    lua_pushstring( p_state, p_item->psz_name );
+   
+    psz_meta = input_item_GetName( p_item );
+    lua_pushstring( p_state, psz_meta );
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "name" );
-    
-    lua_pushstring( p_state, input_item_GetTitle( p_item ) );
+    free( psz_meta );
+   
+    psz_meta = input_item_GetTitle( p_item ) ;
+    lua_pushstring( p_state, psz_meta );
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "title" );
-    
-    lua_pushstring( p_state, input_item_GetAlbum( p_item ) );
+    free( psz_meta );
+   
+    psz_meta = input_item_GetAlbum( p_item );
+    lua_pushstring( p_state, psz_meta );
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "album" );
+    free( psz_meta );
 
-    lua_pushstring( p_state, input_item_GetArtURL( p_item ) );
+    psz_meta = input_item_GetArtURL( p_item );
+    lua_pushstring( p_state, psz_meta );
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "arturl" );
-    /* XXX: all should be passed */
+    free( psz_meta );
+    /* XXX: all should be passed ( could use macro ) */
 
     return p_state;
 }

@@ -188,18 +188,21 @@ void MetaPanel::saveMeta()
  **/
 void MetaPanel::update( input_item_t *p_item )
 {
-    const char *psz_meta; 
+    char *psz_meta; 
 #define UPDATE_META( meta, widget ) {               \
     psz_meta = input_item_Get##meta( p_item );      \
     if( !EMPTY_STR( psz_meta ) )                    \
         widget->setText( qfu( psz_meta ) );         \
     else                                            \
-        widget->setText( "" ); }
+        widget->setText( "" ); }                    \
+    free( psz_meta );
 
 #define UPDATE_META_INT( meta, widget ) {           \
     psz_meta = input_item_Get##meta( p_item );      \
     if( !EMPTY_STR( psz_meta ) )                    \
-        widget->setValue( atoi( psz_meta ) ); }
+        widget->setValue( atoi( psz_meta ) ); }     \
+    free( psz_meta );
+
 
     /* Name / Title */
     psz_meta = input_item_GetTitle( p_item );
@@ -208,6 +211,7 @@ void MetaPanel::update( input_item_t *p_item )
     else if( !EMPTY_STR( p_item->psz_name ) )
         title_text->setText( qfu( p_item->psz_name ) );
     else title_text->setText( "" );
+    free( psz_meta );
 
     /* URL / URI */
     psz_meta = input_item_GetURL( p_item );
@@ -215,6 +219,7 @@ void MetaPanel::update( input_item_t *p_item )
         emit uriSet( QString( psz_meta ) );
     else if( !EMPTY_STR( p_item->psz_uri ) )
         emit uriSet( QString( p_item->psz_uri ) );
+    free( psz_meta );
 
     /* Other classic though */
     UPDATE_META( Artist, artist_text );
@@ -243,6 +248,7 @@ void MetaPanel::update( input_item_t *p_item )
     }
     else
         art_cover->setPixmap( QPixmap( ":/noart.png" ) );
+    free( psz_meta );
 }
 
 /*
