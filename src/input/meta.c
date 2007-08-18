@@ -119,6 +119,9 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
 {
     int i_ret = VLC_EGENERIC;
     module_t *p_module;
+    char * psz_album = input_item_GetAlbum( p_item );
+    char * psz_artist = input_item_GetArtist( p_item );
+    char * psz_title = input_item_GetAlbum( p_item );
 
     if( !p_item->p_meta )
         return VLC_EGENERIC;
@@ -334,7 +337,7 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     else if( p_item->psz_name )
         psz_title = ArtCacheCreateString( p_item->psz_name );
 
-    if( (!psz_title || !psz_album) && !psz_artist )
+    if( !psz_title || (!psz_album && !psz_artist) )
     {
         free( psz_title );
         free( psz_album );
