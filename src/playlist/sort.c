@@ -135,6 +135,8 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     { \
         i_test = strcmp( psz_b, psz_a ); \
     } \
+    free( psz_a ); \
+    free( psz_b ); \
 }
 
     for( i_position = 0; i_position < i_items -1 ; i_position ++ )
@@ -198,7 +200,5 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
         pp_items[i_position] = pp_items[i_small];
         pp_items[i_small] = p_temp;
     }
-    free( psz_a );
-    free( psz_b );
     return VLC_SUCCESS;
 }
