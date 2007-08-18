@@ -181,19 +181,7 @@ static void resolve_callback(
         }
         if( p_input != NULL )
         {
-            playlist_item_t *p_item;
-            p_item = playlist_NodeAddInput( p_sys->p_playlist, p_input,
-                                            p_sys->p_node_cat,
-                                            PLAYLIST_APPEND, PLAYLIST_END,
-                                            VLC_FALSE);
-            p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-            p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
-            p_item = playlist_NodeAddInput( p_sys->p_playlist, p_input,
-                                            p_sys->p_node_one,
-                                            PLAYLIST_APPEND, PLAYLIST_END,
-                                            VLC_FALSE );
-            p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-            p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
+            services_discovery_AddItem( p_sd, p_input, NULL );
        }
     }
 
@@ -308,16 +296,7 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    p_sys->p_node_cat = playlist_NodeCreate( p_sys->p_playlist, _("Bonjour"),
-                                       p_sys->p_playlist->p_root_category, 0 );
-    p_sys->p_node_one = playlist_NodeCreate( p_sys->p_playlist, _("Bonjour"),
-                                       p_sys->p_playlist->p_root_onelevel, 0 );
-    p_sys->p_node_one->p_input->i_id = p_sys->p_node_cat->p_input->i_id;
-
-    p_sys->p_node_one->i_flags |= PLAYLIST_RO_FLAG;
-    p_sys->p_node_cat->i_flags |= PLAYLIST_RO_FLAG;
-    p_sys->p_node_one->i_flags |= PLAYLIST_SKIP_FLAG;
-    p_sys->p_node_cat->i_flags |= PLAYLIST_SKIP_FLAG;
+    services_discovery_SetLocalizedName( p_sd, _("Bonjour") );
 
     p_sd->pf_run = Run;
 
