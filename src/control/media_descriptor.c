@@ -292,12 +292,6 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
         return strdup( p_md->p_input_item->psz_name );
     }
 
-    if( !psz_meta )
-    {
-        free( psz_meta );
-        return NULL
-    }
-
     return psz_meta;
 }
 
