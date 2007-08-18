@@ -84,8 +84,8 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_STREAM;
 
-    psz_socks = var_CreateGetString( p_this, "socks" );
-    if( *psz_socks && *psz_socks != ':' )
+    psz_socks = var_CreateGetNonEmptyString( p_this, "socks" );
+    if( psz_socks != NULL )
     {
         char *psz = strchr( psz_socks, ':' );
 
@@ -95,8 +95,32 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
         psz_realhost = psz_socks;
         i_realport = ( psz != NULL ) ? atoi( psz ) : 1080;
 
-        msg_Dbg( p_this, "net: connecting to %s port %d for %s port %d",
+        msg_Dbg( p_this, "net: connecting to %s port %d (SOCKS) for %s port %d",
                  psz_realhost, i_realport, psz_host, i_port );
+
+        /* We only implement TCP with SOCKS */
+        switch( type )
+        {
+            case 0:
+                type = SOCK_STREAM;
+            case SOCK_STREAM:
+                break;
+            default:
+                msg_Err( p_this, "Socket type not supported through SOCKS" );
+                free( psz_socks );
+                return -1;
+        }
+        switch( proto )
+        {
+            case 0:
+                proto = IPPROTO_TCP;
+            case IPPROTO_TCP:
+                break;
+            default:
+                msg_Err( p_this, "Transport not supported through SOCKS" );
+                free( psz_socks );
+                return -1;
+        }
     }
     else
     {
@@ -108,11 +132,12 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     }
 
     i_val = vlc_getaddrinfo( p_this, psz_realhost, i_realport, &hints, &res );
+    free( psz_socks );
+
     if( i_val )
     {
         msg_Err( p_this, "cannot resolve %s port %d : %s", psz_realhost,
                  i_realport, vlc_gai_strerror( i_val ) );
-        free( psz_socks );
         return -1;
     }
 
@@ -169,7 +194,6 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
                     msg_Dbg( p_this, "connection aborted" );
                     net_Close( fd );
                     vlc_freeaddrinfo( res );
-                    free( psz_socks );
                     return -1;
                 }
 
@@ -230,12 +254,12 @@ next_ai: /* failure */
     {
         msg_Err( p_this, "Connection to %s port %d failed: %s", psz_host,
                  i_port, net_strerror( i_saved_errno ) );
-        free( psz_socks );
         return -1;
     }
 
-    if( *psz_socks && *psz_socks != ':' )
+    if( psz_socks != NULL )
     {
+        /* NOTE: psz_socks already free'd! */
         char *psz_user = var_CreateGetString( p_this, "socks-user" );
         char *psz_pwd  = var_CreateGetString( p_this, "socks-pwd" );
 
@@ -250,7 +274,6 @@ next_ai: /* failure */
         free( psz_user );
         free( psz_pwd );
     }
-    free( psz_socks );
 
     return i_handle;
 }
