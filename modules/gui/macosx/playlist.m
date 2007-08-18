@@ -296,9 +296,9 @@
         char *psz_artist = input_item_GetArtist( p_item->p_input );
         if( [[o_tc identifier] isEqualToString:@"2"] && !EMPTY_STR( psz_artist ) )
         {
-            o_value = [NSString stringWithUTF8String: psz_artist )];
+            o_value = [NSString stringWithUTF8String: psz_artist];
             if( o_value == NULL )
-                o_value = [NSString stringWithCString: psz_artist )];
+                o_value = [NSString stringWithCString: psz_artist];
         }
         else if( [[o_tc identifier] isEqualToString:@"3"] )
         {
