@@ -251,7 +251,7 @@ static inline char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta
 
     if( !p_i->p_meta )
     {
-        vlc_mutex_unlock( &p_i->lock );
+        //vlc_mutex_unlock( &p_i->lock );
         return NULL;
     }
 
