@@ -165,6 +165,7 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
         i_ret = EMPTY_STR( psz_arturl ) ? VLC_SUCCESS : VLC_EGENERIC ;
         free( psz_arturl );
         return i_ret;
+    }
 }
 
 static int FindMetaMBId( vlc_object_t *p_this )
