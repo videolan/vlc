@@ -288,6 +288,7 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent,
  **/
 void ExtraMetaPanel::update( input_item_t *p_item )
 {
+    vlc_mutex_lock( &p_item->lock );
     vlc_meta_t *p_meta = p_item->p_meta;
     if( !p_meta )
         return;
@@ -305,6 +306,7 @@ void ExtraMetaPanel::update( input_item_t *p_item )
         items.append( new QTreeWidgetItem ( extraMetaTree, tempItem ) );
         free( ppsz_allkey[i] );
     }
+    vlc_mutex_unlock( &p_item->lock );
     free( ppsz_allkey );
     extraMetaTree->addTopLevelItems( items );
 }

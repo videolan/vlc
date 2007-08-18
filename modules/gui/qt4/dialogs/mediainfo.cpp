@@ -123,9 +123,7 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
 void MediaInfoDialog::setInput( input_item_t *p_input )
 {
     clear();
-    vlc_mutex_lock( &p_input->lock );
     update( p_input, true, true );
-    vlc_mutex_unlock( &p_input->lock );
 }
 
 void MediaInfoDialog::update()
@@ -144,12 +142,10 @@ void MediaInfoDialog::update()
     }
 
     vlc_object_yield( p_input );
-    vlc_mutex_lock( &input_GetItem(p_input)->lock );
 
     update( input_GetItem(p_input), need_update, need_update );
     need_update = false;
 
-    vlc_mutex_unlock( &input_GetItem(p_input)->lock );
     vlc_object_release( p_input );
 }
 
