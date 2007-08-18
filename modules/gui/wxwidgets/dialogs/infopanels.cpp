@@ -119,9 +119,10 @@ void MetaDataPanel::Update( input_item_t *p_item )
 
     uri_text->SetValue( wxU( p_item->psz_uri ) );
     name_text->SetValue( wxU( p_item->psz_name ) );
+    char *psz_meta;
 
 #define UPDATE_META( meta, widget ) {                                       \
-    char *psz_meta = input_item_Get##meta( p_item );                        \
+    psz_meta = input_item_Get##meta( p_item );                        \
     if( psz_meta != NULL && *psz_meta)                                      \
     {                                                                       \
         widget->SetLabel( wxU( psz_meta ) );                                \
