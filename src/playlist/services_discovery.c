@@ -185,9 +185,9 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
 
     msg_Dbg( p_parent->p_playlist, "Adding %s in %s", p_input->psz_name, psz_cat );
 
-    /* If p_child is in root category (this is clearly a hack) and we have a cat*/
+    /* If p_parent is in root category (this is clearly a hack) and we have a cat */
     if( !EMPTY_STR(psz_cat) &&
-        p_parent == playlist_ItemToNode( p_parent->p_playlist, p_parent, VLC_FALSE ) )
+        p_parent->p_parent == p_parent->p_playlist->p_root_category )
     {
         /* */
         playlist_item_t * p_cat;
