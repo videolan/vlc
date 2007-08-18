@@ -234,6 +234,16 @@ static inline void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_t
     vlc_event_send( &p_i->event_manager, &event );
 }
 
+static inline vlc_bool_t input_item_MetaMatch( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz )
+{
+    vlc_mutex_lock( &p_i->lock );
+    const char * meta = vlc_meta_Get( p_i->p_meta, meta_type );
+    vlc_bool_t ret = meta && strcasestr( meta, psz );
+    vlc_mutex_unlock( &p_i->lock );
+
+    return ret;
+}
+
 static inline char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type )
 {
     char * psz = NULL;
@@ -252,7 +262,7 @@ static inline char * input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta
     return psz;
 }
 
-static inline char * input_item_GetName( input_item_t *p_i )
+static inline char * input_item_GetName( input_item_t * p_i )
 {
     vlc_mutex_lock( &p_i->lock );
     char *psz_s = p_i->psz_name ? strdup( p_i->psz_name ) : NULL;
