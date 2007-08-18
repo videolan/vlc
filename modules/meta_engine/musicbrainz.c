@@ -76,6 +76,7 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
     char psz_data[256];
     char i_album_count, i;
     char *ppsz_args[4];
+    vlc_bool_t b_art_found = VLC_FALSE;
 
     char *psz_artist;
     char *psz_album;
@@ -150,6 +151,7 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
                     psz_buf );
             msg_Dbg( p_obj, "Album art URL: %s", psz_data );
             input_item_SetArtURL( p_item, psz_data );
+            b_art_found = VLC_TRUE;
             break;
         }
     }
@@ -161,14 +163,7 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
     if( !b_art )
         return VLC_SUCCESS;
     else
-    {
-        char *psz_arturl;
-        psz_arturl = input_item_GetArtURL( p_item );
-        int i_ret;
-        i_ret = EMPTY_STR( psz_arturl ) ? VLC_SUCCESS : VLC_EGENERIC ;
-        free( psz_arturl );
-        return i_ret;
-    }
+        return b_art_found ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static int FindMetaMBId( vlc_object_t *p_this )
