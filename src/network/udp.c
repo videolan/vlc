@@ -710,7 +710,6 @@ int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
     memset (&hints, 0, sizeof (hints));
     hints.ai_family = family;
     hints.ai_socktype = SOCK_DGRAM;
-    hints.ai_flags = AI_PASSIVE;
 
     val = vlc_getaddrinfo (obj, psz_server, i_server, &hints, &rem);
     if (val)
@@ -720,6 +719,7 @@ int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
         return -1;
     }
 
+    hints.ai_flags = AI_PASSIVE;
     val = vlc_getaddrinfo (obj, psz_bind, i_bind, &hints, &loc);
     if (val)
     {
