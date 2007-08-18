@@ -64,8 +64,6 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 
     if( !p_child_in_category )
     {
-        b_play = b_play && p_item_in_category == p_playlist->status.p_item;
-
         /* Then, transform to a node if needed */
         p_item_in_category = playlist_ItemFindFromInputAndRoot(
                                 p_playlist, p_parent->i_id,
@@ -75,8 +73,10 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
         {
             /* Item may have been removed */
             PL_UNLOCK;
-            return
+            return;
         }
+
+        b_play = b_play && p_item_in_category == p_playlist->status.p_item;
 
         /* If this item is already a node don't transform it */
         if( p_item_in_category->i_children == -1 )
@@ -169,7 +169,7 @@ playlist_item_t *__playlist_ItemNewFromInput( vlc_object_t *p_obj,
 /** Delete a playlist item and detach its input item */
 int playlist_ItemDelete( playlist_item_t *p_item )
 {
-    uninstall_input_item_observer( p_item->p_playlist, p_item->p_input );
+    uninstall_input_item_observer( p_item, p_item->p_input );
 
     vlc_gc_decref( p_item->p_input );
     free( p_item );
