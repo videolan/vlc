@@ -219,8 +219,6 @@ struct sap_announce_t
     sdp_t       *p_sdp;
 
     int i_input_id;
-    int i_item_id_cat;
-    int i_item_id_one;
 };
 
 struct services_discovery_sys_t
@@ -228,10 +226,6 @@ struct services_discovery_sys_t
     /* Socket descriptors */
     int i_fd;
     int *pi_fd;
-
-    /* playlist node */
-    playlist_item_t *p_node_cat;
-    playlist_item_t *p_node_one;
 
     /* Table of announces */
     int i_announces;
@@ -309,13 +303,9 @@ static int Open( vlc_object_t *p_this )
     /* Cache sap_timeshift value */
     p_sys->b_timeshift = var_CreateGetInteger( p_sd, "sap-timeshift" );
 
-    /* Create our playlist node */
-    pl_Yield( p_sd );
+    /* Set our name */
+    services_discovery_SetLocalizedName( p_sd, _("SAP sessions") );
 
-    playlist_NodesPairCreate( pl_Get( p_sd ), _("SAP sessions"),
-                              &p_sys->p_node_cat, &p_sys->p_node_one,
-                              VLC_TRUE );
-    p_sys->p_node_cat->p_input->b_prefers_tree = VLC_TRUE;
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;
 
@@ -438,10 +428,6 @@ static void Close( vlc_object_t *p_this )
     }
     FREENULL( p_sys->pp_announces );
 
-    playlist_NodeDelete( pl_Get(p_sd), p_sys->p_node_cat, VLC_TRUE,
-                         VLC_TRUE );
-    playlist_NodeDelete( pl_Get(p_sd), p_sys->p_node_one, VLC_TRUE,
-                         VLC_TRUE );
     pl_Release( p_sd );
     free( p_sys );
 }
@@ -780,7 +766,6 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
                                 sdp_t *p_sdp )
 {
     input_item_t *p_input;
-    playlist_item_t     *p_item, *p_child;
     const char *psz_value;
     sap_announce_t *p_sap = (sap_announce_t *)malloc(
                                         sizeof(sap_announce_t ) );
@@ -827,34 +812,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     else
         psz_value = GetAttribute( p_sap->p_sdp->pp_attributes, p_sap->p_sdp->i_attributes, "x-plgroup" );
 
-    if( psz_value != NULL )
-    {
-        p_child = playlist_ChildSearchName( p_sys->p_node_cat, psz_value );
-
-        if( p_child == NULL )
-        {
-            p_child = playlist_NodeCreate( pl_Get( p_sd ), psz_value,
-                                           p_sys->p_node_cat, 0 );
-            p_child->i_flags &= ~PLAYLIST_SKIP_FLAG;
-        }
-    }
-    else
-    {
-        p_child = p_sys->p_node_cat;
-    }
-
-    p_item = playlist_NodeAddInput( pl_Get( p_sd ), p_input, p_child,
-                                    PLAYLIST_APPEND, PLAYLIST_END, VLC_FALSE );
-    p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-    p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
-    p_sap->i_item_id_cat = p_item->i_id;
-
-    p_item = playlist_NodeAddInput( pl_Get( p_sd ), p_input,
-                        p_sys->p_node_one, PLAYLIST_APPEND, PLAYLIST_END,
-                        VLC_FALSE );
-    p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-    p_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
-    p_sap->i_item_id_one = p_item->i_id;
+    services_discovery_AddItem( p_sd, p_input, psz_value /* category name */ );
 
     TAB_APPEND( p_sys->i_announces, p_sys->pp_announces, p_sap );
 
