@@ -89,8 +89,6 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
         free( psz_album );
         return VLC_EGENERIC;
     }
-    free( psz_artist );
-    free( psz_album );
 
     musicbrainz_t p_mb;
 
@@ -112,10 +110,14 @@ static int GetData( vlc_object_t *p_obj, input_item_t *p_item,
         "</mq:FindAlbum>\n", ppsz_args ) )
     {
         mb_GetQueryError( p_mb, psz_buf, 256 );
-        msg_Err( p_obj, "Query failed: %s\n", psz_buf );
+        msg_Err( p_obj, "Query failed: %s", psz_buf );
         mb_Delete( p_mb );
+        free( psz_artist );
+        free( psz_album );
         return VLC_EGENERIC;
     }
+    free( psz_artist );
+    free( psz_album );
 
     i_album_count = mb_GetResultInt( p_mb, MBE_GetNumAlbums );
     if( i_album_count < 1 )
