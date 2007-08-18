@@ -212,7 +212,7 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
 {
     input_item_t * p_input = p_event->u.services_discovery_item_removed.p_item;
     playlist_item_t * p_parent = user_data;
-    printf(" Removind %s\n", p_input->psz_name );
+
     playlist_DeleteInputInParent( p_parent->p_playlist, p_input->i_id,
                                   p_parent, VLC_FALSE );
 }
