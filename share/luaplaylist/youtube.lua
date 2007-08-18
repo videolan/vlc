@@ -32,9 +32,12 @@ function parse()
             if string.match( line, "subscribe_to_user=" ) then
                 artist = string.gsub( line, ".*subscribe_to_user=([^&]*).*", "%1" )
             end
-            if name and description and artist then break end
+            if string.match( line, "player2.swf" ) then
+                video_id = string.gsub( line, ".*BASE_YT_URL=http://youtube.com/&video_id=([^\"]*).*", "%1" )
+            end
+            if name and description and artist and video_id then break end
         end
-        return { { path = string.gsub( vlc.path, "^(.*)watch%?v=([^&]*).*$", "http://%1v/%2" ); name = name; description = description; artist = artist } }
+        return { { path = "http://www.youtube.com/get_video.php?video_id="..video_id; name = name; description = description; artist = artist } }
     else -- This is the flash player's URL
         if string.match( vlc.path, "title=" ) then
             name = get_url_param( vlc.path, "title" )
