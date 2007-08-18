@@ -272,11 +272,11 @@
     {
         /* sanity check to prevent the NSString class from crashing */
         char *psz_title =  input_item_GetTitle( p_item->p_input );
-        if( !EMPTY_STR( psz_title ) ) )
+        if( !EMPTY_STR( psz_title ) )
         {
-            o_value = [NSString stringWithUTF8String: psz_title )];
+            o_value = [NSString stringWithUTF8String: psz_title];
             if( o_value == NULL )
-                o_value = [NSString stringWithCString: psz_title )];
+                o_value = [NSString stringWithCString: psz_title];
         } 
         else
         {
@@ -287,9 +287,9 @@
                 if( o_value == NULL )
                     o_value = [NSString stringWithCString: psz_name];
             }
+            free( psz_name );
         }
         free( psz_title );
-        free( psz_name );
     }
     else
     {
