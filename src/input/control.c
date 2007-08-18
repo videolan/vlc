@@ -152,7 +152,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 p_cat = malloc( sizeof( info_category_t ) );
                 if( !p_cat )
                 {
-                    vlc_mutex_lock( &p_input->p->input.p_item->lock );
+                    vlc_mutex_unlock( &p_input->p->input.p_item->lock );
                     return VLC_EGENERIC;
                 }
                 p_cat->psz_name = strdup( psz_cat );
@@ -180,7 +180,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 p_info = malloc( sizeof( info_t ) );
                 if( !p_info )
                 {
-                    vlc_mutex_lock( &p_input->p->input.p_item->lock );
+                    vlc_mutex_unlock( &p_input->p->input.p_item->lock );
                     return VLC_EGENERIC;
                 }
 

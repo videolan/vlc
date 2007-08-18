@@ -65,13 +65,11 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
         assert( p_current->p_input->psz_uri );
 
         /* General info */
-        if( p_current->p_input->psz_name &&
-             strcmp( p_current->p_input->psz_uri,
-                     p_current->p_input->psz_name ) )
+        char *psz_name = input_item_GetName( p_current->p_input );
+        if( psz_name && strcmp( p_current->p_input->psz_uri, psz_name ) )
         {
-            char *psz_artist = input_item_GetArtist( p_current->p_input ) ?
-                               strdup( input_item_GetArtist( p_current->p_input ) ):
-                               strdup( "" );
+            char *psz_artist = input_item_GetArtist( p_current->p_input );
+            if( psz_artist == NULL ) psz_artist = strdup( "" );
             if( psz_artist && *psz_artist )
             {
                 /* write EXTINF with artist */
@@ -87,9 +85,9 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
                          (int)( p_current->p_input->i_duration/1000000 ),
                           p_current->p_input->psz_name);
             }
-            if( psz_artist )
-                free( psz_artist );
+            free( psz_artist );
         }
+        free( psz_name );
 
         /* VLC specific options */
         for( j = 0; j < p_current->p_input->i_options; j++ )

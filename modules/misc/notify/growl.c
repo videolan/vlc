@@ -124,21 +124,22 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( !p_input ) return VLC_SUCCESS;
     vlc_object_yield( p_input );
 
-    if( p_input->b_dead || !input_GetItem(p_input)->psz_name )
+    char *psz_name = input_item_GetName( input_GetItem( p_input ) );
+    if( p_input->b_dead || !psz_name )
     {
         /* Not playing anything ... */
+        free( psz_name );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
+    free( psz_name );
 
     /* Playing something ... */
-    psz_artist = input_item_GetArtist( input_GetItem(p_input) ) ?
-                  strdup( input_item_GetArtist( input_GetItem(p_input) ) ) :
-                  strdup( "" );
-    psz_album = input_item_GetAlbum( input_GetItem(p_input) ) ?
-                  strdup( input_item_GetAlbum( input_GetItem(p_input) ) ) :
-                  strdup("" );
-    psz_title = strdup( input_GetItem(p_input)->psz_name );
+    psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
+    if( psz_artist == NULL ) psz_artist = strdup( "" );
+    psz_album = input_item_GetAlbum( input_GetItem( p_input ) ) ;
+    if( psz_album == NULL ) psz_album = strdup( "" );
+    psz_title = input_item_GetName( input_GetItem( p_input ) );
     if( psz_title == NULL ) psz_title = strdup( N_("(no title)") );
     snprintf( psz_tmp, GROWL_MAX_LENGTH, "%s %s %s",
               psz_title, psz_artist, psz_album );

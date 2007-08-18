@@ -527,6 +527,8 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
              * This only checks for meta, not for art
              * \todo don't do this for things we won't get meta for, like vids
              */
+            char *psz_arturl = input_item_GetArtURL( p_current );
+            char *psz_name = input_item_GetName( p_current );
             if( !input_MetaSatisfied( p_playlist, p_current, &i_m, &i_o ) )
             {
                 preparse_item_t p;
@@ -542,11 +544,10 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
             }
             /* We already have all needed meta, but we need art right now */
             else if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_ALL &&
-                     EMPTY_STR( input_item_GetArtURL( p_current ) ) )
+                     EMPTY_STR( psz_arturl ) )
             {
                 preparse_item_t p;
-                PL_DEBUG("meta ok for %s, need to fetch art",
-                                                         p_current->psz_name );
+                PL_DEBUG("meta ok for %s, need to fetch art", psz_name );
                 p.p_item = p_current;
                 p.b_fetch_art = VLC_TRUE;
                 vlc_mutex_lock( &p_playlist->p_fetcher->object_lock );
@@ -559,10 +560,11 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
             else
             {
                 PL_DEBUG( "no fetch required for %s (art currently %s)",
-                          p_current->psz_name,
-                          input_item_GetArtURL( p_current ));
+                          psz_name, psz_arturl );
                 vlc_gc_decref( p_current );
             }
+            free( psz_name );
+            free( psz_arturl );
             PL_UNLOCK;
         }
         else

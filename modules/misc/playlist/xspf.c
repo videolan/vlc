@@ -163,11 +163,10 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     }
 
     /* -> the artist/creator */
-    psz = input_item_GetArtist( p_item->p_input ) ?
-                        strdup( input_item_GetArtist( p_item->p_input ) ):
-                        strdup( "" );
+    psz = input_item_GetArtist( p_item->p_input );
+    if( psz == NULL ) psz = strdup( "" );
     psz_temp = convert_xml_special_chars( psz );
-    if( psz ) free( psz );
+    free( psz );
     if( *psz_temp )
     {
         fprintf( p_file, "\t\t\t<creator>%s</creator>\n", psz_temp );
@@ -175,11 +174,10 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     free( psz_temp );
 
     /* -> the album */
-    psz = input_item_GetAlbum( p_item->p_input ) ?
-                        strdup( input_item_GetAlbum( p_item->p_input ) ):
-                        strdup( "" );
+    psz = input_item_GetAlbum( p_item->p_input );
+    if( psz == NULL ) psz = strdup( "" );
     psz_temp = convert_xml_special_chars( psz );
-    if( psz ) free( psz );
+    free( psz );
     if( *psz_temp )
     {
         fprintf( p_file, "\t\t\t<album>%s</album>\n", psz_temp );
@@ -187,24 +185,22 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     free( psz_temp );
 
     /* -> the track number */
-    psz = input_item_GetTrackNum( p_item->p_input ) ?
-                        strdup( input_item_GetTrackNum( p_item->p_input ) ):
-                        strdup( "" );
+    psz = input_item_GetTrackNum( p_item->p_input );
+    if( psz == NULL ) psz = strdup( "" );
     if( psz )
     {
         if( *psz )
         {
             fprintf( p_file, "\t\t\t<trackNum>%i</trackNum>\n", atoi( psz ) );
         }
-        free( psz );
     }
+    free( psz );
 
     /* -> the description */
-    psz = input_item_GetDescription( p_item->p_input ) ?
-                        strdup( input_item_GetDescription( p_item->p_input ) ):
-                        strdup( "" );
+    psz = input_item_GetDescription( p_item->p_input );
+    if( psz == NULL ) psz = strdup( "" );
     psz_temp = convert_xml_special_chars( psz );
-    if( psz ) free( psz );
+    free( psz );
     if( *psz_temp )
     {
         fprintf( p_file, "\t\t\t<annotation>%s</annotation>\n", psz_temp );

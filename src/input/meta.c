@@ -119,24 +119,33 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
 {
     int i_ret = VLC_EGENERIC;
     module_t *p_module;
+    char *psz_name, *psz_title, *psz_artist, *psz_album;
 
     if( !p_item->p_meta )
         return VLC_EGENERIC;
 
-    if(  !p_item->psz_name && !input_item_GetTitle( p_item ) &&
-        (!input_item_GetArtist( p_item ) || !input_item_GetAlbum( p_item )) )
+    psz_name = input_item_GetName( p_item );
+    psz_title = input_item_GetTitle( p_item );
+    psz_artist = input_item_GetArtist( p_item );
+    psz_album = input_item_GetAlbum( p_item );
+
+    if(  !psz_name && !psz_title && !psz_artist && !psz_album )
         return VLC_EGENERIC;
+    free( psz_name );
+    free( psz_title );
 
     /* If we already checked this album in this session, skip */
-    if( input_item_GetArtist( p_item ) && input_item_GetAlbum( p_item ) )
+    if( psz_artist && psz_album )
     {
         FOREACH_ARRAY( playlist_album_t album, p_playlist->p_fetcher->albums )
-            if( !strcmp( album.psz_artist, input_item_GetArtist( p_item ) ) &&
-                !strcmp( album.psz_album, input_item_GetAlbum( p_item ) ) )
+            if( !strcmp( album.psz_artist, psz_artist ) &&
+                !strcmp( album.psz_album, psz_album ) )
             {
                 msg_Dbg( p_playlist, " %s - %s has already been searched",
-                         input_item_GetArtist( p_item ),  input_item_GetAlbum( p_item ) );
+                         psz_artist, psz_album );
         /* TODO-fenrir if we cache art filename too, we can go faster */
+                free( psz_artist );
+                free( psz_album );
                 if( album.b_found )
                 {
                     /* Actually get URL from cache */
@@ -150,23 +159,36 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
             }
         FOREACH_END();
     }
+    free( psz_artist );
+    free( psz_album );
 
+    char *psz_arturl = input_item_GetArtURL( p_item );
     input_FindArtInCache( p_playlist, p_item );
-    if( !EMPTY_STR(input_item_GetArtURL( p_item )) )
+    if( !EMPTY_STR( psz_arturl ) )
+    {
+        free( psz_arturl );
         return 0;
+    }
+    free( psz_arturl );
 
     PL_LOCK;
     p_playlist->p_private = p_item;
-    if( input_item_GetAlbum( p_item ) && input_item_GetArtist( p_item ) )
+    psz_album = input_item_GetAlbum( p_item );
+    psz_artist = input_item_GetArtist( p_item );
+    psz_name = input_item_GetName( p_item );
+    psz_title = input_item_GetTitle( p_item );
+    if( psz_album && psz_artist )
     {
         msg_Dbg( p_playlist, "searching art for %s - %s",
-             input_item_GetArtist( p_item ),  input_item_GetAlbum( p_item ) );
+             psz_artist, psz_album );
     }
     else
     {
         msg_Dbg( p_playlist, "searching art for %s",
-             input_item_GetTitle( p_item ) ? input_item_GetTitle( p_item ) : p_item->psz_name );
+             psz_title ? psz_title : psz_name );
     }
+    free( psz_title );
+    free( psz_name );
 
     p_module = module_Need( p_playlist, "art finder", 0, VLC_FALSE );
 
@@ -176,13 +198,18 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
         msg_Dbg( p_playlist, "unable to find art" );
 
     /* Record this album */
-    if( input_item_GetArtist( p_item ) && input_item_GetAlbum( p_item ) )
+    if( psz_artist && psz_album )
     {
         playlist_album_t a;
-        a.psz_artist = strdup( input_item_GetArtist( p_item ) );
-        a.psz_album = strdup( input_item_GetAlbum( p_item ) );
+        a.psz_artist = psz_artist;
+        a.psz_album = psz_album;
         a.b_found = (i_ret == VLC_EGENERIC ? VLC_FALSE : VLC_TRUE );
         ARRAY_APPEND( p_playlist->p_fetcher->albums, a );
+    }
+    else
+    {
+        free( psz_artist );
+        free( psz_album );
     }
 
     if( p_module )
@@ -280,9 +307,9 @@ static char *ArtCacheCreateString( const char *psz )
 
 static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
 {
-    const char *psz_artist;
-    const char *psz_album;
-    const char *psz_title;
+    char *psz_artist;
+    char *psz_album;
+    char *psz_title;
     char psz_filename[MAX_PATH+1];
     int i;
     struct stat a;
@@ -293,9 +320,16 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
     psz_artist = input_item_GetArtist( p_item );
     psz_album = input_item_GetAlbum( p_item );
     psz_title = input_item_GetTitle( p_item );
-    if( !psz_title ) psz_title = p_item->psz_name;
+    if( !psz_title ) psz_title = input_item_GetName( p_item );
 
-    if( (!psz_artist || !psz_album) && !psz_title ) return VLC_EGENERIC;
+    if( !psz_title && ( !psz_album || !psz_artist ) )
+    {
+        free( psz_artist );
+        free( psz_album );
+        free( psz_title );
+        return VLC_EGENERIC;
+    }
+    free( psz_title );
 
     for( i = 0; i < 5; i++ )
     {
@@ -306,9 +340,13 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
         if( utf8_stat( psz_filename+7, &a ) == 0 )
         {
             input_item_SetArtURL( p_item, psz_filename );
+            free( psz_artist );
+            free( psz_album );
             return VLC_SUCCESS;
         }
     }
+    free( psz_artist );
+    free( psz_album );
     return VLC_EGENERIC;
 }
 
@@ -324,15 +362,23 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     char *psz_artist = NULL;
     char *psz_album = NULL;
     char *psz_title = NULL;
+    char *psz_artist_m, *psz_album_m, *psz_title_m, *psz_name_m, *psz_arturl_m;
     char *psz_type;
-    if( input_item_GetArtist( p_item ) )
-        psz_artist = ArtCacheCreateString( input_item_GetArtist( p_item ) );
-    if( input_item_GetAlbum( p_item ) )
-        psz_album = ArtCacheCreateString( input_item_GetAlbum( p_item ) );
-    if( input_item_GetTitle( p_item ) )
-        psz_title = ArtCacheCreateString( input_item_GetTitle( p_item ) );
-    else if( p_item->psz_name )
-        psz_title = ArtCacheCreateString( p_item->psz_name );
+
+    psz_artist_m = input_item_GetArtist( p_item );
+    psz_album_m = input_item_GetAlbum( p_item );
+    psz_title_m = input_item_GetTitle( p_item );
+    psz_name_m = input_item_GetName( p_item );
+
+    if( psz_artist_m ) psz_artist = ArtCacheCreateString( psz_artist_m );
+    if( psz_album_m ) psz_album = ArtCacheCreateString( psz_album_m );
+    if( psz_title_m ) psz_title = ArtCacheCreateString( psz_title_m );
+    else if( psz_name_m ) psz_title = ArtCacheCreateString( psz_name_m );
+
+    free( psz_artist_m );
+    free( psz_album_m );
+    free( psz_title_m );
+    free( psz_name_m );
 
     if( !psz_title && (!psz_artist || !psz_album) )
     {
@@ -342,9 +388,10 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
         return VLC_EGENERIC;
     }
 
-    assert( !EMPTY_STR(input_item_GetArtURL( p_item )) );
+    psz_arturl_m = input_item_GetArtURL( p_item );
+    assert( !EMPTY_STR( psz_arturl_m ) );
 
-    psz_type = strrchr( input_item_GetArtURL( p_item ), '.' );
+    psz_type = strrchr( psz_arturl_m, '.' );
 
     /* */
     ArtCacheCreateName( p_playlist, psz_filename, psz_title /* Used only if needed*/,
@@ -358,13 +405,14 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     free( psz_album );
     free( psz_title );
 
-    if( !strncmp( input_item_GetArtURL( p_item ) , "APIC", 4 ) )
+    if( !strncmp( psz_arturl_m , "APIC", 4 ) )
     {
         msg_Warn( p_playlist, "APIC fetch not supported yet" );
+        free( psz_arturl_m );
         return VLC_EGENERIC;
     }
 
-    p_stream = stream_UrlNew( p_playlist, input_item_GetArtURL( p_item ) );
+    p_stream = stream_UrlNew( p_playlist, psz_arturl_m );
     if( p_stream )
     {
         uint8_t p_buffer[65536];
@@ -391,6 +439,7 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
         input_item_SetArtURL( p_item, psz_filename );
         i_status = VLC_SUCCESS;
     }
+    free( psz_arturl_m );
     return i_status;
 }
 
@@ -402,6 +451,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     char *psz_album = NULL;
     char *psz_title = NULL;
     char *psz_type = NULL;
+    char *psz_artist_m, *psz_album_m, *psz_title_m, *psz_name_m;
     char psz_filename[MAX_PATH+1];
     FILE *f;
     input_attachment_t *p_attachment;
@@ -411,9 +461,10 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     /* TODO-fenrir merge input_ArtFind with download and make it set the flags FETCH
      * and then set it here to to be faster */
 
-    psz_arturl = strdup( input_item_GetArtURL( p_item ) );
+    psz_arturl = input_item_GetArtURL( p_item );
     if( !psz_arturl || strncmp( psz_arturl, "attachment://", strlen("attachment://") ) )
     {
+        free( psz_arturl );
         msg_Err( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
         return;
     }
@@ -445,14 +496,20 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
         goto end;
     }
 
-    if( input_item_GetArtist( p_item ) )
-        psz_artist = ArtCacheCreateString( input_item_GetArtist( p_item ) );
-    if( input_item_GetAlbum( p_item ) )
-        psz_album = ArtCacheCreateString( input_item_GetAlbum( p_item ) );
-    if( input_item_GetTitle( p_item ) )
-        psz_title = ArtCacheCreateString( input_item_GetTitle( p_item ) );
-    else if( p_item->psz_name )
-        psz_title = ArtCacheCreateString( p_item->psz_name );
+    psz_artist_m = input_item_GetArtist( p_item );
+    psz_album_m = input_item_GetAlbum( p_item );
+    psz_title_m = input_item_GetTitle( p_item );
+    psz_name_m = input_item_GetName( p_item );
+
+    if( psz_artist_m ) psz_artist = ArtCacheCreateString( psz_artist_m );
+    if( psz_album_m ) psz_album = ArtCacheCreateString( psz_album_m );
+    if( psz_title_m ) psz_title = ArtCacheCreateString( psz_title_m );
+    else if( psz_name_m ) psz_title = ArtCacheCreateString( psz_name_m );
+
+    free( psz_artist_m );
+    free( psz_album_m );
+    free( psz_title_m );
+    free( psz_name_m );
 
     if( (!psz_artist || !psz_album ) && !psz_title )
         goto end;

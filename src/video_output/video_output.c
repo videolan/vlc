@@ -1642,10 +1642,14 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
     {
         i_now = mdate();
         i_stop = i_now + (mtime_t)(p_vout->i_title_timeout * 1000);
-        if( !EMPTY_STR(input_item_GetNowPlaying(input_GetItem(p_input))) )
+        char *psz_nowplaying = 
+            input_item_GetNowPlaying( input_GetItem( p_input ) );
+        char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
+        char *psz_name = input_item_GetName( input_GetItem( p_input ) );
+        if( !EMPTY_STR( psz_nowplaying ) )
         {
             vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
-                                   input_item_GetNowPlaying(input_GetItem(p_input)), NULL,
+                                   psz_nowplaying, NULL,
                                    p_vout->i_title_position,
                                    30 + p_vout->fmt_in.i_width
                                       - p_vout->fmt_in.i_visible_width
@@ -1653,17 +1657,14 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
                                    20 + p_vout->fmt_in.i_y_offset,
                                    i_now, i_stop );
         }
-        else if( !EMPTY_STR(input_item_GetArtist(input_GetItem(p_input))) )
+        else if( !EMPTY_STR( psz_artist ) )
         {
             char *psz_string = NULL;
 
-            psz_string = malloc( strlen(input_GetItem(p_input)->psz_name) ) +
-                    strlen( input_item_GetArtist(input_GetItem(p_input)) );
+            psz_string = malloc( strlen( psz_name ) + strlen( psz_artist ) );
             if( psz_string )
             {
-                sprintf( psz_string, "%s - %s",
-                         input_GetItem(p_input)->psz_name,
-                         input_item_GetArtist(input_GetItem(p_input)) );
+                sprintf( psz_string, "%s - %s", psz_name, psz_artist );
 
                 vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
                                        psz_string, NULL,
@@ -1679,7 +1680,7 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
         else
         {
             vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
-                                   input_GetItem(p_input)->psz_name, NULL,
+                                   psz_name, NULL,
                                    p_vout->i_title_position,
                                    30 + p_vout->fmt_in.i_width
                                       - p_vout->fmt_in.i_visible_width
@@ -1688,5 +1689,8 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
                                    i_now, i_stop );
         }
         vlc_object_release( p_input );
+        free( psz_artist );
+        free( psz_name );
+        free( psz_nowplaying );
     }
 }

@@ -454,16 +454,20 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     {
         vlc_bool_t b_has_art;
 
-        vlc_mutex_lock( &p_input->lock );
-        /* p_input->p_meta should not be null after a successfull CreateThread */
-        b_has_art = !EMPTY_STR( input_item_GetArtURL( p_input ) );
-        vlc_mutex_unlock( &p_input->lock );
+        char *psz_arturl, *psz_name;
+        psz_arturl = input_item_GetArtURL( p_input );
+        psz_name = input_item_GetName( p_input );
+
+        /* p_input->p_meta should not be null after a successfull CreateThread*/
+        b_has_art = !EMPTY_STR( psz_arturl );
 
         if( !b_has_art )
         {
-            PL_DEBUG( "requesting art for %s", p_input->psz_name );
+            PL_DEBUG( "requesting art for %s", psz_name );
             playlist_AskForArtEnqueue( p_playlist, p_input );
         }
+        free( psz_arturl );
+        free( psz_name );
     }
 
     val.i_int = p_input->i_id;

@@ -254,9 +254,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_Control( p_input, INPUT_DEL_INFO,
         _(VLC_META_INFO_CAT),
         _(VLC_META_NOW_PLAYING) );
-    vlc_mutex_lock( &p_item->lock );
     input_item_SetNowPlaying( p_item, NULL );
-    vlc_mutex_unlock( &p_item->lock );
 
     /* */
     if( p_input->b_preparsing )
@@ -2505,39 +2503,44 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
 static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
 {
     input_item_t *p_item = p_input->p->input.p_item;
-    char * psz_saved_arturl = NULL;
-    const char * psz_arturl = NULL;
+    char * psz_arturl = NULL;
     char *psz_title = NULL;
     int i;
+    int i_arturl_event = VLC_FALSE;
 
     if( !p_meta )
         return;
+
+    psz_arturl = input_item_GetArtURL( p_item );
 
     vlc_mutex_lock( &p_item->lock );
     if( vlc_meta_Get( p_meta, vlc_meta_Title ) && !p_item->b_fixed_name )
         psz_title = strdup( vlc_meta_Get( p_meta, vlc_meta_Title ) );
 
-    if( input_item_GetArtURL( p_item ) )
-        psz_saved_arturl = strdup( input_item_GetArtURL( p_item ) );
-
     vlc_meta_Merge( p_item->p_meta, p_meta );
 
-    if( psz_saved_arturl && *psz_saved_arturl )
-        input_item_SetArtURL( p_item, psz_saved_arturl );
+    if( psz_arturl && *psz_arturl )
+    {
+        vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, psz_arturl );
+        i_arturl_event = VLC_TRUE;
+    }
 
-    free( psz_saved_arturl );
     vlc_meta_Delete( p_meta );
 
-    psz_arturl = input_item_GetArtURL( p_item );
     if( psz_arturl && !strncmp( psz_arturl, "attachment://", strlen("attachment") ) )
     {
         /* Don't look for art cover if sout
          * XXX It can change when sout has meta data support */
         if( p_input->p->p_sout && !p_input->b_preparsing )
-            input_item_SetArtURL( p_item, "" );
+        {
+            vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, "" );
+            i_arturl_event = VLC_TRUE;
+
+        }
         else
             input_ExtractAttachmentAndCacheArt( p_input );
     }
+    free( psz_arturl );
     
     input_item_SetPreparsed( p_item, VLC_TRUE );
 
@@ -2549,6 +2552,16 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
         vlc_meta_Merge( p_meta, input_item_GetMetaObject( p_item ) );
     }
     vlc_mutex_unlock( &p_item->lock );
+
+    if( i_arturl_event == VLC_TRUE )
+    {
+        vlc_event_t event;
+
+        /* Notify interested third parties */
+        event.type = vlc_InputItemMetaChanged;
+        event.u.input_item_meta_changed.meta_type = vlc_meta_ArtworkURL;
+        vlc_event_send( &p_item->event_manager, &event );
+    }
 
     if( psz_title )
     {

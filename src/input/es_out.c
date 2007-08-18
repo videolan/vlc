@@ -487,12 +487,10 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     }
 
     /* Update now playing */
-    vlc_mutex_lock( &p_input->p->input.p_item->lock );
     input_item_SetNowPlaying( p_input->p->input.p_item,
                               p_pgrm->psz_now_playing );
     input_item_SetPublisher( p_input->p->input.p_item,
                              p_pgrm->psz_publisher );
-    vlc_mutex_unlock( &p_input->p->input.p_item->lock );
 
     var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
 }
@@ -672,11 +670,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
     if( psz_provider )
     {
         if( p_sys->p_pgrm == p_pgrm )
-        {
-            vlc_mutex_lock( &p_input->p->input.p_item->lock );
             input_item_SetPublisher( p_input->p->input.p_item, psz_provider );
-            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
-        }
         input_Control( p_input, INPUT_ADD_INFO, psz_cat, input_MetaTypeToLocalizedString(vlc_meta_Publisher), psz_provider );
     }
     char ** ppsz_all_keys = vlc_dictionary_all_keys( &p_meta->extra_tags );
@@ -798,10 +792,8 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
     if( p_epg->p_current && p_epg->p_current->psz_name && *p_epg->p_current->psz_name )
         p_pgrm->psz_now_playing = strdup( p_epg->p_current->psz_name );
 
-    vlc_mutex_lock( &p_input->p->input.p_item->lock );
     if( p_pgrm == p_sys->p_pgrm )
         input_item_SetNowPlaying( p_input->p->input.p_item, p_pgrm->psz_now_playing );
-    vlc_mutex_unlock( &p_input->p->input.p_item->lock );
 
     if( p_pgrm->psz_now_playing )
     {

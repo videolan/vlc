@@ -416,12 +416,10 @@ static char *TitleGet( vlc_object_t *p_this )
 
     if( p_input )
     {
-        if( !EMPTY_STR( input_item_GetTitle( input_GetItem(p_input) ) ) )
+        psz_title = strdup( input_item_GetTitle( input_GetItem( p_input ) ) );
+        if( EMPTY_STR( psz_title ) )
         {
-            psz_title = strdup( input_item_GetTitle( input_GetItem(p_input) ) );
-        }
-        else
-        {
+            free( psz_title );
             char *psz = strrchr( input_GetItem(p_input)->psz_uri, '/' );
 
             if( psz )

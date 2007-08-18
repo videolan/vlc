@@ -638,18 +638,23 @@ char *str_format_time( const char *tformat )
 }
 
 #define INSERT_STRING( check, string )                              \
-                    if( check && string )                           \
+                    if( check )                                     \
                     {                                               \
-                        int len = strlen( string );                 \
-                        dst = realloc( dst,                         \
-                                       i_size = i_size + len + 1 ); \
-                        strncpy( d, string, len+1 );                \
-                        d += len;                                   \
-                    }                                               \
-                    else                                            \
-                    {                                               \
-                        *d = '-';                                   \
-                        d++;                                        \
+                        psz_meta = string;                          \
+                        if( string )                                \
+                        {                                           \
+                            int len = strlen( psz_meta );           \
+                            dst = realloc( dst,                     \
+                                   i_size = i_size + len + 1 );     \
+                            strncpy( d, psz_meta, len+1 );          \
+                            d += len;                               \
+                            free( psz_meta );                       \
+                        }                                           \
+                        else                                        \
+                        {                                           \
+                                *d = '-';                           \
+                                d++;                                \
+                        }                                           \
                     }
 char *__str_format_meta( vlc_object_t *p_object, const char *string )
 {
@@ -681,6 +686,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
         {
             switch( *s )
             {
+                char *psz_meta; /* used by INSERT_STRING */
                 case 'a':
                     INSERT_STRING( p_item, input_item_GetArtist(p_item) );
                     break;
