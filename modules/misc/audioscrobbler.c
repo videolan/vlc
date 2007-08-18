@@ -1042,7 +1042,7 @@ static int ReadMetaData( intf_thread_t *p_this )
 
     char *psz_meta;
     #define ALLOC_ITEM_META( a, b ) \
-        psz_meta = input_item_Get##b( input_GetItem( p_input ) ) \
+        psz_meta = input_item_Get##b( input_GetItem( p_input ) ); \
         if( psz_meta ) \
         { \
             a = encode_URI_component( psz_meta ); \
