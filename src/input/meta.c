@@ -334,7 +334,7 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     else if( p_item->psz_name )
         psz_title = ArtCacheCreateString( p_item->psz_name );
 
-    if( !psz_title || ( !psz_artist && !psz_album) )
+    if( !psz_title && (!psz_artist || !psz_album) )
     {
         free( psz_title );
         free( psz_album );
