@@ -1448,10 +1448,6 @@ static void SuxorRestartVideoES( suxor_thread_t *p_this )
 
     vlc_object_release( p_this->p_input );
 
-#ifdef WIN32
-    CloseHandle( p_this->p_internals->thread_id );
-#endif
-
     vlc_object_destroy( p_this );
 }
 

@@ -166,9 +166,18 @@ typedef struct
 } vlc_threadvar_t;
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
-typedef HANDLE vlc_thread_t;
+typedef struct
+{
+    /* thread id */
+    DWORD  id;
+    /*
+    ** handle to created thread, needs be closed to dispose of it
+    ** even after thread has exited
+    */
+    HANDLE hThread;
+} vlc_thread_t;
+
 typedef BOOL (WINAPI *SIGNALOBJECTANDWAIT) ( HANDLE, HANDLE, DWORD, BOOL );
-typedef unsigned (WINAPI *PTHREAD_START) (void *);
 
 typedef struct
 {
