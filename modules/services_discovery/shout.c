@@ -88,7 +88,6 @@ vlc_module_end();
 
 struct services_discovery_sys_t
 {
-    playlist_item_t *p_node_cat,*p_node_one;
     input_item_t *p_input;
     vlc_bool_t b_dialog;
 };
@@ -99,6 +98,8 @@ struct services_discovery_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+
+static void Run( services_discovery_t *p_sd );
 
 /* Main functions */
 static int OpenRadio( vlc_object_t *p_this )
@@ -117,44 +118,36 @@ static int OpenTV( vlc_object_t *p_this )
 static int Open( vlc_object_t *p_this, int i_type )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    playlist_t          *p_playlist = pl_Yield( p_this );
     DECMALLOC_ERR( p_sys, services_discovery_sys_t );
     p_sd->p_sys  = p_sys;
+    p_sd->pf_run = Run;
 
     switch( i_type )
     {
         case TV:
-            p_sys->p_input = input_ItemNewExt( p_playlist,
+            p_sys->p_input = input_ItemNewExt( p_sd,
                                 SHOUTCAST_TV_BASE_URL, _("Shoutcast TV"),
                                 0, NULL, -1 );
             break;
         case RADIO:
         default:
-            p_sys->p_input = input_ItemNewExt( p_playlist,
+            p_sys->p_input = input_ItemNewExt( p_sd,
                                 SHOUTCAST_BASE_URL, _("Shoutcast"),
                                 0, NULL, -1 );
             break;
     }
     input_ItemAddOption( p_sys->p_input, "no-playlist-autostart" );
-    p_sys->p_input->b_prefers_tree = VLC_TRUE;
-    p_sys->p_node_cat = playlist_NodeAddInput( p_playlist, p_sys->p_input,
-                           p_playlist->p_root_category,
-                           PLAYLIST_APPEND, PLAYLIST_END, VLC_FALSE );
-    p_sys->p_node_one = playlist_NodeAddInput( p_playlist, p_sys->p_input,
-                           p_playlist->p_root_onelevel,
-                           PLAYLIST_APPEND, PLAYLIST_END, VLC_FALSE );
-    p_sys->p_node_cat->i_flags |= PLAYLIST_RO_FLAG;
-    p_sys->p_node_cat->i_flags |= PLAYLIST_SKIP_FLAG;
-    p_sys->p_node_one->i_flags |= PLAYLIST_RO_FLAG;
-    p_sys->p_node_one->i_flags |= PLAYLIST_SKIP_FLAG;
-    p_sys->p_node_one->p_input->i_id = p_sys->p_node_cat->p_input->i_id;
-
-    var_SetVoid( p_playlist, "intf-change" );
-
-    pl_Release( p_this );
-
-    input_Read( p_sd, p_sys->p_input, VLC_FALSE );
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Run:
+ *****************************************************************************/
+static void Run( services_discovery_t *p_sd )
+{
+    services_discovery_AddItem( p_sd, p_sd->p_sys->p_input, NULL /* no category */ );
+
+    input_Read( pl_Yield(p_sd), p_sd->p_sys->p_input, VLC_FALSE );
 }
 
 /*****************************************************************************
@@ -164,9 +157,6 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
-    playlist_t *p_playlist =  pl_Yield( p_sd );
-    playlist_NodeDelete( p_playlist, p_sys->p_node_cat, VLC_TRUE, VLC_FALSE );
-    playlist_NodeDelete( p_playlist, p_sys->p_node_one, VLC_TRUE, VLC_FALSE );
-    pl_Release( p_sd );
+    services_discovery_RemoveItem( p_sd, p_sys->p_input );
     free( p_sys );
 }
