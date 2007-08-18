@@ -184,9 +184,9 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     current = iscurrent;
 
     char *psz_arturl = input_item_GetArtURL( p_item->p_input );
-    if( current && psz_arturl ) &&
+    if( ( current && psz_arturl ) &&
         !strncmp( psz_arturl, "file://", 7 ) )
-        model->sendArt( qfu( psz_arturl ) ) );
+        model->sendArt( qfu( psz_arturl ) ) ;
     else if( current )
         model->removeArt();
     free( psz_arturl );
@@ -215,8 +215,8 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
                     ADD_META( p_item, Artist );
                     break;
                 case VLC_META_ENGINE_TITLE:
-                    char *psz_title;
-                    psz_title = input_item_GetTile( p_item->p_input );
+                    char *psz_title, *psz_name;
+                    psz_title = input_item_GetTitle( p_item->p_input );
                     psz_name = input_item_GetName( p_item->p_input );
                     if( psz_title )
                     {
