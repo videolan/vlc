@@ -115,6 +115,7 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
    p_playlist->b_reset_currently_playing = VLC_TRUE;
    for( i = 0 ; i< p_root->i_children ; i ++ )
    {
+
         playlist_item_t *p_item = p_root->pp_children[i];
         if( p_item->i_children > -1 )
         {
@@ -122,30 +123,16 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
         }
         else
         {
-            char *psz_name_matches, *psz_artist_matches, *psz_album_matches;
-            char *psz_field, *psz_field_case;
-
-            psz_field = input_item_GetName( p_i );
-            psz_name_matches = strcasestr( psz_field, psz_string );
-            free( psz_field );
-
-            psz_field = input_item_GetMeta( p_item->p_input, vlc_meta_Artist );
-            psz_field_case = strcasestr( input_item_GetMeta( p_item->p_input, vlc_meta_Artist ), psz_string );
-            psz_artist_matches = ( psz_field && psz_field_case );
-            free( psz_field );
-            free( psz_field_case );
-
-
-            psz_field = input_item_GetMeta( p_item->p_input, vlc_meta_Album );
-            psz_field_case = strcasestr( input_item_GetMeta( p_item->p_input, vlc_meta_Album ), psz_string );
-            psz_album_matches = ( psz_field && psz_field_case );
-            free( psz_field );
-            free( psz_field_case );
-
-            if( psz_name_matches || psz_artist_matches || psz_album_matches )
+            if( strcasestr( p_item->p_input->psz_name, psz_string ) || /* Soon to be replaced by vlc_meta_Title */
+                input_item_MetaMatch( p_item->p_input, vlc_meta_Album, psz_string ) ||
+                input_item_MetaMatch( p_item->p_input, vlc_meta_Artist, psz_string ) )
+            {
                 p_item->i_flags &= ~PLAYLIST_DBL_FLAG;
+            }
             else
+            {
                 p_item->i_flags |= PLAYLIST_DBL_FLAG;
+            }
         }
    }
    vlc_cond_signal( &p_playlist->object_wait );
