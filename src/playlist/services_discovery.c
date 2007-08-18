@@ -72,13 +72,9 @@ services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name
  ***********************************************************************/
 void services_discovery_Destroy ( services_discovery_t * p_sd )
 {
-    vlc_object_kill( p_sd );
-    if( p_sd->pf_run ) vlc_thread_join( p_sd );
+    vlc_event_manager_fini( &p_sd->event_manager );
 
     free( p_sd->psz_module );
-    module_Unneed( p_sd, p_sd->p_module );
-
-    vlc_event_manager_fini( &p_sd->event_manager );
     free( p_sd->psz_localized_name );
 
     vlc_object_destroy( p_sd );
@@ -98,6 +94,17 @@ int services_discovery_Start ( services_discovery_t * p_sd )
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
+}
+
+/***********************************************************************
+ * Stop
+ ***********************************************************************/
+void services_discovery_Stop ( services_discovery_t * p_sd )
+{
+    vlc_object_kill( p_sd );
+    if( p_sd->pf_run ) vlc_thread_join( p_sd );
+
+    module_Unneed( p_sd, p_sd->p_module );
 }
 
 /***********************************************************************
@@ -316,7 +323,7 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
 
     if( p_asd && p_asd->p_sd )
     {
-        services_discovery_Destroy( p_asd->p_sd );
+        services_discovery_Stop( p_asd->p_sd );
 
         vlc_event_detach( services_discovery_EventManager( p_asd->p_sd ),
                           vlc_ServicesDiscoveryItemAdded,
@@ -347,6 +354,8 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
             playlist_NodeDelete( p_playlist, p_asd->p_one, VLC_TRUE, VLC_FALSE );
         }
         PL_UNLOCK;
+
+        services_discovery_Destroy( p_asd->p_sd );
 
         free( p_asd );
     }
