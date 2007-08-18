@@ -148,7 +148,7 @@ static void Run( services_discovery_t *p_sd )
     char *psz_tmp = psz_buf = var_CreateGetString( p_sd, "podcast-urls" );
 
     i = 0;
-    p_sys->i_urls = 1;
+    p_sys->i_urls = psz_buf[0] ? 1 : 0;
     while( psz_buf[i] != 0 )
         if( psz_buf[i++] == '|' )
             p_sys->i_urls++;
