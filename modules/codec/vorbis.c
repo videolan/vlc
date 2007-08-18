@@ -136,7 +136,9 @@ static void *ProcessPacket ( decoder_t *, ogg_packet *, block_t ** );
 static aout_buffer_t *DecodePacket  ( decoder_t *, ogg_packet * );
 static block_t *SendPacket( decoder_t *, ogg_packet *, block_t * );
 
+#ifndef HAVE_TAGLIB
 static void ParseVorbisComments( decoder_t * );
+#endif
 
 static void ConfigureChannelOrder(int *, int, uint32_t, vlc_bool_t );
 
@@ -432,7 +434,9 @@ static int ProcessHeaders( decoder_t *p_dec )
         msg_Err( p_dec, "2nd Vorbis header is corrupted" );
         return VLC_EGENERIC;
     }
+#ifndef HAVE_TAGLIB
     ParseVorbisComments( p_dec );
+#endif
 
     /* The next packet in order is the codebooks header
      * We need to watch out that this packet is not missing as a
@@ -605,8 +609,9 @@ static block_t *SendPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     return p_block;
 }
 
+#ifndef HAVE_TAGLIB
 /*****************************************************************************
- * ParseVorbisComments: FIXME should be done in demuxer
+ * ParseVorbisComments
  *****************************************************************************/
 static void ParseVorbisComments( decoder_t *p_dec )
 {
@@ -722,6 +727,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
         i++;
     }
 }
+#endif
 
 /*****************************************************************************
  * Interleave: helper function to interleave channels

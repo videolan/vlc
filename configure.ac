@@ -1727,7 +1727,8 @@ AC_ARG_ENABLE(taglib,
   [  --disable-taglib Taglib support (default enabled) ])
   AS_IF([test "${enable_taglib}" != "no"],[
     PKG_CHECK_MODULES(TAGLIB, taglib,
-      [ VLC_ADD_PLUGINS([taglib])
+      [ AC_DEFINE( HAVE_TAGLIB, 1, [Define if you have taglib plugin built] )
+        VLC_ADD_PLUGINS([taglib])
         VLC_ADD_LDFLAGS([taglib],[$TAGLIB_LIBS -lz])
        VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS]) ],
       [AC_MSG_WARN(TagLib library not found)])
