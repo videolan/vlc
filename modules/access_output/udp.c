@@ -102,8 +102,10 @@ static void Close( vlc_object_t * );
                        "directly, without trying to fill the MTU (ie, " \
                        "without trying to make the biggest possible packets " \
                        "in order to improve streaming)." )
-#define RTCP_TEXT N_("RTCP destination port number")
-#define RTCP_LONGTEXT N_("Sends RTCP packets to this port (0 = auto)")
+#define RTCP_TEXT N_("RTCP Sender Report")
+#define RTCP_LONGTEXT N_("Send RTCP Sender Report packets")
+#define RTCP_PORT_TEXT N_("RTCP destination port number")
+#define RTCP_PORT_LONGTEXT N_("Sends RTCP packets to this port (0 = auto)")
 #define AUTO_MCAST_TEXT N_("Automatic multicast streaming")
 #define AUTO_MCAST_LONGTEXT N_("Allocates an outbound multicast address " \
                                "automatically.")
@@ -123,8 +125,10 @@ vlc_module_begin();
     add_obsolete_integer( SOUT_CFG_PREFIX "late" );
     add_bool( SOUT_CFG_PREFIX "raw",  VLC_FALSE, NULL, RAW_TEXT, RAW_LONGTEXT,
                                  VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "rtcp",  0, NULL, RTCP_TEXT, RTCP_LONGTEXT,
-                 VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "rtcp",  VLC_FALSE, NULL, RAW_TEXT, RAW_LONGTEXT,
+                                 VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "rtcp-port",  0, NULL, RTCP_PORT_TEXT,
+                 RTCP_PORT_LONGTEXT, VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "auto-mcast", VLC_FALSE, NULL, AUTO_MCAST_TEXT,
               AUTO_MCAST_LONGTEXT, VLC_TRUE );
     add_bool( SOUT_CFG_PREFIX "udplite", VLC_FALSE, NULL, UDPLITE_TEXT, UDPLITE_LONGTEXT, VLC_TRUE );
@@ -146,6 +150,7 @@ static const char *const ppsz_sout_options[] = {
     "group",
     "raw",
     "rtcp",
+    "rtcp-port",
     "lite",
     "cscov",
     NULL
@@ -227,8 +232,6 @@ static int Open( vlc_object_t *p_this )
 
     int                 i_handle;
 
-    vlc_value_t         val;
-
     config_ChainParse( p_access, SOUT_CFG_PREFIX,
                        ppsz_sout_options, p_access->p_cfg );
     config_ChainParse( p_access, "",
@@ -283,13 +286,14 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    /* This option is really only meant for the RTP streaming output
-     * plugin. Doing RTCP for raw UDP will yield weird results. */
-    i_rtcp_port = var_GetInteger (p_access, SOUT_CFG_PREFIX"rtcp");
-    /* If RTCP port is not specified, use the default, if we do RTP/MP2 encap,
-     * or do not use RTCP at all otherwise. */
-    if ((i_rtcp_port == 0) && (p_sys->b_rtpts))
-        i_rtcp_port = i_dst_port + 1;
+    if (var_GetBool (p_access, SOUT_CFG_PREFIX"rtcp"))
+    {
+        /* This is really only for the RTP sout plugin.
+         * Doing RTCP for non RTP packet is NOT a good idea. */
+        i_rtcp_port = var_GetInteger (p_access, SOUT_CFG_PREFIX"rtcp-port");
+        if (i_rtcp_port == 0)
+            i_rtcp_port = i_dst_port + 1;
+    }
 
     p_sys->p_thread =
         vlc_object_create( p_access, sizeof( sout_access_thread_t ) );
@@ -398,9 +402,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    var_Get( p_access, SOUT_CFG_PREFIX "raw", &val );
-    if( val.b_bool )  p_access->pf_write = WriteRaw;
-    else p_access->pf_write = Write;
+    if (var_GetBool (p_accesss, SOUT_CFG_PREFIX"raw"))
+        p_access->pf_write = WriteRaw;
+    else
+        p_access->pf_write = Write;
 
     p_access->pf_seek = Seek;
 
