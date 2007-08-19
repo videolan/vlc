@@ -264,10 +264,6 @@ VLC_EXPORT(const char *, config_GetDataDir, ( void ));
     add_typename_inner( type, name, text, longtext, advc, cb ); \
     p_config[i_config].value.psz = v
 
-#define add_password_inner( type, name, text, longtext, advc, cb, v ) \
-    add_typename_inner( type, name, text, longtext, advc, cb ); \
-    p_config[i_config].value.psz = v
-
 #define add_int_inner( type, name, text, longtext, advc, cb, v ) \
     add_typename_inner( type, name, text, longtext, advc, cb ); \
     p_config[i_config].value.i = v
@@ -300,7 +296,7 @@ VLC_EXPORT(const char *, config_GetDataDir, ( void ));
     add_string_inner( CONFIG_ITEM_STRING, name, text, longtext, advc, p_callback, value )
 
 #define add_password( name, value, p_callback, text, longtext, advc ) \
-    add_password_inner( CONFIG_ITEM_PASSWORD, name, text, longtext, advc, p_callback, value )
+    add_string_inner( CONFIG_ITEM_PASSWORD, name, text, longtext, advc, p_callback, value )
 
 #define add_file( name, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_FILE, name, text, longtext, advc, p_callback, value )
