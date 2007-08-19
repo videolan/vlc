@@ -70,6 +70,7 @@ struct libvlc_media_descriptor_t
     input_item_t      *p_input_item;
     int                i_refcount;
     libvlc_instance_t *p_libvlc_instance;
+    vlc_dictionary_t   tags; /* To be merged with core's meta soon */
 };
 
 struct libvlc_tag_query_t
