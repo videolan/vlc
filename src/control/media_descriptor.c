@@ -69,11 +69,17 @@ static const libvlc_meta_t vlc_to_libvlc_meta[] =
     [vlc_meta_TrackID]      = libvlc_meta_TrackID
 };
 
+struct tag_storage
+{
+    char ** ppsz_tags;
+    int i_count;
+};
+
 /**************************************************************************
  * input_item_subitem_added (Private) (vlc event Callback)
  **************************************************************************/
 static void input_item_subitem_added( const vlc_event_t *p_event,
-                                     void * user_data )
+                                       void * user_data )
 {
     libvlc_media_descriptor_t * p_md = user_data;
     libvlc_media_descriptor_t * p_md_child;
@@ -178,8 +184,10 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
     p_md->p_input_item      = p_input_item;
     p_md->b_preparsed       = VLC_TRUE;
     p_md->i_refcount        = 1;
-    p_md->p_event_manager = libvlc_event_manager_new( p_md, p_instance, p_e );
 
+    vlc_dictionary_init( &p_md->tags, 1 );
+
+    p_md->p_event_manager = libvlc_event_manager_new( p_md, p_instance, p_e );
     libvlc_event_manager_register_event_type( p_md->p_event_manager, 
         libvlc_MediaDescriptorMetaChanged, p_e );
     libvlc_event_manager_register_event_type( p_md->p_event_manager, 
@@ -222,6 +230,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
  **************************************************************************/
 void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
 {
+    int i;
     if (!p_md)
         return;
 
@@ -233,6 +242,19 @@ void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
     uninstall_input_item_observer( p_md );
     vlc_gc_decref( p_md->p_input_item );
 
+    char ** all_keys = vlc_dictionary_all_keys( &p_md->tags );
+    for( i = 0; all_keys[i]; i++ )
+    {
+        int j;
+        struct tag_storage * p_ts = vlc_dictionary_value_for_key( &p_md->tags, all_keys[i] );
+        for( j = 0; j < p_ts->i_count; j++ )
+        {
+            free( p_ts->ppsz_tags[j] );
+            free( p_ts->ppsz_tags );
+        }
+        free( p_ts );
+    }
+    vlc_dictionary_clear( &p_md->tags );
     free( p_md );
 }
 
@@ -296,13 +318,106 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
 }
 
 /**************************************************************************
- * Getter for meta information
+ * Add a tag
  **************************************************************************/
-typedef char * libvlc_tag_t;
-void libvlc_media_descriptor_set_tag( libvlc_media_descriptor_t *p_md,
-                                        const libvlc_tag_t tag,
-                                        libvlc_exception_t *p_e )
+void libvlc_media_descriptor_add_tag( libvlc_media_descriptor_t *p_md,
+                                      const char * key,
+                                      const libvlc_tag_t tag,
+                                      libvlc_exception_t *p_e )
 {
+    struct tag_storage * p_ts;
 
+    if( !tag || !key )
+        return;
+    
+    p_ts = vlc_dictionary_value_for_key( &p_md->tags, key );
+
+    if( !p_ts )
+    {
+        p_ts = malloc(sizeof(struct tag_storage));
+        memset( p_ts, 0, sizeof(struct tag_storage) );
+    }
+    p_ts->i_count++;
+
+    if( !p_ts->ppsz_tags )
+        p_ts->ppsz_tags = malloc(sizeof(char*)*(p_ts->i_count));
+    else
+        p_ts->ppsz_tags = realloc(p_ts->ppsz_tags, sizeof(char*)*(p_ts->i_count));
+        
+    p_ts->ppsz_tags[p_ts->i_count-1] = strdup( tag );
+}
+
+
+/**************************************************************************
+ * Remove a tag
+ **************************************************************************/
+void libvlc_media_descriptor_remove_tag( libvlc_media_descriptor_t *p_md,
+                                         const char * key,
+                                         const libvlc_tag_t tag,
+                                         libvlc_exception_t *p_e )
+{
+    struct tag_storage * p_ts;
+    int i;
+
+    if( !tag || !key )
+        return;
+    
+    p_ts = vlc_dictionary_value_for_key( &p_md->tags, key );
+
+    if( !p_ts )
+        return;
+
+    for( i = 0; i < p_ts->i_count; i++ )
+    {
+        if( !strcmp( p_ts->ppsz_tags[i], tag ) )
+        {
+            free( p_ts->ppsz_tags[i] );
+            memcpy( p_ts->ppsz_tags + i + 1, p_ts->ppsz_tags + i, (p_ts->i_count - i - 2)*sizeof(char*) );
+            /* Don't dealloc, the memory will be regain if we add a new tag */
+            p_ts->i_count--;
+            return;
+        }
+    }
+}
+
+/**************************************************************************
+ * Get tags count
+ **************************************************************************/
+int libvlc_media_descriptor_tags_count_for_key( libvlc_media_descriptor_t *p_md,
+                                                 const char * key,
+                                                 libvlc_exception_t *p_e )
+{
+    struct tag_storage * p_ts;
+
+    if( !key )
+        return 0;
+    
+    p_ts = vlc_dictionary_value_for_key( &p_md->tags, key );
+
+    if( !p_ts )
+        return 0;
+    return p_ts->i_count;
+}
+
+/**************************************************************************
+ * Get a tag
+ **************************************************************************/
+libvlc_tag_t
+libvlc_media_descriptor_tag_at_index_for_key( libvlc_media_descriptor_t *p_md,
+                                              int i,
+                                              const char * key,
+                                              libvlc_exception_t *p_e )
+{
+    struct tag_storage * p_ts;
+
+    if( !key )
+        return NULL;
+    
+    p_ts = vlc_dictionary_value_for_key( &p_md->tags, key );
+
+    if( !p_ts )
+        return NULL;
+    
+    return strdup( p_ts->ppsz_tags[i] );
 }
 

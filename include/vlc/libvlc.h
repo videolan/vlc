@@ -160,6 +160,28 @@ VLC_PUBLIC_API char * libvlc_media_descriptor_get_meta(
                                    libvlc_meta_t e_meta,
                                    libvlc_exception_t *p_e );
 
+/* Tags */
+VLC_PUBLIC_API void libvlc_media_descriptor_add_tag( libvlc_media_descriptor_t *p_md,
+                                                     const char * key,
+                                                     const libvlc_tag_t tag,
+                                                     libvlc_exception_t *p_e );
+
+VLC_PUBLIC_API void libvlc_media_descriptor_remove_tag( libvlc_media_descriptor_t *p_md,
+                                                         const char * key,
+                                                         const libvlc_tag_t tag,
+                                                         libvlc_exception_t *p_e );
+
+VLC_PUBLIC_API int
+    libvlc_media_descriptor_tags_count_for_key( libvlc_media_descriptor_t *p_md,
+                                                const char * key,
+                                                libvlc_exception_t *p_e );
+
+VLC_PUBLIC_API libvlc_tag_t
+    libvlc_media_descriptor_tag_at_index_for_key( libvlc_media_descriptor_t *p_md,
+                                                  int i,
+                                                  const char * key,
+                                                  libvlc_exception_t *p_e );
+
 /** @}*/
 
 /*****************************************************************************

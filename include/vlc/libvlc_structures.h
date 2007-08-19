@@ -53,15 +53,16 @@ typedef struct libvlc_exception_t
 /**@} */
 
 /*****************************************************************************
- * Tag Query
+ * Tag
  *****************************************************************************/
-/** defgroup libvlc_tag_query Tag Query
+/** defgroup libvlc_tag Tag
  * \ingroup libvlc
- * LibVLC Tag Query support in media descriptor
+ * LibVLC Tag  support in media descriptor
  * @{
  */
 
 typedef struct libvlc_tag_query_t libvlc_tag_query_t;
+typedef char * libvlc_tag_t;
 
 /**@} */
 
