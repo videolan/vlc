@@ -106,7 +106,7 @@ sout and playlist .
     <img src="images/slider_left.png" alt="slider left" /><span id="progressbar" style="background-image: url( 'images/slider_bar.png' ); width: 408px; height:16px; position:absolute;" onclick="slider_seek( event, this );" onmousemove="slider_move( event, this );"><img src="images/slider_point.png" alt="slider point" style="position:relative; left:0px;" id="main_slider_point" onmousedown="slider_down( event, this );" onmouseup="slider_up( event, this.parentNode );" onmouseout="slider_up( event, this.parentNode );"/></span><img src="images/slider_right.png" alt="slider right" style="position:relative;left:408px;" />
     <br/>
     <span id="nowplaying">(?)</span>
-    <img id="albumart" alt="Album art" src="/art" style="float: right" onclick="refresh_albumart();"/>
+    <img id="albumart" alt="" src="/art" style="float: right" onclick="refresh_albumart(true);"/>
   </div>
 </div>
 

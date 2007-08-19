@@ -27,6 +27,7 @@
 
 var old_time = 0;
 var pl_cur_id;
+var albumart_id = -1;
 
 /**********************************************************************
  * Slider functions
@@ -1039,11 +1040,15 @@ function browse_path( p )
     hide( 'browse' );
     document.getElementById( value( 'browse_dest' ) ).focus();
 }
-function refresh_albumart()
+function refresh_albumart( force )
 {
-    var now = new Date();
-    var albumart = document.getElementById( 'albumart' );
-    albumart.src = '/art?timestamp=' + now.getTime();
+    if( albumart_id != pl_cur_id || force )
+    {
+        var now = new Date();
+        var albumart = document.getElementById( 'albumart' );
+        albumart.src = '/art?timestamp=' + now.getTime();
+        albumart_id = pl_cur_id;
+    }
 }
 /**********************************************************************
  * Periodically update stuff in the interface
@@ -1060,8 +1065,8 @@ function loop_refresh_playlist()
 }
 function loop_refresh_albumart()
 {
-    setTimeout( 'loop_refresh_albumart()', 10000 );
-    refresh_albumart();
+    setTimeout( 'loop_refresh_albumart()', 1000 );
+    refresh_albumart( false );
 }
 function loop_refresh()
 {
