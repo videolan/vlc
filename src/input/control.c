@@ -190,7 +190,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             }
 
             p_info = p_cat->pp_infos[i];
-            vasprintf( &p_info->psz_value, psz_format, args );
+            if( vasprintf( &p_info->psz_value, psz_format, args ) == -1 )
+                p_info->psz_value = NULL;
 
             vlc_mutex_unlock( &p_input->p->input.p_item->lock );
 
@@ -306,8 +307,9 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             vlc_mutex_lock( &p_input->p->input.p_item->lock );
             if( !p_bkmk->psz_name )
             {
-                 asprintf( &p_bkmk->psz_name, _("Bookmark %i"),
-                           p_input->p->i_bookmark );
+                 if( asprintf( &p_bkmk->psz_name, _("Bookmark %i"),
+                               p_input->p->i_bookmark ) == -1 )
+                     p_bkmk->psz_name = NULL;
             }
 
             TAB_APPEND( p_input->p->i_bookmark, p_input->p->bookmark, p_bkmk );
@@ -518,8 +520,9 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                              sizeof(char **) );
             }
 
-            asprintf( &p_input->p->input.p_item->ppsz_options[i],
-                      "%s=%s", psz_option, psz_value ) ;
+            if( asprintf( &p_input->p->input.p_item->ppsz_options[i],
+                          "%s=%s", psz_option, psz_value ) == -1 )
+                p_input->p->input.p_item->ppsz_options[i] = NULL;
             vlc_mutex_unlock( &p_input->p->input.p_item->lock );
 
             return VLC_SUCCESS;
@@ -613,12 +616,10 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
     vlc_mutex_lock( &p_input->p->input.p_item->lock );
     for( i = 0; i < p_input->p->i_bookmark; i++ )
     {
-        asprintf( &psz_value, "{name=%s,bytes="I64Fd",time="I64Fd"}",
-                  p_input->p->bookmark[i]->psz_name,
-                  p_input->p->bookmark[i]->i_byte_offset,
-                  p_input->p->bookmark[i]->i_time_offset/1000000 );
-        i_len += strlen( psz_value );
-        free( psz_value );
+        i_len += snprintf( NULL, 0, "{name=%s,bytes="I64Fd",time="I64Fd"}",
+                           p_input->p->bookmark[i]->psz_name,
+                           p_input->p->bookmark[i]->i_byte_offset,
+                           p_input->p->bookmark[i]->i_time_offset/1000000 );
     }
     for( i = 0; i < p_input->p->i_bookmark; i++ )
     {
