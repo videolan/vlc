@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <errno.h>
 #include <string.h>
 #include <math.h>
 
@@ -235,9 +236,26 @@ int main( int i_argc, char *ppsz_argv[] ) {
     DataCreate();
     printf( " done\n" );
 
+    printf( "Making FIFOs..." );
+    if( mkfifo( ppsz_argv[1], S_IRWXU ) ) {
+        if( errno != EEXIST ) {
+            printf( " failed\n" );
+            exit( -1 );
+        }
+        printf( " input already exists..." );
+    }
+    if( mkfifo( ppsz_argv[2], S_IRWXU ) ) {
+        if( errno != EEXIST ) {
+            printf( " failed\n" );
+            exit( -1 );
+        }
+        printf( " output already exists..." );
+    }
+    printf( " done\n" );
+
     printf( "Please make sure vlc is running.\n"
             "You should append parameters similar to the following:\n"
-            "--sub-filter overlay --overlay-input %s --overlay-output %s\n",
+            "--sub-filter overlay{input=%s,output=%s}\n",
             ppsz_argv[1], ppsz_argv[2] );
 
     printf( "Opening FIFOs..." );
