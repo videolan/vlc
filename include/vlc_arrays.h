@@ -503,6 +503,7 @@ vlc_dictionary_remove_value_for_key( const vlc_dictionary_t * p_dict, const char
         free( p_entry->psz_key );
         free( p_entry );
         p_dict->p_entries[i_pos] = NULL;
+        return;
     }
 
     /* Hash collision */
