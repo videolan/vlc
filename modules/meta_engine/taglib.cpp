@@ -33,7 +33,15 @@
 #include <id3v2tag.h>
 #include <mpegfile.h>
 #include <flacfile.h>
+#if 0
+#include <oggflacfile.h>
+#endif
+#include <flacfile.h>
+#include <flacproperties.h>
+#include <vorbisfile.h>
+#include <vorbisproperties.h>
 #include <uniquefileidentifierframe.h>
+
 #if 0 //for artist and album id
 #include <textidentificationframe.h>
 #endif
@@ -96,6 +104,70 @@ static int ReadMeta( vlc_object_t *p_this )
         if( !p_demux->p_private )
             p_demux->p_private = (void*)vlc_meta_New();
         TagLib::FileRef f( p_demux->psz_path );
+
+        if( !f.isNull() )
+        {
+            if( TagLib::Ogg::Vorbis::File *p_ogg_v =
+                dynamic_cast<TagLib::Ogg::Vorbis::File *>(f.file() ) )
+            {
+                int i_ogg_v_length = p_ogg_v->audioProperties()->length();
+
+                input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+                if( p_input )
+                {
+                    input_item_t *p_item = input_GetItem( p_input );
+                    if( p_item )
+                    {
+                        vlc_mutex_lock( &p_item->lock );
+                        p_item->i_duration = i_ogg_v_length * 1000000;
+                        vlc_mutex_unlock( &p_item->lock );
+                    }
+                    vlc_object_release( p_input );
+                }
+            }
+#if 0 /* at this moment, taglib is unable to detect ogg/flac files
+       * becauses type detection is based on file extension:
+       * ogg = ogg/vorbis
+       * flac = flac
+       * ø = ogg/flac
+       */
+            else if( TagLib::Ogg::FLAC::File *p_ogg_f =
+                dynamic_cast<TagLib::Ogg::FLAC::File *>(f.file() ) )
+            {
+                long i_ogg_f_length = p_ogg_f->streamLength();
+                input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+                if( p_input )
+                {
+                    input_item_t *p_item = input_GetItem( p_input );
+                    if( p_item )
+                    {
+                        vlc_mutex_lock( &p_item->lock );
+                        p_item->i_duration = i_ogg_f_length * 1000000;
+                        vlc_mutex_unlock( &p_item->lock );
+                    }
+                    vlc_object_release( p_input );
+                }
+            }
+#endif
+            else if( TagLib::FLAC::File *p_flac =
+                dynamic_cast<TagLib::FLAC::File *>(f.file() ) )
+            {
+                long i_flac_length = p_flac->audioProperties()->length();
+                input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+                if( p_input )
+                {
+                    input_item_t *p_item = input_GetItem( p_input );
+                    if( p_item )
+                    {
+                        vlc_mutex_lock( &p_item->lock );
+                        p_item->i_duration = i_flac_length * 1000000;
+                        vlc_mutex_unlock( &p_item->lock );
+                    }
+                    vlc_object_release( p_input );
+                }
+            }
+        }
+
         if( !f.isNull() && f.tag() && !f.tag()->isEmpty() )
         {
             TagLib::Tag *tag = f.tag();
@@ -139,7 +211,7 @@ static int ReadMeta( vlc_object_t *p_this )
                             free( psz_ufid );
                         }
                     }
-                    /* musicbrainz artist and album id: not useful yet */
+                    /* musicbrainz artist and album id: not useful (yet?) */
 #if 0
                     list = tag->frameListMap()["TXXX"];
                     TagLib::ID3v2::UserTextIdentificationFrame* p_txxx;
