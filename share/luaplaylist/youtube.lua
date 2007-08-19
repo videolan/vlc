@@ -33,7 +33,7 @@ function parse()
                 artist = string.gsub( line, ".*subscribe_to_user=([^&]*).*", "%1" )
             end
             if string.match( line, "player2.swf" ) then
-                video_id = string.gsub( line, ".*BASE_YT_URL=http://youtube.com/&video_id=([^\"]*).*", "%1" )
+                video_id = string.gsub( line, ".*&video_id=([^\"]*).*", "%1" )
             end
             if name and description and artist and video_id then break end
         end
