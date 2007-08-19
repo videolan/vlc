@@ -298,12 +298,13 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( p_sys->i_bit_rate == 0 )
             {
-                /* Free birate, but 99% emulated startcode :( */
+                /* Free bitrate, but 99% emulated startcode :( */
                 if( p_dec->p_sys->i_free_frame_size == MPGA_HEADER_SIZE )
                 {
                     msg_Dbg( p_dec, "free bitrate mode");
                 }
-                p_sys->i_frame_size = p_sys->i_free_frame_size;
+                /* The -1 below is to account for the frame padding */
+                p_sys->i_frame_size = p_sys->i_free_frame_size - 1;
             }
 
             p_sys->i_state = STATE_NEXT_SYNC;
@@ -705,6 +706,9 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
         default:
             break;
         }
+
+        /* Free bitrate mode can support higher bitrates */
+        if( !*pi_bit_rate ) *pi_max_frame_size *= 2;
     }
     else
     {
