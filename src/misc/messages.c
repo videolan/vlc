@@ -78,21 +78,19 @@ static void PrintMsg ( vlc_object_t *, msg_item_t * );
  */
 void __msg_Create( vlc_object_t *p_this )
 {
+    int i;
     vlc_mutex_init( p_this, &(p_this->p_libvlc->msg_bank.lock) );
 
-#define QUEUE_INIT(i) \
-    vlc_mutex_init( p_this, &QUEUE(i).lock ); \
-    QUEUE(i).b_overflow = VLC_FALSE; \
-    QUEUE(i).i_id = i; \
-    QUEUE(i).i_start = 0; \
-    QUEUE(i).i_stop = 0; \
-    QUEUE(i).i_sub = 0; \
-    QUEUE(i).pp_sub = 0;
-
-    QUEUE_INIT( 0 );
-    QUEUE_INIT( 1 );
-
-#undef QUEUE_INIT
+    for( i = 0; i < 2; i++ )
+    {
+         vlc_mutex_init( p_this, &QUEUE(i).lock );
+         QUEUE(i).b_overflow = VLC_FALSE;
+         QUEUE(i).i_id = i;
+         QUEUE(i).i_start = 0;
+         QUEUE(i).i_stop = 0;
+         QUEUE(i).i_sub = 0;
+         QUEUE(i).pp_sub = 0;
+    }
 
 #ifdef UNDER_CE
     QUEUE(MSG_QUEUE_NORMAL).logfile =
@@ -312,7 +310,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
     vasprintf( &psz_str, psz_format, args );
     va_end( args );
 #else
-    psz_str = (char*) malloc( i_size * sizeof(char) );
+    psz_str = (char*) malloc( i_size );
 #endif
 
     if( psz_str == NULL )
