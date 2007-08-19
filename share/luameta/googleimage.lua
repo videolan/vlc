@@ -3,12 +3,15 @@
 
 -- Replace non alphanumeric char by +
 function get_query( title )
-    return title:gsub( "[^(a-z|A-Z|0-9)]", "+" )
+    return string.gsub( title, "([^%w ])",
+         function (c) return string.format ("%%%02X", string.byte(c)) end)
 end
 
 -- Return the artwork
 function fetch_art()
-    if vlc.title then
+    if vlc.title and vlc.artist then
+        title = vlc.artist.." "..vlc.title
+    elseif vlc.title then
         title = vlc.title
     elseif vlc.name then
         title = vlc.name
