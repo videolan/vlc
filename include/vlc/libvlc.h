@@ -413,6 +413,20 @@ VLC_PUBLIC_API void
     libvlc_media_list_retain( libvlc_media_list_t * );
 
 VLC_PUBLIC_API void
+    libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
+                                        const char * psz_uri,
+                                        libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API void
+    libvlc_media_list_set_name( libvlc_media_list_t *,
+                                const char * psz_name,
+                                libvlc_exception_t *);
+
+VLC_PUBLIC_API char *
+    libvlc_media_list_name( libvlc_media_list_t *,
+                            libvlc_exception_t *);
+
+VLC_PUBLIC_API void
     libvlc_media_list_add_media_descriptor( libvlc_media_list_t *,
                                             libvlc_media_descriptor_t *,
                                             libvlc_exception_t * );
@@ -450,6 +464,38 @@ VLC_PUBLIC_API libvlc_media_list_t *
     libvlc_media_list_dynamic_sublist( libvlc_media_list_t *,
                                        libvlc_tag_query_t *,
                                        libvlc_exception_t * );
+
+/** @} */
+
+/*****************************************************************************
+ * Media List
+ *****************************************************************************/
+/** defgroup libvlc_media_library Media Library
+ * \ingroup libvlc
+ * LibVLC Media Library
+ * @{
+ */
+VLC_PUBLIC_API libvlc_media_library_t *
+    libvlc_media_library_new( libvlc_instance_t * p_inst,
+                              libvlc_exception_t * p_e );
+VLC_PUBLIC_API void
+    libvlc_media_library_release( libvlc_media_library_t * p_mlib );
+VLC_PUBLIC_API void
+    libvlc_media_library_retain( libvlc_media_library_t * p_mlib );
+
+
+VLC_PUBLIC_API void
+    libvlc_media_library_load( libvlc_media_library_t * p_mlib,
+                               libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API void
+    libvlc_media_library_save( libvlc_media_library_t * p_mlib,
+                               libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API libvlc_media_list_t *
+    libvlc_media_library_media_list( libvlc_media_library_t * p_mlib,
+                                     libvlc_exception_t * p_e );
+
 
 /** @} */
 

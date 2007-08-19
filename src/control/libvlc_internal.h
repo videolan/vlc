@@ -87,6 +87,7 @@ struct libvlc_media_list_t
     vlc_mutex_t              object_lock;
     libvlc_media_list_t *    p_media_provider; /* For dynamic sublist */
     libvlc_tag_query_t *     p_query;              /* For dynamic sublist */
+    char *                   psz_name; /* Usually NULL */
     DECL_ARRAY(void *) items;
 };
 
@@ -112,6 +113,14 @@ struct libvlc_media_list_player_t
     libvlc_media_descriptor_t * p_current_playing_item;
     libvlc_media_list_t *    p_mlist;
     libvlc_media_instance_t *  p_mi;
+};
+
+struct libvlc_media_library_t
+{
+    libvlc_event_manager_t * p_event_manager;
+    libvlc_instance_t *      p_libvlc_instance;
+    int                      i_refcount;
+    libvlc_media_list_t *    p_mlist;
 };
 
 struct libvlc_media_discoverer_t

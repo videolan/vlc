@@ -148,6 +148,19 @@ typedef struct libvlc_media_list_player_t libvlc_media_list_player_t;
 /**@} */
 
 /*****************************************************************************
+ * Media Library
+ *****************************************************************************/
+/** defgroup libvlc_media_library Media Library
+ * \ingroup libvlc
+ * LibVLC Media Library
+ * @{
+ */
+
+typedef struct libvlc_media_library_t libvlc_media_library_t;
+
+/**@} */
+
+/*****************************************************************************
  * Playlist
  *****************************************************************************/
 /** defgroup libvlc_playlist Playlist
@@ -256,10 +269,13 @@ typedef struct libvlc_log_message_t
 typedef enum libvlc_event_type_t {
     libvlc_MediaDescriptorMetaChanged,
     libvlc_MediaDescriptorSubItemAdded,
+
     libvlc_MediaInstanceReachedEnd,
+
     libvlc_MediaListItemAdded,
     libvlc_MediaListItemDeleted,
     libvlc_MediaListItemChanged,
+
 } libvlc_event_type_t;
 
 /**
@@ -275,6 +291,7 @@ typedef struct libvlc_event_t
     void * p_obj;
     union event_type_specific
     {
+        /* media descriptor */
         struct
         {
             libvlc_meta_t meta_type;
@@ -283,6 +300,8 @@ typedef struct libvlc_event_t
         {
             libvlc_media_descriptor_t * new_child;
         } media_descriptor_subitem_added;
+
+        /* media list */
         struct
         {
             libvlc_media_descriptor_t * item;

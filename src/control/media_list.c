@@ -276,6 +276,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
     ARRAY_INIT(p_mlist->items);
     p_mlist->i_refcount = 1;
     p_mlist->p_media_provider = NULL;
+    p_mlist->psz_name = NULL;
 
     return p_mlist;
 }
@@ -314,6 +315,7 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
  
     free( p_mlist );
 }
+
 /**************************************************************************
  *       libvlc_media_list_retain (Public)
  *
@@ -324,6 +326,77 @@ void libvlc_media_list_retain( libvlc_media_list_t * p_mlist )
     vlc_mutex_lock( &p_mlist->object_lock );
     p_mlist->i_refcount++;
     vlc_mutex_unlock( &p_mlist->object_lock );
+}
+
+
+/**************************************************************************
+ *       add_file_content (Public)
+ **************************************************************************/
+void
+libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
+                                    const char * psz_uri,
+                                    libvlc_exception_t * p_e )
+{
+    input_item_t * p_input_item;
+    libvlc_media_descriptor_t * p_md;
+
+    p_input_item = input_ItemNewExt( p_mlist->p_libvlc_instance->p_libvlc_int, psz_uri,
+                                _("Media Library"), 0, NULL, -1 );
+
+    if( !p_input_item )
+    {
+        libvlc_exception_raise( p_e, "Can't create an input item" );
+        return;
+    }
+
+    p_md = libvlc_media_descriptor_new_from_input_item(
+            p_mlist->p_libvlc_instance,
+            p_input_item, p_e );
+
+    if( !p_md )
+    {
+        vlc_gc_decref( p_input_item );
+        return;
+    }
+
+    libvlc_media_list_add_media_descriptor( p_mlist, p_md, p_e );
+    if( libvlc_exception_raised( p_e ) )
+        return;
+
+    input_Read( p_mlist->p_libvlc_instance->p_libvlc_int, p_input_item, VLC_TRUE );
+
+    return;
+}
+
+/**************************************************************************
+ *       set_name (Public)
+ **************************************************************************/
+void libvlc_media_list_set_name( libvlc_media_list_t * p_mlist,
+                                 const char * psz_name,
+                                 libvlc_exception_t * p_e)
+
+{
+    (void)p_e;
+    vlc_mutex_lock( &p_mlist->object_lock );
+    free( p_mlist->psz_name );
+    p_mlist->psz_name = psz_name ? strdup( psz_name ) : NULL;
+    vlc_mutex_unlock( &p_mlist->object_lock );
+}
+
+/**************************************************************************
+ *       name (Public)
+ **************************************************************************/
+char * libvlc_media_list_name( libvlc_media_list_t * p_mlist,
+                               libvlc_exception_t * p_e)
+{
+    char *ret;
+    (void)p_e;
+
+    vlc_mutex_lock( &p_mlist->object_lock );
+    ret = p_mlist->psz_name ? strdup( p_mlist->psz_name ) : NULL;
+    vlc_mutex_unlock( &p_mlist->object_lock );
+
+    return ret;
 }
 
 /**************************************************************************
