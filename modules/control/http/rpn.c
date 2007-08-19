@@ -494,8 +494,8 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             int i_id = E_(SSPopN)( st, vars );
             int i_ret;
 
-            i_ret = playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
-                                      NULL,
+            i_ret = playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
+                                      VLC_TRUE, NULL,
                                       playlist_ItemGetById( p_sys->p_playlist,
                                       i_id, VLC_TRUE ) );
             msg_Dbg( p_intf, "requested playlist item: %i", i_id );
@@ -837,7 +837,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             char *mrl = E_(SSPop)( st );
             char *tmp;
             input_item_t *p_input;
-            int i_id;
+            int i_ret;
 
             tmp = E_(ToUTF8)( p_intf, psz_name );
             free( psz_name );
@@ -850,17 +850,17 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
 
             if( !p_input || !p_input->psz_uri || !*p_input->psz_uri )
             {
-                i_id = VLC_EGENERIC;
+                i_ret = VLC_EGENERIC;
                 msg_Dbg( p_intf, "invalid requested mrl: %s", mrl );
             }
             else
             {
-                i_id = playlist_AddInput( p_sys->p_playlist, p_input,
+                i_ret = playlist_AddInput( p_sys->p_playlist, p_input,
                                    PLAYLIST_APPEND, PLAYLIST_END, VLC_TRUE,
                                    VLC_FALSE);
                 msg_Dbg( p_intf, "requested mrl add: %s", mrl );
             }
-            E_(SSPushN)( st, i_id );
+            E_(SSPushN)( st, i_ret );
 
             free( mrl );
             free( psz_name );
@@ -873,8 +873,19 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
         else if( !strcmp( s, "playlist_delete" ) )
         {
             int i_id = E_(SSPopN)( st, vars );
-            playlist_DeleteFromInput( p_sys->p_playlist, i_id, VLC_FALSE );
-            msg_Dbg( p_intf, "requested playlist delete: %d", i_id );
+            playlist_item_t *p_item = playlist_ItemGetById( p_sys->p_playlist,
+                                                            i_id, VLC_FALSE );
+            if( p_item )
+            {
+                playlist_DeleteFromInput( p_sys->p_playlist,
+                                          p_item->p_input->i_id, VLC_FALSE );
+                msg_Dbg( p_intf, "requested playlist delete: %d", i_id );
+            }
+            else
+            {
+                msg_Dbg( p_intf, "couldn't find playlist item to delete (%d)",
+                         i_id );
+            }
         }
         else if( !strcmp( s, "playlist_move" ) )
         {

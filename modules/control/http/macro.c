@@ -410,13 +410,13 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                         {
                             if( p_items[j] ==
                                  ARRAY_VAL(p_sys->p_playlist->items,i)
-                                                ->p_input->i_id)
+                                                ->i_id)
                                 break;
                         }
                         if( j == i_nb_items )
                         {
                             playlist_DeleteFromInput( p_sys->p_playlist,
-                                     p_sys->p_playlist->items.p_elems[i]->p_input->i_id,
+                                     p_sys->p_playlist->items.p_elems[i]->i_id,
                                                       VLC_FALSE );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      i );

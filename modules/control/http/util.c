@@ -432,7 +432,7 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
                 E_(mvar_AppendNewVar)( itm, "current", "0" );
             }
 
-            sprintf( value, "%d", p_node->p_input->i_id );
+            sprintf( value, "%d", p_node->i_id );
             E_(mvar_AppendNewVar)( itm, "index", value );
 
             psz = E_(FromUTF8)( p_intf, p_node->p_input->psz_name );
@@ -478,7 +478,7 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
             sprintf( value, "Node" );
             E_(mvar_AppendNewVar)( itm, "type", value );
 
-            sprintf( value, "%d", p_node->p_input->i_id );
+            sprintf( value, "%d", p_node->i_id );
             E_(mvar_AppendNewVar)( itm, "index", value );
 
             sprintf( value, "%d", p_node->i_children);
