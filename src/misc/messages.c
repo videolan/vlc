@@ -307,7 +307,8 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
     /* Convert message to string  */
 #if defined(HAVE_VASPRINTF) && !defined(__APPLE__) && !defined( SYS_BEOS )
     vlc_va_copy( args, _args );
-    vasprintf( &psz_str, psz_format, args );
+    if( vasprintf( &psz_str, psz_format, args ) == -1 )
+        psz_str = NULL;
     va_end( args );
 #else
     psz_str = (char*) malloc( i_size );
@@ -599,14 +600,14 @@ void msg_StackSet( int i_code, const char *psz_message, ... )
     va_list ap;
     msg_context_t *p_ctx = GetContext();
     assert( p_ctx );
-    va_start( ap, psz_message );
-    if( p_ctx->psz_message != NULL )
-    {
-        free( p_ctx->psz_message );
-    }
 
-    vasprintf( &p_ctx->psz_message, psz_message, ap );
+    va_start( ap, psz_message );
+    free( p_ctx->psz_message );
+
+    if( vasprintf( &p_ctx->psz_message, psz_message, ap ) == -1 )
+        p_ctx->psz_message = NULL;
     va_end( ap );
+
     p_ctx->i_code = i_code;
 }
 
@@ -618,7 +619,8 @@ void msg_StackAdd( const char *psz_message, ... )
     assert( p_ctx );
 
     va_start( ap, psz_message );
-    vasprintf( &psz_tmp, psz_message, ap );
+    if( vasprintf( &psz_tmp, psz_message, ap ) == -1 )
+        psz_tmp = NULL;
     va_end( ap );
 
     if( !p_ctx->psz_message )
