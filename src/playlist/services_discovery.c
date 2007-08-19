@@ -175,7 +175,7 @@ static void RunSD( services_discovery_t *p_sd )
 /*
  * Playlist - Services discovery bridge
  */
- 
+
  /* A new item has been added to a certain sd */
 static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_data )
 {
@@ -296,7 +296,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
         p_asd->p_cat = p_cat;
         
         PL_LOCK;
-        TAB_APPEND( p_playlist->i_asds, p_playlist->pp_asds, p_asd );
+        TAB_APPEND( p_playlist->p_internal->i_asds, p_playlist->p_internal->pp_asds, p_asd );
         PL_UNLOCK;
     }
 
@@ -310,12 +310,12 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
     struct playlist_archived_services_discovery_t *p_asd = NULL;
 
     PL_LOCK;
-    for( i = 0 ; i< p_playlist->i_asds ; i ++ )
+    for( i = 0 ; i< p_playlist->p_internal->i_asds ; i ++ )
     {
-        if( !strcmp( psz_module, p_playlist->pp_asds[i]->p_sd->psz_module ) )
+        if( !strcmp( psz_module, p_playlist->p_internal->pp_asds[i]->p_sd->psz_module ) )
         {
-            p_asd = p_playlist->pp_asds[i];
-            REMOVE_ELEM( p_playlist->pp_asds, p_playlist->i_asds, i );
+            p_asd = p_playlist->p_internal->pp_asds[i];
+            REMOVE_ELEM( p_playlist->p_internal->pp_asds, p_playlist->p_internal->i_asds, i );
             break;
         }
     }
@@ -373,9 +373,9 @@ vlc_bool_t playlist_IsServicesDiscoveryLoaded( playlist_t * p_playlist,
     int i;
     PL_LOCK;
 
-    for( i = 0 ; i< p_playlist->i_asds ; i ++ )
+    for( i = 0 ; i< p_playlist->p_internal->i_asds ; i ++ )
     {
-        if( !strcmp( psz_module, p_playlist->pp_asds[i]->p_sd->psz_module ) )
+        if( !strcmp( psz_module, p_playlist->p_internal->pp_asds[i]->p_sd->psz_module ) )
         {
             PL_UNLOCK;
             return VLC_TRUE;
