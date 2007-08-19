@@ -328,12 +328,16 @@ static int vlclua_scripts_batch_execute( vlc_object_t *p_this,
         if( ( utf8_stat( "share/luaplaylist", &stat_info ) == -1 )
             || !S_ISDIR( stat_info.st_mode ) )
         {
-            ppsz_dir_list[1] = strdup( DATA_PATH "/luaplaylist" );
+            if( asprintf( &ppsz_dir_list[1], 
+                          DATA_PATH DIR_SEP "%s", luadirname ) < 0 )
+                return VLC_ENOMEM;
         }
         else
 #   endif
         {
-            ppsz_dir_list[1] = strdup( "share/luaplaylist" );
+            if( asprintf( &ppsz_dir_list[1], 
+                          "share" DIR_SEP "%s", luadirname ) < 0 )
+                return VLC_ENOMEM;
         }
     }
 #   endif
