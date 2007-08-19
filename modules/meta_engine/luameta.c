@@ -269,6 +269,11 @@ static lua_State * vlclua_meta_init( vlc_object_t *p_this, input_item_t * p_item
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "name" );
     free( psz_meta );
    
+    psz_meta = input_item_GetArtist( p_item );
+    lua_pushstring( p_state, psz_meta );
+    lua_setfield( p_state, lua_gettop( p_state ) - 1, "artist" );
+    free( psz_meta );
+   
     psz_meta = input_item_GetTitle( p_item ) ;
     lua_pushstring( p_state, psz_meta );
     lua_setfield( p_state, lua_gettop( p_state ) - 1, "title" );
