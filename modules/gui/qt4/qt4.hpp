@@ -30,6 +30,8 @@
 
 #include <QEvent>
 
+#define QT43 ( QT_VERSION >= 0x040300 )
+
 /* Add define for duration, VLC_META_ENGINE doesn't include it */
 #define VLC_META_ENGINE_DURATION   0x00000002
 #define VLC_META_DURATION          N_("Duration")
