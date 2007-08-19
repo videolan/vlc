@@ -203,7 +203,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new(
     input_item_t * p_input_item;
     libvlc_media_descriptor_t * p_md;
 
-    p_input_item = input_ItemNew( p_instance->p_libvlc_int, psz_mrl, psz_mrl );
+    p_input_item = input_ItemNew( p_instance->p_libvlc_int, psz_mrl, NULL );
 
     if (!p_input_item)
     {
@@ -293,5 +293,16 @@ char * libvlc_media_descriptor_get_meta( libvlc_media_descriptor_t *p_md,
     }
 
     return psz_meta;
+}
+
+/**************************************************************************
+ * Getter for meta information
+ **************************************************************************/
+typedef char * libvlc_tag_t;
+void libvlc_media_descriptor_set_tag( libvlc_media_descriptor_t *p_md,
+                                        const libvlc_tag_t tag,
+                                        libvlc_exception_t *p_e )
+{
+
 }
 
