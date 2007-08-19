@@ -202,6 +202,7 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
 {
     label = new QLabel( qtr(p_item->psz_text) );
     text = new QLineEdit( qfu(p_item->value.psz) );
+    if( pwd ) text->setEchoMode( QLineEdit::Password );
     finish();
 
     if( !l )
