@@ -346,7 +346,7 @@ void MainInterface::handleMainUi( QSettings *settings )
     {
         bgWidget = new BackgroundWidget( p_intf );
         bgWidget->widgetSize = settings->value( "backgroundSize",
-                                           QSize( 200, 200 ) ).toSize();
+                                           QSize( 300, 300 ) ).toSize();
         bgWidget->resize( bgWidget->widgetSize );
         bgWidget->updateGeometry();
         mainLayout->insertWidget( 0, bgWidget );
@@ -569,7 +569,7 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
         if( VISIBLE( bgWidget) )
         {
             bgWasVisible = true;
-//            bgWidget->hide();
+            bgWidget->hide();
         }
         if( THEMIM->getIM()->hasVideo() || !bgWasVisible )
         {
@@ -595,9 +595,9 @@ void MainInterface::releaseVideo( void *p_win )
     videoWidget->resize( videoWidget->widgetSize );
 
     if( embeddedPlaylistWasActive )
-        ;//playlistWidget->show();
+        playlistWidget->show();
     else if( bgWidget )
-        ;//bgWidget->show();
+        bgWidget->show();
 
     videoIsActive = false;
     need_components_update = true;
@@ -714,17 +714,20 @@ void MainInterface::playlist()
         playlistWidget->widgetSize = settings->value( "playlistSize",
                                                QSize( 650, 310 ) ).toSize();
         playlistWidget->hide();
+        if(bgWidget)
+        CONNECT( playlistWidget, artSet( QString ), bgWidget, setArt(QString) );
     }
     if( VISIBLE( playlistWidget ) )
     {
         playlistWidget->hide();
+        if( bgWidget ) bgWidget->show();
         if( videoIsActive )
         {
             videoWidget->widgetSize = savedVideoSize;
             videoWidget->resize( videoWidget->widgetSize );
             videoWidget->updateGeometry();
+            if( bgWidget ) bgWidget->hide();
         }
-        if( bgWidget ) bgWidget->show();
     }
     else
     {

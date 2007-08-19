@@ -38,7 +38,7 @@
 #include <QPalette>
 #include <QResizeEvent>
 
-#define ICON_SIZE 128
+#define ICON_SIZE 300
 
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
@@ -113,7 +113,6 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
     plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
     setPalette( plt );
 
-    backgroundLayout = new QHBoxLayout;
     label = new QLabel( "" );
     label->setMaximumHeight( ICON_SIZE );
     label->setMaximumWidth( ICON_SIZE );
@@ -128,6 +127,14 @@ BackgroundWidget::~BackgroundWidget()
 {
     backgroundLayout->takeAt(0);
     delete backgroundLayout;
+}
+
+void BackgroundWidget::setArt( QString url )
+{
+    if( url.isNull() )
+        label->setPixmap( QPixmap( ":/vlc128.png" ) );
+    else
+        label->setPixmap( QPixmap( url ) );
 }
 
 QSize BackgroundWidget::sizeHint() const
@@ -338,6 +345,7 @@ void PlaylistWidget::setArt( QString url )
     else if( prevArt != url )
         art->setPixmap( QPixmap( url ) );
     prevArt = url;
+    emit artSet( url );
 }
 
 PlaylistWidget::~PlaylistWidget()

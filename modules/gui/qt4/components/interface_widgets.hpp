@@ -79,6 +79,8 @@ private:
     int DrawBackground();
     int CleanBackground();
     intf_thread_t *p_intf;
+private slots:
+    void setArt( QString );
 };
 
 class VisualSelector : public QFrame
@@ -145,6 +147,7 @@ private slots:
     void setArt( QString );
 signals:
     void rootChanged( int );
+    void artSet( QString );
 };
 
 #endif
