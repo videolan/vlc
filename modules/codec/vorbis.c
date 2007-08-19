@@ -136,9 +136,7 @@ static void *ProcessPacket ( decoder_t *, ogg_packet *, block_t ** );
 static aout_buffer_t *DecodePacket  ( decoder_t *, ogg_packet * );
 static block_t *SendPacket( decoder_t *, ogg_packet *, block_t * );
 
-#ifndef HAVE_TAGLIB
 static void ParseVorbisComments( decoder_t * );
-#endif
 
 static void ConfigureChannelOrder(int *, int, uint32_t, vlc_bool_t );
 
@@ -434,9 +432,7 @@ static int ProcessHeaders( decoder_t *p_dec )
         msg_Err( p_dec, "2nd Vorbis header is corrupted" );
         return VLC_EGENERIC;
     }
-#ifndef HAVE_TAGLIB
     ParseVorbisComments( p_dec );
-#endif
 
     /* The next packet in order is the codebooks header
      * We need to watch out that this packet is not missing as a
@@ -609,7 +605,6 @@ static block_t *SendPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     return p_block;
 }
 
-#ifndef HAVE_TAGLIB
 /*****************************************************************************
  * ParseVorbisComments
  *****************************************************************************/
@@ -640,6 +635,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
             psz_value++;
             input_Control( p_input, INPUT_ADD_INFO, _("Vorbis comment"),
                            psz_name, "%s", psz_value );
+#ifndef HAVE_TAGLIB
             if( !strcasecmp( psz_name, "artist" ) )
             {
                 if( psz_value && ( *psz_value != '\0' ) )
@@ -673,7 +669,24 @@ static void ParseVorbisComments( decoder_t *p_dec )
                     input_item_SetTrackID( p_item, psz_value );
                 }
             }
-            else if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_GAIN" ) ||
+#if 0 //not used
+            else if( !strcasecmp( psz_name, "musicbrainz_artistid" ) )
+            {
+                if( psz_value && ( *psz_value != '\0' ) )
+                {
+                    vlc_meta_SetArtistID( p_item, psz_value );
+                }
+            }
+            else if( !strcasecmp( psz_name, "musicbrainz_albumid" ) )
+            {
+                if( psz_value && ( *psz_value != '\0' ) )
+                {
+                    input_item_SetAlbumID( p_item, psz_value );
+                }
+            }
+#endif
+#endif
+            if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_GAIN" ) ||
                      !strcasecmp( psz_name, "RG_RADIO" ) )
             {
                 audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
@@ -704,22 +717,6 @@ static void ParseVorbisComments( decoder_t *p_dec )
                 r->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = VLC_TRUE;
                 r->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
             }
-#if 0 //not used
-            else if( !strcasecmp( psz_name, "musicbrainz_artistid" ) )
-            {
-                if( psz_value && ( *psz_value != '\0' ) )
-                {
-                    vlc_meta_SetArtistID( p_item, psz_value );
-                }
-            }
-            else if( !strcasecmp( psz_name, "musicbrainz_albumid" ) )
-            {
-                if( psz_value && ( *psz_value != '\0' ) )
-                {
-                    input_item_SetAlbumID( p_item, psz_value );
-                }
-            }
-#endif
         }
         /* FIXME */
         var_SetInteger( p_input, "item-change", p_item->i_id );
@@ -727,7 +724,6 @@ static void ParseVorbisComments( decoder_t *p_dec )
         i++;
     }
 }
-#endif
 
 /*****************************************************************************
  * Interleave: helper function to interleave channels
