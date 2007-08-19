@@ -80,6 +80,15 @@ struct libvlc_tag_query_t
 };
 
 
+struct libvlc_tree_t
+{
+    int     i_refcount;
+    void *  p_item; /* For dynamic sublist */
+    libvlc_retain_function  pf_item_retain;
+    libvlc_release_function pf_item_release;
+    DECL_ARRAY(struct libvlc_tree_t *)  subtrees; /* For dynamic sublist */
+};
+
 struct libvlc_media_list_t
 {
     libvlc_event_manager_t * p_event_manager;

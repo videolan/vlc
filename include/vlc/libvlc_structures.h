@@ -53,6 +53,22 @@ typedef struct libvlc_exception_t
 /**@} */
 
 /*****************************************************************************
+ * Tree
+ *****************************************************************************/
+/** defgroup libvlc_tree Tree
+ * \ingroup libvlc
+ * LibVLC Tree 
+ * @{
+ */
+
+typedef void (*libvlc_retain_function)(void *);
+typedef void (*libvlc_release_function)(void *);
+
+typedef struct libvlc_tree_t libvlc_tree_t;
+
+/**@} */
+
+/*****************************************************************************
  * Tag
  *****************************************************************************/
 /** defgroup libvlc_tag Tag
