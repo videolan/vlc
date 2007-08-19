@@ -67,7 +67,9 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
     QGridLayout *layout = new QGridLayout( this );
 
     /* FIXME GNOME/KDE ? */
+    editMetaButton = new QPushButton( qtr( "&Edit Metadata" ) );
     saveMetaButton = new QPushButton( qtr( "&Save Metadata" ) );
+    saveMetaButton->hide();
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     closeButton->setDefault( true );
 
@@ -78,12 +80,14 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
     layout->addWidget( uriLabel, 1, 0, 1, 1 );
     layout->addWidget( uriLine, 1, 1, 1, 7 );
     layout->addWidget( saveMetaButton, 2, 6 );
+    layout->addWidget( editMetaButton, 2, 6 );
     layout->addWidget( closeButton, 2, 7 );
 
     BUTTONACT( closeButton, close() );
 
     /* The tabs buttons are shown in the main dialog for space and cosmetics */
-    CONNECT( saveMetaButton, clicked(), MP, saveMeta() );
+    CONNECT( saveMetaButton, clicked(), this, saveMeta() );
+    CONNECT( editMetaButton, clicked(), this, editMeta() );
 
     /* Let the MetaData Panel update the URI */
     CONNECT( MP, uriSet( QString ), uriLine, setText( QString ) );
@@ -110,6 +114,22 @@ void MediaInfoDialog::showTab( int i_tab = 0 )
 {
     this->show();
     IT->setCurrentIndex( i_tab );
+}
+
+void MediaInfoDialog::editMeta()
+{
+    in_edit = true;
+    editMetaButton->hide();
+    saveMetaButton->show();
+    MP->editMeta();
+}
+
+void MediaInfoDialog::saveMeta()
+{
+    MP->saveMeta();
+    editMetaButton->show();
+    saveMetaButton->hide();
+    in_edit = false;
 }
 
 static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
@@ -152,6 +172,7 @@ void MediaInfoDialog::update()
 void MediaInfoDialog::update( input_item_t *p_item, bool update_info,
                                                     bool update_meta )
 {
+    if( in_edit ) return;
     MP->p_input = p_item;
     if( update_info )
         IP->update( p_item );
@@ -174,6 +195,7 @@ void MediaInfoDialog::clear()
 
 void MediaInfoDialog::close()
 {
+    in_edit = false;
     this->toggleVisible();
 
     if( mainInput == false ) {

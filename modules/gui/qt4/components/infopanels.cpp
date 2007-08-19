@@ -126,6 +126,7 @@ MetaPanel::MetaPanel( QWidget *parent,
 
 #undef ADD_META
 #undef ADD_META_2
+    ReadOnly( true );
 }
 
 MetaPanel::~MetaPanel(){}
@@ -135,6 +136,7 @@ MetaPanel::~MetaPanel(){}
  **/
 void MetaPanel::saveMeta()
 {
+    ReadOnly( true );
     playlist_t *p_playlist;
     char psz[5];
 
@@ -181,6 +183,28 @@ void MetaPanel::saveMeta()
         module_Unneed( p_playlist, p_mod );
     PL_UNLOCK;
     pl_Release( p_playlist );
+}
+
+void MetaPanel::ReadOnly(bool readonly)
+{
+    title_text->setReadOnly( readonly );
+    artist_text->setReadOnly( readonly );
+    collection_text->setReadOnly( readonly );
+    genre_text->setReadOnly( readonly );
+    date_text->setReadOnly( readonly );
+    seqnum_text->setReadOnly( readonly );
+    rating_text->setReadOnly( readonly );
+    language_text->setReadOnly( readonly );
+    setting_text->setReadOnly( readonly );
+    copyright_text->setReadOnly( readonly );
+    publisher_text->setReadOnly( readonly );
+    description_text->setReadOnly( readonly );
+
+}
+
+void MetaPanel::editMeta()
+{
+    ReadOnly( false );
 }
 
 /**
