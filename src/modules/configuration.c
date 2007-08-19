@@ -90,7 +90,7 @@ int IsConfigStringType (int type)
     static const unsigned char config_types[] = 
     {
         CONFIG_ITEM_STRING, CONFIG_ITEM_FILE, CONFIG_ITEM_MODULE,
-        CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_MODULE_CAT,
+        CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_MODULE_CAT, CONFIG_ITEM_PASSWORD,
         CONFIG_ITEM_MODULE_LIST, CONFIG_ITEM_MODULE_LIST_CAT
     };
 
@@ -158,6 +158,10 @@ int __config_GetType( vlc_object_t *p_this, const char *psz_name )
         break;
 
     case CONFIG_ITEM_STRING:
+        i_type = VLC_VAR_STRING;
+        break;
+
+    case CONFIG_ITEM_PASSWORD:
         i_type = VLC_VAR_STRING;
         break;
 
@@ -239,7 +243,7 @@ float __config_GetFloat( vlc_object_t *p_this, const char *psz_name )
  *****************************************************************************
  * This function is used to get the value of variables which are internally
  * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_FILE,
- * CONFIG_ITEM_DIRECTORY, and CONFIG_ITEM_MODULE).
+ * CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_PASSWORD, and CONFIG_ITEM_MODULE).
  *
  * Important note: remember to free() the returned char* because it's a
  *   duplicate of the actual value. It isn't safe to return a pointer to the
@@ -277,7 +281,7 @@ char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
  *****************************************************************************
  * This function is used to set the value of variables which are internally
  * represented by a string (CONFIG_ITEM_STRING, CONFIG_ITEM_FILE,
- * CONFIG_ITEM_DIRECTORY, and CONFIG_ITEM_MODULE).
+ * CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_PASSWORD, and CONFIG_ITEM_MODULE).
  *****************************************************************************/
 void __config_PutPsz( vlc_object_t *p_this,
                       const char *psz_name, const char *psz_value )
@@ -1586,6 +1590,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                 switch( p_conf->i_type )
                 {
                     case CONFIG_ITEM_STRING:
+                    case CONFIG_ITEM_PASSWORD:
                     case CONFIG_ITEM_FILE:
                     case CONFIG_ITEM_DIRECTORY:
                     case CONFIG_ITEM_MODULE:
@@ -1617,6 +1622,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
             switch( pp_shortopts[i_cmd]->i_type )
             {
                 case CONFIG_ITEM_STRING:
+                case CONFIG_ITEM_PASSWORD:
                 case CONFIG_ITEM_FILE:
                 case CONFIG_ITEM_DIRECTORY:
                 case CONFIG_ITEM_MODULE:

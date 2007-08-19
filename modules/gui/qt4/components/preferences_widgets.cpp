@@ -102,6 +102,14 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
             p_control = new StringListConfigControl( p_this, p_item,
                                             parent, false, l, line );
         break;
+    case CONFIG_ITEM_PASSWORD:
+        if( !p_item->i_list )
+            p_control = new StringConfigControl( p_this, p_item, parent,
+                                                 l, line, true );
+        else
+            p_control = new StringListConfigControl( p_this, p_item,
+                                            parent, true, l, line );
+        break;
     case CONFIG_ITEM_INTEGER:
         if( p_item->i_list )
             p_control = new IntegerListConfigControl( p_this, p_item,

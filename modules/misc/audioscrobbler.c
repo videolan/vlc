@@ -151,7 +151,7 @@ vlc_module_begin();
     set_description( N_("Audioscrobbler submission Plugin") );
     add_string( "lastfm-username", "", NULL,
                 USERNAME_TEXT, USERNAME_LONGTEXT, VLC_FALSE );
-    add_string( "lastfm-password", "", NULL,
+    add_password( "lastfm-password", "", NULL,
                 PASSWORD_TEXT, PASSWORD_LONGTEXT, VLC_FALSE );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
