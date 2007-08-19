@@ -433,7 +433,7 @@ static int Open( vlc_object_t *p_this )
     {
         sout_access_out_t *p_grab;
         const char *psz_rtpmap;
-        char url[NI_MAXHOST + 8], access[17], psz_ttl[5], ipv;
+        char url[NI_MAXHOST + 8], access[22], psz_ttl[5], ipv;
 
         if( b_rtsp )
         {
@@ -468,11 +468,11 @@ static int Open( vlc_object_t *p_this )
         /* create the access out */
         if( p_sys->i_ttl > 0 )
         {
-            sprintf( access, "udp{raw,ttl=%d}", p_sys->i_ttl );
+            sprintf( access, "udp{raw,rtcp,ttl=%d}", p_sys->i_ttl );
         }
         else
         {
-            sprintf( access, "udp{raw}" );
+            sprintf( access, "udp{raw,rtcp}" );
         }
 
         /* IPv6 needs brackets if not already present */
@@ -974,18 +974,18 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     if( p_sys->psz_destination )
     {
-        char access[17];
+        char access[22];
         char url[NI_MAXHOST + 8];
 
         /* first try to create the access out */
         if( p_sys->i_ttl )
         {
-            snprintf( access, sizeof( access ), "udp{raw,ttl=%d}",
+            snprintf( access, sizeof( access ), "udp{raw,rtcp,ttl=%d}",
                       p_sys->i_ttl );
             access[sizeof( access ) - 1] = '\0';
         }
         else
-            strcpy( access, "udp{raw}" );
+            strcpy( access, "udp{raw,rtcp}" );
 
         snprintf( url, sizeof( url ), (( p_sys->psz_destination[0] != '[' ) &&
                  strchr( p_sys->psz_destination, ':' )) ? "[%s]:%d" : "%s:%d",
@@ -1811,7 +1811,7 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             else if( strstr( psz_transport, "unicast" ) && strstr( psz_transport, "client_port=" ) )
             {
                 int  i_port = atoi( strstr( psz_transport, "client_port=" ) + strlen("client_port=") );
-                char ip[NI_MAXNUMERICHOST], psz_access[17], psz_url[NI_MAXNUMERICHOST + 8];
+                char ip[NI_MAXNUMERICHOST], psz_access[22], psz_url[NI_MAXNUMERICHOST + 8];
 
                 sout_access_out_t *p_access;
 
@@ -1850,9 +1850,9 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 /* first try to create the access out */
                 if( p_sys->i_ttl )
                     snprintf( psz_access, sizeof( psz_access ),
-                              "udp{raw,ttl=%d}", p_sys->i_ttl );
+                              "udp{raw,rtcp,ttl=%d}", p_sys->i_ttl );
                 else
-                    strlcpy( psz_access, "udp{raw}", sizeof( psz_access ) );
+                    strcpy( psz_access, "udp{raw,rtcp}" );
 
                 snprintf( psz_url, sizeof( psz_url ),
                          ( strchr( ip, ':' ) != NULL ) ? "[%s]:%d" : "%s:%d",
