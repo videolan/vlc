@@ -290,6 +290,47 @@ int E_(Activate) ( vlc_object_t *p_this )
         }
     }
     p_vout->output.i_chroma = X112VLC_FOURCC(p_vout->output.i_chroma);
+#elif defined(MODULE_NAME_IS_glx)
+    {
+        int i_opcode, i_evt, i_err = 0;
+        int i_maj, i_min = 0;
+
+        /* Check for GLX extension */
+        if( !XQueryExtension( p_vout->p_sys->p_display, "GLX",
+                              &i_opcode, &i_evt, &i_err ) )
+        {
+            msg_Err( p_this, "GLX extension not supported" );
+            XCloseDisplay( p_vout->p_sys->p_display );
+            free( p_vout->p_sys );
+            return VLC_EGENERIC;
+        }
+        if( !glXQueryExtension( p_vout->p_sys->p_display, &i_err, &i_evt ) )
+        {
+            msg_Err( p_this, "glXQueryExtension failed" );
+            XCloseDisplay( p_vout->p_sys->p_display );
+            free( p_vout->p_sys );
+            return VLC_EGENERIC;
+        }
+
+        /* Check GLX version */
+        if (!glXQueryVersion( p_vout->p_sys->p_display, &i_maj, &i_min ) )
+        {
+            msg_Err( p_this, "glXQueryVersion failed" );
+            XCloseDisplay( p_vout->p_sys->p_display );
+            free( p_vout->p_sys );
+            return VLC_EGENERIC;
+        }
+        if( i_maj <= 0 || ((i_maj == 1) && (i_min < 3)) )
+        {
+            p_vout->p_sys->b_glx13 = VLC_FALSE;
+            msg_Dbg( p_this, "using GLX 1.2 API" );
+        }
+        else
+        {
+            p_vout->p_sys->b_glx13 = VLC_TRUE;
+            msg_Dbg( p_this, "using GLX 1.3 API" );
+        }
+    }
 #endif
 
     /* Create blank cursor (for mouse cursor autohiding) */

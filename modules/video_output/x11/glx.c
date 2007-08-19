@@ -76,7 +76,6 @@ static void SwapBuffers  ( vout_thread_t * );
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  CheckGLX     ( vlc_object_t *, vlc_bool_t * );
 static int  InitGLX12    ( vout_thread_t * );
 static int  InitGLX13    ( vout_thread_t * );
 static void SwitchContext( vout_thread_t * );
@@ -136,13 +135,6 @@ extern void E_(Deactivate) ( vlc_object_t * );
 static int CreateOpenGL( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    vlc_bool_t b_glx13;
-
-    if( CheckGLX( p_this, &b_glx13 ) != VLC_SUCCESS )
-    {
-        msg_Err( p_vout, "no GLX support" );
-        return VLC_EGENERIC;
-    }
 
     if( E_(Activate)( p_this ) != VLC_SUCCESS )
     {
@@ -152,7 +144,6 @@ static int CreateOpenGL( vlc_object_t *p_this )
     /* Set the function pointer */
     p_vout->pf_init = InitOpenGL;
     p_vout->pf_swap = SwapBuffers;
-    p_vout->p_sys->b_glx13 = b_glx13;
 
     return VLC_SUCCESS;
 }
@@ -172,59 +163,6 @@ static void DestroyOpenGL( vlc_object_t *p_this )
     }
 
     E_(Deactivate)( p_this );
-}
-
-/*****************************************************************************
- * OpenDisplay: open and initialize OpenGL device
- *****************************************************************************/
-static int CheckGLX( vlc_object_t *p_this, vlc_bool_t *b_glx13 )
-{
-    Display *p_display = NULL;
-    int i_opcode, i_evt, i_err = 0;
-    int i_maj, i_min = 0;
-
-    /* Open the display */
-    p_display = XOpenDisplay( NULL );
-    if( p_display == NULL )
-    {
-        msg_Err( p_this, "cannot open display" );
-        return VLC_EGENERIC;
-    }
-
-    /* Check for GLX extension */
-    if( !XQueryExtension( p_display, "GLX", &i_opcode, &i_evt, &i_err ) )
-    {
-        msg_Err( p_this, "GLX extension not supported" );
-        XCloseDisplay( p_display );
-        return VLC_EGENERIC;
-    }
-    if( !glXQueryExtension( p_display, &i_err, &i_evt ) )
-    {
-        msg_Err( p_this, "glXQueryExtension failed" );
-        XCloseDisplay( p_display );
-        return VLC_EGENERIC;
-    }
-
-    /* Check GLX version */
-    if (!glXQueryVersion( p_display, &i_maj, &i_min ) )
-    {
-        msg_Err( p_this, "glXQueryVersion failed" );
-        XCloseDisplay( p_display );
-        return VLC_EGENERIC;
-    }
-    if( i_maj <= 0 || ((i_maj == 1) && (i_min < 3)) )
-    {
-        *b_glx13 = VLC_FALSE;
-        msg_Dbg( p_this, "using GLX 1.2 API" );
-    }
-    else
-    {
-        *b_glx13 = VLC_TRUE;
-        msg_Dbg( p_this, "using GLX 1.3 API" );
-    }
-
-    XCloseDisplay( p_display );
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
