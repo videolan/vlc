@@ -205,7 +205,7 @@ static int Open( vlc_object_t * p_this )
 
 
     p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( p_input && p_input->b_preparsing )
+    if( p_input )
     {
         module_t *p_meta = module_Need( p_demux, "meta reader", NULL, 0 );
         if( p_meta )
