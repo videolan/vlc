@@ -126,7 +126,18 @@ MetaPanel::MetaPanel( QWidget *parent,
 
 #undef ADD_META
 #undef ADD_META_2
-    ReadOnly( true );
+
+
+    CONNECT( title_text, textEdited( QString ), this, editMeta( QString ) );
+    CONNECT( description_text, textEdited( QString ), this, editMeta( QString ) );
+    CONNECT( artist_text, textEdited( QString ), this, editMeta( QString ) );
+    CONNECT( collection_text, textEdited( QString ), this, editMeta( QString ) );
+    CONNECT( genre_text, textEdited( QString ), this, editMeta( QString ) );
+    CONNECT( description_text, textEdited( QString ), this, editMeta( QString ) );
+    CONNECT( date_text, valueChanged( QString ), this, editMeta( QString ) );
+    CONNECT( seqnum_text, valueChanged( QString ), this, editMeta( QString ) );
+    CONNECT( rating_text, valueChanged( QString ), this, editMeta( QString ) );
+    in_edit = false;
 }
 
 MetaPanel::~MetaPanel(){}
@@ -136,7 +147,6 @@ MetaPanel::~MetaPanel(){}
  **/
 void MetaPanel::saveMeta()
 {
-    ReadOnly( true );
     playlist_t *p_playlist;
     char psz[5];
 
@@ -183,28 +193,25 @@ void MetaPanel::saveMeta()
         module_Unneed( p_playlist, p_mod );
     PL_UNLOCK;
     pl_Release( p_playlist );
+    in_edit = false;
 }
 
-void MetaPanel::ReadOnly(bool readonly)
+void MetaPanel::editMeta( QString edit )
 {
-    title_text->setReadOnly( readonly );
-    artist_text->setReadOnly( readonly );
-    collection_text->setReadOnly( readonly );
-    genre_text->setReadOnly( readonly );
-    date_text->setReadOnly( readonly );
-    seqnum_text->setReadOnly( readonly );
-    rating_text->setReadOnly( readonly );
-    language_text->setReadOnly( readonly );
-    setting_text->setReadOnly( readonly );
-    copyright_text->setReadOnly( readonly );
-    publisher_text->setReadOnly( readonly );
-    description_text->setReadOnly( readonly );
-
+    in_edit = true;
+    emit editing();
 }
 
-void MetaPanel::editMeta()
+void MetaPanel::setEdit( bool editing )
 {
-    ReadOnly( false );
+   in_edit = editing;
+}
+
+void MetaPanel::setInput( input_item_t *input )
+{
+    if( in_edit ) return;
+
+    p_input = input;
 }
 
 /**
@@ -212,6 +219,7 @@ void MetaPanel::editMeta()
  **/
 void MetaPanel::update( input_item_t *p_item )
 {
+    if( in_edit ) return;
     char *psz_meta; 
 #define UPDATE_META( meta, widget ) {               \
     psz_meta = input_item_Get##meta( p_item );      \

@@ -53,10 +53,11 @@ class MetaPanel: public QWidget
 public:
     MetaPanel( QWidget *, intf_thread_t * );
     virtual ~MetaPanel();
-    input_item_t *p_input;
     void saveMeta();
-    void editMeta();
+    void setInput( input_item_t * );
+    void setEdit( bool );
 private:
+    input_item_t *p_input;
     intf_thread_t *p_intf;
     QLineEdit *uri_text;
     QLineEdit *title_text;
@@ -73,13 +74,15 @@ private:
     QLineEdit *nowplaying_text;
     QLineEdit *publisher_text;
     QLabel *art_cover;
-    void ReadOnly( bool );
+    bool in_edit;
 
 public slots:
     void update( input_item_t * );
     void clear();
+    void editMeta( QString );
 signals:
     void uriSet( QString );
+    void editing();
 };
 
 class ExtraMetaPanel: public QWidget
