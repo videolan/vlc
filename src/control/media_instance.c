@@ -61,6 +61,7 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
     if( should_destroy )
     {
         /* We owned this one */
+        input_StopThread( p_input_thread );
         var_Destroy( p_input_thread, "drawable" );
         input_DestroyThread( p_input_thread );
     }
