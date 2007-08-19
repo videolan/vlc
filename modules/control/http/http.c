@@ -46,6 +46,10 @@ static void Close( vlc_object_t * );
 #define HANDLERS_LONGTEXT N_( \
         "List of handler extensions and executable paths (for instance: " \
         "php=/usr/bin/php,pl=/usr/bin/perl)." )
+#define ART_TEXT N_( "Export album art as /art." )
+#define ART_LONGTEXT N_( \
+        "Allow exporting album art for current playlist items at the " \
+        "/art and /art?id=<id> URLs." )
 #define CERT_TEXT N_( "Certificate file" )
 #define CERT_LONGTEXT N_( "HTTP interface x509 PEM certificate file " \
                           "(enables SSL)." )
@@ -68,6 +72,7 @@ vlc_module_begin();
 #if defined( HAVE_FORK ) || defined( WIN32 )
         add_string ( "http-handlers", NULL, NULL, HANDLERS_TEXT, HANDLERS_LONGTEXT, VLC_TRUE );
 #endif
+        add_bool   ( "http-album-art", 1, NULL, ART_TEXT, ART_LONGTEXT, VLC_TRUE );
         set_section( N_("HTTP SSL" ), 0 );
         add_string ( "http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );
         add_string ( "http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,  VLC_TRUE );
@@ -344,21 +349,24 @@ static int Open( vlc_object_t *p_this )
 
     E_(ParseDirectory)( p_intf, psz_src, psz_src );
 
-    /* FIXME: we're leaking h */
-    httpd_handler_sys_t *h = malloc( sizeof( httpd_handler_sys_t ) );
-    if( !h )
+    if( config_GetInt( p_intf, "http-album-art" ) )
     {
-        msg_Err( p_intf, "not enough memory to allocate album art handler" );
-        goto failed;
+        /* FIXME: we're leaking h */
+        httpd_handler_sys_t *h = malloc( sizeof( httpd_handler_sys_t ) );
+        if( !h )
+        {
+            msg_Err( p_intf, "not enough memory to allocate album art handler" );
+            goto failed;
+        }
+        h->file.p_intf = p_intf;
+        h->file.file = NULL;
+        h->file.name = NULL;
+        /* TODO: use ACL and login/password stuff here too */
+        h->p_handler = httpd_HandlerNew( p_sys->p_httpd_host,
+                                         "/art", NULL, NULL, NULL,
+                                         E_(ArtCallback), h );
+        TAB_APPEND( p_sys->i_handlers, p_sys->pp_handlers, h->p_handler );
     }
-    h->file.p_intf = p_intf;
-    h->file.file = NULL;
-    h->file.name = NULL;
-    /* TODO: use ACL and login/password stuff here too */
-    h->p_handler = httpd_HandlerNew( p_sys->p_httpd_host,
-                                     "/art", NULL, NULL, NULL,
-                                     E_(ArtCallback), h );
-    TAB_APPEND( p_sys->i_handlers, p_sys->pp_handlers, h->p_handler );
 
     if( p_sys->i_files <= 0 )
     {
