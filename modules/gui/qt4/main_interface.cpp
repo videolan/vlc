@@ -146,7 +146,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     statusBar()->addWidget( nameLabel, 8 );
     statusBar()->addPermanentWidget( speedLabel, 0 );
     statusBar()->addPermanentWidget( timeLabel, 2 );
-
+    speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
+    timeLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
+    CONNECT( speedLabel, customContextMenuRequested( QPoint ),
+             this, showSpeedMenu( QPoint ) );
+    CONNECT( timeLabel, customContextMenuRequested( QPoint ),
+             this, showTimeMenu( QPoint ) );
     /* Systray */
     sysTray = NULL;
     if( config_GetInt( p_intf, "qt-start-minimized") )
@@ -419,6 +424,22 @@ void MainInterface::resizeEvent( QResizeEvent *e )
                                  e->size().height() - addSize.height() );
         playlistWidget->updateGeometry();
     }
+}
+/****************************************************************************
+ * Small right-click menus
+ ****************************************************************************/
+void MainInterface::showSpeedMenu( QPoint pos )
+{
+    QMenu menu( this );
+    menu.addAction( "Not Implemented Yet" );
+    menu.exec( QCursor::pos() );
+}
+
+void MainInterface::showTimeMenu( QPoint pos )
+{
+    QMenu menu( this );
+    menu.addAction( "Not Implemented Yet" );
+    menu.exec( QCursor::pos() );
 }
 
 /*****************************************************************************

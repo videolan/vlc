@@ -139,6 +139,8 @@ private slots:
     void updateSystrayMenu( int );
     void updateSystrayTooltipName( QString );
     void updateSystrayTooltipStatus( int );
+    void showSpeedMenu( QPoint );
+    void showTimeMenu( QPoint );
 };
 
 
