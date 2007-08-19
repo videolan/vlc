@@ -294,7 +294,7 @@ mvar_t *E_(mvar_InfoSetNew)( intf_thread_t *p_intf, char *name,
     mvar_t *s = E_(mvar_New)( name, "set" );
     int i, j;
 
-    if( p_input == NULL )
+    if( p_input == NULL || p_input->p == NULL /* workarround assert in input_GetItem */ )
     {
         return s;
     }
