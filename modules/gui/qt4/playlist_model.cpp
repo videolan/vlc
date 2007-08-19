@@ -81,7 +81,7 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m)
     } else {
         i_showflags = parentItem->i_showflags;
         //Add empty string and update() handles data appending
-        strings.append( qtr("") ); 
+        strings.append( qtr("") );
     }
 }
 
@@ -91,7 +91,7 @@ void PLItem::updateview( void )
 
     if( model->i_depth == 1 )  //left window for playlist etc.
     {
-        strings.append( qtr("") );   
+        strings.append( qtr("") );
         return;
     }
 

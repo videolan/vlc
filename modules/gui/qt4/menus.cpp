@@ -1016,4 +1016,6 @@ void QVLCMenu::DoAction( intf_thread_t *p_intf, QObject *data )
     if( p_object == NULL ) return;
 
     var_Set( p_object, itemData->psz_var, itemData->val );
-    vlc_object_release( p_object );}
+    vlc_object_release( p_object );
+}
+

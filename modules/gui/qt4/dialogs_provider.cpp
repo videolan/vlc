@@ -428,7 +428,7 @@ void DialogsProvider::streamingDialog()
         if( s->exec() == QDialog::Accepted )
         {
             msg_Err(p_intf, "mrl %s\n", qta(s->mrl));
-            /* Just do it  
+            /* Just do it
             int i_len = strlen( qtu(s->mrl) ) + 10;
             char *psz_option = (char*)malloc(i_len);
             snprintf( psz_option, i_len - 1, ":sout=%s", qtu(s->mrl));
