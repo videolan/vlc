@@ -218,8 +218,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     vlc_mutex_init( p_libvlc, &p_libvlc->quicktime_lock );
     vlc_thread_set_priority( p_libvlc, VLC_THREAD_PRIORITY_LOW );
 #endif
-    /* Fake attachment */
-    p_libvlc->b_attached = VLC_TRUE;
     /* Store data for the non-reentrant API */
     p_static_vlc = p_libvlc;
 

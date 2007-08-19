@@ -112,6 +112,9 @@ struct vlc_object_internals_t
     /* Thread properties, if any */
     vlc_thread_t thread_id;
     vlc_bool_t   b_thread;
+
+    /* Objects management */
+    vlc_bool_t      b_attached;
 };
 
 

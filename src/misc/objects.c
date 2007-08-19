@@ -120,7 +120,7 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_new->b_die = VLC_FALSE;
     p_new->b_error = VLC_FALSE;
     p_new->b_dead = VLC_FALSE;
-    p_new->b_attached = VLC_FALSE;
+    p_priv->b_attached = VLC_FALSE;
     p_new->b_force = VLC_FALSE;
 
     p_new->psz_header = NULL;
@@ -153,13 +153,20 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_libvlc_global->i_objects = 1;
         p_libvlc_global->pp_objects = malloc( sizeof(vlc_object_t *) );
         p_libvlc_global->pp_objects[0] = p_new;
-        p_new->b_attached = VLC_TRUE;
+        p_priv->b_attached = VLC_TRUE;
     }
     else
     {
         libvlc_global_data_t *p_libvlc_global = vlc_global();
-        p_new->p_libvlc = ( i_type == VLC_OBJECT_LIBVLC ) ? (libvlc_int_t*)p_new
-                                                       : p_this->p_libvlc;
+        if( i_type == VLC_OBJECT_LIBVLC )
+        {
+	    p_new->p_libvlc = (libvlc_int_t*)p_new;
+            p_priv->b_attached = VLC_TRUE;
+        }
+        else
+        {
+            p_new->p_libvlc = p_this->p_libvlc;
+        }
 
         vlc_mutex_lock( &structure_lock );
 
@@ -675,7 +682,7 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
                  p_parent->i_children, p_this );
 
     /* Climb up the tree to see whether we are connected with the root */
-    if( p_parent->b_attached )
+    if( p_parent->p_internals->b_attached )
     {
         SetAttachment( p_this, VLC_TRUE );
     }
@@ -702,7 +709,7 @@ void __vlc_object_detach( vlc_object_t *p_this )
     }
 
     /* Climb up the tree to see whether we are connected with the root */
-    if( p_this->p_parent->b_attached )
+    if( p_this->p_parent->p_internals->b_attached )
     {
         SetAttachment( p_this, VLC_FALSE );
     }
@@ -737,7 +744,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 
         for( ; pp_current < pp_end ; pp_current++ )
         {
-            if( (*pp_current)->b_attached
+            if( (*pp_current)->p_internals->b_attached
                  && (*pp_current)->i_object_type == i_type )
             {
                 i_count++;
@@ -749,7 +756,7 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 
         for( ; pp_current < pp_end ; pp_current++ )
         {
-            if( (*pp_current)->b_attached
+            if( (*pp_current)->p_internals->b_attached
                  && (*pp_current)->i_object_type == i_type )
             {
                 ListReplace( p_list, *pp_current, i_index );
@@ -809,7 +816,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
 
         for( ; pp_current < pp_end ; pp_current++ )
         {
-            if( (*pp_current)->b_attached )
+            if( (*pp_current)->p_internals->b_attached )
             {
                 PrintObject( *pp_current, "" );
             }
@@ -1179,7 +1186,7 @@ static void SetAttachment( vlc_object_t *p_this, vlc_bool_t b_attached )
         SetAttachment( p_this->pp_children[i_index], b_attached );
     }
 
-    p_this->b_attached = b_attached;
+    p_this->p_internals->b_attached = b_attached;
 }
 
 static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
