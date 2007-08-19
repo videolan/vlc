@@ -1039,7 +1039,12 @@ function browse_path( p )
     hide( 'browse' );
     document.getElementById( value( 'browse_dest' ) ).focus();
 }
-
+function refresh_albumart()
+{
+    var now = new Date();
+    var albumart = document.getElementById( 'albumart' );
+    albumart.src = '/art?timestamp=' + now.getTime();
+}
 /**********************************************************************
  * Periodically update stuff in the interface
  *********************************************************************/
@@ -1053,9 +1058,15 @@ function loop_refresh_playlist()
     /* setTimeout( 'loop_refresh_playlist()', 10000 ); */
     update_playlist();
 }
+function loop_refresh_albumart()
+{
+    setTimeout( 'loop_refresh_albumart()', 10000 );
+    refresh_albumart();
+}
 function loop_refresh()
 {
     setTimeout( 'loop_refresh_status()', 1 );
     setTimeout( 'loop_refresh_playlist()', 1 );
+    setTimeout( 'loop_refresh_albumart()', 1 );
 }
 

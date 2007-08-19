@@ -82,6 +82,12 @@ vlc_module_end();
  * Local prototypes
  *****************************************************************************/
 static void Run          ( intf_thread_t *p_intf );
+int  E_(ArtCallback)( httpd_handler_sys_t *p_args,
+                          httpd_handler_t *p_handler, char *_p_url,
+                          uint8_t *_p_request, int i_type,
+                          uint8_t *_p_in, int i_in,
+                          char *psz_remote_addr, char *psz_remote_host,
+                          uint8_t **pp_data, int *pi_data );
 
 /*****************************************************************************
  * Local functions
@@ -338,6 +344,21 @@ static int Open( vlc_object_t *p_this )
 
     E_(ParseDirectory)( p_intf, psz_src, psz_src );
 
+    /* FIXME: we're leaking h */
+    httpd_handler_sys_t *h = malloc( sizeof( httpd_handler_sys_t ) );
+    if( !h )
+    {
+        msg_Err( p_intf, "not enough memory to allocate album art handler" );
+        goto failed;
+    }
+    h->file.p_intf = p_intf;
+    h->file.file = NULL;
+    h->file.name = NULL;
+    /* TODO: use ACL and login/password stuff here too */
+    h->p_handler = httpd_HandlerNew( p_sys->p_httpd_host,
+                                     "/art", NULL, NULL, NULL,
+                                     E_(ArtCallback), h );
+    TAB_APPEND( p_sys->i_handlers, p_sys->pp_handlers, h->p_handler );
 
     if( p_sys->i_files <= 0 )
     {
@@ -889,6 +910,71 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
 
         free( p_buffer );
     }
+
+    return VLC_SUCCESS;
+}
+
+int  E_(ArtCallback)( httpd_handler_sys_t *p_args,
+                          httpd_handler_t *p_handler, char *_p_url,
+                          uint8_t *_p_request, int i_type,
+                          uint8_t *_p_in, int i_in,
+                          char *psz_remote_addr, char *psz_remote_host,
+                          uint8_t **pp_data, int *pi_data )
+{
+    uint8_t *p_data = NULL;
+    int i_data = 0;
+    char *psz_art = NULL;
+    intf_thread_t *p_intf = p_args->file.p_intf;
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    if( p_sys->p_input )
+    {
+        psz_art = input_item_GetArtURL( input_GetItem( p_sys->p_input ) );
+    }
+
+    if( psz_art && !strncmp( psz_art, "file://", strlen( "file://" ) ) )
+    {
+        FILE *f;
+        char *psz_ext;
+        char *psz_header;
+        int i_header_size;
+
+        if( ( f = utf8_fopen( psz_art + strlen( "file://" ), "r" ) ) == NULL )
+        {
+            msg_Dbg( p_intf, "Couldn't open album art file %s",
+                     psz_art + strlen( "file://" ) );
+            Callback404( &p_args->file, (char**)pp_data, pi_data );
+            free( psz_art );
+            return VLC_SUCCESS;
+        }
+
+        E_(FileLoad)( f, &p_data, &i_data );
+
+        fclose( f );
+
+        psz_ext = strrchr( psz_art, '.' );
+        if( psz_ext ) psz_ext++;
+
+#define HEADER  "Content-Type: image/%s\n" \
+                "Content-Length: %d\n" \
+                "\n"
+        i_header_size = asprintf( &psz_header, HEADER, psz_ext, i_data );
+#undef HEADER
+
+        *pi_data = i_header_size + i_data;
+        *pp_data = (uint8_t*)malloc( *pi_data );
+        memcpy( *pp_data, psz_header, i_header_size );
+        memcpy( *pp_data+i_header_size, p_data, i_data );
+        free( psz_header );
+        free( p_data );
+    }
+    else
+    {
+        msg_Dbg( p_intf, "No album art found" );
+        Callback404( &p_args->file, (char**)pp_data, pi_data );
+    }
+
+    free( psz_art );
 
     return VLC_SUCCESS;
 }
