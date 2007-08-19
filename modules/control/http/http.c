@@ -600,7 +600,11 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
 #define p_sys p_args->p_intf->p_sys
     if( p_sys->p_input )
     {
-        input_item_t *p_item = input_GetItem( p_sys->p_input );
+        /* FIXME: Workarround a stupid assert in input_GetItem */
+        input_item_t *p_item = p_sys->p_input && p_sys->p_input->p
+                               ? input_GetItem( p_sys->p_input )
+                               : NULL;
+
         if( p_item )
         {
             vlc_mutex_lock( &p_item->p_stats->lock );
@@ -916,8 +920,8 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
 
 int  E_(ArtCallback)( httpd_handler_sys_t *p_args,
                           httpd_handler_t *p_handler, char *_p_url,
-                          uint8_t *_p_request, int i_type,
-                          uint8_t *_p_in, int i_in,
+                          uint8_t *p_request, int i_type,
+                          uint8_t *p_in, int i_in,
                           char *psz_remote_addr, char *psz_remote_host,
                           uint8_t **pp_data, int *pi_data )
 {
@@ -926,10 +930,31 @@ int  E_(ArtCallback)( httpd_handler_sys_t *p_args,
     char *psz_art = NULL;
     intf_thread_t *p_intf = p_args->file.p_intf;
     intf_sys_t *p_sys = p_intf->p_sys;
+    int psz_id[16];
+    input_item_t *p_item = NULL;
+    int i_id;
 
-    if( p_sys->p_input )
+    psz_id[0] = '\0';
+    if( p_request )
+        E_(ExtractURIValue)( p_request, "id", psz_id, 15 );
+    i_id = atoi( psz_id );
+    if( i_id )
     {
-        psz_art = input_item_GetArtURL( input_GetItem( p_sys->p_input ) );
+        playlist_item_t *p_pl_item = playlist_ItemGetById( p_sys->p_playlist,
+                                                           i_id, VLC_FALSE );
+        if( p_pl_item )
+            p_item = p_pl_item->p_input;
+    }
+    else
+    {
+        /* FIXME: Workarround a stupid assert in input_GetItem */
+        if( p_sys->p_input && p_sys->p_input->p )
+            p_item = input_GetItem( p_sys->p_input );
+    }
+
+    if( p_item )
+    {
+        psz_art = input_item_GetArtURL( p_item );
     }
 
     if( psz_art && !strncmp( psz_art, "file://", strlen( "file://" ) ) )
