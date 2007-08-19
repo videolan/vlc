@@ -370,13 +370,12 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    var_Get( p_access, SOUT_CFG_PREFIX "caching", &val );
-    p_sys->p_thread->i_caching = (int64_t)val.i_int * 1000;
+    p_sys->p_thread->i_caching =
+        (int64_t)1000 * var_GetInteger( p_access, SOUT_CFG_PREFIX "caching");
+    p_sys->p_thread->i_group =
+        var_GetInteger( p_access, SOUT_CFG_PREFIX "group" );
 
-    var_Get( p_access, SOUT_CFG_PREFIX "group", &val );
-    p_sys->p_thread->i_group = val.i_int;
-
-    p_sys->i_mtu = var_CreateGetInteger( p_this, "mtu" );
+    p_sys->i_mtu = var_GetInteger( p_this, "mtu" );
 
     srand( (uint32_t)mdate());
     p_sys->p_buffer          = NULL;
@@ -402,7 +401,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if (var_GetBool (p_accesss, SOUT_CFG_PREFIX"raw"))
+    if (var_GetBool (p_access, SOUT_CFG_PREFIX"raw"))
         p_access->pf_write = WriteRaw;
     else
         p_access->pf_write = Write;
