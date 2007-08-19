@@ -114,8 +114,8 @@ vlc_module_begin();
                      VLC_FALSE );
         add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
                 OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_TRUE );
-        add_bool( "macosx-black", 0, NULL, BLACK_TEXT, BLACK_LONGTEXT,
-                  VLC_TRUE );
+        add_bool( "macosx-black", 1, NULL, BLACK_TEXT, BLACK_LONGTEXT,
+                  VLC_FALSE );
         add_bool( "macosx-background", 0, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
                      VLC_FALSE );
     add_submodule();
