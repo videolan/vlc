@@ -48,7 +48,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
     need_update = true;
 
     setWindowTitle( qtr( "Media information" ) );
-    resize( 700 , 450 );
+    resize( 600 , 300 );
 
     /* TabWidgets and Tabs creation */
     IT = new QTabWidget;

@@ -56,8 +56,18 @@ MetaPanel::MetaPanel( QWidget *parent,
 #define ADD_META( string, widget ) {                             \
     l->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
     widget = new QLineEdit;                                      \
-    l->addWidget( widget, line, 1, 1, 9 );                       \
+    l->addWidget( widget, line, 1, 1, 5 );                       \
     line++;            }
+
+    /* ART_URL */
+    art_cover = new QLabel( "" );
+    art_cover->setMinimumHeight( 128 );
+    art_cover->setMinimumWidth( 128 );
+    art_cover->setMaximumHeight( 128 );
+    art_cover->setMaximumWidth( 128 );
+    art_cover->setScaledContents( true );
+    art_cover->setPixmap( QPixmap( ":/noart.png" ) );
+    l->addWidget( art_cover, line, 6, 4, 2 );
 
     /* Title, artist and album*/
     ADD_META( VLC_META_TITLE, title_text ); /* OK */
@@ -68,47 +78,39 @@ MetaPanel::MetaPanel( QWidget *parent,
     /* FIXME List id3genres.h is not includable yet ? */
     genre_text = new QLineEdit;
     l->addWidget( new QLabel( qtr( VLC_META_GENRE ) + " :" ), line, 0 );
-    l->addWidget( genre_text, line, 1, 1, 6 );
+    l->addWidget( genre_text, line, 1, 1, 2 );
+
+    /* Number */
+    l->addWidget( new QLabel( qtr( "Track Number" )  + " :" ),
+                  line, 3 );
+    seqnum_text = new QSpinBox; setSpinBounds( seqnum_text );
+    l->addWidget( seqnum_text, line, 4, 1, 2 );
+    line++;
 
     /* Date (Should be in years) */
     date_text = new QSpinBox; setSpinBounds( date_text );
-    l->addWidget( new QLabel( qtr( VLC_META_DATE ) + " :" ), line, 7 );
-    l->addWidget( date_text, line, 8, 1, 2 );
-    line++;
+    l->addWidget( new QLabel( qtr( VLC_META_DATE ) + " :" ), line, 0 );
+    l->addWidget( date_text, line, 1, 1, 1 );
 
-    /* Number and Rating */
-    l->addWidget( new QLabel( qtr( "Track number/Position" )  + " :" ),
-                  line, 0 );
-    seqnum_text = new QSpinBox; setSpinBounds( seqnum_text );
-    l->addWidget( seqnum_text, line, 1, 1, 4 );
+    /* Rating */
 
-    l->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 5 );
+    l->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 2 );
     rating_text = new QSpinBox; setSpinBounds( rating_text) ;
-    l->addWidget( rating_text, line, 6, 1, 4 );
-    line++;
+    l->addWidget( rating_text, line, 3, 1, 1 );
 
     /* Now Playing ? */
-    ADD_META( VLC_META_NOW_PLAYING, nowplaying_text );
+//    ADD_META( VLC_META_NOW_PLAYING, nowplaying_text );
 
     /* Language and settings */
-    l->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 0 );
+    l->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 4 );
     language_text = new QLineEdit;
-    l->addWidget( language_text, line, 1, 1, 4 );
-    l->addWidget( new QLabel( qtr( VLC_META_SETTING ) + " :" ), line, 5 );
+    l->addWidget( language_text, line, 5, 1, 1 );
+/*    l->addWidget( new QLabel( qtr( VLC_META_SETTING ) + " :" ), line, 5 );
     setting_text = new QLineEdit;
     l->addWidget( setting_text, line, 6, 1, 4 );
-    line++;
+    line++;*/
 
-    /* ART_URL */
-    art_cover = new QLabel( "" );
-    art_cover->setMinimumHeight( 128 );
-    art_cover->setMinimumWidth( 128 );
-    art_cover->setMaximumHeight( 128 );
-    art_cover->setMaximumWidth( 128 );
-    art_cover->setScaledContents( true );
-    art_cover->setPixmap( QPixmap( ":/noart.png" ) );
-    l->addWidget( art_cover, line, 8, 4, 2 );
-
+/* useless metadata
 #define ADD_META_2( string, widget ) {                             \
     l->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
     widget = new QLineEdit;                                      \
@@ -118,22 +120,21 @@ MetaPanel::MetaPanel( QWidget *parent,
     ADD_META_2( VLC_META_COPYRIGHT, copyright_text );
     ADD_META_2( VLC_META_PUBLISHER, publisher_text );
 
-    ADD_META_2( VLC_META_ENCODED_BY, publisher_text );
+    ADD_META_2( VLC_META_ENCODED_BY, encodedby_text );
     ADD_META_2( VLC_META_DESCRIPTION, description_text );
-
+*/
     /*  ADD_META( TRACKID )  Useless ? */
     /*  ADD_URI - DO not show it, done outside */
 
 #undef ADD_META
-#undef ADD_META_2
+//#undef ADD_META_2
 
 
     CONNECT( title_text, textEdited( QString ), this, editMeta( QString ) );
-    CONNECT( description_text, textEdited( QString ), this, editMeta( QString ) );
+//    CONNECT( description_text, textEdited( QString ), this, editMeta( QString ) );
     CONNECT( artist_text, textEdited( QString ), this, editMeta( QString ) );
     CONNECT( collection_text, textEdited( QString ), this, editMeta( QString ) );
     CONNECT( genre_text, textEdited( QString ), this, editMeta( QString ) );
-    CONNECT( description_text, textEdited( QString ), this, editMeta( QString ) );
     CONNECT( date_text, valueChanged( QString ), this, editMeta( QString ) );
     CONNECT( seqnum_text, valueChanged( QString ), this, editMeta( QString ) );
     CONNECT( rating_text, valueChanged( QString ), this, editMeta( QString ) );
@@ -256,13 +257,14 @@ void MetaPanel::update( input_item_t *p_item )
     /* Other classic though */
     UPDATE_META( Artist, artist_text );
     UPDATE_META( Genre, genre_text );
-    UPDATE_META( Copyright, copyright_text );
+//    UPDATE_META( Copyright, copyright_text );
     UPDATE_META( Album, collection_text );
-    UPDATE_META( Description, description_text );
+//    UPDATE_META( Description, description_text );
     UPDATE_META( Language, language_text );
-    UPDATE_META( NowPlaying, nowplaying_text );
-    UPDATE_META( Publisher, publisher_text );
-    UPDATE_META( Setting, setting_text );
+//    UPDATE_META( NowPlaying, nowplaying_text );
+//    UPDATE_META( Publisher, publisher_text );
+//    UPDATE_META( Setting, setting_text );
+//    UPDATE_META( EncodedBy, encodedby_text );
 
     UPDATE_META_INT( Date, date_text );
     UPDATE_META_INT( TrackNum, seqnum_text );

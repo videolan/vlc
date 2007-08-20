@@ -63,16 +63,17 @@ private:
     QLineEdit *title_text;
     QLineEdit *artist_text;
     QLineEdit *genre_text;
-    QLineEdit *copyright_text;
+//    QLineEdit *copyright_text;
     QLineEdit *collection_text;
     QSpinBox *seqnum_text;
-    QLineEdit *description_text;
+//    QLineEdit *description_text;
     QSpinBox *rating_text;
     QSpinBox *date_text;
-    QLineEdit *setting_text;
+//    QLineEdit *setting_text;
     QLineEdit *language_text;
-    QLineEdit *nowplaying_text;
-    QLineEdit *publisher_text;
+//    QLineEdit *nowplaying_text;
+//    QLineEdit *publisher_text;
+//    QLineEdit *encodedby_text;
     QLabel *art_cover;
     bool in_edit;
 
