@@ -26,7 +26,6 @@
 
 #include "xxmc-config.h"
 
-#include <string.h>	/* memcmp/memset, try to remove */
 #include <inttypes.h>
 
 #include "mpeg2.h"

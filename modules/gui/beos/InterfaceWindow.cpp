@@ -35,7 +35,6 @@
 #include <scsi.h>
 #include <scsiprobe_driver.h>
 #include <fs_info.h>
-#include <string.h>
 
 /* VLC headers */
 #include <vlc/vlc.h>

@@ -37,7 +37,6 @@
 #include "vcdplayer.h"
 #include "intf.h"
 
-#include <string.h>
 
 #include <cdio/cdio.h>
 #include <cdio/util.h>

@@ -25,7 +25,6 @@
 
 
 #include <stdio.h>
-#include <string.h>
 
 #include "fatal.h"
 #include "common.h"

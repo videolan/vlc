@@ -28,7 +28,6 @@
 /* System headers */
 #include <InterfaceKit.h>
 #include <StorageKit.h>
-#include <string.h>
 
 /* VLC headers */
 #include <vlc/vlc.h>

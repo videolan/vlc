@@ -28,7 +28,6 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <string.h>
 
 #include <vlc_demux.h>
 #include <vlc_interface.h>

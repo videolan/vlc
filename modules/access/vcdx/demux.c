@@ -25,7 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include <stdio.h>
-#include <string.h>
 
 #include <vlc/vlc.h>
 #include <vlc_input.h>
@@ -39,7 +38,6 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <string.h>
 #include <errno.h>
 
 #ifdef STRNCASECMP_IN_STRINGS_H

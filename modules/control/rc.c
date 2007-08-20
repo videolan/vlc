@@ -27,7 +27,6 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 
-#include <string.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>

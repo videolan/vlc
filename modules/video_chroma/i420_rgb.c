@@ -26,7 +26,6 @@
  * Preamble
  *****************************************************************************/
 #include <math.h>                                            /* exp(), pow() */
-#include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
 #include <vlc_vout.h>

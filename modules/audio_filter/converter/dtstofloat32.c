@@ -28,7 +28,6 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 
-#include <string.h>                                              /* strdup() */
 
 #include <dca.h>                                       /* libdca header file */
 

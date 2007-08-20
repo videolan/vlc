@@ -26,7 +26,6 @@
  *****************************************************************************/
 extern "C"
 {
-#include <string.h>
 #include <errno.h>
 
 #include <vlc/vlc.h>

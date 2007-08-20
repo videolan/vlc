@@ -26,7 +26,6 @@
  * Preamble
  *****************************************************************************/
 #include <errno.h>
-#include <string.h>
 #include <math.h>
 
 #include <vlc/vlc.h>

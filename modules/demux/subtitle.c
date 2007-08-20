@@ -28,7 +28,6 @@
 #include <vlc/vlc.h>
 #include <vlc_input.h>
 
-#include <string.h>
 
 #include <errno.h>
 #ifdef HAVE_SYS_TYPES_H

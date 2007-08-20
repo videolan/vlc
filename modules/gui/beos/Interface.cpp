@@ -33,7 +33,6 @@
 #include <InterfaceKit.h>
 #include <Application.h>
 #include <Message.h>
-#include <string.h>
 
 #include <vlc/vlc.h>
 #include <vlc_interface.h>

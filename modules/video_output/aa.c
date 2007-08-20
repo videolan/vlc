@@ -25,7 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
 
 #include <aalib.h>
 

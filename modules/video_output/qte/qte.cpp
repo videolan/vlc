@@ -37,7 +37,6 @@
 extern "C"
 {
 #include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                                /* strerror() */
 
 #include <vlc/vlc.h>
 #include <vlc_interface.h>

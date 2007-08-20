@@ -28,7 +28,6 @@
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
 #include <ctype.h>                                              /* tolower() */
-#include <string.h>                                            /* strerror() */
 
 #ifndef _WIN32_WINNT
 #   define _WIN32_WINNT 0x0500

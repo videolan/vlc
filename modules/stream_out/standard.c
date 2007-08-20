@@ -27,7 +27,6 @@
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
 
-#include <string.h>
 #include <stdio.h>
 
 #include <vlc_network.h>

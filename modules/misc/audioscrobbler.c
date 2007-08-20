@@ -30,8 +30,6 @@
  * Preamble
  *****************************************************************************/
 
-#define _GNU_SOURCE
-#include <string.h>
 
 #if defined( WIN32 )
 #include <time.h>

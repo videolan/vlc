@@ -33,7 +33,6 @@
 #include "vlc_stream.h"
 
 #include <ctype.h>
-#include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
 

@@ -26,7 +26,6 @@
 #include <InterfaceKit.h>
 #include <AppKit.h>
 #include <String.h>
-#include <string.h>
 
 /* VLC headers */
 #include <vlc/vlc.h>

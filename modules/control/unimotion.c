@@ -73,7 +73,6 @@
 #include "unimotion.h"
 #include <IOKit/IOKitLib.h>
 #include <CoreFoundation/CoreFoundation.h>
-#include <string.h>
 #include <stdint.h>
 
 enum data_type {

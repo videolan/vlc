@@ -26,7 +26,6 @@
  * Preamble
  *****************************************************************************/
 #include <stdio.h>
-#include <string.h>                                              /* strdup() */
 
 #include <vlc/vlc.h>
 #include <vlc_input.h>
@@ -45,7 +44,6 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <string.h>
 
 #include <dvdread/dvd_reader.h>
 #include <dvdread/ifo_types.h>

@@ -29,7 +29,6 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <sys/ioctl.h>                                            /* ioctl() */
-#include <string.h>                                            /* strerror() */
 #include <unistd.h>                                      /* write(), close() */
 
 #include <vlc/vlc.h>

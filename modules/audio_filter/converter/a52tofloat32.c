@@ -29,7 +29,6 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 
-#include <string.h>                                              /* strdup() */
 #ifdef HAVE_STDINT_H
 #   include <stdint.h>                                         /* int16_t .. */
 #elif HAVE_INTTYPES_H

@@ -27,7 +27,6 @@
 #include <vlc/vlc.h>
 #include <vlc_access.h>
 
-#include <string.h>
 #include <errno.h>
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>

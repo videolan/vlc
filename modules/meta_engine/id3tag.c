@@ -26,7 +26,6 @@
  *****************************************************************************/
 #include <config.h>
 
-#include <string.h>
 
 #include <vlc/vlc.h>
 #include <vlc_interface.h>

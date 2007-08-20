@@ -28,7 +28,6 @@
  *****************************************************************************/
 #include <stdio.h>
 #include <malloc.h>
-#include <string.h>
 
 #include <SoundPlayer.h>
 #include <media/MediaDefs.h>
