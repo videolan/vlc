@@ -35,7 +35,6 @@ woven in by Terry Thorsen 1/2003.
  */
 
 
-#include <stdio.h>
 #include "zlib.h"
 #include "unzip.h"
 

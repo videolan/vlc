@@ -27,7 +27,6 @@
 #include <GL/glu.h>
 #include <unistd.h>
 #include <math.h>
-#include <stdio.h>
 #include "common.h"
 #include "preset_types.h"
 #include "preset.h"

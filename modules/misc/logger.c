@@ -26,7 +26,6 @@
  *****************************************************************************/
 
 #include <errno.h>                                                 /* ENOMEM */
-#include <stdio.h>
 
 #ifdef UNDER_CE
 #   define _IONBF 0x0004

@@ -29,7 +29,6 @@
 
 #include <libgnomevfs/gnome-vfs.h>
 
-#include <stdio.h>
 
 #include <vlc_charset.h>
 #include "vlc_url.h"

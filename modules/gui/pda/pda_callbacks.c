@@ -30,7 +30,6 @@
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
 
-#include <stdio.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>

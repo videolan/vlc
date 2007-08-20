@@ -72,7 +72,6 @@
   (cep@andrew.cmu.edu), to suit personal needs, 
 */
 
-#include <stdio.h>
 
 #include "common.h"
 #include "fatal.h"

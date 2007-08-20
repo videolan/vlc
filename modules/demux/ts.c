@@ -28,7 +28,6 @@
 
 #include <vlc/vlc.h>
 
-#include <stdio.h>
 #include <ctype.h>
 
 #include <vlc_access.h> /* DVB-specific things */

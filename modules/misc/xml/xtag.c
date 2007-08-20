@@ -34,7 +34,6 @@
 
 #include <ctype.h>
 #include <stdarg.h>
-#include <stdio.h>
 
 #undef XTAG_DEBUG
 

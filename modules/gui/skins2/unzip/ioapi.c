@@ -6,7 +6,6 @@
    Copyright (C) 1998-2005 Gilles Vollant
 */
 
-#include <stdio.h>
 
 #include "zlib.h"
 #include "ioapi.h"

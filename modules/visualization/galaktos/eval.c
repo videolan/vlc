@@ -26,7 +26,6 @@
 
 /* Evaluation Code */
 
-#include <stdio.h>
 #include "common.h"
 #include "fatal.h"
 

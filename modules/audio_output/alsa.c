@@ -29,7 +29,6 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 
-#include <stdio.h>
 #include <errno.h>                                                 /* ENOMEM */
 #include <vlc_interface.h>
 

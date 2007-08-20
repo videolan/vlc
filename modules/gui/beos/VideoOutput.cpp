@@ -29,7 +29,6 @@
  * Preamble
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
-#include <stdio.h>
 
 #include <Application.h>
 #include <BitmapStream.h>

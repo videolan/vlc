@@ -23,7 +23,6 @@
 
 #if 0
 
-#include <stdio.h>
 #include <malloc.h>
 
 #include <Bitmap.h>

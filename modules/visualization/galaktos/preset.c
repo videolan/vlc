@@ -25,7 +25,6 @@
 #include <vlc/vlc.h>
 
 
-#include <stdio.h>
 #include <dirent.h>
 #include <time.h>
 #include "common.h"

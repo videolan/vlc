@@ -30,7 +30,6 @@
 #include <vlc_codec.h>
 #include <vlc_vout_synchro.h>
 
-#include <stdio.h>
 #include <unistd.h>
 #include <mcheck.h>
 

@@ -24,7 +24,6 @@
 
 #include <vlc/vlc.h>
 
-#include <stdio.h>
 
 #include <vlc_demux.h>
 

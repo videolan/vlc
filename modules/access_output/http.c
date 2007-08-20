@@ -30,7 +30,6 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 
-#include <stdio.h>
 
 #include <vlc_input.h>
 #include <vlc_playlist.h>

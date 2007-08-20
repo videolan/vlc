@@ -26,7 +26,6 @@
 
 /* Basic Parameter Functions */
 
-#include <stdio.h>
 #include <math.h>
 #include "fatal.h"
 #include "common.h"

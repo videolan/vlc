@@ -46,7 +46,6 @@
 #   include <limits.h> /* PATH_MAX */
 #endif
 
-#include <stdio.h> /* sprintf() */
 
 #include "dummy.h"
 

@@ -24,7 +24,6 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <stdio.h>
 #include "http.h"
 #include "vlc_strings.h"
 

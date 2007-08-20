@@ -33,7 +33,6 @@
  *****************************************************************************/
 
 #include <errno.h>                                                 /* ENOMEM */
-#include <stdio.h>
 #include <ctype.h>
 #include <signal.h>
 

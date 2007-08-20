@@ -38,7 +38,6 @@
 #include <cdio/logging.h>
 #include <cdio/cd_types.h>
 
-#include <stdio.h>
 
 /* #ifdef variables below are defined via config.h via #include vlc above. */
 #ifdef HAVE_STDLIB_H

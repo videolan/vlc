@@ -23,7 +23,6 @@
 
 #include <vlc/vlc.h>
 
-#include <stdio.h>
 #include <assert.h>
 #include <time.h>
 #include <errno.h>

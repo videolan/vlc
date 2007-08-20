@@ -28,7 +28,6 @@
  * Preamble
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
-#include <stdio.h>
 #include <time.h>
 
 #include <curses.h>

@@ -24,7 +24,6 @@
 
 
 
-#include <stdio.h>
 #include "common.h"
 
 /* Compares integer value numbers in 32 bit range */

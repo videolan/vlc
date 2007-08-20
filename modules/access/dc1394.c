@@ -31,7 +31,6 @@
 #include <vlc_vout.h>
 #include <vlc_demux.h>
 
-#include <stdio.h>
 
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
