@@ -210,10 +210,12 @@ struct meta_export_t
 
 #define VLC_META_ENGINE_ART_URL         0x00001000
 
+#if 0 /* unused (yet?) */
 #define VLC_META_ENGINE_MB_ARTIST_ID    0x00002000
 #define VLC_META_ENGINE_MB_RELEASE_ID   0x00004000
 #define VLC_META_ENGINE_MB_TRACK_ID     0x00008000
 #define VLC_META_ENGINE_MB_TRM_ID       0x00010000
+#endif
 
 typedef struct meta_engine_sys_t meta_engine_sys_t;
 
