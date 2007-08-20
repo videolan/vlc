@@ -1375,19 +1375,19 @@ void httpd_MsgAdd( httpd_message_t *msg, const char *name, const char *psz_value
     char *value = NULL;
 
     va_start( args, psz_value );
-#if defined(HAVE_VASPRINTF) && !defined(__APPLE__) && !defined(SYS_BEOS)
-    vasprintf( &value, psz_value, args );
-#else
-    {
-        int i_size = strlen( psz_value ) + 4096;    /* FIXME stupid system */
-        value = calloc( i_size, sizeof( char ) );
-        vsnprintf( value, i_size, psz_value, args );
-        value[i_size - 1] = 0;
-    }
-#endif
+    if( vasprintf( &value, psz_value, args ) == -1 )
+        value = NULL;
     va_end( args );
 
+    if( value == NULL )
+        return;
+
     name = strdup( name );
+    if( name == NULL )
+    {
+        free( value );
+        return;
+    }
 
     TAB_APPEND( msg->i_name,  msg->name,  (char*)name );
     TAB_APPEND( msg->i_value, msg->value, value );
@@ -2134,49 +2134,51 @@ static void httpd_HostThread( httpd_host_t *host )
                                 {
                                     char ip[NI_MAXNUMERICHOST];
 
-                                    if( httpd_ClientIP( cl, ip ) != NULL )
+                                    if( ( httpd_ClientIP( cl, ip ) == NULL )
+                                     || ACL_Check( url->p_acl, ip ) )
                                     {
-                                        if( ACL_Check( url->p_acl, ip ) )
-                                        {
-                                            b_hosts_failed = VLC_TRUE;
-                                            break;
-                                        }
-                                    }
-                                    else
                                         b_hosts_failed = VLC_TRUE;
+                                        break;
+                                    }
                                 }
 
                                 if( answer && ( *url->psz_user || *url->psz_password ) )
                                 {
                                     /* create the headers */
                                     const char *b64 = httpd_MsgGet( query, "Authorization" ); /* BASIC id */
-                                    char *auth = NULL;
-                                    char *id;
+                                    char *user = NULL, *pass = NULL;
 
-                                    asprintf( &id, "%s:%s", url->psz_user, url->psz_password );
                                     if( b64 != NULL
-                                         && !strncasecmp( b64, "BASIC", 5 ) )
+                                     && !strncasecmp( b64, "BASIC", 5 ) )
                                     {
                                         b64 += 5;
                                         while( *b64 == ' ' )
-                                        {
                                             b64++;
+
+                                        user = vlc_b64_decode( b64 );
+                                        if (user != NULL)
+                                        {
+                                            pass = strchr (user, ':');
+                                            if (pass != NULL)
+                                                *pass++ = '\0';
                                         }
-                                        auth = vlc_b64_decode( b64 );
                                     }
 
-                                    if( (auth == NULL) || strcmp( id, auth ) )
+                                    if ((user == NULL) || (pass == NULL)
+                                     || strcmp (user, url->psz_user)
+                                     || strcmp (pass, url->psz_password))
                                     {
-                                        httpd_MsgAdd( answer, "WWW-Authenticate", "Basic realm=\"%s\"", url->psz_user );
+                                        httpd_MsgAdd( answer,
+                                                      "WWW-Authenticate",
+                                                      "Basic realm=\"%s\"",
+                                                      url->psz_user );
                                         /* We fail for all url */
                                         b_auth_failed = VLC_TRUE;
-                                        free( id );
-                                        free( auth );
+                                        free( user );
                                         break;
                                     }
 
-                                    free( id );
-                                    free( auth );
+                                    free( user );
                                 }
 
                                 if( !url->catch[i_msg].cb( url->catch[i_msg].p_sys, cl, answer, query ) )
