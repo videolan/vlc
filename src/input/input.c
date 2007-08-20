@@ -904,12 +904,12 @@ static int Init( input_thread_t * p_input )
         var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
         UpdateItemLength( p_input, val.i_time );
     }
-    else if( p_input->p->input.p_item->i_duration > 0)
-        {
-            val.i_time = p_input->p->input.p_item->i_duration;
-            var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
-            UpdateItemLength( p_input, val.i_time );
-        }
+    else if( p_input->p->input.p_item->i_duration > 0 )
+    { /* fallback: gets length from metadata */
+        val.i_time = p_input->p->input.p_item->i_duration;
+        var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
+        UpdateItemLength( p_input, val.i_time );
+    }
 
     /* Start title/chapter */
     if( !p_input->b_preparsing )
