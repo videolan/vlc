@@ -90,7 +90,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
          {
              if( i_type == REG_SZ )
              {
-                 strcat( p_data, "\\plugins" );
+                 strcat( p_data, "\\plugins000" );
                  ppsz_argv[ppsz_argc++] = "--plugin-path";
                  ppsz_argv[ppsz_argc++] = p_data;
              }
@@ -99,7 +99,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     }
     ppsz_argv[ppsz_argc++] = "--no-one-instance";
 
-#if 0
+#if 1
     ppsz_argv[0] = "C:\\Cygwin\\home\\damienf\\vlc-trunk\\vlc";
 #endif
 
@@ -290,15 +290,26 @@ char *VlcPlugin::getAbsoluteURL(const char *url)
         {
             // validate protocol header
             const char *start = url;
-            while( start != end ) {
-                char c = tolower(*start);
-                if( (c < 'a') || (c > 'z') )
-                    // not valid protocol header, assume relative URL
-                    goto relativeurl;
+            char c = *start;
+            if( isalpha(c) )
+            {
                 ++start;
+                while( start != end )
+                {
+                    c  = *start;
+                    if( ! (isalnum(c)
+                       || ('-' == c)
+                       || ('+' == c)
+                       || ('.' == c)
+                       || ('/' == c)) ) /* VLC uses / to allow user to specify a demuxer */
+                        // not valid protocol header, assume relative URL
+                        goto relativeurl;
+                    ++start;
+                }
+                /* we have a protocol header, therefore URL is absolute */
+                return strdup(url);
             }
-            /* we have a protocol header, therefore URL is absolute */
-            return strdup(url);
+            // not a valid protocol header, assume relative URL
         }
 
 relativeurl:

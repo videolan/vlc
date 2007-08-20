@@ -181,22 +181,32 @@ LPWSTR CombineURL(LPCWSTR baseUrl, LPCWSTR url)
         {
             // validate protocol header
             const wchar_t *start = url;
-            while( start != end ) {
-                wchar_t c = towlower(*start);
-                if( (c < L'a') || (c > L'z') )
-                    // not a valid protocol header, assume relative URL
-                    goto relativeurl;
-                ++start;
-            }
-            /* we have a protocol header, therefore URL is absolute */
-            UINT len = wcslen(url);
-            wchar_t *href = (LPWSTR)CoTaskMemAlloc((len+1)*sizeof(wchar_t));
-            if( href )
+            wchar_t c = *start;
+            if( iswalpha(c) )
             {
-                memcpy(href, url, len*sizeof(wchar_t));
-                href[len] = L'\0';
+                ++start;
+                while( start != end )
+                {
+                    c = *start;
+                    if( ! (iswalnum(c)
+                       || (L'-' == c)
+                       || (L'+' == c)
+                       || (L'.' == c)
+                       || (L'/' == c)) ) /* VLC uses / to allow user to specify a demuxer */
+                        // not valid protocol header, assume relative URL
+                        goto relativeurl;
+                    ++start;
+                }
+                /* we have a protocol header, therefore URL is absolute */
+                UINT len = wcslen(url);
+                wchar_t *href = (LPWSTR)CoTaskMemAlloc((len+1)*sizeof(wchar_t));
+                if( href )
+                {
+                    memcpy(href, url, len*sizeof(wchar_t));
+                    href[len] = L'\0';
+                }
+                return href;
             }
-            return href;
         }
 
 relativeurl:
