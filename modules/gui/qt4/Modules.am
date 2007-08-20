@@ -48,7 +48,6 @@ nodist_SOURCES_qt4 = \
 		ui/open_net.h \
 		ui/open_capture.h \
 		ui/open.h \
-		ui/main_interface.h \
 		ui/sprefs_audio.h \
 		ui/sprefs_input.h \
 		ui/sprefs_interface.h \
@@ -146,7 +145,6 @@ EXTRA_DIST += \
 	ui/open_net.ui \
 	ui/open_capture.ui \
 	ui/open.ui \
-	ui/main_interface.ui \
 	ui/sprefs_audio.ui \
 	ui/sprefs_input.ui \
 	ui/sprefs_interface.ui \
