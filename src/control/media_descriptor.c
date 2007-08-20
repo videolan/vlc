@@ -69,12 +69,6 @@ static const libvlc_meta_t vlc_to_libvlc_meta[] =
     [vlc_meta_TrackID]      = libvlc_meta_TrackID
 };
 
-struct tag_storage
-{
-    char ** ppsz_tags;
-    int i_count;
-};
-
 /**************************************************************************
  * input_item_subitem_added (Private) (vlc event Callback)
  **************************************************************************/
@@ -246,7 +240,7 @@ void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
     for( i = 0; all_keys[i]; i++ )
     {
         int j;
-        struct tag_storage * p_ts = vlc_dictionary_value_for_key( &p_md->tags, all_keys[i] );
+        struct libvlc_tags_storage_t * p_ts = vlc_dictionary_value_for_key( &p_md->tags, all_keys[i] );
         for( j = 0; j < p_ts->i_count; j++ )
         {
             free( p_ts->ppsz_tags[j] );
@@ -325,7 +319,7 @@ void libvlc_media_descriptor_add_tag( libvlc_media_descriptor_t *p_md,
                                       const libvlc_tag_t tag,
                                       libvlc_exception_t *p_e )
 {
-    struct tag_storage * p_ts;
+    struct libvlc_tags_storage_t * p_ts;
 
     if( !tag || !key )
         return;
@@ -334,8 +328,8 @@ void libvlc_media_descriptor_add_tag( libvlc_media_descriptor_t *p_md,
 
     if( !p_ts )
     {
-        p_ts = malloc(sizeof(struct tag_storage));
-        memset( p_ts, 0, sizeof(struct tag_storage) );
+        p_ts = malloc(sizeof(struct libvlc_tags_storage_t));
+        memset( p_ts, 0, sizeof(struct libvlc_tags_storage_t) );
     }
     p_ts->i_count++;
 
@@ -356,7 +350,7 @@ void libvlc_media_descriptor_remove_tag( libvlc_media_descriptor_t *p_md,
                                          const libvlc_tag_t tag,
                                          libvlc_exception_t *p_e )
 {
-    struct tag_storage * p_ts;
+    struct libvlc_tags_storage_t * p_ts;
     int i;
 
     if( !tag || !key )
@@ -387,7 +381,7 @@ int libvlc_media_descriptor_tags_count_for_key( libvlc_media_descriptor_t *p_md,
                                                  const char * key,
                                                  libvlc_exception_t *p_e )
 {
-    struct tag_storage * p_ts;
+    struct libvlc_tags_storage_t * p_ts;
 
     if( !key )
         return 0;
@@ -408,7 +402,7 @@ libvlc_media_descriptor_tag_at_index_for_key( libvlc_media_descriptor_t *p_md,
                                               const char * key,
                                               libvlc_exception_t *p_e )
 {
-    struct tag_storage * p_ts;
+    struct libvlc_tags_storage_t * p_ts;
 
     if( !key )
         return NULL;

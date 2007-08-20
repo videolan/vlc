@@ -36,7 +36,7 @@
  */
 
 /**************************************************************************
- *       libvlc_tag_query_new (Public)
+ *       new (Public)
  *
  * Init an object.
  **************************************************************************/
@@ -54,12 +54,14 @@ libvlc_tag_query_new( libvlc_instance_t * p_inst,
 	
 	p_q->p_libvlc_instance = p_inst;
     p_q->i_refcount = 1;
+    p_q->tag = NULL;
+    p_q->psz_tag_key = NULL;
 
 	return p_q;
 }
 
 /**************************************************************************
- *       libvlc_media_list_release (Public)
+ *       release (Public)
  *
  * Release an object.
  **************************************************************************/
@@ -70,11 +72,14 @@ void libvlc_tag_query_release( libvlc_tag_query_t * p_q )
     if( p_q->i_refcount > 0 )
         return;
 
+    free( p_q->tag );
+    free( p_q->psz_tag_key );
+        
 	free( p_q );
 }
 
 /**************************************************************************
- *       libvlc_media_list_retain (Public)
+ *       retain (Public)
  *
  * Release an object.
  **************************************************************************/
@@ -83,9 +88,22 @@ void libvlc_tag_query_retain( libvlc_tag_query_t * p_q )
 	p_q->i_refcount++;
 }
 
+/**************************************************************************
+ *       set_match_tag_and_key (Public)
+ **************************************************************************/
+void libvlc_tag_query_set_match_tag_and_key( libvlc_tag_query_t * p_q,
+                                             libvlc_tag_t tag,
+                                             char * psz_tag_key,
+                                             libvlc_exception_t * p_e )
+{
+    (void)p_e;
+
+    p_q->tag = strdup( tag );
+    p_q->psz_tag_key = strdup( psz_tag_key );
+}
 
 /**************************************************************************
- *       libvlc_query_match (Public)
+ *       match (Public)
  *
  * Return true if the query p_q is matched in p_md
  **************************************************************************/
@@ -94,10 +112,23 @@ libvlc_tag_query_match( libvlc_tag_query_t * p_q,
                         libvlc_media_descriptor_t * p_md,
                         libvlc_exception_t * p_e )
 {
-	(void)p_q;
-	(void)p_md;
-	(void)p_e;
+    int i;
+    struct libvlc_tags_storage_t * p_ts;
+    (void)p_e;
     
+    if( !p_q->psz_tag_key )
+        return 1;
+
+    p_ts = vlc_dictionary_value_for_key( &p_md->tags, p_q->psz_tag_key );
+    if( !p_q->tag )
+        return p_ts->i_count > 0;
+
+    for( i = 0; i < p_ts->i_count; i++ )
+    {
+        if( !strcmp( p_ts->ppsz_tags[i], p_q->tag ) )
+            return 1;
+    }
+
     /* In construction... */
-    return 1;
+    return 0;
 }

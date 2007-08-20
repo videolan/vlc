@@ -63,6 +63,12 @@ struct libvlc_instance_t
     struct libvlc_callback_entry_list_t *p_callback_list;
 };
 
+struct libvlc_tags_storage_t
+{
+    char ** ppsz_tags;
+    int i_count;
+};
+
 struct libvlc_media_descriptor_t
 {
     libvlc_event_manager_t * p_event_manager;
@@ -77,6 +83,8 @@ struct libvlc_tag_query_t
 {
     struct libvlc_instance_t  *p_libvlc_instance; /* Parent instance */
     int                i_refcount;
+    libvlc_tag_t       tag;
+    char *             psz_tag_key;
 };
 
 struct libvlc_tree_t

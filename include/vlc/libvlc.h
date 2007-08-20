@@ -462,6 +462,12 @@ VLC_PUBLIC_API void
 VLC_PUBLIC_API void 
     libvlc_tag_query_retain( libvlc_tag_query_t * );
 
+VLC_PUBLIC_API void
+    libvlc_tag_query_set_match_tag_and_key( libvlc_tag_query_t * p_q,
+                                            libvlc_tag_t tag,
+                                            char * psz_tag_key,
+                                            libvlc_exception_t * );
+
 VLC_PUBLIC_API vlc_bool_t 
     libvlc_tag_query_match( libvlc_tag_query_t *, libvlc_media_descriptor_t *,
                             libvlc_exception_t * );
