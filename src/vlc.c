@@ -30,6 +30,8 @@
 #include <vlc/vlc.h>
 #include <locale.h>
 
+#include <stdio.h>
+
 /* Explicit HACK */
 extern void LocaleFree (const char *);
 extern char *FromLocale (const char *);
