@@ -183,7 +183,9 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
     const char * psz_cat = p_event->u.services_discovery_item_added.psz_category;
     playlist_item_t *p_new_item, * p_parent = user_data;
 
-    msg_Dbg( p_parent->p_playlist, "Adding %s in %s", p_input->psz_name, psz_cat );
+    msg_Dbg( p_parent->p_playlist, "Adding %s in %s",
+                p_input->psz_name ? p_input->psz_name : "(null)",
+                psz_cat ? psz_cat : "(null)" );
 
     /* If p_parent is in root category (this is clearly a hack) and we have a cat */
     if( !EMPTY_STR(psz_cat) &&
