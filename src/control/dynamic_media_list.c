@@ -217,7 +217,7 @@ libvlc_dynamic_media_list_new(
         libvlc_media_descriptor_t * p_md;
         p_md = libvlc_media_list_item_at_index( p_mlist, i, p_e );
         if( libvlc_tag_query_match( p_query, p_md, NULL ) )
-            libvlc_media_list_add_media_descriptor( p_dmlist, p_md, p_e );
+            libvlc_media_list_add_media_descriptor( p_dmlist->p_mlist, p_md, p_e );
     }
 
     /* And we will listen to its event, so we can update p_dmlist->p_mlist
