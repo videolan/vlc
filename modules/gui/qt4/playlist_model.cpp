@@ -95,7 +95,7 @@ void PLItem::updateview( void )
         return;
     }
 
-    for( int i_index=1; i_index <= VLC_META_ENGINE_MB_TRM_ID; i_index = i_index*2 )
+    for( int i_index=1; i_index <= VLC_META_ENGINE_ART_URL; i_index = i_index*2 )
     {
         if( i_showflags & i_index )
         {
@@ -205,7 +205,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
       strings.append( qfu( psz_meta ) ); \
       free( psz_meta );
 
-    for( int i_index=1; i_index <= VLC_META_ENGINE_MB_TRM_ID; i_index = i_index * 2 )
+    for( int i_index=1; i_index <= VLC_META_ENGINE_ART_URL; i_index = i_index * 2 )
     {
         if( parentItem->i_showflags & i_index )
         {
