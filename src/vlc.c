@@ -28,9 +28,10 @@
 #include "config.h"
 
 #include <vlc/vlc.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <locale.h>
 
-#include <stdio.h>
 
 /* Explicit HACK */
 extern void LocaleFree (const char *);
