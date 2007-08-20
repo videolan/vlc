@@ -8,7 +8,11 @@ Important notes:
  * The HTTP interface is now only available on the local machine by default.
    If you want to make it available from other machines, you will have to
    edit the ".hosts" file.
-   XXX: DETAILED INSTRUCTIONS HERE :XXX
+   - On UNIX/Linux, the file is in /usr/share/vlc/http/.hosts
+     If you're using the old http interface, it's located in
+     /usr/share/vlc/http/old/.hosts
+   - On Windows they are in C:\Program Files\VideoLAN\VLC\http\.hosts and
+     C:\Program Files\VideoLAN\VLC\http\old\.hosts
  * This version of VLC contains a new interface for Windows and Linux. This
    interface lacks a few features that used to be present in vlc 0.8.6: 
    - "Streaming wizard" and "VLM control". These features will be replaced
