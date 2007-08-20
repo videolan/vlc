@@ -21,7 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "mediacontrol_internal.h"
 #include <vlc/mediacontrol.h>
 
 #include <vlc/libvlc.h>
@@ -32,6 +31,7 @@
 #include <vlc_aout.h>
 #include <vlc_input.h>
 #include <vlc_osd.h>
+#include "mediacontrol_internal.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>

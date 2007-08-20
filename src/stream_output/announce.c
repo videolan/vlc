@@ -24,14 +24,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                                /* free() */
-#include <stdio.h>                                              /* sprintf() */
-#include <string.h>                                            /* strerror() */
-#include <assert.h>
-
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
 #include "stream_output.h"
+
+#include <assert.h>
+
 
 struct announce_method_t
 {

@@ -1,38 +1,4 @@
-/*****************************************************************************
- * intf_eject.c: CD/DVD-ROM ejection handling functions
- *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
- * $Id$
- *
- * Authors: Julien Blache <jb@technologeek.org> for the Linux part
- *                with code taken from the Linux "eject" command
- *          Jon Lech Johansen <jon-vl@nanocrew.net> for Darwin
- *          Gildas Bazin <gbazin@netcourrier.com> for Win32
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
- *****************************************************************************/
-
-/**
- *  \file
- *  This file contain functions to eject CD and DVD drives
- */
-
 #include <vlc/vlc.h>
-
-#include <stdio.h>
-#include <stdlib.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
@@ -64,7 +30,7 @@
 
 #   include <linux/cdrom.h>
 #   if LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
-#       include <linux/ucdrom.h>
+       include <linux/ucdrom.h>
 #   endif
 
 #   include <scsi/scsi.h>

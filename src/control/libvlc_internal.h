@@ -25,16 +25,16 @@
 #ifndef _LIBVLC_INTERNAL_H
 #define _LIBVLC_INTERNAL_H 1
 
-# ifdef __cplusplus
-extern "C" {
-# endif
-
 #include <vlc/vlc.h>
 #include <vlc/libvlc_structures.h>
 
 #include <vlc_arrays.h>
 #include <vlc_input.h>
-    
+
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 /***************************************************************************
  * Internal creation and destruction functions
  ***************************************************************************/

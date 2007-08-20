@@ -26,7 +26,6 @@
 
 #include <vlc/vlc.h>
 
-#include <stdlib.h>
 #include "libvlc.h"
 
 #define VLC_THREADS_UNINITIALIZED  0

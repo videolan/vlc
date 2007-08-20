@@ -24,11 +24,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 #include <vlc/vlc.h>
 
+#include <ctype.h>
 #include <vlc_acl.h>
 
 #include <errno.h>

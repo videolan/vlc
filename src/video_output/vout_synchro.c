@@ -94,9 +94,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                                /* free() */
-#include <string.h>                                    /* memcpy(), memset() */
-
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
 #include <vlc_input.h>

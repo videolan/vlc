@@ -26,9 +26,6 @@
 #include "vlc_keys.h"
 #include "vlc_charset.h"
 
-#include <stdio.h>                                              /* sprintf() */
-#include <stdlib.h>                                      /* free(), strtol() */
-#include <string.h>                                              /* strdup() */
 #include <errno.h>                                                  /* errno */
 
 #ifdef HAVE_LIMITS_H

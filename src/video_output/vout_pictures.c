@@ -25,9 +25,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                                /* free() */
-#include <stdio.h>                                              /* sprintf() */
-#include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>
 #include <vlc_vout.h>

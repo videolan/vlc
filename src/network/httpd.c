@@ -25,9 +25,6 @@
 
 #include <vlc/vlc.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #ifdef ENABLE_HTTPD
 
 #include <assert.h>

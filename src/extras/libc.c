@@ -27,8 +27,6 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 
-#include <string.h>                                              /* strdup() */
-#include <stdlib.h>
 #include <ctype.h>
 
 

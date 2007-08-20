@@ -21,11 +21,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "libvlc_internal.h"
 #include <vlc/libvlc.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
 #include "input/input_internal.h"
+#include "libvlc_internal.h"
 
 /*
  * Release the associated input thread

@@ -28,8 +28,6 @@
 #include "config.h"
 
 #include <vlc/vlc.h>
-#include <stdio.h>                                              /* fprintf() */
-#include <stdlib.h>                                  /* putenv(), strtol(),  */
 #include <locale.h>
 
 /* Explicit HACK */

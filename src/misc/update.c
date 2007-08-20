@@ -37,8 +37,6 @@
 
 #include <vlc/vlc.h>
 
-#include <stdio.h>
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <ctype.h>                                              /* tolower() */
 
 

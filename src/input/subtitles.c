@@ -27,7 +27,6 @@
  *  This file contains functions to dectect subtitle files.
  */
 
-#include <stdlib.h>
 #include <vlc/vlc.h>
 #include <vlc_input.h>
 #include <vlc_charset.h>

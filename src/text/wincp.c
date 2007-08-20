@@ -23,9 +23,6 @@
 /*** We need your help to complete this file!! Look for FIXME ***/
 
 #include <vlc/vlc.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 #ifndef WIN32
 # include <locale.h>

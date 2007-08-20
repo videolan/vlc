@@ -32,10 +32,6 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 
-#ifdef HAVE_STDLIB_H
-#   include <stdlib.h>                                          /* realloc() */
-#endif
-
 #include "../libvlc.h"
 #include <vlc_vout.h>
 #include <vlc_aout.h>

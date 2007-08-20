@@ -26,7 +26,6 @@
  * libvlc interface to the Transport Layer Security (TLS) plugins.
  */
 
-#include <stdlib.h>
 #include <vlc/vlc.h>
 
 #include <vlc_tls.h>

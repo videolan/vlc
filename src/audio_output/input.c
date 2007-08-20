@@ -28,7 +28,6 @@
 #include <vlc/vlc.h>
 
 #include <stdio.h>
-#include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 #include <math.h>
 

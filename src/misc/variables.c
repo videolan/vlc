@@ -27,9 +27,6 @@
 #include <vlc/vlc.h>
 #include "variables.h"
 
-#ifdef HAVE_STDLIB_H
-#   include <stdlib.h>                                          /* realloc() */
-#endif
 #include "libvlc.h"
 
 /*****************************************************************************
