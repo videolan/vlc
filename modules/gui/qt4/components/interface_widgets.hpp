@@ -110,11 +110,9 @@ public:
     void enableVideo( bool );
 private:
     intf_thread_t *p_intf;
-    QPushButton *slowerButton, *normalButton, *fasterButton;
+    QPushButton *normalButton;
     QPushButton *fullscreenButton, *snapshotButton;
 private slots:
-    void faster();
-    void slower();
     void normal();
     void snapshot();
     void fullscreen();
@@ -134,6 +132,7 @@ public:
     QPushButton *playlistButton;
     QSlider *volumeSlider;
     void setStatus( int );
+    void enableInput( bool );
 public slots:
     void setNavigation( int );
     void updateOnTimer();
@@ -147,6 +146,7 @@ private:
     InputSlider         *slider;
     QPushButton *prevSectionButton, *nextSectionButton, *menuButton;
     QPushButton *playButton;
+    QPushButton *slowerButton, *fasterButton;
 private slots:
     void play();
     void stop();
@@ -156,6 +156,8 @@ private slots:
     void fullscreen();
     void extSettings();
     void prefs();
+    void faster();
+    void slower();
 };
 
 class VolumeClickHandler : public QObject

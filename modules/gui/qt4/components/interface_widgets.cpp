@@ -212,20 +212,11 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     QHBoxLayout *layout = new QHBoxLayout( this );
     layout->setMargin( 0 );
 
-    slowerButton = new QPushButton( "S" );
-    BUTTON_SET_ACT( slowerButton, "S", qtr("Slower" ), slower() );
-    layout->addWidget( slowerButton );
-    slowerButton->setMaximumWidth( 35 );
-
     normalButton = new QPushButton( "N" );
     BUTTON_SET_ACT( normalButton, "N", qtr("Normal rate"), normal() );
     layout->addWidget( normalButton );
     normalButton->setMaximumWidth( 35 );
 
-    fasterButton = new QPushButton( "F" );
-    BUTTON_SET_ACT( fasterButton, "F", qtr("Faster" ), faster() );
-    layout->addWidget( fasterButton );
-    fasterButton->setMaximumWidth( 35 );
 
     layout->addItem( new QSpacerItem( 100,20,
                               QSizePolicy::Expanding, QSizePolicy::Minimum) );
@@ -247,24 +238,14 @@ AdvControlsWidget::~AdvControlsWidget()
 
 void AdvControlsWidget::enableInput( bool enable )
 {
-    slowerButton->setEnabled( enable );
+//    slowerButton->setEnabled( enable );
     normalButton->setEnabled( enable );
-    fasterButton->setEnabled( enable );
+//    fasterButton->setEnabled( enable );
 }
 void AdvControlsWidget::enableVideo( bool enable )
 {
     snapshotButton->setEnabled( enable );
     fullscreenButton->setEnabled( enable );
-}
-
-void AdvControlsWidget::slower()
-{
-    THEMIM->getIM()->slower();
-}
-
-void AdvControlsWidget::faster()
-{
-    THEMIM->getIM()->faster();
 }
 
 void AdvControlsWidget::normal()
@@ -289,13 +270,24 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
 
     /** The main Slider **/
     slider = new InputSlider( Qt::Horizontal, NULL );
-    controlLayout->addWidget( slider, 0, 1, 1, 14 );
+    controlLayout->addWidget( slider, 0, 1, 1, 15 );
     /* Update the position when the IM has changed */
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              slider, setPosition( float,int, int ) );
     /* And update the IM, when the position has changed */
     CONNECT( slider, sliderDragged( float ),
              THEMIM->getIM(), sliderUpdate( float ) );
+
+    /** Slower and faster Buttons **/
+    slowerButton = new QPushButton( "S" );
+    BUTTON_SET_ACT( slowerButton, "S", qtr("Slower" ), slower() );
+    controlLayout->addWidget( slowerButton, 0, 0 );
+    slowerButton->setMaximumSize( QSize( 26, 26 ) );
+
+    fasterButton = new QPushButton( "F" );
+    BUTTON_SET_ACT( fasterButton, "F", qtr("Faster" ), faster() );
+    controlLayout->addWidget( fasterButton, 0, 16 );
+    fasterButton->setMaximumSize( QSize( 26, 26 ) );
 
     /** Disc and Menus handling */
     discFrame = new QFrame( this );
@@ -338,8 +330,8 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     /* Play */
     QPushButton *playButton = new QPushButton;
     playButton->setSizePolicy( sizePolicy );
-    playButton->setMaximumSize( QSize( 45, 45 ) );
-    playButton->setIconSize( QSize( 30, 30 ) );
+    playButton->setMaximumSize( QSize( 26, 26 ) );
+    playButton->setIconSize( QSize( 20, 20 ) );
 
     controlLayout->addWidget( playButton, 2, 0, 2, 2 );
 
@@ -516,13 +508,22 @@ void ControlsWidget::updateOnTimer()
         b_my_volume = false;
     }
 }
+
+/* FIXME */
 void ControlsWidget::setStatus( int status )
 {
     if( status == 1 ) // Playing
-        playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
+    {
+        msg_Dbg( p_intf, "I was here %i", status );
+        // playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
+    }
     else
-        playButton->setIcon( QIcon( ":/pixmaps/play.png" ) ); 
+    {
+        msg_Dbg( p_intf, "I was here %i", status );
+        // playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
+    }
 }
+
 /*
  * This functions toggle the fullscreen mode
  * If there is no video, it should first activate Visualisations... TODO
@@ -539,6 +540,23 @@ void ControlsWidget::extSettings()
 void ControlsWidget::prefs()
 {
     THEDP->prefsDialog();
+}
+
+void ControlsWidget::slower()
+{
+    THEMIM->getIM()->slower();
+}
+
+void ControlsWidget::faster()
+{
+    THEMIM->getIM()->faster();
+}
+
+void ControlsWidget::enableInput( bool enable )
+{
+    slowerButton->setEnabled( enable );
+    slider->setEnabled( enable );
+    fasterButton->setEnabled( enable );
 }
 
 /**********************************************************************

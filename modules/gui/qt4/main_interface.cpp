@@ -887,6 +887,7 @@ void MainInterface::updateOnTimer()
     /* \todo Make this event-driven */
     // TO MOVE TO controls
     advControls->enableInput( THEMIM->getIM()->hasInput() );
+    controls->enableInput( THEMIM->getIM()->hasInput() );
     advControls->enableVideo( THEMIM->getIM()->hasVideo() );
 
     if( intf_ShouldDie( p_intf ) )
