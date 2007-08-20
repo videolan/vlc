@@ -889,6 +889,7 @@ void MainInterface::updateOnTimer()
     advControls->enableInput( THEMIM->getIM()->hasInput() );
     controls->enableInput( THEMIM->getIM()->hasInput() );
     advControls->enableVideo( THEMIM->getIM()->hasVideo() );
+    controls->enableVideo( THEMIM->getIM()->hasVideo() );
 
     if( intf_ShouldDie( p_intf ) )
     {

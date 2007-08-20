@@ -377,17 +377,18 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
      * Might need to be inside a frame to avoid a few resizing pb
      * FIXME
      */
-    /** Playlist Button **/
-    playlistButton = new QPushButton;
-    playlistButton->setMaximumSize( QSize( 26, 26 ) );
-
-    controlLayout->addWidget( playlistButton, 3, 10 );
-
     /** Fullscreen/Visualisation **/
-    QPushButton *fullscreenButton = new QPushButton( "F" );
+    fullscreenButton = new QPushButton( "F" );
     BUTTON_SET_ACT( fullscreenButton, "F", qtr( "Fullscreen" ), fullscreen() );
     fullscreenButton->setMaximumSize( QSize( 26, 26 ) );
     controlLayout->addWidget( fullscreenButton, 3, 11 );
+
+    /** Playlist Button **/
+    playlistButton = new QPushButton;
+    playlistButton->setMaximumSize( QSize( 26, 26 ) );
+    playlistButton->setIconSize( QSize( 20, 20 ) );
+
+    controlLayout->addWidget( playlistButton, 3, 10 );
 
     /** extended Settings **/
     QPushButton *extSettingsButton = new QPushButton( "F" );
@@ -558,6 +559,13 @@ void ControlsWidget::enableInput( bool enable )
     slider->setEnabled( enable );
     fasterButton->setEnabled( enable );
 }
+
+void ControlsWidget::enableVideo( bool enable )
+{
+    // TODO Later make the fullscreenButton toggle Visualisation and so on.
+    fullscreenButton->setEnabled( enable );
+}
+
 
 /**********************************************************************
  * Playlist Widget. The embedded playlist

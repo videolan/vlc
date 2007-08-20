@@ -133,6 +133,7 @@ public:
     QSlider *volumeSlider;
     void setStatus( int );
     void enableInput( bool );
+    void enableVideo( bool );
 public slots:
     void setNavigation( int );
     void updateOnTimer();
@@ -145,7 +146,7 @@ private:
     QGridLayout *controlLayout;
     InputSlider         *slider;
     QPushButton *prevSectionButton, *nextSectionButton, *menuButton;
-    QPushButton *playButton;
+    QPushButton *playButton, *fullscreenButton;
     QPushButton *slowerButton, *fasterButton;
 private slots:
     void play();
