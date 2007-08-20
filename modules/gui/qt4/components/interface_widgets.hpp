@@ -111,7 +111,7 @@ public:
 private:
     intf_thread_t *p_intf;
     QPushButton *normalButton;
-    QPushButton *fullscreenButton, *snapshotButton;
+    QPushButton *snapshotButton;
 private slots:
     void normal();
     void snapshot();

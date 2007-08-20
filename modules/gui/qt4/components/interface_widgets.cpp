@@ -225,11 +225,6 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     BUTTON_SET_ACT( snapshotButton, "S", qtr( "Take a snapshot" ), snapshot() );
     layout->addWidget( snapshotButton );
     snapshotButton->setMaximumWidth( 35 );
-
-    fullscreenButton = new QPushButton( "F" );
-    BUTTON_SET_ACT( fullscreenButton, "F", qtr( "Fullscreen" ), fullscreen() );
-    layout->addWidget( fullscreenButton );
-    fullscreenButton->setMaximumWidth( 35 );
 }
 
 AdvControlsWidget::~AdvControlsWidget()
@@ -245,7 +240,7 @@ void AdvControlsWidget::enableInput( bool enable )
 void AdvControlsWidget::enableVideo( bool enable )
 {
     snapshotButton->setEnabled( enable );
-    fullscreenButton->setEnabled( enable );
+    //fullscreenButton->setEnabled( enable );
 }
 
 void AdvControlsWidget::normal()
@@ -282,12 +277,12 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     slowerButton = new QPushButton( "S" );
     BUTTON_SET_ACT( slowerButton, "S", qtr( "Slower" ), slower() );
     controlLayout->addWidget( slowerButton, 0, 0 );
-    slowerButton->setMaximumSize( QSize( 26, 26 ) );
+    slowerButton->setMaximumSize( QSize( 26, 20 ) );
 
     fasterButton = new QPushButton( "F" );
     BUTTON_SET_ACT( fasterButton, "F", qtr( "Faster" ), faster() );
     controlLayout->addWidget( fasterButton, 0, 16 );
-    fasterButton->setMaximumSize( QSize( 26, 26 ) );
+    fasterButton->setMaximumSize( QSize( 26, 20 ) );
 
     /** Disc and Menus handling */
     discFrame = new QFrame( this );
@@ -330,8 +325,8 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     /* Play */
     QPushButton *playButton = new QPushButton;
     playButton->setSizePolicy( sizePolicy );
-    playButton->setMaximumSize( QSize( 26, 26 ) );
-    playButton->setIconSize( QSize( 20, 20 ) );
+    playButton->setMaximumSize( QSize( 45, 45 ) );
+    playButton->setIconSize( QSize( 30, 30 ) );
 
     controlLayout->addWidget( playButton, 2, 0, 2, 2 );
 
@@ -381,14 +376,14 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     fullscreenButton = new QPushButton( "F" );
     BUTTON_SET_ACT( fullscreenButton, "F", qtr( "Fullscreen" ), fullscreen() );
     fullscreenButton->setMaximumSize( QSize( 26, 26 ) );
-    controlLayout->addWidget( fullscreenButton, 3, 11 );
+    controlLayout->addWidget( fullscreenButton, 3, 10 );
 
     /** Playlist Button **/
     playlistButton = new QPushButton;
-    playlistButton->setMaximumSize( QSize( 45, 45 ) );
-    playlistButton->setIconSize( QSize( 30, 30 ) );
+    playlistButton->setMaximumSize( QSize( 26, 26 ) );
+    playlistButton->setIconSize( QSize( 20, 20 ) );
 
-    controlLayout->addWidget( playlistButton, 3, 10 );
+    controlLayout->addWidget( playlistButton, 3, 11 );
 
     /** extended Settings **/
     QPushButton *extSettingsButton = new QPushButton( "F" );
