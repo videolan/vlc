@@ -187,7 +187,7 @@ struct httpd_client_t
  *****************************************************************************/
 static struct
 {
-    const char *psz_ext;
+    const char psz_ext[8];
     const char *psz_mime;
 } http_mime[] =
 {
@@ -230,7 +230,7 @@ static struct
 
 
     /* end */
-    { NULL,     NULL }
+    { "",       "" }
 };
 
 static const char *httpd_MimeFromUrl( const char *psz_url )
@@ -243,7 +243,7 @@ static const char *httpd_MimeFromUrl( const char *psz_url )
     {
         int i;
 
-        for( i = 0; http_mime[i].psz_ext != NULL ; i++ )
+        for( i = 0; http_mime[i].psz_ext[0] ; i++ )
         {
             if( !strcasecmp( http_mime[i].psz_ext, psz_ext ) )
             {
