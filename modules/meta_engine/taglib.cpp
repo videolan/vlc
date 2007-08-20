@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Rafaël Carré <funman@videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +31,8 @@
 #include <tag.h>
 #include <tstring.h>
 #include <id3v2tag.h>
+#include <textidentificationframe.h>
+#include <tbytevector.h>
 #include <mpegfile.h>
 #include <flacfile.h>
 #if 0
@@ -60,9 +63,9 @@ vlc_module_begin();
         set_callbacks( WriteMeta, NULL );
 vlc_module_end();
 
-static bool checkID3Image( const TagLib::ID3v2::Tag *tag )
+static bool checkID3Image( const TagLib::ID3v2::Tag *p_tag )
 {
-    TagLib::ID3v2::FrameList l = tag->frameListMap()[ "APIC" ];
+    TagLib::ID3v2::FrameList l = p_tag->frameListMap()[ "APIC" ];
     return !l.isEmpty();
 }
 
@@ -111,15 +114,15 @@ static int ReadMeta( vlc_object_t *p_this )
     if( !p_demux->p_private )
         p_demux->p_private = (void*)vlc_meta_New();
     vlc_meta_t *p_meta = (vlc_meta_t *)(p_demux->p_private );
-    TagLib::Tag *tag = f.tag();
+    TagLib::Tag *p_tag = f.tag();
 
     if( TagLib::MPEG::File *p_mpeg =
         dynamic_cast<TagLib::MPEG::File *>(f.file() ) )
     {
         if( p_mpeg->ID3v2Tag() )
         {
-            TagLib::ID3v2::Tag *tag = p_mpeg->ID3v2Tag();
-            TagLib::ID3v2::FrameList list = tag->frameListMap()["UFID"];
+            TagLib::ID3v2::Tag *p_tag = p_mpeg->ID3v2Tag();
+            TagLib::ID3v2::FrameList list = p_tag->frameListMap()["UFID"];
             TagLib::ID3v2::UniqueFileIdentifierFrame* p_ufid;
             for( TagLib::ID3v2::FrameList::Iterator iter = list.begin();
                     iter != list.end(); iter++ )
@@ -142,26 +145,18 @@ static int ReadMeta( vlc_object_t *p_this )
                 }
             }
 
-            list = tag->frameListMap()["TXXX"];
+            list = p_tag->frameListMap()["TXXX"];
             TagLib::ID3v2::UserTextIdentificationFrame* p_txxx;
             for( TagLib::ID3v2::FrameList::Iterator iter = list.begin();
                     iter != list.end(); iter++ )
             {
                 p_txxx = dynamic_cast<TagLib::ID3v2::UserTextIdentificationFrame*>(*iter);
                 const char *psz_desc= p_txxx->description().toCString();
-#if 0 /* musicbrainz artist and album id: not useful (yet?) */
-                if( !strncmp( psz_desc, "MusicBrainz Artist Id", 21 ) )
-                    vlc_meta_SetArtistID( p_meta,
-                            p_txxx->fieldList().toString().toCString());
-                if( !strncmp( psz_desc, "MusicBrainz Album Id", 20 ) )
-                    vlc_meta_SetAlbumID( p_meta,
-                            p_txxx->fieldList().toString().toCString());
-#endif
                 vlc_meta_AddExtra( p_meta, psz_desc, 
                             p_txxx->fieldList().toString().toCString());
             }
 #if 0
-            list = tag->frameListMap()["RVA2"];
+            list = p_tag->frameListMap()["RVA2"];
             TagLib::ID3v2::RelativeVolumeFrame* p_rva2;
             for( TagLib::ID3v2::FrameList::Iterator iter = list.begin();
                     iter != list.end(); iter++ )
@@ -170,7 +165,7 @@ static int ReadMeta( vlc_object_t *p_this )
                 /* TODO: process rva2 frames */
             }
 #endif
-            list = tag->frameList();
+            list = p_tag->frameList();
             TagLib::ID3v2::Frame* p_t;
             char psz_tag[4];
             for( TagLib::ID3v2::FrameList::Iterator iter = list.begin();
@@ -257,12 +252,12 @@ vlc_meta_Set##bar( p_meta, p_t->toString().toCString(true))
         }
     }
 
-#define SET( foo, bar ) vlc_meta_Set##foo( p_meta, tag->bar ().toCString(true))
+#define SET( foo, bar ) vlc_meta_Set##foo( p_meta, p_tag->bar ().toCString(true))
 #define SETINT( foo, bar ) { \
-    char psz_tmp[10]; \
-    snprintf( (char*)psz_tmp, 10, "%d", tag->bar() ); \
-    vlc_meta_Set##foo( p_meta, (char*)psz_tmp ); \
-}
+        char psz_tmp[10]; \
+        snprintf( (char*)psz_tmp, 10, "%d", p_tag->bar() ); \
+        vlc_meta_Set##foo( p_meta, (char*)psz_tmp ); \
+    }
 
     SET( Title, title );
     SET( Artist, artist );
@@ -279,13 +274,6 @@ vlc_meta_Set##bar( p_meta, p_t->toString().toCString(true))
     return VLC_SUCCESS;
 }
 
-#define SET(a,b) if(b) { \
-        TagLib::String *psz_##a = new TagLib::String( b, \
-            TagLib::String::UTF8 ); \
-        tag->set##a( *psz_##a ); \
-        delete psz_##a; \
-    }
-
 static int WriteMeta( vlc_object_t *p_this )
 {
     playlist_t *p_playlist = (playlist_t *)p_this;
@@ -299,48 +287,82 @@ static int WriteMeta( vlc_object_t *p_this )
     }
 
     TagLib::FileRef f( p_export->psz_file );
-    if( !f.isNull() && f.tag() )
+    if( f.isNull() || !f.tag() || f.file()->readOnly() )
     {
-        msg_Dbg( p_this, "Updating metadata for %s", p_export->psz_file );
-
-        TagLib::Tag *tag = f.tag();
-
-        char *psz_meta;
-
-        psz_meta = input_item_GetArtist( p_item );
-        SET( Artist, psz_meta );
-        free( psz_meta );
-
-        psz_meta = input_item_GetTitle( p_item );
-        if( !psz_meta ) psz_meta = input_item_GetName( p_item );
-        TagLib::String *psz_title = new TagLib::String( psz_meta,
-            TagLib::String::UTF8 );
-        tag->setTitle( *psz_title );
-        delete psz_title;
-        free( psz_meta );
-
-        psz_meta = input_item_GetAlbum( p_item );
-        SET( Album, psz_meta );
-        free( psz_meta );
-
-        psz_meta = input_item_GetGenre( p_item );
-        SET( Genre, psz_meta );
-        free( psz_meta );
-
-        psz_meta = input_item_GetDate( p_item );
-        if( psz_meta ) tag->setYear( atoi( psz_meta ) );
-        free( psz_meta );
-
-        psz_meta = input_item_GetTrackNum( p_item );
-        if( psz_meta ) tag->setTrack( atoi( psz_meta ) );
-        free( psz_meta );
-
-        f.save();
-        return VLC_SUCCESS;
+        msg_Err( p_this, "File %s can't be opened for tag writing\n",
+            p_export->psz_file );
+        return VLC_EGENERIC;
     }
-    msg_Err( p_this, "File %s can't be opened for tag writing\n",
-        p_export->psz_file );
-    return VLC_EGENERIC;
+
+    msg_Dbg( p_this, "Writing metadata for %s", p_export->psz_file );
+
+    TagLib::Tag *p_tag = f.tag();
+
+    char *psz_meta;
+
+#define SET(a,b) \
+        if(b) { \
+            TagLib::String *psz_##a = new TagLib::String( b, \
+                TagLib::String::UTF8 ); \
+            p_tag->set##a( *psz_##a ); \
+            delete psz_##a; \
+        }
+
+
+    psz_meta = input_item_GetArtist( p_item );
+    SET( Artist, psz_meta );
+    free( psz_meta );
+
+    psz_meta = input_item_GetTitle( p_item );
+    if( !psz_meta ) psz_meta = input_item_GetName( p_item );
+    TagLib::String *psz_title = new TagLib::String( psz_meta,
+        TagLib::String::UTF8 );
+    p_tag->setTitle( *psz_title );
+    delete psz_title;
+    free( psz_meta );
+
+    psz_meta = input_item_GetAlbum( p_item );
+    SET( Album, psz_meta );
+    free( psz_meta );
+
+    psz_meta = input_item_GetGenre( p_item );
+    SET( Genre, psz_meta );
+    free( psz_meta );
+
+#undef SET
+
+    psz_meta = input_item_GetDate( p_item );
+    if( psz_meta ) p_tag->setYear( atoi( psz_meta ) );
+    free( psz_meta );
+
+    psz_meta = input_item_GetTrackNum( p_item );
+    if( psz_meta ) p_tag->setTrack( atoi( psz_meta ) );
+    free( psz_meta );
+
+    if( TagLib::ID3v2::Tag *p_id3tag =
+        dynamic_cast<TagLib::ID3v2::Tag *>(p_tag) )
+    {
+#define WRITE( foo, bar ) \
+        psz_meta = input_item_Get##foo( p_item ); \
+        if( psz_meta ) \
+        { \
+            TagLib::ByteVector p_byte( bar, 4 ); \
+            TagLib::ID3v2::TextIdentificationFrame p_frame( p_byte ); \
+            p_frame.setText( psz_meta ); \
+            p_id3tag->addFrame( &p_frame ); \
+        } \
+        else free( psz_meta );
+
+        WRITE( Publisher, "TPUB" );
+        WRITE( Copyright, "TCOP" );
+        WRITE( EncodedBy, "TENC" );
+        WRITE( Language, "TLAN" );
+        
+#undef WRITE
+    }
+
+    f.save();
+    return VLC_SUCCESS;
 }
 
 static int DownloadArt( vlc_object_t *p_this )
@@ -350,3 +372,4 @@ static int DownloadArt( vlc_object_t *p_this )
      */
     return VLC_EGENERIC;
 }
+
