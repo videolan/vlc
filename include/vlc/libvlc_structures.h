@@ -152,6 +152,20 @@ typedef struct libvlc_media_list_t libvlc_media_list_t;
 /**@} */
 
 /*****************************************************************************
+ * Dynamic Media List
+ *****************************************************************************/
+/** defgroup libvlc_media_list MediaList
+ * \ingroup libvlc
+ * LibVLC Dynamic Media list: Media list with content synchronized with
+ * an other playlist
+ * @{
+ */
+
+typedef struct libvlc_dynamic_media_list_t libvlc_dynamic_media_list_t;
+
+/**@} */
+
+/*****************************************************************************
  * Media List Player
  *****************************************************************************/
 /** defgroup libvlc_media_list_player MediaListPlayer

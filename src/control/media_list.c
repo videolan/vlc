@@ -153,87 +153,6 @@ uninstall_media_descriptor_observer( libvlc_media_list_t * p_mlist,
                          p_mlist, NULL );
 }
 
-/**************************************************************************
- *       dynamic_list_propose_item (private) (Event Callback)
- *
- * This is called if the dynamic sublist's data provider adds a new item.
- **************************************************************************/
-static void
-dynamic_list_propose_item( const libvlc_event_t * p_event, void * p_user_data )
-{
-    libvlc_media_list_t * p_submlist = p_user_data;
-    libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_added.item;
-
-    //libvlc_media_descriptor_lock( p_md );
-    if( libvlc_tag_query_match( p_submlist->p_query, p_md, NULL ) )
-    {
-        libvlc_media_list_lock( p_submlist );
-        libvlc_media_list_add_media_descriptor( p_submlist, p_md, NULL );
-        libvlc_media_list_unlock( p_submlist );
-    }
-    //libvlc_media_descriptor_unlock( p_md );
-}
-
-/**************************************************************************
- *       dynamic_list_remove_item (private) (Event Callback)
- *
- * This is called if the dynamic sublist's data provider adds a new item.
- **************************************************************************/
-static void
-dynamic_list_remove_item( const libvlc_event_t * p_event, void * p_user_data )
-{
-    libvlc_media_list_t * p_submlist = p_user_data;
-    libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_deleted.item;
-
-    //libvlc_media_descriptor_lock( p_md );
-    if( libvlc_tag_query_match( p_submlist->p_query, p_md, NULL ) )
-    {
-        int i;
-        libvlc_media_list_lock( p_submlist );        
-        i = libvlc_media_list_index_of_item( p_submlist, p_md, NULL );
-        if ( i < 0 )
-        {
-            /* We've missed one item addition, that could happen especially
-             * if we add item in a threaded maner, so we just ignore */
-            libvlc_media_list_unlock( p_submlist );
-            //libvlc_media_descriptor_unlock( p_md );           
-            return;
-        }
-        libvlc_media_list_remove_index( p_submlist, i, NULL );
-        libvlc_media_list_unlock( p_submlist );
-    }
-    //libvlc_media_descriptor_unlock( p_md );
-}
-
-/**************************************************************************
- *       dynamic_list_change_item (private) (Event Callback)
- *
- * This is called if the dynamic sublist's data provider adds a new item.
- **************************************************************************/
-static void
-dynamic_list_change_item( const libvlc_event_t * p_event , void * p_user_data)
-{
-    libvlc_media_list_t * p_submlist = p_user_data;
-    libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_changed.item;
-    int index;
-
-    libvlc_media_list_lock( p_submlist );        
-    
-    index = libvlc_media_list_index_of_item( p_submlist, p_md, NULL );
-    if( index < 0 )
-    {
-        libvlc_media_list_unlock( p_submlist );     
-        return; /* Not found, no prob, just ignore */
-    }
-
-    //libvlc_media_descriptor_lock( p_md );
-    if( !libvlc_tag_query_match( p_submlist->p_query, p_md, NULL ) )
-        libvlc_media_list_remove_index( p_submlist, index, NULL );
-    //libvlc_media_descriptor_unlock( p_md );
-
-    libvlc_media_list_unlock( p_submlist );        
-}
-
 /*
  * Public libvlc functions
  */
@@ -275,7 +194,6 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
     
     ARRAY_INIT(p_mlist->items);
     p_mlist->i_refcount = 1;
-    p_mlist->p_media_provider = NULL;
     p_mlist->psz_name = NULL;
 
     return p_mlist;
@@ -300,11 +218,6 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
     vlc_mutex_unlock( &p_mlist->object_lock );        
 
     /* Refcount null, time to free */
-    if( p_mlist->p_media_provider )
-        libvlc_media_list_release( p_mlist->p_media_provider );
-
-    if( p_mlist->p_query )
-        libvlc_tag_query_release( p_mlist->p_query );
 
     libvlc_event_manager_release( p_mlist->p_event_manager );
 
@@ -536,66 +449,4 @@ libvlc_media_list_event_manager( libvlc_media_list_t * p_mlist,
 {
     (void)p_e;
     return p_mlist->p_event_manager;
-}
-
-/**************************************************************************
- *       libvlc_media_list_dynamic_sublist (Public)
- *
- * Lock should be hold when entering.
- **************************************************************************/
-libvlc_media_list_t *
-libvlc_media_list_dynamic_sublist( libvlc_media_list_t * p_mlist,
-                                   libvlc_tag_query_t * p_query,
-                                   libvlc_exception_t * p_e )
-{
-    libvlc_media_list_t * p_submlist;
-    libvlc_event_manager_t * p_em;
-    int count, i;
-
-    (void)p_e;
-
-    p_submlist = libvlc_media_list_new( p_mlist->p_libvlc_instance, p_e );
-    if( !p_submlist )
-    {
-        if( !libvlc_exception_raised( p_e ) )
-            libvlc_exception_raise( p_e, "Can't get the new media_list" );
-        return NULL;
-    }
-
-    /* We have a query */
-    libvlc_tag_query_retain( p_query );
-    p_submlist->p_query = p_query;
-
-    /* We have a media provider */
-    libvlc_media_list_retain( p_mlist );
-    p_submlist->p_media_provider = p_mlist;
-
-
-    libvlc_media_list_lock( p_submlist );        
-    
-    count = libvlc_media_list_count( p_mlist, p_e );
-
-    /* This should be running in a thread, a good plan to achieve that
-     * move all the dynamic code to libvlc_tag_query. */
-    for( i = 0; i < count; i++ )
-    {
-        libvlc_media_descriptor_t * p_md;
-        p_md = libvlc_media_list_item_at_index( p_mlist, i, p_e );
-        if( libvlc_tag_query_match( p_query, p_md, NULL ) )
-            libvlc_media_list_add_media_descriptor( p_submlist, p_md, p_e );
-    }
-
-    /* And we will listen to its event, so we can update p_submlist
-     * accordingly */
-    p_em = libvlc_media_list_event_manager( p_mlist, p_e );
-    libvlc_event_attach( p_em, libvlc_MediaListItemAdded,
-                         dynamic_list_propose_item, p_submlist, p_e );
-    libvlc_event_attach( p_em, libvlc_MediaListItemDeleted,
-                         dynamic_list_remove_item, p_submlist, p_e );
-    libvlc_event_attach( p_em, libvlc_MediaListItemChanged,
-                         dynamic_list_change_item, p_submlist, p_e );
-
-    libvlc_media_list_unlock( p_submlist );        
-
-    return p_submlist;
 }

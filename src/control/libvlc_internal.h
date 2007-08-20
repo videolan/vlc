@@ -79,7 +79,6 @@ struct libvlc_tag_query_t
     int                i_refcount;
 };
 
-
 struct libvlc_tree_t
 {
     int     i_refcount;
@@ -95,10 +94,20 @@ struct libvlc_media_list_t
     libvlc_instance_t *      p_libvlc_instance;
     int                      i_refcount;
     vlc_mutex_t              object_lock;
-    libvlc_media_list_t *    p_media_provider; /* For dynamic sublist */
-    libvlc_tag_query_t *     p_query;              /* For dynamic sublist */
     char *                   psz_name; /* Usually NULL */
     DECL_ARRAY(void *) items;
+};
+
+struct libvlc_dynamic_media_list_t
+{
+    libvlc_instance_t *     p_libvlc_instance;
+    int                     i_refcount;
+    libvlc_media_list_t *   p_media_provider;
+    libvlc_tag_query_t *    p_query;
+    char *                  psz_tag_key;
+    libvlc_tag_t            tag;
+    struct libvlc_media_list_t *  p_mlist;
+    struct libvlc_media_list_t *  p_provider;
 };
 
 struct libvlc_media_instance_t
