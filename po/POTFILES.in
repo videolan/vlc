@@ -620,7 +620,6 @@ modules/gui/qt4/playlist_model.hpp
 modules/gui/qt4/qt4.cpp
 modules/gui/qt4/qt4.hpp
 modules/gui/qt4/ui/equalizer.ui
-modules/gui/qt4/ui/main_interface.ui
 modules/gui/qt4/ui/open_capture.ui
 modules/gui/qt4/ui/open_disk.ui
 modules/gui/qt4/ui/open_file.ui
