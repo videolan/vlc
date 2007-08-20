@@ -41,6 +41,7 @@
 #include <QSystemTrayIcon>
 #include <QSize>
 #include <QMenu>
+#include <QLabel>
 
 #include <assert.h>
 #include <vlc_keys.h>
