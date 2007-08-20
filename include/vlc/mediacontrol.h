@@ -43,6 +43,7 @@ extern "C" {
 #define WINDOWHANDLE int
 #endif
 
+#include <vlc/libvlc.h>
 #include <vlc/mediacontrol_structures.h>
 
 /**
