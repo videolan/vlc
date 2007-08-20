@@ -346,7 +346,7 @@ typedef struct libvlc_event_t
         /* media instance */
         struct
         {
-            uint64_t new_position;
+            long int new_position;
         } media_instance_position_changed;
 
         /* media list */
