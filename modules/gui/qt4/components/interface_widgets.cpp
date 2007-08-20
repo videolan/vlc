@@ -385,8 +385,8 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
 
     /** Playlist Button **/
     playlistButton = new QPushButton;
-    playlistButton->setMaximumSize( QSize( 26, 26 ) );
-    playlistButton->setIconSize( QSize( 20, 20 ) );
+    playlistButton->setMaximumSize( QSize( 45, 45 ) );
+    playlistButton->setIconSize( QSize( 30, 30 ) );
 
     controlLayout->addWidget( playlistButton, 3, 10 );
 
