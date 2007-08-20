@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,12 +40,11 @@ class QKeyEvent;
 class QLabel;
 class QEvent;
 class InputManager;
-class InputSlider;
 class VideoWidget;
 class BackgroundWidget;
 class PlaylistWidget;
-class VolumeClickHandler;
 class VisualSelector;
+class AdvControlsWidget;
 class ControlsWidget;
 class QMenu;
 class QSize;
@@ -70,7 +70,7 @@ protected:
     void dragMoveEvent( QDragMoveEvent * );
     void dragLeaveEvent( QDragLeaveEvent * );
     void closeEvent( QCloseEvent *);
-    Ui::MainInterfaceUI ui;
+    //Ui::MainInterfaceUI ui;
     friend class VolumeClickHandler;
 private:
     QSettings *settings;
@@ -78,6 +78,8 @@ private:
     QSystemTrayIcon *sysTray;
     QMenu *systrayMenu;
     QString input_name;
+    QVBoxLayout *mainLayout;
+    ControlsWidget *controls;
 
     bool need_components_update;
     void calculateInterfaceSize();
@@ -98,7 +100,7 @@ private:
 
     BackgroundWidget    *bgWidget;
     VisualSelector      *visualSelector;
-    ControlsWidget      *advControls;
+    AdvControlsWidget      *advControls;
     PlaylistWidget      *playlistWidget;
 
     bool                 playlistEmbeddedFlag;
@@ -108,7 +110,6 @@ private:
     bool                 visualSelectorEnabled;
 
     InputManager        *main_input_manager;
-    InputSlider         *slider;
     input_thread_t      *p_input;    ///< Main input associated to the playlist
 
     QLabel              *timeLabel;
@@ -122,46 +123,19 @@ public slots:
     void playlist();
     void toggleUpdateSystrayMenu();
 private slots:
-    void setNavigation( int );
     void setStatus( int );
     void setName( QString );
     void setVLCWindowsTitle( QString title = "" );
     void setDisplay( float, int, int );
     void updateOnTimer();
-    void play();
-    void stop();
-    void prev();
-    void next();
     void visual();
     void advanced();
-    void updateVolume( int sliderVolume );
     void handleSystrayClick(  QSystemTrayIcon::ActivationReason );
     void updateSystrayMenu( int );
     void updateSystrayTooltipName( QString );
     void updateSystrayTooltipStatus( int );
     void showSpeedMenu( QPoint );
     void showTimeMenu( QPoint );
-};
-
-
-class VolumeClickHandler : public QObject
-{
-public:
-    VolumeClickHandler( intf_thread_t *_p_intf, MainInterface *_m ) :QObject(_m)
-    {m = _m; p_intf = _p_intf; }
-    virtual ~VolumeClickHandler() {};
-    bool eventFilter( QObject *obj, QEvent *e )
-    {
-        if (e->type() == QEvent::MouseButtonPress )
-        {
-            aout_VolumeMute( p_intf, NULL );
-            return true;
-        }
-        return false;
-    }
-private:
-    MainInterface *m;
-    intf_thread_t *p_intf;
 };
 
 #endif

@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +28,7 @@
 #include "main_interface.hpp"
 #include "input_manager.hpp"
 
+#include "util/input_slider.hpp"
 #include <vlc_vout.h>
 
 #include <QLabel>
@@ -204,7 +206,7 @@ void VisualSelector::next()
 /**********************************************************************
  * More controls
  **********************************************************************/
-ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
+AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
                                            QFrame( NULL ), p_intf( _p_i )
 {
     QHBoxLayout *layout = new QHBoxLayout( this );
@@ -239,43 +241,304 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     fullscreenButton->setMaximumWidth( 35 );
 }
 
-ControlsWidget::~ControlsWidget()
+AdvControlsWidget::~AdvControlsWidget()
 {
 }
 
-void ControlsWidget::enableInput( bool enable )
+void AdvControlsWidget::enableInput( bool enable )
 {
     slowerButton->setEnabled( enable );
     normalButton->setEnabled( enable );
     fasterButton->setEnabled( enable );
 }
-void ControlsWidget::enableVideo( bool enable )
+void AdvControlsWidget::enableVideo( bool enable )
 {
     snapshotButton->setEnabled( enable );
     fullscreenButton->setEnabled( enable );
 }
 
-void ControlsWidget::slower()
+void AdvControlsWidget::slower()
 {
     THEMIM->getIM()->slower();
 }
 
-void ControlsWidget::faster()
+void AdvControlsWidget::faster()
 {
     THEMIM->getIM()->faster();
 }
 
-void ControlsWidget::normal()
+void AdvControlsWidget::normal()
 {
     THEMIM->getIM()->normalRate();
 }
 
-void ControlsWidget::snapshot()
+void AdvControlsWidget::snapshot()
 {
 }
 
+void AdvControlsWidget::fullscreen()
+{
+}
+
+ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
+                             QFrame( NULL ), p_intf( _p_i )
+{
+    //QSize size( 500, 200 );
+    //resize( size );
+    controlLayout = new QGridLayout( this );
+
+    /** The main Slider **/
+    slider = new InputSlider( Qt::Horizontal, NULL );
+    controlLayout->addWidget( slider, 0, 1, 1, 14 );
+    /* Update the position when the IM has changed */
+    CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
+             slider, setPosition( float,int, int ) );
+    /* And update the IM, when the position has changed */
+    CONNECT( slider, sliderDragged( float ),
+             THEMIM->getIM(), sliderUpdate( float ) );
+
+    /** Disc and Menus handling */
+    discFrame = new QFrame( this );
+    QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
+
+    QPushButton *menuButton = new QPushButton( discFrame );
+    discLayout->addWidget( menuButton );
+
+    QPushButton *prevSectionButton = new QPushButton( discFrame );
+    discLayout->addWidget( prevSectionButton );
+
+    QPushButton *nextSectionButton = new QPushButton( discFrame );
+    discLayout->addWidget( nextSectionButton );
+
+    controlLayout->addWidget( discFrame, 1, 13, 1, 4 );
+
+    BUTTON_SET_IMG( prevSectionButton, "", previous.png, "" );
+    BUTTON_SET_IMG( nextSectionButton, "", next.png, "" );
+    BUTTON_SET_IMG( menuButton, "", previous.png, "" );
+
+    discFrame->hide();
+
+    /* Change the navigation button display when the IM navigation changes */
+    CONNECT( THEMIM->getIM(), navigationChanged( int ),
+             this, setNavigation(int) );
+    /* Changes the IM navigation when triggered on the nav buttons */
+    CONNECT( prevSectionButton, clicked(), THEMIM->getIM(),
+             sectionPrev() );
+    CONNECT( nextSectionButton, clicked(), THEMIM->getIM(),
+             sectionNext() );
+    CONNECT( menuButton, clicked(), THEMIM->getIM(),
+             sectionMenu() );
+
+    /** Play Buttons **/
+    QSizePolicy sizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
+    sizePolicy.setHorizontalStretch( 0 );
+    sizePolicy.setVerticalStretch( 0 );
+//  sizePolicy.setHeightForWidth( playButton->sizePolicy( ).hasHeightForWidth( ) );
+
+    /* Play */
+    QPushButton *playButton = new QPushButton;
+    playButton->setSizePolicy( sizePolicy );
+    playButton->setMaximumSize( QSize( 45, 45 ) );
+    playButton->setIconSize( QSize( 30, 30 ) );
+
+    controlLayout->addWidget( playButton, 2, 0, 2, 2 );
+
+    /** Prev + Stop + Next Block **/
+    QHBoxLayout *controlButLayout = new QHBoxLayout;
+    controlButLayout->setSpacing( 0 ); /* Don't remove that, will be useful */
+
+    /* Prev */
+    QPushButton *prevButton = new QPushButton;
+    prevButton->setSizePolicy( sizePolicy );
+    prevButton->setMaximumSize( QSize( 26, 26 ) );
+    prevButton->setIconSize( QSize( 20, 20 ) );
+
+    controlButLayout->addWidget( prevButton );
+
+    /* Stop */
+    QPushButton *stopButton = new QPushButton;
+    stopButton->setSizePolicy( sizePolicy );
+    stopButton->setMaximumSize( QSize( 26, 26 ) );
+    stopButton->setIconSize( QSize( 20, 20 ) );
+
+    controlButLayout->addWidget( stopButton );
+
+    /* next */
+    QPushButton *nextButton = new QPushButton;
+    nextButton->setSizePolicy( sizePolicy );
+    nextButton->setMaximumSize( QSize( 26, 26 ) );
+    nextButton->setIconSize( QSize( 20, 20 ) );
+
+    controlButLayout->addWidget( nextButton );
+
+    /* Add this block to the main layout */
+    controlLayout->addLayout( controlButLayout, 3, 3, 1, 3 );
+
+    BUTTON_SET_ACT_I( playButton, "", play.png, qtr("Play"), play() );
+    BUTTON_SET_ACT_I( prevButton, "" , previous.png,
+                      qtr("Previous"), prev() );
+    BUTTON_SET_ACT_I( nextButton, "", next.png, qtr("Next"), next() );
+    BUTTON_SET_ACT_I( stopButton, "", stop.png, qtr("Stop"), stop() );
+
+    /*
+     * Other first Line buttons
+     * Might need to be inside a frame to avoid a few resizing pb
+     * FIXME
+     */
+    /** Playlist Button **/
+    playlistButton = new QPushButton;
+    playlistButton->setMaximumSize(QSize(45, 45));
+
+    controlLayout->addWidget( playlistButton, 3, 10 );
+
+    /** Fullscreen/Visualisation **/
+    QPushButton *fullscreenButton = new QPushButton( "F" );
+    BUTTON_SET_ACT( fullscreenButton, "F", qtr("Fullscreen"), fullscreen() );
+    fullscreenButton->setMaximumSize( QSize( 26, 26 ) );
+    controlLayout->addWidget( fullscreenButton, 3, 11 );
+
+    /** extended Settings **/
+    QPushButton *extSettingsButton = new QPushButton( "F" );
+    BUTTON_SET_ACT( extSettingsButton, "Ex", qtr("Extended Settings"),
+            extSettings() );
+    extSettingsButton->setMaximumSize( QSize( 26, 26 ) );
+    controlLayout->addWidget( extSettingsButton, 3, 12 );
+
+    /** Preferences **/
+    QPushButton *prefsButton = new QPushButton( "P" );
+    BUTTON_SET_ACT( prefsButton, "P", qtr("Preferences / Settings"), prefs() );
+    prefsButton->setMaximumSize( QSize( 26, 26 ) );
+    controlLayout->addWidget( prefsButton, 3, 13 );
+
+    /* Volume */
+    VolumeClickHandler *h = new VolumeClickHandler( p_intf, this );
+
+    QLabel *volMuteLabel = new QLabel;
+    volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
+    volMuteLabel->setToolTip( qtr( "Mute" ) );
+    volMuteLabel->installEventFilter(h);
+
+    volumeSlider = new QSlider;
+    volumeSlider->setSizePolicy( sizePolicy );
+    volumeSlider->setMaximumSize( QSize(80, 200) );
+    volumeSlider->setOrientation( Qt::Horizontal );
+
+    volumeSlider->setMaximum( 100 );
+    volumeSlider->setFocusPolicy( Qt::NoFocus );
+    controlLayout->addWidget( volMuteLabel, 3, 14 );
+    controlLayout->addWidget( volumeSlider, 3, 15, 1, 2 );
+
+    /* Volume control connection */
+    CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
+
+}
+ControlsWidget::~ControlsWidget()
+{
+}
+void ControlsWidget::stop()
+{
+    THEMIM->stop();
+}
+
+void ControlsWidget::play()
+{
+    if( playlist_IsEmpty(THEPL) )
+    {
+        /* The playlist is empty, open a file requester */
+        THEDP->openFileDialog();
+        setStatus( 0 );
+        return;
+    }
+    THEMIM->togglePlayPause();
+}
+
+void ControlsWidget::prev()
+{
+    THEMIM->prev();
+}
+
+void ControlsWidget::next()
+{
+    THEMIM->next();
+}
+
+void ControlsWidget::setNavigation( int navigation )
+{
+#define HELP_MENU N_("Menu")
+#define HELP_PCH N_("Previous chapter")
+#define HELP_NCH N_("Next chapter")
+#define HELP_PTR N_("Previous track")
+#define HELP_NTR N_("Next track")
+
+    // 1 = chapter, 2 = title, 0 = no
+    if( navigation == 0 )
+    {
+        discFrame->hide();
+    } else if( navigation == 1 ) {
+        prevSectionButton->show();
+        prevSectionButton->setToolTip( qfu(HELP_PCH) );
+        nextSectionButton->show();
+        nextSectionButton->setToolTip( qfu(HELP_NCH) );
+        menuButton->show();
+        discFrame->show();
+    } else {
+        prevSectionButton->show();
+        prevSectionButton->setToolTip( qfu(HELP_PCH) );
+        nextSectionButton->show();
+        nextSectionButton->setToolTip( qfu(HELP_NCH) );
+        menuButton->hide();
+        discFrame->show();
+    }
+}
+
+static bool b_my_volume;
+void ControlsWidget::updateVolume( int sliderVolume )
+{
+    if( !b_my_volume )
+    {
+        int i_res = sliderVolume * AOUT_VOLUME_MAX /
+                            ( 2*volumeSlider->maximum() );
+        aout_VolumeSet( p_intf, i_res );
+    }
+}
+
+void ControlsWidget::updateOnTimer()
+{
+    audio_volume_t i_volume;
+    aout_VolumeGet( p_intf, &i_volume );
+    i_volume = (i_volume *  200 )/ AOUT_VOLUME_MAX ;
+    int i_gauge = volumeSlider->value();
+    b_my_volume = false;
+    if( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
+    {
+        b_my_volume = true;
+        volumeSlider->setValue( i_volume );
+        b_my_volume = false;
+    }
+}
+void ControlsWidget::setStatus( int status )
+{
+    if( status == 1 ) // Playing
+        playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
+    else
+        playButton->setIcon( QIcon( ":/pixmaps/play.png" ) ); 
+}
+/*
+ * This functions toggle the fullscreen mode
+ * If there is no video, it should first activate Visualisations... TODO
+ */
 void ControlsWidget::fullscreen()
 {
+    msg_Dbg(p_intf, "Not implemented yet");
+}
+
+void ControlsWidget::extSettings()
+{
+    THEDP->extendedDialog();
+}
+void ControlsWidget::prefs()
+{
+    THEDP->prefsDialog();
 }
 
 /**********************************************************************

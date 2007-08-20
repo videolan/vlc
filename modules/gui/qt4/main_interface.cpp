@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +25,6 @@
 #include "qt4.hpp"
 #include "main_interface.hpp"
 #include "input_manager.hpp"
-#include "util/input_slider.hpp"
 #include "util/qvlcframe.hpp"
 #include "util/customwidgets.hpp"
 #include "dialogs_provider.hpp"
@@ -152,6 +152,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              this, showSpeedMenu( QPoint ) );
     CONNECT( timeLabel, customContextMenuRequested( QPoint ),
              this, showTimeMenu( QPoint ) );
+
     /* Systray */
     sysTray = NULL;
     if( config_GetInt( p_intf, "qt-start-minimized") )
@@ -172,12 +173,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      * CONNECTs
      **/
 
-    /* Volume control */
-    CONNECT( ui.volumeSlider, valueChanged(int), this, updateVolume(int) );
-
     /* Connect the input manager to the GUI elements it manages */
-    CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
-             slider, setPosition( float,int, int ) );
+    /* It is also connected to the control->slider */
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, setDisplay( float, int, int ) );
 
@@ -197,23 +194,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* PLAY_STATUS */
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
-    CONNECT( THEMIM->getIM(), navigationChanged( int ),
-             this, setNavigation(int) );
     if( config_GetInt( p_intf, "qt-system-tray" ) && sysTray )
     {
         CONNECT( THEMIM->getIM(), statusChanged( int ), this,
                  updateSystrayTooltipStatus( int ) );
     }
-    CONNECT( slider, sliderDragged( float ),
-             THEMIM->getIM(), sliderUpdate( float ) );
-
-    /* Buttons */
-    CONNECT( ui.prevSectionButton, clicked(), THEMIM->getIM(),
-             sectionPrev() );
-    CONNECT( ui.nextSectionButton, clicked(), THEMIM->getIM(),
-             sectionNext() );
-    CONNECT( ui.menuButton, clicked(), THEMIM->getIM(),
-             sectionMenu() );
 
     /**
      * Callbacks
@@ -281,7 +266,7 @@ void MainInterface::setVLCWindowsTitle( QString aTitle )
 void MainInterface::handleMainUi( QSettings *settings )
 {
     QWidget *main = new QWidget( this );
-    QVBoxLayout *mainLayout = new QVBoxLayout( main );
+    mainLayout = new QVBoxLayout( main );
     setCentralWidget( main );
 
     /* Margins, spacing */
@@ -289,36 +274,13 @@ void MainInterface::handleMainUi( QSettings *settings )
     mainLayout->setMargin( 0 );
 
     /* CONTROLS */
-    QWidget *controls = new QWidget;
-    ui.setupUi( controls );
+    controls = new ControlsWidget( p_intf );
 
     /* Configure the UI */
-    slider = new InputSlider( Qt::Horizontal, NULL );
-    mainLayout->insertWidget( 0, slider );
-    ui.discFrame->hide();
-
-    BUTTON_SET_IMG( ui.prevSectionButton, "", previous.png, "" );
-    BUTTON_SET_IMG( ui.nextSectionButton, "", next.png, "" );
-    BUTTON_SET_IMG( ui.menuButton, "", previous.png, "" );
-
-    BUTTON_SET_ACT_I( ui.prevButton, "" , previous.png,
-                      qtr("Previous"), prev() );
-    BUTTON_SET_ACT_I( ui.nextButton, "", next.png, qtr("Next"), next() );
-    BUTTON_SET_ACT_I( ui.playButton, "", play.png, qtr("Play"), play() );
-    BUTTON_SET_ACT_I( ui.stopButton, "", stop.png, qtr("Stop"), stop() );
-
-    /* Volume */
-    ui.volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
-    ui.volumeSlider->setMaximum( 100 );
-    ui.volMuteLabel->setToolTip( qtr( "Mute" ) );
-    VolumeClickHandler *h = new VolumeClickHandler( p_intf, this );
-    ui.volMuteLabel->installEventFilter(h);
-    ui.volumeSlider->setFocusPolicy( Qt::NoFocus );
-
-    BUTTON_SET_IMG( ui.playlistButton, "" , playlist_icon.png,
+    BUTTON_SET_IMG( controls->playlistButton, "" , playlist_icon.png,
                         playlistEmbeddedFlag ?  qtr( "Show playlist" ) :
                                                 qtr( "Open playlist" ) );
-    BUTTONACT( ui.playlistButton, playlist() );
+    BUTTONACT( controls->playlistButton, playlist() );
 
 #if DEBUG_COLOR
     QPalette palette;
@@ -335,7 +297,7 @@ void MainInterface::handleMainUi( QSettings *settings )
     addSize = QSize( mainLayout->margin() * 2, PREF_H );
 
     /* advanced Controls handling */
-    advControls = new ControlsWidget( p_intf );
+    advControls = new AdvControlsWidget( p_intf );
     mainLayout->insertWidget( 0, advControls );
     advControls->updateGeometry();
     if( !advControlsEnabled ) advControls->hide();
@@ -731,7 +693,7 @@ void MainInterface::playlist()
     {
         PlaylistDialog::killInstance();
         playlistWidget = new PlaylistWidget( p_intf );
-        ui.vboxLayout->insertWidget( 0, playlistWidget );
+        mainLayout->insertWidget( 0, playlistWidget );
         playlistWidget->widgetSize = settings->value( "playlistSize",
                                                QSize( 650, 310 ) ).toSize();
         playlistWidget->hide();
@@ -779,7 +741,7 @@ void MainInterface::undockPlaylist()
     {
         playlistWidget->hide();
         playlistWidget->deleteLater();
-        ui.vboxLayout->removeWidget( playlistWidget );
+        mainLayout->removeWidget( playlistWidget );
         playlistWidget = NULL;
         playlistEmbeddedFlag = false;
 
@@ -897,33 +859,6 @@ void MainInterface::wheelEvent( QWheelEvent *e )
     e->accept();
 }
 
-void MainInterface::stop()
-{
-    THEMIM->stop();
-}
-
-void MainInterface::play()
-{
-    if( playlist_IsEmpty(THEPL) )
-    {
-        /* The playlist is empty, open a file requester */
-        THEDP->openFileDialog();
-        setStatus( 0 );
-        return;
-    }
-    THEMIM->togglePlayPause();
-}
-
-void MainInterface::prev()
-{
-    THEMIM->prev();
-}
-
-void MainInterface::next()
-{
-    THEMIM->next();
-}
-
 void MainInterface::setDisplay( float pos, int time, int length )
 {
     char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
@@ -942,48 +877,15 @@ void MainInterface::setName( QString name )
 
 void MainInterface::setStatus( int status )
 {
-    if( status == 1 ) // Playing
-        ui.playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
-    else
-        ui.playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
+    controls->setStatus( status );
     if( systrayMenu )
         updateSystrayMenu( status );
 }
 
-#define HELP_MENU N_("Menu")
-#define HELP_PCH N_("Previous chapter")
-#define HELP_NCH N_("Next chapter")
-#define HELP_PTR N_("Previous track")
-#define HELP_NTR N_("Next track")
-
-void MainInterface::setNavigation( int navigation )
-{
-    // 1 = chapter, 2 = title, 0 = no
-    if( navigation == 0 )
-    {
-        ui.discFrame->hide();
-    } else if( navigation == 1 ) {
-        ui.prevSectionButton->show();
-        ui.prevSectionButton->setToolTip( qfu(HELP_PCH) );
-        ui.nextSectionButton->show();
-        ui.nextSectionButton->setToolTip( qfu(HELP_NCH) );
-        ui.menuButton->show();
-        ui.discFrame->show();
-    } else {
-        ui.prevSectionButton->show();
-        ui.prevSectionButton->setToolTip( qfu(HELP_PCH) );
-        ui.nextSectionButton->show();
-        ui.nextSectionButton->setToolTip( qfu(HELP_NCH) );
-        ui.menuButton->hide();
-        ui.discFrame->show();
-    }
-}
-
-static bool b_my_volume;
-
 void MainInterface::updateOnTimer()
 {
     /* \todo Make this event-driven */
+    // TO MOVE TO controls
     advControls->enableInput( THEMIM->getIM()->hasInput() );
     advControls->enableVideo( THEMIM->getIM()->hasVideo() );
 
@@ -998,33 +900,13 @@ void MainInterface::updateOnTimer()
         need_components_update = false;
     }
 
-    audio_volume_t i_volume;
-    aout_VolumeGet( p_intf, &i_volume );
-    i_volume = (i_volume *  200 )/ AOUT_VOLUME_MAX ;
-    int i_gauge = ui.volumeSlider->value();
-    b_my_volume = false;
-    if( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
-    {
-        b_my_volume = true;
-        ui.volumeSlider->setValue( i_volume );
-        b_my_volume = false;
-    }
+    controls->updateOnTimer();
 }
 
 void MainInterface::closeEvent( QCloseEvent *e )
 {
     hide();
     vlc_object_kill( p_intf );
-}
-
-void MainInterface::updateVolume( int sliderVolume )
-{
-    if( !b_my_volume )
-    {
-        int i_res = sliderVolume * AOUT_VOLUME_MAX /
-                            (2*ui.volumeSlider->maximum() );
-        aout_VolumeSet( p_intf, i_res );
-    }
 }
 
 static int InteractCallback( vlc_object_t *p_this,

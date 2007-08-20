@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +28,7 @@
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 
+#include <vlc_aout.h>
 #include "qt4.hpp"
 
 #include <QWidget>
@@ -98,12 +100,12 @@ private slots:
 };
 
 class QPushButton;
-class ControlsWidget : public QFrame
+class AdvControlsWidget : public QFrame
 {
     Q_OBJECT
 public:
-    ControlsWidget( intf_thread_t *);
-    virtual ~ControlsWidget();
+    AdvControlsWidget( intf_thread_t *);
+    virtual ~AdvControlsWidget();
     void enableInput( bool );
     void enableVideo( bool );
 private:
@@ -116,6 +118,64 @@ private slots:
     void normal();
     void snapshot();
     void fullscreen();
+};
+
+class InputSlider;
+class QSlider;
+class QGridLayout;
+class VolumeClickHandler;
+class ControlsWidget : public QFrame
+{
+    Q_OBJECT
+public:
+    ControlsWidget( intf_thread_t *);
+    virtual ~ControlsWidget();
+
+    QPushButton *playlistButton;
+    QSlider *volumeSlider;
+    void setStatus( int );
+public slots:
+    void setNavigation( int );
+    void updateOnTimer();
+protected:
+    friend class MainInterface;
+    friend class VolumeClickHandler;
+private:
+    intf_thread_t *p_intf;
+    QFrame *discFrame;
+    QGridLayout *controlLayout;
+    InputSlider         *slider;
+    QPushButton *prevSectionButton, *nextSectionButton, *menuButton;
+    QPushButton *playButton;
+private slots:
+    void play();
+    void stop();
+    void prev();
+    void next();
+    void updateVolume( int );
+    void fullscreen();
+    void extSettings();
+    void prefs();
+};
+
+class VolumeClickHandler : public QObject
+{
+public:
+    VolumeClickHandler( intf_thread_t *_p_intf, ControlsWidget *_m ) :QObject(_m)
+    {m = _m; p_intf = _p_intf; }
+    virtual ~VolumeClickHandler() {};
+    bool eventFilter( QObject *obj, QEvent *e )
+    {
+        if (e->type() == QEvent::MouseButtonPress )
+        {
+            aout_VolumeMute( p_intf, NULL );
+            return true;
+        }
+        return false;
+    }
+private:
+    ControlsWidget *m;
+    intf_thread_t *p_intf;
 };
 
 
