@@ -125,9 +125,49 @@ input_state_changed( vlc_object_t * p_this, char const * psz_cmd,
         case END_S:
             event.type = libvlc_MediaInstanceReachedEnd;
             break;
+        case PAUSE_S:
+            event.type = libvlc_MediaInstancePaused;
+            break;
+        case PLAYING_S:
+            event.type = libvlc_MediaInstancePlayed;
+            break;
         default:
             return VLC_SUCCESS;
     }
+
+    libvlc_event_send( p_mi->p_event_manager, &event );
+    return VLC_SUCCESS;
+}
+
+/*
+ * input_position_changed (Private) (input var "intf-change" Callback)
+ */
+static int
+input_position_changed( vlc_object_t * p_this, char const * psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval,
+                     void * p_userdata )
+{
+    libvlc_media_instance_t * p_mi = p_userdata;
+    vlc_value_t val;
+    
+    if (!strcmp(psz_cmd, "intf" /* "-change" no need to go further */))
+    {
+        input_thread_t * p_input = (input_thread_t *)p_this;
+        var_Get( p_input, "position", &val );
+
+        if ((val.i_time % I64C(500000)) != 0)
+            return VLC_SUCCESS; /* No need to have a better precision */
+        var_Get( p_input, "state", &val );
+
+        if( val.i_int != PLAYING_S )
+            return VLC_SUCCESS; /* Don't send the position while stopped */
+    }
+    else
+        val.i_time = newval.i_time;
+
+    libvlc_event_t event;
+    event.type = libvlc_MediaInstancePositionChanged;
+    event.u.media_instance_position_changed.new_position = val.i_time;
 
     libvlc_event_send( p_mi->p_event_manager, &event );
     return VLC_SUCCESS;
@@ -419,6 +459,7 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
         var_Set( p_input_thread, "drawable", val );
     }
     var_AddCallback( p_input_thread, "state", input_state_changed, p_mi );
+    var_AddCallback( p_input_thread, "intf-change", input_position_changed, p_mi );
 
     /* will be released in media_instance_release() */
     vlc_object_yield( p_input_thread );

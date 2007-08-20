@@ -301,11 +301,18 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaDescriptorMetaChanged,
     libvlc_MediaDescriptorSubItemAdded,
 
+    libvlc_MediaInstancePlayed,
+    libvlc_MediaInstancePaused,
     libvlc_MediaInstanceReachedEnd,
-
+    libvlc_MediaInstancePositionChanged,
+    
     libvlc_MediaListItemAdded,
     libvlc_MediaListItemDeleted,
     libvlc_MediaListItemChanged,
+
+    libvlc_MediaListPlayerPlayed,
+    libvlc_MediaListPlayerNextItemSet,
+    libvlc_MediaListPlayerStopped,
 
     libvlc_TreeSubtreeAdded,
     libvlc_TreeSubtreeDeleted,
@@ -335,6 +342,12 @@ typedef struct libvlc_event_t
         {
             libvlc_media_descriptor_t * new_child;
         } media_descriptor_subitem_added;
+
+        /* media instance */
+        struct
+        {
+            uint64_t new_position;
+        } media_instance_position_changed;
 
         /* media list */
         struct

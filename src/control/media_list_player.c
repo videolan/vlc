@@ -138,6 +138,7 @@ uninstall_media_instance_observer( libvlc_media_list_player_t * p_mlp )
                          libvlc_MediaInstanceReachedEnd,
 					     media_instance_reached_end, p_mlp, NULL );
 }
+
 /**************************************************************************
  *       Stop (Public)
  **************************************************************************/
@@ -191,7 +192,7 @@ media_list_player_set_next( libvlc_media_list_player_t * p_mlp, int index,
  */
 
 /**************************************************************************
- *         libvlc_media_list_player_new (Public)
+ *         new (Public)
  **************************************************************************/
 libvlc_media_list_player_t *
 libvlc_media_list_player_new( libvlc_instance_t * p_instance,
@@ -204,12 +205,19 @@ libvlc_media_list_player_new( libvlc_instance_t * p_instance,
     p_mlp->p_mi = NULL;
     p_mlp->p_mlist = NULL;
     vlc_mutex_init( p_instance->p_libvlc_int, &p_mlp->object_lock );
-    
+    p_mlp->p_event_manager = libvlc_event_manager_new( p_mlp,
+                                                       p_instance,
+                                                       p_e );
+    libvlc_event_manager_register_event_type( p_mlp->p_event_manager,
+            libvlc_MediaListPlayerNextItemSet, p_e );
+    libvlc_event_manager_register_event_type( p_mlp->p_event_manager,
+            libvlc_MediaListPlayerNextItemSet, p_e );
+
 	return p_mlp;
 }
 
 /**************************************************************************
- *         libvlc_media_list_player_release (Public)
+ *         release (Public)
  **************************************************************************/
 void libvlc_media_list_player_release( libvlc_media_list_player_t * p_mlp )
 {
@@ -217,7 +225,7 @@ void libvlc_media_list_player_release( libvlc_media_list_player_t * p_mlp )
 }
 
 /**************************************************************************
- *        libvlc_media_list_player_set_media_instance (Public)
+ *        set_media_instance (Public)
  **************************************************************************/
 void libvlc_media_list_player_set_media_instance(
                                      libvlc_media_list_player_t * p_mlp,
@@ -240,7 +248,7 @@ void libvlc_media_list_player_set_media_instance(
 }
 
 /**************************************************************************
- *       Set a playlist (Public)
+ *       set_media_list (Public)
  **************************************************************************/
 void libvlc_media_list_player_set_media_list(
                                      libvlc_media_list_player_t * p_mlp,
@@ -274,9 +282,7 @@ void libvlc_media_list_player_play( libvlc_media_list_player_t * p_mlp,
     if( p_mlp->i_current_playing_index < 0 )
     {
         libvlc_media_list_player_next( p_mlp, p_e );
-
-        if( libvlc_exception_raised( p_e ) )
-            return;
+        return; /* Will set to play */
     }
 
 	libvlc_media_instance_play( p_mlp->p_mi, p_e );
@@ -296,6 +302,11 @@ void libvlc_media_list_player_play_item_at_index(
 
 	if( libvlc_exception_raised( p_e ) )
 		return;
+
+    /* Send the next item event */
+    libvlc_event_t event;
+    event.type = libvlc_MediaListPlayerNextItemSet;
+    libvlc_event_send( p_mlp->p_event_manager, &event );
 
 	libvlc_media_instance_play( p_mlp->p_mi, p_e );
 }
@@ -336,6 +347,13 @@ void libvlc_media_list_player_next( libvlc_media_list_player_t * p_mlp,
 
 	media_list_player_set_next( p_mlp, index, p_e );
 	
+    libvlc_media_instance_play( p_mlp->p_mi, p_e );
+
     libvlc_media_list_unlock( p_mlp->p_mlist );
+
+    /* Send the next item event */
+    libvlc_event_t event;
+    event.type = libvlc_MediaListPlayerNextItemSet;
+    libvlc_event_send( p_mlp->p_event_manager, &event);
 }
 
