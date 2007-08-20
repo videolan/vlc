@@ -305,14 +305,10 @@ static int Open( vlc_object_t *p_this )
                        ppsz_sout_options, p_stream->p_cfg );
 
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
+    if( p_sys == NULL )
+        return VLC_ENOMEM;
 
-    p_sys->psz_destination = var_GetString( p_stream, SOUT_CFG_PREFIX "dst" );
-    if( *p_sys->psz_destination == '\0' )
-    {
-        free( p_sys->psz_destination );
-        p_sys->psz_destination = NULL;
-    }
-
+    p_sys->psz_destination = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "dst" );
     p_sys->psz_session_name = var_GetString( p_stream, SOUT_CFG_PREFIX "name" );
     p_sys->psz_session_description = var_GetString( p_stream, SOUT_CFG_PREFIX "description" );
     p_sys->psz_session_url = var_GetString( p_stream, SOUT_CFG_PREFIX "url" );
@@ -376,24 +372,20 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "ttl", &val );
-    if( val.i_int == 0 )
+    p_sys->i_ttl = var_GetInteger( p_stream, SOUT_CFG_PREFIX "ttl" );
+    if( p_sys->i_ttl == 0 )
     {
         /* Normally, we should let the default hop limit up to the core,
          * but we have to know it to build our SDP properly, which is why
          * we ask the core. FIXME: broken when neither sout-rtp-ttl nor
          * ttl are set. */
-        val.i_int = config_GetInt( p_stream, "ttl" );
+        p_sys->i_ttl = config_GetInt( p_stream, "ttl" );
     }
-    if( val.i_int > 255 ) val.i_int = 255;
+    if( p_sys->i_ttl > 255 )
+        p_sys->i_ttl = 255;
     /* must not exceed 999 once formatted */
 
-    if( val.i_int < 0 )
-        msg_Warn( p_stream, "illegal TTL %d, the SDP advertised value will be faked", val.i_int );
-    p_sys->i_ttl = val.i_int;
-
-    var_Get( p_stream, SOUT_CFG_PREFIX "mp4a-latm", &val );
-    p_sys->b_latm = val.b_bool;
+    p_sys->b_latm = var_GetBool( p_stream, SOUT_CFG_PREFIX "mp4a-latm" );
 
     p_sys->i_payload_type = 96;
     p_sys->i_es = 0;
@@ -441,13 +433,14 @@ static int Open( vlc_object_t *p_this )
         }
         else if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' )
         {
-            msg_Err( p_stream, "rtp needs a destination when muxing" );
+            msg_Err( p_stream, "RTP needs a destination when muxing" );
             free( p_sys );
             return VLC_EGENERIC;
         }
 
         /* Check muxer type */
-        if( !strncasecmp( val.psz_string, "ps", 2 ) || !strncasecmp( val.psz_string, "mpeg1", 5 ) )
+        if( !strncasecmp( val.psz_string, "ps", 2 )
+         || !strncasecmp( val.psz_string, "mpeg1", 5 ) )
         {
             psz_rtpmap = "MP2P/90000";
         }
@@ -470,21 +463,22 @@ static int Open( vlc_object_t *p_this )
         }
         else
         {
-            sprintf( access, "udp{raw,rtcp}" );
+            strcat( access, "udp{raw,rtcp}" );
         }
 
-        /* IPv6 needs brackets if not already present */
-        snprintf( url, sizeof( url ),
-                  ( ( p_sys->psz_destination[0] != '[' ) 
-                 && ( strchr( p_sys->psz_destination, ':' ) != NULL ) )
-                  ? "[%s]:%d" : "%s:%d", p_sys->psz_destination,
-                  p_sys->i_port );
-        url[sizeof( url ) - 1] = '\0';
         /* FIXME: we should check that url is a numerical address, otherwise
          * the SDP will be quite broken (regardless of the IP protocol version)
          * Also it might be IPv6 with no ':' if it is a DNS name.
          */
         ipv = ( strchr( p_sys->psz_destination, ':' ) != NULL ) ? '6' : '4';
+
+        /* IPv6 needs brackets if not already present */
+        if ((ipv == '6') && (p_sys->psz_destination[0] != '['))
+            snprintf (url, sizeof (url), "[%s]:%d",p_sys->psz_destination,
+                      p_sys->i_port);
+        else
+            snprintf (url, sizeof (url), "%s:%d",p_sys->psz_destination,
+                      p_sys->i_port);
 
         if( !( p_sys->p_access = sout_AccessOutNew( p_sout, access, url ) ) )
         {
@@ -531,7 +525,8 @@ static int Open( vlc_object_t *p_this )
 	   a= source-filter: we need our source address
            a= x-plgroup: (missing)
            RTP packets need to get the correct src IP address  */
-        if( ipv == 4 && net_AddressIsMulticast( VLC_OBJECT(p_stream), p_sys->psz_destination ) )
+        if( ipv == '4'
+         && net_AddressIsMulticast( VLC_OBJECT(p_stream), p_sys->psz_destination ) )
         {
             snprintf( psz_ttl, sizeof( psz_ttl ), "/%d", p_sys->i_ttl );
             psz_ttl[sizeof( psz_ttl ) - 1] = '\0';
