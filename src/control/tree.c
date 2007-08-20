@@ -40,7 +40,15 @@ notify_subtree_addition( libvlc_tree_t * p_tree,
                          libvlc_tree_t * p_subtree,
                          int index )
 {
+    libvlc_event_t event;
 
+    /* Construct the event */
+    event.type = libvlc_TreeSubtreeAdded;
+    event.u.tree_subtree_added.subtree = p_subtree;
+    event.u.tree_subtree_added.index = index;
+
+    /* Send the event */
+    libvlc_event_send( p_tree->p_event_manager, &event );
 }
 
 /**************************************************************************
@@ -53,8 +61,38 @@ notify_subtree_deletion( libvlc_tree_t * p_tree,
                          libvlc_tree_t * p_subtree,
                          int index )
 {
+    libvlc_event_t event;
 
+    /* Construct the event */
+    event.type = libvlc_TreeSubtreeDeleted;
+    event.u.tree_subtree_deleted.subtree = p_subtree;
+    event.u.tree_subtree_deleted.index = index;
+
+    /* Send the event */
+    libvlc_event_send( p_tree->p_event_manager, &event );
 }
+
+#ifdef NOT_USED
+/**************************************************************************
+ *       notify_tree_item_value_changed (private)
+ *
+ * Do the appropriate action when a tree's item changes.
+ **************************************************************************/
+static void
+notify_tree_item_value_changed( libvlc_tree_t * p_tree,
+                                libvlc_tree_t * p_subtree,
+                                int index )
+{
+    libvlc_event_t event;
+
+    /* Construct the event */
+    event.type = libvlc_TreeItemValueChanged;
+    event.u.tree_item_value_changed.new_value = p_tree->p_item;
+
+    /* Send the event */
+    libvlc_event_send( p_tree->p_event_manager, &event );
+}
+#endif
 
 /**************************************************************************
  *       new (Private)
@@ -76,6 +114,15 @@ libvlc_tree_new( libvlc_retain_function item_retain,
     p_tree->i_refcount = 1;
     p_tree->p_item = item;
     ARRAY_INIT( p_tree->subtrees );
+    
+    p_tree->p_event_manager = libvlc_event_manager_new( p_tree, NULL, p_e );
+    libvlc_event_manager_register_event_type( p_tree->p_event_manager,
+            libvlc_TreeSubtreeAdded, p_e );
+    libvlc_event_manager_register_event_type( p_tree->p_event_manager,
+            libvlc_TreeSubtreeDeleted, p_e );
+    libvlc_event_manager_register_event_type( p_tree->p_event_manager,
+            libvlc_TreeItemValueChanged, p_e );
+
 	return p_tree;
 }
 

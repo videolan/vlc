@@ -307,6 +307,10 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaListItemDeleted,
     libvlc_MediaListItemChanged,
 
+    libvlc_TreeSubtreeAdded,
+    libvlc_TreeSubtreeDeleted,
+    libvlc_TreeItemValueChanged,
+
 } libvlc_event_type_t;
 
 /**
@@ -348,6 +352,23 @@ typedef struct libvlc_event_t
             libvlc_media_descriptor_t * item;
             int index;
         } media_list_item_changed;
+
+        /* Tree */
+        struct
+        {
+            libvlc_tree_t * subtree;
+            int index;
+        } tree_subtree_added;
+        struct
+        {
+            libvlc_tree_t * subtree;
+            int index;
+        } tree_subtree_deleted;
+        struct
+        {
+            void * new_value;
+        } tree_item_value_changed;
+
     } u;
 } libvlc_event_t;
 
