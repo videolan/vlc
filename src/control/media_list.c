@@ -108,10 +108,32 @@ media_descriptor_subitem_added( const libvlc_event_t * p_event, void * user_data
 {
     libvlc_media_list_t * p_mlist = user_data;
     libvlc_media_descriptor_t * p_new_md;
+    libvlc_media_descriptor_t * p_parent_md = p_event->p_obj;
+    int count;
+    char * psz_parent_tag = NULL;
+    char * psz_parent_name, *psz_tag;
 
     p_new_md = p_event->u.media_descriptor_subitem_added.new_child;
 
-    /* For now, just add the new item to this media list */
+    /* Here we need something way clever */
+    /* We just set the  */
+    count = libvlc_media_descriptor_tags_count_for_key( p_parent_md,
+                                                        "VLCNode",
+                                                        NULL );
+    psz_parent_name = libvlc_media_descriptor_get_meta(
+                                p_parent_md, libvlc_meta_Title, NULL );
+    if( count > 0 )
+    {
+        psz_parent_tag = libvlc_media_descriptor_tag_at_index_for_key(
+                                            p_parent_md, 0, "VLCNode", NULL );
+        asprintf( &psz_tag, "%s/%s", psz_parent_tag, psz_parent_name );
+        free( psz_parent_tag );
+        free( psz_parent_name );
+    }
+    else
+        psz_tag = psz_parent_name;
+
+    libvlc_media_descriptor_add_tag( p_new_md, "VLCNode", psz_tag, NULL );
     libvlc_media_list_add_media_descriptor( p_mlist, p_new_md, NULL );
 }
 
