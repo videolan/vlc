@@ -13,6 +13,8 @@ Important notes:
      /usr/share/vlc/http/old/.hosts
    - On Windows they are in C:\Program Files\VideoLAN\VLC\http\.hosts and
      C:\Program Files\VideoLAN\VLC\http\old\.hosts
+   - On Mac OS X, you can find it in VLC.app/Contents/MacOS/share/http/.hosts
+     and respectively in VLC.app/Contents/MacOS/share/http/old/.hosts
  * This version of VLC contains a new interface for Windows and Linux. This
    interface lacks a few features that used to be present in vlc 0.8.6: 
    - "Streaming wizard" and "VLM control". These features will be replaced
