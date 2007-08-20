@@ -314,6 +314,7 @@ SOURCES_libvlc_control = \
 	control/vlm.c \
 	control/video.c \
 	control/audio.c \
+	control/dynamic_media_list.c \
 	control/event.c \
 	control/media_descriptor.c \
 	control/media_instance.c \
@@ -325,7 +326,8 @@ SOURCES_libvlc_control = \
 	control/mediacontrol_util.c \
 	control/mediacontrol_audio_video.c \
 	control/media_discoverer.c \
-	control/tag_query.c
+	control/tag_query.c \
+	control/tree.c
 
 ###############################################################################
 # Stamp rules
