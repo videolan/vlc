@@ -1,7 +1,7 @@
 /*****************************************************************************
  * interface_widgets.cpp : Custom widgets for the main interface
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright ( C ) 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -10,7 +10,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * ( at your option ) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -94,7 +94,7 @@ void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
     }
     p_vout = p_nvout;
     setMinimumSize( 16, 16 );
-    return (void*)winId();
+    return ( void* )winId();
 }
 
 void VideoWidget::release( void *p_win )
@@ -127,7 +127,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i ) :
 
 BackgroundWidget::~BackgroundWidget()
 {
-    backgroundLayout->takeAt(0);
+    backgroundLayout->takeAt( 0 );
     delete backgroundLayout;
 }
 
@@ -161,13 +161,13 @@ VisualSelector::VisualSelector( intf_thread_t *_p_i ) :
     QHBoxLayout *layout = new QHBoxLayout( this );
     layout->setMargin( 0 );
     QPushButton *prevButton = new QPushButton( "Prev" );
-    QPushButton *nextButton = new QPushButton( "Next");
+    QPushButton *nextButton = new QPushButton( "Next" );
     layout->addWidget( prevButton );
     layout->addWidget( nextButton );
 
     layout->addItem( new QSpacerItem( 40,20,
-                              QSizePolicy::Expanding, QSizePolicy::Minimum) );
-    layout->addWidget( new QLabel( qtr("Current visualization:") ) );
+                              QSizePolicy::Expanding, QSizePolicy::Minimum ) );
+    layout->addWidget( new QLabel( qtr( "Current visualization:" ) ) );
 
     current = new QLabel( qtr( "None" ) );
     layout->addWidget( current );
@@ -213,21 +213,21 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     layout->setMargin( 0 );
 
     normalButton = new QPushButton( "N" );
-    BUTTON_SET_ACT( normalButton, "N", qtr("Normal rate"), normal() );
+    BUTTON_SET_ACT( normalButton, "N", qtr( "Normal rate" ), normal() );
     layout->addWidget( normalButton );
     normalButton->setMaximumWidth( 35 );
 
 
     layout->addItem( new QSpacerItem( 100,20,
-                              QSizePolicy::Expanding, QSizePolicy::Minimum) );
+                              QSizePolicy::Expanding, QSizePolicy::Minimum ) );
 
     snapshotButton = new QPushButton( "S" );
-    BUTTON_SET_ACT( snapshotButton, "S", qtr("Take a snapshot"), snapshot() );
+    BUTTON_SET_ACT( snapshotButton, "S", qtr( "Take a snapshot" ), snapshot() );
     layout->addWidget( snapshotButton );
     snapshotButton->setMaximumWidth( 35 );
 
     fullscreenButton = new QPushButton( "F" );
-    BUTTON_SET_ACT( fullscreenButton, "F", qtr("Fullscreen"), fullscreen() );
+    BUTTON_SET_ACT( fullscreenButton, "F", qtr( "Fullscreen" ), fullscreen() );
     layout->addWidget( fullscreenButton );
     fullscreenButton->setMaximumWidth( 35 );
 }
@@ -280,12 +280,12 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
 
     /** Slower and faster Buttons **/
     slowerButton = new QPushButton( "S" );
-    BUTTON_SET_ACT( slowerButton, "S", qtr("Slower" ), slower() );
+    BUTTON_SET_ACT( slowerButton, "S", qtr( "Slower" ), slower() );
     controlLayout->addWidget( slowerButton, 0, 0 );
     slowerButton->setMaximumSize( QSize( 26, 26 ) );
 
     fasterButton = new QPushButton( "F" );
-    BUTTON_SET_ACT( fasterButton, "F", qtr("Faster" ), faster() );
+    BUTTON_SET_ACT( fasterButton, "F", qtr( "Faster" ), faster() );
     controlLayout->addWidget( fasterButton, 0, 16 );
     fasterButton->setMaximumSize( QSize( 26, 26 ) );
 
@@ -312,7 +312,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
 
     /* Change the navigation button display when the IM navigation changes */
     CONNECT( THEMIM->getIM(), navigationChanged( int ),
-             this, setNavigation(int) );
+             this, setNavigation( int ) );
     /* Changes the IM navigation when triggered on the nav buttons */
     CONNECT( prevSectionButton, clicked(), THEMIM->getIM(),
              sectionPrev() );
@@ -325,7 +325,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     QSizePolicy sizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
     sizePolicy.setHorizontalStretch( 0 );
     sizePolicy.setVerticalStretch( 0 );
-//  sizePolicy.setHeightForWidth( playButton->sizePolicy( ).hasHeightForWidth( ) );
+//  sizePolicy.setHeightForWidth( playButton->sizePolicy().hasHeightForWidth() );
 
     /* Play */
     QPushButton *playButton = new QPushButton;
@@ -366,11 +366,11 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     /* Add this block to the main layout */
     controlLayout->addLayout( controlButLayout, 3, 3, 1, 3 );
 
-    BUTTON_SET_ACT_I( playButton, "", play.png, qtr("Play"), play() );
+    BUTTON_SET_ACT_I( playButton, "", play.png, qtr( "Play" ), play() );
     BUTTON_SET_ACT_I( prevButton, "" , previous.png,
-                      qtr("Previous"), prev() );
-    BUTTON_SET_ACT_I( nextButton, "", next.png, qtr("Next"), next() );
-    BUTTON_SET_ACT_I( stopButton, "", stop.png, qtr("Stop"), stop() );
+                      qtr( "Previous" ), prev() );
+    BUTTON_SET_ACT_I( nextButton, "", next.png, qtr( "Next" ), next() );
+    BUTTON_SET_ACT_I( stopButton, "", stop.png, qtr( "Stop" ), stop() );
 
     /*
      * Other first Line buttons
@@ -379,26 +379,26 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
      */
     /** Playlist Button **/
     playlistButton = new QPushButton;
-    playlistButton->setMaximumSize(QSize(45, 45));
+    playlistButton->setMaximumSize( QSize( 26, 26 ) );
 
     controlLayout->addWidget( playlistButton, 3, 10 );
 
     /** Fullscreen/Visualisation **/
     QPushButton *fullscreenButton = new QPushButton( "F" );
-    BUTTON_SET_ACT( fullscreenButton, "F", qtr("Fullscreen"), fullscreen() );
+    BUTTON_SET_ACT( fullscreenButton, "F", qtr( "Fullscreen" ), fullscreen() );
     fullscreenButton->setMaximumSize( QSize( 26, 26 ) );
     controlLayout->addWidget( fullscreenButton, 3, 11 );
 
     /** extended Settings **/
     QPushButton *extSettingsButton = new QPushButton( "F" );
-    BUTTON_SET_ACT( extSettingsButton, "Ex", qtr("Extended Settings"),
+    BUTTON_SET_ACT( extSettingsButton, "Ex", qtr( "Extended Settings" ),
             extSettings() );
     extSettingsButton->setMaximumSize( QSize( 26, 26 ) );
     controlLayout->addWidget( extSettingsButton, 3, 12 );
 
     /** Preferences **/
     QPushButton *prefsButton = new QPushButton( "P" );
-    BUTTON_SET_ACT( prefsButton, "P", qtr("Preferences / Settings"), prefs() );
+    BUTTON_SET_ACT( prefsButton, "P", qtr( "Preferences / Settings" ), prefs() );
     prefsButton->setMaximumSize( QSize( 26, 26 ) );
     controlLayout->addWidget( prefsButton, 3, 13 );
 
@@ -408,11 +408,11 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     QLabel *volMuteLabel = new QLabel;
     volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
     volMuteLabel->setToolTip( qtr( "Mute" ) );
-    volMuteLabel->installEventFilter(h);
+    volMuteLabel->installEventFilter( h );
 
     volumeSlider = new QSlider;
     volumeSlider->setSizePolicy( sizePolicy );
-    volumeSlider->setMaximumSize( QSize(80, 200) );
+    volumeSlider->setMaximumSize( QSize( 80, 200 ) );
     volumeSlider->setOrientation( Qt::Horizontal );
 
     volumeSlider->setMaximum( 100 );
@@ -434,7 +434,7 @@ void ControlsWidget::stop()
 
 void ControlsWidget::play()
 {
-    if( playlist_IsEmpty(THEPL) )
+    if( playlist_IsEmpty( THEPL ) )
     {
         /* The playlist is empty, open a file requester */
         THEDP->openFileDialog();
@@ -456,11 +456,11 @@ void ControlsWidget::next()
 
 void ControlsWidget::setNavigation( int navigation )
 {
-#define HELP_MENU N_("Menu")
-#define HELP_PCH N_("Previous chapter")
-#define HELP_NCH N_("Next chapter")
-#define HELP_PTR N_("Previous track")
-#define HELP_NTR N_("Next track")
+#define HELP_MENU N_( "Menu" )
+#define HELP_PCH N_( "Previous chapter" )
+#define HELP_NCH N_( "Next chapter" )
+#define HELP_PTR N_( "Previous track" )
+#define HELP_NTR N_( "Next track" )
 
     // 1 = chapter, 2 = title, 0 = no
     if( navigation == 0 )
@@ -468,16 +468,16 @@ void ControlsWidget::setNavigation( int navigation )
         discFrame->hide();
     } else if( navigation == 1 ) {
         prevSectionButton->show();
-        prevSectionButton->setToolTip( qfu(HELP_PCH) );
+        prevSectionButton->setToolTip( qfu( HELP_PCH ) );
         nextSectionButton->show();
-        nextSectionButton->setToolTip( qfu(HELP_NCH) );
+        nextSectionButton->setToolTip( qfu( HELP_NCH ) );
         menuButton->show();
         discFrame->show();
     } else {
         prevSectionButton->show();
-        prevSectionButton->setToolTip( qfu(HELP_PCH) );
+        prevSectionButton->setToolTip( qfu( HELP_PCH ) );
         nextSectionButton->show();
-        nextSectionButton->setToolTip( qfu(HELP_NCH) );
+        nextSectionButton->setToolTip( qfu( HELP_NCH ) );
         menuButton->hide();
         discFrame->show();
     }
@@ -498,7 +498,7 @@ void ControlsWidget::updateOnTimer()
 {
     audio_volume_t i_volume;
     aout_VolumeGet( p_intf, &i_volume );
-    i_volume = (i_volume *  200 )/ AOUT_VOLUME_MAX ;
+    i_volume = ( i_volume *  200 )/ AOUT_VOLUME_MAX ;
     int i_gauge = volumeSlider->value();
     b_my_volume = false;
     if( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
@@ -530,7 +530,7 @@ void ControlsWidget::setStatus( int status )
  */
 void ControlsWidget::fullscreen()
 {
-    msg_Dbg(p_intf, "Not implemented yet");
+    msg_Dbg( p_intf, "Not implemented yet" );
 }
 
 void ControlsWidget::extSettings()
@@ -566,7 +566,7 @@ void ControlsWidget::enableInput( bool enable )
 #include "components/playlist/selector.hpp"
 
 PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
-                                p_intf ( _p_intf)
+                                p_intf ( _p_intf )
 {
     /* Left Part and design */
     QWidget *leftW = new QWidget( this );
@@ -590,20 +590,20 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_intf ) :
     playlist_item_t *p_root = playlist_GetPreferredNode( THEPL,
                                                 THEPL->p_local_category );
 
-    rightPanel = qobject_cast<PLPanel *>(new StandardPLPanel( this,
+    rightPanel = qobject_cast<PLPanel *>( new StandardPLPanel( this,
                               p_intf, THEPL, p_root ) );
 
     /* Connects */
     CONNECT( selector, activated( int ), rightPanel, setRoot( int ) );
 
-    CONNECT( qobject_cast<StandardPLPanel *>(rightPanel)->model,
+    CONNECT( qobject_cast<StandardPLPanel *>( rightPanel )->model,
              artSet( QString ) , this, setArt( QString ) );
     /* Forward removal requests from the selector to the main panel */
-    CONNECT( qobject_cast<PLSelector *>(selector)->model,
+    CONNECT( qobject_cast<PLSelector *>( selector )->model,
              shouldRemove( int ),
-             qobject_cast<StandardPLPanel *>(rightPanel), removeItem(int) );
+             qobject_cast<StandardPLPanel *>( rightPanel ), removeItem( int ) );
 
-    connect( selector, SIGNAL(activated( int )),
+    connect( selector, SIGNAL( activated( int ) ),
              this, SIGNAL( rootChanged( int ) ) );
     emit rootChanged( p_root->i_id );
 
