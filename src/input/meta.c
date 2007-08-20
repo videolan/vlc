@@ -35,23 +35,21 @@
 #   include <sys/stat.h>
 #endif
 
-// FIXME be sure to not touch p_meta without lock on p_item
-
 static const char * meta_type_to_string[VLC_META_TYPE_COUNT] =
 {
     [vlc_meta_Title]            = N_("Title"),
     [vlc_meta_Artist]           = N_("Artist"),
     [vlc_meta_Genre]            = N_("Genre"),
     [vlc_meta_Copyright]        = N_("Copyright"),
-    [vlc_meta_Album]            = N_("Album/movie/show title"),
-    [vlc_meta_TrackNumber]      = N_("Track number/position in set"),
+    [vlc_meta_Album]            = N_("Album"),
+    [vlc_meta_TrackNumber]      = N_("Track number"),
     [vlc_meta_Description]      = N_("Description"),
     [vlc_meta_Rating]           = N_("Rating"),
     [vlc_meta_Date]             = N_("Date"),
     [vlc_meta_Setting]          = N_("Setting"),
     [vlc_meta_URL]              = N_("URL"),
     [vlc_meta_Language]         = N_("Language"),
-    [vlc_meta_NowPlaying]       = N_("Language"),
+    [vlc_meta_NowPlaying]       = N_("Now Playing"),
     [vlc_meta_Publisher]        = N_("Publisher"),
     [vlc_meta_EncodedBy]        = N_("Encoded by"),
     [vlc_meta_ArtworkURL]       = N_("Artwork URL"),
