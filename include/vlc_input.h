@@ -26,11 +26,6 @@
   #error You are not libvlc or one of its plugins. You cannot include this file
 #endif
 
-#ifndef __USE_GNU
-#define __USE_GNU
-#endif
-#include <string.h>                                     /* strcasestr() */
-
 /* __ is need because conflict with <vlc/input.h> */
 #ifndef _VLC__INPUT_H
 #define _VLC__INPUT_H 1
@@ -39,6 +34,8 @@
 #include <vlc_meta.h>
 #include <vlc_epg.h>
 #include <vlc_events.h>
+
+#include <string.h>                                     /* strcasestr() */
 
 struct vlc_meta_t;
 
