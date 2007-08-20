@@ -35,7 +35,6 @@
  *
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
-#include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
 #include <vlc/vlc.h>

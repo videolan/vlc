@@ -26,7 +26,6 @@
  * Preamble
  *****************************************************************************/
 #define _GNU_SOURCE
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 #include <math.h>
 

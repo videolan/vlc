@@ -29,7 +29,6 @@
 
 #include <libgnomevfs/gnome-vfs.h>
 
-#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 

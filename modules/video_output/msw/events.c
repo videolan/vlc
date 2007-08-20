@@ -27,7 +27,6 @@
  *             a window and the handling of its messages (events).
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
-#include <stdlib.h>                                                /* free() */
 #include <ctype.h>                                              /* tolower() */
 #include <string.h>                                            /* strerror() */
 

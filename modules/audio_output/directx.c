@@ -26,7 +26,6 @@
  *****************************************************************************/
 #include <string.h>                                            /* strerror() */
 
-#include <stdlib.h>                            /* calloc(), malloc(), free() */
 
 #include <vlc/vlc.h>
 #include <vlc_aout.h>

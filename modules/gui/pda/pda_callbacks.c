@@ -25,7 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include <sys/types.h>                                              /* off_t */
-#include <stdlib.h>
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>

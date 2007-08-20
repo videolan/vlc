@@ -32,7 +32,6 @@
 #include <vlc_access.h>
 #include <vlc_demux.h>
 
-#include <stdlib.h>
 #include <string.h>
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>

@@ -32,7 +32,6 @@
  * Preamble
  *****************************************************************************/
 #include <stdio.h>
-#include <stdlib.h>
 #define NDEBUG 1
 #include <assert.h>
 #include <math.h>

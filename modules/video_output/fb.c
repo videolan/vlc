@@ -26,7 +26,6 @@
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
 #include <signal.h>                                      /* SIGUSR1, SIGUSR2 */
-#include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 #include <fcntl.h>                                                 /* open() */
 #include <unistd.h>                                               /* close() */

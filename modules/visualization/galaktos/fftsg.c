@@ -779,7 +779,6 @@ void makect(int nc, int *ip, double *c)
 #endif
 #include <pthread.h>
 #include <stdio.h>
-#include <stdlib.h>
 #define cdft_thread_t pthread_t
 #define cdft_thread_create(thp,func,argp) { \
     if (pthread_create(thp, NULL, func, (void *) argp) != 0) { \
@@ -806,7 +805,6 @@ void makect(int nc, int *ip, double *c)
 #endif
 #include <windows.h>
 #include <stdio.h>
-#include <stdlib.h>
 #define cdft_thread_t HANDLE
 #define cdft_thread_create(thp,func,argp) { \
     DWORD thid; \

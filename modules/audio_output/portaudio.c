@@ -26,7 +26,6 @@
  * Preamble
  *****************************************************************************/
 #include <string.h>
-#include <stdlib.h>
 
 #include <vlc/vlc.h>
 #include <vlc_aout.h>

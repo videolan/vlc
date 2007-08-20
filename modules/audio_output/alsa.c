@@ -32,7 +32,6 @@
 #include <stdio.h>
 #include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                            /* strerror() */
-#include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <vlc_interface.h>
 
 #include <vlc_aout.h>

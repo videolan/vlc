@@ -26,7 +26,6 @@
  * Preamble
  *****************************************************************************/
 #include <errno.h>
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 #include <math.h>
 

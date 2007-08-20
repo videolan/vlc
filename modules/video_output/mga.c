@@ -27,7 +27,6 @@
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
 #include <unistd.h>                                               /* close() */
-#include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 #include <fcntl.h>                                                 /* open() */
 #include <sys/ioctl.h>                                            /* ioctl() */

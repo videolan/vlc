@@ -29,7 +29,6 @@
   \TODO: Change names to VLC standard ???
 */
 
-#include <stdlib.h>
 
 #include <vector>
 #include <string>

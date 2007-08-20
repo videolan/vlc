@@ -27,7 +27,6 @@
  * Includes
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <assert.h>
 
 #include <vlc_playlist.h>

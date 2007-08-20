@@ -26,7 +26,6 @@
  *****************************************************************************/
 #define _GNU_SOURCE
 
-#include <stdlib.h>
 
 #include <vlc/vlc.h>
 #include <vlc_access.h>

@@ -27,7 +27,6 @@
  * Preamble
  *****************************************************************************/
 #include <stdio.h>
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <malloc.h>
 #include <string.h>
 

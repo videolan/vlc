@@ -26,7 +26,6 @@
  *****************************************************************************/
 /* TODO: add OpenDML write support */
 
-#include <stdlib.h>
 
 #include <vlc/vlc.h>
 #include <vlc_sout.h>

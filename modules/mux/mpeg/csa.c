@@ -27,7 +27,6 @@
  * author and the license. If there is a problem with it please e-mail me.
  */
 
-#include <stdlib.h>
 #include <vlc/vlc.h>
 
 #include "csa.h"

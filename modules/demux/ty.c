@@ -32,7 +32,6 @@
  * Preamble
  *****************************************************************************/
 
-#include <stdlib.h>
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 #include "vlc_codec.h"

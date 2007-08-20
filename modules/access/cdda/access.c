@@ -42,7 +42,6 @@
 
 /* #ifdef variables below are defined via config.h via #include vlc above. */
 #ifdef HAVE_STDLIB_H
-#include <stdlib.h>
 #endif
 
 #ifdef HAVE_SYS_TYPES_H

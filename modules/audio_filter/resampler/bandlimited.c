@@ -32,7 +32,6 @@
  * filter is 13 samples.
  *
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
 #include <vlc/vlc.h>

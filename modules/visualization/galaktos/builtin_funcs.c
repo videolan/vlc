@@ -24,7 +24,6 @@
 
 
 #include <math.h>
-#include <stdlib.h>
 #include <stdio.h>
 /* Values to optimize the sigmoid function */
 #define R  32767   

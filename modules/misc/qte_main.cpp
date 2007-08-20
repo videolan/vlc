@@ -27,7 +27,6 @@
 extern "C"
 {
 #include <vlc/vlc.h>
-#include <stdlib.h>                                              /* atexit() */
 }
 
 #include <qapplication.h>

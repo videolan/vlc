@@ -28,7 +28,6 @@
  * Preamble
  *****************************************************************************/
 #define _GNU_SOURCE
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <ctype.h>                                              /* isspace() */
 
 #include <vlc/vlc.h>

@@ -28,7 +28,6 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
 #include <vlc_demux.h>

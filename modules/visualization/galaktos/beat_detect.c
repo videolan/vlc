@@ -30,7 +30,6 @@
 //
 //Some stuff was taken from Frederic Patin's beat-detection article, you'll find it online
 
-#include <stdlib.h>
 #include <stdio.h>
 #include "engine_vars.h"
 

@@ -26,7 +26,6 @@
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                            /* strerror() */
-#include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
 #include <vlc_vout.h>

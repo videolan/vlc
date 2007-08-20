@@ -30,7 +30,6 @@
 //Takes sound data from wherever and hands it back out.
 //Returns PCM Data or spectrum data, or the derivative of the PCM data
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <inttypes.h>
 

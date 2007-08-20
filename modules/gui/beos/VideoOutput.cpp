@@ -29,7 +29,6 @@
  * Preamble
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
-#include <stdlib.h>                                                /* free() */
 #include <stdio.h>
 #include <string.h>                                            /* strerror() */
 

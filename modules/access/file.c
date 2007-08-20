@@ -31,7 +31,6 @@
 #include <vlc_access.h>
 #include <vlc_interface.h>
 
-#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #ifdef HAVE_SYS_TYPES_H

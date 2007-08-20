@@ -25,7 +25,6 @@
 #include <vlc/vlc.h>
 
 #include <inttypes.h>
-#include <stdlib.h> /* defines NULL */
 #include <string.h> /* memcmp */
 
 #include "xxmc-config.h"

@@ -31,7 +31,6 @@
 #include <sys/ioctl.h>                                            /* ioctl() */
 #include <string.h>                                            /* strerror() */
 #include <unistd.h>                                      /* write(), close() */
-#include <stdlib.h>                            /* calloc(), malloc(), free() */
 
 #include <vlc/vlc.h>
 

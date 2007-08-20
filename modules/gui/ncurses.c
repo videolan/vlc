@@ -28,7 +28,6 @@
  * Preamble
  *****************************************************************************/
 #define _GNU_SOURCE
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>

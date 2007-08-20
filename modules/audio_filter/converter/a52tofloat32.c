@@ -29,7 +29,6 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 #ifdef HAVE_STDINT_H
 #   include <stdint.h>                                         /* int16_t .. */

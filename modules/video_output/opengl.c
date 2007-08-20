@@ -28,7 +28,6 @@
  * Preamble
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
 #include <vlc/vlc.h>

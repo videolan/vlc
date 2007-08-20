@@ -25,7 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
 

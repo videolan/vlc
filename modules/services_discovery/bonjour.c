@@ -25,7 +25,6 @@
  * Includes
  *****************************************************************************/
 #define _GNU_SOURCE
-#include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
 #include <vlc_playlist.h>
