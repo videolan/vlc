@@ -41,10 +41,8 @@
 #include <vorbisfile.h>
 #include <vorbisproperties.h>
 #include <uniquefileidentifierframe.h>
-
-#if 0 //for artist and album id
 #include <textidentificationframe.h>
-#endif
+//#include <relativevolumeframe.h> /* parse the tags without taglib helpers? */
 
 static int  ReadMeta    ( vlc_object_t * );
 static int  DownloadArt ( vlc_object_t * );
@@ -174,14 +172,21 @@ static int ReadMeta( vlc_object_t *p_this )
             vlc_meta_t *p_meta = (vlc_meta_t *)(p_demux->p_private );
 
 #define SET( foo, bar ) vlc_meta_Set##foo( p_meta, tag->bar ().toCString(true))
+#define SETINT( foo, bar ) { \
+            char psz_tmp[10]; \
+            snprintf( (char*)psz_tmp, 10, "%d", tag->bar() ); \
+            vlc_meta_Set##foo( p_meta, (char*)psz_tmp ); \
+        }
+
             SET( Title, title );
             SET( Artist, artist );
             SET( Album, album );
-//            SET( Comment, comment );
+            SET( Description, comment );
             SET( Genre, genre );
-//            SET( Year, year ); Gra, this is an int, need to convert
-//            SET( Tracknum , track ); Same
+            SETINT( Date, year );
+            SETINT( Tracknum , track );
 #undef SET
+#undef SETINT
 
             if( TagLib::MPEG::File *p_mpeg =
                 dynamic_cast<TagLib::MPEG::File *>(f.file() ) )
@@ -211,8 +216,7 @@ static int ReadMeta( vlc_object_t *p_this )
                             free( psz_ufid );
                         }
                     }
-                    /* musicbrainz artist and album id: not useful (yet?) */
-#if 0
+
                     list = tag->frameListMap()["TXXX"];
                     TagLib::ID3v2::UserTextIdentificationFrame* p_txxx;
                     for( TagLib::ID3v2::FrameList::Iterator iter = list.begin();
@@ -220,14 +224,47 @@ static int ReadMeta( vlc_object_t *p_this )
                     {
                         p_txxx = dynamic_cast<TagLib::ID3v2::UserTextIdentificationFrame*>(*iter);
                         const char *psz_desc= p_txxx->description().toCString();
+#if 0 /* musicbrainz artist and album id: not useful (yet?) */
                         if( !strncmp( psz_desc, "MusicBrainz Artist Id", 21 ) )
                             vlc_meta_SetArtistID( p_meta,
                                     p_txxx->fieldList().toString().toCString());
                         if( !strncmp( psz_desc, "MusicBrainz Album Id", 20 ) )
                             vlc_meta_SetAlbumID( p_meta,
                                     p_txxx->fieldList().toString().toCString());
+#endif
+                        vlc_meta_AddExtra( p_meta, psz_desc, 
+                                    p_txxx->fieldList().toString().toCString());
+                    }
+#if 0
+                    list = tag->frameListMap()["RVA2"];
+                    TagLib::ID3v2::RelativeVolumeFrame* p_rva2;
+                    for( TagLib::ID3v2::FrameList::Iterator iter = list.begin();
+                            iter != list.end(); iter++ )
+                    {
+                        p_rva2 = dynamic_cast<TagLib::ID3v2::RelativeVolumeFrame*>(*iter);
+                        /* TODO: process rva2 frames */
                     }
 #endif
+                    list = tag->frameList();
+                    TagLib::ID3v2::Frame* p_t;
+                    char psz_tag[4];
+                    for( TagLib::ID3v2::FrameList::Iterator iter = list.begin();
+                            iter != list.end(); iter++ )
+                    {
+                        p_t = dynamic_cast<TagLib::ID3v2::Frame*> (*iter);
+                        memcpy( psz_tag, p_t->frameID().data(), 4);
+
+#define SET( foo, bar ) if( !strncmp( psz_tag, foo, 4 ) ) \
+    vlc_meta_Set##bar( p_meta, p_t->toString().toCString(true))
+                        SET( "TPUB", Publisher );
+                        SET( "TCOP", Copyright );
+                        SET( "TENC", EncodedBy );
+                        SET( "TLAN", Language );
+                        //SET( "POPM", Rating );
+                        //if( !strncmp( psz_tag, "RVA2", 4 ) )
+                            /* TODO */
+#undef SET
+                    }
                 }
             }
 
