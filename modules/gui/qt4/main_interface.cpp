@@ -139,6 +139,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                              advControlsEnabled, visualSelectorEnabled );
 
     /* Status Bar */
+    /**
+     * TODO: clicking on the elapsed time should switch to the remaining time
+     **/
+    /**
+     * TODO: do we add a label for the current Volume 
+     **/
     timeLabel = new QLabel;
     nameLabel = new QLabel;
     speedLabel = new QLabel( "1.0x" );

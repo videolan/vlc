@@ -284,6 +284,14 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     controlLayout->addWidget( fasterButton, 0, 16 );
     fasterButton->setMaximumSize( QSize( 26, 20 ) );
 
+    /** TODO: Insert here the AdvControls Widget 
+     * and add - A->B button
+     *         - frame by frame
+     *         - record button
+     * and put the snapshot in the same QFrame 
+     * Then fix all the size issues in main_interface.cpp
+     **/
+    
     /** Disc and Menus handling */
     discFrame = new QFrame( this );
     QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
@@ -315,6 +323,10 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
              sectionNext() );
     CONNECT( menuButton, clicked(), THEMIM->getIM(),
              sectionMenu() );
+
+    /** TODO
+     * Telextext QFrame
+     **/
 
     /** Play Buttons **/
     QSizePolicy sizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
@@ -406,6 +418,14 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     volMuteLabel->setToolTip( qtr( "Mute" ) );
     volMuteLabel->installEventFilter( h );
 
+    /** TODO: 
+     * Change this slider to use a nice Amarok-like one 
+     * Add a Context menu to change to the most useful %
+     * **/
+    /** FIXME
+     *  THis percerntage thing has to be handled correctly
+     *  This has to match to the OSD
+     **/
     volumeSlider = new QSlider;
     volumeSlider->setSizePolicy( sizePolicy );
     volumeSlider->setMaximumSize( QSize( 80, 200 ) );
@@ -520,9 +540,11 @@ void ControlsWidget::setStatus( int status )
     }
 }
 
-/*
+/**
+ * TODO
  * This functions toggle the fullscreen mode
- * If there is no video, it should first activate Visualisations... TODO
+ * If there is no video, it should first activate Visualisations... 
+ *  This has also to be fixed in enableVideo()
  */
 void ControlsWidget::fullscreen()
 {
