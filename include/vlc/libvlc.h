@@ -927,7 +927,7 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
 VLC_PUBLIC_API void   libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis );
 VLC_PUBLIC_API char * libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis );
 
-VLC_PUBLIC_API libvlc_media_list_t * libvlc_media_discoverer_media_list( );
+VLC_PUBLIC_API libvlc_media_list_t * libvlc_media_discoverer_media_list( libvlc_media_discoverer_t * p_mdis );
 
 /**@} */
 
