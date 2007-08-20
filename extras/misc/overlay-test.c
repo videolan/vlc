@@ -141,6 +141,29 @@ void SetVisibility( FILE *p_cmd, FILE *p_res, int i_overlay, int i_visible ) {
                     i_visible );
 }
 
+void SetTextAlpha( FILE *p_cmd, FILE *p_res, int i_overlay, int i_alpha ) {
+    CheckedCommand( p_cmd, p_res, "SetTextAlpha %d %d\n", i_overlay, i_alpha );
+}
+
+void SetTextColor( FILE *p_cmd, FILE *p_res, int i_overlay, int i_red,
+                   int i_green, int i_blue ) {
+    CheckedCommand( p_cmd, p_res, "SetTextColor %d %d %d %d\n", i_overlay,
+                    i_red, i_green, i_blue );
+}
+
+void SetTextSize( FILE *p_cmd, FILE *p_res, int i_overlay, int i_size ) {
+    CheckedCommand( p_cmd, p_res, "SetTextSize %d %d\n", i_overlay, i_size );
+}
+
+int GetTextSize( FILE *p_cmd, FILE *p_res, int i_overlay ) {
+    int i_size;
+
+    CheckedCommand( p_cmd, p_res, "GetTextSize %d\n", i_overlay );
+    fscanf( p_res, "%d", &i_size );
+
+    return i_size;
+}
+
 /*****************************************************************************
  * Test Routines
  *****************************************************************************/
@@ -176,6 +199,47 @@ void BasicTest( FILE *p_cmd, FILE *p_res, int i_overlay ) {
     EndAtomic( p_cmd, p_res );
     CheckResult( p_res );
     CheckResult( p_res );
+    printf( " done\n" );
+
+    sleep( 5 );
+}
+
+void TextTest( FILE *p_cmd, FILE *p_res, int i_overlay ) {
+    printf( "Sweeping (text) alpha..." );
+    for( int i_alpha = 0xFF; i_alpha >= -0xFF ; i_alpha -= 8 ) {
+        SetTextAlpha( p_cmd, p_res, i_overlay, abs( i_alpha ) );
+        usleep( 20000 );
+    }
+    SetTextAlpha( p_cmd, p_res, i_overlay, 255 );
+    printf( " done\n" );
+
+    printf( "Sweeping colors..." );
+    for( int i_red = 0xFF; i_red >= 0x00 ; i_red -= 8 ) {
+        SetTextColor( p_cmd, p_res, i_overlay, i_red, 0xFF, 0xFF );
+        usleep( 20000 );
+    }
+    for( int i_green = 0xFF; i_green >= 0x00 ; i_green -= 8 ) {
+        SetTextColor( p_cmd, p_res, i_overlay, 0x00, i_green, 0xFF );
+        usleep( 20000 );
+    }
+    for( int i_blue = 0xFF; i_blue >= 0x00 ; i_blue -= 8 ) {
+        SetTextColor( p_cmd, p_res, i_overlay, 0x00, 0x00, i_blue );
+        usleep( 20000 );
+    }
+    SetTextColor( p_cmd, p_res, i_overlay, 0x00, 0x00, 0x00 );
+    printf( " done\n" );
+
+    printf( "Getting size..." );
+    int i_basesize = GetTextSize( p_cmd, p_res, i_overlay );
+    printf( " done. Size is %d\n", i_basesize );
+
+    printf( "Sweeping size..." );
+    for( float f_theta = 0; f_theta <= M_PI ; f_theta += M_PI / 128.0 ) {
+        SetTextSize( p_cmd, p_res, i_overlay,
+                     i_basesize * ( 1 + 3 * sin( f_theta ) ) );
+        usleep( 20000 );
+    }
+    SetTextSize( p_cmd, p_res, i_overlay, i_basesize );
     printf( " done\n" );
 
     sleep( 5 );
@@ -280,6 +344,7 @@ int main( int i_argc, char *ppsz_argv[] ) {
 
     BasicTest( p_cmd, p_res, i_overlay_image );
     BasicTest( p_cmd, p_res, i_overlay_text );
+    TextTest( p_cmd, p_res, i_overlay_text );
 
     DeleteImage( p_cmd, p_res, i_overlay_image );
     DeleteImage( p_cmd, p_res, i_overlay_text );
