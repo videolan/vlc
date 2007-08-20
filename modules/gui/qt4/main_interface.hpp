@@ -27,7 +27,6 @@
 
 
 #include "qt4.hpp"
-#include "ui/main_interface.h"
 #include "util/qvlcframe.hpp"
 
 #include <vlc_aout.h>
