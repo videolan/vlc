@@ -26,6 +26,8 @@
 
 #ifndef __XSTRCAT_H__
 #define __XSTRCAT_H__
+# include <string.h>
+# include <stdlib.h>
 
 /* like strcat, but realloc's enough memory for the new string too */
 

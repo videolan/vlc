@@ -24,7 +24,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  ************************************************************************/
 
-
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 #include "xarray.h"
 
 #define XARRAY_ASSERT_NOT_NULL(xarray) \
