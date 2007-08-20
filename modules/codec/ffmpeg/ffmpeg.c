@@ -1265,6 +1265,10 @@ static struct
     { VLC_FOURCC('M','A','C','6'), CODEC_ID_MACE6,
       AUDIO_ES, "MACE-6 Audio" },
 
+    /* MUSEPACK7 Audio */
+    { VLC_FOURCC('M','P','C',' '), CODEC_ID_MUSEPACK7,
+      AUDIO_ES, "MUSEPACK7 Audio" },
+
     /* RealAudio 1.0 */
     { VLC_FOURCC('1','4','_','4'), CODEC_ID_RA_144,
       AUDIO_ES, "RealAudio 1.0" },
