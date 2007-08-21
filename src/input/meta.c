@@ -259,7 +259,7 @@ static void __ArtCacheCreatePath( vlc_object_t *p_obj,
               p_obj->p_libvlc->psz_homedir );
     utf8_mkdir( psz_dir );
 
-    if( psz_artist && psz_artist )
+    if( !EMPTY_STR(psz_artist) && !EMPTY_STR(psz_album) )
     {
         snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP CONFIG_DIR DIR_SEP
                   "art" DIR_SEP "artistalbum",
