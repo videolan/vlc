@@ -351,7 +351,7 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
     if( !p_dir )
         return VLC_EGENERIC;
 
-    while( (p_de = utf8_readdir( psz_dirname )) )
+    while( (p_de = utf8_readdir( p_dir )) )
     {
         if( strncmp( p_de, "art", 3 ) )
         {
