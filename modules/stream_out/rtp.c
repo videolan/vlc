@@ -594,7 +594,8 @@ static int Open( vlc_object_t *p_this )
                 if( p_cfg->psz_value == NULL || *p_cfg->psz_value == '\0' )
                     continue;
 
-                if( !strcmp( p_cfg->psz_value, val.psz_string ) )   /* needed both :sout-rtp-sdp= and rtp{sdp=} can be used */
+                /* needed both :sout-rtp-sdp= and rtp{sdp=} can be used */
+                if( !strcmp( p_cfg->psz_value, val.psz_string ) ) 
                     continue;
 
                 SDPHandleUrl( p_stream, p_cfg->psz_value );
@@ -630,7 +631,7 @@ static void Close( vlc_object_t * p_this )
             block_Release( p_sys->packet );
         }
         if( p_sys->b_export_sap )
-        {   
+        {
             p_sys->p_mux = NULL;
             SapSetup( p_stream );
         }
