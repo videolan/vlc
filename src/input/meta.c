@@ -353,18 +353,19 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
 
     while( (p_de = utf8_readdir( p_dir )) )
     {
-        if( strncmp( p_de, "art", 3 ) )
+        if( !strncmp( p_de, "art", 3 ) )
         {
             snprintf( psz_filename, MAX_PATH, "%s" DIR_SEP "%s",
                       psz_dirname, p_de );
             input_item_SetArtURL( p_item, psz_filename );
-            closedir( p_dir );
-            return VLC_SUCCESS;
+            free( p_de );
+            break;
         }
+        free( p_de );
     }
 
     closedir( p_dir );
-    return VLC_EGENERIC;
+    return (p_de == NULL) ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 /**
