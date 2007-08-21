@@ -838,6 +838,7 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         p += sprintf( p, "/%d", p_sys->i_ttl ?: 1 );
     }
     p += sprintf( p, "\r\n" );
+    p += sprintf( p, "b=RR:0\r\n" );
 
     for( i = 0; i < p_sys->i_es; i++ )
     {
@@ -861,7 +862,6 @@ static char *SDPGenerate( const sout_stream_t *p_stream,
         {
             p += sprintf(p,"b=AS:%d\r\n",id->i_bitrate);
         }
-        p += sprintf( p, "b=RR:0\r\n" );
         if( id->psz_rtpmap )
         {
             p += sprintf( p, "a=rtpmap:%d %s\r\n", id->i_payload_type,
