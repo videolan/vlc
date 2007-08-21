@@ -1626,7 +1626,6 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     char *psz_destination = p_sys->psz_destination;
     const char *psz_session = NULL;
     const char *psz_cseq = NULL;
-    int i_cseq = 0;
 
     if( answer == NULL || query == NULL )
     {
@@ -1637,6 +1636,8 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     answer->i_proto = HTTPD_PROTO_RTSP;
     answer->i_version= query->i_version;
     answer->i_type   = HTTPD_MSG_ANSWER;
+    answer->i_body = 0;
+    answer->p_body = NULL;
 
     switch( query->i_type )
     {
@@ -1657,8 +1658,6 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             rtsp_client_t *rtsp;
             /* for now only multicast so easy */
             answer->i_status = 200;
-            answer->i_body = 0;
-            answer->p_body = NULL;
 
             psz_session = httpd_MsgGet( query, "Session" );
             rtsp = RtspClientGet( p_stream, psz_session );
@@ -1698,8 +1697,6 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
 
             /* for now only multicast so easy again */
             answer->i_status = 200;
-            answer->i_body = 0;
-            answer->p_body = NULL;
 
             psz_session = httpd_MsgGet( query, "Session" );
             rtsp = RtspClientGet( p_stream, psz_session );
@@ -1734,14 +1731,11 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
         default:
             return VLC_EGENERIC;
     }
+
     httpd_MsgAdd( answer, "Server", PACKAGE_STRING );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     psz_cseq = httpd_MsgGet( query, "Cseq" );
-    if( psz_cseq )
-        i_cseq = atoi( psz_cseq );
-    else
-        i_cseq = 0;
-    httpd_MsgAdd( answer, "Cseq", "%d", i_cseq );
+    httpd_MsgAdd( answer, "Cseq", "%u", psz_cseq ? psz_cseq : "0" );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )
@@ -1759,7 +1753,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     char psz_session_init[100];
     const char *psz_session = NULL;
     const char *psz_cseq = NULL;
-    int  i_cseq = 0;
 
 
     if( answer == NULL || query == NULL )
@@ -1773,6 +1766,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     answer->i_proto = HTTPD_PROTO_RTSP;
     answer->i_version= query->i_version;
     answer->i_type   = HTTPD_MSG_ANSWER;
+    answer->i_body = 0;
+    answer->p_body = NULL;
 
     switch( query->i_type )
     {
@@ -1782,8 +1777,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             if( psz_transport == NULL )
             {
                 answer->i_status = 461;
-                answer->i_body = 0;
-                answer->p_body = NULL;
                 break;
             }
 
@@ -1793,8 +1786,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             {
                 //fprintf( stderr, "HTTPD_MSG_SETUP: multicast\n" );
                 answer->i_status = 200;
-                answer->i_body = 0;
-                answer->p_body = NULL;
 
                 psz_session = httpd_MsgGet( query, "Session" );
                 if( !psz_session )
@@ -1817,8 +1808,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 if( httpd_ClientIP( cl, ip ) == NULL )
                 {
                     answer->i_status = 500;
-                    answer->i_body = 0;
-                    answer->p_body = NULL;
                     break;
                 }
 
@@ -1836,8 +1825,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     if( rtsp == NULL )
                     {
                         answer->i_status = 454;
-                        answer->i_body = 0;
-                        answer->p_body = NULL;
                         break;
                     }
                 }
@@ -1858,8 +1845,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     msg_Err( p_stream, "cannot create the access out for %s://%s",
                              psz_access, psz_url );
                     answer->i_status = 500;
-                    answer->i_body = 0;
-                    answer->p_body = NULL;
                     break;
                 }
 
@@ -1867,8 +1852,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 TAB_APPEND( rtsp->i_access, rtsp->access, p_access );
 
                 answer->i_status = 200;
-                answer->i_body = 0;
-                answer->p_body = NULL;
 
                 httpd_MsgAdd( answer, "Transport",
                               "RTP/AVP/UDP;client_port=%d-%d", i_port, i_port + 1 );
@@ -1876,8 +1859,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             else /* TODO  strstr( psz_transport, "interleaved" ) ) */
             {
                 answer->i_status = 461;
-                answer->i_body = 0;
-                answer->p_body = NULL;
             }
             break;
         }
@@ -1885,14 +1866,11 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
         default:
             return VLC_EGENERIC;
     }
+
     httpd_MsgAdd( answer, "Server", "VLC Server" );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     psz_cseq = httpd_MsgGet( query, "Cseq" );
-    if( psz_cseq )
-        i_cseq = atoi( psz_cseq );
-    else
-        i_cseq = 0;
-    httpd_MsgAdd( answer, "Cseq", "%d", i_cseq );
+    httpd_MsgAdd( answer, "Cseq", "%s", psz_cseq ? psz_cseq : "0");
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )

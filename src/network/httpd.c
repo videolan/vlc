@@ -1296,7 +1296,7 @@ void httpd_MsgInit( httpd_message_t *msg )
 
     msg->i_body_offset = 0;
     msg->i_body        = 0;
-    msg->p_body        = 0;
+    msg->p_body        = NULL;
 }
 
 void httpd_MsgClean( httpd_message_t *msg )
