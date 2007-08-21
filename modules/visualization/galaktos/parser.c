@@ -26,6 +26,7 @@
 
 /* parser.c */
 
+#include <stdlib.h>
 
 #include "common.h"
 #include "fatal.h"

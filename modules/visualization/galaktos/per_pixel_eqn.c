@@ -22,8 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
-
+#include <stdlib.h>
 
 #include "fatal.h"
 #include "common.h"

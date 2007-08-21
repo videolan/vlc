@@ -5,6 +5,7 @@
 #include "per_frame_eqn_types.h"
 #include "init_cond_types.h"
 #include "preset_types.h"
+#include <stdio.h>
 
 per_frame_eqn_t * parse_per_frame_eqn(FILE * fs, int index, struct PRESET_T * preset);
 int parse_per_pixel_eqn(FILE * fs, preset_t * preset);

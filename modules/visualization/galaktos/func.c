@@ -1,5 +1,6 @@
 /* Function management */
 
+#include <stdlib.h>
 
 #include "common.h"
 #include "fatal.h"
