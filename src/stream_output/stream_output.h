@@ -122,11 +122,10 @@ char *StartSDP (const char *name, const char *description, const char *url,
                 const struct sockaddr *orig, socklen_t origlen,
                 const struct sockaddr *addr, socklen_t addrlen);
 
-char *vAddSDPMedia (const char *type, int dport, const char *protocol,
+char *vAddSDPMedia (char **sdp, const char *type, int dport, const char *prot,
                     unsigned pt, const char *rtpmap,
                     const char *fmtpfmt, va_list ap);
-char *AddSDPMedia (const char *type, int dport,
-                   const char *protocol, unsigned pt, const char *rtpmap,
-                   const char *fmtpfmt, ...);
+char *AddSDPMedia (char **sdp, const char *type, int dport, const char *proto,
+                   unsigned pt, const char *rtpmap, const char *fmtpfmt, ...);
 
 #endif

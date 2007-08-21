@@ -157,59 +157,67 @@ char *StartSDP (const char *name, const char *description, const char *url,
 }
 
 
-char *vAddSDPMedia (const char *type, int dport, const char *protocol,
+char *vAddSDPMedia (char **sdp,
+                    const char *type, int dport, const char *protocol,
                     unsigned pt, const char *rtpmap,
                     const char *fmtpfmt, va_list ap)
 {
-    char *sdp_media = NULL;
+    char *newsdp, *ptr;
+    size_t inlen = strlen (*sdp), outlen = inlen;
 
     /* Some default values */
     if (type == NULL)
         type = "video";
-    if (dport == 0)
-        dport = 9;
     if (protocol == NULL)
         protocol = "RTP/AVP";
     assert (pt < 128u);
 
+    outlen += snprintf (NULL, 0,
+                        "m=%s %u %s %d\r\n"
+                        "b=RR:0\r\n",
+                        type, dport, protocol, pt);
+
     /* RTP payload type map */
-    char sdp_rtpmap[rtpmap ? (sizeof ("a=rtpmap:123 *\r\n") + strlen (rtpmap)) : 1];
     if (rtpmap != NULL)
-        sprintf (sdp_rtpmap, "a=rtpmap:%u %s\r\n", pt, rtpmap);
-    else
-        *sdp_rtpmap = '\0';
+        outlen += snprintf (NULL, 0, "a=rtpmap:%u %s\r\n", pt, rtpmap);
 
     /* Format parameters */
-    char *fmtp = NULL;
-    if ((fmtpfmt != NULL)
-     && (vasprintf (&fmtp, fmtpfmt, ap) == -1))
-        return NULL;
-
-    char sdp_fmtp[fmtp ? (sizeof ("a=fmtp:123 *\r\n") + strlen (fmtp)) : 1];
-    if (fmtp != NULL)
+    if (fmtpfmt != NULL)
     {
-        sprintf (sdp_fmtp, "a=fmtp:%u %s\r\n", pt, fmtp);
-        free (fmtp);
+        outlen += sizeof ("a=fmtp:123 *\r\n");
+        outlen += vsnprintf (NULL, 0, fmtpfmt, ap);
     }
-    else
-        *sdp_fmtp = '\0';
 
-    if (asprintf (&sdp_media, "m=%s %u %s %d\r\n" "b=RR:0\r\n" "%s" "%s",
-                  type, dport, protocol, pt,
-                  sdp_rtpmap, sdp_fmtp) == -1)
+    newsdp = realloc (*sdp, outlen + 1);
+    if (newsdp == NULL)
         return NULL;
 
-    return sdp_media;
+    *sdp = newsdp;
+    ptr = newsdp + inlen;
+
+    /* RTP payload type map */
+    ptr += sprintf (ptr, "a=rtpmap:%u %s\r\n", pt, rtpmap);
+
+    /* Format parameters */
+    if (fmtpfmt != NULL)
+    {
+        ptr += sprintf (ptr, "a=fmtp:%u ", pt);
+        ptr += vsprintf (ptr, fmtpfmt, ap);
+    }
+
+    return newsdp;
 }
 
 
-char *AddSDPMedia (const char *type, int dport, const char *protocol,
-                    unsigned pt, const char *rtpmap, const char *fmtpfmt, ...)
+char *AddSDPMedia (char **sdp, const char *type, int dport, const char *proto,
+                   unsigned pt, const char *rtpmap, const char *fmtpfmt, ...)
 {
     va_list ap;
     char *ret;
+
     va_start (ap, fmtpfmt);
-    ret = vAddSDPMedia (type, dport, protocol, pt, rtpmap, fmtpfmt, ap);
+    ret = vAddSDPMedia (sdp, type, dport, proto, pt, rtpmap, fmtpfmt, ap);
     va_end (ap);
+
     return ret;
 }
