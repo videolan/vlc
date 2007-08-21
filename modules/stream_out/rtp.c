@@ -1782,6 +1782,14 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
         case HTTPD_MSG_SETUP:
         {
             const char *psz_transport = httpd_MsgGet( query, "Transport" );
+            if( psz_transport == NULL )
+            {
+                answer->i_status = 461;
+                answer->psz_status = strdup( "Unsupported Transport" );
+                answer->i_body = 0;
+                answer->p_body = NULL;
+                break;
+            }
 
             //fprintf( stderr, "HTTPD_MSG_SETUP: transport=%s\n", psz_transport );
 
