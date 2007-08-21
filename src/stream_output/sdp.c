@@ -87,14 +87,17 @@ static vlc_bool_t IsSDPString (const char *str)
 
 
 char *StartSDP (const char *name, const char *description, const char *url,
-                const char *email, const char *phone, vlc_bool_t ssm,
-                const struct sockaddr *orig, socklen_t origlen,
+                const char *email, const char *phone,
+                const struct sockaddr *src, socklen_t srclen,
                 const struct sockaddr *addr, socklen_t addrlen)
 {
-    uint64_t t = NTPtime64 ();
-    char *sdp, machine[MAXSDPADDRESS], conn[MAXSDPADDRESS],
+    uint64_t now = NTPtime64 ();
+    char *sdp;
+    char connection[MAXSDPADDRESS], hostname[256],
          sfilter[MAXSDPADDRESS + sizeof ("\r\na=source-filter: incl * ")];
     const char *preurl = "\r\nu=", *premail = "\r\ne=", *prephone = "\r\np=";
+
+    gethostname (hostname, sizeof (hostname));
 
     if (name == NULL)
         name = "Unnamed";
@@ -109,18 +112,21 @@ char *StartSDP (const char *name, const char *description, const char *url,
 
     if (!IsSDPString (name) || !IsSDPString (description)
      || !IsSDPString (url) || !IsSDPString (email) || !IsSDPString (phone)
-     || (AddressToSDP (orig, origlen, machine) == NULL)
-     || (AddressToSDP (addr, addrlen, conn) == NULL))
+     || (AddressToSDP (addr, addrlen, connection) == NULL))
         return NULL;
 
-    if (ssm)
-        sprintf (sfilter, "\r\na=source-filter: incl IN IP%c * %s",
-                 machine[5], machine + 7);
-    else
-        *sfilter = '\0';
+    strcpy (sfilter, "");
+    if (srclen > 0)
+    {
+        char machine[MAXSDPADDRESS];
+
+        if (AddressToSDP (src, srclen, machine) != NULL)
+            sprintf (sfilter, "\r\na=source-filter: incl IN IP%c * %s",
+                     machine[5], machine + 7);
+    }
 
     if (asprintf (&sdp, "v=0"
-                    "\r\no=- "I64Fu" "I64Fu" %s"
+                    "\r\no=- "I64Fu" "I64Fu" IN IP%c %s"
                     "\r\ns=%s"
                     "\r\ni=%s"
                     "%s%s" // optional URL
@@ -138,13 +144,13 @@ char *StartSDP (const char *name, const char *description, const char *url,
                     "\r\na=charset:UTF-8"
                     "%s" // optional source filter
                     "\r\n",
-               /* o= */ t, t, machine,
+               /* o= */ now, now, connection[5], hostname,
                /* s= */ name,
                /* i= */ description,
                /* u= */ preurl, url,
                /* e= */ premail, email,
                /* p= */ prephone, phone,
-               /* c= */ conn,
+               /* c= */ connection,
     /* source-filter */ sfilter) == -1)
         return NULL;
     return sdp;
