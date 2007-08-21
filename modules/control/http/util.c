@@ -149,7 +149,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 
     msg_Dbg( p_intf, "dir=%s", psz_dir );
 
-    sprintf( dir, "%s%c.access", psz_dir, sep );
+    snprintf( dir, sizeof( dir ), "%s%c.access", psz_dir, sep );
     if( ( file = utf8_fopen( dir, "r" ) ) != NULL )
     {
         char line[1024];
@@ -183,7 +183,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
         fclose( file );
     }
 
-    sprintf( dir, "%s%c.hosts", psz_dir, sep );
+    snprintf( dir, sizeof( dir ), "%s%c.hosts", psz_dir, sep );
     p_acl = ACL_Create( p_intf, VLC_FALSE );
     if( ACL_LoadFile( p_acl, dir ) )
     {
@@ -193,7 +193,7 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 
     for( ;; )
     {
-        const char *psz_filename;
+        char *psz_filename;
         /* parse psz_src dir */
         if( ( psz_filename = utf8_readdir( p_dir ) ) == NULL )
         {
@@ -202,10 +202,13 @@ int E_(ParseDirectory)( intf_thread_t *p_intf, char *psz_root,
 
         if( ( psz_filename[0] == '.' )
          || ( i_dirlen + strlen( psz_filename ) > MAX_DIR_SIZE ) )
+        {
+            free( psz_filename );
             continue;
+        }
 
-        sprintf( dir, "%s%c%s", psz_dir, sep, psz_filename );
-        free( (char*) psz_filename );
+        snprintf( dir, sizeof( dir ), "%s%c%s", psz_dir, sep, psz_filename );
+        free( psz_filename );
 
         if( E_(ParseDirectory)( p_intf, psz_root, dir ) )
         {

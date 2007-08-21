@@ -1532,7 +1532,10 @@ static int Open( vlc_object_t * p_this )
 #else
                         if (!s_filename.compare(p_demux->psz_path))
 #endif
+                        {
+                            free (psz_file);
                             continue; // don't reuse the original opened file
+                        }
 
 #if defined(__GNUC__) && (__GNUC__ < 3)
                         if (!s_filename.compare("mkv", s_filename.length() - 3, 3) ||

@@ -416,7 +416,7 @@ DIR *utf8_opendir( const char *dirname )
  *
  * @param dir The directory that is being read
  *
- * @return a UTF-8 string of the directory entry. Use LocaleFree() to free this memory
+ * @return a UTF-8 string of the directory entry. Use free() to free this memory.
  */
 char *utf8_readdir( DIR *dir )
 {

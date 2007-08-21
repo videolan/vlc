@@ -27,12 +27,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <vlc/vlc.h>
+
 #include <errno.h>                                                 /* ENOMEM */
 #include <time.h>
 
 #include <curses.h>
 
-#include <vlc/vlc.h>
 #include <vlc_interface.h>
 #include <vlc_vout.h>
 #include <vlc_aout.h>
@@ -1927,11 +1928,8 @@ static void ReadDir( intf_thread_t *p_intf )
         p_sys->pp_dir_entries = NULL;
         p_sys->i_dir_entries = 0;
 
-        /* get the first directory entry */
-        psz_entry = utf8_readdir( p_current_dir );
-
         /* while we still have entries in the directory */
-        while( psz_entry != NULL )
+        while( ( psz_entry = utf8_readdir( p_current_dir ) ) != NULL )
         {
 #if defined( S_ISDIR )
             struct stat stat_data;
@@ -1946,7 +1944,6 @@ static void ReadDir( intf_thread_t *p_intf )
                 strcmp( psz_entry, ".." ) )
             {
                 free( psz_entry );
-                psz_entry = utf8_readdir( p_current_dir );
                 continue;
             }
 
@@ -1955,13 +1952,14 @@ static void ReadDir( intf_thread_t *p_intf )
 
             if( !( p_dir_entry = malloc( sizeof( struct dir_entry_t) ) ) )
             {
-                free( psz_uri);
-                return;
+                free( psz_uri );
+                free( psz_entry );
+                continue;
             }
 
 #if defined( S_ISDIR )
-            utf8_stat( psz_uri, &stat_data );
-            if( S_ISDIR(stat_data.st_mode) )
+            if( !utf8_stat( psz_uri, &stat_data )
+             && S_ISDIR(stat_data.st_mode) )
 /*#elif defined( DT_DIR )
             if( p_dir_content->d_type & DT_DIR )*/
 #else
@@ -1983,8 +1981,6 @@ static void ReadDir( intf_thread_t *p_intf )
 
             free( psz_uri );
             free( psz_entry );
-            /* Read next entry */
-            psz_entry = utf8_readdir( p_current_dir );
         }
 
         /* Sort */
