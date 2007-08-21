@@ -416,6 +416,11 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
         uint8_t p_buffer[65536];
         long int l_read;
         FILE *p_file = utf8_fopen( psz_filename+7, "w" );
+        if( p_file == NULL ) {
+            msg_Err( p_playlist, "Unable write album art in %s" );
+            free( psz_arturl_m );
+            return VLC_EGENERIC;
+        }
         int err = 0;
         while( ( l_read = stream_Read( p_stream, p_buffer, sizeof (p_buffer) ) ) )
         {
