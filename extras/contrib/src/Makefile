@@ -431,6 +431,34 @@ CLEAN_PKG += libiconv
 DISTCLEAN_PKG += libiconv-$(LIBICONV_VERSION).tar.gz
 
 # ***************************************************************************
+# fontconfig
+# ***************************************************************************
+
+fontconfig-$(FONTCONFIG_VERSION).tar.gz:
+	$(WGET) $(FONTCONFIG_URL)
+
+fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz
+	$(EXTRACT_GZ)
+	patch -p0 < Patches/fontconfig.patch
+
+.fontconfig: fontconfig
+ifdef HAVE_WIN32
+  ifdef HAVE_CYGWIN
+	(cd $<; ./configure --target=$(HOST) --disable-pic --disable-shared --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) && make && make install)
+  else
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) && make && make install)
+  endif
+else
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+endif
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .fontconfig
+CLEAN_PKG += fontconfig
+DISTCLEAN_PKG += fontconfig-$(FONTCONFIG_VERSION).tar.gz
+
+# ***************************************************************************
 # freetype2
 # ***************************************************************************
 

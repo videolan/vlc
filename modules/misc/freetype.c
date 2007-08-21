@@ -1,3 +1,4 @@
+#include <time.h>
 /*****************************************************************************
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
@@ -238,6 +239,7 @@ typedef struct
 static int Render( filter_t *, subpicture_region_t *, line_desc_t *, int, int);
 static void FreeLines( line_desc_t * );
 static void FreeLine( line_desc_t * );
+static void FontBuilder( vlc_object_t *p_this);
 
 /*****************************************************************************
  * filter_sys_t: freetype local data
@@ -259,6 +261,8 @@ struct filter_sys_t
     int            i_display_height;
 #ifdef HAVE_FONTCONFIG
     FcConfig      *p_fontconfig;
+    vlc_bool_t     b_fontconfig_ok;
+    vlc_mutex_t    fontconfig_lock;
 #endif
 
     input_attachment_t **pp_font_attachments;
@@ -332,10 +336,36 @@ static int Create( vlc_object_t *p_this )
     }
 
 #ifdef HAVE_FONTCONFIG
-    if( FcInit() )
-        p_sys->p_fontconfig = FcConfigGetCurrent();
+    vlc_mutex_init( p_filter, &p_sys->fontconfig_lock );
+    p_sys->b_fontconfig_ok = VLC_FALSE;
+
+    p_sys->p_fontconfig = FcInitLoadConfig();
+
+    if( p_sys->p_fontconfig )
+    {
+        /* Normally this doesn't take very long, but an initial build of
+         * the fontconfig database or the addition of a lot of new fonts
+         * can cause it to take several minutes for a large number of fonts.
+         * Even a small number can take several seconds - much longer than
+         * we can afford to block, so we build the list in the background
+         * and if it succeeds we allow fontconfig to be used.
+         */
+        if( vlc_thread_create( p_filter, "fontlist builder", FontBuilder,
+                       VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+        {
+            /* Don't destroy the fontconfig object - we won't be able to do
+             * italics or bold or change the font face, but we will still
+             * be able to do underline and change the font size.
+             */
+            msg_Warn( p_filter, "fontconfig database builder thread can't "
+                    "be launched. Font styling support will be limited." );
+        };
+    }
     else
-        p_sys->p_fontconfig = NULL;
+    {
+        msg_Warn( p_filter, "Couldn't initialise Fontconfig. "
+                            "Font styling won't be available." );
+    }
 #endif
     i_error = FT_Init_FreeType( &p_sys->p_library );
     if( i_error )
@@ -376,10 +406,11 @@ static int Create( vlc_object_t *p_this )
 
     p_filter->pf_render_text = RenderText;
 #ifdef HAVE_FONTCONFIG
-    p_filter->pf_render_html = RenderHtml;
-#else
-    p_filter->pf_render_html = NULL;
+    if( p_sys->p_fontconfig )
+        p_filter->pf_render_html = RenderHtml;
+    else
 #endif
+        p_filter->pf_render_html = NULL;
 
     LoadFontsFromAttachments( p_filter );
 
@@ -416,8 +447,13 @@ static void Destroy( vlc_object_t *p_this )
     }
 
 #ifdef HAVE_FONTCONFIG
-    FcConfigDestroy( p_sys->p_fontconfig );
-    p_sys->p_fontconfig = NULL;
+    vlc_mutex_destroy( &p_sys->fontconfig_lock );
+
+    if( p_sys->p_fontconfig )
+    {
+        FcConfigDestroy( p_sys->p_fontconfig );
+        p_sys->p_fontconfig = NULL;
+    }
     /* FcFini asserts calling the subfunction FcCacheFini()
      * even if no other library functions have been made since FcInit(),
      * so don't call it. */
@@ -425,6 +461,38 @@ static void Destroy( vlc_object_t *p_this )
     FT_Done_Face( p_sys->p_face );
     FT_Done_FreeType( p_sys->p_library );
     free( p_sys );
+}
+
+static void FontBuilder( vlc_object_t *p_this)
+{
+    filter_t *p_filter = (filter_t*)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    time_t    t1, t2;
+
+    /* Find the session to announce */
+    vlc_mutex_lock( &p_sys->fontconfig_lock );
+
+    msg_Dbg( p_filter, "Building font database..." );
+    time(&t1);
+    if(! FcConfigBuildFonts( p_sys->p_fontconfig ))
+    {
+        /* Don't destroy the fontconfig object - we won't be able to do
+         * italics or bold or change the font face, but we will still
+         * be able to do underline and change the font size.
+         */
+        msg_Err( p_filter, "fontconfig database can't be built. "
+                                "Font styling won't be available" );
+    }
+    time(&t2);
+
+    msg_Dbg( p_filter, "Finished building font database." );
+    if( t1 > 0 && t2 > 0 )
+        msg_Dbg( p_filter, "Took %ld seconds", t2 - t1 );
+
+    FcConfigSetCurrent( p_sys->p_fontconfig );
+    p_sys->b_fontconfig_ok = VLC_TRUE;
+
+    vlc_mutex_unlock( &p_sys->fontconfig_lock );
 }
 
 /*****************************************************************************
@@ -2281,17 +2349,24 @@ static int ProcessLines( filter_t *p_filter,
             /* Look for a match amongst our attachments first */
             CheckForEmbeddedFont( p_sys, &p_face, p_style );
 
-            if( ! p_face )
+            if( ! p_face && p_sys->b_fontconfig_ok )
             {
-                char *psz_fontfile = FontConfig_Select( p_sys->p_fontconfig,
-                                                        p_style->psz_fontname,
-                                                        p_style->b_bold,
-                                                        p_style->b_italic,
-                                                        &i_idx );
+                char *psz_fontfile;
+
+                vlc_mutex_lock( &p_sys->fontconfig_lock );
+
+                psz_fontfile = FontConfig_Select( p_sys->p_fontconfig,
+                                                  p_style->psz_fontname,
+                                                  p_style->b_bold,
+                                                  p_style->b_italic,
+                                                  &i_idx );
+
+                vlc_mutex_unlock( &p_sys->fontconfig_lock );
+
                 if( psz_fontfile )
                 {
                     if( FT_New_Face( p_sys->p_library,
-                                psz_fontfile ? psz_fontfile : "", i_idx, &p_face ) )
+                                psz_fontfile, i_idx, &p_face ) )
                     {
                         free( psz_fontfile );
                         free( pp_char_styles );

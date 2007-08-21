@@ -4133,6 +4133,9 @@ then
     VLC_ADD_PLUGINS([freetype])
     VLC_ADD_CFLAGS([freetype],[`${FREETYPE_CONFIG} --cflags`])
     VLC_ADD_LDFLAGS([freetype],[`${FREETYPE_CONFIG} --libs`])
+    if test "${SYS}" = "mingw32"; then
+       VLC_ADD_LDFLAGS([freetype],[-lxml2])]
+    fi
     AC_CHECK_HEADERS(fontconfig/fontconfig.h,
       [VLC_ADD_CFLAGS([freetype],[-DHAVE_FONTCONFIG])
        VLC_ADD_LDFLAGS([freetype],[-lfontconfig])])
