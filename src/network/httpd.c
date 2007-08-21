@@ -2035,7 +2035,6 @@ static void httpd_HostThread( httpd_host_t *host )
                 else if( i_msg == HTTPD_MSG_OPTIONS )
                 {
                     const char *psz_cseq;
-                    int i_cseq;
 
                     /* unimplemented */
                     answer->i_proto  = query->i_proto ;
@@ -2047,11 +2046,7 @@ static void httpd_HostThread( httpd_host_t *host )
                     answer->p_body = NULL;
 
                     psz_cseq = httpd_MsgGet( query, "Cseq" );
-                    if( psz_cseq )
-                        i_cseq = atoi( psz_cseq );
-                    else
-                        i_cseq = 0;
-                    httpd_MsgAdd( answer, "Cseq", "%d", i_cseq );
+                    httpd_MsgAdd( answer, "Cseq", "%s", psz_cseq ? psz_cseq : "0" );
                     httpd_MsgAdd( answer, "Server", "VLC Server" );
                     httpd_MsgAdd( answer, "Public", "DESCRIBE, SETUP, "
                                  "TEARDOWN, PLAY, PAUSE" );

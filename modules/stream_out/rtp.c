@@ -1735,7 +1735,7 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     httpd_MsgAdd( answer, "Server", PACKAGE_STRING );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     psz_cseq = httpd_MsgGet( query, "Cseq" );
-    httpd_MsgAdd( answer, "Cseq", "%u", psz_cseq ? psz_cseq : "0" );
+    httpd_MsgAdd( answer, "Cseq", "%s", psz_cseq ? psz_cseq : "0" );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )
