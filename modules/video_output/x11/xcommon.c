@@ -1445,41 +1445,17 @@ static int ManageVideo( vout_thread_t *p_vout )
      */
     if ( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
-        vlc_value_t val;
+        vlc_value_t val_fs, val_ontop;
 
         /* Update the object variable and trigger callback */
-        val.b_bool = !p_vout->b_fullscreen;
+        val_fs.b_bool = !p_vout->b_fullscreen;
 
-        /*
-         * FIXME FIXME FIXME FIXME: EXPLICIT HACK.
-         * On the one hand, we cannot hold the lock while triggering a
-         * callback, as it causes a deadlock with video-on-top handling.
-         * On the other hand, we have to lock while triggering the
-         * callback to:
-         *  1/ make sure video-on-top remains in sync with fullscreen
-         *    (i.e. unlocking creates a race condition if fullscreen is
-         *     switched on and off VERY FAST).
-         *  2/ avoid possible corruption bugs if another thread gets the
-         *     mutex and modifies our data in-between.
-         *
-         * This is obviously contradictory. Correct solutions may include:
-         *  - putting the fullscreen NAND video-on-top logic out of libvlc,
-         *    back into the video output plugins (ugly code duplication...),
-         *  - serializing fullscreen and video-on-top handling properly
-         *    instead of doing it via the fullscreen callback. That's got to
-         *    be the correct one.
-         */
-#ifdef MODULE_NAME_IS_xvmc
-        xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
-#endif
-        vlc_mutex_unlock( &p_vout->p_sys->lock );
+        var_Set( p_vout, "fullscreen", val_fs );
 
-        var_Set( p_vout, "fullscreen", val );
-
-        vlc_mutex_lock( &p_vout->p_sys->lock );
-#ifdef MODULE_NAME_IS_xvmc
-        xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
-#endif
+        /* Disable "always on top" in fullscreen mode */
+        var_Get( p_vout, "video-on-top", &val_ontop );
+        if( val_ontop.b_bool )
+            WindowOnTop( p_vout, val_fs.b_bool );
 
         ToggleFullScreen( p_vout );
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
