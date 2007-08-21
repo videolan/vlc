@@ -153,14 +153,13 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     /* Playing something ... */
-    psz_artist = input_item_GetArtist( input_GetItem(p_input) ) ?
-                  strdup( input_item_GetArtist( input_GetItem(p_input) ) ) :
-                  strdup( "" );
-    psz_album = input_item_GetAlbum( input_GetItem(p_input) ) ?
-                  strdup( input_item_GetAlbum( input_GetItem(p_input) ) ) :
-                  strdup("" );
-    psz_title = strdup( input_GetItem(p_input)->psz_name );
-    if( psz_title == NULL ) psz_title = strdup( N_("(no title)") );
+    psz_artist = input_item_GetArtist( input_GetItem(p_input) );
+    psz_album = input_item_GetAlbum( input_GetItem(p_input) );
+    psz_title = input_item_GetTitle( input_GetItem(p_input) );
+    if( !psz_artist ) psz_artist = strdup( "" );
+    if( !psz_album ) psz_artist = strdup( "" );
+    if( !strcmp( psz_title, NULL ) )
+        psz_title = strdup( N_("(no title)") );
 
     psz_buf = str_format_meta( p_this, p_intf->p_sys->psz_format );
 
