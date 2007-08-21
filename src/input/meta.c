@@ -319,9 +319,9 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
     char *psz_artist;
     char *psz_album;
     char *psz_title;
-    char psz_dirname[MAX_PATH+1];
-    char psz_filename[MAX_PATH+1];
-    char * p_de;
+    char psz_dirpath[MAX_PATH+1];
+    char psz_filepath[MAX_PATH+1];
+    char * psz_filename;
     DIR * p_dir;
 
     if( !p_item->p_meta ) return VLC_EGENERIC;
@@ -339,7 +339,7 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
         return VLC_EGENERIC;
     }
 
-    ArtCacheGetDirPath( p_obj, psz_dirname, psz_title,
+    ArtCacheGetDirPath( p_obj, psz_dirpath, psz_title,
                            psz_artist, psz_album );
 
     free( psz_artist );
@@ -347,25 +347,25 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
     free( psz_title );
 
     /* Check if file exists */
-    p_dir = utf8_opendir( psz_dirname );
+    p_dir = utf8_opendir( psz_dirpath );
     if( !p_dir )
         return VLC_EGENERIC;
 
-    while( (p_de = utf8_readdir( p_dir )) )
+    while( (psz_filename = utf8_readdir( p_dir )) )
     {
-        if( !strncmp( p_de, "art", 3 ) )
+        if( !strncmp( psz_filename, "art", 3 ) )
         {
-            snprintf( psz_filename, MAX_PATH, "%s" DIR_SEP "%s",
-                      psz_dirname, p_de );
-            input_item_SetArtURL( p_item, psz_filename );
-            free( p_de );
+            snprintf( psz_filepath, MAX_PATH, "%s" DIR_SEP "%s",
+                      psz_dirpath, psz_filename );
+            input_item_SetArtURL( p_item, psz_filepath );
+            free( psz_filename );
             break;
         }
-        free( p_de );
+        free( psz_filename );
     }
 
     closedir( p_dir );
-    return (p_de == NULL) ? VLC_EGENERIC : VLC_SUCCESS;
+    return (psz_filename == NULL) ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 /**
