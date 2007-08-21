@@ -359,13 +359,15 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
                       psz_dirpath, psz_filename );
             input_item_SetArtURL( p_item, psz_filepath );
             free( psz_filename );
-            break;
+            closedir( p_dir );
+            return VLC_SUCCESS;
         }
         free( psz_filename );
     }
 
+    /* Not found */
     closedir( p_dir );
-    return (psz_filename == NULL) ? VLC_EGENERIC : VLC_SUCCESS;
+    return VLC_EGENERIC;
 }
 
 /**
