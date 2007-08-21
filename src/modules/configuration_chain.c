@@ -370,6 +370,7 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
             free( val2.psz_string );
         }
         var_Set( p_this, psz_name, val );
-        msg_Dbg( p_this, "set config option: %s to %s", psz_name, cfg->psz_value );
+        msg_Dbg( p_this, "set config option: %s to %s", psz_name,
+                 cfg->psz_value ? cfg->psz_value : "(null)" );
     }
 }
