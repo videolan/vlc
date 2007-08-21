@@ -77,6 +77,8 @@ struct libvlc_media_descriptor_t
     int                i_refcount;
     libvlc_instance_t *p_libvlc_instance;
     vlc_dictionary_t   tags; /* To be merged with core's meta soon */
+    struct libvlc_media_list_t *p_subitems; /* A media descriptor can have
+                                           * Sub item */
 };
 
 struct libvlc_tag_query_t
