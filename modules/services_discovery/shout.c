@@ -144,7 +144,7 @@ static int Open( vlc_object_t *p_this, int i_type )
  *****************************************************************************/
 static void Run( services_discovery_t *p_sd )
 {
-    p_sys->p_input->b_prefers_tree = VLC_TRUE;
+    p_sd->p_sys->p_input->b_prefers_tree = VLC_TRUE;
     services_discovery_AddItem( p_sd, p_sd->p_sys->p_input, NULL /* no category */ );
 
     input_Read( pl_Yield(p_sd), p_sd->p_sys->p_input, VLC_FALSE );
