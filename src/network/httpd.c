@@ -274,7 +274,7 @@ static const http_status_info http_reason[] =
     { 206, "Partial Content" },
     { 250, "Low on Storage Space" },
     { 300, "Multiple Choices" }*/,
-    { 301, "Moved Permanently" }/*,
+    { 301, "Moved permanently" }/*,
     { 302, "Moved Temporarily" }, - aka "Found"
     { 303, "See Other" },
     { 304, "Not Modified" },
@@ -284,7 +284,7 @@ static const http_status_info http_reason[] =
     { 401, "Unauthorized" }/*,
     { 402, "Payment Required" }*/,
     { 403, "Forbidden" },
-    { 404, "Not Found" }/*,
+    { 404, "Not found" }/*,
     { 405, "Method Not Allowed" },
     { 406, "Not Acceptable" },
     { 407, "Proxy Authentication Required" },
@@ -301,7 +301,7 @@ static const http_status_info http_reason[] =
     { 451, "Parameter Not Understood" },
     { 452, "Conference Not Found" },
     { 453, "Not Enough Bandwidth" }*/,
-    { 454, "Session Not Found" }/*,
+    { 454, "Session not found" }/*,
     { 455, "Method Not Valid in This State" },
     { 456, "Header Field Not Valid for Resource" },
     { 457, "Invalid Range" },
@@ -310,11 +310,11 @@ static const http_status_info http_reason[] =
     { 460, "Only aggregate operation allowed" }*/,
     { 461, "Unsupported transport" }/*,
     { 462, "Destination unreachable" }*/,
-    { 500, "Internal Server Error" },
-    { 501, "Not Implemented" }/*,
-    { 502, "Bad Gateway" }*/,
-    { 503, "Service Unavailable" }/*,
-    { 504, "Gateway Time-out" },
+    { 500, "Internal server error" },
+    { 501, "Not implemented" }/*,
+    { 502, "Bad gateway" }*/,
+    { 503, "Service unavailable" }/*,
+    { 504, "Gateway time-out" },
     { 505, "Protocol version not supported" }*/,
     {   0, NULL }
 };
@@ -399,7 +399,6 @@ static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, 
     answer->i_type   = HTTPD_MSG_ANSWER;
 
     answer->i_status = 200;
-    answer->psz_status = strdup( "OK" );
 
     httpd_MsgAdd( answer, "Content-type",  "%s", file->psz_mime );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
@@ -518,7 +517,6 @@ static int httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *c
 
     /* We do it ourselves, thanks */
     answer->i_status = 0;
-    answer->psz_status = NULL;
 
     if( httpd_ClientIP( cl, psz_remote_addr ) == NULL )
         *psz_remote_addr = '\0';
@@ -567,20 +565,8 @@ static int httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *c
             psz_headers = (char *)answer->p_body;
             i_headers = answer->i_body;
         }
-        switch( i_status )
-        {
-        case 200:
-            psz_status = "OK";
-            break;
-        case 401:
-            psz_status = "Unauthorized";
-            break;
-        default:
-            if( (i_status < 0) || (i_status > 999) )
-                i_status = 500;
-            psz_status = "Undefined";
-            break;
-        }
+
+        psz_status = httpd_ReasonFromCode( i_status );
         answer->i_body = sizeof("HTTP/1.0 xxx \r\n")
                         + strlen(psz_status) + i_headers - 1;
         psz_new = (char *)malloc( answer->i_body + 1);
@@ -654,7 +640,6 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
     answer->i_version= query->i_version;
     answer->i_type   = HTTPD_MSG_ANSWER;
     answer->i_status = 301;
-    answer->psz_status = strdup( "Moved Permanently" );
 
     answer->i_body = httpd_HtmlError (&p_body, 301, rdir->psz_dst);
     answer->p_body = (unsigned char *)p_body;
@@ -790,7 +775,6 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
         answer->i_type   = HTTPD_MSG_ANSWER;
 
         answer->i_status = 200;
-        answer->psz_status = strdup( "OK" );
 
         if( query->i_type != HTTPD_MSG_HEAD )
         {
@@ -1299,7 +1283,6 @@ void httpd_MsgInit( httpd_message_t *msg )
     msg->i_version  = -1;
 
     msg->i_status   = 0;
-    msg->psz_status = NULL;
 
     msg->psz_url    = NULL;
     msg->psz_args   = NULL;
@@ -1320,10 +1303,6 @@ void httpd_MsgClean( httpd_message_t *msg )
 {
     int i;
 
-    if( msg->psz_status )
-    {
-        free( msg->psz_status );
-    }
     if( msg->psz_url )
     {
         free( msg->psz_url );
@@ -1584,16 +1563,13 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                         strtol( (char *)&cl->p_buffer[8],
                                 &p, 0 );
                     while( *p == ' ' )
-                    {
                         p++;
-                    }
-                    cl->query.psz_status = strdup( p );
                 }
                 else
                 {
                     static const struct
                     {
-                        const char *name;
+                        const char name[16];
                         int  i_type;
                         int  i_proto;
                     }
@@ -1611,16 +1587,16 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                         { "HEAD",           HTTPD_MSG_HEAD,         HTTPD_PROTO_HTTP },
                         { "POST",           HTTPD_MSG_POST,         HTTPD_PROTO_HTTP },
 
-                        { NULL,             HTTPD_MSG_NONE,         HTTPD_PROTO_NONE }
+                        { "",               HTTPD_MSG_NONE,         HTTPD_PROTO_NONE }
                     };
-                    int  i;
+                    unsigned i;
 
                     p = NULL;
                     cl->query.i_type = HTTPD_MSG_NONE;
 
                     /*fprintf( stderr, "received new request=%s\n", cl->p_buffer);*/
 
-                    for( i = 0; msg_type[i].name != NULL; i++ )
+                    for( i = 0; msg_type[i].name[0]; i++ )
                     {
                         if( !strncmp( (char *)cl->p_buffer, msg_type[i].name,
                                       strlen( msg_type[i].name ) ) )
@@ -1826,9 +1802,9 @@ static void httpd_ClientSend( httpd_client_t *cl )
         /* We need to create the header */
         int i_size = 0;
         char *p;
+        const char *psz_status = httpd_ReasonFromCode( cl->answer.i_status );
 
-        i_size = strlen( "HTTP/1.") + 10 + 10 +
-                 strlen( cl->answer.psz_status ? cl->answer.psz_status : "" ) + 5;
+        i_size = strlen( "HTTP/1.") + 10 + 10 + strlen( psz_status ) + 5;
         for( i = 0; i < cl->answer.i_name; i++ )
         {
             i_size += strlen( cl->answer.name[i] ) + 2 +
@@ -1846,7 +1822,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
         p += sprintf( p, "%s/1.%d %d %s\r\n",
                       cl->answer.i_proto ==  HTTPD_PROTO_HTTP ? "HTTP" : "RTSP",
                       cl->answer.i_version,
-                      cl->answer.i_status, cl->answer.psz_status );
+                      cl->answer.i_status, psz_status );
         for( i = 0; i < cl->answer.i_name; i++ )
         {
             p += sprintf( p, "%s: %s\r\n", cl->answer.name[i],
@@ -2066,7 +2042,6 @@ static void httpd_HostThread( httpd_host_t *host )
                     answer->i_type   = HTTPD_MSG_ANSWER;
                     answer->i_version= 0;
                     answer->i_status = 200;
-                    answer->psz_status = strdup( "Ok" );
 
                     answer->i_body = 0;
                     answer->p_body = NULL;
@@ -2103,7 +2078,6 @@ static void httpd_HostThread( httpd_host_t *host )
                         answer->i_type   = HTTPD_MSG_ANSWER;
                         answer->i_version= 0;
                         answer->i_status = 501;
-                        answer->psz_status = strdup( "Unimplemented" );
 
                         answer->i_body = httpd_HtmlError (&p, 501, NULL);
                         answer->p_body = (uint8_t *)p;
@@ -2210,18 +2184,15 @@ static void httpd_HostThread( httpd_host_t *host )
                         if( b_hosts_failed )
                         {
                             answer->i_status = 403;
-                            answer->psz_status = strdup( "Forbidden" );
                         }
                         else if( b_auth_failed )
                         {
                             answer->i_status = 401;
-                            answer->psz_status = strdup( "Authorization Required" );
                         }
                         else
                         {
                             /* no url registered */
                             answer->i_status = 404;
-                            answer->psz_status = strdup( "Not found" );
                         }
 
                         answer->i_body = httpd_HtmlError (&p,

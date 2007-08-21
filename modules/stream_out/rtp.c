@@ -1645,7 +1645,6 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             char *psz_sdp = SDPGenerate( p_stream, psz_destination ? psz_destination : "0.0.0.0", VLC_TRUE );
 
             answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
             httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
             httpd_MsgAdd( answer, "Content-Base",  "%s", p_sys->psz_rtsp_control );
             answer->p_body = (uint8_t *)psz_sdp;
@@ -1658,7 +1657,6 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             rtsp_client_t *rtsp;
             /* for now only multicast so easy */
             answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
             answer->i_body = 0;
             answer->p_body = NULL;
 
@@ -1700,7 +1698,6 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
 
             /* for now only multicast so easy again */
             answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
             answer->i_body = 0;
             answer->p_body = NULL;
 
@@ -1785,7 +1782,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             if( psz_transport == NULL )
             {
                 answer->i_status = 461;
-                answer->psz_status = strdup( "Unsupported Transport" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
                 break;
@@ -1797,7 +1793,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             {
                 //fprintf( stderr, "HTTPD_MSG_SETUP: multicast\n" );
                 answer->i_status = 200;
-                answer->psz_status = strdup( "OK" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
 
@@ -1822,7 +1817,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 if( httpd_ClientIP( cl, ip ) == NULL )
                 {
                     answer->i_status = 500;
-                    answer->psz_status = strdup( "Internal server error" );
                     answer->i_body = 0;
                     answer->p_body = NULL;
                     break;
@@ -1842,7 +1836,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     if( rtsp == NULL )
                     {
                         answer->i_status = 454;
-                        answer->psz_status = strdup( "Unknown session id" );
                         answer->i_body = 0;
                         answer->p_body = NULL;
                         break;
@@ -1865,7 +1858,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     msg_Err( p_stream, "cannot create the access out for %s://%s",
                              psz_access, psz_url );
                     answer->i_status = 500;
-                    answer->psz_status = strdup( "Internal server error" );
                     answer->i_body = 0;
                     answer->p_body = NULL;
                     break;
@@ -1875,7 +1867,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 TAB_APPEND( rtsp->i_access, rtsp->access, p_access );
 
                 answer->i_status = 200;
-                answer->psz_status = strdup( "OK" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
 
@@ -1885,7 +1876,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             else /* TODO  strstr( psz_transport, "interleaved" ) ) */
             {
                 answer->i_status = 461;
-                answer->psz_status = strdup( "Unsupported Transport" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
             }

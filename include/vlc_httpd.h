@@ -73,7 +73,6 @@ struct httpd_message_t
 
     /* for an answer */
     int     i_status;
-    char    *psz_status;
 
     /* for a query */
     char    *psz_url;

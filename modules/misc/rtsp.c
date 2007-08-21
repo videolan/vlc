@@ -946,7 +946,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 if( httpd_ClientIP( cl, ip ) == NULL )
                 {
                     answer->i_status = 500;
-                    answer->psz_status = strdup( "Internal server error" );
                     answer->i_body = 0;
                     answer->p_body = NULL;
                     break;
@@ -963,7 +962,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                         ( p_vod->p_sys->i_connections >= p_vod->p_sys->i_throttle_users ) )
                     {
                         answer->i_status = 503;
-                        answer->psz_status = strdup( "Too many connections" );
                         answer->i_body = 0;
                         answer->p_body = NULL;
                         break;
@@ -975,7 +973,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     if( !p_rtsp )
                     {
                         answer->i_status = 454;
-                        answer->psz_status = strdup( "Unknown session id" );
                         answer->i_body = 0;
                         answer->p_body = NULL;
                         break;
@@ -987,7 +984,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     if( !p_rtsp )
                     {
                         answer->i_status = 454;
-                        answer->psz_status = strdup( "Unknown session id" );
                         answer->i_body = 0;
                         answer->p_body = NULL;
                         break;
@@ -995,7 +991,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 }
 
                 answer->i_status = 200;
-                answer->psz_status = strdup( "OK" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
 
@@ -1019,7 +1014,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             else /* TODO  strstr( psz_transport, "interleaved" ) ) */
             {
                 answer->i_status = 461;
-                answer->psz_status = strdup( "Unsupported Transport" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
             }
@@ -1038,7 +1032,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( !psz_playnow )
             {
                 answer->i_status = 200;
-                answer->psz_status = strdup( "OK" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
             }
@@ -1051,7 +1044,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( !p_rtsp )
             {
                 answer->i_status = 500;
-                answer->psz_status = strdup( "Internal server error" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
                 break;
@@ -1161,7 +1153,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( psz_sdp != NULL )
             {
                 answer->i_status = 200;
-                answer->psz_status = strdup( "OK" );
                 httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
 
                 answer->p_body = (uint8_t *)psz_sdp;
@@ -1170,7 +1161,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             else
             {
                 answer->i_status = 500;
-                answer->psz_status = strdup( "Internal server error" );
                 answer->p_body = NULL;
                 answer->i_body = 0;
             }
@@ -1188,7 +1178,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             p_rtsp->b_paused = VLC_TRUE;
 
             answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
             answer->i_body = 0;
             answer->p_body = NULL;
             break;
@@ -1196,7 +1185,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
         case HTTPD_MSG_TEARDOWN:
             /* for now only multicast so easy again */
             answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
             answer->i_body = 0;
             answer->p_body = NULL;
 
@@ -1212,7 +1200,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
         case HTTPD_MSG_GETPARAMETER:
             answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
             answer->i_body = 0;
             answer->p_body = NULL;
             break;
@@ -1285,7 +1272,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 if( httpd_ClientIP( cl, ip ) == NULL )
                 {
                     answer->i_status = 500;
-                    answer->psz_status = strdup( "Internal server error" );
                     answer->i_body = 0;
                     answer->p_body = NULL;
                     break;
@@ -1302,7 +1288,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                         ( p_vod->p_sys->i_connections >= p_vod->p_sys->i_throttle_users ) )
                     {
                         answer->i_status = 503;
-                        answer->psz_status = strdup( "Too many connections" );
                         answer->i_body = 0;
                         answer->p_body = NULL;
                         break;
@@ -1318,7 +1303,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     if( !p_rtsp )
                     {
                         answer->i_status = 454;
-                        answer->psz_status = strdup( "Unknown session id" );
                         answer->i_body = 0;
                         answer->p_body = NULL;
                         break;
@@ -1329,7 +1313,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 if( !p_rtsp_es )
                 {
                     answer->i_status = 500;
-                    answer->psz_status = strdup( "Internal server error" );
                     answer->i_body = 0;
                     answer->p_body = NULL;
                     break;
@@ -1340,7 +1323,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 TAB_APPEND( p_rtsp->i_es, p_rtsp->es, p_rtsp_es );
 
                 answer->i_status = 200;
-                answer->psz_status = strdup( "OK" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
 
@@ -1366,7 +1348,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             else /* TODO  strstr( psz_transport, "interleaved" ) ) */
             {
                 answer->i_status = 461;
-                answer->psz_status = strdup( "Unsupported Transport" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
             }
@@ -1405,7 +1386,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( !psz_playnow )
             {
                 answer->i_status = 200;
-                answer->psz_status = strdup( "OK" );
                 answer->i_body = 0;
                 answer->p_body = NULL;
             }
@@ -1413,7 +1393,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 
         case HTTPD_MSG_TEARDOWN:
             answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
             answer->i_body = 0;
             answer->p_body = NULL;
 
@@ -1453,7 +1432,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             p_rtsp->b_paused = VLC_TRUE;
 
             answer->i_status = 200;
-            answer->psz_status = strdup( "OK" );
             answer->i_body = 0;
             answer->p_body = NULL;
             break;
