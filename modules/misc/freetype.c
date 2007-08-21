@@ -239,7 +239,9 @@ typedef struct
 static int Render( filter_t *, subpicture_region_t *, line_desc_t *, int, int);
 static void FreeLines( line_desc_t * );
 static void FreeLine( line_desc_t * );
+#ifdef HAVE_FONTCONFIG
 static void FontBuilder( vlc_object_t *p_this);
+#endif
 
 /*****************************************************************************
  * filter_sys_t: freetype local data
@@ -463,6 +465,8 @@ static void Destroy( vlc_object_t *p_this )
     free( p_sys );
 }
 
+#ifdef HAVE_FONTCONFIG
+
 static void FontBuilder( vlc_object_t *p_this)
 {
     filter_t *p_filter = (filter_t*)p_this;
@@ -494,6 +498,8 @@ static void FontBuilder( vlc_object_t *p_this)
 
     vlc_mutex_unlock( &p_sys->fontconfig_lock );
 }
+
+#endif
 
 /*****************************************************************************
  * Make any TTF/OTF fonts present in the attachments of the media file
