@@ -25,11 +25,11 @@
 /* DBUS IDENTIFIERS */
 
 /* name registered on the session bus */
-#define VLC_DBUS_SERVICE        "org.mpris.vlc"
-#define VLC_DBUS_INTERFACE      "org.freedesktop.MediaPlayer"
-#define VLC_DBUS_ROOT_PATH      "/"
-#define VLC_DBUS_PLAYER_PATH    "/Player"
-#define VLC_DBUS_TRACKLIST_PATH "/TrackList"
+#define VLC_MPRIS_DBUS_SERVICE      "org.mpris.vlc"
+#define MPRIS_DBUS_INTERFACE        "org.freedesktop.MediaPlayer"
+#define MPRIS_DBUS_ROOT_PATH        "/"
+#define MPRIS_DBUS_PLAYER_PATH      "/Player"
+#define MPRIS_DBUS_TRACKLIST_PATH   "/TrackList"
 
 /* MACROS */
 
@@ -54,8 +54,8 @@
     return DBUS_HANDLER_RESULT_HANDLED
 
 #define SIGNAL_INIT( signal ) \
-    DBusMessage *p_msg = dbus_message_new_signal( VLC_DBUS_PLAYER_PATH, \
-        VLC_DBUS_INTERFACE, signal ); \
+    DBusMessage *p_msg = dbus_message_new_signal( MPRIS_DBUS_PLAYER_PATH, \
+        MPRIS_DBUS_INTERFACE, signal ); \
     if( !p_msg ) return DBUS_HANDLER_RESULT_NEED_MEMORY; \
 
 #define SIGNAL_SEND \
@@ -149,6 +149,15 @@ const char* psz_introspection_xml_data_player =
 "    </method>\n"
 "    <method name=\"Disconnect\">\n"
 "    </method>\n"
+"    <signal name=\"TrackChange\">\n"
+"      <arg type=\"a{sv}\"/>\n"
+"    </signal>\n"
+"    <signal name=\"StatusChange\">\n"
+"      <arg type=\"i\">\n"
+"    </signal>\n"
+"    <signal name=\"CapsChange\">\n"
+"      <arg type=\"i\">\n"
+"    </signal>\n"
 "  </interface>\n"
 "</node>\n"
 ;
@@ -190,9 +199,9 @@ const char* psz_introspection_xml_data_tracklist =
 "</node>\n"
 ;
 
-#define VLC_DBUS_ROOT_PATH      "/"
-#define VLC_DBUS_PLAYER_PATH    "/Player"
-#define VLC_DBUS_TRACKLIST_PATH "/TrackList"
+#define MPRIS_DBUS_ROOT_PATH      "/"
+#define MPRIS_DBUS_PLAYER_PATH    "/Player"
+#define MPRIS_DBUS_TRACKLIST_PATH "/TrackList"
 
 /* Handle  messages reception */
 DBUS_METHOD( handle_root );

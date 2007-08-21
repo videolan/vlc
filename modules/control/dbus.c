@@ -323,7 +323,7 @@ DBUS_METHOD( Disconnect )
     DBusError error;
     int i;
     dbus_error_init( &error );
-    i = dbus_bus_release_name( p_conn, "org.mpris.vlc", &error );
+    i = dbus_bus_release_name( p_conn, VLC_MPRIS_DBUS_SERVICE, &error );
     if( ( i == -1 ) && ( dbus_error_is_set( &error ) ) )
     {
         msg_Err( (vlc_object_t*) p_this, "D-Bus disconnection failed : %s\n",
@@ -640,7 +640,7 @@ DBUS_METHOD( handle_introspect_tracklist )
  *****************************************************************************/
 
 #define METHOD_FUNC( method, function ) \
-    else if( dbus_message_is_method_call( p_from, VLC_DBUS_INTERFACE, method ) )\
+    else if( dbus_message_is_method_call( p_from, MPRIS_DBUS_INTERFACE, method ) )\
         return function( p_conn, p_from, p_this )
 
 DBUS_METHOD( handle_root )
@@ -734,21 +734,22 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* register a well-known name on the bus */
-    dbus_bus_request_name( p_conn, "org.mpris.vlc", 0, &error );
+    dbus_bus_request_name( p_conn, VLC_MPRIS_DBUS_SERVICE, 0, &error );
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( p_this, "Error requesting org.mpris.vlc service:"                " %s\n", error.message );
+        msg_Err( p_this, "Error requesting % service: %s\n"
+        VLC_MPRIS_DBUS_SERVICE, error.message );
         dbus_error_free( &error );
         free( p_sys );
         return VLC_EGENERIC;
     }
 
     /* we register the objects */
-    dbus_connection_register_object_path( p_conn, VLC_DBUS_ROOT_PATH,
+    dbus_connection_register_object_path( p_conn, MPRIS_DBUS_ROOT_PATH,
             &vlc_dbus_root_vtable, p_this );
-    dbus_connection_register_object_path( p_conn, VLC_DBUS_PLAYER_PATH,
+    dbus_connection_register_object_path( p_conn, MPRIS_DBUS_PLAYER_PATH,
             &vlc_dbus_player_vtable, p_this );
-    dbus_connection_register_object_path( p_conn, VLC_DBUS_TRACKLIST_PATH,
+    dbus_connection_register_object_path( p_conn, MPRIS_DBUS_TRACKLIST_PATH,
             &vlc_dbus_tracklist_vtable, p_this );
 
     dbus_connection_flush( p_conn );
