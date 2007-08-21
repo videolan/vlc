@@ -124,6 +124,7 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
         return VLC_EGENERIC;
 
     psz_artist = input_item_GetArtist( p_item );
+    psz_album = input_item_GetAlbum( p_item );
     psz_title = input_item_GetTitle( p_item );
     if(!psz_title)
         psz_title = input_item_GetName( p_item );
@@ -350,7 +351,7 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
     if( !p_dir )
         return VLC_EGENERIC;
 
-    while( (p_de = utf8_readdir( p_dir )) )
+    while( (p_de = utf8_readdir( psz_dirname )) )
     {
         if( strncmp( p_de->d_name, "art", 3 ) )
         {
