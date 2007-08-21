@@ -1,5 +1,5 @@
 /*****************************************************************************
- * media_descriptor.c: Libvlc API media descriport management
+ * media_descriptor.c: Libvlc API media descripor management
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  * $Id$
@@ -82,6 +82,14 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
     p_md_child = libvlc_media_descriptor_new_from_input_item(
                 p_md->p_libvlc_instance, 
                 p_event->u.input_item_subitem_added.p_new_child, NULL );
+
+    /* Add this to our media list */
+    if( !p_md->p_subitems )
+        p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance, NULL );
+    if( !p_md->p_subitems )
+    {
+        libvlc_media_list_add_media_descriptor( p_md->p_subitems, p_md_child, NULL );
+    }
 
     /* Construct the event */
     event.type = libvlc_MediaDescriptorSubItemAdded;
@@ -179,6 +187,10 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
     p_md->b_preparsed       = VLC_TRUE;
     p_md->i_refcount        = 1;
 
+    /* A media descriptor can be a playlist. When you open a playlist
+     * It can give a bunch of item to read. */
+    p_md->p_subitems        = NULL;
+
     vlc_dictionary_init( &p_md->tags, 1 );
 
     p_md->p_event_manager = libvlc_event_manager_new( p_md, p_instance, p_e );
@@ -232,6 +244,8 @@ void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
 
     if( p_md->i_refcount > 0 )
         return;
+
+    libvlc_media_list_release( p_md->p_subitems );
 
     uninstall_input_item_observer( p_md );
     vlc_gc_decref( p_md->p_input_item );
