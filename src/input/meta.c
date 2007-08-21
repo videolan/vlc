@@ -129,7 +129,7 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     if(!psz_title)
         psz_title = input_item_GetName( p_item );
 
-    if(  !psz_title && !psz_artist && !psz_album )
+    if( !psz_title && !psz_artist && !psz_album )
         return VLC_EGENERIC;
 
     free( psz_title );
@@ -321,7 +321,7 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
     char *psz_title;
     char psz_dirname[MAX_PATH+1];
     char psz_filename[MAX_PATH+1];
-    struct dirent * p_de;
+    char * p_de;
     DIR * p_dir;
 
     if( !p_item->p_meta ) return VLC_EGENERIC;
@@ -353,10 +353,10 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
 
     while( (p_de = utf8_readdir( psz_dirname )) )
     {
-        if( strncmp( p_de->d_name, "art", 3 ) )
+        if( strncmp( p_de, "art", 3 ) )
         {
             snprintf( psz_filename, MAX_PATH, "%s" DIR_SEP "%s",
-                            psz_dirname, p_de->d_name );
+                      psz_dirname, p_de );
             input_item_SetArtURL( p_item, psz_filename );
             closedir( p_dir );
             return VLC_SUCCESS;
