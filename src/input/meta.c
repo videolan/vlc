@@ -241,6 +241,7 @@ static void ArtCacheCreateDir( const char *psz_dir )
         *psz = DIR_SEP_CHAR;
         psz++;   
     }
+    utf8_mkdir( psz_dir );
 }
 
 static char * ArtCacheGetSanitizedFileName( const char *psz )
