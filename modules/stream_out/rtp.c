@@ -1970,12 +1970,14 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     int sport = var_GetInteger (p_access, "src-port");
 
                     httpd_ServerIP( cl, ip );
-                    fprintf( stderr, "src = %s, ip = %s\n", src, ip );
 
                     if( ( src != NULL ) && strcmp( src, ip ) )
                     {
                         /* Specify source IP if it is different from the RTSP
                          * control connection server address */
+                        char *ptr = strchr( src, '%' );
+                        if( ptr != NULL ) *ptr = '\0'; /* remove scope ID */
+
                         httpd_MsgAdd( answer, "Transport",
                                       "RTP/AVP/UDP;unicast;source=%s;"
                                       "client_port=%u-%u;server_port=%u-%u;"
