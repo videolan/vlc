@@ -175,7 +175,7 @@ void X11Window::toggleOnTop( bool onTop ) const
 {
     int i_ret, i_format;
     unsigned long i, i_items, i_bytesafter;
-    Atom net_wm_supported, net_wm_state, net_wm_state_on_top;
+    Atom net_wm_supported, net_wm_state, net_wm_state_on_top,net_wm_state_above;
     union { Atom *p_atom; unsigned char *p_char; } p_args;
 
     p_args.p_atom = NULL;
@@ -200,8 +200,39 @@ void X11Window::toggleOnTop( bool onTop ) const
         if( p_args.p_atom[i] == net_wm_state_on_top ) break;
     }
 
+    if( i == i_items )
+    { /* use _NET_WM_STATE_ABOVE if window manager
+       * doesn't handle _NET_WM_STATE_STAYS_ON_TOP */
+
+        net_wm_state_above = XInternAtom( XDISPLAY, "_NET_WM_STATE_ABOVE",
+                                          False);
+        for( i = 0; i < i_items; i++ )
+        {
+            if( p_args.p_atom[i] == net_wm_state_above ) break;
+        }
+        
+        XFree( p_args.p_atom );
+        if( i == i_items )
+            return; /* Not supported */
+
+        /* Switch "on top" status */
+        XClientMessageEvent event;
+        memset( &event, 0, sizeof( XClientMessageEvent ) );
+
+        event.type = ClientMessage;
+        event.message_type = net_wm_state;
+        event.display = XDISPLAY;
+        event.window = m_wnd;
+        event.format = 32;
+        event.data.l[ 0 ] = onTop; /* set property */
+        event.data.l[ 1 ] = net_wm_state_above;
+
+        XSendEvent( XDISPLAY, DefaultRootWindow( XDISPLAY ),
+                    False, SubstructureRedirectMask, (XEvent*)&event );
+        return;
+    }
+
     XFree( p_args.p_atom );
-    if( i == i_items ) return; /* Not supported */
 
     /* Switch "on top" status */
     XClientMessageEvent event;
