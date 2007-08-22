@@ -162,12 +162,13 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     free( psz_artist );
     free( psz_album );
 
-    char *psz_arturl = input_item_GetArtURL( p_item );
     input_FindArtInCache( p_playlist, p_item );
+
+    char *psz_arturl = input_item_GetArtURL( p_item );
     if( !EMPTY_STR( psz_arturl ) )
     {
         free( psz_arturl );
-        return 0;
+        return 0; /* Art is in cache, no need to go further */
     }
     free( psz_arturl );
 
