@@ -780,8 +780,8 @@ module_t *__module_FindName( vlc_object_t *p_this, const char * psz_name )
         if( psz_module_name && !strcmp( psz_module_name, psz_name ) )
         {
             /* We can release the list, and return yes */
-            vlc_list_release( p_list );
             vlc_object_yield( p_module );
+            vlc_list_release( p_list );
             return p_module;
         }
     }
