@@ -1610,9 +1610,9 @@ if test "${enable_shout}" = "yes"; then
     [AC_MSG_WARN(libshout library not found)])
 fi
 
-dnl Lua playlist demux
-AC_ARG_ENABLE(luaplaylist,
-  [  --enable-lua            lua playlist demux plugin (default enabled)])
+dnl Lua modules
+AC_ARG_ENABLE(lua,
+  [  --enable-lua            lua modules plugin (default enabled)])
 if test "${enable_lua}" != "no"
 then
   PKG_CHECK_MODULES(LUA, lua5.1,
@@ -1641,9 +1641,9 @@ then
     ])
   if test "x${have_lua}" = "xyes" ;  then
      AC_DEFINE(HAVE_LUA, [], [Define if you have the lua library])
-     VLC_ADD_PLUGINS([luaplaylist luameta])
-     VLC_ADD_LDFLAGS([luaplaylist luameta],[$LUA_LIBS])
-     VLC_ADD_CFLAGS([luaplaylist luameta],[$LUA_CFLAGS])
+     VLC_ADD_PLUGINS([lua])
+     VLC_ADD_LDFLAGS([lua],[$LUA_LIBS])
+     VLC_ADD_CFLAGS([lua],[$LUA_CFLAGS])
   fi
 fi
 
@@ -6041,6 +6041,7 @@ AC_CONFIG_FILES([
   modules/meta_engine/Makefile
   modules/misc/Makefile
   modules/misc/dummy/Makefile
+  modules/misc/lua/Makefile
   modules/misc/memcpy/Makefile
   modules/misc/notify/Makefile
   modules/misc/testsuite/Makefile
