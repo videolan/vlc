@@ -257,36 +257,36 @@ static const char *httpd_MimeFromUrl( const char *psz_url )
 
 typedef struct
 {
-    int i_code;
-    const char *psz_reason;
+    unsigned   i_code;
+    const char psz_reason[36];
 } http_status_info;
 
 static const http_status_info http_reason[] =
 {
   /*{ 100, "Continue" },
     { 101, "Switching Protocols" },*/
-    { 200, "OK" }/*,
-    { 201, "Created" },
+    { 200, "OK" },
+  /*{ 201, "Created" },
     { 202, "Accepted" },
     { 203, "Non-Authoritative Information" },
     { 204, "No Content" },
     { 205, "Reset Content" },
     { 206, "Partial Content" },
     { 250, "Low on Storage Space" },
-    { 300, "Multiple Choices" }*/,
-    { 301, "Moved permanently" }/*,
-    { 302, "Moved Temporarily" }, - aka "Found"
+    { 300, "Multiple Choices" },*/
+    { 301, "Moved permanently" },
+  /*{ 302, "Moved temporarily" },
     { 303, "See Other" },
     { 304, "Not Modified" },
     { 305, "Use Proxy" },
     { 307, "Temporary Redirect" },
-    { 400, "Bad Request" }*/,
-    { 401, "Unauthorized" }/*,
-    { 402, "Payment Required" }*/,
+    { 400, "Bad Request" },*/
+    { 401, "Unauthorized" },
+  /*{ 402, "Payment Required" },*/
     { 403, "Forbidden" },
-    { 404, "Not found" }/*,
+    { 404, "Not found" },
     { 405, "Method Not Allowed" },
-    { 406, "Not Acceptable" },
+  /*{ 406, "Not Acceptable" },
     { 407, "Proxy Authentication Required" },
     { 408, "Request Time-out" },
     { 409, "Conflict" },
@@ -300,38 +300,40 @@ static const http_status_info http_reason[] =
     { 417, "Expectation Failed" },
     { 451, "Parameter Not Understood" },
     { 452, "Conference Not Found" },
-    { 453, "Not Enough Bandwidth" }*/,
-    { 454, "Session not found" }/*,
-    { 455, "Method Not Valid in This State" },
+    { 453, "Not Enough Bandwidth" },*/
+    { 454, "Session not found" },
+  /*{ 455, "Method Not Valid in This State" },
     { 456, "Header Field Not Valid for Resource" },
     { 457, "Invalid Range" },
-    { 458, "Parameter Is Read-Only" },
+    { 458, "Parameter Is Read-Only" },*/
     { 459, "Aggregate operation not allowed" },
-    { 460, "Only aggregate operation allowed" }*/,
-    { 461, "Unsupported transport" }/*,
-    { 462, "Destination unreachable" }*/,
+    { 460, "Non-aggregate operation not allowed" },
+    { 461, "Unsupported transport" },
+  /*{ 462, "Destination unreachable" },*/
     { 500, "Internal server error" },
-    { 501, "Not implemented" }/*,
-    { 502, "Bad gateway" }*/,
-    { 503, "Service unavailable" }/*,
-    { 504, "Gateway time-out" },
-    { 505, "Protocol version not supported" }*/,
-    {   0, NULL }
+    { 501, "Not implemented" },
+  /*{ 502, "Bad gateway" },*/
+    { 503, "Service unavailable" },
+  /*{ 504, "Gateway time-out" },
+    { 505, "Protocol version not supported" },*/
+    { 551, "Option not supported" },
+    { 999, "" }
 };
 
-static const char *psz_fallback_reason[] =
-{ "Continue", "OK", "Found", "Client Error", "Server Error" };
+static const char psz_fallback_reason[5][16] =
+{ "Continue", "OK", "Found", "Client error", "Server error" };
 
-static const char *httpd_ReasonFromCode( int i_code )
+static const char *httpd_ReasonFromCode( unsigned i_code )
 {
     const http_status_info *p;
 
-    for (p = http_reason; p->i_code < i_code; p++);
+    assert( ( i_code >= 100 ) && ( i_code <= 599 ) );
+
+    for (p = http_reason; i_code > p->i_code; p++);
 
     if( p->i_code == i_code )
         return p->psz_reason;
 
-    assert( ( i_code >= 100 ) && ( i_code <= 599 ) );
     return psz_fallback_reason[(i_code / 100) - 1];
 }
 
