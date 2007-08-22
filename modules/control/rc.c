@@ -498,7 +498,7 @@ static void Run( intf_thread_t *p_intf )
                 if( !p_input->b_dead || !p_input->b_die )
                 {
                     char *psz_uri =
-                            input_item_Get_URI( input_GetItem( p_input ) );
+                            input_item_GetURI( input_GetItem( p_input ) );
                     msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
                     free( psz_uri );
                     msg_rc( STATUS_CHANGE "( audio volume: %d )",
