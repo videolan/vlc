@@ -2036,24 +2036,28 @@ static void httpd_HostThread( httpd_host_t *host )
                 }
                 else if( i_msg == HTTPD_MSG_OPTIONS )
                 {
-                    const char *psz_cseq;
+                    const char *psz;
 
                     /* unimplemented */
                     answer->i_proto  = query->i_proto ;
                     answer->i_type   = HTTPD_MSG_ANSWER;
                     answer->i_version= 0;
+
                     answer->i_status = 200;
 
                     answer->i_body = 0;
                     answer->p_body = NULL;
 
-                    psz_cseq = httpd_MsgGet( query, "Cseq" );
-                    httpd_MsgAdd( answer, "Cseq", "%s", psz_cseq ? psz_cseq : "0" );
-                    httpd_MsgAdd( answer, "Server", "VLC Server" );
+                    psz = httpd_MsgGet( query, "Cseq" );
+                    if( psz != NULL )
+                        httpd_MsgAdd( answer, "Cseq", "%s", psz );
+                    psz = httpd_MsgGet( query, "Require" );
+                    if( psz != NULL )
+                        httpd_MsgAdd( query, "Unsupported", "%s", psz );
+                    httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
                     httpd_MsgAdd( answer, "Public", "DESCRIBE, SETUP, "
                                  "TEARDOWN, PLAY, PAUSE" );
-                    httpd_MsgAdd( answer, "Content-Length", "%d",
-                                  answer->i_body );
+                    httpd_MsgAdd( answer, "Content-Length", "0" );
 
                     cl->i_buffer = -1;  /* Force the creation of the answer in
                                          * httpd_ClientSend */

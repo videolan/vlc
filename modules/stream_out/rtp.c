@@ -1643,7 +1643,11 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     answer->p_body = NULL;
 
     if( httpd_MsgGet( query, "Require" ) != NULL )
+    {
         answer->i_status = 551;
+        httpd_MsgAdd( query, "Unsupported", "%s",
+                      httpd_MsgGet( query, "Require" ) );
+    }
     else
     switch( query->i_type )
     {
@@ -1745,10 +1749,11 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             return VLC_EGENERIC;
     }
 
-    httpd_MsgAdd( answer, "Server", PACKAGE_STRING );
+    httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     psz_cseq = httpd_MsgGet( query, "Cseq" );
-    httpd_MsgAdd( answer, "Cseq", "%s", psz_cseq ? psz_cseq : "0" );
+    if( psz_cseq )
+        httpd_MsgAdd( answer, "Cseq", "%s", psz_cseq );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )
@@ -1815,7 +1820,11 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     }
 
     if( httpd_MsgGet( query, "Require" ) != NULL )
+    {
         answer->i_status = 551;
+        httpd_MsgAdd( query, "Unsupported", "%s",
+                      httpd_MsgGet( query, "Require" ) );
+    }
     else
     switch( query->i_type )
     {
@@ -1993,14 +2002,13 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
         default:
             answer->i_status = 460;
             break;
-
-            return VLC_EGENERIC;
     }
 
-    httpd_MsgAdd( answer, "Server", PACKAGE_STRING );
-    httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     psz_cseq = httpd_MsgGet( query, "Cseq" );
-    httpd_MsgAdd( answer, "Cseq", "%s", psz_cseq ? psz_cseq : "0");
+    if( psz_cseq )
+        httpd_MsgAdd( answer, "Cseq", "%s", psz_cseq );
+    httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
+    httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )
