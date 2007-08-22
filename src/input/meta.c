@@ -324,8 +324,6 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
     char * psz_filename;
     DIR * p_dir;
 
-    if( !p_item->p_meta ) return VLC_EGENERIC;
-
     psz_artist = input_item_GetArtist( p_item );
     psz_album = input_item_GetAlbum( p_item );
     psz_title = input_item_GetTitle( p_item );
