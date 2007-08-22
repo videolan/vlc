@@ -3,7 +3,9 @@
 
 -- Replace non alphanumeric char by +
 function get_query( title )
-    return string.gsub( title, "([^%w ])",
+    -- If we have a .EXT remove the extension.
+    str = string.gsub( title, "(.*)%....$", "%1" )
+    return string.gsub( str, "([^%w ])",
          function (c) return string.format ("%%%02X", string.byte(c)) end)
 end
 
