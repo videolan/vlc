@@ -766,27 +766,46 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
 }
 
 /*****************************************************************************
- * module_Exists: tell if a module exists.
- *****************************************************************************
- * This function is a boolean function that tells if a module exist or not.
+ * module_FindName: get a pointer to a module_t given it's name.
  *****************************************************************************/
-
-vlc_bool_t __module_Exists(  vlc_object_t *p_this, const char * psz_name )
+module_t *__module_FindName( vlc_object_t *p_this, const char * psz_name )
 {
     vlc_list_t *p_list;
     int i;
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
     for( i = 0 ; i < p_list->i_count; i++)
     {
-        const char *psz_module_name =
-            ((module_t *) p_list->p_values[i].p_object)->psz_shortname;
+        module_t *p_module = ((module_t *) p_list->p_values[i].p_object);
+        const char *psz_module_name = p_module->psz_object_name;
         if( psz_module_name && !strcmp( psz_module_name, psz_name ) )
         {
             /* We can release the list, and return yes */
-            vlc_list_release( p_list ); return VLC_TRUE;
+            vlc_list_release( p_list );
+            vlc_object_yield( p_module );
+            return p_module;
         }
     }
-    vlc_list_release( p_list ); return VLC_FALSE;
+    vlc_list_release( p_list );
+    return NULL;
+}
+
+/*****************************************************************************
+ * module_Exists: tell if a module exists.
+ *****************************************************************************
+ * This function is a boolean function that tells if a module exist or not.
+ *****************************************************************************/
+vlc_bool_t __module_Exists(  vlc_object_t *p_this, const char * psz_name )
+{
+    module_t *p_module = __module_FindName( p_this, psz_name );
+    if( p_module )
+    {
+        vlc_object_release( p_module );
+        return VLC_TRUE;
+    }
+    else
+    {
+        return VLC_FALSE;
+    }
 }
 
 

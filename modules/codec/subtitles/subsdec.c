@@ -756,7 +756,7 @@ static int ParseImageAttachments( decoder_t *p_dec )
                     fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
 
                     /* Find a suitable decoder module */
-                    if( module_Exists( p_dec, "SDL Image decoder" ) )
+                    if( module_Exists( p_dec, "sdl_image" ) )
                     {
                         /* ffmpeg thinks it can handle bmp properly but it can't (at least
                          * not all of them), so use sdl_image if it is available */
