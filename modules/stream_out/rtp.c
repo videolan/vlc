@@ -1756,24 +1756,47 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     return VLC_SUCCESS;
 }
 
+
+/** Finds the next transport choice */
+static inline const char *transport_next( const char *str )
+{
+    /* Looks for comma */
+    str = strchr( str, ',' );
+    if( str == NULL )
+        return NULL; /* No more transport options */
+
+    str++; /* skips comma */
+    while( strchr( "\r\n\t ", *str ) )
+        str++;
+
+    return (*str) ? str : NULL;
+}
+
+
+/** Finds the next transport parameter */
+static inline const char *parameter_next( const char *str )
+{
+    while( strchr( ",;", *str ) == NULL )
+        str++;
+
+    return (*str == ';') ? (str + 1) : NULL;
+}
+
+
 static int RtspCallbackId( httpd_callback_sys_t *p_args,
-                          httpd_client_t *cl,
-                          httpd_message_t *answer, httpd_message_t *query )
+                           httpd_client_t *cl,
+                           httpd_message_t *answer, httpd_message_t *query )
 {
     sout_stream_id_t *id = (sout_stream_id_t*)p_args;
     sout_stream_t    *p_stream = id->p_stream;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    char psz_session_init[100];
-    const char *psz_session = NULL;
-    const char *psz_cseq = NULL;
-
+    char psz_session_init[21];
+    const char *psz_session;
+    const char *psz_cseq;
 
     if( answer == NULL || query == NULL )
         return VLC_SUCCESS;
     //fprintf( stderr, "RtspCallback query: type=%d\n", query->i_type );
-
-    /* */
-    snprintf( psz_session_init, sizeof(psz_session_init), "%d", rand() );
 
     /* */
     answer->i_proto = HTTPD_PROTO_RTSP;
@@ -1782,6 +1805,15 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     answer->i_body = 0;
     answer->p_body = NULL;
 
+    /* Create new session ID if needed */
+    psz_session = httpd_MsgGet( query, "Session" );
+    if( psz_session == NULL )
+    {
+        /* FIXME: should be somewhat secure randomness */
+        snprintf( psz_session_init, sizeof(psz_session_init), I64Fd,
+                  NTPtime64() + rand() );
+    }
+
     if( httpd_MsgGet( query, "Require" ) != NULL )
         answer->i_status = 551;
     else
@@ -1789,92 +1821,167 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     {
         case HTTPD_MSG_SETUP:
         {
-            const char *psz_transport = httpd_MsgGet( query, "Transport" );
-            if( psz_transport == NULL )
+            answer->i_status = 461;
+
+            for( const char *tpt = httpd_MsgGet( query, "Transport" );
+                 tpt != NULL;
+                 tpt = transport_next( tpt ) )
             {
-                answer->i_status = 461;
-                break;
-            }
+                vlc_bool_t b_multicast = VLC_TRUE, b_unsupp = VLC_FALSE;
+                unsigned loport = 5004, hiport = 5005; /* from RFC3551 */
 
-            //fprintf( stderr, "HTTPD_MSG_SETUP: transport=%s\n", psz_transport );
+                /* Check transport protocol. */
+                /* Currently, we only support RTP/AVP over UDP */
+                if( strncmp( tpt, "RTP/AVP", 7 ) )
+                    continue;
+                tpt += 7;
+                if( strncmp( tpt, "/UDP", 4 ) == 0 )
+                    tpt += 4;
+                if( strchr( ";,", *tpt ) == NULL )
+                    continue;
 
-            if( strstr( psz_transport, "multicast" ) && id->psz_destination )
-            {
-                //fprintf( stderr, "HTTPD_MSG_SETUP: multicast\n" );
-                answer->i_status = 200;
-
-                psz_session = httpd_MsgGet( query, "Session" );
-                if( !psz_session )
-                    psz_session = psz_session_init;
-
-                httpd_MsgAdd( answer, "Transport",
-                              "RTP/AVP/UDP;destination=%s;port=%d-%d;ttl=%d",
-                              id->psz_destination, id->i_port,id->i_port+1,
-                              p_sys->i_ttl > 0 ? p_sys->i_ttl : 1);
-            }
-            else if( strstr( psz_transport, "unicast" ) && strstr( psz_transport, "client_port=" ) )
-            {
-                int  i_port = atoi( strstr( psz_transport, "client_port=" ) + strlen("client_port=") );
-                char ip[NI_MAXNUMERICHOST], psz_access[22], psz_url[NI_MAXNUMERICHOST + 8];
-
-                sout_access_out_t *p_access;
-
-                rtsp_client_t *rtsp = NULL;
-
-                if( httpd_ClientIP( cl, ip ) == NULL )
+                /* Parse transport options */
+                for( const char *opt = parameter_next( tpt );
+                     opt != NULL;
+                     opt = parameter_next( opt ) )
                 {
-                    answer->i_status = 500;
-                    break;
-                }
-
-                //fprintf( stderr, "HTTPD_MSG_SETUP: unicast ip=%s port=%d\n", ip, i_port );
-
-                psz_session = httpd_MsgGet( query, "Session" );
-                if( !psz_session )
-                {
-                    psz_session = psz_session_init;
-                    rtsp = RtspClientNew( p_stream, psz_session_init );
-                }
-                else
-                {
-                    rtsp = RtspClientGet( p_stream, psz_session );
-                    if( rtsp == NULL )
+                    if( strncmp( opt, "multicast", 9 ) == 0)
+                        b_multicast = VLC_TRUE;
+                    else
+                    if( strncmp( opt, "unicast", 7 ) == 0 )
+                        b_multicast = VLC_FALSE;
+                    else
+                    if( sscanf( opt, "client_port=%u-%u", &loport, &hiport ) == 2 )
+                        ;
+                    else
+                    if( strncmp( opt, "mode=", 5 ) == 0 )
                     {
-                        answer->i_status = 454;
+                        if( strncasecmp( opt + 5, "\"PLAY\"", 6 ) )
+                        {
+                            /* Not playing?! */
+                            b_unsupp = VLC_TRUE;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                    /*
+                     * Every other option is unsupported:
+                     *
+                     * "source" and "append" are invalid.
+                     *
+                     * For multicast, "port", "layers", "ttl" are set by the
+                     * stream output configuration.
+                     *
+                     * For unicast, we do not allow "destination" as it
+                     * carries a DoS risk, and we decide on "server_port".
+                     *
+                     * "interleaved" and "ssrc" are not implemented.
+                     */
+                        b_unsupp = VLC_TRUE;
                         break;
                     }
                 }
 
-                /* first try to create the access out */
-                if( p_sys->i_ttl )
-                    snprintf( psz_access, sizeof( psz_access ),
-                              "udp{raw,rtcp,ttl=%d}", p_sys->i_ttl );
-                else
-                    strcpy( psz_access, "udp{raw,rtcp}" );
+                if( b_unsupp )
+                    continue;
 
-                snprintf( psz_url, sizeof( psz_url ),
-                         ( strchr( ip, ':' ) != NULL ) ? "[%s]:%d" : "%s:%d",
-                         ip, i_port );
-
-                if( ( p_access = sout_AccessOutNew( p_stream->p_sout, psz_access, psz_url ) ) == NULL )
+                if( b_multicast )
                 {
-                    msg_Err( p_stream, "cannot create the access out for %s://%s",
-                             psz_access, psz_url );
-                    answer->i_status = 500;
-                    break;
+                    if( id->psz_destination == NULL )
+                        continue;
+
+                    answer->i_status = 200;
+
+                    httpd_MsgAdd( answer, "Transport",
+                                  "RTP/AVP/UDP;destination=%s;port=%d-%d;ttl=%d",
+                                  id->psz_destination, id->i_port, id->i_port+1,
+                                  ( p_sys->i_ttl > 0 ) ? p_sys->i_ttl : 1 );
                 }
+                else
+                {
+                    char ip[NI_MAXNUMERICHOST], psz_access[22],
+                         url[NI_MAXNUMERICHOST + 8];
+                    sout_access_out_t *p_access;
+                    rtsp_client_t *rtsp = NULL;
 
-                TAB_APPEND( rtsp->i_id, rtsp->id, id );
-                TAB_APPEND( rtsp->i_access, rtsp->access, p_access );
+                    if( ( hiport - loport ) > 1 )
+                        continue;
 
-                answer->i_status = 200;
+                    if( psz_session == NULL )
+                    {
+                        psz_session = psz_session_init;
+                        rtsp = RtspClientNew( p_stream, psz_session );
+                    }
+                    else
+                    {
+                        /* FIXME: we probably need to remove an access out,
+                         * if there is already one for the same ID */
+                        rtsp = RtspClientGet( p_stream, psz_session );
+                        if( rtsp == NULL )
+                        {
+                            answer->i_status = 454;
+                            continue;
+                        }
+                    }
 
-                httpd_MsgAdd( answer, "Transport",
-                              "RTP/AVP/UDP;client_port=%d-%d", i_port, i_port + 1 );
-            }
-            else /* TODO  strstr( psz_transport, "interleaved" ) ) */
-            {
-                answer->i_status = 461;
+                    if( httpd_ClientIP( cl, ip ) == NULL )
+                    {
+                        answer->i_status = 500;
+                        continue;
+                    }
+
+                    if( p_sys->i_ttl )
+                        snprintf( psz_access, sizeof( psz_access ),
+                                  "udp{raw,rtcp,ttl=%d}", p_sys->i_ttl );
+                    else
+                        strcpy( psz_access, "udp{raw,rtcp}" );
+
+                    snprintf( url, sizeof( url ),
+                              ( strchr( ip, ':' ) != NULL ) ? "[%s]:%d" : "%s:%d",
+                              ip, loport );
+
+                    p_access = sout_AccessOutNew( p_stream->p_sout,
+                                                  psz_access, url );
+                    if( p_access == NULL )
+                    {
+                        msg_Err( p_stream,
+                                 "cannot create access output for %s://%s",
+                                 psz_access, url );
+                        answer->i_status = 500;
+                        break;
+                    }
+
+                    TAB_APPEND( rtsp->i_id, rtsp->id, id );
+                    TAB_APPEND( rtsp->i_access, rtsp->access, p_access );
+
+                    char *src = var_GetNonEmptyString (p_access, "src-addr");
+                    int sport = var_GetInteger (p_access, "src-port");
+
+                    httpd_ServerIP( cl, ip );
+                    fprintf( stderr, "src = %s, ip = %s\n", src, ip );
+
+                    if( ( src != NULL ) && strcmp( src, ip ) )
+                    {
+                        /* Specify source IP if it is different from the RTSP
+                         * control connection server address */
+                        httpd_MsgAdd( answer, "Transport",
+                                      "RTP/AVP/UDP;unicast;source=%s;"
+                                      "client_port=%u-%u;server_port=%u-%u",
+                                      src, loport, hiport, sport, sport + 1 );
+                    }
+                    else
+                    {
+                        httpd_MsgAdd( answer, "Transport",
+                                      "RTP/AVP/UDP;unicast;"
+                                      "client_port=%u-%u;server_port=%u-%u",
+                                      loport, hiport, sport, sport + 1 );
+                    }
+
+                    answer->i_status = 200;
+                    free( src );
+                }
+                break;
             }
             break;
         }
@@ -1886,7 +1993,7 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             return VLC_EGENERIC;
     }
 
-    httpd_MsgAdd( answer, "Server", "VLC Server" );
+    httpd_MsgAdd( answer, "Server", PACKAGE_STRING );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     psz_cseq = httpd_MsgGet( query, "Cseq" );
     httpd_MsgAdd( answer, "Cseq", "%s", psz_cseq ? psz_cseq : "0");
