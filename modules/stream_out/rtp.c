@@ -1856,7 +1856,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     else
                     if( strncmp( opt, "mode=", 5 ) == 0 )
                     {
-                        if( strncasecmp( opt + 5, "\"PLAY\"", 6 ) )
+                        if( strncasecmp( opt + 5, "play", 4 )
+                         && strncasecmp( opt + 5, "\"PLAY\"", 6 ) )
                         {
                             /* Not playing?! */
                             b_unsupp = VLC_TRUE;
@@ -1894,7 +1895,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     answer->i_status = 200;
 
                     httpd_MsgAdd( answer, "Transport",
-                                  "RTP/AVP/UDP;destination=%s;port=%d-%d;ttl=%d",
+                                  "RTP/AVP/UDP;destination=%s;port=%d-%d;"
+                                  "ttl=%d;mode=play",
                                   id->psz_destination, id->i_port, id->i_port+1,
                                   ( p_sys->i_ttl > 0 ) ? p_sys->i_ttl : 1 );
                 }
@@ -1967,14 +1969,16 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                          * control connection server address */
                         httpd_MsgAdd( answer, "Transport",
                                       "RTP/AVP/UDP;unicast;source=%s;"
-                                      "client_port=%u-%u;server_port=%u-%u",
+                                      "client_port=%u-%u;server_port=%u-%u;"
+                                      "mode=play",
                                       src, loport, hiport, sport, sport + 1 );
                     }
                     else
                     {
                         httpd_MsgAdd( answer, "Transport",
                                       "RTP/AVP/UDP;unicast;"
-                                      "client_port=%u-%u;server_port=%u-%u",
+                                      "client_port=%u-%u;server_port=%u-%u;"
+                                      "mode=play",
                                       loport, hiport, sport, sport + 1 );
                     }
 
