@@ -4400,38 +4400,73 @@ fi
 
 dnl
 dnl  DirectFB module
+dnl  try to find using: 1 - given location; 2 - directfb-config; 3 - pkg-config
+dnl  TODO: support for static linking
 dnl
 AC_ARG_ENABLE(directfb,
   [  --enable-directfb       DirectFB support (default disabled)])
-if test "${enable_directfb}" = "yes"
-then
-  if test "${with_directfb}" = "no"
-  then
-    AC_CHECK_HEADER(directfb.h, have_directfb="true", have_directfb="false")
-    if test "${have_directfb}"= "true"
-    then
-        VLC_ADD_PLUGINS([directfb])
-        VLC_ADD_LDFLAGS([directfb],[-ldirectfb -lfusion -ldirect -lpthread -ljpeg -lz -ldl])
-        VLC_ADD_CPPFLAGS([directfb],[-I/usr/include/directfb -D_REENTRANT])
-    else
-        AC_MSG_ERROR([cannot find /usr/include/directfb headers, make sure directfb is installed on your system or use --disable-directfb])
+AC_ARG_WITH(directfb, 
+  [    --with-directfb=PATH  path to DirectFB headers and libraries])
+
+if test "${enable_directfb}" = "yes"; then
+    have_directfb="false"
+    CPPFLAGS_mydirectfb=
+    LDFLAGS_mydirectfb=
+    if test "${with_directfb}" != "no" -a -n "${with_directfb}"; then
+        dnl Trying the given location
+        CPPFLAGS_save=${CPPFLAGS}
+        LDFLAGS_save=${LDFLAGS}
+
+        CPPFLAGS_new="-I${with_directfb}/include -D_REENTRANT -D_GNU_SOURCE"
+        LDFLAGS_new="-L${with_directfb}/lib/fusion/.libs/ -L${with_directfb}/lib/direct/.libs/"
+        LDFLAGS_new="${LDFLAGS_new} -L${with_directfb}/src/.libs/"
+
+        CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_new}"
+        LDFLAGS="${LD_FLAGS} ${LDFLAGS_new}"
+
+        dnl FIXME: too obscure
+        AC_CHECK_HEADER([directfb.h], [
+            AC_CHECK_LIB([direct],[direct_initialize], [
+                AC_CHECK_LIB([fusion], [fusion_enter], [
+                    AC_CHECK_LIB([directfb], [DirectFBInit], have_directfb="true", have_directfb="false")
+                ], have_directfb="false")
+            ], have_directfb="false")
+        ], have_directfb="false")
+
+        dnl Restore flags
+        CPPFLAGS="${CPPFLAGS_save}"
+        LDFLAGS="${LDFLAGS_save}"
+
+        if test "${have_directfb}" = "true"; then
+            LDFLAGS_mydirectfb="${LDFLAGS_new} -lz -ldl -ldirectfb -lfusion -ldirect -lpthread"
+            CPPFLAGS_mydirectfb="${CPPFLAGS_new}"
+        fi
+    else 
+        dnl Look for directfb-config
+        AC_PATH_PROG(DIRECTFB_CONFIG, directfb-config, no, ${PATH})
+        if test "${DIRECTFB_CONFIG}" != "no"; then
+            CPPFLAGS_mydirectfb="`${DIRECTFB_CONFIG} --cflags`"
+            LDFLAGS_mydirectfb="`${DIRECTFB_CONFIG} --libs`"
+            have_directfb="true"
+        else 
+            dnl Trying with pkg-config
+            PKG_CHECK_MODULES(DIRECTFB, directfb, [
+                CPPFLAGS_mydirectfb="${DIRECTFB_CFLAGS}"
+                LDFLAGS_mydirectfb="${DIRECTFB_LIBS}"
+                have_directfb="true"
+                ], [have_directfb="false"])
+        fi
     fi
-  else
-    CPPFLAGS_save="${CPPFLAGS}"
-    CPPFLAGS="${CPPFLAGS} -I${with_directfb}/include"
-    AC_CHECK_HEADER(directfb.h, have_directfb="true", have_directfb="false")
-    CPPFLAGS="${CPPFLAGS_save}"
-    AC_ARG_WITH(directfb,
-        [    --with-directfb=PATH  path to directfb],
-        [ if test "${with_directfb}" != "no" -a -n "${with_directfb}"
-        then
-            VLC_ADD_PLUGINS([directfb])
-            VLC_ADD_CPPFLAGS([directfb],[-I${with_directfb}/include -D_REENTRANT])
-            VLC_ADD_LDFLAGS([directfb],[-L${with_directfb}/lib -ldirectfb -lfusion -ldirect -lpthread -ljpeg -lz -ldl])
-        fi ],
-        [ AC_MSG_ERROR([cannot find directfb headers in ${with_directfb}/include]) ])
-  fi
+    if test "${have_directfb}" = "true"; then
+        VLC_ADD_PLUGINS([directfb])
+        VLC_ADD_CPPFLAGS([directfb],[${CPPFLAGS_mydirectfb}])
+        VLC_ADD_LDFLAGS([directfb],[${LDFLAGS_mydirectfb}])
+    else 
+        AC_MSG_ERROR([cannot find directfb headers and/or libraries ])
+    fi
 fi
+ 
+
 
 dnl
 dnl  GGI module
