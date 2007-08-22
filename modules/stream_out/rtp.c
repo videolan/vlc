@@ -1244,9 +1244,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         if( id->p_rtsp_url )
         {
+            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_DESCRIBE, RtspCallbackId, (void*)id );
             httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_SETUP,    RtspCallbackId, (void*)id );
-            //httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PLAY,     RtspCallback, (void*)p_stream );
-            //httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PAUSE,    RtspCallback, (void*)p_stream );
+            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PLAY,     RtspCallbackId, (void*)id );
+            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PAUSE,    RtspCallbackId, (void*)id );
+            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_TEARDOWN, RtspCallbackId, (void*)id );
         }
     }
 
@@ -1610,6 +1612,7 @@ static int RtspSetup( sout_stream_t *p_stream, vlc_url_t *url )
         return VLC_EGENERIC;
     }
     httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_DESCRIBE, RtspCallback, (void*)p_stream );
+    httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_SETUP,    RtspCallback, (void*)p_stream );
     httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_PLAY,     RtspCallback, (void*)p_stream );
     httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_PAUSE,    RtspCallback, (void*)p_stream );
     httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_TEARDOWN, RtspCallback, (void*)p_stream );
@@ -1639,6 +1642,9 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     answer->i_body = 0;
     answer->p_body = NULL;
 
+    if( httpd_MsgGet( query, "Require" ) != NULL )
+        answer->i_status = 551;
+    else
     switch( query->i_type )
     {
         case HTTPD_MSG_DESCRIBE:
@@ -1646,12 +1652,16 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             char *psz_sdp = SDPGenerate( p_stream, psz_destination ? psz_destination : "0.0.0.0", VLC_TRUE );
 
             answer->i_status = 200;
-            httpd_MsgAdd( answer, "Content-type",  "%s", "application/sdp" );
+            httpd_MsgAdd( answer, "Content-Type",  "%s", "application/sdp" );
             httpd_MsgAdd( answer, "Content-Base",  "%s", p_sys->psz_rtsp_control );
             answer->p_body = (uint8_t *)psz_sdp;
             answer->i_body = strlen( psz_sdp );
             break;
         }
+
+        case HTTPD_MSG_SETUP:
+            answer->i_status = 459;
+            break;
 
         case HTTPD_MSG_PLAY:
         {
@@ -1688,9 +1698,12 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             }
             break;
         }
+
         case HTTPD_MSG_PAUSE:
-            /* FIXME */
-            return VLC_EGENERIC;
+            answer->i_status = 405;
+            httpd_MsgAdd( answer, "Allow", "DESCRIBE, PLAY, TEARDOWN" );
+            break;
+
         case HTTPD_MSG_TEARDOWN:
         {
             rtsp_client_t *rtsp;
@@ -1769,6 +1782,9 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     answer->i_body = 0;
     answer->p_body = NULL;
 
+    if( httpd_MsgGet( query, "Require" ) != NULL )
+        answer->i_status = 551;
+    else
     switch( query->i_type )
     {
         case HTTPD_MSG_SETUP:
@@ -1864,6 +1880,9 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
         }
 
         default:
+            answer->i_status = 460;
+            break;
+
             return VLC_EGENERIC;
     }
 
