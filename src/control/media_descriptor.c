@@ -157,8 +157,13 @@ static void preparse_if_needed( libvlc_media_descriptor_t *p_md )
     /* XXX: need some locking here */
     if (!p_md->b_preparsed)
     {
-        input_Preparse( p_md->p_libvlc_instance->p_libvlc_int,
-                        p_md->p_input_item );
+        playlist_PreparseEnqueue(
+                p_md->p_libvlc_instance->p_libvlc_int->p_playlist,
+                p_md->p_input_item );
+        playlist_AskForArtEnqueue(
+                p_md->p_libvlc_instance->p_libvlc_int->p_playlist,
+                p_md->p_input_item );
+
         p_md->b_preparsed = VLC_TRUE;
     }
 }
