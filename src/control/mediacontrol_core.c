@@ -362,7 +362,7 @@ mediacontrol_playlist_get_list( mediacontrol_Instance *self,
 
     for( i_index = 0 ; i_index < i_playlist_size ; i_index++ )
     {
-        retval->data[i_index] = strdup( ARRAY_VAL(p_playlist->current, i_index)->p_input->psz_uri );
+        retval->data[i_index] = input_item_GetURI( ARRAY_VAL(p_playlist->current, i_index)->p_input );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
@@ -419,7 +419,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
             break;
         }
 
-        retval->url = strdup( input_GetItem(p_input)->psz_uri );
+        retval->url = input_item_GetURI( input_GetItem( p_input ) );
 
         /* TIME and LENGTH are in microseconds. We want them in ms */
         var_Get( p_input, "time", &val);

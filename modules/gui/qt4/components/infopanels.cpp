@@ -158,15 +158,18 @@ void MetaPanel::saveMeta()
         return;
 
     /* we can write meta data only in a file */
-    if( ( p_input->i_type == ITEM_TYPE_AFILE ) || \
-        ( p_input->i_type == ITEM_TYPE_VFILE ) )
-        /* some audio files are detected as video files */
+    vlc_mutex_lock( &p_input->lock );
+    int i_type = p_input->i_type;
+    vlc_mutex_unlock( &p_input->lock );
+    if( ( i_type == ITEM_TYPE_AFILE ) || ( i_type == ITEM_TYPE_VFILE ) )
     {
-        char *psz_uri = p_input->psz_uri;
+        char *psz_uri_orig = input_item_GetURI( p_input );
+        char *psz_uri = psz_uri_orig;
         if( !strncmp( psz_uri, "file://", 7 ) )
             psz_uri += 7; /* strlen("file://") = 7 */
 
         p_export.psz_file = strndup( psz_uri, PATH_MAX );
+        free( psz_uri_orig );
     }
     else
         return;
@@ -239,20 +242,29 @@ void MetaPanel::update( input_item_t *p_item )
 
     /* Name / Title */
     psz_meta = input_item_GetTitle( p_item );
+    char *psz_name = input_item_GetName( p_item );
     if( !EMPTY_STR( psz_meta ) )
         title_text->setText( qfu( psz_meta ) );
-    else if( !EMPTY_STR( p_item->psz_name ) )
-        title_text->setText( qfu( p_item->psz_name ) );
+    else if( !EMPTY_STR( psz_name ) )
+        title_text->setText( qfu( psz_name ) );
     else title_text->setText( "" );
     free( psz_meta );
+    free( psz_name );
 
     /* URL / URI */
     psz_meta = input_item_GetURL( p_item );
     if( !EMPTY_STR( psz_meta ) )
+    {
         emit uriSet( QString( psz_meta ) );
-    else if( !EMPTY_STR( p_item->psz_uri ) )
-        emit uriSet( QString( p_item->psz_uri ) );
-    free( psz_meta );
+        free( psz_meta );
+    }
+    else
+    {
+        free( psz_meta );
+        psz_meta = input_item_GetURI( p_item );
+        if( !EMPTY_STR( psz_meta ) )
+            emit uriSet( QString( psz_meta ) );
+    }
 
     /* Other classic though */
     UPDATE_META( Artist, artist_text );

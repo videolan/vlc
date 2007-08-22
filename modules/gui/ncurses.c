@@ -1206,8 +1206,9 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         vlc_value_t val_list;
 
         /* Source */
-        mvnprintw( y++, 0, COLS, " Source   : %s",
-                   input_GetItem(p_input)->psz_uri );
+        char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
+        mvnprintw( y++, 0, COLS, " Source   : %s", psz_uri );
+        free( psz_uri );
 
         /* State */
         var_Get( p_input, "state", &val );

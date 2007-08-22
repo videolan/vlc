@@ -1645,7 +1645,12 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
         char *psz_nowplaying = 
             input_item_GetNowPlaying( input_GetItem( p_input ) );
         char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
-        char *psz_name = input_item_GetName( input_GetItem( p_input ) );
+        char *psz_name = input_item_GetTitle( input_GetItem( p_input ) );
+        if( EMPTY_STR( psz_name ) )
+            {
+                free( psz_name );
+                psz_name = input_item_GetName( input_GetItem( p_input ) );
+            }
         if( !EMPTY_STR( psz_nowplaying ) )
         {
             vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,

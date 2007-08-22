@@ -300,13 +300,15 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
     wxString duration = wxU( "" );
 
     char *psz_artist = input_item_GetArtist( p_item->p_input );
-    if( ! psz_artist )
-    {
-        psz_artist = "";
-    }
+    if( !psz_artist )
+        psz_artist = strdup( "" );
+
+    char *psz_name = input_item_GetName( p_item->p_input );
+    if( !psz_name )
+        psz_name = strdup( "" );
 
     char psz_duration[MSTRTIME_MAX_SIZE];
-    mtime_t dur = p_item->p_input->i_duration;
+    mtime_t dur = input_item_GetDuration( p_item->p_input );
 
     if( dur != -1 )
     {
@@ -317,14 +319,15 @@ void PlaylistManager::UpdateTreeItem( wxTreeItemId item )
 
     if( !strcmp( psz_artist, "" ) || p_item->p_input->b_fixed_name == VLC_TRUE )
     {
-        msg = wxString( wxU( p_item->p_input->psz_name ) ) + duration;
+        msg = wxString( wxU( psz_name ) ) + duration;
     }
     else
     {
         msg = wxString(wxU( psz_artist )) + wxT(" - ") +
-                    wxString(wxU(p_item->p_input->psz_name)) + duration;
+                    wxString(wxU(psz_name)) + duration;
     }
     free( psz_artist );
+    free( psz_name );
     treectrl->SetItemText( item , msg );
     treectrl->SetItemImage( item, p_item->p_input->i_type );
 

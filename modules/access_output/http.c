@@ -298,12 +298,15 @@ static int Open( vlc_object_t *p_this )
         char                *psz_txt, *psz_name;
         playlist_t          *p_playlist = pl_Yield( p_access );
 
-        psz_name = strrchr( p_playlist->status.p_item->p_input->psz_uri,
-                            DIRECTORY_SEPARATOR );
+        char *psz_uri = input_item_GetURI( p_playlist->status.p_item->p_input );
+        char *psz_newuri = psz_uri;
+        psz_name = strrchr( psz_newuri, DIRECTORY_SEPARATOR );
         if( psz_name != NULL ) psz_name++;
-        else psz_name = p_playlist->status.p_item->p_input->psz_uri;
+        else psz_name = psz_newuri;
 
-        asprintf( &psz_txt, "path=%s", psz_file_name );
+        asprintf( &psz_txt, "path=%s", psz_name );
+
+        free( psz_uri );
 
         p_sys->p_bonjour = bonjour_start_service( (vlc_object_t *)p_access,
                                     strcmp( p_access->psz_access, "https" )

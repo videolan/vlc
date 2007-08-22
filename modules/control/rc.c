@@ -497,8 +497,10 @@ static void Run( intf_thread_t *p_intf )
             {
                 if( !p_input->b_dead || !p_input->b_die )
                 {
-                    msg_rc( STATUS_CHANGE "( new input: %s )",
-                            input_GetItem(p_input)->psz_uri );
+                    char *psz_uri =
+                            input_item_Get_URI( input_GetItem( p_input ) );
+                    msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
+                    free( psz_uri );
                     msg_rc( STATUS_CHANGE "( audio volume: %d )",
                             config_GetInt( p_intf, "volume" ));
                 }
@@ -1396,8 +1398,10 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         if( p_playlist->p_input )
         {
             /* Replay the current state of the system. */
-            msg_rc( STATUS_CHANGE "( new input: %s )",
-                    input_GetItem(p_playlist->p_input)->psz_uri );
+            char *psz_uri =
+                    input_item_GetURI( input_GetItem( p_playlist->p_input ) );
+            msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
+            free( psz_uri );
             msg_rc( STATUS_CHANGE "( audio volume: %d )",
                     config_GetInt( p_intf, "volume" ));
 

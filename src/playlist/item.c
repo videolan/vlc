@@ -616,7 +616,7 @@ int playlist_ItemSetName( playlist_item_t *p_item, const char *psz_name )
 {
     if( psz_name && p_item )
     {
-        input_ItemSetName( p_item->p_input, psz_name );
+        input_item_SetName( p_item->p_input, psz_name );
         return VLC_SUCCESS;
     }
     return VLC_EGENERIC;

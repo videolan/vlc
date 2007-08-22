@@ -335,12 +335,9 @@ connect:
         PL_LOCK;
 
         p_input_item = p_playlist->status.p_item->p_input;
-        vlc_mutex_lock( &p_input_item->lock );
-        free( p_input_item->psz_uri );
+        input_item_SetURI( p_input_item, p_sys->psz_location );
         free( p_access->psz_path );
-        p_input_item->psz_uri = strdup( p_sys->psz_location );
         p_access->psz_path = strdup( p_sys->psz_location );
-        vlc_mutex_unlock( &p_input_item->lock );
 
         PL_UNLOCK;
         pl_Release( p_access );

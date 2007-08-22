@@ -342,13 +342,14 @@ static VLCBookmarks *_o_sharedInstance = nil;
     }
     msg_Dbg(p_intf, "calling wizard");
 
+    char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
     [[[VLCMain sharedInstance] getWizard] initWithExtractValuesFrom:
             [[NSNumber numberWithInt:
             (pp_bookmarks[i_first]->i_time_offset/1000000)] stringValue]
             to: [[NSNumber numberWithInt:
             (pp_bookmarks[i_second]->i_time_offset/1000000)] stringValue]
-            ofItem: [NSString stringWithUTF8String:
-            input_GetItem(p_input)->psz_uri]];
+            ofItem: [NSString stringWithUTF8String: psz_uri]];
+    free( psz_uri );
     vlc_object_release( p_input );
     msg_Dbg(p_intf, "released input");
 }

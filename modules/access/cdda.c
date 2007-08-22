@@ -412,9 +412,7 @@ static int GetTracks( access_t *p_access,
     }
 
     p_item_in_category = playlist_ItemToNode( p_playlist, p_parent, VLC_FALSE );
-    vlc_mutex_lock( &p_playlist->object_lock );
     playlist_ItemSetName( p_parent, "Audio CD" );
-    vlc_mutex_unlock( &p_playlist->object_lock );
     var_SetInteger( p_playlist, "item-change", p_parent->p_input->i_id );
 
 #ifdef HAVE_LIBCDDB
@@ -424,9 +422,7 @@ static int GetTracks( access_t *p_access,
         if( cddb_disc_get_title( p_sys->p_disc ) )
         {
             const char *psz_name = cddb_disc_get_title( p_sys->p_disc );
-            vlc_mutex_lock( &p_playlist->object_lock );
             playlist_ItemSetName( p_parent, psz_name );
-            vlc_mutex_unlock( &p_playlist->object_lock );
             var_SetInteger( p_playlist, "item-change",
                             p_parent->p_input->i_id );
         }

@@ -245,10 +245,11 @@ static void Run( intf_thread_t *p_intf )
 
                 vlc_object_release( p_playlist );
 
-                if( p_input->i_duration != -1 )
+                mtime_t i_duration = input_item_GetDuration( p_input );
+                if( i_duration != -1 )
                 {
                     char psz_durationstr[MSTRTIME_MAX_SIZE];
-                    secstotimestr( psz_durationstr, p_input->i_duration/1000000 );
+                    secstotimestr( psz_durationstr, i_duration / 1000000 );
                     sprintf( psz_duration, "(%s)", psz_durationstr );
                 }
                 else

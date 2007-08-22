@@ -422,7 +422,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
 
     p_media->i_sdp_id = mdate();
     p_media->i_sdp_version = 1;
-    p_media->i_length = p_item->i_duration;
+    p_media->i_length = input_item_GetDuration( p_item );
 
     vlc_mutex_lock( &p_item->lock );
     msg_Dbg( p_vod, "media has %i declared ES", p_item->i_es );

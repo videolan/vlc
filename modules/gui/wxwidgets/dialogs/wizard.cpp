@@ -724,7 +724,9 @@ void wizInputPage::OnWizardPageChanging(wxWizardEvent& event)
                 playlist_item_t * p_item = playlist_ItemGetById(                                                   p_playlist, (int)data, VLC_FALSE );
                 if( p_item )
                 {
-                    p_parent->SetMrl( (const char*)p_item->p_input->psz_uri );
+                    const char *psz_uri = input_item_GetURI( p_item->p_input );
+                    p_parent->SetMrl( psz_uri );
+                    free( psz_uri );
                 }
                 else
                     event.Veto();

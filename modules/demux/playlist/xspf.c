@@ -628,7 +628,7 @@ static vlc_bool_t set_item_info SIMPLE_INTERFACE
     else if( !strcmp( psz_name, "duration" ) )
     {
         long i_num = atol( psz_value );
-        p_input->i_duration = i_num*1000;
+        input_item_SetDuration( p_input, (mtime_t) i_num*1000 );
     }
     else if( !strcmp( psz_name, "annotation" ) )
     {

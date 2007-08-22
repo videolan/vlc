@@ -107,10 +107,8 @@ ItemInfoDialog::~ItemInfoDialog()
  *****************************************************************************/
 void ItemInfoDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
-    vlc_mutex_lock( &p_item->p_input->lock );
-    p_item->p_input->psz_name = info_panel->GetName();
-    p_item->p_input->psz_uri = info_panel->GetURI();
-    vlc_mutex_unlock( &p_item->p_input->lock );
+    input_item_SetName( p_item->p_input, info_panel->GetName() );
+    input_item_SetURI( p_item->p_input, info_panel->GetURI() );
     EndModal( wxID_OK );
 }
 

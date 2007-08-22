@@ -199,11 +199,8 @@ vlc_meta_Set##bar( p_meta, p_t->toString().toCString(true))
         {
             input_item_t *p_item = input_GetItem( p_input );
             if( p_item )
-            {
-                vlc_mutex_lock( &p_item->lock );
-                p_item->i_duration = i_ogg_v_length * 1000000;
-                vlc_mutex_unlock( &p_item->lock );
-            }
+                input_item_SetDuration( p_item,
+                        (mtime_t) i_ogg_v_length * 1000000 );
             vlc_object_release( p_input );
         }
         
@@ -224,11 +221,8 @@ vlc_meta_Set##bar( p_meta, p_t->toString().toCString(true))
         {
             input_item_t *p_item = input_GetItem( p_input );
             if( p_item )
-            {
-                vlc_mutex_lock( &p_item->lock );
-                p_item->i_duration = i_ogg_f_length * 1000000;
-                vlc_mutex_unlock( &p_item->lock );
-            }
+                input_item_SetDuration( p_item,
+                        (mtime_t) i_ogg_f_length * 1000000 );
             vlc_object_release( p_input );
         }
     }
@@ -243,11 +237,8 @@ vlc_meta_Set##bar( p_meta, p_t->toString().toCString(true))
         {
             input_item_t *p_item = input_GetItem( p_input );
             if( p_item )
-            {
-                vlc_mutex_lock( &p_item->lock );
-                p_item->i_duration = i_flac_length * 1000000;
-                vlc_mutex_unlock( &p_item->lock );
-            }
+                input_item_SetDuration( p_item,
+                        (mtime_t) i_flac_length * 1000000 );
             vlc_object_release( p_input );
         }
     }
@@ -350,8 +341,8 @@ static int WriteMeta( vlc_object_t *p_this )
             TagLib::ID3v2::TextIdentificationFrame p_frame( p_byte ); \
             p_frame.setText( psz_meta ); \
             p_id3tag->addFrame( &p_frame ); \
+            free( psz_meta ); \
         } \
-        else free( psz_meta );
 
         WRITE( Publisher, "TPUB" );
         WRITE( Copyright, "TCOP" );

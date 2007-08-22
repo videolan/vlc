@@ -460,13 +460,13 @@ static void FollowAnchor ( intf_thread_t *p_intf )
 
         /* Get new URL */
         p_current_item = p_playlist->status.p_item;
+        char *psz_uri = input_item_GetURI( p_current_item->p_input );
 #ifdef CMML_INTF_DEBUG
-        msg_Dbg( p_intf, "Current playlist item URL is \"%s\"",
-                p_current_item->input.psz_uri );
+        msg_Dbg( p_intf, "Current playlist item URL is \"%s\"", psz_uri );
 #endif
 
-        psz_uri_to_load = XURL_Concat( p_current_item->p_input->psz_uri,
-                                       psz_url );
+        psz_uri_to_load = XURL_Concat( psz_uri, psz_url );
+        free( psz_uri );
 
 #ifdef CMML_INTF_DEBUG
         msg_Dbg( p_intf, "URL to load is \"%s\"", psz_uri_to_load );
@@ -550,7 +550,9 @@ char *GetTimedURLFromPlaylistItem( intf_thread_t *p_intf,
     char *psz_seconds = NULL;
     int i_seconds;
 
-    psz_url = XURL_GetWithoutFragment( p_current_item->input->psz_uri );
+    char *psz_uri = input_item_GetURI( p_current_item->p_input );
+    psz_url = XURL_GetWithoutFragment( psz_uri );
+    free( psz_uri );
 
     /* Get current time as a string */
     if( XURL_IsFileURL( psz_url ) == VLC_TRUE )
@@ -576,7 +578,7 @@ char *GetTimedURLFromPlaylistItem( intf_thread_t *p_intf,
     p = GetTimedURIFragmentForTime; /* unused */
     p = GetCurrentTimeInSeconds;    /* unused */
 
-    return strdup( p_current_item->p_input->psz_uri );
+    return input_item_GetURI( p_current_item->p_input );
 #endif
 }
 

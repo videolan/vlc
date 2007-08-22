@@ -2604,9 +2604,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
     /* Start new one */
     p_instance->i_index = i_input_index;
-    if( p_instance->item.psz_uri )
-        free( p_instance->item.psz_uri );
-    p_instance->item.psz_uri = strdup( p_media->cfg.ppsz_input[p_instance->i_index] );
+    input_item_SetURI( &p_instance->item, p_media->cfg.ppsz_input[p_instance->i_index] ) ;
 
     asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name );
     p_instance->p_input = input_CreateThreadExtended( p_vlm, &p_instance->item, psz_log, p_instance->p_sout );

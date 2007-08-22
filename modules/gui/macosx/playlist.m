@@ -303,7 +303,7 @@
         else if( [[o_tc identifier] isEqualToString:@"3"] )
         {
             char psz_duration[MSTRTIME_MAX_SIZE];
-            mtime_t dur = p_item->p_input->i_duration;
+            mtime_t dur = input_item_GetDuration( p_item->p_input );
             if( dur != -1 )
             {
                 secstotimestr( psz_duration, dur/1000000 );

@@ -665,13 +665,11 @@ static int Demux( demux_t *p_demux )
             }
             else if( !strncasecmp( psz_parse, "</ASX", 5 ) )
             {
-                vlc_mutex_lock( &p_current_input->lock );
                 if( psz_title_asx ) input_item_SetTitle( p_current_input, psz_title_asx );
                 if( psz_artist_asx ) input_item_SetArtist( p_current_input, psz_artist_asx );
                 if( psz_copyright_asx ) input_item_SetCopyright( p_current_input, psz_copyright_asx );
                 if( psz_moreinfo_asx ) input_item_SetURL( p_current_input, psz_moreinfo_asx );
                 if( psz_abstract_asx ) input_item_SetDescription( p_current_input, psz_abstract_asx );
-                vlc_mutex_unlock( &p_current_input->lock );
                 FREENULL( psz_base_asx );
                 FREENULL( psz_title_asx );
                 FREENULL( psz_artist_asx );

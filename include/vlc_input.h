@@ -138,7 +138,7 @@ static inline void input_ItemCopyOptions( input_item_t *p_parent,
     }
 }
 
-static inline void input_ItemSetName( input_item_t *p_item, const char *psz_name )
+static inline void input_item_SetName( input_item_t *p_item, const char *psz_name )
 {
     if( p_item->psz_name ) free( p_item->psz_name );
     p_item->psz_name = strdup( psz_name );
@@ -270,6 +270,38 @@ static inline char * input_item_GetName( input_item_t * p_i )
     char *psz_s = p_i->psz_name ? strdup( p_i->psz_name ) : NULL;
     vlc_mutex_unlock( &p_i->lock );
     return psz_s;
+}
+
+static inline char * input_item_GetURI( input_item_t * p_i )
+{
+    vlc_mutex_lock( &p_i->lock );
+    char *psz_s = p_i->psz_uri ? strdup( p_i->psz_uri ) : NULL;
+    vlc_mutex_unlock( &p_i->lock );
+    return psz_s;
+}
+
+static inline void input_item_SetURI( input_item_t * p_i, char * psz_uri )
+{
+    vlc_mutex_lock( &p_i->lock );
+    if( p_i->psz_uri ) free( p_i->psz_uri );
+        p_i->psz_uri = strdup( psz_uri );
+    vlc_mutex_unlock( &p_i->lock );
+}
+
+static inline mtime_t input_item_GetDuration( input_item_t * p_i )
+{
+    vlc_mutex_lock( &p_i->lock );
+    mtime_t i_duration = p_i->i_duration;
+    vlc_mutex_unlock( &p_i->lock );
+    return i_duration;
+}
+
+static inline void input_item_SetDuration( input_item_t * p_i, mtime_t i_duration )
+{
+    vlc_mutex_lock( &p_i->lock );
+    p_i->i_duration = i_duration;
+    vlc_mutex_unlock( &p_i->lock );
+    return;
 }
 
 static inline void input_item_SetPreparsed( input_item_t *p_i, vlc_bool_t preparsed )

@@ -414,11 +414,12 @@ static char *TitleGet( vlc_object_t *p_this )
 
     if( p_input )
     {
-        psz_title = strdup( input_item_GetTitle( input_GetItem( p_input ) ) );
+        psz_title = input_item_GetTitle( input_GetItem( p_input ) );
         if( EMPTY_STR( psz_title ) )
         {
             free( psz_title );
-            char *psz = strrchr( input_GetItem(p_input)->psz_uri, '/' );
+            char *psz_orig = input_item_GetURI( input_GetItem( p_input ) );
+            char *psz = strrchr( psz_orig, '/' );
 
             if( psz )
             {
@@ -426,12 +427,13 @@ static char *TitleGet( vlc_object_t *p_this )
             }
             else
             {
-                psz = input_GetItem(p_input)->psz_uri;
+                psz = psz_orig;
             }
             if( psz && *psz )
             {
                 psz_title = strdup( psz );
             }
+            free( psz_orig );
         }
         vlc_object_release( p_input );
     }

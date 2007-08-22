@@ -335,8 +335,8 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
 
                     p_input = E_(MRLParse)( p_intf, mrl, psz_name );
 
-                    if( !p_input || !p_input->psz_uri ||
-                        !*p_input->psz_uri )
+                    char *psz_uri = input_item_GetURI( p_input );
+                    if( !p_input || !psz_uri || !*psz_uri )
                     {
                         msg_Dbg( p_intf, "invalid requested mrl: %s", mrl );
                     }
@@ -347,6 +347,7 @@ void E_(MacroDo)( httpd_file_sys_t *p_args,
                                      VLC_FALSE);
                         msg_Dbg( p_intf, "requested mrl add: %s", mrl );
                     }
+                    free( psz_uri );
 
                     break;
                 }

@@ -153,7 +153,9 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( psz_artist == NULL ) psz_artist = strdup( _("no artist") );
     psz_album = input_item_GetAlbum( input_GetItem( p_input ) ) ;
     if( psz_album == NULL ) psz_album = strdup( _("no album") );
-    psz_title = input_item_GetName( input_GetItem( p_input ) );
+    psz_title = input_item_GetTitle( input_GetItem( p_input ) );
+    if( psz_title == NULL )
+        psz_title = input_item_GetName( input_GetItem( p_input ) );
 
     vlc_object_release( p_input );
 

@@ -61,34 +61,37 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
             continue;
         }
 
-        assert( p_current->p_input->psz_uri );
-
         /* General info */
+
+        char *psz_uri = input_item_GetURI( p_current->p_input );
+
+        assert( psz_uri );
+
         char *psz_name = input_item_GetName( p_current->p_input );
-        if( psz_name && strcmp( p_current->p_input->psz_uri, psz_name ) )
+        if( psz_name && strcmp( psz_uri, psz_name ) )
         {
             char *psz_artist = input_item_GetArtist( p_current->p_input );
             if( psz_artist == NULL ) psz_artist = strdup( "" );
+            mtime_t i_duration = input_item_GetDuration( p_current->p_input );
             if( psz_artist && *psz_artist )
             {
                 /* write EXTINF with artist */
                 fprintf( p_export->p_file, "#EXTINF:%i,%s - %s\n",
-                          (int)( p_current->p_input->i_duration/1000000 ),
-                          psz_artist,
-                          p_current->p_input->psz_name);
+                          (int)( i_duration / 1000000 ), psz_artist, psz_name);
             }
             else
             {
                 /* write EXTINF without artist */
                 fprintf( p_export->p_file, "#EXTINF:%i,%s\n",
-                         (int)( p_current->p_input->i_duration/1000000 ),
-                          p_current->p_input->psz_name);
+                         (int)( i_duration / 1000000 ), psz_name);
             }
             free( psz_artist );
         }
+        free( psz_uri );
         free( psz_name );
 
         /* VLC specific options */
+        vlc_mutex_lock( &p_current->p_input->lock );
         for( j = 0; j < p_current->p_input->i_options; j++ )
         {
             fprintf( p_export->p_file, "#EXTVLCOPT:%s\n",
@@ -96,9 +99,9 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
                      p_current->p_input->ppsz_options[j] + 1 :
                      p_current->p_input->ppsz_options[j] );
         }
+        vlc_mutex_unlock( &p_current->p_input->lock );
 
-        fprintf( p_export->p_file, "%s\n",
-                 p_current->p_input->psz_uri );
+        fprintf( p_export->p_file, "%s\n", psz_uri );
     }
 }
 

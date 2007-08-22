@@ -100,9 +100,11 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                         WS_CHILD | WS_VISIBLE | SS_RIGHT,
                         0, 10, 60, 15, hwnd, NULL, hInst, NULL);
 
-        uri_text = CreateWindow( _T("EDIT"), _FROMMB(p_item->input.psz_uri),
+        char *psz_uri = input_item_GetURI( &p_item->input );
+        uri_text = CreateWindow( _T("EDIT"), _FROMMB(psz_uri),
             WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT | ES_AUTOHSCROLL,
             70, 10 - 3, rcClient.right - 70 - 10, 15 + 6, hwnd, 0, hInst, 0 );
+        free( psz_uri );
 
         /* Name Textbox */
         name_label = CreateWindow( _T("STATIC"), _T("Name:"),
@@ -252,18 +254,15 @@ void ItemInfoDialog::OnOk()
 {
     int b_state = VLC_FALSE;
 
-    vlc_mutex_lock( &p_item->input.lock );
-
     TCHAR psz_name[MAX_PATH];
     Edit_GetText( name_text, psz_name, MAX_PATH );
-    if( p_item->input.psz_name ) free( p_item->input.psz_name );
-    p_item->input.psz_name = strdup( _TOMB(psz_name) );
+    input_item_SetName( &p_item->input, _TOMB( psz_name ) );
 
     TCHAR psz_uri[MAX_PATH];
     Edit_GetText( uri_text, psz_uri, MAX_PATH );
-    if( p_item->input.psz_uri ) free( p_item->input.psz_uri );
-    p_item->input.psz_uri = strdup( _TOMB(psz_uri) );
+    input_item_SetURI( &p_item->input, _TOMB(psz_uri) );
 
+    vlc_mutex_lock( &p_item->input.lock );
     vlc_bool_t b_old_enabled = p_item->b_enabled;
 
     playlist_t * p_playlist = (playlist_t *)

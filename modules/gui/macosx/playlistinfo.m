@@ -187,31 +187,36 @@
     /* check whether our item is valid, because we would crash if not */
     if(! [self isItemInPlaylist: p_item] ) return;
 
-    vlc_mutex_lock( &p_item->p_input->lock );
-
     /* fill uri info */
-    if( p_item->p_input->psz_uri )
+    char *psz_uri = input_item_GetURI( p_item->p_input );
+    if( psz_uri )
     {
         [o_uri_txt setStringValue:
-            ([NSString stringWithUTF8String:p_item->p_input->psz_uri] == nil ) ?
-            [NSString stringWithCString:p_item->p_input->psz_uri] :
-            [NSString stringWithUTF8String:p_item->p_input->psz_uri]];
+            ([NSString stringWithUTF8String:psz_uri] == nil ) ?
+            [NSString stringWithCString:psz_uri] :
+            [NSString stringWithUTF8String:psz_uri]];
     }
+    free( psz_uri );
 
-    vlc_mutex_unlock( &p_item->p_input->lock );
+#define SET( foo, bar ) \
+    char *psz_##foo = input_item_Get##bar ( p_item->p_input ); \
+    [set setMeta: psz_##foo forlabel: o_##foo##_txt]; \
+    free( psz_foo );
 
     /* fill the other fields */
-    [self setMeta: input_item_GetTitle( p_item->p_input )      forLabel: o_title_txt];
-    [self setMeta: input_item_GetArtist( p_item->p_input )     forLabel: o_author_txt];
-    [self setMeta: input_item_GetAlbum( p_item->p_input )      forLabel: o_collection_txt];
-    [self setMeta: input_item_GetTrackNum( p_item->p_input )   forLabel: o_seqNum_txt];
-    [self setMeta: input_item_GetGenre( p_item->p_input )      forLabel: o_genre_txt];
-    [self setMeta: input_item_GetCopyright( p_item->p_input )  forLabel: o_copyright_txt];
-    [self setMeta: input_item_GetRating( p_item->p_input )     forLabel: o_rating_txt];
-    [self setMeta: input_item_GetPublisher( p_item->p_input )  forLabel: o_publisher_txt];
-    [self setMeta: input_item_GetNowPlaying( p_item->p_input ) forLabel: o_nowPlaying_txt];
-    [self setMeta: input_item_GetLanguage( p_item->p_input )   forLabel: o_language_txt];
-    [self setMeta: input_item_GetDate( p_item->p_input )       forLabel: o_date_txt];
+    SET( title, Title );
+    SET( author, Artist );
+    SET( collection, Album );
+    SET( seqNum, TrackNum );
+    SET( genre, Genre );
+    SET( copyright, Copyright );
+    SET( rating, Rating );
+    SET( publisher, Publisher );
+    SET( nowPlaying, NowPlaying );
+    SET( language, Language );
+    SET( date, Date );
+
+#undef SET
 
     /* reload the advanced table */
     [[VLCInfoTreeItem rootItem] refresh];
@@ -293,12 +298,12 @@
 
     if( [self isItemInPlaylist: p_item] )
     {
-        vlc_mutex_lock( &p_item->p_input->lock );
-
-        p_item->p_input->psz_uri = strdup( [[o_uri_txt stringValue] UTF8String] );
-        p_item->p_input->psz_name = strdup( [[o_title_txt stringValue] UTF8String] );
-        vlc_mutex_unlock( &p_item->p_input->lock );
-        input_item_SetArtist( p_item->p_input, [[o_author_txt stringValue] UTF8String] );
+        input_item_SetName( p_item->p_input,
+                [[o_title_txt stringValue] UTF8String] );
+        input_item_SetURI( p_item->p_input,
+                [[o_uri_txt stringValue] UTF8String] );
+        input_item_SetArtist( p_item->p_input,
+                [[o_author_txt stringValue] UTF8String] );
 
         val.b_bool = VLC_TRUE;
         var_Set( p_playlist, "intf-change", val );

@@ -229,7 +229,7 @@ static int Demux( demux_t *p_demux )
                 else if( b_item == VLC_FALSE && b_image == VLC_FALSE
                          && !strcmp( psz_elname, "title" ) )
                 {
-                    input_ItemSetName( p_current_input, psz_text );
+                    input_item_SetName( p_current_input, psz_text );
                 }
 #define ADD_GINFO( info, name ) \
     else if( !b_item && !b_image && !strcmp( psz_elname, name ) ) \

@@ -890,12 +890,16 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
     char *psz_bookmark = strdup( val.psz_string );
     PL_LOCK;
     FOREACH_ARRAY( playlist_item_t *p_item, p_playlist->items )
-        if( !strcmp( psz_bookmark, p_item->p_input->psz_uri ) )
+        char *psz_uri = input_item_GetURI( p_item->p_input );
+        if( !strcmp( psz_bookmark, psz_uri ) )
         {
+            free( psz_uri );
             playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, VLC_TRUE,
                               NULL, p_item );
             break;
         }
+        else
+            free( psz_uri );
     FOREACH_END();
     PL_UNLOCK;
     vlc_object_release( p_playlist );
@@ -910,10 +914,10 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
                 VLC_VAR_STRING|VLC_VAR_DOINHERIT );
     if( p_playlist->status.p_item )
     {
-        config_PutPsz( p_intf, psz_bookmark_name,
-                       p_playlist->status.p_item->p_input->psz_uri);
-        msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num,
-                  p_playlist->status.p_item->p_input->psz_uri);
+        char *psz_uri = input_item_GetURI( p_playlist->status.p_item->p_input );
+        config_PutPsz( p_intf, psz_bookmark_name, psz_uri);
+        msg_Info( p_intf, "setting playlist bookmark %i to %s", i_num, psz_uri);
+        free( psz_uri );
         config_SaveConfigFile( p_intf, "hotkeys" );
     }
     pl_Release( p_intf );

@@ -671,7 +671,7 @@ void Playlist::UpdateItem( int i )
                                    _("General") , _("Author") ) ) );
 
     char psz_duration[MSTRTIME_MAX_SIZE];
-    mtime_t dur = p_item->input.i_duration;
+    mtime_t dur = input_item_GetDuration( p_item );
     if( dur != -1 ) secstotimestr( psz_duration, dur/1000000 );
     else memcpy( psz_duration , "-:--:--", sizeof("-:--:--") );
 

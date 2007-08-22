@@ -420,7 +420,7 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
         if( p_node->i_children == -1 )
         {
             char value[512];
-            char *psz;
+            char *psz, psz_utf8;
             mvar_t *itm = E_(mvar_New)( name, "set" );
 
             if( p_pl->status.p_item && p_node &&
@@ -437,12 +437,16 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
             sprintf( value, "%d", p_node->i_id );
             E_(mvar_AppendNewVar)( itm, "index", value );
 
-            psz = E_(FromUTF8)( p_intf, p_node->p_input->psz_name );
+            psz_utf8 = input_item_GetName( p_node->p_input );
+            psz = E_(FromUTF8)( p_intf, psz_utf8 );
             E_(mvar_AppendNewVar)( itm, "name", psz );
+            free( psz_utf8 );
             free( psz );
 
-            psz = E_(FromUTF8)( p_intf, p_node->p_input->psz_uri );
+            psz_utf8 = input_item_GetURI( p_node->p_input );
+            psz = E_(FromUTF8)( p_intf, psz_utf8 );
             E_(mvar_AppendNewVar)( itm, "uri", psz );
+            free( psz_utf8 );
             free( psz );
 
             sprintf( value, "Item");
@@ -460,7 +464,8 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
                 E_(mvar_AppendNewVar)( itm, "ro", "rw" );
             }
 
-            sprintf( value, "%ld", (long)p_node->p_input->i_duration );
+            sprintf( value, "%ld",
+                    (long) input_item_GetDuration( p_node->p_input ) );
             E_(mvar_AppendNewVar)( itm, "duration", value );
 
             E_(mvar_AppendVar)( s, itm );

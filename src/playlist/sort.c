@@ -104,6 +104,15 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
         return VLC_SUCCESS;
     }
 
+#define META_STRCASECMP_NAME( i, i_small ) { \
+    char *psz_i = input_item_GetName( pp_items[i]->p_input ); \
+    char *psz_ismall = input_item_GetName( pp_items[i_small]->p_input ); \
+    i_test = strcasecmp( psz_i, psz_ismall ); \
+    free( psz_i ); \
+    free( psz_ismall ); \
+}    
+        
+
 #define DO_META_SORT( node ) { \
     char *psz_a = input_item_GetMeta( pp_items[i]->p_input, vlc_meta_##node ); \
     char *psz_b = input_item_GetMeta( pp_items[i_small]->p_input, vlc_meta_##node ); \
@@ -117,8 +126,7 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     else if( pp_items[i]->i_children >= 0 && \
                pp_items[i_small]->i_children >= 0 ) \
     { \
-         i_test = strcasecmp( pp_items[i]->p_input->psz_name, \
-                              pp_items[i_small]->p_input->psz_name ); \
+        META_STRCASECMP_NAME( i, i_small ) \
     } \
     /* Both are items */ \
     else if( psz_a == NULL && psz_b != NULL ) \
@@ -128,8 +136,7 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     /* No meta, sort by name */ \
     else if( psz_a == NULL && psz_b == NULL ) \
     { \
-        i_test = strcasecmp( pp_items[i]->p_input->psz_name, \
-                             pp_items[i_small]->p_input->psz_name ); \
+        META_STRCASECMP_NAME( i, i_small ); \
     } \
     else \
     { \
@@ -148,18 +155,21 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
 
             if( i_mode == SORT_TITLE )
             {
-                i_test = strcasecmp( pp_items[i]->p_input->psz_name,
-                                     pp_items[i_small]->p_input->psz_name );
+                META_STRCASECMP_NAME( i, i_small );
             }
             else if( i_mode == SORT_TITLE_NUMERIC )
             {
-                i_test = atoi( pp_items[i]->p_input->psz_name ) -
-                         atoi( pp_items[i_small]->p_input->psz_name );
+                char *psz_i = input_item_GetName( pp_items[i]->p_input );
+                char *psz_ismall =
+                        input_item_GetName( pp_items[i_small]->p_input );
+                i_test = atoi( psz_i ) - atoi( psz_ismall );
+                free( psz_i );
+                free( psz_ismall );
             }
             else if( i_mode == SORT_DURATION )
             {
-                i_test = pp_items[i]->p_input->i_duration -
-                             pp_items[i_small]->p_input->i_duration;
+                i_test = input_item_GetDuration( pp_items[i]->p_input ) -
+                         input_item_GetDuration( pp_items[i_small]->p_input );
             }
             else if( i_mode == SORT_ARTIST )
             {

@@ -155,7 +155,7 @@ static int Demux( demux_t *p_demux )
         }
         else if( !strcmp( psz_name, "label" ) )
         {
-            input_ItemSetName( p_current_input, psz_value );
+            input_item_SetName( p_current_input, psz_value );
         }
         else
         {

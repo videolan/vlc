@@ -110,6 +110,7 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
 {
     char *psz;
     char *psz_temp;
+    mtime_t i_duration;
 
     if( !p_item ) return;
 
@@ -138,23 +139,27 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     ( *p_i_count )++;
 
     /* -> the location */
-    if( p_item->p_input->psz_uri && *p_item->p_input->psz_uri )
+
+    char *psz_uri = input_item_GetURI( p_item->p_input );
+
+    if( psz_uri && *psz_uri )
     {
-        psz = assertUTF8URI( p_item->p_input->psz_uri );
+        psz = assertUTF8URI( psz_uri );
         fprintf( p_file, "\t\t\t<location>%s</location>\n", psz );
         free( psz );
     }
 
     /* -> the name/title (only if different from uri)*/
-    if( p_item->p_input->psz_name &&
-        p_item->p_input->psz_uri &&
-        strcmp( p_item->p_input->psz_uri, p_item->p_input->psz_name ) )
+    char *psz_name = input_item_GetName( p_item->p_input );
+    if( psz_name && psz_uri && strcmp( psz_uri, psz_name ) )
     {
-        psz_temp = convert_xml_special_chars( p_item->p_input->psz_name );
+        psz_temp = convert_xml_special_chars( psz_name );
         if( *psz_temp )
             fprintf( p_file, "\t\t\t<title>%s</title>\n", psz_temp );
         free( psz_temp );
     }
+    free( psz_name );
+    free( psz_uri );
 
     if( p_item->p_input->p_meta == NULL )
     {
@@ -208,10 +213,11 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
 
 xspfexportitem_end:
     /* -> the duration */
-    if( p_item->p_input->i_duration > 0 )
+    i_duration = input_item_GetDuration( p_item->p_input );
+    if( i_duration > 0 )
     {
         fprintf( p_file, "\t\t\t<duration>%ld</duration>\n",
-                 (long)(p_item->p_input->i_duration / 1000) );
+                 (long)(i_duration / 1000) );
     }
 
     fprintf( p_file, "\t\t</track>\n" );

@@ -231,7 +231,8 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
                     ADD_META( p_item, Description );
                     break;
                 case VLC_META_ENGINE_DURATION:
-                    secstotimestr( psz_duration, p_item->p_input->i_duration / 1000000 );
+                    secstotimestr( psz_duration,
+                        input_item_GetDuration( p_item->p_input ) / 1000000 );
                     strings.append( QString( psz_duration ) );
                     break;
                 case VLC_META_ENGINE_GENRE:

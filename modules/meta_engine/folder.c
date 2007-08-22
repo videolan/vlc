@@ -68,7 +68,7 @@ static int FindMeta( vlc_object_t *p_this )
     int i = 0;
     struct stat a;
     char psz_filename[MAX_PATH];
-    char *psz_dir = strdup( p_item->psz_uri );
+    char *psz_dir = input_item_GetURI( p_item );
     char *psz_buf = strrchr( psz_dir, '/' );
 
     if( psz_buf )

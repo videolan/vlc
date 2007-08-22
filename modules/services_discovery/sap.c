@@ -590,13 +590,13 @@ static int Demux( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    p_parent_input = input_GetItem(p_input);
+    p_parent_input = input_GetItem( p_input );
+
+    input_item_SetURI( p_parent_input, p_sdp->psz_uri );
+    input_item_SetName( p_parent_input, p_sdp->psz_sessionname );
 
     vlc_mutex_lock( &p_parent_input->lock );
-    FREENULL( p_parent_input->psz_uri );
-    p_parent_input->psz_uri = strdup( p_sdp->psz_uri );
-    FREENULL( p_parent_input->psz_name );
-    p_parent_input->psz_name = strdup( p_sdp->psz_sessionname );
+
     p_parent_input->i_type = ITEM_TYPE_NET;
 
     if( p_playlist->status.p_item &&

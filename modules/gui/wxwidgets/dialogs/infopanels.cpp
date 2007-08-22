@@ -117,8 +117,6 @@ void MetaDataPanel::Update( input_item_t *p_item )
     /* Rebuild the tree */
     Clear();
 
-    uri_text->SetValue( wxU( p_item->psz_uri ) );
-    name_text->SetValue( wxU( p_item->psz_name ) );
     char *psz_meta;
 
 #define UPDATE_META( meta, widget ) {                                       \
@@ -131,6 +129,8 @@ void MetaDataPanel::Update( input_item_t *p_item )
     }                                                                       \
     free( psz_meta );
 
+    UPDATE_META( URI, uri_text );
+    UPDATE_META( Name, name_text );
     UPDATE_META( Artist, artist_text );
     UPDATE_META( Genre, genre_text );
     UPDATE_META( Copyright, copyright_text );

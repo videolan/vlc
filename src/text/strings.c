@@ -638,20 +638,36 @@ char *str_format_time( const char *tformat )
                     if( check )                                     \
                     {                                               \
                         psz_meta = string;                          \
-                        if( string )                                \
+                        if( psz_meta )                              \
                         {                                           \
-                            int len = strlen( psz_meta );           \
+                            int len = strlen( string );             \
                             dst = realloc( dst,                     \
                                    i_size = i_size + len + 1 );     \
                             strncpy( d, psz_meta, len+1 );          \
                             d += len;                               \
-                            free( psz_meta );                       \
                         }                                           \
                         else                                        \
                         {                                           \
                                 *d = '-';                           \
                                 d++;                                \
                         }                                           \
+                    }
+
+/* same than INSERT_STRING, except that string won't be freed */
+#define INSERT_STRING_NO_FREE( check, string )                           \
+                    if( check && string )                           \
+                    {                                               \
+                            int len = strlen( string );             \
+                            dst = realloc( dst,                     \
+                                   i_size = i_size + len + 1 );     \
+                            strncpy( d, string, len+1 );            \
+                            d += len;                               \
+                            free( string );                         \
+                    }                                               \
+                    else                                            \
+                    {                                               \
+                            *d = '-';                               \
+                            d++;                                    \
                     }
 char *__str_format_meta( vlc_object_t *p_object, const char *string )
 {
@@ -671,8 +687,6 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
     {
         vlc_object_yield( p_input );
         p_item = input_GetItem(p_input);
-        if( p_item )
-            vlc_mutex_lock( &p_item->lock );
     }
 
     sprintf( dst, string );
@@ -726,7 +740,6 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                         lang = strdup( b_empty_if_na ? "" : "-" );
                     }
                     INSERT_STRING( 1, lang );
-                    free( lang );
                     break;
                 }
                 case 't':
@@ -748,7 +761,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
-                    INSERT_STRING( 1, buf );
+                    INSERT_STRING_NO_FREE( 1, buf );
                     break;
                 case 'C':
                     if( p_input )
@@ -760,24 +773,25 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
-                    INSERT_STRING( 1, buf );
+                    INSERT_STRING_NO_FREE( 1, buf );
                     break;
                 case 'D':
                     if( p_item )
                     {
+                        mtime_t i_duration = input_item_GetDuration( p_item );
                         sprintf( buf, "%02d:%02d:%02d",
-                                 (int)(p_item->i_duration/(3600000000)),
-                                 (int)((p_item->i_duration/(60000000))%60),
-                                 (int)((p_item->i_duration/1000000)%60) );
+                                 (int)(i_duration/(3600000000)),
+                                 (int)((i_duration/(60000000))%60),
+                                 (int)((i_duration/1000000)%60) );
                     }
                     else
                     {
                         sprintf( buf, b_empty_if_na ? "" : "--:--:--" );
                     }
-                    INSERT_STRING( 1, buf );
+                    INSERT_STRING_NO_FREE( 1, buf );
                     break;
                 case 'F':
-                    INSERT_STRING( p_item, p_item->psz_uri );
+                    INSERT_STRING( p_item, input_item_GetURI( p_item ) );
                     break;
                 case 'I':
                     if( p_input )
@@ -789,24 +803,26 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
-                    INSERT_STRING( 1, buf );
+                    INSERT_STRING_NO_FREE( 1, buf );
                     break;
                 case 'L':
                     if( p_item && p_input )
                     {
+                        mtime_t i_duration = input_item_GetDuration( p_item );
+                        int64_t i_time = p_input->i_time;
                         sprintf( buf, "%02d:%02d:%02d",
-                     (int)((p_item->i_duration-p_input->i_time)/(3600000000)),
-                     (int)(((p_item->i_duration-p_input->i_time)/(60000000))%60),
-                     (int)(((p_item->i_duration-p_input->i_time)/1000000)%60) );
+                     (int)( ( i_duration - i_time ) / 3600000000 ),
+                     (int)( ( ( i_duration - i_time ) / 60000000 ) % 60 ),
+                     (int)( ( ( i_duration - i_time ) / 1000000 ) % 60 ) );
                     }
                     else
                     {
                         sprintf( buf, b_empty_if_na ? "" : "--:--:--" );
                     }
-                    INSERT_STRING( 1, buf );
+                    INSERT_STRING_NO_FREE( 1, buf );
                     break;
                 case 'N':
-                    INSERT_STRING( p_item, p_item->psz_name );
+                    INSERT_STRING( p_item, input_item_GetName( p_item ) );
                     break;
                 case 'O':
                 {
@@ -820,7 +836,6 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                         lang = strdup( b_empty_if_na ? "" : "-" );
                     }
                     INSERT_STRING( 1, lang );
-                    free( lang );
                     break;
                 }
                 case 'P':
@@ -833,7 +848,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "--.-%%" );
                     }
-                    INSERT_STRING( 1, buf );
+                    INSERT_STRING_NO_FREE( 1, buf );
                     break;
                 case 'R':
                     if( p_input )
@@ -845,7 +860,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
-                    INSERT_STRING( 1, buf );
+                    INSERT_STRING_NO_FREE( 1, buf );
                     break;
                 case 'S':
                     if( p_input )
@@ -857,21 +872,21 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
-                    INSERT_STRING( 1, buf );
+                    INSERT_STRING_NO_FREE( 1, buf );
                     break;
                 case 'T':
                     if( p_input )
                     {
                         sprintf( buf, "%02d:%02d:%02d",
-                                 (int)(p_input->i_time/(3600000000)),
-                                 (int)((p_input->i_time/(60000000))%60),
-                                 (int)((p_input->i_time/1000000)%60) );
+                            (int)( p_input->i_time / ( 3600000000 ) ),
+                            (int)( ( p_input->i_time / ( 60000000 ) ) % 60 ),
+                            (int)( ( p_input->i_time / 1000000 ) % 60 ) );
                     }
                     else
                     {
                         sprintf( buf, b_empty_if_na ? "" :  "--:--:--" );
                     }
-                    INSERT_STRING( 1, buf );
+                    INSERT_STRING_NO_FREE( 1, buf );
                     break;
                 case 'U':
                     INSERT_STRING( p_item, input_item_GetPublisher(p_item) );
@@ -881,7 +896,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     audio_volume_t volume;
                     aout_VolumeGet( p_object, &volume );
                     snprintf( buf, 10, "%d", volume );
-                    INSERT_STRING( 1, buf );
+                    INSERT_STRING_NO_FREE( 1, buf );
                     break;
                 }
                 case '_':
@@ -916,11 +931,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
     *d = '\0';
 
     if( p_input )
-    {
         vlc_object_release( p_input );
-        if( p_item )
-            vlc_mutex_unlock( &p_item->lock );
-    }
 
     return dst;
 }

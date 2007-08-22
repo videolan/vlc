@@ -877,8 +877,7 @@ static int GetInputMeta( input_item_t* p_input,
     DBusMessageIter dict, dict_entry, variant;
     /* We need the track length to be expressed in seconds
      * instead of milliseconds */
-    dbus_int64_t i_length = (p_input->i_duration / 1000);
-
+    dbus_int64_t i_length = ( input_item_GetDuration( p_input ) / 1000 );
 
     const char* ppsz_meta_items[] = 
     {
@@ -907,10 +906,13 @@ static int GetInputMeta( input_item_t* p_input,
     ADD_VLC_META_STRING( 13, Publisher );
     ADD_VLC_META_STRING( 14, EncodedBy );
     ADD_VLC_META_STRING( 15, ArtURL );
-    ADD_VLC_META_STRING( 16, TrackID ); 
+    ADD_VLC_META_STRING( 16, TrackID );
 
+    vlc_mutex_lock( &p_input->lock );
     ADD_META( 17, DBUS_TYPE_INT32, p_input->p_meta->i_status );
-    ADD_META( 18, DBUS_TYPE_STRING, p_input->psz_uri );
+    vlc_mutex_unlock( &p_input->lock );
+
+    ADD_VLC_META_STRING( 18, URI );
     ADD_META( 19, DBUS_TYPE_INT64, i_length );
 
     dbus_message_iter_close_container( args, &dict );

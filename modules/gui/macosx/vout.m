@@ -285,12 +285,14 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         return;
     }
 
-    if( input_GetItem(p_input)->psz_name != NULL )
-        o_title = [NSMutableString stringWithUTF8String:
-            input_GetItem(p_input)->psz_name];
-    if( input_GetItem(p_input)->psz_uri != NULL )
-        o_mrl = [NSMutableString stringWithUTF8String:
-            input_GetItem(p_input)->psz_uri];
+    char *psz_name = input_item_GetName( input_GetItem( p_input ) );
+    char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
+    if( psz_name != NULL )
+        o_title = [NSMutableString stringWithUTF8String: psz_name];
+    if( psz_uri != NULL )
+        o_mrl = [NSMutableString stringWithUTF8String: psz_uri];
+    free( psz_name );
+    free( psz_uri );
     if( o_title == nil )
         o_title = o_mrl;
 

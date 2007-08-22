@@ -903,11 +903,14 @@ static int Init( input_thread_t * p_input )
         var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
         UpdateItemLength( p_input, val.i_time );
     }
-    else if( p_input->p->input.p_item->i_duration > 0 )
-    { /* fallback: gets length from metadata */
-        val.i_time = p_input->p->input.p_item->i_duration;
-        var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
-        UpdateItemLength( p_input, val.i_time );
+    else
+    {
+        val.i_time = input_item_GetDuration( p_input->p->input.p_item );
+        if( val.i_time > 0 )
+        { /* fallback: gets length from metadata */
+            var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
+            UpdateItemLength( p_input, val.i_time );
+        }
     }
 
     /* Start title/chapter */
@@ -2034,9 +2037,7 @@ static int UpdateFromAccess( input_thread_t *p_input )
  *****************************************************************************/
 static void UpdateItemLength( input_thread_t *p_input, int64_t i_length )
 {
-    vlc_mutex_lock( &p_input->p->input.p_item->lock );
-    p_input->p->input.p_item->i_duration = i_length;
-    vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+    input_item_SetDuration( p_input->p->input.p_item, (mtime_t) i_length );
 
     if( !p_input->b_preparsing )
     {

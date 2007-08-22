@@ -1093,7 +1093,7 @@ static int ReadMetaData( intf_thread_t *p_this )
         else
             psz_trackid = calloc( 1, 1 );
 
-        i_length = input_GetItem(p_input)->i_duration / 1000000;
+        i_length = input_item_GetDuration( input_GetItem( p_input ) ) / 1000000;
 
         vlc_mutex_lock ( &p_sys->lock );
 
