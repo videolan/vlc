@@ -519,7 +519,10 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
         return VLC_EGENERIC;
     
     if( VLC_SUCCESS != input_Control( p_input, INPUT_GET_ATTACHMENTS, &pp_attachments, &i_attachments_cnt ))
+    {
+        vlc_object_release(p_input);
         return VLC_EGENERIC;
+    }
 
     p_sys->i_font_attachments = 0;
     p_sys->pp_font_attachments = malloc( i_attachments_cnt * sizeof( input_attachment_t * ));
@@ -550,6 +553,8 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
         }
     }
     free( pp_attachments );        
+
+    vlc_object_release(p_input);
 
     return rv;
 }
