@@ -457,7 +457,6 @@ modules/demux/playlist/b4s.c
 modules/demux/playlist/dvb.c
 modules/demux/playlist/gvp.c
 modules/demux/playlist/ifo.c
-modules/demux/playlist/luaplaylist.c
 modules/demux/playlist/m3u.c
 modules/demux/playlist/playlist.c
 modules/demux/playlist/playlist.h
