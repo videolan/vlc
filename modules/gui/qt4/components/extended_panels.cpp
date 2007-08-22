@@ -208,11 +208,14 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
     char *psz_parser, *psz_string;
 
     char *psz_filter_type;
+    msg_Err( p_intf, "FIXME %s %s %d.", __FILE__, __func__, __LINE__ );
+    return;
+#if 0
 
     /* Please leave p_libvlc_global. This is where cached modules are
      * stored. We're not trying to find a module instance. */
     vlc_object_t *p_obj = (vlc_object_t *)
-        vlc_object_find_name( p_intf->p_libvlc_global, psz_name, FIND_CHILD );
+        vlc_object_find_name( vlc_global_object(), psz_name, FIND_CHILD );
     if( !p_obj )
     {
         msg_Err( p_intf, "Unable to find filter module \"%s\n.", psz_name );
@@ -308,6 +311,7 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
     }
 
     free( psz_string );
+#endif
 }
 
 void ExtVideo::updateFilters()
