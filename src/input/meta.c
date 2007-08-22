@@ -232,14 +232,13 @@ static void ArtCacheCreateDir( const char *psz_dir )
     char * psz_newdir = newdir;
     char * psz = psz_newdir;
 
-    while( *psz_newdir )
+    while( *psz )
     {
         while( *psz && *psz != '/') psz++;
         if( !*psz ) break;
         *psz = 0;        
         if( !EMPTY_STR( psz_newdir ) ) utf8_mkdir( psz_newdir );
-        *psz = '/';        
-        psz_newdir = psz+1;
+        *psz = DIR_SEP;        
     }
 }
 
