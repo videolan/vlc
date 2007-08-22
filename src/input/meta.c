@@ -255,7 +255,7 @@ static char * ArtCacheGetSanitizedFileName( const char *psz )
      */
     for( i = 0; dup[i] != '\0'; i++ )
     {
-        if( dup[i] == '/' )
+        if( dup[i] == DIR_SEP_CHAR )
             dup[i] = ' ';
     }
     return dup;
