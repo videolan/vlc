@@ -2845,10 +2845,16 @@ fi
 dnl
 dnl   libid3tag support (FIXME!!! doesn't work with new input)
 dnl
-AC_CHECK_HEADERS(id3tag.h, [
-  AC_CHECK_HEADERS(zlib.h, [
-    VLC_ADD_LDFLAGS([id3tag],[-lid3tag -lz])
-    VLC_ADD_PLUGINS([id3tag])]) ])
+AC_ARG_ENABLE( id3tag,
+  [  --disable-id3tag id3tag metadata reader plugin (default enabled)])
+AS_IF([test "${enable_id3tag}" != "no"], [
+  AC_CHECK_HEADERS(id3tag.h, [
+    AC_CHECK_HEADERS(zlib.h, [
+      VLC_ADD_LDFLAGS([id3tag],[-lid3tag -lz])
+      VLC_ADD_PLUGINS([id3tag])
+    ])
+  ])
+])
 
 dnl
 dnl  ffmpeg decoder/demuxer plugin
