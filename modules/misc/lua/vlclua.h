@@ -94,3 +94,4 @@ void vlclua_read_custom_meta_data( vlc_object_t *p_this,
         lua_State *p_state, int o, int t, input_item_t *p_input );
 
 #endif /* VLC_LUA_H */
+
