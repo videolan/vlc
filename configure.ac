@@ -1045,8 +1045,6 @@ AC_CACHE_CHECK([if \$CC accepts -fomit-frame-pointer],
      AC_TRY_COMPILE([],,ac_cv_c_omit_frame_pointer=yes, ac_cv_c_omit_frame_pointer=no)])
 if test "${ac_cv_c_omit_frame_pointer}" != "no"; then
     CFLAGS_OPTIM_NODEBUG="${CFLAGS_OPTIM_NODEBUG} -fomit-frame-pointer"
-    # these plugins do not compile without -fomit-frame-pointer, damn gcc!
-    VLC_ADD_CFLAGS([i420_yuy2_mmx i420_yuy2_sse2],[-fomit-frame-pointer])
 fi
 
 dnl Check for -fvisibility=hidden
