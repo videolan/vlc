@@ -356,6 +356,7 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
             snprintf( psz_filepath, MAX_PATH, "%s" DIR_SEP "%s",
                       psz_dirpath, psz_filename );
             input_item_SetArtURL( p_item, psz_filepath );
+            free( psz_filepath );
             free( psz_filename );
             closedir( p_dir );
             return VLC_SUCCESS;
