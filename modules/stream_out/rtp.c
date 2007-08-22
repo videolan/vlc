@@ -1649,7 +1649,7 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     {
         case HTTPD_MSG_DESCRIBE:
         {
-            char *psz_sdp = SDPGenerate( p_stream, psz_destination ? psz_destination : "0.0.0.0", VLC_TRUE );
+            char *psz_sdp = SDPGenerate( p_stream, psz_destination, VLC_TRUE );
 
             answer->i_status = 200;
             httpd_MsgAdd( answer, "Content-Type",  "%s", "application/sdp" );
