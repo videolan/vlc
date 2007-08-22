@@ -15,5 +15,3 @@ SOURCES_playlist = \
 	gvp.c \
 	ifo.c \
 	$(NULL)
-
-SOURCES_luaplaylist = luaplaylist.c
