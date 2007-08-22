@@ -11,7 +11,9 @@ end
 
 -- Return the artwork
 function fetch_art()
-    if vlc.title and vlc.artist then
+    if vlc.artist and vlc.album then
+        title = vlc.artist.." "..vlc.album
+    elseif vlc.title and vlc.artist then
         title = vlc.artist.." "..vlc.title
     elseif vlc.title then
         title = vlc.title
