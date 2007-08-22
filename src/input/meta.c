@@ -234,11 +234,11 @@ static void ArtCacheCreateDir( const char *psz_dir )
 
     while( *psz )
     {
-        while( *psz && *psz != '/') psz++;
+        while( *psz && *psz != DIR_SEP_CHAR) psz++;
         if( !*psz ) break;
         *psz = 0;        
         if( !EMPTY_STR( psz_newdir ) ) utf8_mkdir( psz_newdir );
-        *psz = DIR_SEP;
+        *psz = DIR_SEP_CHAR;
         psz++;   
     }
 }
