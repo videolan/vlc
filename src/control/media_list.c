@@ -106,15 +106,6 @@ media_descriptor_changed( const libvlc_event_t * p_event, void * user_data )
 static void
 media_descriptor_subitem_added( const libvlc_event_t * p_event, void * user_data )
 {
-    libvlc_media_list_t * p_mlist = user_data;
-    libvlc_media_descriptor_t * p_new_md;
-    libvlc_media_descriptor_t * p_parent_md = p_event->p_obj;
-    int count;
-    char * psz_parent_tag = NULL;
-    char * psz_parent_name, *psz_tag;
-
-    p_new_md = p_event->u.media_descriptor_subitem_added.new_child;
-
     /* Todo: Just forward that event to our event_manager */
 }
 
