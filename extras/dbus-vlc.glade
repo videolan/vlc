@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.2.0 on Sat Apr  7 01:02:24 2007 by fun@ubuntu-->
+<!--Generated with glade3 3.3.3 on Wed Aug 22 03:00:39 2007 -->
 <glade-interface>
   <widget class="GtkWindow" id="window1">
     <property name="resizable">False</property>
@@ -19,6 +19,7 @@
                 <property name="visible">True</property>
                 <property name="tooltip" translatable="yes">Previous</property>
                 <property name="relief">GTK_RELIEF_NONE</property>
+                <property name="response_id">0</property>
                 <child>
                   <widget class="GtkImage" id="image8">
                     <property name="visible">True</property>
@@ -37,6 +38,7 @@
                 <property name="visible">True</property>
                 <property name="tooltip" translatable="yes">Play/Pause</property>
                 <property name="relief">GTK_RELIEF_NONE</property>
+                <property name="response_id">0</property>
                 <child>
                   <widget class="GtkImage" id="image6">
                     <property name="visible">True</property>
@@ -56,6 +58,7 @@
                 <property name="visible">True</property>
                 <property name="tooltip" translatable="yes">Next</property>
                 <property name="relief">GTK_RELIEF_NONE</property>
+                <property name="response_id">0</property>
                 <child>
                   <widget class="GtkImage" id="image1">
                     <property name="visible">True</property>
@@ -75,6 +78,7 @@
                 <property name="visible">True</property>
                 <property name="tooltip" translatable="yes">Stop</property>
                 <property name="relief">GTK_RELIEF_NONE</property>
+                <property name="response_id">0</property>
                 <child>
                   <widget class="GtkImage" id="image9">
                     <property name="visible">True</property>
@@ -95,6 +99,7 @@
                 <property name="visible">True</property>
                 <property name="tooltip" translatable="yes">Quit vlc</property>
                 <property name="relief">GTK_RELIEF_NONE</property>
+                <property name="response_id">0</property>
                 <child>
                   <widget class="GtkImage" id="image5">
                     <property name="width_request">26</property>
@@ -116,6 +121,7 @@
                 <property name="visible">True</property>
                 <property name="tooltip" translatable="yes">Close controller</property>
                 <property name="relief">GTK_RELIEF_NONE</property>
+                <property name="response_id">0</property>
                 <child>
                   <widget class="GtkImage" id="image2">
                     <property name="visible">True</property>
@@ -220,11 +226,13 @@
                             <property name="visible">True</property>
                             <property name="tooltip" translatable="yes">Add MRL, or directory if empty</property>
                             <property name="relief">GTK_RELIEF_NONE</property>
+                            <property name="response_id">0</property>
                             <child>
                               <widget class="GtkImage" id="image4">
                                 <property name="width_request">100</property>
                                 <property name="height_request">80</property>
                                 <property name="visible">True</property>
+                                <property name="tooltip" translatable="yes">Add to playlist</property>
                                 <property name="stock">gtk-add</property>
                               </widget>
                             </child>
@@ -244,10 +252,24 @@
                   </packing>
                 </child>
                 <child>
+                  <widget class="GtkLabel" id="l_artist">
+                    <property name="width_request">180</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="justify">GTK_JUSTIFY_CENTER</property>
+                    <property name="wrap">True</property>
+                    <property name="ellipsize">PANGO_ELLIPSIZE_MIDDLE</property>
+                    <property name="single_line_mode">True</property>
+                  </widget>
+                  <packing>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
                   <widget class="GtkHBox" id="hbox3">
                     <property name="visible">True</property>
                     <child>
-                      <widget class="GtkLabel" id="item">
+                      <widget class="GtkLabel" id="l_title">
                         <property name="width_request">180</property>
                         <property name="height_request">20</property>
                         <property name="visible">True</property>
@@ -264,6 +286,7 @@
                           <widget class="GtkImage" id="vlcicon">
                             <property name="visible">True</property>
                             <property name="events"></property>
+                            <property name="tooltip" translatable="yes">Update meta info</property>
                             <property name="xpad">8</property>
                             <property name="icon_name">vlc</property>
                           </widget>
@@ -275,7 +298,7 @@
                     </child>
                   </widget>
                   <packing>
-                    <property name="position">2</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
               </widget>

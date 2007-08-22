@@ -47,14 +47,19 @@ def itemchange_handler(item):
         a = item["artist"]
     except:
         a = ""
-    if a == "":
-        a = item["URI"] 
-    l_item.set_text(a)
+    try:
+        t = item["title"]
+    except:
+        t = ""
+    if t == "":
+        t = item["URI"]
+    l_artist.set_text(a)
+    l_title.set_text(t)
 
 #connect to the bus
 bus = dbus.SessionBus()
-player_o = bus.get_object("org.freedesktop.MediaPlayer", "/Player")
-tracklist_o = bus.get_object("org.freedesktop.MediaPlayer", "/TrackList")
+player_o = bus.get_object("org.mpris.vlc", "/Player")
+tracklist_o = bus.get_object("org.mpris.vlc", "/TrackList")
 
 tracklist  = dbus.Interface(tracklist_o, "org.freedesktop.MediaPlayer")
 player = dbus.Interface(player_o, "org.freedesktop.MediaPlayer")
@@ -68,6 +73,7 @@ def AddTrack(widget):
     mrl = e_mrl.get_text()
     if mrl != None and mrl != "":
         tracklist.AddTrack(mrl, True)
+        e_mrl.set_text('')
     else:
         mrl = bt_file.get_filename()
         if mrl != None and mrl != "":
@@ -94,9 +100,13 @@ def update(widget):
     try: 
         a = item["artist"]
     except:        a = ""
-    if a == "":
-        a = item["URI"] 
-    l_item.set_text(a)
+    try:
+        t = item["title"]
+    except:        t = ""
+    if t == "":
+        t = item["URI"]
+    l_artist.set_text(a)
+    l_title.set_text(t)
     GetPlayStatus(0)
 
 #get playing status from remote vlc
@@ -112,7 +122,7 @@ def GetPlayStatus(widget):
 
 def Quit(widget):
     player.Quit(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
-    l_item.set_text("")
+    l_title.set_text("")
 
 def Pause(widget):
     player.Pause()
@@ -174,12 +184,13 @@ xml = gtk.glade.XML('dbus-vlc.glade')
 bt_close    = xml.get_widget('close')
 bt_quit     = xml.get_widget('quit')
 bt_file     = xml.get_widget('ChooseFile')
-bt_mrl      = xml.get_widget('AddMRL')
 bt_next     = xml.get_widget('next')
 bt_prev     = xml.get_widget('prev')
 bt_stop     = xml.get_widget('stop')
 bt_toggle   = xml.get_widget('toggle')
-l_item      = xml.get_widget('item')
+bt_mrl      = xml.get_widget('AddMRL')
+l_artist    = xml.get_widget('l_artist')
+l_title     = xml.get_widget('l_title')
 e_mrl       = xml.get_widget('mrl')
 window      = xml.get_widget('window1')
 img_bt_toggle=xml.get_widget('image6')
