@@ -238,6 +238,7 @@ static void ArtCacheCreateDir( const char *psz_dir )
         if( !*psz ) break;
         *psz = 0;        
         if( !EMPTY_STR( psz_newdir ) ) utf8_mkdir( psz_newdir );
+        *psz = '/';        
         psz_newdir = psz+1;
     }
 }
