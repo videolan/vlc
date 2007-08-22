@@ -148,6 +148,8 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     SETUP_VFILTER( noise )
 
+    SETUP_VFILTER( grain )
+
     SETUP_VFILTER( psychedelic )
 
     SETUP_VFILTER( sharpen )
@@ -208,8 +210,11 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
     char *psz_parser, *psz_string;
 
     char *psz_filter_type;
+
+    /* Please leave p_libvlc_global. This is where cached modules are
+     * stored. We're not trying to find a module instance. */
     vlc_object_t *p_obj = (vlc_object_t *)
-        vlc_object_find_name( p_intf->p_libvlc, psz_name, FIND_CHILD );
+        vlc_object_find_name( p_intf->p_libvlc_global, psz_name, FIND_CHILD );
     if( !p_obj )
     {
         msg_Err( p_intf, "Unable to find filter module \"%s\n.", psz_name );
@@ -297,6 +302,7 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
                                               FIND_ANYWHERE );
     if( p_vout )
     {
+        printf("Filter string: %s\n", psz_string);
         if( !strcmp( psz_filter_type, "sub-filter" ) )
             var_SetString( p_vout->p_spu, psz_filter_type, psz_string );
         else
@@ -304,7 +310,10 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
         vlc_object_release( p_vout );
     }
 
+    printf("%s %s %d\n", __FILE__,__func__,__LINE__);
+
     free( psz_string );
+    printf("%s %s %d\n", __FILE__,__func__,__LINE__);
 }
 
 void ExtVideo::updateFilters()
@@ -424,7 +433,6 @@ void ExtVideo::setWidgetValue( QObject *widget )
     }
     else if( i_type == VLC_VAR_STRING )
     {
-        const char *psz_string = NULL;
         if( lineedit ) lineedit->setText( qfu(val.psz_string) );
         else if( combobox ) combobox->setCurrentIndex(
                             combobox->findData( qfu( val.psz_string ) ) );
@@ -511,11 +519,10 @@ void ExtVideo::updateFilterOptions()
     else if( i_type == VLC_VAR_STRING )
     {
         char *psz_string = NULL;
-        if( lineedit ) psz_string = qtu(lineedit->text());
-        else if( combobox ) psz_string = qtu(combobox->itemData(
-                                         combobox->currentIndex()).toString());
+        if( lineedit ) psz_string = strdup(qtu(lineedit->text()));
+        else if( combobox ) psz_string = strdup(qtu(combobox->itemData(
+                                         combobox->currentIndex()).toString()));
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );
-        psz_string = strdup( psz_string );
         config_PutPsz( p_intf, option.toStdString().c_str(), psz_string );
         if( b_is_command )
             var_SetString( p_obj, option.toStdString().c_str(), psz_string );
