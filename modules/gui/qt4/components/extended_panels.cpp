@@ -148,8 +148,6 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     SETUP_VFILTER( noise )
 
-    SETUP_VFILTER( grain )
-
     SETUP_VFILTER( psychedelic )
 
     SETUP_VFILTER( sharpen )
@@ -302,7 +300,6 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
                                               FIND_ANYWHERE );
     if( p_vout )
     {
-        printf("Filter string: %s\n", psz_string);
         if( !strcmp( psz_filter_type, "sub-filter" ) )
             var_SetString( p_vout->p_spu, psz_filter_type, psz_string );
         else
@@ -310,10 +307,7 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
         vlc_object_release( p_vout );
     }
 
-    printf("%s %s %d\n", __FILE__,__func__,__LINE__);
-
     free( psz_string );
-    printf("%s %s %d\n", __FILE__,__func__,__LINE__);
 }
 
 void ExtVideo::updateFilters()
