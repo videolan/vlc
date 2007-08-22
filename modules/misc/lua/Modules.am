@@ -1,0 +1,1 @@
+SOURCES_lua = luaplaylist.c luameta.c vlclua.c
