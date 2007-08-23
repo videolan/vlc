@@ -22,12 +22,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+/*ypedef struct rtsp_stream_t rtsp_stream_t;*/
+typedef struct rtsp_stream_id_t rtsp_stream_id_t;
 typedef struct rtsp_client_t rtsp_client_t;
 
 int RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url );
 void RtspUnsetup( sout_stream_t *p_stream );
-int RtspAddId( sout_stream_t *p_stream, sout_stream_id_t *id );
-void RtspDelId( sout_stream_t *p_stream, sout_stream_id_t *id );
+
+rtsp_stream_id_t *RtspAddId( sout_stream_t *p_stream, sout_stream_id_t *sid,
+                             unsigned loport, unsigned hiport );
+void RtspDelId( sout_stream_t *p_stream, rtsp_stream_id_t * );
 
 char *SDPGenerate( const sout_stream_t *p_stream,
                    const char *psz_destination, vlc_bool_t b_rtsp );
@@ -37,41 +41,6 @@ void rtp_del_sink( sout_stream_id_t *id, sout_access_out_t *access );
 
 typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *,
                                     block_t * );
-
-struct sout_stream_id_t
-{
-    sout_stream_t *p_stream;
-    /* rtp field */
-    uint8_t     i_payload_type;
-    uint16_t    i_sequence;
-    uint32_t    i_timestamp_start;
-    uint8_t     ssrc[4];
-
-    /* for sdp */
-    int         i_clock_rate;
-    char        *psz_rtpmap;
-    char        *psz_fmtp;
-    int         i_port;
-    int         i_cat;
-    int         i_bitrate;
-
-    /* Packetizer specific fields */
-    pf_rtp_packetizer_t pf_packetize;
-    int           i_mtu;
-
-    /* for sending the packets */
-    sout_access_out_t *p_access;
-
-    vlc_mutex_t       lock_sink;
-    int               i_sink;
-    sout_access_out_t **sink;
-
-    /* */
-    sout_input_t      *p_input;
-
-    /* RTSP url control */
-    httpd_url_t  *p_rtsp_url;
-};
 
 struct sout_stream_sys_t
 {

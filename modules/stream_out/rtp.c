@@ -166,6 +166,40 @@ static int SapSetup( sout_stream_t *p_stream );
 static int FileSetup( sout_stream_t *p_stream );
 static int HttpSetup( sout_stream_t *p_stream, vlc_url_t * );
 
+struct sout_stream_id_t
+{
+    sout_stream_t *p_stream;
+    /* rtp field */
+    uint8_t     i_payload_type;
+    uint16_t    i_sequence;
+    uint32_t    i_timestamp_start;
+    uint8_t     ssrc[4];
+
+    /* for sdp */
+    int         i_clock_rate;
+    char        *psz_rtpmap;
+    char        *psz_fmtp;
+    int         i_port;
+    int         i_cat;
+    int         i_bitrate;
+
+    /* Packetizer specific fields */
+    pf_rtp_packetizer_t pf_packetize;
+    int           i_mtu;
+
+    /* for sending the packets */
+    sout_access_out_t *p_access;
+
+    vlc_mutex_t       lock_sink;
+    int               i_sink;
+    sout_access_out_t **sink;
+    rtsp_stream_id_t  *rtsp_id;
+
+    /* */
+    sout_input_t      *p_input;
+};
+
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -805,7 +839,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->p_access    = NULL;
         id->p_input     = p_input;
         id->pf_packetize= NULL;
-        id->p_rtsp_url  = NULL;
+        id->rtsp_id     = NULL;
         id->i_port      = 0;
         return id;
     }
@@ -871,8 +905,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->p_input    = NULL;
     id->psz_rtpmap = NULL;
     id->psz_fmtp   = NULL;
-    id->i_port = i_port;
-    id->p_rtsp_url = NULL;
+    id->i_port     = i_port;
+    id->rtsp_id    = NULL;
 
     vlc_mutex_init( p_stream, &id->lock_sink );
     id->i_sink = 0;
@@ -1103,7 +1137,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     msg_Dbg( p_stream, "maximum RTP packet size: %d bytes", id->i_mtu );
 
     if( p_sys->p_rtsp_url )
-        RtspAddId( p_stream, id );
+        id->rtsp_id = RtspAddId( p_stream, id, id->i_port, id->i_port + 1 );
 
     /* Update p_sys context */
     vlc_mutex_lock( &p_sys->lock_es );
@@ -1161,8 +1195,8 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     {
         sout_MuxDeleteStream( p_sys->p_mux, id->p_input );
     }
-    if( id->p_rtsp_url )
-        RtspDelId( p_stream, id );
+    if( id->rtsp_id )
+        RtspDelId( p_stream, id->rtsp_id );
 
     vlc_mutex_destroy( &id->lock_sink );
     free( id->sink );
@@ -1438,6 +1472,7 @@ int rtp_add_sink( sout_stream_id_t *id, sout_access_out_t *access )
     vlc_mutex_lock( &id->lock_sink );
     TAB_APPEND( id->i_sink, id->sink, access );
     vlc_mutex_unlock( &id->lock_sink );
+    return VLC_SUCCESS;
 }
 
 void rtp_del_sink( sout_stream_id_t *id, sout_access_out_t *access )

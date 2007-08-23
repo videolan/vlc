@@ -103,31 +103,55 @@ void RtspUnsetup( sout_stream_t *p_stream )
 }
 
 
-int RtspAddId( sout_stream_t *p_stream, sout_stream_id_t *id )
+struct rtsp_stream_id_t
+{
+    sout_stream_t    *sout_stream;
+    sout_stream_id_t *sout_id;
+    httpd_url_t      *url;
+    unsigned          loport, hiport;
+};
+
+rtsp_stream_id_t *RtspAddId( sout_stream_t *p_stream, sout_stream_id_t *sid,
+                             unsigned loport, unsigned hiport )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     char psz_urlc[strlen( p_sys->psz_rtsp_control ) + 1 + 10];
+    rtsp_stream_id_t *id = malloc( sizeof( *id ) );
+    httpd_url_t *url;
+
+    if( id == NULL )
+        return NULL;
+
+    id->sout_stream = p_stream;
+    id->sout_id = sid;
+    id->loport = loport;
+    id->hiport = loport;
 
     sprintf( psz_urlc, "%s/trackID=%d", p_sys->psz_rtsp_path, p_sys->i_es );
-    msg_Dbg( p_stream, "rtsp: adding %s\n", psz_urlc );
-    id->p_rtsp_url = httpd_UrlNewUnique( p_sys->p_rtsp_host, psz_urlc, NULL, NULL, NULL );
+    msg_Dbg( p_stream, "RTSP: adding %s\n", psz_urlc );
+    url = id->url =
+        httpd_UrlNewUnique( p_sys->p_rtsp_host, psz_urlc, NULL, NULL, NULL );
 
-    if( id->p_rtsp_url )
+    if( url == NULL )
     {
-        httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_DESCRIBE, RtspCallbackId, (void*)id );
-        httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_SETUP,    RtspCallbackId, (void*)id );
-        httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PLAY,     RtspCallbackId, (void*)id );
-        httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PAUSE,    RtspCallbackId, (void*)id );
-        httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_TEARDOWN, RtspCallbackId, (void*)id );
+        free( id );
+        return NULL;
     }
 
-    return VLC_SUCCESS;
+    httpd_UrlCatch( url, HTTPD_MSG_DESCRIBE, RtspCallbackId, (void *)id );
+    httpd_UrlCatch( url, HTTPD_MSG_SETUP,    RtspCallbackId, (void *)id );
+    httpd_UrlCatch( url, HTTPD_MSG_PLAY,     RtspCallbackId, (void *)id );
+    httpd_UrlCatch( url, HTTPD_MSG_PAUSE,    RtspCallbackId, (void *)id );
+    httpd_UrlCatch( url, HTTPD_MSG_TEARDOWN, RtspCallbackId, (void *)id );
+
+    return id;
 }
 
 
-void RtspDelId( sout_stream_t *p_stream, sout_stream_id_t *id )
+void RtspDelId( sout_stream_t *p_stream, rtsp_stream_id_t *id )
 {
-   httpd_UrlDelete( id->p_rtsp_url );
+   httpd_UrlDelete( id->url );
+   free( id );
 }
 
 
@@ -348,12 +372,13 @@ static inline const char *parameter_next( const char *str )
 
 
 /** Non-aggregate RTSP callback */
-/*static*/ int RtspCallbackId( httpd_callback_sys_t *p_args,
-                               httpd_client_t *cl,
-                               httpd_message_t *answer, httpd_message_t *query )
+static int RtspCallbackId( httpd_callback_sys_t *p_args,
+                           httpd_client_t *cl,
+                           httpd_message_t *answer, httpd_message_t *query )
 {
-    sout_stream_id_t *id = (sout_stream_id_t*)p_args;
-    sout_stream_t    *p_stream = id->p_stream;
+    rtsp_stream_id_t *id = (rtsp_stream_id_t*)p_args;
+    sout_stream_t    *p_stream = id->sout_stream;
+    sout_stream_id_t *sid = id->sout_id;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     char psz_session_init[21];
     const char *psz_session;
@@ -464,9 +489,10 @@ static inline const char *parameter_next( const char *str )
                     answer->i_status = 200;
 
                     httpd_MsgAdd( answer, "Transport",
-                                  "RTP/AVP/UDP;destination=%s;port=%d-%d;"
+                                  "RTP/AVP/UDP;destination=%s;port=%u-%u;"
                                   "ttl=%d;mode=play",
-                                  p_sys->psz_destination, id->i_port, id->i_port+1,
+                                  p_sys->psz_destination, id->loport,
+                                  id->hiport,
                                   ( p_sys->i_ttl > 0 ) ? p_sys->i_ttl : 1 );
                 }
                 else
@@ -476,7 +502,7 @@ static inline const char *parameter_next( const char *str )
                     sout_access_out_t *p_access;
                     rtsp_client_t *rtsp = NULL;
 
-                    if( ( hiport - loport ) > 1 )
+                    if( ( hiport - loport ) != ( id->hiport - id->loport ) )
                         continue;
 
                     if( psz_session == NULL )
@@ -523,7 +549,7 @@ static inline const char *parameter_next( const char *str )
                         break;
                     }
 
-                    TAB_APPEND( rtsp->i_id, rtsp->id, id );
+                    TAB_APPEND( rtsp->i_id, rtsp->id, sid );
                     TAB_APPEND( rtsp->i_access, rtsp->access, p_access );
 
                     char *src = var_GetNonEmptyString (p_access, "src-addr");
