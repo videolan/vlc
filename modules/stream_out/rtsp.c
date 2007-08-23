@@ -213,9 +213,7 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
                     }
                     if( i >= p_sys->i_es ) continue;
 
-                    vlc_mutex_lock( &id->lock_rtsp );
-                    TAB_APPEND( id->i_rtsp_access, id->rtsp_access, rtsp->access[i_id] );
-                    vlc_mutex_unlock( &id->lock_rtsp );
+                    rtp_add_sink( id, rtsp->access[i_id] );
                 }
                 vlc_mutex_unlock( &p_sys->lock_es );
             }
@@ -253,9 +251,7 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
                     }
                     if( i >= p_sys->i_es ) continue;
 
-                    vlc_mutex_lock( &id->lock_rtsp );
-                    TAB_REMOVE( id->i_rtsp_access, id->rtsp_access, rtsp->access[i_id] );
-                    vlc_mutex_unlock( &id->lock_rtsp );
+                    rtp_del_sink( id, rtsp->access[i_id] );
                 }
                 vlc_mutex_unlock( &p_sys->lock_es );
 
@@ -309,11 +305,11 @@ static inline const char *parameter_next( const char *str )
 
 /** Non-aggregate RTSP callback */
 /*static*/ int RtspCallbackId( httpd_callback_sys_t *p_args,
-                           httpd_client_t *cl,
-                           httpd_message_t *answer, httpd_message_t *query )
+                               httpd_client_t *cl,
+                               httpd_message_t *answer, httpd_message_t *query )
 {
     sout_stream_id_t *id = (sout_stream_id_t*)p_args;
-    sout_stream_t    *p_stream = id->p_stream;
+    sout_stream_t    *p_stream = idd->p_stream;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     char psz_session_init[21];
     const char *psz_session;
@@ -418,7 +414,7 @@ static inline const char *parameter_next( const char *str )
 
                 if( b_multicast )
                 {
-                    if( id->psz_destination == NULL )
+                    if( p_sys->psz_destination == NULL )
                         continue;
 
                     answer->i_status = 200;
@@ -426,7 +422,7 @@ static inline const char *parameter_next( const char *str )
                     httpd_MsgAdd( answer, "Transport",
                                   "RTP/AVP/UDP;destination=%s;port=%d-%d;"
                                   "ttl=%d;mode=play",
-                                  id->psz_destination, id->i_port, id->i_port+1,
+                                  p_sys->psz_destination, idd->i_port, idd->i_port+1,
                                   ( p_sys->i_ttl > 0 ) ? p_sys->i_ttl : 1 );
                 }
                 else
@@ -462,7 +458,7 @@ static inline const char *parameter_next( const char *str )
                         continue;
                     }
 
-                    if( p_sys->i_ttl )
+                    if( p_sys->i_ttl > 0 )
                         snprintf( psz_access, sizeof( psz_access ),
                                   "udp{raw,rtcp,ttl=%d}", p_sys->i_ttl );
                     else

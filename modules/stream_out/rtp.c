@@ -399,7 +399,7 @@ static int Open( vlc_object_t *p_this )
            o= - should be local username (no spaces allowed)
            o= time should be hashed with some other value to garantee uniqueness
            o= don't use the localhost address. use fully qualified domain name or IP4 address
-	   a= source-filter: we need our source address
+           a= source-filter: we need our source address
            a= x-plgroup: (missing)
            RTP packets need to get the correct src IP address  */
         if( ipv == '4'
@@ -849,7 +849,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         char url[NI_MAXHOST + 8];
 
         /* first try to create the access out */
-        if( p_sys->i_ttl )
+        if( p_sys->i_ttl > 0 )
         {
             snprintf( access, sizeof( access ), "udp{raw,rtcp,ttl=%d}",
                       p_sys->i_ttl );
@@ -1459,6 +1459,20 @@ static void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
     {
         block_Release( out );
     }
+}
+
+int rtp_add_sink( sout_stream_id_t *id, sout_access_out_t *access )
+{
+    vlc_mutex_lock( &id->lock_rtsp );
+    TAB_APPEND( id->i_rtsp_access, id->rtsp_access, access );
+    vlc_mutex_unlock( &id->lock_rtsp );
+}
+
+void rtp_del_sink( sout_stream_id_t *id, sout_access_out_t *access )
+{
+    vlc_mutex_lock( &id->lock_rtsp );
+    TAB_REMOVE( id->i_rtsp_access, id->rtsp_access, access );
+    vlc_mutex_unlock( &id->lock_rtsp );
 }
 
 static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,

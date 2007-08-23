@@ -34,6 +34,9 @@ void RtspClientDel( sout_stream_t *, rtsp_client_t * );
 char *SDPGenerate( const sout_stream_t *p_stream,
                    const char *psz_destination, vlc_bool_t b_rtsp );
 
+int rtp_add_sink( sout_stream_id_t *id, sout_access_out_t *access );
+void rtp_del_sink( sout_stream_id_t *id, sout_access_out_t *access );
+
 typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *,
                                     block_t * );
 
