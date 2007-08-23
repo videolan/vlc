@@ -170,6 +170,9 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
     p_mlist->p_libvlc_instance = p_inst;
     p_mlist->p_event_manager = libvlc_event_manager_new( p_mlist, p_inst, p_e );
 
+    /* Code for that one should be handled in flat_media_list.c */
+    p_mlist->p_flat_mlist = NULL;
+
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
             libvlc_MediaListItemAdded, p_e );
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
@@ -212,6 +215,10 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
     vlc_mutex_unlock( &p_mlist->object_lock );        
 
     /* Refcount null, time to free */
+
+    /* Handled in flat_media_list.c */
+    if( p_mlist->p_flat_mlist )
+        libvlc_media_list_release( p_mlist->p_flat_mlist );
 
     libvlc_event_manager_release( p_mlist->p_event_manager );
 
