@@ -43,6 +43,7 @@
 
 #include <vlc_strings.h>
 #include <vlc_charset.h>
+#include "../libvlc.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -574,8 +575,9 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 #if defined(__APPLE__) || defined(SYS_BEOS)
     if( !val.psz_string && p_vout->p_libvlc->psz_homedir )
     {
-        asprintf( &val.psz_string, "%s/Desktop",
-                  p_vout->p_libvlc->psz_homedir );
+        if( asprintf( &val.psz_string, "%s/Desktop",
+                      p_vout->p_libvlc->psz_homedir ) == -1 )
+            val.psz_string = NULL;
     }
 
 #elif defined(WIN32) && !defined(UNDER_CE)
@@ -617,12 +619,14 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( p_mypicturesdir == NULL )
         {
-            asprintf( &val.psz_string, "%s\\" CONFIG_DIR,
-                      p_vout->p_libvlc->psz_homedir );
+            if( asprintf( &val.psz_string, "%s\\" CONFIG_DIR,
+                          p_vout->p_libvlc->psz_homedir ) == -1 )
+                val.psz_string = NULL;
         }
         else
         {
-            asprintf( &val.psz_string, p_mypicturesdir );
+            if( asprintf( &val.psz_string, p_mypicturesdir ) == -1 )
+                val.psz_string = NULL;
             free( p_mypicturesdir );
         }
     }
@@ -630,8 +634,9 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 #else
     if( !val.psz_string && p_vout->p_libvlc->psz_homedir )
     {
-        asprintf( &val.psz_string, "%s/" CONFIG_DIR,
-                  p_vout->p_libvlc->psz_homedir );
+        if( asprintf( &val.psz_string, "%s/" CONFIG_DIR,
+                      p_vout->p_libvlc->psz_homedir ) == -1 )
+            val.psz_string = NULL;
     }
 #endif
 
