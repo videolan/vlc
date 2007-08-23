@@ -2,7 +2,7 @@
  * luameta.c: Get meta/artwork using lua scripts
  *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
- * $Id: luameta.c 21327 2007-08-20 19:23:10Z courmisch $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
  *          Pierre d'Herbemont <pdherbemont # videolan.org>

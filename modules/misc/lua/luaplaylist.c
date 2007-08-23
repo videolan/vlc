@@ -2,7 +2,7 @@
  * luaplaylist.c :  Lua playlist demux module
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
- * $Id: luaplaylist.c 21148 2007-08-16 18:02:16Z pdherbemont $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
  *
