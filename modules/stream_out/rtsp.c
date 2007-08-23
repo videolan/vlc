@@ -52,10 +52,12 @@ struct rtsp_client_t
 static int  RtspCallback( httpd_callback_sys_t *p_args,
                           httpd_client_t *cl,
                           httpd_message_t *answer, httpd_message_t *query );
+static int  RtspCallbackId( httpd_callback_sys_t *p_args,
+                            httpd_client_t *cl,
+                            httpd_message_t *answer, httpd_message_t *query );
+static void RtspClientDel( sout_stream_t *p_stream, rtsp_client_t *rtsp );
 
-
-
-int RtspSetup( sout_stream_t *p_stream, vlc_url_t *url )
+int RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
@@ -73,7 +75,7 @@ int RtspSetup( sout_stream_t *p_stream, vlc_url_t *url )
              url->psz_host,  url->i_port > 0 ? url->i_port : 554, p_sys->psz_rtsp_path );
 
     p_sys->p_rtsp_url = httpd_UrlNewUnique( p_sys->p_rtsp_host, p_sys->psz_rtsp_path, NULL, NULL, NULL );
-    if( p_sys->p_rtsp_url == 0 )
+    if( p_sys->p_rtsp_url == NULL )
     {
         return VLC_EGENERIC;
     }
@@ -84,6 +86,36 @@ int RtspSetup( sout_stream_t *p_stream, vlc_url_t *url )
     httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_TEARDOWN, RtspCallback, (void*)p_stream );
 
     return VLC_SUCCESS;
+}
+
+
+int RtspSetupId( sout_stream_t *p_stream, sout_stream_id_t *id )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    char psz_urlc[strlen( p_sys->psz_rtsp_control ) + 1 + 10];
+
+    sprintf( psz_urlc, "%s/trackID=%d", p_sys->psz_rtsp_path, p_sys->i_es );
+    msg_Dbg( p_stream, "rtsp: adding %s\n", psz_urlc );
+    id->p_rtsp_url = httpd_UrlNewUnique( p_sys->p_rtsp_host, psz_urlc, NULL, NULL, NULL );
+
+    if( id->p_rtsp_url )
+    {
+        httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_DESCRIBE, RtspCallbackId, (void*)id );
+        httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_SETUP,    RtspCallbackId, (void*)id );
+        httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PLAY,     RtspCallbackId, (void*)id );
+        httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PAUSE,    RtspCallbackId, (void*)id );
+        httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_TEARDOWN, RtspCallbackId, (void*)id );
+    }
+
+    return VLC_SUCCESS;
+}
+
+
+void RtspUnsetup( sout_stream_t *p_stream )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    while( p_sys->i_rtsp > 0 )
+        RtspClientDel( p_stream, p_sys->rtsp[0] );
 }
 
 
@@ -122,7 +154,7 @@ static rtsp_client_t *RtspClientGet( sout_stream_t *p_stream, const char *psz_se
 }
 
 
-/*static*/ void RtspClientDel( sout_stream_t *p_stream, rtsp_client_t *rtsp )
+static void RtspClientDel( sout_stream_t *p_stream, rtsp_client_t *rtsp )
 {
     int i;
     TAB_REMOVE( p_stream->p_sys->i_rtsp, p_stream->p_sys->rtsp, rtsp );

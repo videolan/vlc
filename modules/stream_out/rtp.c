@@ -514,8 +514,7 @@ static void Close( vlc_object_t * p_this )
         }
     }
 
-    while( p_sys->i_rtsp > 0 )
-        RtspClientDel( p_stream, p_sys->rtsp[0] );
+    RtspUnsetup( p_stream );
 
     vlc_mutex_destroy( &p_sys->lock_sdp );
 
@@ -1112,23 +1111,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     msg_Dbg( p_stream, "maximum RTP packet size: %d bytes", id->i_mtu );
 
     if( p_sys->p_rtsp_url )
-    {
-        char psz_urlc[strlen( p_sys->psz_rtsp_control ) + 1 + 10];
-
-        sprintf( psz_urlc, "%s/trackID=%d", p_sys->psz_rtsp_path, p_sys->i_es );
-        msg_Dbg( p_stream, "rtsp: adding %s\n", psz_urlc );
-        id->p_rtsp_url = httpd_UrlNewUnique( p_sys->p_rtsp_host, psz_urlc, NULL, NULL, NULL );
-
-        if( id->p_rtsp_url )
-        {
-            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_DESCRIBE, RtspCallbackId, (void*)id );
-            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_SETUP,    RtspCallbackId, (void*)id );
-            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PLAY,     RtspCallbackId, (void*)id );
-            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PAUSE,    RtspCallbackId, (void*)id );
-            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_TEARDOWN, RtspCallbackId, (void*)id );
-        }
-    }
-
+        RtspSetupId( p_stream, id );
 
     /* Update p_sys context */
     vlc_mutex_lock( &p_sys->lock_es );

@@ -24,12 +24,9 @@
 
 typedef struct rtsp_client_t rtsp_client_t;
 
-int RtspSetup( sout_stream_t *p_stream, vlc_url_t * );
-
-int RtspCallbackId( httpd_callback_sys_t *, httpd_client_t *,
-                    httpd_message_t *, httpd_message_t * );
-
-void RtspClientDel( sout_stream_t *, rtsp_client_t * );
+int RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url );
+int RtspSetupId( sout_stream_t *p_stream, sout_stream_id_t *id );
+void RtspUnsetup( sout_stream_t *p_stream );
 
 char *SDPGenerate( const sout_stream_t *p_stream,
                    const char *psz_destination, vlc_bool_t b_rtsp );
