@@ -200,8 +200,8 @@
 
 #define SET( foo, bar ) \
     char *psz_##foo = input_item_Get##bar ( p_item->p_input ); \
-    [set setMeta: psz_##foo forlabel: o_##foo##_txt]; \
-    free( psz_foo );
+    [self setMeta: psz_##foo forlabel: o_##foo##_txt]; \
+    free( psz_##foo );
 
     /* fill the other fields */
     SET( title, Title );
@@ -298,11 +298,11 @@
 
     if( [self isItemInPlaylist: p_item] )
     {
-        input_item_SetName( p_item->p_input,
+        input_item_SetName( p_item->p_input, (char*)
                 [[o_title_txt stringValue] UTF8String] );
-        input_item_SetURI( p_item->p_input,
+        input_item_SetURI( p_item->p_input, (char*)
                 [[o_uri_txt stringValue] UTF8String] );
-        input_item_SetArtist( p_item->p_input,
+        input_item_SetArtist( p_item->p_input, (char*)
                 [[o_author_txt stringValue] UTF8String] );
 
         val.b_bool = VLC_TRUE;
