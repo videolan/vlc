@@ -32,8 +32,8 @@
     do {                                    \
     __asm__ __volatile__(                   \
         ".p2align 3 \n\t                    \
-movd       (%1), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
-movd       (%2), %%mm2  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
+movd       (%0), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
+movd       (%1), %%mm2  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
 movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
 movq       (%3), %%mm3  # Load 8 Y            Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
 " \
