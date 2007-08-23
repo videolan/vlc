@@ -1,7 +1,7 @@
 /*****************************************************************************
- * luameta.c: Get meta/artwork using lua scripts
+ * vlclua.c: Generic lua inteface functions
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2007 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
