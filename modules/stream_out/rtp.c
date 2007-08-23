@@ -158,65 +158,6 @@ static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *,
                                block_t* );
 
-struct sout_stream_sys_t
-{
-    /* sdp */
-    int64_t i_sdp_id;
-    int     i_sdp_version;
-    char    *psz_sdp;
-    vlc_mutex_t  lock_sdp;
-
-    char        *psz_session_name;
-    char        *psz_session_description;
-    char        *psz_session_url;
-    char        *psz_session_email;
-
-    /* */
-    vlc_bool_t b_export_sdp_file;
-    char *psz_sdp_file;
-    /* sap */
-    vlc_bool_t b_export_sap;
-    session_descriptor_t *p_session;
-
-    httpd_host_t *p_httpd_host;
-    httpd_file_t *p_httpd_file;
-
-    httpd_host_t *p_rtsp_host;
-    httpd_url_t  *p_rtsp_url;
-    char         *psz_rtsp_control;
-    char         *psz_rtsp_path;
-
-    /* */
-    char *psz_destination;
-    int  i_port;
-    int  i_port_audio;
-    int  i_port_video;
-    int  i_ttl;
-    vlc_bool_t b_latm;
-
-    /* when need to use a private one or when using muxer */
-    int i_payload_type;
-
-    /* in case we do TS/PS over rtp */
-    sout_mux_t        *p_mux;
-    sout_access_out_t *p_access;
-    int               i_mtu;
-    sout_access_out_t *p_grab;
-    uint16_t          i_sequence;
-    uint32_t          i_timestamp_start;
-    uint8_t           ssrc[4];
-    block_t           *packet;
-
-    /* */
-    vlc_mutex_t      lock_es;
-    int              i_es;
-    sout_stream_id_t **es;
-
-    /* */
-    int              i_rtsp;
-    rtsp_client_t    **rtsp;
-};
-
 static int AccessOutGrabberWrite( sout_access_out_t *, block_t * );
 
 static void SDPHandleUrl( sout_stream_t *, char * );

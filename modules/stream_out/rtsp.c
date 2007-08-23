@@ -49,66 +49,6 @@ struct rtsp_client_t
     sout_access_out_t **access;
 };
 
-struct sout_stream_sys_t
-{
-    /* sdp */
-    int64_t i_sdp_id;
-    int     i_sdp_version;
-    char    *psz_sdp;
-    vlc_mutex_t  lock_sdp;
-
-    char        *psz_session_name;
-    char        *psz_session_description;
-    char        *psz_session_url;
-    char        *psz_session_email;
-
-    /* */
-    vlc_bool_t b_export_sdp_file;
-    char *psz_sdp_file;
-    /* sap */
-    vlc_bool_t b_export_sap;
-    session_descriptor_t *p_session;
-
-    httpd_host_t *p_httpd_host;
-    httpd_file_t *p_httpd_file;
-
-    httpd_host_t *p_rtsp_host;
-    httpd_url_t  *p_rtsp_url;
-    char         *psz_rtsp_control;
-    char         *psz_rtsp_path;
-
-    /* */
-    char *psz_destination;
-    int  i_port;
-    int  i_port_audio;
-    int  i_port_video;
-    int  i_ttl;
-    vlc_bool_t b_latm;
-
-    /* when need to use a private one or when using muxer */
-    int i_payload_type;
-
-    /* in case we do TS/PS over rtp */
-    sout_mux_t        *p_mux;
-    sout_access_out_t *p_access;
-    int               i_mtu;
-    sout_access_out_t *p_grab;
-    uint16_t          i_sequence;
-    uint32_t          i_timestamp_start;
-    uint8_t           ssrc[4];
-    block_t           *packet;
-
-    /* */
-    vlc_mutex_t      lock_es;
-    int              i_es;
-    sout_stream_id_t **es;
-
-    /* */
-    int              i_rtsp;
-    rtsp_client_t    **rtsp;
-};
-
-
 static int  RtspCallback( httpd_callback_sys_t *p_args,
                           httpd_client_t *cl,
                           httpd_message_t *answer, httpd_message_t *query );
@@ -250,7 +190,6 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
         case HTTPD_MSG_PLAY:
         {
             rtsp_client_t *rtsp;
-            /* for now only multicast so easy */
             answer->i_status = 200;
 
             psz_session = httpd_MsgGet( query, "Session" );
