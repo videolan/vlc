@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <errno.h>
 
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <libnotify/notify.h>
 
 #include <vlc/vlc.h>
@@ -41,7 +42,7 @@ static void Close   ( vlc_object_t * );
 
 static int ItemChange( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
-static int Notify( vlc_object_t *, const char * );
+static int Notify( vlc_object_t *, const char *, GdkPixbuf * );
 #define MAX_LENGTH 256
 
 struct intf_sys_t
@@ -130,6 +131,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char                *psz_title      = NULL;
     char                *psz_artist     = NULL;
     char                *psz_album      = NULL;
+    char                *psz_arturl     = NULL;
     input_thread_t      *p_input        = NULL;
     playlist_t          * p_playlist    = pl_Yield( p_this );
     intf_thread_t       *p_intf         = ( intf_thread_t* ) param;
@@ -166,24 +168,41 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     free( psz_artist );
     free( psz_album );
 
+    GdkPixbuf *pix = NULL;
+    GError *p_error = NULL;
+
+    psz_arturl = input_item_GetArtURL( input_GetItem( p_input ) );
+    if( psz_arturl && !strncmp( psz_arturl, "file://", 7 ) &&
+                strlen( psz_arturl ) > 7 )
+    { /* scale the art to show it in notify popup */
+        gboolean b = TRUE;
+        pix = gdk_pixbuf_new_from_file_at_scale(
+                (psz_arturl + 7), 72, 72, b, &p_error );
+        free( psz_arturl );
+    }
+    else /* else we show state-of-the art logo */
+        pix = gdk_pixbuf_new_from_file( DATA_PATH "/vlc48x48.png", &p_error );
+
     vlc_mutex_lock( &p_sys->lock );
 
-    Notify( p_this, psz_tmp );
+    Notify( p_this, psz_tmp, pix );
 
     vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
 }
 
-static int Notify( vlc_object_t *p_this, const char *psz_temp )
+static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix )
 {
     NotifyNotification * notification;
     notification = notify_notification_new( _("Now Playing"),
-                             psz_temp,
-                             DATA_PATH "/vlc48x48.png",NULL);
+            psz_temp, NULL, NULL);
     notify_notification_set_timeout( notification,
                                      config_GetInt(p_this, "notify-timeout") );
     notify_notification_set_urgency( notification, NOTIFY_URGENCY_LOW );
+    if( pix )
+        notify_notification_set_icon_from_pixbuf( notification, pix );
+        
     notify_notification_show( notification, NULL);
     return VLC_SUCCESS;
 }
