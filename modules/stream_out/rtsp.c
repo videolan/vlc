@@ -89,7 +89,21 @@ int RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url )
 }
 
 
-int RtspSetupId( sout_stream_t *p_stream, sout_stream_id_t *id )
+void RtspUnsetup( sout_stream_t *p_stream )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    while( p_sys->i_rtsp > 0 )
+        RtspClientDel( p_stream, p_sys->rtsp[0] );
+
+    if( p_sys->p_rtsp_url )
+        httpd_UrlDelete( p_sys->p_rtsp_url );
+
+    if( p_sys->p_rtsp_host )
+        httpd_HostDelete( p_sys->p_rtsp_host );
+}
+
+
+int RtspAddId( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     char psz_urlc[strlen( p_sys->psz_rtsp_control ) + 1 + 10];
@@ -111,11 +125,9 @@ int RtspSetupId( sout_stream_t *p_stream, sout_stream_id_t *id )
 }
 
 
-void RtspUnsetup( sout_stream_t *p_stream )
+void RtspDelId( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-    while( p_sys->i_rtsp > 0 )
-        RtspClientDel( p_stream, p_sys->rtsp[0] );
+   httpd_UrlDelete( id->p_rtsp_url );
 }
 
 

@@ -25,8 +25,9 @@
 typedef struct rtsp_client_t rtsp_client_t;
 
 int RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url );
-int RtspSetupId( sout_stream_t *p_stream, sout_stream_id_t *id );
 void RtspUnsetup( sout_stream_t *p_stream );
+int RtspAddId( sout_stream_t *p_stream, sout_stream_id_t *id );
+void RtspDelId( sout_stream_t *p_stream, sout_stream_id_t *id );
 
 char *SDPGenerate( const sout_stream_t *p_stream,
                    const char *psz_destination, vlc_bool_t b_rtsp );
@@ -62,9 +63,9 @@ struct sout_stream_id_t
     /* for sending the packets */
     sout_access_out_t *p_access;
 
-    vlc_mutex_t       lock_rtsp;
-    int               i_rtsp_access;
-    sout_access_out_t **rtsp_access;
+    vlc_mutex_t       lock_sink;
+    int               i_sink;
+    sout_access_out_t **sink;
 
     /* */
     sout_input_t      *p_input;

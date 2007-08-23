@@ -524,12 +524,6 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->p_httpd_host )
         httpd_HostDelete( p_sys->p_httpd_host );
 
-    if( p_sys->p_rtsp_url )
-        httpd_UrlDelete( p_sys->p_rtsp_url );
-
-    if( p_sys->p_rtsp_host )
-        httpd_HostDelete( p_sys->p_rtsp_host );
-
     if( p_sys->psz_session_name )
         free( p_sys->psz_session_name );
 
@@ -882,9 +876,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->psz_destination = p_sys->psz_destination ? strdup( p_sys->psz_destination ) : NULL;
     id->i_port = i_port;
     id->p_rtsp_url = NULL;
-    vlc_mutex_init( p_stream, &id->lock_rtsp );
-    id->i_rtsp_access = 0;
-    id->rtsp_access = NULL;
+
+    vlc_mutex_init( p_stream, &id->lock_sink );
+    id->i_sink = 0;
+    id->sink = NULL;
 
     switch( p_fmt->i_codec )
     {
@@ -1111,7 +1106,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     msg_Dbg( p_stream, "maximum RTP packet size: %d bytes", id->i_mtu );
 
     if( p_sys->p_rtsp_url )
-        RtspSetupId( p_stream, id );
+        RtspAddId( p_stream, id );
 
     /* Update p_sys context */
     vlc_mutex_lock( &p_sys->lock_es );
@@ -1172,11 +1167,10 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         sout_MuxDeleteStream( p_sys->p_mux, id->p_input );
     }
     if( id->p_rtsp_url )
-    {
-        httpd_UrlDelete( id->p_rtsp_url );
-    }
-    vlc_mutex_destroy( &id->lock_rtsp );
-    if( id->rtsp_access ) free( id->rtsp_access );
+        RtspDelId( p_stream, id );
+
+    vlc_mutex_destroy( &id->lock_sink );
+    free( id->sink );
 
     /* Update SDP (sap/file) */
     if( p_sys->b_export_sap && !p_sys->p_mux ) SapSetup( p_stream );
@@ -1427,12 +1421,12 @@ static void rtp_packetize_common( sout_stream_id_t *id, block_t *out,
 static void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
 {
     int i;
-    vlc_mutex_lock( &id->lock_rtsp );
-    for( i = 0; i < id->i_rtsp_access; i++ )
+    vlc_mutex_lock( &id->lock_sink );
+    for( i = 0; i < id->i_sink; i++ )
     {
-        sout_AccessOutWrite( id->rtsp_access[i], block_Duplicate( out ) );
+        sout_AccessOutWrite( id->sink[i], block_Duplicate( out ) );
     }
-    vlc_mutex_unlock( &id->lock_rtsp );
+    vlc_mutex_unlock( &id->lock_sink );
 
     if( id->p_access )
     {
@@ -1446,16 +1440,16 @@ static void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
 
 int rtp_add_sink( sout_stream_id_t *id, sout_access_out_t *access )
 {
-    vlc_mutex_lock( &id->lock_rtsp );
-    TAB_APPEND( id->i_rtsp_access, id->rtsp_access, access );
-    vlc_mutex_unlock( &id->lock_rtsp );
+    vlc_mutex_lock( &id->lock_sink );
+    TAB_APPEND( id->i_sink, id->sink, access );
+    vlc_mutex_unlock( &id->lock_sink );
 }
 
 void rtp_del_sink( sout_stream_id_t *id, sout_access_out_t *access )
 {
-    vlc_mutex_lock( &id->lock_rtsp );
-    TAB_REMOVE( id->i_rtsp_access, id->rtsp_access, access );
-    vlc_mutex_unlock( &id->lock_rtsp );
+    vlc_mutex_lock( &id->lock_sink );
+    TAB_REMOVE( id->i_sink, id->sink, access );
+    vlc_mutex_unlock( &id->lock_sink );
 }
 
 static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
