@@ -1,5 +1,5 @@
 /* XPM */
-static char * type_vfile_xpm[] = {
+static char * type_file_xpm[] = {
 "16 16 108 2",
 "  	c None",
 ". 	c #8F8F8F",

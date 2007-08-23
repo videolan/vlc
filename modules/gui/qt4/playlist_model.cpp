@@ -33,8 +33,7 @@
 #include <vlc_intf_strings.h>
 
 #include "pixmaps/type_unknown.xpm"
-#include "pixmaps/type_afile.xpm"
-#include "pixmaps/type_vfile.xpm"
+#include "pixmaps/type_file.xpm"
 #include "pixmaps/type_net.xpm"
 #include "pixmaps/type_card.xpm"
 #include "pixmaps/type_disc.xpm"
@@ -276,8 +275,7 @@ PLModel::PLModel( playlist_t *_p_playlist, intf_thread_t *_p_intf,
 
 #define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( QPixmap( type_##x##_xpm ) );
     ADD_ICON( UNKNOWN , unknown );
-    ADD_ICON( AFILE,afile );
-    ADD_ICON( VFILE, vfile );
+    ADD_ICON( FILE, file );
     ADD_ICON( DIRECTORY, directory );
     ADD_ICON( DISC, disc );
     ADD_ICON( CDDA, cdda );

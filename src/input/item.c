@@ -245,8 +245,7 @@ input_item_t *input_ItemNewWithType( vlc_object_t *p_obj, const char *psz_uri,
 
     if( psz_name != NULL )
         p_input->psz_name = strdup( psz_name );
-    else if( p_input->i_type == ITEM_TYPE_AFILE
-             || p_input->i_type == ITEM_TYPE_VFILE )
+    else if( p_input->i_type == ITEM_TYPE_FILE )
     {
         const char *psz_filename = strrchr( p_input->psz_uri, DIR_SEP_CHAR );
         if( psz_filename && *psz_filename == DIR_SEP_CHAR )
@@ -297,14 +296,6 @@ static void GuessType( input_item_t *p_item)
         { NULL, 0 }
     };
 
-#if 0 /* Unused */
-    static struct { char *psz_search; int i_type; } exts_array[] =
-    {
-        { "mp3", ITEM_TYPE_AFILE },
-        { NULL, 0 }
-    };
-#endif
-
     for( i = 0; types_array[i].psz_search != NULL; i++ )
     {
         if( !strncmp( p_item->psz_uri, types_array[i].psz_search,
@@ -314,5 +305,5 @@ static void GuessType( input_item_t *p_item)
             return;
         }
     }
-    p_item->i_type = ITEM_TYPE_VFILE;
+    p_item->i_type = ITEM_TYPE_FILE;
 }

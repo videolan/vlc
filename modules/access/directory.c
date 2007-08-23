@@ -515,7 +515,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
                 memcpy (psz_uri, "file://", 7);
                 p_input = input_ItemNewWithType( VLC_OBJECT(p_playlist),
                                                  psz_uri, entry, 0, NULL,
-                                                 -1, ITEM_TYPE_VFILE );
+                                                 -1, ITEM_TYPE_FILE );
                 if (p_input != NULL)
                 {
                     if( p_current_input )

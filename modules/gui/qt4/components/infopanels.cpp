@@ -161,7 +161,7 @@ void MetaPanel::saveMeta()
     vlc_mutex_lock( &p_input->lock );
     int i_type = p_input->i_type;
     vlc_mutex_unlock( &p_input->lock );
-    if( ( i_type == ITEM_TYPE_AFILE ) || ( i_type == ITEM_TYPE_VFILE ) )
+    if( i_type == ITEM_TYPE_FILE )
     {
         char *psz_uri_orig = input_item_GetURI( p_input );
         char *psz_uri = psz_uri_orig;
