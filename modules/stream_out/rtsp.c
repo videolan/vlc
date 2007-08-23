@@ -309,7 +309,7 @@ static inline const char *parameter_next( const char *str )
                                httpd_message_t *answer, httpd_message_t *query )
 {
     sout_stream_id_t *id = (sout_stream_id_t*)p_args;
-    sout_stream_t    *p_stream = idd->p_stream;
+    sout_stream_t    *p_stream = id->p_stream;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     char psz_session_init[21];
     const char *psz_session;
@@ -422,7 +422,7 @@ static inline const char *parameter_next( const char *str )
                     httpd_MsgAdd( answer, "Transport",
                                   "RTP/AVP/UDP;destination=%s;port=%d-%d;"
                                   "ttl=%d;mode=play",
-                                  p_sys->psz_destination, idd->i_port, idd->i_port+1,
+                                  p_sys->psz_destination, id->i_port, id->i_port+1,
                                   ( p_sys->i_ttl > 0 ) ? p_sys->i_ttl : 1 );
                 }
                 else
