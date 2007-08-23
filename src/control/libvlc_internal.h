@@ -106,7 +106,11 @@ struct libvlc_media_list_t
     int                      i_refcount;
     vlc_mutex_t              object_lock;
     char *                   psz_name; /* Usually NULL */
-    DECL_ARRAY(void *) items;
+    DECL_ARRAY(void *)       items;
+    
+    /* Other way to see that media list */
+    /* Used in flat_media_list.c */
+    libvlc_media_list_t *    p_flat_mlist;
 };
 
 struct libvlc_dynamic_media_list_t
