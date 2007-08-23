@@ -512,6 +512,8 @@ void MainInterface::updateSystrayTooltipName( QString name )
     else
     {
         sysTray->setToolTip( name );
+        sysTray->showMessage( qtr( "VLC media player" ), name,
+                QSystemTrayIcon::NoIcon, 4000 );
     }
 }
 
