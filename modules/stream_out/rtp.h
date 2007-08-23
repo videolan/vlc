@@ -51,7 +51,6 @@ struct sout_stream_id_t
     int         i_clock_rate;
     char        *psz_rtpmap;
     char        *psz_fmtp;
-    char        *psz_destination;
     int         i_port;
     int         i_cat;
     int         i_bitrate;

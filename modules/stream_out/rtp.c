@@ -232,7 +232,7 @@ static int Open( vlc_object_t *p_this )
         free( val2.psz_string );
     }
 
-    if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' )
+    if( p_sys->psz_destination == NULL )
     {
         if( !b_rtsp )
         {
@@ -240,7 +240,6 @@ static int Open( vlc_object_t *p_this )
             free( p_sys );
             return VLC_EGENERIC;
         }
-        p_sys->psz_destination = NULL;
     }
     else if( p_sys->i_port <= 0 )
     {
@@ -308,7 +307,7 @@ static int Open( vlc_object_t *p_this )
             free( p_sys );
             return VLC_EGENERIC;
         }
-        else if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' )
+        else if( p_sys->psz_destination == NULL )
         {
             msg_Err( p_stream, "RTP needs a destination when muxing" );
             free( p_sys );
@@ -546,8 +545,7 @@ static void Close( vlc_object_t * p_this )
 #endif
         free( p_sys->psz_sdp_file );
     }
-    if( p_sys->psz_destination )
-        free( p_sys->psz_destination );
+    free( p_sys->psz_destination );
     free( p_sys );
 }
 
@@ -873,7 +871,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->p_input    = NULL;
     id->psz_rtpmap = NULL;
     id->psz_fmtp   = NULL;
-    id->psz_destination = p_sys->psz_destination ? strdup( p_sys->psz_destination ) : NULL;
     id->i_port = i_port;
     id->p_rtsp_url = NULL;
 
@@ -1158,8 +1155,6 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         {
             free( id->psz_fmtp );
         }
-        if( id->psz_destination )
-            free( id->psz_destination );
         sout_AccessOutDelete( id->p_access );
     }
     else if( id->p_input )
