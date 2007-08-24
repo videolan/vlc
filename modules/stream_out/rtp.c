@@ -499,7 +499,7 @@ static int Open( vlc_object_t *p_this )
         asprintf( &p_sys->psz_sdp,
                   "v=0\r\n"
                   /* FIXME: source address not known :( */
-                  "o=- "I64Fd" %d IN IP%c %s\r\n"
+                  "o=- "I64Fu" %d IN IP%c %s\r\n"
                   "s=%s\r\n"
                   "i=%s\r\n"
                   "u=%s\r\n"
@@ -771,7 +771,7 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
 
     p = psz_sdp = malloc( i_size );
     p += sprintf( p, "v=0\r\n" );
-    p += sprintf( p, "o=- "I64Fd" %d IN IP%c %s\r\n",
+    p += sprintf( p, "o=- "I64Fu" %d IN IP%c %s\r\n",
                   p_sys->i_sdp_id, p_sys->i_sdp_version,
                   ipv, ipv == '6' ? "::1" : "127.0.0.1" );
     if( *p_sys->psz_session_name )

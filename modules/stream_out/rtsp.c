@@ -439,7 +439,7 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     if( psz_session == NULL )
     {
         /* FIXME: should be somewhat secure randomness */
-        snprintf( psz_session_init, sizeof(psz_session_init), I64Fd,
+        snprintf( psz_session_init, sizeof(psz_session_init), I64Fu,
                   NTPtime64() + rand() );
     }
 
