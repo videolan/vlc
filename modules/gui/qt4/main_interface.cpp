@@ -188,7 +188,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Naming in the controller */
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
              setName( QString ) );
-    if( config_GetInt( p_intf, "qt-system-tray" ) && sysTray )
+    if( sysTray )
     {
         CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
                  updateSystrayTooltipName( QString ) );
@@ -201,7 +201,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* PLAY_STATUS */
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
-    if( config_GetInt( p_intf, "qt-system-tray" ) && sysTray )
+    if( sysTray )
     {
         CONNECT( THEMIM->getIM(), statusChanged( int ), this,
                  updateSystrayTooltipStatus( int ) );
@@ -887,7 +887,7 @@ void MainInterface::setName( QString name )
 void MainInterface::setStatus( int status )
 {
     controls->setStatus( status );
-    if( systrayMenu )
+    if( sysTray )
         updateSystrayMenu( status );
 }
 
