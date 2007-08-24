@@ -724,6 +724,22 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
     const char *psz_destination = p_sys->psz_destination;
     char *psz_sdp, *p, ipv;
     int i;
+    /*
+     * When we have a fixed destination (typically when we do multicast),
+     * we need to put the actual port numbers in the SDP.
+     * When there is no fixed destination, we only support RTSP unicast
+     * on-demand setup, so we should rather let the clients decide which ports
+     * to use.
+     * When there is both a fixed destination and RTSP unicast, we need to
+     * put port numbers used by the fixed destination, otherwise the SDP would
+     * become totally incorrect for multicast use. It should be noted that
+     * port numbers from SDP with RTSP are only "recommendation" from the
+     * server to the clients (per RFC2326), so only broken clients will fail
+     * to handle this properly. There is no solution but to use two differents
+     * output chain with two different RTSP URLs if you need to handle this
+     * scenario.
+     */
+    int inclport = (psz_destination != NULL);
 
     /* FIXME: breaks IP version check on unknown destination */
     if( psz_destination == NULL )
@@ -764,7 +780,7 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
     }
     if( p_sys->p_mux )
     {
-        i_size += strlen( "m=video %d RTP/AVP %d\r\n" ) +10 +10;
+        i_size += strlen( "m=video 12345 RTP/AVP 123\r\n" );
     }
 
     ipv = ( strchr( psz_destination, ':' ) != NULL ) ? '6' : '4';
@@ -800,21 +816,19 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
     for( i = 0; i < p_sys->i_es; i++ )
     {
         sout_stream_id_t *id = p_sys->es[i];
+        const char *mime_major; /* major MIME type */
 
         if( id->i_cat == AUDIO_ES )
-        {
-            p += sprintf( p, "m=audio %d RTP/AVP %d\r\n",
-                          id->i_port, id->i_payload_type );
-        }
-        else if( id->i_cat == VIDEO_ES )
-        {
-            p += sprintf( p, "m=video %d RTP/AVP %d\r\n",
-                          id->i_port, id->i_payload_type );
-        }
+            mime_major = "audio";
         else
-        {
+        if( id->i_cat == VIDEO_ES )
+            mime_major = "video";
+        else
             continue;
-        }
+
+        p += sprintf( p, "m=%s %d RTP/AVP %d\r\n", mime_major,
+                      inclport * id->i_port, id->i_payload_type );
+
         if ( id->i_bitrate )
         {
             p += sprintf(p,"b=AS:%d\r\n",id->i_bitrate);
