@@ -141,9 +141,6 @@ struct rtsp_session_t
 {
     rtsp_stream_t *stream;
 
-    /* is it in "play" state */
-    vlc_bool_t     b_playing;
-
     /* output (id-access) */
     int            trackc;
     rtsp_strack_t *trackv;
@@ -237,7 +234,6 @@ rtsp_session_t *RtspClientNew( rtsp_stream_t *rtsp, const char *name )
     rtsp_session_t *s = malloc( sizeof( *s ) + strlen( name ) + 1 );
 
     s->stream = rtsp;
-    s->b_playing = VLC_FALSE;
     s->trackc = 0;
     s->trackv = NULL;
     strcpy( s->name, name );
@@ -339,13 +335,17 @@ static int RtspCallback( httpd_callback_sys_t *p_args,
 
             vlc_mutex_lock( &rtsp->lock );
             ses = RtspClientGet( rtsp, psz_session );
-            if( ( ses != NULL ) && !ses->b_playing )
+            if( ses != NULL )
             {
-                /* FIXME */
-                ses->b_playing = VLC_TRUE;
-
                 for( int i = 0; i < ses->trackc; i++ )
-                    rtp_add_sink( ses->trackv[i].id, ses->trackv[i].access );
+                {
+                    rtsp_strack_t *tr = ses->trackv + i;
+                    if( !tr->playing )
+                    {
+                        tr->playing = VLC_TRUE;
+                        rtp_add_sink( tr->id, tr->access );
+                    }
+                }
             }
             vlc_mutex_unlock( &rtsp->lock );
             break;
@@ -624,9 +624,34 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             break;
         }
 
+        case HTTPD_MSG_PLAY:
+        {
+            rtsp_session_t *ses;
+            answer->i_status = 200;
+
+            psz_session = httpd_MsgGet( query, "Session" );
+
+            vlc_mutex_lock( &rtsp->lock );
+            ses = RtspClientGet( rtsp, psz_session );
+            if( ses != NULL )
+            {
+                for( int i = 0; i < ses->trackc; i++ )
+                {
+                    rtsp_strack_t *tr = ses->trackv + i;
+                    if( !tr->playing && ( tr->id == id->sout_id ) )
+                    {
+                        tr->playing = VLC_TRUE;
+                        rtp_add_sink( tr->id, tr->access );
+                    }
+                }
+            }
+            vlc_mutex_unlock( &rtsp->lock );
+            break;
+        }
+
         case HTTPD_MSG_PAUSE:
             answer->i_status = 405;
-            httpd_MsgAdd( answer, "Allow", "SETUP, TEARDOWN" );
+            httpd_MsgAdd( answer, "Allow", "SETUP, PLAY, TEARDOWN" );
             break;
 
         case HTTPD_MSG_TEARDOWN:
