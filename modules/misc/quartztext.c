@@ -556,7 +556,7 @@ static ATSUStyle GetStyleFromFontStack( filter_sys_t *p_sys, font_stack_t **p_fo
     return p_style;
 }
 
-static void ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
+static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
                           text_style_t *p_font_style, UniChar *psz_text, int *pi_len,
                           uint32_t *pi_runs, uint32_t **ppi_run_lengths,
                           ATSUStyle **ppp_styles)
@@ -564,6 +564,7 @@ static void ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
     filter_sys_t *p_sys          = p_filter->p_sys;
     UniChar      *psz_text_orig  = psz_text;
     font_stack_t *p_fonts        = NULL;
+    int           rv             = VLC_SUCCESS;
 
     char *psz_node  = NULL;
 
@@ -771,6 +772,8 @@ static void ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
     *pi_len = psz_text - psz_text_orig;
 
     while( VLC_SUCCESS == PopFont( &p_fonts ) );
+
+    return rv;
 }
 
 static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
@@ -797,7 +800,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
             if( p_xml_reader )
             {
                 UniChar    *psz_text;
-                int         i_len;
+                int         i_len = 0;
                 uint32_t    i_runs = 0;
                 uint32_t   *pi_run_lengths = NULL;
                 ATSUStyle  *pp_styles = NULL;
