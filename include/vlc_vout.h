@@ -309,6 +309,9 @@ struct subpicture_t
 #define SUBPICTURE_ALIGN_MASK ( SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_RIGHT| \
                                 SUBPICTURE_ALIGN_TOP |SUBPICTURE_ALIGN_BOTTOM )
 
+/* Subpicture rendered flag - should only be used by vout_subpictures */
+#define SUBPICTURE_RENDERED  0x10
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
