@@ -365,6 +365,10 @@ static void Run( intf_thread_t *p_this )
                         vlc_mutex_unlock ( &p_sys->lock );
                         break;
                 }
+                /* handshake is done or failed, lets start from 
+                 * beginning to check it out and wait INTERVAL if needed
+                 */
+                continue;
             }
 
             msg_Dbg( p_this, "Going to submit some data..." );
