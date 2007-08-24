@@ -42,7 +42,7 @@ static void Close   ( vlc_object_t * );
 
 static int ItemChange( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
-static int Notify( vlc_object_t *, const char *, GdkPixbuf *, void * );
+static int Notify( vlc_object_t *, const char *, GdkPixbuf *, intf_thread_t * );
 #define MAX_LENGTH 256
 
 struct intf_sys_t
@@ -155,9 +155,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
     /* Playing something ... */
     psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
-    if( psz_artist == NULL ) psz_artist = strdup( _("no artist") );
     psz_album = input_item_GetAlbum( input_GetItem( p_input ) ) ;
-    if( psz_album == NULL ) psz_album = strdup( _("no album") );
     psz_title = input_item_GetTitle( input_GetItem( p_input ) );
     if( psz_title == NULL )
         psz_title = input_item_GetName( input_GetItem( p_input ) );
@@ -171,9 +169,15 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
     vlc_object_release( p_input );
 
-    if( psz_title == NULL ) psz_title = strdup( N_("(no title)") );
-    snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\n%s - %s",
-              psz_title, psz_artist, psz_album );
+    if( psz_artist && psz_album )
+        snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\nBy %s\n[%s]",
+                  psz_title, psz_artist, psz_album );
+    else if( psz_artist )
+        snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\nBy %s",
+                  psz_title, psz_artist );
+    else
+        snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>", psz_title );
+ 
     free( psz_title );
     free( psz_artist );
     free( psz_album );
@@ -195,7 +199,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
     vlc_mutex_lock( &p_sys->lock );
 
-    Notify( p_this, psz_tmp, pix, param );
+    Notify( p_this, psz_tmp, pix, p_intf );
 
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -203,9 +207,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 }
 
 static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
-                        void *param )
+                   intf_thread_t *p_intf )
 {
-    intf_thread_t   *p_intf = (intf_thread_t *)param;
     NotifyNotification * notification;
     GError *p_error = NULL;
 
