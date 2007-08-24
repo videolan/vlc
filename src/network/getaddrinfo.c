@@ -584,13 +584,21 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     if (p_hints != NULL)
     {
         const int safe_flags =
-            AI_NUMERICHOST |
-            AI_NUMERICSERV |
             AI_PASSIVE |
             AI_CANONNAME |
-            AI_ALL | 
+            AI_NUMERICHOST |
+#ifdef AI_NUMERICSERV
+            AI_NUMERICSERV |
+#endif
+#ifdef AI_ALL
+            AI_ALL |
+#endif
+#ifdef AI_ADDRCONFIG
             AI_ADDRCONFIG |
+#endif
+#ifdef AI_V4MAPPED
             AI_V4MAPPED |
+#endif
             0;
 
         hints.ai_family = p_hints->ai_family;
