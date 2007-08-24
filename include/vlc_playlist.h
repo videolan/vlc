@@ -415,9 +415,10 @@ VLC_EXPORT( playlist_item_t *, playlist_GetLastLeaf, ( playlist_t *p_playlist, p
 /***********************************************************************
  * Service Discovery
  ***********************************************************************/
-/* XXX: no need to inline */
-/* XXX: no need to inline */
-/* Return the number of services_discovery available */
+
+/* Get the services discovery modules names to use in Create(), in a null
+ * terminated string array. Array and string must be freed after use. */
+VLC_EXPORT( char **, services_discovery_GetServicesNames, ( vlc_object_t * p_super ) );
 
 /* Creation of a service_discovery object */
 VLC_EXPORT( services_discovery_t *, services_discovery_Create, ( vlc_object_t * p_super, const char * psz_service_name ) );
