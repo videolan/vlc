@@ -217,8 +217,7 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
     /* Refcount null, time to free */
 
     /* Handled in flat_media_list.c */
-    if( p_mlist->p_flat_mlist )
-        libvlc_media_list_release( p_mlist->p_flat_mlist );
+    libvlc_media_list_flat_media_list_release( p_mlist );
 
     libvlc_event_manager_release( p_mlist->p_event_manager );
 

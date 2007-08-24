@@ -246,6 +246,10 @@ VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_new_from_input_
 VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_duplicate,
                         ( libvlc_media_descriptor_t * ) );
 
+/* Media List */
+VLC_EXPORT ( void, libvlc_media_list_flat_media_list_release,
+                        ( libvlc_media_list_t * ) );
+
 /* Events */
 VLC_EXPORT (void, libvlc_event_init, ( libvlc_instance_t *p_instance, libvlc_exception_t *p_e ) );
 
