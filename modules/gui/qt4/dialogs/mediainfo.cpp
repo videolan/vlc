@@ -137,6 +137,13 @@ void MediaInfoDialog::setInput( input_item_t *p_input )
 {
     clear();
     update( p_input, true, true );
+    /* if info is from current input, don't set default to edit, if user opens 
+     * some other item, se default to edit, so it won't be updated to current item metas
+     *
+     * This really doesn't seem as clean solution as it could be
+     */
+    in_edit = ( input_GetItem( MainInputManager::getInstance( p_intf )->getInput() ) != p_input );
+    MP->setEdit( in_edit );
 }
 
 void MediaInfoDialog::update()
@@ -199,6 +206,8 @@ void MediaInfoDialog::updateButtons( int i_tab )
 {
     msg_Dbg( p_intf, "Coin Coin, Tab number: %i", i_tab );
 
-    if( i_tab == 0 ) saveMetaButton->show();
-    else saveMetaButton->hide();
+    if( in_edit and i_tab == 0 )
+        saveMetaButton->show();
+    else
+        saveMetaButton->hide();
 }
