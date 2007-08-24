@@ -362,8 +362,8 @@ static int Init( vout_thread_t *p_vout )
     }
     p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
 
-    p_vout->output.i_width  = p_sys->i_width;
-    p_vout->output.i_height = p_sys->i_height;
+    p_vout->output.i_width  = p_vout->render.i_width  = p_sys->i_width;
+    p_vout->output.i_height = p_vout->render.i_height = p_sys->i_height;
 
     /* Assume we have square pixels */
     if( p_sys->i_aspect < 0 )
@@ -374,7 +374,7 @@ static int Init( vout_thread_t *p_vout )
     else p_vout->output.i_aspect = p_sys->i_aspect;
 
     p_vout->fmt_out.i_sar_num = p_vout->fmt_out.i_sar_den = 1;
-    p_vout->fmt_out.i_aspect  = p_vout->output.i_aspect;
+    p_vout->fmt_out.i_aspect  = p_vout->render.i_aspect = p_vout->output.i_aspect;
 
     /* Clear the screen */
     memset( p_sys->p_video, 0, p_sys->i_page_size );
