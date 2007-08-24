@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Jean-Paul Saman
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,12 +67,30 @@ static void GfxMode        ( int i_tty );
 #define DEVICE_LONGTEXT N_( \
     "Framebuffer device to use for rendering (usually /dev/fb0).")
 
+#define TTY_TEXT N_("Run fb on current tty.")
+#define TTY_LONGTEXT N_( \
+    "Run framebuffer on current TTY device (default enabled). " \
+    "(disable tty handling with caution)" );
+
+#define CHROMA_TEXT N_("Chroma used.")
+#define CHROMA_LONGTEXT N_( \
+    "Force use of a specific chroma for output. Default is I420." )
+
+#define ASPECT_RATIO_TEXT N_("Video aspect ratio")
+#define ASPECT_RATIO_LONGTEXT N_( \
+    "Aspect ratio of the video image (4:3, 16:9). Default is square pixels." )
+
 vlc_module_begin();
     set_shortname( "Framebuffer" );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_file( FB_DEV_VAR, "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
               VLC_FALSE );
+    add_bool( "fb-tty", 1, NULL, TTY_TEXT, TTY_LONGTEXT, VLC_TRUE );
+    add_string( "fb-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
+                VLC_TRUE );
+    add_string( "fb-aspect-ratio", NULL, NULL, ASPECT_RATIO_TEXT,
+                ASPECT_RATIO_LONGTEXT, VLC_TRUE );
     set_description( _("GNU/Linux console framebuffer video output") );
     set_capability( "video output", 30 );
     set_callbacks( Create, Destroy );
@@ -87,6 +106,7 @@ struct vout_sys_t
 {
     /* System information */
     int                 i_tty;                          /* tty device handle */
+    vlc_bool_t          b_tty;
     struct termios      old_termios;
 
     /* Original configuration information */
@@ -105,7 +125,9 @@ struct vout_sys_t
     /* Video information */
     int i_width;
     int i_height;
+    int i_aspect;
     int i_bytes_per_pixel;
+    vlc_fourcc_t i_chroma;
 
     /* Video memory */
     byte_t *    p_video;                                      /* base adress */
@@ -120,17 +142,21 @@ struct vout_sys_t
 static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-
+    vout_sys_t    *p_sys;
+    char          *psz_chroma;
+    char          *psz_aspect;
     struct sigaction    sig_tty;                 /* sigaction for tty change */
     struct vt_mode      vt_mode;                          /* vt current mode */
     struct termios      new_termios;
 
     /* Allocate instance and initialize some members */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
+    p_vout->p_sys = p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
+        msg_Err( p_vout, "out of memory" );
         return VLC_ENOMEM;
     };
+    memset( p_sys, 0, sizeof(vout_sys_t) );
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
@@ -139,86 +165,147 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_display = Display;
 
     /* Set tty and fb devices */
-    p_vout->p_sys->i_tty = 0;           /* 0 == /dev/tty0 == current console */
-
-    GfxMode( p_vout->p_sys->i_tty );
-
-    /* Set keyboard settings */
-    if (tcgetattr(0, &p_vout->p_sys->old_termios) == -1)
+    p_sys->i_tty = 0; /* 0 == /dev/tty0 == current console */
+    p_sys->b_tty = var_CreateGetBool( p_vout, "fb-tty" );
+#ifndef WIN32
+#if defined(HAVE_ISATTY)
+    /* Check that stdin is a TTY */
+    if( !p_sys->b_tty && !isatty( 0 ) )
     {
-        msg_Err( p_vout, "tcgetattr failed" );
-    }
-
-    if (tcgetattr(0, &new_termios) == -1)
-    {
-        msg_Err( p_vout, "tcgetattr failed" );
-    }
-
- /* new_termios.c_lflag &= ~ (ICANON | ISIG);
-    new_termios.c_lflag |= (ECHO | ECHOCTL); */
-    new_termios.c_lflag &= ~ (ICANON);
-    new_termios.c_lflag &= ~(ECHO | ECHOCTL);
-    new_termios.c_iflag = 0;
-    new_termios.c_cc[VMIN] = 1;
-    new_termios.c_cc[VTIME] = 0;
-
-    if (tcsetattr(0, TCSAFLUSH, &new_termios) == -1)
-    {
-        msg_Err( p_vout, "tcsetattr failed" );
-    }
-
-    ioctl( p_vout->p_sys->i_tty, VT_RELDISP, VT_ACKACQ );
-
-    /* Set-up tty signal handler to be aware of tty changes */
-    memset( &sig_tty, 0, sizeof( sig_tty ) );
-    sig_tty.sa_handler = SwitchDisplay;
-    sigemptyset( &sig_tty.sa_mask );
-    if( sigaction( SIGUSR1, &sig_tty, &p_vout->p_sys->sig_usr1 ) ||
-        sigaction( SIGUSR2, &sig_tty, &p_vout->p_sys->sig_usr2 ) )
-    {
-        msg_Err( p_vout, "cannot set signal handler (%s)", strerror(errno) );
-        tcsetattr(0, 0, &p_vout->p_sys->old_termios);
-        TextMode( p_vout->p_sys->i_tty );
-        free( p_vout->p_sys );
+        msg_Warn( p_vout, "fd 0 is not a TTY" );
         return VLC_EGENERIC;
     }
-
-    /* Set-up tty according to new signal handler */
-    if( -1 == ioctl( p_vout->p_sys->i_tty,
-                     VT_GETMODE, &p_vout->p_sys->vt_mode ) )
+    else
     {
-        msg_Err( p_vout, "cannot get terminal mode (%s)", strerror(errno) );
-        sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
-        sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
-        tcsetattr(0, 0, &p_vout->p_sys->old_termios);
-        TextMode( p_vout->p_sys->i_tty );
-        free( p_vout->p_sys );
-        return VLC_EGENERIC;
+        msg_Warn( p_vout, "disabling tty handling, use with caution because "
+                          "there is no way to return to the tty." );
     }
-    memcpy( &vt_mode, &p_vout->p_sys->vt_mode, sizeof( vt_mode ) );
-    vt_mode.mode   = VT_PROCESS;
-    vt_mode.waitv  = 0;
-    vt_mode.relsig = SIGUSR1;
-    vt_mode.acqsig = SIGUSR2;
+#endif
+#endif
 
-    if( -1 == ioctl( p_vout->p_sys->i_tty, VT_SETMODE, &vt_mode ) )
+    psz_chroma = var_CreateGetNonEmptyString( p_vout, "fb-chroma" );
+    if( psz_chroma )
     {
-        msg_Err( p_vout, "cannot set terminal mode (%s)", strerror(errno) );
-        sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
-        sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
-        tcsetattr(0, 0, &p_vout->p_sys->old_termios);
-        TextMode( p_vout->p_sys->i_tty );
-        free( p_vout->p_sys );
-        return VLC_EGENERIC;
+        if( strlen( psz_chroma ) == 4 )
+        {
+            p_sys->i_chroma = VLC_FOURCC( psz_chroma[0],
+                                   psz_chroma[1],
+                                   psz_chroma[2],
+                                   psz_chroma[3] );
+            msg_Dbg( p_vout, "forcing chroma '%s'", psz_chroma );
+        }
+        else
+        {
+            msg_Warn( p_vout, "invalid chroma (%s), using defaults.",
+                      psz_chroma );
+        }
+        free( psz_chroma );
+        psz_chroma = NULL;
+    }
+
+    p_sys->i_aspect = -1;
+    psz_aspect = var_CreateGetNonEmptyString( p_vout, "fb-aspect-ratio" );
+    if( psz_aspect )
+    {
+        char *psz_parser = strchr( psz_aspect, ':' );
+
+        if( psz_parser )
+        {
+            *psz_parser++ = '\0';
+            p_sys->i_aspect = ( atoi( psz_aspect )
+                              * VOUT_ASPECT_FACTOR ) / atoi( psz_parser );
+        }
+        msg_Dbg( p_vout, "using aspect ratio %d:%d",
+                  atoi( psz_aspect ), atoi( psz_parser ) );
+
+        free( psz_aspect );
+        psz_aspect = NULL;
+    }
+
+    /* tty handling */
+    if( p_sys->b_tty )
+    {
+        GfxMode( p_sys->i_tty );
+
+        /* Set keyboard settings */
+        if( tcgetattr(0, &p_vout->p_sys->old_termios) == -1 )
+        {
+            msg_Err( p_vout, "tcgetattr failed" );
+        }
+
+        if( tcgetattr(0, &new_termios) == -1 )
+        {
+            msg_Err( p_vout, "tcgetattr failed" );
+        }
+
+        /* new_termios.c_lflag &= ~ (ICANON | ISIG);
+        new_termios.c_lflag |= (ECHO | ECHOCTL); */
+        new_termios.c_lflag &= ~ (ICANON);
+        new_termios.c_lflag &= ~(ECHO | ECHOCTL);
+        new_termios.c_iflag = 0;
+        new_termios.c_cc[VMIN] = 1;
+        new_termios.c_cc[VTIME] = 0;
+
+        if( tcsetattr(0, TCSAFLUSH, &new_termios) == -1 )
+        {
+            msg_Err( p_vout, "tcsetattr failed" );
+        }
+
+        ioctl( p_sys->i_tty, VT_RELDISP, VT_ACKACQ );
+
+        /* Set-up tty signal handler to be aware of tty changes */
+        memset( &sig_tty, 0, sizeof( sig_tty ) );
+        sig_tty.sa_handler = SwitchDisplay;
+        sigemptyset( &sig_tty.sa_mask );
+        if( sigaction( SIGUSR1, &sig_tty, &p_vout->p_sys->sig_usr1 ) ||
+            sigaction( SIGUSR2, &sig_tty, &p_vout->p_sys->sig_usr2 ) )
+        {
+            msg_Err( p_vout, "cannot set signal handler (%s)", strerror(errno) );
+            tcsetattr(0, 0, &p_vout->p_sys->old_termios);
+            TextMode( p_sys->i_tty );
+            free( p_vout->p_sys );
+            return VLC_EGENERIC;
+        }
+
+        /* Set-up tty according to new signal handler */
+        if( -1 == ioctl( p_sys->i_tty, VT_GETMODE, &p_vout->p_sys->vt_mode ) )
+        {
+            msg_Err( p_vout, "cannot get terminal mode (%s)", strerror(errno) );
+            sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
+            sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
+            tcsetattr(0, 0, &p_vout->p_sys->old_termios);
+            TextMode( p_sys->i_tty );
+            free( p_vout->p_sys );
+            return VLC_EGENERIC;
+        }
+        memcpy( &vt_mode, &p_vout->p_sys->vt_mode, sizeof( vt_mode ) );
+        vt_mode.mode   = VT_PROCESS;
+        vt_mode.waitv  = 0;
+        vt_mode.relsig = SIGUSR1;
+        vt_mode.acqsig = SIGUSR2;
+
+        if( -1 == ioctl( p_sys->i_tty, VT_SETMODE, &vt_mode ) )
+        {
+            msg_Err( p_vout, "cannot set terminal mode (%s)", strerror(errno) );
+            sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
+            sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
+            tcsetattr(0, 0, &p_vout->p_sys->old_termios);
+            TextMode( p_sys->i_tty );
+            free( p_vout->p_sys );
+            return VLC_EGENERIC;
+        }
     }
 
     if( OpenDisplay( p_vout ) )
     {
-        ioctl( p_vout->p_sys->i_tty, VT_SETMODE, &p_vout->p_sys->vt_mode );
-        sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
-        sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
-        tcsetattr(0, 0, &p_vout->p_sys->old_termios);
-        TextMode( p_vout->p_sys->i_tty );
+        if( p_sys->b_tty )
+        {
+            ioctl( p_sys->i_tty, VT_SETMODE, &p_vout->p_sys->vt_mode );
+            sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
+            sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
+            tcsetattr(0, 0, &p_vout->p_sys->old_termios);
+            TextMode( p_sys->i_tty );
+        }
         free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
@@ -231,15 +318,18 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
+    vout_sys_t *p_sys = p_vout->p_sys;
     int i_index;
     picture_t *p_pic;
 
     I_OUTPUTPICTURES = 0;
 
-    /* Initialize the output structure: RGB with square pixels, whatever
-     * the input format is, since it's the only format we know */
-    switch( p_vout->p_sys->var_info.bits_per_pixel )
+    if( p_sys->i_chroma == 0 )
     {
+        /* Initialize the output structure: RGB with square pixels, whatever
+         * the input format is, since it's the only format we know */
+        switch( p_sys->var_info.bits_per_pixel )
+        {
         case 8: /* FIXME: set the palette */
             p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2'); break;
         case 15:
@@ -254,25 +344,40 @@ static int Init( vout_thread_t *p_vout )
             msg_Err( p_vout, "unknown screen depth %i",
                      p_vout->p_sys->var_info.bits_per_pixel );
             return VLC_EGENERIC;
+        }
+
+        if( p_sys->var_info.bits_per_pixel != 8 )
+        {
+            p_vout->output.i_rmask = ( (1 << p_sys->var_info.red.length) - 1 )
+                                 << p_sys->var_info.red.offset;
+            p_vout->output.i_gmask = ( (1 << p_sys->var_info.green.length) - 1 )
+                                 << p_sys->var_info.green.offset;
+            p_vout->output.i_bmask = ( (1 << p_sys->var_info.blue.length) - 1 )
+                                 << p_sys->var_info.blue.offset;
+        }
     }
+    else
+    {
+        p_vout->output.i_chroma = p_sys->i_chroma;
+    }
+    p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
 
-    /* Only useful for p_vout->p_sys->var_info.bits_per_pixel != 8 */
-    p_vout->output.i_rmask = ( (1 << p_vout->p_sys->var_info.red.length) - 1 )
-                     << p_vout->p_sys->var_info.red.offset;
-    p_vout->output.i_gmask = ( (1 << p_vout->p_sys->var_info.green.length) - 1 )
-                     << p_vout->p_sys->var_info.green.offset;
-    p_vout->output.i_bmask = ( (1 << p_vout->p_sys->var_info.blue.length) - 1 )
-                     << p_vout->p_sys->var_info.blue.offset;
-
-    p_vout->output.i_width = p_vout->p_sys->i_width;
-    p_vout->output.i_height = p_vout->p_sys->i_height;
+    p_vout->output.i_width  = p_sys->i_width;
+    p_vout->output.i_height = p_sys->i_height;
 
     /* Assume we have square pixels */
-    p_vout->output.i_aspect = (p_vout->p_sys->i_width
-                               * VOUT_ASPECT_FACTOR) / p_vout->p_sys->i_height;
+    if( p_sys->i_aspect < 0 )
+    {
+        p_vout->output.i_aspect = ( p_sys->i_width
+                                  * VOUT_ASPECT_FACTOR ) / p_sys->i_height;
+    }
+    else p_vout->output.i_aspect = p_sys->i_aspect;
+
+    p_vout->fmt_out.i_sar_num = p_vout->fmt_out.i_sar_den = 1;
+    p_vout->fmt_out.i_aspect  = p_vout->output.i_aspect;
 
     /* Clear the screen */
-    memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size );
+    memset( p_sys->p_video, 0, p_sys->i_page_size );
 
     /* Try to initialize 1 direct buffer */
     p_pic = NULL;
@@ -346,18 +451,21 @@ static void Destroy( vlc_object_t *p_this )
 
     CloseDisplay( p_vout );
 
-    /* Reset the terminal */
-    ioctl( p_vout->p_sys->i_tty, VT_SETMODE, &p_vout->p_sys->vt_mode );
+    if( p_vout->p_sys->b_tty )
+    {
+        /* Reset the terminal */
+        ioctl( p_vout->p_sys->i_tty, VT_SETMODE, &p_vout->p_sys->vt_mode );
 
-    /* Remove signal handlers */
-    sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
-    sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
+        /* Remove signal handlers */
+        sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
+        sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
 
-    /* Reset the keyboard state */
-    tcsetattr( 0, 0, &p_vout->p_sys->old_termios );
+        /* Reset the keyboard state */
+        tcsetattr( 0, 0, &p_vout->p_sys->old_termios );
 
-    /* Return to text mode */
-    TextMode( p_vout->p_sys->i_tty );
+        /* Return to text mode */
+        TextMode( p_vout->p_sys->i_tty );
+    }
 
     /* Destroy structure */
     free( p_vout->p_sys );
@@ -475,7 +583,6 @@ static int OpenDisplay( vout_thread_t *p_vout )
     }
 
     p_vout->p_sys->i_fd = open( psz_device, O_RDWR);
-
     if( p_vout->p_sys->i_fd == -1 )
     {
         msg_Err( p_vout, "cannot open %s (%s)", psz_device, strerror(errno) );
@@ -483,6 +590,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
     free( psz_device );
+    psz_device = NULL;
 
     /* Get framebuffer device information */
     if( ioctl( p_vout->p_sys->i_fd,
@@ -544,6 +652,17 @@ static int OpenDisplay( vout_thread_t *p_vout )
     {
     case 8:
         p_vout->p_sys->p_palette = malloc( 8 * 256 * sizeof( uint16_t ) );
+        if( !p_vout->p_sys->p_palette )
+        {
+            msg_Err( p_vout, "out of memory" );
+
+            /* Restore fb config */
+            ioctl( p_vout->p_sys->i_fd,
+                   FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
+
+            close( p_vout->p_sys->i_fd );
+            return VLC_ENOMEM;
+        }
         p_vout->p_sys->fb_cmap.start = 0;
         p_vout->p_sys->fb_cmap.len = 256;
         p_vout->p_sys->fb_cmap.red = p_vout->p_sys->p_palette;
@@ -597,6 +716,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
         if( p_vout->p_sys->var_info.bits_per_pixel == 8 )
         {
             free( p_vout->p_sys->p_palette );
+            p_vout->p_sys->p_palette = NULL;
         }
 
         /* Restore fb config */
@@ -627,6 +747,7 @@ static void CloseDisplay( vout_thread_t *p_vout )
         ioctl( p_vout->p_sys->i_fd,
                FBIOPUTCMAP, &p_vout->p_sys->fb_cmap );
         free( p_vout->p_sys->p_palette );
+        p_vout->p_sys->p_palette = NULL;
     }
 
     /* Restore fb config */
@@ -659,11 +780,11 @@ static void SwitchDisplay(int i_signal)
         {
         case SIGUSR1:                                /* vt has been released */
             p_vout->b_active = 0;
-            ioctl( p_vout->p_sys->i_tty, VT_RELDISP, 1 );
+            ioctl( p_sys->i_tty, VT_RELDISP, 1 );
             break;
         case SIGUSR2:                                /* vt has been acquired */
             p_vout->b_active = 1;
-            ioctl( p_vout->p_sys->i_tty, VT_RELDISP, VT_ACTIVATE );
+            ioctl( p_sys->i_tty, VT_RELDISP, VT_ACTIVATE );
             /* handle blanking */
             vlc_mutex_lock( &p_vout->change_lock );
             p_vout->i_changes |= VOUT_SIZE_CHANGE;
