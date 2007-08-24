@@ -253,7 +253,8 @@ void libvlc_media_descriptor_release( libvlc_media_descriptor_t *p_md )
     if( p_md->i_refcount > 0 )
         return;
 
-    libvlc_media_list_release( p_md->p_subitems );
+    if( p_md->p_subitems )
+        libvlc_media_list_release( p_md->p_subitems );
 
     uninstall_input_item_observer( p_md );
     vlc_gc_decref( p_md->p_input_item );
@@ -435,5 +436,16 @@ libvlc_media_descriptor_tag_at_index_for_key( libvlc_media_descriptor_t *p_md,
         return NULL;
     
     return strdup( p_ts->ppsz_tags[i] );
+}
+
+/**************************************************************************
+ * subitems
+ **************************************************************************/
+libvlc_media_list_t *
+libvlc_media_descriptor_subitems( libvlc_media_descriptor_t * p_md,
+                                  libvlc_exception_t * p_e )
+{
+    libvlc_media_list_retain( p_md->p_subitems );
+    return p_md->p_subitems;
 }
 
