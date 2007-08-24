@@ -583,13 +583,28 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     memset (&hints, 0, sizeof (hints));
     if (p_hints != NULL)
     {
+        const int safe_flags =
+            AI_NUMERICHOST |
+            AI_NUMERICSERV |
+            AI_PASSIVE |
+            AI_CANONNAME |
+            AI_ALL | 
+            AI_ADDRCONFIG |
+            AI_V4MAPPED |
+            0;
+
         hints.ai_family = p_hints->ai_family;
         hints.ai_socktype = p_hints->ai_socktype;
         hints.ai_protocol = p_hints->ai_protocol;
-        hints.ai_flags = p_hints->ai_flags & (AI_NUMERICHOST|AI_PASSIVE|AI_CANONNAME);
+        /* Unfortunately, some flags chang the layout of struct addrinfo, so
+         * they cannot be copied blindly from p_hints to &hints. Therefore, we
+         * only copy flags that we know for sure are "safe".
+         */
+        hints.ai_flags = p_hints->ai_flags & safe_flags;
     }
+
 #ifdef AI_NUMERICSERV
-    /* we only ever use port *numbers* */
+    /* We only ever use port *numbers* */
     hints.ai_flags |= AI_NUMERICSERV;
 #endif
 
