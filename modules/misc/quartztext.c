@@ -63,7 +63,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
                        uint32_t i_runs, uint32_t *pi_run_lengths,
                        ATSUStyle *pp_styles );
 static ATSUStyle CreateStyle( char *psz_fontname, int i_font_size,
-                              int i_font_color, int i_font_alpha,
+                              uint32_t i_font_color,
                               vlc_bool_t b_bold, vlc_bool_t b_italic,
                               vlc_bool_t b_uline );
 //////////////////////////////////////////////////////////////////////////////
@@ -91,8 +91,7 @@ struct font_stack_t
 {
     char          *psz_name;
     int            i_size;
-    int            i_color;
-    int            i_alpha;
+    uint32_t       i_color;
 
     font_stack_t  *p_next;
 };
@@ -382,7 +381,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( psz_utf16_str != NULL )
     {
         ATSUStyle p_style = CreateStyle( p_sys->psz_font_name, i_font_size,
-                                         i_font_color, i_font_alpha,
+                                         (i_font_color & 0xfffffff) |
+                                         ((i_font_alpha & 0xff) << 24),
                                          VLC_FALSE, VLC_FALSE, VLC_FALSE );
         if( p_style )
         {
@@ -398,7 +398,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 }
 
 
-static ATSUStyle CreateStyle( char *psz_fontname, int i_font_size, int i_font_color, int i_font_alpha,
+static ATSUStyle CreateStyle( char *psz_fontname, int i_font_size, uint32_t i_font_color,
                               vlc_bool_t b_bold, vlc_bool_t b_italic, vlc_bool_t b_uline )
 {
     ATSUStyle   p_style;
@@ -408,7 +408,7 @@ static ATSUStyle CreateStyle( char *psz_fontname, int i_font_size, int i_font_co
     float f_red   = (float)(( i_font_color & 0x00FF0000 ) >> 16) / 255.0;
     float f_green = (float)(( i_font_color & 0x0000FF00 ) >>  8) / 255.0;
     float f_blue  = (float)(  i_font_color & 0x000000FF        ) / 255.0;
-    float f_alpha = ( 255.0 - (float)i_font_alpha) / 255.0;
+    float f_alpha = ( 255.0 - (float)(( i_font_color & 0xFF000000 ) >> 24)) / 255.0;
 
     ATSUFontID           font;
     Fixed                font_size  = IntToFixed( i_font_size );
@@ -451,7 +451,7 @@ static ATSUStyle CreateStyle( char *psz_fontname, int i_font_size, int i_font_co
 }
 
 static int PushFont( font_stack_t **p_font, const char *psz_name, int i_size,
-                     int i_color, int i_alpha )
+                     uint32_t i_color )
 {
     font_stack_t *p_new;
 
@@ -471,7 +471,6 @@ static int PushFont( font_stack_t **p_font, const char *psz_name, int i_size,
 
     p_new->i_size   = i_size;
     p_new->i_color  = i_color;
-    p_new->i_alpha  = i_alpha;
 
     if( !*p_font )
     {
@@ -518,7 +517,7 @@ static int PopFont( font_stack_t **p_font )
 }
 
 static int PeekFont( font_stack_t **p_font, char **psz_name, int *i_size,
-                     int *i_color, int *i_alpha )
+                     uint32_t *i_color )
 {
     font_stack_t *p_last;
 
@@ -533,7 +532,6 @@ static int PeekFont( font_stack_t **p_font, char **psz_name, int *i_size,
     *psz_name = p_last->psz_name;
     *i_size   = p_last->i_size;
     *i_color  = p_last->i_color;
-    *i_alpha  = p_last->i_alpha;
 
     return VLC_SUCCESS;
 }
@@ -543,23 +541,102 @@ static ATSUStyle GetStyleFromFontStack( filter_sys_t *p_sys, font_stack_t **p_fo
 {
     ATSUStyle   p_style = NULL;
 
-    char  *psz_fontname = NULL;
-    int    i_font_color = p_sys->i_font_color;
-    int    i_font_alpha = 0;
-    int    i_font_size  = p_sys->i_font_size;
+    char     *psz_fontname = NULL;
+    uint32_t  i_font_color = p_sys->i_font_color;
+    int       i_font_size  = p_sys->i_font_size;
 
-    if( VLC_SUCCESS == PeekFont( p_fonts, &psz_fontname, &i_font_size, &i_font_color, &i_font_alpha ) )
+    if( VLC_SUCCESS == PeekFont( p_fonts, &psz_fontname, &i_font_size, &i_font_color ) )
     {
-        p_style = CreateStyle( psz_fontname, i_font_size, i_font_color, i_font_alpha,
+        p_style = CreateStyle( psz_fontname, i_font_size, i_font_color,
                                b_bold, b_italic, b_uline );
     }
     return p_style;
 }
 
-static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
-                          text_style_t *p_font_style, UniChar *psz_text, int *pi_len,
-                          uint32_t *pi_runs, uint32_t **ppi_run_lengths,
-                          ATSUStyle **ppp_styles)
+static int HandleFontAttributes( xml_reader_t *p_xml_reader,
+                                  font_stack_t **p_fonts )
+{
+    int        rv;
+    char      *psz_fontname = NULL;
+    uint32_t   i_font_color = 0xffffff;
+    int        i_font_alpha = 0;
+    int        i_font_size  = 24;
+
+    // Default all attributes to the top font in the stack -- in case not
+    // all attributes are specified in the sub-font
+    if( VLC_SUCCESS == PeekFont( p_fonts,
+                                 &psz_fontname,
+                                 &i_font_size,
+                                 &i_font_color ))
+    {
+        psz_fontname = strdup( psz_fontname );
+    }
+    i_font_alpha = (i_font_color >> 24) & 0xff;
+    i_font_color &= 0x00ffffff;
+
+    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+    {
+        char *psz_name = xml_ReaderName( p_xml_reader );
+        char *psz_value = xml_ReaderValue( p_xml_reader );
+
+        if( psz_name && psz_value )
+        {
+            if( !strcasecmp( "face", psz_name ) )
+            {
+                if( psz_fontname ) free( psz_fontname );
+                psz_fontname = strdup( psz_value );
+            }
+            else if( !strcasecmp( "size", psz_name ) )
+            {
+                if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
+                {
+                    int i_value = atoi( psz_value );
+
+                    if( ( i_value >= -5 ) && ( i_value <= 5 ) )
+                        i_font_size += ( i_value * i_font_size ) / 10;
+                    else if( i_value < -5 )
+                        i_font_size = - i_value;
+                    else if( i_value > 5 )
+                        i_font_size = i_value;
+                }
+                else
+                    i_font_size = atoi( psz_value );
+            }
+            else if( !strcasecmp( "color", psz_name )  &&
+                     ( psz_value[0] == '#' ) )
+            {
+                i_font_color = strtol( psz_value + 1, NULL, 16 );
+                i_font_color &= 0x00ffffff;
+            }
+            else if( !strcasecmp( "alpha", psz_name ) &&
+                     ( psz_value[0] == '#' ) )
+            {
+                i_font_alpha = strtol( psz_value + 1, NULL, 16 );
+                i_font_alpha &= 0xff;
+            }
+            free( psz_name );
+            free( psz_value );
+        }
+    }
+    rv = PushFont( p_fonts,
+                   psz_fontname,
+                   i_font_size,
+                   (i_font_color & 0xffffff) | ((i_font_alpha & 0xff) << 24));
+
+    free( psz_fontname );
+
+    return rv;
+}
+
+static int ProcessNodes( filter_t *p_filter,
+                         xml_reader_t *p_xml_reader,
+                         text_style_t *p_font_style,
+                         UniChar *psz_text,
+                         int *pi_len,
+
+                         uint32_t *pi_runs,
+                         uint32_t **ppi_run_lengths,
+                         ATSUStyle **ppp_styles )
 {
     filter_sys_t *p_sys          = p_filter->p_sys;
     UniChar      *psz_text_orig  = psz_text;
@@ -577,8 +654,8 @@ static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
         rv = PushFont( &p_fonts,
                p_font_style->psz_fontname,
                p_font_style->i_font_size,
-               p_font_style->i_font_color,
-                  p_font_style->i_font_alpha );
+               (p_font_style->i_font_color & 0xffffff) |
+                   ((p_font_style->i_font_alpha & 0xff) << 24) );
 
         if( p_font_style->i_style_flags & STYLE_BOLD )
             b_bold = VLC_TRUE;
@@ -592,7 +669,7 @@ static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
         rv = PushFont( &p_fonts,
                        p_sys->psz_font_name,
                        p_sys->i_font_size,
-                       p_sys->i_font_color, 0 );
+                       p_sys->i_font_color );
     }
     if( rv != VLC_SUCCESS )
         return rv;
@@ -625,78 +702,13 @@ static int ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
                 if( psz_node )
                 {
                     if( !strcasecmp( "font", psz_node ) )
-                    {
-                        char *psz_fontname = NULL;
-                        int   i_font_color = 0xffffff;
-                        int   i_font_alpha = 0;
-                        int   i_font_size  = 24;
-
-                        // Default all attributes to the top font in the stack -- in case not
-                        // all attributes are specified in the sub-font
-                        if( VLC_SUCCESS == PeekFont( &p_fonts, &psz_fontname, &i_font_size, &i_font_color, &i_font_alpha ))
-                        {
-                            psz_fontname = strdup( psz_fontname );
-                        }
-
-                        while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
-                        {
-                            char *psz_name = xml_ReaderName ( p_xml_reader );
-                            char *psz_value = xml_ReaderValue ( p_xml_reader );
-
-                            if( psz_name && psz_value )
-                            {
-                                if( !strcasecmp( "face", psz_name ) )
-                                {
-                                    if( psz_fontname ) free( psz_fontname );
-                                    psz_fontname = strdup( psz_value );
-                                }
-                                else if( !strcasecmp( "size", psz_name ) )
-                                {
-                                    if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
-                                    {
-                                        int i_value = atoi( psz_value );
-
-                                        if( ( i_value >= -5 ) && ( i_value <= 5 ) )
-                                            i_font_size += ( i_value * i_font_size ) / 10;
-                                        else if( i_value < -5 )
-                                            i_font_size = - i_value;
-                                        else if( i_value > 5 )
-                                            i_font_size = i_value;
-                                    }
-                                    else
-                                        i_font_size = atoi( psz_value );
-                                }
-                                else if( !strcasecmp( "color", psz_name )  &&
-                                         ( psz_value[0] == '#' ) )
-                                {
-                                    i_font_color = strtol( psz_value+1, NULL, 16 );
-                                    i_font_color &= 0x00ffffff;
-                                }
-                                else if( !strcasecmp( "alpha", psz_name ) &&
-                                         ( psz_value[0] == '#' ) )
-                                {
-                                    i_font_alpha = strtol( psz_value+1, NULL, 16 );
-                                    i_font_alpha &= 0xff;
-                                }
-                                free( psz_name );
-                                free( psz_value );
-                            }
-                        }
-                        PushFont( &p_fonts, psz_fontname, i_font_size, i_font_color, i_font_alpha );
-                        free( psz_fontname );
-                    }
+                        rv = HandleFontAttributes( p_xml_reader, &p_fonts );
                     else if( !strcasecmp( "b", psz_node ) )
-                    {
                         b_bold = VLC_TRUE;
-                    }
                     else if( !strcasecmp( "i", psz_node ) )
-                    {
                         b_italic = VLC_TRUE;
-                    }
                     else if( !strcasecmp( "u", psz_node ) )
-                    {
                         b_uline = VLC_TRUE;
-                    }
                     else if( !strcasecmp( "br", psz_node ) )
                     {
                         uint32_t i_string_length;
