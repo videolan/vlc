@@ -808,6 +808,42 @@ vlc_bool_t __module_Exists(  vlc_object_t *p_this, const char * psz_name )
     }
 }
 
+/*****************************************************************************
+ * module_GetModuleNamesForCapability: Return a NULL terminated array with the
+ * names of the modules that have a certain capability.
+ * Free after uses both the string and the table.
+ *****************************************************************************/
+char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
+                                               const char * psz_capability )
+{
+    vlc_list_t *p_list;
+    int i, count = 0;
+    char ** psz_ret;
+
+    /* Do it in two passes */
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    for( i = 0 ; i < p_list->i_count; i++)
+    {
+        module_t *p_module = ((module_t *) p_list->p_values[i].p_object);
+        const char *psz_module_capability = p_module->psz_capability;
+        if( psz_module_capability && !strcmp( psz_module_capability, psz_capability ) )
+            count++;
+    }
+    psz_ret = malloc( sizeof(char**) * (count+1) );
+    for( i = 0 ; i < p_list->i_count; i++)
+    {
+        module_t *p_module = ((module_t *) p_list->p_values[i].p_object);
+        const char *psz_module_capability = p_module->psz_capability;
+        if( psz_module_capability && !strcmp( psz_module_capability, psz_capability ) )
+            psz_ret[i] = strdup( p_module->psz_object_name );
+    }
+    psz_ret[count] = NULL;
+
+    vlc_list_release( p_list );
+    
+    return psz_ret;
+}
+
 
 /*****************************************************************************
  * Following functions are local.

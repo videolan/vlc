@@ -113,6 +113,14 @@ VLC_EXPORT( vlc_bool_t,  __module_Exists, ( vlc_object_t *, const char * ) );
 #define module_FindName(a,b) __module_FindName(VLC_OBJECT(a),b)
 VLC_EXPORT( module_t *, __module_FindName, ( vlc_object_t *, const char * ) );
 
+/* Return a NULL terminated array with the names of the modules that have a
+ * certain capability.
+ * Free after uses both the string and the table. */
+ #define module_GetModulesNamesForCapability(a,b) \
+                    __module_GetModulesNamesForCapability(VLC_OBJECT(a),b)
+VLC_EXPORT(char **, __module_GetModulesNamesForCapability,
+                    ( vlc_object_t *p_this, const char * psz_capability ) );
+
 VLC_EXPORT( module_t *, vlc_module_create, ( vlc_object_t * ) );
 VLC_EXPORT( module_t *, vlc_submodule_create, ( module_t * ) );
 VLC_EXPORT( int, vlc_module_set, (module_t *module, int propid, void *value) );
