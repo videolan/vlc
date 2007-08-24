@@ -56,7 +56,6 @@ struct decoder_sys_t
 
     /* for frame skipping algo */
     int b_hurry_up;
-    int i_frame_skip;
 
     /* how many decoded frames are late */
     int     i_late_frames;
@@ -227,6 +226,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
         msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
     }
+    memset( p_sys, 0, sizeof(decoder_sys_t) );
 
     p_dec->p_sys->p_context = p_context;
     p_dec->p_sys->p_codec = p_codec;
@@ -270,6 +270,54 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     var_Create( p_dec, "ffmpeg-hurry-up", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-hurry-up", &val );
     p_sys->b_hurry_up = val.b_bool;
+
+    var_Create( p_dec, "ffmpeg-skip-frame", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_dec, "ffmpeg-skip-frame", &val );
+    switch( val.i_int )
+    {
+        case -1:
+            p_sys->p_context->skip_frame = AVDISCARD_NONE;
+            break;
+        case 0:
+            p_sys->p_context->skip_frame = AVDISCARD_DEFAULT;
+            break;
+        case 1:
+            p_sys->p_context->skip_frame = AVDISCARD_BIDIR;
+            break;
+        case 2:
+            p_sys->p_context->skip_frame = AVDISCARD_NONKEY;
+            break;
+        case 3:
+            p_sys->p_context->skip_frame = AVDISCARD_ALL;
+            break;
+        default:
+            p_sys->p_context->skip_frame = AVDISCARD_NONE;
+            break;
+    }
+
+    var_Create( p_dec, "ffmpeg-skip-idct",  VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_dec, "ffmpeg-skip-idct", &val );
+    switch( val.i_int )
+    {
+        case -1:
+            p_sys->p_context->skip_idct = AVDISCARD_NONE;
+            break;
+        case 0:
+            p_sys->p_context->skip_idct = AVDISCARD_DEFAULT;
+            break;
+        case 1:
+            p_sys->p_context->skip_idct = AVDISCARD_BIDIR;
+            break;
+        case 2:
+            p_sys->p_context->skip_idct = AVDISCARD_NONKEY;
+            break;
+        case 3:
+            p_sys->p_context->skip_idct = AVDISCARD_ALL;
+            break;
+        default:
+            p_sys->p_context->skip_idct = AVDISCARD_NONE;
+            break;
+    }
 
     /* ***** ffmpeg direct rendering ***** */
     p_sys->b_direct_rendering = 0;
@@ -385,8 +433,8 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_late_frames = 0;
     }
 
-    if( !p_dec->b_pace_control && p_sys->i_late_frames > 0 &&
-        mdate() - p_sys->i_late_frames_start > I64C(5000000) )
+    if( !p_dec->b_pace_control && (p_sys->i_late_frames > 0) &&
+        (mdate() - p_sys->i_late_frames_start > I64C(5000000)) )
     {
         if( p_sys->i_pts )
         {
@@ -411,18 +459,19 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
     /* TODO implement it in a better way */
     /* A good idea could be to decode all I pictures and see for the other */
     if( !p_dec->b_pace_control &&
-        p_sys->b_hurry_up && p_sys->i_late_frames > 4 )
+        p_sys->b_hurry_up &&
+        (p_sys->i_late_frames > 4) )
     {
         b_drawpicture = 0;
         if( p_sys->i_late_frames < 8 )
         {
-            p_sys->p_context->hurry_up = 2;
+            p_sys->p_context->skip_frame = AVDISCARD_BIDIR;
         }
         else
         {
             /* picture too late, won't decode
              * but break picture until a new I, and for mpeg4 ...*/
-
+            p_sys->p_context->skip_frame = AVDISCARD_NONKEY;
             p_sys->i_late_frames--; /* needed else it will never be decrease */
             block_Release( p_block );
             p_sys->i_buffer = 0;
@@ -431,17 +480,18 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
     }
     else
     {
-        p_sys->p_context->hurry_up = 0;
+        if( p_sys->b_hurry_up )
+            p_sys->p_context->skip_frame = AVDISCARD_DEFAULT;
         if( !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
             b_drawpicture = 1;
         else
             b_drawpicture = 0;
     }
 
-
     if( p_sys->p_context->width <= 0 || p_sys->p_context->height <= 0 )
     {
-        p_sys->p_context->hurry_up = 5;
+        if( p_sys->b_hurry_up )
+            p_sys->p_context->skip_frame = AVDISCARD_ALL;
         b_null_size = VLC_TRUE;
     }
 
@@ -488,7 +538,8 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         {
             /* Reparse it to not drop the I frame */
             b_null_size = VLC_FALSE;
-            p_sys->p_context->hurry_up = 0;
+            if( p_sys->b_hurry_up )
+                p_sys->p_context->skip_frame = AVDISCARD_DEFAULT;
             i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
                                            &b_gotpicture,
                                            (uint8_t*)p_sys->p_buffer, p_sys->i_buffer );

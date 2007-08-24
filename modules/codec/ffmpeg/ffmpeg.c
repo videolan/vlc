@@ -110,6 +110,12 @@ vlc_module_begin();
         VLC_FALSE );
     add_bool( "ffmpeg-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT,
         VLC_FALSE );
+    add_integer( "ffmpeg-skip-frame", 0, NULL, SKIP_FRAME_TEXT,
+        SKIP_FRAME_LONGTEXT, VLC_TRUE );
+        change_integer_range( -1, 4 );
+    add_integer( "ffmpeg-skip-idct", 0, NULL, SKIP_IDCT_TEXT,
+        SKIP_IDCT_LONGTEXT, VLC_TRUE );
+        change_integer_range( -1, 4 );
     add_integer ( "ffmpeg-vismv", 0, NULL, VISMV_TEXT, VISMV_LONGTEXT,
         VLC_TRUE );
     add_integer ( "ffmpeg-lowres", 0, NULL, LOWRES_TEXT, LOWRES_LONGTEXT,
@@ -304,6 +310,10 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( !(i_cpu & CPU_CAPABILITY_SSE2) )
     {
         p_context->dsp_mask |= FF_MM_SSE2;
+    }
+    if( !(i_cpu & CPU_CAPABILITY_IWMMXT) )
+    {
+        p_context->dsp_mask |= FF_MM_IWMMXT;
     }
 
     p_dec->b_need_packetized = VLC_TRUE;

@@ -116,6 +116,16 @@ void E_(ClosePostproc)( decoder_t *, void * );
     "when there is not enough time. It's useful with low CPU power " \
     "but it can produce distorted pictures.")
 
+#define SKIP_FRAME_TEXT N_("Skip frame (default=0)")
+#define SKIP_FRAME_LONGTEXT N_( \
+    "Force skipping of frames to speed up decoding " \
+    "(-1=None, 0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)." )
+
+#define SKIP_IDCT_TEXT N_("Skip idct (default=0)")
+#define SKIP_IDCT_LONGTEXT N_( \
+    "Force skipping of idct to speed up decoding for frame types" \
+    "(-1=None, 0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)." )
+
 #define PP_Q_TEXT N_("Post processing quality")
 #define PP_Q_LONGTEXT N_( \
     "Quality of post processing. Valid range is 0 to 6\n" \
@@ -305,7 +315,7 @@ N_("<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...
 #define FFMPEG_COMMON_MEMBERS   \
     int i_cat;                  \
     int i_codec_id;             \
-    char *psz_namecodec;        \
+    const char *psz_namecodec;  \
     AVCodecContext *p_context;  \
     AVCodec        *p_codec;
 
