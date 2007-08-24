@@ -134,6 +134,8 @@ struct rtsp_stream_id_t
 };
 
 
+typedef struct rtsp_strack_t rtsp_strack_t;
+
 /* For unicast streaming */
 struct rtsp_session_t
 {
@@ -143,12 +145,19 @@ struct rtsp_session_t
     vlc_bool_t     b_playing;
 
     /* output (id-access) */
-    int               i_id;
-    sout_stream_id_t  **id;
-    int               i_access;
-    sout_access_out_t **access;
+    int            trackc;
+    rtsp_strack_t *trackv;
 
     char name[0];
+};
+
+
+/* Unicast session track */
+struct rtsp_strack_t
+{
+    sout_stream_id_t  *id;
+    sout_access_out_t *access;
+    vlc_bool_t         playing;
 };
 
 
@@ -203,15 +212,13 @@ void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t *id )
     {
         rtsp_session_t *ses = rtsp->sessionv[i];
 
-        for( int j = 0; j < ses->i_id; j++ )
+        for( int j = 0; j < ses->trackc; j++ )
         {
-            if( ses->id[j] == id->sout_id )
+            if( ses->trackv[j].id == id->sout_id )
             {
-                REMOVE_ELEM( ses->id, ses->i_id, j );
-
-                assert( ses->access[j] != NULL );
-                sout_AccessOutDelete( ses->access[j] );
-                REMOVE_ELEM( ses->access, ses->i_access, j );
+                rtsp_strack_t *tr = ses->trackv + j;
+                sout_AccessOutDelete( tr->access );
+                REMOVE_ELEM( ses->trackv, ses->trackc, j );
                 /* FIXME: are we supposed to notify the client? */
             }
         }
@@ -231,9 +238,8 @@ rtsp_session_t *RtspClientNew( rtsp_stream_t *rtsp, const char *name )
 
     s->stream = rtsp;
     s->b_playing = VLC_FALSE;
-    s->i_id = s->i_access = 0;
-    s->id = NULL;
-    s->access = NULL;
+    s->trackc = 0;
+    s->trackv = NULL;
     strcpy( s->name, name );
 
     TAB_APPEND( rtsp->sessionc, rtsp->sessionv, s );
@@ -268,22 +274,21 @@ void RtspClientDel( rtsp_stream_t *rtsp, rtsp_session_t *session )
     int i;
     TAB_REMOVE( rtsp->sessionc, rtsp->sessionv, session );
 
-    for( i = 0; i < session->i_access; i++ )
+    for( i = 0; i < session->trackc; i++ )
     {
-        rtp_del_sink( session->id[i], session->access[i] );
-        sout_AccessOutDelete( session->access[i] );
+        rtp_del_sink( session->trackv[i].id, session->trackv[i].access );
+        sout_AccessOutDelete( session->trackv[i].access );
     }
 
-    free( session->id );
-    free( session->access );
+    free( session->trackv );
     free( session );
 }
 
 
 /** Aggregate RTSP callback */
-static int  RtspCallback( httpd_callback_sys_t *p_args,
-                          httpd_client_t *cl,
-                          httpd_message_t *answer, httpd_message_t *query )
+static int RtspCallback( httpd_callback_sys_t *p_args,
+                         httpd_client_t *cl,
+                         httpd_message_t *answer, httpd_message_t *query )
 {
     rtsp_stream_t *rtsp = (rtsp_stream_t *)p_args;
     const char *psz_session = NULL, *psz_cseq;
@@ -339,8 +344,8 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
                 /* FIXME */
                 ses->b_playing = VLC_TRUE;
 
-                for( int i_id = 0; i_id < ses->i_id; i_id++ )
-                    rtp_add_sink( ses->id[i_id], ses->access[i_id] );
+                for( int i = 0; i < ses->trackc; i++ )
+                    rtp_add_sink( ses->trackv[i].id, ses->trackv[i].access );
             }
             vlc_mutex_unlock( &rtsp->lock );
             break;
@@ -419,7 +424,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     rtsp_stream_id_t *id = (rtsp_stream_id_t *)p_args;
     rtsp_stream_t    *rtsp = id->stream;
     sout_stream_t    *p_stream = id->stream->owner;
-    sout_stream_id_t *sid = id->sout_id;
     char psz_session_init[21];
     const char *psz_session;
     const char *psz_cseq;
@@ -539,8 +543,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 {
                     char ip[NI_MAXNUMERICHOST], url[NI_MAXNUMERICHOST + 8];
                     static const char access[] = "udp{raw,rtcp}";
-                    sout_access_out_t *p_access;
                     rtsp_session_t *ses = NULL;
+                    rtsp_strack_t track = { id->sout_id, NULL, VLC_FALSE };
 
                     if( httpd_ClientIP( cl, ip ) == NULL )
                     {
@@ -552,9 +556,9 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                               ( strchr( ip, ':' ) != NULL ) ? "[%s]:%d" : "%s:%d",
                               ip, loport );
 
-                    p_access = sout_AccessOutNew( p_stream->p_sout, access,
-                                                  url );
-                    if( p_access == NULL )
+                    track.access = sout_AccessOutNew( p_stream->p_sout,
+                                                      access, url );
+                    if( track.access == NULL )
                     {
                         msg_Err( p_stream,
                                  "cannot create access output for %s://%s",
@@ -562,6 +566,9 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                         answer->i_status = 500;
                         continue;
                     }
+
+                    char *src = var_GetNonEmptyString( track.access, "src-addr" );
+                    int sport = var_GetInteger( track.access, "src-port" );
 
                     vlc_mutex_lock( &rtsp->lock );
                     if( psz_session == NULL )
@@ -582,14 +589,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                         }
                     }
 
-                    assert( ses->i_id == ses->i_access );
-                    TAB_APPEND( ses->i_id, ses->id, sid );
-                    TAB_APPEND( ses->i_access, ses->access, p_access );
-                    assert( ses->i_id == ses->i_access );
+                    INSERT_ELEM( ses->trackv, ses->trackc, ses->trackc, track );
                     vlc_mutex_unlock( &rtsp->lock );
-
-                    char *src = var_GetNonEmptyString (p_access, "src-addr");
-                    int sport = var_GetInteger (p_access, "src-port");
 
                     httpd_ServerIP( cl, ip );
 
@@ -640,14 +641,13 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             ses = RtspClientGet( rtsp, psz_session );
             if( ses != NULL )
             {
-                for( int i = 0; i < ses->i_id; i++ )
+                for( int i = 0; i < ses->trackc; i++ )
                 {
-                    if( ses->id[i] == id->sout_id )
+                    if( ses->trackv[i].id == id->sout_id )
                     {
-                        rtp_del_sink( id->sout_id, ses->access[i] );
-                        REMOVE_ELEM( ses->id, ses->i_id, i );
-                        REMOVE_ELEM( ses->access, ses->i_access, i );
-                        sout_AccessOutDelete( ses->access[i] );
+                        rtp_del_sink( id->sout_id, ses->trackv[i].access );
+                        sout_AccessOutDelete( ses->trackv[i].access );
+                        REMOVE_ELEM( ses->trackv, ses->trackc, i );
                     }
                 }
             }
