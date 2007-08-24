@@ -311,10 +311,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         p_context->dsp_mask |= FF_MM_SSE2;
     }
-    if( !(i_cpu & CPU_CAPABILITY_IWMMXT) )
-    {
-        p_context->dsp_mask |= FF_MM_IWMMXT;
-    }
 
     p_dec->b_need_packetized = VLC_TRUE;
     switch( i_cat )
