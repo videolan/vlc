@@ -166,6 +166,61 @@ static int SapSetup( sout_stream_t *p_stream );
 static int FileSetup( sout_stream_t *p_stream );
 static int HttpSetup( sout_stream_t *p_stream, vlc_url_t * );
 
+struct sout_stream_sys_t
+{
+    /* sdp */
+    int64_t i_sdp_id;
+    int     i_sdp_version;
+    char    *psz_sdp;
+    vlc_mutex_t  lock_sdp;
+
+    char        *psz_session_name;
+    char        *psz_session_description;
+    char        *psz_session_url;
+    char        *psz_session_email;
+
+    /* */
+    vlc_bool_t b_export_sdp_file;
+    char *psz_sdp_file;
+    /* sap */
+    vlc_bool_t b_export_sap;
+    session_descriptor_t *p_session;
+
+    httpd_host_t *p_httpd_host;
+    httpd_file_t *p_httpd_file;
+
+    rtsp_stream_t *rtsp;
+
+    /* */
+    char *psz_destination;
+    int  i_port;
+    int  i_port_audio;
+    int  i_port_video;
+    int  i_ttl;
+    vlc_bool_t b_latm;
+
+    /* when need to use a private one or when using muxer */
+    int i_payload_type;
+
+    /* in case we do TS/PS over rtp */
+    sout_mux_t        *p_mux;
+    sout_access_out_t *p_access;
+    int               i_mtu;
+    sout_access_out_t *p_grab;
+    uint16_t          i_sequence;
+    uint32_t          i_timestamp_start;
+    uint8_t           ssrc[4];
+    block_t           *packet;
+
+    /* */
+    vlc_mutex_t      lock_es;
+    int              i_es;
+    sout_stream_id_t **es;
+};
+
+typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *,
+                                    block_t * );
+
 struct sout_stream_id_t
 {
     sout_stream_t *p_stream;
@@ -300,8 +355,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_payload_type = 96;
     p_sys->i_es = 0;
     p_sys->es   = NULL;
-    p_sys->i_rtsp = 0;
-    p_sys->rtsp   = NULL;
+    p_sys->rtsp = NULL;
     p_sys->psz_sdp = NULL;
 
     p_sys->i_sdp_id = mdate();
@@ -314,10 +368,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_httpd_host = NULL;
     p_sys->p_httpd_file = NULL;
-    p_sys->p_rtsp_host  = NULL;
-    p_sys->p_rtsp_url   = NULL;
-    p_sys->psz_rtsp_control = NULL;
-    p_sys->psz_rtsp_path = NULL;
 
     vlc_mutex_init( p_stream, &p_sys->lock_sdp );
     vlc_mutex_init( p_stream, &p_sys->lock_es );
@@ -547,7 +597,8 @@ static void Close( vlc_object_t * p_this )
         }
     }
 
-    RtspUnsetup( p_stream );
+    if( p_sys->rtsp != NULL )
+        RtspUnsetup( p_sys->rtsp );
 
     vlc_mutex_destroy( &p_sys->lock_sdp );
 
@@ -597,26 +648,27 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
         if( p_sys->p_httpd_file )
         {
             msg_Err( p_stream, "you can use sdp=http:// only once" );
-            return;
+            goto out;
         }
 
         if( HttpSetup( p_stream, &url ) )
         {
-            msg_Err( p_stream, "cannot export sdp as http" );
+            msg_Err( p_stream, "cannot export SDP as HTTP" );
         }
     }
     else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "rtsp" ) )
     {
-        if( p_sys->p_rtsp_url )
+        if( p_sys->rtsp != NULL )
         {
             msg_Err( p_stream, "you can use sdp=rtsp:// only once" );
-            return;
+            goto out;
         }
 
         /* FIXME test if destination is multicast or no destination at all FIXME */
-        if( RtspSetup( p_stream, &url ) )
+        p_sys->rtsp = RtspSetup( p_stream, &url );
+        if( p_sys->rtsp == NULL )
         {
-            msg_Err( p_stream, "cannot export sdp as rtsp" );
+            msg_Err( p_stream, "cannot export SDP as RTSP" );
         }
     }
     else if( ( url.psz_protocol && !strcasecmp( url.psz_protocol, "sap" ) ) || 
@@ -630,7 +682,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
         if( p_sys->b_export_sdp_file )
         {
             msg_Err( p_stream, "you can use sdp=file:// only once" );
-            return;
+            goto out;
         }
         p_sys->b_export_sdp_file = VLC_TRUE;
         psz_url = &psz_url[5];
@@ -643,6 +695,8 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
         msg_Warn( p_stream, "unknown protocol for SDP (%s)",
                   url.psz_protocol );
     }
+
+out:
     vlc_UrlClean( &url );
 }
 
@@ -662,11 +716,12 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
            a= charset: (normally charset should be UTF-8, this can be used to override s= and i=)
            a= x-plgroup: (missing)
            RTP packets need to get the correct src IP address  */
-/*static*/ char *SDPGenerate( const sout_stream_t *p_stream,
-                          const char *psz_destination, vlc_bool_t b_rtsp )
+/*static*/
+char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-    int i_size;
+    const sout_stream_sys_t *p_sys = p_stream->p_sys;
+    size_t i_size;
+    const char *psz_destination = p_sys->psz_destination;
     char *psz_sdp, *p, ipv;
     int i;
 
@@ -702,9 +757,9 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
         {
             i_size += strlen( "a=fmtp:* *\r\n" ) + strlen( id->psz_fmtp ) + 10;
         }
-        if( b_rtsp )
+        if( rtsp_url != NULL )
         {
-            i_size += strlen( "a=control:*/trackID=*\r\n" ) + strlen( p_sys->psz_rtsp_control ) + 10;
+            i_size += strlen( "a=control:*/trackID=*\r\n" ) + strlen( rtsp_url ) + 10;
         }
     }
     if( p_sys->p_mux )
@@ -774,7 +829,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
             p += sprintf( p, "a=fmtp:%d %s\r\n", id->i_payload_type,
                           id->psz_fmtp );
         }
-        if( b_rtsp )
+        if( rtsp_url != NULL )
         {
             p += sprintf( p, "a=control:/trackID=%d\r\n", i );
         }
@@ -782,7 +837,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
     if( p_sys->p_mux )
     {
        p += sprintf( p, "m=video %d RTP/AVP %d\r\n",
-                 p_sys->i_port, p_sys->i_payload_type );
+                     p_sys->i_port, p_sys->i_payload_type );
     }
 
     return psz_sdp;
@@ -1136,15 +1191,17 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->i_mtu -= MTU_REDUCE;
     msg_Dbg( p_stream, "maximum RTP packet size: %d bytes", id->i_mtu );
 
-    if( p_sys->p_rtsp_url )
-        id->rtsp_id = RtspAddId( p_stream, id, id->i_port, id->i_port + 1 );
+    if( p_sys->rtsp != NULL )
+        id->rtsp_id = RtspAddId( p_sys->rtsp, id, p_sys->i_es,
+                                 p_sys->psz_destination,
+                                 p_sys->i_ttl, id->i_port, id->i_port + 1 );
 
     /* Update p_sys context */
     vlc_mutex_lock( &p_sys->lock_es );
     TAB_APPEND( p_sys->i_es, p_sys->es, id );
     vlc_mutex_unlock( &p_sys->lock_es );
 
-    psz_sdp = SDPGenerate( p_stream, p_sys->psz_destination, VLC_FALSE );
+    psz_sdp = SDPGenerate( p_stream, NULL );
 
     vlc_mutex_lock( &p_sys->lock_sdp );
     free( p_sys->psz_sdp );
@@ -1196,7 +1253,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         sout_MuxDeleteStream( p_sys->p_mux, id->p_input );
     }
     if( id->rtsp_id )
-        RtspDelId( p_stream, id->rtsp_id );
+        RtspDelId( p_sys->rtsp, id->rtsp_id );
 
     vlc_mutex_destroy( &id->lock_sink );
     free( id->sink );
@@ -1477,6 +1534,7 @@ int rtp_add_sink( sout_stream_id_t *id, sout_access_out_t *access )
 
 void rtp_del_sink( sout_stream_id_t *id, sout_access_out_t *access )
 {
+    /* NOTE: must be safe to use if access is not a sink to id */
     vlc_mutex_lock( &id->lock_sink );
     TAB_REMOVE( id->i_sink, id->sink, access );
     vlc_mutex_unlock( &id->lock_sink );
