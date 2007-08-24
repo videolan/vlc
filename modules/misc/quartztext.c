@@ -202,7 +202,10 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
         return VLC_EGENERIC;
 
     if( VLC_SUCCESS != input_Control( p_input, INPUT_GET_ATTACHMENTS, &pp_attachments, &i_attachments_cnt ))
+    {
+        vlc_object_release(p_input);
         return VLC_EGENERIC;
+    }
 
     p_sys->i_fonts = 0;
     p_sys->p_fonts = malloc( i_attachments_cnt * sizeof( ATSFontContainerRef ) );
@@ -237,6 +240,8 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
         vlc_input_attachment_Delete( p_attach );
     }
     free( pp_attachments );
+
+    vlc_object_release(p_input);
 
     return rv;
 }
@@ -454,6 +459,9 @@ static int PushFont( font_stack_t **p_font, const char *psz_name, int i_size,
         return VLC_EGENERIC;
 
     p_new = malloc( sizeof( font_stack_t ) );
+    if( ! p_new )
+        return VLC_ENOMEM;
+
     p_new->p_next = NULL;
 
     if( psz_name )
@@ -565,10 +573,10 @@ static void ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
 
     if( p_font_style )
     {
-        PushFont( &p_fonts,
-                  p_font_style->psz_fontname,
-                  p_font_style->i_font_size,
-                  p_font_style->i_font_color,
+        rv = PushFont( &p_fonts,
+               p_font_style->psz_fontname,
+               p_font_style->i_font_size,
+               p_font_style->i_font_color,
                   p_font_style->i_font_alpha );
 
         if( p_font_style->i_style_flags & STYLE_BOLD )
@@ -580,8 +588,13 @@ static void ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
     }
     else
     {
-        PushFont( &p_fonts, p_sys->psz_font_name, p_sys->i_font_size, p_sys->i_font_color, 0 );
+        rv = PushFont( &p_fonts,
+                       p_sys->psz_font_name,
+                       p_sys->i_font_size,
+                       p_sys->i_font_color, 0 );
     }
+    if( rv != VLC_SUCCESS )
+        return rv;
 
     while ( ( xml_ReaderRead( p_xml_reader ) == 1 ) )
     {
