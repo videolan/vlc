@@ -200,7 +200,7 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
     p_input = (input_thread_t *)vlc_object_find( p_filter, VLC_OBJECT_INPUT, FIND_PARENT );
     if( ! p_input )
         return VLC_EGENERIC;
-    
+
     if( VLC_SUCCESS != input_Control( p_input, INPUT_GET_ATTACHMENTS, &pp_attachments, &i_attachments_cnt ))
         return VLC_EGENERIC;
 
@@ -236,7 +236,7 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
         }
         vlc_input_attachment_Delete( p_attach );
     }
-    free( pp_attachments );        
+    free( pp_attachments );
 
     return rv;
 }
@@ -245,52 +245,52 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
 // Original version of these functions available on:
 // http://developer.apple.com/documentation/Carbon/Conceptual/QuickDrawToQuartz2D/tq_color/chapter_4_section_3.html
 
-#define kGenericRGBProfilePathStr "/System/Library/ColorSync/Profiles/Generic RGB Profile.icc" 
- 
+#define kGenericRGBProfilePathStr "/System/Library/ColorSync/Profiles/Generic RGB Profile.icc"
+
 static CMProfileRef OpenGenericProfile( void )
 {
     static CMProfileRef cached_rgb_prof = NULL;
- 
+
     // Create the profile reference only once
     if( cached_rgb_prof == NULL )
     {
         OSStatus            err;
         CMProfileLocation   loc;
- 
+
         loc.locType = cmPathBasedProfile;
         strcpy( loc.u.pathLoc.path, kGenericRGBProfilePathStr );
- 
+
         err = CMOpenProfile( &cached_rgb_prof, &loc );
- 
+
         if( err != noErr )
         {
             cached_rgb_prof = NULL;
         }
     }
- 
+
     if( cached_rgb_prof )
     {
-        // Clone the profile reference so that the caller has 
+        // Clone the profile reference so that the caller has
         // their own reference, not our cached one.
-        CMCloneProfileRef( cached_rgb_prof );   
+        CMCloneProfileRef( cached_rgb_prof );
     }
- 
+
     return cached_rgb_prof;
 }
 
 static CGColorSpaceRef CreateGenericRGBColorSpace( void )
 {
     static CGColorSpaceRef p_generic_rgb_cs = NULL;
- 
+
     if( p_generic_rgb_cs == NULL )
     {
         CMProfileRef generic_rgb_prof = OpenGenericProfile();
- 
+
         if( generic_rgb_prof )
         {
             p_generic_rgb_cs = CGColorSpaceCreateWithPlatformColorSpace( generic_rgb_prof );
- 
-            CMCloseProfile( generic_rgb_prof ); 
+
+            CMCloseProfile( generic_rgb_prof );
         }
     }
 
@@ -334,7 +334,7 @@ static void ConvertToUTF16( const char *psz_utf8_str, uint32_t *pi_strlen, UniCh
         *ppsz_utf16_str = (UniChar *) calloc( i_string_length, sizeof( UniChar ) );
 
     CFStringGetCharacters( p_cfString, CFRangeMake( 0, i_string_length ), *ppsz_utf16_str );
-    
+
     CFRelease( p_cfString );
 }
 
@@ -353,7 +353,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( !p_region_in || !p_region_out ) return VLC_EGENERIC;
     psz_string = p_region_in->psz_text;
     if( !psz_string || !*psz_string ) return VLC_EGENERIC;
-    
+
     if( p_region_in->p_style )
     {
         i_font_color = __MAX( __MIN( p_region_in->p_style->i_font_color, 0xFFFFFF ), 0 );
@@ -368,7 +368,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     }
 
     if( !i_font_alpha ) i_font_alpha = 255 - p_sys->i_font_opacity;
-    
+
     ConvertToUTF16( EliminateCRLF( psz_string ), &i_string_length, &psz_utf16_str );
 
     p_region_out->i_x = p_region_in->i_x;
@@ -489,7 +489,7 @@ static int PopFont( font_stack_t **p_font )
 
     if( !p_font || !*p_font )
         return VLC_EGENERIC;
-    
+
     p_next_to_last = NULL;
     for( p_last = *p_font;
          p_last->p_next;
@@ -516,7 +516,7 @@ static int PeekFont( font_stack_t **p_font, char **psz_name, int *i_size,
 
     if( !p_font || !*p_font )
         return VLC_EGENERIC;
-    
+
     for( p_last=*p_font;
          p_last->p_next;
          p_last=p_last->p_next )
@@ -565,12 +565,12 @@ static void ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
 
     if( p_font_style )
     {
-        PushFont( &p_fonts, 
+        PushFont( &p_fonts,
                   p_font_style->psz_fontname,
                   p_font_style->i_font_size,
                   p_font_style->i_font_color,
                   p_font_style->i_font_alpha );
-        
+
         if( p_font_style->i_style_flags & STYLE_BOLD )
             b_bold = VLC_TRUE;
         if( p_font_style->i_style_flags & STYLE_ITALIC )
@@ -591,7 +591,7 @@ static void ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
                 break;
             case XML_READER_ENDELEM:
                 psz_node = xml_ReaderName( p_xml_reader );
-                
+
                 if( psz_node )
                 {
                     if( !strcasecmp( "font", psz_node ) )
@@ -602,7 +602,7 @@ static void ProcessNodes( filter_t *p_filter, xml_reader_t *p_xml_reader,
                         b_italic = VLC_FALSE;
                     else if( !strcasecmp( "u", psz_node ) )
                         b_uline  = VLC_FALSE;
-                    
+
                     free( psz_node );
                 }
                 break;
@@ -872,7 +872,7 @@ static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, ui
     offscreen_bitmap_t  *p_offScreen  = NULL;
     CGColorSpaceRef      p_colorSpace = NULL;
     CGContextRef         p_context = NULL;
-    
+
     p_context = CreateOffScreenContext( i_width, i_height, &p_offScreen, &p_colorSpace );
 
     if( p_context )
@@ -904,7 +904,7 @@ static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, ui
             {
                 alignment = kATSUEndAlignment;
             }
-            else if( i_text_align != SUBPICTURE_ALIGN_LEFT ) 
+            else if( i_text_align != SUBPICTURE_ALIGN_LEFT )
             {
                 alignment = kATSUCenterAlignment;
             }
@@ -921,7 +921,7 @@ static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, ui
             uint32_t i_start = 0;
             uint32_t i_end = i_text_len;
 
-            // Set up black outlining of the text -- 
+            // Set up black outlining of the text --
             CGContextSetRGBStrokeColor( p_context, 0, 0, 0, 0.5 );
             CGContextSetTextDrawingMode( p_context, kCGTextFillStroke );
 
