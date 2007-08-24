@@ -289,7 +289,7 @@ static int WSAAPI
 getaddrinfo (const char *node, const char *service,
              const struct addrinfo *hints, struct addrinfo **res)
 #else
-static int 
+static int
 getaddrinfo (const char *node, const char *service,
              const struct addrinfo *hints, struct addrinfo **res)
 #endif
@@ -558,7 +558,6 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
     return i_val;
 }
 
-
 int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
                      int i_port, const struct addrinfo *p_hints,
                      struct addrinfo **res )
@@ -581,12 +580,15 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 
     /* Check if we have to force ipv4 or ipv6 */
     memset (&hints, 0, sizeof (hints));
-    if (p_hints != NULL)
+    if( p_hints != NULL )
     {
+        int ai_flags = AI_NUMERICHOST|AI_PASSIVE;
+        if( node )
+            ai_flags |= AI_CANONNAME;
         hints.ai_family = p_hints->ai_family;
         hints.ai_socktype = p_hints->ai_socktype;
         hints.ai_protocol = p_hints->ai_protocol;
-        hints.ai_flags = p_hints->ai_flags & (AI_NUMERICHOST|AI_PASSIVE|AI_CANONNAME);
+        hints.ai_flags = p_hints->ai_flags & (ai_flags);
     }
 #ifdef AI_NUMERICSERV
     /* we only ever use port *numbers* */
@@ -618,6 +620,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     if( ( node == NULL ) || (node[0] == '\0' ) )
     {
         psz_node = NULL;
+        hints.ai_flags &= ~AI_CANONNAME;
     }
     else
     {
