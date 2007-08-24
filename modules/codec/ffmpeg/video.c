@@ -456,7 +456,6 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         p_block->i_pts = p_block->i_dts = 0;
     }
 
-    /* TODO implement it in a better way */
     /* A good idea could be to decode all I pictures and see for the other */
     if( !p_dec->b_pace_control &&
         p_sys->b_hurry_up &&
