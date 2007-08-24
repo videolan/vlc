@@ -108,7 +108,7 @@ vlc_module_begin();
         ERROR_LONGTEXT, VLC_TRUE );
     add_integer ( "ffmpeg-workaround-bugs", 1, NULL, BUGS_TEXT, BUGS_LONGTEXT,
         VLC_FALSE );
-    add_bool( "ffmpeg-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT,
+    add_bool( "ffmpeg-hurry-up", 1, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT,
         VLC_FALSE );
     add_integer( "ffmpeg-skip-frame", 0, NULL, SKIP_FRAME_TEXT,
         SKIP_FRAME_LONGTEXT, VLC_TRUE );
