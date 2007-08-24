@@ -417,6 +417,7 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                            httpd_message_t *answer, httpd_message_t *query )
 {
     rtsp_stream_id_t *id = (rtsp_stream_id_t *)p_args;
+    rtsp_stream_t    *rtsp = id->stream;
     sout_stream_t    *p_stream = id->stream->owner;
     sout_stream_id_t *sid = id->sout_id;
     char psz_session_init[21];
@@ -562,21 +563,21 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                         continue;
                     }
 
-                    vlc_mutex_lock( &id->stream->lock );
+                    vlc_mutex_lock( &rtsp->lock );
                     if( psz_session == NULL )
                     {
                         psz_session = psz_session_init;
-                        ses = RtspClientNew( id->stream, psz_session );
+                        ses = RtspClientNew( rtsp, psz_session );
                     }
                     else
                     {
                         /* FIXME: we probably need to remove an access out,
                          * if there is already one for the same ID */
-                        ses = RtspClientGet( id->stream, psz_session );
+                        ses = RtspClientGet( rtsp, psz_session );
                         if( ses == NULL )
                         {
                             answer->i_status = 454;
-                            vlc_mutex_unlock( &id->stream->lock );
+                            vlc_mutex_unlock( &rtsp->lock );
                             continue;
                         }
                     }
@@ -585,7 +586,7 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     TAB_APPEND( ses->i_id, ses->id, sid );
                     TAB_APPEND( ses->i_access, ses->access, p_access );
                     assert( ses->i_id == ses->i_access );
-                    vlc_mutex_unlock( &id->stream->lock );
+                    vlc_mutex_unlock( &rtsp->lock );
 
                     char *src = var_GetNonEmptyString (p_access, "src-addr");
                     int sport = var_GetInteger (p_access, "src-port");
@@ -619,6 +620,38 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 }
                 break;
             }
+            break;
+        }
+
+        case HTTPD_MSG_PAUSE:
+            answer->i_status = 405;
+            httpd_MsgAdd( answer, "Allow", "SETUP, TEARDOWN" );
+            break;
+
+        case HTTPD_MSG_TEARDOWN:
+        {
+            rtsp_session_t *ses;
+
+            answer->i_status = 200;
+
+            psz_session = httpd_MsgGet( query, "Session" );
+
+            vlc_mutex_lock( &rtsp->lock );
+            ses = RtspClientGet( rtsp, psz_session );
+            if( ses != NULL )
+            {
+                for( int i = 0; i < ses->i_id; i++ )
+                {
+                    if( ses->id[i] == id->sout_id )
+                    {
+                        rtp_del_sink( id->sout_id, ses->access[i] );
+                        REMOVE_ELEM( ses->id, ses->i_id, i );
+                        REMOVE_ELEM( ses->access, ses->i_access, i );
+                        sout_AccessOutDelete( ses->access[i] );
+                    }
+                }
+            }
+            vlc_mutex_unlock( &rtsp->lock );
             break;
         }
 
