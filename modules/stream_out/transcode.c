@@ -26,8 +26,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <math.h>
-
 #include <vlc/vlc.h>
 #include <vlc_input.h>
 #include <vlc_sout.h>
@@ -37,6 +35,8 @@
 #include <vlc_block.h>
 #include <vlc_filter.h>
 #include <vlc_osd.h>
+
+#include <math.h>
 
 #define MASTER_SYNC_MAX_DRIFT 100000
 
