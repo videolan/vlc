@@ -97,7 +97,7 @@
                 <property name="width_request">37</property>
                 <property name="height_request">37</property>
                 <property name="visible">True</property>
-                <property name="tooltip" translatable="yes">Quit vlc</property>
+                <property name="tooltip" translatable="yes">Quit Player</property>
                 <property name="relief">GTK_RELIEF_NONE</property>
                 <property name="response_id">0</property>
                 <child>
@@ -283,12 +283,12 @@
                       <widget class="GtkEventBox" id="eventicon">
                         <property name="visible">True</property>
                         <child>
-                          <widget class="GtkImage" id="vlcicon">
+                          <widget class="GtkImage" id="audioicon">
                             <property name="visible">True</property>
                             <property name="events"></property>
                             <property name="tooltip" translatable="yes">Update meta info</property>
                             <property name="xpad">8</property>
-                            <property name="icon_name">vlc</property>
+                            <property name="icon_name">audio-x-generic</property>
                           </widget>
                         </child>
                       </widget>

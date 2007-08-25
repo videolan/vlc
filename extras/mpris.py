@@ -58,9 +58,27 @@ def itemchange_handler(item):
 
 #connect to the bus
 bus = dbus.SessionBus()
-player_o = bus.get_object("org.mpris.vlc", "/Player")
-tracklist_o = bus.get_object("org.mpris.vlc", "/TrackList")
 
+#find the first media player available
+dbus_o = bus.get_object("org.freedesktop.DBus", "/")
+dbus_intf = dbus.Interface(dbus_o, "org.freedesktop.DBus")
+name_list = dbus_intf.ListNames()
+name = ""
+for n in name_list:
+    if "org.mpris." in n:
+        name = n
+        break
+
+if name == "":
+    print "No MPRIS enabled players on the bus !"
+    exit()
+
+
+root_o = bus.get_object(name, "/")
+player_o = bus.get_object(name, "/Player")
+tracklist_o = bus.get_object(name, "/TrackList")
+
+root = dbus.Interface(root_o, "org.freedesktop.MediaPlayer")
 tracklist  = dbus.Interface(tracklist_o, "org.freedesktop.MediaPlayer")
 player = dbus.Interface(player_o, "org.freedesktop.MediaPlayer")
 try:
@@ -109,7 +127,7 @@ def update(widget):
     l_title.set_text(t)
     GetPlayStatus(0)
 
-#get playing status from remote vlc
+#get playing status from remote player
 def GetPlayStatus(widget):
     global playing
     status = player.GetStatus()
@@ -179,7 +197,7 @@ def tray_button(widget):
         window.move(position[0], position[1])
         window.show()
 
-xml = gtk.glade.XML('dbus-vlc.glade')
+xml = gtk.glade.XML('mpris.glade')
 
 bt_close    = xml.get_widget('close')
 bt_quit     = xml.get_widget('quit')
@@ -196,7 +214,7 @@ window      = xml.get_widget('window1')
 img_bt_toggle=xml.get_widget('image6')
 exp         = xml.get_widget('expander2')
 expvbox     = xml.get_widget('expandvbox')
-vlcicon     = xml.get_widget('eventicon')
+audioicon   = xml.get_widget('eventicon')
 vol         = xml.get_widget('vol')
 time_s      = xml.get_widget('time_s')
 time_l      = xml.get_widget('time_l')
@@ -205,7 +223,7 @@ window.connect('delete_event',  delete_event)
 window.connect('destroy',       destroy)
 window.connect('key_release_event', key_release)
 
-tray = gtk.status_icon_new_from_icon_name("vlc")
+tray = gtk.status_icon_new_from_icon_name("audio-x-generic")
 tray.connect('activate', tray_button)
 
 def icon_clicked(widget, event):
@@ -222,8 +240,8 @@ exp.connect('activate',         expander)
 vol.connect('change-value',     volchange)
 vol.connect('scroll-event',     volchange)
 time_s.connect('adjust-bounds', timechange)
-vlcicon.set_events(gtk.gdk.BUTTON_PRESS_MASK) 
-vlcicon.connect('button_press_event', icon_clicked) 
+audioicon.set_events(gtk.gdk.BUTTON_PRESS_MASK) 
+audioicon.connect('button_press_event', icon_clicked) 
 time_s.set_update_policy(gtk.UPDATE_DISCONTINUOUS)
 gobject.timeout_add( 2000, timeset)
 
@@ -235,8 +253,8 @@ try:
 except:
     print "edit this file to point to your media library"
 
-window.set_icon_name('vlc')
-window.set_title("VLC - D-Bus ctrl")
+window.set_icon_name('audio-x-generic')
+window.set_title(root.Identity())
 window.show()
 
 try:
@@ -246,7 +264,7 @@ except:
 
 icon_theme = gtk.icon_theme_get_default()
 try:
-    pix = icon_theme.load_icon("vlc",24,0)
+    pix = icon_theme.load_icon("audio-x-generic",24,0)
     window.set_icon(pix)
 except:
     True
