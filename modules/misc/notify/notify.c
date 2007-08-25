@@ -153,6 +153,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
+    /*Wait a tad so the meta has been fetched*/
+    msleep( 1000*4 );
 
     /* Playing something ... */
     psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
