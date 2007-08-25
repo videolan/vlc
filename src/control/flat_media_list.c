@@ -85,7 +85,7 @@ add_media_list( libvlc_media_list_t * p_mlist,
     {
         libvlc_media_descriptor_t * p_md;
         p_md = libvlc_media_list_item_at_index( p_submlist, i, NULL );
-        add_item( p_mlist->p_flat_mlist, p_md );
+        add_item( p_mlist, p_md );
     }
     install_media_list_observer( p_mlist, p_submlist );
 }
@@ -313,3 +313,4 @@ libvlc_media_list_flat_media_list( libvlc_media_list_t * p_mlist,
     libvlc_media_list_retain( p_mlist->p_flat_mlist );
     return p_mlist->p_flat_mlist;
 }
+
