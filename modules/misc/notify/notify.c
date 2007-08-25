@@ -157,23 +157,37 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
     psz_album = input_item_GetAlbum( input_GetItem( p_input ) ) ;
     psz_title = input_item_GetTitle( input_GetItem( p_input ) );
-    if( psz_title == NULL )
+    if( ( psz_title == NULL ) || EMPTY_STR( psz_title ) )
+    {
+        free( psz_title );
         psz_title = input_item_GetName( input_GetItem( p_input ) );
-    if( psz_title == NULL )
+    }
+    if( ( psz_title == NULL ) || EMPTY_STR( psz_title ) )
     {  /* Not enough metadata ... */
+        free( psz_title );
         free( psz_artist );
         free( psz_album );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
+    if( EMPTY_STR( psz_artist ) )
+    {
+        free( psz_artist );
+        psz_artist = NULL;
+    }
+    if( EMPTY_STR( psz_album ) )
+    {
+        free( psz_album );
+        psz_album = NULL;
+    }
 
     vlc_object_release( p_input );
 
     if( psz_artist && psz_album )
-        snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\nBy %s\n[%s]",
+        snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\n%s\n[%s]",
                   psz_title, psz_artist, psz_album );
     else if( psz_artist )
-        snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\nBy %s",
+        snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\n%s",
                   psz_title, psz_artist );
     else
         snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>", psz_title );
