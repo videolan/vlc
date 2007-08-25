@@ -98,7 +98,7 @@ int main( int i_argc, char *ppsz_argv[] )
     }
 
 #if !defined(WIN32) && !defined(UNDER_CE)
-    /* Synchronously intercepted signals. Thy request a clean shutdown,
+    /* Synchronously intercepted signals. They request a clean shutdown,
      * and force an unclean shutdown if they are triggered again 2+ seconds
      * later. We have to handle SIGTERM cleanly because of daemon mode.
      * Note that we set the signals after the vlc_create call. */
