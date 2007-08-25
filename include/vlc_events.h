@@ -104,10 +104,12 @@ typedef struct vlc_event_manager_t
 {
     void * p_obj;
     vlc_mutex_t object_lock;
+    vlc_object_t *p_parent_object;
     DECL_ARRAY(struct vlc_event_listeners_group_t *) listeners_groups;
 } vlc_event_manager_t;
 
 /* List of event */
+/* Be sure to keep sync-ed with misc/events.c debug name table */
 typedef enum vlc_event_type_t {
     /* Input item events */
     vlc_InputItemMetaChanged,
@@ -184,10 +186,12 @@ VLC_EXPORT(void, vlc_event_send, ( vlc_event_manager_t * p_em,
 /*
  * Add a callback for an event.
  */
-VLC_EXPORT(int, vlc_event_attach, ( vlc_event_manager_t * p_event_manager,
-                                    vlc_event_type_t event_type,
-                                    vlc_event_callback_t pf_callback,
-                                    void *p_user_data ));
+#define vlc_event_attach(a, b, c, d) __vlc_event_attach(a, b, c, d, #c)
+VLC_EXPORT(int, __vlc_event_attach, ( vlc_event_manager_t * p_event_manager,
+                                      vlc_event_type_t event_type,
+                                      vlc_event_callback_t pf_callback,
+                                      void *p_user_data,
+                                      const char * psz_debug_name ));
 
 /*
  * Remove a callback for an event.

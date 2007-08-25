@@ -39,6 +39,8 @@
  * Documentation : Read vlc_events.h
  *****************************************************************************/
 
+//#define DEBUG_EVENT
+
 /*****************************************************************************
  *  Private types.
  *****************************************************************************/
@@ -47,6 +49,9 @@ typedef struct vlc_event_listener_t
 {
     void *               p_user_data;
     vlc_event_callback_t pf_callback;
+#ifdef DEBUG_EVENT
+    char *               psz_debug_name;
+#endif
 } vlc_event_listener_t;
 
 typedef struct vlc_event_listeners_group_t
@@ -54,6 +59,16 @@ typedef struct vlc_event_listeners_group_t
     vlc_event_type_t    event_type;
     DECL_ARRAY(struct vlc_event_listener_t *) listeners;
 } vlc_event_listeners_group_t;
+
+#ifdef DEBUG_EVENT
+static const char * ppsz_event_type_to_name[] = 
+{
+    [vlc_InputItemMetaChanged]          = "vlc_InputItemMetaChanged",
+    [vlc_InputItemSubItemAdded]         = "vlc_InputItemSubItemAdded",
+    [vlc_ServicesDiscoveryItemAdded]    = "vlc_ServicesDiscoveryItemAdded",
+    [vlc_ServicesDiscoveryItemRemoved]  = "vlc_ServicesDiscoveryItemRemoved"
+}
+#endif
 
 /*****************************************************************************
  * 
@@ -70,6 +85,7 @@ int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj,
                             vlc_object_t * p_parent_obj )
 {
     p_em->p_obj = p_obj;
+    p_em->p_parent_object = p_parent_obj;
     vlc_mutex_init( p_parent_obj, &p_em->object_lock );
     ARRAY_INIT( p_em->listeners_groups );
     return VLC_SUCCESS;
@@ -138,6 +154,12 @@ void vlc_event_send( vlc_event_manager_t * p_em,
             FOREACH_ARRAY( listener, listeners_group->listeners )
                 func = listener->pf_callback;
                 user_data = listener->p_user_data;
+#ifdef DEBUG_EVENT
+                msg_Dbg("Calling '%s' with a '%s' event (data %p)\n",
+                    listener->psz_debug_name,
+                    ppsz_event_type_to_name[event_type],
+                    listener->p_user_data );
+#endif
                 /* This is safe to do that because we are sure 
                  * that there will be no object owned references
                  * used after the lock. */
@@ -154,10 +176,11 @@ void vlc_event_send( vlc_event_manager_t * p_em,
 /**
  * Add a callback for an event.
  */
-int vlc_event_attach( vlc_event_manager_t * p_em,
-                      vlc_event_type_t event_type,
-                      vlc_event_callback_t pf_callback,
-                      void *p_user_data )
+int __vlc_event_attach( vlc_event_manager_t * p_em,
+                        vlc_event_type_t event_type,
+                        vlc_event_callback_t pf_callback,
+                        void *p_user_data,
+                        const char * psz_debug_name )
 {
     vlc_event_listeners_group_t * listeners_group;
     vlc_event_listener_t * listener;
@@ -167,18 +190,30 @@ int vlc_event_attach( vlc_event_manager_t * p_em,
     
     listener->p_user_data = p_user_data;
     listener->pf_callback = pf_callback;
+#ifdef DEBUG_EVENT
+    listener->psz_debug_name = strdup( psz_debug_name );
+#else
+    (void)psz_debug_name;
+#endif
 
     vlc_mutex_lock( &p_em->object_lock );
     FOREACH_ARRAY( listeners_group, p_em->listeners_groups )
         if( listeners_group->event_type == event_type )
         {
             ARRAY_APPEND( listeners_group->listeners, listener );
+#ifdef DEBUG_EVENT
+                msg_Dbg("Listening to '%s' event with '%s' (data %p)\n",
+                    ppsz_event_type_to_name[event_type],
+                    listener->psz_debug_name,
+                    listener->p_user_data );
+#endif
             vlc_mutex_unlock( &p_em->object_lock );
             return VLC_SUCCESS;
         }
     FOREACH_END()
     vlc_mutex_unlock( &p_em->object_lock );
 
+    msg_Err( p_em->p_parent_object, "Can't attach to an object event manager event" );
     free(listener);
     return VLC_EGENERIC;
 }
@@ -206,6 +241,14 @@ int vlc_event_detach( vlc_event_manager_t *p_em,
                     ARRAY_REMOVE( listeners_group->listeners,
                         fe_idx /* This comes from the macro (and that's why
                                   I hate macro) */ );
+#ifdef DEBUG_EVENT
+                    msg_Dbg("Detaching '%s' from '%s' event (data %p)\n",
+                        listener->psz_debug_name,
+                        ppsz_event_type_to_name[event_type],
+                        listener->p_user_data );
+
+                    free( listener->psz_debug_name );
+#endif
                     free( listener );
                     vlc_mutex_unlock( &p_em->object_lock );
                     return VLC_SUCCESS;
@@ -215,7 +258,7 @@ int vlc_event_detach( vlc_event_manager_t *p_em,
     FOREACH_END()
     vlc_mutex_unlock( &p_em->object_lock );
 
+    msg_Warn( p_em->p_parent_object, "Can't detach to an object event manager event" );
+
     return VLC_EGENERIC;
 }
-
-
