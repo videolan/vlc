@@ -237,7 +237,7 @@ VLC_PUBLIC_API libvlc_media_list_t *
     libvlc_media_descriptor_subitems( libvlc_media_descriptor_t *p_md,
                                       libvlc_exception_t *p_e );
 
-VLC_PUBLIC_APIlibvlc_event_manager_t *
+VLC_PUBLIC_API libvlc_event_manager_t *
     libvlc_media_descriptor_event_manager( libvlc_media_descriptor_t * p_md,
                                            libvlc_exception_t * p_e );
 
