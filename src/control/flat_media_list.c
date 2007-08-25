@@ -307,10 +307,9 @@ libvlc_media_list_flat_media_list( libvlc_media_list_t * p_mlist,
         p_mlist->p_flat_mlist = libvlc_media_list_new(
                                             p_mlist->p_libvlc_instance,
                                             p_e );
-        add_media_list( p_mlist->p_flat_mlist, p_mlist );
+        add_media_list( p_mlist, p_mlist );
         install_flat_mlist_observer( p_mlist );
     }
     libvlc_media_list_retain( p_mlist->p_flat_mlist );
     return p_mlist->p_flat_mlist;
 }
-
