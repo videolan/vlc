@@ -1083,7 +1083,7 @@ static int ReadMetaData( intf_thread_t *p_this )
             msg_Dbg( p_this, "No artist.." );
             WAIT_METADATA_FETCHING( psz_artist )
         }
-        psz_meta = input_item_GetName( input_GetItem( p_input ) );
+        psz_meta = input_item_GetTitle( input_GetItem( p_input ) );
         if( psz_meta )
         {
             psz_title = encode_URI_component( psz_meta );
