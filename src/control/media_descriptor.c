@@ -449,3 +449,13 @@ libvlc_media_descriptor_subitems( libvlc_media_descriptor_t * p_md,
         libvlc_media_list_retain( p_md->p_subitems );
     return p_md->p_subitems;
 }
+
+/**************************************************************************
+ * event_manager
+ **************************************************************************/
+libvlc_event_manager_t *
+libvlc_media_descriptor_event_manager( libvlc_media_descriptor_t * p_md,
+                                       libvlc_exception_t * p_e )
+{
+    return p_md->p_event_manager;
+}
