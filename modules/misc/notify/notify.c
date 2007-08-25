@@ -220,11 +220,19 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
-static void Skip( NotifyNotification *notification, gchar *psz, gpointer p )
-{ /* libnotify callback, called when the Skip button is pressed */
+static void Next( NotifyNotification *notification, gchar *psz, gpointer p )
+{ /* libnotify callback, called when the "Next" button is pressed */
     notify_notification_close (notification, NULL);
     playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p) );
     playlist_Next( p_playlist );
+    pl_Release( ((vlc_object_t*) p) );
+}
+
+static void Prev( NotifyNotification *notification, gchar *psz, gpointer p )
+{ /* libnotify callback, called when the "Previous" button is pressed */
+    notify_notification_close (notification, NULL);
+    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p) );
+    playlist_Prev( p_playlist );
     pl_Release( ((vlc_object_t*) p) );
 }
 
@@ -249,8 +257,10 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
         gdk_pixbuf_unref( pix );
     }
 
-    /* Adds a button in the notification to skip current element */
-    notify_notification_add_action( notification, "next", _("Skip"), Skip,
+    /* Adds previous and next buttons in the notification */
+    notify_notification_add_action( notification, "prev", _("Previous"), Prev,
+                                    (gpointer*) p_intf, NULL );
+    notify_notification_add_action( notification, "next", _("Next"), Next,
                                     (gpointer*) p_intf, NULL );
 
     notify_notification_show( notification, NULL);
