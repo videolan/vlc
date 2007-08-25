@@ -131,6 +131,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     char                psz_tmp[MAX_LENGTH];
+    char                psz_notify[MAX_LENGTH];
     char                *psz_title      = NULL;
     char                *psz_artist     = NULL;
     char                *psz_album      = NULL;
@@ -211,9 +212,29 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     else /* else we show state-of-the art logo */
         pix = gdk_pixbuf_new_from_file( DATA_PATH "/vlc48x48.png", &p_error );
 
+    /* we need to replace '&' with '&amp;' because '&' is a keyword of 
+     * notification-daemon parser */
+    int i_notify, i_len, i;
+    i_len = strlen( psz_tmp );
+    i_notify = 0;
+    for( i = 0; ( ( i < i_len ) && ( i_notify < ( MAX_LENGTH - 5 ) ) ); i++ )
+    { /* we use MAX_LENGTH - 5 because if the last char of psz_tmp is '&'
+       * we will need 5 more characters: 'amp;\0' .
+       * however that's unlikely to happen because the last char is '\0' */
+        if( psz_tmp[i] != '&' )
+            psz_notify[i_notify] = psz_tmp[i];
+        else
+        {
+            snprintf( psz_notify + i_notify, 6, "&amp;" );
+            i_notify += 4;
+        }
+        i_notify++;
+    }
+    psz_notify[i_notify] = '\0';
+
     vlc_mutex_lock( &p_sys->lock );
 
-    Notify( p_this, psz_tmp, pix, p_intf );
+    Notify( p_this, psz_notify, pix, p_intf );
 
     vlc_mutex_unlock( &p_sys->lock );
 
