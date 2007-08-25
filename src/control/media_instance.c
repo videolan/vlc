@@ -233,7 +233,8 @@ libvlc_media_instance_new_from_media_descriptor(
     if( !p_mi )
         return NULL;
 
-    p_mi->p_md = libvlc_media_descriptor_duplicate( p_md );
+    libvlc_media_descriptor_retain( p_md );
+    p_mi->p_md = p_md;
 
     return p_mi;
 }
@@ -378,7 +379,8 @@ void libvlc_media_instance_set_media_descriptor(
         return; /* It is ok to pass a NULL md */
     }
 
-    p_mi->p_md = libvlc_media_descriptor_duplicate( p_md );
+    libvlc_media_descriptor_retain( p_md );
+    p_mi->p_md = p_md;
     
     /* The policy here is to ignore that we were created using a different
      * libvlc_instance, because we don't really care */
@@ -400,7 +402,8 @@ libvlc_media_instance_get_media_descriptor(
     if( !p_mi->p_md )
         return NULL;
 
-    return libvlc_media_descriptor_duplicate( p_mi->p_md );
+    libvlc_media_descriptor_retain( p_mi->p_md );
+    return p_mi->p_md;
 }
 
 /**************************************************************************
