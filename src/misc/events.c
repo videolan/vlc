@@ -245,7 +245,7 @@ int vlc_event_detach( vlc_event_manager_t *p_em,
                                   I hate macro) */ );
 #ifdef DEBUG_EVENT
                     msg_Dbg( p_em->p_parent_object,
-                        "Detaching '%s' from '%s' event (data %p)\n",
+                        "Detaching '%s' from '%s' event (data %p)",
                         listener->psz_debug_name,
                         ppsz_event_type_to_name[event_type],
                         listener->p_user_data );
