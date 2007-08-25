@@ -67,7 +67,7 @@ static const char * ppsz_event_type_to_name[] =
     [vlc_InputItemSubItemAdded]         = "vlc_InputItemSubItemAdded",
     [vlc_ServicesDiscoveryItemAdded]    = "vlc_ServicesDiscoveryItemAdded",
     [vlc_ServicesDiscoveryItemRemoved]  = "vlc_ServicesDiscoveryItemRemoved"
-}
+};
 #endif
 
 /*****************************************************************************
@@ -155,9 +155,10 @@ void vlc_event_send( vlc_event_manager_t * p_em,
                 func = listener->pf_callback;
                 user_data = listener->p_user_data;
 #ifdef DEBUG_EVENT
-                msg_Dbg("Calling '%s' with a '%s' event (data %p)\n",
+                msg_Dbg( p_em->p_parent_object,
+                    "Calling '%s' with a '%s' event (data %p)",
                     listener->psz_debug_name,
-                    ppsz_event_type_to_name[event_type],
+                    ppsz_event_type_to_name[p_event->type],
                     listener->p_user_data );
 #endif
                 /* This is safe to do that because we are sure 
@@ -202,7 +203,8 @@ int __vlc_event_attach( vlc_event_manager_t * p_em,
         {
             ARRAY_APPEND( listeners_group->listeners, listener );
 #ifdef DEBUG_EVENT
-                msg_Dbg("Listening to '%s' event with '%s' (data %p)\n",
+                msg_Dbg( p_em->p_parent_object,
+                    "Listening to '%s' event with '%s' (data %p)",
                     ppsz_event_type_to_name[event_type],
                     listener->psz_debug_name,
                     listener->p_user_data );
@@ -242,7 +244,8 @@ int vlc_event_detach( vlc_event_manager_t *p_em,
                         fe_idx /* This comes from the macro (and that's why
                                   I hate macro) */ );
 #ifdef DEBUG_EVENT
-                    msg_Dbg("Detaching '%s' from '%s' event (data %p)\n",
+                    msg_Dbg( p_em->p_parent_object,
+                        "Detaching '%s' from '%s' event (data %p)\n",
                         listener->psz_debug_name,
                         ppsz_event_type_to_name[event_type],
                         listener->p_user_data );
