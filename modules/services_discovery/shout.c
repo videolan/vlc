@@ -131,7 +131,7 @@ static int Open( vlc_object_t *p_this, int i_type )
         case RADIO:
         default:
             p_sys->p_input = input_ItemNewExt( p_sd,
-                                SHOUTCAST_BASE_URL, _("Shoutcast"),
+                                SHOUTCAST_BASE_URL, _("Shoutcast Radio"),
                                 0, NULL, -1 );
             break;
     }
