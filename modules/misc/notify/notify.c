@@ -220,6 +220,14 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
+static void Skip( NotifyNotification *notification, gchar *psz, gpointer p )
+{ /* libnotify callback, called when the Skip button is pressed */
+    notify_notification_close (notification, NULL);
+    playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p) );
+    playlist_Next( p_playlist );
+    pl_Release( ((vlc_object_t*) p) );
+}
+
 static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
                    intf_thread_t *p_intf )
 {
@@ -240,6 +248,10 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
         notify_notification_set_icon_from_pixbuf( notification, pix );
         gdk_pixbuf_unref( pix );
     }
+
+    /* Adds a button in the notification to skip current element */
+    notify_notification_add_action( notification, "next", _("Skip"), Skip,
+                                    (gpointer*) p_intf, NULL );
 
     notify_notification_show( notification, NULL);
 
