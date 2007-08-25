@@ -135,9 +135,9 @@ MetaPanel::MetaPanel( QWidget *parent,
     CONNECT( artist_text, textEdited( QString ), this, editMeta( QString ) );
     CONNECT( collection_text, textEdited( QString ), this, editMeta( QString ) );
     CONNECT( genre_text, textEdited( QString ), this, editMeta( QString ) );
-    CONNECT( date_text, valueChanged( QString ), this, editMeta( QString ) );
+/*    CONNECT( date_text, valueChanged( QString ), this, editMeta( QString ) );
     CONNECT( seqnum_text, valueChanged( QString ), this, editMeta( QString ) );
-    CONNECT( rating_text, valueChanged( QString ), this, editMeta( QString ) );
+    CONNECT( rating_text, valueChanged( QString ), this, editMeta( QString ) );*/
     in_edit = false;
 }
 

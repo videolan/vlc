@@ -200,6 +200,7 @@ void MediaInfoDialog::close()
         deleteLater();
     }
     MP->setEdit( false );
+    in_edit = false;
 }
 
 void MediaInfoDialog::updateButtons( int i_tab )
