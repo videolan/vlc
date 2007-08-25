@@ -192,7 +192,7 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
     p_md = malloc( sizeof(libvlc_media_descriptor_t) );
     p_md->p_libvlc_instance = p_instance;
     p_md->p_input_item      = p_input_item;
-    p_md->b_preparsed       = VLC_TRUE;
+    p_md->b_preparsed       = VLC_FALSE;
     p_md->i_refcount        = 1;
 
     /* A media descriptor can be a playlist. When you open a playlist
