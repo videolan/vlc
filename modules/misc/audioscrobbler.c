@@ -100,6 +100,7 @@ intf_sys_t *p_sys_global;     /* to retrieve p_sys in Run() thread */
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
 static void Run         ( intf_thread_t * );
+static void Main        ( intf_thread_t * );
 static int ItemChange   ( vlc_object_t *, const char *, vlc_value_t,
                                 vlc_value_t, void * );
 static int PlayingChange( vlc_object_t *, const char *, vlc_value_t,
@@ -280,10 +281,19 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
+/****************************************************************************
+ * Run : create Main() thread
+ * **************************************************************************/
+static void Run( intf_thread_t *p_intf )
+{
+    if( vlc_thread_create( p_intf, "Audioscrobbler", Main, 0, VLC_TRUE ) )
+        msg_Err( p_intf, "failed to create Audioscrobbler thread" );
+}
+
 /*****************************************************************************
- * Run : call Handshake() then submit songs
+ * Main : call Handshake() then submit songs
  *****************************************************************************/
-static void Run( intf_thread_t *p_this )
+static void Main( intf_thread_t *p_this )
 {
     char                    *psz_submit         = NULL;
     char                    *psz_submit_song    = NULL;
@@ -295,6 +305,8 @@ static void Run( intf_thread_t *p_this )
     audioscrobbler_queue_t  *p_first_queue;
     int                     i_post_socket;
     time_t                  played_time;
+
+    vlc_thread_ready( p_this );
 
     p_this->p_sys = p_sys_global;
     intf_sys_t *p_sys = p_this->p_sys;
@@ -327,7 +339,7 @@ static void Run( intf_thread_t *p_this )
             if( p_sys->b_handshaked == VLC_FALSE )
             {
                 msg_Dbg( p_this, "Handshaking with last.fm ..." );
- 
+
                 switch( Handshake( p_this ) )
                 {
                     case VLC_ENOMEM:
