@@ -89,7 +89,7 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
     /* Add this to our media list */
     if( !p_md->p_subitems )
         p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance, NULL );
-    if( !p_md->p_subitems )
+    if( p_md->p_subitems )
     {
         libvlc_media_list_add_media_descriptor( p_md->p_subitems, p_md_child, NULL );
     }
