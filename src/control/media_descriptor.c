@@ -445,7 +445,7 @@ libvlc_media_list_t *
 libvlc_media_descriptor_subitems( libvlc_media_descriptor_t * p_md,
                                   libvlc_exception_t * p_e )
 {
-    libvlc_media_list_retain( p_md->p_subitems );
+    if( p_md->p_subitems )
+        libvlc_media_list_retain( p_md->p_subitems );
     return p_md->p_subitems;
 }
-
