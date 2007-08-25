@@ -161,9 +161,7 @@ void vlc_event_send( vlc_event_manager_t * p_em,
                     ppsz_event_type_to_name[p_event->type],
                     listener->p_user_data );
 #endif
-                /* This is safe to do that because we are sure 
-                 * that there will be no object owned references
-                 * used after the lock. */
+                /* XXX: Use recursive lock. */
                 vlc_mutex_unlock( &p_em->object_lock );
                 func( p_event, user_data );
                 vlc_mutex_lock( &p_em->object_lock );
