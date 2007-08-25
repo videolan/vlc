@@ -351,7 +351,7 @@ DBUS_METHOD( Identity )
 {
     REPLY_INIT;
     OUT_ARGUMENTS;
-    char *psz_identity = malloc( strlen( PACKAGE ) + strlen( VERSION ) + 1 );
+    char *psz_identity = malloc( strlen( PACKAGE ) + strlen( VERSION ) + 2 );
     sprintf( psz_identity, "%s %s", PACKAGE, VERSION );
     ADD_STRING( &psz_identity );
     free( psz_identity );
