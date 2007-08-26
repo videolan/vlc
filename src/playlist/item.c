@@ -83,6 +83,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
         {
             p_item_in_category = playlist_ItemToNode( p_playlist,
                     p_item_in_category, VLC_TRUE );
+            p_item_in_category->p_input->i_type = ITEM_TYPE_PLAYLIST;
         }
         
         playlist_BothAddInput( p_playlist, p_child, p_item_in_category, 
