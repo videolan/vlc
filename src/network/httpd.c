@@ -2048,12 +2048,20 @@ static void httpd_HostThread( httpd_host_t *host )
                     answer->i_body = 0;
                     answer->p_body = NULL;
 
+                    psz = httpd_MsgGet( query, "Require" );
+                    if( psz != NULL )
+                    {
+                        answer->i_status = 551;
+                        httpd_MsgAdd( query, "Unsupported", "%s", psz );
+                    }
+
                     psz = httpd_MsgGet( query, "Cseq" );
                     if( psz != NULL )
                         httpd_MsgAdd( answer, "Cseq", "%s", psz );
-                    psz = httpd_MsgGet( query, "Require" );
+                    psz = httpd_MsgGet( query, "Timestamp" );
                     if( psz != NULL )
-                        httpd_MsgAdd( query, "Unsupported", "%s", psz );
+                        httpd_MsgAdd( answer, "Timestamp", "%s", psz );
+
                     httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
                     httpd_MsgAdd( answer, "Public", "DESCRIBE, SETUP, "
                                  "TEARDOWN, PLAY, PAUSE" );

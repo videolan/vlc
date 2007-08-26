@@ -287,7 +287,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args,
                          httpd_message_t *answer, httpd_message_t *query )
 {
     rtsp_stream_t *rtsp = (rtsp_stream_t *)p_args;
-    const char *psz_session = NULL, *psz_cseq;
+    const char *psz_session = NULL, *psz;
 
     if( answer == NULL || query == NULL )
     {
@@ -387,9 +387,14 @@ static int RtspCallback( httpd_callback_sys_t *p_args,
 
     httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
-    psz_cseq = httpd_MsgGet( query, "Cseq" );
-    if( psz_cseq )
-        httpd_MsgAdd( answer, "Cseq", "%s", psz_cseq );
+
+    psz = httpd_MsgGet( query, "Cseq" );
+    if( psz != NULL )
+        httpd_MsgAdd( answer, "Cseq", "%s", psz );
+    psz = httpd_MsgGet( query, "Timestamp" );
+    if( psz != NULL )
+        httpd_MsgAdd( answer, "Timestamp", "%s", psz );
+
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
     if( psz_session )
@@ -433,8 +438,7 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     rtsp_stream_t    *rtsp = id->stream;
     sout_stream_t    *p_stream = id->stream->owner;
     char psz_session_init[21];
-    const char *psz_session;
-    const char *psz_cseq;
+    const char *psz_session, *psz;
 
     if( answer == NULL || query == NULL )
         return VLC_SUCCESS;
@@ -701,9 +705,12 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             break;
     }
 
-    psz_cseq = httpd_MsgGet( query, "Cseq" );
-    if( psz_cseq )
-        httpd_MsgAdd( answer, "Cseq", "%s", psz_cseq );
+    psz = httpd_MsgGet( query, "Cseq" );
+    if( psz != NULL )
+        httpd_MsgAdd( answer, "Cseq", "%s", psz );
+    psz = httpd_MsgGet( query, "Timestamp" );
+    if( psz != NULL )
+        httpd_MsgAdd( answer, "Timestamp", "%s", psz );
     httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
     httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
     httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
