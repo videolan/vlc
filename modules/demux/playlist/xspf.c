@@ -155,7 +155,7 @@ static vlc_bool_t parse_playlist_node COMPLEX_INTERFACE
           {"info",         SIMPLE_CONTENT,  {NULL} },
           {"location",     SIMPLE_CONTENT,  {NULL} },
           {"identifier",   SIMPLE_CONTENT,  {NULL} },
-          {"image",        SIMPLE_CONTENT,  {NULL} },
+          {"image",        SIMPLE_CONTENT,  {.smpl = set_item_info} },
           {"date",         SIMPLE_CONTENT,  {NULL} },
           {"license",      SIMPLE_CONTENT,  {NULL} },
           {"attribution",  COMPLEX_CONTENT, {.cmplx = skip_element} },
@@ -386,7 +386,7 @@ static vlc_bool_t parse_track_node COMPLEX_INTERFACE
           {"creator",      SIMPLE_CONTENT,  {.smpl = set_item_info} },
           {"annotation",   SIMPLE_CONTENT,  {.smpl = set_item_info} },
           {"info",         SIMPLE_CONTENT,  {NULL} },
-          {"image",        SIMPLE_CONTENT,  {NULL} },
+          {"image",        SIMPLE_CONTENT,  {.smpl = set_item_info} },
           {"album",        SIMPLE_CONTENT,  {.smpl = set_item_info} },
           {"trackNum",     SIMPLE_CONTENT,  {.smpl = set_item_info} },
           {"duration",     SIMPLE_CONTENT,  {.smpl = set_item_info} },
@@ -610,7 +610,7 @@ static vlc_bool_t set_item_info SIMPLE_INTERFACE
     /* handle each info element in a separate "if" clause */
     if( !strcmp( psz_name, "title" ) )
     {
-        p_input->psz_name = strdup( (char*)psz_value );
+        input_item_SetTitle( p_input, psz_value );
     }
     else if( !strcmp( psz_name, "creator" ) )
     {
@@ -633,6 +633,10 @@ static vlc_bool_t set_item_info SIMPLE_INTERFACE
     else if( !strcmp( psz_name, "annotation" ) )
     {
         input_item_SetDescription( p_input, psz_value );
+    }
+    else if( !strcmp( psz_name, "image" ) )
+    {
+        input_item_SetArtURL( p_input, psz_value );
     }
     return VLC_TRUE;
 }

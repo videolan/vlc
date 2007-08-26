@@ -150,7 +150,7 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     }
 
     /* -> the name/title (only if different from uri)*/
-    char *psz_name = input_item_GetName( p_item->p_input );
+    char *psz_name = input_item_GetTitle( p_item->p_input );
     if( psz_name && psz_uri && strcmp( psz_uri, psz_name ) )
     {
         psz_temp = convert_xml_special_chars( psz_name );
@@ -210,6 +210,13 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
         fprintf( p_file, "\t\t\t<annotation>%s</annotation>\n", psz_temp );
     }
     free( psz_temp );
+
+    psz = input_item_GetArtURL( p_item->p_input );
+    if( !EMPTY_STR( psz ) )
+    {
+        fprintf( p_file, "\t\t\t<image>%s</image>\n", psz );
+    }
+    free( psz );
 
 xspfexportitem_end:
     /* -> the duration */
