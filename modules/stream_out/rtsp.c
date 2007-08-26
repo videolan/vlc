@@ -332,6 +332,11 @@ static int RtspCallback( httpd_callback_sys_t *p_args,
             answer->i_status = 200;
 
             psz_session = httpd_MsgGet( query, "Session" );
+            if( httpd_MsgGet( query, "Range" ) != NULL )
+            {
+                answer->i_status = 456; /* cannot seek */
+                break;
+            }
 
             vlc_mutex_lock( &rtsp->lock );
             ses = RtspClientGet( rtsp, psz_session );
@@ -348,6 +353,9 @@ static int RtspCallback( httpd_callback_sys_t *p_args,
                 }
             }
             vlc_mutex_unlock( &rtsp->lock );
+
+            if( httpd_MsgGet( query, "Scale" ) != NULL )
+                httpd_MsgAdd( answer, "Scale", "1." );
             break;
         }
 
@@ -630,6 +638,11 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             answer->i_status = 200;
 
             psz_session = httpd_MsgGet( query, "Session" );
+            if( httpd_MsgGet( query, "Range" ) != NULL )
+            {
+                answer->i_status = 456; /* cannot seek */
+                break;
+            }
 
             vlc_mutex_lock( &rtsp->lock );
             ses = RtspClientGet( rtsp, psz_session );
@@ -646,6 +659,9 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 }
             }
             vlc_mutex_unlock( &rtsp->lock );
+
+            if( httpd_MsgGet( query, "Scale" ) != NULL )
+                httpd_MsgAdd( answer, "Scale", "1." );
             break;
         }
 
