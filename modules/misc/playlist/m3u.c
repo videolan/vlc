@@ -87,7 +87,6 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
             }
             free( psz_artist );
         }
-        free( psz_uri );
         free( psz_name );
 
         /* VLC specific options */
@@ -102,6 +101,7 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
         vlc_mutex_unlock( &p_current->p_input->lock );
 
         fprintf( p_export->p_file, "%s\n", psz_uri );
+        free( psz_uri );
     }
 }
 
