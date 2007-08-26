@@ -517,7 +517,7 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
     p_input = (input_thread_t *)vlc_object_find( p_filter, VLC_OBJECT_INPUT, FIND_PARENT );
     if( ! p_input )
         return VLC_EGENERIC;
-    
+
     if( VLC_SUCCESS != input_Control( p_input, INPUT_GET_ATTACHMENTS, &pp_attachments, &i_attachments_cnt ))
     {
         vlc_object_release(p_input);
@@ -552,7 +552,7 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
             vlc_input_attachment_Delete( p_attach );
         }
     }
-    free( pp_attachments );        
+    free( pp_attachments );
 
     vlc_object_release(p_input);
 
@@ -1057,7 +1057,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
         i_scale = val.i_int;
- 
+
     if( p_region_in->p_style )
     {
         i_font_color = __MAX( __MIN( p_region_in->p_style->i_font_color, 0xFFFFFF ), 0 );
@@ -1517,7 +1517,7 @@ static void IconvText( filter_t *p_filter, const char *psz_string,
 }
 
 static ft_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
-        font_stack_t **p_fonts, vlc_bool_t b_bold, vlc_bool_t b_italic, 
+        font_stack_t **p_fonts, vlc_bool_t b_bold, vlc_bool_t b_italic,
         vlc_bool_t b_uline )
 {
     ft_style_t   *p_style = NULL;
@@ -1919,7 +1919,7 @@ static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
                 }
                 if( *ppi_k_durations )
                     (*ppi_k_durations)[ *pi_k_runs - 1 ] = atoi( psz_value );
-                
+
                 if( *ppi_k_run_lengths )
                     (*ppi_k_run_lengths)[ *pi_k_runs - 1 ] = 0;
             }
@@ -1959,7 +1959,7 @@ static int ProcessNodes( filter_t *p_filter,
 
     if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
         i_scale = val.i_int;
- 
+
     if( p_font_style )
     {
         rv = PushFont( &p_fonts,
@@ -2135,7 +2135,7 @@ static int CheckForEmbeddedFont( filter_sys_t *p_sys, FT_Face *pp_face, ft_style
                     *pp_face = p_face;
                     return VLC_SUCCESS;
                 }
-                
+
                 FT_Done_Face( p_face );
             }
             i_font_idx++;
@@ -2152,13 +2152,13 @@ static int ProcessLines( filter_t *p_filter,
                          uint32_t *pi_run_lengths,
                          ft_style_t **pp_styles,
                          line_desc_t **pp_lines,
-                         
+
                          FT_Vector *p_result,
 
                          vlc_bool_t b_karaoke,
                          uint32_t i_k_runs,
                          uint32_t *pi_k_run_lengths,
-                         uint32_t *pi_k_durations ) 
+                         uint32_t *pi_k_durations )
 {
     filter_sys_t   *p_sys = p_filter->p_sys;
     ft_style_t    **pp_char_styles;
@@ -2276,7 +2276,7 @@ static int ProcessLines( filter_t *p_filter,
         int64_t i_duration = 0;
         int64_t i_start_pos = 0;
         int64_t i_elapsed  = var_GetTime( p_filter, "spu-elapsed" ) / 1000;
-        
+
         for( k = 0; k< i_k_runs; k++ )
         {
              double fraction = 0.0;
@@ -2324,7 +2324,7 @@ static int ProcessLines( filter_t *p_filter,
                                    ((p_levels ? (p_levels[ j ] % 2) : 0 ) << 7);
                  }
              }
-             
+
              i_last_duration = i_duration;
              i_start_pos += pi_k_run_lengths[ k ];
         }
