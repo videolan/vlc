@@ -319,7 +319,7 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
     */
 
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((int)p_line2|(int)p_y2))) )
+        ((intptr_t)p_line2|(intptr_t)p_y2))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
@@ -529,7 +529,7 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
     ** if memory access is 16 bytes aligned
     */
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((int)p_line2|(int)p_y2))) )
+        ((intptr_t)p_line2|(intptr_t)p_y2))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
@@ -738,7 +738,7 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
     ** if memory access is 16 bytes aligned
     */
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((int)p_line2|(int)p_y2))) )
+        ((intptr_t)p_line2|(intptr_t)p_y2))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
@@ -878,7 +878,7 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
     ** if memory access is 16 bytes aligned
     */
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((int)p_line2|(int)p_y2))) )
+        ((intptr_t)p_line2|(intptr_t)p_y2))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )

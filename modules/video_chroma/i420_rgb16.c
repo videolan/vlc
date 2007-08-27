@@ -370,8 +370,8 @@ void E_(I420_R5G5B5)( vout_thread_t *p_vout, picture_t *p_src,
     p_buffer = b_hscale ? p_buffer_start : p_pic;
     if( 0 == (15 & (p_src->p[Y_PLANE].i_pitch|
                     p_dest->p->i_pitch|
-                    ((int)p_y)|
-                    ((int)p_buffer))) )
+                    ((intptr_t)p_y)|
+                    ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
@@ -611,8 +611,8 @@ void E_(I420_R5G6B5)( vout_thread_t *p_vout, picture_t *p_src,
     p_buffer = b_hscale ? p_buffer_start : p_pic;
     if( 0 == (15 & (p_src->p[Y_PLANE].i_pitch|
                     p_dest->p->i_pitch|
-                    ((int)p_y)|
-                    ((int)p_buffer))) )
+                    ((intptr_t)p_y)|
+                    ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
@@ -964,8 +964,8 @@ void E_(I420_A8R8G8B8)( vout_thread_t *p_vout, picture_t *p_src,
     p_buffer = b_hscale ? p_buffer_start : p_pic;
     if( 0 == (15 & (p_src->p[Y_PLANE].i_pitch|
                     p_dest->p->i_pitch|
-                    ((int)p_y)|
-                    ((int)p_buffer))) )
+                    ((intptr_t)p_y)|
+                    ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
@@ -1203,8 +1203,8 @@ void E_(I420_R8G8B8A8)( vout_thread_t *p_vout, picture_t *p_src,
     p_buffer = b_hscale ? p_buffer_start : p_pic;
     if( 0 == (15 & (p_src->p[Y_PLANE].i_pitch|
                     p_dest->p->i_pitch|
-                    ((int)p_y)|
-                    ((int)p_buffer))) )
+                    ((intptr_t)p_y)|
+                    ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
@@ -1442,8 +1442,8 @@ void E_(I420_B8G8R8A8)( vout_thread_t *p_vout, picture_t *p_src,
     p_buffer = b_hscale ? p_buffer_start : p_pic;
     if( 0 == (15 & (p_src->p[Y_PLANE].i_pitch|
                     p_dest->p->i_pitch|
-                    ((int)p_y)|
-                    ((int)p_buffer))) )
+                    ((intptr_t)p_y)|
+                    ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )
@@ -1678,8 +1678,8 @@ void E_(I420_A8B8G8R8)( vout_thread_t *p_vout, picture_t *p_src,
     p_buffer = b_hscale ? p_buffer_start : p_pic;
     if( 0 == (15 & (p_src->p[Y_PLANE].i_pitch|
                     p_dest->p->i_pitch|
-                    ((int)p_y)|
-                    ((int)p_buffer))) )
+                    ((intptr_t)p_y)|
+                    ((intptr_t)p_buffer))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = 0; i_y < p_vout->render.i_height; i_y++ )

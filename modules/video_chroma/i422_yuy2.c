@@ -161,7 +161,7 @@ static void I422_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 #if defined (MODULE_NAME_IS_i422_yuy2_sse2)
 
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((int)p_line|(int)p_y))) )
+        ((intptr_t)p_line|(intptr_t)p_y))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = p_vout->render.i_height ; i_y-- ; )
@@ -254,7 +254,7 @@ static void I422_YVYU( vout_thread_t *p_vout, picture_t *p_source,
 #if defined (MODULE_NAME_IS_i422_yuy2_sse2)
 
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((int)p_line|(int)p_y))) )
+        ((intptr_t)p_line|(intptr_t)p_y))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = p_vout->render.i_height ; i_y-- ; )
@@ -347,7 +347,7 @@ static void I422_UYVY( vout_thread_t *p_vout, picture_t *p_source,
 #if defined (MODULE_NAME_IS_i422_yuy2_sse2)
 
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((int)p_line|(int)p_y))) )
+        ((intptr_t)p_line|(intptr_t)p_y))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = p_vout->render.i_height ; i_y-- ; )
@@ -450,7 +450,7 @@ static void I422_cyuv( vout_thread_t *p_vout, picture_t *p_source,
 #if defined (MODULE_NAME_IS_i422_yuy2_sse2)
 
     if( 0 == (15 & (p_source->p[Y_PLANE].i_pitch|p_dest->p->i_pitch|
-        ((int)p_line|(int)p_y))) )
+        ((intptr_t)p_line|(intptr_t)p_y))) )
     {
         /* use faster SSE2 aligned fetch and store */
         for( i_y = p_vout->render.i_height ; i_y-- ; )
