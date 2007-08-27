@@ -161,6 +161,7 @@ void vlc_event_send( vlc_event_manager_t * p_em,
             if( !array_of_cached_listeners )
             {
                 msg_Err( p_em->p_parent_object, "Not enough memory in vlc_event_send" );
+                vlc_mutex_unlock( &p_em->object_lock );
                 return;
             }
 
@@ -170,7 +171,9 @@ void vlc_event_send( vlc_event_manager_t * p_em,
 #ifdef DEBUG_EVENT
                 cached_listener->psz_debug_name = strdup(cached_listener->psz_debug_name);
 #endif
-                cached_listener += sizeof(vlc_event_listener_t);
+                printf("%p\n", cached_listener);
+                cached_listener++;
+                printf("%p\n", cached_listener-1);
             FOREACH_END()
 
             break;
@@ -192,7 +195,7 @@ void vlc_event_send( vlc_event_manager_t * p_em,
 #endif
 
         cached_listener->pf_callback( p_event, cached_listener->p_user_data );
-        cached_listener += sizeof(vlc_event_listener_t) ;
+        cached_listener++;
     }
     free( array_of_cached_listeners );
 
