@@ -164,7 +164,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
             listener_cached = array_listeners_cached;
             FOREACH_ARRAY( listener, listeners_group->listeners )
                 memcpy( listener_cached, listener, sizeof(libvlc_event_listener_t));
-                listener_cached += sizeof(libvlc_event_listener_t) ;
+                listener_cached++;
             FOREACH_END()
             break;
         }
@@ -175,7 +175,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
     for( i = 0; i < i_cached_listeners; i++ )
     {
         listener_cached->pf_callback( p_event, listener_cached->p_user_data );
-        listener_cached += sizeof(libvlc_event_listener_t) ;
+        listener_cached++;
     }
     free( array_listeners_cached );
 }
