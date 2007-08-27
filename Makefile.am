@@ -213,8 +213,8 @@ EXTRA_DIST += \
 	extras/make.pl \
 	extras/valgrind.suppressions \
 	extras/m4/autoconf260.m4 \
-	extras/dbus-vlc.py \
-	extras/dbus-vlc.glade
+	extras/mpris.py \
+	extras/mpris.glade
 
 dist-hook:
 	distdir=$(distdir) srcdir=$(srcdir) $(SHELL) $(srcdir)/toolbox --dist-contrib
