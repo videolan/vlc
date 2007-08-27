@@ -105,8 +105,10 @@ void vlc_event_manager_fini( vlc_event_manager_t * p_em )
         FOREACH_ARRAY( listener, listeners_group->listeners )
             free( listener );
         FOREACH_END()
+        ARRAY_RESET( listeners_group->listeners );
         free( listeners_group );
     FOREACH_END()
+    ARRAY_RESET( p_em->listeners_groups );
 }
 
 /**
