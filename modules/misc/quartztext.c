@@ -58,6 +58,7 @@ static int RenderText( filter_t *, subpicture_region_t *,
 static int RenderHtml( filter_t *, subpicture_region_t *,
                        subpicture_region_t * );
 
+static int GetFontSize( filter_t *p_filter );
 static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
                        UniChar *psz_utfString, uint32_t i_text_len,
                        uint32_t i_runs, uint32_t *pi_run_lengths,
@@ -91,7 +92,7 @@ struct font_stack_t
 {
     char          *psz_name;
     int            i_size;
-    uint32_t       i_color;
+    uint32_t       i_color;            // ARGB
 
     font_stack_t  *p_next;
 };
@@ -143,7 +144,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->psz_font_name  = strdup( DEFAULT_FONT );
     p_sys->i_font_opacity = 255;
     p_sys->i_font_color   = DEFAULT_FONT_COLOR;
-    p_sys->i_font_size    = p_filter->fmt_out.video.i_height / DEFAULT_REL_FONT_SIZE;
+    p_sys->i_font_size    = GetFontSize( p_filter );
 
     p_filter->pf_render_text = RenderText;
     p_filter->pf_render_html = RenderHtml;
@@ -352,17 +353,24 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     uint32_t      i_string_length;
     char         *psz_string;
     int           i_font_color, i_font_alpha, i_font_size;
+    vlc_value_t val;
+    int i_scale = 1000;
+
+    p_sys->i_font_size    = GetFontSize( p_filter );
 
     // Sanity check
     if( !p_region_in || !p_region_out ) return VLC_EGENERIC;
     psz_string = p_region_in->psz_text;
     if( !psz_string || !*psz_string ) return VLC_EGENERIC;
 
+    if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
+        i_scale = val.i_int;
+
     if( p_region_in->p_style )
     {
         i_font_color = __MAX( __MIN( p_region_in->p_style->i_font_color, 0xFFFFFF ), 0 );
         i_font_alpha = __MAX( __MIN( p_region_in->p_style->i_font_alpha, 255 ), 0 );
-        i_font_size  = __MAX( __MIN( p_region_in->p_style->i_font_size, 255 ), 0 );
+        i_font_size  = __MAX( __MIN( p_region_in->p_style->i_font_size, 255 ), 0 ) * i_scale / 1000;
     }
     else
     {
@@ -381,7 +389,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( psz_utf16_str != NULL )
     {
         ATSUStyle p_style = CreateStyle( p_sys->psz_font_name, i_font_size,
-                                         (i_font_color & 0xfffffff) |
+                                         (i_font_color & 0xffffff) |
                                          ((i_font_alpha & 0xff) << 24),
                                          VLC_FALSE, VLC_FALSE, VLC_FALSE );
         if( p_style )
@@ -536,8 +544,9 @@ static int PeekFont( font_stack_t **p_font, char **psz_name, int *i_size,
     return VLC_SUCCESS;
 }
 
-static ATSUStyle GetStyleFromFontStack( filter_sys_t *p_sys, font_stack_t **p_fonts,
-                              vlc_bool_t b_bold, vlc_bool_t b_italic, vlc_bool_t b_uline )
+static ATSUStyle GetStyleFromFontStack( filter_sys_t *p_sys,
+        font_stack_t **p_fonts, vlc_bool_t b_bold, vlc_bool_t b_italic,
+        vlc_bool_t b_uline )
 {
     ATSUStyle   p_style = NULL;
 
@@ -545,7 +554,8 @@ static ATSUStyle GetStyleFromFontStack( filter_sys_t *p_sys, font_stack_t **p_fo
     uint32_t  i_font_color = p_sys->i_font_color;
     int       i_font_size  = p_sys->i_font_size;
 
-    if( VLC_SUCCESS == PeekFont( p_fonts, &psz_fontname, &i_font_size, &i_font_color ) )
+    if( VLC_SUCCESS == PeekFont( p_fonts, &psz_fontname, &i_font_size,
+                                 &i_font_color ))
     {
         p_style = CreateStyle( psz_fontname, i_font_size, i_font_color,
                                b_bold, b_italic, b_uline );
@@ -554,7 +564,7 @@ static ATSUStyle GetStyleFromFontStack( filter_sys_t *p_sys, font_stack_t **p_fo
 }
 
 static int HandleFontAttributes( xml_reader_t *p_xml_reader,
-                                  font_stack_t **p_fonts )
+                                  font_stack_t **p_fonts, int i_scale )
 {
     int        rv;
     char      *psz_fontname = NULL;
@@ -570,6 +580,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
                                  &i_font_color ))
     {
         psz_fontname = strdup( psz_fontname );
+        i_font_size = i_font_size * 1000 / i_scale;
     }
     i_font_alpha = (i_font_color >> 24) & 0xff;
     i_font_color &= 0x00ffffff;
@@ -620,8 +631,8 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
     }
     rv = PushFont( p_fonts,
                    psz_fontname,
-                   i_font_size,
-                   (i_font_color & 0xffffff) | ((i_font_alpha & 0xff) << 24));
+                   i_font_size * i_scale / 1000,
+                   (i_font_color & 0xffffff) | ((i_font_alpha & 0xff) << 24) );
 
     free( psz_fontname );
 
@@ -638,10 +649,12 @@ static int ProcessNodes( filter_t *p_filter,
                          uint32_t **ppi_run_lengths,
                          ATSUStyle **ppp_styles )
 {
+    int           rv             = VLC_SUCCESS;
     filter_sys_t *p_sys          = p_filter->p_sys;
     UniChar      *psz_text_orig  = psz_text;
     font_stack_t *p_fonts        = NULL;
-    int           rv             = VLC_SUCCESS;
+    vlc_value_t   val;
+    int           i_scale        = 1000;
 
     char *psz_node  = NULL;
 
@@ -649,11 +662,14 @@ static int ProcessNodes( filter_t *p_filter,
     vlc_bool_t b_bold   = VLC_FALSE;
     vlc_bool_t b_uline  = VLC_FALSE;
 
+    if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
+        i_scale = val.i_int;
+
     if( p_font_style )
     {
         rv = PushFont( &p_fonts,
                p_font_style->psz_fontname,
-               p_font_style->i_font_size,
+               p_font_style->i_font_size * i_scale / 1000,
                (p_font_style->i_font_color & 0xffffff) |
                    ((p_font_style->i_font_alpha & 0xff) << 24) );
 
@@ -702,7 +718,7 @@ static int ProcessNodes( filter_t *p_filter,
                 if( psz_node )
                 {
                     if( !strcasecmp( "font", psz_node ) )
-                        rv = HandleFontAttributes( p_xml_reader, &p_fonts );
+                        rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
                     else if( !strcasecmp( "b", psz_node ) )
                         b_bold = VLC_TRUE;
                     else if( !strcasecmp( "i", psz_node ) )
@@ -799,6 +815,9 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( !p_region_in || !p_region_in->psz_html )
         return VLC_EGENERIC;
 
+    /* Reset the default fontsize in case screen metrics have changed */
+    p_filter->p_sys->i_font_size = GetFontSize( p_filter );
+
     p_sub = stream_MemoryNew( VLC_OBJECT(p_filter),
                               (uint8_t *) p_region_in->psz_html,
                               strlen( p_region_in->psz_html ),
@@ -808,7 +827,40 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
         p_xml = xml_Create( p_filter );
         if( p_xml )
         {
+            vlc_bool_t b_karaoke = VLC_FALSE;
+
             p_xml_reader = xml_ReaderCreate( p_xml, p_sub );
+            if( p_xml_reader )
+            {
+                /* Look for Root Node */
+                if( xml_ReaderRead( p_xml_reader ) == 1 )
+                {
+                    char *psz_node = xml_ReaderName( p_xml_reader );
+
+                    if( !strcasecmp( "karaoke", psz_node ) )
+                    {
+                        /* We're going to have to render the text a number
+                         * of times to show the progress marker on the text.
+                         */
+                        var_SetBool( p_filter, "text-rerender", VLC_TRUE );
+                        b_karaoke = VLC_TRUE;
+                    }
+                    else if( !strcasecmp( "text", psz_node ) )
+                    {
+                        b_karaoke = VLC_FALSE;
+                    }
+                    else
+                    {
+                        /* Only text and karaoke tags are supported */
+                        xml_ReaderDelete( p_xml, p_xml_reader );
+                        p_xml_reader = NULL;
+                        rv = VLC_EGENERIC;
+                    }
+
+                    free( psz_node );
+                }
+            }
+
             if( p_xml_reader )
             {
                 UniChar    *psz_text;
@@ -817,24 +869,29 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                 uint32_t   *pi_run_lengths = NULL;
                 ATSUStyle  *pp_styles = NULL;
 
-                psz_text = (UniChar *) calloc( strlen( p_region_in->psz_html ), sizeof( UniChar ) );
+                psz_text = (UniChar *) malloc( strlen( p_region_in->psz_html ) *
+                                                sizeof( UniChar ) );
                 if( psz_text )
                 {
                     uint32_t k;
 
-                    ProcessNodes( p_filter, p_xml_reader, p_region_in->p_style, psz_text,
-                                  &i_len, &i_runs, &pi_run_lengths, &pp_styles );
+                    rv = ProcessNodes( p_filter, p_xml_reader,
+                                  p_region_in->p_style, psz_text, &i_len,
+                                  &i_runs, &pi_run_lengths, &pp_styles );
 
                     p_region_out->i_x = p_region_in->i_x;
                     p_region_out->i_y = p_region_in->i_y;
 
-                    RenderYUVA( p_filter, p_region_out, psz_text, i_len, i_runs, pi_run_lengths, pp_styles);
+                    if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
+                    {
+                        RenderYUVA( p_filter, p_region_out, psz_text, i_len, i_runs,
+                             pi_run_lengths, pp_styles);
+                    }
 
                     for( k=0; k<i_runs; k++)
                         ATSUDisposeStyle( pp_styles[k] );
                     free( pp_styles );
                     free( pi_run_lengths );
-
                     free( psz_text );
                 }
 
@@ -1002,6 +1059,11 @@ static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, ui
     if( p_colorSpace ) CGColorSpaceRelease( p_colorSpace );
 
     return p_offScreen;
+}
+
+static int GetFontSize( filter_t *p_filter )
+{
+    return p_filter->fmt_out.video.i_height / DEFAULT_REL_FONT_SIZE;
 }
 
 static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region, UniChar *psz_utf16_str,
