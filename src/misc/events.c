@@ -188,6 +188,7 @@ void vlc_event_send( vlc_event_manager_t * p_em,
                     cached_listener->psz_debug_name,
                     ppsz_event_type_to_name[p_event->type],
                     cached_listener->p_user_data );
+        free(psz_debug_name);
 #endif
 
         cached_listener->pf_callback( p_event, cached_listener->p_user_data );
