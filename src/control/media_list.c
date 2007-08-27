@@ -336,7 +336,7 @@ void libvlc_media_list_add_media_descriptor(
 {
     (void)p_e;
     libvlc_media_descriptor_retain( p_md );
-    ARRAY_APPEND( p_mlist->items, p_md );
+    ARRAY_INSERT( p_mlist->items, p_md, p_mlist->items.i_size );
     notify_item_addition( p_mlist, p_md, p_mlist->items.i_size-1 );
     install_media_descriptor_observer( p_mlist, p_md );
 }
