@@ -171,9 +171,7 @@ void vlc_event_send( vlc_event_manager_t * p_em,
 #ifdef DEBUG_EVENT
                 cached_listener->psz_debug_name = strdup(cached_listener->psz_debug_name);
 #endif
-                printf("%p\n", cached_listener);
                 cached_listener++;
-                printf("%p\n", cached_listener-1);
             FOREACH_END()
 
             break;
