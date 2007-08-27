@@ -221,7 +221,7 @@ libvlc_media_list_player_new( libvlc_instance_t * p_instance,
  **************************************************************************/
 void libvlc_media_list_player_release( libvlc_media_list_player_t * p_mlp )
 {
-    libvlc_event_manager_release( p_mlib->p_event_manager );
+    libvlc_event_manager_release( p_mlp->p_event_manager );
     free(p_mlp);
 }
 
