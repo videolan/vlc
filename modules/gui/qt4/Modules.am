@@ -161,8 +161,7 @@ EXTRA_DIST += \
 	pixmaps/type_playlist.xpm \
 	pixmaps/video.xpm \
 	pixmaps/type_unknown.xpm \
-	pixmaps/type_afile.xpm \
-	pixmaps/type_vfile.xpm \
+	pixmaps/type_file.xpm \
 	pixmaps/type_card.xpm \
 	pixmaps/type_disc.xpm \
 	pixmaps/type_cdda.xpm \
