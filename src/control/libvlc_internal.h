@@ -223,6 +223,7 @@ typedef struct libvlc_event_manager_t
     void * p_obj;
     struct libvlc_instance_t * p_libvlc_instance;
     DECL_ARRAY(libvlc_event_listeners_group_t *) listeners_groups;
+    vlc_mutex_t object_lock;
 } libvlc_event_sender_t;
 
 
@@ -247,8 +248,7 @@ VLC_EXPORT (libvlc_media_descriptor_t *, libvlc_media_descriptor_duplicate,
                         ( libvlc_media_descriptor_t * ) );
 
 /* Media List */
-VLC_EXPORT ( void, libvlc_media_list_flat_media_list_release,
-                        ( libvlc_media_list_t * ) );
+VLC_EXPORT ( void, libvlc_media_list_flat_media_list_release, ( libvlc_media_list_t * ) );
 
 /* Events */
 VLC_EXPORT (void, libvlc_event_init, ( libvlc_instance_t *p_instance, libvlc_exception_t *p_e ) );
