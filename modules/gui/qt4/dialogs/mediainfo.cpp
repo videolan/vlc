@@ -142,7 +142,12 @@ void MediaInfoDialog::setInput( input_item_t *p_input )
      *
      * This really doesn't seem as clean solution as it could be
      */
-    in_edit = ( input_GetItem( MainInputManager::getInstance( p_intf )->getInput() ) != p_input );
+    input_thread_t *p_current =
+                     MainInputManager::getInstance( p_intf )->getInput();
+    if( !p_current || p_current->b_dead )
+        in_edit = true;
+    else
+        in_edit = ( input_GetItem( p_current ) != p_input );
     MP->setEdit( in_edit );
 }
 
