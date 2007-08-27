@@ -140,8 +140,9 @@ void vlc_event_send( vlc_event_manager_t * p_em,
 {
     vlc_event_listeners_group_t * listeners_group;
     vlc_event_listener_t * listener;
-    vlc_event_callback_t func = NULL;
-    void * user_data = NULL;
+    vlc_event_listener_t * array_of_cached_listeners = NULL;
+    vlc_event_listener_t * cached_listener;
+    int i, i_cached_listeners = 0;
 
     /* Fill event with the sending object now */
     p_event->p_obj = p_em->p_obj;
@@ -150,26 +151,50 @@ void vlc_event_send( vlc_event_manager_t * p_em,
     FOREACH_ARRAY( listeners_group, p_em->listeners_groups )
         if( listeners_group->event_type == p_event->type )
         {
-            /* We found the group, now send every one the event */
+            if( listeners_group->listeners.i_size <= 0 )
+                break;
+
+            /* Save the function to call */
+            i_cached_listeners = listeners_group->listeners.i_size;
+            array_of_cached_listeners = malloc(
+                    sizeof(vlc_event_listener_t)*i_cached_listeners );
+            if( !array_of_cached_listeners )
+            {
+                msg_Err( p_em->p_parent_object, "Not enough memory in vlc_event_send" );
+                return;
+            }
+
+            cached_listener = array_of_cached_listeners;
             FOREACH_ARRAY( listener, listeners_group->listeners )
-                func = listener->pf_callback;
-                user_data = listener->p_user_data;
+                memcpy( cached_listener, listener, sizeof(vlc_event_listener_t));
 #ifdef DEBUG_EVENT
-                msg_Dbg( p_em->p_parent_object,
-                    "Calling '%s' with a '%s' event (data %p)",
-                    listener->psz_debug_name,
-                    ppsz_event_type_to_name[p_event->type],
-                    listener->p_user_data );
+                cached_listener->psz_debug_name = strdup(cached_listener->psz_debug_name);
 #endif
-                /* XXX: Use recursive lock. */
-                vlc_mutex_unlock( &p_em->object_lock );
-                func( p_event, user_data );
-                vlc_mutex_lock( &p_em->object_lock );
+                cached_listener += sizeof(vlc_event_listener_t);
             FOREACH_END()
+
             break;
         }
     FOREACH_END()
     vlc_mutex_unlock( &p_em->object_lock );
+    
+    /* Call the function attached */
+    cached_listener = array_of_cached_listeners;
+    for( i = 0; i < i_cached_listeners; i++ )
+    {
+#ifdef DEBUG_EVENT
+        msg_Dbg( p_em->p_parent_object,
+                    "Calling '%s' with a '%s' event (data %p)",
+                    cached_listener->psz_debug_name,
+                    ppsz_event_type_to_name[p_event->type],
+                    cached_listener->p_user_data );
+#endif
+
+        cached_listener->pf_callback( p_event, cached_listener->p_user_data );
+        cached_listener += sizeof(vlc_event_listener_t) ;
+    }
+    free( array_of_cached_listeners );
+
 }
 
 /**
