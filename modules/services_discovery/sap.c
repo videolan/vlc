@@ -303,7 +303,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_timeshift = var_CreateGetInteger( p_sd, "sap-timeshift" );
 
     /* Set our name */
-    services_discovery_SetLocalizedName( p_sd, _("SAP sessions") );
+    services_discovery_SetLocalizedName( p_sd, _("SAP") );
 
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;
