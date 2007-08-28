@@ -594,6 +594,12 @@ VLC_PUBLIC_API void
                                    libvlc_exception_t * p_e );
 
 VLC_PUBLIC_API void
+    libvlc_media_list_player_play_item(
+                                   libvlc_media_list_player_t * p_mlp,
+                                   libvlc_media_descriptor_t * p_md,
+                                   libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API void
     libvlc_media_list_player_stop( libvlc_media_list_player_t * p_mlp,
                                    libvlc_exception_t * p_e );
 VLC_PUBLIC_API void
