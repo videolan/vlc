@@ -77,7 +77,7 @@ libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst,
     p_em->p_libvlc_instance = p_libvlc_inst;
     ARRAY_INIT( p_em->listeners_groups );
     vlc_mutex_init( p_libvlc_inst->p_libvlc_int, &p_em->object_lock );
-
+    vlc_mutex_init( p_libvlc_inst->p_libvlc_int, &p_em->event_sending_lock );
     return p_em;
 }
 
@@ -91,6 +91,7 @@ void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
     libvlc_event_listeners_group_t * listeners_group;
     libvlc_event_listener_t * listener;
 
+    vlc_mutex_destroy( &p_em->event_sending_lock );
     vlc_mutex_destroy( &p_em->object_lock );
 
     FOREACH_ARRAY( listeners_group, p_em->listeners_groups )
@@ -147,6 +148,8 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
     /* Fill event with the sending object now */
     p_event->p_obj = p_em->p_obj;
 
+    /* Here a read/write lock would be nice */
+
     vlc_mutex_lock( &p_em->object_lock );
     FOREACH_ARRAY( listeners_group, p_em->listeners_groups )
         if( listeners_group->event_type == p_event->type )
@@ -171,14 +174,23 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
             break;
         }
     FOREACH_END()
+
     vlc_mutex_unlock( &p_em->object_lock );
 
+    /* Here a read/write lock would be *especially* nice,
+     * We would be able to send event without blocking */
+    /* The only reason for this lock is to be able to wait the
+     * End of events sending with libvlc_event_manager_lock_event_sending.
+     * This can be useful to make sure a callback is completely detached. */
+    vlc_mutex_lock( &p_em->event_sending_lock );
     listener_cached = array_listeners_cached;
     for( i = 0; i < i_cached_listeners; i++ )
     {
         listener_cached->pf_callback( p_event, listener_cached->p_user_data );
         listener_cached++;
     }
+    vlc_mutex_unlock( &p_em->event_sending_lock );
+
     free( array_listeners_cached );
 }
 
@@ -238,9 +250,27 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
                           void *p_user_data,
                           libvlc_exception_t *p_e )
 {
+    libvlc_event_detach_lock_state( p_event_manager, event_type, pf_callback,
+                                    p_user_data, libvlc_UnLocked, p_e );
+}
+
+/**************************************************************************
+ *       libvlc_event_detach_no_lock (internal) :
+ *
+ * Remove a callback for an event.
+ **************************************************************************/
+void libvlc_event_detach_lock_state( libvlc_event_manager_t *p_event_manager,
+                                     libvlc_event_type_t event_type,
+                                     libvlc_callback_t pf_callback,
+                                     void *p_user_data,
+                                     libvlc_lock_state_t lockstate,
+                                     libvlc_exception_t *p_e )
+{
     libvlc_event_listeners_group_t * listeners_group;
     libvlc_event_listener_t * listener;
 
+    if( lockstate == libvlc_UnLocked )
+        vlc_mutex_lock( &p_event_manager->event_sending_lock );
     vlc_mutex_lock( &p_event_manager->object_lock );
     FOREACH_ARRAY( listeners_group, p_event_manager->listeners_groups )
         if( listeners_group->event_type == event_type )
@@ -256,12 +286,16 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
                         fe_idx /* This comes from the macro (and that's why
                                   I hate macro) */ );
                     vlc_mutex_unlock( &p_event_manager->object_lock );
+                    if( lockstate == libvlc_UnLocked )
+                        vlc_mutex_unlock( &p_event_manager->event_sending_lock );
                     return;
                 }
             FOREACH_END()
         }
     FOREACH_END()
     vlc_mutex_unlock( &p_event_manager->object_lock );
+    if( lockstate == libvlc_UnLocked )
+        vlc_mutex_unlock( &p_event_manager->event_sending_lock );
 
     libvlc_exception_raise( p_e,
             "This object event manager doesn't know about '%i,%p,%p' event observer",
