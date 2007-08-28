@@ -95,16 +95,6 @@ struct libvlc_tag_query_t
     char *             psz_tag_key;
 };
 
-struct libvlc_tree_t
-{
-    libvlc_event_manager_t * p_event_manager;
-    int     i_refcount;
-    void *  p_item; /* For dynamic sublist */
-    libvlc_retain_function  pf_item_retain;
-    libvlc_release_function pf_item_release;
-    DECL_ARRAY(struct libvlc_tree_t *)  subtrees; /* For dynamic sublist */
-};
-
 struct libvlc_media_list_t
 {
     libvlc_event_manager_t * p_event_manager;
@@ -161,7 +151,6 @@ struct libvlc_media_library_t
     libvlc_instance_t *      p_libvlc_instance;
     int                      i_refcount;
     libvlc_media_list_t *    p_mlist;
-    libvlc_tree_t *          p_playlists_tree;
 };
 
 struct libvlc_media_discoverer_t

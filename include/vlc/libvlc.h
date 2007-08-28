@@ -122,58 +122,6 @@ VLC_PUBLIC_API void libvlc_destroy( libvlc_instance_t *, libvlc_exception_t * );
 /** @}*/
 
 /*****************************************************************************
- * Tree
- *****************************************************************************/
-/** defgroup libvlc_tree Tree
- * \ingroup libvlc
- * LibVLC Tree. A tree holds an item plus several subtrees.
- * @{
- */
-VLC_PUBLIC_API libvlc_tree_t *
-    libvlc_tree_new_with_media_list_as_item( libvlc_media_list_t * p_mlist,
-                                             libvlc_exception_t * p_e );
-
-VLC_PUBLIC_API libvlc_tree_t *
-    libvlc_tree_new_with_string_as_item( const char * psz,
-                                         libvlc_exception_t * p_e );
-VLC_PUBLIC_API void
-    libvlc_tree_release( libvlc_tree_t * p_tree );
-
-VLC_PUBLIC_API void
-    libvlc_tree_retain( libvlc_tree_t * p_tree );
-
-VLC_PUBLIC_API char *
-    libvlc_tree_item_as_string( libvlc_tree_t * p_tree,
-                                libvlc_exception_t * p_e );
-
-VLC_PUBLIC_API libvlc_media_list_t *
-    libvlc_tree_item_as_media_list( libvlc_tree_t * p_tree,
-                                    libvlc_exception_t * p_e );
-
-VLC_PUBLIC_API int
-    libvlc_tree_subtree_count( libvlc_tree_t * p_tree, libvlc_exception_t * p_e );
-
-VLC_PUBLIC_API libvlc_tree_t *
-    libvlc_tree_subtree_at_index( libvlc_tree_t * p_tree,
-                              int index,
-                              libvlc_exception_t * p_e );
-
-VLC_PUBLIC_API void
-    libvlc_tree_insert_subtree_at_index( libvlc_tree_t * p_tree,
-                                         libvlc_tree_t * p_subtree,
-                                         int index,
-                                         libvlc_exception_t * p_e );
-
-VLC_PUBLIC_API void
-    libvlc_tree_remove_subtree_at_index( libvlc_tree_t * p_tree,
-                                         int index,
-                                         libvlc_exception_t * p_e );
-
-/**@} */
-
-
-
-/*****************************************************************************
  * Media descriptor
  *****************************************************************************/
 /** defgroup libvlc_media_descriptor Media Descriptor
@@ -1231,7 +1179,6 @@ VLC_PUBLIC_API void libvlc_event_detach( libvlc_event_manager_t *p_event_manager
                                          libvlc_callback_t f_callback,
                                          void *p_user_data,
                                          libvlc_exception_t *p_e );
-
 
 /**
  * Get an event type name 
