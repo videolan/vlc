@@ -129,37 +129,6 @@ dynamic_list_remove_item( const libvlc_event_t * p_event, void * p_user_data )
     //libvlc_media_descriptor_unlock( p_md );
 }
 
-/**************************************************************************
- *       dynamic_list_change_item (private) (Event Callback)
- *
- * This is called if the dynamic sublist's data provider adds a new item.
- **************************************************************************/
-static void
-dynamic_list_change_item( const libvlc_event_t * p_event , void * p_user_data)
-{
-    /* Check if the item matches still our tag query */
-
-    libvlc_dynamic_media_list_t * p_dmlist = p_user_data;
-    libvlc_media_descriptor_t * p_md = p_event->u.media_list_item_changed.item;
-    int index;
-
-    libvlc_media_list_lock( p_dmlist->p_mlist );        
-    
-    index = libvlc_media_list_index_of_item( p_dmlist->p_mlist, p_md, NULL );
-    if( index < 0 )
-    {
-        libvlc_media_list_unlock( p_dmlist->p_mlist );     
-        return; /* Not found, no prob, just ignore */
-    }
-
-    //libvlc_media_descriptor_lock( p_md );
-    if( !libvlc_tag_query_match( p_dmlist->p_query, p_md, NULL ) )
-        libvlc_media_list_remove_index( p_dmlist->p_mlist, index, NULL );
-    //libvlc_media_descriptor_unlock( p_md );
-
-    libvlc_media_list_unlock( p_dmlist->p_mlist );        
-}
-
 /*
  * Public libvlc functions
  */
@@ -227,8 +196,6 @@ libvlc_dynamic_media_list_new(
                          dynamic_list_propose_item, p_dmlist, p_e );
     libvlc_event_attach( p_em, libvlc_MediaListItemDeleted,
                          dynamic_list_remove_item, p_dmlist, p_e );
-    libvlc_event_attach( p_em, libvlc_MediaListItemChanged,
-                         dynamic_list_change_item, p_dmlist, p_e );
 
     libvlc_media_list_unlock( p_mlist );        
 
