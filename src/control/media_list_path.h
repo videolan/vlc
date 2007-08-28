@@ -26,6 +26,12 @@
 #define _LIBVLC_MEDIA_LIST_PATH_H 1
 
 /**************************************************************************
+ *  Definition (Media List Player Internal)
+ **************************************************************************/
+typedef int * media_list_path_t;
+
+
+/**************************************************************************
  *       path_empty (Media List Player Internal)
  **************************************************************************/
 static inline libvlc_media_list_path_t libvlc_media_list_path_empty( void )
