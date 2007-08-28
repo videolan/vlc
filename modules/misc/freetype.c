@@ -63,6 +63,9 @@
 #elif defined( WIN32 )
 #define DEFAULT_FONT "" /* Default font found at run-time */
 #define FC_DEFAULT_FONT "Arial"
+#elif defined(GENTOO_LINUX)
+#define DEFAULT_FONT "/usr/share/fonts/ttf-bitstream-vera/Vera.ttf"
+#define FC_DEFAULT_FONT "Vera"
 #else
 #define DEFAULT_FONT "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
 #define FC_DEFAULT_FONT "Serif Bold"

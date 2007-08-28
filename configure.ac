@@ -4140,6 +4140,16 @@ then
     if test "${SYS}" = "mingw32"; then
        VLC_ADD_LDFLAGS([freetype],[-lxml2])]
     fi
+    if test "${host_cpu}" = "${build_cpu}"; then
+      AC_MSG_CHECKING(if using Gentoo Linux)
+      GENTOO=`${CC} -fversion |gawk '/(GCC)/ { print substr($4, 2); }'`
+      if test "${GENTOO}" = "Gentoo"; then
+        AC_MSG_RESULT(yes)
+        VLC_ADD_CFLAGS([freetype],[-DGENTOO_LINUX])
+      else
+        AC_MSG_RESULT(no)
+      fi
+    fi
     AC_CHECK_HEADERS(fontconfig/fontconfig.h,
       [VLC_ADD_CFLAGS([freetype],[-DHAVE_FONTCONFIG])
        VLC_ADD_LDFLAGS([freetype],[-lfontconfig])])
