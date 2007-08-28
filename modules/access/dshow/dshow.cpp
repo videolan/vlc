@@ -1055,6 +1055,7 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
     IMoniker *p_moniker = NULL;
     ULONG i_fetched;
     HRESULT hr;
+    list<string> devicelist;
 
     /* Create the system device enumerator */
     ICreateDevEnum *p_dev_enum = NULL;
@@ -1118,9 +1119,29 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
                 SysFreeString(var.bstrVal);
                 p_buf[i_convert] = '\0';
 
-                if( p_listdevices ) p_listdevices->push_back( p_buf );
+		string devname = string(p_buf);
 
-                if( p_devicename && *p_devicename == string(p_buf) )
+		int dup = 0;
+		/* find out if this name is already used by a previously found device */
+		list<string>::const_iterator iter = devicelist.begin();
+		list<string>::const_iterator end = devicelist.end();
+		while ( iter != end )
+		{
+		    if( 0 == (*iter).compare(0, devname.size(), devname) )
+			++dup;
+		    ++iter;
+		}
+		if( dup )
+		{
+		    /* we have a duplicate device name, append a sequence number to name
+		       to provive a unique list back to the user */
+		    char seq[16];
+		    sprintf(seq, " #%d", dup);
+		    devname.append(seq);
+		}
+		devicelist.push_back( devname );
+
+                if( p_devicename && *p_devicename == devname )
                 {
                     /* Bind Moniker to a filter object */
                     hr = p_moniker->BindToObject( 0, 0, IID_IBaseFilter,
@@ -1144,6 +1165,11 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
     }
 
     p_class_enum->Release();
+
+    if( p_listdevices ) {
+	devicelist.sort();
+	*p_listdevices = devicelist;
+    }
     return NULL;
 }
 
