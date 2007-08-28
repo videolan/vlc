@@ -988,7 +988,7 @@ AC_CACHE_CHECK([if \$CC accepts -O3],
     [ac_cv_c_o3],
     [CFLAGS="${CFLAGS_save} -O3"
      AC_TRY_COMPILE([],,ac_cv_c_o3=yes, ac_cv_c_o3=no)])
-if test "${ac_cv_c_o3}" != "no"; then
+if test "${ac_cv_c_o3}" != "no" -a "x${enable_debug}" = "xno"; then
     CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O3"
 else
     AC_CACHE_CHECK([if \$CC accepts -O2],
