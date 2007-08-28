@@ -226,7 +226,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( !(p_file = (p_smb->open)( p_smb, psz_uri, O_RDONLY, 0 )) )
+    if( !(p_file = p_smb->open( p_smb, psz_uri, O_RDONLY, 0 )) )
     {
         msg_Err( p_access, "open failed for '%s' (%s)",
                  p_access->psz_path, strerror(errno) );
@@ -251,7 +251,7 @@ static int Open( vlc_object_t *p_this )
     }
 #endif
 
-    if( (i_smb = (smbc_open)( psz_uri, O_RDONLY, 0 )) < 0 )
+    if( (i_smb = smbc_open( psz_uri, O_RDONLY, 0 )) < 0 )
     {
         msg_Err( p_access, "open failed for '%s' (%s)",
                  p_access->psz_path, strerror(errno) );
