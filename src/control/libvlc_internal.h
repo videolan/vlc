@@ -49,9 +49,12 @@ VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char *, vlc_boo
 VLC_EXPORT (void, libvlc_event_init, ( libvlc_instance_t *, libvlc_exception_t * ) );
 VLC_EXPORT (void, libvlc_event_fini, ( libvlc_instance_t *, libvlc_exception_t * ) );
 
+
 /***************************************************************************
  * Opaque structures for libvlc API
  ***************************************************************************/
+
+typedef int * libvlc_media_list_path_t; /* (Media List Player Internal) */
 
 typedef enum libvlc_lock_state_t
 {
