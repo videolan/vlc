@@ -1653,9 +1653,6 @@ CLEAN_PKG += zvbi
 DISTCLEAN_PKG += zvbi-$(ZVBI_VERSION).tar.bz2
 
 # ***************************************************************************
-# gpg-error 
-# ***************************************************************************
-
 # libraw1394
 # ***************************************************************************
 
@@ -1682,7 +1679,7 @@ libraw1394: libraw1394-$(LIBRAW1394_VERSION).tar.gz
 #	sed 's/^typedef u_int8_t  byte_t;/\/* typedef u_int8_t  byte_t;\*\//'
 	touch $@
 	
-CLEAN_file += .raw1394
+CLEAN_FILE += .raw1394
 CLEAN_PKG += libraw1394
 DISTCLEAN_PKG += libraw1394-$(LIBRAW1394_VERSION).tar.gz
 
@@ -1714,11 +1711,14 @@ libdc1394: libdc1394-$(LIBDC1394_VERSION).tar.gz
 	 make && make DESTDIR=$(PRFIX) install)
 	touch $@
 	
-CLEAN_file += .dc1394
+CLEAN_FILE += .dc1394
 CLEAN_PKG += libdc1394
 DISTCLEAN_PKG += libdc1394-$(LIBDC1394_VERSION).tar.gz
 
 # ***************************************************************************
+# gpg-error 
+# ***************************************************************************
+
 libgpg-error-$(GPGERROR_VERSION).tar.bz2:
 	$(WGET) $(GPGERROR_URL)
 
@@ -2003,8 +2003,8 @@ libmpcdec-$(MUSE_VERSION).tar.bz2:
 
 mpcdec: libmpcdec-$(MUSE_VERSION).tar.bz2 
 	$(EXTRACT_BZ2)
-	patch -p0 < Patches/mpcdec.patch
-	(cd $@; autoreconf -vif)
+#	patch -p0 < Patches/mpcdec.patch
+#	(cd $@; autoconf)
 
 .mpcdec: mpcdec
 ifdef HAVE_WIN32 
