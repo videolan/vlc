@@ -74,79 +74,6 @@ notify_item_deletion( libvlc_media_list_t * p_mlist,
     libvlc_event_send( p_mlist->p_event_manager, &event );
 }
 
-/**************************************************************************
- *       media_descriptor_changed (private) (libvlc Event Callback )
- *
- * An item has changed.
- **************************************************************************/
-static void
-media_descriptor_changed( const libvlc_event_t * p_event, void * user_data )
-{
-    libvlc_media_list_t * p_mlist = user_data;
-    libvlc_media_descriptor_t * p_md = p_event->p_obj;
-    libvlc_event_t event;
-    
-    /* Construct the new media list event */
-    event.type = libvlc_MediaListItemChanged;
-    event.u.media_list_item_changed.item = p_md;
-
-    /* XXX: this is not good, but there is a solution in the pipeline */
-    event.u.media_list_item_changed.index =
-        libvlc_media_list_index_of_item( p_mlist, p_md, NULL );
-
-    /* Send the event */
-    libvlc_event_send( p_mlist->p_event_manager, &event );
-}
-
-/**************************************************************************
- *       media_descriptor_subitem_added (private) (libvlc Event Callback )
- *
- * An item (which is a playlist) has gained sub child.
- **************************************************************************/
-static void
-media_descriptor_subitem_added( const libvlc_event_t * p_event, void * user_data )
-{
-    /* Todo: Just forward that event to our event_manager */
-}
-
-/**************************************************************************
- *       install_media_descriptor_observer (private)
- *
- * Do the appropriate action when an item is deleted.
- **************************************************************************/
-static void
-install_media_descriptor_observer( libvlc_media_list_t * p_mlist,
-                                   libvlc_media_descriptor_t * p_md )
-{
-    libvlc_event_attach( p_md->p_event_manager,
-                         libvlc_MediaDescriptorMetaChanged,
-                         media_descriptor_changed,
-                         p_mlist, NULL );
-    libvlc_event_attach( p_md->p_event_manager,
-                         libvlc_MediaDescriptorSubItemAdded,
-                         media_descriptor_subitem_added,
-                         p_mlist, NULL );
-}
-
-/**************************************************************************
- *       uninstall_media_descriptor_observer (private)
- *
- * Do the appropriate action when an item is deleted.
- **************************************************************************/
-static void
-uninstall_media_descriptor_observer( libvlc_media_list_t * p_mlist,
-                                     libvlc_media_descriptor_t * p_md )
-{
-    libvlc_event_detach( p_md->p_event_manager,
-                         libvlc_MediaDescriptorMetaChanged,
-                         media_descriptor_changed,
-                         p_mlist, NULL );
-    libvlc_event_detach( p_md->p_event_manager,
-                         libvlc_MediaDescriptorSubItemAdded,
-                         media_descriptor_subitem_added,
-                         p_mlist, NULL );
-}
-
 /*
  * Public libvlc functions
  */
@@ -222,7 +149,6 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
     libvlc_event_manager_release( p_mlist->p_event_manager );
 
     FOREACH_ARRAY( p_md, p_mlist->items )
-        uninstall_media_descriptor_observer( p_mlist, p_md );
         libvlc_media_descriptor_release( p_md );
     FOREACH_END()
  
@@ -338,7 +264,6 @@ void libvlc_media_list_add_media_descriptor(
     libvlc_media_descriptor_retain( p_md );
     ARRAY_INSERT( p_mlist->items, p_md, p_mlist->items.i_size );
     notify_item_addition( p_mlist, p_md, p_mlist->items.i_size-1 );
-    install_media_descriptor_observer( p_mlist, p_md );
 }
 
 /**************************************************************************
@@ -357,7 +282,6 @@ void libvlc_media_list_insert_media_descriptor(
 
     ARRAY_INSERT( p_mlist->items, p_md, index);
     notify_item_addition( p_mlist, p_md, index );
-    install_media_descriptor_observer( p_mlist, p_md );
 }
 
 /**************************************************************************
@@ -372,8 +296,6 @@ void libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
     libvlc_media_descriptor_t * p_md;
 
     p_md = ARRAY_VAL( p_mlist->items, index );
-
-    uninstall_media_descriptor_observer( p_mlist, p_md );
 
     ARRAY_REMOVE( p_mlist->items, index )
     notify_item_deletion( p_mlist, p_md, index );

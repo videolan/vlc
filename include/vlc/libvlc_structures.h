@@ -308,7 +308,6 @@ typedef enum libvlc_event_type_t {
     
     libvlc_MediaListItemAdded,
     libvlc_MediaListItemDeleted,
-    libvlc_MediaListItemChanged,
 
     libvlc_MediaListPlayerPlayed,
     libvlc_MediaListPlayerNextItemSet,
@@ -360,11 +359,6 @@ typedef struct libvlc_event_t
             libvlc_media_descriptor_t * item;
             int index;
         } media_list_item_deleted;
-        struct
-        {
-            libvlc_media_descriptor_t * item;
-            int index;
-        } media_list_item_changed;
 
         /* Tree */
         struct
