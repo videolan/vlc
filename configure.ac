@@ -955,7 +955,7 @@ if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
 fi
 CFLAGS="${CFLAGS_save}"
 
-RDC_PROG_CC_WFLAGS([all extra no-unused-parameter sign-compare undef pointer-arith bad-function-cast cast-align write-strings old-style-definition missing-prototypes volatile-register-var])
+RDC_PROG_CC_WFLAGS([all extra no-unused-parameter sign-compare undef pointer-arith bad-function-cast cast-align write-strings missing-prototypes volatile-register-var])
 RDC_PROG_CC_FLAGS_IFELSE([-pipe])
 
 dnl This helps detect broken plugins with undefined symbols
