@@ -1,0 +1,16 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {CLASS = VLCCategoryListDataSource; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = VLCCategoryOutlineView; LANGUAGE = ObjC; SUPERCLASS = NSOutlineView; }, 
+        {
+            CLASS = VLCController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {categoryList = id; detailList = id; detailSearchField = id; videoView = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = VLCVideoView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}
