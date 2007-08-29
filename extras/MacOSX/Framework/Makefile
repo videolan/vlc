@@ -4,10 +4,12 @@ OBJCFLAGS=-fobjc-exceptions
 LDFLAGS=-single_module -read_only_relocs suppress
 
 # We should set this properly.
-srcdir=../../..
-LIBVLC=$(srcdir)/src/.libs/libvlc.1.dylib $(srcdir)/src/.libs/libvlc-control.0.dylib
-LIBVLC_HEADERS=$(srcdir)/include
-VLCCONFIG=$(srcdir)/vlc-config
+top_srcdir=../../..
+top_builddir=../../..
+
+LIBVLC=$(top_builddir)/src/.libs/libvlc.1.dylib $(top_builddir)/src/.libs/libvlc-control.0.dylib
+LIBVLC_HEADERS=$(top_srcdir)/include
+VLCCONFIG=$(top_srcdir)/vlc-config
 
 MODULES = $(patsubst %,$(SRC_DIR)/%,$(_MODULES))
 
@@ -66,12 +68,12 @@ DIR = VLC.framework \
       VLC.framework/Version/Current/Framework \
       VLC.framework/Version/Current/Headers \
 
-VLC.framework/lib/libvlc.dylib: $(srcdir)/src/.libs/libvlc.dylib VLC.framework/lib
-	cp -f $(srcdir)/src/.libs/libvlc.1.dylib VLC.framework/lib/libvlc.dylib && \
+VLC.framework/lib/libvlc.dylib: $(top_builddir)/src/.libs/libvlc.dylib VLC.framework/lib
+	cp -f $(top_builddir)/src/.libs/libvlc.1.dylib VLC.framework/lib/libvlc.dylib && \
 	install_name_tool -id `pwd`/VLC.framework/lib/libvlc.1.dylib \
 	                   VLC.framework/lib/libvlc.dylib
 
-VLC.framework/lib/libvlc-control.dylib: $(srcdir)/src/.libs/libvlc-control.dylib VLC.framework/lib
+VLC.framework/lib/libvlc-control.dylib: $(top_builddir)/src/.libs/libvlc-control.dylib VLC.framework/lib
 	mkdir -p VLC.framework/Version/Current/lib && \
 	cp -f $< $@ && \
 	install_name_tool -id `pwd`/$@ $@ && \
@@ -92,7 +94,7 @@ VLC.framework/Resources:
 
 VLC.framework/modules:
 	/usr/bin/install -c -d ./VLC.framework/Version/Current/modules && \
-	for i in `top_builddir="$(srcdir)" $(VLCCONFIG) --target plugin` ; do \
+	for i in `top_builddir="$(top_builddir)" $(VLCCONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; \
         then \
 	    cp "`pwd`/`dirname $$i`/.libs/`basename $$i`.dylib" \
@@ -113,13 +115,13 @@ VLC.framework/modules:
 	
 
 VLC.framework/share:
-	cp -R $(srcdir)/share ./VLC.framework/Version/Current && \
+	cp -R $(top_builddir)/share ./VLC.framework/Version/Current && \
 	ln -sf Version/Current/share ./VLC.framework
 
 VLC.framework/lib: 
 	mkdir -p VLC.framework/Version/Current/lib && \
-	if test -d $(srcdir)/extras/contrib/vlc-lib; then \
-	  for i in $(srcdir)/extras/contrib/vlc-lib/*.dylib ; do \
+	if test -d $(top_builddir)/extras/contrib/vlc-lib; then \
+	  for i in $(top_builddir)/extras/contrib/vlc-lib/*.dylib ; do \
 		module="VLC.framework/Version/Current/lib/`basename $${i}`"; \
 	    cp `pwd`/$${i}  $${module} ; \
 		install_name_tool -change /usr/local/lib/libvlc.1 @loader_path/../lib/libvlc.dylib \
@@ -137,7 +139,7 @@ VLC.framework/lib:
 VLC.framework/VLC:
 	ln -sf Version/Current/VLC VLC.framework
 
-VLC.framework/Version/Current/VLC: $(OBJECTS) $(LIBVLC) VLC.framework/Headers VLC.framework/Resources VLC.framework/lib/libvlc-control.dylib VLC.framework/lib/libvlc.dylib VLC.framework/modules VLC.framework/share VLC.framework/VLC
+VLC.framework/Version/Current/VLC: $(OBJECTS) VLC.framework/Headers VLC.framework/Resources VLC.framework/lib/libvlc-control.dylib VLC.framework/lib/libvlc.dylib VLC.framework/modules VLC.framework/share VLC.framework/VLC
 	mkdir -p VLC.framework/Version/Current/Framework && \
 	$(CXX) -dynamiclib $(LDFLAGS) $(OBJECTS) $(FRAMEWORKS) $(LIBVLC) $(MODULES) $(LIBS) -install_name @loader_path/../Frameworks/VLC.framework/Version/Current/VLC -o VLC.framework/Version/Current/VLC && \
 	install_name_tool -change /usr/local/lib/libvlc-control.0.dylib \
