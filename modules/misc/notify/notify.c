@@ -281,7 +281,7 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
     }
 
     /* Adds previous and next buttons in the notification */
-    notify_notification_add_action( notification, "prev", _("Previous"), Prev,
+    notify_notification_add_action( notification, "previous", _("Previous"), Prev,
                                     (gpointer*) p_intf, NULL );
     notify_notification_add_action( notification, "next", _("Next"), Next,
                                     (gpointer*) p_intf, NULL );
