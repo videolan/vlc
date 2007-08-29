@@ -400,7 +400,13 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     psz_arturl = input_item_GetArtURL( p_item );
     assert( !EMPTY_STR( psz_arturl ) );
 
-    if( !strncmp( psz_arturl , "APIC", 4 ) )
+    if( !strncmp( psz_arturl , "file://", 7 ) )
+    {
+        msg_Dbg( p_playlist, "Album art is local file, no need to cache" );
+        free( psz_arturl );
+        return VLC_SUCCESS;
+    }
+    else if( !strncmp( psz_arturl , "APIC", 4 ) )
     {
         msg_Warn( p_playlist, "APIC fetch not supported yet" );
         free( psz_arturl );
