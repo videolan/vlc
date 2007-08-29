@@ -116,7 +116,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
     
     ARRAY_INIT(p_mlist->items);
     p_mlist->i_refcount = 1;
-    p_mlist->psz_name = NULL;
+    p_mlist->p_md = NULL;
 
     return p_mlist;
 }
@@ -145,6 +145,9 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
     libvlc_media_list_flat_media_list_release( p_mlist );
 
     libvlc_event_manager_release( p_mlist->p_event_manager );
+
+    if( p_mlist->p_md )
+        libvlc_media_descriptor_release( p_mlist->p_md );
 
     FOREACH_ARRAY( p_md, p_mlist->items )
         libvlc_media_descriptor_release( p_md );
@@ -206,34 +209,45 @@ libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
 }
 
 /**************************************************************************
- *       set_name (Public)
+ *       set_media_descriptor (Public)
  **************************************************************************/
-void libvlc_media_list_set_name( libvlc_media_list_t * p_mlist,
-                                 const char * psz_name,
-                                 libvlc_exception_t * p_e)
+void libvlc_media_list_set_media_descriptor( libvlc_media_list_t * p_mlist,
+                                             libvlc_media_descriptor_t * p_md,
+                                             libvlc_exception_t * p_e)
 
 {
     (void)p_e;
     vlc_mutex_lock( &p_mlist->object_lock );
-    free( p_mlist->psz_name );
-    p_mlist->psz_name = psz_name ? strdup( psz_name ) : NULL;
+    if( p_mlist->p_md )
+        libvlc_media_descriptor_release( p_mlist->p_md );
+    libvlc_media_descriptor_retain( p_md );
+    p_mlist->p_md = p_md;
     vlc_mutex_unlock( &p_mlist->object_lock );
 }
 
 /**************************************************************************
- *       name (Public)
+ *       media_descriptor (Public)
+ *
+ * If this media_list comes is a media_descriptor's subitems,
+ * This holds the corresponding media_descriptor.
+ * This md is also seen as the information holder for the media_list.
+ * Indeed a media_list can have meta information through this
+ * media_descriptor.
  **************************************************************************/
-char * libvlc_media_list_name( libvlc_media_list_t * p_mlist,
-                               libvlc_exception_t * p_e)
+libvlc_media_descriptor_t *
+libvlc_media_list_media_descriptor( libvlc_media_list_t * p_mlist,
+                                    libvlc_exception_t * p_e)
 {
-    char *ret;
+    libvlc_media_descriptor_t *p_md;
     (void)p_e;
 
     vlc_mutex_lock( &p_mlist->object_lock );
-    ret = p_mlist->psz_name ? strdup( p_mlist->psz_name ) : NULL;
+    p_md = p_mlist->p_md;
+    if( p_md )
+        libvlc_media_descriptor_retain( p_md );
     vlc_mutex_unlock( &p_mlist->object_lock );
 
-    return ret;
+    return p_md;
 }
 
 /**************************************************************************

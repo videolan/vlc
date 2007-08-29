@@ -100,16 +100,17 @@ struct libvlc_tag_query_t
 
 struct libvlc_media_list_t
 {
-    libvlc_event_manager_t * p_event_manager;
-    libvlc_instance_t *      p_libvlc_instance;
-    int                      i_refcount;
-    vlc_mutex_t              object_lock;
-    char *                   psz_name; /* Usually NULL */
-    DECL_ARRAY(void *)       items;
+    libvlc_event_manager_t *    p_event_manager;
+    libvlc_instance_t *         p_libvlc_instance;
+    int                         i_refcount;
+    vlc_mutex_t                 object_lock;
+    libvlc_media_descriptor_t * p_md; /* The media_descriptor from which the
+                                       * mlist comes, if any. */
+    DECL_ARRAY(void *)          items;
     
     /* Other way to see that media list */
     /* Used in flat_media_list.c */
-    libvlc_media_list_t *    p_flat_mlist;
+    libvlc_media_list_t *       p_flat_mlist;
 };
 
 struct libvlc_dynamic_media_list_t

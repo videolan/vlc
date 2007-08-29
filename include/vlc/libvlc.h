@@ -453,13 +453,13 @@ VLC_PUBLIC_API void
                                         libvlc_exception_t * p_e );
 
 VLC_PUBLIC_API void
-    libvlc_media_list_set_name( libvlc_media_list_t *,
-                                const char * psz_name,
-                                libvlc_exception_t *);
+    libvlc_media_list_set_media_descriptor( libvlc_media_list_t *,
+                                            libvlc_media_descriptor_t *,
+                                            libvlc_exception_t *);
 
-VLC_PUBLIC_API char *
-    libvlc_media_list_name( libvlc_media_list_t *,
-                            libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_media_descriptor_t *
+    libvlc_media_list_media_descriptor( libvlc_media_list_t *,
+                                        libvlc_exception_t *);
 
 VLC_PUBLIC_API void
     libvlc_media_list_add_media_descriptor( libvlc_media_list_t *,
