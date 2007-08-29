@@ -71,9 +71,9 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define FILEDIALOG_PATH_TEXT N_("Path to use in file dialog")
 #define FILEDIALOG_PATH_LONGTEXT N_("path to use in file dialog")
 
-/*#define ADVANCED_OPTIONS_TEXT N_("Advanced options")
+#define ADVANCED_OPTIONS_TEXT N_("Advanced options")
 #define ADVANCED_OPTIONS_LONGTEXT N_("Activate by default all the" \
-                                     "advanced options for geeks")*/
+                                     "advanced options for geeks")
 
 #define SHOWFLAGS_TEXT N_("Define what columns to show in playlist window")
 #define SHOWFLAGS_LONGTEXT N_("Enter the sum of the options that you want: \n" \
@@ -108,8 +108,8 @@ vlc_module_begin();
                 FILEDIALOG_PATH_LONGTEXT, VLC_TRUE);
             change_autosave();
             change_internal();
-/*        add_bool( "qt-adv-options", VLC_FALSE, NULL, ADVANCED_OPTIONS_TEXT,
-                  ADVANCED_OPTIONS_LONGTEXT, VLC_TRUE );*/
+        add_bool( "qt-adv-options", VLC_FALSE, NULL, ADVANCED_OPTIONS_TEXT,
+                  ADVANCED_OPTIONS_LONGTEXT, VLC_TRUE );
         add_integer( "qt-pl-showflags",
                 VLC_META_ENGINE_ARTIST|VLC_META_ENGINE_TITLE|
                 VLC_META_ENGINE_DURATION|VLC_META_ENGINE_COLLECTION,
