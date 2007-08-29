@@ -1,0 +1,14 @@
+# Automake forgets to add a proper tag to libtool with Objective-C files.
+# Moreocer Libtool should default tag to CC when none is specified but
+# obviously does not. Here is a fix for that.
+LIBTOOL=@LIBTOOL@ --tag=CC
+
+SOURCES_minimal_macosx = \
+	intf.m \
+	macosx.c \
+	VLCMinimalVoutWindow.m \
+	VLCOpenGLVoutView.m \
+	voutgl.m \
+	voutagl.m \
+	$(NULL)
+
