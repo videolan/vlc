@@ -212,11 +212,14 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     free( psz_temp );
 
     psz = input_item_GetArtURL( p_item->p_input );
-    if( !EMPTY_STR( psz ) )
-    {
-        fprintf( p_file, "\t\t\t<image>%s</image>\n", psz );
-    }
+    if( psz == NULL ) psz = strdup( "" );
+    psz_temp = convert_xml_special_chars( psz );
     free( psz );
+    if( !EMPTY_STR( psz_temp ) )
+    {
+        fprintf( p_file, "\t\t\t<image>%s</image>\n", psz_temp );
+    }
+    free( psz_temp );
 
 xspfexportitem_end:
     /* -> the duration */
