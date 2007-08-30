@@ -385,7 +385,7 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
     int          i_sync, i_peek, i;
     int          i_packet_size;
 
@@ -399,8 +399,7 @@ static int Open( vlc_object_t *p_this )
     if( stream_Peek( p_demux->s, &p_peek, TS_PACKET_SIZE_MAX ) <
         TS_PACKET_SIZE_MAX ) return VLC_EGENERIC;
 
-    if( p_peek[0] == 'T' && p_peek[1] == 'F' &&
-        p_peek[2] == 'r' && p_peek[3] == 'c' )
+    if( memcmp( p_peek, "TFrc", 4 ) == 0 )
     {
         b_topfield = VLC_TRUE;
         msg_Dbg( p_demux, "this is a topfield file" );
@@ -1063,7 +1062,7 @@ static int Demux( demux_t *p_demux )
 
             while( !p_demux->b_die )
             {
-                uint8_t *p_peek;
+                const uint8_t *p_peek;
                 int i_peek, i_skip = 0;
 
                 i_peek = stream_Peek( p_demux->s, &p_peek,
@@ -2593,110 +2592,127 @@ static int EITConvertDuration( uint32_t i_duration )
 }
 #undef CVT_FROM_BCD
 
-static inline char *FixUTF8( char *p )
-{
-    EnsureUTF8( p );
-    return p;
-}
 /* FIXME same than dvbsi_to_utf8 from dvb access */
-static char *EITConvertToUTF8( unsigned char *psz_instring, size_t i_length )
+static char *
+EITConvertToUTF8( const unsigned char *psz_instring, size_t i_length )
 {
     const char *psz_encoding;
-    const unsigned char *psz_stringstart, *psz_outstring;
-    char *psz_tmp;
-    char psz_encbuf[12];
-    size_t i_in, i_out;
+    char *psz_outstring;
+    char psz_encbuf[sizeof( "ISO_8859-123" )];
+    size_t i_in, i_out, offset = 1;
     vlc_iconv_t iconv_handle;
+
     if( i_length < 1 ) return NULL;
     if( psz_instring[0] >= 0x20 )
     {
-        psz_stringstart = psz_instring;
-        psz_encoding = "ISO_8859-1"; /* should be ISO6937 according to spec, but this seems to be the one used */
+        psz_encoding = "ISO_8859-1";
+        /* According to the specification, this should be ISO6937,
+         * but it seems Latin-1 is used instead. */
+        offset = 0;
     }
     else switch( psz_instring[0] )
     {
     case 0x01:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "ISO_8859-5";
         break;
     case 0x02:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "ISO_8859-6";
         break;
     case 0x03:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "ISO_8859-7";
         break;
     case 0x04:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "ISO_8859-8";
         break;
     case 0x05:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "ISO_8859-9";
         break;
     case 0x06:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "ISO_8859-10";
         break;
     case 0x07:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "ISO_8859-11";
         break;
     case 0x08:
-        psz_stringstart = &psz_instring[1]; /*possibly reserved?*/
         psz_encoding = "ISO_8859-12";
         break;
     case 0x09:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "ISO_8859-13";
         break;
     case 0x0a:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "ISO_8859-14";
         break;
     case 0x0b:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "ISO_8859-15";
         break;
     case 0x10:
-        if( i_length < 3 || psz_instring[1] != '\0' || psz_instring[2] > 0x0f
-            || psz_instring[2] == 0 )
-            return FixUTF8(strndup(psz_instring,i_length));
-        sprintf( psz_encbuf, "ISO_8859-%d", psz_instring[2] );
-        psz_stringstart = &psz_instring[3];
-        psz_encoding = psz_encbuf;
+#warning Is Latin-10 (psz_instring[2] == 16) really illegal?
+        if( i_length < 3 || psz_instring[1] != 0x00 || psz_instring[2] > 15
+         || psz_instring[2] == 0 )
+        {
+            psz_encoding = "UTF-8";
+            offset = 0;
+        }
+        else
+        {
+            sprintf( psz_encbuf, "ISO_8859-%u", psz_instring[2] );
+            psz_encoding = psz_encbuf;
+            offset = 3;
+        }
         break;
     case 0x11:
-        psz_stringstart = &psz_instring[1];
+#warning Is there a BOM or do we use a fixed endianess?
         psz_encoding = "UTF-16";
         break;
     case 0x12:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "KSC5601-1987";
         break;
     case 0x13:
-        psz_stringstart = &psz_instring[1];
-        psz_encoding = "GB2312";/*GB-2312-1980 */
+        psz_encoding = "GB2312"; /* GB-2312-1980 */
         break;
     case 0x14:
-        psz_stringstart = &psz_instring[1];
         psz_encoding = "BIG-5";
         break;
     case 0x15:
-        return FixUTF8(strndup(&psz_instring[1],i_length-1));
+        psz_encoding = "UTF-8";
         break;
     default:
         /* invalid */
-        return FixUTF8(strndup(psz_instring,i_length));
+        psz_encoding = "UTF-8";
+        offset = 0;
     }
+
+    i_in = i_length - offset;
+    i_out = i_in * 6 + 1;
+
+    psz_outstring = malloc( i_out );
+
     iconv_handle = vlc_iconv_open( "UTF-8", psz_encoding );
-    i_in = i_length - (psz_stringstart - psz_instring );
-    i_out = i_in * 6;
-    psz_outstring = psz_tmp = (char*)malloc( i_out * sizeof(char) + 1 );
-    vlc_iconv( iconv_handle, &psz_stringstart, &i_in, &psz_tmp, &i_out );
-    vlc_iconv_close( iconv_handle );
-    *psz_tmp = '\0';
+    if( iconv_handle == (vlc_iconv_t)(-1) )
+    {
+         /* Invalid character set (e.g. ISO_8859-12) */
+         memcpy( psz_outstring, psz_instring, i_in );
+         psz_outstring[i_in] = '\0';
+         EnsureUTF8( psz_outstring );
+    }
+    else
+    {
+        const char *psz_in = (const char *)psz_instring;
+        char *psz_out = psz_outstring;
+
+        while( vlc_iconv( iconv_handle, &psz_in, &i_in,
+                          &psz_out, &i_out ) == (size_t)(-1) )
+        {
+            /* skip naughty byte. This may fail terribly for multibyte stuff,
+             * but what can we do anyway? */
+            psz_in++;
+            i_in--;
+            vlc_iconv( iconv_handle, NULL, NULL, NULL, NULL ); /* reset */
+        }
+        vlc_iconv_close( iconv_handle );
+
+        *psz_out = '\0';
+    }
     return psz_outstring;
 }
 
