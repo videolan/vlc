@@ -382,7 +382,7 @@ typedef struct httpd_url_t      httpd_url_t;
 typedef struct httpd_client_t   httpd_client_t;
 typedef struct httpd_callback_sys_t httpd_callback_sys_t;
 typedef struct httpd_message_t  httpd_message_t;
-typedef int    (*httpd_callback_t)( httpd_callback_sys_t *, httpd_client_t *, httpd_message_t *answer, httpd_message_t *query );
+typedef int    (*httpd_callback_t)( httpd_callback_sys_t *, httpd_client_t *, httpd_message_t *answer, const httpd_message_t *query );
 typedef struct httpd_file_t     httpd_file_t;
 typedef struct httpd_file_sys_t httpd_file_sys_t;
 typedef int (*httpd_file_callback_t)( httpd_file_sys_t *, httpd_file_t *, uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
