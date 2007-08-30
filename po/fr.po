@@ -14,12 +14,12 @@ msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-14 01:34+0200\n"
-"PO-Revision-Date: 2006-11-29 19:46+0100\n"
+"PO-Revision-Date: 2007-08-30 09:29+0200\n"
 "Last-Translator: Christophe Mutricy <xtophe@videolan.org>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bit"
 
 #: include/vlc_config_cat.h:36
 msgid "VLC preferences"
@@ -627,7 +627,7 @@ msgstr "Répéter un morceau"
 
 #: include/vlc_intf_strings.h:65
 msgid "No repeat"
-msgstr ""
+msgstr "Séquentiel"
 
 #: include/vlc_intf_strings.h:67 src/libvlc-module.c:1209
 #: modules/gui/macosx/controls.m:866 modules/gui/macosx/intf.m:576
@@ -716,7 +716,7 @@ msgstr "Amplification"
 msgid ""
 "Magnify a part of the video. You can select which part of the image should "
 "be magnified."
-msgstr ""
+msgstr "Grossit une partie de la vidéo. Vous pouvez choisir la partie de l'image à grossir."
 
 #: include/vlc_intf_strings.h:99 modules/gui/qt4/ui/video_effects.ui:524
 #, fuzzy
@@ -740,26 +740,28 @@ msgstr "Inversion vidéo"
 
 #: include/vlc_intf_strings.h:106
 msgid "Split the image to make an image wall"
-msgstr ""
+msgstr "Sépare l'image pour en faire un mur d'images"
 
 #: include/vlc_intf_strings.h:108
 msgid ""
 "Create a \"puzzle game\" with the video.\n"
 "The video gets split in parts that you must sort."
-msgstr ""
+msgstr "Crée un \"jeu de puzzle\" avec la vidéo.\n"
+"La vidéo est separée en morceaux que vous devez trier."
 
 #: include/vlc_intf_strings.h:111
 msgid ""
 "\"Edge detection\" video distortion effect.\n"
 "Try changing the various settings for different effects"
-msgstr ""
+msgstr "Effet de déformation vidéo \"Détection des bords\".\n"
+"Essayez de changez les réglages pour en voir les effets"
 
 #: include/vlc_intf_strings.h:114
 msgid ""
 "\"Color detection\" effect. The whole image will be turned to black and "
 "white, except the parts that are of the color that you select in the "
 "settings."
-msgstr ""
+msgstr "Effet de \"Détection des couleurs\". L'image est entiérement en noir et blanc, sauf les parties qui sont de la couleur que vous avez choisi dans les réglages."
 
 #: include/vlc_meta.h:34 modules/gui/macosx/playlist.m:1122
 msgid "Meta-information"
@@ -833,7 +835,7 @@ msgstr "Publicateur"
 
 #: include/vlc_meta.h:49
 msgid "Encoded by"
-msgstr ""
+msgstr "Encodé par"
 
 #: include/vlc_meta.h:51
 #, fuzzy
@@ -871,7 +873,7 @@ msgstr "Filtres audio"
 #: src/audio_output/filters.c:225
 #, c-format
 msgid "The maximum number of filters (%d) was reached."
-msgstr ""
+msgstr "Le nombre maximum de filtres (%d) a été atteint."
 
 #: src/audio_output/input.c:92 src/audio_output/input.c:138
 #: src/input/es_out.c:388 src/libvlc-module.c:470
@@ -1026,18 +1028,19 @@ msgstr ""
 
 #: src/input/decoder.c:149
 msgid "VLC could not open the decoder module."
-msgstr ""
+msgstr "VLC n'a pas pu ouvrir le module de décodage"
 
 #: src/input/decoder.c:159
 msgid "No suitable decoder module for format"
-msgstr ""
+msgstr "Pas de décodeur approprié pour le format"
 
 #: src/input/decoder.c:160
 #, c-format
 msgid ""
 "VLC probably does not support the \"%4.4s\" audio or video format. "
 "Unfortunately there is no way for you to fix this."
-msgstr ""
+msgstr "VLC ne supporte probablement pas le format audio ou vidéo \"%4.4s\"."
+"Malheureusement il n'y a rien à faire."
 
 #: src/input/es_out.c:410 src/input/es_out.c:412 src/input/es_out.c:418
 #: src/input/es_out.c:419 modules/access/cdda/info.c:967
@@ -1049,7 +1052,7 @@ msgstr "Piste %i"
 #: src/input/es_out.c:596
 #, c-format
 msgid "%s [%s %d]"
-msgstr ""
+msgstr "%s.[%s.%d]"
 
 #: src/input/es_out.c:596 src/input/es_out.c:598 src/input/var.c:128
 #: src/libvlc-module.c:501 modules/gui/macosx/intf.m:582
@@ -1120,21 +1123,21 @@ msgstr "Sous-titres"
 
 #: src/input/input.c:2216
 msgid "Your input can't be opened"
-msgstr ""
+msgstr "Votre entrée ne peut être ouverte"
 
 #: src/input/input.c:2217
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
-msgstr ""
+msgstr "VLC ne peut pas ouvrir '%s'. Vérifiez les messages pour plus de détails."
 
 #: src/input/input.c:2312
 msgid "Can't recognize the input's format"
-msgstr ""
+msgstr "Impossible de reconnaitre le format de l'entrée"
 
 #: src/input/input.c:2313
 #, c-format
 msgid "The format of '%s' can't be detected. Have a look the log for details."
-msgstr ""
+msgstr "Le format de '%s' n'a pu être détecté. Vérifiez les messages pour plus de détails."
 
 #: src/input/var.c:118
 msgid "Bookmark"
@@ -1219,7 +1222,7 @@ msgstr "Annuler"
 
 #: src/interface/interaction.c:361
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 #: src/interface/interface.c:320
 msgid "Switch interface"
@@ -2041,11 +2044,11 @@ msgstr "Toujours placer la fenêtre vidéo au-dessus des autres fenêtres"
 
 #: src/libvlc-module.c:332
 msgid "Show video title for x miliseconds."
-msgstr ""
+msgstr "Montrer le titre de la vidéo pendant x millisecondes."
 
 #: src/libvlc-module.c:334
 msgid "Show the video title for n miliseconds, default is 5000 ms (5 sec.)"
-msgstr ""
+msgstr "Montrer le titre de la vidéo pendant n millisecondes, le défaut est 5000 ms (5 secs)."
 
 #: src/libvlc-module.c:336
 #, fuzzy
@@ -2054,7 +2057,7 @@ msgstr "Filtre de détection de mouvement"
 
 #: src/libvlc-module.c:338
 msgid "Place on video where to display the title (default bottom center)."
-msgstr ""
+msgstr "Endroit de la vidéo où afficher le titre (par défaut en bas au centre)."
 
 #: src/libvlc-module.c:345
 msgid "Disable screensaver"
@@ -2274,7 +2277,7 @@ msgstr ""
 msgid ""
 "If you live in France, it is not allowed to workaround any Digital "
 "Restrictions Management measure."
-msgstr ""
+msgstr "Si vous habitez en France, vous n'avez pas le droit de contourner des mesures de restrictions numérique (DRM). Bouh c'est pas bien !"
 
 #: src/libvlc-module.c:452
 msgid "Clock reference average counter"
@@ -3396,23 +3399,23 @@ msgstr ""
 
 #: src/libvlc-module.c:989
 msgid "Album art policy"
-msgstr ""
+msgstr "Politique de téléchargement des couvertures"
 
 #: src/libvlc-module.c:991
 msgid "Choose how album art will be downloaded."
-msgstr ""
+msgstr "Choisir comment les couvertures vont être téléchargées."
 
 #: src/libvlc-module.c:997
 msgid "Manual download only"
-msgstr ""
+msgstr "Téléchargement manuel seulement"
 
 #: src/libvlc-module.c:998
 msgid "When track starts playing"
-msgstr ""
+msgstr "Quand la lecture commence pour la piste"
 
 #: src/libvlc-module.c:999
 msgid "As soon as track is added"
-msgstr ""
+msgstr "Dès que la piste est ajoutée à la liste de lecture"
 
 #: src/libvlc-module.c:1001
 msgid "Services discovery modules"
@@ -3473,7 +3476,7 @@ msgstr "Lecteur multimédia VLC"
 msgid ""
 "The media library is automatically saved and reloaded each time you start "
 "VLC."
-msgstr ""
+msgstr "La bibliothèque est automatiquement sauvegardée et rechargée chaque fois que vous relancez VLC."
 
 #: src/libvlc-module.c:1031
 #, fuzzy
@@ -4173,15 +4176,15 @@ msgstr "Démarrer/arrêter le filtre d’enregistrement"
 
 #: src/libvlc-module.c:1206
 msgid "Normal/Repeat/Loop"
-msgstr ""
+msgstr "Normal/Répéter/Boucler"
 
 #: src/libvlc-module.c:1207
 msgid "Toggle Normal/Repeat/Loop playlist modes"
-msgstr ""
+msgstr "Basculer les modes de liste de lecture Normal/Répéter/Boucler"
 
 #: src/libvlc-module.c:1210
 msgid "Toggle random playlist playback"
-msgstr ""
+msgstr "Basculer le mode de lecture aléatoire"
 
 #: src/libvlc-module.c:1212 src/libvlc-module.c:1213
 #: src/video_output/vout_intf.c:230
@@ -4241,7 +4244,7 @@ msgstr "Sortie vidéo Qt Embedded"
 msgid ""
 "Toggle wallpaper mode in video output. Only works with the directx video "
 "output for the time being."
-msgstr ""
+msgstr "Basculer le mode papier peint dans le module de sortie vidéo. Marche seulement avec le module de sortie vidéo directx pour l'instant."
 
 #: src/libvlc-module.c:1243
 msgid "Display OSD menu on top of video output"
@@ -4252,9 +4255,8 @@ msgid "Display OSDmenu on top of video output"
 msgstr ""
 
 #: src/libvlc-module.c:1245
-#, fuzzy
 msgid "Do not display OSD menu on video output"
-msgstr "Supprimer les erreurs suivantes"
+msgstr ""
 
 #: src/libvlc-module.c:1246
 msgid "Do not display OSDmenu on top of video output"
@@ -4293,9 +4295,8 @@ msgid "Move OSD menu highlight to the widget below"
 msgstr ""
 
 #: src/libvlc-module.c:1259
-#, fuzzy
 msgid "Select current widget"
-msgstr "Répéter l’élément actuel"
+msgstr ""
 
 #: src/libvlc-module.c:1261
 msgid "Selecting current widget performs the associated action."
@@ -4542,7 +4543,7 @@ msgstr "Touche"
 #: src/playlist/engine.c:127 src/playlist/engine.c:129
 #: src/playlist/loadsave.c:112
 msgid "Media Library"
-msgstr ""
+msgstr "Bibliothèque"
 
 #: src/playlist/tree.c:59 modules/access/bda/bda.c:61
 #: modules/access/bda/bda.c:113 modules/access/bda/bda.c:121
@@ -5544,7 +5545,7 @@ msgstr "Entrée DirectShow"
 
 #: modules/access/cdda/access.c:294
 msgid "CD reading failed"
-msgstr ""
+msgstr "La lecture du CD a échoué"
 
 #: modules/access/cdda/access.c:295
 #, c-format
@@ -6342,7 +6343,7 @@ msgstr "Lecture"
 #: modules/access/dvdnav.c:300
 msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disk."
-msgstr ""
+msgstr "VLC ne peut pas définir le titre du DVD. Peut être qu'il ne pourra pas déchiffrer le disque entièrement."
 
 #: modules/access/dvdread.c:69
 msgid "Method used by libdvdcss for decryption"
@@ -6397,17 +6398,17 @@ msgstr "Entrée DVDRead (DVD sans menus)"
 #: modules/access/dvdread.c:239
 #, c-format
 msgid "DVDRead could not open disk \"%s\"."
-msgstr ""
+msgstr "DVDRead: impossible d'ouvrir le disque \"%s\"."
 
 #: modules/access/dvdread.c:498
 #, c-format
 msgid "DVDRead could not read block %d."
-msgstr ""
+msgstr "DVDRead: impossible de lire le block %d."
 
 #: modules/access/dvdread.c:560
 #, c-format
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
-msgstr ""
+msgstr "DVDRead: impossible de lire les blocks %d/%d à 0x%02x."
 
 #: modules/access/eyetv.c:45
 #, fuzzy
@@ -6502,17 +6503,17 @@ msgstr "Filtre de redimensionnement"
 #: modules/access/file.c:284
 #, c-format
 msgid "VLC could not read file \"%s\"."
-msgstr ""
+msgstr "VLC n'a pas pu lire le fichier \"%s\"."
 
 #: modules/access/file.c:436
 #, c-format
 msgid "VLC could not open file \"%s\"."
-msgstr ""
+msgstr "VLC n'a pas pu ouvrir le fichier \"%s\"."
 
 #: modules/access/file.c:453
 #, c-format
 msgid "VLC could not open file \"%s\" (%s)."
-msgstr ""
+msgstr "VLC n'a pas pu ouvrir le fichier \"%s\" (%s)."
 
 #: modules/access_filter/bandwidth.c:31
 msgid "Bandwidth limit (bytes/s)"
@@ -6652,23 +6653,23 @@ msgstr "Adresse de l’interface réseau"
 
 #: modules/access/ftp.c:132
 msgid "VLC could not connect with the given server."
-msgstr ""
+msgstr "VLC n'a pas pu se connecter au serveur spécifié."
 
 #: modules/access/ftp.c:142
 msgid "VLC's connection to the given server was rejected."
-msgstr ""
+msgstr "La connection de VLC au serveur spécifié à été rejetée."
 
 #: modules/access/ftp.c:203
 msgid "Your account was rejected."
-msgstr ""
+msgstr "Votre compte a été rejeté."
 
 #: modules/access/ftp.c:213
 msgid "Your password was rejected."
-msgstr ""
+msgstr "Votre mot de passe a été rejeté."
 
 #: modules/access/ftp.c:221
 msgid "Your connection attempt to the server was rejected."
-msgstr ""
+msgstr "Votre tentative de connection au serveur a été rejetée."
 
 #: modules/access/gnomevfs.c:47
 msgid ""
@@ -6741,11 +6742,11 @@ msgstr "HTTP(S)"
 
 #: modules/access/http.c:297
 msgid "HTTP authentication"
-msgstr ""
+msgstr "Authentification HTTP"
 
 #: modules/access/http.c:298 modules/demux/live555.cpp:484
 msgid "Please enter a valid login name and a password."
-msgstr ""
+msgstr "S'il vous plait entrez un identifiant et un mot de passe valides."
 
 #: modules/access/jack.c:60
 msgid ""
@@ -6938,7 +6939,7 @@ msgstr "Description du flux"
 
 #: modules/access_output/shout.c:78
 msgid "Genre of the content. "
-msgstr ""
+msgstr "Genre du contenu."
 
 #: modules/access_output/shout.c:80
 #, fuzzy
@@ -6975,7 +6976,7 @@ msgstr "Nombre de canaux audio dans les flux transcodés."
 
 #: modules/access_output/shout.c:96
 msgid "Ogg Vorbis Quality"
-msgstr ""
+msgstr "Qualité Ogg Vorbis"
 
 #: modules/access_output/shout.c:97
 #, fuzzy
@@ -7257,7 +7258,7 @@ msgstr "Fichier de configuration"
 #: modules/access/rtsp/access.c:94
 #, c-format
 msgid "VLC could not connect to \"%s:%d\"."
-msgstr ""
+msgstr "VLC n'a pas pu se connecter à \"%s:%d\"."
 
 #: modules/access/rtsp/access.c:227
 #, fuzzy
@@ -8224,12 +8225,12 @@ msgstr "Patte de sortie audio"
 #: modules/audio_output/alsa.c:434 modules/audio_output/alsa.c:485
 #, c-format
 msgid "VLC could not open the ALSA device \"%s\" (%s)."
-msgstr ""
+msgstr "VLC n'a pas pu ouvrir le périphérique ALSA \"%s\" (%s)."
 
 #: modules/audio_output/alsa.c:473
 #, c-format
 msgid "The audio device \"%s\" is already in use."
-msgstr ""
+msgstr "Le périphérique audio \"%s\" est déjà utilisé."
 
 #: modules/audio_output/alsa.c:939
 msgid "Unknown soundcard"
@@ -8256,7 +8257,7 @@ msgstr "Sortie HAL AudioUnit"
 #: modules/audio_output/auhal.c:243
 msgid ""
 "The selected audio output device is exclusively in use by another program."
-msgstr ""
+msgstr "Le périphérique audio séléctionné est exclusivement utilisé par un autre programme."
 
 #: modules/audio_output/auhal.c:427
 #, fuzzy
@@ -8586,7 +8587,7 @@ msgstr "Fichier d’image"
 
 #: modules/codec/fake.c:53
 msgid "Reload image file every n seconds."
-msgstr ""
+msgstr "Recharger l'image toutes les n secondes."
 
 #: modules/codec/fake.c:56 modules/stream_out/mosaic_bridge.c:125
 #: modules/stream_out/transcode.c:75
@@ -8657,11 +8658,11 @@ msgstr "Encodeur audio Vorbis"
 #: modules/codec/ffmpeg/encoder.c:240
 #, c-format
 msgid "VLC could not find encoder \"%s\"."
-msgstr ""
+msgstr "VLC n'a pas pu trouver l'encodeur \"%s\"."
 
 #: modules/codec/ffmpeg/encoder.c:595 modules/codec/ffmpeg/encoder.c:604
 msgid "VLC could not open the encoder."
-msgstr ""
+msgstr "VLC n'a pas pu ouvrir l'encoder"
 
 #: modules/codec/ffmpeg/ffmpeg.c:68
 msgid "Non-ref"
@@ -8740,7 +8741,8 @@ msgid ""
 "Various audio and video decoders/encodersdelivered by the FFmpeg library. "
 "This includes (MS)MPEG4, DivX, SV1,H261, H263, H264, WMV, WMA, AAC, AMR, DV, "
 "MJPEG and other codecs"
-msgstr ""
+msgstr "Encodeurs/Décodeurs divers fournis par la bibliothèque FFmpeg."
+"Cela inclut (MS)MPEG4, DivX, SV1, H261, H263, H264, WMV, WMA, AAC, AMR, DV, MJPEG et d'autres codecs"
 
 #: modules/codec/ffmpeg/ffmpeg.c:94
 msgid ""
@@ -11207,7 +11209,7 @@ msgstr "Népalais"
 
 #: modules/demux/avi/avi.c:588
 msgid "Don't repair"
-msgstr ""
+msgstr "Ne pas réparer"
 
 #: modules/demux/avi/avi.c:2302 modules/demux/avi/avi.c:2325
 #, fuzzy
@@ -12603,11 +12605,11 @@ msgstr "Erreur"
 #: modules/gui/macosx/interaction.m:229 modules/gui/macosx/interaction.m:295
 #, c-format
 msgid "Remaining time: %i seconds"
-msgstr ""
+msgstr "Temps restant: %i secondes"
 
 #: modules/gui/macosx/interaction.m:399 modules/gui/macosx/intf.m:635
 msgid "Errors and Warnings"
-msgstr ""
+msgstr "Erreurs et avertissements"
 
 #: modules/gui/macosx/interaction.m:400
 #, fuzzy
@@ -12868,7 +12870,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:77
 msgid "Show Fullscreen controller"
-msgstr ""
+msgstr "Afficher le contrôleur plein écran"
 
 #: modules/gui/macosx/macosx.m:78
 #, fuzzy
@@ -14661,7 +14663,7 @@ msgstr "Numéro de piste"
 
 #: modules/gui/qt4/components/infopanels.cpp:266
 msgid "Extra metadata and other information are shown in this list.\n"
-msgstr ""
+msgstr "Les méta-données supplémentaires et les autres informations sont affichées dans cette liste.\n"
 
 #: modules/gui/qt4/components/infopanels.cpp:329
 msgid ""
@@ -14763,11 +14765,11 @@ msgstr "Raccourcis"
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1020
 msgid "Press the new keys for "
-msgstr ""
+msgstr "Appuyez sur la nouvelle combinaison pour "
 
 #: modules/gui/qt4/components/preferences_widgets.cpp:1054
 msgid "Warning: the  key is already assigned to \""
-msgstr ""
+msgstr "Attention: la combinaison est déjà assignée à \""
 
 #: modules/gui/qt4/components/simple_preferences.cpp:81
 #, fuzzy
@@ -14981,7 +14983,7 @@ msgstr "Inverser"
 
 #: modules/gui/qt4/dialogs/open.cpp:162
 msgid "&Convert / Save"
-msgstr ""
+msgstr "&Convertir / Sauvegarder"
 
 #: modules/gui/qt4/dialogs/playlist.cpp:65
 #, fuzzy
@@ -15199,7 +15201,7 @@ msgstr "Flux"
 
 #: modules/gui/qt4/menus.cpp:231
 msgid "Conve&rt / Save..."
-msgstr ""
+msgstr "Conve&rtir / Sauvegarder..."
 
 #: modules/gui/qt4/menus.cpp:234 modules/gui/qt4/menus.cpp:694
 #, fuzzy
@@ -15227,7 +15229,7 @@ msgstr "Options avancées"
 
 #: modules/gui/qt4/menus.cpp:292
 msgid "Hide Menus..."
-msgstr ""
+msgstr "Cacher les menus..."
 
 #: modules/gui/qt4/menus.cpp:293
 #, fuzzy
@@ -15281,13 +15283,14 @@ msgstr "Showtunes"
 
 #: modules/gui/qt4/qt4.cpp:46
 msgid "Always show a video screen, with a cone when there is audio only."
-msgstr ""
+msgstr "Toujours afficher un écran vidéo, avec un cone quand il n'y a que du son."
 
 #: modules/gui/qt4/qt4.cpp:48
 msgid ""
 "Start VLC with a cone image, and display it when there is no video track. "
 "Visualisations are enabled."
-msgstr ""
+msgstr "Démarrer VLC avec une image de cone, et l'afficher quand il n'y a pas de piste vidéo."
+"Les visualisations sont activées."
 
 #: modules/gui/qt4/qt4.cpp:52
 #, fuzzy
@@ -15298,7 +15301,7 @@ msgstr "Afficher les options avancées"
 msgid ""
 "Show advanced preferences and not simplepreferences when opening the "
 "preferences dialog."
-msgstr ""
+msgstr "Afficher les préférences avancées à la place des simples à l'ouverture du dialogue de préférences."
 
 #: modules/gui/qt4/qt4.cpp:57
 #, fuzzy
@@ -15309,11 +15312,12 @@ msgstr "Montrer un icône dans la barre système"
 msgid ""
 "Show in the taskbar, a systray iconin order to control VLC media playerfor "
 "basic actions"
-msgstr ""
+msgstr "Afficher une icone de notification dans la barre des tâches pour controler"
+"les actions basiques de VLC"
 
 #: modules/gui/qt4/qt4.cpp:62
 msgid "Start VLC only with a systray icon"
-msgstr ""
+msgstr "Démarrer VLC seulement avec une icone de notifications"
 
 #: modules/gui/qt4/qt4.cpp:63
 msgid ""
@@ -21407,7 +21411,7 @@ msgstr "Nom du périphérique d’affichage désiré"
 #: modules/video_output/msw/directx.c:146
 msgid ""
 "In a multiple monitor configuration, you can specify the Windows device name "
-"of the display that you want the video window to open on. For example, \"\\"
+"of the display that you want the video window to open on. For example, \"\\""
 "\\.\\DISPLAY1\" or \"\\\\.\\DISPLAY2\"."
 msgstr ""
 "Dans une configuration à plusieurs moniteurs, vous pouvez spécifier le nom "
