@@ -52,16 +52,16 @@ int cocoaglvoutviewInit( vout_thread_t * p_vout )
     var_Create( p_vout, "drawable", VLC_VAR_DOINHERIT );
     var_Get( p_vout, "drawable", &value_drawable );
 
+    p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
+
     o_cocoaglview_container = (id) value_drawable.i_int;
     if (!o_cocoaglview_container)
     {
         msg_Warn( p_vout, "No drawable!, spawing a window" );
-        o_cocoaglview_container = [[VLCMinimalVoutWindow alloc] initWithContentRect: NSMakeRect( 0, 0, 200, 200 )];
     }
 
     p_vout->p_sys->b_embedded = VLC_FALSE;
 
-    p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
     /* Create the GL view */
     struct args { vout_thread_t * p_vout; id <VLCOpenGLVoutEmbedding> container; } args = { p_vout, o_cocoaglview_container };
@@ -94,6 +94,8 @@ void cocoaglvoutviewEnd( vout_thread_t * p_vout )
 
     if( [(id)o_cocoaglview_container respondsToSelector:@selector(removeVoutSubview:)] )
         [o_cocoaglview_container removeVoutSubview: p_vout->p_sys->o_glview];
+
+    [p_vout->p_sys->o_glview release];
 
     [p_vout->p_sys->o_pool release];
     
@@ -195,15 +197,22 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
  * vout_thread_t. Must be called from main thread. */
 + (void) autoinitOpenGLVoutViewIntVoutWithContainer: (NSData *) argsAsData
 {
+    NSAutoreleasePool   *pool = [[NSAutoreleasePool alloc] init];
     struct args { vout_thread_t * p_vout; id <VLCOpenGLVoutEmbedding> container; } *
         args = (struct args *)[argsAsData bytes];
     VLCOpenGLVoutView * oglview;
 
+    if( !args->container )
+    {
+        args->container = [[VLCMinimalVoutWindow alloc] initWithContentRect: NSMakeRect( 0, 0, args->p_vout->i_window_width, args->p_vout->i_window_height )];
+        [(VLCMinimalVoutWindow *)args->container makeKeyAndOrderFront: nil];
+    }
     oglview = [[VLCOpenGLVoutView alloc] initWithVout: args->p_vout container: args->container];
 
-    args->p_vout->p_sys->o_glview = [oglview autorelease];
-
+    args->p_vout->p_sys->o_glview = oglview;
     [args->container addVoutSubview: oglview];
+
+    [pool release];
 }
 
 - (void)dealloc
@@ -365,5 +374,9 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
     CGLUnlockContext([[p_vout->p_sys->o_glview openGLContext] CGLContextObj]);
 }
 
+- (BOOL)mouseDownCanMoveWindow
+{
+    return YES;
+}
 @end
 

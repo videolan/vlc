@@ -39,14 +39,20 @@
 {
     if( self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO])
     {
-        rect = contentRect;
+        initialFrame = contentRect;
+        fullscreen = NO;
         [self setBackgroundColor:[NSColor blackColor]];
+        [self setHasShadow:YES];
         [self setMovableByWindowBackground: YES];
+        [self center];
     }
     return self;
 }
+
+/* @protocol VLCOpenGLVoutEmbedding */
 - (void)addVoutSubview:(NSView *)view
 {
+    [view setAutoresizingMask:NSViewHeightSizable|NSViewWidthSizable];
     [[self contentView] addSubview:view];
     [view setFrame:[[self contentView] bounds]];
 }
@@ -59,14 +65,17 @@
 
 - (void)enterFullscreen
 {
+    fullscreen = YES;
+    initialFrame = [self frame];
     SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
-    [self setFrame:[[self screen] frame] display: YES];
+    [self setFrame:[[self screen] frame] display:YES animate:YES];
 }
 
 - (void)leaveFullscreen
 {
+    fullscreen = NO;
     SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
-    [self setFrame:rect display: YES];
+    [self setFrame:initialFrame display:YES animate:YES];
 }
 
 - (BOOL)stretchesVideo

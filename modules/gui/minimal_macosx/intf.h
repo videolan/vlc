@@ -45,6 +45,6 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-    NSAutoreleasePool * o_pool;
+    int nothing_for_now;
 };
 

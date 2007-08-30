@@ -58,12 +58,9 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 
     memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
 
-    p_intf->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
-
-    p_intf->b_play = VLC_TRUE;
     p_intf->pf_run = Run;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -75,6 +72,17 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
 
     free( p_intf->p_sys );
 }
+
+/* Dock Connection */
+typedef struct CPSProcessSerNum
+{
+        UInt32                lo;
+        UInt32                hi;
+} CPSProcessSerNum;
+
+extern OSErr    CPSGetCurrentProcess( CPSProcessSerNum *psn);
+extern OSErr    CPSEnableForegroundOperation( CPSProcessSerNum *psn, UInt32 _arg2, UInt32 _arg3, UInt32 _arg4, UInt32 _arg5);
+extern OSErr    CPSSetFrontProcess( CPSProcessSerNum *psn);
 
 /*****************************************************************************
  * Run: main loop
@@ -95,7 +103,14 @@ static void Run( intf_thread_t *p_intf )
     sigemptyset( &set );
     sigaddset( &set, SIGTERM );
     pthread_sigmask( SIG_UNBLOCK, &set, NULL );
-
+    CPSProcessSerNum PSN;
+    NSAutoreleasePool   *pool = [[NSAutoreleasePool alloc] init];
+    [NSApplication sharedApplication];
+    if (!CPSGetCurrentProcess(&PSN))
+        if (!CPSEnableForegroundOperation(&PSN,0x03,0x3C,0x2C,0x1103))
+            if (!CPSSetFrontProcess(&PSN))
+                [NSApplication sharedApplication];
     [NSApp run];
+    [pool release];
 }
 
