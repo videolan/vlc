@@ -394,16 +394,19 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
             vlc_object_release( p_input );
         }
 
-        if( psz_name == NULL )
-            psz_name = strdup( "Unknown" );
-
-        asprintf( &p_sys->psz_file, "%s %d-%d-%d %.2dh%.2dm%.2ds.%s",
-                  psz_name,
-                  l.tm_mday, l.tm_mon+1, l.tm_year+1900,
-                  l.tm_hour, l.tm_min, l.tm_sec,
-                  p_sys->psz_ext );
+        if( asprintf( &p_sys->psz_file, "%s %d-%d-%d %.2dh%.2dm%.2ds.%s",
+                      ( psz_name != NULL ) ? psz_name : "Unknown",
+                      l.tm_mday, l.tm_mon+1, l.tm_year+1900,
+                      l.tm_hour, l.tm_min, l.tm_sec,
+                      p_sys->psz_ext ) == -1 )
+            p_sys->psz_file = NULL;
 
         free( psz_name );
+        if( p_sys->psz_file == NULL )
+        {
+            p_sys->b_dump = VLC_FALSE;
+            return;
+        }
 
         /* Remove all forbidden characters (except (back)slashes) */
         for( psz = p_sys->psz_file; *psz; psz++ )
@@ -422,16 +425,22 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
 #endif
         }
 
-        psz_name=strdup(p_sys->psz_file);
+        psz_name = p_sys->psz_file;
 
 #if defined (WIN32) || defined (UNDER_CE)
 #define DIR_SEP "\\"
 #else
 #define DIR_SEP "/"
 #endif
-        asprintf(&p_sys->psz_file, "%s" DIR_SEP "%s",
-                 p_sys->psz_path, psz_name);
-        free(psz_name);
+        if( asprintf( &p_sys->psz_file, "%s" DIR_SEP "%s",
+                      p_sys->psz_path, psz_name ) == -1 )
+            p_sys->psz_file = NULL;
+        free( psz_name );
+        if( p_sys->psz_file == NULL )
+        {
+            p_sys->b_dump = VLC_FALSE;
+            return;
+        }
 
         msg_Dbg( p_access, "dump in file '%s'", p_sys->psz_file );
 
