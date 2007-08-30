@@ -384,7 +384,9 @@ struct httpd_file_t
 
 };
 
-static int httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, httpd_message_t *answer, httpd_message_t *query )
+static int
+httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
+                    httpd_message_t *answer, const httpd_message_t *query )
 {
     httpd_file_t *file = (httpd_file_t*)p_sys;
     uint8_t *psz_args = query->psz_args;
@@ -504,7 +506,9 @@ struct httpd_handler_t
 
 };
 
-static int httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, httpd_message_t *answer, httpd_message_t *query )
+static int
+httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
+                       httpd_message_t *answer, const httpd_message_t *query )
 {
     httpd_handler_t *handler = (httpd_handler_t*)p_sys;
     uint8_t *psz_args = query->psz_args;
@@ -628,7 +632,7 @@ struct httpd_redirect_t
 
 static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
                                    httpd_client_t *cl, httpd_message_t *answer,
-                                   httpd_message_t *query )
+                                   const httpd_message_t *query )
 {
     httpd_redirect_t *rdir = (httpd_redirect_t*)p_sys;
     char *p_body;
@@ -708,7 +712,7 @@ struct httpd_stream_t
 
 static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
                                  httpd_client_t *cl, httpd_message_t *answer,
-                                 httpd_message_t *query )
+                                 const httpd_message_t *query )
 {
     httpd_stream_t *stream = (httpd_stream_t*)p_sys;
 
@@ -1333,7 +1337,7 @@ void httpd_MsgClean( httpd_message_t *msg )
     httpd_MsgInit( msg );
 }
 
-const char *httpd_MsgGet( httpd_message_t *msg, const char *name )
+const char *httpd_MsgGet( const httpd_message_t *msg, const char *name )
 {
     int i;
 
