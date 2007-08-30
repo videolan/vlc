@@ -85,14 +85,12 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 
     /* GPL License */
     QTextEdit *licenseEdit = new QTextEdit( this );
-    QString psz_qlicence = QString::fromUtf8( psz_licence );
-    licenseEdit->setText( psz_qlicence );
+    licenseEdit->setText( qfu( psz_licence ) );
     licenseEdit->setReadOnly( true );
 
     /* People who helped */
     QTextEdit *thanksEdit = new QTextEdit( this );
-    QString psz_qthanks = QString::fromUtf8( psz_thanks );
-    thanksEdit->setText( psz_qthanks );
+    thanksEdit->setText( qfu( psz_thanks ) );
     thanksEdit->setReadOnly( true );
 
     /* add the tabs to the Tabwidget */

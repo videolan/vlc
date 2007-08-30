@@ -194,8 +194,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 
     if( model->i_depth == 1 )  //left window for playlist etc.
     {
-        const QString psz_name = QString::fromUtf8( p_item->p_input->psz_name );
-        strings.append( psz_name );
+        strings.append( qfu( p_item->p_input->psz_name ) );
         return;
     }
 
