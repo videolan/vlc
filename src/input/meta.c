@@ -110,7 +110,7 @@ int input_MetaFetch( playlist_t *p_playlist, input_item_t *p_item )
 }
 
 /* Return codes:
- *   0 : Art is in cache
+ *   0 : Art is in cache or is a local file
  *   1 : Art found, need to download
  *  -X : Error/not found
  */
@@ -145,8 +145,10 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
                 free( psz_album );
                 if( album.b_found )
                 {
-                    /* Actually get URL from cache */
-                    input_FindArtInCache( p_playlist, p_item );
+                    if( !strncmp( album.psz_arturl, "file://", 7 ) )
+                        input_item_SetArtURL( p_item, album.psz_arturl );
+                    else /* Actually get URL from cache */
+                        input_FindArtInCache( p_playlist, p_item );
                     return 0;
                 }
                 else
@@ -202,6 +204,7 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
         playlist_album_t a;
         a.psz_artist = psz_artist;
         a.psz_album = psz_album;
+        a.psz_arturl = input_item_GetArtURL( p_item );
         a.b_found = (i_ret == VLC_EGENERIC ? VLC_FALSE : VLC_TRUE );
         ARRAY_APPEND( p_playlist->p_fetcher->albums, a );
     }

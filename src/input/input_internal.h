@@ -215,6 +215,7 @@ typedef struct playlist_album_t
 {
     char *psz_artist;
     char *psz_album;
+    char *psz_arturl;
     vlc_bool_t b_found;
 } playlist_album_t;
 
