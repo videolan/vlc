@@ -21411,7 +21411,7 @@ msgstr "Nom du périphérique d’affichage désiré"
 #: modules/video_output/msw/directx.c:146
 msgid ""
 "In a multiple monitor configuration, you can specify the Windows device name "
-"of the display that you want the video window to open on. For example, \"\\""
+"of the display that you want the video window to open on. For example, \"\\"
 "\\.\\DISPLAY1\" or \"\\\\.\\DISPLAY2\"."
 msgstr ""
 "Dans une configuration à plusieurs moniteurs, vous pouvez spécifier le nom "
