@@ -29,10 +29,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <vlc/vlc.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <ctype.h>
-#include <vlc/vlc.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 
