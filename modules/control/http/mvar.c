@@ -514,6 +514,7 @@ mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
 #endif
     char        **ppsz_dir_content;
     int           i_dir_content, i;
+#warning Obvious bug here:
     char         *psz_dir = E_(RealPath)( p_intf, psz_dir );
 
 #ifdef HAVE_SYS_STAT_H
