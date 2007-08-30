@@ -23,6 +23,7 @@ include/vlc_devices.h
 include/vlc_epg.h
 include/vlc_es.h
 include/vlc_es_out.h
+include/vlc_events.h
 include/vlc_filter.h
 include/vlc_httpd.h
 include/vlc_image.h
@@ -71,7 +72,9 @@ src/audio_output/mixer.c
 src/audio_output/output.c
 src/control/audio.c
 src/control/core.c
+src/control/dynamic_media_list.c
 src/control/event.c
+src/control/flat_media_list.c
 src/control/libvlc_internal.h
 src/control/log.c
 src/control/mediacontrol_audio_video.c
@@ -79,8 +82,14 @@ src/control/mediacontrol_core.c
 src/control/mediacontrol_internal.h
 src/control/mediacontrol_util.c
 src/control/media_descriptor.c
+src/control/media_discoverer.c
 src/control/media_instance.c
+src/control/media_library.c
+src/control/media_list.c
+src/control/media_list_path.h
+src/control/media_list_player.c
 src/control/playlist.c
+src/control/tag_query.c
 src/control/video.c
 src/control/vlm.c
 src/extras/dirent.c
@@ -118,6 +127,7 @@ src/misc/cpu.c
 src/misc/darwin_specific.c
 src/misc/devices.c
 src/misc/error.c
+src/misc/events.c
 src/misc/image.c
 src/misc/md5.c
 src/misc/messages.c
@@ -377,6 +387,7 @@ modules/codec/subtitles/subsdec.h
 modules/codec/subtitles/subsusf.c
 modules/codec/svcdsub.c
 modules/codec/tarkin.c
+modules/codec/telx.c
 modules/codec/theora.c
 modules/codec/twolame.c
 modules/codec/vorbis.c
@@ -554,6 +565,17 @@ modules/gui/macosx/vout.m
 modules/gui/macosx/voutqt.m
 modules/gui/macosx/wizard.h
 modules/gui/macosx/wizard.m
+modules/gui/minimal_macosx/intf.h
+modules/gui/minimal_macosx/intf.m
+modules/gui/minimal_macosx/macosx.c
+modules/gui/minimal_macosx/VLCMinimalVoutWindow.h
+modules/gui/minimal_macosx/VLCMinimalVoutWindow.m
+modules/gui/minimal_macosx/VLCOpenGLVoutView.h
+modules/gui/minimal_macosx/VLCOpenGLVoutView.m
+modules/gui/minimal_macosx/voutagl.h
+modules/gui/minimal_macosx/voutagl.m
+modules/gui/minimal_macosx/voutgl.h
+modules/gui/minimal_macosx/voutgl.m
 modules/gui/ncurses.c
 modules/gui/pda/pda.c
 modules/gui/pda/pda_callbacks.c
@@ -961,6 +983,10 @@ modules/misc/freetype.c
 modules/misc/gnutls.c
 modules/misc/gtk_main.c
 modules/misc/logger.c
+modules/misc/lua/luameta.c
+modules/misc/lua/luaplaylist.c
+modules/misc/lua/vlclua.c
+modules/misc/lua/vlclua.h
 modules/misc/memcpy/fastmemcpy.h
 modules/misc/memcpy/memcpyaltivec.c
 modules/misc/memcpy/memcpy.c
@@ -1027,6 +1053,8 @@ modules/stream_out/es.c
 modules/stream_out/gather.c
 modules/stream_out/mosaic_bridge.c
 modules/stream_out/rtp.c
+modules/stream_out/rtp.h
+modules/stream_out/rtsp.c
 modules/stream_out/standard.c
 modules/stream_out/switcher.c
 modules/stream_out/transcode.c
@@ -1036,6 +1064,7 @@ modules/stream_out/transrate/getvlc.h
 modules/stream_out/transrate/putvlc.h
 modules/stream_out/transrate/transrate.c
 modules/stream_out/transrate/transrate.h
+modules/video_chroma/grey_yuv.c
 modules/video_chroma/i420_rgb16.c
 modules/video_chroma/i420_rgb8.c
 modules/video_chroma/i420_rgb.c
@@ -1061,6 +1090,7 @@ modules/video_filter/filter_common.h
 modules/video_filter/filter_event_info.h
 modules/video_filter/gaussianblur.c
 modules/video_filter/gradient.c
+modules/video_filter/grain.c
 modules/video_filter/invert.c
 modules/video_filter/logo.c
 modules/video_filter/magnify.c
