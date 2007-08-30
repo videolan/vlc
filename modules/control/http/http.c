@@ -537,7 +537,7 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     char length[12]; /* in seconds */
     audio_volume_t i_volume;
     char volume[5];
-    char state[8];
+    const char *state;
     char stats[20];
 
 #define p_sys p_args->p_intf->p_sys
@@ -553,23 +553,23 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
         var_Get( p_sys->p_input, "state", &val );
         if( val.i_int == PLAYING_S )
         {
-            sprintf( state, "playing" );
+            state = "playing";
         }
         else if( val.i_int == OPENING_S )
         {
-            sprintf( state, "opening/connecting" );
+            state = "opening/connecting";
         }
         else if( val.i_int == BUFFERING_S )
         {
-            sprintf( state, "buffering" );
+            state = "buffering";
         }
         else if( val.i_int == PAUSE_S )
         {
-            sprintf( state, "paused" );
+            state = "paused";
         }
         else
         {
-            sprintf( state, "stop" );
+            state = "stop";
         }
     }
     else
@@ -577,7 +577,7 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
         sprintf( position, "%d", 0 );
         sprintf( time, "%d", 0 );
         sprintf( length, "%d", 0 );
-        sprintf( state, "stop" );
+        state = "stop";
     }
 #undef p_sys
 
@@ -938,7 +938,7 @@ int  E_(ArtCallback)( httpd_handler_sys_t *p_args,
     char *psz_art = NULL;
     intf_thread_t *p_intf = p_args->file.p_intf;
     intf_sys_t *p_sys = p_intf->p_sys;
-    int psz_id[16];
+    char psz_id[16];
     input_item_t *p_item = NULL;
     int i_id;
 
