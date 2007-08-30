@@ -15160,7 +15160,7 @@ msgstr "&Navigation"
 
 #: modules/gui/qt4/menus.cpp:199 modules/gui/wxwidgets/interface.cpp:631
 msgid "&Help"
-msgstr "&Aide"
+msgstr "A&ide"
 
 #: modules/gui/qt4/menus.cpp:209 modules/gui/qt4/menus.cpp:523
 #: modules/gui/wxwidgets/menus.cpp:127
