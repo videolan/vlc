@@ -75,6 +75,17 @@ resources.cpp: res.qrc
 	sed -i -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@.tmp
 	mv -f $@.tmp $@
 
+dialogs/help.cpp: dialogs/about.hpp
+
+dialogs/about.hpp:
+	echo "char *psz_licence = { \\" > dialogs/about.hpp
+	cat $(top_srcdir)/COPYING | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\" \\" }' >> dialogs/about.hpp
+	echo "};" >> dialogs/about.hpp
+	echo "char *psz_thanks = { \\" >> dialogs/about.hpp
+	cat $(top_srcdir)/THANKS | grep -v '$$Id:' | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\" \\" }' >> dialogs/about.hpp
+	echo "};" >> dialogs/about.hpp
+
+
 SOURCES_qt4 = 	qt4.cpp \
 		menus.cpp \
 		main_interface.cpp \
@@ -119,6 +130,7 @@ noinst_HEADERS = \
 	dialogs/preferences.hpp \
 	dialogs/interaction.hpp \
 	dialogs/sout.hpp \
+        dialogs/about.hpp \
 	dialogs/help.hpp \
 	dialogs/gototime.hpp \
 	dialogs/open.hpp \

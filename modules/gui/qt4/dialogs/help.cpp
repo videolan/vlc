@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "dialogs/about.hpp"
 #include "dialogs/help.hpp"
 
 #include "dialogs_provider.hpp"
@@ -31,6 +32,7 @@
 #include <QTabWidget>
 #include <QFile>
 #include <QLabel>
+#include <QString>
 
 HelpDialog *HelpDialog::instance = NULL;
 
@@ -80,15 +82,15 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     layout->addWidget( closeButton, 2, 1, 1, 1 );
 
     /* GPL License */
-    QFile *licenseFile = new QFile( "/usr/src/vlc/COPYING" );
     QTextEdit *licenseEdit = new QTextEdit( this );
-    licenseEdit->setText( licenseFile->readAll() );
+    QString psz_qlicence = QString::fromUtf8( psz_licence );
+    licenseEdit->setText( psz_qlicence );
     licenseEdit->setReadOnly( true );
 
     /* People who helped */
-    QFile *thanksFile = new QFile( "/usr/src/vlc/THANKS" );
     QTextEdit *thanksEdit = new QTextEdit( this );
-    thanksEdit->setText( thanksFile->readAll() );
+    QString psz_qthanks = QString::fromUtf8( psz_thanks );
+    thanksEdit->setText( psz_qthanks );
     thanksEdit->setReadOnly( true );
 
     /* add the tabs to the Tabwidget */
