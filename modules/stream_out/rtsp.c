@@ -1,7 +1,9 @@
 /*****************************************************************************
  * rtsp.c: RTSP support for RTP stream output module
  *****************************************************************************
- * Copyright (C) 2003-2007 the VideoLAN team
+ * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright © 2007 Rémi Denis-Courmont
+ *
  * $Id: rtp.c 21407 2007-08-22 20:10:41Z courmisch $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -31,6 +33,8 @@
 #include <vlc_url.h>
 #include <vlc_network.h>
 #include <assert.h>
+#include <errno.h>
+#include <stdlib.h>
 
 #include "rtp.h"
 
@@ -51,11 +55,11 @@ struct rtsp_stream_t
 
 
 static int  RtspCallback( httpd_callback_sys_t *p_args,
-                          httpd_client_t *cl,
-                          httpd_message_t *answer, httpd_message_t *query );
+                          httpd_client_t *cl, httpd_message_t *answer,
+                          const httpd_message_t *query );
 static int  RtspCallbackId( httpd_callback_sys_t *p_args,
-                            httpd_client_t *cl,
-                            httpd_message_t *answer, httpd_message_t *query );
+                            httpd_client_t *cl, httpd_message_t *answer,
+                            const httpd_message_t *query );
 static void RtspClientDel( rtsp_stream_t *rtsp, rtsp_session_t *session );
 
 rtsp_stream_t *RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url )
@@ -140,12 +144,11 @@ typedef struct rtsp_strack_t rtsp_strack_t;
 struct rtsp_session_t
 {
     rtsp_stream_t *stream;
+    uint64_t       id;
 
     /* output (id-access) */
     int            trackc;
     rtsp_strack_t *trackv;
-
-    char name[0];
 };
 
 
@@ -229,14 +232,16 @@ void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t *id )
 
 /** rtsp must be locked */
 static
-rtsp_session_t *RtspClientNew( rtsp_stream_t *rtsp, const char *name )
+rtsp_session_t *RtspClientNew( rtsp_stream_t *rtsp )
 {
-    rtsp_session_t *s = malloc( sizeof( *s ) + strlen( name ) + 1 );
+    rtsp_session_t *s = malloc( sizeof( *s ) );
+    if( s == NULL )
+        return NULL;
 
     s->stream = rtsp;
+    s->id = rand(); /* FIXME: not enough entropy */
     s->trackc = 0;
     s->trackv = NULL;
-    strcpy( s->name, name );
 
     TAB_APPEND( rtsp->sessionc, rtsp->sessionv, s );
 
@@ -248,15 +253,22 @@ rtsp_session_t *RtspClientNew( rtsp_stream_t *rtsp, const char *name )
 static
 rtsp_session_t *RtspClientGet( rtsp_stream_t *rtsp, const char *name )
 {
+    char *end;
+    uint64_t id;
     int i;
 
     if( name == NULL )
         return NULL;
 
+    errno = 0;
+    id = strtoull( name, &end, 0x10 );
+    if( errno || *end )
+        return NULL;
+
     /* FIXME: use a hash/dictionary */
     for( i = 0; i < rtsp->sessionc; i++ )
     {
-        if( !strcmp( rtsp->sessionv[i]->name, name ) )
+        if( rtsp->sessionv[i]->id == id )
             return rtsp->sessionv[i];
     }
     return NULL;
@@ -284,7 +296,8 @@ void RtspClientDel( rtsp_stream_t *rtsp, rtsp_session_t *session )
 /** Aggregate RTSP callback */
 static int RtspCallback( httpd_callback_sys_t *p_args,
                          httpd_client_t *cl,
-                         httpd_message_t *answer, httpd_message_t *query )
+                         httpd_message_t *answer,
+                         const httpd_message_t *query )
 {
     rtsp_stream_t *rtsp = (rtsp_stream_t *)p_args;
     const char *psz_session = NULL, *psz;
@@ -304,7 +317,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args,
     if( httpd_MsgGet( query, "Require" ) != NULL )
     {
         answer->i_status = 551;
-        httpd_MsgAdd( query, "Unsupported", "%s",
+        httpd_MsgAdd( answer, "Unsupported", "%s",
                       httpd_MsgGet( query, "Require" ) );
     }
     else
@@ -432,17 +445,17 @@ static inline const char *parameter_next( const char *str )
 /** Non-aggregate RTSP callback */
 static int RtspCallbackId( httpd_callback_sys_t *p_args,
                            httpd_client_t *cl,
-                           httpd_message_t *answer, httpd_message_t *query )
+                           httpd_message_t *answer,
+                           const httpd_message_t *query )
 {
     rtsp_stream_id_t *id = (rtsp_stream_id_t *)p_args;
     rtsp_stream_t    *rtsp = id->stream;
     sout_stream_t    *p_stream = id->stream->owner;
-    char psz_session_init[21];
+    char psz_sesbuf[17];
     const char *psz_session, *psz;
 
     if( answer == NULL || query == NULL )
         return VLC_SUCCESS;
-    //fprintf( stderr, "RtspCallback query: type=%d\n", query->i_type );
 
     /* */
     answer->i_proto = HTTPD_PROTO_RTSP;
@@ -451,19 +464,12 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     answer->i_body = 0;
     answer->p_body = NULL;
 
-    /* Create new session ID if needed */
     psz_session = httpd_MsgGet( query, "Session" );
-    if( psz_session == NULL )
-    {
-        /* FIXME: should be somewhat secure randomness */
-        snprintf( psz_session_init, sizeof(psz_session_init), I64Fu,
-                  NTPtime64() + rand() );
-    }
 
     if( httpd_MsgGet( query, "Require" ) != NULL )
     {
         answer->i_status = 551;
-        httpd_MsgAdd( query, "Unsupported", "%s",
+        httpd_MsgAdd( answer, "Unsupported", "%s",
                       httpd_MsgGet( query, "Require" ) );
     }
     else
@@ -515,19 +521,25 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                         }
                     }
                     else
+                    if( strncmp( opt,"destination=", 12 ) == 0 )
+                    {
+                        answer->i_status = 403;
+                        b_unsupp = VLC_TRUE;
+                    }
+                    else
                     {
                     /*
                      * Every other option is unsupported:
                      *
-                     * "source" and "append" are invalid.
+                     * "source" and "append" are invalid (server-only);
+                     * "ssrc" also (as clarified per RFC2326bis).
                      *
                      * For multicast, "port", "layers", "ttl" are set by the
                      * stream output configuration.
                      *
-                     * For unicast, we do not allow "destination" as it
-                     * carries a DoS risk, and we decide on "server_port".
+                     * For unicast, we want to decide "server_port" values.
                      *
-                     * "interleaved" and "ssrc" are not implemented.
+                     * "interleaved" is not implemented.
                      */
                         b_unsupp = VLC_TRUE;
                         break;
@@ -585,8 +597,10 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     vlc_mutex_lock( &rtsp->lock );
                     if( psz_session == NULL )
                     {
-                        psz_session = psz_session_init;
-                        ses = RtspClientNew( rtsp, psz_session );
+                        ses = RtspClientNew( rtsp );
+                        snprintf( psz_sesbuf, sizeof( psz_sesbuf ), I64Fx,
+                                  ses->id );
+                        psz_session = psz_sesbuf;
                     }
                     else
                     {
