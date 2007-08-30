@@ -55,7 +55,7 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
     vlc_mutex_init( p_intf, &lock );
     p_vout = NULL;
-
+    CONNECT( this, askResize(), this, SetMinSize() );
     setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
 }
 
@@ -93,7 +93,13 @@ void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
         return NULL;
     }
     p_vout = p_nvout;
+    emit askResize();
     return ( void* )winId();
+}
+
+void VideoWidget::SetMinSize()
+{
+    setMinimumSize( 16, 16 );
 }
 
 void VideoWidget::release( void *p_win )
