@@ -43,6 +43,8 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 
     QGridLayout *layout = new QGridLayout( this );
     QTextBrowser *helpBrowser = new QTextBrowser( this );
+    helpBrowser->setOpenExternalLinks( true );
+    helpBrowser->setHtml( _("<html><b>Documentation</b><br><br>You can find VLC documentation (in english) on VLC wiki website.<br><br>Please see the <a href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies\">Basic Documentation</a>.<br>As well as the more <a href=\"http://wiki.videolan.org/Documentation:Play_HowTo\">Advanced Documentation</a>.<br>You might also be interested by the <a href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming Documentation</a>.<br><br><br><b>Getting Help</b><br><br>You might get (and give) help on the <a href=\"http://forum.videolan.org\">Forums</a>.</html>") );
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
     closeButton->setDefault( true );
 
