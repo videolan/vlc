@@ -68,7 +68,7 @@ vlc_module_begin();
 #elif defined (MODULE_NAME_IS_i422_yuy2_sse2)
     set_description( _("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "chroma", 120 );
-    add_requirement( MMX );
+    add_requirement( SSE2 );
 #endif
     set_callbacks( Activate, NULL );
 vlc_module_end();
