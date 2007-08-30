@@ -53,7 +53,7 @@
 		635FDAEE0C8080B900CE5E69 /* VLCCategoryOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = VLCCategoryOutlineView.h; sourceTree = "<group>"; };
 		635FDB3B0C8083BC00CE5E69 /* VLCCategoryCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCCategoryCell.h; sourceTree = "<group>"; };
 		635FDB3C0C8083BC00CE5E69 /* VLCCategoryCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCCategoryCell.m; sourceTree = "<group>"; };
-		63C551680C7F62EC00B202D3 /* VLC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VLC.framework; path = ../../VLC.framework; sourceTree = SOURCE_ROOT; };
+		63C551680C7F62EC00B202D3 /* VLC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VLC.framework; path = ../Framework/VLC.framework; sourceTree = SOURCE_ROOT; };
 		63C5518A0C7F663500B202D3 /* VLCController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = VLCController.h; sourceTree = "<group>"; };
 		63C5518B0C7F663500B202D3 /* VLCController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VLCController.m; sourceTree = "<group>"; };
 		63C5518E0C7F6A2000B202D3 /* VLCCategoryListDataSource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = VLCCategoryListDataSource.h; sourceTree = "<group>"; };
