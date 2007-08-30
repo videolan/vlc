@@ -26,6 +26,9 @@
 #include "modules/configuration.h"
 #include <vlc_charset.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <errno.h>
 
 int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
@@ -96,6 +99,21 @@ int playlist_MLLoad( playlist_t *p_playlist )
         msg_Err( p_playlist, "no home directory, cannot load media library") ;
         return VLC_EGENERIC;
     }
+
+    if( asprintf( &psz_uri, "%s" DIR_SEP CONFIG_DIR DIR_SEP
+                        "ml.xsp", psz_homedir ) == -1 )
+    {
+        psz_uri = NULL;
+        goto error;
+    }
+    struct stat p_stat;
+    /* checks if media library file is present */
+    if( utf8_stat( psz_uri , &p_stat ) )
+    {
+        free( psz_uri );
+        return VLC_EGENERIC;
+    }
+    free( psz_uri );
 
     if( asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP CONFIG_DIR DIR_SEP
                         "ml.xsp", psz_homedir ) == -1 )
