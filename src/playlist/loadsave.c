@@ -86,10 +86,6 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-#if 0
-    FIXME: this code breaks streaming output (or streaming output breaks this,
-    whichever you prefer).
-
     const char *psz_homedir = p_playlist->p_libvlc->psz_homedir;
     char *psz_uri = NULL;
     input_item_t *p_input;
@@ -113,8 +109,8 @@ int playlist_MLLoad( playlist_t *p_playlist )
     if( p_input == NULL )
         goto error;
 
-    p_playlist->p_ml_onelevel->p_input =
-        p_playlist->p_ml_category->p_input = p_input;
+    playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, 0, VLC_FALSE,
+                        VLC_FALSE );
 
     p_playlist->b_doing_ml = VLC_TRUE;
     stats_TimerStart( p_playlist, "ML Load", STATS_TIMER_ML_LOAD );
@@ -128,10 +124,6 @@ int playlist_MLLoad( playlist_t *p_playlist )
 error:
     free( psz_uri );
     return VLC_ENOMEM;
-#else
-    msg_Err( p_playlist, "Reloading playlist not implemented." );
-    return VLC_EGENERIC;
-#endif
 }
 
 int playlist_MLDump( playlist_t *p_playlist )
