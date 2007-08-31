@@ -54,6 +54,7 @@ Input/Demuxers:
   * AAC tags support
   * APEv1/2 tags support
   * Improved ID3v2 tags support
+  * Improved Ogg/Vorbis tags support
   * Raw video support
 
 Decoders:
@@ -105,10 +106,10 @@ Interfaces:
    * Improved mouse gestures
  * Unix
    * Allow only one running instance, using D-Bus interface.
-   * D-Bus Interface (experimental) implements the MPRIS 
+   * D-Bus Interface implementing the MPRIS 
      (Media Player Remote Interfacing specification), a common dbus control 
      interface for media players that intends to become an xdg standard when 
-     finished.
+     finished: http://wiki.xmms2.xmms.se/index.php/Media_Player_Interfaces .
    * Motion module use disk accelerometers to keep video horizontal
 
 Capture:
