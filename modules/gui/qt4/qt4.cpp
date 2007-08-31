@@ -196,6 +196,17 @@ static void Init( intf_thread_t *p_intf )
     char dummy[] = "";
     char *argv[] = { dummy };
     int argc = 1;
+
+#ifndef WIN32
+    /* unblocks SIGCHLD as that makes the app hang when cleanlooks style is used
+     * ( when launching gconftool-2 to get the icon theme ) */
+    sigset_t set;
+
+    sigemptyset( &set );
+    sigaddset( &set, SIGCHLD );
+    pthread_sigmask( SIG_UNBLOCK, &set, NULL );
+#endif
+
     Q_INIT_RESOURCE( vlc );
     QApplication *app = new QApplication( argc, argv , true );
     app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
@@ -213,19 +224,7 @@ static void Init( intf_thread_t *p_intf )
     }
 
     if( p_intf->pf_show_dialog )
-    {
         vlc_thread_ready( p_intf );
-#ifndef WIN32
-        /* unblocks SIGCHLD as that makes the app hang
-         * when cleanlooks style is used with QT4 
-         * ( exactly when launching gconftool-2 to get the icon theme ) */
-        sigset_t set;
-
-        sigemptyset( &set );
-        sigaddset( &set, SIGCHLD );
-        pthread_sigmask( SIG_UNBLOCK, &set, NULL );
-#endif
-    }
 
     /* Start playing if needed */
     if( !p_intf->pf_show_dialog && p_intf->b_play )
