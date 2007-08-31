@@ -2953,59 +2953,33 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
    fi
    dnl  Use a custom libffmpeg
    AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
-
-   if fgrep -s "CONFIG_ZLIB=yes" "${real_ffmpeg_tree}/config.mak"; then
-     if test "${with_ffmpeg_zlib}" != "yes"; then
-       VLC_ADD_LDFLAGS([ffmpeg],[-lz])
-     fi
-   fi
-   if fgrep -s "CONFIG_MP3LAME=yes" "${real_ffmpeg_tree}/config.mak"; then
-     if test "${with_ffmpeg_mp3lame}" != "yes"; then
-       VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame])
-     fi
-   fi
-   if fgrep -s "CONFIG_FAAC=yes" "${real_ffmpeg_tree}/config.mak"; then
-     if test "${with_ffmpeg_faac}" != "yes"; then
-       VLC_ADD_LDFLAGS([ffmpeg],[-lfaac])
-     fi
-   fi
-   if fgrep -s "CONFIG_DTS=yes" "${real_ffmpeg_tree}/config.mak"; then
-     if test "${with_ffmpeg_dts}" != "yes"; then
-       LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
-       AC_CHECK_LIB(dts_pic, dts_free, 
-         [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts_pic]) ],
-         [ VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
-       LDFLAGS="${LDFLAGS_save}"
-     fi
-   fi
-   if fgrep -s "CONFIG_VORBIS=yes" "${real_ffmpeg_tree}/config.mak"; then
-     VLC_ADD_LDFLAGS([ffmpeg],[-lvorbis -lvorbisenc])
-   fi
-   if fgrep -s "CONFIG_FAAD=yes" "${real_ffmpeg_tree}/config.mak"; then
-     VLC_ADD_LDFLAGS([ffmpeg],[-lfaad])
-   fi
-   if fgrep -s "CONFIG_XVID=yes" "${real_ffmpeg_tree}/config.mak"; then
-     VLC_ADD_LDFLAGS([ffmpeg],[-lxvidcore])
-   fi
-
+   
+   dnl Use pkg-config to look for the ldflags in libav*-uninstalled.pc
+   PKG_CONFIG_PATH_save="$PKG_CONFIG_PATH"
+   PKG_CONFIG_LIBDIR_save="$PKG_CONFIG_LIBDIR"
+   export PKG_CONFIG_PATH=""
+   export PKG_CONFIG_LIBDIR="${real_ffmpeg_tree}"
+  
+   PKG_CHECK_MODULES( [FFMPEG],[libavcodec libavformat libpostproc], [
+	VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher], ${FFMPEG_CFLAGS})
+	VLC_ADD_LDFLAGS([ffmpeg stream_out_switcher], ${FFMPEG_LIBS})]
+      ,[])
+   AS_IF([test -n "${PKG_CONFIG_PATH_save}"],[
+         export PKG_CONFIG_PATH="${PKG_CONFIG_PATH_save}"
+   ],[
+	unset PKG_CONFIG_PATH
+   ])
+   AS_IF([test -n "${PKG_CONFIG_LIBDIR_save}"],[   
+   	export PKG_CONFIG_LIBDIR="${PKG_CONFIG_LIBDIR_save}"   
+   ],[
+        unset PKG_CONFIG_LIBDIR
+   ])
+   
    VLC_ADD_BUILTINS([ffmpeg])
    if test "${enable_sout}" != "no" -a "${enable_switcher}" = "yes" ; then
      VLC_ADD_BUILTINS([stream_out_switcher])
    fi
 
-   if test -f "${real_ffmpeg_tree}/libavutil/libavutil.a"; then
-     VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavutil ${real_ffmpeg_tree}/libavutil/libavutil.a])
-     VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavutil])
-   fi
-
-   VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
-   VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec])
-
-   if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
-     AC_DEFINE(HAVE_LIBAVFORMAT_TREE, 1, [Define if you have ffmpeg's libavformat.])
-     VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat ${real_ffmpeg_tree}/libavformat/libavformat.a])
-     VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavformat])
-   fi
 
    if test -f "${real_ffmpeg_tree}/libswscale/libswscale.a"; then
      AC_DEFINE(HAVE_LIBSWSCALE_TREE, 1, [Define if you have ffmpeg's libswscale.])
