@@ -454,7 +454,7 @@ static int Open( vlc_object_t *p_this )
         if( id->i_mtu <= 16 + MTU_REDUCE )
         {
             /* better than nothing */
-            id->i_mtu = 1500;
+            id->i_mtu = 576 - 20 - 8;
         }
         id->i_mtu -= MTU_REDUCE;
 
