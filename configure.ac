@@ -2920,6 +2920,34 @@ dnl Those options have to be here because the .pc can be bogus for ffmpeg previo
 		VLC_ADD_LDFLAGS([ffmpeg],[-lz])
      fi])
 
+ AC_ARG_WITH(ffmpeg-amrnb,
+   [    --with-ffmpeg-amrnb specify if ffmpeg has been compiled with libamrnb support],
+   [
+     if test "$with_ffmpeg_amrnb" = "yes";	then
+     	VLC_ADD_LDFLAGS([ffmpeg],[-lamrnb])
+     fi])
+
+ AC_ARG_WITH(ffmpeg-amrwb,
+   [    --with-ffmpeg-amrwb specify if ffmpeg has been compiled with libamrwb support],
+   [
+     if test "$with_ffmpeg_amrwb" = "yes";	then
+     	VLC_ADD_LDFLAGS([ffmpeg],[-lamrwb])
+     fi])
+
+ AC_ARG_WITH(ffmpeg-x264,
+   [    --with-ffmpeg-x264 specify if ffmpeg has been compiled with libamrnb support],
+   [
+     if test "$with_ffmpeg_x264" = "yes";	then
+     	VLC_ADD_LDFLAGS([ffmpeg],[-lx264])
+     fi])
+
+ AC_ARG_WITH(ffmpeg-a52,
+   [    --with-ffmpeg-x264 specify if ffmpeg has been compiled with libamrnb support],
+   [
+     if test "$with_ffmpeg_a52" = "yes";	then
+     	VLC_ADD_LDFLAGS([ffmpeg],[-la52])
+     fi])
+
  dnl
  dnl test for --with-ffmpeg-tree
  dnl
