@@ -277,7 +277,7 @@ static int Open( vlc_object_t *p_this )
         /* FIXME */
         p_sys->i_mtu = var_CreateGetInteger( p_access, "mtu" );
         if( p_sys->i_mtu <= 1 )
-            p_sys->i_mtu  = 1500;   /* Avoid problem */
+            p_sys->i_mtu  = 576 - 20 - 8;   /* Avoid problem */
 
         p_sys->b_auto_mtu = var_CreateGetBool( p_access, "udp-auto-mtu" );;
     }
