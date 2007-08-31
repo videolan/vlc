@@ -114,6 +114,9 @@ modules/modules.c: modules/builtin.h
 # Building libvlc
 ###############################################################################
 
+nice:
+	$(top_builddir)/compile
+
 lib_LTLIBRARIES = libvlc.la libvlc-control.la
 
 AM_LDFLAGS = -no-undefined
