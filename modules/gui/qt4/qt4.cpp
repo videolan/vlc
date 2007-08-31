@@ -23,6 +23,7 @@
 
 #ifndef WIN32
 #   include <signal.h>
+#   include <QStyle>
 #endif
 
 #include <QApplication>
@@ -197,20 +198,27 @@ static void Init( intf_thread_t *p_intf )
     char *argv[] = { dummy };
     int argc = 1;
 
+    Q_INIT_RESOURCE( vlc );
+    QApplication *app = new QApplication( argc, argv , true );
+    app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
+    p_intf->p_sys->p_app = app;
+
 #ifndef WIN32
-    /* unblocks SIGCHLD as that makes the app hang when cleanlooks style is used
-     * ( when launching gconftool-2 to get the icon theme ) */
+/* Ugly klugde 
+ * Remove SIGCHLD from the ignored signal the time to initialise 
+ * Qt because it executes gconftool-2 to get the icon theme when using 
+ * cleanlooks theme. */ 
     sigset_t set;
 
     sigemptyset( &set );
     sigaddset( &set, SIGCHLD );
     pthread_sigmask( SIG_UNBLOCK, &set, NULL );
-#endif
 
-    Q_INIT_RESOURCE( vlc );
-    QApplication *app = new QApplication( argc, argv , true );
-    app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
-    p_intf->p_sys->p_app = app;
+/* that forces the execution of QCleanlooksStylePrivate::lookupIconTheme() */
+    app->style()->standardIcon( QStyle::SP_TitleBarMenuButton );
+
+    pthread_sigmask( SIG_BLOCK, &set, NULL );
+#endif
 
     // Initialize timers
     DialogsProvider::getInstance( p_intf );
