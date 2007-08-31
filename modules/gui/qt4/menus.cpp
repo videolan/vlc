@@ -242,7 +242,7 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
     QMenu *menu = new QMenu();
     menu->addMenu( SDMenu( p_intf ) );
     menu->addAction ( QIcon(":/pixmaps/vlc_playlist_16px.png"),
-                      qtr( "Show Playlist"), mi, SLOT( playlist() ) );
+                      qtr( "Show Playlist"), mi, SLOT( togglePlaylist() ) );
     menu->addSeparator();
 
     DP_SADD( menu, qtr( I_PL_LOAD ), "", "", openPlaylist(), "Ctrl+X" );
@@ -285,7 +285,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     if( mi )
     {
         QAction *adv = menu->addAction( qtr("Advanced controls" ),
-                mi, SLOT( advanced() ) );
+                mi, SLOT( toggleAdvanced() ) );
         adv->setCheckable( true );
         if( adv_controls_enabled ) adv->setChecked( true );
 
@@ -300,7 +300,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         if( visual_selector_enabled ) adv->setChecked( true );
 #endif
         menu->addAction ( QIcon(":/pixmaps/vlc_playlist_16px.png"),
-                          qtr( "Playlist"), mi, SLOT( playlist() ),
+                          qtr( "Playlist"), mi, SLOT( togglePlaylist() ),
                           qtr( "Ctrl+L") );
     }
     DP_SADD( menu, qtr( I_MENU_EXT ), "", ":/pixmaps/vlc_settings_16px.png",
@@ -487,9 +487,9 @@ QMenu *QVLCMenu::HelpMenu()
     i_last_separator = 0;
 
 #define POPUP_PLAY_ENTRIES( menu )\
-    vlc_value_t val; \
     if( p_input ) \
     { \
+        vlc_value_t val; \
         var_Get( p_input, "state", &val ); \
         if( val.i_int == PLAYING_S ) \
             MIM_SADD( menu, qtr("Pause"), "", ":/pixmaps/vlc_pause_16px.png", \
@@ -507,10 +507,7 @@ QMenu *QVLCMenu::HelpMenu()
             prev() ); \
     MIM_SADD( menu, qtr("Next"), "", ":/pixmaps/vlc_next_16px.png", next() );
 
-#define POPUP_STATIC_ENTRIES \
-    POPUP_PLAY_ENTRIES( menu ); \
-    \
-    menu->addSeparator(); \
+#define POPUP_STATIC_ENTRIES( menu ) \
     QMenu *intfmenu = InterfacesMenu( p_intf, NULL ); \
     intfmenu->setTitle( qtr("Interfaces" ) ); \
     menu->addMenu( intfmenu ); \
@@ -581,7 +578,9 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
 /* Navigation stuff, and general menus (open) */
 void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
 {
+    vlc_value_t val;
     POPUP_BOILERPLATE;
+
     if( p_input )
     {
         vlc_object_yield( p_input );
@@ -592,8 +591,12 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
 
     QMenu *menu = new QMenu();
     Populate( p_intf, menu, varnames, objects );
+
     menu->addSeparator();
-    POPUP_STATIC_ENTRIES;
+    POPUP_PLAY_ENTRIES( menu );
+
+    menu->addSeparator();
+    POPUP_STATIC_ENTRIES( menu );
 
     p_intf->p_sys->p_popup_menu = menu;
     menu->popup( QCursor::pos() );
@@ -643,7 +646,9 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
             QMenu *menu = new QMenu();
             Populate( p_intf, menu, varnames, objects );
             menu->addSeparator();
-            POPUP_STATIC_ENTRIES;
+            POPUP_PLAY_ENTRIES( menu );
+            menu->addSeparator();
+            POPUP_STATIC_ENTRIES( menu );
 
             p_intf->p_sys->p_popup_menu = menu;
         }
