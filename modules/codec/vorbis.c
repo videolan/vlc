@@ -1,7 +1,10 @@
 /*****************************************************************************
- * vorbis.c: vorbis decoder/encoder/packetizer module making use of libvorbis.
+ * vorbis.c: vorbis decoder/encoder/packetizer module using of libvorbis.
  *****************************************************************************
  * Copyright (C) 2001-2003 the VideoLAN team
+ * Copyright (C) 2007 Société des arts technologiques
+ * Copyright (C) 2007 Savoir-faire Linux
+ *
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -86,7 +89,7 @@ struct decoder_sys_t
     int pi_chan_table[AOUT_CHAN_MAX];
 };
 
-static int pi_channels_maps[7] =
+static int pi_channels_maps[9] =
 {
     0,
     AOUT_CHAN_CENTER,
@@ -97,7 +100,13 @@ static int pi_channels_maps[7] =
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT
+     | AOUT_CHAN_MIDDLERIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
+     | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
+     | AOUT_CHAN_LFE 
 };
 
 /*
@@ -395,10 +404,9 @@ static int ProcessHeaders( decoder_t *p_dec )
     p_dec->fmt_out.audio.i_rate     = p_sys->vi.rate;
     p_dec->fmt_out.audio.i_channels = p_sys->vi.channels;
 
-    if( p_dec->fmt_out.audio.i_channels < 0 ||
-        p_dec->fmt_out.audio.i_channels > 6 )
+    if( p_dec->fmt_out.audio.i_channels > 9 )
     {
-        msg_Err( p_dec, "invalid number of channels (not between 1 and 6): %i",
+        msg_Err( p_dec, "invalid number of channels (not between 1 and 9): %i",
                  p_dec->fmt_out.audio.i_channels );
         return VLC_EGENERIC;
     }
@@ -409,7 +417,6 @@ static int ProcessHeaders( decoder_t *p_dec )
     p_dec->fmt_out.i_bitrate = p_sys->vi.bitrate_nominal;
 
     aout_DateInit( &p_sys->end_date, p_sys->vi.rate );
-    aout_DateSet( &p_sys->end_date, 0 );
 
     msg_Dbg( p_dec, "channels:%d samplerate:%ld bitrate:%ld",
              p_sys->vi.channels, p_sys->vi.rate, p_sys->vi.bitrate_nominal );

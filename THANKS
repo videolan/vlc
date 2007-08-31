@@ -162,7 +162,8 @@ Paul Mackerras <paulus at linuxcare.com.au> - AltiVec IDCT and motion
 Pavlov Konstantin “thresh” - several Linux build system fixes
 Petr Vacek - FTP cleartext authentication
 Philippe Van Hecke <philippe at belnet dot be> - SAP header hash patch
-Pierre d'Herbemont <<pdherbemont at free dot fr> - Compile fix
+Pierre d'Herbemont <pdherbemont at free dot fr> - Compile fix
+Pierre-Luc Beaudoin - Vorbis 9 channels patch
 Pierre Marc Dumuid <pierre.dumuid at adelaide dot edu dot au> - Playlist patches
 Pittayakom Saingtong <develop5 qt datawiz dot co dot th> - Thai localisation
 Rafaël Carré <funman at videolan org> - Audioscrobbler plugin, D-Bus control
