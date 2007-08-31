@@ -21,6 +21,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef WIN32
+#   include <signal.h>
+#endif
+
 #include <QApplication>
 
 #include "qt4.hpp"
@@ -209,7 +213,19 @@ static void Init( intf_thread_t *p_intf )
     }
 
     if( p_intf->pf_show_dialog )
+    {
         vlc_thread_ready( p_intf );
+#ifndef WIN32
+        /* unblocks SIGCHLD as that makes the app hang
+         * when cleanlooks style is used with QT4 
+         * ( exactly when launching gconftool-2 to get the icon theme ) */
+        sigset_t set;
+
+        sigemptyset( &set );
+        sigaddset( &set, SIGCHLD );
+        pthread_sigmask( SIG_UNBLOCK, &set, NULL );
+#endif
+    }
 
     /* Start playing if needed */
     if( !p_intf->pf_show_dialog && p_intf->b_play )

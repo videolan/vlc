@@ -22,10 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef WIN32
-#   include <signal.h>
-#endif
-
 #include <vlc_intf_strings.h>
 
 #include "main_interface.hpp"
@@ -171,20 +167,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
         bool playlist, bool adv_controls_enabled,
         bool visual_selector_enabled )
 {
-#ifndef WIN32
-    /* Ugly klugde
-     * Remove SIGCHLD from the ignored signal the time to initialise
-     * Qt because it call gconf to get the icon theme */
-    sigset_t set;
-
-    sigemptyset( &set );
-    sigaddset( &set, SIGCHLD );
-    pthread_sigmask( SIG_UNBLOCK, &set, NULL );
-#endif /* WIN32 */
     QMenuBar *bar = mi->menuBar();
-#ifndef WIN32
-    pthread_sigmask( SIG_BLOCK, &set, NULL );
-#endif /* WIN32 */
     BAR_ADD( FileMenu(), qtr("&Media") );
     if( playlist )
     {
