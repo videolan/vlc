@@ -373,7 +373,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->i_group =
         var_GetInteger( p_access, SOUT_CFG_PREFIX "group" );
 
-    p_sys->i_mtu = var_GetInteger( p_this, "mtu" );
+    p_sys->i_mtu = var_CreateGetInteger( p_this, "mtu" );
 
     srand( (uint32_t)mdate());
     p_sys->p_buffer          = NULL;
