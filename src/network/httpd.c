@@ -2068,7 +2068,7 @@ static void httpd_HostThread( httpd_host_t *host )
 
                     httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
                     httpd_MsgAdd( answer, "Public", "DESCRIBE, SETUP, "
-                                 "TEARDOWN, PLAY, PAUSE" );
+                                 "TEARDOWN, PLAY, PAUSE, GET_PARAMETER" );
                     httpd_MsgAdd( answer, "Content-Length", "0" );
 
                     cl->i_buffer = -1;  /* Force the creation of the answer in

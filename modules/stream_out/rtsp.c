@@ -108,6 +108,8 @@ rtsp_stream_t *RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url )
     httpd_UrlCatch( rtsp->url, HTTPD_MSG_SETUP,    RtspCallback, (void*)rtsp );
     httpd_UrlCatch( rtsp->url, HTTPD_MSG_PLAY,     RtspCallback, (void*)rtsp );
     httpd_UrlCatch( rtsp->url, HTTPD_MSG_PAUSE,    RtspCallback, (void*)rtsp );
+    httpd_UrlCatch( rtsp->url, HTTPD_MSG_GETPARAMETER, RtspCallback,
+                    (void*)rtsp );
     httpd_UrlCatch( rtsp->url, HTTPD_MSG_TEARDOWN, RtspCallback, (void*)rtsp );
     return rtsp;
 
@@ -205,6 +207,7 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
     httpd_UrlCatch( url, HTTPD_MSG_SETUP,    RtspCallbackId, (void *)id );
     httpd_UrlCatch( url, HTTPD_MSG_PLAY,     RtspCallbackId, (void *)id );
     httpd_UrlCatch( url, HTTPD_MSG_PAUSE,    RtspCallbackId, (void *)id );
+    httpd_UrlCatch( url, HTTPD_MSG_GETPARAMETER, RtspCallbackId, (void *)id );
     httpd_UrlCatch( url, HTTPD_MSG_TEARDOWN, RtspCallbackId, (void *)id );
 
     return id;
@@ -396,7 +399,18 @@ static int RtspCallback( httpd_callback_sys_t *p_args,
 
         case HTTPD_MSG_PAUSE:
             answer->i_status = 405;
-            httpd_MsgAdd( answer, "Allow", "DESCRIBE, PLAY, TEARDOWN" );
+            httpd_MsgAdd( answer, "Allow",
+                          "DESCRIBE, TEARDOWN, PLAY, GET_PARAMETER" );
+            break;
+
+        case HTTPD_MSG_GETPARAMETER:
+            if( query->i_body > 0 )
+            {
+                answer->i_status = 451;
+                break;
+            }
+
+            answer->i_status = 200;
             break;
 
         case HTTPD_MSG_TEARDOWN:
@@ -707,7 +721,18 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
 
         case HTTPD_MSG_PAUSE:
             answer->i_status = 405;
-            httpd_MsgAdd( answer, "Allow", "SETUP, PLAY, TEARDOWN" );
+            httpd_MsgAdd( answer, "Allow",
+                          "SETUP, TEARDOWN, PLAY, GET_PARAMETER" );
+            break;
+
+        case HTTPD_MSG_GETPARAMETER:
+            if( query->i_body > 0 )
+            {
+                answer->i_status = 451;
+                break;
+            }
+
+            answer->i_status = 200;
             break;
 
         case HTTPD_MSG_TEARDOWN:
