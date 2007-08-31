@@ -258,6 +258,10 @@ vlc_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
 LIB_libvlc = libvlc.la
 LIBVLC = src/$(LIB_libvlc)
 
+#To get some nice output
+nice:
+		$(top_builddir)/compile
+
 # Shortcut for developpers to rebuild the core (libvlc + vlc)
 # Don't use it if you don't know what it is about.
 # Don't complain if it doesn't work. -- Courmisch
