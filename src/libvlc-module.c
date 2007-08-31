@@ -475,8 +475,10 @@ static const char *ppsz_clock_descriptions[] =
 
 #define MTU_TEXT N_("MTU of the network interface")
 #define MTU_LONGTEXT N_( \
-    "This is the maximum packet size that can be transmitted " \
-    "over the network interface. On Ethernet it is usually 1500 bytes.")
+    "This is the maximum application-layer packet size that can be " \
+    "transmitted over the network (in bytes).")
+/* Should be less than 1500 - 8[ppp] - 40[ip6] - 8[udp] in any case. */
+#define MTU_DEFAULT 1400
 
 #define TTL_TEXT N_("Hop limit (TTL)")
 #define TTL_LONGTEXT N_( \
@@ -1535,7 +1537,7 @@ vlc_module_begin();
 
     add_integer( "server-port", 1234, NULL,
                  SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, VLC_FALSE );
-    add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT, VLC_TRUE );
+    add_integer( "mtu", MTU_DEFAULT, NULL, MTU_TEXT, MTU_LONGTEXT, VLC_TRUE );
     add_bool( "ipv6", 0, NULL, IPV6_TEXT, IPV6_LONGTEXT, VLC_FALSE );
         change_short('6');
     add_bool( "ipv4", 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, VLC_FALSE );
