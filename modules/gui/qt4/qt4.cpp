@@ -204,20 +204,8 @@ static void Init( intf_thread_t *p_intf )
     p_intf->p_sys->p_app = app;
 
 #ifndef WIN32
-/* Ugly klugde 
- * Remove SIGCHLD from the ignored signal the time to initialise 
- * Qt because it executes gconftool-2 to get the icon theme when using 
- * cleanlooks theme. */ 
-    sigset_t set;
-
-    sigemptyset( &set );
-    sigaddset( &set, SIGCHLD );
-    pthread_sigmask( SIG_UNBLOCK, &set, NULL );
-
 /* that forces the execution of QCleanlooksStylePrivate::lookupIconTheme() */
     app->style()->standardIcon( QStyle::SP_TitleBarMenuButton );
-
-    pthread_sigmask( SIG_BLOCK, &set, NULL );
 #endif
 
     // Initialize timers
