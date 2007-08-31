@@ -46,8 +46,8 @@ struct rtsp_stream_t
     sout_stream_t  *owner;
     httpd_host_t   *host;
     httpd_url_t    *url;
-    char           *psz_control;
     char           *psz_path;
+    unsigned        port;
 
     int             sessionc;
     rtsp_session_t **sessionv;
@@ -66,7 +66,7 @@ rtsp_stream_t *RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url )
 {
     rtsp_stream_t *rtsp = malloc( sizeof( *rtsp ) );
 
-    if( rtsp == NULL )
+    if( rtsp == NULL || ( url->i_port > 99999 ) )
         return NULL;
 
     rtsp->owner = p_stream;
@@ -77,10 +77,13 @@ rtsp_stream_t *RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url )
     msg_Dbg( p_stream, "rtsp setup: %s : %d / %s\n",
              url->psz_host, url->i_port, url->psz_path );
 
-    rtsp->psz_path = strdup( url->psz_path ? url->psz_path : "/" );
-    if( rtsp->psz_path == NULL )
-        goto error;
+    rtsp->port = (url->i_port > 0) ? url->i_port : 554;
+    if( url->psz_path != NULL )
+        rtsp->psz_path = strdup( url->psz_path + 1 );
+    else
+        rtsp->psz_path = NULL;
 
+#if 0
     if( asprintf( &rtsp->psz_control, "rtsp://%s:%d%s",
                   url->psz_host,  url->i_port > 0 ? url->i_port : 554,
                   rtsp->psz_path ) == -1 )
@@ -88,14 +91,16 @@ rtsp_stream_t *RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url )
         rtsp->psz_control = NULL;
         goto error;
     }
+#endif
 
     rtsp->host = httpd_HostNew( VLC_OBJECT(p_stream), url->psz_host,
-                                url->i_port > 0 ? url->i_port : 554 );
+                                rtsp->port );
     if( rtsp->host == NULL )
         goto error;
 
-    rtsp->url = httpd_UrlNewUnique( rtsp->host, rtsp->psz_path, NULL, NULL,
-                                    NULL );
+    rtsp->url = httpd_UrlNewUnique( rtsp->host,
+                                    url->psz_path ? url->psz_path : "/", NULL,
+                                    NULL, NULL );
     if( rtsp->url == NULL )
         goto error;
 
@@ -167,7 +172,7 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
                              const char *dst, int ttl,
                              unsigned loport, unsigned hiport )
 {
-    char urlbuf[strlen( rtsp->psz_control ) + 1 + 10];
+    char urlbuf[sizeof( "//trackID=123" ) + strlen( rtsp->psz_path )];
     rtsp_stream_id_t *id = malloc( sizeof( *id ) );
     httpd_url_t *url;
 
@@ -185,7 +190,8 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
         id->hiport = hiport;
     }
 
-    sprintf( urlbuf, "%s/trackID=%d", rtsp->psz_path, num );
+    snprintf( urlbuf, sizeof( urlbuf ), "/%s/trackID=%u", rtsp->psz_path,
+              num );
     msg_Dbg( rtsp->owner, "RTSP: adding %s\n", urlbuf );
     url = id->url = httpd_UrlNewUnique( rtsp->host, urlbuf, NULL, NULL, NULL );
 
@@ -306,7 +312,6 @@ static int RtspCallback( httpd_callback_sys_t *p_args,
     {
         return VLC_SUCCESS;
     }
-    //fprintf( stderr, "RtspCallback query: type=%d\n", query->i_type );
 
     answer->i_proto = HTTPD_PROTO_RTSP;
     answer->i_version= query->i_version;
@@ -325,13 +330,30 @@ static int RtspCallback( httpd_callback_sys_t *p_args,
     {
         case HTTPD_MSG_DESCRIBE:
         {
-            char *psz_sdp = SDPGenerate( rtsp->owner, rtsp->psz_control );
+            char ip[NI_MAXNUMERICHOST], *ptr;
+            char control[sizeof("rtsp://[]:12345/") + sizeof( ip )
+                            + strlen( rtsp->psz_path )];
+
+            /* Build self-referential URL */
+            httpd_ServerIP( cl, ip );
+            ptr = strchr( ip, '%' );
+            if( ptr != NULL )
+                *ptr = '\0';
+
+            if( strchr( ip, ':' ) != NULL )
+                sprintf( control, "rtsp://[%s]:%u/%s", ip, rtsp->port,
+                         ( rtsp->psz_path != NULL ) ? rtsp->psz_path : "" );
+            else
+                sprintf( control, "rtsp://%s:%u/%s", ip, rtsp->port,
+                         ( rtsp->psz_path != NULL ) ? rtsp->psz_path : "" );
+
+            ptr = SDPGenerate( rtsp->owner, control );
 
             answer->i_status = 200;
             httpd_MsgAdd( answer, "Content-Type",  "%s", "application/sdp" );
-            httpd_MsgAdd( answer, "Content-Base",  "%s", rtsp->psz_control );
-            answer->p_body = (uint8_t *)psz_sdp;
-            answer->i_body = strlen( psz_sdp );
+            httpd_MsgAdd( answer, "Content-Base",  "%s", control );
+            answer->p_body = (uint8_t *)ptr;
+            answer->i_body = strlen( ptr );
             break;
         }
 
