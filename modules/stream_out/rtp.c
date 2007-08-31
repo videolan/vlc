@@ -2050,7 +2050,7 @@ static int MuxDel( sout_stream_t *p_stream, sout_stream_id_t *id )
 
 
 static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
-                                        block_t *p_buffer )
+                                        const block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t *id = p_sys->es[0];
