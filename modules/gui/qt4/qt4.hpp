@@ -88,6 +88,8 @@ struct intf_sys_t
     BUTTON_SET_IMG( button, text, image, tooltip );                \
     BUTTONACT( button, thisslot );
 
+#define VISIBLE(i) (i && i->isVisible())
+
 static int DialogEvent_Type = QEvent::User + 1;
 static int PLUndockEvent_Type = QEvent::User + 2;
 static int PLDockEvent_Type = QEvent::User + 3;
