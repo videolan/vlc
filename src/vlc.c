@@ -98,11 +98,30 @@ int main( int i_argc, char *ppsz_argv[] )
     }
 
 #if !defined(WIN32) && !defined(UNDER_CE)
-    /* Synchronously intercepted signals. They request a clean shutdown,
-     * and force an unclean shutdown if they are triggered again 2+ seconds
-     * later. We have to handle SIGTERM cleanly because of daemon mode.
+    /* Synchronously intercepted POSIX signals.
+     *
+     * In a threaded program such as VLC, the only sane way to handle signals
+     * is to block them in all thread but one - this is the only way to
+     * predict which thread will receive them. If any piece of code depends
+     * on delivery of one of this signal it is intrinsically not thread-safe
+     * and MUST NOT be used in VLC, whether we like it or not.
+     * There is only one exception: if the signal is raised with
+     * pthread_kill() - we do not use this in LibVLC but some pthread
+     * implementations use them internally. You should really use conditions
+     * for thread synchronization anyway.
+     *
+     * Signal that request a clean shutdown, and force an unclean shutdown
+     * if they are triggered again 2+ seconds later.
+     * We have to handle SIGTERM cleanly because of daemon mode.
      * Note that we set the signals after the vlc_create call. */
     static const int exitsigs[] = { SIGINT, SIGHUP, SIGQUIT, SIGTERM };
+    /* Signals that cause a no-op:
+     * - SIGALRM should not happen, but lets stay on the safe side.
+     * - SIGPIPE might happen with sockets and would crash VLC. It MUST be
+     *   blocked by any LibVLC-dependant application, in addition to VLC.
+     * - SIGCHLD is comes after exec*() (such as httpd CGI support) and must
+     *   be dequeued to cleanup zombie processes.
+     */
     static const int dummysigs[] = { SIGALRM, SIGPIPE, SIGCHLD };
 
     sigset_t set;
