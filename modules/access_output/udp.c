@@ -374,6 +374,8 @@ static int Open( vlc_object_t *p_this )
         var_GetInteger( p_access, SOUT_CFG_PREFIX "group" );
 
     p_sys->i_mtu = var_CreateGetInteger( p_this, "mtu" );
+    if( p_sys->b_rtpts && ( p_sys->i_mtu < RTP_HEADER_LENGTH ) )
+        p_sys->i_mtu += RTP_HEADER_LENGTH;
 
     srand( (uint32_t)mdate());
     p_sys->p_buffer          = NULL;
