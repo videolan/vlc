@@ -593,29 +593,11 @@ endif
 
 
 ###############################################################################
-# Building specific source packages
-###############################################################################
-
-dist-woody: distdir
-	$(remove_distdir_woody)
-	mv $(distdir) $(PACKAGE)-woody-$(VERSION)
-	$(srcdir)/toolbox --make-woody $(PACKAGE)-woody-$(VERSION)
-	$(AMTAR) chof - $(PACKAGE)-woody-$(VERSION) \
-	  | GZIP=$(GZIP_ENV) gzip -c >$(PACKAGE)-woody-$(VERSION).tar.gz
-	$(remove_distdir_woody)
-
-remove_distdir_woody = \
-  { test ! -d $(PACKAGE)-woody-$(VERSION) \
-    || { find $(PACKAGE)-woody-$(VERSION) -type d ! -perm -200 \
-           -exec chmod u+w {} ';' \
-         && rm -fr $(PACKAGE)-woody-$(VERSION); }; }
-
-###############################################################################
 # Building architecture-specific binary packages
 ###############################################################################
 
 # XXX: this rule is probably only useful to you if you have exactly
-# the same setup as me. Contact sam@zoy.org if you need to use it.
+# the same setup as the maintaner(s).
 #
 
 package-win-common:
