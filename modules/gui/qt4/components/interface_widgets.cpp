@@ -209,27 +209,54 @@ void VisualSelector::next()
 }
 
 /**********************************************************************
- * More controls
+ * TEH controls
  **********************************************************************/
+
+#define setupSmallButton( aButton ){  \
+    aButton->setMaximumSize( QSize( 26, 26 ) ); \
+    aButton->setMinimumSize( QSize( 26, 26 ) ); \
+    aButton->setIconSize( QSize( 20, 20 ) ); }
+
 AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
                                            QFrame( NULL ), p_intf( _p_i )
 {
-    QHBoxLayout *layout = new QHBoxLayout( this );
-    layout->setMargin( 0 );
+    QHBoxLayout *advLayout = new QHBoxLayout( this );
+    advLayout->setMargin( 0 );
+    advLayout->setSpacing( 0 );
 
-    normalButton = new QPushButton( "N" );
-    BUTTON_SET_ACT( normalButton, "N", qtr( "Normal rate" ), normal() );
-    layout->addWidget( normalButton );
-    normalButton->setMaximumWidth( 35 );
-
-
-    layout->addItem( new QSpacerItem( 100,20,
-                              QSizePolicy::Expanding, QSizePolicy::Minimum ) );
+/* FIXME A to B function */
+    ABButton = new QPushButton( "AB" );
+    ABButton->setMaximumSize( QSize( 26, 26 ) );
+    ABButton->setIconSize( QSize( 20, 20 ) );
+    advLayout->addWidget( ABButton );
+    BUTTON_SET_ACT( ABButton, "AB", qtr( "A to B" ), normal() );
 
     snapshotButton = new QPushButton( "S" );
+    snapshotButton->setMaximumSize( QSize( 26, 26 ) );
+    snapshotButton->setIconSize( QSize( 20, 20 ) );
+    advLayout->addWidget( snapshotButton );
     BUTTON_SET_ACT( snapshotButton, "S", qtr( "Take a snapshot" ), snapshot() );
-    layout->addWidget( snapshotButton );
-    snapshotButton->setMaximumWidth( 35 );
+
+//FIXME Frame by frame function
+    frameButton = new QPushButton( "Fr" );
+    frameButton->setMaximumSize( QSize( 26, 26 ) );
+    frameButton->setIconSize( QSize( 20, 20 ) );
+    advLayout->addWidget( frameButton );
+    BUTTON_SET_ACT( frameButton, "Fr", qtr( "Frame by Frame" ), frame() );
+
+/* FIXME Record function */
+    recordButton = new QPushButton( "R" );
+    recordButton->setMaximumSize( QSize( 26, 26 ) );
+    recordButton->setIconSize( QSize( 20, 20 ) );
+    advLayout->addWidget( recordButton );
+    BUTTON_SET_ACT( recordButton, "R", qtr( "Record" ), record() );
+
+    normalButton = new QPushButton( "N" );
+    normalButton->setMaximumSize( QSize( 26, 26 ) );
+    normalButton->setIconSize( QSize( 20, 20 ) );
+    advLayout->addWidget( normalButton );
+    BUTTON_SET_ACT( normalButton, "N", qtr( "Normal rate" ), normal() );
+
 }
 
 AdvControlsWidget::~AdvControlsWidget()
@@ -239,12 +266,15 @@ AdvControlsWidget::~AdvControlsWidget()
 void AdvControlsWidget::enableInput( bool enable )
 {
 //    slowerButton->setEnabled( enable );
+    ABButton->setEnabled( enable );
+    recordButton->setEnabled( enable );
     normalButton->setEnabled( enable );
 //    fasterButton->setEnabled( enable );
 }
 void AdvControlsWidget::enableVideo( bool enable )
 {
     snapshotButton->setEnabled( enable );
+    frameButton->setEnabled( enable );
     //fullscreenButton->setEnabled( enable );
 }
 
@@ -261,12 +291,24 @@ void AdvControlsWidget::fullscreen()
 {
 }
 
-ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
+void AdvControlsWidget::frame(){}
+void AdvControlsWidget::record(){}
+
+/*****************************
+ * DA Control Widget !
+ *****************************/
+
+ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
                              QFrame( NULL ), p_intf( _p_i )
 {
     //QSize size( 500, 200 );
     //resize( size );
     controlLayout = new QGridLayout( this );
+#if 1 || DEBUG_COLOR
+    QPalette palette2;
+    palette2.setColor(this->backgroundRole(), Qt::magenta);
+    setPalette(palette2);
+#endif
 
     /** The main Slider **/
     slider = new InputSlider( Qt::Horizontal, NULL );
@@ -290,33 +332,42 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     fasterButton->setMaximumSize( QSize( 26, 20 ) );
 
     /** TODO: Insert here the AdvControls Widget 
-     * and add - A->B button
-     *         - frame by frame
-     *         - record button
-     * and put the snapshot in the same QFrame 
      * Then fix all the size issues in main_interface.cpp
      **/
-    
+    /* advanced Controls handling */
+    b_advancedVisible = b_advControls;
+
+    advControls = new AdvControlsWidget( p_intf );
+    controlLayout->addWidget( advControls, 1, 3, 2, 5, Qt::AlignBottom );
+    if( !b_advancedVisible ) advControls->hide();
+//THIS should be removed.    need_components_update = true;
+
     /** Disc and Menus handling */
     discFrame = new QFrame( this );
-    QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
 
-    QPushButton *menuButton = new QPushButton( discFrame );
-    discLayout->addWidget( menuButton );
+    QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
+    discLayout->setSpacing( 0 );
+    discLayout->setMargin( 0 );
 
     QPushButton *prevSectionButton = new QPushButton( discFrame );
+    setupSmallButton( prevSectionButton );
     discLayout->addWidget( prevSectionButton );
 
+    QPushButton *menuButton = new QPushButton( discFrame );
+    setupSmallButton( menuButton );
+    discLayout->addWidget( menuButton );
+
     QPushButton *nextSectionButton = new QPushButton( discFrame );
+    setupSmallButton( nextSectionButton );
     discLayout->addWidget( nextSectionButton );
 
-    controlLayout->addWidget( discFrame, 1, 13, 1, 4 );
+    controlLayout->addWidget( discFrame, 1, 10, 2, 4, Qt::AlignBottom );
 
     BUTTON_SET_IMG( prevSectionButton, "", previous.png, "" );
     BUTTON_SET_IMG( nextSectionButton, "", next.png, "" );
     BUTTON_SET_IMG( menuButton, "", previous.png, "" );
 
-    discFrame->hide();
+    //discFrame->hide();
 
     /* Change the navigation button display when the IM navigation changes */
     CONNECT( THEMIM->getIM(), navigationChanged( int ),
@@ -345,7 +396,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     playButton->setMaximumSize( QSize( 45, 45 ) );
     playButton->setIconSize( QSize( 30, 30 ) );
 
-    controlLayout->addWidget( playButton, 2, 0, 2, 2 );
+    controlLayout->addWidget( playButton, 2, 0, 2, 2, Qt::AlignBottom );
 
     /** Prev + Stop + Next Block **/
     QHBoxLayout *controlButLayout = new QHBoxLayout;
@@ -354,24 +405,21 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     /* Prev */
     QPushButton *prevButton = new QPushButton;
     prevButton->setSizePolicy( sizePolicy );
-    prevButton->setMaximumSize( QSize( 26, 26 ) );
-    prevButton->setIconSize( QSize( 20, 20 ) );
+    setupSmallButton( prevButton );
 
     controlButLayout->addWidget( prevButton );
 
     /* Stop */
     QPushButton *stopButton = new QPushButton;
     stopButton->setSizePolicy( sizePolicy );
-    stopButton->setMaximumSize( QSize( 26, 26 ) );
-    stopButton->setIconSize( QSize( 20, 20 ) );
+    setupSmallButton( stopButton );
 
     controlButLayout->addWidget( stopButton );
 
     /* next */
     QPushButton *nextButton = new QPushButton;
     nextButton->setSizePolicy( sizePolicy );
-    nextButton->setMaximumSize( QSize( 26, 26 ) );
-    nextButton->setIconSize( QSize( 20, 20 ) );
+    setupSmallButton( nextButton );
 
     controlButLayout->addWidget( nextButton );
 
@@ -392,13 +440,12 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     /** Fullscreen/Visualisation **/
     fullscreenButton = new QPushButton( "F" );
     BUTTON_SET_ACT( fullscreenButton, "F", qtr( "Fullscreen" ), fullscreen() );
-    fullscreenButton->setMaximumSize( QSize( 26, 26 ) );
+    setupSmallButton( fullscreenButton );
     controlLayout->addWidget( fullscreenButton, 3, 10 );
 
     /** Playlist Button **/
     playlistButton = new QPushButton;
-    playlistButton->setMaximumSize( QSize( 26, 26 ) );
-    playlistButton->setIconSize( QSize( 20, 20 ) );
+    setupSmallButton( playlistButton );
 
     controlLayout->addWidget( playlistButton, 3, 11 );
 
@@ -406,13 +453,14 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i ) :
     QPushButton *extSettingsButton = new QPushButton( "F" );
     BUTTON_SET_ACT( extSettingsButton, "Ex", qtr( "Extended Settings" ),
             extSettings() );
-    extSettingsButton->setMaximumSize( QSize( 26, 26 ) );
+    setupSmallButton( extSettingsButton );
     controlLayout->addWidget( extSettingsButton, 3, 12 );
 
     /** Preferences **/
     QPushButton *prefsButton = new QPushButton( "P" );
-    BUTTON_SET_ACT( prefsButton, "P", qtr( "Preferences / Settings" ), prefs() );
-    prefsButton->setMaximumSize( QSize( 26, 26 ) );
+    BUTTON_SET_ACT( prefsButton, "P", qtr( "Preferences / Settings" ),
+            prefs() );
+    setupSmallButton( prefsButton );
     controlLayout->addWidget( prefsButton, 3, 13 );
 
     /* Volume */
@@ -458,6 +506,7 @@ void ControlsWidget::play()
     if( playlist_IsEmpty( THEPL ) )
     {
         /* The playlist is empty, open a file requester */
+        msg_Dbg( p_intf, "Nothing to play yet, open a file" );
         THEDP->openFileDialog();
         setStatus( 0 );
         return;
@@ -528,6 +577,9 @@ void ControlsWidget::updateOnTimer()
         volumeSlider->setValue( i_volume );
         b_my_volume = false;
     }
+
+    enableInput( THEMIM->getIM()->hasInput() );
+    enableVideo( THEMIM->getIM()->hasVideo() );
 }
 
 /* FIXME */
@@ -580,14 +632,35 @@ void ControlsWidget::enableInput( bool enable )
     slowerButton->setEnabled( enable );
     slider->setEnabled( enable );
     fasterButton->setEnabled( enable );
+
+    /* Advanced Buttons too */
+    advControls->enableInput( enable );
 }
 
 void ControlsWidget::enableVideo( bool enable )
 {
     // TODO Later make the fullscreenButton toggle Visualisation and so on.
     fullscreenButton->setEnabled( enable );
+
+    /* Advanced Buttons too */
+    advControls->enableVideo( enable );
 }
 
+void ControlsWidget::toggleAdvanced()
+{
+    if( !VISIBLE( advControls ) )
+    {
+        advControls->show();
+        b_advancedVisible = true;
+    }
+    else
+    {
+        advControls->hide();
+        b_advancedVisible = false;
+    }
+    //FIXME connect this one :D
+    emit advancedControlsShowed( b_advancedVisible );  //  doComponentsUpdate();
+}
 
 /**********************************************************************
  * Playlist Widget. The embedded playlist

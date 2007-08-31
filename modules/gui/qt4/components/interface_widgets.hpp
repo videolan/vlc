@@ -114,12 +114,14 @@ public:
     void enableVideo( bool );
 private:
     intf_thread_t *p_intf;
-    QPushButton *normalButton;
-    QPushButton *snapshotButton;
+    QPushButton *normalButton, *recordButton, *ABButton;
+    QPushButton *snapshotButton, *frameButton;
 private slots:
     void normal();
     void snapshot();
     void fullscreen();
+    void frame();
+    void record();
 };
 
 class InputSlider;
@@ -130,7 +132,7 @@ class ControlsWidget : public QFrame
 {
     Q_OBJECT
 public:
-    ControlsWidget( intf_thread_t *);
+    ControlsWidget( intf_thread_t *, bool );
     virtual ~ControlsWidget();
 
     QPushButton *playlistButton;
@@ -145,13 +147,16 @@ protected:
     friend class MainInterface;
     friend class VolumeClickHandler;
 private:
-    intf_thread_t *p_intf;
-    QFrame *discFrame;
-    QGridLayout *controlLayout;
+    intf_thread_t       *p_intf;
+    QFrame              *discFrame;
+    QGridLayout         *controlLayout;
     InputSlider         *slider;
-    QPushButton *prevSectionButton, *nextSectionButton, *menuButton;
-    QPushButton *playButton, *fullscreenButton;
-    QPushButton *slowerButton, *fasterButton;
+    QPushButton         *prevSectionButton, *nextSectionButton, *menuButton;
+    QPushButton         *playButton, *fullscreenButton;
+    QPushButton         *slowerButton, *fasterButton;
+    AdvControlsWidget   *advControls;
+
+    bool                 b_advancedVisible;
 private slots:
     void play();
     void stop();
@@ -163,6 +168,9 @@ private slots:
     void prefs();
     void faster();
     void slower();
+    void toggleAdvanced();
+signals:
+    void advancedControlsShowed( bool );
 };
 
 class VolumeClickHandler : public QObject

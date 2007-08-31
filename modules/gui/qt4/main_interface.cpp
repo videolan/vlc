@@ -52,10 +52,8 @@
     #define PREF_H 121
 #else
     #define PREF_W 450
-    #define PREF_H 125
+    #define PREF_H 160
 #endif
-
-#define VISIBLE(i) (i && i->isVisible())
 
 #define SET_WIDTH(i,j) i->widgetSize.setWidth(j)
 #define SET_HEIGHT(i,j) i->widgetSize.setHeight(j)
@@ -93,8 +91,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     need_components_update = false;
     bgWidget = NULL; videoWidget = NULL; playlistWidget = NULL;
     embeddedPlaylistWasActive = videoIsActive = false;
-
-    bool b_createSystray = false;
     input_name = "";
 
     /**
@@ -119,31 +115,24 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Set the other interface settings */
     playlistEmbeddedFlag = settings->value("playlist-embedded", true).toBool();
-    advControlsEnabled= settings->value( "adv-controls", false ).toBool();
     visualSelectorEnabled= settings->value( "visual-selector", false ).toBool();
 
-#if DEBUG_COLOR
-    QPalette palette2;
-    palette2.setColor(this->backgroundRole(), Qt::magenta);
-    setPalette(palette2);
-#endif
-
-    /**
-     *  UI design
-     **/
+    /**************************
+     *  UI and Widgets design
+     **************************/
     setVLCWindowsTitle();
     handleMainUi( settings );
 
     /* Menu Bar */
     QVLCMenu::createMenuBar( this, p_intf, playlistEmbeddedFlag,
-                             advControlsEnabled, visualSelectorEnabled );
+                             isAdvancedVisible(), visualSelectorEnabled );
 
     /* Status Bar */
     /**
      * TODO: clicking on the elapsed time should switch to the remaining time
      **/
     /**
-     * TODO: do we add a label for the current Volume 
+     * TODO: do we add a label for the current Volume ?
      **/
     timeLabel = new QLabel;
     nameLabel = new QLabel;
@@ -160,16 +149,25 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( timeLabel, customContextMenuRequested( QPoint ),
              this, showTimeMenu( QPoint ) );
 
-    /* Systray */
+    /**********************
+     * Systray Management *
+     **********************/
     sysTray = NULL;
+    bool b_createSystray = false;
+    bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
     if( config_GetInt( p_intf, "qt-start-minimized") )
     {
-        hide();
-        b_createSystray = true;
+        if( b_systrayAvailable ){
+            b_createSystray = true;
+            hide(); //FIXME
+        }
+        else msg_Warn( p_intf, "You can't minize if you haven't a system "
+                "tray bar" );
     }
     if( config_GetInt( p_intf, "qt-system-tray") )
         b_createSystray = true;
-    if (QSystemTrayIcon::isSystemTrayAvailable() && b_createSystray )
+
+    if( b_systrayAvailable && b_createSystray )
             createSystray();
 
     /* Init input manager */
@@ -177,30 +175,35 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     ON_TIMEOUT( updateOnTimer() );
 
     /**
-     * CONNECTs
+     * Various CONNECTs
      **/
 
     /* Connect the input manager to the GUI elements it manages */
-    /* It is also connected to the control->slider */
+    /* It is also connected to the control->slider, see the ControlsWidget */
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, setDisplay( float, int, int ) );
 
-    /* Naming in the controller */
+    /** Connects on nameChanged() */
+    /* Naming in the controller statusbar */
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
              setName( QString ) );
+    /* and in the systray */
     if( sysTray )
     {
         CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
                  updateSystrayTooltipName( QString ) );
     }
+    /* and in the title of the controller */
     if( config_GetInt( p_intf, "qt-name-in-title" ) )
     {
         CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
              setVLCWindowsTitle( QString ) );
     }
 
-    /* PLAY_STATUS */
+    /** CONNECTS on PLAY_STATUS **/
+    /* Status on the main controller */
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
+    /* and in the systray */
     if( sysTray )
     {
         CONNECT( THEMIM->getIM(), statusChanged( int ), this,
@@ -238,7 +241,7 @@ MainInterface::~MainInterface()
     }
 
     settings->setValue( "playlist-embedded", playlistEmbeddedFlag );
-    settings->setValue( "adv-controls", advControlsEnabled );
+    settings->setValue( "adv-controls", isAdvancedVisible() );
     settings->setValue( "pos", pos() );
     settings->endGroup();
     delete settings;
@@ -272,6 +275,7 @@ void MainInterface::setVLCWindowsTitle( QString aTitle )
 
 void MainInterface::handleMainUi( QSettings *settings )
 {
+    /* Create the main Widget and the mainLayout */
     QWidget *main = new QWidget( this );
     mainLayout = new QVBoxLayout( main );
     setCentralWidget( main );
@@ -280,35 +284,23 @@ void MainInterface::handleMainUi( QSettings *settings )
     main->setContentsMargins( 0, 0, 0, 0 );
     mainLayout->setMargin( 0 );
 
-    /* CONTROLS */
-    controls = new ControlsWidget( p_intf );
+    /* Create the CONTROLS Widget */
+    controls = new ControlsWidget( p_intf,
+                   settings->value( "adv-controls", false ).toBool() );
 
-    /* Configure the UI */
+    /* Configure the Controls */
     BUTTON_SET_IMG( controls->playlistButton, "" , playlist_icon.png,
-                        playlistEmbeddedFlag ?  qtr( "Show playlist" ) :
-                                                qtr( "Open playlist" ) );
-    BUTTONACT( controls->playlistButton, playlist() );
+                    playlistEmbeddedFlag ?  qtr( "Show playlist" ) :
+                                            qtr( "Open playlist" ) );
+    BUTTONACT( controls->playlistButton, togglePlaylist() );
 
-#if DEBUG_COLOR
-    QPalette palette;
-    palette.setColor(main->backgroundRole(), Qt::green);
-    main->setPalette(palette);
-#endif
-
-    /* Add the controls Widget */
+    /* Add the controls Widget to the main Widget */
     mainLayout->addWidget( controls );
 
+
     /* Set initial size */
-    resize ( PREF_W, PREF_H );
-
+    resize( PREF_W, PREF_H );
     addSize = QSize( mainLayout->margin() * 2, PREF_H );
-
-    /* advanced Controls handling */
-    advControls = new AdvControlsWidget( p_intf );
-    mainLayout->insertWidget( 0, advControls );
-    advControls->updateGeometry();
-    if( !advControlsEnabled ) advControls->hide();
-    need_components_update = true;
 
     /* Visualisation */
     visualSelector = new VisualSelector( p_intf );
@@ -343,7 +335,7 @@ void MainInterface::handleMainUi( QSettings *settings )
 }
 
 /**********************************************************************
- * Handling of the components
+ * Handling of sizing of the components
  **********************************************************************/
 void MainInterface::calculateInterfaceSize()
 {
@@ -371,10 +363,10 @@ void MainInterface::calculateInterfaceSize()
     }
     if( VISIBLE( visualSelector ) )
         height += visualSelector->height();
-    if( VISIBLE( advControls) )
+/*    if( VISIBLE( advControls) )
     {
         height += advControls->sizeHint().height();
-    }
+    }*/
     mainSize = QSize( width + addSize.width(), height + addSize.height() );
 }
 
@@ -394,6 +386,7 @@ void MainInterface::resizeEvent( QResizeEvent *e )
         playlistWidget->updateGeometry();
     }
 }
+
 /****************************************************************************
  * Small right-click menus
  ****************************************************************************/
@@ -409,6 +402,292 @@ void MainInterface::showTimeMenu( QPoint pos )
     QMenu menu( this );
     menu.addAction( "Not Implemented Yet" );
     menu.exec( QCursor::pos() );
+}
+
+/****************************************************************************
+ * Video Handling
+ ****************************************************************************/
+void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
+                                   int *pi_y, unsigned int *pi_width,
+                                   unsigned int *pi_height )
+{
+    void *ret = videoWidget->request( p_nvout,pi_x, pi_y, pi_width, pi_height );
+    if( ret )
+    {
+        videoIsActive = true;
+        if( VISIBLE( playlistWidget ) )
+        {
+            embeddedPlaylistWasActive = true;
+//            playlistWidget->hide();
+        }
+        bool bgWasVisible = false;
+        if( VISIBLE( bgWidget) )
+        {
+            bgWasVisible = true;
+            bgWidget->hide();
+        }
+        if( THEMIM->getIM()->hasVideo() || !bgWasVisible )
+        {
+            videoWidget->widgetSize = QSize( *pi_width, *pi_height );
+        }
+        else /* Background widget available, use its size */
+        {
+            /* Ok, our visualizations are bad, so don't do this for the moment
+             * use the requested size anyway */
+            // videoWidget->widgetSize = bgWidget->widgeTSize;
+            videoWidget->widgetSize = QSize( *pi_width, *pi_height );
+        }
+//        videoWidget->updateGeometry(); /// FIXME: Needed ?
+        need_components_update = true;
+    }
+    return ret;
+}
+
+void MainInterface::releaseVideo( void *p_win )
+{
+    videoWidget->release( p_win );
+    videoWidget->widgetSize = QSize( 0, 0 );
+    videoWidget->resize( videoWidget->widgetSize );
+
+    if( embeddedPlaylistWasActive )
+        playlistWidget->show();
+    else if( bgWidget )
+        bgWidget->show();
+
+    videoIsActive = false;
+    need_components_update = true;
+}
+
+class SetVideoOnTopQtEvent : public QEvent
+{
+public:
+    SetVideoOnTopQtEvent( bool _onTop ) :
+      QEvent( (QEvent::Type)SetVideoOnTopEvent_Type ), onTop( _onTop)
+    {
+    }
+
+    bool OnTop() const
+    {
+        return onTop;
+    }
+
+private:
+    bool onTop;
+};
+
+int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
+{
+    int i_ret = VLC_EGENERIC;
+    switch( i_query )
+    {
+        case VOUT_GET_SIZE:
+        {
+            unsigned int *pi_width  = va_arg( args, unsigned int * );
+            unsigned int *pi_height = va_arg( args, unsigned int * );
+            *pi_width = videoWidget->widgetSize.width();
+            *pi_height = videoWidget->widgetSize.height();
+            i_ret = VLC_SUCCESS;
+            break;
+        }
+        case VOUT_SET_SIZE:
+        {
+            unsigned int i_width  = va_arg( args, unsigned int );
+            unsigned int i_height = va_arg( args, unsigned int );
+            videoWidget->widgetSize = QSize( i_width, i_height );
+            // videoWidget->updateGeometry();
+            need_components_update = true;
+            i_ret = VLC_SUCCESS;
+            break;
+        }
+        case VOUT_SET_STAY_ON_TOP:
+        {
+            int i_arg = va_arg( args, int );
+            QApplication::postEvent( this, new SetVideoOnTopQtEvent( i_arg ) );
+            i_ret = VLC_SUCCESS;
+            break;
+        }
+        default:
+            msg_Warn( p_intf, "unsupported control query" );
+            break;
+    }
+    return i_ret;
+}
+
+/*****************************************************************************
+ * Playlist, Visualisation and Menus handling
+ *****************************************************************************/
+/**
+ * Toggle the playlist widget or dialog
+ **/
+void MainInterface::togglePlaylist()
+{
+    // Toggle the playlist dialog if not embedded and return
+    if( !playlistEmbeddedFlag )
+    {
+        if( playlistWidget )
+        {
+            /// \todo Destroy it
+        }
+        THEDP->playlistDialog();
+        return;
+    }
+
+    // Create the playlist Widget and destroy the existing dialog
+    if( !playlistWidget )
+    {
+        PlaylistDialog::killInstance();
+        playlistWidget = new PlaylistWidget( p_intf );
+        mainLayout->insertWidget( 0, playlistWidget );
+        playlistWidget->widgetSize = settings->value( "playlistSize",
+                                               QSize( 650, 310 ) ).toSize();
+        playlistWidget->hide();
+        if(bgWidget)
+        CONNECT( playlistWidget, artSet( QString ), bgWidget, setArt(QString) );
+    }
+
+    // And toggle visibility
+    if( VISIBLE( playlistWidget ) )
+    {
+        playlistWidget->hide();
+        if( bgWidget ) bgWidget->show();
+        if( videoIsActive )
+        {
+            videoWidget->widgetSize = savedVideoSize;
+            videoWidget->resize( videoWidget->widgetSize );
+            videoWidget->updateGeometry();
+            if( bgWidget ) bgWidget->hide();
+        }
+    }
+    else
+    {
+        playlistWidget->show();
+        if( videoIsActive )
+        {
+            savedVideoSize = videoWidget->widgetSize;
+            videoWidget->widgetSize.setHeight( 0 );
+            videoWidget->resize( videoWidget->widgetSize );
+            videoWidget->updateGeometry();
+        }
+        if( VISIBLE( bgWidget ) ) bgWidget->hide();
+    }
+
+    doComponentsUpdate();
+}
+
+void MainInterface::undockPlaylist()
+{
+    if( playlistWidget )
+    {
+        playlistWidget->hide();
+        playlistWidget->deleteLater();
+        mainLayout->removeWidget( playlistWidget );
+        playlistWidget = NULL;
+        playlistEmbeddedFlag = false;
+
+        menuBar()->clear();
+        QVLCMenu::createMenuBar( this, p_intf, false, isAdvancedVisible(),
+                                 visualSelectorEnabled);
+
+        if( videoIsActive )
+        {
+            videoWidget->widgetSize = savedVideoSize;
+            videoWidget->resize( videoWidget->widgetSize );
+            videoWidget->updateGeometry();
+        }
+
+        doComponentsUpdate();
+        THEDP->playlistDialog();
+    }
+}
+
+#if 0
+void MainInterface::visual()
+{
+    if( !VISIBLE( visualSelector) )
+    {
+        visualSelector->show();
+        if( !THEMIM->getIM()->hasVideo() )
+        {
+            /* Show the background widget */
+        }
+        visualSelectorEnabled = true;
+    }
+    else
+    {
+        /* Stop any currently running visualization */
+        visualSelector->hide();
+        visualSelectorEnabled = false;
+    }
+    doComponentsUpdate();
+}
+#endif
+
+void MainInterface::toggleMenus()
+{
+    if( menuBar()->isVisible() ) menuBar()->hide();
+        else menuBar()->show();
+    msg_Dbg( p_intf, "I was there: \\_o<~~ coin coin" );
+}
+
+/* Video widget cannot do this synchronously as it runs in another thread */
+/* Well, could it, actually ? Probably dangerous ... */
+void MainInterface::doComponentsUpdate()
+{
+    calculateInterfaceSize();
+    resize( mainSize );
+}
+
+void MainInterface::toggleAdvanced()
+{
+    controls->toggleAdvanced();
+}
+
+bool MainInterface::isAdvancedVisible()
+{
+    return controls->b_advancedVisible;
+}
+
+/************************************************************************
+ * Other stuff
+ ************************************************************************/
+void MainInterface::setDisplay( float pos, int time, int length )
+{
+    char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
+    secstotimestr( psz_length, length );
+    secstotimestr( psz_time, time );
+    QString title;
+    title.sprintf( "%s/%s", psz_time, psz_length );
+    timeLabel->setText( " "+title+" " );
+}
+
+void MainInterface::setName( QString name )
+{
+    input_name = name;
+    nameLabel->setText( " " + name+" " );
+}
+
+void MainInterface::setStatus( int status )
+{
+    controls->setStatus( status );
+    if( sysTray )
+        updateSystrayMenu( status );
+}
+
+void MainInterface::updateOnTimer()
+{
+    /* \todo Make this event-driven */
+    if( intf_ShouldDie( p_intf ) )
+    {
+        QApplication::closeAllWindows();
+        QApplication::quit();
+    }
+    if( need_components_update )
+    {
+        doComponentsUpdate();
+        need_components_update = false;
+    }
+
+    controls->updateOnTimer();
 }
 
 /*****************************************************************************
@@ -544,264 +823,9 @@ void MainInterface::updateSystrayTooltipStatus( int i_status )
             }
     }
 }
-void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
-                                   int *pi_y, unsigned int *pi_width,
-                                   unsigned int *pi_height )
-{
-    void *ret = videoWidget->request( p_nvout,pi_x, pi_y, pi_width, pi_height );
-    if( ret )
-    {
-        videoIsActive = true;
-        if( VISIBLE( playlistWidget ) )
-        {
-            embeddedPlaylistWasActive = true;
-//            playlistWidget->hide();
-        }
-        bool bgWasVisible = false;
-        if( VISIBLE( bgWidget) )
-        {
-            bgWasVisible = true;
-            bgWidget->hide();
-        }
-        if( THEMIM->getIM()->hasVideo() || !bgWasVisible )
-        {
-            videoWidget->widgetSize = QSize( *pi_width, *pi_height );
-        }
-        else /* Background widget available, use its size */
-        {
-            /* Ok, our visualizations are bad, so don't do this for the moment
-             * use the requested size anyway */
-            // videoWidget->widgetSize = bgWidget->widgeTSize;
-            videoWidget->widgetSize = QSize( *pi_width, *pi_height );
-        }
-//        videoWidget->updateGeometry(); /// FIXME: Needed ?
-        need_components_update = true;
-    }
-    return ret;
-}
-
-void MainInterface::releaseVideo( void *p_win )
-{
-    videoWidget->release( p_win );
-    videoWidget->widgetSize = QSize( 0, 0 );
-    videoWidget->resize( videoWidget->widgetSize );
-
-    if( embeddedPlaylistWasActive )
-        playlistWidget->show();
-    else if( bgWidget )
-        bgWidget->show();
-
-    videoIsActive = false;
-    need_components_update = true;
-}
-
-class SetVideoOnTopQtEvent : public QEvent
-{
-public:
-    SetVideoOnTopQtEvent( bool _onTop ) :
-      QEvent( (QEvent::Type)SetVideoOnTopEvent_Type ), onTop( _onTop)
-    {
-    }
-
-    bool OnTop() const
-    {
-        return onTop;
-    }
-
-private:
-    bool onTop;
-};
-
-int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
-{
-    int i_ret = VLC_EGENERIC;
-    switch( i_query )
-    {
-        case VOUT_GET_SIZE:
-        {
-            unsigned int *pi_width  = va_arg( args, unsigned int * );
-            unsigned int *pi_height = va_arg( args, unsigned int * );
-            *pi_width = videoWidget->widgetSize.width();
-            *pi_height = videoWidget->widgetSize.height();
-            i_ret = VLC_SUCCESS;
-            break;
-        }
-        case VOUT_SET_SIZE:
-        {
-            unsigned int i_width  = va_arg( args, unsigned int );
-            unsigned int i_height = va_arg( args, unsigned int );
-            videoWidget->widgetSize = QSize( i_width, i_height );
-            // videoWidget->updateGeometry();
-            need_components_update = true;
-            i_ret = VLC_SUCCESS;
-            break;
-        }
-        case VOUT_SET_STAY_ON_TOP:
-        {
-            int i_arg = va_arg( args, int );
-            QApplication::postEvent( this, new SetVideoOnTopQtEvent( i_arg ) );
-            i_ret = VLC_SUCCESS;
-            break;
-        }
-        default:
-            msg_Warn( p_intf, "unsupported control query" );
-            break;
-    }
-    return i_ret;
-}
-
-void MainInterface::advanced()
-{
-    if( !VISIBLE( advControls ) )
-    {
-        advControls->show();
-        advControlsEnabled = true;
-    }
-    else
-    {
-        advControls->hide();
-        advControlsEnabled = false;
-    }
-    doComponentsUpdate();
-}
-
-void MainInterface::visual()
-{
-    if( !VISIBLE( visualSelector) )
-    {
-        visualSelector->show();
-        if( !THEMIM->getIM()->hasVideo() )
-        {
-            /* Show the background widget */
-        }
-        visualSelectorEnabled = true;
-    }
-    else
-    {
-        /* Stop any currently running visualization */
-        visualSelector->hide();
-        visualSelectorEnabled = false;
-    }
-    doComponentsUpdate();
-}
-
-void MainInterface::playlist()
-{
-    // Toggle the playlist dialog
-    if( !playlistEmbeddedFlag )
-    {
-        if( playlistWidget )
-        {
-            /// \todo Destroy it
-        }
-        THEDP->playlistDialog();
-        return;
-    }
-
-    if( !playlistWidget )
-    {
-        PlaylistDialog::killInstance();
-        playlistWidget = new PlaylistWidget( p_intf );
-        mainLayout->insertWidget( 0, playlistWidget );
-        playlistWidget->widgetSize = settings->value( "playlistSize",
-                                               QSize( 650, 310 ) ).toSize();
-        playlistWidget->hide();
-        if(bgWidget)
-        CONNECT( playlistWidget, artSet( QString ), bgWidget, setArt(QString) );
-    }
-    if( VISIBLE( playlistWidget ) )
-    {
-        playlistWidget->hide();
-        if( bgWidget ) bgWidget->show();
-        if( videoIsActive )
-        {
-            videoWidget->widgetSize = savedVideoSize;
-            videoWidget->resize( videoWidget->widgetSize );
-            videoWidget->updateGeometry();
-            if( bgWidget ) bgWidget->hide();
-        }
-    }
-    else
-    {
-        playlistWidget->show();
-        if( videoIsActive )
-        {
-            savedVideoSize = videoWidget->widgetSize;
-            videoWidget->widgetSize.setHeight( 0 );
-            videoWidget->resize( videoWidget->widgetSize );
-            videoWidget->updateGeometry();
-        }
-        if( VISIBLE( bgWidget ) ) bgWidget->hide();
-    }
-    doComponentsUpdate();
-}
-
-/* Video widget cannot do this synchronously as it runs in another thread */
-/* Well, could it, actually ? Probably dangerous ... */
-void MainInterface::doComponentsUpdate()
-{
-    calculateInterfaceSize();
-    resize( mainSize );
-}
-
-void MainInterface::undockPlaylist()
-{
-    if( playlistWidget )
-    {
-        playlistWidget->hide();
-        playlistWidget->deleteLater();
-        mainLayout->removeWidget( playlistWidget );
-        playlistWidget = NULL;
-        playlistEmbeddedFlag = false;
-
-        menuBar()->clear();
-        QVLCMenu::createMenuBar( this, p_intf, false, advControlsEnabled,
-                                 visualSelectorEnabled);
-
-        if( videoIsActive )
-        {
-            videoWidget->widgetSize = savedVideoSize;
-            videoWidget->resize( videoWidget->widgetSize );
-            videoWidget->updateGeometry();
-        }
-
-        doComponentsUpdate();
-        THEDP->playlistDialog();
-    }
-}
-
-void MainInterface::toggleMenus()
-{
-    if( menuBar()->isVisible() ) menuBar()->hide();
-        else menuBar()->show();
-    msg_Dbg( p_intf, "I was there: \\_o<~~ coin coin" );
-}
-
-void MainInterface::customEvent( QEvent *event )
-{
-    if( event->type() == PLDockEvent_Type )
-    {
-        PlaylistDialog::killInstance();
-        playlistEmbeddedFlag = true;
-        menuBar()->clear();
-        QVLCMenu::createMenuBar(this, p_intf, true, advControlsEnabled,
-                                visualSelectorEnabled);
-        playlist();
-    }
-    else if ( event->type() == SetVideoOnTopEvent_Type )
-    {
-        SetVideoOnTopQtEvent* p_event = (SetVideoOnTopQtEvent*)event;
-        if( p_event->OnTop() )
-            setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-        else
-            setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
-        show(); /* necessary to apply window flags?? */
-    }
-}
-
 
 /************************************************************************
- * D&D
+ * D&D Events
  ************************************************************************/
 void MainInterface::dropEvent(QDropEvent *event)
 {
@@ -847,8 +871,30 @@ void MainInterface::dragLeaveEvent(QDragLeaveEvent *event)
 }
 
 /************************************************************************
- * Other stuff
+ * Events stuff
  ************************************************************************/
+void MainInterface::customEvent( QEvent *event )
+{
+    if( event->type() == PLDockEvent_Type )
+    {
+        PlaylistDialog::killInstance();
+        playlistEmbeddedFlag = true;
+        menuBar()->clear();
+        QVLCMenu::createMenuBar(this, p_intf, true, isAdvancedVisible(),
+                                visualSelectorEnabled);
+        togglePlaylist();
+    }
+    else if ( event->type() == SetVideoOnTopEvent_Type )
+    {
+        SetVideoOnTopQtEvent* p_event = (SetVideoOnTopQtEvent*)event;
+        if( p_event->OnTop() )
+            setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+        else
+            setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
+        show(); /* necessary to apply window flags?? */
+    }
+}
+
 void MainInterface::keyPressEvent( QKeyEvent *e )
 {
     int i_vlck = qtEventToVLCKey( e );
@@ -868,58 +914,15 @@ void MainInterface::wheelEvent( QWheelEvent *e )
     e->accept();
 }
 
-void MainInterface::setDisplay( float pos, int time, int length )
-{
-    char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
-    secstotimestr( psz_length, length );
-    secstotimestr( psz_time, time );
-    QString title;
-    title.sprintf( "%s/%s", psz_time, psz_length );
-    timeLabel->setText( " "+title+" " );
-}
-
-void MainInterface::setName( QString name )
-{
-    input_name = name;
-    nameLabel->setText( " " + name+" " );
-}
-
-void MainInterface::setStatus( int status )
-{
-    controls->setStatus( status );
-    if( sysTray )
-        updateSystrayMenu( status );
-}
-
-void MainInterface::updateOnTimer()
-{
-    /* \todo Make this event-driven */
-    // TO MOVE TO controls
-    advControls->enableInput( THEMIM->getIM()->hasInput() );
-    controls->enableInput( THEMIM->getIM()->hasInput() );
-    advControls->enableVideo( THEMIM->getIM()->hasVideo() );
-    controls->enableVideo( THEMIM->getIM()->hasVideo() );
-
-    if( intf_ShouldDie( p_intf ) )
-    {
-        QApplication::closeAllWindows();
-        QApplication::quit();
-    }
-    if( need_components_update )
-    {
-        doComponentsUpdate();
-        need_components_update = false;
-    }
-
-    controls->updateOnTimer();
-}
-
 void MainInterface::closeEvent( QCloseEvent *e )
 {
     hide();
     vlc_object_kill( p_intf );
 }
 
+/*****************************************************************************
+ * Callbacks
+ *****************************************************************************/
 static int InteractCallback( vlc_object_t *p_this,
                              const char *psz_var, vlc_value_t old_val,
                              vlc_value_t new_val, void *param )

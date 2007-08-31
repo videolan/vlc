@@ -25,7 +25,6 @@
 #ifndef _MAIN_INTERFACE_H_
 #define _MAIN_INTERFACE_H_
 
-
 #include "qt4.hpp"
 #include "util/qvlcframe.hpp"
 
@@ -54,14 +53,16 @@ class MainInterface : public QVLCMW
 public:
     MainInterface( intf_thread_t *);
     virtual ~MainInterface();
+
     void *requestVideo( vout_thread_t *p_nvout, int *pi_x,
                         int *pi_y, unsigned int *pi_width,
                         unsigned int *pi_height );
-    void releaseVideo( void *);
+    void releaseVideo( void * );
     int controlVideo( void *p_window, int i_query, va_list args );
 
     QSystemTrayIcon *getSysTray() { return sysTray; };
     QMenu *getSysTrayMenu() { return systrayMenu; };
+    bool isAdvancedVisible();
 protected:
     void resizeEvent( QResizeEvent * );
     void dropEvent( QDropEvent *);
@@ -69,18 +70,18 @@ protected:
     void dragMoveEvent( QDragMoveEvent * );
     void dragLeaveEvent( QDragLeaveEvent * );
     void closeEvent( QCloseEvent *);
-    //Ui::MainInterfaceUI ui;
     friend class VolumeClickHandler;
 private:
-    QSettings *settings;
-    QSize mainSize, addSize;
-    QSystemTrayIcon *sysTray;
-    QMenu *systrayMenu;
-    QString input_name;
-    QVBoxLayout *mainLayout;
-    ControlsWidget *controls;
+    QSettings           *settings;
+    QSize                mainSize, addSize;
+    QSystemTrayIcon     *sysTray;
+    QMenu               *systrayMenu;
+    QString              input_name;
+    QVBoxLayout         *mainLayout;
+    ControlsWidget      *controls;
 
-    bool need_components_update;
+    bool                 need_components_update;
+
     void calculateInterfaceSize();
     void handleMainUi( QSettings* );
     void handleSystray();
@@ -92,20 +93,17 @@ private:
     virtual void keyPressEvent( QKeyEvent *);
     virtual void wheelEvent( QWheelEvent * );
 
-    bool embeddedPlaylistWasActive;
-    bool videoIsActive;
-    QSize savedVideoSize;
-
+    bool                 embeddedPlaylistWasActive;
+    bool                 videoIsActive;
+    QSize                savedVideoSize;
 
     BackgroundWidget    *bgWidget;
     VisualSelector      *visualSelector;
-    AdvControlsWidget      *advControls;
     PlaylistWidget      *playlistWidget;
 
     bool                 playlistEmbeddedFlag;
     bool                 videoEmbeddedFlag;
     bool                 alwaysVideoFlag;
-    bool                 advControlsEnabled;
     bool                 visualSelectorEnabled;
 
     InputManager        *main_input_manager;
@@ -119,17 +117,19 @@ private:
 public slots:
     void undockPlaylist();
     void toggleMenus();
-    void playlist();
+    void togglePlaylist();
     void toggleUpdateSystrayMenu();
+    void toggleAdvanced();
 private slots:
+    void updateOnTimer();
     void setStatus( int );
     void setName( QString );
     void setVLCWindowsTitle( QString title = "" );
     void setDisplay( float, int, int );
-    void updateOnTimer();
+#if 0
     void visual();
-    void advanced();
-    void handleSystrayClick(  QSystemTrayIcon::ActivationReason );
+#endif
+    void handleSystrayClick( QSystemTrayIcon::ActivationReason );
     void updateSystrayMenu( int );
     void updateSystrayTooltipName( QString );
     void updateSystrayTooltipStatus( int );
