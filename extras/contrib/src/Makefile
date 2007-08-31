@@ -444,15 +444,16 @@ fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz
 .fontconfig: fontconfig
 ifdef HAVE_WIN32
   ifdef HAVE_CYGWIN
-	(cd $<; ./configure --target=$(HOST) --disable-pic --disable-shared --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) && make && make install)
+	(cd $<; LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure --target=$(HOST) --disable-pic --disable-shared --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
   else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --with-cache-dir=WINDOWSTEMPDIR --with-arch=i686 --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
   endif
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	(cd $<; $(HOSTCC) LIBXML2_CFLAGS=`$(PREFIX)/bin/xml2-config --cflags` ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-freetype-config=$(PREFIX)/bin/freetype-config --enable-libxml2 && make && make install)
 endif
 	$(INSTALL_NAME)
 	touch $@
+
 
 CLEAN_FILE += .fontconfig
 CLEAN_PKG += fontconfig
