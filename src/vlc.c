@@ -233,19 +233,25 @@ int main( int i_argc, char *ppsz_argv[] )
  *****************************************************************************/
 static void *SigHandler (void *data)
 {
-    const sigset_t *set = (sigset_t *)data;
+    const sigset_t *exitset = (sigset_t *)data;
+    sigset_t fullset;
     time_t abort_time = 0;
+
+    pthread_sigmask (SIG_BLOCK, exitset, &fullset);
 
     for (;;)
     {
         int i_signal, state;
-        (void)sigwait (set, &i_signal);
+        (void)sigwait (&fullset, &i_signal);
 
 #ifdef __APPLE__
         /* In Mac OS X up to 10.4.8 sigwait (among others) is not a pthread
          * cancellation point */
         pthread_testcancel();
 #endif
+
+        if (!sigismember (exitset, i_signal))
+            continue; /* Ignore "dummy" signals */
 
         /* Once a signal has been trapped, the termination sequence will be
          * armed and subsequent signals will be ignored to avoid sending
@@ -267,7 +273,7 @@ static void *SigHandler (void *data)
         if (time (NULL) <= abort_time)
         {
             /* If user asks again more than 2 seconds later, die badly */
-            pthread_sigmask (SIG_UNBLOCK, set, NULL);
+            pthread_sigmask (SIG_UNBLOCK, exitset, NULL);
             fprintf (stderr, "user insisted too much, dying badly\n");
             abort ();
         }
