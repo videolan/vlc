@@ -2056,7 +2056,6 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
     sout_stream_id_t *id = p_sys->es[0];
 
     int64_t  i_dts = p_buffer->i_dts;
-    uint32_t i_timestamp = i_dts * 9 / 100;
 
     uint8_t         *p_data = p_buffer->p_buffer;
     unsigned int    i_data  = p_buffer->i_buffer;
@@ -2080,17 +2079,7 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
         {
             /* allocate a new packet */
             p_sys->packet = block_New( p_stream, id->i_mtu );
-            p_sys->packet->p_buffer[ 0] = 0x80;
-            p_sys->packet->p_buffer[ 1] = 0x80|id->i_payload_type;
-            p_sys->packet->p_buffer[ 2] = ( id->i_sequence >> 8)&0xff;
-            p_sys->packet->p_buffer[ 3] = ( id->i_sequence     )&0xff;
-            p_sys->packet->p_buffer[ 4] = ( i_timestamp >> 24 )&0xff;
-            p_sys->packet->p_buffer[ 5] = ( i_timestamp >> 16 )&0xff;
-            p_sys->packet->p_buffer[ 6] = ( i_timestamp >>  8 )&0xff;
-            p_sys->packet->p_buffer[ 7] = ( i_timestamp       )&0xff;
-            memcpy( p_sys->packet->p_buffer + 8, id->ssrc, 4 );
-            p_sys->packet->i_buffer = 12;
-
+            rtp_packetize_common( id, p_sys->packet, 1, i_dts );
             p_sys->packet->i_dts = i_dts;
             p_sys->packet->i_length = p_buffer->i_length / i_packet;
             i_dts += p_sys->packet->i_length;
