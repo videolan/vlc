@@ -271,37 +271,36 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* fix or warn of incompatible couple */
-    if( psz_mux && psz_access )
+    if( !strncmp( psz_access, "mmsh", 4 ) &&
+        strncmp( psz_mux, "asfh", 4 ) )
     {
-        if( !strncmp( psz_access, "mmsh", 4 ) &&
-            strncmp( psz_mux, "asfh", 4 ) )
-        {
-            char *p = strchr( psz_mux,'{' );
+        char *p = strchr( psz_mux,'{' );
 
-            msg_Warn( p_stream, "fixing to mmsh/asfh" );
-            if( p )
-            {
-                /* -> a little memleak but ... */
-                psz_mux = malloc( strlen( "asfh" ) + strlen( p ) + 1);
-                sprintf( psz_mux, "asfh%s", p );
-            }
-            else
-            {
-                psz_mux = strdup("asfh");
-            }
-        }
-        else if( ( !strncmp( psz_access, "rtp", 3 ) ||
-                   !strncmp( psz_access, "udp", 3 ) ) &&
-                 strncmp( psz_mux, "ts", 2 ) )
+        msg_Warn( p_stream, "fixing to mmsh/asfh" );
+        if( p )
         {
-            msg_Err( p_stream, "for now udp and rtp are only valid with TS" );
+            if( asprintf( &p, "asfh%s", p ) == -1 )
+                p = NULL;
+            free( psz_mux );
+            psz_mux = p;
         }
-        else if( strncmp( psz_access, "file", 4 ) &&
-                 ( !strncmp( psz_mux, "mov", 3 ) ||
-                   !strncmp( psz_mux, "mp4", 3 ) ) )
+        else
         {
-            msg_Err( p_stream, "mov and mp4 work only with file output" );
+            free( psz_mux );
+            psz_mux = strdup("asfh");
         }
+    }
+    else if( ( !strncmp( psz_access, "rtp", 3 ) ||
+               !strncmp( psz_access, "udp", 3 ) ) &&
+             strncmp( psz_mux, "ts", 2 ) )
+    {
+        msg_Err( p_stream, "UDP and RTP are only valid with TS" );
+    }
+    else if( strncmp( psz_access, "file", 4 ) &&
+             ( !strncmp( psz_mux, "mov", 3 ) ||
+               !strncmp( psz_mux, "mp4", 3 ) ) )
+    {
+        msg_Err( p_stream, "mov and mp4 work only with file output" );
     }
 
     msg_Dbg( p_this, "using `%s/%s://%s'", psz_access, psz_mux, psz_url );
