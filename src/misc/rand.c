@@ -80,12 +80,12 @@ void vlc_rand_bytes (void *buf, size_t len)
     static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
     static uint64_t counter = 0;
 
-    struct md5_s md;
     uint64_t stamp = NTPtime64 ();
 
     while (len > 0)
     {
         uint64_t val;
+        struct md5_s mdi, mdo;
 
         pthread_mutex_lock (&lock);
         if (counter == 0)
@@ -93,21 +93,25 @@ void vlc_rand_bytes (void *buf, size_t len)
         val = counter++;
         pthread_mutex_unlock (&lock);
 
-        InitMD5 (&md);
-        AddMD5 (&md, ikey, sizeof (ikey));
-        AddMD5 (&md, &stamp, sizeof (stamp));
-        AddMD5 (&md, &val, sizeof (val));
-        EndMD5 (&md);
+        InitMD5 (&mdi);
+        AddMD5 (&mdi, ikey, sizeof (ikey));
+        AddMD5 (&mdi, &stamp, sizeof (stamp));
+        AddMD5 (&mdi, &val, sizeof (val));
+        EndMD5 (&mdi);
+        InitMD5 (&mdo);
+        AddMD5 (&mdo, okey, sizeof (okey));
+        AddMD5 (&mdo, mdi.p_digest, sizeof (mdi.p_digest));
+        EndMD5 (&mdo);
 
-        if (len < sizeof (md.p_digest))
+        if (len < sizeof (mdo.p_digest))
         {
-            memcpy (buf, md.p_digest, len);
+            memcpy (buf, mdo.p_digest, len);
             break;
         }
 
-        memcpy (buf, md.p_digest, sizeof (md.p_digest));
-        len -= sizeof (md.p_digest);
-        buf = ((uint8_t *)buf) + sizeof (md.p_digest);
+        memcpy (buf, mdo.p_digest, sizeof (mdo.p_digest));
+        len -= sizeof (mdo.p_digest);
+        buf = ((uint8_t *)buf) + sizeof (mdo.p_digest);
     }
 }
 
