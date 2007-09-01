@@ -1,5 +1,4 @@
 $Id$
-
 VLC makes extensive use of the following persons' code:
 
 Aaron Holtzman <aholtzma at ess.engr.uvic.ca> - AC3 decoder, MPEG video decoder

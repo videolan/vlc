@@ -114,15 +114,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
 
     /* GPL License */
     QTextEdit *licenseEdit = new QTextEdit( this );
-#ifdef WIN32
-    QFile *licenseFile = new QFile( "COPYING.txt" );
-    licenseFile->open( QIODevice::ReadOnly | QIODevice::Text );
-    licenseEdit->setText( licenseFile->readAll().data() );
-    licenseFile->close();
-#else
-    char *psz_license = LICENCE;
     licenseEdit->setText( qfu( psz_license ) );
-#endif
     licenseEdit->setReadOnly( true );
 
     /* People who helped */
@@ -136,29 +128,13 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     thanksLabel->setWordWrap( true );
     thanksLayout->addWidget( thanksLabel );
     QTextEdit *thanksEdit = new QTextEdit( this );
-#ifdef WIN32
-    QFile *thanksFile = new QFile( "THANKS.txt" );
-    thanksFile->open( QIODevice::ReadOnly | QIODevice::Text );
-    thanksEdit->setText( thanksFile->readAll().data() );
-    thanksFile->close();
-#else
-    char *psz_thanks = THANKS;
     thanksEdit->setText( qfu( psz_thanks ) );
-#endif
     thanksEdit->setReadOnly( true );
     thanksLayout->addWidget( thanksEdit );
 
     /* People who wrote the software */
     QTextEdit *authorsEdit = new QTextEdit( this );
-#ifdef WIN32
-    QFile *authorsFile = new QFile( "COPYING.txt" );
-    authorsFile->open( QIODevice::ReadOnly | QIODevice::Text );
-    authorsEdit->setText( authorsFile->readAll().data() );
-    authorsFile->close();
-#else
-    char *psz_authors = AUTHORS;
     authorsEdit->setText( qfu( psz_authors ) );
-#endif
     authorsEdit->setReadOnly( true );
 
     /* add the tabs to the Tabwidget */

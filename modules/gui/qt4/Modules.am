@@ -82,14 +82,14 @@ dialogs/help.cpp: dialogs/about.hpp
 dialogs/about.hpp: Modules.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_srcdir)/AUTHORS
 	mkdir -p -- dialogs
 	echo "/* Automatically generated file - DO NOT EDIT */" > dialogs/about.hpp.tmp
-	echo "static const char psz_licence[] =" >> dialogs/about.hpp.tmp
+	echo "static const char psz_license[] =" >> dialogs/about.hpp.tmp
 	cat $(top_srcdir)/COPYING | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }' >> dialogs/about.hpp.tmp
 	echo ";" >> dialogs/about.hpp.tmp
 	echo "static const char psz_thanks[] =" >> dialogs/about.hpp.tmp
-	cat $(top_srcdir)/THANKS | grep -v '$$Id:' | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }' >> dialogs/about.hpp.tmp
+	grep -v '$$Id:'  $(top_srcdir)/THANKS | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }' >> dialogs/about.hpp.tmp
 	echo ";" >> dialogs/about.hpp.tmp
 	echo "static const char psz_authors[] =" >> dialogs/about.hpp.tmp
-	cat $(top_srcdir)/AUTHORS | grep -v '$$Id:' | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }' >> dialogs/about.hpp.tmp
+	grep N: $(top_srcdir)/AUTHORS | cut -d" " -f 2- | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\"" }' >> dialogs/about.hpp.tmp
 	echo ";" >> dialogs/about.hpp.tmp
 	mv -f -- dialogs/about.hpp.tmp dialogs/about.hpp
 
