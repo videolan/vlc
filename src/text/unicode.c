@@ -27,6 +27,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc_charset.h>
+#include "libvlc.h" /* utf8_mkdir */
 
 #include <assert.h>
 
