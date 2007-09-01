@@ -126,10 +126,10 @@ vlc_module_begin();
     set_description( _("On Screen Display menu") );
     set_shortname( _("OSD menu") );
     add_shortcut( "osdmenu" );
-/*
+
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
-*/
+
     set_callbacks( CreateFilter, DestroyFilter );
 vlc_module_end();
 
