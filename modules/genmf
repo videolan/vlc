@@ -1,0 +1,151 @@
+#! /bin/sh
+
+##  genmf file for the VLC media player
+##
+## Copyright (C) 2005-2007 the VideoLAN team
+##
+##  Authors: Sam Hocevar <sam@zoy.org>
+##           Rémi Denis-Courmont <rem # videolan # org>
+
+cd $(dirname "$0")/.. || exit 1
+
+while test "$1"
+do
+  printf "."
+  dir="$1"
+  modf="modules/${dir}/Modules.am"
+  makf="modules/${dir}/Makefile.am"
+  basedir="`echo "${dir}" | cut -f1 -d/`"
+  # automake will not recurse for make dist if we don't define SUBDIRS = .
+  subdirs="`sed -ne 's,'modules/${dir}'/\([^/]*\)/Makefile,\1,p' configure.ac | xargs`"
+  mods="`sed -n -e 's/^ *SOURCES_\([^ ]*\).*/\1/p' < "${modf}" | xargs`"
+  extra_ltlibs=""
+  for mod in $mods
+  do
+    extra_ltlibs="${extra_ltlibs} lib${mod}_plugin.la"
+  done
+  rm -f "${makf}" && cat > "${makf}" << EOF
+# ${makf} automatically generated from ${modf} by bootstrap
+# DO NOT EDIT - edit Modules.am or \$(top_srcdir)/bootstrap instead
+
+basedir = ${basedir}
+mods = ${mods}
+
+NULL =
+libvlc_LTLIBRARIES =
+EXTRA_DIST = Modules.am
+BUILT_SOURCES =
+CLEANFILES =
+SUBDIRS = ${subdirs}
+SUFFIXES = _plugin\$(LIBEXT) _plugin.la
+
+libvlcdir = \$(libdir)/vlc/\$(basedir)
+
+EXTRA_LTLIBRARIES = ${extra_ltlibs}
+
+include Modules.am
+
+if HAVE_PLUGINS
+LTLIBVLC = -L\$(top_builddir)/src -lvlc
+
+AM_LDFLAGS = -rpath '\$(libvlcdir)' -avoid-version \\
+	-module -no-undefined -shrext \$(LIBEXT) 
+if HAVE_COMPILER_EXPORT
+AM_LDFLAGS += -export-dynamic
+else
+AM_LDFLAGS += -export-symbol-regex ^\$(VLC_ENTRY)\$\$
+endif
+AM_LIBADD = \$(LTLIBVLC)
+endif
+
+all: all-modules
+
+nice:
+	\$(top_builddir)/compile
+
+# Find out which modules were enabled and tell make to build them
+all-modules:
+	@set fnord \$\$MAKEFLAGS; amf=\$\$2; targets=\`\\
+	z=\$\$(\$(VLC_CONFIG) --list plugin); for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo lib\$\${mod}_plugin.la;; esac; done; \\
+	\`; case "\$\$targets" in *lib*) \$(MAKE) \$(AM_MAKEFLAGS) \$\$targets || case "\$\$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; ;; esac; \\
+	test -z "\$\$fail"
+
+# Build a plugin with the adequate linker and linker's flags
+_plugin.la_plugin\$(LIBEXT):
+	@mod="\$*" ; mod=\$\${mod#lib} ; \
+	ldfl="\`\$(VLC_CONFIG) --libs plugin \$\$mod\` \$(LIBVLC) -u \$(SYMPREF)\$(VLC_ENTRY)" ; \
+	case \`\$(VLC_CONFIG) --linkage \$\$mod\` in \\
+	  c++)  ld="\$(CXXLINK)" ;; \
+	  objc) ld="\$(OBJCLINK)" ;; \
+	  c|*)  ld="\$(LINK)" ;; \
+	esac ; \
+	echo \$\$ld \$< \$\$ldfl ; \
+	\$\$ld \$< \$\$ldfl
+
+if MAINTAINER_MODE
+\$(srcdir)/Makefile.am: \$(srcdir)/Modules.am \$(top_srcdir)/modules/genmf
+	cd \$(top_srcdir) && \$(SHELL) modules/genmf ${dir}
+endif
+
+mostlyclean-local:
+	-rm -f -- *.la
+
+### automake creates libvlcdir after running install-*-local
+### so we have to create it ourselves first
+install-exec-local: all-modules
+	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
+	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
+	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
+	  test -z "\$\$m" || \
+  	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" install-libvlcLTLIBRARIES || exit \$\$? ; \
+	fi
+
+uninstall-local:
+	@if test -z "\$(libvlc_LTLIBRARIES)"; then \
+	  z=\$\$(\$(VLC_CONFIG) --list plugin); \
+	  m=\`for mod in \$(mods); do case "\$\$z " in *\ \$\${mod}\ *) echo -n " lib\$\${mod}_plugin.la" ;; esac; done\` ; \
+	  test -z "\$\$m" || \
+	    \$(MAKE) \$(AM_MAKEFLAGS) libvlc_LTLIBRARIES="\$\$m" uninstall-libvlcLTLIBRARIES || exit \$\$?; \
+	fi
+
+EOF
+  for mod in $mods
+  do
+    if grep '^nodist_SOURCES_'${mod}'' < "${modf}" >/dev/null 2>&1; then
+        NODIST=''; else
+        NODIST='#'; fi
+    cat >> m4/private.m4 << EOF
+    ${mod}) list="\\\${list} ${dir}/lib${mod}" ;;
+EOF
+# Generation of modules/**/Makefile.am
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# - L_ is for LIBRARIES_, D_ for DATA_, B_ for BUILT_SOURCES_, F_ for LDFLAGS_,
+#   S_ for SOURCES_, _p is for _plugin, _b is for _builtin. This is to reduce
+#   the resulting file size.
+# - *_CFLAGS, *_CXXFLAGS etc. because per-object CPPFLAGS does not seem to
+#   work properly with any automake version I tested.
+    cat >> "${makf}" << EOF
+# The ${mod} plugin
+
+EOF
+    cat >> "${makf}" << EOF
+lib${mod}_plugin_la_SOURCES = \$(SOURCES_${mod})
+EOF
+    if [ "${NODIST}" != "#" ]; then cat >> "${makf}" << EOF
+nodist_lib${mod}_plugin_la_SOURCES = \$(nodist_SOURCES_${mod})
+CLEANFILES += \$(nodist_SOURCES_${mod})
+BUILT_SOURCES += \$(B${mod})
+EOF
+    fi
+    cat >> "${makf}" << EOF
+lib${mod}_plugin_la_CFLAGS = \`\$(VLC_CONFIG) --cflags plugin ${mod}\`
+lib${mod}_plugin_la_CXXFLAGS = \`\$(VLC_CONFIG) --cxxflags plugin ${mod}\`
+lib${mod}_plugin_la_OBJCFLAGS = \`\$(VLC_CONFIG) --objcflags plugin ${mod}\`
+lib${mod}_plugin_la_LDFLAGS = \`\$(VLC_CONFIG) --libs plugin ${mod}\` \$(AM_LDFLAGS)
+lib${mod}_plugin_la_LIBADD = \$(AM_LIBADD)
+EOF
+  done
+
+  shift
+done
+printf "\n"
