@@ -2079,8 +2079,6 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
             p_sys->packet->i_dts = i_dts;
             p_sys->packet->i_length = p_buffer->i_length / i_packet;
             i_dts += p_sys->packet->i_length;
-
-            id->i_sequence++;
         }
 
         i_size = __MIN( i_data,
