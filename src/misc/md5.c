@@ -159,10 +159,10 @@ void InitMD5( struct md5_s *p_md5 )
 /*****************************************************************************
  * AddMD5: add i_len bytes to an MD5 message
  *****************************************************************************/
-void AddMD5( struct md5_s *p_md5, const uint8_t *p_src, uint32_t i_len )
+void AddMD5( struct md5_s *p_md5, const void *p_src, size_t i_len )
 {
     unsigned int i_current; /* Current bytes in the spare buffer */
-    unsigned int i_offset = 0;
+    size_t i_offset = 0;
 
     i_current = (p_md5->i_bits / 8) & 63;
 
@@ -185,14 +185,15 @@ void AddMD5( struct md5_s *p_md5, const uint8_t *p_src, uint32_t i_len )
     while( i_len >= 64 )
     {
         uint32_t p_tmp[ 16 ];
-        memcpy( p_tmp, p_src + i_offset, 64 );
+        memcpy( p_tmp, ((const uint8_t *)p_src) + i_offset, 64 );
         DigestMD5( p_md5, p_tmp );
         i_offset += 64;
         i_len -= 64;
     }
 
     /* Copy our remaining data to the message's spare buffer */
-    memcpy( ((uint8_t *)p_md5->p_data) + i_current, p_src + i_offset, i_len );
+    memcpy( ((uint8_t *)p_md5->p_data) + i_current,
+            ((const uint8_t *)p_src) + i_offset, i_len );
 }
 
 /*****************************************************************************
