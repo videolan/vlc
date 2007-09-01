@@ -32,6 +32,7 @@
 #include <vlc_httpd.h>
 #include <vlc_url.h>
 #include <vlc_network.h>
+#include <vlc_rand.h>
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -248,7 +249,7 @@ rtsp_session_t *RtspClientNew( rtsp_stream_t *rtsp )
         return NULL;
 
     s->stream = rtsp;
-    s->id = rand(); /* FIXME: not enough entropy */
+    vlc_rand_bytes (&s->id, sizeof (s->id));
     s->trackc = 0;
     s->trackv = NULL;
 
