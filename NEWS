@@ -43,7 +43,6 @@ Playlist:
 
 Input/Demuxers:
   * UDP-Lite protocol (requires OS support) for RTP/AVP
-  * DCCP protocol (requires OS support) for RTP/AVP
   * Proxy support for MMSH stream
   * JACK audio input support
   * MP4 gpac and Apple chapter support
