@@ -77,11 +77,40 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     closeButton->setDefault( true );
 
     QLabel *introduction = new QLabel(
-            qtr( "Information about VLC media player" ) );
+            qtr( "Information about VLC media player." ) );
+    QLabel *iconVLC = new QLabel;
+    iconVLC->setPixmap( QPixmap( ":/vlc48.png" ) );
+    layout->addWidget( iconVLC, 0, 0, 1, 1 );
+    layout->addWidget( introduction, 0, 1, 1, 7 );
+    layout->addWidget( tab, 1, 0, 1, 8 );
+    layout->addWidget( closeButton, 2, 6, 1, 2 );
 
-    layout->addWidget( introduction, 0, 0, 1, 4 );
-    layout->addWidget( tab, 1, 0, 1, 4 );
-    layout->addWidget( closeButton, 2, 3, 1, 1 );
+    /* Main Introduction */
+    QWidget *infoWidget = new QWidget( this );
+    QHBoxLayout *infoLayout = new QHBoxLayout( infoWidget );
+    QLabel *infoLabel = new QLabel( "VLC media player " PACKAGE_VERSION "\n\n"
+            "(c) 1996-2006 - the VideoLAN Team\n\n" +
+            qtr( "VLC media player is a free media player, made by the "
+                "VideoLAN Team.\nIt is a standalone multimedia player, "
+                "encoder and streamer, that can read from many supports "
+                "(files, CDs, DVDs, networks, capture cards) and that works "
+                "on many platforms.\n\n" )
+            + qtr( "You are using the new Qt4 Interface.\n" )
+            + qtr( "Compiled by " ) + qfu( VLC_CompileBy() )+ "@"
+            + qfu( VLC_CompileDomain() ) + ".\n"
+            + "Compiler: " + qfu( VLC_Compiler() ) +".\n"
+            + qtr( "Based on SVN revision: " ) + qfu( VLC_Changeset() )
+            + ".\n\n"
+            + qtr( "This program comes with NO WARRANTY, to the extent "
+                "permitted by the law; read the distribution tab.\n\n" )
+            + "The VideoLAN team <videolan@videolan.org> \n"
+              "http://www.videolan.org/\n") ;
+    infoLabel->setWordWrap( infoLabel );
+
+    QLabel *iconVLC2 = new QLabel;
+    iconVLC2->setPixmap( QPixmap( ":/vlc128.png" ) );
+    infoLayout->addWidget( iconVLC2 );
+    infoLayout->addWidget( infoLabel );
 
     /* GPL License */
     QTextEdit *licenseEdit = new QTextEdit( this );
@@ -89,19 +118,29 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     licenseEdit->setReadOnly( true );
 
     /* People who helped */
+    QWidget *thanksWidget = new QWidget( this );
+    QVBoxLayout *thanksLayout = new QVBoxLayout( thanksWidget );
+
+    QLabel *thanksLabel = new QLabel( qtr("We would like to thanks the whole "
+                "community, the testers, our users and the following people "
+                "(and the missing ones...) for their collaboration to "
+                "provide the best software." ) );
+    thanksLabel->setWordWrap( true );
+    thanksLayout->addWidget( thanksLabel );
     QTextEdit *thanksEdit = new QTextEdit( this );
     thanksEdit->setText( qfu( psz_thanks ) );
     thanksEdit->setReadOnly( true );
+    thanksLayout->addWidget( thanksEdit );
 
-    /* People who helped */
+    /* People who wrote the software */
     QTextEdit *authorsEdit = new QTextEdit( this );
     authorsEdit->setText( qfu( psz_authors ) );
     authorsEdit->setReadOnly( true );
 
     /* add the tabs to the Tabwidget */
-    tab->addTab( NULL, qtr( "General Info" ) );
+    tab->addTab( infoWidget, qtr( "General Info" ) );
     tab->addTab( authorsEdit, qtr( "Authors" ) );
-    tab->addTab( thanksEdit, qtr("Thanks") );
+    tab->addTab( thanksWidget, qtr("Thanks") );
     tab->addTab( licenseEdit, qtr("Distribution License") );
 
     BUTTONACT( closeButton, close() );
