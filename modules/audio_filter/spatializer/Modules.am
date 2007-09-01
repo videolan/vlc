@@ -1,0 +1,4 @@
+SOURCES_spatializer = spatializer.cpp \
+    allpass.cpp allpass.hpp comb.cpp comb.hpp \
+    denormals.h tuning.h revmodel.cpp revmodel.hpp
+
