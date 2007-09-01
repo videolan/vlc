@@ -434,3 +434,4 @@ vout_vaControlDefault
 vout_VarCallback
 __xml_Create
 xml_Delete
+vlc_rand_bytes

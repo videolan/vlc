@@ -68,6 +68,7 @@ HEADERS_include = \
 	../include/vlc_os_specific.h \
 	../include/vlc_osd.h \
 	../include/vlc_playlist.h \
+	../include/vlc_rand.h \
 	../include/vlc_sout.h \
 	../include/vlc_stream.h \
 	../include/vlc_streaming.h \
@@ -275,6 +276,7 @@ SOURCES_libvlc_common = \
 	text/iso_lang.c \
 	text/iso-639_def.h \
 	misc/md5.c \
+	misc/rand.c \
 	misc/mtime.c \
 	misc/block.c \
 	modules/modules.h \
