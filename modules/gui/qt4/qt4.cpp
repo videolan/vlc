@@ -21,11 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef WIN32
-#   include <signal.h>
-#   include <QStyle>
-#endif
-
 #include <QApplication>
 
 #include "qt4.hpp"
@@ -204,8 +199,10 @@ static void Init( intf_thread_t *p_intf )
     p_intf->p_sys->p_app = app;
 
 #ifndef WIN32
-/* that forces the execution of QCleanlooksStylePrivate::lookupIconTheme() */
-    app->style()->standardIcon( QStyle::SP_TitleBarMenuButton );
+    /* kludge:
+     * forces plastique style as cleanlooks bugs on gnome */
+    QPlastiqueStyle *plastique = new QPlastiqueStyle;
+    app->setStyle( plastique );
 #endif
 
     // Initialize timers
