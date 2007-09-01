@@ -357,7 +357,7 @@ void SoutDialog::UpdateMRL()
     if( access_checkboxes[RTP_ACCESS_OUT]->IsChecked() )
     {
         if( !dup_opts.IsEmpty() ) dup_opts += wxT(",");
-        dup_opts += wxT("dst=std{access=rtp,mux=");
+        dup_opts += wxT("dst=rtp{mux=");
         dup_opts += encapsulation + wxT(",dst=");
 
         wxString rtp_addr = net_addrs[RTP_ACCESS_OUT]->GetLineText(0);

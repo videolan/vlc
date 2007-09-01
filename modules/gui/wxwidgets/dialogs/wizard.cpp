@@ -1611,8 +1611,8 @@ void WizardDialog::Run()
             /* Add brackets automatically for IPv6 if they are missing */
             v6 = ( address[0] != '[' ) && ( strchr( address, ':' ) != NULL );
             asprintf( &psz_opt,
-                      ":sout=#standard{mux=%s,dst=%s%s%s,access=%s%s}",
-                      mux, v6 ? "[" : "", address, v6 ? "]" : "", method,
+                      ":sout=#%smux=%s,dst=%s%s%s%s}", method,
+                      mux, v6 ? "[" : "", address, v6 ? "]" : "",
                       psz_sap_option ?: "" );
             if( psz_sap_option ) free( psz_sap_option );
         }
