@@ -2,11 +2,11 @@
  * spatializer.cpp:
  *****************************************************************************
  * Copyright (C) 2004, 2006, 2007 the VideoLAN team
- * 
+ *
  * Google Summer of Code 2007
- * 
- * Authors: Biodun Osunkunle <biodun@videolan.org> 
- * 
+ *
+ * Authors: Biodun Osunkunle <biodun@videolan.org>
+ *
  * Mentor : Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -63,11 +63,11 @@ typedef struct aout_filter_sys_t
 {
     /* reverb static config */
     vlc_bool_t b_first;
-    
+
 } aout_filter_sys_t;
 
 static revmodel reverbm;
-    
+
 static const char *psz_control_names[] =
 {
     "Roomsize", "Width" , "Wet", "Dry", "Damp"
@@ -88,7 +88,8 @@ static int DryCallback ( vlc_object_t *, char const *,
 static int DampCallback ( vlc_object_t *, char const *,
                                            vlc_value_t, vlc_value_t, void * );
 static int WidthCallback ( vlc_object_t *, char const *,
-                                           vlc_value_t, vlc_value_t, void * );                                                                                                                                 
+                                           vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -122,8 +123,8 @@ static int Open( vlc_object_t *p_this )
 
     p_filter->pf_do_work = DoWork;
     p_filter->b_in_place = VLC_TRUE;
-    
-     /* Allocate structure */    
+
+     /* Allocate structure */
     p_sys = p_filter->p_sys = (aout_filter_sys_t*)malloc( sizeof( aout_filter_sys_t ) );
     reverbm.setroomsize(1.05);
     reverbm.setwet(10.0f);
@@ -131,14 +132,14 @@ static int Open( vlc_object_t *p_this )
     reverbm.setdamp(0.3);
     reverbm.setwidth(0.9);
     SpatInit( p_filter);
-    
+
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * Close: close the plugin
  *****************************************************************************/
-static void Close( vlc_object_t *p_this ) 
+static void Close( vlc_object_t *p_this )
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys = p_filter->p_sys;
@@ -169,7 +170,7 @@ static int SpatInit( aout_filter_t *p_filter )
     int i, ch;
     vlc_value_t val1, val2, val3, val4, val5;
     aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
-    
+
     for( int i = 0; i < 5 ; i ++ )
     {
      var_CreateGetFloatCommand( p_aout, psz_control_names[i] );
@@ -195,7 +196,7 @@ static int SpatInit( aout_filter_t *p_filter )
     var_AddCallback( p_aout, psz_control_names[2], WetCallback, p_sys );
     var_AddCallback( p_aout, psz_control_names[3], DryCallback, p_sys );
     var_AddCallback( p_aout, psz_control_names[4], DampCallback, p_sys );
-    
+
     return VLC_SUCCESS;
 }
 
@@ -210,7 +211,7 @@ static void SpatFilter( aout_instance_t *p_aout,
         {
             in[ch] = in[ch] * SPAT_AMP;
         }
-    	   reverbm.processreplace( in, out , 1, i_channels);
+           reverbm.processreplace( in, out , 1, i_channels);
          in  += i_channels;
          out += i_channels;
     }
@@ -236,7 +237,7 @@ static void SpatClean( aout_filter_t *p_filter )
 static int RoomCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    msg_Dbg (p_this,"room callback %3.1f %s %s %d\n", newval.f_float, __FILE__,__func__,__LINE__);    
+    msg_Dbg (p_this,"room callback %3.1f %s %s %d\n", newval.f_float, __FILE__,__func__,__LINE__);
     reverbm.setroomsize(newval.f_float);
     return VLC_SUCCESS;
 }

@@ -12,16 +12,16 @@ class allpass
 {
 public:
         allpass();
-	void	setbuffer(float *buf, int size);
-	inline  float	process(float inp);
-	void	mute();
-	void	setfeedback(float val);
-	float	getfeedback();
+    void    setbuffer(float *buf, int size);
+    inline  float    process(float inp);
+    void    mute();
+    void    setfeedback(float val);
+    float    getfeedback();
 // private:
-	float	feedback;
-	float	*buffer;
-	int	bufsize;
-	int	bufidx;
+    float    feedback;
+    float    *buffer;
+    int    bufsize;
+    int    bufidx;
 };
 
 
@@ -29,18 +29,18 @@ public:
 
 inline float allpass::process(float input)
 {
-	float output;
-	float bufout;
-	
-	bufout = buffer[bufidx];
-	undenormalise(bufout);
-	
-	output = -input + bufout;
-	buffer[bufidx] = input + (bufout*feedback);
+    float output;
+    float bufout;
 
-	if(++bufidx>=bufsize) bufidx = 0;
+    bufout = buffer[bufidx];
+    undenormalise(bufout);
 
-	return output;
+    output = -input + bufout;
+    buffer[bufidx] = input + (bufout*feedback);
+
+    if(++bufidx>=bufsize) bufidx = 0;
+
+    return output;
 }
 
 #endif//_allpass

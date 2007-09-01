@@ -12,22 +12,22 @@
 class comb
 {
 public:
-	comb();
-	void	setbuffer(float *buf, int size);
-	inline  float	process(float inp);
-	void	mute();
-	void	setdamp(float val);
-	float	getdamp();
-	void	setfeedback(float val);
-	float	getfeedback();
+    comb();
+    void    setbuffer(float *buf, int size);
+    inline  float    process(float inp);
+    void    mute();
+    void    setdamp(float val);
+    float    getdamp();
+    void    setfeedback(float val);
+    float    getfeedback();
 private:
-	float	feedback;
-	float	filterstore;
-	float	damp1;
-	float	damp2;
-	float	*buffer;
-	int	bufsize;
-	int	bufidx;
+    float    feedback;
+    float    filterstore;
+    float    damp1;
+    float    damp2;
+    float    *buffer;
+    int    bufsize;
+    int    bufidx;
 };
 
 
@@ -35,19 +35,19 @@ private:
 
 inline float comb::process(float input)
 {
-	float output;
+    float output;
 
-	output = buffer[bufidx];
-	undenormalise(output);
+    output = buffer[bufidx];
+    undenormalise(output);
 
-	filterstore = (output*damp2) + (filterstore*damp1);
-	undenormalise(filterstore);
+    filterstore = (output*damp2) + (filterstore*damp1);
+    undenormalise(filterstore);
 
-	buffer[bufidx] = input + (filterstore*feedback);
+    buffer[bufidx] = input + (filterstore*feedback);
 
-	if(++bufidx>=bufsize) bufidx = 0;
+    if(++bufidx>=bufsize) bufidx = 0;
 
-	return output;
+    return output;
 }
 
 #endif //_comb_

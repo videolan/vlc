@@ -8,29 +8,29 @@
 
 allpass::allpass()
 {
-	bufidx = 0;
+    bufidx = 0;
 }
 
-void allpass::setbuffer(float *buf, int size) 
+void allpass::setbuffer(float *buf, int size)
 {
-	buffer = buf; 
-	bufsize = size;
+    buffer = buf;
+    bufsize = size;
 }
 
 void allpass::mute()
 {
-	for (int i=0; i<bufsize; i++)
-		buffer[i]=0;
+    for (int i=0; i<bufsize; i++)
+        buffer[i]=0;
 }
 
-void allpass::setfeedback(float val) 
+void allpass::setfeedback(float val)
 {
-	feedback = val;
+    feedback = val;
 }
 
-float allpass::getfeedback() 
+float allpass::getfeedback()
 {
-	return feedback;
+    return feedback;
 }
 
 //ends
