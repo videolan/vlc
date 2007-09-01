@@ -251,7 +251,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
 
     while (i_buflen > 0)
     {
-        if (p_this->b_die)
+        if( ( p_this->b_die ) || ( p_this->p_libvlc->b_die ) )
         {
 #if defined(WIN32) || defined(UNDER_CE)
             WSASetLastError (WSAEINTR);
