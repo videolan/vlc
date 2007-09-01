@@ -179,7 +179,7 @@ static int Open( vlc_object_t *p_this )
     if( psz_url && strrchr( psz_url, '.' ) )
     {
         /* by extension */
-        static struct { const char *ext; const char *mux; } exttomux[] =
+        static struct { const char ext[6]; const char mux[16]; } exttomux[] =
         {
             { "avi", "avi" },
             { "ogg", "ogg" },
@@ -196,15 +196,15 @@ static int Open( vlc_object_t *p_this )
             { "mpeg","ps" },
             { "ps",  "ps" },
             { "mpeg1","mpeg1" },
-            { "wav","wav" },
+            { "wav", "wav" },
             { "flv", "ffmpeg{mux=flv}" },
-            { NULL,  NULL }
+            { "",    "" }
         };
         const char *psz_ext = strrchr( psz_url, '.' ) + 1;
         int  i;
 
         msg_Dbg( p_this, "extension is %s", psz_ext );
-        for( i = 0; exttomux[i].ext != NULL; i++ )
+        for( i = 0; exttomux[i].ext[0]; i++ )
         {
             if( !strcasecmp( psz_ext, exttomux[i].ext ) )
             {

@@ -134,7 +134,6 @@ vlc_module_begin();
 
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );
-    add_shortcut( "rtp" ); // Will work only with ts muxer
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -203,11 +202,7 @@ typedef struct sout_access_thread_t
 struct sout_access_out_sys_t
 {
     int                 i_mtu;
-
-    vlc_bool_t          b_rtpts; // true for RTP/MP2 encapsulation
     vlc_bool_t          b_mtu_warning;
-    uint16_t            i_sequence_number;
-    uint32_t            i_ssrc;
 
     block_t             *p_buffer;
 
@@ -256,12 +251,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     p_access->p_sys = p_sys;
-
-    if( p_access->psz_access != NULL )
-    {
-        if (strcmp (p_access->psz_access, "rtp") == 0)
-            p_sys->b_rtpts = VLC_TRUE;
-    }
 
     if (var_GetBool (p_access, SOUT_CFG_PREFIX"lite"))
     {
@@ -381,13 +370,7 @@ static int Open( vlc_object_t *p_this )
         var_GetInteger( p_access, SOUT_CFG_PREFIX "group" );
 
     p_sys->i_mtu = var_CreateGetInteger( p_this, "mtu" );
-    if( p_sys->b_rtpts && ( p_sys->i_mtu < RTP_HEADER_LENGTH ) )
-        p_sys->i_mtu = 576 - 20 - 8;
-
-    srand( (uint32_t)mdate());
-    p_sys->p_buffer          = NULL;
-    p_sys->i_sequence_number = rand()&0xffff;
-    p_sys->i_ssrc            = rand()&0xffffffff;
+    p_sys->p_buffer = NULL;
 
     if (i_rtcp_port && OpenRTCP (VLC_OBJECT (p_access), &p_sys->p_thread->rtcp,
                                  i_handle, proto, i_rtcp_port))
@@ -499,8 +482,6 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
         while( p_buffer->i_buffer )
         {
             int i_payload_size = p_sys->i_mtu;
-            if( p_sys->b_rtpts )
-                i_payload_size -= RTP_HEADER_LENGTH;
 
             int i_write = __MIN( p_buffer->i_buffer, i_payload_size );
 
@@ -604,22 +585,6 @@ static block_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
 
     p_buffer->i_dts = i_dts;
     p_buffer->i_buffer = 0;
-
-    if( p_sys->b_rtpts )
-    {
-        mtime_t i_timestamp = p_buffer->i_dts * 9 / 100;
-
-        /* add rtp/ts header */
-        p_buffer->p_buffer[0] = 0x80;
-        p_buffer->p_buffer[1] = 33; // mpeg2-ts
-
-        SetWBE( p_buffer->p_buffer + 2, p_sys->i_sequence_number );
-        p_sys->i_sequence_number++;
-        SetDWBE( p_buffer->p_buffer + 4, i_timestamp );
-        SetDWBE( p_buffer->p_buffer + 8, p_sys->i_ssrc );
-
-        p_buffer->i_buffer = RTP_HEADER_LENGTH;
-    }
 
     return p_buffer;
 }
