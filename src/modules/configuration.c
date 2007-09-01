@@ -788,13 +788,12 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 {
     static const char psz_subpath[] = DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE;
     const char *psz_filename = p_obj->p_libvlc->psz_configfile;
-    const char *psz_homedir;
+    const char *psz_homedir = p_obj->p_libvlc->psz_homedir;
     size_t i_buflen = 0;
     FILE *p_stream;
 
     if( psz_filename == NULL )
     {
-        psz_homedir = p_obj->p_libvlc->psz_homedir;
         if( psz_homedir == NULL )
         {
             msg_Err( p_obj, "no home directory defined" );
