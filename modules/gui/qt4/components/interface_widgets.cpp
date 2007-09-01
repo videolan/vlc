@@ -304,7 +304,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     //QSize size( 500, 200 );
     //resize( size );
     controlLayout = new QGridLayout( this );
-#if 1 || DEBUG_COLOR
+#if DEBUG_COLOR
     QPalette palette2;
     palette2.setColor(this->backgroundRole(), Qt::magenta);
     setPalette(palette2);

@@ -61,8 +61,6 @@
 
 #define DS(i) i.width(),i.height()
 
-#define DEBUG_COLOR 0
-
 /* Callback prototypes */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param );
