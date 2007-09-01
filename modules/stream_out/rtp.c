@@ -427,7 +427,7 @@ static int Open( vlc_object_t *p_this )
             if( p_sys->i_ttl > 0 )
                 sprintf( access, "udp{raw,rtcp,ttl=%d}", p_sys->i_ttl );
             else
-                strcat( access, "udp{raw,rtcp}" );
+                strcpy( access, "udp{raw,rtcp}" );
 
             /* IPv6 needs brackets if not already present */
             if (strchr( p_sys->psz_destination, ':' ) != NULL )
