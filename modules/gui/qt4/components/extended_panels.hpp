@@ -29,7 +29,7 @@
 
 #include "ui/equalizer.h"
 #include "ui/video_effects.h"
-#include "ui/spatializer.h"
+//#include "ui/spatializer.h"
 
 #define BANDS 10
 #define NUM_SP_CTRL 5
