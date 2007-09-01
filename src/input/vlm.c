@@ -744,6 +744,8 @@ static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, vlc_bool_t b_new,
     int i_result;
     int i;
 
+#undef ERROR
+#undef MISSING
 #define ERROR( txt ) do { *pp_status = vlm_MessageNew( psz_cmd, txt); goto error; } while(0)
     if( vlm_ControlInternal( p_vlm, VLM_GET_MEDIA, id, &p_cfg ) )
         ERROR( "unknown media" );
