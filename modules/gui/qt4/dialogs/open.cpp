@@ -2,7 +2,7 @@
  * open.cpp : Advanced open dialog
  *****************************************************************************
  * Copyright (C) 2006-2007 the VideoLAN team
- * $Id: streaminfo.cpp 16816 2006-09-23 20:56:52Z jb $
+ * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
  *

@@ -2,7 +2,7 @@
  * extended.cpp : Extended controls - Undocked
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
- * $Id: streaminfo.cpp 16687 2006-09-17 12:15:42Z jb $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
