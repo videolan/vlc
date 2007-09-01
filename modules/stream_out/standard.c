@@ -311,8 +311,8 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_stream, "no suitable sout access module for `%s/%s://%s'",
                  psz_access, psz_mux, psz_url );
-        if( psz_access ) free( psz_access );
-        if( psz_mux ) free( psz_mux );
+        free( psz_access );
+        free( psz_mux );
         return VLC_EGENERIC;
     }
     msg_Dbg( p_stream, "access opened" );
@@ -325,8 +325,8 @@ static int Open( vlc_object_t *p_this )
                  psz_access, psz_mux, psz_url );
 
         sout_AccessOutDelete( p_access );
-        if( psz_access ) free( psz_access );
-        if( psz_mux ) free( psz_mux );
+        free( psz_access );
+        free( psz_mux );
         return VLC_EGENERIC;
     }
     msg_Dbg( p_stream, "mux opened" );
@@ -387,10 +387,9 @@ nosap:
 
     p_stream->p_sys->p_mux = p_mux;
 
-    if( psz_access ) free( psz_access );
-    if( psz_mux ) free( psz_mux );
-    if( psz_url ) free( psz_url );
-
+    free( psz_access );
+    free( psz_mux );
+    free( psz_url );
 
     return VLC_SUCCESS;
 }
