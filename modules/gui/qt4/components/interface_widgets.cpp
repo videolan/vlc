@@ -367,7 +367,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     BUTTON_SET_IMG( nextSectionButton, "", next.png, "" );
     BUTTON_SET_IMG( menuButton, "", previous.png, "" );
 
-    //discFrame->hide();
+    discFrame->hide();
 
     /* Change the navigation button display when the IM navigation changes */
     CONNECT( THEMIM->getIM(), navigationChanged( int ),
