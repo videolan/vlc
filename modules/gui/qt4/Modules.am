@@ -85,6 +85,9 @@ dialogs/about.hpp:
 	echo "char *psz_thanks = { \\" >> dialogs/about.hpp
 	cat $(top_srcdir)/THANKS | grep -v '$$Id:' | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\" \\" }' >> dialogs/about.hpp
 	echo "};" >> dialogs/about.hpp
+	echo "char *psz_authors = { \\" >> dialogs/about.hpp
+	cat $(top_srcdir)/AUTHORS | grep -v '$$Id:' | sed s/'"'/'\\"'/g | awk '{ print "\""$$0"\\n\" \\" }' >> dialogs/about.hpp
+	echo "};" >> dialogs/about.hpp
 
 
 SOURCES_qt4 = 	qt4.cpp \

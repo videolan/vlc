@@ -79,9 +79,9 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     QLabel *introduction = new QLabel(
             qtr( "Information about VLC media player" ) );
 
-    layout->addWidget( introduction, 0, 0, 1, 2 );
-    layout->addWidget( tab, 1, 0, 1, 2 );
-    layout->addWidget( closeButton, 2, 1, 1, 1 );
+    layout->addWidget( introduction, 0, 0, 1, 4 );
+    layout->addWidget( tab, 1, 0, 1, 4 );
+    layout->addWidget( closeButton, 2, 3, 1, 1 );
 
     /* GPL License */
     QTextEdit *licenseEdit = new QTextEdit( this );
@@ -93,9 +93,14 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
     thanksEdit->setText( qfu( psz_thanks ) );
     thanksEdit->setReadOnly( true );
 
+    /* People who helped */
+    QTextEdit *authorsEdit = new QTextEdit( this );
+    authorsEdit->setText( qfu( psz_authors ) );
+    authorsEdit->setReadOnly( true );
+
     /* add the tabs to the Tabwidget */
     tab->addTab( NULL, qtr( "General Info" ) );
-    tab->addTab( NULL, qtr( "Authors" ) );
+    tab->addTab( authorsEdit, qtr( "Authors" ) );
     tab->addTab( thanksEdit, qtr("Thanks") );
     tab->addTab( licenseEdit, qtr("Distribution License") );
 
