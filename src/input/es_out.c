@@ -736,7 +736,6 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
     input_thread_t    *p_input = p_sys->p_input;
     es_out_pgrm_t     *p_pgrm = NULL;
     char *psz_cat;
-    char *psz_epg;
     int i;
 
     /* Find program */
@@ -759,7 +758,9 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
     /* Update info */
     psz_cat = EsOutProgramGetMetaName( p_pgrm );
 #ifdef HAVE_LOCALTIME_R
-    asprintf( &psz_epg, "EPG %s", psz_cat );
+    char *psz_epg;
+    if( asprintf( &psz_epg, "EPG %s", psz_cat ) == -1 )
+        psz_epg = NULL;
     input_Control( p_input, INPUT_DEL_INFO, psz_epg, NULL );
     msg_Dbg( p_input, "EsOutProgramEpg: number=%d name=%s", i_group, p_pgrm->p_epg->psz_name );
     for( i = 0; i < p_pgrm->p_epg->i_event; i++ )
