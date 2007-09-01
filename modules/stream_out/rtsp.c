@@ -84,16 +84,6 @@ rtsp_stream_t *RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url )
     else
         rtsp->psz_path = NULL;
 
-#if 0
-    if( asprintf( &rtsp->psz_control, "rtsp://%s:%d%s",
-                  url->psz_host,  url->i_port > 0 ? url->i_port : 554,
-                  rtsp->psz_path ) == -1 )
-    {
-        rtsp->psz_control = NULL;
-        goto error;
-    }
-#endif
-
     rtsp->host = httpd_HostNew( VLC_OBJECT(p_stream), url->psz_host,
                                 rtsp->port );
     if( rtsp->host == NULL )
