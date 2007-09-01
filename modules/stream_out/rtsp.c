@@ -303,20 +303,49 @@ void RtspClientDel( rtsp_stream_t *rtsp, rtsp_session_t *session )
 }
 
 
-/** Aggregate RTSP callback */
-static int RtspCallback( httpd_callback_sys_t *p_args,
-                         httpd_client_t *cl,
-                         httpd_message_t *answer,
-                         const httpd_message_t *query )
+/** Finds the next transport choice */
+static inline const char *transport_next( const char *str )
 {
-    rtsp_stream_t *rtsp = (rtsp_stream_t *)p_args;
+    /* Looks for comma */
+    str = strchr( str, ',' );
+    if( str == NULL )
+        return NULL; /* No more transport options */
+
+    str++; /* skips comma */
+    while( strchr( "\r\n\t ", *str ) )
+        str++;
+
+    return (*str) ? str : NULL;
+}
+
+
+/** Finds the next transport parameter */
+static inline const char *parameter_next( const char *str )
+{
+    while( strchr( ",;", *str ) == NULL )
+        str++;
+
+    return (*str == ';') ? (str + 1) : NULL;
+}
+
+
+/** RTSP requests handler
+ * @param id selected track for non-aggregate URLs,
+ *           NULL for aggregate URLs
+ */
+static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
+                        httpd_client_t *cl,
+                        httpd_message_t *answer,
+                        const httpd_message_t *query )
+{
+    sout_stream_t *p_stream = id->stream->owner;
+    char psz_sesbuf[17];
     const char *psz_session = NULL, *psz;
 
     if( answer == NULL || query == NULL )
-    {
         return VLC_SUCCESS;
-    }
 
+    /* */
     answer->i_proto = HTTPD_PROTO_RTSP;
     answer->i_version= query->i_version;
     answer->i_type   = HTTPD_MSG_ANSWER;
@@ -333,7 +362,13 @@ static int RtspCallback( httpd_callback_sys_t *p_args,
     switch( query->i_type )
     {
         case HTTPD_MSG_DESCRIBE:
-        {
+        {   /* Aggregate-only */
+            if( id != NULL )
+            {
+                answer->i_status = 460;
+                break;
+            }
+
             char ip[NI_MAXNUMERICHOST], *ptr;
             char control[sizeof("rtsp://[]:12345/") + sizeof( ip )
                             + strlen( rtsp->psz_path )];
@@ -362,158 +397,14 @@ static int RtspCallback( httpd_callback_sys_t *p_args,
         }
 
         case HTTPD_MSG_SETUP:
-            answer->i_status = 459;
-            break;
-
-        case HTTPD_MSG_PLAY:
-        {
-            rtsp_session_t *ses;
-            answer->i_status = 200;
-
-            psz_session = httpd_MsgGet( query, "Session" );
-            if( httpd_MsgGet( query, "Range" ) != NULL )
+            /* Non-aggregate-only */
+            if( id == NULL )
             {
-                answer->i_status = 456; /* cannot seek */
+                answer->i_status = 459;
                 break;
             }
 
-            vlc_mutex_lock( &rtsp->lock );
-            ses = RtspClientGet( rtsp, psz_session );
-            if( ses != NULL )
-            {
-                for( int i = 0; i < ses->trackc; i++ )
-                {
-                    rtsp_strack_t *tr = ses->trackv + i;
-                    if( !tr->playing )
-                    {
-                        tr->playing = VLC_TRUE;
-                        rtp_add_sink( tr->id, tr->access );
-                    }
-                }
-            }
-            vlc_mutex_unlock( &rtsp->lock );
-
-            if( httpd_MsgGet( query, "Scale" ) != NULL )
-                httpd_MsgAdd( answer, "Scale", "1." );
-            break;
-        }
-
-        case HTTPD_MSG_PAUSE:
-            answer->i_status = 405;
-            httpd_MsgAdd( answer, "Allow",
-                          "DESCRIBE, TEARDOWN, PLAY, GET_PARAMETER" );
-            break;
-
-        case HTTPD_MSG_GETPARAMETER:
-            if( query->i_body > 0 )
-            {
-                answer->i_status = 451;
-                break;
-            }
-
-            answer->i_status = 200;
-            break;
-
-        case HTTPD_MSG_TEARDOWN:
-        {
-            rtsp_session_t *ses;
-
-            /* for now only multicast so easy again */
-            answer->i_status = 200;
-
             psz_session = httpd_MsgGet( query, "Session" );
-
-            vlc_mutex_lock( &rtsp->lock );
-            ses = RtspClientGet( rtsp, psz_session );
-            if( ses != NULL )
-                RtspClientDel( rtsp, ses );
-            vlc_mutex_unlock( &rtsp->lock );
-            break;
-        }
-
-        default:
-            return VLC_EGENERIC;
-    }
-
-    httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
-    httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
-
-    psz = httpd_MsgGet( query, "Cseq" );
-    if( psz != NULL )
-        httpd_MsgAdd( answer, "Cseq", "%s", psz );
-    psz = httpd_MsgGet( query, "Timestamp" );
-    if( psz != NULL )
-        httpd_MsgAdd( answer, "Timestamp", "%s", psz );
-
-    httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
-
-    if( psz_session )
-        httpd_MsgAdd( answer, "Session", "%s;timeout=5", psz_session );
-    return VLC_SUCCESS;
-}
-
-
-/** Finds the next transport choice */
-static inline const char *transport_next( const char *str )
-{
-    /* Looks for comma */
-    str = strchr( str, ',' );
-    if( str == NULL )
-        return NULL; /* No more transport options */
-
-    str++; /* skips comma */
-    while( strchr( "\r\n\t ", *str ) )
-        str++;
-
-    return (*str) ? str : NULL;
-}
-
-
-/** Finds the next transport parameter */
-static inline const char *parameter_next( const char *str )
-{
-    while( strchr( ",;", *str ) == NULL )
-        str++;
-
-    return (*str == ';') ? (str + 1) : NULL;
-}
-
-
-/** Non-aggregate RTSP callback */
-static int RtspCallbackId( httpd_callback_sys_t *p_args,
-                           httpd_client_t *cl,
-                           httpd_message_t *answer,
-                           const httpd_message_t *query )
-{
-    rtsp_stream_id_t *id = (rtsp_stream_id_t *)p_args;
-    rtsp_stream_t    *rtsp = id->stream;
-    sout_stream_t    *p_stream = id->stream->owner;
-    char psz_sesbuf[17];
-    const char *psz_session, *psz;
-
-    if( answer == NULL || query == NULL )
-        return VLC_SUCCESS;
-
-    /* */
-    answer->i_proto = HTTPD_PROTO_RTSP;
-    answer->i_version= query->i_version;
-    answer->i_type   = HTTPD_MSG_ANSWER;
-    answer->i_body = 0;
-    answer->p_body = NULL;
-
-    psz_session = httpd_MsgGet( query, "Session" );
-
-    if( httpd_MsgGet( query, "Require" ) != NULL )
-    {
-        answer->i_status = 551;
-        httpd_MsgAdd( answer, "Unsupported", "%s",
-                      httpd_MsgGet( query, "Require" ) );
-    }
-    else
-    switch( query->i_type )
-    {
-        case HTTPD_MSG_SETUP:
-        {
             answer->i_status = 461;
 
             for( const char *tpt = httpd_MsgGet( query, "Transport" );
@@ -593,6 +484,13 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     if( dst == NULL )
                         continue;
 
+                    if( psz_session == NULL )
+                    {
+                        /* Create a dummy session ID */
+                        snprintf( psz_sesbuf, sizeof( psz_sesbuf ), "%d",
+                                  rand() );
+                        psz_session = psz_sesbuf;
+                    }
                     answer->i_status = 200;
 
                     httpd_MsgAdd( answer, "Transport",
@@ -655,7 +553,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                         }
                     }
 
-                    INSERT_ELEM( ses->trackv, ses->trackc, ses->trackc, track );
+                    INSERT_ELEM( ses->trackv, ses->trackc, ses->trackc,
+                                 track );
                     vlc_mutex_unlock( &rtsp->lock );
 
                     httpd_ServerIP( cl, ip );
@@ -689,7 +588,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 break;
             }
             break;
-        }
 
         case HTTPD_MSG_PLAY:
         {
@@ -710,7 +608,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 for( int i = 0; i < ses->trackc; i++ )
                 {
                     rtsp_strack_t *tr = ses->trackv + i;
-                    if( !tr->playing && ( tr->id == id->sout_id ) )
+                    if( !tr->playing
+                     && ( ( id == NULL ) || ( tr->id == id->sout_id ) ) )
                     {
                         tr->playing = VLC_TRUE;
                         rtp_add_sink( tr->id, tr->access );
@@ -727,7 +626,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
         case HTTPD_MSG_PAUSE:
             answer->i_status = 405;
             httpd_MsgAdd( answer, "Allow",
-                          "SETUP, TEARDOWN, PLAY, GET_PARAMETER" );
+                          "%s, TEARDOWN, PLAY, GET_PARAMETER",
+                          ( id != NULL ) ? "SETUP" : "DESCRIBE" );
             break;
 
         case HTTPD_MSG_GETPARAMETER:
@@ -737,6 +637,7 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                 break;
             }
 
+            psz_session = httpd_MsgGet( query, "Session" );
             answer->i_status = 200;
             break;
 
@@ -752,6 +653,9 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
             ses = RtspClientGet( rtsp, psz_session );
             if( ses != NULL )
             {
+                if( id == NULL ) /* Delete the entire session */
+                    RtspClientDel( rtsp, ses );
+                else /* Delete one track from the session */
                 for( int i = 0; i < ses->trackc; i++ )
                 {
                     if( ses->trackv[i].id == id->sout_id )
@@ -767,9 +671,15 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
         }
 
         default:
-            answer->i_status = 460;
-            break;
+            return VLC_EGENERIC;
     }
+
+    httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
+    if( psz_session )
+        httpd_MsgAdd( answer, "Session", "%s"/*;timeout=5*/, psz_session );
+
+    httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
+    httpd_MsgAdd( answer, "Cache-Control", "no-cache" );
 
     psz = httpd_MsgGet( query, "Cseq" );
     if( psz != NULL )
@@ -777,11 +687,27 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
     psz = httpd_MsgGet( query, "Timestamp" );
     if( psz != NULL )
         httpd_MsgAdd( answer, "Timestamp", "%s", psz );
-    httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
-    httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
-    httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
 
-    if( psz_session )
-        httpd_MsgAdd( answer, "Session", "%s"/*;timeout=5*/, psz_session );
     return VLC_SUCCESS;
+}
+
+
+/** Aggregate RTSP callback */
+static int RtspCallback( httpd_callback_sys_t *p_args,
+                         httpd_client_t *cl,
+                         httpd_message_t *answer,
+                         const httpd_message_t *query )
+{
+    return RtspHandler( (rtsp_stream_t *)p_args, NULL, cl, answer, query );
+}
+
+
+/** Non-aggregate RTSP callback */
+static int RtspCallbackId( httpd_callback_sys_t *p_args,
+                           httpd_client_t *cl,
+                           httpd_message_t *answer,
+                           const httpd_message_t *query )
+{
+    rtsp_stream_id_t *id = (rtsp_stream_id_t *)p_args;
+    return RtspHandler( id->stream, id, cl, answer, query );
 }
