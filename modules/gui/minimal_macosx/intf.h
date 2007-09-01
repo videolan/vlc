@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -36,9 +36,6 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
- 
-/* switch this to 1, if you want to use Obj-C with GC */
-#define GC_ENABLED 0
 
 /*****************************************************************************
  * intf_sys_t: description and status of the interface

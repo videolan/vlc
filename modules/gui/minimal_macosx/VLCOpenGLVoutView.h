@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCOpenGLVoutView.h: MacOS X OpenGL provider
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>

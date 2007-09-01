@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCOpenGLVoutView.m: MacOS X OpenGL provider
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -11,7 +11,7 @@
  *          Eric Petit <titer@m0k.org>
  *          Benjamin Pracht <bigben at videolan dot org>
  *          Damien Fouilleul <damienf at videolan dot org>
- *          Pierr d'Herbemont <pdherbemont at videolan dot org>
+ *          Pierre d'Herbemont <pdherbemont at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * voutagl.c: MacOS X agl OpenGL provider (used by webbrowser.plugin)
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -66,7 +66,7 @@ int aglInit( vout_thread_t * p_vout )
     pixFormat = aglChoosePixelFormat(NULL, 0, ATTRIBUTES);
     if( NULL == pixFormat )
     {
-        msg_Err( p_vout, "no screen renderer available for required attributes." );
+        msg_Err( p_vout, "No screen renderer available for required attributes." );
         return VLC_EGENERIC;
     }
     
@@ -74,7 +74,7 @@ int aglInit( vout_thread_t * p_vout )
     aglDestroyPixelFormat(pixFormat);
     if( NULL == p_vout->p_sys->agl_ctx )
     {
-        msg_Err( p_vout, "cannot create AGL context." );
+        msg_Err( p_vout, "Cannot create AGL context." );
         return VLC_EGENERIC;
     }
     else {
