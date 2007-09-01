@@ -337,37 +337,22 @@ static int Open( vlc_object_t *p_this )
     {
         session_descriptor_t *p_session;
         announce_method_t *p_method = sout_SAPMethod ();
-        const int payload_type = 33;
 
         static const struct { const char *access; const char *fmt; } fmts[] =
             {
-                /* TLS/DTLS variants (none implemented): */
-                { "dtlslite", "UDPLite/TLS/RTP/AVP %d" },
-                { "dtls",     "UDP/TLS/RTP/AVP %d" },
-                { "dccps",    "DCCP/TLS/RTP/AVP %d" },
-                { "tls",      "TCP/TLS/RTP/AVP %d" },
                 /* Plain text: */
-                { "udplite",  "UDPLite/RTP/AVP %d" },
                 { "udp",      "udp mpeg" },
-                { "rtp",      "RTP/AVP %d" },
-                /* Currently unsupported access outputs: */
-                { "dccp",     "DCCP/RTP/AVP %d" },
-                { "tcp",      "TCP/RTP/AVP %d" },
-                /* SRTP (none implemented): */
-                { "srtp",     "RTP/SAVP %d" },
-                { "sudplite", "UDPLite/RTP/SAVP %d" },
-                { "sdccp",    "DCCP/RTP/SAVP %d" },
-                { "stcp",     "TCP/RTP/SAVP %d" },
+                { "rtp",      "RTP/AVP 33" },
                 { NULL,       NULL }
             };
-        const char *psz_sdp_fmt = NULL;
-        char *fmt, *src, *dst;
+        const char *fmt = NULL;
+        char *src, *dst;
         int sport, dport;
 
         for (unsigned i = 0; fmts[i].access != NULL; i++)
             if (strncasecmp (fmts[i].access, psz_access, strlen (fmts[i].access)) == 0)
             {
-                psz_sdp_fmt = fmts[i].fmt;
+                fmt = fmts[i].fmt;
                 break;
             }
 
@@ -375,10 +360,6 @@ static int Open( vlc_object_t *p_this )
         dst = var_GetNonEmptyString (p_access, "dst-addr");
         sport = var_GetInteger (p_access, "src-port");
         dport = var_GetInteger (p_access, "dst-port");
-
-        if ((psz_sdp_fmt == NULL)
-         || (asprintf (&fmt, psz_sdp_fmt, payload_type) == -1))
-            fmt = NULL;
 
         msg_Dbg( p_stream, "SAP advertized format: %s", fmt);
         if ((fmt == NULL) || ((src == NULL) && (dst == NULL)))
@@ -397,7 +378,6 @@ static int Open( vlc_object_t *p_this )
         sout_MethodRelease (p_method);
 
 nosap:
-        free (fmt);
         free (src);
         free (dst);
     }
