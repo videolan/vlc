@@ -242,9 +242,7 @@ static int Open( vlc_object_t *p_this )
             psz_mux = strdup("asfh");
         }
         else if (!strcmp (psz_access, "udp")
-              || !strcmp (psz_access, "rtp") || !strcmp (psz_access, "udplite")
-              || !strcmp (psz_access, "tcp") || !strcmp (psz_access, "sctp")
-              || !strcmp (psz_access, "dccp"))
+              || !strcmp (psz_access, "rtp"))
         {
             psz_mux = strdup("ts");
         }
