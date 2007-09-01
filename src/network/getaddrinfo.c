@@ -398,7 +398,7 @@ getaddrinfo (const char *node, const char *service,
         port = 0;
     else
     {
-        long d;
+        unsigned long d;
         char *end;
 
         d = strtoul (service, &end, 0);
