@@ -328,11 +328,11 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         httpd_message_t *answer,
                         const httpd_message_t *query )
 {
-    sout_stream_t *p_stream = id->stream->owner;
+    sout_stream_t *p_stream = rtsp->owner;
     char psz_sesbuf[17];
     const char *psz_session = NULL, *psz;
 
-    if( answer == NULL || query == NULL )
+    if( answer == NULL || query == NULL || cl == NULL )
         return VLC_SUCCESS;
 
     /* */
