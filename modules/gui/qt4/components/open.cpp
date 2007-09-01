@@ -2,10 +2,13 @@
  * open.cpp : Panels for the open dialogs
  ****************************************************************************
  * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2007 Société des arts technologiques
+ * Copyright (C) 2007 Savoir-faire Linux
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Pierre-Luc Beaudoin <pierre-luc.beaudoin@savoirfairelinux.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,7 +90,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* Ugly hacks to get the good Widget */
     //This lineEdit is the normal line in the fileDialog.
-#if QT_VERSION >= 0x040300
+#if QT43
     lineFileEdit = findChildren<QLineEdit*>()[2];
 #else
     lineFileEdit = findChildren<QLineEdit*>()[3];
@@ -102,10 +105,10 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* Change the text that was uncool in the usual box */
     listLabel[5]->setText( qtr( "Filter:" ) );
 
-#if WIN32
-    /* QFileDialog is quite buggy make it brerable on win32 by tweaking 
-       the followin */
     QListView *fileListView = findChildren<QListView*>().first();
+#if WIN32
+    /* QFileDialog is quite buggy make it brerable on win32 by tweaking
+       the followin */
     fileListView->setLayoutMode(QListView::Batched);
     fileListView->setViewMode(QListView::ListMode);
     fileListView->setResizeMode(QListView::Adjust);
@@ -128,7 +131,11 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
     BUTTONACT( ui.subCheckBox, toggleSubtitleFrame());
 
+#if QT43
+    CONNECT( fileListView, clicked( QModelIndex ), this, updateMRL() );
+#else
     CONNECT( ui.fileInput, editTextChanged( QString ), this, updateMRL() );
+#endif
     CONNECT( ui.subInput, editTextChanged( QString ), this, updateMRL() );
     CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this,
                                                             updateMRL() );
@@ -169,6 +176,7 @@ void FileOpenPanel::browseFileSub()
 
 void FileOpenPanel::updateMRL()
 {
+    msg_Dbg( p_intf, "I was here" );
     QString mrl = ui.fileInput->currentText();
 
     if( ui.subCheckBox->isChecked() ) {
@@ -519,6 +527,58 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CuMRL( v4lFreq, valueChanged ( int ) );
     CuMRL( v4lNormBox,  currentIndexChanged ( int ) );
 
+    /*******
+     * JACK *
+     *******/
+    addModuleAndLayouts( JACK_DEVICE, jack, "JACK Audio Connection Kit" );
+
+    /* Jack Main panel */
+    /* Channels */
+    QLabel *jackChannelsLabel = new QLabel( qtr( "Channels :" ) );
+    jackDevLayout->addWidget( jackChannelsLabel, 1, 0 );
+
+    jackChannels = new QSpinBox;
+    setSpinBoxFreq( jackChannels );
+    jackChannels->setMaximum(255);
+    jackChannels->setValue(2);
+    jackChannels->setAlignment( Qt::AlignRight );
+    jackDevLayout->addWidget( jackChannels, 1, 1 );
+
+    /* Jack Props panel */
+    
+    /* Selected ports */
+    QLabel *jackPortsLabel = new QLabel( qtr( "Selected ports :" ) );
+    jackPropLayout->addWidget( jackPortsLabel, 0 , 0 );
+
+    jackPortsSelected = new QLineEdit( qtr( ".*") );
+    jackPortsSelected->setAlignment( Qt::AlignRight );
+    jackPropLayout->addWidget( jackPortsSelected, 0, 1 );
+    
+    /* Caching */
+    QLabel *jackCachingLabel = new QLabel( qtr( "Input caching :" ) );
+    jackPropLayout->addWidget( jackCachingLabel, 1 , 0 );
+    jackCaching = new QSpinBox;
+    setSpinBoxFreq( jackCaching );
+    jackCaching->setSuffix( " ms" );
+    jackCaching->setValue(1000);
+    jackCaching->setAlignment( Qt::AlignRight );
+    jackPropLayout->addWidget( jackCaching, 1 , 1 );
+    
+    /* Pace */
+    jackPace = new QCheckBox(qtr( "Use VLC pace" ));
+    jackPropLayout->addWidget( jackPace, 2, 1 );
+    
+    /* Auto Connect */
+    jackConnect = new QCheckBox( qtr( "Auto connnection" ));
+    jackPropLayout->addWidget( jackConnect, 3, 1 );
+    
+    /* Jack CONNECTs */
+    CuMRL( jackChannels, valueChanged( int ) );
+    CuMRL( jackCaching, valueChanged( int ) );
+    CuMRL( jackPace, stateChanged( int ) );
+    CuMRL( jackConnect, stateChanged( int ) );
+    CuMRL( jackPortsSelected, textChanged( QString ) );
+
     /************
      * PVR      *
      ************/
@@ -772,6 +832,20 @@ void CaptureOpenPanel::updateMRL()
         mrl += " :v4l-adev=" + v4lAudioDevice->text();
         mrl += " :v4l-norm=" + QString("%1").arg( v4lNormBox->currentIndex() );
         mrl += " :v4l-frequency=" + QString("%1").arg( v4lFreq->value() );
+        break;
+    case JACK_DEVICE:
+        mrl = "jack://";
+        mrl += "channels=" + QString("%1").arg( jackChannels->value() );
+        mrl += ":ports=" + jackPortsSelected->text();
+        mrl += " --jack-input-caching=" + QString("%1").arg( jackCaching->value() );
+        if ( jackPace->isChecked() )
+        {
+                mrl += " --jack-input-use-vlc-pace";
+        }
+        if ( jackConnect->isChecked() )
+        {
+                mrl += " --jack-input-auto-connect";
+        }
         break;
     case PVR_DEVICE:
         mrl = "pvr://";

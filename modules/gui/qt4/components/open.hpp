@@ -2,10 +2,13 @@
  * open.hpp : Panels for the open dialogs
  ****************************************************************************
  * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2007 Société des arts technologiques
+ * Copyright (C) 2007 Savoir-faire Linux
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Pierre-Luc Beaudoin <pierre-luc.beaudoin@savoirfairelinux.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,6 +50,7 @@
 #define BDA_DEVICE         0x4
 #define DSHOW_DEVICE       0x8
 #define SCREEN_DEVICE      0x16
+#define JACK_DEVICE        0x32
 
 class QWidget;
 class QLineEdit;
@@ -145,12 +149,15 @@ private:
     Ui::OpenCapture ui;
     QRadioButton *dvbs, *dvbt, *dvbc;
     QRadioButton *bdas, *bdat, *bdac;
-    QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr ;
+    QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr;
     QLineEdit *v4lVideoDevice, *v4lAudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
     QComboBox *v4lNormBox, *pvrNormBox, *bdaBandBox;
     QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
     QSpinBox *bdaCard, *bdaFreq, *bdaSrate;
+    QSpinBox *jackChannels, *jackCaching;
+    QCheckBox *jackPace, *jackConnect;
+    QLineEdit *jackPortsSelected;
 
     QLabel *bdaSrateLabel, *bdaBandLabel;
 
