@@ -1198,6 +1198,7 @@ VLC_ADD_PLUGINS([deinterlace invert adjust transform wave ripple psychedelic gra
 VLC_ADD_PLUGINS([converter_fixed mono])
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler])
 VLC_ADD_PLUGINS([trivial_channel_mixer trivial_mixer])
+VLC_ADD_PLUGINS([spatializer])
 VLC_ADD_PLUGINS([playlist export nsc xtag])
 VLC_ADD_PLUGINS([i420_rgb grey_yuv rawvideo blend scale image logo magnify puzzle colorthres])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au ty voc xa nuv])
@@ -6053,6 +6054,7 @@ AC_CONFIG_FILES([
   modules/audio_filter/channel_mixer/Makefile
   modules/audio_filter/converter/Makefile
   modules/audio_filter/resampler/Makefile
+  modules/audio_filter/spatializer/Makefile
   modules/audio_mixer/Makefile
   modules/audio_output/Makefile
   modules/codec/Makefile
