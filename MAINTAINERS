@@ -19,7 +19,7 @@
   - MMX optimizations : [sam]
   - Altivec optimizations : [meuuh] ([jlj])
 
-* PLAYLIST 
+* PLAYLIST
 
   - core support [zorglub]
 
@@ -40,6 +40,7 @@
 
   - interface architecture : [sam] [zorglub]
   - wxWidgets : [gibalou] [zorglub]
+  - qt4       : [jb]
   - skins2    : [ipkiss] [asmax]
   - macosx    : [thedj] [bigben] [fkuehne]
   - lirc, dummy, rc, ncurses : [sam]
@@ -103,3 +104,4 @@
 [sigmund] = Sigmund Augdal
 [stef] = Stéphane Borel
 [thedj] = Derk-Jan Hartman
+[jb] = Jean-Baptiste Kempf
