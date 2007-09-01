@@ -544,7 +544,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     if( strncmp( opt, "unicast", 7 ) == 0 )
                         b_multicast = VLC_FALSE;
                     else
-                    if( sscanf( opt, "client_port=%u-%u", &loport, &hiport ) == 2 )
+                    if( sscanf( opt, "client_port=%u-%u", &loport, &hiport )
+                                == 2 )
                         ;
                     else
                     if( strncmp( opt, "mode=", 5 ) == 0 )
@@ -614,7 +615,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                     }
 
                     snprintf( url, sizeof( url ),
-                              ( strchr( ip, ':' ) != NULL ) ? "[%s]:%d" : "%s:%d",
+                              ( strchr( ip, ':' ) != NULL )
+                                  ? "[%s]:%d" : "%s:%d",
                               ip, loport );
 
                     track.access = sout_AccessOutNew( p_stream->p_sout,
@@ -628,7 +630,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                         continue;
                     }
 
-                    char *src = var_GetNonEmptyString( track.access, "src-addr" );
+                    char *src = var_GetNonEmptyString( track.access,
+                                                       "src-addr" );
                     int sport = var_GetInteger( track.access, "src-port" );
 
                     vlc_mutex_lock( &rtsp->lock );
@@ -668,7 +671,8 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args,
                                       "RTP/AVP/UDP;unicast;source=%s;"
                                       "client_port=%u-%u;server_port=%u-%u;"
                                       "mode=play",
-                                      src, loport, loport + 1, sport, sport + 1 );
+                                      src, loport, loport + 1, sport,
+                                      sport + 1 );
                     }
                     else
                     {
