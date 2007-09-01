@@ -29,8 +29,10 @@
 
 #include "ui/equalizer.h"
 #include "ui/video_effects.h"
+#include "ui/spatializer.h"
 
 #define BANDS 10
+#define NUM_SP_CTRL 5
 
 class QSignalMapper;
 
@@ -77,6 +79,31 @@ private slots:
     void setPreamp();
     void setBand();
     void setPreset(int);
+};
+
+class Spatializer: public QWidget
+{
+    Q_OBJECT
+public:
+    Spatializer( intf_thread_t *, QWidget * );
+    virtual ~Spatializer();
+
+private:
+    Ui::SpatializerWidget ui;
+    QSlider *spatCtrl[NUM_SP_CTRL];
+    QLabel *ctrl_texts[NUM_SP_CTRL];
+    QLabel *ctrl_readout[NUM_SP_CTRL];
+    float controlVars[5];
+    float oldControlVars[5];
+
+    void delCallbacks( aout_instance_t * );
+    void addCallbacks( aout_instance_t * );
+    intf_thread_t *p_intf;
+private slots:
+    void enable(bool);
+    void enable();
+    void setValues(float *);
+    void setInitValues();
 };
 
 class ExtendedControls: public QWidget

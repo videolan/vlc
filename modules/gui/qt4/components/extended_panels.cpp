@@ -41,6 +41,7 @@
 #include <vlc_osd.h>
 
 #include <iostream>
+#include <string.h>
 
 #if 0
 class ConfClickHandler : public QObject
@@ -637,7 +638,11 @@ void Equalizer::enable()
     bool en = ui.enableCheck->isChecked();
     aout_EnableFilter( VLC_OBJECT( p_intf ), "equalizer",
                        en ? VLC_TRUE : VLC_FALSE );
-    enable( en );
+//    aout_EnableFilter( VLC_OBJECT( p_intf ), "upmixer",
+//                       en ? VLC_TRUE : VLC_FALSE );
+//     aout_EnableFilter( VLC_OBJECT( p_intf ), "vsurround",
+//                       en ? VLC_TRUE : VLC_FALSE );
+     enable( en );
 }
 
 void Equalizer::enable( bool en )
@@ -778,6 +783,154 @@ void Equalizer::addCallbacks( aout_instance_t *p_aout )
 //    var_AddCallback( p_aout, "equalizer-preamp", EqzCallback, this );
 }
 
+
+/**********************************************************************
+ * Spatializer
+ **********************************************************************/
+static const char *psz_control_names[] =
+{
+    "Roomsize", "Width" , "Wet", "Dry", "Damp"
+};
+static const QString control_names[] =
+{
+    "Roomsize", "Width" , "Wet", "Dry", "Damp"
+};
+
+Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
+    QWidget( _parent ) , p_intf( _p_intf )
+{
+    QFont smallFont = QApplication::font( static_cast<QWidget*>(0) );
+    smallFont.setPointSize( smallFont.pointSize() - 3 );
+
+    ui.setupUi( this );
+
+    QGridLayout *grid = new QGridLayout( ui.frame );
+    grid->setMargin( 0 );
+
+    for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
+    {
+        spatCtrl[i] = new QSlider( Qt::Vertical );
+        if( i < 2)
+        {
+            spatCtrl[i]->setMaximum( 10 );
+            spatCtrl[i]->setValue( 2 );
+        }
+        else
+        {
+            spatCtrl[i]->setMaximum( 10 );
+            spatCtrl[i]->setValue( 0 );
+            spatCtrl[i]->setMinimum( -10 );
+        }
+        oldControlVars[i] = spatCtrl[i]->value();
+        CONNECT( spatCtrl[i], valueChanged(int), this, setInitValues() );
+        ctrl_texts[i] = new QLabel( control_names[i] + "\n" );
+        ctrl_texts[i]->setFont( smallFont );
+        ctrl_readout[i] = new QLabel( "" );
+        ctrl_readout[i]->setFont( smallFont );
+        grid->addWidget( spatCtrl[i], 0, i );
+        grid->addWidget( ctrl_readout[i],1,i);
+        grid->addWidget( ctrl_texts[i], 2, i );
+    }
+
+    BUTTONACT( ui.enableCheck, enable() );
+
+    /* Write down initial values */
+    aout_instance_t *p_aout = (aout_instance_t *)
+        vlc_object_find(p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE);
+    char *psz_af = NULL;
+
+    if( p_aout )
+    {
+        psz_af = var_GetString( p_aout, "audio-filter" );
+        for( int i = 0; i < NUM_SP_CTRL ; i++)
+        {
+            controlVars[i] = var_GetFloat( p_aout,  psz_control_names[i] );
+        }
+        vlc_object_release( p_aout );
+    }
+    else
+    {
+        psz_af = config_GetPsz( p_aout, "audio-filter" );
+        for( int i = 0; i < NUM_SP_CTRL ; i++)
+        {
+            controlVars[i] = config_GetFloat( p_intf,  psz_control_names[i] );
+        }
+    }
+    if( psz_af && strstr( psz_af, "spatializer" ) != NULL )
+        ui.enableCheck->setChecked( true );
+    enable( ui.enableCheck->isChecked() );
+    setValues( controlVars );
+
+}
+
+Spatializer::~Spatializer()
+{
+}
+
+void Spatializer::enable()
+{
+    bool en = ui.enableCheck->isChecked();
+    aout_EnableFilter( VLC_OBJECT( p_intf ), "spatializer",
+            en ? VLC_TRUE : VLC_FALSE );
+    enable( en );
+}
+
+void Spatializer::enable( bool en )
+{
+    for( int i = 0 ; i< NUM_SP_CTRL; i++ )
+    {
+        spatCtrl[i]->setEnabled( en );
+        ctrl_texts[i]->setEnabled( en );
+        ctrl_readout[i]->setEnabled( en );
+    }
+}
+void Spatializer::setInitValues()
+{
+    setValues(controlVars);
+}
+
+void Spatializer::setValues(float *controlVars)
+{
+    char psz_val[5];
+    char var_name[5];
+    aout_instance_t *p_aout= (aout_instance_t *)
+        vlc_object_find(p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE);
+
+    for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
+    {
+        float f= (float)(  spatCtrl[i]->value() );
+        sprintf( psz_val, "%.1f", f );
+        ctrl_readout[i]->setText( psz_val );
+    }
+    if( p_aout )
+    {
+        for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
+        {
+            if( oldControlVars[i] != spatCtrl[i]->value() )
+            {
+                var_SetFloat( p_aout, psz_control_names[i],
+                        (float)spatCtrl[i]->value() );
+                config_PutFloat( p_intf, psz_control_names[i],
+                        (float) spatCtrl[i]->value());
+                oldControlVars[i] = (float) spatCtrl[i]->value();
+            }
+        }
+        vlc_object_release( p_aout );
+    }
+    //    printf("set callback values %s %s %d\n", __FILE__,__func__,__LINE__);
+
+}
+void Spatializer::delCallbacks( aout_instance_t *p_aout )
+{
+    //    var_DelCallback( p_aout, "Spatializer-bands", EqzCallback, this );
+    //    var_DelCallback( p_aout, "Spatializer-preamp", EqzCallback, this );
+}
+
+void Spatializer::addCallbacks( aout_instance_t *p_aout )
+{
+    //    var_AddCallback( p_aout, "Spatializer-bands", EqzCallback, this );
+    //    var_AddCallback( p_aout, "Spatializer-preamp", EqzCallback, this );
+}
 
 /**********************************************************************
  * Video filters / Adjust
