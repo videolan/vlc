@@ -156,7 +156,7 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         libvlc_global_data_t *p_libvlc_global = vlc_global();
         if( i_type == VLC_OBJECT_LIBVLC )
         {
-	    p_new->p_libvlc = (libvlc_int_t*)p_new;
+            p_new->p_libvlc = (libvlc_int_t*)p_new;
             p_priv->b_attached = VLC_TRUE;
         }
         else
@@ -192,7 +192,10 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     if( i_type == VLC_OBJECT_GLOBAL )
     {
         vlc_mutex_init( p_new, &structure_lock );
+    }
 
+    if( i_type == VLC_OBJECT_LIBVLC )
+    {
         var_Create( p_new, "list", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
         var_AddCallback( p_new, "list", DumpCommand, NULL );
         var_Create( p_new, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
