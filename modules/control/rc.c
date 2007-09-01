@@ -31,6 +31,7 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <ctype.h>
 #include <signal.h>
+#include <poll.h>
 
 #include <vlc_interface.h>
 #include <vlc_aout.h>
@@ -1942,19 +1943,32 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     }
 #endif
 
-    while( !intf_ShouldDie( p_intf ) && *pi_size < MAX_LINE_LENGTH &&
-           (i_read = net_Read( p_intf, p_intf->p_sys->i_socket == -1 ?
-                       0 /*STDIN_FILENO*/ : p_intf->p_sys->i_socket, NULL,
-                  (uint8_t *)p_buffer + *pi_size, 1, VLC_FALSE ) ) > 0 )
+    struct pollfd fds;
+    fds.fd = p_intf->p_sys->i_socket == -1 ?
+                           0 /*STDIN_FILENO*/ : p_intf->p_sys->i_socket;
+    fds.events = POLLIN;
+    i_read = 0;
+    while( !intf_ShouldDie( p_intf ) && *pi_size < MAX_LINE_LENGTH
+                                     && i_read >= 0 )
     {
-        if( p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
-            break;
+        int i_poll = poll( &fds, 1, INTF_IDLE_SLEEP / 1000 );
+        if( i_poll == 1 )
+        {
+        
+            i_read = net_Read( p_intf, p_intf->p_sys->i_socket == -1 ?
+                       0 /*STDIN_FILENO*/ : p_intf->p_sys->i_socket, NULL,
+                  (uint8_t *)p_buffer + *pi_size, 1, VLC_FALSE );
+            if( p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
+                break;
 
-        (*pi_size)++;
+            (*pi_size)++;
+        }
+        else if ( i_poll < 0 )
+            break;
     }
 
     /* Connection closed */
-    if( i_read <= 0 )
+    if( i_read < 0 )
     {
         if( p_intf->p_sys->i_socket != -1 )
         {
