@@ -55,7 +55,7 @@ static inline void Reverse( uint32_t *p_buffer, int n )
 /*****************************************************************************
  * DigestMD5: update the MD5 digest with 64 bytes of data
  *****************************************************************************/
-void DigestMD5( struct md5_s *p_md5, uint32_t *p_input )
+static void DigestMD5( struct md5_s *p_md5, uint32_t *p_input )
 {
     uint32_t a, b, c, d;
 

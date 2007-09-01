@@ -97,7 +97,6 @@ DecodeLanguage
 decode_URI
 decode_URI_duplicate
 demux2_vaControlHelper
-DigestMD5
 encode_URI_component
 EndMD5
 EnsureUTF8
