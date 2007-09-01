@@ -117,7 +117,7 @@ char *vlc_strndup( const char *string, size_t n )
 size_t vlc_strnlen( const char *psz, size_t n )
 {
     const char *psz_end = memchr( psz, 0, n );
-    return psz_end ? ( psz_end - psz ) : n;
+    return psz_end ? (size_t)( psz_end - psz ) : n;
 }
 #endif
 
