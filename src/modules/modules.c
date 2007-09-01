@@ -79,45 +79,10 @@
 #include "modules/configuration.h"
 #include "libvlc.h"
 
-#include "vlc_interface.h"
-#include "vlc_playlist.h"
-
-#include "vlc_stream.h"
-#include "vlc_access.h"
-#include "vlc_demux.h"
-#include "vlc_codec.h"
-
-#include "vlc_vout.h"
-#include "vlc_vout_synchro.h"
-
-#include "vlc_aout.h"
-
-#include "vlc_sout.h"
-#include "vlc_httpd.h"
-#include "vlc_acl.h"
-#include "vlc_tls.h"
-#include "vlc_md5.h"
-#include "vlc_xml.h"
-#include "vlc_url.h"
-
-#include "iso_lang.h"
 #include "vlc_charset.h"
-
-#include "vlc_block.h"
-
-#include "vlc_vlm.h"
-
-#include "vlc_image.h"
-#include "vlc_osd.h"
-
-#include "vlc_update.h"
-#include "vlc_strings.h"
-#include "vlc_streaming.h"
 
 #include "modules/modules.h"
 #include "modules/builtin.h"
-
-#include "vlc_network.h"
 
 #if defined( WIN32 ) || defined( UNDER_CE )
     /* Avoid name collisions */
