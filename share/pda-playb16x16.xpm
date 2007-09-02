@@ -1,5 +1,5 @@
 /* XPM */
-static char * familiar_playb16x16_xpm[] = {
+static const char *const familiar_playb16x16_xpm[] = {
 "16 16 2 1",
 " 	c None",
 ".	c #000000",
