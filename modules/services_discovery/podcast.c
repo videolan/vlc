@@ -62,6 +62,7 @@ vlc_module_begin();
 
     add_string( "podcast-urls", NULL, NULL,
                 URLS_TEXT, URLS_LONGTEXT, VLC_FALSE );
+        change_autosave();
 
     set_capability( "services_discovery", 0 );
     set_callbacks( Open, Close );
