@@ -399,7 +399,7 @@ httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
         return VLC_SUCCESS;
     }
     answer->i_proto  = HTTPD_PROTO_HTTP;
-    answer->i_version= query->i_version;
+    answer->i_version= (query->i_version > 1) ? 1 : query->i_version;
     answer->i_type   = HTTPD_MSG_ANSWER;
 
     answer->i_status = 200;
@@ -642,8 +642,8 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
     {
         return VLC_SUCCESS;
     }
-    answer->i_proto  = query->i_proto;
-    answer->i_version= query->i_version;
+    answer->i_proto  = HTTPD_PROTO_HTTP;
+    answer->i_version= (query->i_version > 1) ? 1 : query->i_version;
     answer->i_type   = HTTPD_MSG_ANSWER;
     answer->i_status = 301;
 
@@ -1286,7 +1286,7 @@ void httpd_MsgInit( httpd_message_t *msg )
     msg->cl         = NULL;
     msg->i_type     = HTTPD_MSG_NONE;
     msg->i_proto    = HTTPD_PROTO_NONE;
-    msg->i_version  = -1;
+    msg->i_version  = -1; /* FIXME */
 
     msg->i_status   = 0;
 
@@ -1825,8 +1825,8 @@ static void httpd_ClientSend( httpd_client_t *cl )
         }
         p = (char *)cl->p_buffer;
 
-        p += sprintf( p, "%s/1.%d %d %s\r\n",
-                      cl->answer.i_proto ==  HTTPD_PROTO_HTTP ? "HTTP" : "RTSP",
+        p += sprintf( p, "%s.%u %d %s\r\n",
+                      cl->answer.i_proto ==  HTTPD_PROTO_HTTP ? "HTTP/1" : "RTSP/1",
                       cl->answer.i_version,
                       cl->answer.i_status, psz_status );
         for( i = 0; i < cl->answer.i_name; i++ )
@@ -2043,7 +2043,7 @@ static void httpd_HostThread( httpd_host_t *host )
                     const char *psz;
 
                     /* unimplemented */
-                    answer->i_proto  = query->i_proto ;
+                    answer->i_proto  = query->i_proto;
                     answer->i_type   = HTTPD_MSG_ANSWER;
                     answer->i_version= 0;
 

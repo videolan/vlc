@@ -67,9 +67,9 @@ struct httpd_message_t
 {
     httpd_client_t *cl; /* NULL if not throught a connection e vlc internal */
 
-    int     i_type;
-    int     i_proto;
-    int     i_version;
+    uint8_t i_type;
+    uint8_t i_proto;
+    uint8_t i_version;
 
     /* for an answer */
     int     i_status;
