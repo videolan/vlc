@@ -5,30 +5,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>481</width>
-    <height>401</height>
+    <width>444</width>
+    <height>362</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QGridLayout" >
-   <property name="leftMargin" >
+   <property name="margin" >
     <number>9</number>
    </property>
-   <property name="topMargin" >
-    <number>9</number>
-   </property>
-   <property name="rightMargin" >
-    <number>9</number>
-   </property>
-   <property name="bottomMargin" >
-    <number>9</number>
-   </property>
-   <property name="horizontalSpacing" >
-    <number>10</number>
-   </property>
-   <property name="verticalSpacing" >
+   <property name="spacing" >
     <number>10</number>
    </property>
    <item row="1" column="0" colspan="2" >
@@ -37,22 +25,10 @@
       <string>_("Default Interface")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="leftMargin" >
+      <property name="margin" >
        <number>9</number>
       </property>
-      <property name="topMargin" >
-       <number>9</number>
-      </property>
-      <property name="rightMargin" >
-       <number>9</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>9</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
+      <property name="spacing" >
        <number>6</number>
       </property>
       <item row="2" column="0" colspan="3" >
@@ -65,7 +41,9 @@
       <item row="3" column="1" colspan="2" >
        <widget class="QLabel" name="skinsLabel" >
         <property name="sizePolicy" >
-         <sizepolicy vsizetype="MinimumExpanding" hsizetype="Preferred" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>3</vsizetype>
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -166,20 +144,11 @@
       <string>_("Instances")</string>
      </property>
      <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
       <property name="spacing" >
        <number>6</number>
-      </property>
-      <property name="leftMargin" >
-       <number>9</number>
-      </property>
-      <property name="topMargin" >
-       <number>9</number>
-      </property>
-      <property name="rightMargin" >
-       <number>9</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>9</number>
       </property>
       <item>
        <widget class="QCheckBox" name="OneInterfaceMode" >
