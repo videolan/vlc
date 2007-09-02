@@ -69,7 +69,12 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                           "controler window title")
 
 #define FILEDIALOG_PATH_TEXT N_("Path to use in file dialog")
-#define FILEDIALOG_PATH_LONGTEXT N_("path to use in file dialog")
+#define FILEDIALOG_PATH_LONGTEXT N_("Path to use in file dialog")
+
+#define NOTIFICATION_TEXT N_("Show notification popup on track change")
+#define NOTIFICATION_LONGTEXT N_( \
+    "Show a notification popup with the artist and track name when " \
+    "the current playlist item changes." )
 
 #define ADVANCED_OPTIONS_TEXT N_("Advanced options")
 #define ADVANCED_OPTIONS_LONGTEXT N_("Activate by default all the" \
@@ -108,6 +113,8 @@ vlc_module_begin();
                 FILEDIALOG_PATH_LONGTEXT, VLC_TRUE);
             change_autosave();
             change_internal();
+        add_bool( "qt-notification", VLC_TRUE, NULL, NOTIFICATION_TEXT,
+                  NOTIFICATION_LONGTEXT, VLC_FALSE );
         add_bool( "qt-adv-options", VLC_FALSE, NULL, ADVANCED_OPTIONS_TEXT,
                   ADVANCED_OPTIONS_LONGTEXT, VLC_TRUE );
         add_integer( "qt-pl-showflags",

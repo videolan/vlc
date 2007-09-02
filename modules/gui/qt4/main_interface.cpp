@@ -112,9 +112,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         alwaysVideoFlag = true;
 
     /* Set the other interface settings */
-    playlistEmbeddedFlag = settings->value("playlist-embedded", true).toBool();
-    visualSelectorEnabled= settings->value( "visual-selector", false ).toBool();
-
+    playlistEmbeddedFlag = settings->value( "playlist-embedded", true).toBool();
+    visualSelectorEnabled = settings->value( "visual-selector", false ).toBool();
+    notificationEnabled = config_GetInt( p_intf, "qt-notification" )
+                          ? true : false;
     /**************************
      *  UI and Widgets design
      **************************/
@@ -789,8 +790,11 @@ void MainInterface::updateSystrayTooltipName( QString name )
     else
     {
         sysTray->setToolTip( name );
-        sysTray->showMessage( qtr( "VLC media player" ), name,
-                QSystemTrayIcon::NoIcon, 4000 );
+        if( notificationEnabled )
+        {
+            sysTray->showMessage( qtr( "VLC media player" ), name,
+                    QSystemTrayIcon::NoIcon, 4000 );
+        }
     }
 }
 

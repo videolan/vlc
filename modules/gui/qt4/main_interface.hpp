@@ -105,6 +105,7 @@ private:
     bool                 videoEmbeddedFlag;
     bool                 alwaysVideoFlag;
     bool                 visualSelectorEnabled;
+    bool                 notificationEnabled;
 
     InputManager        *main_input_manager;
     input_thread_t      *p_input;    ///< Main input associated to the playlist
