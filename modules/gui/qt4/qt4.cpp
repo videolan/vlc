@@ -82,7 +82,9 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define OPACITY_TEXT N_("Windows opacity between 0.1 and 1.")
 #define OPACITY_LONGTEXT N_("Sets the windows opacity between 0.1 and 1 " \
-                            "for main interface, playlist and extended panel.")
+                            "for main interface, playlist and extended panel." \
+                            "This options does only work with Windows and " \
+                            "X11 with composite extensions.")
 
 #define SHOWFLAGS_TEXT N_("Define what columns to show in playlist window")
 #define SHOWFLAGS_LONGTEXT N_("Enter the sum of the options that you want: \n" \
