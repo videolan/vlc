@@ -207,8 +207,7 @@ void ExtVideo::ChangeVFiltersString( char *psz_name, vlc_bool_t b_add )
 {
     vout_thread_t *p_vout;
     char *psz_parser, *psz_string;
-
-    char *psz_filter_type;
+    const char *psz_filter_type;
 
     /* Please leave p_libvlc_global. This is where cached modules are
      * stored. We're not trying to find a module instance. */
