@@ -5,18 +5,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>444</width>
-    <height>362</height>
+    <width>481</width>
+    <height>401</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QGridLayout" >
-   <property name="margin" >
+   <property name="leftMargin" >
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
+   </property>
+   <property name="horizontalSpacing" >
+    <number>10</number>
+   </property>
+   <property name="verticalSpacing" >
     <number>10</number>
    </property>
    <item row="1" column="0" colspan="2" >
@@ -25,10 +37,22 @@
       <string>_("Default Interface")</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="2" column="0" colspan="3" >
@@ -41,9 +65,7 @@
       <item row="3" column="1" colspan="2" >
        <widget class="QLabel" name="skinsLabel" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>3</vsizetype>
+         <sizepolicy vsizetype="MinimumExpanding" hsizetype="Preferred" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -52,7 +74,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="text" >
-         <string>_("This is VLC's skinnable interface. You can download skins at http://www.videolan.org/vlc/skins.php to customize your player.")</string>
+         <string>_("This is VLC's skinnable interface. You can download skins at &lt;a href="http://www.videolan.org/vlc/skins.php">http://www.videolan.org/vlc/skins.php&lt;/a> to customize your player.")</string>
         </property>
         <property name="alignment" >
          <set>Qt::AlignBottom|Qt::AlignJustify</set>
@@ -144,11 +166,20 @@
       <string>_("Instances")</string>
      </property>
      <layout class="QVBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
       <property name="spacing" >
        <number>6</number>
+      </property>
+      <property name="leftMargin" >
+       <number>9</number>
+      </property>
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
       </property>
       <item>
        <widget class="QCheckBox" name="OneInterfaceMode" >
