@@ -399,7 +399,7 @@ httpd_FileCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
         return VLC_SUCCESS;
     }
     answer->i_proto  = HTTPD_PROTO_HTTP;
-    answer->i_version= (query->i_version > 1) ? 1 : query->i_version;
+    answer->i_version= 1;
     answer->i_type   = HTTPD_MSG_ANSWER;
 
     answer->i_status = 200;
@@ -643,7 +643,7 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
         return VLC_SUCCESS;
     }
     answer->i_proto  = HTTPD_PROTO_HTTP;
-    answer->i_version= (query->i_version > 1) ? 1 : query->i_version;
+    answer->i_version= 1;
     answer->i_type   = HTTPD_MSG_ANSWER;
     answer->i_status = 301;
 
@@ -1607,7 +1607,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                         if( !strncmp( (char *)cl->p_buffer, msg_type[i].name,
                                       strlen( msg_type[i].name ) ) )
                         {
-                            p = (char *)&cl->p_buffer[strlen((char *)msg_type[i].name) + 1 ];
+                            p = (char *)&cl->p_buffer[strlen(msg_type[i].name) + 1 ];
                             cl->query.i_type = msg_type[i].i_type;
                             if( cl->query.i_proto != msg_type[i].i_proto )
                             {
@@ -2053,6 +2053,7 @@ static void httpd_HostThread( httpd_host_t *host )
                     switch( query->i_proto )
                     {
                         case HTTPD_PROTO_HTTP:
+                            answer->i_version = 1;
                             httpd_MsgAdd( answer, "Allow",
                                           "GET,HEAD,POST,OPTIONS" );
                             break;
@@ -2078,8 +2079,8 @@ static void httpd_HostThread( httpd_host_t *host )
 
                             httpd_MsgAdd( answer, "Public", "DESCRIBE,SETUP,"
                                           "TEARDOWN,PLAY,PAUSE,GET_PARAMETER" );
+                            break;
                         }
-                        break;
                     }
 
                     cl->i_buffer = -1;  /* Force the creation of the answer in
