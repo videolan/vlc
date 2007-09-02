@@ -355,8 +355,9 @@ void DialogsProvider::savePlaylist()
     {
         if( qfd->selectedFiles().count() > 0 )
         {
-            char *psz_module, *psz_m3u = "export-m3u",
-                 *psz_xspf = "export-xspf";
+            static const char psz_xspf[] = "export-xspf",
+                              psz_m3u[] = "esport-m3u";
+            const char *psz_module;
 
             QString file = qfd->selectedFiles().first();
             QString filter = qfd->selectedFilter();
