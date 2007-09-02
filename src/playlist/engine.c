@@ -650,7 +650,7 @@ void playlist_FetcherLoop( playlist_fetcher_t *p_obj )
                         break;
                     msleep( 50000 );
                 }
-                
+
                 i_ret = input_ArtFind( p_playlist, p_item );
                 if( i_ret == 1 )
                 {
