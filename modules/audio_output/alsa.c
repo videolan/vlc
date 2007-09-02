@@ -653,6 +653,15 @@ static int Open( vlc_object_t *p_this )
 
     i_snd_rc = snd_pcm_sw_params_set_avail_min( p_sys->p_snd_pcm, p_sw,
                                                 p_aout->output.i_nb_samples );
+    /* start playing when one period has been written */
+    i_snd_rc = snd_pcm_sw_params_set_start_threshold( p_sys->p_snd_pcm, p_sw,
+                                                      ALSA_DEFAULT_PERIOD_SIZE);
+    if( i_snd_rc < 0 )
+    {
+        msg_Err( p_aout, "unable to set start threshold (%s)",
+                          snd_strerror( i_snd_rc ) );
+        goto error;
+    }
 
     /* Commit software parameters. */
     if ( snd_pcm_sw_params( p_sys->p_snd_pcm, p_sw ) < 0 )
