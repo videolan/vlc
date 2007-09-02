@@ -2040,36 +2040,47 @@ static void httpd_HostThread( httpd_host_t *host )
                 }
                 else if( i_msg == HTTPD_MSG_OPTIONS )
                 {
-                    const char *psz;
 
-                    /* unimplemented */
-                    answer->i_proto  = query->i_proto;
                     answer->i_type   = HTTPD_MSG_ANSWER;
-                    answer->i_version= 0;
-
+                    answer->i_proto  = query->i_proto;
                     answer->i_status = 200;
-
                     answer->i_body = 0;
                     answer->p_body = NULL;
 
-                    psz = httpd_MsgGet( query, "Require" );
-                    if( psz != NULL )
-                    {
-                        answer->i_status = 551;
-                        httpd_MsgAdd( query, "Unsupported", "%s", psz );
-                    }
-
-                    psz = httpd_MsgGet( query, "Cseq" );
-                    if( psz != NULL )
-                        httpd_MsgAdd( answer, "Cseq", "%s", psz );
-                    psz = httpd_MsgGet( query, "Timestamp" );
-                    if( psz != NULL )
-                        httpd_MsgAdd( answer, "Timestamp", "%s", psz );
-
                     httpd_MsgAdd( answer, "Server", "%s", PACKAGE_STRING );
-                    httpd_MsgAdd( answer, "Public", "DESCRIBE, SETUP, "
-                                 "TEARDOWN, PLAY, PAUSE, GET_PARAMETER" );
                     httpd_MsgAdd( answer, "Content-Length", "0" );
+
+                    switch( query->i_proto )
+                    {
+                        case HTTPD_PROTO_HTTP:
+                            httpd_MsgAdd( answer, "Allow",
+                                          "GET,HEAD,POST,OPTIONS" );
+                            break;
+
+                        case HTTPD_PROTO_RTSP:
+                        {
+                            const char *p;
+                            answer->i_version = 0;
+
+                            p = httpd_MsgGet( query, "Cseq" );
+                            if( p != NULL )
+                                httpd_MsgAdd( answer, "Cseq", "%s", p );
+                            p = httpd_MsgGet( query, "Timestamp" );
+                            if( p != NULL )
+                                httpd_MsgAdd( answer, "Timestamp", "%s", p );
+
+                            p = httpd_MsgGet( query, "Require" );
+                            if( p != NULL )
+                            {
+                                answer->i_status = 551;
+                                httpd_MsgAdd( query, "Unsupported", "%s", p );
+                            }
+
+                            httpd_MsgAdd( answer, "Public", "DESCRIBE,SETUP,"
+                                          "TEARDOWN,PLAY,PAUSE,GET_PARAMETER" );
+                        }
+                        break;
+                    }
 
                     cl->i_buffer = -1;  /* Force the creation of the answer in
                                          * httpd_ClientSend */
