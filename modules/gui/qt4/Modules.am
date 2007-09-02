@@ -10,7 +10,7 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 MOSTLYCLEANFILES = $(UIH)
-CLEANFILES = dialogs/about.hpp
+CLEANFILES += dialogs/about.hpp
 SUFFIXES += .ui .h .hpp .moc.cpp
 
 nodist_SOURCES_qt4 = \
