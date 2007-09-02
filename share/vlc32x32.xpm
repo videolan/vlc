@@ -1,5 +1,5 @@
 /* XPM */
-static const char *constvlc_xpm[] = {
+static const char *const vlc_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "32 32 144 2",
 /* colors */
