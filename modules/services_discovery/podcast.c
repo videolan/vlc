@@ -47,8 +47,8 @@
  *****************************************************************************/
 
 /* Callbacks */
-    static int  Open ( vlc_object_t * );
-    static void Close( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 #define URLS_TEXT N_("Podcast URLs list")
 #define URLS_LONGTEXT N_("Enter the list of podcasts to retrieve, " \
@@ -78,17 +78,21 @@ struct services_discovery_sys_t
 {
     /* playlist node */
     input_thread_t **pp_input;
+    int i_input;
 
     char **ppsz_urls;
     int i_urls;
+
+    vlc_bool_t b_update;
 };
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-
-/* Main functions */
-    static void Run    ( services_discovery_t *p_intf );
+static void Run( services_discovery_t *p_intf );
+static int UrlsChange( vlc_object_t *, char const *, vlc_value_t,
+                       vlc_value_t, void * );
+static void ParseUrls( services_discovery_t *p_sd, char *psz_urls );
 
 /*****************************************************************************
  * Open: initialize and create stuff
@@ -98,11 +102,13 @@ static int Open( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = malloc(
                                     sizeof( services_discovery_sys_t ) );
-    
+
     p_sys->i_urls = 0;
     p_sys->ppsz_urls = NULL;
+    p_sys->i_input = 0;
     p_sys->pp_input = NULL;
-    
+    p_sys->b_update = VLC_TRUE;
+
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
 
@@ -120,7 +126,7 @@ static void Close( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
     int i;
-    for( i = 0; i < p_sys->i_urls; i++ )
+    for( i = 0; i < p_sys->i_input; i++ )
     {
         if( p_sd->p_sys->pp_input[i] )
         {
@@ -142,62 +148,75 @@ static void Run( services_discovery_t *p_sd )
 {
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
 
-    int i, j;
-    char *psz_buf;
-    char *psz_tmp = psz_buf = var_CreateGetString( p_sd, "podcast-urls" );
-
-    i = 0;
-    p_sys->i_urls = psz_buf[0] ? 1 : 0;
-    while( psz_buf[i] != 0 )
-        if( psz_buf[i++] == '|' )
-            p_sys->i_urls++;
-
-    p_sys->ppsz_urls = (char **)malloc( p_sys->i_urls * sizeof( char * ) );
-
-    i = 0;
-    j = 0;
-    while( psz_buf[i] != 0 )
-    {
-        if( psz_buf[i] == '|' )
-        {
-            psz_buf[i] = 0;
-            p_sys->ppsz_urls[j] = strdup( psz_tmp );
-            i++;
-            j++;
-            psz_tmp = psz_buf+i;
-        }
-        else
-            i++;
-    }
-    p_sys->ppsz_urls[j] = strdup( psz_tmp );
-    free( psz_buf );
-
-    p_sys->pp_input = malloc( p_sys->i_urls * sizeof( input_thread_t * ) );
-    for( i = 0; i < p_sys->i_urls; i++ )
-    {
-        input_item_t *p_input;
-        asprintf( &psz_buf, "%s", p_sys->ppsz_urls[i] );
-        p_input = input_ItemNewExt( p_sd, psz_buf,
-                                    p_sys->ppsz_urls[i], 0, NULL, -1 );
-        input_ItemAddOption( p_input, "demux=podcast" );
-        services_discovery_AddItem( p_sd, p_input, NULL /* no cat */ );
-        p_sys->pp_input[i] = input_CreateThread( p_sd, p_input );
-    }
+    char *psz_urls = var_CreateGetString( p_sd, "podcast-urls" );
+    free( psz_urls ); /* Gruik ? */
+    var_AddCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
 
     while( !p_sd->b_die )
     {
         int i;
-        for( i = 0; i < p_sd->p_sys->i_urls; i++ )
+        if( p_sys->b_update == VLC_TRUE )
         {
-            if( p_sd->p_sys->pp_input[i] &&
-                ( p_sd->p_sys->pp_input[i]->b_eof
-                  || p_sd->p_sys->pp_input[i]->b_error ) )
+            msg_Dbg( p_sd, "Update required" );
+            psz_urls = var_GetString( p_sd, "podcast-urls" );
+            ParseUrls( p_sd, psz_urls );
+            free( psz_urls );
+            p_sys->b_update = VLC_FALSE;
+        }
+
+        for( i = 0; i < p_sd->p_sys->i_input; i++ )
+        {
+            if( p_sd->p_sys->pp_input[i]->b_eof
+                || p_sd->p_sys->pp_input[i]->b_error )
             {
                 input_StopThread( p_sd->p_sys->pp_input[i] );
                 input_DestroyThread( p_sd->p_sys->pp_input[i] );
                 p_sd->p_sys->pp_input[i] = NULL;
+                REMOVE_ELEM( p_sys->pp_input, p_sys->i_input, i );
+                i--;
             }
         }
-        msleep( 100000 );
+        msleep( 500 );
+    }
+}
+
+static int UrlsChange( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval,
+                       void *p_data )
+{
+    services_discovery_sys_t *p_sys  = (services_discovery_sys_t *)p_data;
+    p_sys->b_update = VLC_TRUE;
+    return VLC_SUCCESS;
+}
+
+static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
+{
+    services_discovery_sys_t *p_sys = p_sd->p_sys;
+    for( ;; )
+    {
+        int i;
+        char *psz_tok = strchr( psz_urls, '|' );
+        if( psz_tok ) *psz_tok = '\0';
+        for( i = 0; i < p_sys->i_urls; i++ )
+            if( !strcmp( psz_urls, p_sys->ppsz_urls[i] ) )
+                break;
+        if( i == p_sys->i_urls )
+        {
+            /* Only add new urls.
+             * FIXME: We don't delete urls which have been removed from
+             * the config since we don't have a way to know which inputs
+             * they spawned */
+            input_item_t *p_input;
+            INSERT_ELEM( p_sys->ppsz_urls, p_sys->i_urls, p_sys->i_urls,
+                         strdup( psz_urls ) );
+            p_input = input_ItemNewExt( p_sd, psz_urls,
+                                        psz_urls, 0, NULL, -1 );
+            input_ItemAddOption( p_input, "demux=podcast" );
+            services_discovery_AddItem( p_sd, p_input, NULL /* no cat */ );
+            INSERT_ELEM( p_sys->pp_input, p_sys->i_input, p_sys->i_input,
+                         input_CreateThread( p_sd, p_input ) );
+        }
+        if( psz_tok )  psz_urls = psz_tok+1;
+        else           return;
     }
 }
