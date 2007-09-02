@@ -44,6 +44,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     QWidget *main = new QWidget( this );
     setCentralWidget( main );
     setWindowTitle( qtr( "Playlist" ) );
+    setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
 
     createPlMenuBar( menuBar(), p_intf );
 

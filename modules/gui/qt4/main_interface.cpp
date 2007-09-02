@@ -101,6 +101,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setFocusPolicy( Qt::StrongFocus );
     setAcceptDrops(true);
     setWindowIcon( QApplication::windowIcon() );
+    config_GetFloat( p_intf, "qt-opacity" );
+    setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
 
     /* Set The Video In emebedded Mode or not */
     videoEmbeddedFlag = false;

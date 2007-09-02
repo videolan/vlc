@@ -36,6 +36,7 @@ ExtendedDialog *ExtendedDialog::instance = NULL;
 ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
     setWindowFlags( Qt::Tool );
+    setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
 
     QHBoxLayout *l = new QHBoxLayout( this );
     QTabWidget *tab = new QTabWidget( this );

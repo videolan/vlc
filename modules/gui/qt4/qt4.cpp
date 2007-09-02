@@ -80,6 +80,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define ADVANCED_OPTIONS_LONGTEXT N_("Activate by default all the" \
                                      "advanced options for geeks")
 
+#define OPACITY_TEXT N_("Windows opacity between 0.1 and 1.")
+#define OPACITY_LONGTEXT N_("Sets the windows opacity between 0.1 and 1 " \
+                            "for main interface, playlist and extended panel.")
+
 #define SHOWFLAGS_TEXT N_("Define what columns to show in playlist window")
 #define SHOWFLAGS_LONGTEXT N_("Enter the sum of the options that you want: \n" \
             "Title: 1; Duration: 2; Artist: 4; Genre: 8; " \
@@ -115,6 +119,8 @@ vlc_module_begin();
             change_internal();
         add_bool( "qt-notification", VLC_TRUE, NULL, NOTIFICATION_TEXT,
                   NOTIFICATION_LONGTEXT, VLC_FALSE );
+        add_float_with_range( "qt-opacity", 1., 0.1, 1., NULL, OPACITY_TEXT,
+                  OPACITY_LONGTEXT, VLC_FALSE );
         add_bool( "qt-adv-options", VLC_FALSE, NULL, ADVANCED_OPTIONS_TEXT,
                   ADVANCED_OPTIONS_LONGTEXT, VLC_TRUE );
         add_integer( "qt-pl-showflags",
