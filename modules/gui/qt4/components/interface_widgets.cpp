@@ -349,15 +349,15 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     discLayout->setSpacing( 0 );
     discLayout->setMargin( 0 );
 
-    QPushButton *prevSectionButton = new QPushButton( discFrame );
+    prevSectionButton = new QPushButton( discFrame );
     setupSmallButton( prevSectionButton );
     discLayout->addWidget( prevSectionButton );
 
-    QPushButton *menuButton = new QPushButton( discFrame );
+    menuButton = new QPushButton( discFrame );
     setupSmallButton( menuButton );
     discLayout->addWidget( menuButton );
 
-    QPushButton *nextSectionButton = new QPushButton( discFrame );
+    nextSectionButton = new QPushButton( discFrame );
     setupSmallButton( nextSectionButton );
     discLayout->addWidget( nextSectionButton );
 
@@ -391,7 +391,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
 //  sizePolicy.setHeightForWidth( playButton->sizePolicy().hasHeightForWidth() );
 
     /* Play */
-    QPushButton *playButton = new QPushButton;
+    playButton = new QPushButton;
     playButton->setSizePolicy( sizePolicy );
     playButton->setMaximumSize( QSize( 45, 45 ) );
     playButton->setIconSize( QSize( 30, 30 ) );
