@@ -107,8 +107,8 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
             qtr( "VLC media player is a free media player, made by the "
                 "VideoLAN Team.\nIt is a standalone multimedia player, "
                 "encoder and streamer, that can read from many supports "
-                "(files, CDs, DVDs, networks, capture cards) and that works "
-                "on many platforms.\n\n" )
+                "(files, CDs, DVDs, networks, capture cards...) and that "
+                " works on many platforms.\n\n" )
             + qtr( "You are using the new Qt4 Interface.\n" )
             + qtr( "Compiled by " ) + qfu( VLC_CompileBy() )+ "@"
             + qfu( VLC_CompileDomain() ) + ".\n"
