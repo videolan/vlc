@@ -193,7 +193,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
     //p_vlm_dialog = NULL;
 
     /* Give our interface a nice little icon */
-    p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
+    p_intf->p_sys->p_icon = new wxIcon( (const char**) vlc_xpm );
 
     /* Create the messages dialog so it can begin storing logs */
     p_messages_dialog = new Messages( p_intf, p_parent ? p_parent : this );

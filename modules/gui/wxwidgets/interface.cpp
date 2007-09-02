@@ -374,7 +374,7 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
 
     /* Give our interface a nice little icon */
-    SetIcon( wxIcon( vlc_xpm ) );
+    SetIcon( wxIcon( (const char**) vlc_xpm ) );
 
     /* Create a splitter window that will fill in the interface window.
      * We need a splitter bar in order to make the embedded playlist
@@ -1468,7 +1468,7 @@ Systray::Systray( Interface *_p_main_interface, intf_thread_t *_p_intf )
     p_main_interface = _p_main_interface;
     p_intf = _p_intf;
 
-    SetIcon( wxIcon( vlc16x16_xpm ), wxT("VLC media player") );
+    SetIcon( wxIcon( (const char**) vlc16x16_xpm ), wxT("VLC media player") );
     if( !IsOk() || !IsIconInstalled() )
     {
         msg_Warn(p_intf, "cannot set systray icon, weird things may happen");
@@ -1536,7 +1536,7 @@ wxMenu* Systray::CreatePopupMenu()
 
 void Systray::UpdateTooltip( const wxChar* tooltip )
 {
-    SetIcon( wxIcon( vlc16x16_xpm ), tooltip );
+    SetIcon( wxIcon( (const char**) vlc16x16_xpm ), tooltip );
 }
 #endif
 #endif
