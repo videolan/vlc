@@ -116,28 +116,41 @@ void vlc_rand_bytes (void *buf, size_t len)
 }
 
 #else /* WIN32 */
-#define _CRT_RAND_S
-#include <stdlib.h>
+
+#include <wincrypt.h>
 
 void vlc_rand_bytes (void *buf, size_t len)
 {
-    while (len > 0)
+    HCRYPTPROV hProv;
+    size_t count = len;
+
+    /* fill buffer with pseudo-random data */
+    while (count > 0)
     {
         unsigned int val;
-#if 0
-        rand_s (&val);
-#else
-        abort();
-#endif
+	val = rand();
+	if (count < sizeof (val))
+	{
+	    memcpy (buf, &val, count);
+	    break;
+	}
+	
+	memcpy (buf, &val, sizeof (val));
+	count -= sizeof (val);
+    }
 
-        if (len < sizeof (val))
-        {
-            memcpy (buf, &val, len);
-            break;
-        }
-
-        memcpy (buf, &val, sizeof (val));
-        len -= sizeof (val);
+    /* acquire default encryption context */
+    if( CryptAcquireContext(
+	&hProv,            // Variable to hold returned handle.
+	NULL,              // Use default key container.
+	MS_DEF_PROV,       // Use default CSP.
+	PROV_RSA_FULL,     // Type of provider to acquire.
+	0) )
+    {
+        /* fill buffer with pseudo-random data, intial buffer content
+	   is used as auxillary random seed */
+        CryptGenRandom(hProv, len, buf);
+	CryptReleaseContext(hProv, 0);
     }
 }
 #endif
