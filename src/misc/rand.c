@@ -116,9 +116,7 @@ void vlc_rand_bytes (void *buf, size_t len)
 }
 
 #else /* WIN32 */
-/* It would be better to use rand_s() instead of rand() but it's not possible 
- * while we support Win 2OOO and until it gets included in mingw */
-/* #define _CRT_RAND_S*/
+#define _CRT_RAND_S
 #include <stdlib.h>
 
 void vlc_rand_bytes (void *buf, size_t len)
@@ -126,8 +124,11 @@ void vlc_rand_bytes (void *buf, size_t len)
     while (len > 0)
     {
         unsigned int val;
-        /*rand_s (&val);*/
-        val = rand();
+#if 0
+        rand_s (&val);
+#else
+        abort();
+#endif
 
         if (len < sizeof (val))
         {
