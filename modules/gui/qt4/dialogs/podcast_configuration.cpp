@@ -56,10 +56,20 @@ void PodcastConfigurationDialog::accept()
     }
     const char *psz_urls = qtu( urls );
     config_PutPsz( p_intf, "podcast-urls", psz_urls );
+    vlc_object_t *p_obj = (vlc_object_t*)
+                          vlc_object_find_name( p_intf->p_libvlc,
+                                                "podcast", FIND_CHILD );
+    if( p_obj )
+    {
+        var_SetString( p_obj, "podcast-urls", psz_urls );
+        vlc_object_release( p_obj );
+    }
+
     if( playlist_IsServicesDiscoveryLoaded( THEPL, "podcast" ) )
     {
-        msg_Info( p_intf, "You will need to reload the podcast module for changes to be used (FIXME)" );
+        msg_Dbg( p_intf, "You will need to reload the podcast module to take into account deleted podcast urls" );
     }
+
     QDialog::accept();
 }
 
