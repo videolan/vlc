@@ -434,6 +434,14 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
         THEDP->SDMapper->setMapping( a, i>=0? p_parser->pp_shortcuts[i] :
                                               module_GetObjName( p_parser ) );
         menu->addAction( a );
+
+        if( !strcmp( p_parser->psz_object_name, "podcast" ) )
+        {
+            QAction *b = new QAction( qfu( "Configure podcasts..." ), menu );
+            //b->setEnabled( a->isChecked() );
+            menu->addAction( b );
+            CONNECT( b, triggered(), THEDP, podcastConfigureDialog() );
+        }
     }
     vlc_list_release( p_list );
     return menu;

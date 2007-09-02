@@ -30,6 +30,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/help.moc.cpp \
 		dialogs/gototime.moc.cpp \
 		dialogs/open.moc.cpp \
+		dialogs/podcast_configuration.moc.cpp \
 		components/extended_panels.moc.cpp \
 		components/infopanels.moc.cpp \
 	 	components/preferences_widgets.moc.cpp \
@@ -50,6 +51,7 @@ nodist_SOURCES_qt4 = \
 		ui/open_net.h \
 		ui/open_capture.h \
 		ui/open.h \
+		ui/podcast_configuration.h \
 		ui/sprefs_audio.h \
 		ui/sprefs_input.h \
 		ui/sprefs_interface.h \
@@ -110,6 +112,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/help.cpp \
 		dialogs/gototime.cpp \
 		dialogs/open.cpp \
+		dialogs/podcast_configuration.cpp \
 		components/extended_panels.cpp \
 		components/infopanels.cpp \
 		components/preferences_widgets.cpp \
@@ -141,6 +144,7 @@ noinst_HEADERS = \
 	dialogs/help.hpp \
 	dialogs/gototime.hpp \
 	dialogs/open.hpp \
+	dialogs/podcast_configuration.hpp \
 	components/extended_panels.hpp \
 	components/infopanels.hpp \
 	components/preferences_widgets.hpp \
@@ -165,6 +169,7 @@ EXTRA_DIST += \
 	ui/open_net.ui \
 	ui/open_capture.ui \
 	ui/open.ui \
+	ui/podcast_configuration.ui \
 	ui/sprefs_audio.ui \
 	ui/sprefs_input.ui \
 	ui/sprefs_interface.ui \

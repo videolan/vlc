@@ -1,0 +1,115 @@
+<ui version="4.0" >
+ <class>PodcastConfiguration</class>
+ <widget class="QDialog" name="PodcastConfiguration" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>547</width>
+    <height>330</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" >
+   <item row="0" column="0" colspan="2" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>_("Podcast URLs list")</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="4" >
+    <widget class="QListWidget" name="podcastList" >
+     <property name="dragEnabled" >
+      <bool>true</bool>
+     </property>
+     <property name="dragDropMode" >
+      <enum>QAbstractItemView::InternalMove</enum>
+     </property>
+     <property name="alternatingRowColors" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="label2" >
+     <property name="text" >
+      <string>_("URL")</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QLineEdit" name="podcastURL" />
+   </item>
+   <item row="2" column="2" >
+    <widget class="QPushButton" name="podcastAdd" >
+     <property name="text" >
+      <string>_("Add")</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="../res.qrc" >:/pixmaps/play.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3" >
+    <widget class="QPushButton" name="podcastDelete" >
+     <property name="text" >
+      <string>_("Delete")</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="../res.qrc" >:/pixmaps/vlc_quit_16px.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2" colspan="2" >
+    <widget class="QDialogButtonBox" name="okCancel" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../res.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>okCancel</sender>
+   <signal>accepted()</signal>
+   <receiver>PodcastConfiguration</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>445</x>
+     <y>304</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>273</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>okCancel</sender>
+   <signal>rejected()</signal>
+   <receiver>PodcastConfiguration</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>445</x>
+     <y>304</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>273</x>
+     <y>164</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

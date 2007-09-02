@@ -43,6 +43,7 @@
 #include "dialogs/open.hpp"
 #include "dialogs/help.hpp"
 #include "dialogs/gototime.hpp"
+#include "dialogs/podcast_configuration.hpp"
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -500,6 +501,12 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
         p_dialog->i_status = DESTROYED_DIALOG;
         break;
     }
+}
+
+void DialogsProvider::podcastConfigureDialog()
+{
+    PodcastConfigurationDialog c( p_intf );
+    c.exec();
 }
 
 void DialogsProvider::switchToSkins()

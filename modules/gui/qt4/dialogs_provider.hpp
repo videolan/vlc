@@ -166,6 +166,8 @@ public slots:
     void openPlaylist();
     void savePlaylist();
 
+    void podcastConfigureDialog();
+
     void switchToSkins();
     void quit();
 };
