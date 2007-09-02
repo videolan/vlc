@@ -1,5 +1,5 @@
 /* XPM */
-static char * type_file_xpm[] = {
+static const char *const type_file_xpm[] = {
 "16 16 108 2",
 "  	c None",
 ". 	c #8F8F8F",

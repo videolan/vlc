@@ -1,5 +1,5 @@
 /* XPM */
-static char * type_playlist_xpm[] = {
+static const char *const type_playlist_xpm[] = {
 "16 16 126 2",
 "  	c None",
 ". 	c #959695",
