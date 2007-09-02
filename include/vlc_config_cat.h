@@ -239,8 +239,9 @@
 #define UNKNOWN_HELP N_("There is no help available for these modules.")
 
 /* This function is deprecated and is kept only for compatibility */
-static inline char * GetCapabilityHelp( char *psz_capability, int i_type)
+static inline const char * GetCapabilityHelp( char *psz_capability, int i_type)
 {
+    (void)psz_capability; (void)i_type;
     return " ";
 }
 
