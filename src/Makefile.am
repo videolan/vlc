@@ -88,7 +88,7 @@ HEADERS_include = \
 
 modules/builtin.h: modules/builtin.h.in ../vlc-config Makefile.am
 	rm -f -- "$@.tmp"
-	cat "modules/builtin.h.in" > "$@.tmp"
+	cat "$(srcdir)/modules/builtin.h.in" > "$@.tmp"
 if !HAVE_PLUGINS
 	plugins="$$($(VLC_CONFIG) --list plugin)" ; \
 	test -n "$${plugins}" && \
