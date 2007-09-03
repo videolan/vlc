@@ -297,6 +297,11 @@ static int Open( vlc_object_t *p_this )
 
     p_dec->pf_decode_sub = Decode;
     p_sys = p_dec->p_sys = malloc( sizeof(decoder_sys_t) );
+    if( !p_sys )
+    {
+        msg_Err( p_dec, "out of memory" );
+        return VLC_ENOMEM;
+    }
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
     p_sys->i_pts          = (mtime_t) 0;    
