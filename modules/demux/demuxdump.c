@@ -47,7 +47,7 @@ vlc_module_begin();
     set_shortname("Dump");
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_description( _("File dumpper") );
+    set_description( _("File dumper") );
     set_capability( "demux2", 0 );
     add_file( "demuxdump-file", "stream-demux.dump", NULL, FILE_TEXT,
               FILE_LONGTEXT, VLC_FALSE );
