@@ -102,7 +102,7 @@ ifneq ($(BUILD),$(HOST))
     ifndef HAVE_CYGWIN
         # We are REALLY cross compiling
         FFMPEGCONF=--cross-prefix=$(HOST)- --cross-compile
-        X264CONF=--crosscompile=$(HOST)
+        X264CONF=--host=$(HOST)
         PTHREADSCONF="CROSS=$(HOST)-"
     else
         # We are compiling for MinGW on Cygwin
@@ -1328,10 +1328,10 @@ endif
 
 ifdef HAVE_WIN32
 .x264: x264 .pthreads
-	(cd $<; ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 else
 .x264: x264
-	(cd $<; ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 endif
 	touch $@
 
