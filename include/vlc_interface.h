@@ -189,9 +189,10 @@ VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
 #define EXTENSIONS_AUDIO "*.a52;*.aac;*.ac3;*.dts;*.flac;*.m4a;*.m4p;*.mka;" \
                          "*.mod;*.mp1;*.mp2;*.mp3;*.ogg;*.spx;*.wav;*.wma;*.xm"
 
-#define EXTENSIONS_VIDEO "*.asf;*.avi;*.divx;*.dv;*.flv;*.m1v;*.m2v;*.m4v;" \
-                         "*.mkv;*.mov;*.mp2;*.mp4;*.mpeg;*.mpeg1;*.mpeg2;" \
-                         "*.mpeg4;*.mpg;*.ogg;*.ogm;*.ps;*.ts;*.vob;*.wmv"
+#define EXTENSIONS_VIDEO "*.asf;*.avi;*.divx;*.dv;*.flv;*.gxf;*.m1v;*.m2v;" \
+                         "*.m4v;*.mkv;*.mov;*.mp2;*.mp4;*.mpeg;*.mpeg1;" \
+                         "*.mpeg2;*.mpeg4;*.mpg;*.mxf;*.ogg;*.ogm;" \
+                         "*.ps;*.ts;*.vob;*.wmv"
 
 #define EXTENSIONS_PLAYLIST "*.asx;*.b4s;*.m3u;*.pls;*.vlc;*.xspf"
 
