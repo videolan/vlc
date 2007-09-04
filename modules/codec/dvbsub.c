@@ -1905,7 +1905,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     if( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') &&
         p_region->fmt.i_chroma != VLC_FOURCC('Y','U','V','P') )
     {
-         msg_Err( p_enc, "chroma not supported", p_region->fmt.i_chroma );
+         msg_Err( p_enc, "chroma %4s not supported", p_region->fmt.i_chroma );
          return NULL;
     }
 
