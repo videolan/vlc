@@ -317,7 +317,7 @@ static int Open( vlc_object_t *p_this )
 static int OpenDemux( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     char *psz_sdp = NULL;
     sdp_t *p_sdp = NULL;
     int errval = VLC_EGENERIC;

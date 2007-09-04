@@ -221,9 +221,9 @@ static rtsp_client_t *RtspClientGet( vod_media_t *, const char * );
 static void           RtspClientDel( vod_media_t *, rtsp_client_t * );
 
 static int RtspCallback( httpd_callback_sys_t *, httpd_client_t *,
-                         httpd_message_t *, httpd_message_t * );
+                         httpd_message_t *, const httpd_message_t * );
 static int RtspCallbackES( httpd_callback_sys_t *, httpd_client_t *,
-                           httpd_message_t *, httpd_message_t * );
+                           httpd_message_t *, const httpd_message_t * );
 
 static char *SDPGenerate( const vod_media_t *, httpd_client_t *cl );
 
@@ -896,7 +896,7 @@ static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
 }
 
 static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
-                         httpd_message_t *answer, httpd_message_t *query )
+                         httpd_message_t *answer, const httpd_message_t *query )
 {
     vod_media_t *p_media = (vod_media_t*)p_args;
     vod_t *p_vod = p_media->p_vod;
@@ -1228,7 +1228,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
 }
 
 static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
-                           httpd_message_t *answer, httpd_message_t *query )
+                           httpd_message_t *answer, const httpd_message_t *query )
 {
     media_es_t *p_es = (media_es_t*)p_args;
     vod_media_t *p_media = p_es->p_media;
