@@ -420,7 +420,7 @@ void E_(PlaylistListNode)( intf_thread_t *p_intf, playlist_t *p_pl,
         if( p_node->i_children == -1 )
         {
             char value[512];
-            char *psz, psz_utf8;
+            char *psz, *psz_utf8;
             mvar_t *itm = E_(mvar_New)( name, "set" );
 
             if( p_pl->status.p_item && p_node &&
