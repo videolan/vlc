@@ -283,7 +283,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         var_Create( p_input, val.psz_string,
                     VLC_VAR_INTEGER|VLC_VAR_HASCHOICE|VLC_VAR_ISCOMMAND );
         var_AddCallback( p_input, val.psz_string,
-                         NavigationCallback, (void *)i );
+                         NavigationCallback, (void *)(intptr_t)i );
 
         if( p_input->p->title[i]->psz_name == NULL ||
             *p_input->p->title[i]->psz_name == '\0' )
@@ -667,7 +667,7 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
     (void)psz_cmd; (void)oldval;
 
     /* Issue a title change */
-    val.i_int = (int)p_data;
+    val.i_int = (intptr_t)p_data;
     input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE, &val );
 
     var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );

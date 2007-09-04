@@ -78,7 +78,7 @@ int vlc_module_set (module_t *module, int propid, void *value)
     {
         case VLC_MODULE_CPU_REQUIREMENT:
             assert (!module->b_submodule);
-            module->i_cpu |= (int)value;
+            module->i_cpu |= (intptr_t)value;
             break;
 
         case VLC_MODULE_SHORTCUT:
@@ -109,7 +109,7 @@ int vlc_module_set (module_t *module, int propid, void *value)
             break;
 
         case VLC_MODULE_SCORE:
-            module->i_score = (int)value;
+            module->i_score = (intptr_t)value;
             break;
 
         case VLC_MODULE_PROGRAM:
