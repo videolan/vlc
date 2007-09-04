@@ -716,7 +716,7 @@ int  E_(HandlerCallback)( httpd_handler_sys_t *p_args,
     char **ppsz_env = NULL;
     char *psz_tmp;
     char sep;
-    int  i_buffer;
+    size_t i_buffer;
     char *p_buffer;
     char *psz_cwd, *psz_file = NULL;
     int i_ret;
@@ -933,8 +933,6 @@ int  E_(ArtCallback)( httpd_handler_sys_t *p_args,
                           char *psz_remote_addr, char *psz_remote_host,
                           uint8_t **pp_data, int *pi_data )
 {
-    uint8_t *p_data = NULL;
-    int i_data = 0;
     char *psz_art = NULL;
     intf_thread_t *p_intf = p_args->file.p_intf;
     intf_sys_t *p_sys = p_intf->p_sys;
@@ -944,7 +942,7 @@ int  E_(ArtCallback)( httpd_handler_sys_t *p_args,
 
     psz_id[0] = '\0';
     if( p_request )
-        E_(ExtractURIValue)( p_request, "id", psz_id, 15 );
+        E_(ExtractURIValue)( (char *)p_request, "id", psz_id, 15 );
     i_id = atoi( psz_id );
     if( i_id )
     {
@@ -970,7 +968,8 @@ int  E_(ArtCallback)( httpd_handler_sys_t *p_args,
         FILE *f;
         char *psz_ext;
         char *psz_header;
-        int i_header_size;
+        char *p_data = NULL;
+        int i_header_size, i_data;
 
         if( ( f = utf8_fopen( psz_art + strlen( "file://" ), "r" ) ) == NULL )
         {
