@@ -658,10 +658,12 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
         GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 60 );
 
     msg_Dbg( p_access,
-             "answer 0x06 flags:0x%8.8x media_length:%us packet_length:%ul packet_count:%u max_bit_rate:%d header_size:%d",
+             "answer 0x06 flags:0x%8.8x media_length:%us "
+             "packet_length:%ul packet_count:%d max_bit_rate:%d "
+             "header_size:%d",
              p_sys->i_flags_broadcast,
              p_sys->i_media_length,
-             p_sys->i_packet_length,
+             (unsigned)p_sys->i_packet_length,
              p_sys->i_packet_count,
              p_sys->i_max_bit_rate,
              p_sys->i_header_size );

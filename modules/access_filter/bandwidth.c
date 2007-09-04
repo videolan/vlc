@@ -90,7 +90,8 @@ static int Open (vlc_object_t *obj)
     p_sys->bandwidth = var_CreateGetInteger (access, "access-bandwidth");
     p_sys->last_time = mdate ();
 
-    msg_Dbg (obj, "bandwidth limit: %u bytes/s", p_sys->bandwidth);
+    msg_Dbg (obj, "bandwidth limit: %lu bytes/s",
+             (unsigned long)p_sys->bandwidth);
     return VLC_SUCCESS;
 }
 

@@ -318,7 +318,7 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
 
     /* certificate (host)name verification */
     const gnutls_datum *data = gnutls_certificate_get_peers( p_sys->session,
-                                                             &(size_t){ 0 } );
+                                                             &(unsigned){0} );
     if( data == NULL )
     {
         msg_Err( session, "Peer certificate not available" );
