@@ -25,10 +25,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <math.h>
-
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
+
+#include <math.h>
 
 #ifdef HAVE_LIMITS_H
 #   include <limits.h> /* INT_MAX */
@@ -281,7 +281,7 @@ static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    vlc_object_t *p_libvlc = p_filter->p_libvlc;
+    vlc_object_t *p_libvlc = VLC_OBJECT( p_filter->p_libvlc );
     char *psz_order;
     char *psz_offsets;
     int i_index;

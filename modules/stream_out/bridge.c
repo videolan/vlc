@@ -216,7 +216,7 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_bridge = GetBridge( p_stream );
     if ( p_bridge == NULL )
     {
-        vlc_object_t *p_libvlc = p_stream->p_libvlc;
+        vlc_object_t *p_libvlc = VLC_OBJECT( p_stream->p_libvlc );
         vlc_value_t val;
 
         p_bridge = malloc( sizeof( bridge_t ) );
@@ -517,7 +517,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     if( b_no_es )
     {
-        vlc_object_t *p_libvlc = p_stream->p_libvlc;
+        vlc_object_t *p_libvlc = VLC_OBJECT( p_stream->p_libvlc );
         for ( i = 0; i < p_bridge->i_es_num; i++ )
             free( p_bridge->pp_es[i] );
         free( p_bridge->pp_es );

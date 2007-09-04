@@ -591,11 +591,12 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
 #define TRANS_BITS  8
 
     if( (i_pix_pitch == 4)
-     && (((((int)p_dst)|((int)p_src1)|i_dst_pitch|i_src1_pitch) & 3) == 0) )
+     && (((((intptr_t)p_dst)|((intptr_t)p_src1)|i_dst_pitch|i_src1_pitch)
+          & 3) == 0) )
     {
         /*
-        ** if picture pixels are 32 bits long and lines addresses are 32 bit aligned,
-        ** optimize rendering
+        ** if picture pixels are 32 bits long and lines addresses are 32 bit
+        ** aligned, optimize rendering
         */
         uint32_t *p32_dst = (uint32_t *)p_dst;
         uint32_t i32_dst_pitch = (uint32_t)(i_dst_pitch>>2);

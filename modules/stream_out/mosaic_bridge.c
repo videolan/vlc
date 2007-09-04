@@ -173,7 +173,7 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t        *p_stream = (sout_stream_t *)p_this;
     sout_stream_sys_t    *p_sys;
-    vlc_object_t         *p_libvlc = p_this->p_libvlc;
+    vlc_object_t         *p_libvlc = VLC_OBJECT( p_this->p_libvlc );
     vlc_value_t           val;
 
     config_ChainParse( p_stream, CFG_PREFIX, ppsz_sout_options,
@@ -314,7 +314,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_bridge = GetBridge( p_stream );
     if ( p_bridge == NULL )
     {
-        vlc_object_t *p_libvlc = p_stream->p_libvlc;
+        vlc_object_t *p_libvlc = VLC_OBJECT( p_stream->p_libvlc );
         vlc_value_t val;
 
         p_bridge = malloc( sizeof( bridge_t ) );
@@ -493,7 +493,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if ( b_last_es )
     {
-        vlc_object_t *p_libvlc = p_stream->p_libvlc;
+        vlc_object_t *p_libvlc = VLC_OBJECT( p_stream->p_libvlc );
         for ( i = 0; i < p_bridge->i_es_num; i++ )
             free( p_bridge->pp_es[i] );
         free( p_bridge->pp_es );

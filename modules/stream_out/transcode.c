@@ -179,7 +179,7 @@
 #define HURRYUP_LONGTEXT N_( "The transcoder will drop frames if your CPU " \
                 "can't keep up with the encoding rate." )
 
-static char *ppsz_deinterlace_type[] =
+static const char *ppsz_deinterlace_type[] =
 {
     "deinterlace", "ffmpeg-deinterlace"
 };

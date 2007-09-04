@@ -94,8 +94,8 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static char *ppsz_devices[] = { "default" };
-static char *ppsz_devices_text[] = { N_("Default") };
+static const char *ppsz_devices[] = { "default" };
+static const char *ppsz_devices_text[] = { N_("Default") };
 vlc_module_begin();
     set_shortname( "ALSA" );
     set_description( _("ALSA audio output") );
@@ -905,8 +905,8 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
         /* Keep the first entrie */
         for( i = 1; i < p_item->i_list; i++ )
         {
-            free( p_item->ppsz_list[i] );
-            free( p_item->ppsz_list_text[i] );
+            free( (char *)p_item->ppsz_list[i] );
+            free( (char *)p_item->ppsz_list_text[i] );
         }
         /* TODO: Remove when no more needed */
         p_item->ppsz_list[i] = NULL;
@@ -978,10 +978,10 @@ static void GetDevicesForCard(module_config_t *p_item, int i_card)
                   snd_pcm_info_get_name(p_pcm_info), psz_device );
 
         p_item->ppsz_list =
-            (char **)realloc( p_item->ppsz_list,
+            (const char **)realloc( p_item->ppsz_list,
                               (p_item->i_list + 2) * sizeof(char *) );
         p_item->ppsz_list_text =
-            (char **)realloc( p_item->ppsz_list_text,
+            (const char **)realloc( p_item->ppsz_list_text,
                               (p_item->i_list + 2) * sizeof(char *) );
         p_item->ppsz_list[ p_item->i_list ] = psz_device;
         p_item->ppsz_list_text[ p_item->i_list ] = psz_descr;
