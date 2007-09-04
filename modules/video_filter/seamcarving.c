@@ -140,8 +140,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     return p_outpic;
 }
 
-static inline int min3( int a, int b, int c );
-static inline int min( int a, int b );
+static inline int my_min3( int a, int b, int c );
+static inline int my_min( int a, int b );
 static int RemoveVerticalSeam( filter_t *p_filter, picture_t *p_inpic, picture_t *p_outpic, int i_src_visible );
 
 //#define DRAW_GRADIENT
@@ -264,15 +264,15 @@ static int RemoveVerticalSeam( filter_t *p_filter, picture_t *p_inpic, picture_t
         /* Compute line y's minimum energy value for paths ending on
          * each x */
         x = 1;
-        p_energy[x] = min( p_energy_prev[x  ]+p_grad[x  ],
+        p_energy[x] = my_min( p_energy_prev[x  ]+p_grad[x  ],
                            p_energy_prev[x+1]+p_grad[x+1] );
         for( x = 2; x < i_src_visible - 2; x++ )
         {
-            p_energy[x] = min3( p_energy_prev[x-1]+p_grad[x-1],
+            p_energy[x] = my_min3( p_energy_prev[x-1]+p_grad[x-1],
                                 p_energy_prev[x  ]+p_grad[x  ],
                                 p_energy_prev[x+1]+p_grad[x+1] );
         }
-        p_energy[x] = min( p_energy_prev[x-1]+p_grad[x-1],
+        p_energy[x] = my_min( p_energy_prev[x-1]+p_grad[x-1],
                            p_energy_prev[x  ]+p_grad[x  ] );
 
 #ifdef DRAW_ENERGY
@@ -353,7 +353,7 @@ static int RemoveVerticalSeam( filter_t *p_filter, picture_t *p_inpic, picture_t
 #endif
 }
 
-static inline int min3( int a, int b, int c )
+static inline int my_min3( int a, int b, int c )
 {
     if( a < b )
     {
@@ -363,7 +363,7 @@ static inline int min3( int a, int b, int c )
     if( b < c ) return b;
     return c;
 }
-static inline int min( int a, int b )
+static inline int my_min( int a, int b )
 {
     return a < b ? a : b;
 }
