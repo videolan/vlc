@@ -143,7 +143,7 @@ E_(vlc_entry) ( module_t *p_module );
 
 #define add_requirement( cap ) \
     if (vlc_module_set (p_module, VLC_MODULE_CPU_REQUIREMENT, \
-                        (void *)(CPU_CAPABILITY_##cap))) goto error
+                        (void *)(intptr_t)(CPU_CAPABILITY_##cap))) goto error
 
 #define add_shortcut( shortcut ) \
     if (vlc_module_set (p_submodule, VLC_MODULE_SHORTCUT, (void*)(shortcut))) \
@@ -163,7 +163,8 @@ E_(vlc_entry) ( module_t *p_module );
 
 #define set_capability( cap, score ) \
     if (vlc_module_set (p_submodule, VLC_MODULE_CAPABILITY, (void *)(cap)) \
-     || vlc_module_set (p_submodule, VLC_MODULE_SCORE, (void *)(score))) \
+     || vlc_module_set (p_submodule, VLC_MODULE_SCORE, \
+                        (void *)(intptr_t)(score))) \
         goto error
 
 #define set_program( program ) \
