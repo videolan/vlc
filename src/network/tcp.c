@@ -74,8 +74,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     struct addrinfo hints, *res, *ptr;
     const char      *psz_realhost;
     char            *psz_socks;
-    int             i_realport, i_val, i_handle = -1, i_saved_errno = 0;
-    unsigned        u_errstep = 0;
+    int             i_realport, i_val, i_handle = -1;
 
     if( i_port == 0 )
         i_port = 80; /* historical VLC thing */
@@ -95,8 +94,9 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
         i_realport = ( psz != NULL ) ? atoi( psz ) : 1080;
         hints.ai_flags &= ~AI_NUMERICHOST;
 
-        msg_Dbg( p_this, "net: connecting to %s port %d (SOCKS) for %s port %d",
-                 psz_realhost, i_realport, psz_host, i_port );
+        msg_Dbg( p_this, "net: connecting to %s port %d (SOCKS) "
+                 "for %s port %d", psz_realhost, i_realport,
+                 psz_host, i_port );
 
         /* We only implement TCP with SOCKS */
         switch( type )
@@ -147,11 +147,6 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
                              proto ?: ptr->ai_protocol );
         if( fd == -1 )
         {
-            if( u_errstep <= 0 )
-            {
-                u_errstep = 1;
-                i_saved_errno = net_errno;
-            }
             msg_Dbg( p_this, "socket error: %s", strerror( net_errno ) );
             continue;
         }
@@ -164,12 +159,8 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
             if( net_errno != EINPROGRESS )
             {
-                if( u_errstep <= 1 )
-                {
-                    u_errstep = 2;
-                    i_saved_errno = net_errno;
-                }
-                msg_Dbg( p_this, "connect error: %s", strerror( net_errno ) );
+                msg_Err( p_this, "connection failed: %s",
+                         strerror( net_errno ) );
                 goto next_ai;
             }
 
@@ -208,19 +199,14 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
                 if( ( i_ret == -1 ) && ( net_errno != EINTR ) )
                 {
-                    msg_Warn( p_this, "select error: %s",
+                    msg_Err( p_this, "connection polling error: %s",
                               strerror( net_errno ) );
                     goto next_ai;
                 }
 
                 if( d.quot <= 0 )
                 {
-                    msg_Dbg( p_this, "select timed out" );
-                    if( u_errstep <= 2 )
-                    {
-                        u_errstep = 3;
-                        i_saved_errno = ETIMEDOUT;
-                    }
+                    msg_Warn( p_this, "connection timed out" );
                     goto next_ai;
                 }
 
@@ -231,9 +217,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
             if( getsockopt( fd, SOL_SOCKET, SO_ERROR, (void*)&i_val,
                             &i_val_size ) == -1 || i_val != 0 )
             {
-                u_errstep = 4;
-                i_saved_errno = i_val;
-                msg_Dbg( p_this, "connect error (via getsockopt): %s",
+                msg_Err( p_this, "connection failed: %s",
                          net_strerror( i_val ) );
                 goto next_ai;
             }
@@ -251,11 +235,7 @@ next_ai: /* failure */
     vlc_freeaddrinfo( res );
 
     if( i_handle == -1 )
-    {
-        msg_Err( p_this, "Connection to %s port %d failed: %s", psz_host,
-                 i_port, net_strerror( i_saved_errno ) );
         return -1;
-    }
 
     if( psz_socks != NULL )
     {
@@ -266,7 +246,7 @@ next_ai: /* failure */
         if( SocksHandshakeTCP( p_this, i_handle, 5, psz_user, psz_pwd,
                                psz_host, i_port ) )
         {
-            msg_Err( p_this, "Failed to use the SOCKS server" );
+            msg_Err( p_this, "SOCKS handshake failed" );
             net_Close( i_handle );
             i_handle = -1;
         }
