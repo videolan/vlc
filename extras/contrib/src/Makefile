@@ -437,7 +437,7 @@ DISTCLEAN_PKG += libiconv-$(LIBICONV_VERSION).tar.gz
 fontconfig-$(FONTCONFIG_VERSION).tar.gz:
 	$(WGET) $(FONTCONFIG_URL)
 
-fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz
+fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz Makefile Patches/fontconfig.patch
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/fontconfig.patch
 
