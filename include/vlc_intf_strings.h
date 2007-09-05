@@ -57,6 +57,7 @@
 #define I_POP_ADD N_("Add node")
 #define I_POP_STREAM N_("Stream...")
 #define I_POP_SAVE N_("Save...")
+#define I_POP_EXPLORE N_("Open Folder...")
 
 /*************** Playlist *************/
 
