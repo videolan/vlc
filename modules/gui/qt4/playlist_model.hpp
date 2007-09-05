@@ -142,10 +142,7 @@ public:
     void sendArt( QString url );
     void removeArt( );
     
-    int shownFlags()
-    {
-        return rootItem->i_showflags;
-    }
+    int shownFlags() {  return rootItem->i_showflags;  }
 private:
     void addCallbacks();
     void delCallbacks();

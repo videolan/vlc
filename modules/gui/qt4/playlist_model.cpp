@@ -251,7 +251,6 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 
     }
 #undef ADD_META
-
 }
 
 /*************************************************************************
@@ -259,7 +258,7 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
  *************************************************************************/
 
 PLModel::PLModel( playlist_t *_p_playlist, intf_thread_t *_p_intf,
-                  playlist_item_t * p_root, int _i_depth, QObject *parent)
+                    playlist_item_t * p_root, int _i_depth, QObject *parent)
                                     : QAbstractItemModel(parent)
 {
     i_depth = _i_depth;
@@ -969,32 +968,10 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
             menu->addAction( qfu(I_POP_SORT), this, SLOT( popupSort() ) );
             menu->addAction( qfu(I_POP_ADD), this, SLOT( popupAdd() ) );
         }
-      //  menu->addSeparator();
-
-        /*ContextUpdateMapper = new QSignalMapper(this);
-
-        QMenu *selectColMenu = new QMenu( qtr("Show columns") );
-
-#define ADD_META_ACTION( meta ) { \
-   QAction* option = selectColMenu->addAction( qfu(VLC_META_##meta) );     \
-   option->setCheckable( true );                                           \
-   option->setChecked( rootItem->i_showflags & VLC_META_ENGINE_##meta );   \
-   ContextUpdateMapper->setMapping( option, VLC_META_ENGINE_##meta );      \
-   CONNECT( option, triggered(), ContextUpdateMapper, map() );             \
-   }
-        CONNECT(ContextUpdateMapper, mapped( int ), this, viewchanged( int ) );
-
-        ADD_META_ACTION( TITLE );
-        ADD_META_ACTION( ARTIST );
-        ADD_META_ACTION( DURATION );
-        ADD_META_ACTION( COLLECTION );
-        ADD_META_ACTION( GENRE );
-        ADD_META_ACTION( SEQ_NUM );
-        ADD_META_ACTION( RATING );
-        ADD_META_ACTION( DESCRIPTION );
-
-#undef ADD_META_ACTION
-        menu->addMenu( selectColMenu );*/
+#ifdef WIN32        
+        menu->addSeparator();
+        menu->addAction( qfu( I_POP_EXPLORE ), this SLOT( popupExplore() ) );
+#endif
         menu->popup( point );
     }
     else
@@ -1094,6 +1071,13 @@ void PLModel::popupSave()
 {
     fprintf( stderr, "Save not implemented\n" );
 }
+
+#ifdef WIN32
+void PLModel::popupExplore()
+{
+    ShellExecuteW(NULL, L"explore", L"C:\\", NULL, NULL, SW_SHOWNORMAL );
+}
+#endif
 
 /**********************************************************************
  * Playlist callbacks
