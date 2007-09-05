@@ -627,7 +627,7 @@ msgstr "Répéter un morceau"
 
 #: include/vlc_intf_strings.h:65
 msgid "No repeat"
-msgstr "Séquentiel"
+msgstr "Ne pas répéter"
 
 #: include/vlc_intf_strings.h:67 src/libvlc-module.c:1209
 #: modules/gui/macosx/controls.m:866 modules/gui/macosx/intf.m:576
@@ -637,22 +637,20 @@ msgstr "Aléatoire"
 #: include/vlc_intf_strings.h:68
 #, fuzzy
 msgid "No random"
-msgstr "Aléatoire"
+msgstr "Séquentiel"
 
 #: include/vlc_intf_strings.h:70
-#, fuzzy
 msgid "Add to playlist"
 msgstr "Ajouter à la liste de lecture"
 
 #: include/vlc_intf_strings.h:71
 #, fuzzy
 msgid "Add to media library"
-msgstr "Lecteur multimédia VLC"
+msgstr "Ajouter à la Bibliothèque"
 
 #: include/vlc_intf_strings.h:73
-#, fuzzy
 msgid "Add file..."
-msgstr "Enregistrer le fichier..."
+msgstr "Ajouter un fichier..."
 
 #: include/vlc_intf_strings.h:74
 #, fuzzy
@@ -682,12 +680,12 @@ msgstr "Chercher"
 #: include/vlc_intf_strings.h:81
 #, fuzzy
 msgid "Search filter"
-msgstr "Chercher dans la liste de lecture"
+msgstr "Filtre de recherche"
 
 #: include/vlc_intf_strings.h:83
 #, fuzzy
 msgid "Additional sources"
-msgstr "Débogage supplémentaire"
+msgstr "Sources supplémentaires"
 
 #: include/vlc_intf_strings.h:87
 #: modules/gui/wxwidgets/dialogs/preferences.cpp:1019
@@ -695,7 +693,7 @@ msgid ""
 "Some options are available but hidden. Check \"Advanced options\" to see "
 "them."
 msgstr ""
-"Des options sont cachés. Cliquez sur « Options avancées » pour les voir."
+"Des options sont cachés. Cochez « Options avancées » pour les voir."
 
 #: include/vlc_intf_strings.h:92 modules/gui/macosx/extended.m:83
 #: modules/gui/wxwidgets/extrapanel.cpp:147
@@ -705,12 +703,12 @@ msgstr "Clone"
 #: include/vlc_intf_strings.h:93
 #, fuzzy
 msgid "Clone the image"
-msgstr "Permet de rogner l’image"
+msgstr "Permet de cloner l’image"
 
 #: include/vlc_intf_strings.h:95 modules/gui/qt4/ui/video_effects.ui:392
 #, fuzzy
 msgid "Magnification"
-msgstr "Amplification"
+msgstr "Grossissement"
 
 #: include/vlc_intf_strings.h:96
 msgid ""
@@ -721,22 +719,22 @@ msgstr "Grossit une partie de la vidéo. Vous pouvez choisir la partie de l'imag
 #: include/vlc_intf_strings.h:99 modules/gui/qt4/ui/video_effects.ui:524
 #, fuzzy
 msgid "Waves"
-msgstr "Onde"
+msgstr "Ondes"
 
 #: include/vlc_intf_strings.h:100
 #, fuzzy
 msgid "\"Waves\" video distortion effect"
-msgstr "Ajoute des effets de distorsion"
+msgstr "Ajoute des effets de distorsion « Aquatiques »"
 
 #: include/vlc_intf_strings.h:102
 #, fuzzy
 msgid "\"Water surface\" video distortion effect"
-msgstr "Ajoute des effets de distorsion"
+msgstr "Ajoute des effets de distorsion « Aquatiques »"
 
 #: include/vlc_intf_strings.h:104
 #, fuzzy
 msgid "Image colors inversion"
-msgstr "Inversion vidéo"
+msgstr "Inversion des couleurs"
 
 #: include/vlc_intf_strings.h:106
 msgid "Split the image to make an image wall"
@@ -791,7 +789,7 @@ msgstr "Copyright"
 
 #: include/vlc_meta.h:39
 msgid "Album/movie/show title"
-msgstr "Titre"
+msgstr "Album"
 
 #: include/vlc_meta.h:40
 msgid "Track number/position in set"
