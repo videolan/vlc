@@ -2617,7 +2617,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
             if( p_xml_reader )
             {
                 uint32_t   *psz_text;
-                int         i_len;
+                int         i_len = 0;
                 uint32_t    i_runs = 0;
                 uint32_t    i_k_runs = 0;
                 uint32_t   *pi_run_lengths = NULL;
