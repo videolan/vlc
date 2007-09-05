@@ -795,9 +795,9 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
   -- #videolan
 %
 < Mr_Mirsal> ./bootstrap
-< Mr_Mirsal> <StFS> trying that now
-< Mr_Mirsal> <StFS> damn this takes long. :-/
-< Mr_Mirsal> <thresh> good things always take long time
+< StFS> trying that now
+< StFS> damn this takes long. :-/
+< thresh> good things always take long time
   -- #videolan
 %
 < Mr_Mirsal> Oh, btw, I request a fortunes.txt update...
