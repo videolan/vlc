@@ -46,6 +46,7 @@ include/vlc_objects.h
 include/vlc_osd.h
 include/vlc_os_specific.h
 include/vlc_playlist.h
+include/vlc_rand.h
 include/vlc_sout.h
 include/vlc_stream.h
 include/vlc_streaming.h
@@ -133,6 +134,7 @@ src/misc/md5.c
 src/misc/messages.c
 src/misc/mtime.c
 src/misc/objects.c
+src/misc/rand.c
 src/misc/stats.c
 src/misc/threads.c
 src/misc/update.c
@@ -313,6 +315,15 @@ modules/audio_filter/resampler/bandlimited.h
 modules/audio_filter/resampler/linear.c
 modules/audio_filter/resampler/trivial.c
 modules/audio_filter/resampler/ugly.c
+modules/audio_filter/spatializer/allpass.cpp
+modules/audio_filter/spatializer/allpass.hpp
+modules/audio_filter/spatializer/comb.cpp
+modules/audio_filter/spatializer/comb.hpp
+modules/audio_filter/spatializer/denormals.h
+modules/audio_filter/spatializer/revmodel.cpp
+modules/audio_filter/spatializer/revmodel.hpp
+modules/audio_filter/spatializer/spatializer.cpp
+modules/audio_filter/spatializer/tuning.h
 modules/audio_mixer/float32.c
 modules/audio_mixer/spdif.c
 modules/audio_mixer/trivial.c
@@ -606,6 +617,7 @@ modules/gui/qt4/components/preferences_widgets.cpp
 modules/gui/qt4/components/preferences_widgets.hpp
 modules/gui/qt4/components/simple_preferences.cpp
 modules/gui/qt4/components/simple_preferences.hpp
+modules/gui/qt4/dialogs/about.hpp
 modules/gui/qt4/dialogs/errors.cpp
 modules/gui/qt4/dialogs/errors.hpp
 modules/gui/qt4/dialogs/extended.cpp
@@ -624,6 +636,8 @@ modules/gui/qt4/dialogs/open.cpp
 modules/gui/qt4/dialogs/open.hpp
 modules/gui/qt4/dialogs/playlist.cpp
 modules/gui/qt4/dialogs/playlist.hpp
+modules/gui/qt4/dialogs/podcast_configuration.cpp
+modules/gui/qt4/dialogs/podcast_configuration.hpp
 modules/gui/qt4/dialogs/preferences.cpp
 modules/gui/qt4/dialogs/preferences.hpp
 modules/gui/qt4/dialogs_provider.cpp
@@ -646,7 +660,9 @@ modules/gui/qt4/ui/open_disk.ui
 modules/gui/qt4/ui/open_file.ui
 modules/gui/qt4/ui/open_net.ui
 modules/gui/qt4/ui/open.ui
+modules/gui/qt4/ui/podcast_configuration.ui
 modules/gui/qt4/ui/sout.ui
+modules/gui/qt4/ui/spatializer.ui
 modules/gui/qt4/ui/sprefs_audio.ui
 modules/gui/qt4/ui/sprefs_input.ui
 modules/gui/qt4/ui/sprefs_interface.ui
@@ -1111,6 +1127,7 @@ modules/video_filter/rotate.c
 modules/video_filter/rss.c
 modules/video_filter/rv32.c
 modules/video_filter/scale.c
+modules/video_filter/seamcarving.c
 modules/video_filter/sharpen.c
 modules/video_filter/transform.c
 modules/video_filter/wall.c
