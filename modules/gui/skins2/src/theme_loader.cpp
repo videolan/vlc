@@ -738,9 +738,9 @@ int makedir( const char *newdir )
 static int currentGzFd = -1;
 static void * currentGzVp = NULL;
 
-int gzopen_frontend( char *pathname, int oflags, int mode )
+int gzopen_frontend( const char *pathname, int oflags, int mode )
 {
-    char *gzflags;
+    const char *gzflags;
     gzFile gzf;
 
     switch( oflags )
