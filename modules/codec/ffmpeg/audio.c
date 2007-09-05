@@ -253,10 +253,16 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
     p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
     memset( &p_block->p_buffer[p_block->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE );
 
+#if LIBAVCODEC_VERSION_INT >= ((52<<16)+(0<<8)+0)
     i_output = __MAX( AVCODEC_MAX_AUDIO_FRAME_SIZE, p_block->i_buffer );
     i_used = avcodec_decode_audio2( p_sys->p_context,
                                    (int16_t*)p_sys->p_output, &i_output,
                                    p_block->p_buffer, p_block->i_buffer );
+#else
+    i_used = avcodec_decode_audio( p_sys->p_context,
+                                   (int16_t*)p_sys->p_output, &i_output,
+                                   p_block->p_buffer, p_block->i_buffer );
+#endif
 
     if( i_used < 0 || i_output < 0 )
     {
