@@ -191,6 +191,24 @@ typedef uint32_t vlc_fourcc_t;
 
 #endif
 
+static inline void __vlc_fourcc_to_char( vlc_fourcc_t fcc, char *psz_fourcc )
+{
+#ifdef WORDS_BIGENDIAN
+    psz_fourcc[0] = (uint32_t) (fcc >> 24);
+    psz_fourcc[1] = (uint32_t) (fcc >> 16);
+    psz_fourcc[2] = (uint32_t) (fcc >> 8);
+    psz_fourcc[3] = (uint32_t) (fcc);
+#else
+    psz_fourcc[3] = (uint32_t) (fcc >> 24);
+    psz_fourcc[2] = (uint32_t) (fcc >> 16);
+    psz_fourcc[1] = (uint32_t) (fcc >> 8);
+    psz_fourcc[0] = (uint32_t) (fcc);
+#endif
+}
+
+#define vlc_fourcc_to_char( a, b ) \
+    __vlc_fourcc_to_char( (vlc_fourcc_t)(a), (char *)(b) )
+
 /*****************************************************************************
  * Classes declaration
  *****************************************************************************/
