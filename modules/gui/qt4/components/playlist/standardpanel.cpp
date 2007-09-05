@@ -50,27 +50,34 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   PLPanel( _parent, _p_intf )
 {
     model = new PLModel( p_playlist, p_intf, p_root, -1, this );
+    
+    /* Create and configure the QTreeView */
     view = new QVLCTreeView( 0 );
     view->setModel(model);
     view->setIconSize( QSize(20,20) );
     view->setAlternatingRowColors( true );
-    view->header()->resizeSection( 0, 230 );
-    view->header()->resizeSection( 1, 170 );
-    view->header()->setSortIndicatorShown( true );
-    view->header()->setClickable( true );
-
+    view->setAnimated( true ); 
+    view->setSortingEnabled( true );	
     view->setSelectionMode( QAbstractItemView::ExtendedSelection );
     view->setDragEnabled( true );
     view->setAcceptDrops( true );
     view->setDropIndicatorShown( true );
     view->setAutoScroll( true );
-
+    
+    view->header()->resizeSection( 0, 230 );
+    view->header()->resizeSection( 1, 170 );
+    view->header()->setSortIndicatorShown( true );
+    view->header()->setClickable( true );
+	view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
+        
     CONNECT( view, activated( const QModelIndex& ) ,
              model,activateItem( const QModelIndex& ) );
     CONNECT( view, rightClicked( QModelIndex , QPoint ),
              this, doPopup( QModelIndex, QPoint ) );
     CONNECT( model, dataChanged( const QModelIndex&, const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
+	CONNECT( view->header(), customContextMenuRequested( const QPoint & ),
+             this, popupSelectColumn( QPoint ) );
 
     currentRootId = -1;
     CONNECT( parent, rootChanged(int), this, setCurrentRootId( int ) );
@@ -78,25 +85,29 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing( 0 ); layout->setMargin( 0 );
 
+    /* Buttons configuration */
     QHBoxLayout *buttons = new QHBoxLayout();
-
+    
     addButton = new QPushButton( "+", this );
     addButton->setMaximumWidth( 25 );
     BUTTONACT( addButton, add() );
     buttons->addWidget( addButton );
 
-    repeatButton = new QPushButton( 0 ); buttons->addWidget( repeatButton );
+    repeatButton = new QPushButton( this ); 
     if( model->hasRepeat() ) repeatButton->setText( qtr( I_PL_REPEAT ) );
     else if( model->hasLoop() ) repeatButton->setText( qtr( I_PL_LOOP ) );
     else repeatButton->setText( qtr( I_PL_NOREPEAT ) );
     BUTTONACT( repeatButton, toggleRepeat() );
+    buttons->addWidget( repeatButton );
 
-    randomButton = new QPushButton( 0 ); buttons->addWidget( randomButton );
+    randomButton = new QPushButton( this ); 
     randomButton->setText( model->hasRandom() ? qtr( I_PL_RANDOM )
                                               : qtr( I_PL_NORANDOM) );
     BUTTONACT( randomButton, toggleRandom() );
+    buttons->addWidget( randomButton );
 
-    QSpacerItem *spacer = new QSpacerItem( 10, 20 );buttons->addItem( spacer );
+    QSpacerItem *spacer = new QSpacerItem( 10, 20 );
+    buttons->addItem( spacer );
 
     QLabel *filter = new QLabel( qtr(I_PL_SEARCH) + " " );
     buttons->addWidget( filter );
@@ -106,8 +117,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     QPushButton *clear = new QPushButton( qfu( "CL") );
     clear->setMaximumWidth( 30 );
-    buttons->addWidget( clear );
     BUTTONACT( clear, clearFilter() );
+    buttons->addWidget( clear );
 
     layout->addWidget( view );
     layout->addLayout( buttons );
@@ -194,6 +205,35 @@ void StandardPLPanel::add()
     }
     popup->popup( QCursor::pos() );
 }
+
+void StandardPLPanel::popupSelectColumn( QPoint )
+{     
+    ContextUpdateMapper = new QSignalMapper(this);
+
+    QMenu *selectColMenu = new QMenu( qtr("Show columns") );
+
+#define ADD_META_ACTION( meta ) { \
+   QAction* option = selectColMenu->addAction( qfu(VLC_META_##meta) );     \
+   option->setCheckable( true );                                           \
+   option->setChecked( model->shownFlags() & VLC_META_ENGINE_##meta );   \
+   ContextUpdateMapper->setMapping( option, VLC_META_ENGINE_##meta );      \
+   CONNECT( option, triggered(), ContextUpdateMapper, map() );             \
+   }
+    CONNECT( ContextUpdateMapper, mapped( int ),  model, viewchanged( int ) );
+
+    ADD_META_ACTION( TITLE );
+    ADD_META_ACTION( ARTIST );
+    ADD_META_ACTION( DURATION );
+    ADD_META_ACTION( COLLECTION );
+    ADD_META_ACTION( GENRE );
+    ADD_META_ACTION( SEQ_NUM );
+    ADD_META_ACTION( RATING );
+    ADD_META_ACTION( DESCRIPTION );
+
+#undef ADD_META_ACTION
+    
+    selectColMenu->popup( QCursor::pos() );
+ }
 
 void StandardPLPanel::clearFilter()
 {

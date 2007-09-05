@@ -75,6 +75,7 @@ private:
     QPushButton *repeatButton , *randomButton,*addButton;
     ClickLineEdit *searchLine;
     int currentRootId;
+QSignalMapper *ContextUpdateMapper;
 public slots:
     void removeItem( int );
     virtual void setRoot( int );
@@ -88,6 +89,7 @@ private slots:
     void clearFilter();
     void add();
     void setCurrentRootId( int );
+    void popupSelectColumn( QPoint );
 };
 
 #endif

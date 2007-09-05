@@ -72,7 +72,6 @@ void PLItem::init( int _i_id, int _i_input_id, PLItem *parent, PLModel *m)
     i_id = _i_id; i_input_id = _i_input_id;
     model = m;
 
-
     if( parentItem == NULL )
     {
         i_showflags = config_GetInt( model->p_intf , "qt-pl-showflags" );
@@ -288,7 +287,6 @@ PLModel::PLModel( playlist_t *_p_playlist, intf_thread_t *_p_intf,
     addCallbacks();
     rebuild( p_root );
 }
-
 
 PLModel::~PLModel()
 {
@@ -971,9 +969,9 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
             menu->addAction( qfu(I_POP_SORT), this, SLOT( popupSort() ) );
             menu->addAction( qfu(I_POP_ADD), this, SLOT( popupAdd() ) );
         }
-        menu->addSeparator();
+      //  menu->addSeparator();
 
-        ContextUpdateMapper = new QSignalMapper(this);
+        /*ContextUpdateMapper = new QSignalMapper(this);
 
         QMenu *selectColMenu = new QMenu( qtr("Show columns") );
 
@@ -996,7 +994,7 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
         ADD_META_ACTION( DESCRIPTION );
 
 #undef ADD_META_ACTION
-        menu->addMenu( selectColMenu );
+        menu->addMenu( selectColMenu );*/
         menu->popup( point );
     }
     else

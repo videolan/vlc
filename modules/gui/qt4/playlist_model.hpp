@@ -66,6 +66,7 @@ protected:
     int i_id;
     int i_input_id;
     int i_showflags;
+    
     void updateview( void );
     friend class PLModel;
 private:
@@ -120,6 +121,7 @@ public:
 
     bool b_need_update;
     int i_items_to_append;
+   
     void rebuild(); void rebuild( playlist_item_t *);
     bool hasRandom(); bool hasLoop(); bool hasRepeat();
 
@@ -139,6 +141,11 @@ public:
 
     void sendArt( QString url );
     void removeArt( );
+    
+    int shownFlags()
+    {
+        return rootItem->i_showflags;
+    }
 private:
     void addCallbacks();
     void delCallbacks();
