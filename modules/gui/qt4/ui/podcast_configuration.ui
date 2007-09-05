@@ -65,11 +65,8 @@
    </item>
    <item row="3" column="2" colspan="2" >
     <widget class="QDialogButtonBox" name="okCancel" >
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
      <property name="standardButtons" >
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::NoButton</set>
      </property>
     </widget>
    </item>

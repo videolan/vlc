@@ -27,6 +27,10 @@ PodcastConfigurationDialog::PodcastConfigurationDialog( intf_thread_t *_p_intf )
     :p_intf( _p_intf )
 {
     ui.setupUi( this );
+    QPushButton *okButton = new QPushButton( qtr( "OK" ), this );
+    QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ), this );
+    ui.okCancel->addButton( okButton, QDialogButtonBox::AcceptRole );
+    ui.okCancel->addButton( cancelButton, QDialogButtonBox::RejectRole );
     CONNECT( ui.podcastAdd, clicked(), this, add() );
     CONNECT( ui.podcastDelete, clicked(), this, remove() );
 
