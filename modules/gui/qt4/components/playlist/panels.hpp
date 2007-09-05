@@ -87,8 +87,8 @@ private slots:
     void doPopup( QModelIndex index, QPoint point );
     void search( QString search );
     void clearFilter();
-    void add();
     void setCurrentRootId( int );
+    void popupAdd();
     void popupSelectColumn( QPoint );
 };
 

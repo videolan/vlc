@@ -90,7 +90,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     
     addButton = new QPushButton( "+", this );
     addButton->setMaximumWidth( 25 );
-    BUTTONACT( addButton, add() );
+    BUTTONACT( addButton, popupAdd() );
     buttons->addWidget( addButton );
 
     repeatButton = new QPushButton( this ); 
@@ -186,7 +186,7 @@ void StandardPLPanel::setCurrentRootId( int _new )
         addButton->setEnabled( false );
 }
 
-void StandardPLPanel::add()
+void StandardPLPanel::popupAdd()
 {
     QMenu popup;
     if( currentRootId == THEPL->p_local_category->i_id ||
