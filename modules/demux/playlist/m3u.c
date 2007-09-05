@@ -30,7 +30,6 @@
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 
-#include <errno.h>                                                 /* ENOMEM */
 #include "playlist.h"
 
 struct demux_sys_t

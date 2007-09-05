@@ -27,12 +27,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <ctype.h>                                              /* isspace() */
-
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 
-#include <errno.h>                                                 /* ENOMEM */
+#include <ctype.h>
 #include <vlc_charset.h>
 #include "playlist.h"
 #include "vlc_meta.h"

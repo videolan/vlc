@@ -27,7 +27,6 @@
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 
-#include <errno.h>                                                 /* ENOMEM */
 #include "playlist.h"
 
 /*****************************************************************************
@@ -81,8 +80,6 @@ void E_(Close_IFO)( vlc_object_t *p_this )
 static int Demux( demux_t *p_demux )
 {
     char *psz_url = NULL;
-    char *psz_file = p_demux->psz_path + strlen( p_demux->psz_path )
-                     - strlen( "VIDEO_TS.IFO" );
     size_t len = 0;
     input_item_t *p_input;
 

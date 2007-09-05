@@ -51,7 +51,6 @@ description:The now infamous Apple Macintosh commercial aired during the 1984 Su
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 
-#include <errno.h>                                                 /* ENOMEM */
 #include "playlist.h"
 
 #define MAX_LINE 1024
