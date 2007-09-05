@@ -1065,7 +1065,7 @@ static int Request( access_t *p_access, int64_t i_tell )
             if( p_sys->b_continuous )
             {
                 p_access->info.i_size = -1;
-                msg_Dbg( p_access, "this frame size="I64Fd, atoll(p ) );
+                msg_Dbg( p_access, "this frame size=%lld", atoll(p ) );
                 p_sys->i_remaining = atoll( p );
             }
             else
