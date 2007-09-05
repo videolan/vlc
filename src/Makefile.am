@@ -325,6 +325,7 @@ SOURCES_libvlc_control = \
 	control/media_descriptor.c \
 	control/media_instance.c \
 	control/media_list.c \
+	control/media_list_path.h \
 	control/media_list_player.c \
 	control/media_library.c \
 	control/mediacontrol_internal.h \
