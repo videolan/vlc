@@ -93,6 +93,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
         psz_realhost = psz_socks;
         i_realport = ( psz != NULL ) ? atoi( psz ) : 1080;
+        hints.ai_flags &= ~AI_NUMERICHOST;
 
         msg_Dbg( p_this, "net: connecting to %s port %d (SOCKS) for %s port %d",
                  psz_realhost, i_realport, psz_host, i_port );
