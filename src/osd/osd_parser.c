@@ -677,8 +677,9 @@ int osd_ConfigLoader( vlc_object_t *p_this, const char *psz_file,
                 ( strncmp( ppsz_button_states[1], &state[0], strlen(ppsz_button_states[1]) ) != 0 ) &&
                 ( strncmp( ppsz_button_states[2], &state[0], strlen(ppsz_button_states[2]) ) != 0 ) )
             {
-                msg_Err( p_this, "invalid button state %s for button %s expected %d: unselect, select or pressed)",
-                                    &state[0], &action[0], strlen(&state[0]));
+                msg_Err( p_this, "invalid button state %s for button %s "
+                         "expected %u: unselect, select or pressed)",
+                         &state[0], &action[0], (unsigned)strlen(&state[0]));
                 goto error;
             }
 

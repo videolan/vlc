@@ -630,8 +630,8 @@ static char *SDPGenerate( sap_handler_t *p_sap,
     if (res == -1)
         return NULL;
 
-    msg_Dbg( p_sap, "Generated SDP (%i bytes):\n%s", strlen(psz_sdp),
-             psz_sdp );
+    msg_Dbg( p_sap, "Generated SDP (%u bytes):\n%s",
+             (unsigned)strlen(psz_sdp), psz_sdp );
     return psz_sdp;
 }
 
