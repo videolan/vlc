@@ -61,6 +61,7 @@
 # define SOL_UDPLITE IPPROTO_UDPLITE
 #endif
 
+#define MTU 65535
 
 /*****************************************************************************
  * Module descriptor
@@ -69,11 +70,6 @@
 #define CACHING_LONGTEXT N_( \
     "Caching value for UDP streams. This " \
     "value should be set in milliseconds." )
-
-#define AUTO_MTU_TEXT N_("Autodetection of MTU")
-#define AUTO_MTU_LONGTEXT N_( \
-    "Automatically detect the line's MTU. This will increase the size if" \
-    " truncated packets are found" )
 
 #define RTP_LATE_TEXT N_("RTP reordering timeout in ms")
 #define RTP_LATE_LONGTEXT N_( \
@@ -92,9 +88,7 @@ vlc_module_begin();
     add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, VLC_TRUE );
     add_integer( "rtp-late", 100, NULL, RTP_LATE_TEXT, RTP_LATE_LONGTEXT, VLC_TRUE );
-
-    add_bool( "udp-auto-mtu", 1, NULL,
-              AUTO_MTU_TEXT, AUTO_MTU_LONGTEXT, VLC_TRUE );
+    add_obsolete_bool( "udp-auto-mtu" );
 
     set_capability( "access2", 0 );
     add_shortcut( "udp" );
@@ -126,8 +120,6 @@ struct access_sys_t
 {
     int fd;
 
-    int i_mtu;
-    vlc_bool_t b_auto_mtu;
     vlc_bool_t b_framed_rtp;
 
     /* reorder rtp packets when out-of-sequence */
@@ -270,16 +262,6 @@ static int Open( vlc_object_t *p_this )
     {
         /* We don't do autodetection and prebuffering in case of framing */
         p_access->pf_block = BlockRTP;
-        p_sys->i_mtu = 65535;
-    }
-    else
-    {
-        /* FIXME */
-        p_sys->i_mtu = var_CreateGetInteger( p_access, "mtu" );
-        if( p_sys->i_mtu <= 1 )
-            p_sys->i_mtu  = 576 - 20 - 8;   /* Avoid problem */
-
-        p_sys->b_auto_mtu = var_CreateGetBool( p_access, "udp-auto-mtu" );;
     }
 
     /* Update default_pts to a suitable value for udp access */
@@ -311,7 +293,6 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    access_sys_t *p_sys = p_access->p_sys;
     vlc_bool_t   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
@@ -329,7 +310,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_MTU:
             pi_int = (int*)va_arg( args, int * );
-            *pi_int = p_sys->i_mtu;
+            *pi_int = MTU;
             break;
 
         case ACCESS_GET_PTS_DELAY:
@@ -362,25 +343,16 @@ static block_t *BlockUDP( access_t *p_access )
     block_t      *p_block;
 
     /* Read data */
-    p_block = block_New( p_access, p_sys->i_mtu );
+    p_block = block_New( p_access, MTU );
     p_block->i_buffer = net_Read( p_access, p_sys->fd, NULL,
-                                  p_block->p_buffer, p_sys->i_mtu,
-                                  VLC_FALSE );
+                                  p_block->p_buffer, MTU, VLC_FALSE );
     if( p_block->i_buffer < 0 )
     {
         block_Release( p_block );
         return NULL;
     }
 
-    if( (p_block->i_buffer >= p_sys->i_mtu) && p_sys->b_auto_mtu &&
-        p_sys->i_mtu < 32767 )
-    {
-        /* Increase by 100% */
-        p_sys->i_mtu *= 2;
-        msg_Dbg( p_access, "increasing MTU to %d", p_sys->i_mtu );
-    }
-
-    return p_block;
+    return block_Realloc( p_block, 0, p_block->i_buffer );
 }
 
 /*****************************************************************************
@@ -397,7 +369,7 @@ static block_t *BlockTCP( access_t *p_access )
     if( p_block == NULL )
     {
         /* MTU should always be 65535 in this case */
-        p_sys->p_partial_frame = p_block = block_New( p_access, 65537 );
+        p_sys->p_partial_frame = p_block = block_New( p_access, 2 + MTU );
         if (p_block == NULL)
             return NULL;
     }
