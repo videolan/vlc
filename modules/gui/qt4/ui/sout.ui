@@ -5,14 +5,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>660</width>
-    <height>669</height>
+    <width>657</width>
+    <height>621</height>
    </rect>
   </property>
   <property name="sizePolicy" >
-   <sizepolicy>
-    <hsizetype>1</hsizetype>
-    <vsizetype>5</vsizetype>
+   <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -20,19 +18,11 @@
   <property name="windowTitle" >
    <string>_("Stream Output")</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
-    <number>6</number>
-   </property>
-   <item>
+  <layout class="QGridLayout" >
+   <item row="0" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox" >
      <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>1</hsizetype>
-       <vsizetype>5</vsizetype>
+      <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -41,18 +31,39 @@
       <string>_("Outputs")</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
       <property name="spacing" >
        <number>6</number>
       </property>
+      <property name="leftMargin" >
+       <number>9</number>
+      </property>
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
       <item>
        <layout class="QGridLayout" >
-        <property name="margin" >
+        <property name="leftMargin" >
          <number>3</number>
         </property>
-        <property name="spacing" >
+        <property name="topMargin" >
+         <number>3</number>
+        </property>
+        <property name="rightMargin" >
+         <number>3</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>3</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
          <number>6</number>
         </property>
         <item row="1" column="1" >
@@ -86,11 +97,11 @@
             <height>16777215</height>
            </size>
           </property>
-          <property name="maximum" >
-           <number>65535</number>
-          </property>
           <property name="minimum" >
            <number>1</number>
+          </property>
+          <property name="maximum" >
+           <number>65535</number>
           </property>
           <property name="singleStep" >
            <number>1</number>
@@ -256,11 +267,11 @@
             <height>16777215</height>
            </size>
           </property>
-          <property name="maximum" >
-           <number>65535</number>
-          </property>
           <property name="minimum" >
            <number>1</number>
+          </property>
+          <property name="maximum" >
+           <number>65535</number>
           </property>
           <property name="value" >
            <number>1234</number>
@@ -278,11 +289,11 @@
             <height>16777215</height>
            </size>
           </property>
-          <property name="maximum" >
-           <number>65535</number>
-          </property>
           <property name="minimum" >
            <number>1</number>
+          </property>
+          <property name="maximum" >
+           <number>65535</number>
           </property>
           <property name="value" >
            <number>1234</number>
@@ -294,298 +305,337 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QGroupBox" name="Encapsulation" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item row="1" column="0" colspan="2" >
+    <widget class="Line" name="line" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="title" >
-      <string>_("Encapsulation")</string>
-     </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item>
-       <widget class="QRadioButton" name="TSMux" >
-        <property name="text" >
-         <string>MPEG-TS</string>
-        </property>
-        <property name="checked" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="PSMux" >
-        <property name="text" >
-         <string>MPEG-PS</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="MPEG1Mux" >
-        <property name="text" >
-         <string>MPEG 1</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="OggMux" >
-        <property name="text" >
-         <string>Ogg</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="ASFMux" >
-        <property name="text" >
-         <string>ASF</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="MP4Mux" >
-        <property name="text" >
-         <string>MP4</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="MOVMux" >
-        <property name="text" >
-         <string>MOV</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="WAVMux" >
-        <property name="text" >
-         <string>WAV</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="RAWMux" >
-        <property name="text" >
-         <string>RAW</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="FLVMux" >
-        <property name="text" >
-         <string>FLV</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
-      <string>_("Transcoding")</string>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="label_3" >
+     <property name="text" >
+      <string>_("Profile")</string>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item>
-       <layout class="QGridLayout" >
-        <property name="margin" >
-         <number>3</number>
-        </property>
-        <property name="spacing" >
-         <number>6</number>
-        </property>
-        <item row="1" column="5" >
-         <widget class="QSpinBox" name="aChannels" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="maximum" >
-           <number>10</number>
-          </property>
-          <property name="minimum" >
-           <number>1</number>
-          </property>
-          <property name="value" >
-           <number>2</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2" >
-         <widget class="QLabel" name="aBitrateLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>_("Bitrate (kb/s)")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" >
-         <widget class="QCheckBox" name="transcodeVideo" >
-          <property name="text" >
-           <string>_("Video")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" >
-         <widget class="QCheckBox" name="transcodeAudio" >
-          <property name="text" >
-           <string>_("Audio")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2" >
-         <widget class="QLabel" name="vBitrateLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>_("Bitrate (kb/s)")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1" >
-         <widget class="QComboBox" name="aCodec" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" >
-         <widget class="QComboBox" name="vCodec" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="editable" >
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5" >
-         <widget class="QComboBox" name="vScale" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="editable" >
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="4" >
-         <widget class="QLabel" name="s_2" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>_("Channels")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="4" >
-         <widget class="QLabel" name="vScaleLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>_("Scale")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" >
-         <widget class="QCheckBox" name="transcodeSubs" >
-          <property name="text" >
-           <string>_("Subtitles")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" >
-         <widget class="QComboBox" name="sCodec" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2" colspan="4" >
-         <widget class="QCheckBox" name="sOverlay" >
-          <property name="enabled" >
-           <bool>true</bool>
-          </property>
-          <property name="text" >
-           <string>_("Overlay subtitles on the video")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3" >
-         <widget class="QSpinBox" name="vBitrate" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="maximum" >
-           <number>8192</number>
-          </property>
-          <property name="minimum" >
-           <number>8</number>
-          </property>
-          <property name="value" >
-           <number>800</number>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3" >
-         <widget class="QSpinBox" name="aBitrate" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="maximum" >
-           <number>512</number>
-          </property>
-          <property name="minimum" >
-           <number>8</number>
-          </property>
-          <property name="value" >
-           <number>128</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
     </widget>
    </item>
-   <item>
+   <item row="2" column="1" >
+    <widget class="QComboBox" name="comboBox" />
+   </item>
+   <item row="3" column="0" colspan="2" >
+    <widget class="QTabWidget" name="tabWidget" >
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab" >
+      <attribute name="title" >
+       <string>_("Encapsulation")</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <item row="0" column="0" >
+        <widget class="QRadioButton" name="TSMux" >
+         <property name="text" >
+          <string>MPEG-TS</string>
+         </property>
+         <property name="checked" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QRadioButton" name="OggMux" >
+         <property name="text" >
+          <string>Ogg</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" >
+        <widget class="QRadioButton" name="MOVMux" >
+         <property name="text" >
+          <string>MOV</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3" >
+        <widget class="QRadioButton" name="FLVMux" >
+         <property name="text" >
+          <string>FLV</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QRadioButton" name="PSMux" >
+         <property name="text" >
+          <string>MPEG-PS</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QRadioButton" name="ASFMux" >
+         <property name="text" >
+          <string>ASF</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2" >
+        <widget class="QRadioButton" name="WAVMux" >
+         <property name="text" >
+          <string>WAV</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QRadioButton" name="MPEG1Mux" >
+         <property name="text" >
+          <string>MPEG 1</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QRadioButton" name="MP4Mux" >
+         <property name="text" >
+          <string>MP4</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2" >
+        <widget class="QRadioButton" name="RAWMux" >
+         <property name="text" >
+          <string>RAW</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2" >
+      <attribute name="title" >
+       <string>_("Video Codec")</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <item row="0" column="0" >
+        <widget class="QCheckBox" name="transcodeVideo_2" >
+         <property name="text" >
+          <string>_("Video")</string>
+         </property>
+        </widget>
+       </item>
+       <item rowspan="2" row="0" column="1" >
+        <widget class="QComboBox" name="vCodec_2" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="editable" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="label_2" >
+         <property name="text" >
+          <string>_("Codec")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QLabel" name="vBitrateLabel_2" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="text" >
+          <string>_("Bitrate (kb/s)")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QSpinBox" name="vBitrate_2" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="minimum" >
+          <number>8</number>
+         </property>
+         <property name="maximum" >
+          <number>8192</number>
+         </property>
+         <property name="value" >
+          <number>800</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" >
+        <widget class="QLabel" name="vScaleLabel_2" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="text" >
+          <string>_("Scale")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QComboBox" name="vScale_2" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="editable" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3" >
+      <attribute name="title" >
+       <string>_("Audio Codec")</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <item row="0" column="0" >
+        <widget class="QCheckBox" name="transcodeAudio_2" >
+         <property name="text" >
+          <string>_("Audio")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="label" >
+         <property name="text" >
+          <string>_("Codec")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QComboBox" name="aCodec_2" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QLabel" name="aBitrateLabel_2" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="text" >
+          <string>_("Bitrate (kb/s)")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QSpinBox" name="aBitrate_2" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="minimum" >
+          <number>8</number>
+         </property>
+         <property name="maximum" >
+          <number>512</number>
+         </property>
+         <property name="value" >
+          <number>128</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" >
+        <widget class="QLabel" name="s_3" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="text" >
+          <string>_("Channels")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QSpinBox" name="aChannels_2" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="minimum" >
+          <number>1</number>
+         </property>
+         <property name="maximum" >
+          <number>10</number>
+         </property>
+         <property name="value" >
+          <number>2</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_4" >
+      <attribute name="title" >
+       <string>_("Subtitles")</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <item row="0" column="0" >
+        <widget class="QCheckBox" name="transcodeSubs_2" >
+         <property name="text" >
+          <string>_("Subtitles")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QComboBox" name="sCodec_2" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QCheckBox" name="sOverlay_2" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string>_("Overlay subtitles on the video")</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="title" >
       <string>_("Miscellaneous")</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
       <property name="spacing" >
        <number>6</number>
       </property>
+      <property name="leftMargin" >
+       <number>9</number>
+      </property>
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
       <item>
        <layout class="QGridLayout" >
-        <property name="margin" >
+        <property name="leftMargin" >
          <number>3</number>
         </property>
-        <property name="spacing" >
+        <property name="topMargin" >
+         <number>3</number>
+        </property>
+        <property name="rightMargin" >
+         <number>3</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>3</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
          <number>6</number>
         </property>
         <item row="0" column="0" >
@@ -620,11 +670,11 @@
           <property name="alignment" >
            <set>Qt::AlignRight</set>
           </property>
-          <property name="maximum" >
-           <number>255</number>
-          </property>
           <property name="minimum" >
            <number>1</number>
+          </property>
+          <property name="maximum" >
+           <number>255</number>
           </property>
          </widget>
         </item>
@@ -654,12 +704,10 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="5" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox_4" >
      <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>0</vsizetype>
+      <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -668,11 +716,20 @@
       <string>_("Generated stream output string")</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
       <property name="spacing" >
        <number>6</number>
+      </property>
+      <property name="leftMargin" >
+       <number>9</number>
+      </property>
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
       </property>
       <item>
        <widget class="QLineEdit" name="mrlEdit" />
@@ -680,13 +737,22 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="6" column="0" colspan="2" >
     <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
      <property name="spacing" >
       <number>6</number>
+     </property>
+     <property name="leftMargin" >
+      <number>0</number>
+     </property>
+     <property name="topMargin" >
+      <number>0</number>
+     </property>
+     <property name="rightMargin" >
+      <number>0</number>
+     </property>
+     <property name="bottomMargin" >
+      <number>0</number>
      </property>
      <item>
       <spacer>
@@ -990,182 +1056,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>transcodeVideo</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>vCodec</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>60</x>
-     <y>323</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>180</x>
-     <y>322</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>transcodeVideo</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>vBitrateLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>96</x>
-     <y>311</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>249</x>
-     <y>324</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>transcodeVideo</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>vScaleLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>27</x>
-     <y>319</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>463</x>
-     <y>322</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>transcodeVideo</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>vScale</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>26</x>
-     <y>322</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>567</x>
-     <y>327</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>transcodeSubs</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>sOverlay</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>44</x>
-     <y>378</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>336</x>
-     <y>376</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sOverlay</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>transcodeSubs</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>404</x>
-     <y>374</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>92</x>
-     <y>386</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>transcodeSubs</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>sCodec</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>27</x>
-     <y>375</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>177</x>
-     <y>381</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>transcodeAudio</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>aCodec</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>40</x>
-     <y>353</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>133</x>
-     <y>346</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>transcodeAudio</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>aBitrateLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>31</x>
-     <y>357</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>264</x>
-     <y>355</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>transcodeAudio</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>s_2</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>36</x>
-     <y>342</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>448</x>
-     <y>342</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>transcodeAudio</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>aChannels</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>26</x>
-     <y>343</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>574</x>
-     <y>347</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>fileOutput</sender>
    <signal>clicked(bool)</signal>
    <receiver>fileEdit</receiver>
@@ -1216,22 +1106,6 @@
   <connection>
    <sender>rawInput</sender>
    <signal>clicked(bool)</signal>
-   <receiver>Encapsulation</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>579</x>
-     <y>79</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>271</x>
-     <y>225</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rawInput</sender>
-   <signal>clicked(bool)</signal>
    <receiver>HTTPOutput</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
@@ -1242,22 +1116,6 @@
     <hint type="destinationlabel" >
      <x>24</x>
      <y>115</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rawInput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>groupBox_2</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>585</x>
-     <y>77</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>57</x>
-     <y>296</y>
     </hint>
    </hints>
   </connection>
@@ -1306,38 +1164,6 @@
     <hint type="destinationlabel" >
      <x>46</x>
      <y>141</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>transcodeVideo</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>vBitrate</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>28</x>
-     <y>322</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>365</x>
-     <y>316</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>transcodeAudio</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>aBitrate</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>28</x>
-     <y>349</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>370</x>
-     <y>352</y>
     </hint>
    </hints>
   </connection>

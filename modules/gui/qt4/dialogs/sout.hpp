@@ -25,6 +25,7 @@
 #define _SOUT_DIALOG_H_
 
 #include <vlc/vlc.h>
+#include <vlc_streaming.h>
 
 #include "ui/sout.h"
 #include "util/qvlcframe.hpp"
@@ -43,14 +44,21 @@ public:
     virtual ~SoutDialog() {}
 
     QString mrl;
+    //sout_gui_descr_t *sout;
 private:
     Ui::Sout ui;
+    
 public slots:
     void ok();
     void cancel();
     void updateMRL();
     void fileBrowse();
     void toggleSout();
+    void setOptions();
+    void setVTranscodeOptions(bool);
+    void setATranscodeOptions(bool);
+    void setSTranscodeOptions(bool);
+    void setRawOptions(bool);
 };
 
 #endif
