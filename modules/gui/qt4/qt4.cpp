@@ -209,16 +209,15 @@ static void Init( intf_thread_t *p_intf )
     int argc = 1;
 
     Q_INIT_RESOURCE( vlc );
+#ifndef WIN32
+    /* KLUDGE:
+     * disables icon theme use because that makes cleanlook style bug
+     * see commits 21610 21622 21654 for reference */
+    QApplication::setDesktopSettingsAware(false);
+#endif
     QApplication *app = new QApplication( argc, argv , true );
     app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
     p_intf->p_sys->p_app = app;
-
-#ifndef WIN32
-    /* kludge:
-     * forces plastique style as cleanlooks bugs on gnome */
-    QPlastiqueStyle *plastique = new QPlastiqueStyle;
-    app->setStyle( plastique );
-#endif
 
     // Initialize timers
     DialogsProvider::getInstance( p_intf );
