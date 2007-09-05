@@ -21,5 +21,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-void *bonjour_start_service( vlc_object_t *, char*, char *, int, char * );
+void *bonjour_start_service( vlc_object_t *, const char*, const char *, int,
+                             char * );
 void bonjour_stop_service( void * );

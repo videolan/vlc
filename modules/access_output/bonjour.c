@@ -26,6 +26,7 @@
  *****************************************************************************/
 
 #include <vlc/vlc.h>
+#include "bonjour.h"
 
 #ifdef HAVE_AVAHI_CLIENT
 #include <vlc_sout.h>
@@ -188,8 +189,8 @@ static void poll_iterate_thread( poll_thread_t *p_pt )
 /*****************************************************************************
  * bonjour_start_service
  *****************************************************************************/
-void *bonjour_start_service( vlc_object_t *p_log, char *psz_stype,
-                            char *psz_name, int i_port, char *psz_txt )
+void *bonjour_start_service( vlc_object_t *p_log, const char *psz_stype,
+                             const char *psz_name, int i_port, char *psz_txt )
 {
     int err;
     bonjour_t *p_sys;
