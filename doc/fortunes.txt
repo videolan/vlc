@@ -794,3 +794,15 @@ Meuuh changed the topic of #videolan to: Welcome! | <funman> i don't remember la
 < whyz> :O
   -- #videolan
 %
+< Mr_Mirsal> ./bootstrap
+< Mr_Mirsal> <StFS> trying that now
+< Mr_Mirsal> <StFS> damn this takes long. :-/
+< Mr_Mirsal> <thresh> good things always take long time
+  -- #videolan
+%
+< Mr_Mirsal> Oh, btw, I request a fortunes.txt update...
+< thresh> Mr_Mirsal: commit !
+< Mr_Mirsal> thresh: Eh ! I can't.
+< thresh> and i don't want to be a developer who only develops fortunes! :)
+  -- #videolan
+%
