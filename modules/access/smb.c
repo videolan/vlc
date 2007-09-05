@@ -109,8 +109,8 @@ struct access_sys_t
 static void Win32AddConnection( access_t *, char *, char *, char *, char * );
 #endif
 
-void smb_auth( const char *srv, const char *shr, char *wg, int wglen,
-               char *un, int unlen, char *pw, int pwlen )
+static void smb_auth( const char *srv, const char *shr, char *wg, int wglen,
+                      char *un, int unlen, char *pw, int pwlen )
 {
     //wglen = unlen = pwlen = 0;
 }
