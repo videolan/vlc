@@ -24,9 +24,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>                                               /* required */
 
 #include <vlc/vlc.h>
+#include <stdio.h>                                               /* required */
 
 #include "input/input_internal.h"
 
