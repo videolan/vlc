@@ -75,7 +75,8 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
     for (i = 0; i < _dyld_image_count(); i++)
     {
         char * psz_img_name = _dyld_get_image_name(i);
-        if( !strstr( psz_img_name, "VLC.framework/Version/Current/Framework/VLC" ) )
+		printf("%s\n", psz_img_name );
+        if( strstr( psz_img_name, "VLC.framework/Version/Current/VLC" ) )
             p_char = strdup( psz_img_name );
     }
 
