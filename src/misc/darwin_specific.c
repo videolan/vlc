@@ -67,9 +67,25 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     char i_dummy;
     char *p_char, *p_oldchar = &i_dummy;
+	int i;
 
     /* Get the full program path and name */
-    p_char = vlc_global()->psz_vlcpath = strdup( ppsz_argv[ 0 ] );
+
+    /* First try to see if we are linked to the framework */
+    for (i = 0; i < _dyld_image_count(); i++)
+    {
+        char * psz_img_name = _dyld_get_image_name(i);
+        if( !strstr( psz_img_name, "VLC.framework/Version/Current/Framework/VLC" ) )
+            p_char = strdup( psz_img_name );
+    }
+
+    if( !p_char )
+    {
+        /* We are not linked to the VLC.framework, return the executable path */
+        p_char = strdup( ppsz_argv[ 0 ] );
+    }
+
+	vlc_global()->psz_vlcpath = p_char;
 
     /* Remove trailing program name */
     for( ; *p_char ; )
