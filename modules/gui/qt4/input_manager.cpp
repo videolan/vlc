@@ -86,7 +86,6 @@ void InputManager::update()
     if( p_input->b_dead || p_input->b_die )
     {
         emit positionUpdated( 0.0, 0, 0 );
-        msg_Dbg( p_intf, "*********** NAV 0");
         emit navigationChanged( 0 );
         i_old_playing_status = 0;
         emit statusChanged( 0 ); // 0 = STOPPED, 1 = PLAY, 2 = PAUSE
@@ -115,13 +114,11 @@ void InputManager::update()
         val.i_int = 0;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
         if( val.i_int > 0 )
-        {
-            msg_Dbg( p_intf, "******* CHAPTER");
+        {          
             emit navigationChanged( 1 ); // 1 = chapter, 2 = title, 0 = NO
         }
         else
         {
-            msg_Dbg( p_intf, "******* TITLE");
             emit navigationChanged( 2 );
         }
     }
@@ -220,7 +217,7 @@ void InputManager::sectionNext()
 void InputManager::sectionMenu()
 {
     if( hasInput() )
-        var_SetInteger( p_input, "title 0", 2);
+        var_SetInteger( p_input, "title 0", 2 );
 }
 
 void InputManager::slower()
