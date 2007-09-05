@@ -2,12 +2,12 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2006 the VideoLAN team
- * $Id: subsdec.c 20996 2007-08-05 20:01:21Z jb $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Samuel Hocevar <sam@zoy.org>
  *          Derk-Jan Hartman <hartman at videolan dot org>
- *          Bernie Purcell <b dot purcell at adbglobal dot com>
+ *          Bernie Purcell <bitmap@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,9 +40,7 @@ static subpicture_t   *DecodeBlock   ( decoder_t *, block_t ** );
 static subpicture_t   *ParseText     ( decoder_t *, block_t * );
 static char           *StripTags      ( char * );
 static char           *CreateHtmlSubtitle ( char * );
-static int            ParseImageAttachments( decoder_t *p_dec );
 
-static int            ParsePositionAttributeList( char *, int *, int *, int * );
 
 /*****************************************************************************
  * Module descriptor.
@@ -142,7 +140,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     vlc_value_t    val;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','u','b','t') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('u','s','f',' ') &&
         p_dec->fmt_in.i_codec != VLC_FOURCC('s','s','a',' ') )
     {
         return VLC_EGENERIC;
@@ -231,17 +228,10 @@ static int OpenDecoder( vlc_object_t *p_this )
     var_Get( p_dec, "subsdec-align", &val );
     p_sys->i_align = val.i_int;
 
-    ParseImageAttachments( p_dec );
-
     if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','s','a',' ') && var_CreateGetBool( p_dec, "subsdec-formatted" ) )
     {
         if( p_dec->fmt_in.i_extra > 0 )
             ParseSSAHeader( p_dec );
-    }
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC('u','s','f',' ') && var_CreateGetBool( p_dec, "subsdec-formatted" ) )
-    {
-        if( p_dec->fmt_in.i_extra > 0 )
-            ParseUSFHeader( p_dec );
     }
 
     return VLC_SUCCESS;
@@ -425,8 +415,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Decode and format the subpicture unit */
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','s','a',' ') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('u','s','f',' ') )
+    if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','s','a',' ') )
     {
         /* Normal text subs, easy markup */
         p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
@@ -451,11 +440,6 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         /* Decode SSA/USF strings */
         if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','s','a',' ') )
             ParseSSAString( p_dec, psz_subtitle, p_spu );
-        else
-        {
-            p_spu->pf_destroy_region( VLC_OBJECT(p_dec), p_spu->p_region );
-            p_spu->p_region = ParseUSFString( p_dec, psz_subtitle, p_spu );
-        }
 
         p_spu->i_start = p_block->i_pts;
         p_spu->i_stop = p_block->i_pts + p_block->i_length;
@@ -467,331 +451,6 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     if( psz_subtitle ) free( psz_subtitle );
 
     return p_spu;
-}
-
-char *GrabAttributeValue( const char *psz_attribute,
-                                 const char *psz_tag_start )
-{
-    if( psz_attribute && psz_tag_start )
-    {
-        char *psz_tag_end = strchr( psz_tag_start, '>' );
-        char *psz_found   = strcasestr( psz_tag_start, psz_attribute );
-
-        if( psz_found )
-        {
-            psz_found += strlen( psz_attribute );
-
-            if(( *(psz_found++) == '=' ) &&
-               ( *(psz_found++) == '\"' ))
-            {
-                if( psz_found < psz_tag_end )
-                {
-                    int   i_len = strcspn( psz_found, "\"" );
-                    return strndup( psz_found, i_len );
-                }
-            }
-        }
-    }
-    return NULL;
-}
-
-static ssa_style_t *ParseStyle( decoder_sys_t *p_sys, char *psz_subtitle )
-{
-    ssa_style_t *p_style   = NULL;
-    char        *psz_style = GrabAttributeValue( "style", psz_subtitle );
-
-    if( psz_style )
-    {
-        int i;
-
-        for( i = 0; i < p_sys->i_ssa_styles; i++ )
-        {
-            if( !strcmp( p_sys->pp_ssa_styles[i]->psz_stylename, psz_style ) )
-                p_style = p_sys->pp_ssa_styles[i];
-        }
-        free( psz_style );
-    }
-    return p_style;
-}
-
-static int ParsePositionAttributeList( char *psz_subtitle, int *i_align,
-                                       int *i_x, int *i_y )
-{
-    int   i_mask = 0;
-
-    char *psz_align    = GrabAttributeValue( "alignment", psz_subtitle );
-    char *psz_margin_x = GrabAttributeValue( "horizontal-margin", psz_subtitle );
-    char *psz_margin_y = GrabAttributeValue( "vertical-margin", psz_subtitle );
-    /* -- UNSUPPORTED
-    char *psz_relative = GrabAttributeValue( "relative-to", psz_subtitle );
-    char *psz_rotate_x = GrabAttributeValue( "rotate-x", psz_subtitle );
-    char *psz_rotate_y = GrabAttributeValue( "rotate-y", psz_subtitle );
-    char *psz_rotate_z = GrabAttributeValue( "rotate-z", psz_subtitle );
-    */
-
-    *i_align = SUBPICTURE_ALIGN_BOTTOM;
-    *i_x = 0;
-    *i_y = 0;
-
-    if( psz_align )
-    {
-        if( !strcasecmp( "TopLeft", psz_align ) )
-            *i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
-        else if( !strcasecmp( "TopCenter", psz_align ) )
-            *i_align = SUBPICTURE_ALIGN_TOP;
-        else if( !strcasecmp( "TopRight", psz_align ) )
-            *i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT;
-        else if( !strcasecmp( "MiddleLeft", psz_align ) )
-            *i_align = SUBPICTURE_ALIGN_LEFT;
-        else if( !strcasecmp( "MiddleCenter", psz_align ) )
-            *i_align = 0;
-        else if( !strcasecmp( "MiddleRight", psz_align ) )
-            *i_align = SUBPICTURE_ALIGN_RIGHT;
-        else if( !strcasecmp( "BottomLeft", psz_align ) )
-            *i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
-        else if( !strcasecmp( "BottomCenter", psz_align ) )
-            *i_align = SUBPICTURE_ALIGN_BOTTOM;
-        else if( !strcasecmp( "BottomRight", psz_align ) )
-            *i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
-
-        i_mask |= ATTRIBUTE_ALIGNMENT;
-        free( psz_align );
-    }
-    if( psz_margin_x )
-    {
-        *i_x = atoi( psz_margin_x );
-        if( strchr( psz_margin_x, '%' ) )
-            i_mask |= ATTRIBUTE_X_PERCENT;
-        else
-            i_mask |= ATTRIBUTE_X;
-
-        free( psz_margin_x );
-    }
-    if( psz_margin_y )
-    {
-        *i_y = atoi( psz_margin_y );
-        if( strchr( psz_margin_y, '%' ) )
-            i_mask |= ATTRIBUTE_Y_PERCENT;
-        else
-            i_mask |= ATTRIBUTE_Y;
-
-        free( psz_margin_y );
-    }
-    return i_mask;
-}
-
-void SetupPositions( subpicture_region_t *p_region, char *psz_subtitle )
-{
-    int           i_mask = 0;
-    int           i_align;
-    int           i_x, i_y;
-
-    i_mask = ParsePositionAttributeList( psz_subtitle, &i_align, &i_x, &i_y );
-
-    if( i_mask & ATTRIBUTE_ALIGNMENT )
-        p_region->i_align = i_align;
-
-    /* TODO: Setup % based offsets properly, without adversely affecting
-     *       everything else in vlc. Will address with separate patch, to
-     *       prevent this one being any more complicated.
-     */
-    if( i_mask & ATTRIBUTE_X )
-        p_region->i_x = i_x;
-    else if( i_mask & ATTRIBUTE_X_PERCENT )
-        p_region->i_x = 0;
-
-    if( i_mask & ATTRIBUTE_Y )
-        p_region->i_y = i_y;
-    else if( i_mask & ATTRIBUTE_Y_PERCENT )
-        p_region->i_y = 0;
-}
-
-subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
-                                              subpicture_t *p_spu,
-                                              char *psz_subtitle,
-                                              int i_len,
-                                              int i_sys_align )
-{
-    decoder_sys_t        *p_sys = p_dec->p_sys;
-    subpicture_region_t  *p_text_region;
-    video_format_t        fmt;
-
-    /* Create a new subpicture region */
-    memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('T','E','X','T');
-    fmt.i_aspect = 0;
-    fmt.i_width = fmt.i_height = 0;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_text_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
-
-    if( p_text_region != NULL )
-    {
-        ssa_style_t  *p_style = NULL;
-
-        p_text_region->psz_text = NULL;
-        p_text_region->psz_html = strndup( psz_subtitle, i_len );
-        if( ! p_text_region->psz_html )
-        {
-            msg_Err( p_dec, "out of memory" );
-            p_spu->pf_destroy_region( VLC_OBJECT(p_dec), p_text_region );
-            return NULL;
-        }
-
-        p_style = ParseStyle( p_sys, p_text_region->psz_html );
-        if( !p_style )
-        {
-            int i;
-
-            for( i = 0; i < p_sys->i_ssa_styles; i++ )
-            {
-                if( !strcasecmp( p_sys->pp_ssa_styles[i]->psz_stylename, "Default" ) )
-                    p_style = p_sys->pp_ssa_styles[i];
-            }
-        }
-
-        if( p_style )
-        {
-            msg_Dbg( p_dec, "style is: %s", p_style->psz_stylename );
-
-            p_text_region->p_style = &p_style->font_style;
-            p_text_region->i_align = p_style->i_align;
-
-            /* TODO: Setup % based offsets properly, without adversely affecting
-             *       everything else in vlc. Will address with separate patch,
-             *       to prevent this one being any more complicated.
-
-                     * p_style->i_margin_percent_h;
-                     * p_style->i_margin_percent_v;
-             */
-            p_text_region->i_x         = p_style->i_margin_h;
-            p_text_region->i_y         = p_style->i_margin_v;
-
-        }
-        else
-        {
-            p_text_region->i_align = SUBPICTURE_ALIGN_BOTTOM | i_sys_align;
-            p_text_region->i_x = i_sys_align ? 20 : 0;
-            p_text_region->i_y = 10;
-        }
-        /* Look for position arguments which may override the style-based
-         * defaults.
-         */
-        SetupPositions( p_text_region, psz_subtitle );
-
-        p_text_region->p_next = NULL;
-    }
-    return p_text_region;
-}
-
-static int ParseImageAttachments( decoder_t *p_dec )
-{
-    decoder_sys_t        *p_sys = p_dec->p_sys;
-    input_attachment_t  **pp_attachments;
-    int                   i_attachments_cnt;
-    int                   k = 0;
-
-    if( VLC_SUCCESS != decoder_GetInputAttachments( p_dec, &pp_attachments, &i_attachments_cnt ))
-        return VLC_EGENERIC;
-
-    for( k = 0; k < i_attachments_cnt; k++ )
-    {
-        input_attachment_t *p_attach = pp_attachments[k];
-
-        vlc_fourcc_t  type  = 0;
-
-        if( ( !strcmp( p_attach->psz_mime, "image/bmp" ) )      || /* BMP */
-            ( !strcmp( p_attach->psz_mime, "image/x-bmp" ) )    ||
-            ( !strcmp( p_attach->psz_mime, "image/x-bitmap" ) ) ||
-            ( !strcmp( p_attach->psz_mime, "image/x-ms-bmp" ) ) )
-        {
-             type = VLC_FOURCC('b','m','p',' ');
-        }
-        else if( ( !strcmp( p_attach->psz_mime, "image/x-portable-anymap" ) )  || /* PNM */
-                 ( !strcmp( p_attach->psz_mime, "image/x-portable-bitmap" ) )  || /* PBM */
-                 ( !strcmp( p_attach->psz_mime, "image/x-portable-graymap" ) ) || /* PGM */
-                 ( !strcmp( p_attach->psz_mime, "image/x-portable-pixmap" ) ) )   /* PPM */
-        {
-            type = VLC_FOURCC('p','n','m',' ');
-        }
-        else if ( !strcmp( p_attach->psz_mime, "image/gif" ) )         /* GIF */
-            type = VLC_FOURCC('g','i','f',' ');
-        else if ( !strcmp( p_attach->psz_mime, "image/jpeg" ) )        /* JPG, JPEG */
-            type = VLC_FOURCC('j','p','e','g');
-        else if ( !strcmp( p_attach->psz_mime, "image/pcx" ) )         /* PCX */
-            type = VLC_FOURCC('p','c','x',' ');
-        else if ( !strcmp( p_attach->psz_mime, "image/png" ) )         /* PNG */
-            type = VLC_FOURCC('p','n','g',' ');
-        else if ( !strcmp( p_attach->psz_mime, "image/tiff" ) )        /* TIF, TIFF */
-            type = VLC_FOURCC('t','i','f','f');
-        else if ( !strcmp( p_attach->psz_mime, "image/x-tga" ) )       /* TGA */
-            type = VLC_FOURCC('t','g','a',' ');
-        else if ( !strcmp( p_attach->psz_mime, "image/x-xpixmap") )    /* XPM */
-            type = VLC_FOURCC('x','p','m',' ');
-
-        if( ( type != 0 ) &&
-            ( p_attach->i_data > 0 ) &&
-            ( p_attach->p_data != NULL ) )
-        {
-            picture_t         *p_pic = NULL;
-            image_handler_t   *p_image;
-
-            p_image = image_HandlerCreate( p_dec );
-            if( p_image != NULL )
-            {
-                block_t   *p_block;
-
-                p_block = block_New( p_image->p_parent, p_attach->i_data );
-
-                if( p_block != NULL )
-                {
-                    video_format_t     fmt_in;
-                    video_format_t     fmt_out;
-
-                    memcpy( p_block->p_buffer, p_attach->p_data, p_attach->i_data );
-
-                    memset( &fmt_in,  0, sizeof( video_format_t));
-                    memset( &fmt_out, 0, sizeof( video_format_t));
-
-                    fmt_in.i_chroma  = type;
-                    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-
-                    /* Find a suitable decoder module */
-                    if( module_Exists( p_dec, "sdl_image" ) )
-                    {
-                        /* ffmpeg thinks it can handle bmp properly but it can't (at least
-                         * not all of them), so use sdl_image if it is available */
-
-                        vlc_value_t val;
-
-                        var_Create( p_dec, "codec", VLC_VAR_MODULE | VLC_VAR_DOINHERIT );
-                        val.psz_string = (char*) "sdl_image";
-                        var_Set( p_dec, "codec", val );
-                    }
-
-                    p_pic = image_Read( p_image, p_block, &fmt_in, &fmt_out );
-                    var_Destroy( p_dec, "codec" );
-                }
-
-                image_HandlerDelete( p_image );
-            }
-            if( p_pic )
-            {
-                image_attach_t *p_picture = malloc( sizeof(image_attach_t) );
-
-                if( p_picture )
-                {
-                    p_picture->psz_filename = strdup( p_attach->psz_name );
-                    p_picture->p_pic = p_pic;
-
-                    TAB_APPEND( p_sys->i_images, p_sys->pp_images, p_picture );
-                }
-            }
-        }
-        vlc_input_attachment_Delete( pp_attachments[ k ] );
-    }
-    free( pp_attachments );
-
-    return VLC_SUCCESS;
 }
 
 char* GotoNextLine( char *psz_text )
@@ -1122,133 +781,4 @@ static char *CreateHtmlSubtitle( char *psz_subtitle )
         }
     }
     return psz_html_start;
-}
-
-/* The reverse of the above function - given a HTML subtitle, turn it
- * into a plain-text version, complete with sensible whitespace compaction
- */
-
-char *CreatePlainText( char *psz_subtitle )
-{
-    char *psz_text = StripTags( psz_subtitle );
-    char *s;
-
-    if( !psz_text )
-        return NULL;
-
-    s = strpbrk( psz_text, "\t\r\n " );
-    while( s )
-    {
-        int   k;
-        char  spc = ' ';
-        int   i_whitespace = strspn( s, "\t\r\n " );
-
-        /* Favour '\n' over other whitespaces - if one of these
-         * occurs in the whitespace use a '\n' as our value,
-         * otherwise just use a ' '
-         */
-        for( k = 0; k < i_whitespace; k++ )
-            if( s[k] == '\n' ) spc = '\n';
-
-        if( i_whitespace > 1 )
-        {
-            memmove( &s[1],
-                     &s[i_whitespace],
-                     strlen( s ) - i_whitespace + 1 );
-        }
-        *s++ = spc;
-
-        s = strpbrk( s, "\t\r\n " );
-    }
-    return psz_text;
-}
-
-/****************************************************************************
- * download and resize image located at psz_url
- ***************************************************************************/
-subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
-                                        subpicture_t *p_spu,
-                                        const char *psz_filename,
-                                        int i_transparent_color )
-{
-    decoder_sys_t         *p_sys = p_dec->p_sys;
-    subpicture_region_t   *p_region;
-    video_format_t         fmt_out;
-    int                    k;
-    picture_t             *p_pic = NULL;
-
-    for( k = 0; k < p_sys->i_images; k++ )
-    {
-        if( p_sys->pp_images &&
-            !strcmp( p_sys->pp_images[k]->psz_filename, psz_filename ) )
-        {
-            p_pic = p_sys->pp_images[k]->p_pic;
-            break;
-        }
-    }
-
-    if( !p_pic )
-    {
-        msg_Err( p_dec, "Unable to read image %s", psz_filename );
-        return NULL;
-    }
-
-    /* Display the feed's image */
-    memset( &fmt_out, 0, sizeof( video_format_t));
-
-    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-    fmt_out.i_aspect = VOUT_ASPECT_FACTOR;
-    fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
-    fmt_out.i_width =
-        fmt_out.i_visible_width = p_pic->p[Y_PLANE].i_visible_pitch;
-    fmt_out.i_height =
-        fmt_out.i_visible_height = p_pic->p[Y_PLANE].i_visible_lines;
-
-    p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt_out );
-    if( !p_region )
-    {
-        msg_Err( p_dec, "cannot allocate SPU region" );
-        return NULL;
-    }
-    vout_CopyPicture( p_dec, &p_region->picture, p_pic );
-
-    /* This isn't the best way to do this - if you really want transparency, then
-     * you're much better off using an image type that supports it like PNG. The
-     * spec requires this support though.
-     */
-    if( i_transparent_color > 0 )
-    {
-        uint8_t i_r = ( i_transparent_color >> 16 ) & 0xff;
-        uint8_t i_g = ( i_transparent_color >>  8 ) & 0xff;
-        uint8_t i_b = ( i_transparent_color       ) & 0xff;
-        uint8_t i_y = ( ( (  66 * i_r + 129 * i_g +  25 * i_b + 128 ) >> 8 ) + 16 );
-        uint8_t i_u =   ( ( -38 * i_r -  74 * i_g + 112 * i_b + 128 ) >> 8 ) + 128 ;
-        uint8_t i_v =   ( ( 112 * i_r -  94 * i_g -  18 * i_b + 128 ) >> 8 ) + 128 ;
-
-        if( ( p_region->picture.Y_PITCH == p_region->picture.U_PITCH ) &&
-            ( p_region->picture.Y_PITCH == p_region->picture.V_PITCH ) &&
-            ( p_region->picture.Y_PITCH == p_region->picture.A_PITCH ) )
-        {
-            int i_lines = p_region->picture.p[ Y_PLANE ].i_lines;
-            if( i_lines > p_region->picture.p[ U_PLANE ].i_lines )
-                i_lines = p_region->picture.p[ U_PLANE ].i_lines;
-            if( i_lines > p_region->picture.p[ V_PLANE ].i_lines )
-                i_lines = p_region->picture.p[ V_PLANE ].i_lines;
-            if( i_lines > p_region->picture.p[ A_PLANE ].i_lines )
-                i_lines = p_region->picture.p[ A_PLANE ].i_lines;
-
-            int   i;
-
-            for( i = 0; i < p_region->picture.A_PITCH * i_lines; i++ )
-            {
-                if(( p_region->picture.Y_PIXELS[ i ] == i_y ) &&
-                   ( p_region->picture.U_PIXELS[ i ] == i_u ) &&
-                   ( p_region->picture.V_PIXELS[ i ] == i_v ) )
-                {
-                    p_region->picture.A_PIXELS[ i ] = 1;
-                }
-            }
-        }
-    }
-    return p_region;
 }

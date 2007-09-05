@@ -7,7 +7,7 @@
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Samuel Hocevar <sam@zoy.org>
  *          Derk-Jan Hartman <hartman at videolan dot org>
- *          Bernie Purcell <b dot purcell at adbglobal dot com>
+ *          Bernie Purcell <bitmap@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -93,18 +93,6 @@ struct decoder_sys_t
 
 
 char                *GotoNextLine( char *psz_text );
-void                SetupPositions( subpicture_region_t *, char * );
-
-char                *GrabAttributeValue( const char *, const char * );
-subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, subpicture_t *p_spu,
-                        const char *psz_filename, int i_transparent_color );
-
-char                *CreatePlainText( char * );
-subpicture_region_t *CreateTextRegion( decoder_t *, subpicture_t *,
-                                        char *, int, int );
-
-void                ParseUSFHeader ( decoder_t * );
-subpicture_region_t *ParseUSFString ( decoder_t *, char *, subpicture_t * );
 
 void                ParseSSAHeader ( decoder_t * );
 void                ParseSSAString ( decoder_t *, char *, subpicture_t * );

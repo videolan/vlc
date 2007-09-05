@@ -2,12 +2,11 @@
  * subsass.c : ASS/SSA subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2006 the VideoLAN team
- * $Id: subsdec.c 20996 2007-08-05 20:01:21Z jb $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *          Samuel Hocevar <sam@zoy.org>
  *          Derk-Jan Hartman <hartman at videolan dot org>
- *          Bernie Purcell <b dot purcell at adbglobal dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
