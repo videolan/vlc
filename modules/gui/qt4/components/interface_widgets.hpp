@@ -119,8 +119,8 @@ private:
 private slots:
     void normal();
     void snapshot();
-    void fullscreen();
     void frame();
+    void fromAtoB();
     void record();
 };
 
@@ -170,7 +170,7 @@ private slots:
     void slower();
     void toggleAdvanced();
 signals:
-    void advancedControlsShowed( bool );
+    void advancedControlsToggled( bool );
 };
 
 class VolumeClickHandler : public QObject

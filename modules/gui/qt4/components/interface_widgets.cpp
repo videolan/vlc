@@ -229,7 +229,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     ABButton->setMaximumSize( QSize( 26, 26 ) );
     ABButton->setIconSize( QSize( 20, 20 ) );
     advLayout->addWidget( ABButton );
-    BUTTON_SET_ACT( ABButton, "AB", qtr( "A to B" ), normal() );
+    BUTTON_SET_ACT( ABButton, "AB", qtr( "A to B" ), fromAtoB() );
 
     snapshotButton = new QPushButton( "S" );
     snapshotButton->setMaximumSize( QSize( 26, 26 ) );
@@ -287,23 +287,20 @@ void AdvControlsWidget::snapshot()
 {
 }
 
-void AdvControlsWidget::fullscreen()
-{
-}
-
 void AdvControlsWidget::frame(){}
+void AdvControlsWidget::fromAtoB(){}
 void AdvControlsWidget::record(){}
 
 /*****************************
  * DA Control Widget !
  *****************************/
-
 ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
                              QFrame( NULL ), p_intf( _p_i )
 {
     //QSize size( 500, 200 );
     //resize( size );
     controlLayout = new QGridLayout( this );
+    
 #if DEBUG_COLOR
     QPalette palette2;
     palette2.setColor(this->backgroundRole(), Qt::magenta);
@@ -312,7 +309,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
 
     /** The main Slider **/
     slider = new InputSlider( Qt::Horizontal, NULL );
-    controlLayout->addWidget( slider, 0, 1, 1, 15 );
+    controlLayout->addWidget( slider, 0, 1, 1, 16 );
     /* Update the position when the IM has changed */
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              slider, setPosition( float,int, int ) );
@@ -328,7 +325,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
 
     fasterButton = new QPushButton( "F" );
     BUTTON_SET_ACT( fasterButton, "F", qtr( "Faster" ), faster() );
-    controlLayout->addWidget( fasterButton, 0, 16 );
+    controlLayout->addWidget( fasterButton, 0, 17 );
     fasterButton->setMaximumSize( QSize( 26, 20 ) );
 
     /** TODO: Insert here the AdvControls Widget 
@@ -361,7 +358,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     setupSmallButton( nextSectionButton );
     discLayout->addWidget( nextSectionButton );
 
-    controlLayout->addWidget( discFrame, 1, 10, 2, 4, Qt::AlignBottom );
+    controlLayout->addWidget( discFrame, 1, 10, 2, 3, Qt::AlignBottom );
 
     BUTTON_SET_IMG( prevSectionButton, "", previous.png, "" );
     BUTTON_SET_IMG( nextSectionButton, "", next.png, "" );
@@ -397,6 +394,9 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     playButton->setIconSize( QSize( 30, 30 ) );
 
     controlLayout->addWidget( playButton, 2, 0, 2, 2, Qt::AlignBottom );
+    
+    controlLayout->setColumnMinimumWidth( 2, 20 );
+    controlLayout->setColumnStretch( 2, 0 );
 
     /** Prev + Stop + Next Block **/
     QHBoxLayout *controlButLayout = new QHBoxLayout;
@@ -432,6 +432,9 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     BUTTON_SET_ACT_I( nextButton, "", next.png, qtr( "Next" ), next() );
     BUTTON_SET_ACT_I( stopButton, "", stop.png, qtr( "Stop" ), stop() );
 
+    controlLayout->setColumnStretch( 8 , 10 );
+    controlLayout->setColumnStretch( 9, 0 );
+    
     /*
      * Other first Line buttons
      * Might need to be inside a frame to avoid a few resizing pb
@@ -462,6 +465,8 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
             prefs() );
     setupSmallButton( prefsButton );
     controlLayout->addWidget( prefsButton, 3, 13 );
+    
+    controlLayout->setColumnStretch( 14, 5 );
 
     /* Volume */
     VolumeClickHandler *h = new VolumeClickHandler( p_intf, this );
@@ -486,8 +491,8 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
 
     volumeSlider->setMaximum( 100 );
     volumeSlider->setFocusPolicy( Qt::NoFocus );
-    controlLayout->addWidget( volMuteLabel, 3, 14 );
-    controlLayout->addWidget( volumeSlider, 3, 15, 1, 2 );
+    controlLayout->addWidget( volMuteLabel, 3, 15 );
+    controlLayout->addWidget( volumeSlider, 3, 16, 1, 2 );
 
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
@@ -503,10 +508,11 @@ void ControlsWidget::stop()
 
 void ControlsWidget::play()
 {
+    if( THEPL )
+        msg_Dbg( p_intf, "Nothing to play yet, open a file %i", THEPL->items.i_size );
     if( playlist_IsEmpty( THEPL ) )
     {
         /* The playlist is empty, open a file requester */
-        msg_Dbg( p_intf, "Nothing to play yet, open a file" );
         THEDP->openFileDialog();
         setStatus( 0 );
         return;
@@ -537,16 +543,12 @@ void ControlsWidget::setNavigation( int navigation )
     {
         discFrame->hide();
     } else if( navigation == 1 ) {
-        prevSectionButton->show();
         prevSectionButton->setToolTip( qfu( HELP_PCH ) );
-        nextSectionButton->show();
         nextSectionButton->setToolTip( qfu( HELP_NCH ) );
         menuButton->show();
         discFrame->show();
     } else {
-        prevSectionButton->show();
         prevSectionButton->setToolTip( qfu( HELP_PCH ) );
-        nextSectionButton->show();
         nextSectionButton->setToolTip( qfu( HELP_NCH ) );
         menuButton->hide();
         discFrame->show();
@@ -566,6 +568,7 @@ void ControlsWidget::updateVolume( int sliderVolume )
 
 void ControlsWidget::updateOnTimer()
 {
+    /* Audio part */
     audio_volume_t i_volume;
     aout_VolumeGet( p_intf, &i_volume );
     i_volume = ( i_volume *  200 )/ AOUT_VOLUME_MAX ;
@@ -578,6 +581,7 @@ void ControlsWidget::updateOnTimer()
         b_my_volume = false;
     }
 
+    /* Activate the interface buttons according to the presence of the input */
     enableInput( THEMIM->getIM()->hasInput() );
     enableVideo( THEMIM->getIM()->hasVideo() );
 }
@@ -605,7 +609,11 @@ void ControlsWidget::setStatus( int status )
  */
 void ControlsWidget::fullscreen()
 {
-    msg_Dbg( p_intf, "Not implemented yet" );
+    vlc_object_t *p_vout = (vlc_object_t *)vlc_object_find( p_intf,
+                VLC_OBJECT_VOUT, FIND_CHILD );
+    if( p_vout)
+        var_SetBool( p_vout, "fullscreen", VLC_TRUE );
+    //msg_Dbg( p_intf, "Not implemented yet" );
 }
 
 void ControlsWidget::extSettings()
@@ -638,7 +646,7 @@ void ControlsWidget::enableInput( bool enable )
 }
 
 void ControlsWidget::enableVideo( bool enable )
-{
+{  
     // TODO Later make the fullscreenButton toggle Visualisation and so on.
     fullscreenButton->setEnabled( enable );
 
@@ -659,7 +667,7 @@ void ControlsWidget::toggleAdvanced()
         b_advancedVisible = false;
     }
     //FIXME connect this one :D
-    emit advancedControlsShowed( b_advancedVisible );  //  doComponentsUpdate();
+    emit advancedControlsToggled( b_advancedVisible );  //  doComponentsUpdate();
 }
 
 /**********************************************************************
