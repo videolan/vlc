@@ -27,13 +27,13 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
-
 #include <vlc/vlc.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
 #include <vlc_keys.h>
+
+#include <errno.h>                                                 /* ENOMEM */
 
 #ifdef HAVE_MACHINE_PARAM_H
     /* BSD */
