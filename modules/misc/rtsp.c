@@ -924,6 +924,11 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
         {
             psz_playnow = httpd_MsgGet( query, "x-playNow" );
             psz_transport = httpd_MsgGet( query, "Transport" );
+            if( psz_transport == NULL )
+            {
+                answer->i_status = 400;
+                break;
+            }
             msg_Dbg( p_vod, "HTTPD_MSG_SETUP: transport=%s", psz_transport );
 
             if( strstr( psz_transport, "unicast" ) &&
