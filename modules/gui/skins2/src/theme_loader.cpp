@@ -52,7 +52,7 @@
 #if defined( HAVE_ZLIB_H )
 #   include <zlib.h>
 #   include <errno.h>
-int gzopen_frontend ( char *pathname, int oflags, int mode );
+int gzopen_frontend ( const char *pathname, int oflags, int mode );
 int gzclose_frontend( int );
 int gzread_frontend ( int, void *, size_t );
 int gzwrite_frontend( int, const void *, size_t );
