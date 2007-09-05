@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>657</width>
-    <height>621</height>
+    <width>617</width>
+    <height>653</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -31,21 +31,6 @@
       <string>_("Outputs")</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <property name="leftMargin" >
-       <number>9</number>
-      </property>
-      <property name="topMargin" >
-       <number>9</number>
-      </property>
-      <property name="rightMargin" >
-       <number>9</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>9</number>
-      </property>
       <item>
        <layout class="QGridLayout" >
         <property name="leftMargin" >
@@ -59,12 +44,6 @@
         </property>
         <property name="bottomMargin" >
          <number>3</number>
-        </property>
-        <property name="horizontalSpacing" >
-         <number>6</number>
-        </property>
-        <property name="verticalSpacing" >
-         <number>6</number>
         </property>
         <item row="1" column="1" >
          <widget class="QLabel" name="fileLabel" >
@@ -96,6 +75,9 @@
             <width>90</width>
             <height>16777215</height>
            </size>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <property name="minimum" >
            <number>1</number>
@@ -267,6 +249,9 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
           <property name="minimum" >
            <number>1</number>
           </property>
@@ -288,6 +273,9 @@
             <width>90</width>
             <height>16777215</height>
            </size>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <property name="minimum" >
            <number>1</number>
@@ -322,10 +310,10 @@
    <item row="2" column="1" >
     <widget class="QComboBox" name="comboBox" />
    </item>
-   <item row="3" column="0" colspan="2" >
+   <item row="4" column="0" colspan="2" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
@@ -336,9 +324,6 @@
         <widget class="QRadioButton" name="TSMux" >
          <property name="text" >
           <string>MPEG-TS</string>
-         </property>
-         <property name="checked" >
-          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -451,6 +436,15 @@
          <property name="enabled" >
           <bool>false</bool>
          </property>
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="accelerated" >
+          <bool>true</bool>
+         </property>
+         <property name="suffix" >
+          <string> kb/s</string>
+         </property>
          <property name="minimum" >
           <number>8</number>
          </property>
@@ -525,6 +519,12 @@
          <property name="enabled" >
           <bool>false</bool>
          </property>
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="suffix" >
+          <string> kb/s</string>
+         </property>
          <property name="minimum" >
           <number>8</number>
          </property>
@@ -550,6 +550,9 @@
         <widget class="QSpinBox" name="aChannels_2" >
          <property name="enabled" >
           <bool>false</bool>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
          <property name="minimum" >
           <number>1</number>
@@ -597,7 +600,7 @@
      </widget>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2" >
+   <item row="5" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="title" >
       <string>_("Miscellaneous")</string>
@@ -632,12 +635,6 @@
         <property name="bottomMargin" >
          <number>3</number>
         </property>
-        <property name="horizontalSpacing" >
-         <number>6</number>
-        </property>
-        <property name="verticalSpacing" >
-         <number>6</number>
-        </property>
         <item row="0" column="0" >
          <widget class="QCheckBox" name="sap" >
           <property name="enabled" >
@@ -668,7 +665,7 @@
         <item row="1" column="4" >
          <widget class="QSpinBox" name="ttl" >
           <property name="alignment" >
-           <set>Qt::AlignRight</set>
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
           <property name="minimum" >
            <number>1</number>
@@ -704,7 +701,7 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2" >
+   <item row="6" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox_4" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
@@ -716,32 +713,14 @@
       <string>_("Generated stream output string")</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <property name="leftMargin" >
-       <number>9</number>
-      </property>
-      <property name="topMargin" >
-       <number>9</number>
-      </property>
-      <property name="rightMargin" >
-       <number>9</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>9</number>
-      </property>
       <item>
        <widget class="QLineEdit" name="mrlEdit" />
       </item>
      </layout>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2" >
+   <item row="7" column="0" colspan="2" >
     <layout class="QHBoxLayout" >
-     <property name="spacing" >
-      <number>6</number>
-     </property>
      <property name="leftMargin" >
       <number>0</number>
      </property>
@@ -769,15 +748,19 @@
      </item>
      <item>
       <widget class="QDialogButtonBox" name="acceptButtonBox" >
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
        <property name="standardButtons" >
         <set>QDialogButtonBox::NoButton</set>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="3" column="0" colspan="2" >
+    <widget class="Line" name="line_2" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
