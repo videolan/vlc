@@ -188,32 +188,32 @@ void StandardPLPanel::setCurrentRootId( int _new )
 
 void StandardPLPanel::add()
 {
-    QMenu *popup = new QMenu();
+    QMenu popup;
     if( currentRootId == THEPL->p_local_category->i_id ||
         currentRootId == THEPL->p_local_onelevel->i_id )
     {
-        popup->addAction( qtr(I_PL_ADDF), THEDP, SLOT(simplePLAppendDialog()));
-        popup->addAction( qtr(I_PL_ADVADD), THEDP, SLOT(PLAppendDialog()) );
-        popup->addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
+        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT(simplePLAppendDialog()));
+        popup.addAction( qtr(I_PL_ADVADD), THEDP, SLOT(PLAppendDialog()) );
+        popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
     }
     else if( currentRootId == THEPL->p_ml_category->i_id ||
              currentRootId == THEPL->p_ml_onelevel->i_id )
     {
-        popup->addAction( qtr(I_PL_ADDF), THEDP, SLOT(simpleMLAppendDialog()));
-        popup->addAction( qtr(I_PL_ADVADD), THEDP, SLOT( MLAppendDialog() ) );
-        popup->addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
+        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT(simpleMLAppendDialog()));
+        popup.addAction( qtr(I_PL_ADVADD), THEDP, SLOT( MLAppendDialog() ) );
+        popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
     }
-    popup->popup( QCursor::pos() );
+    popup.exec( QCursor::pos() );
 }
 
 void StandardPLPanel::popupSelectColumn( QPoint )
 {     
     ContextUpdateMapper = new QSignalMapper(this);
 
-    QMenu *selectColMenu = new QMenu( qtr("Show columns") );
+    QMenu selectColMenu;
 
 #define ADD_META_ACTION( meta ) { \
-   QAction* option = selectColMenu->addAction( qfu(VLC_META_##meta) );     \
+   QAction* option = selectColMenu.addAction( qfu(VLC_META_##meta) );     \
    option->setCheckable( true );                                           \
    option->setChecked( model->shownFlags() & VLC_META_ENGINE_##meta );   \
    ContextUpdateMapper->setMapping( option, VLC_META_ENGINE_##meta );      \
@@ -232,7 +232,7 @@ void StandardPLPanel::popupSelectColumn( QPoint )
 
 #undef ADD_META_ACTION
     
-    selectColMenu->popup( QCursor::pos() );
+    selectColMenu.exec( QCursor::pos() );
  }
 
 void StandardPLPanel::clearFilter()

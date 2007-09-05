@@ -75,7 +75,7 @@ private:
     QPushButton *repeatButton , *randomButton,*addButton;
     ClickLineEdit *searchLine;
     int currentRootId;
-QSignalMapper *ContextUpdateMapper;
+    QSignalMapper *ContextUpdateMapper;
 public slots:
     void removeItem( int );
     virtual void setRoot( int );
