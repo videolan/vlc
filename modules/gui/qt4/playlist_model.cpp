@@ -1073,6 +1073,7 @@ void PLModel::popupSave()
 }
 
 #ifdef WIN32
+#include <shellapi.h>
 void PLModel::popupExplore()
 {
     ShellExecuteW(NULL, L"explore", L"C:\\", NULL, NULL, SW_SHOWNORMAL );

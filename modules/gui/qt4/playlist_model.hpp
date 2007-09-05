@@ -198,6 +198,7 @@ private slots:
     void popupInfo();
     void popupStream();
     void popupSave();
+    void popupExplore();
     void viewchanged( int );
 friend class PLItem;
 };
