@@ -617,7 +617,6 @@ modules/gui/qt4/components/preferences_widgets.cpp
 modules/gui/qt4/components/preferences_widgets.hpp
 modules/gui/qt4/components/simple_preferences.cpp
 modules/gui/qt4/components/simple_preferences.hpp
-modules/gui/qt4/dialogs/about.hpp
 modules/gui/qt4/dialogs/errors.cpp
 modules/gui/qt4/dialogs/errors.hpp
 modules/gui/qt4/dialogs/extended.cpp

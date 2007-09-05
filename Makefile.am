@@ -986,6 +986,8 @@ package-translations:
 
 ###############################################################################
 # PO translation files update
+# Generate po/POTFILES.in which lists all the files containing translatable
+# strings. Find all source files and remove the generated files
 ###############################################################################
 .PHONY: update-po
 
@@ -1003,7 +1005,7 @@ update-po:
 	  echo "# modules" ; \
 	  find modules -name '*.[chm]' -o -name '*.[ch]pp' -o -wholename 'modules/gui/qt4/ui/*.ui'\
 	    | grep -v '\(\.moc\.\|gui/gtk2/\)' \
-	    | grep -vE 'qt4/ui/.*.h' |grep -v qt4/resources.cpp \
+	    | grep -vE 'qt4/ui/.*.h' |grep -v 'qt4/resources.cpp\|qt4/dialogs/about.hpp' \
 	    | sort ; \
 	} > $(top_srcdir)/po/POTFILES.in
 	rm -f $(top_srcdir)/po/vlc.pot
