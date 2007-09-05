@@ -236,8 +236,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     return p_outpic;
 }
 
-inline uint8_t crop( int a );
-inline uint8_t crop( int a )
+static inline uint8_t crop( int a )
 {
     if( a < 0 ) return 0;
     if( a > 255 ) return 255;
