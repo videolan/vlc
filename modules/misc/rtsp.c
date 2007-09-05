@@ -26,8 +26,6 @@
  * Preamble
  *****************************************************************************/
 
-#include <errno.h>
-
 #include <vlc/vlc.h>
 #include <vlc_input.h>
 #include <vlc_sout.h>
@@ -39,6 +37,8 @@
 #include <vlc_network.h>
 #include <vlc_charset.h>
 #include <vlc_strings.h>
+
+#include <errno.h>
 
 /*****************************************************************************
  * Module descriptor

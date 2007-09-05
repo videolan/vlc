@@ -25,16 +25,16 @@
  * Preamble
  *****************************************************************************/
 
+#include <vlc/vlc.h>
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
+#include <vlc_charset.h>
+
 #include <errno.h>                                                 /* ENOMEM */
 
 #ifdef UNDER_CE
 #   define _IONBF 0x0004
 #endif
-
-#include <vlc/vlc.h>
-#include <vlc_interface.h>
-#include <vlc_playlist.h>
-#include <vlc_charset.h>
 
 #define MODE_TEXT 0
 #define MODE_HTML 1

@@ -1,4 +1,3 @@
-#include <time.h>
 /*****************************************************************************
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
@@ -28,10 +27,6 @@
  * Preamble
  *****************************************************************************/
 
-#ifdef HAVE_LINUX_LIMITS_H
-#   include <linux/limits.h>
-#endif
-
 #include <vlc/vlc.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
@@ -41,11 +36,13 @@
 #include <vlc_xml.h>
 #include <vlc_input.h>
 
-#include <math.h>
-
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>
+#ifdef HAVE_LINUX_LIMITS_H
+#   include <linux/limits.h>
 #endif
+
+#include <time.h>
+#include <math.h>
+#include <errno.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
