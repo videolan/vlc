@@ -400,7 +400,7 @@ void DialogsProvider::streamingDialog( QString mrl, bool b_transcode_only )
         /* Just do it */
         int i_len = strlen( qtu(s->mrl) ) + 10;
         char *psz_option = (char*)malloc(i_len);
-        snprintf( psz_option, i_len - 1, ":sout=%s", qtu(s->mrl));
+        snprintf( psz_option, i_len - 1, "%s", qtu(s->mrl));
 
         playlist_AddExt( THEPL, qtu( mrl ), "Streaming",
                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,

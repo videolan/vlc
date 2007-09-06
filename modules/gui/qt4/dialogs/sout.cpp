@@ -89,7 +89,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
                                                 "when you change the above settings,\n but you can update it manually." ) ) ;
 
 //     /* Connect everything to the updateMRL function */
- #define CB( x ) CONNECT( ui.x, clicked( bool ), this, updateMRL() );
+ #define CB( x ) CONNECT( ui.x, toggled( bool ), this, updateMRL() );
  #define CT( x ) CONNECT( ui.x, textChanged( const QString ), this, updateMRL() );
  #define CS( x ) CONNECT( ui.x, valueChanged( int ), this, updateMRL() );
  #define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateMRL() );
@@ -127,6 +127,11 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     BUTTONACT( cancelButton, cancel() );
 
     if( b_transcode_only ) toggleSout();
+}
+
+QString SoutDialog::getMrl()
+{
+    return this->mrl;
 }
 
 void SoutDialog::fileBrowse()
@@ -256,6 +261,7 @@ void SoutDialog::updateMRL()
 {
     sout_gui_descr_t sout;
     memset( &sout, 0, sizeof( sout_gui_descr_t ) );
+    int counter = 0;
 
     sout.b_local = ui.localOutput->isChecked();
     sout.b_file = ui.fileOutput->isChecked();
@@ -280,6 +286,22 @@ void SoutDialog::updateMRL()
     sout.f_scale = atof( qta( ui.vScaleBox->currentText() ) );
     sout.psz_group = strdup( qtu( ui.sapGroup->text() ) );
     sout.psz_name = strdup( qtu( ui.sapName->text() ) );
+
+#define COUNT() \
+{ \
+    if ( sout.b_local ) \
+        counter += 1; \
+    if ( sout.b_file ) \
+        counter += 1; \
+    if ( sout.b_http ) \
+        counter += 1; \
+    if ( sout.b_mms ) \
+        counter += 1; \
+    if ( sout.b_udp ) \
+        counter += 1; \
+}
+
+COUNT()
 
 #define SMUX( x, txt ) if( ui.x->isChecked() ) sout.psz_mux = strdup( txt );
     SMUX( PSMux, "ps" );
@@ -340,26 +362,39 @@ void SoutDialog::updateMRL()
 
 #define ISMORE() if ( more ) mrl.append( "," );
 
-        if ( trans )
-        {
-            mrl.append( ":duplicate{" );
+#define ATLEASTONE() \
+        if ( counter > 1 ) \
+        { \
+            mrl.append( "dst=" ); \
         }
-        else
+
+    if ( trans )
+    {
+        mrl.append( ":" );
+    }
+    else
         {
             mrl = ":sout=#";
+        }
+
+        if ( counter > 1 )
+        {
+            mrl.append( "duplicate{" );
         }
 
         if ( sout.b_local )
         {
             ISMORE();
-            mrl.append( "dst=display" );
+            ATLEASTONE()
+            mrl.append( "display" );
             more = true;
         }
 
         if ( sout.b_file )
         {
             ISMORE();
-            mrl.append( "dst=std{access=file,mux=" );
+        ATLEASTONE()
+            mrl.append( "std{access=file,mux=" );
             mrl.append( sout.psz_mux );
             mrl.append( ",dst=" );
             mrl.append( sout.psz_file );
@@ -370,7 +405,8 @@ void SoutDialog::updateMRL()
         if ( sout.b_http )
         {
             ISMORE();
-            mrl.append( "dst=std{access=http,mux=" );
+            ATLEASTONE()
+            mrl.append( "std{access=http,mux=" );
             mrl.append( sout.psz_mux );
             mrl.append( ",dst=" );
             mrl.append( sout.psz_http );
@@ -383,7 +419,8 @@ void SoutDialog::updateMRL()
         if ( sout.b_mms )
         {
             ISMORE();
-            mrl.append( "dst=std{access=mmsh,mux=" );
+            ATLEASTONE()
+            mrl.append( "std{access=mmsh,mux=" );
             mrl.append( sout.psz_mux );
             mrl.append( ",dst=" );
             mrl.append( sout.psz_mms );
@@ -396,7 +433,8 @@ void SoutDialog::updateMRL()
         if ( sout.b_udp )
         {
             ISMORE();
-            mrl.append( "dst=std{access=udp,mux=" );
+            ATLEASTONE()
+            mrl.append( "std{access=udp,mux=" );
             mrl.append( sout.psz_mux );
             mrl.append( ",dst=" );
             mrl.append( sout.psz_udp );
@@ -416,7 +454,7 @@ void SoutDialog::updateMRL()
             more = true;
         }
 
-        if ( trans )
+        if ( counter > 1 )
         {
             mrl.append( "}" );
         }
