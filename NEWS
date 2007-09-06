@@ -16,11 +16,11 @@ Important notes:
    - On Mac OS X, you can find it in VLC.app/Contents/MacOS/share/http/.hosts
      and respectively in VLC.app/Contents/MacOS/share/http/old/.hosts
  * This version of VLC contains a new interface for Windows and Linux. This
-   interface lacks a few features that used to be present in vlc 0.8.6: 
+   interface lacks a few features that used to be present in vlc 0.8.6:
    - "Streaming wizard" and "VLM control". These features will be replaced
      by a better alternative in the next version. If you absolutely need these
      features, we advise you to keep vlc 0.8.6
-   - Similarly, "Bookmarks" will be reintroduced in an improved version at a 
+   - Similarly, "Bookmarks" will be reintroduced in an improved version at a
      later point
   * The default for --sout-keep has changed. It's now activated by default.
   * The marq, mosaic and logo commands in the rc interface changed. They
@@ -90,9 +90,10 @@ Video output and filters:
  * Support for Intel SSE2 intruction set in chroma converters
  * Improved use of Intel MMX intruction set in chroma converters
 
-Audio output
+Audio output and filters
  * Replay gain support.
- * Play audio when going slower/faster ( no pitch filter yet )
+ * Play audio when going slower/faster ( no pitch filter yet ).
+ * New spatializer audio filter.
 
 Stream output:
  * UDP-Lite (requires OS support) for RTP/TS encapsulation
