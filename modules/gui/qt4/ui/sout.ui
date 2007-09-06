@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>617</width>
-    <height>653</height>
+    <height>678</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -33,13 +33,10 @@
      <layout class="QHBoxLayout" >
       <item>
        <layout class="QGridLayout" >
-        <item row="1" column="1" >
-         <widget class="QLabel" name="fileLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
+        <item row="0" column="0" >
+         <widget class="QCheckBox" name="localOutput" >
           <property name="text" >
-           <string>_("Filename")</string>
+           <string>_("Play locally")</string>
           </property>
          </widget>
         </item>
@@ -50,6 +47,80 @@
           </property>
           <property name="text" >
            <string>_("File")</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" >
+         <widget class="QLabel" name="fileLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Filename")</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" >
+         <widget class="QLineEdit" name="fileEdit" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" >
+         <widget class="QPushButton" name="fileSelectButton" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Browse...")</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4" >
+         <widget class="QCheckBox" name="rawInput" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Dump raw input")</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" >
+         <widget class="QCheckBox" name="HTTPOutput" >
+          <property name="text" >
+           <string>HTTP</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" >
+         <widget class="QLabel" name="HTTPLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Address")</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2" >
+         <widget class="QLineEdit" name="HTTPEdit" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3" >
+         <widget class="QLabel" name="HTTPPortLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Port:")</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -81,18 +152,25 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="4" >
-         <widget class="QCheckBox" name="rawInput" >
+        <item row="3" column="0" >
+         <widget class="QCheckBox" name="MMSHOutput" >
+          <property name="text" >
+           <string>MMSH</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" >
+         <widget class="QLabel" name="MMSHLabel" >
           <property name="enabled" >
            <bool>false</bool>
           </property>
           <property name="text" >
-           <string>_("Dump raw input")</string>
+           <string>_("Address")</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="2" >
-         <widget class="QLineEdit" name="fileEdit" >
+        <item row="3" column="2" >
+         <widget class="QLineEdit" name="MMSHEdit" >
           <property name="enabled" >
            <bool>false</bool>
           </property>
@@ -108,121 +186,6 @@
           </property>
           <property name="alignment" >
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" >
-         <widget class="QLabel" name="MMSHLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>_("Address")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" >
-         <widget class="QCheckBox" name="localOutput" >
-          <property name="text" >
-           <string>_("Play locally")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" >
-         <widget class="QCheckBox" name="MMSHOutput" >
-          <property name="text" >
-           <string>MMSH</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3" >
-         <widget class="QPushButton" name="fileSelectButton" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>_("Browse...")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2" >
-         <widget class="QLineEdit" name="HTTPEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" >
-         <widget class="QLabel" name="HTTPLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>_("Address")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3" >
-         <widget class="QLabel" name="HTTPPortLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>_("Port:")</string>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2" >
-         <widget class="QLineEdit" name="MMSHEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" >
-         <widget class="QCheckBox" name="HTTPOutput" >
-          <property name="text" >
-           <string>HTTP</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" >
-         <widget class="QCheckBox" name="RTPOutput" >
-          <property name="text" >
-           <string>RTP</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1" >
-         <widget class="QLabel" name="RTPLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>_("Address")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="3" >
-         <widget class="QLabel" name="RTPPortLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-          <property name="text" >
-           <string>_("Port:")</string>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2" >
-         <widget class="QLineEdit" name="RTPEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -251,6 +214,43 @@
           </property>
          </widget>
         </item>
+        <item row="4" column="0" >
+         <widget class="QCheckBox" name="RTPOutput" >
+          <property name="text" >
+           <string>RTP</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1" >
+         <widget class="QLabel" name="RTPLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Address")</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2" >
+         <widget class="QLineEdit" name="RTPEdit" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="3" >
+         <widget class="QLabel" name="RTPPortLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Port:")</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
         <item row="4" column="4" >
          <widget class="QSpinBox" name="RTPPort" >
           <property name="enabled" >
@@ -264,6 +264,71 @@
           </property>
           <property name="alignment" >
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="minimum" >
+           <number>1</number>
+          </property>
+          <property name="maximum" >
+           <number>65535</number>
+          </property>
+          <property name="value" >
+           <number>1234</number>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" >
+         <widget class="QCheckBox" name="UDPOutput" >
+          <property name="text" >
+           <string>UDP</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1" >
+         <widget class="QLabel" name="UDPLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Address")</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2" >
+         <widget class="QLineEdit" name="UDPEdit" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="3" >
+         <widget class="QLabel" name="UDPPortLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>_("Port")</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="4" >
+         <widget class="QSpinBox" name="UDPPort" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>90</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="accelerated" >
+           <bool>true</bool>
           </property>
           <property name="minimum" >
            <number>1</number>

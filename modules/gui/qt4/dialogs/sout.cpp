@@ -95,9 +95,9 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
  #define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateMRL() );
 //     /* Output */
      CB( fileOutput ); CB( HTTPOutput ); CB( localOutput );
-     CB( RTPOutput ); CB( MMSHOutput ); CB( rawInput );
-     CT( fileEdit ); CT( HTTPEdit ); CT( RTPEdit ); CT( MMSHEdit );
-     CS( HTTPPort ); CS( RTPPort ); CS( MMSHPort );
+     CB( RTPOutput ); CB( MMSHOutput ); CB( rawInput ); CB( UDPOutput );
+     CT( fileEdit ); CT( HTTPEdit ); CT( RTPEdit ); CT( MMSHEdit ); CT( UDPEdit );
+     CS( HTTPPort ); CS( RTPPort ); CS( MMSHPort ); CS( UDPPort );
 //     /* Transcode */
      CC( vCodecBox ); CC( subsCodecBox ); CC( aCodecBox ) ;
      CB( transcodeVideo ); CB( transcodeAudio ); CB( transcodeSubs );
@@ -230,11 +230,11 @@ void SoutDialog::setOptions()
 void SoutDialog::toggleSout()
 {
     //Toggle all the streaming options.
-    TOGGLEV( ui.HTTPOutput ) ; TOGGLEV( ui.RTPOutput ) ; TOGGLEV( ui.MMSHOutput ) ;
-    TOGGLEV( ui.HTTPEdit ) ; TOGGLEV( ui.RTPEdit ) ; TOGGLEV( ui.MMSHEdit ) ;
-    TOGGLEV( ui.HTTPLabel ) ; TOGGLEV( ui.RTPLabel ) ; TOGGLEV( ui.MMSHLabel ) ;
-    TOGGLEV( ui.HTTPPortLabel ) ; TOGGLEV( ui.RTPPortLabel ) ; TOGGLEV( ui.MMSHPortLabel ) ;
-    TOGGLEV( ui.HTTPPort ) ; TOGGLEV( ui.RTPPort ) ; TOGGLEV( ui.MMSHPort ) ;
+    TOGGLEV( ui.HTTPOutput ) ; TOGGLEV( ui.RTPOutput ) ; TOGGLEV( ui.MMSHOutput ) ; TOGGLEV( ui.UDPOutput ) ;
+    TOGGLEV( ui.HTTPEdit ) ; TOGGLEV( ui.RTPEdit ) ; TOGGLEV( ui.MMSHEdit ) ; TOGGLEV( ui.UDPEdit ) ;
+    TOGGLEV( ui.HTTPLabel ) ; TOGGLEV( ui.RTPLabel ) ; TOGGLEV( ui.MMSHLabel ) ; TOGGLEV( ui.UDPLabel ) ;
+    TOGGLEV( ui.HTTPPortLabel ) ; TOGGLEV( ui.RTPPortLabel ) ; TOGGLEV( ui.MMSHPortLabel ) ; TOGGLEV( ui.UDPPortLabel )
+    TOGGLEV( ui.HTTPPort ) ; TOGGLEV( ui.RTPPort ) ; TOGGLEV( ui.MMSHPort ) ; TOGGLEV( ui.UDPPort ) ;
 
     TOGGLEV( ui.sap ); TOGGLEV( ui.sapName );
     TOGGLEV( ui.sapGroup ); TOGGLEV( ui.sapGroupLabel );
@@ -268,6 +268,7 @@ void SoutDialog::updateMRL()
     sout.b_http = ui.HTTPOutput->isChecked();
     sout.b_mms = ui.MMSHOutput->isChecked();
     sout.b_rtp = ui.RTPOutput->isChecked();
+    sout.b_udp = ui.UDPOutput->isChecked();
     sout.b_sap = ui.sap->isChecked();
     sout.b_all_es = ui.soutAll->isChecked();
     sout.psz_vcodec = strdup( qtu( ui.vCodecBox->itemData( ui.vCodecBox->currentIndex() ).toString() ) );
@@ -277,9 +278,11 @@ void SoutDialog::updateMRL()
     sout.psz_http = strdup( qtu( ui.HTTPEdit->text() ) );
     sout.psz_mms = strdup( qtu( ui.MMSHEdit->text() ) );
     sout.psz_rtp = strdup( qtu( ui.RTPEdit->text() ) );
+    sout.psz_udp = strdup( qtu( ui.UDPEdit->text() ) );
     sout.i_http = ui.HTTPPort->value();
     sout.i_mms = ui.MMSHPort->value();
     sout.i_rtp = ui.RTPPort->value();
+    sout.i_udp = ui.UDPPort->value();
     sout.i_ab = ui.aBitrateSpin->value();
     sout.i_vb = ui.vBitrateSpin->value();
     sout.i_channels = ui.aChannelsSpin->value();
@@ -288,18 +291,20 @@ void SoutDialog::updateMRL()
     sout.psz_name = strdup( qtu( ui.sapName->text() ) );
 
 #define COUNT() \
-{ \
-    if ( sout.b_local ) \
+    { \
+        if ( sout.b_local ) \
         counter += 1; \
-    if ( sout.b_file ) \
+        if ( sout.b_file ) \
         counter += 1; \
-    if ( sout.b_http ) \
+        if ( sout.b_http ) \
         counter += 1; \
-    if ( sout.b_mms ) \
+        if ( sout.b_mms ) \
         counter += 1; \
-    if ( sout.b_rtp ) \
+        if ( sout.b_rtp ) \
         counter += 1; \
-}
+        if ( sout.b_udp ) \
+        counter += 1; \
+    }
 
 COUNT()
 
@@ -357,7 +362,7 @@ COUNT()
         mrl.append( "}" );
     }
 
-    if ( sout.b_local || sout.b_file || sout.b_http || sout.b_mms || sout.b_rtp )
+    if ( sout.b_local || sout.b_file || sout.b_http || sout.b_mms || sout.b_rtp || sout.b_udp )
     {
 
 #define ISMORE() if ( more ) mrl.append( "," );
@@ -368,11 +373,12 @@ COUNT()
             mrl.append( "dst=" ); \
         }
 
-    if ( trans )
-    {
-        mrl.append( ":" );
-    }
-    else
+
+        if ( trans )
+        {
+            mrl.append( ":" );
+        }
+        else
         {
             mrl = ":sout=#";
         }
@@ -386,15 +392,15 @@ COUNT()
         {
             ISMORE();
             ATLEASTONE()
-            mrl.append( "display" );
+                mrl.append( "display" );
             more = true;
         }
 
         if ( sout.b_file )
         {
             ISMORE();
-        ATLEASTONE()
-            mrl.append( "std{access=file,mux=" );
+            ATLEASTONE()
+                mrl.append( "std{access=file,mux=" );
             mrl.append( sout.psz_mux );
             mrl.append( ",dst=" );
             mrl.append( sout.psz_file );
@@ -406,7 +412,7 @@ COUNT()
         {
             ISMORE();
             ATLEASTONE()
-            mrl.append( "std{access=http,mux=" );
+                mrl.append( "std{access=http,mux=" );
             mrl.append( sout.psz_mux );
             mrl.append( ",dst=" );
             mrl.append( sout.psz_http );
@@ -420,7 +426,7 @@ COUNT()
         {
             ISMORE();
             ATLEASTONE()
-            mrl.append( "std{access=mmsh,mux=" );
+                mrl.append( "std{access=mmsh,mux=" );
             mrl.append( sout.psz_mux );
             mrl.append( ",dst=" );
             mrl.append( sout.psz_mms );
@@ -434,12 +440,26 @@ COUNT()
         {
             ISMORE();
             ATLEASTONE()
-            mrl.append( "rtp{mux=" );
+                mrl.append( "rtp{mux=" );
             mrl.append( sout.psz_mux );
             mrl.append( ",dst=" );
             mrl.append( sout.psz_rtp );
             mrl.append( ":" );
             mrl.append( QString::number( sout.i_rtp,10 ) );
+            mrl.append( "}" );
+            more = true;
+        }
+
+        if ( sout.b_udp )
+        {
+            ISMORE();
+            ATLEASTONE()
+            mrl.append( "std{access=udp,mux=" );
+            mrl.append( sout.psz_mux );
+            mrl.append( ",dst=" );
+            mrl.append( sout.psz_udp );
+            mrl.append( ":" );
+            mrl.append( QString::number( sout.i_udp,10 ) );
             if ( sout.b_sap )
             {
                 mrl.append( ",sap," );
@@ -466,6 +486,6 @@ COUNT()
     ui.mrlEdit->setText( mrl );
     free( sout.psz_acodec ); free( sout.psz_vcodec ); free( sout.psz_scodec );
     free( sout.psz_file );free( sout.psz_http ); free( sout.psz_mms );
-    free( sout.psz_rtp ); free( sout.psz_mux );
+    free( sout.psz_rtp ); free( sout.psz_udp ); free( sout.psz_mux );
     free( sout.psz_name ); free( sout.psz_group );
 }
