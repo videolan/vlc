@@ -2008,8 +2008,8 @@ libmpcdec-$(MUSE_VERSION).tar.bz2:
 
 mpcdec: libmpcdec-$(MUSE_VERSION).tar.bz2 
 	$(EXTRACT_BZ2)
-#	patch -p0 < Patches/mpcdec.patch
-#	(cd $@; autoconf)
+	patch -p0 < Patches/mpcdec.patch
+	(cd $@; autoconf -vif)
 
 .mpcdec: mpcdec
 ifdef HAVE_WIN32 
