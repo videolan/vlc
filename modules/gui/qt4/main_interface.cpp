@@ -624,9 +624,12 @@ void MainInterface::visual()
 
 void MainInterface::toggleMenus()
 {
-    if( menuBar()->isVisible() ) menuBar()->hide();
-        else menuBar()->show();
-    msg_Dbg( p_intf, "I was there: \\_o<~~ coin coin" );
+    msg_Dbg( p_intf, "I HAS HERE, HIDING YOUR MENUZ: \\_o<~~ coin coin" );
+    if( controls->isVisible() ) controls->hide();
+    else controls->show();
+    if( statusBar()->isVisible() ) statusBar()->hide();
+    else statusBar()->show();
+    updateGeometry();
 }
 
 /* Video widget cannot do this synchronously as it runs in another thread */
