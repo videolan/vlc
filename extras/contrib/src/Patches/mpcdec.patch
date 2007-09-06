@@ -1,18 +1,18 @@
-Index: mpcdec/configure.ac
-===================================================================
---- mpcdec/configure.ac (revision 276)
-+++ mpcdec/configure.ac (revision 289)
-@@ -59,11 +59,6 @@
+--- mpcdec/configure.ac	2007-04-17 21:05:32.000000000 +0200
++++ mpcdec/configure.ac	2007-09-06 23:52:09.000000000 +0200
+@@ -58,10 +58,15 @@
+ 	ac_cv_c_int64_t=int64_t
  fi
-
--AC_FUNC_MEMCMP
--if test "x$ac_cv_func_memcmp_working" = "xno" ; then
--	AC_MSG_ERROR([working memcmp is not available.])
--fi
--
--AC_CHECK_FUNCS([memmove memset], [],
--        AC_MSG_ERROR([memset or memmove is missing.]))
-+AC_CHECK_FUNCS([memmove memset memcmp], [],
-+        AC_MSG_ERROR([memmove memset or memcmp is missing.]))
  
-  dnl Make substitutions
++if test "x$cross_compiling" = "xyes" ; then
++AC_CHECK_FUNCS([memcmp], [],
++        AC_MSG_ERROR([memcmp is missing.]))
++else
+ AC_FUNC_MEMCMP
+ if test "x$ac_cv_func_memcmp_working" = "xno" ; then
+ 	AC_MSG_ERROR([working memcmp is not available.])
+ fi
++fi
+ 
+ AC_CHECK_FUNCS([memmove memset], [],
+         AC_MSG_ERROR([memset or memmove is missing.]))
