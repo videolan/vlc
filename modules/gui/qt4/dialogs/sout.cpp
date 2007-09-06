@@ -37,14 +37,15 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     /* UI stuff */
     ui.setupUi( this );
 
-#define ADD_PROFILE( name ) ui.comboBox->addItem( name );
-    ADD_PROFILE( "" )
-    ADD_PROFILE( "Ipod" )
+#define ADD_PROFILE( name ) ui.profileBox->addItem( name );
+    ADD_PROFILE( "Custom" )  
+    ADD_PROFILE( "IPod" )
+    ADD_PROFILE( "XBox" )
+    ADD_PROFILE( "Windows" )
     ADD_PROFILE( "PSP" )
-    ADD_PROFILE( "GSM" )
-    ADD_PROFILE( "Custom" )
+    ADD_PROFILE( "GSM" )    
 
-#define ADD_VCODEC( name, fourcc ) ui.vCodec_2->addItem( name, QVariant( fourcc ) );
+#define ADD_VCODEC( name, fourcc ) ui.vCodecBox->addItem( name, QVariant( fourcc ) );
     ADD_VCODEC( "MPEG-1", "mp1v" )
     ADD_VCODEC( "MPEG-2", "mp2v" )
     ADD_VCODEC( "MPEG-4", "mp4v" )
@@ -58,7 +59,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     ADD_VCODEC( "M-JPEG", "MJPG" )
     ADD_VCODEC( "Theora", "theo" )
 
-#define ADD_ACODEC( name, fourcc ) ui.aCodec_2->addItem( name, QVariant( fourcc ) );
+#define ADD_ACODEC( name, fourcc ) ui.aCodecBox->addItem( name, QVariant( fourcc ) );
     ADD_ACODEC( "MPEG Audio", "mpga" )
     ADD_ACODEC( "MP3", "mp3" )
     ADD_ACODEC( "MPEG 4 Audio ( AAC )", "mp4a" )
@@ -69,7 +70,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     ADD_ACODEC( "WAV", "s16l" )
     ADD_ACODEC( "WMA", "wma" )
 
-#define ADD_SCALING( factor ) ui.vScale_2->addItem( factor );
+#define ADD_SCALING( factor ) ui.vScaleBox->addItem( factor );
     ADD_SCALING( "0.25" )
     ADD_SCALING( "0.5" )
     ADD_SCALING( "0.75" )
@@ -92,22 +93,22 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
      CT( fileEdit ); CT( HTTPEdit ); CT( UDPEdit ); CT( MMSHEdit );
      CS( HTTPPort ); CS( UDPPort ); CS( MMSHPort );
 //     /* Transcode */
-     CC( vCodec_2 ); CC( sCodec_2 ); CC( aCodec_2 ) ;
-     CB( transcodeVideo_2 ); CB( transcodeAudio_2 ); CB( transcodeSubs_2 );
+     CC( vCodecBox ); CC( subsCodecBox ); CC( aCodecBox ) ;
+     CB( transcodeVideo ); CB( transcodeAudio ); CB( transcodeSubs );
 //     CB( sOverlay );
-     CS( vBitrate_2 ); CS( aBitrate_2 ); CS( aChannels_2 ); CC( vScale_2 );
+     CS( vBitrateSpin ); CS( aBitrateSpin ); CS( aChannelsSpin ); CC( vScaleBox );
 //     /* Mux */
      CB( PSMux ); CB( TSMux ); CB( MPEG1Mux ); CB( OggMux ); CB( ASFMux );
      CB( MP4Mux ); CB( MOVMux ); CB( WAVMux ); CB( RAWMux ); CB( FLVMux );
 //     /* Misc */
      CB( soutAll ); CS( ttl ); CT( sapName ); CT( sapGroup );
 //
-    connect( ui.comboBox, SIGNAL( activated( const QString & ) ), this, SLOT( setOptions() ) );
-    connect( ui.fileSelectButton, SIGNAL( clicked() ), this, SLOT( fileBrowse() ) );
-    connect( ui.transcodeVideo_2,SIGNAL( toggled( bool ) ),this,SLOT( setVTranscodeOptions( bool ) ) );
-    connect( ui.transcodeAudio_2,SIGNAL( toggled( bool ) ),this,SLOT( setATranscodeOptions( bool ) ) );
-    connect( ui.transcodeSubs_2,SIGNAL( toggled( bool ) ),this,SLOT( setSTranscodeOptions( bool ) ) );
-    connect( ui.rawInput,SIGNAL( toggled( bool ) ),this,SLOT( setRawOptions( bool ) ) );
+    CONNECT( ui.profileBox, activated( const QString & ), this, setOptions() );
+    CONNECT( ui.fileSelectButton, clicked() , this, fileBrowse()  );
+    CONNECT( ui.transcodeVideo, toggled( bool ), this, setVTranscodeOptions( bool ) );
+    CONNECT( ui.transcodeAudio, toggled( bool ), this, setATranscodeOptions( bool ) );
+    CONNECT( ui.transcodeSubs, toggled( bool ), this, setSTranscodeOptions( bool ) );
+    CONNECT( ui.rawInput, toggled( bool ), this, setRawOptions( bool ) );
 
     QPushButton *okButton = new QPushButton( qtr( "&Stream" ) );
     QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ) );
@@ -131,29 +132,28 @@ void SoutDialog::fileBrowse()
 
 void SoutDialog::setVTranscodeOptions( bool b_trans )
 {
-    ui.label_2->setEnabled( b_trans );
-    ui.vCodec_2->setEnabled( b_trans );
-    ui.vBitrateLabel_2->setEnabled( b_trans );
-    ui.vScaleLabel_2->setEnabled( b_trans );
-    ui.vBitrate_2->setEnabled( b_trans );
-    ui.vScaleLabel_2->setEnabled( b_trans );
-    ui.vScale_2->setEnabled( b_trans );
+    ui.vCodecLabel->setEnabled( b_trans );
+    ui.vCodecBox->setEnabled( b_trans );
+    ui.vBitrateLabel->setEnabled( b_trans );
+    ui.vBitrateSpin->setEnabled( b_trans );
+    ui.vScaleLabel->setEnabled( b_trans );       
+    ui.vScaleBox->setEnabled( b_trans );
 }
 
 void SoutDialog::setATranscodeOptions( bool b_trans )
 {
-    ui.label->setEnabled( b_trans );
-    ui.aCodec_2->setEnabled( b_trans );
-    ui.aBitrateLabel_2->setEnabled( b_trans );
-    ui.aBitrate_2->setEnabled( b_trans );
-    ui.s_3->setEnabled( b_trans );
-    ui.aChannels_2->setEnabled( b_trans );
+    ui.aCodecLabel->setEnabled( b_trans );
+    ui.aCodecBox->setEnabled( b_trans );
+    ui.aBitrateLabel->setEnabled( b_trans );
+    ui.aBitrateSpin->setEnabled( b_trans );
+    ui.aChannelsLabel->setEnabled( b_trans );
+    ui.aChannelsSpin->setEnabled( b_trans );
 }
 
 void SoutDialog::setSTranscodeOptions( bool b_trans )
 {
-    ui.sCodec_2->setEnabled( b_trans );
-    ui.sOverlay_2->setEnabled( b_trans );
+    ui.subsCodecBox->setEnabled( b_trans );
+    ui.subsOverlay->setEnabled( b_trans );
 }
 
 void SoutDialog::setRawOptions( bool b_raw )
@@ -171,7 +171,7 @@ void SoutDialog::setRawOptions( bool b_raw )
 void SoutDialog::setOptions()
 {
     /* The test is currently done with a QString, it could be done with the index, it'd depend how translation works */
-    if ( ui.comboBox->currentText() == "Custom" )
+    if ( ui.profileBox->currentText() == "Custom" )
     {
         ui.tabWidget->setEnabled( true );
     }
@@ -219,9 +219,9 @@ void SoutDialog::updateMRL()
     sout.b_udp = ui.UDPOutput->isChecked();
     sout.b_sap = ui.sap->isChecked();
     sout.b_all_es = ui.soutAll->isChecked();
-    sout.psz_vcodec = strdup( qtu( ui.vCodec_2->itemData( ui.vCodec_2->currentIndex() ).toString() ) );
-    sout.psz_acodec = strdup( qtu( ui.aCodec_2->itemData( ui.vCodec_2->currentIndex() ).toString() ) );
-    sout.psz_scodec = strdup( qtu( ui.sCodec_2->itemData( ui.vCodec_2->currentIndex() ).toString() ) );
+    sout.psz_vcodec = strdup( qtu( ui.vCodecBox->itemData( ui.vCodecBox->currentIndex() ).toString() ) );
+    sout.psz_acodec = strdup( qtu( ui.aCodecBox->itemData( ui.aCodecBox->currentIndex() ).toString() ) );
+    sout.psz_scodec = strdup( qtu( ui.subsCodecBox->itemData( ui.subsCodecBox->currentIndex() ).toString() ) );
     sout.psz_file = strdup( qtu( ui.fileEdit->text() ) );
     sout.psz_http = strdup( qtu( ui.HTTPEdit->text() ) );
     sout.psz_mms = strdup( qtu( ui.MMSHEdit->text() ) );
@@ -229,10 +229,10 @@ void SoutDialog::updateMRL()
     sout.i_http = ui.HTTPPort->value();
     sout.i_mms = ui.MMSHPort->value();
     sout.i_udp = ui.UDPPort->value();
-    sout.i_ab = ui.aBitrate_2->value();
-    sout.i_vb = ui.vBitrate_2->value();
-    sout.i_channels = ui.aChannels_2->value();
-    sout.f_scale = atof( qta( ui.vScale_2->currentText() ) );
+    sout.i_ab = ui.aBitrateSpin->value();
+    sout.i_vb = ui.vBitrateSpin->value();
+    sout.i_channels = ui.aChannelsSpin->value();
+    sout.f_scale = atof( qta( ui.vScaleBox->currentText() ) );
     sout.psz_group = strdup( qtu( ui.sapGroup->text() ) );
     sout.psz_name = strdup( qtu( ui.sapName->text() ) );
 
@@ -251,9 +251,9 @@ void SoutDialog::updateMRL()
     bool trans = false;
     bool more = false;
 
-if ( ui.transcodeVideo_2->isChecked() || ui.transcodeAudio_2->isChecked() )
+if ( ui.transcodeVideo->isChecked() || ui.transcodeAudio->isChecked() )
 {
-     if ( ui.transcodeVideo_2->isChecked() )
+     if ( ui.transcodeVideo->isChecked() )
      {
         mrl = ":sout=#transcode{";
          mrl.append( "vcodec=" );
@@ -267,7 +267,7 @@ if ( ui.transcodeVideo_2->isChecked() || ui.transcodeAudio_2->isChecked() )
         trans = true;
      }
 
-    if ( ui.transcodeAudio_2->isChecked() )
+    if ( ui.transcodeAudio->isChecked() )
     {
         if ( trans )
         {

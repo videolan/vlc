@@ -33,9 +33,6 @@
      <layout class="QHBoxLayout" >
       <item>
        <layout class="QGridLayout" >
-        <property name="margin" >
-         <number>3</number>
-        </property>
         <item row="1" column="1" >
          <widget class="QLabel" name="fileLabel" >
           <property name="enabled" >
@@ -299,13 +296,10 @@
     </widget>
    </item>
    <item row="2" column="1" >
-    <widget class="QComboBox" name="comboBox" />
+    <widget class="QComboBox" name="profileBox" />
    </item>
    <item row="4" column="0" colspan="2" >
     <widget class="QTabWidget" name="tabWidget" >
-     <property name="currentIndex" >
-      <number>3</number>
-     </property>
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
        <string>_("Encapsulation")</string>
@@ -384,19 +378,22 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tab_2" >
+      <property name="enabled" >
+       <bool>true</bool>
+      </property>
       <attribute name="title" >
        <string>_("Video Codec")</string>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
-        <widget class="QCheckBox" name="transcodeVideo_2" >
+        <widget class="QCheckBox" name="transcodeVideo" >
          <property name="text" >
           <string>_("Video")</string>
          </property>
         </widget>
        </item>
        <item rowspan="2" row="0" column="1" >
-        <widget class="QComboBox" name="vCodec_2" >
+        <widget class="QComboBox" name="vCodecBox" >
          <property name="enabled" >
           <bool>false</bool>
          </property>
@@ -406,14 +403,17 @@
         </widget>
        </item>
        <item row="1" column="0" >
-        <widget class="QLabel" name="label_2" >
+        <widget class="QLabel" name="vCodecLabel" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
          <property name="text" >
           <string>_("Codec")</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0" >
-        <widget class="QLabel" name="vBitrateLabel_2" >
+        <widget class="QLabel" name="vBitrateLabel" >
          <property name="enabled" >
           <bool>false</bool>
          </property>
@@ -423,7 +423,7 @@
         </widget>
        </item>
        <item row="2" column="1" >
-        <widget class="QSpinBox" name="vBitrate_2" >
+        <widget class="QSpinBox" name="vBitrateSpin" >
          <property name="enabled" >
           <bool>false</bool>
          </property>
@@ -448,7 +448,7 @@
         </widget>
        </item>
        <item row="3" column="0" >
-        <widget class="QLabel" name="vScaleLabel_2" >
+        <widget class="QLabel" name="vScaleLabel" >
          <property name="enabled" >
           <bool>false</bool>
          </property>
@@ -458,7 +458,7 @@
         </widget>
        </item>
        <item row="3" column="1" >
-        <widget class="QComboBox" name="vScale_2" >
+        <widget class="QComboBox" name="vScaleBox" >
          <property name="enabled" >
           <bool>false</bool>
          </property>
@@ -475,28 +475,31 @@
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
-        <widget class="QCheckBox" name="transcodeAudio_2" >
+        <widget class="QCheckBox" name="transcodeAudio" >
          <property name="text" >
           <string>_("Audio")</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0" >
-        <widget class="QLabel" name="label" >
+        <widget class="QLabel" name="aCodecLabel" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
          <property name="text" >
           <string>_("Codec")</string>
          </property>
         </widget>
        </item>
        <item row="1" column="1" >
-        <widget class="QComboBox" name="aCodec_2" >
+        <widget class="QComboBox" name="aCodecBox" >
          <property name="enabled" >
           <bool>false</bool>
          </property>
         </widget>
        </item>
        <item row="2" column="0" >
-        <widget class="QLabel" name="aBitrateLabel_2" >
+        <widget class="QLabel" name="aBitrateLabel" >
          <property name="enabled" >
           <bool>false</bool>
          </property>
@@ -506,7 +509,7 @@
         </widget>
        </item>
        <item row="2" column="1" >
-        <widget class="QSpinBox" name="aBitrate_2" >
+        <widget class="QSpinBox" name="aBitrateSpin" >
          <property name="enabled" >
           <bool>false</bool>
          </property>
@@ -528,7 +531,7 @@
         </widget>
        </item>
        <item row="3" column="0" >
-        <widget class="QLabel" name="s_3" >
+        <widget class="QLabel" name="aChannelsLabel" >
          <property name="enabled" >
           <bool>false</bool>
          </property>
@@ -538,7 +541,7 @@
         </widget>
        </item>
        <item row="3" column="1" >
-        <widget class="QSpinBox" name="aChannels_2" >
+        <widget class="QSpinBox" name="aChannelsSpin" >
          <property name="enabled" >
           <bool>false</bool>
          </property>
@@ -564,23 +567,23 @@
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
-        <widget class="QCheckBox" name="transcodeSubs_2" >
+        <widget class="QCheckBox" name="transcodeSubs" >
          <property name="text" >
           <string>_("Subtitles")</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1" >
-        <widget class="QComboBox" name="sCodec_2" >
+        <widget class="QComboBox" name="subsCodecBox" >
          <property name="enabled" >
           <bool>false</bool>
          </property>
         </widget>
        </item>
        <item row="1" column="1" >
-        <widget class="QCheckBox" name="sOverlay_2" >
+        <widget class="QCheckBox" name="subsOverlay" >
          <property name="enabled" >
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="text" >
           <string>_("Overlay subtitles on the video")</string>
@@ -599,9 +602,6 @@
      <layout class="QHBoxLayout" >
       <item>
        <layout class="QGridLayout" >
-        <property name="margin" >
-         <number>3</number>
-        </property>
         <item row="0" column="0" >
          <widget class="QCheckBox" name="sap" >
           <property name="enabled" >
@@ -688,9 +688,6 @@
    </item>
    <item row="7" column="0" colspan="2" >
     <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
      <item>
       <spacer>
        <property name="orientation" >
