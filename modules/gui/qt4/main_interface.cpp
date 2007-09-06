@@ -625,10 +625,8 @@ void MainInterface::visual()
 void MainInterface::toggleMenus()
 {
     msg_Dbg( p_intf, "I HAS HERE, HIDING YOUR MENUZ: \\_o<~~ coin coin" );
-    if( controls->isVisible() ) controls->hide();
-    else controls->show();
-    if( statusBar()->isVisible() ) statusBar()->hide();
-    else statusBar()->show();
+    TOGGLEV( controls );
+    TOGGLEV( statusBar() );
     updateGeometry();
 }
 

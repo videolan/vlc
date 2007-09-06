@@ -280,7 +280,7 @@ void OpenDialog::finish( bool b_enqueue = false )
 void OpenDialog::toggleAdvancedPanel()
 {
     //FIXME does not work under Windows
-    if (ui.advancedFrame->isVisible()) {
+    if( ui.advancedFrame->isVisible() ) {
         ui.advancedFrame->hide();
 #ifndef WIN32
         setMinimumHeight(1);

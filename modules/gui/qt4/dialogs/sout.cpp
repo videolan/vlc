@@ -225,20 +225,15 @@ void SoutDialog::setOptions()
 void SoutDialog::toggleSout()
 {
     //Toggle all the streaming options.
-    #define TGV( x ) { \
-        if( ( x->isHidden() ) )  \
-        x->show();          \
-        else  x->hide();\
-    }
-    TGV( ui.HTTPOutput ) ; TGV( ui.UDPOutput ) ; TGV( ui.MMSHOutput ) ;
-    TGV( ui.HTTPEdit ) ; TGV( ui.UDPEdit ) ; TGV( ui.MMSHEdit ) ;
-    TGV( ui.HTTPLabel ) ; TGV( ui.UDPLabel ) ; TGV( ui.MMSHLabel ) ;
-    TGV( ui.HTTPPortLabel ) ; TGV( ui.UDPPortLabel ) ; TGV( ui.MMSHPortLabel ) ;
-    TGV( ui.HTTPPort ) ; TGV( ui.UDPPort ) ; TGV( ui.MMSHPort ) ;
+    TOGGLEV( ui.HTTPOutput ) ; TOGGLEV( ui.UDPOutput ) ; TOGGLEV( ui.MMSHOutput ) ;
+    TOGGLEV( ui.HTTPEdit ) ; TOGGLEV( ui.UDPEdit ) ; TOGGLEV( ui.MMSHEdit ) ;
+    TOGGLEV( ui.HTTPLabel ) ; TOGGLEV( ui.UDPLabel ) ; TOGGLEV( ui.MMSHLabel ) ;
+    TOGGLEV( ui.HTTPPortLabel ) ; TOGGLEV( ui.UDPPortLabel ) ; TOGGLEV( ui.MMSHPortLabel ) ;
+    TOGGLEV( ui.HTTPPort ) ; TOGGLEV( ui.UDPPort ) ; TOGGLEV( ui.MMSHPort ) ;
 
-    TGV( ui.sap ); TGV( ui.sapName );
-    TGV( ui.sapGroup ); TGV( ui.sapGroupLabel );
-    TGV( ui.ttlLabel ); TGV( ui.ttl );
+    TOGGLEV( ui.sap ); TOGGLEV( ui.sapName );
+    TOGGLEV( ui.sapGroup ); TOGGLEV( ui.sapGroupLabel );
+    TOGGLEV( ui.ttlLabel ); TOGGLEV( ui.ttl );
 
     if( b_transcode_only ) okButton->setText( "&Save" );
     else okButton->setText( "&Stream" );
