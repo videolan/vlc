@@ -132,8 +132,9 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
 void SoutDialog::fileBrowse()
 {
     ui.tabWidget->setTabEnabled( 0,false );
-    QString f = QFileDialog::getOpenFileName( this, qtr( "Save file" ), "", "" );
-    ui.fileEdit->setText( f );
+    QString fileName = QFileDialog::getOpenFileName( this, qtr( "Save file" ), "",
+        qtr( "Containers (*.ps *.ts *.mpg *.ogg *.asf *.mp4 *.mov *.wav *.raw *.flv)" ) );
+    ui.fileEdit->setText( fileName );
     updateMRL();
 }
 
