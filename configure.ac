@@ -5272,15 +5272,20 @@ AC_ARG_ENABLE(macosx,
    then
      VLC_ADD_PLUGINS([access_eyetv])
      VLC_ADD_LDFLAGS([access_eyetv], [-Wl,-framework,CoreFoundation])
+     VLC_ADD_LDFLAGS([minimal_macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL])
      VLC_ADD_LDFLAGS([macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL,-framework,QTKit])
      VLC_ADD_OBJCFLAGS( [macosx],[-fobjc-exceptions] )
+     VLC_ADD_OBJCFLAGS( [minimal_macosx],[-fobjc-exceptions] )
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
     [VLC_ADD_PLUGINS([access_eyetv])
      VLC_ADD_LDFLAGS([access_eyetv], [-Wl,-framework,CoreFoundation])
      VLC_ADD_BUILTINS([macosx])
+     VLC_ADD_BUILTINS([minimal_macosx])
+     VLC_ADD_LDFLAGS([minimal_macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL])
      VLC_ADD_LDFLAGS([macosx],[-Wl,-framework,IOKit,-framework,Cocoa,-framework,Carbon,-framework,QuickTime,-lobjc,-ObjC,-framework,OpenGL,-framework,AGL,-framework,QTKit])
      VLC_ADD_OBJCFLAGS([macosx],[-fobjc-exceptions])
+     VLC_ADD_OBJCFLAGS([minimal_macosx],[-fobjc-exceptions])
     ])])
 CFLAGS=$ORIGCFLAGS
 
@@ -6076,6 +6081,7 @@ AC_CONFIG_FILES([
   modules/gui/beos/Makefile
   modules/gui/pda/Makefile
   modules/gui/macosx/Makefile
+  modules/gui/minimal_macosx/Makefile
   modules/gui/qnx/Makefile
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
