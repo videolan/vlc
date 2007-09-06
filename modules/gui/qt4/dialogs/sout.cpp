@@ -434,7 +434,7 @@ COUNT()
         {
             ISMORE();
             ATLEASTONE()
-            mrl.append( "std{access=udp,mux=" );
+            mrl.append( "rtp{mux=" );
             mrl.append( sout.psz_mux );
             mrl.append( ",dst=" );
             mrl.append( sout.psz_udp );
