@@ -98,7 +98,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
                                     QKeySequence( "Alt+P" ) );
     openButtonMenu->addAction( qtr("&Stream"), this, SLOT( stream() ) ,
                                     QKeySequence( "Alt+S" ) );
-    openButtonMenu->addAction( qtr("&Convert"), this, SLOT( transcode( ) ) ,
+    openButtonMenu->addAction( qtr("&Convert"), this, SLOT( transcode() ) ,
                                     QKeySequence( "Alt+C" ) );
 
     playButton->setMenu( openButtonMenu );
@@ -160,7 +160,7 @@ void OpenDialog::setMenuAction()
             break;
         case OPEN_AND_SAVE:
             playButton->setText( qtr("&Convert / Save") );
-            BUTTONACT( playButton, stream( true ) );
+            BUTTONACT( playButton, transcode() );
             break;
         case ENQUEUE:
             playButton->setText( qtr("&Enqueue") );
