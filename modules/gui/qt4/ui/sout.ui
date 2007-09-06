@@ -343,7 +343,7 @@
        <item row="1" column="1" >
         <widget class="QRadioButton" name="ASFMux" >
          <property name="text" >
-          <string>ASF</string>
+          <string>ASF/WMV</string>
          </property>
         </widget>
        </item>

@@ -5,6 +5,8 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Jean-François Massol <jf.massol -at- gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,13 +39,14 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     /* UI stuff */
     ui.setupUi( this );
 
-#define ADD_PROFILE( name ) ui.profileBox->addItem( name );
-    ADD_PROFILE( "Custom" )  
-    ADD_PROFILE( "IPod" )
-    ADD_PROFILE( "XBox" )
-    ADD_PROFILE( "Windows" )
-    ADD_PROFILE( "PSP" )
-    ADD_PROFILE( "GSM" )    
+/* ADD HERE for new profiles */
+#define ADD_PROFILE( name, shortname ) ui.profileBox->addItem( qtr( name ), QVariant( QString( shortname ) ) );
+    ADD_PROFILE( "Custom" , "Custom" )
+    ADD_PROFILE( "IPod (mp4/aac)", "IPod" )
+    ADD_PROFILE( "XBox", "XBox" )
+    ADD_PROFILE( "Windows (wmv/asf)", "Windows" )
+    ADD_PROFILE( "PSP", "PSP")
+    ADD_PROFILE( "GSM", "GSM" )
 
 #define ADD_VCODEC( name, fourcc ) ui.vCodecBox->addItem( name, QVariant( fourcc ) );
     ADD_VCODEC( "MPEG-1", "mp1v" )
@@ -80,7 +83,8 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     ADD_SCALING( "1.75" )
     ADD_SCALING( "2" )
 
-    ui.mrlEdit->setToolTip ( qtr( "Stream output string.\n This is automatically generated when you change the above settings,\n but you can update it manually." ) ) ;
+    ui.mrlEdit->setToolTip ( qtr( "Stream output string.\n This is automatically generated "
+                                                "when you change the above settings,\n but you can update it manually." ) ) ;
 
 //     /* Connect everything to the updateMRL function */
  #define CB( x ) CONNECT( ui.x, clicked( bool ), this, updateMRL() );
@@ -124,7 +128,8 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
 }
 
 void SoutDialog::fileBrowse()
-{ui.tabWidget->setTabEnabled( 0,false );
+{
+    ui.tabWidget->setTabEnabled( 0,false );
     QString f = QFileDialog::getOpenFileName( this, qtr( "Save file" ), "", "" );
     ui.fileEdit->setText( f );
     updateMRL();
@@ -136,7 +141,7 @@ void SoutDialog::setVTranscodeOptions( bool b_trans )
     ui.vCodecBox->setEnabled( b_trans );
     ui.vBitrateLabel->setEnabled( b_trans );
     ui.vBitrateSpin->setEnabled( b_trans );
-    ui.vScaleLabel->setEnabled( b_trans );       
+    ui.vScaleLabel->setEnabled( b_trans );
     ui.vScaleBox->setEnabled( b_trans );
 }
 
@@ -168,32 +173,65 @@ void SoutDialog::setRawOptions( bool b_raw )
     }
 }
 
+int indexFromItemData( QComboBox *aCombo, QString aString )
+{
+    for( int i=0; i < aCombo->count(); i++ )
+    {
+        if( aCombo->itemData( i ).toString() == aString ) return i;
+    }
+    return -1;
+}
+
 void SoutDialog::setOptions()
 {
-    /* The test is currently done with a QString, it could be done with the index, it'd depend how translation works */
-    if ( ui.profileBox->currentText() == "Custom" )
-    {
-        ui.tabWidget->setEnabled( true );
+    QString profileString = ui.profileBox->itemData( ui.profileBox->currentIndex() ).toString();
+    msg_Dbg( p_intf, "Profile Used: %s",  qta( profileString ));
+    int index;
+
+#define setProfile( muxName, hasVideo, vCodecName, hasAudio, aCodecName ) \
+    { \
+        ui.muxName ##Mux->setChecked( true ); \
+        \
+        ui.transcodeAudio->setChecked( hasAudio ); \
+        index = indexFromItemData( ui.aCodecBox, vCodecName );  \
+        if( index >= 0 ) ui.aCodecBox->setCurrentIndex( index ); \
+        \
+        ui.transcodeVideo->setChecked( hasVideo ); \
+        index = indexFromItemData( ui.aCodecBox, vCodecName );  \
+        if( index >=0 ) ui.vCodecBox->setCurrentIndex( index ); \
     }
-    else
-    {
-        ui.tabWidget->setDisabled( true );
-    }
+
+    /* ADD HERE the profiles you want and need */
+    if( profileString == "IPod" ) setProfile( MP4, true, "mp4a", true, "mp4v" )
+    else if( profileString == "XBox" ) setProfile( ASF, true, "wma", true, "WMV2" )
+
+        /* If the profile is not a custom one, then disable the tabWidget */
+        if ( profileString == "Custom" )
+        {
+            ui.tabWidget->setEnabled( true );
+        }
+        else
+        {
+            ui.tabWidget->setDisabled( true );
+        }
+
+    /* Update the MRL !! */
+    updateMRL();
 }
 
 void SoutDialog::toggleSout()
 {
-#define TGV( x ) { \
-     if( ( x->isHidden() ) )  \
+    #define TGV( x ) { \
+        if( ( x->isHidden() ) )  \
         x->show();          \
-     else  x->hide();\
-}
- TGV( ui.HTTPOutput ) ; TGV( ui.UDPOutput ) ; TGV( ui.MMSHOutput ) ;
- TGV( ui.HTTPEdit ) ; TGV( ui.UDPEdit ) ; TGV( ui.MMSHEdit ) ;
- TGV( ui.HTTPLabel ) ; TGV( ui.UDPLabel ) ; TGV( ui.MMSHLabel ) ;
- TGV( ui.HTTPPortLabel ) ; TGV( ui.UDPPortLabel ) ; TGV( ui.MMSHPortLabel ) ;
- TGV( ui.HTTPPort ) ; TGV( ui.UDPPort ) ; TGV( ui.MMSHPort ) ;
- updateGeometry();
+        else  x->hide();\
+    }
+    TGV( ui.HTTPOutput ) ; TGV( ui.UDPOutput ) ; TGV( ui.MMSHOutput ) ;
+    TGV( ui.HTTPEdit ) ; TGV( ui.UDPEdit ) ; TGV( ui.MMSHEdit ) ;
+    TGV( ui.HTTPLabel ) ; TGV( ui.UDPLabel ) ; TGV( ui.MMSHLabel ) ;
+    TGV( ui.HTTPPortLabel ) ; TGV( ui.UDPPortLabel ) ; TGV( ui.MMSHPortLabel ) ;
+    TGV( ui.HTTPPort ) ; TGV( ui.UDPPort ) ; TGV( ui.MMSHPort ) ;
+    updateGeometry();
 }
 
 void SoutDialog::ok()
@@ -237,58 +275,58 @@ void SoutDialog::updateMRL()
     sout.psz_name = strdup( qtu( ui.sapName->text() ) );
 
 #define SMUX( x, txt ) if( ui.x->isChecked() ) sout.psz_mux = strdup( txt );
-        SMUX( PSMux, "ps" );
-        SMUX( TSMux, "ts" );
-        SMUX( MPEG1Mux, "mpeg" );
-        SMUX( OggMux, "ogg" );
-        SMUX( ASFMux, "asf" );
-        SMUX( MP4Mux, "mp4" );
-        SMUX( MOVMux, "mov" );
-        SMUX( WAVMux, "wav" );
-        SMUX( RAWMux, "raw" );
-        SMUX( FLVMux, "flv" );
+    SMUX( PSMux, "ps" );
+    SMUX( TSMux, "ts" );
+    SMUX( MPEG1Mux, "mpeg" );
+    SMUX( OggMux, "ogg" );
+    SMUX( ASFMux, "asf" );
+    SMUX( MP4Mux, "mp4" );
+    SMUX( MOVMux, "mov" );
+    SMUX( WAVMux, "wav" );
+    SMUX( RAWMux, "raw" );
+    SMUX( FLVMux, "flv" );
 
     bool trans = false;
     bool more = false;
 
-if ( ui.transcodeVideo->isChecked() || ui.transcodeAudio->isChecked() )
-{
-     if ( ui.transcodeVideo->isChecked() )
-     {
-        mrl = ":sout=#transcode{";
-         mrl.append( "vcodec=" );
-        mrl.append( sout.psz_vcodec );
-        mrl.append( "," );
-        mrl.append( "vb=" );
-        mrl.append( QString::number( sout.i_vb,10 ) );
-        mrl.append( "," );
-        mrl.append( "scale=" );
-        mrl.append( QString::number( sout.f_scale ) );
-        trans = true;
-     }
-
-    if ( ui.transcodeAudio->isChecked() )
+    if ( ui.transcodeVideo->isChecked() || ui.transcodeAudio->isChecked() )
     {
-        if ( trans )
-        {
-            mrl.append( "," );
-        }
-        else
+        if ( ui.transcodeVideo->isChecked() )
         {
             mrl = ":sout=#transcode{";
+            mrl.append( "vcodec=" );
+            mrl.append( sout.psz_vcodec );
+            mrl.append( "," );
+            mrl.append( "vb=" );
+            mrl.append( QString::number( sout.i_vb,10 ) );
+            mrl.append( "," );
+            mrl.append( "scale=" );
+            mrl.append( QString::number( sout.f_scale ) );
+            trans = true;
         }
-        mrl.append( "acodec=" );
-        mrl.append( sout.psz_acodec );
-        mrl.append( "," );
-        mrl.append( "ab=" );
-        mrl.append( QString::number( sout.i_ab,10 ) );
-        mrl.append( "," );
-        mrl.append( "channels=" );
-        mrl.append( QString::number( sout.i_channels,10 ) );
-        trans = true;
+
+        if ( ui.transcodeAudio->isChecked() )
+        {
+            if ( trans )
+            {
+                mrl.append( "," );
+            }
+            else
+            {
+                mrl = ":sout=#transcode{";
+            }
+            mrl.append( "acodec=" );
+            mrl.append( sout.psz_acodec );
+            mrl.append( "," );
+            mrl.append( "ab=" );
+            mrl.append( QString::number( sout.i_ab,10 ) );
+            mrl.append( "," );
+            mrl.append( "channels=" );
+            mrl.append( QString::number( sout.i_channels,10 ) );
+            trans = true;
+        }
+        mrl.append( "}" );
     }
-    mrl.append( "}" );
-}
 
     if ( sout.b_local || sout.b_file || sout.b_http || sout.b_mms || sout.b_udp )
     {
@@ -378,8 +416,7 @@ if ( ui.transcodeVideo->isChecked() || ui.transcodeAudio->isChecked() )
     }
 
     if ( sout.b_all_es )
-            mrl.append( ":sout-all" );
-
+        mrl.append( ":sout-all" );
 
     ui.mrlEdit->setText( mrl );
     free( sout.psz_acodec ); free( sout.psz_vcodec ); free( sout.psz_scodec );
@@ -387,78 +424,3 @@ if ( ui.transcodeVideo->isChecked() || ui.transcodeAudio->isChecked() )
     free( sout.psz_udp ); free( sout.psz_mux );
     free( sout.psz_name ); free( sout.psz_group );
 }
-
-// void SoutDialog::updateMRL()
-// {
-//     sout_gui_descr_t pd;
-//     memset( &pd, 0, sizeof( sout_gui_descr_t ) );
-//
-//     /* Output */
-//     pd.b_dump = ui.rawInput->isChecked();
-//     if( pd.b_dump ) goto end;
-//
-//     pd.b_local = ui.localOutput->isChecked();
-//     pd.b_file = ui.fileOutput->isChecked();
-//     pd.b_http = ui.HTTPOutput->isChecked();
-//     pd.b_mms = ui.MMSHOutput->isChecked();
-//     pd.b_udp = ui.UDPOutput->isChecked();
-//
-//     pd.psz_file = ui.fileOutput->isChecked() ?
-//                             strdup( qtu( ui.fileEdit->text() ) ): NULL;
-//     pd.psz_http = ui.HTTPOutput->isChecked() ?
-//                             strdup( qtu( ui.HTTPEdit->text() ) ) : NULL;
-//     pd.psz_mms = ui.MMSHOutput->isChecked() ?
-//                             strdup( qtu( ui.MMSHEdit->text() ) ): NULL;
-//     pd.psz_udp = ui.UDPOutput->isChecked() ?
-//                             strdup( qtu( ui.UDPEdit->text() ) ): NULL;
-//
-//     pd.i_http = ui.HTTPPort->value();
-//     pd.i_mms = ui.MMSHPort->value();
-//     pd.i_udp = ui.UDPPort->value();
-//
-//     /* Mux */
-// #define SMUX( x, txt ) if( ui.x##Mux->isChecked() ) pd.psz_mux = strdup( txt );
-//     SMUX( PS, "ps" );
-//     SMUX( TS, "ts" );
-//     SMUX( MPEG1, "mpeg" );
-//     SMUX( Ogg, "ogg" );
-//     SMUX( ASF, "asf" );
-//     SMUX( MP4, "mp4" );
-//     SMUX( MOV, "mov" );
-//     SMUX( WAV, "wav" );
-//     SMUX( RAW, "raw" );
-//     SMUX( FLV, "flv" );
-//
-//
-//
-//     /* Transcode */
-// //     pd.b_soverlay = ui.sOverlay->isChecked();
-// //     pd.i_vb = ui.vBitrate->value();
-// //     pd.i_ab = ui.aBitrate->value();
-// //     pd.i_channels = ui.aChannels->value();
-// //     pd.f_scale = atof( qta( ui.vScale->currentText() ) );
-// //
-// //     pd.psz_vcodec = ui.transcodeVideo->isChecked() ?
-// //                      strdup( qtu( ui.vCodec->itemData( 
-// //                             ui.vCodec->currentIndex() ). toString() ) ) : NULL;
-// //     pd.psz_acodec = ui.transcodeAudio->isChecked() ?
-// //                      strdup( qtu( ui.aCodec->itemData( 
-// //                             ui.aCodec->currentIndex() ).toString() ) ) : NULL;
-// //     pd.psz_scodec = ui.transcodeSubs->isChecked() ?
-// //                      strdup( qtu( ui.sCodec->itemData( 
-// //                             ui.sCodec->currentIndex() ).toString() ) ) : NULL;
-// //     pd.b_sap = ui.sap->isChecked();
-// //     pd.b_all_es = ui.soutAll->isChecked();
-// //     pd.psz_name = qtu( ui.sapName->text() );
-// //     pd.psz_group = qtu( ui.sapGroup->text() );
-// //     pd.i_ttl = ui.ttl->value() ;
-// end:
-//     sout_chain_t* p_chain = streaming_ChainNew();
-//     streaming_GuiDescToChain( VLC_OBJECT( p_intf ), p_chain, &pd );
-//     char *psz_mrl = streaming_ChainToPsz( p_chain );
-//
-//     ui.mrlEdit->setText( qfu( strdup( psz_mrl ) ) );
-//     free( pd.psz_acodec ); free( pd.psz_vcodec ); free( pd.psz_scodec );
-//     free( pd.psz_file );free( pd.psz_http ); free( pd.psz_mms );
-//     free( pd.psz_udp ); free( pd.psz_mux );
-// }
