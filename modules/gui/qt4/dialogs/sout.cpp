@@ -36,6 +36,8 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
 {
     setWindowTitle( qtr( "Stream output" ) );
 
+    b_transcode_only = _transcode_only;
+
     /* UI stuff */
     ui.setupUi( this );
 
@@ -114,7 +116,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     CONNECT( ui.transcodeSubs, toggled( bool ), this, setSTranscodeOptions( bool ) );
     CONNECT( ui.rawInput, toggled( bool ), this, setRawOptions( bool ) );
 
-    QPushButton *okButton = new QPushButton( qtr( "&Stream" ) );
+    okButton = new QPushButton( qtr( "&Stream" ) );
     QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ) );
 
     okButton->setDefault( true );
@@ -124,7 +126,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     BUTTONACT( okButton, ok() );
     BUTTONACT( cancelButton, cancel() );
 
-    if( _transcode_only ) toggleSout();
+    if( b_transcode_only ) toggleSout();
 }
 
 void SoutDialog::fileBrowse()
@@ -221,6 +223,7 @@ void SoutDialog::setOptions()
 
 void SoutDialog::toggleSout()
 {
+    //Toggle all the streaming options.
     #define TGV( x ) { \
         if( ( x->isHidden() ) )  \
         x->show();          \
@@ -231,6 +234,14 @@ void SoutDialog::toggleSout()
     TGV( ui.HTTPLabel ) ; TGV( ui.UDPLabel ) ; TGV( ui.MMSHLabel ) ;
     TGV( ui.HTTPPortLabel ) ; TGV( ui.UDPPortLabel ) ; TGV( ui.MMSHPortLabel ) ;
     TGV( ui.HTTPPort ) ; TGV( ui.UDPPort ) ; TGV( ui.MMSHPort ) ;
+
+    TGV( ui.sap ); TGV( ui.sapName );
+    TGV( ui.sapGroup ); TGV( ui.sapGroupLabel );
+    TGV( ui.ttlLabel ); TGV( ui.ttl );
+
+    if( b_transcode_only ) okButton->setText( "&Save" );
+    else okButton->setText( "&Stream" );
+
     updateGeometry();
 }
 

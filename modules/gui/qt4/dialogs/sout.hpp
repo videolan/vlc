@@ -47,7 +47,8 @@ public:
     //sout_gui_descr_t *sout;
 private:
     Ui::Sout ui;
-    
+    QPushButton *okButton;
+    bool b_transcode_only;
 public slots:
     void ok();
     void cancel();
