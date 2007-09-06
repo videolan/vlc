@@ -95,9 +95,9 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
  #define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateMRL() );
 //     /* Output */
      CB( fileOutput ); CB( HTTPOutput ); CB( localOutput );
-     CB( UDPOutput ); CB( MMSHOutput ); CB( rawInput );
-     CT( fileEdit ); CT( HTTPEdit ); CT( UDPEdit ); CT( MMSHEdit );
-     CS( HTTPPort ); CS( UDPPort ); CS( MMSHPort );
+     CB( RTPOutput ); CB( MMSHOutput ); CB( rawInput );
+     CT( fileEdit ); CT( HTTPEdit ); CT( RTPEdit ); CT( MMSHEdit );
+     CS( HTTPPort ); CS( RTPPort ); CS( MMSHPort );
 //     /* Transcode */
      CC( vCodecBox ); CC( subsCodecBox ); CC( aCodecBox ) ;
      CB( transcodeVideo ); CB( transcodeAudio ); CB( transcodeSubs );
@@ -230,11 +230,11 @@ void SoutDialog::setOptions()
 void SoutDialog::toggleSout()
 {
     //Toggle all the streaming options.
-    TOGGLEV( ui.HTTPOutput ) ; TOGGLEV( ui.UDPOutput ) ; TOGGLEV( ui.MMSHOutput ) ;
-    TOGGLEV( ui.HTTPEdit ) ; TOGGLEV( ui.UDPEdit ) ; TOGGLEV( ui.MMSHEdit ) ;
-    TOGGLEV( ui.HTTPLabel ) ; TOGGLEV( ui.UDPLabel ) ; TOGGLEV( ui.MMSHLabel ) ;
-    TOGGLEV( ui.HTTPPortLabel ) ; TOGGLEV( ui.UDPPortLabel ) ; TOGGLEV( ui.MMSHPortLabel ) ;
-    TOGGLEV( ui.HTTPPort ) ; TOGGLEV( ui.UDPPort ) ; TOGGLEV( ui.MMSHPort ) ;
+    TOGGLEV( ui.HTTPOutput ) ; TOGGLEV( ui.RTPOutput ) ; TOGGLEV( ui.MMSHOutput ) ;
+    TOGGLEV( ui.HTTPEdit ) ; TOGGLEV( ui.RTPEdit ) ; TOGGLEV( ui.MMSHEdit ) ;
+    TOGGLEV( ui.HTTPLabel ) ; TOGGLEV( ui.RTPLabel ) ; TOGGLEV( ui.MMSHLabel ) ;
+    TOGGLEV( ui.HTTPPortLabel ) ; TOGGLEV( ui.RTPPortLabel ) ; TOGGLEV( ui.MMSHPortLabel ) ;
+    TOGGLEV( ui.HTTPPort ) ; TOGGLEV( ui.RTPPort ) ; TOGGLEV( ui.MMSHPort ) ;
 
     TOGGLEV( ui.sap ); TOGGLEV( ui.sapName );
     TOGGLEV( ui.sapGroup ); TOGGLEV( ui.sapGroupLabel );
@@ -267,7 +267,7 @@ void SoutDialog::updateMRL()
     sout.b_file = ui.fileOutput->isChecked();
     sout.b_http = ui.HTTPOutput->isChecked();
     sout.b_mms = ui.MMSHOutput->isChecked();
-    sout.b_udp = ui.UDPOutput->isChecked();
+    sout.b_rtp = ui.RTPOutput->isChecked();
     sout.b_sap = ui.sap->isChecked();
     sout.b_all_es = ui.soutAll->isChecked();
     sout.psz_vcodec = strdup( qtu( ui.vCodecBox->itemData( ui.vCodecBox->currentIndex() ).toString() ) );
@@ -276,10 +276,10 @@ void SoutDialog::updateMRL()
     sout.psz_file = strdup( qtu( ui.fileEdit->text() ) );
     sout.psz_http = strdup( qtu( ui.HTTPEdit->text() ) );
     sout.psz_mms = strdup( qtu( ui.MMSHEdit->text() ) );
-    sout.psz_udp = strdup( qtu( ui.UDPEdit->text() ) );
+    sout.psz_rtp = strdup( qtu( ui.RTPEdit->text() ) );
     sout.i_http = ui.HTTPPort->value();
     sout.i_mms = ui.MMSHPort->value();
-    sout.i_udp = ui.UDPPort->value();
+    sout.i_rtp = ui.RTPPort->value();
     sout.i_ab = ui.aBitrateSpin->value();
     sout.i_vb = ui.vBitrateSpin->value();
     sout.i_channels = ui.aChannelsSpin->value();
@@ -297,7 +297,7 @@ void SoutDialog::updateMRL()
         counter += 1; \
     if ( sout.b_mms ) \
         counter += 1; \
-    if ( sout.b_udp ) \
+    if ( sout.b_rtp ) \
         counter += 1; \
 }
 
@@ -357,7 +357,7 @@ COUNT()
         mrl.append( "}" );
     }
 
-    if ( sout.b_local || sout.b_file || sout.b_http || sout.b_mms || sout.b_udp )
+    if ( sout.b_local || sout.b_file || sout.b_http || sout.b_mms || sout.b_rtp )
     {
 
 #define ISMORE() if ( more ) mrl.append( "," );
@@ -430,16 +430,16 @@ COUNT()
             more = true;
         }
 
-        if ( sout.b_udp )
+        if ( sout.b_rtp )
         {
             ISMORE();
             ATLEASTONE()
             mrl.append( "rtp{mux=" );
             mrl.append( sout.psz_mux );
             mrl.append( ",dst=" );
-            mrl.append( sout.psz_udp );
+            mrl.append( sout.psz_rtp );
             mrl.append( ":" );
-            mrl.append( QString::number( sout.i_udp,10 ) );
+            mrl.append( QString::number( sout.i_rtp,10 ) );
             if ( sout.b_sap )
             {
                 mrl.append( ",sap," );
@@ -466,6 +466,6 @@ COUNT()
     ui.mrlEdit->setText( mrl );
     free( sout.psz_acodec ); free( sout.psz_vcodec ); free( sout.psz_scodec );
     free( sout.psz_file );free( sout.psz_http ); free( sout.psz_mms );
-    free( sout.psz_udp ); free( sout.psz_mux );
+    free( sout.psz_rtp ); free( sout.psz_mux );
     free( sout.psz_name ); free( sout.psz_group );
 }

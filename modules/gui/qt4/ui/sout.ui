@@ -190,14 +190,14 @@
          </widget>
         </item>
         <item row="4" column="0" >
-         <widget class="QCheckBox" name="UDPOutput" >
+         <widget class="QCheckBox" name="RTPOutput" >
           <property name="text" >
-           <string>UDP</string>
+           <string>RTP</string>
           </property>
          </widget>
         </item>
         <item row="4" column="1" >
-         <widget class="QLabel" name="UDPLabel" >
+         <widget class="QLabel" name="RTPLabel" >
           <property name="enabled" >
            <bool>false</bool>
           </property>
@@ -207,7 +207,7 @@
          </widget>
         </item>
         <item row="4" column="3" >
-         <widget class="QLabel" name="UDPPortLabel" >
+         <widget class="QLabel" name="RTPPortLabel" >
           <property name="enabled" >
            <bool>false</bool>
           </property>
@@ -220,7 +220,7 @@
          </widget>
         </item>
         <item row="4" column="2" >
-         <widget class="QLineEdit" name="UDPEdit" >
+         <widget class="QLineEdit" name="RTPEdit" >
           <property name="enabled" >
            <bool>false</bool>
           </property>
@@ -252,7 +252,7 @@
          </widget>
         </item>
         <item row="4" column="4" >
-         <widget class="QSpinBox" name="UDPPort" >
+         <widget class="QSpinBox" name="RTPPort" >
           <property name="enabled" >
            <bool>false</bool>
           </property>
@@ -722,7 +722,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>UDPOutput</sender>
+   <sender>RTPOutput</sender>
    <signal>clicked(bool)</signal>
    <receiver>sap</receiver>
    <slot>setEnabled(bool)</slot>
@@ -738,9 +738,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>UDPOutput</sender>
+   <sender>RTPOutput</sender>
    <signal>clicked(bool)</signal>
-   <receiver>UDPLabel</receiver>
+   <receiver>RTPLabel</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -754,9 +754,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>UDPOutput</sender>
+   <sender>RTPOutput</sender>
    <signal>clicked(bool)</signal>
-   <receiver>UDPEdit</receiver>
+   <receiver>RTPEdit</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -818,9 +818,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>UDPOutput</sender>
+   <sender>RTPOutput</sender>
    <signal>clicked(bool)</signal>
-   <receiver>UDPPortLabel</receiver>
+   <receiver>RTPPortLabel</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -834,9 +834,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>UDPOutput</sender>
+   <sender>RTPOutput</sender>
    <signal>clicked(bool)</signal>
-   <receiver>UDPPort</receiver>
+   <receiver>RTPPort</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
@@ -1076,7 +1076,7 @@
   <connection>
    <sender>rawInput</sender>
    <signal>clicked(bool)</signal>
-   <receiver>UDPOutput</receiver>
+   <receiver>RTPOutput</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
