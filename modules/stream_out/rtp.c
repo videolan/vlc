@@ -25,12 +25,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "config.h"
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
-#include <errno.h>
 
 #include <vlc/vlc.h>
 #include <vlc_sout.h>
@@ -43,6 +37,12 @@
 #include <vlc_strings.h>
 
 #include "rtp.h"
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
+
+#include <errno.h>
 
 /*****************************************************************************
  * Module descriptor
