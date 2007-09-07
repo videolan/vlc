@@ -364,9 +364,11 @@ void ExtVideo::setWidgetValue( QObject *widget )
 
     if( !p_obj )
     {
+#if 0
         msg_Dbg( p_intf,
                  "Module instance %s not found, looking in config values.",
                  module.toStdString().c_str() );
+#endif
         i_type = config_GetType( p_intf, option.toStdString().c_str() ) & 0xf0;
         switch( i_type )
         {
