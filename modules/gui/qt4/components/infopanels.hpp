@@ -65,10 +65,10 @@ private:
     QLineEdit *genre_text;
 //    QLineEdit *copyright_text;
     QLineEdit *collection_text;
-    QSpinBox *seqnum_text;
+    QLineEdit *seqnum_text;
 //    QLineEdit *description_text;
     QSpinBox *rating_text;
-    QSpinBox *date_text;
+    QLineEdit *date_text;
 //    QLineEdit *setting_text;
     QLineEdit *language_text;
 //    QLineEdit *nowplaying_text;

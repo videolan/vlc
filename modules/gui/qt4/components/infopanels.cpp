@@ -83,12 +83,16 @@ MetaPanel::MetaPanel( QWidget *parent,
     /* Number */
     l->addWidget( new QLabel( qtr( "Track Number" )  + " :" ),
                   line, 3 );
-    seqnum_text = new QSpinBox; setSpinBounds( seqnum_text );
+    seqnum_text = new QLineEdit;
+    seqnum_text->setInputMask("0000");
+    seqnum_text->setAlignment( Qt::AlignRight );
     l->addWidget( seqnum_text, line, 4, 1, 2 );
     line++;
 
     /* Date (Should be in years) */
-    date_text = new QSpinBox; setSpinBounds( date_text );
+    date_text = new QLineEdit;
+    date_text->setInputMask("0000");
+    date_text->setAlignment( Qt::AlignRight );
     l->addWidget( new QLabel( qtr( VLC_META_DATE ) + " :" ), line, 0 );
     l->addWidget( date_text, line, 1, 1, 1 );
 
@@ -135,9 +139,9 @@ MetaPanel::MetaPanel( QWidget *parent,
     CONNECT( artist_text, textEdited( QString ), this, editMeta( QString ) );
     CONNECT( collection_text, textEdited( QString ), this, editMeta( QString ) );
     CONNECT( genre_text, textEdited( QString ), this, editMeta( QString ) );
-/*    CONNECT( date_text, valueChanged( QString ), this, editMeta( QString ) );
-    CONNECT( seqnum_text, valueChanged( QString ), this, editMeta( QString ) );
-    CONNECT( rating_text, valueChanged( QString ), this, editMeta( QString ) );*/
+    CONNECT( date_text, textEdited( QString ), this, editMeta( QString ) );
+    CONNECT( seqnum_text, textEdited( QString ), this, editMeta( QString ) );
+/*    CONNECT( rating_text, valueChanged( QString ), this, editMeta( QString ) );*/
     in_edit = false;
 }
 
@@ -179,11 +183,9 @@ void MetaPanel::saveMeta()
     input_item_SetAlbum(  p_input, qtu( collection_text->text() ) );
     input_item_SetGenre(  p_input, qtu( genre_text->text() ) );
 
-    snprintf( psz, sizeof(psz), "%d", date_text->value() );
-    input_item_SetDate(  p_input, psz );
+    input_item_SetDate(  p_input, qtu( date_text->text() ) );
 
-    snprintf( psz, sizeof(psz), "%d", seqnum_text->value() );
-    input_item_SetTrackNum(  p_input, psz );
+    input_item_SetTrackNum(  p_input, qtu( seqnum_text->text() ) );
 
     input_item_SetTitle(  p_input, qtu( title_text->text() ) );
 
@@ -278,8 +280,8 @@ void MetaPanel::update( input_item_t *p_item )
 //    UPDATE_META( Setting, setting_text );
 //    UPDATE_META( EncodedBy, encodedby_text );
 
-    UPDATE_META_INT( Date, date_text );
-    UPDATE_META_INT( TrackNum, seqnum_text );
+    UPDATE_META( Date, date_text );
+    UPDATE_META( TrackNum, seqnum_text );
     UPDATE_META_INT( Rating, rating_text );
 
 #undef UPDATE_META_INT
