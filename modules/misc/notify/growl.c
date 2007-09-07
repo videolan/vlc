@@ -70,7 +70,7 @@ vlc_module_begin();
 
     add_string( "growl-server", SERVER_DEFAULT, NULL,
                 SERVER_TEXT, SERVER_LONGTEXT, VLC_FALSE );
-    add_string( "growl-password", PASS_DEFAULT, NULL,
+    add_password( "growl-password", PASS_DEFAULT, NULL,
                 PASS_TEXT, PASS_LONGTEXT, VLC_FALSE );
     add_integer( "growl-port", 9887, NULL,
                 PORT_TEXT, PORT_LONGTEXT, VLC_TRUE );
