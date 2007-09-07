@@ -241,8 +241,6 @@ struct sout_stream_id_t
     int          i_mtu;
 
     /* Packets sinks */
-    sout_access_out_t *p_access;
-
     vlc_mutex_t       lock_sink;
     int               fdc;
     int              *fdv;
@@ -418,34 +416,22 @@ static int Open( vlc_object_t *p_this )
         id->i_bitrate = 0;
 
         /* create the access out */
-        if( p_sys->psz_destination == NULL )
-            id->p_access = NULL;
-        else
+        if( p_sys->psz_destination != NULL )
         {
-            char url[NI_MAXHOST + 8], access[22];
+            int ttl = (p_sys->i_ttl > 0) ? p_sys->i_ttl : -1;
+            int fd = net_ConnectDgram( p_stream, p_sys->psz_destination,
+                                       p_sys->i_port, ttl, IPPROTO_UDP );
 
-            if( p_sys->i_ttl > 0 )
-                sprintf( access, "udp{raw,rtcp,ttl=%d}", p_sys->i_ttl );
-            else
-                strcpy( access, "udp{raw,rtcp}" );
-
-            /* IPv6 needs brackets if not already present */
-            if (strchr( p_sys->psz_destination, ':' ) != NULL )
-                snprintf (url, sizeof (url), "[%s]:%d",p_sys->psz_destination,
-                          p_sys->i_port);
-            else
-                snprintf (url, sizeof (url), "%s:%d",p_sys->psz_destination,
-                          p_sys->i_port);
-
-            id->p_access = sout_AccessOutNew( p_sout, access, url );
-            if( id->p_access == NULL )
+            if( fd == -1 )
             {
-                msg_Err( p_stream, "cannot create the access out for %s://%s",
-                        access, url );
+                msg_Err( p_stream, "cannot create RTP socket" );
+                vlc_mutex_destroy( &id->lock_sink );
+                free( id );
                 free( psz );
                 free( p_sys );
                 return VLC_EGENERIC;
             }
+            rtp_add_sink( id, fd );
         }
 
         id->i_mtu = config_GetInt( p_stream, "mtu" );  /* XXX beurk */
@@ -462,7 +448,10 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_stream, "cannot create the muxer (%s)", psz );
             sout_AccessOutDelete( p_sys->p_grab );
-            sout_AccessOutDelete( id->p_access );
+            if( id->fdc > 0 )
+                rtp_del_sink( id, id->fdv[0] );
+            vlc_mutex_destroy( &id->lock_sink );
+            free( id );
             free( psz );
             free( p_sys );
             return VLC_EGENERIC;
@@ -843,10 +832,8 @@ static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 /** Add an ES as a new RTP stream */
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
-    sout_instance_t   *p_sout = p_stream->p_sout;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t  *id;
-    sout_access_out_t *p_access;
     int               i_port;
     char              *psz_sdp;
 
@@ -875,43 +862,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         p_sys->i_port += 2;
     }
 
-    if( p_sys->psz_destination == NULL )
-        p_access = NULL;
-    else
-    {
-        char access[22];
-        char url[NI_MAXHOST + 8];
-
-        /* first try to create the access out */
-        if( p_sys->i_ttl > 0 )
-        {
-            snprintf( access, sizeof( access ), "udp{raw,rtcp,ttl=%d}",
-                      p_sys->i_ttl );
-            access[sizeof( access ) - 1] = '\0';
-        }
-        else
-            strcpy( access, "udp{raw,rtcp}" );
-
-        snprintf( url, sizeof( url ), (( p_sys->psz_destination[0] != '[' ) &&
-                 strchr( p_sys->psz_destination, ':' )) ? "[%s]:%d" : "%s:%d",
-                 p_sys->psz_destination, i_port );
-        url[sizeof( url ) - 1] = '\0';
-
-        p_access = sout_AccessOutNew( p_sout, access, url );
-        if( p_access == NULL )
-        {
-            msg_Err( p_stream, "cannot create the access out for %s://%s",
-                     access, url );
-            return NULL;
-        }
-        msg_Dbg( p_stream, "access out %s:%s", access, url );
-    }
-
     /* not create the rtp specific stuff */
     id = malloc( sizeof( sout_stream_id_t ) );
     memset( id, 0, sizeof( sout_stream_id_t ) );
     id->p_stream   = p_stream;
-    id->p_access   = p_access;
     id->psz_rtpmap = NULL;
     id->psz_fmtp   = NULL;
     id->i_port     = i_port;
@@ -920,6 +874,22 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     vlc_mutex_init( p_stream, &id->lock_sink );
     id->fdc = 0;
     id->fdv = NULL;
+
+    if( p_sys->psz_destination != NULL )
+    {
+        int ttl = (p_sys->i_ttl > 0) ? p_sys->i_ttl : -1;
+        int fd = net_ConnectDgram( p_stream, p_sys->psz_destination,
+                                   p_sys->i_port, ttl, IPPROTO_UDP );
+
+        if( fd == -1 )
+        {
+            msg_Err( p_stream, "cannot create RTP socket" );
+            vlc_mutex_destroy( &id->lock_sink );
+            free( id );
+            return NULL;
+        }
+        rtp_add_sink( id, fd );
+    }
 
     switch( p_fmt->i_codec )
     {
@@ -1119,10 +1089,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         default:
             msg_Err( p_stream, "cannot add this stream (unsupported "
                      "codec:%4.4s)", (char*)&p_fmt->i_codec );
-            if( p_access )
-            {
-                sout_AccessOutDelete( p_access );
-            }
+            if( id->fdc > 0 )
+                rtp_del_sink( id, id->fdv[0] );
+            vlc_mutex_destroy( &id->lock_sink );
             free( id );
             return NULL;
     }
@@ -1189,24 +1158,15 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
             p_sys->i_port_video = id->i_port;
     }
 
-    if( id->p_access )
-    {
-        if( id->psz_rtpmap )
-        {
-            free( id->psz_rtpmap );
-        }
-        if( id->psz_fmtp )
-        {
-            free( id->psz_fmtp );
-        }
-        sout_AccessOutDelete( id->p_access );
-    }
+    free( id->psz_rtpmap );
+    free( id->psz_fmtp );
 
     if( id->rtsp_id )
         RtspDelId( p_sys->rtsp, id->rtsp_id );
+    if( id->fdc > 0 )
+        rtp_del_sink( id, id->fdv[0] ); /* sink for explicit dst= */
 
     vlc_mutex_destroy( &id->lock_sink );
-    free( id->fdv );
 
     /* Update SDP (sap/file) */
     if( p_sys->b_export_sap && !p_sys->p_mux ) SapSetup( p_stream );
@@ -1368,14 +1328,7 @@ static void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
     }
     vlc_mutex_unlock( &id->lock_sink );
 
-    if( id->p_access )
-    {
-        sout_AccessOutWrite( id->p_access, out );
-    }
-    else
-    {
-        block_Release( out );
-    }
+    block_Release( out );
 }
 
 int rtp_add_sink( sout_stream_id_t *id, int fd )
