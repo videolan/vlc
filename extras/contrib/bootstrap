@@ -67,6 +67,7 @@ if test "$HOST" != "$BUILD"; then
     LD="${HOST}-ld"
     RANLIB="${HOST}-ranlib"
     AR="${HOST}-ar"
+    STRIP="${HOST}-strip"
 fi
 
 # Check the HAVE_{OS}
@@ -254,6 +255,7 @@ echo "CXX = ${CXX}" >> config.mak
 echo "LD = ${LD}" >> config.mak
 echo "RANLIB = ${RANLIB}" >> config.mak
 echo "AR = ${AR}" >> config.mak
+echo "STRIP = ${STRIP}" >> config.mak
 echo "EXTRA_CFLAGS = ${CFLAGS_TUNING} ${EXTRA_CFLAGS}" >> config.mak
 echo "EXTRA_CPPFLAGS = ${EXTRA_CPPFLAGS} -isystem \$(PREFIX)/include" >> config.mak
 echo "EXTRA_LDFLAGS = ${EXTRA_LDFLAGS}" >> config.mak

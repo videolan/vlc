@@ -71,6 +71,10 @@ endif
 ifneq ($(AR),)
 HOSTCC+= AR="$(AR)"
 endif
+ifneq ($(STRIP),)
+HOSTCC+= STRIP="$(STRIP)"
+endif
+
 
 # Define ranlib on non-cross compilation setups
 ifeq ($(RANLIB),)

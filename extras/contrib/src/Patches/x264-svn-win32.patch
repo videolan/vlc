@@ -1,213 +1,23 @@
 Index: configure
 ===================================================================
---- configure	(revision 612)
+--- configure	(revision 672)
 +++ configure	(working copy)
-@@ -64,8 +64,101 @@
- 
- EXE=""
- 
-+AR="ar"
-+AROPTS="rc"
-+RANLIB="ranlib"
-+
- MACHINE="$(./config.guess)"
- 
-+# parse options
-+
-+for opt do
-+    optarg="${opt#*=}"
-+    case "$opt" in
-+	--crosscompile=*)
-+            CROSS="$optarg"
-+            CC="$CROSS-gcc"
-+            AR="$CROSS-ar"
-+            RANLIB="$CROSS-ranlib"
-+            MACHINE="`echo $CROSS | sed -e 's/-/-x-/g'`"
-+	    ;;
-+        --prefix=*)
-+            prefix="$optarg"
-+            ;;
-+        --exec-prefix=*)
-+            exec_prefix="$optarg"
-+            ;;
-+        --bindir=*)
-+            bindir="$optarg"
-+            ;;
-+        --libdir=*)
-+            libdir="$optarg"
-+            ;;
-+        --includedir=*)
-+            includedir="$optarg"
-+            ;;
-+        --enable-avis-input)
-+            avis_input="yes"
-+            ;;
-+        --disable-avis-input)
-+            avis_input="no"
-+            ;;
-+        --enable-mp4-output)
-+            mp4_output="yes"
-+            ;;
-+        --disable-mp4-output)
-+            mp4_output="no"
-+            ;;
-+        --extra-asflags=*)
-+            ASFLAGS="$ASFLAGS ${opt#--extra-asflags=}"
-+            ;;
-+        --extra-cflags=*)
-+            CFLAGS="$CFLAGS ${opt#--extra-cflags=}"
-+            ;;
-+        --extra-ldflags=*)
-+            LDFLAGS="$LDFLAGS ${opt#--extra-ldflags=}"
-+            ;;
-+        --enable-pthread)
-+            pthread="yes"
-+            ;;
-+        --disable-pthread)
-+            pthread="no"
-+            ;;
-+        --enable-debug)
-+            debug="yes"
-+            ;;
-+        --enable-gprof)
-+            CFLAGS="$CFLAGS -pg"
-+            LDFLAGS="$LDFLAGS -pg"
-+            gprof="yes"
-+            ;;
-+        --enable-pic)
-+            pic="yes"
-+            ;;
-+        --enable-gtk)
-+            gtk="yes"
-+            ;;
-+        --disable-gtk)
-+            gtk="no"
-+            ;;
-+        --enable-shared)
-+            shared="yes"
-+            if [ $ARCH = "X86_64" -o $ARCH = "PPC" -o $ARCH = "ALPHA" ] ; then
-+                pic="yes"
-+            fi
-+            ;;
-+        --enable-visualize)
-+            LDFLAGS="$LDFLAGS -L/usr/X11R6/lib -lX11"
-+            CFLAGS="$CFLAGS -DVISUALIZE=1"
-+            vis="yes"
-+            ;;
-+        *)
-+            echo "Unknown option $opt, ignored"
-+            ;;
-+    esac
-+done
-+
-+
- case "${MACHINE#*-*-}" in
-   beos*)
-     SYS="BEOS"
-@@ -183,88 +276,6 @@
- esac
- 
- CFLAGS="$CFLAGS -DARCH_$ARCH -DSYS_$SYS"
--
--# parse options
--
--for opt do
--    optarg="${opt#*=}"
--    case "$opt" in
--        --prefix=*)
--            prefix="$optarg"
--            ;;
--        --exec-prefix=*)
--            exec_prefix="$optarg"
--            ;;
--        --bindir=*)
--            bindir="$optarg"
--            ;;
--        --libdir=*)
--            libdir="$optarg"
--            ;;
--        --includedir=*)
--            includedir="$optarg"
--            ;;
--        --enable-avis-input)
--            avis_input="yes"
--            ;;
--        --disable-avis-input)
--            avis_input="no"
--            ;;
--        --enable-mp4-output)
--            mp4_output="yes"
--            ;;
--        --disable-mp4-output)
--            mp4_output="no"
--            ;;
--        --extra-asflags=*)
--            ASFLAGS="$ASFLAGS ${opt#--extra-asflags=}"
--            ;;
--        --extra-cflags=*)
--            CFLAGS="$CFLAGS ${opt#--extra-cflags=}"
--            ;;
--        --extra-ldflags=*)
--            LDFLAGS="$LDFLAGS ${opt#--extra-ldflags=}"
--            ;;
--        --enable-pthread)
--            pthread="auto" # can't skip detection, since it differs by OS
--            ;;
--        --disable-pthread)
--            pthread="no"
--            ;;
--        --enable-debug)
--            debug="yes"
--            ;;
--        --enable-gprof)
--            CFLAGS="$CFLAGS -pg"
--            LDFLAGS="$LDFLAGS -pg"
--            gprof="yes"
--            ;;
--        --enable-pic)
--            pic="yes"
--            ;;
--        --enable-gtk)
--            gtk="yes"
--            ;;
--        --disable-gtk)
--            gtk="no"
--            ;;
--        --enable-shared)
--            shared="yes"
--            if [ $ARCH = "X86_64" -o $ARCH = "PPC" -o $ARCH = "ALPHA" ] ; then
--                pic="yes"
--            fi
--            ;;
--        --enable-visualize)
--            LDFLAGS="$LDFLAGS -L/usr/X11R6/lib -lX11"
--            CFLAGS="$CFLAGS -DVISUALIZE=1"
--            vis="yes"
--            ;;
--        *)
--            echo "Unknown option $opt, ignored"
--            ;;
--    esac
--done
--
- # autodetect options that weren't forced nor disabled
- 
- libpthread=""
-@@ -363,6 +374,9 @@
+@@ -428,6 +428,10 @@
  ASFLAGS=$ASFLAGS
  GTK=$gtk
  EXE=$EXE
-+AR=$AR 
-+AROPTS=$AROPTS 
-+RANLIB=$RANLIB 
++AR=$AR
++STRIP=$STRIP
++AROPTS=$AROPTS
++RANLIB=$RANLIB
  VIS=$vis
  HAVE_GETOPT_LONG=$HAVE_GETOPT_LONG
  DEVNULL=$DEVNULL
 Index: Makefile
 ===================================================================
---- Makefile	(revision 590)
+--- Makefile	(revision 672)
 +++ Makefile	(working copy)
-@@ -66,8 +66,8 @@
+@@ -73,8 +73,8 @@
  default: $(DEP) x264$(EXE)
  
  libx264.a: .depend $(OBJS) $(OBJASM)
@@ -218,8 +28,17 @@ Index: Makefile
  
  $(SONAME): .depend $(OBJS) $(OBJASM)
  	$(CC) -shared -o $@ $(OBJS) $(OBJASM) -Wl,-soname,$(SONAME) $(LDFLAGS)
-@@ -138,14 +138,14 @@
- 	rm -f config.mak config.h x264.pc
+@@ -93,7 +93,7 @@
+ %.o: %.asm
+ 	$(AS) $(ASFLAGS) -o $@ $<
+ # delete local/anonymous symbols, so they don't show up in oprofile
+-	-@ strip -x $@
++	-@ $(STRIP) -x $@
+ 
+ .depend: config.mak
+ 	rm -f .depend
+@@ -146,14 +146,14 @@
+ 	rm -rf test/
  	$(MAKE) -C gtk distclean
  
 -install: x264 $(SONAME)
