@@ -240,13 +240,13 @@ struct sout_stream_id_t
     pf_rtp_packetizer_t pf_packetize;
     int          i_mtu;
 
-    /* for sending the packets */
+    /* Packets sinks */
     sout_access_out_t *p_access;
 
     vlc_mutex_t       lock_sink;
-    int               i_sink;
-    sout_access_out_t **sink;
-    rtsp_stream_id_t  *rtsp_id;
+    int               fdc;
+    int              *fdv;
+    rtsp_stream_id_t *rtsp_id;
 };
 
 
@@ -322,7 +322,7 @@ static int Open( vlc_object_t *p_this )
     {
         if( !b_rtsp )
         {
-            msg_Err( p_stream, "missing destination and not in rtsp mode" );
+            msg_Err( p_stream, "missing destination and not in RTSP mode" );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -387,8 +387,8 @@ static int Open( vlc_object_t *p_this )
         id->p_stream = p_stream;
 
         vlc_mutex_init( p_stream, &id->lock_sink );
-        id->i_sink = 0;
-        id->sink = NULL;
+        id->fdc = 0;
+        id->fdv = NULL;
         id->rtsp_id = NULL;
 
         /* Check muxer type */
@@ -918,8 +918,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->rtsp_id    = NULL;
 
     vlc_mutex_init( p_stream, &id->lock_sink );
-    id->i_sink = 0;
-    id->sink = NULL;
+    id->fdc = 0;
+    id->fdv = NULL;
 
     switch( p_fmt->i_codec )
     {
@@ -1206,7 +1206,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         RtspDelId( p_sys->rtsp, id->rtsp_id );
 
     vlc_mutex_destroy( &id->lock_sink );
-    free( id->sink );
+    free( id->fdv );
 
     /* Update SDP (sap/file) */
     if( p_sys->b_export_sap && !p_sys->p_mux ) SapSetup( p_stream );
@@ -1362,9 +1362,9 @@ static void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
 {
     int i;
     vlc_mutex_lock( &id->lock_sink );
-    for( i = 0; i < id->i_sink; i++ )
+    for( i = 0; i < id->fdc; i++ )
     {
-        sout_AccessOutWrite( id->sink[i], block_Duplicate( out ) );
+        send( id->fdv[i], out->p_buffer, out->i_buffer, 0 );
     }
     vlc_mutex_unlock( &id->lock_sink );
 
@@ -1378,20 +1378,21 @@ static void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
     }
 }
 
-int rtp_add_sink( sout_stream_id_t *id, sout_access_out_t *access )
+int rtp_add_sink( sout_stream_id_t *id, int fd )
 {
     vlc_mutex_lock( &id->lock_sink );
-    TAB_APPEND( id->i_sink, id->sink, access );
+    TAB_APPEND( id->fdc, id->fdv, fd );
     vlc_mutex_unlock( &id->lock_sink );
     return VLC_SUCCESS;
 }
 
-void rtp_del_sink( sout_stream_id_t *id, sout_access_out_t *access )
+void rtp_del_sink( sout_stream_id_t *id, int fd )
 {
-    /* NOTE: must be safe to use if access is not a sink to id */
+    /* NOTE: must be safe to use if fd is not included */
     vlc_mutex_lock( &id->lock_sink );
-    TAB_REMOVE( id->i_sink, id->sink, access );
+    TAB_REMOVE( id->fdc, id->fdv, fd );
     vlc_mutex_unlock( &id->lock_sink );
+    net_Close( fd );
 }
 
 static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,

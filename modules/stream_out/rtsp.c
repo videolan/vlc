@@ -154,7 +154,7 @@ struct rtsp_session_t
 struct rtsp_strack_t
 {
     sout_stream_id_t  *id;
-    sout_access_out_t *access;
+    int                fd;
     vlc_bool_t         playing;
 };
 
@@ -217,9 +217,8 @@ void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t *id )
             if( ses->trackv[j].id == id->sout_id )
             {
                 rtsp_strack_t *tr = ses->trackv + j;
-                sout_AccessOutDelete( tr->access );
+                net_Close( tr->fd );
                 REMOVE_ELEM( ses->trackv, ses->trackc, j );
-                /* FIXME: are we supposed to notify the client? */
             }
         }
     }
@@ -283,10 +282,7 @@ void RtspClientDel( rtsp_stream_t *rtsp, rtsp_session_t *session )
     TAB_REMOVE( rtsp->sessionc, rtsp->sessionv, session );
 
     for( i = 0; i < session->trackc; i++ )
-    {
-        rtp_del_sink( session->trackv[i].id, session->trackv[i].access );
-        sout_AccessOutDelete( session->trackv[i].access );
-    }
+        rtp_del_sink( session->trackv[i].id, session->trackv[i].fd );
 
     free( session->trackv );
     free( session );
@@ -491,10 +487,10 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 }
                 else
                 {
-                    char ip[NI_MAXNUMERICHOST], url[NI_MAXNUMERICHOST + 8];
-                    static const char access[] = "udp{raw,rtcp}";
+                    char ip[NI_MAXNUMERICHOST], src[NI_MAXNUMERICHOST];
                     rtsp_session_t *ses = NULL;
-                    rtsp_strack_t track = { id->sout_id, NULL, VLC_FALSE };
+                    rtsp_strack_t track = { id->sout_id, -1, VLC_FALSE };
+                    int sport;
 
                     if( httpd_ClientIP( cl, ip ) == NULL )
                     {
@@ -502,25 +498,18 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         continue;
                     }
 
-                    snprintf( url, sizeof( url ),
-                              ( strchr( ip, ':' ) != NULL )
-                                  ? "[%s]:%d" : "%s:%d",
-                              ip, loport );
-
-                    track.access = sout_AccessOutNew( p_stream->p_sout,
-                                                      access, url );
-                    if( track.access == NULL )
+                    track.fd = net_ConnectDgram( p_stream, ip, loport, -1,
+                                                 IPPROTO_UDP );
+                    if( track.fd == -1 )
                     {
                         msg_Err( p_stream,
-                                 "cannot create access output for %s://%s",
-                                 access, url );
+                                 "cannot create RTP socket for %s port %u",
+                                 ip, loport );
                         answer->i_status = 500;
                         continue;
                     }
 
-                    char *src = var_GetNonEmptyString( track.access,
-                                                       "src-addr" );
-                    int sport = var_GetInteger( track.access, "src-port" );
+                    net_GetSockAddress( track.fd, src, &sport );
 
                     vlc_mutex_lock( &rtsp->lock );
                     if( psz_session == NULL )
@@ -549,7 +538,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
 
                     httpd_ServerIP( cl, ip );
 
-                    if( ( src != NULL ) && strcmp( src, ip ) )
+                    if( strcmp( src, ip ) )
                     {
                         /* Specify source IP if it is different from the RTSP
                          * control connection server address */
@@ -573,7 +562,6 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     }
 
                     answer->i_status = 200;
-                    free( src );
                 }
                 break;
             }
@@ -602,7 +590,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                      && ( ( id == NULL ) || ( tr->id == id->sout_id ) ) )
                     {
                         tr->playing = VLC_TRUE;
-                        rtp_add_sink( tr->id, tr->access );
+                        rtp_add_sink( tr->id, tr->fd );
                     }
                 }
             }
@@ -650,8 +638,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 {
                     if( ses->trackv[i].id == id->sout_id )
                     {
-                        rtp_del_sink( id->sout_id, ses->trackv[i].access );
-                        sout_AccessOutDelete( ses->trackv[i].access );
+                        rtp_del_sink( id->sout_id, ses->trackv[i].fd );
                         REMOVE_ELEM( ses->trackv, ses->trackc, i );
                     }
                 }

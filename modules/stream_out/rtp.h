@@ -36,6 +36,6 @@ void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t * );
 
 char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url );
 
-int rtp_add_sink( sout_stream_id_t *id, sout_access_out_t *access );
-void rtp_del_sink( sout_stream_id_t *id, sout_access_out_t *access );
+int rtp_add_sink( sout_stream_id_t *id, int fd );
+void rtp_del_sink( sout_stream_id_t *id, int fd );
 
