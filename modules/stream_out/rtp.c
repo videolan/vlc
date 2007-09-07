@@ -161,7 +161,7 @@ static int               MuxDel ( sout_stream_t *, sout_stream_id_t * );
 static int               MuxSend( sout_stream_t *, sout_stream_id_t *,
                                   block_t* );
 
-static int AccessOutGrabberWrite( sout_access_out_t *, block_t * );
+static sout_access_out_t *GrabberCreate( sout_stream_t *p_sout );
 
 static void SDPHandleUrl( sout_stream_t *, char * );
 
@@ -371,7 +371,7 @@ static int Open( vlc_object_t *p_this )
     psz = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "mux" );
     if( psz != NULL )
     {
-        sout_access_out_t *p_grab;
+        /* TODO: factorize code with Add() */
         sout_stream_id_t  *id;
 
         p_stream->pf_add  = MuxAdd;
@@ -455,17 +455,7 @@ static int Open( vlc_object_t *p_this )
             id->i_mtu = 576 - 20 - 8;
         }
 
-        /* the access out grabber TODO export it as sout_AccessOutGrabberNew */
-        p_grab = p_sys->p_grab =
-            vlc_object_create( p_sout, sizeof( sout_access_out_t ) );
-        p_grab->p_module    = NULL;
-        p_grab->p_sout      = p_sout;
-        p_grab->psz_access  = strdup( "grab" );
-        p_grab->p_cfg       = NULL;
-        p_grab->psz_path    = strdup( "" );
-        p_grab->p_sys       = (sout_access_out_sys_t*)p_stream;
-        p_grab->pf_seek     = NULL;
-        p_grab->pf_write    = AccessOutGrabberWrite;
+        p_sys->p_grab = GrabberCreate( p_stream );
 
         /* the muxer */
         if( !( p_sys->p_mux = sout_MuxNew( p_sout, psz, p_sys->p_grab ) ) )
@@ -2113,4 +2103,24 @@ static int AccessOutGrabberWrite( sout_access_out_t *p_access,
     }
 
     return VLC_SUCCESS;
+}
+
+
+static sout_access_out_t *GrabberCreate( sout_stream_t *p_stream )
+{
+    sout_access_out_t *p_grab;
+
+    p_grab = vlc_object_create( p_stream->p_sout, sizeof( *p_grab ) );
+    if( p_grab == NULL )
+        return NULL;
+
+    p_grab->p_module    = NULL;
+    p_grab->p_sout      = p_stream->p_sout;
+    p_grab->psz_access  = strdup( "grab" );
+    p_grab->p_cfg       = NULL;
+    p_grab->psz_path    = strdup( "" );
+    p_grab->p_sys       = (sout_access_out_sys_t *)p_stream;
+    p_grab->pf_seek     = NULL;
+    p_grab->pf_write    = AccessOutGrabberWrite;
+    return p_grab;
 }
