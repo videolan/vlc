@@ -62,13 +62,11 @@ private:
     int i_runs;
     bool mainInput;
     bool stats;
-    bool in_edit;
     InputStatsPanel *ISP;
     MetaPanel *MP;
     InfoPanel *IP;
     ExtraMetaPanel *EMP;
     QPushButton *saveMetaButton;
-    QPushButton *editMetaButton;
 public slots:
     void update();
     void saveMeta();

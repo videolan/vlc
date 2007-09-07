@@ -49,14 +49,15 @@ MetaPanel::MetaPanel( QWidget *parent,
                       intf_thread_t *_p_intf )
                       : QWidget( parent ), p_intf( _p_intf )
 {
-    QGridLayout *l = new QGridLayout( this );
+    QGridLayout *metaLayout = new QGridLayout( this );
+    
     int line = 0; /* Counter for GridLayout */
     p_input = NULL;
 
 #define ADD_META( string, widget ) {                             \
-    l->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
+    metaLayout->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
     widget = new QLineEdit;                                      \
-    l->addWidget( widget, line, 1, 1, 5 );                       \
+    metaLayout->addWidget( widget, line, 1, 1, 9 );                       \
     line++;            }
 
     /* ART_URL */
@@ -67,7 +68,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     art_cover->setMaximumWidth( 128 );
     art_cover->setScaledContents( true );
     art_cover->setPixmap( QPixmap( ":/noart.png" ) );
-    l->addWidget( art_cover, line, 6, 4, 2 );
+    metaLayout->addWidget( art_cover, line, 8, 4, 2 );
 
     /* Title, artist and album*/
     ADD_META( VLC_META_TITLE, title_text ); /* OK */
@@ -77,75 +78,157 @@ MetaPanel::MetaPanel( QWidget *parent,
     /* Genre Name */
     /* FIXME List id3genres.h is not includable yet ? */
     genre_text = new QLineEdit;
-    l->addWidget( new QLabel( qtr( VLC_META_GENRE ) + " :" ), line, 0 );
-    l->addWidget( genre_text, line, 1, 1, 2 );
+    metaLayout->addWidget( new QLabel( qtr( VLC_META_GENRE ) + " :" ), line, 0 );
+    metaLayout->addWidget( genre_text, line, 1, 1, 2 );
 
-    /* Number */
-    l->addWidget( new QLabel( qtr( "Track Number" )  + " :" ),
+    /* Number - on the same line */
+    metaLayout->addWidget( new QLabel( qtr( "Track Number" )  + " :" ),
                   line, 3 );
     seqnum_text = new QLineEdit;
     seqnum_text->setInputMask("0000");
     seqnum_text->setAlignment( Qt::AlignRight );
-    l->addWidget( seqnum_text, line, 4, 1, 2 );
+    metaLayout->addWidget( seqnum_text, line, 4, 1, 2 );
     line++;
 
     /* Date (Should be in years) */
     date_text = new QLineEdit;
     date_text->setInputMask("0000");
     date_text->setAlignment( Qt::AlignRight );
-    l->addWidget( new QLabel( qtr( VLC_META_DATE ) + " :" ), line, 0 );
-    l->addWidget( date_text, line, 1, 1, 1 );
+    metaLayout->addWidget( new QLabel( qtr( VLC_META_DATE ) + " :" ), line, 0 );
+    metaLayout->addWidget( date_text, line, 1, 1, 1 );
 
-    /* Rating */
+    /* Rating - on the same line */
+    metaLayout->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 2 );
+    rating_text = new QSpinBox; setSpinBounds( rating_text );
+    metaLayout->addWidget( rating_text, line, 3, 1, 1 );
 
-    l->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 2 );
-    rating_text = new QSpinBox; setSpinBounds( rating_text) ;
-    l->addWidget( rating_text, line, 3, 1, 1 );
-
-    /* Now Playing ? */
-//    ADD_META( VLC_META_NOW_PLAYING, nowplaying_text );
-
-    /* Language and settings */
-    l->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 4 );
+    /* Language on the same line */
+    metaLayout->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 4 );
     language_text = new QLineEdit;
-    l->addWidget( language_text, line, 5, 1, 1 );
+    metaLayout->addWidget( language_text, line, 5, 1, 1 );
+    line++;
+
+    /* Now Playing - Useful for live feeds (HTTP, DVB, ETC...) */
+    ADD_META( VLC_META_NOW_PLAYING, nowplaying_text );
+
+/* Settings is unused */
 /*    l->addWidget( new QLabel( qtr( VLC_META_SETTING ) + " :" ), line, 5 );
     setting_text = new QLineEdit;
-    l->addWidget( setting_text, line, 6, 1, 4 );
-    line++;*/
+    l->addWidget( setting_text, line, 6, 1, 4 ); */
 
-/* useless metadata
+/* Less used metadata */
 #define ADD_META_2( string, widget ) {                             \
-    l->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
+    metaLayout->addWidget( new QLabel( qtr( string ) + " :" ), line, 0 ); \
     widget = new QLineEdit;                                      \
-    l->addWidget( widget, line, 1, 1, 7 );                       \
+    metaLayout->addWidget( widget, line, 1, 1, 7 );                       \
     line++;            }
-
-    ADD_META_2( VLC_META_COPYRIGHT, copyright_text );
     ADD_META_2( VLC_META_PUBLISHER, publisher_text );
+    ADD_META_2( VLC_META_COPYRIGHT, copyright_text );
+    ADD_META_2( "Comments:", description_text );
 
-    ADD_META_2( VLC_META_ENCODED_BY, encodedby_text );
-    ADD_META_2( VLC_META_DESCRIPTION, description_text );
-*/
+/* useless metadata */
+
+    //ADD_META_2( VLC_META_ENCODED_BY, encodedby_text );
     /*  ADD_META( TRACKID )  Useless ? */
     /*  ADD_URI - DO not show it, done outside */
 
 #undef ADD_META
-//#undef ADD_META_2
+#undef ADD_META_2
 
+    CONNECT( title_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( description_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( artist_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( collection_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( genre_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( date_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( seqnum_text, textEdited( QString ), this, enterEditMode() );
+/*    CONNECT( rating_text, valueChanged( QString ), this, enterEditMode( QString ) );*/
 
-    CONNECT( title_text, textEdited( QString ), this, editMeta( QString ) );
-//    CONNECT( description_text, textEdited( QString ), this, editMeta( QString ) );
-    CONNECT( artist_text, textEdited( QString ), this, editMeta( QString ) );
-    CONNECT( collection_text, textEdited( QString ), this, editMeta( QString ) );
-    CONNECT( genre_text, textEdited( QString ), this, editMeta( QString ) );
-    CONNECT( date_text, textEdited( QString ), this, editMeta( QString ) );
-    CONNECT( seqnum_text, textEdited( QString ), this, editMeta( QString ) );
-/*    CONNECT( rating_text, valueChanged( QString ), this, editMeta( QString ) );*/
-    in_edit = false;
+    /* We are not yet in Edit Mode */
+    b_inEditMode = false;
 }
 
 MetaPanel::~MetaPanel(){}
+
+/**
+ * Update all the MetaData and art on an "item-changed" event
+ **/
+void MetaPanel::update( input_item_t *p_item )
+{
+    /* Don't update if you are in edit mode */
+    if( b_inEditMode ) return;
+        
+    char *psz_meta; 
+#define UPDATE_META( meta, widget ) {               \
+    psz_meta = input_item_Get##meta( p_item );      \
+    if( !EMPTY_STR( psz_meta ) )                    \
+        widget->setText( qfu( psz_meta ) );         \
+    else                                            \
+        widget->setText( "" ); }                    \
+    free( psz_meta );
+
+#define UPDATE_META_INT( meta, widget ) {           \
+    psz_meta = input_item_Get##meta( p_item );      \
+    if( !EMPTY_STR( psz_meta ) )                    \
+        widget->setValue( atoi( psz_meta ) ); }     \
+    free( psz_meta );
+
+    /* Name / Title */
+    psz_meta = input_item_GetTitle( p_item );
+    char *psz_name = input_item_GetName( p_item );
+    if( !EMPTY_STR( psz_meta ) )
+        title_text->setText( qfu( psz_meta ) );
+    else if( !EMPTY_STR( psz_name ) )
+        title_text->setText( qfu( psz_name ) );
+    else title_text->setText( "" );
+    free( psz_meta );
+    free( psz_name );
+
+    /* URL / URI */
+    psz_meta = input_item_GetURL( p_item );
+    if( !EMPTY_STR( psz_meta ) )
+    {
+        emit uriSet( QString( psz_meta ) );
+        free( psz_meta );
+    }
+    else
+    {
+        free( psz_meta );
+        psz_meta = input_item_GetURI( p_item );
+        if( !EMPTY_STR( psz_meta ) )
+            emit uriSet( QString( psz_meta ) );
+    }
+
+    /* Other classic though */
+    UPDATE_META( Artist, artist_text );
+    UPDATE_META( Genre, genre_text );
+    UPDATE_META( Copyright, copyright_text );
+    UPDATE_META( Album, collection_text );
+    UPDATE_META( Description, description_text );
+    UPDATE_META( Language, language_text );
+    UPDATE_META( NowPlaying, nowplaying_text );
+    UPDATE_META( Publisher, publisher_text );
+//    UPDATE_META( Setting, setting_text );
+//    UPDATE_META( EncodedBy, encodedby_text );
+
+    UPDATE_META( Date, date_text );
+    UPDATE_META( TrackNum, seqnum_text );
+    UPDATE_META_INT( Rating, rating_text );
+
+#undef UPDATE_META_INT
+#undef UPDATE_META
+
+    /* Art Urls */
+    psz_meta = input_item_GetArtURL( p_item );
+    if( psz_meta && !strncmp( psz_meta, "file://", 7 ) )
+    {
+        QString artUrl = qfu( psz_meta ).replace( "file://",QString("" ) );
+        art_cover->setPixmap( QPixmap( artUrl ) );
+    }
+    else
+        art_cover->setPixmap( QPixmap( ":/noart.png" ) );
+    free( psz_meta );
+}
 
 /**
  * Save the MetaData, triggered by parent->save Button
@@ -199,111 +282,40 @@ void MetaPanel::saveMeta()
         module_Unneed( p_playlist, p_mod );
     PL_UNLOCK;
     pl_Release( p_playlist );
-    in_edit = false;
+    b_inEditMode = false;
 }
 
-void MetaPanel::editMeta( QString edit )
+
+bool MetaPanel::isInEditMode()
 {
-    in_edit = true;
-    emit editing();
+    return b_inEditMode;
 }
 
-void MetaPanel::setEdit( bool editing )
+void MetaPanel::enterEditMode()
 {
-   in_edit = editing;
+    setEditMode( true );
+}
+
+void MetaPanel::setEditMode( bool b_editing )
+{
+    b_inEditMode = b_editing;
+    if( b_editing )emit editing();
 }
 
 void MetaPanel::setInput( input_item_t *input )
 {
-    if( in_edit ) return;
+    if( b_inEditMode ) return;
 
     p_input = input;
 }
 
-/**
- * Update all the MetaData and art on an "item-changed" event
- **/
-void MetaPanel::update( input_item_t *p_item )
-{
-    if( in_edit ) return;
-    char *psz_meta; 
-#define UPDATE_META( meta, widget ) {               \
-    psz_meta = input_item_Get##meta( p_item );      \
-    if( !EMPTY_STR( psz_meta ) )                    \
-        widget->setText( qfu( psz_meta ) );         \
-    else                                            \
-        widget->setText( "" ); }                    \
-    free( psz_meta );
-
-#define UPDATE_META_INT( meta, widget ) {           \
-    psz_meta = input_item_Get##meta( p_item );      \
-    if( !EMPTY_STR( psz_meta ) )                    \
-        widget->setValue( atoi( psz_meta ) ); }     \
-    free( psz_meta );
-
-
-    /* Name / Title */
-    psz_meta = input_item_GetTitle( p_item );
-    char *psz_name = input_item_GetName( p_item );
-    if( !EMPTY_STR( psz_meta ) )
-        title_text->setText( qfu( psz_meta ) );
-    else if( !EMPTY_STR( psz_name ) )
-        title_text->setText( qfu( psz_name ) );
-    else title_text->setText( "" );
-    free( psz_meta );
-    free( psz_name );
-
-    /* URL / URI */
-    psz_meta = input_item_GetURL( p_item );
-    if( !EMPTY_STR( psz_meta ) )
-    {
-        emit uriSet( QString( psz_meta ) );
-        free( psz_meta );
-    }
-    else
-    {
-        free( psz_meta );
-        psz_meta = input_item_GetURI( p_item );
-        if( !EMPTY_STR( psz_meta ) )
-            emit uriSet( QString( psz_meta ) );
-    }
-
-    /* Other classic though */
-    UPDATE_META( Artist, artist_text );
-    UPDATE_META( Genre, genre_text );
-//    UPDATE_META( Copyright, copyright_text );
-    UPDATE_META( Album, collection_text );
-//    UPDATE_META( Description, description_text );
-    UPDATE_META( Language, language_text );
-//    UPDATE_META( NowPlaying, nowplaying_text );
-//    UPDATE_META( Publisher, publisher_text );
-//    UPDATE_META( Setting, setting_text );
-//    UPDATE_META( EncodedBy, encodedby_text );
-
-    UPDATE_META( Date, date_text );
-    UPDATE_META( TrackNum, seqnum_text );
-    UPDATE_META_INT( Rating, rating_text );
-
-#undef UPDATE_META_INT
-#undef UPDATE_META
-
-    /* Art Urls */
-    psz_meta = input_item_GetArtURL( p_item );
-    if( psz_meta && !strncmp( psz_meta, "file://", 7 ) )
-    {
-        QString artUrl = qfu( psz_meta ).replace( "file://",QString("" ) );
-        art_cover->setPixmap( QPixmap( artUrl ) );
-    }
-    else
-        art_cover->setPixmap( QPixmap( ":/noart.png" ) );
-    free( psz_meta );
-}
-
 /*
  * Clear all the metadata widgets
- * Unused yet
+ * Unused yet FIXME
  */
-void MetaPanel::clear(){}
+void MetaPanel::clear(){
+    setEditMode( false );
+}
 
 /**
  * Second Panel - Shows the extra metadata in a tree, non editable.
@@ -568,5 +580,3 @@ void InputStatsPanel::update( input_item_t *p_item )
 void InputStatsPanel::clear()
 {
 }
-
-

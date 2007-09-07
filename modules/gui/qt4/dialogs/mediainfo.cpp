@@ -88,10 +88,9 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
 
     /* Let the MetaData Panel update the URI */
     CONNECT( MP, uriSet( QString ), uriLine, setText( QString ) );
-    CONNECT( MP, editing(), this, editMeta() );
+    CONNECT( MP, editing( bool ), this, editMeta( bool ) );
 
-    CONNECT( IT, currentChanged ( int ), this, updateButtons( int ) );
-
+    CONNECT( IT, currentChanged( int ), this, updateButtons( int ) );
 
     /* Create the main Update function with a time (150ms) */
     if( mainInput ) {
@@ -114,6 +113,8 @@ void MediaInfoDialog::showTab( int i_tab = 0 )
     IT->setCurrentIndex( i_tab );
 }
 
+
+/**/
 void MediaInfoDialog::editMeta()
 {
     saveMetaButton->show();
@@ -144,11 +145,8 @@ void MediaInfoDialog::setInput( input_item_t *p_input )
      */
     input_thread_t *p_current =
                      MainInputManager::getInstance( p_intf )->getInput();
-    if( !p_current || p_current->b_dead )
-        in_edit = true;
-    else
-        in_edit = ( input_GetItem( p_current ) != p_input );
-    MP->setEdit( in_edit );
+    MP->setEditMode( ( !p_current || p_current->b_dead ) ? 
+                            true: false );
 }
 
 void MediaInfoDialog::update()
@@ -174,8 +172,9 @@ void MediaInfoDialog::update()
     vlc_object_release( p_input );
 }
 
-void MediaInfoDialog::update( input_item_t *p_item, bool update_info,
-                                                    bool update_meta )
+void MediaInfoDialog::update( input_item_t *p_item, 
+                                                 bool update_info,
+                                                 bool update_meta )
 {
     MP->setInput( p_item );
     if( update_info )
@@ -204,15 +203,12 @@ void MediaInfoDialog::close()
     if( mainInput == false ) {
         deleteLater();
     }
-    MP->setEdit( false );
-    in_edit = false;
+    MP->setEditMode( false );
 }
 
 void MediaInfoDialog::updateButtons( int i_tab )
 {
-    msg_Dbg( p_intf, "Coin Coin, Tab number: %i", i_tab );
-
-    if( in_edit and i_tab == 0 )
+    if( MP->isInEditMode() && i_tab == 0 )
         saveMetaButton->show();
     else
         saveMetaButton->hide();

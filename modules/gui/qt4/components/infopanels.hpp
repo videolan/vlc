@@ -55,32 +55,38 @@ public:
     virtual ~MetaPanel();
     void saveMeta();
     void setInput( input_item_t * );
-    void setEdit( bool );
+    
+    bool isInEditMode();
+    void setEditMode( bool );
 private:
     input_item_t *p_input;
     intf_thread_t *p_intf;
+    bool b_inEditMode;
+
     QLineEdit *uri_text;
     QLineEdit *title_text;
     QLineEdit *artist_text;
     QLineEdit *genre_text;
-//    QLineEdit *copyright_text;
+    QLineEdit *copyright_text;
     QLineEdit *collection_text;
     QLineEdit *seqnum_text;
-//    QLineEdit *description_text;
+    QLineEdit *description_text;
     QSpinBox *rating_text;
     QLineEdit *date_text;
 //    QLineEdit *setting_text;
     QLineEdit *language_text;
-//    QLineEdit *nowplaying_text;
-//    QLineEdit *publisher_text;
+    QLineEdit *nowplaying_text;
+    QLineEdit *publisher_text;
 //    QLineEdit *encodedby_text;
     QLabel *art_cover;
-    bool in_edit;
 
 public slots:
     void update( input_item_t * );
     void clear();
-    void editMeta( QString );
+
+private slots:
+    void enterEditMode();
+    
 signals:
     void uriSet( QString );
     void editing();
