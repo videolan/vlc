@@ -66,8 +66,9 @@ static CFArrayRef copy_all_locale_indentifiers(void)
 void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     char i_dummy;
-    char *p_char, *p_oldchar = &i_dummy;
-	int i;
+    char *p_char = NULL;
+    char *p_oldchar = &i_dummy;
+    int i;
 
     /* Get the full program path and name */
 
@@ -75,7 +76,6 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
     for (i = 0; i < _dyld_image_count(); i++)
     {
         char * psz_img_name = _dyld_get_image_name(i);
-		printf("%s\n", psz_img_name );
         if( strstr( psz_img_name, "VLC.framework/Version/Current/VLC" ) )
             p_char = strdup( psz_img_name );
     }
@@ -86,7 +86,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
         p_char = strdup( ppsz_argv[ 0 ] );
     }
 
-	vlc_global()->psz_vlcpath = p_char;
+    vlc_global()->psz_vlcpath = p_char;
 
     /* Remove trailing program name */
     for( ; *p_char ; )
