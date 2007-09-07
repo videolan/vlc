@@ -36,12 +36,10 @@ class MediaInfoDialog : public QVLCFrame
 {
     Q_OBJECT;
 public:
-    MediaInfoDialog( intf_thread_t *, bool stats = true,
-                    bool mainInput = false );
+    MediaInfoDialog( intf_thread_t *, bool stats = true, bool mainInput = false );
     static MediaInfoDialog * getInstance( intf_thread_t *p_intf )
     {
-        if( !instance)
-            instance = new MediaInfoDialog( p_intf, true, true );
+        if( !instance) instance = new MediaInfoDialog( p_intf, true, true );
         return instance;
     }
     static void killInstance()
@@ -51,30 +49,39 @@ public:
     }
     virtual ~MediaInfoDialog();
 
-    void showTab( int );
-    bool need_update;
+    void showTab( int );    
     void setInput( input_item_t * );
-    QLineEdit *uriLine;
+    
+    bool b_need_update;
+    
 private:
     input_thread_t *p_input;
-    QTabWidget *IT;
     static MediaInfoDialog *instance;
+
     int i_runs;
     bool mainInput;
     bool stats;
+    
+
+    QTabWidget *IT;
     InputStatsPanel *ISP;
     MetaPanel *MP;
     InfoPanel *IP;
     ExtraMetaPanel *EMP;
+
     QPushButton *saveMetaButton;
+    QLineEdit *uriLine;
+
 public slots:
     void update();
     void saveMeta();
     void editMeta();
     void update( input_item_t *, bool, bool );
+    void updateButtons( int i_tab );
+
+private slots:
     void close();
     void clear();
-    void updateButtons( int i_tab );
 };
 
 #endif

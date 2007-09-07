@@ -45,7 +45,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
 {
     i_runs = 0;
     p_input = NULL;
-    need_update = true;
+    b_need_update = true;
 
     setWindowTitle( qtr( "Media information" ) );
     resize( 600 , 300 );
@@ -113,8 +113,6 @@ void MediaInfoDialog::showTab( int i_tab = 0 )
     IT->setCurrentIndex( i_tab );
 }
 
-
-/**/
 void MediaInfoDialog::editMeta()
 {
     saveMetaButton->show();
@@ -130,7 +128,7 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     MediaInfoDialog *p_d = (MediaInfoDialog *)param;
-    p_d->need_update = VLC_TRUE;
+    p_d->b_need_update = VLC_TRUE;
     return VLC_SUCCESS;
 }
 
@@ -166,8 +164,8 @@ void MediaInfoDialog::update()
 
     vlc_object_yield( p_input );
 
-    update( input_GetItem(p_input), need_update, need_update );
-    need_update = false;
+    update( input_GetItem(p_input), b_need_update, b_need_update );
+    b_need_update = false;
 
     vlc_object_release( p_input );
 }
