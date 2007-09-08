@@ -604,7 +604,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
             goto out;
         }
 
-        /* FIXME test if destination is multicast or no destination at all FIXME */
+        /* FIXME test if destination is multicast or no destination at all */
         p_sys->rtsp = RtspSetup( p_stream, &url );
         if( p_sys->rtsp == NULL )
         {
@@ -699,7 +699,7 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
              sizeof( "i=*\r\n" ) + strlen( p_sys->psz_session_description ) +
              sizeof( "u=*\r\n" ) + strlen( p_sys->psz_session_url ) +
              sizeof( "e=*\r\n" ) + strlen( p_sys->psz_session_email ) +
-             sizeof( "t=0 0\r\n" ) + /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
+             sizeof( "t=0 0\r\n" ) +
              sizeof( "b=RR:0\r\n" ) +
              sizeof( "a=tool:"PACKAGE_STRING"\r\n" ) +
              sizeof( "a=recvonly\r\n" ) +
@@ -745,7 +745,8 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
     if( *p_sys->psz_session_email )
         p += sprintf( p, "e=%s\r\n", p_sys->psz_session_email );
 
-    p += sprintf( p, "t=0 0\r\n" ); /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
+    p += sprintf( p, "t=0 0\r\n" ); /* permanent stream */
+        /* when scheduled from vlm, we should set this info correctly */
     p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
     p += sprintf( p, "a=recvonly\r\n" );
     p += sprintf( p, "a=type:broadcast\r\n" );
@@ -853,7 +854,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     }
     while( i_port == 0 )
     {
-        if( p_sys->i_port != p_sys->i_port_audio && p_sys->i_port != p_sys->i_port_video )
+        if( p_sys->i_port != p_sys->i_port_audio
+         && p_sys->i_port != p_sys->i_port_video )
         {
             i_port = p_sys->i_port;
             p_sys->i_port += 2;
@@ -1256,7 +1258,8 @@ static int HttpSetup( sout_stream_t *p_stream, vlc_url_t *url)
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_stream), url->psz_host, url->i_port > 0 ? url->i_port : 80 );
+    p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_stream), url->psz_host,
+                                         url->i_port > 0 ? url->i_port : 80 );
     if( p_sys->p_httpd_host )
     {
         p_sys->p_httpd_file = httpd_FileNew( p_sys->p_httpd_host,
