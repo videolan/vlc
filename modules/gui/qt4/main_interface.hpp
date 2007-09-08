@@ -128,10 +128,12 @@ public slots:
     void toggleAdvanced();
 private slots:
     void updateOnTimer();
+
     void setStatus( int );
+    void setRate( int );
     void setName( QString );
     void setVLCWindowsTitle( QString title = "" );
-    void setDisplay( float, int, int );
+    void setDisplayPosition( float, int, int );
     void toggleTimeDisplay();
     void setElapsedTime();
     void setRemainTime();

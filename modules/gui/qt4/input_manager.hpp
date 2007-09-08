@@ -60,6 +60,7 @@ public slots:
 signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int, int );
+    void rateChanged( int );
     void nameChanged( QString );
     /// Used to signal whether we should show navigation buttons
     void navigationChanged( int );

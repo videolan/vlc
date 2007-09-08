@@ -183,8 +183,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Connect the input manager to the GUI elements it manages */
     /* It is also connected to the control->slider, see the ControlsWidget */
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
-             this, setDisplay( float, int, int ) );
-
+             this, setDisplayPosition( float, int, int ) );
+    
+    CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
+    
     /** Connects on nameChanged() */
     /* Naming in the controller statusbar */
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
@@ -655,7 +657,7 @@ bool MainInterface::isAdvancedVisible()
 /************************************************************************
  * Other stuff
  ************************************************************************/
-void MainInterface::setDisplay( float pos, int time, int length )
+void MainInterface::setDisplayPosition( float pos, int time, int length )
 {
     char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
     secstotimestr( psz_length, length );
@@ -684,6 +686,15 @@ void MainInterface::setStatus( int status )
     controls->setStatus( status );
     if( sysTray )
         updateSystrayMenu( status );
+}
+
+void MainInterface::setRate( int rate )
+{
+    msg_Dbg( p_intf, "raaahhh %i", rate );
+    QString str;
+    str.setNum( ( 1000/(double)rate), 'f', 2 );
+    str.append( "x" );
+    speedLabel->setText( str );
 }
 
 void MainInterface::updateOnTimer()

@@ -100,8 +100,11 @@ void InputManager::update()
     i_time = var_GetTime( p_input, "time") / 1000000;
     f_pos = var_GetFloat( p_input, "position" );
     emit positionUpdated( f_pos, i_time, i_length );
+    
+    /* Update rate */
+    emit rateChanged( var_GetInteger( p_input, "rate") );
 
-    /* Update disc status */
+    /* Update navigation status */
     vlc_value_t val; val.i_int = 0;
     var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
     if( val.i_int > 0 )
