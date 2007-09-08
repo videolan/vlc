@@ -109,7 +109,7 @@ void InputManager::update()
         val.i_int = 0;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
         if( val.i_int > 0 )
-        {          
+        {
             emit navigationChanged( 1 ); // 1 = chapter, 2 = title, 0 = NO
         }
         else

@@ -108,4 +108,6 @@ void GotoTimeDialog::close()
         var_SetTime( THEMIM->getInput(), "time", i_time );
     }
     this->toggleVisible();
+    timeEdit->setTime( QTime( 0, 0, 0) );
+    THEMIM->getIM()->update();
 }
