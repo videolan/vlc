@@ -49,7 +49,7 @@
 
 #ifdef WIN32
     #define PREF_W 410
-    #define PREF_H 151
+    #define PREF_H 121
 #else
     #define PREF_W 450
     #define PREF_H 160
@@ -145,7 +145,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     statusBar()->addPermanentWidget( timeLabel, 2 );
     speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
     timeLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
-    
+    timeLabel->installEventFilter( this );
     CONNECT( speedLabel, customContextMenuRequested( QPoint ),
              this, showSpeedMenu( QPoint ) );
     CONNECT( timeLabel, customContextMenuRequested( QPoint ),
@@ -274,6 +274,7 @@ void MainInterface::setVLCWindowsTitle( QString aTitle )
         setWindowTitle( aTitle + " - " + qtr( "VLC media player" ) );
     }
 }
+
 
 void MainInterface::handleMainUi( QSettings *settings )
 {
@@ -664,7 +665,7 @@ void MainInterface::setDisplay( float pos, int time, int length )
     else timeLabel->setText( " "+title+" " );
 }
 
-void MainInterface::toggleTimeDisplay( bool b_remain = false )
+void MainInterface::toggleTimeDisplay()
 {
     b_remainingTime = ( b_remainingTime ? false : true );
 }
@@ -803,7 +804,7 @@ void MainInterface::updateSystrayTooltipName( QString name )
     else
     {
         sysTray->setToolTip( name );
-        if( notificationEnabled && ( isHidden() || isMinimized() ) )
+        if( notificationEnabled )
         {
             sysTray->showMessage( qtr( "VLC media player" ), name,
                     QSystemTrayIcon::NoIcon, 4000 );
@@ -909,6 +910,12 @@ void MainInterface::customEvent( QEvent *event )
         show(); /* necessary to apply window flags?? */
     }
 }
+
+bool MainInterface::eventFilter(QObject *obj, QEvent *event)
+{
+    if( (obj == timeLabel) && (event->type() == QEvent::MouseButtonPress) ) toggleTimeDisplay();
+}
+
 
 void MainInterface::keyPressEvent( QKeyEvent *e )
 {

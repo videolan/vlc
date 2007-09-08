@@ -70,6 +70,9 @@ protected:
     void dragMoveEvent( QDragMoveEvent * );
     void dragLeaveEvent( QDragLeaveEvent * );
     void closeEvent( QCloseEvent *);
+ 
+    bool eventFilter(QObject *obj, QEvent *event);
+
     friend class VolumeClickHandler;
 private:
     QSettings           *settings;
@@ -129,7 +132,7 @@ private slots:
     void setName( QString );
     void setVLCWindowsTitle( QString title = "" );
     void setDisplay( float, int, int );
-    void toggleTimeDisplay( bool );
+    void toggleTimeDisplay();
     void setElapsedTime();
     void setRemainTime();
 #if 0
