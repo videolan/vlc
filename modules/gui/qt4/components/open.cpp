@@ -795,13 +795,11 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /**********
      * Screen *
      **********/
-
     addModuleAndLayouts( SCREEN_DEVICE, screen, "Desktop" );
     QLabel *screenLabel = new QLabel( "This option will open your own "
             "desktop in order to save or stream it.");
     screenLabel->setWordWrap( true );
     screenDevLayout->addWidget( screenLabel, 0, 0 );
-
 
     /* General connects */
     connect( ui.deviceCombo, SIGNAL( activated( int ) ),
@@ -825,7 +823,6 @@ void CaptureOpenPanel::updateMRL()
     QString mrl = "";
     int i_devicetype = ui.deviceCombo->itemData(
             ui.deviceCombo->currentIndex() ).toInt();
-    msg_Dbg( p_intf, "Capture Type: %i", i_devicetype );
     switch( i_devicetype )
     {
     case V4L_DEVICE:
