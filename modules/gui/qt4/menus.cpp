@@ -175,8 +175,8 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
     }
     BAR_ADD( ToolsMenu( p_intf, mi, adv_controls_enabled,
                 visual_selector_enabled ), qtr("&Tools") );
-    BAR_DADD( VideoMenu( p_intf, NULL ), qtr("&Video"), 1 );
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr("&Audio"), 2 );
+    BAR_DADD( VideoMenu( p_intf, NULL ), qtr("&Video"), 1 );
     BAR_DADD( NavigMenu( p_intf, NULL ), qtr("&Navigation"), 3 );
 
     BAR_ADD( HelpMenu(), qtr("&Help" ) );
@@ -255,9 +255,9 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     }
     DP_SADD( menu, qtr( I_MENU_MSG ), "", ":/pixmaps/vlc_messages_16px.png",
              messagesDialog(), "Ctrl+M" );
-    DP_SADD( menu, qtr( I_MENU_INFO ) , "", "", mediaInfoDialog(), "Ctrl+J" );
+    DP_SADD( menu, qtr( I_MENU_INFO ) , "", "", mediaInfoDialog(), "Ctrl+I" );
     DP_SADD( menu, qtr( I_MENU_CODECINFO ) , "", ":/pixmaps/vlc_info_16px.png",
-             mediaCodecDialog(), "Ctrl+I" );
+             mediaCodecDialog(), "Ctrl+J" );
     DP_SADD( menu, qtr( I_MENU_GOTOTIME ), "","", gotoTimeDialog(), "Ctrl+T" );
 #if 0 /* Not Implemented yet */
     DP_SADD( menu, qtr( I_MENU_BOOKMARK ), "","", bookmarksDialog(), "Ctrl+B" );
@@ -607,7 +607,19 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
             {
                 vlc_object_yield( p_input );
                 InputAutoMenuBuilder( VLC_OBJECT(p_input), objects, varnames );
-
+                
+                /* Audio menu */
+                PUSH_SEPARATOR
+                    varnames.push_back( "audio-es" );
+                objects.push_back( p_input->i_object_id );
+                vlc_object_t *p_aout = (vlc_object_t *)vlc_object_find( p_input,
+                        VLC_OBJECT_AOUT, FIND_ANYWHERE );
+                if( p_aout )
+                {
+                    AudioAutoMenuBuilder( p_aout, objects, varnames );
+                    vlc_object_release( p_aout );
+                }
+                
                 /* Video menu */
                 PUSH_SEPARATOR;
                 varnames.push_back( "video-es" );
@@ -620,17 +632,6 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 {
                     VideoAutoMenuBuilder( p_vout, objects, varnames );
                     vlc_object_release( p_vout );
-                }
-                /* Audio menu */
-                PUSH_SEPARATOR
-                    varnames.push_back( "audio-es" );
-                objects.push_back( p_input->i_object_id );
-                vlc_object_t *p_aout = (vlc_object_t *)vlc_object_find( p_input,
-                        VLC_OBJECT_AOUT, FIND_ANYWHERE );
-                if( p_aout )
-                {
-                    AudioAutoMenuBuilder( p_aout, objects, varnames );
-                    vlc_object_release( p_aout );
                 }
             }
 
