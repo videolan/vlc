@@ -61,7 +61,7 @@ services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name
     vlc_event_manager_register_event_type( &p_sd->event_manager,
             vlc_ServicesDiscoveryItemRemoved );
 
-    p_sd->p_module = module_Need( p_sd, "services_discovery", psz_module_name, 0 );
+    p_sd->p_module = module_Need( p_sd, "services_discovery", psz_module_name, VLC_TRUE );
 
     if( p_sd->p_module == NULL )
     {
