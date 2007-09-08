@@ -867,7 +867,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         int ttl = (p_sys->i_ttl > 0) ? p_sys->i_ttl : -1;
         int fd = net_ConnectDgram( p_stream, p_sys->psz_destination,
-                                   p_sys->i_port, ttl, IPPROTO_UDP );
+                                   i_port, ttl, IPPROTO_UDP );
 
         if( fd == -1 )
         {
@@ -1770,12 +1770,6 @@ rtp_packetize_h264_nal( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     i_nal_hdr = p_data[3];
     i_nal_type = i_nal_hdr&0x1f;
-    if( i_nal_type == 7 || i_nal_type == 8 )
-    {
-        /* XXX Why do you want to remove them ? It will break streaming with 
-         * SPS/PPS change (broadcast) ? */
-        return VLC_SUCCESS;
-    }
 
     /* Skip start code */
     p_data += 3;
