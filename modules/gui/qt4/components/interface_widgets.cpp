@@ -265,17 +265,14 @@ AdvControlsWidget::~AdvControlsWidget()
 
 void AdvControlsWidget::enableInput( bool enable )
 {
-//    slowerButton->setEnabled( enable );
     ABButton->setEnabled( enable );
     recordButton->setEnabled( enable );
     normalButton->setEnabled( enable );
-//    fasterButton->setEnabled( enable );
 }
 void AdvControlsWidget::enableVideo( bool enable )
 {
     snapshotButton->setEnabled( enable );
     frameButton->setEnabled( enable );
-    //fullscreenButton->setEnabled( enable );
 }
 
 void AdvControlsWidget::normal()
@@ -339,7 +336,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     advControls = new AdvControlsWidget( p_intf );
     controlLayout->addWidget( advControls, 1, 3, 2, 5, Qt::AlignBottom );
     if( !b_advancedVisible ) advControls->hide();
-//THIS should be removed.    need_components_update = true;
+    //THIS should be removed.    need_components_update = true;
 
     /** Disc and Menus handling */
     discFrame = new QFrame( this );
@@ -387,7 +384,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     QSizePolicy sizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
     sizePolicy.setHorizontalStretch( 0 );
     sizePolicy.setVerticalStretch( 0 );
-//  sizePolicy.setHeightForWidth( playButton->sizePolicy().hasHeightForWidth() );
 
     /* Play */
     playButton = new QPushButton;
@@ -451,7 +447,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     /** Playlist Button **/
     playlistButton = new QPushButton;
     setupSmallButton( playlistButton );
-
     controlLayout->addWidget( playlistButton, 3, 11 );
 
     /** extended Settings **/
@@ -585,8 +580,8 @@ void ControlsWidget::updateOnTimer()
 
     /* Activate the interface buttons according to the presence of the input */
     enableInput( THEMIM->getIM()->hasInput() );
-    enableVideo( true );
     //enableVideo( THEMIM->getIM()->hasVideo() );
+    enableVideo( true );
 }
 
 void ControlsWidget::setStatus( int status )
