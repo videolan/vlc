@@ -63,6 +63,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     // Make this QFileDialog a child of tempWidget from the ui.
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
             qfu( p_intf->p_libvlc->psz_homedir ), fileTypes );
+
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
 
@@ -70,7 +71,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     char *psz_filepath = config_GetPsz( p_intf, "qt-filedialog-path" );
     if( psz_filepath )
     {
-        dialogBox->setDirectory( QString::fromUtf8( psz_filepath ) );
+        dialogBox->setDirectory( qfu( psz_filepath ) );
         delete psz_filepath;
     }
 
@@ -95,7 +96,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 #else
     lineFileEdit = findChildren<QLineEdit*>()[3];
 #endif
-    lineFileEdit->hide();
+//    lineFileEdit->hide();
 
     /* Make a list of QLabel inside the QFileDialog to access the good ones */
     QList<QLabel *> listLabel = findChildren<QLabel*>();
@@ -104,6 +105,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     listLabel[4]->hide();
     /* Change the text that was uncool in the usual box */
     listLabel[5]->setText( qtr( "Filter:" ) );
+
 
     QListView *fileListView = findChildren<QListView*>().first();
 #if WIN32
@@ -353,7 +355,6 @@ void DiscOpenPanel::updateMRL()
 }
 
 
-
 /**************************************************************************
  * Open Network streams and URL pages                                     *
  **************************************************************************/
@@ -389,10 +390,10 @@ void NetOpenPanel::updateProtocol( int idx ) {
     QString addr = ui.addressText->text();
     QString proto = ui.protocolCombo->itemData( idx ).toString();
 
-    ui.timeShift->setEnabled( idx >= 4 );
-    ui.ipv6->setEnabled( idx == 4 );
-    ui.addressText->setEnabled( idx != 4 );
-    ui.portSpin->setEnabled( idx >= 4 );
+    ui.timeShift->setEnabled( idx >= 5 );
+    ui.ipv6->setEnabled( idx == 5 );
+    ui.addressText->setEnabled( idx != 5 );
+    ui.portSpin->setEnabled( idx >= 5 );
 
     /* If we already have a protocol in the address, replace it */
     if( addr.contains( "://")) {
@@ -412,13 +413,14 @@ void NetOpenPanel::updateMRL() {
     QString addr = ui.addressText->text();
     int proto = ui.protocolCombo->currentIndex();
 
-    if( addr.contains( "://") && proto != 4 ) {
+    if( addr.contains( "://") && proto != 5 ) {
         mrl = addr;
     } else {
         switch( proto ) {
         case 0:
-        case 1:
             mrl = "http://" + addr;
+        case 1:
+            mrl = "https://" + addr;
             emit methodChanged("http-caching");
             break;
         case 3:
