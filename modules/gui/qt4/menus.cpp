@@ -1,7 +1,7 @@
 /*****************************************************************************
  * menus.cpp : Qt menus
  *****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright ( C ) 2006-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -10,7 +10,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * ( at your option ) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -101,9 +101,9 @@ static int InputAutoMenuBuilder( vlc_object_t *p_object,
         vector<int> &objects,
         vector<const char *> &varnames )
 {
-    PUSH_VAR( "bookmark");
+    PUSH_VAR( "bookmark" );
     PUSH_VAR( "title" );
-    PUSH_VAR ("chapter" );
+    PUSH_VAR ( "chapter" );
     PUSH_VAR( "program" );
     PUSH_VAR( "navigation" );
     PUSH_VAR( "dvd_menus" );
@@ -123,7 +123,7 @@ static int VideoAutoMenuBuilder( vlc_object_t *p_object,
     PUSH_VAR( "directx-wallpaper" );
     PUSH_VAR( "video-snapshot" );
 
-    vlc_object_t *p_dec_obj = (vlc_object_t *)vlc_object_find( p_object,
+    vlc_object_t *p_dec_obj = ( vlc_object_t * )vlc_object_find( p_object,
             VLC_OBJECT_DECODER,
             FIND_PARENT );
     if( p_dec_obj != NULL )
@@ -152,10 +152,10 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
  *****************************************************************************/
 
 #define BAR_ADD( func, title ) { \
-    QMenu *menu = func; menu->setTitle( title  ); bar->addMenu( menu ); }
+    QMenu *menu = func; menu->setTitle( title ); bar->addMenu( menu ); }
 
 #define BAR_DADD( func, title, id ) { \
-    QMenu *menu = func; menu->setTitle( title  ); bar->addMenu( menu ); \
+    QMenu *menu = func; menu->setTitle( title ); bar->addMenu( menu ); \
     MenuFunc *f = new MenuFunc( menu, id ); \
     CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() ); \
     THEDP->menusUpdateMapper->setMapping( menu, f ); }
@@ -168,48 +168,48 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
         bool visual_selector_enabled )
 {
     QMenuBar *bar = mi->menuBar();
-    BAR_ADD( FileMenu(), qtr("&Media") );
+    BAR_ADD( FileMenu(), qtr( "&Media" ) );
     if( playlist )
     {
-        BAR_ADD( PlaylistMenu( mi,p_intf ), qtr("&Playlist" ) );
+        BAR_ADD( PlaylistMenu( mi,p_intf ), qtr( "&Playlist" ) );
     }
-    BAR_ADD( ToolsMenu( p_intf, mi, visual_selector_enabled, true ), qtr("&Tools") );
-    BAR_DADD( AudioMenu( p_intf, NULL ), qtr("&Audio"), 2 );
-    BAR_DADD( VideoMenu( p_intf, NULL ), qtr("&Video"), 1 );
-    BAR_DADD( NavigMenu( p_intf, NULL ), qtr("&Navigation"), 3 );
+    BAR_ADD( ToolsMenu( p_intf, mi, visual_selector_enabled, true ), qtr( "&Tools" ) );
+    BAR_DADD( AudioMenu( p_intf, NULL ), qtr( "&Audio" ), 2 );
+    BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 1 );
+    BAR_DADD( NavigMenu( p_intf, NULL ), qtr( "&Navigation" ), 3 );
 
-    BAR_ADD( HelpMenu(), qtr("&Help" ) );
+    BAR_ADD( HelpMenu(), qtr( "&Help" ) );
 }
 
 /**
- * Media (File) Menu
+ * Media ( File ) Menu
  * Opening, streaming and quit
  **/
 QMenu *QVLCMenu::FileMenu()
 {
     QMenu *menu = new QMenu();
-    
-    DP_SADD( menu, qtr("Open &File..." ), "",
+
+    DP_SADD( menu, qtr( "Open &File..." ), "",
             ":/pixmaps/vlc_file-asym_16px.png", openFileDialog(), "Ctrl+O" );
     DP_SADD( menu, qtr( I_OPEN_FOLDER ), "",
             ":/pixmaps/vlc_folder-grey_16px.png", openDirDialog(), "Ctrl+F" );
-    DP_SADD( menu, qtr("Open &Disc..." ), "", ":/pixmaps/vlc_disc_16px.png",
+    DP_SADD( menu, qtr( "Open &Disc..." ), "", ":/pixmaps/vlc_disc_16px.png",
              openDiscDialog(), "Ctrl+D" );
-    DP_SADD( menu, qtr("Open &Network..." ), "",
+    DP_SADD( menu, qtr( "Open &Network..." ), "",
                 ":/pixmaps/vlc_network_16px.png", openNetDialog(), "Ctrl+N" );
-    DP_SADD( menu, qtr("Open &Capture Device..." ), "",
+    DP_SADD( menu, qtr( "Open &Capture Device..." ), "",
             ":/pixmaps/vlc_capture-card_16px.png", openCaptureDialog(),
             "Ctrl+C" );
     menu->addSeparator();
-    
-    DP_SADD( menu, qtr("&Streaming..."), "", ":/pixmaps/vlc_stream_16px.png",
+
+    DP_SADD( menu, qtr( "&Streaming..." ), "", ":/pixmaps/vlc_stream_16px.png",
             openThenStreamingDialogs(), "Ctrl+S" );
-    DP_SADD( menu, qtr("Conve&rt / Save..."), "", "",
+    DP_SADD( menu, qtr( "Conve&rt / Save..." ), "", "",
             openThenTranscodingDialogs(), "Ctrl+R" );
-    
+
     menu->addSeparator();
-    DP_SADD( menu, qtr("&Quit") , "", ":/pixmaps/vlc_quit_16px.png", quit(),
-            "Ctrl+Q");
+    DP_SADD( menu, qtr( "&Quit" ) , "", ":/pixmaps/vlc_quit_16px.png", quit(),
+            "Ctrl+Q" );
     return menu;
 }
 
@@ -218,15 +218,15 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
 {
     QMenu *menu = new QMenu();
     menu->addMenu( SDMenu( p_intf ) );
-    menu->addAction ( QIcon(":/pixmaps/vlc_playlist_16px.png"),
-                      qtr( "Show Playlist"), mi, SLOT( togglePlaylist() ) );
+    menu->addAction ( QIcon( ":/pixmaps/vlc_playlist_16px.png" ),
+                      qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
     menu->addSeparator();
 
     DP_SADD( menu, qtr( I_PL_LOAD ), "", "", openPlaylist(), "Ctrl+X" );
     DP_SADD( menu, qtr( I_PL_SAVE ), "", "", savePlaylist(), "Ctrl+Y" );
     menu->addSeparator();
-    menu->addAction( qtr("Undock from interface"), mi,
-            SLOT( undockPlaylist() ), qtr("Ctrl+U") );
+    menu->addAction( qtr( "Undock from interface" ), mi,
+            SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );
     return menu;
 }
 
@@ -236,25 +236,25 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
  * longer.
  **/
 QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
-        bool visual_selector_enabled, 
+        bool visual_selector_enabled,
         bool with_intf )
 {
     QMenu *menu = new QMenu();
     if( with_intf )
     {
         QMenu *intfmenu = InterfacesMenu( p_intf, NULL );
-        intfmenu->setTitle( qtr("Interfaces" ) );
+        intfmenu->setTitle( qtr( "Interfaces" ) );
         menu->addMenu( intfmenu );
         menu->addSeparator();
     }
-    
+
     DP_SADD( menu, qtr( I_MENU_MSG ), "", ":/pixmaps/vlc_messages_16px.png",
              messagesDialog(), "Ctrl+M" );
     DP_SADD( menu, qtr( I_MENU_INFO ) , "", "", mediaInfoDialog(), "Ctrl+I" );
     DP_SADD( menu, qtr( I_MENU_CODECINFO ) , "", ":/pixmaps/vlc_info_16px.png",
              mediaCodecDialog(), "Ctrl+J" );
     DP_SADD( menu, qtr( I_MENU_GOTOTIME ), "","", gotoTimeDialog(), "Ctrl+T" );
-    
+
 #if 0 /* Not Implemented yet */
     DP_SADD( menu, qtr( I_MENU_BOOKMARK ), "","", bookmarksDialog(), "Ctrl+B" );
     DP_SADD( menu, qtr( I_MENU_VLM ), "","", vlmDialog(), "Ctrl+V" );
@@ -265,32 +265,32 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     {
         /* Minimal View */
         QAction *action=menu->addAction( qtr( "Minimal View..." ), mi, SLOT( toggleMenus() ),
-                qtr( "Ctrl+H") );
+                qtr( "Ctrl+H" ) );
         action->setCheckable( true );
         if( mi->getControlsVisibilityStatus() & 0x2 ) action->setChecked( true );
-        
+
         /* Advanced Controls */
-        action = menu->addAction( qtr("Advanced controls" ), mi, SLOT( toggleAdvanced() ) );
+        action = menu->addAction( qtr( "Advanced controls" ), mi, SLOT( toggleAdvanced() ) );
         action->setCheckable( true );
         if( mi->getControlsVisibilityStatus() & 0x1 ) action->setChecked( true );
         menu->addSeparator();
 
 #if 0 /* For Visualisations. Not yet working */
-        adv = menu->addAction( qtr("Visualizations selector" ),
+        adv = menu->addAction( qtr( "Visualizations selector" ),
                 mi, SLOT( visual() ) );
         adv->setCheckable( true );
         if( visual_selector_enabled ) adv->setChecked( true );
 #endif
-        menu->addAction ( QIcon(":/pixmaps/vlc_playlist_16px.png"),
-                          qtr( "Playlist"), mi, SLOT( togglePlaylist() ),
-                          qtr( "Ctrl+L") );
+        menu->addAction ( QIcon( ":/pixmaps/vlc_playlist_16px.png" ),
+                          qtr( "Playlist" ), mi, SLOT( togglePlaylist() ),
+                          qtr( "Ctrl+L" ) );
     }
-    
+
     DP_SADD( menu, qtr( I_MENU_EXT ), "", ":/pixmaps/vlc_settings_16px.png",
-                 extendedDialog() ,  "Ctrl+E"  );
+                 extendedDialog() ,  "Ctrl+E" );
 
     menu->addSeparator();
-    DP_SADD( menu, qtr("Preferences"), "", ":/pixmaps/vlc_preferences_16px.png",
+    DP_SADD( menu, qtr( "Preferences" ), "", ":/pixmaps/vlc_preferences_16px.png",
              prefsDialog(), "Ctrl+P" );
     return menu;
 }
@@ -311,8 +311,8 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     if( !p_intf->pf_show_dialog )
     {
         menu->addSeparator();
-        menu->addAction( qtr("Switch to skins"), THEDP, SLOT( switchToSkins() ),
-                QString("Ctrl+Z") );
+        menu->addAction( qtr( "Switch to skins" ), THEDP, SLOT( switchToSkins() ),
+                QString( "Ctrl+Z" ) );
     }
 
     CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() );
@@ -328,7 +328,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     vector<int> objects;
     vector<const char *> varnames;
 
-    vlc_object_t *p_object = (vlc_object_t *)vlc_object_find( p_intf,
+    vlc_object_t *p_object = ( vlc_object_t * )vlc_object_find( p_intf,
             VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_object != NULL )
     {
@@ -336,7 +336,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
         vlc_object_release( p_object );
     }
 
-    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+    p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_AOUT,
             FIND_ANYWHERE );
     if( p_object )
     {
@@ -356,7 +356,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     vector<int> objects;
     vector<const char *> varnames;
 
-    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+    p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_INPUT,
             FIND_ANYWHERE );
     if( p_object != NULL )
     {
@@ -365,7 +365,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         vlc_object_release( p_object );
     }
 
-    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+    p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_VOUT,
             FIND_ANYWHERE );
     if( p_object != NULL )
     {
@@ -386,13 +386,13 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *current )
     vector<const char *> varnames;
 
     /* FIXME */
-    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+    p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_INPUT,
             FIND_ANYWHERE );
     if( p_object != NULL )
     {
         InputAutoMenuBuilder( p_object, objects, varnames );
-        PUSH_VAR( "prev-title"); PUSH_VAR ( "next-title" );
-        PUSH_VAR( "prev-chapter"); PUSH_VAR( "next-chapter" );
+        PUSH_VAR( "prev-title" ); PUSH_VAR ( "next-title" );
+        PUSH_VAR( "prev-chapter" ); PUSH_VAR( "next-chapter" );
         vlc_object_release( p_object );
     }
     return Populate( p_intf, current, varnames, objects );
@@ -410,13 +410,13 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
     int i_num = 0;
     for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
     {
-        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+        module_t * p_parser = ( module_t * )p_list->p_values[i_index].p_object ;
         if( module_IsCapable( p_parser, "services_discovery" ) )
             i_num++;
     }
     for( int i_index = 0 ; i_index < p_list->i_count; i_index++ )
     {
-        module_t * p_parser = (module_t *)p_list->p_values[i_index].p_object;
+        module_t * p_parser = ( module_t * )p_list->p_values[i_index].p_object;
         if( !module_IsCapable( p_parser, "services_discovery" ) )
             continue;
 
@@ -452,10 +452,10 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 QMenu *QVLCMenu::HelpMenu()
 {
     QMenu *menu = new QMenu();
-    DP_SADD( menu, qtr("Help") , "", ":/pixmaps/vlc_help_16px.png",
+    DP_SADD( menu, qtr( "Help" ) , "", ":/pixmaps/vlc_help_16px.png",
              helpDialog(), "F1" );
     menu->addSeparator();
-    DP_SADD( menu, qtr( I_MENU_ABOUT ), "", "", aboutDialog(), "Ctrl+F1");
+    DP_SADD( menu, qtr( I_MENU_ABOUT ), "", "", aboutDialog(), "Ctrl+F1" );
     return menu;
 }
 
@@ -483,44 +483,44 @@ QMenu *QVLCMenu::HelpMenu()
         vlc_value_t val; \
         var_Get( p_input, "state", &val ); \
         if( val.i_int == PLAYING_S ) \
-            MIM_SADD( menu, qtr("Pause"), "", ":/pixmaps/vlc_pause_16px.png", \
+            MIM_SADD( menu, qtr( "Pause" ), "", ":/pixmaps/vlc_pause_16px.png", \
                     togglePlayPause() ) \
         else \
-            MIM_SADD( menu, qtr("Play"), "", ":/pixmaps/vlc_play_16px.png", \
+            MIM_SADD( menu, qtr( "Play" ), "", ":/pixmaps/vlc_play_16px.png", \
                     togglePlayPause() ) \
     } \
     else if( THEPL->items.i_size && THEPL->i_enabled ) \
-        MIM_SADD( menu, qtr("Play"), "", ":/pixmaps/vlc_play_16px.png", \
+        MIM_SADD( menu, qtr( "Play" ), "", ":/pixmaps/vlc_play_16px.png", \
                 togglePlayPause() ); \
     \
-    MIM_SADD( menu, qtr("Stop"), "", ":/pixmaps/vlc_stop_16px.png", stop() ); \
-    MIM_SADD( menu, qtr("Previous"), "", ":/pixmaps/vlc_previous_16px.png", \
+    MIM_SADD( menu, qtr( "Stop" ), "", ":/pixmaps/vlc_stop_16px.png", stop() ); \
+    MIM_SADD( menu, qtr( "Previous" ), "", ":/pixmaps/vlc_previous_16px.png", \
             prev() ); \
-    MIM_SADD( menu, qtr("Next"), "", ":/pixmaps/vlc_next_16px.png", next() );
+    MIM_SADD( menu, qtr( "Next" ), "", ":/pixmaps/vlc_next_16px.png", next() );
 
 #define POPUP_STATIC_ENTRIES( menu ) \
     QMenu *intfmenu = InterfacesMenu( p_intf, NULL ); \
-    intfmenu->setTitle( qtr("Interfaces" ) ); \
+    intfmenu->setTitle( qtr( "Interfaces" ) ); \
     menu->addMenu( intfmenu ); \
     \
     QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, false ); \
-    toolsmenu->setTitle( qtr("Tools" ) ); \
+    toolsmenu->setTitle( qtr( "Tools" ) ); \
     menu->addMenu( toolsmenu ); \
     \
-    QMenu *openmenu = new QMenu( qtr("Open") ); \
-    openmenu->addAction( qtr("Open &File..." ), THEDP, SLOT( openFileDialog() ) ); \
-    openmenu->addAction( qtr("Open &Disc..." ), THEDP, SLOT( openDiscDialog() ) ); \
-    openmenu->addAction( qtr("Open &Network..." ), THEDP, SLOT( openNetDialog() ) ); \
-    openmenu->addAction( qtr("Open &Capture Device..." ), THEDP, \
+    QMenu *openmenu = new QMenu( qtr( "Open" ) ); \
+    openmenu->addAction( qtr( "Open &File..." ), THEDP, SLOT( openFileDialog() ) ); \
+    openmenu->addAction( qtr( "Open &Disc..." ), THEDP, SLOT( openDiscDialog() ) ); \
+    openmenu->addAction( qtr( "Open &Network..." ), THEDP, SLOT( openNetDialog() ) ); \
+    openmenu->addAction( qtr( "Open &Capture Device..." ), THEDP, \
             SLOT( openCaptureDialog() ) ); \
     menu->addMenu( openmenu ); \
     \
     menu->addSeparator(); \
     QMenu *helpmenu = HelpMenu(); \
-    helpmenu->setTitle( qtr("Help") ); \
+    helpmenu->setTitle( qtr( "Help" ) ); \
     menu->addMenu( helpmenu ); \
     \
-    DP_SADD( menu, qtr("Quit"), "", "", quit() , "Ctrl+Q" );
+    DP_SADD( menu, qtr( "Quit" ), "", "", quit() , "Ctrl+Q" );
 
 /* Video Tracks and Subtitles tracks */
 void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
@@ -533,7 +533,7 @@ void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
         objects.push_back( p_input->i_object_id );
         varnames.push_back( "spu-es" );
         objects.push_back( p_input->i_object_id );
-        vlc_object_t *p_vout = (vlc_object_t *)vlc_object_find( p_input,
+        vlc_object_t *p_vout = ( vlc_object_t * )vlc_object_find( p_input,
                 VLC_OBJECT_VOUT, FIND_CHILD );
         if( p_vout )
         {
@@ -554,7 +554,7 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
         vlc_object_yield( p_input );
         varnames.push_back( "audio-es" );
         objects.push_back( p_input->i_object_id );
-        vlc_object_t *p_aout = (vlc_object_t *)vlc_object_find( p_input,
+        vlc_object_t *p_aout = ( vlc_object_t * )vlc_object_find( p_input,
                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
         if( p_aout )
         {
@@ -566,7 +566,7 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
     CREATE_POPUP;
 }
 
-/* Navigation stuff, and general menus (open) */
+/* Navigation stuff, and general menus ( open ) */
 void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
 {
     vlc_value_t val;
@@ -576,7 +576,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
     {
         vlc_object_yield( p_input );
         varnames.push_back( "audio-es" );
-        InputAutoMenuBuilder( VLC_OBJECT(p_input), objects, varnames );
+        InputAutoMenuBuilder( VLC_OBJECT( p_input ), objects, varnames );
         PUSH_SEPARATOR;
     }
 
@@ -606,27 +606,27 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
             if( p_input )
             {
                 vlc_object_yield( p_input );
-                InputAutoMenuBuilder( VLC_OBJECT(p_input), objects, varnames );
-                
+                InputAutoMenuBuilder( VLC_OBJECT( p_input ), objects, varnames );
+
                 /* Audio menu */
                 PUSH_SEPARATOR
                     varnames.push_back( "audio-es" );
                 objects.push_back( p_input->i_object_id );
-                vlc_object_t *p_aout = (vlc_object_t *)vlc_object_find( p_input,
+                vlc_object_t *p_aout = ( vlc_object_t * )vlc_object_find( p_input,
                         VLC_OBJECT_AOUT, FIND_ANYWHERE );
                 if( p_aout )
                 {
                     AudioAutoMenuBuilder( p_aout, objects, varnames );
                     vlc_object_release( p_aout );
                 }
-                
+
                 /* Video menu */
                 PUSH_SEPARATOR;
                 varnames.push_back( "video-es" );
                 objects.push_back( p_input->i_object_id );
                 varnames.push_back( "spu-es" );
                 objects.push_back( p_input->i_object_id );
-                vlc_object_t *p_vout = (vlc_object_t *)vlc_object_find( p_input,
+                vlc_object_t *p_vout = ( vlc_object_t * )vlc_object_find( p_input,
                         VLC_OBJECT_VOUT, FIND_CHILD );
                 if( p_vout )
                 {
@@ -672,13 +672,13 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     if( mi->isVisible() || b_force_visible )
     {
         sysMenu->addAction( QIcon( ":/vlc16.png" ),
-                qtr("Hide VLC media player"), mi,
+                qtr( "Hide VLC media player" ), mi,
                 SLOT( toggleUpdateSystrayMenu() ) );
     }
     else
     {
         sysMenu->addAction( QIcon( ":/vlc16.png" ),
-                qtr("Show VLC media player"), mi,
+                qtr( "Show VLC media player" ), mi,
                 SLOT( toggleUpdateSystrayMenu() ) );
     }
 
@@ -686,9 +686,9 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     POPUP_PLAY_ENTRIES( sysMenu );
 
     sysMenu->addSeparator();
-    DP_SADD( sysMenu, qtr("&Open Media" ), "",
+    DP_SADD( sysMenu, qtr( "&Open Media" ), "",
             ":/pixmaps/vlc_file-wide_16px.png", openFileDialog(), "" );
-    DP_SADD( sysMenu, qtr("&Quit") , "", ":/pixmaps/vlc_quit_16px.png",
+    DP_SADD( sysMenu, qtr( "&Quit" ) , "", ":/pixmaps/vlc_quit_16px.png",
              quit(), "" );
 
     /* Set the menu */
@@ -718,10 +718,10 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf, QMenu *current,
     vlc_bool_t b_section_empty = VLC_FALSE;
     int i;
 
-#define APPEND_EMPTY { QAction *action = menu->addAction( qtr("Empty" ) ); \
+#define APPEND_EMPTY { QAction *action = menu->addAction( qtr( "Empty" ) ); \
     action->setEnabled( false ); }
 
-    for( i = 0; i < (int)objects.size() ; i++ )
+    for( i = 0; i < ( int )objects.size() ; i++ )
     {
         if( !varnames[i] || !*varnames[i] )
         {
@@ -732,7 +732,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf, QMenu *current,
             continue;
         }
 
-        if( objects[i] == 0  )
+        if( objects[i] == 0 )
         {
             /// \bug What is this ?
             // Append( menu, varnames[i], NULL );
@@ -740,13 +740,13 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf, QMenu *current,
             continue;
         }
 
-        p_object = (vlc_object_t *)vlc_object_get( p_intf,
+        p_object = ( vlc_object_t * )vlc_object_get( p_intf,
                 objects[i] );
         if( p_object == NULL ) continue;
 
         b_section_empty = VLC_FALSE;
         /* Ugly specific stuff */
-        if( strstr(varnames[i], "intf-add" ) )
+        if( strstr( varnames[i], "intf-add" ) )
             CreateItem( menu, varnames[i], p_object, false );
         else
             CreateItem( menu, varnames[i], p_object, true );
@@ -757,7 +757,7 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf, QMenu *current,
     if( menu->actions().size() == 0 || b_section_empty )
         APPEND_EMPTY
 
-            return menu;
+    return menu;
 }
 
 /*****************************************************************************
@@ -774,12 +774,12 @@ static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object,
     i_type = var_Type( p_object, psz_var );
 
     /* Check if we want to display the variable */
-    if( !(i_type & VLC_VAR_HASCHOICE) ) return FALSE;
+    if( !( i_type & VLC_VAR_HASCHOICE ) ) return FALSE;
 
     var_Change( p_object, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
     if( val.i_int == 0 ) return TRUE;
 
-    if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE )
+    if( ( i_type & VLC_VAR_TYPE ) != VLC_VAR_VARIABLE )
     {
         /* Very evil hack ! intf-switch can have only one value */
         if( !strcmp( psz_var, "intf-switch" ) ) return FALSE;
@@ -846,7 +846,7 @@ void QVLCMenu::CreateItem( QMenu *menu, const char *psz_var,
             QMenu *submenu = new QMenu();
             submenu->setTitle( qfu( text.psz_string ?
                         text.psz_string : psz_var ) );
-            if( CreateChoicesMenu( submenu, psz_var, p_object, true ) == 0)
+            if( CreateChoicesMenu( submenu, psz_var, p_object, true ) == 0 )
                 menu->addMenu( submenu );
         }
         else
@@ -908,7 +908,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
         return VLC_EGENERIC;
     }
 #define NORMAL_OR_RADIO i_type & VLC_VAR_ISCOMMAND ? ITEM_NORMAL: ITEM_RADIO
-#define NOTCOMMAND !(i_type & VLC_VAR_ISCOMMAND)
+#define NOTCOMMAND !( i_type & VLC_VAR_ISCOMMAND )
 #define CURVAL val_list.p_list->p_values[i]
 #define CURTEXT text_list.p_list->p_values[i].psz_string
 
@@ -941,7 +941,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
             case VLC_VAR_INTEGER:
                 var_Get( p_object, psz_var, &val );
                 if( CURTEXT ) menutext = qfu( CURTEXT );
-                else menutext.sprintf( "%d", CURVAL.i_int);
+                else menutext.sprintf( "%d", CURVAL.i_int );
                 CreateAndConnect( submenu, psz_var, menutext, "", NORMAL_OR_RADIO,
                         p_object->i_object_id, CURVAL, i_type,
                         NOTCOMMAND && CURVAL.i_int == val.i_int );
@@ -1007,8 +1007,8 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
 
 void QVLCMenu::DoAction( intf_thread_t *p_intf, QObject *data )
 {
-    MenuItemData *itemData = qobject_cast<MenuItemData *>(data);
-    vlc_object_t *p_object = (vlc_object_t *)vlc_object_get( p_intf,
+    MenuItemData *itemData = qobject_cast<MenuItemData *>( data );
+    vlc_object_t *p_object = ( vlc_object_t * )vlc_object_get( p_intf,
             itemData->i_object_id );
     if( p_object == NULL ) return;
 
