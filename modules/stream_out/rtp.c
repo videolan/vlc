@@ -103,6 +103,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-rtp-"
+#define MAX_EMPTY_BLOCKS 200
 
 vlc_module_begin();
     set_shortname( _("RTP"));
@@ -162,6 +163,7 @@ static int               MuxSend( sout_stream_t *, sout_stream_id_t *,
                                   block_t* );
 
 static sout_access_out_t *GrabberCreate( sout_stream_t *p_sout );
+static void ThreadSend( vlc_object_t *p_this );
 
 static void SDPHandleUrl( sout_stream_t *, char * );
 
@@ -221,6 +223,8 @@ typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *,
 
 struct sout_stream_id_t
 {
+    VLC_COMMON_MEMBERS
+
     sout_stream_t *p_stream;
     /* rtp field */
     uint32_t    i_timestamp_start;
@@ -245,6 +249,9 @@ struct sout_stream_id_t
     int               fdc;
     int              *fdv;
     rtsp_stream_id_t *rtsp_id;
+
+    block_fifo_t     *p_fifo;
+    int64_t           i_caching;
 };
 
 
@@ -795,6 +802,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     int               i_port;
     char              *psz_sdp;
 
+    id = vlc_object_create( p_stream, sizeof( sout_stream_id_t ) );
+    if( id == NULL )
+        return NULL;
+
     /* Choose the port */
     i_port = 0;
     if( p_fmt == NULL )
@@ -824,8 +835,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         p_sys->i_port += 2;
     }
 
-    /* now create the rtp specific stuff */
-    id = malloc( sizeof( sout_stream_id_t ) );
     id->p_stream   = p_stream;
 
     id->i_timestamp_start = rand()&0xffffffff;
@@ -861,7 +870,19 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     vlc_mutex_init( p_stream, &id->lock_sink );
     id->fdc = 0;
     id->fdv = NULL;
-    id->rtsp_id    = NULL;
+    id->rtsp_id = NULL;
+
+    id->i_caching =
+        (int64_t)1000 * var_GetInteger( p_stream, SOUT_CFG_PREFIX "caching");
+    id->p_fifo = block_FifoNew( p_stream );
+
+    if( vlc_thread_create( id, "RTP send thread", ThreadSend,
+                           VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
+    {
+        vlc_mutex_destroy( &id->lock_sink );
+        vlc_object_destroy( id );
+        return NULL;
+    }
 
     if( p_sys->psz_destination != NULL )
     {
@@ -872,8 +893,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         if( fd == -1 )
         {
             msg_Err( p_stream, "cannot create RTP socket" );
+            vlc_thread_join( id );
             vlc_mutex_destroy( &id->lock_sink );
-            free( id );
+            vlc_object_destroy( id );
             return NULL;
         }
         rtp_add_sink( id, fd );
@@ -1071,8 +1093,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                      "codec:%4.4s)", (char*)&p_fmt->i_codec );
             if( id->fdc > 0 )
                 rtp_del_sink( id, id->fdv[0] );
+            vlc_thread_join( id );
             vlc_mutex_destroy( &id->lock_sink );
-            free( id );
+            vlc_object_destroy( id );
             return NULL;
     }
 
@@ -1104,12 +1127,15 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( p_sys->b_export_sap ) SapSetup( p_stream );
     if( p_sys->b_export_sdp_file ) FileSetup( p_stream );
 
+    vlc_object_attach( id, p_stream );
     return id;
 }
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    vlc_object_kill( id );
 
     vlc_mutex_lock( &p_sys->lock_es );
     TAB_REMOVE( p_sys->i_es, p_sys->es, id );
@@ -1132,13 +1158,16 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( id->fdc > 0 )
         rtp_del_sink( id, id->fdv[0] ); /* sink for explicit dst= */
 
+    vlc_thread_join( id );
     vlc_mutex_destroy( &id->lock_sink );
+    block_FifoRelease( id->p_fifo );
 
     /* Update SDP (sap/file) */
     if( p_sys->b_export_sap && !p_sys->p_mux ) SapSetup( p_stream );
     if( p_sys->b_export_sdp_file ) FileSetup( p_stream );
 
-    free( id );
+    vlc_object_detach( id );
+    vlc_object_destroy( id );
     return VLC_SUCCESS;
 }
 
@@ -1263,6 +1292,52 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
 }
 
 /****************************************************************************
+ * RTP send
+ ****************************************************************************/
+static void ThreadSend( vlc_object_t *p_this )
+{
+    sout_stream_id_t *id = (sout_stream_id_t *)p_this;
+    unsigned i_caching = id->i_caching;
+
+    while( !id->b_die )
+    {
+        block_t *out = block_FifoGet( id->p_fifo );
+        mtime_t  i_date = out->i_dts + i_caching;
+
+        mwait( i_date );
+
+        vlc_mutex_lock( &id->lock_sink );
+        for( int i = 0; i < id->fdc; i++ )
+            send( id->fdv[i], out->p_buffer, out->i_buffer, 0 );
+        vlc_mutex_unlock( &id->lock_sink );
+
+        block_Release( out );
+    }
+}
+
+static inline void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
+{
+    block_FifoPut( id->p_fifo, out );
+}
+
+int rtp_add_sink( sout_stream_id_t *id, int fd )
+{
+    vlc_mutex_lock( &id->lock_sink );
+    TAB_APPEND( id->fdc, id->fdv, fd );
+    vlc_mutex_unlock( &id->lock_sink );
+    return VLC_SUCCESS;
+}
+
+void rtp_del_sink( sout_stream_id_t *id, int fd )
+{
+    /* NOTE: must be safe to use if fd is not included */
+    vlc_mutex_lock( &id->lock_sink );
+    TAB_REMOVE( id->fdc, id->fdv, fd );
+    vlc_mutex_unlock( &id->lock_sink );
+    net_Close( fd );
+}
+
+/****************************************************************************
  * rtp_packetize_*:
  ****************************************************************************/
 static void rtp_packetize_common( sout_stream_id_t *id, block_t *out,
@@ -1283,36 +1358,6 @@ static void rtp_packetize_common( sout_stream_id_t *id, block_t *out,
 
     out->i_buffer = 12;
     id->i_sequence++;
-}
-
-static void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
-{
-    int i;
-    vlc_mutex_lock( &id->lock_sink );
-    for( i = 0; i < id->fdc; i++ )
-    {
-        send( id->fdv[i], out->p_buffer, out->i_buffer, 0 );
-    }
-    vlc_mutex_unlock( &id->lock_sink );
-
-    block_Release( out );
-}
-
-int rtp_add_sink( sout_stream_id_t *id, int fd )
-{
-    vlc_mutex_lock( &id->lock_sink );
-    TAB_APPEND( id->fdc, id->fdv, fd );
-    vlc_mutex_unlock( &id->lock_sink );
-    return VLC_SUCCESS;
-}
-
-void rtp_del_sink( sout_stream_id_t *id, int fd )
-{
-    /* NOTE: must be safe to use if fd is not included */
-    vlc_mutex_lock( &id->lock_sink );
-    TAB_REMOVE( id->fdc, id->fdv, fd );
-    vlc_mutex_unlock( &id->lock_sink );
-    net_Close( fd );
 }
 
 static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
