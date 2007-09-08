@@ -152,7 +152,6 @@ public slots:
     void openFileDialog();
     void openNetDialog();
     void openCaptureDialog();
-    void openDirDialog();
 
     void PLAppendDialog();
     void MLAppendDialog();

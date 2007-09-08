@@ -192,7 +192,7 @@ QMenu *QVLCMenu::FileMenu()
     DP_SADD( menu, qtr( "Open &File..." ), "",
             ":/pixmaps/vlc_file-asym_16px.png", openFileDialog(), "Ctrl+O" );
     DP_SADD( menu, qtr( I_OPEN_FOLDER ), "",
-            ":/pixmaps/vlc_folder-grey_16px.png", openDirDialog(), "Ctrl+F" );
+            ":/pixmaps/vlc_folder-grey_16px.png", PLAppendDir(), "Ctrl+F" );
     DP_SADD( menu, qtr( "Open &Disc..." ), "", ":/pixmaps/vlc_disc_16px.png",
              openDiscDialog(), "Ctrl+D" );
     DP_SADD( menu, qtr( "Open &Network..." ), "",

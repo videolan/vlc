@@ -313,11 +313,6 @@ static void openDirectory( intf_thread_t* p_intf, bool pl, bool go )
     }
 }
 
-void DialogsProvider::openDirDialog()
-{
-    openDirectory( p_intf, true, true );
-}
-
 void DialogsProvider::PLAppendDir()
 {
     openDirectory( p_intf, true, false );
