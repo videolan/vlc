@@ -74,14 +74,15 @@ private:
 
 public slots:
     void update();
-    void saveMeta();
-    void editMeta();
     void update( input_item_t *, bool, bool );
-    void updateButtons( int i_tab );
+    
 
 private slots:
     void close();
     void clear();
+    void saveMeta();
+    void editMeta();
+    void updateButtons( int i_tab );
 };
 
 #endif

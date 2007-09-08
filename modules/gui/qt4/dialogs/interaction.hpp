@@ -57,6 +57,7 @@ private:
     QLineEdit *inputEdit, *loginEdit, *passwordEdit;
 
     void Finish( int );
+
 private slots:
     void defaultB();
     void altB();

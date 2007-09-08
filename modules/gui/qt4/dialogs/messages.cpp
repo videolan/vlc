@@ -179,4 +179,3 @@ bool MessagesDialog::save()
     }
     return false;
 }
-

@@ -49,7 +49,7 @@ private:
     static MessagesDialog *instance;
     QSpinBox *verbosityBox;
     QTextEdit *messages;
-public slots:
+private slots:
     void updateLog();
     void close();
     void clear();
