@@ -95,11 +95,6 @@ static void Close( vlc_object_t * );
                           "of packets that will be sent at a time. It " \
                           "helps reducing the scheduling load on " \
                           "heavily-loaded systems." )
-#define RAW_TEXT N_("Raw write")
-#define RAW_LONGTEXT N_("Packets will be sent " \
-                       "directly, without trying to fill the MTU (ie, " \
-                       "without trying to make the biggest possible packets " \
-                       "in order to improve streaming)." )
 #define RTCP_TEXT N_("RTCP Sender Report")
 #define RTCP_LONGTEXT N_("Send RTCP Sender Report packets")
 #define RTCP_PORT_TEXT N_("RTCP destination port number")
@@ -121,9 +116,8 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "group", 1, NULL, GROUP_TEXT, GROUP_LONGTEXT,
                                  VLC_TRUE );
     add_obsolete_integer( SOUT_CFG_PREFIX "late" );
-    add_bool( SOUT_CFG_PREFIX "raw",  VLC_FALSE, NULL, RAW_TEXT, RAW_LONGTEXT,
-                                 VLC_TRUE );
-    add_bool( SOUT_CFG_PREFIX "rtcp",  VLC_FALSE, NULL, RAW_TEXT, RAW_LONGTEXT,
+    add_obsolete_bool( SOUT_CFG_PREFIX "raw" );
+    add_bool( SOUT_CFG_PREFIX "rtcp",  VLC_FALSE, NULL, RTCP_TEXT, RTCP_LONGTEXT,
                                  VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "rtcp-port",  0, NULL, RTCP_PORT_TEXT,
                  RTCP_PORT_LONGTEXT, VLC_TRUE );
@@ -145,7 +139,6 @@ static const char *const ppsz_sout_options[] = {
     "auto-mcast",
     "caching",
     "group",
-    "raw",
     "rtcp",
     "rtcp-port",
     "lite",
@@ -163,7 +156,6 @@ static const char *const ppsz_core_options[] = {
 };
 
 static int  Write   ( sout_access_out_t *, block_t * );
-static int  WriteRaw( sout_access_out_t *, block_t * );
 static int  Seek    ( sout_access_out_t *, off_t  );
 
 static void ThreadWrite( vlc_object_t * );
@@ -392,11 +384,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if (var_GetBool (p_access, SOUT_CFG_PREFIX"raw"))
-        p_access->pf_write = WriteRaw;
-    else
-        p_access->pf_write = Write;
-
+    p_access->pf_write = Write;
     p_access->pf_seek = Seek;
 
     /* update p_sout->i_out_pace_nocontrol */
@@ -524,27 +512,6 @@ static int Write( sout_access_out_t *p_access, block_t *p_buffer )
         block_Release( p_buffer );
         p_buffer = p_next;
     }
-
-    return( p_sys->p_thread->b_error ? -1 : i_len );
-}
-
-/*****************************************************************************
- * WriteRaw: write p_buffer without trying to fill mtu
- *****************************************************************************/
-static int WriteRaw( sout_access_out_t *p_access, block_t *p_buffer )
-{
-    sout_access_out_sys_t   *p_sys = p_access->p_sys;
-    block_t *p_buf;
-    int i_len;
-
-    while ( p_sys->p_thread->p_empty_blocks->i_depth >= MAX_EMPTY_BLOCKS )
-    {
-        p_buf = block_FifoGet(p_sys->p_thread->p_empty_blocks);
-        block_Release( p_buf );
-    }
-
-    i_len = p_buffer->i_buffer;
-    block_FifoPut( p_sys->p_thread->p_fifo, p_buffer );
 
     return( p_sys->p_thread->b_error ? -1 : i_len );
 }
