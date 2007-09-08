@@ -2,6 +2,7 @@
 <RCC version="1.0">
  <qresource>
   <file>pixmaps/play.png</file>
+  <file>pixmaps/pause.png</file>
   <file>pixmaps/stop.png</file>
   <file>pixmaps/previous.png</file>
   <file>pixmaps/next.png</file>

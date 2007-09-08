@@ -586,19 +586,12 @@ void ControlsWidget::updateOnTimer()
     enableVideo( THEMIM->getIM()->hasVideo() );
 }
 
-/* FIXME */
 void ControlsWidget::setStatus( int status )
 {
-    if( status == 1 ) // Playing
-    {
-        msg_Dbg( p_intf, "I was here %i", status );
-        // playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
-    }
+    if( status == PLAYING_S ) // Playing
+        playButton->setIcon( QIcon( ":/pixmaps/pause.png" ) );
     else
-    {
-        msg_Dbg( p_intf, "I was here %i", status );
-        // playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
-    }
+        playButton->setIcon( QIcon( ":/pixmaps/play.png" ) );
 }
 
 /**

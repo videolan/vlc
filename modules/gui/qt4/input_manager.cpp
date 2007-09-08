@@ -88,15 +88,10 @@ void InputManager::update()
         emit positionUpdated( 0.0, 0, 0 );
         emit navigationChanged( 0 );
         i_old_playing_status = 0;
-        emit statusChanged( 0 ); // 0 = STOPPED, 1 = PLAY, 2 = PAUSE
+        emit statusChanged( END_S ); // see vlc_input.h, input_state_e enum
         delInput();
         return;
     }
-
-    if( !b_had_audio && b_has_audio )
-        emit audioStarted();
-    if( !b_had_video && b_has_video )
-        emit videoStarted();
 
     /* Update position */
     mtime_t i_length, i_time;

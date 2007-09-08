@@ -65,8 +65,6 @@ signals:
     void navigationChanged( int );
     /// Play/pause status
     void statusChanged( int );
-    void audioStarted();
-    void videoStarted();
 };
 
 class MainInputManager : public QObject
