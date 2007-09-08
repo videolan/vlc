@@ -58,6 +58,7 @@ public:
     
     bool isInEditMode();
     void setEditMode( bool );
+
 private:
     input_item_t *p_input;
     intf_thread_t *p_intf;

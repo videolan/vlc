@@ -59,6 +59,44 @@ MetaPanel::MetaPanel( QWidget *parent,
     widget = new QLineEdit;                                      \
     metaLayout->addWidget( widget, line, 1, 1, 9 );                       \
     line++;            }
+    
+    /* Title, artist and album*/
+    ADD_META( VLC_META_TITLE, title_text ); /* OK */
+    ADD_META( VLC_META_ARTIST, artist_text ); /* OK */
+    ADD_META( VLC_META_COLLECTION, collection_text ); /* OK */
+
+    /* Genre Name */
+    /* FIXME List id3genres.h is not includable yet ? */
+    genre_text = new QLineEdit;
+    metaLayout->addWidget( new QLabel( qtr( VLC_META_GENRE ) + " :" ), line, 0 );
+    metaLayout->addWidget( genre_text, line, 1, 1, 5 );
+
+    /* Number - on the same line */
+    metaLayout->addWidget( new QLabel( qtr( "Track Number" )  + " :" ),
+                  line, 6 );
+    seqnum_text = new QLineEdit;
+    seqnum_text->setInputMask("0000");
+    seqnum_text->setAlignment( Qt::AlignRight );
+    metaLayout->addWidget( seqnum_text, line, 7, 1, 4 );
+    line++;
+
+    /* Date (Should be in years) */
+    date_text = new QLineEdit;
+    date_text->setInputMask("0000");
+    date_text->setAlignment( Qt::AlignRight );
+    metaLayout->addWidget( new QLabel( qtr( VLC_META_DATE ) + " :" ), line, 0 );
+    metaLayout->addWidget( date_text, line, 1, 1, 2 );
+
+    /* Rating - on the same line */
+    metaLayout->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 3, 1, 2 );
+    rating_text = new QSpinBox; setSpinBounds( rating_text );
+    metaLayout->addWidget( rating_text, line, 5, 1, 2 );
+
+    /* Language on the same line */
+    metaLayout->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 7 );
+    language_text = new QLineEdit;
+    metaLayout->addWidget( language_text, line,  8, 1, 2 );
+    line++;
 
     /* ART_URL */
     art_cover = new QLabel( "" );
@@ -69,48 +107,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     art_cover->setScaledContents( true );
     art_cover->setPixmap( QPixmap( ":/noart.png" ) );
     metaLayout->addWidget( art_cover, line, 8, 4, 2 );
-
-    /* Title, artist and album*/
-    ADD_META( VLC_META_TITLE, title_text ); /* OK */
-    ADD_META( VLC_META_ARTIST, artist_text ); /* OK */
-    ADD_META( VLC_META_COLLECTION, collection_text ); /* OK */
-
-    /* Genre Name */
-    /* FIXME List id3genres.h is not includable yet ? */
-    genre_text = new QLineEdit;
-    metaLayout->addWidget( new QLabel( qtr( VLC_META_GENRE ) + " :" ), line, 0 );
-    metaLayout->addWidget( genre_text, line, 1, 1, 2 );
-
-    /* Number - on the same line */
-    metaLayout->addWidget( new QLabel( qtr( "Track Number" )  + " :" ),
-                  line, 3 );
-    seqnum_text = new QLineEdit;
-    seqnum_text->setInputMask("0000");
-    seqnum_text->setAlignment( Qt::AlignRight );
-    metaLayout->addWidget( seqnum_text, line, 4, 1, 2 );
-    line++;
-
-    /* Date (Should be in years) */
-    date_text = new QLineEdit;
-    date_text->setInputMask("0000");
-    date_text->setAlignment( Qt::AlignRight );
-    metaLayout->addWidget( new QLabel( qtr( VLC_META_DATE ) + " :" ), line, 0 );
-    metaLayout->addWidget( date_text, line, 1, 1, 1 );
-
-    /* Rating - on the same line */
-    metaLayout->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 2 );
-    rating_text = new QSpinBox; setSpinBounds( rating_text );
-    metaLayout->addWidget( rating_text, line, 3, 1, 1 );
-
-    /* Language on the same line */
-    metaLayout->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 4 );
-    language_text = new QLineEdit;
-    metaLayout->addWidget( language_text, line, 5, 1, 1 );
-    line++;
-
-    /* Now Playing - Useful for live feeds (HTTP, DVB, ETC...) */
-    ADD_META( VLC_META_NOW_PLAYING, nowplaying_text );
-
+    
 /* Settings is unused */
 /*    l->addWidget( new QLabel( qtr( VLC_META_SETTING ) + " :" ), line, 5 );
     setting_text = new QLineEdit;
@@ -122,6 +119,10 @@ MetaPanel::MetaPanel( QWidget *parent,
     widget = new QLineEdit;                                      \
     metaLayout->addWidget( widget, line, 1, 1, 7 );                       \
     line++;            }
+    
+    /* Now Playing - Useful for live feeds (HTTP, DVB, ETC...) */
+    ADD_META_2( VLC_META_NOW_PLAYING, nowplaying_text );
+    nowplaying_text->setReadOnly( true );
     ADD_META_2( VLC_META_PUBLISHER, publisher_text );
     ADD_META_2( VLC_META_COPYRIGHT, copyright_text );
     ADD_META_2( "Comments:", description_text );
@@ -262,18 +263,18 @@ void MetaPanel::saveMeta()
         return;
 
     /* now we read the modified meta data */
+    input_item_SetTitle(  p_input, qtu( title_text->text() ) );
     input_item_SetArtist( p_input, qtu( artist_text->text() ) );
     input_item_SetAlbum(  p_input, qtu( collection_text->text() ) );
     input_item_SetGenre(  p_input, qtu( genre_text->text() ) );
-
+    input_item_SetTrackNum(  p_input, qtu( seqnum_text->text() ) );
     input_item_SetDate(  p_input, qtu( date_text->text() ) );
 
-    input_item_SetTrackNum(  p_input, qtu( seqnum_text->text() ) );
-
-    input_item_SetTitle(  p_input, qtu( title_text->text() ) );
+    input_item_SetCopyright( p_input, qtu( copyright_text->text() ) );
+    input_item_SetPublisher( p_input, qtu( publisher_text->text() ) );
+    input_item_SetDescription( p_input, qtu( description_text->text() ) );
 
     p_playlist = pl_Yield( p_intf );
-
     PL_LOCK;
     p_playlist->p_private = &p_export;
 
@@ -282,6 +283,8 @@ void MetaPanel::saveMeta()
         module_Unneed( p_playlist, p_mod );
     PL_UNLOCK;
     pl_Release( p_playlist );
+    
+    /* Reset the status of the mode. No need to emit any signal */
     b_inEditMode = false;
 }
 
