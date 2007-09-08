@@ -224,7 +224,7 @@ typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *,
 typedef struct rtp_sink_t
 {
     int rtp_fd;
-    int rtcp_fd;
+    rtcp_sender_t *rtcp;
 } rtp_sink_t;
 
 struct sout_stream_id_t
@@ -1314,7 +1314,10 @@ static void ThreadSend( vlc_object_t *p_this )
 
         vlc_mutex_lock( &id->lock_sink );
         for( int i = 0; i < id->sinkc; i++ )
+        {
             send( id->sinkv[i].rtp_fd, out->p_buffer, out->i_buffer, 0 );
+            SendRTCP( id->sinkv[i].rtcp, out );
+        }
         vlc_mutex_unlock( &id->lock_sink );
 
         block_Release( out );
@@ -1328,7 +1331,10 @@ static inline void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
 
 int rtp_add_sink( sout_stream_id_t *id, int fd )
 {
-    rtp_sink_t sink = { fd, -1 };
+    rtp_sink_t sink = { fd, NULL };
+    sink.rtcp = OpenRTCP( VLC_OBJECT( id->p_stream ), fd, IPPROTO_UDP );
+    if( sink.rtcp == NULL )
+        msg_Err( id, "RTCP failed!" );
 
     vlc_mutex_lock( &id->lock_sink );
     INSERT_ELEM( id->sinkv, id->sinkc, id->sinkc, sink );
@@ -1338,18 +1344,23 @@ int rtp_add_sink( sout_stream_id_t *id, int fd )
 
 void rtp_del_sink( sout_stream_id_t *id, int fd )
 {
+    rtp_sink_t sink = { fd, NULL };
+
     /* NOTE: must be safe to use if fd is not included */
     vlc_mutex_lock( &id->lock_sink );
     for( int i = 0; i < id->sinkc; i++ )
     {
         if (id->sinkv[i].rtp_fd == fd)
         {
+            sink = id->sinkv[i];
             REMOVE_ELEM( id->sinkv, id->sinkc, i );
             break;
         }
     }
     vlc_mutex_unlock( &id->lock_sink );
-    net_Close( fd );
+
+    CloseRTCP( sink.rtcp );
+    net_Close( sink.rtp_fd );
 }
 
 /****************************************************************************

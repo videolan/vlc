@@ -59,20 +59,21 @@ struct rtcp_sender_t
 };
 
 
-rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd,
-                         int proto, uint16_t dport)
+rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto)
 {
     rtcp_sender_t *rtcp;
     uint8_t *ptr;
     char src[NI_MAXNUMERICHOST], dst[NI_MAXNUMERICHOST];
-    int sport;
+    int sport, dport;
     int fd;
 
     if (net_GetSockAddress (rtp_fd, src, &sport)
-     || net_GetPeerAddress (rtp_fd, dst, NULL))
+     || net_GetPeerAddress (rtp_fd, dst, &dport))
         return NULL;
 
     sport++;
+    dport++;
+
     fd = net_OpenDgram (obj, src, sport, dst, dport, AF_UNSPEC, proto);
     if (fd == -1)
         return NULL;
@@ -127,7 +128,7 @@ rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd,
     SetWBE (lenptr, ptr - sdes);
 
     rtcp->length = ptr - rtcp->payload;
-    return VLC_SUCCESS;
+    return rtcp;
 }
 
 
