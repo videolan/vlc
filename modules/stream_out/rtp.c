@@ -221,6 +221,12 @@ struct sout_stream_sys_t
 typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *,
                                     block_t * );
 
+typedef struct rtp_sink_t
+{
+    int rtp_fd;
+    int rtcp_fd;
+} rtp_sink_t;
+
 struct sout_stream_id_t
 {
     VLC_COMMON_MEMBERS
@@ -246,8 +252,8 @@ struct sout_stream_id_t
 
     /* Packets sinks */
     vlc_mutex_t       lock_sink;
-    int               fdc;
-    int              *fdv;
+    int               sinkc;
+    rtp_sink_t       *sinkv;
     rtsp_stream_id_t *rtsp_id;
 
     block_fifo_t     *p_fifo;
@@ -868,8 +874,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     msg_Dbg( p_stream, "maximum RTP packet size: %d bytes", id->i_mtu );
 
     vlc_mutex_init( p_stream, &id->lock_sink );
-    id->fdc = 0;
-    id->fdv = NULL;
+    id->sinkc = 0;
+    id->sinkv = NULL;
     id->rtsp_id = NULL;
 
     id->i_caching =
@@ -1079,20 +1085,20 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->psz_fmtp = strdup( "octet-align=1" );
             id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_amr;
-            break; 
+            break;
         case VLC_FOURCC( 's', 'a', 'w', 'b' ):
             id->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
                                      "AMR-WB/16000/2" : "AMR-WB/16000" );
             id->psz_fmtp = strdup( "octet-align=1" );
             id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_amr;
-            break; 
+            break;
 
         default:
             msg_Err( p_stream, "cannot add this stream (unsupported "
                      "codec:%4.4s)", (char*)&p_fmt->i_codec );
-            if( id->fdc > 0 )
-                rtp_del_sink( id, id->fdv[0] );
+            if( id->sinkc > 0 )
+                rtp_del_sink( id, id->sinkv[0].rtp_fd );
             vlc_thread_join( id );
             vlc_mutex_destroy( &id->lock_sink );
             vlc_object_destroy( id );
@@ -1155,8 +1161,8 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if( id->rtsp_id )
         RtspDelId( p_sys->rtsp, id->rtsp_id );
-    if( id->fdc > 0 )
-        rtp_del_sink( id, id->fdv[0] ); /* sink for explicit dst= */
+    if( id->sinkc > 0 )
+        rtp_del_sink( id, id->sinkv[0].rtp_fd ); /* sink for explicit dst= */
 
     vlc_thread_join( id );
     vlc_mutex_destroy( &id->lock_sink );
@@ -1307,8 +1313,8 @@ static void ThreadSend( vlc_object_t *p_this )
         mwait( i_date );
 
         vlc_mutex_lock( &id->lock_sink );
-        for( int i = 0; i < id->fdc; i++ )
-            send( id->fdv[i], out->p_buffer, out->i_buffer, 0 );
+        for( int i = 0; i < id->sinkc; i++ )
+            send( id->sinkv[i].rtp_fd, out->p_buffer, out->i_buffer, 0 );
         vlc_mutex_unlock( &id->lock_sink );
 
         block_Release( out );
@@ -1322,8 +1328,10 @@ static inline void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
 
 int rtp_add_sink( sout_stream_id_t *id, int fd )
 {
+    rtp_sink_t sink = { fd, -1 };
+
     vlc_mutex_lock( &id->lock_sink );
-    TAB_APPEND( id->fdc, id->fdv, fd );
+    INSERT_ELEM( id->sinkv, id->sinkc, id->sinkc, sink );
     vlc_mutex_unlock( &id->lock_sink );
     return VLC_SUCCESS;
 }
@@ -1332,7 +1340,14 @@ void rtp_del_sink( sout_stream_id_t *id, int fd )
 {
     /* NOTE: must be safe to use if fd is not included */
     vlc_mutex_lock( &id->lock_sink );
-    TAB_REMOVE( id->fdc, id->fdv, fd );
+    for( int i = 0; i < id->sinkc; i++ )
+    {
+        if (id->sinkv[i].rtp_fd == fd)
+        {
+            REMOVE_ELEM( id->sinkv, id->sinkc, i );
+            break;
+        }
+    }
     vlc_mutex_unlock( &id->lock_sink );
     net_Close( fd );
 }
