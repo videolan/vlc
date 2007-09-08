@@ -690,7 +690,6 @@ void MainInterface::setStatus( int status )
 
 void MainInterface::setRate( int rate )
 {
-    msg_Dbg( p_intf, "raaahhh %i", rate );
     QString str;
     str.setNum( ( 1000/(double)rate), 'f', 2 );
     str.append( "x" );
