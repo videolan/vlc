@@ -40,6 +40,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     i_old_playing_status = END_S;
     old_name="";
     p_input = NULL;
+    i_rate = 0;
     ON_TIMEOUT( update() );
 }
 
@@ -101,8 +102,13 @@ void InputManager::update()
     f_pos = var_GetFloat( p_input, "position" );
     emit positionUpdated( f_pos, i_time, i_length );
     
-    /* Update rate */
-    emit rateChanged( var_GetInteger( p_input, "rate") );
+    int i_new_rate = var_GetInteger( p_input, "rate");
+    if( i_new_rate != i_rate )
+    {
+        i_rate = i_new_rate;
+        /* Update rate */
+        emit rateChanged( i_rate );
+    }
 
     /* Update navigation status */
     vlc_value_t val; val.i_int = 0;

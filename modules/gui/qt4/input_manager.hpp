@@ -46,6 +46,7 @@ private:
     input_thread_t *p_input;
     int i_old_playing_status;
     QString old_name;
+    int i_rate;
 public slots:
     void togglePlayPause();
     void update(); ///< Periodic updates
