@@ -610,6 +610,7 @@ void ControlsWidget::fullscreen()
     if( p_vout)
     {
         var_SetBool( p_vout, "fullscreen", !var_GetBool( p_vout, "fullscreen" ) );
+        vlc_object_release( p_vout );
     }
 }
 
