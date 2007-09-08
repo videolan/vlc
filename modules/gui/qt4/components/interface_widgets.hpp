@@ -184,7 +184,9 @@ public:
     {
         if (e->type() == QEvent::MouseButtonPress )
         {
+            /* Mute it */
             aout_VolumeMute( p_intf, NULL );
+            m->updateVolume( 0 );
             return true;
         }
         return false;
