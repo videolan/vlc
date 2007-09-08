@@ -300,7 +300,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     //QSize size( 500, 200 );
     //resize( size );
     controlLayout = new QGridLayout( this );
-    
+
 #if DEBUG_COLOR
     QPalette palette2;
     palette2.setColor(this->backgroundRole(), Qt::magenta);
@@ -583,7 +583,8 @@ void ControlsWidget::updateOnTimer()
 
     /* Activate the interface buttons according to the presence of the input */
     enableInput( THEMIM->getIM()->hasInput() );
-    enableVideo( THEMIM->getIM()->hasVideo() );
+    enableVideo( true );
+    //enableVideo( THEMIM->getIM()->hasVideo() );
 }
 
 void ControlsWidget::setStatus( int status )
@@ -605,8 +606,11 @@ void ControlsWidget::fullscreen()
     vlc_object_t *p_vout = (vlc_object_t *)vlc_object_find( p_intf,
                 VLC_OBJECT_VOUT, FIND_CHILD );
     if( p_vout)
-        var_SetBool( p_vout, "fullscreen", VLC_TRUE );
-    //msg_Dbg( p_intf, "Not implemented yet" );
+    {
+        var_Get( p_vout, "fullscreen", &val );
+        val.b_bool = !val.b_bool;
+        var_Set( p_vout, "fullscreen", val );
+    }
 }
 
 void ControlsWidget::extSettings()
@@ -639,7 +643,7 @@ void ControlsWidget::enableInput( bool enable )
 }
 
 void ControlsWidget::enableVideo( bool enable )
-{  
+{
     // TODO Later make the fullscreenButton toggle Visualisation and so on.
     fullscreenButton->setEnabled( enable );
 
