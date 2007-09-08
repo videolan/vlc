@@ -155,6 +155,7 @@ private:
     QPushButton         *playButton, *fullscreenButton;
     QPushButton         *slowerButton, *fasterButton;
     AdvControlsWidget   *advControls;
+    QLabel              *volMuteLabel;
 
     bool                 b_advancedVisible;
 private slots:

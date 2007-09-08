@@ -650,7 +650,7 @@ void MainInterface::toggleAdvanced()
 
 int MainInterface::getControlsVisibilityStatus()
 {
-    return(  (controls->isVisible() ? 0x2 : 0x0 ) 
+    return( (controls->isVisible() ? 0x2 : 0x0 )
                 + controls->b_advancedVisible );
 }
 

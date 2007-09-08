@@ -462,18 +462,18 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
             prefs() );
     setupSmallButton( prefsButton );
     controlLayout->addWidget( prefsButton, 3, 13 );
-    
+
     controlLayout->setColumnStretch( 14, 5 );
 
     /* Volume */
     VolumeClickHandler *h = new VolumeClickHandler( p_intf, this );
 
-    QLabel *volMuteLabel = new QLabel;
+    volMuteLabel = new QLabel;
     volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
     volMuteLabel->setToolTip( qtr( "Mute" ) );
     volMuteLabel->installEventFilter( h );
 
-    /** TODO: 
+    /** TODO:
      * Change this slider to use a nice Amarok-like one 
      * Add a Context menu to change to the most useful %
      * **/
@@ -553,13 +553,16 @@ void ControlsWidget::setNavigation( int navigation )
 }
 
 static bool b_my_volume;
-void ControlsWidget::updateVolume( int sliderVolume )
+void ControlsWidget::updateVolume( int i_sliderVolume )
 {
     if( !b_my_volume )
     {
-        int i_res = sliderVolume * AOUT_VOLUME_MAX /
+        int i_res = i_sliderVolume * AOUT_VOLUME_MAX /
                             ( 2*volumeSlider->maximum() );
         aout_VolumeSet( p_intf, i_res );
+        if( i_sliderVolume < volumeSlider->maximum()/2 )
+            volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
+        else volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
     }
 }
 
