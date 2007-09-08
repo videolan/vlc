@@ -38,19 +38,17 @@ public:
 
     void mousePressEvent(QMouseEvent* event)
     {
-        if(event->button() == Qt::LeftButton)
+        if( event->button() != Qt::LeftButton && event->button() != Qt::MidButton )
         {
-#ifdef WIN32
-            int width1 = qobject_cast<QWidget*>(parent())->sizeHint().width() -
-                     2 * qobject_cast<QWidget*>(parent())->layout()->margin();
-#else
-            int width1 = width();
-#endif
-            int pos = (int)(minimum() +
-                          (double)(event->x())/width1*(maximum()-minimum()) );
-            setValue( pos );
-            QSlider::mousePressEvent(event);
+            QSlider::mousePressEvent( event );
+            return;
         }
+
+        QMouseEvent newEvent( event->type(), event->pos(), event->globalPos(),
+                Qt::MouseButton( event->button() ^ Qt::LeftButton ^ Qt::MidButton ),
+                Qt::MouseButtons( event->buttons() ^ Qt::LeftButton ^ Qt::MidButton ),
+                event->modifiers() );
+        QSlider::mousePressEvent( &newEvent );
     }
 };
 #endif
