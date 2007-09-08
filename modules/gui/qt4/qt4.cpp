@@ -118,7 +118,7 @@ vlc_module_begin();
         add_bool( "qt-name-in-title", VLC_TRUE, NULL, TITLE_TEXT,
                   TITLE_LONGTEXT, VLC_FALSE );
         add_bool( "qt-error-dialogs", VLC_TRUE, NULL, ERROR_TEXT,
-                ERROR_TEXT, VLC_FALSE ):
+                ERROR_TEXT, VLC_FALSE );
         add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
                 FILEDIALOG_PATH_LONGTEXT, VLC_TRUE);
             change_autosave();
