@@ -6,6 +6,7 @@
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Rafaël Carré <funman@videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -469,7 +470,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     VolumeClickHandler *h = new VolumeClickHandler( p_intf, this );
 
     volMuteLabel = new QLabel;
-    volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
+    volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
     volMuteLabel->setToolTip( qtr( "Mute" ) );
     volMuteLabel->installEventFilter( h );
 
@@ -560,11 +561,6 @@ void ControlsWidget::updateVolume( int i_sliderVolume )
         int i_res = i_sliderVolume * AOUT_VOLUME_MAX /
                             ( 2*volumeSlider->maximum() );
         aout_VolumeSet( p_intf, i_res );
-        if( i_sliderVolume == 0 )
-            volMuteLabel->setPixmap( QPixmap(":/pixmaps/volume-muted.png" ) );
-        else if( i_sliderVolume < volumeSlider->maximum()/2 )
-            volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
-        else volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
     }
 }
 
@@ -582,6 +578,11 @@ void ControlsWidget::updateOnTimer()
         volumeSlider->setValue( i_volume );
         b_my_volume = false;
     }
+    if( i_volume == 0 )
+        volMuteLabel->setPixmap( QPixmap(":/pixmaps/volume-muted.png" ) );
+    else if( i_volume < volumeSlider->maximum()/2 )
+        volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
+    else volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
 
     /* Activate the interface buttons according to the presence of the input */
     enableInput( THEMIM->getIM()->hasInput() );

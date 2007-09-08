@@ -6,6 +6,7 @@
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Rafaël Carré <funman@videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -184,9 +185,7 @@ public:
     {
         if (e->type() == QEvent::MouseButtonPress )
         {
-            /* Mute it */
             aout_VolumeMute( p_intf, NULL );
-            m->updateVolume( 0 );
             return true;
         }
         return false;
