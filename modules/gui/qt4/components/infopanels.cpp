@@ -69,11 +69,11 @@ MetaPanel::MetaPanel( QWidget *parent,
     /* FIXME List id3genres.h is not includable yet ? */
     genre_text = new QLineEdit;
     metaLayout->addWidget( new QLabel( qtr( VLC_META_GENRE ) + " :" ), line, 0 );
-    metaLayout->addWidget( genre_text, line, 1, 1, 5 );
+    metaLayout->addWidget( genre_text, line, 1, 1, 4 );
 
     /* Number - on the same line */
     metaLayout->addWidget( new QLabel( qtr( "Track Number" )  + " :" ),
-                  line, 6 );
+                  line, 5, 1, 2  );
     seqnum_text = new QLineEdit;
     seqnum_text->setInputMask("0000");
     seqnum_text->setAlignment( Qt::AlignRight );
@@ -85,18 +85,18 @@ MetaPanel::MetaPanel( QWidget *parent,
     date_text->setInputMask("0000");
     date_text->setAlignment( Qt::AlignRight );
     metaLayout->addWidget( new QLabel( qtr( VLC_META_DATE ) + " :" ), line, 0 );
-    metaLayout->addWidget( date_text, line, 1, 1, 2 );
+    metaLayout->addWidget( date_text, line, 1, 1, 3 );
 
     /* Rating - on the same line */
-    metaLayout->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 3, 1, 2 );
+    metaLayout->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 4, 1, 2 );
     rating_text = new QSpinBox; setSpinBounds( rating_text );
-    metaLayout->addWidget( rating_text, line, 5, 1, 1 );
+    metaLayout->addWidget( rating_text, line, 6, 1, 1 );
 
     /* Language on the same line */
-    metaLayout->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 6, 1, 2 );
+    metaLayout->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 7, 1, 2 );
     language_text = new QLineEdit;
     language_text->setReadOnly( true );
-    metaLayout->addWidget( language_text, line,  8, 1, 2 );
+    metaLayout->addWidget( language_text, line,  9, 1, 1 );
     line++;
 
     /* ART_URL */
@@ -107,7 +107,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     art_cover->setMaximumWidth( 128 );
     art_cover->setScaledContents( true );
     art_cover->setPixmap( QPixmap( ":/noart.png" ) );
-    metaLayout->addWidget( art_cover, line, 7, 4, 2 );
+    metaLayout->addWidget( art_cover, line, 8, 4, 2 );
     
 /* Settings is unused */
 /*    l->addWidget( new QLabel( qtr( VLC_META_SETTING ) + " :" ), line, 5 );
