@@ -998,6 +998,8 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
                 QTreeWidgetItem *it = table->topLevelItem(i);
                 module_config_t *p_item = static_cast<module_config_t*>
                               (it->data( 0, Qt::UserRole ).value<void*>());
+                if( p_keyItem != p_item && p_item->value.i == d->keyValue )
+                    p_item->value.i = 0;
                 it->setText( 1, VLCKeyToString( p_item->value.i ) );
             }
         }
@@ -1052,7 +1054,6 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
         if( p_current->value.i == i_vlckey && strcmp( p_current->psz_text,
                                                     keyToChange ) )
         {
-            p_current->value.i = 0;
             conflicts = true;
             break;
         }
