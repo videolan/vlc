@@ -49,7 +49,7 @@
 
 #ifdef WIN32
     #define PREF_W 410
-    #define PREF_H 121
+    #define PREF_H 151
 #else
     #define PREF_W 450
     #define PREF_H 160
