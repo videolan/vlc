@@ -62,7 +62,7 @@ public:
 
     QSystemTrayIcon *getSysTray() { return sysTray; };
     QMenu *getSysTrayMenu() { return systrayMenu; };
-    bool isAdvancedVisible();
+    int getControlsVisibilityStatus();
 protected:
     void resizeEvent( QResizeEvent * );
     void dropEvent( QDropEvent *);

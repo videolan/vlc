@@ -164,7 +164,7 @@ static int AudioAutoMenuBuilder( vlc_object_t *p_object,
  * Main Menu Bar Creation
  **/
 void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
-        bool playlist, bool adv_controls_enabled,
+        bool playlist,
         bool visual_selector_enabled )
 {
     QMenuBar *bar = mi->menuBar();
@@ -173,8 +173,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
     {
         BAR_ADD( PlaylistMenu( mi,p_intf ), qtr("&Playlist" ) );
     }
-    BAR_ADD( ToolsMenu( p_intf, mi, adv_controls_enabled,
-                visual_selector_enabled ), qtr("&Tools") );
+    BAR_ADD( ToolsMenu( p_intf, mi, visual_selector_enabled, true ), qtr("&Tools") );
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr("&Audio"), 2 );
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr("&Video"), 1 );
     BAR_DADD( NavigMenu( p_intf, NULL ), qtr("&Navigation"), 3 );
@@ -189,18 +188,11 @@ void QVLCMenu::createMenuBar( MainInterface *mi, intf_thread_t *p_intf,
 QMenu *QVLCMenu::FileMenu()
 {
     QMenu *menu = new QMenu();
+    
     DP_SADD( menu, qtr("Open &File..." ), "",
             ":/pixmaps/vlc_file-asym_16px.png", openFileDialog(), "Ctrl+O" );
-
-    /* Folder vs. Directory */
-#ifdef WIN32
-    DP_SADD( menu, qtr( "Open Folder..." ), "",
+    DP_SADD( menu, qtr( I_OPEN_FOLDER ), "",
             ":/pixmaps/vlc_folder-grey_16px.png", openDirDialog(), "Ctrl+F" );
-#else
-    DP_SADD( menu, qtr( "Open Directory..." ), "",
-            ":/pixmaps/vlc_folder-grey_16px.png", openDirDialog(), "Ctrl+F" );
-#endif /* WIN32 */
-
     DP_SADD( menu, qtr("Open &Disc..." ), "", ":/pixmaps/vlc_disc_16px.png",
              openDiscDialog(), "Ctrl+D" );
     DP_SADD( menu, qtr("Open &Network..." ), "",
@@ -209,10 +201,12 @@ QMenu *QVLCMenu::FileMenu()
             ":/pixmaps/vlc_capture-card_16px.png", openCaptureDialog(),
             "Ctrl+C" );
     menu->addSeparator();
+    
     DP_SADD( menu, qtr("&Streaming..."), "", ":/pixmaps/vlc_stream_16px.png",
             openThenStreamingDialogs(), "Ctrl+S" );
     DP_SADD( menu, qtr("Conve&rt / Save..."), "", "",
             openThenTranscodingDialogs(), "Ctrl+R" );
+    
     menu->addSeparator();
     DP_SADD( menu, qtr("&Quit") , "", ":/pixmaps/vlc_quit_16px.png", quit(),
             "Ctrl+Q");
@@ -242,8 +236,8 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
  * longer.
  **/
 QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
-        bool adv_controls_enabled,
-        bool visual_selector_enabled, bool with_intf )
+        bool visual_selector_enabled, 
+        bool with_intf )
 {
     QMenu *menu = new QMenu();
     if( with_intf )
@@ -253,12 +247,14 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
         menu->addMenu( intfmenu );
         menu->addSeparator();
     }
+    
     DP_SADD( menu, qtr( I_MENU_MSG ), "", ":/pixmaps/vlc_messages_16px.png",
              messagesDialog(), "Ctrl+M" );
     DP_SADD( menu, qtr( I_MENU_INFO ) , "", "", mediaInfoDialog(), "Ctrl+I" );
     DP_SADD( menu, qtr( I_MENU_CODECINFO ) , "", ":/pixmaps/vlc_info_16px.png",
              mediaCodecDialog(), "Ctrl+J" );
     DP_SADD( menu, qtr( I_MENU_GOTOTIME ), "","", gotoTimeDialog(), "Ctrl+T" );
+    
 #if 0 /* Not Implemented yet */
     DP_SADD( menu, qtr( I_MENU_BOOKMARK ), "","", bookmarksDialog(), "Ctrl+B" );
     DP_SADD( menu, qtr( I_MENU_VLM ), "","", vlmDialog(), "Ctrl+V" );
@@ -267,13 +263,16 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     menu->addSeparator();
     if( mi )
     {
-        QAction *adv = menu->addAction( qtr("Advanced controls" ),
-                mi, SLOT( toggleAdvanced() ) );
-        adv->setCheckable( true );
-        if( adv_controls_enabled ) adv->setChecked( true );
-
-        menu->addAction( qtr( "Hide Menus..." ), mi, SLOT( toggleMenus() ),
+        /* Minimal View */
+        QAction *action=menu->addAction( qtr( "Minimal View..." ), mi, SLOT( toggleMenus() ),
                 qtr( "Ctrl+H") );
+        action->setCheckable( true );
+        if( mi->getControlsVisibilityStatus() & 0x2 ) action->setChecked( true );
+        
+        /* Advanced Controls */
+        action = menu->addAction( qtr("Advanced controls" ), mi, SLOT( toggleAdvanced() ) );
+        action->setCheckable( true );
+        if( mi->getControlsVisibilityStatus() & 0x1 ) action->setChecked( true );
         menu->addSeparator();
 
 #if 0 /* For Visualisations. Not yet working */
@@ -286,6 +285,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
                           qtr( "Playlist"), mi, SLOT( togglePlaylist() ),
                           qtr( "Ctrl+L") );
     }
+    
     DP_SADD( menu, qtr( I_MENU_EXT ), "", ":/pixmaps/vlc_settings_16px.png",
                  extendedDialog() ,  "Ctrl+E"  );
 
@@ -399,7 +399,7 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *current )
 }
 
 /**
- * Service Discovery Menu
+ * Service Discovery SubMenu
  **/
 QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 {
@@ -503,7 +503,7 @@ QMenu *QVLCMenu::HelpMenu()
     intfmenu->setTitle( qtr("Interfaces" ) ); \
     menu->addMenu( intfmenu ); \
     \
-    QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, false, false ); \
+    QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, false ); \
     toolsmenu->setTitle( qtr("Tools" ) ); \
     menu->addMenu( toolsmenu ); \
     \

@@ -125,7 +125,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* Menu Bar */
     QVLCMenu::createMenuBar( this, p_intf, playlistEmbeddedFlag,
-                             isAdvancedVisible(), visualSelectorEnabled );
+                             visualSelectorEnabled );
 
     /* Status Bar */
     /**
@@ -245,7 +245,7 @@ MainInterface::~MainInterface()
     }
 
     settings->setValue( "playlist-embedded", playlistEmbeddedFlag );
-    settings->setValue( "adv-controls", isAdvancedVisible() );
+    settings->setValue( "adv-controls", getControlsVisibilityStatus() & 0x1 );
     settings->setValue( "pos", pos() );
     settings->endGroup();
     delete settings;
@@ -591,8 +591,7 @@ void MainInterface::undockPlaylist()
         playlistEmbeddedFlag = false;
 
         menuBar()->clear();
-        QVLCMenu::createMenuBar( this, p_intf, false, isAdvancedVisible(),
-                                 visualSelectorEnabled);
+        QVLCMenu::createMenuBar( this, p_intf, false, visualSelectorEnabled);
 
         if( videoIsActive )
         {
@@ -649,9 +648,10 @@ void MainInterface::toggleAdvanced()
     controls->toggleAdvanced();
 }
 
-bool MainInterface::isAdvancedVisible()
+int MainInterface::getControlsVisibilityStatus()
 {
-    return controls->b_advancedVisible;
+    return(  (controls->isVisible() ? 0x2 : 0x0 ) 
+                + controls->b_advancedVisible );
 }
 
 /************************************************************************
@@ -907,8 +907,7 @@ void MainInterface::customEvent( QEvent *event )
         PlaylistDialog::killInstance();
         playlistEmbeddedFlag = true;
         menuBar()->clear();
-        QVLCMenu::createMenuBar(this, p_intf, true, isAdvancedVisible(),
-                                visualSelectorEnabled);
+        QVLCMenu::createMenuBar(this, p_intf, true, visualSelectorEnabled);
         togglePlaylist();
     }
     else if ( event->type() == SetVideoOnTopEvent_Type )

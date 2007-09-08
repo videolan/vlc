@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +28,13 @@
 
 #include <QObject>
 #include <vector>
+
+/* Folder vs. Directory */
+#ifdef WIN32
+#define I_OPEN_FOLDER "Open &Folder..."
+#else 
+#define I_OPEN_FOLDER "Open D&irectory..."
+#endif //WIN32
 
 using namespace std;
 
@@ -64,14 +72,13 @@ class QVLCMenu : public QObject
     Q_OBJECT;
 public:
     static void createMenuBar( MainInterface *mi, intf_thread_t *,
-                               bool, bool, bool );
+                               bool, bool );
 
     /* Menus */
     static QMenu *FileMenu();
     static QMenu *SDMenu( intf_thread_t * );
     static QMenu *PlaylistMenu( MainInterface *, intf_thread_t *);
-    static QMenu *ToolsMenu( intf_thread_t *, MainInterface *, bool, bool,
-                             bool with = true );
+    static QMenu *ToolsMenu( intf_thread_t *, MainInterface *, bool, bool with = true );
     static QMenu *NavigMenu( intf_thread_t * , QMenu * );
     static QMenu *VideoMenu( intf_thread_t * , QMenu * );
     static QMenu *AudioMenu( intf_thread_t * , QMenu * );
