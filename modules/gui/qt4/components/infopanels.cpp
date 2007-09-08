@@ -77,7 +77,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     seqnum_text = new QLineEdit;
     seqnum_text->setInputMask("0000");
     seqnum_text->setAlignment( Qt::AlignRight );
-    metaLayout->addWidget( seqnum_text, line, 7, 1, 4 );
+    metaLayout->addWidget( seqnum_text, line, 7, 1, 3 );
     line++;
 
     /* Date (Should be in years) */
@@ -90,11 +90,12 @@ MetaPanel::MetaPanel( QWidget *parent,
     /* Rating - on the same line */
     metaLayout->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 3, 1, 2 );
     rating_text = new QSpinBox; setSpinBounds( rating_text );
-    metaLayout->addWidget( rating_text, line, 5, 1, 2 );
+    metaLayout->addWidget( rating_text, line, 5, 1, 1 );
 
     /* Language on the same line */
-    metaLayout->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 7 );
+    metaLayout->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 6, 1, 2 );
     language_text = new QLineEdit;
+    language_text->setReadOnly( true );
     metaLayout->addWidget( language_text, line,  8, 1, 2 );
     line++;
 
@@ -106,7 +107,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     art_cover->setMaximumWidth( 128 );
     art_cover->setScaledContents( true );
     art_cover->setPixmap( QPixmap( ":/noart.png" ) );
-    metaLayout->addWidget( art_cover, line, 8, 4, 2 );
+    metaLayout->addWidget( art_cover, line, 7, 4, 2 );
     
 /* Settings is unused */
 /*    l->addWidget( new QLabel( qtr( VLC_META_SETTING ) + " :" ), line, 5 );
@@ -137,12 +138,13 @@ MetaPanel::MetaPanel( QWidget *parent,
 #undef ADD_META_2
 
     CONNECT( title_text, textEdited( QString ), this, enterEditMode() );
-    CONNECT( description_text, textEdited( QString ), this, enterEditMode() );
     CONNECT( artist_text, textEdited( QString ), this, enterEditMode() );
     CONNECT( collection_text, textEdited( QString ), this, enterEditMode() );
     CONNECT( genre_text, textEdited( QString ), this, enterEditMode() );
-    CONNECT( date_text, textEdited( QString ), this, enterEditMode() );
     CONNECT( seqnum_text, textEdited( QString ), this, enterEditMode() );
+    
+    CONNECT( date_text, textEdited( QString ), this, enterEditMode() );
+    CONNECT( description_text, textEdited( QString ), this, enterEditMode() );
 /*    CONNECT( rating_text, valueChanged( QString ), this, enterEditMode( QString ) );*/
 
     /* We are not yet in Edit Mode */

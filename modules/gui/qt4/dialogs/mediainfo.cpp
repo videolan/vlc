@@ -88,7 +88,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
 
     /* Let the MetaData Panel update the URI */
     CONNECT( MP, uriSet( QString ), uriLine, setText( QString ) );
-    CONNECT( MP, editing( bool ), this, editMeta( bool ) );
+    CONNECT( MP, editing(), this, editMeta() );
 
     CONNECT( IT, currentChanged( int ), this, updateButtons( int ) );
 
