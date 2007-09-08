@@ -396,11 +396,11 @@ void DialogsProvider::streamingDialog( QString mrl, bool b_transcode_only )
                                                     b_transcode_only );
     if( s->exec() == QDialog::Accepted )
     {
-        msg_Err(p_intf, "mrl %s\n", qta(s->mrl));
+        msg_Err( p_intf, "mrl %s\n", qta( s->getMrl() ) );
         /* Just do it */
-        int i_len = strlen( qtu(s->mrl) ) + 10;
+        int i_len = strlen( qtu( s->getMrl() ) ) + 10;
         char *psz_option = (char*)malloc(i_len);
-        snprintf( psz_option, i_len - 1, "%s", qtu(s->mrl));
+        snprintf( psz_option, i_len - 1, "%s", qtu( s->getMrl() ) );
 
         playlist_AddExt( THEPL, qtu( mrl ), "Streaming",
                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,

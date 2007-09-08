@@ -204,7 +204,7 @@ void MediaInfoDialog::close()
     MP->setEditMode( false );
 }
 
-void MediaInfoDialog::( int i_tab )
+void MediaInfoDialog::updateButtons( int i_tab )
 {
     if( MP->isInEditMode() && i_tab == 0 )
         saveMetaButton->show();

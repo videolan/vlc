@@ -43,20 +43,23 @@ public:
                 bool _transcode_only = false );
     virtual ~SoutDialog() {}
 
-    QString getMrl();
-    QString mrl;
+    QString getMrl();  
     //sout_gui_descr_t *sout;
 private:
     Ui::Sout ui;
     QPushButton *okButton;
+    QString mrl;
     bool b_transcode_only;
+
 public slots:
+    void updateMRL();
+
+private slots:
     void ok();
     void cancel();
-    void updateMRL();
-    void fileBrowse();
     void toggleSout();
     void setOptions();
+    void fileBrowse();
     void setVTranscodeOptions( bool );
     void setATranscodeOptions( bool );
     void setSTranscodeOptions( bool );
