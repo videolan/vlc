@@ -278,33 +278,26 @@
         </item>
         <item row="5" column="0" >
          <widget class="QCheckBox" name="UDPOutput" >
+          <property name="toolTip" >
+           <string>_("Using this option is not recommended in most of the cases.")</string>
+          </property>
           <property name="text" >
-           <string>UDP</string>
+           <string>_("Prefer UDP over RTP")</string>
           </property>
          </widget>
         </item>
         <item row="5" column="1" >
          <widget class="QLabel" name="UDPLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Address")</string>
           </property>
          </widget>
         </item>
         <item row="5" column="2" >
-         <widget class="QLineEdit" name="UDPEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="UDPEdit" />
         </item>
         <item row="5" column="3" >
          <widget class="QLabel" name="UDPPortLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Port")</string>
           </property>
@@ -315,9 +308,6 @@
         </item>
         <item row="5" column="4" >
          <widget class="QSpinBox" name="UDPPort" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="maximumSize" >
            <size>
             <width>90</width>
@@ -1167,6 +1157,70 @@
     <hint type="destinationlabel" >
      <x>46</x>
      <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UDPOutput</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>UDPPort</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>98</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>493</x>
+     <y>212</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UDPOutput</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>UDPPortLabel</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>107</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>396</x>
+     <y>212</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UDPOutput</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>UDPLabel</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>107</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>241</x>
+     <y>212</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UDPOutput</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>UDPEdit</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>107</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>315</x>
+     <y>212</y>
     </hint>
    </hints>
   </connection>

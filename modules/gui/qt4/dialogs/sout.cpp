@@ -41,6 +41,8 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     /* UI stuff */
     ui.setupUi( this );
 
+    ui.UDPEdit->hide(); ui.UDPLabel->hide();
+    ui.UDPPort->hide(); ui.UDPPortLabel->hide();
 /* ADD HERE for new profiles */
 #define ADD_PROFILE( name, shortname ) ui.profileBox->addItem( qtr( name ), QVariant( QString( shortname ) ) );
     ADD_PROFILE( "Custom" , "Custom" )
