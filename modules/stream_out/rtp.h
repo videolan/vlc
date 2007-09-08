@@ -39,3 +39,9 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url );
 int rtp_add_sink( sout_stream_id_t *id, int fd );
 void rtp_del_sink( sout_stream_id_t *id, int fd );
 
+/* RTCP */
+typedef struct rtcp_sender_t rtcp_sender_t;
+rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd,
+                         int proto, uint16_t dport);
+void CloseRTCP (rtcp_sender_t *rtcp);
+void SendRTCP (rtcp_sender_t *restrict rtcp, const block_t *rtp);
