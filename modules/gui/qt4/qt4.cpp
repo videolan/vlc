@@ -90,6 +90,8 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define SHOWFLAGS_LONGTEXT N_("Enter the sum of the options that you want: \n" \
             "Title: 1; Duration: 2; Artist: 4; Genre: 8; " \
             "Copyright: 16; Collection/album: 32; Rating: 256." )
+#define ERROR_TEXT N_("Show unimportant error and warnings dialogs" )
+
 
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
@@ -115,6 +117,8 @@ vlc_module_begin();
                 MINIMIZED_LONGTEXT, VLC_TRUE);
         add_bool( "qt-name-in-title", VLC_TRUE, NULL, TITLE_TEXT,
                   TITLE_LONGTEXT, VLC_FALSE );
+        add_bool( "qt-error-dialogs", VLC_TRUE, NULL, ERROR_TEXT,
+                ERROR_TEXT, VLC_FALSE ):
         add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
                 FILEDIALOG_PATH_LONGTEXT, VLC_TRUE);
             change_autosave();

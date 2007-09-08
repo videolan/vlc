@@ -52,7 +52,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     }
     else if( p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
-        if( config_GetInt( p_intf, "errors-dialog" ) != 0 )
+        if( config_GetInt( p_intf, "qt-error-dialogs" ) != 0 )
             ErrorsDialog::getInstance( p_intf )->addError(
                  qfu( p_dialog->psz_title ), qfu( p_dialog->psz_description ) );
         i_ret = 0;
@@ -60,7 +60,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     }
     else if( p_dialog->i_flags & DIALOG_WARNING )
     {
-        if( config_GetInt( p_intf, "errors-dialog" ) != 0 )
+        if( config_GetInt( p_intf, "qt-error-dialogs" ) != 0 )
             ErrorsDialog::getInstance( p_intf )->addWarning(
                 qfu( p_dialog->psz_title ),qfu( p_dialog->psz_description ) );
         i_ret = 0;
