@@ -197,6 +197,7 @@ EXTRA_DIST += \
 	pixmaps/noart.png \
 	pixmaps/playlist_icon.png \
 	pixmaps/play.png \
+	pixmaps/pause.png \
 	pixmaps/previous.png \
 	pixmaps/spref_cone_Audio_64.png \
 	pixmaps/spref_cone_Hotkeys_64.png \
@@ -207,6 +208,7 @@ EXTRA_DIST += \
 	pixmaps/stop.png \
 	pixmaps/volume-high.png \
 	pixmaps/volume-low.png \
+	pixmaps/volume-muted.png \
 	pixmaps/vlc_help_16px.png \
 	pixmaps/vlc_stop_16px.png \
 	pixmaps/vlc_play_16px.png \

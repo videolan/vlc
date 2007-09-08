@@ -560,7 +560,9 @@ void ControlsWidget::updateVolume( int i_sliderVolume )
         int i_res = i_sliderVolume * AOUT_VOLUME_MAX /
                             ( 2*volumeSlider->maximum() );
         aout_VolumeSet( p_intf, i_res );
-        if( i_sliderVolume < volumeSlider->maximum()/2 )
+        if( i_sliderVolume == 0 )
+            volMuteLabel->setPixmap( QPixmap(":/pixmaps/volume-muted.png" ) );
+        else if( i_sliderVolume < volumeSlider->maximum()/2 )
             volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
         else volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
     }
