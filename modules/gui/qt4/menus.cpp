@@ -499,11 +499,7 @@ QMenu *QVLCMenu::HelpMenu()
     MIM_SADD( menu, qtr( "Next" ), "", ":/pixmaps/vlc_next_16px.png", next() );
 
 #define POPUP_STATIC_ENTRIES( menu ) \
-    QMenu *intfmenu = InterfacesMenu( p_intf, NULL ); \
-    intfmenu->setTitle( qtr( "Interfaces" ) ); \
-    menu->addMenu( intfmenu ); \
-    \
-    QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, false ); \
+    QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, true ); \
     toolsmenu->setTitle( qtr( "Tools" ) ); \
     menu->addMenu( toolsmenu ); \
     \
