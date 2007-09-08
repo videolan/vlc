@@ -1,7 +1,7 @@
 /*****************************************************************************
  * errors.cpp : Errors
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright ( C ) 2006 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -9,7 +9,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * ( at your option ) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,12 +40,12 @@ ErrorsDialog::ErrorsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     setWindowModality( Qt::ApplicationModal );
 
     QGridLayout *layout = new QGridLayout( this );
-    QPushButton *closeButton = new QPushButton(qtr("&Close"));
-    QPushButton *clearButton = new QPushButton(qtr("&Clear"));
+    QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
+    QPushButton *clearButton = new QPushButton( qtr( "&Clear" ) );
     messages = new QTextEdit();
     messages->setReadOnly( true );
     messages->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    stopShowing = new QCheckBox( qtr( "Hide future errors") );
+    stopShowing = new QCheckBox( qtr( "Hide future errors" ) );
 
     layout->addWidget( messages, 0, 0, 1, 3 );
     layout->addWidget( stopShowing, 1, 0 );
@@ -73,7 +73,7 @@ void ErrorsDialog::add( bool error, QString title, QString text )
     if( stopShowing->isChecked() ) return;
     messages->textCursor().movePosition( QTextCursor::End );
     messages->setTextColor( error ? "red" : "yellow" );
-    messages->insertPlainText( title + QString( ":\n" ));
+    messages->insertPlainText( title + QString( ":\n" ) );
     messages->setTextColor( "black" );
     messages->insertPlainText( text + QString( "\n" ) );
     messages->ensureCursorVisible();

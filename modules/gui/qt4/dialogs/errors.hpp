@@ -51,7 +51,7 @@ private:
 
     QCheckBox *stopShowing;
     QTextEdit *messages;
-public slots:
+private slots:
     void close();
     void clear();
     void dontShow();
