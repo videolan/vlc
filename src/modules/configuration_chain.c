@@ -313,7 +313,6 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
         /* </Check if the option is deprecated> */
 
         /* get the type of the variable */
-        msg_Err( p_this, "name = %s", name );
         i_type = config_GetType( p_this, psz_name );
         if( !i_type )
         {
