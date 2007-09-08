@@ -455,9 +455,7 @@ void InfoPanel::clear()
  **/
 /*
 void InfoPanel::saveCodecsInfo()
-{
-
-}
+{}
 */
 
 /**
@@ -496,10 +494,10 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
     catName->addChild( itemName ); }
 
     /* Create the main categories */
-    CREATE_CATEGORY( input, qtr("Input") );
-    CREATE_CATEGORY( video, qtr("Video") );
-    CREATE_CATEGORY( streaming, qtr("Streaming") );
     CREATE_CATEGORY( audio, qtr("Audio") );
+    CREATE_CATEGORY( video, qtr("Video") );
+    CREATE_CATEGORY( input, qtr("Input") );
+    CREATE_CATEGORY( streaming, qtr("Streaming") );
 
     CREATE_AND_ADD_TO_CAT( read_media_stat, qtr("Read at media"),
                            "0", input , "kB" );
