@@ -134,6 +134,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /**
      * TODO: do we add a label for the current Volume ?
      **/
+    b_remainingTime = false;
     timeLabel = new QLabel;
     nameLabel = new QLabel;
     speedLabel = new QLabel( "1.0x" );
@@ -144,6 +145,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     statusBar()->addPermanentWidget( timeLabel, 2 );
     speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
     timeLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
+    
     CONNECT( speedLabel, customContextMenuRequested( QPoint ),
              this, showSpeedMenu( QPoint ) );
     CONNECT( timeLabel, customContextMenuRequested( QPoint ),
@@ -400,7 +402,8 @@ void MainInterface::showSpeedMenu( QPoint pos )
 void MainInterface::showTimeMenu( QPoint pos )
 {
     QMenu menu( this );
-    menu.addAction( "Not Implemented Yet" );
+    menu.addAction(  qtr("Elapsed Time") , this, SLOT( setElapsedTime() ) );
+    menu.addAction(  qtr("Remaining Time") , this, SLOT( setRemainTime() ) );
     menu.exec( QCursor::pos() );
 }
 
@@ -655,11 +658,19 @@ void MainInterface::setDisplay( float pos, int time, int length )
 {
     char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
     secstotimestr( psz_length, length );
-    secstotimestr( psz_time, time );
-    QString title;
-    title.sprintf( "%s/%s", psz_time, psz_length );
-    timeLabel->setText( " "+title+" " );
+    secstotimestr( psz_time, b_remainingTime ? length - time : time );
+    QString title; title.sprintf( "%s/%s", psz_time, psz_length );
+    if( b_remainingTime ) timeLabel->setText( " -"+title+" " );
+    else timeLabel->setText( " "+title+" " );
 }
+
+void MainInterface::toggleTimeDisplay( bool b_remain = false )
+{
+    b_remainingTime = ( b_remainingTime ? false : true );
+}
+
+void MainInterface::setElapsedTime(){ b_remainingTime = false; }
+void MainInterface::setRemainTime(){ b_remainingTime = true; }
 
 void MainInterface::setName( QString name )
 {

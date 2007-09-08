@@ -113,6 +113,8 @@ private:
     QLabel              *timeLabel;
     QLabel              *speedLabel;
     QLabel              *nameLabel;
+    
+    bool                 b_remainingTime;
 
     void customEvent( QEvent *);
 public slots:
@@ -127,6 +129,9 @@ private slots:
     void setName( QString );
     void setVLCWindowsTitle( QString title = "" );
     void setDisplay( float, int, int );
+    void toggleTimeDisplay( bool );
+    void setElapsedTime();
+    void setRemainTime();
 #if 0
     void visual();
 #endif
