@@ -258,7 +258,7 @@ static int Open( vlc_object_t * p_this )
     case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
     case VLC_FOURCC( 'a', '5', '2', ' ' ):
         /* FIXME set end of area FIXME */
-        goto relay;
+        goto error;
     default:
         msg_Err( p_demux, "unsupported codec (%4.4s)",
                  (char*)&p_sys->fmt.i_codec );
@@ -290,7 +290,6 @@ static int Open( vlc_object_t * p_this )
 
 error:
     free( p_wf );
-relay:
     free( p_sys );
     return VLC_EGENERIC;
 }
