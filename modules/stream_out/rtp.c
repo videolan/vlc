@@ -894,14 +894,16 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             {
                 id->i_payload_type = 10;
             }
-            asprintf( &id->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate,
-                      p_fmt->audio.i_channels );
+            if( asprintf( &id->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate,
+                          p_fmt->audio.i_channels ) == -1 )
+                id->psz_rtpmap = NULL;
             id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_l16;
             break;
         case VLC_FOURCC( 'u', '8', ' ', ' ' ):
-            asprintf( &id->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate,
-                      p_fmt->audio.i_channels );
+            if( asprintf( &id->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate,
+                          p_fmt->audio.i_channels ) == -1 )
+                id->psz_rtpmap = NULL;
             id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_l8;
             break;
@@ -969,15 +971,14 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                     p_buffer += i_size;
                 }
                 /* */
-                if( p_64_sps && p_64_pps )
-                    asprintf( &id->psz_fmtp,
-                               "packetization-mode=1;profile-level-id=%s;"
-                               "sprop-parameter-sets=%s,%s;", hexa, p_64_sps,
-                               p_64_pps );
-                if( p_64_sps )
-                    free( p_64_sps );
-                if( p_64_pps )
-                    free( p_64_pps );
+                if( p_64_sps && p_64_pps &&
+                    ( asprintf( &id->psz_fmtp,
+                                "packetization-mode=1;profile-level-id=%s;"
+                                "sprop-parameter-sets=%s,%s;", hexa, p_64_sps,
+                                p_64_pps ) == -1 ) )
+                    id->psz_fmtp = NULL;
+                free( p_64_sps );
+                free( p_64_pps );
             }
             if( !id->psz_fmtp )
                 id->psz_fmtp = strdup( "packetization-mode=1" );
@@ -991,10 +992,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->pf_packetize = rtp_packetize_split;
             if( p_fmt->i_extra > 0 )
             {
-                id->psz_fmtp = malloc( 100 + 2 * p_fmt->i_extra );
                 sprintf_hexa( hexa, p_fmt->p_extra, p_fmt->i_extra );
-                sprintf( id->psz_fmtp,
-                         "profile-level-id=3; config=%s;", hexa );
+                if( asprintf( &id->psz_fmtp,
+                              "profile-level-id=3; config=%s;", hexa ) == -1 )
+                    id->psz_fmtp = NULL;
             }
             break;
         }
@@ -1006,14 +1007,17 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             {
                 char hexa[2*p_fmt->i_extra +1];
 
-                asprintf( &id->psz_rtpmap, "mpeg4-generic/%d",
-                          p_fmt->audio.i_rate );
+                if( asprintf( &id->psz_rtpmap, "mpeg4-generic/%d",
+                              p_fmt->audio.i_rate ) == -1 )
+                    id->psz_rtpmap = NULL;
                 id->pf_packetize = rtp_packetize_mp4a;
                 sprintf_hexa( hexa, p_fmt->p_extra, p_fmt->i_extra );
-                asprintf( &id->psz_fmtp,
-                         "streamtype=5; profile-level-id=15; mode=AAC-hbr; "
-                         "config=%s; SizeLength=13;IndexLength=3; "
-                         "IndexDeltaLength=3; Profile=1;", hexa );
+                if( asprintf( &id->psz_fmtp,
+                              "streamtype=5; profile-level-id=15; "
+                              "mode=AAC-hbr; config=%s; SizeLength=13; "
+                              "IndexLength=3; IndexDeltaLength=3; Profile=1;",
+                              hexa ) == -1 )
+                    id->psz_fmtp = NULL;
             }
             else
             {
@@ -1035,12 +1039,15 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 config[4]=0x3f;
                 config[5]=0xc0;
 
-                asprintf( &id->psz_rtpmap, "MP4A-LATM/%d/%d",
-                          p_fmt->audio.i_rate, p_fmt->audio.i_channels );
+                if( asprintf( &id->psz_rtpmap, "MP4A-LATM/%d/%d",
+                              p_fmt->audio.i_rate,
+                              p_fmt->audio.i_channels ) == -1)
+                    id->psz_rtpmap = NULL;
                 id->pf_packetize = rtp_packetize_mp4a_latm;
                 sprintf_hexa( hexa, config, 6 );
-                asprintf( &id->psz_fmtp, "profile-level-id=15; "
-                          "object=2; cpresent=0; config=%s", hexa );
+                if( asprintf( &id->psz_fmtp, "profile-level-id=15; "
+                              "object=2; cpresent=0; config=%s", hexa ) == -1 )
+                    id->psz_fmtp = NULL;
             }
             break;
         }
