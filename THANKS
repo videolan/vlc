@@ -177,6 +177,7 @@ Scott Caudle <dorkmanzcot at gmail dot com> - Visualization, WX
 improvements
 Sebastien Chaumat <Sebastien.Chaumat at ens-lyon.fr> - YOPY port tests
 Simon Damkjær Andersen <simondamkjaer at gmail.com> - playmode icons and the entire Fullscreen Panel design for the OSX GUI (v0.8.6)
+Stefán Freyr Stefánsson <stefan.freyr -at- gmail.com> - Qt4 speed slider
 Steve Lhomme <steve dot lhomme at free dot fr> - MSVC fixes and Matroska enhancements
 Steve Brown <sbrown at cortland.com> - fix for optional PES size bug
 Steven M. Schultz <sms at TO.GD-ES.COM> - BSD/OS port
