@@ -105,7 +105,7 @@ Interfaces:
    * Improved user interaction
    * Improved mouse gestures
  * Unix
-   * Allow only one running instance, using D-Bus interface.
+   * Option to allow only one running instance, using D-Bus interface.
    * D-Bus Interface implementing the MPRIS 
      (Media Player Remote Interfacing specification), a common dbus control 
      interface for media players that intends to become an xdg standard when 
