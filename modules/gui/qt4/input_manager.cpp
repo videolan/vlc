@@ -242,6 +242,12 @@ void InputManager::normalRate()
         var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT );
 }
 
+void InputManager::setRate( int new_rate )
+{
+    if( hasInput() )
+        var_SetInteger( p_input, "rate", new_rate );
+}
+
 /**********************************************************************
  * MainInputManager implementation. Wrap an input manager and
  * take care of updating the main playlist input

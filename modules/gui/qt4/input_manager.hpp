@@ -55,6 +55,7 @@ public slots:
     void slower();
     void faster();
     void normalRate();
+    void setRate( int );
     void sectionNext();
     void sectionPrev();
     void sectionMenu();
