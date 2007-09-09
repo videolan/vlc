@@ -1,3 +1,8 @@
+--[[
+    Parse YouTube homepage and browse pages. Next step is to recode firefox
+    in VLC ... using Lua of course ;)
+--]]
+
 function probe()
     return vlc.access == "http" and ( string.match( vlc.path, "youtube.com/?$" ) or string.match( vlc.path, "youtube.com/browse" ) )
 end
