@@ -183,15 +183,6 @@ void SoutDialog::setRawOptions( bool b_raw )
     }
 }
 
-int indexFromItemData( QComboBox *aCombo, QString aString )
-{
-    for( int i=0; i < aCombo->count(); i++ )
-    {
-        if( aCombo->itemData( i ).toString() == aString ) return i;
-    }
-    return -1;
-}
-
 void SoutDialog::setOptions()
 {
     QString profileString = ui.profileBox->itemData( ui.profileBox->currentIndex() ).toString();
@@ -203,11 +194,11 @@ void SoutDialog::setOptions()
         ui.muxName ##Mux->setChecked( true ); \
         \
         ui.transcodeAudio->setChecked( hasAudio ); \
-        index = indexFromItemData( ui.aCodecBox, vCodecName );  \
+        index = ui.aCodecBox->findText( vCodecName );  \
         if( index >= 0 ) ui.aCodecBox->setCurrentIndex( index ); \
         \
         ui.transcodeVideo->setChecked( hasVideo ); \
-        index = indexFromItemData( ui.aCodecBox, vCodecName );  \
+        index = ui.aCodecBox->findText( vCodecName );  \
         if( index >=0 ) ui.vCodecBox->setCurrentIndex( index ); \
     }
 
