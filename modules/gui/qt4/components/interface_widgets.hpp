@@ -186,7 +186,7 @@ public:
     virtual ~VolumeClickHandler() {};
     bool eventFilter( QObject *obj, QEvent *e )
     {
-        if (e->type() == QEvent::MouseButtonPress )
+        if (e->type() == QEvent::MouseButtonPress  )
         {
             aout_VolumeMute( p_intf, NULL );
             audio_volume_t i_volume;
@@ -201,6 +201,18 @@ private:
     intf_thread_t *p_intf;
 };
 
+#include <QLabel>
+#include <QMouseEvent>
+class TimeLabel : public QLabel
+{
+    Q_OBJECT
+    void mousePressEvent( QMouseEvent *event )
+    {
+        if( event->button() == Qt::LeftButton ) emit timeLabelClicked();
+    }
+signals:
+    void timeLabelClicked();
+};
 
 /******************** Playlist Widgets ****************/
 #include <QModelIndex>

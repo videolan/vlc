@@ -137,7 +137,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      * TODO: do we add a label for the current Volume ?
      **/
     b_remainingTime = false;
-    timeLabel = new QLabel;
+    timeLabel = new TimeLabel;
     nameLabel = new QLabel;
     speedLabel = new QLabel( "1.00x" );
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
@@ -147,7 +147,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     statusBar()->addPermanentWidget( timeLabel, 2 );
     speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
     timeLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
-    timeLabel->installEventFilter( this );
+    CONNECT( timeLabel, timeLabelClicked(), this, toggleTimeDisplay() );
     CONNECT( speedLabel, customContextMenuRequested( QPoint ),
              this, showSpeedMenu( QPoint ) );
     CONNECT( timeLabel, customContextMenuRequested( QPoint ),
@@ -675,6 +675,7 @@ void MainInterface::setDisplayPosition( float pos, int time, int length )
 
 void MainInterface::toggleTimeDisplay()
 {
+    msg_Dbg( p_intf, "coincoin" );
     b_remainingTime = ( b_remainingTime ? false : true );
 }
 
@@ -697,7 +698,7 @@ void MainInterface::setStatus( int status )
 void MainInterface::setRate( int rate )
 {
     QString str;
-    str.setNum( ( 1000/(double)rate), 'f', 2 );
+    str.setNum( ( 1000 / (double)rate), 'f', 2 );
     str.append( "x" );
     speedLabel->setText( str );
     speedControl->updateControls( rate );
@@ -931,12 +932,6 @@ void MainInterface::customEvent( QEvent *event )
         show(); /* necessary to apply window flags?? */
     }
 }
-
-bool MainInterface::eventFilter(QObject *obj, QEvent *event)
-{
-    if( (obj == timeLabel) && (event->type() == QEvent::MouseButtonPress) ) toggleTimeDisplay();
-}
-
 
 void MainInterface::keyPressEvent( QKeyEvent *e )
 {

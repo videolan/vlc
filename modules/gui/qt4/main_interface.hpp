@@ -72,8 +72,6 @@ protected:
     void dragLeaveEvent( QDragLeaveEvent * );
     void closeEvent( QCloseEvent *);
  
-    bool eventFilter(QObject *obj, QEvent *event);
-
     friend class VolumeClickHandler;
 private:
     QSettings           *settings;
