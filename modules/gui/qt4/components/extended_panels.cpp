@@ -560,8 +560,8 @@ void ExtVideo::gotoConf( QObject* src )
 
 static const QString band_frequencies[] =
 {
-    "   60Hz  ", " 170 Hz " , " 310 Hz ", " 600 Hz ", "  1 kHz  ",
-    "  3 kHz  " , "  6 kHz ", " 12 kHz ", " 14 kHz ", " 16 kHz "
+    "  60 Hz  ", " 170 Hz ", " 310 Hz ", " 600 Hz ", "  1 kHz ",
+    "  3 kHz  ", "  6 kHz ", " 12 kHz ", " 14 kHz ", " 16 kHz "
 };
 
 Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
@@ -571,6 +571,7 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
     smallFont.setPointSize( smallFont.pointSize() - 3 );
 
     ui.setupUi( this );
+    presetsComboBox = ui.presetsCombo;
 
     ui.preampLabel->setFont( smallFont );
     ui.preampSlider->setMaximum( 400 );
@@ -772,18 +773,28 @@ void Equalizer::setPreset( int preset )
     setValues( psz_values, eqz_preset_10b[preset]->f_preamp );
 }
 
+static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    char *psz_preset = newval.psz_string;
+    Equalizer *eq = (Equalizer *)p_data;
+    eq->presetsComboBox->setCurrentIndex( eq->presetsComboBox->findText( qfu( psz_preset) ) );
+    return VLC_SUCCESS;
+}
+
 void Equalizer::delCallbacks( aout_instance_t *p_aout )
 {
-//    var_DelCallback( p_aout, "equalizer-bands", EqzCallback, this );
-//    var_DelCallback( p_aout, "equalizer-preamp", EqzCallback, this );
+    //var_DelCallback( p_aout, "equalizer-bands", EqzCallback, this );
+    //var_DelCallback( p_aout, "equalizer-preamp", EqzCallback, this );
+    var_DelCallback( p_aout, "equalizer-preset", PresetCallback, this );
 }
 
 void Equalizer::addCallbacks( aout_instance_t *p_aout )
 {
-//    var_AddCallback( p_aout, "equalizer-bands", EqzCallback, this );
-//    var_AddCallback( p_aout, "equalizer-preamp", EqzCallback, this );
+    //var_AddCallback( p_aout, "equalizer-bands", EqzCallback, this );
+    //var_AddCallback( p_aout, "equalizer-preamp", EqzCallback, this );
+    var_AddCallback( p_aout, "equalizer-preset", PresetCallback, this );
 }
-
 
 /**********************************************************************
  * Spatializer

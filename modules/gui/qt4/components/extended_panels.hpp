@@ -61,6 +61,7 @@ class Equalizer: public QWidget
 public:
     Equalizer( intf_thread_t *, QWidget * );
     virtual ~Equalizer();
+    QComboBox *presetsComboBox;
 
 private:
     Ui::EqualizerWidget ui;
