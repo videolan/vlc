@@ -116,6 +116,8 @@ VLC_EXPORT( void, net_ListenClose, ( int *fd ) );
 int net_Subscribe (vlc_object_t *obj, int fd, const struct sockaddr *addr,
                    socklen_t addrlen);
 
+VLC_EXPORT( int, net_SetCSCov, ( int fd, int sendcov, int recvcov ) );
+
 /* Functions to read from or write to the networking layer */
 struct virtual_socket_t
 {

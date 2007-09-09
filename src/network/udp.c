@@ -60,7 +60,34 @@
 # define SOL_IPV6 IPPROTO_IPV6
 #endif
 #ifndef IPPROTO_IPV6
-# define IPPROTO_IPV6 41
+# define IPPROTO_IPV6 41 /* IANA */
+#endif
+#ifndef SOL_DCCP
+# define SOL_DCCP IPPROTO_DCCP
+#endif
+#ifndef IPPROTO_DCCP
+# define IPPROTO_DCCP 33 /* IANA */
+#endif
+#ifndef SOL_UDPLITE
+# define SOL_UDPLITE IPPROTO_UDPLITE
+#endif
+#ifndef IPPROTO_UDPLITE
+# define IPPROTO_UDPLITE 136 /* IANA */
+#endif
+
+#ifdef __linux__
+# include <linux/dccp.h>
+# ifndef SOCK_DCCP /* provisional API */
+#  define SOCK_DCCP 6
+# endif
+#endif
+
+#if defined (HAVE_NETINET_UDPLITE_H)
+# include <netinet/udplite.h>
+#elif defined (__linux__)
+/* still missing from glibc 2.6 */
+# define UDPLITE_SEND_CSCOV     10
+# define UDPLITE_RECV_CSCOV     11
 #endif
 
 extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
@@ -802,3 +829,65 @@ int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
     return val;
 }
 
+
+/**
+ * net_SetCSCov:
+ * Sets the send and receive checksum coverage of a socket:
+ * @param fd socket
+ * @param sendcov payload coverage of sent packets (bytes), -1 for full
+ * @param recvcov minimum payload coverage of received packets, -1 for full
+ */
+int net_SetCSCov (int fd, int sendcov, int recvcov)
+{
+    int type;
+
+    if (getsockopt (fd, SOL_SOCKET, SO_TYPE,
+                    &type, &(socklen_t){ sizeof (type) }))
+        return VLC_EGENERIC;
+
+    switch (type)
+    {
+#ifdef UDPLITE_RECV_CSCOV
+        case SOCK_DGRAM: /* UDP-Lite */
+            if (sendcov == -1)
+                sendcov = 0;
+            else
+                sendcov += 8; /* partial */
+            if (setsockopt (fd, SOL_UDPLITE, UDPLITE_SEND_CSCOV, &sendcov,
+                            sizeof (sendcov)))
+                return VLC_EGENERIC;
+
+            if (recvcov == -1)
+                recvcov = 0;
+            else
+                recvcov += 8;
+            if (setsockopt (fd, SOL_UDPLITE, UDPLITE_RECV_CSCOV,
+                            &recvcov, sizeof (recvcov)))
+                return VLC_EGENERIC;
+
+            return VLC_SUCCESS;
+#endif
+#ifdef DCCP_SOCKOPT_SEND_CSCOV
+        case SOCK_DCCP: /* DCCP and its ill-named socket type */
+            if ((sendcov == -1) || (sendcov > 56))
+                sendcov = 0;
+            else
+                sendcov = (sendcov + 3) / 4;
+            if (setsockopt (fd, SOL_DCCP, DCCP_SOCKOPT_SEND_CSCOV,
+                            &sendcov, sizeof (sendcov)))
+                return VLC_EGENERIC;
+
+            if ((sendcov == -1) || (sendcov > 56))
+                sendcov = 0;
+            else
+                sendcov = (sendcov + 3) / 4;
+            if (setsockopt (fd, SOL_DCCP, DCCP_SOCKOPT_RECV_CSCOV,
+                            &recvcov, sizeof (recvcov)))
+                return VLC_EGENERIC;
+
+            return VLC_SUCCESS;
+#endif
+    }
+
+    return VLC_EGENERIC;
+}

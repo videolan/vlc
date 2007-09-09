@@ -22,6 +22,7 @@ vlc_b64_encode
 __net_Connect
 __net_ConnectDgram
 __net_OpenDgram
+net_SetCSCov
 vlc_module_set
 vlc_submodule_create
 libvlc_InternalCleanup
