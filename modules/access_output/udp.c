@@ -49,20 +49,6 @@
 
 #include <vlc_network.h>
 
-#if defined (HAVE_NETINET_UDPLITE_H)
-# include <netinet/udplite.h>
-#elif defined (__linux__)
-# define UDPLITE_SEND_CSCOV     10
-# define UDPLITE_RECV_CSCOV     11
-#endif
-
-#ifndef IPPROTO_UDPLITE
-# define IPPROTO_UDPLITE 136 /* from IANA */
-#endif
-#ifndef SOL_UDPLITE
-# define SOL_UDPLITE IPPROTO_UDPLITE
-#endif
-
 #define MAX_EMPTY_BLOCKS 200
 
 #if defined(WIN32) || defined(UNDER_CE)
@@ -98,10 +84,6 @@ static void Close( vlc_object_t * );
 #define AUTO_MCAST_TEXT N_("Automatic multicast streaming")
 #define AUTO_MCAST_LONGTEXT N_("Allocates an outbound multicast address " \
                                "automatically.")
-#define UDPLITE_TEXT N_("UDP-Lite")
-#define UDPLITE_LONGTEXT N_("Use UDP-Lite/IP instead of normal UDP/IP")
-#define CSCOV_TEXT N_("Checksum coverage")
-#define CSCOV_LONGTEXT N_("Payload bytes covered by layer-4 checksum")
 
 vlc_module_begin();
     set_description( _("UDP stream output") );
@@ -115,8 +97,6 @@ vlc_module_begin();
     add_obsolete_bool( SOUT_CFG_PREFIX "raw" );
     add_bool( SOUT_CFG_PREFIX "auto-mcast", VLC_FALSE, NULL, AUTO_MCAST_TEXT,
               AUTO_MCAST_LONGTEXT, VLC_TRUE );
-    add_bool( SOUT_CFG_PREFIX "udplite", VLC_FALSE, NULL, UDPLITE_TEXT, UDPLITE_LONGTEXT, VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "cscov", 12, NULL, CSCOV_TEXT, CSCOV_LONGTEXT, VLC_TRUE );
 
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );
@@ -131,8 +111,6 @@ static const char *const ppsz_sout_options[] = {
     "auto-mcast",
     "caching",
     "group",
-    "lite",
-    "cscov",
     NULL
 };
 
@@ -191,8 +169,7 @@ static int Open( vlc_object_t *p_this )
     sout_access_out_sys_t   *p_sys;
 
     char                *psz_dst_addr = NULL;
-    int                 i_dst_port, proto = IPPROTO_UDP;
-    const char          *protoname = "UDP";
+    int                 i_dst_port;
 
     int                 i_handle;
 
@@ -215,12 +192,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     p_access->p_sys = p_sys;
-
-    if (var_GetBool (p_access, SOUT_CFG_PREFIX"lite"))
-    {
-        protoname = "UDP-Lite";
-        proto = IPPROTO_UDPLITE;
-    }
 
     i_dst_port = DEFAULT_PORT;
     if (var_GetBool (p_access, SOUT_CFG_PREFIX"auto-mcast"))
@@ -261,12 +232,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread->p_fifo = block_FifoNew( p_access );
     p_sys->p_thread->p_empty_blocks = block_FifoNew( p_access );
 
-    i_handle = net_ConnectDgram( p_this, psz_dst_addr, i_dst_port, -1, proto );
+    i_handle = net_ConnectDgram( p_this, psz_dst_addr, i_dst_port, -1,
+                                 IPPROTO_UDP );
     free (psz_dst_addr);
 
     if( i_handle == -1 )
     {
-         msg_Err( p_access, "failed to create %s socket", protoname );
+         msg_Err( p_access, "failed to create raw UDP socket" );
          vlc_object_destroy (p_sys->p_thread);
          free (p_sys);
          return VLC_EGENERIC;
@@ -292,32 +264,6 @@ static int Open( vlc_object_t *p_this )
     }
     p_sys->p_thread->i_handle = i_handle;
     shutdown( i_handle, SHUT_RD );
-
-    int cscov = var_GetInteger (p_access, SOUT_CFG_PREFIX"cscov");
-    if (cscov)
-    {
-        switch (proto)
-        {
-#ifdef UDPLITE_SEND_CSCOV
-            case IPPROTO_UDPLITE:
-                cscov += 8;
-                setsockopt (i_handle, SOL_UDPLITE, UDPLITE_SEND_CSCOV,
-                            &(int){ cscov }, sizeof (cscov));
-                break;
-#endif
-#ifdef DCCP_SOCKOPT_RECV_CSCOV
-            /* FIXME: ^^is this the right name ? */
-            /* FIXME: is this inherited by accept() ? */
-            case IPPROTO_DCCP:
-                cscov = ((cscov + 3) >> 2) + 1;
-                if (cscov > 15)
-                    break; /* out of DCCP cscov range */
-                setsockopt (i_handle, SOL_DCCP, DCCP_SOCKOPT_RECV_CSCOV,
-                            &(int){ cscov }, sizeof (cscov));
-                break;
-#endif
-        }
-    }
 
     p_sys->p_thread->i_caching =
         (int64_t)1000 * var_GetInteger( p_access, SOUT_CFG_PREFIX "caching");
