@@ -623,7 +623,7 @@ void Interface::CreateOurMenuBar()
     /* Append the freshly created menus to the menu bar... */
     wxMenuBar *menubar = new wxMenuBar();
     menubar->Append( file_menu, wxU(_("&File")) );
-    menubar->Append( view_menu, wxU(_("&View")) );
+    menubar->Append( view_menu, wxU(_("V&iew")) );
     menubar->Append( p_settings_menu, wxU(_("&Settings")) );
     menubar->Append( p_audio_menu, wxU(_("&Audio")) );
     menubar->Append( p_video_menu, wxU(_("&Video")) );
