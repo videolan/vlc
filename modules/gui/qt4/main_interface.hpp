@@ -44,6 +44,7 @@ class PlaylistWidget;
 class VisualSelector;
 class AdvControlsWidget;
 class ControlsWidget;
+class SpeedControlWidget;
 class QMenu;
 class QSize;
 
@@ -82,6 +83,8 @@ private:
     QString              input_name;
     QVBoxLayout         *mainLayout;
     ControlsWidget      *controls;
+    QMenu				*speedControlMenu;
+    SpeedControlWidget  *speedControl;
 
     bool                 need_components_update;
 

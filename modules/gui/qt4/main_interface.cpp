@@ -42,6 +42,8 @@
 #include <QSize>
 #include <QMenu>
 #include <QLabel>
+#include <QSlider>
+#include <QWidgetAction>
 
 #include <assert.h>
 #include <vlc_keys.h>
@@ -302,6 +304,12 @@ void MainInterface::handleMainUi( QSettings *settings )
     /* Add the controls Widget to the main Widget */
     mainLayout->addWidget( controls );
 
+    /* Create the Speed Control Widget */
+    speedControl = new SpeedControlWidget( p_intf );
+    speedControlMenu = new QMenu( this );
+    QWidgetAction *widgetAction = new QWidgetAction( this );
+    widgetAction->setDefaultWidget( speedControl );
+    speedControlMenu->addAction( widgetAction );
 
     /* Set initial size */
     resize( PREF_W, PREF_H );
@@ -397,9 +405,7 @@ void MainInterface::resizeEvent( QResizeEvent *e )
  ****************************************************************************/
 void MainInterface::showSpeedMenu( QPoint pos )
 {
-    QMenu menu( this );
-    menu.addAction( "Not Implemented Yet" );
-    menu.exec( QCursor::pos() );
+    speedControlMenu->exec( QCursor::pos() );
 }
 
 void MainInterface::showTimeMenu( QPoint pos )
@@ -694,6 +700,7 @@ void MainInterface::setRate( int rate )
     str.setNum( ( 1000/(double)rate), 'f', 2 );
     str.append( "x" );
     speedLabel->setText( str );
+    speedControl->updateControls( rate );
 }
 
 void MainInterface::updateOnTimer()

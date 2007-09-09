@@ -233,4 +233,23 @@ signals:
     void artSet( QString );
 };
 
+
+/******************** Speed Control Widgets ****************/
+class SpeedControlWidget : public QFrame
+{
+    Q_OBJECT
+public:
+    SpeedControlWidget( intf_thread_t *);
+    virtual ~SpeedControlWidget();
+    void updateControls( int );
+private:
+    intf_thread_t *p_intf;
+    QSlider *speedSlider;
+    QPushButton *normalSpeedButton;
+private slots:
+    void updateRate( int );
+    void resetRate();
+};
+
+
 #endif
