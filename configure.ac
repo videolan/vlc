@@ -444,6 +444,10 @@ AC_CHECK_FUNCS(strcasecmp,,[AC_CHECK_FUNCS(stricmp)])
 AC_CHECK_FUNCS(strncasecmp,,[AC_CHECK_FUNCS(strnicmp)])
 AC_CHECK_FUNCS(strcasestr,,[AC_CHECK_FUNCS(stristr)])
 
+AS_IF([test "${SYS}" = "linux"], [
+  AC_CHECK_FUNCS(tee)
+])
+
 dnl Check for setlocal and langinfo
 AC_CHECK_FUNCS(setlocale)
 AC_CHECK_HEADERS(langinfo.h)

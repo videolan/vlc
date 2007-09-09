@@ -39,7 +39,10 @@
 #include "rtp.h"
 
 #ifdef HAVE_UNISTD_H
+#   include <sys/types.h>
 #   include <unistd.h>
+#   include <fcntl.h>
+#   include <sys/stat.h>
 #endif
 
 #include <errno.h>
@@ -1304,24 +1307,60 @@ static void ThreadSend( vlc_object_t *p_this )
 {
     sout_stream_id_t *id = (sout_stream_id_t *)p_this;
     unsigned i_caching = id->i_caching;
+#ifdef HAVE_TEE
+    int fd[5] = { -1, -1, -1, -1, -1 };
+
+    if( pipe( fd ) )
+        fd[0] = fd[1] = -1;
+    else
+    if( pipe( fd ) )
+        fd[2] = fd[3] = -1;
+    else
+        fd[4] = open( "/dev/null", O_WRONLY );
+#endif
 
     while( !id->b_die )
     {
         block_t *out = block_FifoGet( id->p_fifo );
         mtime_t  i_date = out->i_dts + i_caching;
+        ssize_t  len = out->i_buffer;
 
+#ifdef HAVE_TEE
+        if( fd[4] != -1 )
+            len = write( fd[1], out->p_buffer, len);
+        if( len == -1 )
+            continue; /* Uho - should not happen */
+#endif
         mwait( i_date );
 
         vlc_mutex_lock( &id->lock_sink );
         for( int i = 0; i < id->sinkc; i++ )
         {
-            send( id->sinkv[i].rtp_fd, out->p_buffer, out->i_buffer, 0 );
             SendRTCP( id->sinkv[i].rtcp, out );
+
+#ifdef HAVE_TEE
+            tee( fd[0], fd[3], len, 0 );
+            if( splice( fd[2], NULL, id->sinkv[i].rtp_fd, NULL, len,
+                        SPLICE_F_NONBLOCK ) >= 0 )
+                continue;
+
+            /* splice failed */
+            splice( fd[2], NULL, fd[4], NULL, len, 0 );
+#endif
+            send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 );
         }
         vlc_mutex_unlock( &id->lock_sink );
 
         block_Release( out );
+#ifdef HAVE_TEE
+        splice( fd[0], NULL, fd[4], NULL, len, 0 );
+#endif
     }
+
+#ifdef HAVE_TEE
+    for( unsigned i = 0; i < 5; i++ )
+        close( fd[i] );
+#endif
 }
 
 static inline void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
