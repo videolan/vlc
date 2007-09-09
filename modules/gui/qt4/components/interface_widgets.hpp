@@ -186,6 +186,9 @@ public:
         if (e->type() == QEvent::MouseButtonPress )
         {
             aout_VolumeMute( p_intf, NULL );
+            audio_volume_t i_volume;
+            aout_VolumeGet( p_intf, &i_volume );
+            m->updateVolume( i_volume *  200 /AOUT_VOLUME_MAX );
             return true;
         }
         return false;

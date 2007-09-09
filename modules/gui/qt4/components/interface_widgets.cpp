@@ -562,6 +562,11 @@ void ControlsWidget::updateVolume( int i_sliderVolume )
                             ( 2*volumeSlider->maximum() );
         aout_VolumeSet( p_intf, i_res );
     }
+    if( i_sliderVolume == 0 )
+        volMuteLabel->setPixmap( QPixmap(":/pixmaps/volume-muted.png" ) );
+    else if( i_sliderVolume < volumeSlider->maximum()/2 )
+        volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
+    else volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
 }
 
 void ControlsWidget::updateOnTimer()
@@ -578,12 +583,7 @@ void ControlsWidget::updateOnTimer()
         volumeSlider->setValue( i_volume );
         b_my_volume = false;
     }
-    if( i_volume == 0 )
-        volMuteLabel->setPixmap( QPixmap(":/pixmaps/volume-muted.png" ) );
-    else if( i_volume < volumeSlider->maximum()/2 )
-        volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
-    else volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
-
+    
     /* Activate the interface buttons according to the presence of the input */
     enableInput( THEMIM->getIM()->hasInput() );
     //enableVideo( THEMIM->getIM()->hasVideo() );
