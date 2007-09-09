@@ -36,14 +36,6 @@
 #include <vlc_access.h>
 #include <vlc_network.h>
 
-/* Big pile of stuff missing form glibc 2.5 */
-#if defined (HAVE_NETINET_UDPLITE_H)
-# include <netinet/udplite.h>
-#elif defined (__linux__)
-# define UDPLITE_SEND_CSCOV     10
-# define UDPLITE_RECV_CSCOV     11
-#endif
-
 #ifndef SOCK_DCCP /* provisional API */
 # ifdef __linux__
 #  define SOCK_DCCP 6
@@ -251,12 +243,7 @@ static int Open( vlc_object_t *p_this )
 
     shutdown( p_sys->fd, SHUT_WR );
 
-#ifdef UDPLITE_RECV_CSCOV
-    if (proto == IPPROTO_UDPLITE)
-        /* UDP header: 8 bytes + RTP header: 12 bytes (or more) */
-        setsockopt (p_sys->fd, SOL_UDPLITE, UDPLITE_RECV_CSCOV,
-                    &(int){ 20 }, sizeof (int));
-#endif
+    net_SetCSCov (p_sys->fd, -1, 12);
 
     if (p_sys->b_framed_rtp)
     {
