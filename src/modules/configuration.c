@@ -1914,8 +1914,8 @@ char *config_GetConfigDir( libvlc_int_t *p_libvlc )
 }
 
 /**
- * Get the user's VLC data and cache directory
- * (used for stuff like the modules cache, the album art cache, ...)
+ * Get the user's VLC data directory
+ * (used for stuff like the skins, custom lua modules, ...)
  */
 char *config_GetUserDataDir( libvlc_int_t *p_libvlc )
 {
@@ -1938,6 +1938,36 @@ char *config_GetUserDataDir( libvlc_int_t *p_libvlc )
     psz_env = getenv( "HOME" );
     if( !psz_env ) psz_env = p_libvlc->psz_homedir; /* not part of XDG spec but we want a sensible fallback */
     if( asprintf( &psz_dir, "%s/.local/share/vlc", psz_env ) == -1 )
+        return NULL;
+    return psz_dir;
+#endif
+}
+
+/**
+ * Get the user's VLC cache directory
+ * (used for stuff like the modules cache, the album art cache, ...)
+ */
+char *config_GetCacheDir( libvlc_int_t *p_libvlc )
+{
+    char *psz_dir;
+#if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
+    char *psz_parent = config_GetUserDir();
+    if( !psz_parent ) psz_parent = p_libvlc->psz_homedir;
+    if( asprintf( &psz_dir, "%s" DIR_SEP CONFIG_DIR, psz_parent ) == -1 )
+        return NULL;
+    return psz_dir;
+#else
+    /* XDG Base Directory Specification - Version 0.6 */
+    char *psz_env = getenv( "XDG_CACHE_HOME" );
+    if( psz_env )
+    {
+        if( asprintf( &psz_dir, "%s/vlc", psz_env ) == -1 )
+            return NULL;
+        return psz_dir;
+    }
+    psz_env = getenv( "HOME" );
+    if( !psz_env ) psz_env = p_libvlc->psz_homedir; /* not part of XDG spec but we want a sensible fallback */
+    if( asprintf( &psz_dir, "%s/.cache/vlc", psz_env ) == -1 )
         return NULL;
     return psz_dir;
 #endif

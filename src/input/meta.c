@@ -236,10 +236,10 @@ static void ArtCacheCreateDir( const char *psz_dir )
     {
         while( *psz && *psz != DIR_SEP_CHAR) psz++;
         if( !*psz ) break;
-        *psz = 0;        
+        *psz = 0;
         if( !EMPTY_STR( psz_newdir ) ) utf8_mkdir( psz_newdir );
         *psz = DIR_SEP_CHAR;
-        psz++;   
+        psz++;
     }
     utf8_mkdir( psz_dir );
 }
@@ -275,7 +275,7 @@ static void __ArtCacheGetDirPath( vlc_object_t *p_obj,
 
         snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP
                   "art" DIR_SEP "artistalbum" DIR_SEP "%s" DIR_SEP "%s",
-                      p_obj->p_libvlc->psz_datadir,
+                      p_obj->p_libvlc->psz_cachedir,
                       psz_artist_sanitized, psz_album_sanitized );
         free( psz_album_sanitized );
         free( psz_artist_sanitized );
@@ -285,7 +285,7 @@ static void __ArtCacheGetDirPath( vlc_object_t *p_obj,
         char * psz_title_sanitized = ArtCacheGetSanitizedFileName( psz_title );
         snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP
                   "art" DIR_SEP "title" DIR_SEP "%s",
-                  p_obj->p_libvlc->psz_datadir,
+                  p_obj->p_libvlc->psz_cachedir,
                   psz_title_sanitized );
         free( psz_title_sanitized );
     }
@@ -417,7 +417,7 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
     }
 
     psz_type = strrchr( psz_arturl, '.' );
-    if( strlen( psz_type ) > 5 ) 
+    if( strlen( psz_type ) > 5 )
         psz_type = NULL; /* remove extension if it's > to 4 characters */
 
     /* Warning: psz_title, psz_artist, psz_album may change in ArtCache*() */
