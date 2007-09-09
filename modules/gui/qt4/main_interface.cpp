@@ -186,9 +186,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* It is also connected to the control->slider, see the ControlsWidget */
     CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, setDisplayPosition( float, int, int ) );
-    
+
     CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
-    
+
     /** Connects on nameChanged() */
     /* Naming in the controller statusbar */
     CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
@@ -740,7 +740,7 @@ void MainInterface::createSystray()
     QVLCMenu::updateSystrayMenu( this, p_intf, true );
     sysTray->show();
 
-    CONNECT( sysTray, activated(  QSystemTrayIcon::ActivationReason ),
+    CONNECT( sysTray, activated( QSystemTrayIcon::ActivationReason ),
             this, handleSystrayClick( QSystemTrayIcon::ActivationReason ) );
 }
 
@@ -762,6 +762,11 @@ void MainInterface::toggleUpdateSystrayMenu()
     if( isHidden() )
     {
         show();
+        activateWindow();
+    }
+    else if( isMinimized() )
+    {
+        showNormal();
         activateWindow();
     }
     else
