@@ -143,7 +143,7 @@ void MediaInfoDialog::setInput( input_item_t *p_input )
      */
     input_thread_t *p_current =
                      MainInputManager::getInstance( p_intf )->getInput();
-    MP->setEditMode( ( !p_current || p_current->b_dead ) ? 
+    MP->setEditMode( ( !p_current || p_current->b_dead || input_GetItem( p_current ) != p_input ) ? 
                             true: false );
 }
 
