@@ -28,8 +28,7 @@
 #include "components/extended_panels.hpp"
 
 #include <QTabWidget>
-#include <QBoxLayout>
-#include <QHBoxLayout>
+#include <QGridLayout>
 
 ExtendedDialog *ExtendedDialog::instance = NULL;
 
@@ -37,19 +36,22 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
     setWindowFlags( Qt::Tool );
     setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
-
-    QHBoxLayout *l = new QHBoxLayout( this );
-    QTabWidget *tab = new QTabWidget( this );
-
-    l->addWidget( tab );
-
     setWindowTitle( qtr( "Adjustments and Effects" ) );
 
+    QGridLayout *layout = new QGridLayout( this );
+
+    QTabWidget *tab = new QTabWidget( this );
     Equalizer *foo = new Equalizer( p_intf, this );
     tab->addTab( foo, qtr( "Graphic Equalizer" ) );
 
     ExtVideo *bar = new ExtVideo( p_intf, this );
-    tab->addTab( bar, qtr( "Video Adjustments and Effects" ) );
+    tab->addTab( bar, qtr( "Video Adjustments and Effects" ) );    
+
+    layout->addWidget( tab, 0, 0, 1, 5 );
+
+    QPushButton *closeButton = new QPushButton( qtr( "Close" ) );
+    layout->addWidget( closeButton, 1, 4, 1, 1);
+    CONNECT( closeButton, clicked(), this, close() );
 }
 
 ExtendedDialog::~ExtendedDialog()
