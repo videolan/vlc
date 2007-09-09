@@ -151,7 +151,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             p_in64 = (uint64_t*)p_in;
             p_out64 = (uint64_t*)p_out;
 
-            for( ; (ptrdiff_t)p_in64 < (ptrdiff_t)p_line_end ; )
+            while( p_in64 < p_line_end )
             {
                 /* Do 64 pixels at a time */
                 *p_out64++ = ~*p_in64++; *p_out64++ = ~*p_in64++;
