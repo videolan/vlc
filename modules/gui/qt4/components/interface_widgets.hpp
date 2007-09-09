@@ -170,7 +170,6 @@ private slots:
     void updateVolume( int );
     void fullscreen();
     void extSettings();
-    void prefs();
     void faster();
     void slower();
     void toggleAdvanced();

@@ -457,13 +457,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     setupSmallButton( extSettingsButton );
     controlLayout->addWidget( extSettingsButton, 3, 12 );
 
-    /** Preferences **/
-    QPushButton *prefsButton = new QPushButton( "P" );
-    BUTTON_SET_ACT( prefsButton, "P", qtr( "Preferences / Settings" ),
-            prefs() );
-    setupSmallButton( prefsButton );
-    controlLayout->addWidget( prefsButton, 3, 13 );
-
     controlLayout->setColumnStretch( 14, 5 );
 
     /* Volume */
@@ -615,10 +608,6 @@ void ControlsWidget::fullscreen()
 void ControlsWidget::extSettings()
 {
     THEDP->extendedDialog();
-}
-void ControlsWidget::prefs()
-{
-    THEDP->prefsDialog();
 }
 
 void ControlsWidget::slower()

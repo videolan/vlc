@@ -675,7 +675,6 @@ void MainInterface::setDisplayPosition( float pos, int time, int length )
 
 void MainInterface::toggleTimeDisplay()
 {
-    msg_Dbg( p_intf, "coincoin" );
     b_remainingTime = ( b_remainingTime ? false : true );
 }
 
