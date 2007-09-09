@@ -227,7 +227,7 @@ bool Win32Factory::init()
     // Initialize the resource path
     m_resourcePath.push_back( (string)getIntf()->p_libvlc->psz_datadir +
                                "\\skins" );
-    m_resourcePath.push_back( (dstring)config_GetDataDir() +
+    m_resourcePath.push_back( (string)config_GetDataDir() +
                               "\\skins" );
     m_resourcePath.push_back( (string)config_GetDataDir() +
                               "\\skins2" );
