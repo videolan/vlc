@@ -94,7 +94,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /**
      *  Configuration and settings
      **/
-    settings = new QSettings( "VideoLAN", "VLC" );
+    settings = new QSettings( "vlc", "vlc-qt-interface" );
     settings->beginGroup( "MainWindow" );
 
     /* Main settings */
