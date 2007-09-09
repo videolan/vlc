@@ -34,6 +34,7 @@
 
 #include <QWidget>
 #include <QFrame>
+#define VOLUME_MAX 200
 
 class ResizeEvent;
 class QPalette;
@@ -125,6 +126,8 @@ private slots:
     void record();
 };
 
+
+
 class InputSlider;
 class QSlider;
 class QGridLayout;
@@ -188,7 +191,7 @@ public:
             aout_VolumeMute( p_intf, NULL );
             audio_volume_t i_volume;
             aout_VolumeGet( p_intf, &i_volume );
-            m->updateVolume( i_volume *  200 /AOUT_VOLUME_MAX );
+            m->updateVolume( i_volume *  VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
             return true;
         }
         return false;

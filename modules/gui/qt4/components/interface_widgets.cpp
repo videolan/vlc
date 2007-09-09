@@ -487,7 +487,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     volumeSlider->setMaximumSize( QSize( 80, 200 ) );
     volumeSlider->setOrientation( Qt::Horizontal );
 
-    volumeSlider->setMaximum( 100 );
+    volumeSlider->setMaximum( VOLUME_MAX );
     volumeSlider->setFocusPolicy( Qt::NoFocus );
     controlLayout->addWidget( volMuteLabel, 3, 15 );
     controlLayout->addWidget( volumeSlider, 3, 16, 1, 2 );
@@ -558,13 +558,12 @@ void ControlsWidget::updateVolume( int i_sliderVolume )
 {
     if( !b_my_volume )
     {
-        int i_res = i_sliderVolume * AOUT_VOLUME_MAX /
-                            ( 2*volumeSlider->maximum() );
+        int i_res = i_sliderVolume  * (AOUT_VOLUME_MAX / 2) / VOLUME_MAX;
         aout_VolumeSet( p_intf, i_res );
     }
     if( i_sliderVolume == 0 )
         volMuteLabel->setPixmap( QPixmap(":/pixmaps/volume-muted.png" ) );
-    else if( i_sliderVolume < volumeSlider->maximum()/2 )
+    else if( i_sliderVolume < VOLUME_MAX / 2 )
         volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-low.png" ) );
     else volMuteLabel->setPixmap( QPixmap( ":/pixmaps/volume-high.png" ) );
 }
@@ -574,7 +573,7 @@ void ControlsWidget::updateOnTimer()
     /* Audio part */
     audio_volume_t i_volume;
     aout_VolumeGet( p_intf, &i_volume );
-    i_volume = ( i_volume *  200 )/ AOUT_VOLUME_MAX ;
+    i_volume = ( i_volume *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2) ;
     int i_gauge = volumeSlider->value();
     b_my_volume = false;
     if( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
