@@ -35,7 +35,7 @@
    <property name="title" >
     <string>Media configuration</string>
    </property>
-   <widget class="MultiPageWidget" name="typeVLM" >
+   <widget class="QStackedWidget" name="typeVLM" >
     <property name="geometry" >
      <rect>
       <x>0</x>
@@ -433,14 +433,6 @@
    </column>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>MultiPageWidget</class>
-   <extends>QWidget</extends>
-   <header>multipagewidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>

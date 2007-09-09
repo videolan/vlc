@@ -41,9 +41,11 @@
 #include "dialogs/extended.hpp"
 #include "dialogs/sout.hpp"
 #include "dialogs/open.hpp"
+#include "dialogs/vlm.hpp"
 #include "dialogs/help.hpp"
 #include "dialogs/gototime.hpp"
 #include "dialogs/podcast_configuration.hpp"
+
 
 DialogsProvider* DialogsProvider::instance = NULL;
 
@@ -156,8 +158,7 @@ void DialogsProvider::gotoTimeDialog()
 
 void DialogsProvider::vlmDialog()
 {
-    /* FIXME - Implement me */
-    /*  VLMDialog::getInstance( p_intf )->toggleVisible(); */
+    VLMDialog::getInstance( p_intf )->toggleVisible();
 }
 
 void DialogsProvider::helpDialog()

@@ -257,8 +257,9 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
 
 #if 0 /* Not Implemented yet */
     DP_SADD( menu, qtr( I_MENU_BOOKMARK ), "","", bookmarksDialog(), "Ctrl+B" );
-    DP_SADD( menu, qtr( I_MENU_VLM ), "","", vlmDialog(), "Ctrl+V" );
 #endif
+    DP_SADD( menu, qtr( I_MENU_VLM ), "","", vlmDialog(), "Ctrl+V" );
+
 
     menu->addSeparator();
     if( mi )

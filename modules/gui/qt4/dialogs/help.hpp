@@ -32,7 +32,7 @@ public:
     static HelpDialog * getInstance( intf_thread_t *p_intf )
     {
         if( !instance)
-            instance = new HelpDialog( p_intf);
+            instance = new HelpDialog( p_intf );
         return instance;
     }
     virtual ~HelpDialog();
