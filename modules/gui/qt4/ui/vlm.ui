@@ -1,0 +1,543 @@
+<ui version="4.0" >
+ <class>Vlm</class>
+ <widget class="QWidget" name="Vlm" >
+  <property name="windowModality" >
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>632</width>
+    <height>602</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy>
+    <hsizetype>5</hsizetype>
+    <vsizetype>5</vsizetype>
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <widget class="QGroupBox" name="groupBox" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>611</width>
+     <height>351</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Media configuration</string>
+   </property>
+   <widget class="MultiPageWidget" name="typeVLM" >
+    <property name="geometry" >
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>601</width>
+      <height>331</height>
+     </rect>
+    </property>
+    <property name="currentIndex" >
+     <number>1</number>
+    </property>
+    <widget class="QWidget" name="page" >
+     <property name="windowTitle" >
+      <string>Broadcast</string>
+     </property>
+     <widget class="QWidget" name="gridLayout_3" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>581</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>4</number>
+       </property>
+       <item row="5" column="4" >
+        <widget class="QPushButton" name="pushButton_6" >
+         <property name="text" >
+          <string>Cancel</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="4" >
+        <widget class="QToolButton" name="BcastOutputQToolButton" >
+         <property name="text" >
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" >
+        <widget class="QLineEdit" name="BcastNameLEdit" />
+       </item>
+       <item row="2" column="5" >
+        <widget class="QCheckBox" name="BcastspecOut" >
+         <property name="text" >
+          <string>specify</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" >
+        <widget class="QLineEdit" name="BcastInputLEdit" />
+       </item>
+       <item row="1" column="1" >
+        <widget class="QLabel" name="BcastInputLabel" >
+         <property name="text" >
+          <string>Input :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="3" >
+        <widget class="QPushButton" name="pushButton_5" >
+         <property name="text" >
+          <string>Add</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QLabel" name="BcastOutputLabel" >
+         <property name="sizePolicy" >
+          <sizepolicy>
+           <hsizetype>5</hsizetype>
+           <vsizetype>5</vsizetype>
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>Output :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3" >
+        <widget class="QCheckBox" name="BcastEnable" >
+         <property name="text" >
+          <string>Enable</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QLabel" name="BcastNameLabel" >
+         <property name="text" >
+          <string>Name :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3" >
+        <widget class="QLineEdit" name="BcastOutputLEdit" />
+       </item>
+       <item row="1" column="4" >
+        <widget class="QToolButton" name="BcastInputQToolButton" >
+         <property name="text" >
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3" >
+        <widget class="QGroupBox" name="groupBox_2" >
+         <property name="title" >
+          <string>Controls</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="page_2" >
+     <property name="windowTitle" >
+      <string>Video On Demand</string>
+     </property>
+     <widget class="QWidget" name="gridLayout_2" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>581</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>4</number>
+       </property>
+       <item row="1" column="1" >
+        <widget class="QLabel" name="VODInputLabel" >
+         <property name="text" >
+          <string>Input :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="3" >
+        <widget class="QPushButton" name="pushButton_3" >
+         <property name="text" >
+          <string>Add</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QLabel" name="VODOutputLabel" >
+         <property name="sizePolicy" >
+          <sizepolicy>
+           <hsizetype>5</hsizetype>
+           <vsizetype>5</vsizetype>
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>Output :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="4" >
+        <widget class="QToolButton" name="VODOutputQToolButton" >
+         <property name="text" >
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QLabel" name="VODNameLabel" >
+         <property name="text" >
+          <string>Name :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3" >
+        <widget class="QLineEdit" name="VODOutputLEdit" />
+       </item>
+       <item row="4" column="4" >
+        <widget class="QPushButton" name="pushButton_4" >
+         <property name="text" >
+          <string>Cancel</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" >
+        <widget class="QLineEdit" name="VODNameLEdit" />
+       </item>
+       <item row="1" column="4" >
+        <widget class="QToolButton" name="VODInputQToolButton" >
+         <property name="text" >
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3" >
+        <widget class="QCheckBox" name="VODenable" >
+         <property name="text" >
+          <string>Enable</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" >
+        <widget class="QLineEdit" name="VODInputLEdit" />
+       </item>
+       <item row="2" column="5" >
+        <widget class="QCheckBox" name="VODspecOut" >
+         <property name="text" >
+          <string>specify</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="page_3" >
+     <property name="windowTitle" >
+      <string>Schedule</string>
+     </property>
+     <widget class="QWidget" name="gridLayout" >
+      <property name="geometry" >
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>581</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>0</number>
+       </property>
+       <property name="spacing" >
+        <number>4</number>
+       </property>
+       <item row="2" column="4" >
+        <widget class="QToolButton" name="toolButton_2" >
+         <property name="text" >
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QLabel" name="label_2" >
+         <property name="sizePolicy" >
+          <sizepolicy>
+           <hsizetype>5</hsizetype>
+           <vsizetype>5</vsizetype>
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>Output :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="4" >
+        <widget class="QToolButton" name="toolButton" >
+         <property name="text" >
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" >
+        <widget class="QLineEdit" name="lineEdit_3" />
+       </item>
+       <item row="4" column="3" >
+        <widget class="QPushButton" name="pushButton" >
+         <property name="text" >
+          <string>Add</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QLabel" name="label_3" >
+         <property name="text" >
+          <string>Name :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QLabel" name="label" >
+         <property name="text" >
+          <string>Input :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3" >
+        <widget class="QLineEdit" name="lineEdit_2" />
+       </item>
+       <item row="4" column="4" >
+        <widget class="QPushButton" name="pushButton_2" >
+         <property name="text" >
+          <string>Cancel</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" >
+        <widget class="QLineEdit" name="lineEdit" />
+       </item>
+       <item row="0" column="3" >
+        <widget class="QCheckBox" name="checkBox" >
+         <property name="text" >
+          <string>Enable</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QTableWidget" name="mediasDB" >
+   <property name="windowModality" >
+    <enum>Qt::NonModal</enum>
+   </property>
+   <property name="enabled" >
+    <bool>true</bool>
+   </property>
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>370</y>
+     <width>611</width>
+     <height>221</height>
+    </rect>
+   </property>
+   <property name="sizePolicy" >
+    <sizepolicy>
+     <hsizetype>0</hsizetype>
+     <vsizetype>7</vsizetype>
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="sizeIncrement" >
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="baseSize" >
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="autoFillBackground" >
+    <bool>false</bool>
+   </property>
+   <property name="horizontalScrollBarPolicy" >
+    <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="showGrid" >
+    <bool>true</bool>
+   </property>
+   <property name="sortingEnabled" >
+    <bool>true</bool>
+   </property>
+   <row/>
+   <column>
+    <property name="text" >
+     <string>Type</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Media Name</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Input</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>Output</string>
+    </property>
+   </column>
+   <column>
+    <property name="text" >
+     <string>State</string>
+    </property>
+   </column>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MultiPageWidget</class>
+   <extends>QWidget</extends>
+   <header>multipagewidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>BcastspecOut</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>BcastOutputLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>565</x>
+     <y>139</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>65</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>BcastspecOut</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>BcastOutputLEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>565</x>
+     <y>139</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>362</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>BcastspecOut</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>BcastOutputQToolButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>565</x>
+     <y>139</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>468</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>VODspecOut</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>VODOutputLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>565</x>
+     <y>217</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>65</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>VODspecOut</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>VODOutputQToolButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>565</x>
+     <y>217</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>468</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>VODspecOut</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>VODOutputLEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>565</x>
+     <y>217</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>362</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
