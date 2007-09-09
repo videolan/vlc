@@ -877,10 +877,10 @@ int net_SetCSCov (int fd, int sendcov, int recvcov)
                             &sendcov, sizeof (sendcov)))
                 return VLC_EGENERIC;
 
-            if ((sendcov == -1) || (sendcov > 56))
-                sendcov = 0;
+            if ((recvcov == -1) || (recvcov > 56))
+                recvcov = 0;
             else
-                sendcov = (sendcov + 3) / 4;
+                recvcov = (recvcov + 3) / 4;
             if (setsockopt (fd, SOL_DCCP, DCCP_SOCKOPT_RECV_CSCOV,
                             &recvcov, sizeof (recvcov)))
                 return VLC_EGENERIC;
