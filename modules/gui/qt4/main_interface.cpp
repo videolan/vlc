@@ -405,7 +405,7 @@ void MainInterface::resizeEvent( QResizeEvent *e )
  ****************************************************************************/
 void MainInterface::showSpeedMenu( QPoint pos )
 {
-    speedControlMenu->exec( QCursor::pos() );
+    speedControlMenu->exec( QCursor::pos() - pos + QPoint( 0, speedLabel->height() ) );
 }
 
 void MainInterface::showTimeMenu( QPoint pos )
@@ -413,7 +413,7 @@ void MainInterface::showTimeMenu( QPoint pos )
     QMenu menu( this );
     menu.addAction(  qtr("Elapsed Time") , this, SLOT( setElapsedTime() ) );
     menu.addAction(  qtr("Remaining Time") , this, SLOT( setRemainTime() ) );
-    menu.exec( QCursor::pos() );
+    menu.exec( QCursor::pos() - pos +QPoint( 0, timeLabel->height() ) );
 }
 
 /****************************************************************************
