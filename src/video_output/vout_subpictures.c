@@ -226,8 +226,9 @@ void spu_Destroy( spu_t *p_spu )
 static void spu_DeleteChain( spu_t *p_spu )
 {
     if( p_spu->i_filter )
-    while( p_spu->i_filter-- )
+    while( p_spu->i_filter )
     {
+        p_spu->i_filter--;
         module_Unneed( p_spu->pp_filter[p_spu->i_filter],
                        p_spu->pp_filter[p_spu->i_filter]->p_module );
         free( p_spu->pp_filter[p_spu->i_filter]->p_owner );
