@@ -88,21 +88,25 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     /* Buttons configuration */
     QHBoxLayout *buttons = new QHBoxLayout();
     
-    addButton = new QPushButton( "+", this );
+    addButton = new QPushButton( QIcon( ":/pixmaps/vlc_playlist_add.png" ), "", this );
     addButton->setMaximumWidth( 25 );
     BUTTONACT( addButton, popupAdd() );
     buttons->addWidget( addButton );
 
     repeatButton = new QPushButton( this ); 
-    if( model->hasRepeat() ) repeatButton->setText( qtr( I_PL_REPEAT ) );
-    else if( model->hasLoop() ) repeatButton->setText( qtr( I_PL_LOOP ) );
-    else repeatButton->setText( qtr( I_PL_NOREPEAT ) );
+    if( model->hasRepeat() ) repeatButton->setIcon(
+                        QIcon( ":/pixmaps/vlc_playlist_repeat_one.png" ) );
+    else if( model->hasLoop() ) repeatButton->setIcon( 
+                        QIcon( ":/pixmaps/vlc_playlist_repeat_all.png" ) );
+    else repeatButton->setIcon(
+                        QIcon( ":/pixmaps/vlc_playlist_repeat_off.png" ) );
     BUTTONACT( repeatButton, toggleRepeat() );
     buttons->addWidget( repeatButton );
 
     randomButton = new QPushButton( this ); 
-    randomButton->setText( model->hasRandom() ? qtr( I_PL_RANDOM )
-                                              : qtr( I_PL_NORANDOM) );
+    randomButton->setIcon( model->hasRandom() ?
+                            QIcon( ":/pixmaps/vlc_playlist_shuffle_on.png" ) :
+                            QIcon( ":/pixmaps/vlc_playlist_shuffle_off.png" ) );
     BUTTONACT( randomButton, toggleRandom() );
     buttons->addWidget( randomButton );
 
@@ -131,17 +135,17 @@ void StandardPLPanel::toggleRepeat()
     if( model->hasRepeat() )
     {
         model->setRepeat( false ); model->setLoop( true );
-        repeatButton->setText( qtr(I_PL_LOOP) );
+        repeatButton->setIcon( QIcon( ":/pixmaps/vlc_playlist_repeat_all.png" ) );
     }
     else if( model->hasLoop() )
     {
         model->setRepeat( false ) ; model->setLoop( false );
-        repeatButton->setText( qtr(I_PL_NOREPEAT) );
+        repeatButton->setIcon( QIcon( ":/pixmaps/vlc_playlist_repeat_off.png" ) );
     }
     else
     {
         model->setRepeat( true );
-        repeatButton->setText( qtr(I_PL_REPEAT) );
+        repeatButton->setIcon( QIcon( ":/pixmaps/vlc_playlist_repeat_one.png" ) );
     }
 }
 
@@ -149,7 +153,9 @@ void StandardPLPanel::toggleRandom()
 {
     bool prev = model->hasRandom();
     model->setRandom( !prev );
-    randomButton->setText( prev ? qtr(I_PL_NORANDOM) : qtr(I_PL_RANDOM) );
+    randomButton->setIcon( prev ?
+                QIcon( ":/pixmaps/vlc_playlist_shuffle_off.png" ) :
+                QIcon( ":/pixmaps/vlc_playlist_shuffle_on.png" ) );
 }
 
 void StandardPLPanel::handleExpansion( const QModelIndex &index )

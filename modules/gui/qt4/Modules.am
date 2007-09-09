@@ -232,4 +232,10 @@ EXTRA_DIST += \
 	pixmaps/vlc_file-wide_16px.png \
 	pixmaps/vlc_info_16px.png \
 	pixmaps/vlc_previous_16px.png \
-	pixmaps/vlc_next_16px.png
+	pixmaps/vlc_next_16px.png \
+	pixmaps/vlc_playlist_add.png \
+	pixmaps/vlc_playlist_repeat_off.png \
+	pixmaps/vlc_playlist_repeat_all.png \
+	pixmaps/vlc_playlist_repeat_one.png \
+	pixmaps/vlc_shuffle_on.png \
+	pixmaps/vlc_shuffle_off.png

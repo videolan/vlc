@@ -40,5 +40,11 @@
   <file>pixmaps/vlc_playlist_16px.png</file>
   <file>pixmaps/vlc_settings_16px.png</file>
   <file>pixmaps/vlc_stream_16px.png</file>
+  <file>pixmaps/vlc_playlist_add.png</file>
+  <file>pixmaps/vlc_playlist_repeat_all.png</file>
+  <file>pixmaps/vlc_playlist_repeat_one.png</file>
+  <file>pixmaps/vlc_playlist_repeat_off.png</file>
+  <file>pixmaps/vlc_playlist_shuffle_off.png</file>
+  <file>pixmaps/vlc_playlist_shuffle_on.png</file>
  </qresource>
 </RCC>
