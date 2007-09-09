@@ -139,7 +139,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     b_remainingTime = false;
     timeLabel = new QLabel;
     nameLabel = new QLabel;
-    speedLabel = new QLabel( "1.0x" );
+    speedLabel = new QLabel( "1.00x" );
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
     statusBar()->addWidget( nameLabel, 8 );
