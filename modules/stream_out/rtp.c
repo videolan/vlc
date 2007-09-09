@@ -312,13 +312,12 @@ static int Open( vlc_object_t *p_this )
 
     for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
     {
-        if( !strcmp( p_cfg->psz_name, "sdp" ) )
+        if( !strcmp( p_cfg->psz_name, "sdp" )
+         && ( p_cfg->psz_value != NULL )
+         && !strncasecmp( p_cfg->psz_value, "rtsp:", 5 ) )
         {
-            if( p_cfg->psz_value && !strncasecmp( p_cfg->psz_value, "rtsp", 4 ) )
-            {
-                b_rtsp = VLC_TRUE;
-                break;
-            }
+            b_rtsp = VLC_TRUE;
+            break;
         }
     }
     if( !b_rtsp )
@@ -326,24 +325,15 @@ static int Open( vlc_object_t *p_this )
         psz = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "sdp" );
         if( psz != NULL )
         {
-            if( !strncasecmp( psz, "rtsp", 4 ) )
+            if( !strncasecmp( psz, "rtsp:", 5 ) )
                 b_rtsp = VLC_TRUE;
             free( psz );
         }
     }
 
-    if( p_sys->psz_destination == NULL )
+    if( ( p_sys->psz_destination == NULL ) && !b_rtsp )
     {
-        if( !b_rtsp )
-        {
-            msg_Err( p_stream, "missing destination and not in RTSP mode" );
-            free( p_sys );
-            return VLC_EGENERIC;
-        }
-    }
-    else if( p_sys->i_port <= 0 )
-    {
-        msg_Err( p_stream, "invalid port" );
+        msg_Err( p_stream, "missing destination and not in RTSP mode" );
         free( p_sys );
         return VLC_EGENERIC;
     }
