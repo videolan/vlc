@@ -180,7 +180,7 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
         }
         else
         {
-            msg_Err( p_this, "Lua playlist script %s: "
+            msg_Err( p_this, "Lua art fetcher script %s: "
                  "didn't return a string", psz_filename );
         }
     }
