@@ -898,7 +898,9 @@ static int Play( demux_t *p_demux )
 
         /* Retrieve the timeout value and set up a timeout prevention thread */
         p_sys->i_timeout = p_sys->rtsp->sessionTimeoutParameter();
-        if( p_sys->i_timeout > 0 && !p_sys->p_timeout )
+        if( p_sys->i_timeout <= 0 )
+            p_sys->i_timeout = 60; /* default value from RFC2326 */
+        if( !p_sys->p_timeout )
         {
             msg_Dbg( p_demux, "We have a timeout of %d seconds",  p_sys->i_timeout );
             p_sys->p_timeout = (timeout_thread_t *)vlc_object_create( p_demux, sizeof(timeout_thread_t) );
