@@ -126,6 +126,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     if( p_input == NULL )
         goto error;
 
+    /* FIXME [21574] pdherbemont do we need *install_input_item_observer ? */
     playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, 0, VLC_FALSE,
                         VLC_FALSE );
 
