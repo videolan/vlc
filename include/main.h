@@ -38,8 +38,11 @@ struct libvlc_int_t
     /* Global properties */
     int                    i_argc;           ///< command line arguments count
     char **                ppsz_argv;        ///< command line arguments
-    char *                 psz_homedir;      ///< configuration directory
-    char *                 psz_userdir;      ///< user's home directory
+
+    char *                 psz_homedir;      ///< user's home directory
+    char *                 psz_configdir;    ///< user's configuration directory
+    char *                 psz_datadir;      ///< user's data/cache directory
+
     char *                 psz_configfile;   ///< location of config file
 
     playlist_t            *p_playlist;       ///< playlist object

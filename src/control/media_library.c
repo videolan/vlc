@@ -88,17 +88,17 @@ void
 libvlc_media_library_load( libvlc_media_library_t * p_mlib,
                            libvlc_exception_t * p_e )
 {
-    const char *psz_homedir = p_mlib->p_libvlc_instance->p_libvlc_int->psz_homedir;
+    const char *psz_datadir = p_mlib->p_libvlc_instance->p_libvlc_int->psz_datadir;
     char * psz_uri;
 
-    if( !psz_homedir )
+    if( !psz_datadir ) /* XXX: i doubt that this can ever happen */
     {
-        libvlc_exception_raise( p_e, "Can't get HOME DIR" );
+        libvlc_exception_raise( p_e, "Can't get data directory" );
         return;
     }
 
-    if( asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP CONFIG_DIR DIR_SEP
-                        "ml.xsp", psz_homedir ) == -1 )
+    if( asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP "ml.xsp",
+                  psz_datadir ) == -1 )
     {
         libvlc_exception_raise( p_e, "Can't get create the path" );
         return;

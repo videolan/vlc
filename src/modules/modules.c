@@ -1665,7 +1665,7 @@ static char * GetWindowsError( void )
  *****************************************************************************/
 static void CacheLoad( vlc_object_t *p_this )
 {
-    char *psz_filename, *psz_homedir;
+    char *psz_filename, *psz_datadir;
     FILE *file;
     int i, j, i_size, i_read;
     char p_cachestring[sizeof(PLUGINSCACHE_DIR COPYRIGHT_MESSAGE)];
@@ -1675,15 +1675,15 @@ static void CacheLoad( vlc_object_t *p_this )
     int32_t i_file_size, i_marker;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
 
-    psz_homedir = p_this->p_libvlc->psz_homedir;
-    if( !psz_homedir )
+    psz_datadir = p_this->p_libvlc->psz_datadir;
+    if( !psz_datadir ) /* XXX: this should never happen */
     {
-        msg_Err( p_this, "psz_homedir is null" );
+        msg_Err( p_this, "Unable to get cache directory" );
         return;
     }
 
-    i_size = asprintf( &psz_filename, "%s"DIR_SEP"%s"DIR_SEP"%s"DIR_SEP"%s",
-            psz_homedir, CONFIG_DIR, PLUGINSCACHE_DIR, CacheName() );
+    i_size = asprintf( &psz_filename, "%s"DIR_SEP"%s"DIR_SEP"%s",
+            psz_datadir, PLUGINSCACHE_DIR, CacheName() );
     if( i_size <= 0 )
     {
         msg_Err( p_this, "out of memory" );
@@ -2022,22 +2022,23 @@ static void CacheSave( vlc_object_t *p_this )
         "# For information about cache directory tags, see:\r\n"
         "#   http://www.brynosaurus.com/cachedir/\r\n";
 
-    char *psz_filename, *psz_homedir;
+    char *psz_filename, *psz_datadir;
     FILE *file;
     int i, j, i_cache;
     module_cache_t **pp_cache;
     int32_t i_file_size = 0;
     libvlc_global_data_t *p_libvlc_global = vlc_global();
 
-    psz_homedir = p_this->p_libvlc->psz_homedir;
-    if( !psz_homedir )
+    psz_datadir = p_this->p_libvlc->psz_datadir;
+    if( !psz_datadir ) /* XXX: this should never happen */
     {
-        msg_Err( p_this, "psz_homedir is null" );
+        msg_Err( p_this, "Unable to get cache directory" );
         return;
     }
+
     psz_filename =
-       (char *)malloc( sizeof(DIR_SEP CONFIG_DIR DIR_SEP PLUGINSCACHE_DIR DIR_SEP ) +
-                       strlen(psz_homedir) + strlen(CacheName()) );
+       (char *)malloc( sizeof(DIR_SEP PLUGINSCACHE_DIR DIR_SEP ) +
+                       strlen(psz_datadir) + strlen(CacheName()) );
 
     if( !psz_filename )
     {
@@ -2045,7 +2046,7 @@ static void CacheSave( vlc_object_t *p_this )
         return;
     }
 
-    sprintf( psz_filename, "%s"DIR_SEP"%s", psz_homedir, CONFIG_DIR );
+    sprintf( psz_filename, "%s", psz_datadir );
 
     config_CreateDir( p_this, psz_filename );
 
@@ -2062,7 +2063,7 @@ static void CacheSave( vlc_object_t *p_this )
         fclose( file );
     }
 
-    sprintf( psz_filename, "%s"DIR_SEP"%s"DIR_SEP"%s"DIR_SEP"%s", psz_homedir, CONFIG_DIR,
+    sprintf( psz_filename, "%s"DIR_SEP"%s"DIR_SEP"%s", psz_datadir,
              PLUGINSCACHE_DIR, CacheName() );
 
     msg_Dbg( p_this, "saving plugins cache file %s", psz_filename );

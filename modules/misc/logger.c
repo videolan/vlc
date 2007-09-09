@@ -201,7 +201,7 @@ static int Open( vlc_object_t *p_this )
 #ifdef __APPLE__
             char *psz_homedir = p_this->p_libvlc->psz_homedir;
 
-            if( !psz_homedir )
+            if( !psz_homedir ) /* XXX: This should never happen */
             {
                 msg_Err( p_this, "unable to find home directory" );
                 return -1;

@@ -245,8 +245,8 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
     char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
     char **ppsz_dir;
 
-    if( asprintf( &ppsz_dir_list[0], "%s" DIR_SEP CONFIG_DIR DIR_SEP "%s", p_this->p_libvlc->psz_homedir,
-            luadirname ) < 0 )
+    if( asprintf( &ppsz_dir_list[0], "%s" DIR_SEP "%s",
+                   p_this->p_libvlc->psz_datadir, luadirname ) < 0 )
         return VLC_ENOMEM;
 
 #   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)

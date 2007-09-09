@@ -702,11 +702,11 @@ gnutls_ClientCreate( tls_t *p_tls )
 
     vlc_object_attach( p_session, p_tls );
 
-    const char *homedir = p_tls->p_libvlc->psz_homedir,
+    const char *homedir = p_tls->p_libvlc->psz_datadir,
                *datadir = config_GetDataDir ();
     size_t l1 = strlen (homedir), l2 = strlen (datadir);
-    char path[((l1 > l2) ? l1 : l2) + sizeof ("/"CONFIG_DIR"/ssl/private")];
-    //                              > sizeof ("/"CONFIG_DIR"/ssl/certs")
+    char path[((l1 > l2) ? l1 : l2) + sizeof ("/ssl/private")];
+    //                              > sizeof ("/ssl/certs")
     //                              > sizeof ("/ca-certificates.crt")
 
     i_val = gnutls_certificate_allocate_credentials( &p_sys->x509_cred );
@@ -719,7 +719,7 @@ gnutls_ClientCreate( tls_t *p_tls )
 
     if (var_CreateGetBool (p_tls, "tls-check-cert"))
     {
-        sprintf (path, "%s/"CONFIG_DIR"/ssl/certs", homedir);
+        sprintf (path, "%s/ssl/certs", homedir);
         gnutls_Addx509Directory ((vlc_object_t *)p_session,
                                   p_sys->x509_cred, path, VLC_FALSE);
 
@@ -731,7 +731,7 @@ gnutls_ClientCreate( tls_t *p_tls )
     else
         p_session->pf_handshake2 = gnutls_ContinueHandshake;
 
-    sprintf (path, "%s/"CONFIG_DIR"/ssl/private", homedir);
+    sprintf (path, "%s/ssl/private", homedir);
     gnutls_Addx509Directory ((vlc_object_t *)p_session, p_sys->x509_cred,
                              path, VLC_TRUE);
 

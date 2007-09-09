@@ -89,19 +89,18 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-    const char *psz_homedir = p_playlist->p_libvlc->psz_homedir;
+    const char *psz_datadir = p_playlist->p_libvlc->psz_datadir;
     char *psz_uri = NULL;
     input_item_t *p_input;
 
     if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
-    if( !psz_homedir )
+    if( !psz_datadir ) /* XXX: This should never happen */
     {
-        msg_Err( p_playlist, "no home directory, cannot load media library") ;
+        msg_Err( p_playlist, "no data directory, cannot load media library") ;
         return VLC_EGENERIC;
     }
 
-    if( asprintf( &psz_uri, "%s" DIR_SEP CONFIG_DIR DIR_SEP
-                        "ml.xsp", psz_homedir ) == -1 )
+    if( asprintf( &psz_uri, "%s" DIR_SEP "ml.xsp", psz_datadir ) == -1 )
     {
         psz_uri = NULL;
         goto error;
@@ -115,8 +114,8 @@ int playlist_MLLoad( playlist_t *p_playlist )
     }
     free( psz_uri );
 
-    if( asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP CONFIG_DIR DIR_SEP
-                        "ml.xsp", psz_homedir ) == -1 )
+    if( asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP "ml.xsp",
+                  psz_datadir ) == -1 )
     {
         psz_uri = NULL;
         goto error;
@@ -146,24 +145,24 @@ error:
 
 int playlist_MLDump( playlist_t *p_playlist )
 {
-    char *psz_homedir = p_playlist->p_libvlc->psz_homedir;
+    char *psz_datadir = p_playlist->p_libvlc->psz_datadir;
     if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
-    if( !psz_homedir )
+    if( !psz_datadir ) /* XXX: This should never happen */
     {
-        msg_Err( p_playlist, "no home directory, cannot save media library") ;
+        msg_Err( p_playlist, "no data directory, cannot save media library") ;
         return VLC_EGENERIC;
     }
 
-    char psz_dirname[ strlen( psz_homedir )
-                      + sizeof( DIR_SEP CONFIG_DIR DIR_SEP "ml.xsl")];
-    sprintf( psz_dirname, "%s" DIR_SEP CONFIG_DIR, psz_homedir );
+    char psz_dirname[ strlen( psz_datadir )
+                      + sizeof( DIR_SEP "ml.xsl")];
+    sprintf( psz_dirname, "%s", psz_datadir );
     if( config_CreateDir( (vlc_object_t *)p_playlist, psz_dirname ) )
     {
         return VLC_EGENERIC;
     }
 
     strcat( psz_dirname, DIR_SEP "ml.xsp" );
-    
+
     stats_TimerStart( p_playlist, "ML Dump", STATS_TIMER_ML_DUMP );
     playlist_Export( p_playlist, psz_dirname, p_playlist->p_ml_category,
                      "export-xspf" );

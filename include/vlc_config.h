@@ -48,19 +48,6 @@
  * outputting an error message (in second) */
 #define THREAD_COND_TIMEOUT             1
 
-/* The configuration file and directory */
-#if defined (SYS_BEOS)
-#  define CONFIG_DIR                    "config/settings/VideoLAN Client"
-#elif defined (__APPLE__)
-#  define CONFIG_DIR                    "Library/Preferences/VLC"
-#elif defined( WIN32 ) || defined( UNDER_CE )
-#  define CONFIG_DIR                    "vlc"
-#else
-#  define CONFIG_DIR                    ".vlc"
-#endif
-#define CONFIG_FILE                     "vlcrc"
-#define PLUGINSCACHE_DIR                "cache"
-
 /*****************************************************************************
  * Interface configuration
  *****************************************************************************/

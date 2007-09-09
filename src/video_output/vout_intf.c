@@ -619,7 +619,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( p_mypicturesdir == NULL )
         {
-            if( asprintf( &val.psz_string, "%s\\" CONFIG_DIR,
+            if( asprintf( &val.psz_string, "%s",
                           p_vout->p_libvlc->psz_homedir ) == -1 )
                 val.psz_string = NULL;
         }
@@ -632,10 +632,12 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
 #else
-    if( !val.psz_string && p_vout->p_libvlc->psz_homedir )
+    /* XXX: This saves in the data directory. Shouldn't we try saving
+     *      to psz_homedir/Desktop or something nicer ? */
+    if( !val.psz_string && p_vout->p_libvlc->psz_datadir )
     {
-        if( asprintf( &val.psz_string, "%s/" CONFIG_DIR,
-                      p_vout->p_libvlc->psz_homedir ) == -1 )
+        if( asprintf( &val.psz_string, "%s",
+                      p_vout->p_libvlc->psz_datadir ) == -1 )
             val.psz_string = NULL;
     }
 #endif

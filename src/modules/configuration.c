@@ -84,7 +84,7 @@ static inline char *_strdupnull (const char *src)
 /* Item types that use a string value (i.e. serialized in the module cache) */
 int IsConfigStringType (int type)
 {
-    static const unsigned char config_types[] = 
+    static const unsigned char config_types[] =
     {
         CONFIG_ITEM_STRING, CONFIG_ITEM_FILE, CONFIG_ITEM_MODULE,
         CONFIG_ITEM_DIRECTORY, CONFIG_ITEM_MODULE_CAT, CONFIG_ITEM_PASSWORD,
@@ -98,7 +98,7 @@ int IsConfigStringType (int type)
 
 static int IsConfigIntegerType (int type)
 {
-    static const unsigned char config_types[] = 
+    static const unsigned char config_types[] =
     {
         CONFIG_ITEM_INTEGER, CONFIG_ITEM_KEY, CONFIG_ITEM_BOOL,
         CONFIG_CATEGORY, CONFIG_SUBCATEGORY
@@ -786,34 +786,67 @@ void __config_ResetAll( vlc_object_t *p_this )
 
 static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 {
-    static const char psz_subpath[] = DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE;
-    const char *psz_filename = p_obj->p_libvlc->psz_configfile;
-    const char *psz_homedir = p_obj->p_libvlc->psz_homedir;
-    size_t i_buflen = 0;
+    char *psz_filename = p_obj->p_libvlc->psz_configfile;
     FILE *p_stream;
 
-    if( psz_filename == NULL )
+    if( !psz_filename )
     {
-        if( psz_homedir == NULL )
-        {
-            msg_Err( p_obj, "no home directory defined" );
-            return NULL;
-        }
-
-        i_buflen = strlen(psz_homedir) + sizeof(psz_subpath) + 1;
-    }
-
-    char buf[i_buflen];
-    if( psz_filename == NULL )
-    {
-        sprintf( buf, "%s%s", psz_homedir, psz_subpath );
-        psz_filename = buf;
+        psz_filename = config_GetConfigFile( p_obj->p_libvlc );
     }
 
     msg_Dbg( p_obj, "opening config file (%s)", psz_filename );
+
     p_stream = utf8_fopen( psz_filename, mode );
     if( p_stream == NULL && errno != ENOENT )
-        msg_Err( p_obj, "cannot open config file (%s): %s", psz_filename, strerror(errno) );
+    {
+        msg_Err( p_obj, "cannot open config file (%s): %s",
+                 psz_filename, strerror(errno) );
+
+    }
+#if !( defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS) )
+    else if( p_stream == NULL && errno == ENOENT && mode[0] == 'r' )
+    {
+        /* This is the fallback for pre XDG Base Directory
+         * Specification configs */
+        char *psz_old;
+        if( asprintf( &psz_old, "%s" DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE,
+                  p_obj->p_libvlc->psz_homedir ) != -1 )
+        {
+            p_stream = utf8_fopen( psz_old, mode );
+            if( p_stream )
+            {
+                /* Old config file found. We want to write it at the
+                 * new location now. */
+                msg_Info( p_obj->p_libvlc, "Found old config file at %s. "
+                          "VLC will now use %s.", psz_old, psz_filename );
+                char *psz_readme;
+                if( asprintf(&psz_readme,"%s"DIR_SEP CONFIG_DIR DIR_SEP"README",
+                              p_obj->p_libvlc->psz_homedir ) != -1 )
+                {
+                    FILE *p_readme = utf8_fopen( psz_readme, "wt" );
+                    if( p_readme )
+                    {
+                        fputs( "The VLC media player configuration folder has "
+                               "moved to comply with the XDG Base "
+                               "Directory Specification version 0.6. Your "
+                               "configuration has been copied to the new "
+                               "location (", p_readme );
+                        fputs( p_obj->p_libvlc->psz_configdir, p_readme );
+                        fputs( "). You can delete this directory and "
+                               "all its contents.", p_readme );
+                        fclose( p_readme );
+                    }
+                    free( psz_readme );
+                }
+            }
+            free( psz_old );
+        }
+    }
+#endif
+    else if( p_stream != NULL )
+    {
+        p_obj->p_libvlc->psz_configfile = psz_filename;
+    }
 
     return p_stream;
 }
@@ -1017,6 +1050,25 @@ int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
 
     if( utf8_mkdir( psz_dirname ) && ( errno != EEXIST ) )
     {
+        if( errno == ENOENT )
+        {
+            /* Let's try to create the parent directory */
+            char *psz_parent = strdup( psz_dirname );
+            char *psz_end = strrchr( psz_parent, DIR_SEP_CHAR );
+            if( psz_end && psz_end != psz_parent )
+            {
+                *psz_end = '\0';
+                if( config_CreateDir( p_this, psz_parent ) == 0 )
+                {
+                    if( !utf8_mkdir( psz_dirname ) )
+                    {
+                        free( psz_parent );
+                        return 0;
+                    }
+                }
+            }
+            free( psz_parent );
+        }
         msg_Err( p_this, "could not create %s (%s)",
                  psz_dirname, strerror(errno) );
         return -1;
@@ -1059,23 +1111,21 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     /* Acquire config file lock */
     vlc_mutex_lock( &p_this->p_libvlc->config_lock );
 
-    if (p_this->p_libvlc->psz_configfile == NULL)
+    if( p_this->p_libvlc->psz_configfile == NULL )
     {
-        const char *psz_homedir = p_this->p_libvlc->psz_homedir;
-        if( !psz_homedir )
+        const char *psz_configdir = p_this->p_libvlc->psz_configdir;
+        if( !psz_configdir ) /* XXX: This should never happen */
         {
-            msg_Err( p_this, "no home directory defined" );
+            msg_Err( p_this, "no configuration directory defined" );
             vlc_mutex_unlock( &p_this->p_libvlc->config_lock );
             return -1;
         }
 
-        char dirname[strlen (psz_homedir) + sizeof (DIR_SEP CONFIG_DIR)];
-        sprintf (dirname, "%s" DIR_SEP CONFIG_DIR, psz_homedir);
-        config_CreateDir (p_this, dirname);
+        config_CreateDir( p_this, psz_configdir );
     }
 
-    file = config_OpenConfigFile (p_this, "rt");
-    if (file != NULL)
+    file = config_OpenConfigFile( p_this, "rt" );
+    if( file != NULL )
     {
         /* look for file size */
         fseek( file, 0L, SEEK_END );
@@ -1578,7 +1628,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
                         free( psz_shortopts );
                         return -1;
                     }
-  
+
                     psz_name = (char *)p_conf->psz_current;
                     p_conf = config_FindConfig( p_this, psz_name );
                 }
@@ -1815,16 +1865,120 @@ static char *GetDir( vlc_bool_t b_appdata )
     return FromLocaleDup( psz_localhome );
 }
 
+/**
+ * Get the user's home directory
+ */
 char *config_GetHomeDir( void )
-{
-    return GetDir( VLC_TRUE );
-}
-
-char *config_GetUserDir( void )
 {
     return GetDir( VLC_FALSE );
 }
 
+/**
+ * Get the user's main data and config directory:
+ *   - on windows that's the App Data directory;
+ *   - on other OSes it's the same as the home directory.
+ */
+char *config_GetUserDir( void );
+char *config_GetUserDir( void )
+{
+    return GetDir( VLC_TRUE );
+}
+
+/**
+ * Get the user's VLC configuration directory
+ */
+char *config_GetConfigDir( libvlc_int_t *p_libvlc )
+{
+    char *psz_dir;
+#if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
+    char *psz_parent = config_GetUserDir();
+    if( !psz_parent ) psz_parent = p_libvlc->psz_homedir;
+    if( asprintf( &psz_dir, "%s" DIR_SEP CONFIG_DIR, psz_parent ) == -1 )
+        return NULL;
+    return psz_dir;
+#else
+    /* XDG Base Directory Specification - Version 0.6 */
+    char *psz_env = getenv( "XDG_CONFIG_HOME" );
+    if( psz_env )
+    {
+        if( asprintf( &psz_dir, "%s/vlc", psz_env ) == -1 )
+            return NULL;
+        return psz_dir;
+    }
+    psz_env = getenv( "HOME" );
+    if( !psz_env ) psz_env = p_libvlc->psz_homedir; /* not part of XDG spec but we want a sensible fallback */
+    if( asprintf( &psz_dir, "%s/.config/vlc", psz_env ) == -1 )
+        return NULL;
+    return psz_dir;
+#endif
+}
+
+/**
+ * Get the user's VLC data and cache directory
+ * (used for stuff like the modules cache, the album art cache, ...)
+ */
+char *config_GetUserDataDir( libvlc_int_t *p_libvlc )
+{
+    char *psz_dir;
+#if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
+    char *psz_parent = config_GetUserDir();
+    if( !psz_parent ) psz_parent = p_libvlc->psz_homedir;
+    if( asprintf( &psz_dir, "%s" DIR_SEP CONFIG_DIR, psz_parent ) == -1 )
+        return NULL;
+    return psz_dir;
+#else
+    /* XDG Base Directory Specification - Version 0.6 */
+    char *psz_env = getenv( "XDG_DATA_HOME" );
+    if( psz_env )
+    {
+        if( asprintf( &psz_dir, "%s/vlc", psz_env ) == -1 )
+            return NULL;
+        return psz_dir;
+    }
+    psz_env = getenv( "HOME" );
+    if( !psz_env ) psz_env = p_libvlc->psz_homedir; /* not part of XDG spec but we want a sensible fallback */
+    if( asprintf( &psz_dir, "%s/.local/share/vlc", psz_env ) == -1 )
+        return NULL;
+    return psz_dir;
+#endif
+}
+
+/**
+ * Get the user's configuration file
+ */
+char *config_GetConfigFile( libvlc_int_t *p_libvlc )
+{
+    char *psz_configfile;
+    if( asprintf( &psz_configfile, "%s" DIR_SEP CONFIG_FILE,
+                  p_libvlc->psz_configdir ) == -1 )
+        return NULL;
+    return psz_configfile;
+}
+
+/**
+ * Get the user's configuration file when given with the --config option
+ */
+char *config_GetCustomConfigFile( libvlc_int_t *p_libvlc )
+{
+    char *psz_configfile = config_GetPsz( p_libvlc, "config" );
+    if( psz_configfile != NULL )
+    {
+        if( psz_configfile[0] == '~' && psz_configfile[1] == '/' )
+        {
+            /* This is incomplete: we should also support the ~cmassiot/ syntax */
+            char *psz_buf;
+            if( asprintf( &psz_buf, "%s/%s", p_libvlc->psz_homedir,
+                          psz_configfile + 2 ) == -1 )
+            {
+                free( psz_configfile );
+                return NULL;
+            }
+            free( psz_configfile );
+            psz_configfile = psz_buf;
+        }
+    }
+    return psz_configfile;
+}
 
 static int ConfigStringToKey( const char *psz_key )
 {

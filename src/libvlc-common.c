@@ -325,25 +325,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     }
 
     /* Set the config file stuff */
-    p_libvlc->psz_homedir = config_GetHomeDir();
-    p_libvlc->psz_userdir = config_GetUserDir();
-    if( p_libvlc->psz_userdir == NULL )
-        p_libvlc->psz_userdir = strdup(p_libvlc->psz_homedir);
-    p_libvlc->psz_configfile = config_GetPsz( p_libvlc, "config" );
-    if( (p_libvlc->psz_configfile != NULL) && (p_libvlc->psz_configfile[0] == '~')
-         && (p_libvlc->psz_configfile[1] == '/') )
-    {
-        char *psz = malloc( strlen(p_libvlc->psz_userdir)
-                             + strlen(p_libvlc->psz_configfile) );
-        if( psz )
-        {
-            /* This is incomplete : we should also support the ~cmassiot/ syntax. */
-            sprintf( psz, "%s/%s", p_libvlc->psz_userdir,
-                                p_libvlc->psz_configfile + 2 );
-            free( p_libvlc->psz_configfile );
-            p_libvlc->psz_configfile = psz;
-        } /* else keep old config stuff */
-    }
+    p_libvlc->psz_homedir    = config_GetHomeDir();
+    p_libvlc->psz_configdir  = config_GetConfigDir( p_libvlc );
+    p_libvlc->psz_datadir    = config_GetUserDataDir( p_libvlc );
+    p_libvlc->psz_configfile = config_GetCustomConfigFile( p_libvlc );
 
     /* Check for plugins cache options */
     if( config_GetInt( p_libvlc, "reset-plugins-cache" ) )
@@ -1067,7 +1052,8 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
     module_EndBank( p_libvlc );
 
     FREENULL( p_libvlc->psz_homedir );
-    FREENULL( p_libvlc->psz_userdir );
+    FREENULL( p_libvlc->psz_configdir );
+    FREENULL( p_libvlc->psz_datadir );
     FREENULL( p_libvlc->psz_configfile );
     FREENULL( p_libvlc->p_hotkeys );
 

@@ -989,7 +989,7 @@ char *E_(RealPath)( intf_thread_t *p_intf, const char *psz_src )
     {
         char *dir;
         /* This is incomplete : we should also support the ~cmassiot/ syntax. */
-        asprintf( &dir, "%s%s", p_intf->p_libvlc->psz_userdir, psz_dir + 1 );
+        asprintf( &dir, "%s%s", p_intf->p_libvlc->psz_homedir, psz_dir + 1 );
         free( psz_dir );
         psz_dir = dir;
     }

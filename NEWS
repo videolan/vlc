@@ -112,6 +112,11 @@ Interfaces:
      finished: http://wiki.xmms2.xmms.se/index.php/Media_Player_Interfaces .
    * Motion module use disk accelerometers to keep video horizontal
 
+Linux Port:
+ * VLC now complies with the XDG Base Directory Specification version 0.6
+   http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html
+   (which means that VLC doesn't use the $HOME/.vlc directory anymore)
+
 Capture:
  * new BDA device driver plugin for DVB-C/S/T capture cards on Microsoft
    Windows
