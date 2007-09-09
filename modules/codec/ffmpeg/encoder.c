@@ -619,6 +619,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_sys->p_buffer_out = malloc( 2 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
         p_sys->i_frame_size = p_context->frame_size * 2 * p_context->channels;
         p_sys->p_buffer = malloc( p_sys->i_frame_size );
+        p_enc->fmt_out.audio.i_blockalign = p_context->block_align;
     }
 
     msg_Dbg( p_enc, "found encoder %s", psz_namecodec );
