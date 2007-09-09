@@ -443,7 +443,7 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
             // videoWidget->widgetSize = bgWidget->widgeTSize;
             videoWidget->widgetSize = QSize( *pi_width, *pi_height );
         }
-//        videoWidget->updateGeometry(); /// FIXME: Needed ?
+        videoWidget->updateGeometry(); // Needed for deinterlace
         need_components_update = true;
     }
     return ret;
