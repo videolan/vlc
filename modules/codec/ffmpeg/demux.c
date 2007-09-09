@@ -266,11 +266,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
             module_Unneed( p_demux, p_meta );
         }
         vlc_object_release( p_input );
-        return VLC_SUCCESS;
     }
-    if( p_input )
-        vlc_object_release( p_input );
-
 
     return VLC_SUCCESS;
 }
