@@ -1,5 +1,10 @@
 -- $Id$
 
+--[[
+    Translate Daily Motion video webpages URLs to the corresponding
+    FLV URL.
+--]]
+
 -- Probe function.
 function probe()
     return vlc.access == "http"
@@ -13,9 +18,11 @@ function parse()
     do 
         line = vlc.readline()
         if not line then break end
-        if string.match( line, "param name=\"flashvars\" value=\"url=" )
+        if string.match( line, "param name=\"flashvars\" value=\".*url=" )
         then
-            path = vlc.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\"url=([^&]*).*$", "%1" ) )
+            vlc.msg_err( "Tada!" )
+            path = vlc.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\".*url=([^&]*).*$", "%1" ) )
+            vlc.msg_err( path )
         end
         --[[ if string.match( line, "<title>" )
         then
