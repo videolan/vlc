@@ -93,7 +93,7 @@ int main( int i_argc, char **ppsz_argv )
     printf( "    _alternative 'files:file:_files' 'urls:URL:_urls' && ret=0\n" );
     printf( "  ;;\n" );
     printf( "esac\n\n" );
-    
+
     printf( "return ret\n" );
 
     return 0;
@@ -104,7 +104,7 @@ int main( int i_argc, char **ppsz_argv )
     VLC_Destroy( 0 );
 
     return i_ret;
-    
+
 }
 
 void ParseModules( libvlc_int_t *p_libvlc, mmap &mods, mcmap &mods2 )
@@ -148,7 +148,7 @@ void ParseModules( libvlc_int_t *p_libvlc, mmap &mods, mcmap &mods2 )
         }
         while( i_items++ < p_module->i_config_items && p_item++ );
 
-    }    
+    }
 }
 
 void PrintModuleList( libvlc_int_t *p_libvlc, mmap &mods, mcmap &mods2 )
@@ -197,7 +197,7 @@ void PrintModuleList( libvlc_int_t *p_libvlc, mmap &mods, mcmap &mods2 )
 
 void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 )
 {
-    char *psz_arguments = "";
+    char *psz_arguments = strdup( "" );
     char *psz_exclusive;
     char *psz_option;
     char *psz_name;
@@ -209,7 +209,7 @@ void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 )
     //Skip deprecated options
     if( p_item->psz_current )
         return;
-    
+
     switch( p_item->i_type )
     {
     case CONFIG_ITEM_MODULE:
@@ -286,16 +286,16 @@ void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 )
                 asprintf( &psz_arguments, "((%s))", psz_list );
             else
                 asprintf( &psz_arguments, "(%s)", psz_list );
-                
+
             free( psz_list );
         }
         break;
 
     case CONFIG_ITEM_FILE:
-        psz_arguments = "_files";
+        psz_arguments = strdup( "_files" );
         break;
     case CONFIG_ITEM_DIRECTORY:
-        psz_arguments = "_files -/";
+        psz_arguments = strdup( "_files -/" );
         break;
 
     case CONFIG_ITEM_INTEGER:
@@ -326,7 +326,7 @@ void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 )
                 asprintf( &psz_arguments, "((%s))", psz_list );
             else
                 asprintf( &psz_arguments, "(%s)", psz_list );
-                
+
             free( psz_list );
         }
         else if( p_item->min.i != 0 || p_item->max.i != 0 )
@@ -382,7 +382,7 @@ void ParseOption( module_config_t *p_item, mmap &mods, mcmap &mods2 )
         free( psz_text );
         free( psz_longtext );
         free( psz_exclusive );
-        free( psz_option );        
+        free( psz_option );
         return;
 
     case CONFIG_SECTION:
@@ -421,7 +421,7 @@ void PrintOption( char *psz_option, char i_short, char *psz_exclusive,
         strchr( psz_longtext, '(' ) ) psz_longtext = psz_text;
     if( i_short )
     {
-        if( !psz_exclusive ) psz_exclusive = "";
+        if( !psz_exclusive ) psz_exclusive = strdup( "" );
         else asprintf( &psz_exclusive, " %s", psz_exclusive );
         printf( "  \"(-%c%s)--%s%s[%s]", i_short, psz_exclusive,
                 psz_option, psz_args?"=":"", psz_text );
@@ -430,12 +430,12 @@ void PrintOption( char *psz_option, char i_short, char *psz_exclusive,
         else
             printf( "\"\\\n" );
         printf( "  \"(--%s%s)-%c[%s]", psz_option, psz_exclusive,
-                i_short, psz_text );        
+                i_short, psz_text );
         if( psz_args )
             printf( ":%s:%s\"\\\n", psz_longtext, psz_args );
         else
             printf( "\"\\\n" );
-                
+
     }
     else
     {
@@ -444,12 +444,12 @@ void PrintOption( char *psz_option, char i_short, char *psz_exclusive,
                     psz_args?"=":"", psz_text );
         else
             printf( "  \"--%s[%s]", psz_option, psz_text );
-            
+
         if( psz_args )
             printf( ":%s:%s\"\\\n", psz_longtext, psz_args );
         else
             printf( "\"\\\n" );
-        
+
     }
 }
 
