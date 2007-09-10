@@ -39,7 +39,7 @@
 
 #if defined (WIN32) || defined (__APPLE__)
 static const char *ppsz_language[] =
-{ "auto", "ar", "en", "en_GB", "ca", "cs", "da", "de", "es", "fa"  "fr", "gl",
+{ "auto", "ar", "en", "en_GB", "ca", "cs", "da", "de", "es", "fa", "fr", "gl",
     "he", "hu", "it", "ja", "ka", "ko", "ms", "nl", "oc", "pl", "pt_BR", "ro",
     "ru", "sk", "sl", "sv", "tr", "zh_CN", "zh_TW" };
 
