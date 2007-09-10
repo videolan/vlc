@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2006 the VideoLAN team
  * $Id$
  *
- * Authors: Felix Kühne <fkuehne@users.sf.net> 
+ * Authors: Felix Kühne <fkuehne@users.sf.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,13 +22,13 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * VLCWizard 
+ * VLCWizard
  *****************************************************************************/
  
 #import <Cocoa/Cocoa.h>
 
 @interface VLCWizard : NSObject
-{    
+{
     /* general items */
     IBOutlet id o_btn_backward;
     IBOutlet id o_btn_cancel;
@@ -36,7 +36,7 @@
     IBOutlet id o_tab_pageHolder;
     IBOutlet id o_wizard_window;
     IBOutlet id o_playlist_wizard;
-    
+ 
     /* page one ("Hello") */
     IBOutlet id o_t1_btn_mrInfo_strmg;
     IBOutlet id o_t1_btn_mrInfo_trnscd;
@@ -44,7 +44,7 @@
     IBOutlet id o_t1_txt_notice;
     IBOutlet id o_t1_txt_text;
     IBOutlet id o_t1_txt_title;
-    
+ 
     /* page two ("Input") */
     IBOutlet id o_t2_box_prtExtrct;
     IBOutlet id o_t2_ckb_enblPartExtrct;
@@ -58,7 +58,7 @@
     IBOutlet id o_t2_title;
     IBOutlet id o_t2_txt_prtExtrctFrom;
     IBOutlet id o_t2_txt_prtExtrctTo;
-    
+ 
     /* page one ("Streaming 1") */
     IBOutlet id o_t3_box_dest;
     IBOutlet id o_t3_box_strmgMthd;
@@ -68,7 +68,7 @@
     IBOutlet id o_t3_txt_text;
     IBOutlet id o_t3_txt_title;
     IBOutlet id o_t3_txt_strgMthdInfo;
-    
+ 
     /* page four ("Transcode 1") */
     IBOutlet id o_t4_box_audio;
     IBOutlet id o_t4_box_video;
@@ -86,12 +86,12 @@
     IBOutlet id o_t4_txt_videoCodec;
     IBOutlet id o_t4_txt_hintAudio;
     IBOutlet id o_t4_txt_hintVideo;
-    
+ 
     /* page five ("Encap") */
     IBOutlet id o_t5_matrix_encap;
     IBOutlet id o_t5_text;
     IBOutlet id o_t5_title;
-    
+ 
     /* page six ("Streaming 2") */
     IBOutlet id o_t6_ckb_sap;
     IBOutlet id o_t6_fld_sap;
@@ -104,7 +104,7 @@
     IBOutlet id o_t6_btn_mrInfo_local;
     IBOutlet id o_t6_ckb_soverlay;
     IBOutlet id o_t6_ckb_local;
-    
+ 
     /* page seven ("Transcode 2") */
     IBOutlet id o_t7_btn_chooseFile;
     IBOutlet id o_t7_fld_filePath;
@@ -114,7 +114,7 @@
     IBOutlet id o_t7_btn_mrInfo_local;
     IBOutlet id o_t7_ckb_soverlay;
     IBOutlet id o_t7_ckb_local;
-    
+ 
     /* page eight ("Summary") */
     IBOutlet id o_t8_fld_destination;
     IBOutlet id o_t8_fld_encapFormat;
@@ -144,14 +144,14 @@
     IBOutlet id o_t8_txt_ttl;
     IBOutlet id o_t8_txt_mrl;
     IBOutlet id o_t8_txt_local;
-    
+ 
     NSMutableDictionary * o_userSelections;
     NSArray * o_videoCodecs;
     NSArray * o_audioCodecs;
     NSArray * o_encapFormats;
     NSArray * o_strmgMthds;
     NSString * o_opts;
-    
+ 
     BOOL b_keepSettingsOrNot;
 }
 - (IBAction)cancelRun:(id)sender;

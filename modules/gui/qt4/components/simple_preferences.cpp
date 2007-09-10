@@ -256,7 +256,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #endif
           CONFIG_GENERIC( "timeshift-force", Bool, NULL, timeshiftBox );
           CONFIG_GENERIC( "dump-force", Bool, NULL, DumpBox );
-//        CONFIG_GENERIC( "", Bool, NULL, RecordBox ); //FIXME activate record 
+//        CONFIG_GENERIC( "", Bool, NULL, RecordBox ); //FIXME activate record
         END_SPREFS_CAT;
 
         /* Interface Panel */
@@ -284,11 +284,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             //FIXME interface choice
 
             CONFIG_GENERIC( "qt-always-video", Bool, NULL, qtAlwaysVideo );
-            CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin, 
+            CONFIG_GENERIC_FILE( "skins2-last", File, NULL, fileSkin,
                     skinBrowse );
 #if defined( WIN32 ) || defined(HAVE_DBUS_3)
             CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
-            CONFIG_GENERIC( "playlist-enqueue", Bool, NULL, 
+            CONFIG_GENERIC( "playlist-enqueue", Bool, NULL,
                     EnqueueOneInterfaceMode );
 #else
             ui.OneInterfaceBox->hide();

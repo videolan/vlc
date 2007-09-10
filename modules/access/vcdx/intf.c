@@ -87,7 +87,7 @@ void VCDCloseIntf ( vlc_object_t *p_this )
 /*****************************************************************************
  * RunIntf: main loop
  *****************************************************************************/
-static void 
+static void
 RunIntf( intf_thread_t *p_intf )
 {
     vlc_object_t      * p_vout = NULL;
@@ -113,7 +113,7 @@ RunIntf( intf_thread_t *p_intf )
     {
         msleep( INTF_IDLE_SLEEP );
     }
-    
+ 
     p_vcdplayer = p_intf->p_sys->p_vcdplayer;
     p_access    = p_vcdplayer->p_access;
 
@@ -214,8 +214,8 @@ RunIntf( intf_thread_t *p_intf )
 
                 dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_ACTIVATE" );
 
-                if ( vcdplayer_pbc_is_on( p_vcdplayer ) 
-		     && number_addend != 0 ) {
+                if ( vcdplayer_pbc_is_on( p_vcdplayer )
+             && number_addend != 0 ) {
                   lid_t next_num=vcdinfo_selection_get_lid(p_vcdplayer->vcd,
                                                            p_vcdplayer->i_lid,
                                                            number_addend);
@@ -373,7 +373,7 @@ int vcdIntfStillTime( intf_thread_t *p_intf, uint8_t i_sec )
     {
         p_intf->p_sys->b_infinite_still = VLC_TRUE;
     }
-    else 
+    else
     {
         p_intf->p_sys->m_still_time = MILLISECONDS_PER_SEC * i_sec;
     }

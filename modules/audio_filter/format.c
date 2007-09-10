@@ -158,7 +158,7 @@ static struct
     { VLC_FOURCC('s','8',' ',' '), AOUT_FMT_U16_NE,             S8toU16 },
     { VLC_FOURCC('s','8',' ',' '), AOUT_FMT_U16_IE,             S8toU16Invert },
     { VLC_FOURCC('s','8',' ',' '), VLC_FOURCC('u','8',' ',' '), S8toU8 },
-    
+ 
     /* From u8 */
     { VLC_FOURCC('u','8',' ',' '), VLC_FOURCC('f','l','3','2'), U8toFloat32 },
     { VLC_FOURCC('u','8',' ',' '), AOUT_FMT_S16_NE,             U8toS16 },
@@ -250,11 +250,11 @@ static block_t *Float32toS24( filter_t *p_filter, block_t *p_block )
         else out = *p_in * 8388608.0;
 
 #ifdef WORDS_BIGENDIAN
-	*((int16_t *)p_out) = out >> 8;
-	p_out[2] = out & 0xFF;
+    *((int16_t *)p_out) = out >> 8;
+    p_out[2] = out & 0xFF;
 #else
-	*((int16_t *)(p_out+1)) = out >> 8;
-	p_out[0] = out & 0xFF;
+    *((int16_t *)(p_out+1)) = out >> 8;
+    p_out[0] = out & 0xFF;
 #endif
 
         p_in++; p_out += 3;

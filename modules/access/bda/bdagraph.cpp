@@ -60,7 +60,7 @@ extern "C" {
         if( p_access->p_sys->p_bda_module )
             return p_access->p_sys->p_bda_module->SubmitDVBCTuneRequest();
         return VLC_EGENERIC;
-    };    
+    };
 
     int dvb_SubmitDVBSTuneRequest( access_t* p_access )
     {
@@ -79,7 +79,7 @@ extern "C" {
     long dvb_ReadBuffer( access_t* p_access, long* l_buffer_len, BYTE* p_buff )
     {
         if( p_access->p_sys->p_bda_module )
-            return p_access->p_sys->p_bda_module->ReadBuffer( l_buffer_len, 
+            return p_access->p_sys->p_bda_module->ReadBuffer( l_buffer_len,
                 p_buff );
         return -1;
     };
@@ -532,7 +532,7 @@ int BDAGraph::SubmitDVBSTuneRequest()
     l_elevation = var_GetInteger( p_access, "dvb-elevation" );
     l_longitude = var_GetInteger( p_access, "dvb-longitude" );
     l_lnb_lof1 = var_GetInteger( p_access, "dvb-lnb-lof1" );
-    l_lnb_lof2 = var_GetInteger( p_access, "dvb-lnb-lof2" ); 
+    l_lnb_lof2 = var_GetInteger( p_access, "dvb-lnb-lof2" );
     l_lnb_slof = var_GetInteger( p_access, "dvb-lnb-slof" );
     psz_polarisation = var_GetString( p_access, "dvb-polarisation" );
     l_inversion = var_GetInteger( p_access, "dvb-inversion" );

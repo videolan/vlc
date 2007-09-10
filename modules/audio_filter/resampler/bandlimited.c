@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -272,7 +272,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         if( p_filter->p_sys->d_old_factor == 1 )
         {
             /* Just copy the samples */
-            memcpy( p_out, p_in, 
+            memcpy( p_out, p_in,
                     p_filter->input.i_bytes_per_frame );
             p_in += i_nb_channels;
             p_out += i_nb_channels;

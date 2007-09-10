@@ -365,7 +365,7 @@ vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_
     if( !p_entry )
         return kVLCDictionaryNotFound;
 
-    /* Hash collision */        
+    /* Hash collision */
     do {
         if( !strcmp( psz_key, p_entry->psz_key ) )
             return p_entry->p_value;
@@ -378,7 +378,7 @@ vlc_dictionary_value_for_key( const vlc_dictionary_t * p_dict, const char * psz_
 static inline int
 vlc_dictionary_keys_count( const vlc_dictionary_t * p_dict )
 {
-    struct vlc_dictionary_entry_t * p_entry;    
+    struct vlc_dictionary_entry_t * p_entry;
     int i, count = 0;
     for( i = 0; i < p_dict->i_size; i++ )
     {
@@ -396,7 +396,7 @@ vlc_dictionary_all_keys( const vlc_dictionary_t * p_dict )
 
     ppsz_ret = (char**)malloc(sizeof(char *) * (count + 1));
     assert( ppsz_ret );
-    
+ 
     count = 0;
     for( i = 0; i < p_dict->i_size; i++ )
     {
@@ -470,7 +470,7 @@ __vlc_dictionary_insert( vlc_dictionary_t * p_dict, const char * psz_key,
                                              p_entry->p_value,
                                              0 /* To avoid multiple rebuild loop */);
                     p_entry = p_entry->p_next;
-                } 
+                }
             }
             vlc_dictionary_clear( p_dict );
             p_dict->i_size = new_dict.i_size;

@@ -108,7 +108,7 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options, int i_
         GtkTreeIter   p_play_iter;
 
         p_play_model = gtk_tree_view_get_model(p_tvplaylist);
-        
+ 
         if (p_play_model)
         {
             int i;
@@ -227,7 +227,7 @@ void ReadDirectory(intf_thread_t *p_intf, GtkListStore *p_list, char *psz_dir )
         }
             /* kludge */
         for (i=0; i<n; i++)
-        {           
+        {
             if ((pp_namelist[i]->d_name[0] != '.') &&
                 (lstat(pp_namelist[i]->d_name, &st)==0))
             {
@@ -529,7 +529,7 @@ void onAddFileToPlaylist(GtkButton *button, gpointer user_data)
     {
         GtkTreeSelection *p_selection = gtk_tree_view_get_selection(p_treeview);
 
-        gtk_tree_selection_selected_foreach(p_selection, (GtkTreeSelectionForeachFunc) &addSelectedToPlaylist, (gpointer) p_treeview);    
+        gtk_tree_selection_selected_foreach(p_selection, (GtkTreeSelectionForeachFunc) &addSelectedToPlaylist, (gpointer) p_treeview);
     }
 }
 
@@ -640,7 +640,7 @@ void onAddCameraToPlaylist(GtkButton *button, gpointer user_data)
 
     GtkCheckButton  *p_check_v4l_transcode = NULL;
     gboolean         b_v4l_transcode;
-    
+ 
     char **ppsz_options = NULL; /* list of options */
     int  i_options=0;
     char v4l_mrl[6];
@@ -883,7 +883,7 @@ void onDeletePlaylist(GtkButton *button, gpointer user_data)
                     }
                 }
             }
-#if 0 
+#if 0
             g_list_foreach (p_rows, (GFunc*)gtk_tree_path_free, NULL);
 #endif /* Testing the next line */
             g_list_foreach (p_rows, deleteItemFromPlaylist, NULL);
@@ -1049,12 +1049,12 @@ void onAddTranscodeToPlaylist(GtkButton *button, gpointer user_data)
     p_entryVideoBitrate = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryVideoBitrate" );
     p_entryVideoBitrateTolerance = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryVideoBitrateTolerance" );
     p_entryVideoKeyFrameInterval = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryVideoKeyFrameInterval" );
-    
+ 
     p_video_codec = gtk_entry_get_text(GTK_ENTRY(p_entryVideoCodec));
     i_video_bitrate = gtk_spin_button_get_value_as_int(p_entryVideoBitrate);
     i_video_bitrate_tolerance = gtk_spin_button_get_value_as_int(p_entryVideoBitrateTolerance);
     i_video_keyframe_interval = gtk_spin_button_get_value_as_int(p_entryVideoKeyFrameInterval);
-    
+ 
     i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "vcodec=%s,", (char*)p_video_codec );
     if (i_pos>=VLC_MAX_MRL) ppsz_options[i_options][VLC_MAX_MRL-1] = '\0';
     i_pos += snprintf( &ppsz_options[i_options][i_pos], VLC_MAX_MRL - i_pos, "vb=%d,", (int)i_video_bitrate );
@@ -1146,7 +1146,7 @@ void onEntryStdAccessChanged(GtkEditable *editable, gpointer user_data)
     GtkCheckButton *p_checkSAP = NULL;
     GtkCheckButton *p_checkSLP = NULL;
     GtkEntry       *p_entryStdAccess = NULL;
-    const gchar    *p_std_access = NULL;    
+    const gchar    *p_std_access = NULL;
     gboolean        b_announce = FALSE;
 
     p_entryStdAccess = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryStdAccess" );

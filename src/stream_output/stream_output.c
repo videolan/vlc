@@ -332,11 +332,11 @@ int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
         if( p_input )
         {
             stats_UpdateInteger( p_input, p_input->p->counters.p_sout_sent_packets,
-			         30, NULL );
+                     30, NULL );
             stats_UpdateInteger( p_input, p_input->p->counters.p_sout_sent_bytes,
                                  p_access->i_sent_bytes, &i_total );
             stats_UpdateFloat( p_input, p_input->p->counters.p_sout_send_bitrate,
-			   	 (float)i_total, NULL );
+                    (float)i_total, NULL );
             p_access->i_sent_bytes = 0;
             vlc_object_release( p_input );
         }

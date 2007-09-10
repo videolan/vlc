@@ -27,7 +27,7 @@
  */
 int
 dialog_msgbox (const char *title, const char *prompt, int height, int width,
-		int pause)
+        int pause)
 {
     int i, x, y, key = 0;
     WINDOW *dialog;
@@ -44,40 +44,40 @@ dialog_msgbox (const char *title, const char *prompt, int height, int width,
     draw_box (dialog, 0, 0, height, width, dialog_attr, border_attr);
 
     if (title != NULL && strlen(title) >= width-2 ) {
-	/* truncate long title -- mec */
-	char * title2 = malloc(width-2+1);
-	memcpy( title2, title, width-2 );
-	title2[width-2] = '\0';
-	title = title2;
+    /* truncate long title -- mec */
+    char * title2 = malloc(width-2+1);
+    memcpy( title2, title, width-2 );
+    title2[width-2] = '\0';
+    title = title2;
     }
 
     if (title != NULL) {
-	wattrset (dialog, title_attr);
-	mvwaddch (dialog, 0, (width - strlen(title))/2 - 1, ' ');
-	waddstr (dialog, (char *)title);
-	waddch (dialog, ' ');
+    wattrset (dialog, title_attr);
+    mvwaddch (dialog, 0, (width - strlen(title))/2 - 1, ' ');
+    waddstr (dialog, (char *)title);
+    waddch (dialog, ' ');
     }
     wattrset (dialog, dialog_attr);
     print_autowrap (dialog, prompt, width - 2, 1, 2);
 
     if (pause) {
-	wattrset (dialog, border_attr);
-	mvwaddch (dialog, height - 3, 0, ACS_LTEE);
-	for (i = 0; i < width - 2; i++)
-	    waddch (dialog, ACS_HLINE);
-	wattrset (dialog, dialog_attr);
-	waddch (dialog, ACS_RTEE);
+    wattrset (dialog, border_attr);
+    mvwaddch (dialog, height - 3, 0, ACS_LTEE);
+    for (i = 0; i < width - 2; i++)
+        waddch (dialog, ACS_HLINE);
+    wattrset (dialog, dialog_attr);
+    waddch (dialog, ACS_RTEE);
 
-	print_button (dialog, "  Ok  ",
-		      height - 2, width / 2 - 4, TRUE);
+    print_button (dialog, "  Ok  ",
+              height - 2, width / 2 - 4, TRUE);
 
-	wrefresh (dialog);
-	while (key != ESC && key != '\n' && key != ' ' &&
+    wrefresh (dialog);
+    while (key != ESC && key != '\n' && key != ' ' &&
                key != 'O' && key != 'o' && key != 'X' && key != 'x')
-	    key = wgetch (dialog);
+        key = wgetch (dialog);
     } else {
-	key = '\n';
-	wrefresh (dialog);
+    key = '\n';
+    wrefresh (dialog);
     }
 
     delwin (dialog);

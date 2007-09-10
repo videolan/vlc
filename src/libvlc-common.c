@@ -640,7 +640,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
 
                     /* append MRLs */
                     dbus_message_iter_init_append( p_dbus_msg, &dbus_args );
-                    if ( !dbus_message_iter_append_basic( &dbus_args, 
+                    if ( !dbus_message_iter_append_basic( &dbus_args,
                                 DBUS_TYPE_STRING, &ppsz_argv[i_input] ) )
                     {
                         msg_Err( p_libvlc, "Out of memory" );
@@ -1084,7 +1084,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
     p_libvlc = NULL;
 
     /* Stop thread system: last one out please shut the door!
-     * The number of initializations of the thread system is counted, we 
+     * The number of initializations of the thread system is counted, we
      * can call this each time */
     vlc_threads_end( p_libvlc_global );
 

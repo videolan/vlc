@@ -50,7 +50,7 @@ MetaPanel::MetaPanel( QWidget *parent,
                       : QWidget( parent ), p_intf( _p_intf )
 {
     QGridLayout *metaLayout = new QGridLayout( this );
-    
+ 
     int line = 0; /* Counter for GridLayout */
     p_input = NULL;
 
@@ -59,7 +59,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     widget = new QLineEdit;                                      \
     metaLayout->addWidget( widget, line, 1, 1, 9 );                       \
     line++;            }
-    
+ 
     /* Title, artist and album*/
     ADD_META( VLC_META_TITLE, title_text ); /* OK */
     ADD_META( VLC_META_ARTIST, artist_text ); /* OK */
@@ -108,7 +108,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     art_cover->setScaledContents( true );
     art_cover->setPixmap( QPixmap( ":/noart.png" ) );
     metaLayout->addWidget( art_cover, line, 8, 4, 2 );
-    
+ 
 /* Settings is unused */
 /*    l->addWidget( new QLabel( qtr( VLC_META_SETTING ) + " :" ), line, 5 );
     setting_text = new QLineEdit;
@@ -120,7 +120,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     widget = new QLineEdit;                                      \
     metaLayout->addWidget( widget, line, 1, 1, 7 );                       \
     line++;            }
-    
+ 
     /* Now Playing - Useful for live feeds (HTTP, DVB, ETC...) */
     ADD_META_2( VLC_META_NOW_PLAYING, nowplaying_text );
     nowplaying_text->setReadOnly( true );
@@ -142,7 +142,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     CONNECT( collection_text, textEdited( QString ), this, enterEditMode() );
     CONNECT( genre_text, textEdited( QString ), this, enterEditMode() );
     CONNECT( seqnum_text, textEdited( QString ), this, enterEditMode() );
-    
+ 
     CONNECT( date_text, textEdited( QString ), this, enterEditMode() );
     CONNECT( description_text, textEdited( QString ), this, enterEditMode() );
 /*    CONNECT( rating_text, valueChanged( QString ), this, enterEditMode( QString ) );*/
@@ -160,8 +160,8 @@ void MetaPanel::update( input_item_t *p_item )
 {
     /* Don't update if you are in edit mode */
     if( b_inEditMode ) return;
-        
-    char *psz_meta; 
+ 
+    char *psz_meta;
 #define UPDATE_META( meta, widget ) {               \
     psz_meta = input_item_Get##meta( p_item );      \
     if( !EMPTY_STR( psz_meta ) )                    \
@@ -285,7 +285,7 @@ void MetaPanel::saveMeta()
         module_Unneed( p_playlist, p_mod );
     PL_UNLOCK;
     pl_Release( p_playlist );
-    
+ 
     /* Reset the status of the mode. No need to emit any signal */
     b_inEditMode = false;
 }
@@ -349,7 +349,7 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent,
 }
 
 /**
- * Update the Extra Metadata from p_meta->i_extras 
+ * Update the Extra Metadata from p_meta->i_extras
  **/
 void ExtraMetaPanel::update( input_item_t *p_item )
 {

@@ -14,7 +14,7 @@
  *
  * The Original Code is Mozilla Communicator client code.
  *
- * The Initial Developer of the Original Code is 
+ * The Initial Developer of the Original Code is
  * Netscape Communications Corporation.
  * Portions created by the Initial Developer are Copyright (C) 1998
  * the Initial Developer. All Rights Reserved.
@@ -22,7 +22,7 @@
  * Contributor(s):
  *
  * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or 
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
  * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
  * in which case the provisions of the GPL or the LGPL are applicable instead
  * of those above. If you wish to allow use of your version of this file only
@@ -72,7 +72,7 @@ Private_GetJavaClass(void)
 
 //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\.
 ////\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//.
-//                                              PLUGIN DLL entry points   
+//                                              PLUGIN DLL entry points
 //
 // These are the Windows specific DLL entry points. They must be exoprted
 //
@@ -98,12 +98,12 @@ NPError WINAPI NP_EXPORT
 #endif
 NP_GetEntryPoints(NPPluginFuncs* pFuncs)
 {
-    // trap a NULL ptr 
+    // trap a NULL ptr
     if(pFuncs == NULL)
         return NPERR_INVALID_FUNCTABLE_ERROR;
 
     // if the plugin's function table is smaller than the plugin expects,
-    // then they are incompatible, and should return an error 
+    // then they are incompatible, and should return an error
 
     pFuncs->version       = (NP_VERSION_MAJOR << 8) | NP_VERSION_MINOR;
     pFuncs->newp          = NPP_New;
@@ -115,7 +115,7 @@ NP_GetEntryPoints(NPPluginFuncs* pFuncs)
     pFuncs->writeready    = NPP_WriteReady;
     pFuncs->write         = NPP_Write;
     pFuncs->print         = NPP_Print;
-    pFuncs->event         = 0;       /// reserved 
+    pFuncs->event         = 0;       /// reserved
     pFuncs->getvalue      = NPP_GetValue;
     pFuncs->setvalue      = NPP_SetValue;
 
@@ -133,18 +133,18 @@ NP_GetEntryPoints(NPPluginFuncs* pFuncs)
 #ifdef __MINGW32__
 extern "C" __declspec(dllexport) NPError WINAPI
 #else
-NPError WINAPI NP_EXPORT 
+NPError WINAPI NP_EXPORT
 #endif
 NP_Initialize(NPNetscapeFuncs* pFuncs)
 {
-    // trap a NULL ptr 
+    // trap a NULL ptr
     if(pFuncs == NULL)
         return NPERR_INVALID_FUNCTABLE_ERROR;
 
-    g_pNavigatorFuncs = pFuncs; // save it for future reference 
+    g_pNavigatorFuncs = pFuncs; // save it for future reference
 
     // if the plugin's major ver level is lower than the Navigator's,
-    // then they are incompatible, and should return an error 
+    // then they are incompatible, and should return an error
     if(HIBYTE(pFuncs->version) > NP_VERSION_MAJOR)
         return NPERR_INCOMPATIBLE_VERSION_ERROR;
 
@@ -154,7 +154,7 @@ NP_Initialize(NPNetscapeFuncs* pFuncs)
     if( navMinorVers >= NPVERS_HAS_NOTIFICATION ) {
         g_pluginFuncs->urlnotify = NPP_URLNotify;
     }
-    
+ 
     if( navMinorVers >= NPVERS_HAS_LIVECONNECT ) {
         g_pluginFuncs->javaClass = Private_GetJavaClass();
     }
@@ -169,12 +169,12 @@ NP_Initialize(NPNetscapeFuncs* pFuncs)
 //
 //      called immediately before the plugin DLL is unloaded.
 //      This functio shuold check for some ref count on the dll to see if it is
-//      unloadable or it needs to stay in memory. 
+//      unloadable or it needs to stay in memory.
 //
 #ifdef __MINGW32__
 extern "C" __declspec(dllexport) NPError WINAPI
 #else
-NPError WINAPI NP_EXPORT 
+NPError WINAPI NP_EXPORT
 #endif
 NP_Shutdown()
 {
@@ -183,7 +183,7 @@ NP_Shutdown()
     return NPERR_NO_ERROR;
 }
 
-//                                              END - PLUGIN DLL entry points   
+//                                              END - PLUGIN DLL entry points
 ////\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//.
 //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\.
 
@@ -260,7 +260,7 @@ NPError NPN_RequestRead(NPStream* stream, NPByteRange* rangeList)
 /* Creates a new stream of data from the plug-in to be interpreted
    by Netscape in the current window.
 */
-NPError NPN_NewStream(NPP instance, NPMIMEType type, 
+NPError NPN_NewStream(NPP instance, NPMIMEType type,
                                                                 const char* target, NPStream** stream)
 {
     int navMinorVersion = g_pNavigatorFuncs->version & 0xFF;
@@ -292,7 +292,7 @@ int32 NPN_Write(NPP instance, NPStream *stream,
     return result;
 }
 
-/* Closes a stream object.  
+/* Closes a stream object.
 reason indicates why the stream was closed.
 */
 NPError NPN_DestroyStream(NPP instance, NPStream* stream, NPError reason)
@@ -386,7 +386,7 @@ NPIdentifier NPN_GetStringIdentifier(const NPUTF8 *name)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->getstringidentifier(name);
     }
     return NULL;
@@ -396,7 +396,7 @@ void NPN_GetStringIdentifiers(const NPUTF8 **names, int32_t nameCount, NPIdentif
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         g_pNavigatorFuncs->getstringidentifiers(names, nameCount, identifiers);
     }
 }
@@ -405,7 +405,7 @@ NPIdentifier NPN_GetIntIdentifier(int32_t intid)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->getintidentifier(intid);
     }
     return NULL;
@@ -415,7 +415,7 @@ bool NPN_IdentifierIsString(NPIdentifier identifier)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->identifierisstring(identifier);
     }
     return false;
@@ -425,7 +425,7 @@ NPUTF8 *NPN_UTF8FromIdentifier(NPIdentifier identifier)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->utf8fromidentifier(identifier);
     }
     return NULL;
@@ -435,7 +435,7 @@ int32_t NPN_IntFromIdentifier(NPIdentifier identifier)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->intfromidentifier(identifier);
     }
     return 0;
@@ -445,7 +445,7 @@ NPObject *NPN_CreateObject(NPP instance, NPClass *aClass)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->createobject(instance, aClass);
     }
     return NULL;
@@ -455,7 +455,7 @@ NPObject *NPN_RetainObject(NPObject *npobj)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->retainobject(npobj);
     }
     return NULL;
@@ -465,7 +465,7 @@ void NPN_ReleaseObject(NPObject *npobj)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         g_pNavigatorFuncs->releaseobject(npobj);
     }
 }
@@ -474,7 +474,7 @@ bool NPN_Invoke(NPP instance, NPObject *npobj, NPIdentifier methodName, const NP
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->invoke(instance, npobj, methodName, args, argCount, result);
     }
     return false;
@@ -484,7 +484,7 @@ bool NPN_InvokeDefault(NPP instance, NPObject *npobj, const NPVariant *args, uin
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->invokeDefault(instance, npobj, args, argCount, result);
     }
     return false;
@@ -494,7 +494,7 @@ bool NPN_Evaluate(NPP instance, NPObject *npobj, NPString *script, NPVariant *re
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->evaluate(instance, npobj, script, result);
     }
     return false;
@@ -504,7 +504,7 @@ bool NPN_GetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, N
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->getproperty(instance, npobj, propertyName, result);
     }
     return false;
@@ -514,7 +514,7 @@ bool NPN_SetProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName, c
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->setproperty(instance, npobj, propertyName, value);
     }
     return false;
@@ -524,7 +524,7 @@ bool NPN_RemoveProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->removeproperty(instance, npobj, propertyName);
     }
     return false;
@@ -534,7 +534,7 @@ bool NPN_HasProperty(NPP instance, NPObject *npobj, NPIdentifier propertyName)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->hasproperty(instance, npobj, propertyName);
     }
     return false;
@@ -544,7 +544,7 @@ bool NPN_HasMethod(NPP instance, NPObject *npobj, NPIdentifier methodName)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         return g_pNavigatorFuncs->hasmethod(instance, npobj, methodName);
     }
     return false;
@@ -554,7 +554,7 @@ void NPN_ReleaseVariantValue(NPVariant *variant)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         g_pNavigatorFuncs->releasevariantvalue(variant);
     }
 }
@@ -563,7 +563,7 @@ void NPN_SetException(NPObject *npobj, const NPUTF8 *message)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     if( navMinorVers >= 14 )
-    {   
+    {
         g_pNavigatorFuncs->setexception(npobj, message);
     }
 }

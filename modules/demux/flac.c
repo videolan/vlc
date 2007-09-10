@@ -321,7 +321,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
         i_next_offset = stream_Size(p_demux->s)-p_sys->i_data_pos;
     }
     i_delta_time = i_time - p_sys->seekpoint[i]->i_time_offset;
-    i_delta_offset = (i_next_offset - p_sys->seekpoint[i]->i_byte_offset) * i_delta_time / 
+    i_delta_offset = (i_next_offset - p_sys->seekpoint[i]->i_byte_offset) * i_delta_time /
                             (p_sys->seekpoint[i+1]->i_time_offset-p_sys->seekpoint[i]->i_time_offset);
 
     /* XXX We do exact seek if it's not too far away(45s) */

@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 /**
- * \defgroup mediacontrol MediaControl 
+ * \defgroup mediacontrol MediaControl
  * This is the MediaControl API, * intended to provide a generic API to movie players.
  *
  * @{
@@ -48,7 +48,7 @@ extern "C" {
 
 /**
  * mediacontrol_Instance is an opaque structure, defined in
- * mediacontrol_internal.h. API users do not have to mess with it. 
+ * mediacontrol_internal.h. API users do not have to mess with it.
  */
 typedef struct mediacontrol_Instance mediacontrol_Instance;
 
@@ -113,7 +113,7 @@ mediacontrol_new( int argc, char **argv, mediacontrol_Exception *exception );
  */
 VLC_PUBLIC_API mediacontrol_Instance *
 mediacontrol_new_from_instance( libvlc_instance_t* p_instance,
-				mediacontrol_Exception *exception );
+                mediacontrol_Exception *exception );
 
 /**
  * Get the associated libvlc instance
@@ -316,7 +316,7 @@ VLC_PUBLIC_API vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
  * \return the rate
  */
 VLC_PUBLIC_API int mediacontrol_get_rate( mediacontrol_Instance *self,
-			   mediacontrol_Exception *exception );
+               mediacontrol_Exception *exception );
 
 /**
  * Set the playing rate, in percent
@@ -325,8 +325,8 @@ VLC_PUBLIC_API int mediacontrol_get_rate( mediacontrol_Instance *self,
  * \param exception an initialized exception pointer
  */
 VLC_PUBLIC_API void mediacontrol_set_rate( mediacontrol_Instance *self,
-			    const int rate,
-			    mediacontrol_Exception *exception );
+                const int rate,
+                mediacontrol_Exception *exception );
 
 /**
  * Get current fullscreen status
@@ -335,7 +335,7 @@ VLC_PUBLIC_API void mediacontrol_set_rate( mediacontrol_Instance *self,
  * \return the fullscreen status
  */
 VLC_PUBLIC_API int mediacontrol_get_fullscreen( mediacontrol_Instance *self,
-				 mediacontrol_Exception *exception );
+                 mediacontrol_Exception *exception );
 
 /**
  * Set fullscreen status
@@ -344,8 +344,8 @@ VLC_PUBLIC_API int mediacontrol_get_fullscreen( mediacontrol_Instance *self,
  * \param exception an initialized exception pointer
  */
 VLC_PUBLIC_API void mediacontrol_set_fullscreen( mediacontrol_Instance *self,
-				  const int b_fullscreen,
-				  mediacontrol_Exception *exception );
+                  const int b_fullscreen,
+                  mediacontrol_Exception *exception );
 
 # ifdef __cplusplus
 }

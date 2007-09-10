@@ -330,7 +330,7 @@ static int OSDMenuUpdateEvent( vlc_object_t *p_this, char const *psz_var,
 /*****************************************************************************
  * create_text_region : compose a text region SPU
  *****************************************************************************/
-static subpicture_region_t *create_text_region( filter_t *p_filter, subpicture_t *p_spu, 
+static subpicture_region_t *create_text_region( filter_t *p_filter, subpicture_t *p_spu,
     int i_width, int i_height, const char *psz_text )
 {
     subpicture_region_t *p_region;

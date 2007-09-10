@@ -345,7 +345,7 @@ static XList *xlist_append( XList *list, void *data )
         if( last->next == NULL ) break;
 
     if( last ) last->next = l;
-    l->prev = last; 
+    l->prev = last;
     return list;
 }
 
@@ -554,7 +554,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
     char *name;
     char *pcdata;
     char *s;
-	 int xi;
+     int xi;
 
     if( !parser->valid ) return NULL;
 
@@ -562,7 +562,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
 
     /* if this starts a comment tag, skip until end */
     if( (parser->end - parser->start) > 7 &&
-		  xtag_cin( s[0], X_OPENTAG ) && xtag_cin( s[1], X_EMARK ) &&
+          xtag_cin( s[0], X_OPENTAG ) && xtag_cin( s[1], X_EMARK ) &&
         xtag_cin( s[2], X_DASH ) && xtag_cin( s[3], X_DASH ) )
     {
         parser->start = s = &s[4];
@@ -581,7 +581,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
 
     /* ignore processing instructions '<?' ... '?>' */
     if( (parser->end - parser->start) > 4 &&
-		  xtag_cin( s[0], X_OPENTAG ) && xtag_cin( s[1], X_QMARK ) )
+          xtag_cin( s[0], X_OPENTAG ) && xtag_cin( s[1], X_QMARK ) )
     {
         parser->start = s = &s[2];
         while ((xi = xtag_index( parser, X_QMARK )) >= 0) {
@@ -596,7 +596,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
 
     /* ignore doctype  '<!DOCTYPE' ... '>' */
     if ( (parser->end - parser->start) > 8 &&
-			!strncmp( s, "<!DOCTYPE", 9 ) ) {
+            !strncmp( s, "<!DOCTYPE", 9 ) ) {
         xi = xtag_index( parser, X_CLOSETAG );
         if ( xi > 0 ) {
             parser->start = s = &s[xi+1];
@@ -626,8 +626,8 @@ static XTag *xtag_parse_tag( XTagParser *parser )
         return NULL;
 
     /* parse CDATA content */
-    if ( (parser->end - parser->start) > 8 && 
-			!strncmp( s, "<![CDATA[", 9 ) ) {
+    if ( (parser->end - parser->start) > 8 &&
+            !strncmp( s, "<![CDATA[", 9 ) ) {
         parser->start = s = &s[9];
         while (parser->end - s > 2) {
             if (strncmp( s, "]]>", 3 ) == 0) {
@@ -773,7 +773,7 @@ static XTag *xtag_new_parse( const char *s, int n )
     {
 #ifdef XTAG_DEBUG
         printf ("empty buffer");
-#endif        
+#endif
         return NULL;
     }
     else parser.end = (char *)&s[n];
@@ -946,7 +946,7 @@ static int xtag_snprints( char *buf, int n, ... )
     int len, to_copy, total = 0;
 
     va_start( ap, n );
-  
+ 
     for( s = va_arg( ap, char * ); s; s = va_arg( ap, char *) )
     {
         len = strlen (s);
@@ -1000,7 +1000,7 @@ static int xtag_snprint( char *buf, int n, XTag *xtag )
         for( l = xtag->attributes; l; l = l->next )
         {
             attr = (XAttribute *)l->data;
-      
+ 
             nn = xtag_snprints( buf, n, " ", attr->name, "=\"", attr->value,
                                 "\"", NULL);
             FORWARD( nn );

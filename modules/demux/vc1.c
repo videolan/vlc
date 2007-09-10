@@ -134,7 +134,7 @@ static int Demux( demux_t *p_demux)
     if( ( p_block_in = stream_Block( p_demux->s, VC1_PACKET_SIZE ) ) == NULL )
         return 0;
 
-    /*  */ 
+    /*  */
     p_block_in->i_dts = 1;
     p_block_in->i_pts = 1;
 

@@ -62,24 +62,24 @@ mediacontrol_Instance* mediacontrol_new( int argc, char** argv, mediacontrol_Exc
     mediacontrol_exception_init( exception );
 
     retval = ( mediacontrol_Instance* )malloc( sizeof( mediacontrol_Instance ) );
-    if( !retval ) 
+    if( !retval )
         RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
 
-    /* Prepend a dummy argv[0] so that users of the API do not have to  
-       do it themselves, and can simply provide the args list. */ 
-    ppsz_argv = malloc( ( argc + 2 ) * sizeof( char * ) ) ; 
-    if( ! ppsz_argv )  
-        RAISE_NULL( mediacontrol_InternalException, "Out of memory" ); 
-	 	 
-    ppsz_argv[0] = strdup("vlc"); 
-    for ( i_index = 0; i_index < argc; i_index++ ) 
-        ppsz_argv[i_index + 1] = argv[i_index]; 
-    ppsz_argv[argc + 1] = NULL; 
-	 	     
+    /* Prepend a dummy argv[0] so that users of the API do not have to
+       do it themselves, and can simply provide the args list. */
+    ppsz_argv = malloc( ( argc + 2 ) * sizeof( char * ) ) ;
+    if( ! ppsz_argv )
+        RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
+         
+    ppsz_argv[0] = strdup("vlc");
+    for ( i_index = 0; i_index < argc; i_index++ )
+        ppsz_argv[i_index + 1] = argv[i_index];
+    ppsz_argv[argc + 1] = NULL;
+         
     retval->p_instance = libvlc_new( argc + 1, ppsz_argv, &ex );
     retval->p_playlist = retval->p_instance->p_libvlc_int->p_playlist;
     HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
-    return retval;  
+    return retval;
 };
 
 void
@@ -99,18 +99,18 @@ mediacontrol_get_libvlc_instance( mediacontrol_Instance *self )
 
 mediacontrol_Instance *
 mediacontrol_new_from_instance( libvlc_instance_t* p_instance,
-				mediacontrol_Exception *exception )
+                mediacontrol_Exception *exception )
 {
   mediacontrol_Instance* retval;
 
   retval = ( mediacontrol_Instance* )malloc( sizeof( mediacontrol_Instance ) );
   if( ! retval )
-  { 
+  {
       RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
   }
   retval->p_instance = p_instance;
   retval->p_playlist = retval->p_instance->p_libvlc_int->p_playlist;
-  return retval;  
+  return retval;
 }
 
 /**************************************************************************
@@ -196,7 +196,7 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
  * Known issues: since moving in the playlist using playlist_Next
  * or playlist_Prev implies starting to play items, the a_position
  * argument will be only honored for the 1st item in the list.
- * 
+ *
  * XXX:FIXME split moving in the playlist and playing items two
  * different actions or make playlist_<Next|Prev> accept a time
  * value to start to play from.

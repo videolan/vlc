@@ -110,8 +110,8 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
     i_test = strcasecmp( psz_i, psz_ismall ); \
     free( psz_i ); \
     free( psz_ismall ); \
-}    
-        
+}
+ 
 
 #define DO_META_SORT( node ) { \
     char *psz_a = input_item_GetMeta( pp_items[i]->p_input, vlc_meta_##node ); \

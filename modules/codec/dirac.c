@@ -149,7 +149,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec )
     case format420: p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0'); break;
     case format422: p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','2'); break;
     case format444: p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','4','4'); break;    // XXX 0.6 ?
-    default:        
+    default:
         p_dec->fmt_out.i_codec = 0;
         break;
     }
@@ -448,7 +448,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
             }
             if( p_sys->p_dirac->decoded_frame_avail )
             {
-                //locally decoded frame is available in 
+                //locally decoded frame is available in
                 //encoder->dec_buf
                 //locally decoded frame parameters available
                 //in encoder->dec_fparams

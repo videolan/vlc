@@ -227,7 +227,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block )
 #ifdef CMML_DEBUG
     msg_Dbg( p_dec, "psz_cmml is \"%s\"", psz_cmml );
 #endif
-    
+ 
     /* Parse the <clip> part of the CMML */
     p_clip_parser = xtag_new_parse( psz_cmml, p_block->i_buffer );
     if( !p_clip_parser )
@@ -260,7 +260,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block )
     if( psz_url )
     {
         char *psz_tmp = strdup( psz_url );
-        
+ 
         val.p_address = psz_tmp;
         if( var_Set( p_dec, "psz-current-anchor-url", val ) != VLC_SUCCESS )
         {

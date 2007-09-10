@@ -227,7 +227,7 @@ static inline void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_t
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
     vlc_meta_Set( p_i->p_meta, meta_type, psz_val );
-    vlc_mutex_unlock( &p_i->lock ); 
+    vlc_mutex_unlock( &p_i->lock );
 
     /* Notify interested third parties */
     event.type = vlc_InputItemMetaChanged;

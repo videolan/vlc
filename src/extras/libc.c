@@ -111,7 +111,7 @@ char *vlc_strndup( const char *string, size_t n )
 #endif
 
 /*****************************************************************************
- * strnlen: 
+ * strnlen:
  *****************************************************************************/
 #if !defined( HAVE_STRNLEN )
 size_t vlc_strnlen( const char *psz, size_t n )
@@ -178,7 +178,7 @@ char * vlc_strcasestr( const char *psz_big, const char *psz_little )
 
     if( !psz_big || !psz_little || !*psz_little ) return p_pos;
  
-    while( *p_pos ) 
+    while( *p_pos )
     {
         if( toupper( *p_pos ) == toupper( *psz_little ) )
         {

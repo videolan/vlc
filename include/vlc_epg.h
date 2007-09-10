@@ -30,12 +30,12 @@
 
 typedef struct
 {
-	int64_t i_start;	/* Interpreted as a value return by time() */
-	int     i_duration;	/* Duration of the event in second */
+    int64_t i_start;    /* Interpreted as a value return by time() */
+    int     i_duration;    /* Duration of the event in second */
 
-	char	*psz_name;
-	char	*psz_short_description;
-	char	*psz_description;
+    char    *psz_name;
+    char    *psz_short_description;
+    char    *psz_description;
 
 } vlc_epg_event_t;
 
@@ -44,15 +44,15 @@ typedef struct
     char            *psz_name;
     vlc_epg_event_t *p_current; /* Can be null or should be the same than one of pp_event entry */
 
-	int 			i_event;
-	vlc_epg_event_t **pp_event;
+    int             i_event;
+    vlc_epg_event_t **pp_event;
 } vlc_epg_t;
 
 static inline void vlc_epg_Init( vlc_epg_t *p_epg, const char *psz_name )
 {
     p_epg->psz_name = psz_name ? strdup( psz_name ) : NULL;
     p_epg->p_current = NULL;
-	TAB_INIT( p_epg->i_event, p_epg->pp_event );
+    TAB_INIT( p_epg->i_event, p_epg->pp_event );
 }
 static inline void vlc_epg_Clean( vlc_epg_t *p_epg )
 {
@@ -88,9 +88,9 @@ static inline void vlc_epg_AddEvent( vlc_epg_t *p_epg, int64_t i_start, int i_du
 
 static inline vlc_epg_t *vlc_epg_New( const char *psz_name )
 {
-	vlc_epg_t *p_epg = (vlc_epg_t*)malloc( sizeof(vlc_epg_t) );
-	if( p_epg )
-		vlc_epg_Init( p_epg, psz_name );
+    vlc_epg_t *p_epg = (vlc_epg_t*)malloc( sizeof(vlc_epg_t) );
+    if( p_epg )
+        vlc_epg_Init( p_epg, psz_name );
     return p_epg;
 }
 static inline void vlc_epg_Delete( vlc_epg_t *p_epg )

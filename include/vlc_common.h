@@ -490,13 +490,13 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 
 #if defined (WIN32) && defined (DLL_EXPORT)
 #  ifdef __cplusplus
-#    define VLC_PUBLIC_API __declspec(dllexport) 
-#    define VLC_PRIVATE_API __declspec(dllexport) 
+#    define VLC_PUBLIC_API __declspec(dllexport)
+#    define VLC_PRIVATE_API __declspec(dllexport)
 #    define   VLC_EXPORT( type, name, args ) extern "C" __declspec(dllexport) type name args
 #    define VLC_INTERNAL( type, name, args ) extern "C" type name args
 #  else
-#    define VLC_PUBLIC_API extern __declspec(dllexport) 
-#    define VLC_PRIVATE_API extern __declspec(dllexport) 
+#    define VLC_PUBLIC_API extern __declspec(dllexport)
+#    define VLC_PRIVATE_API extern __declspec(dllexport)
 #    define   VLC_EXPORT( type, name, args ) __declspec(dllexport) type name args
 #    define VLC_INTERNAL( type, name, args ) type name args
 #  endif
@@ -519,7 +519,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #      define   VLC_EXPORT( type, name, args ) __attribute__((visibility("default"))) type name args
 #      define VLC_INTERNAL( type, name, args ) __attribute__((visibility("hidden"))) type name args
 #    else
-#      define VLC_PUBLIC_API extern 
+#      define VLC_PUBLIC_API extern
 #      define VLC_PRIVATE_API extern
 #      define   VLC_EXPORT( type, name, args ) type name args
 #      define VLC_INTERNAL( type, name, args ) type name args

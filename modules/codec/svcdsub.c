@@ -349,7 +349,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
                       p_spu->i_buffer, p_sys->i_spu_size );
         }
 
-	dbg_print( (DECODE_DBG_PACKET),
+    dbg_print( (DECODE_DBG_PACKET),
                  "subtitle packet complete, size=%d", p_spu->i_buffer );
 
         p_sys->i_state = SUBTITLE_BLOCK_EMPTY;
@@ -365,14 +365,14 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
  
    size     description
    -------------------------------------------
-   byte     subtitle channel (0..7) in bits 0-3 
+   byte     subtitle channel (0..7) in bits 0-3
    byte     subtitle packet number of this subtitle image 0-N,
             if the subtitle packet is complete, the top bit of the byte is 1.
    u_int16  subtitle image number
    u_int16  length in bytes of the rest
    byte     option flags, unknown meaning except bit 3 (0x08) indicates
             presence of the duration field
-   byte     unknown 
+   byte     unknown
    u_int32  duration in 1/90000ths of a second (optional), start time
             is as indicated by the PTS in the PES header
    u_int32  xpos
@@ -385,7 +385,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
             cmd>>6==1 indicates shift
             (cmd>>4)&3 is direction from, (0=top,1=left,2=right,3=bottom)
    u_int32  shift duration in 1/90000ths of a second
-   u_int16  offset of odd-numbered scanlines - subtitle images are 
+   u_int16  offset of odd-numbered scanlines - subtitle images are
             given in interlace order
    byte[]   limited RLE image data in interlace order (0,2,4... 1,3,5) with
             2-bits per palette number
@@ -429,20 +429,20 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
     p_sys->i_image_length  = p_sys->i_spu_size - p_sys->i_image_offset;
     p_sys->metadata_length = p_sys->i_image_offset;
 
-  if (p_sys && p_sys->i_debug & DECODE_DBG_PACKET) 
+  if (p_sys && p_sys->i_debug & DECODE_DBG_PACKET)
   {
       msg_Dbg( p_dec, "x-start: %d, y-start: %d, width: %d, height %d, "
-	       "spu size: %d, duration: %lu (d:%d p:%d)",
-	       p_sys->i_x_start, p_sys->i_y_start, 
-	       p_sys->i_width, p_sys->i_height, 
-	       p_sys->i_spu_size, (long unsigned int) p_sys->i_duration,
-	       p_sys->i_image_length, p_sys->i_image_offset);
-      
+           "spu size: %d, duration: %lu (d:%d p:%d)",
+           p_sys->i_x_start, p_sys->i_y_start,
+           p_sys->i_width, p_sys->i_height,
+           p_sys->i_spu_size, (long unsigned int) p_sys->i_duration,
+           p_sys->i_image_length, p_sys->i_image_offset);
+ 
       for( i = 0; i < 4; i++ )
       {
           msg_Dbg( p_dec, "palette[%d]= T: %2x, Y: %2x, u: %2x, v: %2x", i,
-		   p_sys->p_palette[i][3], p_sys->p_palette[i][0], 
-		   p_sys->p_palette[i][1], p_sys->p_palette[i][2] );
+           p_sys->p_palette[i][3], p_sys->p_palette[i][0],
+           p_sys->p_palette[i][1], p_sys->p_palette[i][2] );
       }
   }
 }
@@ -498,7 +498,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     }
 
     p_region->fmt.i_aspect = VOUT_ASPECT_FACTOR;
-    
+ 
     p_spu->p_region = p_region;
     p_region->i_x = p_region->i_y = 0;
 
@@ -536,7 +536,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
  interlacing will also be removed.
  *****************************************************************************/
 static void SVCDSubRenderImage( decoder_t *p_dec, block_t *p_data,
-				subpicture_region_t *p_region )
+                subpicture_region_t *p_region )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t *p_dest = p_region->picture.Y_PIXELS;

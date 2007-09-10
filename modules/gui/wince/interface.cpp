@@ -37,9 +37,9 @@
 #include <commctrl.h>
 #include <commdlg.h>
 
-#define NUMIMAGES     9   // Number of buttons in the toolbar           
-#define IMAGEWIDTH    17   // Width of the buttons in the toolbar  
-#define IMAGEHEIGHT   16   // Height of the buttons in the toolbar  
+#define NUMIMAGES     9   // Number of buttons in the toolbar
+#define IMAGEWIDTH    17   // Width of the buttons in the toolbar
+#define IMAGEHEIGHT   16   // Height of the buttons in the toolbar
 #define BUTTONWIDTH   0    // Width of the button images in the toolbar
 #define BUTTONHEIGHT  0    // Height of the button images in the toolbar
 #define ID_TOOLBAR    2000 // Identifier of the main tool bar
@@ -75,7 +75,7 @@
 #define HELP_FAST _T("Play faster")
 
 // The TBBUTTON structure contains information the toolbar buttons.
-static TBBUTTON tbButton[] =      
+static TBBUTTON tbButton[] =
 {
   {0, ID_FILE_QUICKOPEN,        TBSTATE_ENABLED, TBSTYLE_BUTTON},
   {1, ID_FILE_OPENNET,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
@@ -93,7 +93,7 @@ static TBBUTTON tbButton[] =
 };
 
 // Toolbar ToolTips
-TCHAR * szToolTips[] = 
+TCHAR * szToolTips[] =
 {
     HELP_SIMPLE, HELP_NET, HELP_STOP, HELP_PLAY, HELP_PLO, HELP_PLP,
     HELP_PLN, HELP_SLOW, HELP_FAST
@@ -142,10 +142,10 @@ BOOL Interface::InitInstance()
 }
 
 /***********************************************************************
-FUNCTION: 
+FUNCTION:
   CreateMenuBar
 
-PURPOSE: 
+PURPOSE:
   Creates a menu bar.
 ***********************************************************************/
 HWND Interface::CreateMenuBar( HWND hwnd, HINSTANCE hInst )
@@ -241,10 +241,10 @@ HWND Interface::CreateMenuBar( HWND hwnd, HINSTANCE hInst )
 }
 
 /***********************************************************************
-FUNCTION: 
+FUNCTION:
   CreateToolBar
 
-PURPOSE: 
+PURPOSE:
   Registers the TOOLBAR control class and creates a toolbar.
 ***********************************************************************/
 HWND CreateToolBar( HWND hwnd, HINSTANCE hInst )
@@ -269,15 +269,15 @@ HWND CreateToolBar( HWND hwnd, HINSTANCE hInst )
         BUTTONWIDTH, BUTTONHEIGHT, IMAGEWIDTH, IMAGEHEIGHT, sizeof(TBBUTTON) );
 
     if( !hwndTB ) return NULL;
-  
+ 
     // Add ToolTips to the toolbar.
-    SendMessage( hwndTB, TB_SETTOOLTIPS, (WPARAM)NUMIMAGES, 
+    SendMessage( hwndTB, TB_SETTOOLTIPS, (WPARAM)NUMIMAGES,
                  (LPARAM)szToolTips );
 
     // Reposition the toolbar.
     GetClientRect( hwnd, &rect );
     GetWindowRect( hwndTB, &rectTB );
-    MoveWindow( hwndTB, rect.left, rect.bottom - rect.top - 2*MENU_HEIGHT, 
+    MoveWindow( hwndTB, rect.left, rect.bottom - rect.top - 2*MENU_HEIGHT,
                 rect.right - rect.left, MENU_HEIGHT, TRUE );
 
     return hwndTB;
@@ -285,10 +285,10 @@ HWND CreateToolBar( HWND hwnd, HINSTANCE hInst )
 
 /***********************************************************************
 
-FUNCTION: 
+FUNCTION:
   CreateSliderBar
 
-PURPOSE: 
+PURPOSE:
   Registers the TRACKBAR_CLASS control class and creates a trackbar.
 
 ***********************************************************************/
@@ -317,8 +317,8 @@ HWND CreateSliderBar( HWND hwnd, HINSTANCE hInst )
 
     // Reposition the trackbar
     GetClientRect( hwnd, &rect );
-    MoveWindow( hwndSlider, rect.left, 
-                rect.bottom - rect.top - 2*(MENU_HEIGHT-1) - SLIDER_HEIGHT, 
+    MoveWindow( hwndSlider, rect.left,
+                rect.bottom - rect.top - 2*(MENU_HEIGHT-1) - SLIDER_HEIGHT,
                 rect.right - rect.left - 40, 30, TRUE );
 
     ShowWindow( hwndSlider, SW_HIDE );
@@ -350,10 +350,10 @@ HWND CreateStaticText( HWND hwnd, HINSTANCE hInst )
 
 /***********************************************************************
 
-FUNCTION: 
+FUNCTION:
   CreateVolTrackBar
 
-PURPOSE: 
+PURPOSE:
   Registers the TRACKBAR_CLASS control class and creates a trackbar.
 
 ***********************************************************************/
@@ -379,12 +379,12 @@ HWND CreateVolTrackBar( HWND hwnd, HINSTANCE hInst )
     SendMessage( hwndVol, TBM_SETRANGEMIN, 1, 0 );
     SendMessage( hwndVol, TBM_SETRANGEMAX, 1, 200 );
     SendMessage( hwndVol, TBM_SETPOS, 1, 100 );
-    SendMessage( hwndVol, TBM_SETTICFREQ, 50, 0 );  
+    SendMessage( hwndVol, TBM_SETTICFREQ, 50, 0 );
 
     // Reposition the trackbar
     GetClientRect( hwnd, &rect );
-    MoveWindow( hwndVol, rect.right - rect.left - 40, 
-                rect.bottom - rect.top - 2*(MENU_HEIGHT-1) - SLIDER_HEIGHT, 
+    MoveWindow( hwndVol, rect.right - rect.left - 40,
+                rect.bottom - rect.top - 2*(MENU_HEIGHT-1) - SLIDER_HEIGHT,
                 40, SLIDER_HEIGHT, TRUE );
 
     ShowWindow( hwndVol, SW_HIDE );
@@ -394,10 +394,10 @@ HWND CreateVolTrackBar( HWND hwnd, HINSTANCE hInst )
 
 /***********************************************************************
 
-FUNCTION: 
+FUNCTION:
   CreateStatusBar
 
-PURPOSE: 
+PURPOSE:
   Registers the StatusBar control class and creates a Statusbar.
 
 ***********************************************************************/
@@ -424,7 +424,7 @@ HWND CreateStatusBar( HWND hwnd, HINSTANCE hInst )
 
     if (!hwndSB ) return NULL;
 
-    // Get the coordinates of the parent window's client area. 
+    // Get the coordinates of the parent window's client area.
     GetClientRect( hwnd, &rect );
 
     // allocate memory for the panes of status bar
@@ -442,10 +442,10 @@ HWND CreateStatusBar( HWND hwnd, HINSTANCE hInst )
 }
 
 /***********************************************************************
-FUNCTION: 
+FUNCTION:
   WndProc
 
-PURPOSE: 
+PURPOSE:
   Processes messages sent to the main window.
 ***********************************************************************/
 LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
@@ -472,8 +472,8 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
     case WM_COMMAND:
         switch( GET_WM_COMMAND_ID(wp,lp) )
         {
-        case ID_FILE_QUICKOPEN: 
-        case ID_FILE_OPENFILE: 
+        case ID_FILE_QUICKOPEN:
+        case ID_FILE_OPENFILE:
         case ID_FILE_OPENDIR:
         case ID_FILE_OPENNET:
         case ID_VIEW_STREAMINFO:
@@ -490,7 +490,7 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         case SlowStream_Event: OnSlowStream(); break;
         case FastStream_Event: OnFastStream(); break;
 
-        case ID_FILE_ABOUT: 
+        case ID_FILE_ABOUT:
         {
             string about = (string)"VLC media player " PACKAGE_VERSION +
                 _("\n(WinCE interface)\n\n") +
@@ -516,20 +516,20 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             // we should test if it is a menu command
         }
         break;
-  
+ 
     case WM_TIMER:
         timer->Notify();
         break;
 
-    case WM_CTLCOLORSTATIC: 
+    case WM_CTLCOLORSTATIC:
         if( ( (HWND)lp == hwndSlider ) || ( (HWND)lp == hwndVol ) )
-        { 
-            return( (LRESULT)::GetSysColorBrush(COLOR_3DFACE) ); 
+        {
+            return( (LRESULT)::GetSysColorBrush(COLOR_3DFACE) );
         }
         if( (HWND)lp == hwndLabel )
         {
-            SetBkColor( (HDC)wp, RGB (192, 192, 192) ); 
-            return( (LRESULT)::GetSysColorBrush(COLOR_3DFACE) ); 
+            SetBkColor( (HDC)wp, RGB (192, 192, 192) );
+            return( (LRESULT)::GetSysColorBrush(COLOR_3DFACE) );
         }
         break;
 
@@ -560,7 +560,7 @@ LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         break;
 
     case WM_SETFOCUS:
-        SHSipPreference( hwnd, SIP_DOWN ); 
+        SHSipPreference( hwnd, SIP_DOWN );
         SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
     case WM_EXITMENULOOP:
         if( video && video->hWnd )
@@ -729,7 +729,7 @@ void Interface::OnSliderUpdate( int wp )
     vlc_mutex_lock( &p_intf->change_lock );
     input_thread_t *p_input = p_intf->p_sys->p_input;
 
-    int dwPos = SendMessage( hwndSlider, TBM_GETPOS, 0, 0 ); 
+    int dwPos = SendMessage( hwndSlider, TBM_GETPOS, 0, 0 );
 
     if( (int)LOWORD(wp) == SB_THUMBPOSITION ||
         (int)LOWORD(wp) == SB_ENDSCROLL )

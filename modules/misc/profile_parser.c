@@ -55,7 +55,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_xml ) return VLC_EGENERIC;
     p_reader = xml_ReaderCreate( p_xml, p_stream );
 
-    if( xml_ReaderRead( p_reader ) != 1 || 
+    if( xml_ReaderRead( p_reader ) != 1 ||
         xml_ReaderNodeType( p_reader ) != XML_READER_STARTELEM )
     {
         msg_Err( p_this, "invalid file (invalid root)" );

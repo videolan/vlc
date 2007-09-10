@@ -247,7 +247,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             p_sys->pp_last = &p_sys->p_frame;
             p_sys->b_frame_slice = VLC_FALSE;
         }
-//        p_sys->i_interpolated_dts = 
+//        p_sys->i_interpolated_dts =
 //        p_sys->i_last_ref_pts = 0;
 
         block_Release( *pp_block );

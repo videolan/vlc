@@ -59,7 +59,7 @@ static void Run     ( intf_thread_t * );
 static int TrackChange( vlc_object_t *p_this, const char *psz_var,
                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
-static int GetInputMeta ( input_item_t *p_input, 
+static int GetInputMeta ( input_item_t *p_input,
                     DBusMessageIter *args);
 
 struct intf_sys_t
@@ -96,7 +96,7 @@ DBUS_METHOD( PlaylistExport_XSPF )
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    DBusError error; 
+    DBusError error;
     dbus_error_init( &error );
 
     char *psz_file;
@@ -438,7 +438,7 @@ DBUS_METHOD( GetMetadata )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    while ( i_count < i_position ) 
+    while ( i_count < i_position )
     {
         i_count++;
         TEST_NEXT;
@@ -459,7 +459,7 @@ DBUS_METHOD( GetLength )
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
     playlist_item_t* p_last_item = playlist_GetLastLeaf( p_playlist,
-                    p_playlist->p_root_onelevel ); 
+                    p_playlist->p_root_onelevel );
 
     while ( p_tested_item->p_input->i_id != p_last_item->p_input->i_id )
     {
@@ -496,13 +496,13 @@ DBUS_METHOD( DelTrack )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    while ( i_count < i_position ) 
+    while ( i_count < i_position )
     {
         i_count++;
         TEST_NEXT;
     }
 
-    PL_LOCK; 
+    PL_LOCK;
     playlist_DeleteFromInput( p_playlist,
         p_tested_item->p_input->i_id,
         VLC_TRUE );
@@ -585,12 +585,12 @@ DBUS_METHOD( Random )
     dbus_bool_t b_random;
     vlc_value_t val;
     playlist_t* p_playlist = NULL;
-    
+ 
     dbus_error_init( &error );
     dbus_message_get_args( p_from, &error,
             DBUS_TYPE_BOOLEAN, &b_random,
             DBUS_TYPE_INVALID );
-    
+ 
     if( dbus_error_is_set( &error ) )
     {
         msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
@@ -600,7 +600,7 @@ DBUS_METHOD( Random )
     }
 
     val.b_bool = ( b_random == TRUE ) ? VLC_TRUE : VLC_FALSE ;
-    
+ 
     p_playlist = pl_Yield( (vlc_object_t*) p_this );
     var_Set ( p_playlist, "random", val );
     pl_Release( ((vlc_object_t*) p_this) );
@@ -879,7 +879,7 @@ static int GetInputMeta( input_item_t* p_input,
      * instead of milliseconds */
     dbus_int64_t i_length = ( input_item_GetDuration( p_input ) / 1000 );
 
-    const char* ppsz_meta_items[] = 
+    const char* ppsz_meta_items[] =
     {
     "title", "artist", "genre", "copyright", "album", "tracknum",
     "description", "rating", "date", "setting", "url", "language",

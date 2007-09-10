@@ -39,15 +39,15 @@ void eval_per_frame_eqn(per_frame_eqn_t * per_frame_eqn) {
   if (per_frame_eqn == NULL)
     return;
 
-     if (PER_FRAME_EQN_DEBUG) { 
-		 printf("per_frame_%d=%s= ", per_frame_eqn->index, per_frame_eqn->param->name);
-		 fflush(stdout);
-	 }
-	 
+     if (PER_FRAME_EQN_DEBUG) {
+         printf("per_frame_%d=%s= ", per_frame_eqn->index, per_frame_eqn->param->name);
+         fflush(stdout);
+     }
+    
     //*((double*)per_frame_eqn->param->engine_val) = eval_gen_expr(per_frame_eqn->gen_expr);
-	set_param(per_frame_eqn->param, eval_gen_expr(per_frame_eqn->gen_expr));
-     if (PER_FRAME_EQN_DEBUG) printf(" = %.4f\n", *((double*)per_frame_eqn->param->engine_val)); 
-		 
+    set_param(per_frame_eqn->param, eval_gen_expr(per_frame_eqn->gen_expr));
+     if (PER_FRAME_EQN_DEBUG) printf(" = %.4f\n", *((double*)per_frame_eqn->param->engine_val));
+        
 }
 
 /*
@@ -58,25 +58,25 @@ void eval_per_frame_init_eqn(per_frame_eqn_t * per_frame_eqn) {
    if (per_frame_eqn == NULL)
      return;
 
-     if (PER_FRAME_EQN_DEBUG) { 
-		 printf("per_frame_init: %s = ", per_frame_eqn->param->name);
-		 fflush(stdout);
-	 }
-	 		
-	
+     if (PER_FRAME_EQN_DEBUG) {
+         printf("per_frame_init: %s = ", per_frame_eqn->param->name);
+         fflush(stdout);
+     }
+             
+    
     val = *((double*)per_frame_eqn->param->engine_val) = eval_gen_expr(per_frame_eqn->gen_expr);
-    if (PER_FRAME_EQN_DEBUG) printf(" = %f\n", *((double*)per_frame_eqn->param->engine_val)); 
-     
-	if (per_frame_eqn->param->flags & P_FLAG_QVAR) {
-		
-		per_frame_eqn->param->init_val.double_val = val;
-		if ((init_cond = new_init_cond(per_frame_eqn->param)) == NULL)
-			return;
-		
-		if ((list_append(init_cond_list, init_cond)) < 0) {
-			free_init_cond(init_cond);
-			return;
-		}
+    if (PER_FRAME_EQN_DEBUG) printf(" = %f\n", *((double*)per_frame_eqn->param->engine_val));
+ 
+    if (per_frame_eqn->param->flags & P_FLAG_QVAR) {
+        
+        per_frame_eqn->param->init_val.double_val = val;
+        if ((init_cond = new_init_cond(per_frame_eqn->param)) == NULL)
+            return;
+        
+        if ((list_append(init_cond_list, init_cond)) < 0) {
+            free_init_cond(init_cond);
+            return;
+        }
     }
 }
 */
@@ -84,9 +84,9 @@ void eval_per_frame_init_eqn(per_frame_eqn_t * per_frame_eqn) {
 /* Frees perframe equation structure */
 void free_per_frame_eqn(per_frame_eqn_t * per_frame_eqn) {
 
-	if (per_frame_eqn == NULL)
-	  return;
-	
+    if (per_frame_eqn == NULL)
+      return;
+    
   free_gen_expr(per_frame_eqn->gen_expr);
   free(per_frame_eqn);
 }

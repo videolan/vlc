@@ -110,7 +110,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = NULL;
     uint32_t i_accel = 0;
-    FILE *f_wd_dec; 
+    FILE *f_wd_dec;
 
     msg_Dbg(p_dec, "OpenDecoder Entering");
     mtrace();
@@ -695,7 +695,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
     {
 //         fprintf(p_sys->f_wd_nb, "%d\n", mdate());
         fprintf(p_sys->f_wd_nb, "%s\n", mdate());
-	fflush(p_sys->f_wd_nb);	
+    fflush(p_sys->f_wd_nb);    
     }
 #endif
     p_pic = p_dec->pf_vout_buffer_new( p_dec );

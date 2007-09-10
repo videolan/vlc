@@ -81,7 +81,7 @@ private:
     QString              input_name;
     QVBoxLayout         *mainLayout;
     ControlsWidget      *controls;
-    QMenu				*speedControlMenu;
+    QMenu                *speedControlMenu;
     SpeedControlWidget  *speedControl;
 
     bool                 need_components_update;
@@ -117,7 +117,7 @@ private:
     QLabel              *timeLabel;
     QLabel              *speedLabel;
     QLabel              *nameLabel;
-    
+ 
     bool                 b_remainingTime;
 
     void customEvent( QEvent *);

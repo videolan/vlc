@@ -50,33 +50,33 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   PLPanel( _parent, _p_intf )
 {
     model = new PLModel( p_playlist, p_intf, p_root, -1, this );
-    
+ 
     /* Create and configure the QTreeView */
     view = new QVLCTreeView( 0 );
     view->setModel(model);
     view->setIconSize( QSize(20,20) );
     view->setAlternatingRowColors( true );
-    view->setAnimated( true ); 
-    view->setSortingEnabled( true );	
+    view->setAnimated( true );
+    view->setSortingEnabled( true );    
     view->setSelectionMode( QAbstractItemView::ExtendedSelection );
     view->setDragEnabled( true );
     view->setAcceptDrops( true );
     view->setDropIndicatorShown( true );
     view->setAutoScroll( true );
-    
+ 
     view->header()->resizeSection( 0, 230 );
     view->header()->resizeSection( 1, 170 );
     view->header()->setSortIndicatorShown( true );
     view->header()->setClickable( true );
-	view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
-        
+    view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
+ 
     CONNECT( view, activated( const QModelIndex& ) ,
              model,activateItem( const QModelIndex& ) );
     CONNECT( view, rightClicked( QModelIndex , QPoint ),
              this, doPopup( QModelIndex, QPoint ) );
     CONNECT( model, dataChanged( const QModelIndex&, const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
-	CONNECT( view->header(), customContextMenuRequested( const QPoint & ),
+    CONNECT( view->header(), customContextMenuRequested( const QPoint & ),
              this, popupSelectColumn( QPoint ) );
 
     currentRootId = -1;
@@ -87,23 +87,23 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     /* Buttons configuration */
     QHBoxLayout *buttons = new QHBoxLayout();
-    
+ 
     addButton = new QPushButton( QIcon( ":/pixmaps/vlc_playlist_add.png" ), "", this );
     addButton->setMaximumWidth( 25 );
     BUTTONACT( addButton, popupAdd() );
     buttons->addWidget( addButton );
 
-    repeatButton = new QPushButton( this ); 
+    repeatButton = new QPushButton( this );
     if( model->hasRepeat() ) repeatButton->setIcon(
                         QIcon( ":/pixmaps/vlc_playlist_repeat_one.png" ) );
-    else if( model->hasLoop() ) repeatButton->setIcon( 
+    else if( model->hasLoop() ) repeatButton->setIcon(
                         QIcon( ":/pixmaps/vlc_playlist_repeat_all.png" ) );
     else repeatButton->setIcon(
                         QIcon( ":/pixmaps/vlc_playlist_repeat_off.png" ) );
     BUTTONACT( repeatButton, toggleRepeat() );
     buttons->addWidget( repeatButton );
 
-    randomButton = new QPushButton( this ); 
+    randomButton = new QPushButton( this );
     randomButton->setIcon( model->hasRandom() ?
                             QIcon( ":/pixmaps/vlc_playlist_shuffle_on.png" ) :
                             QIcon( ":/pixmaps/vlc_playlist_shuffle_off.png" ) );
@@ -213,7 +213,7 @@ void StandardPLPanel::popupAdd()
 }
 
 void StandardPLPanel::popupSelectColumn( QPoint )
-{     
+{
     ContextUpdateMapper = new QSignalMapper(this);
 
     QMenu selectColMenu;
@@ -237,7 +237,7 @@ void StandardPLPanel::popupSelectColumn( QPoint )
     ADD_META_ACTION( DESCRIPTION );
 
 #undef ADD_META_ACTION
-    
+ 
     selectColMenu.exec( QCursor::pos() );
  }
 

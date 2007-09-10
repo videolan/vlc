@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -26,7 +26,7 @@
 #import "interaction.h"
 
 /* for the icons in our custom error panel */
-#import <ApplicationServices/ApplicationServices.h> 
+#import <ApplicationServices/ApplicationServices.h>
 
 /*****************************************************************************
  * VLCInteractionList implementation
@@ -78,7 +78,7 @@
 -(void)addInteraction: (interaction_dialog_t *)p_dialog
 {
     VLCInteraction *o_interaction = [[VLCInteraction alloc] initDialog: p_dialog];
-    
+ 
     p_dialog->p_private = (void *)o_interaction;
     [o_interaction_list addObject:[o_interaction autorelease]];
     [o_interaction runDialog];
@@ -97,9 +97,9 @@
 #if GC_ENABLED
 -(void)finalize
 {
-	/* dealloc doesn't get called on 10.5 if GC is enabled, so we need to provide the basic functionality here */
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[o_interaction_list removeAllObjects];
+    /* dealloc doesn't get called on 10.5 if GC is enabled, so we need to provide the basic functionality here */
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [o_interaction_list removeAllObjects];
     [super finalize];
 }
 #endif
@@ -181,28 +181,28 @@
     if( p_dialog->i_flags & DIALOG_BLOCKING_ERROR )
     {
         msg_Dbg( p_intf, "error panel requested" );
-        NSBeginInformationalAlertSheet( o_title, _NS("OK"), nil, nil, 
-            o_window, self, @selector(sheetDidEnd: returnCode: contextInfo:), 
+        NSBeginInformationalAlertSheet( o_title, _NS("OK"), nil, nil,
+            o_window, self, @selector(sheetDidEnd: returnCode: contextInfo:),
             NULL, nil, o_description );
     }
     else if( p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
         msg_Dbg( p_intf, "addition to non-blocking error panel received" );
-        [[[[VLCMain sharedInstance] getInteractionList] getErrorPanel] 
+        [[[[VLCMain sharedInstance] getInteractionList] getErrorPanel]
         addError: o_title withMsg: o_description];
     }
     else if( p_dialog->i_flags & DIALOG_WARNING )
     {
         msg_Dbg( p_intf, "addition to non-blocking warning panel received" );
-        [[[[VLCMain sharedInstance] getInteractionList] getErrorPanel] 
+        [[[[VLCMain sharedInstance] getInteractionList] getErrorPanel]
             addWarning: o_title withMsg: o_description];
     }
     else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
         msg_Dbg( p_intf, "yes-no-cancel-dialog requested" );
-        NSBeginInformationalAlertSheet( o_title, o_defaultButton, 
+        NSBeginInformationalAlertSheet( o_title, o_defaultButton,
             o_alternateButton, o_otherButton, o_window, self,
-            @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, 
+            @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil,
             o_description );
     }
     else if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
@@ -414,7 +414,7 @@
     errorIcon = [[NSImage alloc] initWithSize:NSMakeSize(32,32)];
     [errorIcon lockFocus];
     CGRect rect = CGRectMake(0,0,32,32);
-    PlotIconRefInContext((CGContextRef)[[NSGraphicsContext currentContext] 
+    PlotIconRefInContext((CGContextRef)[[NSGraphicsContext currentContext]
         graphicsPort],
         &rect,
         kAlignNone,
@@ -429,7 +429,7 @@
     returnValue = GetIconRef(kOnSystemDisk, 'macs', 'caut', &ourIconRef);
     warnIcon = [[NSImage alloc] initWithSize:NSMakeSize(32,32)];
     [warnIcon lockFocus];
-    PlotIconRefInContext((CGContextRef)[[NSGraphicsContext currentContext] 
+    PlotIconRefInContext((CGContextRef)[[NSGraphicsContext currentContext]
         graphicsPort],
         &rect,
         kAlignNone,
@@ -438,7 +438,7 @@
         kPlotIconRefNormalFlags,
         (IconRef)ourIconRef);
     [warnIcon unlockFocus];
-    returnValue = ReleaseIconRef(ourIconRef);    
+    returnValue = ReleaseIconRef(ourIconRef);
 
     return self;
 }
@@ -463,11 +463,11 @@
     NSMutableAttributedString * ourError;
     ourError = [[NSMutableAttributedString alloc] initWithString:
         [NSString stringWithFormat:@"%@\n%@", o_error, o_msg]
-        attributes: 
+        attributes:
         [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize:11] forKey: NSFontAttributeName]];
-    [ourError 
+    [ourError
         addAttribute: NSFontAttributeName
-        value: [NSFont boldSystemFontOfSize:11] 
+        value: [NSFont boldSystemFontOfSize:11]
         range: NSMakeRange( 0, [o_error length])];
     [o_errors addObject: ourError];
     [ourError release];
@@ -484,17 +484,17 @@
     NSMutableAttributedString * ourWarning;
     ourWarning = [[NSMutableAttributedString alloc] initWithString:
         [NSString stringWithFormat:@"%@\n%@", o_warning, o_msg]
-        attributes: 
+        attributes:
         [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize:11] forKey: NSFontAttributeName]];
-    [ourWarning 
+    [ourWarning
         addAttribute: NSFontAttributeName
-        value: [NSFont boldSystemFontOfSize:11] 
+        value: [NSFont boldSystemFontOfSize:11]
         range: NSMakeRange( 0, [o_warning length])];
     [o_errors addObject: ourWarning];
     [ourWarning release];
 
     [o_icons addObject: warnIcon];
-    
+ 
     [o_error_table reloadData];
 
     [self showPanel];

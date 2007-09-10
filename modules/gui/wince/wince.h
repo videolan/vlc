@@ -44,7 +44,7 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
-using namespace std; 
+using namespace std;
 
 class CBaseWindow;
 class MenuItemExt;
@@ -203,7 +203,7 @@ public:
 protected:
 
     HWND hwnd_fileinfo;                 // handle to fileinfo window
-    HWND hwndTV;                                // handle to tree-view control 
+    HWND hwndTV;                                // handle to tree-view control
 
     TCHAR szFileInfoClassName[100];     // Main window class name
     TCHAR szFileInfoTitle[100];         // Main window name
@@ -432,7 +432,7 @@ public:
     /* Constructor */
     Timer( intf_thread_t *p_intf, HWND hwnd, Interface *_p_main_interface );
     virtual ~Timer();
-    void Notify( void ); 
+    void Notify( void );
 
 private:
     intf_thread_t *p_intf;
@@ -452,7 +452,7 @@ void RefreshMenu( intf_thread_t *, vector<MenuItemExt*> *, HMENU, int,
 int wce_GetMenuItemCount( HMENU );
 void CreateMenuItem( intf_thread_t *, vector<MenuItemExt*> *, HMENU, char *,
                      vlc_object_t *, int * );
-HMENU CreateChoicesMenu( intf_thread_t *, vector<MenuItemExt*> *, char *, 
+HMENU CreateChoicesMenu( intf_thread_t *, vector<MenuItemExt*> *, char *,
                          vlc_object_t *, int * );
 void OnMenuEvent( intf_thread_t *, int );
 

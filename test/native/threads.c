@@ -13,7 +13,7 @@ PyObject *threadvar_test( PyObject *self, PyObject *args )
     vlc_threadvar_create( NULL, &key2 );
     vlc_threadvar_set( &key2, NULL );
     ASSERT( vlc_threadvar_get( &key2 ) == NULL, "key2 does not match" );
-    
+ 
     Py_INCREF( Py_None );
     return Py_None;
 }

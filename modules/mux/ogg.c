@@ -165,7 +165,7 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
 }
 
 /*****************************************************************************
- * Definitions of structures and functions used by this plugins 
+ * Definitions of structures and functions used by this plugins
  *****************************************************************************/
 typedef struct
 {
@@ -981,7 +981,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     if( p_stream->i_cat == SPU_ES ||
         p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) )
     {
-        /* Subtitles or Speex packets are quite small so they 
+        /* Subtitles or Speex packets are quite small so they
          * need to be flushed to be sent on time */
         p_og = OggStreamFlush( p_mux, &p_stream->os, p_data->i_dts );
     }

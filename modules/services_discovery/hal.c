@@ -312,7 +312,7 @@ static void DelItem( services_discovery_t *p_sd, char* psz_udi )
                 }
                 /* delete parent item */
 
-                /* HACK: if i_children == 0 the item won't be deleted 
+                /* HACK: if i_children == 0 the item won't be deleted
                  * That means that it _had_ children but they were deleted */
                 if( p_pl_item->i_children == 0 )
                     p_pl_item->i_children = -1;

@@ -774,7 +774,7 @@ void ConfigWidget::Apply( bool doIt )
                 fAltCheck->SetValue( val.i_int & KEY_MODIFIER_ALT );
                 fCtrlCheck->SetValue( val.i_int & KEY_MODIFIER_CTRL );
                 fShiftCheck->SetValue( val.i_int & KEY_MODIFIER_SHIFT );
-        
+ 
                 for( unsigned i = 0;
                      i < sizeof( vlc_keys ) / sizeof( key_descriptor_t ); i++ )
                 {

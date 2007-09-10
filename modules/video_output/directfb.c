@@ -6,7 +6,7 @@
  * Authors: Iuri Diniz <iuri@digizap.com.br>
  *
  * This code is based in sdl.c and fb.c, thanks for VideoLAN team.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -71,7 +71,7 @@ vlc_module_begin();
 vlc_module_end();
 
 
-static int Create( vlc_object_t *p_this ) 
+static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t *p_sys = NULL;
@@ -128,7 +128,7 @@ static int Init( vout_thread_t *p_vout )
 
     switch( p_sys->p_pixel_format )
     {
-        case DSPF_RGB332: 
+        case DSPF_RGB332:
             /* 8 bit RGB (1 byte, red 3@5, green 3@2, blue 2@0) */
             /* i_pixel_pitch = 1; */
             i_rlength = 3;

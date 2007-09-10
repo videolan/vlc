@@ -815,10 +815,10 @@ static int ASF_ReadObject_language_list(stream_t *s, asf_object_t *p_obj)
     }
 
 #ifdef ASF_DEBUG
-    msg_Dbg( s, "read \"language list object\" %d entries", 
+    msg_Dbg( s, "read \"language list object\" %d entries",
              p_ll->i_language );
     for( i = 0; i < p_ll->i_language; i++ )
-        msg_Dbg( s, "  - '%s'", 
+        msg_Dbg( s, "  - '%s'",
                  p_ll->ppsz_language[i] );
 #endif
     return VLC_SUCCESS;
@@ -866,7 +866,7 @@ static int ASF_ReadObject_stream_bitrate_properties( stream_t *s,
     {
         msg_Dbg( s,"  - stream=%d bitrate=%d",
                  p_sb->bitrate[i].i_stream_number,
-                 p_sb->bitrate[i].i_avg_bitrate ); 
+                 p_sb->bitrate[i].i_avg_bitrate );
     }
 #endif
     return VLC_SUCCESS;
@@ -945,7 +945,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
         asf_object_t *p_sp;
         /* Cannot fail as peek succeed */
         stream_Read( s, NULL, p_data - p_peek );
-        
+ 
         p_sp = malloc( sizeof( asf_object_t ) );
 
         if( ASF_ReadObject( s, p_sp, NULL ) )
@@ -1025,7 +1025,7 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
         p_ae->pi_stream_number[i] = GetWLE( p_data );
         p_data += 2;
     }
-        
+ 
 #ifdef ASF_DEBUG
     msg_Dbg( s, "read \"advanced mutual exclusion object\"" );
     for( i = 0; i < p_ae->i_stream_number_count; i++ )
@@ -1165,7 +1165,7 @@ static int ASF_ReadObject_extended_content_description( stream_t *s,
             p_ec->ppsz_value[i] = NULL;
 
         p_data += i_size;
-        
+ 
 
 
 #undef GETSTRINGW

@@ -411,7 +411,7 @@ static void SyslogPrint( const msg_item_t *p_msg )
                 p_msg->psz_module, p_msg->psz_msg );
     else
         syslog( i_priority, "%s: %s", p_msg->psz_module, p_msg->psz_msg );
-        
+ 
 }
 #endif
 

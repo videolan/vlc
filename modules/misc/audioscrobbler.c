@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* audioscrobbler protocol version: 1.1 
+/* audioscrobbler protocol version: 1.1
  * http://audioscrobbler.net/wiki/Protocol1.1
  * */
 
@@ -330,7 +330,7 @@ static void Main( intf_thread_t *p_this )
     /* main loop */
     while( !p_this->b_die )
     {
-        /* verify if there is data to submit 
+        /* verify if there is data to submit
          * and if waiting interval is elapsed */
         if ( ( p_sys->p_first_queue->i_songs_nb > 0 ) &&
             ( time( NULL ) >= p_sys->time_next_exchange ) )
@@ -377,7 +377,7 @@ static void Main( intf_thread_t *p_this )
                         vlc_mutex_unlock ( &p_sys->lock );
                         break;
                 }
-                /* handshake is done or failed, lets start from 
+                /* handshake is done or failed, lets start from
                  * beginning to check it out and wait INTERVAL if needed
                  */
                 continue;
@@ -759,7 +759,7 @@ static int Handshake( intf_thread_t *p_this )
     stream_t            *p_stream;
     char                *psz_handshake_url      = NULL;
     uint8_t             *p_buffer               = NULL;
-    char                *p_buffer_pos           = NULL; 
+    char                *p_buffer_pos           = NULL;
     char                *psz_url_parser         = NULL;
     char                *psz_buffer_substring;
     int                 i_url_pos, i;
@@ -1125,8 +1125,8 @@ static int ReadMetaData( intf_thread_t *p_this )
 
         msg_Dbg( p_this, "Meta data registered, waiting to be queued" );
     }
-   
-    FREE_INPUT_AND_CHARS 
+ 
+    FREE_INPUT_AND_CHARS
     return VLC_SUCCESS;
 #undef FREE_INPUT_AND_CHARS
 #undef ALLOC_ITEM_META

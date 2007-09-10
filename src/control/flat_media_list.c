@@ -108,7 +108,7 @@ remove_media_list( libvlc_media_list_t * p_mlist,
                    libvlc_media_list_t * p_submlist )
 {
     trace("\n");
-    int count = libvlc_media_list_count( p_submlist, NULL );    
+    int count = libvlc_media_list_count( p_submlist, NULL );
     int i;
     uninstall_media_list_observer( p_mlist, p_submlist );
 
@@ -122,7 +122,7 @@ remove_media_list( libvlc_media_list_t * p_mlist,
 
 
 /**************************************************************************
- *       add_item (private) 
+ *       add_item (private)
  **************************************************************************/
 static void
 add_item( libvlc_media_list_t * p_mlist, libvlc_media_descriptor_t * p_md )
@@ -147,13 +147,13 @@ add_item( libvlc_media_list_t * p_mlist, libvlc_media_descriptor_t * p_md )
                                                     p_md, NULL );
             install_flat_mlist_observer( p_mlist );
             libvlc_media_list_unlock( p_mlist->p_flat_mlist );
-       
+ 
         }
     }
 }
 
 /**************************************************************************
- *       remove_item (private) 
+ *       remove_item (private)
  **************************************************************************/
 static void
 remove_item( libvlc_media_list_t * p_mlist, libvlc_media_descriptor_t * p_md )
@@ -246,8 +246,8 @@ remove_item_in_submlist_rec( libvlc_media_list_t * p_mlist,
                              libvlc_media_list_t * p_submlist,
                              libvlc_media_descriptor_t * p_md )
 {
-    libvlc_media_descriptor_t * p_md_insub;    
-    int count = libvlc_media_list_count( p_submlist, NULL );    
+    libvlc_media_descriptor_t * p_md_insub;
+    int count = libvlc_media_list_count( p_submlist, NULL );
     int i;
     trace("p_md '%s'\n", p_md->p_input_item->psz_name);
 
@@ -296,7 +296,7 @@ flat_mlist_item_added( const libvlc_event_t * p_event, void * p_user_data )
                         subitems_created, p_mlist, NULL );
 
     /* Add in our root */
-    uninstall_media_list_observer( p_mlist, p_mlist );    
+    uninstall_media_list_observer( p_mlist, p_mlist );
     libvlc_media_list_add_media_descriptor( p_mlist, p_md, NULL );
     install_media_list_observer( p_mlist, p_mlist );
 }

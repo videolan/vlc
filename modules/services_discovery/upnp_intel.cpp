@@ -465,11 +465,11 @@ static int Callback( Upnp_EventType eventType, void* event, void* pCookie )
     case UPNP_EVENT_SUBSCRIBE_COMPLETE:
         msg_Warn( cookie->serviceDiscovery, "subscription complete" );
         break;
-        
+ 
     case UPNP_DISCOVERY_SEARCH_TIMEOUT:
         msg_Warn( cookie->serviceDiscovery, "search timeout" );
         break;
-        
+ 
     default:
     msg_Dbg( cookie->serviceDiscovery, "%s:%d: DEBUG: UNHANDLED EVENT ( TYPE=%d )", __FILE__, __LINE__, eventType );
     break;

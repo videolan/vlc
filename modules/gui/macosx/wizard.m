@@ -164,7 +164,7 @@ static VLCWizard *_o_sharedInstance = nil;
     o_videoCodecs = [[NSArray alloc] initWithObjects: o_mp1v, o_mp2v, o_mp4v, \
         o_div1, o_div2, o_div3, o_h263, o_h264, o_wmv1, o_wmv2, o_mjpg, o_theo, \
         o_dummyVid, nil];
-    
+ 
 
     NSArray * o_mpga;
     NSArray * o_mp3;
@@ -187,7 +187,7 @@ static VLCWizard *_o_sharedInstance = nil;
     o_mp4a = [NSArray arrayWithObjects: @"MPEG 4 Audio", @"mp4a", \
         _NS("Audio format for MPEG4 (useable with MPEG TS and MPEG4)"), @"MUX_TS", \
         @"MUX_MP4", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", @"-1", nil];
-    o_a52 = [NSArray arrayWithObjects: @"A/52", @"a52", 
+    o_a52 = [NSArray arrayWithObjects: @"A/52", @"a52",
         _NS("DVD audio format (useable with MPEG PS, MPEG TS, MPEG1, ASF, OGG " \
         "and RAW)"), @"MUX_PS", @"MUX_TS", @"MUX_MPEG", @"MUX_ASF", @"MUX_OGG", \
         @"MUX_RAW", @"-1", @"-1", @"-1", nil];
@@ -312,10 +312,10 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_btn_forward setTitle: _NS("Next")];
     [o_tab_pageHolder selectFirstTabViewItem:self];
 
-    
+ 
     if( b_keepSettingsOrNot )
         return;
-    
+ 
     /* reset the wizard-window to its default values if wanted */
     [o_t1_matrix_strmgOrTrnscd selectCellAtRow:0 column:0];
     [[o_t1_matrix_strmgOrTrnscd cellAtRow:1 column:0] setState: NSOffState];
@@ -504,7 +504,7 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_t2_ckb_enblPartExtrct setState: NSOnState];
     [self t2_enableExtract: nil];
     msg_Dbg(VLCIntf, "wizard interface is set");
-    
+ 
     [o_wizard_window center];
     [o_wizard_window display];
     [o_wizard_window makeKeyAndOrderFront:nil];
@@ -591,8 +591,8 @@ static VLCWizard *_o_sharedInstance = nil;
                 while( x != y )
                 {
                     playlist_item_t *p_item =
-                        [[o_t2_tbl_plst itemAtRow: 
-                            [[o_t2_tbl_plst selectedRowIndexes] 
+                        [[o_t2_tbl_plst itemAtRow:
+                            [[o_t2_tbl_plst selectedRowIndexes]
                             indexGreaterThanOrEqualToIndex: x]] pointerValue];
 
                     if( p_item->i_children <= 0 )
@@ -647,7 +647,7 @@ static VLCWizard *_o_sharedInstance = nil;
     {
         /* rebuild the menues for the codec-selections */
         [self rebuildCodecMenus];
-        
+ 
         /* check which streaming method is selected and store it */
         int mode;
         mode = [[o_t3_matrix_stmgMhd selectedCell] tag];
@@ -660,12 +660,12 @@ static VLCWizard *_o_sharedInstance = nil;
              * OGG, RAW or ASF */
             [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, integer"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, floating point"];
-            
+ 
         } else if ( mode == 1 )
         {
             /* MMS Streaming */
             [o_userSelections setObject:@"1" forKey:@"stmgMhd"];
-            
+ 
             /* disable all codecs which don't support ASF / ASFH */
             [o_t4_pop_audioCodec removeItemWithTitle:@"MPEG 4 Audio"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Vorbis"];
@@ -673,7 +673,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_t4_pop_audioCodec removeItemWithTitle:@"Speex"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, integer"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Uncompressed, floating point"];
-            
+ 
             [o_t4_pop_videoCodec removeItemWithTitle:@"MPEG-1 Video"];
             [o_t4_pop_videoCodec removeItemWithTitle:@"MPEG-2 Video"];
             [o_t4_pop_videoCodec removeItemWithTitle:@"H.263"];
@@ -684,7 +684,7 @@ static VLCWizard *_o_sharedInstance = nil;
             /* RTP/UDP Unicast/Multicast Streaming */
             [o_userSelections setObject: [[NSNumber numberWithInt: mode] \
                 stringValue] forKey:@"stmgMhd"];
-            
+ 
             /* disable all codecs which don't support MPEG-TS */
             [o_t4_pop_audioCodec removeItemWithTitle:@"Vorbis"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"FLAC"];
@@ -724,7 +724,7 @@ static VLCWizard *_o_sharedInstance = nil;
     else if ([[[o_tab_pageHolder selectedTabViewItem] label] isEqualToString: \
         @"Transcode 1"])
     {
-        /* check whether the user wants to transcode the video-track and store 
+        /* check whether the user wants to transcode the video-track and store
          * the related options */
         if ([o_t4_ckb_video state] == NSOnState)
         {
@@ -738,7 +738,7 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_userSelections setObject:@"NO" forKey:@"trnscdVideo"];
         }
 
-        /* check whether the user wants to transcode the audio-track and store 
+        /* check whether the user wants to transcode the audio-track and store
          * the related options */
         if ([o_t4_ckb_audio state] == NSOnState)
         {
@@ -1014,7 +1014,7 @@ static VLCWizard *_o_sharedInstance = nil;
              * -> enabled the encap-formats allowed when streaming content via
              * http plus MP4 since this should work fine in most cases */
 
-            /* FIXME: choose a selection of encap-formats based upon the 
+            /* FIXME: choose a selection of encap-formats based upon the
              * actually used codecs */
 
             /* enable MPEG PS, MPEG TS, MPEG 1, OGG, RAW, ASF, MP4 and MOV
@@ -1120,12 +1120,12 @@ static VLCWizard *_o_sharedInstance = nil;
              * select a folder instead of a localtion for a single item */
             if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
             {
-                [o_t7_txt_saveFileTo setStringValue: 
+                [o_t7_txt_saveFileTo setStringValue:
                     _NS("Select the directory to save to")];
             }
             else
             {
-                [o_t7_txt_saveFileTo setStringValue: 
+                [o_t7_txt_saveFileTo setStringValue:
                     _NS("Select the file to save to")];
             }
         }
@@ -1144,7 +1144,7 @@ static VLCWizard *_o_sharedInstance = nil;
         } else {
             [o_userSelections setObject:@"NO" forKey:@"sap"];
         }
-        
+ 
         /* local playback? */
         if ([o_t6_ckb_local state] == NSOnState)
         {
@@ -1152,12 +1152,12 @@ static VLCWizard *_o_sharedInstance = nil;
         } else {
             [o_userSelections setObject:@"NO" forKey:@"localPb"];
         }
-        
+ 
         /* include subtitles? */
-        [o_userSelections setObject: 
+        [o_userSelections setObject:
             [[NSNumber numberWithInt:[o_t6_ckb_soverlay state]] stringValue]
                              forKey: @"soverlay"];
-        
+ 
         /* go to "Summary" */
         [self showSummary];
     }
@@ -1209,7 +1209,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 while( x != y )
                 {
                     NSString * fileNameToUse;
-                    /* check whether the extension is hidden or not. 
+                    /* check whether the extension is hidden or not.
                      * if not, remove it
                      * we need the casting to make GCC4 happy */
                     if( [[[NSFileManager defaultManager] fileAttributesAtPath: \
@@ -1283,10 +1283,10 @@ static VLCWizard *_o_sharedInstance = nil;
             }
 
             /* include subtitles ? */
-            [o_userSelections setObject: 
+            [o_userSelections setObject:
                 [[NSNumber numberWithInt:[o_t7_ckb_soverlay state]] stringValue]
                                  forKey: @"soverlay"];
-            
+ 
             /* go to "Summary" */
             [self showSummary];
         }
@@ -1333,8 +1333,8 @@ static VLCWizard *_o_sharedInstance = nil;
                 @"ttl=%@", [o_userSelections objectForKey:@"ttl"]] \
                 UTF8String] );
 
-            playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP, 
-		    	PLAYLIST_END, VLC_TRUE, VLC_FALSE );
+            playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP,
+                PLAYLIST_END, VLC_TRUE, VLC_FALSE );
 
             if( x == 0 )
             {
@@ -1390,12 +1390,12 @@ static VLCWizard *_o_sharedInstance = nil;
      * print the URI of the single item */
     if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
         [o_t8_fld_inptStream setStringValue: [NSString stringWithFormat:
-            _NS("%i items"), 
+            _NS("%i items"),
             [[o_userSelections objectForKey:@"pathToStrm"] count]]];
     else
-        [o_t8_fld_inptStream setStringValue: 
+        [o_t8_fld_inptStream setStringValue:
             [[o_userSelections objectForKey:@"pathToStrm"] objectAtIndex: 0]];
-    
+ 
     if ([[o_userSelections objectForKey:@"localPb"] isEqualToString: @"YES"])
     {
         [o_t8_fld_local setStringValue: _NS("yes")];
@@ -1405,8 +1405,8 @@ static VLCWizard *_o_sharedInstance = nil;
 
     if ([[o_userSelections objectForKey:@"partExtract"] isEqualToString: @"YES"])
     {
-        [o_t8_fld_partExtract setStringValue: [NSString stringWithFormat: 
-            _NS("yes: from %@ to %@ secs"), 
+        [o_t8_fld_partExtract setStringValue: [NSString stringWithFormat:
+            _NS("yes: from %@ to %@ secs"),
             [o_userSelections objectForKey:@"partExtractFrom"],
             [o_userSelections objectForKey:@"partExtractTo"]]];
     } else {
@@ -1425,12 +1425,12 @@ static VLCWizard *_o_sharedInstance = nil;
     {
         [o_t8_fld_trnscdVideo setStringValue: _NS("no")];
     }
-    
+ 
     if ([[o_userSelections objectForKey:@"soverlay"] isEqualToString:@"1"])
         [o_t8_fld_soverlay setStringValue: _NS("yes")];
     else
         [o_t8_fld_soverlay setStringValue: _NS("no")];
-    
+ 
     if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualToString:@"YES"])
     {
         [o_t8_fld_trnscdAudio setStringValue: [NSString stringWithFormat:
@@ -1456,7 +1456,7 @@ static VLCWizard *_o_sharedInstance = nil;
         [o_t8_fld_ttl setStringValue: [o_userSelections objectForKey:@"ttl"]];
         if ([[o_userSelections objectForKey:@"sap"] isEqualToString: @"YES"])
         {
-            [o_t8_fld_sap setStringValue: 
+            [o_t8_fld_sap setStringValue:
                 [_NS("yes") stringByAppendingFormat: @": \"%@\"",
                     [o_userSelections objectForKey:@"sapText"]]];
         }else{
@@ -1496,7 +1496,7 @@ static VLCWizard *_o_sharedInstance = nil;
     int x = 0;
     int y = [[o_userSelections objectForKey:@"pathToStrm"] count];
     NSMutableArray * tempArray = [[NSMutableArray alloc] init];
-    
+ 
     /* loop to create an opt-string for each item we're processing */
     while( x != y )
     {
@@ -1518,14 +1518,14 @@ static VLCWizard *_o_sharedInstance = nil;
                 [o_trnscdCmd appendString: @"}:"];
             }
         }
-            
+ 
         /* check whether the user requested local playback. if yes, prepare the
          * string, if not, let it empty */
         if ([[o_userSelections objectForKey:@"localPb"] isEqualToString:@"YES"])
         {
             [o_duplicateCmd appendString: @"duplicate{dst=display,dst=\""];
         }
-    
+ 
         if ([[o_userSelections objectForKey:@"trnscdAudio"] isEqualToString:@"YES"])
         {
             if ([[o_userSelections objectForKey:@"trnscdVideo"] isEqualToString:@"NO"])
@@ -1538,7 +1538,7 @@ static VLCWizard *_o_sharedInstance = nil;
                 intValue]] objectAtIndex:1] UTF8String],  [[o_userSelections \
                 objectForKey:@"trnscdAudioBitrate"] intValue]];
         }
-    
+ 
         if ([[o_userSelections objectForKey:@"trnscdOrStrmg"] isEqualToString:@"trnscd"])
         {
             /* we are just transcoding and dumping the stuff to a file */
@@ -1597,9 +1597,9 @@ static VLCWizard *_o_sharedInstance = nil;
         {
             [o_opts_string appendString: @"\"}"];
         }
-        
+ 
         /* add subtitles to the video if desired */
-        [o_opts_string appendFormat: @":sout-transcode-soverlay=%@", 
+        [o_opts_string appendFormat: @":sout-transcode-soverlay=%@",
                 [o_userSelections objectForKey:@"soverlay"]];
 
         [tempArray addObject: o_opts_string];
@@ -1902,16 +1902,16 @@ static VLCWizard *_o_sharedInstance = nil;
 
 - (IBAction)t7_selectTrnscdDestFile:(id)sender
 {
-    /* provide a save-to-dialogue, so the user can choose a location for 
+    /* provide a save-to-dialogue, so the user can choose a location for
      * his/her new file. We take a modified NSOpenPanel to select a folder
      * and a plain NSSavePanel to save a single file. */
 
     SEL sel = @selector(t7_getTrnscdDestFile:returnCode:contextInfo:);
-    
+ 
     if( [[o_userSelections objectForKey:@"pathToStrm"] count] > 1 )
     {
         NSOpenPanel * saveFolderPanel = [[NSOpenPanel alloc] init];
-        
+ 
         [saveFolderPanel setCanChooseDirectories: YES];
         [saveFolderPanel setCanChooseFiles: NO];
         [saveFolderPanel setCanSelectHiddenExtension: NO];
@@ -1923,8 +1923,8 @@ static VLCWizard *_o_sharedInstance = nil;
     {
         NSSavePanel * saveFilePanel = [[NSSavePanel alloc] init];
 
-        /* don't use ".ps" as suffix, since the OSX Finder confuses our 
-         * creations with PostScript-files and wants to open them with 
+        /* don't use ".ps" as suffix, since the OSX Finder confuses our
+         * creations with PostScript-files and wants to open them with
          * Preview.app */
         NSString * theEncapFormat = [[o_encapFormats objectAtIndex: \
         [[o_userSelections objectForKey:@"encapFormat"] intValue]] \

@@ -115,7 +115,7 @@ struct update_mirror_t
  */
 struct update_t
 {
-    libvlc_int_t *p_libvlc; 
+    libvlc_int_t *p_libvlc;
 
     vlc_mutex_t lock;
 

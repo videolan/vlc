@@ -54,12 +54,12 @@ ItemInfoDialog::ItemInfoDialog( intf_thread_t *p_intf, CBaseWindow *p_parent,
 
 /***********************************************************************
 
-FUNCTION: 
+FUNCTION:
   WndProc
 
-PURPOSE: 
+PURPOSE:
   Processes messages sent to the main window.
-  
+ 
 ***********************************************************************/
 LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
@@ -70,7 +70,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
     switch( msg )
     {
-    case WM_INITDIALOG: 
+    case WM_INITDIALOG:
         shidi.dwMask = SHIDIM_FLAGS;
         shidi.dwFlags = SHIDIF_DONEBUTTON | SHIDIF_SIPDOWN |
             SHIDIF_FULLSCREENNOMENUBAR;//SHIDIF_SIZEDLGFULLSCREEN;
@@ -129,7 +129,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             rcClient.right - 15 - 10, 10 + 4*( 15 + 10 ) + 5, 15, 15,
             hwnd, NULL, hInst, NULL );
 
-        SendMessage( enabled_checkbox, BM_SETCHECK, 
+        SendMessage( enabled_checkbox, BM_SETCHECK,
                      p_item->b_enabled ? BST_CHECKED : BST_UNCHECKED, 0 );
 
         /* Treeview */
@@ -153,7 +153,7 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         break;
 
     case WM_SETFOCUS:
-        SHSipPreference( hwnd, SIP_DOWN ); 
+        SHSipPreference( hwnd, SIP_DOWN );
         SHFullScreen( hwnd, SHFS_HIDESIPBUTTON );
         break;
 
@@ -177,27 +177,27 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
  *****************************************************************************/
  void ItemInfoDialog::UpdateInfo()
 {
-    TVITEM tvi = {0}; 
-    TVINSERTSTRUCT tvins = {0}; 
-    HTREEITEM hPrev = (HTREEITEM)TVI_FIRST; 
-    HTREEITEM hPrevRootItem = NULL; 
-    HTREEITEM hPrevLev2Item = NULL; 
+    TVITEM tvi = {0};
+    TVINSERTSTRUCT tvins = {0};
+    HTREEITEM hPrev = (HTREEITEM)TVI_FIRST;
+    HTREEITEM hPrevRootItem = NULL;
+    HTREEITEM hPrevLev2Item = NULL;
 
-    tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+    tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
-    // Set the text of the item. 
+    // Set the text of the item.
     tvi.pszText = _FROMMB(p_item->input.psz_name);
     tvi.cchTextMax = _tcslen(tvi.pszText);
 
-    // Save the heading level in the item's application-defined data area 
+    // Save the heading level in the item's application-defined data area
     tvi.lParam = (LPARAM)1; // root level
-    tvins.item = tvi; 
-    tvins.hInsertAfter = hPrev; 
-    tvins.hParent = TVI_ROOT; 
+    tvins.item = tvi;
+    tvins.hInsertAfter = hPrev;
+    tvins.hParent = TVI_ROOT;
 
-    // Add the item to the tree-view control. 
+    // Add the item to the tree-view control.
     hPrev = (HTREEITEM)TreeView_InsertItem( info_tree, &tvins );
-    hPrevRootItem = hPrev; 
+    hPrevRootItem = hPrev;
 
     /* Rebuild the tree */
     vlc_mutex_lock( &p_item->input.lock );
@@ -205,17 +205,17 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
     {
         info_category_t *p_cat = p_item->input.pp_categories[i];
 
-        // Set the text of the item. 
+        // Set the text of the item.
         tvi.pszText = _FROMMB( p_item->input.psz_name );
         tvi.cchTextMax = _tcslen( tvi.pszText );
-        
+ 
         // Save the heading level in the item's application-defined data area
         tvi.lParam = (LPARAM)2; // level 2
-        tvins.item = tvi; 
-        tvins.hInsertAfter = hPrev; 
+        tvins.item = tvi;
+        tvins.hInsertAfter = hPrev;
         tvins.hParent = hPrevRootItem;
 
-        // Add the item to the tree-view control. 
+        // Add the item to the tree-view control.
         hPrev = (HTREEITEM)TreeView_InsertItem( info_tree, &tvins );
 
         hPrevLev2Item = hPrev;
@@ -224,18 +224,18 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         {
             info_t *p_info = p_cat->pp_infos[j];
 
-            // Set the text of the item. 
+            // Set the text of the item.
             string szAnsi = (string)p_info->psz_name;
             szAnsi += ": ";
             szAnsi += p_info->psz_value;
             tvi.pszText = (TCHAR *)_FROMMB( szAnsi.c_str() );
             tvi.cchTextMax = _tcslen( tvi.pszText );
             tvi.lParam = (LPARAM)3; // level 3
-            tvins.item = tvi; 
-            tvins.hInsertAfter = hPrev; 
+            tvins.item = tvi;
+            tvins.hInsertAfter = hPrev;
             tvins.hParent = hPrevLev2Item;
-    
-            // Add the item to the tree-view control. 
+ 
+            // Add the item to the tree-view control.
             hPrev = (HTREEITEM)TreeView_InsertItem( info_tree, &tvins );
         }
 

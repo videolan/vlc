@@ -91,7 +91,7 @@ static int get_capability_for_osversion(void)
         if( winVer.dwMajorVersion > 5 )
         {
             /* Windows Vista or above, make this module the default */
-	    _got_vista_or_above = VLC_TRUE;
+        _got_vista_or_above = VLC_TRUE;
             return 150;
         }
     }
@@ -122,12 +122,12 @@ vlc_module_end();
 #endif
 
 /*****************************************************************************
- * CUSTOMVERTEX: 
+ * CUSTOMVERTEX:
  *****************************************************************************
  *****************************************************************************/
-typedef struct 
+typedef struct
 {
-    FLOAT       x,y,z;      // vertex untransformed position 
+    FLOAT       x,y,z;      // vertex untransformed position
     FLOAT       rhw;        // eye distance
     D3DCOLOR    diffuse;    // diffuse color
     FLOAT       tu, tv;     // texture relative coordinates
@@ -560,10 +560,10 @@ static void FirstDisplay( vout_thread_t *p_vout, picture_t *p_pic )
     Display(p_vout, p_pic);
 
     /*
-    ** Video window is initially hidden, show it now since we got a 
+    ** Video window is initially hidden, show it now since we got a
     ** picture to show.
     */
-    SetWindowPos( p_vout->p_sys->hvideownd, 0, 0, 0, 0, 0, 
+    SetWindowPos( p_vout->p_sys->hvideownd, 0, 0, 0, 0, 0,
         SWP_ASYNCWINDOWPOS|
         SWP_FRAMECHANGED|
         SWP_SHOWWINDOW|
@@ -576,7 +576,7 @@ static void FirstDisplay( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
- * DirectD3DVoutCreate: Initialize and instance of Direct3D9 
+ * DirectD3DVoutCreate: Initialize and instance of Direct3D9
  *****************************************************************************
  * This function initialize Direct3D and analyze available resources from
  * default adapter.
@@ -707,7 +707,7 @@ static int Direct3DVoutOpen( vout_thread_t *p_vout )
                                  D3DCREATE_SOFTWARE_VERTEXPROCESSING|
                                  D3DCREATE_MULTITHREADED,
                                  &d3dpp, &p_d3ddev );
-    if( FAILED(hr) )                                      
+    if( FAILED(hr) )
     {
        msg_Err(p_vout, "Could not create the D3D device! (hr=0x%lX)", hr);
        return VLC_EGENERIC;
@@ -719,7 +719,7 @@ static int Direct3DVoutOpen( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * DirectD3DClose: release the Direct3D9 device 
+ * DirectD3DClose: release the Direct3D9 device
  *****************************************************************************/
 static void Direct3DVoutClose( vout_thread_t *p_vout )
 {
@@ -728,12 +728,12 @@ static void Direct3DVoutClose( vout_thread_t *p_vout )
        IDirect3DDevice9_Release(p_vout->p_sys->p_d3ddev);
        p_vout->p_sys->p_d3ddev = NULL;
     }
-       
+ 
     p_vout->p_sys->hmonitor = NULL;
 }
 
 /*****************************************************************************
- * DirectD3DClose: reset the Direct3D9 device 
+ * DirectD3DClose: reset the Direct3D9 device
  *****************************************************************************
  * All resources must be deallocated before the reset occur, they will be
  * realllocated once the reset has been performed successfully
@@ -837,7 +837,7 @@ static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3D
     //if( p_vout->p_sys->b_hw_yuv && ! _got_vista_or_above )
     if( p_vout->p_sys->b_hw_yuv )
     {
-	/* it sounds like vista does not support YUV surfaces at all */
+    /* it sounds like vista does not support YUV surfaces at all */
         switch( i_chroma )
         {
             case VLC_FOURCC('U','Y','V','Y'):
@@ -855,14 +855,14 @@ static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3D
                 /* typically 3D textures don't support planar format
                 ** fallback to packed version and use CPU for the conversion
                 */
-                static const D3DFORMAT formats[] = 
+                static const D3DFORMAT formats[] =
                     { D3DFMT_YUY2, D3DFMT_UYVY, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
                 return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
             }
             case VLC_FOURCC('Y','U','Y','2'):
             case VLC_FOURCC('Y','U','N','V'):
             {
-                static const D3DFORMAT formats[] = 
+                static const D3DFORMAT formats[] =
                     { D3DFMT_YUY2, D3DFMT_UYVY, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
                 return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
             }
@@ -873,25 +873,25 @@ static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3D
     {
         case VLC_FOURCC('R', 'V', '1', '5'):
         {
-            static const D3DFORMAT formats[] = 
+            static const D3DFORMAT formats[] =
                 { D3DFMT_X1R5G5B5 };
             return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
         }
         case VLC_FOURCC('R', 'V', '1', '6'):
         {
-            static const D3DFORMAT formats[] = 
+            static const D3DFORMAT formats[] =
                 { D3DFMT_R5G6B5 };
             return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
         }
         case VLC_FOURCC('R', 'V', '2', '4'):
         {
-            static const D3DFORMAT formats[] = 
+            static const D3DFORMAT formats[] =
                 { D3DFMT_R8G8B8, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8 };
             return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
         }
         case VLC_FOURCC('R', 'V', '3', '2'):
         {
-            static const D3DFORMAT formats[] = 
+            static const D3DFORMAT formats[] =
                 { D3DFMT_A8R8G8B8, D3DFMT_X8R8G8B8 };
             return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
         }
@@ -905,7 +905,7 @@ static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3D
             if( SUCCEEDED(hr))
             {
                 /*
-                ** some professional cards could use some advanced pixel format as default, 
+                ** some professional cards could use some advanced pixel format as default,
                 ** make sure we stick with chromas that we can handle internally
                 */
                 switch( d3ddm.Format )
@@ -920,7 +920,7 @@ static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3D
                     default:
                     {
                         /* if we fall here, that probably means that we need to render some YUV format */
-                        static const D3DFORMAT formats[] = 
+                        static const D3DFORMAT formats[] =
                             { D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
                         msg_Dbg( p_vout, "defaulting to built-in pixel format");
                         return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
@@ -987,7 +987,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
     D3DFORMAT               format;
     HRESULT hr;
     size_t c;
-    // if vout is already running, use current chroma, otherwise choose from upstream 
+    // if vout is already running, use current chroma, otherwise choose from upstream
     int i_chroma = p_vout->output.i_chroma ? : p_vout->render.i_chroma;
 
     I_OUTPUTPICTURES = 0;
@@ -996,7 +996,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
     ** find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
     ** the requested chroma which is usable by the hardware in an offscreen surface, as they
     ** typically support more formats than textures
-    */ 
+    */
     format = Direct3DVoutFindFormat(p_vout, i_chroma, p_vout->p_sys->bbFormat);
     if( VLC_SUCCESS != Direct3DVoutSetOutputFormat(p_vout, format) )
     {
@@ -1008,9 +1008,9 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
     {
 
         LPDIRECT3DSURFACE9 p_d3dsurf;
-        picture_t *p_pic = p_vout->p_picture+c; 
+        picture_t *p_pic = p_vout->p_picture+c;
 
-        hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_d3ddev, 
+        hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_d3ddev,
                 p_vout->render.i_width,
                 p_vout->render.i_height,
                 format,
@@ -1026,7 +1026,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
 
         /* fill surface with black color */
         IDirect3DDevice9_ColorFill(p_d3ddev, p_d3dsurf, NULL, D3DCOLOR_ARGB(0xFF, 0, 0, 0) );
-        
+ 
         /* assign surface to internal structure */
         p_pic->p_sys = (void *)p_d3dsurf;
 
@@ -1096,7 +1096,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
 }
 
 /*****************************************************************************
- * Direct3DVoutReleasePictures: destroy a picture vector 
+ * Direct3DVoutReleasePictures: destroy a picture vector
  *****************************************************************************
  * release all video resources used for pictures
  *****************************************************************************/
@@ -1106,7 +1106,7 @@ static void Direct3DVoutReleasePictures( vout_thread_t *p_vout)
     size_t c;
     for( c=0; c<i_num_pics; ++c )
     {
-        picture_t *p_pic = p_vout->p_picture+c; 
+        picture_t *p_pic = p_vout->p_picture+c;
         if( p_pic->p_sys )
         {
             LPDIRECT3DSURFACE9 p_d3dsurf = (LPDIRECT3DSURFACE9)p_pic->p_sys;
@@ -1194,14 +1194,14 @@ static int Direct3DVoutCreateScene( vout_thread_t *p_vout )
     ** for performance reason, texture format is identical to backbuffer
     ** which would usually be a RGB format
     */
-    hr = IDirect3DDevice9_CreateTexture(p_d3ddev, 
+    hr = IDirect3DDevice9_CreateTexture(p_d3ddev,
             p_vout->render.i_width,
             p_vout->render.i_height,
             1,
-            D3DUSAGE_RENDERTARGET, 
+            D3DUSAGE_RENDERTARGET,
             p_vout->p_sys->bbFormat,
             D3DPOOL_DEFAULT,
-            &p_d3dtex, 
+            &p_d3dtex,
             NULL);
     if( FAILED(hr))
     {
@@ -1229,7 +1229,7 @@ static int Direct3DVoutCreateScene( vout_thread_t *p_vout )
     p_vout->p_sys->p_d3dtex = p_d3dtex;
     p_vout->p_sys->p_d3dvtc = p_d3dvtc;
 
-    // Texture coordinates outside the range [0.0, 1.0] are set 
+    // Texture coordinates outside the range [0.0, 1.0] are set
     // to the texture color at 0.0 or 1.0, respectively.
     IDirect3DDevice9_SetSamplerState(p_d3ddev, 0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
     IDirect3DDevice9_SetSamplerState(p_d3ddev, 0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
@@ -1315,7 +1315,7 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     HRESULT hr;
     float f_width, f_height;
 
-    // check if device is still available    
+    // check if device is still available
     hr = IDirect3DDevice9_TestCooperativeLevel(p_d3ddev);
     if( FAILED(hr) )
     {

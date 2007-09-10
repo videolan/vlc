@@ -59,7 +59,7 @@ typedef struct
     vlm_media_instance_sys_t **instance;
 } vlm_media_sys_t;
 
-typedef struct 
+typedef struct
 {
     /* names "schedule" is reserved */
     char    *psz_name;

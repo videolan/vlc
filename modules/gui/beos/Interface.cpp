@@ -68,7 +68,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
         msg_Err( p_intf, "out of memory" );
         return VLC_EGENERIC;
     }
-    
+ 
     p_intf->pf_run = Run;
 
     /* Create the interface window */

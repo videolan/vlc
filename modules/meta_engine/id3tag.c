@@ -155,7 +155,7 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
     for( i = 0; (p_frame = id3_tag_findframe( p_id3_tag, "T", i )) != NULL; i++ )
     {
         int i_strings;
-        
+ 
         /* Special case TXXX is not the same beast */
         if( ID_IS( "TXXX" ) )
             continue;

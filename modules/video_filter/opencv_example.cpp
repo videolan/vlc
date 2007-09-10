@@ -1,5 +1,5 @@
 /*****************************************************************************
- * opencv_example.cpp : Example OpenCV internal video filter 
+ * opencv_example.cpp : Example OpenCV internal video filter
  * (performs face identification).  Mostly taken from the facedetect.c
  * OpenCV sample.
  *****************************************************************************
@@ -70,8 +70,8 @@ vlc_module_begin();
     set_callbacks( OpenFilter, CloseFilter );
 
     add_string( "opencv-haarcascade-file", "c:\\haarcascade_frontalface_alt.xml", NULL,
-                          N_("Haar cascade filename"), 
-                          N_("Name of XML file containing Haar cascade description"), VLC_FALSE);    
+                          N_("Haar cascade filename"),
+                          N_("Name of XML file containing Haar cascade description"), VLC_FALSE);
 vlc_module_end();
 
 /*****************************************************************************
@@ -90,7 +90,7 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    //init the video_filter_event_info_t struct   
+    //init the video_filter_event_info_t struct
     p_sys->event_info.i_region_size = 0;
     p_sys->event_info.p_region = NULL;
     p_sys->i_id = 0;
@@ -129,7 +129,7 @@ static void CloseFilter( vlc_object_t *p_this )
         cvReleaseMemStorage( &p_filter->p_sys->p_storage );
 
     if (NULL != p_filter->p_sys->event_info.p_region)
-        free(p_filter->p_sys->event_info.p_region); 
+        free(p_filter->p_sys->event_info.p_region);
 
     free( p_sys );
 
@@ -139,8 +139,8 @@ static void CloseFilter( vlc_object_t *p_this )
 /****************************************************************************
  * Filter: Check for faces and raises an event when one is found.
  ****************************************************************************
- * p_pic: A picture_t with its p_data_orig member set to an array of 
- * IplImages (one image for each picture_t plane). 
+ * p_pic: A picture_t with its p_data_orig member set to an array of
+ * IplImages (one image for each picture_t plane).
  ****************************************************************************/
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
@@ -148,7 +148,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     int i_planes = 0;
     CvPoint pt1, pt2;
     int i, scale = 1;
-    
+ 
     if ((!p_pic) )
     {
         msg_Err( p_filter, "no image array" );
@@ -182,23 +182,23 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     //perform face detection
     cvClearMemStorage(p_filter->p_sys->p_storage);
-    CvSeq* faces = NULL; 
+    CvSeq* faces = NULL;
     if( p_filter->p_sys->p_cascade )
     {
         //we should make some of these params config variables
-        faces = cvHaarDetectObjects( p_img[0], p_filter->p_sys->p_cascade, 
+        faces = cvHaarDetectObjects( p_img[0], p_filter->p_sys->p_cascade,
             p_filter->p_sys->p_storage, 1.15, 5, CV_HAAR_DO_CANNY_PRUNING,
                                             cvSize(20, 20) );
         //create the video_filter_region_info_t struct
         CvRect* r;
         if (faces && (faces->total > 0))
         {
-            //msg_Dbg( p_filter, "Found %d face(s)\n", faces->total );            
+            //msg_Dbg( p_filter, "Found %d face(s)\n", faces->total );
             if (NULL != p_filter->p_sys->event_info.p_region)
             {
                 free(p_filter->p_sys->event_info.p_region);
                 p_filter->p_sys->event_info.p_region = NULL;
-            } 
+            }
             if( NULL == ( p_filter->p_sys->event_info.p_region =
                   (video_filter_region_info_t *)malloc(faces->total*sizeof(video_filter_region_info_t))))
             {

@@ -43,7 +43,7 @@ public:
                 bool _transcode_only = false );
     virtual ~SoutDialog() {}
 
-    QString getMrl();  
+    QString getMrl();
     //sout_gui_descr_t *sout;
 private:
     Ui::Sout ui;

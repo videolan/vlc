@@ -96,11 +96,11 @@
 #if GC_ENABLED
 - (void)finalize
 {
-	/* dealloc isn't called on 10.5 in case that GC is enabled, so we need to provide the functionality here */
-	[[NSNotificationCenter defaultCenter] removeObserver: self];
-	[self setFadeTimer:nil];
-	
-	[super finalize];
+    /* dealloc isn't called on 10.5 in case that GC is enabled, so we need to provide the functionality here */
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [self setFadeTimer:nil];
+    
+    [super finalize];
 }
 #endif
 
@@ -566,7 +566,7 @@
 
 - (void)drawRect:(NSRect)rect
 {
-	NSRect frame = [self frame];
+    NSRect frame = [self frame];
     NSRect image_rect;
     NSImage *img;
     addImage( @"fs_background", 0, 0, NSCompositeCopy, 0 );

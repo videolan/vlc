@@ -1836,7 +1836,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                     else
                         i_seekpoint--;
                 }
-                else if( i_type == INPUT_CONTROL_SET_SEEKPOINT_NEXT ) 
+                else if( i_type == INPUT_CONTROL_SET_SEEKPOINT_NEXT )
                     i_seekpoint = p_access->info.i_seekpoint + 1;
                 else
                     i_seekpoint = val.i_int;
@@ -2547,7 +2547,7 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
             input_ExtractAttachmentAndCacheArt( p_input );
     }
     free( psz_arturl );
-    
+ 
     input_item_SetPreparsed( p_item, VLC_TRUE );
 
     /* A bit ugly */

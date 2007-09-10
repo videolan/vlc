@@ -895,19 +895,19 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
     {
         *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom *
             p_vout->fmt_in.i_sar_num / p_vout->fmt_in.i_sar_den / FP_FACTOR );
-        *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom 
+        *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom
             / FP_FACTOR );
     }
     else
     {
-        *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom 
+        *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom
             / FP_FACTOR );
         *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom *
             p_vout->fmt_in.i_sar_den / p_vout->fmt_in.i_sar_num / FP_FACTOR );
     }
 
 initwsize_end:
-    msg_Dbg( p_vout, "window size: %dx%d", p_vout->i_window_width, 
+    msg_Dbg( p_vout, "window size: %dx%d", p_vout->i_window_width,
              p_vout->i_window_height );
 
 #undef FP_FACTOR

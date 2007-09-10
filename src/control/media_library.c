@@ -40,21 +40,21 @@ libvlc_media_library_t *
 libvlc_media_library_new( libvlc_instance_t * p_inst,
                           libvlc_exception_t * p_e )
 {
-	(void)p_e;
+    (void)p_e;
     libvlc_media_library_t * p_mlib;
 
-	p_mlib = malloc(sizeof(libvlc_media_library_t));
+    p_mlib = malloc(sizeof(libvlc_media_library_t));
 
-	if( !p_mlib )
-		return NULL;
+    if( !p_mlib )
+        return NULL;
 
-	p_mlib->p_libvlc_instance = p_inst;
+    p_mlib->p_libvlc_instance = p_inst;
     p_mlib->i_refcount = 1;
     p_mlib->p_mlist = NULL;
 
     p_mlib->p_event_manager = libvlc_event_manager_new( p_mlib, p_inst, p_e );
 
-	return p_mlib;
+    return p_mlib;
 }
 
 /**************************************************************************
@@ -68,7 +68,7 @@ void libvlc_media_library_release( libvlc_media_library_t * p_mlib )
         return;
 
     libvlc_event_manager_release( p_mlib->p_event_manager );
-	free( p_mlib );
+    free( p_mlib );
 }
 
 /**************************************************************************
@@ -76,7 +76,7 @@ void libvlc_media_library_release( libvlc_media_library_t * p_mlib )
  **************************************************************************/
 void libvlc_media_library_retain( libvlc_media_library_t * p_mlib )
 {
-	p_mlib->i_refcount++;
+    p_mlib->i_refcount++;
 }
 
 /**************************************************************************
@@ -132,7 +132,7 @@ libvlc_media_list_t *
 libvlc_media_library_media_list( libvlc_media_library_t * p_mlib,
                                      libvlc_exception_t * p_e )
 {
-	(void)p_e;
+    (void)p_e;
     if( p_mlib->p_mlist )
         libvlc_media_list_retain( p_mlib->p_mlist );
     return p_mlib->p_mlist;

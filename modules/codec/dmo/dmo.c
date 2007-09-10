@@ -1012,7 +1012,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     BITMAPINFOHEADER *p_bih;
 
     /* FIXME */
-    p_enc->fmt_in.video.i_bits_per_pixel = 
+    p_enc->fmt_in.video.i_bits_per_pixel =
         p_enc->fmt_out.video.i_bits_per_pixel = 12;
 
     /* Enumerate input format (for debug output) */

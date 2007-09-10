@@ -60,7 +60,7 @@ void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level, li
 
 libvlc_log_t *libvlc_log_open( const libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
-    
+ 
     struct libvlc_log_t *p_log =
         (struct libvlc_log_t *)malloc(sizeof(struct libvlc_log_t));
 

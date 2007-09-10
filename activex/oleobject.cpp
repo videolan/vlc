@@ -157,7 +157,7 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
         if( ! _p_instance->isInPlaceActive() )
         {
             if( ((NULL == p_inPlaceSite) || (S_OK == p_inPlaceSite->CanInPlaceActivate()))
-             && SUCCEEDED(_p_instance->onActivateInPlace(lpMsg, hwndParent, lprcPosRect, lprcClipRect)) ) 
+             && SUCCEEDED(_p_instance->onActivateInPlace(lpMsg, hwndParent, lprcPosRect, lprcClipRect)) )
             {
                 if( p_inPlaceSiteEx )
                 {
@@ -180,7 +180,7 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
                         p_inPlaceUIWindow->Release();
                 }
                 return OLEOBJ_S_CANNOT_DOVERB_NOW;
-            } 
+            }
         }
 
         if( p_inPlaceSite )
@@ -190,7 +190,7 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
         {
             if( (NULL == p_inPlaceSiteEx) || (S_OK == p_inPlaceSiteEx->RequestUIActivate()) )
             {
-                if( p_inPlaceSite) 
+                if( p_inPlaceSite)
                 {
                     p_inPlaceSite->OnUIActivate();
 
@@ -244,7 +244,7 @@ STDMETHODIMP VLCOleObject::GetClientSite(LPOLECLIENTSITE *ppClientSite)
         return E_POINTER;
 
     if( NULL != _p_clientsite )
-        _p_clientsite->AddRef(); 
+        _p_clientsite->AddRef();
 
     *ppClientSite = _p_clientsite;
     return S_OK;
@@ -304,7 +304,7 @@ STDMETHODIMP VLCOleObject::GetUserClassID(LPCLSID pClsid)
     if( NULL == pClsid )
         return E_POINTER;
  
-    *pClsid = _p_instance->getClassID(); 
+    *pClsid = _p_instance->getClassID();
     return S_OK;
 };
 
@@ -363,7 +363,7 @@ STDMETHODIMP VLCOleObject::SetExtent(DWORD dwDrawAspect, SIZEL *pSizel)
 
                 if( SUCCEEDED(p_inPlaceSite->GetWindow(&hwnd)) )
                 {
-                    // use HIMETRIC to pixel transform 
+                    // use HIMETRIC to pixel transform
                     RECT posRect = _p_instance->getPosRect();
                     HDC hDC = GetDC(hwnd);
                     posRect.right = (pSizel->cx*GetDeviceCaps(hDC, LOGPIXELSX)/2540L)+posRect.left;

@@ -412,10 +412,10 @@ static void FirstSwap( vout_thread_t *p_vout )
     GLSwapBuffers( p_vout );
 
     /*
-    ** Video window is initially hidden, show it now since we got a 
+    ** Video window is initially hidden, show it now since we got a
     ** picture to show.
     */
-    SetWindowPos( p_vout->p_sys->hvideownd, NULL, 0, 0, 0, 0, 
+    SetWindowPos( p_vout->p_sys->hvideownd, NULL, 0, 0, 0, 0,
         SWP_ASYNCWINDOWPOS|
         SWP_FRAMECHANGED|
         SWP_SHOWWINDOW|

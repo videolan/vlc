@@ -62,6 +62,6 @@ struct intf_sys_t
 #define GTK_GET( type, nom ) GTK_##type( gtk_object_get_data( \
         GTK_OBJECT( p_intf->p_sys->p_window ), nom ) )
 
-            
+ 
 #define  GtkGetIntf( widget ) E_(__GtkGetIntf)( GTK_WIDGET( widget ) )
 void * E_(__GtkGetIntf)( GtkWidget * );

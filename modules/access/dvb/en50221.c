@@ -461,15 +461,15 @@ static void SessionOpen( access_t * p_access, uint8_t i_slot,
     switch ( i_resource_id )
     {
     case RI_RESOURCE_MANAGER:
-        ResourceManagerOpen( p_access, i_session_id ); break; 
+        ResourceManagerOpen( p_access, i_session_id ); break;
     case RI_APPLICATION_INFORMATION:
-        ApplicationInformationOpen( p_access, i_session_id ); break; 
+        ApplicationInformationOpen( p_access, i_session_id ); break;
     case RI_CONDITIONAL_ACCESS_SUPPORT:
-        ConditionalAccessOpen( p_access, i_session_id ); break; 
+        ConditionalAccessOpen( p_access, i_session_id ); break;
     case RI_DATE_TIME:
-        DateTimeOpen( p_access, i_session_id ); break; 
+        DateTimeOpen( p_access, i_session_id ); break;
     case RI_MMI:
-        MMIOpen( p_access, i_session_id ); break; 
+        MMIOpen( p_access, i_session_id ); break;
 
     case RI_HOST_CONTROL:
     default:
@@ -554,15 +554,15 @@ static void SessionCreateResponse( access_t * p_access, uint8_t i_slot,
     switch ( i_resource_id )
     {
     case RI_RESOURCE_MANAGER:
-        ResourceManagerOpen( p_access, i_session_id ); break; 
+        ResourceManagerOpen( p_access, i_session_id ); break;
     case RI_APPLICATION_INFORMATION:
-        ApplicationInformationOpen( p_access, i_session_id ); break; 
+        ApplicationInformationOpen( p_access, i_session_id ); break;
     case RI_CONDITIONAL_ACCESS_SUPPORT:
-        ConditionalAccessOpen( p_access, i_session_id ); break; 
+        ConditionalAccessOpen( p_access, i_session_id ); break;
     case RI_DATE_TIME:
-        DateTimeOpen( p_access, i_session_id ); break; 
+        DateTimeOpen( p_access, i_session_id ); break;
     case RI_MMI:
-        MMIOpen( p_access, i_session_id ); break; 
+        MMIOpen( p_access, i_session_id ); break;
 
     case RI_HOST_CONTROL:
     default:
@@ -984,7 +984,7 @@ static vlc_bool_t CAPMTNeedsDescrambling( dvbpsi_pmt_t *p_pmt )
             return VLC_TRUE;
         }
     }
-    
+ 
     for( p_es = p_pmt->p_first_es; p_es != NULL; p_es = p_es->p_next )
     {
         for( p_dr = p_es->p_first_descriptor; p_dr != NULL;
@@ -1082,7 +1082,7 @@ static uint8_t *CAPMTES( system_ids_t *p_ids, uint8_t *p_capmt,
 {
     uint8_t *p_data;
     int i;
-    
+ 
     if ( i_size )
         p_data = realloc( p_capmt, i_capmt_size + 6 + i_size );
     else
@@ -1223,8 +1223,8 @@ static void CAPMTAdd( access_t * p_access, int i_session_id,
         CAPMTFirst( p_access, i_session_id, p_pmt );
         return;
     }
-        
-    
+ 
+ 
     msg_Dbg( p_access, "adding CAPMT for SID %d on session %d",
              p_pmt->i_program_number, i_session_id );
 

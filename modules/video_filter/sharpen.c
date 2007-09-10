@@ -96,7 +96,7 @@ inline static int32_t clip( int32_t a )
 static void init_precalc_table(filter_sys_t *p_filter)
 {
     float sigma = p_filter->f_sigma;
-    
+ 
     for(int i = 0; i < 512; ++i)
     {
         p_filter->tab_precalc[i] = (i - 256) * sigma;
@@ -218,9 +218,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                   (p_src[(i + 1) * i_src_pitch + j    ] * v1) +
                   (p_src[(i + 1) * i_src_pitch + j + 1] * v1);
 
-	    pix = pix >= 0 ? clip(pix) : -clip(pix * -1);
-	    p_out[i * i_src_pitch + j] = clip( p_src[i * i_src_pitch + j] + 
-			p_filter->p_sys->tab_precalc[pix + 256] );
+        pix = pix >= 0 ? clip(pix) : -clip(pix * -1);
+        p_out[i * i_src_pitch + j] = clip( p_src[i * i_src_pitch + j] +
+            p_filter->p_sys->tab_precalc[pix + 256] );
         }
     }
 

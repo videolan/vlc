@@ -163,7 +163,7 @@ libvlc_video_take_snapshot( libvlc_media_instance_t *p_mi, char *psz_filepath,
 }
 
 int libvlc_video_get_height( libvlc_media_instance_t *p_mi,
-                             libvlc_exception_t *p_e ) 
+                             libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout1 = GetVout( p_mi, p_e );
     if( !p_vout1 )
@@ -175,7 +175,7 @@ int libvlc_video_get_height( libvlc_media_instance_t *p_mi,
 }
 
 int libvlc_video_get_width( libvlc_media_instance_t *p_mi,
-                            libvlc_exception_t *p_e ) 
+                            libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout1 = GetVout( p_mi, p_e );
     if( !p_vout1 )
@@ -277,9 +277,9 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
 libvlc_drawable_t libvlc_video_get_parent( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
     libvlc_drawable_t result;
-    
+ 
     result = var_GetInteger( p_instance->p_libvlc_int, "drawable" );
-    
+ 
     return result;
 }
 
@@ -514,7 +514,7 @@ int libvlc_video_destroy( libvlc_media_instance_t *p_mi,
                           libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
-    vlc_object_detach( p_vout ); 
+    vlc_object_detach( p_vout );
     vlc_object_release( p_vout );
     vout_Destroy( p_vout );
 

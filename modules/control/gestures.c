@@ -136,10 +136,10 @@ static input_thread_t * input_from_playlist ( playlist_t *p_playlist )
 {
     input_thread_t * p_input;
 
-    PL_LOCK; 
-    p_input = p_playlist->p_input; 
-    if( p_input ) 
-        vlc_object_yield( p_input ); 
+    PL_LOCK;
+    p_input = p_playlist->p_input;
+    if( p_input )
+        vlc_object_yield( p_input );
     PL_UNLOCK;
 
     return p_input;
@@ -229,10 +229,10 @@ static void RunIntf( intf_thread_t *p_intf )
 
                     p_input = input_from_playlist( p_playlist );
                     vlc_object_release( p_playlist );
-                    
+ 
                     if( !p_input )
                         break;
-                    
+ 
                     val.i_int = PLAYING_S;
                     if( p_input )
                     {
@@ -404,7 +404,7 @@ static void RunIntf( intf_thread_t *p_intf )
                     }
                     else
                     {
-                        var_Set( p_input, "spu-es", 
+                        var_Set( p_input, "spu-es",
                                 list.p_list->p_values[i+1] );
                         i = i + 1;
                     }

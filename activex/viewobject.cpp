@@ -92,7 +92,7 @@ STDMETHODIMP VLCViewObject::GetAdvise(LPDWORD pdwAspect, LPDWORD padvf,
     return S_OK;
 };
 
-STDMETHODIMP VLCViewObject::GetColorSet(DWORD dwAspect, LONG lindex, 
+STDMETHODIMP VLCViewObject::GetColorSet(DWORD dwAspect, LONG lindex,
         PVOID pvAspect, DVTARGETDEVICE *ptd, HDC hicTargetDev, LPLOGPALETTE *ppColorSet)
 {
     return S_FALSE;

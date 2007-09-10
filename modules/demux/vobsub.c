@@ -472,7 +472,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
             return( VLC_EGENERIC );
         }
 
-        if( *line == 0 || *line == '\r' || *line == '\n' || *line == '#' ) 
+        if( *line == 0 || *line == '\r' || *line == '\n' || *line == '#' )
             continue;
         else if( !strncmp( "size:", line, 5 ) )
         {
@@ -493,9 +493,9 @@ static int ParseVobSubIDX( demux_t *p_demux )
 
             /* Store the palette of the subs */
             if( sscanf( line, "palette: %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x",
-                        &p_sys->palette[0], &p_sys->palette[1], &p_sys->palette[2], &p_sys->palette[3], 
-                        &p_sys->palette[4], &p_sys->palette[5], &p_sys->palette[6], &p_sys->palette[7], 
-                        &p_sys->palette[8], &p_sys->palette[9], &p_sys->palette[10], &p_sys->palette[11], 
+                        &p_sys->palette[0], &p_sys->palette[1], &p_sys->palette[2], &p_sys->palette[3],
+                        &p_sys->palette[4], &p_sys->palette[5], &p_sys->palette[6], &p_sys->palette[7],
+                        &p_sys->palette[8], &p_sys->palette[9], &p_sys->palette[10], &p_sys->palette[11],
                         &p_sys->palette[12], &p_sys->palette[13], &p_sys->palette[14], &p_sys->palette[15] ) == 16 )
             {
                 for( i = 0; i < 16; i++ )

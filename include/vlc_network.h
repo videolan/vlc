@@ -152,7 +152,7 @@ VLC_EXPORT (int, inet_pton, (int af, const char *src, void *dst) );
 #ifndef HAVE_INET_NTOP
 #ifdef WIN32
 /* only in core, so no need for C++ extern "C" */
-VLC_EXPORT (const char *, inet_ntop, (int af, const void *src, 
+VLC_EXPORT (const char *, inet_ntop, (int af, const void *src,
                                       char *dst, socklen_t cnt) );
 #endif
 #endif
@@ -370,11 +370,11 @@ static inline void net_SetPort (struct sockaddr *addr, uint16_t port)
 #ifdef AF_INET6
         case AF_INET6:
             ((struct sockaddr_in6 *)addr)->sin6_port = port;
-	    break;
+        break;
 #endif
         case AF_INET:
             ((struct sockaddr_in *)addr)->sin_port = port;
-	    break;
+        break;
     }
 }
 # ifdef __cplusplus

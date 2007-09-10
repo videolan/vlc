@@ -227,7 +227,7 @@ static int Open( vlc_object_t *p_this )
         free( psz_name );
         return VLC_EGENERIC;
     }
-    
+ 
     p_sys->p_ev->p_frame = NULL;
     p_sys->p_ev->pp_last = &p_sys->p_ev->p_frame;
     p_sys->p_ev->p_access = p_access;

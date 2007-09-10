@@ -47,4 +47,4 @@ VLMDialog::~VLMDialog(){}
 void VLMDialog::close(){
     close();
 }
-    
+ 

@@ -98,7 +98,7 @@ void cocoaglvoutviewEnd( vout_thread_t * p_vout )
     [p_vout->p_sys->o_glview release];
 
     [p_vout->p_sys->o_pool release];
-    
+ 
 }
 
 /*****************************************************************************
@@ -217,7 +217,7 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
 
 - (void)dealloc
 {
-    [objectLock dealloc]; 
+    [objectLock dealloc];
     [super dealloc];
 }
 

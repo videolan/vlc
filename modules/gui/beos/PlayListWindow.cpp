@@ -71,7 +71,7 @@ PlayListWindow::PlayListWindow( BRect frame, const char* name,
     snprintf( psz_tmp, 1024, "%s%s", a, B_UTF8_ELLIPSIS );
 
     p_intf = p_interface;
-    
+ 
     SetName( _("playlist") );
 
     // set up the main menu bar
@@ -190,7 +190,7 @@ PlayListWindow::~PlayListWindow()
 bool
 PlayListWindow::QuitRequested()
 {
-    Hide(); 
+    Hide();
     return false;
 }
 

@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -215,7 +215,7 @@ static int MyCallback( vlc_object_t *p_this, char const *psz_var,
     sprintf( psz_newvar, "blork-%i", i_var );
     var_Set( p_this, psz_newvar, newval );
 
-    return VLC_SUCCESS;   
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

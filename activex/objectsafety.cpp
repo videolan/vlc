@@ -26,13 +26,13 @@
 #include "axvlc_idl.h"
 
 #if 0
-const GUID IID_IObjectSafety = 
-    {0xCB5BDC81,0x93C1,0x11cf,{0x8F,0x20,0x00,0x80,0x5F,0x2C,0xD0,0x64}}; 
+const GUID IID_IObjectSafety =
+    {0xCB5BDC81,0x93C1,0x11cf,{0x8F,0x20,0x00,0x80,0x5F,0x2C,0xD0,0x64}};
 #endif
 
 using namespace std;
 
-STDMETHODIMP VLCObjectSafety::GetInterfaceSafetyOptions(      
+STDMETHODIMP VLCObjectSafety::GetInterfaceSafetyOptions(
     REFIID riid,
     DWORD *pdwSupportedOptions,
     DWORD *pdwEnabledOptions
@@ -61,7 +61,7 @@ STDMETHODIMP VLCObjectSafety::GetInterfaceSafetyOptions(
     return E_NOINTERFACE;
 };
 
-STDMETHODIMP VLCObjectSafety::SetInterfaceSafetyOptions(      
+STDMETHODIMP VLCObjectSafety::SetInterfaceSafetyOptions(
     REFIID riid,
     DWORD dwOptionSetMask,
     DWORD dwEnabledOptions

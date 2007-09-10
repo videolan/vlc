@@ -274,7 +274,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_META:
             p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
             if( p_sys->p_meta )
-                vlc_meta_Merge( p_meta, p_sys->p_meta ); 
+                vlc_meta_Merge( p_meta, p_sys->p_meta );
             else
                 p_meta = NULL;
             return VLC_SUCCESS;

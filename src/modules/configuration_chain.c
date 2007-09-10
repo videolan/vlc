@@ -238,7 +238,7 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
         snprintf( name, sizeof (name), "%s%s", psz_prefix, optname );
         if( var_Create( p_this, name,
                         config_GetType( p_this, name ) | VLC_VAR_DOINHERIT ) )
-            return /* VLC_xxx */; 
+            return /* VLC_xxx */;
     }
 
     /* Now parse options and set value */

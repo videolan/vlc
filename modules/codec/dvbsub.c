@@ -32,7 +32,7 @@
  * FIXME:
  * DVB subtitles coded as strings of characters are not handled correctly.
  * The character codes in the string should actually be indexes referring to a
- * character table identified in the subtitle descriptor. 
+ * character table identified in the subtitle descriptor.
  *
  * The spec is quite vague in this area, but what is meant is perhaps that it
  * refers to the character index in the codepage belonging to the language specified
@@ -52,7 +52,7 @@
 #define POSX_LONGTEXT N_("X coordinate of the rendered subtitle")
 
 #define POSY_TEXT N_("Decoding Y coordinate")
-#define POSY_LONGTEXT N_("Y coordinate of the rendered subtitle") 
+#define POSY_LONGTEXT N_("Y coordinate of the rendered subtitle")
 
 #define POS_TEXT N_("Subpicture position")
 #define POS_LONGTEXT N_( \
@@ -249,7 +249,7 @@ struct decoder_sys_t
 #define DVBSUB_OT_BASIC_CHAR            0x01
 #define DVBSUB_OT_COMPOSITE_STRING      0x02
 /* Pixel DATA TYPES */
-/* According to EN 300-743, table 9 */ 
+/* According to EN 300-743, table 9 */
 #define DVBSUB_DT_2BP_CODE_STRING       0x10
 #define DVBSUB_DT_4BP_CODE_STRING       0x11
 #define DVBSUB_DT_8BP_CODE_STRING       0x12
@@ -304,7 +304,7 @@ static int Open( vlc_object_t *p_this )
     }
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
-    p_sys->i_pts          = (mtime_t) 0;    
+    p_sys->i_pts          = (mtime_t) 0;
     p_sys->i_id           = p_dec->fmt_in.subs.dvb.i_id & 0xFFFF;
     p_sys->i_ancillary_id = p_dec->fmt_in.subs.dvb.i_id >> 16;
 
@@ -976,7 +976,7 @@ static void decode_display_definition( decoder_t *p_dec, bs_t *s )
         p_display->i_max_x = bs_read( s, 16 );
         p_display->i_y     = bs_read( s, 16 );
         p_display->i_max_y = bs_read( s, 16 );
-        i_processed_length += 64;  
+        i_processed_length += 64;
     }
 
     p_sys->p_display = p_display;
@@ -1667,7 +1667,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-/* FIXME: this routine is a hack to convert VLC_FOURCC('Y','U','V','A') 
+/* FIXME: this routine is a hack to convert VLC_FOURCC('Y','U','V','A')
  *        into VLC_FOURCC('Y','U','V','P')
  */
 static subpicture_t *YuvaYuvp( encoder_t *p_enc, subpicture_t *p_subpic )
@@ -1907,7 +1907,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     {
         char psz_fourcc[5];
         memset( &psz_fourcc, 0, sizeof(char)*5 );
-        vlc_fourcc_to_char( p_region->fmt.i_chroma, &psz_fourcc ); 
+        vlc_fourcc_to_char( p_region->fmt.i_chroma, &psz_fourcc );
         msg_Err( p_enc, "chroma %4s not supported", &psz_fourcc );
         return NULL;
     }
@@ -2022,7 +2022,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
         }
 
         if( ( p_sys->p_regions[i_regions].i_width <
-              (int)p_region->fmt.i_visible_width ) || 
+              (int)p_region->fmt.i_visible_width ) ||
             ( p_sys->p_regions[i_regions].i_width >
               (int)p_region->fmt.i_visible_width ) )
         {

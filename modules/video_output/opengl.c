@@ -117,7 +117,7 @@
     static const char *ppsz_effects[] = {
             "none", "cube", "transparent-cube", "cylinder", "torus", "sphere","SQUAREXY","SQUARER", "ASINXY", "ASINR", "SINEXY", "SINER" };
     static const char *ppsz_effects_text[] = {
-            N_("None"), N_("Cube"), N_("Transparent Cube"), 
+            N_("None"), N_("Cube"), N_("Transparent Cube"),
             N_("Cylinder"), N_("Torus"), N_("Sphere"), N_("SQUAREXY"),N_("SQUARER"), N_("ASINXY"), N_("ASINR"), N_("SINEXY"), N_("SINER") };
 #endif
 
@@ -139,7 +139,7 @@ static int InitTextures  ( vout_thread_t * );
 static int SendEvents    ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 
-#ifdef OPENGL_MORE_EFFECT                       
+#ifdef OPENGL_MORE_EFFECT
 static float Z_Compute   ( float, int, float, float );
 static void Transform    ( float, int, float, float, int, int, int, int, double *, double * );
 
@@ -465,7 +465,7 @@ static int Init( vout_thread_t *p_vout )
         {
             p_sys->i_effect ++;
         }
-        if (pow(2,p_sys->i_effect) < INIFILE) 
+        if (pow(2,p_sys->i_effect) < INIFILE)
             p_sys->i_effect = pow(2,p_sys->i_effect);
         else if ( strcmp( val.psz_string, ppsz_effects[p_sys->i_effect]))
         {
@@ -493,7 +493,7 @@ static int Init( vout_thread_t *p_vout )
         glTranslatef( 0.0, 0.0, - 5.0 );
     }
 #ifdef OPENGL_MORE_EFFECT
-    else 
+    else
     {
         /* Set the perpective */
         glMatrixMode( GL_PROJECTION );
@@ -623,7 +623,7 @@ static int Manage( vout_thread_t *p_vout )
             case ASINR:
             case SINEXY:
             case SINER:
-#endif            
+#endif
                 glEnable( GL_CULL_FACE );
                 break;
 
@@ -646,7 +646,7 @@ static int Manage( vout_thread_t *p_vout )
             glTranslatef( 0.0, 0.0, - 5.0 );
         }
 #ifdef OPENGL_MORE_EFFECT
-        else 
+        else
         {
             glMatrixMode( GL_PROJECTION );
             glLoadIdentity();
@@ -654,14 +654,14 @@ static int Manage( vout_thread_t *p_vout )
             glMatrixMode( GL_MODELVIEW );
             glLoadIdentity();
             glTranslatef( 0.0, 0.0, -3.0 );
-    
+ 
             float f_pov_x, f_pov_y, f_pov_z;
             f_pov_x = var_CreateGetFloat( p_vout, "opengl-pov-x");
             f_pov_y = var_CreateGetFloat( p_vout, "opengl-pov-y");
             f_pov_z = var_CreateGetFloat( p_vout, "opengl-pov-z");
             gluLookAt(0, 0, 0, f_pov_x, f_pov_y, f_pov_z, 0, 1, 0);
         }
-#endif        
+#endif
     }
 
     if( p_sys->p_vout->pf_unlock )
@@ -670,12 +670,12 @@ static int Manage( vout_thread_t *p_vout )
     }
 #endif
 // to align in real time in OPENGL
-	if (p_sys->p_vout->i_alignment != p_vout->i_alignment)
-	{
-		p_vout->i_changes = VOUT_CROP_CHANGE;		//to force change
-    	p_sys->p_vout->i_alignment = p_vout->i_alignment;	
-	}
-	
+    if (p_sys->p_vout->i_alignment != p_vout->i_alignment)
+    {
+        p_vout->i_changes = VOUT_CROP_CHANGE;        //to force change
+        p_sys->p_vout->i_alignment = p_vout->i_alignment;    
+    }
+    
     return i_ret;
 }
 
@@ -763,7 +763,7 @@ static void Transform(float p, int distortion, float width, float height,int i, 
     r = sqrt(x*x+y*y);
     theta = atan2(y,x);
 
-    switch (distortion) 
+    switch (distortion)
     {
 /* GRID2D TRANSFORMATION */
         case SINEXY:
@@ -814,23 +814,23 @@ static float Z_Compute(float p, int distortion, float x, float y)
     float f_z = 0.0;
     double d_p = p / 100.0;
 
-    switch (distortion) 
+    switch (distortion)
     {
 /* 3D MODEL */
         case CYLINDER:
-            if (d_p > 0) 
+            if (d_p > 0)
                 f_z = (1 - d_p * d_p) / (2 * d_p) - sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x));
             else
                 f_z = (1 - d_p * d_p) / (2 * d_p) + d_p + sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x));
             break;
         case TORUS:
-            if (d_p > 0) 
+            if (d_p > 0)
                 f_z =  (1 - d_p * d_p) / (d_p) - sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x)) - sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - y * y));
             else
                 f_z =  (1 - d_p * d_p) / (d_p) + 2 * d_p + sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x)) + sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - y * y));
             break;
         case SPHERE:
-            if (d_p > 0) 
+            if (d_p > 0)
                 f_z = (1 - d_p * d_p) / (2 * d_p) - sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x - y * y));
             else
                 f_z = (1 - d_p * d_p) / (2 * d_p) + d_p + sqrt(fabs((d_p * d_p + 1) / (2 * d_p) * (d_p * d_p + 1) / (2 * d_p) - x * x - y * y));
@@ -903,31 +903,31 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     }
     else
 #ifdef OPENGL_MORE_EFFECT
-    if ((p_sys->i_effect > OPENGL_EFFECT_TRANSPARENT_CUBE) || 
+    if ((p_sys->i_effect > OPENGL_EFFECT_TRANSPARENT_CUBE) ||
         ((p_sys->i_effect == OPENGL_EFFECT_NONE)))
     {
        unsigned int i_i, i_j;
        unsigned int i_accuracy  = config_GetInt( p_vout, "opengl-accuracy");
-       unsigned int i_n = pow(2, i_accuracy);    
+       unsigned int i_n = pow(2, i_accuracy);
        unsigned int i_n_x = (p_vout->fmt_out.i_visible_width / (i_n * 2));
        unsigned int i_n_y = (p_vout->fmt_out.i_visible_height / i_n);
        double d_x, d_y;
        int i_distortion = p_sys->i_effect;
-       float f_p = p_sys->f_radius; 
-            
+       float f_p = p_sys->f_radius;
+ 
        glEnable( VLCGL_TARGET );
-       glBegin(GL_QUADS);                                   
-       for (i_i = 0; i_i < p_vout->fmt_out.i_visible_width; i_i += i_n_x) 
+       glBegin(GL_QUADS);
+       for (i_i = 0; i_i < p_vout->fmt_out.i_visible_width; i_i += i_n_x)
        {
           if ( i_i == i_n_x * i_n / 2) i_n_x += p_vout->fmt_out.i_visible_width % i_n;
           if ((i_i == (p_vout->fmt_out.i_visible_width / i_n) * i_n / 2 + i_n_x) &&
               (p_vout->fmt_out.i_visible_width / i_n != i_n_x))
-                i_n_x -= p_vout->fmt_out.i_visible_width % i_n; 
+                i_n_x -= p_vout->fmt_out.i_visible_width % i_n;
 
           int i_m;
           int i_index_max = 0;
-                
-          for (i_j = 0; i_j < p_vout->fmt_out.i_visible_height; i_j += i_n_y) 
+ 
+          for (i_j = 0; i_j < p_vout->fmt_out.i_visible_height; i_j += i_n_y)
           {
             if ( i_j == i_n_y * i_n / 2) i_n_y += p_vout->fmt_out.i_visible_height % i_n;
             if ((i_j == (p_vout->fmt_out.i_visible_height / i_n) * i_n / 2 + i_n_y) &&
@@ -939,14 +939,14 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                 int i_k = ((i_m % 4) == 1) || ((i_m % 4) == 2);
                 int i_l = ((i_m % 4) == 2) || ((i_m % 4) == 3);
 
-                Transform(f_p, i_distortion, f_width, f_height, i_i + i_k * i_n_x, i_j + i_l * i_n_y, p_vout->fmt_out.i_visible_width, p_vout->fmt_out.i_visible_height, &d_x, &d_y);                                
+                Transform(f_p, i_distortion, f_width, f_height, i_i + i_k * i_n_x, i_j + i_l * i_n_y, p_vout->fmt_out.i_visible_width, p_vout->fmt_out.i_visible_height, &d_x, &d_y);
                 glTexCoord2f(f_x + d_x, f_y + d_y);
                 d_x =  - 1.0 + 2.0 * ((double)(i_k * i_n_x + i_i) / (double)p_vout->fmt_out.i_visible_width);
                 d_y =    1.0 - 2.0 * (((double)i_l * i_n_y + i_j) / (double)p_vout->fmt_out.i_visible_height);
-                glVertex3f((float)d_x, (float)d_y, Z_Compute(f_p, i_distortion, (float)d_x, (float)d_y));    
+                glVertex3f((float)d_x, (float)d_y, Z_Compute(f_p, i_distortion, (float)d_x, (float)d_y));
             }
           }
-       } 
+       }
        glEnd();
     }
     else

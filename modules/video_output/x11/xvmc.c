@@ -569,7 +569,7 @@ static void xxmc_xvmc_surface_handler_construct( vout_thread_t *p_vout )
 {
     int i;
     xvmc_surface_handler_t *handler = &p_vout->p_sys->xvmc_surf_handler;
-    
+ 
     pthread_mutex_init( &handler->mutex, NULL );
     for( i=0; i<XVMC_MAX_SURFACES; ++i )
     {
@@ -772,7 +772,7 @@ int checkXvMCCap( vout_thread_t *p_vout )
         xvmc_context_writer_unlock( &p_vout->p_sys->xvmc_lock );
         return VLC_SUCCESS;
     }
-    XVMCLOCKDISPLAY( p_vout->p_sys->p_display );  
+    XVMCLOCKDISPLAY( p_vout->p_sys->p_display );
     XvMCDestroyContext( p_vout->p_sys->p_display, &c );
     xxmc_xvmc_surface_handler_construct(p_vout );
     /*  p_vout->p_sys->capabilities |= VO_CAP_XXMC; */

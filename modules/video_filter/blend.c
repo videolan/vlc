@@ -744,7 +744,7 @@ static void BlendR24( filter_t *p_filter, picture_t *p_dst_pic,
                     /* Completely transparent. Don't change pixel */
                     continue;
                 }
-                else 
+                else
                 {
                     int i_pos = i_x * i_pix_pitch;
                     if( i_trans == MAX_TRANS )

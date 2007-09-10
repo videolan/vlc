@@ -183,7 +183,7 @@ static int net_SetMcastHopLimit( vlc_object_t *p_this,
 {
     int proto, cmd;
 
-    /* There is some confusion in the world whether IP_MULTICAST_TTL 
+    /* There is some confusion in the world whether IP_MULTICAST_TTL
      * takes a byte or an int as an argument.
      * BSD seems to indicate byte so we are going with that and use
      * int as a fallback to be safe */
@@ -516,7 +516,7 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
 
     msg_Dbg (obj, "Multicast %sgroup join request", src ? "source " : "");
 
-    if (setsockopt (fd, level, 
+    if (setsockopt (fd, level,
                     src ? MCAST_JOIN_SOURCE_GROUP : MCAST_JOIN_GROUP,
                     (void *)&opt, optlen) == 0)
         return 0;

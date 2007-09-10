@@ -155,7 +155,7 @@
     screen = [NSScreen screenWithDisplayID:(CGDirectDisplayID)var_GetInteger( p_vout, "video-device" )];
 
     vlc_object_release( p_vout );
-    
+ 
     [self lockFullscreenAnimation];
 
     if (!screen)
@@ -166,7 +166,7 @@
     [o_btn_fullscreen setState: YES];
 
     [NSCursor setHiddenUntilMouseMoves: YES];
-    
+ 
     if (blackout_other_displays)
         [screen blackoutOtherScreens]; /* We should do something like [screen blackoutOtherScreens]; */
 
@@ -188,15 +188,15 @@
              * Mac OS X <10.4 which doesn't support NSAnimation, instead we
              * simply fade the display */
             CGDisplayFadeReservationToken token;
-            
+ 
             [o_fullscreen_window setFrame:screen_rect display:NO];
-            
+ 
             CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
             CGDisplayFade( token, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
-            
+ 
             if ([screen isMainScreen])
                 SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
-            
+ 
             [[self contentView] replaceSubview:o_view with:o_temp_view];
             [o_temp_view setFrame:[o_view frame]];
             [o_fullscreen_window setContentView:o_view];
@@ -211,7 +211,7 @@
 
             return;
         }
-        
+ 
         /* Make sure we don't see the o_view disappearing of the screen during this operation */
         DisableScreenUpdates();
         [[self contentView] replaceSubview:o_view with:o_temp_view];
@@ -253,7 +253,7 @@
  
      /* This is a recursive lock. If we are already in the middle of an animation we
      * unlock it. We don't add an extra locking here, because enter/leavefullscreen
-     * are executed always in the same thread */ 
+     * are executed always in the same thread */
     if (b_animation_lock_alreadylocked)
         [self unlockFullscreenAnimation];
     b_animation_lock_alreadylocked = YES;
@@ -304,7 +304,7 @@
 
     /* tell the fspanel to move itself to front next time it's triggered */
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
-    
+ 
     [super orderOut: self];
 
     [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
@@ -378,13 +378,13 @@
 
     /* This is a recursive lock. If we are already in the middle of an animation we
      * unlock it. We don't add an extra locking here, because enter/leavefullscreen
-     * are executed always in the same thread */ 
+     * are executed always in the same thread */
     if (b_animation_lock_alreadylocked)
         [self unlockFullscreenAnimation];
     b_animation_lock_alreadylocked = YES;
 
     frame = [[o_temp_view superview] convertRect: [o_temp_view frame] toView: nil]; /* Convert to Window base coord */
-    frame.origin.x += [self frame].origin.x; 
+    frame.origin.x += [self frame].origin.x;
     frame.origin.y += [self frame].origin.y;
 
     dict2 = [[NSMutableDictionary alloc] initWithCapacity:2];

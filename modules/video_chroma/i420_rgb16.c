@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -363,7 +363,7 @@ void E_(I420_R5G5B5)( vout_thread_t *p_vout, picture_t *p_src,
     }
 
     /*
-    ** SSE2 128 bits fetch/store instructions are faster 
+    ** SSE2 128 bits fetch/store instructions are faster
     ** if memory access is 16 bytes aligned
     */
 
@@ -604,7 +604,7 @@ void E_(I420_R5G6B5)( vout_thread_t *p_vout, picture_t *p_src,
     }
 
     /*
-    ** SSE2 128 bits fetch/store instructions are faster 
+    ** SSE2 128 bits fetch/store instructions are faster
     ** if memory access is 16 bytes aligned
     */
 
@@ -957,7 +957,7 @@ void E_(I420_A8R8G8B8)( vout_thread_t *p_vout, picture_t *p_src,
     }
 
     /*
-    ** SSE2 128 bits fetch/store instructions are faster 
+    ** SSE2 128 bits fetch/store instructions are faster
     ** if memory access is 16 bytes aligned
     */
 
@@ -1196,7 +1196,7 @@ void E_(I420_R8G8B8A8)( vout_thread_t *p_vout, picture_t *p_src,
     }
 
     /*
-    ** SSE2 128 bits fetch/store instructions are faster 
+    ** SSE2 128 bits fetch/store instructions are faster
     ** if memory access is 16 bytes aligned
     */
 
@@ -1435,7 +1435,7 @@ void E_(I420_B8G8R8A8)( vout_thread_t *p_vout, picture_t *p_src,
     }
 
     /*
-    ** SSE2 128 bits fetch/store instructions are faster 
+    ** SSE2 128 bits fetch/store instructions are faster
     ** if memory access is 16 bytes aligned
     */
 
@@ -1671,7 +1671,7 @@ void E_(I420_A8B8G8R8)( vout_thread_t *p_vout, picture_t *p_src,
     }
 
     /*
-    ** SSE2 128 bits fetch/store instructions are faster 
+    ** SSE2 128 bits fetch/store instructions are faster
     ** if memory access is 16 bytes aligned
     */
 

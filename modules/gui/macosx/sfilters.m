@@ -23,10 +23,10 @@
 
 
 /*****************************************************************************
- * Note: 
- * the code used to bind with VLC's core is partially based upon the 
- * RC-interface, written by Antoine Cellerier and Mark F. Moriarty  
- * (members of the VideoLAN team) 
+ * Note:
+ * the code used to bind with VLC's core is partially based upon the
+ * RC-interface, written by Antoine Cellerier and Mark F. Moriarty
+ * (members of the VideoLAN team)
  *****************************************************************************/
 
 #import "sfilters.h"
@@ -98,7 +98,7 @@ static VLCsFilters *_o_sharedInstance = nil;
 - (void)awakeFromNib
 {
     /* colors as implemented at the beginning of marq.c and time.c
-     * feel free to add more colors, but remember to add them to these files 
+     * feel free to add more colors, but remember to add them to these files
      * as well to keep a certain level of consistency across the interfaces */
     NSArray * o_default;
     NSArray * o_black;
@@ -141,19 +141,19 @@ static VLCsFilters *_o_sharedInstance = nil;
     unsigned int x = 0;
     [o_marq_color_pop removeAllItems];
     [o_time_color_pop removeAllItems];
-    
-    /* we are adding tags to the items, so we can easily identify them even if 
+ 
+    /* we are adding tags to the items, so we can easily identify them even if
      * the menu was sorted */
     while (x != [o_colors count])
     {
         [o_marq_color_pop addItemWithTitle: [[o_colors objectAtIndex:x]
             objectAtIndex:0]];
         [[o_marq_color_pop lastItem] setTag: x];
-        
+ 
         [o_time_color_pop addItemWithTitle: [[o_colors objectAtIndex:x]
             objectAtIndex:0]];
         [[o_time_color_pop lastItem] setTag: x];
-        
+ 
         x = (x + 1);
     }
 
@@ -188,7 +188,7 @@ static VLCsFilters *_o_sharedInstance = nil;
         NULL, 0) != tempInt )
     {
         x = (x + 1);
-        
+ 
         if( x >= [o_marq_color_pop numberOfItems] )
         {
             x = 0;
@@ -200,18 +200,18 @@ static VLCsFilters *_o_sharedInstance = nil;
         [o_marq_marq_fld setStringValue: [NSString stringWithUTF8String: psz_temp]];
     else
         [o_marq_marq_fld setStringValue: _NS("Not Available")];
-    
+ 
     [o_marq_opaque_sld setIntValue: config_GetInt( p_intf, "marq-opacity")];
     [o_marq_pos_radio selectCellWithTag: config_GetInt( p_intf, "marq-position" )];
     /* FIXME: the following line doesn't work with "-1", which is the default
      * value */
-    [o_marq_size_pop selectItemWithTitle: 
+    [o_marq_size_pop selectItemWithTitle:
         [[NSNumber numberWithInt: config_GetInt( p_intf, "marq-size" )]
             stringValue]];
     [o_marq_size_pop selectItemAtIndex: x];
     [o_marq_tmOut_fld setStringValue: [[NSNumber numberWithInt:
         config_GetInt( p_intf, "marq-timeout" )] stringValue]];
-    
+ 
     /* retrieve the time settings */
     x = 0;
     tempInt = config_GetInt( p_intf, "time-color" );
@@ -219,7 +219,7 @@ static VLCsFilters *_o_sharedInstance = nil;
         NULL, 0) != tempInt )
     {
         x = (x + 1);
-        
+ 
         if( x >= [o_time_color_pop numberOfItems] )
         {
             x = 0;
@@ -235,10 +235,10 @@ static VLCsFilters *_o_sharedInstance = nil;
     [o_time_opaque_sld setIntValue: config_GetInt( p_intf, "time-opacity")];
     /* FIXME: the following line doesn't work with "-1", which is the default
      * value */
-    [o_time_size_pop selectItemWithTitle: 
+    [o_time_size_pop selectItemWithTitle:
         [[NSNumber numberWithInt: config_GetInt( p_intf, "time-size" )]
             stringValue]];
-    [o_time_pos_radio selectCellWithTag: config_GetInt( p_intf, "time-position" )];    
+    [o_time_pos_radio selectCellWithTag: config_GetInt( p_intf, "time-position" )];
 
     /* retrieve the logo settings */
     [o_logo_opaque_sld setIntValue: config_GetInt( p_intf, "logo-transparency")];
@@ -248,7 +248,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     else
         [o_logo_image_fld setStringValue: @""];
     [o_logo_pos_radio selectCellWithTag: config_GetInt( p_intf, "logo-position" )];
-    
+ 
     /* enable the requested filters */
     char * psz_subfilters;
     psz_subfilters = config_GetPsz( p_intf, "sub-filter" );
@@ -258,12 +258,12 @@ static VLCsFilters *_o_sharedInstance = nil;
             [o_marq_enabled_ckb setState: YES];
         else
             [o_marq_enabled_ckb setState: NO];
-        
+ 
         if( strstr( psz_subfilters, "logo") )
             [o_logo_enabled_ckb setState: YES];
         else
             [o_logo_enabled_ckb setState: NO];
-        
+ 
         if( strstr( psz_subfilters, "time") )
             [o_time_enabled_ckb setState: YES];
         else
@@ -305,7 +305,7 @@ static VLCsFilters *_o_sharedInstance = nil;
     /* general properties */
     if( sender == o_sfilter_saveSettings_ckb)
     {
-        o_save_settings = [o_sfilter_saveSettings_ckb state]; 
+        o_save_settings = [o_sfilter_saveSettings_ckb state];
     }
 
     /* marquee */
@@ -376,9 +376,9 @@ static VLCsFilters *_o_sharedInstance = nil;
 
         config_PutInt( p_intf, "marq-timeout", val.i_int );
     }
-    
+ 
     /* time */
-    
+ 
     else if( sender == o_time_stamp_fld )
     {
         if( [[o_time_stamp_fld stringValue] length] == 0 )
@@ -517,7 +517,7 @@ static VLCsFilters *_o_sharedInstance = nil;
             [self changeFiltersString:(char *)"time" onOrOff:VLC_FALSE];
         }
         [self enableTime];
-    }    
+    }
 }
 
 - (void)enableMarq
@@ -554,10 +554,10 @@ static VLCsFilters *_o_sharedInstance = nil;
      * and slightly modified to suit our needs */
 
     intf_thread_t * p_intf = VLCIntf;
-    
+ 
     char *psz_parser, *psz_string;
     psz_string = config_GetPsz( p_intf, "sub-filter" );
-    
+ 
     if( !psz_string ) psz_string = strdup("");
 
     psz_parser = strstr( psz_string, psz_name );
@@ -596,9 +596,9 @@ static VLCsFilters *_o_sharedInstance = nil;
              return;
          }
     }
-    
+ 
     config_PutPsz( p_intf, "sub-filter", psz_string );
-    
+ 
     /* Try to set on the fly */
     /* FIXME: enable this once we support on-the-fly addition of this kind of
      * filters... */

@@ -258,18 +258,18 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
             return VLC_ENOMEM;
     }
 #   else
-    if( asprintf( &ppsz_dir_list[1], 
+    if( asprintf( &ppsz_dir_list[1],
                   "share" DIR_SEP "%s", luadirname ) < 0 )
         return VLC_ENOMEM;
 
 #   ifdef HAVE_SYS_STAT_H
-    {    
+    {
         struct stat stat_info;
         if( ( utf8_stat( ppsz_dir_list[1], &stat_info ) == -1 )
             || !S_ISDIR( stat_info.st_mode ) )
         {
             free(ppsz_dir_list[1]);
-            if( asprintf( &ppsz_dir_list[1], 
+            if( asprintf( &ppsz_dir_list[1],
                           DATA_PATH DIR_SEP "%s", luadirname ) < 0 )
                 return VLC_ENOMEM;
         }
@@ -306,13 +306,13 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
         for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend; ppsz_file++ )
         {
             char  *psz_filename;
-            if( asprintf( &psz_filename, 
+            if( asprintf( &psz_filename,
                           "%s" DIR_SEP "%s", *ppsz_dir, *ppsz_file ) < 0)
                 return VLC_ENOMEM;
             msg_Dbg( p_this, "Trying Lua playlist script %s", psz_filename );
-            
+ 
             i_ret = func( p_this, psz_filename, p_state, user_data );
-            
+ 
             free( psz_filename );
 
             if( i_ret == VLC_SUCCESS ) break;

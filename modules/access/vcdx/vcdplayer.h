@@ -2,7 +2,7 @@
  * Copyright (C) 2003, 2004 Rocky Bernstein (for the VideoLAN team)
  * $Id$
  *
- * Authors: Rocky Bernstein <rocky@panix.com> 
+ * Authors: Rocky Bernstein <rocky@panix.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@
    if (p_vcdplayer && p_vcdplayer->i_debug & mask) \
      msg_Dbg(p_access, "%s: "s, __func__ , ##args)
 #else
-#define dbg_print(mask, s, args...) 
+#define dbg_print(mask, s, args...)
 #endif
 
 #define LOG_ERR(args...)  msg_Err( p_access, args )
@@ -78,29 +78,29 @@ typedef struct vcdplayer_input_s
   vcdinfo_obj_t *vcd;                   /* CD device descriptor */
 
   /*------------------------------------------------------------------
-    User-settable options 
+    User-settable options
    --------------------------------------------------------------*/
   unsigned int i_debug;                 /* Debugging mask */
   unsigned int i_blocks_per_read;       /* number of blocks per read */
 
   /*-------------------------------------------------------------
-     Playback control fields 
+     Playback control fields
    --------------------------------------------------------------*/
   bool         in_still;                /* true if in still */
-  int          i_lid;                   /* LID that play item is in. Implies 
-                                           PBC is on. VCDPLAYER_BAD_ENTRY if 
+  int          i_lid;                   /* LID that play item is in. Implies
+                                           PBC is on. VCDPLAYER_BAD_ENTRY if
                                            not none or not in PBC */
-  PsdListDescriptor_t pxd;              /* If PBC is on, the relevant 
+  PsdListDescriptor_t pxd;              /* If PBC is on, the relevant
                                             PSD/PLD */
-  int          pdi;                     /* current pld index of pxd. -1 if 
+  int          pdi;                     /* current pld index of pxd. -1 if
                                            no index*/
-  vcdinfo_itemid_t play_item;           /* play-item, VCDPLAYER_BAD_ENTRY 
+  vcdinfo_itemid_t play_item;           /* play-item, VCDPLAYER_BAD_ENTRY
                                            if none */
-  vcdinfo_itemid_t loop_item;           /* Where do we loop back to? 
-                                           Meaningful only in a selection 
+  vcdinfo_itemid_t loop_item;           /* Where do we loop back to?
+                                           Meaningful only in a selection
                                            list */
-  int          i_loop;                  /* # of times play-item has been 
-                                           played. Meaningful only in a 
+  int          i_loop;                  /* # of times play-item has been
+                                           played. Meaningful only in a
                                            selection list.              */
   track_t      i_track;                 /* current track number */
 
@@ -108,15 +108,15 @@ typedef struct vcdplayer_input_s
      location fields
    ------------------------------------*/
   lsn_t        i_lsn;                   /* LSN of where we are right now */
-  lsn_t        end_lsn;                 /* LSN of end of current 
+  lsn_t        end_lsn;                 /* LSN of end of current
                                            entry/segment/track. This block
-                                           can be read (and is not one after 
+                                           can be read (and is not one after
                                            the "end").
                                         */
   lsn_t        origin_lsn;              /* LSN of start of seek/slider */
-  lsn_t        track_lsn;               /* LSN of start track origin of track 
+  lsn_t        track_lsn;               /* LSN of start track origin of track
                                            we are in. */
-  lsn_t        track_end_lsn;           /* LSN of end of current track (if 
+  lsn_t        track_end_lsn;           /* LSN of end of current track (if
                                            entry). */
   lsn_t *      p_entries;               /* Entry points */
   lsn_t *      p_segments;              /* Segments */
@@ -130,7 +130,7 @@ typedef struct vcdplayer_input_s
   char        *psz_source;              /* (S)VCD drive or image filename */
   bool         b_svd;                   /* true if we have SVD info */
   vlc_meta_t  *p_meta;
-  track_t      i_tracks;                /* # of playable MPEG tracks. This is 
+  track_t      i_tracks;                /* # of playable MPEG tracks. This is
                                            generally one less than the number
                                            of CD tracks as the first CD track
                                            is an ISO-9660 track and is not
@@ -148,7 +148,7 @@ typedef struct vcdplayer_input_s
 
   unsigned int i_titles;                /* # of navigatable titles. */
 
-  /* 
+  /*
      # tracks + menu for segments + menu for LIDs
    */
   input_title_t *p_title[CDIO_CD_MAX_TRACKS+2];
@@ -161,7 +161,7 @@ typedef struct vcdplayer_input_s
   bool           b_track_length; /* Use track as max unit in seek */
   input_thread_t *p_input;
   access_t       *p_access;
-  
+ 
 } vcdplayer_t;
 
 /* vcdplayer_read return status */
@@ -174,7 +174,7 @@ typedef enum {
 
 
 /* ----------------------------------------------------------------------
-   Function Prototypes 
+   Function Prototypes
   -----------------------------------------------------------------------*/
 
 /*!
@@ -210,8 +210,8 @@ bool vcdplayer_play_prev( access_t * p_access );
 */
 bool vcdplayer_play_return( access_t * p_access );
 
-/* 
-   Set's start origin and size for subsequent seeks.  
+/*
+   Set's start origin and size for subsequent seeks.
    input: p_vcd->i_lsn, p_vcd->play_item
    changed: p_vcd->origin_lsn, p_vcd->end_lsn
 */
@@ -223,7 +223,7 @@ void vcdplayer_play(access_t *p_access, vcdinfo_itemid_t itemid);
 vcdplayer_read_status_t vcdplayer_read (access_t * p_access_t, uint8_t *p_buf);
 
 #endif /* _VCDPLAYER_H_ */
-/* 
+/*
  * Local variables:
  *  c-file-style: "gnu"
  *  tab-width: 8

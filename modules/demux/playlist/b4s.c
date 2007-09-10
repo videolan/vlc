@@ -52,7 +52,7 @@ static int IsWhitespace( char *psz_string );
  *****************************************************************************/
 int E_(Import_B4S)( vlc_object_t *p_this )
 {
-    DEMUX_BY_EXTENSION_OR_FORCED_MSG( ".b4s", "b4s-open", 
+    DEMUX_BY_EXTENSION_OR_FORCED_MSG( ".b4s", "b4s-open",
                                       "using B4S playlist reader" );
     p_demux->p_sys->psz_prefix = E_(FindPrefix)( p_demux );
     p_demux->p_sys->p_xml = NULL;

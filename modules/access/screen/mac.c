@@ -73,8 +73,8 @@ int screen_InitCapture( demux_t *p_demux )
     if( CGDisplaySamplesPerPixel(p_data->displayID) != 3 )
     {
         msg_Err( p_demux, "screenformat not supported" );
-    } 
-    
+    }
+ 
     switch( CGDisplaySamplesPerPixel(p_data->displayID) * CGDisplayBitsPerSample(p_data->displayID) )
     {
     /* TODO figure out 256 colors (who uses it anyways) */
@@ -98,7 +98,7 @@ int screen_InitCapture( demux_t *p_demux )
     GetPenState(&p_data->oldState);
     ForeColor(blackColor);
     BackColor(whiteColor);
-    
+ 
     p_data->gMainDevice = GetMainDevice();
     p_data->gDeviceState = HGetState((Handle)p_data->gMainDevice);
     HLock((Handle)p_data->gMainDevice);
@@ -107,7 +107,7 @@ int screen_InitCapture( demux_t *p_demux )
     NewGWorld(&p_data->LocalBufferGW, (**p_data->gDevicePix).pixelSize, &(**p_data->gDevicePix).bounds, (**p_data->gDevicePix).pmTable, NULL, 0);
     p_data->LocalBufferPix = GetGWorldPixMap(p_data->LocalBufferGW);
     LockPixels(p_data->LocalBufferPix);
-    
+ 
     es_format_Init( &p_sys->fmt, VIDEO_ES, i_chroma );
     p_sys->fmt.video.i_width  = CGDisplayPixelsWide(p_data->displayID) + i_offset;
     p_sys->fmt.video.i_visible_width  = CGDisplayPixelsWide(p_data->displayID);
@@ -141,7 +141,7 @@ block_t *screen_Capture( demux_t *p_demux )
     block_t *p_block;
     int i_size;
  
-    i_size = p_sys->fmt.video.i_height * p_sys->fmt.video.i_width * 32 / 8; 
+    i_size = p_sys->fmt.video.i_height * p_sys->fmt.video.i_width * 32 / 8;
 
     if( !( p_block = block_New( p_demux, i_size ) ) )
     {

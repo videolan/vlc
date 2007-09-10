@@ -32,7 +32,7 @@
  *
  * Object lock is NOT held.
  */
-static void release_input_thread( libvlc_media_instance_t *p_mi ) 
+static void release_input_thread( libvlc_media_instance_t *p_mi )
 {
     input_thread_t *p_input_thread;
     vlc_bool_t should_destroy;
@@ -48,7 +48,7 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
 
     if( !p_input_thread )
         return;
-    
+ 
     /* release for previous vlc_object_get */
     vlc_object_release( p_input_thread );
 
@@ -81,7 +81,7 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
  * Object lock is held.
  */
 input_thread_t *libvlc_get_input_thread( libvlc_media_instance_t *p_mi,
-                                         libvlc_exception_t *p_e ) 
+                                         libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
 
@@ -149,7 +149,7 @@ input_position_changed( vlc_object_t * p_this, char const * psz_cmd,
 {
     libvlc_media_instance_t * p_mi = p_userdata;
     vlc_value_t val;
-    
+ 
     if (!strcmp(psz_cmd, "intf" /* "-change" no need to go further */))
     {
         input_thread_t * p_input = (input_thread_t *)p_this;
@@ -271,7 +271,7 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
     }
 
     p_mi->i_input_id = p_input->i_object_id;
-    
+ 
     /* will be released in media_instance_release() */
     vlc_object_yield( p_input );
 
@@ -323,7 +323,7 @@ void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
         return;
 
     vlc_mutex_lock( &p_mi->object_lock );
-    
+ 
     p_mi->i_refcount--;
 
     if( p_mi->i_refcount > 0 )
@@ -335,7 +335,7 @@ void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
     vlc_mutex_destroy( &p_mi->object_lock );
 
     libvlc_event_manager_release( p_mi->p_event_manager );
-    
+ 
     release_input_thread( p_mi );
 
     libvlc_media_descriptor_release( p_mi->p_md );
@@ -381,7 +381,7 @@ void libvlc_media_instance_set_media_descriptor(
 
     libvlc_media_descriptor_retain( p_md );
     p_mi->p_md = p_md;
-    
+ 
     /* The policy here is to ignore that we were created using a different
      * libvlc_instance, because we don't really care */
     p_mi->p_libvlc_instance = p_md->p_libvlc_instance;
@@ -427,9 +427,9 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
 {
     input_thread_t * p_input_thread;
 
-    if( (p_input_thread = libvlc_get_input_thread( p_mi, p_e )) ) 
+    if( (p_input_thread = libvlc_get_input_thread( p_mi, p_e )) )
     {
-        /* A thread alread exists, send it a play message */        
+        /* A thread alread exists, send it a play message */
         vlc_value_t val;
         val.i_int = PLAYING_S;
 
@@ -442,7 +442,7 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
     libvlc_exception_clear( p_e );
 
     vlc_mutex_lock( &p_mi->object_lock );
-    
+ 
     if( !p_mi->p_md )
     {
         libvlc_exception_raise( p_e, "no associated media descriptor" );
@@ -564,7 +564,7 @@ void libvlc_media_instance_set_time(
 void libvlc_media_instance_set_position(
                                 libvlc_media_instance_t *p_mi,
                                 float position,
-                                libvlc_exception_t *p_e ) 
+                                libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
     vlc_value_t val;
@@ -597,7 +597,7 @@ float libvlc_media_instance_get_position(
 
 float libvlc_media_instance_get_fps(
                                  libvlc_media_instance_t *p_mi,
-                                 libvlc_exception_t *p_e) 
+                                 libvlc_exception_t *p_e)
 {
     double f_fps = 0.0;
     input_thread_t *p_input_thread;
@@ -622,14 +622,14 @@ float libvlc_media_instance_get_fps(
 
 vlc_bool_t libvlc_media_instance_will_play(
                                  libvlc_media_instance_t *p_mi,
-                                 libvlc_exception_t *p_e) 
+                                 libvlc_exception_t *p_e)
 {
     input_thread_t *p_input_thread =
                             libvlc_get_input_thread ( p_mi, p_e);
     if ( !p_input_thread )
         return VLC_FALSE;
 
-    if ( !p_input_thread->b_die && !p_input_thread->b_dead ) 
+    if ( !p_input_thread->b_die && !p_input_thread->b_dead )
     {
         vlc_object_release( p_input_thread );
         return VLC_TRUE;
@@ -641,7 +641,7 @@ vlc_bool_t libvlc_media_instance_will_play(
 void libvlc_media_instance_set_rate(
                                  libvlc_media_instance_t *p_mi,
                                  float rate,
-                                 libvlc_exception_t *p_e ) 
+                                 libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
     vlc_value_t val;

@@ -98,11 +98,11 @@ typedef struct
 #undef FSHIFT
 #endif
 
-#define	FVIRTKEY	TRUE          /* Assumed to be == TRUE */
-#define	FNOINVERT	0x02
-#define	FSHIFT		0x04
-#define	FCONTROL	0x08
-#define	FALT		0x10
+#define    FVIRTKEY    TRUE          /* Assumed to be == TRUE */
+#define    FNOINVERT    0x02
+#define    FSHIFT        0x04
+#define    FCONTROL    0x08
+#define    FALT        0x10
 
 
 typedef struct tagANIMATIONINFO
@@ -120,11 +120,11 @@ typedef struct tagNMHDR
 
 typedef struct
 {
-	UINT	cbSize;
-	INT	iTabLength;
-	INT	iLeftMargin;
-	INT	iRightMargin;
-	UINT	uiLengthDrawn;
+    UINT    cbSize;
+    INT    iTabLength;
+    INT    iLeftMargin;
+    INT    iRightMargin;
+    UINT    uiLengthDrawn;
 } DRAWTEXTPARAMS,*LPDRAWTEXTPARAMS;
 
 #define WM_USER             0x0400
@@ -221,20 +221,20 @@ typedef struct
 #define BS_FLAT                0x00008000L
 
   /* Dialog styles */
-#define DS_ABSALIGN		0x0001
-#define DS_SYSMODAL		0x0002
-#define DS_3DLOOK		0x0004	/* win95 */
-#define DS_FIXEDSYS		0x0008	/* win95 */
-#define DS_NOFAILCREATE		0x0010	/* win95 */
-#define DS_LOCALEDIT		0x0020
-#define DS_SETFONT		0x0040
-#define DS_MODALFRAME		0x0080
-#define DS_NOIDLEMSG		0x0100
-#define DS_SETFOREGROUND	0x0200	/* win95 */
-#define DS_CONTROL		0x0400	/* win95 */
-#define DS_CENTER		0x0800	/* win95 */
-#define DS_CENTERMOUSE		0x1000	/* win95 */
-#define DS_CONTEXTHELP		0x2000	/* win95 */
+#define DS_ABSALIGN        0x0001
+#define DS_SYSMODAL        0x0002
+#define DS_3DLOOK        0x0004    /* win95 */
+#define DS_FIXEDSYS        0x0008    /* win95 */
+#define DS_NOFAILCREATE        0x0010    /* win95 */
+#define DS_LOCALEDIT        0x0020
+#define DS_SETFONT        0x0040
+#define DS_MODALFRAME        0x0080
+#define DS_NOIDLEMSG        0x0100
+#define DS_SETFOREGROUND    0x0200    /* win95 */
+#define DS_CONTROL        0x0400    /* win95 */
+#define DS_CENTER        0x0800    /* win95 */
+#define DS_CENTERMOUSE        0x1000    /* win95 */
+#define DS_CONTEXTHELP        0x2000    /* win95 */
 
 
   /* Dialog messages */
@@ -320,8 +320,8 @@ typedef struct
 #define OBM_SIZE            32766
 #define OBM_OLD_CLOSE       32767
 
-#define OCR_BUMMER	    100
-#define OCR_DRAGOBJECT	    101
+#define OCR_BUMMER        100
+#define OCR_DRAGOBJECT        101
 
 #define OCR_NORMAL          32512
 #define OCR_IBEAM           32513
@@ -355,25 +355,25 @@ typedef struct
 #define OIC_HDISK           32524
 #define OIC_NETWORK         32525
 
-#define COLOR_SCROLLBAR		    0
-#define COLOR_BACKGROUND	    1
-#define COLOR_ACTIVECAPTION	    2
-#define COLOR_INACTIVECAPTION	    3
-#define COLOR_MENU		    4
-#define COLOR_WINDOW		    5
-#define COLOR_WINDOWFRAME	    6
-#define COLOR_MENUTEXT		    7
-#define COLOR_WINDOWTEXT	    8
-#define COLOR_CAPTIONTEXT  	    9
-#define COLOR_ACTIVEBORDER	   10
-#define COLOR_INACTIVEBORDER	   11
-#define COLOR_APPWORKSPACE	   12
-#define COLOR_HIGHLIGHT		   13
-#define COLOR_HIGHLIGHTTEXT	   14
+#define COLOR_SCROLLBAR            0
+#define COLOR_BACKGROUND        1
+#define COLOR_ACTIVECAPTION        2
+#define COLOR_INACTIVECAPTION        3
+#define COLOR_MENU            4
+#define COLOR_WINDOW            5
+#define COLOR_WINDOWFRAME        6
+#define COLOR_MENUTEXT            7
+#define COLOR_WINDOWTEXT        8
+#define COLOR_CAPTIONTEXT          9
+#define COLOR_ACTIVEBORDER       10
+#define COLOR_INACTIVEBORDER       11
+#define COLOR_APPWORKSPACE       12
+#define COLOR_HIGHLIGHT           13
+#define COLOR_HIGHLIGHTTEXT       14
 #define COLOR_BTNFACE              15
 #define COLOR_BTNSHADOW            16
 #define COLOR_GRAYTEXT             17
-#define COLOR_BTNTEXT		   18
+#define COLOR_BTNTEXT           18
 #define COLOR_INACTIVECAPTIONTEXT  19
 #define COLOR_BTNHIGHLIGHT         20
 /* win95 colors */
@@ -461,9 +461,9 @@ typedef struct
 #define EN_VSCROLL      0x0602
 
 /* New since win95 : EM_SETMARGIN parameters */
-#define EC_LEFTMARGIN	0x0001
-#define EC_RIGHTMARGIN	0x0002
-#define EC_USEFONTINFO	0xffff
+#define EC_LEFTMARGIN    0x0001
+#define EC_RIGHTMARGIN    0x0002
+#define EC_USEFONTINFO    0xffff
 
 
 /* Messages */
@@ -532,30 +532,30 @@ typedef struct
 #define WM_COMPAREITEM          0x0039
 #define WM_TESTING              0x003a
 
-#define WM_OTHERWINDOWCREATED	0x003c
-#define WM_OTHERWINDOWDESTROYED	0x003d
-#define WM_ACTIVATESHELLWINDOW	0x003e
+#define WM_OTHERWINDOWCREATED    0x003c
+#define WM_OTHERWINDOWDESTROYED    0x003d
+#define WM_ACTIVATESHELLWINDOW    0x003e
 
-#define WM_COMPACTING		0x0041
+#define WM_COMPACTING        0x0041
 
-#define WM_COMMNOTIFY		0x0044
-#define WM_WINDOWPOSCHANGING 	0x0046
-#define WM_WINDOWPOSCHANGED 	0x0047
-#define WM_POWER		0x0048
+#define WM_COMMNOTIFY        0x0044
+#define WM_WINDOWPOSCHANGING     0x0046
+#define WM_WINDOWPOSCHANGED     0x0047
+#define WM_POWER        0x0048
 
   /* Win32 4.0 messages */
-#define WM_COPYDATA		0x004a
-#define WM_CANCELJOURNAL	0x004b
-#define WM_NOTIFY		0x004e
-#define WM_HELP			0x0053
-#define WM_NOTIFYFORMAT		0x0055
+#define WM_COPYDATA        0x004a
+#define WM_CANCELJOURNAL    0x004b
+#define WM_NOTIFY        0x004e
+#define WM_HELP            0x0053
+#define WM_NOTIFYFORMAT        0x0055
 
-#define WM_CONTEXTMENU		0x007b
-#define WM_STYLECHANGING 	0x007c
-#define WM_STYLECHANGED		0x007d
+#define WM_CONTEXTMENU        0x007b
+#define WM_STYLECHANGING     0x007c
+#define WM_STYLECHANGED        0x007d
 #define WM_DISPLAYCHANGE        0x007e
-#define WM_GETICON		0x007f
-#define WM_SETICON		0x0080
+#define WM_GETICON        0x007f
+#define WM_SETICON        0x0080
 
   /* Non-client system messages */
 #define WM_NCCREATE         0x0081
@@ -565,9 +565,9 @@ typedef struct
 #define WM_NCPAINT          0x0085
 #define WM_NCACTIVATE       0x0086
 
-#define WM_GETDLGCODE	    0x0087
-#define WM_SYNCPAINT	    0x0088
-#define WM_SYNCTASK	    0x0089
+#define WM_GETDLGCODE        0x0087
+#define WM_SYNCPAINT        0x0088
+#define WM_SYNCTASK        0x0089
 
   /* Non-client mouse messages */
 #define WM_NCMOUSEMOVE      0x00a0
@@ -599,11 +599,11 @@ typedef struct
 #define WM_IME_COMPOSITION          0x010f
 #define WM_IME_KEYLAST              0x010f
 
-#define WM_INITDIALOG       0x0110 
+#define WM_INITDIALOG       0x0110
 #define WM_COMMAND          0x0111
 #define WM_SYSCOMMAND       0x0112
-#define WM_TIMER	    0x0113
-#define WM_SYSTIMER	    0x0118
+#define WM_TIMER        0x0113
+#define WM_SYSTIMER        0x0118
 
   /* scroll messages */
 #define WM_HSCROLL          0x0114
@@ -629,59 +629,59 @@ typedef struct
 #define WM_CTLCOLORSTATIC    0x0138
 
   /* Mouse messages */
-#define WM_MOUSEMOVE	    0x0200
-#define WM_LBUTTONDOWN	    0x0201
-#define WM_LBUTTONUP	    0x0202
+#define WM_MOUSEMOVE        0x0200
+#define WM_LBUTTONDOWN        0x0201
+#define WM_LBUTTONUP        0x0202
 #define WM_LBUTTONDBLCLK    0x0203
-#define WM_RBUTTONDOWN	    0x0204
-#define WM_RBUTTONUP	    0x0205
+#define WM_RBUTTONDOWN        0x0204
+#define WM_RBUTTONUP        0x0205
 #define WM_RBUTTONDBLCLK    0x0206
-#define WM_MBUTTONDOWN	    0x0207
-#define WM_MBUTTONUP	    0x0208
+#define WM_MBUTTONDOWN        0x0207
+#define WM_MBUTTONUP        0x0208
 #define WM_MBUTTONDBLCLK    0x0209
 #define WM_MOUSEWHEEL       0x020A
-#define WM_MOUSEFIRST	    WM_MOUSEMOVE
+#define WM_MOUSEFIRST        WM_MOUSEMOVE
 
 
-#define WM_MOUSELAST	    WM_MOUSEWHEEL
+#define WM_MOUSELAST        WM_MOUSEWHEEL
  
 #define WHEEL_DELTA      120
 #define WHEEL_PAGESCROLL  (UINT_MAX)
 #define WM_PARENTNOTIFY     0x0210
 #define WM_ENTERMENULOOP    0x0211
 #define WM_EXITMENULOOP     0x0212
-#define WM_NEXTMENU	    0x0213
+#define WM_NEXTMENU        0x0213
 
   /* Win32 4.0 messages */
-#define WM_SIZING	    0x0214
+#define WM_SIZING        0x0214
 #define WM_CAPTURECHANGED   0x0215
-#define WM_MOVING	    0x0216
+#define WM_MOVING        0x0216
 
   /* MDI messages */
-#define WM_MDICREATE	    0x0220
-#define WM_MDIDESTROY	    0x0221
-#define WM_MDIACTIVATE	    0x0222
-#define WM_MDIRESTORE	    0x0223
-#define WM_MDINEXT	    0x0224
-#define WM_MDIMAXIMIZE	    0x0225
-#define WM_MDITILE	    0x0226
-#define WM_MDICASCADE	    0x0227
+#define WM_MDICREATE        0x0220
+#define WM_MDIDESTROY        0x0221
+#define WM_MDIACTIVATE        0x0222
+#define WM_MDIRESTORE        0x0223
+#define WM_MDINEXT        0x0224
+#define WM_MDIMAXIMIZE        0x0225
+#define WM_MDITILE        0x0226
+#define WM_MDICASCADE        0x0227
 #define WM_MDIICONARRANGE   0x0228
 #define WM_MDIGETACTIVE     0x0229
 #define WM_MDIREFRESHMENU   0x0234
 
   /* D&D messages */
-#define WM_DROPOBJECT	    0x022A
+#define WM_DROPOBJECT        0x022A
 #define WM_QUERYDROPOBJECT  0x022B
-#define WM_BEGINDRAG	    0x022C
-#define WM_DRAGLOOP	    0x022D
-#define WM_DRAGSELECT	    0x022E
-#define WM_DRAGMOVE	    0x022F
-#define WM_MDISETMENU	    0x0230
+#define WM_BEGINDRAG        0x022C
+#define WM_DRAGLOOP        0x022D
+#define WM_DRAGSELECT        0x022E
+#define WM_DRAGMOVE        0x022F
+#define WM_MDISETMENU        0x0230
 
 #define WM_ENTERSIZEMOVE    0x0231
 #define WM_EXITSIZEMOVE     0x0232
-#define WM_DROPFILES	    0x0233
+#define WM_DROPFILES        0x0233
 
 
 /* Win32 4.0 messages for IME */
@@ -722,7 +722,7 @@ typedef struct
 #define WM_QUERYNEWPALETTE   0x030F
 #define WM_PALETTEISCHANGING 0x0310
 #define WM_PALETTECHANGED    0x0311
-#define WM_HOTKEY	     0x0312
+#define WM_HOTKEY         0x0312
 
 #define WM_PRINT             0x0317
 #define WM_PRINTCLIENT       0x0318
@@ -733,19 +733,19 @@ typedef struct
 #define WM_QUERYAFXWNDPROC  0x0360
 #define WM_SIZEPARENT       0x0361
 #define WM_SETMESSAGESTRING 0x0362
-#define WM_IDLEUPDATECMDUI  0x0363 
+#define WM_IDLEUPDATECMDUI  0x0363
 #define WM_INITIALUPDATE    0x0364
 #define WM_COMMANDHELP      0x0365
 #define WM_HELPHITTEST      0x0366
 #define WM_EXITHELPMODE     0x0367
 #define WM_RECALCPARENT     0x0368
 #define WM_SIZECHILD        0x0369
-#define WM_KICKIDLE         0x036A 
+#define WM_KICKIDLE         0x036A
 #define WM_QUERYCENTERWND   0x036B
 #define WM_DISABLEMODAL     0x036C
-#define WM_FLOATSTATUS      0x036D 
-#define WM_ACTIVATETOPLEVEL 0x036E 
-#define WM_QUERY3DCONTROLS  0x036F 
+#define WM_FLOATSTATUS      0x036D
+#define WM_ACTIVATETOPLEVEL 0x036E
+#define WM_QUERY3DCONTROLS  0x036F
 #define WM_SOCKET_NOTIFY    0x0373
 #define WM_SOCKET_DEAD      0x0374
 #define WM_POPMESSAGESTRING 0x0375
@@ -789,7 +789,7 @@ typedef struct
 #define IDYES               6
 #define IDNO                7
 #define IDCLOSE             8
-#define IDHELP              9      
+#define IDHELP              9
 
 /****** Window classes ******/
 
@@ -838,7 +838,7 @@ typedef struct
     BYTE    rgbReserved[32];
 } PAINTSTRUCT, *PPAINTSTRUCT, *LPPAINTSTRUCT;
 
-typedef struct 
+typedef struct
 {
     HMENU   hWindowMenu;
     UINT    idFirstChild;
@@ -874,7 +874,7 @@ typedef struct
 DECL_WINELIB_TYPE_AW(MDICREATESTRUCT)
 DECL_WINELIB_TYPE_AW(LPMDICREATESTRUCT)
 
-#define MDITILE_VERTICAL     0x0000   
+#define MDITILE_VERTICAL     0x0000
 #define MDITILE_HORIZONTAL   0x0001
 #define MDITILE_SKIPDISABLED 0x0002
 
@@ -896,17 +896,17 @@ typedef struct {
 #define GWW_HINSTANCE       (-6)
 #define GWL_HINSTANCE       GWW_HINSTANCE
 #define GWL_WNDPROC         (-4)
-#define DWL_MSGRESULT	    0
-#define DWL_DLGPROC	    4
-#define DWL_USER	    8
+#define DWL_MSGRESULT        0
+#define DWL_DLGPROC        4
+#define DWL_USER        8
 
   /* GetWindow() constants */
-#define GW_HWNDFIRST	0
-#define GW_HWNDLAST	1
-#define GW_HWNDNEXT	2
-#define GW_HWNDPREV	3
-#define GW_OWNER	4
-#define GW_CHILD	5
+#define GW_HWNDFIRST    0
+#define GW_HWNDLAST    1
+#define GW_HWNDNEXT    2
+#define GW_HWNDPREV    3
+#define GW_OWNER    4
+#define GW_CHILD    5
 
   /* WM_GETMINMAXINFO struct */
 typedef struct
@@ -1084,18 +1084,18 @@ typedef struct
 /***** Window hooks *****/
 
   /* Hook values */
-#define WH_MIN		    (-1)
-#define WH_MSGFILTER	    (-1)
+#define WH_MIN            (-1)
+#define WH_MSGFILTER        (-1)
 #define WH_JOURNALRECORD    0
 #define WH_JOURNALPLAYBACK  1
-#define WH_KEYBOARD	    2
-#define WH_GETMESSAGE	    3
-#define WH_CALLWNDPROC	    4
-#define WH_CBT		    5
-#define WH_SYSMSGFILTER	    6
-#define WH_MOUSE	    7
-#define WH_HARDWARE	    8
-#define WH_DEBUG	    9
+#define WH_KEYBOARD        2
+#define WH_GETMESSAGE        3
+#define WH_CALLWNDPROC        4
+#define WH_CBT            5
+#define WH_SYSMSGFILTER        6
+#define WH_MOUSE        7
+#define WH_HARDWARE        8
+#define WH_DEBUG        9
 #define WH_SHELL            10
 #define WH_FOREGROUNDIDLE   11
 #define WH_CALLWNDPROCRET   12
@@ -1170,12 +1170,12 @@ typedef struct {
 
 /* WinHelp internal structure */
 typedef struct {
-	WORD size;
-	WORD command;
-	LONG data;
-	LONG reserved;
-	WORD ofsFilename;
-	WORD ofsData;
+    WORD size;
+    WORD command;
+    LONG data;
+    LONG reserved;
+    WORD ofsFilename;
+    WORD ofsData;
 } WINHELP,*LPWINHELP;
 
 typedef struct
@@ -1186,13 +1186,13 @@ typedef struct
 } MULTIKEYHELP, *LPMULTIKEYHELP;
 
 typedef struct {
-	WORD wStructSize;
-	WORD x;
-	WORD y;
-	WORD dx;
-	WORD dy;
-	WORD wMax;
-	char rgchMember[2];
+    WORD wStructSize;
+    WORD x;
+    WORD y;
+    WORD dx;
+    WORD dy;
+    WORD wMax;
+    char rgchMember[2];
 } HELPWININFO, *LPHELPWININFO;
 
 #define HELP_CONTEXT        0x0001
@@ -1210,12 +1210,12 @@ typedef struct {
 #define HELP_MULTIKEY       0x0201
 #define HELP_SETWINPOS      0x0203
 #define HELP_CONTEXTMENU    0x000a
-#define HELP_FINDER	    0x000b
-#define HELP_WM_HELP	    0x000c
+#define HELP_FINDER        0x000b
+#define HELP_WM_HELP        0x000c
 #define HELP_SETPOPUP_POS   0x000d
 
-#define HELP_TCARD	    0x8000
-#define HELP_TCARD_DATA	    0x0010
+#define HELP_TCARD        0x8000
+#define HELP_TCARD_DATA        0x0010
 #define HELP_TCARD_OTHER_CALLER 0x0011
 
 
@@ -1230,23 +1230,23 @@ typedef struct {
 #define DISP_CHANGE_BADPARAM   (-5)
 
 /* ChangeDisplaySettings.dwFlags */
-#define	CDS_UPDATEREGISTRY	0x00000001
-#define	CDS_TEST		0x00000002
-#define	CDS_FULLSCREEN		0x00000004
-#define	CDS_GLOBAL		0x00000008
-#define	CDS_SET_PRIMARY		0x00000010
-#define	CDS_RESET		0x40000000
-#define	CDS_SETRECT		0x20000000
-#define	CDS_NORESET		0x10000000
+#define    CDS_UPDATEREGISTRY    0x00000001
+#define    CDS_TEST        0x00000002
+#define    CDS_FULLSCREEN        0x00000004
+#define    CDS_GLOBAL        0x00000008
+#define    CDS_SET_PRIMARY        0x00000010
+#define    CDS_RESET        0x40000000
+#define    CDS_SETRECT        0x20000000
+#define    CDS_NORESET        0x10000000
 
 /* flags to FormatMessage */
-#define	FORMAT_MESSAGE_ALLOCATE_BUFFER	0x00000100
-#define	FORMAT_MESSAGE_IGNORE_INSERTS	0x00000200
-#define	FORMAT_MESSAGE_FROM_STRING	0x00000400
-#define	FORMAT_MESSAGE_FROM_HMODULE	0x00000800
-#define	FORMAT_MESSAGE_FROM_SYSTEM	0x00001000
-#define	FORMAT_MESSAGE_ARGUMENT_ARRAY	0x00002000
-#define	FORMAT_MESSAGE_MAX_WIDTH_MASK	0x000000FF
+#define    FORMAT_MESSAGE_ALLOCATE_BUFFER    0x00000100
+#define    FORMAT_MESSAGE_IGNORE_INSERTS    0x00000200
+#define    FORMAT_MESSAGE_FROM_STRING    0x00000400
+#define    FORMAT_MESSAGE_FROM_HMODULE    0x00000800
+#define    FORMAT_MESSAGE_FROM_SYSTEM    0x00001000
+#define    FORMAT_MESSAGE_ARGUMENT_ARRAY    0x00002000
+#define    FORMAT_MESSAGE_MAX_WIDTH_MASK    0x000000FF
 
 typedef struct
 {
@@ -1295,7 +1295,7 @@ typedef struct tagMSG
 
 #define POINTSTOPOINT(pt, pts)                          \
         { (pt).x = (LONG)(SHORT)LOWORD(*(LONG*)&pts);   \
-          (pt).y = (LONG)(SHORT)HIWORD(*(LONG*)&pts); }          
+          (pt).y = (LONG)(SHORT)HIWORD(*(LONG*)&pts); }
 
 #define POINTTOPOINTS(pt)      (MAKELONG((short)((pt).x), (short)((pt).y)))
 
@@ -1303,11 +1303,11 @@ typedef struct tagMSG
 /* Cursors / Icons */
 
 typedef struct {
-	WIN_BOOL	fIcon;
-	DWORD		xHotspot;
-	DWORD		yHotspot;
-	HBITMAP	hbmMask;
-	HBITMAP	hbmColor;
+    WIN_BOOL    fIcon;
+    DWORD        xHotspot;
+    DWORD        yHotspot;
+    HBITMAP    hbmMask;
+    HBITMAP    hbmColor;
 } ICONINFO,*LPICONINFO;
 
 
@@ -1345,7 +1345,7 @@ typedef struct
 #define TPM_NONOTIFY      0x0080
 #define TPM_RETURNCMD     0x0100
 
-typedef struct 
+typedef struct
 {
     UINT   cbSize;
     RECT   rcExclude;
@@ -1397,12 +1397,12 @@ typedef struct {
 
 typedef MENUINFO const * LPCMENUINFO;
 
-#define MIM_MAXHEIGHT		0x00000001
-#define MIM_BACKGROUND		0x00000002
-#define MIM_HELPID		0x00000004
-#define MIM_MENUDATA		0x00000008
-#define MIM_STYLE		0x00000010
-#define MIM_APPLYTOSUBMENUS	0x80000000
+#define MIM_MAXHEIGHT        0x00000001
+#define MIM_BACKGROUND        0x00000002
+#define MIM_HELPID        0x00000004
+#define MIM_MENUDATA        0x00000008
+#define MIM_STYLE        0x00000010
+#define MIM_APPLYTOSUBMENUS    0x80000000
 
 typedef struct {
   WORD versionNumber;
@@ -1431,17 +1431,17 @@ typedef PVOID *LPMENUTEMPLATE;
 #define MIIM_BITMAP      0x00000080
 #define MIIM_FTYPE       0x00000100
 
-#define HBMMENU_CALLBACK	((HBITMAP) -1)
-#define HBMMENU_SYSTEM		((HBITMAP)  1)
-#define HBMMENU_MBAR_RESTORE	((HBITMAP)  2)
-#define HBMMENU_MBAR_MINIMIZE	((HBITMAP)  3)
-#define HBMMENU_MBAR_CLOSE	((HBITMAP)  5)
-#define HBMMENU_MBAR_CLOSE_D	((HBITMAP)  6)
-#define HBMMENU_MBAR_MINIMIZE_D	((HBITMAP)  7)
-#define HBMMENU_POPUP_CLOSE	((HBITMAP)  8)
-#define HBMMENU_POPUP_RESTORE	((HBITMAP)  9)
-#define HBMMENU_POPUP_MAXIMIZE	((HBITMAP) 10)
-#define HBMMENU_POPUP_MINIMIZE	((HBITMAP) 11)
+#define HBMMENU_CALLBACK    ((HBITMAP) -1)
+#define HBMMENU_SYSTEM        ((HBITMAP)  1)
+#define HBMMENU_MBAR_RESTORE    ((HBITMAP)  2)
+#define HBMMENU_MBAR_MINIMIZE    ((HBITMAP)  3)
+#define HBMMENU_MBAR_CLOSE    ((HBITMAP)  5)
+#define HBMMENU_MBAR_CLOSE_D    ((HBITMAP)  6)
+#define HBMMENU_MBAR_MINIMIZE_D    ((HBITMAP)  7)
+#define HBMMENU_POPUP_CLOSE    ((HBITMAP)  8)
+#define HBMMENU_POPUP_RESTORE    ((HBITMAP)  9)
+#define HBMMENU_POPUP_MAXIMIZE    ((HBITMAP) 10)
+#define HBMMENU_POPUP_MINIMIZE    ((HBITMAP) 11)
 
 /* DrawState defines ... */
 typedef WIN_BOOL CALLBACK (*DRAWSTATEPROC)(HDC,LPARAM,WPARAM,INT,INT);
@@ -1518,7 +1518,7 @@ typedef WIN_BOOL CALLBACK (*DRAWSTATEPROC)(HDC,LPARAM,WPARAM,INT,INT);
 #define BST_CHECKED          0x0001
 #define BST_INDETERMINATE    0x0002
 #define BST_PUSHED           0x0004
-#define BST_FOCUS            0x0008      
+#define BST_FOCUS            0x0008
 
 /* Static Control Styles */
 #define SS_LEFT             0x00000000L
@@ -1579,7 +1579,7 @@ typedef struct
     INT     nTrackPos;
 } SCROLLINFO, *LPSCROLLINFO;
  
-/* GetScrollInfo() flags */ 
+/* GetScrollInfo() flags */
 #define SIF_RANGE           0x0001
 #define SIF_PAGE            0x0002
 #define SIF_POS             0x0004
@@ -1677,8 +1677,8 @@ typedef struct
 #define CBS_NOINTEGRALHEIGHT  0x0400L
 #define CBS_DISABLENOSCROLL   0x0800L
 
-#define CBS_UPPERCASE	      0x2000L
-#define CBS_LOWERCASE	      0x4000L
+#define CBS_UPPERCASE          0x2000L
+#define CBS_LOWERCASE          0x4000L
 
 
 /* Combo box messages */
@@ -1735,90 +1735,90 @@ typedef struct
 #define CB_ERR              (-1)
 #define CB_ERRSPACE         (-2)
 
-#define MB_OK			0x00000000
-#define MB_OKCANCEL		0x00000001
-#define MB_ABORTRETRYIGNORE	0x00000002
-#define MB_YESNOCANCEL		0x00000003
-#define MB_YESNO		0x00000004
-#define MB_RETRYCANCEL		0x00000005
-#define MB_TYPEMASK		0x0000000F
+#define MB_OK            0x00000000
+#define MB_OKCANCEL        0x00000001
+#define MB_ABORTRETRYIGNORE    0x00000002
+#define MB_YESNOCANCEL        0x00000003
+#define MB_YESNO        0x00000004
+#define MB_RETRYCANCEL        0x00000005
+#define MB_TYPEMASK        0x0000000F
 
-#define MB_ICONHAND		0x00000010
-#define MB_ICONQUESTION		0x00000020
-#define MB_ICONEXCLAMATION	0x00000030
-#define MB_ICONASTERISK		0x00000040
-#define	MB_USERICON		0x00000080
-#define MB_ICONMASK		0x000000F0
+#define MB_ICONHAND        0x00000010
+#define MB_ICONQUESTION        0x00000020
+#define MB_ICONEXCLAMATION    0x00000030
+#define MB_ICONASTERISK        0x00000040
+#define    MB_USERICON        0x00000080
+#define MB_ICONMASK        0x000000F0
 
-#define MB_ICONINFORMATION	MB_ICONASTERISK
-#define MB_ICONSTOP		MB_ICONHAND
-#define MB_ICONWARNING		MB_ICONEXCLAMATION
-#define MB_ICONERROR		MB_ICONHAND
+#define MB_ICONINFORMATION    MB_ICONASTERISK
+#define MB_ICONSTOP        MB_ICONHAND
+#define MB_ICONWARNING        MB_ICONEXCLAMATION
+#define MB_ICONERROR        MB_ICONHAND
 
-#define MB_DEFBUTTON1		0x00000000
-#define MB_DEFBUTTON2		0x00000100
-#define MB_DEFBUTTON3		0x00000200
-#define MB_DEFBUTTON4		0x00000300
-#define MB_DEFMASK		0x00000F00
+#define MB_DEFBUTTON1        0x00000000
+#define MB_DEFBUTTON2        0x00000100
+#define MB_DEFBUTTON3        0x00000200
+#define MB_DEFBUTTON4        0x00000300
+#define MB_DEFMASK        0x00000F00
 
-#define MB_APPLMODAL		0x00000000
-#define MB_SYSTEMMODAL		0x00001000
-#define MB_TASKMODAL		0x00002000
-#define MB_MODEMASK		0x00003000
+#define MB_APPLMODAL        0x00000000
+#define MB_SYSTEMMODAL        0x00001000
+#define MB_TASKMODAL        0x00002000
+#define MB_MODEMASK        0x00003000
 
-#define MB_HELP			0x00004000
-#define MB_NOFOCUS		0x00008000
-#define MB_MISCMASK		0x0000C000
+#define MB_HELP            0x00004000
+#define MB_NOFOCUS        0x00008000
+#define MB_MISCMASK        0x0000C000
 
-#define MB_SETFOREGROUND	0x00010000
-#define MB_DEFAULT_DESKTOP_ONLY	0x00020000
-#define MB_SERVICE_NOTIFICATION	0x00040000
-#define MB_TOPMOST		0x00040000
-#define MB_RIGHT		0x00080000
-#define MB_RTLREADING		0x00100000
+#define MB_SETFOREGROUND    0x00010000
+#define MB_DEFAULT_DESKTOP_ONLY    0x00020000
+#define MB_SERVICE_NOTIFICATION    0x00040000
+#define MB_TOPMOST        0x00040000
+#define MB_RIGHT        0x00080000
+#define MB_RTLREADING        0x00100000
 
-#define	HELPINFO_WINDOW		0x0001
-#define	HELPINFO_MENUITEM	0x0002
+#define    HELPINFO_WINDOW        0x0001
+#define    HELPINFO_MENUITEM    0x0002
 
 /* Structure pointed to by lParam of WM_HELP */
-typedef struct			
+typedef struct            
 {
-    UINT	cbSize;		/* Size in bytes of this struct  */
-    INT	iContextType;	/* Either HELPINFO_WINDOW or HELPINFO_MENUITEM */
-    INT	iCtrlId;	/* Control Id or a Menu item Id. */
-    HANDLE	hItemHandle;	/* hWnd of control or hMenu.     */
-    DWORD	dwContextId;	/* Context Id associated with this item */
-    POINT	MousePos;	/* Mouse Position in screen co-ordinates */
+    UINT    cbSize;        /* Size in bytes of this struct  */
+    INT    iContextType;    /* Either HELPINFO_WINDOW or HELPINFO_MENUITEM */
+    INT    iCtrlId;    /* Control Id or a Menu item Id. */
+    HANDLE    hItemHandle;    /* hWnd of control or hMenu.     */
+    DWORD    dwContextId;    /* Context Id associated with this item */
+    POINT    MousePos;    /* Mouse Position in screen co-ordinates */
 }  HELPINFO,*LPHELPINFO;
 
 typedef void CALLBACK (*MSGBOXCALLBACK)(LPHELPINFO lpHelpInfo);
 
 typedef struct
 {
-    UINT	cbSize;
-    HWND	hwndOwner;
-    HINSTANCE	hInstance;
-    LPCSTR	lpszText;
-    LPCSTR	lpszCaption;
-    DWORD	dwStyle;
-    LPCSTR	lpszIcon;
-    DWORD	dwContextHelpId;
-    MSGBOXCALLBACK	lpfnMsgBoxCallback;
-    DWORD	dwLanguageId;
+    UINT    cbSize;
+    HWND    hwndOwner;
+    HINSTANCE    hInstance;
+    LPCSTR    lpszText;
+    LPCSTR    lpszCaption;
+    DWORD    dwStyle;
+    LPCSTR    lpszIcon;
+    DWORD    dwContextHelpId;
+    MSGBOXCALLBACK    lpfnMsgBoxCallback;
+    DWORD    dwLanguageId;
 } MSGBOXPARAMSA,*LPMSGBOXPARAMSA;
 
 typedef struct
 {
-    UINT	cbSize;
-    HWND	hwndOwner;
-    HINSTANCE	hInstance;
-    LPCWSTR	lpszText;
-    LPCWSTR	lpszCaption;
-    DWORD	dwStyle;
-    LPCWSTR	lpszIcon;
-    DWORD	dwContextHelpId;
-    MSGBOXCALLBACK	lpfnMsgBoxCallback;
-    DWORD	dwLanguageId;
+    UINT    cbSize;
+    HWND    hwndOwner;
+    HINSTANCE    hInstance;
+    LPCWSTR    lpszText;
+    LPCWSTR    lpszCaption;
+    DWORD    dwStyle;
+    LPCWSTR    lpszIcon;
+    DWORD    dwContextHelpId;
+    MSGBOXCALLBACK    lpfnMsgBoxCallback;
+    DWORD    dwLanguageId;
 } MSGBOXPARAMSW,*LPMSGBOXPARAMSW;
 
 DECL_WINELIB_TYPE_AW(MSGBOXPARAMS)
@@ -1843,28 +1843,28 @@ typedef struct _numberfmt32w {
 } NUMBERFMTW;
 
 typedef struct _currencyfmt32a
-{   
-	UINT      NumDigits;   
-	UINT      LeadingZero; 
-	UINT      Grouping;   
-	LPCSTR    lpDecimalSep;   
-	LPCSTR    lpThousandSep; 
-	UINT      NegativeOrder;   
-	UINT      PositiveOrder; 
-	LPCSTR    lpCurrencySymbol;
-} CURRENCYFMTA; 
+{
+    UINT      NumDigits;
+    UINT      LeadingZero;
+    UINT      Grouping;
+    LPCSTR    lpDecimalSep;
+    LPCSTR    lpThousandSep;
+    UINT      NegativeOrder;
+    UINT      PositiveOrder;
+    LPCSTR    lpCurrencySymbol;
+} CURRENCYFMTA;
 
 typedef struct _currencyfmt32w
-{   
-	UINT      NumDigits;   
-	UINT      LeadingZero; 
-	UINT      Grouping;   
-	LPCWSTR   lpDecimalSep;   
-	LPCWSTR   lpThousandSep; 
-	UINT      NegativeOrder;   
-	UINT      PositiveOrder; 
-	LPCWSTR   lpCurrencySymbol;
-} CURRENCYFMTW; 
+{
+    UINT      NumDigits;
+    UINT      LeadingZero;
+    UINT      Grouping;
+    LPCWSTR   lpDecimalSep;
+    LPCWSTR   lpThousandSep;
+    UINT      NegativeOrder;
+    UINT      PositiveOrder;
+    LPCWSTR   lpCurrencySymbol;
+} CURRENCYFMTW;
 
 #define MONITOR_DEFAULTTONULL       0x00000000
 #define MONITOR_DEFAULTTOPRIMARY    0x00000001
@@ -1923,16 +1923,16 @@ typedef const DLGITEMTEMPLATE *LPCDLGITEMTEMPLATEW;
 
 
   /* CBT hook values */
-#define HCBT_MOVESIZE	    0
-#define HCBT_MINMAX	    1
-#define HCBT_QS 	    2
-#define HCBT_CREATEWND	    3
-#define HCBT_DESTROYWND	    4
-#define HCBT_ACTIVATE	    5
+#define HCBT_MOVESIZE        0
+#define HCBT_MINMAX        1
+#define HCBT_QS         2
+#define HCBT_CREATEWND        3
+#define HCBT_DESTROYWND        4
+#define HCBT_ACTIVATE        5
 #define HCBT_CLICKSKIPPED   6
 #define HCBT_KEYSKIPPED     7
-#define HCBT_SYSCOMMAND	    8
-#define HCBT_SETFOCUS	    9
+#define HCBT_SYSCOMMAND        8
+#define HCBT_SETFOCUS        9
 
   /* CBT hook structures */
 
@@ -1959,14 +1959,14 @@ typedef struct
 
 
 /* modifiers for RegisterHotKey */
-#define	MOD_ALT		0x0001
-#define	MOD_CONTROL	0x0002
-#define	MOD_SHIFT	0x0004
-#define	MOD_WIN		0x0008
+#define    MOD_ALT        0x0001
+#define    MOD_CONTROL    0x0002
+#define    MOD_SHIFT    0x0004
+#define    MOD_WIN        0x0008
 
 /* ids for RegisterHotKey */
-#define	IDHOT_SNAPWINDOW	(-1)    /* SHIFT-PRINTSCRN  */
-#define	IDHOT_SNAPDESKTOP	(-2)    /* PRINTSCRN        */
+#define    IDHOT_SNAPWINDOW    (-1)    /* SHIFT-PRINTSCRN  */
+#define    IDHOT_SNAPDESKTOP    (-2)    /* PRINTSCRN        */
 
   /* keybd_event flags */
 #define KEYEVENTF_EXTENDEDKEY        0x0001
@@ -1997,9 +1997,9 @@ typedef struct
 #define EWX_POWEROFF         8
 
 /* SetLastErrorEx types */
-#define	SLE_ERROR	0x00000001
-#define	SLE_MINORERROR	0x00000002
-#define	SLE_WARNING	0x00000003
+#define    SLE_ERROR    0x00000001
+#define    SLE_MINORERROR    0x00000002
+#define    SLE_WARNING    0x00000003
 
 /* Predefined resources */
 #define IDI_APPLICATIONA MAKEINTRESOURCEA(32512)
@@ -2070,7 +2070,7 @@ typedef struct
 #define MNC_IGNORE 0
 #define MNC_CLOSE 1
 #define MNC_EXECUTE 2
-#define MNC_SELECT 3 
+#define MNC_SELECT 3
 
 /* SystemParametersInfo */
 /* defines below are for all win versions */
@@ -2108,7 +2108,7 @@ typedef struct
 #define SPI_GETFASTTASKSWITCH     35
 #define SPI_SETFASTTASKSWITCH     36
 #define SPI_SETDRAGFULLWINDOWS    37
-#define SPI_GETDRAGFULLWINDOWS	  38
+#define SPI_GETDRAGFULLWINDOWS      38
 
 #define SPI_GETFILTERKEYS         50
 #define SPI_SETFILTERKEYS         51
@@ -2281,7 +2281,7 @@ typedef struct
 #define WS_EX_PALETTEWINDOW    (WS_EX_WINDOWEDGE|WS_EX_TOOLWINDOW|WS_EX_TOPMOST)
 
 /* WINE internal... */
-#define WS_EX_TRAYWINDOW	0x80000000L
+#define WS_EX_TRAYWINDOW    0x80000000L
 
 /* Window scrolling */
 #define SW_SCROLLCHILDREN      0x0001
@@ -2298,9 +2298,9 @@ typedef struct
 #define CWP_SKIPTRANSPARENT    0x0004
 
   /* PeekMessage() options */
-#define PM_NOREMOVE	0x0000
-#define PM_REMOVE	0x0001
-#define PM_NOYIELD	0x0002
+#define PM_NOREMOVE    0x0000
+#define PM_REMOVE    0x0001
+#define PM_NOYIELD    0x0002
 
 /* WM_SHOWWINDOW wParam codes */
 #define SW_PARENTCLOSING    1
@@ -2321,9 +2321,9 @@ typedef struct
 #define SW_SHOWMINNOACTIVE  7
 #define SW_SHOWNA           8
 #define SW_RESTORE          9
-#define SW_SHOWDEFAULT	    10
-#define SW_MAX		    10
-#define SW_NORMALNA	    0xCC	/* undoc. flag in MinMaximize */
+#define SW_SHOWDEFAULT        10
+#define SW_MAX            10
+#define SW_NORMALNA        0xCC    /* undoc. flag in MinMaximize */
 
   /* WM_SIZE message wParam values */
 #define SIZE_RESTORED        0
@@ -2443,11 +2443,11 @@ typedef struct
 #define DT_INTERNAL 4096
 
 /* DrawCaption()/DrawCaptionTemp() flags */
-#define DC_ACTIVE		0x0001
-#define DC_SMALLCAP		0x0002
-#define DC_ICON			0x0004
-#define DC_TEXT			0x0008
-#define DC_INBUTTON		0x0010
+#define DC_ACTIVE        0x0001
+#define DC_SMALLCAP        0x0002
+#define DC_ICON            0x0004
+#define DC_TEXT            0x0008
+#define DC_INBUTTON        0x0010
 
 /* DrawEdge() flags */
 #define BDR_RAISEDOUTER    0x0001
@@ -2499,7 +2499,7 @@ typedef struct
 #define DFCS_CAPTIONMIN         0x0001
 #define DFCS_CAPTIONMAX         0x0002
 #define DFCS_CAPTIONRESTORE     0x0003
-#define DFCS_CAPTIONHELP        0x0004		/* Windows 95 only */
+#define DFCS_CAPTIONHELP        0x0004        /* Windows 95 only */
 
 #define DFCS_MENUARROW          0x0000
 #define DFCS_MENUCHECK          0x0001
@@ -2516,7 +2516,7 @@ typedef struct
 
 #define DFCS_BUTTONCHECK        0x0000
 #define DFCS_BUTTONRADIOIMAGE   0x0001
-#define DFCS_BUTTONRADIOMASK    0x0002		/* to draw nonsquare button */
+#define DFCS_BUTTONRADIOMASK    0x0002        /* to draw nonsquare button */
 #define DFCS_BUTTONRADIO        0x0004
 #define DFCS_BUTTON3STATE       0x0008
 #define DFCS_BUTTONPUSH         0x0010
@@ -2526,24 +2526,24 @@ typedef struct
 #define DFCS_INACTIVE           0x0100
 #define DFCS_PUSHED             0x0200
 #define DFCS_CHECKED            0x0400
-#define DFCS_ADJUSTRECT         0x2000		/* exclude surrounding edge */
+#define DFCS_ADJUSTRECT         0x2000        /* exclude surrounding edge */
 #define DFCS_FLAT               0x4000
 #define DFCS_MONO               0x8000
 
 /* Image type */
-#define	DST_COMPLEX	0x0000
-#define	DST_TEXT	0x0001
-#define	DST_PREFIXTEXT	0x0002
-#define	DST_ICON	0x0003
-#define	DST_BITMAP	0x0004
+#define    DST_COMPLEX    0x0000
+#define    DST_TEXT    0x0001
+#define    DST_PREFIXTEXT    0x0002
+#define    DST_ICON    0x0003
+#define    DST_BITMAP    0x0004
 
 /* State type */
-#define	DSS_NORMAL	0x0000
-#define	DSS_UNION	0x0010  /* Gray string appearance */
-#define	DSS_DISABLED	0x0020
-#define	DSS_DEFAULT	0x0040  /* Make it bold */
-#define	DSS_MONO	0x0080
-#define	DSS_RIGHT	0x8000
+#define    DSS_NORMAL    0x0000
+#define    DSS_UNION    0x0010  /* Gray string appearance */
+#define    DSS_DISABLED    0x0020
+#define    DSS_DEFAULT    0x0040  /* Make it bold */
+#define    DSS_MONO    0x0080
+#define    DSS_RIGHT    0x8000
 
 typedef struct
 {
@@ -2764,38 +2764,38 @@ typedef struct
 #define VK_NONAME           0xFC
 #define VK_PA1              0xFD
 #define VK_OEM_CLEAR        0xFE
-  
+ 
   /* Key status flags for mouse events */
-#define MK_LBUTTON	    0x0001
-#define MK_RBUTTON	    0x0002
-#define MK_SHIFT	    0x0004
-#define MK_CONTROL	    0x0008
-#define MK_MBUTTON	    0x0010
+#define MK_LBUTTON        0x0001
+#define MK_RBUTTON        0x0002
+#define MK_SHIFT        0x0004
+#define MK_CONTROL        0x0008
+#define MK_MBUTTON        0x0010
 
   /* Queue status flags */
-#define QS_KEY		0x0001
-#define QS_MOUSEMOVE	0x0002
-#define QS_MOUSEBUTTON	0x0004
-#define QS_MOUSE	(QS_MOUSEMOVE | QS_MOUSEBUTTON)
-#define QS_POSTMESSAGE	0x0008
-#define QS_TIMER	0x0010
-#define QS_PAINT	0x0020
-#define QS_SENDMESSAGE	0x0040
-#define QS_HOTKEY	0x0080
-#define QS_INPUT	(QS_MOUSE | QS_KEY)
-#define QS_ALLEVENTS	(QS_INPUT | QS_POSTMESSAGE | QS_TIMER | QS_PAINT | QS_HOTKEY)
+#define QS_KEY        0x0001
+#define QS_MOUSEMOVE    0x0002
+#define QS_MOUSEBUTTON    0x0004
+#define QS_MOUSE    (QS_MOUSEMOVE | QS_MOUSEBUTTON)
+#define QS_POSTMESSAGE    0x0008
+#define QS_TIMER    0x0010
+#define QS_PAINT    0x0020
+#define QS_SENDMESSAGE    0x0040
+#define QS_HOTKEY    0x0080
+#define QS_INPUT    (QS_MOUSE | QS_KEY)
+#define QS_ALLEVENTS    (QS_INPUT | QS_POSTMESSAGE | QS_TIMER | QS_PAINT | QS_HOTKEY)
 #define QS_ALLINPUT     (QS_ALLEVENTS | QS_SENDMESSAGE)
 
-#define DDL_READWRITE	0x0000
-#define DDL_READONLY	0x0001
-#define DDL_HIDDEN	0x0002
-#define DDL_SYSTEM	0x0004
-#define DDL_DIRECTORY	0x0010
-#define DDL_ARCHIVE	0x0020
+#define DDL_READWRITE    0x0000
+#define DDL_READONLY    0x0001
+#define DDL_HIDDEN    0x0002
+#define DDL_SYSTEM    0x0004
+#define DDL_DIRECTORY    0x0010
+#define DDL_ARCHIVE    0x0020
 
-#define DDL_POSTMSGS	0x2000
-#define DDL_DRIVES	0x4000
-#define DDL_EXCLUSIVE	0x8000
+#define DDL_POSTMSGS    0x2000
+#define DDL_DRIVES    0x4000
+#define DDL_EXCLUSIVE    0x8000
 
   /* Shell hook values */
 #define HSHELL_WINDOWCREATED       1
@@ -2847,35 +2847,35 @@ typedef struct
     LONG       l WINE_PACKED;
 } DRAGINFO, *LPDRAGINFO;
 
-#define DRAGOBJ_PROGRAM		0x0001
-#define DRAGOBJ_DATA		0x0002
-#define DRAGOBJ_DIRECTORY	0x0004
-#define DRAGOBJ_MULTIPLE	0x0008
-#define DRAGOBJ_EXTERNAL	0x8000
+#define DRAGOBJ_PROGRAM        0x0001
+#define DRAGOBJ_DATA        0x0002
+#define DRAGOBJ_DIRECTORY    0x0004
+#define DRAGOBJ_MULTIPLE    0x0008
+#define DRAGOBJ_EXTERNAL    0x8000
 
-#define DRAG_PRINT		0x544E5250
-#define DRAG_FILE		0x454C4946
+#define DRAG_PRINT        0x544E5250
+#define DRAG_FILE        0x454C4946
 
 /* types of LoadImage */
-#define IMAGE_BITMAP	0
-#define IMAGE_ICON	1
-#define IMAGE_CURSOR	2
-#define IMAGE_ENHMETAFILE	3
+#define IMAGE_BITMAP    0
+#define IMAGE_ICON    1
+#define IMAGE_CURSOR    2
+#define IMAGE_ENHMETAFILE    3
 
 /* loadflags to LoadImage */
-#define LR_DEFAULTCOLOR		0x0000
-#define LR_MONOCHROME		0x0001
-#define LR_COLOR		0x0002
-#define LR_COPYRETURNORG	0x0004
-#define LR_COPYDELETEORG	0x0008
-#define LR_LOADFROMFILE		0x0010
-#define LR_LOADTRANSPARENT	0x0020
-#define LR_DEFAULTSIZE		0x0040
-#define LR_VGA_COLOR		0x0080
-#define LR_LOADMAP3DCOLORS	0x1000
-#define	LR_CREATEDIBSECTION	0x2000
-#define LR_COPYFROMRESOURCE	0x4000
-#define LR_SHARED		0x8000
+#define LR_DEFAULTCOLOR        0x0000
+#define LR_MONOCHROME        0x0001
+#define LR_COLOR        0x0002
+#define LR_COPYRETURNORG    0x0004
+#define LR_COPYDELETEORG    0x0008
+#define LR_LOADFROMFILE        0x0010
+#define LR_LOADTRANSPARENT    0x0020
+#define LR_DEFAULTSIZE        0x0040
+#define LR_VGA_COLOR        0x0080
+#define LR_LOADMAP3DCOLORS    0x1000
+#define    LR_CREATEDIBSECTION    0x2000
+#define LR_COPYFROMRESOURCE    0x4000
+#define LR_SHARED        0x8000
 
 /* Flags for DrawIconEx.  */
 #define DI_MASK                 1
@@ -2889,10 +2889,10 @@ typedef struct
 #define WM_CPL_LAUNCHED     (WM_USER + 1001)
 
 /* WM_NOTIFYFORMAT commands and return values */
-#define NFR_ANSI	    1
-#define NFR_UNICODE	    2
-#define NF_QUERY	    3
-#define NF_REQUERY	    4
+#define NFR_ANSI        1
+#define NFR_UNICODE        2
+#define NF_QUERY        3
+#define NF_REQUERY        4
 
 #include "poppack.h"
 #define     EnumTaskWindows(handle,proc,lparam) \

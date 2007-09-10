@@ -109,7 +109,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         p_sys->p_input = vlc_object_find( p_stream, VLC_OBJECT_INPUT, FIND_PARENT );
     if( !p_sys->p_input )
         return NULL;
-    
+ 
     p_item = input_GetItem(p_sys->p_input);
 
     p_fmt_copy = malloc(sizeof(es_format_t));

@@ -550,7 +550,7 @@ wizInputPage::wizInputPage( wxWizard *parent, wxWizardPage *prev, intf_thread_t 
                                wxU( INPUT_OPEN ) );
     radioSizer->Add( input_radios[0], 0, wxALL, 5 );
     input_radios[1] = new wxRadioButton( radio_panel, InputRadio1_Event ,
-                               wxU( INPUT_PL ) );  
+                               wxU( INPUT_PL ) );
     radioSizer->Add( input_radios[1], 0, wxALL, 5 );
 
     radio_panel->SetSizer( radioSizer );
@@ -821,7 +821,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
     /* Line 2 : codec */
     video_sizer1->Add( new wxStaticText(this, -1, wxU(_("Codec"))),0,wxLEFT ,5);
     video_combo = new wxComboBox( this, VideoCodec_Event, wxT(""),
-                                  wxDefaultPosition, wxSize(200,25), 0, NULL, 
+                                  wxDefaultPosition, wxSize(200,25), 0, NULL,
                                   wxCB_DROPDOWN| wxCB_READONLY );
     for( i= 0; vcodecs_array[i].psz_display != NULL; i++ )
     {
@@ -861,7 +861,7 @@ wizTranscodeCodecPage::wizTranscodeCodecPage( wxWizard *parent,
     /* Line 2 : codec */
     audio_sizer1->Add( new wxStaticText(this, -1, wxU(_("Codec"))),0,wxLEFT,5);
     audio_combo = new wxComboBox( this, AudioCodec_Event, wxT(""),
-                                  wxDefaultPosition, wxSize(200,25), 0, NULL, 
+                                  wxDefaultPosition, wxSize(200,25), 0, NULL,
                                   wxCB_DROPDOWN| wxCB_READONLY );
     for( i= 0; acodecs_array[i].psz_display != NULL; i++ )
     {

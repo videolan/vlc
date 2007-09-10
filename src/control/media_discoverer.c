@@ -75,7 +75,7 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
                                        libvlc_exception_t * p_e )
 {
     libvlc_media_discoverer_t * p_mdis;
-    
+ 
     p_mdis = malloc(sizeof(libvlc_media_discoverer_t));
     if( !p_mdis )
     {
@@ -102,7 +102,7 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
                       vlc_ServicesDiscoveryItemRemoved,
                       services_discovery_item_removed,
                       p_mdis );
-    
+ 
     services_discovery_Start( p_mdis->p_sd );
 
     /* Here we go */

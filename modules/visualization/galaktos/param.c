@@ -42,7 +42,7 @@
 #include "expr_types.h"
 #include "eval.h"
 
-#include "engine_vars.h" 
+#include "engine_vars.h"
 
 void reset_param(param_t * param);
 
@@ -59,35 +59,35 @@ int insert_builtin_param(param_t * param);
 /* Private function prototypes */
 int compare_param(char * name, char * name2);
 
-int load_builtin_param_double(char * name, void * engine_val, void * matrix, short int flags, 
-								double init_val, double upper_bound, double lower_bound, char * alt_name);
+int load_builtin_param_double(char * name, void * engine_val, void * matrix, short int flags,
+                                double init_val, double upper_bound, double lower_bound, char * alt_name);
 
-int load_builtin_param_int(char * name, void * engine_val, short int flags, 
-								int init_val, int upper_bound, int lower_bound, char * alt_name);
-								
-int load_builtin_param_bool(char * name, void * engine_val, short int flags, 
-								int init_val, char * alt_name);
-								
-								
-								
+int load_builtin_param_int(char * name, void * engine_val, short int flags,
+                                int init_val, int upper_bound, int lower_bound, char * alt_name);
+                                
+int load_builtin_param_bool(char * name, void * engine_val, short int flags,
+                                int init_val, char * alt_name);
+                                
+                                
+                                
 param_t * create_param (char * name, short int type, short int flags, void * engine_val, void * matrix,
-							value_t default_init_val, value_t upper_bound, value_t lower_bound) {
+                            value_t default_init_val, value_t upper_bound, value_t lower_bound) {
 
   param_t * param = NULL;
 
   param = (param_t*)malloc(sizeof(param_t));
  
   if (param == NULL) {
-	printf("create_param: out of memory!!!\n");
-	return NULL;
+    printf("create_param: out of memory!!!\n");
+    return NULL;
   }
-  
+ 
   /* Clear name space, think the strncpy statement makes this redundant */
   //memset(param->name, 0, MAX_TOKEN_SIZE);
 
   /* Copy given name into parameter structure */
-  strncpy(param->name, name, MAX_TOKEN_SIZE-1); 
-  
+  strncpy(param->name, name, MAX_TOKEN_SIZE-1);
+ 
   /* Assign other entries in a constructor like fashion */
   param->type = type;
   param->flags = flags;
@@ -98,7 +98,7 @@ param_t * create_param (char * name, short int type, short int flags, void * eng
   //*param->init_val = default_init_val;
   param->upper_bound = upper_bound;
   param->lower_bound = lower_bound;
-  
+ 
   /* Return instantiated parameter */
   return param;
 
@@ -112,7 +112,7 @@ param_t * create_user_param(char * name) {
   value_t ub;
   value_t lb;
   double * engine_val;
-  
+ 
   /* Set initial values to default */
   iv.double_val = DEFAULT_DOUBLE_IV;
   ub.double_val = DEFAULT_DOUBLE_UB;
@@ -127,7 +127,7 @@ param_t * create_user_param(char * name) {
     return NULL;
 
   (*engine_val) = iv.double_val; /* set some default init value */
-  
+ 
   /* Create the new user parameter */
   if ((param = create_param(name, P_TYPE_DOUBLE, P_FLAG_USERDEF, engine_val, NULL, iv, ub, lb)) == NULL) {
     free(engine_val);
@@ -141,26 +141,26 @@ param_t * create_user_param(char * name) {
 /* Initialize the builtin parameter database.
    Should only be necessary once */
 int init_builtin_param_db() {
-	
+    
   /* Create the builtin parameter splay tree (go Sleator...) */
   if ((builtin_param_tree = create_splaytree(compare_string, copy_string, free_string)) == NULL) {
-	  if (PARAM_DEBUG) printf("init_builtin_param_db: failed to initialize database (FATAL)\n");  
-	  return OUTOFMEM_ERROR;
-  } 
+      if (PARAM_DEBUG) printf("init_builtin_param_db: failed to initialize database (FATAL)\n");
+      return OUTOFMEM_ERROR;
+  }
 
   if (PARAM_DEBUG) {
-	  printf("init_builtin_param: loading database...");
-	  fflush(stdout);
+      printf("init_builtin_param: loading database...");
+      fflush(stdout);
   }
-  
+ 
   /* Loads all builtin parameters into the database */
   if (load_all_builtin_param() < 0) {
-	if (PARAM_DEBUG) printf("failed loading builtin parameters (FATAL)\n");
+    if (PARAM_DEBUG) printf("failed loading builtin parameters (FATAL)\n");
     return ERROR;
   }
-  
+ 
   if (PARAM_DEBUG) printf("success!\n");
-	  
+    
   /* Finished, no errors */
   return SUCCESS;
 }
@@ -168,23 +168,23 @@ int init_builtin_param_db() {
 /* Destroy the builtin parameter database.
    Generally, do this on projectm exit */
 int destroy_builtin_param_db() {
-  
+ 
   splay_traverse(free_param, builtin_param_tree);
   destroy_splaytree(builtin_param_tree);
   builtin_param_tree = NULL;
-  return SUCCESS;	
+  return SUCCESS;    
 
 }
 
 
 /* Insert a parameter into the database with an alternate name */
 int insert_param_alt_name(param_t * param, char * alt_name) {
-  
+ 
   if (param == NULL)
     return ERROR;
   if (alt_name == NULL)
-	  return ERROR;
-  	
+      return ERROR;
+      
   splay_insert_link(alt_name, param->name, builtin_param_tree);
 
   return SUCCESS;
@@ -195,8 +195,8 @@ param_t * find_builtin_param(char * name) {
 
   /* Null argument checks */
   if (name == NULL)
-	  return NULL;
-    
+      return NULL;
+ 
   return splay_find(name, builtin_param_tree);
 
 }
@@ -208,10 +208,10 @@ param_t * find_param(char * name, preset_t * preset, int flags) {
 
   /* Null argument checks */
   if (name == NULL)
-	  return NULL;
+      return NULL;
   if (preset == NULL)
-	  return NULL;
-  
+      return NULL;
+ 
   /* First look in the builtin database */
   param = (param_t *)splay_find(name, builtin_param_tree);
 
@@ -219,13 +219,13 @@ param_t * find_param(char * name, preset_t * preset, int flags) {
   if (param == NULL) {
     param = (param_t*)splay_find(name, preset->user_param_tree);
   }
-  /* If it doesn't exist in the user (or builtin) database and 
-  	  create_flag is set, then make it and insert into the database 
+  /* If it doesn't exist in the user (or builtin) database and
+        create_flag is set, then make it and insert into the database
   */
-  
+ 
   if ((param == NULL) && (flags & P_CREATE)) {
-	
-	/* Check if string is valid */
+    
+    /* Check if string is valid */
     if (!is_valid_param_string(name)) {
       if (PARAM_DEBUG) printf("find_param: invalid parameter name:\"%s\"\n", name);
       return NULL;
@@ -240,13 +240,13 @@ param_t * find_param(char * name, preset_t * preset, int flags) {
       if (PARAM_DEBUG) printf("PARAM \"%s\" already exists in user parameter tree!\n", param->name);
       free_param(param);
       return NULL;
-    }	 
-    
-  }	  
-  
+    }    
+ 
+  }    
+ 
   /* Return the found (or created) parameter. Note that if P_CREATE is not set, this could be null */
   return param;
-  
+ 
 }
 
 /* Compare string name with parameter name */
@@ -256,7 +256,7 @@ int compare_param(char * name, char * name2) {
   printf("am i used\n");
   /* Uses string comparison function */
   cmpval = strncmp(name, name2, MAX_TOKEN_SIZE-1);
-  
+ 
   return cmpval;
 }
 
@@ -269,18 +269,18 @@ int load_all_builtin_param() {
   load_builtin_param_double("echo_zoom", (void*)&fVideoEchoZoom, NULL, P_FLAG_NONE, 0.0, MAX_DOUBLE_SIZE, 0, "fVideoEchoZoom");
   load_builtin_param_double("echo_alpha", (void*)&fVideoEchoAlpha, NULL, P_FLAG_NONE, 0.0, MAX_DOUBLE_SIZE, 0, "fVideoEchoAlpha");
   load_builtin_param_double("wave_a", (void*)&fWaveAlpha, NULL, P_FLAG_NONE, 0.0, 1.0, 0, "fWaveAlpha");
-  load_builtin_param_double("fWaveSmoothing", (void*)&fWaveSmoothing, NULL, P_FLAG_NONE, 0.0, 1.0, -1.0, NULL);  
+  load_builtin_param_double("fWaveSmoothing", (void*)&fWaveSmoothing, NULL, P_FLAG_NONE, 0.0, 1.0, -1.0, NULL);
   load_builtin_param_double("fModWaveAlphaStart", (void*)&fModWaveAlphaStart, NULL, P_FLAG_NONE, 0.0, 1.0, -1.0, NULL);
   load_builtin_param_double("fModWaveAlphaEnd", (void*)&fModWaveAlphaEnd, NULL, P_FLAG_NONE, 0.0, 1.0, -1.0, NULL);
   load_builtin_param_double("fWarpAnimSpeed",  (void*)&fWarpAnimSpeed, NULL, P_FLAG_NONE, 0.0, 1.0, -1.0, NULL);
   //  load_builtin_param_double("warp", (void*)&warp, warp_mesh, P_FLAG_NONE, 0.0, MAX_DOUBLE_SIZE, 0, NULL);
-	
+    
   load_builtin_param_double("fShader", (void*)&fShader, NULL, P_FLAG_NONE, 0.0, 1.0, -1.0, NULL);
   load_builtin_param_double("decay", (void*)&decay, NULL, P_FLAG_NONE, 0.0, 1.0, 0, "fDecay");
 
   load_builtin_param_int("echo_orient", (void*)&nVideoEchoOrientation, P_FLAG_NONE, 0, 3, 0, "nVideoEchoOrientation");
   load_builtin_param_int("wave_mode", (void*)&nWaveMode, P_FLAG_NONE, 0, 7, 0, "nWaveMode");
-  
+ 
   load_builtin_param_bool("wave_additive", (void*)&bAdditiveWaves, P_FLAG_NONE, FALSE, "bAdditiveWaves");
   load_builtin_param_bool("bModWaveAlphaByVolume", (void*)&bModWaveAlphaByVolume, P_FLAG_NONE, FALSE, NULL);
   load_builtin_param_bool("wave_brighten", (void*)&bMaximizeWaveColor, P_FLAG_NONE, FALSE, "bMaximizeWaveColor");
@@ -295,8 +295,8 @@ int load_all_builtin_param() {
   load_builtin_param_bool("wave_dots", (void*)&bWaveDots, P_FLAG_NONE, FALSE, "bWaveDots");
   load_builtin_param_bool("wave_thick", (void*)&bWaveThick, P_FLAG_NONE, FALSE, "bWaveThick");
  
-  
-  
+ 
+ 
   load_builtin_param_double("zoom", (void*)&zoom, zoom_mesh,  P_FLAG_PER_PIXEL |P_FLAG_DONT_FREE_MATRIX, 0.0, MAX_DOUBLE_SIZE, 0, NULL);
   load_builtin_param_double("rot", (void*)&rot, rot_mesh,  P_FLAG_PER_PIXEL |P_FLAG_DONT_FREE_MATRIX, 0.0, MAX_DOUBLE_SIZE, MIN_DOUBLE_SIZE, NULL);
   load_builtin_param_double("zoomexp", (void*)&zoomexp, zoomexp_mesh,  P_FLAG_PER_PIXEL |P_FLAG_NONE, 0.0, MAX_DOUBLE_SIZE, 0, "fZoomExponent");
@@ -314,7 +314,7 @@ int load_all_builtin_param() {
   load_builtin_param_double("wave_x", (void*)&wave_x, NULL, P_FLAG_NONE, 0.0, 1.0, 0.0, NULL);
   load_builtin_param_double("wave_y", (void*)&wave_y, NULL, P_FLAG_NONE, 0.0, 1.0, 0.0, NULL);
   load_builtin_param_double("wave_mystery", (void*)&wave_mystery, NULL, P_FLAG_NONE, 0.0, 1.0, -1.0, "fWaveParam");
-  
+ 
   load_builtin_param_double("ob_size", (void*)&ob_size, NULL, P_FLAG_NONE, 0.0, 0.5, 0, NULL);
   load_builtin_param_double("ob_r", (void*)&ob_r, NULL, P_FLAG_NONE, 0.0, 1.0, 0.0, NULL);
   load_builtin_param_double("ob_g", (void*)&ob_g, NULL, P_FLAG_NONE, 0.0, 1.0, 0.0, NULL);
@@ -337,9 +337,9 @@ int load_all_builtin_param() {
   load_builtin_param_double("mv_dx", (void*)&mv_dx,  NULL,P_FLAG_NONE, 0.0, 1.0, -1.0, NULL);
   load_builtin_param_double("mv_a", (void*)&mv_a,  NULL,P_FLAG_NONE, 0.0, 1.0, 0.0, NULL);
 
-  load_builtin_param_double("time", (void*)&Time,  NULL,P_FLAG_READONLY, 0.0, MAX_DOUBLE_SIZE, 0.0, NULL);        
+  load_builtin_param_double("time", (void*)&Time,  NULL,P_FLAG_READONLY, 0.0, MAX_DOUBLE_SIZE, 0.0, NULL);
   load_builtin_param_double("bass", (void*)&bass,  NULL,P_FLAG_READONLY, 0.0, MAX_DOUBLE_SIZE, 0.0, NULL);
-  load_builtin_param_double("mid", (void*)&mid,  NULL,P_FLAG_READONLY, 0.0, MAX_DOUBLE_SIZE, 0, NULL);      
+  load_builtin_param_double("mid", (void*)&mid,  NULL,P_FLAG_READONLY, 0.0, MAX_DOUBLE_SIZE, 0, NULL);
   load_builtin_param_double("bass_att", (void*)&bass_att,  NULL,P_FLAG_READONLY, 0.0, MAX_DOUBLE_SIZE, 0, NULL);
   load_builtin_param_double("mid_att", (void*)&mid_att,  NULL,P_FLAG_READONLY, 0.0, MAX_DOUBLE_SIZE, 0, NULL);
   load_builtin_param_double("treb_att", (void*)&treb_att,  NULL,P_FLAG_READONLY, 0.0, MAX_DOUBLE_SIZE, 0, NULL);
@@ -349,14 +349,14 @@ int load_all_builtin_param() {
 
 
 
-  load_builtin_param_double("x", (void*)&x_per_pixel, x_mesh,  P_FLAG_PER_PIXEL |P_FLAG_ALWAYS_MATRIX | P_FLAG_READONLY | P_FLAG_DONT_FREE_MATRIX, 
-			    0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, NULL);
-  load_builtin_param_double("y", (void*)&y_per_pixel, y_mesh,  P_FLAG_PER_PIXEL |P_FLAG_ALWAYS_MATRIX |P_FLAG_READONLY | P_FLAG_DONT_FREE_MATRIX, 
-			    0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, NULL);
-  load_builtin_param_double("ang", (void*)&ang_per_pixel, theta_mesh,  P_FLAG_PER_PIXEL |P_FLAG_ALWAYS_MATRIX | P_FLAG_READONLY | P_FLAG_DONT_FREE_MATRIX, 
-			    0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, NULL);      
-  load_builtin_param_double("rad", (void*)&rad_per_pixel, rad_mesh,  P_FLAG_PER_PIXEL |P_FLAG_ALWAYS_MATRIX | P_FLAG_READONLY | P_FLAG_DONT_FREE_MATRIX, 
-			    0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, NULL);
+  load_builtin_param_double("x", (void*)&x_per_pixel, x_mesh,  P_FLAG_PER_PIXEL |P_FLAG_ALWAYS_MATRIX | P_FLAG_READONLY | P_FLAG_DONT_FREE_MATRIX,
+                0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, NULL);
+  load_builtin_param_double("y", (void*)&y_per_pixel, y_mesh,  P_FLAG_PER_PIXEL |P_FLAG_ALWAYS_MATRIX |P_FLAG_READONLY | P_FLAG_DONT_FREE_MATRIX,
+                0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, NULL);
+  load_builtin_param_double("ang", (void*)&ang_per_pixel, theta_mesh,  P_FLAG_PER_PIXEL |P_FLAG_ALWAYS_MATRIX | P_FLAG_READONLY | P_FLAG_DONT_FREE_MATRIX,
+                0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, NULL);
+  load_builtin_param_double("rad", (void*)&rad_per_pixel, rad_mesh,  P_FLAG_PER_PIXEL |P_FLAG_ALWAYS_MATRIX | P_FLAG_READONLY | P_FLAG_DONT_FREE_MATRIX,
+                0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, NULL);
 
 
   load_builtin_param_double("q1", (void*)&q1,  NULL, P_FLAG_PER_PIXEL |P_FLAG_QVAR, 0, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, NULL);
@@ -374,16 +374,16 @@ int load_all_builtin_param() {
   load_builtin_param_int("meshx", (void*)&gx, P_FLAG_READONLY, 32, 96, 8, NULL);
   load_builtin_param_int("meshy", (void*)&gy, P_FLAG_READONLY, 24, 72, 6, NULL);
 
-  return SUCCESS;  
-  
+  return SUCCESS;
+ 
 }
 
 /* Free's a parameter type */
 void free_param(param_t * param) {
   int x;
   if (param == NULL)
-	return;
-  
+    return;
+ 
   if (param->flags & P_FLAG_USERDEF) {
     free(param->engine_val);
 
@@ -395,8 +395,8 @@ void free_param(param_t * param) {
       free(param->matrix);
 
     else if (param->flags & P_FLAG_PER_PIXEL) {
-       for(x = 0; x < gx; x++) 
-	   free(((double**)param->matrix)[x]);
+       for(x = 0; x < gx; x++)
+       free(((double**)param->matrix)[x]);
        free(param->matrix);
       }
   }
@@ -407,8 +407,8 @@ void free_param(param_t * param) {
 }
 
 /* Loads a double parameter into the builtin database */
-int load_builtin_param_double(char * name, void * engine_val, void * matrix, short int flags, 
-						double init_val, double upper_bound, double lower_bound, char * alt_name) {
+int load_builtin_param_double(char * name, void * engine_val, void * matrix, short int flags,
+                        double init_val, double upper_bound, double lower_bound, char * alt_name) {
 
   param_t * param = NULL;
   value_t iv, ub, lb;
@@ -416,48 +416,48 @@ int load_builtin_param_double(char * name, void * engine_val, void * matrix, sho
   iv.double_val = init_val;
   ub.double_val = upper_bound;
   lb.double_val = lower_bound;
-							
+                            
   /* Create new parameter of type double */
   if (PARAM_DEBUG == 2) {
-	  printf("load_builtin_param_double: (name \"%s\") (alt_name = \"%s\") ", name, alt_name);
-	  fflush(stdout);
-  }  
-  
+      printf("load_builtin_param_double: (name \"%s\") (alt_name = \"%s\") ", name, alt_name);
+      fflush(stdout);
+  }
+ 
  if ((param = create_param(name, P_TYPE_DOUBLE, flags, engine_val, matrix, iv, ub, lb)) == NULL) {
     return OUTOFMEM_ERROR;
   }
-  
+ 
   if (PARAM_DEBUG == 2) {
-	printf("created...");
-	fflush(stdout);
-   }	  
-   
+    printf("created...");
+    fflush(stdout);
+   }    
+ 
   /* Insert the paremeter into the database */
 
   if (insert_builtin_param(param) < 0) {
-	free_param(param);
+    free_param(param);
     return ERROR;
   }
 
   if (PARAM_DEBUG == 2) {
-	  printf("inserted...");
-	  fflush(stdout);
-  }  
-  
+      printf("inserted...");
+      fflush(stdout);
+  }
+ 
   /* If this parameter has an alternate name, insert it into the database as link */
-  
+ 
   if (alt_name != NULL) {
-	insert_param_alt_name(param, alt_name); 
+    insert_param_alt_name(param, alt_name);
 
   if (PARAM_DEBUG == 2) {
-	  printf("alt_name inserted...");
-	  fflush(stdout);
-  	}
-  
-	
-  }  	  
+      printf("alt_name inserted...");
+      fflush(stdout);
+      }
+ 
+    
+  }      
 
-  if (PARAM_DEBUG == 2) printf("finished\n");	  
+  if (PARAM_DEBUG == 2) printf("finished\n");    
   /* Finished, return success */
   return SUCCESS;
 }
@@ -466,7 +466,7 @@ int load_builtin_param_double(char * name, void * engine_val, void * matrix, sho
 
 /* Loads a double parameter into the builtin database */
 param_t * new_param_double(char * name, short int flags, void * engine_val, void * matrix,
-						double upper_bound, double lower_bound, double init_val) {
+                        double upper_bound, double lower_bound, double init_val) {
 
   param_t * param;
   value_t iv, ub, lb;
@@ -474,11 +474,11 @@ param_t * new_param_double(char * name, short int flags, void * engine_val, void
   iv.double_val = init_val;
   ub.double_val = upper_bound;
   lb.double_val = lower_bound;
-			     			
-  if ((param = create_param(name, P_TYPE_DOUBLE, flags, engine_val, matrix,iv, ub, lb)) == NULL) 
+                             
+  if ((param = create_param(name, P_TYPE_DOUBLE, flags, engine_val, matrix,iv, ub, lb)) == NULL)
     return NULL;
-  
-  
+ 
+ 
   /* Finished, return success */
   return param;
 }
@@ -486,7 +486,7 @@ param_t * new_param_double(char * name, short int flags, void * engine_val, void
 
 /* Creates a new parameter of type int */
 param_t * new_param_int(char * name, short int flags, void * engine_val,
-						int upper_bound, int lower_bound, int init_val) {
+                        int upper_bound, int lower_bound, int init_val) {
 
   param_t * param;
   value_t iv, ub, lb;
@@ -494,10 +494,10 @@ param_t * new_param_int(char * name, short int flags, void * engine_val,
   iv.int_val = init_val;
   ub.int_val = upper_bound;
   lb.int_val = lower_bound;
-							
-  if ((param = create_param(name, P_TYPE_INT, flags, engine_val, NULL, iv, ub, lb)) == NULL) 
+                            
+  if ((param = create_param(name, P_TYPE_INT, flags, engine_val, NULL, iv, ub, lb)) == NULL)
     return NULL;
-  
+ 
  
   /* Finished, return success */
   return param;
@@ -505,7 +505,7 @@ param_t * new_param_int(char * name, short int flags, void * engine_val,
 
 /* Creates a new parameter of type bool */
 param_t * new_param_bool(char * name, short int flags, void * engine_val,
-						int upper_bound, int lower_bound, int init_val) {
+                        int upper_bound, int lower_bound, int init_val) {
 
   param_t * param;
   value_t iv, ub, lb;
@@ -513,10 +513,10 @@ param_t * new_param_bool(char * name, short int flags, void * engine_val,
   iv.bool_val = init_val;
   ub.bool_val = upper_bound;
   lb.bool_val = lower_bound;
-							
+                            
   if ((param = create_param(name, P_TYPE_BOOL, flags, engine_val, NULL, iv, ub, lb)) == NULL)
     return NULL;
-  
+ 
  
   /* Finished, return success */
   return param;
@@ -525,15 +525,15 @@ param_t * new_param_bool(char * name, short int flags, void * engine_val,
 
 /* Loads a integer parameter into the builtin database */
 int load_builtin_param_int(char * name, void * engine_val, short int flags,
-						int init_val, int upper_bound, int lower_bound, char * alt_name) {
+                        int init_val, int upper_bound, int lower_bound, char * alt_name) {
 
   param_t * param;
   value_t iv, ub, lb;
 
   iv.int_val = init_val;
   ub.int_val = upper_bound;
-  lb.int_val = lower_bound;	
-							
+  lb.int_val = lower_bound;    
+                            
   param = create_param(name, P_TYPE_INT, flags, engine_val, NULL, iv, ub, lb);
 
   if (param == NULL) {
@@ -541,29 +541,29 @@ int load_builtin_param_int(char * name, void * engine_val, short int flags,
   }
 
   if (insert_builtin_param(param) < 0) {
-	free_param(param);
+    free_param(param);
     return ERROR;
   }
-  
+ 
   if (alt_name != NULL) {
-	insert_param_alt_name(param, alt_name);  	 
-  }  
-  
+    insert_param_alt_name(param, alt_name);      
+  }
+ 
   return SUCCESS;
 
-}							
-							
+}                            
+                            
 /* Loads a boolean parameter */
-int load_builtin_param_bool(char * name, void * engine_val, short int flags, 
-								int init_val, char * alt_name) {
+int load_builtin_param_bool(char * name, void * engine_val, short int flags,
+                                int init_val, char * alt_name) {
 
   param_t * param;
   value_t iv, ub, lb;
 
   iv.int_val = init_val;
   ub.int_val = TRUE;
-  lb.int_val = FALSE;	
-																
+  lb.int_val = FALSE;    
+                                                                
   param = create_param(name, P_TYPE_BOOL, flags, engine_val, NULL, iv, ub, lb);
 
   if (param == NULL) {
@@ -571,115 +571,115 @@ int load_builtin_param_bool(char * name, void * engine_val, short int flags,
   }
 
   if (insert_builtin_param(param) < 0) {
-	free_param(param);
+    free_param(param);
     return ERROR;
   }
-  
+ 
   if (alt_name != NULL) {
-	insert_param_alt_name(param, alt_name);  	 
-  }  
-  
+    insert_param_alt_name(param, alt_name);      
+  }
+ 
   return SUCCESS;
 
 }
 
 
-	
+    
 
 /* Returns nonzero if the string is valid parameter name */
 int is_valid_param_string(char * string) {
-  
+ 
   if (string == NULL)
     return FALSE;
-  
+ 
   /* This ensures the first character is non numeric */
   if( ((*string) >= 48) && ((*string) <= 57))
-    return FALSE; 
+    return FALSE;
 
   /* These probably should never happen */
   if (*string == '.')
-	return FALSE;
-  
+    return FALSE;
+ 
   if (*string == '+')
-	return FALSE;
-  
+    return FALSE;
+ 
   if (*string == '-')
-	return FALSE;
-  
+    return FALSE;
+ 
   /* Could also add checks for other symbols. May do later */
-  
+ 
   return TRUE;
-   
+ 
 }
 
 /* Inserts a parameter into the builtin database */
 int insert_builtin_param(param_t * param) {
 
-	if (param == NULL)
-		return FAILURE;
-	
-	return splay_insert(param, param->name, builtin_param_tree);	
+    if (param == NULL)
+        return FAILURE;
+    
+    return splay_insert(param, param->name, builtin_param_tree);    
 }
 
 /* Inserts a parameter into the builtin database */
 int insert_param(param_t * param, splaytree_t * database) {
 
-	if (param == NULL)
-	  return FAILURE;
-	if (database == NULL)
-	  return FAILURE;
+    if (param == NULL)
+      return FAILURE;
+    if (database == NULL)
+      return FAILURE;
 
-	return splay_insert(param, param->name, database);	
+    return splay_insert(param, param->name, database);    
 }
 
 
 /* Sets the parameter engine value to value val.
-	clipping occurs if necessary */
+    clipping occurs if necessary */
 void set_param(param_t * param, double val) {
 
-	switch (param->type) {
-		
-	case P_TYPE_BOOL:
-		if (val < 0)
-			*((int*)param->engine_val) = 0;
-		else if (val > 0)
-			*((int*)param->engine_val) = 1;
-		else
-			*((int*)param->engine_val) = 0;
-		break;
-	case P_TYPE_INT:
-		/* Make sure value is an integer */
-		val = floor(val);
-		if (val < param->lower_bound.int_val)
-				*((int*)param->engine_val) = param->lower_bound.int_val;
-		else if (val > param->upper_bound.int_val)
-				*((int*)param->engine_val) = param->upper_bound.int_val;
-		else
-				*((int*)param->engine_val) = val;
-		break;
-	case P_TYPE_DOUBLE:
-	  /* Make sure value is an integer */	
+    switch (param->type) {
+        
+    case P_TYPE_BOOL:
+        if (val < 0)
+            *((int*)param->engine_val) = 0;
+        else if (val > 0)
+            *((int*)param->engine_val) = 1;
+        else
+            *((int*)param->engine_val) = 0;
+        break;
+    case P_TYPE_INT:
+        /* Make sure value is an integer */
+        val = floor(val);
+        if (val < param->lower_bound.int_val)
+                *((int*)param->engine_val) = param->lower_bound.int_val;
+        else if (val > param->upper_bound.int_val)
+                *((int*)param->engine_val) = param->upper_bound.int_val;
+        else
+                *((int*)param->engine_val) = val;
+        break;
+    case P_TYPE_DOUBLE:
+      /* Make sure value is an integer */    
 
-	 
-	  if (val < param->lower_bound.double_val) 
-	    *((double*)param->engine_val) = param->lower_bound.double_val;	  
-	  else if (val > param->upper_bound.double_val)
-	    *((double*)param->engine_val) = param->upper_bound.double_val;
-	  else
-	    *((double*)param->engine_val) = val;
-	  break;
-	default:
-	  break;
+    
+      if (val < param->lower_bound.double_val)
+        *((double*)param->engine_val) = param->lower_bound.double_val;    
+      else if (val > param->upper_bound.double_val)
+        *((double*)param->engine_val) = param->upper_bound.double_val;
+      else
+        *((double*)param->engine_val) = val;
+      break;
+    default:
+      break;
 
-	}
-	
-	return;
+    }
+    
+    return;
 }
 
 
 
 
-/* Search for parameter 'name' in 'database', if create_flag is true, then generate the parameter 
+/* Search for parameter 'name' in 'database', if create_flag is true, then generate the parameter
    and insert it into 'database' */
 param_t * find_param_db(char * name, splaytree_t * database, int create_flag) {
 
@@ -690,29 +690,29 @@ param_t * find_param_db(char * name, splaytree_t * database, int create_flag) {
     return NULL;
   if (database == NULL)
     return NULL;
-  
+ 
   /* First look in the builtin database */
   param = (param_t *)splay_find(name, database);
 
-  
+ 
   if (((param = (param_t *)splay_find(name, database)) == NULL) && (create_flag == TRUE)) {
-	
-	/* Check if string is valid */
-	if (!is_valid_param_string(name))
-		return NULL;
-	
-	/* Now, create the user defined parameter given the passed name */
-	if ((param = create_user_param(name)) == NULL)
-		return NULL;
-	
-	/* Finally, insert the new parameter into this preset's proper splaytree */
-	if (splay_insert(param, param->name, database) < 0) {
-		free_param(param);
-		return NULL;
-	}	 
-	
-  }	  
-  
+    
+    /* Check if string is valid */
+    if (!is_valid_param_string(name))
+        return NULL;
+    
+    /* Now, create the user defined parameter given the passed name */
+    if ((param = create_user_param(name)) == NULL)
+        return NULL;
+    
+    /* Finally, insert the new parameter into this preset's proper splaytree */
+    if (splay_insert(param, param->name, database) < 0) {
+        free_param(param);
+        return NULL;
+    }    
+    
+  }    
+ 
   /* Return the found (or created) parameter. Note that this could be null */
   return param;
 

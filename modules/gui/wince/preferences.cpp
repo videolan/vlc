@@ -74,7 +74,7 @@ public:
     /*void CleanChanges();*/
 
     void OnSelectTreeItem( LPNM_TREEVIEW pnmtv, HWND parent, HINSTANCE hInst );
-        
+ 
     ConfigTreeData *FindModuleConfig( ConfigTreeData *config_data );
 
     HWND hwndTV;
@@ -149,10 +149,10 @@ PrefsDialog::PrefsDialog( intf_thread_t *p_intf, CBaseWindow *p_parent,
 
 /***********************************************************************
 
-FUNCTION: 
+FUNCTION:
   WndProc
 
-PURPOSE: 
+PURPOSE:
   Processes messages sent to the main window.
 
 ***********************************************************************/
@@ -189,7 +189,7 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         // Get the client area rect to put the panels in
         GetClientRect(hwnd, &rcClient);
 
-        /* Create the buttons */            
+        /* Create the buttons */
         advanced_checkbox =
             CreateWindow( _T("BUTTON"), _T("Advanced options"),
                         WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
@@ -251,19 +251,19 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         TVITEM tvi = {0};
         tvi.mask = TVIF_PARAM;
         tvi.hItem = TreeView_GetSelection( prefs_tree->hwndTV );
-	if( !tvi.hItem ) break;
+    if( !tvi.hItem ) break;
 
         if( !TreeView_GetItem( prefs_tree->hwndTV, &tvi ) ) break;
 
         ConfigTreeData *config_data =
             prefs_tree->FindModuleConfig( (ConfigTreeData *)tvi.lParam );
-        if( config_data && hwnd == config_data->panel->config_window ) 
+        if( config_data && hwnd == config_data->panel->config_window )
         {
             int dy;
             RECT rc;
             GetWindowRect( hwnd, &rc);
             int newvalue = config_data->panel->oldvalue;
-            switch ( GET_WM_VSCROLL_CODE(wp,lp) ) 
+            switch ( GET_WM_VSCROLL_CODE(wp,lp) )
             {
             case SB_BOTTOM       : newvalue = 0; break;
             case SB_TOP          : newvalue = config_data->panel->maxvalue; break;
@@ -281,7 +281,7 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             ScrollWindowEx( hwnd, 0, dy, NULL, NULL, NULL, NULL, SW_SCROLLCHILDREN );
             UpdateWindow ( hwnd);
 
-            config_data->panel->oldvalue = newvalue;                                
+            config_data->panel->oldvalue = newvalue;
         }
         break;
     }
@@ -320,8 +320,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
 
     INITCOMMONCONTROLSEX iccex;
     RECT rcClient;
-    TVITEM tvi = {0}; 
-    TVINSERTSTRUCT tvins = {0}; 
+    TVITEM tvi = {0};
+    TVINSERTSTRUCT tvins = {0};
     HTREEITEM hPrev;
 
     size_t i_capability_count = 0;
@@ -409,15 +409,15 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
                 config_data->i_object_id = p_module->i_object_id;
 
                 /* Add the category to the tree */
-                // Set the text of the item. 
-                tvi.pszText = _FROMMB(p_item->psz_text); 
+                // Set the text of the item.
+                tvi.pszText = _FROMMB(p_item->psz_text);
                 tvi.cchTextMax = _tcslen(tvi.pszText);
                 tvi.lParam = (long)config_data;
                 tvins.item = tvi;
-                tvins.hInsertAfter = hPrev; 
+                tvins.hInsertAfter = hPrev;
                 tvins.hParent = general_item; //level 3
-    
-                // Add the item to the tree-view control. 
+ 
+                // Add the item to the tree-view control.
                 hPrev = (HTREEITEM)TreeView_InsertItem( hwndTV, &tvins );
 
                 break;
@@ -427,7 +427,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
 
         TreeView_SortChildren( hwndTV, general_item, 0 );
     }
-        
+ 
     /*
      * Build a tree of all the plugins
      */
@@ -508,10 +508,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
             tvi.cchTextMax = _tcslen(tvi.pszText);
             tvi.lParam = (long)config_data;
             tvins.item = tvi;
-            tvins.hInsertAfter = plugins_item; 
+            tvins.hInsertAfter = plugins_item;
             tvins.hParent = plugins_item;// level 3
 
-            // Add the item to the tree-view control. 
+            // Add the item to the tree-view control.
             capability_item = (HTREEITEM) TreeView_InsertItem( hwndTV, &tvins);
 
             i_capability_count++;
@@ -528,10 +528,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
         tvi.cchTextMax = _tcslen(tvi.pszText);
         tvi.lParam = (long)config_data;
         tvins.item = tvi;
-        tvins.hInsertAfter = capability_item; 
+        tvins.hInsertAfter = capability_item;
         tvins.hParent = capability_item;// level 4
 
-        // Add the item to the tree-view control. 
+        // Add the item to the tree-view control.
         TreeView_InsertItem( hwndTV, &tvins );
     }
 
@@ -583,7 +583,7 @@ void PrefsTreeCtrl::ApplyChanges()
     {
         HTREEITEM item2 = TreeView_GetChild( hwndTV, item );
         while( item2 != 0 )
-        {       
+        {
             TVITEM tvi = {0};
             tvi.mask = TVIF_PARAM;
             tvi.hItem = item2;
@@ -616,7 +616,7 @@ ConfigTreeData *PrefsTreeCtrl::FindModuleConfig( ConfigTreeData *config_data )
     {
         HTREEITEM item2 = TreeView_GetChild( hwndTV, item );
         while( item2 != 0 )
-        {       
+        {
             TVITEM tvi = {0};
             tvi.mask = TVIF_PARAM;
             tvi.hItem = item2;
@@ -776,7 +776,7 @@ PrefsPanel::PrefsPanel( HWND parent, HINSTANCE hInst, intf_thread_t *_p_intf,
             config_array.push_back( control );
         }
         while( p_item->i_type != CONFIG_HINT_END && p_item++ );
-                
+ 
         GetWindowRect( config_window, &rc);
         maxvalue = y_pos - (rc.bottom - rc.top) + 5;
         oldvalue = 0;

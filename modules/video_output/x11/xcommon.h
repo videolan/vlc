@@ -212,14 +212,14 @@ struct vout_sys_t
 
 #ifdef HAVE_XSP
     int                 i_hw_scale;
-#endif 
+#endif
 
 #ifdef HAVE_OSSO
     osso_context_t      *p_octx;
     int                 i_backlight_on_counter;
 #endif
 
-    
+ 
 };
 
 /*****************************************************************************

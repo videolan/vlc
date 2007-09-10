@@ -31,12 +31,12 @@
 #   ifdef HAVE_LRINT
 #       define lrintf( x ) (int)rint( x )
 #   elif defined WIN32
-	    __inline long int lrintf( float x )
-	    {
+        __inline long int lrintf( float x )
+        {
             int i;
             _asm fld x __asm fistp i
-		    return i;
-    	}
+            return i;
+        }
 #   endif
 #endif
 

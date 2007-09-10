@@ -671,10 +671,10 @@ static void DisplayGDI( vout_thread_t *p_vout, picture_t *p_pic )
 static void FirstDisplayGDI( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /*
-    ** Video window is initially hidden, show it now since we got a 
+    ** Video window is initially hidden, show it now since we got a
     ** picture to show.
     */
-    SetWindowPos( p_vout->p_sys->hvideownd, 0, 0, 0, 0, 0, 
+    SetWindowPos( p_vout->p_sys->hvideownd, 0, 0, 0, 0, 0,
         SWP_ASYNCWINDOWPOS|
         SWP_FRAMECHANGED|
         SWP_SHOWWINDOW|
@@ -792,10 +792,10 @@ static void FirstDisplayGAPI( vout_thread_t *p_vout, picture_t *p_pic )
     DisplayGAPI(p_vout, p_pic);
 
     /*
-    ** Video window is initially hidden, show it now since we got a 
+    ** Video window is initially hidden, show it now since we got a
     ** picture to show.
     */
-    SetWindowPos( p_vout->p_sys->hvideownd, 0, 0, 0, 0, 0, 
+    SetWindowPos( p_vout->p_sys->hvideownd, 0, 0, 0, 0, 0,
         SWP_ASYNCWINDOWPOS|
         SWP_FRAMECHANGED|
         SWP_SHOWWINDOW|

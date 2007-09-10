@@ -151,7 +151,7 @@ typedef struct {
 #ifdef WORDS_BIGENDIAN
   unsigned char zero                           : 7; /* 25-31 */
   unsigned char video_pres_mode_change         : 1; /* 24 */
-  
+ 
   unsigned char karaoke_audio_pres_mode_change : 1; /* 23 */
   unsigned char angle_change                   : 1;
   unsigned char subpic_stream_change           : 1;
@@ -160,7 +160,7 @@ typedef struct {
   unsigned char still_off                      : 1;
   unsigned char button_select_or_activate      : 1;
   unsigned char resume                         : 1; /* 16 */
-  
+ 
   unsigned char chapter_menu_call              : 1; /* 15 */
   unsigned char angle_menu_call                : 1;
   unsigned char audio_menu_call                : 1;
@@ -169,7 +169,7 @@ typedef struct {
   unsigned char title_menu_call                : 1;
   unsigned char backward_scan                  : 1;
   unsigned char forward_scan                   : 1; /* 8 */
-  
+ 
   unsigned char next_pg_search                 : 1; /* 7 */
   unsigned char prev_or_top_pg_search          : 1;
   unsigned char time_or_chapter_search         : 1;
@@ -181,7 +181,7 @@ typedef struct {
 #else
   unsigned char video_pres_mode_change         : 1; /* 24 */
   unsigned char zero                           : 7; /* 25-31 */
-  
+ 
   unsigned char resume                         : 1; /* 16 */
   unsigned char button_select_or_activate      : 1;
   unsigned char still_off                      : 1;
@@ -190,7 +190,7 @@ typedef struct {
   unsigned char subpic_stream_change           : 1;
   unsigned char angle_change                   : 1;
   unsigned char karaoke_audio_pres_mode_change : 1; /* 23 */
-  
+ 
   unsigned char forward_scan                   : 1; /* 8 */
   unsigned char backward_scan                  : 1;
   unsigned char title_menu_call                : 1;
@@ -199,7 +199,7 @@ typedef struct {
   unsigned char audio_menu_call                : 1;
   unsigned char angle_menu_call                : 1;
   unsigned char chapter_menu_call              : 1; /* 15 */
-  
+ 
   unsigned char title_or_time_play             : 1; /* 0 */
   unsigned char chapter_search_or_play         : 1;
   unsigned char title_play                     : 1;
@@ -644,7 +644,7 @@ public:
     ,i_codec_id( codec_id )
     ,sys( demuxer )
     {}
-        
+ 
     virtual ~chapter_codec_cmds_c()
     {
         delete p_private_data;
@@ -674,7 +674,7 @@ public:
     }
 
     void AddCommand( const KaxChapterProcessCommand & command );
-    
+ 
     /// \return wether the codec has seeked in the files or not
     virtual bool Enter() { return false; }
     virtual bool Leave() { return false; }
@@ -708,9 +708,9 @@ public:
         p_PRMs[ 0x80 + 16 ] = 0xFFFFu;
         p_PRMs[ 0x80 + 18 ] = 0xFFFFu;
     }
-    
+ 
     bool Interpret( const binary * p_command, size_t i_size = 8 );
-    
+ 
     uint16 GetPRM( size_t index ) const
     {
         if ( index < 256 )
@@ -742,7 +742,7 @@ public:
         }
         return false;
     }
-    
+ 
     bool SetGPRM( size_t index, uint16 value )
     {
         if ( index >= 0 && index < 16 )
@@ -799,7 +799,7 @@ protected:
 
     uint16       p_PRMs[256];
     demux_sys_t  & sys;
-    
+ 
     // DVD command IDs
 
     // Tests
@@ -812,7 +812,7 @@ protected:
     static const uint16 CMD_DVD_IF_GPREG_SUP        = (5 << 4);
     static const uint16 CMD_DVD_IF_GPREG_INF_EQUAL  = (6 << 4);
     static const uint16 CMD_DVD_IF_GPREG_INF        = (7 << 4);
-    
+ 
     static const uint16 CMD_DVD_NOP                    = 0x0000;
     static const uint16 CMD_DVD_GOTO_LINE              = 0x0001;
     static const uint16 CMD_DVD_BREAK                  = 0x0002;
@@ -841,7 +841,7 @@ protected:
     static const uint16 CMD_DVD_MULT_GPREG             = 0x7500;
     static const uint16 CMD_DVD_GPREG_DIV_VALUE        = 0x7600;
     static const uint16 CMD_DVD_GPREG_AND_VALUE        = 0x7900;
-    
+ 
     // callbacks when browsing inside CodecPrivate
     static bool MatchIsDomain     ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
     static bool MatchIsVMG        ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
@@ -875,10 +875,10 @@ public:
     {}
 
     bool Interpret( const binary * p_command, size_t i_size );
-    
+ 
     // DVD command IDs
     static const std::string CMD_MS_GOTO_AND_PLAY;
-    
+ 
 protected:
     demux_sys_t  & sys;
 };
@@ -961,7 +961,7 @@ public:
     std::string                 GetCodecName( bool f_for_title = false ) const;
     bool                        ParentOf( const chapter_item_c & item ) const;
     int16                       GetTitleNumber( ) const;
-    
+ 
     int64_t                     i_start_time, i_end_time;
     int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
     std::vector<chapter_item_c*> sub_chapters;
@@ -972,7 +972,7 @@ public:
     std::string                 psz_name;
     chapter_item_c              *psz_parent;
     bool                        b_is_leaving;
-    
+ 
     std::vector<chapter_codec_cmds_c*> codecs;
 
     static bool CompareTimecode( const chapter_item_c * itemA, const chapter_item_c * itemB )
@@ -991,12 +991,12 @@ public:
     chapter_edition_c()
     :b_ordered(false)
     {}
-    
+ 
     void RefreshChapters( );
     mtime_t Duration() const;
     std::string GetMainName() const;
     chapter_item_c * FindTimecode( mtime_t i_timecode, const chapter_item_c * p_current );
-    
+ 
     bool                        b_ordered;
 };
 
@@ -1146,7 +1146,7 @@ public:
 
     std::vector<chapter_translation_c*> translations;
     std::vector<KaxSegmentFamily*>  families;
-    
+ 
     demux_sys_t                    & sys;
     EbmlParser                     *ep;
     bool                           b_preloaded;
@@ -1548,8 +1548,8 @@ static int Open( vlc_object_t * p_this )
                             // test wether this file belongs to our family
                             const uint8_t *p_peek;
                             bool          file_ok = false;
-                            stream_t      *p_file_stream = stream_UrlNew( 
-                                                            p_demux, 
+                            stream_t      *p_file_stream = stream_UrlNew(
+                                                            p_demux,
                                                             s_filename.c_str());
                             /* peek the begining */
                             if( p_file_stream &&
@@ -1604,7 +1604,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_sys->StartUiThread();
-    
+ 
     return VLC_SUCCESS;
 
 error:
@@ -2309,7 +2309,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                         memcpy( p_out, p_data, i_size1 );
                         p_data += i_size1;
                         p_out += i_size1;
-                        
+ 
                         *p_out++ = (i_size2>>8) & 0xFF;
                         *p_out++ = i_size2 & 0xFF;
                         memcpy( p_out, p_data, i_size2 );
@@ -2588,7 +2588,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 char *p_buf = (char *)malloc( tracks[i_track]->i_extra_data + 1);
                 memcpy( p_buf, tracks[i_track]->p_extra_data , tracks[i_track]->i_extra_data );
                 p_buf[tracks[i_track]->i_extra_data] = '\0';
-                
+ 
                 p_start = strstr( p_buf, "size:" );
                 if( sscanf( p_start, "size: %dx%d",
                         &tracks[i_track]->fmt.subs.spu.i_original_frame_width, &tracks[i_track]->fmt.subs.spu.i_original_frame_height ) == 2 )
@@ -2633,7 +2633,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tracks[i_track]->p_es, i_start_time );
     }
-    
+ 
     sys.i_start_pts = i_start_time;
     // reset the stream reading to the first cluster of the segment used
     es.I_O().setFilePointer( i_start_pos );
@@ -2872,7 +2872,7 @@ int demux_sys_t::EventThread( vlc_object_t *p_this )
                 break;
             case ACTIONID_NAV_ACTIVATE:
                 b_activated = VLC_TRUE;
-        
+ 
                 if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
                 {
                     btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
@@ -3158,7 +3158,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
                         Seek( demux, sys.i_pts, 0, psz_curr_chapter );
                 }
             }
-            
+ 
             if ( !b_has_seeked )
             {
                 psz_current_chapter = psz_curr_chapter;
@@ -3229,7 +3229,7 @@ chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
             return this;
         index++;
     }
-    
+ 
     // sub-chapters
     chapter_item_c *p_result = NULL;
     std::vector<chapter_item_c*>::const_iterator index2 = sub_chapters.begin();
@@ -3240,7 +3240,7 @@ chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
             return p_result;
         index2++;
     }
-    
+ 
     return p_result;
 }
 
@@ -3478,14 +3478,14 @@ static int Demux( demux_t *p_demux)
                 i_return = 1;
                 break;
             }
-        
+ 
         if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered && p_vsegment->CurrentChapter() == NULL )
         {
             /* nothing left to read in this ordered edition */
             if ( !p_vsegment->SelectNext() )
                 break;
             p_segment->UnSelect( );
-            
+ 
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             /* switch to the next segment */
@@ -3533,7 +3533,7 @@ static int Demux( demux_t *p_demux)
             {
                 msg_Warn( p_demux, "cannot get block EOF?" );
                 p_segment->UnSelect( );
-                
+ 
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
                 /* switch to the next segment */
@@ -3569,7 +3569,7 @@ static int Demux( demux_t *p_demux)
                 break;
             }
         }
-        
+ 
         if ( p_vsegment->Edition() && p_vsegment->Edition()->b_ordered && p_vsegment->CurrentChapter() == NULL )
         {
             /* nothing left to read in this ordered edition */
@@ -3579,7 +3579,7 @@ static int Demux( demux_t *p_demux)
                 break;
             }
             p_segment->UnSelect( );
-            
+ 
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
             /* switch to the next segment */
@@ -4214,7 +4214,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     tk->psz_codec_settings = NULL;
     tk->psz_codec_info_url = NULL;
     tk->psz_codec_download_url = NULL;
-    
+ 
     tk->i_compression_type = MATROSKA_COMPRESSION_NONE;
     tk->p_compression_data = NULL;
 
@@ -4476,7 +4476,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
 
             tk->fmt.video.i_frame_rate_base = (unsigned int)(tk->i_default_duration / 1000);
             tk->fmt.video.i_frame_rate = 1000000;
-            
+ 
             for( j = 0; j < tkv->ListSize(); j++ )
             {
                 EbmlElement *l = (*tkv)[j];
@@ -5038,7 +5038,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
         if( MKV_IS_ID( l, KaxEditionEntry ) )
         {
             chapter_edition_c *p_edition = new chapter_edition_c();
-            
+ 
             EbmlMaster *E = static_cast<EbmlMaster *>(l );
             size_t j;
             msg_Dbg( &sys.demuxer, "|   |   + EditionEntry" );
@@ -5082,7 +5082,7 @@ void matroska_segment_c::ParseChapters( KaxChapters *chapters )
     {
         stored_editions[i]->RefreshChapters( );
     }
-    
+ 
     if ( stored_editions.size() != 0 && stored_editions[i_default_edition]->b_ordered )
     {
         /* update the duration of the segment according to the sum of all sub chapters */
@@ -5200,7 +5200,7 @@ void chapter_edition_c::RefreshChapters( )
 int64_t chapter_item_c::RefreshChapters( bool b_ordered, int64_t i_prev_user_time )
 {
     int64_t i_user_time = i_prev_user_time;
-    
+ 
     // first the sub-chapters, and then ourself
     std::vector<chapter_item_c*>::iterator index = sub_chapters.begin();
     while ( index != sub_chapters.end() )
@@ -5248,14 +5248,14 @@ int64_t chapter_item_c::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
 mtime_t chapter_edition_c::Duration() const
 {
     mtime_t i_result = 0;
-    
+ 
     if ( sub_chapters.size() )
     {
         std::vector<chapter_item_c*>::const_iterator index = sub_chapters.end();
         index--;
         i_result = (*index)->i_user_end_time;
     }
-    
+ 
     return i_result;
 }
 
@@ -5284,7 +5284,7 @@ chapter_item_c *chapter_item_c::FindTimecode( mtime_t i_user_timecode, const cha
             psz_result = (*index)->FindTimecode( i_user_timecode, p_current, b_found );
             index++;
         }
-        
+ 
         if ( psz_result == NULL )
             psz_result = this;
     }
@@ -5339,7 +5339,7 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
     virtual_segment_c *p_seg;
 
     p_current_segment = VirtualFromSegments( p_segment );
-    
+ 
     used_segments.push_back( p_current_segment );
 
     // create all the other virtual segments of the family
@@ -5472,7 +5472,7 @@ void demux_sys_t::JumpTo( virtual_segment_c & vsegment, chapter_item_c * p_chapt
             vsegment.Seek( demuxer, p_chapter->i_user_start_time, -1, p_chapter );
         }
     }
-    
+ 
 }
 
 bool matroska_segment_c::CompareSegmentUIDs( const matroska_segment_c * p_item_a, const matroska_segment_c * p_item_b )
@@ -5490,7 +5490,7 @@ bool matroska_segment_c::CompareSegmentUIDs( const matroska_segment_c * p_item_a
     p_tmp = (EbmlBinary *)p_item_a->p_next_segment_uid;
     if ( !p_tmp )
         return false;
-    
+ 
     if ( p_item_b->p_segment_uid != NULL
           && *p_tmp == *p_item_b->p_segment_uid )
         return true;
@@ -6169,10 +6169,10 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         if ( !b_test_positive )
             return false;
     }
-    
+ 
     // strip the test command
     i_command &= 0xFF0F;
-    
+ 
     switch ( i_command )
     {
     case CMD_DVD_NOP:
@@ -6402,7 +6402,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     case CMD_DVD_SET_GPRMMD:
         {
             msg_Dbg( &sys.demuxer, "Set GPRMMD [%d]=%d", (p_command[4] << 8) + p_command[5], (p_command[2] << 8) + p_command[3]);
-            
+ 
             if ( !SetGPRM( (p_command[4] << 8) + p_command[5], (p_command[2] << 8) + p_command[3] ) )
                 msg_Dbg( &sys.demuxer, "Set GPRMMD failed" );
             break;
@@ -6410,7 +6410,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     case CMD_DVD_LINKPGCN:
         {
             uint16 i_pgcn = (p_command[6] << 8) + p_command[7];
-            
+ 
             msg_Dbg( &sys.demuxer, "Link PGCN(%d)", i_pgcn );
             p_chapter = sys.p_current_segment->BrowseCodecPrivate( 1, MatchPgcNumber, &i_pgcn, 2 );
             if ( p_chapter != NULL )
@@ -6426,7 +6426,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     case CMD_DVD_LINKCN:
         {
             uint8 i_cn = p_command[7];
-            
+ 
             p_chapter = sys.p_current_segment->CurrentChapter();
 
             msg_Dbg( &sys.demuxer, "LinkCN (cell %d)", i_cn );
@@ -6488,7 +6488,7 @@ bool dvd_command_interpretor_c::MatchVTSNumber( const chapter_codec_cmds_c &data
 {
     if ( i_cookie_size != 2 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
         return false;
-    
+ 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_SS || data.p_private_data->GetBuffer()[1] != 0x80 )
         return false;
 
@@ -6502,7 +6502,7 @@ bool dvd_command_interpretor_c::MatchVTSMNumber( const chapter_codec_cmds_c &dat
 {
     if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
         return false;
-    
+ 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_SS || data.p_private_data->GetBuffer()[1] != 0x40 )
         return false;
 
@@ -6516,7 +6516,7 @@ bool dvd_command_interpretor_c::MatchTitleNumber( const chapter_codec_cmds_c &da
 {
     if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
         return false;
-    
+ 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_TT )
         return false;
 
@@ -6530,7 +6530,7 @@ bool dvd_command_interpretor_c::MatchPgcType( const chapter_codec_cmds_c &data, 
 {
     if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 8 )
         return false;
-    
+ 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
         return false;
 
@@ -6544,7 +6544,7 @@ bool dvd_command_interpretor_c::MatchPgcNumber( const chapter_codec_cmds_c &data
 {
     if ( i_cookie_size != 2 || data.p_private_data == NULL || data.p_private_data->GetSize() < 8 )
         return false;
-    
+ 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
         return false;
 
@@ -6558,7 +6558,7 @@ bool dvd_command_interpretor_c::MatchChapterNumber( const chapter_codec_cmds_c &
 {
     if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 2 )
         return false;
-    
+ 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PTT )
         return false;
 
@@ -6572,7 +6572,7 @@ bool dvd_command_interpretor_c::MatchCellNumber( const chapter_codec_cmds_c &dat
 {
     if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 5 )
         return false;
-    
+ 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_CN )
         return false;
 

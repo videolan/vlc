@@ -70,7 +70,7 @@ struct vout_sys_t
     uint32_t            i_height;                   /* height of main window */
     uint32_t            i_screen_depth;
     vlc_bool_t          b_double_buffered;
-    
+ 
     uint32_t            u_current; /* Current output resolution. */
     CascadeScreen      *p_screen;
 };
@@ -89,7 +89,7 @@ static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     bool b_double_buffered = false;
-    
+ 
     p_vout->p_sys = (struct vout_sys_t*) malloc( sizeof(struct vout_sys_t) );
     if( p_vout->p_sys == NULL )
     {
@@ -115,7 +115,7 @@ static int Create( vlc_object_t *p_this )
     /* Get current screen resolution */
     msg_Dbg( p_vout, "number of screen resolutions supported %u",
       p_vout->p_sys->p_screen->GetNumScreenResolutionsSupported() );
-      
+ 
     p_vout->p_sys->p_screen->GetCurrentScreenResolution( (u32) p_vout->p_sys->u_current );
     p_vout->p_sys->p_screen->SetScreenResolution( (u32) p_vout->p_sys->u_current );
 
@@ -123,18 +123,18 @@ static int Create( vlc_object_t *p_this )
     msg_Dbg( p_vout, "available screen resolutions:" );
     for (u32 i=0; i<p_vout->p_sys->p_screen->GetNumScreenResolutionsSupported(); i++)
     {
-        u32 i_width=0; 
-	u32 i_height=0; 
-	u8 i_screen_depth=0; 
-	bool b_buffered;
-	
+        u32 i_width=0;
+    u32 i_height=0;
+    u8 i_screen_depth=0;
+    bool b_buffered;
+    
         p_vout->p_sys->p_screen->GetSupportedScreenResolutionAt( i,
             i_width, i_height, i_screen_depth, b_buffered);
         msg_Dbg( p_vout, "  screen index = %u, width = %u, height = %u, depth = %u, double buffered = %s",
             i, i_width, i_height, i_screen_depth, (b_buffered ? "yes" : "no") );
     }
-#endif        
-    
+#endif
+ 
     p_vout->p_sys->p_screen->GetSupportedScreenResolutionAt( (u32) p_vout->p_sys->u_current,
             (u32) p_vout->p_sys->i_width,
             (u32) p_vout->p_sys->i_height,
@@ -147,7 +147,7 @@ static int Create( vlc_object_t *p_this )
             p_vout->p_sys->i_height,
             p_vout->p_sys->i_screen_depth,
             p_vout->p_sys->b_double_buffered );
-        
+ 
     return VLC_SUCCESS;
 }
 
@@ -274,7 +274,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         free( p_pic->p_sys );
         return -1;
     }
-    
+ 
     p_pic->p->i_lines = p_vout->output.i_height;
     p_pic->p->i_visible_lines = p_vout->output.i_height;
     p_pic->p->p_pixels = (uint8_t*) p_pic->p_sys->p_image->MapLock();
@@ -282,7 +282,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_pic->p->i_visible_pitch = p_pic->p->i_pixel_pitch
                                  * p_vout->output.i_width;
 
-    return VLC_SUCCESS;                                 
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -298,13 +298,13 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     { /* Just a test to see the effect described above. REMOVE THIS */
         msg_Err( p_vout, "unlocking shared memory failed, already unlocked" );
     }
-    
+ 
     if( p_pic->p_sys->p_image->Close() )
     {
         msg_Err( p_vout, "closing shared memory failed. Leaking memory of %ul",
                     p_pic->p_sys->p_image->GetSize() );
     }
-    
+ 
     delete p_pic->p_sys->p_image;
     free( p_pic->p_sys );
 }
@@ -316,7 +316,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     uint32_t i_width, i_height, i_x, i_y;
     uint32_t i_offset = 0;
-    
+ 
     vout_PlacePicture( p_vout, p_vout->p_sys->i_width,
                        p_vout->p_sys->i_height,
                        &i_x, &i_y, &i_width, &i_height );
@@ -325,13 +325,13 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Currently the only pixel format supported is 32bpp RGBA.*/
     p_vout->p_sys->p_screen->LockScreen();
-    
+ 
     /* Unlock the shared memory region first. */
-    if( p_pic->p_sys->p_image->Unlock() ) 
+    if( p_pic->p_sys->p_image->Unlock() )
     {
         msg_Err( p_vout, "unlocking shared memory failed. Expect threading problems." );
     }
-    
+ 
     p_vout->p_sys->p_screen->Blit( CascadePoint( (u32) i_x, (u32) i_y ), /* Place bitmap at */
             (*p_pic->p_sys->p_image)   ,                                      /* Image data */
             (u32) i_offset,                                   /* Offset in SharedMemoryZone */
@@ -339,6 +339,6 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
             (u32) i_height,                                         /* Source bitmap height */
             (u32) p_vout->p_sys->i_screen_depth,                      /* Source pixel depth */
             CascadeRect( (u32) i_x, (u32) i_y, (u32) i_width, (u32) i_height ) );
-            
+ 
     p_vout->p_sys->p_screen->UnlockScreen();
 }

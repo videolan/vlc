@@ -968,7 +968,7 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
             menu->addAction( qfu(I_POP_SORT), this, SLOT( popupSort() ) );
             menu->addAction( qfu(I_POP_ADD), this, SLOT( popupAdd() ) );
         }
-#ifdef WIN32        
+#ifdef WIN32
         menu->addSeparator();
         menu->addAction( qfu( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
 #endif

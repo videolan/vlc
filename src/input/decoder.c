@@ -132,7 +132,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create packetizer" );
-            intf_UserFatal( p_input, VLC_FALSE, _("Streaming / Transcoding failed"), 
+            intf_UserFatal( p_input, VLC_FALSE, _("Streaming / Transcoding failed"),
                             _("VLC could not open the packetizer module.") );
             return NULL;
         }
@@ -144,7 +144,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create decoder" );
-            intf_UserFatal( p_input, VLC_FALSE, _("Streaming / Transcoding failed"), 
+            intf_UserFatal( p_input, VLC_FALSE, _("Streaming / Transcoding failed"),
                             _("VLC could not open the decoder module.") );
             return NULL;
         }

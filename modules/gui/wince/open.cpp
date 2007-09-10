@@ -97,17 +97,17 @@ OpenDialog::OpenDialog( intf_thread_t *p_intf, CBaseWindow *p_parent,
 
 /***********************************************************************
 
-FUNCTION: 
+FUNCTION:
   WndProc
 
-PURPOSE: 
+PURPOSE:
   Processes messages sent to the main window.
-  
+ 
 ***********************************************************************/
 LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
     SHINITDLGINFO shidi;
-    INITCOMMONCONTROLSEX  iccex;  // INITCOMMONCONTROLSEX structure    
+    INITCOMMONCONTROLSEX  iccex;  // INITCOMMONCONTROLSEX structure
     RECT rcClient;
     TC_ITEM tcItem;
 
@@ -186,7 +186,7 @@ LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
     case WM_SETFOCUS:
         SHFullScreen( hwnd, SHFS_SHOWSIPBUTTON );
-        SHSipPreference( hwnd, SIP_DOWN ); 
+        SHSipPreference( hwnd, SIP_DOWN );
         break;
 
     case WM_COMMAND:
@@ -219,7 +219,7 @@ LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             } else if( (HWND)lp == browse_button )
             {
                 OnFileBrowse();
-            } 
+            }
             break;
         }
         if( HIWORD(wp) == EN_CHANGE )
@@ -414,7 +414,7 @@ void OpenDialog::NetPanel( HWND hwnd )
         WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON,
         rc.left + 5 + 15 + 5 + net_type_array[0].length + 5,
         rc.top + 10, 15, 15, hwnd, NULL, hInst, NULL );
-        
+ 
     net_label[2] = CreateWindow( _T("STATIC"), net_type_array[2].psz_text,
         WS_CHILD | WS_VISIBLE | SS_LEFT,
         rc.left + 5 + 15 + 5 + net_type_array[0].length + 5 + 15 + 5,
@@ -600,7 +600,7 @@ void OpenDialog::OnOk()
     char **pp_args = vlc_parse_cmdline( _TOMB(psz_text), &i_args );
 
     ComboBox_AddString( mrl_combo, psz_text );
-    if( ComboBox_GetCount( mrl_combo ) > 10 ) 
+    if( ComboBox_GetCount( mrl_combo ) > 10 )
         ComboBox_DeleteString( mrl_combo, 0 );
     ComboBox_SetCurSel( mrl_combo, ComboBox_GetCount( mrl_combo ) - 1 );
 
@@ -681,7 +681,7 @@ static void OnOpenCB( intf_dialog_args_t *p_arg )
 
         SetWindowText( p_this->file_combo, _FROMMB(psz_tmp) );
         ComboBox_AddString( p_this->file_combo, _FROMMB(psz_tmp) );
-        if( ComboBox_GetCount( p_this->file_combo ) > 10 ) 
+        if( ComboBox_GetCount( p_this->file_combo ) > 10 )
             ComboBox_DeleteString( p_this->file_combo, 0 );
 
         p_this->UpdateMRL( FILE_ACCESS );
@@ -734,7 +734,7 @@ void OpenDialog::OnNetTypeChange( int event )
                       SWP_NOMOVE | SWP_NOSIZE );
         SetWindowPos( hUpdown[0], HWND_TOP, 0, 0, 0, 0,
                       SWP_NOMOVE | SWP_NOSIZE );
-    } 
+    }
     else if( event == NetRadio2_Event )
     {
         SetWindowPos( net_addrs_label[1], HWND_TOP, 0, 0, 0, 0,
@@ -747,14 +747,14 @@ void OpenDialog::OnNetTypeChange( int event )
                       SWP_NOMOVE | SWP_NOSIZE );
         SetWindowPos( hUpdown[1], HWND_TOP, 0, 0, 0, 0,
                       SWP_NOMOVE | SWP_NOSIZE );
-    } 
+    }
     else if( event == NetRadio3_Event )
     {
         SetWindowPos( net_addrs_label[2], HWND_TOP, 0, 0, 0, 0,
                       SWP_NOMOVE | SWP_NOSIZE );
         SetWindowPos( net_addrs[2], HWND_TOP, 0, 0, 0, 0,
                       SWP_NOMOVE | SWP_NOSIZE );
-    } 
+    }
     else if( event == NetRadio4_Event )
     {
         SetWindowPos( net_addrs_label[3], HWND_TOP, 0, 0, 0, 0,
@@ -762,7 +762,7 @@ void OpenDialog::OnNetTypeChange( int event )
         SetWindowPos( net_addrs[3], HWND_TOP, 0, 0, 0, 0,
                       SWP_NOMOVE | SWP_NOSIZE );
     }
-        
+ 
     UpdateMRL( NET_ACCESS );
 }
 

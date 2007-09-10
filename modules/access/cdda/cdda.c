@@ -151,22 +151,22 @@ vlc_module_begin();
               N_("If set, get CD-Text information"),
               VLC_FALSE );
 
-    add_bool( MODULE_STRING "-navigation-mode", VLC_TRUE, 
+    add_bool( MODULE_STRING "-navigation-mode", VLC_TRUE,
 #if FIXED
-	      CDDANavModeCB,
+          CDDANavModeCB,
 #else
-	      NULL,
+          NULL,
 #endif
               N_("Use Navigation-style playback?"),
               N_("Tracks are navigated via Navagation rather than "
-		 "a playlist entries"),
+         "a playlist entries"),
               VLC_FALSE );
 
 #if LIBCDIO_VERSION_NUM >= 72
       add_string( MODULE_STRING "-paranoia", NULL, NULL,
-		PARANOIA_TEXT,
-		PARANOIA_LONGTEXT,
-		VLC_FALSE );
+        PARANOIA_TEXT,
+        PARANOIA_LONGTEXT,
+        VLC_FALSE );
       change_string_list( psz_paranoia_list, psz_paranoia_list_text, 0 );
 #endif /* LIBCDIO_VERSION_NUM >= 72 */
 
@@ -186,7 +186,7 @@ vlc_module_begin();
     add_string( MODULE_STRING "-cddb-server", "freedb.freedb.org", NULL,
                 N_("CDDB server"),
                 N_( "Contact this CDDB server look up CD-DA information"),
-		VLC_TRUE );
+        VLC_TRUE );
 
     add_integer( MODULE_STRING "-cddb-port", 8880, NULL,
                  N_("CDDB server port"),
@@ -196,7 +196,7 @@ vlc_module_begin();
     add_string( MODULE_STRING "-cddb-email", "me@home", NULL,
                 N_("email address reported to CDDB server"),
                 N_("email address reported to CDDB server"),
-		VLC_TRUE );
+        VLC_TRUE );
 
     add_bool( MODULE_STRING "-cddb-enable-cache", VLC_TRUE, NULL,
               N_("Cache CDDB lookups?"),
@@ -218,12 +218,12 @@ vlc_module_begin();
     add_string( MODULE_STRING "-cddb-cachedir", "~/.cddbslave", NULL,
                 N_("Directory to cache CDDB requests"),
                 N_("Directory to cache CDDB requests"),
-		VLC_TRUE );
+        VLC_TRUE );
 
     add_bool( MODULE_STRING "-cdtext-prefer", VLC_TRUE, CDTextPreferCB,
               N_("Prefer CD-Text info to CDDB info?"),
               N_("If set, CD-Text information will be preferred "
-		 "to CDDB information when both are available"),
+         "to CDDB information when both are available"),
               VLC_FALSE );
 #endif /*HAVE_LIBCDDB*/
 

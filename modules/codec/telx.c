@@ -20,8 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 /*****************************************************************************
- * 
- * information on teletext format can be found here : 
+ *
+ * information on teletext format can be found here :
  * http://pdc.ro.nu/teletext.html
  *
  *****************************************************************************/
@@ -35,7 +35,7 @@
 
 /* #define TELX_DEBUG */
 #ifdef TELX_DEBUG
-#   define dbg( a ) msg_Dbg a 
+#   define dbg( a ) msg_Dbg a
 #else
 #   define dbg( a )
 #endif
@@ -103,7 +103,7 @@ struct decoder_sys_t
  ****************************************************************************/
 
 /*
- * My doc only mentions 13 national characters, but experiments show there 
+ * My doc only mentions 13 national characters, but experiments show there
  * are more, in france for example I already found two more (0x9 and 0xb).
  *
  * Conversion is in this order :
@@ -115,44 +115,44 @@ struct decoder_sys_t
 
 static uint16_t ppi_national_subsets[][20] =
 {
-  { 0x00a3, 0x0024, 0x0040, 0x00ab, 0x00bd, 0x00bb, 0x005e, 0x0023, 
+  { 0x00a3, 0x0024, 0x0040, 0x00ab, 0x00bd, 0x00bb, 0x005e, 0x0023,
     0x002d, 0x00bc, 0x00a6, 0x00be, 0x00f7 }, /* english ,000 */
 
   { 0x00e9, 0x00ef, 0x00e0, 0x00eb, 0x00ea, 0x00f9, 0x00ee, 0x0023,
     0x00e8, 0x00e2, 0x00f4, 0x00fb, 0x00e7, 0, 0x00eb, 0, 0x00ef }, /* french  ,001 */
 
-  { 0x0023, 0x00a4, 0x00c9, 0x00c4, 0x00d6, 0x00c5, 0x00dc, 0x005f, 
+  { 0x0023, 0x00a4, 0x00c9, 0x00c4, 0x00d6, 0x00c5, 0x00dc, 0x005f,
     0x00e9, 0x00e4, 0x00f6, 0x00e5, 0x00fc }, /* swedish,finnish,hungarian ,010 */
 
-  { 0x0023, 0x016f, 0x010d, 0x0165, 0x017e, 0x00fd, 0x00ed, 0x0159, 
+  { 0x0023, 0x016f, 0x010d, 0x0165, 0x017e, 0x00fd, 0x00ed, 0x0159,
     0x00e9, 0x00e1, 0x0115, 0x00fa, 0x0161 }, /* czech,slovak  ,011 */
 
-  { 0x0023, 0x0024, 0x00a7, 0x00c4, 0x00d6, 0x00dc, 0x005e, 0x005f, 
+  { 0x0023, 0x0024, 0x00a7, 0x00c4, 0x00d6, 0x00dc, 0x005e, 0x005f,
     0x00b0, 0x00e4, 0x00f6, 0x00fc, 0x00df }, /* german ,100 */
 
-  { 0x00e7, 0x0024, 0x00a1, 0x00e1, 0x00e9, 0x00ed, 0x00f3, 0x00fa, 
+  { 0x00e7, 0x0024, 0x00a1, 0x00e1, 0x00e9, 0x00ed, 0x00f3, 0x00fa,
     0x00bf, 0x00fc, 0x00f1, 0x00e8, 0x00e0 }, /* portuguese,spanish ,101 */
 
-  { 0x00a3, 0x0024, 0x00e9, 0x00b0, 0x00e7, 0x00bb, 0x005e, 0x0023, 
+  { 0x00a3, 0x0024, 0x00e9, 0x00b0, 0x00e7, 0x00bb, 0x005e, 0x0023,
     0x00f9, 0x00e0, 0x00f2, 0x00e8, 0x00ec }, /* italian  ,110 */
 
-  { 0x0023, 0x00a4, 0x0162, 0x00c2, 0x015e, 0x0102, 0x00ce, 0x0131, 
+  { 0x0023, 0x00a4, 0x0162, 0x00c2, 0x015e, 0x0102, 0x00ce, 0x0131,
     0x0163, 0x00e2, 0x015f, 0x0103, 0x00ee }, /* rumanian ,111 */
 
   /* I have these tables too, but I don't know how they can be triggered */
-  { 0x0023, 0x0024, 0x0160, 0x0117, 0x0119, 0x017d, 0x010d, 0x016b, 
+  { 0x0023, 0x0024, 0x0160, 0x0117, 0x0119, 0x017d, 0x010d, 0x016b,
     0x0161, 0x0105, 0x0173, 0x017e, 0x012f }, /* lettish,lithuanian ,1000 */
 
-  { 0x0023, 0x0144, 0x0105, 0x005a, 0x015a, 0x0141, 0x0107, 0x00f3, 
+  { 0x0023, 0x0144, 0x0105, 0x005a, 0x015a, 0x0141, 0x0107, 0x00f3,
     0x0119, 0x017c, 0x015b, 0x0142, 0x017a }, /* polish,  1001 */
 
-  { 0x0023, 0x00cb, 0x010c, 0x0106, 0x017d, 0x0110, 0x0160, 0x00eb, 
+  { 0x0023, 0x00cb, 0x010c, 0x0106, 0x017d, 0x0110, 0x0160, 0x00eb,
     0x010d, 0x0107, 0x017e, 0x0111, 0x0161 }, /* serbian,croatian,slovenian, 1010 */
 
-  { 0x0023, 0x00f5, 0x0160, 0x00c4, 0x00d6, 0x017e, 0x00dc, 0x00d5, 
+  { 0x0023, 0x00f5, 0x0160, 0x00c4, 0x00d6, 0x017e, 0x00dc, 0x00d5,
     0x0161, 0x00e4, 0x00f6, 0x017e, 0x00fc }, /* estonian  ,1011 */
 
-  { 0x0054, 0x011f, 0x0130, 0x015e, 0x00d6, 0x00c7, 0x00dc, 0x011e, 
+  { 0x0054, 0x011f, 0x0130, 0x015e, 0x00d6, 0x00c7, 0x00dc, 0x011e,
     0x0131, 0x015f, 0x00f6, 0x00e7, 0x00fc }, /* turkish  ,1100 */
 };
 
@@ -268,39 +268,39 @@ static uint8_t bytereverse( int n )
 static int hamming_8_4( int a )
 {
     switch (a) {
-    case 0xA8: 
+    case 0xA8:
         return 0;
-    case 0x0B: 
+    case 0x0B:
         return 1;
-    case 0x26: 
+    case 0x26:
         return 2;
-    case 0x85: 
+    case 0x85:
         return 3;
-    case 0x92: 
+    case 0x92:
         return 4;
-    case 0x31: 
+    case 0x31:
         return 5;
-    case 0x1C: 
+    case 0x1C:
         return 6;
-    case 0xBF: 
+    case 0xBF:
         return 7;
-    case 0x40: 
+    case 0x40:
         return 8;
-    case 0xE3: 
+    case 0xE3:
         return 9;
-    case 0xCE: 
+    case 0xCE:
         return 10;
-    case 0x6D: 
+    case 0x6D:
         return 11;
-    case 0x7A: 
+    case 0x7A:
         return 12;
-    case 0xD9: 
+    case 0xD9:
         return 13;
-    case 0xF4: 
+    case 0xF4:
         return 14;
-    case 0x57: 
+    case 0x57:
         return 15;
-    default: 
+    default:
         return -1;     // decoding error , not yet corrected
     }
 }
@@ -333,8 +333,8 @@ static void to_utf8( char * res, uint16_t ch )
     }
 }
 
-static void decode_string( char * res, int res_len, 
-                           decoder_sys_t *p_sys, int magazine, 
+static void decode_string( char * res, int res_len,
+                           decoder_sys_t *p_sys, int magazine,
                            uint8_t * packet, int len )
 {
     char utf8[7];
@@ -351,44 +351,44 @@ static void decode_string( char * res, int res_len,
         {
         /* special national characters */
         case 0x23:
-            out = p_sys->pi_active_national_set[magazine][0]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][0];
+            break;
         case 0x24:
-            out = p_sys->pi_active_national_set[magazine][1]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][1];
+            break;
         case 0x40:
-            out = p_sys->pi_active_national_set[magazine][2]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][2];
+            break;
         case 0x5b:
-            out = p_sys->pi_active_national_set[magazine][3]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][3];
+            break;
         case 0x5c:
-            out = p_sys->pi_active_national_set[magazine][4]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][4];
+            break;
         case 0x5d:
-            out = p_sys->pi_active_national_set[magazine][5]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][5];
+            break;
         case 0x5e:
-            out = p_sys->pi_active_national_set[magazine][6]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][6];
+            break;
         case 0x5f:
-            out = p_sys->pi_active_national_set[magazine][7]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][7];
+            break;
         case 0x60:
-            out = p_sys->pi_active_national_set[magazine][8]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][8];
+            break;
         case 0x7b:
-            out = p_sys->pi_active_national_set[magazine][9]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][9];
+            break;
         case 0x7c:
-            out = p_sys->pi_active_national_set[magazine][10]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][10];
+            break;
         case 0x7d:
-            out = p_sys->pi_active_national_set[magazine][11]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][11];
+            break;
         case 0x7e:
-            out = p_sys->pi_active_national_set[magazine][12]; 
-            break; 
+            out = p_sys->pi_active_national_set[magazine][12];
+            break;
 
         /* some special control characters (empirical) */
         case 0x0d:
@@ -429,7 +429,7 @@ static void decode_string( char * res, int res_len,
     }
     /* end: */
     *pt++ = 0;
-}  
+}
 
 /*****************************************************************************
  * Decode:
@@ -463,7 +463,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     {
         uint8_t * packet = (uint8_t *) p_block->p_buffer+offset;
 //        int vbi = ((0x20 & packet[2]) != 0 ? 0 : 313) + (0x1F & packet[2]);
-      
+ 
 //        dbg((p_dec, "vbi %d header %02x %02x %02x\n", vbi, packet[0], packet[1], packet[2]));
         if ( packet[0] == 0xFF ) continue;
 
@@ -495,7 +495,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             /* row 0 : flags and header line */
             int flag = 0;
             int a;
-            
+ 
             for ( a = 0; a < 6; a++ )
             {
                 flag |= (0xF & (bytereverse( hamming_8_4(packet[8 + a]) ) >> 4))
@@ -531,7 +531,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                   (1 & (flag>>18))? " interrupt" : "",
                   (1 & (flag>>19))? " inhibit" : "",
                   (1 & (flag>>20)) ));
-           
+ 
             if ( (p_sys->i_wanted_page != -1
                    && p_sys->i_page[magazine] != p_sys->i_wanted_page)
                    || !p_sys->b_is_subtitle[magazine] )
@@ -540,7 +540,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             p_sys->b_erase[magazine] = (1 & (flag >> 7));
 
             dbg((p_dec, "%ld --> %ld\n", (long int) p_block->i_pts, (long int)(p_sys->prev_pts+1500000)));
-            /* kludge here : 
+            /* kludge here :
              * we ignore the erase flag if it happens less than 1.5 seconds
              * before last caption
              * TODO   make this time configurable
@@ -550,10 +550,10 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                  p_sys->b_erase[magazine] )
             {
                 int i;
-              
+ 
                 dbg((p_dec, "ERASE !\n"));
 
-                p_sys->b_erase[magazine] = 0;          
+                p_sys->b_erase[magazine] = 0;
                 for ( i = 1; i < 32; i++ )
                 {
                     if ( !p_sys->ppsz_lines[i][0] ) continue;
@@ -579,7 +579,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
             if ( (p_sys->i_wanted_page != -1
                    && p_sys->i_page[magazine] != p_sys->i_wanted_page)
-                   || !p_sys->b_is_subtitle[magazine] 
+                   || !p_sys->b_is_subtitle[magazine]
                    || (p_sys->i_wanted_page == -1
                         && p_sys->i_page[magazine] > 0x99) )
                 continue;
@@ -629,7 +629,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                 dbg((p_dec, "%s\n", dbg));
             }
 #endif
-        
+ 
         }
         else if ( row == 25 )
         {
@@ -696,7 +696,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         msg_Warn( p_dec, "can't get spu buffer" );
         goto error;
     }
-    
+ 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');

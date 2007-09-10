@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * VLCExtended 
+ * VLCExtended
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
@@ -35,7 +35,7 @@
     IBOutlet id o_audioFlts_view;
     IBOutlet id o_videoFilters_view;
     IBOutlet id o_extended_window;
-    
+ 
     /* window content */
     IBOutlet id o_expBtn_adjustImage;
     IBOutlet id o_expBtn_audioFlts;
@@ -48,7 +48,7 @@
     IBOutlet id o_box_vidFlts;
     IBOutlet id o_box_audFlts;
     IBOutlet id o_box_adjImg;
-    
+ 
     /* video filters */
     IBOutlet id o_btn_vidFlts_mrInfo;
     IBOutlet id o_ckb_blur;
@@ -63,13 +63,13 @@
     IBOutlet id o_ckb_gradient;
     IBOutlet id o_lbl_general;
     IBOutlet id o_lbl_distort;
-    
+ 
     /* audio filters */
     IBOutlet id o_ckb_vlme_norm;
     IBOutlet id o_ckb_hdphnVirt;
     IBOutlet id o_lbl_maxLevel;
     IBOutlet id o_sld_maxLevel;
-    
+ 
     /* adjust image */
     IBOutlet id o_btn_rstrDefaults;
     IBOutlet id o_ckb_enblAdjustImg;
@@ -85,12 +85,12 @@
     IBOutlet id o_sld_hue;
     IBOutlet id o_sld_saturation;
     IBOutlet id o_sld_opaque;
-    
+ 
     /* global variables */
     BOOL o_adjImg_expanded;
     BOOL o_audFlts_expanded;
     BOOL o_vidFlts_expanded;
-    
+ 
     BOOL o_config_changed;
 }
 

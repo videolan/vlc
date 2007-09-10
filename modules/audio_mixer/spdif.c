@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -88,7 +88,7 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
         p_input = p_aout->pp_inputs[i];
         if ( p_input->b_error ) continue;
         p_fifo = &p_input->fifo;
-        p_deleted = p_fifo->p_first;  
+        p_deleted = p_fifo->p_first;
         while ( p_deleted != NULL )
         {
             aout_buffer_t * p_next = p_deleted->p_next;

@@ -180,7 +180,7 @@ static void DumpDict( dict_test_t *p_dict )
     fprintf( stderr, "**** Begin Dump ****\n" );
     for( i = 0 ; i < p_dict->i_entries; i++ )
     {
-        fprintf( stderr, "Entry %i - hash %lli int %i string %s data %i\n", 
+        fprintf( stderr, "Entry %i - hash %lli int %i string %s data %i\n",
                         i, p_dict->p_entries[i].i_hash,
                         p_dict->p_entries[i].i_int,
                         p_dict->p_entries[i].psz_string,

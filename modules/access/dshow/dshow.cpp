@@ -59,9 +59,9 @@ static int ConfigDevicesCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 
 static void ShowPropertyPage( IUnknown * );
-static void ShowDeviceProperties( vlc_object_t *, ICaptureGraphBuilder2 *, 
+static void ShowDeviceProperties( vlc_object_t *, ICaptureGraphBuilder2 *,
                                   IBaseFilter *, vlc_bool_t );
-static void ShowTunerProperties( vlc_object_t *, ICaptureGraphBuilder2 *, 
+static void ShowTunerProperties( vlc_object_t *, ICaptureGraphBuilder2 *,
                                  IBaseFilter *, vlc_bool_t );
 static void ConfigTuner( vlc_object_t *, ICaptureGraphBuilder2 *,
                          IBaseFilter * );
@@ -888,7 +888,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
     {
         msg_Err( p_this, "can't use device: %s, unsupported device type",
                  devicename.c_str() );
-        intf_UserFatal( p_this, VLC_FALSE, _("Capturing failed"), 
+        intf_UserFatal( p_this, VLC_FALSE, _("Capturing failed"),
                         _("VLC cannot use the device \"%s\", because its device "
                           "type is not supported.") );
         return VLC_EGENERIC;
@@ -938,7 +938,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
     else {
         /* capture device */
         msg_Err( p_this, "capture device '%s' does not support required parameters !", devicename.c_str() );
-        intf_UserFatal( p_this, VLC_FALSE, _("Capturing failed"), 
+        intf_UserFatal( p_this, VLC_FALSE, _("Capturing failed"),
                         _("The capture device \"%s\" does not support the "
                           "required parameters."), devicename.c_str() );
         p_device_filter->Release();
@@ -1119,27 +1119,27 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
                 SysFreeString(var.bstrVal);
                 p_buf[i_convert] = '\0';
 
-		string devname = string(p_buf);
+        string devname = string(p_buf);
 
-		int dup = 0;
-		/* find out if this name is already used by a previously found device */
-		list<string>::const_iterator iter = devicelist.begin();
-		list<string>::const_iterator end = devicelist.end();
-		while ( iter != end )
-		{
-		    if( 0 == (*iter).compare(0, devname.size(), devname) )
-			++dup;
-		    ++iter;
-		}
-		if( dup )
-		{
-		    /* we have a duplicate device name, append a sequence number to name
-		       to provive a unique list back to the user */
-		    char seq[16];
-		    sprintf(seq, " #%d", dup);
-		    devname.append(seq);
-		}
-		devicelist.push_back( devname );
+        int dup = 0;
+        /* find out if this name is already used by a previously found device */
+        list<string>::const_iterator iter = devicelist.begin();
+        list<string>::const_iterator end = devicelist.end();
+        while ( iter != end )
+        {
+            if( 0 == (*iter).compare(0, devname.size(), devname) )
+            ++dup;
+            ++iter;
+        }
+        if( dup )
+        {
+            /* we have a duplicate device name, append a sequence number to name
+               to provive a unique list back to the user */
+            char seq[16];
+            sprintf(seq, " #%d", dup);
+            devname.append(seq);
+        }
+        devicelist.push_back( devname );
 
                 if( p_devicename && *p_devicename == devname )
                 {
@@ -1167,8 +1167,8 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
     p_class_enum->Release();
 
     if( p_listdevices ) {
-	devicelist.sort();
-	*p_listdevices = devicelist;
+    devicelist.sort();
+    *p_listdevices = devicelist;
     }
     return NULL;
 }
@@ -1296,7 +1296,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                 if( i_height )
                                 {
                                     if( i_height % pVSCC->OutputGranularityY
-                                     || pVSCC->MinOutputSize.cy > i_height 
+                                     || pVSCC->MinOutputSize.cy > i_height
                                      || i_height > pVSCC->MaxOutputSize.cy )
                                     {
                                         // required height not compatible, try next media type
@@ -1309,7 +1309,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
 
                                 // Set the sample size and image size.
                                 // (Round the image width up to a DWORD boundary.)
-                                p_mt->lSampleSize = pVih->bmiHeader.biSizeImage = 
+                                p_mt->lSampleSize = pVih->bmiHeader.biSizeImage =
                                     ((pVih->bmiHeader.biWidth + 3) & ~3) *
                                     pVih->bmiHeader.biHeight * (pVih->bmiHeader.biBitCount>>3);
 
@@ -1322,7 +1322,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                 {
                                     i_priority = i_current_priority;
                                     if( i_fourcc )
-                                        // no need to check any more media types 
+                                        // no need to check any more media types
                                         i = piCount;
                                 }
                             }
@@ -1364,7 +1364,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                                     }
                                     pWfx->nSamplesPerSec = val;
  
-                                    val = i_bitspersample; 
+                                    val = i_bitspersample;
                                     if( ! val )
                                     {
                                         if( VLC_FOURCC('f', 'l', '3', '2') == i_current_fourcc )
@@ -1427,7 +1427,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                 LONGLONG i_current_atpf = ((VIDEOINFOHEADER *)p_mt->pbFormat)->AvgTimePerFrame;
 
                 if( i_current_height < 0 )
-                    i_current_height = -i_current_height; 
+                    i_current_height = -i_current_height;
 
                 msg_Dbg( p_this, "EnumDeviceCaps: input pin "
                          "accepts chroma: %4.4s, width:%i, height:%i, fps:%f",
@@ -1445,7 +1445,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                 }
                 else FreeMediaType( *p_mt );
             }
-            else if( i_current_fourcc && p_mt->majortype == MEDIATYPE_Audio 
+            else if( i_current_fourcc && p_mt->majortype == MEDIATYPE_Audio
                     && p_mt->formattype == FORMAT_WaveFormatEx)
             {
                 int i_current_channels =
@@ -1542,33 +1542,33 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
                     i_current_fourcc = VLC_FOURCC('I','4','2','0');
                     if( !i_fourcc || i_fourcc == i_current_fourcc )
                     {
-                        // return alternative media type  
-                        AM_MEDIA_TYPE mtr;  
-                        VIDEOINFOHEADER vh;  
-             
-                        mtr.majortype            = MEDIATYPE_Video;  
-                        mtr.subtype              = MEDIASUBTYPE_I420;  
-                        mtr.bFixedSizeSamples    = TRUE;  
-                        mtr.bTemporalCompression = FALSE;  
-                        mtr.pUnk                 = NULL;  
-                        mtr.formattype           = FORMAT_VideoInfo;  
-                        mtr.cbFormat             = sizeof(vh);  
-                        mtr.pbFormat             = (BYTE *)&vh;  
-             
-                        memset(&vh, 0, sizeof(vh));  
-             
-                        vh.bmiHeader.biSize   = sizeof(vh.bmiHeader);  
+                        // return alternative media type
+                        AM_MEDIA_TYPE mtr;
+                        VIDEOINFOHEADER vh;
+ 
+                        mtr.majortype            = MEDIATYPE_Video;
+                        mtr.subtype              = MEDIASUBTYPE_I420;
+                        mtr.bFixedSizeSamples    = TRUE;
+                        mtr.bTemporalCompression = FALSE;
+                        mtr.pUnk                 = NULL;
+                        mtr.formattype           = FORMAT_VideoInfo;
+                        mtr.cbFormat             = sizeof(vh);
+                        mtr.pbFormat             = (BYTE *)&vh;
+ 
+                        memset(&vh, 0, sizeof(vh));
+ 
+                        vh.bmiHeader.biSize   = sizeof(vh.bmiHeader);
                         vh.bmiHeader.biWidth  = i_width > 0 ? i_width :
-                            ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biWidth;  
+                            ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biWidth;
                         vh.bmiHeader.biHeight = i_height > 0 ? i_height :
-                            ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biHeight;  
-                        vh.bmiHeader.biPlanes      = 3; 
-                        vh.bmiHeader.biBitCount    = 12;  
-                        vh.bmiHeader.biCompression = VLC_FOURCC('I','4','2','0');  
-                        vh.bmiHeader.biSizeImage   = vh.bmiHeader.biWidth * 12 *  
-                            vh.bmiHeader.biHeight / 8;  
-                        mtr.lSampleSize            = vh.bmiHeader.biSizeImage;  
-             
+                            ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biHeight;
+                        vh.bmiHeader.biPlanes      = 3;
+                        vh.bmiHeader.biBitCount    = 12;
+                        vh.bmiHeader.biCompression = VLC_FOURCC('I','4','2','0');
+                        vh.bmiHeader.biSizeImage   = vh.bmiHeader.biWidth * 12 *
+                            vh.bmiHeader.biHeight / 8;
+                        mtr.lSampleSize            = vh.bmiHeader.biSizeImage;
+ 
                         msg_Dbg( p_this, "EnumDeviceCaps: input pin media: using 'I420' in place of unsupported format 'HCW2'");
 
                         if( SUCCEEDED(CopyMediaType(mt+mt_count, &mtr)) )

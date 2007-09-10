@@ -76,7 +76,7 @@ int E_(VCDInit) ( vlc_object_t *p_this )
     demux_sys_t *   p_demux;
 
     printf("++++ VCDInit CALLED\n");
-    
+ 
 
     if( p_input->stream.i_method != INPUT_METHOD_VCD )
     {

@@ -106,7 +106,7 @@ struct sout_stream_id_t
     vlc_bool_t      b_transrate;
 
     block_t         *p_current_buffer;
-    block_t   	    *p_next_gop;
+    block_t           *p_next_gop;
     mtime_t         i_next_gop_duration;
     size_t          i_next_gop_size;
 

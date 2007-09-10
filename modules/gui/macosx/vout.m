@@ -265,7 +265,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     p_vout = NULL;
     s_frame = nil;
     o_window = nil;
-    p_real_vout = NULL;            
+    p_real_vout = NULL;
 }
 
 - (void)updateTitle
@@ -306,7 +306,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
             [o_mrl deleteCharactersInRange: prefix_range];
 
         if( [o_mrl characterAtIndex:0] == '/' )
-        { 
+        {
             /* it's a local file */
             [o_window setRepresentedFilename: o_mrl];
         }
@@ -592,7 +592,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     {
         /* FIXME: this isn't the appropriate place, but we can't receive
          * NSRightMouseDown some how */
-        msg_Dbg( p_vout, "received NSRightMouseUp" ); 
+        msg_Dbg( p_vout, "received NSRightMouseUp" );
         [NSMenu popUpContextMenu: [[VLCMain sharedInstance] getVoutMenu] withEvent: o_event forView: [[[VLCMain sharedInstance] getControls] getVoutView]];
     }
 
@@ -932,7 +932,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     /* o_window needs to point to our o_embeddedwindow, super might have set it
      * to the fullscreen window that o_embeddedwindow setups during fullscreen */
     o_window = o_embeddedwindow;
-    
+ 
     if( b_return )
     {
         [o_window lockFullscreenAnimation];
@@ -964,7 +964,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     if(!playlist_IsPlaying( p_playlist ))
         [o_window performSelectorOnMainThread: @selector(orderOut:) withObject: self waitUntilDone: YES];
-    
+ 
     vlc_object_release( p_playlist );
 
     [super closeVout];
@@ -1042,7 +1042,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
          * this won't and is not supposed to work when it's fading right now */
         if( [[[[VLCMain sharedInstance] getControls] getFSPanel] isDisplayed] )
             [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
-        
+ 
         /* tell the fspanel to move itself to front next time it's triggered */
         [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: i_device];
 
@@ -1051,7 +1051,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
               styleMask: NSBorderlessWindowMask
               backing: NSBackingStoreBuffered
               defer: YES screen: o_screen];
-        
+ 
         if( b_menubar_screen )
         {
             SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
@@ -1146,7 +1146,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         CGDisplayFadeReservationToken token;
         CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
         CGDisplayFade( token, 0.3 , kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
-        
+ 
         [self disableScreenUpdatesUntilFlush];
         [self orderOut: self];
 

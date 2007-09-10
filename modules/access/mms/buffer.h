@@ -32,7 +32,7 @@ typedef struct
 
 
 /*****************************************************************************
- * Macro/Function to create/manipulate buffer 
+ * Macro/Function to create/manipulate buffer
  *****************************************************************************/
 int  var_buffer_initwrite( var_buffer_t *p_buf, int i_default_size );
 int  var_buffer_reinitwrite( var_buffer_t *p_buf, int i_default_size );

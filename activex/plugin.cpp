@@ -192,7 +192,7 @@ STDMETHODIMP VLCPluginClass::LockServer(BOOL fLock)
 {
     if( fLock )
         AddRef();
-    else 
+    else
         Release();
 
     return S_OK;
@@ -370,7 +370,7 @@ HRESULT VLCPlugin::onLoad(void)
     {
         /*
         ** try to retreive the base URL using the client site moniker, which for Internet Explorer
-        ** is the URL of the page the plugin is embedded into. 
+        ** is the URL of the page the plugin is embedded into.
         */
         LPOLECLIENTSITE pClientSite;
         if( SUCCEEDED(vlcOleObject->GetClientSite(&pClientSite)) && (NULL != pClientSite) )
@@ -651,7 +651,7 @@ HRESULT VLCPlugin::onClose(DWORD dwSaveOption)
         libvlc_instance_t* p_libvlc = _p_libvlc;
 
         IVLCLog *p_log;
-    	if( SUCCEEDED(vlcControl2->get_log(&p_log)) )
+        if( SUCCEEDED(vlcControl2->get_log(&p_log)) )
         {
             // make sure the log is disabled
             p_log->put_verbosity(-1);
@@ -677,7 +677,7 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
 
     /*
     ** record keeping of control geometry within container
-    */ 
+    */
     _posRect = *lprcPosRect;
 
     /*
@@ -901,7 +901,7 @@ void VLCPlugin::onDraw(DVTARGETDEVICE * ptd, HDC hicTargetDev,
                     pict->Render(hdcDraw, dstX, dstY, picSize.cx, picSize.cy,
                             0L, picHeight, picWidth, -picHeight, &wBounds);
                 }
-                else 
+                else
                     pict->Render(hdcDraw, dstX, dstY, picSize.cx, picSize.cy,
                             0L, picHeight, picWidth, -picHeight, NULL);
 
@@ -1009,23 +1009,23 @@ void VLCPlugin::freezeEvents(BOOL freeze)
 
 void VLCPlugin::firePropChangedEvent(DISPID dispid)
 {
-    vlcConnectionPointContainer->firePropChangedEvent(dispid); 
+    vlcConnectionPointContainer->firePropChangedEvent(dispid);
 };
 
 void VLCPlugin::fireOnPlayEvent(void)
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_PlayEvent, &dispparamsNoArgs); 
+    vlcConnectionPointContainer->fireEvent(DISPID_PlayEvent, &dispparamsNoArgs);
 };
 
 void VLCPlugin::fireOnPauseEvent(void)
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_PauseEvent, &dispparamsNoArgs); 
+    vlcConnectionPointContainer->fireEvent(DISPID_PauseEvent, &dispparamsNoArgs);
 };
 
 void VLCPlugin::fireOnStopEvent(void)
 {
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-    vlcConnectionPointContainer->fireEvent(DISPID_StopEvent, &dispparamsNoArgs); 
+    vlcConnectionPointContainer->fireEvent(DISPID_StopEvent, &dispparamsNoArgs);
 };

@@ -39,14 +39,14 @@
 
 #define LONG2POINT(l, pt)  ((pt).x = (SHORT)LOWORD(l), (pt).y = (SHORT)HIWORD(l))
 
-#define NUMIMAGES     11   // Number of buttons in the toolbar           
-#define IMAGEWIDTH    16   // Width of the buttons in the toolbar  
-#define IMAGEHEIGHT   16   // Height of the buttons in the toolbar  
+#define NUMIMAGES     11   // Number of buttons in the toolbar
+#define IMAGEWIDTH    16   // Width of the buttons in the toolbar
+#define IMAGEHEIGHT   16   // Height of the buttons in the toolbar
 #define BUTTONWIDTH   0    // Width of the button images in the toolbar
 #define BUTTONHEIGHT  0    // Height of the button images in the toolbar
 #define ID_TOOLBAR    2000 // Identifier of the main tool bar
 
-enum      
+enum
 {
   Infos_Event = 1000,
   Up_Event,
@@ -57,7 +57,7 @@ enum
   PopupPlay_Event,
   PopupDel_Event,
   PopupEna_Event,
-  PopupInfo_Event  
+  PopupInfo_Event
 };
 
 // Help strings
@@ -94,7 +94,7 @@ static TBBUTTON tbButton2[] =
 };
 
 // Toolbar ToolTips
-TCHAR * szToolTips2[] = 
+TCHAR * szToolTips2[] =
 {
     HELP_OPENPL,
     HELP_SAVEPL,
@@ -129,10 +129,10 @@ Playlist::Playlist( intf_thread_t *p_intf, CBaseWindow *p_parent,
 }
 
 /***********************************************************************
-FUNCTION: 
+FUNCTION:
   CreateMenuBar
 
-PURPOSE: 
+PURPOSE:
   Creates a menu bar.
 ***********************************************************************/
 static HWND CreateMenuBar( HWND hwnd, HINSTANCE hInst )
@@ -227,10 +227,10 @@ static HWND CreateMenuBar( HWND hwnd, HINSTANCE hInst )
 }
 
 /***********************************************************************
-FUNCTION: 
+FUNCTION:
   WndProc
 
-PURPOSE: 
+PURPOSE:
   Processes messages sent to the main window.
 ***********************************************************************/
 LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
@@ -246,7 +246,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
     switch( msg )
     {
-    case WM_INITDIALOG: 
+    case WM_INITDIALOG:
         shidi.dwMask = SHIDIM_FLAGS;
         shidi.dwFlags = SHIDIF_DONEBUTTON | SHIDIF_SIPDOWN |
             SHIDIF_FULLSCREENNOMENUBAR;//SHIDIF_SIZEDLGFULLSCREEN;
@@ -271,7 +271,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                                   BUTTONWIDTH, BUTTONHEIGHT,
                                   IMAGEWIDTH, IMAGEHEIGHT, sizeof(TBBUTTON) );
         if( !hwndTB ) break;
-  
+ 
         // Add ToolTips to the toolbar.
         SendMessage( hwndTB, TB_SETTOOLTIPS, (WPARAM) NUMIMAGES,
                      (LPARAM)szToolTips2 );
@@ -279,11 +279,11 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         // Reposition the toolbar.
         GetClientRect( hwnd, &rect );
         GetWindowRect( hwndTB, &rectTB );
-        MoveWindow( hwndTB, rect.left, rect.top - 2, rect.right - rect.left, 
+        MoveWindow( hwndTB, rect.left, rect.top - 2, rect.right - rect.left,
                     MENU_HEIGHT /*rectTB.bottom - rectTB.top */, TRUE);
 
         // random, loop, repeat buttons states
-        vlc_value_t val; 
+        vlc_value_t val;
         p_playlist = (playlist_t *)
             vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
         if( !p_playlist ) break;
@@ -305,8 +305,8 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         GetClientRect( hwnd, &rect );
         hListView = CreateWindow( WC_LISTVIEW, NULL, WS_VISIBLE | WS_CHILD |
             LVS_REPORT | LVS_SHOWSELALWAYS | WS_VSCROLL | WS_HSCROLL,
-            rect.left, rect.top + 2*(MENU_HEIGHT+1), rect.right - rect.left, 
-            rect.bottom - ( rect.top + 2*MENU_HEIGHT) - MENU_HEIGHT, 
+            rect.left, rect.top + 2*(MENU_HEIGHT+1), rect.right - rect.left,
+            rect.bottom - ( rect.top + 2*MENU_HEIGHT) - MENU_HEIGHT,
             hwnd, NULL, hInst, NULL );
         ListView_SetExtendedListViewStyle( hListView, LVS_EX_FULLROWSELECT );
 
@@ -339,11 +339,11 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         break;
 
     case WM_SETFOCUS:
-        SHSipPreference( hwnd, SIP_DOWN ); 
+        SHSipPreference( hwnd, SIP_DOWN );
         SHFullScreen( hwnd, SHFS_HIDESIPBUTTON );
         break;
 
-    case WM_COMMAND:    
+    case WM_COMMAND:
         switch( LOWORD(wp) )
         {
         case IDOK:
@@ -478,7 +478,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         }
         else if( ( ((LPNMHDR)lp)->hwndFrom == hListView ) &&
                  ( ((LPNMHDR)lp)->code == GN_CONTEXTMENU  ) )
-        {                       
+        {
             HandlePopupMenu( hwnd, ((PNMRGINFO)lp)->ptAction );
         }
         else if( ( ((LPNMHDR)lp)->hwndFrom == hListView ) &&
@@ -522,7 +522,7 @@ LRESULT Playlist::ProcessCustomDraw( LPARAM lParam )
             vlc_object_release(p_playlist);
             return CDRF_NEWFONT;
         }
-        
+ 
         playlist_item_t *p_item = playlist_ItemGetByPos( p_playlist,
                                         (int)lplvcd->nmcd.dwItemSpec );
         if( !p_item )
@@ -584,11 +584,11 @@ void Playlist::UpdatePlaylist()
         Rebuild();
         b_need_update = VLC_FALSE;
     }
-        
+ 
     playlist_t *p_playlist = (playlist_t *)
         vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
-        
+ 
     /* Update the colour of items */
 
     vlc_mutex_lock( &p_playlist->object_lock );
@@ -878,7 +878,7 @@ void Playlist::ShowInfos( HWND hwnd, int i_item )
     {
         ItemInfoDialog *iteminfo_dialog =
             new ItemInfoDialog( p_intf, this, hInst, p_item );
-        CreateDialogBox( hwnd, iteminfo_dialog );                
+        CreateDialogBox( hwnd, iteminfo_dialog );
         UpdateItem( i_item );
         delete iteminfo_dialog;
     }
@@ -945,7 +945,7 @@ void Playlist::OnDown()
 void Playlist::OnRandom()
 {
     vlc_value_t val;
-    int bState = SendMessage( hwndTB, TB_GETSTATE, Random_Event, 0 ); 
+    int bState = SendMessage( hwndTB, TB_GETSTATE, Random_Event, 0 );
     val.b_bool = (bState & TBSTATE_CHECKED) ? VLC_TRUE : VLC_FALSE;
 
     playlist_t *p_playlist = (playlist_t *)
@@ -959,7 +959,7 @@ void Playlist::OnRandom()
 void Playlist::OnLoop ()
 {
     vlc_value_t val;
-    int bState = SendMessage( hwndTB, TB_GETSTATE, Loop_Event, 0 ); 
+    int bState = SendMessage( hwndTB, TB_GETSTATE, Loop_Event, 0 );
     val.b_bool = (bState & TBSTATE_CHECKED) ? VLC_TRUE : VLC_FALSE;
 
     playlist_t *p_playlist = (playlist_t *)
@@ -973,7 +973,7 @@ void Playlist::OnLoop ()
 void Playlist::OnRepeat ()
 {
     vlc_value_t val;
-    int bState = SendMessage( hwndTB, TB_GETSTATE, Repeat_Event, 0 );  
+    int bState = SendMessage( hwndTB, TB_GETSTATE, Repeat_Event, 0 );
     val.b_bool = (bState & TBSTATE_CHECKED) ? VLC_TRUE : VLC_FALSE;
 
     playlist_t *p_playlist = (playlist_t *)

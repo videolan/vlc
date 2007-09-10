@@ -83,7 +83,7 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
     libvlc_event_t event;
 
     p_md_child = libvlc_media_descriptor_new_from_input_item(
-                p_md->p_libvlc_instance, 
+                p_md->p_libvlc_instance,
                 p_event->u.input_item_subitem_added.p_new_child, NULL );
 
     /* Add this to our media list */
@@ -205,9 +205,9 @@ libvlc_media_descriptor_t * libvlc_media_descriptor_new_from_input_item(
     vlc_dictionary_init( &p_md->tags, 1 );
 
     p_md->p_event_manager = libvlc_event_manager_new( p_md, p_instance, p_e );
-    libvlc_event_manager_register_event_type( p_md->p_event_manager, 
+    libvlc_event_manager_register_event_type( p_md->p_event_manager,
         libvlc_MediaDescriptorMetaChanged, p_e );
-    libvlc_event_manager_register_event_type( p_md->p_event_manager, 
+    libvlc_event_manager_register_event_type( p_md->p_event_manager,
         libvlc_MediaDescriptorSubItemAdded, p_e );
 
     vlc_gc_incref( p_md->p_input_item );
@@ -349,7 +349,7 @@ void libvlc_media_descriptor_add_tag( libvlc_media_descriptor_t *p_md,
 
     if( !tag || !key )
         return;
-    
+ 
     p_ts = vlc_dictionary_value_for_key( &p_md->tags, key );
 
     if( !p_ts )
@@ -363,7 +363,7 @@ void libvlc_media_descriptor_add_tag( libvlc_media_descriptor_t *p_md,
         p_ts->ppsz_tags = malloc(sizeof(char*)*(p_ts->i_count));
     else
         p_ts->ppsz_tags = realloc(p_ts->ppsz_tags, sizeof(char*)*(p_ts->i_count));
-        
+ 
     p_ts->ppsz_tags[p_ts->i_count-1] = strdup( tag );
 }
 
@@ -381,7 +381,7 @@ void libvlc_media_descriptor_remove_tag( libvlc_media_descriptor_t *p_md,
 
     if( !tag || !key )
         return;
-    
+ 
     p_ts = vlc_dictionary_value_for_key( &p_md->tags, key );
 
     if( !p_ts )
@@ -411,7 +411,7 @@ int libvlc_media_descriptor_tags_count_for_key( libvlc_media_descriptor_t *p_md,
 
     if( !key )
         return 0;
-    
+ 
     p_ts = vlc_dictionary_value_for_key( &p_md->tags, key );
 
     if( !p_ts )
@@ -432,12 +432,12 @@ libvlc_media_descriptor_tag_at_index_for_key( libvlc_media_descriptor_t *p_md,
 
     if( !key )
         return NULL;
-    
+ 
     p_ts = vlc_dictionary_value_for_key( &p_md->tags, key );
 
     if( !p_ts )
         return NULL;
-    
+ 
     return strdup( p_ts->ppsz_tags[i] );
 }
 

@@ -136,14 +136,14 @@ void MediaInfoDialog::setInput( input_item_t *p_input )
 {
     clear();
     update( p_input, true, true );
-    /* if info is from current input, don't set default to edit, if user opens 
+    /* if info is from current input, don't set default to edit, if user opens
      * some other item, se default to edit, so it won't be updated to current item metas
      *
      * This really doesn't seem as clean solution as it could be
      */
     input_thread_t *p_current =
                      MainInputManager::getInstance( p_intf )->getInput();
-    MP->setEditMode( ( !p_current || p_current->b_dead || input_GetItem( p_current ) != p_input ) ? 
+    MP->setEditMode( ( !p_current || p_current->b_dead || input_GetItem( p_current ) != p_input ) ?
                             true: false );
 }
 
@@ -170,7 +170,7 @@ void MediaInfoDialog::update()
     vlc_object_release( p_input );
 }
 
-void MediaInfoDialog::update( input_item_t *p_item, 
+void MediaInfoDialog::update( input_item_t *p_item,
                                                  bool update_info,
                                                  bool update_meta )
 {

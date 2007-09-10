@@ -295,7 +295,7 @@ static int Open( vlc_object_t *p_this )
         if( dvdnav_title_play( p_sys->dvdnav, 1 ) != DVDNAV_STATUS_OK )
         {
             msg_Err( p_demux, "cannot set title (can't decrypt DVD?)" );
-            intf_UserFatal( p_demux, VLC_FALSE, _("Playback failure"), 
+            intf_UserFatal( p_demux, VLC_FALSE, _("Playback failure"),
                             _("VLC cannot set the DVD's title. It possibly "
                               "cannot decrypt the entire disk.") );
             dvdnav_close( p_sys->dvdnav );
@@ -760,7 +760,7 @@ static int Demux( demux_t *p_demux )
          *  - ...
          */
         DemuxBlock( p_demux, packet, i_len );
-        if( p_sys->b_spu_change ) 
+        if( p_sys->b_spu_change )
         {
             ButtonUpdate( p_demux, VLC_FALSE );
             p_sys->b_spu_change = VLC_FALSE;

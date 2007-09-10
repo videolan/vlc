@@ -109,8 +109,8 @@ void Timer::Notify( void )
             if (! shortname)
                 shortname = p_intf->p_sys->p_input->input.p_item->psz_name;
             else shortname++;
-                        
-            SendMessage( p_main_interface->hwndSB, SB_SETTEXT, 
+ 
+            SendMessage( p_main_interface->hwndSB, SB_SETTEXT,
                          (WPARAM) 0, (LPARAM)_FROMMB(shortname) );
 
             p_main_interface->TogglePlayButton( PLAYING_S );
@@ -127,7 +127,7 @@ void Timer::Notify( void )
         p_main_interface->TogglePlayButton( PAUSE_S );
         i_old_playing_status = PAUSE_S;
 
-        SendMessage( p_main_interface->hwndSB, SB_SETTEXT, 
+        SendMessage( p_main_interface->hwndSB, SB_SETTEXT,
                      (WPARAM) 0, (LPARAM)(LPCTSTR) TEXT(""));
 
         vlc_object_release( p_intf->p_sys->p_input );
@@ -161,14 +161,14 @@ void Timer::Notify( void )
                         p_intf->p_sys->i_slider_pos =
                             (int)(SLIDER_MAX_POS * pos.f_float);
 
-                        SendMessage( p_main_interface->hwndSlider, TBM_SETPOS, 
+                        SendMessage( p_main_interface->hwndSlider, TBM_SETPOS,
                                      1, p_intf->p_sys->i_slider_pos );
 
                         var_Get( p_intf->p_sys->p_input, "time", &time );
                         i_seconds = time.i_time / 1000000;
                         secstotimestr ( psz_time, i_seconds );
 
-                        SendMessage( p_main_interface->hwndLabel, WM_SETTEXT, 
+                        SendMessage( p_main_interface->hwndLabel, WM_SETTEXT,
                                      (WPARAM)1, (LPARAM)_FROMMB(psz_time) );
                     }
                 }
@@ -200,7 +200,7 @@ void Timer::Notify( void )
                 _stprintf( psz_text + 2, _T("x%.2f"), 1000.0 / val.i_int );
                 psz_text[0] = psz_text[1] = _T('\t');
 
-                SendMessage( p_main_interface->hwndSB, SB_SETTEXT, 
+                SendMessage( p_main_interface->hwndSB, SB_SETTEXT,
                              (WPARAM) 1, (LPARAM)(LPCTSTR) psz_text );
 
                 i_old_rate = val.i_int;

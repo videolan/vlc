@@ -98,7 +98,7 @@ static void CatalogLoad( xml_t *p_xml, const char *psz_filename )
 static void CatalogAdd( xml_t *p_xml, const char *psz_arg1,
                           const char *psz_arg2, const char *psz_filename )
 {
-    xmlCatalogAdd( (unsigned char*)psz_arg1, (unsigned char*)psz_arg2, 
+    xmlCatalogAdd( (unsigned char*)psz_arg1, (unsigned char*)psz_arg2,
         (unsigned char*)psz_filename );
 }
 
@@ -234,5 +234,5 @@ static int ReaderNextAttr( xml_reader_t *p_reader )
 static int StreamRead( void *p_context, char *p_buffer, int i_buffer )
 {
     stream_t *s = (stream_t*)p_context;
-    return stream_Read( s, p_buffer, i_buffer );    
+    return stream_Read( s, p_buffer, i_buffer );
 }

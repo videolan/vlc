@@ -136,7 +136,7 @@ MessagesWindow::MessagesWindow( intf_thread_t * _p_intf,
     SetSizeLimits( 400, 2000, 200, 2000 );
 
     p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
-    
+ 
     BRect rect, textRect;
 
     rect = Bounds();
@@ -152,7 +152,7 @@ MessagesWindow::MessagesWindow( intf_thread_t * _p_intf,
                                    B_FOLLOW_ALL, false, true );
     fMessagesView->fScrollBar = fScrollView->ScrollBar( B_VERTICAL );
     AddChild( fScrollView );
-    
+ 
     /* start window thread in hidden state */
     Hide();
     Show();

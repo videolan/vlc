@@ -438,7 +438,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
         i_socks_version = 5;
     }
 
-    if( i_socks_version == 5 && 
+    if( i_socks_version == 5 &&
         SocksNegociate( p_obj, fd, i_socks_version,
                         psz_socks_user, psz_socks_passwd ) )
         return VLC_EGENERIC;
@@ -448,7 +448,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
         struct addrinfo hints, *p_res;
 
         /* v4 only support ipv4 */
-	memset (&hints, 0, sizeof (hints));
+    memset (&hints, 0, sizeof (hints));
         hints.ai_family = AF_INET;
         if( vlc_getaddrinfo( p_obj, psz_host, 0, &hints, &p_res ) )
             return VLC_EGENERIC;
@@ -513,7 +513,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
             i_len = buffer[4] + 2;
         else if( buffer[3] == 0x04 )
             i_len = 16-1+2;
-        else 
+        else
             return VLC_EGENERIC;
 
         if( net_Read( p_obj, fd, NULL, buffer, i_len, VLC_TRUE ) != i_len )

@@ -39,7 +39,7 @@ public:
         if( NULL == ppv )
             return E_POINTER;
         if( (IID_IUnknown == riid)
-         || (IID_IPersist == riid) 
+         || (IID_IPersist == riid)
          || (IID_IPersistPropertyBag == riid) )
         {
             AddRef();

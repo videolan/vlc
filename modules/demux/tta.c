@@ -105,7 +105,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    
+ 
     /* Read the metadata */
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'T', 'T', 'A', '1' ) );
     fmt.audio.i_channels = GetWLE( &p_header[6] );
@@ -115,7 +115,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_datalength = GetDWLE( &p_header[14] );
     p_sys->i_framelength = TTA_FRAMETIME * fmt.audio.i_rate;
 
-    p_sys->i_totalframes = p_sys->i_datalength / p_sys->i_framelength + 
+    p_sys->i_totalframes = p_sys->i_datalength / p_sys->i_framelength +
                           ((p_sys->i_datalength % p_sys->i_framelength) ? 1 : 0);
     p_sys->i_currentframe = 0;
 
@@ -138,7 +138,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     free( p_seektable );
     p_sys->i_start = stream_Tell( p_demux->s );
-    
+ 
 #if 0
     /* Parse possible id3 header */
     if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
@@ -231,7 +231,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
-         
+ 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = I64C(1000000) * p_sys->i_totalframes * TTA_FRAMETIME;
@@ -241,7 +241,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = I64C(1000000) * p_sys->i_currentframe * TTA_FRAMETIME;
             return VLC_SUCCESS;
-            
+ 
         default:
             return VLC_EGENERIC;
     }

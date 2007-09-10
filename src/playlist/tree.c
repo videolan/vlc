@@ -309,7 +309,7 @@ void playlist_NodesPairCreate( playlist_t *p_playlist, const char *psz_name,
 
 /**
  * Get the node in the preferred tree from a node in one of category
- * or onelevel tree. 
+ * or onelevel tree.
  * For example, for the SAP node, it will return the node in the category
  * tree if --playlist-tree is not set to never, because the SAP node prefers
  * category

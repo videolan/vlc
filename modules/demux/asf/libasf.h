@@ -119,7 +119,7 @@ static const guid_t asf_object_stream_prioritization =
 static const guid_t asf_object_extended_content_description =
 {0xD2D0A440, 0xE307, 0x11D2, {0x97, 0xF0, 0x00, 0xA0, 0xC9, 0x5E, 0xA8, 0x50}};
 
-static const guid_t asf_object_extended_stream_header = 
+static const guid_t asf_object_extended_stream_header =
 {0x3afb65e2, 0x47ef, 0x40f2, { 0xac, 0x2c, 0x70, 0xa9, 0x0d, 0x71, 0xd3, 0x43}};
 
 static const guid_t asf_object_extended_stream_type_audio =

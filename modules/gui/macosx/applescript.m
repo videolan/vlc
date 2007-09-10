@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -30,7 +30,7 @@
 #include "open.h"
 
 /*****************************************************************************
- * VLGetURLScriptCommand implementation 
+ * VLGetURLScriptCommand implementation
  *****************************************************************************/
 @implementation VLGetURLScriptCommand
 
@@ -77,7 +77,7 @@
 
 
 /*****************************************************************************
- * VLControlScriptCommand implementation 
+ * VLControlScriptCommand implementation
  *****************************************************************************/
 /*
  * This entire control command needs a better design. more object oriented.
@@ -95,9 +95,9 @@
     {
         return nil;
     }
-    
+ 
     VLCControls * o_controls = (VLCControls *)[[NSApp delegate] getControls];
-    
+ 
     if ( o_controls )
     {
         if ( [o_command isEqualToString:@"play"] )
@@ -152,7 +152,7 @@
  *****************************************************************************/
 @implementation NSApplication(ScriptSupport)
 
-- (BOOL) scriptFullscreenMode {	
+- (BOOL) scriptFullscreenMode {    
     VLCControls * o_controls = (VLCControls *)[[self delegate] getControls];
 
     return [o_controls isFullscreen];

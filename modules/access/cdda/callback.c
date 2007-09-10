@@ -34,7 +34,7 @@ CDDADebugCB   ( vlc_object_t *p_this, const char *psz_name,
 
     p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
 
-    if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
+    if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT))
     {
         msg_Dbg( p_cdda_input, "old debug (x%0x) %d, new debug (x%0x) %d",
                  p_cdda->i_debug, p_cdda->i_debug, val.i_int, val.i_int);
@@ -56,7 +56,7 @@ CDDBEnabledCB   ( vlc_object_t *p_this, const char *psz_name,
     p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
 
 #ifdef HAVE_LIBCDDB
-    if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
+    if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT))
     {
         msg_Dbg( p_cdda_input, "old CDDB Enabled (x%0x) %d, new (x%0x) %d",
                  p_cdda->b_cddb_enabled, p_cdda->b_cddb_enabled,
@@ -98,8 +98,8 @@ CDDANavModeCB( vlc_object_t *p_this, const char *psz_name,
 
     if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT))
     {
-        msg_Dbg( p_cdda_input, 
-		 "old Navigation Mode Enabled %d, new %d",
+        msg_Dbg( p_cdda_input,
+         "old Navigation Mode Enabled %d, new %d",
                  p_cdda->b_nav_mode, val.b_bool);
     }
     p_cdda->b_nav_mode = val.b_bool;
@@ -117,7 +117,7 @@ CDTextPreferCB   ( vlc_object_t *p_this, const char *psz_name,
     p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
 
 #ifdef HAVE_LIBCDDB
-    if ( p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
+    if ( p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT))
     {
         msg_Dbg( p_cdda_input, "old CDText Prefer (x%0x) %d, new (x%0x) %d",
                  p_cdda->b_cdtext_prefer, p_cdda->b_cdtext_prefer,
@@ -138,7 +138,7 @@ CDDABlocksPerReadCB ( vlc_object_t *p_this, const char *psz_name,
 
     p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
 
-    if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
+    if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT))
     {
         msg_Dbg( p_cdda_input, "old blocks per read: %d, new %d",
                  p_cdda->i_blocks_per_read, val.i_int);

@@ -231,7 +231,7 @@ void ParseSSAHeader( decoder_t *p_dec )
                     psz_temp_stylename, psz_temp_fontname, &i_font_size,
                     psz_temp_color1, psz_temp_color2, psz_temp_color3,
                     psz_temp_color4, &i_bold, &i_italic,
-                    &i_border, &i_outline, &i_shadow, &i_align, &i_margin_l, 
+                    &i_border, &i_outline, &i_shadow, &i_align, &i_margin_l,
                     &i_margin_r, &i_margin_v ) == 16 )
                 {
                     ssa_style_t *p_style = malloc( sizeof(ssa_style_t) );
@@ -243,13 +243,13 @@ void ParseSSAHeader( decoder_t *p_dec )
                     ParseColor( p_dec, psz_temp_color1, &p_style->font_style.i_font_color, NULL );
                     ParseColor( p_dec, psz_temp_color4, &p_style->font_style.i_shadow_color, NULL );
                     p_style->font_style.i_outline_color = p_style->font_style.i_shadow_color;
-                    p_style->font_style.i_font_alpha = p_style->font_style.i_outline_alpha 
+                    p_style->font_style.i_font_alpha = p_style->font_style.i_outline_alpha
                                                      = p_style->font_style.i_shadow_alpha = 0x00;
                     p_style->font_style.i_style_flags = 0;
                     if( i_bold ) p_style->font_style.i_style_flags |= STYLE_BOLD;
                     if( i_italic ) p_style->font_style.i_style_flags |= STYLE_ITALIC;
 
-                    if( i_border == 1 ) 
+                    if( i_border == 1 )
                         p_style->font_style.i_style_flags |= (STYLE_ITALIC | STYLE_OUTLINE);
                     else if( i_border == 3 )
                     {
@@ -267,7 +267,7 @@ void ParseSSAHeader( decoder_t *p_dec )
                         p_style->i_align |= SUBPICTURE_ALIGN_RIGHT;
                     if( i_align < 4 )
                         p_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;
-                    else if( i_align < 8 ) 
+                    else if( i_align < 8 )
                         p_style->i_align |= SUBPICTURE_ALIGN_TOP;
 
                     p_style->i_margin_h = ( p_style->i_align & SUBPICTURE_ALIGN_RIGHT ) ?

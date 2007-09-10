@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -38,7 +38,7 @@
 #define OFFSET_RIGHT 20
 #define OFFSET_BETWEEN 2
 
-#define UPWARDS_WHITE_ARROW                 "\xE2\x87\xA7" 
+#define UPWARDS_WHITE_ARROW                 "\xE2\x87\xA7"
 #define OPTION_KEY                          "\xE2\x8C\xA5"
 #define UP_ARROWHEAD                        "\xE2\x8C\x83"
 #define PLACE_OF_INTEREST_SIGN              "\xE2\x8C\x98"
@@ -1225,7 +1225,7 @@
         types:nil
         modalForWindow:[sender window]
         modalDelegate: self
-        didEndSelector: @selector(pathChosenInPanel: 
+        didEndSelector: @selector(pathChosenInPanel:
                         withReturn:
                         contextInfo:)
         contextInfo: nil];
@@ -1331,7 +1331,7 @@
                                                 p_parser->psz_object_name) )
                             [o_popup selectItem:[o_popup lastItem]];
                     }
-                } 
+                }
             }
         }
         vlc_list_release( p_list );

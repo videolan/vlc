@@ -651,7 +651,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            
+ 
             /* the commented following lines are fen's implementation, which doesn't seem to
              * work for one reason or another -- FK */
             /*if( p_sys->i_mux_rate > 0 )
@@ -663,7 +663,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 /* our stored duration is in ms, so... */
                 *pi64 = (int64_t)1000 * p_sys->i_our_duration;
-                
+ 
                 return VLC_SUCCESS;
             }
             *pi64 = 0;
@@ -673,7 +673,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
 
-            /* the core will crash if we provide NULL strings, so check 
+            /* the core will crash if we provide NULL strings, so check
              * every string first */
             if( p_sys->psz_title )
                 vlc_meta_SetTitle( p_meta, p_sys->psz_title );
@@ -752,10 +752,10 @@ static int HeaderRead( demux_t *p_demux )
             msg_Dbg( p_demux, "    - index offset=%d", GetDWBE(&header[28]) );
             msg_Dbg( p_demux, "    - data offset=%d", GetDWBE(&header[32]) );
             msg_Dbg( p_demux, "    - num streams=%d", GetWBE(&header[36]) );
-            
+ 
             /* set the duration for export in control */
             p_sys->i_our_duration = (int)GetDWBE(&header[20]);
-            
+ 
             i_flags = GetWBE(&header[38]);
             msg_Dbg( p_demux, "    - flags=0x%x %s%s%s",
                      i_flags,
@@ -768,7 +768,7 @@ static int HeaderRead( demux_t *p_demux )
         {
             int i_len;
             char *psz;
-            
+ 
             /* FIXME FIXME: should convert from whatever the character
              * encoding of the input meta data is to UTF-8. */
 
@@ -849,7 +849,7 @@ static int HeaderRead( demux_t *p_demux )
             msg_Dbg( p_demux, "    - start time=%d", GetDWBE(&header[18]) );
             msg_Dbg( p_demux, "    - preroll=%d", GetDWBE(&header[22]) );
             msg_Dbg( p_demux, "    - duration=%d", GetDWBE(&header[26]) );
-            
+ 
             i_skip -= 30;
 
             stream_Read( p_demux->s, header, 1 );

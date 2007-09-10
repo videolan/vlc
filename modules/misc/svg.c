@@ -413,8 +413,8 @@ static void svg_RenderPicture( filter_t *p_filter,
     rsvg_handle_set_size_callback( p_handle, svg_SizeCallback, p_filter, NULL );
 
     if( ! rsvg_handle_write( p_handle,
-			     ( guchar* )p_svg->psz_text, strlen( p_svg->psz_text ),
-			     &error ) ) 
+                 ( guchar* )p_svg->psz_text, strlen( p_svg->psz_text ),
+                 &error ) )
     {
         msg_Err( p_filter, "error while rendering SVG: %s\n", error->message );
         g_object_unref( G_OBJECT( p_handle ) );

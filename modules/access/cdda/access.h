@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Open: open cdda device or image file and initialize structures 
+ * Open: open cdda device or image file and initialize structures
  * for subsequent operations.
  *****************************************************************************/
 int  CDDAOpen     ( vlc_object_t * );

@@ -44,7 +44,7 @@ MetaInfoAddStr(access_t *p_access, char *psz_cat,
   if ( psz ) {
     dbg_print( INPUT_DBG_META, "cat %s, field: %s: %s", psz_cat, title, psz);
     input_Control( p_vcdplayer->p_input, INPUT_ADD_INFO, psz_cat, title, "%s",
-		   psz);
+           psz);
   }
 }
 
@@ -54,8 +54,8 @@ MetaInfoAddNum(access_t *p_access, char *psz_cat, char *title, int num)
 {
   vcdplayer_t *p_vcdplayer = (vcdplayer_t *) p_access->p_sys;
   dbg_print( INPUT_DBG_META, "cat %s, field %s: %d", psz_cat,  title, num);
-  input_Control( p_vcdplayer->p_input, INPUT_ADD_INFO, psz_cat, title, 
-		 "%d", num );
+  input_Control( p_vcdplayer->p_input, INPUT_ADD_INFO, psz_cat, title,
+         "%d", num );
 }
 
 static inline void
@@ -63,8 +63,8 @@ MetaInfoAddHex(access_t *p_access, char *psz_cat, char *title, int hex)
 {
   vcdplayer_t *p_vcdplayer = (vcdplayer_t *) p_access->p_sys;
   dbg_print( INPUT_DBG_META, "cat %s, field %s: %d", psz_cat, title, hex);
-  input_Control( p_vcdplayer->p_input, INPUT_ADD_INFO, psz_cat, title, 
-		 "%x", hex );
+  input_Control( p_vcdplayer->p_input, INPUT_ADD_INFO, psz_cat, title,
+         "%x", hex );
 }
 
 #define addstr(title, str) \
@@ -76,7 +76,7 @@ MetaInfoAddHex(access_t *p_access, char *psz_cat, char *title, int hex)
 #define addhex(title, hex) \
   MetaInfoAddHex( p_access, psz_cat, title, hex );
 
-void 
+void
 VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
 {
   vcdplayer_t *p_vcdplayer = (vcdplayer_t *) p_access->p_sys;
@@ -109,24 +109,24 @@ VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
 #define TITLE_MAX 30
   for( i_track = 1 ; i_track < p_vcdplayer->i_tracks ; i_track++ ) {
     char psz_cat[20];
-    unsigned int audio_type = vcdinfo_get_track_audio_type(p_vcdplayer->vcd, 
-							   i_track);
+    unsigned int audio_type = vcdinfo_get_track_audio_type(p_vcdplayer->vcd,
+                               i_track);
     uint32_t i_secsize = vcdinfo_get_track_sect_count(p_vcdplayer->vcd, i_track);
 
     snprintf(psz_cat, sizeof(psz_cat), "Track %d", i_track);
     if (p_vcdplayer->b_svd) {
-      addnum(_("Audio Channels"),  
-	     vcdinfo_audio_type_num_channels(p_vcdplayer->vcd, audio_type) );
+      addnum(_("Audio Channels"),
+         vcdinfo_audio_type_num_channels(p_vcdplayer->vcd, audio_type) );
     }
 
     addnum(_("First Entry Point"), last_entry );
-    for ( ; last_entry < i_entries 
-	    && vcdinfo_get_track(p_vcdplayer->vcd, last_entry) == i_track;
-	  last_entry++ ) ;
+    for ( ; last_entry < i_entries
+        && vcdinfo_get_track(p_vcdplayer->vcd, last_entry) == i_track;
+      last_entry++ ) ;
     addnum(_("Last Entry Point"), last_entry-1 );
     addnum(_("Track size (in sectors)"), i_secsize );
   }
-  
+ 
   {
     lid_t i_lid;
     for( i_lid = 1 ; i_lid <= p_vcdplayer->i_lids ; i_lid++ ) {
@@ -134,79 +134,79 @@ VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
       char psz_cat[20];
       snprintf(psz_cat, sizeof(psz_cat), "LID %d", i_lid);
       if (vcdinfo_lid_get_pxd(p_vcdplayer->vcd, &pxd, i_lid)) {
-	switch (pxd.descriptor_type) {
-	case PSD_TYPE_END_LIST:
-	  addstr(_("type"), _("end"));
-	  break;
-	case PSD_TYPE_PLAY_LIST:
-	  addstr(_("type"), _("play list"));
-	  addnum("items",     vcdinf_pld_get_noi(pxd.pld));
-	  addhex("next",      vcdinf_pld_get_next_offset(pxd.pld));
-	  addhex("previous",  vcdinf_pld_get_prev_offset(pxd.pld));
-	  addhex("return",    vcdinf_pld_get_return_offset(pxd.pld));
-	  addnum("wait time", vcdinf_get_wait_time(pxd.pld));
-	  break;
-	case PSD_TYPE_SELECTION_LIST:
-	case PSD_TYPE_EXT_SELECTION_LIST:
-	  addstr(_("type"), 
-		 PSD_TYPE_SELECTION_LIST == pxd.descriptor_type 
-		 ? _("extended selection list")
-		 : _("selection list")
-		 );
-	  addhex("default",          vcdinf_psd_get_default_offset(pxd.psd));
-	  addhex("loop count",       vcdinf_get_loop_count(pxd.psd));
-	  addhex("next",             vcdinf_psd_get_next_offset(pxd.psd));
-	  addhex("previous",         vcdinf_psd_get_prev_offset(pxd.psd));
-	  addhex("return",           vcdinf_psd_get_return_offset(pxd.psd));
-	  addhex("rejected",         vcdinf_psd_get_lid_rejected(pxd.psd));
-	  addhex("time-out offset",  vcdinf_get_timeout_offset(pxd.psd));
-	  addnum("time-out time",    vcdinf_get_timeout_time(pxd.psd));
-	  break;
-	default: 
-	  addstr(_("type"), _("unknown type"));
-	  break;
-	}
+    switch (pxd.descriptor_type) {
+    case PSD_TYPE_END_LIST:
+      addstr(_("type"), _("end"));
+      break;
+    case PSD_TYPE_PLAY_LIST:
+      addstr(_("type"), _("play list"));
+      addnum("items",     vcdinf_pld_get_noi(pxd.pld));
+      addhex("next",      vcdinf_pld_get_next_offset(pxd.pld));
+      addhex("previous",  vcdinf_pld_get_prev_offset(pxd.pld));
+      addhex("return",    vcdinf_pld_get_return_offset(pxd.pld));
+      addnum("wait time", vcdinf_get_wait_time(pxd.pld));
+      break;
+    case PSD_TYPE_SELECTION_LIST:
+    case PSD_TYPE_EXT_SELECTION_LIST:
+      addstr(_("type"),
+         PSD_TYPE_SELECTION_LIST == pxd.descriptor_type
+         ? _("extended selection list")
+         : _("selection list")
+         );
+      addhex("default",          vcdinf_psd_get_default_offset(pxd.psd));
+      addhex("loop count",       vcdinf_get_loop_count(pxd.psd));
+      addhex("next",             vcdinf_psd_get_next_offset(pxd.psd));
+      addhex("previous",         vcdinf_psd_get_prev_offset(pxd.psd));
+      addhex("return",           vcdinf_psd_get_return_offset(pxd.psd));
+      addhex("rejected",         vcdinf_psd_get_lid_rejected(pxd.psd));
+      addhex("time-out offset",  vcdinf_get_timeout_offset(pxd.psd));
+      addnum("time-out time",    vcdinf_get_timeout_time(pxd.psd));
+      break;
+    default:
+      addstr(_("type"), _("unknown type"));
+      break;
+    }
       }
     }
   }
 
   if ( CDIO_INVALID_TRACK != i_track )
-  { 
-    char *psz_name = 
+  {
+    char *psz_name =
       VCDFormatStr( p_access, p_vcdplayer,
-		    config_GetPsz( p_access, MODULE_STRING "-title-format" ),
-		    psz_mrl, &(p_vcdplayer->play_item) );
-    
+            config_GetPsz( p_access, MODULE_STRING "-title-format" ),
+            psz_mrl, &(p_vcdplayer->play_item) );
+ 
     input_Control( p_vcdplayer->p_input, INPUT_SET_NAME, psz_name );
   }
 
 }
 
-#define add_format_str_info(val)			       \
-  {							       \
-    const char *str = strdup(val);			       \
-    unsigned int len;					       \
-    if (val != NULL) {					       \
-      len=strlen(str);					       \
-      if (len != 0) {					       \
-        strncat(tp, str, TEMP_STR_LEN-(tp-temp_str));	       \
-        tp += len;					       \
+#define add_format_str_info(val)                   \
+  {                                   \
+    const char *str = strdup(val);                   \
+    unsigned int len;                           \
+    if (val != NULL) {                           \
+      len=strlen(str);                           \
+      if (len != 0) {                           \
+        strncat(tp, str, TEMP_STR_LEN-(tp-temp_str));           \
+        tp += len;                           \
       }                                                        \
-      saw_control_prefix = VLC_FALSE;			       \
-    }							       \
+      saw_control_prefix = VLC_FALSE;                   \
+    }                                   \
   }
 
-#define add_format_num_info( val, fmt )			       \
-  {							       \
-    char num_str[10];					       \
-    unsigned int len;					       \
+#define add_format_num_info( val, fmt )                   \
+  {                                   \
+    char num_str[10];                           \
+    unsigned int len;                           \
     sprintf(num_str, fmt, val);                                \
-    len = strlen(num_str);				       \
+    len = strlen(num_str);                       \
     if( len != 0 )                                             \
-    {					                       \
+    {                                           \
       strncat(tp, num_str, TEMP_STR_LEN-(tp-temp_str));        \
-      tp += len;					       \
-    }							       \
+      tp += len;                           \
+    }                                   \
     saw_control_prefix = VLC_FALSE;                                \
   }
 
@@ -371,25 +371,25 @@ VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcdplayer,
 
 void
 VCDUpdateTitle( access_t *p_access )
-{ 
+{
 
     vcdplayer_t *p_vcdplayer= (vcdplayer_t *)p_access->p_sys;
 
-    unsigned int psz_mrl_max = strlen(VCD_MRL_PREFIX) 
+    unsigned int psz_mrl_max = strlen(VCD_MRL_PREFIX)
       + strlen(p_vcdplayer->psz_source) + sizeof("@E999")+3;
     char *psz_mrl = malloc( psz_mrl_max );
 
-    if( psz_mrl ) 
+    if( psz_mrl )
     {
         char *psz_name;
-	snprintf(psz_mrl, psz_mrl_max, "%s%s", 
-		 VCD_MRL_PREFIX, p_vcdplayer->psz_source);
-	psz_name = VCDFormatStr( p_access, p_vcdplayer,
-				 config_GetPsz( p_access, MODULE_STRING 
-						"-title-format" ),
-				psz_mrl, &(p_vcdplayer->play_item) );
-	input_Control( p_vcdplayer->p_input, INPUT_SET_NAME, psz_name );
-	free(psz_mrl);
+    snprintf(psz_mrl, psz_mrl_max, "%s%s",
+         VCD_MRL_PREFIX, p_vcdplayer->psz_source);
+    psz_name = VCDFormatStr( p_access, p_vcdplayer,
+                 config_GetPsz( p_access, MODULE_STRING
+                        "-title-format" ),
+                psz_mrl, &(p_vcdplayer->play_item) );
+    input_Control( p_vcdplayer->p_input, INPUT_SET_NAME, psz_name );
+    free(psz_mrl);
     }
 }
 

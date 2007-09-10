@@ -49,10 +49,10 @@ FileInfo::FileInfo( intf_thread_t *p_intf, CBaseWindow *p_parent,
 
 /***********************************************************************
 
-FUNCTION: 
+FUNCTION:
   CreateTreeView
 
-PURPOSE: 
+PURPOSE:
   Registers the TreeView control class and creates a TreeView.
 
 ***********************************************************************/
@@ -72,7 +72,7 @@ BOOL FileInfo::CreateTreeView(HWND hwnd)
     GetClientRect( hwnd, &rect );
 
     // Assign the window styles for the tree view.
-    dwStyle = WS_VISIBLE | WS_CHILD | TVS_HASLINES | TVS_LINESATROOT | 
+    dwStyle = WS_VISIBLE | WS_CHILD | TVS_HASLINES | TVS_LINESATROOT |
                           TVS_HASBUTTONS;
 
     // Create the tree-view control.
@@ -91,20 +91,20 @@ BOOL FileInfo::CreateTreeView(HWND hwnd)
 
 /***********************************************************************
 
-FUNCTION: 
+FUNCTION:
   UpdateFileInfo
 
-PURPOSE: 
+PURPOSE:
   Update the TreeView with file information.
 
 ***********************************************************************/
 void FileInfo::UpdateFileInfo()
 {
-    TVITEM tvi = {0}; 
-    TVINSERTSTRUCT tvins = {0}; 
-    HTREEITEM hPrev = (HTREEITEM)TVI_FIRST; 
-    HTREEITEM hPrevRootItem = NULL; 
-    HTREEITEM hPrevLev2Item = NULL; 
+    TVITEM tvi = {0};
+    TVINSERTSTRUCT tvins = {0};
+    HTREEITEM hPrev = (HTREEITEM)TVI_FIRST;
+    HTREEITEM hPrevRootItem = NULL;
+    HTREEITEM hPrevLev2Item = NULL;
 
     p_intf->p_sys->p_input = (input_thread_t *)
         vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
@@ -113,7 +113,7 @@ void FileInfo::UpdateFileInfo()
 
     if( !p_input ) return;
 
-    tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM; 
+    tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
     // Set the text of the item.
     tvi.pszText = _FROMMB( p_input->input.p_item->psz_name );
@@ -121,32 +121,32 @@ void FileInfo::UpdateFileInfo()
 
     // Save the heading level in the item's application-defined data area
     tvi.lParam = (LPARAM)1;
-    tvins.item = tvi; 
+    tvins.item = tvi;
     //tvins.hInsertAfter = TVI_LAST;
-    tvins.hInsertAfter = hPrev; 
-    tvins.hParent = TVI_ROOT; 
+    tvins.hInsertAfter = hPrev;
+    tvins.hParent = TVI_ROOT;
 
-    // Add the item to the tree-view control. 
+    // Add the item to the tree-view control.
     hPrev = (HTREEITEM)TreeView_InsertItem( hwndTV, &tvins );
 
-    hPrevRootItem = hPrev; 
+    hPrevRootItem = hPrev;
 
     vlc_mutex_lock( &p_input->input.p_item->lock );
     for( int i = 0; i < p_input->input.p_item->i_categories; i++ )
     {
         info_category_t *p_cat = p_input->input.p_item->pp_categories[i];
 
-        // Set the text of the item. 
+        // Set the text of the item.
         tvi.pszText = _FROMMB( p_input->input.p_item->psz_name );
         tvi.cchTextMax = _tcslen( tvi.pszText );
-        
+ 
         // Save the heading level in the item's application-defined data area
         tvi.lParam = (LPARAM)2; // level 2
-        tvins.item = tvi; 
-        tvins.hInsertAfter = hPrev; 
+        tvins.item = tvi;
+        tvins.hInsertAfter = hPrev;
         tvins.hParent = hPrevRootItem;
 
-        // Add the item to the tree-view control. 
+        // Add the item to the tree-view control.
         hPrev = (HTREEITEM)TreeView_InsertItem( hwndTV, &tvins );
 
         hPrevLev2Item = hPrev;
@@ -155,18 +155,18 @@ void FileInfo::UpdateFileInfo()
         {
             info_t *p_info = p_cat->pp_infos[j];
 
-            // Set the text of the item. 
+            // Set the text of the item.
             string szAnsi = (string)p_info->psz_name;
             szAnsi += ": ";
             szAnsi += p_info->psz_value;
             tvi.pszText = (TCHAR *)_FROMMB( szAnsi.c_str() );
             tvi.cchTextMax = _tcslen( tvi.pszText );
             tvi.lParam = (LPARAM)3; // level 3
-            tvins.item = tvi; 
-            tvins.hInsertAfter = hPrev; 
+            tvins.item = tvi;
+            tvins.hInsertAfter = hPrev;
             tvins.hParent = hPrevLev2Item;
-    
-            // Add the item to the tree-view control. 
+ 
+            // Add the item to the tree-view control.
             hPrev = (HTREEITEM)TreeView_InsertItem( hwndTV, &tvins );
         }
 
@@ -181,12 +181,12 @@ void FileInfo::UpdateFileInfo()
 
 /***********************************************************************
 
-FUNCTION: 
+FUNCTION:
   WndProc
 
-PURPOSE: 
+PURPOSE:
   Processes messages sent to the main window.
-  
+ 
 ***********************************************************************/
 LRESULT FileInfo::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
@@ -194,7 +194,7 @@ LRESULT FileInfo::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
     switch( msg )
     {
-    case WM_INITDIALOG: 
+    case WM_INITDIALOG:
         shidi.dwMask = SHIDIM_FLAGS;
         shidi.dwFlags = SHIDIF_DONEBUTTON | SHIDIF_SIPDOWN |
             SHIDIF_FULLSCREENNOMENUBAR;//SHIDIF_SIZEDLGFULLSCREEN;
@@ -210,7 +210,7 @@ LRESULT FileInfo::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         break;
 
     case WM_SETFOCUS:
-        SHSipPreference( hwnd, SIP_DOWN ); 
+        SHSipPreference( hwnd, SIP_DOWN );
         SHFullScreen( hwnd, SHFS_HIDESIPBUTTON );
         break;
 

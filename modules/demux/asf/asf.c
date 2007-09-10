@@ -163,7 +163,7 @@ static int Demux( demux_t *p_demux )
                 if( DemuxInit( p_demux ) )
                 {
                     msg_Err( p_demux, "failed to load the new header" );
-                    intf_UserFatal( p_demux, VLC_FALSE, _("Could not demux ASF stream"), 
+                    intf_UserFatal( p_demux, VLC_FALSE, _("Could not demux ASF stream"),
                                     _("VLC failed to load the ASF header.") );
                     return 0;
                 }
@@ -425,7 +425,7 @@ static int DemuxPacket( demux_t *p_demux )
     i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
     i_packet_duration  = GetWLE( p_peek + i_skip ); i_skip += 2;
 
-//        i_packet_size_left = i_packet_length;   // XXX data really read 
+//        i_packet_size_left = i_packet_length;   // XXX data really read
     /* FIXME I have to do that for some file, I don't known why */
     i_packet_size_left = i_data_packet_min;
 
@@ -819,7 +819,7 @@ static int DemuxInit( demux_t *p_demux )
                         (int64_t)fmt.video.i_width * VOUT_ASPECT_FACTOR /
                         fmt.video.i_height / i_aspect_y;
                 }
-	    }
+        }
 
             tk->i_cat = VIDEO_ES;
             tk->p_es = es_out_Add( p_demux->out, &fmt );
@@ -841,13 +841,13 @@ static int DemuxInit( demux_t *p_demux )
             unsigned int i_data = p_sp->i_type_specific_data_length - 64;
 
             msg_Dbg( p_demux, "Ext stream header detected. datasize = %d", p_sp->i_type_specific_data_length );
-            if( ASF_CmpGUID( p_ref, &asf_object_extended_stream_type_audio ) && 
+            if( ASF_CmpGUID( p_ref, &asf_object_extended_stream_type_audio ) &&
                 i_data >= sizeof( WAVEFORMATEX ) - 2)
             {
                 int      i_format;
                 es_format_Init( &fmt, AUDIO_ES, 0 );
                 i_format = GetWLE( &p_data[0] );
-                if( i_format == 0 ) 
+                if( i_format == 0 )
                     fmt.i_codec = VLC_FOURCC( 'a','5','2',' ');
                 else
                     wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );

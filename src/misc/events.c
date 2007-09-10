@@ -61,7 +61,7 @@ typedef struct vlc_event_listeners_group_t
 } vlc_event_listeners_group_t;
 
 #ifdef DEBUG_EVENT
-static const char * ppsz_event_type_to_name[] = 
+static const char * ppsz_event_type_to_name[] =
 {
     [vlc_InputItemMetaChanged]          = "vlc_InputItemMetaChanged",
     [vlc_InputItemSubItemAdded]         = "vlc_InputItemSubItemAdded",
@@ -71,7 +71,7 @@ static const char * ppsz_event_type_to_name[] =
 #endif
 
 /*****************************************************************************
- * 
+ *
  *****************************************************************************/
 
 /**
@@ -126,7 +126,7 @@ int vlc_event_manager_register_event_type(
 
     listeners_group->event_type = event_type;
     ARRAY_INIT( listeners_group->listeners );
-    
+ 
     vlc_mutex_lock( &p_em->object_lock );
     ARRAY_APPEND( p_em->listeners_groups, listeners_group );
     vlc_mutex_unlock( &p_em->object_lock );
@@ -180,7 +180,7 @@ void vlc_event_send( vlc_event_manager_t * p_em,
         }
     FOREACH_END()
     vlc_mutex_unlock( &p_em->object_lock );
-    
+ 
     /* Call the function attached */
     cached_listener = array_of_cached_listeners;
     for( i = 0; i < i_cached_listeners; i++ )
@@ -215,7 +215,7 @@ int __vlc_event_attach( vlc_event_manager_t * p_em,
     listener = malloc(sizeof(vlc_event_listener_t));
     if( !listener )
         return VLC_ENOMEM;
-    
+ 
     listener->p_user_data = p_user_data;
     listener->pf_callback = pf_callback;
 #ifdef DEBUG_EVENT

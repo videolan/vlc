@@ -319,7 +319,7 @@ InterfaceWindow::InterfaceWindow( intf_thread_t * _p_intf, BRect frame,
 
     /* Add the Show menu */
     fShowMenu = new BMenu( _("Window") );
-#if 0    
+#if 0
     ADD_ELLIPSIS( _("Playlist") );
     fShowMenu->AddItem( new BMenuItem( psz_tmp, new BMessage( OPEN_PLAYLIST ), 'P') );
 #endif
@@ -1070,10 +1070,10 @@ InterfaceWindow::_RestoreSettings()
         BRect frame;
         if ( fSettings->FindRect( "main frame", &frame ) == B_OK )
             set_window_pos( this, frame );
-#if 0            
+#if 0
         if (fSettings->FindRect( "playlist frame", &frame ) == B_OK )
             set_window_pos( fPlaylistWindow, frame );
-#endif 
+#endif
         if (fSettings->FindRect( "messages frame", &frame ) == B_OK )
             set_window_pos( fMessagesWindow, frame );
         if (fSettings->FindRect( "settings frame", &frame ) == B_OK )
@@ -1088,7 +1088,7 @@ InterfaceWindow::_RestoreSettings()
 #if 0
         if ( fSettings->FindBool( "playlist showing", &showing ) == B_OK )
             launch_window( fPlaylistWindow, showing );
-#endif    
+#endif
         if ( fSettings->FindBool( "messages showing", &showing ) == B_OK )
             launch_window( fMessagesWindow, showing );
         if ( fSettings->FindBool( "settings showing", &showing ) == B_OK )

@@ -163,7 +163,7 @@ osd_state_t *__osd_StateChange( osd_state_t *p_states, const int i_state )
     return p_states;
 }
 
-/* The volume can be modified in another interface while the OSD Menu 
+/* The volume can be modified in another interface while the OSD Menu
  * has not been instantiated yet. This routines updates the "volume OSD menu item"
  * to reflect the current state of the GUI.
  */
@@ -216,7 +216,7 @@ void __osd_MenuShow( vlc_object_t *p_this )
     p_button = p_osd->p_state->p_visible;
     if( p_button )
     {
-        if( !p_button->b_range ) 
+        if( !p_button->b_range )
             p_button->p_current_state = osd_StateChange( p_button->p_states, OSD_BUTTON_UNSELECT );
         p_osd->p_state->p_visible = p_osd->p_button;
 
@@ -352,7 +352,7 @@ void __osd_MenuNext( vlc_object_t *p_this )
     p_button = p_osd->p_state->p_visible;
     if( p_button )
     {
-        if( !p_button->b_range ) 
+        if( !p_button->b_range )
             p_button->p_current_state = osd_StateChange( p_button->p_states, OSD_BUTTON_UNSELECT );
         if( p_button->p_next )
             p_osd->p_state->p_visible = p_button->p_next;
@@ -481,7 +481,7 @@ void __osd_MenuUp( vlc_object_t *p_this )
                 p_osd->p_state->p_visible->p_current_state->p_pic->p[Y_PLANE].i_visible_lines,
                 p_osd->p_state->p_visible->p_current_state->p_pic );
         osd_SetMenuUpdate( p_osd, VLC_TRUE );
-        /* If this is a range style action with associated images of only one state, 
+        /* If this is a range style action with associated images of only one state,
             * then perform "menu select" on every menu navigation
             */
         if( p_button->b_range )
@@ -565,7 +565,7 @@ void __osd_MenuDown( vlc_object_t *p_this )
         }
     }
 #if defined(OSD_MENU_DEBUG)
-    msg_Dbg( p_osd, "direction down [button %s]", p_osd->p_state->p_visible->psz_action ); 
+    msg_Dbg( p_osd, "direction down [button %s]", p_osd->p_state->p_visible->psz_action );
 #endif
 
     vlc_object_release( (vlc_object_t*) p_osd );

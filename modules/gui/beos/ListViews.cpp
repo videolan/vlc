@@ -249,12 +249,12 @@ DragSortableListView::InitiateDrag( BPoint point, int32 index, bool )
                 v->SetHighColor( 0, 0, 0, 255 );
                 v->StrokeRect( v->Bounds() );
                 v->Sync();
-    
+ 
                 uint8 *bits = (uint8 *)dragBitmap->Bits();
                 int32 height = (int32)dragBitmap->Bounds().Height() + 1;
                 int32 width = (int32)dragBitmap->Bounds().Width() + 1;
                 int32 bpr = dragBitmap->BytesPerRow();
-    
+ 
                 if (fade) {
                     for ( int32 y = 0; y < height - ALPHA / 2; y++, bits += bpr ) {
                         uint8 *line = bits + 3;
@@ -369,7 +369,7 @@ DragSortableListView::MouseMoved(BPoint where, uint32 transit, const BMessage *m
                     // offset where by half of item height
                     BRect r( ItemFrame( 0 ) );
                     where.y += r.Height() / 2.0;
-    
+ 
                     int32 index = IndexOf( where );
                     if ( index < 0 )
                         index = CountItems();
@@ -727,7 +727,7 @@ PlaylistView::KeyDown( const char* bytes, int32 numBytes )
 {
     if ( numBytes < 1 )
         return;
-        
+ 
     if ( ( bytes[0] == B_BACKSPACE ) || ( bytes[0] == B_DELETE ) )
     {
         RemoveSelected();
@@ -844,7 +844,7 @@ PlaylistView::CopyItems( BList& items, int32 toIndex )
             void* cloned = fVlcWrapper->PlaylistCloneItem( item );
             if ( cloned && !clonedItems.AddItem( cloned ) )
                 free( cloned );
-            
+ 
         }
         // add cloned items at index
         int32 index = toIndex;
@@ -1045,7 +1045,7 @@ PlaylistView::SortReverse()
 void
 PlaylistView::SortByPath()
 {
-    
+ 
 }
 
 /*****************************************************************************
@@ -1102,7 +1102,7 @@ PlaylistView::_SetPlayingIndex( BListItem* playingItem )
             playlist_t * p_playlist;
             p_playlist = (playlist_t *) vlc_object_find( p_intf,
                 VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        
+ 
             if( !p_playlist )
             {
                 return;

@@ -79,7 +79,7 @@ tls_Deinit( tls_t *p_tls )
     vlc_mutex_lock( lockval.p_address );
 
     vlc_object_release( p_tls );
-    
+ 
     i = p_tls->i_refcount;
     if( i == 0 )
         vlc_object_detach( p_tls );
@@ -164,7 +164,7 @@ tls_ClientCreate( vlc_object_t *p_this, int fd, const char *psz_hostname )
     p_tls = tls_Init( p_this );
     if( p_tls == NULL )
         return NULL;
-        
+ 
     p_session = p_tls->pf_client_create( p_tls );
     if( p_session != NULL )
     {

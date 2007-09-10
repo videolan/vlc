@@ -37,7 +37,7 @@ struct intf_sys_t
   vlc_bool_t      b_infinite_still;  /* True if still wait time is infinite */
   mtime_t         m_still_time;      /* Time in microseconds remaining
                                          to wait in still frame.
-				     */
+                     */
 #if FINISHED
   vcdplay_ctrl_t      control;
 #else

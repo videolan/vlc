@@ -6,7 +6,7 @@
 typedef struct PER_POINT_EQN {
 
   custom_wave_t * custom_wave;
-  
+ 
 
 } per_point_eqn_t;
 

@@ -77,25 +77,25 @@ custom_shape_t * new_custom_shape(int id) {
 
   /* Initialize tree data structures */
 
-  if ((custom_shape->param_tree = 
+  if ((custom_shape->param_tree =
        create_splaytree(compare_string, copy_string, free_string)) == NULL) {
     free_custom_shape(custom_shape);
     return NULL;
   }
 
-  if ((custom_shape->per_frame_eqn_tree = 
+  if ((custom_shape->per_frame_eqn_tree =
        create_splaytree(compare_int, copy_int, free_int)) == NULL) {
     free_custom_shape(custom_shape);
     return NULL;
   }
 
-  if ((custom_shape->init_cond_tree = 
+  if ((custom_shape->init_cond_tree =
        create_splaytree(compare_string, copy_string, free_string)) == NULL) {
     free_custom_shape(custom_shape);
     return NULL;
   }
-  
-  if ((custom_shape->per_frame_init_eqn_tree = 
+ 
+  if ((custom_shape->per_frame_init_eqn_tree =
        create_splaytree(compare_string, copy_string, free_string)) == NULL) {
     free_custom_shape(custom_shape);
     return NULL;
@@ -125,7 +125,7 @@ custom_shape_t * new_custom_shape(int id) {
 
   if ((param = new_param_double("b", P_FLAG_NONE, &custom_shape->b, NULL, 1.0, 0.0, .5)) == NULL){
     free_custom_shape(custom_shape);
-    return NULL;				       
+    return NULL;                
   }
 
   if (insert_param(param, custom_shape->param_tree) < 0) {
@@ -165,7 +165,7 @@ custom_shape_t * new_custom_shape(int id) {
 
   if ((param = new_param_double("border_b", P_FLAG_NONE, &custom_shape->border_b, NULL, 1.0, 0.0, .5)) == NULL){
     free_custom_shape(custom_shape);
-    return NULL;				       
+    return NULL;                
   }
 
   if (insert_param(param, custom_shape->param_tree) < 0) {
@@ -205,7 +205,7 @@ custom_shape_t * new_custom_shape(int id) {
 
   if ((param = new_param_double("b2", P_FLAG_NONE, &custom_shape->b2, NULL, 1.0, 0.0, .5)) == NULL){
     free_custom_shape(custom_shape);
-    return NULL;				       
+    return NULL;                
   }
 
   if (insert_param(param, custom_shape->param_tree) < 0) {
@@ -217,7 +217,7 @@ custom_shape_t * new_custom_shape(int id) {
     free_custom_shape(custom_shape);
     return NULL;
   }
-  
+ 
   if (insert_param(param, custom_shape->param_tree) < 0) {
     free_custom_shape(custom_shape);
     return NULL;
@@ -322,7 +322,7 @@ custom_shape_t * new_custom_shape(int id) {
     free_custom_shape(custom_shape);
     return NULL;
   }
-   
+ 
    if ((param = new_param_double("tex_ang", P_FLAG_NONE, &custom_shape->tex_ang, NULL, MAX_DOUBLE_SIZE, -MAX_DOUBLE_SIZE, 0.0)) == NULL) {
     free_custom_shape(custom_shape);
     return NULL;
@@ -409,7 +409,7 @@ custom_shape_t * new_custom_shape(int id) {
   }
  
   /* End of parameter loading. Note that the read only parameters associated
-     with custom shapes (ie, sample) are global variables, and not specific to 
+     with custom shapes (ie, sample) are global variables, and not specific to
      the custom shape datastructure. */
 
 
@@ -475,7 +475,7 @@ void free_custom_shape(custom_shape_t * custom_shape) {
   destroy_init_cond_tree_shape(custom_shape->init_cond_tree);
   destroy_param_db_tree_shape(custom_shape->param_tree);
   destroy_per_frame_init_eqn_tree_shape(custom_shape->per_frame_init_eqn_tree);
-  
+ 
   free(custom_shape);
 
   return;
@@ -489,32 +489,32 @@ custom_shape_t * find_custom_shape(int id, preset_t * preset, int create_flag) {
 
   if (preset == NULL)
     return NULL;
-  
+ 
   if ((custom_shape = splay_find(&id, preset->custom_shape_tree)) == NULL) {
-    
+ 
     if (CUSTOM_SHAPE_DEBUG) { printf("find_custom_shape: creating custom shape (id = %d)...", id);fflush(stdout);}
-    
+ 
     if (create_flag == FALSE) {
       if (CUSTOM_SHAPE_DEBUG) printf("you specified not to (create flag = false), returning null\n");
       return NULL;
     }
-    
+ 
     if ((custom_shape = new_custom_shape(id)) == NULL) {
       if (CUSTOM_SHAPE_DEBUG) printf("failed...out of memory?\n");
       return NULL;
     }
-    
+ 
     if (CUSTOM_SHAPE_DEBUG) { printf("success.Inserting..."); fflush(stdout);}
-    
+ 
     if (splay_insert(custom_shape, &custom_shape->id, preset->custom_shape_tree) < 0) {
       if (CUSTOM_SHAPE_DEBUG) printf("failed, probably a duplicated!!\n");
       free_custom_shape(custom_shape);
       return NULL;
     }
-    
+ 
     if (CUSTOM_SHAPE_DEBUG) printf("done.\n");
   }
-  
+ 
   return custom_shape;
 }
 
@@ -555,14 +555,14 @@ void load_unspec_init_cond_shape(param_t * param) {
   /* If initial condition was not defined by the preset file, force a default one
      with the following code */
   if ((init_cond = splay_find(param->name, interface_shape->init_cond_tree)) == NULL) {
-    
+ 
     /* Make sure initial condition does not exist in the set of per frame initial equations */
     if ((init_cond = splay_find(param->name, interface_shape->per_frame_init_eqn_tree)) != NULL)
       return;
-    
+ 
     if (param->type == P_TYPE_BOOL)
       init_val.bool_val = 0;
-    
+ 
     else if (param->type == P_TYPE_INT)
       init_val.int_val = *(int*)param->engine_val;
 
@@ -573,13 +573,13 @@ void load_unspec_init_cond_shape(param_t * param) {
     /* Create new initial condition */
     if ((init_cond = new_init_cond(param, init_val)) == NULL)
       return;
-    
+ 
     /* Insert the initial condition into this presets tree */
     if (splay_insert(init_cond, init_cond->param->name, interface_shape->init_cond_tree) < 0) {
       free_init_cond(init_cond);
       return;
     }
-    
+ 
   }
  
 }

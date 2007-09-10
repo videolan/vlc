@@ -107,7 +107,7 @@ struct libvlc_media_list_t
     libvlc_media_descriptor_t * p_md; /* The media_descriptor from which the
                                        * mlist comes, if any. */
     DECL_ARRAY(void *)          items;
-    
+ 
     /* Other way to see that media list */
     /* Used in flat_media_list.c */
     libvlc_media_list_t *       p_flat_mlist;
@@ -165,7 +165,7 @@ struct libvlc_media_discoverer_t
     libvlc_media_list_t *    p_mlist;
 };
 
-/* 
+/*
  * Event Handling
  */
 /* Example usage

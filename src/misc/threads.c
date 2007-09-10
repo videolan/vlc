@@ -496,7 +496,7 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
           || !CloseHandle( p_condvar->semaphore );
 
     if( p_condvar->semaphore != NULL )
-		DeleteCriticalSection( &p_condvar->csection );
+        DeleteCriticalSection( &p_condvar->csection );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_condvar->init = 0;
@@ -585,17 +585,17 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
         DWORD  threadId;
         HANDLE hThread = CreateThread( NULL, 0, (LPTHREAD_START_ROUTINE)func,
                                       (LPVOID)p_data, CREATE_SUSPENDED,
-				      &threadId );
+                      &threadId );
 #else
         unsigned threadId;
         uintptr_t hThread = _beginthreadex( NULL, 0,
-					    (LPTHREAD_START_ROUTINE)func,
+                        (LPTHREAD_START_ROUTINE)func,
                                             (void*)p_data, CREATE_SUSPENDED,
-					    &threadId );
+                        &threadId );
 #endif
         p_priv->thread_id.id = (DWORD)threadId;
         p_priv->thread_id.hThread = (HANDLE)hThread;
-	ResumeThread((HANDLE)hThread);
+    ResumeThread((HANDLE)hThread);
     }
 
     i_ret = ( p_priv->thread_id.hThread ? 0 : 1 );
@@ -673,7 +673,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
 #if defined( WIN32 ) || defined( UNDER_CE )
         msg_Dbg( p_this, "thread %u (%s) created at priority %d (%s:%d)",
                  (unsigned int)p_priv->thread_id.id, psz_name,
-		 i_priority, psz_file, i_line );
+         i_priority, psz_file, i_line );
 #else
         msg_Dbg( p_this, "thread %u (%s) created at priority %d (%s:%d)",
                  (unsigned int)p_priv->thread_id, psz_name, i_priority,
@@ -773,9 +773,9 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
     FILETIME create_ft, exit_ft, kernel_ft, user_ft;
     int64_t real_time, kernel_time, user_time;
     HANDLE hThread;
-   
+ 
     /*
-    ** object will close its thread handle when destroyed, duplicate it here 
+    ** object will close its thread handle when destroyed, duplicate it here
     ** to be on the safe side
     */
     if( ! DuplicateHandle(GetCurrentProcess(),
@@ -788,7 +788,7 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
     {
         msg_Err( p_this, "thread_join(%u) failed at %s:%d (%s)",
                          (unsigned int)p_priv->thread_id.id,
-			 psz_file, i_line, GetLastError() );
+             psz_file, i_line, GetLastError() );
         p_priv->b_thread = VLC_FALSE;
         return;
     }
@@ -796,8 +796,8 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
     WaitForSingleObject( hThread, INFINITE );
 
     msg_Dbg( p_this, "thread %u joined (%s:%d)",
-		     (unsigned int)p_priv->thread_id.id,
-		     psz_file, i_line );
+             (unsigned int)p_priv->thread_id.id,
+             psz_file, i_line );
 #if defined( UNDER_CE )
     hmodule = GetModuleHandle( _T("COREDLL") );
 #else

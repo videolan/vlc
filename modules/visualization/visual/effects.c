@@ -528,7 +528,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
             {
                for( k = 0 ; k< 3 ; k ++)
                {
-                   //* Draw the peak 
+                   //* Draw the peak
                      *(p_picture->p[0].p_pixels +
                     (p_picture->p[0].i_lines - i_line -1 -k ) *
                      p_picture->p[0].i_pitch + (i_band_width*i +j) )

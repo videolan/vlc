@@ -108,7 +108,7 @@ static void Close( vlc_object_t * );
 #define FILTER_LONGTEXT N_( "Loop filter AlphaC0 and Beta parameters. " \
     "Range -6 to 6 for both alpha and beta parameters. -6 means light " \
     "filter, 6 means strong.")
-    
+ 
 #define LEVEL_TEXT N_("H.264 level")
 #define LEVEL_LONGTEXT N_( "Specify H.264 level (as defined by Annex A " \
     "of the standard). Levels are not enforced; it's up to the user to select " \
@@ -445,12 +445,12 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "qpmin", 10, NULL, QPMIN_TEXT,
                  QPMIN_LONGTEXT, VLC_FALSE );
         change_integer_range( 0, 51 );
-    	add_deprecated_alias( SOUT_CFG_PREFIX "qp-min" ); /* Deprecated since 0.8.5 */
+        add_deprecated_alias( SOUT_CFG_PREFIX "qp-min" ); /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "qpmax", 51, NULL, QPMAX_TEXT,
                  QPMAX_LONGTEXT, VLC_FALSE );
         change_integer_range( 0, 51 );
-    	add_deprecated_alias( SOUT_CFG_PREFIX "qp-max" ); /* Deprecated since 0.8.5 */
+        add_deprecated_alias( SOUT_CFG_PREFIX "qp-max" ); /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "qpstep", 4, NULL, QPSTEP_TEXT,
                  QPSTEP_LONGTEXT, VLC_FALSE );
@@ -459,7 +459,7 @@ vlc_module_begin();
     add_float( SOUT_CFG_PREFIX "ratetol", 1.0, NULL, RATETOL_TEXT,
                RATETOL_LONGTEXT, VLC_FALSE );
         change_float_range( 0, 100 );
-    	add_deprecated_alias( SOUT_CFG_PREFIX "tolerance" ); /* Deprecated since 0.8.5 */
+        add_deprecated_alias( SOUT_CFG_PREFIX "tolerance" ); /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "vbv-maxrate", 0, NULL, VBV_MAXRATE_TEXT,
                  VBV_MAXRATE_LONGTEXT, VLC_FALSE );
@@ -504,7 +504,7 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "partitions", "normal", NULL, ANALYSE_TEXT,
                 ANALYSE_LONGTEXT, VLC_FALSE );
         change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
-    	add_deprecated_alias( SOUT_CFG_PREFIX "analyse" ); /* Deprecated since 0.8.6 */
+        add_deprecated_alias( SOUT_CFG_PREFIX "analyse" ); /* Deprecated since 0.8.6 */
 
     add_string( SOUT_CFG_PREFIX "direct", "spatial", NULL, DIRECT_PRED_TEXT,
                 DIRECT_PRED_LONGTEXT, VLC_FALSE );
@@ -542,7 +542,7 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "subme", 5, NULL, SUBME_TEXT,
                  SUBME_LONGTEXT, VLC_FALSE );
         change_integer_range( 1, SUBME_MAX );
-    	add_deprecated_alias( SOUT_CFG_PREFIX "subpel" ); /* Deprecated since 0.8.5 */
+        add_deprecated_alias( SOUT_CFG_PREFIX "subpel" ); /* Deprecated since 0.8.5 */
 
 #if X264_BUILD >= 41 /* r368 */
     add_bool( SOUT_CFG_PREFIX "b-rdo", 0, NULL, B_RDO_TEXT,
@@ -984,7 +984,7 @@ static int  Open ( vlc_object_t *p_this )
 #endif
 
 #if X264_BUILD >= 37
-    var_Get( p_enc, SOUT_CFG_PREFIX "crf", &val ); 
+    var_Get( p_enc, SOUT_CFG_PREFIX "crf", &val );
     if( val.i_int > 0 && val.i_int <= 51 )
     {
 #if X264_BUILD >= 54
@@ -1037,11 +1037,11 @@ static int  Open ( vlc_object_t *p_this )
 
     var_Get( p_enc, SOUT_CFG_PREFIX "deadzone-intra", &val );
     if( val.i_int >= 0 && val.i_int <= 32 )
-        p_sys->param.analyse.i_luma_deadzone[1] = val.i_int;   
+        p_sys->param.analyse.i_luma_deadzone[1] = val.i_int;
 
     var_Get( p_enc, SOUT_CFG_PREFIX "direct-8x8", &val );
     if( val.i_int >= -1 && val.i_int <= 1 )
-        p_sys->param.analyse.i_direct_8x8_inference = val.i_int; 
+        p_sys->param.analyse.i_direct_8x8_inference = val.i_int;
 #endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "asm", &val );
@@ -1273,7 +1273,7 @@ static void Close( vlc_object_t *p_this )
 {
     encoder_t     *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
-    
+ 
     if( p_sys->psz_stat_name )
         free( p_sys->psz_stat_name );
 

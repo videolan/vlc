@@ -356,7 +356,7 @@ VLC_PUBLIC_API void libvlc_media_instance_retain( libvlc_media_instance_t * );
 
 /** Set the media descriptor that will be used by the media_instance. If any,
  * previous md will be released.
- * \param p_mi the Media Instance 
+ * \param p_mi the Media Instance
  * \param p_md the Media Descriptor. Afterwards the p_md can safely be
  * destroyed.
  */
@@ -364,12 +364,12 @@ VLC_PUBLIC_API void libvlc_media_instance_set_media_descriptor( libvlc_media_ins
 
 /** Get the media descriptor used by the media_instance (if any). A copy of
  * the md is returned. NULL is returned if no media instance is associated.
- * \param p_mi the Media Instance 
+ * \param p_mi the Media Instance
  */
 VLC_PUBLIC_API libvlc_media_descriptor_t * libvlc_media_instance_get_media_descriptor( libvlc_media_instance_t *, libvlc_exception_t * );
 
 /** Get the Event Manager from which the media instance send event.
- * \param p_mi the Media Instance 
+ * \param p_mi the Media Instance
  */
 VLC_PUBLIC_API libvlc_event_manager_t * libvlc_media_instance_event_manager ( libvlc_media_instance_t *, libvlc_exception_t * );
 
@@ -409,13 +409,13 @@ VLC_PUBLIC_API float       libvlc_media_instance_get_fps( libvlc_media_instance_
  * LibVLC Tag query
  * @{
  */
-VLC_PUBLIC_API libvlc_tag_query_t * 
+VLC_PUBLIC_API libvlc_tag_query_t *
     libvlc_tag_query_new( libvlc_instance_t *, libvlc_exception_t * );
 
-VLC_PUBLIC_API void 
+VLC_PUBLIC_API void
     libvlc_tag_query_release( libvlc_tag_query_t * );
 
-VLC_PUBLIC_API void 
+VLC_PUBLIC_API void
     libvlc_tag_query_retain( libvlc_tag_query_t * );
 
 VLC_PUBLIC_API void
@@ -424,7 +424,7 @@ VLC_PUBLIC_API void
                                             char * psz_tag_key,
                                             libvlc_exception_t * );
 
-VLC_PUBLIC_API vlc_bool_t 
+VLC_PUBLIC_API vlc_bool_t
     libvlc_tag_query_match( libvlc_tag_query_t *, libvlc_media_descriptor_t *,
                             libvlc_exception_t * );
 
@@ -1014,7 +1014,7 @@ VLC_PUBLIC_API void libvlc_vlm_play_media ( libvlc_instance_t *, char *, libvlc_
  * \param p_instance the instance
  * \param psz_name the name of the broadcast
  * \param p_exception an initialized exception
- */ 
+ */
 VLC_PUBLIC_API void libvlc_vlm_stop_media ( libvlc_instance_t *, char *, libvlc_exception_t * );
 
 /**
@@ -1022,25 +1022,25 @@ VLC_PUBLIC_API void libvlc_vlm_stop_media ( libvlc_instance_t *, char *, libvlc_
  * \param p_instance the instance
  * \param psz_name the name of the broadcast
  * \param p_exception an initialized exception
- */ 
+ */
 VLC_PUBLIC_API void libvlc_vlm_pause_media( libvlc_instance_t *, char *, libvlc_exception_t * );
-    
+ 
 /**
  * Seeks in the named broadcast.
  * \param p_instance the instance
  * \param psz_name the name of the broadcast
  * \param f_percentage the percentage to seek to
  * \param p_exception an initialized exception
- */ 
+ */
 VLC_PUBLIC_API void libvlc_vlm_seek_media( libvlc_instance_t *, char *,
                                            float, libvlc_exception_t * );
-   
+ 
 /**
  * Return information of the named broadcast.
  * \param p_instance the instance
  * \param psz_name the name of the broadcast
  * \param p_exception an initialized exception
- */ 
+ */
 VLC_PUBLIC_API char* libvlc_vlm_show_media( libvlc_instance_t *, char *, libvlc_exception_t * );
 
 #define LIBVLC_VLM_GET_MEDIA_ATTRIBUTE( attr, returnType, getType, default)\
@@ -1086,14 +1086,14 @@ VLC_PUBLIC_API void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, uns
                                               libvlc_exception_t *p_e );
 
 /**
- * Open an instance to VLC message log 
+ * Open an instance to VLC message log
  * \param p_instance libvlc instance
  * \param exception an initialized exception pointer
  */
 VLC_PUBLIC_API libvlc_log_t *libvlc_log_open( const libvlc_instance_t *, libvlc_exception_t *);
 
 /**
- * Close an instance of VLC message log 
+ * Close an instance of VLC message log
  * \param p_log libvlc log instance
  * \param exception an initialized exception pointer
  */
@@ -1123,13 +1123,13 @@ VLC_PUBLIC_API libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_
 
 /**
  * Releases a previoulsy allocated iterator
- * \param p_log libvlc log iterator 
+ * \param p_log libvlc log iterator
  * \param exception an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter, libvlc_exception_t *p_e );
 
 /**
- * Returns whether log iterator has more messages 
+ * Returns whether log iterator has more messages
  * \param p_log libvlc log iterator
  * \param exception an initialized exception pointer
  */
@@ -1187,7 +1187,7 @@ VLC_PUBLIC_API void libvlc_event_detach( libvlc_event_manager_t *p_event_manager
                                          libvlc_exception_t *p_e );
 
 /**
- * Get an event type name 
+ * Get an event type name
  * \param i_event_type the desired event
  */
 #define libvlc_event_type_name(a) #a

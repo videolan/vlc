@@ -112,7 +112,7 @@ static int Open( vlc_object_t *p_this )
     char        *ext;
     int         i;
     vlc_value_t val;
-    
+ 
     /* We accept file based on extention match */
     if( strcasecmp( p_demux->psz_demux, "gme" ) )
     {
@@ -157,7 +157,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Prepare emulator */
-   
+ 
 #ifdef HAVE_ZLIB_H
     if (i == 4) /* gzipped vgm */
     {
@@ -165,7 +165,7 @@ static int Open( vlc_object_t *p_this )
         size_t i_outsize;
 
         inflate_gzbuf( p_sys->p_data, p_sys->i_data, &p_outbuffer, &i_outsize );
-        
+ 
         if (p_outbuffer == NULL)
         {
             msg_Err( p_demux, "failed to understand the file : unable to inflate vgz file" );
@@ -180,11 +180,11 @@ static int Open( vlc_object_t *p_this )
 
         p_sys->p_data = p_outbuffer;
         p_sys->i_data = i_outsize;
-    }    
+    }
 #endif
 
-    p_sys->p_reader = new Emu_Mem_Reader( p_sys->p_data, p_sys->i_data ); 
-    
+    p_sys->p_reader = new Emu_Mem_Reader( p_sys->p_data, p_sys->i_data );
+ 
     switch(i)
     {
         case 0:
@@ -214,15 +214,15 @@ static int Open( vlc_object_t *p_this )
         p_emu->init( 44100 ); \
         p_sys->p_musicemu = p_emu; \
         p_sys->p_reader->read( &header, sizeof(header) ); \
-        p_error = p_emu->load( header, *(p_sys->p_reader) ); 
+        p_error = p_emu->load( header, *(p_sys->p_reader) );
 
     p_sys->p_meta = vlc_meta_New();
 
     char psz_temp[512];
-    
+ 
     /// \todo Reinstate meta codec name
     //SET_META( VLC_META_CODEC_NAME, type_str[p_sys->i_type])
-    
+ 
     const char * p_error;
 
     switch(p_sys->i_type)
@@ -284,7 +284,7 @@ static int Open( vlc_object_t *p_this )
             }
      }
         break;
-    } 
+    }
 
     if( p_error != NULL )
     {
@@ -314,7 +314,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->fmt.audio.i_channels = 2;
     p_sys->fmt.audio.i_bitspersample = 16;
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
-    
+ 
     return VLC_SUCCESS;
 }
 
@@ -351,7 +351,7 @@ static int Demux( demux_t *p_demux )
     p_frame = block_New( p_demux, i_buf );
 
     p_sys->p_musicemu->play( i_emubuf, p_emubuf );
-    
+ 
     /*
     if( p_error != NULL )
     {
@@ -468,7 +468,7 @@ switch( i_query )
 
         case DEMUX_SET_TITLE:
             i_idx = (int)va_arg( args, int );
-            p_sys->p_musicemu->start_track( i_idx );    
+            p_sys->p_musicemu->start_track( i_idx );
             p_demux->info.i_title = i_idx;
             p_demux->info.i_update = INPUT_UPDATE_TITLE;
             msg_Dbg( p_demux, "set title %i", i_idx);
@@ -531,8 +531,8 @@ static void inflate_gzbuf(uint8_t * p_buffer, size_t i_size, uint8_t ** pp_obuff
     (*pi_osize) = out_size - z_str.avail_out;
 
     inflateEnd(&z_str);
-    
-    out_buffer = (uint8_t *)realloc(out_buffer, *pi_osize); 
+ 
+    out_buffer = (uint8_t *)realloc(out_buffer, *pi_osize);
     (*pp_obuffer) = out_buffer;
 }
 #endif

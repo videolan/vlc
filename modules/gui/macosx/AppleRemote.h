@@ -3,10 +3,10 @@
  * AppleRemote
  * $Id$
  *
- * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
+ * Created by Martin Kahr on 11.03.06 under a MIT-style license.
  * Copyright (c) 2006 martinkahr.com. All rights reserved.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a 
+ * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,7 +18,7 @@
  *
  * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -29,7 +29,7 @@
  * Note that changes made by any members or contributors of the VideoLAN team
  * (i.e. changes that were checked in exclusively into one of VideoLAN's source code
  * repositories) are licensed under the GNU General Public License version 2,
- * or (at your option) any later version. 
+ * or (at your option) any later version.
  * Thus, the following statements apply to our changes:
  *
  * Copyright (C) 2006-2007 the VideoLAN team
@@ -86,23 +86,23 @@ The class is not thread safe
     IOHIDQueueInterface**  queue;
     NSMutableArray*        allCookies;
     NSMutableDictionary*   cookieToButtonMapping;
-    
+ 
     BOOL openInExclusiveMode;
     BOOL simulatePlusMinusHold;
     BOOL processesBacklog;
-    
+ 
     /* state for simulating plus/minus hold */
     BOOL lastEventSimulatedHold;
     AppleRemoteEventIdentifier lastPlusMinusEvent;
     NSTimeInterval lastPlusMinusEventTime;
-    
+ 
     int remoteId;
     unsigned int clickCountEnabledButtons;
     NSTimeInterval maxClickTimeDifference;
-    NSTimeInterval lastClickCountEventTime; 
+    NSTimeInterval lastClickCountEventTime;
     AppleRemoteEventIdentifier lastClickCountEvent;
     unsigned int eventClickCount;
-    
+ 
     IBOutlet id delegate;
 }
 
@@ -140,7 +140,7 @@ The class is not thread safe
 - (void) setProcessesBacklog: (BOOL) value;
 
 /* Sets an NSApplication delegate which starts listening when application is becoming active
- * and stops listening when application resigns being active. 
+ * and stops listening when application resigns being active.
  * If an NSApplication delegate has been already set all method calls will be forwarded to this delegate, too. */
 - (BOOL) listeningOnAppActivate;
 - (void) setListeningOnAppActivate: (BOOL) value;
@@ -172,15 +172,15 @@ The class is not thread safe
 
 @end
 
-@interface AppleRemote (PrivateMethods) 
+@interface AppleRemote (PrivateMethods)
 - (void) setRemoteId: (int) aValue;
 - (NSDictionary*) cookieToButtonMapping;
 - (IOHIDQueueInterface**) queue;
 - (IOHIDDeviceInterface**) hidDeviceInterface;
-- (void) handleEventWithCookieString: (NSString*) cookieString sumOfValues: (SInt32) sumOfValues; 
+- (void) handleEventWithCookieString: (NSString*) cookieString sumOfValues: (SInt32) sumOfValues;
 @end
 
-@interface AppleRemote (IOKitMethods) 
+@interface AppleRemote (IOKitMethods)
 - (io_object_t) findAppleRemoteDevice;
 - (IOHIDDeviceInterface**) createInterfaceForDevice: (io_object_t) hidDevice;
 - (BOOL) initializeCookies;
@@ -196,4 +196,3 @@ The class is not thread safe
 
 - (id) initWithApplicationDelegate: (id) delegate;
 - (id) applicationDelegate;
-@end

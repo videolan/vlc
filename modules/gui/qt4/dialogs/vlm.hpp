@@ -41,7 +41,7 @@ public:
         return instance;
     };
     virtual ~VLMDialog();
-    
+ 
 private:
     VLMDialog( intf_thread_t *);
     static VLMDialog *instance;

@@ -689,7 +689,7 @@ int IntegerListConfigControl::GetIntValue()
  * RangedIntConfigControl implementation
  *****************************************************************************/
 RangedIntConfigControl::RangedIntConfigControl( vlc_object_t *p_this,
-                                                module_config_t *p_item, 
+                                                module_config_t *p_item,
                                                 HWND parent, HINSTANCE hInst,
                                                 int * py_pos )
   : ConfigControl( p_this, p_item, parent, hInst )
@@ -750,7 +750,7 @@ float FloatConfigControl::GetFloatValue()
 {
     float f_value;
 
-    int i_size = Edit_GetTextLength( textctrl );  
+    int i_size = Edit_GetTextLength( textctrl );
     TCHAR *psz_string = (TCHAR *)malloc( (i_size + 1) * sizeof(TCHAR) );
     Edit_GetText( textctrl, psz_string, i_size + 1 );
 

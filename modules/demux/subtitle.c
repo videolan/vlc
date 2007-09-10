@@ -833,7 +833,7 @@ static int ParseSubRipSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
         if( b_replace_br )
         {
             char *p;
-            
+ 
             while( ( p = strstr( psz_text, "[br]" ) ) )
             {
                 *p++ = '\n';

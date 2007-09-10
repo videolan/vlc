@@ -40,7 +40,7 @@
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif
-#ifdef HAVE_FCNTL_H 
+#ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
 #endif
 
@@ -887,8 +887,8 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     msg_Dbg( p_this,"using vcd image file: %s", psz_vcdfile );
     p_vcddev->i_vcdimage_handle = utf8_open( psz_vcdfile,
                                     O_RDONLY | O_NONBLOCK | O_BINARY, 0666 );
-        
-    if( p_vcddev->i_vcdimage_handle == -1 && 
+ 
+    if( p_vcddev->i_vcdimage_handle == -1 &&
         fscanf( cuefile, "FILE %c", line ) &&
         fgets( line, 1024, cuefile ) )
     {
@@ -1021,7 +1021,7 @@ static CDTOC *darwin_getTOC( vlc_object_t * p_this, const vcddev_t *p_vcddev )
     }
 
     /* get service iterator for the device */
-    if( ( ret = IOServiceGetMatchingServices( 
+    if( ( ret = IOServiceGetMatchingServices(
                     port, IOBSDNameMatching( port, 0, psz_devname ),
                     &iterator ) ) != KERN_SUCCESS )
     {
@@ -1033,10 +1033,10 @@ static CDTOC *darwin_getTOC( vlc_object_t * p_this, const vcddev_t *p_vcddev )
     service = IOIteratorNext( iterator );
     IOObjectRelease( iterator );
 
-    /* search for kIOCDMediaClass */ 
+    /* search for kIOCDMediaClass */
     while( service && !IOObjectConformsTo( service, kIOCDMediaClass ) )
     {
-        if( ( ret = IORegistryEntryGetParentIterator( service, 
+        if( ( ret = IORegistryEntryGetParentIterator( service,
                         kIOServicePlane, &iterator ) ) != KERN_SUCCESS )
         {
             msg_Err( p_this, "IORegistryEntryGetParentIterator: 0x%08x", ret );
@@ -1085,18 +1085,18 @@ static CDTOC *darwin_getTOC( vlc_object_t * p_this, const vcddev_t *p_vcddev )
     }
 
     CFRelease( properties );
-    IOObjectRelease( service ); 
+    IOObjectRelease( service );
 
-    return( pTOC ); 
+    return( pTOC );
 }
 
 /****************************************************************************
- * darwin_getNumberOfTracks: get number of tracks in TOC 
+ * darwin_getNumberOfTracks: get number of tracks in TOC
  ****************************************************************************/
 static int darwin_getNumberOfTracks( CDTOC *pTOC, int i_descriptors )
 {
     u_char track;
-    int i, i_tracks = 0; 
+    int i, i_tracks = 0;
     CDTOCDescriptor *pTrackDescriptors = NULL;
 
     pTrackDescriptors = (CDTOCDescriptor *)pTOC->descriptors;
@@ -1108,7 +1108,7 @@ static int darwin_getNumberOfTracks( CDTOC *pTOC, int i_descriptors )
         if( track > CD_MAX_TRACK_NO || track < CD_MIN_TRACK_NO )
             continue;
 
-        i_tracks++; 
+        i_tracks++;
     }
 
     return( i_tracks );

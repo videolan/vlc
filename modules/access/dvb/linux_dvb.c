@@ -1477,7 +1477,7 @@ int E_(CAMOpen)( access_t *p_access )
     }
 
     /* Output CA capabilities */
-    msg_Dbg( p_access, "CAMInit: CA interface with %d %s", caps.slot_num, 
+    msg_Dbg( p_access, "CAMInit: CA interface with %d %s", caps.slot_num,
         caps.slot_num == 1 ? "slot" : "slots" );
     if ( caps.slot_type & CA_CI )
         msg_Dbg( p_access, "CAMInit: CI high level interface type" );

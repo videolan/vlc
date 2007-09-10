@@ -794,10 +794,10 @@ static void FirstDisplay( vout_thread_t *p_vout, picture_t *p_pic )
                       (LONG)CreateSolidBrush( p_vout->p_sys->i_rgb_colorkey ) );
     }
     /*
-    ** Video window is initially hidden, show it now since we got a 
+    ** Video window is initially hidden, show it now since we got a
     ** picture to show.
     */
-    SetWindowPos( p_vout->p_sys->hvideownd, NULL, 0, 0, 0, 0, 
+    SetWindowPos( p_vout->p_sys->hvideownd, NULL, 0, 0, 0, 0,
         SWP_ASYNCWINDOWPOS|
         SWP_FRAMECHANGED|
         SWP_SHOWWINDOW|
@@ -2032,7 +2032,7 @@ void SwitchWallpaperMode( vout_thread_t *p_vout, vlc_bool_t b_on )
     }
 
     /* Update desktop */
-    InvalidateRect( hwnd, NULL, TRUE );            
+    InvalidateRect( hwnd, NULL, TRUE );
     UpdateWindow( hwnd );
 }
 

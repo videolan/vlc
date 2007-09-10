@@ -149,7 +149,7 @@ typedef struct IWMCodecPrivateData_vt
     long (STDCALL *AddRef)(IUnknown *This) ;
     long (STDCALL *Release)(IUnknown *This) ;
 
-        
+ 
     long (STDCALL *SetPartialOutputType)(IWMCodecPrivateData * This,
                                          DMO_MEDIA_TYPE *pmt);
 

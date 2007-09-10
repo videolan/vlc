@@ -43,10 +43,10 @@ int aglInit( vout_thread_t * p_vout )
 {
     vlc_value_t val;
 
-    Rect viewBounds;    
+    Rect viewBounds;
     Rect clipBounds;
 
-    static const GLint ATTRIBUTES[] = { 
+    static const GLint ATTRIBUTES[] = {
         AGL_WINDOW,
         AGL_RGBA,
         AGL_NO_RECOVERY,
@@ -69,7 +69,7 @@ int aglInit( vout_thread_t * p_vout )
         msg_Err( p_vout, "No screen renderer available for required attributes." );
         return VLC_EGENERIC;
     }
-    
+ 
     p_vout->p_sys->agl_ctx = aglCreateContext(pixFormat, NULL);
     aglDestroyPixelFormat(pixFormat);
     if( NULL == p_vout->p_sys->agl_ctx )
@@ -133,7 +133,7 @@ void aglReshape( vout_thread_t * p_vout )
     unsigned int i_height = p_vout->p_sys->i_height;
     unsigned int i_width  = p_vout->p_sys->i_width;
 
-    vout_PlacePicture(p_vout, i_width, i_height, &x, &y, &i_width, &i_height); 
+    vout_PlacePicture(p_vout, i_width, i_height, &x, &y, &i_width, &i_height);
 
     glViewport( p_vout->p_sys->i_offx + x, p_vout->p_sys->i_offy + y, i_width, i_height );
 
@@ -154,7 +154,7 @@ void aglReshape( vout_thread_t * p_vout )
 }
 
 /* private event class */
-enum 
+enum
 {
     kEventClassVLCPlugin = 'vlcp',
 };
@@ -202,7 +202,7 @@ int aglManage( vout_thread_t * p_vout )
         {
             /* Close the fullscreen window and resume normal drawing */
             vlc_value_t val;
-            Rect viewBounds;    
+            Rect viewBounds;
             Rect clipBounds;
 
             var_Get( p_vout->p_libvlc, "drawable", &val );
@@ -235,10 +235,10 @@ int aglManage( vout_thread_t * p_vout )
         else
         {
             Rect deviceRect;
-            
+ 
             GDHandle deviceHdl = GetMainDevice();
             deviceRect = (*deviceHdl)->gdRect;
-            
+ 
             if( !p_vout->p_sys->theWindow )
             {
                 /* Create a window */
@@ -248,7 +248,7 @@ int aglManage( vout_thread_t * p_vout )
                             | kWindowStandardHandlerAttribute
                             | kWindowLiveResizeAttribute
                             | kWindowNoShadowAttribute;
-                                            
+ 
                 windowAttrs &= (~kWindowResizableAttribute);
 
                 CreateNewWindow(kDocumentWindowClass, windowAttrs, &deviceRect, &p_vout->p_sys->theWindow);
@@ -258,14 +258,14 @@ int aglManage( vout_thread_t * p_vout )
                     SetWindowGroup(p_vout->p_sys->theWindow, p_vout->p_sys->winGroup);
                     SetWindowGroupParent( p_vout->p_sys->winGroup, GetWindowGroupOfClass(kDocumentWindowClass) ) ;
                 }
-                
+ 
                 // Window title
                 CFStringRef titleKey    = CFSTR("Fullscreen VLC media plugin");
                 CFStringRef windowTitle = CFCopyLocalizedString(titleKey, NULL);
                 SetWindowTitleWithCFString(p_vout->p_sys->theWindow, windowTitle);
                 CFRelease(titleKey);
                 CFRelease(windowTitle);
-                
+ 
                 //Install event handler
                 static const EventTypeSpec win_events[] = {
                     { kEventClassMouse, kEventMouseDown },
@@ -317,8 +317,8 @@ int aglControl( vout_thread_t *p_vout, int i_query, va_list args )
             clipBounds.left = va_arg( args, int);
             clipBounds.bottom = va_arg( args, int);
             clipBounds.right = va_arg( args, int);
-            
-            if( !p_vout->b_fullscreen ) 
+ 
+            if( !p_vout->b_fullscreen )
             {
                 /*
                 ** check that the clip rect is not empty, as this is used
@@ -428,7 +428,7 @@ static void aglSetViewport( vout_thread_t *p_vout, Rect viewBounds, Rect clipBou
     p_vout->p_sys->i_height = viewBounds.bottom-viewBounds.top;
     p_vout->p_sys->i_offx   = -clipBounds.left - viewBounds.left;
     p_vout->p_sys->i_offy   = clipBounds.bottom + viewBounds.top
-                            - p_vout->p_sys->i_height; 
+                            - p_vout->p_sys->i_height;
 
     aglUpdateContext(p_vout->p_sys->agl_ctx);
 }
@@ -438,7 +438,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
 {
     OSStatus result = noErr;
     UInt32 class = GetEventClass (event);
-    UInt32 kind = GetEventKind (event); 
+    UInt32 kind = GetEventKind (event);
     vout_thread_t *p_vout = (vout_thread_t *)userData;
 
     result = CallNextEventHandler(nextHandler, event);
@@ -446,7 +446,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
     {
         HICommand theHICommand;
         GetEventParameter( event, kEventParamDirectObject, typeHICommand, NULL, sizeof( HICommand ), NULL, &theHICommand );
-        
+ 
         switch ( theHICommand.commandID )
         {
             default:
@@ -457,13 +457,13 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
     {
         WindowRef     window;
         Rect          rectPort = {0,0,0,0};
-        
+ 
         GetEventParameter(event, kEventParamDirectObject, typeWindowRef, NULL, sizeof(WindowRef), NULL, &window);
 
         if(window)
         {
             GetPortBounds(GetWindowPort(window), &rectPort);
-        }   
+        }
 
         switch (kind)
         {
@@ -471,7 +471,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
             case kEventWindowZoomed:
             case kEventWindowBoundsChanged:
                 break;
-            
+ 
             default:
                 result = eventNotHandledErr;
         }
@@ -483,7 +483,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
             case kEventMouseDown:
             {
                 UInt16     button;
-        
+ 
                 GetEventParameter(event, kEventParamMouseButton, typeMouseButton, NULL, sizeof(button), NULL, &button);
                 switch (button)
                 {
@@ -523,7 +523,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
             case kEventMouseUp:
             {
                 UInt16     button;
-        
+ 
                 GetEventParameter(event, kEventParamMouseButton, typeMouseButton, NULL, sizeof(button), NULL, &button);
                 switch (button)
                 {
@@ -584,10 +584,10 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
                 unsigned int i_height = p_vout->p_sys->i_height;
                 unsigned int i_width  = p_vout->p_sys->i_width;
 
-                vout_PlacePicture(p_vout, i_width, i_height, &i_x, &i_y, &i_width, &i_height); 
+                vout_PlacePicture(p_vout, i_width, i_height, &i_x, &i_y, &i_width, &i_height);
 
                 GetEventParameter(event, kEventParamWindowMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &ml);
-                
+ 
                 val.i_int = ( ((int)ml.h) - i_x ) *
                             p_vout->render.i_width / i_width;
                 var_Set( p_vout, "mouse-x", val );
@@ -602,7 +602,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
 
                 break;
             }
-            
+ 
             default:
                 result = eventNotHandledErr;
         }
@@ -646,7 +646,7 @@ int aglLock( vout_thread_t * p_vout )
 #ifdef __ppc__
     /*
      * before 10.4, we set the AGL context as current and
-     * then we retrieve and use the matching CGL context 
+     * then we retrieve and use the matching CGL context
      */
     aglSetCurrentContext(p_vout->p_sys->agl_ctx);
     return kCGLNoError != CGLLockContext( CGLGetCurrentContext() );
@@ -670,7 +670,7 @@ void aglUnlock( vout_thread_t * p_vout )
 #ifdef __ppc__
     /*
      * before 10.4, we assume that the AGL context is current.
-     * therefore, we use the current CGL context 
+     * therefore, we use the current CGL context
      */
     CGLUnlockContext( CGLGetCurrentContext() );
 #else

@@ -114,7 +114,7 @@ xlist_append (XList * list, void * data)
 
   last = xlist_tail (list);
   if (last) last->next = l;
-  l->prev = last; 
+  l->prev = last;
   return list;
 }
 
@@ -134,7 +134,7 @@ xlist_add_before (XList * list, void * data, XList * node)
   l->next = node;
   if (p) p->next = l;
   node->prev = l;
-  
+ 
   return list;
 }
 

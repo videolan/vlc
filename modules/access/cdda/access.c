@@ -73,7 +73,7 @@ static int      CDDAInit( access_t *p_access, cdda_data_t *p_cdda ) ;
  * Private functions
  ****************************************************************************/
 
-/* process messages that originate from libcdio. 
+/* process messages that originate from libcdio.
    called by CDDAOpen
 */
 static void
@@ -165,7 +165,7 @@ uninit_log_handler( cdio_log_level_t level, const char message[] )
     /* gl_default_cdio_log_handler (level, message); */
 }
 
-/* Only used in audio control mode. Gets the current LSN from the 
+/* Only used in audio control mode. Gets the current LSN from the
    CD-ROM drive. */
 static int64_t get_audio_position ( access_t *p_access )
 {
@@ -220,7 +220,7 @@ static block_t * CDDAReadBlocks( access_t * p_access )
     cdda_data_t *p_cdda   = (cdda_data_t *) p_access->p_sys;
     int          i_blocks = p_cdda->i_blocks_per_read;
 
-    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_LSN), 
+    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_LSN),
                 "called i_lsn: %d i_pos: %lld, size: %lld",
                 p_cdda->i_lsn, p_access->info.i_pos, p_access->info.i_size );
 
@@ -288,8 +288,8 @@ static block_t * CDDAReadBlocks( access_t * p_access )
     {
         msg_Err( p_access, "cannot get a new block of size: %i",
                 i_blocks * CDIO_CD_FRAMESIZE_RAW );
-        intf_UserFatal( p_access, VLC_FALSE, _("CD reading failed"), 
-                        _("VLC could not get a new block of size: %i."), 
+        intf_UserFatal( p_access, VLC_FALSE, _("CD reading failed"),
+                        _("VLC could not get a new block of size: %i."),
                         i_blocks * CDIO_CD_FRAMESIZE_RAW );
         return NULL;
     }
@@ -534,7 +534,7 @@ static bool cdda_play_track( access_t *p_access, track_t i_track )
     p_cdda->i_track = i_track;
 
     /* set up the frame boundaries for this particular track */
-    p_cdda->first_frame = p_cdda->i_lsn = 
+    p_cdda->first_frame = p_cdda->i_lsn =
     cdio_get_track_lsn( p_cdda->p_cdio, i_track );
 
     p_cdda->last_frame  = cdio_get_track_lsn( p_cdda->p_cdio, i_track+1 ) - 1;
@@ -1099,7 +1099,7 @@ static int CDDAInit( access_t *p_access, cdda_data_t *p_cdda )
     return VLC_SUCCESS;
 }
 
-/* 
+/*
  * Local variables:
  *  mode: C
  *  style: gnu

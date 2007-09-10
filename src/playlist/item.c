@@ -54,8 +54,8 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
     b_play = var_CreateGetBool( p_playlist, "playlist-autostart" );
 
     /* This part is really hakish, but this playlist system isn't simple */
-    /* First check if we haven't already added the item as we are 
-     * listening using the onelevel and the category representent 
+    /* First check if we haven't already added the item as we are
+     * listening using the onelevel and the category representent
      * (Because of the playlist design) */
     p_child_in_category = playlist_ItemFindFromInputAndRoot(
                             p_playlist, p_child->i_id,
@@ -85,8 +85,8 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
                     p_item_in_category, VLC_TRUE );
             p_item_in_category->p_input->i_type = ITEM_TYPE_PLAYLIST;
         }
-        
-        playlist_BothAddInput( p_playlist, p_child, p_item_in_category, 
+ 
+        playlist_BothAddInput( p_playlist, p_child, p_item_in_category,
                 PLAYLIST_APPEND | PLAYLIST_SPREPARSE , PLAYLIST_END,
                 NULL, NULL,  VLC_TRUE );
 
@@ -96,7 +96,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
                           VLC_TRUE, p_item_in_category, NULL );
         }
     }
-    
+ 
     PL_UNLOCK;
 
 }
@@ -118,7 +118,7 @@ static void uninstall_input_item_observer( playlist_item_t * p_item,
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                       input_item_subitem_added,
                       p_item );
-                      
+ 
 }
 
 /*****************************************************************************

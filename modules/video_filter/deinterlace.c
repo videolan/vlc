@@ -1012,7 +1012,7 @@ static void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
     while( (uintptr_t)p_s1 % 16 )
     {
         *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
-    }        
+    }
     p_end = p_dest + i_bytes - 16;
     while( p_dest < p_end )
     {

@@ -674,7 +674,7 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strncmp( sub->codecName(), "G726", 4 ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 'g', '7', '2', '6' ); 
+                    tk->fmt.i_codec = VLC_FOURCC( 'g', '7', '2', '6' );
                     tk->fmt.audio.i_rate = 8000;
                     tk->fmt.audio.i_channels = 1;
                     if( !strcmp( sub->codecName()+5, "40" ) )
@@ -1558,7 +1558,7 @@ static void TaskInterrupt( void *p_private )
 }
 
 /*****************************************************************************
- *  
+ *
  *****************************************************************************/
 static void TimeoutPrevention( timeout_thread_t *p_timeout )
 {

@@ -23,7 +23,7 @@
 
 #include <vlc/vlc.h>
 
-/* 
+/*
    Minimum, maximum and default number of blocks we allow on read.
 */
 #define MIN_BLOCKS_PER_READ 1
@@ -40,19 +40,19 @@ int  CDDBEnabledCB( vlc_object_t *p_this, const char *psz_name,
 
 
 int  CDTextEnabledCB( vlc_object_t *p_this, const char *psz_name,
-			  vlc_value_t oldval, vlc_value_t val,
-			  void *p_data );
+              vlc_value_t oldval, vlc_value_t val,
+              void *p_data );
 
 int  CDTextPreferCB( vlc_object_t *p_this, const char *psz_name,
-			 vlc_value_t oldval, vlc_value_t val,
-			 void *p_data );
+             vlc_value_t oldval, vlc_value_t val,
+             void *p_data );
 
 int  CDDANavModeCB( vlc_object_t *p_this, const char *psz_name,
-		    vlc_value_t oldval, vlc_value_t val,
-		    void *p_data );
+            vlc_value_t oldval, vlc_value_t val,
+            void *p_data );
 
 
 int CDDABlocksPerReadCB ( vlc_object_t *p_this, const char *psz_name,
-			      vlc_value_t oldval, vlc_value_t val, 
-			      void *p_data );
+                  vlc_value_t oldval, vlc_value_t val,
+                  void *p_data );
 

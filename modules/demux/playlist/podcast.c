@@ -219,7 +219,7 @@ static int Demux( demux_t *p_demux )
                     psz_item_summary = strdup( psz_text );
                 }
                 SET_DATA( psz_item_date, "pubDate" )
-                SET_DATA( psz_item_category, "itunes:category" ) 
+                SET_DATA( psz_item_category, "itunes:category" )
                 SET_DATA( psz_item_duration, "itunes:duration" )
                 SET_DATA( psz_item_keywords, "itunes:keywords" )
                 SET_DATA( psz_item_subtitle, "itunes:subtitle" )

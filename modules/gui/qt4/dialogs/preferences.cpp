@@ -61,7 +61,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     types->setAlignment( Qt::AlignHCenter );
     QHBoxLayout *types_l = new QHBoxLayout(0);
     types_l->setSpacing( 3 ); types_l->setMargin( 3 );
-    small = new QRadioButton( qtr("Basic"), types ); 
+    small = new QRadioButton( qtr("Basic"), types );
     types_l->addWidget( small );
     all = new QRadioButton( qtr("All"), types ); types_l->addWidget( all );
     types->setLayout( types_l );
@@ -260,7 +260,7 @@ void PrefsDialog::apply()
         advanced_tree->applyAll();
     config_SaveConfigFile( p_intf, NULL );
 
-    /* Delete the other panel in order to force its reload after clicking 
+    /* Delete the other panel in order to force its reload after clicking
        on apply - UGLY but will work for now. */
     if( simple_panel && simple_panel->isVisible() && advanced_panel )
     {

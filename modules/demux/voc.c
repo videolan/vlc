@@ -249,8 +249,8 @@ static int ReadBlockHeader( demux_t *p_demux )
             }
             break;
 
-        case 8: 
-            /* 
+        case 8:
+            /*
              * Block 8 is a big kludge to add stereo support to block 1 :
              * A block of type 8 is always followed by a block of type 1
              * and specifies the number of channels in that 1-block
@@ -280,7 +280,7 @@ static int ReadBlockHeader( demux_t *p_demux )
             /* read subsequent block 1 */
             if( stream_Read( p_demux->s, buf, 4 ) < 4 )
                 return VLC_EGENERIC; /* EOF */
-        
+ 
             i_block_size = GetDWLE( buf ) >> 8;
             msg_Dbg( p_demux, "new block: type: %u, size: %u",
                     (unsigned)*buf, i_block_size );
@@ -350,7 +350,7 @@ static int ReadBlockHeader( demux_t *p_demux )
                     }
                     break;
 
-                default: 
+                default:
                     msg_Err( p_demux, "unsupported compression" );
                     return VLC_EGENERIC;
             }

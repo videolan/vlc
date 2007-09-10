@@ -177,7 +177,7 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     /* Test in we have an X*/
-#if defined HAVE_GETENV && (defined __WXGTK__ || defined __WXX11) 
+#if defined HAVE_GETENV && (defined __WXGTK__ || defined __WXX11)
     if( !getenv( "DISPLAY" ) )
     {
         msg_Err( p_intf, "no X server");

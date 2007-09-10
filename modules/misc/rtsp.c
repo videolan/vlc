@@ -466,7 +466,7 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
     vlc_mutex_destroy( &p_media->lock );
 
     if( p_media->psz_session_name ) free( p_media->psz_session_name );
-    if( p_media->psz_session_description ) 
+    if( p_media->psz_session_description )
         free( p_media->psz_session_description );
     if( p_media->psz_session_url ) free( p_media->psz_session_url );
     if( p_media->psz_session_email ) free( p_media->psz_session_email );
@@ -498,7 +498,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             {
                 p_es->i_payload_type = 11;
             }
-            else if( p_fmt->audio.i_channels == 2 && 
+            else if( p_fmt->audio.i_channels == 2 &&
                      p_fmt->audio.i_rate == 44100 )
             {
                 p_es->i_payload_type = 10;
@@ -578,7 +578,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
                 }
                 /* */
                 if( p_64_sps && p_64_pps )
-                    if( asprintf( &p_es->psz_fmtp, 
+                    if( asprintf( &p_es->psz_fmtp,
                                   "packetization-mode=1;profile-level-id=%s;"
                                   "sprop-parameter-sets=%s,%s;", hexa, p_64_sps,
                                   p_64_pps ) < 0 )
@@ -1074,7 +1074,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             {
                 const char *psz_position = httpd_MsgGet( query, "Range" );
                 const char *psz_scale = httpd_MsgGet( query, "Scale" );
-                if( psz_position ) 
+                if( psz_position )
                     psz_position = strstr( psz_position, "npt=" );
                 if( psz_position && !psz_scale )
                 {
@@ -1105,12 +1105,12 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                         if( psz_scale[0] == '-' ) /* rewind */
                         {
                             msg_Dbg( p_vod, "rewind request: %s", psz_scale );
-                            CommandPush( p_vod, RTSP_CMD_TYPE_REWIND, p_media, 
+                            CommandPush( p_vod, RTSP_CMD_TYPE_REWIND, p_media,
                                          psz_session, f_scale, NULL );
                         }
                         else if(psz_scale[0] != '1' ) /* fast-forward */
                         {
-                            msg_Dbg( p_vod, "fastforward request: %s", 
+                            msg_Dbg( p_vod, "fastforward request: %s",
                                      psz_scale );
                             CommandPush( p_vod, RTSP_CMD_TYPE_FORWARD, p_media,
                                          psz_session, f_scale, NULL );
@@ -1153,14 +1153,14 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             {
                 if( p_media->b_raw )
                 {
-                    if( asprintf( &psz_output, 
+                    if( asprintf( &psz_output,
                               "std{access=udp,dst=%s:%i,mux=%s}",
                               ip, i_port, p_media->psz_mux ) < 0 )
                         return VLC_ENOMEM;
                 }
                 else
                 {
-                    if( asprintf( &psz_output, 
+                    if( asprintf( &psz_output,
                               "rtp{dst=%s,port=%i,mux=%s}",
                               ip, i_port_video, p_media->psz_mux ) < 0 )
                         return VLC_ENOMEM;
@@ -1168,7 +1168,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             }
             else
             {
-                if( asprintf( &psz_output, 
+                if( asprintf( &psz_output,
                               "rtp{dst=%s,port-video=%i,port-audio=%i}",
                               ip, i_port_video, i_port_audio ) < 0 )
                     return VLC_ENOMEM;
@@ -1260,7 +1260,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                p_media->p_vod->p_sys->i_session_timeout );
          else
               httpd_MsgAdd( answer, "Session", "%s", psz_session );
-    } 
+    }
 
     return VLC_SUCCESS;
 }

@@ -2217,7 +2217,7 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
 
 /*
  * 3 types: for audio
- * 
+ *
  */
 #define QT_V0_MAX_SAMPLES 1024
 static int MP4_TrackSampleSize( mp4_track_t *p_track )

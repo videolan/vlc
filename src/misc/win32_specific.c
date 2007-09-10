@@ -73,7 +73,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 
 #ifndef HAVE_RELEASE
     {
-        /* remove trailing \.libs from executable dir path if seen, 
+        /* remove trailing \.libs from executable dir path if seen,
            we assume we are running vlc through libtool wrapper in build dir */
         int offset  = strlen(psz_path)-sizeof("\\.libs")+1;
         if( offset > 0 )

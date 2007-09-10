@@ -49,7 +49,7 @@ static CFArrayRef copy_all_locale_indentifiers(void)
     while ( (file = readdir(dir)) )
     {
         /* we should probably filter out garbage */
-        /* we can't use CFStringCreateWithFileSystemRepresentation as it is 
+        /* we can't use CFStringCreateWithFileSystemRepresentation as it is
          * supported only on post-10.4 (and this function is only for pre-10.4) */
         CFStringRef locale = CFStringCreateWithCString( kCFAllocatorDefault, file->d_name, kCFStringEncodingUTF8 );
         CFArrayAppendValue( available_locales, (void*)locale );
@@ -107,7 +107,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
         /*
            Retrieve the preferred language as chosen in  System Preferences.app
            (note that CFLocaleCopyCurrent() is not used because it returns the
-            prefered locale not language) 
+            prefered locale not language)
         */
         CFArrayRef all_locales, preferred_locales;
         char psz_locale[50];

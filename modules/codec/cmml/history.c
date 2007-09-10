@@ -53,7 +53,7 @@ static void history_Dump( history_t *p_history );
 history_t *history_New( void )
 {
    history_t *p_new_history;
-   
+ 
    p_new_history = calloc( 1, sizeof( struct history_t ) );
    if( p_new_history == NULL ) return NULL;
 

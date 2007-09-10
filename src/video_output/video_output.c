@@ -1642,7 +1642,7 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
     {
         i_now = mdate();
         i_stop = i_now + (mtime_t)(p_vout->i_title_timeout * 1000);
-        char *psz_nowplaying = 
+        char *psz_nowplaying =
             input_item_GetNowPlaying( input_GetItem( p_input ) );
         char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
         char *psz_name = input_item_GetTitle( input_GetItem( p_input ) );

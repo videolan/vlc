@@ -101,7 +101,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('l','p','c','m')
          && p_dec->fmt_in.i_codec != VLC_FOURCC('l','p','c','b') )
-    {   
+    {
         return VLC_EGENERIC;
     }
 

@@ -72,7 +72,7 @@
 #   endif
 #endif
 #ifdef HAVE_TIME_H
-#   include <time.h> 
+#   include <time.h>
 #endif
 #undef TS_DEBUG
 
@@ -458,7 +458,7 @@ static int Open( vlc_object_t *p_this )
     {
         i_packet_size = TS_PACKET_SIZE_188;
 #if 0
-        /* I used the TF5000PVR 2004 Firmware .doc header documentation, 
+        /* I used the TF5000PVR 2004 Firmware .doc header documentation,
          * http://www.i-topfield.com/data/product/firmware/Structure%20of%20Recorded%20File%20in%20TF5000PVR%20(Feb%2021%202004).doc
          * but after the filename the offsets seem to be incorrect.  - DJ */
         int i_duration, i_name;
@@ -489,7 +489,7 @@ static int Open( vlc_object_t *p_this )
         // 4 bytes of freq. Uimsbf (56,57,58,59)
         // 2 bytes of symbol rate Uimsbf (60,61)
         // 2 bytes of TS stream ID Uimsbf (62,63)
-        // 4 bytes reserved 
+        // 4 bytes reserved
         // 2 bytes reserved
         // 2 bytes duration Uimsbf (70,71)
         //i_duration = (int) (p_peek[70] << 8) | p_peek[71];
@@ -1768,7 +1768,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     const vlc_bool_t b_adaptation = p[3]&0x20;
     const vlc_bool_t b_payload    = p[3]&0x10;
     const int        i_cc         = p[3]&0x0f;   /* continuity counter */
-    vlc_bool_t       b_discontinuity = VLC_FALSE;/* discontinuity */    
+    vlc_bool_t       b_discontinuity = VLC_FALSE;/* discontinuity */
 
     /* transport_scrambling_control is ignored */
     int         i_skip = 0;
@@ -2586,7 +2586,7 @@ static int64_t EITConvertStartTime( uint64_t i_date )
 }
 static int EITConvertDuration( uint32_t i_duration )
 {
-    return CVT_FROM_BCD(i_duration >> 16) * 3600 + 
+    return CVT_FROM_BCD(i_duration >> 16) * 3600 +
            CVT_FROM_BCD(i_duration >> 8 ) * 60 +
            CVT_FROM_BCD(i_duration      );
 }
@@ -3494,7 +3494,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     ( p_dr->p_data[4] << 8 ) | p_dr->p_data[5];
                 pid->es->fmt.video.i_height =
                     ( p_dr->p_data[6] << 8 ) | p_dr->p_data[7];
-                pid->es->fmt.i_extra = 
+                pid->es->fmt.i_extra =
                     (p_dr->p_data[8] << 8) | p_dr->p_data[9];
 
                 if( pid->es->fmt.i_extra > 0 )

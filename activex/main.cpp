@@ -147,7 +147,7 @@ STDAPI DllUnregisterServer(VOID)
 
     // remove component categories we supports
     ICatRegister *pcr;
-    if( SUCCEEDED(CoCreateInstance(CLSID_StdComponentCategoriesMgr, 
+    if( SUCCEEDED(CoCreateInstance(CLSID_StdComponentCategoriesMgr,
             NULL, CLSCTX_INPROC_SERVER, IID_ICatRegister, (void**)&pcr)) ) {
         CATID implCategories[] = {
             CATID_Control,
@@ -314,7 +314,7 @@ STDAPI DllRegisterServer(VOID)
 
     // indicate which component categories we support
     ICatRegister *pcr;
-    if( SUCCEEDED(CoCreateInstance(CLSID_StdComponentCategoriesMgr, 
+    if( SUCCEEDED(CoCreateInstance(CLSID_StdComponentCategoriesMgr,
             NULL, CLSCTX_INPROC_SERVER, IID_ICatRegister, (void**)&pcr)) ) {
         CATID implCategories[] = {
             CATID_Control,

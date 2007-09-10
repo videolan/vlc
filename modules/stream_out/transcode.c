@@ -1319,7 +1319,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         msg_Err( p_stream, "cannot find decoder" );
         return VLC_EGENERIC;
     }
-    id->p_decoder->fmt_out.audio.i_bitspersample = 
+    id->p_decoder->fmt_out.audio.i_bitspersample =
         audio_BitsPerSample( id->p_decoder->fmt_out.i_codec );
     fmt_last = id->p_decoder->fmt_out;
     /* Fix AAC SBR changing number of channels and sampling rate */

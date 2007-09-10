@@ -31,7 +31,7 @@ PyPosition_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 {
     PyPosition *self;
     static char *kwlist[] = { "value", "origin", "key", NULL};
-    
+ 
     self = PyObject_New( PyPosition, &PyPosition_Type );
 
     self->value=0;
@@ -43,27 +43,27 @@ PyPosition_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
                                       &(self->origin),
                                       &(self->key) ) )
     {
-        return NULL;        
+        return NULL;
     }
 
-    if( self->key != mediacontrol_MediaTime 
-	&& self->key != mediacontrol_ByteCount
-	&& self->key != mediacontrol_SampleCount ) 
+    if( self->key != mediacontrol_MediaTime
+    && self->key != mediacontrol_ByteCount
+    && self->key != mediacontrol_SampleCount )
     {
         PyErr_SetString ( MediaControl_InternalException, "Invalid key value" );
         return NULL;
     }
 
-    if( self->origin != mediacontrol_AbsolutePosition 
-	&& self->origin != mediacontrol_RelativePosition
-	&& self->origin != mediacontrol_ModuloPosition ) 
+    if( self->origin != mediacontrol_AbsolutePosition
+    && self->origin != mediacontrol_RelativePosition
+    && self->origin != mediacontrol_ModuloPosition )
     {
         PyErr_SetString ( MediaControl_InternalException, "Invalid origin value" );
         return NULL;
     }
 
     Py_INCREF( self );
-    return ( PyObject * )self;    
+    return ( PyObject * )self;
 }
 
 mediacontrol_PositionKey

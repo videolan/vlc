@@ -148,7 +148,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( p_dec->fmt_in.audio.i_channels <= 0 ||
         p_dec->fmt_in.audio.i_channels > 5 )
     {
-        msg_Err( p_dec, "invalid number of channel (not between 1 and 5): %i", 
+        msg_Err( p_dec, "invalid number of channel (not between 1 and 5): %i",
                  p_dec->fmt_in.audio.i_channels );
         return VLC_EGENERIC;
     }

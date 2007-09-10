@@ -66,9 +66,9 @@ struct mpeg2_decoder_s
     /* next inside a slice, and is never used outside of mpeg2_slice() */
 
     /* bit parsing stuff */
-    uint32_t bitstream_buf;		/* current 32 bit working set */
-    int bitstream_bits;			/* used bits in working set */
-    const uint8_t * bitstream_ptr;	/* buffer with stream data */
+    uint32_t bitstream_buf;        /* current 32 bit working set */
+    int bitstream_bits;            /* used bits in working set */
+    const uint8_t * bitstream_ptr;    /* buffer with stream data */
 
     uint8_t * dest[3];
 
@@ -203,7 +203,7 @@ struct mpeg2dec_s
     mpeg2_picture_t new_picture;
     mpeg2_picture_t pictures[4];
     mpeg2_picture_t * picture;
-    /*const*/ mpeg2_fbuf_t * fbuf[3];	/* 0: current fbuf, 1-2: prediction fbufs */
+    /*const*/ mpeg2_fbuf_t * fbuf[3];    /* 0: current fbuf, 1-2: prediction fbufs */
 
     fbuf_alloc_t fbuf_alloc[3];
     int custom_fbuf;
@@ -281,7 +281,7 @@ typedef struct {
     mpeg2_mc_fct * avg [8];
 } mpeg2_mc_t;
 
-#define MPEG2_MC_EXTERN(x) mpeg2_mc_t mpeg2_mc_##x = {			  \
+#define MPEG2_MC_EXTERN(x) mpeg2_mc_t mpeg2_mc_##x = {              \
     {MC_put_o_16_##x, MC_put_x_16_##x, MC_put_y_16_##x, MC_put_xy_16_##x, \
      MC_put_o_8_##x,  MC_put_x_8_##x,  MC_put_y_8_##x,  MC_put_xy_8_##x}, \
     {MC_avg_o_16_##x, MC_avg_x_16_##x, MC_avg_y_16_##x, MC_avg_xy_16_##x, \

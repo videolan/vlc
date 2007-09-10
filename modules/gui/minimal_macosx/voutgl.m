@@ -57,7 +57,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
     var_Get( p_vout->p_libvlc, "drawable", &value_drawable );
-    
+ 
     if( 0 /* Are we in the mozilla plugin ? XXX: get that from drawable */ )
     {
         p_vout->pf_init             = aglInit;

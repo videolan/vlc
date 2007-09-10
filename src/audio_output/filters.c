@@ -148,7 +148,7 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
     if( *pi_nb_filters + 1 > AOUT_MAX_FILTERS )
     {
         msg_Err( p_aout, "max filter reached (%d)", AOUT_MAX_FILTERS );
-        intf_UserFatal( p_aout, VLC_FALSE, _("Audio filtering failed"), 
+        intf_UserFatal( p_aout, VLC_FALSE, _("Audio filtering failed"),
                         _("The maximum number of filters (%d) was reached."),
                         AOUT_MAX_FILTERS );
         return -1;
@@ -195,7 +195,7 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
     {
         ReleaseFilter( pp_filters[0] );
         msg_Err( p_aout, "max filter reached (%d)", AOUT_MAX_FILTERS );
-        intf_UserFatal( p_aout, VLC_FALSE, _("Audio filtering failed"), 
+        intf_UserFatal( p_aout, VLC_FALSE, _("Audio filtering failed"),
                         _("The maximum number of filters (%d) was reached."),
                         AOUT_MAX_FILTERS );
         return -1;
@@ -218,7 +218,7 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
         {
             ReleaseFilter( pp_filters[0] );
             msg_Err( p_aout, "max filter reached (%d)", AOUT_MAX_FILTERS );
-            intf_UserFatal( p_aout, VLC_FALSE, _("Audio filtering failed"), 
+            intf_UserFatal( p_aout, VLC_FALSE, _("Audio filtering failed"),
                             _("The maximum number of filters (%d) was reached."),
                             AOUT_MAX_FILTERS );
             return -1;

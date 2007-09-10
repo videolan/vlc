@@ -265,7 +265,7 @@ static const GUID VLC_KSDATAFORMAT_SUBTYPE_PCM = {0xE923AABF, 0xCB58, 0x4471, {0
 #define KSDATAFORMAT_SUBTYPE_PCM VLC_KSDATAFORMAT_SUBTYPE_PCM
 #endif
 
-#ifndef _KSDATAFORMAT_SUBTYPE_UNKNOWN_ 
+#ifndef _KSDATAFORMAT_SUBTYPE_UNKNOWN_
 #define _KSDATAFORMAT_SUBTYPE_UNKNOWN_ {0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}
 static const GUID VLC_KSDATAFORMAT_SUBTYPE_UNKNOWN = {0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
 #define KSDATAFORMAT_SUBTYPE_UNKNOWN VLC_KSDATAFORMAT_SUBTYPE_UNKNOWN
@@ -383,7 +383,7 @@ static inline void sf_tag_to_fourcc( GUID *guid_tag,
 {
     int i;
 
-    for( i = 0; !guidcmp( &sub_format_tag_to_fourcc[i].guid_tag, 
+    for( i = 0; !guidcmp( &sub_format_tag_to_fourcc[i].guid_tag,
                           &KSDATAFORMAT_SUBTYPE_UNKNOWN ); i++ )
     {
         if( guidcmp( &sub_format_tag_to_fourcc[i].guid_tag, guid_tag ) ) break;

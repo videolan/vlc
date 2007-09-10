@@ -48,13 +48,13 @@ int new;          //how many new samples
 
 void initPCM(int samples)
 {
-  int i; 
+  int i;
 
   //Allocate memory for PCM data buffer
   PCMd = (double **)malloc(2 * sizeof(double *));
   PCMd[0] = (double *)malloc(samples * sizeof(double));
   PCMd[1] = (double *)malloc(samples * sizeof(double));
-  
+ 
   maxsamples=samples;
   new=0;
 
@@ -83,15 +83,15 @@ void addPCM(int16_t PCMdata[2][512])
   int i,j;
   int samples=512;
 
-	 for(i=0;i<samples;i++)
-	   {
-	     j=i+start;
-	     PCMd[0][j%maxsamples]=(PCMdata[0][i]/16384.0);
-	     PCMd[1][j%maxsamples]=(PCMdata[1][i]/16384.0);  
-	   }
-       
+     for(i=0;i<samples;i++)
+       {
+         j=i+start;
+         PCMd[0][j%maxsamples]=(PCMdata[0][i]/16384.0);
+         PCMd[1][j%maxsamples]=(PCMdata[1][i]/16384.0);
+       }
  
-	 // printf("Added %d samples %d %d %f\n",samples,start,(start+samples)%maxsamples,PCM[0][start+10]); 
+ 
+     // printf("Added %d samples %d %d %f\n",samples,start,(start+samples)%maxsamples,PCM[0][start+10]);
 
  start+=samples;
  start=start%maxsamples;
@@ -113,28 +113,28 @@ void addPCM(int16_t PCMdata[2][512])
 void getPCM(double *PCMdata, int samples, int channel, int freq, double smoothing, int derive)
 {
    int i,index;
-   
+ 
    index=start-1;
 
    if (index<0) index=maxsamples+index;
 
    PCMdata[0]=PCMd[channel][index];
-   
+ 
    for(i=1;i<samples;i++)
      {
        index=start-1-i;
        if (index<0) index=maxsamples+index;
-       
+ 
        PCMdata[i]=(1-smoothing)*PCMd[channel][index]+smoothing*PCMdata[i-1];
      }
-   
+ 
    //return derivative of PCM data
    if(derive)
      {
        for(i=0;i<samples-1;i++)
-	 {	   
-	   PCMdata[i]=PCMdata[i]-PCMdata[i+1];
-	 }
+     {    
+       PCMdata[i]=PCMdata[i]-PCMdata[i+1];
+     }
        PCMdata[samples-1]=0;
      }
 
@@ -142,7 +142,7 @@ void getPCM(double *PCMdata, int samples, int channel, int freq, double smoothin
    if (freq) rdft(samples, 1, PCMdata, ip, w);
 
 
-     
+ 
 }
 
 //getPCMnew
@@ -154,28 +154,28 @@ void getPCM(double *PCMdata, int samples, int channel, int freq, double smoothin
 int getPCMnew(double *PCMdata, int channel, int freq, double smoothing, int derive, int reset)
 {
    int i,index;
-   
+ 
    index=start-1;
 
    if (index<0) index=maxsamples+index;
 
    PCMdata[0]=PCMd[channel][index];
-   
+ 
    for(i=1;i<new;i++)
      {
        index=start-1-i;
        if (index<0) index=maxsamples+index;
-       
+ 
        PCMdata[i]=(1-smoothing)*PCMd[channel][index]+smoothing*PCMdata[i-1];
      }
-   
+ 
    //return derivative of PCM data
    if(derive)
      {
        for(i=0;i<new-1;i++)
-	 {	   
-	   PCMdata[i]=PCMdata[i]-PCMdata[i+1];
-	 }
+     {    
+       PCMdata[i]=PCMdata[i]-PCMdata[i+1];
+     }
        PCMdata[new-1]=0;
      }
 

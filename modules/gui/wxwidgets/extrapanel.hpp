@@ -58,7 +58,7 @@ namespace wxvlc
         wxPanel *EqzPanel( wxWindow * );
         wxPanel *AudioPanel( wxWindow * );
         wxNotebook *notebook;
-    
+ 
         /* Equalizer */
         wxCheckBox *eq_chkbox;
         wxCheckBox *eq_2p_chkbox;
@@ -71,7 +71,7 @@ namespace wxvlc
         wxSlider *band_sliders[10];
         wxStaticText *band_texts[10];
         int i_values[10];
-    
+ 
         void OnEnableEqualizer( wxCommandEvent& );
         void OnRestoreDefaults( wxCommandEvent& );
         void OnChangeEqualizer( wxScrollEvent& );

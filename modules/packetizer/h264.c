@@ -245,7 +245,7 @@ static int Open( vlc_object_t *p_this )
         /* FIXME: FFMPEG isn't happy at all if you leave this */
         if( p_dec->fmt_out.i_extra ) free( p_dec->fmt_out.p_extra );
         p_dec->fmt_out.i_extra = 0; p_dec->fmt_out.p_extra = NULL;
-        
+ 
         /* Set the new extradata */
         p_dec->fmt_out.i_extra = p_sys->p_pps->i_buffer + p_sys->p_sps->i_buffer;
         p_dec->fmt_out.p_extra = (uint8_t*)malloc( p_dec->fmt_out.i_extra );
@@ -258,10 +258,10 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        /* This type of stream contains data with 3 of 4 byte startcodes 
+        /* This type of stream contains data with 3 of 4 byte startcodes
          * The fmt_in.p_extra MAY contain SPS/PPS with 4 byte startcodes
          * The fmt_out.p_extra should be the same */
-         
+ 
         /* Set callback */
         p_dec->pf_packetize = Packetize;
 
@@ -523,7 +523,7 @@ static inline int bs_read_se( bs_t *s )
 
 /*****************************************************************************
  * ParseNALBlock: parses annexB type NALs
- * All p_frag blocks are required to start with 0 0 0 1 4-byte startcode 
+ * All p_frag blocks are required to start with 0 0 0 1 4-byte startcode
  *****************************************************************************/
 static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 {

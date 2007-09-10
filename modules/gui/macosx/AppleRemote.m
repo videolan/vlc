@@ -3,10 +3,10 @@
  * AppleRemote
  * $Id$
  *
- * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
+ * Created by Martin Kahr on 11.03.06 under a MIT-style license.
  * Copyright (c) 2006 martinkahr.com. All rights reserved.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a 
+ * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -18,7 +18,7 @@
  *
  * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -29,7 +29,7 @@
  * Note that changes made by any members or contributors of the VideoLAN team
  * (i.e. changes that were exclusively checked in to one of VideoLAN's source code
  * repositories) are licensed under the GNU General Public License version 2,
- * or (at your option) any later version. 
+ * or (at your option) any later version.
  * Thus, the following statements apply to our changes:
  *
  * Copyright (C) 2006-2007 the VideoLAN team
@@ -65,7 +65,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 
 #pragma public interface
 
-- (id) init {   
+- (id) init {
     if ( self = [super init] ) {
         openInExclusiveMode = YES;
         queue = NULL;
@@ -73,8 +73,8 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
         cookieToButtonMapping = [[NSMutableDictionary alloc] init];
 
         [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Plus]  forKey:@"14_12_11_6_"];
-        [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Minus] forKey:@"14_13_11_6_"];     
-        [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu]         forKey:@"14_7_6_14_7_6_"];      
+        [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Minus] forKey:@"14_13_11_6_"];
+        [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu]         forKey:@"14_7_6_14_7_6_"];
         [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]         forKey:@"14_8_6_14_8_6_"];
         [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight]        forKey:@"14_9_6_14_9_6_"];
         [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft]         forKey:@"14_10_6_14_10_6_"];
@@ -82,7 +82,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
         [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft_Hold]    forKey:@"14_6_3_2_"];
         [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu_Hold]    forKey:@"14_6_14_6_"];
         [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Sleep]   forKey:@"18_14_6_18_14_6_"];
-        [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]   forKey:@"19_"]; 
+        [cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]   forKey:@"19_"];
 
         /* defaults */
         [self setSimulatesPlusMinusHold: YES];
@@ -111,18 +111,18 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
     return remoteId;
 }
 
-- (BOOL) isRemoteAvailable {    
+- (BOOL) isRemoteAvailable {
     io_object_t hidDevice = [self findAppleRemoteDevice];
     if (hidDevice != 0) {
         IOObjectRelease(hidDevice);
         return YES;
     } else {
-        return NO;      
+        return NO;
     }
 }
 
 - (BOOL) isListeningToRemote {
-    return (hidDeviceInterface != NULL && allCookies != NULL && queue != NULL); 
+    return (hidDeviceInterface != NULL && allCookies != NULL && queue != NULL);
 }
 
 - (void) setListeningToRemote: (BOOL) value {
@@ -135,7 +135,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 
 /* Delegates are not retained!
  * http://developer.apple.com/documentation/Cocoa/Conceptual/CocoaFundamentals/CommunicatingWithObjects/chapter_6_section_4.html
- * Delegating objects do not (and should not) retain their delegates. 
+ * Delegating objects do not (and should not) retain their delegates.
  * However, clients of delegating objects (applications, usually) are responsible for ensuring that their delegates are around
  * to receive delegation messages. To do this, they may have to retain the delegate. */
 - (void) setDelegate: (id) _delegate {
@@ -212,7 +212,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
     simulatePlusMinusHold = value;
 }
 
-- (IBAction) startListening: (id) sender {  
+- (IBAction) startListening: (id) sender {
     if ([self isListeningToRemote]) return;
 
     io_object_t hidDevice = [self findAppleRemoteDevice];
@@ -234,19 +234,19 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 error:
     [self stopListening:self];
 
-cleanup:    
+cleanup:
     IOObjectRelease(hidDevice);
 }
 
 - (IBAction) stopListening: (id) sender {
     if (queue != NULL) {
-        (*queue)->stop(queue);      
+        (*queue)->stop(queue);
 
         //dispose of queue
-        (*queue)->dispose(queue);       
+        (*queue)->dispose(queue);
 
         //release the queue we allocated
-        (*queue)->Release(queue);   
+        (*queue)->Release(queue);
 
         queue = NULL;
     }
@@ -260,20 +260,20 @@ cleanup:
         //close the device
         (*hidDeviceInterface)->close(hidDeviceInterface);
 
-        //release the interface 
+        //release the interface
         (*hidDeviceInterface)->Release(hidDeviceInterface);
 
-        hidDeviceInterface = NULL;      
-    }   
+        hidDeviceInterface = NULL;
+    }
 }
 
 @end
 
-@implementation AppleRemote (Singleton) 
+@implementation AppleRemote (Singleton)
 
 static AppleRemote* sharedInstance=nil;
 
-+ (AppleRemote*) sharedRemote { 
++ (AppleRemote*) sharedRemote {
     @synchronized(self) {
         if (sharedInstance == nil) {
             sharedInstance = [[self alloc] init];
@@ -286,7 +286,7 @@ static AppleRemote* sharedInstance=nil;
         if (sharedInstance == nil) {
             return [super allocWithZone:zone];
         }
-    }   
+    }
     return sharedInstance;
 }
 - (id)copyWithZone:(NSZone *)zone {
@@ -307,7 +307,7 @@ static AppleRemote* sharedInstance=nil;
 
 @end
 
-@implementation AppleRemote (PrivateMethods) 
+@implementation AppleRemote (PrivateMethods)
 
 - (void) setRemoteId: (int) value {
     remoteId = value;
@@ -332,7 +332,7 @@ static AppleRemote* sharedInstance=nil;
     NSString* key;
     while(key = [keyEnum nextObject]) {
         NSRange range = [cookieString rangeOfString:key];
-        if (range.location == 0) return key; 
+        if (range.location == 0) return key;
     }
     return nil;
 }
@@ -357,7 +357,7 @@ static AppleRemote* sharedInstance=nil;
                 if (pressedDown) {
                     lastPlusMinusEvent = event;
                     lastPlusMinusEventTime = [NSDate timeIntervalSinceReferenceDate];
-                    [self performSelector:@selector(sendSimulatedPlusMinusEvent:) 
+                    [self performSelector:@selector(sendSimulatedPlusMinusEvent:)
                                withObject:[NSNumber numberWithDouble:lastPlusMinusEventTime]
                                afterDelay:HOLD_RECOGNITION_TIME_INTERVAL];
                     return;
@@ -393,29 +393,29 @@ static AppleRemote* sharedInstance=nil;
                 timeNumber = [NSNumber numberWithDouble:lastClickCountEventTime];
                 eventNumber= [NSNumber numberWithUnsignedInt:event];
             }
-            [self performSelector: @selector(executeClickCountEvent:) 
+            [self performSelector: @selector(executeClickCountEvent:)
                        withObject: [NSArray arrayWithObjects:eventNumber, timeNumber, nil]
                        afterDelay: maxClickTimeDifference];
         } else {
             [delegate appleRemoteButton:event pressedDown: pressedDown clickCount:1];
-        }       
+        }
     }
 }
 
 - (void) executeClickCountEvent: (NSArray*) values {
-    AppleRemoteEventIdentifier event = [[values objectAtIndex: 0] unsignedIntValue]; 
+    AppleRemoteEventIdentifier event = [[values objectAtIndex: 0] unsignedIntValue];
     NSTimeInterval eventTimePoint = [[values objectAtIndex: 1] doubleValue];
 
     BOOL finishedClicking = NO;
-    int finalClickCount = eventClickCount;  
+    int finalClickCount = eventClickCount;
 
     @synchronized(self) {
         finishedClicking = (event != lastClickCountEvent || eventTimePoint == lastClickCountEventTime);
-        if (finishedClicking) eventClickCount = 0;      
+        if (finishedClicking) eventClickCount = 0;
     }
 
-    if (finishedClicking) { 
-        [delegate appleRemoteButton:event pressedDown: YES clickCount:finalClickCount];     
+    if (finishedClicking) {
+        [delegate appleRemoteButton:event pressedDown: YES clickCount:finalClickCount];
         if ([self simulatesPlusMinusHold]==NO && (event == kRemoteButtonVolume_Minus || event == kRemoteButtonVolume_Plus)) {
             // trigger a button release event, too
             [NSThread sleepUntilDate: [NSDate dateWithTimeIntervalSinceNow:0.1]];
@@ -430,7 +430,7 @@ static AppleRemote* sharedInstance=nil;
     if (previousRemainingCookieString) {
         cookieString = [previousRemainingCookieString stringByAppendingString: cookieString];
         NSLog(@"New cookie string is %@", cookieString);
-        [previousRemainingCookieString release], previousRemainingCookieString=nil;                         
+        [previousRemainingCookieString release], previousRemainingCookieString=nil;
     }*/
     if (cookieString == nil || [cookieString length] == 0) return;
     NSNumber* buttonId = [[self cookieToButtonMapping] objectForKey: cookieString];
@@ -441,21 +441,21 @@ static AppleRemote* sharedInstance=nil;
         // happen when the main thread is too busy to handle all incoming events in time.
         NSString* subCookieString;
         NSString* lastSubCookieString=nil;
-        while(subCookieString = [self validCookieSubstring: cookieString]) {            
+        while(subCookieString = [self validCookieSubstring: cookieString]) {
             cookieString = [cookieString substringFromIndex: [subCookieString length]];
             lastSubCookieString = subCookieString;
             if (processesBacklog) [self handleEventWithCookieString: subCookieString sumOfValues:sumOfValues];
         }
         if (processesBacklog == NO && lastSubCookieString != nil) {
             // process the last event of the backlog and assume that the button is not pressed down any longer.
-            // The events in the backlog do not seem to be in order and therefore (in rare cases) the last event might be 
-            // a button pressed down event while in reality the user has released it. 
+            // The events in the backlog do not seem to be in order and therefore (in rare cases) the last event might be
+            // a button pressed down event while in reality the user has released it.
             // NSLog(@"processing last event of backlog");
             [self handleEventWithCookieString: lastSubCookieString sumOfValues:0];
         }
         if ([cookieString length] > 0) {
             NSLog(@"Unknown button for cookiestring %@", cookieString);
-        }       
+        }
     }
 }
 
@@ -464,20 +464,20 @@ static AppleRemote* sharedInstance=nil;
 /*  Callback method for the device queue
 Will be called for any event of any type (cookie) to which we subscribe
 */
-static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, void* sender) { 
+static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, void* sender) {
     AppleRemote* remote = (AppleRemote*)target;
 
-    IOHIDEventStruct event; 
+    IOHIDEventStruct event;
     AbsoluteTime     zeroTime = {0,0};
     NSMutableString* cookieString = [NSMutableString string];
     SInt32           sumOfValues = 0;
     while (result == kIOReturnSuccess)
     {
-        result = (*[remote queue])->getNextEvent([remote queue], &event, zeroTime, 0);      
+        result = (*[remote queue])->getNextEvent([remote queue], &event, zeroTime, 0);
         if ( result != kIOReturnSuccess )
             continue;
 
-        //printf("%d %d %d\n", event.elementCookie, event.value, event.longValue);      
+        //printf("%d %d %d\n", event.elementCookie, event.value, event.longValue);
 
         if (REMOTE_SWITCH_COOKIE == (int)event.elementCookie) {
             [remote setRemoteId: event.value];
@@ -487,10 +487,10 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
                 sumOfValues+=event.value;
                 [cookieString appendString:[NSString stringWithFormat:@"%d_", event.elementCookie]];
             }
-        }               
+        }
     }
 
-    [remote handleEventWithCookieString: cookieString sumOfValues: sumOfValues];    
+    [remote handleEventWithCookieString: cookieString sumOfValues: sumOfValues];
 }
 
 @implementation AppleRemote (IOKitMethods)
@@ -532,7 +532,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 
 - (io_object_t) findAppleRemoteDevice {
     CFMutableDictionaryRef hidMatchDictionary = NULL;
-    IOReturn ioReturnValue = kIOReturnSuccess;  
+    IOReturn ioReturnValue = kIOReturnSuccess;
     io_iterator_t hidObjectIterator = 0;
     io_object_t hidDevice = 0;
 
@@ -573,9 +573,9 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 
     if (success == kIOReturnSuccess) {
 
-        [elements autorelease];     
+        [elements autorelease];
         /*
-        cookies = calloc(NUMBER_OF_APPLE_REMOTE_ACTIONS, sizeof(IOHIDElementCookie)); 
+        cookies = calloc(NUMBER_OF_APPLE_REMOTE_ACTIONS, sizeof(IOHIDElementCookie));
         memset(cookies, 0, sizeof(IOHIDElementCookie) * NUMBER_OF_APPLE_REMOTE_ACTIONS);
         */
         allCookies = [[NSMutableArray alloc] init];
@@ -591,12 +591,12 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 
             //Get usage
             object = [element valueForKey: (NSString*)CFSTR(kIOHIDElementUsageKey) ];
-            if (object == nil || ![object isKindOfClass:[NSNumber class]]) continue;            
+            if (object == nil || ![object isKindOfClass:[NSNumber class]]) continue;
             usage = [object longValue];
 
             //Get usage page
             object = [element valueForKey: (NSString*)CFSTR(kIOHIDElementUsagePageKey) ];
-            if (object == nil || ![object isKindOfClass:[NSNumber class]]) continue;            
+            if (object == nil || ![object isKindOfClass:[NSNumber class]]) continue;
             usagePage = [object longValue];
 
             [allCookies addObject: [NSNumber numberWithInt:(int)cookie]];
@@ -612,8 +612,8 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
     HRESULT  result;
 
     IOHIDOptionsType openMode = kIOHIDOptionsTypeNone;
-    if ([self isOpenInExclusiveMode]) openMode = kIOHIDOptionsTypeSeizeDevice;  
-    IOReturn ioReturnValue = (*hidDeviceInterface)->open(hidDeviceInterface, openMode); 
+    if ([self isOpenInExclusiveMode]) openMode = kIOHIDOptionsTypeSeizeDevice;
+    IOReturn ioReturnValue = (*hidDeviceInterface)->open(hidDeviceInterface, openMode);
 
     if (ioReturnValue == KERN_SUCCESS) {
         queue = (*hidDeviceInterface)->allocQueue(hidDeviceInterface);
@@ -632,9 +632,9 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
             if (ioReturnValue == KERN_SUCCESS) {
                 ioReturnValue = (*queue)->setEventCallout(queue,QueueCallbackFunction, self, NULL);
                 if (ioReturnValue == KERN_SUCCESS) {
-                    CFRunLoopAddSource(CFRunLoopGetCurrent(), eventSource, kCFRunLoopDefaultMode);                  
+                    CFRunLoopAddSource(CFRunLoopGetCurrent(), eventSource, kCFRunLoopDefaultMode);
                     //start data delivery to queue
-                    (*queue)->start(queue); 
+                    (*queue)->start(queue);
                     return YES;
                 } else {
                     NSLog(@"Error when setting event callout");
@@ -646,7 +646,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
             NSLog(@"Error when opening device");
         }
     }
-    return NO;              
+    return NO;
 }
 
 @end
@@ -680,19 +680,19 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 
     if ([applicationDelegate respondsToSelector: @selector(applicationDidBecomeActive:)]) {
         [applicationDelegate applicationDidBecomeActive: aNotification];
-    }   
+    }
 }
 - (void)applicationWillResignActive:(NSNotification *)aNotification {
     [[AppleRemote sharedRemote] setListeningToRemote: NO];
 
     if ([applicationDelegate respondsToSelector: @selector(applicationWillResignActive:)]) {
         [applicationDelegate applicationWillResignActive: aNotification];
-    }       
+    }
 }
 - (void)applicationDidResignActive:(NSNotification *)aNotification {
     if ([applicationDelegate respondsToSelector: @selector(applicationDidResignActive:)]) {
         [applicationDelegate applicationDidResignActive: aNotification];
-    }   
+    }
 }
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
@@ -713,4 +713,3 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 
     [invocation invokeWithTarget:applicationDelegate];
 }
-@end

@@ -59,7 +59,7 @@ public:
                      unsigned int * );
     void ReleaseWindow( void * );
     int  ControlWindow( void *, int, va_list );
-        
+ 
     HWND p_child_window; // public because of menu
 
 private:
@@ -188,7 +188,7 @@ void VideoWindow::ReleaseWindow( void *p_window )
 FUNCTION:
   WndProc
 
-PURPOSE: 
+PURPOSE:
   Processes messages sent to the main window.
 
 ***********************************************************************/

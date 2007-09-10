@@ -430,7 +430,7 @@ int E_(Activate) ( vlc_object_t *p_this )
 #endif
 
 #ifdef HAVE_OSSO
-    p_vout->p_sys->i_backlight_on_counter = i_backlight_on_interval; 
+    p_vout->p_sys->i_backlight_on_counter = i_backlight_on_interval;
     p_vout->p_sys->p_octx = osso_initialize( "vlc", VERSION, 0, NULL );
     if ( p_vout->p_sys->p_octx == NULL ) {
         msg_Err( p_vout, "Could not get osso context" );
@@ -499,7 +499,7 @@ void E_(Deactivate) ( vlc_object_t *p_this )
 #ifdef HAVE_XSP
     DisablePixelDoubling(p_vout);
 #endif
-	    
+    
     DestroyCursor( p_vout );
     EnableXScreenSaver( p_vout );
     DestroyWindow( p_vout, &p_vout->p_sys->original_window );
@@ -1034,7 +1034,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                     first_field);
 
     XVMCUNLOCKDISPLAY( p_vout->p_sys->p_display );
-    if( p_vout->p_sys->xvmc_deinterlace_method == 2 ) 
+    if( p_vout->p_sys->xvmc_deinterlace_method == 2 )
     {   /* BOB DEINTERLACE */
         if( p_picture->p_sys->nb_display == 0 )/* && ((t2-t1) < 15000)) */
         {
@@ -1519,13 +1519,13 @@ static int ManageVideo( vout_thread_t *p_vout )
 #ifdef MODULE_NAME_IS_xvmc
     xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
 #endif
-    
+ 
 #ifdef HAVE_OSSO
     if ( p_vout->p_sys->p_octx != NULL ) {
         if ( p_vout->p_sys->i_backlight_on_counter == i_backlight_on_interval ) {
             if ( osso_display_blanking_pause( p_vout->p_sys->p_octx ) != OSSO_OK ) {
                 msg_Err( p_vout, "Could not disable backlight blanking" );
-	    } else {
+        } else {
                 msg_Dbg( p_vout, "Backlight blanking disabled" );
             }
             p_vout->p_sys->i_backlight_on_counter = 0;
@@ -1534,7 +1534,7 @@ static int ManageVideo( vout_thread_t *p_vout )
         }
     }
 #endif
-	    
+    
     vlc_mutex_unlock( &p_vout->p_sys->lock );
     return 0;
 }
@@ -1908,7 +1908,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_pic->p_sys->p_image =
             CreateImage( p_vout, p_vout->p_sys->p_display,
 #if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
-                         p_vout->p_sys->i_xvport, 
+                         p_vout->p_sys->i_xvport,
                          VLC2X11_FOURCC(p_vout->output.i_chroma),
                          p_pic->format.i_bits_per_pixel,
 #else
@@ -2232,7 +2232,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
 #ifdef HAVE_XSP
         EnablePixelDoubling( p_vout );
 #endif
-		
+        
     }
     else
     {

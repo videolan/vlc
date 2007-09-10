@@ -35,7 +35,7 @@ extern "C" {
 # endif
 
 /**
- * A position may have different origins: 
+ * A position may have different origins:
  *  - absolute counts from the movie start
  *  - relative counts from the current position
  *  - modulo counts from the current position and wraps at the end of the movie

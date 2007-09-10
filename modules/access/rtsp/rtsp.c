@@ -247,7 +247,7 @@ static int rtsp_get_answers( rtsp_client_t *rtsp )
           {
               if( strcmp( buf, rtsp->p_private->session ) )
               {
-                  //fprintf( stderr, 
+                  //fprintf( stderr,
                   //         "rtsp: warning: setting NEW session: %s\n", buf );
                   free( rtsp->p_private->session );
                   rtsp->p_private->session = strdup( buf );
@@ -491,7 +491,7 @@ int rtsp_connect( rtsp_client_t *rtsp, const char *psz_mrl,
     colon = strchr( mrl_ptr, ':' );
 
     if( !slash ) slash = mrl_ptr + strlen(mrl_ptr) + 1;
-    if( !colon ) colon = slash; 
+    if( !colon ) colon = slash;
     if( colon > slash ) colon = slash;
 
     pathbegin = slash - mrl_ptr;
@@ -544,7 +544,7 @@ int rtsp_connect( rtsp_client_t *rtsp, const char *psz_mrl,
 }
 
 /*
- * closes an rtsp connection 
+ * closes an rtsp connection
  */
 
 void rtsp_close( rtsp_client_t *rtsp )
@@ -630,7 +630,7 @@ void rtsp_schedule_field( rtsp_client_t *rtsp, const char *string )
 }
 
 /*
- * removes the first scheduled field which prefix matches string. 
+ * removes the first scheduled field which prefix matches string.
  */
 
 void rtsp_unschedule_field( rtsp_client_t *rtsp, const char *string )

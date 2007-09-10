@@ -89,7 +89,7 @@ libvlc_instance_t * libvlc_new( int argc, char **argv,
     if( !p_new ) RAISENULL( "Out of memory" );
 
     /** \todo Look for interface settings. If we don't have any, add -I dummy */
-    /* Because we probably don't want a GUI by default */    
+    /* Because we probably don't want a GUI by default */
 
     if( libvlc_InternalInit( p_libvlc_int, argc, argv ) )
         RAISENULL( "VLC initialization failed" );
@@ -100,7 +100,7 @@ libvlc_instance_t * libvlc_new( int argc, char **argv,
     p_new->p_callback_list = NULL;
     vlc_mutex_init(p_libvlc_int, &p_new->instance_lock);
     vlc_mutex_init(p_libvlc_int, &p_new->event_callback_lock);
-    
+ 
     libvlc_event_init(p_new, p_e);
 
     return p_new;

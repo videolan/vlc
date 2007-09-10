@@ -217,7 +217,7 @@ void libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
         libvlc_exception_raise( p_e, "No Memory left" );
         return;
     }
-    
+ 
     listener->event_type = event_type;
     listener->p_user_data = p_user_data;
     listener->pf_callback = pf_callback;

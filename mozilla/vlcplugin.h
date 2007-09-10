@@ -57,11 +57,11 @@
 class VlcPlugin
 {
 public:
-             VlcPlugin( NPP, uint16 ); 
+             VlcPlugin( NPP, uint16 );
     virtual ~VlcPlugin();
 
     NPError             init(int argc, char* const argn[], char* const argv[]);
-    libvlc_instance_t*  getVLC() 
+    libvlc_instance_t*  getVLC()
                             { return libvlc_instance; };
     NPP                 getBrowser()
                             { return p_browser; };

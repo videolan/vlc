@@ -336,31 +336,31 @@ typedef GrafPtr                         CGrafPtr;
 
 /*  codec capabilities flags    */
 enum {
-    codecCanScale               = 1L << 0,	// 1
-    codecCanMask                = 1L << 1,	// 2
-    codecCanMatte               = 1L << 2,	// 4
-    codecCanTransform           = 1L << 3,	// 8
-    codecCanTransferMode        = 1L << 4,	// 10
-    codecCanCopyPrev            = 1L << 5,	// 20
-    codecCanSpool               = 1L << 6,	// 40
-    codecCanClipVertical        = 1L << 7,	// 80
-    codecCanClipRectangular     = 1L << 8,	// 100
-    codecCanRemapColor          = 1L << 9,	// 200
-    codecCanFastDither          = 1L << 10,	// 400
-    codecCanSrcExtract          = 1L << 11,	// 800
-    codecCanCopyPrevComp        = 1L << 12,	// 1000
-    codecCanAsync               = 1L << 13,	// 2000
-    codecCanMakeMask            = 1L << 14,	// 4000
-    codecCanShift               = 1L << 15,	// 8000
-    codecCanAsyncWhen           = 1L << 16,	// 10000
-    codecCanShieldCursor        = 1L << 17,	// 20000
-    codecCanManagePrevBuffer    = 1L << 18,	// 40000
+    codecCanScale               = 1L << 0,    // 1
+    codecCanMask                = 1L << 1,    // 2
+    codecCanMatte               = 1L << 2,    // 4
+    codecCanTransform           = 1L << 3,    // 8
+    codecCanTransferMode        = 1L << 4,    // 10
+    codecCanCopyPrev            = 1L << 5,    // 20
+    codecCanSpool               = 1L << 6,    // 40
+    codecCanClipVertical        = 1L << 7,    // 80
+    codecCanClipRectangular     = 1L << 8,    // 100
+    codecCanRemapColor          = 1L << 9,    // 200
+    codecCanFastDither          = 1L << 10,    // 400
+    codecCanSrcExtract          = 1L << 11,    // 800
+    codecCanCopyPrevComp        = 1L << 12,    // 1000
+    codecCanAsync               = 1L << 13,    // 2000
+    codecCanMakeMask            = 1L << 14,    // 4000
+    codecCanShift               = 1L << 15,    // 8000
+    codecCanAsyncWhen           = 1L << 16,    // 10000
+    codecCanShieldCursor        = 1L << 17,    // 20000
+    codecCanManagePrevBuffer    = 1L << 18,    // 40000
     codecHasVolatileBuffer      = 1L << 19,     // 80000                /* codec requires redraw after window movement */
-    codecWantsRegionMask        = 1L << 20,	// 100000
+    codecWantsRegionMask        = 1L << 20,    // 100000
     codecImageBufferIsOnScreen  = 1L << 21,     // 200000                /* old def of codec using overlay surface, = ( codecIsDirectToScreenOnly | codecUsesOverlaySurface | codecImageBufferIsOverlaySurface | codecSrcMustBeImageBuffer ) */
     codecWantsDestinationPixels = 1L << 22,     // 400000
     codecWantsSpecialScaling    = 1L << 23,     // 800000
-    codecHandlesInputs          = 1L << 24,	// 1000000
+    codecHandlesInputs          = 1L << 24,    // 1000000
     codecCanDoIndirectSurface   = 1L << 25,                     /* codec can handle indirect surface (GDI) */
     codecIsSequenceSensitive    = 1L << 26,
     codecRequiresOffscreen      = 1L << 27,
@@ -382,24 +382,24 @@ enum {
 /*  codec condition flags   */
 // FFD =  13 = 8+4+1
 enum {
-    codecConditionFirstBand     = 1L << 0,	// 1
-    codecConditionLastBand      = 1L << 1,	// 2
-    codecConditionFirstFrame    = 1L << 2,	// 4
-    codecConditionNewDepth      = 1L << 3,	// 8
-    codecConditionNewTransform  = 1L << 4,	// 10
-    codecConditionNewSrcRect    = 1L << 5,	// 20
-    codecConditionNewMask       = 1L << 6,	// 40
-    codecConditionNewMatte      = 1L << 7,	// 80
-    codecConditionNewTransferMode = 1L << 8,	// 100
-    codecConditionNewClut       = 1L << 9,	// 200
-    codecConditionNewAccuracy   = 1L << 10,	// 400
-    codecConditionNewDestination = 1L << 11,	// 800
-    codecConditionFirstScreen   = 1L << 12,	// 1000
-    codecConditionDoCursor      = 1L << 13,	// 2000
-    codecConditionCatchUpDiff   = 1L << 14,	// 4000
-    codecConditionMaskMayBeChanged = 1L << 15,	// 8000
-    codecConditionToBuffer      = 1L << 16,	// 10000
-    codecConditionCodecChangedMask = 1L << 31	// 20000
+    codecConditionFirstBand     = 1L << 0,    // 1
+    codecConditionLastBand      = 1L << 1,    // 2
+    codecConditionFirstFrame    = 1L << 2,    // 4
+    codecConditionNewDepth      = 1L << 3,    // 8
+    codecConditionNewTransform  = 1L << 4,    // 10
+    codecConditionNewSrcRect    = 1L << 5,    // 20
+    codecConditionNewMask       = 1L << 6,    // 40
+    codecConditionNewMatte      = 1L << 7,    // 80
+    codecConditionNewTransferMode = 1L << 8,    // 100
+    codecConditionNewClut       = 1L << 9,    // 200
+    codecConditionNewAccuracy   = 1L << 10,    // 400
+    codecConditionNewDestination = 1L << 11,    // 800
+    codecConditionFirstScreen   = 1L << 12,    // 1000
+    codecConditionDoCursor      = 1L << 13,    // 2000
+    codecConditionCatchUpDiff   = 1L << 14,    // 4000
+    codecConditionMaskMayBeChanged = 1L << 15,    // 8000
+    codecConditionToBuffer      = 1L << 16,    // 10000
+    codecConditionCodecChangedMask = 1L << 31    // 20000
 };
 
 
@@ -627,8 +627,8 @@ static inline void dump_ImageDescription(void* xxx){
     int i;
 
     for(i=0;i<id->idSize;i++){
-	printf(" %02X",((unsigned char*)id)[i]);
-	if((i%16)==15) printf("\n");
+    printf(" %02X",((unsigned char*)id)[i]);
+    if((i%16)==15) printf("\n");
     }
     printf("\n");
 
@@ -637,16 +637,16 @@ static inline void dump_ImageDescription(void* xxx){
     printf("idSize=0x%X  fourcc=0x%08X\n",id->idSize,id->cType);
     printf("ver=%d rev=%d vendor=0x%08X\n",id->version,id->revisionLevel,id->vendor);
     printf("tempQ=%d spatQ=%d  dim: %d x %d  dpi: %d x %d  depth: %d\n",
-	id->temporalQuality,id->spatialQuality,
-	id->width, id->height,
-	id->hRes, id->vRes,
-	id->depth);
+    id->temporalQuality,id->spatialQuality,
+    id->width, id->height,
+    id->hRes, id->vRes,
+    id->depth);
     printf("dataSize=%d frameCount=%d clutID=%d\n",id->dataSize, id->frameCount, id->clutID);
     printf("name='%.*s'\n",((char*)(&id->name))[0],((char*)(&id->name))+1);
     x=((char*)(&id->clutID))+2;
     if(id->idSize>sizeof(ImageDescription)){
-	printf("%02X %02X %02X %02X | %02X %02X %02X %02X | %02X %02X %02X %02X | %02X %02X %02X %02X\n",
-	x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9],x[10],x[11],x[12],x[13],x[14],x[15]);
+    printf("%02X %02X %02X %02X | %02X %02X %02X %02X | %02X %02X %02X %02X | %02X %02X %02X %02X\n",
+    x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9],x[10],x[11],x[12],x[13],x[14],x[15]);
     }
     printf("=========================================================\n");
 }
@@ -658,9 +658,9 @@ static inline void dump_Rect(char* title,Rect *r){
 
 static inline void dump_MatrixRecord(char* title, MatrixRecord *m){
     printf("%s: [%d %d %d][%d %d %d][%d %d %d]\n",title,
-	m->matrix[0][0],m->matrix[0][1],m->matrix[0][2],
-	m->matrix[1][0],m->matrix[1][1],m->matrix[1][2],
-	m->matrix[2][0],m->matrix[2][1],m->matrix[2][2]);
+    m->matrix[0][0],m->matrix[0][1],m->matrix[0][2],
+    m->matrix[1][0],m->matrix[1][1],m->matrix[1][2],
+    m->matrix[2][0],m->matrix[2][1],m->matrix[2][2]);
 }
 
 static inline void dump_PixMap(void* xxx){
@@ -669,11 +669,11 @@ static inline void dump_PixMap(void* xxx){
     printf("base=%p  stride=%d\n",p->baseAddr, p->rowBytes);
     dump_Rect("bounds",&p->bounds);
     printf("pmVersion=0x%X packType=0x%X\n packSize=0x%X\n",
-	p->pmVersion,p->packType, p->packSize);
+    p->pmVersion,p->packType, p->packSize);
     printf("hRes=0x%X vRes=0x%X pixelType=0x%X pixelSize=0x%X\n",
-	p->hRes,p->vRes,p->pixelType,p->pixelSize);
+    p->hRes,p->vRes,p->pixelType,p->pixelSize);
     printf("cmpCount=0x%X cmpSize=0x%X pixelFormat=0x%X\n",
-	p->cmpCount,p->cmpSize,p->pixelFormat);
+    p->cmpCount,p->cmpSize,p->pixelFormat);
     printf("pmTable=%p pmExt=%p\n",p->pmTable,p->pmExt);
     printf("=========================================================\n");
 }
@@ -684,8 +684,8 @@ static inline void dump_CodecCapabilities(void* xxx){
     printf("=============== CodecCapabilities at %p =================\n",xxx);
     printf("flags=0x%X  flags2=0x%X\n",cc->flags,cc->flags2);
     printf("wantedPixelSize=%d extendWidth=%d extendHeight=%d band=%d+%d\n",
-	cc->wantedPixelSize,cc->extendWidth,cc->extendHeight,
-	cc->bandMin,cc->bandInc);
+    cc->wantedPixelSize,cc->extendWidth,cc->extendHeight,
+    cc->bandMin,cc->bandInc);
     printf("pad=0x%X  time=0x%X\n",cc->pad,cc->time);
     printf("=========================================================\n");
 }
@@ -699,36 +699,36 @@ static inline void dump_CodecDecompressParams(void* xxx){
     printf("sequenceID=%d\n",cd->sequenceID);
     idh=cd->imageDescription;
     if(idh && idh[0]) dump_ImageDescription(idh[0]);
-    
+ 
     for(i=0;i<sizeof(CodecDecompressParams);i++){
-	printf(" %02X",((unsigned char*)cd)[i]);
-	if((i%16)==15) printf("\n");
+    printf(" %02X",((unsigned char*)cd)[i]);
+    if((i%16)==15) printf("\n");
     }
     printf("\n");
-    
+ 
     printf("data=%p  size=%d\n",cd->data,cd->bufferSize);
     printf("frameno=%d  lines: %d .. %d   condflags=0x%X  callerflags=0x%X\n",
-	cd->frameNumber, cd->startLine, cd->stopLine, cd->conditionFlags,cd->callerFlags);
+    cd->frameNumber, cd->startLine, cd->stopLine, cd->conditionFlags,cd->callerFlags);
 //    printf("maskBits=%p mattePixMap=%p\n",
-//	cd->maskBits,cd->mattePixMap);
+//    cd->maskBits,cd->mattePixMap);
     dump_PixMap(&cd->dstPixMap);
 //    if(cd->mattePixMap) dump_PixMap(cd->mattePixMap);
     if(cd->matrix) dump_MatrixRecord("matrix",cd->matrix);
     if(cd->capabilities) dump_CodecCapabilities(cd->capabilities);
     printf("accuracy=%d  transferMode=%d  matrixFlags=0x%X matrixType=%d\n",
-	(int)cd->accuracy, (int)cd->transferMode, (int)cd->matrixFlags, (int)cd->matrixType);
+    (int)cd->accuracy, (int)cd->transferMode, (int)cd->matrixFlags, (int)cd->matrixType);
     printf("srcrect: %d;%d - %d;%d\n",cd->srcRect.top,cd->srcRect.left,cd->srcRect.bottom,cd->srcRect.right);
     printf("dstrect: %d;%d - %d;%d\n",cd->dstRect.top,cd->dstRect.left,cd->dstRect.bottom,cd->dstRect.right);
     printf("wantedDestinationPixelTypes=%p\n",cd->wantedDestinationPixelTypes);
     if(cd->wantedDestinationPixelTypes){
-	unsigned int* p=cd->wantedDestinationPixelTypes;
-	while(p[0]){
-	    printf("  0x%08X %.4s\n",p[0],&p[0]);
-	    ++p;
-	}
+    unsigned int* p=cd->wantedDestinationPixelTypes;
+    while(p[0]){
+        printf("  0x%08X %.4s\n",p[0],&p[0]);
+        ++p;
+    }
     }
     printf("screenFloodMethod=%d value=%d  preferredOffscreenPixelSize=%d\n",
-	cd->screenFloodMethod, cd->screenFloodValue, cd->preferredOffscreenPixelSize);
+    cd->screenFloodMethod, cd->screenFloodValue, cd->preferredOffscreenPixelSize);
     printf("callbacks: progress=%p compl=%p data=%p ftime=%p srcdata=%p sync=%p\n",
      cd->progressProcRecord, cd->completionProcRecord,
      cd->dataProcRecord, cd->frameTime, cd->sourceData, cd->syncFrameTime);

@@ -550,7 +550,7 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
         psz_af = var_GetString( p_aout, "audio-filter" );
         if( var_GetBool( p_aout, "equalizer-2pass" ) )
             eq_2p_chkbox->SetValue( true );
-	vlc_object_release( p_aout );
+    vlc_object_release( p_aout );
     }
     else
     {

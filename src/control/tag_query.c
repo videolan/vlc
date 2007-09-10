@@ -25,7 +25,7 @@
 #include "vlc_arrays.h"
 
 /* XXX This API is in construction
- * 
+ *
  * It's goal is to represent a meta tag query
  * It should be also able to say if a query can be matched in a media
  * descriptor through libvlc_query_match.
@@ -44,20 +44,20 @@ libvlc_tag_query_t *
 libvlc_tag_query_new( libvlc_instance_t * p_inst,
                       libvlc_exception_t * p_e )
 {
-	(void)p_e;
+    (void)p_e;
     libvlc_tag_query_t * p_q;
 
-	p_q = malloc(sizeof(libvlc_tag_query_t));
+    p_q = malloc(sizeof(libvlc_tag_query_t));
 
-	if( !p_q )
-		return NULL;
-	
-	p_q->p_libvlc_instance = p_inst;
+    if( !p_q )
+        return NULL;
+    
+    p_q->p_libvlc_instance = p_inst;
     p_q->i_refcount = 1;
     p_q->tag = NULL;
     p_q->psz_tag_key = NULL;
 
-	return p_q;
+    return p_q;
 }
 
 /**************************************************************************
@@ -74,8 +74,8 @@ void libvlc_tag_query_release( libvlc_tag_query_t * p_q )
 
     free( p_q->tag );
     free( p_q->psz_tag_key );
-        
-	free( p_q );
+ 
+    free( p_q );
 }
 
 /**************************************************************************
@@ -85,7 +85,7 @@ void libvlc_tag_query_release( libvlc_tag_query_t * p_q )
  **************************************************************************/
 void libvlc_tag_query_retain( libvlc_tag_query_t * p_q )
 {
-	p_q->i_refcount++;
+    p_q->i_refcount++;
 }
 
 /**************************************************************************
@@ -115,7 +115,7 @@ libvlc_tag_query_match( libvlc_tag_query_t * p_q,
     int i;
     struct libvlc_tags_storage_t * p_ts;
     (void)p_e;
-    
+ 
     if( !p_q->psz_tag_key )
         return 1;
 

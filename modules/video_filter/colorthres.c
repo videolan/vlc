@@ -68,7 +68,7 @@ vlc_module_begin();
         change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
     add_integer( CFG_PREFIX "saturationthres", 20, NULL,
                  _("Saturaton threshold"), "", VLC_FALSE );
-    add_integer( CFG_PREFIX "similaritythres", 15, NULL, 
+    add_integer( CFG_PREFIX "similaritythres", 15, NULL,
                  _("Similarity threshold"), "", VLC_FALSE );
     set_callbacks( Create, Destroy );
 vlc_module_end();

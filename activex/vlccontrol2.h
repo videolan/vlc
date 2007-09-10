@@ -248,7 +248,7 @@ public:
     // IVLCMessageIterator methods
     STDMETHODIMP get_hasNext(VARIANT_BOOL*);
     STDMETHODIMP next(IVLCMessage**);
-    
+ 
 protected:
     HRESULT loadTypeInfo();
 

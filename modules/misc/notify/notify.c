@@ -80,7 +80,7 @@ static int Open( vlc_object_t *p_this )
     intf_thread_t   *p_intf = (intf_thread_t *)p_this;
     playlist_t      *p_playlist;
     intf_sys_t      *p_sys  = malloc( sizeof( intf_sys_t ) );
-    
+ 
     if( !p_sys )
     {
         msg_Err( p_intf, "Out of memory" );
@@ -213,7 +213,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     else /* else we show state-of-the art logo */
         pix = gdk_pixbuf_new_from_file( DATA_PATH "/vlc48x48.png", &p_error );
 
-    /* we need to replace '&' with '&amp;' because '&' is a keyword of 
+    /* we need to replace '&' with '&amp;' because '&' is a keyword of
      * notification-daemon parser */
     int i_notify, i_len, i;
     i_len = strlen( psz_tmp );

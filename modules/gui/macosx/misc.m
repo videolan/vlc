@@ -80,7 +80,7 @@ static NSMutableArray *blackoutWindows = NULL;
 + (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID
 {
     int i;
-    
+ 
     for( i = 0; i < [[NSScreen screens] count]; i++ )
     {
         NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
@@ -113,13 +113,13 @@ static NSMutableArray *blackoutWindows = NULL;
     [blackoutWindows makeObjectsPerformSelector:@selector(close)];
     [blackoutWindows removeAllObjects];
 
-    
+ 
     for(i = 0; i < [[NSScreen screens] count]; i++)
     {
         NSScreen *screen = [[NSScreen screens] objectAtIndex: i];
         VLCWindow *blackoutWindow;
         NSRect screen_rect;
-        
+ 
         if([self isScreen: screen])
             continue;
 
@@ -134,7 +134,7 @@ static NSMutableArray *blackoutWindows = NULL;
                 backing: NSBackingStoreBuffered defer: NO screen: screen];
         [blackoutWindow setBackgroundColor:[NSColor blackColor]];
         [blackoutWindow setLevel: NSFloatingWindowLevel]; /* Disappear when Expose is triggered */
-        
+ 
         [blackoutWindow orderFront: self animate: YES];
 
         [blackoutWindows addObject: blackoutWindow];
@@ -187,7 +187,7 @@ static NSMutableArray *blackoutWindows = NULL;
 - (void)closeAndAnimate: (BOOL)animate
 {
     NSInvocation *invoc;
-    
+ 
     if (!animate || MACOS_VERSION < 10.4f)
     {
         [super close];
@@ -268,7 +268,7 @@ static NSMutableArray *blackoutWindows = NULL;
     NSViewAnimation *anim;
     NSViewAnimation *current_anim;
     NSMutableDictionary *dict;
-    
+ 
     if (!animate || MACOS_VERSION < 10.4f)
     {
         [super orderFront: sender];
@@ -290,11 +290,11 @@ static NSMutableArray *blackoutWindows = NULL;
     dict = [[NSMutableDictionary alloc] initWithCapacity:2];
 
     [dict setObject:self forKey:NSViewAnimationTargetKey];
-    
+ 
     [dict setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
     anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict, nil]];
     [dict release];
-    
+ 
     [anim setAnimationBlockingMode:NSAnimationNonblocking];
     [anim setDuration:0.5];
     [anim setFrameRate:30];
@@ -392,13 +392,13 @@ static NSMutableArray *blackoutWindows = NULL;
 
 - (void)awakeFromNib
 {
-    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSTIFFPboardType, 
+    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSTIFFPboardType,
         NSFilenamesPboardType, nil]];
 }
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) 
+    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask])
                 == NSDragOperationGeneric)
     {
         return NSDragOperationGeneric;
@@ -479,13 +479,13 @@ static NSMutableArray *blackoutWindows = NULL;
 
 - (void)awakeFromNib
 {
-    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSTIFFPboardType, 
+    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSTIFFPboardType,
         NSFilenamesPboardType, nil]];
 }
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) 
+    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask])
                 == NSDragOperationGeneric)
     {
         return NSDragOperationGeneric;
@@ -553,7 +553,7 @@ void _drawKnobInRect(NSRect knobRect)
     // Center knob in given rect
     knobRect.origin.x += (int)((float)(knobRect.size.width - 7)/2.0);
     knobRect.origin.y += (int)((float)(knobRect.size.height - 7)/2.0);
-    
+ 
     // Draw diamond
     NSRectFillUsingOperation(NSMakeRect(knobRect.origin.x + 3, knobRect.origin.y + 6, 1, 1), NSCompositeSourceOver);
     NSRectFillUsingOperation(NSMakeRect(knobRect.origin.x + 2, knobRect.origin.y + 5, 3, 1), NSCompositeSourceOver);
@@ -580,7 +580,7 @@ void _drawFrameInRect(NSRect frameRect)
     NSRectClip(NSZeroRect);
     [super drawRect:rect];
     [[NSGraphicsContext currentContext] restoreGraphicsState];
-    
+ 
     // Full size
     rect = [self bounds];
     int diff = (int)(([[self cell] knobThickness] - 7.0)/2.0) - 1;
@@ -588,13 +588,13 @@ void _drawFrameInRect(NSRect frameRect)
     rect.origin.y += diff;
     rect.size.width -= 2*diff-2;
     rect.size.height -= 2*diff;
-    
+ 
     // Draw dark
     NSRect knobRect = [[self cell] knobRectFlipped:NO];
     [[[NSColor blackColor] colorWithAlphaComponent:0.6] set];
     _drawFrameInRect(rect);
     _drawKnobInRect(knobRect);
-    
+ 
     // Draw shadow
     [[[NSColor blackColor] colorWithAlphaComponent:0.1] set];
     rect.origin.x++;
@@ -625,7 +625,7 @@ void _drawFrameInRect(NSRect frameRect)
         [newCell setAction:[oldCell action]];
         [newCell setControlSize:[oldCell controlSize]];
         [newCell setType:[oldCell type]];
-        [newCell setState:[oldCell state]]; 
+        [newCell setState:[oldCell state]];
         [newCell setAllowsTickMarkValuesOnly:[oldCell allowsTickMarkValuesOnly]];
         [newCell setAltIncrementValue:[oldCell altIncrementValue]];
         [newCell setControlTint:[oldCell controlTint]];
@@ -677,12 +677,12 @@ void _drawFrameInRect(NSRect frameRect)
 
     [[self controlView] lockFocus];
     [knob compositeToPoint:NSMakePoint( knob_rect.origin.x + 1,
-        knob_rect.origin.y + knob_rect.size.height -2 )  
+        knob_rect.origin.y + knob_rect.size.height -2 )
         operation:NSCompositeSourceOver];
     [[self controlView] unlockFocus];
 }
 
-- (void)stopTracking:(NSPoint)lastPoint at:(NSPoint)stopPoint inView: 
+- (void)stopTracking:(NSPoint)lastPoint at:(NSPoint)stopPoint inView:
         (NSView *)controlView mouseIsUp:(BOOL)flag
 {
     b_mouse_down = NO;

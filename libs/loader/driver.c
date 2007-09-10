@@ -97,9 +97,9 @@ void SetCodecPath(const char* path)
     if(needs_free)free(def_path);
     if(path==0)
     {
-	def_path=WIN32_PATH;
-	needs_free=0;
-	return;
+    def_path=WIN32_PATH;
+    needs_free=0;
+    return;
     }
     def_path = (char*) malloc(strlen(path)+1);
     strcpy(def_path, path);
@@ -109,7 +109,7 @@ void SetCodecPath(const char* path)
 static DWORD dwDrvID = 0;
 
 LRESULT WINAPI SendDriverMessage(HDRVR hDriver, UINT message,
-				 LPARAM lParam1, LPARAM lParam2)
+                 LPARAM lParam1, LPARAM lParam2)
 {
     DRVR* module=(DRVR*)hDriver;
     int result;
@@ -146,21 +146,21 @@ void DrvClose(HDRVR hDriver)
 {
     if (hDriver)
     {
-	DRVR* d = (DRVR*)hDriver;
-	if (d->hDriverModule)
-	{
+    DRVR* d = (DRVR*)hDriver;
+    if (d->hDriverModule)
+    {
 #ifdef WIN32_LOADER
-	    Setup_FS_Segment();
+        Setup_FS_Segment();
 #endif
-	    if (d->DriverProc)
-	    {
-		SendDriverMessage(hDriver, DRV_CLOSE, 0, 0);
-		d->dwDriverID = 0;
-		SendDriverMessage(hDriver, DRV_FREE, 0, 0);
-	    }
-	    FreeLibrary(d->hDriverModule);
-	}
-	free(d);
+        if (d->DriverProc)
+        {
+        SendDriverMessage(hDriver, DRV_CLOSE, 0, 0);
+        d->dwDriverID = 0;
+        SendDriverMessage(hDriver, DRV_FREE, 0, 0);
+        }
+        FreeLibrary(d->hDriverModule);
+    }
+    free(d);
     }
 #ifdef WIN32_LOADER
     CodecRelease();
@@ -184,7 +184,7 @@ HDRVR DrvOpen(LPARAM lParam2)
 
     hDriver = (NPDRVR) malloc(sizeof(DRVR));
     if (!hDriver)
-	return ((HDRVR) 0);
+    return ((HDRVR) 0);
     memset((void*)hDriver, 0, sizeof(DRVR));
 
 #ifdef WIN32_LOADER
@@ -195,18 +195,18 @@ HDRVR DrvOpen(LPARAM lParam2)
     hDriver->hDriverModule = LoadLibraryA(filename);
     if (!hDriver->hDriverModule)
     {
-	printf("Can't open library %s\n", filename);
-	DrvClose((HDRVR)hDriver);
-	return ((HDRVR) 0);
+    printf("Can't open library %s\n", filename);
+    DrvClose((HDRVR)hDriver);
+    return ((HDRVR) 0);
     }
 
     hDriver->DriverProc = (DRIVERPROC) GetProcAddress(hDriver->hDriverModule,
-						      "DriverProc");
+                              "DriverProc");
     if (!hDriver->DriverProc)
     {
-	printf("Library %s is not a valid VfW/ACM codec\n", filename);
-	DrvClose((HDRVR)hDriver);
-	return ((HDRVR) 0);
+    printf("Library %s is not a valid VfW/ACM codec\n", filename);
+    DrvClose((HDRVR)hDriver);
+    return ((HDRVR) 0);
     }
 
     TRACE("DriverProc == %X\n", hDriver->DriverProc);

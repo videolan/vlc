@@ -70,13 +70,13 @@ static HRESULT GetCrossbarIPinAtIndex( IAMCrossbar *pXbar, LONG PinIndex,
 
     if( pXbar->QueryInterface(IID_IBaseFilter, (void **)&pFilter) == S_OK )
     {
-        if( SUCCEEDED(pFilter->EnumPins(&pins)) ) 
+        if( SUCCEEDED(pFilter->EnumPins(&pins)) )
         {
             LONG i = 0;
-            while( pins->Next(1, &pP, &n) == S_OK ) 
+            while( pins->Next(1, &pP, &n) == S_OK )
             {
                 pP->Release();
-                if( i == TrueIndex ) 
+                if( i == TrueIndex )
                 {
                     *ppPin = pP;
                     break;
@@ -88,7 +88,7 @@ static HRESULT GetCrossbarIPinAtIndex( IAMCrossbar *pXbar, LONG PinIndex,
         pFilter->Release();
     }
 
-    return *ppPin ? S_OK : E_FAIL; 
+    return *ppPin ? S_OK : E_FAIL;
 }
 
 /*****************************************************************************
@@ -132,7 +132,7 @@ static HRESULT GetCrossbarIndexFromIPin( IAMCrossbar * pXbar, LONG * PinIndex,
         pFilter->Release();
     }
 
-    return fOK ? S_OK : E_FAIL; 
+    return fOK ? S_OK : E_FAIL;
 }
 
 /*****************************************************************************
@@ -203,11 +203,11 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
             {
                 // remember connector type
                 physicalType = inputPinPhysicalType;
-                
+ 
                 msg_Dbg( p_this, "found existing route for output %ld (type %ld) to input %ld (type %ld)",
                          outputPinIndex, outputPinPhysicalType, inputPinIndex,
                          inputPinPhysicalType );
-                         
+ 
                 // fall through to for loop, note 'inputPinIndex' is set to the pin we are looking for
                 // hence, loop iteration should not wind back
 
@@ -217,8 +217,8 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
             // reset to first pin for complete loop iteration
             inputPinIndex = 0;
         }
-    }                  
-         
+    }
+ 
     //
     // for all input pins
     //
@@ -232,8 +232,8 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
 
         // Can we route it?
         if( FAILED(pXbar->CanRoute(outputPinIndex, inputPinIndex)) ) continue;
-            
-   
+ 
+ 
         IPin *pPin;
         if( FAILED(GetCrossbarIPinAtIndex( pXbar, inputPinIndex,
                                            TRUE, &pPin)) ) continue;

@@ -176,7 +176,7 @@ xtag_skip_to (XTagParser * parser, int char_class)
     }
   }
 
-  return;  
+  return;
 }
 #endif
 
@@ -609,7 +609,7 @@ xtag_snprints (char * buf, int n, ...)
   int len, to_copy, total = 0;
 
   va_start (ap, n);
-  
+ 
   for (s = va_arg (ap, char *); s; s = va_arg (ap, char *)) {
     len = strlen (s);
 
@@ -658,19 +658,19 @@ xtag_snprint (char * buf, int n, XTag * xtag)
 
     for (l = xtag->attributes; l; l = l->next) {
       attr = (XAttribute *)l->data;
-      
+ 
       nn = xtag_snprints (buf, n, " ", attr->name, "=\"", attr->value, "\"",
                           NULL);
       FORWARD(nn);
     }
-    
+ 
     if (xtag->children == NULL) {
       nn = xtag_snprints (buf, n, "/>", NULL);
       FORWARD(nn);
 
       return written;
     }
-    
+ 
     nn = xtag_snprints (buf, n, ">", NULL);
     FORWARD(nn);
   }

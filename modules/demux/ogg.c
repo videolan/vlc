@@ -506,13 +506,13 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         ! memcmp ( &p_oggpacket->packet[0], "Annodex", 7 ) )
     {
         /* it's an Annodex packet -- skip it (do nothing) */
-        return; 
+        return;
     }
     else if( p_oggpacket->bytes >= 7 &&
         ! memcmp ( &p_oggpacket->packet[0], "AnxData", 7 ) )
     {
         /* it's an AnxData packet -- skip it (do nothing) */
-        return; 
+        return;
     }
 
     if( p_stream->fmt.i_codec == VLC_FOURCC( 's','u','b','t' ) &&
@@ -700,7 +700,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             }
             if( p_oggpacket->bytes - 1 - i_header_len > 2 ||
                 ( p_oggpacket->packet[i_header_len + 1] != ' ' &&
-                  p_oggpacket->packet[i_header_len + 1] != 0 && 
+                  p_oggpacket->packet[i_header_len + 1] != 0 &&
                   p_oggpacket->packet[i_header_len + 1] != '\n' &&
                   p_oggpacket->packet[i_header_len + 1] != '\r' ) )
             {

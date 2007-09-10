@@ -32,7 +32,7 @@
 /* Folder vs. Directory */
 #ifdef WIN32
 #define I_OPEN_FOLDER "Open &Folder..."
-#else 
+#else
 #define I_OPEN_FOLDER "Open D&irectory..."
 #endif //WIN32
 

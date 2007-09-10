@@ -210,7 +210,7 @@ static void poke_screensaver( intf_thread_t *p_intf,
 #   endif
         /* gnome-screensaver changed it's D-Bus interface, so we need both */
         screensaver_send_message_void( p_intf, p_connection, "Poke" );
-        screensaver_send_message_void( p_intf, p_connection, 
+        screensaver_send_message_void( p_intf, p_connection,
                 "SimulateUserActivity" );
     }
 #   ifdef SCREENSAVER_DEBUG

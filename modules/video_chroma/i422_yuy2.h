@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -107,7 +107,7 @@ movq      %%mm1, 8(%0)  # Store high UYVY                                 \n\
     *(uint64_t*)p_line = (uint64_t)mm2;     \
     mm0 = _mm_unpackhi_pi8(mm0, mm1);       \
     *(uint64_t*)(p_line+8) = (uint64_t)mm0;
-    
+ 
 #define MMX_YUV422_YVYU                     \
     mm0 = (__m64)*(uint64_t*)p_y;           \
     mm2 = _mm_cvtsi32_si64(*(int*)p_u);     \

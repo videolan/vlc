@@ -123,7 +123,7 @@ typedef struct
 
 } rtcp_stats_t;
 
-typedef struct 
+typedef struct
 {
     uint32_t u_version;        /*< RTCP version number */
     vlc_bool_t b_padding;      /*< indicates if packets has padding */
@@ -186,7 +186,7 @@ typedef struct rtcp_t
     int (*pf_add_client)( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos );
     int (*pf_del_client)( vlc_object_t *p_this, uint32_t u_ssrc );
     int (*pf_find_client)( vlc_object_t *p_this, uint32_t u_ssrc, uint32_t *i_pos );
-	int (*pf_cleanup_clients)( vlc_object_t *p_this );
+    int (*pf_cleanup_clients)( vlc_object_t *p_this );
     int (*pf_destroy_clients)( vlc_object_t *p_this );
 } rtcp_t;
 
@@ -265,7 +265,7 @@ uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth, uint32_t u_s
  *                      it will return *b_first = VLC_FALSE;
  */
 void rtcp_expire( vlc_object_t *p_this, rtcp_event_t rtcp_event, uint64_t u_bandwidth,
-				  uint32_t u_ssrc, vlc_bool_t b_sender, vlc_bool_t *b_first );
+                  uint32_t u_ssrc, vlc_bool_t b_sender, vlc_bool_t *b_first );
 
 /**
  * rtcp_received

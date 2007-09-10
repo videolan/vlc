@@ -697,7 +697,7 @@ static block_t *ConvertAVC1( sout_mux_t *p_mux, mp4_stream_t *tk, block_t *p_blo
         last[2] = ( i_size >>  8 )&0xff;
         last[3] = ( i_size       )&0xff;
 
-        /* Skip blocks with SPS/PPS */ 
+        /* Skip blocks with SPS/PPS */
         if( (last[4]&0x1f) == 7 || (last[4]&0x1f) == 8 )
         {
             ; // FIXME Find a way to skip dat without frelling everything
@@ -907,7 +907,7 @@ static bo_t *GetAvcCTag( mp4_stream_t *p_stream )
         uint8_t *p_buffer = p_stream->fmt.p_extra;
         int     i_buffer = p_stream->fmt.i_extra;
 
-        while( i_buffer > 4 && 
+        while( i_buffer > 4 &&
             p_buffer[0] == 0 && p_buffer[1] == 0 &&
             p_buffer[2] == 0 && p_buffer[3] == 1 )
         {
@@ -915,18 +915,18 @@ static bo_t *GetAvcCTag( mp4_stream_t *p_stream )
             int i_offset    = 1;
             int i_size      = 0;
             int i_startcode = 0;
-            
+ 
             //msg_Dbg( p_stream, "we found a startcode for NAL with TYPE:%d", i_nal_type );
-            
+ 
             for( i_offset = 1; i_offset+3 < i_buffer ; i_offset++)
             {
-                if( p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 && 
+                if( p_buffer[i_offset] == 0 && p_buffer[i_offset+1] == 0 &&
                     p_buffer[i_offset+2] == 0 && p_buffer[i_offset+3] == 1 )
                 {
                     /* we found another startcode */
                     i_startcode = i_offset;
                     break;
-                } 
+                }
             }
             i_size = i_startcode ? i_startcode : i_buffer;
             if( i_nal_type == 7 )
@@ -943,7 +943,7 @@ static bo_t *GetAvcCTag( mp4_stream_t *p_stream )
             p_buffer += i_size;
         }
     }
-    
+ 
     /* FIXME use better value */
     avcC = box_new( "avcC" );
     bo_add_8( avcC, 1 );      /* configuration version */
@@ -2027,9 +2027,9 @@ static void bo_add_descr( bo_t *p_bo, uint8_t tag, uint32_t i_size )
     i_length = i_size;
     vals[3] = (unsigned char)(i_length & 0x7f);
     i_length >>= 7;
-    vals[2] = (unsigned char)((i_length & 0x7f) | 0x80); 
+    vals[2] = (unsigned char)((i_length & 0x7f) | 0x80);
     i_length >>= 7;
-    vals[1] = (unsigned char)((i_length & 0x7f) | 0x80); 
+    vals[1] = (unsigned char)((i_length & 0x7f) | 0x80);
     i_length >>= 7;
     vals[0] = (unsigned char)((i_length & 0x7f) | 0x80);
 

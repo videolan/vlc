@@ -67,19 +67,19 @@ main (int argc, const char * const * argv)
     trace(TRACE_CALLS|TRACE_UPDATE);
 #endif
     if (argc < 2) {
-	Usage (argv[0]);
-	exit (-1);
+    Usage (argv[0]);
+    exit (-1);
     }
 
-    while (offset < argc - 1 && !end_common_opts) {	/* Common options */
-	if (!strcmp (argv[offset + 1], "--title")) {
-	    if (argc - offset < 3 || title != NULL) {
-		Usage (argv[0]);
-		exit (-1);
-	    } else {
-		title = argv[offset + 2];
-		offset += 2;
-	    }
+    while (offset < argc - 1 && !end_common_opts) {    /* Common options */
+    if (!strcmp (argv[offset + 1], "--title")) {
+        if (argc - offset < 3 || title != NULL) {
+        Usage (argv[0]);
+        exit (-1);
+        } else {
+        title = argv[offset + 2];
+        offset += 2;
+        }
         } else if (!strcmp (argv[offset + 1], "--backtitle")) {
             if (backtitle != NULL) {
                 Usage (argv[0]);
@@ -88,48 +88,48 @@ main (int argc, const char * const * argv)
                 backtitle = argv[offset + 2];
                 offset += 2;
             }
-	} else if (!strcmp (argv[offset + 1], "--clear")) {
-	    if (clear_screen) {	/* Hey, "--clear" can't appear twice! */
-		Usage (argv[0]);
-		exit (-1);
-	    } else if (argc == 2) {	/* we only want to clear the screen */
-		init_dialog ();
-		refresh ();	/* init_dialog() will clear the screen for us */
-		end_dialog ();
-		return 0;
-	    } else {
-		clear_screen = 1;
-		offset++;
-	    }
-	} else			/* no more common options */
-	    end_common_opts = 1;
+    } else if (!strcmp (argv[offset + 1], "--clear")) {
+        if (clear_screen) {    /* Hey, "--clear" can't appear twice! */
+        Usage (argv[0]);
+        exit (-1);
+        } else if (argc == 2) {    /* we only want to clear the screen */
+        init_dialog ();
+        refresh ();    /* init_dialog() will clear the screen for us */
+        end_dialog ();
+        return 0;
+        } else {
+        clear_screen = 1;
+        offset++;
+        }
+    } else            /* no more common options */
+        end_common_opts = 1;
     }
 
-    if (argc - 1 == offset) {	/* no more options */
-	Usage (argv[0]);
-	exit (-1);
+    if (argc - 1 == offset) {    /* no more options */
+    Usage (argv[0]);
+    exit (-1);
     }
     /* use a table to look for the requested mode, to avoid code duplication */
 
-    for (modePtr = modes; modePtr->name; modePtr++)	/* look for the mode */
-	if (!strcmp (argv[offset + 1], modePtr->name))
-	    break;
+    for (modePtr = modes; modePtr->name; modePtr++)    /* look for the mode */
+    if (!strcmp (argv[offset + 1], modePtr->name))
+        break;
 
     if (!modePtr->name)
-	Usage (argv[0]);
+    Usage (argv[0]);
     if (argc - offset < modePtr->argmin)
-	Usage (argv[0]);
+    Usage (argv[0]);
     if (modePtr->argmax && argc - offset > modePtr->argmax)
-	Usage (argv[0]);
+    Usage (argv[0]);
 
 
 
     init_dialog ();
     retval = (*(modePtr->jumper)) (title, argc - offset, argv + offset);
 
-    if (clear_screen) {		/* clear screen before exit */
-	attr_clear (stdscr, LINES, COLS, screen_attr);
-	refresh ();
+    if (clear_screen) {        /* clear screen before exit */
+    attr_clear (stdscr, LINES, COLS, screen_attr);
+    refresh ();
     }
     end_dialog();
 
@@ -173,21 +173,21 @@ int
 j_menu (const char *t, int ac, const char * const * av)
 {
     return dialog_menu (t, av[2], atoi (av[3]), atoi (av[4]),
-			atoi (av[5]), av[6], (ac - 6) / 2, av + 7);
+            atoi (av[5]), av[6], (ac - 6) / 2, av + 7);
 }
 
 int
 j_checklist (const char *t, int ac, const char * const * av)
 {
     return dialog_checklist (t, av[2], atoi (av[3]), atoi (av[4]),
-	atoi (av[5]), (ac - 6) / 3, av + 6, FLAG_CHECK);
+    atoi (av[5]), (ac - 6) / 3, av + 6, FLAG_CHECK);
 }
 
 int
 j_radiolist (const char *t, int ac, const char * const * av)
 {
     return dialog_checklist (t, av[2], atoi (av[3]), atoi (av[4]),
-	atoi (av[5]), (ac - 6) / 3, av + 6, FLAG_RADIO);
+    atoi (av[5]), (ac - 6) / 3, av + 6, FLAG_RADIO);
 }
 
 int

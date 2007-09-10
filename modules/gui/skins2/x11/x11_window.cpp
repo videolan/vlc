@@ -210,7 +210,7 @@ void X11Window::toggleOnTop( bool onTop ) const
         {
             if( p_args.p_atom[i] == net_wm_state_above ) break;
         }
-        
+ 
         XFree( p_args.p_atom );
         if( i == i_items )
             return; /* Not supported */

@@ -13,7 +13,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -249,10 +249,10 @@ static int InteractCallback( vlc_object_t *p_this, const char *psz_variable,
     VLCMain *interface = (VLCMain *)param;
     interaction_dialog_t *p_dialog = (interaction_dialog_t *)(new_val.p_address);
     NSValue *o_value = [NSValue valueWithPointer:p_dialog];
-    
+ 
     [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewInteractionEventNotification" object:[interface getInteractionList]
      userInfo:[NSDictionary dictionaryWithObject:o_value forKey:@"VLCDialogPointer"]];
-    
+ 
     [o_pool release];
     return VLC_SUCCESS;
 }
@@ -368,7 +368,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     i_lastShownVolume = -1;
 
     o_remote = [[AppleRemote alloc] init];
-	[o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
+    [o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
     [o_remote setDelegate: _o_sharedMainInstance];
 
     o_eyetv = [[VLCEyeTVController alloc] init];
@@ -464,7 +464,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [self setSubmenusEnabled: FALSE];
     [self manageVolumeSlider];
     [o_window setDelegate: self];
-    
+ 
     b_restore_size = false;
     if( [o_window frame].size.height <= 200 )
     {
@@ -500,7 +500,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback( p_playlist, "intf-show", ShowController, self);
 
     vlc_object_release( p_playlist );
-    
+ 
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, self );
     p_intf->b_interaction = VLC_TRUE;
@@ -512,7 +512,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                                              selector: @selector(refreshVoutDeviceMenu:)
                                                  name: NSApplicationDidChangeScreenParametersNotification
                                                object: nil];
-    
+ 
     nib_main_loaded = TRUE;
 }
 
@@ -651,7 +651,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_dmi_next setTitle: _NS("Next")];
     [o_dmi_previous setTitle: _NS("Previous")];
     [o_dmi_mute setTitle: _NS("Mute")];
-    
+ 
     /* vout menu */
     [o_vmi_play setTitle: _NS("Play")];
     [o_vmi_stop setTitle: _NS("Stop")];
@@ -731,7 +731,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 /* When user click in the Dock icon our double click in the finder */
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication hasVisibleWindows:(BOOL)hasVisibleWindows
-{	
+{    
     if (!hasVisibleWindows)
         [o_window makeKeyAndOrderFront:self];
 
@@ -777,13 +777,13 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 /* Helper method for the remote control interface in order to trigger forward/backward and volume
    increase/decrease as long as the user holds the left/right, plus/minus button */
-- (void) executeHoldActionForRemoteButton: (NSNumber*) buttonIdentifierNumber 
+- (void) executeHoldActionForRemoteButton: (NSNumber*) buttonIdentifierNumber
 {
-    if (b_remote_button_hold) 
+    if (b_remote_button_hold)
     {
-        switch([buttonIdentifierNumber intValue]) 
+        switch([buttonIdentifierNumber intValue])
         {
-            case kRemoteButtonRight_Hold:       
+            case kRemoteButtonRight_Hold:
                   [o_controls forward: self];
             break;
             case kRemoteButtonLeft_Hold:
@@ -794,22 +794,22 @@ static VLCMain *_o_sharedMainInstance = nil;
             break;
             case kRemoteButtonVolume_Minus_Hold:
                 [o_controls volumeDown: self];
-            break;              
+            break;
         }
-        if (b_remote_button_hold) 
+        if (b_remote_button_hold)
         {
             /* trigger event */
-            [self performSelector:@selector(executeHoldActionForRemoteButton:) 
+            [self performSelector:@selector(executeHoldActionForRemoteButton:)
                          withObject:buttonIdentifierNumber
-                         afterDelay:0.25];         
+                         afterDelay:0.25];
         }
     }
 }
 
 /* Apple Remote callback */
-- (void) appleRemoteButton: (AppleRemoteEventIdentifier)buttonIdentifier 
-               pressedDown: (BOOL) pressedDown 
-                clickCount: (unsigned int) count 
+- (void) appleRemoteButton: (AppleRemoteEventIdentifier)buttonIdentifier
+               pressedDown: (BOOL) pressedDown
+                clickCount: (unsigned int) count
 {
     switch( buttonIdentifier )
     {
@@ -818,7 +818,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                 [o_controls toogleFullscreen:self];
             } else {
                 [o_controls play: self];
-            }            
+            }
             break;
         case kRemoteButtonVolume_Plus:
             [o_controls volumeUp: self];
@@ -839,9 +839,9 @@ static VLCMain *_o_sharedMainInstance = nil;
             /* simulate an event as long as the user holds the button */
             b_remote_button_hold = pressedDown;
             if( pressedDown )
-            {                
-                NSNumber* buttonIdentifierNumber = [NSNumber numberWithInt: buttonIdentifier];  
-                [self performSelector:@selector(executeHoldActionForRemoteButton:) 
+            {
+                NSNumber* buttonIdentifierNumber = [NSNumber numberWithInt: buttonIdentifier];
+                [self performSelector:@selector(executeHoldActionForRemoteButton:)
                            withObject:buttonIdentifierNumber];
             }
             break;
@@ -1152,7 +1152,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         vlc_bool_t b_chapters = VLC_FALSE;
 
         playlist_t * p_playlist = pl_Yield( p_intf );
-	/** \todo fix i_size use */
+    /** \todo fix i_size use */
         b_plmul = p_playlist->items.i_size > 1;
         p_input = p_playlist->p_input;
 
@@ -1164,7 +1164,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
             /* check wether slow/fast motion is possible*/
             b_control = p_input->b_can_pace_control;
-    
+ 
 
             /* chapters & titles */
             //b_chapters = p_input->stream.i_area_nb > 1;
@@ -1239,7 +1239,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             [[[self getControls] getFSPanel] setStreamTitle: o_temp];
 
             [[o_controls getVoutView] updateTitle];
-            
+ 
             [o_playlist updateRowSelection];
             p_intf->p_sys->b_current_title_update = FALSE;
         }
@@ -1397,10 +1397,10 @@ static VLCMain *_o_sharedMainInstance = nil;
     int x,y = 0;
     vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
-    
+ 
     if(! p_vout )
         return;
-    
+ 
     /* clean the menu before adding new entries */
     if( [o_mi_screen hasSubmenu] )
     {
@@ -1621,7 +1621,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     playlist_t * p_playlist;
     vout_thread_t * p_vout;
     int returnedValue = 0;
-    
+ 
     /* Stop playback */
     p_playlist = pl_Yield( p_intf );
     playlist_Stop( p_playlist );
@@ -1631,7 +1631,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     config_PutInt( p_intf->p_libvlc, "volume", i_lastShownVolume );
     returnedValue = config_SaveConfigFile( p_intf->p_libvlc, "main" );
     if( returnedValue != 0 )
-        msg_Err( p_intf, 
+        msg_Err( p_intf,
                  "error while saving volume in osx's terminate method (%i)",
                  returnedValue );
 
@@ -1640,7 +1640,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         [o_extended savePrefs];
     }
-    
+ 
     p_intf->b_interaction = VLC_FALSE;
     var_DelCallback( p_intf, "interaction", InteractCallback, self );
 
@@ -1653,22 +1653,22 @@ static VLCMain *_o_sharedMainInstance = nil;
      * will be called later on -- FK (10/6/05) */
     if( nib_about_loaded && o_about )
         [o_about release];
-    
+ 
     if( nib_open_loaded && o_open )
         [o_open release];
-    
+ 
     if( nib_extended_loaded && o_extended )
     {
         [o_extended collapsAll];
         [o_extended release];
     }
-    
+ 
     if( nib_bookmarks_loaded && o_bookmarks )
         [o_bookmarks release];
 
     if( nib_wizard_loaded && o_wizard )
         [o_wizard release];
-        
+ 
     if( o_embedded_list != nil )
         [o_embedded_list release];
 
@@ -1839,7 +1839,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         nib_wizard_loaded = [NSBundle loadNibNamed:@"Wizard" owner:self];
         [o_wizard initStrings];
     }
-    
+ 
     if ( !nib_bookmarks_loaded )
     {
         nib_bookmarks_loaded = [NSBundle loadNibNamed:@"Bookmarks" owner:self];
@@ -1997,14 +1997,14 @@ static VLCMain *_o_sharedMainInstance = nil;
         } else {
             o_rect.size.height = 500;
         }
-        
+ 
         if ( o_size_with_playlist.width > [o_window minSize].width )
         {
             o_rect.size.width = o_size_with_playlist.width;
         } else {
             o_rect.size.width = 500;
         }
-        
+ 
         o_rect.size.height = (o_size_with_playlist.height > 200) ?
             o_size_with_playlist.height : 500;
         o_rect.origin.x = [o_window frame].origin.x;
@@ -2032,7 +2032,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         o_rect.origin.y = [o_window frame].origin.y +
             [o_window frame].size.height - [o_window minSize].height;
 
-        if ( b_restore_size ) 
+        if ( b_restore_size )
             o_rect = o_restore_rect;
 
         [o_playlist_view setAutoresizesSubviews: NO];

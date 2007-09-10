@@ -28,10 +28,10 @@
 
 #include <vlc/libvlc.h>
 
-extern const GUID CLSID_VLCPlugin; 
-extern const GUID CLSID_VLCPlugin2; 
-extern const GUID LIBID_AXVLC; 
-extern const GUID DIID_DVLCEvents; 
+extern const GUID CLSID_VLCPlugin;
+extern const GUID CLSID_VLCPlugin2;
+extern const GUID LIBID_AXVLC;
+extern const GUID DIID_DVLCEvents;
 
 class VLCPluginClass : public IClassFactory
 {
@@ -104,7 +104,7 @@ public:
     };
     inline BOOL getAutoPlay(void) { return _b_autoplay; };
 
-    inline void setAutoLoop(BOOL autoloop) 
+    inline void setAutoLoop(BOOL autoloop)
     {
         _b_autoloop = autoloop;
         setDirty(TRUE);
@@ -147,7 +147,7 @@ public:
     };
     const SIZEL& getExtent(void) { return _extent; };
 
-    // transient properties 
+    // transient properties
     inline void setMute(BOOL mute) { _b_mute = mute; };
 
     inline void setPicture(LPPICTURE pict)
@@ -191,7 +191,7 @@ public:
     void setErrorInfo(REFIID riid, const char *description);
 
     // control geometry within container
-    RECT getPosRect(void) { return _posRect; }; 
+    RECT getPosRect(void) { return _posRect; };
     inline HWND getInPlaceWindow(void) const { return _inplacewnd; };
     BOOL isInPlaceActive(void);
 

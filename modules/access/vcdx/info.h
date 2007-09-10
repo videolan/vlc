@@ -27,14 +27,14 @@
 #include "vcdplayer.h"
 
 /*
- Sets VCD meta information and navigation/playlist entries. 
+ Sets VCD meta information and navigation/playlist entries.
  */
 void VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl );
 
 
 char * VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcdplayer,
-		    const char format_str[], const char *mrl,
-		    const vcdinfo_itemid_t *itemid);
+            const char format_str[], const char *mrl,
+            const vcdinfo_itemid_t *itemid);
 
 void VCDUpdateTitle( access_t *p_access );
 

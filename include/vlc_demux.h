@@ -85,7 +85,7 @@ enum demux_query_e
     DEMUX_SET_TIME,             /* arg1= int64_t        res=can fail    */
 
     /* TITLE_INFO only if more than 1 title or 1 chapter */
-    DEMUX_GET_TITLE_INFO,       /* arg1=input_title_t*** arg2=int* 
+    DEMUX_GET_TITLE_INFO,       /* arg1=input_title_t*** arg2=int*
                                    arg3=int*pi_title_offset(0), arg4=int*pi_seekpoint_offset(0) can fail */
     /* TITLE/SEEKPOINT, only when TITLE_INFO succeed */
     DEMUX_SET_TITLE,            /* arg1= int            can fail */

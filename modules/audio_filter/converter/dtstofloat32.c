@@ -138,7 +138,7 @@ static int Create( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Open: 
+ * Open:
  *****************************************************************************/
 static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
                  audio_format_t input, audio_format_t output )
@@ -339,7 +339,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         p_samples = dca_samples( p_sys->p_libdca );
 
         if ( (p_sys->i_flags & DCA_CHANNEL_MASK) == DCA_MONO
-              && (p_filter->output.i_physical_channels 
+              && (p_filter->output.i_physical_channels
                    & (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
         {
             Duplicate( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
@@ -376,7 +376,7 @@ static void Destroy( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * OpenFilter: 
+ * OpenFilter:
  *****************************************************************************/
 static int OpenFilter( vlc_object_t *p_this )
 {

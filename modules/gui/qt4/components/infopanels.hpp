@@ -55,7 +55,7 @@ public:
     virtual ~MetaPanel();
     void saveMeta();
     void setInput( input_item_t * );
-    
+ 
     bool isInEditMode();
     void setEditMode( bool );
 
@@ -87,7 +87,7 @@ public slots:
 
 private slots:
     void enterEditMode();
-    
+ 
 signals:
     void uriSet( QString );
     void editing();

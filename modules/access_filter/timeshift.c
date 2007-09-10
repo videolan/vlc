@@ -537,7 +537,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         *pi_int = 0;
         break;
 
-    case ACCESS_SET_PAUSE_STATE: 
+    case ACCESS_SET_PAUSE_STATE:
         break;
 
     /* Forward everything else to the source access */

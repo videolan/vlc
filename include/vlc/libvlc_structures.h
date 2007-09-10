@@ -203,7 +203,7 @@ typedef struct libvlc_playlist_item_t
  * LibVLC Video handling
  * @{
  */
-    
+ 
 /**
 * Downcast to this general type as placeholder for a platform specific one, such as:
 *  Drawable on X11,
@@ -275,7 +275,7 @@ typedef struct libvlc_log_message_t
  * LibVLC Event Callbacks
  * @{
  */
-    
+ 
 /**
  * Available events: (XXX: being reworked)
  * - libvlc_MediaInstanceReachedEnd
@@ -289,7 +289,7 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaInstancePaused,
     libvlc_MediaInstanceReachedEnd,
     libvlc_MediaInstancePositionChanged,
-    
+ 
     libvlc_MediaListItemAdded,
     libvlc_MediaListItemDeleted,
 

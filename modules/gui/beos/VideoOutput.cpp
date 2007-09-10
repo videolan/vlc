@@ -1054,9 +1054,9 @@ VLCView::MouseDown(BPoint where)
                 BMenuItem *zoomItem = new BMenuItem(_("Fullscreen"), new BMessage(TOGGLE_FULL_SCREEN));
                 zoomItem->SetMarked(videoWindow->IsFullScreen());
                 menu->AddItem(zoomItem);
-    
+ 
                 menu->AddSeparatorItem();
-    
+ 
                 // Toggle vSync
                 BMenuItem *vsyncItem = new BMenuItem(_("Vertical Sync"), new BMessage(VERT_SYNC));
                 vsyncItem->SetMarked(videoWindow->IsSyncedToRetrace());
@@ -1065,22 +1065,22 @@ VLCView::MouseDown(BPoint where)
                 BMenuItem *aspectItem = new BMenuItem(_("Correct Aspect Ratio"), new BMessage(ASPECT_CORRECT));
                 aspectItem->SetMarked(videoWindow->CorrectAspectRatio());
                 menu->AddItem(aspectItem);
-    
+ 
                 menu->AddSeparatorItem();
-    
+ 
                 // Window Feel Items
 /*                BMessage *winNormFeel = new BMessage(WINDOW_FEEL);
                 winNormFeel->AddInt32("WinFeel", (int32_t)B_NORMAL_WINDOW_FEEL);
                 BMenuItem *normWindItem = new BMenuItem("Normal Window", winNormFeel);
                 normWindItem->SetMarked(videoWindow->Feel() == B_NORMAL_WINDOW_FEEL);
                 menu->AddItem(normWindItem);
-                
+ 
                 BMessage *winFloatFeel = new BMessage(WINDOW_FEEL);
                 winFloatFeel->AddInt32("WinFeel", (int32_t)B_FLOATING_APP_WINDOW_FEEL);
                 BMenuItem *onTopWindItem = new BMenuItem("App Top", winFloatFeel);
                 onTopWindItem->SetMarked(videoWindow->Feel() == B_FLOATING_APP_WINDOW_FEEL);
                 menu->AddItem(onTopWindItem);
-                
+ 
                 BMessage *winAllFeel = new BMessage(WINDOW_FEEL);
                 winAllFeel->AddInt32("WinFeel", (int32_t)B_FLOATING_ALL_WINDOW_FEEL);
                 BMenuItem *allSpacesWindItem = new BMenuItem("On Top All Workspaces", winAllFeel);
@@ -1169,7 +1169,7 @@ VLCView::Pulse()
         {
             be_app->ObscureCursor();
             fCursorHidden = true;
-            
+ 
             // hide the interface window as well if full screen
             if (videoWindow && videoWindow->IsFullScreen())
                 videoWindow->SetInterfaceShowing(false);
@@ -1177,7 +1177,7 @@ VLCView::Pulse()
     }
 
     // Workaround to disable the screensaver in full screen:
-    // we simulate an activity every 29 seconds    
+    // we simulate an activity every 29 seconds
     if( videoWindow && videoWindow->IsFullScreen() &&
         mdate() - fLastMouseMovedTime > 29000000 )
     {

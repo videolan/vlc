@@ -56,10 +56,10 @@ vlc_module_end();
 typedef struct
 {
     VLC_COMMON_MEMBERS
-    
+ 
     vlc_mutex_t     lock;
     vlc_cond_t      wait;
-    
+ 
     CFMessagePortRef    inputMessagePortFromEyeTV;
 } eyetv_thread_t;
 
@@ -86,8 +86,8 @@ static int Open( vlc_object_t *p_this )
     access_sys_t    *p_sys;
     eyetv_thread_t  *p_thread;
     CFMessagePortContext context;
-    memset(&context, 0, sizeof(context)); 
-    
+    memset(&context, 0, sizeof(context));
+ 
     /* Init p_access */
     access_InitFields( p_access ); \
     ACCESS_SET_CALLBACKS( Read, NULL, Control, NULL ); \
@@ -102,11 +102,11 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( p_access, &p_thread->lock );
     vlc_cond_init( p_access, &p_thread->wait );
     msg_Dbg( p_access, "thread created, msg port following now" );
-    
+ 
     /* set up our own msg port
     * we may give the msgport such a generic name, because EyeTV may only run
     * once per entire machine, so we can't interfere with other instances.
-    * we just trust the user no to launch multiple VLC instances trying to 
+    * we just trust the user no to launch multiple VLC instances trying to
     * access EyeTV at the same time. If this happens, the latest launched
     * instance will win. */
     p_sys->p_thread->inputMessagePortFromEyeTV =  CFMessagePortCreateLocal( kCFAllocatorDefault,
@@ -127,7 +127,7 @@ static int Open( vlc_object_t *p_this )
     }
     else
         msg_Dbg( p_access, "remote msg port opened" );
-    
+ 
     /* let the thread run */
     if( vlc_thread_create( p_thread, "EyeTV Receiver Thread", Thread,
                            VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
@@ -142,19 +142,19 @@ static int Open( vlc_object_t *p_this )
     }
 
     msg_Dbg( p_access, "receiver thread created and launched" );
-    
+ 
     /* tell the EyeTV plugin to open up its msg port and start sending */
     CFNotificationCenterPostNotification( CFNotificationCenterGetDistributedCenter (),
-                                          CFSTR("VLCAccessStartDataSending"), 
-                                          CFSTR("VLCEyeTVSupport"), 
-                                          /*userInfo*/ NULL, 
+                                          CFSTR("VLCAccessStartDataSending"),
+                                          CFSTR("VLCEyeTVSupport"),
+                                          /*userInfo*/ NULL,
                                           TRUE );
-    
+ 
     msg_Dbg( p_access, "plugin notified" );
-    
+ 
     /* we don't need such a high priority */
     //vlc_thread_set_priority( p_access, VLC_THREAD_PRIORITY_LOW );
-    
+ 
     return VLC_SUCCESS;
 }
 
@@ -165,36 +165,36 @@ static void Close( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t *)p_this;
     access_sys_t *p_sys = p_access->p_sys;
-    
+ 
     msg_Dbg( p_access, "closing" );
-    
+ 
     /* tell the EyeTV plugin to close its msg port and stop sending */
     CFNotificationCenterPostNotification( CFNotificationCenterGetDistributedCenter (),
-                                          CFSTR("VLCAccessStopDataSending"), 
-                                          CFSTR("VLCEyeTVSupport"), 
-                                          /*userInfo*/ NULL, 
+                                          CFSTR("VLCAccessStopDataSending"),
+                                          CFSTR("VLCEyeTVSupport"),
+                                          /*userInfo*/ NULL,
                                           TRUE );
-    
+ 
     msg_Dbg( p_access, "plugin notified" );
-    
+ 
     /* stop receiver thread */
     vlc_object_kill( p_sys->p_thread );
     vlc_mutex_lock( &p_sys->p_thread->lock );
     vlc_cond_signal( &p_sys->p_thread->wait );
     vlc_mutex_unlock( &p_sys->p_thread->lock );
     vlc_thread_join( p_sys->p_thread );
-    
+ 
     /* close msg port */
     CFMessagePortInvalidate( p_sys->p_thread->inputMessagePortFromEyeTV );
     free( p_sys->p_thread->inputMessagePortFromEyeTV );
     msg_Dbg( p_access, "msg port closed and freed" );
-    
+ 
     /* free thread */
     vlc_mutex_destroy( &p_sys->p_thread->lock );
     vlc_cond_destroy( &p_sys->p_thread->wait );
     vlc_object_detach( p_sys->p_thread );
     vlc_object_destroy( p_sys->p_thread );
-    
+ 
     free( p_sys );
 }
 
@@ -202,7 +202,7 @@ static void Thread( vlc_object_t *p_this )
 {
     eyetv_thread_t *p_thread= (eyetv_thread_t*)p_this;
     CFRunLoopSourceRef runLoopSource;
-    
+ 
     /* create our run loop source for the port and attach it to our current loop */
     runLoopSource = CFMessagePortCreateRunLoopSource( kCFAllocatorDefault,
                                                       p_thread->inputMessagePortFromEyeTV,
@@ -210,7 +210,7 @@ static void Thread( vlc_object_t *p_this )
     CFRunLoopAddSource( CFRunLoopGetCurrent(),
                         runLoopSource,
                         kCFRunLoopDefaultMode );
-    
+ 
     CFRunLoopRun();
 }
 
@@ -222,7 +222,7 @@ CFDataRef msgPortCallback( CFMessagePortRef local, SInt32 msgid, CFDataRef data,
 {
     extern CFDataRef dataFromEyetv;
     extern int lastPacketId;
-    
+ 
     /* copy callback data to module data */
     dataFromEyetv = CFDataCreateCopy( kCFAllocatorDefault, data );
 #if 0
@@ -233,7 +233,7 @@ CFDataRef msgPortCallback( CFMessagePortRef local, SInt32 msgid, CFDataRef data,
 #endif
 
     lastPacketId = msgid;
-    
+ 
     return NULL; /* we've got nothing to return */
 }
 
@@ -246,13 +246,13 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     extern CFDataRef dataFromEyetv;
     extern int lastPacketId;
     extern int lastForwardedPacketId;
-    
+ 
     /* wait for a new buffer before forwarding */
     while( lastPacketId == lastForwardedPacketId && !p_access->b_die )
     {
         msleep( INPUT_ERROR_SLEEP );
     }
-    
+ 
     /* read data here, copy it to p_buffer, fill i_len with respective length
      * and return info with i_read; i_read = 0 == EOF */
     if( dataFromEyetv )
@@ -272,10 +272,10 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             return 0;
         }
     }
-    
+ 
     if( p_access->b_die )
         return 0;
-    
+ 
     return i_len;
 }
 
@@ -287,7 +287,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
     vlc_bool_t   *pb_bool;
     int          *pi_int;
     int64_t      *pi_64;
-    
+ 
     switch( i_query )
     {
         * *
@@ -300,17 +300,17 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
         case ACCESS_GET_MTU:
-        case ACCESS_GET_PTS_DELAY:            
+        case ACCESS_GET_PTS_DELAY:
         case ACCESS_GET_TITLE_INFO:
         case ACCESS_SET_TITLE:
         case ACCESS_SET_SEEKPOINT:
         case ACCESS_SET_PRIVATE_ID_STATE:
             return VLC_EGENERIC;
-            
+ 
         default:
             msg_Warn( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;
-            
+ 
     }
     return VLC_SUCCESS;*/
     return VLC_EGENERIC;

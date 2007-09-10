@@ -51,12 +51,12 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *p_intf, CBaseWindow *p_parent,
 
 /***********************************************************************
 
-FUNCTION: 
+FUNCTION:
   WndProc
 
-PURPOSE: 
+PURPOSE:
   Processes messages sent to the main window.
-  
+ 
 ***********************************************************************/
 LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
@@ -260,7 +260,7 @@ LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             {
                 SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
                 OnFileBrowse();
-            } 
+            }
         }
         break;
 

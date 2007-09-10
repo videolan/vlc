@@ -108,7 +108,7 @@ void mpeg2_header_state_init( mpeg2dec_t *mpeg2dec )
     }
     mpeg2dec->decoder.coding_type = I_TYPE;
     mpeg2dec->decoder.convert = NULL;
-    mpeg2dec->decoder.convert_id = NULL; 
+    mpeg2dec->decoder.convert_id = NULL;
     mpeg2dec->decoder.load_intra_quantizer_matrix = 1;
     mpeg2dec->decoder.load_non_intra_quantizer_matrix = 1;
     mpeg2dec->picture = mpeg2dec->pictures;
@@ -249,11 +249,11 @@ static int sequence_ext( mpeg2dec_t * mpeg2dec )
 
     switch( buffer[1] & 6 )
     {
-        case 0:	/* invalid */
+        case 0:    /* invalid */
             return 1;
-        case 2:	/* 4:2:0 */
+        case 2:    /* 4:2:0 */
             sequence->chroma_height >>= 1;
-        case 4:	/* 4:2:2 */
+        case 4:    /* 4:2:2 */
             sequence->chroma_width >>= 1;
     }
 
@@ -337,13 +337,13 @@ static inline void finalize_sequence( mpeg2_sequence_t * sequence )
                 sequence->pixel_width = sequence->pixel_height = 1;
                 return;
             case 3: /* 720x576 16:9 */
-                sequence->pixel_width = 64;	sequence->pixel_height = 45;
+                sequence->pixel_width = 64;    sequence->pixel_height = 45;
                 return;
             case 6: /* 720x480 16:9 */
-                sequence->pixel_width = 32;	sequence->pixel_height = 27;
+                sequence->pixel_width = 32;    sequence->pixel_height = 27;
                 return;
             case 12: /* 720*480 4:3 */
-                sequence->pixel_width = 8;	sequence->pixel_height = 9;
+                sequence->pixel_width = 8;    sequence->pixel_height = 9;
                 return;
             default:
                 height = 88 * sequence->pixel_width + 1171;
@@ -577,7 +577,7 @@ int mpeg2_header_picture( mpeg2dec_t * mpeg2dec )
     decoder->concealment_motion_vectors = 0;
     decoder->scan = mpeg2_scan_norm;
     decoder->picture_structure = FRAME_PICTURE;
-    mpeg2dec->copy_matrix = 0;  
+    mpeg2dec->copy_matrix = 0;
     return 0;
 }
 
@@ -814,7 +814,7 @@ void mpeg2_header_picture_finalize( mpeg2dec_t * mpeg2dec, uint32_t accels )
     else
     {
         /* decoder->second_field = 1; */
-        mpeg2dec->picture++;	/* second field picture */
+        mpeg2dec->picture++;    /* second field picture */
         *(mpeg2dec->picture) = mpeg2dec->new_picture;
         mpeg2dec->info.current_picture_2nd = mpeg2dec->picture;
         if (low_delay || decoder->coding_type == B_TYPE)

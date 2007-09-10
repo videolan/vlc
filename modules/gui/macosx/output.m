@@ -34,7 +34,7 @@
 #include "output.h"
 
 /*****************************************************************************
- * VLCOutput implementation 
+ * VLCOutput implementation
  *****************************************************************************/
 @implementation VLCOutput
 
@@ -142,7 +142,7 @@
     [[o_method cellAtRow:0 column:0] setTitle: _NS("File")];
     [[o_method cellAtRow:1 column:0] setTitle: _NS("Stream")];
     [o_dump_chkbox setTitle: _NS("Dump raw input")];
-    [o_btn_browse setTitle: _NS("Browse...")]; 
+    [o_btn_browse setTitle: _NS("Browse...")];
     [o_stream_address_lbl setStringValue: _NS("Address")];
     [o_stream_port_lbl setStringValue: _NS("Port")];
     [o_stream_ttl_lbl setStringValue: @"TTL"];
@@ -420,7 +420,7 @@
                 componentsSeparatedByString: @"/"];
             NSMutableString * o_finalStreamAddress;
             o_finalStreamAddress = [[NSMutableString alloc] init];
-            
+ 
             if ([o_urlItems count] == 1)
             {
                 [o_finalStreamAddress appendFormat: @"\"%@:%@\"", \
@@ -440,7 +440,7 @@
                 }
                 [o_finalStreamAddress appendString: @"\""];
             }
-            
+ 
             [o_mrl_string appendFormat:
                         @"std{access=%@,mux=%@,dst=%@%@}",
                         o_mode, o_mux_string, o_finalStreamAddress, o_announce];

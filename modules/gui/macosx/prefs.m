@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* VLCPrefs manages the main preferences dialog 
+/* VLCPrefs manages the main preferences dialog
    the class is related to wxwindows intf, PrefsPanel */
 /* VLCTreeItem should contain:
    - the children of the treeitem
@@ -196,7 +196,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
-    return (item == nil) ? YES : ( ([item numberOfChildren] != -1) && 
+    return (item == nil) ? YES : ( ([item numberOfChildren] != -1) &&
                                    ([item numberOfChildren] != 0));
 }
 
@@ -284,7 +284,7 @@ static VLCTreeItem *o_root_item = nil;
         /* get parser */
         p_parser = (module_t *)p_list->p_values[i_index].p_object;
         p_end = p_parser->p_config + p_parser->confsize;
-        
+ 
         if( [[self getName] isEqualToString: @"main"] )
         {
             /*
@@ -318,7 +318,7 @@ static VLCTreeItem *o_root_item = nil;
                     switch( p_item->i_type )
                     {
                     case CONFIG_CATEGORY:
-			            if( p_item->value.i == -1 ) break;
+                        if( p_item->value.i == -1 ) break;
 
                         o_child_name = [[VLCMain sharedInstance]
                             localizedString: config_CategoryNameGet( p_item->value.i )];
@@ -337,7 +337,7 @@ static VLCTreeItem *o_root_item = nil;
                             whithCategory: p_item - p_module->p_config]];
                         break;
                     case CONFIG_SUBCATEGORY:
-			            if( p_item->value.i == -1 ) break;
+                        if( p_item->value.i == -1 ) break;
 
                         if( p_item->value.i != SUBCAT_PLAYLIST_GENERAL &&
                             p_item->value.i != SUBCAT_VIDEO_GENERAL &&
@@ -364,7 +364,7 @@ static VLCTreeItem *o_root_item = nil;
                                     initWithCapacity:10]
                                 whithCategory: p_item - p_module->p_config]];
                         }
-                        
+ 
                         break;
                     default:
                         break;
@@ -526,7 +526,7 @@ static VLCTreeItem *o_root_item = nil;
     NSView          *o_view;
 
     [[VLCPrefs sharedInstance] setTitle: [self getTitle]];
-    /* NSLog( [self getHelp] ); */ 
+    /* NSLog( [self getHelp] ); */
     s_vrc = [[o_prefs_view contentView] bounds]; s_vrc.size.height -= 4;
     o_view = [[VLCFlippedView alloc] initWithFrame: s_vrc];
     [o_view setAutoresizingMask: NSViewWidthSizable | NSViewMinYMargin |
@@ -540,7 +540,7 @@ static VLCTreeItem *o_root_item = nil;
         vlc_list_t      *p_list;
         module_t        *p_parser = NULL;
         module_config_t *p_item,
-                        *p_end; 
+                        *p_end;
 
         o_subviews = [[NSMutableArray alloc] initWithCapacity:10];
         /* Get a pointer to the module */
@@ -552,9 +552,9 @@ static VLCTreeItem *o_root_item = nil;
                 /* 0OOoo something went really bad */
                 return nil;
             }
-            
+ 
             p_end = p_parser->p_config + p_parser->confsize;
-            
+ 
             p_item = p_parser->p_config;
 
             p_item = p_parser->p_config + 1;
@@ -617,7 +617,7 @@ static VLCTreeItem *o_root_item = nil;
                 return o_view;
             }
             p_end = p_parser->p_config + p_parser->confsize;
-            
+ 
             p_item = (p_parser->p_config + i_object_category);
             if( ( p_item->i_type == CONFIG_CATEGORY ) &&
               ( ( p_item->value.i == CAT_PLAYLIST )  ||
@@ -651,10 +651,10 @@ static VLCTreeItem *o_root_item = nil;
                 default:
                 {
                     VLCConfigControl *o_control = nil;
-		    if( p_item->b_internal == VLC_TRUE )
-		    {
-			break;
-		    }
+            if( p_item->b_internal == VLC_TRUE )
+            {
+            break;
+            }
                     o_control = [VLCConfigControl newControl:p_item
                                                   withView:o_view];
                     if( o_control != nil )
@@ -683,7 +683,7 @@ static VLCTreeItem *o_root_item = nil;
         NSEnumerator *enumerator = [o_subviews objectEnumerator];
         VLCConfigControl *o_widget;
         NSRect o_frame;
-        
+ 
         while( ( o_widget = [enumerator nextObject] ) )
             if( ( [o_widget isAdvanced] ) && (! b_advanced) )
                 continue;

@@ -34,11 +34,11 @@ protected:
 
     LibvlcRootNPObject(NPP instance, const NPClass *aClass) :
         RuntimeNPObject(instance, aClass),
-	audioObj(NULL),
-	inputObj(NULL),
-	logObj(NULL),
-	playlistObj(NULL),
-	videoObj(NULL) {};
+    audioObj(NULL),
+    inputObj(NULL),
+    logObj(NULL),
+    playlistObj(NULL),
+    videoObj(NULL) {};
 
     virtual ~LibvlcRootNPObject();
 
@@ -180,8 +180,8 @@ protected:
     friend class RuntimeNPClass<LibvlcLogNPObject>;
 
     LibvlcLogNPObject(NPP instance, const NPClass *aClass) :
-	RuntimeNPObject(instance, aClass),
-	messagesObj(NULL) {};
+    RuntimeNPObject(instance, aClass),
+    messagesObj(NULL) {};
 
     virtual ~LibvlcLogNPObject();
 
@@ -224,9 +224,9 @@ protected:
     friend class RuntimeNPClass<LibvlcPlaylistNPObject>;
 
     LibvlcPlaylistNPObject(NPP instance, const NPClass *aClass) :
-	RuntimeNPObject(instance, aClass),
-	playlistItemsObj(NULL) {};
-	
+    RuntimeNPObject(instance, aClass),
+    playlistItemsObj(NULL) {};
+    
     virtual ~LibvlcPlaylistNPObject();
 
     static const int propertyCount;

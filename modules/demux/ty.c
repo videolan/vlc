@@ -92,7 +92,7 @@ vlc_module_end();
  b/e0: video B-frame header start
  c/e0: video GOP header start
  e/01: closed-caption data
- e/02: Extended data services data 
+ e/02: Extended data services data
  e/03: ipreview data ("thumbs up to record" signal)
 */
 
@@ -171,7 +171,7 @@ static int TyOpen(vlc_object_t *p_this)
                   "continuing anyway..." );
     }
 
-    /* at this point, we assume we have a valid TY stream */  
+    /* at this point, we assume we have a valid TY stream */
     msg_Dbg( p_demux, "valid TY stream detected" );
 
     /* Set exported functions */
@@ -407,7 +407,7 @@ int TyDemux(demux_t *p_demux)
     {
         /*msg_Dbg(p_demux, "Record Type 0x%x/%02x %ld bytes",
                     subrec_type, rec_type, l_rec_size );*/
-  
+ 
         /* some normal records are 0 length, so check for that... */
         if (l_rec_size > 0)
         {
@@ -486,12 +486,12 @@ int TyDemux(demux_t *p_demux)
                 if (p_sys->lastVideoPTS > 0)
                 {
                     p_block_in->i_pts = p_sys->lastVideoPTS;
-                    /* PTS gets used ONCE. 
+                    /* PTS gets used ONCE.
                      * Any subsequent frames we get BEFORE next PES
                      * header will have their PTS computed in the codec */
                     p_sys->lastVideoPTS = 0;
                 }
-            } 
+            }
             es_out_Send(p_demux->out, p_sys->p_video, p_block_in);
         }
     } /* end if video rec type */
@@ -561,7 +561,7 @@ int TyDemux(demux_t *p_demux)
                     }
                     else
                     {
-                        p_sys->lastAudioPTS = get_pts( 
+                        p_sys->lastAudioPTS = get_pts(
                             &p_sys->pes_buffer[ esOffset1 + DTIVO_PTS_OFFSET ] );
                         p_block_in->i_pts = p_sys->lastAudioPTS;
                     }
@@ -620,7 +620,7 @@ int TyDemux(demux_t *p_demux)
                 if (check_sync_pes(p_demux, p_block_in, esOffset1,
                                     l_rec_size) == -1)
                 {
-                    /* partial PES header found, nothing else. 
+                    /* partial PES header found, nothing else.
                      * we're done. */
                     p_sys->i_cur_rec++;
                     block_Release(p_block_in);
@@ -779,7 +779,7 @@ static int ty_stream_seek(demux_t *p_demux, double seek_pct)
     }
     /* load the chunk */
     get_chunk_header(p_demux);
-  
+ 
     /* seek within the chunk to get roughly to where we want */
     p_sys->i_cur_rec = (int)
       ((double) ((seek_pos % CHUNK_SIZE) / (double) (CHUNK_SIZE)) * p_sys->i_num_recs);
@@ -807,7 +807,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
     demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
     int64_t i64, *p_i64;
-  
+ 
     /*msg_Info(p_demux, "control cmd %d", i_query);*/
     switch( i_query )
     {
@@ -871,14 +871,14 @@ static int get_chunk_header(demux_t *p_demux)
     /* read the TY packet header */
     i_readSize = stream_Read( p_demux->s, packet_header, 4 );
     p_sys->i_chunk_count++;
-  
+ 
     if ( i_readSize < 4 )
     {
         /* EOF */
         p_sys->eof = 1;
         return 0;
     }
-  
+ 
     /* if it's a PART Header, then try again. */
     if( U32_AT( &packet_header[ 0 ] ) == TIVO_PES_FILEID )
     {
@@ -907,7 +907,7 @@ static int get_chunk_header(demux_t *p_demux)
     }
     p_sys->i_cur_rec = 0;
     p_sys->b_first_chunk = VLC_FALSE;
-  
+ 
     /*msg_Dbg( p_demux, "chunk has %d records", i_num_recs );*/
 
     /* parse headers into array */
@@ -930,10 +930,10 @@ static int get_chunk_header(demux_t *p_demux)
         {
             unsigned char b1, b2;
             /* marker bit 2 set, so read extended data */
-            b1 = ( ( ( record_header[ 0 ] & 0x0f ) << 4 ) | 
+            b1 = ( ( ( record_header[ 0 ] & 0x0f ) << 4 ) |
                    ( ( record_header[ 1 ] & 0xf0 ) >> 4 ) );
             b1 &= 0x7f;
-            b2 = ( ( ( record_header[ 1 ] & 0x0f ) << 4 ) | 
+            b2 = ( ( ( record_header[ 1 ] & 0x0f ) << 4 ) |
                    ( ( record_header[ 2 ] & 0xf0 ) >> 4 ) );
             b2 &= 0x7f;
 

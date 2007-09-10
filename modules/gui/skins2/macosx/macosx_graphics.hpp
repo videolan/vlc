@@ -50,7 +50,7 @@ class MacOSXGraphics: public OSGraphics
         virtual void drawBitmap( const GenericBitmap &rBitmap, int xSrc = 0,
                                  int ySrc = 0, int xDest = 0, int yDest = 0,
                                  int width = -1, int height = -1,
-								 bool blend = false );
+                                 bool blend = false );
 
         /// Draw a filled rectangle on the grahics (color is #RRGGBB)
         virtual void fillRect( int left, int top, int width, int height,

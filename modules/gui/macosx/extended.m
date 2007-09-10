@@ -106,7 +106,7 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_lbl_hue setStringValue: _NS("Hue")];
     [o_lbl_saturation setStringValue: _NS("Saturation")];
     [o_lbl_opaque setStringValue: _NS("Opaqueness")];
-    
+ 
 }
 
 - (void)awakeFromNib
@@ -126,7 +126,7 @@ static VLCExtended *_o_sharedInstance = nil;
 
         free( psz_vfilters );
     }
-    
+ 
     /* set the video-filter checkboxes to the correct values */
     char * psz_vifilters;
     psz_vifilters = config_GetPsz( p_intf, "video-filter" );
@@ -160,7 +160,7 @@ static VLCExtended *_o_sharedInstance = nil;
 
         free( psz_vifilters );
     }
-    
+ 
     /* set the audio-filter-checkboxes to the values taken from the prefs */
     char * psz_afilters;
     psz_afilters = config_GetPsz( p_intf, "audio-filter" );
@@ -168,7 +168,7 @@ static VLCExtended *_o_sharedInstance = nil;
     {
         [o_ckb_hdphnVirt setState: (int)strstr( psz_afilters, "headphone" ) ];
         [o_ckb_vlme_norm setState: (int)strstr( psz_afilters, "normvol" ) ];
-        
+ 
         free( psz_afilters );
     }
 }
@@ -208,7 +208,7 @@ static VLCExtended *_o_sharedInstance = nil;
     }
 
     float f_value;
-    
+ 
     f_value = config_GetFloat( p_intf, "saturation" );
     if( f_value > 0 && f_value < 5 )
     {
@@ -280,7 +280,7 @@ static VLCExtended *_o_sharedInstance = nil;
     [o_sld_hue setIntValue: 0];
     [o_sld_saturation setIntValue: 100];
     [o_sld_opaque setIntValue: 100];
-    
+ 
     /* transmit the values */
     [self sliderActionAdjustImage: o_sld_brightness];
     [self sliderActionAdjustImage: o_sld_contrast];
@@ -383,10 +383,10 @@ static VLCExtended *_o_sharedInstance = nil;
         }
         vlc_object_release( p_vout );
     }
-    
+ 
     /* store to prefs */
     config_PutFloat( p_playlist , "macosx-opaqueness" , val.f_float );
-    
+ 
     vlc_object_release( p_playlist );
 
     o_config_changed = YES;
@@ -437,7 +437,7 @@ static VLCExtended *_o_sharedInstance = nil;
     NSRect o_box_audFlts_rect = [o_box_audFlts frame];
     NSRect o_box_vidFlts_rect = [o_box_vidFlts frame];
     NSRect o_box_adjImg_rect = [o_box_adjImg frame];
-    
+ 
     if (o_adjImg_expanded)
     {
         /* move the window contents upwards (partially done through settings
@@ -446,23 +446,23 @@ static VLCExtended *_o_sharedInstance = nil;
         o_win_rect.origin.y = [o_extended_window frame].origin.y + 193;
         o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y + 193;
         o_box_vidFlts_rect.origin.y = o_box_vidFlts_rect.origin.y + 193;
-        
+ 
         /* remove the inserted view */
         [o_adjustImg_view removeFromSuperviewWithoutNeedingDisplay];
     }else{
-    
+ 
         /* move the window contents downwards and resize the window */
         o_win_rect.size.height = o_win_rect.size.height + 193;
         o_win_rect.origin.y = [o_extended_window frame].origin.y - 193;
         o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y - 193;
         o_box_vidFlts_rect.origin.y = o_box_vidFlts_rect.origin.y - 193;
     }
-    
+ 
     [o_box_audFlts setFrameFromContentFrame: o_box_audFlts_rect];
     [o_box_vidFlts setFrameFromContentFrame: o_box_vidFlts_rect];
     [o_extended_window displayIfNeeded];
     [o_extended_window setFrame: o_win_rect display:YES animate: YES];
-    
+ 
     if (o_adjImg_expanded)
     {
         o_box_adjImg_rect.size.height = [o_box_adjImg frame].size.height - 193;
@@ -484,14 +484,14 @@ static VLCExtended *_o_sharedInstance = nil;
     /* expand or collapse audFlts */
     NSRect o_win_rect = [o_extended_window frame];
     NSRect o_box_audFlts_rect = [o_box_audFlts frame];
-    
+ 
     if (o_audFlts_expanded)
     {
         /* move the window contents upwards (partially done through settings
          * inside the nib) and resize the window */
         o_win_rect.size.height = o_win_rect.size.height - 66;
         o_win_rect.origin.y = [o_extended_window frame].origin.y + 66;
-        
+ 
         /* remove the inserted view */
         [o_audioFlts_view removeFromSuperviewWithoutNeedingDisplay];
     }else{
@@ -501,8 +501,8 @@ static VLCExtended *_o_sharedInstance = nil;
     }
     [o_extended_window displayIfNeeded];
     [o_extended_window setFrame: o_win_rect display:YES animate: YES];
-    
-    
+ 
+ 
     if (o_audFlts_expanded)
     {
         o_box_audFlts_rect.size.height = [o_box_audFlts frame].size.height - 66;
@@ -525,7 +525,7 @@ static VLCExtended *_o_sharedInstance = nil;
     NSRect o_win_rect = [o_extended_window frame];
     NSRect o_box_audFlts_rect = [o_box_audFlts frame];
     NSRect o_box_vidFlts_rect = [o_box_vidFlts frame];
-    
+ 
     if (o_vidFlts_expanded)
     {
         /* move the window contents upwards (partially done through settings
@@ -533,21 +533,21 @@ static VLCExtended *_o_sharedInstance = nil;
         o_win_rect.size.height = o_win_rect.size.height - 172;
         o_win_rect.origin.y = [o_extended_window frame].origin.y + 172;
         o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y + 172;
-        
+ 
         /* remove the inserted view */
         [o_videoFilters_view removeFromSuperviewWithoutNeedingDisplay];
     }else{
-    
+ 
         /* move the window contents downwards and resize the window */
         o_win_rect.size.height = o_win_rect.size.height + 172;
         o_win_rect.origin.y = [o_extended_window frame].origin.y - 172;
         o_box_audFlts_rect.origin.y = o_box_audFlts_rect.origin.y - 172;
     }
-    
+ 
     [o_box_audFlts setFrameFromContentFrame: o_box_audFlts_rect];
     [o_extended_window displayIfNeeded];
     [o_extended_window setFrame: o_win_rect display:YES animate: YES];
-    
+ 
     if (o_vidFlts_expanded)
     {
         o_box_vidFlts_rect.size.height = [o_box_vidFlts frame].size.height - 172;
@@ -620,20 +620,20 @@ static VLCExtended *_o_sharedInstance = nil;
  * methods to communicate changes to VLC's core
  *****************************************************************************/
 
-- (void)changeVoutFiltersString:(char *)psz_name onOrOff:(vlc_bool_t )b_add 
+- (void)changeVoutFiltersString:(char *)psz_name onOrOff:(vlc_bool_t )b_add
 {
     /* copied from ../wxwidgets/extrapanel.cpp
      * renamed to conform with Cocoa's rules */
-    /* this method only changes 1st generation video filters (the ones which 
+    /* this method only changes 1st generation video filters (the ones which
      * can't be used for transcoding). Have a look at changeVideoFiltersString
      * for the 2nd generation filters. */
-     
+ 
     vout_thread_t *p_vout;
     intf_thread_t * p_intf = VLCIntf;
-    
+ 
     char *psz_parser, *psz_string;
     psz_string = config_GetPsz( p_intf, "vout-filter" );
-    
+ 
     if( !psz_string ) psz_string = strdup("");
 
     psz_parser = strstr( psz_string, psz_name );
@@ -690,17 +690,17 @@ static VLCExtended *_o_sharedInstance = nil;
 }
 
 
-- (void)changeVideoFiltersString:(char *)psz_name onOrOff:(vlc_bool_t )b_add 
+- (void)changeVideoFiltersString:(char *)psz_name onOrOff:(vlc_bool_t )b_add
 {
     /* same as changeVoutFiltersString but addressing the "video-filter"
      * variable which represents the video filter 2 modules */
-     
+ 
     vout_thread_t *p_vout;
     intf_thread_t * p_intf = VLCIntf;
-    
+ 
     char *psz_parser, *psz_string;
     psz_string = config_GetPsz( p_intf, "video-filter" );
-    
+ 
     if( !psz_string ) psz_string = strdup("");
 
     psz_parser = strstr( psz_string, psz_name );
@@ -834,7 +834,7 @@ static VLCExtended *_o_sharedInstance = nil;
 }
 
 - (void)savePrefs
-{    
+{
     /* save the preferences to make sure that our module-changes will up on
      * next launch again */
     playlist_t * p_playlist = pl_Yield( VLCIntf );
@@ -845,7 +845,7 @@ static VLCExtended *_o_sharedInstance = nil;
         @"clone", @"crop", @"normvol", @"headphone_channel_mixer", @"macosx",
         nil];
     unsigned int x = 0;
-    
+ 
     while ( x != [theModules count] )
     {
         returnedValue = config_SaveConfigFile( p_playlist, [[theModules
@@ -854,19 +854,19 @@ static VLCExtended *_o_sharedInstance = nil;
         if (returnedValue != 0)
         {
             msg_Err(p_playlist, "unable to save the preferences of the "
-            "extended control attribute '%s' (%i)", 
+            "extended control attribute '%s' (%i)",
             [[theModules objectAtIndex: x] UTF8String] , returnedValue);
             [theModules release];
             vlc_object_release( p_playlist );
-            
+ 
             return;
         }
 
         x = ( x + 1 );
     }
-    
+ 
     msg_Dbg( p_playlist, "VLCExtended: saved certain preferences successfully" );
-    
+ 
     [theModules release];
     vlc_object_release( p_playlist );
 }

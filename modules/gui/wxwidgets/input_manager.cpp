@@ -91,7 +91,7 @@ static LRESULT CALLBACK MovieSliderWindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 
                 /* following is only valid for horizontal a trackbar */
                 newpos = ((click.x-tRect.left-(thumb/2))*(max-min)+((tRect.right-tRect.left-thumb)/2))
-		       /(tRect.right-tRect.left-thumb);
+               /(tRect.right-tRect.left-thumb);
 
                 /* set new postion */
                 SendMessage(hWnd, TBM_SETPOS, TRUE, min+newpos);

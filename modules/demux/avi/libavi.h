@@ -287,7 +287,7 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 #define AVIFOURCC_ISMP         VLC_FOURCC('I','S','M','P')
 #define AVIFOURCC_IDIT         VLC_FOURCC('I','D','I','T')
 
-    
+ 
 #define AVITWOCC_wb            VLC_TWOCC('w','b')
 #define AVITWOCC_db            VLC_TWOCC('d','b')
 #define AVITWOCC_dc            VLC_TWOCC('d','c')

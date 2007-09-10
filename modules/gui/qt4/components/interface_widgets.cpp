@@ -328,7 +328,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     controlLayout->addWidget( fasterButton, 0, 17 );
     fasterButton->setMaximumSize( QSize( 26, 20 ) );
 
-    /** TODO: Insert here the AdvControls Widget 
+    /** TODO: Insert here the AdvControls Widget
      * Then fix all the size issues in main_interface.cpp
      **/
     /* advanced Controls handling */
@@ -393,7 +393,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     playButton->setIconSize( QSize( 30, 30 ) );
 
     controlLayout->addWidget( playButton, 2, 0, 2, 2, Qt::AlignBottom );
-    
+ 
     controlLayout->setColumnMinimumWidth( 2, 20 );
     controlLayout->setColumnStretch( 2, 0 );
 
@@ -433,7 +433,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
 
     controlLayout->setColumnStretch( 8 , 10 );
     controlLayout->setColumnStretch( 9, 0 );
-    
+ 
     /*
      * Other first Line buttons
      * Might need to be inside a frame to avoid a few resizing pb
@@ -468,7 +468,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     volMuteLabel->installEventFilter( h );
 
     /** TODO:
-     * Change this slider to use a nice Amarok-like one 
+     * Change this slider to use a nice Amarok-like one
      * Add a Context menu to change to the most useful %
      * **/
     /** FIXME
@@ -574,7 +574,7 @@ void ControlsWidget::updateOnTimer()
         volumeSlider->setValue( i_volume );
         b_my_volume = false;
     }
-    
+ 
     /* Activate the interface buttons according to the presence of the input */
     enableInput( THEMIM->getIM()->hasInput() );
     //enableVideo( THEMIM->getIM()->hasVideo() );
@@ -592,7 +592,7 @@ void ControlsWidget::setStatus( int status )
 /**
  * TODO
  * This functions toggle the fullscreen mode
- * If there is no video, it should first activate Visualisations... 
+ * If there is no video, it should first activate Visualisations...
  *  This has also to be fixed in enableVideo()
  */
 void ControlsWidget::fullscreen()
@@ -739,11 +739,11 @@ QSize PlaylistWidget::sizeHint() const
  **********************************************************************/
 SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
                              QFrame( NULL ), p_intf( _p_i )
-{	
-	QSizePolicy sizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
+{    
+    QSizePolicy sizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
     sizePolicy.setHorizontalStretch( 0 );
     sizePolicy.setVerticalStretch( 0 );
-    
+ 
     speedSlider = new QSlider;
     speedSlider->setSizePolicy( sizePolicy );
     speedSlider->setMaximumSize( QSize( 80, 200 ) );
@@ -754,20 +754,20 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
     speedSlider->setSingleStep( 10 );
     speedSlider->setPageStep( 20 );
     speedSlider->setTickInterval( 20 );
-    
+ 
     CONNECT( speedSlider, valueChanged( int ), this, updateRate( int ) );
-	
+    
     normalSpeedButton = new QPushButton( "N" );
     normalSpeedButton->setMaximumSize( QSize( 26, 20 ) );
     normalSpeedButton->setFlat( true );
     normalSpeedButton->setToolTip( qtr( "Revert to normal play speed" ) );
-    
+ 
     CONNECT( normalSpeedButton, clicked(), this, resetRate() );
-    
+ 
     QVBoxLayout *speedControlLayout = new QVBoxLayout;
-	speedControlLayout->addWidget(speedSlider);
-	speedControlLayout->addWidget(normalSpeedButton);
-	setLayout(speedControlLayout);
+    speedControlLayout->addWidget(speedSlider);
+    speedControlLayout->addWidget(normalSpeedButton);
+    setLayout(speedControlLayout);
 }
 
 SpeedControlWidget::~SpeedControlWidget()
@@ -780,65 +780,65 @@ SpeedControlWidget::~SpeedControlWidget()
 
 void SpeedControlWidget::updateControls( int rate )
 {
-	if( speedSlider->isSliderDown() )
-	{
-		//We don't want to change anything if the user is using the slider
-		return;
-	}
-	
-	int sliderValue;
-	double speed = INPUT_RATE_DEFAULT / (double)rate;
-	
-	if( rate >= INPUT_RATE_DEFAULT )
-	{		
-		if( speed < RATE_SLIDER_MINIMUM )
-		{
-			sliderValue = speedSlider->minimum();
-		}
-		else
-		{
-			sliderValue = (int)( ( speed - 1.0 ) * RATE_SLIDER_LENGTH 
+    if( speedSlider->isSliderDown() )
+    {
+        //We don't want to change anything if the user is using the slider
+        return;
+    }
+    
+    int sliderValue;
+    double speed = INPUT_RATE_DEFAULT / (double)rate;
+    
+    if( rate >= INPUT_RATE_DEFAULT )
+    {        
+        if( speed < RATE_SLIDER_MINIMUM )
+        {
+            sliderValue = speedSlider->minimum();
+        }
+        else
+        {
+            sliderValue = (int)( ( speed - 1.0 ) * RATE_SLIDER_LENGTH
                                         / ( 1.0 - RATE_SLIDER_MAXIMUM ) );
-		}
-	}
-	else
-	{
-		if( speed > RATE_SLIDER_MAXIMUM )
-		{
-			sliderValue = speedSlider->maximum();
-		}
-		else
-		{
-			sliderValue = (int)( ( speed - 1.0 ) * RATE_SLIDER_LENGTH
+        }
+    }
+    else
+    {
+        if( speed > RATE_SLIDER_MAXIMUM )
+        {
+            sliderValue = speedSlider->maximum();
+        }
+        else
+        {
+            sliderValue = (int)( ( speed - 1.0 ) * RATE_SLIDER_LENGTH
                                         / ( RATE_SLIDER_MAXIMUM - 1.0 ) );
-		}
-	}
-	
-	//Block signals to avoid feedback loop
-	speedSlider->blockSignals( true );
-	speedSlider->setValue( sliderValue );
-	speedSlider->blockSignals( false );
+        }
+    }
+    
+    //Block signals to avoid feedback loop
+    speedSlider->blockSignals( true );
+    speedSlider->setValue( sliderValue );
+    speedSlider->blockSignals( false );
 }
 
 void SpeedControlWidget::updateRate( int sliderValue )
 {
-	int rate;
-	
-	if( sliderValue < 0.0 )
-	{
-		rate = INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
+    int rate;
+    
+    if( sliderValue < 0.0 )
+    {
+        rate = INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
                 ( sliderValue * ( 1.0 - RATE_SLIDER_MINIMUM ) + RATE_SLIDER_LENGTH ) ;
-	}
-	else
-	{
+    }
+    else
+    {
         rate = INPUT_RATE_DEFAULT* RATE_SLIDER_LENGTH /
                 ( sliderValue * ( RATE_SLIDER_MAXIMUM - 1.0 ) + RATE_SLIDER_LENGTH );
-	}
+    }
 
-    THEMIM->getIM()->setRate(rate);	
+    THEMIM->getIM()->setRate(rate);    
 }
 
 void SpeedControlWidget::resetRate()
 {
-    THEMIM->getIM()->setRate(INPUT_RATE_DEFAULT);	
+    THEMIM->getIM()->setRate(INPUT_RATE_DEFAULT);    
 }

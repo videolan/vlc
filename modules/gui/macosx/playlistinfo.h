@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * VLCPlaylistInfo interface 
+ * VLCPlaylistInfo interface
  *****************************************************************************/
 
 
@@ -41,7 +41,7 @@
     IBOutlet id o_btn_delete_group;
     IBOutlet id o_btn_add_group;
     IBOutlet id o_outline_view;
-    
+ 
     IBOutlet id o_tab_view;
 
     IBOutlet id o_collection_lbl;

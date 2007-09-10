@@ -424,7 +424,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
         p_sys->p_end = p_block;
         return VLC_TRUE;
     }
-    /* walk through the queue from top down since the new packet is in 
+    /* walk through the queue from top down since the new packet is in
     most cases just appended to the end */
 
     for( ;; )
@@ -605,7 +605,7 @@ static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
             break;
 
         p = BlockParseRTP( p_access, BlockUDP( p_access ) );
-        if( !p && (i_date - i_first) > p_sys->i_rtp_late ) 
+        if( !p && (i_date - i_first) > p_sys->i_rtp_late )
         {
             msg_Err( p_access, "error in RTP prebuffering!" );
             break;

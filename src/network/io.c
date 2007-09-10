@@ -605,8 +605,8 @@ const char *inet_ntop(int af, const void * src,
                 memset(&addr, 0, sizeof(addr));
                 addr.sin6_family = AF_INET6;
                 addr.sin6_addr = *((struct in6_addr*)src);
-                if( 0 == WSAAddressToStringA((LPSOCKADDR)&addr, 
-                                             sizeof(struct sockaddr_in6), 
+                if( 0 == WSAAddressToStringA((LPSOCKADDR)&addr,
+                                             sizeof(struct sockaddr_in6),
                                              NULL, dst, &cnt) )
                 {
                     dst[cnt] = '\0';

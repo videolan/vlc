@@ -5,12 +5,12 @@
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * VLAboutBox interface 
+ * VLAboutBox interface
  *****************************************************************************/
 @interface VLAboutBox : NSObject
 {
@@ -32,13 +32,13 @@
     IBOutlet id o_copyright_field;
     IBOutlet id o_credits_textview;
     IBOutlet id o_credits_scrollview;
-    
+ 
     NSTimer *o_scroll_timer;
     float f_current;
     float f_end;
     NSTimeInterval i_start;
     BOOL b_restart;
-    
+ 
     NSString *o_credits_path;
     NSString *o_credits;
     NSString *o_thanks;

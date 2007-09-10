@@ -118,7 +118,7 @@ struct demux_sys_t
 
     /* Used for the pause command */
     mtime_t expiration;
-    
+ 
     /* The command to run */
     char* psz_command;
 };
@@ -174,7 +174,7 @@ int E_(OpenDemux) ( vlc_object_t *p_this )
         p_sys->expiration = mdate() + (mtime_t)i_arg * (mtime_t)1000000;
         return VLC_SUCCESS;
     }
-    
+ 
     msg_Err( p_demux, "unknown command `%s'", psz_name );
 
     free( p_sys );
@@ -221,11 +221,11 @@ static int Demux( demux_t *p_demux )
             else
                 msleep( 10000 );
             break;
-        
+ 
         case COMMAND_NOP:
         default:
             b_eof = VLC_TRUE;
-            break;       
+            break;
     }
 
     vlc_object_release( p_playlist );

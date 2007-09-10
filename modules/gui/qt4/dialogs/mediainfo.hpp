@@ -49,11 +49,11 @@ public:
     }
     virtual ~MediaInfoDialog();
 
-    void showTab( int );    
+    void showTab( int );
     void setInput( input_item_t * );
-    
+ 
     bool b_need_update;
-    
+ 
 private:
     input_thread_t *p_input;
     static MediaInfoDialog *instance;
@@ -61,7 +61,7 @@ private:
     int i_runs;
     bool mainInput;
     bool stats;
-    
+ 
 
     QTabWidget *IT;
     InputStatsPanel *ISP;
@@ -75,7 +75,7 @@ private:
 public slots:
     void update();
     void update( input_item_t *, bool, bool );
-    
+ 
 
 private slots:
     void close();

@@ -4,13 +4,13 @@
  * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
- * Authors: Derk-Jan Hartman <hartman at videolan.org> 
+ * Authors: Derk-Jan Hartman <hartman at videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -202,7 +202,7 @@ static NSMenu   *o_keys_menu = nil;
 
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view;
-           
+ 
 @end
 
 //#undef CONFIG_ITEM_LIST_STRING

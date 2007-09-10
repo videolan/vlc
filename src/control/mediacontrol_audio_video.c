@@ -90,11 +90,11 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     if( p_snapshot )
     {
         p_pic = private_mediacontrol_createRGBPicture( p_snapshot->i_width,
-						       p_snapshot->i_height,
-						       VLC_FOURCC( 'p','n','g',' ' ),
-						       p_snapshot->date,
-						       p_snapshot->p_data,
-						       p_snapshot->i_datasize );
+                               p_snapshot->i_height,
+                               VLC_FOURCC( 'p','n','g',' ' ),
+                               p_snapshot->date,
+                               p_snapshot->p_data,
+                               p_snapshot->i_datasize );
         if( !p_pic )
         {
             free( p_snapshot->p_data );
@@ -282,7 +282,7 @@ vlc_bool_t mediacontrol_set_visual( mediacontrol_Instance *self,
 
 int
 mediacontrol_get_rate( mediacontrol_Instance *self,
-		       mediacontrol_Exception *exception )
+               mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
     libvlc_media_instance_t* p_mi;
@@ -303,8 +303,8 @@ mediacontrol_get_rate( mediacontrol_Instance *self,
 
 void
 mediacontrol_set_rate( mediacontrol_Instance *self,
-		       const int rate,
-		       mediacontrol_Exception *exception )
+               const int rate,
+               mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
     libvlc_media_instance_t* p_mi;
@@ -322,7 +322,7 @@ mediacontrol_set_rate( mediacontrol_Instance *self,
 
 int
 mediacontrol_get_fullscreen( mediacontrol_Instance *self,
-			     mediacontrol_Exception *exception )
+                 mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
     libvlc_media_instance_t* p_mi;
@@ -343,8 +343,8 @@ mediacontrol_get_fullscreen( mediacontrol_Instance *self,
 
 void
 mediacontrol_set_fullscreen( mediacontrol_Instance *self,
-			     const int b_fullscreen,
-			     mediacontrol_Exception *exception )
+                 const int b_fullscreen,
+                 mediacontrol_Exception *exception )
 {
     libvlc_exception_t ex;
     libvlc_media_instance_t* p_mi;

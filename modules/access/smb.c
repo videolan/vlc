@@ -474,7 +474,7 @@ static void Win32AddConnection( access_t *p_access, char *psz_path,
     {
         msg_Dbg( p_access, "connected to %s", psz_remote );
     }
-    else if( i_result != ERROR_ALREADY_ASSIGNED && 
+    else if( i_result != ERROR_ALREADY_ASSIGNED &&
              i_result != ERROR_DEVICE_ALREADY_REMEMBERED )
     {
         msg_Dbg( p_access, "already connected to %s", psz_remote );

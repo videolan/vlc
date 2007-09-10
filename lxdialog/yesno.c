@@ -59,23 +59,23 @@ dialog_yesno (const char *title, const char *prompt, int height, int width)
     wattrset (dialog, border_attr);
     mvwaddch (dialog, height-3, 0, ACS_LTEE);
     for (i = 0; i < width - 2; i++)
-	waddch (dialog, ACS_HLINE);
+    waddch (dialog, ACS_HLINE);
     wattrset (dialog, dialog_attr);
     waddch (dialog, ACS_RTEE);
 
     if (title != NULL && strlen(title) >= width-2 ) {
-	/* truncate long title -- mec */
-	char * title2 = malloc(width-2+1);
-	memcpy( title2, title, width-2 );
-	title2[width-2] = '\0';
-	title = title2;
+    /* truncate long title -- mec */
+    char * title2 = malloc(width-2+1);
+    memcpy( title2, title, width-2 );
+    title2[width-2] = '\0';
+    title = title2;
     }
 
     if (title != NULL) {
-	wattrset (dialog, title_attr);
-	mvwaddch (dialog, 0, (width - strlen(title))/2 - 1, ' ');
-	waddstr (dialog, (char *)title);
-	waddch (dialog, ' ');
+    wattrset (dialog, title_attr);
+    mvwaddch (dialog, 0, (width - strlen(title))/2 - 1, ' ');
+    waddstr (dialog, (char *)title);
+    waddch (dialog, ' ');
     }
 
     wattrset (dialog, dialog_attr);
@@ -84,35 +84,35 @@ dialog_yesno (const char *title, const char *prompt, int height, int width)
     print_buttons(dialog, height, width, 0);
 
     while (key != ESC) {
-	key = wgetch (dialog);
-	switch (key) {
-	case 'Y':
-	case 'y':
-	    delwin (dialog);
-	    return 0;
-	case 'N':
-	case 'n':
-	    delwin (dialog);
-	    return 1;
+    key = wgetch (dialog);
+    switch (key) {
+    case 'Y':
+    case 'y':
+        delwin (dialog);
+        return 0;
+    case 'N':
+    case 'n':
+        delwin (dialog);
+        return 1;
 
-	case TAB:
-	case KEY_LEFT:
-	case KEY_RIGHT:
-	    button = ((key == KEY_LEFT ? --button : ++button) < 0)
-			? 1 : (button > 1 ? 0 : button);
+    case TAB:
+    case KEY_LEFT:
+    case KEY_RIGHT:
+        button = ((key == KEY_LEFT ? --button : ++button) < 0)
+            ? 1 : (button > 1 ? 0 : button);
 
-	    print_buttons(dialog, height, width, button);
-	    wrefresh (dialog);
-	    break;
-	case ' ':
-	case '\n':
-	    delwin (dialog);
-	    return button;
-	case ESC:
-	    break;
-	}
+        print_buttons(dialog, height, width, button);
+        wrefresh (dialog);
+        break;
+    case ' ':
+    case '\n':
+        delwin (dialog);
+        return button;
+    case ESC:
+        break;
+    }
     }
 
     delwin (dialog);
-    return -1;			/* ESC pressed */
+    return -1;            /* ESC pressed */
 }

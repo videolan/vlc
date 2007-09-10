@@ -430,7 +430,7 @@ static int open_file (access_t *p_access, const char *psz_name)
     if ( !p_sys->fd )
     {
         msg_Err( p_access, "cannot open file %s", psz_name );
-        intf_UserFatal( p_access, VLC_FALSE, _("File reading failed"), 
+        intf_UserFatal( p_access, VLC_FALSE, _("File reading failed"),
                         _("VLC could not open file \"%s\"."), psz_name );
         free (path);
         return VLC_EGENERIC;
@@ -447,7 +447,7 @@ static int open_file (access_t *p_access, const char *psz_name)
     {
         msg_Err (p_access, "cannot open file %s (%s)", psz_name,
                  strerror (errno));
-        intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"), 
+        intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"),
                         _("VLC could not open file \"%s\" (%s)."),
                         psz_name, strerror (errno));
         return -1;

@@ -231,7 +231,7 @@ static int Open( vlc_object_t *p_this )
     if( !(p_dvdread = DVDOpen( psz_name )) )
     {
         msg_Err( p_demux, "DVDRead cannot open source: %s", psz_name );
-        intf_UserFatal( p_demux, VLC_FALSE, _("Playback failure"), 
+        intf_UserFatal( p_demux, VLC_FALSE, _("Playback failure"),
                         _("DVDRead could not open disk \"%s\"."), psz_name );
         free( psz_name );
         return VLC_EGENERIC;
@@ -325,7 +325,7 @@ static int64_t dvdtime_to_time( dvd_time_t *dtime, uint8_t still_time )
         i_micro_second += (int64_t)(BCD2D(dtime->minute)) * 60 * 1000000;
         i_micro_second += (int64_t)(BCD2D(dtime->second)) * 1000000;
 
-        switch((dtime->frame_u & 0xc0) >> 6) 
+        switch((dtime->frame_u & 0xc0) >> 6)
         {
         case 1:
             f_fps = 25.0;
@@ -387,7 +387,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_demux->info.i_title >= 0 && p_demux->info.i_title < p_sys->i_titles )
             {
-                *pi64 = (int64_t) dvdtime_to_time( &p_sys->p_cur_pgc->playback_time, 0 ) / 
+                *pi64 = (int64_t) dvdtime_to_time( &p_sys->p_cur_pgc->playback_time, 0 ) /
                         p_sys->i_title_blocks * p_sys->i_title_offset;
                 return VLC_SUCCESS;
             }
@@ -490,7 +490,7 @@ static int Demux( demux_t *p_demux )
                            1, p_buffer ) != 1 )
         {
             msg_Err( p_demux, "read failed for block %d", p_sys->i_next_vobu );
-            intf_UserWarn( p_demux, _("Playback failure"), 
+            intf_UserWarn( p_demux, _("Playback failure"),
                             _("DVDRead could not read block %d."),
                            p_sys->i_next_vobu );
             return -1;
@@ -552,7 +552,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Err( p_demux, "read failed for %d/%d blocks at 0x%02x",
                  i_read, i_blocks_once, p_sys->i_cur_block );
-        intf_UserFatal( p_demux, VLC_FALSE, _("Playback failure"), 
+        intf_UserFatal( p_demux, VLC_FALSE, _("Playback failure"),
                         _("DVDRead could not read %d/%d blocks at 0x%02x."),
                         i_read, i_blocks_once, p_sys->i_cur_block );
         return -1;
@@ -1222,7 +1222,7 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
              p_sys->dsi_pack.dsi_gi.vobu_c_idn,
              dvdtime_to_time( &p_sys->dsi_pack.dsi_gi.c_eltm, 0 ) );
 
-    msg_Dbg( p_demux, "cell duration: %lld", 
+    msg_Dbg( p_demux, "cell duration: %lld",
              (mtime_t)dvdtime_to_time( &p_sys->p_cur_pgc->cell_playback[p_sys->i_cur_cell].playback_time, 0 ) );
 
     msg_Dbg( p_demux, "cat 0x%02x ilvu_ea %d ilvu_sa %d size %d",

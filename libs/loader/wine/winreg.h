@@ -1,5 +1,5 @@
 /*
- * 		Win32 registry defines (see also winnt.h)
+ *         Win32 registry defines (see also winnt.h)
  */
 #ifndef __WINE_WINREG_H
 #define __WINE_WINREG_H
@@ -32,20 +32,20 @@ extern "C" {
 #define HKEY_DYN_DATA           ((HKEY) 0x80000006)
 
 /*
- *	registry provider structs
+ *    registry provider structs
  */
-typedef struct value_entA 
-{   LPSTR	ve_valuename;
-    DWORD	ve_valuelen;
-    DWORD_PTR	ve_valueptr;
-    DWORD	ve_type;
+typedef struct value_entA
+{   LPSTR    ve_valuename;
+    DWORD    ve_valuelen;
+    DWORD_PTR    ve_valueptr;
+    DWORD    ve_type;
 } VALENTA, *PVALENTA;
 
 typedef struct value_entW {
-    LPWSTR	ve_valuename;
-    DWORD	ve_valuelen;
-    DWORD_PTR	ve_valueptr;
-    DWORD	ve_type;
+    LPWSTR    ve_valuename;
+    DWORD    ve_valuelen;
+    DWORD_PTR    ve_valueptr;
+    DWORD    ve_type;
 } VALENTW, *PVALENTW;
 
 typedef ACCESS_MASK REGSAM;

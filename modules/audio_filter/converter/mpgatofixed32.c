@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -39,7 +39,7 @@
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
-static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,  
+static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                         aout_buffer_t * );
 
 static int  OpenFilter ( vlc_object_t * );
@@ -75,7 +75,7 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * Create: 
+ * Create:
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
@@ -126,7 +126,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_samples * sizeof(vlc_fixed_t) * 
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_samples * sizeof(vlc_fixed_t) *
                                aout_FormatNbChannels( &p_filter->output );
 
     /* Do the actual decoding now. */
@@ -296,7 +296,7 @@ static void Destroy( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * OpenFilter: 
+ * OpenFilter:
  *****************************************************************************/
 static int OpenFilter( vlc_object_t *p_this )
 {

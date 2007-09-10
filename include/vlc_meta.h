@@ -73,7 +73,7 @@ struct vlc_meta_t
 };
 
 /* Setters for meta.
- * Warning: Make sure to use the input_item meta setters (defined in vlc_input.h) 
+ * Warning: Make sure to use the input_item meta setters (defined in vlc_input.h)
  * instead of those one. */
 #define vlc_meta_SetTitle( meta, b )       vlc_meta_Set( meta, vlc_meta_Title, b )
 #define vlc_meta_SetArtist( meta, b )      vlc_meta_Set( meta, vlc_meta_Artist, b )

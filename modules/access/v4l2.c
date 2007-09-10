@@ -412,7 +412,7 @@ int ProbeDev( demux_t *p_demux )
         p_sys->i_codec = i_index;
 
         p_sys->p_codecs = malloc( p_sys->i_codec * sizeof( struct v4l2_fmtdesc ) );
-        memset( p_sys->p_codecs, 0, p_sys->i_codec * sizeof( struct v4l2_fmtdesc ) ); 
+        memset( p_sys->p_codecs, 0, p_sys->i_codec * sizeof( struct v4l2_fmtdesc ) );
 
         for( i_index = 0; i_index < p_sys->i_codec; i_index++ )
         {
@@ -435,7 +435,7 @@ int ProbeDev( demux_t *p_demux )
     return VLC_SUCCESS;
 
 open_failed:
-    
+ 
     if( i_fd >= 0 ) close( i_fd );
     return VLC_EGENERIC;
 

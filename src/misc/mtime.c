@@ -127,7 +127,7 @@ static inline unsigned mprec( void )
 
 static unsigned prec = 0;
 static volatile mtime_t cached_time = 0;
-#if defined( HAVE_CLOCK_NANOSLEEP ) 
+#if defined( HAVE_CLOCK_NANOSLEEP )
 #  if (_POSIX_MONOTONIC_CLOCK - 0 < 0)
 #    define CLOCK_MONOTONIC CLOCK_REALTIME
 #  endif
@@ -290,7 +290,7 @@ void msleep( mtime_t delay )
 {
     mtime_t earlier = cached_time;
 
-#if defined( HAVE_CLOCK_NANOSLEEP ) 
+#if defined( HAVE_CLOCK_NANOSLEEP )
     lldiv_t d = lldiv( delay, 1000000 );
     struct timespec ts = { d.quot, d.rem * 1000 };
 

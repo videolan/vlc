@@ -121,7 +121,7 @@ static int Demux( demux_t *p_demux )
         }
         if( !strcasecmp( psz_key, "numberofentries" ) )
         {
-            msg_Dbg( p_demux, "pls should have %d entries", atoi(psz_value) ); 
+            msg_Dbg( p_demux, "pls should have %d entries", atoi(psz_value) );
             free( psz_line);
             continue;
         }

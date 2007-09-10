@@ -1500,7 +1500,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 pl_Release( p_playlist );
             }
             return VLC_SUCCESS;
-            
+ 
         case ES_OUT_SET_DEFAULT:
         {
             es = (es_out_id_t*) va_arg( args, es_out_id_t * );

@@ -67,7 +67,7 @@ static int Create( vlc_object_t *p_this )
 
     /* Only conversion to Stereo and 4.0 right now */
     if( p_filter->output.i_physical_channels !=
-        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) 
+        (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)
         && p_filter->output.i_physical_channels !=
         ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
         AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT) )

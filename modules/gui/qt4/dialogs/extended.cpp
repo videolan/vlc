@@ -45,7 +45,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     tab->addTab( foo, qtr( "Graphic Equalizer" ) );
 
     ExtVideo *bar = new ExtVideo( p_intf, this );
-    tab->addTab( bar, qtr( "Video Adjustments and Effects" ) );    
+    tab->addTab( bar, qtr( "Video Adjustments and Effects" ) );
 
     layout->addWidget( tab, 0, 0, 1, 5 );
 

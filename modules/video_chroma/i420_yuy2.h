@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -130,7 +130,7 @@ movq      %%mm1, (%1)   # Store YUYV                                      \n\
     } while(0)
 
 #define MMX_END _mm_empty()
-    
+ 
 #define MMX_YUV420_YUYV                     \
     mm1 = _mm_cvtsi32_si64(*(int*)p_u);     \
     mm2 = _mm_cvtsi32_si64(*(int*)p_v);     \

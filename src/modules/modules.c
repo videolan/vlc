@@ -371,7 +371,7 @@ const char *module_GetName( const module_t *m, vlc_bool_t long_name )
 {
     if( long_name && ( m->psz_longname != NULL) )
         return m->psz_longname;
-    
+ 
     return m->psz_shortname ?: m->psz_object_name;
 }
 
@@ -805,7 +805,7 @@ char ** __module_GetModulesNamesForCapability( vlc_object_t *p_this,
     psz_ret[count] = NULL;
 
     vlc_list_release( p_list );
-    
+ 
     return psz_ret;
 }
 

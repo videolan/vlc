@@ -116,14 +116,14 @@ vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
 
 //         if( p_input->stream.i_mux_rate == 0 )
 //             return 0;
-// 
+//
 //         /* Convert an offset into milliseconds. Taken from input_ext-intf.c.
 //            The 50 hardcoded constant comes from the definition of i_mux_rate :
 //            i_mux_rate : the rate we read the stream (in units of 50 bytes/s) ;
 //            0 if undef */
 //         if( to == mediacontrol_MediaTime )
 //             return ( vlc_int64_t )( 1000 * value / 50 / p_input->stream.i_mux_rate );
-// 
+//
 //         if( to == mediacontrol_SampleCount )
 //         {
 //             double f_fps;
@@ -264,7 +264,7 @@ mediacontrol_Exception*
 mediacontrol_exception_create( void )
 {
     mediacontrol_Exception* exception;
-    
+ 
     exception = ( mediacontrol_Exception* )malloc( sizeof( mediacontrol_Exception ) );
     mediacontrol_exception_init( exception );
     return exception;

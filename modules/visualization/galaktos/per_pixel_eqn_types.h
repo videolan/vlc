@@ -7,8 +7,8 @@
 typedef struct PER_PIXEL_EQN_T {
   int index; /* used for splay tree ordering. */
   int flags; /* primarily to specify if this variable is user-defined */
-  param_t * param; 
-  gen_expr_t * gen_expr;	
+  param_t * param;
+  gen_expr_t * gen_expr;    
 } per_pixel_eqn_t;
 
 

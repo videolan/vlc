@@ -121,7 +121,7 @@ struct sout_mux_sys_t
     int i_system_header;
     int i_dts_delay;
     int i_rate_bound; /* units of 50 bytes/second */
-    
+ 
     int64_t i_instant_bitrate;
     int64_t i_instant_size;
     int64_t i_instant_dts;
@@ -259,7 +259,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     ps_stream_t *p_stream;
-    
+ 
 
     msg_Dbg( p_mux, "adding input codec=%4.4s",
              (char*)&p_input->p_fmt->i_codec );
@@ -343,7 +343,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_sys->i_instant_bitrate += p_input->p_fmt->i_bitrate + 1000/* overhead */;
 
     /* FIXME -- spec requires  an upper limit rate boundary in the system header;
-       our codecs are VBR; using 2x nominal rate, convert to 50 bytes/sec */ 
+       our codecs are VBR; using 2x nominal rate, convert to 50 bytes/sec */
     p_sys->i_rate_bound += p_input->p_fmt->i_bitrate * 2 / (8 * 50);
     p_sys->i_psm_version++;
 
@@ -663,7 +663,7 @@ static void MuxWriteSystemHeader( sout_mux_t *p_mux, block_t **p_buf,
     bits_write( &bits, 32, 0x01bb );
     bits_write( &bits, 16, 12 - 6 + i_nb_stream * 3 );
     bits_write( &bits, 1,  1 ); // marker bit
-    bits_write( &bits, 22, i_rate_bound); 
+    bits_write( &bits, 22, i_rate_bound);
     bits_write( &bits, 1,  1 ); // marker bit
 
     bits_write( &bits, 6,  p_sys->i_audio_bound );

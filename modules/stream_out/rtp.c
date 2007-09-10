@@ -502,7 +502,7 @@ static int Open( vlc_object_t *p_this )
                     continue;
 
                 /* needed both :sout-rtp-sdp= and rtp{sdp=} can be used */
-                if( !strcmp( p_cfg->psz_value, psz ) ) 
+                if( !strcmp( p_cfg->psz_value, psz ) )
                     continue;
 
                 SDPHandleUrl( p_stream, p_cfg->psz_value );
@@ -620,7 +620,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
                                      id->i_port, id->i_port + 1 );
         }
     }
-    else if( ( url.psz_protocol && !strcasecmp( url.psz_protocol, "sap" ) ) || 
+    else if( ( url.psz_protocol && !strcasecmp( url.psz_protocol, "sap" ) ) ||
              ( url.psz_host && !strcasecmp( url.psz_host, "sap" ) ) )
     {
         p_sys->b_export_sap = VLC_TRUE;
@@ -999,7 +999,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 char    *p_64_pps = NULL;
                 char    hexa[6+1];
 
-                while( i_buffer > 4 && 
+                while( i_buffer > 4 &&
                        p_buffer[0] == 0 && p_buffer[1] == 0 &&
                        p_buffer[2] == 0 && p_buffer[3] == 1 )
                 {
@@ -1999,7 +1999,7 @@ static int rtp_packetize_h264( sout_stream_t *p_stream, sout_stream_id_t *id,
                 i_size = i_offset - ( p_buffer[i_offset-1] == 0 ? 1 : 0);
                 i_skip = i_offset;
                 break;
-            } 
+            }
         }
         /* TODO add STAP-A to remove a lot of overhead with small slice/sei/... */
         rtp_packetize_h264_nal( p_stream, id, p_buffer, i_size,

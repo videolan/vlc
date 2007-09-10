@@ -182,7 +182,7 @@ int intf_RunThread( intf_thread_t *p_intf )
                              "README.MacOSX.rtf file.");
             return VLC_EGENERIC;
         }
-        
+ 
         /* If the main interface does not have a run function,
          * implement a waiting loop ourselves
          */

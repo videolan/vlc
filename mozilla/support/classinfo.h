@@ -4,7 +4,7 @@
 // and to set flags used by the security system
 class  ClassInfo : public nsIClassInfo
 {
-  // These flags are used by the DOM and security systems to signal that 
+  // These flags are used by the DOM and security systems to signal that
   // JavaScript callers are allowed to call this object's scritable methods.
   NS_IMETHOD GetFlags(PRUint32 *aFlags)
     {*aFlags = nsIClassInfo::PLUGIN_OBJECT | nsIClassInfo::DOM_OBJECT;

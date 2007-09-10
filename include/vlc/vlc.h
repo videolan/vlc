@@ -159,7 +159,7 @@ struct vlc_list_t
  * Shared library Export macros
  *****************************************************************************/
 #ifndef VLC_PUBLIC_API
-#  define VLC_PUBLIC_API extern 
+#  define VLC_PUBLIC_API extern
 #endif
 
 /*****************************************************************************

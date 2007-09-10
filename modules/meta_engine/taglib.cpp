@@ -132,7 +132,7 @@ static int ReadMeta( vlc_object_t *p_this )
                 if (!strcmp( owner, "http://musicbrainz.org" ))
                 {
                     /* ID3v2 UFID contains up to 64 bytes binary data
-                        * but in our case it will be a '\0' 
+                        * but in our case it will be a '\0'
                         * terminated string */
                     char *psz_ufid = (char*) malloc( 64 );
                     int j = 0;
@@ -152,7 +152,7 @@ static int ReadMeta( vlc_object_t *p_this )
             {
                 p_txxx = dynamic_cast<TagLib::ID3v2::UserTextIdentificationFrame*>(*iter);
                 const char *psz_desc= p_txxx->description().toCString();
-                vlc_meta_AddExtra( p_meta, psz_desc, 
+                vlc_meta_AddExtra( p_meta, psz_desc,
                             p_txxx->fieldList().toString().toCString());
             }
 #if 0
@@ -203,7 +203,7 @@ vlc_meta_Set##bar( p_meta, p_t->toString().toCString(true))
                         (mtime_t) i_ogg_v_length * 1000000 );
             vlc_object_release( p_input );
         }
-        
+ 
     }
 #if 0 /* at this moment, taglib is unable to detect ogg/flac files
 * becauses type detection is based on file extension:
@@ -270,7 +270,7 @@ static int WriteMeta( vlc_object_t *p_this )
     playlist_t *p_playlist = (playlist_t *)p_this;
     meta_export_t *p_export = (meta_export_t *)p_playlist->p_private;
     input_item_t *p_item = p_export->p_item;
-    
+ 
     if( p_item == NULL )
     {
         msg_Err( p_this, "Can't save meta data of an empty input" );
@@ -348,7 +348,7 @@ static int WriteMeta( vlc_object_t *p_this )
         WRITE( Copyright, "TCOP" );
         WRITE( EncodedBy, "TENC" );
         WRITE( Language, "TLAN" );
-        
+ 
 #undef WRITE
     }
 

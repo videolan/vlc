@@ -18,8 +18,8 @@ typedef struct tagCOORD {
 
 
   /* Windows Exit Procedure flag values */
-#define	WEP_FREE_DLL        0
-#define	WEP_SYSTEM_EXIT     1
+#define    WEP_FREE_DLL        0
+#define    WEP_SYSTEM_EXIT     1
 
 typedef DWORD CALLBACK (*LPTHREAD_START_ROUTINE)(LPVOID);
 
@@ -146,7 +146,7 @@ typedef struct
 #define COPY_FILE_OPEN_SOURCE_FOR_WRITE 0x00000004
 
 /* GetTempFileName() Flags */
-#define TF_FORCEDRIVE	        0x80
+#define TF_FORCEDRIVE            0x80
 
 #define DRIVE_CANNOTDETERMINE      0
 #define DRIVE_DOESNOTEXIST         1
@@ -241,90 +241,90 @@ typedef struct
 
 /* comm */
 
-#define CBR_110	0xFF10
-#define CBR_300	0xFF11
-#define CBR_600	0xFF12
-#define CBR_1200	0xFF13
-#define CBR_2400	0xFF14
-#define CBR_4800	0xFF15
-#define CBR_9600	0xFF16
-#define CBR_14400	0xFF17
-#define CBR_19200	0xFF18
-#define CBR_38400	0xFF1B
-#define CBR_56000	0xFF1F
-#define CBR_128000	0xFF23
-#define CBR_256000	0xFF27
+#define CBR_110    0xFF10
+#define CBR_300    0xFF11
+#define CBR_600    0xFF12
+#define CBR_1200    0xFF13
+#define CBR_2400    0xFF14
+#define CBR_4800    0xFF15
+#define CBR_9600    0xFF16
+#define CBR_14400    0xFF17
+#define CBR_19200    0xFF18
+#define CBR_38400    0xFF1B
+#define CBR_56000    0xFF1F
+#define CBR_128000    0xFF23
+#define CBR_256000    0xFF27
 
-#define NOPARITY	0
-#define ODDPARITY	1
-#define EVENPARITY	2
-#define MARKPARITY	3
-#define SPACEPARITY	4
-#define ONESTOPBIT	0
-#define ONE5STOPBITS	1
-#define TWOSTOPBITS	2
+#define NOPARITY    0
+#define ODDPARITY    1
+#define EVENPARITY    2
+#define MARKPARITY    3
+#define SPACEPARITY    4
+#define ONESTOPBIT    0
+#define ONE5STOPBITS    1
+#define TWOSTOPBITS    2
 
-#define IGNORE		0
+#define IGNORE        0
 #define INFINITE16      0xFFFF
 #define INFINITE      0xFFFFFFFF
 
-#define CE_RXOVER	0x0001
-#define CE_OVERRUN	0x0002
-#define CE_RXPARITY	0x0004
-#define CE_FRAME	0x0008
-#define CE_BREAK	0x0010
-#define CE_CTSTO	0x0020
-#define CE_DSRTO	0x0040
-#define CE_RLSDTO	0x0080
-#define CE_TXFULL	0x0100
-#define CE_PTO		0x0200
-#define CE_IOE		0x0400
-#define CE_DNS		0x0800
-#define CE_OOP		0x1000
-#define CE_MODE	0x8000
+#define CE_RXOVER    0x0001
+#define CE_OVERRUN    0x0002
+#define CE_RXPARITY    0x0004
+#define CE_FRAME    0x0008
+#define CE_BREAK    0x0010
+#define CE_CTSTO    0x0020
+#define CE_DSRTO    0x0040
+#define CE_RLSDTO    0x0080
+#define CE_TXFULL    0x0100
+#define CE_PTO        0x0200
+#define CE_IOE        0x0400
+#define CE_DNS        0x0800
+#define CE_OOP        0x1000
+#define CE_MODE    0x8000
 
-#define IE_BADID	-1
-#define IE_OPEN	-2
-#define IE_NOPEN	-3
-#define IE_MEMORY	-4
-#define IE_DEFAULT	-5
-#define IE_HARDWARE	-10
-#define IE_BYTESIZE	-11
-#define IE_BAUDRATE	-12
+#define IE_BADID    -1
+#define IE_OPEN    -2
+#define IE_NOPEN    -3
+#define IE_MEMORY    -4
+#define IE_DEFAULT    -5
+#define IE_HARDWARE    -10
+#define IE_BYTESIZE    -11
+#define IE_BAUDRATE    -12
 
-#define EV_RXCHAR	0x0001
-#define EV_RXFLAG	0x0002
-#define EV_TXEMPTY	0x0004
-#define EV_CTS		0x0008
-#define EV_DSR		0x0010
-#define EV_RLSD	0x0020
-#define EV_BREAK	0x0040
-#define EV_ERR		0x0080
-#define EV_RING	0x0100
-#define EV_PERR	0x0200
-#define EV_CTSS	0x0400
-#define EV_DSRS	0x0800
-#define EV_RLSDS	0x1000
-#define EV_RINGTE	0x2000
-#define EV_RingTe	EV_RINGTE
+#define EV_RXCHAR    0x0001
+#define EV_RXFLAG    0x0002
+#define EV_TXEMPTY    0x0004
+#define EV_CTS        0x0008
+#define EV_DSR        0x0010
+#define EV_RLSD    0x0020
+#define EV_BREAK    0x0040
+#define EV_ERR        0x0080
+#define EV_RING    0x0100
+#define EV_PERR    0x0200
+#define EV_CTSS    0x0400
+#define EV_DSRS    0x0800
+#define EV_RLSDS    0x1000
+#define EV_RINGTE    0x2000
+#define EV_RingTe    EV_RINGTE
 
-#define SETXOFF	1
-#define SETXON		2
-#define SETRTS		3
-#define CLRRTS		4
-#define SETDTR		5
-#define CLRDTR		6
-#define RESETDEV	7
-#define SETBREAK	8
-#define CLRBREAK	9
+#define SETXOFF    1
+#define SETXON        2
+#define SETRTS        3
+#define CLRRTS        4
+#define SETDTR        5
+#define CLRDTR        6
+#define RESETDEV    7
+#define SETBREAK    8
+#define CLRBREAK    9
 
-#define GETBASEIRQ	10
+#define GETBASEIRQ    10
 
 /* Purge functions for Comm Port */
-#define PURGE_TXABORT       0x0001  /* Kill the pending/current writes to the 
-				       comm port */
-#define PURGE_RXABORT       0x0002  /*Kill the pending/current reads to 
-				     the comm port */
+#define PURGE_TXABORT       0x0001  /* Kill the pending/current writes to the
+                       comm port */
+#define PURGE_RXABORT       0x0002  /*Kill the pending/current reads to
+                     the comm port */
 #define PURGE_TXCLEAR       0x0004  /* Kill the transmit queue if there*/
 #define PURGE_RXCLEAR       0x0008  /* Kill the typeahead buffer if there*/
 
@@ -335,22 +335,22 @@ typedef struct
 #define MS_RING_ON          ((DWORD)0x0040)
 #define MS_RLSD_ON          ((DWORD)0x0080)
 
-#define	RTS_CONTROL_DISABLE	0
-#define	RTS_CONTROL_ENABLE	1
-#define	RTS_CONTROL_HANDSHAKE	2
-#define	RTS_CONTROL_TOGGLE	3
+#define    RTS_CONTROL_DISABLE    0
+#define    RTS_CONTROL_ENABLE    1
+#define    RTS_CONTROL_HANDSHAKE    2
+#define    RTS_CONTROL_TOGGLE    3
 
-#define	DTR_CONTROL_DISABLE	0
-#define	DTR_CONTROL_ENABLE	1
-#define	DTR_CONTROL_HANDSHAKE	2
+#define    DTR_CONTROL_DISABLE    0
+#define    DTR_CONTROL_ENABLE    1
+#define    DTR_CONTROL_HANDSHAKE    2
 
-#define CSTF_CTSHOLD	0x01
-#define CSTF_DSRHOLD	0x02
-#define CSTF_RLSDHOLD	0x04
-#define CSTF_XOFFHOLD	0x08
-#define CSTF_XOFFSENT	0x10
-#define CSTF_EOF	0x20
-#define CSTF_TXIM	0x40
+#define CSTF_CTSHOLD    0x01
+#define CSTF_DSRHOLD    0x02
+#define CSTF_RLSDHOLD    0x04
+#define CSTF_XOFFHOLD    0x08
+#define CSTF_XOFFSENT    0x10
+#define CSTF_EOF    0x20
+#define CSTF_TXIM    0x40
 
 #define MAKEINTRESOURCEA(i) (LPSTR)((DWORD)((WORD)(i)))
 #define MAKEINTRESOURCEW(i) (LPWSTR)((DWORD)((WORD)(i)))
@@ -398,15 +398,15 @@ typedef struct
 #define RT_GROUP_ICON        WINELIB_NAME_AW(RT_GROUP_ICON)
 
 
-#define LMEM_FIXED          0   
+#define LMEM_FIXED          0
 #define LMEM_MOVEABLE       0x0002
 #define LMEM_NOCOMPACT      0x0010
 #define LMEM_NODISCARD      0x0020
 #define LMEM_ZEROINIT       0x0040
 #define LMEM_MODIFY         0x0080
 #define LMEM_DISCARDABLE    0x0F00
-#define LMEM_DISCARDED	    0x4000
-#define LMEM_LOCKCOUNT	    0x00FF
+#define LMEM_DISCARDED        0x4000
+#define LMEM_LOCKCOUNT        0x00FF
 
 #define LPTR (LMEM_FIXED | LMEM_ZEROINIT)
 
@@ -610,36 +610,36 @@ typedef struct {
  */
 
 /* STARTUPINFO.dwFlags */
-#define	STARTF_USESHOWWINDOW	0x00000001
-#define	STARTF_USESIZE		0x00000002
-#define	STARTF_USEPOSITION	0x00000004
-#define	STARTF_USECOUNTCHARS	0x00000008
-#define	STARTF_USEFILLATTRIBUTE	0x00000010
-#define	STARTF_RUNFULLSCREEN	0x00000020
-#define	STARTF_FORCEONFEEDBACK	0x00000040
-#define	STARTF_FORCEOFFFEEDBACK	0x00000080
-#define	STARTF_USESTDHANDLES	0x00000100
-#define	STARTF_USEHOTKEY	0x00000200
+#define    STARTF_USESHOWWINDOW    0x00000001
+#define    STARTF_USESIZE        0x00000002
+#define    STARTF_USEPOSITION    0x00000004
+#define    STARTF_USECOUNTCHARS    0x00000008
+#define    STARTF_USEFILLATTRIBUTE    0x00000010
+#define    STARTF_RUNFULLSCREEN    0x00000020
+#define    STARTF_FORCEONFEEDBACK    0x00000040
+#define    STARTF_FORCEOFFFEEDBACK    0x00000080
+#define    STARTF_USESTDHANDLES    0x00000100
+#define    STARTF_USEHOTKEY    0x00000200
 
 typedef struct {
-        DWORD cb;		/* 00: size of struct */
-        LPSTR lpReserved;	/* 04: */
-        LPSTR lpDesktop;	/* 08: */
-        LPSTR lpTitle;		/* 0c: */
-        DWORD dwX;		/* 10: */
-        DWORD dwY;		/* 14: */
-        DWORD dwXSize;		/* 18: */
-        DWORD dwYSize;		/* 1c: */
-        DWORD dwXCountChars;	/* 20: */
-        DWORD dwYCountChars;	/* 24: */
-        DWORD dwFillAttribute;	/* 28: */
-        DWORD dwFlags;		/* 2c: */
-        WORD wShowWindow;	/* 30: */
-        WORD cbReserved2;	/* 32: */
-        BYTE *lpReserved2;	/* 34: */
-        HANDLE hStdInput;	/* 38: */
-        HANDLE hStdOutput;	/* 3c: */
-        HANDLE hStdError;	/* 40: */
+        DWORD cb;        /* 00: size of struct */
+        LPSTR lpReserved;    /* 04: */
+        LPSTR lpDesktop;    /* 08: */
+        LPSTR lpTitle;        /* 0c: */
+        DWORD dwX;        /* 10: */
+        DWORD dwY;        /* 14: */
+        DWORD dwXSize;        /* 18: */
+        DWORD dwYSize;        /* 1c: */
+        DWORD dwXCountChars;    /* 20: */
+        DWORD dwYCountChars;    /* 24: */
+        DWORD dwFillAttribute;    /* 28: */
+        DWORD dwFlags;        /* 2c: */
+        WORD wShowWindow;    /* 30: */
+        WORD cbReserved2;    /* 32: */
+        BYTE *lpReserved2;    /* 34: */
+        HANDLE hStdInput;    /* 38: */
+        HANDLE hStdOutput;    /* 3c: */
+        HANDLE hStdError;    /* 40: */
 } STARTUPINFOA, *LPSTARTUPINFOA;
 
 typedef struct {
@@ -667,10 +667,10 @@ DECL_WINELIB_TYPE_AW(STARTUPINFO)
 DECL_WINELIB_TYPE_AW(LPSTARTUPINFO)
 
 typedef struct {
-	HANDLE	hProcess;
-	HANDLE	hThread;
-	DWORD		dwProcessId;
-	DWORD		dwThreadId;
+    HANDLE    hProcess;
+    HANDLE    hThread;
+    DWORD        dwProcessId;
+    DWORD        dwThreadId;
 } PROCESS_INFORMATION,*LPPROCESS_INFORMATION;
 
 typedef struct {
@@ -720,7 +720,7 @@ typedef struct {
 /* File creation flags
  */
 #define FILE_FLAG_WRITE_THROUGH    0x80000000UL
-#define FILE_FLAG_OVERLAPPED 	   0x40000000L
+#define FILE_FLAG_OVERLAPPED        0x40000000L
 #define FILE_FLAG_NO_BUFFERING     0x20000000L
 #define FILE_FLAG_RANDOM_ACCESS    0x10000000L
 #define FILE_FLAG_SEQUENTIAL_SCAN  0x08000000L
@@ -786,28 +786,28 @@ DECL_WINELIB_TYPE_AW(LOCALE_ENUMPROC)
 typedef struct tagSYSTEM_INFO
 {
     union {
-	DWORD	dwOemId; /* Obsolete field - do not use */
-	struct {
-		WORD wProcessorArchitecture;
-		WORD wReserved;
-	} DUMMYSTRUCTNAME;
+    DWORD    dwOemId; /* Obsolete field - do not use */
+    struct {
+        WORD wProcessorArchitecture;
+        WORD wReserved;
+    } DUMMYSTRUCTNAME;
     } DUMMYUNIONNAME;
-    DWORD	dwPageSize;
-    LPVOID	lpMinimumApplicationAddress;
-    LPVOID	lpMaximumApplicationAddress;
-    DWORD	dwActiveProcessorMask;
-    DWORD	dwNumberOfProcessors;
-    DWORD	dwProcessorType;
-    DWORD	dwAllocationGranularity;
-    WORD	wProcessorLevel;
-    WORD	wProcessorRevision;
+    DWORD    dwPageSize;
+    LPVOID    lpMinimumApplicationAddress;
+    LPVOID    lpMaximumApplicationAddress;
+    DWORD    dwActiveProcessorMask;
+    DWORD    dwNumberOfProcessors;
+    DWORD    dwProcessorType;
+    DWORD    dwAllocationGranularity;
+    WORD    wProcessorLevel;
+    WORD    wProcessorRevision;
 } SYSTEM_INFO, *LPSYSTEM_INFO;
 
 /* {G,S}etPriorityClass */
-#define	NORMAL_PRIORITY_CLASS	0x00000020
-#define	IDLE_PRIORITY_CLASS	0x00000040
-#define	HIGH_PRIORITY_CLASS	0x00000080
-#define	REALTIME_PRIORITY_CLASS	0x00000100
+#define    NORMAL_PRIORITY_CLASS    0x00000020
+#define    IDLE_PRIORITY_CLASS    0x00000040
+#define    HIGH_PRIORITY_CLASS    0x00000080
+#define    REALTIME_PRIORITY_CLASS    0x00000100
 
 typedef WIN_BOOL CALLBACK (*ENUMRESTYPEPROCA)(HMODULE,LPSTR,LONG);
 typedef WIN_BOOL CALLBACK (*ENUMRESTYPEPROCW)(HMODULE,LPWSTR,LONG);
@@ -821,33 +821,33 @@ DECL_WINELIB_TYPE_AW(ENUMRESNAMEPROC)
 DECL_WINELIB_TYPE_AW(ENUMRESLANGPROC)
 
 /* flags that can be passed to LoadLibraryEx */
-#define	DONT_RESOLVE_DLL_REFERENCES	0x00000001
-#define	LOAD_LIBRARY_AS_DATAFILE	0x00000002
-#define	LOAD_WITH_ALTERED_SEARCH_PATH	0x00000008
+#define    DONT_RESOLVE_DLL_REFERENCES    0x00000001
+#define    LOAD_LIBRARY_AS_DATAFILE    0x00000002
+#define    LOAD_WITH_ALTERED_SEARCH_PATH    0x00000008
 
 /* ifdef _x86_ ... */
 typedef struct _LDT_ENTRY {
-    WORD	LimitLow;
-    WORD	BaseLow;
+    WORD    LimitLow;
+    WORD    BaseLow;
     union {
-	struct {
-	    BYTE	BaseMid;
-	    BYTE	Flags1;/*Declare as bytes to avoid alignment problems */
-	    BYTE	Flags2; 
-	    BYTE	BaseHi;
-	} Bytes;
-	struct {	    
-	    unsigned	BaseMid		: 8;
-	    unsigned	Type		: 5;
-	    unsigned	Dpl		: 2;
-	    unsigned	Pres		: 1;
-	    unsigned	LimitHi		: 4;
-	    unsigned	Sys		: 1;
-	    unsigned	Reserved_0	: 1;
-	    unsigned	Default_Big	: 1;
-	    unsigned	Granularity	: 1;
-	    unsigned	BaseHi		: 8;
-	} Bits;
+    struct {
+        BYTE    BaseMid;
+        BYTE    Flags1;/*Declare as bytes to avoid alignment problems */
+        BYTE    Flags2;
+        BYTE    BaseHi;
+    } Bytes;
+    struct {    
+        unsigned    BaseMid        : 8;
+        unsigned    Type        : 5;
+        unsigned    Dpl        : 2;
+        unsigned    Pres        : 1;
+        unsigned    LimitHi        : 4;
+        unsigned    Sys        : 1;
+        unsigned    Reserved_0    : 1;
+        unsigned    Default_Big    : 1;
+        unsigned    Granularity    : 1;
+        unsigned    BaseHi        : 8;
+    } Bits;
     } HighWord;
 } LDT_ENTRY, *LPLDT_ENTRY;
 
@@ -877,29 +877,29 @@ typedef struct _DllVersionInfo {
  * This one seems to be a Win32 only definition. It also is defined with
  * WINAPI instead of CALLBACK in the windows headers.
  */
-typedef DWORD WINAPI (*LPPROGRESS_ROUTINE)(LARGE_INTEGER, LARGE_INTEGER, LARGE_INTEGER, 
+typedef DWORD WINAPI (*LPPROGRESS_ROUTINE)(LARGE_INTEGER, LARGE_INTEGER, LARGE_INTEGER,
                                            LARGE_INTEGER, DWORD, DWORD, HANDLE,
                                            HANDLE, LPVOID);
 
 
-#define WAIT_FAILED		0xffffffff
-#define WAIT_OBJECT_0		0
-#define WAIT_ABANDONED		STATUS_ABANDONED_WAIT_0
-#define WAIT_ABANDONED_0	STATUS_ABANDONED_WAIT_0
-#define WAIT_IO_COMPLETION	STATUS_USER_APC
-#define WAIT_TIMEOUT		STATUS_TIMEOUT
+#define WAIT_FAILED        0xffffffff
+#define WAIT_OBJECT_0        0
+#define WAIT_ABANDONED        STATUS_ABANDONED_WAIT_0
+#define WAIT_ABANDONED_0    STATUS_ABANDONED_WAIT_0
+#define WAIT_IO_COMPLETION    STATUS_USER_APC
+#define WAIT_TIMEOUT        STATUS_TIMEOUT
 #define STILL_ACTIVE            STATUS_PENDING
 
-#define	PAGE_NOACCESS		0x01
-#define	PAGE_READONLY		0x02
-#define	PAGE_READWRITE		0x04
-#define	PAGE_WRITECOPY		0x08
-#define	PAGE_EXECUTE		0x10
-#define	PAGE_EXECUTE_READ	0x20
-#define	PAGE_EXECUTE_READWRITE	0x40
-#define	PAGE_EXECUTE_WRITECOPY	0x80
-#define	PAGE_GUARD		0x100
-#define	PAGE_NOCACHE		0x200
+#define    PAGE_NOACCESS        0x01
+#define    PAGE_READONLY        0x02
+#define    PAGE_READWRITE        0x04
+#define    PAGE_WRITECOPY        0x08
+#define    PAGE_EXECUTE        0x10
+#define    PAGE_EXECUTE_READ    0x20
+#define    PAGE_EXECUTE_READWRITE    0x40
+#define    PAGE_EXECUTE_WRITECOPY    0x80
+#define    PAGE_GUARD        0x100
+#define    PAGE_NOCACHE        0x200
 
 #define MEM_COMMIT              0x00001000
 #define MEM_RESERVE             0x00002000
@@ -968,8 +968,8 @@ typedef DWORD WINAPI (*LPPROGRESS_ROUTINE)(LARGE_INTEGER, LARGE_INTEGER, LARGE_I
 /* Wine extension; Windows doesn't have a name for this code */
 #define EXCEPTION_CRITICAL_SECTION_WAIT     0xc0000194
 
-#define DUPLICATE_CLOSE_SOURCE		0x00000001
-#define DUPLICATE_SAME_ACCESS		0x00000002
+#define DUPLICATE_CLOSE_SOURCE        0x00000001
+#define DUPLICATE_SAME_ACCESS        0x00000002
 
 #define HANDLE_FLAG_INHERIT             0x00000001
 #define HANDLE_FLAG_PROTECT_FROM_CLOSE  0x00000002
@@ -987,12 +987,12 @@ typedef DWORD WINAPI (*LPPROGRESS_ROUTINE)(LARGE_INTEGER, LARGE_INTEGER, LARGE_I
 
 /* Could this type be considered opaque? */
 typedef struct {
-	LPVOID	DebugInfo;
-	LONG LockCount;
-	LONG RecursionCount;
-	HANDLE OwningThread;
-	HANDLE LockSemaphore;
-	DWORD Reserved;
+    LPVOID    DebugInfo;
+    LONG LockCount;
+    LONG RecursionCount;
+    HANDLE OwningThread;
+    HANDLE LockSemaphore;
+    DWORD Reserved;
 }CRITICAL_SECTION;
 
 #ifdef __WINE__
@@ -1009,21 +1009,21 @@ typedef struct {
 } OSVERSIONINFO16;
 
 typedef struct {
-	DWORD dwOSVersionInfoSize;
-	DWORD dwMajorVersion;
-	DWORD dwMinorVersion;
-	DWORD dwBuildNumber;
-	DWORD dwPlatformId;
-	CHAR szCSDVersion[128];
+    DWORD dwOSVersionInfoSize;
+    DWORD dwMajorVersion;
+    DWORD dwMinorVersion;
+    DWORD dwBuildNumber;
+    DWORD dwPlatformId;
+    CHAR szCSDVersion[128];
 } OSVERSIONINFOA;
 
 typedef struct {
-	DWORD dwOSVersionInfoSize;
-	DWORD dwMajorVersion;
-	DWORD dwMinorVersion;
-	DWORD dwBuildNumber;
-	DWORD dwPlatformId;
-	WCHAR szCSDVersion[128];
+    DWORD dwOSVersionInfoSize;
+    DWORD dwMajorVersion;
+    DWORD dwMinorVersion;
+    DWORD dwBuildNumber;
+    DWORD dwPlatformId;
+    WCHAR szCSDVersion[128];
 } OSVERSIONINFOW;
 
 DECL_WINELIB_TYPE_AW(OSVERSIONINFO)
@@ -1073,13 +1073,13 @@ typedef struct tagDCB
 
 
 typedef struct tagCOMMTIMEOUTS {
-	DWORD	ReadIntervalTimeout;
-	DWORD	ReadTotalTimeoutMultiplier;
-	DWORD	ReadTotalTimeoutConstant;
-	DWORD	WriteTotalTimeoutMultiplier;
-	DWORD	WriteTotalTimeoutConstant;
+    DWORD    ReadIntervalTimeout;
+    DWORD    ReadTotalTimeoutMultiplier;
+    DWORD    ReadTotalTimeoutConstant;
+    DWORD    WriteTotalTimeoutMultiplier;
+    DWORD    WriteTotalTimeoutConstant;
 } COMMTIMEOUTS,*LPCOMMTIMEOUTS;
-  
+ 
 #include "poppack.h"
 
 typedef void CALLBACK (*PAPCFUNC)(ULONG_PTR);
@@ -1099,7 +1099,7 @@ WIN_BOOL      WINAPI SetCommState(INT,LPDCB);
 WIN_BOOL      WINAPI TransmitCommChar(INT,CHAR);
 WIN_BOOL      WINAPI SetupComm(HANDLE, DWORD, DWORD);
 WIN_BOOL      WINAPI GetCommProperties(HANDLE, LPDCB *);
-  
+ 
 /*DWORD WINAPI GetVersion( void );*/
 WIN_BOOL16 WINAPI GetVersionEx16(OSVERSIONINFO16*);
 WIN_BOOL WINAPI GetVersionExA(OSVERSIONINFOA*);
@@ -1120,7 +1120,7 @@ void      WINAPI RaiseException(DWORD,DWORD,DWORD,const LPDWORD);
 WIN_BOOL    WINAPI SetProcessWorkingSetSize(HANDLE,DWORD,DWORD);
 WIN_BOOL    WINAPI TerminateProcess(HANDLE,DWORD);
 WIN_BOOL    WINAPI TerminateThread(HANDLE,DWORD);
-WIN_BOOL    WINAPI GetExitCodeThread(HANDLE,LPDWORD); 
+WIN_BOOL    WINAPI GetExitCodeThread(HANDLE,LPDWORD);
 
 /* GetBinaryType return values.
  */
@@ -1252,9 +1252,9 @@ WIN_BOOL      WINAPI FlushConsoleInputBuffer(HANDLE);
 WIN_BOOL      WINAPI FlushFileBuffers(HANDLE);
 WIN_BOOL      WINAPI FlushViewOfFile(LPCVOID, DWORD);
 DWORD       WINAPI FormatMessageA(DWORD,LPCVOID,DWORD,DWORD,LPSTR,
-				    DWORD,LPDWORD);
+                    DWORD,LPDWORD);
 DWORD       WINAPI FormatMessageW(DWORD,LPCVOID,DWORD,DWORD,LPWSTR,
-				    DWORD,LPDWORD);
+                    DWORD,LPDWORD);
 #define     FormatMessage WINELIB_NAME_AW(FormatMessage)
 WIN_BOOL      WINAPI FreeConsole(void);
 WIN_BOOL      WINAPI FreeEnvironmentStringsA(LPSTR);
@@ -1372,7 +1372,7 @@ WIN_BOOL        WINAPI LookupAccountSidW(LPCWSTR,PSID,LPWSTR,LPDWORD,LPWSTR,LPDW
 #define     LookupAccountSid WINELIB_NAME_AW(LookupAccountSidW)
 WIN_BOOL        WINAPI LocalFileTimeToFileTime(const FILETIME*,LPFILETIME);
 WIN_BOOL        WINAPI LockFile(HANDLE,DWORD,DWORD,DWORD,DWORD);
-WIN_BOOL        WINAPI LockFileEx(HANDLE, DWORD, DWORD, DWORD, DWORD, LPOVERLAPPED);    
+WIN_BOOL        WINAPI LockFileEx(HANDLE, DWORD, DWORD, DWORD, DWORD, LPOVERLAPPED);
 WIN_BOOL        WINAPI LookupPrivilegeValueA(LPCSTR,LPCSTR,LPVOID);
 WIN_BOOL        WINAPI LookupPrivilegeValueW(LPCWSTR,LPCWSTR,LPVOID);
 #define     LookupPrivilegeValue WINELIB_NAME_AW(LookupPrivilegeValue)
@@ -1426,7 +1426,7 @@ WIN_BOOL      WINAPI ReadConsoleA(HANDLE,LPVOID,DWORD,LPDWORD,LPVOID);
 WIN_BOOL      WINAPI ReadConsoleW(HANDLE,LPVOID,DWORD,LPDWORD,LPVOID);
 #define     ReadConsole WINELIB_NAME_AW(ReadConsole)
 WIN_BOOL      WINAPI ReadConsoleOutputCharacterA(HANDLE,LPSTR,DWORD,
-						 COORD,LPDWORD);
+                         COORD,LPDWORD);
 #define     ReadConsoleOutputCharacter WINELIB_NAME_AW(ReadConsoleOutputCharacter)
 WIN_BOOL        WINAPI ReadEventLogA(HANDLE,DWORD,DWORD,LPVOID,DWORD,DWORD *,DWORD *);
 WIN_BOOL        WINAPI ReadEventLogW(HANDLE,DWORD,DWORD,LPVOID,DWORD,DWORD *,DWORD *);
@@ -1722,8 +1722,8 @@ WIN_BOOL      WINAPI WritePrivateProfileSectionW(LPCWSTR,LPCWSTR,LPCWSTR);
 WIN_BOOL      WINAPI WritePrivateProfileStringA(LPCSTR,LPCSTR,LPCSTR,LPCSTR);
 WIN_BOOL      WINAPI WritePrivateProfileStringW(LPCWSTR,LPCWSTR,LPCWSTR,LPCWSTR);
 #define     WritePrivateProfileString WINELIB_NAME_AW(WritePrivateProfileString)
-WIN_BOOL	     WINAPI WriteProfileSectionA(LPCSTR,LPCSTR);
-WIN_BOOL	     WINAPI WriteProfileSectionW(LPCWSTR,LPCWSTR);
+WIN_BOOL         WINAPI WriteProfileSectionA(LPCSTR,LPCSTR);
+WIN_BOOL         WINAPI WriteProfileSectionW(LPCWSTR,LPCWSTR);
 #define     WritePrivateProfileSection WINELIB_NAME_AW(WritePrivateProfileSection)
 WIN_BOOL      WINAPI WritePrivateProfileStructA(LPCSTR,LPCSTR,LPVOID,UINT,LPCSTR);
 WIN_BOOL      WINAPI WritePrivateProfileStructW(LPCWSTR,LPCWSTR,LPVOID,UINT,LPCWSTR);

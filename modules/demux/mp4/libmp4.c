@@ -1117,12 +1117,12 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
     {
         /* SoundDescriptionV2 */
         double f_sample_rate;
-	int64_t dummy;
+    int64_t dummy;
         uint32_t i_channel;
 
         MP4_GET4BYTES( p_box->data.p_sample_soun->i_sample_per_packet );
         MP4_GET8BYTES( dummy );
-	memcpy( &f_sample_rate, &dummy, 8 );
+    memcpy( &f_sample_rate, &dummy, 8 );
 
         msg_Dbg( p_stream, "read box: %f Hz", f_sample_rate );
         p_box->data.p_sample_soun->i_sampleratehi = (int)f_sample_rate % 65536;

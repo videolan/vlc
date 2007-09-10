@@ -13,7 +13,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -60,7 +60,7 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 #define OPAQUENESS_LONGTEXT N_( \
     "Set the transparency of the video output. 1 is non-transparent (default) " \
     "0 is fully transparent.")
-    
+ 
 #define STRETCH_TEXT N_("Stretch video to fill window")
 #define STRETCH_LONGTEXT N_("Stretch the video to fill the entire window when "\
         "resizing the video instead of keeping the aspect ratio and "\
@@ -76,11 +76,11 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 
 #define FSPANEL_TEXT N_("Show Fullscreen controller")
 #define FSPANEL_LONGTEXT N_("Shows a lucent controller when moving the mouse " \
-                            "in fullscreen mode.") 
+                            "in fullscreen mode.")
 
 #define WIZARD_OPTIONS_SAVING_TEXT N_("Remember wizard options")
 #define WIZARD_OPTIONS_SAVING_LONGTEXT N_("Remember the options in the " \
-        "wizard during one session of VLC.") 
+        "wizard during one session of VLC.")
 
 #define AUTOPLAY_OSX_TEST N_("Auto-playback of new items")
 #define AUTOPLAY_OSX_LONGTEXT N_("Start playback of new items immediately " \

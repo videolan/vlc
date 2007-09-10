@@ -43,7 +43,7 @@ static VLCEyeTVController *_o_sharedInstance = nil;
     } else {
         _o_sharedInstance = [super init];
 
-        [[NSDistributedNotificationCenter defaultCenter] 
+        [[NSDistributedNotificationCenter defaultCenter]
                     addObserver: self
                        selector: @selector(globalNotificationReceived:)
                            name: NULL

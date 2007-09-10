@@ -13,7 +13,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -94,7 +94,7 @@ XSTATIC XArray * xarray_New (unsigned int initial_size_hint)
         dummy_reference = xarray_ObjectAtIndex;
         dummy_reference = xarray_Count;
     }
-    
+ 
     return new_xarray;
 }
 
@@ -181,7 +181,7 @@ XSTATIC int xarray_RemoveObject (XArray *xarray, unsigned int at_index)
     xarray->array[xarray->last_valid_element] = NULL;
     --xarray->last_valid_element;
 
-    return XARRAY_SUCCESS;    
+    return XARRAY_SUCCESS;
 }
 
 XSTATIC int xarray_RemoveObjects (XArray *xarray, unsigned int at_index,

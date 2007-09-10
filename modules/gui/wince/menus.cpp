@@ -371,7 +371,7 @@ void RefreshNavigMenu( intf_thread_t *p_intf, HMENU hMenu )
     /* Delete old menu */
     int count = wce_GetMenuItemCount( hMenu );
     for( i = 0; i <= count; i++ ) RemoveMenu( hMenu, 0, MF_BYPOSITION );
-        
+ 
     if( p_intf->p_sys->p_navig_menu )
         MenuItemExt::ClearList( p_intf->p_sys->p_navig_menu );
     else p_intf->p_sys->p_navig_menu = new vector<MenuItemExt*>;
@@ -455,7 +455,7 @@ void RefreshSettingsMenu( intf_thread_t *p_intf, HMENU hMenu )
  * Refresh the menu.
  *****************************************************************************/
 void RefreshMenu( intf_thread_t *p_intf, vector<MenuItemExt*> *p_menu_list,
-                  HMENU hMenu , int i_count, char **ppsz_varnames, 
+                  HMENU hMenu , int i_count, char **ppsz_varnames,
                   int *pi_objects, int i_start_id )
 {
     vlc_object_t *p_object;
@@ -579,7 +579,7 @@ void CreateMenuItem( intf_thread_t *p_intf, vector<MenuItemExt*> *p_menu_list,
         p_menu_list->push_back( pMenuItemExt );
         CheckMenuItem( hMenu, *pi_item_id ,
                        ( val.b_bool ? MF_UNCHECKED : MF_CHECKED ) |
-                       MF_BYCOMMAND ); 
+                       MF_BYCOMMAND );
         break;
 
     default:
@@ -592,7 +592,7 @@ void CreateMenuItem( intf_thread_t *p_intf, vector<MenuItemExt*> *p_menu_list,
 }
 
 HMENU CreateChoicesMenu( intf_thread_t *p_intf,
-                         vector<MenuItemExt*> *p_menu_list, char *psz_var, 
+                         vector<MenuItemExt*> *p_menu_list, char *psz_var,
                          vlc_object_t *p_object, int *pi_item_id )
 {
     MenuItemExt *pMenuItemExt;
@@ -732,7 +732,7 @@ void OnMenuEvent( intf_thread_t *p_intf, int id )
 
     if( p_intf->p_sys->p_audio_menu && !p_menuitemext )
     for( iter = p_intf->p_sys->p_audio_menu->begin();
-         iter != p_intf->p_sys->p_audio_menu->end(); iter++ ) 
+         iter != p_intf->p_sys->p_audio_menu->end(); iter++ )
         if( (*iter)->id == id )
         {
             p_menuitemext = *iter;

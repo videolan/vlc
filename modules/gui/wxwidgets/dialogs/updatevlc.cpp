@@ -167,7 +167,7 @@ void UpdateVLC::OnCheckForUpdate( wxCommandEvent& event )
             if( psz_tmp ) free( psz_tmp );
         }
 
-        main_sizer->Add( new wxStaticText( this, -1, wxU( _("\nAvailable " 
+        main_sizer->Add( new wxStaticText( this, -1, wxU( _("\nAvailable "
                 "updates and related downloads.\n"
                 "(Double click on a file to download it)\n" ) ) ) );
         main_sizer->Add( list );

@@ -89,7 +89,7 @@ PyObject *create_destroy( PyObject *self, PyObject *args )
 
     /* Initial status */
     libvlc_playlist_play( p_instance, 0, 0, argv, &exception );
-    ASSERT( libvlc_exception_raised( &exception ), 
+    ASSERT( libvlc_exception_raised( &exception ),
             "Playlist empty and exception not raised" );
 
     libvlc_exception_clear( &exception );
@@ -113,8 +113,8 @@ PyObject *create_destroy( PyObject *self, PyObject *args )
     ASSERT_NOEXCEPTION;
     ASSERT( i_playing == 0, "Playlist shouldn't be running" );
 
-    /* */ 
-    
+    /* */
+ 
     Py_INCREF( Py_None );
     return Py_None;
 }
@@ -129,7 +129,7 @@ PyObject *create_destroy( PyObject *self, PyObject *args )
 
     p_instance = libvlc_new( 2, argv, &exception );
     ASSERT_NOEXCEPTION;
-  
+ 
     /* Test that working on unexisting streams fail */
     libvlc_vlm_set_enabled( p_instance, "test", 1, &exception );
     ASSERT_EXCEPTION;

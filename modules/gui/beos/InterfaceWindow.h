@@ -107,11 +107,11 @@ class InterfaceWindow : public BWindow
             void            UpdatePlaylist();
 
             bool            IsStopped() const;
-        
+ 
     MediaControlView*        p_mediaControl;
     MessagesWindow*         fMessagesWindow;
 
- private:    
+ private:
             void            _SetMenusEnabled( bool hasFile,
                                               bool hasChapters = false,
                                               bool hasTitles = false );
@@ -129,7 +129,7 @@ class InterfaceWindow : public BWindow
 
     BFilePanel*             fFilePanel;
 #if 0
-	PlayListWindow*         fPlaylistWindow;
+    PlayListWindow*         fPlaylistWindow;
 #endif
     PreferencesWindow*      fPreferencesWindow;
     BMenuBar*               fMenuBar;

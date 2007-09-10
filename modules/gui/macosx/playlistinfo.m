@@ -58,7 +58,7 @@
     [o_author_lbl setStringValue: _NS("Author")];
     [o_btn_ok setTitle: _NS("OK")];
     [o_btn_cancel setTitle: _NS("Cancel")];
-    
+ 
     [[o_tab_view tabViewItemAtIndex: 0] setLabel: _NS("General")];
     [[o_tab_view tabViewItemAtIndex: 1] setLabel: _NS("Advanced Information")];
     [[o_tab_view tabViewItemAtIndex: 2] setLabel: _NS("Statistics")];
@@ -75,24 +75,24 @@
     [o_language_lbl setStringValue: _NS(VLC_META_LANGUAGE)];
     [o_nowPlaying_lbl setStringValue: _NS(VLC_META_NOW_PLAYING)];
     [o_publisher_lbl setStringValue: _NS(VLC_META_PUBLISHER)];
-    
+ 
     /* statistics */
     [o_input_box setTitle: _NS("Input")];
     [o_read_bytes_lbl setStringValue: _NS("Read at media")];
     [o_input_bitrate_lbl setStringValue: _NS("Input bitrate")];
     [o_demux_bytes_lbl setStringValue: _NS("Demuxed")];
     [o_demux_bitrate_lbl setStringValue: _NS("Stream bitrate")];
-    
+ 
     [o_video_box setTitle: _NS("Video")];
     [o_video_decoded_lbl setStringValue: _NS("Decoded blocks")];
     [o_displayed_lbl setStringValue: _NS("Displayed frames")];
     [o_lost_frames_lbl setStringValue: _NS("Lost frames")];
-    
+ 
     [o_sout_box setTitle: _NS("Streaming")];
     [o_sent_packets_lbl setStringValue: _NS("Sent packets")];
     [o_sent_bytes_lbl setStringValue: _NS("Sent bytes")];
     [o_sent_bitrate_lbl setStringValue: _NS("Send rate")];
-    
+ 
     [o_audio_box setTitle: _NS("Audio")];
     [o_audio_decoded_lbl setStringValue: _NS("Decoded blocks")];
     [o_played_abuffers_lbl setStringValue: _NS("Played buffers")];
@@ -120,7 +120,7 @@
     [super finalize];
 }
 #endif
-    
+ 
 - (IBAction)togglePlaylistInfoPanel:(id)sender
 {
     if( [o_info_window isVisible] )
@@ -149,7 +149,7 @@
 
         p_item = p_playlist->status.p_item;
         vlc_object_release( p_playlist );
-        
+ 
         [self initPanel:sender];
     }
 }
@@ -161,7 +161,7 @@
     {
         o_statUpdateTimer = [NSTimer scheduledTimerWithTimeInterval: 1
             target: self selector: @selector(updateStatistics:)
-            userInfo: nil repeats: YES]; 
+            userInfo: nil repeats: YES];
         [o_statUpdateTimer fire];
         [o_statUpdateTimer retain];
     }
@@ -229,8 +229,8 @@
 - (void)setMeta: (char *)psz_meta forLabel: (id)theItem
 {
     if( psz_meta != NULL && *psz_meta)
-        [theItem setStringValue: 
-            ([NSString stringWithUTF8String:psz_meta] == nil ) ? 
+        [theItem setStringValue:
+            ([NSString stringWithUTF8String:psz_meta] == nil ) ?
             [NSString stringWithCString:psz_meta] :
             [NSString stringWithUTF8String:psz_meta]];
     else

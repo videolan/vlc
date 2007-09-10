@@ -17,7 +17,7 @@
 #undef TARGET_RT_MAC_CFM
 
 //
-// A4Stuff.h contains the definition of EnterCodeResource and 
+// A4Stuff.h contains the definition of EnterCodeResource and
 // EnterCodeResource, used for setting up the code resource’s
 // globals for 68K (analagous to the function SetCurrentA5
 // defined by the toolbox).
@@ -40,7 +40,7 @@
 // Metrowerks with the exception of pointer return types, which
 // in Metrowerks 68K are returned in A0, instead of the standard
 // D0. Thus, since NPN_MemAlloc and NPN_UserAgent return pointers,
-// Mixed Mode will return the values to a 68K plugin in D0, but 
+// Mixed Mode will return the values to a 68K plugin in D0, but
 // a 68K plugin compiled by Metrowerks will expect the result in
 // A0.  The following pragma forces Metrowerks to use D0 instead.
 //
@@ -63,7 +63,7 @@
 #endif
 
 // The following fix for static initializers (which fixes a previous
-// incompatibility with some parts of PowerPlant, was submitted by 
+// incompatibility with some parts of PowerPlant, was submitted by
 // Jan Ulbrich.
 #ifdef __MWERKS__
     #ifdef __cplusplus
@@ -259,7 +259,7 @@ NPError NPN_PostURLNotify(NPP instance, const char* url, const char* window, uin
 
     if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
     {
-        err = CallNPN_PostURLNotifyProc(gNetscapeFuncs.posturlnotify, instance, url, 
+        err = CallNPN_PostURLNotifyProc(gNetscapeFuncs.posturlnotify, instance, url,
                                                         window, len, buf, file, notifyData);
     }
     else
@@ -586,7 +586,7 @@ void NPN_SetException(NPObject *npobj, const NPUTF8 *message)
 //
 // Wrapper functions for all calls from Netscape to the plugin.
 // These functions let the plugin developer just create the APIs
-// as documented and defined in npapi.h, without needing to 
+// as documented and defined in npapi.h, without needing to
 // install those functions in the function table or worry about
 // setting up globals for 68K plugins.
 //
@@ -639,7 +639,7 @@ NPError    Private_New(NPMIMEType pluginType, NPP instance, uint16 mode, int16 a
     NPError ret = NPP_New(pluginType, instance, mode, argc, argn, argv, saved);
     PLUGINDEBUGSTR("\pNew;g;");
     ExitCodeResource();
-    return ret; 
+    return ret;
 }
 
 NPError Private_Destroy(NPP instance, NPSavedData** save)
@@ -787,7 +787,7 @@ void SetUpQD(void)
 #endif
 
     //
-    // Memorize the plugin’s resource file 
+    // Memorize the plugin’s resource file
     // refnum for later use.
     //
     gResFile = CurResFile();
@@ -804,7 +804,7 @@ void SetUpQD(void)
     if (hasCFM)
     {
         //
-        // GetProcessInformation takes a process serial number and 
+        // GetProcessInformation takes a process serial number and
         // will give us back the name and FSSpec of the application.
         // See the Process Manager in IM.
         //
@@ -834,7 +834,7 @@ void SetUpQD(void)
         //
         // Now that we know the app name and FSSpec, we can call GetDiskFragment
         // to get a connID to use in a subsequent call to FindSymbol (it will also
-        // return the address of “main” in app, which we ignore).  If GetDiskFragment 
+        // return the address of “main” in app, which we ignore).  If GetDiskFragment
         // returns an error, we assume the app must be 68K.
         //
         Ptr mainAddr;
@@ -843,7 +843,7 @@ void SetUpQD(void)
                                   kLoadCFrag, &connID, (Ptr*)&mainAddr, errName);
     }
 
-    if (result == noErr) 
+    if (result == noErr)
     {
         //
         // The app is a PPC code fragment, so call FindSymbol
@@ -964,7 +964,7 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
         gNetscapeFuncs.forceredraw      = (NPN_ForceRedrawUPP)HOST_TO_PLUGIN_GLUE(forceredraw, nsTable->forceredraw);
         if( navMinorVers >= 14 )
         {
-            // NPRuntime support 
+            // NPRuntime support
             gNetscapeFuncs.getstringidentifier  = (NPN_GetStringIdentifierUPP)HOST_TO_PLUGIN_GLUE(getstringidentifier, nsTable->getstringidentifier);
             gNetscapeFuncs.getstringidentifiers = (NPN_GetStringIdentifiersUPP)HOST_TO_PLUGIN_GLUE(getstringidentifiers, nsTable->getstringidentifiers);
             gNetscapeFuncs.getintidentifier     = (NPN_GetIntIdentifierUPP)HOST_TO_PLUGIN_GLUE(getintidentifier, nsTable->getintidentifier);
@@ -1107,7 +1107,7 @@ NPError NP_Initialize(NPNetscapeFuncs* nsTable)
     gNetscapeFuncs.forceredraw      = nsTable->forceredraw;
     if( navMinorVers >= 14 )
     {
-        // NPRuntime support 
+        // NPRuntime support
         gNetscapeFuncs.getstringidentifier  = nsTable->getstringidentifier;
         gNetscapeFuncs.getstringidentifiers = nsTable->getstringidentifiers;
         gNetscapeFuncs.getintidentifier     = nsTable->getintidentifier;
@@ -1140,7 +1140,7 @@ NPError NP_GetEntryPoints(NPPluginFuncs* pluginFuncs)
     if( pluginFuncs == NULL )
         return NPERR_INVALID_FUNCTABLE_ERROR;
 
-    /*if (pluginFuncs->size < sizeof(NPPluginFuncs)) 
+    /*if (pluginFuncs->size < sizeof(NPPluginFuncs))
     return NPERR_INVALID_FUNCTABLE_ERROR;*/
 
     /*

@@ -716,7 +716,7 @@ static void mpeg2_slice( transrate_t *tr, const int code )
                 bs_write( bs, *(dc + i), *(dc_len + i) );
                 putintrablk( bs, new_block[i], tr->intra_vlc_format );
             }
-    
+ 
         }
         else
         {

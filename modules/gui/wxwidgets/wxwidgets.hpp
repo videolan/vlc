@@ -109,7 +109,7 @@ static inline char *wxFromLocale (const wxString& string)
 # define wxLocaleFree LocaleFree
 #endif
 }
-	
+    
 /* From Locale functions to use for File Drop targets ... go figure */
 #if defined( wxUSE_UNICODE ) && !defined( WIN32 )
 static inline char *wxDnDFromLocale( const wxChar *stupid )

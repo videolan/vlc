@@ -199,7 +199,7 @@ vlcInput_toggle_fullscreen( PyObject *self, PyObject *args )
     libvlc_toggle_fullscreen( LIBVLC_INPUT->p_md, &ex);
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
-    return Py_None;    
+    return Py_None;
 }
 
 static PyObject *

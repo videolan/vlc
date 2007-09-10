@@ -1053,7 +1053,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         {
             char *psz = p_input->p_fmt->p_extra_languages[i-1].psz_language;
             const iso639_lang_t *pl = NULL;
-            
+ 
             if( strlen( psz ) == 2 )
             {
                 pl = GetLang_1( psz );
@@ -1071,7 +1071,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_stream->lang[i*3+0] = pl->psz_iso639_2T[0];
                 p_stream->lang[i*3+1] = pl->psz_iso639_2T[1];
                 p_stream->lang[i*3+2] = pl->psz_iso639_2T[2];
-                
+ 
                 msg_Dbg( p_mux, "    - lang=%c%c%c",
                          p_stream->lang[i*3+0], p_stream->lang[i*3+1],
                          p_stream->lang[i*3+2] );

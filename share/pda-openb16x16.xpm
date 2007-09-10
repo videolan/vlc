@@ -1,8 +1,8 @@
 /* XPM */
 static const char *const familiar_openb16x16_xpm[] = {
 "16 16 2 1",
-" 	c None",
-".	c #000000",
+"     c None",
+".    c #000000",
 "                ",
 "                ",
 "       ..       ",

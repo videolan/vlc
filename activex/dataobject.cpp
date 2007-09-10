@@ -162,7 +162,7 @@ HRESULT VLCDataObject::getMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedi
     if( NULL == hicTargetDev )
         return E_FAIL;
 
-    HDC hdcMeta = CreateMetaFile(NULL); 
+    HDC hdcMeta = CreateMetaFile(NULL);
     if( NULL != hdcMeta )
     {
         LPMETAFILEPICT pMetaFilePict = (LPMETAFILEPICT)CoTaskMemAlloc(sizeof(METAFILEPICT));
@@ -202,7 +202,7 @@ HRESULT VLCDataObject::getEnhMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pM
 
     SIZEL size = _p_instance->getExtent();
 
-    HDC hdcMeta = CreateEnhMetaFile(hicTargetDev, NULL, NULL, NULL); 
+    HDC hdcMeta = CreateEnhMetaFile(hicTargetDev, NULL, NULL, NULL);
     if( NULL != hdcMeta )
     {
         RECTL wBounds = { 0L, 0L, size.cx, size.cy };
@@ -237,7 +237,7 @@ STDMETHODIMP VLCDataObject::QueryGetData(LPFORMATETC pFormatEtc)
         default:
             return DV_E_FORMATETC;
     }
-    
+ 
     if( pFormatEtc->dwAspect != formatEtc->dwAspect )
         return DV_E_DVASPECT;
 

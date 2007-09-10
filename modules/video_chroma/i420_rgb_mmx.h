@@ -374,7 +374,7 @@ movq      %%mm2, 24(%3) # Store ABGR7 ABGR6                                 \n\
     } while(0)
 
 #define MMX_END _mm_empty()
-    
+ 
 #define MMX_INIT_16                     \
     mm0 = _mm_cvtsi32_si64(*(int*)p_u); \
     mm1 = _mm_cvtsi32_si64(*(int*)p_v); \

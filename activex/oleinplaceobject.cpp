@@ -55,7 +55,7 @@ STDMETHODIMP VLCOleInPlaceObject::InPlaceDeactivate(void)
         _p_instance->onInPlaceDeactivate();
 
         LPOLEOBJECT p_oleObject;
-        if( SUCCEEDED(QueryInterface(IID_IOleObject, (void**)&p_oleObject)) ) 
+        if( SUCCEEDED(QueryInterface(IID_IOleObject, (void**)&p_oleObject)) )
         {
             LPOLECLIENTSITE p_clientSite;
             if( SUCCEEDED(p_oleObject->GetClientSite(&p_clientSite)) )
@@ -84,7 +84,7 @@ STDMETHODIMP VLCOleInPlaceObject::UIDeactivate(void)
             _p_instance->setFocus(FALSE);
 
         LPOLEOBJECT p_oleObject;
-        if( SUCCEEDED(QueryInterface(IID_IOleObject, (void**)&p_oleObject)) ) 
+        if( SUCCEEDED(QueryInterface(IID_IOleObject, (void**)&p_oleObject)) )
         {
             LPOLECLIENTSITE p_clientSite;
             if( SUCCEEDED(p_oleObject->GetClientSite(&p_clientSite)) )

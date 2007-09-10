@@ -82,7 +82,7 @@ STDMETHODIMP VLCControl::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCControl::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames, 
+STDMETHODIMP VLCControl::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
         UINT cNames, LCID lcid, DISPID* rgDispID)
 {
     if( SUCCEEDED(getTypeInfo()) )
@@ -531,7 +531,7 @@ STDMETHODIMP VLCControl::getVariable( BSTR name, VARIANT *value)
 
 void VLCControl::FreeTargetOptions(char **cOptions, int cOptionCount)
 {
-    // clean up 
+    // clean up
     if( NULL != cOptions )
     {
         for( int pos=0; pos<cOptionCount; ++pos )
@@ -589,7 +589,7 @@ static HRESULT parseStringOptions(int codePage, BSTR bstr, char*** cOptions, int
                         if( nOptions == capacity )
                         {
                             capacity += 16;
-                            char **moreOptions = (char **)CoTaskMemRealloc(options, capacity*sizeof(char*)); 
+                            char **moreOptions = (char **)CoTaskMemRealloc(options, capacity*sizeof(char*));
                             if( ! moreOptions )
                             {
                                 /* failed to allocate more memory */
@@ -766,7 +766,7 @@ HRESULT VLCControl::CreateTargetOptions(int codePage, VARIANT *options, char ***
                     hr = SafeArrayGetElement(array, &pos, &option);
                     if( SUCCEEDED(hr) )
                     {
-                        if( VT_BSTR == V_VT(&option) ) 
+                        if( VT_BSTR == V_VT(&option) )
                         {
                             char *cOption = CStrFromBSTR(codePage, V_BSTR(&option));
                             (*cOptions)[pos-lBound] = cOption;
@@ -803,7 +803,7 @@ HRESULT VLCControl::CreateTargetOptions(int codePage, VARIANT *options, char ***
                     }
                 }
             }
-            else 
+            else
             {
                 // unsupported type
                 return E_INVALIDARG;
@@ -960,7 +960,7 @@ STDMETHODIMP VLCControl::get_VersionInfo(BSTR *version)
     if( NULL != versionStr )
     {
         *version = BSTRFromCStr(CP_UTF8, versionStr);
-        
+ 
         return NULL == *version ? E_OUTOFMEMORY : NOERROR;
     }
     *version = NULL;

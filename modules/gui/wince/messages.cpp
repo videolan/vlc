@@ -62,10 +62,10 @@ Messages::Messages( intf_thread_t *p_intf, CBaseWindow *p_parent,
 }
 
 /***********************************************************************
-FUNCTION: 
+FUNCTION:
   WndProc
 
-PURPOSE: 
+PURPOSE:
   Processes messages sent to the main window.
 ***********************************************************************/
 LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
@@ -90,7 +90,7 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                                   WS_VISIBLE | WS_CHILD | LVS_REPORT |
                                   LVS_SHOWSELALWAYS | WS_VSCROLL | WS_HSCROLL |
                                   WS_BORDER | LVS_NOCOLUMNHEADER, 0, 0, 0, 0,
-                                  hwnd, NULL, hInst, NULL );            
+                                  hwnd, NULL, hInst, NULL );
         ListView_SetExtendedListViewStyle( hListView, LVS_EX_FULLROWSELECT );
 
         LVCOLUMN lv;
@@ -116,7 +116,7 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         break;
 
     case WM_SETFOCUS:
-        SHSipPreference( hwnd, SIP_DOWN ); 
+        SHSipPreference( hwnd, SIP_DOWN );
         SHFullScreen( hwnd, SHFS_HIDESIPBUTTON );
         break;
 
@@ -139,15 +139,15 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             ListView_DeleteAllItems( hListView );
             break;
 
-        case IDSAVEAS:  
+        case IDSAVEAS:
             memset( &(ofn), 0, sizeof(ofn) );
             ofn.lStructSize = sizeof(ofn);
             ofn.hwndOwner = hwnd;
             ofn.lpstrFile = _T("");
-            ofn.nMaxFile = NMAXFILE;    
+            ofn.nMaxFile = NMAXFILE;
             ofn.lpstrFilter = _T("Text (*.txt)\0*.txt\0");
             ofn.lpstrTitle = _T("Save File As");
-            ofn.Flags = OFN_HIDEREADONLY; 
+            ofn.Flags = OFN_HIDEREADONLY;
             ofn.lpstrDefExt = _T("txt");
 
             if( GetSaveFileName( (LPOPENFILENAME)&ofn ) )
@@ -218,7 +218,7 @@ void Messages::UpdateLog()
 
             /* Append all messages to log window */
             debug = p_sub->p_msg[i_start].psz_module;
-        
+ 
             switch( p_sub->p_msg[i_start].i_type )
             {
             case VLC_MSG_INFO: debug += ": "; break;

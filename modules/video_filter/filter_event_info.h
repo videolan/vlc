@@ -4,7 +4,7 @@
  * Copyright (C) 2004-2005 the VideoLAN team
  * $Id: ???
  *
- * Authors: Dugal Harris 
+ * Authors: Dugal Harris
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,10 +33,10 @@ typedef struct video_filter_region_info_t
                   rectangle corner[s] */
     int i_width; /* width of the rectangle */
     int i_height; /* height of the rectangle */
-    
+ 
     int i_id;
     int i_type;
-    
+ 
     char *p_description;
     float *pf_param;
     int i_param_size;

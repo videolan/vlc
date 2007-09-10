@@ -4,7 +4,7 @@
  * Copyright (C) 2002-2007 the VideoLAN team
  * $Id$
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
+ * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
  *          Benjamin Pracht <bigben at videolan dot org>
@@ -14,7 +14,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -46,7 +46,7 @@
 #import "eyetv.h"
 
 /*****************************************************************************
- * GetEjectableMediaOfClass 
+ * GetEjectableMediaOfClass
  *****************************************************************************/
 NSArray *GetEjectableMediaOfClass( const char *psz_class )
 {
@@ -63,17 +63,17 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     {
         return( nil );
     }
-    
+ 
     classes_to_match = IOServiceMatching( psz_class );
     if( classes_to_match == NULL )
     {
         return( nil );
     }
-    
-    CFDictionarySetValue( classes_to_match, CFSTR( kIOMediaEjectableKey ), 
+ 
+    CFDictionarySetValue( classes_to_match, CFSTR( kIOMediaEjectableKey ),
                           kCFBooleanTrue );
-    
-    kern_result = IOServiceGetMatchingServices( master_port, classes_to_match, 
+ 
+    kern_result = IOServiceGetMatchingServices( master_port, classes_to_match,
                                                 &media_iterator );
     if( kern_result != KERN_SUCCESS )
     {
@@ -81,14 +81,14 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     }
 
     p_list = [NSMutableArray arrayWithCapacity: 1];
-    
+ 
     next_media = IOIteratorNext( media_iterator );
     if( next_media != nil )
     {
         char psz_buf[0x32];
         size_t dev_path_length;
         CFTypeRef str_bsd_path;
-    
+ 
         do
         {
             str_bsd_path = IORegistryEntryCreateCFProperty( next_media,
@@ -100,10 +100,10 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
                 IOObjectRelease( next_media );
                 continue;
             }
-            
+ 
             snprintf( psz_buf, sizeof(psz_buf), "%s%c", _PATH_DEV, 'r' );
             dev_path_length = strlen( psz_buf );
-            
+ 
             if( CFStringGetCString( str_bsd_path,
                                     (char*)&psz_buf + dev_path_length,
                                     sizeof(psz_buf) - dev_path_length,
@@ -111,14 +111,14 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             {
                 [p_list addObject: [NSString stringWithCString: psz_buf]];
             }
-            
+ 
             CFRelease( str_bsd_path );
-            
+ 
             IOObjectRelease( next_media );
-        
+ 
         } while( ( next_media = IOIteratorNext( media_iterator ) ) != nil );
     }
-    
+ 
     IOObjectRelease( media_iterator );
 
     o_devices = [NSArray arrayWithArray: p_list];
@@ -127,7 +127,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 }
 
 /*****************************************************************************
- * VLCOpen implementation 
+ * VLCOpen implementation
  *****************************************************************************/
 @implementation VLCOpen
 
@@ -145,7 +145,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     } else {
         _o_sharedMainInstance = [super init];
     }
-    
+ 
     return _o_sharedMainInstance;
 }
 
@@ -189,10 +189,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
-    
+ 
     [o_eyetv_chn_bgbar setUsesThreadedAnimation: YES];
     /* FIXME: implement EyeTV l10n here */
-    
+ 
     [self setSubPanel];
 
 
@@ -243,13 +243,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
         [o_eyetv_tabView selectTabViewItemWithIdentifier:@"eyetvup"];
         [self setupChannelInfo];
     }
-    
+ 
     [[NSDistributedNotificationCenter defaultCenter] addObserver: self
                                                         selector: @selector(eyetvChanged:)
                                                             name: NULL
                                                           object: @"VLCEyeTVSupport"
                                               suspensionBehavior: NSNotificationSuspensionBehaviorDeliverImmediately];
-    
+ 
     /* register clicks on text fields */
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(textFieldWasClicked:)
@@ -336,7 +336,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     [o_tabview selectTabViewItemAtIndex: i_type];
     [o_file_sub_ckbox setState: NSOffState];
-    
+ 
     i_result = [NSApp runModalForWindow: o_panel];
     [o_panel close];
 
@@ -410,7 +410,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     else if( [o_label isEqualToString: _NS("Network")] )
     {
         [self openNetInfoChanged: nil];
-    }  
+    }
 }
 
 - (void)openFileGeneric
@@ -438,7 +438,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     NSString *o_ext = [o_filename pathExtension];
     vlc_bool_t b_stream = [o_file_stream state];
     BOOL b_dir = NO;
-    
+ 
     [[NSFileManager defaultManager] fileExistsAtPath:o_filename isDirectory:&b_dir];
 
     if( b_dir )
@@ -458,13 +458,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
                         b_stream ? "stream" : "file",
                         o_filename];
     }
-    [o_mrl setStringValue: o_mrl_string]; 
+    [o_mrl setStringValue: o_mrl_string];
 }
 
 - (IBAction)openFileBrowse:(id)sender
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
-    
+ 
     [o_open_panel setAllowsMultipleSelection: NO];
     [o_open_panel setCanChooseDirectories: YES];
     [o_open_panel setTitle: _NS("Open File")];
@@ -475,7 +475,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         types:nil
         modalForWindow:[sender window]
         modalDelegate: self
-        didEndSelector: @selector(pathChosenInPanel: 
+        didEndSelector: @selector(pathChosenInPanel:
                         withReturn:
                         contextInfo:)
         contextInfo: nil];
@@ -500,10 +500,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     NSString *o_type;
     vlc_bool_t b_device, b_menus, b_title_chapter;
-    
+ 
     [o_disc_device removeAllItems];
     b_title_chapter = ![o_disc_dvd_menus state];
-    
+ 
     o_type = [[o_disc_type selectedCell] title];
 
     if ( [o_type isEqualToString: _NS("VIDEO_TS directory")] )
@@ -537,19 +537,19 @@ static VLCOpen *_o_sharedMainInstance = nil;
             o_disc = o_type;
             b_menus = 1;
         }
-    
+ 
         o_devices = GetEjectableMediaOfClass( psz_class );
         if ( o_devices != nil )
         {
             int i_devices = [o_devices count];
-        
+ 
             if ( i_devices )
             {
                 int i;
-        
+ 
                 for( i = 0; i < i_devices; i++ )
                 {
-                    [o_disc_device 
+                    [o_disc_device
                         addItemWithObjectValue: [o_devices objectAtIndex: i]];
                 }
 
@@ -557,7 +557,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             }
             else
             {
-                [o_disc_device setStringValue: 
+                [o_disc_device setStringValue:
                     [NSString stringWithFormat: _NS("No %@s found"), o_disc]];
             }
         }
@@ -613,7 +613,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
                 [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
             o_device = @"";
         o_mrl_string = [NSString stringWithFormat: @"vcd://%@@%i:%i",
-                        o_device, i_title, i_chapter]; 
+                        o_device, i_title, i_chapter];
     }
     else if ( [o_type isEqualToString: _NS("Audio CD")] )
     {
@@ -621,7 +621,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
                 [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
             o_device = @"";
         o_mrl_string = [NSString stringWithFormat: @"cdda://%@",
-                        o_device]; 
+                        o_device];
     }
     else if ( [o_type isEqualToString: _NS("DVD")] )
     {
@@ -630,22 +630,22 @@ static VLCOpen *_o_sharedMainInstance = nil;
             o_device = @"";
         if ( b_menus )
             o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
-                            o_device]; 
+                            o_device];
         else
             o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i-",
-                            o_device, i_title, i_chapter]; 
+                            o_device, i_title, i_chapter];
     }
     else /* VIDEO_TS folder */
     {
         if ( b_menus )
             o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
-                            o_videots]; 
+                            o_videots];
         else
             o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i",
-                            o_videots, i_title, i_chapter]; 
+                            o_videots, i_title, i_chapter];
     }
 
-    [o_mrl setStringValue: o_mrl_string]; 
+    [o_mrl setStringValue: o_mrl_string];
 }
 
 - (IBAction)openDiscMenusChanged:(id)sender
@@ -705,14 +705,14 @@ static VLCOpen *_o_sharedMainInstance = nil;
     if( i_tag == 0 )
     {
         [o_net_udp_port setIntValue: [o_net_udp_port_stp intValue]];
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCOpenTextFieldWasClicked" 
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCOpenTextFieldWasClicked"
                                                             object: o_net_udp_port];
         [o_panel makeFirstResponder: o_net_udp_port];
     }
     else if( i_tag == 1 )
     {
         [o_net_udpm_port setIntValue: [o_net_udpm_port_stp intValue]];
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCOpenTextFieldWasClicked" 
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCOpenTextFieldWasClicked"
                                                             object: o_net_udpm_port];
         [o_panel makeFirstResponder: o_net_udpm_port];
     }
@@ -732,26 +732,26 @@ static VLCOpen *_o_sharedMainInstance = nil;
     {
         int i_port = [o_net_udp_port intValue];
 
-        o_mrl_string = [NSString stringWithString: @"udp://"]; 
+        o_mrl_string = [NSString stringWithString: @"udp://"];
 
         if( i_port != config_GetInt( p_intf, "server-port" ) )
         {
-            o_mrl_string = 
-                [o_mrl_string stringByAppendingFormat: @"@:%i", i_port]; 
-        } 
+            o_mrl_string =
+                [o_mrl_string stringByAppendingFormat: @"@:%i", i_port];
+        }
     }
-    else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] ) 
+    else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] )
     {
         NSString *o_addr = [o_net_udpm_addr stringValue];
         int i_port = [o_net_udpm_port intValue];
 
-        o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr]; 
+        o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr];
 
         if( i_port != config_GetInt( p_intf, "server-port" ) )
         {
-            o_mrl_string = 
-                [o_mrl_string stringByAppendingFormat: @":%i", i_port]; 
-        } 
+            o_mrl_string =
+                [o_mrl_string stringByAppendingFormat: @":%i", i_port];
+        }
     }
     else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS/RTSP")] )
     {
@@ -771,12 +771,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
     int i;
     b_autoplay = config_GetInt( VLCIntf, "macosx-autoplay" );
-    
+ 
     [o_open_panel setAllowsMultipleSelection: YES];
     [o_open_panel setCanChooseDirectories: YES];
     [o_open_panel setTitle: _NS("Open File")];
     [o_open_panel setPrompt: _NS("Open")];
-    
+ 
     if( [o_open_panel runModalForDirectory: nil
             file: nil types: nil] == NSOKButton )
     {
@@ -804,7 +804,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     else if( sender == o_eyetv_previousProgram_btn )
         [[[VLCMain sharedInstance] getEyeTVController] switchChannelUp: NO];
     else if( sender == o_eyetv_channels_pop )
-        [[[VLCMain sharedInstance] getEyeTVController] selectChannel: 
+        [[[VLCMain sharedInstance] getEyeTVController] selectChannel:
             [sender indexOfSelectedItem]];
     else
         msg_Err( VLCIntf, "eyetvSwitchChannel sent by unknown object" );
@@ -855,20 +855,20 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_chn_bgbar animate: self];
     [o_eyetv_chn_status_txt setStringValue: _NS("Retrieving Channel Info...")];
     [o_eyetv_chn_status_txt setHidden: NO];
-    
+ 
     /* retrieve info */
     int x = 0;
     int channelCount = ( [[[VLCMain sharedInstance] getEyeTVController] getNumberOfChannels] + 1 );
     while( x != channelCount )
     {
-        /* we have to add items this way, because we accept duplicates 
+        /* we have to add items this way, because we accept duplicates
          * additionally, we save a bit of time */
         [[o_eyetv_channels_pop menu] addItemWithTitle: [[[VLCMain sharedInstance] getEyeTVController] getNameOfChannel: x]
                                                action: nil
                                         keyEquivalent: @""];
         x += 1;
     }
-    
+ 
     /* clean up GUI */
     [o_eyetv_chn_bgbar setHidden: YES];
     [o_eyetv_chn_status_txt setHidden: YES];
@@ -898,12 +898,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (IBAction)subFileBrowse:(id)sender
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
-    
+ 
     [o_open_panel setAllowsMultipleSelection: NO];
     [o_open_panel setTitle: _NS("Open File")];
     [o_open_panel setPrompt: _NS("Open")];
 
-    if( [o_open_panel runModalForDirectory: nil 
+    if( [o_open_panel runModalForDirectory: nil
             file: nil types: nil] == NSOKButton )
     {
         NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
@@ -965,4 +965,3 @@ static VLCOpen *_o_sharedMainInstance = nil;
 }
 
 @end
-        

@@ -78,7 +78,7 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
     struct filter_sys_t * p_sys;
-    
+ 
     if ( p_filter->input.i_rate == p_filter->output.i_rate
           || p_filter->input.i_format != p_filter->output.i_format
           || p_filter->input.i_physical_channels
@@ -122,7 +122,7 @@ static void Close( vlc_object_t * p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
-    
+ 
     free( p_sys->p_prev_sample );
     free( p_sys );
 }
@@ -265,7 +265,7 @@ static int OpenFilter( vlc_object_t *p_this )
     {
         return VLC_EGENERIC;
     }
-    
+ 
     /* Allocate the memory needed to store the module's structure */
     p_filter->p_sys = p_sys = malloc( sizeof(struct filter_sys_t) );
     if( p_sys == NULL )
@@ -325,11 +325,11 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
         if( p_block ) p_block->pf_release( p_block );
         return NULL;
     }
-    
+ 
     i_bytes_per_frame = p_filter->fmt_out.audio.i_channels *
                   p_filter->fmt_out.audio.i_bitspersample / 8;
-    
-    i_out_size = i_bytes_per_frame * ( 1 + (p_block->i_samples * 
+ 
+    i_out_size = i_bytes_per_frame * ( 1 + (p_block->i_samples *
         p_filter->fmt_out.audio.i_rate / p_filter->fmt_in.audio.i_rate));
 
     p_out = p_filter->pf_audio_buffer_new( p_filter, i_out_size );
@@ -360,7 +360,7 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
     DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
 
     p_block->pf_release( p_block );
-    
+ 
     p_out->i_buffer = out_buf.i_nb_bytes;
     p_out->i_samples = out_buf.i_nb_samples;
 

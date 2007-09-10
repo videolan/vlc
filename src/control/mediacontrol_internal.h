@@ -39,11 +39,11 @@ struct mediacontrol_Instance {
 };
 
 vlc_int64_t private_mediacontrol_unit_convert( input_thread_t *p_input,
-					       mediacontrol_PositionKey from,
-					       mediacontrol_PositionKey to,
-					       vlc_int64_t value );
+                           mediacontrol_PositionKey from,
+                           mediacontrol_PositionKey to,
+                           vlc_int64_t value );
 vlc_int64_t private_mediacontrol_position2microsecond( input_thread_t *p_input,
-						       const mediacontrol_Position *pos );
+                               const mediacontrol_Position *pos );
 
 /**
  * Allocate a RGBPicture structure.
@@ -56,18 +56,18 @@ mediacontrol_RGBPicture *private_mediacontrol_createRGBPicture( int, int, long, 
 mediacontrol_PlaylistSeq *private_mediacontrol_PlaylistSeq__alloc( int size );
 
 
-#define RAISE( c, m )  if( exception ) { exception->code = c;	\
+#define RAISE( c, m )  if( exception ) { exception->code = c;    \
                                          exception->message = strdup(m); }
 
 #define RAISE_NULL( c, m ) { RAISE( c, m ); return NULL; }
 #define RAISE_VOID( c, m ) { RAISE( c, m ); return; }
 
-#define HANDLE_LIBVLC_EXCEPTION_VOID( e )  if( libvlc_exception_raised( e ) ) {	\
-	RAISE( mediacontrol_InternalException, libvlc_exception_get_message( e )); \
+#define HANDLE_LIBVLC_EXCEPTION_VOID( e )  if( libvlc_exception_raised( e ) ) {    \
+    RAISE( mediacontrol_InternalException, libvlc_exception_get_message( e )); \
         libvlc_exception_clear( e ); \
         return; }
 
-#define HANDLE_LIBVLC_EXCEPTION_NULL( e )  if( libvlc_exception_raised( e ) ) { 	\
+#define HANDLE_LIBVLC_EXCEPTION_NULL( e )  if( libvlc_exception_raised( e ) ) {     \
         RAISE( mediacontrol_InternalException, libvlc_exception_get_message( e )); \
         libvlc_exception_clear( e ); \
         return NULL; }

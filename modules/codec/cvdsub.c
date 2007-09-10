@@ -314,7 +314,7 @@ static void ParseHeader( decoder_t *p_dec, block_t *p_block )
 }
 
 /*
-  We parse the metadata information here. 
+  We parse the metadata information here.
 
   Although metadata information does not have to come in a fixed field
   order, every metadata field consists of a tag byte followed by
@@ -381,7 +381,7 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
         case 0x24:
         case 0x25:
         case 0x26:
-        case 0x27: 
+        case 0x27:
         {
             uint8_t v = p[0] - 0x24;
 
@@ -470,7 +470,7 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
 
         default:
 #ifdef DEBUG_CVDSUB
-            msg_Warn( p_dec, "unknown sequence in control header " 
+            msg_Warn( p_dec, "unknown sequence in control header "
                       "0x%0x 0x%0x 0x%0x 0x%0x", p[0], p[1], p[2], p[3]);
 #endif
         }
@@ -539,7 +539,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
 /*****************************************************************************
  * ParseImage: parse and render the image part of the subtitle
  *****************************************************************************
- This part parses the subtitle graphical data and renders it. 
+ This part parses the subtitle graphical data and renders it.
 
  Image data comes interlaced and is run-length encoded (RLE). Each
  field is a four-bit nibbles that is further subdivided in a two-bit
@@ -555,7 +555,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
  may be untested.
 
  However we'll transform this so that that the RLE is expanded and
- interlacing will also be removed. On output each pixel entry will by 
+ interlacing will also be removed. On output each pixel entry will by
  a 4-bit alpha (filling 8 bits), and 8-bit y, u, and v entry.
 
  *****************************************************************************/

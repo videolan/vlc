@@ -15,7 +15,7 @@
 typedef struct PER_POINT_EQN_T {
   int index;
   param_t * param;
-  gen_expr_t * gen_expr;	
+  gen_expr_t * gen_expr;    
 } per_point_eqn_t;
 
 typedef struct CUSTOM_WAVE_T {
@@ -85,7 +85,7 @@ typedef struct CUSTOM_WAVE_T {
   char per_frame_init_eqn_string_buffer[STRING_BUFFER_SIZE];
   /* Per point equation array */
   gen_expr_t * per_point_eqn_array[NUM_POINT_OPS];
-  
+ 
 } custom_wave_t;
 
 

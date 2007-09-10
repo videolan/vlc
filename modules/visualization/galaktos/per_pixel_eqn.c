@@ -56,40 +56,40 @@ inline void evalPerPixelEqn(per_pixel_eqn_t * per_pixel_eqn) {
   gen_expr_t * eqn_ptr = NULL;
   int x,y;
 
-  eqn_ptr = per_pixel_eqn->gen_expr; 
+  eqn_ptr = per_pixel_eqn->gen_expr;
  if (per_pixel_eqn->param->matrix == NULL) {
-    if (PER_PIXEL_EQN_DEBUG) printf("evalPerPixelEqn: [begin initializing matrix] (index = %d) (name = %s)\n", 
-  			  per_pixel_eqn->index, per_pixel_eqn->param->name);
-    
+    if (PER_PIXEL_EQN_DEBUG) printf("evalPerPixelEqn: [begin initializing matrix] (index = %d) (name = %s)\n",
+                per_pixel_eqn->index, per_pixel_eqn->param->name);
+ 
     param_matrix = per_pixel_eqn->param->matrix = (double**)malloc(gx*sizeof(double*));
-    
+ 
     for(x = 0; x < gx; x++)
       param_matrix[x] = (double *)malloc(gy * sizeof(double));
 
     for (x = 0; x < gx; x++)
       for (y = 0; y < gy; y++)
-	param_matrix[x][y] = 0.0;
+    param_matrix[x][y] = 0.0;
 
     if (per_pixel_eqn->param->name == NULL)
       printf("null parameter?\n");
 
     //    printf("PARAM MATRIX: \"%s\" initialized.\n", per_pixel_eqn->param->name);
   }
-  else 
+  else
     param_matrix = (double**)per_pixel_eqn->param->matrix;
  
   if (eqn_ptr == NULL)
     printf("something is seriously wrong...\n");
-  for (mesh_i = 0; mesh_i < gx; mesh_i++) {    
-    for (mesh_j = 0; mesh_j < gy; mesh_j++) {     
+  for (mesh_i = 0; mesh_i < gx; mesh_i++) {
+    for (mesh_j = 0; mesh_j < gy; mesh_j++) {
       param_matrix[mesh_i][mesh_j] = eval_gen_expr(eqn_ptr);
     }
   }
-  
+ 
   /* Now that this parameter has been referenced with a per
      pixel equation, we let the evaluator know by setting
      this flag */
-  per_pixel_eqn->param->matrix_flag = 1; 
+  per_pixel_eqn->param->matrix_flag = 1;
 }
 
 inline void evalPerPixelEqns() {
@@ -112,25 +112,25 @@ int add_per_pixel_eqn(char * name, gen_expr_t * gen_expr, preset_t * preset) {
 
   /* Argument checks */
   if (preset == NULL)
-	  return FAILURE;
+      return FAILURE;
   if (gen_expr == NULL)
-	  return FAILURE;
+      return FAILURE;
   if (name == NULL)
-	  return FAILURE;
-  
+      return FAILURE;
+ 
  if (PER_PIXEL_EQN_DEBUG) printf("add_per_pixel_eqn: per pixel equation (name = \"%s\")\n", name);
  
- if (!strncmp(name, "dx", strlen("dx"))) 
+ if (!strncmp(name, "dx", strlen("dx")))
    preset->per_pixel_flag[DX_OP] = TRUE;
- else if (!strncmp(name, "dy", strlen("dy"))) 
+ else if (!strncmp(name, "dy", strlen("dy")))
    preset->per_pixel_flag[DY_OP] = TRUE;
- else if (!strncmp(name, "cx", strlen("cx"))) 
+ else if (!strncmp(name, "cx", strlen("cx")))
    preset->per_pixel_flag[CX_OP] = TRUE;
- else if (!strncmp(name, "cy", strlen("cy"))) 
+ else if (!strncmp(name, "cy", strlen("cy")))
    preset->per_pixel_flag[CX_OP] = TRUE;
- else if (!strncmp(name, "zoom", strlen("zoom"))) 
+ else if (!strncmp(name, "zoom", strlen("zoom")))
    preset->per_pixel_flag[ZOOM_OP] = TRUE;
- else if (!strncmp(name, "zoomexp", strlen("zoomexp"))) 
+ else if (!strncmp(name, "zoomexp", strlen("zoomexp")))
    preset->per_pixel_flag[ZOOMEXP_OP] = TRUE;
  else if (!strncmp(name, "rot", strlen("rot")))
    preset->per_pixel_flag[ROT_OP] = TRUE;
@@ -146,14 +146,14 @@ int add_per_pixel_eqn(char * name, gen_expr_t * gen_expr, preset_t * preset) {
    if (PER_PIXEL_EQN_DEBUG) printf("add_per_pixel_eqn: failed to allocate a new parameter!\n");
    return FAILURE;
  
- } 	 
+ }     
 
  /* Find most largest index in the splaytree */
  // if ((per_pixel_eqn = splay_find_max(active_preset->per_pixel_eqn_tree)) == NULL)
  // index = 0;
  // else
  index = splay_size(preset->per_pixel_eqn_tree);
-   
+ 
  /* Create the per pixel equation given the index, parameter, and general expression */
  if ((per_pixel_eqn = new_per_pixel_eqn(index, param, gen_expr)) == NULL) {
    if (PER_PIXEL_EQN_DEBUG) printf("add_per_pixel_eqn: failed to create new per pixel equation!\n");
@@ -161,56 +161,56 @@ int add_per_pixel_eqn(char * name, gen_expr_t * gen_expr, preset_t * preset) {
 
  }
 
- if (PER_PIXEL_EQN_DEBUG) printf("add_per_pixel_eqn: new equation (index = %d) (param = \"%s\")\n", 
-				 per_pixel_eqn->index, per_pixel_eqn->param->name);
+ if (PER_PIXEL_EQN_DEBUG) printf("add_per_pixel_eqn: new equation (index = %d) (param = \"%s\")\n",
+                 per_pixel_eqn->index, per_pixel_eqn->param->name);
  /* Insert the per pixel equation into the preset per pixel database */
  if (splay_insert(per_pixel_eqn, &per_pixel_eqn->index, preset->per_pixel_eqn_tree) < 0) {
    free_per_pixel_eqn(per_pixel_eqn);
    printf("failed to add per pixel eqn!\n");
-   return FAILURE;	 
+   return FAILURE;    
  }
 
- /* Done */ 
+ /* Done */
  return SUCCESS;
 }
 
 per_pixel_eqn_t * new_per_pixel_eqn(int index, param_t * param, gen_expr_t * gen_expr) {
 
-	per_pixel_eqn_t * per_pixel_eqn;
-	
-	if (index < 0)
-	  return NULL;
-	if (param == NULL)
-	  return NULL;
-	if (gen_expr == NULL)
-	  return NULL;
-	
-	if ((per_pixel_eqn = (per_pixel_eqn_t*)malloc(sizeof(per_pixel_eqn_t))) == NULL)
-	  return NULL;
+    per_pixel_eqn_t * per_pixel_eqn;
+    
+    if (index < 0)
+      return NULL;
+    if (param == NULL)
+      return NULL;
+    if (gen_expr == NULL)
+      return NULL;
+    
+    if ((per_pixel_eqn = (per_pixel_eqn_t*)malloc(sizeof(per_pixel_eqn_t))) == NULL)
+      return NULL;
 
-	
-	per_pixel_eqn->index = index;
-	per_pixel_eqn->param = param;
-	per_pixel_eqn->gen_expr = gen_expr;
-	
-	return per_pixel_eqn;	
+    
+    per_pixel_eqn->index = index;
+    per_pixel_eqn->param = param;
+    per_pixel_eqn->gen_expr = gen_expr;
+    
+    return per_pixel_eqn;    
 }
 
 
 void free_per_pixel_eqn(per_pixel_eqn_t * per_pixel_eqn) {
 
-	if (per_pixel_eqn == NULL)
-		return;
-	
-	free_gen_expr(per_pixel_eqn->gen_expr);
-	
-	free(per_pixel_eqn);
-	
-	return;
+    if (per_pixel_eqn == NULL)
+        return;
+    
+    free_gen_expr(per_pixel_eqn->gen_expr);
+    
+    free(per_pixel_eqn);
+    
+    return;
 }
 
 inline int isPerPixelEqn(int op) {
-    
+ 
   return active_preset->per_pixel_flag[op];
 
 }

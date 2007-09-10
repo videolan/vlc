@@ -31,7 +31,7 @@
 
 using namespace std;
 
-class AxVLCVariant 
+class AxVLCVariant
 {
 
 public:
@@ -95,7 +95,7 @@ private:
     VARIANTARG _v;
 };
 
-class AxVLCWSTR 
+class AxVLCWSTR
 {
 
 public:
@@ -211,7 +211,7 @@ public:
     {
         if( NULL == ppv )
             return E_POINTER;
-        if( (IID_IUnknown == riid) 
+        if( (IID_IUnknown == riid)
          || (IID_IPropertyBag == riid) )
         {
             AddRef();
@@ -262,7 +262,7 @@ public:
         else
             return E_INVALIDARG;
     };
-    
+ 
     STDMETHODIMP Write(LPCOLESTR pszPropName, VARIANT *pVar)
     {
         if( (NULL == pszPropName) || (NULL == pVar) )
@@ -389,7 +389,7 @@ private:
                 if( FAILED(result) )
                     return result;
                 if( len > 0 )
-                { 
+                {
                     result = pStm->Write(V_BSTR(propValue), len*sizeof(OLECHAR), NULL);
                     if( FAILED(result) )
                         return result;

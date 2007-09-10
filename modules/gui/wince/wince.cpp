@@ -96,7 +96,7 @@ static int Open( vlc_object_t *p_this )
 
     // Check if the application is running.
     // If it's running then focus its window and bail out.
-    HWND hwndMain = FindWindow( _T("VLC WinCE"), _T("VLC media player") );  
+    HWND hwndMain = FindWindow( _T("VLC WinCE"), _T("VLC media player") );
     if( hwndMain )
     {
         SetForegroundWindow( hwndMain );

@@ -228,7 +228,7 @@ static int Open( vlc_object_t *p_this )
     switch( p_dec->fmt_in.i_codec )
     {
         case VLC_FOURCC('S','V','Q','3'): /* Sorenson v3 */
-    /*    case VLC_FOURCC('S','V','Q','1'):  Sorenson v1 
+    /*    case VLC_FOURCC('S','V','Q','1'):  Sorenson v1
         case VLC_FOURCC('Z','y','G','o'):
         case VLC_FOURCC('V','P','3','1'):
         case VLC_FOURCC('3','I','V','1'): */
@@ -790,7 +790,7 @@ static int OpenVideo( decoder_t *p_dec )
     p_dec->fmt_out.video.i_width = p_dec->fmt_in.video.i_width;
     p_dec->fmt_out.video.i_height= p_dec->fmt_in.video.i_height;
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * p_dec->fmt_in.video.i_width / p_dec->fmt_in.video.i_height;
-    
+ 
     vlc_mutex_unlock( lock );
     return VLC_SUCCESS;
 
@@ -840,7 +840,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     }
     p_block = *pp_block;
     *pp_block = NULL;
-    
+ 
     i_pts = p_block->i_pts ? p_block->i_pts : p_block->i_dts;
 
     if( i_pts < mdate() )
@@ -859,7 +859,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         block_Release( p_block );
         return NULL;
     }
-    
+ 
     lock = var_GetGlobalMutex( "qt_mutex" );
     vlc_mutex_lock( lock );
 
@@ -884,7 +884,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
                 p_dec->fmt_in.video.i_width * p_dec->fmt_in.video.i_height * 2 );
         p_pic->date = i_pts;
     }
-    
+ 
     vlc_mutex_unlock( lock );
 
     block_Release( p_block );

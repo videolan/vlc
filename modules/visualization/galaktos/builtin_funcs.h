@@ -1,4 +1,4 @@
-/* Wrappers for all the builtin functions 
+/* Wrappers for all the builtin functions
    The arg_list pointer is a list of doubles. Its
    size is equal to the number of arguments the parameter
    takes */

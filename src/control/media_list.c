@@ -93,7 +93,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
 
     if( !p_mlist )
         return NULL;
-    
+ 
     p_mlist->p_libvlc_instance = p_inst;
     p_mlist->p_event_manager = libvlc_event_manager_new( p_mlist, p_inst, p_e );
 
@@ -113,7 +113,7 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
     }
 
     vlc_mutex_init( p_inst->p_libvlc_int, &p_mlist->object_lock );
-    
+ 
     ARRAY_INIT(p_mlist->items);
     p_mlist->i_refcount = 1;
     p_mlist->p_md = NULL;
@@ -134,10 +134,10 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
     p_mlist->i_refcount--;
     if( p_mlist->i_refcount > 0 )
     {
-        vlc_mutex_unlock( &p_mlist->object_lock );        
+        vlc_mutex_unlock( &p_mlist->object_lock );
         return;
     }
-    vlc_mutex_unlock( &p_mlist->object_lock );        
+    vlc_mutex_unlock( &p_mlist->object_lock );
 
     /* Refcount null, time to free */
 
@@ -267,7 +267,7 @@ int libvlc_media_list_count( libvlc_media_list_t * p_mlist,
  *
  * Lock should be hold when entering.
  **************************************************************************/
-void libvlc_media_list_add_media_descriptor( 
+void libvlc_media_list_add_media_descriptor(
                                    libvlc_media_list_t * p_mlist,
                                    libvlc_media_descriptor_t * p_md,
                                    libvlc_exception_t * p_e )
@@ -283,7 +283,7 @@ void libvlc_media_list_add_media_descriptor(
  *
  * Lock should be hold when entering.
  **************************************************************************/
-void libvlc_media_list_insert_media_descriptor( 
+void libvlc_media_list_insert_media_descriptor(
                                    libvlc_media_list_t * p_mlist,
                                    libvlc_media_descriptor_t * p_md,
                                    int index,

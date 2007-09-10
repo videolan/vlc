@@ -209,7 +209,7 @@ static void Probe( aout_instance_t * p_aout,
         }
 
         /* Special case for mono on stereo only boards */
-        i_channels = aout_FormatNbChannels( &p_aout->output.output );        
+        i_channels = aout_FormatNbChannels( &p_aout->output.output );
         var_Change( p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &val, NULL );
         if( val.i_int <= 0 && i_channels == 1 )
         {
@@ -319,7 +319,7 @@ static int Open( vlc_object_t *p_this )
     if( (psz_device = config_GetPsz( p_aout, "alsadev" )) == NULL )
     {
         msg_Err( p_aout, "no audio device given (maybe \"default\" ?)" );
-        intf_UserFatal( p_aout, VLC_FALSE, _("No Audio Device"), 
+        intf_UserFatal( p_aout, VLC_FALSE, _("No Audio Device"),
                         _("No audio device name was given. You might want to " \
                           "enter \"default\".") );
         free( p_sys );
@@ -427,7 +427,7 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
                              psz_iec_device, snd_strerror( i_snd_rc ) );
-            intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"), 
+            intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"),
                             _("VLC could not open the ALSA device \"%s\" (%s)."),
                             psz_iec_device, snd_strerror( i_snd_rc ) );
             free( p_sys );
@@ -466,7 +466,7 @@ static int Open( vlc_object_t *p_this )
                 {
                     msg_Err( p_aout, "audio device: %s is already in use",
                               psz_device );
-                    intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"), 
+                    intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"),
                                     _("The audio device \"%s\" is already in use."),
                                     psz_device );
                 }
@@ -478,7 +478,7 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
                              psz_device, snd_strerror( i_snd_rc ) );
-            intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"), 
+            intf_UserFatal( p_aout, VLC_FALSE, _("Audio output failed"),
                             _("VLC could not open the ALSA device \"%s\" (%s)."),
                             psz_device, snd_strerror( i_snd_rc ) );
             free( p_sys );
@@ -932,14 +932,14 @@ static void GetDevicesForCard(module_config_t *p_item, int i_card)
     snd_ctl_t *p_ctl;
     char psz_dev[64];
     char *psz_card_name;
-    
+ 
     sprintf(psz_dev, "hw:%i", i_card);
-    
+ 
     if (( i_err = snd_ctl_open(&p_ctl, psz_dev, 0)) < 0 )
     {
         return;
     }
-    
+ 
     if ((i_err = snd_card_get_name(i_card, &psz_card_name)) != 0)
     {
         psz_card_name = _("Unknown soundcard");
@@ -999,13 +999,13 @@ static void GetDevices( module_config_t *p_item )
 {
     int i_card = -1;
     int i_err = 0;
-    
+ 
     if ((i_err = snd_card_next(&i_card)) != 0)
     {
 //        g_warning("snd_next_card() failed: %s", snd_strerror(-err));
         return;
     }
-    
+ 
     while (i_card > -1)
     {
         GetDevicesForCard(p_item, i_card);

@@ -377,7 +377,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         if ( ((p_sys->i_flags & A52_CHANNEL_MASK) == A52_CHANNEL1
                || (p_sys->i_flags & A52_CHANNEL_MASK) == A52_CHANNEL2
                || (p_sys->i_flags & A52_CHANNEL_MASK) == A52_MONO)
-              && (p_filter->output.i_physical_channels 
+              && (p_filter->output.i_physical_channels
                    & (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
         {
             Duplicate( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
@@ -414,7 +414,7 @@ static void Destroy( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * OpenFilter: 
+ * OpenFilter:
  *****************************************************************************/
 static int OpenFilter( vlc_object_t *p_this )
 {

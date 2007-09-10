@@ -135,7 +135,7 @@ void vlc_rand_bytes (void *buf, size_t len)
             memcpy (p_buf, &val, count);
             break;
         }
-        
+ 
         memcpy (p_buf, &val, sizeof (val));
         count -= sizeof (val);
         p_buf += sizeof (val);

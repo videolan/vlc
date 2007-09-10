@@ -88,7 +88,7 @@ typedef struct aout_filter_sys_t
     float   coeffs[5*5];
     /* State */
     float  *p_state;
-       
+ 
 } aout_filter_sys_t;
 
 
@@ -135,11 +135,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->f_lowgain = config_GetFloat( p_this, "param-eq-lowgain");
     p_sys->f_highf = config_GetFloat( p_this, "param-eq-highf");
     p_sys->f_highgain = config_GetFloat( p_this, "param-eq-highgain");
-    
+ 
     p_sys->f_f1 = config_GetFloat( p_this, "param-eq-f1");
     p_sys->f_Q1 = config_GetFloat( p_this, "param-eq-q1");
     p_sys->f_gain1 = config_GetFloat( p_this, "param-eq-gain1");
-    
+ 
     p_sys->f_f2 = config_GetFloat( p_this, "param-eq-f2");
     p_sys->f_Q2 = config_GetFloat( p_this, "param-eq-q2");
     p_sys->f_gain2 = config_GetFloat( p_this, "param-eq-gain2");
@@ -147,7 +147,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->f_f3 = config_GetFloat( p_this, "param-eq-f3");
     p_sys->f_Q3 = config_GetFloat( p_this, "param-eq-q3");
     p_sys->f_gain3 = config_GetFloat( p_this, "param-eq-gain3");
-  
+ 
 
     i_samplerate = p_filter->input.i_rate;
     CalcPeakEQCoeffs(p_sys->f_f1, p_sys->f_Q1, p_sys->f_gain1,
@@ -185,7 +185,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
 
     ProcessEQ( (float*)p_in_buf->p_buffer, (float*)p_out_buf->p_buffer,
-               p_filter->p_sys->p_state, 
+               p_filter->p_sys->p_state,
                p_filter->input.i_channels, p_in_buf->i_nb_samples,
                p_filter->p_sys->coeffs, 5 );
 }
@@ -198,7 +198,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
  * coeffs[3] = a1
  * coeffs[4] = a2
  *
- * Equations taken from RBJ audio EQ cookbook 
+ * Equations taken from RBJ audio EQ cookbook
  * (http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt)
  */
 static void CalcPeakEQCoeffs( float f0, float Q, float gainDB, float Fs,
@@ -211,23 +211,23 @@ static void CalcPeakEQCoeffs( float f0, float Q, float gainDB, float Fs,
     float a0, a1, a2;
 
     // Provide sane limits to avoid overflow
-    if (Q < 0.1f) Q = 0.1f;   
+    if (Q < 0.1f) Q = 0.1f;
     if (Q > 100) Q = 100;
     if (f0 > Fs/2*0.95f) f0 = Fs/2*0.95f;
     if (gainDB < -40) gainDB = -40;
     if (gainDB > 40) gainDB = 40;
-    
+ 
     A = pow(10, gainDB/40);
     w0 = 2*3.141593f*f0/Fs;
     alpha = sin(w0)/(2*Q);
-    
+ 
     b0 = 1 + alpha*A;
     b1 = -2*cos(w0);
     b2 = 1 - alpha*A;
     a0 = 1 + alpha/A;
     a1 = -2*cos(w0);
     a2 = 1 - alpha/A;
-    
+ 
     // Store values to coeffs and normalize by 1/a0
     coeffs[0] = b0/a0;
     coeffs[1] = b1/a0;
@@ -244,7 +244,7 @@ static void CalcPeakEQCoeffs( float f0, float Q, float gainDB, float Fs,
  * coeffs[3] = a1
  * coeffs[4] = a2
  *
- * Equations taken from RBJ audio EQ cookbook 
+ * Equations taken from RBJ audio EQ cookbook
  * (http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt)
  */
 static void CalcShelfEQCoeffs( float f0, float slope, float gainDB, int high,
@@ -298,8 +298,8 @@ static void CalcShelfEQCoeffs( float f0, float slope, float gainDB, int high,
   samples is not premultiplied by channels
   size of coeffs is 5*eqCount
 */
-void ProcessEQ( float *src, float *dest, float *state, 
-                unsigned channels, unsigned samples, float *coeffs, 
+void ProcessEQ( float *src, float *dest, float *state,
+                unsigned channels, unsigned samples, float *coeffs,
                 unsigned eqCount )
 {
     unsigned i, chn, eq;

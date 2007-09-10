@@ -81,7 +81,7 @@
  * AutoStart=True
  *     Start playing automatically
  * DeliveryService=cds
- *     Simulcasted (scheduled unicast) content. (Green dot in Kasenna web interface) 
+ *     Simulcasted (scheduled unicast) content. (Green dot in Kasenna web interface)
  * sgiShowingName=A nice name that everyone likes
  *     A human readible descriptive title for this stream.
  * sgiSid=2311
@@ -165,7 +165,7 @@ int E_(Import_SGIMB)( vlc_object_t * p_this )
             p_demux->p_sys->i_sid = 0;
             p_demux->p_sys->b_rtsp_kasenna = VLC_FALSE;
             p_demux->p_sys->b_concert = VLC_FALSE;
-            
+ 
             return VLC_SUCCESS;
         }
     }
@@ -373,7 +373,7 @@ static int Demux ( demux_t *p_demux )
     p_child = input_ItemNewWithType( (vlc_object_t *)p_playlist, p_sys->psz_uri,
                       p_sys->psz_name ? p_sys->psz_name : p_sys->psz_uri,
                       0, NULL, p_sys->i_duration, ITEM_TYPE_NET );
-    
+ 
     if( !p_child )
     {
         msg_Err( p_demux, "A valid playlistitem could not be created" );

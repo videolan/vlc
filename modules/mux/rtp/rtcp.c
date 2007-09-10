@@ -39,7 +39,7 @@ void rtcp_schedule( vlc_object_t *p_this, mtime_t, rtcp_event_t );
 static int SDES_client_item_add( rtcp_client_t *p_client, int i_item, char *psz_name )
 {
     rtcp_SDES_item_t *p_item = NULL;
-	
+    
     p_item = (rtcp_SDES_item_t *) malloc( sizeof( rtcp_SDES_item_t ) );
     if( !p_item )
         return VLC_ENOMEM;
@@ -143,17 +143,17 @@ int rtcp_destroy_clients( vlc_object_t *p_this )
         rtcp_client_t *p_old = p_rtcp->pp_clients[i];
 
         p_rtcp->pf_del_client( p_this, p_old->u_ssrc );
-	pkt = rtcp_pkt_new( p_this, RTCP_BYE );
-	if( pkt )
-	{
-	    block_t *p_block = NULL;
-	    p_block = rtcp_encode_BYE( p_this, pkt, strdup("server is leaving") );
-            /* FIXME: 
+    pkt = rtcp_pkt_new( p_this, RTCP_BYE );
+    if( pkt )
+    {
+        block_t *p_block = NULL;
+        p_block = rtcp_encode_BYE( p_this, pkt, strdup("server is leaving") );
+            /* FIXME:
              * if( p_block )
-	     *    send_RTCP( p_this, p_block );
+         *    send_RTCP( p_this, p_block );
              */
-	}
-			
+    }
+            
     }
     /* wait till all clients have been signalled */
     while( p_rtcp->i_clients != 0 )
@@ -192,10 +192,10 @@ uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth, uint32_t u_s
                         vlc_bool_t b_sender, vlc_bool_t b_first )
 {
     rtcp_t *p_rtcp = (rtcp_t *) p_this;
-	rtcp_client_t *p_client = NULL;
+    rtcp_client_t *p_client = NULL;
     uint32_t i_rtcp_min = 5; /* seconds */
-	uint32_t i_pos = 0;
-	double i_bandwidth = u_bandwidth;
+    uint32_t i_pos = 0;
+    double i_bandwidth = u_bandwidth;
     const double i_compensation = 2.71828 - 1.5;
     double i_interval = 0;
     int n = p_rtcp->i_clients;
@@ -220,8 +220,8 @@ uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth, uint32_t u_s
     p_client = p_rtcp->pf_find_client( p_this, u_ssrc, &i_pos );
     if( !p_client )
         return -1;
-		
-	i_interval = p_client->p_stats->u_avg_pkt_size * ( n / i_bandwidth );
+        
+    i_interval = p_client->p_stats->u_avg_pkt_size * ( n / i_bandwidth );
     if( i_interval < i_rtcp_min )
         i_interval = i_rtcp_min;
     i_interval = i_interval * ( drand48() + 0.5 );
@@ -235,7 +235,7 @@ uint64_t rtcp_interval( vlc_object_t *p_this, uint64_t u_bandwidth, uint32_t u_s
  *--------------------------------------------------------------------------
  */
 void rtcp_expire( vlc_object_t *p_this, rtcp_event_t rtcp_event, uint64_t u_bandwidth,
-		  uint32_t u_ssrc, vlc_bool_t b_sender, vlc_bool_t *b_first )
+          uint32_t u_ssrc, vlc_bool_t b_sender, vlc_bool_t *b_first )
 {
     rtcp_t *p_rtcp = (rtcp_t *) p_this;
     rtcp_client_t *p_client = NULL;
@@ -315,7 +315,7 @@ static int rtcp_decode_SR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
     msg_Dbg( p_this, "decoding record: SR" );
 
     /* parse sender info */
-	p_pkt->u_payload_type = RTCP_SR;
+    p_pkt->u_payload_type = RTCP_SR;
     p_pkt->report.sr.ntp_timestampH = bs_read( p_rtcp->bs, 32 );
     p_pkt->report.sr.ntp_timestampL = bs_read( p_rtcp->bs, 32 );
     p_pkt->report.sr.rtp_timestamp  = bs_read( p_rtcp->bs, 32 );
@@ -351,7 +351,7 @@ static int rtcp_decode_SR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
             p_client->p_stats->u_pkt_count,
             p_client->p_stats->u_octet_count,
             p_pkt->u_ssrc );
-		
+        
         p_client->p_stats->u_fraction_lost = bs_read( p_rtcp->bs, 8 );
         p_client->p_stats->u_pkt_lost = bs_read( p_rtcp->bs, 24 );
         p_client->p_stats->u_highest_seq_no = bs_read( p_rtcp->bs, 32 );
@@ -412,8 +412,8 @@ static int rtcp_decode_RR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
         p_client = p_rtcp->pp_clients[i_pos];
 
         p_client->p_stats->u_RR_received++;
-        msg_Dbg( p_this, "RR received %d, SSRC %d", 
-		         p_client->p_stats->u_RR_received, u_ssrc );
+        msg_Dbg( p_this, "RR received %d, SSRC %d",
+                 p_client->p_stats->u_RR_received, u_ssrc );
 
         p_client->p_stats->u_fraction_lost = bs_read( p_rtcp->bs, 8 );
         p_client->p_stats->u_pkt_lost = bs_read( p_rtcp->bs, 24 );
@@ -487,8 +487,8 @@ static int rtcp_decode_SDES( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
             case RTCP_SDES_LOC:
             case RTCP_SDES_TOOL:
             case RTCP_SDES_NOTE:
-			{
-			    char psz_name[255];
+            {
+                char psz_name[255];
 
                 u_length = bs_read( p_rtcp->bs, 8 );
                 for( i = 0 ; i < u_length; i++ )
@@ -496,13 +496,13 @@ static int rtcp_decode_SDES( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
                     psz_name[i] = bs_read( p_rtcp->bs, 8 );
                 }
                 SDES_client_item_add( p_client, u_item, psz_name );
-			}
-			break;
+            }
+            break;
 
             case RTCP_SDES_PRIV: /* ignoring these */
             {
                 uint8_t u_prefix_len = 0;
-				uint8_t u_length = 0;
+                uint8_t u_length = 0;
                 char psz_prefix_name[255];
                 char psz_name[255];
 
@@ -524,8 +524,8 @@ static int rtcp_decode_SDES( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
                 }
                 psz_name[255] = '\0';
                 SDES_client_item_add( p_client, u_item, psz_name );
-			}
-			break;
+            }
+            break;
 
             default:
                 return VLC_EGENERIC;
@@ -570,10 +570,10 @@ static int rtcp_decode_BYE( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
 static int rtcp_decode_APP( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
 {
     rtcp_t        *p_rtcp = (rtcp_t *) p_this;
-	rtcp_client_t *p_client = NULL;
+    rtcp_client_t *p_client = NULL;
     char  psz_name[4];
     char* psz_data = NULL;
-	uint32_t u_ssrc = 0;
+    uint32_t u_ssrc = 0;
     uint32_t i_pos = 0;
     uint32_t i = 0;
     int   result = 0;
@@ -601,7 +601,7 @@ static int rtcp_decode_APP( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
         psz_name[i] = bs_read( p_rtcp->bs, 8 );
     }
     psz_name[4] = '\0';
-	
+    
     p_pkt->u_payload_type = RTCP_APP;
     p_pkt->report.app.psz_prefix = strdup( psz_name );
     p_pkt->report.app.u_prefix_len = 4;
@@ -661,8 +661,8 @@ int rtcp_pkt_decode( vlc_object_t *p_this, rtcp_pkt_t *p_pkt, block_t *p_block )
 
     while( !bs_eof( p_rtcp->bs ) )
     {
-		uint32_t i_pos = 0;
-		
+        uint32_t i_pos = 0;
+        
         switch( p_pkt->u_payload_type )
         {
             case RTCP_SR:
@@ -694,8 +694,8 @@ int rtcp_pkt_decode( vlc_object_t *p_this, rtcp_pkt_t *p_pkt, block_t *p_block )
 
                 if( p_rtcp->u_active < p_rtcp->u_members )
                 {
-					rtcp_event_t event = EVENT_BYE;
-					
+                    rtcp_event_t event = EVENT_BYE;
+                    
                     p_rtcp->i_next_date = p_rtcp->i_date +
                                 (mtime_t) ( (p_rtcp->u_active / p_rtcp->u_members) *
                                             (p_rtcp->i_next_date - p_rtcp->i_date) );
@@ -749,8 +749,8 @@ rtcp_pkt_t *rtcp_pkt_new( vlc_object_t *p_this, int type )
             break;
         case RTCP_SDES:
             p_pkt->u_length += sizeof(rtcp_SDES_t);
-			if( p_pkt->report.sdes.pp_items )
-				p_pkt->u_length += p_pkt->report.sdes.u_items;
+            if( p_pkt->report.sdes.pp_items )
+                p_pkt->u_length += p_pkt->report.sdes.u_items;
             break;
         case RTCP_BYE:
             p_pkt->u_length += sizeof(rtcp_BYE_t);
@@ -804,7 +804,7 @@ void rtcp_pkt_del( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
         default:
             msg_Err( p_this, "unknown RTCP packet type %d: "
                              "possible leaking of memory.",
-							p_pkt->u_payload_type );
+                            p_pkt->u_payload_type );
             break;
     }
     free( p_pkt );
@@ -819,7 +819,7 @@ block_t *rtcp_encode_SR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
     rtcp_stats_t *p_stats = NULL;
     rtcp_client_t *p_client = NULL;
     uint32_t i_pos = 0;
-	int result = 0;
+    int result = 0;
 
     if( p_pkt->u_payload_type != RTCP_SR )
         return NULL;
@@ -893,8 +893,8 @@ block_t *rtcp_encode_RR( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
     block_t *p_block = NULL;
     rtcp_stats_t *p_stats = NULL;
     rtcp_client_t *p_client = NULL;
-	uint32_t i_pos = 0;
-	int result = 0;
+    uint32_t i_pos = 0;
+    int result = 0;
 
     if( p_pkt->u_payload_type != RTCP_RR )
         return NULL;
@@ -981,7 +981,7 @@ block_t *rtcp_encode_SDES( vlc_object_t *p_this, rtcp_pkt_t *p_pkt )
             uint32_t i_count = strlen( p_pkt->report.sdes.pp_items[i_item]->psz_data );
             uint8_t  u_octet = i_count / 8;  /* Octect count ??*/
             rtcp_SDES_item_t *p_item = p_pkt->report.sdes.pp_items[i_item];
-			uint32_t i_pos, i_pad, i_padding;
+            uint32_t i_pos, i_pad, i_padding;
 
             bs_write( s, 8, p_item->u_type );
             bs_write( s, 8, u_octet );
@@ -1034,7 +1034,7 @@ block_t *rtcp_encode_BYE( vlc_object_t *p_this, rtcp_pkt_t *p_pkt, char *psz_rea
     /* Give reason for leaving */
     //FIXME: bs_write( s, 8, p_item->u_type );
     bs_write( s, 8, u_octet );
-	
+    
     for( i_pos = 0; i_pos < i_count; i_pos++ )
     {
         /* FIXME: must be UTF 8 encoded */

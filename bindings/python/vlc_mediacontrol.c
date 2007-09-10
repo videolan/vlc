@@ -37,7 +37,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
     char** ppsz_args = NULL;
     libvlc_instance_t* p_instance = NULL;
     Py_ssize_t i_size = 0;
-    
+ 
     self = PyObject_New( MediaControl, &MediaControl_Type );
 
     if( PyArg_ParseTuple( args, "O", &py_param ) )

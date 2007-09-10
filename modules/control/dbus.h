@@ -36,7 +36,7 @@
 /* DBus related */
 #define DBUS_METHOD( method_function ) \
     static DBusHandlerResult method_function \
-            ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this ) 
+            ( DBusConnection *p_conn, DBusMessage *p_from, void *p_this )
 
 #define DBUS_SIGNAL( signal_function ) \
     static DBusHandlerResult signal_function \

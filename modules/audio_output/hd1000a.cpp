@@ -115,7 +115,7 @@ static int Open( vlc_object_t * p_this )
         delete pPlayer;
         free( p_sys );
         return VLC_EGENERIC;
-    } 
+    }
 
     p_sys->nBuffers = __MIN( p_sys->nBuffers, 4 );
 
@@ -234,7 +234,7 @@ static int Thread( aout_instance_t * p_aout )
         if( p_buffer == NULL )
         {
             p_aout->p_libvlc->pf_memset( p_sys->ppBuffers[ i ], 0,
-                                      p_sys->nBufferSize ); 
+                                      p_sys->nBufferSize );
         }
         else
         {
@@ -247,7 +247,7 @@ static int Thread( aout_instance_t * p_aout )
                                    p_sys->nBufferSize / 2 ) )
         {
             msg_Err( p_aout, "QueueBuffer failed" );
-        } 
+        }
 
         i = (i + 1) % p_sys->nBuffers;
 #undef i

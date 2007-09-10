@@ -249,8 +249,8 @@ static int Open( vlc_object_t *p_this )
     {
         int        i_input_ports;
         int        j;
-        
-	if( p_sys->i_match_ports > 0 )
+ 
+    if( p_sys->i_match_ports > 0 )
         {
             for( j = 0; j < p_sys->i_match_ports; j++ )
             {
@@ -283,7 +283,7 @@ static int Open( vlc_object_t *p_this )
                     jack_port_name( p_sys->pp_jack_port_input[i_input_ports] ) );
             }
         }
-	if( pp_jack_port_output ) free( pp_jack_port_output );
+    if( pp_jack_port_output ) free( pp_jack_port_output );
     }
 
     /* info about jack server */
@@ -403,7 +403,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
     demux_sys_t        *p_sys = p_demux->p_sys;
     unsigned int        i, j;
     size_t              i_write;
-    
+ 
     /* Get and interlace buffers */
     for ( i = 0; i < p_sys->i_channels ; i++ )
     {
@@ -416,13 +416,13 @@ int Process( jack_nframes_t i_frames, void *p_arg )
     {
         for( i = 0; i <p_sys->i_channels; i++ )
         {
-            if( jack_ringbuffer_write_space( p_sys->p_jack_ringbuffer ) < 
+            if( jack_ringbuffer_write_space( p_sys->p_jack_ringbuffer ) <
                 p_sys->jack_sample_size ) {
                 msg_Err( p_demux, "buffer overflow");
                 return 0; // buffer overflow
             }
-            i_write = jack_ringbuffer_write( p_sys->p_jack_ringbuffer, 
-                                             ( char * ) (p_sys->pp_jack_buffer[i]+j), 
+            i_write = jack_ringbuffer_write( p_sys->p_jack_ringbuffer,
+                                             ( char * ) (p_sys->pp_jack_buffer[i]+j),
                                              p_sys->jack_sample_size );
             if (i_write != p_sys->jack_sample_size ) {
                 msg_Warn( p_demux, "error writing on ring buffer");
@@ -465,7 +465,7 @@ static block_t *GrabJack( demux_t *p_demux )
         msg_Warn( p_demux, "cannot get block" );
         return 0;
     }
-    
+ 
     //Find the previous power of 2, this algo assumes size_t has the same size on all arch
     i_read >>= 1;
     i_read--;
@@ -475,22 +475,22 @@ static block_t *GrabJack( demux_t *p_demux )
     i_read |= i_read >> 8;
     i_read |= i_read >> 16;
     i_read++;
-    
+ 
     i_read = jack_ringbuffer_read( p_sys->p_jack_ringbuffer, ( char * ) p_block->p_buffer, i_read );
-      
+ 
     p_block->i_dts = p_block->i_pts =    date_Increment( &p_sys->pts,
          i_read/(p_sys->i_channels * p_sys->jack_sample_size) );
 
     p_sys->p_block_audio = p_block;
     p_block->i_buffer = i_read;
     p_sys->p_block_audio = 0;
-    
+ 
     return p_block;
 }
 
 
 /*****************************************************************************
- * Port_finder: compare ports with the regexp entered 
+ * Port_finder: compare ports with the regexp entered
  *****************************************************************************/
 static void Port_finder( demux_t *p_demux )
 {

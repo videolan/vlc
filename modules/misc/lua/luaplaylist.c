@@ -135,14 +135,14 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
     demux_t * p_demux = (demux_t *)p_this;
 
     p_demux->p_sys->psz_filename = strdup(psz_filename);
-    
+ 
     /* Ugly hack to delete previous versions of the probe() and parse()
     * functions. */
     lua_pushnil( p_state );
     lua_pushnil( p_state );
     lua_setglobal( p_state, "probe" );
     lua_setglobal( p_state, "parse" );
-    
+ 
     /* Load and run the script(s) */
     if( luaL_dofile( p_state, psz_filename ) )
     {
@@ -151,9 +151,9 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
         lua_pop( p_state, 1 );
         return VLC_EGENERIC;
     }
-    
+ 
     lua_getglobal( p_state, "probe" );
-    
+ 
     if( !lua_isfunction( p_state, lua_gettop( p_state ) ) )
     {
         msg_Warn( p_demux, "Error while runing script %s, "
@@ -161,7 +161,7 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
         lua_pop( p_state, 1 );
         return VLC_EGENERIC;
     }
-    
+ 
     if( lua_pcall( p_state, 0, 1, 0 ) )
     {
         msg_Warn( p_demux, "Error while runing script %s, "
@@ -170,7 +170,7 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
         lua_pop( p_state, 1 );
         return VLC_EGENERIC;
     }
-    
+ 
     if( lua_gettop( p_state ) )
     {
         int i_ret = VLC_EGENERIC;
@@ -181,7 +181,7 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
             i_ret = VLC_SUCCESS;
         }
         lua_pop( p_state, 1 );
-        
+ 
         return i_ret;
     }
     return VLC_EGENERIC;

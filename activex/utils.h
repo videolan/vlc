@@ -84,7 +84,7 @@ public:
     {
         if( NULL == ppv )
             return E_POINTER;
-        if( (IID_IUnknown == riid) 
+        if( (IID_IUnknown == riid)
          || (EnumeratorIID == riid) )
         {
             AddRef();

@@ -38,8 +38,8 @@ public:
     {
         if( NULL == ppv )
             return E_POINTER;
-        if( (IID_IUnknown == riid) 
-         || (IID_IOleWindow == riid) 
+        if( (IID_IUnknown == riid)
+         || (IID_IOleWindow == riid)
          || (IID_IOleInPlaceActiveObject == riid) )
         {
             AddRef();

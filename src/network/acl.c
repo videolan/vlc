@@ -373,7 +373,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
             *ptr++ = '\0'; /* separate address from mask length */
 
         if( (ptr != NULL)
-            ? ACL_AddNet( p_acl, psz_ip, atoi( ptr ), VLC_TRUE ) 
+            ? ACL_AddNet( p_acl, psz_ip, atoi( ptr ), VLC_TRUE )
             : ACL_AddHost( p_acl, psz_ip, VLC_TRUE ) )
         {
             msg_Err( p_acl->p_owner, "cannot add ACL from %s", psz_path );

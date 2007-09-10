@@ -118,7 +118,7 @@ static int Control( stream_t *s, int i_query, va_list args )
         case STREAM_SET_POSITION:
             i_64 = (int64_t)va_arg( args, int64_t );
             i_64 = __MAX( i_64, 0 );
-            i_64 = __MIN( i_64, s->p_sys->i_size ); 
+            i_64 = __MIN( i_64, s->p_sys->i_size );
             p_sys->i_pos = i_64;
             break;
 

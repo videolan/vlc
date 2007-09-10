@@ -327,11 +327,11 @@ void E_(EventThread)( event_thread_t *p_event )
                 val.psz_string = strdup( VOUT_TITLE " (Direct3D output)" );
 #endif
 #ifdef MODULE_NAME_IS_vout_directx
-                if( p_event->p_vout->p_sys->b_using_overlay ) val.psz_string = 
+                if( p_event->p_vout->p_sys->b_using_overlay ) val.psz_string =
                     strdup( VOUT_TITLE " (hardware YUV overlay DirectX output)" );
-                else if( p_event->p_vout->p_sys->b_hw_yuv ) val.psz_string = 
+                else if( p_event->p_vout->p_sys->b_hw_yuv ) val.psz_string =
                     strdup( VOUT_TITLE " (hardware YUV DirectX output)" );
-                else val.psz_string = 
+                else val.psz_string =
                     strdup( VOUT_TITLE " (software RGB DirectX output)" );
 #endif
             }
@@ -659,12 +659,12 @@ void E_(UpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
     {
         if( p_vout->p_sys->i_align_dest_boundary )
             rect_dest.left = ( rect_dest.left +
-                p_vout->p_sys->i_align_dest_boundary / 2 ) & 
+                p_vout->p_sys->i_align_dest_boundary / 2 ) &
                 ~p_vout->p_sys->i_align_dest_boundary;
 
         if( p_vout->p_sys->i_align_dest_size )
             rect_dest.right = (( rect_dest.right - rect_dest.left +
-                p_vout->p_sys->i_align_dest_size / 2 ) & 
+                p_vout->p_sys->i_align_dest_size / 2 ) &
                 ~p_vout->p_sys->i_align_dest_size) + rect_dest.left;
     }
 
@@ -729,13 +729,13 @@ void E_(UpdateRects)( vout_thread_t *p_vout, vlc_bool_t b_force )
     {
         if( p_vout->p_sys->i_align_src_boundary )
             rect_src_clipped.left = ( rect_src_clipped.left +
-                p_vout->p_sys->i_align_src_boundary / 2 ) & 
+                p_vout->p_sys->i_align_src_boundary / 2 ) &
                 ~p_vout->p_sys->i_align_src_boundary;
 
         if( p_vout->p_sys->i_align_src_size )
             rect_src_clipped.right = (( rect_src_clipped.right -
                 rect_src_clipped.left +
-                p_vout->p_sys->i_align_src_size / 2 ) & 
+                p_vout->p_sys->i_align_src_size / 2 ) &
                 ~p_vout->p_sys->i_align_src_size) + rect_src_clipped.left;
     }
 #endif
@@ -825,7 +825,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         /*
         ** For overlay, DefWindowProc() will erase dirty regions
         ** with colorkey.
-        ** For non-overlay, vout will paint the whole window at 
+        ** For non-overlay, vout will paint the whole window at
         ** regular interval, therefore dirty regions can be ignored
         ** to minimize repaint.
         */
@@ -847,7 +847,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
             /* nothing to repaint */
             ValidateRect(hwnd, NULL);
             // fall through
-#endif 
+#endif
         default:
             return DefWindowProc(hwnd, message, wParam, lParam);
         }
@@ -1138,7 +1138,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 }
 
 
-/* Internal wrapper over GetWindowPlacement / SetWindowPlacement */ 
+/* Internal wrapper over GetWindowPlacement / SetWindowPlacement */
 static void SetWindowState(HWND hwnd, int nShowCmd)
 {
     WINDOWPLACEMENT window_placement;

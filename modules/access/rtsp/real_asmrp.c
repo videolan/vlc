@@ -2,7 +2,7 @@
  * Copyright (C) 2002-2004 the xine project
  *
  * This file is part of xine, a free video player.
- * 
+ *
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -72,7 +72,7 @@ typedef struct {
 
   int         sym;
   int         num;
-  
+ 
   char        str[ASMRP_MAX_ID];
 
   /* private part */
@@ -103,7 +103,7 @@ static void asmrp_dispose (asmrp_t *p) {
 
   int i;
 
-  for (i=0; i<p->sym_tab_num; i++) 
+  for (i=0; i<p->sym_tab_num; i++)
     free (p->sym_tab[i].id);
 
   if (p->buf) free (p->buf);
@@ -122,7 +122,7 @@ static void asmrp_init (asmrp_t *p, const char *str) {
 
   p->buf = strdup (str);
   p->pos = 0;
-  
+ 
   asmrp_getch (p);
 }
 
@@ -156,10 +156,10 @@ static void asmrp_string (asmrp_t *p) {
     asmrp_getch (p);
   }
   p->str[l]=0;
-  
+ 
   if (p->ch=='"')
     asmrp_getch (p);
-  
+ 
   p->sym = ASMRP_SYM_STRING;
 }
 
@@ -170,7 +170,7 @@ static void asmrp_identifier (asmrp_t *p) {
   l = 0;
 
   while ( ((p->ch>='A') && (p->ch<='z'))
-	  || ((p->ch>='0') && (p->ch<='9'))) {
+      || ((p->ch>='0') && (p->ch<='9'))) {
 
     p->str[l] = p->ch;
 
@@ -178,7 +178,7 @@ static void asmrp_identifier (asmrp_t *p) {
     asmrp_getch (p);
   }
   p->str[l]=0;
-  
+ 
   p->sym = ASMRP_SYM_ID;
 }
 
@@ -376,7 +376,7 @@ static int asmrp_set_id (asmrp_t *p, const char *s, int v) {
 
     lprintf ("new symbol '%s'\n", s);
 
-  }    
+  }
 
   p->sym_tab[i].v = v;
  
@@ -390,7 +390,7 @@ static int asmrp_condition (asmrp_t *p) ;
 static int asmrp_operand (asmrp_t *p) {
 
   int i, ret;
-  
+ 
   lprintf ("operand\n");
 
   ret = 0;
@@ -400,7 +400,7 @@ static int asmrp_operand (asmrp_t *p) {
   case ASMRP_SYM_DOLLAR:
 
     asmrp_get_sym (p);
-    
+ 
     if (p->sym != ASMRP_SYM_ID) {
       printf ("error: identifier expected.\n");
       break;
@@ -440,7 +440,7 @@ static int asmrp_operand (asmrp_t *p) {
   }
 
   lprintf ("operand done, =%d\n", ret);
-  
+ 
   return ret;
 }
 
@@ -453,10 +453,10 @@ static int asmrp_comp_expression (asmrp_t *p) {
   a = asmrp_operand (p);
 
   while ( (p->sym == ASMRP_SYM_LESS)
-	  || (p->sym == ASMRP_SYM_LEQ)
-	  || (p->sym == ASMRP_SYM_EQUALS)
-	  || (p->sym == ASMRP_SYM_GEQ)
-	  || (p->sym == ASMRP_SYM_GREATER) ) {
+      || (p->sym == ASMRP_SYM_LEQ)
+      || (p->sym == ASMRP_SYM_EQUALS)
+      || (p->sym == ASMRP_SYM_GEQ)
+      || (p->sym == ASMRP_SYM_GREATER) ) {
     int op = p->sym;
     int b;
 
@@ -490,7 +490,7 @@ static int asmrp_comp_expression (asmrp_t *p) {
 }
 
 static int asmrp_condition (asmrp_t *p) {
-  
+ 
   int a;
 
   lprintf ("condition\n");
@@ -529,7 +529,7 @@ static void asmrp_assignment (asmrp_t *p) {
     lprintf ("empty assignment\n");
     return;
   }
-  
+ 
   if (p->sym != ASMRP_SYM_ID) {
     printf ("error: identifier expected\n");
     return;
@@ -542,7 +542,7 @@ static void asmrp_assignment (asmrp_t *p) {
   }
   asmrp_get_sym (p);
 
-  if ( (p->sym != ASMRP_SYM_NUM) && (p->sym != ASMRP_SYM_STRING) 
+  if ( (p->sym != ASMRP_SYM_NUM) && (p->sym != ASMRP_SYM_STRING)
        && (p->sym != ASMRP_SYM_ID)) {
     printf ("error: number or string expected\n");
     return;
@@ -553,22 +553,22 @@ static void asmrp_assignment (asmrp_t *p) {
 }
 
 static int asmrp_rule (asmrp_t *p) {
-  
+ 
   int ret;
 
   lprintf ("rule\n");
 
   ret = 1;
-  
+ 
   if (p->sym == ASMRP_SYM_HASH) {
 
     asmrp_get_sym (p);
     ret = asmrp_condition (p);
 
     while (p->sym == ASMRP_SYM_COMMA) {
-      
+ 
       asmrp_get_sym (p);
-      
+ 
       asmrp_assignment (p);
     }
 

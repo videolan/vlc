@@ -40,605 +40,605 @@ class BitmapStash {
 // flavors of a bitmap. If the stash does not have a particular bitmap,
 // it turns around to ask the button to create one and stores it for next time.
 public:
-	BitmapStash(TransportButton *);
-	~BitmapStash();
-	BBitmap *GetBitmap(uint32 signature);
-	
+    BitmapStash(TransportButton *);
+    ~BitmapStash();
+    BBitmap *GetBitmap(uint32 signature);
+    
 private:
-	TransportButton *owner;
-	map<uint32, BBitmap *> stash;
+    TransportButton *owner;
+    map<uint32, BBitmap *> stash;
 };
 
 BitmapStash::BitmapStash(TransportButton *owner)
-	:	owner(owner)
+    :    owner(owner)
 {
 }
 
 BBitmap *
 BitmapStash::GetBitmap(uint32 signature)
 {
-	if (stash.find(signature) == stash.end()) {
-		BBitmap *newBits = owner->MakeBitmap(signature);
-		ASSERT(newBits);
-		stash[signature] = newBits;
-	}
-	
-	return stash[signature];
+    if (stash.find(signature) == stash.end()) {
+        BBitmap *newBits = owner->MakeBitmap(signature);
+        ASSERT(newBits);
+        stash[signature] = newBits;
+    }
+    
+    return stash[signature];
 }
 
 BitmapStash::~BitmapStash()
 {
-	// delete all the bitmaps
-	for (map<uint32, BBitmap *>::iterator i = stash.begin(); i != stash.end(); i++) 
-		delete (*i).second;
+    // delete all the bitmaps
+    for (map<uint32, BBitmap *>::iterator i = stash.begin(); i != stash.end(); i++)
+        delete (*i).second;
 }
 
 
 class PeriodicMessageSender {
-	// used to send a specified message repeatedly when holding down a button
+    // used to send a specified message repeatedly when holding down a button
 public:
-	static PeriodicMessageSender *Launch(BMessenger target,
-		const BMessage *message, bigtime_t period);
-	void Quit();
+    static PeriodicMessageSender *Launch(BMessenger target,
+        const BMessage *message, bigtime_t period);
+    void Quit();
 
 private:
-	PeriodicMessageSender(BMessenger target, const BMessage *message,
-		bigtime_t period);
-	~PeriodicMessageSender() {}
-		// use quit
+    PeriodicMessageSender(BMessenger target, const BMessage *message,
+        bigtime_t period);
+    ~PeriodicMessageSender() {}
+        // use quit
 
-	static status_t TrackBinder(void *);
-	void Run();
-	
-	BMessenger target;
-	BMessage message;
+    static status_t TrackBinder(void *);
+    void Run();
+    
+    BMessenger target;
+    BMessage message;
 
-	bigtime_t period;
-	
-	bool requestToQuit;
+    bigtime_t period;
+    
+    bool requestToQuit;
 };
 
 
 PeriodicMessageSender::PeriodicMessageSender(BMessenger target,
-	const BMessage *message, bigtime_t period)
-	:	target(target),
-		message(*message),
-		period(period),
-		requestToQuit(false)
+    const BMessage *message, bigtime_t period)
+    :    target(target),
+        message(*message),
+        period(period),
+        requestToQuit(false)
 {
 }
 
 PeriodicMessageSender *
 PeriodicMessageSender::Launch(BMessenger target, const BMessage *message,
-	bigtime_t period)
+    bigtime_t period)
 {
-	PeriodicMessageSender *result = new PeriodicMessageSender(target, message, period);
-	thread_id thread = spawn_thread(&PeriodicMessageSender::TrackBinder,
-		"ButtonRepeatingThread", B_NORMAL_PRIORITY, result);
-	
-	if (thread <= 0 || resume_thread(thread) != B_OK) {
-		// didn't start, don't leak self
-		delete result;
-		result = 0;
-	}
+    PeriodicMessageSender *result = new PeriodicMessageSender(target, message, period);
+    thread_id thread = spawn_thread(&PeriodicMessageSender::TrackBinder,
+        "ButtonRepeatingThread", B_NORMAL_PRIORITY, result);
+    
+    if (thread <= 0 || resume_thread(thread) != B_OK) {
+        // didn't start, don't leak self
+        delete result;
+        result = 0;
+    }
 
-	return result;
+    return result;
 }
 
-void 
+void
 PeriodicMessageSender::Quit()
 {
-	requestToQuit = true;
+    requestToQuit = true;
 }
 
-status_t 
+status_t
 PeriodicMessageSender::TrackBinder(void *castToThis)
 {
-	((PeriodicMessageSender *)castToThis)->Run();
-	return 0;
+    ((PeriodicMessageSender *)castToThis)->Run();
+    return 0;
 }
 
-void 
+void
 PeriodicMessageSender::Run()
 {
-	for (;;) {
-		snooze(period);
-		if (requestToQuit)
-			break;
-		target.SendMessage(&message);
-	}
-	delete this;
+    for (;;) {
+        snooze(period);
+        if (requestToQuit)
+            break;
+        target.SendMessage(&message);
+    }
+    delete this;
 }
 
 class SkipButtonKeypressFilter : public BMessageFilter {
 public:
-	SkipButtonKeypressFilter(uint32 shortcutKey, uint32 shortcutModifier,
-		TransportButton *target);
+    SkipButtonKeypressFilter(uint32 shortcutKey, uint32 shortcutModifier,
+        TransportButton *target);
 
 protected:
-	filter_result Filter(BMessage *message, BHandler **handler);
+    filter_result Filter(BMessage *message, BHandler **handler);
 
 private:
-	uint32 shortcutKey;
-	uint32 shortcutModifier;
-	TransportButton *target;
+    uint32 shortcutKey;
+    uint32 shortcutModifier;
+    TransportButton *target;
 };
 
 SkipButtonKeypressFilter::SkipButtonKeypressFilter(uint32 shortcutKey,
-	uint32 shortcutModifier, TransportButton *target)
-	:	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
-		shortcutKey(shortcutKey),
-		shortcutModifier(shortcutModifier),
-		target(target)
+    uint32 shortcutModifier, TransportButton *target)
+    :    BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+        shortcutKey(shortcutKey),
+        shortcutModifier(shortcutModifier),
+        target(target)
 {
 }
 
-filter_result 
+filter_result
 SkipButtonKeypressFilter::Filter(BMessage *message, BHandler **handler)
 {
-	if (target->IsEnabled()
-		&& (message->what == B_KEY_DOWN || message->what == B_KEY_UP)) {
-		uint32 modifiers;
-		uint32 rawKeyChar = 0;
-		uint8 byte = 0;
-		int32 key = 0;
-		
-		if (message->FindInt32("modifiers", (int32 *)&modifiers) != B_OK
-			|| message->FindInt32("raw_char", (int32 *)&rawKeyChar) != B_OK
-			|| message->FindInt8("byte", (int8 *)&byte) != B_OK
-			|| message->FindInt32("key", &key) != B_OK)
-			return B_DISPATCH_MESSAGE;
+    if (target->IsEnabled()
+        && (message->what == B_KEY_DOWN || message->what == B_KEY_UP)) {
+        uint32 modifiers;
+        uint32 rawKeyChar = 0;
+        uint8 byte = 0;
+        int32 key = 0;
+        
+        if (message->FindInt32("modifiers", (int32 *)&modifiers) != B_OK
+            || message->FindInt32("raw_char", (int32 *)&rawKeyChar) != B_OK
+            || message->FindInt8("byte", (int8 *)&byte) != B_OK
+            || message->FindInt32("key", &key) != B_OK)
+            return B_DISPATCH_MESSAGE;
 
-		modifiers &= B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY
-			| B_OPTION_KEY | B_MENU_KEY;
-			// strip caps lock, etc.
+        modifiers &= B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY
+            | B_OPTION_KEY | B_MENU_KEY;
+            // strip caps lock, etc.
 
-		if (modifiers == shortcutModifier && rawKeyChar == shortcutKey) {
-			if (message->what == B_KEY_DOWN)
-				target->ShortcutKeyDown();
-			else
-				target->ShortcutKeyUp();
-			
-			return B_SKIP_MESSAGE;
-		}
-	}
+        if (modifiers == shortcutModifier && rawKeyChar == shortcutKey) {
+            if (message->what == B_KEY_DOWN)
+                target->ShortcutKeyDown();
+            else
+                target->ShortcutKeyUp();
+            
+            return B_SKIP_MESSAGE;
+        }
+    }
 
-	// let others deal with this
-	return B_DISPATCH_MESSAGE;
+    // let others deal with this
+    return B_DISPATCH_MESSAGE;
 }
 
 TransportButton::TransportButton(BRect frame, const char *name,
-	const unsigned char *normalBits,
-	const unsigned char *pressedBits,
-	const unsigned char *disabledBits,
-	BMessage *invokeMessage, BMessage *startPressingMessage,
-	BMessage *pressingMessage, BMessage *donePressingMessage, bigtime_t period,
-	uint32 key, uint32 modifiers, uint32 resizeFlags)
-	:	BControl(frame, name, "", invokeMessage, resizeFlags, B_WILL_DRAW | B_NAVIGABLE),
-		bitmaps(new BitmapStash(this)),
-		normalBits(normalBits),
-		pressedBits(pressedBits),
-		disabledBits(disabledBits),
-		startPressingMessage(startPressingMessage),
-		pressingMessage(pressingMessage),
-		donePressingMessage(donePressingMessage),
-		pressingPeriod(period),
-		mouseDown(false),
-		keyDown(false),
-		messageSender(0),
-		keyPressFilter(0)
+    const unsigned char *normalBits,
+    const unsigned char *pressedBits,
+    const unsigned char *disabledBits,
+    BMessage *invokeMessage, BMessage *startPressingMessage,
+    BMessage *pressingMessage, BMessage *donePressingMessage, bigtime_t period,
+    uint32 key, uint32 modifiers, uint32 resizeFlags)
+    :    BControl(frame, name, "", invokeMessage, resizeFlags, B_WILL_DRAW | B_NAVIGABLE),
+        bitmaps(new BitmapStash(this)),
+        normalBits(normalBits),
+        pressedBits(pressedBits),
+        disabledBits(disabledBits),
+        startPressingMessage(startPressingMessage),
+        pressingMessage(pressingMessage),
+        donePressingMessage(donePressingMessage),
+        pressingPeriod(period),
+        mouseDown(false),
+        keyDown(false),
+        messageSender(0),
+        keyPressFilter(0)
 {
-	if (key)
-		keyPressFilter = new SkipButtonKeypressFilter(key, modifiers, this);
+    if (key)
+        keyPressFilter = new SkipButtonKeypressFilter(key, modifiers, this);
 }
 
 
-void 
+void
 TransportButton::AttachedToWindow()
 {
-	_inherited::AttachedToWindow();
-	if (keyPressFilter)
-		Window()->AddCommonFilter(keyPressFilter);
-	
-	// transparent to reduce flicker
-	SetViewColor(B_TRANSPARENT_COLOR);
+    _inherited::AttachedToWindow();
+    if (keyPressFilter)
+        Window()->AddCommonFilter(keyPressFilter);
+    
+    // transparent to reduce flicker
+    SetViewColor(B_TRANSPARENT_COLOR);
 }
 
-void 
+void
 TransportButton::DetachedFromWindow()
 {
-	if (keyPressFilter)
-		Window()->RemoveCommonFilter(keyPressFilter);
-	_inherited::DetachedFromWindow();
+    if (keyPressFilter)
+        Window()->RemoveCommonFilter(keyPressFilter);
+    _inherited::DetachedFromWindow();
 }
 
 
 TransportButton::~TransportButton()
 {
-	delete startPressingMessage;
-	delete pressingMessage;
-	delete donePressingMessage;
-	delete bitmaps;
-	delete keyPressFilter;
+    delete startPressingMessage;
+    delete pressingMessage;
+    delete donePressingMessage;
+    delete bitmaps;
+    delete keyPressFilter;
 }
 
-void 
+void
 TransportButton::WindowActivated(bool state)
 {
-	if (!state)
-		ShortcutKeyUp();
-	
-	_inherited::WindowActivated(state);
+    if (!state)
+        ShortcutKeyUp();
+    
+    _inherited::WindowActivated(state);
 }
 
-void 
+void
 TransportButton::SetEnabled(bool on)
 {
-	if (on != IsEnabled()) {
-		_inherited::SetEnabled(on);
-		if (!on)
-			ShortcutKeyUp();
-	}	
+    if (on != IsEnabled()) {
+        _inherited::SetEnabled(on);
+        if (!on)
+            ShortcutKeyUp();
+    }    
 }
 
 const unsigned char *
 TransportButton::BitsForMask(uint32 mask) const
 {
-	switch (mask) {
-		case 0:
-			return normalBits;
-		case kDisabledMask:
-			return disabledBits;
-		case kPressedMask:
-			return pressedBits;
-		default:
-			break;
-	}	
-	TRESPASS();
-	return 0;
+    switch (mask) {
+        case 0:
+            return normalBits;
+        case kDisabledMask:
+            return disabledBits;
+        case kPressedMask:
+            return pressedBits;
+        default:
+            break;
+    }    
+    TRESPASS();
+    return 0;
 }
 
 
 BBitmap *
 TransportButton::MakeBitmap(uint32 mask)
 {
-	BRect r(Bounds());
-	BBitmap *result = new BBitmap(r, B_CMAP8);
+    BRect r(Bounds());
+    BBitmap *result = new BBitmap(r, B_CMAP8);
 
-	uint8* src = (uint8*)BitsForMask(mask);
+    uint8* src = (uint8*)BitsForMask(mask);
 
-	if (src && result && result->IsValid()) {
-		// int32 width = r.IntegerWidth() + 1;
-		int32 height = r.IntegerHeight() + 1;
-		int32 bpr = result->BytesPerRow();
-		uint8* dst = (uint8*)result->Bits();
-		// copy source bits into bitmap line by line,
-		// taking possible alignment into account
-		// since the source data has been generated
-		// by QuickRes, it still contains aligment too
-		// (hence skipping bpr and not width bytes)
-		for (int32 y = 0; y < height; y++) {
-			memcpy(dst, src, bpr);
-			src += bpr;
-			dst += bpr;
-		}
-		ReplaceTransparentColor(result, Parent()->ViewColor());
-	} else {
-		delete result;
-		result = NULL;
-	}
-	
-	return result;
+    if (src && result && result->IsValid()) {
+        // int32 width = r.IntegerWidth() + 1;
+        int32 height = r.IntegerHeight() + 1;
+        int32 bpr = result->BytesPerRow();
+        uint8* dst = (uint8*)result->Bits();
+        // copy source bits into bitmap line by line,
+        // taking possible alignment into account
+        // since the source data has been generated
+        // by QuickRes, it still contains aligment too
+        // (hence skipping bpr and not width bytes)
+        for (int32 y = 0; y < height; y++) {
+            memcpy(dst, src, bpr);
+            src += bpr;
+            dst += bpr;
+        }
+        ReplaceTransparentColor(result, Parent()->ViewColor());
+    } else {
+        delete result;
+        result = NULL;
+    }
+    
+    return result;
 }
 
-uint32 
+uint32
 TransportButton::ModeMask() const
 {
-	return (IsEnabled() ? 0 : kDisabledMask)
-		| (Value() ? kPressedMask : 0);
+    return (IsEnabled() ? 0 : kDisabledMask)
+        | (Value() ? kPressedMask : 0);
 }
 
-void 
+void
 TransportButton::Draw(BRect)
 {
-	DrawBitmapAsync(bitmaps->GetBitmap(ModeMask()));
+    DrawBitmapAsync(bitmaps->GetBitmap(ModeMask()));
 }
 
 
-void 
+void
 TransportButton::StartPressing()
 {
-	SetValue(1);
-	if (startPressingMessage)
-		Invoke(startPressingMessage);
-	
-	if (pressingMessage) {
-		ASSERT(pressingMessage);
-		messageSender = PeriodicMessageSender::Launch(Messenger(),
-			pressingMessage, pressingPeriod);
-	}
+    SetValue(1);
+    if (startPressingMessage)
+        Invoke(startPressingMessage);
+    
+    if (pressingMessage) {
+        ASSERT(pressingMessage);
+        messageSender = PeriodicMessageSender::Launch(Messenger(),
+            pressingMessage, pressingPeriod);
+    }
 }
 
-void 
+void
 TransportButton::MouseCancelPressing()
 {
-	if (!mouseDown || keyDown)
-		return;
+    if (!mouseDown || keyDown)
+        return;
 
-	mouseDown = false;
+    mouseDown = false;
 
-	if (pressingMessage) {
-		ASSERT(messageSender);
-		PeriodicMessageSender *sender = messageSender;
-		messageSender = 0;
-		sender->Quit();
-	}
+    if (pressingMessage) {
+        ASSERT(messageSender);
+        PeriodicMessageSender *sender = messageSender;
+        messageSender = 0;
+        sender->Quit();
+    }
 
-	if (donePressingMessage)
-		Invoke(donePressingMessage);
-	SetValue(0);
+    if (donePressingMessage)
+        Invoke(donePressingMessage);
+    SetValue(0);
 }
 
-void 
+void
 TransportButton::DonePressing()
-{	
-	if (pressingMessage) {
-		ASSERT(messageSender);
-		PeriodicMessageSender *sender = messageSender;
-		messageSender = 0;
-		sender->Quit();
-	}
+{    
+    if (pressingMessage) {
+        ASSERT(messageSender);
+        PeriodicMessageSender *sender = messageSender;
+        messageSender = 0;
+        sender->Quit();
+    }
 
-	Invoke();
-	SetValue(0);
+    Invoke();
+    SetValue(0);
 }
 
-void 
+void
 TransportButton::MouseStartPressing()
 {
-	if (mouseDown)
-		return;
-	
-	mouseDown = true;
-	if (!keyDown)
-		StartPressing();
+    if (mouseDown)
+        return;
+    
+    mouseDown = true;
+    if (!keyDown)
+        StartPressing();
 }
 
-void 
+void
 TransportButton::MouseDonePressing()
 {
-	if (!mouseDown)
-		return;
-	
-	mouseDown = false;
-	if (!keyDown)
-		DonePressing();
+    if (!mouseDown)
+        return;
+    
+    mouseDown = false;
+    if (!keyDown)
+        DonePressing();
 }
 
-void 
+void
 TransportButton::ShortcutKeyDown()
 {
-	if (!IsEnabled())
-		return;
+    if (!IsEnabled())
+        return;
 
-	if (keyDown)
-		return;
-	
-	keyDown = true;
-	if (!mouseDown)
-		StartPressing();
+    if (keyDown)
+        return;
+    
+    keyDown = true;
+    if (!mouseDown)
+        StartPressing();
 }
 
-void 
+void
 TransportButton::ShortcutKeyUp()
 {
-	if (!keyDown)
-		return;
-	
-	keyDown = false;
-	if (!mouseDown)
-		DonePressing();
+    if (!keyDown)
+        return;
+    
+    keyDown = false;
+    if (!mouseDown)
+        DonePressing();
 }
 
 
-void 
+void
 TransportButton::MouseDown(BPoint)
 {
-	if (!IsEnabled())
-		return;
+    if (!IsEnabled())
+        return;
 
-	ASSERT(Window()->Flags() & B_ASYNCHRONOUS_CONTROLS);
-	SetTracking(true);
-	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
-	MouseStartPressing();
+    ASSERT(Window()->Flags() & B_ASYNCHRONOUS_CONTROLS);
+    SetTracking(true);
+    SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+    MouseStartPressing();
 }
 
-void 
+void
 TransportButton::MouseMoved(BPoint point, uint32 code, const BMessage *)
 {
-	if (IsTracking() && Bounds().Contains(point) != Value()) {
-		if (!Value())
-			MouseStartPressing();
-		else
-			MouseCancelPressing();
-	}
+    if (IsTracking() && Bounds().Contains(point) != Value()) {
+        if (!Value())
+            MouseStartPressing();
+        else
+            MouseCancelPressing();
+    }
 }
 
-void 
+void
 TransportButton::MouseUp(BPoint point)
 {
-	if (IsTracking()) {
-		if (Bounds().Contains(point))
-			MouseDonePressing();
-		else
-			MouseCancelPressing();
-		SetTracking(false);
-	}
+    if (IsTracking()) {
+        if (Bounds().Contains(point))
+            MouseDonePressing();
+        else
+            MouseCancelPressing();
+        SetTracking(false);
+    }
 }
 
-void 
+void
 TransportButton::SetStartPressingMessage(BMessage *message)
 {
-	delete startPressingMessage;
-	startPressingMessage = message;
+    delete startPressingMessage;
+    startPressingMessage = message;
 }
 
-void 
+void
 TransportButton::SetPressingMessage(BMessage *message)
 {
-	delete pressingMessage;
-	pressingMessage = message;
+    delete pressingMessage;
+    pressingMessage = message;
 }
 
-void 
+void
 TransportButton::SetDonePressingMessage(BMessage *message)
 {
-	delete donePressingMessage;
-	donePressingMessage = message;
+    delete donePressingMessage;
+    donePressingMessage = message;
 }
 
-void 
+void
 TransportButton::SetPressingPeriod(bigtime_t newTime)
 {
-	pressingPeriod = newTime;
+    pressingPeriod = newTime;
 }
 
 
 PlayPauseButton::PlayPauseButton(BRect frame, const char *name,
-	const unsigned char *normalBits, const unsigned char *pressedBits,
-	const unsigned char *disabledBits, const unsigned char *normalPlayingBits,
-	const unsigned char *pressedPlayingBits, const unsigned char *normalPausedBits,
-	const unsigned char *pressedPausedBits,
-	BMessage *invokeMessage, uint32 key, uint32 modifiers, uint32 resizeFlags)
-	:	TransportButton(frame, name, normalBits, pressedBits,
-			disabledBits, invokeMessage, 0,
-			0, 0, 0, key, modifiers, resizeFlags),
-		normalPlayingBits(normalPlayingBits),
-		pressedPlayingBits(pressedPlayingBits),
-		normalPausedBits(normalPausedBits),
-		pressedPausedBits(pressedPausedBits),
-		state(PlayPauseButton::kStopped),
-		lastPauseBlinkTime(0),
-		lastModeMask(0)
+    const unsigned char *normalBits, const unsigned char *pressedBits,
+    const unsigned char *disabledBits, const unsigned char *normalPlayingBits,
+    const unsigned char *pressedPlayingBits, const unsigned char *normalPausedBits,
+    const unsigned char *pressedPausedBits,
+    BMessage *invokeMessage, uint32 key, uint32 modifiers, uint32 resizeFlags)
+    :    TransportButton(frame, name, normalBits, pressedBits,
+            disabledBits, invokeMessage, 0,
+            0, 0, 0, key, modifiers, resizeFlags),
+        normalPlayingBits(normalPlayingBits),
+        pressedPlayingBits(pressedPlayingBits),
+        normalPausedBits(normalPausedBits),
+        pressedPausedBits(pressedPausedBits),
+        state(PlayPauseButton::kStopped),
+        lastPauseBlinkTime(0),
+        lastModeMask(0)
 {
 }
 
-void 
+void
 PlayPauseButton::SetStopped()
 {
-	if (state == kStopped || state == kAboutToPlay)
-		return;
-	
-	state = kStopped;
-	Invalidate();
+    if (state == kStopped || state == kAboutToPlay)
+        return;
+    
+    state = kStopped;
+    Invalidate();
 }
 
-void 
+void
 PlayPauseButton::SetPlaying()
 {
-	if (state == kPlaying || state == kAboutToPause)
-		return;
-	
-	state = kPlaying;
-	Invalidate();
+    if (state == kPlaying || state == kAboutToPause)
+        return;
+    
+    state = kPlaying;
+    Invalidate();
 }
 
 const bigtime_t kPauseBlinkPeriod = 600000;
 
-void 
+void
 PlayPauseButton::SetPaused()
 {
-	if (state == kAboutToPlay)
-		return;
+    if (state == kAboutToPlay)
+        return;
 
-	// in paused state blink the LED on and off
-	bigtime_t now = system_time();
-	if (state == kPausedLedOn || state == kPausedLedOff) {
-		if (now - lastPauseBlinkTime < kPauseBlinkPeriod)
-			return;
-		
-		if (state == kPausedLedOn)
-			state = kPausedLedOff;
-		else
-			state = kPausedLedOn;
-	} else
-		state = kPausedLedOn;
-	
-	lastPauseBlinkTime = now;
-	Invalidate();
+    // in paused state blink the LED on and off
+    bigtime_t now = system_time();
+    if (state == kPausedLedOn || state == kPausedLedOff) {
+        if (now - lastPauseBlinkTime < kPauseBlinkPeriod)
+            return;
+        
+        if (state == kPausedLedOn)
+            state = kPausedLedOff;
+        else
+            state = kPausedLedOn;
+    } else
+        state = kPausedLedOn;
+    
+    lastPauseBlinkTime = now;
+    Invalidate();
 }
 
-uint32 
+uint32
 PlayPauseButton::ModeMask() const
 {
-	if (!IsEnabled())
-		return kDisabledMask;
-	
-	uint32 result = 0;
+    if (!IsEnabled())
+        return kDisabledMask;
+    
+    uint32 result = 0;
 
-	if (Value())
-		result = kPressedMask;
+    if (Value())
+        result = kPressedMask;
 
-	if (state == kPlaying || state == kAboutToPlay)
-		result |= kPlayingMask;
-	else if (state == kAboutToPause || state == kPausedLedOn)		
-		result |= kPausedMask;
-	
-	return result;
+    if (state == kPlaying || state == kAboutToPlay)
+        result |= kPlayingMask;
+    else if (state == kAboutToPause || state == kPausedLedOn)        
+        result |= kPausedMask;
+    
+    return result;
 }
 
 const unsigned char *
 PlayPauseButton::BitsForMask(uint32 mask) const
 {
-	switch (mask) {
-		case kPlayingMask:
-			return normalPlayingBits;
-		case kPlayingMask | kPressedMask:
-			return pressedPlayingBits;
-		case kPausedMask:
-			return normalPausedBits;
-		case kPausedMask | kPressedMask:
-			return pressedPausedBits;
-		default:
-			return _inherited::BitsForMask(mask);
-	}	
-	TRESPASS();
-	return 0;
+    switch (mask) {
+        case kPlayingMask:
+            return normalPlayingBits;
+        case kPlayingMask | kPressedMask:
+            return pressedPlayingBits;
+        case kPausedMask:
+            return normalPausedBits;
+        case kPausedMask | kPressedMask:
+            return pressedPausedBits;
+        default:
+            return _inherited::BitsForMask(mask);
+    }    
+    TRESPASS();
+    return 0;
 }
 
 
-void 
+void
 PlayPauseButton::StartPressing()
 {
-	if (state == kPlaying)
-		state = kAboutToPause;
-	else
-	 	state = kAboutToPlay;
-	
-	_inherited::StartPressing();
+    if (state == kPlaying)
+        state = kAboutToPause;
+    else
+         state = kAboutToPlay;
+    
+    _inherited::StartPressing();
 }
 
-void 
+void
 PlayPauseButton::MouseCancelPressing()
 {
-	if (state == kAboutToPause)
-	 	state = kPlaying;
-	else
-		state = kStopped;
-	
-	_inherited::MouseCancelPressing();
+    if (state == kAboutToPause)
+         state = kPlaying;
+    else
+        state = kStopped;
+    
+    _inherited::MouseCancelPressing();
 }
 
-void 
+void
 PlayPauseButton::DonePressing()
 {
-	if (state == kAboutToPause) {
-	 	state = kPausedLedOn;
-		lastPauseBlinkTime = system_time();
-	} else if (state == kAboutToPlay)
-		state = kPlaying;
-	
-	_inherited::DonePressing();
+    if (state == kAboutToPause) {
+         state = kPausedLedOn;
+        lastPauseBlinkTime = system_time();
+    } else if (state == kAboutToPlay)
+        state = kPlaying;
+    
+    _inherited::DonePressing();
 }
 
 

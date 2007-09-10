@@ -36,47 +36,47 @@ class PlaylistView;
 class PlayListWindow : public BWindow
 {
  public:
-								PlayListWindow(BRect frame,
-											   const char* name,
-											   InterfaceWindow* mainWindow,
-											   intf_thread_t *p_interface );
-	virtual						~PlayListWindow();
+                                PlayListWindow(BRect frame,
+                                               const char* name,
+                                               InterfaceWindow* mainWindow,
+                                               intf_thread_t *p_interface );
+    virtual                        ~PlayListWindow();
 
-								// BWindow
-	virtual	bool				QuitRequested();
-	virtual	void				MessageReceived(BMessage *message);
-	virtual	void				FrameResized(float width, float height);
+                                // BWindow
+    virtual    bool                QuitRequested();
+    virtual    void                MessageReceived(BMessage *message);
+    virtual    void                FrameResized(float width, float height);
 
-								// PlayListWindow
-			void				ReallyQuit();
-			void				UpdatePlaylist( bool rebuild = false );
+                                // PlayListWindow
+            void                ReallyQuit();
+            void                UpdatePlaylist( bool rebuild = false );
 
-			void				SetDisplayMode( uint32 mode );
-			uint32				DisplayMode() const;
+            void                SetDisplayMode( uint32 mode );
+            uint32                DisplayMode() const;
 
- private:	
-			void				_CheckItemsEnableState() const;
-			void				_SetMenuItemEnabled( BMenuItem* item,
-													 bool enabled ) const;
+ private:    
+            void                _CheckItemsEnableState() const;
+            void                _SetMenuItemEnabled( BMenuItem* item,
+                                                     bool enabled ) const;
 
-			PlaylistView *      fListView;
-			BView *             fBackgroundView;
-			BMenuBar *          fMenuBar;
-			InterfaceWindow *   fMainWindow;
+            PlaylistView *      fListView;
+            BView *             fBackgroundView;
+            BMenuBar *          fMenuBar;
+            InterfaceWindow *   fMainWindow;
 
-			BMenuItem*			fSelectAllMI;
-			BMenuItem*			fSelectNoneMI;
-			BMenuItem*			fSortReverseMI;
-			BMenuItem*			fSortNameMI;
-			BMenuItem*			fSortPathMI;
-			BMenuItem*			fRandomizeMI;
-			BMenuItem*			fRemoveMI;
-			BMenuItem*			fRemoveAllMI;
-			BMenu*				fViewMenu;
-			
-			intf_thread_t *     p_intf;
+            BMenuItem*            fSelectAllMI;
+            BMenuItem*            fSelectNoneMI;
+            BMenuItem*            fSortReverseMI;
+            BMenuItem*            fSortNameMI;
+            BMenuItem*            fSortPathMI;
+            BMenuItem*            fRandomizeMI;
+            BMenuItem*            fRemoveMI;
+            BMenuItem*            fRemoveAllMI;
+            BMenu*                fViewMenu;
+            
+            intf_thread_t *     p_intf;
 };
 
-#endif	// BEOS_PLAY_LIST_WINDOW_H
+#endif    // BEOS_PLAY_LIST_WINDOW_H
 #endif
 

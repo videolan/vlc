@@ -598,7 +598,7 @@ static void CloseAudio( vlc_object_t *p_this )
 
     /* finally release the DirectSound object */
     if( p_sys->p_dsobject ) IDirectSound_Release( p_sys->p_dsobject );
-    
+ 
     /* free DSOUND.DLL */
     if( p_sys->hdsound_dll ) FreeLibrary( p_sys->hdsound_dll );
 
@@ -658,7 +658,7 @@ static int InitDirectSound( aout_instance_t *p_aout )
     if( OurDirectSoundEnumerate )
     {
         /* Attempt enumeration */
-        if( FAILED( OurDirectSoundEnumerate( CallBackDirectSoundEnum, 
+        if( FAILED( OurDirectSoundEnumerate( CallBackDirectSoundEnum,
                                              p_aout ) ) )
         {
             msg_Dbg( p_aout, "enumeration of DirectSound devices failed" );
@@ -666,7 +666,7 @@ static int InitDirectSound( aout_instance_t *p_aout )
     }
 
     /* Create the direct sound object */
-    if FAILED( OurDirectSoundCreate( p_aout->output.p_sys->p_device_guid, 
+    if FAILED( OurDirectSoundCreate( p_aout->output.p_sys->p_device_guid,
                                      &p_aout->output.p_sys->p_dsobject,
                                      NULL ) )
     {
@@ -970,7 +970,7 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
 }
 
 /*****************************************************************************
- * DirectSoundThread: this thread will capture play notification events. 
+ * DirectSoundThread: this thread will capture play notification events.
  *****************************************************************************
  * We use this thread to emulate a callback mechanism. The thread probes for
  * event notification and fills up the DS secondary buffer when needed.

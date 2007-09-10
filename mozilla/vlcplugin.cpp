@@ -62,7 +62,7 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
 }
 
 static bool boolValue(const char *value) {
-    return ( !strcmp(value, "1") || 
+    return ( !strcmp(value, "1") ||
              !strcasecmp(value, "true") ||
              !strcasecmp(value, "yes") );
 }
@@ -376,7 +376,7 @@ relativeurl:
                     return href;
                 }
 
-                /* find last path component and replace it */ 
+                /* find last path component and replace it */
                 while( '/' != *pathend)
                     --pathend;
 
@@ -403,7 +403,7 @@ relativeurl:
                         url = ++p;
                         continue;
                     }
-                    if( '.' != *p ) 
+                    if( '.' != *p )
                         break;
                     ++p;
                     if( '\0' == *p )
@@ -412,7 +412,7 @@ relativeurl:
                     }
                     else
                     {
-                        if( '/' != *p ) 
+                        if( '/' != *p )
                             break;
                         /* relative url starts with '../' */
                         ++p;

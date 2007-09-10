@@ -173,7 +173,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     mvdv = i_video_header & 0x1f; /* vertical motion vector data */
     cc = p_block->i_buffer - 4;
     msg_Dbg( p_dec, "packet size %d", cc );
-    
+ 
     /* Find out p_vdec->i_raw_size */
     p_sys->p_decoder->decode( p_block->p_buffer + 4 /*bp?*/,
                               cc /*cc?*/,

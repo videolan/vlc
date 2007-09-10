@@ -178,7 +178,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     if( p_input->p_fmt->audio.i_physical_channels )
     {
         unsigned int i;
-        
+ 
         for( i = 0; i < sizeof(pi_channels_in)/sizeof(uint32_t); i++ )
         {
             if( p_input->p_fmt->audio.i_physical_channels & pi_channels_src[i])

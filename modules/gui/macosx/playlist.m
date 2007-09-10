@@ -53,7 +53,7 @@
 #import <vlc_interface.h>
 
 /*****************************************************************************
- * VLCPlaylistView implementation 
+ * VLCPlaylistView implementation
  *****************************************************************************/
 @implementation VLCPlaylistView
 
@@ -190,11 +190,11 @@
     }
     else
     {
-        p_item = (playlist_item_t *)[item pointerValue];      
+        p_item = (playlist_item_t *)[item pointerValue];
     }
     if( p_item && index < p_item->i_children && index >= 0 )
         p_return = p_item->pp_children[index];
-    
+ 
     vlc_object_release( p_playlist );
 
     o_value = [o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", p_return]];
@@ -252,7 +252,7 @@
         }
         return @"error" ;
     }
-    
+ 
     p_item = (playlist_item_t *)[item pointerValue];
     if( !p_item || !p_item->p_input )
     {
@@ -265,7 +265,7 @@
         }
         return @"error";
     }
-    
+ 
     attempted_reload = NO;
 
     if( [[o_tc identifier] isEqualToString:@"1"] )
@@ -277,7 +277,7 @@
             o_value = [NSString stringWithUTF8String: psz_title];
             if( o_value == NULL )
                 o_value = [NSString stringWithCString: psz_title];
-        } 
+        }
         else
         {
             char *psz_name = input_item_GetName( p_item->p_input );
@@ -385,7 +385,7 @@
         @"VLCPlaylistItemPboardType", nil]];
     [o_outline_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 
-    /* this uses private Apple API which works fine until 10.4, 
+    /* this uses private Apple API which works fine until 10.4,
      * but keep checking in the future!
      * These methods are being added artificially to NSOutlineView's interface above */
     o_ascendingSortingImage = [[NSOutlineView class] _defaultTableHeaderSortImage];
@@ -409,7 +409,7 @@
             /* Check whether to enable these menuitems */
             objectname = i>=0 ? (char *)p_parser->pp_shortcuts[i] : (char *)p_parser->psz_object_name;
             b_enabled = playlist_IsServicesDiscoveryLoaded( p_playlist, objectname );
-            
+ 
             /* Create the menu entries used in the playlist menu */
             o_lmi = [[o_mi_services submenu] addItemWithTitle:
                      [NSString stringWithUTF8String:
@@ -421,7 +421,7 @@
             [o_lmi setTarget: self];
             [o_lmi setRepresentedObject: [NSString stringWithCString: objectname]];
             if( b_enabled ) [o_lmi setState: NSOnState];
-                
+ 
             /* Create the menu entries for the main menu */
             o_lmi = [[o_mm_mi_services submenu] addItemWithTitle:
                      [NSString stringWithUTF8String:
@@ -499,7 +499,7 @@
     {
         [o_status_field setStringValue: [NSString stringWithFormat:
                     _NS("%i items in the playlist"),
-				playlist_CurrentSize( p_playlist )]];
+                playlist_CurrentSize( p_playlist )]];
     }
     else
     {
@@ -716,8 +716,8 @@
             {
                 o_real_filename = o_filename;
             }
-            playlist_Export( p_playlist, 
-                [o_real_filename fileSystemRepresentation], 
+            playlist_Export( p_playlist,
+                [o_real_filename fileSystemRepresentation],
                 p_playlist->p_local_category, "export-xspf" );
         }
         else
@@ -736,7 +736,7 @@
             {
                 o_real_filename = o_filename;
             }
-            playlist_Export( p_playlist, 
+            playlist_Export( p_playlist,
                 [o_real_filename fileSystemRepresentation],
                 p_playlist->p_local_category, "export-m3u" );
         }
@@ -786,7 +786,7 @@
     NSMutableArray *o_to_preparse;
     intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = pl_Yield( p_intf );
-                                                       
+ 
     o_to_preparse = [NSMutableArray arrayWithArray:[[o_outline_view selectedRowEnumerator] allObjects]];
     i_count = [o_to_preparse count];
 
@@ -1040,7 +1040,7 @@
         /* Add the item */
         playlist_AddInput( p_playlist, p_input, PLAYLIST_INSERT,
              i_position == -1 ? PLAYLIST_END : i_position + i_item, VLC_TRUE,
-	     VLC_FALSE );
+         VLC_FALSE );
 
         if( i_item == 0 && !b_enqueue )
         {
@@ -1352,7 +1352,7 @@
     /* we have to create a new thread here because otherwise we would block the
      * interface since the interaction-stuff and this code would run in the same
      * thread */
-    [NSThread detachNewThreadSelector: @selector(addNodeThreadedly) 
+    [NSThread detachNewThreadSelector: @selector(addNodeThreadedly)
         toTarget: self withObject:nil];
     [self playlistUpdated];
 }
@@ -1368,16 +1368,16 @@
     int ret_v;
     char *psz_name = NULL;
     playlist_item_t * p_item;
-    ret_v = intf_UserStringInput( p_playlist, _("New Node"), 
+    ret_v = intf_UserStringInput( p_playlist, _("New Node"),
         _("Please enter a name for the new node."), &psz_name );
 
     if( psz_name != NULL && psz_name != "" )
-        p_item = playlist_NodeCreate( p_playlist, psz_name, 
+        p_item = playlist_NodeCreate( p_playlist, psz_name,
                                             p_playlist->p_local_category, 0 );
     else if(! config_GetInt( p_playlist, "interact" ) )
     {
         /* in case that the interaction is disabled, just give it a bogus name */
-        p_item = playlist_NodeCreate( p_playlist, _("Empty Folder"), 
+        p_item = playlist_NodeCreate( p_playlist, _("Empty Folder"),
                                             p_playlist->p_local_category, 0 );
     }
 
@@ -1401,7 +1401,7 @@
     {
         [o_status_field setStringValue: [NSString stringWithFormat:
                     _NS("%i items in the playlist"),
-	 		playlist_CurrentSize( p_playlist )]];
+             playlist_CurrentSize( p_playlist )]];
     }
     else
     {

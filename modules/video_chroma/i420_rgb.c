@@ -428,9 +428,9 @@ static void Set8bppPalette( vout_thread_t *p_vout, uint8_t *p_rgb8 )
                     p_cmap_b[ j ] = CLIP( b );
 
 #if 0
-		    printf("+++Alloc RGB cmap %d (%d, %d, %d)\n", j,
-			   p_cmap_r[ j ] >>8, p_cmap_g[ j ] >>8, 
-			   p_cmap_b[ j ] >>8);
+            printf("+++Alloc RGB cmap %d (%d, %d, %d)\n", j,
+               p_cmap_r[ j ] >>8, p_cmap_g[ j ] >>8,
+               p_cmap_b[ j ] >>8);
 #endif
 
                     /* Allocate color */

@@ -702,7 +702,7 @@ static LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpa
             FillRect( hdc, &rect, (HBRUSH)GetStockObject(BLACK_BRUSH) );
             SetTextColor(hdc, RGB(255, 255, 255));
             SetBkColor(hdc, RGB(0, 0, 0));
-            DrawText( hdc, WINDOW_TEXT, strlen(WINDOW_TEXT), &rect, DT_CENTER|DT_VCENTER|DT_SINGLELINE); 
+            DrawText( hdc, WINDOW_TEXT, strlen(WINDOW_TEXT), &rect, DT_CENTER|DT_VCENTER|DT_SINGLELINE);
 
             EndPaint( p_hwnd, &paintstruct );
             return 0L;

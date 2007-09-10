@@ -96,7 +96,7 @@ extern int bDarken;
 extern int bSolarize;
 extern int bInvert;
 extern int bMotionVectorsOn;
-extern int fps; 
+extern int fps;
 
 extern double fWaveAlpha ;
 extern double fWaveScale;

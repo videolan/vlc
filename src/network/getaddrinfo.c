@@ -118,7 +118,7 @@ static int WSAAPI
 getnameinfo (const struct sockaddr *sa, socklen_t salen,
              char *host, DWORD hostlen, char *serv, DWORD servlen, int flags)
 #else
-static int 
+static int
 getnameinfo (const struct sockaddr *sa, socklen_t salen,
              char *host, int hostlen, char *serv, int servlen, int flags)
 #endif
@@ -289,7 +289,7 @@ static int WSAAPI
 getaddrinfo (const char *node, const char *service,
              const struct addrinfo *hints, struct addrinfo **res)
 #else
-static int 
+static int
 getaddrinfo (const char *node, const char *service,
              const struct addrinfo *hints, struct addrinfo **res)
 #endif
@@ -490,7 +490,7 @@ static WSAAPI int _ws2_getnameinfo_bind( const struct sockaddr FAR * sa, socklen
     if (entry == NULL)
     {
         /* not found, use replacement API instead */
-	entry = getnameinfo;
+    entry = getnameinfo;
 
     }
     /* call API before replacing function pointer to avoid crash */
@@ -514,8 +514,8 @@ static WSAAPI int _ws2_getaddrinfo_bind(const char FAR *node, const char FAR *se
     if ((entry == NULL) ||  (freentry == NULL))
     {
         /* not found, use replacement API instead */
-	entry = getaddrinfo;
-	freentry = freeaddrinfo;
+    entry = getaddrinfo;
+    freentry = freeaddrinfo;
     }
     /* call API before replacing function pointer to avoid crash */
     result = entry (node, service, hints, res);

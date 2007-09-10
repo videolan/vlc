@@ -273,7 +273,7 @@ relativeurl:
                     return href;
                 }
 
-                /* find last path component and replace it */ 
+                /* find last path component and replace it */
                 while( L'/' != *pathend )
                     --pathend;
 
@@ -300,7 +300,7 @@ relativeurl:
                         url = ++p;
                         continue;
                     }
-                    if( L'.' != *p ) 
+                    if( L'.' != *p )
                         break;
                     ++p;
                     if( L'\0' == *p )
@@ -309,7 +309,7 @@ relativeurl:
                     }
                     else
                     {
-                        if( L'/' != *p ) 
+                        if( L'/' != *p )
                             break;
                         /* relative url starts with '../' */
                         ++p;

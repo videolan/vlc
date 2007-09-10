@@ -23,8 +23,8 @@
 
 
 /*****************************************************************************
- * Note: the code used to communicate with VLC's core was inspired by 
- * ../wxwidgets/dialogs/updatevlc.cpp, written by Antoine Cellerier. 
+ * Note: the code used to communicate with VLC's core was inspired by
+ * ../wxwidgets/dialogs/updatevlc.cpp, written by Antoine Cellerier.
  *****************************************************************************/
 
 
@@ -68,7 +68,7 @@ static VLCUpdate *_o_sharedInstance = nil;
 
     /* clean the interface */
     [o_fld_releaseNote setString: @""];
-    
+ 
     [self initInterface];
 }
 
@@ -102,7 +102,7 @@ static VLCUpdate *_o_sharedInstance = nil;
 {
     NSDate *o_last_update;
     NSDate *o_next_update;
-    
+ 
     if( ![[NSUserDefaults standardUserDefaults] objectForKey: kPrefUpdateOnStartup] )
     {
         /* We don't have any preferences stored, ask the user. */
@@ -146,7 +146,7 @@ static VLCUpdate *_o_sharedInstance = nil;
     /* provide a save dialogue */
     SEL sel = @selector(getLocationForSaving:returnCode:contextInfo:);
     NSSavePanel * saveFilePanel = [[NSSavePanel alloc] init];
-    
+ 
     [saveFilePanel setRequiredFileType: @"dmg"];
     [saveFilePanel setCanSelectHiddenExtension: YES];
     [saveFilePanel setCanCreateDirectories: YES];
@@ -199,12 +199,12 @@ static VLCUpdate *_o_sharedInstance = nil;
         p_uit->i_rs = UPDATE_RELEASE_STATUS_NEWER;
         p_uit->i_t = UPDATE_FILE_TYPE_ALL;
         update_iterator_Action( p_uit, UPDATE_MIRROR );
-        
+ 
         while( update_iterator_Action( p_uit, UPDATE_FILE) != UPDATE_FAIL )
         {
             msg_Dbg( p_intf, "parsing available updates, run %i", x );
             /* if the announced item is of the type "binary", keep it and display
-             * its details to the user. Do similar stuff on "info". Do both 
+             * its details to the user. Do similar stuff on "info". Do both
              * only if the file is announced as stable */
             if( p_uit->release.i_type == UPDATE_RELEASE_TYPE_STABLE )
             {
@@ -232,7 +232,7 @@ static VLCUpdate *_o_sharedInstance = nil;
                             "is %s (%i MB to download)."), \
                         p_uit->release.psz_version, ((p_uit->file.l_size \
                         / 1024) / 1024)]];
-                        
+ 
                     if( o_urlOfBinary )
                         [o_urlOfBinary release];
                     o_urlOfBinary = [[NSString alloc] initWithUTF8String: \
@@ -293,14 +293,14 @@ static VLCUpdate *_o_sharedInstance = nil;
             msleep( 500000 );
 
             /* let's open our cached release note and display it
-             * we can't use NSString stringWithContentsOfFile:encoding:error: 
+             * we can't use NSString stringWithContentsOfFile:encoding:error:
              * since it is Tiger only */
             NSString * releaseNote = [[NSString alloc] initWithData: \
                 [NSData dataWithContentsOfFile: pathToReleaseNote] \
                 encoding: NSISOLatin1StringEncoding];
             if( releaseNote )
                 [o_fld_releaseNote setString: releaseNote];
-        
+ 
             /* delete the file since it isn't needed anymore */
             BOOL myBOOL = NO;
             myBOOL = [[NSFileManager defaultManager] removeFileAtPath: \
@@ -340,7 +340,7 @@ static VLCUpdate *_o_sharedInstance = nil;
                 update_download( p_uit, (char *)[path UTF8String] );
             }
         }
-        
+ 
         update_iterator_Delete( p_uit );
     }
 

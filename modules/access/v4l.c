@@ -765,7 +765,7 @@ static void ParseMRL( demux_t *p_demux )
             }
             else if( !strncmp( psz_parser, "hue=", strlen( "hue=" ) ) )
             {
-                p_sys->i_hue = strtol( psz_parser + strlen( "hue=" ), 
+                p_sys->i_hue = strtol( psz_parser + strlen( "hue=" ),
                                        &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "contrast=", strlen( "contrast=" ) ) )
@@ -1450,7 +1450,7 @@ static uint8_t *GrabCapture( demux_t *p_demux )
 
     while( ioctl(p_sys->fd_video, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 )
     {
-        if( errno != EAGAIN && errno != EINTR )    
+        if( errno != EAGAIN && errno != EINTR )
         {
             msg_Err( p_demux, "failed syncing new frame" );
             return NULL;
@@ -1488,7 +1488,7 @@ static uint8_t *GrabMJPEG( demux_t *p_demux )
     /* sync on the next frame */
     while( ioctl( p_sys->fd_video, MJPIOC_SYNC, &sync ) < 0 )
     {
-        if( errno != EAGAIN && errno != EINTR )    
+        if( errno != EAGAIN && errno != EINTR )
         {
             msg_Err( p_demux, "failed syncing new frame" );
             return NULL;

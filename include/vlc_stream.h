@@ -129,7 +129,7 @@ VLC_EXPORT( stream_t *,__stream_UrlNew, (vlc_object_t *p_this, const char *psz_u
    /* Maybe we should make VLC_OBJECT a simple cast noawadays... */
 struct stream_t
 {
-	VLC_COMMON_MEMBERS
+    VLC_COMMON_MEMBERS
 };
 # endif
 

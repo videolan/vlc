@@ -116,7 +116,7 @@ void *E_(OpenPostproc)( decoder_t *p_dec, vlc_bool_t *pb_pp )
 }
 
 /*****************************************************************************
- * InitPostproc: 
+ * InitPostproc:
  *****************************************************************************/
 int E_(InitPostproc)( decoder_t *p_dec, void *p_data,
                       int i_width, int i_height, int pix_fmt )
@@ -167,7 +167,7 @@ int E_(InitPostproc)( decoder_t *p_dec, void *p_data,
 }
 
 /*****************************************************************************
- * PostprocPict: 
+ * PostprocPict:
  *****************************************************************************/
 int E_(PostprocPict)( decoder_t *p_dec, void *p_data,
                       picture_t *p_pic, AVFrame *p_ff_pic )
@@ -196,7 +196,7 @@ int E_(PostprocPict)( decoder_t *p_dec, void *p_data,
 }
 
 /*****************************************************************************
- * ClosePostproc: 
+ * ClosePostproc:
  *****************************************************************************/
 void E_(ClosePostproc)( decoder_t *p_dec, void *p_data )
 {

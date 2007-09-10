@@ -89,7 +89,7 @@ dynamic_list_propose_item( const libvlc_event_t * p_event, void * p_user_data )
             libvlc_media_list_unlock( p_dmlist->p_mlist );
             return;
         }
-        
+ 
         libvlc_media_list_lock( p_dmlist->p_mlist );
         libvlc_media_list_add_media_descriptor( p_dmlist->p_mlist, p_md, NULL );
         libvlc_media_list_unlock( p_dmlist->p_mlist );
@@ -113,14 +113,14 @@ dynamic_list_remove_item( const libvlc_event_t * p_event, void * p_user_data )
     if( libvlc_tag_query_match( p_dmlist->p_query, p_md, NULL ) )
     {
         int i;
-        libvlc_media_list_lock( p_dmlist->p_mlist );        
+        libvlc_media_list_lock( p_dmlist->p_mlist );
         i = libvlc_media_list_index_of_item( p_dmlist->p_mlist, p_md, NULL );
         if ( i < 0 )
         {
             /* We've missed one item addition, that could happen especially
              * if we add item in a threaded maner, so we just ignore */
             libvlc_media_list_unlock( p_dmlist->p_mlist );
-            //libvlc_media_descriptor_unlock( p_md );           
+            //libvlc_media_descriptor_unlock( p_md );
             return;
         }
         libvlc_media_list_remove_index( p_dmlist->p_mlist, i, NULL );
@@ -175,8 +175,8 @@ libvlc_dynamic_media_list_new(
     libvlc_media_list_retain( p_mlist );
     p_dmlist->p_media_provider = p_mlist;
 
-    libvlc_media_list_lock( p_mlist );        
-    
+    libvlc_media_list_lock( p_mlist );
+ 
     count = libvlc_media_list_count( p_mlist, p_e );
 
     /* This should be running in a thread, a good plan to achieve that
@@ -197,7 +197,7 @@ libvlc_dynamic_media_list_new(
     libvlc_event_attach( p_em, libvlc_MediaListItemDeleted,
                          dynamic_list_remove_item, p_dmlist, p_e );
 
-    libvlc_media_list_unlock( p_mlist );        
+    libvlc_media_list_unlock( p_mlist );
 
     /* Make sure item added/removed will gain/loose our mark */
     p_em = libvlc_media_list_event_manager( p_dmlist->p_mlist, p_e );

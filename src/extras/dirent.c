@@ -1,14 +1,14 @@
 /*
  * dirent.c
  *
- * Derived from DIRLIB.C by Matt J. Weinstein 
+ * Derived from DIRLIB.C by Matt J. Weinstein
  * This note appears in the DIRLIB.H
  * DIRLIB.H by M. J. Weinstein   Released to public domain 1-Jan-89
  *
  * Updated by Jeremy Bettis <jeremy@hksys.com>
  * Significantly revised and rewinddir, seekdir and telldir added by Colin
  * Peters <colin@fu.is.saga-u.ac.jp>
- *      
+ *
  * $Revision: 1.6 $
  * $Author: sam $
  * $Date: 2002/11/13 20:51:04 $
@@ -48,35 +48,35 @@
 
 struct dirent
 {
-	long		d_ino;		/* Always zero. */
-	unsigned short	d_reclen;	/* Always zero. */
-	unsigned short	d_namlen;	/* Length of name in d_name. */
-	char            d_name[FILENAME_MAX]; /* File name. */
+    long        d_ino;        /* Always zero. */
+    unsigned short    d_reclen;    /* Always zero. */
+    unsigned short    d_namlen;    /* Length of name in d_name. */
+    char            d_name[FILENAME_MAX]; /* File name. */
 };
 
 typedef struct
 {
-	/* disk transfer area for this dir */
-	WIN32_FIND_DATA		dd_dta;
+    /* disk transfer area for this dir */
+    WIN32_FIND_DATA        dd_dta;
 
-	/* dirent struct to return from dir (NOTE: this makes this thread
-	 * safe as long as only one thread uses a particular DIR struct at
-	 * a time) */
-	struct dirent		dd_dir;
+    /* dirent struct to return from dir (NOTE: this makes this thread
+     * safe as long as only one thread uses a particular DIR struct at
+     * a time) */
+    struct dirent        dd_dir;
 
-	/* findnext handle */
-	HANDLE			dd_handle;
+    /* findnext handle */
+    HANDLE            dd_handle;
 
-	/*
+    /*
          * Status of search:
-	 *   0 = not started yet (next entry to read is first entry)
-	 *  -1 = off the end
-	 *   positive = 0 based index of next entry
-	 */
-	int			dd_stat;
+     *   0 = not started yet (next entry to read is first entry)
+     *  -1 = off the end
+     *   positive = 0 based index of next entry
+     */
+    int            dd_stat;
 
-	/* given path for dir with search pattern (struct is extended) */
-	char			dd_name[1];
+    /* given path for dir with search pattern (struct is extended) */
+    char            dd_name[1];
 } DIR;
 
 /*
@@ -85,7 +85,7 @@ typedef struct
  * Returns a pointer to a DIR structure appropriately filled in to begin
  * searching a directory.
  */
-DIR * 
+DIR *
 vlc_opendir (const CHAR *szPath)
 {
   DIR *nd;

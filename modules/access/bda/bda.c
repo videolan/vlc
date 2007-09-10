@@ -119,14 +119,14 @@ static const char *ppsz_qam_text[] = { N_("Undefined"), N_("16"), N_("32"),
     "[Undefined,1/2,2/3,3/4,5/6,7/8]")
 static const int i_hp_fec_list[] = { -1, 1, 2, 3, 4, 5 };
 static const char *ppsz_hp_fec_text[] = { N_("Undefined"), N_("1/2"), N_("2/3"),
-    N_("3/4"), N_("5/6"), N_("7/8") };    
+    N_("3/4"), N_("5/6"), N_("7/8") };
 
 #define CODE_RATE_LP_TEXT N_("Terrestrial low priority stream code rate (FEC)")
 #define CODE_RATE_LP_LONGTEXT N_("Low Priority FEC Rate " \
     "[Undefined,1/2,2/3,3/4,5/6,7/8]")
 static const int i_lp_fec_list[] = { -1, 1, 2, 3, 4, 5 };
 static const char *ppsz_lp_fec_text[] = { N_("Undefined"), N_("1/2"), N_("2/3"),
-    N_("3/4"), N_("5/6"), N_("7/8") }; 
+    N_("3/4"), N_("5/6"), N_("7/8") };
 
 #define BANDWIDTH_TEXT N_("Terrestrial bandwidth")
 #define BANDWIDTH_LONGTEXT N_("Terrestrial bandwidth [0=auto,6,7,8 in MHz]")
@@ -446,7 +446,7 @@ static int ParsePath( access_t *p_access, const char* psz_module,
         }
         b_used[i_this_param] = TRUE;
 
-        /* if "=" was found in token then value starts at 
+        /* if "=" was found in token then value starts at
          * psz_token + i_paramlen + 1
          * else there is no value specified so we use an empty string */
         psz_value = psz_token + i_param_len + 1;

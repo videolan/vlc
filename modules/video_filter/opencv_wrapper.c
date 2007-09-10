@@ -592,7 +592,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     ReleaseImages(p_vout);
     vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
-	
+    
     vout_UnlinkPicture( p_vout->p_sys->p_vout, p_outpic );
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
 }

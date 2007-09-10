@@ -797,7 +797,7 @@ static int ExecuteMediaProperty( vlm_t *p_vlm, int64_t id, vlc_bool_t b_new,
             int i_index;
 
             MISSING( "inputdeln" );
-            
+ 
             i_index = atoi( psz_value );
             if( i_index > 0 && i_index <= p_cfg->i_input )
                 TAB_REMOVE( p_cfg->i_input, p_cfg->ppsz_input, p_cfg->ppsz_input[i_index-1] );

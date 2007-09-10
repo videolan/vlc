@@ -25,8 +25,8 @@
 
 #include <math.h>
 /* Values to optimize the sigmoid function */
-#define R  32767   
-#define RR 65534   
+#define R  32767
+#define RR 65534
  
 inline double int_wrapper(double * arg_list) {
 
@@ -36,57 +36,57 @@ inline double int_wrapper(double * arg_list) {
 
 
 inline double sqr_wrapper(double * arg_list) {
-	
-	return pow(2, arg_list[0]);
-}	
-	
-	
-inline double sign_wrapper(double * arg_list) {	
-	
-	return -arg_list[0];	
-}	
+    
+    return pow(2, arg_list[0]);
+}    
+    
+    
+inline double sign_wrapper(double * arg_list) {    
+    
+    return -arg_list[0];    
+}    
 
 inline double min_wrapper(double * arg_list) {
-	
-	if (arg_list[0] > arg_list[1])
-		return arg_list[1];
-	
-	return arg_list[0];
-}		
+    
+    if (arg_list[0] > arg_list[1])
+        return arg_list[1];
+    
+    return arg_list[0];
+}        
 
 inline double max_wrapper(double * arg_list) {
 
-	if (arg_list[0] > arg_list[1])
-	  return arg_list[0];
+    if (arg_list[0] > arg_list[1])
+      return arg_list[0];
 
-	return arg_list[1];
+    return arg_list[1];
 }
 
 /* consult your AI book */
 inline double sigmoid_wrapper(double * arg_list) {
   return (RR / (1 + exp( -(((double)(arg_list[0])) * arg_list[1]) / R) - R));
 }
-	
-	
+    
+    
 inline double bor_wrapper(double * arg_list) {
 
-	return (double)((int)arg_list[0] || (int)arg_list[1]);
-}	
-	
+    return (double)((int)arg_list[0] || (int)arg_list[1]);
+}    
+    
 inline double band_wrapper(double * arg_list) {
-	return (double)((int)arg_list[0] && (int)arg_list[1]);
-}	
+    return (double)((int)arg_list[0] && (int)arg_list[1]);
+}    
 
 inline double bnot_wrapper(double * arg_list) {
-	return (double)(!(int)arg_list[0]);
-}		
+    return (double)(!(int)arg_list[0]);
+}        
 
 inline double if_wrapper(double * arg_list) {
 
-		if ((int)arg_list[0] == 0)
-			return arg_list[2];
-		return arg_list[1];
-}		
+        if ((int)arg_list[0] == 0)
+            return arg_list[2];
+        return arg_list[1];
+}        
 
 
 inline double rand_wrapper(double * arg_list) {
@@ -96,48 +96,48 @@ inline double rand_wrapper(double * arg_list) {
   l = (double)((rand()) % ((int)arg_list[0]));
   //printf("VAL: %f\n", l);
   return l;
-}	
+}    
 
 inline double equal_wrapper(double * arg_list) {
 
-	return (arg_list[0] == arg_list[1]);
-}	
+    return (arg_list[0] == arg_list[1]);
+}    
 
 
 inline double above_wrapper(double * arg_list) {
 
-	return (arg_list[0] > arg_list[1]);
-}	
+    return (arg_list[0] > arg_list[1]);
+}    
 
 
 inline double below_wrapper(double * arg_list) {
 
-	return (arg_list[0] < arg_list[1]);
+    return (arg_list[0] < arg_list[1]);
 }
 
 inline double sin_wrapper(double * arg_list) {
-	return (sin (arg_list[0]));	
+    return (sin (arg_list[0]));    
 }
 
 
 inline double cos_wrapper(double * arg_list) {
-	return (cos (arg_list[0]));
+    return (cos (arg_list[0]));
 }
 
 inline double tan_wrapper(double * arg_list) {
-	return (tan(arg_list[0]));
+    return (tan(arg_list[0]));
 }
 
 inline double asin_wrapper(double * arg_list) {
-	return (asin (arg_list[0]));
+    return (asin (arg_list[0]));
 }
 
 inline double acos_wrapper(double * arg_list) {
-	return (acos (arg_list[0]));
+    return (acos (arg_list[0]));
 }
 
 inline double atan_wrapper(double * arg_list) {
-	return (atan (arg_list[0]));
+    return (atan (arg_list[0]));
 }
 
 inline double atan2_wrapper(double * arg_list) {
@@ -193,9 +193,9 @@ inline double fact_wrapper(double * arg_list) {
 
 
   int result = 1;
-  
+ 
   int n = (int)arg_list[0];
-  
+ 
   while (n > 1) {
     result = result * n;
     n--;

@@ -42,7 +42,7 @@
  *
  * This implements a way to send and receive event for an object (which can be
  * a simple C struct or less).
- * 
+ *
  * This is in direct concurrency with the Variable based Callback
  * (see src/misc/variables.c).
  *
@@ -59,7 +59,7 @@
  *
  * (vlc_cool_object_t doesn't need to have the VLC_COMMON_MEMBERS.)
  *
- * struct vlc_cool_object_t 
+ * struct vlc_cool_object_t
  * {
  *        ...
  *        vlc_event_manager_t p_event_manager;
@@ -136,7 +136,7 @@ typedef struct vlc_event_t
         {
             input_item_t * p_new_child;
         } input_item_subitem_added;
-        
+ 
         /* Service discovery events */
         struct vlc_services_discovery_item_added
         {

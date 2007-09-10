@@ -158,7 +158,7 @@ libvlc_media_list_item_at_path( libvlc_media_list_t * p_mlist, libvlc_media_list
 
         p_current_mlist = libvlc_media_descriptor_subitems( p_md, NULL );
         libvlc_media_descriptor_release( p_md );
-    
+ 
         if( !p_current_mlist )
             return NULL;
 
@@ -167,7 +167,7 @@ libvlc_media_list_item_at_path( libvlc_media_list_t * p_mlist, libvlc_media_list
     /* Not found, shouldn't happen if the p_path is not empty */
     if( p_current_mlist != p_mlist )
         libvlc_media_list_release( p_current_mlist );
-    return NULL; 
+    return NULL;
 }
 
 /**************************************************************************
@@ -191,7 +191,7 @@ libvlc_media_list_parentlist_at_path( libvlc_media_list_t * p_mlist, libvlc_medi
 
         p_current_mlist = libvlc_media_descriptor_subitems( p_md, NULL );
         libvlc_media_descriptor_release( p_md );
-    
+ 
         if( !p_current_mlist )
             return NULL;
 
@@ -200,7 +200,7 @@ libvlc_media_list_parentlist_at_path( libvlc_media_list_t * p_mlist, libvlc_medi
     /* Not found, shouldn't happen if the p_path is not empty */
     if( p_current_mlist != p_mlist )
         libvlc_media_list_release( p_current_mlist );
-    return NULL; 
+    return NULL;
 }
 
 /**************************************************************************
@@ -213,11 +213,11 @@ libvlc_media_list_sublist_at_path( libvlc_media_list_t * p_mlist, libvlc_media_l
     libvlc_media_descriptor_t * p_md = libvlc_media_list_item_at_path( p_mlist, path );
     if( !p_md )
         return NULL;
-    
+ 
     ret = libvlc_media_descriptor_subitems( p_md, NULL );
     libvlc_media_descriptor_release( p_md );
-    
-    return ret; 
+ 
+    return ret;
 }
 
 #endif

@@ -14,7 +14,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -41,7 +41,7 @@
 #include <vlc_keys.h>
 
 /*****************************************************************************
- * VLCControls implementation 
+ * VLCControls implementation
  *****************************************************************************/
 @implementation VLCControls
 
@@ -212,55 +212,55 @@
     if( !repeating.b_bool && !looping.b_bool )
     {
         /* was: no repeating at all, switching to Repeat One */
-        
+ 
         /* set our button's look */
         [self repeatOne];
-        
+ 
         /* prepare core communication */
         repeating.b_bool = VLC_TRUE;
         looping.b_bool = VLC_FALSE;
         config_PutInt( p_playlist, "repeat", 1 );
-        config_PutInt( p_playlist, "loop", 0 ); 
-        
+        config_PutInt( p_playlist, "loop", 0 );
+ 
         /* show the change */
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat One" ) );
     }
     else if( repeating.b_bool && !looping.b_bool )
     {
         /* was: Repeat One, switching to Repeat All */
-        
+ 
         /* set our button's look */
         [self repeatAll];
-        
+ 
         /* prepare core communication */
         repeating.b_bool = VLC_FALSE;
         looping.b_bool = VLC_TRUE;
-        config_PutInt( p_playlist, "repeat", 0 ); 
-        config_PutInt( p_playlist, "loop", 1 ); 
-        
+        config_PutInt( p_playlist, "repeat", 0 );
+        config_PutInt( p_playlist, "loop", 1 );
+ 
         /* show the change */
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat All" ) );
     }
     else
     {
         /* was: Repeat All or bug in VLC, switching to Repeat Off */
-        
+ 
         /* set our button's look */
         [self repeatOff];
-        
+ 
         /* prepare core communication */
         repeating.b_bool = VLC_FALSE;
         looping.b_bool = VLC_FALSE;
-        config_PutInt( p_playlist, "repeat", 0 ); 
-        config_PutInt( p_playlist, "loop", 0 ); 
-        
+        config_PutInt( p_playlist, "repeat", 0 );
+        config_PutInt( p_playlist, "loop", 0 );
+ 
         /* show the change */
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat Off" ) );
     }
 
     /* communicate with core and the main intf loop */
     var_Set( p_playlist, "repeat", repeating );
-    var_Set( p_playlist, "loop", looping );    
+    var_Set( p_playlist, "loop", looping );
     p_intf->p_sys->b_playmode_update = VLC_TRUE;
     p_intf->p_sys->b_intf_update = VLC_TRUE;
 
@@ -291,7 +291,7 @@
         vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Repeat Off" ) );
         config_PutInt( p_playlist, "repeat", 0 );
     }
-    
+ 
     p_intf->p_sys->b_playmode_update = VLC_TRUE;
     p_intf->p_sys->b_intf_update = VLC_TRUE;
     vlc_object_release( p_playlist );
@@ -399,8 +399,8 @@
 }
 
 - (IBAction)toogleFullscreen:(id)sender {
-    NSMenuItem *o_mi = [[NSMenuItem alloc] initWithTitle: _NS("Fullscreen") action: nil keyEquivalent:@""];             
-    [self windowAction: [o_mi autorelease]]; 
+    NSMenuItem *o_mi = [[NSMenuItem alloc] initWithTitle: _NS("Fullscreen") action: nil keyEquivalent:@""];
+    [self windowAction: [o_mi autorelease]];
 }
 
 - (BOOL) isFullscreen {
@@ -546,7 +546,7 @@
         /* Variable doesn't exist or isn't handled */
         return;
     }
-    
+ 
     /* Make sure we want to display the variable */
     if( i_type & VLC_VAR_HASCHOICE )
     {
@@ -555,7 +555,7 @@
         if( (i_type & VLC_VAR_TYPE) != VLC_VAR_VARIABLE && val.i_int == 1 )
             return;
     }
-    
+ 
     /* Get the descriptive name of the variable */
     var_Change( p_object, psz_variable, VLC_VAR_GETTEXT, &text, NULL );
     [o_mi setTitle: [[VLCMain sharedInstance] localizedString: text.psz_string ?
@@ -568,7 +568,7 @@
 
         [self setupVarMenu: o_menu forMenuItem: o_mi target:p_object
                         var:psz_variable selector:pf_callback];
-        
+ 
         if( text.psz_string ) free( text.psz_string );
         return;
     }
@@ -761,7 +761,7 @@
         {
             unsigned int timeInSec = 0;
             NSString * fieldContent = [o_specificTime_enter_fld stringValue];
-            if( [[fieldContent componentsSeparatedByString: @":"] count] > 1 && 
+            if( [[fieldContent componentsSeparatedByString: @":"] count] > 1 &&
                 [[fieldContent componentsSeparatedByString: @":"] count] <= 3 )
             {
                 NSArray * ourTempArray = \
@@ -785,7 +785,7 @@
             input_Control( p_input, INPUT_SET_TIME, (int64_t)(timeInSec * 1000000));
             vlc_object_release( p_input );
         }
-    
+ 
         [NSApp endSheet: o_specificTime_win];
         [o_specificTime_win close];
     }
@@ -912,7 +912,7 @@
         NSArray *o_windows = [NSApp orderedWindows];
         NSEnumerator *o_enumerator = [o_windows objectEnumerator];
         bEnabled = FALSE;
-        
+ 
         vout_thread_t   *p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
         if( p_vout != NULL )
@@ -953,7 +953,7 @@
 @end
 
 /*****************************************************************************
- * VLCMenuExt implementation 
+ * VLCMenuExt implementation
  *****************************************************************************
  * Object connected to a playlistitem which remembers the data belonging to
  * the variable of the autogenerated menu
@@ -1006,7 +1006,7 @@
 
 
 /*****************************************************************************
- * VLCTimeField implementation 
+ * VLCTimeField implementation
  *****************************************************************************
  * we need this to catch our click-event in the controller window
  *****************************************************************************/

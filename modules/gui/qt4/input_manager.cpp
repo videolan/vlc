@@ -101,7 +101,7 @@ void InputManager::update()
     i_time = var_GetTime( p_input, "time") / 1000000;
     f_pos = var_GetFloat( p_input, "position" );
     emit positionUpdated( f_pos, i_time, i_length );
-    
+ 
     int i_new_rate = var_GetInteger( p_input, "rate");
     if( i_new_rate != i_rate )
     {

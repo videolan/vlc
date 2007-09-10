@@ -150,7 +150,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
-   
+ 
     INIT_APACKETIZER( p_sys->p_packetizer, 'd','t','s',' ' );
     LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "DTS" );
 

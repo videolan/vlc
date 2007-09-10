@@ -49,7 +49,7 @@ char* RuntimeNPObject::stringValue(const NPString &s)
 char* RuntimeNPObject::stringValue(const NPVariant &v)
 {
     char *s = NULL;
-    if( NPVARIANT_IS_STRING(v) ) 
+    if( NPVARIANT_IS_STRING(v) )
     {
         return stringValue(NPVARIANT_TO_STRING(v));
     }
