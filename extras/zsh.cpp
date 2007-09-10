@@ -406,11 +406,19 @@ void PrintOption( char *psz_option, char i_short, char *psz_exclusive,
                    char *psz_text, char *psz_longtext, char *psz_args )
 {
     char *foo;
+    if( psz_text )
+    {
+        while( (foo = strchr( psz_text, ':' ))) *foo=';';
+        while( (foo = strchr( psz_text, '"' ))) *foo='\'';
+    }
+    if( psz_longtext )
+    {
+        while( (foo = strchr( psz_longtext, ':' ))) *foo=';';
+        while( (foo = strchr( psz_longtext, '"' ))) *foo='\'';
+    }
     if( !psz_longtext ||
         strchr( psz_longtext, '\n' ) ||
         strchr( psz_longtext, '(' ) ) psz_longtext = psz_text;
-    if( psz_text )
-        while( (foo = strchr( psz_text, '"' ))) *foo='\'';
     if( i_short )
     {
         if( !psz_exclusive ) psz_exclusive = "";
