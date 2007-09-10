@@ -31,7 +31,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/gototime.moc.cpp \
 		dialogs/open.moc.cpp \
 		dialogs/podcast_configuration.moc.cpp \
-        dialogs/vlm.moc.cpp \
+	        dialogs/vlm.moc.cpp \
 		components/extended_panels.moc.cpp \
 		components/infopanels.moc.cpp \
 	 	components/preferences_widgets.moc.cpp \
@@ -147,7 +147,7 @@ noinst_HEADERS = \
 	dialogs/help.hpp \
 	dialogs/gototime.hpp \
 	dialogs/open.hpp \
-    dialogs/vlm.hpp \
+    	dialogs/vlm.hpp \
 	dialogs/podcast_configuration.hpp \
 	components/extended_panels.hpp \
 	components/infopanels.hpp \
@@ -240,5 +240,5 @@ EXTRA_DIST += \
 	pixmaps/vlc_playlist_repeat_off.png \
 	pixmaps/vlc_playlist_repeat_all.png \
 	pixmaps/vlc_playlist_repeat_one.png \
-	pixmaps/vlc_shuffle_on.png \
-	pixmaps/vlc_shuffle_off.png
+	pixmaps/vlc_playlist_shuffle_on.png \
+	pixmaps/vlc_playlist_shuffle_off.png
