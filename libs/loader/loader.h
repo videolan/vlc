@@ -42,9 +42,9 @@ extern "C" {
 
 unsigned int _GetPrivateProfileIntA(const char* appname, const char* keyname, int default_value, const char* filename);
 int _GetPrivateProfileStringA(const char* appname, const char* keyname,
-    const char* def_val, char* dest, unsigned int len, const char* filename);
+	const char* def_val, char* dest, unsigned int len, const char* filename);
 int _WritePrivateProfileStringA(const char* appname, const char* keyname,
-    const char* string, const char* filename);
+	const char* string, const char* filename);
 
 INT WINAPI LoadStringA( HINSTANCE instance, UINT resource_id,
                             LPSTR buffer, INT buflen );

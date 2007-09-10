@@ -78,7 +78,7 @@ struct IClassFactory
 };
 
 long CoCreateInstance(GUID* rclsid, struct IUnknown* pUnkOuter,
-              long dwClsContext, const GUID* riid, void** ppv);
+		      long dwClsContext, const GUID* riid, void** ppv);
 
 #ifdef __cplusplus
 };

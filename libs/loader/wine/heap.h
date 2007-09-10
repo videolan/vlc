@@ -31,7 +31,7 @@ extern LPSTR HEAP_strdupWtoA( HANDLE heap, DWORD flags, LPCWSTR str );
          (HIWORD(str) ? HEAP_strdupA( SegptrHeap, 0, (str) ) : (LPSTR)(str))
 #define SEGPTR_STRDUP_WtoA(str) \
          (HIWORD(str) ? HEAP_strdupWtoA( SegptrHeap, 0, (str) ) : (LPSTR)(str))
-    /* define an inline function, a macro won't do */
+	/* define an inline function, a macro won't do */
 static inline SEGPTR WINE_UNUSED SEGPTR_Get(LPCVOID ptr) {
          return (HIWORD(ptr) ? HEAP_GetSegptr( SegptrHeap, 0, ptr ) : (SEGPTR)ptr);
 }

@@ -9,19 +9,19 @@
 
 #define MMSYSERR_BASE          0
 
-#define MMSYSERR_NOERROR          0                    /* no error */
-#define MMSYSERR_ERROR            (MMSYSERR_BASE + 1)  /* unspecified error */
-#define MMSYSERR_BADDEVICEID      (MMSYSERR_BASE + 2)  /* device ID out of range */
-#define MMSYSERR_NOTENABLED       (MMSYSERR_BASE + 3)  /* driver failed enable */
-#define MMSYSERR_ALLOCATED        (MMSYSERR_BASE + 4)  /* device already allocated */
-#define MMSYSERR_INVALHANDLE      (MMSYSERR_BASE + 5)  /* device handle is invalid */
-#define MMSYSERR_NODRIVER         (MMSYSERR_BASE + 6)  /* no device driver present */
-#define MMSYSERR_NOMEM            (MMSYSERR_BASE + 7)  /* memory allocation error */
-#define MMSYSERR_NOTSUPPORTED     (MMSYSERR_BASE + 8)  /* function isn't supported */
-#define MMSYSERR_BADERRNUM        (MMSYSERR_BASE + 9)  /* error value out of range */
-#define MMSYSERR_INVALFLAG        (MMSYSERR_BASE + 10) /* invalid flag passed */
-#define MMSYSERR_INVALPARAM       (MMSYSERR_BASE + 11) /* invalid parameter passed */
-#define MMSYSERR_LASTERROR        (MMSYSERR_BASE + 11) /* last error in range */
+#define MMSYSERR_NOERROR      	0                    /* no error */
+#define MMSYSERR_ERROR        	(MMSYSERR_BASE + 1)  /* unspecified error */
+#define MMSYSERR_BADDEVICEID  	(MMSYSERR_BASE + 2)  /* device ID out of range */
+#define MMSYSERR_NOTENABLED   	(MMSYSERR_BASE + 3)  /* driver failed enable */
+#define MMSYSERR_ALLOCATED    	(MMSYSERR_BASE + 4)  /* device already allocated */
+#define MMSYSERR_INVALHANDLE  	(MMSYSERR_BASE + 5)  /* device handle is invalid */
+#define MMSYSERR_NODRIVER     	(MMSYSERR_BASE + 6)  /* no device driver present */
+#define MMSYSERR_NOMEM        	(MMSYSERR_BASE + 7)  /* memory allocation error */
+#define MMSYSERR_NOTSUPPORTED 	(MMSYSERR_BASE + 8)  /* function isn't supported */
+#define MMSYSERR_BADERRNUM    	(MMSYSERR_BASE + 9)  /* error value out of range */
+#define MMSYSERR_INVALFLAG    	(MMSYSERR_BASE + 10) /* invalid flag passed */
+#define MMSYSERR_INVALPARAM   	(MMSYSERR_BASE + 11) /* invalid parameter passed */
+#define MMSYSERR_LASTERROR    	(MMSYSERR_BASE + 11) /* last error in range */
 
 #define DRV_LOAD                0x0001
 #define DRV_ENABLE              0x0002
@@ -42,29 +42,29 @@
 
 #define DRVCNF_CANCEL           0x0000
 #define DRVCNF_OK               0x0001
-#define DRVCNF_RESTART         0x0002
+#define DRVCNF_RESTART 		0x0002
 
-#define DRVEA_NORMALEXIT      0x0001
-#define DRVEA_ABNORMALEXIT     0x0002
+#define DRVEA_NORMALEXIT  	0x0001
+#define DRVEA_ABNORMALEXIT 	0x0002
 
-#define DRV_SUCCESS        0x0001
-#define DRV_FAILURE        0x0000
+#define DRV_SUCCESS		0x0001
+#define DRV_FAILURE		0x0000
 
-#define GND_FIRSTINSTANCEONLY     0x00000001
+#define GND_FIRSTINSTANCEONLY 	0x00000001
 
-#define GND_FORWARD          0x00000000
-#define GND_REVERSE            0x00000002
+#define GND_FORWARD  		0x00000000
+#define GND_REVERSE    		0x00000002
 
 typedef struct {
-    DWORD               dwDCISize;
-    LPCSTR              lpszDCISectionName;
-    LPCSTR              lpszDCIAliasName;
+    DWORD   			dwDCISize;
+    LPCSTR  			lpszDCISectionName;
+    LPCSTR  			lpszDCIAliasName;
 } DRVCONFIGINFO16, *LPDRVCONFIGINFO16;
 
 typedef struct {
-    DWORD               dwDCISize;
-    LPCWSTR              lpszDCISectionName;
-    LPCWSTR              lpszDCIAliasName;
+    DWORD   			dwDCISize;
+    LPCWSTR  			lpszDCISectionName;
+    LPCWSTR  			lpszDCIAliasName;
 } DRVCONFIGINFO, *LPDRVCONFIGINFO;
 
 
@@ -74,13 +74,13 @@ typedef struct {
  */
 typedef struct
 {
-    UINT16               length;
-    HDRVR16              hDriver;
-    HINSTANCE16          hModule;
-    CHAR                 szAliasName[128];
+    UINT16       		length;
+    HDRVR16      		hDriver;
+    HINSTANCE16  		hModule;
+    CHAR         		szAliasName[128];
 } DRIVERINFOSTRUCT16, *LPDRIVERINFOSTRUCT16;
 
-LRESULT WINAPI DefDriverProc16(DWORD dwDevID, HDRVR16 hDriv, UINT16 wMsg,
+LRESULT WINAPI DefDriverProc16(DWORD dwDevID, HDRVR16 hDriv, UINT16 wMsg, 
                                LPARAM dwParam1, LPARAM dwParam2);
 LRESULT WINAPI DefDriverProc(DWORD dwDriverIdentifier, HDRVR hdrvr,
                                UINT Msg, LPARAM lParam1, LPARAM lParam2);
@@ -105,8 +105,8 @@ DWORD WINAPI GetDriverFlags( HDRVR hDriver );
 /* this call (GetDriverFlags) is not documented, nor the flags returned.
  * here are Wine only definitions
  */
-#define WINE_GDF_EXIST    0x80000000
-#define WINE_GDF_16BIT    0x10000000
+#define WINE_GDF_EXIST	0x80000000
+#define WINE_GDF_16BIT	0x10000000
 #endif
 
 #endif  /* __WINE_DRIVER_H */

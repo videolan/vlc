@@ -5,7 +5,7 @@
  */
 
 #ifndef loader_driver_h
-#define    loader_driver_h
+#define	loader_driver_h
 
 #ifdef __cplusplus
 extern "C" {
