@@ -13,6 +13,8 @@ dist_pkgdata_DATA = \
 
 nobase_dist_pkgdata_DATA = \
 	utils/gnome-vlc-default.sh \
+	utils/audio-vlc-default.sh \
+	utils/video-vlc-default.sh \
 	$(DIST_skins2) \
 	$(DIST_http) \
 	$(DIST_lua) \
