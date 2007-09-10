@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id $
+# $Id$
 #
 # Copyright © 2007 VideoLAN team
 #
