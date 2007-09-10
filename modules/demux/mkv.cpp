@@ -2619,6 +2619,18 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 
         tracks[i_track]->p_es = es_out_Add( sys.demuxer.out, &tracks[i_track]->fmt );
 
+        /* Turn on a subtitles track if it has been flagged as default -
+         * but only do this if no subtitles track has already been engaged,
+         * either by an earlier 'default track' (??) or by default
+         * language choice behaviour.
+         */
+        if( tracks[i_track]->b_default )
+        {
+            es_out_Control( sys.demuxer.out,
+                            ES_OUT_SET_DEFAULT,
+                            tracks[i_track]->p_es );
+        }
+
         es_out_Control( sys.demuxer.out, ES_OUT_SET_NEXT_DISPLAY_TIME, tracks[i_track]->p_es, i_start_time );
     }
     

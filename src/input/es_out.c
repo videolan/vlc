@@ -108,6 +108,7 @@ struct es_out_sys_t
     /* es to select */
     int         i_audio_last, i_audio_id;
     int         i_sub_last, i_sub_id;
+    int         i_default_sub_id;   /* As specified in container; if applicable */
     char        **ppsz_audio_language;
     char        **ppsz_sub_language;
 
@@ -178,6 +179,8 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
 
     var_Get( p_input, "sub-track", &val );
     p_sys->i_sub_last = val.i_int;
+
+    p_sys->i_default_sub_id   = -1;
 
     if( !p_input->b_preparsing )
     {
@@ -1128,6 +1131,12 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
 
                 i_wanted  = es->i_channel;
             }
+            else if( p_sys->i_default_sub_id >= 0 )
+            {
+                if( es->i_id == p_sys->i_default_sub_id )
+                    i_wanted = es->i_channel;
+            }
+
             if( p_sys->i_sub_last >= 0 )
                 i_wanted  = p_sys->i_sub_last;
 
@@ -1491,6 +1500,42 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 pl_Release( p_playlist );
             }
             return VLC_SUCCESS;
+            
+        case ES_OUT_SET_DEFAULT:
+        {
+            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
+
+            if( es == NULL )
+            {
+                /*p_sys->i_default_video_id = -1;*/
+                /*p_sys->i_default_audio_id = -1;*/
+                p_sys->i_default_sub_id = -1;
+            }
+            else if( es == (es_out_id_t*)((uint8_t*)NULL+AUDIO_ES) )
+            {
+                /*p_sys->i_default_video_id = -1;*/
+            }
+            else if( es == (es_out_id_t*)((uint8_t*)NULL+VIDEO_ES) )
+            {
+                /*p_sys->i_default_audio_id = -1;*/
+            }
+            else if( es == (es_out_id_t*)((uint8_t*)NULL+SPU_ES) )
+            {
+                p_sys->i_default_sub_id = -1;
+            }
+            else
+            {
+                /*if( es->fmt.i_cat == VIDEO_ES )
+                    p_sys->i_default_video_id = es->i_id;
+                else
+                if( es->fmt.i_cat == AUDIO_ES )
+                    p_sys->i_default_audio_id = es->i_id;
+                else*/
+                if( es->fmt.i_cat == SPU_ES )
+                    p_sys->i_default_sub_id = es->i_id;
+            }
+            return VLC_SUCCESS;
+        }
 
         case ES_OUT_SET_PCR:
         case ES_OUT_SET_GROUP_PCR:

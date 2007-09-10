@@ -55,6 +55,9 @@ enum es_out_query_e
     /* set es selected for the es category(audio/video/spu) */
     ES_OUT_SET_ES,      /* arg1= es_out_id_t*                   */
 
+    /* set 'default' tag on es (copied across from container) */
+    ES_OUT_SET_DEFAULT, /* arg1= es_out_id_t*                   */
+
     /* force selection/unselection of the ES (bypass current mode)*/
     ES_OUT_SET_ES_STATE,/* arg1= es_out_id_t* arg2=vlc_bool_t   */
     ES_OUT_GET_ES_STATE,/* arg1= es_out_id_t* arg2=vlc_bool_t*  */
