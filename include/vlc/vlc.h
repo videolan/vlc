@@ -358,7 +358,7 @@ VLC_PUBLIC_API int     VLC_VariableType( int, char const *, int * );
  * \param i_options the amount of options in the ppsz_options array
  * \param i_mode the insert mode to insert the target into the playlist (PLAYLIST_* defines)
  * \param i_pos the position at which to add the new target (PLAYLIST_END for end)
- * \return VLC_SUCCESS on success
+ * \return the item id on success and -1 on error
  */
 VLC_PUBLIC_API int     VLC_AddTarget( int, char const *, const char **, int, int, int );
 
