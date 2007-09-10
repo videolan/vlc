@@ -95,6 +95,8 @@ void DialogsProvider::customEvent( QEvent *event )
             case INTF_DIALOG_SAT:
             case INTF_DIALOG_CAPTURE:
                 openCaptureDialog(); break;
+            case INTF_DIALOG_DIRECTORY:
+                PLAppendDir(); break;
             case INTF_DIALOG_PLAYLIST:
                 playlistDialog(); break;
             case INTF_DIALOG_MESSAGES:
@@ -121,6 +123,7 @@ void DialogsProvider::customEvent( QEvent *event )
             case INTF_DIALOG_VLM:
                vlmDialog(); break;
             case INTF_DIALOG_WIZARD:
+            case INTF_DIALOG_STREAMWIZARD:
             case INTF_DIALOG_UPDATEVLC:
             case INTF_DIALOG_EXIT:
             default:
@@ -300,7 +303,7 @@ void DialogsProvider::simpleOpenDialog()
  * pl helps you to choose from playlist or media library,
  * go to start or enqueue
  **/
-static void openDirectory( intf_thread_t* p_intf, bool pl, bool go )
+static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 {
     QString dir = QFileDialog::getExistingDirectory ( 0, qtr("Open directory") );
     if (!dir.isEmpty()) {
