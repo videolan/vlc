@@ -98,6 +98,16 @@
     "the multicast packets sent by the stream output (0 = use operating " \
     "system built-in default).")
 
+#define DCCP_TEXT N_("DCCP transport")
+#define DCCP_LONGTEXT N_( \
+    "This enables DCCP instead of UDP as a transport for RTP." )
+#define TCP_TEXT N_("TCP transport")
+#define TCP_LONGTEXT N_( \
+    "This enables TCP instead of UDP as a transport for RTP." )
+#define UDP_LITE_TEXT N_("UDP-Lite transport")
+#define UDP_LITE_LONGTEXT N_( \
+    "This enables UDP-Lite instead of UDP as a transport for RTP." )
+
 #define RFC3016_TEXT N_("MP4A LATM")
 #define RFC3016_LONGTEXT N_( \
     "This allows you to stream MPEG4 LATM audio streams (see RFC3016)." )
@@ -142,6 +152,13 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, TTL_TEXT,
                  TTL_LONGTEXT, VLC_TRUE );
 
+    add_bool( SOUT_CFG_PREFIX "dccp", 0, NULL,
+              DCCP_TEXT, DCCP_LONGTEXT, VLC_FALSE );
+    add_bool( SOUT_CFG_PREFIX "tcp", 0, NULL,
+              TCP_TEXT, TCP_LONGTEXT, VLC_FALSE );
+    add_bool( SOUT_CFG_PREFIX "udplite", 0, NULL,
+              UDP_LITE_TEXT, UDP_LITE_LONGTEXT, VLC_FALSE );
+
     add_bool( SOUT_CFG_PREFIX "mp4a-latm", 0, NULL, RFC3016_TEXT,
                  RFC3016_LONGTEXT, VLC_FALSE );
 
@@ -153,7 +170,9 @@ vlc_module_end();
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
     "dst", "name", "port", "port-audio", "port-video", "*sdp", "ttl", "mux",
-    "description", "url","email", "mp4a-latm", NULL
+    "description", "url", "email",
+    "dccp", "tcp", "udplite",
+    "mp4a-latm", NULL
 };
 
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
@@ -176,7 +195,7 @@ static int HttpSetup( sout_stream_t *p_stream, vlc_url_t * );
 
 struct sout_stream_sys_t
 {
-    /* sdp */
+    /* SDP */
     int64_t i_sdp_id;
     int     i_sdp_version;
     char    *psz_sdp;
@@ -187,24 +206,28 @@ struct sout_stream_sys_t
     char        *psz_session_url;
     char        *psz_session_email;
 
-    /* */
+    /* SDP to disk */
     vlc_bool_t b_export_sdp_file;
     char *psz_sdp_file;
-    /* sap */
+
+    /* SDP via SAP */
     vlc_bool_t b_export_sap;
     session_descriptor_t *p_session;
 
+    /* SDP via HTTP */
     httpd_host_t *p_httpd_host;
     httpd_file_t *p_httpd_file;
 
+    /* RTSP */
     rtsp_stream_t *rtsp;
 
     /* */
-    char *psz_destination;
-    int  i_port;
-    int  i_port_audio;
-    int  i_port_video;
-    int  i_ttl;
+    char     *psz_destination;
+    uint8_t   proto;
+    uint8_t   i_ttl;
+    uint16_t  i_port;
+    uint16_t  i_port_audio;
+    uint16_t  i_port_video;
     vlc_bool_t b_latm;
 
     /* when need to use a private one or when using muxer */
@@ -331,6 +354,26 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
+    /* Transport protocol */
+    p_sys->proto = IPPROTO_UDP;
+
+#if 0
+    if( var_GetBool( p_stream, SOUT_CFG_PREFIX "dccp" ) )
+    {
+        p_sys->sotype = SOCK_DCCP;
+        p_sys->proto = 33 /*IPPROTO_DCCP*/;
+    }
+    else
+    if( var_GetBool( p_stream, SOUT_CFG_PREFIX "tcp" ) )
+    {
+        p_sys->sotype = SOCK_STREAM;
+        p_sys->proto = IPPROTO_TCP;
+    }
+    else
+#endif
+    if( var_GetBool( p_stream, SOUT_CFG_PREFIX "udplite" ) )
+        p_sys->proto = 136 /*IPPROTO_UDPLITE*/;
+
     if( ( p_sys->psz_destination == NULL ) && !b_rtsp )
     {
         msg_Err( p_stream, "missing destination and not in RTSP mode" );
@@ -347,9 +390,6 @@ static int Open( vlc_object_t *p_this )
          * ttl are set. */
         p_sys->i_ttl = config_GetInt( p_stream, "ttl" );
     }
-    if( p_sys->i_ttl > 255 )
-        p_sys->i_ttl = 255;
-    /* must not exceed 999 once formatted */
 
     p_sys->b_latm = var_GetBool( p_stream, SOUT_CFG_PREFIX "mp4a-latm" );
 
@@ -798,7 +838,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
      * mux (TS/PS), then p_fmt is NULL. */
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t  *id;
-    int               i_port;
+    int               i_port, cscov = -1;
     char              *psz_sdp;
 
     id = vlc_object_create( p_stream, sizeof( sout_stream_id_t ) );
@@ -887,7 +927,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         int ttl = (p_sys->i_ttl > 0) ? p_sys->i_ttl : -1;
         int fd = net_ConnectDgram( p_stream, p_sys->psz_destination,
-                                   i_port, ttl, IPPROTO_UDP );
+                                   i_port, ttl, p_sys->proto );
 
         if( fd == -1 )
         {
@@ -1097,6 +1137,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             vlc_object_destroy( id );
             return NULL;
     }
+
+    if( cscov != -1 )
+        cscov += 8 /* UDP */ + 12 /* RTP */;
+    if( id->sinkc > 0 )
+        net_SetCSCov( id->sinkv[0].rtp_fd, cscov, -1 );
 
     if( id->i_payload_type == p_sys->i_payload_type )
         p_sys->i_payload_type++;
