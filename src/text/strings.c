@@ -654,8 +654,7 @@ char *str_format_time( const char *tformat )
                     }
 
 /* same than INSERT_STRING, except that string won't be freed */
-#define INSERT_STRING_NO_FREE( check, string )                           \
-                    if( check && string )                           \
+#define INSERT_STRING_NO_FREE( string )                             \
                     {                                               \
                             int len = strlen( string );             \
                             dst = realloc( dst,                     \
@@ -663,12 +662,7 @@ char *str_format_time( const char *tformat )
                             strncpy( d, string, len+1 );            \
                             d += len;                               \
                             free( string );                         \
-                    }                                               \
-                    else                                            \
-                    {                                               \
-                            *d = '-';                               \
-                            d++;                                    \
-                    }
+                    }                                               
 char *__str_format_meta( vlc_object_t *p_object, const char *string )
 {
     const char *s = string;
@@ -761,7 +755,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
-                    INSERT_STRING_NO_FREE( 1, buf );
+                    INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'C':
                     if( p_input )
@@ -773,7 +767,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
-                    INSERT_STRING_NO_FREE( 1, buf );
+                    INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'D':
                     if( p_item )
@@ -788,7 +782,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "--:--:--" );
                     }
-                    INSERT_STRING_NO_FREE( 1, buf );
+                    INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'F':
                     INSERT_STRING( p_item, input_item_GetURI( p_item ) );
@@ -803,7 +797,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
-                    INSERT_STRING_NO_FREE( 1, buf );
+                    INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'L':
                     if( p_item && p_input )
@@ -819,7 +813,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "--:--:--" );
                     }
-                    INSERT_STRING_NO_FREE( 1, buf );
+                    INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'N':
                     INSERT_STRING( p_item, input_item_GetName( p_item ) );
@@ -848,7 +842,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "--.-%%" );
                     }
-                    INSERT_STRING_NO_FREE( 1, buf );
+                    INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'R':
                     if( p_input )
@@ -860,7 +854,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
-                    INSERT_STRING_NO_FREE( 1, buf );
+                    INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'S':
                     if( p_input )
@@ -872,7 +866,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" : "-" );
                     }
-                    INSERT_STRING_NO_FREE( 1, buf );
+                    INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'T':
                     if( p_input )
@@ -886,7 +880,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     {
                         sprintf( buf, b_empty_if_na ? "" :  "--:--:--" );
                     }
-                    INSERT_STRING_NO_FREE( 1, buf );
+                    INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'U':
                     INSERT_STRING( p_item, input_item_GetPublisher(p_item) );
@@ -896,7 +890,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     audio_volume_t volume;
                     aout_VolumeGet( p_object, &volume );
                     snprintf( buf, 10, "%d", volume );
-                    INSERT_STRING_NO_FREE( 1, buf );
+                    INSERT_STRING_NO_FREE( buf );
                     break;
                 }
                 case '_':
