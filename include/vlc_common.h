@@ -861,7 +861,7 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 
 #if !defined(HAVE_ASPRINTF) || defined(__APPLE__) || defined(SYS_BEOS)
 #   define asprintf vlc_asprintf
-    VLC_EXPORT( int, vlc_asprintf, (char **, const char *, ... ) );
+    VLC_EXPORT( int, vlc_asprintf, (char **, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 #elif !defined(__PLUGIN__)
 #   define vlc_asprintf NULL
 #endif

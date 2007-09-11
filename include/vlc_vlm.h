@@ -157,7 +157,7 @@ VLC_EXPORT( void,      vlm_Delete, ( vlm_t * ) );
 VLC_EXPORT( int,       vlm_ExecuteCommand, ( vlm_t *, const char *, vlm_message_t ** ) );
 VLC_EXPORT( int,       vlm_Control, ( vlm_t *p_vlm, int i_query, ... ) );
 
-VLC_EXPORT( vlm_message_t *, vlm_MessageNew, ( const char *, const char *, ... ) );
+VLC_EXPORT( vlm_message_t *, vlm_MessageNew, ( const char *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 VLC_EXPORT( vlm_message_t *, vlm_MessageAdd, ( vlm_message_t *, vlm_message_t * ) );
 VLC_EXPORT( void,            vlm_MessageDelete, ( vlm_message_t * ) );
 

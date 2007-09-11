@@ -307,9 +307,9 @@ struct interaction_t
  ***************************************************************************/
 
 #define intf_UserFatal( a, b, c, d, e... ) __intf_UserFatal( VLC_OBJECT(a),b,c,d, ## e )
-VLC_EXPORT( int, __intf_UserFatal,( vlc_object_t*, vlc_bool_t, const char*, const char*, ...) );
+VLC_EXPORT( int, __intf_UserFatal,( vlc_object_t*, vlc_bool_t, const char*, const char*, ...) ATTRIBUTE_FORMAT( 4, 5 ) );
 #define intf_UserWarn( a, c, d, e... ) __intf_UserWarn( VLC_OBJECT(a),c,d, ## e )
-VLC_EXPORT( int, __intf_UserWarn,( vlc_object_t*, const char*, const char*, ...) );
+VLC_EXPORT( int, __intf_UserWarn,( vlc_object_t*, const char*, const char*, ...) ATTRIBUTE_FORMAT( 3, 4 ) );
 #define intf_UserLoginPassword( a, b, c, d, e... ) __intf_UserLoginPassword( VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( int, __intf_UserLoginPassword,( vlc_object_t*, const char*, const char*, char **, char **) );
 #define intf_UserYesNo( a, b, c, d, e, f ) __intf_UserYesNo( VLC_OBJECT(a),b,c, d, e, f )

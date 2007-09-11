@@ -139,7 +139,7 @@ VLC_EXPORT( int,              httpd_StreamSend,   ( httpd_stream_t *, uint8_t *p
 
 /* Msg functions facilities */
 VLC_EXPORT( void,         httpd_MsgInit, ( httpd_message_t * )  );
-VLC_EXPORT( void,         httpd_MsgAdd, ( httpd_message_t *, const char *psz_name, const char *psz_value, ... ) );
+VLC_EXPORT( void,         httpd_MsgAdd, ( httpd_message_t *, const char *psz_name, const char *psz_value, ... ) ATTRIBUTE_FORMAT( 3, 4 ) );
 /* return "" if not found. The string is not allocated */
 VLC_EXPORT( const char *, httpd_MsgGet, ( const httpd_message_t *, const char *psz_name ) );
 VLC_EXPORT( void,         httpd_MsgClean, ( httpd_message_t * ) );
