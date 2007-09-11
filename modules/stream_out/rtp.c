@@ -639,19 +639,6 @@ out:
 /*****************************************************************************
  * SDPGenerate
  *****************************************************************************/
-        /* FIXME  http://www.faqs.org/rfcs/rfc2327.html
-           All text fields should be UTF-8 encoded. Use global a:charset to announce this.
-           o= - should be local username (no spaces allowed)
-           o= time should be hashed with some other value to garantue uniqueness
-           o= we need IP6 support?
-           o= don't use the localhost address. use fully qualified domain name or IP4 address
-           p= international phone number (pass via vars?)
-           c= IP6 support
-           a= recvonly (missing)
-           a= type:broadcast (missing)
-           a= charset: (normally charset should be UTF-8, this can be used to override s= and i=)
-           a= x-plgroup: (missing)
-           RTP packets need to get the correct src IP address  */
 /*static*/
 char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
 {
