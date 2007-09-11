@@ -133,7 +133,7 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
                 MUX_LONGTEXT, VLC_TRUE );
 
-    add_string( SOUT_CFG_PREFIX "name", "NONE", NULL, NAME_TEXT,
+    add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT,
                 NAME_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "description", "", NULL, DESC_TEXT,
                 DESC_LONGTEXT, VLC_TRUE );
@@ -307,10 +307,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->psz_destination = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "dst" );
-    p_sys->psz_session_name = var_GetString( p_stream, SOUT_CFG_PREFIX "name" );
-    p_sys->psz_session_description = var_GetString( p_stream, SOUT_CFG_PREFIX "description" );
-    p_sys->psz_session_url = var_GetString( p_stream, SOUT_CFG_PREFIX "url" );
-    p_sys->psz_session_email = var_GetString( p_stream, SOUT_CFG_PREFIX "email" );
+    p_sys->psz_session_name = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "name" );
+    p_sys->psz_session_description = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "description" );
+    p_sys->psz_session_url = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "url" );
+    p_sys->psz_session_email = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "email" );
 
     p_sys->i_port       = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port" );
     p_sys->i_port_audio = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-audio" );
@@ -669,9 +669,9 @@ out:
 char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
 {
     const sout_stream_sys_t *p_sys = p_stream->p_sys;
-    size_t i_size;
-    const char *psz_destination = p_sys->psz_destination;
-    char *psz_sdp, *p, ipv;
+    char *psz_sdp;
+    struct sockaddr_storage dst;
+    socklen_t dstlen;
     int i;
     /*
      * When we have a fixed destination (typically when we do multicast),
@@ -688,81 +688,40 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
      * output chain with two different RTSP URLs if you need to handle this
      * scenario.
      */
-    int inclport = (psz_destination != NULL);
+    int inclport;
 
-    /* FIXME: breaks IP version check on unknown destination */
-    if( psz_destination == NULL )
-        psz_destination = "0.0.0.0";
-
-    i_size = sizeof( "v=0\r\n" ) +
-             sizeof( "o=- * * IN IP4 127.0.0.1\r\n" ) + 10 + 10 +
-             sizeof( "s=*\r\n" ) + strlen( p_sys->psz_session_name ) +
-             sizeof( "i=*\r\n" ) + strlen( p_sys->psz_session_description ) +
-             sizeof( "u=*\r\n" ) + strlen( p_sys->psz_session_url ) +
-             sizeof( "e=*\r\n" ) + strlen( p_sys->psz_session_email ) +
-             sizeof( "t=0 0\r\n" ) +
-             sizeof( "b=RR:0\r\n" ) +
-             sizeof( "a=tool:"PACKAGE_STRING"\r\n" ) +
-             sizeof( "a=recvonly\r\n" ) +
-             sizeof( "a=type:broadcast\r\n" ) +
-             sizeof( "c=IN IP4 */*\r\n" ) + 20 + 10 +
-             strlen( psz_destination ) ;
-    for( i = 0; i < p_sys->i_es; i++ )
+    if( p_sys->psz_destination != NULL )
     {
-        sout_stream_id_t *id = p_sys->es[i];
+        inclport = 1;
 
-        i_size += strlen( "m=**d*o * RTP/AVP *\r\n" ) + 10 + 10;
-        if ( id->i_bitrate )
-        {
-            i_size += strlen( "b=AS: *\r\n") + 10;
-        }
-        if( id->psz_rtpmap )
-        {
-            i_size += strlen( "a=rtpmap:* *\r\n" ) + strlen( id->psz_rtpmap )+10;
-        }
-        if( id->psz_fmtp )
-        {
-            i_size += strlen( "a=fmtp:* *\r\n" ) + strlen( id->psz_fmtp ) + 10;
-        }
-        if( rtsp_url != NULL )
-        {
-            i_size += strlen( "a=control:*/trackID=*\r\n" ) + strlen( rtsp_url ) + 10;
-        }
+        /* Oh boy, this is really ugly! (+ race condition on lock_es) */
+        dstlen = sizeof( dst );
+        getsockname( p_sys->es[0]->sinkv[0].rtp_fd, (struct sockaddr *)&dst,
+                     &dstlen );
+    }
+    else
+    {
+        inclport = 0;
+
+        /* Dummy destination address for RTSP */
+        memset (&dst, 0, sizeof( struct sockaddr_in ) );
+        dst.ss_family = AF_INET;
+#ifdef HAVE_SA_LEN
+        dst.ss_len =
+#endif
+        dstlen = sizeof( struct sockaddr_in );
     }
 
-    ipv = ( strchr( psz_destination, ':' ) != NULL ) ? '6' : '4';
+    psz_sdp = sdp_Start( p_sys->psz_session_name,
+                         p_sys->psz_session_description,
+                         p_sys->psz_session_url, p_sys->psz_session_email,
+                         NULL, NULL, 0, (struct sockaddr *)&dst, dstlen );
+    if( psz_sdp == NULL )
+        return NULL;
 
-    p = psz_sdp = malloc( i_size );
-    p += sprintf( p, "v=0\r\n" );
-    p += sprintf( p, "o=- "I64Fu" %d IN IP%c %s\r\n",
-                  p_sys->i_sdp_id, p_sys->i_sdp_version,
-                  ipv, ipv == '6' ? "::1" : "127.0.0.1" );
-    if( *p_sys->psz_session_name )
-        p += sprintf( p, "s=%s\r\n", p_sys->psz_session_name );
-    if( *p_sys->psz_session_description )
-        p += sprintf( p, "i=%s\r\n", p_sys->psz_session_description );
-    if( *p_sys->psz_session_url )
-        p += sprintf( p, "u=%s\r\n", p_sys->psz_session_url );
-    if( *p_sys->psz_session_email )
-        p += sprintf( p, "e=%s\r\n", p_sys->psz_session_email );
+    /* TODO: a=source-filter */
 
-    p += sprintf( p, "t=0 0\r\n" ); /* permanent stream */
-        /* when scheduled from vlm, we should set this info correctly */
-    p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
-    p += sprintf( p, "a=recvonly\r\n" );
-    p += sprintf( p, "a=type:broadcast\r\n" );
-
-    p += sprintf( p, "c=IN IP%c %s", ipv, psz_destination );
-
-    if( ( ipv == 4 )
-     && net_AddressIsMulticast( (vlc_object_t *)p_stream, psz_destination ) )
-    {
-        /* Add the deprecated TTL field if it is an IPv4 multicast address */
-        p += sprintf( p, "/%d", p_sys->i_ttl ?: 1 );
-    }
-    p += sprintf( p, "\r\n" );
-    p += sprintf( p, "b=RR:0\r\n" );
-
+    /* FIXME: locking?! */
     for( i = 0; i < p_sys->i_es; i++ )
     {
         sout_stream_id_t *id = p_sys->es[i];
@@ -776,27 +735,19 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
         else
             continue;
 
-        p += sprintf( p, "m=%s %d RTP/AVP %d\r\n", mime_major,
-                      inclport * id->i_port, id->i_payload_type );
+        sdp_AddMedia( &psz_sdp, mime_major, "RTP/AVP", inclport * id->i_port,
+                     id->i_payload_type, VLC_FALSE, id->i_bitrate,
+                     id->psz_rtpmap, id->psz_fmtp);
 
+#if 0
         if ( id->i_bitrate )
         {
             p += sprintf(p,"b=AS:%d\r\n",id->i_bitrate);
         }
-        if( id->psz_rtpmap )
-        {
-            p += sprintf( p, "a=rtpmap:%d %s\r\n", id->i_payload_type,
-                          id->psz_rtpmap );
-        }
-        if( id->psz_fmtp )
-        {
-            p += sprintf( p, "a=fmtp:%d %s\r\n", id->i_payload_type,
-                          id->psz_fmtp );
-        }
+#endif
+
         if( rtsp_url != NULL )
-        {
-            p += sprintf( p, "a=control:/trackID=%d\r\n", i );
-        }
+            sdp_AddAttribute ( &psz_sdp, "control", "/trackID=%d", i );
     }
 
     return psz_sdp;
