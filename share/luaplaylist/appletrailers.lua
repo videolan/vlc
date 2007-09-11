@@ -35,7 +35,6 @@ function parse()
             else
                 extraname = ""
             end
-            vlc.msg_err( path )
             table.insert( p, { path = path; name = title..extraname; description = description; url = vlc.path } )
         end
         if string.match( line, "<title>" )
