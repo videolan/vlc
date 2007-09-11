@@ -21,11 +21,9 @@
 #
 
 #
-# NOTE: this controller is a SAMPLE, and thus doesn't implement all the D-Bus Media Player specification. http://wiki.videolan.org/index.php/DBus-spec
-# This is an unfinished document (on the 12/06/2006) and has been designed to be as general as possible.
-# So don't expect that much from this, but basic capabilities should work out of the box (Play/Pause/Next/Add)
-#
-# Also notice it has been designed first for a previous specificaiton, and thus some code may not work/be disabled
+# NOTE: this controller is a SAMPLE, and thus doesn't implement all the
+# Media Player Remote Interface Specification (MPRIS for short) available at
+# http://wiki.xmms2.xmms.se/index.php/Media_Player_Interfaces
 #
 # You'll need pygtk >= 2.10 to use gtk.StatusIcon
 #
@@ -40,6 +38,24 @@ global position
 global timer
 global playing
 playing = False
+
+global shuffle
+global repeat
+global loop
+#mpris doesn't support getting the status of these (at the moment)
+shuffle = False
+repeat = False
+loop = False
+
+global root
+global player
+global tracklist
+
+global bus
+
+def player_change(newname, a, b):
+    if b != "" and "org.mpris." in newname:
+        Connect(newname)
 
 def itemchange_handler(item):
     gobject.timeout_add( 2000, timeset)
@@ -56,35 +72,26 @@ def itemchange_handler(item):
     l_artist.set_text(a)
     l_title.set_text(t)
 
-#connect to the bus
-bus = dbus.SessionBus()
-
 #find the first media player available
-dbus_o = bus.get_object("org.freedesktop.DBus", "/")
-dbus_intf = dbus.Interface(dbus_o, "org.freedesktop.DBus")
-name_list = dbus_intf.ListNames()
-name = ""
-for n in name_list:
-    if "org.mpris." in n:
-        name = n
-        break
+def Connect(name):
+    global root
+    global player
+    global tracklist
+    global bus
+    global playing
 
-if name == "":
-    print "No MPRIS enabled players on the bus !"
-    exit()
+    root_o = bus.get_object(name, "/")
+    player_o = bus.get_object(name, "/Player")
+    tracklist_o = bus.get_object(name, "/TrackList")
 
-
-root_o = bus.get_object(name, "/")
-player_o = bus.get_object(name, "/Player")
-tracklist_o = bus.get_object(name, "/TrackList")
-
-root = dbus.Interface(root_o, "org.freedesktop.MediaPlayer")
-tracklist  = dbus.Interface(tracklist_o, "org.freedesktop.MediaPlayer")
-player = dbus.Interface(player_o, "org.freedesktop.MediaPlayer")
-try:
+    root = dbus.Interface(root_o, "org.freedesktop.MediaPlayer")
+    tracklist  = dbus.Interface(tracklist_o, "org.freedesktop.MediaPlayer")
+    player = dbus.Interface(player_o, "org.freedesktop.MediaPlayer")
     player_o.connect_to_signal("TrackChange", itemchange_handler, dbus_interface="org.freedesktop.MediaPlayer")
-except:
-    True
+    if player.GetStatus() == 0:
+        gobject.timeout_add( 2000, timeset)
+        playing = True
+    window.set_title(root.Identity())
 
 #plays an element
 def AddTrack(widget):
@@ -122,7 +129,10 @@ def update(widget):
         t = item["title"]
     except:        t = ""
     if t == "":
-        t = item["URI"]
+        try:
+            t = item["URI"]
+        except:
+            t = ""
     l_artist.set_text(a)
     l_title.set_text(t)
     GetPlayStatus(0)
@@ -147,10 +157,25 @@ def Pause(widget):
     status = player.GetStatus()
     if status == 0:
         img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_SMALL_TOOLBAR)
-	gobject.timeout_add( 2000, timeset)
+        gobject.timeout_add( 2000, timeset)
     else:
         img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PLAY, gtk.ICON_SIZE_SMALL_TOOLBAR)
     update(0)
+
+def Repeat(widget):
+    global repeat
+    repeat = not repeat
+    player.Repeat(repeat)
+
+def Shuffle(widget):
+    global shuffle
+    shuffle = not shuffle
+    tracklist.Random(shuffle)
+
+def Loop(widget):
+    global loop
+    loop = not loop
+    tracklist.Loop(loop)
 
 #callback for volume
 def volchange(widget, data):
@@ -197,6 +222,7 @@ def tray_button(widget):
         window.move(position[0], position[1])
         window.show()
 
+#ui setup
 xml = gtk.glade.XML('mpris.glade')
 
 bt_close    = xml.get_widget('close')
@@ -207,6 +233,9 @@ bt_prev     = xml.get_widget('prev')
 bt_stop     = xml.get_widget('stop')
 bt_toggle   = xml.get_widget('toggle')
 bt_mrl      = xml.get_widget('AddMRL')
+bt_shuffle  = xml.get_widget('shuffle')
+bt_repeat   = xml.get_widget('repeat')
+bt_loop     = xml.get_widget('loop')
 l_artist    = xml.get_widget('l_artist')
 l_title     = xml.get_widget('l_title')
 e_mrl       = xml.get_widget('mrl')
@@ -236,6 +265,9 @@ bt_toggle.connect('clicked',    Pause)
 bt_next.connect('clicked',      Next)
 bt_prev.connect('clicked',      Prev)
 bt_stop.connect('clicked',      Stop)
+bt_loop.connect('clicked',      Loop)
+bt_repeat.connect('clicked',    Repeat)
+bt_shuffle.connect('clicked',   Shuffle)
 exp.connect('activate',         expander)
 vol.connect('change-value',     volchange)
 vol.connect('scroll-event',     volchange)
@@ -243,18 +275,35 @@ time_s.connect('adjust-bounds', timechange)
 audioicon.set_events(gtk.gdk.BUTTON_PRESS_MASK) 
 audioicon.connect('button_press_event', icon_clicked) 
 time_s.set_update_policy(gtk.UPDATE_DISCONTINUOUS)
-gobject.timeout_add( 2000, timeset)
 
-library = "/media/mp3"
+library = "/media/mp3" #editme
 
 try:
     os.chdir(library)
     bt_file.set_current_folder(library)
 except:
-    print "edit this file to point to your media library"
+    bt_file.set_current_folder(os.path.expanduser("~")
+
+#connect to the bus
+bus = dbus.SessionBus()
+dbus_names = bus.get_object( "org.freedesktop.DBus", "/org/freedesktop/DBus" )
+dbus_names.connect_to_signal("NameOwnerChanged", player_change, dbus_interface="org.freedesktop.DBus")
+
+dbus_o = bus.get_object("org.freedesktop.DBus", "/")
+dbus_intf = dbus.Interface(dbus_o, "org.freedesktop.DBus")
+name_list = dbus_intf.ListNames()
+name = ""
+for n in name_list:
+    if "org.mpris." in n:
+        name = n
+        break
+
+if name != "":
+    Connect(name)
+    window.set_title(root.Identity())
+    vol.set_value(player.VolumeGet())
 
 window.set_icon_name('audio-x-generic')
-window.set_title(root.Identity())
 window.show()
 
 try:
@@ -269,6 +318,5 @@ try:
 except:
     True
 position = window.get_position()
-vol.set_value(player.VolumeGet())
 
 gtk.main()
