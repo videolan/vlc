@@ -21,35 +21,35 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#define GETWORD(bit_buf,shift,bit_ptr)                \
-do {                                \
-    bit_buf |= ((bit_ptr[0] << 8) | bit_ptr[1]) << (shift);    \
-    bit_ptr += 2;                        \
+#define GETWORD(bit_buf,shift,bit_ptr)				\
+do {								\
+    bit_buf |= ((bit_ptr[0] << 8) | bit_ptr[1]) << (shift);	\
+    bit_ptr += 2;						\
 } while (0)
 
 static inline void bitstream_init (mpeg2_decoder_t * decoder,
-                   const uint8_t * start)
+				   const uint8_t * start)
 {
     decoder->bitstream_buf =
-    (start[0] << 24) | (start[1] << 16) | (start[2] << 8) | start[3];
+	(start[0] << 24) | (start[1] << 16) | (start[2] << 8) | start[3];
     decoder->bitstream_ptr = start + 4;
     decoder->bitstream_bits = -16;
 }
 
 /* make sure that there are at least 16 valid bits in bit_buf */
-#define NEEDBITS(bit_buf,bits,bit_ptr)        \
-do {                        \
-    if (unlikely (bits > 0)) {            \
-    GETWORD (bit_buf, bits, bit_ptr);    \
-    bits -= 16;                \
-    }                        \
+#define NEEDBITS(bit_buf,bits,bit_ptr)		\
+do {						\
+    if (unlikely (bits > 0)) {			\
+	GETWORD (bit_buf, bits, bit_ptr);	\
+	bits -= 16;				\
+    }						\
 } while (0)
 
 /* remove num valid bits from bit_buf */
-#define DUMPBITS(bit_buf,bits,num)    \
-do {                    \
-    bit_buf <<= (num);            \
-    bits += (num);            \
+#define DUMPBITS(bit_buf,bits,num)	\
+do {					\
+    bit_buf <<= (num);			\
+    bits += (num);			\
 } while (0)
 
 /* take num bits from the high part of bit_buf and zero extend them */

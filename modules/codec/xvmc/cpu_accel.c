@@ -81,15 +81,15 @@ static inline uint32_t arch_accel( void )
     AMD = (ebx == 0x68747541) && (ecx == 0x444d4163) && (edx == 0x69746e65);
 
     cpuid (0x00000001, eax, ebx, ecx, edx);
-    if (! (edx & 0x00800000))    /* no MMX */
+    if (! (edx & 0x00800000))	/* no MMX */
         return 0;
 
     caps = MPEG2_ACCEL_X86_MMX;
-    if (edx & 0x02000000)    /* SSE - identical to AMD MMX extensions */
+    if (edx & 0x02000000)	/* SSE - identical to AMD MMX extensions */
         caps = MPEG2_ACCEL_X86_MMX | MPEG2_ACCEL_X86_MMXEXT;
 
     cpuid (0x80000000, eax, ebx, ecx, edx);
-    if (eax < 0x80000001)    /* no extended capabilities */
+    if (eax < 0x80000001)	/* no extended capabilities */
         return caps;
 
     cpuid (0x80000001, eax, ebx, ecx, edx);
@@ -97,7 +97,7 @@ static inline uint32_t arch_accel( void )
     if (edx & 0x80000000)
         caps |= MPEG2_ACCEL_X86_3DNOW;
 
-    if (AMD && (edx & 0x00400000))    /* AMD MMX extensions */
+    if (AMD && (edx & 0x00400000))	/* AMD MMX extensions */
         caps |= MPEG2_ACCEL_X86_MMXEXT;
 
     return caps;

@@ -105,7 +105,7 @@ void mpeg2_xxmc_slice( mpeg2dec_t *mpeg2dec, picture_t *picture,
         /*
          * Check that first field went through OK. Otherwise,
          * indicate bad frame.
-         */
+         */ 
         if (decoder->second_field)
         {
             mpeg2dec->xvmc_last_slice_code = (xxmc->decoded) ? 0 : -1;
@@ -238,7 +238,7 @@ void mpeg2_xxmc_slice( mpeg2dec_t *mpeg2dec, picture_t *picture,
         if (xxmc->result != 0)
         {
             //xxmc->proc_xxmc_flushsync( picture );
-            xxmc->proc_xxmc_flush( picture );    
+            xxmc->proc_xxmc_flush( picture );	
             mpeg2dec->xvmc_last_slice_code=-1;
             return;
         }
@@ -276,7 +276,7 @@ void mpeg2_xxmc_slice( mpeg2dec_t *mpeg2dec, picture_t *picture,
     }
 }
 
-void mpeg2_xxmc_vld_frame_complete(mpeg2dec_t *mpeg2dec, picture_t *picture, int code)
+void mpeg2_xxmc_vld_frame_complete(mpeg2dec_t *mpeg2dec, picture_t *picture, int code) 
 {
     vlc_xxmc_t *xxmc = (vlc_xxmc_t *) picture->p_data;
     vlc_vld_frame_t *vft = &xxmc->vld_frame;

@@ -99,7 +99,7 @@ static inline int copy_chunk( mpeg2dec_t * mpeg2dec, int bytes )
 
             mpeg2dec->shift = 0xffffff00;
             mpeg2dec->chunk_size = chunk_ptr - mpeg2dec->chunk_start - 3;
-            mpeg2dec->chunk_ptr = chunk_ptr + 1;
+            mpeg2dec->chunk_ptr = chunk_ptr + 1;   
             copied = current - mpeg2dec->buf_start;
             mpeg2dec->buf_start = current;
             return copied;

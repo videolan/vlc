@@ -2,7 +2,7 @@
 /* include/config.h.in.  Generated from configure.in by autoheader.  */
 
 /* autodetect accelerations */
-#define ACCEL_DETECT
+#define ACCEL_DETECT 
 
 /* alpha architecture */
 /* #undef ARCH_ALPHA */
@@ -14,7 +14,7 @@
 /* #undef ARCH_SPARC */
 
 /* x86 architecture */
-#define ARCH_X86
+#define ARCH_X86 
 
 /* maximum supported data alignment */
 #define ATTRIBUTE_ALIGNED_MAX 64
@@ -26,7 +26,7 @@
 /* #undef HAVE_ALTIVEC_H */
 
 /* Define if you have the `__builtin_expect' function. */
-#define HAVE_BUILTIN_EXPECT
+#define HAVE_BUILTIN_EXPECT 
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
@@ -86,10 +86,10 @@
 /* #undef LIBVO_SDL */
 
 /* libvo X11 support */
-#define LIBVO_X11
+#define LIBVO_X11 
 
 /* libvo Xv support */
-#define LIBVO_XV
+#define LIBVO_XV 
 
 /* mpeg2dec profiling */
 /* #undef MPEG2DEC_GPROF */
