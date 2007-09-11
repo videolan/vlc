@@ -692,7 +692,8 @@ static int AddToQueue ( intf_thread_t *p_this )
         NO_SUBMISSION
     }
 
-    if( !*p_sys->p_current_song->psz_a || !*p_sys->p_current_song->psz_t )
+    if( !p_sys->p_current_song->psz_a || !*p_sys->p_current_song->psz_a ||
+        !p_sys->p_current_song->psz_t || !*p_sys->p_current_song->psz_t )
     {
         msg_Dbg( p_this, "Missing artist or title -> not submitting" );
         NO_SUBMISSION
