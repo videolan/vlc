@@ -79,7 +79,8 @@
 #define ADD_BYTE( b ) DBUS_ADD( DBUS_TYPE_BYTE, b )
 
 /* VLC related */
-#define TEST_NEXT \
+/* Don't forget to test p_tested_item for NULL on loops */
+#define TEST_NEXT_ITEM \
     p_tested_item = playlist_GetNextLeaf( p_playlist, \
             p_playlist->p_root_onelevel, p_tested_item, VLC_FALSE, VLC_FALSE );
 
@@ -146,8 +147,6 @@ const char* psz_introspection_xml_data_player =
 "    </method>\n"
 "    <method name=\"GetMetadata\">\n"
 "      <arg type=\"a{sv}\" direction=\"out\" />\n"
-"    </method>\n"
-"    <method name=\"Disconnect\">\n"
 "    </method>\n"
 "    <signal name=\"TrackChange\">\n"
 "      <arg type=\"a{sv}\"/>\n"

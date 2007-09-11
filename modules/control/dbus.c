@@ -83,58 +83,6 @@ vlc_module_end();
 /*****************************************************************************
  * Methods
  *****************************************************************************/
-#if 0
-DBUS_METHOD( PlaylistExport_XSPF )
-{ /*export playlist to an xspf file */
-
-  /* reads the filename to export to */
-  /* returns the status as int32:
-   *    0 : success
-   *    1 : error
-   *    2 : playlist empty
-   */
-    REPLY_INIT;
-    OUT_ARGUMENTS;
-
-    DBusError error;
-    dbus_error_init( &error );
-
-    char *psz_file;
-    dbus_int32_t i_ret;
-
-    dbus_message_get_args( p_from, &error,
-            DBUS_TYPE_STRING, &psz_file,
-            DBUS_TYPE_INVALID );
-
-    if( dbus_error_is_set( &error ) )
-    {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
-                error.message );
-        dbus_error_free( &error );
-        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-    }
-
-    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-
-    if( ( !playlist_IsEmpty( p_playlist ) ) &&
-            ( p_playlist->p_root_category->i_children > 0 ) )
-    {
-        if( playlist_Export( p_playlist, psz_file,
-                         p_playlist->p_root_category->pp_children[0],
-                         "export-xspf" ) == VLC_SUCCESS )
-            i_ret = 0;
-        else
-            i_ret = 1;
-    }
-    else
-        i_ret = 2;
-
-    pl_Release( ((vlc_object_t*) p_this ) );
-
-    ADD_INT32( &i_ret );
-    REPLY_SEND;
-}
-#endif
 
 /* Player */
 
@@ -317,29 +265,14 @@ DBUS_METHOD( Play )
     REPLY_SEND;
 }
 
-DBUS_METHOD( Disconnect )
-{
-    REPLY_INIT;
-    DBusError error;
-    int i;
-    dbus_error_init( &error );
-    i = dbus_bus_release_name( p_conn, VLC_MPRIS_DBUS_SERVICE, &error );
-    if( ( i == -1 ) && ( dbus_error_is_set( &error ) ) )
-    {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus disconnection failed : %s\n",
-            error.message );
-        dbus_error_free( &error );
-    }
-    REPLY_SEND;
-}
-
 DBUS_METHOD( GetCurrentMetadata )
 {
     REPLY_INIT;
     OUT_ARGUMENTS;
     playlist_t* p_playlist = pl_Yield( (vlc_object_t*) p_this );
 
-    GetInputMeta( p_playlist->status.p_item->p_input, &args );
+    if( p_playlist->status.p_item )
+        GetInputMeta( p_playlist->status.p_item->p_input, &args );
 
     pl_Release( p_playlist );
     REPLY_SEND;
@@ -397,17 +330,19 @@ DBUS_METHOD( GetCurrentTrack )
 {
     REPLY_INIT;
     OUT_ARGUMENTS;
+    /* FIXME 0 indicates the first item,
+     * what to do if we're stopped, or empty ? */
     dbus_int32_t i_position = 0;
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
 
-    while ( p_tested_item->p_input->i_id !=
-                    p_playlist->status.p_item->p_input->i_id )
+    while ( p_tested_item && p_tested_item->p_input->i_id !=
+                p_playlist->status.p_item->p_input->i_id )
     {
         i_position++;
-        TEST_NEXT;
+        TEST_NEXT_ITEM;
     }
-
+    /* FIXME if p_tested_item is NULL at that point, what do we do ? */
     pl_Release( p_playlist );
 
     ADD_INT32( &i_position );
@@ -427,8 +362,8 @@ DBUS_METHOD( GetMetadata )
     playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
 
     dbus_message_get_args( p_from, &error,
-            DBUS_TYPE_INT32, &i_position,
-            DBUS_TYPE_INVALID );
+           DBUS_TYPE_INT32, &i_position,
+           DBUS_TYPE_INVALID );
 
     if( dbus_error_is_set( &error ) )
     {
@@ -438,13 +373,14 @@ DBUS_METHOD( GetMetadata )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    while ( i_count < i_position )
+    while ( p_tested_item && ( i_count < i_position ) )
     {
         i_count++;
-        TEST_NEXT;
+        TEST_NEXT_ITEM;
     }
 
-    GetInputMeta ( p_tested_item->p_input, &args );
+    if( p_tested_item )
+        GetInputMeta ( p_tested_item->p_input, &args );
 
     pl_Release( p_playlist );
     REPLY_SEND;
@@ -461,10 +397,11 @@ DBUS_METHOD( GetLength )
     playlist_item_t* p_last_item = playlist_GetLastLeaf( p_playlist,
                     p_playlist->p_root_onelevel );
 
-    while ( p_tested_item->p_input->i_id != p_last_item->p_input->i_id )
+    while ( p_tested_item &&
+               ( p_tested_item->p_input->i_id != p_last_item->p_input->i_id ) )
     {
         i_elements++;
-        TEST_NEXT;
+        TEST_NEXT_ITEM;
     }
 
     pl_Release( p_playlist );
@@ -496,17 +433,20 @@ DBUS_METHOD( DelTrack )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    while ( i_count < i_position )
+    while ( p_tested_item && ( i_count < i_position ) )
     {
         i_count++;
-        TEST_NEXT;
+        TEST_NEXT_ITEM;
     }
 
-    PL_LOCK;
-    playlist_DeleteFromInput( p_playlist,
-        p_tested_item->p_input->i_id,
-        VLC_TRUE );
-    PL_UNLOCK;
+    if( p_tested_item )
+    {
+        PL_LOCK;
+        playlist_DeleteFromInput( p_playlist,
+            p_tested_item->p_input->i_id,
+            VLC_TRUE );
+        PL_UNLOCK;
+    }
 
     pl_Release( p_playlist );
 
@@ -673,7 +613,6 @@ DBUS_METHOD( handle_player )
     METHOD_FUNC( "Play",                    Play );
     METHOD_FUNC( "Pause",                   Pause );
     METHOD_FUNC( "Repeat",                  Repeat );
-    METHOD_FUNC( "Disconnect",              Disconnect );
     METHOD_FUNC( "VolumeSet",               VolumeSet );
     METHOD_FUNC( "VolumeGet",               VolumeGet );
     METHOD_FUNC( "PositionSet",             PositionSet );
@@ -737,8 +676,8 @@ static int Open( vlc_object_t *p_this )
     dbus_bus_request_name( p_conn, VLC_MPRIS_DBUS_SERVICE, 0, &error );
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( p_this, "Error requesting % service: %s\n"
-        VLC_MPRIS_DBUS_SERVICE, error.message );
+        msg_Err( p_this, "Error requesting service " VLC_MPRIS_DBUS_SERVICE
+                 ": %s", error.message );
         dbus_error_free( &error );
         free( p_sys );
         return VLC_EGENERIC;
@@ -909,7 +848,8 @@ static int GetInputMeta( input_item_t* p_input,
     ADD_VLC_META_STRING( 16, TrackID );
 
     vlc_mutex_lock( &p_input->lock );
-    ADD_META( 17, DBUS_TYPE_INT32, p_input->p_meta->i_status );
+    if( p_input->p_meta )
+        ADD_META( 17, DBUS_TYPE_INT32, p_input->p_meta->i_status );
     vlc_mutex_unlock( &p_input->lock );
 
     ADD_VLC_META_STRING( 18, URI );
