@@ -169,7 +169,7 @@ vsdp_AddAttribute (char **sdp, const char *name, const char *fmt, va_list ap)
         return NULL;
 
     oldlen += sprintf (ret + oldlen, "a=%s:", name);
-    oldlen += sprintf (ret + oldlen, fmt, ap);
+    oldlen += vsprintf (ret + oldlen, fmt, ap);
     strcpy (ret + oldlen, "\r\n");
     return *sdp = ret;
 }
@@ -227,7 +227,7 @@ char *sdp_AddMedia (char **sdp,
     *sdp = newsdp;
     ptr = newsdp + inlen;
 
-    ptr += sprintf (ptr, "m=%s %u %s %d\r\n"
+    ptr += sprintf (ptr, "m=%s %u %s %u\r\n"
                          "b=RR:0\r\n",
                          type, dport, protocol, pt);
 
