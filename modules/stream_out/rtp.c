@@ -419,21 +419,11 @@ static int Open( vlc_object_t *p_this )
     if( psz != NULL )
     {
         sout_stream_id_t *id;
-        const char *psz_rtpmap;
-        int i_payload_type;
 
         /* Check muxer type */
-        if( !strncasecmp( psz, "ps", 2 )
-         || !strncasecmp( psz, "mpeg1", 5 ) )
-        {
-            psz_rtpmap = "MP2P/90000";
-        }
-        else if( !strncasecmp( psz, "ts", 2 ) )
-        {
-            psz_rtpmap = "MP2T/90000";
-            i_payload_type = 33;
-        }
-        else
+        if( strncasecmp( psz, "ps", 2 )
+         && strncasecmp( psz, "mpeg1", 5 )
+         && strncasecmp( psz, "ts", 2 ) )
         {
             msg_Err( p_stream, "unsupported muxer type for RTP (only TS/PS)" );
             free( psz );
@@ -467,9 +457,6 @@ static int Open( vlc_object_t *p_this )
             free( p_sys );
             return VLC_EGENERIC;
         }
-
-        id->psz_rtpmap = strdup( psz_rtpmap );
-        id->i_payload_type = i_payload_type;
 
         p_sys->packet = NULL;
 
@@ -736,15 +723,8 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
             continue;
 
         sdp_AddMedia( &psz_sdp, mime_major, "RTP/AVP", inclport * id->i_port,
-                     id->i_payload_type, VLC_FALSE, id->i_bitrate,
-                     id->psz_rtpmap, id->psz_fmtp);
-
-#if 0
-        if ( id->i_bitrate )
-        {
-            p += sprintf(p,"b=AS:%d\r\n",id->i_bitrate);
-        }
-#endif
+                      id->i_payload_type, VLC_FALSE, id->i_bitrate,
+                      id->psz_rtpmap, id->psz_fmtp);
 
         if( rtsp_url != NULL )
             sdp_AddAttribute ( &psz_sdp, "control", "/trackID=%d", i );
@@ -892,7 +872,22 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     }
 
     if( p_fmt == NULL )
-        ;
+    {
+        char *psz = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "mux" );
+
+        if( psz == NULL ) /* Uho! */
+            ;
+        else
+        if( strncmp( psz, "ts", 2 ) == 0 )
+        {
+            id->i_payload_type = 33;
+            id->psz_rtpmap = strdup( "MP2T/90000" );
+        }
+        else
+        {
+            id->psz_rtpmap = strdup( "MP2P/90000" );
+        }
+    }
     else
     switch( p_fmt->i_codec )
     {
