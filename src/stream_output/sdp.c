@@ -232,10 +232,10 @@ char *sdp_AddMedia (char **sdp,
 
     /* RTP payload type map */
     if (rtpmap != NULL)
-        sdp_AddAttribute ("rtpmap", "%u %s", pt, rtpmap);
+        sdp_AddAttribute (sdp, "rtpmap", "%u %s", pt, rtpmap);
     /* Format parameters */
     if (fmtp != NULL)
-        sdp_AddAttribute ("fmtp", "%u %s", pt, fmtp);
+        sdp_AddAttribute (sdp, "fmtp", "%u %s", pt, fmtp);
 
     return newsdp;
 }
