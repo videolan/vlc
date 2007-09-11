@@ -93,6 +93,7 @@ vlc_module_begin();
     add_shortcut( "http" );
     add_shortcut( "https" );
     add_shortcut( "unsv" );
+    add_shortcut( "itpc" ); /* iTunes Podcast */
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -398,6 +399,10 @@ connect:
     {
         /* Grrrr! detect ultravox server and force NSV demuxer */
         p_access->psz_demux = strdup( "nsv" );
+    }
+    else if( !strcmp( p_access->psz_access, "itpc" ) )
+    {
+        p_access->psz_demux = strdup( "podcast" );
     }
     else if( p_sys->psz_mime &&
              !strncasecmp( p_sys->psz_mime, "application/xspf+xml", 20 ) &&
