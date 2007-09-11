@@ -161,6 +161,8 @@ static char *
 vsdp_AddAttribute (char **sdp, const char *name, const char *fmt, va_list ap)
 {
     size_t oldlen = strlen (*sdp);
+    va_list aq;
+    va_copy ( aq, ap );
     size_t addlen =
         sizeof ("a=:\r\n") + strlen (name) + vsnprintf (NULL, 0, fmt, ap);
     char *ret = realloc (*sdp, oldlen + addlen);
@@ -169,7 +171,8 @@ vsdp_AddAttribute (char **sdp, const char *name, const char *fmt, va_list ap)
         return NULL;
 
     oldlen += sprintf (ret + oldlen, "a=%s:", name);
-    oldlen += vsprintf (ret + oldlen, fmt, ap);
+    oldlen += vsprintf (ret + oldlen, fmt, aq);
+    va_end (aq);
     strcpy (ret + oldlen, "\r\n");
     return *sdp = ret;
 }
