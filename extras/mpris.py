@@ -282,7 +282,7 @@ try:
     os.chdir(library)
     bt_file.set_current_folder(library)
 except:
-    bt_file.set_current_folder(os.path.expanduser("~")
+    bt_file.set_current_folder(os.path.expanduser("~"))
 
 #connect to the bus
 bus = dbus.SessionBus()
