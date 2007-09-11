@@ -185,7 +185,7 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
 
     snprintf( urlbuf, sizeof( urlbuf ), "/%s/trackID=%u", rtsp->psz_path,
               num );
-    msg_Dbg( rtsp->owner, "RTSP: adding %s\n", urlbuf );
+    msg_Dbg( rtsp->owner, "RTSP: adding %s", urlbuf );
     url = id->url = httpd_UrlNewUnique( rtsp->host, urlbuf, NULL, NULL, NULL );
 
     if( url == NULL )
