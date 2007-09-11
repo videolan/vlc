@@ -169,7 +169,8 @@ vsdp_AddAttribute (char **sdp, const char *name, const char *fmt, va_list ap)
         return NULL;
 
     oldlen += sprintf (ret + oldlen, "a=%s:", name);
-    sprintf (ret + oldlen, fmt, ap);
+    oldlen += sprintf (ret + oldlen, fmt, ap);
+    strcpy (ret + oldlen, "\r\n");
     return *sdp = ret;
 }
 
