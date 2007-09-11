@@ -25,7 +25,7 @@ typedef struct VAL_EXPR_T {
 /* Infix Operator Function */
 typedef struct INFIX_OP_T {
   int type;
-  int precedence;
+  int precedence;  
 } infix_op_t;
 
 /* A binary expression tree ordered by operator precedence */

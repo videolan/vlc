@@ -21,7 +21,7 @@
 #define INFIX_OR 5
 #define INFIX_AND 6
 
-//#define EVAL_DEBUG
+//#define EVAL_DEBUG 
 
 
 inline double eval_gen_expr(gen_expr_t * gen_expr);

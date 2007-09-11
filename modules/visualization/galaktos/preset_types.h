@@ -5,7 +5,7 @@
 #include "expr_types.h"
 #include "per_pixel_eqn_types.h"
 
-typedef enum {    
+typedef enum {	
   ALPHA_NEXT,
   ALPHA_PREVIOUS,
   RANDOM_NEXT,
@@ -13,14 +13,14 @@ typedef enum {
 } switch_mode_t;
 
 typedef struct PRESET_T {
- 
+  
   char name[MAX_TOKEN_SIZE]; /* preset name as parsed in file */
   char file_path[MAX_PATH_SIZE]; /* Points to the preset file name */
- 
+  
   int per_pixel_eqn_string_index;
   int per_frame_eqn_string_index;
   int per_frame_init_eqn_string_index;
-    
+	
   int per_pixel_flag[NUM_OPS];
   char per_pixel_eqn_string_buffer[STRING_BUFFER_SIZE];
   char per_frame_eqn_string_buffer[STRING_BUFFER_SIZE];

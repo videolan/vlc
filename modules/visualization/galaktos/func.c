@@ -24,16 +24,16 @@ void * copy_func_key(char * string);
 
 
 void * copy_func_key(char * string) {
-    
-    char * clone_string;
-    
-    if ((clone_string = malloc(MAX_TOKEN_SIZE)) == NULL)
-        return NULL;
-    
-    strncpy(clone_string, string, MAX_TOKEN_SIZE-1);
-    
-    return (void*)clone_string;
-}    
+	
+	char * clone_string;
+	
+	if ((clone_string = malloc(MAX_TOKEN_SIZE)) == NULL)
+		return NULL;
+	
+	strncpy(clone_string, string, MAX_TOKEN_SIZE-1);
+	
+	return (void*)clone_string;
+}	
 
 
 func_t * create_func (char * name, double (*func_ptr)(), int num_args) {
@@ -44,12 +44,12 @@ func_t * create_func (char * name, double (*func_ptr)(), int num_args) {
   if (func == NULL)
     return NULL;
 
- 
+  
   /* Clear name space */
   memset(func->name, 0, MAX_TOKEN_SIZE);
 
   /* Copy given name into function structure */
-  strncpy(func->name, name, MAX_TOKEN_SIZE);
+  strncpy(func->name, name, MAX_TOKEN_SIZE); 
 
   /* Assign value pointer */
   func->func_ptr = func_ptr;
@@ -118,7 +118,7 @@ func_t * find_func(char * name) {
 
   /* First look in the builtin database */
   func = (func_t *)splay_find(name, builtin_func_tree);
-    
+	
   return func;
 
 }
@@ -130,15 +130,15 @@ int compare_func(char * name, char * name2) {
 
   /* Uses string comparison function */
   cmpval = strncmp(name, name2, MAX_TOKEN_SIZE-1);
- 
+  
   return cmpval;
 }
 
 /* Loads a builtin function */
 int load_builtin_func(char * name,  double (*func_ptr)(), int num_args) {
 
-  func_t * func;
-  int retval;
+  func_t * func; 
+  int retval; 
 
   /* Create new function */
   func = create_func(name, func_ptr, num_args);
@@ -155,7 +155,7 @@ int load_builtin_func(char * name,  double (*func_ptr)(), int num_args) {
 /* Loads all builtin functions */
 int load_all_builtin_func() {
 
- 
+  
   if (load_builtin_func("int", int_wrapper, 1) < 0)
     return ERROR;
   if (load_builtin_func("abs", abs_wrapper, 1) < 0)

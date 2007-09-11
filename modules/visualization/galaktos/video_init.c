@@ -43,7 +43,7 @@ extern char *buffer;
 
 void setup_opengl( int w, int h )
 {
- 
+   
     /* Our shading model--Gouraud (smooth). */
      glShadeModel( GL_SMOOTH);
     /* Culling. */
@@ -60,21 +60,21 @@ void setup_opengl( int w, int h )
      */
     glMatrixMode(GL_TEXTURE);
     glLoadIdentity();
- 
+    
     //    gluOrtho2D(0.0, (GLfloat) width, 0.0, (GLfloat) height);
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
- 
+    glLoadIdentity();  
+   
     //    glFrustum(0.0, height, 0.0,width,10,40);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-glDrawBuffer(GL_BACK);
-  glReadBuffer(GL_BACK);
-  glEnable(GL_BLEND);
+glDrawBuffer(GL_BACK); 
+  glReadBuffer(GL_BACK); 
+  glEnable(GL_BLEND); 
 
-     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-     // glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+     // glBlendFunc(GL_SRC_ALPHA, GL_ONE); 
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_POINT_SMOOTH);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -83,8 +83,8 @@ glDrawBuffer(GL_BACK);
   // glCopyTexImage2D(GL_TEXTURE_2D,0,GL_RGB,0,0,texsize,texsize,0);
   //glCopyTexSubImage2D(GL_TEXTURE_2D,0,0,0,0,0,texsize,texsize);
    glLineStipple(2, 0xAAAA);
- 
- 
+  
+    
 }
 
 void CreateRenderTarget(int texsize,int *RenderTargetTextureID, int *RenderTarget )
@@ -98,23 +98,23 @@ void CreateRenderTarget(int texsize,int *RenderTargetTextureID, int *RenderTarge
     /* Create the render target */
     *RenderTarget = SDL_GL_CreateRenderTarget(texsize,texsize, NULL);
         if ( *RenderTarget ) {
- 
-    int value;
+    
+	int value;
 
-    //printf("Created render target:\n");
-    SDL_GL_GetRenderTargetAttribute( *RenderTarget, SDL_GL_RED_SIZE, &value );
-    //    printf( "SDL_GL_RED_SIZE: %d\n", value);
-    SDL_GL_GetRenderTargetAttribute( *RenderTarget, SDL_GL_GREEN_SIZE, &value );
-    //    printf( "SDL_GL_GREEN_SIZE: %d\n", value);
-    SDL_GL_GetRenderTargetAttribute( *RenderTarget, SDL_GL_BLUE_SIZE, &value );
-    //    printf( "SDL_GL_BLUE_SIZE: %d\n", value);
-    SDL_GL_GetRenderTargetAttribute( *RenderTarget, SDL_GL_ALPHA_SIZE, &value );
-    //    printf( "SDL_GL_ALPHA_SIZE: %d\n", value);
-    SDL_GL_GetRenderTargetAttribute( *RenderTarget, SDL_GL_DEPTH_SIZE, &value );
-    //    printf( "SDL_GL_DEPTH_SIZE: %d\n", value );
+	//printf("Created render target:\n");
+	SDL_GL_GetRenderTargetAttribute( *RenderTarget, SDL_GL_RED_SIZE, &value );
+	//	printf( "SDL_GL_RED_SIZE: %d\n", value);
+	SDL_GL_GetRenderTargetAttribute( *RenderTarget, SDL_GL_GREEN_SIZE, &value );
+	//	printf( "SDL_GL_GREEN_SIZE: %d\n", value);
+	SDL_GL_GetRenderTargetAttribute( *RenderTarget, SDL_GL_BLUE_SIZE, &value );
+	//	printf( "SDL_GL_BLUE_SIZE: %d\n", value);
+	SDL_GL_GetRenderTargetAttribute( *RenderTarget, SDL_GL_ALPHA_SIZE, &value );
+	//	printf( "SDL_GL_ALPHA_SIZE: %d\n", value);
+	SDL_GL_GetRenderTargetAttribute( *RenderTarget, SDL_GL_DEPTH_SIZE, &value );
+	//	printf( "SDL_GL_DEPTH_SIZE: %d\n", value );
 
-    SDL_GL_BindRenderTarget(*RenderTarget, *RenderTargetTextureID);
- 
+	SDL_GL_BindRenderTarget(*RenderTarget, *RenderTargetTextureID);
+       
     } else {
 #endif
         /* We can fake a render target in this demo by rendering to the
@@ -124,13 +124,13 @@ void CreateRenderTarget(int texsize,int *RenderTargetTextureID, int *RenderTarge
 
         glBindTexture(GL_TEXTURE_2D, *RenderTargetTextureID);
         glTexImage2D(GL_TEXTURE_2D,
-            0,
-            GL_RGB,
-            texsize, texsize,
-            0,
-            GL_RGB,
-            GL_UNSIGNED_BYTE,
-            buffer);
+			0,
+			GL_RGB,
+			texsize, texsize,
+			0,
+			GL_RGB,
+			GL_UNSIGNED_BYTE,
+			buffer);
  //   }
 
 }

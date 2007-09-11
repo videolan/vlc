@@ -23,7 +23,7 @@ typedef struct CUSTOM_SHAPE_T {
 
   double tex_zoom;
   double tex_ang;
- 
+  
   double x; /* x position for per point equations */
   double y; /* y position for per point equations */
   double rad;
@@ -67,8 +67,8 @@ typedef struct CUSTOM_SHAPE_T {
   char per_frame_eqn_string_buffer[STRING_BUFFER_SIZE];
   char per_frame_init_eqn_string_buffer[STRING_BUFFER_SIZE];
   /* Per point equation array */
- 
- 
+  
+  
 } custom_shape_t;
 
 

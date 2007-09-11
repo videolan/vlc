@@ -29,12 +29,12 @@
 /* Compares integer value numbers in 32 bit range */
 int compare_int(int * num1, int * num2) {
 
-    if ((*num1) < (*num2))
-        return -1;
-    if ((*num1) > (*num2))
-        return 1;
-    
-    return 0;
+	if ((*num1) < (*num2))
+		return -1;
+	if ((*num1) > (*num2))
+		return 1;
+	
+	return 0;
 }
 
 /* Compares strings in lexographical order */
@@ -43,8 +43,8 @@ int compare_string(char * str1, char * str2) {
   //  printf("comparing \"%s\" to \"%s\"\n", str1, str2);
   //return strcmp(str1, str2);
   return strncmp(str1, str2, MAX_TOKEN_SIZE-1);
-    
-}    
+	
+}	
 
 /* Compares a string in version order. That is, file1 < file2 < file10 */
 int compare_string_version(char * str1, char * str2) {
@@ -55,36 +55,36 @@ int compare_string_version(char * str1, char * str2) {
 
 
 void free_int(void * num) {
-    free(num);
+	free(num);
 }
 
 
 void free_string(char * string) {
-    
-    free(string);    
-}    
+	
+	free(string);	
+}	
  
 void * copy_int(int * num) {
-    
-    int * new_num;
-    
-    if ((new_num = (int*)malloc(sizeof(int))) == NULL)
-        return NULL;
+	
+	int * new_num;
+	
+	if ((new_num = (int*)malloc(sizeof(int))) == NULL)
+		return NULL;
 
-    *new_num = *num;
-    
-    return (void*)new_num;
-}    
+	*new_num = *num;
+	
+	return (void*)new_num;
+}	
 
 
 void * copy_string(char * string) {
-    
-    char * new_string;
-    
-    if ((new_string = (char*)malloc(MAX_TOKEN_SIZE)) == NULL)
-        return NULL;
-    
-    strncpy(new_string, string, MAX_TOKEN_SIZE-1);
-    
-    return (void*)new_string;
+	
+	char * new_string;
+	
+	if ((new_string = (char*)malloc(MAX_TOKEN_SIZE)) == NULL)
+		return NULL;
+	
+	strncpy(new_string, string, MAX_TOKEN_SIZE-1);
+	
+	return (void*)new_string;
 }

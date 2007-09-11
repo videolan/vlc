@@ -72,7 +72,7 @@ custom_wave_t * new_custom_wave(int id) {
 
   custom_wave_t * custom_wave;
   param_t * param;
- 
+  
   if ((custom_wave = (custom_wave_t*)malloc(sizeof(custom_wave_t))) == NULL)
     return NULL;
 
@@ -103,38 +103,38 @@ custom_wave_t * new_custom_wave(int id) {
   custom_wave->sample_mesh = malloc(MAX_SAMPLE_SIZE*sizeof(double));
 
   /* Initialize tree data structures */
- 
-  if ((custom_wave->param_tree =
+  
+  if ((custom_wave->param_tree = 
        create_splaytree(compare_string, copy_string, free_string)) == NULL) {
     free_custom_wave(custom_wave);
     return NULL;
   }
 
-  if ((custom_wave->per_point_eqn_tree =
+  if ((custom_wave->per_point_eqn_tree = 
        create_splaytree(compare_int, copy_int, free_int)) == NULL) {
     free_custom_wave(custom_wave);
     return NULL;
   }
 
-  if ((custom_wave->per_frame_eqn_tree =
+  if ((custom_wave->per_frame_eqn_tree = 
        create_splaytree(compare_int, copy_int, free_int)) == NULL) {
     free_custom_wave(custom_wave);
     return NULL;
   }
 
-  if ((custom_wave->init_cond_tree =
+  if ((custom_wave->init_cond_tree = 
        create_splaytree(compare_string, copy_string, free_string)) == NULL) {
     free_custom_wave(custom_wave);
     return NULL;
   }
- 
-  if ((custom_wave->per_frame_init_eqn_tree =
+  
+  if ((custom_wave->per_frame_init_eqn_tree = 
        create_splaytree(compare_string, copy_string, free_string)) == NULL) {
     free_custom_wave(custom_wave);
     return NULL;
   }
 
- 
+  
   /* Start: Load custom wave parameters */
 
   if ((param = new_param_double("r", P_FLAG_DONT_FREE_MATRIX | P_FLAG_PER_POINT, &custom_wave->r, custom_wave->r_mesh, 1.0, 0.0, .5)) == NULL) {
@@ -159,7 +159,7 @@ custom_wave_t * new_custom_wave(int id) {
 
   if ((param = new_param_double("b", P_FLAG_DONT_FREE_MATRIX | P_FLAG_PER_POINT, &custom_wave->b,  custom_wave->b_mesh, 1.0, 0.0, .5)) == NULL){
     free_custom_wave(custom_wave);
-    return NULL;                
+    return NULL;				       
   }
 
   if (insert_param(param, custom_wave->param_tree) < 0) {
@@ -171,7 +171,7 @@ custom_wave_t * new_custom_wave(int id) {
     free_custom_wave(custom_wave);
     return NULL;
   }
- 
+  
   if (insert_param(param, custom_wave->param_tree) < 0) {
     free_custom_wave(custom_wave);
     return NULL;
@@ -268,7 +268,7 @@ custom_wave_t * new_custom_wave(int id) {
   }
 
   if ((param = new_param_double("sample", P_FLAG_READONLY | P_FLAG_DONT_FREE_MATRIX | P_FLAG_ALWAYS_MATRIX | P_FLAG_PER_POINT,
-                &custom_wave->sample, custom_wave->sample_mesh, 1.0, 0.0, 0.0)) == NULL) {
+				&custom_wave->sample, custom_wave->sample_mesh, 1.0, 0.0, 0.0)) == NULL) {
     free_custom_wave(custom_wave);
     return NULL;
   }
@@ -394,9 +394,9 @@ custom_wave_t * new_custom_wave(int id) {
     free_custom_wave(custom_wave);
     return NULL;
   }
- 
+  
   /* End of parameter loading. Note that the read only parameters associated
-     with custom waves (ie, sample) are global variables, and not specific to
+     with custom waves (ie, sample) are global variables, and not specific to 
      the custom wave datastructure. */
 
 
@@ -498,12 +498,12 @@ int add_per_point_eqn(char * name, gen_expr_t * gen_expr, custom_wave_t * custom
 
   /* Argument checks */
   if (custom_wave == NULL)
-      return FAILURE;
+	  return FAILURE;
   if (gen_expr == NULL)
-      return FAILURE;
+	  return FAILURE;
   if (name == NULL)
-      return FAILURE;
- 
+	  return FAILURE;
+  
  if (CUSTOM_WAVE_DEBUG) printf("add_per_point_eqn: per pixel equation (name = \"%s\")\n", name);
 
  /* Search for the parameter so we know what matrix the per pixel equation is referencing */
@@ -512,7 +512,7 @@ int add_per_point_eqn(char * name, gen_expr_t * gen_expr, custom_wave_t * custom
    if (CUSTOM_WAVE_DEBUG) printf("add_per_point_eqn: failed to allocate a new parameter!\n");
    return FAILURE;
  
- }     
+ } 	 
 
  /* Find most largest index in the splaytree */
  if ((per_point_eqn = splay_find_max(custom_wave->per_point_eqn_tree)) == NULL)
@@ -522,49 +522,49 @@ int add_per_point_eqn(char * name, gen_expr_t * gen_expr, custom_wave_t * custom
 
  /* Create the per pixel equation given the index, parameter, and general expression */
  if ((per_point_eqn = new_per_point_eqn(index, param, gen_expr)) == NULL)
-     return FAILURE;
- if (CUSTOM_WAVE_DEBUG)
+	 return FAILURE;
+ if (CUSTOM_WAVE_DEBUG) 
    printf("add_per_point_eqn: created new equation (index = %d) (name = \"%s\")\n", per_point_eqn->index, per_point_eqn->param->name);
  /* Insert the per pixel equation into the preset per pixel database */
  if (splay_insert(per_point_eqn, &per_point_eqn->index, custom_wave->per_point_eqn_tree) < 0) {
-    free_per_point_eqn(per_point_eqn);
-    return FAILURE;    
+	free_per_point_eqn(per_point_eqn);
+	return FAILURE;	 
  }
-    
- /* Done */
+	 
+ /* Done */ 
  return SUCCESS;
 }
 
 per_point_eqn_t * new_per_point_eqn(int index, param_t * param, gen_expr_t * gen_expr) {
 
-    per_point_eqn_t * per_point_eqn;
-    
-    if (param == NULL)
-        return NULL;
-    if (gen_expr == NULL)
-        return NULL;
+	per_point_eqn_t * per_point_eqn;
+	
+	if (param == NULL)
+		return NULL;
+	if (gen_expr == NULL)
+		return NULL;
 
-    if ((per_point_eqn = (per_point_eqn_t*)malloc(sizeof(per_point_eqn_t))) == NULL)
-        return NULL;
+	if ((per_point_eqn = (per_point_eqn_t*)malloc(sizeof(per_point_eqn_t))) == NULL)
+		return NULL;
 
- 
-    per_point_eqn->index = index;
-    per_point_eqn->gen_expr = gen_expr;
-    per_point_eqn->param = param;
-    return per_point_eqn;    
+      
+	per_point_eqn->index = index;
+	per_point_eqn->gen_expr = gen_expr;
+	per_point_eqn->param = param;
+	return per_point_eqn;	
 }
 
 
 void free_per_point_eqn(per_point_eqn_t * per_point_eqn) {
 
-    if (per_point_eqn == NULL)
-        return;
-    
-    free_gen_expr(per_point_eqn->gen_expr);
-    
-    free(per_point_eqn);
-    
-    return;
+	if (per_point_eqn == NULL)
+		return;
+	
+	free_gen_expr(per_point_eqn->gen_expr);
+	
+	free(per_point_eqn);
+	
+	return;
 }
 
 custom_wave_t * find_custom_wave(int id, preset_t * preset, int create_flag) {
@@ -573,7 +573,7 @@ custom_wave_t * find_custom_wave(int id, preset_t * preset, int create_flag) {
 
   if (preset == NULL)
     return NULL;
- 
+  
   if ((custom_wave = splay_find(&id, preset->custom_wave_tree)) == NULL) {
 
     if (CUSTOM_WAVE_DEBUG) { printf("find_custom_wave: creating custom wave (id = %d)...", id);fflush(stdout);}
@@ -628,7 +628,7 @@ inline custom_wave_t * nextCustomWave() {
 }
 
 
-inline void evalPerPointEqns() {
+inline void evalPerPointEqns() { 
 
   int x;
 
@@ -655,8 +655,8 @@ inline void evalPerPointEqns() {
 
 /* Evaluates a per point equation for the current custom wave given by interface_wave ptr */
 inline void evalPerPointEqn(per_point_eqn_t * per_point_eqn) {
- 
- 
+  
+  
   int samples, size;
   double * param_matrix;
   gen_expr_t * eqn_ptr;
@@ -669,17 +669,17 @@ inline void evalPerPointEqn(per_point_eqn_t * per_point_eqn) {
       return;
     memset(param_matrix, 0, size);
   }
-  else
+  else 
     param_matrix = (double*)per_point_eqn->param->matrix;
- 
-  for (mesh_i = 0; mesh_i < samples; mesh_i++) {
+  
+  for (mesh_i = 0; mesh_i < samples; mesh_i++) {    
       param_matrix[mesh_i] = eval_gen_expr(eqn_ptr);
   }
- 
+  
   /* Now that this parameter has been referenced with a per
      point equation, we let the evaluator know by setting
      this flag */
-  per_point_eqn->param->matrix_flag = 1;
+  per_point_eqn->param->matrix_flag = 1; 
 
 }
 
@@ -710,14 +710,14 @@ void load_unspec_init_cond(param_t * param) {
   /* If initial condition was not defined by the preset file, force a default one
      with the following code */
   if ((init_cond = splay_find(param->name, interface_wave->init_cond_tree)) == NULL) {
- 
+    
     /* Make sure initial condition does not exist in the set of per frame initial equations */
     if ((init_cond = splay_find(param->name, interface_wave->per_frame_init_eqn_tree)) != NULL)
       return;
- 
+    
     if (param->type == P_TYPE_BOOL)
       init_val.bool_val = 0;
- 
+    
     else if (param->type == P_TYPE_INT)
       init_val.int_val = *(int*)param->engine_val;
 
@@ -728,13 +728,13 @@ void load_unspec_init_cond(param_t * param) {
     /* Create new initial condition */
     if ((init_cond = new_init_cond(param, init_val)) == NULL)
       return;
- 
+    
     /* Insert the initial condition into this presets tree */
     if (splay_insert(init_cond, init_cond->param->name, interface_wave->init_cond_tree) < 0) {
       free_init_cond(init_cond);
       return;
     }
- 
+    
   }
  
 }

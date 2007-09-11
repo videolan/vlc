@@ -21,14 +21,14 @@
 typedef union VALUE_T {
   int bool_val;
   int int_val;
-  double double_val;    
+  double double_val;	
 } value_t;
 
 /* Parameter Type */
 typedef struct PARAM_T {
   char name[MAX_TOKEN_SIZE]; /* name of the parameter, not necessary but useful neverthless */
-  short int type; /* parameter number type (int, bool, or double) */    
-  short int flags; /* read, write, user defined, etc */    
+  short int type; /* parameter number type (int, bool, or double) */	
+  short int flags; /* read, write, user defined, etc */	
   short int matrix_flag; /* for optimization purposes */
   void * engine_val; /* pointer to the engine variable */
   void * matrix; /* per pixel / per point matrix for this variable */

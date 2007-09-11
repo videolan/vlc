@@ -5,7 +5,7 @@
 
 /* Function Type */
 typedef struct FUNC_T {
-  char name[MAX_TOKEN_SIZE];
+  char name[MAX_TOKEN_SIZE];  
   double (*func_ptr)();
   int num_args;
 } func_t;

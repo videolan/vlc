@@ -57,28 +57,28 @@ void eval_init_cond(init_cond_t * init_cond) {
   /* Parameter is of boolean type, either a 1 or 0 value integer */
 
   /* Set matrix flag to zero. This ensures
-     its constant value will be used rather than a matrix value
+     its constant value will be used rather than a matrix value 
   */
   init_cond->param->matrix_flag = 0;
   if (init_cond->param->type == P_TYPE_BOOL) {
-     if (INIT_COND_DEBUG) printf("init_cond: %s = %d (TYPE BOOL)\n", init_cond->param->name, init_cond->init_val.bool_val);
-     *((int*)init_cond->param->engine_val) = init_cond->init_val.bool_val;
+	 if (INIT_COND_DEBUG) printf("init_cond: %s = %d (TYPE BOOL)\n", init_cond->param->name, init_cond->init_val.bool_val); 
+	 *((int*)init_cond->param->engine_val) = init_cond->init_val.bool_val;
      return;
   }
- 
+  
   /* Parameter is an integer type, just like C */
- 
+  
   if (init_cond->param->type == P_TYPE_INT) {
-     if (INIT_COND_DEBUG) printf("init_cond: %s = %d (TYPE INT)\n", init_cond->param->name, init_cond->init_val.int_val);
-     *((int*)init_cond->param->engine_val) = init_cond->init_val.int_val;
+	 if (INIT_COND_DEBUG) printf("init_cond: %s = %d (TYPE INT)\n", init_cond->param->name, init_cond->init_val.int_val);
+	 *((int*)init_cond->param->engine_val) = init_cond->init_val.int_val;
      return;
   }
 
   /* Parameter is of a double type, just like C */
 
   if (init_cond->param->type == P_TYPE_DOUBLE) {
-    if (INIT_COND_DEBUG) printf("init_cond: %s = %f (TYPE DOUBLE)\n", init_cond->param->name, init_cond->init_val.double_val);
-    *((double*)init_cond->param->engine_val) = init_cond->init_val.double_val;
+	if (INIT_COND_DEBUG) printf("init_cond: %s = %f (TYPE DOUBLE)\n", init_cond->param->name, init_cond->init_val.double_val);
+	*((double*)init_cond->param->engine_val) = init_cond->init_val.double_val;
     return;
   }
 
@@ -92,7 +92,7 @@ init_cond_t * new_init_cond(param_t * param, value_t init_val) {
   init_cond_t * init_cond;
 
   init_cond = (init_cond_t*)malloc(sizeof(init_cond_t));
- 
+   
   if (init_cond == NULL)
     return NULL;
  
@@ -103,59 +103,59 @@ init_cond_t * new_init_cond(param_t * param, value_t init_val) {
 
 /* WIP */
 void init_cond_to_string(init_cond_t * init_cond) {
-    
-    int string_length;
-    char string[MAX_TOKEN_SIZE];
-    
-    if (init_cond == NULL)
-        return;
+	
+	int string_length;
+	char string[MAX_TOKEN_SIZE];
+	
+	if (init_cond == NULL)
+		return;
 
-    /* Create a string "param_name=val" */
-    switch (init_cond->param->type) {
+	/* Create a string "param_name=val" */
+	switch (init_cond->param->type) {
                 lldiv_t div;
-        
-        case P_TYPE_BOOL:
-            sprintf(string, "%s=%d\n", init_cond->param->name, init_cond->init_val.bool_val);
-            break;
-        case P_TYPE_INT:
-            sprintf(string, "%s=%d\n", init_cond->param->name, init_cond->init_val.int_val);
-            break;
-        case P_TYPE_DOUBLE:
+		
+		case P_TYPE_BOOL:
+			sprintf(string, "%s=%d\n", init_cond->param->name, init_cond->init_val.bool_val);
+			break; 
+		case P_TYPE_INT:
+			sprintf(string, "%s=%d\n", init_cond->param->name, init_cond->init_val.int_val);
+			break;
+		case P_TYPE_DOUBLE:
                         div = lldiv( init_cond->init_val.double_val * 1000000,
                                      1000000 );
-            sprintf(string, "%s="I64Fd".%06u\n", init_cond->param->name, div.quot, (unsigned int) div.rem );
-            break;
-        default:
-            return;
-    }        
-        
-    /* Compute the length of the string */
-    string_length = strlen(string);
-    
-    /* Buffer overflow check */
-    if ((init_cond_string_buffer_index + string_length + 1)  > (STRING_BUFFER_SIZE - 1))
-        return;
-    
-    /* Copy the string into the initial condition string buffer */
-    
-    strncpy(init_cond_string_buffer + init_cond_string_buffer_index, string, string_length);
-    
-    /* Increment the string buffer, offset by one for the null terminator, which will be
-       overwritten by the next call to this function */
-    init_cond_string_buffer_index+= string_length + 1;
-        
+			sprintf(string, "%s="I64Fd".%06u\n", init_cond->param->name, div.quot, (unsigned int) div.rem );
+			break;
+		default:
+			return;
+	}		
+		
+	/* Compute the length of the string */
+	string_length = strlen(string);
+	
+	/* Buffer overflow check */
+	if ((init_cond_string_buffer_index + string_length + 1)  > (STRING_BUFFER_SIZE - 1))
+		return;
+	
+	/* Copy the string into the initial condition string buffer */
+	
+	strncpy(init_cond_string_buffer + init_cond_string_buffer_index, string, string_length);
+	
+	/* Increment the string buffer, offset by one for the null terminator, which will be
+	   overwritten by the next call to this function */
+	init_cond_string_buffer_index+= string_length + 1;
+		
 }
 
 
 char * create_init_cond_string_buffer(splaytree_t * init_cond_tree) {
 
-    if (init_cond_tree == NULL)
-        return NULL;
-    
-    init_cond_string_buffer_index = 0;
-    
-    splay_traverse(init_cond_to_string, init_cond_tree);
-    
-    return init_cond_string_buffer;
-        
+	if (init_cond_tree == NULL)
+		return NULL;
+	
+	init_cond_string_buffer_index = 0;
+	
+	splay_traverse(init_cond_to_string, init_cond_tree);
+	
+	return init_cond_string_buffer;
+		
 }
