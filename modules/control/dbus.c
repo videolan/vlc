@@ -336,12 +336,13 @@ DBUS_METHOD( GetCurrentTrack )
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
     playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
 
-    while ( p_tested_item && p_tested_item->p_input->i_id !=
+    if( p_playlist->status.p_item )
+        while ( p_tested_item && p_tested_item->p_input->i_id !=
                 p_playlist->status.p_item->p_input->i_id )
-    {
-        i_position++;
-        TEST_NEXT_ITEM;
-    }
+        {
+            i_position++;
+            TEST_NEXT_ITEM;
+        }
     /* FIXME if p_tested_item is NULL at that point, what do we do ? */
     pl_Release( p_playlist );
 
