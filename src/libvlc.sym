@@ -255,6 +255,9 @@ playlist_ServicesDiscoveryRemove
 playlist_TreeMove
 resolve_xml_special_chars
 secstotimestr
+sdp_Start
+sdp_AddAttribute
+sdp_AddMedia
 sout_AccessOutDelete
 sout_AccessOutNew
 sout_AccessOutRead

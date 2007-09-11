@@ -115,17 +115,4 @@ int announce_UnRegister( announce_handler_t *p_announce,
 sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce );
 void announce_SAPHandlerDestroy( sap_handler_t *p_sap );
 
-#include <stdarg.h>
-
-char *StartSDP (const char *name, const char *description, const char *url,
-                const char *email, const char *phone,
-                const struct sockaddr *orig, socklen_t origlen,
-                const struct sockaddr *addr, socklen_t addrlen);
-
-char *vAddSDPMedia (char **sdp, const char *type, int dport, const char *prot,
-                    unsigned pt, const char *rtpmap,
-                    const char *fmtpfmt, va_list ap);
-char *AddSDPMedia (char **sdp, const char *type, int dport, const char *proto,
-                   unsigned pt, const char *rtpmap, const char *fmtpfmt, ...);
-
 #endif

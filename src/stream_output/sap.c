@@ -597,7 +597,7 @@ static char *SDPGenerate( sap_handler_t *p_sap,
 {
     char *psz_group, *psz_name, *psz_sdp;
 
-     char *head = StartSDP (p_session->psz_name, p_session->description,
+     char *head = sdp_Start (p_session->psz_name, p_session->description,
         p_session->url, p_session->email, p_session->phone,
         (const struct sockaddr *)&p_session->orig, p_session->origlen,
         (const struct sockaddr *)&p_session->addr, p_session->addrlen);

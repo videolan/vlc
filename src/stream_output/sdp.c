@@ -86,7 +86,7 @@ static vlc_bool_t IsSDPString (const char *str)
 }
 
 
-char *StartSDP (const char *name, const char *description, const char *url,
+char *sdp_Start (const char *name, const char *description, const char *url,
                 const char *email, const char *phone,
                 const struct sockaddr *src, socklen_t srclen,
                 const struct sockaddr *addr, socklen_t addrlen)
@@ -157,10 +157,52 @@ char *StartSDP (const char *name, const char *description, const char *url,
 }
 
 
-char *vAddSDPMedia (char **sdp,
-                    const char *type, int dport, const char *protocol,
-                    unsigned pt, const char *rtpmap,
-                    const char *fmtpfmt, va_list ap)
+static char *
+vsdp_AddAttribute (char **sdp, const char *name, const char *fmt, va_list ap)
+{
+    size_t oldlen = strlen (*sdp);
+    size_t addlen =
+        sizeof ("a=:\r\n") + strlen (name) + vsnprintf (NULL, 0, fmt, ap);
+    char *ret = realloc (*sdp, oldlen + addlen);
+
+    if (ret == NULL)
+        return NULL;
+
+    oldlen += sprintf (ret + oldlen, "a=%s:", name);
+    sprintf (ret + oldlen, fmt, ap);
+    return *sdp = ret;
+}
+
+
+char *sdp_AddAttribute (char **sdp, const char *name, const char *fmt, ...)
+{
+    char *ret;
+
+    if (fmt != NULL)
+    {
+        va_list ap;
+
+        va_start (ap, fmt);
+        ret = vsdp_AddAttribute (sdp, name, fmt, ap);
+        va_end (ap);
+    }
+    else
+    {
+        size_t oldlen = strlen (*sdp);
+        ret = realloc (*sdp, oldlen + strlen (name) + sizeof ("a=\r\n"));
+        if (ret == NULL)
+            return NULL;
+
+        sprintf (ret + oldlen, "a=%s\r\n", name);
+    }
+    return ret;
+}
+
+
+char *sdp_AddMedia (char **sdp,
+                    const char *type, const char *protocol, int dport,
+                    unsigned pt, vlc_bool_t bw_indep, unsigned bw,
+                    const char *rtpmap, const char *fmtp)
 {
     char *newsdp, *ptr;
     size_t inlen = strlen (*sdp), outlen = inlen;
@@ -177,17 +219,6 @@ char *vAddSDPMedia (char **sdp,
                         "b=RR:0\r\n",
                         type, dport, protocol, pt);
 
-    /* RTP payload type map */
-    if (rtpmap != NULL)
-        outlen += snprintf (NULL, 0, "a=rtpmap:%u %s\r\n", pt, rtpmap);
-
-    /* Format parameters */
-    if (fmtpfmt != NULL)
-    {
-        outlen += sizeof ("a=fmtp:123 *\r\n");
-        outlen += vsnprintf (NULL, 0, fmtpfmt, ap);
-    }
-
     newsdp = realloc (*sdp, outlen + 1);
     if (newsdp == NULL)
         return NULL;
@@ -195,29 +226,16 @@ char *vAddSDPMedia (char **sdp,
     *sdp = newsdp;
     ptr = newsdp + inlen;
 
-    /* RTP payload type map */
-    ptr += sprintf (ptr, "a=rtpmap:%u %s\r\n", pt, rtpmap);
+    ptr += sprintf (ptr, "m=%s %u %s %d\r\n"
+                         "b=RR:0\r\n",
+                         type, dport, protocol, pt);
 
+    /* RTP payload type map */
+    if (rtpmap != NULL)
+        sdp_AddAttribute ("rtpmap", "%u %s", pt, rtpmap);
     /* Format parameters */
-    if (fmtpfmt != NULL)
-    {
-        ptr += sprintf (ptr, "a=fmtp:%u ", pt);
-        ptr += vsprintf (ptr, fmtpfmt, ap);
-    }
+    if (fmtp != NULL)
+        sdp_AddAttribute ("fmtp", "%u %s", pt, fmtp);
 
     return newsdp;
-}
-
-
-char *AddSDPMedia (char **sdp, const char *type, int dport, const char *proto,
-                   unsigned pt, const char *rtpmap, const char *fmtpfmt, ...)
-{
-    va_list ap;
-    char *ret;
-
-    va_start (ap, fmtpfmt);
-    ret = vAddSDPMedia (sdp, type, dport, proto, pt, rtpmap, fmtpfmt, ap);
-    va_end (ap);
-
-    return ret;
 }
