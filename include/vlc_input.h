@@ -422,7 +422,7 @@ static inline void input_item_MetaMerge( input_item_t *p_i, const vlc_meta_t * p
 #define input_item_GetSetting( item )        input_item_GetMeta( item, vlc_meta_Setting )
 
 VLC_EXPORT( char *, input_ItemGetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) );
-VLC_EXPORT(int, input_ItemAddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) );
+VLC_EXPORT(int, input_ItemAddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) ATTRIBUTE_FORMAT( 4, 5 ) );
 
 #define input_ItemNew( a,b,c ) input_ItemNewExt( a, b, c, 0, NULL, -1 )
 #define input_ItemNewExt(a,b,c,d,e,f) __input_ItemNewExt( VLC_OBJECT(a),b,c,d,e,f)
