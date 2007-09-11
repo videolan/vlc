@@ -696,7 +696,7 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
 
         /* Oh boy, this is really ugly! (+ race condition on lock_es) */
         dstlen = sizeof( dst );
-        getsockname( p_sys->es[0]->sinkv[0].rtp_fd, (struct sockaddr *)&dst,
+        getpeername( p_sys->es[0]->sinkv[0].rtp_fd, (struct sockaddr *)&dst,
                      &dstlen );
     }
     else
