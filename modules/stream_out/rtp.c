@@ -701,13 +701,20 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
         sout_stream_id_t *id = p_sys->es[i];
         const char *mime_major; /* major MIME type */
 
-        if( id->i_cat == AUDIO_ES )
-            mime_major = "audio";
-        else
-        if( id->i_cat == VIDEO_ES )
-            mime_major = "video";
-        else
-            continue;
+        switch( id->i_cat )
+        {
+            case VIDEO_ES:
+                mime_major = "video";
+                break;
+            case AUDIO_ES:
+                mime_major = "audio";
+                break;
+            case SPU_ES:
+                mime_major = "text";
+                break;
+            default:
+                continue;
+        }
 
         sdp_AddMedia( &psz_sdp, mime_major, "RTP/AVP", inclport * id->i_port,
                       id->i_payload_type, VLC_FALSE, id->i_bitrate,
