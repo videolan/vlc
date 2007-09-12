@@ -228,7 +228,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     var_Get( p_dec, "subsdec-align", &val );
     p_sys->i_align = val.i_int;
 
-    if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','s','a',' ') && var_CreateGetBool( p_dec, "subsdec-formatted" ) )
+    if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','s','a',' ')
+     && var_CreateGetBool( p_dec, "subsdec-formatted" ) )
     {
         if( p_dec->fmt_in.i_extra > 0 )
             ParseSSAHeader( p_dec );
