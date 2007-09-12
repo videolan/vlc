@@ -741,6 +741,7 @@ static int rtp_packetize_mp4a_latm ( sout_stream_t *, sout_stream_id_t *, block_
 static int rtp_packetize_h263 ( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_h264 ( sout_stream_t *, sout_stream_id_t *, block_t * );
 static int rtp_packetize_amr  ( sout_stream_t *, sout_stream_id_t *, block_t * );
+static int rtp_packetize_t140 ( sout_stream_t *, sout_stream_id_t *, block_t * );
 
 static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
 {
@@ -1065,6 +1066,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->psz_fmtp = strdup( "octet-align=1" );
             id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_amr;
+            break;
+        case VLC_FOURCC( 't', '1', '4', '0' ):
+            id->psz_rtpmap = strdup( "t140/1000" );
+            id->i_clock_rate = 1000;
+            id->pf_packetize = rtp_packetize_t140;
             break;
 
         default:
@@ -1981,6 +1987,52 @@ static int rtp_packetize_amr( sout_stream_t *p_stream, sout_stream_id_t *id,
         out->i_buffer   = 14 + i_payload-1;
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
+
+        rtp_packetize_send( id, out );
+
+        p_data += i_payload;
+        i_data -= i_payload;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int rtp_packetize_t140( sout_stream_t *p_stream, sout_stream_id_t *id,
+                               block_t *in )
+{
+    const size_t   i_max  = id->i_mtu - 12;
+    const uint8_t *p_data = in->p_buffer;
+    size_t         i_data = in->i_buffer;
+
+    for( unsigned i_packet = 0; i_data > 0; i_packet++ )
+    {
+        size_t i_payload = i_data;
+
+        /* Make sure we stop on an UTF-8 character boundary
+         * (assuming the input is valid UTF-8) */
+        if( i_data > i_max )
+        {
+            i_payload = i_max;
+
+            while( ( p_data[i_payload] & 0xC0 ) == 0x80 )
+            {
+                if( i_payload == 0 )
+                    return VLC_SUCCESS; /* fishy input! */
+
+                i_payload--;
+            }
+        }
+
+        block_t *out = block_New( p_stream, 12 + i_payload );
+        if( out == NULL )
+            return VLC_SUCCESS;
+
+        rtp_packetize_common( id, out, 0, in->i_pts + i_packet );
+        memcpy( out->p_buffer + 12, p_data, i_payload );
+
+        out->i_buffer = 12 + i_payload;
+        out->i_dts    = out->i_pts;
+        out->i_length = 0;
 
         rtp_packetize_send( id, out );
 
