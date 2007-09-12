@@ -70,24 +70,12 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-#if 0
-    sout_stream_t   *p_stream = (sout_stream_t*)p_this;
-#endif
+    (void)p_this;
 }
-
-struct sout_stream_id_t
-{
-    int i_d_u_m_m_y;
-};
 
 static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
-    sout_stream_id_t *id;
-
-    id = malloc( sizeof( sout_stream_id_t ) );
-    id->i_d_u_m_m_y = 0;
-
-    return id;
+    return malloc( 0 );
 }
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
@@ -100,6 +88,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                  block_t *p_buffer )
 {
+    (void)p_stream; (void)id;
     block_ChainRelease( p_buffer );
     return VLC_SUCCESS;
 }
