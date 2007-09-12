@@ -56,7 +56,12 @@
 /**
  * The possible extensions for subtitle files we support
  */
-static const char * sub_exts[] = {  "utf", "utf8", "utf-8", "sub", "srt", "smi", "txt", "ssa", "idx", NULL };
+static const char const sub_exts[][6] = {
+    "utf", "utf8", "utf-8",
+    "sub", "srt", "smi",
+    "txt", "ssa", "idx", ""
+};
+
 /* extensions from unsupported types */
 /* rt, aqt, jss, js, ass */
 
@@ -163,7 +168,7 @@ int subtitles_Filter( const char *psz_dir_content )
         int i;
         tmp++;
 
-        for( i = 0; sub_exts[i]; i++ )
+        for( i = 0; sub_exts[i][0]; i++ )
             if( strcasecmp( sub_exts[i], tmp ) == 0 )
                 return 1;
     }
