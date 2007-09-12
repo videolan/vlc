@@ -826,7 +826,7 @@ void MainInterface::updateSystrayTooltipName( QString name )
     else
     {
         sysTray->setToolTip( name );
-        if( notificationEnabled )
+        if( notificationEnabled && ( isHidden() || isMinimized() ) )
         {
             sysTray->showMessage( qtr( "VLC media player" ), name,
                     QSystemTrayIcon::NoIcon, 4000 );
