@@ -6,6 +6,7 @@
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Ilkka Ollakka <ileoo@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,7 +73,7 @@ private:
     QLineEdit *collection_text;
     QLineEdit *seqnum_text;
     QLineEdit *description_text;
-    QSpinBox *rating_text;
+//    QSpinBox *rating_text;
     QLineEdit *date_text;
 //    QLineEdit *setting_text;
     QLineEdit *language_text;

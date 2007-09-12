@@ -6,6 +6,7 @@
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
+ *          Ilkka Ollakka <ileoo@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,10 +89,11 @@ MetaPanel::MetaPanel( QWidget *parent,
     metaLayout->addWidget( date_text, line, 1, 1, 3 );
 
     /* Rating - on the same line */
+    /*
     metaLayout->addWidget( new QLabel( qtr( VLC_META_RATING ) + " :" ), line, 4, 1, 2 );
     rating_text = new QSpinBox; setSpinBounds( rating_text );
     metaLayout->addWidget( rating_text, line, 6, 1, 1 );
-
+    */
     /* Language on the same line */
     metaLayout->addWidget( new QLabel( qfu( VLC_META_LANGUAGE ) + " :" ), line, 7, 1, 2 );
     language_text = new QLineEdit;
@@ -216,7 +218,7 @@ void MetaPanel::update( input_item_t *p_item )
 
     UPDATE_META( Date, date_text );
     UPDATE_META( TrackNum, seqnum_text );
-    UPDATE_META_INT( Rating, rating_text );
+//    UPDATE_META_INT( Rating, rating_text );
 
 #undef UPDATE_META_INT
 #undef UPDATE_META
