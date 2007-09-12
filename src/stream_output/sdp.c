@@ -161,18 +161,28 @@ static char *
 vsdp_AddAttribute (char **sdp, const char *name, const char *fmt, va_list ap)
 {
     size_t oldlen = strlen (*sdp);
-    va_list aq;
-    va_copy ( aq, ap );
-    size_t addlen =
-        sizeof ("a=:\r\n") + strlen (name) + vsnprintf (NULL, 0, fmt, ap);
-    char *ret = realloc (*sdp, oldlen + addlen);
+    size_t addlen = sizeof ("a=\r\n") + strlen (name);
 
+    if (fmt != NULL)
+    {
+        va_list aq;
+
+        va_copy (aq, ap);
+        addlen += 1 + vsnprintf (NULL, 0, fmt, aq);
+        va_end (aq);
+    }
+
+    char *ret = realloc (*sdp, oldlen + addlen);
     if (ret == NULL)
         return NULL;
 
-    oldlen += sprintf (ret + oldlen, "a=%s:", name);
-    oldlen += vsprintf (ret + oldlen, fmt, aq);
-    va_end (aq);
+    oldlen += sprintf (ret + oldlen, "a=%s", name);
+    if (fmt != NULL)
+    {
+        ret[oldlen++] = ':';
+        oldlen += vsprintf (ret + oldlen, fmt, ap);
+    }
+
     strcpy (ret + oldlen, "\r\n");
     return *sdp = ret;
 }
@@ -181,24 +191,12 @@ vsdp_AddAttribute (char **sdp, const char *name, const char *fmt, va_list ap)
 char *sdp_AddAttribute (char **sdp, const char *name, const char *fmt, ...)
 {
     char *ret;
+    va_list ap;
 
-    if (fmt != NULL)
-    {
-        va_list ap;
+    va_start (ap, fmt);
+    ret = vsdp_AddAttribute (sdp, name, fmt, ap);
+    va_end (ap);
 
-        va_start (ap, fmt);
-        ret = vsdp_AddAttribute (sdp, name, fmt, ap);
-        va_end (ap);
-    }
-    else
-    {
-        size_t oldlen = strlen (*sdp);
-        ret = realloc (*sdp, oldlen + strlen (name) + sizeof ("a=\r\n"));
-        if (ret == NULL)
-            return NULL;
-
-        sprintf (ret + oldlen, "a=%s\r\n", name);
-    }
     return ret;
 }
 
