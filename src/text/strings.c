@@ -638,7 +638,7 @@ char *str_format_time( const char *tformat )
                     if( check )                                     \
                     {                                               \
                         psz_meta = string;                          \
-                        if( psz_meta )                              \
+                        if( psz_meta != NULL )                      \
                         {                                           \
                             int len = strlen( string );             \
                             dst = realloc( dst,                     \
@@ -648,8 +648,8 @@ char *str_format_time( const char *tformat )
                         }                                           \
                         else                                        \
                         {                                           \
-                                *d = '-';                           \
-                                d++;                                \
+                            *d = '-';                               \
+                            d++;                                    \
                         }                                           \
                     }
 
