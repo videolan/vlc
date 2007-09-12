@@ -181,7 +181,9 @@ struct intf_sys_t
     int             i_current_view;             /* playlist view             */
     struct pl_item_t    **pp_plist;
     int             i_plist_entries;
-    vlc_bool_t      b_need_update;              /* for playlist view */
+    vlc_bool_t      b_need_update;              /* for playlist view         */
+
+    int             i_verbose;                  /* stores verbosity level    */
 };
 
 static void DrawBox( WINDOW *win, int y, int x, int h, int w, const char *title );
@@ -233,6 +235,9 @@ static int Open( vlc_object_t *p_this )
     /* exported function */
     p_intf->pf_run = Run;
 
+    /* Remember verbosity level */
+    var_Get( p_intf->p_libvlc, "verbose", &val );
+    p_sys->i_verbose = val.i_int;
     /* Set quiet mode */
     val.i_int = -1;
     var_Set( p_intf->p_libvlc, "verbose", val );
@@ -316,6 +321,11 @@ static void Close( vlc_object_t *p_this )
     endwin();
 
     msg_Unsubscribe( p_intf, p_sys->p_sub );
+
+    /* Restores initial verbose setting */
+    vlc_value_t val;
+    val.i_int = p_sys->i_verbose;
+    var_Set( p_intf->p_libvlc, "verbose", val );
 
     /* Destroy structure */
     free( p_sys );
