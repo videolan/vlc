@@ -22,8 +22,8 @@ function probe()
             or string.match( vlc.path, "watch_fullscreen%?video_id=" ) -- the fullscreen page
             or string.match( vlc.path, "p.swf" ) -- the (old?) player url
             or string.match( vlc.path, "jp.swf" ) -- the (new?) player url (as of 24/08/2007)
-            or string.match( vlc.path, "player2.swf" ) ) -- another player url
-            or ( string.match( vlc.path, "get_video%?video_id=" ) and not string.match( vlc.path, "t=" ) ) -- the video url without the t= parameter which is mandatory (since 24/08/2007)
+            or string.match( vlc.path, "player2.swf" ) -- another player url
+            or ( string.match( vlc.path, "get_video%?video_id=" ) and not string.match( vlc.path, "t=" ) ) ) -- the video url without the t= parameter which is mandatory (since 24/08/2007)
 end
 
 -- Parse function.
