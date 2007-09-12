@@ -43,25 +43,23 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ALWAYS_VIDEO_TEXT N_("Always show a video screen, with a cone " \
-                                "when there is audio only.")
+#define ALWAYS_VIDEO_TEXT N_("Always show video area")
 #define ALWAYS_VIDEO_LONGTEXT N_("Start VLC with a cone image, and display it" \
-                                   " when there is no video track. " \
-                                    "Visualisations are enabled." )
+                                   " when there is no video track." )
 
-#define ADVANCED_PREFS_TEXT N_("Show advanced prefs over simple")
-#define ADVANCED_PREFS_LONGTEXT N_("Show advanced preferences and not simple" \
+#define ADVANCED_PREFS_TEXT N_("Show advanced prefs over simple ones")
+#define ADVANCED_PREFS_LONGTEXT N_("Show advanced preferences and not simple " \
                                    "preferences when opening the preferences " \
                                    "dialog.")
 
-#define SYSTRAY_TEXT N_("Show a systray icon to control VLC")
-#define SYSTRAY_LONGTEXT N_("Show in the taskbar, a systray icon" \
-                            "in order to control VLC media player" \
+#define SYSTRAY_TEXT N_("Systray icon")
+#define SYSTRAY_LONGTEXT N_("Show an icon in the systray " \
+                            "allowing you to control VLC media player " \
                             "for basic actions")
 
-#define MINIMIZED_TEXT N_("Start VLC only with a systray icon")
-#define MINIMIZED_LONGTEXT N_("When you launch VLC with that option" \
-                            "VLC will start just with an icon in" \
+#define MINIMIZED_TEXT N_("Start VLC with only a systray icon")
+#define MINIMIZED_LONGTEXT N_("When you launch VLC with that option, " \
+                            "VLC will start with just an icon in" \
                             "your taskbar")
 
 #define TITLE_TEXT N_("Show playing item name in window title")
@@ -69,29 +67,29 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                           "controler window title")
 
 #define FILEDIALOG_PATH_TEXT N_("Path to use in file dialog")
-#define FILEDIALOG_PATH_LONGTEXT N_("Path to use in file dialog")
 
-#define NOTIFICATION_TEXT N_("Show notification popup on track change if VLC is not visible")
+#define NOTIFICATION_TEXT N_("Show notification popup on track change")
 #define NOTIFICATION_LONGTEXT N_( \
     "Show a notification popup with the artist and track name when " \
     "the current playlist item changes, when VLC is minimized or hidden." )
 
 #define ADVANCED_OPTIONS_TEXT N_("Advanced options")
-#define ADVANCED_OPTIONS_LONGTEXT N_("Activate by default all the" \
-                                     "advanced options for geeks")
+#define ADVANCED_OPTIONS_LONGTEXT N_("Show all the advanced options " \
+                                    "in the dialogs")
 
 #define OPACITY_TEXT N_("Windows opacity between 0.1 and 1.")
 #define OPACITY_LONGTEXT N_("Sets the windows opacity between 0.1 and 1 " \
                             "for main interface, playlist and extended panel." \
-                            "This options only works with Windows and " \
+                            " This option only works with Windows and " \
                             "X11 with composite extensions.")
 
 #define SHOWFLAGS_TEXT N_("Define what columns to show in playlist window")
 #define SHOWFLAGS_LONGTEXT N_("Enter the sum of the options that you want: \n" \
             "Title: 1; Duration: 2; Artist: 4; Genre: 8; " \
             "Copyright: 16; Collection/album: 32; Rating: 256." )
-#define ERROR_TEXT N_("Show unimportant error and warnings dialogs" )
 
+#define ERROR_TEXT N_("Show unimportant error and warnings dialogs" )
+/* FIXME - longtext*/
 
 vlc_module_begin();
     set_shortname( (char *)"Qt" );
@@ -120,7 +118,7 @@ vlc_module_begin();
         add_bool( "qt-error-dialogs", VLC_TRUE, NULL, ERROR_TEXT,
                 ERROR_TEXT, VLC_FALSE );
         add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
-                FILEDIALOG_PATH_LONGTEXT, VLC_TRUE);
+                FILEDIALOG_PATH_TEXT, VLC_TRUE);
             change_autosave();
             change_internal();
         add_bool( "qt-notification", VLC_TRUE, NULL, NOTIFICATION_TEXT,
