@@ -111,6 +111,8 @@ Interfaces:
      interface for media players that intends to become an xdg standard when 
      finished: http://wiki.xmms2.xmms.se/index.php/Media_Player_Interfaces .
    * Motion module use disk accelerometers to keep video horizontal
+   * Ncurses interface now uses ncursesw to correctly display wide characters
+     when using an UTF-8 locale.
 
 Linux Port:
  * VLC now complies with the XDG Base Directory Specification version 0.6

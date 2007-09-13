@@ -32,7 +32,7 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <time.h>
 
-#include <curses.h>
+#include <ncursesw/curses.h>
 
 #include <vlc_interface.h>
 #include <vlc_vout.h>
@@ -1125,46 +1125,59 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
     va_list  vl_args;
     char    *p_buf = NULL;
     int      i_len;
+    size_t   i_char_len;    /* UCS character length */
+    size_t   i_width;       /* Display width */
+    wchar_t *psz_wide;      /* wchar_t representation of p_buf */
 
     va_start( vl_args, p_fmt );
     vasprintf( &p_buf, p_fmt, vl_args );
     va_end( vl_args );
 
-    if( p_buf == NULL )
-    {
+    if( ( p_buf == NULL ) || ( w <= 0 ) )
         return;
-    }
-    if(  w > 0 )
-    {
-        if( ( i_len = strlen( p_buf ) ) > w )
-        {
-            char *psz_local;
-            int i_cut = i_len - w;
-            int x1 = i_len/2 - i_cut/2;
-            int x2 = x1 + i_cut;
 
-            if( i_len > x2 )
-            {
-                memmove( &p_buf[x1], &p_buf[x2], i_len - x2 );
-            }
-            p_buf[w] = '\0';
-            if( w > 7 )
-            {
-                p_buf[w/2-1] = '.';
-                p_buf[w/2  ] = '.';
-                p_buf[w/2+1] = '.';
-            }
-            psz_local = ToLocale( p_buf );
-            mvprintw( y, x, "%s", psz_local );
-            LocaleFree( p_buf );
-        }
-        else
+    i_len = strlen( p_buf );
+    psz_wide = (wchar_t *) malloc( sizeof( wchar_t ) * ( i_len + 1 ) );
+
+    i_char_len = mbstowcs( psz_wide, p_buf, i_len );
+
+    if( i_char_len == -1 ) /* an invalid character was encountered */
+        i_width = i_len;
+    else
+    {
+        i_width = wcswidth( psz_wide, i_char_len );
+        if( i_width == -1 ) /* a non printable character was encountered */
+            i_width = i_len;
+    }
+
+    if( i_width > w )
+    { /* FIXME: ellipsize psz_wide while keeping the width in mind */
+        char *psz_local;
+        int i_cut = i_len - w;
+        int x1 = i_len/2 - i_cut/2;
+        int x2 = x1 + i_cut;
+
+        if( i_len > x2 )
         {
-            char *psz_local = ToLocale( p_buf );
-            mvprintw( y, x, "%s", psz_local );
-            LocaleFree( p_buf );
-            mvhline( y, x + i_len, ' ', w - i_len );
+            memmove( &p_buf[x1], &p_buf[x2], i_len - x2 );
         }
+        p_buf[w] = '\0';
+        if( w > 7 )
+        {
+            p_buf[w/2-1] = '.';
+            p_buf[w/2  ] = '.';
+            p_buf[w/2+1] = '.';
+        }
+        psz_local = ToLocale( p_buf );
+        mvprintw( y, x, "%s", psz_local );
+        LocaleFree( p_buf );
+    }
+    else
+    {
+        char *psz_local = ToLocale( p_buf );
+        mvprintw( y, x, "%s", psz_local );
+        LocaleFree( p_buf );
+        mvhline( y, x + i_width, ' ', w - i_width );
     }
 }
 static void MainBoxWrite( intf_thread_t *p_intf, int l, int x, const char *p_fmt, ... )
