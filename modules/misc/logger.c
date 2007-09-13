@@ -53,12 +53,14 @@
 #define TEXT_FOOTER "-- logger module stopped --\n"
 
 #define HTML_HEADER \
+    "<!DOCTYPE html PUBLIC \"-\/\/W3C\/\/DTD HTML 4.01\/\/EN\"\n" \
+    "  \"http:\/\/www.w3.org/TR/html4/strict.dtd\">\n" \
     "<html>\n" \
     "  <head>\n" \
     "    <title>vlc log</title>\n" \
-    "    <META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" \
+    "    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" \
     "  </head>\n" \
-    "  <body bgcolor=\"#000000\" text=\"#aaaaaa\">\n" \
+    "  <body style=\"background-color: #000000; color: #aaaaaa;\">\n" \
     "    <pre>\n" \
     "      <b>-- logger module started --</b>\n"
 #define HTML_FOOTER \
@@ -418,16 +420,16 @@ static void SyslogPrint( const msg_item_t *p_msg )
 
 static void HtmlPrint( const msg_item_t *p_msg, FILE *p_file )
 {
-    static const char *ppsz_color[4] = { "<font color=\"#ffffff\">",
-                                         "<font color=\"#ff6666\">",
-                                         "<font color=\"#ffff66\">",
-                                         "<font color=\"#aaaaaa\">" };
+    static const char *ppsz_color[4] = { "<span style=\"color: #ffffff\">",
+                                         "<span style=\"color: #ff6666\">",
+                                         "<span style=\"color: #ffff66\">",
+                                         "<span style=\"color: #aaaaaa\">" };
 
     LOG_STRING( p_msg->psz_module, p_file );
     LOG_STRING( ppsz_type[p_msg->i_type], p_file );
     LOG_STRING( ppsz_color[p_msg->i_type], p_file );
     LOG_STRING( p_msg->psz_msg, p_file );
-    LOG_STRING( "</font>\n", p_file );
+    LOG_STRING( "</span>\n", p_file );
 }
 
 static void DoRRD( intf_thread_t *p_intf )
