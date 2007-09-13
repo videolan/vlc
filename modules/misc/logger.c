@@ -56,6 +56,7 @@
     "<html>\n" \
     "  <head>\n" \
     "    <title>vlc log</title>\n" \
+    "    <META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" \
     "  </head>\n" \
     "  <body bgcolor=\"#000000\" text=\"#aaaaaa\">\n" \
     "    <pre>\n" \
