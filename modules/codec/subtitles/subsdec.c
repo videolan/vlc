@@ -139,23 +139,28 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     vlc_value_t    val;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','u','b','t') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('s','s','a',' ') )
+    switch( p_dec->fmt_in.i_codec )
     {
-        return VLC_EGENERIC;
+        case VLC_FOURCC('s','u','b','t'):
+        case VLC_FOURCC('s','s','a',' '):
+        case VLC_FOURCC('t','1','4','0'):
+            break;
+        default:
+            return VLC_EGENERIC;
     }
 
     p_dec->pf_decode_sub = DecodeBlock;
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)calloc(1, sizeof(decoder_sys_t)) ) == NULL )
+    p_dec->p_sys = p_sys = malloc( sizeof( *p_sys ) );
+    if( p_sys == NULL )
     {
         msg_Err( p_dec, "out of memory" );
         return VLC_ENOMEM;
     }
 
     /* init of p_sys */
+    memset( p_sys, 0, sizeof( *p_sys ) );
     p_sys->i_align = 0;
     p_sys->iconv_handle = (vlc_iconv_t)-1;
     p_sys->b_autodetect_utf8 = VLC_FALSE;
@@ -166,6 +171,10 @@ static int OpenDecoder( vlc_object_t *p_this )
     TAB_INIT( p_sys->i_images, p_sys->pp_images );
 
     char *psz_charset = NULL;
+
+    if( p_dec->fmt_in.i_codec == VLC_FOURCC('t','1','4','0') )
+        psz_charset = strdup( "UTF-8" ); /* IUT T.140 is always using UTF-8 */
+    else
     /* First try demux-specified encoding */
     if( p_dec->fmt_in.subs.psz_encoding && *p_dec->fmt_in.subs.psz_encoding )
     {
@@ -206,7 +215,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         psz_charset = strdup ("UTF-8");
         msg_Dbg (p_dec, "trying hard-coded character encoding: %s",
-                 psz_charset ?: "error");
+                 psz_charset ? psz_charset : "error");
     }
 
     if (psz_charset == NULL)
@@ -472,7 +481,7 @@ char* GotoNextLine( char *psz_text )
     return p_newline;
 }
 
-/* Function now handles tags which has attribute values, and tries
+/* Function now handles tags with attribute values, and tries
  * to deal with &' commands too. It no longer modifies the string
  * in place, so that the original text can be reused
  */
