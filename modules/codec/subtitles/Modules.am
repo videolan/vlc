@@ -1,2 +1,3 @@
 SOURCES_subsdec = subsass.c subsdec.c subsdec.h
 SOURCES_subsusf = subsusf.c subsdec.h
+SOURCES_t140 = t140.c
