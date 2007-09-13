@@ -32,7 +32,11 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <time.h>
 
+#ifdef HAVE_NCURSESW_CURSES_H
 #include <ncursesw/curses.h>
+#else
+#include <curses.h>
+#endif
 
 #include <vlc_interface.h>
 #include <vlc_vout.h>
@@ -1125,9 +1129,11 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
     va_list  vl_args;
     char    *p_buf = NULL;
     int      i_len;
+#ifdef HAVE_NCURSESW_CURSES_H
     size_t   i_char_len;    /* UCS character length */
     size_t   i_width;       /* Display width */
     wchar_t *psz_wide;      /* wchar_t representation of p_buf */
+#endif
 
     va_start( vl_args, p_fmt );
     vasprintf( &p_buf, p_fmt, vl_args );
@@ -1137,6 +1143,7 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
         return;
 
     i_len = strlen( p_buf );
+#ifdef HAVE_NCURSESW_CURSES_H
     psz_wide = (wchar_t *) malloc( sizeof( wchar_t ) * ( i_len + 1 ) );
 
     i_char_len = mbstowcs( psz_wide, p_buf, i_len );
@@ -1149,9 +1156,11 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
         if( i_width == -1 ) /* a non printable character was encountered */
             i_width = i_len;
     }
-
     if( i_width > w )
-    { /* FIXME: ellipsize psz_wide while keeping the width in mind */
+#else
+    if( i_len > w )
+#endif
+    { /* FIXME: ncursesw: ellipsize psz_wide while keeping the width in mind */
         char *psz_local;
         int i_cut = i_len - w;
         int x1 = i_len/2 - i_cut/2;
@@ -1177,7 +1186,11 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
         char *psz_local = ToLocale( p_buf );
         mvprintw( y, x, "%s", psz_local );
         LocaleFree( p_buf );
+#ifdef HAVE_NCURSESW_CURSES_H
         mvhline( y, x + i_width, ' ', w - i_width );
+#else
+        mvhline( y, x + i_len, ' ', w - i_len );
+#endif
     }
 }
 static void MainBoxWrite( intf_thread_t *p_intf, int l, int x, const char *p_fmt, ... )

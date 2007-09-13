@@ -5310,12 +5310,20 @@ dnl
 dnl  ncurses module
 dnl
 AC_ARG_ENABLE(ncurses,
-  [  --enable-ncurses        ncurses interface support (default disabled)],
-  [if test "${enable_ncurses}" = "yes"; then
-     AC_CHECK_HEADERS(ncursesw/curses.h,[
-       VLC_ADD_PLUGINS([ncurses])
-       VLC_ADD_LDFLAGS([ncurses],[-lncursesw])
-     ])
+  [  --disable-ncurses        ncurses interface support (default enabled)],
+  [if test "${enable_ncurses}" != "no"; then
+     AC_CHECK_HEADERS(ncursesw/curses.h,
+       [AC_CHECK_LIB( ncursesw, mvprintw,
+         [VLC_ADD_PLUGINS([ncurses])
+         VLC_ADD_LDFLAGS([ncurses],[-lncursesw])])
+       ],
+       [AC_CHECK_HEADER(curses.h,
+         [AC_CHECK_LIB(ncurses, mvprintw,
+           [VLC_ADD_PLUGINS([ncurses])
+           VLC_ADD_LDFLAGS([ncurses],[-lncurses])]
+         )]
+       )]
+     )  
    fi])
 
 dnl
