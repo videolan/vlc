@@ -88,8 +88,8 @@ static vlc_bool_t IsSDPString (const char *str)
 
 char *sdp_Start (const char *name, const char *description, const char *url,
                 const char *email, const char *phone,
-                const struct sockaddr *src, socklen_t srclen,
-                const struct sockaddr *addr, socklen_t addrlen)
+                const struct sockaddr *src, size_t srclen,
+                const struct sockaddr *addr, size_t addrlen)
 {
     uint64_t now = NTPtime64 ();
     char *sdp;

@@ -222,7 +222,7 @@ VLC_EXPORT(void,                 sout_MethodRelease, (announce_method_t *) );
 
 /** SDP */
 
-VLC_EXPORT( char *, sdp_Start, (const char *name, const char *description, const char *url, const char *email, const char *phone, const struct sockaddr *orig, socklen_t origlen, const struct sockaddr *addr, socklen_t addrlen) );
+VLC_EXPORT( char *, sdp_Start, (const char *name, const char *description, const char *url, const char *email, const char *phone, const struct sockaddr *orig, size_t origlen, const struct sockaddr *addr, size_t addrlen) );
 VLC_EXPORT( char *, sdp_AddMedia, (char **sdp, const char *type, const char *protocol, int dport, unsigned pt, vlc_bool_t bw_indep, unsigned bw, const char *rtpmap, const char *fmtp) );
 VLC_EXPORT( char *, sdp_AddAttribute, (char **sdp, const char *name, const char *fmt, ...) ATTRIBUTE_FORMAT( 3, 4 ) );
 
