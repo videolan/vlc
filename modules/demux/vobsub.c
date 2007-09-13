@@ -626,7 +626,9 @@ static int ParseVobSubIDX( demux_t *p_demux )
                             ms ) * 1000;
 
                 current_tk->i_delay = current_tk->i_delay + (i_gap * i_sign);
-                msg_Dbg( p_demux, "sign: %+d gap: %+lld global delay: %+lld", i_sign, i_gap, current_tk->i_delay  );
+                msg_Dbg( p_demux, "sign: %+d gap: %+lld global delay: %+lld",
+                         i_sign, (long long)i_gap,
+                         (long long)current_tk->i_delay  );
             }
         }
     }

@@ -129,7 +129,7 @@ void DeleteQueue        ( audioscrobbler_queue_t *p_queue );
 /* HTTP POST request : to submit data */
 #define    POST_REQUEST "POST /%s HTTP/1.1\n"                               \
                         "Accept-Encoding: identity\n"                       \
-                        "Content-length: %d\n"                              \
+                        "Content-length: %u\n"                              \
                         "Connection: close\n"                               \
                         "Content-type: application/x-www-form-urlencoded\n" \
                         "Host: %s\n"                                        \
@@ -421,7 +421,7 @@ static void Main( intf_thread_t *p_this )
             i_net_ret = net_Printf(
                 VLC_OBJECT(p_this), i_post_socket, NULL,
                 POST_REQUEST, p_sys->psz_submit_file,
-                strlen( psz_submit ), p_sys->psz_submit_file,
+                (unsigned)strlen( psz_submit ), p_sys->psz_submit_file,
                 VERSION, psz_submit
             );
 
