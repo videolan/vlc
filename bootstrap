@@ -28,8 +28,6 @@ set -x
 ##
 ## Check for various tools
 ##
-AUTOMAKESUCKS=no
-INSTALLSUCKS=no
 
 ACLOCAL_ARGS="-I m4 ${ACLOCAL_ARGS}"
 
@@ -64,12 +62,14 @@ fi
 rm -f m4/autoconf260.m4
 case "$(autoconf --version|head -n 1)" in
   *2.5[012345678]*)
-    echo "Hey, your autoconf is quite old. Update it." >&2
+    echo "$0: you need autoconf version 2.59 or later (2.60 recommanded)."
     exit 1
     ;;
 
   *2.59*)
     echo "Enabling provisional autoconf 2.59 work-around. Update autoconf ASAP."
+    echo "Press Enter to continue"
+    read
     cp -f extras/m4/autoconf260.m4 m4/
     ;;
 esac
@@ -127,7 +127,7 @@ else
   GETTEXT=old
 fi;else
   set +x
-  echo "you need gettextize (package gettext-devel or gettext)"
+  echo "$0: you need gettextize (package gettext-devel or gettext)"
   exit 1
 fi
 
@@ -271,3 +271,4 @@ reliable.
 EOF
 fi
 
+echo "Successfully bootstrapped"
