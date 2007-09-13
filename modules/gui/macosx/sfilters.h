@@ -40,7 +40,7 @@
     IBOutlet id o_logo_opaque_sld;
     IBOutlet id o_logo_pos_lbl;
     IBOutlet id o_logo_pos_radio;
- 
+
     /* marquee section */
     IBOutlet id o_marq_enabled_ckb;
     IBOutlet id o_marq_color_lbl;
@@ -71,7 +71,7 @@
     IBOutlet id o_time_size_pop;
     IBOutlet id o_time_stamp_fld;
     IBOutlet id o_time_stamp_lbl;
- 
+
     BOOL o_config_changed;
     BOOL o_save_settings;
     NSArray * o_colors;

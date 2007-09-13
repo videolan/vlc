@@ -40,4 +40,4 @@
 
 - (BOOL) scriptFullscreenMode;
 - (void) setScriptFullscreenMode: (BOOL) mode;
-
+@end

@@ -107,7 +107,7 @@
     BOOL b_selected_item_met;
     BOOL b_isSortDescending;
     id o_tc_sortColumn;
- 
+
     /* "add node" button and menu entry */
     IBOutlet id o_mi_addNode;
     IBOutlet id o_btn_addNode;

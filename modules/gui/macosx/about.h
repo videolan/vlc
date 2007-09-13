@@ -32,13 +32,13 @@
     IBOutlet id o_copyright_field;
     IBOutlet id o_credits_textview;
     IBOutlet id o_credits_scrollview;
- 
+
     NSTimer *o_scroll_timer;
     float f_current;
     float f_end;
     NSTimeInterval i_start;
     BOOL b_restart;
- 
+
     NSString *o_credits_path;
     NSString *o_credits;
     NSString *o_thanks;

@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -36,8 +36,8 @@
     BOOL b_voutWasUpdated;
     int i_device;
 }
-- (id)initWithContentRect: (NSRect)contentRect 
-                styleMask: (unsigned int)aStyle 
+- (id)initWithContentRect: (NSRect)contentRect
+                styleMask: (unsigned int)aStyle
                   backing: (NSBackingStoreType)bufferingType
                     defer: (BOOL)flag;
 - (void)awakeFromNib;
@@ -87,7 +87,7 @@
 - (void)setPause;
 - (void)setStreamTitle: (NSString *)o_title;
 - (void)setStreamPos: (float)f_pos andTime: (NSString *)o_time;
-- (void)setSeekable: (BOOL)b_seekable; 
+- (void)setSeekable: (BOOL)b_seekable;
 - (void)setVolumeLevel: (float)f_volumeLevel;
 - (IBAction)play:(id)sender;
 - (IBAction)prev:(id)sender;

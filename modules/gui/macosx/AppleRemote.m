@@ -713,3 +713,4 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 
     [invocation invokeWithTarget:applicationDelegate];
 }
+@end

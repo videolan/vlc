@@ -35,7 +35,7 @@
 
     IBOutlet id o_btn_fullscreen;
     IBOutlet id o_volumeslider;
- 
+
     IBOutlet id o_btn_shuffle;
     IBOutlet id o_btn_addNode;
     IBOutlet id o_btn_repeat;
@@ -48,7 +48,7 @@
     IBOutlet id o_specificTime_sec_lbl;
     IBOutlet id o_specificTime_stepper;
     IBOutlet id o_specificTime_mi;
- 
+
     VLCFSPanel *o_fs_panel;
 }
 

@@ -24,7 +24,7 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface VLCEyeTVController : NSObject 
+@interface VLCEyeTVController : NSObject
 {
     BOOL b_eyeTVactive;
     BOOL b_deviceConnected;

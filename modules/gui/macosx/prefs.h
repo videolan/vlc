@@ -57,7 +57,7 @@
     VLCTreeItem *o_config_tree;
     NSView *o_empty_view;
     NSMutableDictionary *o_save_prefs;
- 
+
     IBOutlet id o_prefs_window;
     IBOutlet id o_title;
     IBOutlet id o_tree;

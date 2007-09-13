@@ -41,7 +41,7 @@
     IBOutlet id o_btn_delete_group;
     IBOutlet id o_btn_add_group;
     IBOutlet id o_outline_view;
- 
+
     IBOutlet id o_tab_view;
 
     IBOutlet id o_collection_lbl;

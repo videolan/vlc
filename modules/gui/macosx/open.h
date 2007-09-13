@@ -114,7 +114,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_eyetv_noEyeTV_lbl;
     IBOutlet id o_eyetv_noEyeTVLong_lbl;
     IBOutlet id o_eyetv_previousProgram_btn;
- 
+
     BOOL b_autoplay;
 }
 

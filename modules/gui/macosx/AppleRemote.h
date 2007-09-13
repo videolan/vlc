@@ -86,23 +86,23 @@ The class is not thread safe
     IOHIDQueueInterface**  queue;
     NSMutableArray*        allCookies;
     NSMutableDictionary*   cookieToButtonMapping;
- 
+
     BOOL openInExclusiveMode;
     BOOL simulatePlusMinusHold;
     BOOL processesBacklog;
- 
+
     /* state for simulating plus/minus hold */
     BOOL lastEventSimulatedHold;
     AppleRemoteEventIdentifier lastPlusMinusEvent;
     NSTimeInterval lastPlusMinusEventTime;
- 
+
     int remoteId;
     unsigned int clickCountEnabledButtons;
     NSTimeInterval maxClickTimeDifference;
     NSTimeInterval lastClickCountEventTime;
     AppleRemoteEventIdentifier lastClickCountEvent;
     unsigned int eventClickCount;
- 
+
     IBOutlet id delegate;
 }
 
@@ -196,3 +196,4 @@ The class is not thread safe
 
 - (id) initWithApplicationDelegate: (id) delegate;
 - (id) applicationDelegate;
+@end

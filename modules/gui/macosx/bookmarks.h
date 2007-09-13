@@ -34,7 +34,7 @@
     IBOutlet id o_btn_extract;
     IBOutlet id o_btn_rm;
     IBOutlet id o_tbl_dataTable;
- 
+
     /* edit window */
     IBOutlet id o_edit_window;
     IBOutlet id o_edit_btn_ok;
@@ -45,7 +45,7 @@
     IBOutlet id o_edit_fld_name;
     IBOutlet id o_edit_fld_time;
     IBOutlet id o_edit_fld_bytes;
- 
+
     input_thread_t *p_old_input;
 }
 
