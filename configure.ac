@@ -5312,8 +5312,10 @@ dnl
 AC_ARG_ENABLE(ncurses,
   [  --enable-ncurses        ncurses interface support (default disabled)],
   [if test "${enable_ncurses}" = "yes"; then
-     VLC_ADD_PLUGINS([ncurses])
-     VLC_ADD_LDFLAGS([ncurses],[-lncursesw])
+     AC_CHECK_HEADERS(ncursesw/curses.h,[
+       VLC_ADD_PLUGINS([ncurses])
+       VLC_ADD_LDFLAGS([ncurses],[-lncursesw])
+     ])
    fi])
 
 dnl

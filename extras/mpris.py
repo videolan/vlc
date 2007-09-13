@@ -222,9 +222,12 @@ def tray_button(widget):
         window.move(position[0], position[1])
         window.show()
 
-#ui setup
-xml = gtk.glade.XML('mpris.glade')
+#loads glade file from the directory where the script is,
+#so we can use /path/to/mpris.py to execute it.
+import sys
+xml = gtk.glade.XML(os.path.dirname(sys.argv[0]) + '/mpris.glade')
 
+#ui setup
 bt_close    = xml.get_widget('close')
 bt_quit     = xml.get_widget('quit')
 bt_file     = xml.get_widget('ChooseFile')
