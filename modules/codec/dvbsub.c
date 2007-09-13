@@ -1906,9 +1906,9 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
         p_region->fmt.i_chroma != VLC_FOURCC('Y','U','V','P') )
     {
         char psz_fourcc[5];
-        memset( &psz_fourcc, 0, sizeof(char)*5 );
+        memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
         vlc_fourcc_to_char( p_region->fmt.i_chroma, &psz_fourcc );
-        msg_Err( p_enc, "chroma %4s not supported", &psz_fourcc );
+        msg_Err( p_enc, "chroma %4s not supported", psz_fourcc );
         return NULL;
     }
 
