@@ -489,7 +489,7 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 return;
             }
         }
-        printf( "pointer playlist XX: %p\n", p_current->lock.p_this );
+
         p_current = p_obj->pp_waiting[0];
         REMOVE_ELEM( p_obj->pp_waiting, p_obj->i_waiting, 0 );
         vlc_mutex_unlock( &p_obj->object_lock );
