@@ -1137,7 +1137,7 @@ libdvbpsi: libdvbpsi4-$(LIBDVBPSI_VERSION).tar.gz
 
 CLEAN_FILE += .dvbpsi
 CLEAN_PKG += libdvbpsi
-DISTCLEAN_PKG += libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
+DISTCLEAN_PKG += libdvbpsi4-$(LIBDVBPSI_VERSION).tar.gz
 
 # ***************************************************************************
 # live
@@ -2162,6 +2162,23 @@ pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 	$(INSTALL_NAME)
 	touch $@
 
+# ***************************************************************************
+# ncurses library (with wide chars support)
+# ***************************************************************************
+
+ncurses-$(NCURSES_VERSION).tar.gz:
+	$(WGET) $(NCURSES_URL)
+
+ncurses: ncurses-$(NCURSES_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.ncurses: ncurses
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-debug --enable-widec --without-develop --without-shared && make && make install)
+	touch $@
+
+CLEAN_FILE += .ncurses
+CLEAN_PKG += ncurses
+DISTCLEAN_PKG += ncurses-$(NCURSES_VERSION).tar.gz
 
 # ***************************************************************************
 # Some cleaning
