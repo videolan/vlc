@@ -262,6 +262,8 @@ static inline block_t *block_ChainGather( block_t *p_list )
  * - block_FifoShow : show the first packet of the fifo (and wait if
  *      needed), be carefull, you can use it ONLY if you are sure to be the
  *      only one getting data from the fifo.
+ * - block_FifoCount : how many packets are waiting in the fifo
+ * - block_FifoSize : how many cumulated bytes are waiting in the fifo
  ****************************************************************************/
 struct block_fifo_t
 {
