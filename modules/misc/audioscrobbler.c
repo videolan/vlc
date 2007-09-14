@@ -449,7 +449,7 @@ static void Main( intf_thread_t *p_this )
             net_Close( i_post_socket );
 
             /* record interval */
-            p_buffer_pos = strstr( ( char * ) p_buffer, "INTERVAL" );
+            p_buffer_pos = strstr( ( char * ) p_buffer, "INTERVAL " );
             if ( p_buffer_pos )
             {
                 time( &p_sys->time_next_exchange );
@@ -462,6 +462,8 @@ static void Main( intf_thread_t *p_this )
             {
                 /* woops, submission failed */
                 msg_Dbg( p_this, "%s", p_buffer_pos );
+                /* Buggy last.fm server sometimes return INTERVAL 1 */
+                p_sys->time_next_exchange += DEFAULT_INTERVAL;
                 vlc_mutex_unlock ( &p_sys->lock );
                 continue;
             }
