@@ -693,7 +693,11 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
     if( psz_sdp == NULL )
         return NULL;
 
+
     /* TODO: a=source-filter */
+
+    if( rtsp_url != NULL )
+        sdp_AddAttribute ( &psz_sdp, "control", "%s", rtsp_url );
 
     /* FIXME: locking?! */
     for( i = 0; i < p_sys->i_es; i++ )
@@ -721,7 +725,8 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
                       id->psz_rtpmap, id->psz_fmtp);
 
         if( rtsp_url != NULL )
-            sdp_AddAttribute ( &psz_sdp, "control", "/trackID=%d", i );
+            sdp_AddAttribute ( &psz_sdp, "control", "%s/trackID=%d",
+                               rtsp_url, i );
     }
 
     return psz_sdp;
