@@ -58,7 +58,6 @@ def player_change(newname, a, b):
         Connect(newname)
 
 def itemchange_handler(item):
-    gobject.timeout_add( 2000, timeset)
     try:
         a = item["artist"]
     except:
@@ -89,7 +88,6 @@ def Connect(name):
     player = dbus.Interface(player_o, "org.freedesktop.MediaPlayer")
     player_o.connect_to_signal("TrackChange", itemchange_handler, dbus_interface="org.freedesktop.MediaPlayer")
     if player.GetStatus() == 0:
-        gobject.timeout_add( 2000, timeset)
         playing = True
     window.set_title(root.Identity())
 
@@ -157,7 +155,6 @@ def Pause(widget):
     status = player.GetStatus()
     if status == 0:
         img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PAUSE, gtk.ICON_SIZE_SMALL_TOOLBAR)
-        gobject.timeout_add( 2000, timeset)
     else:
         img_bt_toggle.set_from_stock(gtk.STOCK_MEDIA_PLAY, gtk.ICON_SIZE_SMALL_TOOLBAR)
     update(0)
@@ -188,8 +185,9 @@ def timechange(widget, x=None, y=None):
 #refresh position
 def timeset():
     global playing
-    time_s.set_value(player.PositionGet())
-    return playing
+    if playing == True:
+        time_s.set_value(player.PositionGet())
+    return True
 
 #simple/full display
 def expander(widget):
@@ -305,6 +303,9 @@ if name != "":
     Connect(name)
     window.set_title(root.Identity())
     vol.set_value(player.VolumeGet())
+
+#runs timer to update position
+gobject.timeout_add( 1000, timeset)
 
 window.set_icon_name('audio-x-generic')
 window.show()
