@@ -209,7 +209,7 @@ static int Mux( sout_mux_t *p_mux )
     if( !p_mux->i_nb_inputs ) return VLC_SUCCESS;
 
     p_fifo = p_mux->pp_inputs[0]->p_fifo;
-    i_count = p_fifo->i_depth;
+    i_count = block_FifoCount( p_fifo );
     while( i_count > 0 )
     {
         block_t *p_length = block_New( p_mux, 25 );

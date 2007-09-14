@@ -1342,7 +1342,7 @@ static int Mux( sout_mux_t *p_mux )
                     p_pcr_stream->i_pes_dts + p_pcr_stream->i_pes_length )
                 {
                     /* Need more data */
-                    if( p_input->p_fifo->i_depth <= 1 )
+                    if( block_FifoCount( p_input->p_fifo ) <= 1 )
                     {
                         if( p_input->p_fmt->i_cat == AUDIO_ES ||
                             p_input->p_fmt->i_cat == VIDEO_ES )
@@ -1350,7 +1350,7 @@ static int Mux( sout_mux_t *p_mux )
                             /* We need more data */
                             return VLC_SUCCESS;
                         }
-                        else if( p_input->p_fifo->i_depth <= 0 )
+                        else if( block_FifoCount( p_input->p_fifo ) <= 0 )
                         {
                             /* spu, only one packet is needed */
                             continue;
@@ -1388,7 +1388,7 @@ static int Mux( sout_mux_t *p_mux )
                     else
                         p_data = FixPES( p_mux, p_input->p_fifo );
 
-                    if( p_input->p_fifo->i_depth > 0 &&
+                    if( block_FifoCount( p_input->p_fifo ) > 0 &&
                         p_input->p_fmt->i_cat != SPU_ES )
                     {
                         block_t *p_next = block_FifoShow( p_input->p_fifo );

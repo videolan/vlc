@@ -431,13 +431,13 @@ static block_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     block_t *p_buffer;
 
-    while ( p_sys->p_thread->p_empty_blocks->i_depth > MAX_EMPTY_BLOCKS )
+    while ( block_FifoCount( p_sys->p_thread->p_empty_blocks ) > MAX_EMPTY_BLOCKS )
     {
         p_buffer = block_FifoGet( p_sys->p_thread->p_empty_blocks );
         block_Release( p_buffer );
     }
 
-    if( p_sys->p_thread->p_empty_blocks->i_depth == 0 )
+    if( block_FifoCount( p_sys->p_thread->p_empty_blocks ) == 0 )
     {
         p_buffer = block_New( p_access->p_sout, p_sys->i_mtu );
     }

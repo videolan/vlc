@@ -143,9 +143,9 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
 
         /* We don't really need to have anything in the SPU fifo */
         if( p_mux->pp_inputs[i]->p_fmt->i_cat == SPU_ES &&
-            p_fifo->i_depth == 0 ) continue;
+            block_FifoCount( p_fifo ) == 0 ) continue;
 
-        if( p_fifo->i_depth )
+        if( block_FifoCount( p_fifo ) )
         {
             block_t *p_buf;
 
@@ -493,7 +493,8 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         if( !p_stream->b_new )
         {
-            while( p_input->p_fifo->i_depth ) MuxBlock( p_mux, p_input );
+            while( block_FifoCount( p_input->p_fifo ) )
+                MuxBlock( p_mux, p_input );
         }
 
         if( !p_stream->b_new &&

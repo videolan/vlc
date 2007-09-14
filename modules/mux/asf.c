@@ -647,7 +647,7 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
         sout_input_t  *p_input = p_mux->pp_inputs[i];
         block_t *p_data;
 
-        if( p_input->p_fifo->i_depth <= 0 )
+        if( block_FifoCount( p_input->p_fifo ) <= 0 )
         {
             if( p_input->p_fmt->i_cat == AUDIO_ES ||
                 p_input->p_fmt->i_cat == VIDEO_ES )

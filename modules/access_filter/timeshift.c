@@ -298,7 +298,7 @@ static void Thread( access_t *p_access )
 
         /* Write block */
         if( !p_sys->p_write_list && !p_sys->p_read_list &&
-            p_sys->p_fifo->i_size < TIMESHIFT_FIFO_MAX )
+            block_FifoSize( p_sys->p_fifo ) < TIMESHIFT_FIFO_MAX )
         {
             /* If there isn't too much timeshifted data,
              * write directly to FIFO */
@@ -310,7 +310,7 @@ static void Thread( access_t *p_access )
         block_Release( p_block );
 
         /* Read from file to fill up the fifo */
-        while( p_sys->p_fifo->i_size < TIMESHIFT_FIFO_MIN &&
+        while( block_FifoSize( p_sys->p_fifo ) < TIMESHIFT_FIFO_MIN &&
                !p_access->b_die )
         {
             p_block = ReadBlockFromFile( p_access );
@@ -323,10 +323,10 @@ static void Thread( access_t *p_access )
     msg_Dbg( p_access, "timeshift: no more input data" );
 
     while( !p_access->b_die &&
-           (p_sys->p_read_list || p_sys->p_fifo->i_size) )
+           (p_sys->p_read_list || block_FifoSize( p_sys->p_fifo ) ) )
     {
         /* Read from file to fill up the fifo */
-        while( p_sys->p_fifo->i_size < TIMESHIFT_FIFO_MIN &&
+        while( block_FifoSize( p_sys->p_fifo ) < TIMESHIFT_FIFO_MIN &&
                !p_access->b_die && p_sys->p_read_list )
         {
             p_block = ReadBlockFromFile( p_access );

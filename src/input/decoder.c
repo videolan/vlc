@@ -252,12 +252,12 @@ void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
         {
             /* FIXME !!!!! */
             while( !p_dec->b_die && !p_dec->b_error &&
-                   p_dec->p_owner->p_fifo->i_depth > 10 )
+                   block_FifoCount( p_dec->p_owner->p_fifo ) > 10 )
             {
                 msleep( 1000 );
             }
         }
-        else if( p_dec->p_owner->p_fifo->i_size > 50000000 /* 50 MB */ )
+        else if( block_FifoSize( p_dec->p_owner->p_fifo ) > 50000000 /* 50 MB */ )
         {
             /* FIXME: ideally we would check the time amount of data
              * in the fifo instead of its size. */
@@ -302,7 +302,8 @@ void input_DecoderDiscontinuity( decoder_t * p_dec, vlc_bool_t b_flush )
 
 vlc_bool_t input_DecoderEmpty( decoder_t * p_dec )
 {
-    if( p_dec->p_owner->b_own_thread && p_dec->p_owner->p_fifo->i_depth > 0 )
+    if( p_dec->p_owner->b_own_thread
+     && block_FifoCount( p_dec->p_owner->p_fifo ) > 0 )
     {
         return VLC_FALSE;
     }
@@ -789,9 +790,9 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
  */
 static void DeleteDecoder( decoder_t * p_dec )
 {
-    msg_Dbg( p_dec, "killing decoder fourcc `%4.4s', %d PES in FIFO",
+    msg_Dbg( p_dec, "killing decoder fourcc `%4.4s', %u PES in FIFO",
              (char*)&p_dec->fmt_in.i_codec,
-             p_dec->p_owner->p_fifo->i_depth );
+             (unsigned)block_FifoCount( p_dec->p_owner->p_fifo ) );
 
     /* Free all packets still in the decoder fifo. */
     block_FifoEmpty( p_dec->p_owner->p_fifo );

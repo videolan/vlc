@@ -155,7 +155,7 @@ static int Mux( sout_mux_t *p_mux )
         }
 
         p_fifo = p_mux->pp_inputs[i]->p_fifo;
-        i_count = p_fifo->i_depth;
+        i_count = block_FifoCount( p_fifo );
         while( i_count > 0 )
         {
             block_t *p_data = block_FifoGet( p_fifo );

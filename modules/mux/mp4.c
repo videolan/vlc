@@ -455,7 +455,7 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
         block_fifo_t   *p_fifo = p_mux->pp_inputs[i]->p_fifo;
         block_t *p_buf;
 
-        if( p_fifo->i_depth <= 1 )
+        if( Block_FifoCount( p_fifo ) <= 1 )
         {
             if( p_mux->pp_inputs[i]->p_fmt->i_cat != SPU_ES )
             {
@@ -521,7 +521,7 @@ again:
         if( p_stream->fmt.i_cat != SPU_ES )
         {
             /* Fix length of the sample */
-            if( p_input->p_fifo->i_depth > 0 )
+            if( block_FifoCount( p_input->p_fifo ) > 0 )
             {
                 block_t *p_next = block_FifoShow( p_input->p_fifo );
                 int64_t       i_diff  = p_next->i_dts - p_data->i_dts;
