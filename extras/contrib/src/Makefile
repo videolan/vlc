@@ -304,6 +304,8 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 
 CLEAN_PKG += libtool
 DISTCLEAN_PKG += libtool-$(LIBTOOL_VERSION).tar.gz
+CLEAN_FILE += .libtool
+
 endif
 
 ifeq ($(BUILD),i586-pc-beos)
@@ -319,9 +321,9 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 
 CLEAN_PKG += libtool
 DISTCLEAN_PKG += libtool-$(LIBTOOL_VERSION).tar.gz
-endif
-
 CLEAN_FILE += .libtool
+
+endif
 
 # ***************************************************************************
 # automake
@@ -462,7 +464,6 @@ endif
 	$(INSTALL_NAME)
 	touch $@
 
-
 CLEAN_FILE += .fontconfig
 CLEAN_PKG += fontconfig
 DISTCLEAN_PKG += fontconfig-$(FONTCONFIG_VERSION).tar.gz
@@ -582,7 +583,6 @@ libid3tag: libid3tag-$(LIBID3TAG_VERSION).tar.gz
 CLEAN_FILE += .id3tag
 CLEAN_PKG += libid3tag
 DISTCLEAN_PKG += libid3tag-$(LIBID3TAG_VERSION).tar.gz
-
 
 # ***************************************************************************
 # lua
@@ -721,6 +721,8 @@ tremor:
 	(cd $@; rm -f ogg.h && echo "#include <ogg/ogg.h>" > ogg.h && rm -f os_types.h && echo "#include <ogg/os_types.h>" > os_types.h && ./autogen.sh)
 else
 tremor-$(TREMOR_VERSION).tar.bz2:
+	echo "tremor snapshot does not exist, you MUST use subversion !"
+	exit -1
 	$(WGET) $(TREMOR_URL)
 
 tremor: tremor-$(TREMOR_VERSION).tar.bz2
@@ -734,8 +736,6 @@ endif
 
 ifdef SVN
 tremor-source: tremor
-	cd tremor;   find . -depth -iname ".svn" -exec rm -rf {} \;
-	cd ..;
 	tar cfvz tremor-$(DATE).tar.gz tremor
 
 SOURCE += tremor-source
@@ -743,7 +743,7 @@ endif
 
 CLEAN_FILE += .tremor
 CLEAN_PKG += tremor
-#DISTCLEAN_PKG += tremor-$(TREMOR_VERSION).tar.gz
+#DISTCLEAN_PKG += tremor-$(TREMOR_VERSION).tar.bz2 #no tremor snapshot
 
 # ***************************************************************************
 # theora
@@ -950,8 +950,6 @@ endif
 
 ifdef SVN
 libebml-source: libebml
-	cd libebml;   find . -depth -iname ".svn" -exec rm -rf {} \;
-	cd ..;
 	tar cfvz  libebml-$(DATE).tar.gz libebml
 SOURCE += libebml-source	
 endif
@@ -989,13 +987,10 @@ endif
 
 ifdef SVN
 libmatroska-source: libmatroska
-	cd libmatroska;    find . -depth -iname ".svn" -exec rm -rf {} \;
-	cd ..;
 	tar cfvz libmatroska-$(DATE).tar.gz libmatroska
 
 SOURCE += libmatroska-source
 endif
-
 
 CLEAN_FILE += .matroska
 CLEAN_PKG += libmatroska
@@ -1005,6 +1000,7 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 # ffmpeg
 # ***************************************************************************
 
+ifdef SVN
 ffmpeg:
 	$(SVN) export $(FFMPEG_SVN)  ffmpeg
 	(cd "$@" && patch -p0 < ../Patches/ffmpeg-svn-swscale-pc.patch)
@@ -1023,12 +1019,15 @@ ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-grab.patch
 endif
 
+else
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
+	echo "ffmpeg snapshot is too old, you MUST use subversion !"
+	exit -1
 	$(WGET) $(FFMPEG_URL)
 
-#ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
-#	$(EXTRACT_GZ)
-#	patch -p0 < Patches/ffmpeg.patch
+ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
+	$(EXTRACT_GZ)
+endif
 
 ifdef HAVE_WINCE
 .ffmpeg: ffmpeg .zlib
@@ -1044,8 +1043,6 @@ endif
 
 ifdef SVN
 ffmpeg-source: ffmpeg
-	cd ffmpeg;   find . -depth -iname ".svn" -exec rm -rf {} \;
-	cd ..;
 	tar cfvz ffmpeg-$(DATE).tar.gz ffmpeg
 
 SOURCE += ffmpeg-source
@@ -1078,45 +1075,14 @@ endif
 
 ifdef SVN
 libdvdcss-source: libdvdcss
-	cd libmatroska;   find . -depth -iname ".svn" -exec rm -rf {} \;
-	cd ..;
 	tar cfvz libdvdcss-$(DATE).tar.gz libdvdcss
 
 SOURCE += libdvdcss-source
 endif
 
-
 CLEAN_FILE += .dvdcss
 CLEAN_PKG += libdvdcss
 DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
-
-# ***************************************************************************
-# libdvdread: We use dvdnav's dvdread
-# ***************************************************************************
-
-#libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
-#	$(WGET) $(LIBDVDREAD_URL)
-
-#libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
-#	$(EXTRACT_BZ2)
-#	patch  -p 0 < Patches/libdvdread.patch
-#ifdef HAVE_WIN32
-#	if automake-1.4 --version >/dev/null 2>&1; then \
-#		echo "Please get rid of your automake 1.4"; \
-#		rm -rf $@ \
-#		exit 1; \
-#	fi
-#	(cd libdvdread; patch -p0 < ../Patches/libdvdread-20041028-win32.patch; ./bootstrap)
-#endif
-
-#.dvdread: libdvdread .dvdcss
-#	(cd libdvdread; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
-#	$(INSTALL_NAME)
-#	touch $@
-
-#CLEAN_FILE += .dvdread
-#CLEAN_PKG += libdvdread
-#DISTCLEAN_PKG += libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
 
 # ***************************************************************************
 # dummy dvdread to trigger the INSTALL_NAME script
@@ -1345,8 +1311,6 @@ endif
 
 ifdef SVN
 x264-source: x264
-	cd x264;   find . -depth -iname ".svn" -exec rm -rf {} \;
-	cd ..;
 	tar cfvz x264-$(DATE).tar.gz x264
 
 SOURCE += x264-source
@@ -1435,24 +1399,6 @@ CLEAN_PKG += libcdio
 DISTCLEAN_PKG += libcdio-$(CDIO_VERSION).tar.gz
 
 # ***************************************************************************
-# OpenMash
-# ***************************************************************************
-#
-#mash-src-$(MASH_VERSION).tar.gz:
-#	$(WGET) $(MASH_URL)
-#
-#mash-code: mash-src-$(MASH_VERSION).tar.gz
-#	$(EXTRACT_GZ)
-#
-#.mash: mash-code
-#	(cd $<; ./configure && make)
-#	touch $@
-#
-#CLEAN_FILE += .mash
-#CLEAN_PKG += mash-code
-#DISTCLEAN_PKG += mash-src-$(MASH_VERSION).tar.gz
-
-# ***************************************************************************
 # wxWidgets
 # ***************************************************************************
 
@@ -1483,7 +1429,6 @@ qt4-$(QT4_VERSION)-win32-bin.tar.gz:
 qt4: qt4-$(QT4_VERSION)-win32-bin.tar.gz
 	$(EXTRACT_GZ)
 
-
 .qt4: qt4
 	(cd qt4;mkdir -p $(PREFIX)/bin; mkdir -p $(PREFIX)/include;mkdir -p $(PREFIX)/lib/pkgconfig;rm -f $(PREFIX)/lib/pkgconfig/Qt*; sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtCore.pc.in > $(PREFIX)/lib/pkgconfig/QtCore.pc;sed 's,@@PREFIX@@,$(PREFIX),' lib/pkgconfig/QtGui.pc.in > $(PREFIX)/lib/pkgconfig/QtGui.pc;cp -r include/* $(PREFIX)/include;cp lib/*a $(PREFIX)/lib)
 ifeq ($(BUILD),i686-pc-cygwin)
@@ -1495,7 +1440,7 @@ endif
 
 CLEAN_FILE += .qt4
 CLEAN_PKG += qt4
-#DISTCLEAN_PKG += qt4-$(QT4_VERSION).tar.gz
+DISTCLEAN_PKG += qt4-$(QT4_VERSION)-win32-bin.tar.gz
 
 # ***************************************************************************
 # zlib
@@ -1516,7 +1461,6 @@ zlib: zlib-$(ZLIB_VERSION).tar.gz
 CLEAN_FILE += .zlib
 CLEAN_PKG += zlib
 DISTCLEAN_PKG += zlib-$(ZLIB_VERSION).tar.gz
-
 
 # ***************************************************************************
 # PortAudio 
@@ -1539,7 +1483,6 @@ endif
 CLEAN_FILE += .portaudio
 CLEAN_PKG += portaudio
 DISTCLEAN_PKG += pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz
-
 
 # ***************************************************************************
 # xml
@@ -1568,7 +1511,6 @@ endif
 CLEAN_FILE += .xml
 CLEAN_PKG += xml
 DISTCLEAN_PKG += libxml2-$(XML_VERSION).tar.gz
-
 
 # ***************************************************************************
 # twolame
@@ -2201,6 +2143,13 @@ taglib: taglib-$(TAGLIB_VERSION).tar.gz
 	$(INSTALL_NAME)
 	touch $@
 
+CLEAN_FILE += .tag
+CLEAN_PKG += taglib
+DISTCLEAN_PKG += taglib-$(TAGLIB_VERSION).tar.gz
+
+# ***************************************************************************
+# pthreads for win32
+# ***************************************************************************
 
 pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz:
 	$(WGET) $(PTHREADS_URL)
@@ -2215,7 +2164,7 @@ pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 
 
 # ***************************************************************************
-# Some cleansing
+# Some cleaning
 # ***************************************************************************
 
 clean-dots: FORCE
@@ -2231,5 +2180,9 @@ clean-svn:
 	rm -rf ffmpeg tremor libebml libmatroska x264 libdca
 
 distclean: clean-src
+
+# ***************************************************************************
+# Download all the sources and package unversionned copies of subversion trees
+# ***************************************************************************
 
 source: $(SOURCE) $(DISTCLEAN_PKG)
