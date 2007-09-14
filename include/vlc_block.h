@@ -252,8 +252,6 @@ static inline block_t *block_ChainGather( block_t *p_list )
 /****************************************************************************
  * Fifos of blocks.
  ****************************************************************************
- * Avoid touching block_fifo_t unless you really know what you are doing.
- * ( Some race conditions has to be correctly handled, like in win32 ;)
  * - block_FifoNew : create and init a new fifo
  * - block_FifoRelease : destroy a fifo and free all blocks in it.
  * - block_FifoEmpty : free all blocks in a fifo
@@ -265,16 +263,6 @@ static inline block_t *block_ChainGather( block_t *p_list )
  * - block_FifoCount : how many packets are waiting in the fifo
  * - block_FifoSize : how many cumulated bytes are waiting in the fifo
  ****************************************************************************/
-struct block_fifo_t
-{
-    vlc_mutex_t         lock;                         /* fifo data lock */
-    vlc_cond_t          wait;         /* fifo data conditional variable */
-
-    int                 i_depth;
-    block_t             *p_first;
-    block_t             **pp_last;
-    int                 i_size;
-};
 
 #define block_FifoNew( a ) __block_FifoNew( VLC_OBJECT(a) )
 VLC_EXPORT( block_fifo_t *, __block_FifoNew,    ( vlc_object_t * ) );

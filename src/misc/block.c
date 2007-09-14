@@ -155,18 +155,16 @@ static void BlockRelease( block_t *p_block )
 /*****************************************************************************
  * block_fifo_t management
  *****************************************************************************/
-#if 0
 struct block_fifo_t
 {
     vlc_mutex_t         lock;                         /* fifo data lock */
     vlc_cond_t          wait;         /* fifo data conditional variable */
 
-    int                 i_depth;
+    size_t              i_depth;
     block_t             *p_first;
     block_t             **pp_last;
-    int                 i_size;
+    size_t              i_size;
 };
-#endif
 
 block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
 {
