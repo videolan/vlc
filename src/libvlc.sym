@@ -70,6 +70,8 @@ __block_FifoNew
 block_FifoPut
 block_FifoRelease
 block_FifoShow
+block_FifoCount
+block_FifoSize
 __block_New
 block_Realloc
 config_ChainCreate

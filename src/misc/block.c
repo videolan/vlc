@@ -155,6 +155,19 @@ static void BlockRelease( block_t *p_block )
 /*****************************************************************************
  * block_fifo_t management
  *****************************************************************************/
+#if 0
+struct block_fifo_t
+{
+    vlc_mutex_t         lock;                         /* fifo data lock */
+    vlc_cond_t          wait;         /* fifo data conditional variable */
+
+    int                 i_depth;
+    block_t             *p_first;
+    block_t             **pp_last;
+    int                 i_size;
+};
+#endif
+
 block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
 {
     block_fifo_t *p_fifo;
@@ -269,6 +282,14 @@ block_t *block_FifoShow( block_fifo_t *p_fifo )
     vlc_mutex_unlock( &p_fifo->lock );
 
     return( b );
-
 }
 
+size_t block_FifoSize( const block_fifo_t *p_fifo )
+{
+    return p_fifo->i_size;
+}
+
+size_t block_FifoCount( const block_fifo_t *p_fifo )
+{
+    return p_fifo->i_depth;
+}

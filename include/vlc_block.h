@@ -281,5 +281,7 @@ VLC_EXPORT( void,           block_FifoEmpty,    ( block_fifo_t * ) );
 VLC_EXPORT( int,            block_FifoPut,      ( block_fifo_t *, block_t * ) );
 VLC_EXPORT( block_t *,      block_FifoGet,      ( block_fifo_t * ) );
 VLC_EXPORT( block_t *,      block_FifoShow,     ( block_fifo_t * ) );
+VLC_EXPORT( size_t,         block_FifoSize,     ( const block_fifo_t *p_fifo ) );
+VLC_EXPORT( size_t,         block_FifoCount,    ( const block_fifo_t *p_fifo ) );
 
 #endif /* VLC_BLOCK_H */
