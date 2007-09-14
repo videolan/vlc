@@ -18,9 +18,9 @@ function parse()
     do 
         line = vlc.readline()
         if not line then break end
-        if string.match( line, "param name=\"flashvars\" value=\".*url=" )
+        if string.match( line, "param name=\"flashvars\" value=\".*url=http" )
         then
-            path = vlc.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\".*url=([^&]*).*$", "%1" ) )
+            path = vlc.decode_uri( string.gsub( line, "^.*param name=\"flashvars\" value=\".*url=(http[^&]*).*$", "%1" ) )
         end
         --[[ if string.match( line, "<title>" )
         then
