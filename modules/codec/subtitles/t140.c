@@ -71,7 +71,6 @@ static int Open( vlc_object_t *p_this )
 
 static void Close( vlc_object_t *p_this )
 {
-    msg_Err( p_this, "out of codec" );
     (void)p_this;
 }
 
