@@ -455,7 +455,7 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
         block_fifo_t   *p_fifo = p_mux->pp_inputs[i]->p_fifo;
         block_t *p_buf;
 
-        if( Block_FifoCount( p_fifo ) <= 1 )
+        if( block_FifoCount( p_fifo ) <= 1 )
         {
             if( p_mux->pp_inputs[i]->p_fmt->i_cat != SPU_ES )
             {
