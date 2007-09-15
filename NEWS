@@ -46,10 +46,10 @@ Input/Demuxers:
   * Proxy support for MMSH stream
   * JACK audio input support
   * MP4 gpac and Apple chapter support
-  * Input run time option ( improved live stream recording )
+  * Input run time option (improved live stream recording)
   * Fixed aiff stereo file
   * Fixed audio glitch on seek
-  * Improved FLAC demuxer ( duration / current time / meta data )
+  * Improved FLAC demuxer (duration / current time / meta data)
   * AAC tags support
   * APEv1/2 tags support
   * Improved ID3v2 tags support
@@ -65,7 +65,8 @@ Decoders:
  * DosBox Capture support
  * Karl Morton's Video support
  * limited atrac3 support
- * New codec FOURCCs to support more specific files (Avid, FCP, Sony, Samsung, ...)
+ * New codec FOURCCs to support more specific files:
+   Avid, FCP, Sony, Samsung, ...
 
 Encoders:
  * Flash Screen Video support
