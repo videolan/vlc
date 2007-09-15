@@ -580,8 +580,10 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     struct timespec ts = { d.quot, d.rem * 1000 };
 
     i_res = pthread_cond_timedwait( &p_condvar->cond, &p_mutex->mutex, &ts );
-
-    if ( i_res )
+    if( i_res = ETIMEDOUT )
+        i_res = 0; /* this error is perfectly normal */
+    else
+    if ( i_res ) /* other errors = bug */
     {
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
         psz_error = strerror(i_res);
