@@ -584,10 +584,6 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
         p_session->i_next = p_session->i_last
                             + p_session->p_address->i_interval*1000000;
     }
-    else
-    {
-        return VLC_SUCCESS;
-    }
     return VLC_SUCCESS;
 }
 
