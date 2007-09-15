@@ -374,7 +374,8 @@ error:
  * Starts negociation of a TLS session.
  *
  * @param fd stream socket already connected with the peer.
- * @param psz_hostname if not NULL, hostname to mention as a Server Name.
+ * @param psz_hostname if not NULL, hostname to mention as a Server Name,
+ *                     and to be found in the server's certificate.
  *
  * @return -1 on error (you need not and must not call tls_SessionClose),
  * 0 on succesful handshake completion, 1 if more would-be blocking recv is
