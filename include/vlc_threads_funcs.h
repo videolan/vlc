@@ -45,6 +45,7 @@ VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int
 VLC_EXPORT( void, __vlc_thread_ready,  ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 
+#include <errno.h>
 
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
@@ -506,7 +507,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     /* In debug mode, timeout */
     struct timespec timeout;
 
-    clock_gettime( CLOCK_MONOTONIC, &now );
+    clock_gettime( CLOCK_MONOTONIC, &timeout );
     timeout.tv_sec += THREAD_COND_TIMEOUT;
 
     i_result = pthread_cond_timedwait( &p_condvar->cond, &p_mutex->mutex,
@@ -580,7 +581,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     struct timespec ts = { d.quot, d.rem * 1000 };
 
     i_res = pthread_cond_timedwait( &p_condvar->cond, &p_mutex->mutex, &ts );
-    if( i_res = ETIMEDOUT )
+    if( i_res == ETIMEDOUT )
         i_res = 0; /* this error is perfectly normal */
     else
     if ( i_res ) /* other errors = bug */
