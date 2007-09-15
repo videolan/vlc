@@ -96,7 +96,8 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DST_TEXT,
                 DST_LONGTEXT, VLC_FALSE );
 
-    add_bool( SOUT_CFG_PREFIX "sap", 0, NULL, SAP_TEXT, SAP_LONGTEXT, VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "sap", VLC_FALSE, NULL, SAP_TEXT, SAP_LONGTEXT,
+              VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT, NAME_LONGTEXT,
                                         VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "group", "", NULL, GROUP_TEXT, GROUP_LONGTEXT,
@@ -142,6 +143,7 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_instance_t     *p_sout = p_stream->p_sout;
+    sout_stream_sys_t   *p_sys;
 
     char *psz_mux;
     char *psz_access;
@@ -170,7 +172,7 @@ static int Open( vlc_object_t *p_this )
     psz_url = *val.psz_string ? val.psz_string : NULL;
     if( !*val.psz_string ) free( val.psz_string );
 
-    p_stream->p_sys = malloc( sizeof( sout_stream_sys_t) );
+    p_sys = p_stream->p_sys = malloc( sizeof( sout_stream_sys_t) );
     p_stream->p_sys->p_session = NULL;
 
     msg_Dbg( p_this, "creating `%s/%s://%s'", psz_access, psz_mux, psz_url );
@@ -334,58 +336,60 @@ static int Open( vlc_object_t *p_this )
     /* *** Create the SAP Session structure *** */
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX"sap" ) )
     {
-        session_descriptor_t *p_session;
-        announce_method_t *p_method = sout_SAPMethod ();
+        /* Create the SDP */
+        char *shost = var_GetNonEmptyString (p_access, "src-addr");
+        char *dhost = var_GetNonEmptyString (p_access, "dst-addr");
+        int sport = var_GetInteger (p_access, "src-port");
+        int dport = var_GetInteger (p_access, "dst-port");
+        struct sockaddr_storage src, dst;
+        socklen_t srclen = 0, dstlen = 0;
 
-        static const struct { const char *access; const char *fmt; } fmts[] =
-            {
-                /* Plain text: */
-                { "udp",      "udp mpeg" },
-                { "rtp",      "RTP/AVP 33" },
-                { NULL,       NULL }
-            };
-        const char *fmt = NULL;
-        char *src, *dst;
-        int sport, dport;
-
-        for (unsigned i = 0; fmts[i].access != NULL; i++)
-            if (strncasecmp (fmts[i].access, psz_access, strlen (fmts[i].access)) == 0)
-            {
-                fmt = fmts[i].fmt;
-                break;
-            }
-
-        src = var_GetNonEmptyString (p_access, "src-addr");
-        dst = var_GetNonEmptyString (p_access, "dst-addr");
-        sport = var_GetInteger (p_access, "src-port");
-        dport = var_GetInteger (p_access, "dst-port");
-
-        msg_Dbg( p_stream, "SAP advertized format: %s", fmt);
-        if ((fmt == NULL) || ((src == NULL) && (dst == NULL)))
+        struct addrinfo *res;
+        if (vlc_getaddrinfo (VLC_OBJECT (p_stream), dhost, dport, NULL, &res) == 0)
         {
-            msg_Err (p_access, "SAP announces not supported for access %s",
-                     psz_access);
-            goto nosap;
+            memcpy (&dst, res->ai_addr, dstlen = res->ai_addrlen);
+            vlc_freeaddrinfo (res);
         }
 
-        p_session = sout_AnnounceSessionCreate (VLC_OBJECT (p_stream),
-                                                SOUT_CFG_PREFIX);
-        sout_SessionSetMedia (VLC_OBJECT (p_stream), p_session, fmt,
-                              src, sport, dst, dport);
-        sout_AnnounceRegister( p_sout, p_session, p_method );
-        p_stream->p_sys->p_session = p_session;
-        sout_MethodRelease (p_method);
+        if (vlc_getaddrinfo (VLC_OBJECT (p_stream), shost, sport, NULL, &res) == 0)
+        {
+            memcpy (&src, res->ai_addr, srclen = res->ai_addrlen);
+            vlc_freeaddrinfo (res);
+        }
 
-nosap:
-        free (src);
-        free (dst);
+        char *head = vlc_sdp_Start (VLC_OBJECT (p_stream), SOUT_CFG_PREFIX,
+                                    (struct sockaddr *)&src, srclen,
+                                    (struct sockaddr *)&dst, dstlen);
+        free (shost);
+
+        char *psz_sdp = NULL;
+        if (head != NULL)
+        {
+            if (asprintf (&psz_sdp, "%s"
+                          "m=video %d udp mpeg\r\n", head, dport) == -1)
+                psz_sdp = NULL;
+            free (head);
+        }
+
+        /* Register the SDP with the SAP thread */
+        if (psz_sdp != NULL)
+        {
+            announce_method_t *p_method = sout_SAPMethod ();
+            msg_Dbg (p_stream, "Generated SDP:\n%s", psz_sdp);
+
+            p_sys->p_session =
+                sout_AnnounceRegisterSDP (p_sout, SOUT_CFG_PREFIX, psz_sdp,
+                                          dhost, p_method);
+            sout_MethodRelease (p_method);
+        }
+        free (dhost);
     }
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
 
-    p_stream->p_sys->p_mux = p_mux;
+    p_sys->p_mux = p_mux;
 
     free( psz_access );
     free( psz_mux );
@@ -408,7 +412,6 @@ static void Close( vlc_object_t * p_this )
         sout_AnnounceUnRegister( p_stream->p_sout, p_sys->p_session );
         sout_AnnounceSessionDestroy( p_sys->p_session );
     }
-
 
     sout_MuxDelete( p_sys->p_mux );
     sout_AccessOutDelete( p_access );
