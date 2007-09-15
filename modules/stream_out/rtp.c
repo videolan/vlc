@@ -1196,25 +1196,24 @@ static int SapSetup( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_instance_t   *p_sout = p_stream->p_sout;
-    announce_method_t *p_method = sout_SAPMethod();
 
     /* Remove the previous session */
     if( p_sys->p_session != NULL)
     {
         sout_AnnounceUnRegister( p_sout, p_sys->p_session);
-        sout_AnnounceSessionDestroy( p_sys->p_session );
         p_sys->p_session = NULL;
     }
 
     if( ( p_sys->i_es > 0 || p_sys->p_mux ) && p_sys->psz_sdp && *p_sys->psz_sdp )
     {
+        announce_method_t *p_method = sout_SAPMethod();
         p_sys->p_session = sout_AnnounceRegisterSDP( p_sout, SOUT_CFG_PREFIX,
                                                      p_sys->psz_sdp,
                                                      p_sys->psz_destination,
                                                      p_method );
+        sout_MethodRelease( p_method );
     }
 
-    sout_MethodRelease( p_method );
     return VLC_SUCCESS;
 }
 

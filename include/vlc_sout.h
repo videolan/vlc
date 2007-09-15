@@ -208,12 +208,11 @@ static inline int sout_StreamIdSend( sout_stream_t *s, sout_stream_id_t *id, blo
 }
 
 /****************************************************************************
- * Announce handler mess
+ * Announce handler
  ****************************************************************************/
 VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, (sout_instance_t *, const char *, const char *, const char *, announce_method_t* ) );
 VLC_EXPORT( int,                sout_AnnounceUnRegister, (sout_instance_t *,session_descriptor_t* ) );
 
-VLC_EXPORT(void,                 sout_AnnounceSessionDestroy, (session_descriptor_t *) );
 VLC_EXPORT(announce_method_t*,   sout_SAPMethod, (void) );
 VLC_EXPORT(void,                 sout_MethodRelease, (announce_method_t *) );
 

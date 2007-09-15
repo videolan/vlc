@@ -47,28 +47,17 @@ struct announce_method_t
  ****************************************************************************/
 
 /**
- * Create and initialize a session descriptor
- *
- * \return a new session descriptor
- */
-static session_descriptor_t * sout_AnnounceSessionCreate (vlc_object_t *obj,
-                                                   const char *cfgpref)
-{
-    return calloc (1, sizeof (session_descriptor_t));
-}
-
-/**
  *  Register a new session with the announce handler, using a pregenerated SDP
  *
  * \param p_sout a sout instance structure
  * \param psz_sdp the SDP to register
- * \param psz_uri session address (needed for SAP address auto detection)
+ * \param psz_dst session address (needed for SAP address auto detection)
  * \param p_method an announce method descriptor
  * \return the new session descriptor structure
  */
 session_descriptor_t *
 sout_AnnounceRegisterSDP( sout_instance_t *p_sout, const char *cfgpref,
-                          const char *psz_sdp, const char *psz_uri,
+                          const char *psz_sdp, const char *psz_dst,
                           announce_method_t *p_method )
 {
     session_descriptor_t *p_session;
@@ -88,12 +77,13 @@ sout_AnnounceRegisterSDP( sout_instance_t *p_sout, const char *cfgpref,
         vlc_object_yield( p_announce );
     }
 
-    p_session = sout_AnnounceSessionCreate(VLC_OBJECT (p_sout), cfgpref);
+    p_session = malloc( sizeof( *p_session ) );
+    memset( p_session, 0, sizeof( *p_session ) );
     p_session->psz_sdp = strdup( psz_sdp );
 
     /* GRUIK. We should not convert back-and-forth from string to numbers */
     struct addrinfo *res;
-    if (vlc_getaddrinfo (VLC_OBJECT (p_sout), psz_uri, 0, NULL, &res) == 0)
+    if (vlc_getaddrinfo (VLC_OBJECT (p_sout), psz_dst, 0, NULL, &res) == 0)
     {
         if (res->ai_addrlen <= sizeof (p_session->addr))
             memcpy (&p_session->addr, res->ai_addr,
@@ -128,21 +118,12 @@ int sout_AnnounceUnRegister( sout_instance_t *p_sout,
         return VLC_ENOOBJ;
     }
     i_ret  = announce_UnRegister( p_announce, p_session );
+    if( i_ret == 0 )
+        free( p_session );
 
     vlc_object_release( p_announce );
 
     return i_ret;
-}
-
-/**
- * Destroy a session descriptor and free all
- *
- * \param p_session the session to destroy
- * \return Nothing
- */
-void sout_AnnounceSessionDestroy( session_descriptor_t *p_session )
-{
-    free( p_session );
 }
 
 /**

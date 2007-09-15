@@ -265,7 +265,6 @@ sout_AccessOutRead
 sout_AccessOutSeek
 sout_AccessOutWrite
 sout_AnnounceRegisterSDP
-sout_AnnounceSessionDestroy
 sout_AnnounceUnRegister
 sout_MuxAddStream
 sout_MuxDelete
