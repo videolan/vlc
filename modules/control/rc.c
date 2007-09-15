@@ -747,12 +747,10 @@ static void Run( intf_thread_t *p_intf )
 
             Help( p_intf, b_longhelp );
         }
-#if 0
         else if( !strcmp( psz_cmd, "check-updates" ) )
         {
             checkUpdates( p_intf, psz_arg );
         }
-#endif
         else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
         {
             var_SetInteger( p_intf->p_libvlc, "key-pressed",
@@ -2057,7 +2055,6 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
     return p_item;
 }
 
-#if 0
 /*****************************************************************************
  * checkUpdates : check for updates
  ****************************************************************************/
@@ -2174,4 +2171,3 @@ static void checkUpdates( intf_thread_t *p_intf, char *psz_arg )
     }
     update_Delete( p_u );
 }
-#endif
