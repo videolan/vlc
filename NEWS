@@ -28,6 +28,10 @@ Important notes:
     vlc --sub-filter "marq@test{marquee=Hello}" -I rc <somevideo>
     You can then use commands like: @test marq-marquee Goodbye
     These new commands are also available in the telnet interface.
+ * The "rtp" access output module has been removed:
+   Please the RTP stream output instead, e.g.:
+     Old: '#std{access=rtp,dst=239.255.1.2,sap}'
+     New: '#rtp{dst=239.255.1.2,sap}'
 
 Changes:
 --------
@@ -97,7 +101,12 @@ Audio output and filters
  * New spatializer audio filter.
 
 Stream output:
- * UDP-Lite (requires OS support) for RTP/TS encapsulation
+ * RTSP for TS-multiplexed broadcast streams
+ * New RTP payload formats:
+   * ITU T.140 (for text, subtitles)
+(FIXME: * Speex voice audio codec)
+ * UDP-Lite (requires OS support) transport for RTP
+ * Lots of fixes for RTSP broadcasting
 
 Interfaces:
  * Windows/Linux
