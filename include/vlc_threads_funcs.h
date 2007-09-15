@@ -504,12 +504,10 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
 
 #   ifdef DEBUG
     /* In debug mode, timeout */
-    struct timeval now;
     struct timespec timeout;
 
-    gettimeofday( &now, NULL );
-    timeout.tv_sec = now.tv_sec + THREAD_COND_TIMEOUT;
-    timeout.tv_nsec = now.tv_usec * 1000;
+    clock_gettime( CLOCK_MONOTONIC, &now );
+    timeout.tv_sec += THREAD_COND_TIMEOUT;
 
     i_result = pthread_cond_timedwait( &p_condvar->cond, &p_mutex->mutex,
                                        &timeout );

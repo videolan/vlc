@@ -457,7 +457,19 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     return 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    return pthread_cond_init( &p_condvar->cond, NULL );
+    pthread_condattr_t attr;
+    int ret;
+
+    ret = pthread_condattr_init (&attr);
+    if (ret)
+        return ret;
+
+    /* This must be the same clock as the one in mtime.c */
+    pthread_condattr_setclock (&attr, CLOCK_MONOTONIC);
+
+    ret = pthread_cond_init (&p_condvar->cond, &attr);
+    pthread_condattr_destroy (&attr);
+    return ret;
 
 #elif defined( HAVE_CTHREADS_H )
     /* condition_init() */
