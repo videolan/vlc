@@ -318,14 +318,6 @@ tls_ServerDelete
 ToLocale
 unescape_URI
 unescape_URI_duplicate
-update_Check
-update_Delete
-update_download
-update_iterator_Action
-update_iterator_ChooseMirrorAndFile
-update_iterator_Delete
-update_iterator_New
-__update_New
 us_atof
 us_strtod
 utf8_fopen

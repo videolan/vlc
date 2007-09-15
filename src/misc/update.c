@@ -1,3 +1,4 @@
+#if 0
 /*****************************************************************************
  * update.c: VLC update and plugins download
  *****************************************************************************
@@ -1337,3 +1338,4 @@ void update_download_for_real( download_thread_t *p_this )
 
     vlc_object_destroy( p_this );
 }
+#endif
