@@ -80,11 +80,6 @@ static void Close( vlc_object_t * );
     "This ensures that the server certificate is valid " \
     "(i.e. signed by an approved Certification Authority)." )
 
-#define CHECK_HOSTNAME_TEXT N_("Check TLS/SSL server hostname in certificate")
-#define CHECK_HOSTNAME_LONGTEXT N_( \
-    "This ensures that the server hostname in certificate matches the " \
-    "requested host name." )
-
 vlc_module_begin();
     set_shortname( "GnuTLS" );
     set_description( _("GnuTLS TLS encryption layer") );
@@ -95,8 +90,7 @@ vlc_module_begin();
 
     add_bool( "tls-check-cert", VLC_TRUE, NULL, CHECK_CERT_TEXT,
               CHECK_CERT_LONGTEXT, VLC_FALSE );
-    add_bool( "tls-check-hostname", VLC_TRUE, NULL, CHECK_HOSTNAME_TEXT,
-              CHECK_HOSTNAME_LONGTEXT, VLC_FALSE );
+    add_deprecated_bool( "tls-check-hostname" );
 
     add_integer( "gnutls-dh-bits", DH_BITS, NULL, DH_BITS_TEXT,
                  DH_BITS_LONGTEXT, VLC_TRUE );
@@ -398,16 +392,13 @@ gnutls_BeginHandshake( tls_session_t *p_session, int fd,
 
     if( psz_hostname != NULL )
     {
-        gnutls_server_name_set( p_sys->session, GNUTLS_NAME_DNS, psz_hostname,
-                                strlen( psz_hostname ) );
-        if (var_CreateGetBool (p_session, "tls-check-hostname"))
+        gnutls_server_name_set (p_sys->session, GNUTLS_NAME_DNS, psz_hostname,
+                                strlen (psz_hostname));
+        p_sys->psz_hostname = strdup (psz_hostname);
+        if (p_sys->psz_hostname == NULL)
         {
-            p_sys->psz_hostname = strdup( psz_hostname );
-            if( p_sys->psz_hostname == NULL )
-            {
-                p_session->pf_close( p_session );
-                return -1;
-            }
+            p_session->pf_close (p_session);
+            return -1;
         }
     }
 
