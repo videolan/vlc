@@ -123,7 +123,7 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 
 /* If the interface is in the main thread, it should listen both to
  * p_intf->b_die and p_libvlc->b_die */
-#define intf_ShouldDie( p_intf ) (p_intf->b_die || (p_intf->b_block && p_intf->p_libvlc->b_die ) )
+#define intf_ShouldDie( p_intf ) (p_intf->b_die || p_intf->p_libvlc->b_die )
 
 #define intf_Eject(a,b) __intf_Eject(VLC_OBJECT(a),b)
 VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
