@@ -271,10 +271,6 @@ char *vlc_sdp_Start (vlc_object_t *obj, const char *cfgpref,
     char *email = var_GetNonEmptyString (obj, varname);
     strcpy (subvar, "phone");
     char *phone = var_GetNonEmptyString (obj, varname);
-#if 0
-    strcpy (subvar, "group");
-    char *group = var_GetNonEmptyString (obj, varname);
-#endif
 
     char *sdp = sdp_Start (name, description, url, email, phone,
                            src, srclen, addr, addrlen);
@@ -283,6 +279,18 @@ char *vlc_sdp_Start (vlc_object_t *obj, const char *cfgpref,
     free (url);
     free (email);
     free (phone);
+
+    if (sdp == NULL)
+        return NULL;
+
+    /* Totally non-standard */
+    strcpy (subvar, "group");
+    char *group = var_GetNonEmptyString (obj, varname);
+    if (group != NULL)
+    {
+        sdp_AddAttribute (&sdp, "x-plgroup", "%s", group)
+        free (group);
+    }
 
     return sdp;
 }
