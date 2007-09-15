@@ -2,7 +2,7 @@
  * vlc_threads_funcs.h : threads implementation for the VideoLAN client
  * This header provides a portable threads implementation.
  *****************************************************************************
- * Copyright (C) 1999, 2002 the VideoLAN team
+ * Copyright (C) 1999-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
@@ -546,6 +546,59 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     }
 
     return i_result;
+}
+
+
+/*****************************************************************************
+ * vlc_cond_timedwait: wait until condition completion or expiration
+ *****************************************************************************/
+#define vlc_cond_timedwait( P_COND, P_MUTEX, DEADLINE )                      \
+    __vlc_cond_timedwait( __FILE__, __LINE__, P_COND, P_MUTEX, DEADLINE  )
+
+static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
+                                        vlc_cond_t *p_condvar,
+                                        vlc_mutex_t *p_mutex,
+                                        mtime_t deadline )
+{
+    int i_res;
+    unsigned long int i_thread = 0;
+    const char * psz_error = "";
+
+#if defined( PTH_INIT_IN_PTH_H )
+#   error Unimplemented
+#elif defined( ST_INIT_IN_ST_H )
+#   error Unimplemented
+#elif defined( UNDER_CE )
+#   error Unimplemented
+#elif defined( WIN32 )
+#   error Unimplemented FIXME FIXME
+
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+#   error Unimplemented
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    lldiv_t d = lldiv( deadline, 1000000 );
+    struct timespec ts = { d.quot, d.rem * 1000 };
+
+    i_res = pthread_cond_timedwait( &p_condvar->cond, &p_mutex->mutex, &ts );
+
+    if ( i_res )
+    {
+        i_thread = CAST_PTHREAD_TO_INT(pthread_self());
+        psz_error = strerror(i_res);
+    }
+
+#elif defined( HAVE_CTHREADS_H )
+#   error Unimplemented
+#endif
+
+    if( i_res )
+    {
+        msg_Err( p_condvar->p_this,
+                 "thread %li: cond_wait failed at %s:%d (%d:%s)",
+                 i_thread, psz_file, i_line, i_res, psz_error );
+    }
+
+    return i_res;
 }
 
 /*****************************************************************************
