@@ -90,7 +90,7 @@ vlc_module_begin();
 
     add_bool( "tls-check-cert", VLC_TRUE, NULL, CHECK_CERT_TEXT,
               CHECK_CERT_LONGTEXT, VLC_FALSE );
-    add_deprecated_bool( "tls-check-hostname" );
+    add_obsolete_bool( "tls-check-hostname" );
 
     add_integer( "gnutls-dh-bits", DH_BITS, NULL, DH_BITS_TEXT,
                  DH_BITS_LONGTEXT, VLC_TRUE );
