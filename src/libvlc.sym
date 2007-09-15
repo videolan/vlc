@@ -1,6 +1,5 @@
 sout_MethodRelease
 sout_SAPMethod
-sout_SessionSetMedia
 vlc_b64_encode_binary
 vlc_strnlen
 stream_Block
@@ -265,9 +264,7 @@ sout_AccessOutNew
 sout_AccessOutRead
 sout_AccessOutSeek
 sout_AccessOutWrite
-sout_AnnounceRegister
 sout_AnnounceRegisterSDP
-sout_AnnounceSessionCreate
 sout_AnnounceSessionDestroy
 sout_AnnounceUnRegister
 sout_MuxAddStream

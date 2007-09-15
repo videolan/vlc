@@ -101,16 +101,7 @@ struct announce_handler_t
     sap_handler_t *p_sap;
 };
 
-#define announce_HandlerCreate(a) __announce_HandlerCreate(VLC_OBJECT(a))
-announce_handler_t*  __announce_HandlerCreate( vlc_object_t *);
-
-/* Private functions for the announce handler */
 int announce_HandlerDestroy( announce_handler_t * );
-int announce_Register( announce_handler_t *p_announce,
-                       session_descriptor_t *p_session,
-                       announce_method_t *p_method );
-int announce_UnRegister( announce_handler_t *p_announce,
-                         session_descriptor_t *p_session );
 
 sap_handler_t *announce_SAPHandlerCreate( announce_handler_t *p_announce );
 void announce_SAPHandlerDestroy( sap_handler_t *p_sap );

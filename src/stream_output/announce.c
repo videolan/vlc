@@ -30,6 +30,13 @@
 
 #include <assert.h>
 
+/* Private functions for the announce handler */
+static announce_handler_t*  announce_HandlerCreate( vlc_object_t *);
+static int announce_Register( announce_handler_t *p_announce,
+                              session_descriptor_t *p_session,
+                              announce_method_t *p_method );
+static int announce_UnRegister( announce_handler_t *p_announce,
+                                session_descriptor_t *p_session );
 
 struct announce_method_t
 {
@@ -40,40 +47,39 @@ struct announce_method_t
  ****************************************************************************/
 
 /**
- *  Register a new session with the announce handler
+ * Create and initialize a session descriptor
  *
- * \param p_sout a sout instance structure
- * \param p_session a session descriptor
- * \param p_method an announce method descriptor
- * \return VLC_SUCCESS or an error
+ * \return a new session descriptor
  */
-int sout_AnnounceRegister( sout_instance_t *p_sout,
-                       session_descriptor_t *p_session,
-                       announce_method_t *p_method )
+static session_descriptor_t * sout_AnnounceSessionCreate (vlc_object_t *obj,
+                                                   const char *cfgpref)
 {
-    int i_ret;
-    announce_handler_t *p_announce = (announce_handler_t*)
-                              vlc_object_find( p_sout,
-                                              VLC_OBJECT_ANNOUNCE,
-                                              FIND_ANYWHERE );
+    size_t cfglen = strlen (cfgpref);
+    if (cfglen > 100)
+        return NULL;
 
-    if( !p_announce )
-    {
-        msg_Dbg( p_sout, "No announce handler found, creating one" );
-        p_announce = announce_HandlerCreate( p_sout );
-        if( !p_announce )
-        {
-            msg_Err( p_sout, "Creation failed" );
-            return VLC_ENOMEM;
-        }
-        vlc_object_yield( p_announce );
-        msg_Dbg( p_sout, "creation done" );
-    }
+    char varname[cfglen + sizeof ("description")], *subvar = varname + cfglen;
+    strcpy (varname, cfgpref);
 
-    i_ret = announce_Register( p_announce, p_session, p_method );
-    vlc_object_release( p_announce );
+    session_descriptor_t *p_session = calloc (1, sizeof (*p_session));
+    if (p_session == NULL)
+        return NULL;
 
-    return i_ret;
+    strcpy (subvar, "name");
+    p_session->psz_name = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "group");
+    p_session->psz_group = var_GetNonEmptyString (obj, varname);
+
+    strcpy (subvar, "description");
+    p_session->description = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "url");
+    p_session->url = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "email");
+    p_session->email = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "phone");
+    p_session->phone = var_GetNonEmptyString (obj, varname);
+
+    return p_session;
 }
 
 /**
@@ -98,7 +104,7 @@ sout_AnnounceRegisterSDP( sout_instance_t *p_sout, const char *cfgpref,
     if( !p_announce )
     {
         msg_Dbg( p_sout, "no announce handler found, creating one" );
-        p_announce = announce_HandlerCreate( p_sout );
+        p_announce = announce_HandlerCreate( VLC_OBJECT( p_sout ) );
         if( !p_announce )
         {
             msg_Err( p_sout, "Creation failed" );
@@ -154,75 +160,6 @@ int sout_AnnounceUnRegister( sout_instance_t *p_sout,
 }
 
 /**
- * Create and initialize a session descriptor
- *
- * \return a new session descriptor
- */
-session_descriptor_t * sout_AnnounceSessionCreate (vlc_object_t *obj,
-                                                   const char *cfgpref)
-{
-    size_t cfglen = strlen (cfgpref);
-    if (cfglen > 100)
-        return NULL;
-
-    char varname[cfglen + sizeof ("description")], *subvar = varname + cfglen;
-    strcpy (varname, cfgpref);
-
-    session_descriptor_t *p_session = calloc (1, sizeof (*p_session));
-    if (p_session == NULL)
-        return NULL;
-
-    strcpy (subvar, "name");
-    p_session->psz_name = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "group");
-    p_session->psz_group = var_GetNonEmptyString (obj, varname);
-
-    strcpy (subvar, "description");
-    p_session->description = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "url");
-    p_session->url = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "email");
-    p_session->email = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "phone");
-    p_session->phone = var_GetNonEmptyString (obj, varname);
-
-    return p_session;
-}
-
-int sout_SessionSetMedia (vlc_object_t *obj, session_descriptor_t *p_session,
-                          const char *fmt, const char *src, int sport,
-                          const char *dst, int dport)
-{
-    if ((p_session->sdpformat = strdup (fmt)) == NULL)
-        return VLC_ENOMEM;
-
-    /* GRUIK. We should not convert back-and-forth from string to numbers */
-    struct addrinfo *res;
-    if (vlc_getaddrinfo (obj, dst, dport, NULL, &res) == 0)
-    {
-        if (res->ai_addrlen > sizeof (p_session->addr))
-            goto oflow;
-
-        memcpy (&p_session->addr, res->ai_addr,
-                p_session->addrlen = res->ai_addrlen);
-        vlc_freeaddrinfo (res);
-    }
-    if (vlc_getaddrinfo (obj, src, sport, NULL, &res) == 0)
-    {
-        if (res->ai_addrlen > sizeof (p_session->orig))
-            goto oflow;
-        memcpy (&p_session->orig, res->ai_addr,
-               p_session->origlen = res->ai_addrlen);
-        vlc_freeaddrinfo (res);
-    }
-    return 0;
-
-oflow:
-    vlc_freeaddrinfo (res);
-    return VLC_ENOMEM;
-}
-
-/**
  * Destroy a session descriptor and free all
  *
  * \param p_session the session to destroy
@@ -267,7 +204,7 @@ void sout_MethodRelease (announce_method_t *m)
  * \param p_this a vlc_object structure
  * \return the new announce handler or NULL on error
  */
-announce_handler_t *__announce_HandlerCreate( vlc_object_t *p_this )
+static announce_handler_t *announce_HandlerCreate( vlc_object_t *p_this )
 {
     announce_handler_t *p_announce;
 
@@ -308,9 +245,9 @@ int announce_HandlerDestroy( announce_handler_t *p_announce )
 }
 
 /* Register an announce */
-int announce_Register( announce_handler_t *p_announce,
-                       session_descriptor_t *p_session,
-                       announce_method_t *p_method )
+static int announce_Register( announce_handler_t *p_announce,
+                              session_descriptor_t *p_session,
+                              announce_method_t *p_method )
 {
     if (p_method == NULL)
         return VLC_EGENERIC;
@@ -344,8 +281,8 @@ int announce_Register( announce_handler_t *p_announce,
 
 
 /* Unregister an announce */
-int announce_UnRegister( announce_handler_t *p_announce,
-                  session_descriptor_t *p_session )
+static int announce_UnRegister( announce_handler_t *p_announce,
+                                session_descriptor_t *p_session )
 {
     msg_Dbg( p_announce, "unregistering announce" );
     if( p_announce->p_sap )
