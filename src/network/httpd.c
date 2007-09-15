@@ -535,6 +535,8 @@ httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
     if( query->i_type == HTTPD_MSG_HEAD )
     {
         char *p = (char *)answer->p_body;
+
+        /* Looks for end of header (i.e. one empty line) */
         while ( (p = strchr( p, '\r' )) != NULL )
         {
             if( p[1] && p[1] == '\n' && p[2] && p[2] == '\r'
@@ -543,6 +545,7 @@ httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
                 break;
             }
         }
+
         if( p != NULL )
         {
             p[4] = '\0';
@@ -1468,13 +1471,36 @@ static int httpd_NetSend( httpd_client_t *cl, const uint8_t *p, int i_len )
     return send( cl->fd, p, i_len, 0 );
 }
 
+
+static const struct
+{
+    const char name[16];
+    int  i_type;
+    int  i_proto;
+}
+msg_type[] =
+{
+    { "OPTIONS",       HTTPD_MSG_OPTIONS,      HTTPD_PROTO_RTSP },
+    { "DESCRIBE",      HTTPD_MSG_DESCRIBE,     HTTPD_PROTO_RTSP },
+    { "SETUP",         HTTPD_MSG_SETUP,        HTTPD_PROTO_RTSP },
+    { "PLAY",          HTTPD_MSG_PLAY,         HTTPD_PROTO_RTSP },
+    { "PAUSE",         HTTPD_MSG_PAUSE,        HTTPD_PROTO_RTSP },
+    { "GET_PARAMETER", HTTPD_MSG_GETPARAMETER, HTTPD_PROTO_RTSP },
+    { "TEARDOWN",      HTTPD_MSG_TEARDOWN,     HTTPD_PROTO_RTSP },
+    { "GET",           HTTPD_MSG_GET,          HTTPD_PROTO_HTTP },
+    { "HEAD",          HTTPD_MSG_HEAD,         HTTPD_PROTO_HTTP },
+    { "POST",          HTTPD_MSG_POST,         HTTPD_PROTO_HTTP },
+    { "",              HTTPD_MSG_NONE,         HTTPD_PROTO_NONE }
+};
+
+
 static void httpd_ClientRecv( httpd_client_t *cl )
 {
     int i_len;
 
     if( cl->query.i_proto == HTTPD_PROTO_NONE )
     {
-        /* enough to see if it's rtp over rtsp or RTSP/HTTP */
+        /* enough to see if it's Interleaved RTP over RTSP or RTSP/HTTP */
         i_len = httpd_NetRecv( cl, &cl->p_buffer[cl->i_buffer],
                                4 - cl->i_buffer );
         if( i_len > 0 )
@@ -1484,11 +1510,10 @@ static void httpd_ClientRecv( httpd_client_t *cl )
 
         if( cl->i_buffer >= 4 )
         {
-            /*fprintf( stderr, "peek=%4.4s\n", cl->p_buffer );*/
             /* detect type */
             if( cl->p_buffer[0] == '$' )
             {
-                /* RTSP (rtp over rtsp) */
+                /* Interleaved RTP over RTSP */
                 cl->query.i_proto = HTTPD_PROTO_RTSP;
                 cl->query.i_type  = HTTPD_MSG_CHANNEL;
                 cl->query.i_channel = cl->p_buffer[1];
@@ -1540,6 +1565,19 @@ static void httpd_ClientRecv( httpd_client_t *cl )
         /* we are reading a header -> char by char */
         for( ;; )
         {
+            if( cl->i_buffer == cl->i_buffer_size )
+            {
+                char *newbuf = realloc( cl->p_buffer, cl->i_buffer_size + 1024 );
+                if( newbuf == NULL )
+                {
+                    i_len = 0;
+                    break;
+                }
+
+                cl->p_buffer = newbuf;
+                cl->i_buffer_size += 1024;
+            }
+
             i_len = httpd_NetRecv (cl, &cl->p_buffer[cl->i_buffer], 1 );
             if( i_len <= 0 )
             {
@@ -1547,11 +1585,6 @@ static void httpd_ClientRecv( httpd_client_t *cl )
             }
             cl->i_buffer++;
 
-            if( cl->i_buffer + 1 >= cl->i_buffer_size )
-            {
-                cl->i_buffer_size += 1024;
-                cl->p_buffer = realloc( cl->p_buffer, cl->i_buffer_size );
-            }
             if( ( cl->i_buffer >= 2 && !memcmp( &cl->p_buffer[cl->i_buffer-2], "\n\n", 2 ) )||
                 ( cl->i_buffer >= 4 && !memcmp( &cl->p_buffer[cl->i_buffer-4], "\r\n\r\n", 4 ) ) )
             {
@@ -1573,28 +1606,6 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                 }
                 else
                 {
-                    static const struct
-                    {
-                        const char name[16];
-                        int  i_type;
-                        int  i_proto;
-                    }
-                    msg_type[] =
-                    {
-                        { "OPTIONS",        HTTPD_MSG_OPTIONS,      HTTPD_PROTO_RTSP },
-                        { "DESCRIBE",       HTTPD_MSG_DESCRIBE,     HTTPD_PROTO_RTSP },
-                        { "SETUP",          HTTPD_MSG_SETUP,        HTTPD_PROTO_RTSP },
-                        { "PLAY",           HTTPD_MSG_PLAY,         HTTPD_PROTO_RTSP },
-                        { "PAUSE",          HTTPD_MSG_PAUSE,        HTTPD_PROTO_RTSP },
-                        { "GET_PARAMETER",  HTTPD_MSG_GETPARAMETER, HTTPD_PROTO_RTSP },
-                        { "TEARDOWN",       HTTPD_MSG_TEARDOWN,     HTTPD_PROTO_RTSP },
-
-                        { "GET",            HTTPD_MSG_GET,          HTTPD_PROTO_HTTP },
-                        { "HEAD",           HTTPD_MSG_HEAD,         HTTPD_PROTO_HTTP },
-                        { "POST",           HTTPD_MSG_POST,         HTTPD_PROTO_HTTP },
-
-                        { "",               HTTPD_MSG_NONE,         HTTPD_PROTO_NONE }
-                    };
                     unsigned i;
 
                     p = NULL;
