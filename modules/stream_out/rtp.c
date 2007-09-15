@@ -69,10 +69,10 @@
 #define NAME_LONGTEXT N_( \
     "This is the name of the session that will be announced in the SDP " \
     "(Session Descriptor)." )
-#define DESC_TEXT N_("Session description")
+#define DESC_TEXT N_("Session descriptipn")
 #define DESC_LONGTEXT N_( \
-    "This allows you to give a broader description of the stream, that will " \
-    "be announced in the SDP (Session Descriptor)." )
+    "This allows you to give a short description with details about the stream, " \
+    "that will be announced in the SDP (Session Descriptor)." )
 #define URL_TEXT N_("Session URL")
 #define URL_LONGTEXT N_( \
     "This allows you to give an URL with more details about the stream " \
@@ -80,8 +80,13 @@
     "be announced in the SDP (Session Descriptor)." )
 #define EMAIL_TEXT N_("Session email")
 #define EMAIL_LONGTEXT N_( \
-   "This allows you to give a contact mail address for the stream, that will " \
-   "be announced in the SDP (Session Descriptor)." )
+    "This allows you to give a contact mail address for the stream, that will " \
+    "be announced in the SDP (Session Descriptor)." )
+#define PHONE_TEXT N_("Session phone number")
+#define PHONE_LONGTEXT N_( \
+    "This allows you to give a contact telephone number for the stream, that will " \
+    "be announced in the SDP (Session Descriptor)." )
+
 #define PORT_TEXT N_("Port")
 #define PORT_LONGTEXT N_( \
     "This allows you to specify the base port for the RTP streaming." )
@@ -141,6 +146,8 @@ vlc_module_begin();
                 URL_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "email", "", NULL, EMAIL_TEXT,
                 EMAIL_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "phone", "", NULL, PHONE_TEXT,
+                PHONE_LONGTEXT, VLC_TRUE );
 
     add_integer( SOUT_CFG_PREFIX "port", 1234, NULL, PORT_TEXT,
                  PORT_LONGTEXT, VLC_TRUE );
@@ -170,7 +177,7 @@ vlc_module_end();
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
     "dst", "name", "port", "port-audio", "port-video", "*sdp", "ttl", "mux",
-    "description", "url", "email",
+    "description", "url", "email", "phone",
     "dccp", "tcp", "udplite",
     "mp4a-latm", NULL
 };
@@ -686,13 +693,10 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
         dstlen = sizeof( struct sockaddr_in );
     }
 
-    psz_sdp = sdp_Start( p_sys->psz_session_name,
-                         p_sys->psz_session_description,
-                         p_sys->psz_session_url, p_sys->psz_session_email,
-                         NULL, NULL, 0, (struct sockaddr *)&dst, dstlen );
+    psz_sdp = vlc_sdp_Start( VLC_OBJECT( p_stream ), SOUT_CFG_PREFIX,
+                             NULL, 0, (struct sockaddr *)&dst, dstlen );
     if( psz_sdp == NULL )
         return NULL;
-
 
     /* TODO: a=source-filter */
 

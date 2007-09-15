@@ -87,9 +87,9 @@ static vlc_bool_t IsSDPString (const char *str)
 
 
 char *sdp_Start (const char *name, const char *description, const char *url,
-                const char *email, const char *phone,
-                const struct sockaddr *src, size_t srclen,
-                const struct sockaddr *addr, size_t addrlen)
+                 const char *email, const char *phone,
+                 const struct sockaddr *src, size_t srclen,
+                 const struct sockaddr *addr, size_t addrlen)
 {
     uint64_t now = NTPtime64 ();
     char *sdp;
@@ -243,4 +243,46 @@ char *sdp_AddMedia (char **sdp,
         sdp_AddAttribute (sdp, "fmtp", "%u %s", pt, fmtp);
 
     return newsdp;
+}
+
+
+char *vlc_sdp_Start (vlc_object_t *obj, const char *cfgpref,
+                     const struct sockaddr *src, size_t srclen,
+                     const struct sockaddr *addr, size_t addrlen)
+{
+    size_t cfglen = strlen (cfgpref);
+    if (cfglen > 100)
+        return NULL;
+
+    char varname[cfglen + sizeof ("description")], *subvar = varname + cfglen;
+    strcpy (varname, cfgpref);
+
+    session_descriptor_t *p_session = calloc (1, sizeof (*p_session));
+    if (p_session == NULL)
+        return NULL;
+
+    strcpy (subvar, "name");
+    char *name = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "description");
+    char *description = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "url");
+    char *url = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "email");
+    char *email = var_GetNonEmptyString (obj, varname);
+    strcpy (subvar, "phone");
+    char *phone = var_GetNonEmptyString (obj, varname);
+#if 0
+    strcpy (subvar, "group");
+    char *group = var_GetNonEmptyString (obj, varname);
+#endif
+
+    char *sdp = sdp_Start (name, description, url, email, phone,
+                           src, srclen, addr, addrlen);
+    free (name);
+    free (description);
+    free (url);
+    free (email);
+    free (phone);
+
+    return sdp;
 }

@@ -257,7 +257,7 @@ playlist_ServicesDiscoveryRemove
 playlist_TreeMove
 resolve_xml_special_chars
 secstotimestr
-sdp_Start
+vlc_sdp_Start
 sdp_AddAttribute
 sdp_AddMedia
 sout_AccessOutDelete
