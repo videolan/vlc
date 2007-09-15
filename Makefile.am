@@ -739,7 +739,7 @@ package-win32-base-debug: package-win-common
 
 	mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu"
 	cp $(srcdir)/share/osdmenu/*.* "$(top_builddir)/vlc-${VERSION}/osdmenu"
-	for dir in dvd dvd/selected dvd/unselect dvd/selection dvd/volume default default/selected default/selection default/volume;do \
+	for dir in dvd dvd/selected dvd/unselect dvd/selection dvd/volume default default/selected default/selection default/volume minimal;do \
 		mkdir -p "$(top_builddir)/vlc-${VERSION}/osdmenu/$$dir"; \
 		for file in $(srcdir)/share/osdmenu/$${dir}/*.*;do \
 			 cp $$file "$(top_builddir)/vlc-${VERSION}/osdmenu/$$dir" || true; \
