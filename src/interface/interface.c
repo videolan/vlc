@@ -136,14 +136,11 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
 /*****************************************************************************
  * intf_RunThread: launch the interface thread
  *****************************************************************************
- * This function either creates a new thread and runs the interface in it,
- * or runs the interface in the current thread, depending on b_block.
+ * This function either creates a new thread and runs the interface in it.
  *****************************************************************************/
 /**
- * Run the interface thread.
+ * Starts and runs the interface thread.
  *
- * If b_block is not set, runs the interface in the thread, else,
- * creates a new thread and runs the interface.
  * \param p_intf the interface thread
  * \return VLC_SUCCESS on success, an error number else
  */
@@ -172,51 +169,26 @@ int intf_RunThread( intf_thread_t *p_intf )
     }
     else
 #endif
-    if( p_intf->b_block )
+
+    /* This interface doesn't need to be run */
+    if( p_intf->pf_run == NULL )
+        return VLC_SUCCESS;
+
+    /* Run the interface in a separate thread */
+    if( !strcmp( p_intf->p_module->psz_object_name, "macosx" ) )
     {
-        /* If we are clivlc+macosx, don't run the macosx GUI */
-        if( !strcmp( p_intf->p_module->psz_object_name, "macosx" ) )
-        {
-            msg_Err( p_intf, "You cannot run the MacOS X module as an "
-                             "interface in clivlc mode. Please read the "
-                             "README.MacOSX.rtf file.");
-            return VLC_EGENERIC;
-        }
- 
-        /* If the main interface does not have a run function,
-         * implement a waiting loop ourselves
-         */
-        if( p_intf->pf_run )
-            RunInterface( p_intf );
-        else
-        {
-            while( !intf_ShouldDie( p_intf ) )
-                msleep( INTF_IDLE_SLEEP * 2);
-        }
-        vlc_object_kill( p_intf );
+        msg_Err( p_intf, "You cannot run the MacOS X module as an "
+                         "extra interface. Please read the "
+                         "README.MacOSX.rtf file.");
+        return VLC_EGENERIC;
     }
-    else
+
+    /* Run the interface in a separate thread */
+    if( vlc_thread_create( p_intf, "interface", RunInterface,
+                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
-        /* This interface doesn't need to be run */
-        if( !p_intf->pf_run )
-            return VLC_SUCCESS;
-
-        /* Run the interface in a separate thread */
-        if( !strcmp( p_intf->p_module->psz_object_name, "macosx" ) )
-        {
-            msg_Err( p_intf, "You cannot run the MacOS X module as an "
-                             "extra interface. Please read the "
-                             "README.MacOSX.rtf file.");
-            return VLC_EGENERIC;
-        }
-
-        /* Run the interface in a separate thread */
-        if( vlc_thread_create( p_intf, "interface", RunInterface,
-                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
-        {
-            msg_Err( p_intf, "cannot spawn interface thread" );
-            return VLC_EGENERIC;
-        }
+        msg_Err( p_intf, "cannot spawn interface thread" );
+        return VLC_EGENERIC;
     }
 
     return VLC_SUCCESS;
@@ -232,14 +204,11 @@ int intf_RunThread( intf_thread_t *p_intf )
 void intf_StopThread( intf_thread_t *p_intf )
 {
     /* Tell the interface to die */
-    if( !p_intf->b_block )
+    vlc_object_kill( p_intf );
+    if( p_intf->pf_run != NULL )
     {
-        vlc_object_kill( p_intf );
-        if( p_intf->pf_run )
-        {
-            vlc_cond_signal( &p_intf->object_wait );
-            vlc_thread_join( p_intf );
-        }
+        vlc_cond_signal( &p_intf->object_wait );
+        vlc_thread_join( p_intf );
     }
 }
 
@@ -426,7 +395,6 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
 
     /* Try to run the interface */
-    p_intf->b_block = VLC_FALSE;
     if( intf_RunThread( p_intf ) != VLC_SUCCESS )
     {
         vlc_object_detach( p_intf );

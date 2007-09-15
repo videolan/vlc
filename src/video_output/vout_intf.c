@@ -107,7 +107,7 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     for( i = 0; i < p_list->i_count; i++ )
     {
         p_intf = (intf_thread_t *)p_list->p_values[i].p_object;
-        if( p_intf->b_block && p_intf->pf_request_window ) break;
+        if( p_intf->pf_request_window ) break;
         p_intf = NULL;
     }
 

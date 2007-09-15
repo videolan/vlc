@@ -54,7 +54,6 @@ struct intf_thread_t
     VLC_COMMON_MEMBERS
 
     /* Thread properties and locks */
-    vlc_bool_t          b_block;
     vlc_bool_t          b_play;
 
     /* Specific interfaces */

@@ -1462,7 +1462,6 @@ static int Intf( vlc_object_t *p_this, char const *psz_cmd,
     p_newintf = intf_Create( p_this->p_libvlc, newval.psz_string, 0, NULL );
     if( p_newintf )
     {
-        p_newintf->b_block = VLC_FALSE;
         if( intf_RunThread( p_newintf ) )
         {
             vlc_object_detach( p_newintf );

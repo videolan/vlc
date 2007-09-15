@@ -324,7 +324,6 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
             }
 
             /* Try to run the interface */
-            p_new_intf->b_block = VLC_FALSE;
             if( intf_RunThread( p_new_intf ) )
             {
                 vlc_object_detach( p_new_intf );

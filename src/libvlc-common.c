@@ -1132,7 +1132,6 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
 
     /* Try to run the interface */
     p_intf->b_play = b_play;
-    p_intf->b_block = b_block;
     i_err = intf_RunThread( p_intf );
     if( i_err )
     {
@@ -1141,6 +1140,22 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
         p_intf = NULL;
         return i_err;
     }
+
+    if( b_block )
+    {
+        /* FIXME: should be moved to interface/interface.c */
+        if( p_intf->pf_run )
+            vlc_thread_join( p_intf );
+        else
+	{
+            vlc_mutex_lock( &p_intf->object_lock );
+            vlc_cond_wait( &p_intf->object_wait, &p_intf->object_lock );
+            vlc_mutex_unlock( &p_intf->object_lock );
+        }
+        vlc_object_detach( p_intf );
+        intf_Destroy( p_intf );
+    }
+
     return VLC_SUCCESS;
 };
 
