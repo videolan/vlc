@@ -464,8 +464,10 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     if (ret)
         return ret;
 
+# if defined (HAVE_CLOCK_NANOSLEEP) && (_POSIX_CLOCK_MONOTONIC - 0 >= 0)
     /* This must be the same clock as the one in mtime.c */
     pthread_condattr_setclock (&attr, CLOCK_MONOTONIC);
+# endif
 
     ret = pthread_cond_init (&p_condvar->cond, &attr);
     pthread_condattr_destroy (&attr);
