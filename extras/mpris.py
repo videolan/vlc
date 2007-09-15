@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 #
-# Copyright (C) 2006 Rafaël Carré <funman at videolanorg>
+# Copyright © 2006-2007 Rafaël Carré <funman at videolanorg>
 #
 # $Id$
 # 
@@ -21,75 +21,99 @@
 #
 
 #
-# NOTE: this controller is a SAMPLE, and thus doesn't implement all the
-# Media Player Remote Interface Specification (MPRIS for short) available at
-# http://wiki.xmms2.xmms.se/index.php/Media_Player_Interfaces
+# NOTE: This controller is a SAMPLE, and thus doesn't use all the
+# Media Player Remote Interface Specification (MPRIS for short) capabilities
+#
+# MPRIS:  http://wiki.xmms2.xmms.se/index.php/Media_Player_Interfaces
 #
 # You'll need pygtk >= 2.10 to use gtk.StatusIcon
 #
+# TODO
+#   Ability to choose the Media Player if several are connected to the bus
+
+# core dbus stuff
 import dbus
 import dbus.glib
+
+# core interface stuff
 import gtk
 import gtk.glade
+
+# timer
 import gobject
+
+# file loading
 import os
 
-global position
-global timer
+global win_position # store the window position on the screen
+
 global playing
 playing = False
 
-global shuffle
-global repeat
-global loop
-#mpris doesn't support getting the status of these (at the moment)
+global shuffle      # playlist will play randomly
+global repeat       # repeat the playlist
+global loop         # loop the current element
+
+# mpris doesn't support getting the status of these (at the moment)
 shuffle = False
 repeat = False
 loop = False
 
-global root
-global player
-global tracklist
+# these are defined on the mpris detected unique name
+global root         # / org.freedesktop.MediaPlayer
+global player       # /Player org.freedesktop.MediaPlayer
+global tracklist    # /Tracklist org.freedesktop.MediaPlayer
 
-global bus
+global bus          # Connection to the session bus
+global identity     # MediaPlayer Identity
 
-def player_change(newname, a, b):
-    if b != "" and "org.mpris." in newname:
-        Connect(newname)
 
-def itemchange_handler(item):
+# If a Media Player connects to the bus, we'll use it
+# Note that we forget the previous Media Player we were connected to
+def NameOwnerChanged(name, new, old):
+    if old != "" and "org.mpris." in name:
+        Connect(name)
+
+# Callback for when "TrackChange" signal is emitted
+def TrackChange(Track):
+    # the only mandatory metadata is "URI"
     try:
-        a = item["artist"]
+        a = Track["artist"]
     except:
         a = ""
     try:
-        t = item["title"]
+        t = Track["title"]
     except:
-        t = ""
-    if t == "":
-        t = item["URI"]
+        t = Track["URI"]
+    # update the labels
     l_artist.set_text(a)
     l_title.set_text(t)
 
-#find the first media player available
+# Connects to the Media Player we detected
 def Connect(name):
-    global root
-    global player
-    global tracklist
-    global bus
-    global playing
+    global root, player, tracklist
+    global playing, identity
 
+    # first we connect to the objects
     root_o = bus.get_object(name, "/")
     player_o = bus.get_object(name, "/Player")
     tracklist_o = bus.get_object(name, "/TrackList")
 
+    # there is only 1 interface per object
     root = dbus.Interface(root_o, "org.freedesktop.MediaPlayer")
     tracklist  = dbus.Interface(tracklist_o, "org.freedesktop.MediaPlayer")
     player = dbus.Interface(player_o, "org.freedesktop.MediaPlayer")
-    player_o.connect_to_signal("TrackChange", itemchange_handler, dbus_interface="org.freedesktop.MediaPlayer")
+
+    # connect to the TrackChange signal
+    player_o.connect_to_signal("TrackChange", TrackChange, dbus_interface="org.freedesktop.MediaPlayer")
+
+    # determine if the Media Player is playing something
     if player.GetStatus() == 0:
         playing = True
-    window.set_title(root.Identity())
+
+    # gets its identity (name and version)
+    identity = root.Identity()
+    window.set_title(identity)
 
 #plays an element
 def AddTrack(widget):
@@ -103,7 +127,8 @@ def AddTrack(widget):
             tracklist.AddTrack("directory://" + mrl, True)
     update(0)
 
-#basic control
+# basic control
+
 def Next(widget):
     player.Next(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     update(0)
@@ -115,36 +140,6 @@ def Prev(widget):
 def Stop(widget):
     player.Stop(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
     update(0)
-
-#update status display
-def update(widget):
-    item = tracklist.GetMetadata(tracklist.GetCurrentTrack())
-    vol.set_value(player.VolumeGet())
-    try: 
-        a = item["artist"]
-    except:        a = ""
-    try:
-        t = item["title"]
-    except:        t = ""
-    if t == "":
-        try:
-            t = item["URI"]
-        except:
-            t = ""
-    l_artist.set_text(a)
-    l_title.set_text(t)
-    GetPlayStatus(0)
-
-#get playing status from remote player
-def GetPlayStatus(widget):
-    global playing
-    status = player.GetStatus()
-    if status == 0:
-        img_bt_toggle.set_from_stock("gtk-media-pause", gtk.ICON_SIZE_SMALL_TOOLBAR)
-        playing = True
-    else:
-        img_bt_toggle.set_from_stock("gtk-media-play", gtk.ICON_SIZE_SMALL_TOOLBAR)
-        playing = False
 
 def Quit(widget):
     player.Quit(reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
@@ -174,58 +169,96 @@ def Loop(widget):
     loop = not loop
     tracklist.Loop(loop)
 
-#callback for volume
+# update status display
+def update(widget):
+    item = tracklist.GetMetadata(tracklist.GetCurrentTrack())
+    vol.set_value(player.VolumeGet())
+    try: 
+        a = item["artist"]
+    except:        a = ""
+    try:
+        t = item["title"]
+    except:        t = ""
+    if t == "":
+        try:
+            t = item["URI"]
+        except:
+            t = ""
+    l_artist.set_text(a)
+    l_title.set_text(t)
+    GetPlayStatus(0)
+
+# callback for volume change
 def volchange(widget, data):
     player.VolumeSet(vol.get_value_as_int(), reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
 
-#callback for position change
+# callback for position change
 def timechange(widget, x=None, y=None):
     player.PositionSet(int(time_s.get_value()), reply_handler=(lambda *args: None), error_handler=(lambda *args: None))
 
-#refresh position
+# refresh position change
 def timeset():
     global playing
     if playing == True:
         time_s.set_value(player.PositionGet())
     return True
 
-#simple/full display
+# toggle simple/full display
 def expander(widget):
     if exp.get_expanded() == False:
         exp.set_label("Less")
     else:
         exp.set_label("More")
 
-#close event
+# close event : hide in the systray
 def delete_event(self, widget):
     self.hide()
     return True
 
+# shouldn't happen
 def destroy(widget):
     gtk.main_quit()
 
+# hide the controller when 'Esc' is pressed
 def key_release(widget, event):
-    global position
     if event.keyval == gtk.keysyms.Escape:
-        position = window.get_position()
+        global win_position
+        win_position = window.get_position()
         widget.hide()
 
-#click on the tray icon
+# callback for click on the tray icon
 def tray_button(widget):
-    global position
+    global win_position
     if window.get_property('visible'):
-        position = window.get_position()
+        # store position
+        win_position = window.get_position()
         window.hide()
     else:
-        window.move(position[0], position[1])
+        # restore position
+        window.move(win_position[0], win_position[1])
         window.show()
 
-#loads glade file from the directory where the script is,
-#so we can use /path/to/mpris.py to execute it.
+# hack: update position, volume, and metadata
+def icon_clicked(widget, event):
+    update(0)
+
+# get playing status, modify the Play/Pause button accordingly
+def GetPlayStatus(widget):
+    global playing
+    status = player.GetStatus()
+    if status == 0:
+        img_bt_toggle.set_from_stock("gtk-media-pause", gtk.ICON_SIZE_SMALL_TOOLBAR)
+        playing = True
+    else:
+        img_bt_toggle.set_from_stock("gtk-media-play", gtk.ICON_SIZE_SMALL_TOOLBAR)
+        playing = False
+
+# loads glade file from the directory where the script is,
+# so we can use /path/to/mpris.py to execute it.
 import sys
 xml = gtk.glade.XML(os.path.dirname(sys.argv[0]) + '/mpris.glade')
 
-#ui setup
+# ui setup
 bt_close    = xml.get_widget('close')
 bt_quit     = xml.get_widget('quit')
 bt_file     = xml.get_widget('ChooseFile')
@@ -249,15 +282,14 @@ vol         = xml.get_widget('vol')
 time_s      = xml.get_widget('time_s')
 time_l      = xml.get_widget('time_l')
 
+# connect to the different callbacks
+
 window.connect('delete_event',  delete_event)
 window.connect('destroy',       destroy)
 window.connect('key_release_event', key_release)
 
 tray = gtk.status_icon_new_from_icon_name("audio-x-generic")
 tray.connect('activate', tray_button)
-
-def icon_clicked(widget, event):
-    update(0)
 
 bt_close.connect('clicked',     destroy)
 bt_quit.connect('clicked',      Quit)
@@ -273,47 +305,42 @@ exp.connect('activate',         expander)
 vol.connect('change-value',     volchange)
 vol.connect('scroll-event',     volchange)
 time_s.connect('adjust-bounds', timechange)
-audioicon.set_events(gtk.gdk.BUTTON_PRESS_MASK) 
+audioicon.set_events(gtk.gdk.BUTTON_PRESS_MASK) # hack for the bottom right icon
 audioicon.connect('button_press_event', icon_clicked) 
 time_s.set_update_policy(gtk.UPDATE_DISCONTINUOUS)
 
-library = "/media/mp3" #editme
+library = "/media/mp3" # editme
 
+# set the Directory chooser to a default location
 try:
     os.chdir(library)
     bt_file.set_current_folder(library)
 except:
     bt_file.set_current_folder(os.path.expanduser("~"))
 
-#connect to the bus
+# connect to the bus
 bus = dbus.SessionBus()
 dbus_names = bus.get_object( "org.freedesktop.DBus", "/org/freedesktop/DBus" )
-dbus_names.connect_to_signal("NameOwnerChanged", player_change, dbus_interface="org.freedesktop.DBus")
+dbus_names.connect_to_signal("NameOwnerChanged", NameOwnerChanged, dbus_interface="org.freedesktop.DBus") # to detect new Media Players
 
 dbus_o = bus.get_object("org.freedesktop.DBus", "/")
 dbus_intf = dbus.Interface(dbus_o, "org.freedesktop.DBus")
 name_list = dbus_intf.ListNames()
-name = ""
+
+# connect to the first Media Player found
 for n in name_list:
     if "org.mpris." in n:
-        name = n
+        Connect(n)
+        window.set_title(identity)
+        vol.set_value(player.VolumeGet())
+        update(0)
         break
 
-if name != "":
-    Connect(name)
-    window.set_title(root.Identity())
-    vol.set_value(player.VolumeGet())
-
-#runs timer to update position
+# run a timer to update position
 gobject.timeout_add( 1000, timeset)
 
 window.set_icon_name('audio-x-generic')
 window.show()
-
-try:
-    update(0)
-except:
-    True
 
 icon_theme = gtk.icon_theme_get_default()
 try:
@@ -321,6 +348,7 @@ try:
     window.set_icon(pix)
 except:
     True
-position = window.get_position()
 
-gtk.main()
+win_position = window.get_position()
+
+gtk.main() # execute the main loop
