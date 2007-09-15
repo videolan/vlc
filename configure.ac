@@ -796,7 +796,7 @@ AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioc
 AC_CHECK_HEADERS([arpa/inet.h net/if.h netinet/in.h sys/socket.h netinet/udplite.h])
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_CHECK_HEADERS(machine/param.h sys/shm.h)
-AC_CHECK_HEADERS(linux/version.h)
+AC_CHECK_HEADERS([linux/version.h linux/dccp.h])
 AC_CHECK_HEADERS(syslog.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 

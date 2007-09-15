@@ -75,7 +75,7 @@
 # define IPPROTO_UDPLITE 136 /* IANA */
 #endif
 
-#ifdef __linux__
+#ifdef HAVE_LINUX_DCCP_H
 # include <linux/dccp.h>
 # ifndef SOCK_DCCP /* provisional API */
 #  define SOCK_DCCP 6
