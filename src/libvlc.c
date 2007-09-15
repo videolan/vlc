@@ -148,7 +148,7 @@ int VLC_AddIntf( int i_object, char const *psz_module,
 /*****************************************************************************
  * VLC_Die: ask vlc to die.
  *****************************************************************************
- * This function sets p_vlc->b_die to VLC_TRUE, but does not do any other
+ * This function sets p_libvlc->b_die to VLC_TRUE, but does not do any other
  * task. It is your duty to call VLC_CleanUp and VLC_Destroy afterwards.
  *****************************************************************************/
 int VLC_Die( int i_object )
