@@ -97,7 +97,7 @@ DBUS_METHOD( Quit )
 }
 
 DBUS_METHOD( PositionGet )
-{ /* returns position as an int in the range [0;1000] */
+{ /* returns position in milliseconds */
     REPLY_INIT;
     OUT_ARGUMENTS;
     vlc_value_t position;
@@ -110,8 +110,8 @@ DBUS_METHOD( PositionGet )
         i_pos = 0;
     else
     {
-        var_Get( p_input, "position", &position );
-        i_pos = position.f_float * 1000 ;
+        var_Get( p_input, "time", &position );
+        i_pos = position.i_time / 1000;
     }
     pl_Release( ((vlc_object_t*) p_this) );
     ADD_INT32( &i_pos );
@@ -119,7 +119,7 @@ DBUS_METHOD( PositionGet )
 }
 
 DBUS_METHOD( PositionSet )
-{ /* set position from an int in the range [0;1000] */
+{ /* set position in milliseconds */
 
     REPLY_INIT;
     vlc_value_t position;
@@ -145,8 +145,8 @@ DBUS_METHOD( PositionSet )
 
     if( p_input )
     {
-        position.f_float = ((float)i_pos) / 1000;
-        var_Set( p_input, "position", position );
+        position.i_time = i_pos * 1000;
+        var_Set( p_input, "time", position );
     }
     pl_Release( ((vlc_object_t*) p_this) );
     REPLY_SEND;

@@ -85,6 +85,16 @@ def TrackChange(Track):
         t = Track["title"]
     except:
         t = Track["URI"]
+    try:
+        length = Track["length"]
+    except:
+        length = 0
+    if length > 0:
+        time_s.set_range(0,Track["length"])
+        time_s.set_sensitive(True)
+    else:
+        # disable the position scale if length isn't available
+        time_s.set_sensitive(False)
     # update the labels
     l_artist.set_text(a)
     l_title.set_text(t)
@@ -110,6 +120,7 @@ def Connect(name):
     # determine if the Media Player is playing something
     if player.GetStatus() == 0:
         playing = True
+        TrackChange(player.GetMetadata())
 
     # gets its identity (name and version)
     identity = root.Identity()
