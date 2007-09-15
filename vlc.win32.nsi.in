@@ -13,6 +13,10 @@
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 !define PRODUCT_ID "{ea92ef52-afe4-4212-bacb-dfe9fca94cd6}"
 
+!define MUI_LANGDLL_REGISTRY_ROOT "HKLM"
+!define MUI_LANGDLL_REGISTRY_KEY "${PRODUCT_DIR_REGKEY}"
+!define MUI_LANGDLL_REGISTRY_VALUENAME "Language"
+
 @FILE_LIBVLC_DLL@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -728,5 +732,5 @@ SectionEnd
 ;FunctionEnd
 
 Function un.onInit
-  !insertmacro MUI_LANGDLL_DISPLAY
+  !insertmacro MUI_UNGETLANGUAGE
 FunctionEnd
