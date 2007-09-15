@@ -134,50 +134,54 @@ static void Deactivate( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    int i_lastcall = 0;
+    mtime_t deadline = mdate();
 
 #ifdef HAVE_DBUS
     p_intf->p_sys->p_connection = dbus_init( p_intf );
 #endif
 
-    while( !p_intf->b_die )
+    do
     {
-        msleep( INTF_IDLE_SLEEP*5 ); // 250ms
+        vlc_object_t *p_vout;
+        p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+
+        /* If there is a video output, disable xscreensaver */
+        if( p_vout )
+        {
+            input_thread_t *p_input;
+            p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
+            vlc_object_release( p_vout );
+            if( p_input )
+            {
+                if( PLAYING_S == p_input->i_state )
+                {
+                    /* http://www.jwz.org/xscreensaver/faq.html#dvd */
+                    system( "xscreensaver-command -deactivate >&- 2>&- &" );
+
+                    /* If we have dbus support, let's communicate directly
+                       with gnome-screensave else, run
+                       gnome-screensaver-command */
+#ifdef HAVE_DBUS
+                    poke_screensaver( p_intf, p_intf->p_sys->p_connection );
+#else
+                    system( "gnome-screensaver-command --poke >&- 2>&- &" );
+#endif
+                    /* FIXME: add support for other screensavers */
+                }
+                vlc_object_release( p_input );
+            }
+        }
+
+        vlc_mutex_lock( &p_intf->object_lock );
 
         /* Check screensaver every 30 seconds */
-        if( ++i_lastcall > 120 )
-        {
-            vlc_object_t *p_vout;
-            p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-            /* If there is a video output, disable xscreensaver */
-            if( p_vout )
-            {
-                input_thread_t *p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
-                vlc_object_release( p_vout );
-                if( p_input )
-                {
-                    if( PLAYING_S == p_input->i_state )
-                    {
-                        /* http://www.jwz.org/xscreensaver/faq.html#dvd */
-
-                        system( "xscreensaver-command -deactivate >&- 2>&- &" );
-
-                        /* If we have dbus support, let's communicate directly
-                           with gnome-screensave else, run
-                           gnome-screensaver-command */
-#ifdef HAVE_DBUS
-                        poke_screensaver( p_intf, p_intf->p_sys->p_connection );
-#else
-                        system( "gnome-screensaver-command --poke >&- 2>&- &" );
-#endif
-                        /* FIXME: add support for other screensavers */
-                    }
-                    vlc_object_release( p_input );
-                }
-            }
-            i_lastcall = 0;
-        }
+        deadline += 30 * 1000000;
+        vlc_cond_timedwait( &p_intf->object_wait, &p_intf->object_lock,
+                            deadline );
     }
+    while( !p_intf->b_die );
+
+    vlc_mutex_unlock( &p_intf->object_lock );
 }
 
 #ifdef HAVE_DBUS
