@@ -75,20 +75,11 @@ struct sap_handler_t
 
 struct session_descriptor_t
 {
-    char *psz_name;
-    char *psz_group;
-
-    char *description;
-    char *url; // meta URL for SAP, potentially real URL for other cases
-    char *email;
-    char *phone;
-
     struct sockaddr_storage orig;
     socklen_t origlen;
     struct sockaddr_storage addr;
     socklen_t addrlen;
 
-    char *sdpformat; // format suitable for SDP
     char *psz_sdp;
     vlc_bool_t b_ssm;
 };

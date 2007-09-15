@@ -90,9 +90,6 @@ struct sap_session_t {
  *****************************************************************************/
 static void RunThread( vlc_object_t *p_this);
 static int ComputeRate( sap_address_t *p_address );
-static char *SDPGenerate( sap_handler_t *p_sap,
-                          const session_descriptor_t *p_session,
-                          vlc_bool_t b_ssm );
 
 static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
                                      sap_session_t *p_session );
@@ -419,9 +416,8 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         p_sap_session->p_address = p_address;
     }
 
-    if (p_session->origlen == 0)
-        memcpy (&p_session->orig, &p_sap_session->p_address->orig,
-                p_session->origlen = p_sap_session->p_address->origlen);
+    memcpy (&p_session->orig, &p_sap_session->p_address->orig,
+             p_session->origlen = p_sap_session->p_address->origlen);
 
     size_t headsize = 20;
     switch (p_session->orig.ss_family)
@@ -442,15 +438,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     }
 
     /* If needed, build the SDP */
-    if( p_session->psz_sdp == NULL )
-    {
-        p_session->psz_sdp = SDPGenerate( p_sap, p_session, b_ssm );
-        if( p_session->psz_sdp == NULL )
-        {
-            vlc_mutex_unlock( &p_sap->object_lock );
-            return VLC_ENOMEM;
-        }
-    }
+    assert( p_session->psz_sdp != NULL );
 
     p_sap_session->i_last = 0;
     p_sap_session->i_length = headsize + strlen (p_session->psz_sdp);
@@ -585,50 +573,6 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
                             + p_session->p_address->i_interval*1000000;
     }
     return VLC_SUCCESS;
-}
-
-static char *SDPGenerate( sap_handler_t *p_sap,
-                          const session_descriptor_t *p_session,
-                          vlc_bool_t b_ssm )
-{
-    char *psz_group, *psz_name, *psz_sdp;
-
-     char *head = sdp_Start (p_session->psz_name, p_session->description,
-        p_session->url, p_session->email, p_session->phone,
-        (const struct sockaddr *)&p_session->orig, p_session->origlen,
-        (const struct sockaddr *)&p_session->addr, p_session->addrlen);
-    if (head == NULL)
-        return NULL;
-
-    psz_group = p_session->psz_group;
-    psz_name = p_session->psz_name;
-
-    char *plgroup;
-    if ((psz_group == NULL)
-     || (asprintf (&plgroup, "a=x-plgroup:%s\r\n", psz_group) == -1))
-        plgroup = NULL;
-
-    const char *comedia = NULL;
-    if (!strncasecmp (p_session->sdpformat, "DCCP", 4)
-     || !strncasecmp (p_session->sdpformat, "TCP", 3))
-        comedia = "a=setup:passive\r\n"
-                  "a=connection:new\r\n";
-
-    int res = asprintf (&psz_sdp, "%s" "%s" "%s"
-                        "m=video %d %s\r\n",
-                        head,
-                        plgroup ?: "",
-                        comedia ?: "",
-                        ntohs (net_GetPort ((const struct sockaddr *)&p_session->addr)),
-                        p_session->sdpformat);
-    free (plgroup);
-
-    if (res == -1)
-        return NULL;
-
-    msg_Dbg( p_sap, "Generated SDP (%u bytes):\n%s",
-             (unsigned)strlen(psz_sdp), psz_sdp );
-    return psz_sdp;
 }
 
 static int ComputeRate( sap_address_t *p_address )

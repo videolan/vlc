@@ -54,32 +54,7 @@ struct announce_method_t
 static session_descriptor_t * sout_AnnounceSessionCreate (vlc_object_t *obj,
                                                    const char *cfgpref)
 {
-    size_t cfglen = strlen (cfgpref);
-    if (cfglen > 100)
-        return NULL;
-
-    char varname[cfglen + sizeof ("description")], *subvar = varname + cfglen;
-    strcpy (varname, cfgpref);
-
-    session_descriptor_t *p_session = calloc (1, sizeof (*p_session));
-    if (p_session == NULL)
-        return NULL;
-
-    strcpy (subvar, "name");
-    p_session->psz_name = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "group");
-    p_session->psz_group = var_GetNonEmptyString (obj, varname);
-
-    strcpy (subvar, "description");
-    p_session->description = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "url");
-    p_session->url = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "email");
-    p_session->email = var_GetNonEmptyString (obj, varname);
-    strcpy (subvar, "phone");
-    p_session->phone = var_GetNonEmptyString (obj, varname);
-
-    return p_session;
+    return calloc (1, sizeof (session_descriptor_t));
 }
 
 /**
@@ -167,18 +142,7 @@ int sout_AnnounceUnRegister( sout_instance_t *p_sout,
  */
 void sout_AnnounceSessionDestroy( session_descriptor_t *p_session )
 {
-    if( p_session )
-    {
-        free (p_session->psz_name);
-        free (p_session->psz_group);
-        free (p_session->psz_sdp);
-        free (p_session->description);
-        free (p_session->sdpformat);
-        free (p_session->url);
-        free (p_session->email);
-        free (p_session->phone);
-        free( p_session );
-    }
+    free( p_session );
 }
 
 /**
