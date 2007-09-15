@@ -147,11 +147,12 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
 int intf_RunThread( intf_thread_t *p_intf )
 {
 #ifdef __APPLE__
+# warning FIXME
+#if 0
     NSAutoreleasePool * o_pool;
 
     /* If !clivlc, then run as a OS X application */
-    if( p_intf->b_block && strncmp( p_intf->p_libvlc->psz_object_name,
-                                    "clivlc", 6) )
+    if( strncmp( p_intf->p_libvlc->psz_object_name, "clivlc", 6) )
     {
         o_pool = [[NSAutoreleasePool alloc] init];
         [VLCApplication sharedApplication];
@@ -166,8 +167,9 @@ int intf_RunThread( intf_thread_t *p_intf )
                 msleep( INTF_IDLE_SLEEP * 2);
         }
         vlc_object_kill( p_intf );
+        return VLC_SUCCESS;
     }
-    else
+#endif
 #endif
 
     /* This interface doesn't need to be run */
