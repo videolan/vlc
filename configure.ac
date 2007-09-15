@@ -6167,6 +6167,8 @@ echo "
 vlc aliases           :${ALIASES}
 plugins/bindings      :${PLUGINS_BINDINGS}
 
+You can check which modules have been enabled 
+with \`./vlc-config --list plugin'.
 You can tune the compiler flags in vlc-config.
 To build vlc and its plugins, type \`./compile' or \`make'.
 "
