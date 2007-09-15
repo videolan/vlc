@@ -134,12 +134,21 @@ static void Deactivate( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
+    vlc_bool_t b_quit = VLC_FALSE;
+
 #ifdef HAVE_DBUS
     p_intf->p_sys->p_connection = dbus_init( p_intf );
 #endif
 
-    do
+    while( !b_quit )
     {
+        /* Check screensaver every 30 seconds */
+        vlc_mutex_lock( &p_intf->object_lock );
+        vlc_cond_timedwait( &p_intf->object_wait, &p_intf->object_lock,
+                            mdate() + 30000000 );
+        b_quit = p_intf->b_die;
+        vlc_mutex_unlock( &p_intf->object_lock );
+
         vlc_object_t *p_vout;
         p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
 
@@ -169,15 +178,7 @@ static void Run( intf_thread_t *p_intf )
                 vlc_object_release( p_input );
             }
         }
-
-        /* Check screensaver every 30 seconds */
-        vlc_mutex_lock( &p_intf->object_lock );
-        vlc_cond_timedwait( &p_intf->object_wait, &p_intf->object_lock,
-                            mdate() + 30000000 );
     }
-    while( !p_intf->b_die );
-
-    vlc_mutex_unlock( &p_intf->object_lock );
 }
 
 #ifdef HAVE_DBUS
