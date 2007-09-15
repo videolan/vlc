@@ -288,7 +288,7 @@ char *vlc_sdp_Start (vlc_object_t *obj, const char *cfgpref,
     char *group = var_GetNonEmptyString (obj, varname);
     if (group != NULL)
     {
-        sdp_AddAttribute (&sdp, "x-plgroup", "%s", group)
+        sdp_AddAttribute (&sdp, "x-plgroup", "%s", group);
         free (group);
     }
 
