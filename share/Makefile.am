@@ -235,7 +235,7 @@ DIST_osdmenu_dvd = \
 	osdmenu/dvd/unselect/barroff.png
 
 DIST_osdmenu_minimal = \
-	osdmenu/menu.cfg \
+	osdmenu/minimal.cfg \
 	osdmenu/minimal/fs_panel_simple.xcf \
 	osdmenu/minimal/fs_panel_skip_next.png \
 	osdmenu/minimal/fs_panel_simple.png \
