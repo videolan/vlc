@@ -661,8 +661,9 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 
     if ( path != NULL )
     {
-        char *psz_prefix = var_GetString( p_vout, "snapshot-prefix" );
-        if( !psz_prefix ) psz_prefix = strdup( "vlcsnap-" );
+        char *psz_prefix = var_GetNonEmptyString( p_vout, "snapshot-prefix" );
+        if( psz_prefix == NULL )
+            psz_prefix = strdup( "vlcsnap-" );
         else
         {
             char *psz_tmp = str_format( p_vout, psz_prefix );
