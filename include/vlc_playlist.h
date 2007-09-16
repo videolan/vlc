@@ -465,12 +465,7 @@ static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
 #define playlist_CurrentSize( obj ) obj->p_libvlc->p_playlist->current.i_size
 
 /** Ask the playlist to do some work */
-static inline void playlist_Signal( playlist_t *p_playlist )
-{
-    PL_LOCK;
-    vlc_object_signal( p_playlist );
-    PL_UNLOCK;
-}
+#define playlist_Signal( p_playlist ) vlc_object_signal( p_playlist )
 
 /** @} */
 # ifdef __cplusplus
