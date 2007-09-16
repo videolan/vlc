@@ -2122,7 +2122,7 @@ static int InputSourceInit( input_thread_t *p_input,
              * (and do nothing with a list) */
             char *psz_var_demux = var_GetNonEmptyString( p_input, "demux" );
 
-            if( psz_var_demux != NULL' &&
+            if( psz_var_demux != NULL &&
                 !strchr(psz_var_demux, ',' ) &&
                 !strchr(psz_var_demux, ':' ) )
             {
