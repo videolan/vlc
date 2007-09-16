@@ -604,15 +604,15 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
     /* Write down initial values */
     aout_instance_t *p_aout = (aout_instance_t *)vlc_object_find(p_intf,
                                     VLC_OBJECT_AOUT, FIND_ANYWHERE);
-    char *psz_af = NULL;
+    char *psz_af;
     char *psz_bands;
     float f_preamp;
     if( p_aout )
     {
-        psz_af = var_GetString( p_aout, "audio-filter" );
+        psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
         if( var_GetBool( p_aout, "equalizer-2pass" ) )
             ui.eq2PassCheck->setChecked( true );
-        psz_bands = var_GetString( p_aout, "equalizer-bands" );
+        psz_bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
         f_preamp = var_GetFloat( p_aout, "equalizer-preamp" );
         vlc_object_release( p_aout );
     }
@@ -626,6 +626,7 @@ Equalizer::Equalizer( intf_thread_t *_p_intf, QWidget *_parent ) :
     }
     if( psz_af && strstr( psz_af, "equalizer" ) != NULL )
         ui.enableCheck->setChecked( true );
+    free( psz_af );
     enable( ui.enableCheck->isChecked() );
 
     setValues( psz_bands, f_preamp );
@@ -849,11 +850,11 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
     /* Write down initial values */
     aout_instance_t *p_aout = (aout_instance_t *)
         vlc_object_find(p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE);
-    char *psz_af = NULL;
+    char *psz_af;
 
     if( p_aout )
     {
-        psz_af = var_GetString( p_aout, "audio-filter" );
+        psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
         for( int i = 0; i < NUM_SP_CTRL ; i++)
         {
             controlVars[i] = var_GetFloat( p_aout,  psz_control_names[i] );
@@ -870,6 +871,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
     }
     if( psz_af && strstr( psz_af, "spatializer" ) != NULL )
         ui.enableCheck->setChecked( true );
+    free( psz_af );
     enable( ui.enableCheck->isChecked() );
     setValues( controlVars );
 
