@@ -262,6 +262,8 @@ static inline block_t *block_ChainGather( block_t *p_list )
  *      only one getting data from the fifo.
  * - block_FifoCount : how many packets are waiting in the fifo
  * - block_FifoSize : how many cumulated bytes are waiting in the fifo
+ * - block_FifoWake : wake ups a thread with block_FifoGet() = NULL
+ *   (this is used to wakeup a thread when there is no data to queue)
  ****************************************************************************/
 
 #define block_FifoNew( a ) __block_FifoNew( VLC_OBJECT(a) )
@@ -269,6 +271,7 @@ VLC_EXPORT( block_fifo_t *, __block_FifoNew,    ( vlc_object_t * ) );
 VLC_EXPORT( void,           block_FifoRelease,  ( block_fifo_t * ) );
 VLC_EXPORT( void,           block_FifoEmpty,    ( block_fifo_t * ) );
 VLC_EXPORT( int,            block_FifoPut,      ( block_fifo_t *, block_t * ) );
+VLC_EXPORT( void,           block_FifoWake,     ( block_fifo_t * ) );
 VLC_EXPORT( block_t *,      block_FifoGet,      ( block_fifo_t * ) );
 VLC_EXPORT( block_t *,      block_FifoShow,     ( block_fifo_t * ) );
 VLC_EXPORT( size_t,         block_FifoSize,     ( const block_fifo_t *p_fifo ) );

@@ -160,10 +160,11 @@ struct block_fifo_t
     vlc_mutex_t         lock;                         /* fifo data lock */
     vlc_cond_t          wait;         /* fifo data conditional variable */
 
-    size_t              i_depth;
     block_t             *p_first;
     block_t             **pp_last;
+    size_t              i_depth;
     size_t              i_size;
+    vlc_bool_t          b_force_wake;
 };
 
 block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
@@ -173,9 +174,10 @@ block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
     p_fifo = malloc( sizeof( block_fifo_t ) );
     vlc_mutex_init( p_obj, &p_fifo->lock );
     vlc_cond_init( p_obj, &p_fifo->wait );
-    p_fifo->i_depth = p_fifo->i_size = 0;
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
+    p_fifo->i_depth = p_fifo->i_size = 0;
+    p_fifo->b_force_wake = VLC_FALSE;
 
     return p_fifo;
 }
@@ -233,21 +235,37 @@ int block_FifoPut( block_fifo_t *p_fifo, block_t *p_block )
     return i_size;
 }
 
+void block_FifoWake( block_fifo_t *p_fifo )
+{
+    vlc_mutex_lock( &p_fifo->lock );
+    if( p_fifo->p_first == NULL )
+        p_fifo->b_force_wake = VLC_TRUE;
+    vlc_cond_signal( &p_fifo->wait );
+    vlc_mutex_unlock( &p_fifo->lock );
+}
+
 block_t *block_FifoGet( block_fifo_t *p_fifo )
 {
     block_t *b;
 
     vlc_mutex_lock( &p_fifo->lock );
 
-    /* We do a while here because there is a race condition in the
-     * win32 implementation of vlc_cond_wait() (We can't be sure the fifo
-     * hasn't been emptied again since we were signaled). */
-    while( p_fifo->p_first == NULL )
+    /* Remember vlc_cond_wait() may cause spurious wakeups
+     * (on both Win32 and POSIX) */
+    while( ( p_fifo->p_first == NULL ) && !p_fifo->b_force_wake )
     {
         vlc_cond_wait( &p_fifo->wait, &p_fifo->lock );
     }
 
     b = p_fifo->p_first;
+
+    p_fifo->b_force_wake = VLC_FALSE;
+    if( b == NULL )
+    {
+        /* Forced wakeup */
+        vlc_mutex_unlock( &p_fifo->lock );
+        return NULL;
+    }
 
     p_fifo->p_first = b->p_next;
     p_fifo->i_depth--;
