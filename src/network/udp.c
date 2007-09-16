@@ -321,17 +321,15 @@ net_IPv4Join (vlc_object_t *obj, int fd,
     socklen_t optlen;
 
     /* Multicast interface IPv4 address */
-    char *iface = var_CreateGetString (obj, "miface-addr");
-    if (iface != NULL)
+    char *iface = var_CreateGetNonEmptyString (obj, "miface-addr");
+    if ((iface != NULL)
+     && (inet_pton (AF_INET, iface, &id) <= 0))
     {
-        if ((*iface)
-         && (inet_pton (AF_INET, iface, &id) <= 0))
-        {
-            msg_Err (obj, "invalid multicast interface address %s", iface);
-            free (iface);
-            goto error;
-        }
+        msg_Err (obj, "invalid multicast interface address %s", iface);
+        free (iface);
+        goto error;
     }
+    free (iface);
 
     memset (&opt, 0, sizeof (opt));
     if (src != NULL)
@@ -428,18 +426,15 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
 {
     int level, iid = 0;
 
-    char *iface = var_CreateGetString (obj, "miface");
+    char *iface = var_CreateGetNonEmptyString (obj, "miface");
     if (iface != NULL)
     {
-        if (*iface)
+        iid = if_nametoindex (iface);
+        if (iid == 0)
         {
-            iid = if_nametoindex (iface);
-            if (iid == 0)
-            {
-                msg_Err (obj, "invalid multicast interface: %s", iface);
-                free (iface);
-                return -1;
-            }
+            msg_Err (obj, "invalid multicast interface: %s", iface);
+            free (iface);
+            return -1;
         }
         free (iface);
     }
@@ -661,19 +656,17 @@ int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
         if( i_hlim > 0 )
             net_SetMcastHopLimit( p_this, fd, ptr->ai_family, i_hlim );
 
-        str = var_CreateGetString (p_this, "miface");
+        str = var_CreateGetNonEmptyString (p_this, "miface");
         if (str != NULL)
         {
-            if (*str)
-                net_SetMcastOut (p_this, fd, ptr->ai_family, str, NULL);
+            net_SetMcastOut (p_this, fd, ptr->ai_family, str, NULL);
             free (str);
         }
 
-        str = var_CreateGetString (p_this, "miface-addr");
+        str = var_CreateGetNonEmptyString (p_this, "miface-addr");
         if (str != NULL)
         {
-            if (*str)
-                net_SetMcastOut (p_this, fd, ptr->ai_family, NULL, str);
+            net_SetMcastOut (p_this, fd, ptr->ai_family, NULL, str);
             free (str);
         }
 
