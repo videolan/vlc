@@ -145,9 +145,9 @@ int E_(HTTPOpen)( access_t *p_access )
     }
     free( psz_address );
 
-    psz_user = var_GetString( p_access, "dvb-http-user" );
-    psz_password = var_GetString( p_access, "dvb-http-password" );
-    psz_acl = var_GetString( p_access, "dvb-http-acl" );
+    psz_user = var_GetNonEmptyString( p_access, "dvb-http-user" );
+    psz_password = var_GetNonEmptyString( p_access, "dvb-http-password" );
+    psz_acl = var_GetNonEmptyString( p_access, "dvb-http-acl" );
 
     if ( psz_acl != NULL )
     {
