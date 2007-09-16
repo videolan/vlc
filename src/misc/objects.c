@@ -507,17 +507,6 @@ void __vlc_object_signal_unlocked( vlc_object_t *obj )
 
 
 /**
- * Signals an object for which the lock is NOT held.
- */
-void __vlc_object_signal( vlc_object_t *obj )
-{
-    vlc_mutex_lock( &obj->object_lock );
-    vlc_object_signal_unlocked( obj );
-    vlc_mutex_unlock( &obj->object_lock );
-}
-
-
-/**
  * Requests termination of an object.
  * If the object is LibVLC, also request to terminate all its children.
  */
