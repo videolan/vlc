@@ -574,7 +574,8 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 #elif defined( UNDER_CE )
 #   error Unimplemented
 #elif defined( WIN32 )
-#   error Unimplemented FIXME FIXME
+    abort();
+#   warning Unimplemented FIXME FIXME
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #   error Unimplemented
