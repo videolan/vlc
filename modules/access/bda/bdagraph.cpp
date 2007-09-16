@@ -24,6 +24,7 @@
  * Preamble
  *****************************************************************************/
 #include "bdagraph.h"
+#include <ctype.h>
 
 /****************************************************************************
  * Interfaces for calls from C
@@ -534,21 +535,29 @@ int BDAGraph::SubmitDVBSTuneRequest()
     l_lnb_lof1 = var_GetInteger( p_access, "dvb-lnb-lof1" );
     l_lnb_lof2 = var_GetInteger( p_access, "dvb-lnb-lof2" );
     l_lnb_slof = var_GetInteger( p_access, "dvb-lnb-slof" );
-    psz_polarisation = var_GetString( p_access, "dvb-polarisation" );
+    psz_polarisation = var_GetNonEmptyString( p_access, "dvb-polarisation" );
     l_inversion = var_GetInteger( p_access, "dvb-inversion" );
     l_network_id = var_GetInteger( p_access, "dvb-network_id" );
 
     b_west = ( l_longitude < 0 ) ? TRUE : FALSE;
 
     i_polar = BDA_POLARISATION_NOT_SET;
-    if( *psz_polarisation == 'H' || *psz_polarisation == 'h' )
-        i_polar = BDA_POLARISATION_LINEAR_H;
-    if( *psz_polarisation == 'V' || *psz_polarisation == 'v' )
-        i_polar = BDA_POLARISATION_LINEAR_V;
-    if( *psz_polarisation == 'L' || *psz_polarisation == 'l' )
-        i_polar = BDA_POLARISATION_CIRCULAR_L;
-    if( *psz_polarisation == 'R' || *psz_polarisation == 'r' )
-        i_polar = BDA_POLARISATION_CIRCULAR_R;
+    if( psz_polarisation != NULL )
+        switch( toupper( psz_polarisation[0] ) )
+        {
+            case 'H':
+                i_polar = BDA_POLARISATION_LINEAR_H;
+                break;
+            case 'V':
+                i_polar = BDA_POLARISATION_LINEAR_V;
+                break;
+            case 'L':
+                i_polar = BDA_POLARISATION_CIRCULAR_L;
+                break;
+            case 'R':
+                i_polar = BDA_POLARISATION_CIRCULAR_R;
+                break;
+        }
 
     i_inversion = BDA_SPECTRAL_INVERSION_NOT_SET;
     if( l_inversion == 0 )
