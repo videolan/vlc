@@ -455,7 +455,7 @@ void __vlc_object_lock( vlc_object_t *obj )
 
 void __vlc_object_unlock( vlc_object_t *obj )
 {
-    vlc_assert_locked( &p_this->object_lock );
+    vlc_assert_locked( &obj->object_lock );
     vlc_mutex_unlock( &obj->object_lock );
 }
 
