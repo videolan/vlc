@@ -110,8 +110,8 @@ struct vlc_object_internals_t
     int             i_vars;
 
     /* Thread properties, if any */
-    vlc_thread_t thread_id;
-    vlc_bool_t   b_thread;
+    vlc_thread_t    thread_id;
+    vlc_bool_t      b_thread;
 
     /* Objects management */
     vlc_bool_t      b_attached;
