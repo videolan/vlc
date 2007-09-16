@@ -724,15 +724,11 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     break;
                 case 's':
                 {
-                    char *lang;
+                    char *lang = NULL;
                     if( p_input )
-                    {
-                        lang = var_GetString( p_input, "sub-language" );
-                    }
-                    else
-                    {
+                        lang = var_GetNonEmptyString( p_input, "sub-language" );
+                    if( lang == NULL )
                         lang = strdup( b_empty_if_na ? "" : "-" );
-                    }
                     INSERT_STRING( 1, lang );
                     break;
                 }
@@ -820,15 +816,12 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     break;
                 case 'O':
                 {
-                    char *lang;
+                    char *lang = NULL;
                     if( p_input )
-                    {
-                        lang = var_GetString( p_input, "audio-language" );
-                    }
-                    else
-                    {
+                        lang = var_GetNonEmptyString( p_input,
+                                                      "audio-language" );
+                    if( lang == NULL )
                         lang = strdup( b_empty_if_na ? "" : "-" );
-                    }
                     INSERT_STRING( 1, lang );
                     break;
                 }
