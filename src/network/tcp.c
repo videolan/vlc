@@ -54,10 +54,10 @@
 #endif
 
 static int SocksNegociate( vlc_object_t *, int fd, int i_socks_version,
-                           char *psz_socks_user, char *psz_socks_passwd );
+                           const char *psz_user, const char *psz_passwd );
 static int SocksHandshakeTCP( vlc_object_t *,
                               int fd, int i_socks_version,
-                              char *psz_socks_user, char *psz_socks_passwd,
+                              const char *psz_user, const char *psz_passwd,
                               const char *psz_host, int i_port );
 extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
                        int i_protocol );
@@ -240,8 +240,8 @@ next_ai: /* failure */
     if( psz_socks != NULL )
     {
         /* NOTE: psz_socks already free'd! */
-        char *psz_user = var_CreateGetString( p_this, "socks-user" );
-        char *psz_pwd  = var_CreateGetString( p_this, "socks-pwd" );
+        char *psz_user = var_CreateGetNonEmptyString( p_this, "socks-user" );
+        char *psz_pwd  = var_CreateGetNonEmptyString( p_this, "socks-pwd" );
 
         if( SocksHandshakeTCP( p_this, i_handle, 5, psz_user, psz_pwd,
                                psz_host, i_port ) )
@@ -336,8 +336,8 @@ int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
  *****************************************************************************/
 static int SocksNegociate( vlc_object_t *p_obj,
                            int fd, int i_socks_version,
-                           char *psz_socks_user,
-                           char *psz_socks_passwd )
+                           const char *psz_socks_user,
+                           const char *psz_socks_passwd )
 {
     uint8_t buffer[128+2*256];
     int i_len;
@@ -348,8 +348,7 @@ static int SocksNegociate( vlc_object_t *p_obj,
 
     /* We negociate authentication */
 
-    if( psz_socks_user && psz_socks_passwd &&
-        *psz_socks_user && *psz_socks_passwd )
+    if( ( psz_socks_user == NULL ) && ( psz_socks_passwd == NULL ) )
         b_auth = VLC_TRUE;
 
     buffer[0] = i_socks_version;    /* SOCKS version */
@@ -427,7 +426,7 @@ static int SocksNegociate( vlc_object_t *p_obj,
 static int SocksHandshakeTCP( vlc_object_t *p_obj,
                               int fd,
                               int i_socks_version,
-                              char *psz_socks_user, char *psz_socks_passwd,
+                              const char *psz_user, const char *psz_passwd,
                               const char *psz_host, int i_port )
 {
     uint8_t buffer[128+2*256];
@@ -440,7 +439,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 
     if( i_socks_version == 5 &&
         SocksNegociate( p_obj, fd, i_socks_version,
-                        psz_socks_user, psz_socks_passwd ) )
+                        psz_user, psz_passwd ) )
         return VLC_EGENERIC;
 
     if( i_socks_version == 4 )
@@ -448,7 +447,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
         struct addrinfo hints, *p_res;
 
         /* v4 only support ipv4 */
-    memset (&hints, 0, sizeof (hints));
+        memset (&hints, 0, sizeof (hints));
         hints.ai_family = AF_INET;
         if( vlc_getaddrinfo( p_obj, psz_host, 0, &hints, &p_res ) )
             return VLC_EGENERIC;
