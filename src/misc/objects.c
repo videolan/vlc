@@ -446,6 +446,81 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 }
 
 
+/** Inter-object signaling */
+
+void __vlc_object_lock( vlc_object_t *obj )
+{
+    vlc_mutex_lock( &obj->object_lock );
+}
+
+void __vlc_object_unlock( vlc_object_t *obj )
+{
+    vlc_assert_locked( &p_this->object_lock );
+    vlc_mutex_unlock( &obj->object_lock );
+}
+
+/**
+ * Waits for the object to be signaled (using vlc_object_signal()).
+ * If the object already has a signal pending, this function will return
+ * immediately. It is asserted that the caller holds the object lock.
+ *
+ * @return true if the object is dying and should terminate.
+ */
+vlc_bool_t __vlc_object_wait( vlc_object_t *obj )
+{
+    vlc_assert_locked( &obj->object_lock );
+    vlc_cond_wait( &obj->object_wait, &obj->object_lock );
+    return obj->b_die;
+}
+
+
+/**
+ * Waits for the object to be signaled (using vlc_object_signal()), or for
+ * a timer to expire.
+ * If the object already has a signal pending, this function will return
+ * immediately. It is asserted that the caller holds the object lock.
+ *
+ * @return negative if the object is dying and should terminate,
+ * positive if the the object has been signaled but is not dying,
+ * 0 if timeout has been reached.
+ */
+int __vlc_object_timedwait( vlc_object_t *obj, mtime_t deadline )
+{
+    int v;
+
+    vlc_assert_locked( &obj->object_lock );
+    v = vlc_cond_timedwait( &obj->object_wait, &obj->object_lock, deadline );
+    if( v == 0 ) /* signaled */
+        return obj->b_die ? -1 : 1;
+    return 0;
+}
+
+
+/**
+ * Signals an object for which the lock is held.
+ */
+void __vlc_object_signal_unlocked( vlc_object_t *obj )
+{
+    vlc_assert_locked( &obj->object_lock );
+    vlc_cond_signal( &obj->object_wait );
+}
+
+
+/**
+ * Signals an object for which the lock is NOT held.
+ */
+void __vlc_object_signal( vlc_object_t *obj )
+{
+    vlc_mutex_lock( &obj->object_lock );
+    vlc_object_signal_unlocked( obj );
+    vlc_mutex_unlock( &obj->object_lock );
+}
+
+
+/**
+ * Requests termination of an object.
+ * If the object is LibVLC, also request to terminate all its children.
+ */
 void __vlc_object_kill( vlc_object_t *p_this )
 {
     vlc_mutex_lock( &p_this->object_lock );
@@ -455,25 +530,8 @@ void __vlc_object_kill( vlc_object_t *p_this )
             vlc_object_kill( p_this->pp_children[i] );
 
     p_this->b_die = VLC_TRUE;
-    vlc_cond_signal( &p_this->object_wait );
+    vlc_object_signal_unlocked( p_this );
     vlc_mutex_unlock( &p_this->object_lock );
-}
-
-
-vlc_bool_t __vlc_object_dying_unlocked( vlc_object_t *p_this )
-{
-    vlc_assert_locked( &p_this->object_lock );
-    return p_this->b_die;
-}
-
-
-vlc_bool_t __vlc_object_dying( vlc_object_t *p_this )
-{
-     vlc_bool_t b;
-     vlc_mutex_lock( &p_this->object_lock );
-     b = __vlc_object_dying_unlocked( p_this );
-     vlc_mutex_unlock( &p_this->object_lock );
-     return b;
 }
 
 

@@ -96,9 +96,6 @@ struct vlc_object_t
  *****************************************************************************/
 VLC_EXPORT( void *, __vlc_object_create, ( vlc_object_t *, int ) );
 VLC_EXPORT( void, __vlc_object_destroy, ( vlc_object_t * ) );
-VLC_EXPORT( void, __vlc_object_kill, ( vlc_object_t * ) );
-VLC_EXPORT( vlc_bool_t, __vlc_object_dying_unlocked, ( vlc_object_t * ) );
-VLC_EXPORT( vlc_bool_t, __vlc_object_dying, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_attach, ( vlc_object_t *, vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_detach, ( vlc_object_t * ) );
 VLC_EXPORT( void *, __vlc_object_get, ( vlc_object_t *, int ) );
@@ -117,9 +114,6 @@ VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
 #define vlc_object_destroy(a) do { \
     __vlc_object_destroy( VLC_OBJECT(a) ); \
     (a) = NULL; } while(0)
-
-#define vlc_object_kill(a) \
-    __vlc_object_kill( VLC_OBJECT(a) )
 
 #define vlc_object_detach(a) \
     __vlc_object_detach( VLC_OBJECT(a) )
@@ -144,3 +138,44 @@ VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
 
 #define vlc_list_find(a,b,c) \
     __vlc_list_find( VLC_OBJECT(a),b,c)
+
+
+/* Objects and threading */
+VLC_EXPORT( void, __vlc_object_lock, ( vlc_object_t * ) );
+#define vlc_object_lock( obj ) \
+    __vlc_object_lock( VLC_OBJECT( obj ) )
+
+VLC_EXPORT( void, __vlc_object_unlock, ( vlc_object_t * ) );
+#define vlc_object_unlock( obj ) \
+    __vlc_object_unlock( VLC_OBJECT( obj ) )
+
+VLC_EXPORT( vlc_bool_t, __vlc_object_wait, ( vlc_object_t * ) );
+#define vlc_object_wait( obj ) \
+    __vlc_object_wait( VLC_OBJECT( obj ) )
+
+static inline
+vlc_bool_t __vlc_object_lock_and_wait( vlc_object_t *obj )
+{
+    vlc_bool_t b;
+
+    vlc_object_lock( obj );
+    b = vlc_object_wait( obj );
+    vlc_object_unlock( obj );
+    return b;
+}
+
+VLC_EXPORT( int, __vlc_object_timedwait, ( vlc_object_t *, mtime_t ) );
+#define vlc_object_timedwait( obj, d ) \
+    __vlc_object_timedwait( VLC_OBJECT( obj ), d )
+
+VLC_EXPORT( void, __vlc_object_signal_unlocked, ( vlc_object_t * ) );
+#define vlc_object_signal_unlocked( obj ) \
+    __vlc_object_signal_unlocked( VLC_OBJECT( obj ) )
+
+VLC_EXPORT( void, __vlc_object_signal, ( vlc_object_t * ) );
+#define vlc_object_signal( obj ) \
+    __vlc_object_signal( VLC_OBJECT( obj ) )
+
+VLC_EXPORT( void, __vlc_object_kill, ( vlc_object_t * ) );
+#define vlc_object_kill(a) \
+    __vlc_object_kill( VLC_OBJECT(a) )
