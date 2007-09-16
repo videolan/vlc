@@ -302,6 +302,8 @@ static void Close( vlc_object_t * p_this )
     int i;
 
     vlc_object_kill( p_sys->p_thread );
+    block_FifoWake( p_sys->p_thread->p_fifo );
+
     for( i = 0; i < 10; i++ )
     {
         block_t *p_dummy = block_New( p_access, p_sys->i_mtu );
@@ -485,6 +487,8 @@ static void ThreadWrite( vlc_object_t *p_this )
         }
 #endif
         p_pk = block_FifoGet( p_thread->p_fifo );
+        if( p_pk == NULL )
+            continue; /* forced wake-up */
 
         i_date = p_thread->i_caching + p_pk->i_dts;
         if( i_date_last > 0 )

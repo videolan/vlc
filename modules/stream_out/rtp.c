@@ -1135,6 +1135,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     vlc_object_kill( id );
+    block_FifoWake( id->p_fifo );
 
     vlc_mutex_lock( &p_sys->lock_es );
     TAB_REMOVE( p_sys->i_es, p_sys->es, id );
@@ -1311,6 +1312,9 @@ static void ThreadSend( vlc_object_t *p_this )
     while( !id->b_die )
     {
         block_t *out = block_FifoGet( id->p_fifo );
+        if( out == NULL )
+            continue; /* Forced wakeup */
+
         mtime_t  i_date = out->i_dts + i_caching;
         ssize_t  len = out->i_buffer;
 
