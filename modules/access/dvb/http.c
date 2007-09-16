@@ -91,8 +91,8 @@ int E_(HTTPOpen)( access_t *p_access )
     p_sys->b_request_frontend_info = p_sys->b_request_mmi_info = VLC_FALSE;
     p_sys->i_httpd_timeout = 0;
 
-    psz_address = var_GetString( p_access, "dvb-http-host" );
-    if( psz_address != NULL && *psz_address )
+    psz_address = var_GetNonEmptyString( p_access, "dvb-http-host" );
+    if( psz_address != NULL )
     {
         char *psz_parser = strchr( psz_address, ':' );
         if( psz_parser )
@@ -102,14 +102,11 @@ int E_(HTTPOpen)( access_t *p_access )
         }
     }
     else
-    {
-        if ( psz_address != NULL ) free( psz_address );
         return VLC_SUCCESS;
-    }
 
     /* determine SSL configuration */
-    psz_cert = var_GetString( p_access, "dvb-http-intf-cert" );
-    if ( psz_cert != NULL && *psz_cert )
+    psz_cert = var_GetNonEmptyString( p_access, "dvb-http-intf-cert" );
+    if ( psz_cert != NULL )
     {
         msg_Dbg( p_access, "enabling TLS for HTTP interface (cert file: %s)",
                  psz_cert );
@@ -122,11 +119,6 @@ int E_(HTTPOpen)( access_t *p_access )
     }
     else
     {
-        if ( !*psz_cert )
-        {
-            free( psz_cert );
-            psz_cert = NULL;
-        }
         if ( i_port <= 0 )
             i_port= 8082;
     }
@@ -140,10 +132,10 @@ int E_(HTTPOpen)( access_t *p_access )
     p_sys->p_httpd_host = httpd_TLSHostNew( VLC_OBJECT(p_access), psz_address,
                                             i_port, psz_cert, psz_key, psz_ca,
                                             psz_crl );
-    FREE( psz_cert );
-    FREE( psz_key );
-    FREE( psz_ca );
-    FREE( psz_crl );
+    free( psz_cert );
+    free( psz_key );
+    free( psz_ca );
+    free( psz_crl );
 
     if ( p_sys->p_httpd_host == NULL )
     {
@@ -175,9 +167,9 @@ int E_(HTTPOpen)( access_t *p_access )
                                psz_user, psz_password, p_acl,
                                HttpCallback, f );
 
-    FREE( psz_user );
-    FREE( psz_password );
-    FREE( psz_acl );
+    free( psz_user );
+    free( psz_password );
+    free( psz_acl );
     if ( p_acl != NULL )
         ACL_Destroy( p_acl );
 

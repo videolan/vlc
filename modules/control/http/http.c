@@ -136,12 +136,7 @@ static int Open( vlc_object_t *p_this )
     int           i_port       = 0;
     char          *psz_src;
 
-    var_Create(p_intf->p_libvlc, "http-host", VLC_VAR_STRING );
-    psz_address = var_GetString(p_intf->p_libvlc, "http-host");
-    if( !psz_address || !*psz_address )
-    {
-        psz_address = config_GetPsz( p_intf, "http-host" );
-    }
+    psz_address = var_GetNonEmptyString(p_intf->p_libvlc, "http-host");
     if( psz_address != NULL )
     {
         char *psz_parser = strchr( psz_address, ':' );
@@ -260,9 +255,9 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Dbg( p_intf, "enabling TLS for HTTP interface (cert file: %s)",
                  psz_cert );
-        psz_key = config_GetPsz( p_intf, "http-intf-key" );
-        psz_ca = config_GetPsz( p_intf, "http-intf-ca" );
-        psz_crl = config_GetPsz( p_intf, "http-intf-crl" );
+        psz_key = var_GetNonEmptyString( p_intf, "http-intf-key" );
+        psz_ca = var_GetNonEmptyString( p_intf, "http-intf-ca" );
+        psz_crl = var_GetNonEmptyString( p_intf, "http-intf-crl" );
 
         if( i_port <= 0 )
             i_port = 8443;
@@ -292,6 +287,7 @@ static int Open( vlc_object_t *p_this )
 
         /* Ugly hack to run several HTTP servers on different ports */
         snprintf( psz_tmp, sizeof (psz_tmp), "%s:%d", psz_address, i_port + 1 );
+        var_Create(p_intf->p_libvlc, "http-host", VLC_VAR_STRING );
         var_SetString( p_intf->p_libvlc, "http-host", psz_tmp );
     }
 
@@ -379,11 +375,8 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 failed:
-    if( psz_src ) free( psz_src );
-    if( p_sys->pp_files )
-    {
-        free( p_sys->pp_files );
-    }
+    free( psz_src );
+    free( p_sys->pp_files );
     httpd_HostDelete( p_sys->p_httpd_host );
     free( p_sys->psz_address );
     free( p_sys->psz_html_type );

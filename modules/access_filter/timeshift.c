@@ -555,14 +555,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
 #endif
 static char *GetTmpFilePath( access_t *p_access )
 {
-    char *psz_dir = var_GetString( p_access, "timeshift-dir" );
+    char *psz_dir = var_GetNonEmptyString( p_access, "timeshift-dir" );
     char *psz_filename_base;
-
-    if( ( psz_dir != NULL ) && ( psz_dir[0] == '\0' ) )
-    {
-        free( psz_dir );
-        psz_dir = NULL;
-    }
 
     if( psz_dir == NULL )
     {
