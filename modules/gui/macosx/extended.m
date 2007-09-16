@@ -768,7 +768,7 @@ static VLCExtended *_o_sharedInstance = nil;
 
     if( p_aout )
     {
-        psz_string = var_GetString( p_aout, "audio-filter" );
+        psz_string = var_GetNonEmptyString( p_aout, "audio-filter" );
     }
     else
     {
