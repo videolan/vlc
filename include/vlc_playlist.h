@@ -275,8 +275,8 @@ struct playlist_add_t
  *****************************************************************************/
 
 /* Helpers */
-#define PL_LOCK vlc_mutex_lock( &p_playlist->object_lock );
-#define PL_UNLOCK vlc_mutex_unlock( &p_playlist->object_lock );
+#define PL_LOCK vlc_object_lock( p_playlist );
+#define PL_UNLOCK vlc_object_unlock( p_playlist );
 
 #define pl_Get( a ) a->p_libvlc->p_playlist
 #define pl_Yield( a ) __pl_Yield( VLC_OBJECT(a) )
@@ -468,7 +468,7 @@ static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
 static inline void playlist_Signal( playlist_t *p_playlist )
 {
     PL_LOCK;
-    vlc_cond_signal( &p_playlist->object_wait );
+    vlc_object_signal( p_playlist );
     PL_UNLOCK;
 }
 
