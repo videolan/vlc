@@ -1495,7 +1495,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 playlist_t * p_playlist = pl_Yield( p_sys->p_input );
                 PL_LOCK;
                 p_playlist->gc_date = mdate();
-                vlc_cond_signal( &p_playlist->object_wait );
+                vlc_object_signal_unlocked( p_playlist );
                 PL_UNLOCK;
                 pl_Release( p_playlist );
             }
