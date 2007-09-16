@@ -790,8 +790,8 @@ static int Init( input_thread_t * p_input )
         }
 
         /* Find a usable sout and attach it to p_input */
-        psz = var_GetString( p_input, "sout" );
-        if( *psz && strncasecmp( p_input->p->input.p_item->psz_uri, "vlc:", 4 ) )
+        psz = var_GetNonEmptyString( p_input, "sout" );
+        if( psz && strncasecmp( p_input->p->input.p_item->psz_uri, "vlc:", 4 ) )
         {
             /* Check the validity of the provided sout */
             if( p_input->p->p_sout )
@@ -985,8 +985,8 @@ static int Init( input_thread_t * p_input )
         }
 
         /* Look for and add subtitle files */
-        psz_subtitle = var_GetString( p_input, "sub-file" );
-        if( *psz_subtitle )
+        psz_subtitle = var_GetNonEmptyString( p_input, "sub-file" );
+        if( psz_subtitle != NULL )
         {
             msg_Dbg( p_input, "forced subtitle: %s", psz_subtitle );
             input_AddSubtitles( p_input, psz_subtitle, VLC_FALSE );
@@ -1003,7 +1003,7 @@ static int Init( input_thread_t * p_input )
 
             /* Try to autoselect the first autodetected subtitles file
              * if no subtitles file was specified */
-            if( *psz_subtitle == 0 && subs && subs[0] )
+            if( ( psz_subtitle == NULL ) && subs && subs[0] )
             {
                 input_AddSubtitles( p_input, subs[0], VLC_FALSE );
                 free( subs[0] );
@@ -1030,8 +1030,8 @@ static int Init( input_thread_t * p_input )
         free( psz_subtitle );
 
         /* Look for slave */
-        psz = var_GetString( p_input, "input-slave" );
-        if( *psz )
+        psz = var_GetNonEmptyString( p_input, "input-slave" );
+        if( psz != NULL )
         {
             char *psz_delim;
             input_source_t *slave;
@@ -1059,8 +1059,8 @@ static int Init( input_thread_t * p_input )
                 else free( slave );
                 psz = psz_delim;
             }
+            free( psz );
         }
-        if( psz ) free( psz );
     }
     else
     {
@@ -2224,7 +2224,7 @@ static int InputSourceInit( input_thread_t *p_input,
         }
 
         /* */
-        psz_tmp = psz = var_GetString( p_input, "access-filter" );
+        psz_tmp = psz = var_GetNonEmptyString( p_input, "access-filter" );
         while( psz && *psz )
         {
             access_t *p_access = in->p_access;
@@ -2243,7 +2243,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
             psz = end;
         }
-        if( psz_tmp ) free( psz_tmp );
+        free( psz_tmp );
 
         /* Get infos from access */
         if( !p_input->b_preparsing )

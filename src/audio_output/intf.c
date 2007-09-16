@@ -482,7 +482,7 @@ void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
                                                 FIND_ANYWHERE );
 
     if( p_aout )
-        psz_string = var_GetString( p_aout, "audio-filter" );
+        psz_string = var_GetNonEmptyString( p_aout, "audio-filter" );
     else
         psz_string = config_GetPsz( p_this, "audio-filter" );
 

@@ -888,7 +888,8 @@ static int ReplayGainCallback( vlc_object_t *p_this, char const *psz_cmd,
 
 static void ReplayGainSelect( aout_instance_t *p_aout, aout_input_t *p_input )
 {
-    char *psz_replay_gain = var_GetString( p_aout, "audio-replay-gain-mode" );
+    char *psz_replay_gain = var_GetNonEmptyString( p_aout,
+                                                   "audio-replay-gain-mode" );
     int i_mode;
     int i_use;
     float f_gain;
