@@ -684,7 +684,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
         if( b_wait )
         {
             msg_Dbg( p_this, "waiting for thread completion" );
-            vlc_cond_wait( &p_this->object_wait, &p_this->object_lock );
+            vlc_object_wait( p_this );
         }
 
         p_priv->b_thread = VLC_TRUE;
@@ -773,9 +773,7 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
  *****************************************************************************/
 void __vlc_thread_ready( vlc_object_t *p_this )
 {
-    vlc_mutex_lock( &p_this->object_lock );
-    vlc_cond_signal( &p_this->object_wait );
-    vlc_mutex_unlock( &p_this->object_lock );
+    vlc_object_signal( p_this );
 }
 
 /*****************************************************************************
