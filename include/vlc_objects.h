@@ -176,7 +176,7 @@ VLC_EXPORT( void, __vlc_object_signal_unlocked, ( vlc_object_t * ) );
 
 static inline void __vlc_object_signal( vlc_object_t *obj )
 {
-    vlc_oject_lock( obj );
+    vlc_object_lock( obj );
     vlc_object_signal_unlocked( obj );
     vlc_object_unlock( obj );
 }
