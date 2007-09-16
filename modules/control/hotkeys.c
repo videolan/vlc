@@ -154,7 +154,7 @@ static void Run( intf_thread_t *p_intf )
         var_Set( p_intf->p_libvlc, p_hotkeys[i].psz_action, val );
     }
 
-    while( !intf_ShouldDie( p_intf ) )
+    for( vlc_bool_t b_quit = VLC_FALSE ; !b_quit; )
     {
         int i_key, i_action;
         int i_times = 0;
@@ -204,11 +204,8 @@ static void Run( intf_thread_t *p_intf )
 
         if( !i_action )
         {
-            vlc_mutex_lock( &p_intf->object_lock );
-            vlc_cond_wait( &p_intf->object_wait, &p_intf->object_lock );
-            vlc_mutex_unlock( &p_intf->object_lock );
+            b_quit = vlc_object_lock_and_wait( p_intf );
             /* No key pressed, sleep a bit more */
-//            msleep( INTF_IDLE_SLEEP );
             continue;
         }
 
