@@ -120,7 +120,7 @@ nice:
 
 lib_LTLIBRARIES = libvlc.la libvlc-control.la
 
-AM_LDFLAGS = -no-undefined
+AM_LDFLAGS = -no-undefined -no-install
 if HAVE_WIN32
 AM_LDFLAGS += -avoid-version
 endif
