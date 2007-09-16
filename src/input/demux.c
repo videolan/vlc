@@ -50,7 +50,9 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
     if( *p_demux->psz_demux == '\0' )
     {
         free( p_demux->psz_demux );
-        p_demux->psz_demux = var_GetString( p_obj, "demux" );
+        p_demux->psz_demux = var_GetNonEmptyString( p_obj, "demux" );
+        if( p_demux->psz_demux == NULL )
+            p_demux->psz_demux = strdup( "" );
     }
 
     if( !b_quick )

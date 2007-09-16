@@ -995,11 +995,13 @@ static int Init( input_thread_t * p_input )
         var_Get( p_input, "sub-autodetect-file", &val );
         if( val.b_bool )
         {
-            char *psz_autopath = var_GetString( p_input, "sub-autodetect-path" );
+            char *psz_autopath = var_GetNonEmptyString( p_input, "sub-autodetect-path" );
             char **subs = subtitles_Detect( p_input, psz_autopath,
                                             p_input->p->input.p_item->psz_uri );
             input_source_t *sub;
             i = 0;
+            if( psz_autopath == NULL )
+                psz_autopath = strdup("");
 
             /* Try to autoselect the first autodetected subtitles file
              * if no subtitles file was specified */

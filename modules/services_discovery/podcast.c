@@ -158,8 +158,9 @@ static void Run( services_discovery_t *p_sd )
         if( p_sys->b_update == VLC_TRUE )
         {
             msg_Dbg( p_sd, "Update required" );
-            psz_urls = var_GetString( p_sd, "podcast-urls" );
-            ParseUrls( p_sd, psz_urls );
+            psz_urls = var_GetNonEmptyString( p_sd, "podcast-urls" );
+            if( psz_urls != NULL )
+                ParseUrls( p_sd, psz_urls );
             free( psz_urls );
             p_sys->b_update = VLC_FALSE;
         }

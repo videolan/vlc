@@ -1036,7 +1036,9 @@ void ExtraPanel::CheckAout()
             p_intf->p_sys->p_aout = p_aout;
 
             f_preamp = var_GetFloat( p_aout, "equalizer-preamp" );
-            psz_bands = var_GetString( p_aout, "equalizer-bands" );
+            psz_bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
+            if( psz_bands == NULL )
+                psz_bands = strdup("");
             b_update = VLC_TRUE;
         }
         vlc_object_release( p_aout );

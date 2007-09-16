@@ -359,9 +359,9 @@ char *libvlc_video_get_aspect_ratio( libvlc_media_instance_t *p_mi,
     if( !p_vout )
         return 0;
 
-    psz_aspect = var_GetString( p_vout, "aspect-ratio" );
+    psz_aspect = var_GetNonEmptyString( p_vout, "aspect-ratio" );
     vlc_object_release( p_vout );
-    return psz_aspect;
+    return psz_aspect ? psz_aspect : strdup("");
 }
 
 void libvlc_video_set_aspect_ratio( libvlc_media_instance_t *p_mi,
@@ -458,9 +458,9 @@ char *libvlc_video_get_crop_geometry( libvlc_media_instance_t *p_mi,
     if( !p_vout )
         return 0;
 
-    psz_geometry = var_GetString( p_vout, "crop" );
+    psz_geometry = var_GetNonEmptyString( p_vout, "crop" );
     vlc_object_release( p_vout );
-    return psz_geometry;
+    return psz_geometry ? psz_geometry : strdup("");
 }
 
 void libvlc_video_set_crop_geometry( libvlc_media_instance_t *p_mi,
