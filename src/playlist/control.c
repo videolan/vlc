@@ -37,7 +37,23 @@ static void PreparseEnqueueItemSub( playlist_t *, playlist_item_t * );
  * Playlist control
  *****************************************************************************/
 
-int playlist_Control( playlist_t * p_playlist, int i_query, vlc_bool_t b_locked, ... )
+playlist_t *__pl_Yield( vlc_object_t *p_this )
+{
+    playlist_t *pl = p_this->p_libvlc->p_playlist;
+    assert( pl != NULL );
+    vlc_object_yield( pl );
+    return pl;
+}
+
+void __pl_Release( vlc_object_t *p_this )
+{
+    playlist_t *pl = p_this->p_libvlc->p_playlist;
+    assert( pl != NULL );
+    vlc_object_release( pl );
+}
+
+int playlist_Control( playlist_t * p_playlist, int i_query,
+                      vlc_bool_t b_locked, ... )
 {
     va_list args;
     int i_result;

@@ -226,6 +226,8 @@ playlist_BothAddInput
 playlist_ChildSearchName
 playlist_Clear
 playlist_Control
+__pl_Yield
+__pl_Release
 playlist_DeleteFromInput
 playlist_Export
 playlist_GetPreferredNode

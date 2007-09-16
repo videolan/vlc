@@ -279,14 +279,12 @@ struct playlist_add_t
 #define PL_UNLOCK vlc_object_unlock( p_playlist );
 
 #define pl_Get( a ) a->p_libvlc->p_playlist
+
+VLC_EXPORT( playlist_t *, __pl_Yield, ( vlc_object_t * ) );
 #define pl_Yield( a ) __pl_Yield( VLC_OBJECT(a) )
-static inline playlist_t *__pl_Yield( vlc_object_t *p_this )
-{
-    assert( p_this->p_libvlc->p_playlist );
-    vlc_object_yield( p_this->p_libvlc->p_playlist );
-    return p_this->p_libvlc->p_playlist;
-}
-#define pl_Release(a) vlc_object_release( a->p_libvlc->p_playlist );
+
+VLC_EXPORT( void, __pl_Release, ( vlc_object_t * ) );
+#define pl_Release(a) __pl_Release( VLC_OBJECT(a) );
 
 /* Playlist control */
 #define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY, VLC_FALSE )
