@@ -552,6 +552,8 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
 
 /*****************************************************************************
  * vlc_cond_timedwait: wait until condition completion or expiration
+ *****************************************************************************
+ * Returns 0 if object signaled, an error code in case of timeout or error.
  *****************************************************************************/
 #define vlc_cond_timedwait( P_COND, P_MUTEX, DEADLINE )                      \
     __vlc_cond_timedwait( __FILE__, __LINE__, P_COND, P_MUTEX, DEADLINE  )
@@ -582,7 +584,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 
     i_res = pthread_cond_timedwait( &p_condvar->cond, &p_mutex->mutex, &ts );
     if( i_res == ETIMEDOUT )
-        i_res = 0; /* this error is perfectly normal */
+        return ETIMEDOUT; /* this error is perfectly normal */
     else
     if ( i_res ) /* other errors = bug */
     {
