@@ -544,13 +544,13 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
 
     aout_instance_t *p_aout = (aout_instance_t *)vlc_object_find(p_intf,
                                  VLC_OBJECT_AOUT, FIND_ANYWHERE);
-    char *psz_af = NULL;
+    char *psz_af;
     if( p_aout )
     {
-        psz_af = var_GetString( p_aout, "audio-filter" );
+        psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
         if( var_GetBool( p_aout, "equalizer-2pass" ) )
             eq_2p_chkbox->SetValue( true );
-    vlc_object_release( p_aout );
+        vlc_object_release( p_aout );
     }
     else
     {
@@ -558,7 +558,7 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
         if( config_GetInt( p_intf, "equalizer-2pass" ) )
             eq_2p_chkbox->SetValue( true );
     }
-    if( psz_af != NULL ? strstr( psz_af, "equalizer" ) != NULL : VLC_FALSE )
+    if( psz_af != NULL && strstr( psz_af, "equalizer" ) )
     {
         eq_chkbox->SetValue( true );
     } else {
@@ -1114,7 +1114,7 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
 
     if( p_aout )
     {
-        psz_string = var_GetString( p_aout, "audio-filter" );
+        psz_string = var_GetNonEmptyString( p_aout, "audio-filter" );
     }
     else
     {

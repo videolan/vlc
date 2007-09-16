@@ -53,7 +53,7 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
     if( p_object == NULL )
         return;
 
-    psz_string = var_GetString( p_object, "audio-filter" );
+    psz_string = var_GetNonEmptyString( p_object, "audio-filter" );
 
     if( !psz_string ) psz_string = strdup( "" );
 
@@ -117,7 +117,7 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
     if( p_object == NULL )
         return VLC_FALSE;
 
-    psz_string = var_GetString( p_object, "audio-filter" );
+    psz_string = var_GetNonEmptyString( p_object, "audio-filter" );
 
     vlc_object_release( p_object );
 
@@ -192,9 +192,9 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
                                                     VLC_VAR_DOINHERIT );
 
     f_preamp = var_GetFloat( p_object, "equalizer-preamp" );
-    psz_bands = var_GetString( p_object, "equalizer-bands" );
+    psz_bands = var_GetNonEmptyString( p_object, "equalizer-bands" );
 
-    if( !strcmp( psz_bands, "" ) )
+    if( psz_bands == NULL )
         psz_bands = strdup( "0 0 0 0 0 0 0 0 0 0" );
 
     b_2p = var_GetBool( p_object, "equalizer-2pass" );
@@ -404,56 +404,56 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
 
         var_Create( p_object, "equalizer-preset", VLC_VAR_STRING |
                                                         VLC_VAR_DOINHERIT );
-        psz_preset = var_GetString( p_object, "equalizer-preset" );
+        psz_preset = var_GetNonEmptyString( p_object, "equalizer-preset" );
 
-        for( i = 0 ; i < 18 ; i++ )
+        for( i = 0 ; (psz_preset != NULL) && (i < 18) ; i++ )
         {
-            if( !strcmp( preset_list[i], psz_preset ) )
+            if( strcmp( preset_list[i], psz_preset ) )
+                continue;
+
+            [o_popup_presets selectItemAtIndex: i];
+
+            [o_slider_preamp setFloatValue: eqz_preset_10b[i]->f_preamp];
+            [self setBandSlidersValues: (float *)eqz_preset_10b[i]->f_amp];
+                
+            /*
+            [o_slider_band1 setFloatValue: eqz_preset_10b[i]->f_amp[0]];
+            [o_slider_band2 setFloatValue: eqz_preset_10b[i]->f_amp[1]];
+            [o_slider_band3 setFloatValue: eqz_preset_10b[i]->f_amp[2]];
+            [o_slider_band4 setFloatValue: eqz_preset_10b[i]->f_amp[3]];
+            [o_slider_band5 setFloatValue: eqz_preset_10b[i]->f_amp[4]];
+            [o_slider_band6 setFloatValue: eqz_preset_10b[i]->f_amp[5]];
+            [o_slider_band7 setFloatValue: eqz_preset_10b[i]->f_amp[6]];
+            [o_slider_band8 setFloatValue: eqz_preset_10b[i]->f_amp[7]];
+            [o_slider_band9 setFloatValue: eqz_preset_10b[i]->f_amp[8]];
+            [o_slider_band10 setFloatValue: eqz_preset_10b[i]->f_amp[9]];
+            */
+                
+            if( strcmp( psz_preset, "flat" ) )
             {
-                [o_popup_presets selectItemAtIndex: i];
+                char psz_bands[100];
 
-                [o_slider_preamp setFloatValue: eqz_preset_10b[i]->f_preamp];
-                [self setBandSlidersValues: (float *)eqz_preset_10b[i]->f_amp];
-                
-                /*
-                [o_slider_band1 setFloatValue: eqz_preset_10b[i]->f_amp[0]];
-                [o_slider_band2 setFloatValue: eqz_preset_10b[i]->f_amp[1]];
-                [o_slider_band3 setFloatValue: eqz_preset_10b[i]->f_amp[2]];
-                [o_slider_band4 setFloatValue: eqz_preset_10b[i]->f_amp[3]];
-                [o_slider_band5 setFloatValue: eqz_preset_10b[i]->f_amp[4]];
-                [o_slider_band6 setFloatValue: eqz_preset_10b[i]->f_amp[5]];
-                [o_slider_band7 setFloatValue: eqz_preset_10b[i]->f_amp[6]];
-                [o_slider_band8 setFloatValue: eqz_preset_10b[i]->f_amp[7]];
-                [o_slider_band9 setFloatValue: eqz_preset_10b[i]->f_amp[8]];
-                [o_slider_band10 setFloatValue: eqz_preset_10b[i]->f_amp[9]];
-                */
-                
-                if( strcmp( psz_preset, "flat" ) )
-                {
-                    char psz_bands[100];
-                    memset( psz_bands, 0, 100 );
+                snprintf( psz_bands, sizeof( psz_bands ),
+                          "%.1f %.1f %.1f %.1f %.1f %.1f %.1f "
+                          "%.1f %.1f %.1f",
+                          eqz_preset_10b[i]->f_amp[0],
+                          eqz_preset_10b[i]->f_amp[1],
+                          eqz_preset_10b[i]->f_amp[2],
+                          eqz_preset_10b[i]->f_amp[3],
+                          eqz_preset_10b[i]->f_amp[4],
+                          eqz_preset_10b[i]->f_amp[5],
+                          eqz_preset_10b[i]->f_amp[6],
+                          eqz_preset_10b[i]->f_amp[7],
+                          eqz_preset_10b[i]->f_amp[8],
+                          eqz_preset_10b[i]->f_amp[9] );
 
-                    sprintf( psz_bands, "%.1f %.1f %.1f %.1f %.1f %.1f %.1f "
-                                        "%.1f %.1f %.1f",
-                                        eqz_preset_10b[i]->f_amp[0],
-                                        eqz_preset_10b[i]->f_amp[1],
-                                        eqz_preset_10b[i]->f_amp[2],
-                                        eqz_preset_10b[i]->f_amp[3],
-                                        eqz_preset_10b[i]->f_amp[4],
-                                        eqz_preset_10b[i]->f_amp[5],
-                                        eqz_preset_10b[i]->f_amp[6],
-                                        eqz_preset_10b[i]->f_amp[7],
-                                        eqz_preset_10b[i]->f_amp[8],
-                                        eqz_preset_10b[i]->f_amp[9] );
-
-                    var_Create( p_object, "equalizer-preamp", VLC_VAR_FLOAT |
-                                                            VLC_VAR_DOINHERIT );
-                    var_Create( p_object, "equalizer-bands", VLC_VAR_STRING |
-                                                            VLC_VAR_DOINHERIT );
-                    var_SetFloat( p_object, "equalizer-preamp",
-                                                eqz_preset_10b[i]->f_preamp );
-                    var_SetString( p_object, "equalizer-bands", psz_bands );
-                }
+                var_Create( p_object, "equalizer-preamp", VLC_VAR_FLOAT |
+                                                          VLC_VAR_DOINHERIT );
+                var_Create( p_object, "equalizer-bands", VLC_VAR_STRING |
+                                                         VLC_VAR_DOINHERIT );
+                var_SetFloat( p_object, "equalizer-preamp",
+                                        eqz_preset_10b[i]->f_preamp );
+                var_SetString( p_object, "equalizer-bands", psz_bands );
             }
         }
         free( psz_preset );
