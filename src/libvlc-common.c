@@ -1147,11 +1147,8 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc,
         if( p_intf->pf_run )
             vlc_thread_join( p_intf );
         else
-	{
-            vlc_mutex_lock( &p_intf->object_lock );
-            vlc_cond_wait( &p_intf->object_wait, &p_intf->object_lock );
-            vlc_mutex_unlock( &p_intf->object_lock );
-        }
+            while( vlc_object_lock_and_wait( p_intf ) == 0 );
+
         vlc_object_detach( p_intf );
         intf_Destroy( p_intf );
     }
