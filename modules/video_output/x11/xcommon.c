@@ -210,7 +210,7 @@ int E_(Activate) ( vlc_object_t *p_this )
 
     p_vout->p_sys->p_display = XOpenDisplay( psz_display );
 
-    if( p_vout->p_sys->p_display == NULL )                          /* error */
+    if( p_vout->p_sys->p_display == NULL )                         /* error */
     {
         msg_Err( p_vout, "cannot open display %s",
                          XDisplayName( psz_display ) );
@@ -2622,6 +2622,17 @@ static int InitDisplay( vout_thread_t *p_vout )
 #   else
         p_vout->p_sys->b_shm =
                   ( XShmQueryExtension( p_vout->p_sys->p_display ) == True );
+        if( p_vout->p_sys->b_shm )
+        {
+            int major, minor;
+            Bool pixmaps;
+
+            XShmQueryVersion( p_vout->p_sys->p_display, &major, &minor,
+                              &pixmaps );
+            msg_Dbg( p_vout, "XShm video extension v%d.%d (with%s pixmaps)",
+                     major, minor, pixmaps ? "" : "out" );
+        }
+
 #   endif
 
         if( !p_vout->p_sys->b_shm )
@@ -2907,6 +2918,14 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
  *****************************************************************************/
 static int X11ErrorHandler( Display * display, XErrorEvent * event )
 {
+    char txt[1024];
+
+    XGetErrorText( display, event->error_code, txt, sizeof( txt ) );
+    fprintf( stderr,
+             "[????????] x11 video output error: X11 request %u.%u failed "
+              "with error code %u:\n %s\n",
+             event->request_code, event->minor_code, event->error_code, txt );
+
     switch( event->request_code )
     {
     case X_SetInputFocus:
