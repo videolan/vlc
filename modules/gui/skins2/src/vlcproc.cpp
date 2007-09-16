@@ -250,7 +250,7 @@ void VlcProc::CmdManage::execute()
 
 void VlcProc::refreshAudio()
 {
-    char *pFilters = NULL;
+    char *pFilters;
 
     // Check if the audio output has changed
     aout_instance_t *pAout = (aout_instance_t *)vlc_object_find( getIntf(),
@@ -270,7 +270,7 @@ void VlcProc::refreshAudio()
             }
         }
         // Get the audio filters
-        pFilters = var_GetString( pAout, "audio-filter" );
+        pFilters = var_GetNonEmptyString( pAout, "audio-filter" );
         vlc_object_release( pAout );
     }
     else
@@ -292,6 +292,7 @@ void VlcProc::refreshAudio()
     // Refresh the equalizer variable
     VarBoolImpl *pVarEqualizer = (VarBoolImpl*)m_cVarEqualizer.get();
     pVarEqualizer->set( pFilters && strstr( pFilters, "equalizer" ) );
+    free( pFilters );
 }
 
 void VlcProc::refreshPlaylist()
