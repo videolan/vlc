@@ -140,16 +140,19 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_connection = dbus_init( p_intf );
 #endif
 
-    while( !b_quit )
+    for(;;)
     {
-        /* Check screensaver every 30 seconds */
-        vlc_mutex_lock( &p_intf->object_lock );
-        vlc_cond_timedwait( &p_intf->object_wait, &p_intf->object_lock,
-                            mdate() + 30000000 );
-        b_quit = p_intf->b_die;
-        vlc_mutex_unlock( &p_intf->object_lock );
-
         vlc_object_t *p_vout;
+        vlc_bool_t b_quit;
+
+        /* Check screensaver every 30 seconds */
+        vlc_object_lock( p_intf );
+        b_quit = vlc_object_timedwait( p_intf, mdate() + 30000000 ) < 0;
+        vlc_object_unlock( p_intf );
+
+        if( b_quit )
+            break;
+
         p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
 
         /* If there is a video output, disable xscreensaver */
