@@ -323,6 +323,7 @@ AC_CACHE_VAL(lt_cv_deplibs_check_method,
     [lt_cv_deplibs_check_method=pass_all])
 
 AC_DISABLE_STATIC
+AC_DISABLE_FAST_INSTALL
 AC_LIBTOOL_DLOPEN
 AC_LIBTOOL_WIN32_DLL
 m4_undefine([AC_PROG_F77])
