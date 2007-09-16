@@ -2132,7 +2132,6 @@ static int InputSourceInit( input_thread_t *p_input,
 
                 msg_Dbg( p_input, "enforced demux ` %s'", psz_demux );
             }
-            free( psz_var_demux );
         }
 
         /* Try access_demux if no demux given */
