@@ -163,6 +163,8 @@ vlc_bool_t __vlc_object_lock_and_wait( vlc_object_t *obj )
     vlc_object_unlock( obj );
     return b;
 }
+#define vlc_object_lock_and_wait( obj ) \
+    __vlc_object_lock_and_wait( VLC_OBJECT(obj) )
 
 VLC_EXPORT( int, __vlc_object_timedwait, ( vlc_object_t *, mtime_t ) );
 #define vlc_object_timedwait( obj, d ) \
