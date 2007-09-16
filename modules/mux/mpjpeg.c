@@ -79,26 +79,39 @@ struct sout_mux_sys_t
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    int i_size;
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t  *p_sys;
     char *psz_separator_block, *psz_separator;
 
     msg_Dbg( p_mux, "Multipart jpeg muxer opened" );
-    config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
+    psz_separator = var_GetNonEmptyString( p_mux, SOUT_CFG_PREFIX"separator" );
+    if( psz_separator == NULL )
+    {
+        msg_Err( p_this, "missing required multipart separator" );
+        return VLC_EGENERIC;
+    }
+
+    config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options,
+                       p_mux->p_cfg );
 
     p_sys = p_mux->p_sys = malloc( sizeof(sout_mux_sys_t) );
+    if( p_sys == NULL )
+        return VLC_ENOMEM;
     p_sys->b_send_headers = VLC_TRUE;
 
-    psz_separator = var_GetString( p_mux, SOUT_CFG_PREFIX "separator" );
-    i_size = strlen( psz_separator ) + 2 + 2 + 2 + strlen( CONTENT_TYPE );
-    psz_separator_block = (char*)malloc( i_size );
-    sprintf( psz_separator_block, "\r\n%s\r\n%s\r\n", psz_separator,
-                                  CONTENT_TYPE );
-    p_sys->p_separator = block_New( p_mux, i_size );
-    memcpy( p_sys->p_separator->p_buffer, psz_separator_block , i_size );
+    if( asprintf( &psz_separator_block, "\r\n%s\r\n%s\r\n", psz_separator,
+                  CONTENT_TYPE ) == -1 )
+        psz_separator_block = NULL;
+    free( psz_separator_block );
 
-    if( psz_separator_block ) free( psz_separator_block );
+    if( psz_separator_block == NULL )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+
+    p_sys->p_separator = block_New( p_mux, strlen( psz_separator_block ) );
+    strcpy( (char *)p_sys->p_separator->p_buffer, psz_separator_block );
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
