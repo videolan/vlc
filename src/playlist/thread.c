@@ -143,22 +143,22 @@ int playlist_ThreadDestroy( playlist_t * p_playlist )
     // Kill preparser
     if( p_playlist->p_preparse )
     {
-        vlc_cond_signal( &p_playlist->p_preparse->object_wait );
+        vlc_object_kill( p_playlist->p_preparse );
+        vlc_thread_join( p_playlist->p_preparse );
         free( p_playlist->p_preparse->pp_waiting );
+        vlc_object_detach( p_playlist->p_preparse );
+        vlc_object_destroy( p_playlist->p_preparse );
     }
-    vlc_thread_join( p_playlist->p_preparse );
-    vlc_object_detach( p_playlist->p_preparse );
-    vlc_object_destroy( p_playlist->p_preparse );
 
     // Kill meta fetcher
     if( p_playlist->p_fetcher )
     {
-        vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
+        vlc_object_kill( p_playlist->p_fetcher );
+        vlc_thread_join( p_playlist->p_fetcher );
         free( p_playlist->p_fetcher->p_waiting );
+        vlc_object_detach( p_playlist->p_fetcher );
+        vlc_object_destroy( p_playlist->p_fetcher );
     }
-    vlc_thread_join( p_playlist->p_fetcher );
-    vlc_object_detach( p_playlist->p_fetcher );
-    vlc_object_destroy( p_playlist->p_fetcher );
 
     // Wait for thread to complete
     vlc_thread_join( p_playlist );
