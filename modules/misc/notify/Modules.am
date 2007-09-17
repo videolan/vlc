@@ -2,3 +2,4 @@ SOURCES_msn = msn.c
 SOURCES_growl = growl.c
 SOURCES_notify = notify.c
 SOURCES_xosd = xosd.c
+SOURCES_telepathy = telepathy.c

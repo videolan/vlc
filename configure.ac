@@ -890,6 +890,14 @@ then
           VLC_ADD_PLUGINS([dbus])
           VLC_ADD_LDFLAGS([dbus],[$DBUS_LIBS])
           VLC_ADD_CFLAGS([dbus],[$DBUS_CFLAGS])
+        fi
+      dnl Check for Telepathy
+        AC_ARG_ENABLE(telepathy,
+          [  --enable-telepathy          Telepathy Presence plugin through DBus(default enabled)])
+        if test "${enable_telepathy}" != "no"; then
+          VLC_ADD_PLUGINS([telepathy])
+          VLC_ADD_LDFLAGS([telepathy],[$DBUS_LIBS])
+          VLC_ADD_CFLAGS([telepathy],[$DBUS_CFLAGS])
         fi],
 
     if ${PKG_CONFIG} --exists dbus-1
