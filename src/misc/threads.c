@@ -297,31 +297,21 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 # if defined(DEBUG)
+    {
+        /* Create error-checking mutex to detect problems more easily. */
+        pthread_mutexattr_t attr;
+        int                 i_result;
+
+        pthread_mutexattr_init( &attr );
 #   if defined(SYS_LINUX)
-    {
-        /* Create error-checking mutex to detect problems more easily. */
-        pthread_mutexattr_t attr;
-        int                 i_result;
-
-        pthread_mutexattr_init( &attr );
         pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
-        i_result = pthread_mutex_init( &p_mutex->mutex, &attr );
-        pthread_mutexattr_destroy( &attr );
-        return( i_result );
-    }
 #   else
-    {
-        /* Create error-checking mutex to detect problems more easily. */
-        pthread_mutexattr_t attr;
-        int                 i_result;
-
-        pthread_mutexattr_init( &attr );
         pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
+#   endif
         i_result = pthread_mutex_init( &p_mutex->mutex, &attr );
         pthread_mutexattr_destroy( &attr );
         return( i_result );
     }
-#   endif
 # endif
     return pthread_mutex_init( &p_mutex->mutex, NULL );
 
