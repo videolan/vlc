@@ -497,17 +497,8 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
         PL_LOCK;
         if( p_current )
         {
-            vlc_bool_t b_preparsed = VLC_FALSE;
-            if( strncmp( p_current->psz_uri, "http:", 5 ) &&
-                strncmp( p_current->psz_uri, "rtsp:", 5 ) &&
-                strncmp( p_current->psz_uri, "udp:", 4 ) &&
-                strncmp( p_current->psz_uri, "mms:", 4 ) &&
-                strncmp( p_current->psz_uri, "cdda:", 4 ) &&
-                strncmp( p_current->psz_uri, "dvd:", 4 ) &&
-                strncmp( p_current->psz_uri, "v4l:", 4 ) &&
-                strncmp( p_current->psz_uri, "dshow:", 6 ) )
+            if( !strncmp( p_current->psz_uri, "file:", 5 ) )
             {
-                b_preparsed = VLC_TRUE;
                 stats_TimerStart( p_playlist, "Preparse run",
                                   STATS_TIMER_PREPARSE );
                 /* Do not preparse if it is already done (like by playing it) */
@@ -518,15 +509,11 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                     PL_LOCK;
                 }
                 stats_TimerStop( p_playlist, STATS_TIMER_PREPARSE );
-            }
-            PL_UNLOCK;
-            if( b_preparsed )
-            {
+                PL_UNLOCK;
                 input_item_SetPreparsed( p_current, VLC_TRUE );
                 var_SetInteger( p_playlist, "item-change", p_current->i_id );
+                PL_LOCK;
             }
-            PL_LOCK;
-
             /* If we haven't retrieved enough meta, add to secondary queue
              * which will run the "meta fetchers".
              * This only checks for meta, not for art
