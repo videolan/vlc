@@ -250,7 +250,24 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 {
     ui.setupUi( this );
 
-    /*Win 32 Probe  as in WX ? */
+#if WIN32 /* Disc drives probing for Windows */
+    char szDrives[512];
+    szDrives[0] = '\0';
+    if( GetLogicalDriveStringsA( sizeof( szDrives ) - 1, szDrives ) )
+    {
+        char *drive = szDrives;
+        UINT oldMode = SetErrorMode( SEM_FAILCRITICALERRORS );
+        while( *drive )
+        {
+            if( GetDriveTypeA(drive) == DRIVE_CDROM )
+                ui.deviceCombo->addItem( drive );
+
+            /* go to next drive */
+            while( *(drive++) );
+        }
+        SetErrorMode(oldMode);
+    }
+#endif /* Disc Probing under Windows */
 
     /* CONNECTs */
     BUTTONACT( ui.dvdRadioButton, updateButtons());
