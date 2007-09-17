@@ -100,7 +100,7 @@ vlc_module_end();
 #define RTP_HEADER_LEN 12
 
 static block_t *BlockUDP( access_t * );
-static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block );
+static block_t *BlockStartRTP( access_t * );
 static block_t *BlockRTP( access_t * );
 static block_t *BlockChoose( access_t * );
 static int Control( access_t *, int, va_list );
@@ -135,7 +135,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Set up p_access */
     access_InitFields( p_access );
-    ACCESS_SET_CALLBACKS( NULL, BlockPrebufferRTP, Control, NULL );
+    ACCESS_SET_CALLBACKS( NULL, BlockStartRTP, Control, NULL );
     p_access->info.b_prebuffered = VLC_FALSE;
     MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
     memset (p_sys, 0, sizeof (*p_sys));
@@ -526,10 +526,13 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     p_block->i_dts = (mtime_t) GetWBE( p_block->p_buffer + 2 );
 
     /* FIXME: use rtpmap */
+    const char *psz_demux = NULL;
+
     switch( i_payload_type )
     {
         case 14: // MPA: MPEG Audio (RFC2250, §3.4)
             i_skip += 4; // 32 bits RTP/MPA header
+            psz_demux = "mpga";
             break;
 
         case 32: // MPV: MPEG Video (RFC2250, §3.5)
@@ -541,10 +544,12 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
                 /* MPEG2 Video extension header */
                 /* TODO: shouldn't we skip this too ? */
             }
+            psz_demux = "mpgv";
             break;
 
         case 33: // MP2: MPEG TS (RFC2250, §2)
             /* plain TS over RTP */
+            psz_demux = "ts";
             break;
 
         case 72: /* muxed SR */
@@ -581,11 +586,51 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
     }
 #endif
 
+    if( !p_access->psz_demux || !*p_access->psz_demux )
+    {
+        free( p_access->psz_demux );
+        p_access->psz_demux = strdup( psz_demux );
+    }
+
     return p_block;
 
 trash:
     block_Release( p_block );
     return NULL;
+}
+
+/*****************************************************************************
+ * BlockRTP: receives an RTP packet, parses it, queues it queue,
+ * then dequeues the oldest packet and returns it to input/demux.
+ ****************************************************************************/
+static block_t *BlockRTP( access_t *p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    block_t *p;
+
+    while ( !p_sys->p_list ||
+             ( mdate() - p_sys->p_list->i_pts ) < p_sys->i_rtp_late )
+    {
+        p = BlockParseRTP( p_access,
+                           p_sys->b_framed_rtp ? BlockTCP( p_access )
+                                               : BlockUDP( p_access ) );
+        if ( !p )
+            return NULL;
+
+        rtp_ChainInsert( p_access, p );
+    }
+
+    p = p_sys->p_list;
+    p_sys->p_list = p_sys->p_list->p_next;
+    p_sys->i_last_seqno++;
+    if( p_sys->i_last_seqno != (uint16_t) p->i_dts )
+    {
+        msg_Dbg( p_access, "RTP: packet(s) lost, expected %d, got %d",
+                 p_sys->i_last_seqno, (uint16_t) p->i_dts );
+        p_sys->i_last_seqno = (uint16_t) p->i_dts;
+    }
+    p->p_next = NULL;
+    return p;
 }
 
 /*****************************************************************************
@@ -631,39 +676,11 @@ static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
     return p;
 }
 
-/*****************************************************************************
- * BlockRTP: receives an RTP packet, parses it, queues it queue,
- * then dequeues the oldest packet and returns it to input/demux.
- ****************************************************************************/
-static block_t *BlockRTP( access_t *p_access )
+static block_t *BlockStartRTP( access_t *p_access )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    block_t *p;
-
-    while ( !p_sys->p_list ||
-             ( mdate() - p_sys->p_list->i_pts ) < p_sys->i_rtp_late )
-    {
-        p = BlockParseRTP( p_access,
-                           p_sys->b_framed_rtp ? BlockTCP( p_access )
-                                               : BlockUDP( p_access ) );
-        if ( !p )
-            return NULL;
-
-        rtp_ChainInsert( p_access, p );
-    }
-
-    p = p_sys->p_list;
-    p_sys->p_list = p_sys->p_list->p_next;
-    p_sys->i_last_seqno++;
-    if( p_sys->i_last_seqno != (uint16_t) p->i_dts )
-    {
-        msg_Dbg( p_access, "RTP: packet(s) lost, expected %d, got %d",
-                 p_sys->i_last_seqno, (uint16_t) p->i_dts );
-        p_sys->i_last_seqno = (uint16_t) p->i_dts;
-    }
-    p->p_next = NULL;
-    return p;
+    return BlockPrebufferRTP( p_access, BlockUDP( p_access ) );
 }
+
 
 /*****************************************************************************
  * BlockChoose: decide between RTP and UDP
