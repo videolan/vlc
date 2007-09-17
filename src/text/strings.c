@@ -634,44 +634,38 @@ char *str_format_time( const char *tformat )
     return strdup( buffer );
 }
 
-#define INSERT_STRING( check, string )                              \
-                    if( check )                                     \
+#define INSERT_STRING( string )                                     \
+                    if( string != NULL )                            \
                     {                                               \
-                        psz_meta = string;                          \
-                        if( psz_meta != NULL )                      \
-                        {                                           \
-                            int len = strlen( string );             \
-                            dst = realloc( dst,                     \
-                                   i_size = i_size + len + 1 );     \
-                            strncpy( d, psz_meta, len+1 );          \
-                            d += len;                               \
-                        }                                           \
-                        else                                        \
-                        {                                           \
-                            *d = '-';                               \
-                            d++;                                    \
-                        }                                           \
-                    }
+                        int len = strlen( string );                 \
+                        dst = realloc( dst, i_size = i_size + len );\
+                        memcpy( (dst+d), string, len );             \
+                        d += len;                                   \
+                        free( string );                             \
+                    }                                               \
+                    else                                            \
+                    {                                               \
+                        *(dst+d) = '-';                             \
+                        d++;                                        \
+                    }                                               \
 
 /* same than INSERT_STRING, except that string won't be freed */
 #define INSERT_STRING_NO_FREE( string )                             \
                     {                                               \
-                            int len = strlen( string );             \
-                            dst = realloc( dst,                     \
-                                   i_size = i_size + len + 1 );     \
-                            strncpy( d, string, len+1 );            \
-                            d += len;                               \
-                            free( string );                         \
-                    }                                               
+                        int len = strlen( string );                 \
+                        dst = realloc( dst, i_size = i_size + len );\
+                        memcpy( dst+d, string, len );               \
+                        d += len;                                   \
+                    }
 char *__str_format_meta( vlc_object_t *p_object, const char *string )
 {
     const char *s = string;
-    char *dst = malloc( 1000 );
-    char *d = dst;
     int b_is_format = 0;
     int b_empty_if_na = 0;
     char buf[10];
-    int i_size = strlen( string );
+    int i_size = strlen( string ) + 1; /* +1 to store '\0' */
+    char *dst = malloc( i_size );
+    int d = 0;
 
     playlist_t *p_playlist = pl_Yield( p_object );
     input_thread_t *p_input = p_playlist->p_input;
@@ -691,36 +685,65 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
         {
             switch( *s )
             {
-                char *psz_meta; /* used by INSERT_STRING */
                 case 'a':
-                    INSERT_STRING( p_item, input_item_GetArtist(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetArtist( p_item ) );
+                    }
                     break;
                 case 'b':
-                    INSERT_STRING( p_item, input_item_GetAlbum(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetAlbum( p_item ) );
+                    }
                     break;
                 case 'c':
-                    INSERT_STRING( p_item, input_item_GetCopyright(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetCopyright( p_item ) );
+                    }
                     break;
                 case 'd':
-                    INSERT_STRING( p_item, input_item_GetDescription(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetDescription( p_item ) );
+                    }
                     break;
                 case 'e':
-                    INSERT_STRING( p_item, input_item_GetEncodedBy(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetEncodedBy( p_item ) );
+                    }
                     break;
                 case 'g':
-                    INSERT_STRING( p_item, input_item_GetGenre(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetGenre( p_item ) );
+                    }
                     break;
                 case 'l':
-                    INSERT_STRING( p_item, input_item_GetLanguage(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetLanguage( p_item ) );
+                    }
                     break;
                 case 'n':
-                    INSERT_STRING( p_item, input_item_GetTrackNum(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetTrackNum( p_item ) );
+                    }
                     break;
                 case 'p':
-                    INSERT_STRING( p_item, input_item_GetNowPlaying(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetNowPlaying( p_item ) );
+                    }
                     break;
                 case 'r':
-                    INSERT_STRING( p_item, input_item_GetRating(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetRating( p_item ) );
+                    }
                     break;
                 case 's':
                 {
@@ -729,17 +752,26 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                         lang = var_GetNonEmptyString( p_input, "sub-language" );
                     if( lang == NULL )
                         lang = strdup( b_empty_if_na ? "" : "-" );
-                    INSERT_STRING( 1, lang );
+                    INSERT_STRING( lang );
                     break;
                 }
                 case 't':
-                    INSERT_STRING( p_item, input_item_GetTitle(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetTitle( p_item ) );
+                    }
                     break;
                 case 'u':
-                    INSERT_STRING( p_item, input_item_GetURL(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetURL( p_item ) );
+                    }
                     break;
                 case 'A':
-                    INSERT_STRING( p_item, input_item_GetDate(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetDate( p_item ) );
+                    }
                     break;
                 case 'B':
                     if( p_input )
@@ -781,7 +813,10 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'F':
-                    INSERT_STRING( p_item, input_item_GetURI( p_item ) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetURI( p_item ) );
+                    }
                     break;
                 case 'I':
                     if( p_input )
@@ -812,7 +847,10 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'N':
-                    INSERT_STRING( p_item, input_item_GetName( p_item ) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetName( p_item ) );
+                    }
                     break;
                 case 'O':
                 {
@@ -822,7 +860,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                                                       "audio-language" );
                     if( lang == NULL )
                         lang = strdup( b_empty_if_na ? "" : "-" );
-                    INSERT_STRING( 1, lang );
+                    INSERT_STRING( lang );
                     break;
                 }
                 case 'P':
@@ -876,7 +914,10 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     INSERT_STRING_NO_FREE( buf );
                     break;
                 case 'U':
-                    INSERT_STRING( p_item, input_item_GetPublisher(p_item) );
+                    if( p_item )
+                    {
+                        INSERT_STRING( input_item_GetPublisher( p_item ) );
+                    }
                     break;
                 case 'V':
                 {
@@ -887,7 +928,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     break;
                 }
                 case '_':
-                    *d = '\n';
+                    *(dst+d) = '\n';
                     d++;
                     break;
 
@@ -896,7 +937,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     break;
 
                 default:
-                    *d = *s;
+                    *(dst+d) = *s;
                     d++;
                     break;
             }
@@ -910,12 +951,12 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
         }
         else
         {
-            *d = *s;
+            *(dst+d) = *s;
             d++;
         }
         s++;
     }
-    *d = '\0';
+    *(dst+d) = '\0';
 
     if( p_input )
         vlc_object_release( p_input );
