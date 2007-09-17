@@ -49,9 +49,6 @@
 #ifndef IPPROTO_UDPLITE
 # define IPPROTO_UDPLITE 136 /* from IANA */
 #endif
-#ifndef SOL_UDPLITE
-# define SOL_UDPLITE IPPROTO_UDPLITE
-#endif
 
 #define MTU 65535
 
