@@ -69,7 +69,7 @@ vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_CONTROL );
     set_shortname( "Telepathy" );
-    set_description( _("Telepathy « Now Playing » using MissionControl") );
+    set_description( _("Telepathy \"Now Playing\" using MissionControl") );
 
     add_string( "telepathy-format", FORMAT_DEFAULT, NULL,
                 FORMAT_TEXT, FORMAT_LONGTEXT, VLC_FALSE );
