@@ -48,6 +48,7 @@ struct rtsp_stream_t
     httpd_host_t   *host;
     httpd_url_t    *url;
     char           *psz_path;
+    const char     *track_fmt;
     unsigned        port;
 
     int             sessionc;
@@ -68,30 +69,40 @@ rtsp_stream_t *RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url )
     rtsp_stream_t *rtsp = malloc( sizeof( *rtsp ) );
 
     if( rtsp == NULL || ( url->i_port > 99999 ) )
+    {
+        free( rtsp );
         return NULL;
+    }
 
     rtsp->owner = p_stream;
     rtsp->sessionc = 0;
     rtsp->sessionv = NULL;
+    rtsp->host = NULL;
+    rtsp->url = NULL;
+    rtsp->psz_path = NULL;
     vlc_mutex_init( p_stream, &rtsp->lock );
 
-    msg_Dbg( p_stream, "rtsp setup: %s : %d / %s\n",
-             url->psz_host, url->i_port, url->psz_path );
-
     rtsp->port = (url->i_port > 0) ? url->i_port : 554;
-    if( url->psz_path != NULL )
-        rtsp->psz_path = strdup( url->psz_path + 1 );
+    rtsp->psz_path = strdup( ( url->psz_path != NULL ) ? url->psz_path : "/" );
+    if( rtsp->psz_path == NULL )
+        goto error;
+
+    assert( strlen( rtsp->psz_path ) > 0 );
+    if( rtsp->psz_path[strlen( rtsp->psz_path ) - 1] == '/' )
+        rtsp->track_fmt = "%strackID=%u";
     else
-        rtsp->psz_path = NULL;
+        rtsp->track_fmt = "%s/trackID=%u";
+
+    msg_Dbg( p_stream, "RTSP stream: host %s port %d at %s",
+             url->psz_host, rtsp->port, rtsp->psz_path );
 
     rtsp->host = httpd_HostNew( VLC_OBJECT(p_stream), url->psz_host,
                                 rtsp->port );
     if( rtsp->host == NULL )
         goto error;
 
-    rtsp->url = httpd_UrlNewUnique( rtsp->host,
-                                    url->psz_path ? url->psz_path : "/", NULL,
-                                    NULL, NULL );
+    rtsp->url = httpd_UrlNewUnique( rtsp->host, rtsp->psz_path,
+                                    NULL, NULL, NULL );
     if( rtsp->url == NULL )
         goto error;
 
@@ -121,6 +132,7 @@ void RtspUnsetup( rtsp_stream_t *rtsp )
     if( rtsp->host )
         httpd_HostDelete( rtsp->host );
 
+    free( rtsp->psz_path );
     vlc_mutex_destroy( &rtsp->lock );
 }
 
@@ -165,7 +177,7 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
                              const char *dst, int ttl,
                              unsigned loport, unsigned hiport )
 {
-    char urlbuf[sizeof( "//trackID=123" ) + strlen( rtsp->psz_path )];
+    char urlbuf[sizeof( "/trackID=123" ) + strlen( rtsp->psz_path )];
     rtsp_stream_id_t *id = malloc( sizeof( *id ) );
     httpd_url_t *url;
 
@@ -183,7 +195,7 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
         id->hiport = hiport;
     }
 
-    snprintf( urlbuf, sizeof( urlbuf ), "/%s/trackID=%u", rtsp->psz_path,
+    snprintf( urlbuf, sizeof( urlbuf ), rtsp->track_fmt, rtsp->psz_path,
               num );
     msg_Dbg( rtsp->owner, "RTSP: adding %s", urlbuf );
     url = id->url = httpd_UrlNewUnique( rtsp->host, urlbuf, NULL, NULL, NULL );
@@ -356,7 +368,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             }
 
             char ip[NI_MAXNUMERICHOST], *ptr;
-            char control[sizeof("rtsp://[]:12345/") + sizeof( ip )
+            char control[sizeof("rtsp://[]:12345") + sizeof( ip )
                             + strlen( rtsp->psz_path )];
 
             /* Build self-referential URL */
@@ -366,11 +378,11 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 *ptr = '\0';
 
             if( strchr( ip, ':' ) != NULL )
-                sprintf( control, "rtsp://[%s]:%u/%s", ip, rtsp->port,
-                         ( rtsp->psz_path != NULL ) ? rtsp->psz_path : "" );
+                sprintf( control, "rtsp://[%s]:%u%s", ip, rtsp->port,
+                         rtsp->psz_path );
             else
-                sprintf( control, "rtsp://%s:%u/%s", ip, rtsp->port,
-                         ( rtsp->psz_path != NULL ) ? rtsp->psz_path : "" );
+                sprintf( control, "rtsp://%s:%u%s", ip, rtsp->port,
+                         rtsp->psz_path );
 
             ptr = SDPGenerate( rtsp->owner, control );
 

@@ -708,8 +708,13 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
                       id->psz_rtpmap, id->psz_fmtp);
 
         if( rtsp_url != NULL )
-            sdp_AddAttribute ( &psz_sdp, "control", "%s/trackID=%d",
+        {
+            assert( strlen( rtsp_url ) > 0 );
+            vlc_bool_t addslash = ( rtsp_url[strlen( rtsp_url ) - 1] != '/' );
+            sdp_AddAttribute ( &psz_sdp, "control",
+                               addslash ? "%s/trackID=%u" : "%strackID=%u",
                                rtsp_url, i );
+        }
     }
 
     return psz_sdp;
