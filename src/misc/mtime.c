@@ -67,6 +67,19 @@ struct timespec
 int nanosleep(struct timespec *, struct timespec *);
 #endif
 
+#ifdef HAVE_CLOCK_NANOSLEEP
+#  if !defined _POSIX_CLOCK_SELECTION || (_POSIX_CLOCK_SELECTION - 0 <= 0)
+/*
+ * We cannot use the monotonic clock is clock selection is not available,
+ * as it would screw vlc_cond_timedwait() completely. Instead, we have to
+ * stick to the realtime clock. Nevermind it screws everything when ntpdate
+ * warps the wall clock.
+ */
+#    undef CLOCK_MONOTONIC
+#    define CLOCK_MONOTONIC CLOCK_REALTIME
+#  endif
+#endif
+
 /**
  * Return a date in a readable format
  *
@@ -127,11 +140,6 @@ static inline unsigned mprec( void )
 
 static unsigned prec = 0;
 static volatile mtime_t cached_time = 0;
-#if defined( HAVE_CLOCK_NANOSLEEP )
-#  if (_POSIX_MONOTONIC_CLOCK - 0 < 0)
-#    define CLOCK_MONOTONIC CLOCK_REALTIME
-#  endif
-#endif
 
 /**
  * Return high precision date
