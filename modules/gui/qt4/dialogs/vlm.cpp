@@ -30,6 +30,18 @@
 #include <iostream>
 #include <QString>
 #include <QFileDialog>
+#include <QComboBox>
+#include <QVBoxLayout>
+#include <QStackedWidget>
+#include <QLabel>
+#include <QWidget>
+#include <QGridLayout>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QToolButton>
+#include <QGroupBox>
+#include <QPushButton>
+#include <QHBoxLayout>
 
 VLMDialog *VLMDialog::instance = NULL;
 
@@ -38,13 +50,140 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf) : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "VLM front-end" ) );
 
-    /* UI stuff */
+    // UI stuff 
     ui.setupUi( this );
+    mediatype = new QComboBox(ui.groupBox);
+    layout = new QVBoxLayout(ui.groupBox);
+    layout->addWidget(mediatype);
+
+#define ADDMEDIATYPES(type) mediatype->addItem(type);
+
+    ADDMEDIATYPES("Broadcast");
+    ADDMEDIATYPES("Video On Demand (VOD)");
+    ADDMEDIATYPES("Schedule");
+
+    makeBcastPage();
+    makeVODPage();
+    makeSchedulePage();
+
+    slayout = new QStackedWidget(ui.groupBox);
+    slayout->addWidget(pBcast);
+    slayout->addWidget(pVod);
+    slayout->addWidget(pSchedule);
+
+    layout->addWidget(slayout);
+
+    connect(mediatype,SIGNAL(currentIndexChanged(int)),slayout,SLOT(setCurrentIndex(int)));
+
 }
 
 VLMDialog::~VLMDialog(){}
 
-void VLMDialog::close(){
+void VLMDialog::close()
+{
     close();
+}
+
+void VLMDialog::makeBcastPage()
+{
+	pBcast = new QWidget(ui.groupBox);
+	bcastlayout = new QGridLayout(pBcast);
+	bcastname = new QLabel(tr("Name :"),pBcast);
+	bcastnameledit = new QLineEdit(pBcast);
+	bcastenable = new QCheckBox(tr("Enable"),pBcast);
+	bcastinput = new QLabel(tr("Input :"),pBcast);
+	bcastinputledit = new QLineEdit(pBcast);
+	bcastinputtbutton = new QToolButton(pBcast);
+	bcastoutput = new QLabel(tr("Output :"),pBcast);
+	bcastoutputledit = new QLineEdit(pBcast);
+	bcastoutputtbutton = new QToolButton(pBcast);
+	bcastcontrol = new QGroupBox(tr("Controls"),pBcast);
+	bcastgbox = new QHBoxLayout(bcastcontrol);
+	bcastplay = new QPushButton(tr("Play"),bcastcontrol);
+	bcastpause = new QPushButton(tr("Pause"),bcastcontrol);
+	bcaststop = new QPushButton(tr("Stop"),bcastcontrol);
+	bcastadd = new QPushButton(tr("Add"),pBcast);
+	bcastremove = new QPushButton(tr("Remove"),pBcast);
+
+// Adding all widgets in the QGridLayout 
+	bcastgbox->addWidget(bcastplay);
+	bcastgbox->addWidget(bcastpause);
+	bcastgbox->addWidget(bcaststop);
+	bcastlayout->addWidget(bcastname,0,0);
+	bcastlayout->addWidget(bcastnameledit,0,1);
+	bcastlayout->addWidget(bcastenable,0,2);
+	bcastlayout->addWidget(bcastinput,1,0);
+	bcastlayout->addWidget(bcastinputledit,1,1);
+	bcastlayout->addWidget(bcastinputtbutton,1,2);
+	bcastlayout->addWidget(bcastoutput,2,0);
+	bcastlayout->addWidget(bcastoutputledit,2,1);
+	bcastlayout->addWidget(bcastoutputtbutton,2,2);
+	bcastlayout->addWidget(bcastcontrol,3,0,1,3);
+	bcastlayout->addWidget(bcastadd,4,1);
+	bcastlayout->addWidget(bcastremove,4,2);
+}
+
+void VLMDialog::makeVODPage()
+{
+	pVod = new QWidget(ui.groupBox);
+	vodlayout = new QGridLayout(pVod);
+	vodname = new QLabel(tr("Name :"),pVod);
+	vodnameledit = new QLineEdit(pVod);
+	vodenable = new QCheckBox(tr("Enable"),pVod);
+	vodinput = new QLabel(tr("Input :"),pVod);
+	vodinputledit = new QLineEdit(pVod);
+	vodinputtbutton = new QToolButton(pVod);
+	vodoutput = new QLabel(tr("Output :"),pVod);
+	vodoutputledit = new QLineEdit(pVod);
+	vodoutputtbutton = new QToolButton(pVod);
+	vodadd = new QPushButton(tr("Add"),pVod);
+	vodremove = new QPushButton(tr("Remove"),pVod);
+	
+// Adding all widgets in the QGridLayout 
+	vodlayout->addWidget(vodname,0,0);
+	vodlayout->addWidget(vodnameledit,0,1);
+	vodlayout->addWidget(vodenable,0,2);
+	vodlayout->addWidget(vodinput,1,0);
+	vodlayout->addWidget(vodinputledit,1,1);
+	vodlayout->addWidget(vodinputtbutton,1,2);
+	vodlayout->addWidget(vodoutput,2,0);
+	vodlayout->addWidget(vodoutputledit,2,1);
+	vodlayout->addWidget(vodoutputtbutton,2,2);
+	vodlayout->addWidget(vodadd,3,1);
+	vodlayout->addWidget(vodremove,3,2);
+}
+
+void VLMDialog::makeSchedulePage()
+{
+	pSchedule = new QWidget(ui.groupBox);
+	schelayout = new QGridLayout(pSchedule);
+	schename = new QLabel(tr("Name :"),pSchedule);
+	schenameledit = new QLineEdit(pSchedule);
+	scheenable = new QCheckBox(tr("Enable"),pSchedule);
+	scheinput = new QLabel(tr("Input :"),pSchedule);
+	scheinputledit = new QLineEdit(pSchedule);
+	scheinputtbutton = new QToolButton(pSchedule);
+	scheoutput = new QLabel(tr("Output :"),pSchedule);
+	scheoutputledit = new QLineEdit(pSchedule);
+	scheoutputtbutton = new QToolButton(pSchedule);
+	schecontrol = new QGroupBox(tr("Time Control"),pSchedule);
+	scheadd = new QPushButton(tr("Add"),pSchedule);
+	scheremove = new QPushButton(tr("Remove"),pSchedule);
+
+	//scheadd->setMaximumWidth(30);
+	
+// Adding all widgets in the QGridLayout 
+	schelayout->addWidget(schename,0,0);
+	schelayout->addWidget(schenameledit,0,1);
+	schelayout->addWidget(scheenable,0,2);
+	schelayout->addWidget(scheinput,1,0);
+	schelayout->addWidget(scheinputledit,1,1);
+	schelayout->addWidget(scheinputtbutton,1,2);
+	schelayout->addWidget(scheoutput,2,0);
+	schelayout->addWidget(scheoutputledit,2,1);
+	schelayout->addWidget(scheoutputtbutton,2,2);
+	schelayout->addWidget(schecontrol,3,0,1,3);
+	schelayout->addWidget(scheadd,4,1);
+	schelayout->addWidget(scheremove,4,2);
 }
  

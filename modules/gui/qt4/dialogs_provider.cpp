@@ -45,6 +45,7 @@
 #include "dialogs/help.hpp"
 #include "dialogs/gototime.hpp"
 #include "dialogs/podcast_configuration.hpp"
+#include "dialogs/vlm.hpp"
 
 
 DialogsProvider* DialogsProvider::instance = NULL;

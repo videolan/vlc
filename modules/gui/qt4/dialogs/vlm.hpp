@@ -5,6 +5,7 @@
  * $Id: vlm.hpp 21875 2007-09-08 16:01:33Z jb $
  *
  * Authors: Jean-François Massol <jf.massol@gmail.com>
+ *          Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +30,18 @@
 #include "ui/vlm.h"
 #include "util/qvlcframe.hpp"
 
+class QComboBox;
+class QVBoxLayout;
+class QStackedWidget;
+class QLabel;
+class QWidget;
+class QGridLayout;
+class QLineEdit;
+class QCheckBox;
+class QToolButton;
+class QGroupBox;
+class QPushButton;
+class QHBoxLayout;
 
 class VLMDialog : public QVLCFrame
 {
@@ -46,6 +59,27 @@ private:
     VLMDialog( intf_thread_t *);
     static VLMDialog *instance;
     Ui::Vlm ui;
+
+    void makeBcastPage();
+    void makeVODPage();
+    void makeSchedulePage();
+
+    QComboBox *mediatype;
+    QVBoxLayout *layout;
+    QHBoxLayout *bcastgbox;
+    QStackedWidget *slayout;
+    QWidget *pBcast, *pVod, *pSchedule;
+    QGridLayout *bcastlayout, *vodlayout, *schelayout;
+    QLabel *bcastname, *vodname, *schename,*bcastinput, *vodinput, *scheinput;
+    QLabel *bcastoutput, *vodoutput, *scheoutput;
+    QCheckBox *bcastenable, *vodenable, *scheenable;
+    QLineEdit *bcastnameledit, *vodnameledit, *schenameledit, *bcastinputledit, *vodinputledit, *scheinputledit;
+    QLineEdit *bcastoutputledit, *vodoutputledit, *scheoutputledit;
+    QToolButton *bcastinputtbutton, *vodinputtbutton, *scheinputtbutton;
+    QToolButton *bcastoutputtbutton, *vodoutputtbutton, *scheoutputtbutton;
+    QGroupBox *bcastcontrol, *schecontrol;
+    QPushButton *bcastplay, *bcastpause, *bcaststop;
+    QPushButton *bcastadd, *vodadd, *scheadd, *bcastremove, *vodremove, *scheremove;
 
 private slots:
     void close();
