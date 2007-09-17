@@ -79,6 +79,8 @@ VLC.framework/lib/libvlc-control.dylib: $(top_builddir)/src/.libs/libvlc-control
 	install_name_tool -id `pwd`/$@ $@ && \
 	install_name_tool -change /usr/local/lib/libvlc.1.dylib \
 	                          `pwd`/VLC.framework/lib/libvlc.dylib  $@
+	install_name_tool -change @executable_path/lib/vlc_libintl.dylib \
+	                          `pwd`/VLC.framework/lib/vlc_libintl.dylib  $@
 
 
 VLC.framework/Headers: $(HEADERS)
