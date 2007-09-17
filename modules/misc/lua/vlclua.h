@@ -57,6 +57,23 @@ int E_(FindMeta)( vlc_object_t * );
 int E_(Import_LuaPlaylist)( vlc_object_t * );
 void E_(Close_LuaPlaylist)( vlc_object_t * );
 
+
+/*****************************************************************************
+ * Lua debug
+ *****************************************************************************/
+static inline void lua_Dbg( vlc_object_t * p_this, const char * ppz_fmt, ... )
+{
+    if( p_this->p_libvlc->i_verbose < 3 )
+        return;
+
+    va_list ap;
+    va_start( ap, ppz_fmt );
+    __msg_GenericVa( ( vlc_object_t *)p_this, MSG_QUEUE_NORMAL,
+                      VLC_MSG_DBG, MODULE_STRING,
+                      ppz_fmt, ap );
+    va_end( ap );
+}
+
 /*****************************************************************************
  * Lua function bridge
  *****************************************************************************/
