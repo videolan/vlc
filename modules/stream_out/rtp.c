@@ -208,11 +208,6 @@ struct sout_stream_sys_t
     char    *psz_sdp;
     vlc_mutex_t  lock_sdp;
 
-    char        *psz_session_name;
-    char        *psz_session_description;
-    char        *psz_session_url;
-    char        *psz_session_email;
-
     /* SDP to disk */
     vlc_bool_t b_export_sdp_file;
     char *psz_sdp_file;
@@ -314,10 +309,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->psz_destination = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "dst" );
-    p_sys->psz_session_name = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "name" );
-    p_sys->psz_session_description = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "description" );
-    p_sys->psz_session_url = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "url" );
-    p_sys->psz_session_email = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "email" );
 
     p_sys->i_port       = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port" );
     p_sys->i_port_audio = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-audio" );
@@ -330,14 +321,6 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_stream, "audio and video port cannot be the same" );
         p_sys->i_port_audio = 0;
         p_sys->i_port_video = 0;
-    }
-
-    if( !p_sys->psz_session_name )
-    {
-        if( p_sys->psz_destination )
-            p_sys->psz_session_name = strdup( p_sys->psz_destination );
-        else
-           p_sys->psz_session_name = strdup( "NONE" );
     }
 
     for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
@@ -552,10 +535,6 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->p_httpd_host )
         httpd_HostDelete( p_sys->p_httpd_host );
 
-    free( p_sys->psz_session_name );
-    free( p_sys->psz_session_description );
-    free( p_sys->psz_session_url );
-    free( p_sys->psz_session_email );
     free( p_sys->psz_sdp );
 
     if( p_sys->b_export_sdp_file )
