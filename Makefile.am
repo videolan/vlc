@@ -746,8 +746,11 @@ package-win32-base-debug: package-win-common
 		done; \
 	done
 	unix2dos $(top_builddir)/vlc-${VERSION}/osdmenu/*.cfg;
-	sed -i 's%share/osdmenu%osdmenu%g' $(top_builddir)/vlc-${VERSION}/osdmenu/*.cfg
-	sed -i 's%/%\\%g' $(top_builddir)/vlc-${VERSION}/osdmenu/*.cfg 
+	for file in $(top_builddir)/vlc-${VERSION}/osdmenu/*.cfg; do \
+		if sed 's%share/osdmenu%osdmenu%g' $$file >$$file.tmp; then :; else exit 1; fi; \
+		if sed 's%/%\\%g' $$file.tmp >$$file; then :; else exit 1; fi; \
+		rm -f $$file.tmp; \
+	done
 
 
 package-win32-base: package-win32-base-debug package-win-common-strip
@@ -760,6 +763,8 @@ package-win32-base-exe: package-win32-base
 	    MAKENSIS="makensis -DVERSION=${VERSION}"; \
 	elif [ -x "/cygdrive/c/Program Files/NSIS/makensis" ]; then \
 	    MAKENSIS="/cygdrive/c/Program\ Files/NSIS/makensis /DVERSION=${VERSION}"; \
+	elif [ -x "${PROGRAMFILES}/NSIS/makensis" ]; then \
+	    MAKENSIS="${PROGRAMFILES}/NSIS/makensis -DVERSION=${VERSION}"; \
 	elif wine --version >dev/null 2>&1; then \
 	    MAKENSIS="wine C:/Program\ Files/NSIS/makensis.exe /DVERSION=${VERSION}"; \
 	else \
