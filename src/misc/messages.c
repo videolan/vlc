@@ -301,6 +301,49 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
         return;
     }
 
+#ifndef __GLIBC__
+    /* Expand %m to strerror(errno) - only once */
+    char buf[strlen( psz_format ) + 2001], *ptr;
+    strcpy( buf, psz_format );
+    ptr = psz_format = buf;
+
+    for( ;; )
+    {
+        ptr = strchr( ptr, '%' );
+        if( ptr == NULL )
+            break;
+
+        if( ptr[1] == 'm' )
+        {
+            char errbuf[2001];
+            size_t errlen;
+
+            strerror_r( errno, errbuf, 1001 );
+            errbuf[1000] = 0;
+
+            /* Escape '%' from the error string */
+            for( char *percent = strchr( errbuf, '%' );
+                 percent != NULL;
+                 percent = strchr( percent + 2, '%' ) )
+            {
+                memmove( percent + 1, percent, strlen( percent ) + 1 );
+            }
+
+            errlen = strlen( errbuf );
+            memmove( ptr + errlen, ptr + 2, strlen( ptr + 2 ) + 1 );
+            memcpy( ptr, errbuf, errlen );
+            break; /* Only once, so we don't overflow */
+        }
+
+        /* Looks for conversion specifier... */
+        do
+            ptr++;
+        while( *ptr && ( strchr( "diouxXeEfFgGaAcspn%", *ptr ) == NULL ) );
+        if( *ptr )
+            ptr++; /* ...and skip it */
+    }
+#endif
+
     /* Convert message to string  */
 #if defined(HAVE_VASPRINTF) && !defined(__APPLE__) && !defined( SYS_BEOS )
     vlc_va_copy( args, _args );
