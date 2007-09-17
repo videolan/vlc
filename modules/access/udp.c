@@ -100,7 +100,7 @@ vlc_module_end();
 #define RTP_HEADER_LEN 12
 
 static block_t *BlockUDP( access_t * );
-static block_t *BlockTCP( access_t * );
+static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block );
 static block_t *BlockRTP( access_t * );
 static block_t *BlockChoose( access_t * );
 static int Control( access_t *, int, va_list );
@@ -135,7 +135,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Set up p_access */
     access_InitFields( p_access );
-    ACCESS_SET_CALLBACKS( NULL, BlockRTP, Control, NULL );
+    ACCESS_SET_CALLBACKS( NULL, BlockPrebufferRTP, Control, NULL );
     p_access->info.b_prebuffered = VLC_FALSE;
     MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
     memset (p_sys, 0, sizeof (*p_sys));
@@ -222,6 +222,7 @@ static int Open( vlc_object_t *p_this )
 
         case IPPROTO_TCP:
             p_sys->fd = net_ConnectTCP( p_access, psz_server_addr, i_server_port );
+            p_access->pf_block = BlockRTP;
             p_sys->b_framed_rtp = VLC_TRUE;
             break;
 
@@ -359,7 +360,6 @@ static block_t *BlockTCP( access_t *p_access )
     /* Read RTP framing */
     if (p_block->i_buffer < 2)
     {
-        /* FIXME: not very efficient */
         int i_read = net_Read( p_access, p_sys->fd, NULL,
                                p_block->p_buffer + p_block->i_buffer,
                                2 - p_block->i_buffer, VLC_FALSE );
@@ -479,7 +479,7 @@ static inline vlc_bool_t rtp_ChainInsert( access_t *p_access, block_t *p_block )
 }
 
 /*****************************************************************************
- * BlockParseRTP/BlockRTP:
+ * BlockParseRTP: decapsulate the RTP packet and return it
  *****************************************************************************/
 static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
 {
@@ -581,12 +581,20 @@ trash:
     return NULL;
 }
 
+/*****************************************************************************
+ * BlockPrebufferRTP: waits until we have at least two RTP datagrams,
+ * so that we can synchronize the RTP sequence number.
+ * This is only useful for non-reliable transport protocols.
+ ****************************************************************************/
 static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
 {
     access_sys_t *p_sys = p_access->p_sys;
     mtime_t   i_first = mdate();
     int       i_count = 0;
     block_t   *p = p_block;
+
+    if( BlockParseRTP( p_access, p_block ) == NULL )
+        return NULL;
 
     for( ;; )
     {
@@ -603,7 +611,7 @@ static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
         if( !p && (i_date - i_first) > p_sys->i_rtp_late )
         {
             msg_Err( p_access, "error in RTP prebuffering!" );
-            break;
+            return NULL;
         }
     }
 
@@ -616,6 +624,10 @@ static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
     return p;
 }
 
+/*****************************************************************************
+ * BlockRTP: receives an RTP packet, parses it, queues it queue,
+ * then dequeues the oldest packet and returns it to input/demux.
+ ****************************************************************************/
 static block_t *BlockRTP( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
@@ -707,9 +719,6 @@ static block_t *BlockChoose( access_t *p_access )
             return p_block;
     }
 
-    if( !BlockParseRTP( p_access, p_block )) return NULL;
-
     p_access->pf_block = BlockRTP;
-
     return BlockPrebufferRTP( p_access, p_block );
 }
