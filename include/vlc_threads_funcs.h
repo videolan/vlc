@@ -45,8 +45,6 @@ VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int
 VLC_EXPORT( void, __vlc_thread_ready,  ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t *, const char *, int ) );
 
-#include <errno.h>
-
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
  *****************************************************************************/

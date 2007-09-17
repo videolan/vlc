@@ -59,10 +59,8 @@
 #   define _APPLE_C_SOURCE    1 /* Proper pthread semantics on OSX */
 
 #   include <pthread.h>
-#   ifdef DEBUG
-        /* Needed for pthread_cond_timedwait */
-#       include <errno.h>
-#   endif
+    /* Needed for pthread_cond_timedwait */
+#   include <errno.h>
     /* This is not prototyped under Linux, though it exists. */
     int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 
