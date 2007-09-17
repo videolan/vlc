@@ -192,7 +192,6 @@ static void Close( vlc_object_t *p_this )
         playlist_NodeDelete( p_playlist, p_sys->p_node_one, VLC_TRUE,VLC_TRUE );
         vlc_object_release( p_playlist );
     }
-    free( p_sys );
 #ifdef HAVE_HAL_1
     dbus_connection_unref( p_sys->p_connection );
 
@@ -208,6 +207,7 @@ static void Close( vlc_object_t *p_this )
     }
     p_sys->pp_devices = NULL;
 #endif
+    free( p_sys );
 }
 
 static void AddItem( services_discovery_t *p_sd, input_item_t * p_input
