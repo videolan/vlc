@@ -1156,7 +1156,7 @@ ifdef HAVE_DARWIN_OS
 	patch -p0 < Patches/live-osx.patch
 endif
 	patch -p0 < Patches/live-starttime.patch
-	patch -p0 < Patches/live-config.patch
+	patch -Np0 < Patches/live-config.patch
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/live-noapps.patch
 endif

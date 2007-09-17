@@ -1,11 +1,25 @@
-diff -ruN faac/bootstrap faac-new/bootstrap
---- faac/bootstrap	2004-07-28 10:18:20.000000000 +0200
-+++ faac-new/bootstrap	2007-08-04 12:57:19.000000000 +0200
-@@ -1,6 +1,6 @@
- #! /bin/sh
- 
+--- faac.orig/bootstrap	2004-07-28 10:18:20.000000000 +0200
++++ faac/bootstrap	2007-09-17 02:00:08.000000000 +0200
+@@ -1,11 +1,11 @@
+-#! /bin/sh
+-
 -aclocal -I .
-+aclocal -I /usr/share/aclocal
- autoheader
- if test "`uname -s`" = Darwin; then
-     glibtoolize --automake
+-autoheader
+-if test "`uname -s`" = Darwin; then
+-    glibtoolize --automake
+-else
+-    libtoolize --automake
+-fi
+-automake --add-missing
+-autoconf
++#! /bin/sh
++
++aclocal -I .
++autoheader
++if test "`uname -s`" = Darwin; then
++    glibtoolize --automake
++else
++    libtoolize --automake
++fi
++automake --add-missing
++autoconf
