@@ -88,7 +88,7 @@ vlc_module_begin();
     add_shortcut( "rtp4" );
     add_shortcut( "rtp6" );
     add_shortcut( "udplite" );
-    add_shortcut( "rtptcp" );
+    add_shortcut( "rtptcp" ); /* tcp name is already taken */
     add_shortcut( "dccp" );
 
     set_callbacks( Open, Close );
@@ -133,9 +133,16 @@ static int Open( vlc_object_t *p_this )
     int  i_bind_port, i_server_port = 0;
     int fam = AF_UNSPEC, proto = IPPROTO_UDP;
 
-    if (strlen (p_access->psz_access) >= 3)
+    /* Set up p_access */
+    access_InitFields( p_access );
+    ACCESS_SET_CALLBACKS( NULL, BlockRTP, Control, NULL );
+    p_access->info.b_prebuffered = VLC_FALSE;
+    MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
+    memset (p_sys, 0, sizeof (*p_sys));
+
+    if (strlen (p_access->psz_access) > 0)
     {
-        switch (p_access->psz_access[3])
+        switch (p_access->psz_access[strlen (p_access->psz_access) - 1])
         {
             case '4':
                 fam = AF_INET;
@@ -145,10 +152,14 @@ static int Open( vlc_object_t *p_this )
                 fam = AF_INET6;
                 break;
         }
-        if (strcmp (p_access->psz_access + 3, "lite") == 0)
+
+        if (strcmp (p_access->psz_access, "udplite") == 0)
             proto = IPPROTO_UDPLITE;
         else
-        if (strcmp (p_access->psz_access + 3, "tcp") == 0)
+        if (strncmp (p_access->psz_access, "udp", 3 ) == 0 )
+            p_access->pf_block = BlockChoose;
+        else
+        if (strcmp (p_access->psz_access, "rtptcp") == 0)
             proto = IPPROTO_TCP;
         else
         if (strcmp (p_access->psz_access, "dccp") == 0)
@@ -199,13 +210,7 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_access, "opening server=%s:%d local=%s:%d",
              psz_server_addr, i_server_port, psz_bind_addr, i_bind_port );
 
-    /* Set up p_access */
-    access_InitFields( p_access );
-    ACCESS_SET_CALLBACKS( NULL, BlockChoose, Control, NULL );
-    p_access->info.b_prebuffered = VLC_FALSE;
-    MALLOC_ERR( p_access->p_sys, access_sys_t ); p_sys = p_access->p_sys;
-    memset (p_sys, 0, sizeof (*p_sys));
-
+    /* Hmm, the net_* connection functions may need to be unified... */
     switch (proto)
     {
         case IPPROTO_UDP:
@@ -239,14 +244,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     shutdown( p_sys->fd, SHUT_WR );
-
     net_SetCSCov (p_sys->fd, -1, 12);
-
-    if (p_sys->b_framed_rtp)
-    {
-        /* We don't do autodetection and prebuffering in case of framing */
-        p_access->pf_block = BlockRTP;
-    }
 
     /* Update default_pts to a suitable value for udp access */
     var_Create( p_access, "udp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
