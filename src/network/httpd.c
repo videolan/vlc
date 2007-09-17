@@ -1188,6 +1188,8 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url
     httpd_url_t *url;
     int         i;
 
+    assert( psz_url != NULL );
+
     vlc_mutex_lock( &host->lock );
     if( b_check )
     {
