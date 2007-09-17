@@ -544,8 +544,8 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
                              p_playlist->p_fetcher->i_waiting,
                              p_playlist->p_fetcher->i_waiting, p);
-                vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
                 vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
+                vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
             }
             /* We already have all needed meta, but we need art right now */
             else if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_ALL &&
@@ -559,8 +559,8 @@ void playlist_PreparseLoop( playlist_preparse_t *p_obj )
                 INSERT_ELEM( p_playlist->p_fetcher->p_waiting,
                              p_playlist->p_fetcher->i_waiting,
                              p_playlist->p_fetcher->i_waiting, p);
-                vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
                 vlc_cond_signal( &p_playlist->p_fetcher->object_wait );
+                vlc_mutex_unlock( &p_playlist->p_fetcher->object_lock );
             }
             else
             {
