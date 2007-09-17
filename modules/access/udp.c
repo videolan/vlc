@@ -547,6 +547,13 @@ static block_t *BlockParseRTP( access_t *p_access, block_t *p_block )
             /* plain TS over RTP */
             break;
 
+        case 72: /* muxed SR */
+        case 73: /* muxed RR */
+        case 74: /* muxed SDES */
+        case 75: /* muxed BYE */
+        case 76: /* muxed APP */
+            goto trash; /* ooh! ignoring RTCP is evil! */
+
         default:
             msg_Dbg( p_access, "unsupported RTP payload type: %u", i_payload_type );
             goto trash;
