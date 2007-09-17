@@ -37,8 +37,9 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-    char *psz_format;
+    char            *psz_format;
     DBusConnection  *p_conn;
+    int             i_id;
 };
 
 /*****************************************************************************
@@ -98,6 +99,8 @@ static int Open( vlc_object_t *p_this )
     }
     msg_Dbg( p_intf, "using format: %s", p_intf->p_sys->psz_format );
 
+    p_intf->p_sys->i_id = -1;
+
     p_playlist = pl_Yield( p_intf );
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
     var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
@@ -156,6 +159,16 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     intf_thread_t *p_intf = (intf_thread_t *)param;
     char *psz_buf = NULL;
     input_thread_t *p_input;
+
+    /* Don't update Telepathy presence each time an item has been preparsed */
+    if( !strncmp( "playlist-current", psz_var, 16 ) )
+    { /* stores the current input item id */
+        p_intf->p_sys->i_id = newval.i_int;
+    }
+    else if( newval.i_int != p_intf->p_sys->i_id ) /* "item-change" */
+        return VLC_SUCCESS;
+
+
     playlist_t *p_playlist = pl_Yield( p_this );
 
     p_input = p_playlist->p_input;
@@ -218,7 +231,7 @@ static int SendToTelepathy( intf_thread_t *p_intf, const char *psz_msg )
         return VLC_ENOMEM;
 
     p_reply = dbus_connection_send_with_reply_and_block( p_conn, p_msg,
-        1000, &error );
+        50, &error ); /* blocks 50ms maximum */
 
     dbus_message_unref( p_msg );
     if( p_reply == NULL )
