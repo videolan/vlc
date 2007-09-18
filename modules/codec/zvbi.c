@@ -44,6 +44,7 @@
 #include "vlc_vout.h"
 #include "vlc_bits.h"
 #include "vlc_codec.h"
+#include "vlc_image.h"
 
 typedef enum {
     DATA_UNIT_EBU_TELETEXT_NON_SUBTITLE     = 0x02,
@@ -77,6 +78,17 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
 #define OPAQUE_LONGTEXT N_("Setting vbi-opaque to false " \
         "makes the boxed text transparent." )
 
+#define POS_TEXT N_("Teletext alignment")
+#define POS_LONGTEXT N_( \
+  "You can enforce the teletext position on the video " \
+  "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
+  "also use combinations of these values, eg. 6 = top-right).")
+
+static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const char *ppsz_pos_descriptions[] =
+{ N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
+  N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
+
 vlc_module_begin();
     set_description( _("VBI and Teletext decoder") );
     set_shortname( "VBI & Teletext" );
@@ -89,6 +101,8 @@ vlc_module_begin();
                  PAGE_TEXT, PAGE_LONGTEXT, VLC_FALSE );
     add_bool( "vbi-opaque", VLC_TRUE, NULL,
                  OPAQUE_TEXT, OPAQUE_LONGTEXT, VLC_FALSE );
+    add_integer( "vbi-position", 4, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
 vlc_module_end();
 
 /****************************************************************************
@@ -97,12 +111,15 @@ vlc_module_end();
 
 struct decoder_sys_t
 {
-   vbi_decoder *           p_vbi_dec;
-   vbi_dvb_demux *         p_dvb_demux;
-   unsigned int            i_wanted_page;
-   unsigned int            i_last_page;
-   vlc_bool_t              b_update;
-   vlc_bool_t              b_opaque;
+    vbi_decoder *           p_vbi_dec;
+    vbi_dvb_demux *         p_dvb_demux;
+    unsigned int            i_wanted_page;
+    unsigned int            i_last_page;
+    vlc_bool_t              b_update;
+    vlc_bool_t              b_opaque;
+
+    /* Positioning of Teletext images */
+    int                     i_align;
 };
 
 static void event_handler( vbi_event *ev, void *user_data );
@@ -110,6 +127,8 @@ static int RequestPage( vlc_object_t *p_this, char const *psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval, void *p_data );
 static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
+static int Position( vlc_object_t *p_this, char const *psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
 /*****************************************************************************
  * Open: probe the decoder and return score
@@ -159,6 +178,10 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_opaque = var_CreateGetBool( p_dec, "vbi-opaque" );
     var_AddCallback( p_dec, "vbi-opaque", Opaque, p_sys );
+
+    p_sys->i_align = var_CreateGetInteger( p_dec, "vbi-position" );
+    var_AddCallback( p_dec, "vbi-position", Position, p_sys );
+
     return VLC_SUCCESS;
 }
 
@@ -170,10 +193,8 @@ static void Close( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*) p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->p_vbi_dec )
-        vbi_decoder_delete( p_sys->p_vbi_dec );
-    if( p_sys->p_dvb_demux )
-        vbi_dvb_demux_delete( p_sys->p_dvb_demux );
+    if( p_sys->p_vbi_dec ) vbi_decoder_delete( p_sys->p_vbi_dec );
+    if( p_sys->p_dvb_demux ) vbi_dvb_demux_delete( p_sys->p_dvb_demux );
     free( p_sys );
 }
 
@@ -190,13 +211,13 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     video_format_t  fmt;
     vlc_bool_t      b_cached = VLC_FALSE;
     vbi_page        p_page;
-    uint8_t         *p_pos;
+    const uint8_t   *p_pos;
     unsigned int    i_left;
 
     /* part of kludge */
     uint32_t        *p_begin, *p_end;
     unsigned        int x = 0, y = 0;
-    vbi_opacity opacity;
+    vbi_opacity     opacity;
     /* end part of kludge */
 
     if( (pp_block == NULL) || (*pp_block == NULL) )
@@ -266,12 +287,13 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     p_spu->p_region->i_x = 0;
     p_spu->p_region->i_y = 0;
+    p_spu->p_region->i_align = SUBPICTURE_ALIGN_TOP;
 
     /* Normal text subs, easy markup */
     p_spu->i_flags = SUBPICTURE_ALIGN_TOP;
 
     p_spu->i_start = p_block->i_pts;
-    p_spu->i_stop = 0;
+    p_spu->i_stop = (mtime_t) 0;
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_absolute = VLC_FALSE;
     p_spu->b_pausable = VLC_TRUE;
@@ -349,7 +371,7 @@ error:
     return NULL;
 }
 
-static void event_handler( vbi_event *ev, void *user_data)
+static void event_handler( vbi_event *ev, void *user_data )
 {
     decoder_t *p_dec        = (decoder_t *)user_data;
     decoder_sys_t *p_sys    = p_dec->p_sys;
@@ -396,5 +418,15 @@ static int Opaque( vlc_object_t *p_this, char const *psz_cmd,
 
     if( p_sys )
         p_sys->b_opaque = newval.b_bool;
+    return VLC_SUCCESS;
+}
+
+static int Position( vlc_object_t *p_this, char const *psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    decoder_sys_t *p_sys = p_data;
+
+    if( p_sys )
+        p_sys->i_align = newval.i_int;
     return VLC_SUCCESS;
 }
