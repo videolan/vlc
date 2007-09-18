@@ -947,7 +947,7 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
     switch (pid)
     {
         case -1:
-            msg_Err (p_object, "unable to fork (%s)", strerror (errno));
+            msg_Err (p_object, "unable to fork (%m)");
             close (fds[0]);
             close (fds[1]);
             return -1;

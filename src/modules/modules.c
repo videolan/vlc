@@ -1370,8 +1370,8 @@ static int CallEntry( module_t * p_module )
         msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s' (%s)",
                             psz_name, p_module->psz_filename, dlerror() );
 #elif defined(HAVE_DL_SHL_LOAD)
-        msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s' (%s)",
-                            psz_name, p_module->psz_filename, strerror(errno) );
+        msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s' (%m)",
+                            psz_name, p_module->psz_filename );
 #else
 #   error "Something is wrong in modules.c"
 #endif
@@ -1503,8 +1503,7 @@ static int LoadModule( vlc_object_t *p_this, char *psz_file,
     handle = shl_load( psz_file, BIND_IMMEDIATE | BIND_NONFATAL, NULL );
     if( handle == NULL )
     {
-        msg_Warn( p_this, "cannot load module `%s' (%s)",
-                          psz_file, strerror(errno) );
+        msg_Warn( p_this, "cannot load module `%s' (%m)", psz_file );
         return -1;
     }
 

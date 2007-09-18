@@ -35,7 +35,7 @@
 
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                                   /* FILE */
-#include <string.h>                                            /* strerror() */
+#include <string.h>
 
 #include <vlc_interface.h>
 #include <vlc_playlist.h>

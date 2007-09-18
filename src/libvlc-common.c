@@ -41,7 +41,7 @@
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>                                              /* sprintf() */
-#include <string.h>                                            /* strerror() */
+#include <string.h>
 #include <stdlib.h>                                                /* free() */
 
 #ifndef WIN32
@@ -374,8 +374,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
             }
             else
             {
-                msg_Err( p_libvlc, "cannot open pid file for writing: %s (%s)",
-                         psz_pidfile, strerror(errno) );
+                msg_Err( p_libvlc, "cannot open pid file for writing: %s (%m)",
+                         psz_pidfile );
             }
         }
         free( psz_pidfile );
@@ -1035,8 +1035,8 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc, vlc_bool_t b_release )
             msg_Dbg( p_libvlc, "removing pid file %s", psz_pidfile );
             if( unlink( psz_pidfile ) == -1 )
             {
-                msg_Dbg( p_libvlc, "removing pid file %s: failed: %s",
-                        psz_pidfile, strerror(errno) );
+                msg_Dbg( p_libvlc, "removing pid file %s: %m",
+                        psz_pidfile );
             }
         }
         free ( psz_pidfile );
@@ -1210,7 +1210,7 @@ static inline int LoadMessages (void)
     }
 
     /* LibVLC wants all messages in UTF-8.
-     * Unfortunately, we cannot ask UTF-8 for strerror(), strsignal()
+     * Unfortunately, we cannot ask UTF-8 for strerror_r(), strsignal_r()
      * and other functions that are not part of our text domain.
      */
     if (bind_textdomain_codeset (PACKAGE_NAME, "UTF-8") == NULL)

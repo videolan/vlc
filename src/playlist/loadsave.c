@@ -55,8 +55,8 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     p_export->p_file = utf8_fopen( psz_filename, "wt" );
     if( !p_export->p_file )
     {
-        msg_Err( p_playlist , "could not create playlist file %s"
-                 " (%s)", psz_filename, strerror(errno) );
+        msg_Err( p_playlist , "could not create playlist file %s (%m)",
+                 psz_filename );
         return VLC_EGENERIC;
     }
 

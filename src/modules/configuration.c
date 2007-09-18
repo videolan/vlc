@@ -799,8 +799,8 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
     p_stream = utf8_fopen( psz_filename, mode );
     if( p_stream == NULL && errno != ENOENT )
     {
-        msg_Err( p_obj, "cannot open config file (%s): %s",
-                 psz_filename, strerror(errno) );
+        msg_Err( p_obj, "cannot open config file (%s): %m",
+                 psz_filename );
 
     }
 #if !( defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS) )
@@ -988,9 +988,8 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 {
                     long l = strtoi (psz_option_value);
                     if (errno)
-                        msg_Warn (p_this, "Integer value (%s) for %s: %s",
-                                  psz_option_value, psz_option_name,
-                                  strerror (errno));
+                        msg_Warn (p_this, "Integer value (%s) for %s: %m",
+                                  psz_option_value, psz_option_name);
                     else
                         p_item->saved.i = p_item->value.i = (int)l;
                     break;
@@ -1030,7 +1029,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 
     if (ferror (file))
     {
-        msg_Err (p_this, "error reading configuration: %s", strerror (errno));
+        msg_Err (p_this, "error reading configuration: %m");
         clearerr (file);
     }
     fclose (file);
@@ -1069,8 +1068,7 @@ int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
             }
             free( psz_parent );
         }
-        msg_Err( p_this, "could not create %s (%s)",
-                 psz_dirname, strerror(errno) );
+        msg_Err( p_this, "could not create %s: %m", psz_dirname );
         return -1;
     }
 

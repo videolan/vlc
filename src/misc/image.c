@@ -352,7 +352,7 @@ static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
     file = utf8_fopen( psz_url, "wb" );
     if( !file )
     {
-        msg_Err( p_image->p_parent, "%s: %s", psz_url, strerror( errno ) );
+        msg_Err( p_image->p_parent, "%s: %m", psz_url );
         return VLC_EGENERIC;
     }
 
@@ -370,7 +370,10 @@ static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
         err = errno;
 
     if( err )
-       msg_Err( p_image->p_parent, "%s: %s", psz_url, strerror( err ) );
+    {
+       errno = err;
+       msg_Err( p_image->p_parent, "%s: %m", psz_url );
+    }
 
     return err ? VLC_EGENERIC : VLC_SUCCESS;
 }
