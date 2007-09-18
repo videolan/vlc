@@ -671,7 +671,7 @@ static int OSSThread( aout_instance_t * p_aout )
 
         if( i_tmp < 0 )
         {
-            msg_Err( p_aout, "write failed (%s)", strerror(errno) );
+            msg_Err( p_aout, "write failed (%m)" );
         }
 
         if ( p_buffer != NULL )
