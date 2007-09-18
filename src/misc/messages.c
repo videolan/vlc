@@ -318,7 +318,18 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
             char errbuf[2001];
             size_t errlen;
 
+#ifndef WIN32
             strerror_r( errno, errbuf, 1001 );
+#else
+            int sockerr = WSAGetLastError( );
+            if( sockerr )
+            {
+                strncpy( errbuf, net_strerror( sockerr ), 1001 );
+                WSASetLastError( sockerr );
+            }
+            else
+                strncpy( errbuf, strerror( errno ), 1001 );
+#endif
             errbuf[1000] = 0;
 
             /* Escape '%' from the error string */
