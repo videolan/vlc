@@ -82,7 +82,7 @@ int E_(OpenChroma)( vlc_object_t *p_this )
     p_vout->chroma.p_sys = malloc( sizeof( chroma_sys_t ) );
     if( p_vout->chroma.p_sys == NULL )
     {
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     p_vout->chroma.p_sys->i_src_vlc_chroma = p_vout->render.i_chroma;
