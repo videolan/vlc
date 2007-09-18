@@ -51,17 +51,6 @@
 
 #define MAX_EMPTY_BLOCKS 200
 
-#if defined(WIN32) || defined(UNDER_CE)
-# define WINSOCK_STRERROR_SIZE 20
-static const char *winsock_strerror( char *buf )
-{
-    snprintf( buf, WINSOCK_STRERROR_SIZE, "Winsock error %d",
-              WSAGetLastError( ) );
-    buf[WINSOCK_STRERROR_SIZE - 1] = '\0';
-    return buf;
-}
-#endif
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
