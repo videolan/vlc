@@ -260,7 +260,7 @@ LIBVLC = src/$(LIB_libvlc)
 
 #To get some nice output
 nice:
-		$(top_builddir)/compile
+	$(top_builddir)/compile
 
 # Shortcut for developpers to rebuild the core (libvlc + vlc)
 # Don't use it if you don't know what it is about.
