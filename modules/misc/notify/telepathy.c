@@ -58,9 +58,9 @@ static int SendToTelepathy( intf_thread_t *, const char * );
 #define FORMAT_DEFAULT "$a - $t"
 #define FORMAT_TEXT N_("Title format string")
 #define FORMAT_LONGTEXT N_("Format of the string to send to Telepathy." \
-"Defaults to \"Artist - Title\" ($a - $t)." \
+"Defaults to \"Artist - Title\" ($a - $t). " \
 "You can use the following substitutions: " \
-"$a Artist, $b Album, $c, Copyright, $d Description, $e Encoder, $g Genre, " \
+"$a Artist, $b Album, $c Copyright, $d Description, $e Encoder, $g Genre, " \
 "$l Language, $n number, $p Now Playing, $r Rating, $s Subtitles language, " \
 "$t Title, $u URL, $A Date, $B Bitrate, $C Chapter, $D Duration, $F URI, " \
 "$I Video Title, $L Time Remaining, $N Name, $O Audio language, $P Position, " \
