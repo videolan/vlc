@@ -1112,8 +1112,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
         if( i_in_bytes )
         {
-            msg_Warn( p_filter, "failed to convert string to unicode (%s), "
-                      "bytes left %d", strerror(errno), (int)i_in_bytes );
+            msg_Warn( p_filter, "failed to convert string to unicode (%m), "
+                      "bytes left %u", (unsigned)i_in_bytes );
             goto error;
         }
         *(uint32_t*)p_out_buffer = 0;
@@ -1496,8 +1496,8 @@ static void IconvText( filter_t *p_filter, const char *psz_string,
 
             if( i_in_bytes )
             {
-                msg_Warn( p_filter, "failed to convert string to unicode (%s), "
-                          "bytes left %d", strerror(errno), (int)i_in_bytes );
+                msg_Warn( p_filter, "failed to convert string to unicode (%m), "
+                          "bytes left %u", (unsigned)i_in_bytes );
             }
             else
             {

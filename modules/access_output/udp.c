@@ -465,10 +465,6 @@ static void ThreadWrite( vlc_object_t *p_this )
     mtime_t              i_date_last = -1;
     mtime_t              i_to_send = p_thread->i_group;
     int                  i_dropped_packets = 0;
-#if defined(WIN32) || defined(UNDER_CE)
-    char strerror_buf[WINSOCK_STRERROR_SIZE];
-# define strerror( x ) winsock_strerror( strerror_buf )
-#endif
 
     while( !p_thread->b_die )
     {
@@ -523,7 +519,7 @@ static void ThreadWrite( vlc_object_t *p_this )
                             p_pk->i_buffer, 0 );
         if (val == -1)
         {
-            msg_Warn( p_thread, "send error: %s", strerror(errno) );
+            msg_Warn( p_thread, "send error: %m" );
         }
 
         if( i_dropped_packets )

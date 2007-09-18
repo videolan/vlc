@@ -228,8 +228,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         p_sys->iconv_handle = vlc_iconv_open ("UTF-8", psz_charset);
         if (p_sys->iconv_handle == (vlc_iconv_t)(-1))
-            msg_Err (p_dec, "cannot convert from %s: %s", psz_charset,
-                     strerror (errno));
+            msg_Err (p_dec, "cannot convert from %s: %m", psz_charset);
     }
     free (psz_charset);
 

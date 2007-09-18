@@ -422,8 +422,8 @@ static int WriteBlockToFile( access_t *p_access, block_t *p_block )
         if( !file && p_sys->i_files < 2 )
         {
             /* We just can't work with less than 2 buffer files */
-            msg_Err( p_access, "cannot open temporary file '%s' (%s)",
-                     p_sys->psz_filename, strerror(errno) );
+            msg_Err( p_access, "cannot open temporary file '%s' (%m)",
+                     p_sys->psz_filename );
             return VLC_EGENERIC;
         }
         else if( !file ) return VLC_EGENERIC;

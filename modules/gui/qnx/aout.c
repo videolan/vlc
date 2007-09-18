@@ -174,7 +174,7 @@ int E_(OpenAudio)( vlc_object_t *p_this )
     if( vlc_thread_create( p_aout, "aout", QNXaoutThread,
                            VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
     {
-        msg_Err( p_aout, "cannot create QNX audio thread (%s)", strerror(errno) );
+        msg_Err( p_aout, "cannot create QNX audio thread (%m)" );
         E_(CloseAudio)( p_this );
         free( p_aout->output.p_sys );
         return -1;
@@ -307,7 +307,7 @@ static int QNXaoutThread( aout_instance_t * p_aout )
 
         if( i_tmp < 0 )
         {
-            msg_Err( p_aout, "write failed (%s)", strerror(errno) );
+            msg_Err( p_aout, "write failed (%m)" );
         }
 
         if ( p_buffer != NULL )

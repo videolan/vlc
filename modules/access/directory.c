@@ -377,8 +377,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
 
     if ((fd == -1) || fstat (fd, &stself.st))
     {
-        msg_Err (p_playlist, "cannot stat `%s': %s", psz_name,
-                 strerror (errno));
+        msg_Err (p_playlist, "cannot stat `%s': %m", psz_name);
         return VLC_EGENERIC;
     }
 
@@ -405,8 +404,7 @@ static int ReadDir( playlist_t *p_playlist, const char *psz_name,
     i_dir_content = utf8_loaddir (handle, &pp_dir_content, NULL, Sort);
     if( i_dir_content == -1 )
     {
-        msg_Err (p_playlist, "cannot read `%s': %s", psz_name,
-                 strerror (errno));
+        msg_Err (p_playlist, "cannot read `%s': %m", psz_name);
         return VLC_EGENERIC;
     }
     else if( i_dir_content <= 0 )
@@ -551,7 +549,7 @@ static DIR *OpenDir (vlc_object_t *obj, const char *path)
     {
         int err = errno;
         if (err != ENOTDIR)
-            msg_Err (obj, "%s: %s", path, strerror (err));
+            msg_Err (obj, "%s: %m", path);
         else
             msg_Dbg (obj, "skipping non-directory `%s'", path);
         errno = err;

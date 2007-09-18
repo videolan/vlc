@@ -831,7 +831,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_fd = open( p_sys->psz_videodev, O_RDWR );
     if( p_sys->i_fd < 0 )
     {
-        msg_Err( p_access, "Cannot open device (%s).", strerror( errno ) );
+        msg_Err( p_access, "Cannot open device (%m)." );
         Close( VLC_OBJECT(p_access) );
         return VLC_EGENERIC;
     }
@@ -936,8 +936,7 @@ static int Open( vlc_object_t * p_this )
             p_sys->i_radio_fd = open( p_sys->psz_radiodev, O_RDWR );
             if( p_sys->i_radio_fd < 0 )
             {
-                msg_Err( p_access, "Cannot open radio device (%s).",
-                         strerror( errno ) );
+                msg_Err( p_access, "Cannot open radio device (%m)." );
                 Close( VLC_OBJECT(p_access) );
                 return VLC_EGENERIC;
             }
@@ -954,8 +953,7 @@ static int Open( vlc_object_t * p_this )
         result = ioctl( i_fd, VIDIOC_G_TUNER, &vt );
         if ( result < 0 )
         {
-            msg_Warn( p_access, "Failed to read tuner information (%s).",
-                      strerror( errno ) );
+            msg_Warn( p_access, "Failed to read tuner information (%m)." );
         }
         else
         {
@@ -967,8 +965,7 @@ static int Open( vlc_object_t * p_this )
             result = ioctl( i_fd, VIDIOC_G_FREQUENCY, &vf );
             if ( result < 0 )
             {
-                msg_Warn( p_access, "Failed to read tuner frequency (%s).",
-                          strerror( errno ) );
+                msg_Warn( p_access, "Failed to read tuner frequency (%m)." );
             }
             else
             {
@@ -980,8 +977,7 @@ static int Open( vlc_object_t * p_this )
                 result = ioctl( i_fd, VIDIOC_S_FREQUENCY, &vf );
                 if( result < 0 )
                 {
-                    msg_Warn( p_access, "Failed to set tuner frequency (%s).",
-                              strerror( errno ) );
+                    msg_Warn( p_access, "Failed to set tuner frequency (%m)." );
                 }
                 else
                 {
@@ -1090,7 +1086,7 @@ static int Read( access_t * p_access, uint8_t * p_buffer, int i_len )
 
     if( i_ret < 0 )
     {
-        msg_Err( p_access, "Select error (%s).", strerror( errno ) );
+        msg_Err( p_access, "Polling error (%m)." );
         return -1;
     }
 

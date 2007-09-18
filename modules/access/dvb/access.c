@@ -433,7 +433,7 @@ static block_t *Block( access_t *p_access )
             if( errno == EINTR )
                 continue;
 
-            msg_Err( p_access, "poll error: %s", strerror(errno) );
+            msg_Err( p_access, "poll error: %m" );
             return NULL;
         }
 
@@ -492,7 +492,7 @@ static block_t *Block( access_t *p_access )
             if( ( p_block->i_buffer = read( p_sys->i_handle, p_block->p_buffer,
                                 p_sys->i_read_once * TS_PACKET_SIZE ) ) <= 0 )
             {
-                msg_Warn( p_access, "read failed (%s)", strerror(errno) );
+                msg_Warn( p_access, "read failed (%m)" );
                 block_Release( p_block );
                 continue;
             }

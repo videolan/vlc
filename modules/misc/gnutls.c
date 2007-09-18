@@ -568,8 +568,7 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
     dir = utf8_opendir( psz_dirname );
     if( dir == NULL )
     {
-        msg_Warn( p_this, "cannot open directory (%s): %s", psz_dirname,
-                  strerror( errno ) );
+        msg_Warn( p_this, "cannot open directory (%s): %m", psz_dirname );
         return VLC_EGENERIC;
     }
 #ifdef S_ISLNK
@@ -655,8 +654,7 @@ gnutls_Addx509File( vlc_object_t *p_this,
         }
     }
     else
-        msg_Warn( p_this, "cannot add x509 credentials (%s): %s",
-                  psz_path, strerror( errno ) );
+        msg_Warn( p_this, "cannot add x509 credentials (%s): %m", psz_path );
     return VLC_EGENERIC;
 }
 

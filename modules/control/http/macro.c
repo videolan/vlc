@@ -921,8 +921,8 @@ void E_(Execute)( httpd_file_sys_t *p_args,
                     if( ( f = fopen( psz_file, "r" ) ) == NULL )
                     {
                         msg_Warn( p_args->p_intf,
-                                  "unable to include file %s (%s)",
-                                  psz_file, strerror(errno) );
+                                  "unable to include file %s (%m)",
+                                  psz_file );
                         break;
                     }
 

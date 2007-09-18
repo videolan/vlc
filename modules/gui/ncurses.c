@@ -1945,12 +1945,8 @@ static void ReadDir( intf_thread_t *p_intf )
         if( p_current_dir == NULL )
         {
             /* something went bad, get out of here ! */
-#ifdef HAVE_ERRNO_H
-            msg_Warn( p_intf, "cannot open directory `%s' (%s)",
-                      p_sys->psz_current_dir, strerror(errno));
-#else
-            msg_Warn( p_intf, "cannot open directory `%s'", p_sys->psz_current_dir );
-#endif
+            msg_Warn( p_intf, "cannot open directory `%s' (%m)",
+                      p_sys->psz_current_dir );
             return;
         }
 

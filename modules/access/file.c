@@ -168,7 +168,7 @@ static int Open( vlc_object_t *p_this )
     while (fd != -1)
     {
         if (fstat (fd, &st))
-            msg_Err (p_access, "fstat(%d): %s", fd, strerror (errno));
+            msg_Err (p_access, "fstat(%d): %m", fd);
         else
         if (S_ISDIR (st.st_mode))
             /* The directory plugin takes care of that */
@@ -277,7 +277,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
                 break;
 
             default:
-                msg_Err (p_access, "read failed (%s)", strerror (errno));
+                msg_Err (p_access, "read failed (%m)");
+                /* FIXME: DO NOT USE strerror!!!! */
                 intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"),
                                 _("VLC could not read file \"%s\"."),
                                 strerror (errno));
@@ -445,8 +446,7 @@ static int open_file (access_t *p_access, const char *psz_name)
     free (path);
     if (fd == -1)
     {
-        msg_Err (p_access, "cannot open file %s (%s)", psz_name,
-                 strerror (errno));
+        msg_Err (p_access, "cannot open file %s (%m)", psz_name);
         intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"),
                         _("VLC could not open file \"%s\" (%s)."),
                         psz_name, strerror (errno));

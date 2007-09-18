@@ -1212,8 +1212,8 @@ static int FileSetup( sout_stream_t *p_stream )
 
     if( ( f = utf8_fopen( p_sys->psz_sdp_file, "wt" ) ) == NULL )
     {
-        msg_Err( p_stream, "cannot open file '%s' (%s)",
-                 p_sys->psz_sdp_file, strerror(errno) );
+        msg_Err( p_stream, "cannot open file '%s' (%m)",
+                 p_sys->psz_sdp_file );
         return VLC_EGENERIC;
     }
 

@@ -232,7 +232,7 @@ static int Activate( vlc_object_t *p_this )
 
         if( (i_socket = socket( AF_LOCAL, SOCK_STREAM, 0 ) ) < 0 )
         {
-            msg_Warn( p_intf, "can't open socket: %s", strerror(errno) );
+            msg_Warn( p_intf, "can't open socket: %m" );
             free( psz_unix_path );
             return VLC_EGENERIC;
         }
@@ -251,8 +251,8 @@ static int Activate( vlc_object_t *p_this )
 
             if (bind (i_socket, (struct sockaddr *)&addr, sizeof (addr)))
             {
-                msg_Err (p_intf, "cannot bind UNIX socket at %s: %s",
-                         psz_unix_path, strerror (errno));
+                msg_Err (p_intf, "cannot bind UNIX socket at %s: %m",
+                         psz_unix_path);
                 free (psz_unix_path);
                 net_Close (i_socket);
                 return VLC_EGENERIC;
@@ -261,7 +261,7 @@ static int Activate( vlc_object_t *p_this )
 
         if( listen( i_socket, 1 ) )
         {
-            msg_Warn( p_intf, "can't listen on socket: %s", strerror(errno));
+            msg_Warn( p_intf, "can't listen on socket: %m");
             free( psz_unix_path );
             net_Close( i_socket );
             return VLC_EGENERIC;

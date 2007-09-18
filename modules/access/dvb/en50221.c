@@ -230,8 +230,7 @@ static int TPDUSend( access_t * p_access, uint8_t i_slot, uint8_t i_tag,
 
     if ( write( p_sys->i_ca_handle, p_data, i_size ) != i_size )
     {
-        msg_Err( p_access, "cannot write to CAM device (%s)",
-                 strerror(errno) );
+        msg_Err( p_access, "cannot write to CAM device (%m)" );
         return VLC_EGENERIC;
     }
 
@@ -275,8 +274,7 @@ static int TPDURecv( access_t * p_access, uint8_t i_slot, uint8_t *pi_tag,
 
     if ( i_size < 5 )
     {
-        msg_Err( p_access, "cannot read from CAM device (%d:%s)", i_size,
-                 strerror(errno) );
+        msg_Err( p_access, "cannot read from CAM device (%d:%m)", i_size );
         return VLC_EGENERIC;
     }
 
@@ -815,7 +813,7 @@ static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
             i_ret = ioctl(p_sys->i_ca_handle, CA_SEND_MSG, &ca_msg );
             if ( i_ret < 0 )
             {
-                msg_Err( p_access, "Error sending to CAM: %s", strerror(errno) );
+                msg_Err( p_access, "Error sending to CAM: %m" );
                 i_ret = VLC_EGENERIC;
             }
         }

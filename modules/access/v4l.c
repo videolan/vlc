@@ -878,13 +878,13 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
-        msg_Err( p_demux, "cannot open device (%s)", strerror( errno ) );
+        msg_Err( p_demux, "cannot open device (%m)" );
         goto vdev_failed;
     }
 
     if( ioctl( i_fd, VIDIOCGCAP, &p_sys->vid_cap ) < 0 )
     {
-        msg_Err( p_demux, "cannot get capabilities (%s)", strerror( errno ) );
+        msg_Err( p_demux, "cannot get capabilities (%m)" );
         goto vdev_failed;
     }
 
@@ -929,8 +929,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
     vid_channel.channel = p_sys->i_channel;
     if( ioctl( i_fd, VIDIOCGCHAN, &vid_channel ) < 0 )
     {
-        msg_Err( p_demux, "cannot get channel infos (%s)",
-                          strerror( errno ) );
+        msg_Err( p_demux, "cannot get channel infos (%m)" );
         goto vdev_failed;
     }
     msg_Dbg( p_demux,
@@ -947,7 +946,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
     vid_channel.norm = p_sys->i_norm;
     if( ioctl( i_fd, VIDIOCSCHAN, &vid_channel ) < 0 )
     {
-        msg_Err( p_demux, "cannot set channel (%s)", strerror( errno ) );
+        msg_Err( p_demux, "cannot set channel (%m)" );
         goto vdev_failed;
     }
 
@@ -962,7 +961,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
             vid_tuner.tuner = p_sys->i_tuner;
             if( ioctl( i_fd, VIDIOCGTUNER, &vid_tuner ) < 0 )
             {
-                msg_Err( p_demux, "cannot get tuner (%s)", strerror( errno ) );
+                msg_Err( p_demux, "cannot get tuner (%m)" );
                 goto vdev_failed;
             }
             msg_Dbg( p_demux, "tuner %s low=%d high=%d, flags=0x%x "
@@ -977,7 +976,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
             //vid_tuner.mode = p_sys->i_norm;
             if( ioctl( i_fd, VIDIOCSTUNER, &vid_tuner ) < 0 )
             {
-                msg_Err( p_demux, "cannot set tuner (%s)", strerror( errno ) );
+                msg_Err( p_demux, "cannot set tuner (%m)" );
                 goto vdev_failed;
             }
         }
@@ -993,8 +992,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
             int driver_frequency = p_sys->i_frequency * 16 /1000;
             if( ioctl( i_fd, VIDIOCSFREQ, &driver_frequency ) < 0 )
             {
-                msg_Err( p_demux, "cannot set frequency (%s)",
-                                  strerror( errno ) );
+                msg_Err( p_demux, "cannot set frequency (%m)" );
                 goto vdev_failed;
             }
             msg_Dbg( p_demux, "frequency %d (%d)", p_sys->i_frequency,
@@ -1013,7 +1011,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
             vid_audio.audio = p_sys->i_audio;
             if( ioctl( i_fd, VIDIOCGAUDIO, &vid_audio ) < 0 )
             {
-                msg_Err( p_demux, "cannot get audio (%s)", strerror( errno ) );
+                msg_Err( p_demux, "cannot get audio (%m)" );
                 goto vdev_failed;
             }
 
@@ -1022,7 +1020,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
 
             if( ioctl( i_fd, VIDIOCSAUDIO, &vid_audio ) < 0 )
             {
-                msg_Err( p_demux, "cannot set audio (%s)", strerror( errno ) );
+                msg_Err( p_demux, "cannot set audio (%m)" );
                 goto vdev_failed;
             }
         }
@@ -1038,8 +1036,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
 
         if( ioctl( i_fd, MJPIOC_G_PARAMS, &mjpeg ) < 0 )
         {
-            msg_Err( p_demux, "cannot get mjpeg params (%s)",
-                              strerror( errno ) );
+            msg_Err( p_demux, "cannot get mjpeg params (%m)" );
             goto vdev_failed;
         }
         mjpeg.input = p_sys->i_channel;
@@ -1089,8 +1086,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
 
         if( ioctl( i_fd, MJPIOC_S_PARAMS, &mjpeg ) < 0 )
         {
-            msg_Err( p_demux, "cannot set mjpeg params (%s)",
-                              strerror( errno ) );
+            msg_Err( p_demux, "cannot set mjpeg params (%m)" );
             goto vdev_failed;
         }
 
@@ -1106,7 +1102,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
 
         if( ioctl( i_fd, VIDIOCGWIN, &vid_win ) < 0 )
         {
-            msg_Err( p_demux, "cannot get win (%s)", strerror( errno ) );
+            msg_Err( p_demux, "cannot get win (%m)" );
             goto vdev_failed;
         }
         p_sys->i_width  = vid_win.width;
@@ -1336,7 +1332,7 @@ static int OpenAudioDev( demux_t *p_demux, char *psz_device )
 
     if( (i_fd = open( psz_device, O_RDONLY | O_NONBLOCK )) < 0 )
     {
-        msg_Err( p_demux, "cannot open audio device (%s)", strerror( errno ) );
+        msg_Err( p_demux, "cannot open audio device (%m)" );
         goto adev_fail;
     }
 
@@ -1345,23 +1341,21 @@ static int OpenAudioDev( demux_t *p_demux, char *psz_device )
         || i_format != AFMT_S16_LE )
     {
         msg_Err( p_demux, "cannot set audio format (16b little endian) "
-                 "(%s)", strerror( errno ) );
+                 "(%m)" );
         goto adev_fail;
     }
 
     if( ioctl( i_fd, SNDCTL_DSP_STEREO,
                &p_sys->b_stereo ) < 0 )
     {
-        msg_Err( p_demux, "cannot set audio channels count (%s)",
-                 strerror( errno ) );
+        msg_Err( p_demux, "cannot set audio channels count (%m)" );
         goto adev_fail;
     }
 
     if( ioctl( i_fd, SNDCTL_DSP_SPEED,
                &p_sys->i_sample_rate ) < 0 )
     {
-        msg_Err( p_demux, "cannot set audio sample rate (%s)",
-                 strerror( errno ) );
+        msg_Err( p_demux, "cannot set audio sample rate (%m)" );
         goto adev_fail;
     }
 

@@ -277,7 +277,7 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
     if( send( i_handle, p_data, i_offset, 0 )
           == -1 )
     {
-        msg_Warn( p_this, "send error: %s", strerror(errno) );
+        msg_Warn( p_this, "send error: %m" );
     }
     net_Close( i_handle );
 

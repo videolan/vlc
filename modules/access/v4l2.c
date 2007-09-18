@@ -188,7 +188,7 @@ int OpenVideoDev( demux_t *p_demux )
 
     if( ( i_fd = open( p_sys->psz_device, O_RDWR ) ) < 0 )
     {
-        msg_Err( p_demux, "cannot open device (%s)", strerror( errno ) );
+        msg_Err( p_demux, "cannot open device (%m)" );
         goto open_failed;
     }
 
@@ -203,7 +203,7 @@ int OpenVideoDev( demux_t *p_demux )
 
     if( ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
     {
-       msg_Err( p_demux, "cannot set input (%s)", strerror( errno ) );
+       msg_Err( p_demux, "cannot set input (%m)" );
        goto open_failed;
     }
 
@@ -217,8 +217,8 @@ int OpenVideoDev( demux_t *p_demux )
 
         if( ioctl( i_fd, VIDIOC_REQBUFS, &reqbuf ) < 0 )
         {
-            msg_Err( p_demux, "cannot initiate I/O operation (%s). "
-                    "Only MMAP is supported at the moment", strerror( errno ) );
+            msg_Err( p_demux, "cannot initiate I/O operation (%m). "
+                    "Only MMAP is supported at the moment" );
             goto open_failed;
         }
         p_demux->pf_demux = DemuxMMAP;
@@ -250,7 +250,7 @@ int ProbeDev( demux_t *p_demux )
 
     if( ( i_fd = open( p_sys->psz_device, O_RDWR ) ) < 0 )
     {
-        msg_Err( p_demux, "cannot open device (%s)", strerror( errno ) );
+        msg_Err( p_demux, "cannot open device (%m)" );
         goto open_failed;
     }
 
@@ -258,7 +258,7 @@ int ProbeDev( demux_t *p_demux )
 
     if( ioctl( i_fd, VIDIOC_QUERYCAP, &p_sys->dev_cap ) < 0 )
     {
-        msg_Err( p_demux, "cannot get capabilities (%s)", strerror( errno ) );
+        msg_Err( p_demux, "cannot get capabilities (%m)" );
         goto open_failed;
     }
 
@@ -305,8 +305,8 @@ int ProbeDev( demux_t *p_demux )
 
             if( ioctl( i_fd, VIDIOC_ENUMINPUT, &p_sys->p_inputs[i_index] ) )
             {
-                msg_Err( p_demux, "cannot get video input characteristics (%s)",
-                                                 strerror( errno ) );
+                msg_Err( p_demux,
+                         "cannot get video input characteristics (%m)" );
                 goto open_failed;
             }
             msg_Dbg( p_demux, "video input %i (%s) has type: %s",
@@ -334,8 +334,8 @@ int ProbeDev( demux_t *p_demux )
         {
             if( ioctl( i_fd, VIDIOC_G_AUDIO, &p_sys->p_audios[ p_sys->i_audio] ) < 0 )
             {
-                msg_Err( p_demux, "cannot get video input characteristics (%s)",
-                                                 strerror( errno ) );
+                msg_Err( p_demux,
+                         "cannot get video input characteristics (%m)" );
                 goto open_failed;
             }
 
@@ -371,8 +371,7 @@ int ProbeDev( demux_t *p_demux )
 
             if( ioctl( i_fd, VIDIOC_G_TUNER, &p_sys->p_tuners[i_index] ) )
             {
-                msg_Err( p_demux, "cannot get tuner characteristics (%s)",
-                                                 strerror( errno ) );
+                msg_Err( p_demux, "cannot get tuner characteristics (%m)" );
                 goto open_failed;
             }
             msg_Dbg( p_demux, "tuner %i (%s) has type: %s, "
@@ -421,7 +420,7 @@ int ProbeDev( demux_t *p_demux )
 
             if( ioctl( i_fd, VIDIOC_ENUM_FMT, &p_sys->p_codecs[i_index] ) < 0 )
             {
-                msg_Err( p_demux, "cannot get codec description (%s)", strerror( errno ) );
+                msg_Err( p_demux, "cannot get codec description (%m)" );
                 goto open_failed;
             }
 

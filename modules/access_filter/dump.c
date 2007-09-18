@@ -111,7 +111,7 @@ static int Open (vlc_object_t *obj)
 
     if ((p_sys->stream = tmpfile ()) == NULL)
     {
-        msg_Err (access, "cannot create temporary file: %s", strerror (errno));
+        msg_Err (access, "cannot create temporary file: %m");
         free (p_sys);
         return VLC_EGENERIC;
     }
@@ -167,7 +167,7 @@ static void Dump (access_t *access, const uint8_t *buffer, size_t len)
     assert (len > 0);
     if (fwrite (buffer, len, 1, stream) != 1)
     {
-        msg_Err (access, "cannot write to file: %s", strerror (errno));
+        msg_Err (access, "cannot write to file: %m");
         goto error;
     }
 
@@ -294,8 +294,7 @@ static void Trigger (access_t *access)
     FILE *newstream = utf8_fopen (filename, "wb");
     if (newstream == NULL)
     {
-        msg_Err (access, "cannot create dump file \"%s\": %s", filename,
-                 strerror (errno));
+        msg_Err (access, "cannot create dump file \"%s\": %m", filename);
         return;
     }
 
@@ -311,8 +310,7 @@ static void Trigger (access_t *access)
         {
             if (ferror (oldstream))
             {
-                msg_Err (access, "cannot read temporary file: %s",
-                         strerror (errno));
+                msg_Err (access, "cannot read temporary file: %m");
                 break;
             }
 
@@ -325,7 +323,7 @@ static void Trigger (access_t *access)
 
         if (fwrite (buf, len, 1, newstream) != 1)
         {
-            msg_Err (access, "cannot write dump file: %s", strerror (errno));
+            msg_Err (access, "cannot write dump file: %m");
             break;
         }
     }

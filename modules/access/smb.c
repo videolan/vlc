@@ -220,7 +220,7 @@ static int Open( vlc_object_t *p_this )
 
     if( !smbc_init_context( p_smb ) )
     {
-        msg_Err( p_access, "cannot initialize context (%s)", strerror(errno) );
+        msg_Err( p_access, "cannot initialize context (%m)" );
         smbc_free_context( p_smb, 1 );
         free( psz_uri );
         return VLC_EGENERIC;
@@ -228,8 +228,8 @@ static int Open( vlc_object_t *p_this )
 
     if( !(p_file = (p_smb->open)( p_smb, psz_uri, O_RDONLY, 0 )) )
     {
-        msg_Err( p_access, "open failed for '%s' (%s)",
-                 p_access->psz_path, strerror(errno) );
+        msg_Err( p_access, "open failed for '%s' (%m)",
+                 p_access->psz_path );
         smbc_free_context( p_smb, 1 );
         free( psz_uri );
         return VLC_EGENERIC;
@@ -239,7 +239,7 @@ static int Open( vlc_object_t *p_this )
     STANDARD_READ_ACCESS_INIT;
 
     i_ret = p_smb->fstat( p_smb, p_file, &filestat );
-    if( i_ret ) msg_Err( p_access, "stat failed (%s)", strerror(errno) );
+    if( i_ret ) msg_Err( p_access, "stat failed (%m)" );
     else p_access->info.i_size = filestat.st_size;
 #else
 
@@ -261,8 +261,8 @@ static int Open( vlc_object_t *p_this )
 #endif
     if( (i_smb = smbc_open( psz_uri, O_RDONLY, 0 )) < 0 )
     {
-        msg_Err( p_access, "open failed for '%s' (%s)",
-                 p_access->psz_path, strerror(errno) );
+        msg_Err( p_access, "open failed for '%s' (%m)",
+                 p_access->psz_path );
         free( psz_uri );
         return VLC_EGENERIC;
     }
@@ -271,7 +271,11 @@ static int Open( vlc_object_t *p_this )
     STANDARD_READ_ACCESS_INIT;
 
     i_ret = smbc_fstat( i_smb, &filestat );
-    if( i_ret ) msg_Err( p_access, "stat failed (%s)", strerror(i_ret) );
+    if( i_ret )
+    {
+        errno = i_ret;
+        msg_Err( p_access, "stat failed (%m)" );
+    }
     else p_access->info.i_size = filestat.st_size;
 #endif
 
@@ -331,7 +335,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
 #endif
     if( i_ret == -1 )
     {
-        msg_Err( p_access, "seek failed (%s)", strerror(errno) );
+        msg_Err( p_access, "seek failed (%m)" );
         return VLC_EGENERIC;
     }
 
@@ -358,7 +362,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 #endif
     if( i_read < 0 )
     {
-        msg_Err( p_access, "read failed (%s)", strerror(errno) );
+        msg_Err( p_access, "read failed (%m)" );
         return -1;
     }
 

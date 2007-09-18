@@ -267,7 +267,7 @@ static int Open( vlc_object_t * p_this )
         if( fwrite( wh, sizeof(WAVEHEADER), 1,
                     p_aout->output.p_sys->p_file ) != 1 )
         {
-            msg_Err( p_aout, "write error (%s)", strerror(errno) );
+            msg_Err( p_aout, "write error (%m)" );
         }
     }
 
@@ -292,7 +292,7 @@ static void Close( vlc_object_t * p_this )
         /* Write Wave Header */
         if( fseek( p_aout->output.p_sys->p_file, 0, SEEK_SET ) )
         {
-            msg_Err( p_aout, "seek error (%s)", strerror(errno) );
+            msg_Err( p_aout, "seek error (%m)" );
         }
 
         /* Header -> little endian format */
@@ -304,7 +304,7 @@ static void Close( vlc_object_t * p_this )
         if( fwrite( &p_aout->output.p_sys->waveh, sizeof(WAVEHEADER), 1,
                     p_aout->output.p_sys->p_file ) != 1 )
         {
-            msg_Err( p_aout, "write error (%s)", strerror(errno) );
+            msg_Err( p_aout, "write error (%m)" );
         }
     }
 
@@ -324,7 +324,7 @@ static void Play( aout_instance_t * p_aout )
     if( fwrite( p_buffer->p_buffer, p_buffer->i_nb_bytes, 1,
                 p_aout->output.p_sys->p_file ) != 1 )
     {
-        msg_Err( p_aout, "write error (%s)", strerror(errno) );
+        msg_Err( p_aout, "write error (%m)" );
     }
 
     if( p_aout->output.p_sys->b_add_wav_header )

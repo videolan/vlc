@@ -260,7 +260,7 @@ static int Create( vlc_object_t *p_this )
         if( sigaction( SIGUSR1, &sig_tty, &p_vout->p_sys->sig_usr1 ) ||
             sigaction( SIGUSR2, &sig_tty, &p_vout->p_sys->sig_usr2 ) )
         {
-            msg_Err( p_vout, "cannot set signal handler (%s)", strerror(errno) );
+            msg_Err( p_vout, "cannot set signal handler (%m)" );
             tcsetattr(0, 0, &p_vout->p_sys->old_termios);
             TextMode( p_sys->i_tty );
             free( p_vout->p_sys );
@@ -270,7 +270,7 @@ static int Create( vlc_object_t *p_this )
         /* Set-up tty according to new signal handler */
         if( -1 == ioctl( p_sys->i_tty, VT_GETMODE, &p_vout->p_sys->vt_mode ) )
         {
-            msg_Err( p_vout, "cannot get terminal mode (%s)", strerror(errno) );
+            msg_Err( p_vout, "cannot get terminal mode (%m)" );
             sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
             sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
             tcsetattr(0, 0, &p_vout->p_sys->old_termios);
@@ -286,7 +286,7 @@ static int Create( vlc_object_t *p_this )
 
         if( -1 == ioctl( p_sys->i_tty, VT_SETMODE, &vt_mode ) )
         {
-            msg_Err( p_vout, "cannot set terminal mode (%s)", strerror(errno) );
+            msg_Err( p_vout, "cannot set terminal mode (%m)" );
             sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
             sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
             tcsetattr(0, 0, &p_vout->p_sys->old_termios);
@@ -585,7 +585,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->i_fd = open( psz_device, O_RDWR);
     if( p_vout->p_sys->i_fd == -1 )
     {
-        msg_Err( p_vout, "cannot open %s (%s)", psz_device, strerror(errno) );
+        msg_Err( p_vout, "cannot open %s (%m)", psz_device );
         free( psz_device );
         return VLC_EGENERIC;
     }
@@ -596,7 +596,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( ioctl( p_vout->p_sys->i_fd,
                FBIOGET_VSCREENINFO, &p_vout->p_sys->var_info ) )
     {
-        msg_Err( p_vout, "cannot get fb info (%s)", strerror(errno) );
+        msg_Err( p_vout, "cannot get fb info (%m)" );
         close( p_vout->p_sys->i_fd );
         return VLC_EGENERIC;
     }
@@ -612,7 +612,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( ioctl( p_vout->p_sys->i_fd,
                FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info ) )
     {
-        msg_Err( p_vout, "cannot set fb info (%s)", strerror(errno) );
+        msg_Err( p_vout, "cannot set fb info (%m)" );
         close( p_vout->p_sys->i_fd );
         return VLC_EGENERIC;
     }
@@ -622,8 +622,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
          || ioctl( p_vout->p_sys->i_fd,
                    FBIOGET_VSCREENINFO, &p_vout->p_sys->var_info ) )
     {
-        msg_Err( p_vout, "cannot get additional fb info (%s)",
-                          strerror(errno) );
+        msg_Err( p_vout, "cannot get additional fb info (%m)" );
 
         /* Restore fb config */
         ioctl( p_vout->p_sys->i_fd,
@@ -711,7 +710,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->p_video == ((void*)-1) )
     {
-        msg_Err( p_vout, "cannot map video memory (%s)", strerror(errno) );
+        msg_Err( p_vout, "cannot map video memory (%m)" );
 
         if( p_vout->p_sys->var_info.bits_per_pixel == 8 )
         {

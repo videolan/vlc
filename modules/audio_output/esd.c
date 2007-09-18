@@ -204,7 +204,7 @@ static void Play( aout_instance_t *p_aout )
             i_tmp = write( p_sys->i_fd, data + pos, ESD_BUF_SIZE );
             if( i_tmp < 0 )
             {
-                msg_Err( p_aout, "write failed (%s)", strerror(errno) );
+                msg_Err( p_aout, "write failed (%m)" );
             }
         }
         aout_BufferFree( p_buffer );

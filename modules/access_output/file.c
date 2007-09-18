@@ -138,8 +138,7 @@ static int Open( vlc_object_t *p_this )
 
         if( fd == -1 )
         {
-            msg_Err( p_access, "cannot open `%s' (%s)", p_access->psz_path,
-                     strerror( errno ) );
+            msg_Err( p_access, "cannot open `%s' (%m)", p_access->psz_path );
             free( p_access->p_sys );
             return( VLC_EGENERIC );
         }

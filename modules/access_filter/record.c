@@ -447,8 +447,8 @@ static void Dump( access_t *p_access, uint8_t *p_buffer, int i_buffer )
         p_sys->f = utf8_fopen( p_sys->psz_file, "wb" );
         if( p_sys->f == NULL )
         {
-            msg_Err( p_access, "cannot open file '%s' (%s)",
-                     p_sys->psz_file, strerror(errno) );
+            msg_Err( p_access, "cannot open file '%s' (%m)",
+                     p_sys->psz_file );
             free( p_sys->psz_file );
             p_sys->psz_file = NULL;
             p_sys->b_dump = VLC_FALSE;

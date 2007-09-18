@@ -365,8 +365,8 @@ char *E_(FromUTF8)( intf_thread_t *p_intf, char *psz_utf8 )
         if( i_ret == (size_t)-1 || i_in )
         {
             msg_Warn( p_intf,
-                      "failed to convert \"%s\" to desired charset (%s)",
-                      psz_utf8, strerror(errno) );
+                      "failed to convert \"%s\" to desired charset (%m)",
+                      psz_utf8 );
             free( psz_local );
             return strdup( psz_utf8 );
         }
@@ -395,8 +395,8 @@ char *E_(ToUTF8)( intf_thread_t *p_intf, char *psz_local )
         if( i_ret == (size_t)-1 || i_in )
         {
             msg_Warn( p_intf,
-                      "failed to convert \"%s\" to desired charset (%s)",
-                      psz_local, strerror(errno) );
+                      "failed to convert \"%s\" to desired charset (%m)",
+                      psz_local );
             free( psz_utf8 );
             return strdup( psz_local );
         }

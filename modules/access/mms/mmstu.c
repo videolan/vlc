@@ -1042,7 +1042,7 @@ static int NetFillBuffer( access_t *p_access )
 
     if( i_ret < 0 )
     {
-        msg_Err( p_access, "network select error (%s)", strerror(errno) );
+        msg_Err( p_access, "network select error (%m)" );
         return -1;
     }
 

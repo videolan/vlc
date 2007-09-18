@@ -2020,8 +2020,7 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         shmctl( p_pic->p_sys->shminfo.shmid, IPC_RMID, 0 );
         if( shmdt( p_pic->p_sys->shminfo.shmaddr ) )
         {
-            msg_Err( p_vout, "cannot detach shared memory (%s)",
-                             strerror(errno) );
+            msg_Err( p_vout, "cannot detach shared memory (%m)" );
         }
     }
     else
@@ -2802,8 +2801,7 @@ static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
     p_shm->shmid = shmget( IPC_PRIVATE, DATA_SIZE(p_image), IPC_CREAT | 0776 );
     if( p_shm->shmid < 0 )
     {
-        msg_Err( p_vout, "cannot allocate shared image data (%s)",
-                         strerror( errno ) );
+        msg_Err( p_vout, "cannot allocate shared image data (%m)" );
         IMAGE_FREE( p_image );
         return NULL;
     }
@@ -2812,8 +2810,7 @@ static IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
     p_shm->shmaddr = p_image->data = shmat( p_shm->shmid, 0, 0 );
     if(! p_shm->shmaddr )
     {
-        msg_Err( p_vout, "cannot attach shared memory (%s)",
-                         strerror(errno));
+        msg_Err( p_vout, "cannot attach shared memory (%m)" );
         IMAGE_FREE( p_image );
         shmctl( p_shm->shmid, IPC_RMID, 0 );
         return NULL;

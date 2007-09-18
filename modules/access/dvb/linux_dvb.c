@@ -110,8 +110,7 @@ int E_(FrontendOpen)( access_t *p_access )
     msg_Dbg( p_access, "Opening device %s", frontend );
     if( (p_sys->i_frontend_handle = open(frontend, O_RDWR | O_NONBLOCK)) < 0 )
     {
-        msg_Err( p_access, "FrontEndOpen: opening device failed (%s)",
-                 strerror(errno) );
+        msg_Err( p_access, "FrontEndOpen: opening device failed (%m)" );
         free( p_frontend );
         return VLC_EGENERIC;
     }
@@ -296,8 +295,8 @@ void E_(FrontendPoll)( access_t *p_access )
             if( errno == EWOULDBLOCK )
                 return; /* no more events */
 
-            msg_Err( p_access, "reading frontend event failed (%d) %s",
-                     i_ret, strerror(errno) );
+            msg_Err( p_access, "reading frontend event failed (%d): %m",
+                     i_ret );
             return;
         }
 
@@ -379,8 +378,9 @@ void E_(FrontendStatus)( access_t *p_access )
     if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_GET_INFO,
                         &p_frontend->info )) < 0 )
     {
-        p += sprintf( p, "ioctl FE_GET_INFO failed (%d) %s\n", i_ret,
-                      strerror(errno) );
+        char buf[1000];
+        strerror_r( errno, buf, sizeof( buf ) );
+        p += sprintf( p, "ioctl FE_GET_INFO failed (%d) %s\n", i_ret, buf );
         goto out;
     }
 
@@ -466,8 +466,10 @@ void E_(FrontendStatus)( access_t *p_access )
     if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_READ_STATUS, &i_status ))
            < 0 )
     {
-        p += sprintf( p, "</table>ioctl FE_READ_STATUS failed (%d) %s\n", i_ret,
-                      strerror(errno) );
+        char buf[1000];
+        strerror_r( errno, buf, sizeof( buf ) );
+        p += sprintf( p, "</table>ioctl FE_READ_STATUS failed (%d) %s\n",
+                      i_ret, buf );
         goto out;
     }
 
@@ -523,8 +525,7 @@ static int FrontendInfo( access_t *p_access )
     if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_GET_INFO,
                         &p_frontend->info )) < 0 )
     {
-        msg_Err( p_access, "ioctl FE_GET_INFO failed (%d) %s", i_ret,
-                 strerror(errno) );
+        msg_Err( p_access, "ioctl FE_GET_INFO failed (%d): %m", i_ret );
         return VLC_EGENERIC;
     }
 
@@ -807,17 +808,16 @@ static int DoDiseqc( access_t *p_access )
     /* Switch off continuous tone. */
     if( (i_err = ioctl( p_sys->i_frontend_handle, FE_SET_TONE, SEC_TONE_OFF )) < 0 )
     {
-        msg_Err( p_access, "ioctl FE_SET_TONE failed, tone=%s (%d) %s",
-                 fe_tone == SEC_TONE_ON ? "on" : "off", i_err,
-                 strerror(errno) );
+        msg_Err( p_access, "ioctl FE_SET_TONE failed, tone=%s (%d) %m",
+                 fe_tone == SEC_TONE_ON ? "on" : "off", i_err );
         return i_err;
     }
 
     /* Configure LNB voltage. */
     if( (i_err = ioctl( p_sys->i_frontend_handle, FE_SET_VOLTAGE, fe_voltage )) < 0 )
     {
-        msg_Err( p_access, "ioctl FE_SET_VOLTAGE failed, voltage=%d (%d) %s",
-                 fe_voltage, i_err, strerror(errno) );
+        msg_Err( p_access, "ioctl FE_SET_VOLTAGE failed, voltage=%d (%d) %m",
+                 fe_voltage, i_err );
         return i_err;
     }
 
@@ -826,8 +826,8 @@ static int DoDiseqc( access_t *p_access )
                         val.b_bool )) < 0 && val.b_bool )
     {
         msg_Err( p_access,
-                 "ioctl FE_ENABLE_HIGH_LNB_VOLTAGE failed, val=%d (%d) %s",
-                 val.b_bool, i_err, strerror(errno) );
+                 "ioctl FE_ENABLE_HIGH_LNB_VOLTAGE failed, val=%d (%d) %m",
+                 val.b_bool, i_err );
     }
 
     /* Wait for at least 15 ms. */
@@ -854,8 +854,8 @@ static int DoDiseqc( access_t *p_access )
         if( (i_err = ioctl( p_sys->i_frontend_handle, FE_DISEQC_SEND_MASTER_CMD,
                            &cmd.cmd )) < 0 )
         {
-            msg_Err( p_access, "ioctl FE_SEND_MASTER_CMD failed (%d) %s",
-                     i_err, strerror(errno) );
+            msg_Err( p_access, "ioctl FE_SEND_MASTER_CMD failed (%d) %m",
+                     i_err );
             return i_err;
         }
 
@@ -865,8 +865,8 @@ static int DoDiseqc( access_t *p_access )
         if( (i_err = ioctl( p_sys->i_frontend_handle, FE_DISEQC_SEND_BURST,
                       ((val.i_int - 1) % 2) ? SEC_MINI_B : SEC_MINI_A )) < 0 )
         {
-            msg_Err( p_access, "ioctl FE_SEND_BURST failed (%d) %s",
-                     i_err, strerror(errno) );
+            msg_Err( p_access, "ioctl FE_SEND_BURST failed (%d) %m",
+                     i_err );
             return i_err;
         }
 
@@ -875,9 +875,8 @@ static int DoDiseqc( access_t *p_access )
 
     if( (i_err = ioctl( p_sys->i_frontend_handle, FE_SET_TONE, fe_tone )) < 0 )
     {
-        msg_Err( p_access, "ioctl FE_SET_TONE failed, tone=%s (%d) %s",
-                 fe_tone == SEC_TONE_ON ? "on" : "off", i_err,
-                 strerror(errno) );
+        msg_Err( p_access, "ioctl FE_SET_TONE failed, tone=%s (%d) %m",
+                 fe_tone == SEC_TONE_ON ? "on" : "off", i_err );
         return i_err;
     }
 
@@ -990,8 +989,7 @@ static int FrontendSetQPSK( access_t *p_access )
     /* Now send it all to the frontend device */
     if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep )) < 0 )
     {
-        msg_Err( p_access, "DVB-S: setting frontend failed (%d) %s", i_ret,
-                 strerror(errno) );
+        msg_Err( p_access, "DVB-S: setting frontend failed (%d) %m", i_ret );
         return VLC_EGENERIC;
     }
 
@@ -1035,8 +1033,7 @@ static int FrontendSetQAM( access_t *p_access )
     /* Now send it all to the frontend device */
     if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep )) < 0 )
     {
-        msg_Err( p_access, "DVB-C: setting frontend failed (%d) %s", i_ret,
-                 strerror(errno) );
+        msg_Err( p_access, "DVB-C: setting frontend failed (%d): %m", i_ret );
         return VLC_EGENERIC;
     }
 
@@ -1171,8 +1168,7 @@ static int FrontendSetOFDM( access_t * p_access )
     /* Now send it all to the frontend device */
     if( (ret = ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep )) < 0 )
     {
-        msg_Err( p_access, "DVB-T: setting frontend failed (%d) %s", ret,
-                 strerror(errno) );
+        msg_Err( p_access, "DVB-T: setting frontend failed (%d): %s", ret );
         return -1;
     }
 
@@ -1208,8 +1204,7 @@ static int FrontendSetATSC( access_t *p_access )
     /* Now send it all to the frontend device */
     if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep )) < 0 )
     {
-        msg_Err( p_access, "ATSC: setting frontend failed (%d) %s", i_ret,
-                 strerror(errno) );
+        msg_Err( p_access, "ATSC: setting frontend failed (%d): %s", i_ret );
         return VLC_EGENERIC;
     }
 
@@ -1247,8 +1242,7 @@ int E_(DMXSetFilter)( access_t * p_access, int i_pid, int * pi_fd, int i_type )
     msg_Dbg( p_access, "Opening device %s", dmx );
     if( (*pi_fd = open(dmx, O_RDWR)) < 0 )
     {
-        msg_Err( p_access, "DMXSetFilter: opening device failed (%s)",
-                 strerror(errno) );
+        msg_Err( p_access, "DMXSetFilter: opening device failed (%m)" );
         return VLC_EGENERIC;
     }
 
@@ -1354,8 +1348,7 @@ int E_(DMXSetFilter)( access_t * p_access, int i_pid, int * pi_fd, int i_type )
     /* We then give the order to the device : */
     if( (i_ret = ioctl( *pi_fd, DMX_SET_PES_FILTER, &s_filter_params )) < 0 )
     {
-        msg_Err( p_access, "DMXSetFilter: failed with %d (%s)", i_ret,
-                 strerror(errno) );
+        msg_Err( p_access, "DMXSetFilter: failed with %d (%m)", i_ret );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
@@ -1370,8 +1363,7 @@ int E_(DMXUnsetFilter)( access_t * p_access, int i_fd )
 
     if( (i_ret = ioctl( i_fd, DMX_STOP )) < 0 )
     {
-        msg_Err( p_access, "DMX_STOP failed for demux (%d) %s",
-                 i_ret, strerror(errno) );
+        msg_Err( p_access, "DMX_STOP failed for demux (%d): %m", i_ret );
         return i_ret;
     }
 
@@ -1410,15 +1402,13 @@ int E_(DVROpen)( access_t * p_access )
     msg_Dbg( p_access, "Opening device %s", dvr );
     if( (p_sys->i_handle = open(dvr, O_RDONLY)) < 0 )
     {
-        msg_Err( p_access, "DVROpen: opening device failed (%s)",
-                 strerror(errno) );
+        msg_Err( p_access, "DVROpen: opening device failed (%m)" );
         return VLC_EGENERIC;
     }
 
     if( fcntl( p_sys->i_handle, F_SETFL, O_NONBLOCK ) == -1 )
     {
-        msg_Warn( p_access, "DVROpen: couldn't set non-blocking mode (%s)",
-                  strerror(errno) );
+        msg_Warn( p_access, "DVROpen: couldn't set non-blocking mode (%m)" );
     }
 
     return VLC_SUCCESS;
@@ -1462,8 +1452,7 @@ int E_(CAMOpen)( access_t *p_access )
     msg_Dbg( p_access, "Opening device %s", ca );
     if( (p_sys->i_ca_handle = open(ca, O_RDWR | O_NONBLOCK)) < 0 )
     {
-        msg_Warn( p_access, "CAMInit: opening CAM device failed (%s)",
-                  strerror(errno) );
+        msg_Warn( p_access, "CAMInit: opening CAM device failed (%m)" );
         p_sys->i_ca_handle = 0;
         return VLC_EGENERIC;
     }
@@ -1686,8 +1675,9 @@ void E_(CAMStatus)( access_t * p_access )
 
     if ( ioctl( p_sys->i_ca_handle, CA_GET_CAP, &caps ) != 0 )
     {
-        p += sprintf( p, "ioctl CA_GET_CAP failed (%s)\n",
-                      strerror(errno) );
+        char buf[1000];
+        strerror_r( errno, buf, sizeof( buf ) );
+        p += sprintf( p, "ioctl CA_GET_CAP failed (%s)\n", buf );
         goto out;
     }
 
@@ -1728,8 +1718,9 @@ void E_(CAMStatus)( access_t * p_access )
         sinfo.num = i_slot;
         if ( ioctl( p_sys->i_ca_handle, CA_GET_SLOT_INFO, &sinfo ) != 0 )
         {
-            p += sprintf( p, "ioctl CA_GET_SLOT_INFO failed (%s)<br>\n",
-                          strerror(errno) );
+            char buf[1000];
+            strerror_r( errno, buf, sizeof( buf ) );
+            p += sprintf( p, "ioctl CA_GET_SLOT_INFO failed (%s)<br>\n", buf );
             continue;
         }
 
