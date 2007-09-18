@@ -46,7 +46,7 @@
 
 /* When a thread waits on a condition in debug mode, delay to wait before
  * outputting an error message (in second) */
-#define THREAD_COND_TIMEOUT             1
+#define THREAD_COND_TIMEOUT             3
 
 /*****************************************************************************
  * Interface configuration
