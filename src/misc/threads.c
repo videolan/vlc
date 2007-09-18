@@ -330,7 +330,6 @@ int __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex
     int i_result;
     /* In case of error : */
     int i_thread = -1;
-    const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
     return 0;
@@ -367,7 +366,7 @@ int __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex
     if( i_result )
     {
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        psz_error = strerror(i_result);
+        errno = i_result;
     }
 
 #elif defined( HAVE_CTHREADS_H )
@@ -378,8 +377,8 @@ int __vlc_mutex_destroy( const char * psz_file, int i_line, vlc_mutex_t *p_mutex
     if( i_result )
     {
         msg_Err( p_mutex->p_this,
-                 "thread %d: mutex_destroy failed at %s:%d (%d:%s)",
-                 i_thread, psz_file, i_line, i_result, psz_error );
+                 "thread %d: mutex_destroy failed at %s:%d (%d:%m)",
+                 i_thread, psz_file, i_line, i_result );
     }
     return i_result;
 }
@@ -500,7 +499,6 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
     int i_result;
     /* In case of error : */
     int i_thread = -1;
-    const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
     return 0;
@@ -530,7 +528,7 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
     if( i_result )
     {
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        psz_error = strerror(i_result);
+        errno = i_result;
     }
 
 #elif defined( HAVE_CTHREADS_H )
@@ -541,8 +539,8 @@ int __vlc_cond_destroy( const char * psz_file, int i_line, vlc_cond_t *p_condvar
     if( i_result )
     {
         msg_Err( p_condvar->p_this,
-                 "thread %d: cond_destroy failed at %s:%d (%d:%s)",
-                 i_thread, psz_file, i_line, i_result, psz_error );
+                 "thread %d: cond_destroy failed at %s:%d (%d:%m)",
+                 i_thread, psz_file, i_line, i_result );
     }
     return i_result;
 }
@@ -665,8 +663,9 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
         if( (i_error = pthread_setschedparam( p_priv->thread_id,
                                                i_policy, &param )) )
         {
-            msg_Warn( p_this, "couldn't set thread priority (%s:%d): %s",
-                      psz_file, i_line, strerror(i_error) );
+            errno = i_error;
+            msg_Warn( p_this, "couldn't set thread priority (%s:%d): %m",
+                      psz_file, i_line );
             i_priority = 0;
         }
     }
@@ -708,8 +707,9 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     }
     else
     {
-        msg_Err( p_this, "%s thread could not be created at %s:%d (%s)",
-                         psz_name, psz_file, i_line, strerror(i_ret) );
+        errno = i_ret;
+        msg_Err( p_this, "%s thread could not be created at %s:%d (%m)",
+                         psz_name, psz_file, i_line );
         vlc_mutex_unlock( &p_this->object_lock );
     }
 
@@ -762,8 +762,9 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
         if( (i_error = pthread_setschedparam( p_priv->thread_id,
                                                i_policy, &param )) )
         {
-            msg_Warn( p_this, "couldn't set thread priority (%s:%d): %s",
-                      psz_file, i_line, strerror(i_error) );
+            errno = i_error;
+            msg_Warn( p_this, "couldn't set thread priority (%s:%d): %m",
+                      psz_file, i_line );
             i_priority = 0;
         }
     }
@@ -881,9 +882,9 @@ void __vlc_thread_join( vlc_object_t *p_this, const char * psz_file, int i_line 
 
     if( i_ret )
     {
-        msg_Err( p_this, "thread_join(%u) failed at %s:%d (%s)",
-                         (unsigned int)p_priv->thread_id, psz_file, i_line,
-                         strerror(i_ret) );
+        errno = i_ret;
+        msg_Err( p_this, "thread_join(%u) failed at %s:%d (%m)",
+                         (unsigned int)p_priv->thread_id, psz_file, i_line );
     }
     else
     {

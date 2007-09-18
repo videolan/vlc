@@ -88,8 +88,7 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
     if (fd == -1)
     {
         if (net_errno != EAFNOSUPPORT)
-            msg_Err (p_this, "cannot create socket: %s",
-                     net_strerror (net_errno));
+            msg_Err (p_this, "cannot create socket: %m");
         return -1;
     }
 
@@ -148,7 +147,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
                              protocol ?: ptr->ai_protocol);
         if (fd == -1)
         {
-            msg_Dbg (p_this, "socket error: %s", net_strerror (net_errno));
+            msg_Dbg (p_this, "socket error: %m");
             continue;
         }
 
@@ -176,8 +175,6 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
 #endif
         if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
         {
-            int saved_errno = net_errno;
-
             net_Close (fd);
 #if !defined(WIN32) && !defined(UNDER_CE)
             fd = rootwrap_bind (ptr->ai_family, ptr->ai_socktype,
@@ -190,8 +187,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
             else
 #endif
             {
-                msg_Err (p_this, "socket bind error (%s)",
-                         net_strerror( saved_errno ) );
+                msg_Err (p_this, "socket bind error (%m)");
                 continue;
             }
         }
@@ -216,8 +212,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
 #endif
                 if (listen (fd, INT_MAX))
                 {
-                    msg_Err (p_this, "socket listen error (%s)",
-                            net_strerror (net_errno));
+                    msg_Err (p_this, "socket listen error (%m)");
                     net_Close (fd);
                     continue;
                 }
@@ -362,7 +357,7 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
     return i_total;
 
 error:
-    msg_Err (p_this, "Read error: %s", net_strerror (net_errno));
+    msg_Err (p_this, "Read error: %m");
     return i_total ? (ssize_t)i_total : -1;
 }
 
@@ -421,7 +416,7 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         switch (val)
         {
             case -1:
-               msg_Err (p_this, "Write error: %s", net_strerror (net_errno));
+               msg_Err (p_this, "Write error: %m");
                goto out;
 
             case 0:
@@ -442,7 +437,7 @@ ssize_t __net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 
         if (val == -1)
         {
-            msg_Err (p_this, "Write error: %s", net_strerror (net_errno));
+            msg_Err (p_this, "Write error: %m");
             break;
         }
 

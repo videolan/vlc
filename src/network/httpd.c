@@ -2362,7 +2362,7 @@ static void httpd_HostThread( httpd_host_t *host )
                 if (errno != EINTR)
                 {
                     /* This is most likely a bug */
-                    msg_Err( host, "polling error: %s", strerror (errno));
+                    msg_Err( host, "polling error: %m" );
                     msleep( 1000 );
                 }
             case 0:

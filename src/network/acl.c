@@ -317,8 +317,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
         {
             if( ferror( file ) )
             {
-                msg_Err( p_acl->p_owner, "error reading %s : %s\n", psz_path,
-                        strerror( errno ) );
+                msg_Err( p_acl->p_owner, "error reading %s : %m", psz_path );
                 goto error;
             }
             continue;
@@ -337,7 +336,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
         ptr = strchr( psz_ip, '\n' );
         if( ptr == NULL )
         {
-            msg_Warn( p_acl->p_owner, "skipping overly long line in %s\n",
+            msg_Warn( p_acl->p_owner, "skipping overly long line in %s",
                       psz_path);
             do
             {
@@ -345,8 +344,8 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
                 {
                      if( ferror( file ) )
                      {
-                         msg_Err( p_acl->p_owner, "error reading %s : %s\n",
-                                  psz_path, strerror( errno ) );
+                         msg_Err( p_acl->p_owner, "error reading %s : %m",
+                                  psz_path );
                      }
                      goto error;
                 }

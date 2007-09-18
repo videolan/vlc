@@ -30,7 +30,7 @@
 
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>                                              /* sprintf() */
-#include <string.h>                                            /* strerror() */
+#include <string.h>
 #include <ctype.h>                                  /* tolower(), isxdigit() */
 
 #include <vlc_sout.h>

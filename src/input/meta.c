@@ -458,7 +458,10 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
         stream_Delete( p_stream );
 
         if( err )
-            msg_Err( p_playlist, "%s: %s", psz_filename, strerror( err ) );
+        {
+            errno = err;
+            msg_Err( p_playlist, "%s: %m", psz_filename );
+        }
         else
             msg_Dbg( p_playlist, "album art saved to %s\n", psz_filename );
 
@@ -545,7 +548,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     if( f )
     {
         if( fwrite( p_attachment->p_data, p_attachment->i_data, 1, f ) != 1 )
-            msg_Err( p_input, "%s: %s", psz_filename, strerror( errno ) );
+            msg_Err( p_input, "%s: %m", psz_filename );
         else
             msg_Dbg( p_input, "album art saved to %s\n", psz_filename );
         fclose( f );

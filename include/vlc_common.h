@@ -64,7 +64,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include <string.h>                                         /* strerror() */
+#include <string.h>
 #include <stdio.h>
 
 #ifdef HAVE_SYS_TYPES_H

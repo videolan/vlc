@@ -81,7 +81,6 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
     int i_result;
     /* In case of error : */
     unsigned long int i_thread = 0;
-    const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
     i_result = ( pth_mutex_acquire( &p_mutex->mutex, FALSE, NULL ) == FALSE );
@@ -126,7 +125,7 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
     if ( i_result )
     {
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        psz_error = strerror(i_result);
+        errno = i_result;
     }
 
 #elif defined( HAVE_CTHREADS_H )
@@ -138,8 +137,8 @@ static inline int __vlc_mutex_lock( const char * psz_file, int i_line,
     if( i_result )
     {
         msg_Err( p_mutex->p_this,
-                 "thread %li: mutex_lock failed at %s:%d (%d:%s)",
-                 i_thread, psz_file, i_line, i_result, psz_error );
+                 "thread %li: mutex_lock failed at %s:%d (%d:%m)",
+                 i_thread, psz_file, i_line, i_result );
     }
     return i_result;
 }
@@ -160,7 +159,6 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
     int i_result;
     /* In case of error : */
     unsigned long int i_thread = 0;
-    const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
     i_result = ( pth_mutex_release( &p_mutex->mutex ) == FALSE );
@@ -203,7 +201,7 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
     if ( i_result )
     {
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        psz_error = strerror(i_result);
+        errno = i_result;
     }
 
 #elif defined( HAVE_CTHREADS_H )
@@ -215,8 +213,8 @@ static inline int __vlc_mutex_unlock( const char * psz_file, int i_line,
     if( i_result )
     {
         msg_Err( p_mutex->p_this,
-                 "thread %li: mutex_unlock failed at %s:%d (%d:%s)",
-                 i_thread, psz_file, i_line, i_result, psz_error );
+                 "thread %li: mutex_unlock failed at %s:%d (%d:%m)",
+                 i_thread, psz_file, i_line, i_result );
     }
 
     return i_result;
@@ -246,7 +244,6 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
     int i_result;
     /* In case of error : */
     unsigned long int i_thread = 0;
-    const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
     i_result = ( pth_cond_notify( &p_condvar->cond, FALSE ) == FALSE );
@@ -341,7 +338,7 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
     if ( i_result )
     {
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        psz_error = strerror(i_result);
+        errno = i_result;
     }
 
 #elif defined( HAVE_CTHREADS_H )
@@ -357,8 +354,8 @@ static inline int __vlc_cond_signal( const char * psz_file, int i_line,
     if( i_result )
     {
         msg_Err( p_condvar->p_this,
-                 "thread %li: cond_signal failed at %s:%d (%d:%s)",
-                 i_thread, psz_file, i_line, i_result, psz_error );
+                 "thread %li: cond_signal failed at %s:%d (%d:%m)",
+                 i_thread, psz_file, i_line, i_result );
     }
 
     return i_result;
@@ -376,7 +373,6 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     int i_result;
     /* In case of error : */
     unsigned long int i_thread = 0;
-    const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
     i_result = ( pth_cond_await( &p_condvar->cond, &p_mutex->mutex, NULL )
@@ -513,10 +509,11 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
 
     if( i_result == ETIMEDOUT )
     {
+        errno = ETIMEDOUT;
         msg_Dbg( p_condvar->p_this,
                   "thread %li: possible condition deadlock "
-                  "at %s:%d (%s)", CAST_PTHREAD_TO_INT(pthread_self()),
-                  psz_file, i_line, strerror(i_result) );
+                  "at %s:%d (%m)", CAST_PTHREAD_TO_INT(pthread_self()),
+                  psz_file, i_line );
 
         i_result = pthread_cond_wait( &p_condvar->cond, &p_mutex->mutex );
     }
@@ -528,7 +525,7 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     if ( i_result )
     {
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        psz_error = strerror(i_result);
+        errno = i_result;
     }
 
 #elif defined( HAVE_CTHREADS_H )
@@ -540,8 +537,8 @@ static inline int __vlc_cond_wait( const char * psz_file, int i_line,
     if( i_result )
     {
         msg_Err( p_condvar->p_this,
-                 "thread %li: cond_wait failed at %s:%d (%d:%s)",
-                 i_thread, psz_file, i_line, i_result, psz_error );
+                 "thread %li: cond_wait failed at %s:%d (%d:%m)",
+                 i_thread, psz_file, i_line, i_result );
     }
 
     return i_result;
@@ -563,7 +560,6 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 {
     int i_res;
     unsigned long int i_thread = 0;
-    const char * psz_error = "";
 
 #if defined( PTH_INIT_IN_PTH_H )
 #   error Unimplemented
@@ -588,7 +584,7 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     if ( i_res ) /* other errors = bug */
     {
         i_thread = CAST_PTHREAD_TO_INT(pthread_self());
-        psz_error = strerror(i_res);
+        errno = i_res;
     }
 
 #elif defined( HAVE_CTHREADS_H )
@@ -598,8 +594,8 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
     if( i_res )
     {
         msg_Err( p_condvar->p_this,
-                 "thread %li: cond_wait failed at %s:%d (%d:%s)",
-                 i_thread, psz_file, i_line, i_res, psz_error );
+                 "thread %li: cond_wait failed at %s:%d (%d:%m)",
+                 i_thread, psz_file, i_line, i_res );
     }
 
     return i_res;

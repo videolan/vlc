@@ -147,7 +147,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
                              proto ?: ptr->ai_protocol );
         if( fd == -1 )
         {
-            msg_Dbg( p_this, "socket error: %s", strerror( net_errno ) );
+            msg_Dbg( p_this, "socket error: %m" );
             continue;
         }
 
@@ -159,8 +159,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
             if( net_errno != EINPROGRESS )
             {
-                msg_Err( p_this, "connection failed: %s",
-                         strerror( net_errno ) );
+                msg_Err( p_this, "connection failed: %m" );
                 goto next_ai;
             }
 
@@ -199,8 +198,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
                 if( ( i_ret == -1 ) && ( net_errno != EINTR ) )
                 {
-                    msg_Err( p_this, "connection polling error: %s",
-                              strerror( net_errno ) );
+                    msg_Err( p_this, "connection polling error: %m" );
                     goto next_ai;
                 }
 
@@ -217,8 +215,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
             if( getsockopt( fd, SOL_SOCKET, SO_ERROR, (void*)&i_val,
                             &i_val_size ) == -1 || i_val != 0 )
             {
-                msg_Err( p_this, "connection failed: %s",
-                         net_strerror( i_val ) );
+                msg_Err( p_this, "connection failed: %m" );
                 goto next_ai;
             }
 #endif
@@ -288,8 +285,7 @@ int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
             case -1:
                 if (net_errno != EINTR)
                 {
-                    msg_Err (p_this, "poll error: %s",
-                             net_strerror (net_errno));
+                    msg_Err (p_this, "poll error: %m");
                 }
                 return -1;
 
@@ -308,8 +304,7 @@ int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
             int fd = accept (sfd, NULL, NULL);
             if (fd == -1)
             {
-                msg_Err (p_this, "accept failed (%s)",
-                         net_strerror (net_errno));
+                msg_Err (p_this, "accept failed (%m)");
                 continue;
             }
             net_SetupSocket (fd);

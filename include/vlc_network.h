@@ -63,7 +63,6 @@ extern const char *net_strerror( int val );
 #   endif
 #   include <netdb.h>
 #   define net_errno errno
-#   define net_strerror strerror
 #endif
 
 # ifdef __cplusplus

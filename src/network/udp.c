@@ -124,7 +124,7 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
                              protocol ?: ptr->ai_protocol);
         if (fd == -1)
         {
-            msg_Dbg (obj, "socket error: %s", net_strerror (net_errno));
+            msg_Dbg (obj, "socket error: %m");
             continue;
         }
 
@@ -157,7 +157,7 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
 #endif
         if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
         {
-            msg_Err (obj, "socket bind error (%s)", net_strerror (net_errno));
+            msg_Err (obj, "socket bind error (%m)");
             net_Close (fd);
             continue;
         }
@@ -204,7 +204,8 @@ static int net_SetMcastHopLimit( vlc_object_t *p_this,
 #endif
 
         default:
-            msg_Warn( p_this, "%s", strerror( EAFNOSUPPORT ) );
+            errno = EAFNOSUPPORT;
+            msg_Warn( p_this, "%m" );
             return VLC_EGENERIC;
     }
 
@@ -274,7 +275,7 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
         if (net_SetMcastOutIface (fd, family, scope) == 0)
             return 0;
 
-        msg_Err (p_this, "%s: %s", iface, net_strerror (net_errno));
+        msg_Err (p_this, "%s: %m", iface);
     }
 
     if (addr != NULL)
@@ -292,7 +293,7 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
             if (net_SetMcastOutIPv4 (fd, ipv4) == 0)
                 return 0;
 
-            msg_Err (p_this, "%s: %s", addr, net_strerror (net_errno));
+            msg_Err (p_this, "%s: %m", addr);
         }
     }
 
@@ -362,8 +363,7 @@ net_IPv4Join (vlc_object_t *obj, int fd,
 error:
 #endif
 
-    msg_Err (obj, "cannot join IPv4 multicast group (%s)",
-             net_strerror (net_errno));
+    msg_Err (obj, "cannot join IPv4 multicast group (%m)");
     return -1;
 }
 
@@ -385,8 +385,7 @@ net_IPv6Join (vlc_object_t *obj, int fd, const struct sockaddr_in6 *src)
     errno = ENOSYS;
 #endif
 
-    msg_Err (obj, "cannot join IPv6 any-source multicast group (%s)",
-             net_strerror (net_errno));
+    msg_Err (obj, "cannot join IPv6 any-source multicast group (%m)");
     return -1;
 }
 
@@ -549,8 +548,7 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
 #endif
     }
 
-    msg_Err (obj, "Multicast group join error (%s)",
-             net_strerror (net_errno));
+    msg_Err (obj, "Multicast group join error (%m)");
 
     if (src != NULL)
     {
@@ -687,8 +685,7 @@ int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
             b_unreach = VLC_TRUE;
         else
         {
-            msg_Warn( p_this, "%s port %d : %s", psz_host, i_port,
-                      strerror( errno ) );
+            msg_Warn( p_this, "%s port %d : %m", psz_host, i_port);
             net_Close( fd );
             continue;
         }
@@ -803,8 +800,8 @@ int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
                                      ptr->ai_addr, ptr->ai_addrlen)
               : connect (fd, ptr2->ai_addr, ptr2->ai_addrlen))
             {
-                msg_Err (obj, "cannot connect to %s port %d: %s",
-                         psz_server, i_server, net_strerror (net_errno));
+                msg_Err (obj, "cannot connect to %s port %d: %m",
+                         psz_server, i_server);
                 continue;
             }
             val = fd;
