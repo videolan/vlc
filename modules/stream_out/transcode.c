@@ -919,6 +919,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_id_t *id;
 
     id = malloc( sizeof( sout_stream_id_t ) );
+    if( !id )
+    {
+        msg_Err( p_stream, "out of memory" );
+        goto error;
+    }
     memset( id, 0, sizeof(sout_stream_id_t) );
 
     id->id = NULL;
@@ -1635,6 +1640,7 @@ static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
     }
 
     p_buffer = malloc( sizeof(aout_buffer_t) );
+    if( !p_buffer ) return NULL;
     p_buffer->b_discontinuity = VLC_FALSE;
     p_buffer->pf_release = audio_release_buffer;
     p_buffer->p_sys = p_block = block_New( p_dec, i_size );
@@ -2602,6 +2608,7 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring,
     }
 
     p_pic = malloc( sizeof(picture_t) );
+    if( !p_pic ) return NULL;
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     vout_AllocatePicture( VLC_OBJECT(p_dec), p_pic,
                           p_dec->fmt_out.video.i_chroma,
@@ -2612,11 +2619,17 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring,
     if( !p_pic->i_planes )
     {
         free( p_pic );
-        return 0;
+        return NULL;
     }
 
     p_pic->pf_release = video_release_buffer;
     p_pic->p_sys = malloc( sizeof(picture_sys_t) );
+    if( !p_pic->p_sys )
+    {
+        free( p_pic );
+        return NULL;
+    }
+
     p_pic->p_sys->p_owner = p_this;
     p_pic->i_status = RESERVED_PICTURE;
 
