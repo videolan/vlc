@@ -278,10 +278,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 
             default:
                 msg_Err (p_access, "read failed (%m)");
-                /* FIXME: DO NOT USE strerror!!!! */
                 intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"),
-                                _("VLC could not read file \"%s\"."),
-                                strerror (errno));
+                                _("VLC could not read file."));
         }
 
         /* Delay a bit to avoid consuming all the CPU. This is particularly
@@ -448,8 +446,7 @@ static int open_file (access_t *p_access, const char *psz_name)
     {
         msg_Err (p_access, "cannot open file %s (%m)", psz_name);
         intf_UserFatal (p_access, VLC_FALSE, _("File reading failed"),
-                        _("VLC could not open file \"%s\" (%s)."),
-                        psz_name, strerror (errno));
+                        _("VLC could not open file \"%s\"."), psz_name);
         return -1;
     }
 
