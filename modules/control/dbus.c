@@ -732,7 +732,7 @@ static void Close   ( vlc_object_t *p_this )
 
 static void Run          ( intf_thread_t *p_intf )
 {
-    while( !p_intf->b_die )
+    while( !intf_ShouldDie( p_intf ) )
     {
         msleep( INTF_IDLE_SLEEP );
         dbus_connection_read_write_dispatch( p_intf->p_sys->p_conn, 0 );
