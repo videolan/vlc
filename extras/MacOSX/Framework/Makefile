@@ -72,6 +72,8 @@ VLC.framework/lib/libvlc.dylib: $(top_builddir)/src/.libs/libvlc.dylib VLC.frame
 	cp -f $(top_builddir)/src/.libs/libvlc.1.dylib VLC.framework/lib/libvlc.dylib && \
 	install_name_tool -id `pwd`/VLC.framework/lib/libvlc.1.dylib \
 	                   VLC.framework/lib/libvlc.dylib
+	install_name_tool -change @executable_path/lib/vlc_libintl.dylib \
+	                          `pwd`/VLC.framework/lib/vlc_libintl.dylib  $@
 
 VLC.framework/lib/libvlc-control.dylib: $(top_builddir)/src/.libs/libvlc-control.dylib VLC.framework/lib
 	mkdir -p VLC.framework/Version/Current/lib && \
