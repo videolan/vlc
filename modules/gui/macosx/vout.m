@@ -32,7 +32,7 @@
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
-#include <string.h>                                            /* strerror() */
+#include <string.h>
 
 /* BeginFullScreen, EndFullScreen */
 #include <QuickTime/QuickTime.h>

@@ -31,7 +31,7 @@
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
-#include <string.h>                                            /* strerror() */
+#include <string.h>
 
 #include <QuickTime/QuickTime.h>
 
