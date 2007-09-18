@@ -2809,7 +2809,6 @@ static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
 static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    es_format_t fmt;
 
     id->p_decoder->fmt_in.i_cat = SPU_ES;
     id->p_encoder->fmt_out.psz_language = strdup( "osd" );
@@ -2817,7 +2816,7 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( p_sys->i_osdcodec != 0 || p_sys->psz_osdenc )
     {
         msg_Dbg( p_stream, "creating osdmenu transcoding from fcc=`%4.4s' "
-                 "to fcc=`%4.4s'", (char*)&fmt.i_codec,
+                 "to fcc=`%4.4s'", (char*)&id->p_encoder->fmt_out.i_codec,
                  (char*)&p_sys->i_osdcodec );
 
         /* Complete destination format */
@@ -2848,8 +2847,8 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     else
     {
         msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
-                 (char*)&fmt.i_codec );
-        id->id = p_sys->p_out->pf_add( p_sys->p_out, &fmt );
+                 (char*)&id->p_decoder->fmt_out.i_codec );
+        id->id = p_sys->p_out->pf_add( p_sys->p_out, &id->p_decoder->fmt_out );
         id->b_transcode = VLC_FALSE;
 
         if( !id->id ) goto error;
