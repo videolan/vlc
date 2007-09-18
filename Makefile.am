@@ -304,7 +304,7 @@ vlc-bundle: vlc
 	    cp $$i $(top_builddir)/vlc-bundle/lib/ ; \
 	  done ; \
 	fi
-	for i in $(ALL_LINGUAS); do \
+	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  mkdir -p "$(top_builddir)/vlc-bundle/locale/$$i/LC_MESSAGES" ; \
 	  cp "$(top_builddir)/po/$$i.gmo" \
 	    "$(top_builddir)/vlc-bundle/locale/$$i/LC_MESSAGES/vlc.mo" || true ; \
@@ -469,7 +469,7 @@ VLC-release.app: vlc
 	done ; \
 	$(INSTALL) -m 644 $(srcdir)/share/http/requests/readme $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests/readme.txt
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/locale
-	for i in $(ALL_LINGUAS); do \
+	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  mkdir -p $(top_builddir)/VLC-release.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
 	  cp $(srcdir)/po/$${i}.gmo $(top_builddir)/VLC-release.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	  mkdir -p $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
@@ -585,7 +585,7 @@ VLC.app: vlc
 	fi
 	ln -sfn `pwd`/$(srcdir)/share $(top_builddir)/VLC.app/Contents/MacOS/
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/locale
-	for i in $(ALL_LINGUAS); do \
+	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES ; \
 	  ln -sfn `pwd`/po/$${i}.gmo $(top_builddir)/VLC.app/Contents/MacOS/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	  mkdir -p $(top_builddir)/VLC.app/Contents/Resources/$${i}.lproj ; \
@@ -634,7 +634,7 @@ package-win-common:
 	  unix2dos "$(top_builddir)/vlc-${VERSION}/$${file}.txt" ; done
 
 	mkdir $(top_builddir)/vlc-${VERSION}/locale
-	for i in $(ALL_LINGUAS); do \
+	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  mkdir -p "$(top_builddir)/vlc-${VERSION}/locale/$${i}/LC_MESSAGES" ; \
 	  cp "$(srcdir)/po/$${i}.gmo" \
 	    "$(top_builddir)/vlc-${VERSION}/locale/$${i}/LC_MESSAGES/vlc.mo" \
@@ -979,7 +979,7 @@ package-translations:
 	  echo "OK."; mkdir -p "$(srcdir)/vlc-translations-${VERSION}"; \
 	fi
 # Copy translations
-	for i in $(ALL_LINGUAS); do \
+	cat $(top_srcdir)/po/LINGUAS | while read i; do \
 	  cp "$(srcdir)/po/$${i}.po" \
 	    "$(srcdir)/vlc-translations-${VERSION}/$${i}.po" \
 	    || true ; \
