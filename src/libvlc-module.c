@@ -39,18 +39,76 @@
 
 #if defined (WIN32) || defined (__APPLE__)
 static const char *ppsz_language[] =
-{ "auto", "en", "ar", "pt_BR", "en_GB", "ca", "zh_TW", "cs", "da", "nl", "fr",
-  "gl", "ka", "de", "he", "hu", "it", "ja", "ko", "ms", "oc", "fa", "pl", "ro",
-  "ru", "zh_CN", "sk", "sl", "es", "sv", "tr" };
+{
+    "auto",
+    "en",
+    "ar",
+    "pt_BR",
+    "en_GB",
+    "ca",
+    "zh_TW",
+    "cs",
+    "da",
+    "nl",
+    "fi",
+    "fr",
+    "gl",
+    "ka",
+    "de",
+    "he",
+    "hu",
+    "it",
+    "ja",
+    "ko",
+    "ms",
+    "oc",
+    "fa",
+    "pl",
+    "ro",
+    "ru",
+    "zh_CN",
+    "sk",
+    "sl",
+    "es",
+    "sv",
+    "tr"
+};
 
 static const char *ppsz_language_text[] =
-{ N_("Auto"), N_("American English"), N_("Arabic"), N_("Brazilian Portuguese"),
-  N_("British English"), N_("Catalan"), N_("Chinese Traditional"), N_("Czech"),
-  N_("Danish"), N_("Dutch"), N_("French"), N_("Galician"), N_("Georgian"),
-  N_("German"), N_("Hebrew"), N_("Hungarian"), N_("Italian"), N_("Japanese"),
-  N_("Korean"), N_("Malay"), N_("Occitan"), N_("Persian"), N_("Polish"),
-  N_("Romanian"), N_("Russian"), N_("Simplified Chinese"), N_("Slovak"),
-  N_("Slovenian"), N_("Spanish"), N_("Swedish"), N_("Turkish") };
+{
+    N_("Auto"),
+    N_("American English"),
+    N_("Arabic"),
+    N_("Brazilian Portuguese"),
+    N_("British English"),
+    N_("Catalan"),
+    N_("Chinese Traditional"),
+    N_("Czech"),
+    N_("Danish"),
+    N_("Dutch"),
+    N_("Finnish"),
+    N_("French"),
+    N_("Galician"),
+    N_("Georgian"),
+    N_("German"),
+    N_("Hebrew"),
+    N_("Hungarian"),
+    N_("Italian"),
+    N_("Japanese"),
+    N_("Korean"),
+    N_("Malay"),
+    N_("Occitan"),
+    N_("Persian"),
+    N_("Polish"),
+    N_("Romanian"),
+    N_("Russian"),
+    N_("Simplified Chinese"),
+    N_("Slovak"),
+    N_("Slovenian"),
+    N_("Spanish"),
+    N_("Swedish"),
+    N_("Turkish")
+};
 #endif
 
 static const char *ppsz_snap_formats[] =
