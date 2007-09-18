@@ -1164,7 +1164,7 @@ msgstr "Hiirieleet"
 #: src/libvlc-common.c:282 src/libvlc-common.c:453 src/modules/modules.c:1796
 #: src/modules/modules.c:2127
 msgid "C"
-msgstr "C"
+msgstr "fi"
 
 #: src/libvlc-common.c:298
 msgid "Help options"
