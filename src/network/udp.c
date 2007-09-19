@@ -53,6 +53,13 @@
 #   endif
 #endif
 
+#ifdef HAVE_LINUX_DCCP_H
+# include <linux/dccp.h>
+# ifndef SOCK_DCCP /* provisional API */
+#  define SOCK_DCCP 6
+# endif
+#endif
+
 #ifndef SOL_IP
 # define SOL_IP IPPROTO_IP
 #endif
@@ -73,13 +80,6 @@
 #endif
 #ifndef IPPROTO_UDPLITE
 # define IPPROTO_UDPLITE 136 /* IANA */
-#endif
-
-#ifdef HAVE_LINUX_DCCP_H
-# include <linux/dccp.h>
-# ifndef SOCK_DCCP /* provisional API */
-#  define SOCK_DCCP 6
-# endif
 #endif
 
 #if defined (HAVE_NETINET_UDPLITE_H)
@@ -379,7 +379,7 @@ net_IPv6Join (vlc_object_t *obj, int fd, const struct sockaddr_in6 *src)
 
     msg_Dbg (obj, "IPV6_JOIN_GROUP multicast request");
 
-    if (!setsockopt (fd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &gr6, sizeof (gr6)))
+    if (!setsockopt (fd, SOL_IPV6, IPV6_JOIN_GROUP, &gr6, sizeof (gr6)))
         return 0;
 #else
     errno = ENOSYS;
