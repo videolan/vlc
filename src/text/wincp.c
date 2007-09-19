@@ -55,7 +55,7 @@ static const char *FindFallbackEncoding (const char *locale)
 {
     if ((locale == NULL) || (strlen (locale) < 2)
      || !strcasecmp (locale, "POSIX"))
-        return "ASCII";
+        return "CP1252"; /* Yeah, this is totally western-biased */
 
 
     /*** The ISO-8859 series (anything but Asia) ***/
@@ -193,20 +193,12 @@ const char *GetFallbackEncoding( void )
 #ifndef WIN32
     const char *psz_lang;
 
-    /* Some systems (like Darwin, SunOS 4 or DJGPP) have only the C locale.
-     * Therefore we don't use setlocale here; it would return "C". */
-#  if defined (HAVE_SETLOCALE) && !defined ( __APPLE__)
-    psz_lang = setlocale (LC_ALL, NULL);
-    if (psz_lang == NULL)
-#  endif
+    psz_lang = getenv ("LC_ALL");
+    if ((psz_lang == NULL) || !*psz_lang)
     {
-        psz_lang = getenv ("LC_ALL");
+        psz_lang = getenv ("LC_CTYPE");
         if ((psz_lang == NULL) || !*psz_lang)
-        {
-            psz_lang = getenv ("LC_CTYPE");
-            if ((psz_lang == NULL))
-                psz_lang = getenv ("LANG");
-        }
+            psz_lang = getenv ("LANG");
     }
 
     return FindFallbackEncoding (psz_lang);
