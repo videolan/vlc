@@ -261,8 +261,11 @@ next_ai: /* failure */
  *****************************************************************************
  * Accept a connection on a set of listening sockets and return it
  *****************************************************************************/
-int __net_Accept( vlc_object_t *p_this, int pi_fd[], mtime_t i_wait )
+int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
 {
+    if( pi_fd == NULL )
+        return -1;
+
     vlc_bool_t b_block = (i_wait < 0);
 
     while( !p_this->b_die )
