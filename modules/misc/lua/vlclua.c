@@ -86,6 +86,7 @@ int vlclua_stream_new( lua_State *p_state )
     psz_url = lua_tostring( p_state, 1 );
     lua_pop( p_state, i );
     p_stream = stream_UrlNew( p_this, psz_url );
+    if( !p_stream ) return 0;
     lua_pushlightuserdata( p_state, p_stream );
     return 1;
 }
