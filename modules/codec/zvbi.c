@@ -84,6 +84,10 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
   "also use combinations of these values, eg. 6 = top-right).")
 
+#define TELX_TEXT N_("Teletext text subtitles")
+#define TELX_LONGTEXT N_( "Output teletext subtitles as text " \
+  "instead of as RGBA" )
+
 static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -103,6 +107,8 @@ vlc_module_begin();
                  OPAQUE_TEXT, OPAQUE_LONGTEXT, VLC_FALSE );
     add_integer( "vbi-position", 4, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
+    add_bool( "vbi-text", VLC_TRUE, NULL,
+              TELX_TEXT, TELX_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
 /****************************************************************************
@@ -117,6 +123,9 @@ struct decoder_sys_t
     unsigned int            i_last_page;
     vlc_bool_t              b_update;
     vlc_bool_t              b_opaque;
+
+    /* Subtitles as text */
+    vlc_bool_t              b_text;
 
     /* Positioning of Teletext images */
     int                     i_align;
@@ -181,6 +190,9 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_align = var_CreateGetInteger( p_dec, "vbi-position" );
     var_AddCallback( p_dec, "vbi-position", Position, p_sys );
+
+    p_sys->b_text = var_CreateGetBool( p_dec, "vbi-text" );
+//    var_AddCallback( p_dec, "vbi-text", Text, p_sys );
 
     return VLC_SUCCESS;
 }
@@ -270,12 +282,12 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('R','G','B','A');
-    fmt.i_aspect = VOUT_ASPECT_FACTOR;
+    fmt.i_chroma = p_sys->b_text ? VLC_FOURCC('T','E','X','T') : VLC_FOURCC('R','G','B','A');
+    fmt.i_aspect = p_sys->b_text ? 0 : VOUT_ASPECT_FACTOR;
     fmt.i_sar_num = fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = p_page.columns * 12;
     fmt.i_height = fmt.i_visible_height = p_page.rows * 10;
-    fmt.i_bits_per_pixel = 32;
+    fmt.i_bits_per_pixel =  p_sys->b_text ? 0 : 32;
     fmt.i_x_offset = fmt.i_y_offset = 0;
 
     p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
@@ -290,7 +302,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->p_region->i_align = SUBPICTURE_ALIGN_TOP;
 
     /* Normal text subs, easy markup */
-    p_spu->i_flags = SUBPICTURE_ALIGN_TOP;
+    p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM;
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = (mtime_t) 0;
@@ -300,20 +312,40 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->i_original_picture_width = p_page.columns * 12;
     p_spu->i_original_picture_height = p_page.rows * 10;
 
-    vbi_draw_vt_page( &p_page, VBI_PIXFMT_RGBA32_LE,
-                      p_spu->p_region->picture.p->p_pixels, 1, 1 );
-    p_spu->p_region->picture.p->i_lines = p_page.rows * 10;
-    p_spu->p_region->picture.p->i_pitch = p_page.columns * 12 * 4;
+    if( p_sys->b_text )
+    {
+        unsigned int i_total, i_textsize = 7000;
+        char p_text[7000];
+
+        i_total = vbi_print_page_region( &p_page, p_text, i_textsize,
+                        "ASCII", 0, 0, 0, 0, p_page.columns,
+                        p_page.rows );
+        p_text[i_total] = '\0';
+        /* Strip off the pagenumber */
+        if( i_total <= 8 ) goto error;
+        p_spu->p_region->psz_text = strdup( &p_text[8] );
+
+        msg_Dbg( p_dec, "page %x-%x(%d)\n%s", p_page.pgno, p_page.subno, i_total, p_text );
+    }
+    else 
+    {
+        vbi_draw_vt_page( &p_page, VBI_PIXFMT_RGBA32_LE,
+                          p_spu->p_region->picture.p->p_pixels, 1, 1 );
+        p_spu->p_region->picture.p->i_lines = p_page.rows * 10;
+        p_spu->p_region->picture.p->i_pitch = p_page.columns * 12 * 4;
+    }
 
     /* Kludge since zvbi doesn't provide an option to specify opacity. */
-    p_begin = (uint32_t *)p_spu->p_region->picture.p->p_pixels;
-    p_end   = (uint32_t *)p_spu->p_region->picture.p->p_pixels+(fmt.i_width * fmt.i_height);
-
-    for( ; p_begin < p_end; p_begin++ )
+    if( p_sys->b_opaque && !p_sys->b_text )
     {
-        opacity = p_page.text[ y / 10 * p_page.columns + x / 12 ].opacity;
-        switch( opacity )
+        p_begin = (uint32_t *)p_spu->p_region->picture.p->p_pixels;
+        p_end   = (uint32_t *)p_spu->p_region->picture.p->p_pixels+(fmt.i_width * fmt.i_height);
+
+        for( ; p_begin < p_end; p_begin++ )
         {
+            opacity = p_page.text[ y / 10 * p_page.columns + x / 12 ].opacity;
+            switch( opacity )
+            {
             /* Show video instead of this character */
             case VBI_TRANSPARENT_SPACE:
                 *p_begin = 0;
@@ -333,27 +365,16 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
                 break;
             default:
                 break;
-        }
-        x++;
-        if( x >= fmt.i_width )
-        {
-            x = 0;
-            y++;
+            }
+            x++;
+            if( x >= fmt.i_width )
+            {
+                x = 0;
+                y++;
+            }
         }
     }
     /* end of kludge */
-
-#if 0
-    unsigned int i_total, i_textsize = 7000;
-    char p_text[7000];
-
-    i_total =  vbi_print_page_region( &p_page, p_text, i_textsize,
-                        "ISO-8859-1", 0, 0, 0, 0, p_page.columns,
-                        p_page.rows );
-    p_text[i_total] = '\0';
-
-    msg_Dbg( p_dec, "page %x-%x\n%s", p_page.pgno, p_page.subno, p_text );
-#endif
 
     vbi_unref_page( &p_page );
     block_Release( p_block );
