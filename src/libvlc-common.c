@@ -272,10 +272,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc, char *ppsz_argv[] )
     /*
      * Support for gettext
      */
-#ifdef HAVE_LC_MESSAGES
-    setlocale( LC_MESSAGES, "" );
-#endif
-    setlocale( LC_CTYPE, "" );
     LoadMessages ();
 
     /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
