@@ -1421,7 +1421,7 @@ static inline void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
 int rtp_add_sink( sout_stream_id_t *id, int fd )
 {
     rtp_sink_t sink = { fd, NULL };
-    sink.rtcp = OpenRTCP( VLC_OBJECT( id->p_stream ), fd, IPPROTO_UDP );
+    sink.rtcp = OpenRTCP( VLC_OBJECT( id->p_stream ), fd, IPPROTO_UDP, 0 );
     if( sink.rtcp == NULL )
         msg_Err( id, "RTCP failed!" );
 

@@ -59,22 +59,45 @@ struct rtcp_sender_t
 };
 
 
-rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto)
+rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto,
+                         vlc_bool_t mux)
 {
     rtcp_sender_t *rtcp;
     uint8_t *ptr;
-    char src[NI_MAXNUMERICHOST], dst[NI_MAXNUMERICHOST];
-    int sport, dport;
     int fd;
+    char src[NI_MAXNUMERICHOST];
+    int sport;
 
-    if (net_GetSockAddress (rtp_fd, src, &sport)
-     || net_GetPeerAddress (rtp_fd, dst, &dport))
+    if (net_GetSockAddress (rtp_fd, src, &sport))
         return NULL;
 
-    sport++;
-    dport++;
+    if (mux)
+    {
+        /* RTP/RTCP mux: duplicate the socket */
+#ifndef WIN32
+        fd = dup (rtp_fd);
+#else
+        WSAPROTOCOL_INFO info;
+        WSADuplicateSocket (rtp_fd, GetProcessId (), &info);
+        fd = WSASocket (info.iAddressFamily, info.iSockets, info.iProtocol,
+                        &info, 0, 0);
+#endif
+    }
+    else
+    {
+        /* RTCP on a separate port */
+        char dst[NI_MAXNUMERICHOST];
+        int dport;
 
-    fd = net_OpenDgram (obj, src, sport, dst, dport, AF_UNSPEC, proto);
+        if (net_GetPeerAddress (rtp_fd, dst, &dport))
+            return NULL;
+
+        sport++;
+        dport++;
+
+        fd = net_OpenDgram (obj, src, sport, dst, dport, AF_UNSPEC, proto);
+    }
+
     if (fd == -1)
         return NULL;
 
