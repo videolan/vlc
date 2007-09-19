@@ -131,7 +131,10 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
             break;
         case 33: /* DCCP */
 #ifdef __linux__
-            socktype = 6;
+# ifndef SOCK_DCCP
+#  define SOCK_DCCP 6
+# endif
+            socktype = SOCK_DCCP;
 #endif
             break;
     }
@@ -215,7 +218,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
         }
 
         /* Listen */
-        switch (ptr->ai_socktype)
+        switch (socktype)
         {
             case SOCK_STREAM:
             case SOCK_RDM:
