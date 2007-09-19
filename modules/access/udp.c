@@ -678,6 +678,7 @@ static block_t *BlockPrebufferRTP( access_t *p_access, block_t *p_block )
 
 static block_t *BlockStartRTP( access_t *p_access )
 {
+    p_access->pf_block = BlockRTP;
     return BlockPrebufferRTP( p_access, BlockUDP( p_access ) );
 }
 
