@@ -44,6 +44,15 @@
 #   include <fcntl.h>
 #   include <sys/stat.h>
 #endif
+#ifdef HAVE_LINUX_DCCP_H
+#   include <linux/dccp.h>
+#endif
+#ifndef IPPROTO_DCCP
+# define IPPROTO_DCCP 33
+#endif
+#ifndef IPPROTO_UDPLITE
+# define IPPROTO_UDPLITE 136
+#endif
 
 #include <errno.h>
 
@@ -283,6 +292,7 @@ struct sout_stream_id_t
     int               sinkc;
     rtp_sink_t       *sinkv;
     rtsp_stream_id_t *rtsp_id;
+    int              *listen_fd;
 
     block_fifo_t     *p_fifo;
     int64_t           i_caching;
@@ -347,22 +357,20 @@ static int Open( vlc_object_t *p_this )
     /* Transport protocol */
     p_sys->proto = IPPROTO_UDP;
 
-#if 0
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX "dccp" ) )
     {
-        p_sys->sotype = SOCK_DCCP;
-        p_sys->proto = 33 /*IPPROTO_DCCP*/;
+        p_sys->proto = IPPROTO_DCCP;
     }
+#if 0
     else
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX "tcp" ) )
     {
-        p_sys->sotype = SOCK_STREAM;
         p_sys->proto = IPPROTO_TCP;
     }
     else
 #endif
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX "udplite" ) )
-        p_sys->proto = 136 /*IPPROTO_UDPLITE*/;
+        p_sys->proto = IPPROTO_UDPLITE;
 
     if( ( p_sys->psz_destination == NULL ) && !b_rtsp )
     {
@@ -656,8 +664,12 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
 
         /* Oh boy, this is really ugly! (+ race condition on lock_es) */
         dstlen = sizeof( dst );
-        getpeername( p_sys->es[0]->sinkv[0].rtp_fd, (struct sockaddr *)&dst,
-                     &dstlen );
+        if( p_sys->es[0]->listen_fd != NULL )
+            getsockname( p_sys->es[0]->listen_fd[0],
+                         (struct sockaddr *)&dst, &dstlen );
+        else
+            getpeername( p_sys->es[0]->sinkv[0].rtp_fd,
+                         (struct sockaddr *)&dst, &dstlen );
     }
     else
     {
@@ -687,23 +699,47 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
     {
         sout_stream_id_t *id = p_sys->es[i];
         const char *mime_major; /* major MIME type */
+        const char *proto = "RTP/AVP"; /* protocol */
+        const char *scode; /* DCCP service code */
 
         switch( id->i_cat )
         {
             case VIDEO_ES:
                 mime_major = "video";
+                scode = "SC:RTPV";
                 break;
             case AUDIO_ES:
                 mime_major = "audio";
+                scode = "SC:RTPA";
                 break;
             case SPU_ES:
                 mime_major = "text";
+                scode = "SC:RTPT";
                 break;
             default:
-                continue;
+                mime_major = "application";
+                scode = "SC:RTPO";
+                break;
         }
 
-        sdp_AddMedia( &psz_sdp, mime_major, "RTP/AVP", inclport * id->i_port,
+        if( rtsp_url == NULL )
+        {
+            switch( p_sys->proto )
+            {
+                case IPPROTO_UDP:
+                    break;
+                case IPPROTO_TCP:
+                    proto = "TCP/RTP/AVP";
+                    break;
+                case IPPROTO_DCCP:
+                    proto = "DCCP/RTP/AVP";
+                    break;
+                case IPPROTO_UDPLITE:
+                    continue;
+            }
+        }
+
+        sdp_AddMedia( &psz_sdp, mime_major, proto, inclport * id->i_port,
                       id->i_payload_type, VLC_FALSE, id->i_bitrate,
                       id->psz_rtpmap, id->psz_fmtp);
 
@@ -714,6 +750,13 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
             sdp_AddAttribute ( &psz_sdp, "control",
                                addslash ? "%s/trackID=%u" : "%strackID=%u",
                                rtsp_url, i );
+        }
+        else
+        {
+            if( id->listen_fd != NULL )
+                sdp_AddAttribute( &psz_sdp, "setup", "passive" );
+            if( p_sys->proto == IPPROTO_DCCP )
+                sdp_AddAttribute( &psz_sdp, "dccp-service-code", scode );
         }
     }
 
@@ -763,6 +806,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id = vlc_object_create( p_stream, sizeof( sout_stream_id_t ) );
     if( id == NULL )
         return NULL;
+    vlc_object_attach( id, p_stream );
 
     /* Choose the port */
     i_port = 0;
@@ -829,35 +873,40 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->sinkc = 0;
     id->sinkv = NULL;
     id->rtsp_id = NULL;
+    id->p_fifo = NULL;
+    id->listen_fd = NULL;
 
     id->i_caching =
         (int64_t)1000 * var_GetInteger( p_stream, SOUT_CFG_PREFIX "caching");
-    id->p_fifo = block_FifoNew( p_stream );
-
-    if( vlc_thread_create( id, "RTP send thread", ThreadSend,
-                           VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
-    {
-        vlc_mutex_destroy( &id->lock_sink );
-        vlc_object_destroy( id );
-        return NULL;
-    }
 
     if( p_sys->psz_destination != NULL )
-    {
-        int ttl = (p_sys->i_ttl > 0) ? p_sys->i_ttl : -1;
-        int fd = net_ConnectDgram( p_stream, p_sys->psz_destination,
-                                   i_port, ttl, p_sys->proto );
-
-        if( fd == -1 )
+        switch( p_sys->proto )
         {
-            msg_Err( p_stream, "cannot create RTP socket" );
-            vlc_thread_join( id );
-            vlc_mutex_destroy( &id->lock_sink );
-            vlc_object_destroy( id );
-            return NULL;
+            case IPPROTO_TCP:
+            case IPPROTO_DCCP:
+                id->listen_fd = net_Listen( VLC_OBJECT(p_stream),
+                                            p_sys->psz_destination, i_port,
+                                            p_sys->proto );
+                if( id->listen_fd == NULL )
+                {
+                    msg_Err( p_stream, "passive COMEDIA RTP socket failed" );
+                    goto error;
+                }
+                break;
+
+            default:
+            {
+                int ttl = (p_sys->i_ttl > 0) ? p_sys->i_ttl : -1;
+                int fd = net_ConnectDgram( p_stream, p_sys->psz_destination,
+                                           i_port, ttl, p_sys->proto );
+                if( fd == -1 )
+                {
+                    msg_Err( p_stream, "cannot create RTP socket" );
+                    goto error;
+                }
+                rtp_add_sink( id, fd );
+            }
         }
-        rtp_add_sink( id, fd );
-    }
 
     if( p_fmt == NULL )
     {
@@ -1069,12 +1118,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         default:
             msg_Err( p_stream, "cannot add this stream (unsupported "
                      "codec:%4.4s)", (char*)&p_fmt->i_codec );
-            if( id->sinkc > 0 )
-                rtp_del_sink( id, id->sinkv[0].rtp_fd );
-            vlc_thread_join( id );
-            vlc_mutex_destroy( &id->lock_sink );
-            vlc_object_destroy( id );
-            return NULL;
+            goto error;
     }
 
     if( cscov != -1 )
@@ -1089,6 +1133,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->rtsp_id = RtspAddId( p_sys->rtsp, id, p_sys->i_es,
                                  p_sys->psz_destination,
                                  p_sys->i_ttl, id->i_port, id->i_port + 1 );
+
+    id->p_fifo = block_FifoNew( p_stream );
+    if( vlc_thread_create( id, "RTP send thread", ThreadSend,
+                           VLC_THREAD_PRIORITY_HIGHEST, VLC_FALSE ) )
+        goto error;
 
     /* Update p_sys context */
     vlc_mutex_lock( &p_sys->lock_es );
@@ -1110,16 +1159,24 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( p_sys->b_export_sap ) SapSetup( p_stream );
     if( p_sys->b_export_sdp_file ) FileSetup( p_stream );
 
-    vlc_object_attach( id, p_stream );
     return id;
+
+error:
+    Del( p_stream, id );
+    return NULL;
 }
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    vlc_object_kill( id );
-    block_FifoWake( id->p_fifo );
+    if( id->p_fifo != NULL )
+    {
+        vlc_object_kill( id );
+        block_FifoWake( id->p_fifo );
+        vlc_thread_join( id );
+        block_FifoRelease( id->p_fifo );
+    }
 
     vlc_mutex_lock( &p_sys->lock_es );
     TAB_REMOVE( p_sys->i_es, p_sys->es, id );
@@ -1141,10 +1198,10 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         RtspDelId( p_sys->rtsp, id->rtsp_id );
     if( id->sinkc > 0 )
         rtp_del_sink( id, id->sinkv[0].rtp_fd ); /* sink for explicit dst= */
+    if( id->listen_fd != NULL )
+        net_ListenClose( id->listen_fd );
 
-    vlc_thread_join( id );
     vlc_mutex_destroy( &id->lock_sink );
-    block_FifoRelease( id->p_fifo );
 
     /* Update SDP (sap/file) */
     if( p_sys->b_export_sap && !p_sys->p_mux ) SapSetup( p_stream );
@@ -1311,6 +1368,11 @@ static void ThreadSend( vlc_object_t *p_this )
         mwait( i_date );
 
         vlc_mutex_lock( &id->lock_sink );
+#if 0
+        unsigned deadc = 0; /* How many dead sockets? */
+        int deadv[id->sinkc]; /* Dead sockets list */
+#endif
+
         for( int i = 0; i < id->sinkc; i++ )
         {
             SendRTCP( id->sinkv[i].rtcp, out );
@@ -1324,7 +1386,8 @@ static void ThreadSend( vlc_object_t *p_this )
             /* splice failed */
             splice( fd[2], NULL, fd[4], NULL, len, 0 );
 #endif
-            send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 );
+            if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) < 0 )
+                /*deadv[deadc++] = id->sinkv[i].rtp_fd*/;
         }
         vlc_mutex_unlock( &id->lock_sink );
 
@@ -1332,6 +1395,24 @@ static void ThreadSend( vlc_object_t *p_this )
 #ifdef HAVE_TEE
         splice( fd[0], NULL, fd[4], NULL, len, 0 );
 #endif
+
+#if 0
+        for( unsigned i = 0; i < deadc; i++ )
+        {
+            msg_Dbg( id, "removing socket %d", deadv[i] );
+            rtp_del_sink( id, deadv[i] );
+        }
+#endif
+
+        /* Hopefully we won't overflow the SO_MAXCONN accept queue */
+        while( id->listen_fd != NULL )
+        {
+            int fd = net_Accept( id, id->listen_fd, 0 );
+            if( fd == -1 )
+                break;
+            msg_Dbg( id, "adding socket %d", fd );
+            rtp_add_sink( id, fd );
+        }
     }
 
 #ifdef HAVE_TEE
