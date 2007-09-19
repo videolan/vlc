@@ -263,10 +263,9 @@ next_ai: /* failure */
  *****************************************************************************/
 int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
 {
-    if( pi_fd == NULL )
-        return -1;
-
     vlc_bool_t b_block = (i_wait < 0);
+
+    assert( pi_fd != NULL );
 
     while( !p_this->b_die )
     {
