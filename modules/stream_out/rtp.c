@@ -212,8 +212,6 @@ static int HttpSetup( sout_stream_t *p_stream, vlc_url_t * );
 struct sout_stream_sys_t
 {
     /* SDP */
-    int64_t i_sdp_id;
-    int     i_sdp_version;
     char    *psz_sdp;
     vlc_mutex_t  lock_sdp;
 
@@ -395,10 +393,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_es = 0;
     p_sys->es   = NULL;
     p_sys->rtsp = NULL;
-    p_sys->psz_sdp = NULL;
-
-    p_sys->i_sdp_id = mdate();
-    p_sys->i_sdp_version = 1;
     p_sys->psz_sdp = NULL;
 
     p_sys->b_export_sap = VLC_FALSE;
@@ -1150,8 +1144,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     free( p_sys->psz_sdp );
     p_sys->psz_sdp = psz_sdp;
     vlc_mutex_unlock( &p_sys->lock_sdp );
-
-    p_sys->i_sdp_version++;
 
     msg_Dbg( p_stream, "sdp=\n%s", p_sys->psz_sdp );
 
