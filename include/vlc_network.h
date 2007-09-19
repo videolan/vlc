@@ -76,15 +76,10 @@ int net_SetupSocket (int fd);
 #define net_Connect(a, b, c, d, e) __net_Connect(VLC_OBJECT(a), b, c, d, e)
 VLC_EXPORT( int, __net_Connect, (vlc_object_t *p_this, const char *psz_host, int i_port, int socktype, int protocol) );
 
-VLC_EXPORT( int *, net_Listen, (vlc_object_t *p_this, const char *psz_host, int i_port, int family, int socktype, int protocol) );
+VLC_EXPORT( int *, net_Listen, (vlc_object_t *p_this, const char *psz_host, int i_port, int protocol) );
 
-#define net_ListenTCP(a, b, c) __net_ListenTCP(VLC_OBJECT(a), b, c)
+#define net_ListenTCP(a, b, c) net_Listen(VLC_OBJECT(a), b, c, IPPROTO_TCP)
 #define net_ConnectTCP(a, b, c) __net_ConnectTCP(VLC_OBJECT(a), b, c)
-
-static inline int *__net_ListenTCP (vlc_object_t *obj, const char *host, int port)
-{
-    return net_Listen (obj, host, port, AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP);
-}
 
 static inline int __net_ConnectTCP (vlc_object_t *obj, const char *host, int port)
 {

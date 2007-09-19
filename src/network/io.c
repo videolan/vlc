@@ -119,13 +119,14 @@ int net_Socket (vlc_object_t *p_this, int family, int socktype,
 
 
 int *net_Listen (vlc_object_t *p_this, const char *psz_host,
-                 int i_port, int family, int socktype, int protocol)
+                 int i_port, int protocol)
 {
     struct addrinfo hints, *res;
 
     memset (&hints, 0, sizeof( hints ));
-    hints.ai_family = family;
-    hints.ai_socktype = socktype;
+    /* Since we use port numbers rather than service names, the socket type
+     * does not really matter. */
+    hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
     msg_Dbg (p_this, "net: listening to %s port %d", psz_host, i_port);
@@ -144,7 +145,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
     for (struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
         int fd = net_Socket (p_this, ptr->ai_family, ptr->ai_socktype,
-                             protocol ?: ptr->ai_protocol);
+                             protocol);
         if (fd == -1)
         {
             msg_Dbg (p_this, "socket error: %m");
