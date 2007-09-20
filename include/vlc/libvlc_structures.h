@@ -132,6 +132,7 @@ typedef struct libvlc_media_instance_t libvlc_media_instance_t;
  */
 
 typedef struct libvlc_media_list_t libvlc_media_list_t;
+typedef struct libvlc_media_list_view_t libvlc_media_list_view_t;
 
 /**@} */
 

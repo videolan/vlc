@@ -113,6 +113,43 @@ struct libvlc_media_list_t
     libvlc_media_list_t *       p_flat_mlist;
 };
 
+/* A way to see a media list */
+struct libvlc_media_list_view_t
+{
+    libvlc_event_manager_t *    p_event_manager;
+    libvlc_instance_t *         p_libvlc_instance;
+    int                         i_refcount;
+    vlc_mutex_t                 object_lock;
+    
+    libvlc_media_list_t *       p_mlist;
+
+    void *                      this_view_data;
+
+    /* Accessors */
+    int (*pf_count)( struct libvlc_media_list_view_t * p_mlv,
+                      libvlc_exception_t * );
+    libvlc_media_descriptor_t *
+        (*pf_item_at_index)( struct libvlc_media_list_view_t * p_mlv,
+                              int index,
+                              libvlc_exception_t * );
+    int  (*pf_index_of_item)( struct libvlc_media_list_view_t * p_mlv,
+                              libvlc_media_descriptor_t * p_md,
+                              libvlc_exception_t * );
+
+    /* Setters */
+    void (*pf_insert_at_index)( struct libvlc_media_list_view_t * p_mlv,
+                                     libvlc_media_descriptor_t * p_md,
+                                     int index,
+                                     libvlc_exception_t * );
+    void (*pf_remove_at_index)( struct libvlc_media_list_view_t * p_mlv,
+                                     int index,
+                                     libvlc_exception_t * );
+    void (*pf_add_item)( struct libvlc_media_list_view_t * p_mlv,
+                         libvlc_media_descriptor_t * p_md,
+                         libvlc_exception_t * );
+        
+};
+
 struct libvlc_dynamic_media_list_t
 {
     libvlc_instance_t *     p_libvlc_instance;

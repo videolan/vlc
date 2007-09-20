@@ -500,8 +500,44 @@ VLC_PUBLIC_API libvlc_event_manager_t *
                                     libvlc_exception_t * );
 /** @} */
 
+
 /*****************************************************************************
- * Dynamic Media List
+ * Media List View
+ *****************************************************************************/
+/** defgroup libvlc_media_list_view MediaListView
+ * \ingroup libvlc
+ * LibVLC Media List View
+ * @{ */
+
+VLC_PUBLIC_API int
+    libvlc_media_list_view_count(  libvlc_media_list_view_t * p_mlv,
+                                   libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API libvlc_media_descriptor_t *
+    libvlc_media_list_view_item_at_index(  libvlc_media_list_view_t * p_mlv,
+                                           int index,
+                                           libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API int
+    libvlc_media_list_view_index_of_item(  libvlc_media_list_view_t * p_mlv,
+                                           libvlc_media_descriptor_t * p_md,
+                                           libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API void
+    libvlc_media_list_view_insert_at_index(  libvlc_media_list_view_t * p_mlv,
+                                             libvlc_media_descriptor_t * p_md,
+                                             int index,
+                                             libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API void
+    libvlc_media_list_view_add_item(  libvlc_media_list_view_t * p_mlv,
+                                      libvlc_media_descriptor_t * p_md,
+                                      libvlc_exception_t * p_e );
+
+/** @} */
+
+/*****************************************************************************
+ * Dynamic Media List (Deprecated)
  *****************************************************************************/
 /** defgroup libvlc_media_list MediaList
  * \ingroup libvlc
