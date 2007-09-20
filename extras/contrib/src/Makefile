@@ -1227,7 +1227,7 @@ endif
 ifdef HAVE_DARWIN_OS
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
 else
-	(cd $< && rm -f configure; autoconf configure.in > configure && $(HOSTCC) sh ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
+	(cd $< && rm -f configure; aclocal && automake --add-missing && autoconf configure.in > configure && $(HOSTCC) sh ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
 endif
 	touch $@
 

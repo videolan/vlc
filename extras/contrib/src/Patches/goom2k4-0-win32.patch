@@ -1,6 +1,6 @@
-diff -Naur goom-orig/configure.in goom/configure.in
---- goom-orig/configure.in	2005-02-07 14:46:41.000000000 +0100
-+++ goom/configure.in	2005-08-26 16:37:03.000000000 +0200
+diff -ur goom.orig/configure.in goom/configure.in
+--- goom.orig/configure.in	2007-09-20 17:16:48.000000000 +0200
++++ goom/configure.in	2007-09-20 17:17:36.000000000 +0200
 @@ -1,6 +1,5 @@
  AC_INIT(README)
  
@@ -8,7 +8,27 @@ diff -Naur goom-orig/configure.in goom/configure.in
  AM_INIT_AUTOMAKE(SDL_Goom, 2k4)
  
  ACLOCAL="$ACLOCAL -I m4"
-@@ -76,24 +75,7 @@
+@@ -19,17 +18,13 @@
+ 
+ dnl *** check for xmms ***
+ 
+-AM_PATH_XMMS2(0.9.5.1, HAVE_XMMS="yes", HAVE_XMMS="no")
++HAVE_XMMS="no"
+ AM_CONDITIONAL(HAVE_XMMS,test "x$HAVE_XMMS" = "xyes")
+ 
+ 
+ dnl *** SDL ***
+ 
+-if test "x$HAVE_XMMS" = "xyes"; then
+-  AM_PATH_SDL2(1.2.0, HAVE_SDL="yes", HAVE_SDL="no"])
+-else
+-  HAVE_SDL="no"
+-fi
++HAVE_SDL="no"
+ AM_CONDITIONAL(HAVE_SDL,test "x$HAVE_SDL" = "xyes")
+ 
+ 
+@@ -76,24 +71,7 @@
  AM_CONDITIONAL(MACTARGET,test "x$MACTARGET" = "xyes")
  
  
@@ -34,9 +54,9 @@ diff -Naur goom-orig/configure.in goom/configure.in
  
  dnl rm -f mmx_zoom.s
  dnl 	echo -n checking for nasm...
-diff -Naur goom-orig/src/filters.c goom/src/filters.c
---- goom-orig/src/filters.c	2005-02-07 14:46:41.000000000 +0100
-+++ goom/src/filters.c	2005-08-26 16:31:17.000000000 +0200
+diff -ur goom2k4-0.orig/src/filters.c goom2k4-0/src/filters.c
+--- goom.orig/src/filters.c	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/filters.c	2007-09-20 17:17:11.000000000 +0200
 @@ -201,8 +201,8 @@
      /* Noise */
      if (data->noisify)
@@ -48,9 +68,9 @@ diff -Naur goom-orig/src/filters.c goom/src/filters.c
      }
      
      /* Hypercos */
-diff -Naur goom-orig/src/goom_core.c goom/src/goom_core.c
---- goom-orig/src/goom_core.c	2005-02-07 14:46:41.000000000 +0100
-+++ goom/src/goom_core.c	2005-08-26 16:33:01.000000000 +0200
+diff -ur goom/src/goom_core.c goom/src/goom_core.c
+--- goom/src/goom_core.c	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/goom_core.c	2007-09-20 17:17:11.000000000 +0200
 @@ -40,11 +40,11 @@
  static void init_buffers(PluginInfo *goomInfo, int buffsize)
  {
