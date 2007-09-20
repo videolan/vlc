@@ -114,7 +114,7 @@ int spu_Init( spu_t *p_spu )
 
     spu_ParseChain( p_spu );
 
-    return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 int spu_ParseChain( spu_t *p_spu )
@@ -167,7 +167,7 @@ int spu_ParseChain( spu_t *p_spu )
     }
     if( val.psz_string ) free( val.psz_string );
 
-    return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 /**
