@@ -1502,6 +1502,9 @@ ifdef HAVE_UCLIBC
 endif
 
 .xml: xml
+ifdef HAVE_WIN32
+	(cd xml; aclocal && automake && autoreconf)
+endif
 	(cd xml; CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-minimal --with-catalog --with-reader --with-tree --with-push --with-xptr --with-valid --with-xpath --with-xinclude --with-sax1 --without-zlib --without-iconv --without-http --without-ftp && make && make install)
 ifndef HAVE_DARWIN_OS
 	$(INSTALL_NAME)
