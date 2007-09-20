@@ -41,10 +41,6 @@
 #include "vlc_interface.h"
 #include "modules/modules.h" // Gruik!
 
-#ifdef __APPLE__
-#    include <Cocoa/Cocoa.h>
-#endif
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -54,21 +50,6 @@ static int SwitchIntfCallback( vlc_object_t *, char const *,
                                vlc_value_t , vlc_value_t , void * );
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
-
-#ifdef __APPLE__
-static void Manager( intf_thread_t *p_intf );
-/*****************************************************************************
- * VLCApplication interface
- *****************************************************************************/
-@interface VLCApplication : NSApplication
-{
-   libvlc_int_t *o_libvlc;
-}
-
-- (void)setVLC: (libvlc_int_t *)p_libvlc;
-
-@end
-#endif
 
 /*****************************************************************************
  * intf_Create: prepare interface before main loop
@@ -146,45 +127,18 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module,
  */
 int intf_RunThread( intf_thread_t *p_intf )
 {
-#ifdef __APPLE__
-# warning FIXME
-#if 0
-    NSAutoreleasePool * o_pool;
-
-    /* If !clivlc, then run as a OS X application */
-    if( strncmp( p_intf->p_libvlc->psz_object_name, "clivlc", 6) )
-    {
-        o_pool = [[NSAutoreleasePool alloc] init];
-        [VLCApplication sharedApplication];
-        [NSApp setVLC: p_intf->p_libvlc];
-
-        if( p_intf->pf_run )
-            RunInterface( p_intf );
-        else
-        {
-            [NSApp run];
-            while( !intf_ShouldDie( p_intf ) )
-                msleep( INTF_IDLE_SLEEP * 2);
-        }
-        vlc_object_kill( p_intf );
-        return VLC_SUCCESS;
-    }
-#endif
-#endif
-
     /* This interface doesn't need to be run */
     if( p_intf->pf_run == NULL )
         return VLC_SUCCESS;
 
-    /* Run the interface in a separate thread */
-    if( !strcmp( p_intf->p_module->psz_object_name, "macosx" ) )
+    /* Hack to get Mac OS X Cocoa runtime,
+     * which need access to the main thread */
+    if( p_intf->b_should_run_on_first_thread )
     {
-        msg_Err( p_intf, "You cannot run the MacOS X module as an "
-                         "extra interface. Please read the "
-                         "README.MacOSX.rtf file.");
-        return VLC_EGENERIC;
+        RunInterface( p_intf );
+        return VLC_SUCCESS;
     }
-
+    
     /* Run the interface in a separate thread */
     if( vlc_thread_create( p_intf, "interface", RunInterface,
                            VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
@@ -237,29 +191,6 @@ void intf_Destroy( intf_thread_t *p_intf )
 
 
 /* Following functions are local */
-
-/*****************************************************************************
- * Manager: helper thread for blocking OS X
- *****************************************************************************/
-#ifdef __APPLE__
-static void Manager( intf_thread_t *p_intf )
-{
-    while( !p_intf->b_die )
-    {
-        msleep( INTF_IDLE_SLEEP );
-
-        if( p_intf->p_libvlc->b_die )
-        {
-            p_intf->b_die = VLC_TRUE;
-            if( strncmp( p_intf->p_libvlc->psz_object_name, "clivlc", 6 ) )
-            {
-                [NSApp stop: NULL];
-            }
-            return;
-        }
-    }
-}
-#endif
 
 /*****************************************************************************
  * RunInterface: setups necessary data and give control to the interface
@@ -406,24 +337,4 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     return VLC_SUCCESS;
 }
-
-#ifdef __APPLE__
-/*****************************************************************************
- * VLCApplication implementation
- *****************************************************************************/
-@implementation VLCApplication
-
-- (void)setVLC: (libvlc_int_t *) p_libvlc
-{
-    o_libvlc = p_libvlc;
-}
-
-- (void)terminate: (id)sender
-{
-    vlc_object_kill( o_libvlc );
-    [super terminate: sender];
-}
-
-@end
-#endif
 
