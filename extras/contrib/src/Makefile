@@ -2165,6 +2165,9 @@ pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 	$(INSTALL_NAME)
 	touch $@
 
+CLEAN_FILE += .pthreads
+CLEAN_PKG += pthreads
+DISTCLEAN_PKG += pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 # ***************************************************************************
 # ncurses library (with wide chars support)
 # ***************************************************************************
