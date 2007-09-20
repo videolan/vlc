@@ -145,10 +145,10 @@ VLC.framework/VLC:
 VLC.framework/Version/Current/VLC: $(OBJECTS) VLC.framework/Headers VLC.framework/Resources VLC.framework/lib/libvlc-control.dylib VLC.framework/lib/libvlc.dylib VLC.framework/modules VLC.framework/share VLC.framework/VLC
 	mkdir -p VLC.framework/Version/Current/Framework && \
 	$(CXX) -dynamiclib $(LDFLAGS) $(OBJECTS) $(FRAMEWORKS) -LVLC.framework/lib -lvlc -lvlc-control $(MODULES) $(LIBS) -install_name @loader_path/../Frameworks/VLC.framework/Version/Current/VLC -o VLC.framework/Version/Current/VLC && \
-	install_name_tool -change /usr/local/lib/libvlc-control.0.dylib \
+	install_name_tool -change `pwd`/VLC.framework/lib/libvlc-control.0.dylib \
 	                          `pwd`/VLC.framework/lib/libvlc-control.dylib \
 	                   VLC.framework/Version/Current/VLC && \
-	install_name_tool -change /usr/local/lib/libvlc.1.dylib \
+	install_name_tool -change `pwd`/VLC.framework/lib/libvlc.1.dylib \
 	                          `pwd`/VLC.framework/lib/libvlc.dylib \
 	                   VLC.framework/Version/Current/VLC && \
 	touch VLC.framework
