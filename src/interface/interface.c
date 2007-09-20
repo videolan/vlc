@@ -286,6 +286,8 @@ static void RunInterface( intf_thread_t *p_intf )
         vlc_mutex_lock( &p_intf->object_lock );
         p_intf->b_die = VLC_FALSE; /* FIXME */
         p_intf->b_dead = VLC_FALSE;
+        p_intf->b_should_run_on_first_thread = VLC_FALSE;
+
         vlc_mutex_unlock( &p_intf->object_lock );
 
         p_intf->p_module = module_Need( p_intf, "interface", psz_intf, 0 );
