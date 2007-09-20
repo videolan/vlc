@@ -287,7 +287,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     fmt.i_sar_num = fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = p_page.columns * 12;
     fmt.i_height = fmt.i_visible_height = p_page.rows * 10;
-    fmt.i_bits_per_pixel =  p_sys->b_text ? 0 : 32;
+    fmt.i_bits_per_pixel = p_sys->b_text ? 0 : 32;
     fmt.i_x_offset = fmt.i_y_offset = 0;
 
     p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_dec), &fmt );
@@ -309,6 +309,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_absolute = VLC_FALSE;
     p_spu->b_pausable = VLC_TRUE;
+    p_spu->i_width = fmt.i_width;
+    p_spu->i_height = fmt.i_height;
     p_spu->i_original_picture_width = p_page.columns * 12;
     p_spu->i_original_picture_height = p_page.rows * 10;
 
@@ -318,13 +320,13 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         char p_text[7000];
 
         i_total = vbi_print_page_region( &p_page, p_text, i_textsize,
-                        "ASCII", 0, 0, 0, 0, p_page.columns,
-                        p_page.rows );
+                        "UTF-8", 0, 0, 0, 0, p_page.columns, p_page.rows );
         p_text[i_total] = '\0';
         /* Strip off the pagenumber */
         if( i_total <= 8 ) goto error;
         p_spu->p_region->psz_text = strdup( &p_text[8] );
 
+        p_spu->p_region->fmt.i_height = p_spu->p_region->fmt.i_visible_height = p_page.rows + 1;
         msg_Dbg( p_dec, "page %x-%x(%d)\n%s", p_page.pgno, p_page.subno, i_total, p_text );
     }
     else 
