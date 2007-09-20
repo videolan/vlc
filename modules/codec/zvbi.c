@@ -107,7 +107,7 @@ vlc_module_begin();
                  OPAQUE_TEXT, OPAQUE_LONGTEXT, VLC_FALSE );
     add_integer( "vbi-position", 4, NULL, POS_TEXT, POS_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
-    add_bool( "vbi-text", VLC_TRUE, NULL,
+    add_bool( "vbi-text", VLC_FALSE, NULL,
               TELX_TEXT, TELX_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
