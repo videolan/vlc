@@ -131,8 +131,8 @@ int intf_RunThread( intf_thread_t *p_intf )
     if( p_intf->pf_run == NULL )
         return VLC_SUCCESS;
 
-    /* Hack to get Mac OS X Cocoa runtime,
-     * which need access to the main thread */
+    /* Hack to get Mac OS X Cocoa runtime running
+     * (it needs access to the main thread) */
     if( p_intf->b_should_run_on_first_thread )
     {
         RunInterface( p_intf );
