@@ -3936,7 +3936,8 @@ static int expdelete(void* memory)
  */
 typedef struct __attribute__((__packed__))
 {
-    char hay[0x40];
+    char hay[0x3C];
+    void*	pbUnknown;		//0x3C
     unsigned long cbFormat;		//0x40
     char*	pbFormat;		//0x44
 } MY_MEDIA_TYPE;
@@ -3958,12 +3959,18 @@ static HRESULT WINAPI expMoInitMediaType(MY_MEDIA_TYPE* dest, DWORD cbFormat)
 {
     if (!dest)
         return E_POINTER;
-    memset(dest, 0, sizeof(MY_MEDIA_TYPE));
+
+    dest->pbUnknown = NULL;
+    dest->cbFormat = cbFormat;
     if (cbFormat)
     {
 	dest->pbFormat = (char*) my_mreq(cbFormat, 0);
 	if (!dest->pbFormat)
             return E_OUTOFMEMORY;
+    }
+    else 
+    {
+    dest->pbFormat=NULL;
     }
     return S_OK;
 }

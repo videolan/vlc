@@ -142,6 +142,7 @@ static const GUID guid_wma = { 0x874131cb, 0x4ecc, 0x443b, { 0x89, 0x48, 0x74, 0
 static const GUID guid_wma9 = { 0x27ca0808, 0x01f5, 0x4e7a, { 0x8b, 0x05, 0x87, 0xf8, 0x07, 0xa2, 0x33, 0xd1 } };
 
 static const GUID guid_wmv_enc = { 0x3181343b, 0x94a2, 0x4feb, { 0xad, 0xef, 0x30, 0xa1, 0xdd, 0xe6, 0x17, 0xb4 } };
+static const GUID guid_wmv_enc2 = { 0x96b57cdd, 0x8966, 0x410c,{ 0xbb, 0x1f, 0xc9, 0x7e, 0xea, 0x76, 0x5c, 0x04 } };
 static const GUID guid_wma_enc = { 0x70f598e9, 0xf4ab, 0x495a, { 0x99, 0xe2, 0xa7, 0xc4, 0xd3, 0xd8, 0x9a, 0xbf } };
 
 typedef struct
@@ -191,12 +192,15 @@ static const codec_dll decoders_table[] =
 
 static const codec_dll encoders_table[] =
 {
+    /* WMV3 */
+    { VLC_FOURCC('W','M','V','3'), "wmvdmoe2.dll", &guid_wmv_enc2 },
+    { VLC_FOURCC('w','m','v','3'), "wmvdmoe2.dll", &guid_wmv_enc2 },
     /* WMV2 */
-    { VLC_FOURCC('W','M','V','2'), "wmvdmoe.dll", &guid_wmv_enc },
-    { VLC_FOURCC('w','m','v','2'), "wmvdmoe.dll", &guid_wmv_enc },
+    { VLC_FOURCC('W','M','V','2'), "wmvdmoe2.dll", &guid_wmv_enc2 },
+    { VLC_FOURCC('w','m','v','2'), "wmvdmoe2.dll", &guid_wmv_enc2 },
     /* WMV1 */
-    { VLC_FOURCC('W','M','V','1'), "wmvdmoe.dll", &guid_wmv_enc },
-    { VLC_FOURCC('w','m','v','1'), "wmvdmoe.dll", &guid_wmv_enc },
+    { VLC_FOURCC('W','M','V','1'), "wmvdmoe2.dll", &guid_wmv_enc2 },
+    { VLC_FOURCC('w','m','v','1'), "wmvdmoe2.dll", &guid_wmv_enc2 },
 
     /* WMA 3 */
     { VLC_FOURCC('W','M','A','3'), "wmadmoe.dll", &guid_wma_enc },
@@ -967,30 +971,8 @@ static int EncoderOpen( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t*)p_this;
 
-#ifndef LOADER
     int i_ret = EncOpen( p_this );
     if( i_ret != VLC_SUCCESS ) return i_ret;
-
-#else
-    /* We can't open it now, because of ldt_keeper or something
-     * Open/Encode/Close has to be done in the same thread */
-    int i;
-
-    /* Probe if we support it */
-    for( i = 0; encoders_table[i].i_fourcc != 0; i++ )
-    {
-        if( encoders_table[i].i_fourcc == p_enc->fmt_out.i_codec )
-        {
-            msg_Dbg( p_enc, "DMO codec for %4.4s may work with dll=%s",
-                     (char*)&p_enc->fmt_out.i_codec,
-                     encoders_table[i].psz_dll );
-            break;
-        }
-    }
-
-    p_enc->p_sys = NULL;
-    if( !encoders_table[i].i_fourcc ) return VLC_EGENERIC;
-#endif /* LOADER */
 
     /* Set callbacks */
     p_enc->pf_encode_video = (block_t *(*)(encoder_t *, picture_t *))
@@ -1033,7 +1015,6 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
 
     /* Setup input format */
     memset( &dmo_type, 0, sizeof(dmo_type) );
-    dmo_type.pUnk = 0;
     memset( &vih, 0, sizeof(VIDEOINFOHEADER) );
 
     p_bih = &vih.bmiHeader;
@@ -1410,16 +1391,6 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
     uint32_t i_status;
     int i_result;
     mtime_t i_pts;
-
-    if( p_sys == NULL )
-    {
-        if( EncOpen( VLC_OBJECT(p_enc) ) )
-        {
-            msg_Err( p_enc, "EncOpen failed" );
-            return NULL;
-        }
-        p_sys = p_enc->p_sys;
-    }
 
     if( !p_data ) return NULL;
 
