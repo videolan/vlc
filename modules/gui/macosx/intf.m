@@ -57,6 +57,31 @@
  *****************************************************************************/
 static void Run ( intf_thread_t *p_intf );
 
+/* Quick hack */
+/*****************************************************************************
+ * VLCApplication implementation (this hack is really disgusting now,
+ *                                feel free to fix.)
+ *****************************************************************************/
+@interface VLCApplication : NSApplication
+{
+   libvlc_int_t *o_libvlc;
+}
+- (void)setVLC: (libvlc_int_t *)p_libvlc;
+@end
+
+
+@implementation VLCApplication
+- (void)setVLC: (libvlc_int_t *) p_libvlc
+{
+    o_libvlc = p_libvlc;
+}
+- (void)terminate: (id)sender
+{
+    vlc_object_kill( o_libvlc );
+    [super terminate: sender];
+}
+@end
+
 /*****************************************************************************
  * OpenIntf: initialize interface
  *****************************************************************************/
@@ -74,16 +99,11 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 
     p_intf->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
-    /* Put Cocoa into multithread mode as soon as possible.
-     * http://developer.apple.com/techpubs/macosx/Cocoa/
-     * TasksAndConcepts/ProgrammingTopics/Multithreading/index.html
-     * This thread does absolutely nothing at all. */
-    //[NSThread detachNewThreadSelector:@selector(self) toTarget:[NSString string] withObject:nil];
-
     p_intf->p_sys->o_sendport = [[NSPort port] retain];
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
     p_intf->b_play = VLC_TRUE;
     p_intf->pf_run = Run;
+    p_intf->b_should_run_on_first_thread = VLC_TRUE;
 
     return( 0 );
 }
@@ -125,6 +145,14 @@ static void Run( intf_thread_t *p_intf )
     sigaddset( &set, SIGTERM );
     pthread_sigmask( SIG_UNBLOCK, &set, NULL );
 
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+
+    /* Install a jmpbuffer to where we can go back before the NSApp exit
+     * see applicationWillTerminate: */
+    /* We need that code to run on main thread */
+    [VLCApplication sharedApplication];
+    [NSApp setVLC: p_intf->p_libvlc];
+
     [[VLCMain sharedInstance] setIntf: p_intf];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
@@ -132,6 +160,8 @@ static void Run( intf_thread_t *p_intf )
      * see applicationWillTerminate: */
     if(setjmp(jmpbuffer) == 0)
         [NSApp run];
+
+    [o_pool release];
 }
 
 int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
