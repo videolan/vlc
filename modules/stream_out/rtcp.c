@@ -79,7 +79,7 @@ rtcp_sender_t *OpenRTCP (vlc_object_t *obj, int rtp_fd, int proto,
 #else
         WSAPROTOCOL_INFO info;
         WSADuplicateSocket (rtp_fd, GetProcessId (), &info);
-        fd = WSASocket (info.iAddressFamily, info.iSockets, info.iProtocol,
+        fd = WSASocket (info.iAddressFamily, info.iSocketType, info.iProtocol,
                         &info, 0, 0);
 #endif
     }
