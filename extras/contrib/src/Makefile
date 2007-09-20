@@ -783,10 +783,10 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
 	patch -p0 < Patches/libshout-win32.patch
-	(cd $@; aclocal && automake)
+	(cd $@; autoreconf && automake)
 endif
   
-.shout: libshout .theora .ogg .speex
+.shout: libshout .theora .ogg .speex .vorbis
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) &&  make && make install )
 	$(INSTALL_NAME)
 	touch $@
