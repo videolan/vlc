@@ -271,7 +271,7 @@ VLC_PUBLIC_API int     VLC_AddIntf( int, char const *, vlc_bool_t, vlc_bool_t );
 /**
  * Ask vlc to die
  *
- * This function sets p_vlc->b_die to VLC_TRUE, but does not do any other
+ * This function sets p_libvlc->b_die to VLC_TRUE, but does not do any other
  * task. It is your duty to call VLC_CleanUp and VLC_Destroy afterwards.
  *
  * \param i_object a vlc object id
