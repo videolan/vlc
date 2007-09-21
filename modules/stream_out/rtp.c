@@ -708,26 +708,20 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
         sout_stream_id_t *id = p_sys->es[i];
         const char *mime_major; /* major MIME type */
         const char *proto = "RTP/AVP"; /* protocol */
-        const char *scode; /* DCCP service code */
 
         switch( id->i_cat )
         {
             case VIDEO_ES:
                 mime_major = "video";
-                scode = "SC:RTPV";
                 break;
             case AUDIO_ES:
                 mime_major = "audio";
-                scode = "SC:RTPA";
                 break;
             case SPU_ES:
                 mime_major = "text";
-                scode = "SC:RTPT";
                 break;
             default:
-                mime_major = "application";
-                scode = "SC:RTPO";
-                break;
+                continue;
         }
 
         if( rtsp_url == NULL )
@@ -763,8 +757,11 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
         {
             if( id->listen_fd != NULL )
                 sdp_AddAttribute( &psz_sdp, "setup", "passive" );
+#if 0
             if( p_sys->proto == IPPROTO_DCCP )
-                sdp_AddAttribute( &psz_sdp, "dccp-service-code", scode );
+                sdp_AddAttribute( &psz_sdp, "dccp-service-code", 
+                                  "SC:RTP%c", toupper( mime_major[0] ) );
+#endif
         }
     }
 
