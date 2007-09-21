@@ -2371,6 +2371,17 @@ static int ProcessLines( filter_t *p_filter,
 
                 vlc_mutex_unlock( &p_sys->fontconfig_lock );
 
+                if( psz_fontfile && ! *psz_fontfile )
+                {
+                    msg_Warn( p_filter, "Fontconfig was unable to find a font: \"%s\" %s"
+                        " so using default font", p_style->psz_fontname,
+                        ((p_style->b_bold && p_style->b_italic) ? "(Bold,Italic)" :
+                                               (p_style->b_bold ? "(Bold)" :
+                                             (p_style->b_italic ? "(Italic)" : ""))) );
+                    free( psz_fontfile );
+                    psz_fontfile = NULL;
+                }
+
                 if( psz_fontfile )
                 {
                     if( FT_New_Face( p_sys->p_library,
@@ -2602,6 +2613,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                     else
                     {
                         /* Only text and karaoke tags are supported */
+                        msg_Dbg( p_filter, "Unsupported top-level tag '%s' ignored.", psz_node );
                         xml_ReaderDelete( p_xml, p_xml_reader );
                         p_xml_reader = NULL;
                         rv = VLC_EGENERIC;
