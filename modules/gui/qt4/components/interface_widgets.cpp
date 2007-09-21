@@ -720,9 +720,11 @@ void PlaylistWidget::setArt( QString url )
     if( url.isNull() )
         art->setPixmap( QPixmap( ":/noart.png" ) );
     else if( prevArt != url )
+    {
         art->setPixmap( QPixmap( url ) );
-    prevArt = url;
-    emit artSet( url );
+        prevArt = url;
+        emit artSet( url );
+    }
 }
 
 PlaylistWidget::~PlaylistWidget()
