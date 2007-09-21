@@ -112,6 +112,11 @@
     "the multicast packets sent by the stream output (0 = use operating " \
     "system built-in default).")
 
+#define RTCP_MUX_TEXT N_("RTP/RTCP multiplexing")
+#define RTCP_MUX_LONGTEXT N_( \
+    "This sends and receives RTCP packet multiplexed over the same port " \
+    "as RTP packets." )
+
 #define DCCP_TEXT N_("DCCP transport")
 #define DCCP_LONGTEXT N_( \
     "This enables DCCP instead of UDP as a transport for RTP." )
@@ -168,11 +173,14 @@ vlc_module_begin();
     add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, TTL_TEXT,
                  TTL_LONGTEXT, VLC_TRUE );
 
-    add_bool( SOUT_CFG_PREFIX "dccp", 0, NULL,
+    add_bool( SOUT_CFG_PREFIX "rtcp-mux", VLC_FALSE, NULL,
+              RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, VLC_FALSE );
+
+    add_bool( SOUT_CFG_PREFIX "dccp", VLC_FALSE, NULL,
               DCCP_TEXT, DCCP_LONGTEXT, VLC_FALSE );
-    add_bool( SOUT_CFG_PREFIX "tcp", 0, NULL,
+    add_bool( SOUT_CFG_PREFIX "tcp", VLC_FALSE, NULL,
               TCP_TEXT, TCP_LONGTEXT, VLC_FALSE );
-    add_bool( SOUT_CFG_PREFIX "udplite", 0, NULL,
+    add_bool( SOUT_CFG_PREFIX "udplite", VLC_FALSE, NULL,
               UDP_LITE_TEXT, UDP_LITE_LONGTEXT, VLC_FALSE );
 
     add_bool( SOUT_CFG_PREFIX "mp4a-latm", 0, NULL, RFC3016_TEXT,
@@ -187,7 +195,7 @@ vlc_module_end();
 static const char *ppsz_sout_options[] = {
     "dst", "name", "port", "port-audio", "port-video", "*sdp", "ttl", "mux",
     "description", "url", "email", "phone",
-    "dccp", "tcp", "udplite",
+    "rtcp-mux", "dccp", "tcp", "udplite",
     "mp4a-latm", NULL
 };
 
@@ -238,6 +246,7 @@ struct sout_stream_sys_t
     uint16_t  i_port_audio;
     uint16_t  i_port_video;
     vlc_bool_t b_latm;
+    vlc_bool_t rtcp_mux;
 
     /* when need to use a private one or when using muxer */
     int i_payload_type;
@@ -321,6 +330,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_port       = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port" );
     p_sys->i_port_audio = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-audio" );
     p_sys->i_port_video = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-video" );
+    p_sys->rtcp_mux   = var_GetBool( p_stream, SOUT_CFG_PREFIX "rtcp-mux" );
 
     p_sys->psz_sdp_file = NULL;
 
@@ -358,12 +368,14 @@ static int Open( vlc_object_t *p_this )
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX "dccp" ) )
     {
         p_sys->proto = IPPROTO_DCCP;
+        p_sys->rtcp_mux = VLC_TRUE; /* Force RTP/RTCP mux */
     }
 #if 0
     else
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX "tcp" ) )
     {
         p_sys->proto = IPPROTO_TCP;
+        p_sys->rtcp_mux = VLC_TRUE; /* Force RTP/RTCP mux */
     }
     else
 #endif
@@ -684,6 +696,8 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
         return NULL;
 
     /* TODO: a=source-filter */
+    if( p_sys->rtcp_mux )
+        sdp_AddAttribute( &psz_sdp, "rtcp-mux", NULL );
 
     if( rtsp_url != NULL )
         sdp_AddAttribute ( &psz_sdp, "control", "%s", rtsp_url );
@@ -898,7 +912,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                     msg_Err( p_stream, "cannot create RTP socket" );
                     goto error;
                 }
-                rtp_add_sink( id, fd );
+                rtp_add_sink( id, fd, p_sys->rtcp_mux );
             }
         }
 
@@ -1403,7 +1417,7 @@ static void ThreadSend( vlc_object_t *p_this )
             if( fd == -1 )
                 break;
             msg_Dbg( id, "adding socket %d", fd );
-            rtp_add_sink( id, fd );
+            rtp_add_sink( id, fd, VLC_TRUE );
         }
     }
 
@@ -1418,10 +1432,11 @@ static inline void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
     block_FifoPut( id->p_fifo, out );
 }
 
-int rtp_add_sink( sout_stream_id_t *id, int fd )
+int rtp_add_sink( sout_stream_id_t *id, int fd, vlc_bool_t rtcp_mux )
 {
     rtp_sink_t sink = { fd, NULL };
-    sink.rtcp = OpenRTCP( VLC_OBJECT( id->p_stream ), fd, IPPROTO_UDP, 0 );
+    sink.rtcp = OpenRTCP( VLC_OBJECT( id->p_stream ), fd, IPPROTO_UDP,
+                          rtcp_mux );
     if( sink.rtcp == NULL )
         msg_Err( id, "RTCP failed!" );
 

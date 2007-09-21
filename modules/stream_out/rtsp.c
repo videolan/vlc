@@ -602,7 +602,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                      && ( ( id == NULL ) || ( tr->id == id->sout_id ) ) )
                     {
                         tr->playing = VLC_TRUE;
-                        rtp_add_sink( tr->id, tr->fd );
+                        rtp_add_sink( tr->id, tr->fd, VLC_FALSE );
                     }
                 }
             }
