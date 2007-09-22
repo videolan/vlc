@@ -41,7 +41,7 @@
 
 #include "vlc_httpd.h"
 #include "vlc_vlm.h"
-#include "vlc_tls.h"
+#include "vlc_network.h"
 #include "vlc_acl.h"
 #include "vlc_charset.h"
 
