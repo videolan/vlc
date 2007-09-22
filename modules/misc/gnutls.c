@@ -718,9 +718,9 @@ static int OpenClient (vlc_object_t *obj)
     const char *homedir = obj->p_libvlc->psz_datadir,
                *datadir = config_GetDataDir ();
     size_t l1 = strlen (homedir), l2 = strlen (datadir);
-    char path[((l1 > l2) ? l1 : l2) + sizeof ("/ssl/private")];
+    char path[((l1 > l2) ? l1 : l2) + sizeof ("/ca-certificates.crt")];
+    //                              > sizeof ("/ssl/private")
     //                              > sizeof ("/ssl/certs")
-    //                              > sizeof ("/ca-certificates.crt")
 
     i_val = gnutls_certificate_allocate_credentials (&p_sys->x509_cred);
     if (i_val != 0)
