@@ -1067,7 +1067,7 @@ int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
                 *psz_end = '\0';
                 if( config_CreateDir( p_this, psz_parent ) == 0 )
                 {
-                    if( !utf8_mkdir( psz_dirname, 0755 ) )
+                    if( !utf8_mkdir( psz_dirname, 0700 ) )
                         return 0;
                 }
             }
