@@ -1169,9 +1169,9 @@ static int OpenServer (vlc_object_t *obj)
     val = gnutls_certificate_set_x509_key_file (p_sys->x509_cred,
                                                 psz_local_cert, psz_local_key,
                                                 GNUTLS_X509_FMT_PEM );
-    LocaleFree (psz_key_path);
+    LocaleFree (psz_local_key);
     free (psz_key_path);
-    LocaleFree (psz_cert_path);
+    LocaleFree (psz_local_cert);
     free (psz_cert_path);
 
     if( val < 0 )
