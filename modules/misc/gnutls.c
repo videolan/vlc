@@ -301,9 +301,11 @@ gnutls_Recv( void *p_session, void *buf, int i_length )
 
 
 /**
- * @return -1 on error (you need not and must not call tls_SessionClose())
- * 0 on succesful handshake completion, 1 if more would-be blocking recv is
- * needed, 2 if more would-be blocking send is required.
+ * Starts or continues the TLS handshake.
+ *
+ * @return -1 on fatal error, 0 on succesful handshake completion,
+ * 1 if more would-be blocking recv is needed,
+ * 2 if more would-be blocking send is required.
  */
 static int
 gnutls_ContinueHandshake (tls_session_t *p_session)
@@ -325,7 +327,6 @@ gnutls_ContinueHandshake (tls_session_t *p_session)
 #endif
         msg_Err( p_session, "TLS handshake error: %s",
                  gnutls_strerror( val ) );
-        p_session->pf_close( p_session );
         return -1;
     }
 
@@ -373,7 +374,7 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
     {
         msg_Err( session, "Certificate verification failed: %s",
                  gnutls_strerror( val ) );
-        goto error;
+        return -1;
     }
 
     if( status )
@@ -392,7 +393,7 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
             msg_Err( session,
                      "unknown certificate error (you found a bug in VLC)" );
 
-        goto error;
+        return -1;
     }
 
     /* certificate (host)name verification */
@@ -401,7 +402,7 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
     if( data == NULL )
     {
         msg_Err( session, "Peer certificate not available" );
-        goto error;
+        return -1;
     }
 
     gnutls_x509_crt cert;
@@ -409,7 +410,7 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
     if( val )
     {
         msg_Err( session, "x509 fatal error: %s", gnutls_strerror( val ) );
-        goto error;
+        return -1;
     }
 
     val = gnutls_x509_crt_import( cert, data, GNUTLS_X509_FMT_DER );
@@ -417,7 +418,7 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
     {
         msg_Err( session, "Certificate import error: %s",
                  gnutls_strerror( val ) );
-        goto crt_error;
+        goto error;
     }
 
     if( p_sys->psz_hostname != NULL )
@@ -426,7 +427,7 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
         {
             msg_Err( session, "Certificate does not match \"%s\"",
                      p_sys->psz_hostname );
-            goto crt_error;
+            goto error;
         }
     }
     else
@@ -435,43 +436,34 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
     if( gnutls_x509_crt_get_expiration_time( cert ) < time( NULL ) )
     {
         msg_Err( session, "Certificate expired" );
-        goto crt_error;
+        goto error;
     }
 
     if( gnutls_x509_crt_get_activation_time( cert ) > time ( NULL ) )
     {
         msg_Err( session, "Certificate not yet valid" );
-        goto crt_error;
+        goto error;
     }
 
     gnutls_x509_crt_deinit( cert );
     msg_Dbg( session, "TLS/x509 certificate verified" );
     return 0;
 
-crt_error:
-    gnutls_x509_crt_deinit( cert );
 error:
-    session->pf_close( session );
+    gnutls_x509_crt_deinit( cert );
     return -1;
 }
 
 /**
- * Starts negociation of a TLS session.
+ * Sets the operating system file descriptor backend for the TLS sesison.
  *
  * @param fd stream socket already connected with the peer.
- *
- * @return -1 on error (you need not and must not call tls_SessionClose),
- * 0 on succesful handshake completion, 1 if more would-be blocking recv is
- * needed, 2 if more would-be blocking send is required.
  */
-static int
-gnutls_BeginHandshake( tls_session_t *p_session, int fd )
+static void
+gnutls_SetFD (tls_session_t *p_session, int fd)
 {
-    tls_session_sys_t *p_sys = p_session->p_sys;
-
-    gnutls_transport_set_ptr (p_sys->session, (gnutls_transport_ptr)(intptr_t)fd);
-
-    return p_session->pf_handshake2( p_session );
+    gnutls_transport_set_ptr (p_session->p_sys->session,
+                              (gnutls_transport_ptr)(intptr_t)fd);
 }
 
 typedef int (*tls_prio_func) (gnutls_session_t, const int *);
@@ -718,8 +710,7 @@ static int OpenClient (vlc_object_t *obj)
     p_session->sock.p_sys = p_session;
     p_session->sock.pf_send = gnutls_Send;
     p_session->sock.pf_recv = gnutls_Recv;
-    p_session->pf_handshake = gnutls_BeginHandshake;
-    p_session->pf_close = NULL;
+    p_session->pf_set_fd = gnutls_SetFD;
 
     p_sys->session.b_handshaked = VLC_FALSE;
     p_sys->session.psz_hostname = NULL;
@@ -748,10 +739,10 @@ static int OpenClient (vlc_object_t *obj)
         sprintf (path, "%s/ca-certificates.crt", datadir);
         gnutls_Addx509File (VLC_OBJECT (p_session),
                             p_sys->x509_cred, path, VLC_FALSE);
-        p_session->pf_handshake2 = gnutls_HandshakeAndValidate;
+        p_session->pf_handshake = gnutls_HandshakeAndValidate;
     }
     else
-        p_session->pf_handshake2 = gnutls_ContinueHandshake;
+        p_session->pf_handshake = gnutls_ContinueHandshake;
 
     sprintf (path, "%s/ssl/private", homedir);
     gnutls_Addx509Directory (VLC_OBJECT (p_session), p_sys->x509_cred,
@@ -830,7 +821,7 @@ struct tls_server_sys_t
     int                             i_cache_size;
     vlc_mutex_t                     cache_lock;
 
-    int                             (*pf_handshake2)( tls_session_t * );
+    int                             (*pf_handshake)( tls_session_t * );
 };
 
 
@@ -949,9 +940,10 @@ static int cb_delete( void *p_server, gnutls_datum key )
  * You still have to close the socket yourself.
  */
 static void
-gnutls_SessionClose( tls_session_t *p_session )
+gnutls_SessionClose (tls_server_t *p_server, tls_session_t *p_session)
 {
     tls_session_sys_t *p_sys = p_session->p_sys;
+    (void)p_server;
 
     if( p_sys->b_handshaked == VLC_TRUE )
         gnutls_bye( p_sys->session, GNUTLS_SHUT_WR );
@@ -986,15 +978,12 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
         return NULL;
     }
 
-    vlc_object_attach( p_session, p_server );
-
     p_server_sys = p_server->p_sys;
     p_session->sock.p_sys = p_session;
     p_session->sock.pf_send = gnutls_Send;
     p_session->sock.pf_recv = gnutls_Recv;
-    p_session->pf_handshake = gnutls_BeginHandshake;
-    p_session->pf_handshake2 = p_server_sys->pf_handshake2;
-    p_session->pf_close = gnutls_SessionClose;
+    p_session->pf_set_fd = gnutls_SetFD;
+    p_session->pf_handshake = p_server_sys->pf_handshake;
 
     p_session->p_sys->b_handshaked = VLC_FALSE;
     p_session->p_sys->psz_hostname = NULL;
@@ -1025,8 +1014,8 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
         goto error;
     }
 
-    if( p_session->pf_handshake2 == gnutls_HandshakeAndValidate )
-        gnutls_certificate_server_set_request( session, GNUTLS_CERT_REQUIRE );
+    if (p_session->pf_handshake == gnutls_HandshakeAndValidate)
+        gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUIRE);
 
     i_val = config_GetInt (p_server, "gnutls-dh-bits");
     gnutls_dh_set_prime_bits (session, i_val);
@@ -1079,7 +1068,7 @@ gnutls_ServerAddCA( tls_server_t *p_server, const char *psz_ca_path )
     msg_Dbg( p_server, " %d trusted CA added (%s)", val, psz_ca_path );
 
     /* enables peer's certificate verification */
-    p_sys->pf_handshake2 = gnutls_HandshakeAndValidate;
+    p_sys->pf_handshake = gnutls_HandshakeAndValidate;
 
     return VLC_SUCCESS;
 }
@@ -1143,12 +1132,13 @@ static int OpenServer (vlc_object_t *obj)
 
     p_sys->p_store = p_sys->p_cache;
     p_server->p_sys = p_sys;
-    p_server->pf_add_CA = gnutls_ServerAddCA;
+    p_server->pf_add_CA  = gnutls_ServerAddCA;
     p_server->pf_add_CRL = gnutls_ServerAddCRL;
-    p_server->pf_session_prepare = gnutls_ServerSessionPrepare;
+    p_server->pf_open    = gnutls_ServerSessionPrepare;
+    p_server->pf_close   = gnutls_SessionClose;
 
     /* No certificate validation by default */
-    p_sys->pf_handshake2 = gnutls_ContinueHandshake;
+    p_sys->pf_handshake  = gnutls_ContinueHandshake;
 
     vlc_mutex_init( p_server, &p_sys->cache_lock );
 

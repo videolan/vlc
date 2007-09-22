@@ -311,8 +311,6 @@ __str_format_meta
 str_format_time
 tls_ClientCreate
 tls_ClientDelete
-tls_ServerCreate
-tls_ServerDelete
 ToLocale
 unescape_URI
 unescape_URI_duplicate

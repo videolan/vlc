@@ -95,6 +95,62 @@ void tls_ServerDelete (tls_server_t *srv)
 
 
 /**
+ * Adds one or more certificate authorities from a file.
+ * @return -1 on error, 0 on success.
+ */
+int tls_ServerAddCA (tls_server_t *srv, const char *path)
+{
+    return srv->pf_add_CA (srv, path);
+}
+
+
+/**
+ * Adds one or more certificate revocation list from a file.
+ * @return -1 on error, 0 on success.
+ */
+int tls_ServerAddCRL (tls_server_t *srv, const char *path)
+{
+    return srv->pf_add_CRL (srv, path);
+}
+
+
+tls_session_t *tls_ServerSessionPrepare (tls_server_t *srv)
+{
+    tls_session_t *ses;
+
+    ses = srv->pf_open (srv);
+    if (ses == NULL)
+        return NULL;
+
+    vlc_object_attach (ses, srv);
+    return ses;
+}
+
+
+void tls_ServerSessionClose (tls_session_t *ses)
+{
+    tls_server_t *srv = (tls_server_t *)(ses->p_parent);
+    srv->pf_close (srv, ses);
+}
+
+
+int tls_ServerSessionHandshake (tls_session_t *ses, int fd)
+{
+    ses->pf_set_fd (ses, fd);
+    return 2;
+}
+
+
+int tls_SessionContinueHandshake (tls_session_t *ses)
+{
+    int val = ses->pf_handshake (ses);
+    if (val < 0)
+        tls_ServerSessionClose (ses);
+    return val;
+}
+
+
+/**
  * Allocates a client's TLS credentials and shakes hands through the network.
  * This is a blocking network operation.
  *
@@ -108,6 +164,7 @@ tls_session_t *
 tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
 {
     tls_session_t *cl;
+    int val;
 
     cl = (tls_session_t *)vlc_custom_create (obj, sizeof (*cl),
                                              VLC_OBJECT_GENERIC,
@@ -132,9 +189,11 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
         return NULL;
     }
 
-    int val = tls_ClientSessionHandshake (cl, fd);
-    while (val > 0)
-        val = tls_SessionContinueHandshake (cl);
+    cl->pf_set_fd (cl, fd);
+
+    do
+        val = cl->pf_handshake (cl);
+    while (val > 0);
 
     if (val == 0)
     {
