@@ -262,9 +262,9 @@ static int gnutls_Error (vlc_object_t *obj, int val)
 
 struct tls_session_sys_t
 {
-    gnutls_session  session;
-    char                          *psz_hostname;
-    vlc_bool_t      b_handshaked;
+    gnutls_session_t session;
+    char            *psz_hostname;
+    vlc_bool_t       b_handshaked;
 };
 
 
@@ -397,15 +397,15 @@ gnutls_HandshakeAndValidate( tls_session_t *session )
     }
 
     /* certificate (host)name verification */
-    const gnutls_datum *data = gnutls_certificate_get_peers( p_sys->session,
-                                                             &(unsigned){0} );
+    const gnutls_datum_t *data;
+    data = gnutls_certificate_get_peers (p_sys->session, &(unsigned){0});
     if( data == NULL )
     {
         msg_Err( session, "Peer certificate not available" );
         return -1;
     }
 
-    gnutls_x509_crt cert;
+    gnutls_x509_crt_t cert;
     val = gnutls_x509_crt_init( &cert );
     if( val )
     {
@@ -463,7 +463,7 @@ static void
 gnutls_SetFD (tls_session_t *p_session, int fd)
 {
     gnutls_transport_set_ptr (p_session->p_sys->session,
-                              (gnutls_transport_ptr)(intptr_t)fd);
+                              (gnutls_transport_ptr_t)(intptr_t)fd);
 }
 
 typedef int (*tls_prio_func) (gnutls_session_t, const int *);
@@ -572,12 +572,12 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
 
 static int
 gnutls_Addx509File( vlc_object_t *p_this,
-                    gnutls_certificate_credentials cred,
+                    gnutls_certificate_credentials_t cred,
                     const char *psz_path, vlc_bool_t b_priv );
 
 static int
 gnutls_Addx509Directory( vlc_object_t *p_this,
-                         gnutls_certificate_credentials cred,
+                         gnutls_certificate_credentials_t cred,
                          const char *psz_dirname,
                          vlc_bool_t b_priv )
 {
@@ -691,8 +691,8 @@ gnutls_Addx509File( vlc_object_t *p_this,
 /** TLS client session data */
 typedef struct tls_client_sys_t
 {
-    struct tls_session_sys_t       session;
-    gnutls_certificate_credentials x509_cred;
+    struct tls_session_sys_t         session;
+    gnutls_certificate_credentials_t x509_cred;
 } tls_client_sys_t;
 
 
@@ -824,15 +824,15 @@ static void CloseClient (vlc_object_t *obj)
  */
 struct tls_server_sys_t
 {
-    gnutls_certificate_credentials  x509_cred;
-    gnutls_dh_params                dh_params;
+    gnutls_certificate_credentials_t x509_cred;
+    gnutls_dh_params_t               dh_params;
 
     struct saved_session_t          *p_cache;
     struct saved_session_t          *p_store;
-    int                             i_cache_size;
-    vlc_mutex_t                     cache_lock;
+    int                              i_cache_size;
+    vlc_mutex_t                      cache_lock;
 
-    int                             (*pf_handshake)( tls_session_t * );
+    int                            (*pf_handshake) (tls_session_t *);
 };
 
 
@@ -880,7 +880,7 @@ static int cb_store( void *p_server, gnutls_datum key, gnutls_datum data )
 
 static gnutls_datum cb_fetch( void *p_server, gnutls_datum key )
 {
-    static const gnutls_datum err_datum = { NULL, 0 };
+    static const gnutls_datum_t err_datum = { NULL, 0 };
     tls_server_sys_t *p_sys = ((tls_server_t *)p_server)->p_sys;
     saved_session_t *p_session, *p_end;
 
@@ -894,7 +894,7 @@ static gnutls_datum cb_fetch( void *p_server, gnutls_datum key )
         if( ( p_session->i_idlen == key.size )
          && !memcmp( p_session->id, key.data, key.size ) )
         {
-            gnutls_datum data;
+            gnutls_datum_t data;
 
             data.size = p_session->i_datalen;
 
@@ -975,7 +975,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
 {
     tls_session_t *p_session;
     tls_server_sys_t *p_server_sys;
-    gnutls_session session;
+    gnutls_session_t session;
     int i_val;
 
     p_session = vlc_object_create( p_server, sizeof (struct tls_session_t) );
