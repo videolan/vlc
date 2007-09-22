@@ -215,6 +215,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
             if( getsockopt( fd, SOL_SOCKET, SO_ERROR, (void*)&i_val,
                             &i_val_size ) == -1 || i_val != 0 )
             {
+                errno = i_val;
                 msg_Err( p_this, "connection failed: %m" );
                 goto next_ai;
             }
