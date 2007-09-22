@@ -807,6 +807,7 @@ void E_(EvaluateRPN)( intf_thread_t *p_intf, mvar_t  *vars,
             default:
                 msg_Warn( p_intf, "vlc_config_get called on unknown var (%s)",
                           psz_variable );
+                E_(SSPush)( st, "" );
             }
             free( psz_variable );
         }
