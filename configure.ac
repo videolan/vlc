@@ -5480,7 +5480,7 @@ AC_ARG_ENABLE(gnutls,
   [  --enable-gnutls         gnutls TLS/SSL support (default enabled)])
 
 AS_IF([test "${enable_gnutls}" != "no"], [
-  PKG_CHECK_MODULES(GNUTLS, [gnutls >= 1.2.9], [have_gnutls="yes"], [have_gnutls="no"])
+  PKG_CHECK_MODULES(GNUTLS, [gnutls >= 1.3.3], [have_gnutls="yes"], [have_gnutls="no"])
 
   AS_IF([test "${have_gnutls}" = "yes"], [
     VLC_ADD_PLUGINS([gnutls])
