@@ -1032,7 +1032,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     gnutls_dh_set_prime_bits (session, i_val);
 
     /* Session resumption support */
-    i_val = config_GetInt (p_server, "gnutls-cache-expiration");
+    i_val = config_GetInt (p_server, "gnutls-cache-timeout");
     gnutls_db_set_cache_expiration (session, i_val);
     gnutls_db_set_retrieve_function( session, cb_fetch );
     gnutls_db_set_remove_function( session, cb_delete );
@@ -1189,13 +1189,38 @@ static int OpenServer (vlc_object_t *obj)
     val = gnutls_dh_params_init( &p_sys->dh_params );
     if( val >= 0 )
     {
-        msg_Dbg( p_server, "computing Diffie Hellman ciphers parameters" );
+        msg_Dbg( p_server, "computing DHE ciphers parameters" );
         val = gnutls_dh_params_generate2 (p_sys->dh_params,
                                           config_GetInt (obj, "gnutls-dh-bits"));
+
+        /* Write the DH parameter to cache */
+        const char *cachedir = p_server->p_libvlc->psz_cachedir;
+        char cachefile[strlen (cachedir) + sizeof ("/dh_params.pem")];
+        sprintf (cachefile, "%s/dh_params.pem", cachedir);
+
+        FILE *cache = utf8_fopen (cachefile, "wb");
+        if (cache != NULL)
+        {
+            size_t len = 0;
+            gnutls_dh_params_export_pkcs3 (p_sys->dh_params,
+                                           GNUTLS_X509_FMT_PEM, NULL, &len);
+            msg_Dbg (p_server, "caching DHE parameters (%u bytes) to %s",
+                     (unsigned)len, cachefile);
+
+            unsigned char buf[len];
+            gnutls_dh_params_export_pkcs3 (p_sys->dh_params,
+                                           GNUTLS_X509_FMT_PEM, buf, &len);
+            if (fwrite (buf, 1, len, cache) != len)
+                msg_Warn (p_server, "cannot write to %s: %m", cachefile);
+            fclose (cache);
+        }
+        else
+            msg_Warn (p_server, "cannot open to %s: %m", cachefile);
+
     }
     if( val < 0 )
     {
-        msg_Err( p_server, "cannot initialize DH cipher suites: %s",
+        msg_Err( p_server, "cannot initialize DHE cipher suites: %s",
                  gnutls_strerror( val ) );
         gnutls_certificate_free_credentials( p_sys->x509_cred );
         goto error;
