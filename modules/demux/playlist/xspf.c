@@ -769,8 +769,9 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
                 if( !p_handler || !p_handler->name
                     || strcmp( p_handler->name, psz_name ))
                 {
+                    /* FIXME: see #1293
                     msg_Err( p_demux, "there's no open element left for <%s>",
-                             psz_name );
+                             psz_name );*/
                     FREE_ATT();
                     return VLC_FALSE;
                 }
