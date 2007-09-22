@@ -55,7 +55,7 @@ struct tls_session_t
     tls_session_sys_t *p_sys;
 
     struct virtual_socket_t sock;
-    int (*pf_handshake) ( tls_session_t *, int, const char * );
+    int (*pf_handshake) ( tls_session_t *, int );
     int (*pf_handshake2) ( tls_session_t * );
     void (*pf_close) ( tls_session_t * );
 };
@@ -91,13 +91,13 @@ VLC_EXPORT( void, tls_ServerDelete, ( tls_server_t * ) );
 
 
 # define tls_ServerSessionPrepare( a ) (((tls_server_t *)a)->pf_session_prepare (a))
-# define tls_ServerSessionHandshake( a, b ) (((tls_session_t *)a)->pf_handshake (a, b, NULL))
+# define tls_ServerSessionHandshake( a, b ) (((tls_session_t *)a)->pf_handshake (a, b))
 # define tls_ServerSessionClose( a ) (((tls_session_t *)a)->pf_close (a))
 
 VLC_EXPORT( tls_session_t *, tls_ClientCreate, ( vlc_object_t *, int, const char * ) );
 VLC_EXPORT( void, tls_ClientDelete, ( tls_session_t * ) );
 
-# define tls_ClientSessionHandshake( a, b, c ) (((tls_session_t *)a)->pf_handshake (a, b, c))
+# define tls_ClientSessionHandshake( a, b ) (((tls_session_t *)a)->pf_handshake (a, b))
 
 # define tls_SessionContinueHandshake( a ) (((tls_session_t *)a)->pf_handshake2 (a))
 

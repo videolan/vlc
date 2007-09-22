@@ -306,12 +306,10 @@ gnutls_Recv( void *p_session, void *buf, int i_length )
  * needed, 2 if more would-be blocking send is required.
  */
 static int
-gnutls_ContinueHandshake( tls_session_t *p_session)
+gnutls_ContinueHandshake (tls_session_t *p_session)
 {
-    tls_session_sys_t *p_sys;
+    tls_session_sys_t *p_sys = p_session->p_sys;
     int val;
-
-    p_sys = (tls_session_sys_t *)(p_session->p_sys);
 
 #ifdef WIN32
     WSASetLastError( 0 );
@@ -461,32 +459,17 @@ error:
  * Starts negociation of a TLS session.
  *
  * @param fd stream socket already connected with the peer.
- * @param psz_hostname if not NULL, hostname to mention as a Server Name,
- *                     and to be found in the server's certificate.
  *
  * @return -1 on error (you need not and must not call tls_SessionClose),
  * 0 on succesful handshake completion, 1 if more would-be blocking recv is
  * needed, 2 if more would-be blocking send is required.
  */
 static int
-gnutls_BeginHandshake( tls_session_t *p_session, int fd,
-                       const char *psz_hostname )
+gnutls_BeginHandshake( tls_session_t *p_session, int fd )
 {
     tls_session_sys_t *p_sys = p_session->p_sys;
 
     gnutls_transport_set_ptr (p_sys->session, (gnutls_transport_ptr)(intptr_t)fd);
-
-    if( psz_hostname != NULL )
-    {
-        gnutls_server_name_set (p_sys->session, GNUTLS_NAME_DNS, psz_hostname,
-                                strlen (psz_hostname));
-        p_sys->psz_hostname = strdup (psz_hostname);
-        if (p_sys->psz_hostname == NULL)
-        {
-            p_session->pf_close (p_session);
-            return -1;
-        }
-    }
 
     return p_session->pf_handshake2( p_session );
 }
@@ -774,7 +757,7 @@ static int OpenClient (vlc_object_t *obj)
     gnutls_Addx509Directory (VLC_OBJECT (p_session), p_sys->x509_cred,
                              path, VLC_TRUE);
 
-    i_val = gnutls_init( &p_sys->session.session, GNUTLS_CLIENT );
+    i_val = gnutls_init (&p_sys->session.session, GNUTLS_CLIENT);
     if (i_val != 0)
     {
         msg_Err (obj, "cannot initialize TLS session: %s",
@@ -795,6 +778,14 @@ static int OpenClient (vlc_object_t *obj)
         msg_Err (obj, "cannot set TLS session credentials: %s",
                  gnutls_strerror (i_val));
         goto s_error;
+    }
+
+    char *servername = var_GetNonEmptyString (p_session, "tls-server-name");
+    if (servername != NULL )
+    {
+        p_sys->session.psz_hostname = servername;
+        gnutls_server_name_set (p_sys->session.session, GNUTLS_NAME_DNS,
+                                servername, strlen (servername));
     }
 
     return VLC_SUCCESS;

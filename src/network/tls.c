@@ -115,6 +115,15 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
     if (cl == NULL)
         return NULL;
 
+    var_Create (cl, "tls-server-name", VLC_VAR_STRING);
+    if (psz_hostname != NULL)
+    {
+        msg_Dbg (cl, "requested server name: %s", psz_hostname);
+        var_SetString (cl, "tls-server-name", psz_hostname);
+    }
+    else
+        msg_Dbg (cl, "requested anonymous server");
+
     cl->p_module = module_Need (cl, "tls client", 0, 0);
     if (cl->p_module == NULL)
     {
@@ -123,7 +132,7 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
         return NULL;
     }
 
-    int val = tls_ClientSessionHandshake (cl, fd, psz_hostname);
+    int val = tls_ClientSessionHandshake (cl, fd);
     while (val > 0)
         val = tls_SessionContinueHandshake (cl);
 
