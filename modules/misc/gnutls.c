@@ -589,8 +589,16 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
     dir = utf8_opendir( psz_dirname );
     if( dir == NULL )
     {
-        msg_Warn( p_this, "cannot open directory (%s): %m", psz_dirname );
-        return VLC_EGENERIC;
+        if (errno != ENOENT)
+        {
+            msg_Err (p_this, "cannot open directory (%s): %m", psz_dirname);
+            return VLC_EGENERIC;
+        }
+
+        msg_Dbg (p_this, "creating empty certificate directory: %s",
+                 psz_dirname);
+        utf8_mkdir (psz_dirname);
+        return VLC_SUCCESS;
     }
 #ifdef S_ISLNK
     else
@@ -729,6 +737,9 @@ static int OpenClient (vlc_object_t *obj)
                  gnutls_strerror (i_val));
         goto error;
     }
+
+    sprintf (path, "%s/ssl", homedir);
+    utf8_mkdir (path);
 
     if (var_CreateGetBool (obj, "tls-check-cert"))
     {
