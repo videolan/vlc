@@ -49,8 +49,6 @@ uint32_t CPUCapabilities( void );
 /*
  * Unicode stuff
  */
-int utf8_mkdir( const char *filename );
-
 
 /*
  * LibVLC objects stuff

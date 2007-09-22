@@ -327,6 +327,7 @@ us_strtod
 utf8_fopen
 utf8_fprintf
 utf8_lstat
+utf8_mkdir
 utf8_open
 utf8_opendir
 utf8_readdir

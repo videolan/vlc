@@ -45,6 +45,7 @@ VLC_EXPORT( DIR *, utf8_opendir, ( const char *dirname ) );
 VLC_EXPORT( char *, utf8_readdir, ( DIR *dir ) );
 VLC_EXPORT( int, utf8_loaddir, ( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
 VLC_EXPORT( int, utf8_scandir, ( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
+VLC_EXPORT( int, utf8_mkdir, ( const char *filename ) );
 
 #ifdef WIN32
 # define stat _stati64
