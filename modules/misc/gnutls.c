@@ -739,7 +739,7 @@ static int OpenClient (vlc_object_t *obj)
     }
 
     sprintf (path, "%s/ssl", homedir);
-    utf8_mkdir (path);
+    utf8_mkdir (path, 0755);
 
     if (var_CreateGetBool (obj, "tls-check-cert"))
     {
