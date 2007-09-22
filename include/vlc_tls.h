@@ -1,7 +1,7 @@
 /*****************************************************************************
- * tls.c: TLS wrapper
+ * tls.c: Transport Layer Security API
  *****************************************************************************
- * Copyright (C) 2004-2005 the VideoLAN team
+ * Copyright (C) 2004-2007 the VideoLAN team
  * $Id$
  *
  * Authors: Rémi Denis-Courmont <rem # videolan.org>
@@ -30,26 +30,14 @@
 
 # include <vlc_network.h>
 
-struct tls_t
-{
-    VLC_COMMON_MEMBERS
-
-    /* Module properties */
-    module_t  *p_module;
-    void *p_sys;
-
-    tls_server_t * (*pf_server_create) ( tls_t *, const char *,
-                                         const char * );
-    tls_session_t * (*pf_client_create) ( tls_t * );
-};
+typedef struct tls_server_sys_t tls_server_sys_t;
 
 struct tls_server_t
 {
     VLC_COMMON_MEMBERS
 
-    void *p_sys;
-
-    void (*pf_delete) ( tls_server_t * );
+    module_t  *p_module;
+    tls_server_sys_t *p_sys;
 
     int (*pf_add_CA) ( tls_server_t *, const char * );
     int (*pf_add_CRL) ( tls_server_t *, const char * );
@@ -57,11 +45,14 @@ struct tls_server_t
     tls_session_t * (*pf_session_prepare) ( tls_server_t * );
 };
 
+typedef struct tls_session_sys_t tls_session_sys_t;
+
 struct tls_session_t
 {
     VLC_COMMON_MEMBERS
 
-    void *p_sys;
+    module_t  *p_module;
+    tls_session_sys_t *p_sys;
 
     struct virtual_socket_t sock;
     int (*pf_handshake) ( tls_session_t *, int, const char * );

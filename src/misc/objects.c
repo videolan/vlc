@@ -299,10 +299,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof( vod_t );
             psz_type = "vod server";
             break;
-        case VLC_OBJECT_TLS:
-            i_size = sizeof( tls_t );
-            psz_type = "tls";
-            break;
         case VLC_OBJECT_XML:
             i_size = sizeof( xml_t );
             psz_type = "xml";

@@ -411,7 +411,6 @@ typedef struct httpd_redirect_t httpd_redirect_t;
 typedef struct httpd_stream_t httpd_stream_t;
 
 /* TLS support */
-typedef struct tls_t tls_t;
 typedef struct tls_server_t tls_server_t;
 typedef struct tls_session_t tls_session_t;
 

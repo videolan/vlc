@@ -60,7 +60,7 @@
 #define VLC_OBJECT_FILTER      (-22)
 #define VLC_OBJECT_VOD         (-23)
 #define VLC_OBJECT_SPU         (-24)
-#define VLC_OBJECT_TLS         (-25)
+/*#define VLC_OBJECT_xxx         (-25) - formerly TLS */
 #define VLC_OBJECT_SD          (-26)
 #define VLC_OBJECT_XML         (-27)
 #define VLC_OBJECT_OSDMENU     (-28)
