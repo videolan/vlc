@@ -1667,7 +1667,7 @@ static void CacheLoad( vlc_object_t *p_this )
     char *psz_filename, *psz_cachedir;
     FILE *file;
     int i, j, i_size, i_read;
-    char p_cachestring[sizeof(PLUGINSCACHE_DIR COPYRIGHT_MESSAGE)];
+    char p_cachestring[sizeof("cache " COPYRIGHT_MESSAGE)];
     char p_cachelang[6], p_lang[6];
     int i_cache;
     module_cache_t **pp_cache = 0;
@@ -1681,8 +1681,8 @@ static void CacheLoad( vlc_object_t *p_this )
         return;
     }
 
-    i_size = asprintf( &psz_filename, "%s"DIR_SEP"%s"DIR_SEP"%s",
-            psz_cachedir, PLUGINSCACHE_DIR, CacheName() );
+    i_size = asprintf( &psz_filename, "%s"DIR_SEP"%s",
+                       psz_cachedir, CacheName() );
     if( i_size <= 0 )
     {
         msg_Err( p_this, "out of memory" );
@@ -1736,10 +1736,10 @@ static void CacheLoad( vlc_object_t *p_this )
     fseek( file, sizeof(i_file_size), SEEK_SET );
 
     /* Check the file is a plugins cache */
-    i_size = sizeof(PLUGINSCACHE_DIR COPYRIGHT_MESSAGE) - 1;
+    i_size = sizeof("cache " COPYRIGHT_MESSAGE) - 1;
     i_read = fread( p_cachestring, 1, i_size, file );
     if( i_read != i_size ||
-        memcmp( p_cachestring, PLUGINSCACHE_DIR COPYRIGHT_MESSAGE, i_size ) )
+        memcmp( p_cachestring, "cache " COPYRIGHT_MESSAGE, i_size ) )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
         fclose( file );
@@ -2021,7 +2021,7 @@ static void CacheSave( vlc_object_t *p_this )
         "# For information about cache directory tags, see:\r\n"
         "#   http://www.brynosaurus.com/cachedir/\r\n";
 
-    char *psz_filename, *psz_cachedir;
+    char *psz_cachedir;
     FILE *file;
     int i, j, i_cache;
     module_cache_t **pp_cache;
@@ -2035,26 +2035,10 @@ static void CacheSave( vlc_object_t *p_this )
         return;
     }
 
-    psz_filename =
-       (char *)malloc( sizeof(DIR_SEP PLUGINSCACHE_DIR DIR_SEP ) +
-                       strlen(psz_cachedir) + strlen(CacheName()) );
+    char psz_filename[sizeof(DIR_SEP) + 32 + strlen(psz_cachedir)];
+    config_CreateDir( p_this, psz_cachedir );
 
-    if( !psz_filename )
-    {
-        msg_Err( p_this, "out of memory" );
-        return;
-    }
-
-    sprintf( psz_filename, "%s", psz_cachedir );
-
-    config_CreateDir( p_this, psz_filename );
-
-    strcat( psz_filename, DIR_SEP PLUGINSCACHE_DIR );
-
-    config_CreateDir( p_this, psz_filename );
-
-    strcat( psz_filename, DIR_SEP"CACHEDIR.TAG" );
-
+    sprintf( psz_filename, "%s"DIR_SEP"CACHEDIR.TAG", psz_cachedir );
     file = utf8_fopen( psz_filename, "wb" );
     if( file )
     {
@@ -2062,8 +2046,7 @@ static void CacheSave( vlc_object_t *p_this )
         fclose( file );
     }
 
-    sprintf( psz_filename, "%s"DIR_SEP"%s"DIR_SEP"%s", psz_cachedir,
-             PLUGINSCACHE_DIR, CacheName() );
+    sprintf( psz_filename, "%s"DIR_SEP"%s", psz_cachedir, CacheName() );
 
     msg_Dbg( p_this, "saving plugins cache file %s", psz_filename );
 
@@ -2075,13 +2058,12 @@ static void CacheSave( vlc_object_t *p_this )
         free( psz_filename );
         return;
     }
-    free( psz_filename );
 
     /* Empty space for file size */
     fwrite( &i_file_size, sizeof(char), sizeof(i_file_size), file );
 
     /* Contains version number */
-    fprintf( file, "%s", PLUGINSCACHE_DIR COPYRIGHT_MESSAGE );
+    fprintf( file, "%s", "cache " COPYRIGHT_MESSAGE );
 
     /* Sub-version number (to avoid breakage in the dev version when cache
      * structure changes) */

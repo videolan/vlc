@@ -60,7 +60,6 @@ int IsConfigStringType( int type );
 #  define CONFIG_DIR                    ".vlc"
 #endif
 #define CONFIG_FILE                     "vlcrc"
-#define PLUGINSCACHE_DIR                "cache"
 
 # ifdef __cplusplus
 }
