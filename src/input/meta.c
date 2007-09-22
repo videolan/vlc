@@ -222,12 +222,9 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     return i_ret;
 }
 
-#ifndef MAX_PATH
-#   define MAX_PATH 250
-#endif
 static void ArtCacheCreateDir( const char *psz_dir )
 {
-    char newdir[MAX_PATH+1];
+    char newdir[strlen( psz_dir ) + 1];
     strcpy( newdir, psz_dir );
     char * psz_newdir = newdir;
     char * psz = psz_newdir;
@@ -237,11 +234,12 @@ static void ArtCacheCreateDir( const char *psz_dir )
         while( *psz && *psz != DIR_SEP_CHAR) psz++;
         if( !*psz ) break;
         *psz = 0;
-        if( !EMPTY_STR( psz_newdir ) ) utf8_mkdir( psz_newdir );
+        if( !EMPTY_STR( psz_newdir ) )
+            utf8_mkdir( psz_newdir, 0700 );
         *psz = DIR_SEP_CHAR;
         psz++;
     }
-    utf8_mkdir( psz_dir );
+    utf8_mkdir( psz_dir, 0700 );
 }
 
 static char * ArtCacheGetSanitizedFileName( const char *psz )
@@ -273,7 +271,7 @@ static void __ArtCacheGetDirPath( vlc_object_t *p_obj,
         char * psz_album_sanitized = ArtCacheGetSanitizedFileName( psz_album );
         char * psz_artist_sanitized = ArtCacheGetSanitizedFileName( psz_artist );
 
-        snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP
+        snprintf( psz_dir, PATH_MAX, "%s" DIR_SEP
                   "art" DIR_SEP "artistalbum" DIR_SEP "%s" DIR_SEP "%s",
                       p_obj->p_libvlc->psz_cachedir,
                       psz_artist_sanitized, psz_album_sanitized );
@@ -283,7 +281,7 @@ static void __ArtCacheGetDirPath( vlc_object_t *p_obj,
     else
     {
         char * psz_title_sanitized = ArtCacheGetSanitizedFileName( psz_title );
-        snprintf( psz_dir, MAX_PATH, "%s" DIR_SEP
+        snprintf( psz_dir, PATH_MAX, "%s" DIR_SEP
                   "art" DIR_SEP "title" DIR_SEP "%s",
                   p_obj->p_libvlc->psz_cachedir,
                   psz_title_sanitized );
@@ -300,7 +298,7 @@ static void __ArtCacheGetFilePath( vlc_object_t *p_obj,
                                    const char *psz_artist, const char *psz_album,
                                    const char *psz_extension )
 {
-    char psz_dir[MAX_PATH+1];
+    char psz_dir[PATH_MAX+1];
     char * psz_ext;
     ArtCacheGetDirPath( p_obj, psz_dir, psz_title, psz_artist, psz_album );
 
@@ -311,7 +309,7 @@ static void __ArtCacheGetFilePath( vlc_object_t *p_obj,
     }
     else psz_ext = strdup( "" );
 
-    snprintf( psz_filename, MAX_PATH, "file://%s" DIR_SEP "art%s",
+    snprintf( psz_filename, PATH_MAX, "file://%s" DIR_SEP "art%s",
               psz_dir, psz_ext );
 
     free( psz_ext );
@@ -322,8 +320,8 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
     char *psz_artist;
     char *psz_album;
     char *psz_title;
-    char psz_dirpath[MAX_PATH+1];
-    char psz_filepath[MAX_PATH+1];
+    char psz_dirpath[PATH_MAX+1];
+    char psz_filepath[PATH_MAX+1];
     char * psz_filename;
     DIR * p_dir;
 
@@ -356,7 +354,7 @@ static int __input_FindArtInCache( vlc_object_t *p_obj, input_item_t *p_item )
     {
         if( !strncmp( psz_filename, "art", 3 ) )
         {
-            snprintf( psz_filepath, MAX_PATH, "file://%s" DIR_SEP "%s",
+            snprintf( psz_filepath, PATH_MAX, "file://%s" DIR_SEP "%s",
                       psz_dirpath, psz_filename );
             input_item_SetArtURL( p_item, psz_filepath );
             free( psz_filename );
@@ -379,7 +377,7 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
 {
     int i_status = VLC_EGENERIC;
     stream_t *p_stream;
-    char psz_filename[MAX_PATH+1];
+    char psz_filename[PATH_MAX+1];
     char *psz_artist = NULL;
     char *psz_album = NULL;
     char *psz_title = NULL;
@@ -480,7 +478,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     char *psz_album = NULL;
     char *psz_title = NULL;
     char *psz_type = NULL;
-    char psz_filename[MAX_PATH+1];
+    char psz_filename[PATH_MAX+1];
     FILE *f;
     input_attachment_t *p_attachment;
     struct stat s;

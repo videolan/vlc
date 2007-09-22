@@ -597,7 +597,7 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
 
         msg_Dbg (p_this, "creating empty certificate directory: %s",
                  psz_dirname);
-        utf8_mkdir (psz_dirname);
+        utf8_mkdir (psz_dirname, b_priv ? 0700 : 0755);
         return VLC_SUCCESS;
     }
 #ifdef S_ISLNK

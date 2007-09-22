@@ -325,7 +325,7 @@ FILE *utf8_fopen (const char *filename, const char *mode)
  * @return A 0 return value indicates success. A -1 return value indicates an
  *        error, and an error code is stored in errno
  */
-int utf8_mkdir( const char *dirname )
+int utf8_mkdir( const char *dirname, mode_t mode )
 {
 #if defined (UNDER_CE) || defined (WIN32)
     wchar_t wname[MAX_PATH + 1];
@@ -372,7 +372,7 @@ int utf8_mkdir( const char *dirname )
         errno = ENOENT;
         return -1;
     }
-    res = mkdir( locname, 0755 );
+    res = mkdir( locname, mode );
 
     LocaleFree( locname );
     return res;
