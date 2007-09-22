@@ -1187,24 +1187,48 @@ static int OpenServer (vlc_object_t *obj)
      * - support other ciper suites
      */
     val = gnutls_dh_params_init( &p_sys->dh_params );
-    if( val >= 0 )
-    {
-        msg_Dbg( p_server, "computing DHE ciphers parameters" );
-        val = gnutls_dh_params_generate2 (p_sys->dh_params,
-                                          config_GetInt (obj, "gnutls-dh-bits"));
 
-        /* Write the DH parameter to cache */
+    if (val >= 0)
+    {
+        FILE *cache;
         const char *cachedir = p_server->p_libvlc->psz_cachedir;
         char cachefile[strlen (cachedir) + sizeof ("/dh_params.pem")];
         sprintf (cachefile, "%s/dh_params.pem", cachedir);
 
-        FILE *cache = utf8_fopen (cachefile, "wb");
+        /* Read DH parameters from cache */
+        cache = utf8_fopen (cachefile, "rb");
+        if (cache != NULL)
+        {
+            unsigned char buf[1024];
+            gnutls_datum_t data;
+
+            data.data = buf;
+            data.size = fread (buf, 1, sizeof (buf), cache);
+
+            msg_Dbg (p_server, "loading DHE parameters (%u bytes) from %s",
+                     data.size, cachefile);
+            val = gnutls_dh_params_import_pkcs3 (p_sys->dh_params, &data,
+                                                 GNUTLS_X509_FMT_PEM);
+            fclose (cache);
+            if (val == 0)
+                goto dh_done;
+        }
+        else
+            msg_Dbg (p_server, "cannot load DHE parameters from %s: %m",
+                     cachefile);
+
+        msg_Dbg (p_server, "computing DHE ciphers parameters");
+        val = gnutls_dh_params_generate2 (p_sys->dh_params,
+                                          config_GetInt (obj, "gnutls-dh-bits"));
+
+        /* Write the DH parameter to cache */
+        cache = utf8_fopen (cachefile, "wb");
         if (cache != NULL)
         {
             size_t len = 0;
             gnutls_dh_params_export_pkcs3 (p_sys->dh_params,
                                            GNUTLS_X509_FMT_PEM, NULL, &len);
-            msg_Dbg (p_server, "caching DHE parameters (%u bytes) to %s",
+            msg_Dbg (p_server, "saving DHE parameters (%u bytes) to %s",
                      (unsigned)len, cachefile);
 
             unsigned char buf[len];
@@ -1216,15 +1240,17 @@ static int OpenServer (vlc_object_t *obj)
         }
         else
             msg_Warn (p_server, "cannot open to %s: %m", cachefile);
-
     }
-    if( val < 0 )
+
+    if (val < 0)
     {
-        msg_Err( p_server, "cannot initialize DHE cipher suites: %s",
-                 gnutls_strerror( val ) );
-        gnutls_certificate_free_credentials( p_sys->x509_cred );
+        msg_Err (p_server, "cannot initialize DHE cipher suites: %s",
+                 gnutls_strerror (val));
+        gnutls_certificate_free_credentials (p_sys->x509_cred);
         goto error;
     }
+dh_done:
+
     msg_Dbg( p_server, "ciphers parameters computed" );
 
     gnutls_certificate_set_dh_params( p_sys->x509_cred, p_sys->dh_params);
