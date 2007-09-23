@@ -222,6 +222,10 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     return i_ret;
 }
 
+#ifndef PATH_MAX
+#   define PATH_MAX 250
+#endif
+
 static void ArtCacheCreateDir( const char *psz_dir )
 {
     char newdir[strlen( psz_dir ) + 1];
