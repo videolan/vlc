@@ -282,10 +282,10 @@ subpicture_region_t *__spu_CreateRegion( vlc_object_t *p_this,
     if( !p_region ) return NULL;
 
     memset( p_region, 0, sizeof(subpicture_region_t) );
-    p_region->p_next = 0;
-    p_region->p_cache = 0;
+    p_region->p_next = NULL;
+    p_region->p_cache = NULL;
     p_region->fmt = *p_fmt;
-    p_region->psz_text = 0;
+    p_region->psz_text = NULL;
     p_region->p_style = NULL;
 
     if( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') )
@@ -441,10 +441,10 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
     p_subpic->b_pausable = VLC_FALSE;
     p_subpic->b_fade     = VLC_FALSE;
     p_subpic->i_alpha    = 0xFF;
-    p_subpic->p_region   = 0;
-    p_subpic->pf_render  = 0;
-    p_subpic->pf_destroy = 0;
-    p_subpic->p_sys      = 0;
+    p_subpic->p_region   = NULL;
+    p_subpic->pf_render  = NULL;
+    p_subpic->pf_destroy = NULL;
+    p_subpic->p_sys      = NULL;
     vlc_mutex_unlock( &p_spu->subpicture_lock );
 
     p_subpic->pf_create_region = __spu_CreateRegion;
@@ -516,7 +516,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
     vlc_mutex_lock( &p_spu->subpicture_lock );
 
     /* Check i_status again to make sure spudec hasn't destroyed the subpic */
-    while( p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE )
+    while( ( p_subpic != NULL ) && ( p_subpic->i_status != FREE_SUBPICTURE ) )
     {
         subpicture_region_t *p_region = p_subpic->p_region;
         int pi_scale_width[ SCALE_SIZE ];
@@ -524,7 +524,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         int pi_subpic_x[ SCALE_SIZE ];
         int k;
 
-        for( k=0; k< SCALE_SIZE ; k++ )
+        for( k = 0; k < SCALE_SIZE ; k++ )
             pi_subpic_x[ k ] = p_subpic->i_x;
 
         /* Load the blending module */
@@ -537,7 +537,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_spu->p_blend->fmt_out.video.i_aspect = p_fmt->i_aspect;
             p_spu->p_blend->fmt_out.video.i_chroma = p_fmt->i_chroma;
             p_spu->p_blend->fmt_in.video.i_chroma = VLC_FOURCC('Y','U','V','P');
-            /* XXX: We'll also be using it for YUVA and RGBA blending ... */
+            /* FIXME: We'll also be using it for YUVA and RGBA blending ... */
 
             p_spu->p_blend->p_module =
                 module_Need( p_spu->p_blend, "video blending", 0, 0 );
@@ -578,6 +578,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             }
             if( psz_modulename ) free( psz_modulename );
         }
+
         if( p_spu->p_text )
         {
             subpicture_region_t *p_text_region = p_subpic->p_region;
@@ -590,11 +591,13 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
              * rendered at native resolution, rather than video resolution.
              */
             while( p_text_region &&
-                p_text_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') )
+                   ( p_text_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') ) )
             {
                 p_text_region = p_text_region->p_next;
             }
-            if( p_text_region && ((p_text_region->i_align & SUBPICTURE_RENDERED) == 0) )
+
+            if( p_text_region && 
+                ( ( p_text_region->i_align & SUBPICTURE_RENDERED ) == 0 ) )
             {
                 p_spu->p_text->fmt_out.video.i_width =
                     p_spu->p_text->fmt_out.video.i_visible_width =
@@ -607,10 +610,16 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
         pi_scale_width[ SCALE_DEFAULT ]  = i_scale_width_orig;
         pi_scale_height[ SCALE_DEFAULT ] = i_scale_height_orig;
-        pi_scale_width[ SCALE_TEXT ]     = p_fmt->i_width  * 1000 / p_spu->p_text->fmt_out.video.i_width;
-        pi_scale_height[ SCALE_TEXT ]    = p_fmt->i_height * 1000 / p_spu->p_text->fmt_out.video.i_height;
 
-        for( k=0; k< SCALE_SIZE ; k++ )
+        if( p_spu->p_text )
+        {
+            pi_scale_width[ SCALE_TEXT ]     = ( p_fmt->i_width * 1000 ) /
+                                          p_spu->p_text->fmt_out.video.i_width;
+            pi_scale_height[ SCALE_TEXT ]    = ( p_fmt->i_height * 1000 ) /
+                                          p_spu->p_text->fmt_out.video.i_height;
+        }
+
+        for( k = 0; k < SCALE_SIZE ; k++ )
         {
             if( (p_subpic->i_original_picture_height > 0) &&
                 (p_subpic->i_original_picture_width  > 0) )
@@ -631,23 +640,24 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
         /* Set default subpicture aspect ratio */
         if( p_region && p_region->fmt.i_aspect &&
-            (!p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den) )
+            ( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den ) )
         {
             p_region->fmt.i_sar_den = p_region->fmt.i_aspect;
             p_region->fmt.i_sar_num = VOUT_ASPECT_FACTOR;
         }
         if( p_region &&
-            (!p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den) )
+            ( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den ) )
         {
             p_region->fmt.i_sar_den = p_fmt->i_sar_den;
             p_region->fmt.i_sar_num = p_fmt->i_sar_num;
         }
 
         /* Take care of the aspect ratio */
-        if( p_region && p_region->fmt.i_sar_num * p_fmt->i_sar_den !=
-            p_region->fmt.i_sar_den * p_fmt->i_sar_num )
+        if( p_region && 
+            ( ( p_region->fmt.i_sar_num * p_fmt->i_sar_den ) !=
+              ( p_region->fmt.i_sar_den * p_fmt->i_sar_num ) ) )
         {
-            for( k=0; k< SCALE_SIZE ; k++ )
+            for( k = 0; k < SCALE_SIZE ; k++ )
             {
                 pi_scale_width[ k ] = pi_scale_width[ k ] *
                     (int64_t)p_region->fmt.i_sar_num * p_fmt->i_sar_den /
@@ -668,7 +678,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_spu->p_scale->fmt_out.video.i_chroma =
                 p_spu->p_scale->fmt_in.video.i_chroma =
                     VLC_FOURCC('Y','U','V','P');
-            /* XXX: We'll also be using it for YUVA and RGBA blending ... */
+            /* FIXME: We'll also be using it for YUVA and RGBA blending ... */
+
             p_spu->p_scale->fmt_in.video.i_width =
                 p_spu->p_scale->fmt_in.video.i_height = 32;
             p_spu->p_scale->fmt_out.video.i_width =
@@ -751,6 +762,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 }
                 p_region->i_align |= SUBPICTURE_RENDERED;
             }
+
             if( p_region->i_align & SUBPICTURE_RENDERED )
             {
                 i_scale_idx   = SCALE_TEXT;
@@ -763,14 +775,15 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
             /* Force palette if requested */
             if( p_spu->b_force_palette &&
-                (VLC_FOURCC('Y','U','V','P') == p_region->fmt.i_chroma) )
+                ( VLC_FOURCC('Y','U','V','P') == p_region->fmt.i_chroma ) )
             {
                 memcpy( p_region->fmt.p_palette->palette,
                         p_spu->palette, 16 );
             }
 
             /* Scale SPU if necessary */
-            if( p_region->p_cache )
+            if( p_region->p_cache && 
+                ( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') ) )
             {
                 if( pi_scale_width[ i_scale_idx ] * p_region->fmt.i_width / 1000 !=
                     p_region->p_cache->fmt.i_width ||
@@ -783,9 +796,12 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 }
             }
 
-            if( ((pi_scale_width[ i_scale_idx ] != 1000) || (pi_scale_height[ i_scale_idx ] != 1000)) &&
-                ((pi_scale_width[ i_scale_idx ] > 0) || (pi_scale_height[ i_scale_idx ] > 0)) &&
-                p_spu->p_scale && !p_region->p_cache )
+            if( ( ( pi_scale_width[ i_scale_idx ] != 1000 ) || 
+                  ( pi_scale_height[ i_scale_idx ] != 1000 ) ) &&
+                ( ( pi_scale_width[ i_scale_idx ] > 0 ) || 
+                  ( pi_scale_height[ i_scale_idx ] > 0 ) ) &&
+                p_spu->p_scale && !p_region->p_cache &&
+                ( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') ) )
             {
                 picture_t *p_pic;
 
@@ -826,9 +842,13 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                     free( p_pic );
                 }
             }
-            if( ((pi_scale_width[ i_scale_idx ] != 1000) || (pi_scale_height[ i_scale_idx ] != 1000)) &&
-                ((pi_scale_width[ i_scale_idx ] > 0) || (pi_scale_height[ i_scale_idx ] > 0)) &&
-                p_spu->p_scale && p_region->p_cache )
+
+            if( ( ( pi_scale_width[ i_scale_idx ] != 1000 ) ||
+                  ( pi_scale_height[ i_scale_idx ] != 1000 ) ) &&
+                ( ( pi_scale_width[ i_scale_idx ] > 0 ) ||
+                  ( pi_scale_height[ i_scale_idx ] > 0 ) ) &&
+                p_spu->p_scale && p_region->p_cache &&
+                ( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') )  )
             {
                 p_region = p_region->p_cache;
             }
@@ -869,7 +889,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             i_x_offset = __MAX( i_x_offset, 0 );
             i_y_offset = __MAX( i_y_offset, 0 );
 
-            if( p_spu->i_margin != 0 && p_spu->b_force_crop == VLC_FALSE )
+            if( ( p_spu->i_margin != 0 ) &&
+                ( p_spu->b_force_crop == VLC_FALSE ) )
             {
                 int i_diff = 0;
                 int i_low = (i_y_offset - p_spu->i_margin) * i_inv_scale_y / 1000;
@@ -927,14 +948,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 }
             }
 
-            /* Update the output picture size */
-            p_spu->p_blend->fmt_out.video.i_width =
-                p_spu->p_blend->fmt_out.video.i_visible_width =
-                    p_fmt->i_width;
-            p_spu->p_blend->fmt_out.video.i_height =
-                p_spu->p_blend->fmt_out.video.i_visible_height =
-                    p_fmt->i_height;
-
             if( p_subpic->b_fade )
             {
                 mtime_t i_fade_start = ( p_subpic->i_stop +
@@ -950,9 +963,20 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             i_x_offset = __MAX( i_x_offset, 0 );
             i_y_offset = __MAX( i_y_offset, 0 );
 
-            p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
-                p_pic_src, &p_region->picture, i_x_offset, i_y_offset,
-                i_fade_alpha * p_subpic->i_alpha / 255 );
+            if( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') )
+            {
+                /* Update the output picture size */
+                p_spu->p_blend->fmt_out.video.i_width =
+                    p_spu->p_blend->fmt_out.video.i_visible_width =
+                        p_fmt->i_width;
+                p_spu->p_blend->fmt_out.video.i_height =
+                    p_spu->p_blend->fmt_out.video.i_visible_height =
+                        p_fmt->i_height;
+
+                p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
+                    p_pic_src, &p_region->picture, i_x_offset, i_y_offset,
+                    i_fade_alpha * p_subpic->i_alpha / 255 );
+            }
 
             if( b_rerender_text )
             {
