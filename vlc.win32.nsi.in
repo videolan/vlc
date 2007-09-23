@@ -226,16 +226,22 @@ FunctionEnd
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
 !macro AddContextMenu EXT
-  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC "" "Play with VLC media player"
-  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC\command "" '$INSTDIR\vlc.exe --started-from-file --no-playlist-enqueue "%1"'
+  Push $R0
+  ReadRegStr $R0 HKCR ${EXT} ""
+  WriteRegStr HKCR $R0\shell\PlayWithVLC "" "Play with VLC media player"
+  WriteRegStr HKCR $R0\shell\PlayWithVLC\command "" '$INSTDIR\vlc.exe --started-from-file --no-playlist-enqueue "%1"'
 
-  WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC "" "Add to VLC media player's Playlist"
-  WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC\command "" '$INSTDIR\vlc.exe --started-from-file --playlist-enqueue "%1"'
+  WriteRegStr HKCR $R0\shell\AddToPlaylistVLC "" "Add to VLC media player's Playlist"
+  WriteRegStr HKCR $R0\shell\AddToPlaylistVLC\command "" '$INSTDIR\vlc.exe --started-from-file --playlist-enqueue "%1"'
+  Pop $R0
 !macroend
 
 !macro DeleteContextMenu EXT
-  DeleteRegKey HKCR ${EXT}\shell\PlayWithVLC
-  DeleteRegKey HKCR ${EXT}\shell\AddToPlaylistVLC
+  Push $R0
+  ReadRegStr $R0 HKCR ${EXT} ""
+  DeleteRegKey HKCR $R0\shell\PlayWithVLC
+  DeleteRegKey HKCR $R0\shell\AddToPlaylistVLC
+  Pop $R0
 !macroend
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
