@@ -272,23 +272,23 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 static void Destroy( input_thread_t *p_input, sout_instance_t **pp_sout )
 {
     vlc_object_detach( p_input );
+    input_thread_private_t *priv = p_input->p;
 
     if( pp_sout )
         *pp_sout = NULL;
-    if( p_input->p->p_sout )
+    if( priv->p_sout )
     {
         if( pp_sout )
-            *pp_sout = p_input->p->p_sout;
-        else if( p_input->p->b_sout_keep )
-            SoutKeep( p_input->p->p_sout );
+            *pp_sout = priv->p_sout;
+        else if( priv->b_sout_keep )
+            SoutKeep( priv->p_sout );
         else
-            sout_DeleteInstance( p_input->p->p_sout );
+            sout_DeleteInstance( priv->p_sout );
     }
 
-    vlc_mutex_destroy( &p_input->p->lock_control );
-    free( p_input->p );
-
     vlc_object_destroy( p_input );
+    vlc_mutex_destroy( &priv->lock_control );
+    free( priv );
 }
 
 /**
