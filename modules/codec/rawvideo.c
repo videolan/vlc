@@ -109,6 +109,7 @@ static int OpenDecoder( vlc_object_t *p_this )
             break;
         case VLC_FOURCC('2','V','u','y'):
         case VLC_FOURCC('2','v','u','y'):
+        case VLC_FOURCC('A','V','U','I'):
             p_dec->fmt_in.i_codec = VLC_FOURCC('U','Y','V','Y');
             break;
         case VLC_FOURCC('y','v','1','2'):
