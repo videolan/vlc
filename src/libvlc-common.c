@@ -201,7 +201,8 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     /* Find verbosity from VLC_VERBOSE environment variable */
     psz_env = getenv( "VLC_VERBOSE" );
-    p_libvlc->i_verbose = psz_env ? atoi( psz_env ) : -1;
+    if( psz_env != NULL )
+        p_libvlc->i_verbose = atoi( psz_env );
 #if defined( HAVE_ISATTY ) && !defined( WIN32 )
     p_libvlc->b_color = isatty( 2 ); /* 2 is for stderr */
 #else
