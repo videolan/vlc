@@ -53,8 +53,8 @@
     #define PREF_W 410
     #define PREF_H 151
 #else
-    #define PREF_W 450
-    #define PREF_H 160
+    #define PREF_W 400
+    #define PREF_H 140
 #endif
 
 #define SET_WIDTH(i,j) i->widgetSize.setWidth(j)
