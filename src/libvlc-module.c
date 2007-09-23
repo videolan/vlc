@@ -1779,6 +1779,7 @@ vlc_module_begin();
               ONEINSTANCE_DBUS_LONGTEXT, VLC_TRUE );
     add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, VLC_TRUE );
+        change_unsaveable();
 #endif
 
 #if defined(WIN32)
@@ -1793,6 +1794,7 @@ vlc_module_begin();
               ONEINSTANCEWHENSTARTEDFROMFILE_LONGTEXT, VLC_TRUE );
     add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, VLC_TRUE );
+        change_unsaveable();
     add_bool( "high-priority", 0, NULL, HPRIORITY_TEXT,
               HPRIORITY_LONGTEXT, VLC_FALSE );
         change_need_restart();
