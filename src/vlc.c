@@ -78,12 +78,6 @@ int main( int i_argc, char *ppsz_argv[] )
     /* Disable the ugly Gnome crash dialog so that we properly segfault */
     putenv( (char *)"GNOME_DISABLE_CRASH_DIALOG=1" );
 #   endif
-
-    /* If the user isn't using VLC_VERBOSE, set it to 0 by default */
-    if( getenv( "VLC_VERBOSE" ) == NULL )
-    {
-        putenv( (char *)"VLC_VERBOSE=0" );
-    }
 #endif
 
 #if defined (HAVE_GETEUID) && !defined (SYS_BEOS)
