@@ -340,13 +340,11 @@ int osd_ConfigLoader( vlc_object_t *p_this, const char *psz_file,
         size_t i_len = 0;
         long pos = 0;
 
+        result = fscanf(fd, "%24s %255s", &action[0], &path[0] );
+
         /* override images path ? */
         psz_path = config_GetPsz( p_this, "osdmenu-file-path" );
-        if( psz_path == NULL )
-        {
-            result = fscanf(fd, "%24s %255s", &action[0], &path[0] );
-        }
-        else
+        if( psz_path )
         {
             /* psz_path is not null and therefor &path[0] cannot be NULL
              * it might be null terminated.
