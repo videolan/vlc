@@ -382,6 +382,7 @@ struct intf_sys_t
 
     int                 i_handlers;
     http_association_t  **pp_handlers;
+    httpd_handler_t     *p_art_handler;
 
     playlist_t          *p_playlist;
     input_thread_t      *p_input;

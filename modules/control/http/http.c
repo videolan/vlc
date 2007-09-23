@@ -159,6 +159,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_vlm      = NULL;
     p_sys->psz_address = psz_address;
     p_sys->i_port     = i_port;
+    p_sys->p_art_handler = NULL;
 
     /* determine Content-Type value for HTML pages */
     psz_src = config_GetPsz( p_intf, "http-charset" );
@@ -344,6 +345,14 @@ static int Open( vlc_object_t *p_this )
     }
 
     E_(ParseDirectory)( p_intf, psz_src, psz_src );
+    if( p_sys->i_files <= 0 )
+    {
+        msg_Err( p_intf, "cannot find any file in directory %s", psz_src );
+        goto failed;
+    }
+
+    p_intf->pf_run = Run;
+    free( psz_src );
 
     if( config_GetInt( p_intf, "http-album-art" ) )
     {
@@ -361,16 +370,8 @@ static int Open( vlc_object_t *p_this )
         h->p_handler = httpd_HandlerNew( p_sys->p_httpd_host,
                                          "/art", NULL, NULL, NULL,
                                          E_(ArtCallback), h );
-        TAB_APPEND( p_sys->i_handlers, p_sys->pp_handlers, h->p_handler );
+        p_sys->p_art_handler = h->p_handler;
     }
-
-    if( p_sys->i_files <= 0 )
-    {
-        msg_Err( p_intf, "cannot find any file in directory %s", psz_src );
-        goto failed;
-    }
-    p_intf->pf_run = Run;
-    free( psz_src );
 
     return VLC_SUCCESS;
 
@@ -434,6 +435,8 @@ static void Close ( vlc_object_t *p_this )
     }
     if( p_sys->i_handlers )
         free( p_sys->pp_handlers );
+    if( p_sys->p_art_handler )
+        httpd_HandlerDelete( p_sys->p_art_handler );
     httpd_HostDelete( p_sys->p_httpd_host );
     free( p_sys->psz_address );
     free( p_sys->psz_html_type );
