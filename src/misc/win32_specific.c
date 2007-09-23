@@ -128,6 +128,12 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
  *****************************************************************************/
 static void IPCHelperThread( vlc_object_t * );
 LRESULT CALLBACK WMCOPYWNDPROC( HWND, UINT, WPARAM, LPARAM );
+typedef struct
+{
+  int argc;
+  int enqueue;
+  char data[0];
+} vlc_ipc_data_t;
 
 void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
@@ -210,24 +216,27 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
             if( *pi_argc - 1 >= optind )
             {
                 COPYDATASTRUCT wm_data;
-                int i_opt, i_data;
-                char *p_data;
+                int i_opt;
+                vlc_ipc_data_t *p_data;
+                size_t i_data = sizeof (p_data);
 
-                i_data = sizeof(int);
                 for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
                 {
-                    i_data += sizeof(int);
+                    i_data += sizeof (size_t);
                     i_data += strlen( ppsz_argv[ i_opt ] ) + 1;
                 }
 
-                p_data = (char *)malloc( i_data );
-                *((int *)&p_data[0]) = *pi_argc - optind;
-                i_data = sizeof(int);
+                p_data = malloc( i_data );
+                p_data->argc = *pi_argc - optind;
+                p_data->enqueue = config_GetInt( p_this, "playlist-enqueue" );
+                i_data = 0;
                 for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
                 {
-                    int i_len = strlen( ppsz_argv[ i_opt ] ) + 1;
-                    *((int *)&p_data[i_data]) = i_len;
-                    i_data += sizeof(int);
+                    size_t i_len = strlen( ppsz_argv[ i_opt ] ) + 1;
+                    /* Windows will never switch to an architecture
+                     * with stronger alignment requirements, right. */
+                    *((size_t *)(p_data->data + i_data)) = i_len;
+                    i_data += sizeof (size_t);
                     memcpy( &p_data[i_data], ppsz_argv[ i_opt ], i_len );
                     i_data += i_len;
                 }
@@ -304,13 +313,12 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 
         if( pwm_data->lpData )
         {
-            int i_argc, i_data, i_opt, i_options;
             char **ppsz_argv;
-            char *p_data = (char *)pwm_data->lpData;
+            vlc_ipc_data_t *p_data = (vlc_ipc_data_t *)pwm_data->lpData;
+            size_t i_data = 0;
+            int i_argc = p_data->argc, i_opt, i_options;
 
-            i_argc = *((int *)&p_data[0]);
             ppsz_argv = (char **)malloc( i_argc * sizeof(char *) );
-            i_data = sizeof(int);
             for( i_opt = 0; i_opt < i_argc; i_opt++ )
             {
                 ppsz_argv[i_opt] = &p_data[i_data + sizeof(int)];
@@ -328,20 +336,12 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                 {
                     i_options++;
                 }
-                if( i_opt || config_GetInt( p_this, "playlist-enqueue" ) )
-                {
-                  playlist_AddExt( p_playlist, ppsz_argv[i_opt],
-                    NULL, PLAYLIST_APPEND ,
-                    PLAYLIST_END, -1,
-                    (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                    i_options, VLC_TRUE, VLC_FALSE );
-                } else {
-                  playlist_AddExt( p_playlist, ppsz_argv[i_opt],
-                    NULL, PLAYLIST_APPEND | PLAYLIST_GO,
-                    PLAYLIST_END, -1,
-                    (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                    i_options, VLC_TRUE, VLC_FALSE );
-                }
+                playlist_AddExt( p_playlist, ppsz_argv[i_opt],
+                  NULL, PLAYLIST_APPEND |
+                        ( ( i_opt || p_data->enqueue ) ? 0 : PLAYLIST_GO ),
+                  PLAYLIST_END, -1,
+                  (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
+                  i_options, VLC_TRUE, VLC_FALSE );
 
                 i_opt += i_options;
             }
