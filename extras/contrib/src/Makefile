@@ -803,25 +803,25 @@ flac-$(FLAC_VERSION).tar.gz:
 
 flac: flac-$(FLAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_WIN32
-	patch -p0 < Patches/flac-mingw32.patch
-endif
 ifneq ($(HOST),$(BUILD))
-	(patch -p0 < Patches/flac-cross.patch && cd $@ && autoconf)
+	(patch -p0 < Patches/flac-cross.patch)
 endif
+	cd $@ && autoconf
+
+FLAC_DISABLE_FLAGS = --disable-oggtest --disable-xmms-plugin --disable-cpplibs
 
 .flac: flac .ogg 
 ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src&& make -C libFLAC&& make -C libFLAC install  && cd .. && make -C include install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(FLAC_DISABLE_FLAGS) && cd src&& make -C libFLAC&& make -C libFLAC install && cd .. && make -C include install)
 else
 ifdef HAVE_DARWIN_OS
 ifdef HAVE_DARWIN_OS_ON_INTEL
-	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm-optimizations&& cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm-optimizations && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
 else
-	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(FLAC_DISABLE_FLAGS) && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
 endif
 else
-	(cd $<; autoconf && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-oggtest && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  $(FLAC_DISABLE_FLAGS) && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
 endif
 endif
 	$(INSTALL_NAME)
