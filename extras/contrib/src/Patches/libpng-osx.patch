@@ -1,6 +1,6 @@
-diff -ruN libpng-1.2.12/scripts/makefile.darwin libpng/scripts/makefile.darwin
---- libpng-1.2.12/scripts/makefile.darwin	2006-06-27 22:22:40.000000000 +0200
-+++ libpng/scripts/makefile.darwin	2006-12-08 18:15:36.000000000 +0100
+diff -ruN libpng-1.2.20/scripts/makefile.darwin libpng/scripts/makefile.darwin
+--- libpng-1.2.20/scripts/makefile.darwin	2007-09-08 05:23:01.000000000 +0200
++++ libpng/scripts/makefile.darwin	2007-09-23 15:31:21.000000000 +0200
 @@ -7,14 +7,14 @@
  # For conditions of distribution and use, see copyright notice in png.h
  
@@ -21,18 +21,18 @@ diff -ruN libpng-1.2.12/scripts/makefile.darwin libpng/scripts/makefile.darwin
  
  # Library name:
  LIBNAME = libpng12
-@@ -38,8 +38,8 @@
- RANLIB=ranlib
+@@ -39,8 +39,8 @@
  RM_F=/bin/rm -f
  
--CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops
+ # CFLAGS=-I$(ZLIBINC) -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE
+-CFLAGS=-I$(ZLIBINC) -Wall -O -funroll-loops
 -LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
 +CFLAGS=??EXTRA_CFLAGS?? -I$(ZLIBINC) -Wall -O3 -funroll-loops
 +LDFLAGS=??EXTRA_LDFLAGS?? -L. -L$(ZLIBLIB) -lpng12 -lz
  
  INCPATH=$(prefix)/include
  LIBPATH=$(exec_prefix)/lib
-@@ -72,7 +72,7 @@
+@@ -73,7 +73,7 @@
  .c.pic.o:
  	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
  
@@ -41,7 +41,7 @@ diff -ruN libpng-1.2.12/scripts/makefile.darwin libpng/scripts/makefile.darwin
  
  libpng.a: $(OBJS)
  	$(AR_RC) $@ $(OBJS)
-@@ -178,7 +178,7 @@
+@@ -179,7 +179,7 @@
  	chmod 755 $(DB)/$(LIBNAME)-config
  	(cd $(DB); $(LN_SF) $(LIBNAME)-config libpng-config)
  
