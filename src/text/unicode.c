@@ -81,6 +81,7 @@ static void find_charset_once (void)
     char *psz_charset;
     if (vlc_current_charset (&psz_charset)
      || (psz_charset == NULL)
+     || (strcmp (psz_charset, "ASCII") == 0)
      || ((size_t)snprintf (charset, sizeof (charset), "%s//translit",
                            psz_charset) >= sizeof (charset)))
         strcpy (charset, "UTF-8");
