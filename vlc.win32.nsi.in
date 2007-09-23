@@ -492,12 +492,6 @@ Section "ActiveX plugin" SEC04
   RegDLL "$INSTDIR\axvlc.dll"
 SectionEnd
 
-Section /o "Context Menus" SEC05
-  SectionIn 3
-  !insertmacro MacroAllExtensions AddContextMenu
-  !insertmacro AddContextMenu "Directory"
-SectionEnd
-
 SectionGroup "File type associations" SEC06
   SectionGroup "Audio Files"
     !insertmacro MacroAudioExtensions RegisterExtensionSection
@@ -509,6 +503,12 @@ SectionGroup "File type associations" SEC06
     !insertmacro MacroOtherExtensions RegisterExtensionSection
   SectionGroupEnd
 SectionGroupEnd
+
+Section /o "Context Menus" SEC05
+  SectionIn 3
+  !insertmacro MacroAllExtensions AddContextMenu
+  !insertmacro AddContextMenu "Directory"
+SectionEnd
 
 Section /o "Delete preferences and cache" SEC07
   !insertmacro delprefs
