@@ -1867,7 +1867,7 @@ vlc_module_begin();
         change_need_restart();
 #endif
 
-    add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
+    add_bool( "color", VLC_TRUE, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT,
                     VLC_FALSE );
         change_need_restart();
