@@ -203,6 +203,8 @@ libvlc_int_t * libvlc_InternalCreate( void )
     psz_env = getenv( "VLC_VERBOSE" );
     if( psz_env != NULL )
         p_libvlc->i_verbose = atoi( psz_env );
+    else
+        p_libvlc->i_verbose = 3;
 #if defined( HAVE_ISATTY ) && !defined( WIN32 )
     p_libvlc->b_color = isatty( 2 ); /* 2 is for stderr */
 #else
