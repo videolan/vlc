@@ -89,6 +89,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
+#if 0
     const char *psz_datadir = p_playlist->p_libvlc->psz_datadir;
     char *psz_uri = NULL;
     input_item_t *p_input;
@@ -141,6 +142,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
 error:
     free( psz_uri );
+#endif
     return VLC_ENOMEM;
 }
 
