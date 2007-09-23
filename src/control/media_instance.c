@@ -676,7 +676,18 @@ float libvlc_media_instance_get_rate(
     return (float)1000.0f/val.i_int;
 }
 
-int libvlc_media_instance_get_state(
+static libvlc_state_t vlc_to_libvlc_state[] =
+{
+    [INIT_S]        = libvlc_Opening,
+    [OPENING_S]     = libvlc_Opening,
+    [BUFFERING_S]   = libvlc_Buffering,    
+    [PLAYING_S]     = libvlc_Playing,    
+    [PAUSE_S]       = libvlc_Paused,    
+    [END_S]         = libvlc_Ended,    
+    [ERROR_S]       = libvlc_Error,    
+};
+
+libvlc_state_t libvlc_media_instance_get_state(
                                  libvlc_media_instance_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
@@ -685,10 +696,13 @@ int libvlc_media_instance_get_state(
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if ( !p_input_thread )
-        return 0;
+        return libvlc_Stopped;
 
     var_Get( p_input_thread, "state", &val );
     vlc_object_release( p_input_thread );
 
-    return val.i_int;
+    if( val.i_int < 0 || val.i_int > 6 )
+        return libvlc_Stopped;
+
+    return vlc_to_libvlc_state[val.i_int];
 }

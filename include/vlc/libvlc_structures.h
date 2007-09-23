@@ -120,6 +120,17 @@ typedef struct libvlc_media_descriptor_t libvlc_media_descriptor_t;
 
 typedef struct libvlc_media_instance_t libvlc_media_instance_t;
 
+typedef enum libvlc_state_t
+{
+    libvlc_Stopped,
+    libvlc_Opening,
+    libvlc_Buffering,
+    libvlc_Ended,
+    libvlc_Error,
+    libvlc_Playing,
+    libvlc_Paused
+} libvlc_state_t;
+
 /**@} */
 
 /*****************************************************************************

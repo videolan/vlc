@@ -388,7 +388,7 @@ VLC_PUBLIC_API void        libvlc_media_instance_set_position   ( libvlc_media_i
 VLC_PUBLIC_API vlc_bool_t  libvlc_media_instance_will_play      ( libvlc_media_instance_t *, libvlc_exception_t *);
 VLC_PUBLIC_API float       libvlc_media_instance_get_rate       ( libvlc_media_instance_t *, libvlc_exception_t *);
 VLC_PUBLIC_API void        libvlc_media_instance_set_rate       ( libvlc_media_instance_t *, float, libvlc_exception_t *);
-VLC_PUBLIC_API int         libvlc_media_instance_get_state      ( libvlc_media_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_state_t libvlc_media_instance_get_state      ( libvlc_media_instance_t *, libvlc_exception_t *);
 
 /**
  * Does this input have a video output ?
@@ -530,6 +530,11 @@ VLC_PUBLIC_API void
                                              libvlc_exception_t * p_e );
 
 VLC_PUBLIC_API void
+    libvlc_media_list_view_remove_at_index(  libvlc_media_list_view_t * p_mlv,
+                                             int index,
+                                             libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API void
     libvlc_media_list_view_add_item(  libvlc_media_list_view_t * p_mlv,
                                       libvlc_media_descriptor_t * p_md,
                                       libvlc_exception_t * p_e );
@@ -622,6 +627,18 @@ VLC_PUBLIC_API void
 VLC_PUBLIC_API void
     libvlc_media_list_player_play( libvlc_media_list_player_t * p_mlp,
                                    libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API void
+    libvlc_media_list_player_pause( libvlc_media_list_player_t * p_mlp,
+                                   libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API int
+    libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp,
+                                         libvlc_exception_t * p_e );
+
+VLC_PUBLIC_API libvlc_state_t
+    libvlc_media_list_player_get_state( libvlc_media_list_player_t * p_mlp,
+                                        libvlc_exception_t * p_e );
 
 VLC_PUBLIC_API void
     libvlc_media_list_player_play_item_at_index(
