@@ -72,7 +72,7 @@ vlc_module_begin();
 #if defined( HAVE_FORK ) || defined( WIN32 )
         add_string ( "http-handlers", NULL, NULL, HANDLERS_TEXT, HANDLERS_LONGTEXT, VLC_TRUE );
 #endif
-        add_bool   ( "http-album-art", 1, NULL, ART_TEXT, ART_LONGTEXT, VLC_TRUE );
+        add_bool   ( "http-album-art", VLC_FALSE, NULL, ART_TEXT, ART_LONGTEXT, VLC_TRUE );
         set_section( N_("HTTP SSL" ), 0 );
         add_string ( "http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );
         add_string ( "http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,  VLC_TRUE );
