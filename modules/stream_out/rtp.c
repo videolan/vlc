@@ -277,7 +277,6 @@ struct sout_stream_id_t
 
     sout_stream_t *p_stream;
     /* rtp field */
-    uint32_t    i_timestamp_start;
     uint16_t    i_sequence;
     uint8_t     i_payload_type;
     uint8_t     ssrc[4];
@@ -845,7 +844,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     id->p_stream   = p_stream;
 
-    id->i_timestamp_start = rand()&0xffffffff;
     id->i_sequence = rand()&0xffff;
     id->i_payload_type = p_sys->i_payload_type;
     id->ssrc[0] = rand()&0xff;
