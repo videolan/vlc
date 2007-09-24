@@ -369,6 +369,11 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
     answer->i_body = 0;
     answer->p_body = NULL;
 
+    if( query->i_proto != HTTPD_PROTO_RTSP )
+    {
+        answer->i_status = 505;
+    }
+    else
     if( httpd_MsgGet( query, "Require" ) != NULL )
     {
         answer->i_status = 551;
