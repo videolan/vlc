@@ -339,9 +339,28 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
     sout_stream_t *p_stream = rtsp->owner;
     char psz_sesbuf[17];
     const char *psz_session = NULL, *psz;
+    char control[sizeof("rtsp://[]:12345") + NI_MAXNUMERICHOST
+                  + strlen( rtsp->psz_path )];
 
     if( answer == NULL || query == NULL || cl == NULL )
         return VLC_SUCCESS;
+    else
+    {
+        /* Build self-referential control URL */
+        char ip[NI_MAXNUMERICHOST], *ptr;
+
+        httpd_ServerIP( cl, ip );
+        ptr = strchr( ip, '%' );
+        if( ptr != NULL )
+            *ptr = '\0';
+
+        if( strchr( ip, ':' ) != NULL )
+            sprintf( control, "rtsp://[%s]:%u%s", ip, rtsp->port,
+                     rtsp->psz_path );
+        else
+            sprintf( control, "rtsp://%s:%u%s", ip, rtsp->port,
+                     rtsp->psz_path );
+    }
 
     /* */
     answer->i_proto = HTTPD_PROTO_RTSP;
@@ -367,30 +386,14 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 break;
             }
 
-            char ip[NI_MAXNUMERICHOST], *ptr;
-            char control[sizeof("rtsp://[]:12345") + sizeof( ip )
-                            + strlen( rtsp->psz_path )];
-
-            /* Build self-referential URL */
-            httpd_ServerIP( cl, ip );
-            ptr = strchr( ip, '%' );
-            if( ptr != NULL )
-                *ptr = '\0';
-
-            if( strchr( ip, ':' ) != NULL )
-                sprintf( control, "rtsp://[%s]:%u%s", ip, rtsp->port,
-                         rtsp->psz_path );
-            else
-                sprintf( control, "rtsp://%s:%u%s", ip, rtsp->port,
-                         rtsp->psz_path );
-
-            ptr = SDPGenerate( rtsp->owner, control );
-
             answer->i_status = 200;
             httpd_MsgAdd( answer, "Content-Type",  "%s", "application/sdp" );
             httpd_MsgAdd( answer, "Content-Base",  "%s", control );
-            answer->p_body = (uint8_t *)ptr;
-            answer->i_body = strlen( ptr );
+            answer->p_body = (uint8_t *)SDPGenerate( rtsp->owner, control );
+            if( answer->p_body != NULL )
+                answer->i_body = strlen( (char *)answer->p_body );
+            else
+                answer->i_status = 500;
             break;
         }
 
