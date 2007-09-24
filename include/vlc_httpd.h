@@ -59,8 +59,9 @@ enum
 enum
 {
     HTTPD_PROTO_NONE,
-    HTTPD_PROTO_HTTP,
-    HTTPD_PROTO_RTSP,
+    HTTPD_PROTO_HTTP,  /* HTTP/1.x */
+    HTTPD_PROTO_RTSP,  /* RTSP/1.x */
+    HTTPD_PROTO_HTTP0, /* HTTP/0.x */
 };
 
 struct httpd_message_t

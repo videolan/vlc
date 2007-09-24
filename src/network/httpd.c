@@ -1525,21 +1525,23 @@ static void httpd_ClientRecv( httpd_client_t *cl )
             cl->i_buffer += i_len;
         }
 
+        if( ( cl->i_buffer >= 4 ) && ( cl->p_buffer[0] == '$' ) )
+        {
+            /* Interleaved RTP over RTSP */
+            cl->query.i_proto = HTTPD_PROTO_RTSP;
+            cl->query.i_type  = HTTPD_MSG_CHANNEL;
+            cl->query.i_channel = cl->p_buffer[1];
+            cl->query.i_body  = (cl->p_buffer[2] << 8)|cl->p_buffer[3];
+            cl->query.p_body  = malloc( cl->query.i_body );
+            cl->i_buffer      -= 4;
+            memcpy( cl->query.p_body, cl->p_buffer + 4, cl->i_buffer );
+        }
+        else
+        /* The smallest legal request is 7 bytes ("GET /\r\n"),
+         * this is the maximum we can ask at this point. */
         if( cl->i_buffer >= 7 )
         {
-            /* detect type */
-            if( cl->p_buffer[0] == '$' )
-            {
-                /* Interleaved RTP over RTSP */
-                cl->query.i_proto = HTTPD_PROTO_RTSP;
-                cl->query.i_type  = HTTPD_MSG_CHANNEL;
-                cl->query.i_channel = cl->p_buffer[1];
-                cl->query.i_body  = (cl->p_buffer[2] << 8)|cl->p_buffer[3];
-                cl->query.p_body  = malloc( cl->query.i_body );
-
-                cl->i_buffer      = 0;
-            }
-            else if( !memcmp( cl->p_buffer, "HTTP/1.", 7 ) )
+            if( !memcmp( cl->p_buffer, "HTTP/1.", 7 ) )
             {
                 cl->query.i_proto = HTTPD_PROTO_HTTP;
                 cl->query.i_type  = HTTPD_MSG_ANSWER;
@@ -1549,16 +1551,10 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                 cl->query.i_proto = HTTPD_PROTO_RTSP;
                 cl->query.i_type  = HTTPD_MSG_ANSWER;
             }
-            else if( !memcmp( cl->p_buffer, "GET ", 4 ) ||
-                     !memcmp( cl->p_buffer, "HEAD", 4 ) ||
-                     !memcmp( cl->p_buffer, "POST", 4 ) )
-            {
-                cl->query.i_proto = HTTPD_PROTO_HTTP;
-                cl->query.i_type  = HTTPD_MSG_NONE;
-            }
             else
             {
-                cl->query.i_proto = HTTPD_PROTO_RTSP;
+                /* We need the full request line to determine the protocol. */
+                cl->query.i_proto = HTTPD_PROTO_HTTP0;
                 cl->query.i_type  = HTTPD_MSG_NONE;
             }
         }
@@ -1584,7 +1580,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
         {
             if( cl->i_buffer == cl->i_buffer_size )
             {
-                char *newbuf = realloc( cl->p_buffer, cl->i_buffer_size + 1024 );
+                uint8_t *newbuf = realloc( cl->p_buffer, cl->i_buffer_size + 1024 );
                 if( newbuf == NULL )
                 {
                     i_len = 0;
@@ -1601,6 +1597,74 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                 break;
             }
             cl->i_buffer++;
+
+            if( ( cl->query.i_proto == HTTPD_PROTO_HTTP0 )
+             && ( cl->p_buffer[cl->i_buffer - 1] == '\n' ) )
+            {
+                /* Request line is now complete */
+                const char *p = memchr( cl->p_buffer, ' ', cl->i_buffer );
+                size_t len;
+
+                assert( cl->query.i_type == HTTPD_MSG_NONE );
+
+                if( p == NULL ) /* no URI: evil guy */
+                {
+                    i_len = 0; /* drop connection */
+                    break;
+                }
+
+                do
+                    p++; /* skips extra spaces */
+                while( *p == ' ' );
+
+                p = memchr( p, ' ', ((char *)cl->p_buffer) + cl->i_buffer - p );
+                if( p == NULL ) /* no explicit protocol: HTTP/0.9 */
+                {
+                    i_len = 0; /* not supported currently -> drop */
+                    break;
+                }
+
+                do
+                    p++; /* skips extra spaces ever again */
+                while( *p == ' ' );
+
+                len = ((char *)cl->p_buffer) + cl->i_buffer - p;
+                if( len < 7 ) /* foreign protocol */
+                    i_len = 0; /* I don't understand -> drop */
+                else
+                if( memcmp( p, "HTTP/1.", 7 ) == 0 )
+                {
+                    cl->query.i_proto = HTTPD_PROTO_HTTP;
+                    cl->query.i_version = atoi( p + 7 );
+                }
+                else
+                if( memcmp( p, "RTSP/1.", 7 ) == 0 )
+                {
+                    cl->query.i_proto = HTTPD_PROTO_RTSP;
+                    cl->query.i_version = atoi( p + 7 );
+                }
+                else
+                if( memcmp( p, "HTTP/", 5 ) == 0 )
+                {
+                    const uint8_t sorry[] =
+                       "HTTP/1.1 505 Unknown HTTP version\r\n\r\n";
+                    httpd_NetSend( cl, sorry, sizeof( sorry ) - 1 );
+                    i_len = 0; /* drop */
+                }
+                else
+                if( memcmp( p, "RTSP/", 5 ) == 0 )
+                {
+                    const uint8_t sorry[] =
+                        "RTSP/1.0 505 Unknown RTSP version\r\n\r\n";
+                    httpd_NetSend( cl, sorry, sizeof( sorry ) - 1 );
+                    i_len = 0; /* drop */
+                }
+                else /* yet another foreign protocol */
+                    i_len = 0;
+
+                if( i_len == 0 )
+                    break;
+            }
 
             if( ( cl->i_buffer >= 2 && !memcmp( &cl->p_buffer[cl->i_buffer-2], "\n\n", 2 ) )||
                 ( cl->i_buffer >= 4 && !memcmp( &cl->p_buffer[cl->i_buffer-4], "\r\n\r\n", 4 ) ) )
@@ -1684,23 +1748,6 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                             *p3++ = '\0';
                             cl->query.psz_args = (uint8_t *)strdup( p3 );
                         }
-                        if( p2 )
-                        {
-                            while( *p2 == ' ' )
-                            {
-                                p2++;
-                            }
-                            if( !strncasecmp( p2, "HTTP/1.", 7 ) )
-                            {
-                                cl->query.i_proto = HTTPD_PROTO_HTTP;
-                                cl->query.i_version = atoi( p2+7 );
-                            }
-                            else if( !strncasecmp( p2, "RTSP/1.", 7 ) )
-                            {
-                                cl->query.i_proto = HTTPD_PROTO_RTSP;
-                                cl->query.i_version = atoi( p2+7 );
-                            }
-                        }
                         p = p2;
                     }
                 }
@@ -1759,7 +1806,8 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                 }
                 if( cl->query.i_body > 0 )
                 {
-                    /* TODO Mhh, handle the case client will only send a request and close the connection
+                    /* TODO Mhh, handle the case client will only send a
+                     * request and close the connection
                      * to mark and of body (probably only RTSP) */
                     cl->query.p_body = malloc( cl->query.i_body );
                     cl->i_buffer = 0;
