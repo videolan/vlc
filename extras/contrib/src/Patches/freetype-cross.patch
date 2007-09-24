@@ -1,0 +1,23 @@
+--- freetype2/builds/unix/configure	Tue Jul  3 07:41:45 2007
++++ freetype2/builds/unix/configure.new	Mon Sep 24 10:42:30 2007
+***************
+*** 3269,3277 ****
+    IFS=$as_save_IFS
+    test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+    if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+-     ac_cv_prog_CC_BUILD="${build-gcc}"
+      echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+      break 2
+    fi
+  done
+--- 3269,3277 ----
+    IFS=$as_save_IFS
+    test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+    if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
++     ac_cv_prog_CC_BUILD="${build}-gcc"
+      echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+      break 2
+    fi
+  done

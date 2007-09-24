@@ -477,6 +477,7 @@ freetype-$(FREETYPE2_VERSION).tar.gz:
 
 freetype2: freetype-$(FREETYPE2_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p0 < Patches/freetype-cross.patch
 
 .freetype: freetype2
 ifdef HAVE_CYGWIN
