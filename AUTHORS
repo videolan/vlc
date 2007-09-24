@@ -272,6 +272,13 @@ D: AC3 decoder
 D: MPEG audio decoder
 S: France
 
+N: Jean-Baptiste Kempf
+E: jb@videolan.org
+C: jb
+D: Qt4 Interface
+D: Contribs system
+S: France
+
 N: Pavlov Konstantin
 E: thresh@videolan.org
 C: thresh
