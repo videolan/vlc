@@ -1500,6 +1500,21 @@ static void httpd_ClientRecv( httpd_client_t *cl )
 {
     int i_len;
 
+    /* ignore leading whites */
+    if( ( cl->query.i_proto == HTTPD_PROTO_NONE ) &&
+        ( cl->i_buffer == 0 ) )
+    {
+        unsigned char c;
+
+        i_len = httpd_NetRecv( cl, &c, 1 );
+
+        if( ( i_len > 0 ) && ( strchr( "\r\n\t ", c ) == NULL ) )
+        {
+            cl->p_buffer[0] = c;
+            cl->i_buffer++;
+        }
+    }
+    else
     if( cl->query.i_proto == HTTPD_PROTO_NONE )
     {
         /* enough to see if it's Interleaved RTP over RTSP or RTSP/HTTP */
