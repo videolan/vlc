@@ -1473,6 +1473,32 @@ void rtp_del_sink( sout_stream_id_t *id, int fd )
     net_Close( sink.rtp_fd );
 }
 
+uint16_t rtp_get_seq( const sout_stream_id_t *id )
+{
+    /* This will return values for the next packet.
+     * Accounting for caching would not be totally trivial. */
+    return id->i_sequence;
+}
+
+/* FIXME: this is pretty bad - if we remove and then insert an ES
+ * the number will get unsynched from inside RTSP */
+unsigned rtp_get_num( const sout_stream_id_t *id )
+{
+    sout_stream_sys_t *p_sys = id->p_stream->p_sys;
+    int i;
+
+    vlc_mutex_lock( &p_sys->lock_es );
+    for( i = 0; i < p_sys->i_es; i++ )
+    {
+        if( id == p_sys->es[i] )
+            break;
+    }
+    vlc_mutex_unlock( &p_sys->lock_es );
+
+    return i;
+}
+
+
 /****************************************************************************
  * rtp_packetize_*:
  ****************************************************************************/

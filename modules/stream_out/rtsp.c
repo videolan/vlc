@@ -195,6 +195,7 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
         id->hiport = hiport;
     }
 
+    /* FIXME: num screws up if any ES has been removed and re-added */
     snprintf( urlbuf, sizeof( urlbuf ), rtsp->track_fmt, rtsp->psz_path,
               num );
     msg_Dbg( rtsp->owner, "RTSP: adding %s", urlbuf );
@@ -603,15 +604,31 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             ses = RtspClientGet( rtsp, psz_session );
             if( ses != NULL )
             {
+                /* FIXME: we really need to limit the number of tracks... */
+                char info[ses->trackc * ( strlen( control )
+                                  + sizeof("/trackID=123;seq=65535, ") ) + 1];
+                size_t infolen = 0;
+
                 for( int i = 0; i < ses->trackc; i++ )
                 {
                     rtsp_strack_t *tr = ses->trackv + i;
-                    if( !tr->playing
-                     && ( ( id == NULL ) || ( tr->id == id->sout_id ) ) )
+                    if( ( id == NULL ) || ( tr->id == id->sout_id ) )
                     {
-                        tr->playing = VLC_TRUE;
-                        rtp_add_sink( tr->id, tr->fd, VLC_FALSE );
+                        if( !tr->playing )
+                        {
+                            tr->playing = VLC_TRUE;
+                            rtp_add_sink( tr->id, tr->fd, VLC_FALSE );
+                        }
+                        infolen += sprintf( info + infolen,
+                                            "%s/trackID=%u;seq=%u, ", control,
+                                            rtp_get_num( tr->id ),
+                                            rtp_get_seq( tr->id ) );
                     }
+                }
+                if( infolen > 0 )
+                {
+                    info[infolen - 2] = '\0'; /* remove trailing ", " */
+                    httpd_MsgAdd( answer, "RTP-Info", "%s", info );
                 }
             }
             vlc_mutex_unlock( &rtsp->lock );

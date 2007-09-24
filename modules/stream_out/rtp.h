@@ -38,6 +38,8 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url );
 
 int rtp_add_sink( sout_stream_id_t *id, int fd, vlc_bool_t rtcp_mux );
 void rtp_del_sink( sout_stream_id_t *id, int fd );
+uint16_t rtp_get_seq( const sout_stream_id_t *id );
+unsigned rtp_get_num( const sout_stream_id_t *id );
 
 /* RTCP */
 typedef struct rtcp_sender_t rtcp_sender_t;
