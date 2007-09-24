@@ -116,7 +116,7 @@ fi
 # Check for gettext
 if gettextize --version >/dev/null 2>&1; then
 # Autopoint is available from 0.11.3, but we need 0.11.5
-if expr `gettextize --version | sed -e '1s/[^0-9]*//' -e q` \
+if expr `gettextize --version |cut -d' ' -f2- | sed -e '1s/[^0-9]*//' -e q` \
         '>=' 0.11.5 >/dev/null 2>&1; then
   # We have gettext, and a recent version! Everything is cool.
   autopoint=autopoint
