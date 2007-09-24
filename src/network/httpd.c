@@ -314,8 +314,8 @@ static const http_status_info http_reason[] =
     { 501, "Not implemented" },
   /*{ 502, "Bad gateway" },*/
     { 503, "Service unavailable" },
-  /*{ 504, "Gateway time-out" },
-    { 505, "Protocol version not supported" },*/
+  /*{ 504, "Gateway time-out" },*/
+    { 505, "Protocol version not supported" },
     { 551, "Option not supported" },
     { 999, "" }
 };
