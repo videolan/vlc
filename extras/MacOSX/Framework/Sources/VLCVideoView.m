@@ -158,7 +158,7 @@ static void HandleMediaListPlayerStopped( const libvlc_event_t * event, void * s
 {
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
-    //libvlc_media_list_player_pause( p_mlp, &p_e );
+    libvlc_media_list_player_pause( p_mlp, &p_e );
     quit_on_exception( &p_e );
 }
 
@@ -170,14 +170,18 @@ static void HandleMediaListPlayerStopped( const libvlc_event_t * event, void * s
 /* State */
 - (BOOL)isPlaying
 {
-    //libvlc_media_list_player_is_playing( p_mlp, &p_e );
-    //quit_on_exception( &p_e );
-    return FALSE;
+    libvlc_exception_t p_e;
+    BOOL ret = libvlc_media_list_player_is_playing( p_mlp, &p_e );
+    quit_on_exception( &p_e );
+    return ret;
 }
 
 - (BOOL)isPaused
 {
-    return FALSE;
+    libvlc_exception_t p_e;
+    libvlc_state_t state = libvlc_media_list_player_get_state( p_mlp, &p_e );
+    quit_on_exception( &p_e );
+    return (state == libvlc_Paused);
 }
 
 - (VLCTime *)currentTime
@@ -233,10 +237,6 @@ static void HandleMediaListPlayerStopped( const libvlc_event_t * event, void * s
     [[NSColor blackColor] set];
     NSRectFill(aRect);
     [self unlockFocus];
-}
-- (BOOL)preservesContentDuringLiveResize
-{
-    return NO;//YES;
 }
 - (BOOL)isOpaque
 {
