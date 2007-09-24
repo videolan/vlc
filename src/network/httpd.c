@@ -1519,13 +1519,13 @@ static void httpd_ClientRecv( httpd_client_t *cl )
     {
         /* enough to see if it's Interleaved RTP over RTSP or RTSP/HTTP */
         i_len = httpd_NetRecv( cl, &cl->p_buffer[cl->i_buffer],
-                               4 - cl->i_buffer );
+                               7 - cl->i_buffer );
         if( i_len > 0 )
         {
             cl->i_buffer += i_len;
         }
 
-        if( cl->i_buffer >= 4 )
+        if( cl->i_buffer >= 7 )
         {
             /* detect type */
             if( cl->p_buffer[0] == '$' )
@@ -1539,12 +1539,12 @@ static void httpd_ClientRecv( httpd_client_t *cl )
 
                 cl->i_buffer      = 0;
             }
-            else if( !memcmp( cl->p_buffer, "HTTP", 4 ) )
+            else if( !memcmp( cl->p_buffer, "HTTP/1.", 7 ) )
             {
                 cl->query.i_proto = HTTPD_PROTO_HTTP;
                 cl->query.i_type  = HTTPD_MSG_ANSWER;
             }
-            else if( !memcmp( cl->p_buffer, "RTSP", 4 ) )
+            else if( !memcmp( cl->p_buffer, "RTSP/1.", 7 ) )
             {
                 cl->query.i_proto = HTTPD_PROTO_RTSP;
                 cl->query.i_type  = HTTPD_MSG_ANSWER;
