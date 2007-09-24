@@ -364,7 +364,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
 
     /* */
     answer->i_proto = HTTPD_PROTO_RTSP;
-    answer->i_version= query->i_version;
+    answer->i_version= 0;
     answer->i_type   = HTTPD_MSG_ANSWER;
     answer->i_body = 0;
     answer->p_body = NULL;
