@@ -1155,6 +1155,9 @@ ifdef HAVE_DARWIN_OS
 	patch -p0 < Patches/live-osx.patch
 endif
 	patch -p0 < Patches/live-starttime.patch
+	(cd live/liveMedia/include; \
+		mv liveMedia_version.hh liveMedia_version.hh.bak; \
+	sed -e 's/.*LIVEMEDIA_LIBRARY_VERSION_INT.*/#define LIVEMEDIA_LIBRARY_VERSION_INT         9999999999/' liveMedia_version.hh.bak > liveMedia_version.hh )
 	patch -Np0 < Patches/live-config.patch
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/live-noapps.patch
