@@ -121,16 +121,6 @@ if expr `gettextize --version |cut -d' ' -f2- | sed -e '1s/[^0-9]*//' -e q` \
   # We have gettext, and a recent version! Everything is cool.
   autopoint=autopoint
   GETTEXT=yes
-  set +x
-  echo "autopoint program we will use:"
-  which ${autopoint}
-  echo "autopoint --version"
-  autopoint --version
-  echo "Directory listing of extras/contrib/bin"
-  ls -la extras/contrib/bin
-  echo "extras/contrib/bin/autopoint --version"
-  extras/contrib/bin/autopoint --version
-  set -x
 else
   # User's gettext is too old. try to continue anyway.
   autopoint=:
