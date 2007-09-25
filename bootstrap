@@ -121,6 +121,9 @@ if expr `gettextize --version |cut -d' ' -f2- | sed -e '1s/[^0-9]*//' -e q` \
   # We have gettext, and a recent version! Everything is cool.
   autopoint=autopoint
   GETTEXT=yes
+  if test `which autopoint` = "/home/buildslave/slave/win32-trunk-contrib/build/extras/contrib/bin/autopoint"; then
+    (cd extras/contrib/src ; rm -rf gettext .gettext ; make gettext && make .intl)
+  fi
 else
   # User's gettext is too old. try to continue anyway.
   autopoint=:
