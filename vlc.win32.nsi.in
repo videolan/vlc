@@ -225,22 +225,30 @@ FunctionEnd
 ; Context menu entries ;
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
+!macro AddContextMenuExt EXT
+  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC "" "Play with VLC media player"
+  WriteRegStr HKCR ${EXT}\shell\PlayWithVLC\command "" '$INSTDIR\vlc.exe --started-from-file --no-playlist-enqueue "%1"'
+
+  WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC "" "Add to VLC media player's Playlist"
+  WriteRegStr HKCR ${EXT}\shell\AddToPlaylistVLC\command "" '$INSTDIR\vlc.exe --started-from-file --playlist-enqueue "%1"'
+!macroend
+
 !macro AddContextMenu EXT
   Push $R0
   ReadRegStr $R0 HKCR ${EXT} ""
-  WriteRegStr HKCR $R0\shell\PlayWithVLC "" "Play with VLC media player"
-  WriteRegStr HKCR $R0\shell\PlayWithVLC\command "" '$INSTDIR\vlc.exe --started-from-file --no-playlist-enqueue "%1"'
-
-  WriteRegStr HKCR $R0\shell\AddToPlaylistVLC "" "Add to VLC media player's Playlist"
-  WriteRegStr HKCR $R0\shell\AddToPlaylistVLC\command "" '$INSTDIR\vlc.exe --started-from-file --playlist-enqueue "%1"'
+  !insertmacro AddContextMenuExt $R0
   Pop $R0
+!macroend
+
+!macro DeleteContextMenuExt EXT
+  DeleteRegKey HKCR ${EXT}\shell\PlayWithVLC
+  DeleteRegKey HKCR ${EXT}\shell\AddToPlaylistVLC
 !macroend
 
 !macro DeleteContextMenu EXT
   Push $R0
   ReadRegStr $R0 HKCR ${EXT} ""
-  DeleteRegKey HKCR $R0\shell\PlayWithVLC
-  DeleteRegKey HKCR $R0\shell\AddToPlaylistVLC
+  !insertmacro DeleteContextMenuExt $R0
   Pop $R0
 !macroend
 
@@ -513,7 +521,7 @@ SectionGroupEnd
 Section /o "Context Menus" SEC05
   SectionIn 3
   !insertmacro MacroAllExtensions AddContextMenu
-  !insertmacro AddContextMenu "Directory"
+  !insertmacro AddContextMenuExt "Directory"
 SectionEnd
 
 Section /o "Delete preferences and cache" SEC07
@@ -641,7 +649,7 @@ Section "Uninstall" SEC91
 
   !insertmacro MacroAllExtensions DeleteContextMenu
   !insertmacro MacroAllExtensions UnRegisterExtensionSection
-  !insertmacro DeleteContextMenu "Directory"
+  !insertmacro DeleteContextMenuExt "Directory"
 
   ;remove activex plugin
   UnRegDLL "$INSTDIR\axvlc.dll"
