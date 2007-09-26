@@ -194,6 +194,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_text = var_CreateGetBool( p_dec, "vbi-text" );
 //    var_AddCallback( p_dec, "vbi-text", Text, p_sys );
 
+    es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
+    if( p_sys->b_text )
+        p_dec->fmt_out.video.i_chroma = VLC_FOURCC('T','E','X','T');
+    else
+        p_dec->fmt_out.video.i_chroma = VLC_FOURCC('R','G','B','A');
+
     return VLC_SUCCESS;
 }
 
@@ -304,7 +310,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     /* Normal text subs, easy markup */
     p_spu->i_flags = SUBPICTURE_ALIGN_BOTTOM;
 
-    p_spu->i_start = p_block->i_pts;
+    p_spu->i_start = (mtime_t) p_block->i_pts;
     p_spu->i_stop = (mtime_t) 0;
     p_spu->b_ephemer = VLC_TRUE;
     p_spu->b_absolute = VLC_FALSE;
@@ -316,7 +322,8 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
     if( p_sys->b_text )
     {
-        unsigned int i_total, i_textsize = 7000;
+        unsigned int i_textsize = 7000;
+        int i_total;
         char p_text[7000];
 
         i_total = vbi_print_page_region( &p_page, p_text, i_textsize,
