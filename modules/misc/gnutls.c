@@ -49,9 +49,10 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
-#define DH_BITS           1024
 #define CACHE_TIMEOUT     3600
 #define CACHE_SIZE          64
+
+#include "dhparams.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -60,12 +61,6 @@ static int  OpenClient  (vlc_object_t *);
 static void CloseClient (vlc_object_t *);
 static int  OpenServer  (vlc_object_t *);
 static void CloseServer (vlc_object_t *);
-
-#define DH_BITS_TEXT N_("Diffie-Hellman prime bits")
-#define DH_BITS_LONGTEXT N_( \
-    "This allows you to modify the Diffie-Hellman prime's number of bits, " \
-    "used for TLS or SSL-based server-side encryption. This is generally " \
-    "not needed." )
 
 #define CACHE_TIMEOUT_TEXT N_("Expiration time for resumed TLS sessions")
 #define CACHE_TIMEOUT_LONGTEXT N_( \
@@ -101,8 +96,7 @@ vlc_module_begin();
         set_subcategory( SUBCAT_ADVANCED_MISC );
         set_callbacks( OpenServer, CloseServer );
 
-        add_integer( "gnutls-dh-bits", DH_BITS, NULL, DH_BITS_TEXT,
-                    DH_BITS_LONGTEXT, VLC_TRUE );
+        add_obsolete_integer( "gnutls-dh-bits" );
         add_integer( "gnutls-cache-timeout", CACHE_TIMEOUT, NULL,
                     CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, VLC_TRUE );
         add_integer( "gnutls-cache-size", CACHE_SIZE, NULL, CACHE_SIZE_TEXT,
@@ -772,6 +766,9 @@ static int OpenClient (vlc_object_t *obj)
                                   p_sys->session.session))
         goto s_error;
 
+    /* minimum DH prime bits */
+    gnutls_dh_set_prime_bits (p_sys->session.session, 1024);
+
     i_val = gnutls_credentials_set (p_sys->session.session,
                                     GNUTLS_CRD_CERTIFICATE,
                                     p_sys->x509_cred);
@@ -1028,9 +1025,6 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     if (p_session->pf_handshake == gnutls_HandshakeAndValidate)
         gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUIRE);
 
-    i_val = config_GetInt (p_server, "gnutls-dh-bits");
-    gnutls_dh_set_prime_bits (session, i_val);
-
     /* Session resumption support */
     i_val = config_GetInt (p_server, "gnutls-cache-timeout");
     gnutls_db_set_cache_expiration (session, i_val);
@@ -1183,77 +1177,27 @@ static int OpenServer (vlc_object_t *obj)
     }
 
     /* FIXME:
-     * - regenerate these regularly
      * - support other ciper suites
      */
-    val = gnutls_dh_params_init( &p_sys->dh_params );
-
+    val = gnutls_dh_params_init (&p_sys->dh_params);
     if (val >= 0)
     {
-        FILE *cache;
-        const char *cachedir = p_server->p_libvlc->psz_cachedir;
-        char cachefile[strlen (cachedir) + sizeof ("/dh_params.pem")];
-        sprintf (cachefile, "%s/dh_params.pem", cachedir);
+        const gnutls_datum_t data = {
+            .data = (unsigned char *)dh_params,
+            .size = sizeof (dh_params) - 1,
+        };
 
-        /* Read DH parameters from cache */
-        cache = utf8_fopen (cachefile, "rb");
-        if (cache != NULL)
-        {
-            unsigned char buf[1024];
-            gnutls_datum_t data;
-
-            data.data = buf;
-            data.size = fread (buf, 1, sizeof (buf), cache);
-
-            msg_Dbg (p_server, "loading DHE parameters (%u bytes) from %s",
-                     data.size, cachefile);
-            val = gnutls_dh_params_import_pkcs3 (p_sys->dh_params, &data,
-                                                 GNUTLS_X509_FMT_PEM);
-            fclose (cache);
-            if (val == 0)
-                goto dh_done;
-        }
-        else
-            msg_Dbg (p_server, "cannot load DHE parameters from %s: %m",
-                     cachefile);
-
-        msg_Dbg (p_server, "computing DHE ciphers parameters");
-        val = gnutls_dh_params_generate2 (p_sys->dh_params,
-                                          config_GetInt (obj, "gnutls-dh-bits"));
-
-        /* Write the DH parameter to cache */
-        cache = utf8_fopen (cachefile, "wb");
-        if (cache != NULL)
-        {
-            size_t len = 0;
-            gnutls_dh_params_export_pkcs3 (p_sys->dh_params,
-                                           GNUTLS_X509_FMT_PEM, NULL, &len);
-            msg_Dbg (p_server, "saving DHE parameters (%u bytes) to %s",
-                     (unsigned)len, cachefile);
-
-            unsigned char buf[len];
-            gnutls_dh_params_export_pkcs3 (p_sys->dh_params,
-                                           GNUTLS_X509_FMT_PEM, buf, &len);
-            if (fwrite (buf, 1, len, cache) != len)
-                msg_Warn (p_server, "cannot write to %s: %m", cachefile);
-            fclose (cache);
-        }
-        else
-            msg_Warn (p_server, "cannot open to %s: %m", cachefile);
+        val = gnutls_dh_params_import_pkcs3 (p_sys->dh_params, &data,
+                                             GNUTLS_X509_FMT_PEM);
+        if (val == 0)
+            gnutls_certificate_set_dh_params (p_sys->x509_cred,
+                                              p_sys->dh_params);
     }
-
     if (val < 0)
     {
         msg_Err (p_server, "cannot initialize DHE cipher suites: %s",
                  gnutls_strerror (val));
-        gnutls_certificate_free_credentials (p_sys->x509_cred);
-        goto error;
     }
-dh_done:
-
-    msg_Dbg( p_server, "ciphers parameters computed" );
-
-    gnutls_certificate_set_dh_params( p_sys->x509_cred, p_sys->dh_params);
 
     return VLC_SUCCESS;
 
