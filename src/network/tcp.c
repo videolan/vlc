@@ -162,6 +162,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
                 msg_Err( p_this, "connection failed: %m" );
                 goto next_ai;
             }
+            msg_Dbg( p_this, "connection: %m" );
 
             var_Create( p_this, "ipv4-timeout",
                         VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -173,7 +174,6 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
             }
             d = div( timeout.i_int, 100 );
 
-            msg_Dbg( p_this, "connection in progress" );
             for (;;)
             {
                 struct pollfd ufd = { .fd = fd, .events = POLLOUT };
@@ -222,6 +222,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 #endif
         }
 
+        msg_Dbg( p_this, "connection succeeded (socket = %d)", fd );
         i_handle = fd; /* success! */
         break;
 
