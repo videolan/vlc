@@ -1,0 +1,12 @@
+diff -ur flac-1.2.1/include/share/alloc.h flac/include/share/alloc.h
+--- flac-1.2.1/include/share/alloc.h	2007-09-12 06:32:21.000000000 +0100
++++ flac/include/share/alloc.h	2007-09-25 20:54:09.000000000 +0100
+@@ -28,7 +28,7 @@
+  */
+ 
+ #include <limits.h> /* for SIZE_MAX */
+-#if !defined _MSC_VER && !defined __MINGW32__ && !defined __EMX__
++#if !defined _MSC_VER && !defined __EMX__
+ #include <stdint.h> /* for SIZE_MAX in case limits.h didn't get it */
+ #endif
+ #include <stdlib.h> /* for size_t, malloc(), etc */
