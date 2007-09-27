@@ -77,7 +77,8 @@
         dragdrop    CDATA   "true"
         playondrop  CDATA   "true"
     >
-<!ELEMENT Layout (Group)+>
+<!ELEMENT Layout (Group|Image|Button|Playlist|Slider|RadialSlider|Text|Checkbox|
+                  Anchor|Video|Playtree|Panel)+>
     <!ATTLIST Layout
         id          CDATA   "none"
         width       CDATA   #REQUIRED
