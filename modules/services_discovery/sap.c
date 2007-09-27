@@ -869,7 +869,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     if (strchr (psz_uri + 1, ':'))
     {
         host = psz_uri;
-        psz_uri[strlen (psz_uri)] = ']';
+        strcat (psz_uri, "]");
     }
     else
         host = psz_uri + 1;
@@ -957,7 +957,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
                         psz_source_ip) == 2)
             {
                 /* According to RFC4570, FQDNs can be used for source-filters,
-                * but -seriously- this is impractical */
+                 * but -seriously- this is impractical */
                 switch (ipv)
                 {
 #ifdef AF_INET6
