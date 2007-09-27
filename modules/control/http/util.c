@@ -347,6 +347,9 @@ char *E_(FromUTF8)( intf_thread_t *p_intf, char *psz_utf8 )
 {
     intf_sys_t    *p_sys = p_intf->p_sys;
 
+    if( psz_utf8 == NULL )
+        return NULL;
+
     if ( p_sys->iconv_from_utf8 != (vlc_iconv_t)-1 )
     {
         size_t i_in = strlen(psz_utf8);
