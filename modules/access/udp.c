@@ -109,7 +109,7 @@ struct access_sys_t
 {
     int fd;
 
-    vlc_bool_t b_framed_rtp;
+    vlc_bool_t b_framed_rtp, b_comedia;
 
     /* reorder rtp packets when out-of-sequence */
     uint16_t i_last_seqno;
@@ -223,7 +223,7 @@ static int Open( vlc_object_t *p_this )
         case IPPROTO_TCP:
             p_sys->fd = net_ConnectTCP( p_access, psz_server_addr, i_server_port );
             p_access->pf_block = BlockRTP;
-            p_sys->b_framed_rtp = VLC_TRUE;
+            p_sys->b_comedia = p_sys->b_framed_rtp = VLC_TRUE;
             break;
 
         case IPPROTO_DCCP:
@@ -234,6 +234,7 @@ static int Open( vlc_object_t *p_this )
             p_sys->fd = -1;
             msg_Err( p_access, "DCCP support not compiled-in!" );
 #endif
+            p_sys->b_comedia = VLC_TRUE;
             break;
     }
     free (psz_name);
@@ -325,12 +326,21 @@ static block_t *BlockUDP( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     block_t      *p_block;
 
+    if( p_access->info.b_eof )
+        return NULL;
+
     /* Read data */
     p_block = block_New( p_access, MTU );
     p_block->i_buffer = net_Read( p_access, p_sys->fd, NULL,
                                   p_block->p_buffer, MTU, VLC_FALSE );
-    if( p_block->i_buffer < 0 )
+    if( ( p_block->i_buffer < 0 )
+     || ( p_sys->b_comedia && ( p_block->i_buffer == 0 ) ) )
     {
+        if( p_sys->b_comedia )
+        {
+            p_access->info.b_eof = VLC_TRUE;
+            msg_Dbg( p_access, "connection-oriented media hangup" );
+        }
         block_Release( p_block );
         return NULL;
     }
