@@ -31,6 +31,7 @@
 #include <vlc_strings.h>
 #include "../playlist/playlist_internal.h"
 #include <errno.h>
+#include <limits.h>                                             /* PATH_MAX */
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -221,10 +222,6 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
 
     return i_ret;
 }
-
-#ifndef PATH_MAX
-#   define PATH_MAX 250
-#endif
 
 static void ArtCacheCreateDir( const char *psz_dir )
 {
