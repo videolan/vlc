@@ -1390,13 +1390,20 @@ static void ThreadSend( vlc_object_t *p_this )
             if( splice( fd[2], NULL, id->sinkv[i].rtp_fd, NULL, len,
                         SPLICE_F_NONBLOCK ) >= 0 )
                 continue;
+            if( errno == EAGAIN )
+                continue;
 
             /* splice failed */
             splice( fd[2], NULL, fd[4], NULL, len, 0 );
+#else
+            if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) >= 0 )
+                continue;
 #endif
-            if( ( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) < 0 )
-             && ( errno != EAGAIN ) )
-                deadv[deadc++] = id->sinkv[i].rtp_fd;
+            /* Retry sending to root out soft-errors */
+            if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) >= 0 )
+                continue;
+
+            deadv[deadc++] = id->sinkv[i].rtp_fd;
         }
         vlc_mutex_unlock( &id->lock_sink );
 
