@@ -1378,10 +1378,8 @@ static void ThreadSend( vlc_object_t *p_this )
         mwait( i_date );
 
         vlc_mutex_lock( &id->lock_sink );
-#if 0
         unsigned deadc = 0; /* How many dead sockets? */
         int deadv[id->sinkc]; /* Dead sockets list */
-#endif
 
         for( int i = 0; i < id->sinkc; i++ )
         {
@@ -1396,8 +1394,9 @@ static void ThreadSend( vlc_object_t *p_this )
             /* splice failed */
             splice( fd[2], NULL, fd[4], NULL, len, 0 );
 #endif
-            if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) < 0 )
-                /*deadv[deadc++] = id->sinkv[i].rtp_fd*/;
+            if( ( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) < 0 )
+             && ( errno != EAGAIN ) )
+                deadv[deadc++] = id->sinkv[i].rtp_fd;
         }
         vlc_mutex_unlock( &id->lock_sink );
 
@@ -1406,13 +1405,11 @@ static void ThreadSend( vlc_object_t *p_this )
         splice( fd[0], NULL, fd[4], NULL, len, 0 );
 #endif
 
-#if 0
         for( unsigned i = 0; i < deadc; i++ )
         {
             msg_Dbg( id, "removing socket %d", deadv[i] );
             rtp_del_sink( id, deadv[i] );
         }
-#endif
 
         /* Hopefully we won't overflow the SO_MAXCONN accept queue */
         while( id->listen_fd != NULL )
