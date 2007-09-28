@@ -1461,23 +1461,6 @@ static int LoadModule( vlc_object_t *p_this, char *psz_file,
 
 #elif defined(HAVE_DL_DLOPEN) && defined(RTLD_NOW)
     /* static is OK, we are called atomically */
-
-#   if defined(SYS_LINUX)
-    /* XXX HACK #1 - we should NOT open modules with RTLD_GLOBAL, or we
-     * are going to get namespace collisions when two modules have common
-     * public symbols, but ALSA is being a pest here. */
-    if( strstr( psz_file, "alsa_plugin" ) )
-    {
-        handle = dlopen( psz_file, RTLD_NOW | RTLD_GLOBAL );
-        if( handle == NULL )
-        {
-            msg_Warn( p_this, "cannot load module `%s' (%s)",
-                              psz_file, dlerror() );
-            return -1;
-        }
-    }
-#   endif
-
     handle = dlopen( psz_file, RTLD_NOW );
     if( handle == NULL )
     {
