@@ -883,7 +883,7 @@ then
       VLC_ADD_LDFLAGS([screensaver libvlc],[$DBUS_LIBS])
       VLC_ADD_CFLAGS([screensaver libvlc],[$DBUS_CFLAGS])
       dnl Check for dbus control interface
-        AC_ARG_ENABLE(dbus-control, [  --disable-dbus-control   D-BUS control interface (default enabled)])
+        AC_ARG_ENABLE(dbus-control, [  --disable-dbus-control  D-BUS control interface (default enabled)])
         if test "${enable_dbus_control}" != "no"
         then
           VLC_ADD_PLUGINS([dbus])
@@ -891,8 +891,7 @@ then
           VLC_ADD_CFLAGS([dbus],[$DBUS_CFLAGS])
         fi
       dnl Check for Telepathy
-        AC_ARG_ENABLE(telepathy,
-          [  --enable-telepathy          Telepathy Presence plugin through DBus(default enabled)])
+        AC_ARG_ENABLE(telepathy, [  --enable-telepathy      Telepathy Presence plugin through DBus(default enabled)])
         if test "${enable_telepathy}" != "no"; then
           VLC_ADD_PLUGINS([telepathy])
           VLC_ADD_LDFLAGS([telepathy],[$DBUS_LIBS])
@@ -902,7 +901,7 @@ then
     if ${PKG_CONFIG} --exists dbus-1
     then
       [AC_ARG_ENABLE(old-dbus,
-        [  --enable-old-dbus      Deprecated D-Bus support (default disabled)])]
+        [  --enable-old-dbus       Deprecated D-Bus support (default disabled)])]
 
       if test "${enable_old_dbus}" != "yes"
       then
@@ -1524,7 +1523,7 @@ dnl
 dnl  Memory usage
 dnl
 AC_ARG_ENABLE(optimize-memory,
-[  --enable-optimize-memory      optimize memory usage over performance])
+[  --enable-optimize-memory optimize memory usage over performance])
 if test "${enable_optimize_memory}" = "yes"; then
   AC_DEFINE(OPTIMIZE_MEMORY, 1, Define if you want to optimize memory usage over performance)
 fi
@@ -1850,7 +1849,7 @@ dnl
 dnl  special access module for dc1394 input
 dnl
 AC_ARG_ENABLE(dc1394,
-  [  --enable-dc1394       dc1394 access module (default disabled)])
+  [  --enable-dc1394         dc1394 access module (default disabled)])
 if test "${enable_dc1394}" = "yes"
 then
   AC_CHECK_HEADERS(libraw1394/raw1394.h, [
@@ -2119,7 +2118,7 @@ dnl
 dnl  Windows DirectShow BDA access module
 dnl
 AC_ARG_ENABLE(bda,
-  [  --enable-bda          Win32 DirectShow BDA support (default enabled on Win32)])
+  [  --enable-bda            Win32 DirectShow BDA support (default enabled on Win32)])
 if test "${enable_bda}" != "no"
 then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
@@ -2136,7 +2135,7 @@ dnl
 dnl  OpenCV wrapper and example filters
 dnl
 AC_ARG_ENABLE(opencv,
-  [  --enable-opencv            OpenCV (computer vision) filter (default disabled)])
+  [  --enable-opencv         OpenCV (computer vision) filter (default disabled)])
 if test "${enable_opencv}" = "yes" -a "${CXX}" != "";
 then
   AC_ARG_WITH(opencv-tree,
@@ -2306,7 +2305,7 @@ dnl
 dnl  Video4Linux plugin
 dnl
 AC_ARG_ENABLE(v4l2,
-  [  --enable-v4l2            Video4Linux2 input support (default disabled)])
+  [  --enable-v4l2           Video4Linux2 input support (default disabled)])
 if test "${enable_v4l2}" = "yes"
 then
   AC_ARG_WITH(v4l2,
@@ -3934,7 +3933,7 @@ dnl  XVMC module
 dnl  (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(xvmc,
-  [  --enable-xvmc            XVMC support (default disabled)])
+  [  --enable-xvmc           XVMC support (default disabled)])
 if test "${enable_xvmc}" = "yes" &&
   (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
    test "${enable_xvmc}" = "yes"); then
@@ -4042,7 +4041,7 @@ dnl
 AC_ARG_ENABLE(sdl,
   [  --enable-sdl            SDL support (default enabled)])
 AC_ARG_ENABLE(sdl-image,
-  [  --enable-sdl-image            SDL image support (default enabled)])
+  [  --enable-sdl-image      SDL image support (default enabled)])
 if test "${enable_sdl}" != "no"
 then
   SDL_PATH="${PATH}"
@@ -5318,7 +5317,7 @@ dnl
 dnl  ncurses module
 dnl
 AC_ARG_ENABLE(ncurses,
-  [  --disable-ncurses        ncurses interface support (default enabled)],
+  [  --disable-ncurses       ncurses interface support (default enabled)],
   [if test "${enable_ncurses}" != "no"; then
      AC_CHECK_HEADERS(ncursesw/curses.h,
        [AC_CHECK_LIB( ncursesw, mvprintw,
@@ -5844,7 +5843,7 @@ dnl
 dnl  Mediacontrol Python bindings
 dnl
 AC_ARG_ENABLE(python-bindings,
-  [  --enable-python-bindings    Enable Python bindings (default disabled)])
+  [  --enable-python-bindings Enable Python bindings (default disabled)])
 dnl TODO: look for python dev headers
 AS_IF([test "${enable_python_bindings}" = "yes"],
       PLUGINS_BINDINGS="${PLUGINS_BINDINGS} python"
