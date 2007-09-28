@@ -106,8 +106,6 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
     pl_Release( p_intf );
 
-    dbus_threads_init_default();
-
     dbus_error_init( &error );
 
     /* connect to the session bus */
