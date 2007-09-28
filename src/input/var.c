@@ -448,10 +448,6 @@ void input_ConfigVarInit ( input_thread_t *p_input )
                     VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     }
 
-    var_Create( p_input, "demuxed-id3", VLC_VAR_BOOL ); /* FIXME beurk */
-    val.b_bool = VLC_FALSE;
-    var_Change( p_input, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
-
     var_Create( p_input, "seekable", VLC_VAR_BOOL );
     val.b_bool = VLC_TRUE; /* Fixed later*/
     var_Change( p_input, "seekable", VLC_VAR_SETVALUE, &val, NULL );
