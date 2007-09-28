@@ -29,7 +29,7 @@ Important notes:
     You can then use commands like: @test marq-marquee Goodbye
     These new commands are also available in the telnet interface.
  * The "rtp" access output module has been removed:
-   Please the RTP stream output instead, e.g.:
+   Please use the RTP stream output instead, e.g.:
      Old: '#std{access=rtp,dst=239.255.1.2,sap}'
      New: '#rtp{dst=239.255.1.2,sap}'
 
