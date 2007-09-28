@@ -46,7 +46,8 @@ Playlist:
    (Default scripts open YouTube, DailyMotion, metacafe and Google Video URLs)
 
 Input/Demuxers:
-  * UDP-Lite protocol (requires OS support) for RTP/AVP
+  * UDP-Lite transport for RTP/AVP
+  * DCCP transport for RTP/AVP
   * Proxy support for MMSH stream
   * JACK audio input support
   * MP4 gpac and Apple chapter support
@@ -103,9 +104,10 @@ Audio output and filters
 Stream output:
  * RTSP for TS-multiplexed broadcast streams
  * New RTP payload formats:
+   * Speex voice audio codec
    * ITU T.140 (for text, subtitles)
-(FIXME: * Speex voice audio codec)
- * UDP-Lite (requires OS support) transport for RTP
+ * UDP-Lite transport for RTP
+ * DCCP transport for RTP
  * Lots of fixes for RTSP broadcasting
 
 Interfaces:
