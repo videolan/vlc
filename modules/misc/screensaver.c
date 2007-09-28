@@ -134,8 +134,6 @@ static void Deactivate( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    vlc_bool_t b_quit = VLC_FALSE;
-
 #ifdef HAVE_DBUS
     p_intf->p_sys->p_connection = dbus_init( p_intf );
 #endif
