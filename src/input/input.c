@@ -761,6 +761,20 @@ static int Init( input_thread_t * p_input )
     memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
     vlc_mutex_init( p_input, &p_input->p->counters.counters_lock );
 
+    for( i = 0; i < p_input->p->input.p_item->i_options; i++ )
+    {
+        if( !strncmp( p_input->p->input.p_item->ppsz_options[i], "meta-file", 9 ) )
+        {
+            msg_Dbg( p_input, "Input is a meta file: disabling unneeded options" );
+            var_SetString( p_input, "sout", "" );
+            var_SetBool( p_input, "sout-all", VLC_FALSE );
+            var_SetString( p_input, "input-slave", "" );
+            var_SetInteger( p_input, "input-repeat", 0 );
+            var_SetString( p_input, "sub-file", "" );
+            var_SetBool( p_input, "sub-autodetect-file", VLC_FALSE );
+        }
+    }
+
     if( !p_input->b_preparsing )
     {
         /* Prepare statistics */

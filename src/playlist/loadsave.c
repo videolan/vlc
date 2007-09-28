@@ -89,7 +89,6 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-#if 0
     const char *psz_datadir = p_playlist->p_libvlc->psz_datadir;
     char *psz_uri = NULL;
     input_item_t *p_input;
@@ -122,8 +121,9 @@ int playlist_MLLoad( playlist_t *p_playlist )
         goto error;
     }
 
+    const char *const psz_option = "meta-file";
     p_input = input_ItemNewExt( p_playlist, psz_uri,
-                                _("Media Library"), 0, NULL, -1 );
+                                _("Media Library"), 1, &psz_option, -1 );
     if( p_input == NULL )
         goto error;
 
@@ -142,7 +142,6 @@ int playlist_MLLoad( playlist_t *p_playlist )
 
 error:
     free( psz_uri );
-#endif
     return VLC_ENOMEM;
 }
 

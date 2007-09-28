@@ -446,7 +446,9 @@ static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
     char psz_uri[256+10];
     input_item_t *p_input;
     snprintf( psz_uri, 256+9, "file/://%s", psz_file );
-    p_input = input_ItemNewExt( p_playlist, psz_uri, psz_file, 0, NULL, -1 );
+    const char *const psz_option = "meta-file";
+    p_input = input_ItemNewExt( p_playlist, psz_uri, psz_file,
+                                1, &psz_option, -1 );
     playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, PLAYLIST_END,
                        VLC_TRUE, VLC_FALSE );
     input_Read( p_playlist, p_input, VLC_TRUE );
