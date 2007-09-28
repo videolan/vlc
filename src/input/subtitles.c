@@ -59,7 +59,11 @@
 static const char const sub_exts[][6] = {
     "utf", "utf8", "utf-8",
     "sub", "srt", "smi",
-    "txt", "ssa", "idx", ""
+    "txt", "ssa", "idx",
+
+    "cdg",
+
+    ""
 };
 
 /* extensions from unsupported types */
@@ -400,6 +404,9 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                     struct stat st;
 
                     sprintf( psz_path, "%s%s", psz_dir, psz_name );
+                    if( !strcmp( psz_path, psz_fname ) )
+                        continue;
+
                     msg_Dbg( p_this,
                                 "autodetected subtitle: %s with priority %d",
                                 psz_path, i_prio );
@@ -455,6 +462,14 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                     break;
             }
             if( i >= i_sub_count )
+            {
+                result2[i_result2] = result[j].psz_fname;
+                i_result2++;
+            }
+        }
+        else if( result[j].psz_ext && !strcasecmp( result[j].psz_ext, "cdg" ) )
+        {
+            if( result[j].priority == 4 )
             {
                 result2[i_result2] = result[j].psz_fname;
                 i_result2++;
