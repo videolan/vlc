@@ -193,7 +193,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                   psz_title, psz_artist );
     else
         snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>", psz_title );
- 
+
     free( psz_title );
     free( psz_artist );
     free( psz_album );

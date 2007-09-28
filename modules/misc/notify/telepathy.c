@@ -40,6 +40,7 @@ struct intf_sys_t
     char            *psz_format;
     DBusConnection  *p_conn;
     int             i_id;
+    int             i_item-changes;
 };
 
 /*****************************************************************************
@@ -162,9 +163,18 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( !strncmp( "playlist-current", psz_var, 16 ) )
     { /* stores the current input item id */
         p_intf->p_sys->i_id = newval.i_int;
+        p_intf->p_sys->i_item-changes = 0;
     }
-    else if( newval.i_int != p_intf->p_sys->i_id ) /* "item-change" */
-        return VLC_SUCCESS;
+    else
+    {
+        if( newval.i_int != p_intf->p_sys->i_id ) /* "item-change" */
+            return VLC_SUCCESS;
+        /* some variable bitrate inputs call "item-change callbacks each time
+         * their length is updated, that is several times per second. */
+        if( p_intf->p_sys->i_item-changes > 5 )
+            return VLC_SUCCESS;
+        p_intf->p_sys->i_item-changes++;
+    }
 
 
     playlist_t *p_playlist = pl_Yield( p_this );
