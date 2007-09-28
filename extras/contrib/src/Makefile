@@ -804,9 +804,6 @@ flac-$(FLAC_VERSION).tar.gz:
 
 flac: flac-$(FLAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifneq ($(HOST),$(BUILD))
-	(patch -p0 < Patches/flac-cross.patch)
-endif
 ifdef HAVE_WIN32
 	patch -p0 < Patches/flac-win32.patch
 endif
