@@ -165,7 +165,7 @@ void E_(CloseMux)( vlc_object_t *p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    int i;
+    unsigned int i;
 
     if( av_write_trailer( p_sys->oc ) < 0 )
     {
