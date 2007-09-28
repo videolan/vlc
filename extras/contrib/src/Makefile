@@ -391,8 +391,13 @@ ifeq ($(BUILD),i586-pc-beos)
 	( cd $< && for f in `find . -name libtool`; do  sed -e 's/ -shared / -nostart /' -e 's/^predep_objects.*/predep_objects=""/' -i  $$f; chmod +x $$f; done )
 endif
 ifneq ($(HOST),$(BUILD))
-# We'll use the installed gettext and only need to cross-compile libintl, also build autopoint and gettextsize tools need for VLC bootstrap
+  ifndef HAVE_CYGWIN
+    # We'll use the installed gettext and only need to cross-compile libintl, also build autopoint and gettextsize tools need for VLC bootstrap
 	( cd $< && make -C gettext-runtime/intl && patch -p1 < ../Patches/libintl.patch && make -C gettext-runtime/intl install && make -C gettext-tools/misc install )
+  else
+    # We are compiling for MinGW on Cygwin -- build the full current gettext
+	( cd $< && make && patch -p1 < ../Patches/libintl.patch && make install )
+  endif
 else
 # Build and install the whole gettext
 	( cd $< && make && patch -p1 < ../Patches/libintl.patch && make install )
@@ -1295,7 +1300,9 @@ else
 x264: x264-$(X264_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
+  ifndef HAVE_CYGWIN
 	(cd x264;patch -p0 <../Patches/x264-20050624-win32.patch)
+  endif
 else
 	patch -p0 < Patches/x264.patch
 	rm x264/x264.c
@@ -2164,6 +2171,10 @@ pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 
 .pthreads: pthreads
 	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC-static && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && cp -v *.a $(PREFIX)/lib/)
+ifdef HAVE_CYGWIN
+# for some reason Cygwin builds libpthreadGC2.a
+	mv $(PREFIX)/lib/libpthreadGC2.a $(PREFIX)/lib/libpthread.a
+endif
 	$(INSTALL_NAME)
 	touch $@
 
