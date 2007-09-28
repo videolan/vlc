@@ -658,8 +658,6 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    dbus_threads_init_default();
-
     dbus_error_init( &error );
 
     /* connect to the session bus */
