@@ -250,7 +250,8 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     recordButton->setMaximumSize( QSize( 26, 26 ) );
     recordButton->setIconSize( QSize( 20, 20 ) );
     advLayout->addWidget( recordButton );
-    BUTTON_SET_ACT( recordButton, "R", qtr( "Record" ), record() );
+    BUTTON_SET_ACT_I( recordButton, "", vlc_record_16px.png,
+            qtr( "Record" ), record() );
 
     normalButton = new QPushButton( "N" );
     normalButton->setMaximumSize( QSize( 26, 26 ) );
@@ -393,7 +394,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
     playButton->setIconSize( QSize( 30, 30 ) );
 
     controlLayout->addWidget( playButton, 2, 0, 2, 2, Qt::AlignBottom );
- 
+
     controlLayout->setColumnMinimumWidth( 2, 20 );
     controlLayout->setColumnStretch( 2, 0 );
 
@@ -433,7 +434,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i, bool b_advControls ) :
 
     controlLayout->setColumnStretch( 8 , 10 );
     controlLayout->setColumnStretch( 9, 0 );
- 
+
     /*
      * Other first Line buttons
      * Might need to be inside a frame to avoid a few resizing pb
