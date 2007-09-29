@@ -2593,8 +2593,8 @@ static int EITConvertDuration( uint32_t i_duration )
 #undef CVT_FROM_BCD
 
 /* FIXME same than dvbsi_to_utf8 from dvb access */
-static char *
-EITConvertToUTF8( const unsigned char *psz_instring, size_t i_length )
+static char *EITConvertToUTF8( const unsigned char *psz_instring,
+                               size_t i_length )
 {
     const char *psz_encoding;
     char *psz_outstring;
@@ -2691,13 +2691,13 @@ EITConvertToUTF8( const unsigned char *psz_instring, size_t i_length )
     if( iconv_handle == (vlc_iconv_t)(-1) )
     {
          /* Invalid character set (e.g. ISO_8859-12) */
-         memcpy( psz_outstring, psz_instring, i_in );
+         memcpy( psz_outstring, &psz_instring[offset], i_in );
          psz_outstring[i_in] = '\0';
          EnsureUTF8( psz_outstring );
     }
     else
     {
-        const char *psz_in = (const char *)psz_instring;
+        const char *psz_in = (const char *)&psz_instring[offset];
         char *psz_out = psz_outstring;
 
         while( vlc_iconv( iconv_handle, &psz_in, &i_in,
