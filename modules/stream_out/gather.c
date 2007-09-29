@@ -74,6 +74,9 @@ static int Open( vlc_object_t *p_this )
     sout_stream_sys_t *p_sys;
 
     p_stream->p_sys = p_sys = malloc( sizeof( sout_stream_sys_t ) );
+    if( p_sys == NULL )
+        return VLC_EGENERIC;
+
     p_sys->p_out    = sout_StreamNew( p_stream->p_sout, p_stream->psz_next );
     if( p_sys->p_out == NULL )
     {
@@ -171,6 +174,8 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     msg_Dbg( p_stream, "creating new output" );
     id = malloc( sizeof( sout_stream_id_t ) );
+    if( id == NULL )
+        return NULL;
     es_format_Copy( &id->fmt, p_fmt );
     id->b_used           = VLC_TRUE;
     id->id               = sout_StreamIdAdd( p_sys->p_out, &id->fmt );
@@ -203,4 +208,3 @@ static int Send( sout_stream_t *p_stream,
 
     return sout_StreamIdSend( p_sys->p_out, id->id, p_buffer );
 }
-
