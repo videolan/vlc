@@ -426,7 +426,9 @@ static void Run( intf_thread_t *p_intf )
 }
 
 /* following functions are local */
-
+#ifdef HAVE_NCURSESW_CURSES_H
+#   define KeyToUTF8( i, psz ) psz
+#else
 static char *KeyToUTF8( int i_key, char *psz_part )
 {
     char *psz_utf8, *psz;
@@ -463,6 +465,7 @@ static char *KeyToUTF8( int i_key, char *psz_part )
     memset( psz_part, 0, 6 );
     return psz_utf8;
 }
+#endif
 
 static inline int RemoveLastUTF8Entity( char *psz, int len )
 {
@@ -1177,18 +1180,23 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
             p_buf[w/2  ] = '.';
             p_buf[w/2+1] = '.';
         }
+#ifdef HAVE_NCURSESW_CURSES_H
+        mvprintw( y, x, "%s", p_buf );
+#else
         psz_local = ToLocale( p_buf );
         mvprintw( y, x, "%s", psz_local );
         LocaleFree( p_buf );
+#endif
     }
     else
     {
+#ifdef HAVE_NCURSESW_CURSES_H
+        mvprintw( y, x, "%s", p_buf );
+        mvhline( y, x + i_width, ' ', w - i_width );
+#else
         char *psz_local = ToLocale( p_buf );
         mvprintw( y, x, "%s", psz_local );
         LocaleFree( p_buf );
-#ifdef HAVE_NCURSESW_CURSES_H
-        mvhline( y, x + i_width, ' ', w - i_width );
-#else
         mvhline( y, x + i_len, ' ', w - i_len );
 #endif
     }
