@@ -207,7 +207,7 @@ static char **paths_to_list( const char *psz_dir, char *psz_path )
     if( !subdirs )
         return NULL;
 
-    for( i = 0; *psz_parser != '\0' ; )
+    for( i = 0; psz_parser && *psz_parser != '\0' ; )
     {
         char *psz_subdir = psz_parser;
         psz_parser = strchr( psz_subdir, ',' );
@@ -323,7 +323,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
         int i_dir_content;
         int a;
 
-        if( psz_dir == NULL )
+        if( psz_dir == NULL || ( j >= 0 && !strcmp( psz_dir, f_dir ) ) )
             continue;
 
         /* parse psz_src dir */
