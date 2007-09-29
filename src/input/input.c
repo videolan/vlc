@@ -1029,7 +1029,7 @@ static int Init( input_thread_t * p_input )
             /* Then, just add the following subtitles files */
             for( ; subs && subs[i]; i++ )
             {
-                if( strcmp( psz_subtitle, subs[i] ) )
+                if( !psz_subtitle || strcmp( psz_subtitle, subs[i] ) )
                 {
                     sub = InputSourceNew( p_input );
                     if( !InputSourceInit( p_input, sub, subs[i], "subtitle" ) )
