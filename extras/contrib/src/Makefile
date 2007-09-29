@@ -809,10 +809,6 @@ flac-$(FLAC_VERSION).tar.gz:
 
 flac: flac-$(FLAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_WIN32
-	patch -p0 < Patches/flac-win32.patch
-endif
-	cd $@ && autoconf
 
 FLAC_DISABLE_FLAGS = --disable-oggtest --disable-xmms-plugin --disable-cpplibs
 
@@ -932,13 +928,15 @@ DISTCLEAN_PKG += lame-$(LAME_VERSION).tar.gz
 libebml-$(LIBEBML_VERSION).tar.bz2:
 	$(WGET) $(LIBEBML_URL)
 
-ifdef SVN
-libebml:
-	$(SVN) export http://svn.matroska.org/svn/matroska/trunk/libebml libebml
-else
+## No reasons to use SVN anymore
+#ifdef SVN
+#libebml:
+#	$(SVN) export http://svn.matroska.org/svn/matroska/trunk/libebml libebml
+#else
 libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-endif
+#endif
+
 ifdef HAVE_WIN32
 	(cd $@; patch -p0 < ../Patches/libebml-svn-win32.patch)
 endif
@@ -951,12 +949,12 @@ else
 	$(RANLIB) $(PREFIX)/lib/libebml.a
 endif	
 	touch $@
-
-ifdef SVN
-libebml-source: libebml
-	tar cfvz  libebml-$(DATE).tar.gz libebml
-SOURCE += libebml-source	
-endif
+## No reasons to use SVN anymore
+#ifdef SVN
+#libebml-source: libebml
+#	tar cfvz  libebml-$(DATE).tar.gz libebml
+#SOURCE += libebml-source	
+#endif
 
 CLEAN_FILE += .ebml
 CLEAN_PKG += libebml
@@ -969,13 +967,15 @@ DISTCLEAN_PKG += libebml-$(LIBEBML_VERSION).tar.bz2
 libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
 	$(WGET) $(LIBMATROSKA_URL)
 
-ifdef SVN
-libmatroska:
-	$(SVN) export http://svn.matroska.org/svn/matroska/trunk/libmatroska libmatroska
-else
+## No reasons to use SVN anymore
+#if SVN
+#libmatroska:
+#	$(SVN) export http://svn.matroska.org/svn/matroska/trunk/libmatroska libmatroska
+#else
 libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-endif
+#endif 
+
 ifdef HAVE_WIN32
 	(cd $@; patch -p0 < ../Patches/libmatroska-win32.patch)
 endif
@@ -989,12 +989,13 @@ else
 endif
 	touch $@
 
-ifdef SVN
-libmatroska-source: libmatroska
-	tar cfvz libmatroska-$(DATE).tar.gz libmatroska
-
-SOURCE += libmatroska-source
-endif
+## No reasons to use SVN anymore
+#ifdef SVN
+#libmatroska-source: libmatroska
+#	tar cfvz libmatroska-$(DATE).tar.gz libmatroska
+#
+#SOURCE += libmatroska-source
+#endif
 
 CLEAN_FILE += .matroska
 CLEAN_PKG += libmatroska
@@ -2213,7 +2214,7 @@ clean-src: clean
 	rm -rf $(DISTCLEAN_PKG)
 
 clean-svn:
-	rm -rf ffmpeg tremor libebml libmatroska x264 libdca
+	rm -rf ffmpeg tremor x264 libdca
 
 distclean: clean-src
 
