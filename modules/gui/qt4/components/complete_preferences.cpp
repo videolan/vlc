@@ -45,13 +45,7 @@
 #include <vlc_intf_strings.h>
 #include <assert.h>
 
-#include "pixmaps/audio.xpm"
-#include "pixmaps/video.xpm"
-#include "pixmaps/type_net.xpm"
-#include "pixmaps/type_playlist.xpm"
-#include "pixmaps/advanced.xpm"
 #include "pixmaps/codec.xpm"
-#include "pixmaps/intf.xpm"
 
 #define ITEM_HEIGHT 25
 
@@ -68,14 +62,14 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     setTextElideMode( Qt::ElideNone );
     setHorizontalScrollBarPolicy ( Qt::ScrollBarAlwaysOn );
 
-#define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b##_xpm ))
-    BI( audio, audio );
-    BI( video, video );
-    BI( input, codec );
-    BI( sout, type_net );
-    BI( advanced, advanced );
-    BI( playlist, type_playlist );
-    BI( interface, intf );
+#define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b ))
+    BI( audio, ":/pixmaps/vlc_advprefs_audio.png" );
+    BI( video, ":/pixmaps/vlc_advprefs_video.png" );
+    BI( input, codec_xpm );
+    BI( sout, ":/pixmaps/vlc_advprefs_sout.png" );
+    BI( advanced, ":/pixmaps/vlc_advprefs_extended.png" );
+    BI( playlist, ":/pixmaps/vlc_advprefs_playlist.png" );
+    BI( interface, ":/pixmaps/vlc_advprefs_intf.png" );
 #undef BI
 
     /* Build the tree for the main module */

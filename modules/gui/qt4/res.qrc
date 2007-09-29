@@ -46,5 +46,11 @@
   <file>pixmaps/vlc_playlist_repeat_off.png</file>
   <file>pixmaps/vlc_playlist_shuffle_off.png</file>
   <file>pixmaps/vlc_playlist_shuffle_on.png</file>
+  <file>pixmaps/vlc_advprefs_audio.png</file>
+  <file>pixmaps/vlc_advprefs_video.png</file>
+  <file>pixmaps/vlc_advprefs_intf.png</file>
+  <file>pixmaps/vlc_advprefs_sout.png</file>
+  <file>pixmaps/vlc_advprefs_extended.png</file>
+  <file>pixmaps/vlc_advprefs_playlist.png</file>
  </qresource>
 </RCC>

@@ -31,7 +31,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/gototime.moc.cpp \
 		dialogs/open.moc.cpp \
 		dialogs/podcast_configuration.moc.cpp \
-	        dialogs/vlm.moc.cpp \
+		dialogs/vlm.moc.cpp \
 		components/extended_panels.moc.cpp \
 		components/infopanels.moc.cpp \
 	 	components/preferences_widgets.moc.cpp \
@@ -183,13 +183,9 @@ EXTRA_DIST += \
 	ui/streampanel.ui \
 	ui/sout.ui \
 	ui/vlm.ui \
-	pixmaps/advanced.xpm \
-	pixmaps/audio.xpm \
 	pixmaps/codec.xpm \
-	pixmaps/intf.xpm \
 	pixmaps/type_net.xpm \
 	pixmaps/type_playlist.xpm \
-	pixmaps/video.xpm \
 	pixmaps/type_unknown.xpm \
 	pixmaps/type_file.xpm \
 	pixmaps/type_card.xpm \
@@ -241,4 +237,10 @@ EXTRA_DIST += \
 	pixmaps/vlc_playlist_repeat_all.png \
 	pixmaps/vlc_playlist_repeat_one.png \
 	pixmaps/vlc_playlist_shuffle_on.png \
-	pixmaps/vlc_playlist_shuffle_off.png
+	pixmaps/vlc_playlist_shuffle_off.png \
+	pixmaps/vlc_advprefs_audio.png \
+	pixmaps/vlc_advprefs_video.png \
+	pixmaps/vlc_advprefs_intf.png \
+	pixmaps/vlc_advprefs_sout.png \
+	pixmaps/vlc_advprefs_extended.png \
+	pixmaps/vlc_advprefs_playlist.png
