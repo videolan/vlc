@@ -601,7 +601,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
         if( p_sys->p_mux != NULL )
         {
             sout_stream_id_t *id = p_sys->es[0];
-            id->rtsp_id = RtspAddId( p_sys->rtsp, id, 0,
+            id->rtsp_id = RtspAddId( p_sys->rtsp, id, 0, GetDWBE( id->ssrc ),
                                      p_sys->psz_destination, p_sys->i_ttl,
                                      id->i_port, id->i_port + 1 );
         }
@@ -1143,6 +1143,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     if( p_sys->rtsp != NULL )
         id->rtsp_id = RtspAddId( p_sys->rtsp, id, p_sys->i_es,
+                                 GetDWBE( id->ssrc ),
                                  p_sys->psz_destination,
                                  p_sys->i_ttl, id->i_port, id->i_port + 1 );
 

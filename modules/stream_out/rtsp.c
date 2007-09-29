@@ -144,7 +144,8 @@ struct rtsp_stream_id_t
     httpd_url_t      *url;
     const char       *dst;
     int               ttl;
-    unsigned          loport, hiport;
+    uint32_t          ssrc;
+    uint16_t          loport, hiport;
 };
 
 
@@ -172,7 +173,7 @@ struct rtsp_strack_t
 
 
 rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
-                             unsigned num,
+                             unsigned num, uint32_t ssrc,
                              /* Multicast stuff - TODO: cleanup */
                              const char *dst, int ttl,
                              unsigned loport, unsigned hiport )
@@ -186,6 +187,7 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
 
     id->stream = rtsp;
     id->sout_id = sid;
+    id->ssrc = ssrc;
     /* TODO: can we assume that this need not be strdup'd? */
     id->dst = dst;
     if( id->dst != NULL )
@@ -569,17 +571,18 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         httpd_MsgAdd( answer, "Transport",
                                       "RTP/AVP/UDP;unicast;source=%s;"
                                       "client_port=%u-%u;server_port=%u-%u;"
-                                      "mode=play",
+                                      "ssrc=%08X;mode=play",
                                       src, loport, loport + 1, sport,
-                                      sport + 1 );
+                                      sport + 1, id->ssrc );
                     }
                     else
                     {
                         httpd_MsgAdd( answer, "Transport",
                                       "RTP/AVP/UDP;unicast;"
                                       "client_port=%u-%u;server_port=%u-%u;"
-                                      "mode=play",
-                                      loport, loport + 1, sport, sport + 1 );
+                                      "ssrc=%08X;mode=play",
+                                      loport, loport + 1, sport, sport + 1,
+                                      id->ssrc );
                     }
 
                     answer->i_status = 200;
