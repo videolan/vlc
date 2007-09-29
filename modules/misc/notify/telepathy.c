@@ -169,9 +169,10 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     {
         if( newval.i_int != p_intf->p_sys->i_id ) /* "item-change" */
             return VLC_SUCCESS;
-        /* some variable bitrate inputs call "item-change callbacks each time
-         * their length is updated, that is several times per second. */
-        if( p_intf->p_sys->i_item_changes > 5 )
+        /* Some variable bitrate inputs call "item-change callbacks each time
+         * their length is updated, that is several times per second.
+         * We'll limit the number of changes to 10 per input. */
+        if( p_intf->p_sys->i_item_changes > 10 )
             return VLC_SUCCESS;
         p_intf->p_sys->i_item_changes++;
     }
