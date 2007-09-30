@@ -84,9 +84,7 @@ static int Open( vlc_object_t *p_this )
 {
     vlc_mutex_t *lock;
 
-    /* FIXME: put this in the module (de)initialization ASAP */
-    lock = var_GetGlobalCreate( "gtk" );
-    vlc_mutex_lock( lock );
+    lock = var_AcquireMutex( "gtk" );
 
     if( i_refcount > 0 )
     {
@@ -128,8 +126,7 @@ static void Close( vlc_object_t *p_this )
 {
     vlc_mutex_t *lock;
 
-    lock = var_GetGlobalMutex( "gtk" );
-    vlc_mutex_lock( lock );
+    lock = var_AcquireMutex( "gtk" );
 
     i_refcount--;
 

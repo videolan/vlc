@@ -341,7 +341,6 @@ static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    vlc_mutex_t *lock = var_GetGlobalMutex( "avcodec" );
 
     switch( p_sys->i_cat )
     {
@@ -355,10 +354,13 @@ static void CloseDecoder( vlc_object_t *p_this )
 
     if( p_sys->p_context )
     {
+        vlc_mutex_t *lock;
+
         if( p_sys->p_context->extradata )
             free( p_sys->p_context->extradata );
         p_sys->p_context->extradata = NULL;
-        vlc_mutex_lock( lock );
+
+        lock = var_AcquireMutex( "avcodec" );
         avcodec_close( p_sys->p_context );
         vlc_mutex_unlock( lock );
         msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->psz_namecodec );
@@ -428,9 +430,7 @@ void E_(LibavcodecCallback)( void *p_opaque, int i_level,
 void E_(InitLibavcodec)( vlc_object_t *p_object )
 {
     static int b_ffmpeginit = 0;
-    vlc_mutex_t *lock = var_GetGlobalMutex( "avcodec" );
-
-    vlc_mutex_lock( lock );
+    vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
 
     /* *** init ffmpeg library (libavcodec) *** */
     if( !b_ffmpeginit )

@@ -126,7 +126,7 @@ VLC_EXPORT( void, __var_OptionParse, ( vlc_object_t *, const char * ) );
 #define var_Command(a,b,c,d,e) __var_Command( VLC_OBJECT( a ), b, c, d, e )
 VLC_EXPORT( int, __var_Command, ( vlc_object_t *, const char *, const char *, const char *, char ** ) );
 
-VLC_EXPORT( vlc_mutex_t *, var_GetGlobalMutex, ( const char * ) );
+VLC_EXPORT( vlc_mutex_t *, var_AcquireMutex, ( const char * ) );
 
 /**
  * __var_Create() with automatic casting.

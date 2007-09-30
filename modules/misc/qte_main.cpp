@@ -84,8 +84,7 @@ static int Open( vlc_object_t *p_this )
 {
     vlc_mutex_t *lock;
 
-    lock = var_GetGlobalMutex( "qte" );
-    vlc_mutex_lock( lockval );
+    lock = var_AcquireMutex( "qte" );
 
     if( i_refcount > 0 )
     {
@@ -124,8 +123,7 @@ static void Close( vlc_object_t *p_this )
 {
     vlc_mutex_t *lock;
 
-    lock = var_GetGlobalMutex( "qte" );
-    vlc_mutex_lock( lock );
+    lock = var_AcquireMutex( "qte" );
 
     i_refcount--;
 

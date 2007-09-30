@@ -341,7 +341,7 @@ __var_Create
 __var_DelCallback
 __var_Destroy
 __var_Get
-var_GetGlobalMutex
+var_AcquireMutex
 __var_OptionParse
 __var_Set
 __var_Type

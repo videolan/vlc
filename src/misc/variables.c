@@ -834,9 +834,10 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
 
 
 /**
- * Gets a process-wide mutex, creates it if needed.
+ * Finds a process-wide mutex, creates it if needed, and locks it.
+ * Unlock with vlc_mutex_unlock().
  */
-vlc_mutex_t *var_GetGlobalMutex( const char *name )
+vlc_mutex_t *var_AcquireMutex( const char *name )
 {
     libvlc_global_data_t *p_global = vlc_global();
     vlc_value_t val;
@@ -845,6 +846,7 @@ vlc_mutex_t *var_GetGlobalMutex( const char *name )
         return NULL;
 
     var_Get( p_global, name, &val );
+    vlc_mutex_lock( &val.p_address );
     return val.p_address;
 }
 

@@ -130,11 +130,14 @@ static int Open ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
     /* XXX: check for conflicts with the SDL audio output */
-    vlc_mutex_t *lock = var_GetGlobalMutex( "sdl" );
+    vlc_mutex_t *lock = var_AcquireMutex( "sdl" );
 
 #ifdef HAVE_SETENV
     char *psz_method;
 #endif
+
+    if( lock == NULL )
+        return VLC_ENOMEM;
 
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -142,8 +145,6 @@ static int Open ( vlc_object_t *p_this )
         vlc_mutex_unlock( lock );
         return VLC_ENOMEM;
     }
-
-    vlc_mutex_lock( lock );
 
     if( SDL_WasInit( SDL_INIT_VIDEO ) != 0 )
     {

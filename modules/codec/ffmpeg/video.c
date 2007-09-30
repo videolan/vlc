@@ -215,11 +215,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
                       AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
-    vlc_mutex_t *lock = var_GetGlobalMutex( "avcodec" );
     vlc_value_t val;
-
-    if( lock == NULL )
-        return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
@@ -382,7 +378,13 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->p_context->palctrl = &palette_control;
 
     /* ***** Open the codec ***** */
-    vlc_mutex_lock( lock );
+    vlc_mutex_t *lock = var_GetAcquireMutex( "avcodec" );
+    if( lock == NULL )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+
     if( avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0 )
     {
         vlc_mutex_unlock( lock );

@@ -195,7 +195,6 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     int i_codec_id, i_cat;
     const char *psz_namecodec;
     vlc_value_t val;
-    vlc_mutex_t *lock = var_GetGlobalMutex( "avcodec" );
 
     if( !E_(GetFfmpegCodec)( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
@@ -530,7 +529,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     p_context->extradata = NULL;
     p_context->flags |= CODEC_FLAG_GLOBAL_HEADER;
 
-    vlc_mutex_lock( lock );
+    vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
+
     if( avcodec_open( p_context, p_codec ) )
     {
         vlc_mutex_unlock( lock );
@@ -1003,7 +1003,6 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
-    vlc_mutex_t *lock = var_GetGlobalMutex( "avcodec" );
 
     if ( p_sys->b_inited && p_enc->i_threads >= 1 )
     {
@@ -1023,7 +1022,7 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
         free( pp_contexts );
     }
 
-    vlc_mutex_lock( lock );
+    vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
     avcodec_close( p_sys->p_context );
     vlc_mutex_unlock( lock );
     av_free( p_sys->p_context );

@@ -89,10 +89,6 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
                       AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
-    vlc_mutex_t *lock = var_GetGlobalMutex( "avcodec" );
-
-    if( lock == NULL )
-        return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
@@ -132,13 +128,23 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
                 p_sys->p_context->extradata_size, 0,
                 FF_INPUT_BUFFER_PADDING_SIZE );
     }
+    else
+        p_sys->p_context->extradata = NULL;
 
     /* ***** Open the codec ***** */
-    vlc_mutex_lock( lock );
+    vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
+    if( lock == NULL )
+    {
+        free( p_sys->p_context->extradata );
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+
     if (avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0)
     {
         vlc_mutex_unlock( lock );
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
+        free( p_sys->p_context->extradata );
         free( p_sys );
         return VLC_EGENERIC;
     }

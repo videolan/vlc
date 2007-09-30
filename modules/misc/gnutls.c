@@ -172,8 +172,7 @@ static int gnutls_Init (vlc_object_t *p_this)
 {
     int ret = VLC_EGENERIC;
 
-    vlc_mutex_t *lock = var_GetGlobalMutex ("gnutls_mutex");
-    vlc_mutex_lock (lock);
+    vlc_mutex_t *lock = var_AcquireMutex ("gnutls_mutex");
 
     /* This should probably be removed/fixed. It will screw up with multiple
      * LibVLC instances. */
@@ -210,8 +209,7 @@ error:
  */
 static void gnutls_Deinit (vlc_object_t *p_this)
 {
-    vlc_mutex_t *lock = var_GetGlobalMutex( "gnutls_mutex" );
-    vlc_mutex_lock (lock);
+    vlc_mutex_t *lock = var_AcquireMutex( "gnutls_mutex" );
 
     gnutls_global_deinit ();
     msg_Dbg (p_this, "GnuTLS deinitialized");
