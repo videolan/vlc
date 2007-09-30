@@ -846,7 +846,7 @@ vlc_mutex_t *var_AcquireMutex( const char *name )
         return NULL;
 
     var_Get( p_global, name, &val );
-    vlc_mutex_lock( &val.p_address );
+    vlc_mutex_lock( val.p_address );
     return val.p_address;
 }
 
