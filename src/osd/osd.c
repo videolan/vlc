@@ -116,8 +116,8 @@ osd_menu_t *__osd_MenuCreate( vlc_object_t *p_this, const char *psz_file )
 
 error:
     msg_Err( p_this, "creating OSD menu object failed" );
-    vlc_mutex_unlock( lockval.p_address );
     vlc_object_destroy( p_osd );
+    vlc_mutex_unlock( lockval.p_address );
     return NULL;
 }
 
