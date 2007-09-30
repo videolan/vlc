@@ -47,7 +47,8 @@ void E_(CloseVideoGL) ( vlc_object_t * );
 
 vlc_module_begin();
     /* Minimal interface. see intf.m */
-    set_shortname( _( "minimal_macosx" ));
+    set_shortname( "Minimal Macosx" );
+    add_shortcut( "minimal_macosx" );
     set_description( _("Minimal Mac OS X interface") );
     set_capability( "interface", 50 );
     set_callbacks( E_(OpenIntf), E_(CloseIntf) );
