@@ -683,8 +683,7 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
 #define DECMALLOC_NULL( var, type ) type* var = (type*)malloc( sizeof(type) );\
                                     if( !var ) return NULL;
 
-#define FREENULL(a) do { if( a ) { free( a ); a = NULL; } } while(0)
-#define FREE(a) do { if( a ) { free( a ); } } while(0)
+#define FREENULL(a) do { free( a ); a = NULL; } while(0)
 
 #define EMPTY_STR(str) (!str || !*str)
 
