@@ -32,10 +32,12 @@ static libvlc_instance_t * shared_instance = NULL;
     if(!shared_instance)
     {
         libvlc_exception_t ex;
-        char *lib_vlc_params[] = { "vlc", "-I", "dummy", "-vvvvvv" };
+        char *lib_vlc_params[] = { "vlc", "-I", "dummy",
+                                   "--opengl-provider=minimal_macosx",
+                                   "-vvvvvv" };
         libvlc_exception_init( &ex );
         
-        shared_instance = libvlc_new( 4, lib_vlc_params, &ex );
+        shared_instance = libvlc_new( 5, lib_vlc_params, &ex );
         quit_on_exception( &ex );
     }
     return shared_instance;
