@@ -112,6 +112,7 @@ struct vlc_object_internals_t
     vlc_bool_t      b_thread;
 
     /* Objects management */
+    unsigned        i_refcount;
     vlc_bool_t      b_attached;
 };
 

@@ -52,7 +52,7 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
     /* release for previous vlc_object_get */
     vlc_object_release( p_input_thread );
 
-    should_destroy = p_input_thread->i_refcount == 1;
+    should_destroy = p_input_thread->p_internals->i_refcount == 1;
 
     /* release for initial p_input_thread yield (see _new()) */
     vlc_object_release( p_input_thread );

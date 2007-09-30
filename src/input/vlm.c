@@ -167,7 +167,7 @@ void vlm_Delete( vlm_t *p_vlm )
 
     vlc_object_release( p_vlm );
 
-    if( p_vlm->i_refcount > 0 )
+    if( p_vlm->p_internals->i_refcount > 0 )
     {
         vlc_mutex_unlock( lockval.p_address );
         return;

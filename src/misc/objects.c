@@ -177,7 +177,7 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         vlc_mutex_unlock( &structure_lock );
     }
 
-    p_new->i_refcount = 0;
+    p_priv->i_refcount = 0;
     p_new->p_parent = NULL;
     p_new->pp_children = NULL;
     p_new->i_children = 0;
@@ -358,7 +358,7 @@ void __vlc_object_destroy( vlc_object_t *p_this )
         return;
     }
 
-    while( p_this->i_refcount )
+    while( p_priv->i_refcount > 0 )
     {
         i_delay++;
 
@@ -366,15 +366,15 @@ void __vlc_object_destroy( vlc_object_t *p_this )
         if( i_delay == 2 )
         {
             msg_Warn( p_this,
-                  "refcount is %i, delaying before deletion (id=%d,type=%d)",
-                  p_this->i_refcount, p_this->i_object_id,
+                  "refcount is %u, delaying before deletion (id=%d,type=%d)",
+                  p_priv->i_refcount, p_this->i_object_id,
                   p_this->i_object_type );
         }
         else if( i_delay == 10 )
         {
             msg_Err( p_this,
-                  "refcount is %i, delaying again (id=%d,type=%d)",
-                  p_this->i_refcount, p_this->i_object_id,
+                  "refcount is %u, delaying again (id=%d,type=%d)",
+                  p_priv->i_refcount, p_this->i_object_id,
                   p_this->i_object_type );
         }
         else if( i_delay == 20 )
@@ -558,7 +558,7 @@ void * __vlc_object_get( vlc_object_t *p_this, int i_id )
                 if( pp_objects[i_middle+1]->i_object_id == i_id )
                 {
                     vlc_mutex_unlock( &structure_lock );
-                    pp_objects[i_middle+1]->i_refcount++;
+                    pp_objects[i_middle+1]->p_internals->i_refcount++;
                     return pp_objects[i_middle+1];
                 }
                 break;
@@ -567,7 +567,7 @@ void * __vlc_object_get( vlc_object_t *p_this, int i_id )
         else
         {
             vlc_mutex_unlock( &structure_lock );
-            pp_objects[i_middle]->i_refcount++;
+            pp_objects[i_middle]->p_internals->i_refcount++;
             return pp_objects[i_middle];
         }
 
@@ -599,7 +599,7 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     /* If we are of the requested type ourselves, don't look further */
     if( !(i_mode & FIND_STRICT) && p_this->i_object_type == i_type )
     {
-        p_this->i_refcount++;
+        p_this->p_internals->i_refcount++;
         vlc_mutex_unlock( &structure_lock );
         return p_this;
     }
@@ -652,7 +652,7 @@ void * __vlc_object_find_name( vlc_object_t *p_this, const char *psz_name,
         && p_this->psz_object_name
         && !strcmp( p_this->psz_object_name, psz_name ) )
     {
-        p_this->i_refcount++;
+        p_this->p_internals->i_refcount++;
         vlc_mutex_unlock( &structure_lock );
         return p_this;
     }
@@ -694,18 +694,23 @@ void * __vlc_object_find_name( vlc_object_t *p_this, const char *psz_name,
 void __vlc_object_yield( vlc_object_t *p_this )
 {
     vlc_mutex_lock( &structure_lock );
-    p_this->i_refcount++;
+    p_this->p_internals->i_refcount++;
     vlc_mutex_unlock( &structure_lock );
 }
 
-/**
- ****************************************************************************
+static inline void Release( vlc_object_t *obj )
+{
+    assert( obj->p_internals->i_refcount > 0 );
+    obj->p_internals->i_refcount--;
+}
+
+/*****************************************************************************
  * decrement an object refcount
  *****************************************************************************/
 void __vlc_object_release( vlc_object_t *p_this )
 {
     vlc_mutex_lock( &structure_lock );
-    p_this->i_refcount--;
+    Release( p_this );
     vlc_mutex_unlock( &structure_lock );
 }
 
@@ -1030,7 +1035,7 @@ void vlc_list_release( vlc_list_t *p_list )
     vlc_mutex_lock( &structure_lock );
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {
-        p_list->p_values[i_index].p_object->i_refcount--;
+        Release( p_list->p_values[i_index].p_object );
     }
     vlc_mutex_unlock( &structure_lock );
 
@@ -1093,7 +1098,7 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
         {
             if( p_tmp->i_object_type == i_type )
             {
-                p_tmp->i_refcount++;
+                p_tmp->p_internals->i_refcount++;
                 return p_tmp;
             }
             else
@@ -1109,7 +1114,7 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
             p_tmp = p_this->pp_children[i];
             if( p_tmp->i_object_type == i_type )
             {
-                p_tmp->i_refcount++;
+                p_tmp->p_internals->i_refcount++;
                 return p_tmp;
             }
             else if( p_tmp->i_children )
@@ -1147,7 +1152,7 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
             if( p_tmp->psz_object_name
                 && !strcmp( p_tmp->psz_object_name, psz_name ) )
             {
-                p_tmp->i_refcount++;
+                p_tmp->p_internals->i_refcount++;
                 return p_tmp;
             }
             else
@@ -1164,7 +1169,7 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
             if( p_tmp->psz_object_name
                 && !strcmp( p_tmp->psz_object_name, psz_name ) )
             {
-                p_tmp->i_refcount++;
+                p_tmp->p_internals->i_refcount++;
                 return p_tmp;
             }
             else if( p_tmp->i_children )
@@ -1264,8 +1269,9 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
     }
 
     psz_refcount[0] = '\0';
-    if( p_this->i_refcount )
-        snprintf( psz_refcount, 19, ", refcount %i", p_this->i_refcount );
+    if( p_this->p_internals->i_refcount > 0 )
+        snprintf( psz_refcount, 19, ", refcount %u",
+                  p_this->p_internals->i_refcount );
 
     psz_thread[0] = '\0';
     if( p_this->p_internals->b_thread )
@@ -1364,7 +1370,7 @@ static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,
         return;
     }
 
-    p_object->i_refcount++;
+    p_object->p_internals->i_refcount++;
 
     p_list->p_values[i_index].p_object = p_object;
 
@@ -1386,7 +1392,7 @@ static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,
         return;
     }
 
-    p_object->i_refcount++;
+    p_object->p_internals->i_refcount++;
 
     p_list->p_values[p_list->i_count].p_object = p_object;
     p_list->i_count++;

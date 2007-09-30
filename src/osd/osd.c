@@ -28,6 +28,7 @@
 #include <vlc/vlc.h>
 #include <vlc_keys.h>
 #include <vlc_osd.h>
+#include "libvlc.h"
 
 #undef OSD_MENU_DEBUG
 
@@ -130,7 +131,7 @@ void __osd_MenuDelete( vlc_object_t *p_this, osd_menu_t *p_osd )
     vlc_mutex_lock( lockval.p_address );
 
     vlc_object_release( p_osd );
-    if( p_osd->i_refcount > 0 )
+    if( p_osd->p_internals->i_refcount > 0 )
     {
         vlc_mutex_unlock( lockval.p_address );
         return;
