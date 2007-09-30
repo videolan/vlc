@@ -52,13 +52,11 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
     /* release for previous vlc_object_get */
     vlc_object_release( p_input_thread );
 
-    should_destroy = p_input_thread->p_internals->i_refcount == 1;
-
     /* release for initial p_input_thread yield (see _new()) */
     vlc_object_release( p_input_thread );
 
     /* No one is tracking this input_thread appart us. Destroy it */
-    if( should_destroy )
+    if( p_mi->b_own_its_input_thread )
     {
         /* We owned this one */
         input_StopThread( p_input_thread );
@@ -69,7 +67,7 @@ static void release_input_thread( libvlc_media_instance_t *p_mi )
     {
         /* XXX: hack the playlist doesn't retain the input thread,
          * so we did it for the playlist (see _new_from_input_thread),
-         * revert that here. */
+         * revert that here. This will be deleted with the playlist API */
         vlc_object_release( p_input_thread );
     }
 }
@@ -199,6 +197,7 @@ libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
      *   operation the refcount is 0, the object is destroyed.
      * - Accessor _retain increase the refcount by 1 (XXX: to implement) */
     p_mi->i_refcount = 1;
+    p_mi->b_own_its_input_thread = VLC_TRUE;
     /* object_lock strategy:
      * - No lock held in constructor
      * - Lock when accessing all variable this lock is held
@@ -271,7 +270,8 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
     }
 
     p_mi->i_input_id = p_input->i_object_id;
- 
+    p_mi->b_own_its_input_thread = VLC_FALSE;
+
     /* will be released in media_instance_release() */
     vlc_object_yield( p_input );
 

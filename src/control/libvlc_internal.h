@@ -172,6 +172,8 @@ struct libvlc_media_instance_t
     libvlc_media_descriptor_t * p_md; /* current media descriptor */
     libvlc_event_manager_t *    p_event_manager;
     libvlc_drawable_t           drawable;
+    
+    vlc_bool_t        b_own_its_input_thread;
 };
 
 struct libvlc_media_list_player_t
