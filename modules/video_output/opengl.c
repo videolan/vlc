@@ -160,6 +160,8 @@ static void Transform    ( float, int, float, float, int, int, int, int, double 
 #define POV_Z_LONGTEXT N_("Point of view (Z coordinate) of the cube/cylinder "\
                            "effect, if enabled.")
 #endif
+#define PROVIDER_TEXT N_("OpenGL Provider")
+#define PROVIDER_LONGTEXT N_("Allows you to modify what OpenGL provider should be used")
 #define SPEED_TEXT N_( "OpenGL cube rotation speed" )
 #define SPEED_LONGTEXT N_( "Rotation speed of the OpenGL cube effect, if " \
         "enabled." )
@@ -200,6 +202,9 @@ vlc_module_begin();
                     RADIUS_LONGTEXT, VLC_TRUE );
 
 #endif
+    /* Allow opengl provider plugin selection */
+    add_string( "opengl-provider", "default", NULL, PROVIDER_TEXT, 
+                    PROVIDER_LONGTEXT, VLC_TRUE );
     set_callbacks( CreateVout, DestroyVout );
     add_string( "opengl-effect", "none", NULL, EFFECT_TEXT,
                  EFFECT_LONGTEXT, VLC_FALSE );
@@ -235,6 +240,7 @@ static int CreateVout( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t *p_sys;
+    char * psz;
 
     /* Allocate structure */
     p_vout->p_sys = p_sys = malloc( sizeof( vout_sys_t ) );
@@ -280,8 +286,14 @@ static int CreateVout( vlc_object_t *p_this )
     p_sys->p_vout->b_scale = p_vout->b_scale;
     p_sys->p_vout->i_alignment = p_vout->i_alignment;
 
+    psz = config_GetPsz( p_vout, "opengl-provider" );
+
+    msg_Dbg( p_vout, "requesting \"%s\" opengl provider",
+                      psz ? psz : "default" );
+
     p_sys->p_vout->p_module =
-        module_Need( p_sys->p_vout, "opengl provider", NULL, 0 );
+        module_Need( p_sys->p_vout, "opengl provider", psz, 0 );
+    free( psz );
     if( p_sys->p_vout->p_module == NULL )
     {
         msg_Warn( p_vout, "No OpenGL provider found" );
