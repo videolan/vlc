@@ -59,6 +59,7 @@ typedef struct
     vlc_bool_t b_can_pace_control;
     vlc_bool_t b_can_pause;
     vlc_bool_t b_eof;   /* eof of demuxer */
+    double     f_fps;
 
     /* Clock average variation */
     int     i_cr_average;
@@ -265,7 +266,8 @@ void       input_EsOutDelete( es_out_t * );
 es_out_id_t *input_EsOutGetFromID( es_out_t *, int i_id );
 void       input_EsOutDiscontinuity( es_out_t *, vlc_bool_t b_flush, vlc_bool_t b_audio );
 void       input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
-void       input_EsOutSetRate( es_out_t * );
+void       input_EsOutChangeRate( es_out_t * );
+void       input_EsOutChangeState( es_out_t * );
 vlc_bool_t input_EsOutDecodersEmpty( es_out_t * );
 
 /* clock.c */

@@ -1619,8 +1619,9 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 val.i_int = PLAYING_S;
                 var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
 
-                /* Reset clock */
-                es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
+                /* */
+                if( !i_ret )
+                    input_EsOutChangeState( p_input->p->p_es_out );
             }
             else if( val.i_int == PAUSE_S && p_input->i_state == PLAYING_S &&
                      p_input->p->b_can_pause )
@@ -1649,9 +1650,9 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 p_input->i_state = val.i_int;
                 var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
 
-                /* Send discontinuity to decoders (it will allow them to flush
-                 * if implemented */
-                input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_FALSE, VLC_FALSE );
+                /* */
+                if( !i_ret )
+                    input_EsOutChangeState( p_input->p->p_es_out );
             }
             else if( val.i_int == PAUSE_S && !p_input->p->b_can_pause )
             {
@@ -1702,12 +1703,9 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 val.i_int = i_rate;
                 var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
 
-                input_EsOutDiscontinuity( p_input->p->p_es_out,
-                                          VLC_FALSE, VLC_FALSE );
-
                 p_input->p->i_rate  = i_rate;
 
-                input_EsOutSetRate( p_input->p->p_es_out );
+                input_EsOutChangeRate( p_input->p->p_es_out );
 
                 b_force_update = VLC_TRUE;
             }
@@ -2085,6 +2083,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input )
     TAB_INIT( in->i_title, in->title );
     in->b_can_pace_control = VLC_TRUE;
     in->b_eof = VLC_FALSE;
+    in->f_fps = 0.0;
     in->i_cr_average = 0;
 
     return in;
@@ -2104,6 +2103,7 @@ static int InputSourceInit( input_thread_t *p_input,
     char *psz_tmp;
     char *psz;
     vlc_value_t val;
+    double f_fps;
 
     strcpy( psz_dup, psz_mrl );
 
@@ -2345,26 +2345,33 @@ static int InputSourceInit( input_thread_t *p_input,
                 in->b_title_demux = VLC_TRUE;
             }
         }
-        /* get attachment
-         * FIXME improve for b_preparsing: move it after GET_META and check psz_arturl */
-        if( 1 || !p_input->b_preparsing )
+    }
+
+    /* get attachment
+     * FIXME improve for b_preparsing: move it after GET_META and check psz_arturl */
+    if( 1 || !p_input->b_preparsing )
+    {
+        int i_attachment;
+        input_attachment_t **attachment;
+        if( !demux2_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
+                             &attachment, &i_attachment ) )
         {
-            int i_attachment;
-            input_attachment_t **attachment;
-            if( !demux2_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
-                                 &attachment, &i_attachment ) )
-            {
-                int i;
-                vlc_mutex_lock( &p_input->p->input.p_item->lock );
-                p_input->p->attachment = realloc( p_input->p->attachment,
-                        sizeof(input_attachment_t**) * ( p_input->p->i_attachment + i_attachment ) );
-                for( i = 0; i < i_attachment; i++ )
-                    p_input->p->attachment[p_input->p->i_attachment++] = attachment[i];
-                if( attachment )
-                    free( attachment );
-                vlc_mutex_unlock( &p_input->p->input.p_item->lock );
-            }
+            int i;
+            vlc_mutex_lock( &p_input->p->input.p_item->lock );
+            p_input->p->attachment = realloc( p_input->p->attachment,
+                    sizeof(input_attachment_t**) * ( p_input->p->i_attachment + i_attachment ) );
+            for( i = 0; i < i_attachment; i++ )
+                p_input->p->attachment[p_input->p->i_attachment++] = attachment[i];
+            if( attachment )
+                free( attachment );
+            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
         }
+    }
+    if( !demux2_Control( in->p_demux, DEMUX_GET_FPS, &f_fps ) )
+    {
+        vlc_mutex_lock( &p_input->p->input.p_item->lock );
+        in->f_fps = f_fps;
+        vlc_mutex_unlock( &p_input->p->input.p_item->lock );
     }
 
     if( var_GetInteger( p_input, "clock-synchro" ) != -1 )

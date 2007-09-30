@@ -24,8 +24,8 @@
 #include <vlc/libvlc.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
-#include "input/input_internal.h"
 #include "libvlc_internal.h"
+#include "libvlc.h"
 
 /*
  * Release the associated input thread
@@ -592,25 +592,16 @@ float libvlc_media_instance_get_fps(
                                  libvlc_media_instance_t *p_mi,
                                  libvlc_exception_t *p_e)
 {
+    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     double f_fps = 0.0;
-    input_thread_t *p_input_thread;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
-    if( !p_input_thread )
-        return 0.0;
-
-    if( (NULL == p_input_thread->p->input.p_demux)
-        || demux2_Control( p_input_thread->p->input.p_demux, DEMUX_GET_FPS, &f_fps )
-        || f_fps < 0.1 )
+    if( p_input_thread )
     {
+        if( input_Control( p_input_thread, INPUT_GET_VIDEO_FPS, &f_fps ) )
+            f_fps = 0.0;
         vlc_object_release( p_input_thread );
-        return 0.0;
     }
-    else
-    {
-        vlc_object_release( p_input_thread );
-        return( f_fps );
-    }
+    return f_fps;
 }
 
 vlc_bool_t libvlc_media_instance_will_play(

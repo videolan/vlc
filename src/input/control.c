@@ -540,6 +540,18 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 stream_Size( p_input->p->input.p_stream );
             return VLC_SUCCESS;
 
+        case INPUT_GET_VIDEO_FPS:
+        {
+            int i;
+            pf = (double*)va_arg( args, double * );
+            vlc_mutex_lock( &p_input->p->input.p_item->lock );
+            *pf = p_input->p->input.f_fps;
+            for( i = 0; i < p_input->p->i_slave && *pf <= 0.001; i++ )
+                *pf = p_input->p->slave[i]->f_fps;
+            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+            return VLC_SUCCESS;
+        }
+
         case INPUT_ADD_SLAVE:
             psz = (char*)va_arg( args, char * );
             if( psz && *psz )

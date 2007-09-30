@@ -104,7 +104,7 @@ enum demux_query_e
      */
     DEMUX_SET_NEXT_DEMUX_TIME,  /* arg1= int64_t *      can fail */
     /* FPS for correct subtitles handling */
-    DEMUX_GET_FPS,              /* arg1= float *        res=can fail    */
+    DEMUX_GET_FPS,              /* arg1= double *       res=can fail    */
 
     /* Meta data */
     DEMUX_GET_META,             /* arg1= vlc_meta_t **  res=can fail    */
