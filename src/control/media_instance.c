@@ -262,7 +262,7 @@ libvlc_media_instance_t * libvlc_media_instance_new_from_input_thread(
 
     p_mi->p_md = libvlc_media_descriptor_new_from_input_item(
                     p_libvlc_instance,
-                    p_input->p->input.p_item, p_e );
+                    input_GetItem( p_input ), p_e );
 
     if( !p_mi->p_md )
     {
