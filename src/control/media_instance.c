@@ -430,10 +430,7 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
     if( (p_input_thread = libvlc_get_input_thread( p_mi, p_e )) )
     {
         /* A thread alread exists, send it a play message */
-        vlc_value_t val;
-        val.i_int = PLAYING_S;
-
-        input_Control( p_input_thread, INPUT_CONTROL_SET_STATE, PLAYING_S );
+        input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
         vlc_object_release( p_input_thread );
         return;
     }
@@ -476,16 +473,12 @@ void libvlc_media_instance_play( libvlc_media_instance_t *p_mi,
 void libvlc_media_instance_pause( libvlc_media_instance_t *p_mi,
                                   libvlc_exception_t *p_e )
 {
-    input_thread_t * p_input_thread;
-    vlc_value_t val;
-    val.i_int = PAUSE_S;
-
-    p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
 
     if( !p_input_thread )
         return;
 
-    input_Control( p_input_thread, INPUT_CONTROL_SET_STATE, val );
+    input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
     vlc_object_release( p_input_thread );
 }
 
