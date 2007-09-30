@@ -246,7 +246,7 @@ vlc_SOURCES = src/vlc.c
 # Ugly kludge so that automake defines $(CXXLINK)
 nodist_EXTRA_vlc_SOURCES = extras/zsh.cpp src/misc/darwin_specific.m
 
-vlc_DEPENDENCIES = $(LIBVLC) $(DATA_win32_rc)
+vlc_DEPENDENCIES = $(DATA_win32_rc)
 
 vlc_LDADD = $(DATA_win32_rc) $(LIBVLC) $(LTLIBINTL)
 vlc_LDFLAGS = `$(VLC_CONFIG) --libs vlc`
@@ -268,12 +268,9 @@ nice:
 libvlc:
 	cd src && $(MAKE) $(AM_MAKEFLAGS) $(LIB_libvlc)
 
-core: libvlc
-	$(MAKE) $(AM_MAKEFLAGS) vlc$(EXEEXT)
+core: libvlc vlc$(EXEEXT)
 
 .PHONY: libvlc core
-
-src/$(LIB_libvlc): libvlc
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
 	@rm -f vlc$(EXEEXT)
