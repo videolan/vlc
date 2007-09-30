@@ -1258,24 +1258,32 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         var_Get( p_input, "state", &val );
         if( val.i_int == PLAYING_S )
         {
-            mvnprintw( y++, 0, COLS, " State    : Playing" );
+            mvnprintw( y, 0, COLS, " State    : Playing" );
         }
         else if( val.i_int == OPENING_S )
         {
-            mvnprintw( y++, 0, COLS, " State    : Openning/Connecting" );
+            mvnprintw( y, 0, COLS, " State    : Opening/Connecting" );
         }
         else if( val.i_int == BUFFERING_S )
         {
-            mvnprintw( y++, 0, COLS, " State    : Buffering" );
+            mvnprintw( y, 0, COLS, " State    : Buffering" );
         }
         else if( val.i_int == PAUSE_S )
         {
-            mvnprintw( y++, 0, COLS, " State    : Paused" );
+            mvnprintw( y, 0, COLS, " State    : Paused" );
         }
-        else
-        {
-            y++;
-        }
+        char *psz_playlist_state = malloc( 25 );
+        /* strlen( "[Repeat] [Random] [Loop] ) == 24, + '\0' */
+        psz_playlist_state[0] = '\0';
+        if( var_GetBool( p_sys->p_playlist, "repeat" ) )
+            strcat( psz_playlist_state, "[Repeat] " );
+        if( var_GetBool( p_sys->p_playlist, "random" ) )
+            strcat( psz_playlist_state, "[Random] " );
+        if( var_GetBool( p_sys->p_playlist, "loop" ) )
+            strcat( psz_playlist_state, "[Loop]" );
+        mvnprintw( y++, 32, COLS, psz_playlist_state );
+        free( psz_playlist_state );
+
         if( val.i_int != INIT_S && val.i_int != END_S )
         {
             audio_volume_t i_volume;
