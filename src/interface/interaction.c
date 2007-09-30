@@ -302,7 +302,7 @@ void __intf_ProgressUpdate( vlc_object_t *p_this, int i_id,
         return;
     }
 
-    FREE( p_dialog->psz_description );
+    free( p_dialog->psz_description );
     p_dialog->psz_description = strdup( psz_status );
 
     p_dialog->val.f_float = f_pos;

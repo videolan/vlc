@@ -291,8 +291,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     }
     if( !f_fname || !f_dir )
     {
-        FREE( f_fname );
-        FREE( f_dir );
+        free( f_fname );
+        free( f_dir );
         return NULL;
     }
 
@@ -302,10 +302,10 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     f_fname_trim = malloc(i_fname_len + 1 );
     if( !f_fname_noext || !f_fname_trim )
     {
-        FREE( f_fname );
-        FREE( f_dir );
-        FREE( f_fname_noext );
-        FREE( f_fname_trim );
+        free( f_fname );
+        free( f_dir );
+        free( f_fname_noext );
+        free( f_fname_trim );
         return NULL;
     }
 
@@ -408,14 +408,14 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
         if( ppsz_dir_content )
         {
             for( a = 0; a < i_dir_content; a++ )
-                FREE( ppsz_dir_content[a] );
+                free( ppsz_dir_content[a] );
             free( ppsz_dir_content );
         }
     }
     if( subdirs )
     {
         for( j = 0; subdirs[j]; j++ )
-            FREE( subdirs[j] );
+            free( subdirs[j] );
         free( subdirs );
     }
     free( f_fname );
@@ -464,8 +464,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
     for( j = 0; j < i_sub_count; j++ )
     {
-        FREE( result[j].psz_fname );
-        FREE( result[j].psz_ext );
+        free( result[j].psz_fname );
+        free( result[j].psz_ext );
     }
     free( result );
 

@@ -158,7 +158,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Err( p_demux, "invalid root node %i, %s",
                  xml_ReaderNodeType( p_xml_reader ), psz_eltname );
-        FREE( psz_eltname );
+        free( psz_eltname );
 
         /* second line has <?quicktime tag ... so we try to skip it */
         msg_Dbg( p_demux, "trying to read one more node" );
@@ -169,11 +169,11 @@ static int Demux( demux_t *p_demux )
         {
             msg_Err( p_demux, "invalid root node %i, %s",
                      xml_ReaderNodeType( p_xml_reader ), psz_eltname );
-            FREE( psz_eltname );
+            free( psz_eltname );
             return -1;
         }
     }
-    FREE( psz_eltname );
+    free( psz_eltname );
 
     while( xml_ReaderNextAttr( p_sys->p_xml_reader ) == VLC_SUCCESS )
     {
@@ -182,8 +182,8 @@ static int Demux( demux_t *p_demux )
 
         if( !psz_attrname || !psz_attrvalue )
         {
-            FREE( psz_attrname );
-            FREE( psz_attrvalue );
+            free( psz_attrname );
+            free( psz_attrvalue );
             return -1;
         }
 
@@ -318,8 +318,8 @@ static int Demux( demux_t *p_demux )
             msg_Dbg( p_demux, "Attribute %s with value %s isn't valid",
                      psz_attrname, psz_attrvalue );
         }
-        FREE( psz_attrname );
-        FREE( psz_attrvalue );
+        free( psz_attrname );
+        free( psz_attrvalue );
     }
 
     msg_Dbg( p_demux, "autoplay: %s (unused by VLC)",
@@ -369,11 +369,11 @@ static int Demux( demux_t *p_demux )
 
     p_sys->p_playlist = NULL;
 
-    FREE( psz_href );
-    FREE( psz_moviename );
-    FREE( psz_qtnext );
-    FREE( psz_src );
-    FREE( psz_mimetype );
+    free( psz_href );
+    free( psz_moviename );
+    free( psz_qtnext );
+    free( psz_src );
+    free( psz_mimetype );
 
     return -1; /* Needed for correct operation of go back */
 }

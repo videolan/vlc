@@ -74,7 +74,7 @@ static int Open( vlc_object_t *p_this )
             return -1;
 
         case XML_READER_STARTELEM:
-            FREE( psz_elname );
+            free( psz_elname );
             psz_elname = xml_ReaderName( p_reader );
             if( !psz_elname ) return VLC_EGENERIC;
             printf( "<%s", psz_elname );
@@ -83,7 +83,7 @@ static int Open( vlc_object_t *p_this )
         case XML_READER_TEXT:
             break;
         case XML_READER_ENDELEM:
-            FREE( psz_elname );
+            free( psz_elname );
             psz_elname = xml_ReaderName( p_reader );
             if( !psz_elname ) return VLC_EGENERIC;
             printf( ">" );

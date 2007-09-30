@@ -358,7 +358,7 @@ static void Close( vlc_object_t * p_this )
     httpd_StreamDelete( p_sys->p_httpd_stream );
     httpd_HostDelete( p_sys->p_httpd_host );
 
-    FREE( p_sys->p_header );
+    free( p_sys->p_header );
 
     msg_Dbg( p_access, "Close" );
 

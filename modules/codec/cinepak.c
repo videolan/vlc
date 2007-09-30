@@ -406,7 +406,7 @@ static int cinepak_decode_frame( cinepak_context_t *p_context,
         int i;
         for( i = 0; i < 3; i++ )
         {
-            FREE( p_context->p_pix[i] );
+            free( p_context->p_pix[i] );
         }
 
         p_context->i_width = i_width;
