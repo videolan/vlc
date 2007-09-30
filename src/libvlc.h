@@ -111,6 +111,9 @@ struct vlc_object_internals_t
     vlc_thread_t    thread_id;
     vlc_bool_t      b_thread;
 
+    /* Objects thread synchronization */
+    int             pipes[2];
+
     /* Objects management */
     unsigned        i_refcount;
     vlc_bool_t      b_attached;

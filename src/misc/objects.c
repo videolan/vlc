@@ -188,6 +188,7 @@ vlc_object_t *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     vlc_mutex_init( p_new, &p_new->object_lock );
     vlc_cond_init( p_new, &p_new->object_wait );
     vlc_mutex_init( p_new, &p_priv->var_lock );
+    p_priv->pipes[0] = p_priv->pipes[1] = -1;
 
     if( i_type == VLC_OBJECT_GLOBAL )
     {
@@ -435,6 +436,10 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 
     vlc_mutex_destroy( &p_this->object_lock );
     vlc_cond_destroy( &p_this->object_wait );
+    if( p_priv->pipes[0] != -1 )
+        close( p_priv->pipes[0] );
+    if( p_priv->pipes[1] != -1 )
+        close( p_priv->pipes[1] );
 
     /* global is not dynamically allocated by vlc_object_create */
     if( p_this->i_object_type != VLC_OBJECT_GLOBAL )
@@ -465,6 +470,15 @@ void __vlc_object_unlock( vlc_object_t *obj )
 vlc_bool_t __vlc_object_wait( vlc_object_t *obj )
 {
     vlc_assert_locked( &obj->object_lock );
+
+    int fd = obj->p_internals->pipes[0];
+    if( ( fd != -1 )
+     && ( read( fd, &(char){ 0 }, 1 ) == 0 ) )
+    {
+        close( fd );
+        obj->p_internals->pipes[1] = -1;
+    }   
+
     vlc_cond_wait( &obj->object_wait, &obj->object_lock );
     return obj->b_die;
 }
@@ -498,6 +512,11 @@ int __vlc_object_timedwait( vlc_object_t *obj, mtime_t deadline )
 void __vlc_object_signal_unlocked( vlc_object_t *obj )
 {
     vlc_assert_locked( &obj->object_lock );
+
+    int fd = obj->p_internals->pipes[1];
+    if( fd != -1 )
+        while( write( fd, &(char){ 0 }, 1 ) < 0 );
+
     vlc_cond_signal( &obj->object_wait );
 }
 
@@ -515,6 +534,14 @@ void __vlc_object_kill( vlc_object_t *p_this )
             vlc_object_kill( p_this->pp_children[i] );
 
     p_this->b_die = VLC_TRUE;
+
+    int fd = p_this->p_internals->pipes[1];
+    if( fd != -1 )
+    {
+        close( fd );
+        p_this->p_internals->pipes[1] = -1;
+    }
+
     vlc_object_signal_unlocked( p_this );
     vlc_mutex_unlock( &p_this->object_lock );
 }
