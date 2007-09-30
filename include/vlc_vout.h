@@ -86,7 +86,7 @@ struct picture_t
      * These properties can be modified using the video output thread API,
      * but should never be written directly */
     /**@{*/
-    int             i_refcount;                  /**< link reference counter */
+    unsigned        i_refcount;                  /**< link reference counter */
     mtime_t         date;                                  /**< display date */
     vlc_bool_t      b_force;
     /**@}*/
