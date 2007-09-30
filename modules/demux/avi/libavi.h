@@ -234,14 +234,17 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
     /* *** avi stuff *** */
 
 #define AVIFOURCC_RIFF         VLC_FOURCC('R','I','F','F')
+#define AVIFOURCC_ON2          VLC_FOURCC('O','N','2',' ')
 #define AVIFOURCC_LIST         VLC_FOURCC('L','I','S','T')
 #define AVIFOURCC_JUNK         VLC_FOURCC('J','U','N','K')
 #define AVIFOURCC_AVI          VLC_FOURCC('A','V','I',' ')
 #define AVIFOURCC_AVIX         VLC_FOURCC('A','V','I','X')
+#define AVIFOURCC_ON2f         VLC_FOURCC('O','N','2','f')
 #define AVIFOURCC_WAVE         VLC_FOURCC('W','A','V','E')
 #define AVIFOURCC_INFO         VLC_FOURCC('I','N','F','O')
 
 #define AVIFOURCC_avih         VLC_FOURCC('a','v','i','h')
+#define AVIFOURCC_ON2h         VLC_FOURCC('O','N','2','h')
 #define AVIFOURCC_hdrl         VLC_FOURCC('h','d','r','l')
 #define AVIFOURCC_movi         VLC_FOURCC('m','o','v','i')
 #define AVIFOURCC_idx1         VLC_FOURCC('i','d','x','1')
