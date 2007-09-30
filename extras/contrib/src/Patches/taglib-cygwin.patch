@@ -1,0 +1,10 @@
+--- taglib/admin/conf.change.pl	2005-07-27 10:23:52.000000000 +1000
++++ taglib/admin/conf.change.pl	2007-09-30 15:57:48.062500000 +1000
+@@ -146,6 +146,7 @@
+       fi
+   done
+   if test -f \$tmp/subs.files ; then
++      dos2unix \$tmp/subs.files
+       perl $ac_aux_dir/config.pl "\$tmp/subs.sed" "\$tmp/subs.files" "\$srcdir" "\$INSTALL"
+   fi
+   rm -f \$tmp/subs.files

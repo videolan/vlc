@@ -2,6 +2,23 @@ Index: configure
 ===================================================================
 --- configure	(revision 672)
 +++ configure	(working copy)
+@@ -339,13 +339,13 @@
+             pthread="yes"
+             ;;
+         MINGW|CYGWIN)
+-            if cc_check pthread.h -lpthread "pthread_create(0,0,0,0);" ; then
++            if cc_check pthread.h -lpthread "pthread_create(0,0,0,0); pthread_num_processors_np();" ; then
+                 pthread="yes"
+                 libpthread="-lpthread"
+-            elif cc_check pthread.h -lpthreadGC2 "pthread_create(0,0,0,0);" ; then
++            elif cc_check pthread.h -lpthreadGC2 "pthread_create(0,0,0,0); pthread_num_processors_np();" ; then
+                 pthread="yes"
+                 libpthread="-lpthreadGC2"
+-            elif cc_check pthread.h "-lpthreadGC2 -lwsock32 -DPTW32_STATIC_LIB" "pthread_create(0,0,0,0);" ; then
++            elif cc_check pthread.h "-lpthreadGC2 -lwsock32 -DPTW32_STATIC_LIB" "pthread_create(0,0,0,0); pthread_num_processors_np();" ; then
+                 pthread="yes"
+                 libpthread="-lpthreadGC2 -lwsock32"
+                 CFLAGS="$CFLAGS -DPTW32_STATIC_LIB"
 @@ -428,6 +428,10 @@
  ASFLAGS=$ASFLAGS
  GTK=$gtk

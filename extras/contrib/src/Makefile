@@ -1312,7 +1312,11 @@ endif
 
 ifdef HAVE_WIN32
 .x264: x264 .pthreads
+  ifdef HAVE_CYGWIN
+	(cd $<; $(HOSTCC) RANLIB="ranlib" AR="ar" STRIP="strip" ./configure $(X264CONF) --prefix="$(PREFIX)" --extra-cflags="-I$(PREFIX)/include" --extra-ldflags="-L$(PREFIX)/lib" && make && make install)
+  else
 	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+  endif
 else
 .x264: x264
 	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
@@ -1515,7 +1519,11 @@ endif
 ifdef HAVE_WIN32
 	(cd xml; aclocal && automake && autoreconf)
 endif
+  ifdef HAVE_CYGWIN
+	(cd xml; ac_cv_header_pthread_h="no" CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-minimal --with-catalog --with-reader --with-tree --with-push --with-xptr --with-valid --with-xpath --with-xinclude --with-sax1 --without-zlib --without-iconv --without-http --without-ftp && make && make install)
+  else
 	(cd xml; CFLAGS="-DLIBXML_STATIC" $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-minimal --with-catalog --with-reader --with-tree --with-push --with-xptr --with-valid --with-xpath --with-xinclude --with-sax1 --without-zlib --without-iconv --without-http --without-ftp && make && make install)
+  endif
 ifndef HAVE_DARWIN_OS
 	$(INSTALL_NAME)
 endif
@@ -1995,6 +2003,9 @@ dirac-$(DIRAC_VERSION).tar.gz:
 dirac: dirac-$(DIRAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p0 <Patches/dirac-cross.patch
+ifdef HAVE_CYGWIN
+	patch -p0 <Patches/dirac-cygwin.patch
+endif
 	(cd $@; aclocal && autoconf && automake)
 
 DIRAC_SUBDIRS = libdirac_byteio libdirac_common libdirac_motionest libdirac_encoder libdirac_decoder
@@ -2150,6 +2161,9 @@ taglib-$(TAGLIB_VERSION).tar.gz:
 
 taglib: taglib-$(TAGLIB_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_CYGWIN
+	patch -p0 <Patches/taglib-cygwin.patch
+endif
 
 .tag: taglib
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
@@ -2172,10 +2186,6 @@ pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 
 .pthreads: pthreads
 	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC-static && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && cp -v *.a $(PREFIX)/lib/)
-ifdef HAVE_CYGWIN
-# for some reason Cygwin builds libpthreadGC2.a
-	mv $(PREFIX)/lib/libpthreadGC2.a $(PREFIX)/lib/libpthread.a
-endif
 	$(INSTALL_NAME)
 	touch $@
 
