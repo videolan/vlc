@@ -225,9 +225,11 @@ libvlc_media_instance_t * libvlc_playlist_get_media_instance(
                             p_instance, PL->p_input, p_e );
     }
     else
+    {
         /* no active input */
         p_mi = NULL;
-
+        libvlc_exception_raise( p_e, "No active input" );
+    }
     vlc_mutex_unlock( &PL->object_lock );
 
     return p_mi;
