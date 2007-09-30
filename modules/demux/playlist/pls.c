@@ -47,7 +47,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 int E_(Import_PLS)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     CHECK_PEEK( p_peek, 10 );
 
     if( POKE( p_peek, "[playlist]", 10 ) || POKE( p_peek, "[Reference]", 10 ) ||

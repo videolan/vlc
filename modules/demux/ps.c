@@ -98,7 +98,7 @@ static int OpenCommon( vlc_object_t *p_this, vlc_bool_t b_force )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
@@ -502,7 +502,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  */
 static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code )
 {
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     int     i_peek;
     int     i_skip;
 
@@ -545,7 +545,7 @@ static int ps_pkt_resynch( stream_t *s, uint32_t *pi_code )
 
 static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
 {
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     int      i_peek = stream_Peek( s, &p_peek, 14 );
     int      i_size = ps_pkt_size( p_peek, i_peek );
 

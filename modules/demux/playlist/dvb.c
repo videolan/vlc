@@ -50,7 +50,7 @@ static int ParseLine( char *, char **, char ***, int *);
 int E_(Import_DVB)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     int     i_peek;
     vlc_bool_t b_valid = VLC_FALSE;
 

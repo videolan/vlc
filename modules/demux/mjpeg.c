@@ -74,7 +74,7 @@ struct demux_sys_t
     mtime_t         i_frame_length;
     char            *psz_separator;
     int             i_frame_size_estimate;
-    uint8_t         *p_peek;
+    const uint8_t   *p_peek;
     int             i_data_peeked;
 };
 
@@ -117,7 +117,7 @@ static vlc_bool_t Peek( demux_t *p_demux, vlc_bool_t b_first )
 static char* GetLine( demux_t *p_demux, int *p_pos )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    uint8_t     *p_buf;
+    const uint8_t *p_buf;
     int         i_size;
     int         i;
     char        *p_line;
@@ -300,7 +300,6 @@ static int Open( vlc_object_t * p_this )
     int         i_size;
     int         b_matched = VLC_FALSE;
     vlc_value_t val;
-    char *psz_ext;
 
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
@@ -342,9 +341,8 @@ static int Open( vlc_object_t * p_this )
     /* Check for jpeg file extension */
     p_sys->b_still = VLC_FALSE;
     p_sys->i_still_end = 0;
-    psz_ext = strrchr( p_demux->psz_path, '.' );
-    if( psz_ext && ( !strcasecmp( psz_ext, ".jpeg" ) ||
-                     !strcasecmp( psz_ext, ".jpg" ) ) )
+    if( demux2_IsPathExtension( p_demux, ".jpeg" ) ||
+        demux2_IsPathExtension( p_demux, ".jpg" ) )
     {
         p_sys->b_still = VLC_TRUE;
         if( val.f_float)

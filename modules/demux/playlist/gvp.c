@@ -74,7 +74,7 @@ int E_(Import_GVP)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     int i_peek, i, b_found = VLC_FALSE;
-    byte_t *p_peek;
+    const byte_t *p_peek;
 
     i_peek = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
 
@@ -90,7 +90,7 @@ int E_(Import_GVP)( vlc_object_t *p_this )
 
     if( !b_found ) return VLC_EGENERIC;
 
-    STANDARD_DEMUX_INIT_MSG(  "using Google Video Playlist (gvp) import" )
+    STANDARD_DEMUX_INIT_MSG(  "using Google Video Playlist (gvp) import" );
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
     MALLOC_ERR( p_demux->p_sys, demux_sys_t );

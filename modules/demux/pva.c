@@ -77,16 +77,14 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     es_format_t  fmt;
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
 
     if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;
     if( p_peek[0] != 'A' || p_peek[1] != 'V' || p_peek[4] != 0x55 )
     {
         /* In case we had forced this demuxer we try to resynch */
-        if( strcasecmp( p_demux->psz_demux, "pva" ) || ReSynch( p_demux ) )
-        {
+        if( !p_demux->b_force || ReSynch( p_demux ) )
             return VLC_EGENERIC;
-        }
     }
 
     /* Fill p_demux field */
@@ -133,7 +131,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
     int         i_size;
     block_t     *p_frame;
     int64_t     i_pts;
@@ -337,7 +335,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  *****************************************************************************/
 static int ReSynch( demux_t *p_demux )
 {
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     int      i_skip;
     int      i_peek;
 

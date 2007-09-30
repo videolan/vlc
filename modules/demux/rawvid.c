@@ -154,10 +154,8 @@ static int Open( vlc_object_t * p_this )
                 break;
             }
     }
-    if( ( !b_valid ) && strcmp(p_demux->psz_demux, "rawvid") )
-    {
+    if( !b_valid && !p_demux->b_force )
         return VLC_EGENERIC;
-    }
 
     /* Set p_input field */
     p_demux->pf_demux   = Demux;

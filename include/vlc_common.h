@@ -668,23 +668,23 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
 }
 
 /* Malloc with automatic error */
-#define MALLOC_VOID( var, type ) { var = (type*)malloc( sizeof( type) ); \
-                                   if( !var ) return; }
-#define MALLOC_NULL( var, type ) { var = (type*)malloc( sizeof( type) ); \
-                                   if( !var ) return NULL; }
-#define MALLOC_ERR( var, type ) { var = (type*)malloc( sizeof( type) ); \
-                                   if( !var ) return VLC_ENOMEM; }
-#define MALLOC_GOTOERR( var, type ) { var = (type*)malloc( sizeof( type) ); \
-                                      if( !var ) goto error; }
+#define MALLOC_VOID( var, type ) do { var = (type*)malloc( sizeof( type) ); \
+                                   if( !var ) return; } while(0)
+#define MALLOC_NULL( var, type ) do { var = (type*)malloc( sizeof( type) ); \
+                                   if( !var ) return NULL; } while(0)
+#define MALLOC_ERR( var, type ) do { var = (type*)malloc( sizeof( type) ); \
+                                   if( !var ) return VLC_ENOMEM; } while(0)
+#define MALLOC_GOTOERR( var, type ) do { var = (type*)malloc( sizeof( type) ); \
+                                      if( !var ) goto error; } while(0)
 #define DECMALLOC_VOID( var, type ) type* var = (type*)malloc( sizeof(type) );\
                                     if( !var ) return;
-#define DECMALLOC_ERR( var, type ) type* var = (type*)malloc( sizeof(type) );\
+#define DECMALLOC_ERR( var, type )  type* var = (type*)malloc( sizeof(type) );\
                                     if( !var ) return VLC_ENOMEM;
 #define DECMALLOC_NULL( var, type ) type* var = (type*)malloc( sizeof(type) );\
                                     if( !var ) return NULL;
 
-#define FREENULL(a) if( a ) { free( a ); a = NULL; }
-#define FREE(a) if( a ) { free( a ); }
+#define FREENULL(a) do { if( a ) { free( a ); a = NULL; } } while(0)
+#define FREE(a) do { if( a ) { free( a ); } } while(0)
 
 #define EMPTY_STR(str) (!str || !*str)
 
@@ -813,6 +813,9 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #else
 #   define ATTR_ALIGN(align)
 #endif
+
+/* */
+#define VLC_UNUSED(x) (void)(x)
 
 /* Alignment of critical dynamic data structure
  *

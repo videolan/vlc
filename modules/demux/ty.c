@@ -151,7 +151,7 @@ static int TyOpen(vlc_object_t *p_this)
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys;
     es_format_t fmt;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
 
     /* peek at the first 12 bytes. */
     /* for TY streams, they're always the same */
@@ -165,8 +165,8 @@ static int TyOpen(vlc_object_t *p_this)
         /* doesn't look like a TY file... */
         char *psz_ext = strrchr(p_demux->psz_path, '.');
 
-        if( !p_demux->b_force &&
-            (!psz_ext || strcasecmp(psz_ext, ".ty")) ) return VLC_EGENERIC;
+        if( !p_demux->b_force && !demux2_IsPathExtension( p_demux, ".ty" ) )
+            return VLC_EGENERIC;
         msg_Warn( p_demux, "this does not look like a TY file, "
                   "continuing anyway..." );
     }

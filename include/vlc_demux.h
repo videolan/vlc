@@ -128,7 +128,7 @@ VLC_EXPORT( int,       demux2_vaControlHelper, ( stream_t *, int64_t i_start, in
 static inline vlc_bool_t demux2_IsPathExtension( demux_t *p_demux, const char *psz_extension )
 {
     const char *psz_ext = strrchr ( p_demux->psz_path, '.' );
-    if( !psz_ext || strcmp( psz_ext, psz_extension ) )
+    if( !psz_ext || strcasecmp( psz_ext, psz_extension ) )
         return VLC_FALSE;
     return VLC_TRUE;
 }
@@ -140,24 +140,21 @@ static inline vlc_bool_t demux2_IsForced( demux_t *p_demux, const char *psz_name
     return VLC_TRUE;
 }
 
-#define STANDARD_DEMUX_INIT \
-    p_demux->pf_control = Control; \
-    p_demux->pf_demux = Demux; \
+#define DEMUX_INIT_COMMON() do {            \
+    p_demux->pf_control = Control;          \
+    p_demux->pf_demux = Demux;              \
     MALLOC_ERR( p_demux->p_sys, demux_sys_t ); \
-    memset( p_demux->p_sys, 0, sizeof( demux_sys_t ) );
+    memset( p_demux->p_sys, 0, sizeof( demux_sys_t ) ); } while(0)
 
-#define STANDARD_DEMUX_INIT_MSG( msg ) \
-    p_demux->pf_control = Control; \
-    p_demux->pf_demux = Demux; \
-    MALLOC_ERR( p_demux->p_sys, demux_sys_t ); \
-    memset( p_demux->p_sys, 0, sizeof( demux_sys_t ) ); \
-    msg_Dbg( p_demux, msg ); \
+#define STANDARD_DEMUX_INIT_MSG( msg ) do { \
+    DEMUX_INIT_COMMON();                    \
+    msg_Dbg( p_demux, msg ); } while(0)
 
 #define DEMUX_BY_EXTENSION( ext ) \
     demux_t *p_demux = (demux_t *)p_this; \
     if( !demux2_IsPathExtension( p_demux, ext ) ) \
         return VLC_EGENERIC; \
-    STANDARD_DEMUX_INIT;
+    DEMUX_INIT_COMMON();
 
 #define DEMUX_BY_EXTENSION_MSG( ext, msg ) \
     demux_t *p_demux = (demux_t *)p_this; \
@@ -169,7 +166,7 @@ static inline vlc_bool_t demux2_IsForced( demux_t *p_demux, const char *psz_name
     demux_t *p_demux = (demux_t *)p_this; \
     if( !demux2_IsPathExtension( p_demux, ext ) && !demux2_IsForced( p_demux, module ) ) \
         return VLC_EGENERIC; \
-    STANDARD_DEMUX_INIT;
+    DEMUX_INIT_COMMON();
 
 #define DEMUX_BY_EXTENSION_OR_FORCED_MSG( ext, module, msg ) \
     demux_t *p_demux = (demux_t *)p_this; \
@@ -185,10 +182,7 @@ static inline vlc_bool_t demux2_IsForced( demux_t *p_demux, const char *psz_name
     if( stream_Peek( p_demux->s , &zepeek, size ) < size ) { \
         msg_Dbg( p_demux, "not enough data" ); goto error; }
 
-#define CHECK_DISCARD_PEEK( size ) { uint8_t *p_peek; \
-    if( stream_Peek( p_demux->s , &p_peek, size ) < size ) return VLC_EGENERIC;}
-
-#define POKE( peek, stuff, size ) (strncasecmp( (char *)peek, stuff, size )==0)
+#define POKE( peek, stuff, size ) (strncasecmp( (const char *)peek, stuff, size )==0)
 
 #define COMMON_INIT_PACKETIZER( location ) \
     location = vlc_object_create( p_demux, VLC_OBJECT_PACKETIZER ); \

@@ -225,7 +225,7 @@ static int Open( vlc_object_t * p_this )
     unsigned int i_track;
     unsigned int i, i_peeker;
 
-    uint8_t  *p_peek;
+    const uint8_t *p_peek;
 
     /* Is it an avi file ? */
     if( stream_Peek( p_demux->s, &p_peek, 200 ) < 200 ) return VLC_EGENERIC;
@@ -1898,7 +1898,7 @@ static void AVI_ParseStreamHeader( vlc_fourcc_t i_id,
  ****************************************************************************/
 static int AVI_PacketGetHeader( demux_t *p_demux, avi_packet_t *p_pk )
 {
-    uint8_t  *p_peek;
+    const uint8_t *p_peek;
 
     if( stream_Peek( p_demux->s, &p_peek, 16 ) < 16 )
     {

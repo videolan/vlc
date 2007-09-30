@@ -703,7 +703,7 @@ static int MP4_ReadBox_url( stream_t *p_stream, MP4_Box_t *p_box )
 
 static void MP4_FreeBox_url( MP4_Box_t *p_box )
 {
-    FREENULL( p_box->data.p_url->psz_location )
+    FREENULL( p_box->data.p_url->psz_location );
 }
 
 static int MP4_ReadBox_urn( stream_t *p_stream, MP4_Box_t *p_box )
@@ -1552,7 +1552,7 @@ static int MP4_ReadBox_stss( stream_t *p_stream, MP4_Box_t *p_box )
 
 static void MP4_FreeBox_stss( MP4_Box_t *p_box )
 {
-    FREENULL( p_box->data.p_stss->i_sample_number )
+    FREENULL( p_box->data.p_stss->i_sample_number );
 }
 
 static int MP4_ReadBox_stsh( stream_t *p_stream, MP4_Box_t *p_box )
@@ -1589,8 +1589,8 @@ static int MP4_ReadBox_stsh( stream_t *p_stream, MP4_Box_t *p_box )
 
 static void MP4_FreeBox_stsh( MP4_Box_t *p_box )
 {
-    FREENULL( p_box->data.p_stsh->i_shadowed_sample_number )
-    FREENULL( p_box->data.p_stsh->i_sync_sample_number )
+    FREENULL( p_box->data.p_stsh->i_shadowed_sample_number );
+    FREENULL( p_box->data.p_stsh->i_sync_sample_number );
 }
 
 
@@ -1621,7 +1621,7 @@ static int MP4_ReadBox_stdp( stream_t *p_stream, MP4_Box_t *p_box )
 
 static void MP4_FreeBox_stdp( MP4_Box_t *p_box )
 {
-    FREENULL( p_box->data.p_stdp->i_priority )
+    FREENULL( p_box->data.p_stdp->i_priority );
 }
 
 static int MP4_ReadBox_padb( stream_t *p_stream, MP4_Box_t *p_box )
@@ -1970,7 +1970,7 @@ static int MP4_ReadBox_rdrf( stream_t *p_stream, MP4_Box_t *p_box )
 
 static void MP4_FreeBox_rdrf( MP4_Box_t *p_box )
 {
-    FREENULL( p_box->data.p_rdrf->psz_ref )
+    FREENULL( p_box->data.p_rdrf->psz_ref );
 }
 
 

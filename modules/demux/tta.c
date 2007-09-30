@@ -79,7 +79,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     es_format_t fmt;
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
     uint8_t     p_header[22];
     uint8_t     *p_seektable;
     int         i_seektable_size = 0, i;

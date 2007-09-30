@@ -129,10 +129,8 @@ static int Open( vlc_object_t * p_this )
 
     if( CheckSync( p_peek + i_peek, &b_big_endian ) != VLC_SUCCESS )
     {
-        if( strncmp( p_demux->psz_demux, "a52", 3 ) )
-        {
+        if( !p_demux->b_force )
             return VLC_EGENERIC;
-        }
 
         /* User forced */
         msg_Err( p_demux, "this doesn't look like a A52 audio stream, "
@@ -140,7 +138,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Fill p_demux fields */
-    STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
+    DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     p_sys->b_start = VLC_TRUE;
     p_sys->i_mux_rate = 0;
     p_sys->b_big_endian = b_big_endian;

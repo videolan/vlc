@@ -264,7 +264,7 @@ static char *nscdec( vlc_object_t *p_demux, char* p_encoded )
 static int DemuxOpen( vlc_object_t * p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    byte_t *p_peek;
+    const byte_t *p_peek;
     int i_size;
 
     /* Lets check the content to see if this is a NSC file */

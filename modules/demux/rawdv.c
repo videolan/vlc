@@ -134,7 +134,6 @@ static int Open( vlc_object_t * p_this )
     uint32_t    i_dword;
     dv_header_t dv_header;
     dv_id_t     dv_id;
-    char        *psz_ext;
 
     /* It isn't easy to recognize a raw DV stream. The chances that we'll
      * mistake a stream from another type for a raw DV stream are too high, so
@@ -142,12 +141,8 @@ static int Open( vlc_object_t * p_this )
      * it is possible to force this demux. */
 
     /* Check for DV file extension */
-    psz_ext = strrchr( p_demux->psz_path, '.' );
-    if( ( !psz_ext || strcasecmp( psz_ext, ".dv") ) &&
-        strcmp(p_demux->psz_demux, "rawdv") )
-    {
+    if( !demux2_IsPathExtension( p_demux, ".dv" ) && !p_demux->b_force )
         return VLC_EGENERIC;
-    }
 
     if( stream_Peek( p_demux->s, &p_peek, DV_PAL_FRAME_SIZE ) <
         DV_NTSC_FRAME_SIZE )

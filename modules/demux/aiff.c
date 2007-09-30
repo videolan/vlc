@@ -74,7 +74,7 @@ static int Demux  ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
 /* GetF80BE: read a 80 bits float in big endian */
-static unsigned int GetF80BE( uint8_t p[10] )
+static unsigned int GetF80BE( const uint8_t p[10] )
 {
     unsigned int i_mantissa = GetDWBE( &p[2] );
     int          i_exp = 30 - p[1];
@@ -112,7 +112,7 @@ static int Open( vlc_object_t *p_this )
     stream_Read( p_demux->s, NULL, 12 );
 
     /* Fill p_demux field */
-    STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
+    DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     es_format_Init( &p_sys->fmt, UNKNOWN_ES, 0 );
     p_sys->i_time = 1;
     p_sys->i_ssnd_pos = -1;

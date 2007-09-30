@@ -70,7 +70,7 @@ static int __input_FindArtInCache( vlc_object_t *, input_item_t *p_item );
 vlc_bool_t input_MetaSatisfied( playlist_t *p_playlist, input_item_t *p_item,
                                 uint32_t *pi_mandatory, uint32_t *pi_optional )
 {
-    (void)p_playlist;
+    VLC_UNUSED(p_playlist);
     *pi_mandatory = VLC_META_ENGINE_TITLE | VLC_META_ENGINE_ARTIST;
 
     uint32_t i_meta = input_CurrentMetaFlags( p_item->p_meta );

@@ -120,18 +120,12 @@ static int Open( vlc_object_t * p_this )
     vlc_bool_t   b_forced = VLC_FALSE;
 
     uint32_t     header;
-    uint8_t     *p_peek;
+    const uint8_t     *p_peek;
     module_t    *p_id3;
     block_t     *p_block_in, *p_block_out;
 
-    if( p_demux->psz_path )
-    {
-        int  i_len = strlen( p_demux->psz_path );
-        if( i_len > 4 && !strcasecmp( &p_demux->psz_path[i_len - 4], ".mp3" ) )
-        {
-            b_forced = VLC_TRUE;
-        }
-    }
+    if( demux2_IsPathExtension( p_demux, ".mp3" ) )
+        b_forced = VLC_TRUE;
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
@@ -156,7 +150,7 @@ static int Open( vlc_object_t * p_this )
         if( !b_ok && !p_demux->b_force ) return VLC_EGENERIC;
     }
 
-    STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
+    DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->p_es = 0;
     p_sys->b_start = VLC_TRUE;
@@ -171,7 +165,7 @@ static int Open( vlc_object_t * p_this )
     if( HeaderCheck( header ) )
     {
         int i_xing, i_skip;
-        uint8_t *p_xing;
+        const uint8_t *p_xing;
 
         if( ( i_xing = stream_Peek( p_demux->s, &p_xing, 1024 ) ) < 21 )
             return VLC_SUCCESS; /* No header */

@@ -83,7 +83,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     xa_header_t p_xa;
-    uint8_t     *p_buf;
+    const uint8_t *p_buf;
 
     /* XA file heuristic */
     if( stream_Peek( p_demux->s, &p_buf, sizeof( p_xa ) )

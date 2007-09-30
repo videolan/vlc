@@ -97,7 +97,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     es_format_t fmt;
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
     module_t    *p_id3;
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
@@ -111,18 +111,12 @@ static int Open( vlc_object_t * p_this )
         if( i_version  < 4 || i_version > 6 )
             return VLC_EGENERIC;
 
-        if( !p_demux->psz_demux || strcmp( p_demux->psz_demux, "mpc" ) )
+        if( !p_demux->b_force )
         {
             /* Check file name extension */
-            int i_len;
-            if( !p_demux->psz_path )
-                return VLC_EGENERIC;
-
-            i_len = strlen( p_demux->psz_path );
-            if( i_len < 4 ||
-                ( strcasecmp( &p_demux->psz_path[i_len-4], ".mpc" ) &&
-                  strcasecmp( &p_demux->psz_path[i_len-4], ".mp+" ) &&
-                  strcasecmp( &p_demux->psz_path[i_len-4], ".mpp" ) ) )
+            if( !demux2_IsPathExtension( p_demux, ".mpc" ) &&
+                !demux2_IsPathExtension( p_demux, ".mp+" ) &&
+                !demux2_IsPathExtension( p_demux, ".mpp" ) )
                 return VLC_EGENERIC;
         }
     }

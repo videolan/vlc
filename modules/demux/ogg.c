@@ -186,7 +186,7 @@ static int Open( vlc_object_t * p_this )
 
     /* Check if we are dealing with an ogg stream */
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
-    if( strcmp( p_demux->psz_demux, "ogg" ) && memcmp( p_peek, "OggS", 4 ) )
+    if( !p_demux->b_force && memcmp( p_peek, "OggS", 4 ) )
     {
         return VLC_EGENERIC;
     }

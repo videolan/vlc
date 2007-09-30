@@ -129,14 +129,14 @@ static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    char        *ext;
-    int         i;
     ModPlug_Settings settings;
     vlc_value_t val;
 
     /* We accept file based on extension match */
-    if( strcasecmp( p_demux->psz_demux, "mod" ) )
+    if( !p_demux->b_force )
     {
+        char *ext;
+        int i;
         if( ( ext = strrchr( p_demux->psz_path, '.' ) ) == NULL ||
             stream_Size( p_demux->s ) == 0 ) return VLC_EGENERIC;
 

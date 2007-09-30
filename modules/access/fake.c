@@ -97,7 +97,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Set up p_demux */
-    STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
+    DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     p_demux->info.i_update = 0;
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;

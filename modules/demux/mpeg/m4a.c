@@ -78,23 +78,14 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     module_t    *p_id3;
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
     int         b_forced = VLC_FALSE;
 
-    if( p_demux->psz_path )
-    {
-        int i_len = strlen( p_demux->psz_path );
-
-        if( i_len > 4 && !strcasecmp( &p_demux->psz_path[i_len - 4], ".aac" ) )
-        {
-            b_forced = VLC_TRUE;
-        }
-    }
+    if( demux2_IsPathExtension( p_demux, ".aac" ) )
+        b_forced = VLC_TRUE;
 
     if( !p_demux->b_force && !b_forced )
-    {
         return VLC_EGENERIC;
-    }
 
     /* peek the begining (10 is for adts header) */
     if( stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )

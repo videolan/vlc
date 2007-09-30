@@ -91,7 +91,7 @@ static int Open( vlc_object_t * p_this )
     vlc_bool_t  b_append;
 
     /* Accept only if forced */
-    if( strcasecmp( p_demux->psz_demux, "dump" ) )
+    if( !p_demux->b_force )
         return VLC_EGENERIC;
 
     var_Create( p_demux, "demuxdump-append", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );

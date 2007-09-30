@@ -412,7 +412,8 @@ static int Open( vlc_object_t *p_this )
     }
     if( i_sync >= TS_PACKET_SIZE_MAX && !b_topfield )
     {
-        if( strcmp( p_demux->psz_demux, "ts" ) ) return VLC_EGENERIC;
+        if( !p_demux->b_force )
+            return VLC_EGENERIC;
         msg_Warn( p_demux, "this does not look like a TS stream, continuing" );
     }
 
@@ -450,7 +451,7 @@ static int Open( vlc_object_t *p_this )
     {
         i_packet_size = TS_PACKET_SIZE_204;
     }
-    else if( !strcmp( p_demux->psz_demux, "ts" ) )
+    else if( p_demux->b_force )
     {
         i_packet_size = TS_PACKET_SIZE_188;
     }

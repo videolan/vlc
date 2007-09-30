@@ -425,13 +425,13 @@ static int DemuxStation( demux_t *p_demux )
                     input_ItemAddSubItem( p_sys->p_current_input, p_input );
 
                     FREENULL( psz_name );
-                    FREENULL( psz_mt )
-                    FREENULL( psz_id )
-                    FREENULL( psz_br )
-                    FREENULL( psz_genre )
-                    FREENULL( psz_ct )
-                    FREENULL( psz_lc )
-                    FREENULL( psz_rt )
+                    FREENULL( psz_mt );
+                    FREENULL( psz_id );
+                    FREENULL( psz_br );
+                    FREENULL( psz_genre );
+                    FREENULL( psz_ct );
+                    FREENULL( psz_lc );
+                    FREENULL( psz_rt );
                 }
                 free( psz_eltname );
                 break;

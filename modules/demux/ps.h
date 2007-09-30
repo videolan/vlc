@@ -246,7 +246,7 @@ static inline int ps_pkt_id( block_t *p_pkt )
 /* return the size of the next packet
  * XXX you need to give him at least 14 bytes (and it need to start as a
  * valid packet) */
-static inline int ps_pkt_size( uint8_t *p, int i_peek )
+static inline int ps_pkt_size( const uint8_t *p, int i_peek )
 {
     if( p[3] == 0xb9 && i_peek >= 4 )
     {

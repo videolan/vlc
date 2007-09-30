@@ -192,7 +192,7 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
     frame_header_t fh;
     vlc_bool_t  b_extended;
 

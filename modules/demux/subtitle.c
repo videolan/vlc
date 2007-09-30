@@ -182,7 +182,7 @@ static int Open ( vlc_object_t *p_this )
     int  (*pf_read)( demux_t *, subtitle_t* );
     int            i, i_max;
 
-    if( strcmp( p_demux->psz_demux, "subtitle" ) )
+    if( !p_demux->b_force )
     {
         msg_Dbg( p_demux, "subtitle demux discarded" );
         return VLC_EGENERIC;

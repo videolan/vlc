@@ -31,7 +31,7 @@
 
 #define __EVEN( x ) ( (x)&0x01 ? (x)+1 : (x) )
 
-static vlc_fourcc_t GetFOURCC( byte_t *p_buff )
+static vlc_fourcc_t GetFOURCC( const byte_t *p_buff )
 {
     return VLC_FOURCC( p_buff[0], p_buff[1], p_buff[2], p_buff[3] );
 }
@@ -46,7 +46,7 @@ void    _AVI_ChunkFree( stream_t *, avi_chunk_t *p_chk );
  ****************************************************************************/
 static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk )
 {
-    uint8_t  *p_peek;
+    const uint8_t *p_peek;
     int i_peek;
 
     memset( p_chk, 0, sizeof( avi_chunk_t ) );
@@ -111,7 +111,7 @@ static int AVI_NextChunk( stream_t *s, avi_chunk_t *p_chk )
 static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
 {
     avi_chunk_t *p_chk;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     vlc_bool_t b_seekable;
 
     if( p_container->common.i_chunk_size > 0 && p_container->common.i_chunk_size < 8 )
@@ -471,7 +471,7 @@ static void AVI_ChunkFree_idx1( avi_chunk_t *p_chk )
 {
     p_chk->idx1.i_entry_count = 0;
     p_chk->idx1.i_entry_max   = 0;
-    FREENULL( p_chk->idx1.entry )
+    FREENULL( p_chk->idx1.entry );
 }
 
 

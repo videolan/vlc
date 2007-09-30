@@ -476,7 +476,7 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
                           void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    (void)psz_cmd; (void)oldval; (void)p_data;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( newval.i_int == PLAYING_S || newval.i_int == PAUSE_S )
     {
@@ -491,7 +491,7 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    (void)oldval; (void)p_data;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     /* Problem with this way: the "rate" variable is update after the input thread do the change */
     if( !strcmp( psz_cmd, "rate-slower" ) )
@@ -516,7 +516,7 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     vlc_value_t val, length;
-    (void)oldval; (void)p_data;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( !strcmp( psz_cmd, "position-offset" ) )
     {
@@ -549,7 +549,7 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     vlc_value_t val, length;
-    (void)oldval; (void)p_data;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( !strcmp( psz_cmd, "time-offset" ) )
     {
@@ -581,7 +581,7 @@ static int ProgramCallback( vlc_object_t *p_this, char const *psz_cmd,
                             void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    (void)psz_cmd; (void)oldval; (void)p_data;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_PROGRAM, &newval );
 
@@ -594,7 +594,7 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     vlc_value_t val, count;
-    (void)oldval; (void)p_data;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( !strcmp( psz_cmd, "next-title" ) )
     {
@@ -627,7 +627,7 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     vlc_value_t val, count;
-    (void)oldval; (void)p_data;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( !strcmp( psz_cmd, "next-chapter" ) )
     {
@@ -660,7 +660,7 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     vlc_value_t     val;
-    (void)psz_cmd; (void)oldval;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
 
     /* Issue a title change */
     val.i_int = (intptr_t)p_data;
@@ -680,7 +680,7 @@ static int ESCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    (void)oldval; (void)p_data;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( newval.i_int < 0 )
     {
@@ -709,7 +709,7 @@ static int EsDelayCallback ( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    (void)oldval; (void)p_data;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( !strcmp( psz_cmd, "audio-delay" ) )
     {
@@ -730,7 +730,7 @@ static int BookmarkCallback( vlc_object_t *p_this, char const *psz_cmd,
                              void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    (void)psz_cmd; (void)oldval; (void)p_data;
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_BOOKMARK, &newval );
 

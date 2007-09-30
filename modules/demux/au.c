@@ -127,7 +127,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
+    DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     p_sys->i_time = 1;
     p_sys->i_header_size = GetDWBE( &hdr[0] );
 

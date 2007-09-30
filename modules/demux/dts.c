@@ -140,16 +140,15 @@ static int Open( vlc_object_t * p_this )
 
     if( CheckSync( p_peek + i_peek ) != VLC_SUCCESS )
     {
-        if( strncmp( p_demux->psz_demux, "dts", 3 ) )
-        {
+        if( !p_demux->b_force )
             return VLC_EGENERIC;
-        }
+
         /* User forced */
         msg_Err( p_demux, "this doesn't look like a DTS audio stream, "
                  "continuing anyway" );
     }
 
-    STANDARD_DEMUX_INIT; p_sys = p_demux->p_sys;
+    DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
  
     INIT_APACKETIZER( p_sys->p_packetizer, 'd','t','s',' ' );
     LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "DTS" );

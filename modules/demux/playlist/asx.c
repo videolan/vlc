@@ -184,7 +184,7 @@ static int ParseTime(char *s, size_t i_strlen)
 int E_(Import_ASX)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     CHECK_PEEK( p_peek, 10 );
 
     // skip over possible leading empty lines and empty spaces
@@ -529,14 +529,14 @@ static int Demux( demux_t *p_demux )
                     input_ItemAddSubItem( p_current_input, p_entry );
                 }
 
-                /* cleanup entry */
-                FREENULL( psz_href )
-                FREENULL( psz_title_entry )
-                FREENULL( psz_base_entry )
-                FREENULL( psz_artist_entry )
-                FREENULL( psz_copyright_entry )
-                FREENULL( psz_moreinfo_entry )
-                FREENULL( psz_abstract_entry )
+                /* cleanup entry */;
+                FREENULL( psz_href );
+                FREENULL( psz_title_entry );
+                FREENULL( psz_base_entry );
+                FREENULL( psz_artist_entry );
+                FREENULL( psz_copyright_entry );
+                FREENULL( psz_moreinfo_entry );
+                FREENULL( psz_abstract_entry );
                 b_entry = VLC_FALSE;
             }
             else if( !strncasecmp( psz_parse, "<Entry", 6 ) )

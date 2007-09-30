@@ -93,10 +93,8 @@ static int Open( vlc_object_t *p_this )
     if( memcmp( p_peek, "NSVf", 4 ) && memcmp( p_peek, "NSVs", 4 ) )
     {
        /* In case we had force this demuxer we try to resynch */
-        if( strcmp( p_demux->psz_demux, "nsv" ) || ReSynch( p_demux ) )
-        {
+        if( !p_demux->b_force || ReSynch( p_demux ) )
             return VLC_EGENERIC;
-        }
     }
 
     /* Fill p_demux field */

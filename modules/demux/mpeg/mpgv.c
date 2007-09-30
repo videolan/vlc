@@ -70,7 +70,7 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_sys;
     vlc_bool_t   b_forced = VLC_FALSE;
 
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
 
     es_format_t  fmt;
 
@@ -80,10 +80,8 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    if( !strncmp( p_demux->psz_demux, "mpgv", 4 ) )
-    {
+    if( p_demux->b_force )
         b_forced = VLC_TRUE;
-    }
 
     if( p_peek[0] != 0x00 || p_peek[1] != 0x00 || p_peek[2] != 0x01 )
     {

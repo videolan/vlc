@@ -114,7 +114,7 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t val;
  
     /* We accept file based on extention match */
-    if( strcasecmp( p_demux->psz_demux, "gme" ) )
+    if( !p_demux->b_force )
     {
         if( ( ext = strrchr( p_demux->psz_path, '.' ) ) == NULL ||
             stream_Size( p_demux->s ) == 0 ) return VLC_EGENERIC;

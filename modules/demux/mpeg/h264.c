@@ -74,7 +74,7 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    uint8_t     *p_peek;
+    const uint8_t *p_peek;
     vlc_value_t val;
 
     if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;

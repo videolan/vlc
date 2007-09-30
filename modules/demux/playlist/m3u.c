@@ -50,7 +50,7 @@ static void parseEXTINF( char *psz_string, char **ppsz_artist, char **ppsz_name,
 int E_(Import_M3U)( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     CHECK_PEEK( p_peek, 8 );
 
     if(! ( POKE( p_peek, "#EXTM3U", 7 ) || POKE( p_peek, "RTSPtext", 8 ) ||
