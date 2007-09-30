@@ -378,7 +378,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->p_context->palctrl = &palette_control;
 
     /* ***** Open the codec ***** */
-    vlc_mutex_t *lock = var_GetAcquireMutex( "avcodec" );
+    vlc_mutex_t *lock = var_AcquireMutex( "avcodec" );
     if( lock == NULL )
     {
         free( p_sys );
