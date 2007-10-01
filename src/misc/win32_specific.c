@@ -237,7 +237,7 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
                      * with stronger alignment requirements, right. */
                     *((size_t *)(p_data->data + i_data)) = i_len;
                     i_data += sizeof (size_t);
-                    memcpy( &p_data[i_data], ppsz_argv[ i_opt ], i_len );
+                    memcpy( &p_data->data[i_data], ppsz_argv[ i_opt ], i_len );
                     i_data += i_len;
                 }
                 i_data += sizeof (*p_data);
