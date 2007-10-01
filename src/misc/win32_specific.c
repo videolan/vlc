@@ -218,7 +218,7 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
                 COPYDATASTRUCT wm_data;
                 int i_opt;
                 vlc_ipc_data_t *p_data;
-                size_t i_data = sizeof (p_data);
+                size_t i_data = sizeof (*p_data);
 
                 for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
                 {
@@ -240,6 +240,7 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, char *ppsz_argv[] )
                     memcpy( &p_data[i_data], ppsz_argv[ i_opt ], i_len );
                     i_data += i_len;
                 }
+                i_data += sizeof (*p_data);
 
                 /* Send our playlist items to the 1st instance */
                 wm_data.dwData = 0;
@@ -321,9 +322,8 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
             ppsz_argv = (char **)malloc( i_argc * sizeof(char *) );
             for( i_opt = 0; i_opt < i_argc; i_opt++ )
             {
-                ppsz_argv[i_opt] = &p_data[i_data + sizeof(int)];
-                i_data += *((int *)&p_data[i_data]);
-                i_data += sizeof(int);
+                ppsz_argv[i_opt] = p_data->data + i_data + sizeof(int);
+                i_data += sizeof(int) + *((int *)(p_data->data + i_data));
             }
 
             for( i_opt = 0; i_opt < i_argc; i_opt++ )
