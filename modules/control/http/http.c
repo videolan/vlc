@@ -154,7 +154,8 @@ static int Open( vlc_object_t *p_this )
     {
         return( VLC_ENOMEM );
     }
-    p_sys->p_playlist = NULL;
+
+    p_sys->p_playlist = pl_Yield( p_this );
     p_sys->p_input    = NULL;
     p_sys->p_vlm      = NULL;
     p_sys->psz_address = psz_address;
@@ -172,6 +173,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_html_type = malloc( 20 + strlen( psz_src ) );
     if( p_sys->psz_html_type == NULL )
     {
+        pl_Release( p_this );
         free( p_sys->psz_address );
         free( p_sys );
         free( psz_src );
@@ -277,6 +279,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_intf, "cannot listen on %s:%d", psz_address, i_port );
+        pl_Release( p_this );
         free( p_sys->psz_html_type );
         free( p_sys->psz_address );
         free( p_sys );
@@ -386,6 +389,7 @@ failed:
     if( p_sys->iconv_to_utf8 != (vlc_iconv_t)-1 )
         vlc_iconv_close( p_sys->iconv_to_utf8 );
     free( p_sys );
+    pl_Release( p_this );
     return VLC_EGENERIC;
 }
 
@@ -446,6 +450,7 @@ static void Close ( vlc_object_t *p_this )
     if( p_sys->iconv_to_utf8 != (vlc_iconv_t)-1 )
         vlc_iconv_close( p_sys->iconv_to_utf8 );
     free( p_sys );
+    pl_Release( p_this );
 }
 
 /*****************************************************************************
@@ -457,12 +462,6 @@ static void Run( intf_thread_t *p_intf )
 
     while( !intf_ShouldDie( p_intf ) )
     {
-        /* get the playlist */
-        if( p_sys->p_playlist == NULL )
-        {
-            p_sys->p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        }
-
         /* Manage the input part */
         if( p_sys->p_input == NULL )
         {
@@ -485,12 +484,6 @@ static void Run( intf_thread_t *p_intf )
     {
         vlc_object_release( p_sys->p_input );
         p_sys->p_input = NULL;
-    }
-
-    if( p_sys->p_playlist )
-    {
-        vlc_object_release( p_sys->p_playlist );
-        p_sys->p_playlist = NULL;
     }
 }
 
