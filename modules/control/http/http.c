@@ -465,16 +465,12 @@ static void Run( intf_thread_t *p_intf )
         /* Manage the input part */
         if( p_sys->p_input == NULL )
         {
-            if( p_sys->p_playlist )
-            {
-                p_sys->p_input = p_sys->p_playlist->p_input;
-            }
+            p_sys->p_input = p_sys->p_playlist->p_input;
         }
         else if( p_sys->p_input->b_dead || p_sys->p_input->b_die )
         {
             p_sys->p_input = NULL;
         }
-
 
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );
