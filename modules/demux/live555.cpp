@@ -1041,12 +1041,10 @@ static int Demux( demux_t *p_demux )
 
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             tk->b_rtcp_sync = VLC_TRUE;
-#if 0
             /* reset PCR */
             tk->i_pts = 0;
             p_sys->i_pcr = 0;
             i_pcr = 0;
-#endif
         }
     }
 
