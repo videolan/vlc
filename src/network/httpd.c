@@ -1062,6 +1062,14 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     if (host == NULL)
         goto error;
 
+    vlc_object_lock( host );
+    if( vlc_object_waitpipe( host ) == -1 )
+    {
+        vlc_object_unlock( host );
+        goto error;
+    }
+    vlc_object_unlock( host );
+
     host->httpd = httpd;
     vlc_mutex_init( httpd, &host->lock );
     host->i_ref = 1;
@@ -2015,7 +2023,12 @@ static void httpd_HostThread( httpd_host_t *host )
     tls_session_t *p_tls = NULL;
     counter_t *p_total_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
     counter_t *p_active_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
+    int evfd;
     vlc_bool_t b_die = VLC_FALSE;
+
+    vlc_object_lock( host );
+    evfd = vlc_object_waitpipe( host );
+    vlc_object_unlock( host );
 
     while( !b_die )
     {
@@ -2414,17 +2427,12 @@ static void httpd_HostThread( httpd_host_t *host )
             else
                 b_low_delay = VLC_TRUE;
         }
-
-        vlc_object_lock( host );
-        int evfd = ufd[nfd].fd = vlc_object_waitpipe( host );
-        if( ufd[nfd].fd != -1 )
-        {
-            ufd[nfd].events = POLLIN;
-            ufd[nfd].revents = 0;
-            nfd++;
-        }
-        vlc_object_unlock( host );
         vlc_mutex_unlock( &host->lock );
+
+        ufd[nfd].fd = evfd;
+        ufd[nfd].events = POLLIN;
+        ufd[nfd].revents = 0;
+        nfd++;
 
         /* we will wait 20ms (not too big) if HTTPD_CLIENT_WAITING */
         switch( poll( ufd, nfd, b_low_delay ? 20 : -1) )
@@ -2441,7 +2449,7 @@ static void httpd_HostThread( httpd_host_t *host )
         }
 
         vlc_object_lock( host );
-        if( ( evfd != -1 ) && ( ufd[nfd - 1].revents ) )
+        if( ufd[nfd - 1].revents )
             b_die = vlc_object_wait( host );
         vlc_object_unlock( host );
 
