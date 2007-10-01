@@ -45,8 +45,6 @@
 #include <vlc_intf_strings.h>
 #include <assert.h>
 
-#include "pixmaps/codec.xpm"
-
 #define ITEM_HEIGHT 25
 
 /*********************************************************************
@@ -65,7 +63,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 #define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b ))
     BI( audio, ":/pixmaps/vlc_advprefs_audio.png" );
     BI( video, ":/pixmaps/vlc_advprefs_video.png" );
-    BI( input, codec_xpm );
+    BI( input, ":/pixmaps/vlc_advprefs_codec.png" );
     BI( sout, ":/pixmaps/vlc_advprefs_sout.png" );
     BI( advanced, ":/pixmaps/vlc_advprefs_extended.png" );
     BI( playlist, ":/pixmaps/vlc_advprefs_playlist.png" );

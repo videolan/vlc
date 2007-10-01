@@ -34,8 +34,8 @@ nodist_SOURCES_qt4 = \
 		dialogs/vlm.moc.cpp \
 		components/extended_panels.moc.cpp \
 		components/infopanels.moc.cpp \
-	 	components/preferences_widgets.moc.cpp \
-	 	components/complete_preferences.moc.cpp \
+		components/preferences_widgets.moc.cpp \
+		components/complete_preferences.moc.cpp \
 		components/simple_preferences.moc.cpp \
 		components/open.moc.cpp \
 		components/interface_widgets.moc.cpp \
@@ -114,7 +114,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/help.cpp \
 		dialogs/gototime.cpp \
 		dialogs/open.cpp \
-        dialogs/vlm.cpp \
+		dialogs/vlm.cpp \
 		dialogs/podcast_configuration.cpp \
 		components/extended_panels.cpp \
 		components/infopanels.cpp \
@@ -147,7 +147,7 @@ noinst_HEADERS = \
 	dialogs/help.hpp \
 	dialogs/gototime.hpp \
 	dialogs/open.hpp \
-    	dialogs/vlm.hpp \
+	dialogs/vlm.hpp \
 	dialogs/podcast_configuration.hpp \
 	components/extended_panels.hpp \
 	components/infopanels.hpp \
@@ -243,5 +243,6 @@ EXTRA_DIST += \
 	pixmaps/vlc_advprefs_video.png \
 	pixmaps/vlc_advprefs_intf.png \
 	pixmaps/vlc_advprefs_sout.png \
+	pixmaps/vlc_advprefs_codec.png \
 	pixmaps/vlc_advprefs_extended.png \
 	pixmaps/vlc_advprefs_playlist.png
