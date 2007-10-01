@@ -458,28 +458,10 @@ static void Close ( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    intf_sys_t     *p_sys = p_intf->p_sys;
-
     while( !intf_ShouldDie( p_intf ) )
     {
-        /* Manage the input part */
-        if( p_sys->p_input == NULL )
-        {
-            p_sys->p_input = p_sys->p_playlist->p_input;
-        }
-        else if( p_sys->p_input->b_dead || p_sys->p_input->b_die )
-        {
-            p_sys->p_input = NULL;
-        }
-
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );
-    }
-
-    if( p_sys->p_input )
-    {
-        vlc_object_release( p_sys->p_input );
-        p_sys->p_input = NULL;
     }
 }
 
@@ -514,6 +496,7 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
                           int i_buffer, char *p_request,
                           char **pp_data, int *pi_data )
 {
+    intf_sys_t *p_sys = p_args->p_intf->p_sys;
     int i_request = p_request != NULL ? strlen( p_request ) : 0;
     char *dst;
     vlc_value_t val;
@@ -525,9 +508,12 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     const char *state;
     char stats[20];
 
-#define p_sys p_args->p_intf->p_sys
+    assert( p_sys->p_input == NULL );
+    /* FIXME: proper locking anyone? */
+    p_sys->p_input = p_sys->p_playlist->p_input;
     if( p_sys->p_input )
     {
+        vlc_object_yield( p_sys->p_input );
         var_Get( p_sys->p_input, "position", &val);
         sprintf( position, "%d" , (int)((val.f_float) * 100.0));
         var_Get( p_sys->p_input, "time", &val);
@@ -564,7 +550,6 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
         sprintf( length, "%d", 0 );
         state = "stop";
     }
-#undef p_sys
 
     aout_VolumeGet( p_args->p_intf, &i_volume );
     sprintf( volume, "%d", (int)i_volume );
@@ -587,10 +572,9 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     E_(mvar_AppendNewVar)( p_args->vars, "stream_length", length );
     E_(mvar_AppendNewVar)( p_args->vars, "volume", volume );
     E_(mvar_AppendNewVar)( p_args->vars, "stream_state", state );
-    E_(mvar_AppendNewVar)( p_args->vars, "charset", ((intf_sys_t *)p_args->p_intf->p_sys)->psz_charset );
+    E_(mvar_AppendNewVar)( p_args->vars, "charset", p_sys->psz_charset );
 
     /* Stats */
-#define p_sys p_args->p_intf->p_sys
     if( p_sys->p_input )
     {
         /* FIXME: Workarround a stupid assert in input_GetItem */
@@ -623,7 +607,6 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
             vlc_mutex_unlock( &p_item->p_stats->lock );
         }
     }
-#undef p_sys
 
     E_(SSInit)( &p_args->stack );
 
@@ -638,6 +621,11 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     *dst     = '\0';
     *pi_data = dst - *pp_data;
 
+    if( p_sys->p_input != NULL )
+    {
+        vlc_object_release( p_sys->p_input );
+        p_sys->p_input = NULL;
+    }
     E_(SSClean)( &p_args->stack );
     E_(mvar_Delete)( p_args->vars );
 }
