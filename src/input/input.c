@@ -1519,8 +1519,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             if( f_pos < 0.0 ) f_pos = 0.0;
             if( f_pos > 1.0 ) f_pos = 1.0;
             /* Reset the decoders states and clock sync (before calling the demuxer */
-            es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
-            input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
+            input_EsOutChangePosition( p_input->p->p_es_out );
             if( demux2_Control( p_input->p->input.p_demux, DEMUX_SET_POSITION,
                                 f_pos ) )
             {
@@ -1557,8 +1556,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             if( i_time < 0 ) i_time = 0;
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
-            es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
-            input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
+            input_EsOutChangePosition( p_input->p->p_es_out );
 
             i_ret = demux2_Control( p_input->p->input.p_demux,
                                     DEMUX_SET_TIME, i_time );
@@ -1760,8 +1758,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 if( i_title >= 0 && i_title < p_input->p->input.i_title )
                 {
-                    es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
-                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
+                    input_EsOutChangePosition( p_input->p->p_es_out );
 
                     demux2_Control( p_demux, DEMUX_SET_TITLE, i_title );
                     input_ControlVarTitle( p_input, i_title );
@@ -1781,8 +1778,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
 
                 if( i_title >= 0 && i_title < p_input->p->input.i_title )
                 {
-                    es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
-                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
+                    input_EsOutChangePosition( p_input->p->p_es_out );
 
                     access2_Control( p_access, ACCESS_SET_TITLE, i_title );
                     stream_AccessReset( p_input->p->input.p_stream );
@@ -1822,8 +1818,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( i_seekpoint >= 0 && i_seekpoint <
                     p_input->p->input.title[p_demux->info.i_title]->i_seekpoint )
                 {
-                    es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
-                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
+
+                    input_EsOutChangePosition( p_input->p->p_es_out );
 
                     demux2_Control( p_demux, DEMUX_SET_SEEKPOINT, i_seekpoint );
                 }
@@ -1858,8 +1854,7 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( i_seekpoint >= 0 && i_seekpoint <
                     p_input->p->input.title[p_access->info.i_title]->i_seekpoint )
                 {
-                    es_out_Control( p_input->p->p_es_out, ES_OUT_RESET_PCR );
-                    input_EsOutDiscontinuity( p_input->p->p_es_out, VLC_TRUE, VLC_FALSE );
+                    input_EsOutChangePosition( p_input->p->p_es_out );
 
                     access2_Control( p_access, ACCESS_SET_SEEKPOINT,
                                     i_seekpoint );

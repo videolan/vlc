@@ -302,7 +302,7 @@ es_out_id_t *input_EsOutGetFromID( es_out_t *out, int i_id )
     return NULL;
 }
 
-void input_EsOutDiscontinuity( es_out_t *out, vlc_bool_t b_flush, vlc_bool_t b_audio )
+static void EsOutDiscontinuity( es_out_t *out, vlc_bool_t b_flush, vlc_bool_t b_audio )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     int i;
@@ -322,7 +322,7 @@ void input_EsOutChangeRate( es_out_t *out )
     es_out_sys_t      *p_sys = out->p_sys;
     int i;
 
-    input_EsOutDiscontinuity( out, VLC_FALSE, VLC_FALSE );
+    EsOutDiscontinuity( out, VLC_FALSE, VLC_FALSE );
 
     for( i = 0; i < p_sys->i_pgrm; i++ )
         input_ClockSetRate( p_sys->p_input, &p_sys->pgrm[i]->clock );
@@ -346,13 +346,20 @@ void input_EsOutChangeState( es_out_t *out )
     {
         /* Send discontinuity to decoders (it will allow them to flush
          *                  * if implemented */
-        input_EsOutDiscontinuity( out, VLC_FALSE, VLC_FALSE );
+        EsOutDiscontinuity( out, VLC_FALSE, VLC_FALSE );
     }
     else
     {
         /* Out of pause, reset pcr */
         es_out_Control( out, ES_OUT_RESET_PCR );
     }
+}
+void input_EsOutChangePosition( es_out_t *out )
+{
+    //es_out_sys_t *p_sys = out->p_sys;
+
+    es_out_Control( out, ES_OUT_RESET_PCR );
+    EsOutDiscontinuity( out, VLC_TRUE, VLC_FALSE );
 }
 
 vlc_bool_t input_EsOutDecodersEmpty( es_out_t *out )
