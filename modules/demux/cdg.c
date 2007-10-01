@@ -73,7 +73,7 @@ static int Open( vlc_object_t * p_this )
 
     /* Identify cdg file by extension, as there is no simple way to
      * detect it */
-    if( !demux2_IsPathExtension( p_demux, ".cdg" ) && !p_demux->b_force )
+    if( !demux2_IsPathExtension( p_demux, ".cdg" ) && !demux2_IsForced( p_demux, "cdg" ) )
         return VLC_EGENERIC;
 
     /* CDG file size has to be multiple of CDG_FRAME_SIZE (it works even
