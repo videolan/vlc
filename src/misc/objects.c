@@ -515,12 +515,15 @@ vlc_bool_t __vlc_object_wait( vlc_object_t *obj )
     vlc_assert_locked( &obj->object_lock );
 
     int fd = obj->p_internals->pipes[0];
-    if( ( fd != -1 )
-     && ( read( fd, &(char){ 0 }, 1 ) == 0 ) )
+    if( fd != -1 )
     {
-        close( fd );
-        obj->p_internals->pipes[1] = -1;
-    }   
+        if( read( fd, &(char){ 0 }, 1 ) == 0 )
+        {
+            close( fd );
+            obj->p_internals->pipes[1] = -1;
+        }
+        return obj->b_die;
+    }
 
     vlc_cond_wait( &obj->object_wait, &obj->object_lock );
     return obj->b_die;
