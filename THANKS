@@ -109,6 +109,7 @@ Joel Arvidsson <dogai at privat.utfors.se> - Swedish translation
 Joeri van Dooren <joeri at van.dooren.be> - OS X icon (v0.4.0)
 Jörg<vlc-ml at aab.noctis dot de> - VLM seek/show media functions
 Johen Michael Zorko <zorko at att.net> - fix for delay issues in udp sout
+John Dalgliesh <johnd at defyne.org> - macosx interface playlist fix
 John Paul Lorenti <jpl31 at columbia.edu> - ALSA device selection patch
 Jonas Larsen <jonas at vrt.dk> - Danish translation
 Jouni Kähkönen - Finnish translation
