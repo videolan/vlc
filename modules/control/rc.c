@@ -1941,26 +1941,15 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     }
 #endif
 
-    int i_socket =  p_intf->p_sys->i_socket == -1 ? 0 : p_intf->p_sys->i_socket;
-    /* 0 == STDIN_FILENO */
-
-    while( !intf_ShouldDie( p_intf ) && *pi_size < MAX_LINE_LENGTH )
+    while( !intf_ShouldDie( p_intf ) && *pi_size < MAX_LINE_LENGTH &&
+           (i_read = net_Read( p_intf, p_intf->p_sys->i_socket == -1 ?
+                       0 /*STDIN_FILENO*/ : p_intf->p_sys->i_socket, NULL,
+                  (uint8_t *)p_buffer + *pi_size, 1, VLC_FALSE ) ) > 0 )
     {
-        i_read = net_Read( p_intf, i_socket, NULL,
-                           (uint8_t *)p_buffer + *pi_size, 1, VLC_FALSE );
-
-        if( i_read > 0 )
-        {
-            if( p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
-                break;
-
-            (*pi_size)++;
-        }
-        else if( i_read == 0 )
+        if( p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
             break;
-        else if( errno != EINTR )
-        /* we try again if a system call was interrupted */
-            break;
+
+        (*pi_size)++;
     }
 
     /* Connection closed */
