@@ -299,22 +299,6 @@ typedef struct
     char *param2;       ///< Second parameter
 } macro_t;
 
-/** This function creates a macro from a <vlc ....> tag */
-int E_(MacroParse)( macro_t *m, char *psz_src );
-/** This function cleans a macro */
-void E_(MacroClean)( macro_t *m );
-
-/** This function returns the macro type identifier from its id= string value
- * It uses the StrToMacroTypeTab mapping array for this */
-int E_(StrToMacroType)( char *name );
-/** This function actually executes the macro */
-void E_(MacroDo)( httpd_file_sys_t *p_args, macro_t *m,
-                  char *p_request, int i_request, char **pp_data,
-                  int *pi_data, char **pp_dst );
-/** This function looks for macros in a string */
-char *E_(MacroSearch)( char *src, char *end,
-                   int i_mvlc, vlc_bool_t b_after );
-
 /** This function parses a file for macros */
 void E_(Execute)( httpd_file_sys_t *p_args,
                   char *p_request, int i_request,
