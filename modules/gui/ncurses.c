@@ -1152,20 +1152,19 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
 
     i_char_len = mbstowcs( psz_wide, p_buf, i_len );
 
-    if( i_char_len == -1 ) /* an invalid character was encountered */
+    if( i_char_len == (size_t)-1 ) /* an invalid character was encountered */
         i_width = i_len;
     else
     {
         i_width = wcswidth( psz_wide, i_char_len );
-        if( i_width == -1 ) /* a non printable character was encountered */
+        if( i_width == (size_t)-1 ) /* a non printable character was encountered */
             i_width = i_len;
     }
-    if( i_width > w )
+    if( i_width > (size_t)w )
 #else
     if( i_len > w )
 #endif
     { /* FIXME: ncursesw: ellipsize psz_wide while keeping the width in mind */
-        char *psz_local;
         int i_cut = i_len - w;
         int x1 = i_len/2 - i_cut/2;
         int x2 = x1 + i_cut;
@@ -1184,7 +1183,7 @@ static void mvnprintw( int y, int x, int w, const char *p_fmt, ... )
 #ifdef HAVE_NCURSESW_CURSES_H
         mvprintw( y, x, "%s", p_buf );
 #else
-        psz_local = ToLocale( p_buf );
+        char *psz_local = ToLocale( p_buf );
         mvprintw( y, x, "%s", psz_local );
         LocaleFree( p_buf );
 #endif
