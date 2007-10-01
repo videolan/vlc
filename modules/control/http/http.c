@@ -86,7 +86,6 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void Run          ( intf_thread_t *p_intf );
 int  E_(ArtCallback)( httpd_handler_sys_t *p_args,
                           httpd_handler_t *p_handler, char *_p_url,
                           uint8_t *_p_request, int i_type,
@@ -354,7 +353,6 @@ static int Open( vlc_object_t *p_this )
         goto failed;
     }
 
-    p_intf->pf_run = Run;
     free( psz_src );
 
     if( config_GetInt( p_intf, "http-album-art" ) )
@@ -451,18 +449,6 @@ static void Close ( vlc_object_t *p_this )
         vlc_iconv_close( p_sys->iconv_to_utf8 );
     free( p_sys );
     pl_Release( p_this );
-}
-
-/*****************************************************************************
- * Run: http interface thread
- *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
-{
-    while( !intf_ShouldDie( p_intf ) )
-    {
-        /* Wait a bit */
-        msleep( INTF_IDLE_SLEEP );
-    }
 }
 
 /****************************************************************************
