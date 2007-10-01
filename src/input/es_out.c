@@ -1598,10 +1598,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
 
         case ES_OUT_RESET_PCR:
             for( i = 0; i < p_sys->i_pgrm; i++ )
-            {
-                p_sys->pgrm[i]->clock.i_synchro_state =  SYNCHRO_REINIT;
-                p_sys->pgrm[i]->clock.last_pts = 0;
-            }
+                input_ClockResetPCR( p_sys->p_input, &p_sys->pgrm[i]->clock );
             return VLC_SUCCESS;
 
         case ES_OUT_GET_TS:

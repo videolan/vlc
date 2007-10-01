@@ -204,6 +204,15 @@ void input_ClockSetPCR( input_thread_t *p_input,
 }
 
 /*****************************************************************************
+ * input_ClockResetPCR:
+ *****************************************************************************/
+void input_ClockResetPCR( input_thread_t * p_input, input_clock_t *cl )
+{
+    cl->i_synchro_state =  SYNCHRO_REINIT;
+    cl->last_pts = 0;
+}
+
+/*****************************************************************************
  * input_ClockGetTS: manages a PTS or DTS
  *****************************************************************************/
 mtime_t input_ClockGetTS( input_thread_t * p_input,

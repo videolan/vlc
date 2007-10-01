@@ -301,6 +301,7 @@ typedef struct
 
 void    input_ClockInit( input_thread_t *, input_clock_t *, vlc_bool_t b_master, int i_cr_average );
 void    input_ClockSetPCR( input_thread_t *, input_clock_t *, mtime_t );
+void    input_ClockResetPCR( input_thread_t *, input_clock_t * );
 mtime_t input_ClockGetTS( input_thread_t *, input_clock_t *, mtime_t );
 void    input_ClockSetRate( input_thread_t *, input_clock_t *cl );
 
