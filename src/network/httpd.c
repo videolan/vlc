@@ -2015,12 +2015,13 @@ static void httpd_HostThread( httpd_host_t *host )
     tls_session_t *p_tls = NULL;
     counter_t *p_total_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
     counter_t *p_active_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
+    vlc_bool_t b_die = VLC_FALSE;
 
-    while( !host->b_die )
+    while( !b_die )
     {
         if( host->i_url <= 0 )
         {
-            /* 0.2s */
+            /* 0.2s (FIXME: use a condition variable) */
             msleep( 200000 );
             continue;
         }
@@ -2029,7 +2030,7 @@ static void httpd_HostThread( httpd_host_t *host )
         if( ( p_tls == NULL ) && ( host->p_tls != NULL ) )
             p_tls = tls_ServerSessionPrepare( host->p_tls );
 
-        struct pollfd ufd[host->nfd + host->i_client];
+        struct pollfd ufd[host->nfd + host->i_client + 1];
         unsigned nfd;
         for( nfd = 0; nfd < host->nfd; nfd++ )
         {
@@ -2399,11 +2400,6 @@ static void httpd_HostThread( httpd_host_t *host )
                     cl->answer.i_body = 0;
                     cl->i_state = HTTPD_CLIENT_SENDING;
                 }
-                else
-                {
-                    /* we shouldn't wait too long */
-                    b_low_delay = VLC_TRUE;
-                }
             }
 
             /* Special for BIDIR mode we also check reading */
@@ -2415,22 +2411,39 @@ static void httpd_HostThread( httpd_host_t *host )
 
             if (pufd->events != 0)
                 nfd++;
+            else
+                b_low_delay = VLC_TRUE;
         }
+
+        vlc_object_lock( host );
+        int evfd = ufd[nfd].fd = vlc_object_waitpipe( host );
+        if( ufd[nfd].fd != -1 )
+        {
+            ufd[nfd].events = POLLIN;
+            ufd[nfd].revents = 0;
+            nfd++;
+        }
+        vlc_object_unlock( host );
         vlc_mutex_unlock( &host->lock );
 
-        /* we will wait 100ms or 20ms (not too big 'cause HTTPD_CLIENT_WAITING) */
-        switch( poll( ufd, nfd, b_low_delay ? 20 : 100) )
+        /* we will wait 20ms (not too big) if HTTPD_CLIENT_WAITING */
+        switch( poll( ufd, nfd, b_low_delay ? 20 : -1) )
         {
             case -1:
                 if (errno != EINTR)
                 {
-                    /* This is most likely a bug */
+                    /* Kernel on low memory or a bug: pace */
                     msg_Err( host, "polling error: %m" );
-                    msleep( 1000 );
+                    msleep( 100000 );
                 }
             case 0:
                 continue;
         }
+
+        vlc_object_lock( host );
+        if( ( evfd != -1 ) && ( ufd[nfd - 1].revents ) )
+            b_die = vlc_object_wait( host );
+        vlc_object_unlock( host );
 
         /* Handle client sockets */
         vlc_mutex_lock( &host->lock );
