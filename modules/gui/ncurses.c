@@ -426,12 +426,9 @@ static void Run( intf_thread_t *p_intf )
 }
 
 /* following functions are local */
-#ifdef HAVE_NCURSESW_CURSES_H
-#   define KeyToUTF8( i, psz ) psz
-#else
 static char *KeyToUTF8( int i_key, char *psz_part )
 {
-    char *psz_utf8, *psz;
+    char *psz_utf8;
     int len = strlen( psz_part );
     if( len == 6 )
     {
@@ -442,10 +439,14 @@ static char *KeyToUTF8( int i_key, char *psz_part )
 
     psz_part[len] = (char)i_key;
 
+#ifdef HAVE_NCURSESW_CURSES_H
+    psz_utf8 = strdup( psz_part );
+#else
     psz_utf8 = FromLocaleDup( psz_part );
 
     /* Ugly check for incomplete bytes sequences
      * (in case of non-UTF8 multibyte local encoding) */
+    char *psz;
     for( psz = psz_utf8; *psz; psz++ )
         if( ( *psz == '?' ) && ( *psz_utf8 != '?' ) )
         {
@@ -461,11 +462,11 @@ static char *KeyToUTF8( int i_key, char *psz_part )
         free( psz_utf8 );
         return NULL;
     }
+#endif
 
     memset( psz_part, 0, 6 );
     return psz_utf8;
 }
-#endif
 
 static inline int RemoveLastUTF8Entity( char *psz, int len )
 {
