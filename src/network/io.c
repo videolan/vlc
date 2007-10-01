@@ -267,6 +267,8 @@ net_ReadInner (vlc_object_t *restrict p_this, unsigned fdc, const int *fdv,
 #if defined(WIN32) || defined(UNDER_CE)
             WSASetLastError (WSAEINTR);
 #else
+            if( p_this->b_die ) printf("b_die\n");
+            else printf("p_libvlc->b_die\n");
             errno = EINTR;
 #endif
             goto error;

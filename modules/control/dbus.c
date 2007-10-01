@@ -526,12 +526,12 @@ DBUS_METHOD( Random )
     dbus_bool_t b_random;
     vlc_value_t val;
     playlist_t* p_playlist = NULL;
- 
+
     dbus_error_init( &error );
     dbus_message_get_args( p_from, &error,
             DBUS_TYPE_BOOLEAN, &b_random,
             DBUS_TYPE_INVALID );
- 
+
     if( dbus_error_is_set( &error ) )
     {
         msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
@@ -541,7 +541,7 @@ DBUS_METHOD( Random )
     }
 
     val.b_bool = ( b_random == TRUE ) ? VLC_TRUE : VLC_FALSE ;
- 
+
     p_playlist = pl_Yield( (vlc_object_t*) p_this );
     var_Set ( p_playlist, "random", val );
     pl_Release( ((vlc_object_t*) p_this) );

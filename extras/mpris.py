@@ -182,21 +182,33 @@ def Loop(widget):
 
 # update status display
 def update(widget):
-    item = tracklist.GetMetadata(tracklist.GetCurrentTrack())
+    Track = player.GetMetadata()
     vol.set_value(player.VolumeGet())
     try: 
-        a = item["artist"]
-    except:        a = ""
+        a = Track["artist"]
+    except:
+        a = ""
     try:
-        t = item["title"]
-    except:        t = ""
+        t = Track["title"]
+    except:        
+        t = ""
     if t == "":
         try:
-            t = item["URI"]
+            t = Track["URI"]
         except:
             t = ""
     l_artist.set_text(a)
     l_title.set_text(t)
+    try:
+        length = Track["length"]
+    except:
+        length = 0
+    if length > 0:
+        time_s.set_range(0,Track["length"])
+        time_s.set_sensitive(True)
+    else:
+        # disable the position scale if length isn't available
+        time_s.set_sensitive(False)
     GetPlayStatus(0)
 
 # callback for volume change
@@ -211,7 +223,10 @@ def timechange(widget, x=None, y=None):
 def timeset():
     global playing
     if playing == True:
-        time_s.set_value(player.PositionGet())
+        try:
+            time_s.set_value(player.PositionGet())
+        except:
+            playing = False
     return True
 
 # toggle simple/full display

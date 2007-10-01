@@ -1508,7 +1508,7 @@ AS_IF([test "${CFLAGS_TUNING}"],
 dnl
 dnl  x86 accelerations
 dnl
-if test "${host_cpu}" = "i686" -o "${host_cpu}" = "i586" -o "${host_cpu}" = "x86" -o "${host_cpu}" = "i386" -o "${host_cpu}"="i486" -o "${host_cpu}" = "x86_64"
+if test "${host_cpu}" = "i686" -o "${host_cpu}" = "i586" -o "${host_cpu}" = "x86" -o "${host_cpu}" = "i386" -o "${host_cpu}" = "i486" -o "${host_cpu}" = "x86_64"
 then
     ARCH="${ARCH} mmx"
     VLC_ADD_PLUGINS([${ACCEL_MODULES}])
