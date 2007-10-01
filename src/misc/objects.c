@@ -59,6 +59,12 @@
 #include "vlc_meta.h"
 
 #include "variables.h"
+#ifndef WIN32
+# include <unistd.h>
+#else
+# include <io.h>
+# include <fcntl.h>
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -461,6 +467,43 @@ void __vlc_object_unlock( vlc_object_t *obj )
 }
 
 /**
+ * Returns the readable end of a pipe that becomes readable whenever
+ * an object is signaled. This can be used to wait for VLC object events
+ * inside select(), poll() loops or frameworks providing an event loop.
+ *
+ * Note that the pipe will remain the same for the lifetime of the object.
+ * DO NOT close it yourself. Ever.
+ *
+ * DO NOT try to read from the pipe either: call vlc_object_wait() instead.
+ * Assuming the pipe is readable, vlc_object_wait() will not block.
+ * Also note that, as with vlc_object_wait(), there may be spurious wakeups.
+ *
+ * @param obj object that would be signaled (object lock MUST hold)
+ * @return a readable pipe descriptor, or -1 on error.
+ */
+int vlc_object_waitpipe( vlc_object_t *obj )
+{
+    int *pipes = obj->p_internals->pipes;
+    vlc_assert_locked( &obj->object_lock );
+
+    if( pipes[1] == -1 )
+    {
+        /* This can only ever happen if someone killed us without locking */
+        assert( pipes[0] == -1 );
+
+#ifndef WIN32
+        if( pipe( pipes ) )
+#else
+        if( _pipe( pipes, 1, _O_BINARY ) )
+#endif
+            return -1;
+    }
+
+    return pipes[0];
+}
+
+
+/**
  * Waits for the object to be signaled (using vlc_object_signal()).
  * If the object already has a signal pending, this function will return
  * immediately. It is asserted that the caller holds the object lock.
@@ -528,17 +571,16 @@ void __vlc_object_signal_unlocked( vlc_object_t *obj )
 void __vlc_object_kill( vlc_object_t *p_this )
 {
     vlc_mutex_lock( &p_this->object_lock );
+    p_this->b_die = VLC_TRUE;
 
     if( p_this->i_object_type == VLC_OBJECT_LIBVLC )
         for( int i = 0; i < p_this->i_children ; i++ )
             vlc_object_kill( p_this->pp_children[i] );
 
-    p_this->b_die = VLC_TRUE;
-
     int fd = p_this->p_internals->pipes[1];
     if( fd != -1 )
     {
-        close( fd );
+        close( fd ); /* closing a pipe makes it readable too */
         p_this->p_internals->pipes[1] = -1;
     }
 

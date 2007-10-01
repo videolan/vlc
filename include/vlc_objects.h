@@ -186,3 +186,5 @@ static inline void __vlc_object_signal( vlc_object_t *obj )
 VLC_EXPORT( void, __vlc_object_kill, ( vlc_object_t * ) );
 #define vlc_object_kill(a) \
     __vlc_object_kill( VLC_OBJECT(a) )
+
+int vlc_object_waitpipe( vlc_object_t *obj );
