@@ -352,7 +352,7 @@ static int OpenDemux( vlc_object_t *p_this )
         psz_sdp = psz_sdp_new;
 
         i_read = stream_Read( p_demux->s, &psz_sdp[i_len], i_read_max );
-        if( i_read < 0 )
+        if( i_read <= (size_t)-1 )
         {
             msg_Err( p_demux, "cannot read SDP" );
             goto error;
@@ -361,7 +361,7 @@ static int OpenDemux( vlc_object_t *p_this )
 
         psz_sdp[i_len] = '\0';
 
-        if( i_read < i_read_max )
+        if( i_read < (size_t)i_read_max )
             break; // EOF
     }
 
