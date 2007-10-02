@@ -107,8 +107,10 @@
 
 struct decoder_synchro_t
 {
-    VLC_COMMON_MEMBERS
+    /* */
+    decoder_t       *p_dec;
 
+    /* */
     int             i_frame_rate;
     int             i_current_rate;
     vlc_bool_t      b_no_skip;
@@ -154,18 +156,17 @@ struct decoder_synchro_t
 /*****************************************************************************
  * decoder_SynchroInit : You know what ?
  *****************************************************************************/
-decoder_synchro_t * decoder_SynchroInit( decoder_t *p_dec,
-                                     int i_frame_rate )
+decoder_synchro_t * decoder_SynchroInit( decoder_t *p_dec, int i_frame_rate )
 {
-    decoder_synchro_t * p_synchro = vlc_object_create( p_dec,
-                                                  sizeof(decoder_synchro_t) );
+    decoder_synchro_t * p_synchro = malloc( sizeof(*p_synchro) );
     if ( p_synchro == NULL )
     {
         msg_Err( p_dec, "out of memory" );
         return NULL;
     }
-    vlc_object_attach( p_synchro, p_dec );
+    memset( p_synchro, 0, sizeof(*p_synchro) );
 
+    p_synchro->p_dec = p_dec;
     p_synchro->b_no_skip = !config_GetInt( p_dec, "skip-frames" );
     p_synchro->b_quiet = config_GetInt( p_dec, "quiet-synchro" );
 
@@ -192,8 +193,7 @@ decoder_synchro_t * decoder_SynchroInit( decoder_t *p_dec,
  *****************************************************************************/
 void decoder_SynchroRelease( decoder_synchro_t * p_synchro )
 {
-    vlc_object_detach( p_synchro );
-    vlc_object_destroy( p_synchro );
+    free( p_synchro );
 }
 
 /*****************************************************************************
@@ -260,7 +260,7 @@ vlc_bool_t decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_ty
         }
         if( !b_decode && !p_synchro->b_quiet )
         {
-            msg_Warn( p_synchro,
+            msg_Warn( p_synchro->p_dec,
                       "synchro trashing I ("I64Fd")", pts - now );
         }
         break;
@@ -415,7 +415,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
         {
 #if 0
             if( !p_synchro->b_quiet )
-                msg_Dbg( p_synchro,
+                msg_Dbg( p_synchro->p_dec,
                          "stream periodicity changed from P[%d] to P[%d]",
                          p_synchro->i_n_p, p_synchro->i_eta_p );
 #endif
@@ -430,7 +430,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
 
 #if 0
         if( !p_synchro->b_quiet )
-            msg_Dbg( p_synchro, "I("I64Fd") P("I64Fd")[%d] B("I64Fd")"
+            msg_Dbg( p_synchro->p_dec, "I("I64Fd") P("I64Fd")[%d] B("I64Fd")"
                   "[%d] YUV("I64Fd") : trashed %d:%d/%d",
                   p_synchro->p_tau[I_CODING_TYPE],
                   p_synchro->p_tau[P_CODING_TYPE],
@@ -448,7 +448,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
         if( p_synchro->i_pic >= 100 )
         {
             if( !p_synchro->b_quiet && p_synchro->i_trashed_pic != 0 )
-                msg_Dbg( p_synchro, "decoded %d/%d pictures",
+                msg_Dbg( p_synchro->p_dec, "decoded %d/%d pictures",
                          p_synchro->i_pic
                            - p_synchro->i_trashed_pic,
                          p_synchro->i_pic );
@@ -465,7 +465,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
         {
 #if 0
             if( !p_synchro->b_quiet )
-                msg_Dbg( p_synchro,
+                msg_Dbg( p_synchro->p_dec,
                          "stream periodicity changed from B[%d] to B[%d]",
                          p_synchro->i_n_b, p_synchro->i_eta_b );
 #endif
@@ -501,7 +501,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
                   || p_synchro->current_pts - next_pts
                     > PTS_THRESHOLD) && !p_synchro->b_quiet )
             {
-                msg_Warn( p_synchro, "decoder synchro warning: pts != "
+                msg_Warn( p_synchro->p_dec, "decoder synchro warning: pts != "
                           "current_date ("I64Fd")",
                           p_synchro->current_pts
                               - next_pts );
@@ -522,7 +522,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
                   || p_synchro->backward_pts - next_dts
                     > PTS_THRESHOLD) && !p_synchro->b_quiet )
             {
-                msg_Warn( p_synchro, "backward_pts != dts ("I64Fd")",
+                msg_Warn( p_synchro->p_dec, "backward_pts != dts ("I64Fd")",
                            next_dts
                                - p_synchro->backward_pts );
             }
@@ -531,7 +531,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
                   || p_synchro->current_pts - p_synchro->backward_pts
                     > PTS_THRESHOLD) && !p_synchro->b_quiet )
             {
-                msg_Warn( p_synchro,
+                msg_Warn( p_synchro->p_dec,
                           "backward_pts != current_pts ("I64Fd")",
                           p_synchro->current_pts
                               - p_synchro->backward_pts );
@@ -546,7 +546,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
                   || p_synchro->current_pts - next_dts
                     > PTS_THRESHOLD) && !p_synchro->b_quiet )
             {
-                msg_Warn( p_synchro, "dts != current_pts ("I64Fd")",
+                msg_Warn( p_synchro->p_dec, "dts != current_pts ("I64Fd")",
                           p_synchro->current_pts
                               - next_dts );
             }
@@ -571,7 +571,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
         /* We cannot be _that_ late, something must have happened, reinit
          * the dates. */
         if( !p_synchro->b_quiet )
-            msg_Warn( p_synchro, "PTS << now ("I64Fd"), resetting",
+            msg_Warn( p_synchro->p_dec, "PTS << now ("I64Fd"), resetting",
                       now - p_synchro->current_pts - DEFAULT_PTS_DELAY );
         p_synchro->current_pts = now + DEFAULT_PTS_DELAY;
     }
