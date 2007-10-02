@@ -474,10 +474,10 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
 void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
 {
     input_item_t *p_item = p_input->p->input.p_item;
-    char *psz_arturl;
-    char *psz_artist = NULL;
-    char *psz_album = NULL;
-    char *psz_title = NULL;
+    const char *psz_arturl;
+    const char *psz_artist = NULL;
+    const char *psz_album = NULL;
+    const char *psz_title = NULL;
     char *psz_type = NULL;
     char psz_filename[PATH_MAX+1];
     FILE *f;
@@ -488,14 +488,13 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     /* TODO-fenrir merge input_ArtFind with download and make it set the flags FETCH
      * and then set it here to to be faster */
 
-    psz_arturl = input_item_GetArtURL( p_item );
+    psz_arturl = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
+
     if( !psz_arturl || strncmp( psz_arturl, "attachment://", strlen("attachment://") ) )
     {
-        free( psz_arturl );
         msg_Err( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
         return;
     }
-    input_item_SetArtURL( p_item, NULL );
 
     if( input_item_IsArtFetched( p_item ) )
     {
@@ -503,7 +502,6 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
          * condition */
         msg_Warn( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
         input_FindArtInCache( p_input, p_item );
-        free( psz_arturl );
         return;
     }
 
@@ -520,28 +518,31 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     if( !p_attachment || p_attachment->i_data <= 0 )
     {
         msg_Warn( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
-        goto end;
+        return;
     }
 
-    psz_artist = input_item_GetArtist( p_item );
-    psz_album = input_item_GetAlbum( p_item );
-    psz_title = input_item_GetTitle( p_item );
+    psz_artist = vlc_meta_Get( p_item->p_meta, vlc_meta_Artist );
+    psz_album = vlc_meta_Get( p_item->p_meta, vlc_meta_Album );
+    psz_title = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
+    if( !strcmp( p_attachment->psz_mime, "image/jpeg" ) )
+        psz_type = strdup( ".jpg" );
+    else if( !strcmp( p_attachment->psz_mime, "image/png" ) )
+        psz_type = strdup( ".png" );
+
     if( !psz_title )
-        psz_title = input_item_GetName( p_item );
+        psz_title = p_item->psz_name;
 
     if( (!psz_artist || !psz_album ) && !psz_title )
-        goto end;
-
-    /* */
-    psz_type = strrchr( psz_arturl, '.' );
+        return;
 
     ArtCacheGetDirPath( p_input, psz_filename, psz_title, psz_artist, psz_album );
     ArtCacheCreateDir( psz_filename );
     ArtCacheGetFilePath( p_input, psz_filename, psz_title, psz_artist, psz_album, psz_type );
+    free( psz_type );
 
     /* Check if we already dumped it */
     if( !utf8_stat( psz_filename+7, &s ) )
-        goto end;
+        return;
 
     f = utf8_fopen( psz_filename+7, "w" );
     if( f )
@@ -549,15 +550,12 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
         if( fwrite( p_attachment->p_data, p_attachment->i_data, 1, f ) != 1 )
             msg_Err( p_input, "%s: %m", psz_filename );
         else
+        {
             msg_Dbg( p_input, "album art saved to %s\n", psz_filename );
+            vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, psz_filename );
+        }
         fclose( f );
     }
-
-end:
-    if( psz_artist ) free( psz_artist );
-    if( psz_album ) free( psz_album );
-    if( psz_title ) free( psz_title );
-    if( psz_arturl ) free( psz_arturl );
 }
 
 
