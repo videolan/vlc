@@ -31,8 +31,6 @@
 /*****************************************************************************
  * vout_synchro_t : timers for the video synchro
  *****************************************************************************/
-#define MAX_PIC_AVERAGE         8
-
 /* Read the discussion on top of vout_synchro.c for more information. */
 /* Pictures types */
 #define I_CODING_TYPE           1
@@ -40,11 +38,6 @@
 #define B_CODING_TYPE           3
 #define D_CODING_TYPE           4 /* MPEG-1 ONLY */
 /* other values are reserved */
-
-/* Structures */
-#define TOP_FIELD               1
-#define BOTTOM_FIELD            2
-#define FRAME_STRUCTURE         3
 
 /*****************************************************************************
  * Prototypes
