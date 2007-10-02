@@ -312,7 +312,6 @@ typedef struct aout_filter_t aout_filter_t;
 /* Video */
 typedef struct vout_thread_t vout_thread_t;
 typedef struct vout_sys_t vout_sys_t;
-typedef struct vout_synchro_t vout_synchro_t;
 typedef struct chroma_sys_t chroma_sys_t;
 
 typedef video_format_t video_frame_format_t;
@@ -366,8 +365,9 @@ typedef struct sout_gui_descr_t sout_gui_descr_t;
 typedef struct profile_parser_t profile_parser_t;
 
 /* Decoders */
-typedef struct decoder_t      decoder_t;
-typedef struct decoder_sys_t  decoder_sys_t;
+typedef struct decoder_t         decoder_t;
+typedef struct decoder_sys_t     decoder_sys_t;
+typedef struct decoder_synchro_t decoder_synchro_t;
 
 /* Encoders */
 typedef struct encoder_t      encoder_t;
