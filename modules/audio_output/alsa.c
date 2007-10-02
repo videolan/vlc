@@ -874,6 +874,18 @@ static void ALSAFill( aout_instance_t * p_aout )
         i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
                                    p_buffer->i_nb_samples );
 
+        if( i_snd_rc == -ESTRPIPE )
+        { /* a suspend event occurred
+           * (stream is suspended and waiting for an application recovery) */
+            msg_Dbg( p_aout, "entering in suspend mode, trying to resume..." );
+            while( !p_aout->b_die && !p_aout->p_libvlc->b_die &&
+                ( i_snd_rc = snd_pcm_resume( p_sys->p_snd_pcm ) ) == -EAGAIN )
+                msleep( 100000 );
+            i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
+                                       p_buffer->i_nb_samples );
+
+        }
+
         if( i_snd_rc < 0 )
         {
             msg_Err( p_aout, "write failed (%s)",
@@ -884,7 +896,7 @@ static void ALSAFill( aout_instance_t * p_aout )
     }
 }
 
-static void GetDevicesForCard(module_config_t *p_item, int i_card);
+static void GetDevicesForCard( module_config_t *p_item, int i_card );
 static void GetDevices( module_config_t *p_item );
 
 /*****************************************************************************
@@ -924,7 +936,7 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 }
 
 
-static void GetDevicesForCard(module_config_t *p_item, int i_card)
+static void GetDevicesForCard( module_config_t *p_item, int i_card )
 {
     int i_pcm_device = -1;
     int i_err = 0;
@@ -932,43 +944,37 @@ static void GetDevicesForCard(module_config_t *p_item, int i_card)
     snd_ctl_t *p_ctl;
     char psz_dev[64];
     char *psz_card_name;
- 
-    sprintf(psz_dev, "hw:%i", i_card);
- 
-    if (( i_err = snd_ctl_open(&p_ctl, psz_dev, 0)) < 0 )
-    {
-        return;
-    }
- 
-    if ((i_err = snd_card_get_name(i_card, &psz_card_name)) != 0)
-    {
-        psz_card_name = _("Unknown soundcard");
-    }
 
-    snd_pcm_info_alloca(&p_pcm_info);
+    sprintf( psz_dev, "hw:%i", i_card );
+
+    if( ( i_err = snd_ctl_open( &p_ctl, psz_dev, 0 ) ) < 0 )
+        return;
+
+    if( ( i_err = snd_card_get_name( i_card, &psz_card_name ) ) != 0)
+        psz_card_name = _("Unknown soundcard");
+
+    snd_pcm_info_alloca( &p_pcm_info );
 
     for (;;)
     {
         char *psz_device, *psz_descr;
-        if ((i_err = snd_ctl_pcm_next_device(p_ctl, &i_pcm_device)) < 0)
-        {
+        if( ( i_err = snd_ctl_pcm_next_device( p_ctl, &i_pcm_device ) ) < 0 )
             i_pcm_device = -1;
-        }
-        if ( i_pcm_device < 0 )
+        if( i_pcm_device < 0 )
             break;
 
-        snd_pcm_info_set_device(p_pcm_info, i_pcm_device);
-        snd_pcm_info_set_subdevice(p_pcm_info, 0);
-        snd_pcm_info_set_stream(p_pcm_info, SND_PCM_STREAM_PLAYBACK);
+        snd_pcm_info_set_device( p_pcm_info, i_pcm_device );
+        snd_pcm_info_set_subdevice( p_pcm_info, 0 );
+        snd_pcm_info_set_stream( p_pcm_info, SND_PCM_STREAM_PLAYBACK );
 
-        if ((i_err = snd_ctl_pcm_info(p_ctl, p_pcm_info)) < 0)
+        if( ( i_err = snd_ctl_pcm_info( p_ctl, p_pcm_info ) ) < 0 )
         {
-            if (i_err != -ENOENT)
+            if( i_err != -ENOENT )
             {
-/*                printf("get_devices_for_card(): "
+                /*printf( "get_devices_for_card(): "
                          "snd_ctl_pcm_info() "
                          "failed (%d:%d): %s.\n", i_card,
-                         i_pcm_device, snd_strerror(-i_err));*/
+                         i_pcm_device, snd_strerror( -i_err ) );*/
             }
             continue;
         }
@@ -999,20 +1005,19 @@ static void GetDevices( module_config_t *p_item )
 {
     int i_card = -1;
     int i_err = 0;
- 
-    if ((i_err = snd_card_next(&i_card)) != 0)
+
+    if( ( i_err = snd_card_next( &i_card ) ) != 0 )
     {
-//        g_warning("snd_next_card() failed: %s", snd_strerror(-err));
+        /*printf( "snd_card_next() failed: %s", snd_strerror( -i_err ) );*/
         return;
     }
- 
-    while (i_card > -1)
+
+    while( i_card > -1 )
     {
-        GetDevicesForCard(p_item, i_card);
-        if ((i_err = snd_card_next(&i_card)) != 0)
+        GetDevicesForCard( p_item, i_card );
+        if( ( i_err = snd_card_next( &i_card ) ) != 0 )
         {
-//            g_warning("snd_next_card() failed: %s",
-//                  snd_strerror(-err));
+            /*printf( "snd_card_next() failed: %s", snd_strerror( -i_err ) );*/
             break;
         }
     }
