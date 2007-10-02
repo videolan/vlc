@@ -214,6 +214,12 @@ libvlc_media_instance_new( libvlc_instance_t * p_libvlc_instance,
  
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaInstanceReachedEnd, p_e );
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+            libvlc_MediaInstancePaused, p_e );
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+            libvlc_MediaInstancePlayed, p_e );
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+            libvlc_MediaInstancePositionChanged, p_e );
 
     return p_mi;
 }
@@ -353,6 +359,7 @@ void libvlc_media_instance_retain( libvlc_media_instance_t *p_mi )
 
     p_mi->i_refcount++;
 }
+
 /**************************************************************************
  * Set the Media descriptor associated with the instance
  **************************************************************************/
