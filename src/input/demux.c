@@ -508,6 +508,7 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case STREAM_CONTROL_ACCESS:
+        case STREAM_GET_CONTENT_TYPE:
             return VLC_EGENERIC;
 
         default:

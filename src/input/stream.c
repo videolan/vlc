@@ -556,6 +556,10 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             }
             return access2_vaControl( p_access, i_int, args );
 
+        case STREAM_GET_CONTENT_TYPE:
+            return access2_Control( p_access, ACCESS_GET_CONTENT_TYPE,
+                                    va_arg( args, char ** ) );
+
         default:
             msg_Err( s, "invalid stream_vaControl query=0x%x", i_query );
             return VLC_EGENERIC;

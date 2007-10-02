@@ -60,8 +60,10 @@ enum stream_query_e
 
     /* Special for direct access control from demuxer.
      * XXX: avoid using it by all means */
-    STREAM_CONTROL_ACCESS   /* arg1= int i_access_query, args   res: can fail
+    STREAM_CONTROL_ACCESS,  /* arg1= int i_access_query, args   res: can fail
                              if access unreachable or access control answer */
+
+    STREAM_GET_CONTENT_TYPE,   /**< arg1= char **         res=can file */
 };
 
 VLC_EXPORT( int, stream_Read, ( stream_t *s, void *p_read, int i_read ) );
@@ -91,15 +93,29 @@ static inline int64_t stream_Size( stream_t *s )
     stream_Control( s, STREAM_GET_SIZE, &i_pos );
     return i_pos;
 }
+
 static inline int stream_MTU( stream_t *s )
 {
     int i_mtu;
     stream_Control( s, STREAM_GET_MTU, &i_mtu );
     return i_mtu;
 }
+
 static inline int stream_Seek( stream_t *s, int64_t i_pos )
 {
     return stream_Control( s, STREAM_SET_POSITION, i_pos );
+}
+
+/**
+ * Get the Content-Type of a stream, or NULL if unknown.
+ * Result must be free()'d.
+ */
+static inline char *stream_ContentType( stream_t *s )
+{
+    char *res;
+    if( stream_Control( s, STREAM_GET_CONTENT_TYPE, &res ) )
+        return NULL;
+    return res;
 }
 
 /**

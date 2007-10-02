@@ -123,6 +123,7 @@ static int Control( stream_t *s, int i_query, va_list args )
             break;
 
         case STREAM_GET_MTU:
+        case STREAM_GET_CONTENT_TYPE:
             return VLC_EGENERIC;
 
         case STREAM_CONTROL_ACCESS:
