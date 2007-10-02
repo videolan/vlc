@@ -2008,7 +2008,7 @@ static int UpdateFromAccess( input_thread_t *p_input )
         vlc_meta_t *p_meta = vlc_meta_New();
         access2_Control( p_input->p->input.p_access,ACCESS_GET_META, p_meta );
         InputUpdateMeta( p_input, p_meta );
-        var_SetBool( p_input, "item-change", p_input->p->input.p_item->i_id );
+        var_SetInteger( pl_Get( p_input ), "item-change", p_input->p->input.p_item->i_id );
         p_access->info.i_update &= ~INPUT_UPDATE_META;
     }
 

@@ -193,9 +193,6 @@ void input_ControlVarInit ( input_thread_t *p_input )
          * TODO list all changes warn by this callbacks */
         var_Create( p_input, "intf-change", VLC_VAR_BOOL );
         var_SetBool( p_input, "intf-change", VLC_TRUE );
-
-       /* item-change variable */
-        var_Create( p_input, "item-change", VLC_VAR_INTEGER );
     }
 #undef ADD_CALLBACK
 }
