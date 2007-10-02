@@ -243,8 +243,6 @@ libvlc_media_list_player_new( libvlc_instance_t * p_instance,
                                                        p_e );
     libvlc_event_manager_register_event_type( p_mlp->p_event_manager,
             libvlc_MediaListPlayerNextItemSet, p_e );
-    libvlc_event_manager_register_event_type( p_mlp->p_event_manager,
-            libvlc_MediaListPlayerNextItemSet, p_e );
 
     return p_mlp;
 }
