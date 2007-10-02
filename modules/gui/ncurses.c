@@ -62,7 +62,7 @@
 #ifdef HAVE_VCDX
 #define VCD_MRL "vcdx://"
 #else
-#define VCD_MRL "vcdx://"
+#define VCD_MRL "vcd://"
 #endif
 
 #define SEARCH_CHAIN_SIZE 20
@@ -163,7 +163,6 @@ struct intf_sys_t
 
     int             i_box_plidx;    /* Playlist index */
     int             b_box_plidx_follow;
-    playlist_item_t *p_plnode;      /* Playlist node */
     int             i_box_bidx;     /* browser index */
 
     int             b_box_cleared;
@@ -216,7 +215,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_box_plidx_follow = VLC_TRUE;
     p_sys->b_box_cleared = VLC_FALSE;
     p_sys->i_box_plidx = 0;
-    p_sys->p_plnode = NULL;
     p_sys->i_box_bidx = 0;
     p_sys->p_sub = msg_Subscribe( p_intf, MSG_QUEUE_NORMAL );
     memset( p_sys->psz_partial_keys, 0, sizeof( p_sys->psz_partial_keys ) );
@@ -584,8 +582,10 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 if( p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children
                         == -1 )
                 {
+                    playlist_item_t *p_item =
+                            p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
-                                      VLC_TRUE, NULL,
+                                      VLC_TRUE, p_item->p_parent,
                         p_sys->pp_plist[p_sys->i_box_plidx]->p_item );
                 }
                 else
