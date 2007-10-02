@@ -194,7 +194,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 
         if( ( p_vout->fmt_render.i_width != p_fmt->i_width ) ||
             ( p_vout->fmt_render.i_height != p_fmt->i_height ) ||
-            ( p_vout->fmt_render.i_chroma != p_fmt->i_chroma ) ||
+           
             ( p_vout->fmt_render.i_aspect != p_fmt->i_aspect ) ||
             p_vout->b_filter_change )
         {
@@ -1647,10 +1647,10 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
         char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
         char *psz_name = input_item_GetTitle( input_GetItem( p_input ) );
         if( EMPTY_STR( psz_name ) )
-            {
-                free( psz_name );
-                psz_name = input_item_GetName( input_GetItem( p_input ) );
-            }
+        {
+            free( psz_name );
+            psz_name = input_item_GetName( input_GetItem( p_input ) );
+        }
         if( !EMPTY_STR( psz_nowplaying ) )
         {
             vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
@@ -1699,3 +1699,4 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
         free( psz_nowplaying );
     }
 }
+
