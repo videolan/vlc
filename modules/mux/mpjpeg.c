@@ -30,14 +30,6 @@
 #include <vlc_block.h>
 #include <vlc_codecs.h>
 
-#define SEPARATOR_TEXT N_( "Multipart separator string" )
-#define SEPARATOR_LONGTEXT N_( "Multipart strings like MPJPEG use a " \
-                               "specific string to separate its content " \
-                               "pieces. You can select this string. " \
-                               "Default is --myboundary" )
-
-
-#define CONTENT_TYPE "Content-Type: image/jpeg"
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -50,8 +42,7 @@ vlc_module_begin();
     set_shortname( "MPJPEG" );
     set_description( _("Multipart JPEG muxer") );
     set_capability( "sout mux", 5 );
-    add_string( SOUT_CFG_PREFIX "separator", "--myboundary", NULL,
-                              SEPARATOR_TEXT, SEPARATOR_LONGTEXT, VLC_TRUE );
+    add_obsolete_string( SOUT_CFG_PREFIX "separator" );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_MUX );
     set_callbacks( Open, Close );
@@ -61,18 +52,13 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static const char *ppsz_sout_options[] = { "separator", NULL };
-
 static int Control  ( sout_mux_t *, int, va_list );
 static int AddStream( sout_mux_t *, sout_input_t * );
 static int DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
-struct sout_mux_sys_t
-{
-    block_t *p_separator;
-    vlc_bool_t b_send_headers;
-};
+/* This pseudo-random sequence is unlikely to ever happen */
+#define BOUNDARY "7b3cc56e5f51db803f790dad720ed50a"
 
 /*****************************************************************************
  * Open:
@@ -80,43 +66,14 @@ struct sout_mux_sys_t
 static int Open( vlc_object_t *p_this )
 {
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
-    sout_mux_sys_t  *p_sys;
-    char *psz_separator_block, *psz_separator;
 
     msg_Dbg( p_mux, "Multipart jpeg muxer opened" );
-    psz_separator = var_GetNonEmptyString( p_mux, SOUT_CFG_PREFIX"separator" );
-    if( psz_separator == NULL )
-    {
-        msg_Err( p_this, "missing required multipart separator" );
-        return VLC_EGENERIC;
-    }
-
-    config_ChainParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options,
-                       p_mux->p_cfg );
-
-    p_sys = p_mux->p_sys = malloc( sizeof(sout_mux_sys_t) );
-    if( p_sys == NULL )
-        return VLC_ENOMEM;
-    p_sys->b_send_headers = VLC_TRUE;
-
-    if( asprintf( &psz_separator_block, "\r\n%s\r\n%s\r\n", psz_separator,
-                  CONTENT_TYPE ) == -1 )
-        psz_separator_block = NULL;
-    free( psz_separator_block );
-
-    if( psz_separator_block == NULL )
-    {
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
-
-    p_sys->p_separator = block_New( p_mux, strlen( psz_separator_block ) );
-    strcpy( (char *)p_sys->p_separator->p_buffer, psz_separator_block );
 
     p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
+    p_mux->p_sys        = NULL;
 
     return VLC_SUCCESS;
 }
@@ -127,12 +84,9 @@ static int Open( vlc_object_t *p_this )
 
 static void Close( vlc_object_t * p_this )
 {
-    sout_mux_t *p_mux = (sout_mux_t*)p_this;
-    sout_mux_sys_t *p_sys = p_mux->p_sys;
-
-    msg_Dbg( p_mux, "Multipart jpeg muxer closed" );
-    block_Release( p_sys->p_separator );
-    free( p_sys );
+    /* TODO: send the ending boundary ("\r\n--"BOUNDARY"--\r\n"),
+     * but is the access_output still useable?? */
+    msg_Dbg( p_this, "Multipart jpeg muxer closed" );
 }
 
 static int Control( sout_mux_t *p_mux, int i_query, va_list args )
@@ -154,7 +108,7 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 
        case MUX_GET_MIME:
            ppsz = (char**)va_arg( args, char ** );
-           *ppsz = strdup( "multipart/x-mixed-replace; boundary=This Random String" );
+           *ppsz = strdup( "multipart/x-mixed-replace; boundary="BOUNDARY );
            return VLC_SUCCESS;
 
         default:
@@ -194,49 +148,33 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 static int Mux( sout_mux_t *p_mux )
 {
     block_fifo_t *p_fifo;
-    sout_mux_sys_t *p_sys = p_mux->p_sys;
-    int i_count;
-    /* Content-Length:.......\r\n */
-    char psz_content_length[25];
-
-    if( p_sys->b_send_headers )
-    {
-        block_t *p_header;
-        char *psz_separator = var_CreateGetString( p_mux,
-                                             SOUT_CFG_PREFIX "separator" );
-        char *psz_separator_block = (char *)malloc( strlen( psz_separator ) +
-                                              2 + strlen( CONTENT_TYPE ) );
-
-        sprintf( psz_separator_block, "%s\r\n%s\r\n", psz_separator,
-                                      CONTENT_TYPE );
-
-        p_header = block_New( p_mux, strlen( psz_separator_block ) );
-        memcpy( p_header->p_buffer, psz_separator_block ,
-                                    strlen( psz_separator_block ) );
-        p_header->i_flags |= BLOCK_FLAG_HEADER;
-        sout_AccessOutWrite( p_mux->p_access, p_header );
-        p_sys->b_send_headers = VLC_FALSE;
-        if( psz_separator_block ) free( psz_separator_block );
-    }
 
     if( !p_mux->i_nb_inputs ) return VLC_SUCCESS;
 
     p_fifo = p_mux->pp_inputs[0]->p_fifo;
-    i_count = block_FifoCount( p_fifo );
-    while( i_count > 0 )
-    {
-        block_t *p_length = block_New( p_mux, 25 );
-        block_t *p_data = block_FifoGet( p_fifo );
-        sout_AccessOutWrite( p_mux->p_access,
-                             block_Duplicate( p_sys->p_separator ) );
-        memset( psz_content_length, 0, 25 );
-        snprintf( psz_content_length, 25, "Content-Length: %i\r\n\r\n",
-                                          p_data->i_buffer );
-        memcpy( p_length->p_buffer, psz_content_length, 25 );
-        sout_AccessOutWrite( p_mux->p_access, p_length );
-        sout_AccessOutWrite( p_mux->p_access, p_data );
 
-        i_count--;
+    while( block_FifoCount( p_fifo ) > 0 )
+    {
+        static const char psz_hfmt[] = "\r\n"
+            "--"BOUNDARY"\r\n"
+            "Content-Type: image/jpeg\r\n"
+            "Content-Length: %u\r\n"
+            "\r\n";
+        block_t *p_data = block_FifoGet( p_fifo );
+        block_t *p_header = block_New( p_mux, sizeof( psz_hfmt ) + 20 );
+
+        if( p_header == NULL ) /* uho! */
+        {
+            block_Release( p_data );
+            continue;
+        }
+
+        p_header->i_buffer =
+            snprintf( (char *)p_header->p_buffer, p_header->i_buffer,
+                      psz_hfmt, p_data->i_buffer );
+        p_header->i_flags |= BLOCK_FLAG_HEADER;
+        sout_AccessOutWrite( p_mux->p_access, p_header );
+        sout_AccessOutWrite( p_mux->p_access, p_data );
     }
 
     return VLC_SUCCESS;
