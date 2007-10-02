@@ -61,15 +61,18 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
 {
     struct id3_tag   *p_id3_tag;
     struct id3_frame *p_frame;
-    vlc_meta_t *p_meta = (vlc_meta_t *)p_demux->p_private;
+    demux_meta_t     *p_demux_meta = p_demux->p_private;
+    vlc_meta_t       *p_meta;
     int i;
+
+    TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
+    p_demux_meta->p_meta = NULL;
 
     p_id3_tag = id3_tag_parse( p_data, i_size );
     if( !p_id3_tag )
         return;
 
-    if( !p_meta )
-        p_demux->p_private = p_meta = vlc_meta_New();
+    p_demux_meta->p_meta = p_meta = vlc_meta_New();
 
 #define ID_IS( a ) (!strcmp(  p_frame->id, a ))
 #define DESCR_IS( a) strstr( (char*)p_frame->description, a )

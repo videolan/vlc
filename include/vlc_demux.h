@@ -72,6 +72,16 @@ struct demux_t
     demux_sys_t *p_sys;
 };
 
+
+/* demux_meta_t is returned by "meta reader" module to the demuxer */
+struct demux_meta_t
+{
+    vlc_meta_t *p_meta;                 /**< meta data */
+
+    int i_attachments;                  /**< number of attachments */
+    input_attachment_t **attachments;    /**< array of attachments */
+};
+
 enum demux_query_e
 {
     /* I. Common queries to access_demux and demux */

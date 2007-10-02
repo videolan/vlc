@@ -35,6 +35,7 @@
 #include <tbytevector.h>
 #include <mpegfile.h>
 #include <flacfile.h>
+#include <attachedpictureframe.h>
 #if 0
 #include <oggflacfile.h>
 #endif
@@ -63,27 +64,114 @@ vlc_module_begin();
         set_callbacks( WriteMeta, NULL );
 vlc_module_end();
 
-static bool checkID3Image( const TagLib::ID3v2::Tag *p_tag )
-{
-    TagLib::ID3v2::FrameList l = p_tag->frameListMap()[ "APIC" ];
-    return !l.isEmpty();
-}
-
 /* Try detecting embedded art */
-static void DetectImage( TagLib::FileRef f, vlc_meta_t *p_meta )
+static void DetectImage( TagLib::FileRef f, demux_t *p_demux )
 {
+    demux_meta_t        *p_demux_meta   = (demux_meta_t *)p_demux->p_private;
+    vlc_meta_t          *p_meta         = p_demux_meta->p_meta;
+    TagLib::ID3v2::Tag  *p_tag;
+    int                 i_score         = -1;
+
+    /* Preferred type of image
+     * The 21 types are defined in id3v2 standard:
+     * http://www.id3.org/id3v2.4.0-frames */
+    static const int pi_cover_score[] = {
+        0,  /* Other */
+        5,  /* 32x32 PNG image that should be used as the file icon */
+        4,  /* File icon of a different size or format. */
+        20, /* Front cover image of the album. */
+        19, /* Back cover image of the album. */
+        13, /* Inside leaflet page of the album. */
+        18, /* Image from the album itself. */
+        17, /* Picture of the lead artist or soloist. */
+        16, /* Picture of the artist or performer. */
+        14, /* Picture of the conductor. */
+        15, /* Picture of the band or orchestra. */
+        9,  /* Picture of the composer. */
+        8,  /* Picture of the lyricist or text writer. */
+        7,  /* Picture of the recording location or studio. */
+        10, /* Picture of the artists during recording. */
+        11, /* Picture of the artists during performance. */
+        6,  /* Picture from a movie or video related to the track. */
+        1,  /* Picture of a large, coloured fish. */
+        12, /* Illustration related to the track. */
+        3,  /* Logo of the band or performer. */
+        2   /* Logo of the publisher (record company). */
+    };
+
     if( TagLib::MPEG::File *mpeg =
                dynamic_cast<TagLib::MPEG::File *>(f.file() ) )
     {
-        if( mpeg->ID3v2Tag() && checkID3Image( mpeg->ID3v2Tag() ) )
-            vlc_meta_SetArtURL( p_meta, "APIC" );
+        p_tag = mpeg->ID3v2Tag();
+        if( !p_tag )
+            return;
+        TagLib::ID3v2::FrameList list = p_tag->frameListMap()[ "APIC" ];
+        if( list.isEmpty() )
+            return;
+        input_thread_t *p_input = (input_thread_t *)
+                vlc_object_find( p_demux,VLC_OBJECT_INPUT, FIND_PARENT );
+        if( !p_input )
+            return;
+        input_item_t *p_item = input_GetItem( p_input );
+        TagLib::ID3v2::AttachedPictureFrame *p_apic;
+
+        TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
+        for( TagLib::ID3v2::FrameList::Iterator iter = list.begin();
+                iter != list.end(); iter++ )
+        {
+            p_apic = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame*>(*iter);
+            input_attachment_t *p_attachment;
+
+            const char *psz_name, *psz_mime, *psz_description;
+            TagLib::ByteVector p_data_taglib; const char *p_data; int i_data;
+
+            psz_mime = p_apic->mimeType().toCString(true);
+            psz_description = p_apic->description().toCString(true);
+            psz_name = psz_description;
+
+            p_data_taglib = p_apic->picture();
+            p_data = p_data_taglib.data();
+            i_data = p_data_taglib.size();
+
+            msg_Dbg( p_demux, "Found embedded art: %s (%s) is %i bytes",
+                    psz_name, psz_mime, i_data );
+
+            p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
+                    psz_description, p_data, i_data );
+            TAB_APPEND_CAST( (input_attachment_t**),
+                    p_demux_meta->i_attachments, p_demux_meta->attachments,
+                    p_attachment );
+
+            if( pi_cover_score[p_apic->type()] > i_score )
+            {
+                i_score = pi_cover_score[p_apic->type()];
+                char *psz_url;
+                if( asprintf( &psz_url, "attachment://%s",
+                        p_attachment->psz_name ) == -1 )
+                {
+                    vlc_object_release( p_input );
+                    return;
+                }
+                vlc_meta_SetArtURL( p_meta, psz_url );
+                free( psz_url );
+            }
+        }
+        vlc_object_release( p_input );
     }
+#if 0
+    //flac embedded images are extracted in the flac demuxer
     else if( TagLib::FLAC::File *flac =
              dynamic_cast<TagLib::FLAC::File *>(f.file() ) )
     {
-        if( flac->ID3v2Tag() && checkID3Image( flac->ID3v2Tag() ) )
+        p_tag = flac->ID3v2Tag();
+        if( p_tag )
+            return;
+        TagLib::ID3v2::FrameList l = p_tag->frameListMap()[ "APIC" ];
+        if( l.isEmpty() )
+            return;
             vlc_meta_SetArtURL( p_meta, "APIC" );
     }
+#endif
 #if 0
 /* This needs special additions to taglib */
  * else if( TagLib::MP4::File *mp4 =
@@ -99,10 +187,12 @@ static void DetectImage( TagLib::FileRef f, vlc_meta_t *p_meta )
 
 static int ReadMeta( vlc_object_t *p_this )
 {
-    demux_t *p_demux = (demux_t *)p_this;
+    demux_t         *p_demux = (demux_t *)p_this;
+    demux_meta_t    *p_demux_meta = (demux_meta_t*)p_demux->p_private;
+    vlc_meta_t      *p_meta = p_demux_meta->p_meta;
 
-    if( strncmp( p_demux->psz_access, "file", 4 ) )
-        return VLC_EGENERIC;
+    TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
+    p_demux_meta->p_meta = NULL;
 
     TagLib::FileRef f( p_demux->psz_path );
     if( f.isNull() )
@@ -111,9 +201,7 @@ static int ReadMeta( vlc_object_t *p_this )
     if ( !f.tag() || f.tag()->isEmpty() )
         return VLC_EGENERIC;
 
-    if( !p_demux->p_private )
-        p_demux->p_private = (void*)vlc_meta_New();
-    vlc_meta_t *p_meta = (vlc_meta_t *)(p_demux->p_private );
+    p_demux_meta->p_meta = p_meta = vlc_meta_New();
     TagLib::Tag *p_tag = f.tag();
 
     if( TagLib::MPEG::File *p_mpeg =
@@ -203,7 +291,7 @@ vlc_meta_Set##bar( p_meta, p_t->toString().toCString(true))
                         (mtime_t) i_ogg_v_length * 1000000 );
             vlc_object_release( p_input );
         }
- 
+
     }
 #if 0 /* at this moment, taglib is unable to detect ogg/flac files
 * becauses type detection is based on file extension:
@@ -260,7 +348,7 @@ vlc_meta_Set##bar( p_meta, p_t->toString().toCString(true))
 #undef SET
 #undef SETINT
 
-    DetectImage( f, p_meta );
+    DetectImage( f, p_demux );
 
     return VLC_SUCCESS;
 }
@@ -270,7 +358,7 @@ static int WriteMeta( vlc_object_t *p_this )
     playlist_t *p_playlist = (playlist_t *)p_this;
     meta_export_t *p_export = (meta_export_t *)p_playlist->p_private;
     input_item_t *p_item = p_export->p_item;
- 
+
     if( p_item == NULL )
     {
         msg_Err( p_this, "Can't save meta data of an empty input" );
@@ -348,7 +436,7 @@ static int WriteMeta( vlc_object_t *p_this )
         WRITE( Copyright, "TCOP" );
         WRITE( EncodedBy, "TENC" );
         WRITE( Language, "TLAN" );
- 
+
 #undef WRITE
     }
 

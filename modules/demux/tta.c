@@ -105,7 +105,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
- 
+
     /* Read the metadata */
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'T', 'T', 'A', '1' ) );
     fmt.audio.i_channels = GetWLE( &p_header[6] );
@@ -138,15 +138,21 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     free( p_seektable );
     p_sys->i_start = stream_Tell( p_demux->s );
- 
+
 #if 0
     /* Parse possible id3 header */
+    p_demux->p_private = malloc( sizeof( demux_meta_t ) );
+    if( !p_demux->p_private )
+        return VLC_ENOMEM;
     if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
     {
-        p_sys->p_meta = (vlc_meta_t *)p_demux->p_private;
+        demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
+        p_sys->p_meta = p_demux_meta->p_meta;
         p_demux->p_private = NULL;
         module_Unneed( p_demux, p_id3 );
+        TAB_CLEAN( p_demux_meta->i_attachments, p_demux_meta->attachments );
     }
+    free( p_demux->p_private );
 
     if( !p_sys->p_meta )
         p_sys->p_meta = vlc_meta_New();

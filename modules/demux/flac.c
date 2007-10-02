@@ -78,8 +78,8 @@ struct demux_sys_t
     seekpoint_t **seekpoint;
 
     /* */
-    int                i_attachment;
-    input_attachment_t **attachment;
+    int                i_attachments;
+    input_attachment_t **attachments;
     int                i_cover_idx;
     int                i_cover_score;
 };
@@ -123,7 +123,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_pts_start = 0;
     p_sys->p_es = NULL;
     TAB_INIT( p_sys->i_seekpoint, p_sys->seekpoint );
-    TAB_INIT( p_sys->i_attachment, p_sys->attachment );
+    TAB_INIT( p_sys->i_attachments, p_sys->attachments);
     p_sys->i_cover_idx = 0;
     p_sys->i_cover_score = 0;
 
@@ -155,9 +155,13 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Parse possible id3 header */
+    p_demux->p_private = malloc( sizeof( demux_meta_t ) );
+    if( !p_demux->p_private )
+        return VLC_ENOMEM;
     if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
     {
-        vlc_meta_t *p_meta = (vlc_meta_t *)p_demux->p_private;
+        demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
+        vlc_meta_t *p_meta = p_demux_meta->p_meta;
 
         if( !p_sys->p_meta )
         {
@@ -170,15 +174,23 @@ static int Open( vlc_object_t * p_this )
         }
         p_demux->p_private = NULL;
         module_Unneed( p_demux, p_id3 );
-    }
+        int i;
+        for( i = 0; i < p_demux_meta->i_attachments; i++ )
+            TAB_APPEND_CAST( (input_attachment_t**),
+                    p_sys->i_attachments, p_sys->attachments,
+                    p_demux_meta->attachments[p_demux_meta->i_attachments] );
 
-    if( p_sys->i_cover_idx < p_sys->i_attachment )
+        TAB_CLEAN( p_demux_meta->i_attachments, p_demux_meta->attachments );
+    }
+    free( p_demux->p_private );
+
+    if( p_sys->i_cover_idx < p_sys->i_attachments )
     {
         char psz_url[128];
         if( !p_sys->p_meta )
             p_sys->p_meta = vlc_meta_New();
         snprintf( psz_url, sizeof(psz_url), "attachment://%s",
-                  p_sys->attachment[p_sys->i_cover_idx]->psz_name );
+                  p_sys->attachments[p_sys->i_cover_idx]->psz_name );
         vlc_meta_Set( p_sys->p_meta, vlc_meta_ArtworkURL, psz_url );
     }
     vlc_audio_replay_gain_MergeFromMeta( &p_sys->replay_gain, p_sys->p_meta );
@@ -192,6 +204,9 @@ static void Close( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    TAB_CLEAN( p_sys->i_seekpoint, p_sys->seekpoint );
+    TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
 
     /* Unneed module */
     module_Unneed( p_sys->p_packetizer, p_sys->p_packetizer->p_module );
@@ -394,13 +409,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         int *pi_int = (int*)va_arg( args, int * );
         int i;
 
-        if( p_sys->i_attachment <= 0 )
+        if( p_sys->i_attachments <= 0 )
             return VLC_EGENERIC;
 
-        *pi_int = p_sys->i_attachment;;
-        *ppp_attach = malloc( sizeof(input_attachment_t**) * p_sys->i_attachment );
-        for( i = 0; i < p_sys->i_attachment; i++ )
-            *(ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachment[i] );
+        *pi_int = p_sys->i_attachments;;
+        *ppp_attach = malloc( sizeof(input_attachment_t**) * p_sys->i_attachments );
+        for( i = 0; i < p_sys->i_attachments; i++ )
+            (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachments[i] );
         return VLC_SUCCESS;
     }
 
@@ -472,8 +487,6 @@ static int  ReadMeta( demux_t *p_demux, uint8_t **pp_streaminfo, int *pi_streami
     s->i_time_offset = 0;
     s->i_byte_offset = 0;
     TAB_APPEND( p_sys->i_seekpoint, p_sys->seekpoint, s );
-
-
 
     b_last = (*pp_streaminfo)[4]&0x80;
     while( !b_last )
@@ -699,7 +712,7 @@ static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
     msg_Dbg( p_demux, "FLAC: Picture type=%d mime=%s description='%s' file length=%d",
              i_type, psz_mime, psz_description, i_len );
 
-    snprintf( psz_name, sizeof(psz_name), "picture%d", p_sys->i_attachment );
+    snprintf( psz_name, sizeof(psz_name), "picture%d", p_sys->i_attachments );
     if( !strcasecmp( psz_mime, "image/jpeg" ) )
         strcat( psz_name, ".jpg" );
     else if( !strcasecmp( psz_mime, "image/png" ) )
@@ -707,12 +720,12 @@ static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, int i_data )
 
     p_attachment = vlc_input_attachment_New( psz_name, psz_mime, psz_description,
                                              p_data, i_data );
-    TAB_APPEND( p_sys->i_attachment, p_sys->attachment, p_attachment );
+    TAB_APPEND( p_sys->i_attachments, p_sys->attachments, p_attachment );
 
     if( i_type >= 0 && i_type < sizeof(pi_cover_score)/sizeof(pi_cover_score[0]) &&
         p_sys->i_cover_score < pi_cover_score[i_type] )
     {
-        p_sys->i_cover_idx = p_sys->i_attachment-1;
+        p_sys->i_cover_idx = p_sys->i_attachments-1;
         p_sys->i_cover_score = pi_cover_score[i_type];
     }
 error:

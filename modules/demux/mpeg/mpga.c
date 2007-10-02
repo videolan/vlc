@@ -74,6 +74,9 @@ struct demux_sys_t
     int i_xing_bitrate_avg;
     int i_xing_frame_samples;
     block_t *p_block_in, *p_block_out;
+
+    int                i_attachments;
+    input_attachment_t **attachments;
 };
 
 static int HeaderCheck( uint32_t h )
@@ -252,12 +255,19 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_block_out = p_block_out;
 
     /* Parse possible id3 header */
+    p_demux->p_private = malloc( sizeof( demux_meta_t ) );
+    if( !p_demux->p_private )
+        return VLC_ENOMEM;
     if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
     {
-        p_sys->meta = (vlc_meta_t *)p_demux->p_private;
+        demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
+        p_sys->meta = p_demux_meta->p_meta;
         p_demux->p_private = NULL;
         module_Unneed( p_demux, p_id3 );
+        p_sys->i_attachments = p_demux_meta->i_attachments;
+        p_sys->attachments = p_demux_meta->attachments;
     }
+    free( p_demux->p_private );
 
     /* */
     p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
@@ -337,6 +347,8 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->meta ) vlc_meta_Delete( p_sys->meta );
     if( p_sys->p_block_out ) block_Release( p_sys->p_block_out );
 
+    TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
+
     free( p_sys );
 }
 
@@ -350,11 +362,28 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     vlc_meta_t *p_meta;
     int i_ret;
 
+    input_attachment_t ***ppp_attach;
+    int *pi_int, i;
+
     switch( i_query )
     {
         case DEMUX_GET_META:
             p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
             vlc_meta_Merge( p_meta, p_sys->meta );
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_ATTACHMENTS:
+            ppp_attach =
+                (input_attachment_t***)va_arg( args, input_attachment_t*** );
+            pi_int = (int*)va_arg( args, int * );
+
+            if( p_sys->i_attachments <= 0 )
+                return VLC_EGENERIC;
+
+            *pi_int = p_sys->i_attachments;
+            *ppp_attach = malloc( sizeof(input_attachment_t**) * p_sys->i_attachments );
+            for( i = 0; i < p_sys->i_attachments; i++ )
+                (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachments[i] );
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:

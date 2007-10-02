@@ -207,17 +207,25 @@ static int Open( vlc_object_t * p_this )
     p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
     if( p_input )
     {
+        p_demux->p_private = malloc( sizeof( demux_meta_t ) );
+        if( !p_demux->p_private )
+        {
+            vlc_object_release( p_input );
+            return VLC_ENOMEM;
+        }
         module_t *p_meta = module_Need( p_demux, "meta reader", NULL, 0 );
         if( p_meta )
         {
-            vlc_meta_Merge( input_GetItem(p_input)->p_meta, (vlc_meta_t*)(p_demux->p_private ) );
+            demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
+            vlc_meta_Merge( input_GetItem(p_input)->p_meta,
+                    p_demux_meta->p_meta );
+            vlc_meta_Delete( p_demux_meta->p_meta );
             module_Unneed( p_demux, p_meta );
+            TAB_CLEAN( p_demux_meta->i_attachments, p_demux_meta->attachments );
         }
         vlc_object_release( p_input );
-        return VLC_SUCCESS;
+        free( p_demux->p_private );
     }
-    if( p_input )
-        vlc_object_release( p_input );
 
     /* Initialize the Ogg physical bitstream parser */
     ogg_sync_init( &p_sys->oy );

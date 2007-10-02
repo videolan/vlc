@@ -115,12 +115,18 @@ static int Open( vlc_object_t * p_this )
     LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "mp4 audio" );
 
     /* Parse possible id3 header */
+    p_demux->p_private = malloc( sizeof( demux_meta_t ) );
+    if( !p_demux->p_private )
+        return VLC_ENOMEM;
     if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
     {
-        p_sys->meta = (vlc_meta_t *)p_demux->p_private;
+        demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
+        p_sys->meta = p_demux_meta->p_meta;
         p_demux->p_private = NULL;
         module_Unneed( p_demux, p_id3 );
+        TAB_CLEAN( p_demux_meta->i_attachments, p_demux_meta->attachments );
     }
+    free( p_demux->p_private );
     return VLC_SUCCESS;
 }
 
