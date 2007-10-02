@@ -102,7 +102,7 @@ typedef struct
     /* codec information */
     uint16_t     i_tag;     /* for audio */
     vlc_fourcc_t i_fourcc;  /* for video */
-    char         *psz_name; /* codec name */
+    const char         *psz_name; /* codec name */
     int          i_blockalign; /* for audio only */
     vlc_bool_t   b_audio_correction;
 
@@ -168,7 +168,7 @@ static void bo_addle_u32( bo_t *, uint32_t );
 static void bo_addle_u64( bo_t *, uint64_t );
 static void bo_add_mem  ( bo_t *, uint8_t *, int );
 
-static void bo_addle_str16( bo_t *, char * );
+static void bo_addle_str16( bo_t *, const char * );
 
 /*****************************************************************************
  * Open:
@@ -721,7 +721,7 @@ static void bo_add_mem( bo_t *p_bo, uint8_t *p_mem, int i_size )
     p_bo->i_buffer += i_size;
 }
 
-static void bo_addle_str16( bo_t *bo, char *str )
+static void bo_addle_str16( bo_t *bo, const char *str )
 {
     bo_addle_u16( bo, strlen( str ) + 1 );
     for( ;; )
@@ -732,7 +732,7 @@ static void bo_addle_str16( bo_t *bo, char *str )
     }
 }
 
-static void bo_addle_str16_nosize( bo_t *bo, char *str )
+static void bo_addle_str16_nosize( bo_t *bo, const char *str )
 {
     for( ;; )
     {
