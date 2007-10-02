@@ -96,6 +96,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc_input.h>
+#include <vlc_codec.h>
 #include <vlc_codec_synchro.h>
 
 /*
