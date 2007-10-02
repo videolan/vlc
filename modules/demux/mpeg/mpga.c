@@ -347,6 +347,9 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->meta ) vlc_meta_Delete( p_sys->meta );
     if( p_sys->p_block_out ) block_Release( p_sys->p_block_out );
 
+    int i;
+    for( i = 0; i < p_sys->i_attachments; i++ )
+        free( p_sys->attachments[i] );
     TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
 
     free( p_sys );

@@ -206,6 +206,10 @@ static void Close( vlc_object_t * p_this )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     TAB_CLEAN( p_sys->i_seekpoint, p_sys->seekpoint );
+
+    int i;
+    for( i = 0; i < p_sys->i_attachments; i++ )
+        free( p_sys->attachments[i] );
     TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
 
     /* Unneed module */
