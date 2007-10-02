@@ -346,10 +346,10 @@ connect:
         /* Clean up current Open() run */
         vlc_UrlClean( &p_sys->url );
         vlc_UrlClean( &p_sys->proxy );
-        if( p_sys->psz_mime ) free( p_sys->psz_mime );
-        if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
-        if( p_sys->psz_location ) free( p_sys->psz_location );
-        if( p_sys->psz_user_agent ) free( p_sys->psz_user_agent );
+        free( p_sys->psz_mime );
+        free( p_sys->psz_pragma );
+        free( p_sys->psz_location );
+        free( p_sys->psz_user_agent );
 
         Disconnect( p_access );
         free( p_sys );
@@ -419,10 +419,10 @@ connect:
 error:
     vlc_UrlClean( &p_sys->url );
     vlc_UrlClean( &p_sys->proxy );
-    if( p_sys->psz_mime ) free( p_sys->psz_mime );
-    if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
-    if( p_sys->psz_location ) free( p_sys->psz_location );
-    if( p_sys->psz_user_agent ) free( p_sys->psz_user_agent );
+    free( p_sys->psz_mime );
+    free( p_sys->psz_pragma );
+    free( p_sys->psz_location );
+    free( p_sys->psz_user_agent );
 
     Disconnect( p_access );
     free( p_sys );
@@ -440,15 +440,15 @@ static void Close( vlc_object_t *p_this )
     vlc_UrlClean( &p_sys->url );
     vlc_UrlClean( &p_sys->proxy );
 
-    if( p_sys->psz_mime ) free( p_sys->psz_mime );
-    if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
-    if( p_sys->psz_location ) free( p_sys->psz_location );
+    free( p_sys->psz_mime );
+    free( p_sys->psz_pragma );
+    free( p_sys->psz_location );
 
-    if( p_sys->psz_icy_name ) free( p_sys->psz_icy_name );
-    if( p_sys->psz_icy_genre ) free( p_sys->psz_icy_genre );
-    if( p_sys->psz_icy_title ) free( p_sys->psz_icy_title );
+    free( p_sys->psz_icy_name );
+    free( p_sys->psz_icy_genre );
+    free( p_sys->psz_icy_title );
 
-    if( p_sys->psz_user_agent ) free( p_sys->psz_user_agent );
+    free( p_sys->psz_user_agent );
 
     Disconnect( p_access );
     free( p_sys );
@@ -769,13 +769,13 @@ static int Connect( access_t *p_access, int64_t i_tell )
     vlc_url_t      srv = p_sys->b_proxy ? p_sys->proxy : p_sys->url;
 
     /* Clean info */
-    if( p_sys->psz_location ) free( p_sys->psz_location );
-    if( p_sys->psz_mime ) free( p_sys->psz_mime );
-    if( p_sys->psz_pragma ) free( p_sys->psz_pragma );
+    free( p_sys->psz_location );
+    free( p_sys->psz_mime );
+    free( p_sys->psz_pragma );
 
-    if( p_sys->psz_icy_genre ) free( p_sys->psz_icy_genre );
-    if( p_sys->psz_icy_name ) free( p_sys->psz_icy_name );
-    if( p_sys->psz_icy_title ) free( p_sys->psz_icy_title );
+    free( p_sys->psz_icy_genre );
+    free( p_sys->psz_icy_name );
+    free( p_sys->psz_icy_title );
 
 
     p_sys->psz_location = NULL;
