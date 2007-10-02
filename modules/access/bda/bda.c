@@ -519,6 +519,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
     case ACCESS_SET_PAUSE_STATE:    /* 8 */
     case ACCESS_SET_TITLE:          /* 9 */
     case ACCESS_SET_SEEKPOINT:      /* 10 */
+    case ACCESS_GET_CONTENT_TYPE:
         return VLC_EGENERIC;
 
     case ACCESS_SET_PRIVATE_ID_STATE: /* 11 */

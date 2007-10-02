@@ -746,6 +746,11 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 vlc_meta_Set( p_meta, vlc_meta_NowPlaying, p_sys->psz_icy_title );
             break;
 
+        case ACCESS_GET_CONTENT_TYPE:
+            *va_arg( args, char ** ) =
+                p_sys->psz_mime ? strdup( p_sys->psz_mime ) : NULL;
+            break;
+
         case ACCESS_GET_TITLE_INFO:
         case ACCESS_SET_TITLE:
         case ACCESS_SET_SEEKPOINT:

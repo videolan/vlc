@@ -62,7 +62,9 @@ enum access_query_e
      * XXX: avoid to use it unless you can't */
     ACCESS_SET_PRIVATE_ID_STATE,    /* arg1= int i_private_data, vlc_bool_t b_selected can fail */
     ACCESS_SET_PRIVATE_ID_CA,    /* arg1= int i_program_number, uint16_t i_vpid, uint16_t i_apid1, uint16_t i_apid2, uint16_t i_apid3, uint8_t i_length, uint8_t *p_data */
-    ACCESS_GET_PRIVATE_ID_STATE     /* arg1=int i_private_data arg2=vlc_bool_t *  res=can fail */
+    ACCESS_GET_PRIVATE_ID_STATE,    /* arg1=int i_private_data arg2=vlc_bool_t *  res=can fail */
+
+    ACCESS_GET_CONTENT_TYPE, /* arg1=char **ppsz_content_type */
 };
 
 struct access_t
@@ -130,6 +132,14 @@ static inline int access2_Control( access_t *p_access, int i_query, ... )
     i_result = access2_vaControl( p_access, i_query, args );
     va_end( args );
     return i_result;
+}
+
+static inline char *access_GetContentType( access_t *p_access )
+{
+    char *res;
+    if( access2_Control( p_access, ACCESS_GET_CONTENT_TYPE, &res ) )
+        return NULL;
+    return res;
 }
 
 static inline void access_InitFields( access_t *p_a )
