@@ -466,6 +466,15 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
                     DEFAULT_INPUT_ACTIVITY );
     p_playlist->p_input = input_CreateThread( p_playlist, p_input );
 
+    char *psz_uri = input_item_GetURI( p_item->p_input );
+    if( psz_uri && ( !strncmp( psz_uri, "directory:", 10 ) ||
+                     !strncmp( psz_uri, "vlc:", 4 ) ) )
+    {
+        free( psz_uri );
+        return VLC_SUCCESS;
+    }
+    free( psz_uri );
+
     if( p_playlist->p_fetcher->i_art_policy == ALBUM_ART_WHEN_PLAYED )
     {
         vlc_bool_t b_has_art;
