@@ -110,6 +110,12 @@ int decoder_GetInputAttachments( decoder_t *p_dec,
     return input_Control( p_dec->p_owner->p_input, INPUT_GET_ATTACHMENTS,
                           ppp_attachment, pi_attachment );
 }
+/* decoder_GetDisplayDate:
+ */
+mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
+{
+    return i_ts;
+}
 
 /**
  * Spawns a new decoder thread
