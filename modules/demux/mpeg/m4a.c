@@ -101,13 +101,8 @@ static int Open( vlc_object_t * p_this )
 
     p_demux->pf_demux  = Demux;
     p_demux->pf_control= Control;
-    p_demux->p_sys     = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->p_es        = NULL;
+    p_demux->p_sys     = p_sys = calloc( sizeof( demux_sys_t ), 1 );
     p_sys->b_start     = VLC_TRUE;
-    p_sys->i_pts       = 0;
-    p_sys->i_bytes     = 0;
-    p_sys->i_time_offset = 0;
-    p_sys->i_bitrate_avg = 0;
 
     /* Load the mpeg 4 audio packetizer */
     INIT_APACKETIZER( p_sys->p_packetizer,  'm', 'p', '4', 'a'  );
