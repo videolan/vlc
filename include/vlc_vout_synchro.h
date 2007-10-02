@@ -34,46 +34,6 @@
 #define MAX_PIC_AVERAGE         8
 
 /* Read the discussion on top of vout_synchro.c for more information. */
-struct vout_synchro_t
-{
-    VLC_COMMON_MEMBERS
-
-    vout_thread_t * p_vout;
-    int             i_frame_rate;
-    int             i_current_rate;
-    vlc_bool_t      b_no_skip;
-    vlc_bool_t      b_quiet;
-
-    /* date of the beginning of the decoding of the current picture */
-    mtime_t         decoding_start;
-
-    /* stream properties */
-    unsigned int    i_n_p, i_n_b;
-
-    /* decoding values */
-    mtime_t         p_tau[4];                  /* average decoding durations */
-    unsigned int    pi_meaningful[4];            /* number of durations read */
-
-    /* render_time filled by SynchroChoose() */
-    int i_render_time;
-
-    /* stream context */
-    int             i_nb_ref;                /* Number of reference pictures */
-    int             i_dec_nb_ref;      /* Number of reference pictures we'll *
-                                        * have if we decode the current pic  */
-    int             i_trash_nb_ref;    /* Number of reference pictures we'll *
-                                        * have if we trash the current pic   */
-    unsigned int    i_eta_p, i_eta_b;
-    mtime_t         backward_pts, current_pts;
-    int             i_current_period;   /* period to add to the next picture */
-    int             i_backward_period;  /* period to add after the next
-                                         * reference picture
-                                         * (backward_period * period / 2) */
-
-    /* statistics */
-    unsigned int    i_trashed_pic, i_not_chosen_pic, i_pic;
-};
-
 /* Pictures types */
 #define I_CODING_TYPE           1
 #define P_CODING_TYPE           2
