@@ -769,9 +769,8 @@ static vlc_bool_t parse_extension_node COMPLEX_INTERFACE
                 if( !p_handler || !p_handler->name
                     || strcmp( p_handler->name, psz_name ))
                 {
-                    /* FIXME: see #1293
                     msg_Err( p_demux, "there's no open element left for <%s>",
-                             psz_name );*/
+                             psz_name );
                     FREE_ATT();
                     return VLC_FALSE;
                 }
@@ -840,6 +839,11 @@ static vlc_bool_t parse_extitem_node COMPLEX_INTERFACE
         msg_Warn( p_demux, "invalid \"href\" attribute" );
         return VLC_FALSE;
     }
+
+    /* fix for #1293 - XTAG sends ENDELEM for self closing tag */
+    /* (libxml sends NONE) */
+    xml_ReaderRead( p_xml_reader );
+
     return VLC_TRUE;
 }
 
