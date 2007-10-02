@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vout_synchro.c : frame dropping routines
+ * decoder_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2005 the VideoLAN team
  * $Id$
@@ -95,9 +95,8 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc_vout.h>
 #include <vlc_input.h>
-#include <vlc_vout_synchro.h>
+#include <vlc_codec_synchro.h>
 
 /*
  * Local prototypes
@@ -105,7 +104,7 @@
 
 #define MAX_PIC_AVERAGE         8
 
-struct vout_synchro_t
+struct decoder_synchro_t
 {
     VLC_COMMON_MEMBERS
 
@@ -152,22 +151,22 @@ struct vout_synchro_t
 #define DEFAULT_NB_B            1
 
 /*****************************************************************************
- * vout_SynchroInit : You know what ?
+ * decoder_SynchroInit : You know what ?
  *****************************************************************************/
-vout_synchro_t * __vout_SynchroInit( vlc_object_t * p_object,
+decoder_synchro_t * decoder_SynchroInit( decoder_t *p_dec,
                                      int i_frame_rate )
 {
-    vout_synchro_t * p_synchro = vlc_object_create( p_object,
-                                                  sizeof(vout_synchro_t) );
+    decoder_synchro_t * p_synchro = vlc_object_create( p_dec,
+                                                  sizeof(decoder_synchro_t) );
     if ( p_synchro == NULL )
     {
-        msg_Err( p_object, "out of memory" );
+        msg_Err( p_dec, "out of memory" );
         return NULL;
     }
-    vlc_object_attach( p_synchro, p_object );
+    vlc_object_attach( p_synchro, p_dec );
 
-    p_synchro->b_no_skip = !config_GetInt( p_object, "skip-frames" );
-    p_synchro->b_quiet = config_GetInt( p_object, "quiet-synchro" );
+    p_synchro->b_no_skip = !config_GetInt( p_dec, "skip-frames" );
+    p_synchro->b_quiet = config_GetInt( p_dec, "quiet-synchro" );
 
     /* We use a fake stream pattern, which is often right. */
     p_synchro->i_n_p = p_synchro->i_eta_p = DEFAULT_NB_P;
@@ -188,27 +187,27 @@ vout_synchro_t * __vout_SynchroInit( vlc_object_t * p_object,
 }
 
 /*****************************************************************************
- * vout_SynchroRelease : You know what ?
+ * decoder_SynchroRelease : You know what ?
  *****************************************************************************/
-void vout_SynchroRelease( vout_synchro_t * p_synchro )
+void decoder_SynchroRelease( decoder_synchro_t * p_synchro )
 {
     vlc_object_detach( p_synchro );
     vlc_object_destroy( p_synchro );
 }
 
 /*****************************************************************************
- * vout_SynchroReset : Reset the reference picture counter
+ * decoder_SynchroReset : Reset the reference picture counter
  *****************************************************************************/
-void vout_SynchroReset( vout_synchro_t * p_synchro )
+void decoder_SynchroReset( decoder_synchro_t * p_synchro )
 {
     p_synchro->i_nb_ref = 0;
     p_synchro->i_trash_nb_ref = p_synchro->i_dec_nb_ref = 0;
 }
 
 /*****************************************************************************
- * vout_SynchroChoose : Decide whether we will decode a picture or not
+ * decoder_SynchroChoose : Decide whether we will decode a picture or not
  *****************************************************************************/
-vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type,
+vlc_bool_t decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
                                int i_render_time, vlc_bool_t b_low_delay )
 {
 #define TAU_PRIME( coding_type )    (p_synchro->p_tau[(coding_type)] \
@@ -335,27 +334,27 @@ vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type,
 }
 
 /*****************************************************************************
- * vout_SynchroTrash : Update counters when we trash a picture
+ * decoder_SynchroTrash : Update counters when we trash a picture
  *****************************************************************************/
-void vout_SynchroTrash( vout_synchro_t * p_synchro )
+void decoder_SynchroTrash( decoder_synchro_t * p_synchro )
 {
     p_synchro->i_trashed_pic++;
     p_synchro->i_nb_ref = p_synchro->i_trash_nb_ref;
 }
 
 /*****************************************************************************
- * vout_SynchroDecode : Update timers when we decide to decode a picture
+ * decoder_SynchroDecode : Update timers when we decide to decode a picture
  *****************************************************************************/
-void vout_SynchroDecode( vout_synchro_t * p_synchro )
+void decoder_SynchroDecode( decoder_synchro_t * p_synchro )
 {
     p_synchro->decoding_start = mdate();
     p_synchro->i_nb_ref = p_synchro->i_dec_nb_ref;
 }
 
 /*****************************************************************************
- * vout_SynchroEnd : Called when the image is totally decoded
+ * decoder_SynchroEnd : Called when the image is totally decoded
  *****************************************************************************/
-void vout_SynchroEnd( vout_synchro_t * p_synchro, int i_coding_type,
+void decoder_SynchroEnd( decoder_synchro_t * p_synchro, int i_coding_type,
                       vlc_bool_t b_garbage )
 {
     mtime_t     tau;
@@ -384,18 +383,18 @@ void vout_SynchroEnd( vout_synchro_t * p_synchro, int i_coding_type,
 }
 
 /*****************************************************************************
- * vout_SynchroDate : When an image has been decoded, ask for its date
+ * decoder_SynchroDate : When an image has been decoded, ask for its date
  *****************************************************************************/
-mtime_t vout_SynchroDate( vout_synchro_t * p_synchro )
+mtime_t decoder_SynchroDate( decoder_synchro_t * p_synchro )
 {
     /* No need to lock, since PTS are only used by the video parser. */
     return p_synchro->current_pts;
 }
 
 /*****************************************************************************
- * vout_SynchroNewPicture: Update stream structure and PTS
+ * decoder_SynchroNewPicture: Update stream structure and PTS
  *****************************************************************************/
-void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
+void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type,
                              int i_repeat_field, mtime_t next_pts,
                              mtime_t next_dts, int i_current_rate,
                              vlc_bool_t b_low_delay )
@@ -501,7 +500,7 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
                   || p_synchro->current_pts - next_pts
                     > PTS_THRESHOLD) && !p_synchro->b_quiet )
             {
-                msg_Warn( p_synchro, "vout synchro warning: pts != "
+                msg_Warn( p_synchro, "decoder synchro warning: pts != "
                           "current_date ("I64Fd")",
                           p_synchro->current_pts
                               - next_pts );

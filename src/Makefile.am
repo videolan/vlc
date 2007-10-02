@@ -39,6 +39,7 @@ HEADERS_include = \
 	../include/vlc_block_helper.h \
 	../include/vlc_charset.h \
 	../include/vlc_codec.h \
+	../include/vlc_codec_synchro.h \
 	../include/vlc_codecs.h \
 	../include/vlc_common.h \
 	../include/vlc_config.h \
@@ -82,7 +83,6 @@ HEADERS_include = \
 	../include/vlc_vlm.h \
 	../include/vlc_vod.h \
 	../include/vlc_vout.h \
-	../include/vlc_vout_synchro.h \
 	../include/vlc_xml.h \
 	$(NULL)
 
@@ -223,6 +223,7 @@ SOURCES_libvlc_common = \
 	input/clock.c \
 	input/control.c \
 	input/decoder.c \
+	input/decoder_synchro.c \
 	input/demux.c \
 	input/es_out.c \
 	input/input.c \
@@ -239,7 +240,6 @@ SOURCES_libvlc_common = \
 	video_output/video_text.c \
 	video_output/video_widgets.c \
 	video_output/vout_subpictures.c \
-	video_output/vout_synchro.c \
 	video_output/vout_intf.c \
 	audio_output/aout_internal.h \
 	audio_output/common.c \

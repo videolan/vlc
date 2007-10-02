@@ -31,7 +31,7 @@
 
 #include <mpeg2dec/mpeg2.h>
 
-#include <vlc_vout_synchro.h>
+#include <vlc_codec_synchro.h>
 
 /* Aspect ratio (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
 #define AR_SQUARE_PICTURE       1                           /* square pixels */
@@ -71,7 +71,7 @@ struct decoder_sys_t
     /*
      * Output properties
      */
-    vout_synchro_t *p_synchro;
+    decoder_synchro_t *p_synchro;
     int            i_aspect;
     int            i_sar_num;
     int            i_sar_den;
@@ -228,7 +228,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->p_info->sequence &&
                 p_sys->p_info->sequence->width != (unsigned)-1 )
             {
-                vout_SynchroReset( p_sys->p_synchro );
+                decoder_SynchroReset( p_sys->p_synchro );
                 if( p_sys->p_info->current_fbuf != NULL
                     && p_sys->p_info->current_fbuf->id != NULL )
                 {
@@ -248,11 +248,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
                 if ( p_sys->b_slice_i )
                 {
-                    vout_SynchroNewPicture( p_sys->p_synchro,
+                    decoder_SynchroNewPicture( p_sys->p_synchro,
                         I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
                         p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
-                    vout_SynchroDecode( p_sys->p_synchro );
-                    vout_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
+                    decoder_SynchroDecode( p_sys->p_synchro );
+                    decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
                 }
             }
 
@@ -264,7 +264,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 p_sys->b_preroll = VLC_FALSE;
                 /* Reset synchro */
-                vout_SynchroReset( p_sys->p_synchro );
+                decoder_SynchroReset( p_sys->p_synchro );
             }
 
 #ifdef PIC_FLAG_PTS
@@ -333,9 +333,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( p_sys->p_synchro )
             {
-                vout_SynchroRelease( p_sys->p_synchro );
+                decoder_SynchroRelease( p_sys->p_synchro );
             }
-            p_sys->p_synchro = vout_SynchroInit( p_dec,
+            p_sys->p_synchro = decoder_SynchroInit( p_dec,
                 (uint32_t)((uint64_t)1001000000 * 27 /
                 p_sys->p_info->sequence->frame_period) );
             p_sys->b_after_sequence_header = 1;
@@ -358,11 +358,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 /* Intra-slice refresh. Simulate a blank I picture. */
                 msg_Dbg( p_dec, "intra-slice refresh stream" );
-                vout_SynchroNewPicture( p_sys->p_synchro,
+                decoder_SynchroNewPicture( p_sys->p_synchro,
                     I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
                     p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
-                vout_SynchroDecode( p_sys->p_synchro );
-                vout_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
+                decoder_SynchroDecode( p_sys->p_synchro );
+                decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
                 p_sys->b_slice_i = 1;
             }
             p_sys->b_after_sequence_header = 0;
@@ -401,11 +401,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* If nb_fields == 1, it is a field picture, and it will be
              * followed by another field picture for which we won't call
-             * vout_SynchroNewPicture() because this would have other
+             * decoder_SynchroNewPicture() because this would have other
              * problems, so we take it into account here.
              * This kind of sucks, but I didn't think better. --Meuuh
              */
-            vout_SynchroNewPicture( p_sys->p_synchro,
+            decoder_SynchroNewPicture( p_sys->p_synchro,
                 p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
                 p_sys->p_info->current_picture->nb_fields == 1 ? 2 :
                 p_sys->p_info->current_picture->nb_fields, i_pts, i_dts,
@@ -416,7 +416,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 !(p_sys->b_slice_i
                    && ((p_sys->p_info->current_picture->flags
                          & PIC_MASK_CODING_TYPE) == P_CODING_TYPE))
-                   && !vout_SynchroChoose( p_sys->p_synchro,
+                   && !decoder_SynchroChoose( p_sys->p_synchro,
                               p_sys->p_info->current_picture->flags
                                 & PIC_MASK_CODING_TYPE,
                               /*p_sys->p_vout->render_time*/ 0 /*FIXME*/,
@@ -424,14 +424,14 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 mpeg2_skip( p_sys->p_mpeg2dec, 1 );
                 p_sys->b_skip = 1;
-                vout_SynchroTrash( p_sys->p_synchro );
+                decoder_SynchroTrash( p_sys->p_synchro );
                 mpeg2_set_buf( p_sys->p_mpeg2dec, buf, NULL );
             }
             else
             {
                 mpeg2_skip( p_sys->p_mpeg2dec, 0 );
                 p_sys->b_skip = 0;
-                vout_SynchroDecode( p_sys->p_synchro );
+                decoder_SynchroDecode( p_sys->p_synchro );
 
                 if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
                 {
@@ -453,7 +453,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 p_pic = (picture_t *)p_sys->p_info->display_fbuf->id;
 
-                vout_SynchroEnd( p_sys->p_synchro,
+                decoder_SynchroEnd( p_sys->p_synchro,
                             p_sys->p_info->display_picture->flags
                              & PIC_MASK_CODING_TYPE,
                             p_sys->b_garbage_pic );
@@ -461,7 +461,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
                 if ( p_sys->p_picture_to_destroy != p_pic )
                 {
-                    p_pic->date = vout_SynchroDate( p_sys->p_synchro );
+                    p_pic->date = decoder_SynchroDate( p_sys->p_synchro );
                 }
                 else
                 {
@@ -502,7 +502,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                ( ( p_sys->p_info->current_picture->flags &
                    PIC_MASK_CODING_TYPE) != B_CODING_TYPE ) )
             {
-                if( p_sys->p_synchro ) vout_SynchroReset( p_sys->p_synchro );
+                if( p_sys->p_synchro ) decoder_SynchroReset( p_sys->p_synchro );
             }
             mpeg2_skip( p_sys->p_mpeg2dec, 1 );
             p_sys->b_skip = 1;
@@ -538,11 +538,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             if( p_sys->b_slice_i )
             {
-                vout_SynchroNewPicture( p_sys->p_synchro,
+                decoder_SynchroNewPicture( p_sys->p_synchro,
                         I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
                         p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
-                vout_SynchroDecode( p_sys->p_synchro );
-                vout_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
+                decoder_SynchroDecode( p_sys->p_synchro );
+                decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
             }
             break;
         }
@@ -564,7 +564,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->p_synchro ) vout_SynchroRelease( p_sys->p_synchro );
+    if( p_sys->p_synchro ) decoder_SynchroRelease( p_sys->p_synchro );
 
     if( p_sys->p_mpeg2dec ) mpeg2_close( p_sys->p_mpeg2dec );
 
