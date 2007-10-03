@@ -463,6 +463,9 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "meta-description", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
     var_Create( p_input, "meta-date", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_input, "meta-url", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+
+    var_Create( p_input, "meta-preparsed", VLC_VAR_BOOL );
+    var_SetBool( p_input, "meta-preparsed", VLC_FALSE );
 }
 
 /*****************************************************************************

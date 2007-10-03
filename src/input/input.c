@@ -196,6 +196,12 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     /* Create Object Variables for private use only */
     input_ConfigVarInit( p_input );
 
+    vlc_mutex_lock( &p_item->lock );
+    if( p_item->p_meta && (p_item->p_meta->i_status & ITEM_PREPARSED ) )
+        var_SetBool( p_input, "meta-preparsed", VLC_TRUE );
+    vlc_mutex_unlock( &p_item->lock );
+
+
     /* Create Objects variables for public Get and Set */
     input_ControlVarInit( p_input );
 
