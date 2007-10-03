@@ -369,6 +369,7 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     ADD( "add", STRING, Playlist )
     ADD( "repeat", STRING, Playlist )
     ADD( "loop", STRING, Playlist )
+    ADD( "random", STRING, Playlist )
     ADD( "enqueue", STRING, Playlist )
     ADD( "playlist", VOID, Playlist )
     ADD( "sort", VOID, Playlist )
@@ -847,8 +848,9 @@ static void Help( intf_thread_t *p_intf, vlc_bool_t b_longhelp)
     msg_rc(_("| prev . . . . . . . . . . . .  previous playlist item"));
     msg_rc(_("| goto . . . . . . . . . . . . . .  goto item at index"));
     msg_rc(_("| repeat [on|off] . . . .  toggle playlist item repeat"));
-    msg_rc(_("| loop [on|off] . . . . . .  toggle playlist item loop"));
-    msg_rc(_("| clear . . . . . . . . . . . . .   clear the playlist"));
+    msg_rc(_("| loop [on|off] . . . . . . . . . toggle playlist loop"));
+    msg_rc(_("| random [on|off] . . . . . . .  toggle random jumping"));
+    msg_rc(_("| clear . . . . . . . . . . . . . . clear the playlist"));
     msg_rc(_("| status . . . . . . . . . . . current playlist status"));
     msg_rc(_("| title [X]  . . . . . . set/get title in current item"));
     msg_rc(_("| title_n  . . . . . . . .  next title in current item"));
@@ -1340,6 +1342,28 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             var_Set( p_playlist, "loop", val );
         }
         msg_rc( "Setting loop to %d", val.b_bool );
+    }
+    else if( !strcmp( psz_cmd, "random" ) )
+    {
+        vlc_bool_t b_update = VLC_TRUE;
+
+        var_Get( p_playlist, "random", &val );
+
+        if( strlen( newval.psz_string ) > 0 )
+        {
+            if ( ( !strncmp( newval.psz_string, "on", 2 ) && ( val.b_bool == VLC_TRUE ) ) ||
+                 ( !strncmp( newval.psz_string, "off", 3 ) && ( val.b_bool == VLC_FALSE ) ) )
+            {
+                b_update = VLC_FALSE;
+            }
+        }
+
+        if ( b_update )
+        {
+            val.b_bool = !val.b_bool;
+            var_Set( p_playlist, "random", val );
+        }
+        msg_rc( "Setting random to %d", val.b_bool );
     }
     else if (!strcmp( psz_cmd, "goto" ) )
     {
