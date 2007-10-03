@@ -80,7 +80,7 @@ static int Open( vlc_object_t *p_this )
     intf_thread_t   *p_intf = (intf_thread_t *)p_this;
     playlist_t      *p_playlist;
     intf_sys_t      *p_sys  = malloc( sizeof( intf_sys_t ) );
- 
+
     if( !p_sys )
     {
         msg_Err( p_intf, "Out of memory" );
@@ -117,6 +117,9 @@ static void Close( vlc_object_t *p_this )
     playlist_t *p_playlist = pl_Yield( p_this );
     var_DelCallback( p_playlist, "playlist-current", ItemChange, p_this );
     pl_Release( p_this );
+
+    if( p_intf->p_sys->notification )
+        g_object_unref( p_intf->p_sys->notification );
 
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
@@ -266,7 +269,10 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
 
     /* Close previous notification if still active */
     if( p_intf->p_sys->notification )
+    {
         notify_notification_close( p_intf->p_sys->notification, &p_error );
+        g_object_unref( p_intf->p_sys->notification );
+    }
 
     notification = notify_notification_new( _("Now Playing"),
             psz_temp, NULL, NULL);
