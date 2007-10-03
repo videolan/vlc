@@ -119,6 +119,18 @@ static void DetectImage( FileRef f, demux_t *p_demux )
             ByteVector p_data_taglib; const char *p_data; int i_data;
 
             psz_mime = p_apic->mimeType().toCString(true);
+
+            /* some old iTunes version not only sets incorrectly the mime type
+             * but also embeds incorrectly the image.
+             * Recent versions seem to behave correctly */
+            if( !strncmp( psz_mime, "PNG", 3 ) )
+            {
+                msg_Warn( p_demux,
+                    "%s: Invalid picture embedded by broken iTunes version",
+                    f.file()->name() );
+                break;
+            }
+
             psz_description = p_apic->description().toCString(true);
             psz_name = psz_description;
 
