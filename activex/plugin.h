@@ -28,10 +28,10 @@
 
 #include <vlc/libvlc.h>
 
-extern const GUID CLSID_VLCPlugin;
-extern const GUID CLSID_VLCPlugin2;
-extern const GUID LIBID_AXVLC;
-extern const GUID DIID_DVLCEvents;
+extern "C" const GUID CLSID_VLCPlugin;
+extern "C" const GUID CLSID_VLCPlugin2;
+extern "C" const GUID LIBID_AXVLC;
+extern "C" const GUID DIID_DVLCEvents;
 
 class VLCPluginClass : public IClassFactory
 {
