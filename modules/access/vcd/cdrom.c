@@ -1157,10 +1157,8 @@ static int win32_vcd_open( vlc_object_t * p_this, const char *psz_dev,
         hASPI = LoadLibrary( "wnaspi32.dll" );
         if( hASPI != NULL )
         {
-            (FARPROC) lpGetSupport = GetProcAddress( hASPI,
-                                                     "GetASPI32SupportInfo" );
-            (FARPROC) lpSendCommand = GetProcAddress( hASPI,
-                                                      "SendASPI32Command" );
+            lpGetSupport = (void *)GetProcAddress( hASPI, "GetASPI32SupportInfo" );
+            lpSendCommand = (void *)GetProcAddress( hASPI, "SendASPI32Command" );
         }
 
         if( hASPI == NULL || lpGetSupport == NULL || lpSendCommand == NULL )
