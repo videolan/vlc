@@ -533,7 +533,7 @@ playlist_item_t *GetNextUncle( playlist_t *p_playlist, playlist_item_t *p_item,
     if( p_parent != NULL )
     {
         p_grandparent = p_parent->p_parent;
-        while( 1 )
+        while( p_grandparent )
         {
             int i;
             for( i = 0 ; i< p_grandparent->i_children ; i++ )
