@@ -110,6 +110,13 @@
 
 */
 
+/* This macro is used when we want to printf the box type
+ * APPLE annotation box is :
+ *  either 0xA9 + 24-bit ASCII text string (and 0xA9 isn't printable)
+ *  either 32-bit ASCII text string
+ */
+#define MP4_BOX_TYPE_ASCII() ( ((char*)&p_box->i_type)[0] != (char)0xA9 )
+
 static uint32_t Get24bBE( const uint8_t *p )
 {
     return( ( p[0] <<16 ) + ( p[1] <<8 ) + p[2] );
@@ -206,8 +213,12 @@ int MP4_ReadBoxCommon( stream_t *p_stream, MP4_Box_t *p_box )
 #ifdef MP4_VERBOSE
     if( p_box->i_size )
     {
-        msg_Dbg( p_stream, "found Box: %4.4s size "I64Fd,
-                 (char*)&p_box->i_type, p_box->i_size );
+        if MP4_BOX_TYPE_ASCII()
+            msg_Dbg( p_stream, "found Box: %4.4s size "I64Fd,
+                    (char*)&p_box->i_type, p_box->i_size );
+        else
+            msg_Dbg( p_stream, "found Box: c%3.3s size "I64Fd,
+                    (char*)&p_box->i_type+1, p_box->i_size );
     }
 #endif
 
@@ -338,7 +349,10 @@ static int MP4_ReadBoxSkip( stream_t *p_stream, MP4_Box_t *p_box )
 
     /* Nothing to do */
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "skip box: \"%4.4s\"", (char*)&p_box->i_type );
+    if MP4_BOX_TYPE_ASCII()
+        msg_Dbg( p_stream, "skip box: \"%4.4s\"", (char*)&p_box->i_type );
+    else
+        msg_Dbg( p_stream, "skip box: \"c%3.3s\"", (char*)&p_box->i_type+1 );
 #endif
     return 1;
 }
@@ -604,9 +618,9 @@ static int MP4_ReadBox_hdlr( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"hdlr\" handler type %4.4s name %s",
-                       (char*)&p_box->data.p_hdlr->i_handler_type,
-                       p_box->data.p_hdlr->psz_name );
+        msg_Dbg( p_stream, "read box: \"hdlr\" handler type %4.4s name %s",
+                   (char*)&p_box->data.p_hdlr->i_handler_type,
+                   p_box->data.p_hdlr->psz_name );
 
 #endif
     MP4_READBOX_EXIT( 1 );
@@ -1960,10 +1974,9 @@ static int MP4_ReadBox_rdrf( stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream,
-             "read box: \"rdrf\" type:%4.4s ref %s",
-             (char*)&p_box->data.p_rdrf->i_ref_type,
-             p_box->data.p_rdrf->psz_ref );
-
+            "read box: \"rdrf\" type:%4.4s ref %s",
+            (char*)&p_box->data.p_rdrf->i_ref_type,
+            p_box->data.p_rdrf->psz_ref );
 #endif
     MP4_READBOX_EXIT( 1 );
 }
@@ -2063,9 +2076,12 @@ static int MP4_ReadBox_drms( stream_t *p_stream, MP4_Box_t *p_box )
                 case -7: psz_error = "you live in France"; break;
                 default: psz_error = "unknown error"; break;
             }
-
-            msg_Err( p_stream, "drms_init(%4.4s) failed (%s)",
-                     (char *)&p_box->i_type, psz_error );
+            if MP4_BOX_TYPE_ASCII()
+                msg_Err( p_stream, "drms_init(%4.4s) failed (%s)",
+                        (char *)&p_box->i_type, psz_error );
+            else
+                msg_Err( p_stream, "drms_init(c%3.3s) failed (%s)",
+                        (char *)&p_box->i_type+1, psz_error );
 
             drms_free( p_drms_box->data.p_sample_soun->p_drms );
             p_drms_box->data.p_sample_soun->p_drms = NULL;
@@ -2302,9 +2318,14 @@ static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
     }
 
 unknown:
-    msg_Warn( p_stream,
-              "unknown box type %4.4s (uncompletetly loaded)",
-              (char*)&p_box->i_type );
+    if MP4_BOX_TYPE_ASCII()
+        msg_Warn( p_stream,
+                "unknown box type %4.4s (uncompletetly loaded)",
+                (char*)&p_box->i_type );
+    else
+        msg_Warn( p_stream,
+                "unknown box type c%3.3s (uncompletetly loaded)",
+                (char*)&p_box->i_type+1 );
 
     return 1;
 }
@@ -2586,9 +2607,14 @@ void MP4_BoxFree( stream_t *s, MP4_Box_t *p_box )
         if( MP4_Box_Function[i_index].MP4_FreeBox_function == NULL )
         {
             /* Should not happen */
-            msg_Warn( s,
-                      "cannot free box %4.4s, type unknown",
-                      (char*)&p_box->i_type );
+            if MP4_BOX_TYPE_ASCII()
+                msg_Warn( s,
+                        "cannot free box %4.4s, type unknown",
+                        (char*)&p_box->i_type );
+            else
+                msg_Warn( s,
+                        "cannot free box c%3.3s, type unknown",
+                        (char*)&p_box->i_type+1 );
         }
         else
         {
@@ -2670,8 +2696,12 @@ static void __MP4_BoxDumpStructure( stream_t *s,
 
     if( !i_level )
     {
-        msg_Dbg( s, "dumping root Box \"%4.4s\"",
-                          (char*)&p_box->i_type );
+        if MP4_BOX_TYPE_ASCII()
+            msg_Dbg( s, "dumping root Box \"%4.4s\"",
+                              (char*)&p_box->i_type );
+        else
+            msg_Dbg( s, "dumping root Box \"c%3.3s\"",
+                              (char*)&p_box->i_type+1 );
     }
     else
     {
@@ -2682,10 +2712,12 @@ static void __MP4_BoxDumpStructure( stream_t *s,
         {
             str[i*5] = '|';
         }
-        sprintf( str + i_level * 5, "+ %4.4s size %d",
-                      (char*)&p_box->i_type,
-                      (uint32_t)p_box->i_size );
-
+        if MP4_BOX_TYPE_ASCII()
+            sprintf( str + i_level * 5, "+ %4.4s size %d",
+                        (char*)&p_box->i_type, (uint32_t)p_box->i_size );
+        else
+            sprintf( str + i_level * 5, "+ c%3.3s size %d",
+                        (char*)&p_box->i_type+1, (uint32_t)p_box->i_size );
         msg_Dbg( s, "%s", str );
     }
     p_child = p_box->p_first;
