@@ -179,6 +179,7 @@ static void DetectImage( FileRef f, demux_t *p_demux )
         TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
         p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
                 psz_description, p_data, i_data );
+        free( p_data );
 
         TAB_APPEND_CAST( (input_attachment_t**),
                 p_demux_meta->i_attachments, p_demux_meta->attachments,
