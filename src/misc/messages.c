@@ -367,8 +367,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
 
     if( psz_str == NULL )
     {
-        fprintf( stderr, "main warning: can't store message (%s): ",
-                 strerror(errno) );
+        fputs( "main warning: no memory to store message): ", stderr );
         vlc_va_copy( args, _args );
         /* We should use utf8_vfprintf - but it calls malloc()... */
         vfprintf( stderr, psz_format, args );
