@@ -376,14 +376,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
          * will be stored in the buffer we provide to strerror_r() */
         strerror_r( errno, psz_err, 1001 );
 #else
-        int sockerr = WSAGetLastError( );
-        if( sockerr )
-        {
-            strncpy( psz_err, net_strerror( sockerr ), 1001 );
-            WSASetLastError( sockerr );
-        }
-        else
-            strncpy( psz_err, strerror( errno ), 1001 );
+        strncpy( psz_err, strerror( errno ), 1001 );
 #endif
         psz_err[1000] = '\0';
         fprintf( stderr, "main warning: can't store message (%s): ", psz_err );
