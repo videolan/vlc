@@ -582,11 +582,14 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 if( p_sys->pp_plist[p_sys->i_box_plidx]->p_item->i_children
                         == -1 )
                 {
-                    playlist_item_t *p_item =
+                    playlist_item_t *p_item, *p_parent;
+                    p_item = p_parent =
                             p_sys->pp_plist[p_sys->i_box_plidx]->p_item;
+
+                    while( p_parent->p_parent )
+                        p_parent = p_parent->p_parent;
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
-                                      VLC_TRUE, p_item->p_parent,
-                        p_sys->pp_plist[p_sys->i_box_plidx]->p_item );
+                                      VLC_TRUE, p_parent, p_item );
                 }
                 else
                 {
