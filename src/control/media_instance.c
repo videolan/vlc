@@ -340,10 +340,10 @@ void libvlc_media_instance_release( libvlc_media_instance_t *p_mi )
     vlc_mutex_unlock( &p_mi->object_lock );
     vlc_mutex_destroy( &p_mi->object_lock );
 
-    libvlc_event_manager_release( p_mi->p_event_manager );
- 
     release_input_thread( p_mi );
 
+    libvlc_event_manager_release( p_mi->p_event_manager );
+ 
     libvlc_media_descriptor_release( p_mi->p_md );
 
     free( p_mi );
