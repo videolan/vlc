@@ -273,8 +273,10 @@ int E_(OpenDemux)( vlc_object_t *p_this )
                     p_demux_meta->p_meta );
             vlc_meta_Delete( p_demux_meta->p_meta );
             module_Unneed( p_demux, p_meta );
-            TAB_CLEAN( p_demux_meta->i_attachments,
-                    p_demux_meta->attachments );
+            int i;
+            for( i = 0; i < p_demux_meta->i_attachments; i++ )
+                free( p_demux_meta->attachments[i] );
+            TAB_CLEAN( p_demux_meta->i_attachments, p_demux_meta->attachments );
         }
         vlc_object_release( p_input );
         free( p_demux->p_private );

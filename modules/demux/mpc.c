@@ -197,6 +197,9 @@ static int Open( vlc_object_t * p_this )
         demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
         p_sys->p_meta = p_demux_meta->p_meta;
         module_Unneed( p_demux, p_id3 );
+        int i;
+        for( i = 0; i < p_demux_meta->i_attachments; i++ )
+            free( p_demux_meta->attachments[i] );
         TAB_CLEAN( p_demux_meta->i_attachments, p_demux_meta->attachments );
     }
     free( p_demux->p_private );
