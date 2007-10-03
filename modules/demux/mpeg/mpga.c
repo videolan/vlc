@@ -255,19 +255,31 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_block_out = p_block_out;
 
     /* Parse possible id3 header */
-    p_demux->p_private = malloc( sizeof( demux_meta_t ) );
-    if( !p_demux->p_private )
-        return VLC_ENOMEM;
-    if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
+    input_thread_t *p_input = (input_thread_t *)
+            vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( p_input )
     {
-        demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
-        p_sys->meta = p_demux_meta->p_meta;
-        p_demux->p_private = NULL;
-        module_Unneed( p_demux, p_id3 );
-        p_sys->i_attachments = p_demux_meta->i_attachments;
-        p_sys->attachments = p_demux_meta->attachments;
+        if( !( input_GetItem( p_input )->p_meta->i_status & ITEM_PREPARSED ) )
+        {
+            p_demux->p_private = malloc( sizeof( demux_meta_t ) );
+            if( !p_demux->p_private )
+            {
+                vlc_object_release( p_input );
+                return VLC_ENOMEM;
+            }
+            if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
+            {
+                demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
+                p_sys->meta = p_demux_meta->p_meta;
+                p_demux->p_private = NULL;
+                module_Unneed( p_demux, p_id3 );
+                p_sys->i_attachments = p_demux_meta->i_attachments;
+                p_sys->attachments = p_demux_meta->attachments;
+            }
+            free( p_demux->p_private );
+        }
+        vlc_object_release( p_input );
     }
-    free( p_demux->p_private );
 
     /* */
     p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
