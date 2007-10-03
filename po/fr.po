@@ -10759,168 +10759,132 @@ msgid "+----[ Remote control commands ]"
 msgstr "+----[ Commandes de l’interface à distance ]"
 
 #: modules/control/rc.c:841
-#, fuzzy
 msgid "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
-msgstr "| add XYZ  . . . . . . . . . ajoute XYZ à la playlist"
+msgstr "| add XYZ  . . . .  ajoute XYZ à la playlist et le lit"
 
 #: modules/control/rc.c:842
-#, fuzzy
 msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
-msgstr "| add XYZ  . . . . . . . . . ajoute XYZ à la playlist"
+msgstr "| add XYZ  . . . . . . . . .  ajoute XYZ à la playlist"
 
 #: modules/control/rc.c:843
-#, fuzzy
 msgid "| playlist . . . . .  show items currently in playlist"
-msgstr "| playlist . . . . . . . . . . . .afficher les éléments de la playlist"
+msgstr "| playlist . . .  afficher les éléments de la playlist"
 
 #: modules/control/rc.c:844
-#, fuzzy
 msgid "| play . . . . . . . . . . . . . . . . . . play stream"
-msgstr "| play . . . . . . . . . . . . . jouer"
+msgstr "| play . . . . . . . . . . . . . . . . . . . . . jouer"
 
 #: modules/control/rc.c:845
-#, fuzzy
 msgid "| stop . . . . . . . . . . . . . . . . . . stop stream"
-msgstr "| stop . . . . . . . . . . . . . arrêter"
+msgstr "| stop . . . . . . . . . . . . . . . . . . . . arrêter"
 
 #: modules/control/rc.c:846
-#, fuzzy
 msgid "| next . . . . . . . . . . . . . .  next playlist item"
-msgstr "| next . . . . . . . . . . . . élément suivant"
+msgstr "| next . . . . . . . . . . . . . . . . élément suivant"
 
 #: modules/control/rc.c:847
-#, fuzzy
 msgid "| prev . . . . . . . . . . . .  previous playlist item"
-msgstr "| prev . . . . . . . . . . . . élément précédent"
+msgstr "| prev . . . . . . . . . . . . . . . élément précédent"
 
 #: modules/control/rc.c:848
-#, fuzzy
 msgid "| goto . . . . . . . . . . . . . .  goto item at index"
-msgstr "| goto . . . . . . . . . . . . . aller à l’élément X"
+msgstr "| goto . . . . . . . . . . . . . . aller à la position"
 
 #: modules/control/rc.c:849
-#, fuzzy
 msgid "| repeat [on|off] . . . .  toggle playlist item repeat"
-msgstr "| f [on|off]. . . . . . . . . basculer le mode plein-écran"
+msgstr "| repeat [on|off]. . . .  basculer le mode « répéter »"
 
 #: modules/control/rc.c:850
-#, fuzzy
 msgid "| loop [on|off] . . . . . .  toggle playlist item loop"
-msgstr "| f [on|off]. . . . . . . . . basculer le mode plein-écran"
+msgstr "| loop [on|off]. . . . .  basculer le mode « boucler »"
 
 #: modules/control/rc.c:851
-#, fuzzy
 msgid "| clear . . . . . . . . . . . . .   clear the playlist"
-msgstr "| clear . . . . . . . . . . . . .vider la liste de lecture"
+msgstr "| clear . . . . . . . . . .  vider la liste de lecture"
 
 #: modules/control/rc.c:852
-#, fuzzy
 msgid "| status . . . . . . . . . . . current playlist status"
-msgstr "| status . . . . . . . . . . . .afficher les informations"
+msgstr "| status . . . . . . . . . . afficher les informations"
 
 #: modules/control/rc.c:853
-#, fuzzy
 msgid "| title [X]  . . . . . . set/get title in current item"
-msgstr ""
-"| title [X] . . . . . . . . . .  afficher le titre courant ou sauter à un "
-"titre"
+msgstr "| title [X] . . . . afficher/modifier le titre courant"
 
 #: modules/control/rc.c:854
-#, fuzzy
 msgid "| title_n  . . . . . . . .  next title in current item"
-msgstr "| title_n  . . . . . . . . . . . .titre suivant dans l’item courant"
+msgstr "| title_n  . . . . . . . . . . . . . . . titre suivant"
 
 #: modules/control/rc.c:855
-#, fuzzy
 msgid "| title_p  . . . . . .  previous title in current item"
-msgstr "| title_p  . . . . . . . . . . . .titre précédent"
+msgstr "| title_p  . . . . . . . . . . . . . . titre précédent"
 
 #: modules/control/rc.c:856
-#, fuzzy
 msgid "| chapter [X]  . . . . set/get chapter in current item"
-msgstr "| chapter [X]  . . . . . .  modifier/afficher le chapitre"
+msgstr "| chapter [X]  . . . . . modifier/afficher le chapitre"
 
 #: modules/control/rc.c:857
-#, fuzzy
 msgid "| chapter_n  . . . . . .  next chapter in current item"
-msgstr "| chapter_n . . . . . . . . chapitre suivant"
+msgstr "| chapter_n . . . . . . . . . . . . . chapitre suivant"
 
 #: modules/control/rc.c:858
-#, fuzzy
 msgid "| chapter_p  . . . .  previous chapter in current item"
-msgstr "| chapter_p . . . . . . . . chapitre précédant"
+msgstr "| chapter_p . . . . . . . . . . . . chapitre précédent"
 
 #: modules/control/rc.c:860
-#, fuzzy
 msgid "| seek X . . . seek in seconds, for instance `seek 12'"
-msgstr ""
-"| seek X . . . . . . . . . . .se déplacer, en secondes, ex. « seek 12 »"
+msgstr "| seek X . . se déplacer, en secondes, ex. « seek 12 »"
 
 #: modules/control/rc.c:861
-#, fuzzy
 msgid "| pause  . . . . . . . . . . . . . . . .  toggle pause"
-msgstr "| pause  . . . . . . . . . . .basculer la pause"
+msgstr "| pause  . . . . . . . . . . . . . . basculer la pause"
 
 #: modules/control/rc.c:862
-#, fuzzy
 msgid "| fastforward  . . . . . . . .  .  set to maximum rate"
-msgstr "| fastforward  . . . . . .  avance rapide"
+msgstr "| fastforward  . . . . . . . . . . . . . avance rapide"
 
 #: modules/control/rc.c:863
-#, fuzzy
 msgid "| rewind  . . . . . . . . . . . .  set to minimum rate"
-msgstr "| rewind . . . . . . . . . .  rembobiner"
+msgstr "| rewind . . . . . . . . . . . . . . . . .  rembobiner"
 
 #: modules/control/rc.c:864
-#, fuzzy
 msgid "| faster . . . . . . . . . .  faster playing of stream"
-msgstr "| play . . . . . . . . . . . .  jouer plus vite"
+msgstr "| play . . . . . . . . . . . . . . . . jouer plus vite"
 
 #: modules/control/rc.c:865
-#, fuzzy
 msgid "| slower . . . . . . . . . .  slower playing of stream"
-msgstr "| slower . . . . . . . . . . .  jouer plus lentement"
+msgstr "| slower . . . . . . . . . . . .  jouer plus lentement"
 
 #: modules/control/rc.c:866
-#, fuzzy
 msgid "| normal . . . . . . . . . .  normal playing of stream"
-msgstr "| normal . . . . . . . . . . .  jouer à vitesse normale"
+msgstr "| normal . . . . . . . . . . . jouer à vitesse normale"
 
 #: modules/control/rc.c:867
-#, fuzzy
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
-msgstr "| f [on|off]. . . . . . . . . basculer le mode plein-écran"
+msgstr "| f [on|off]. . . . . . . basculer le mode plein-écran"
 
 #: modules/control/rc.c:868
-#, fuzzy
 msgid "| info . . . . .  information about the current stream"
-msgstr "| info . . . . . . . . . . . . . informations sur le flux courant"
+msgstr "| info . . . . . . .  informations sur le flux courant"
 
 #: modules/control/rc.c:869
 msgid "| get_time . . seconds elapsed since stream's beginning"
-msgstr ""
+msgstr "| get_time . . . temps parcouru depuis le début du flux"
 
 #: modules/control/rc.c:870
-#, fuzzy
 msgid "| is_playing . . . .  1 if a stream plays, 0 otherwise"
-msgstr "| is_playing . .  1 si un élément est joué, 0 sinon"
+msgstr "| is_playing . . . . 1 si un élément est joué, 0 sinon"
 
 #: modules/control/rc.c:871
-#, fuzzy
 msgid "| get_title . . . . .  the title of the current stream"
-msgstr ""
-"| title [X] . . . . . . . . . .  afficher le titre courant ou sauter à un "
-"titre"
+msgstr "| get_title . . . .  afficher le titre du flux courant"
 
 #: modules/control/rc.c:872
-#, fuzzy
 msgid "| get_length . . . .  the length of the current stream"
-msgstr "| info . . . . . . . . . . . . . informations sur le flux courant"
+msgstr "| get_length . . . . . . . la longueur du flux courant"
 
 #: modules/control/rc.c:874
-#, fuzzy
 msgid "| volume [X] . . . . . . . . . .  set/get audio volume"
-msgstr "| volume [X] . . . . . . . .modifier/afficher le volume"
+msgstr "| volume [X] . . . . . . . modifier/afficher le volume"
 
 #: modules/control/rc.c:875
 #, fuzzy
