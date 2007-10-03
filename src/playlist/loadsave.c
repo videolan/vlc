@@ -22,6 +22,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc_playlist.h>
+#include <vlc_events.h>
 #include "playlist_internal.h"
 #include "modules/configuration.h"
 #include <vlc_charset.h>
@@ -87,6 +88,18 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * A subitem has been added to the Media Library (Event Callback)
+ *****************************************************************************/
+static void input_item_subitem_added( const vlc_event_t * p_event,
+                                      void * user_data )
+{
+    playlist_t *p_playlist = user_data;
+    input_item_t *p_item = p_event->u.input_item_subitem_added.p_new_child;
+    playlist_AddInput( p_playlist, p_item, PLAYLIST_APPEND, PLAYLIST_END,
+            VLC_FALSE, VLC_FALSE );
+}
+
 int playlist_MLLoad( playlist_t *p_playlist )
 {
     const char *psz_datadir = p_playlist->p_libvlc->psz_datadir;
@@ -127,15 +140,20 @@ int playlist_MLLoad( playlist_t *p_playlist )
     if( p_input == NULL )
         goto error;
 
-    /* FIXME [21574] pdherbemont do we need *install_input_item_observer ? */
-    playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, 0, VLC_FALSE,
-                        VLC_FALSE );
+    p_playlist->p_ml_onelevel->p_input =
+    p_playlist->p_ml_category->p_input = p_input;
+
+    vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
+                        input_item_subitem_added, p_playlist );
 
     p_playlist->b_doing_ml = VLC_TRUE;
     stats_TimerStart( p_playlist, "ML Load", STATS_TIMER_ML_LOAD );
     input_Read( p_playlist, p_input, VLC_TRUE );
     stats_TimerStop( p_playlist,STATS_TIMER_ML_LOAD );
     p_playlist->b_doing_ml = VLC_FALSE;
+
+    vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemAdded,
+                        input_item_subitem_added, p_playlist );
 
     free( psz_uri );
     return VLC_SUCCESS;
