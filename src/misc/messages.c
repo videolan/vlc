@@ -367,7 +367,27 @@ static void QueueMsg( vlc_object_t *p_this, int i_queue, int i_type,
 
     if( psz_str == NULL )
     {
-        fputs( "main warning: no memory to store message): ", stderr );
+#ifdef __GLIBC__
+        fprintf( stderr, "main warning: can't store message (%m): " );
+#else
+        char *psz_err[1001];
+#ifndef WIN32
+        /* we're not using GLIBC, so we are sure that the error description
+         * will be stored in the buffer we provide to strerror_r() */
+        strerror_r( errno, psz_err, 1001 );
+#else
+        int sockerr = WSAGetLastError( );
+        if( sockerr )
+        {
+            strncpy( psz_err, net_strerror( sockerr ), 1001 );
+            WSASetLastError( sockerr );
+        }
+        else
+            strncpy( psz_err, strerror( errno ), 1001 );
+#endif
+        psz_err[1000] = '\0';
+        fprintf( stderr, "main warning: can't store message (%s): ", psz_err );
+#endif
         vlc_va_copy( args, _args );
         /* We should use utf8_vfprintf - but it calls malloc()... */
         vfprintf( stderr, psz_format, args );
