@@ -78,12 +78,6 @@
 #define ADD_INT32( i ) DBUS_ADD( DBUS_TYPE_INT32, i )
 #define ADD_BYTE( b ) DBUS_ADD( DBUS_TYPE_BYTE, b )
 
-/* VLC related */
-/* Don't forget to test p_tested_item for NULL on loops */
-#define TEST_NEXT_ITEM \
-    p_tested_item = playlist_GetNextLeaf( p_playlist, \
-            p_playlist->p_root_onelevel, p_tested_item, VLC_FALSE, VLC_FALSE );
-
 /* XML data to answer org.freedesktop.DBus.Introspectable.Introspect requests */
 
 const char* psz_introspection_xml_data_root =

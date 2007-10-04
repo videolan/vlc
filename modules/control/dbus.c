@@ -357,10 +357,9 @@ DBUS_METHOD( GetMetadata )
     DBusError error;
     dbus_error_init( &error );
 
-    dbus_int32_t i_position, i_count = 0;
+    dbus_int32_t i_position;
 
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-    playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
 
     dbus_message_get_args( p_from, &error,
            DBUS_TYPE_INT32, &i_position,
@@ -374,14 +373,10 @@ DBUS_METHOD( GetMetadata )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    while ( p_tested_item && ( i_count < i_position ) )
+    if( i_position <= p_playlist->items.i_size / 2 )
     {
-        i_count++;
-        TEST_NEXT_ITEM;
+        GetInputMeta( p_playlist->items.p_elems[i_position*2-1]->p_input, &args );
     }
-
-    if( p_tested_item )
-        GetInputMeta ( p_tested_item->p_input, &args );
 
     pl_Release( p_playlist );
     REPLY_SEND;
@@ -392,19 +387,8 @@ DBUS_METHOD( GetLength )
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    dbus_int32_t i_elements = 0;
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-    playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
-    playlist_item_t* p_last_item = playlist_GetLastLeaf( p_playlist,
-                    p_playlist->p_root_onelevel );
-
-    while ( p_tested_item &&
-               ( p_tested_item->p_input->i_id != p_last_item->p_input->i_id ) )
-    {
-        i_elements++;
-        TEST_NEXT_ITEM;
-    }
-
+    dbus_int32_t i_elements = p_playlist->items.i_size / 2;
     pl_Release( p_playlist );
 
     ADD_INT32( &i_elements );
@@ -418,9 +402,8 @@ DBUS_METHOD( DelTrack )
     DBusError error;
     dbus_error_init( &error );
 
-    dbus_int32_t i_position, i_count = 0;
+    dbus_int32_t i_position;
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-    playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
 
     dbus_message_get_args( p_from, &error,
             DBUS_TYPE_INT32, &i_position,
@@ -434,19 +417,11 @@ DBUS_METHOD( DelTrack )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    while ( p_tested_item && ( i_count < i_position ) )
+    if( i_position >= p_playlist->items.i_size / 2 )
     {
-        i_count++;
-        TEST_NEXT_ITEM;
-    }
-
-    if( p_tested_item )
-    {
-        PL_LOCK;
         playlist_DeleteFromInput( p_playlist,
-            p_tested_item->p_input->i_id,
-            VLC_TRUE );
-        PL_UNLOCK;
+            p_playlist->items.p_elems[i_position*2-1]->i_id,
+            VLC_FALSE );
     }
 
     pl_Release( p_playlist );
