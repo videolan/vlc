@@ -61,7 +61,7 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
 {
     struct id3_tag   *p_id3_tag;
     struct id3_frame *p_frame;
-    demux_meta_t     *p_demux_meta = p_demux->p_private;
+    demux_meta_t     *p_demux_meta = (demux_meta_t*)p_demux->p_private;
     vlc_meta_t       *p_meta;
     int i;
 
