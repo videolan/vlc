@@ -66,12 +66,12 @@ static block_t *EncoderEncode( encoder_t *, aout_buffer_t * );
 
 struct decoder_sys_t
 {
-    int16_t *p_logtos16;  /* used with m/alaw to int16_t */
+    const int16_t *p_logtos16;  /* used with m/alaw to int16_t */
 
     audio_date_t end_date;
 };
 
-static int pi_channels_maps[] =
+static const int pi_channels_maps[] =
 {
     0,
     AOUT_CHAN_CENTER,
@@ -91,7 +91,7 @@ static int pi_channels_maps[] =
      | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE
 };
 
-static int16_t ulawtos16[256] =
+static const int16_t ulawtos16[256] =
 {
     -32124, -31100, -30076, -29052, -28028, -27004, -25980, -24956,
     -23932, -22908, -21884, -20860, -19836, -18812, -17788, -16764,
@@ -127,7 +127,7 @@ static int16_t ulawtos16[256] =
         56,     48,     40,     32,     24,     16,      8,      0
 };
 
-static int16_t alawtos16[256] =
+static const int16_t alawtos16[256] =
 {
      -5504,  -5248,  -6016,  -5760,  -4480,  -4224,  -4992,  -4736,
      -7552,  -7296,  -8064,  -7808,  -6528,  -6272,  -7040,  -6784,

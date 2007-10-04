@@ -77,7 +77,7 @@ static void DecodeAdpcmDk4   ( decoder_t *, int16_t *, uint8_t * );
 static void DecodeAdpcmDk3   ( decoder_t *, int16_t *, uint8_t * );
 static void DecodeAdpcmEA    ( decoder_t *, int16_t *, uint8_t * );
 
-static int pi_channels_maps[6] =
+static const int pi_channels_maps[6] =
 {
     0,
     AOUT_CHAN_CENTER,
@@ -89,13 +89,13 @@ static int pi_channels_maps[6] =
 };
 
 /* Various table from http://www.pcisys.net/~melanson/codecs/adpcm.txt */
-static int i_index_table[16] =
+static const int i_index_table[16] =
 {
     -1, -1, -1, -1, 2, 4, 6, 8,
     -1, -1, -1, -1, 2, 4, 6, 8
 };
 
-static int i_step_table[89] =
+static const int i_step_table[89] =
 {
     7, 8, 9, 10, 11, 12, 13, 14, 16, 17,
     19, 21, 23, 25, 28, 31, 34, 37, 41, 45,
@@ -108,18 +108,18 @@ static int i_step_table[89] =
     15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767
 };
 
-static int i_adaptation_table[16] =
+static const int i_adaptation_table[16] =
 {
     230, 230, 230, 230, 307, 409, 512, 614,
     768, 614, 512, 409, 307, 230, 230, 230
 };
 
-static int i_adaptation_coeff1[7] =
+static const int i_adaptation_coeff1[7] =
 {
     256, 512, 0, 192, 240, 460, 392
 };
 
-static int i_adaptation_coeff2[7] =
+static const int i_adaptation_coeff2[7] =
 {
     0, -256, 0, 64, 0, -208, -232
 };
