@@ -490,7 +490,6 @@ static void FontBuilder( vlc_object_t *p_this)
     if( t1 > 0 && t2 > 0 )
         msg_Dbg( p_filter, "Took %ld seconds", t2 - t1 );
 
-    FcConfigSetCurrent( p_sys->p_fontconfig );
     p_sys->b_fontconfig_ok = VLC_TRUE;
 
     vlc_mutex_unlock( &p_sys->fontconfig_lock );
