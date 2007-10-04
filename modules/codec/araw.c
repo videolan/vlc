@@ -1442,6 +1442,11 @@ static int EncoderOpen( vlc_object_t *p_this )
         p_sys->i_s16tolog = ULAW;
     }
 
+    p_enc->fmt_out.i_bitrate =
+        p_enc->fmt_in.audio.i_channels *
+        p_enc->fmt_in.audio.i_rate *
+        p_enc->fmt_in.audio.i_bitspersample;
+
     msg_Dbg( p_enc, "samplerate:%dHz channels:%d bits/sample:%d",
              p_enc->fmt_out.audio.i_rate, p_enc->fmt_out.audio.i_channels,
              p_enc->fmt_out.audio.i_bitspersample );
