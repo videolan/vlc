@@ -258,7 +258,7 @@ vlc_module_begin();
                 AENC_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "acodec", NULL, NULL, ACODEC_TEXT,
                 ACODEC_LONGTEXT, VLC_FALSE );
-    add_integer( SOUT_CFG_PREFIX "ab", 64000, NULL, AB_TEXT,
+    add_integer( SOUT_CFG_PREFIX "ab", 0, NULL, AB_TEXT,
                  AB_LONGTEXT, VLC_FALSE );
     add_integer( SOUT_CFG_PREFIX "channels", 0, NULL, ACHANS_TEXT,
                  ACHANS_LONGTEXT, VLC_FALSE );
