@@ -271,7 +271,6 @@ static int Open( vlc_object_t * p_this )
         }
         free( p_demux->p_private );
     }
-    else printf("SKIP\n");
     /* */
     p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
     vlc_audio_replay_gain_MergeFromMeta( &p_sys->p_packetizer->fmt_out.audio_replay_gain,
