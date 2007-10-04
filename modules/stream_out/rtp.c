@@ -287,6 +287,7 @@ struct sout_stream_id_t
     int          i_clock_rate;
     int          i_port;
     int          i_cat;
+    int          i_channels;
     int          i_bitrate;
 
     /* Packetizer specific fields */
@@ -853,11 +854,17 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     id->psz_rtpmap = NULL;
     id->psz_fmtp   = NULL;
-    id->i_clock_rate = 90000; /* most common case */
+    id->i_clock_rate = 90000; /* most common case for video */
+    id->i_channels = 0;
     id->i_port     = i_port;
     if( p_fmt != NULL )
     {
         id->i_cat  = p_fmt->i_cat;
+        if( p_fmt->i_cat == AUDIO_ES )
+        {
+            id->i_clock_rate = p_fmt->audio.i_rate;
+            id->i_channels = p_fmt->audio.i_channels;
+        }
         id->i_bitrate = p_fmt->i_bitrate/1000; /* Stream bitrate in kbps */
     }
     else
@@ -935,21 +942,17 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
             if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 8000 )
                 id->i_payload_type = 0;
-            id->i_clock_rate = p_fmt->audio.i_rate;
             if( asprintf( &id->psz_rtpmap, "PCMU/%d/%d", p_fmt->audio.i_rate,
                           p_fmt->audio.i_channels ) == -1 )
                 id->psz_rtpmap = NULL;
-            id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_l8;
             break;
         case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
             if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 8000 )
                 id->i_payload_type = 8;
-            id->i_clock_rate = p_fmt->audio.i_rate;
             if( asprintf( &id->psz_rtpmap, "PCMA/%d/%d", p_fmt->audio.i_rate,
                           p_fmt->audio.i_channels ) == -1 )
                 id->psz_rtpmap = NULL;
-            id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_l8;
             break;
         case VLC_FOURCC( 's', '1', '6', 'b' ):
@@ -965,14 +968,12 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             if( asprintf( &id->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate,
                           p_fmt->audio.i_channels ) == -1 )
                 id->psz_rtpmap = NULL;
-            id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_l16;
             break;
         case VLC_FOURCC( 'u', '8', ' ', ' ' ):
             if( asprintf( &id->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate,
                           p_fmt->audio.i_channels ) == -1 )
                 id->psz_rtpmap = NULL;
-            id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_l8;
             break;
         case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
@@ -1069,8 +1070,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
         case VLC_FOURCC( 'm', 'p', '4', 'a' ):
         {
-            id->i_clock_rate = p_fmt->audio.i_rate;
-
             if(!p_sys->b_latm)
             {
                 char hexa[2*p_fmt->i_extra +1];
@@ -1123,14 +1122,12 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
                                      "AMR/8000/2" : "AMR/8000" );
             id->psz_fmtp = strdup( "octet-align=1" );
-            id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_amr;
             break;
         case VLC_FOURCC( 's', 'a', 'w', 'b' ):
             id->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
                                      "AMR-WB/16000/2" : "AMR-WB/16000" );
             id->psz_fmtp = strdup( "octet-align=1" );
-            id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_amr;
             break;
         case VLC_FOURCC( 's', 'p', 'x', ' ' ):
@@ -1138,7 +1135,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             if( asprintf( &id->psz_rtpmap, "SPEEX/%d",
                           p_fmt->audio.i_rate ) == -1)
                 id->psz_rtpmap = NULL;
-            id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_spx;
             break;
         case VLC_FOURCC( 't', '1', '4', '0' ):
