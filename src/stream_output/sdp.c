@@ -86,6 +86,7 @@ static vlc_bool_t IsSDPString (const char *str)
 }
 
 
+static
 char *sdp_Start (const char *name, const char *description, const char *url,
                  const char *email, const char *phone,
                  const struct sockaddr *src, size_t srclen,
