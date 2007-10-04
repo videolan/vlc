@@ -27,7 +27,8 @@
 
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
-#include "vlc_codec.h"
+#include <vlc_codec.h>
+#include <vlc_meta.h>
 
 /*****************************************************************************
  * Module descriptor
