@@ -932,6 +932,26 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     else
     switch( p_fmt->i_codec )
     {
+        case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
+            if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 8000 )
+                id->i_payload_type = 0;
+            id->i_clock_rate = p_fmt->audio.i_rate;
+            if( asprintf( &id->psz_rtpmap, "PCMU/%d/%d", p_fmt->audio.i_rate,
+                          p_fmt->audio.i_channels ) == -1 )
+                id->psz_rtpmap = NULL;
+            id->i_clock_rate = p_fmt->audio.i_rate;
+            id->pf_packetize = rtp_packetize_l8;
+            break;
+        case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
+            if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 8000 )
+                id->i_payload_type = 8;
+            id->i_clock_rate = p_fmt->audio.i_rate;
+            if( asprintf( &id->psz_rtpmap, "PCMA/%d/%d", p_fmt->audio.i_rate,
+                          p_fmt->audio.i_channels ) == -1 )
+                id->psz_rtpmap = NULL;
+            id->i_clock_rate = p_fmt->audio.i_rate;
+            id->pf_packetize = rtp_packetize_l8;
+            break;
         case VLC_FOURCC( 's', '1', '6', 'b' ):
             if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 44100 )
             {
