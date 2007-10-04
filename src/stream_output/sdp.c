@@ -205,7 +205,8 @@ char *sdp_AddAttribute (char **sdp, const char *name, const char *fmt, ...)
 char *sdp_AddMedia (char **sdp,
                     const char *type, const char *protocol, int dport,
                     unsigned pt, vlc_bool_t bw_indep, unsigned bw,
-                    const char *rtpmap, const char *fmtp)
+                    const char *ptname, unsigned clock, unsigned chans,
+                    const char *fmtp)
 {
     char *newsdp, *ptr;
     size_t inlen = strlen (*sdp), outlen = inlen;
@@ -237,8 +238,14 @@ char *sdp_AddMedia (char **sdp,
     ptr += sprintf (ptr, "b=RR:0\r\n");
 
     /* RTP payload type map */
-    if (rtpmap != NULL)
-        sdp_AddAttribute (sdp, "rtpmap", "%u %s", pt, rtpmap);
+    if (ptname != NULL)
+    {
+        if ((strcmp (type, "audio") == 0) && (chans != 1))
+            sdp_AddAttribute (sdp, "rtpmap", "%u %s/%u/%u", pt, ptname, clock,
+                              chans);
+        else
+            sdp_AddAttribute (sdp, "rtpmap", "%u %s/%u", pt, ptname, clock);
+    }
     /* Format parameters */
     if (fmtp != NULL)
         sdp_AddAttribute (sdp, "fmtp", "%u %s", pt, fmtp);
