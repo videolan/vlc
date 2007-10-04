@@ -26,8 +26,9 @@
  * Preamble
  *****************************************************************************/
 #include <vlc/vlc.h>
-#include <vlc_input.h>
 #include <vlc_demux.h>
+#include <vlc_meta.h>
+#include <vlc_input.h>
 
 #include <ogg/ogg.h>
 
@@ -103,6 +104,9 @@ struct demux_sys_t
 
     /* bitrate */
     int     i_bitrate;
+
+    /* meta data */
+    vlc_meta_t *meta;
 
     /* attachments */
     int                i_attachments;
@@ -183,7 +187,6 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *, logical_stream_t *, ogg_packe
 static int Open( vlc_object_t * p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    input_thread_t *p_input;
     demux_sys_t    *p_sys;
     const uint8_t  *p_peek;
 
@@ -207,32 +210,21 @@ static int Open( vlc_object_t * p_this )
     /* Begnning of stream, tell the demux to look for elementary streams. */
     p_sys->i_eos = 0;
 
-
-    p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( p_input )
+    if( !var_CreateGetBool( p_demux, "meta-preparsed" ) )
     {
-        if( !( input_GetItem( p_input )->p_meta->i_status & ITEM_PREPARSED ) )
+        p_demux->p_private = malloc( sizeof( demux_meta_t ) );
+        if( !p_demux->p_private )
+            return VLC_ENOMEM;
+        module_t *p_meta = module_Need( p_demux, "meta reader", NULL, 0 );
+        if( p_meta )
         {
-            p_demux->p_private = malloc( sizeof( demux_meta_t ) );
-            if( !p_demux->p_private )
-            {
-                vlc_object_release( p_input );
-                return VLC_ENOMEM;
-            }
-            module_t *p_meta = module_Need( p_demux, "meta reader", NULL, 0 );
-            if( p_meta )
-            {
-                demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
-                vlc_meta_Merge( input_GetItem(p_input)->p_meta,
-                        p_demux_meta->p_meta );
-                vlc_meta_Delete( p_demux_meta->p_meta );
-                module_Unneed( p_demux, p_meta );
-                p_sys->i_attachments = p_demux_meta->i_attachments;
-                p_sys->attachments = p_demux_meta->attachments;
-            }
-            free( p_demux->p_private );
+            module_Unneed( p_demux, p_meta );
+            demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
+            p_sys->meta = p_demux_meta->p_meta;
+            p_sys->i_attachments = p_demux_meta->i_attachments;
+            p_sys->attachments = p_demux_meta->attachments;
         }
-        vlc_object_release( p_input );
+        free( p_demux->p_private );
     }
 
     /* Initialize the Ogg physical bitstream parser */
@@ -253,6 +245,9 @@ static void Close( vlc_object_t *p_this )
     ogg_sync_clear( &p_sys->oy );
 
     Ogg_EndOfStream( p_demux );
+
+    var_Destroy( p_demux, "meta-preparsed" );
+    if( p_sys->meta ) vlc_meta_Delete( p_sys->meta );
 
     int i;
     for( i = 0; i < p_sys->i_attachments; i++ )
@@ -406,9 +401,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     int i;
     input_attachment_t ***ppp_attach;
     int *pi_int;
+    vlc_meta_t *p_meta;
 
     switch( i_query )
     {
+        case DEMUX_GET_META:
+            p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
+            vlc_meta_Merge( p_meta, p_sys->meta );
+            return VLC_SUCCESS;
+
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = p_sys->i_pcr;

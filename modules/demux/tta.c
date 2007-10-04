@@ -139,39 +139,6 @@ static int Open( vlc_object_t * p_this )
     free( p_seektable );
     p_sys->i_start = stream_Tell( p_demux->s );
 
-#if 0
-    /* Parse possible id3 header */
-    input_thread_t *p_input = (input_thread_t *)
-            vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( p_input )
-    {
-        if( !( input_GetItem( p_input )->p_meta->i_status & ITEM_PREPARSED ) )
-        {
-            p_demux->p_private = malloc( sizeof( demux_meta_t ) );
-            if( !p_demux->p_private )
-            {
-                vlc_object_release( p_input );
-                return VLC_ENOMEM;
-            }
-            if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
-            {
-                demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
-                p_sys->p_meta = p_demux_meta->p_meta;
-                p_demux->p_private = NULL;
-                module_Unneed( p_demux, p_id3 );
-                int i;
-                for( i = 0; i < p_demux_meta->i_attachments; i++ )
-                    free( p_demux_meta->attachments[i] );
-                TAB_CLEAN( p_demux_meta->i_attachments,
-                            p_demux_meta->attachments );
-            }
-            free( p_demux->p_private );
-        }
-        vlc_object_release( p_input );
-    }
-    if( !p_sys->p_meta )
-        p_sys->p_meta = vlc_meta_New();
-#endif
     return VLC_SUCCESS;
 }
 
@@ -252,7 +219,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
- 
+
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = I64C(1000000) * p_sys->i_totalframes * TTA_FRAMETIME;
@@ -262,7 +229,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = I64C(1000000) * p_sys->i_currentframe * TTA_FRAMETIME;
             return VLC_SUCCESS;
- 
+
         default:
             return VLC_EGENERIC;
     }
