@@ -40,14 +40,9 @@
 
 
 /* #ifdef variables below are defined via config.h via #include vlc above. */
-#ifdef HAVE_STDLIB_H
-#endif
 
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
-#endif
-
-#ifdef HAVE_STRING_H
 #endif
 
 #ifdef HAVE_UNISTD_H
