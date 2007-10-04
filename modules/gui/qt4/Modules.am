@@ -183,7 +183,6 @@ EXTRA_DIST += \
 	ui/streampanel.ui \
 	ui/sout.ui \
 	ui/vlm.ui \
-	pixmaps/codec.xpm \
 	pixmaps/type_net.xpm \
 	pixmaps/type_playlist.xpm \
 	pixmaps/type_unknown.xpm \
