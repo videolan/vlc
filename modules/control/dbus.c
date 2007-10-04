@@ -104,6 +104,7 @@ DBUS_METHOD( PositionGet )
     dbus_int32_t i_pos;
 
     playlist_t *p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
+    PL_LOCK;
     input_thread_t *p_input = p_playlist->p_input;
 
     if( !p_input )
@@ -113,6 +114,7 @@ DBUS_METHOD( PositionGet )
         var_Get( p_input, "time", &position );
         i_pos = position.i_time / 1000;
     }
+    PL_UNLOCK;
     pl_Release( ((vlc_object_t*) p_this) );
     ADD_INT32( &i_pos );
     REPLY_SEND;
@@ -141,6 +143,7 @@ DBUS_METHOD( PositionSet )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
     p_playlist = pl_Yield( ((vlc_object_t*) p_this) );
+    PL_LOCK;
     input_thread_t *p_input = p_playlist->p_input;
 
     if( p_input )
@@ -148,6 +151,7 @@ DBUS_METHOD( PositionSet )
         position.i_time = i_pos * 1000;
         var_Set( p_input, "time", position );
     }
+    PL_UNLOCK;
     pl_Release( ((vlc_object_t*) p_this) );
     REPLY_SEND;
 }
@@ -229,6 +233,7 @@ DBUS_METHOD( GetStatus )
     vlc_value_t val;
 
     playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    PL_LOCK;
     input_thread_t *p_input = p_playlist->p_input;
 
     i_status = 2;
@@ -241,6 +246,7 @@ DBUS_METHOD( GetStatus )
             i_status = 0;
     }
 
+    PL_UNLOCK;
     pl_Release( p_playlist );
 
     ADD_INT32( &i_status );
@@ -270,10 +276,10 @@ DBUS_METHOD( GetCurrentMetadata )
     REPLY_INIT;
     OUT_ARGUMENTS;
     playlist_t* p_playlist = pl_Yield( (vlc_object_t*) p_this );
-
+    PL_LOCK;
     if( p_playlist->status.p_item )
         GetInputMeta( p_playlist->status.p_item->p_input, &args );
-
+    PL_UNLOCK;
     pl_Release( p_playlist );
     REPLY_SEND;
 }
@@ -330,20 +336,9 @@ DBUS_METHOD( GetCurrentTrack )
 {
     REPLY_INIT;
     OUT_ARGUMENTS;
-    /* FIXME 0 indicates the first item,
-     * what to do if we're stopped, or empty ? */
-    dbus_int32_t i_position = 0;
-    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
-    playlist_item_t* p_tested_item = p_playlist->p_root_onelevel;
 
-    if( p_playlist->status.p_item )
-        while ( p_tested_item && p_tested_item->p_input->i_id !=
-                p_playlist->status.p_item->p_input->i_id )
-        {
-            i_position++;
-            TEST_NEXT_ITEM;
-        }
-    /* FIXME if p_tested_item is NULL at that point, what do we do ? */
+    playlist_t *p_playlist = pl_Yield( (vlc_object_t*) p_this );
+    dbus_int32_t i_position = p_playlist->i_current_index;
     pl_Release( p_playlist );
 
     ADD_INT32( &i_position );
