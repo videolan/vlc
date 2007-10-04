@@ -485,8 +485,6 @@ static int ParseTags( vlc_object_t *p_this )
     vlc_bool_t b_seekable;
     int64_t i_init;
 
-    p_demux->p_private = NULL;
-
     msg_Dbg( p_demux, "checking for ID3v1/2 and APEv1/2 tags" );
 
     stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
