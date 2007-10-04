@@ -18,6 +18,7 @@
 !define MUI_LANGDLL_REGISTRY_VALUENAME "Language"
 
 @FILE_LIBVLC_DLL@
+@FILE_LIBVLC_CONTROL_DLL@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; General configuration ;
@@ -350,6 +351,9 @@ Section "Media player (required)" SEC01
   !ifdef LIBVLC_DLL
   !insertmacro InstallFile ${LIBVLC_DLL}
   !endif
+  !ifdef LIBVLC_CONTROL_DLL
+  !insertmacro InstallFile ${LIBVLC_CONTROL_DLL}
+  !endif
   !insertmacro InstallFile *.txt
 
   !insertmacro InstallFolder plugins
@@ -489,6 +493,9 @@ Section /o "Mozilla plugin" SEC03
  ;  CopyFiles "$INSTDIR\npvlc.dll" "$R2"
  ;  !ifdef LIBVLC_DLL
  ;  CopyFiles ${LIBVLC_DLL} "$R2"
+ ;  !endif
+ ;  !ifdef LIBVLC_CONTROL_DLL
+ ;  CopyFiles ${LIBVLC_CONTROL_DLL} "$R2"
  ;  !endif
  ;  Goto "${Index}-Loop"
 

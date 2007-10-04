@@ -5975,6 +5975,7 @@ dnl Pic and shared libvlc stuff
 dnl
 AS_IF([test "${SYS}" = "mingw32"], [
   FILE_LIBVLC_DLL="!define LIBVLC_DLL libvlc.dll"
+  FILE_LIBVLC_CONTROL_DLL="!define LIBVLC_CONTROL_DLL libvlc-control.dll"
 ])
 
 dnl
@@ -6036,6 +6037,7 @@ AC_SUBST(LIBEXT)
 AC_SUBST(AM_CPPFLAGS)
 AC_SUBST(MACOSX_DEPLOYMENT_TARGET)
 AC_SUBST(FILE_LIBVLC_DLL)
+AC_SUBST(FILE_LIBVLC_CONTROL_DLL)
 
 dnl Create vlc-config.in
 VLC_OUTPUT_VLC_CONFIG_IN
