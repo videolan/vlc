@@ -1239,7 +1239,7 @@ if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
     VLC_ADD_PLUGINS([screensaver motion])
 elif test "${SYS}" != "mingwce"; then
     VLC_ADD_PLUGINS([ntservice access_smb dmo msn])
-    VLC_ADD_LDFLAGS([dmo],[-lole32])
+    VLC_ADD_LDFLAGS([dmo],[-lole32 -luuid])
 else
     VLC_ADD_PLUGINS([win32text])
 fi
