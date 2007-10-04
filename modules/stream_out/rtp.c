@@ -1793,16 +1793,14 @@ static int rtp_packetize_mp4a_latm( sout_stream_t *p_stream, sout_stream_id_t *i
 static int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id,
                               block_t *in )
 {
-    int     i_max   = id->i_mtu - 12; /* payload max in one packet */
-    int     i_count = ( in->i_buffer + i_max - 1 ) / i_max;
+    const uint8_t *p_data = in->p_buffer;
+    size_t i_data  = in->i_buffer;
+    /* ptime=20ms -> 50Hz */
+    size_t i_plen = 2 * id->i_channels * ( ( id->i_clock_rate + 49 ) / 50 );
 
-    uint8_t *p_data = in->p_buffer;
-    int     i_data  = in->i_buffer;
-    int     i_packet = 0;
-
-    while( i_data > 0 )
+    for( unsigned i_packet = 0; i_data > 0; i_packet++ )
     {
-        int           i_payload = (__MIN( i_max, i_data )/4)*4;
+        int           i_payload = __MIN( i_plen, i_data );
         block_t *out = block_New( p_stream, 12 + i_payload );
 
         /* rtp common header */
@@ -1810,15 +1808,14 @@ static int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id,
                               (in->i_pts > 0 ? in->i_pts : in->i_dts) );
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
-        out->i_buffer   = 12 + i_payload;
-        out->i_dts    = in->i_dts + i_packet * in->i_length / i_count;
-        out->i_length = in->i_length / i_count;
+        out->i_buffer = 12 + i_payload;
+        out->i_dts    = in->i_dts + i_packet * 20000;
+        out->i_length = i_payload * 20000 / i_plen;
 
         rtp_packetize_send( id, out );
 
         p_data += i_payload;
         i_data -= i_payload;
-        i_packet++;
     }
 
     return VLC_SUCCESS;
@@ -1827,10 +1824,10 @@ static int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id,
 static int rtp_packetize_l8( sout_stream_t *p_stream, sout_stream_id_t *id,
                              block_t *in )
 {
-    /* ptime=20ms */
-    size_t   i_plen = id->i_channels * ( ( id->i_clock_rate + 49 ) / 50 );
-    uint8_t *p_data = in->p_buffer;
-    size_t   i_data  = in->i_buffer;
+    const uint8_t *p_data = in->p_buffer;
+    size_t i_data  = in->i_buffer;
+    /* ptime=20ms -> 50Hz */
+    size_t i_plen = id->i_channels * ( ( id->i_clock_rate + 49 ) / 50 );
 
     for( unsigned i_packet = 0; i_data > 0; i_packet++ )
     {
