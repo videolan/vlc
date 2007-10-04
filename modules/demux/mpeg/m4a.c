@@ -29,6 +29,7 @@
 #include <vlc_demux.h>
 #include <vlc_codec.h>
 #include <vlc_meta.h>
+#include <vlc_input.h>
 
 /*****************************************************************************
  * Module descriptor
