@@ -668,14 +668,6 @@ VLC_PUBLIC_API void
  */
 
 /**
- * Does this input have a video output ?
- * \param p_input the input
- * \param p_exception an initialized exception
- */
-VLC_PUBLIC_API vlc_bool_t  libvlc_input_has_vout( libvlc_media_instance_t *, libvlc_exception_t *);
-VLC_PUBLIC_API float       libvlc_input_get_fps( libvlc_media_instance_t *, libvlc_exception_t *);
-
-/**
  * Toggle fullscreen status on video output
  * \param p_input the input
  * \param p_exception an initialized exception
