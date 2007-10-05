@@ -366,6 +366,13 @@ COUNT()
             mrl.append( "dst=" ); \
         }
 
+#define CHECKMUX() \
+       if( sout.psz_mux ) \
+       {                  \
+         mrl.append( ",mux=");\
+         mrl.append( sout.psz_mux ); \
+       }
+
 
         if ( trans )
         {
@@ -393,8 +400,8 @@ COUNT()
         {
             ISMORE();
             ATLEASTONE()
-                mrl.append( "std{access=file,mux=" );
-            mrl.append( sout.psz_mux );
+                mrl.append( "std{access=file" );
+            CHECKMUX();
             mrl.append( ",dst=" );
             mrl.append( sout.psz_file );
             mrl.append( "}" );
@@ -405,8 +412,8 @@ COUNT()
         {
             ISMORE();
             ATLEASTONE()
-                mrl.append( "std{access=http,mux=" );
-            mrl.append( sout.psz_mux );
+                mrl.append( "std{access=http" );
+            CHECKMUX();
             mrl.append( ",dst=" );
             mrl.append( sout.psz_http );
             mrl.append( ":" );
@@ -419,8 +426,8 @@ COUNT()
         {
             ISMORE();
             ATLEASTONE()
-                mrl.append( "std{access=mmsh,mux=" );
-            mrl.append( sout.psz_mux );
+                mrl.append( "std{access=mmsh" );
+            CHECKMUX();
             mrl.append( ",dst=" );
             mrl.append( sout.psz_mms );
             mrl.append( ":" );
@@ -433,8 +440,8 @@ COUNT()
         {
             ISMORE();
             ATLEASTONE()
-                mrl.append( "rtp{mux=" );
-            mrl.append( sout.psz_mux );
+                mrl.append( "rtp{" );
+            CHECKMUX();
             mrl.append( ",dst=" );
             mrl.append( sout.psz_rtp );
             mrl.append( ":" );
@@ -447,8 +454,8 @@ COUNT()
         {
             ISMORE();
             ATLEASTONE()
-            mrl.append( "std{access=udp,mux=" );
-            mrl.append( sout.psz_mux );
+            mrl.append( "std{access=udp" );
+            CHECKMUX();
             mrl.append( ",dst=" );
             mrl.append( sout.psz_udp );
             mrl.append( ":" );
@@ -472,6 +479,8 @@ COUNT()
             mrl.append( "}" );
         }
     }
+
+#undef CHECKMUX
 
     if ( sout.b_all_es )
         mrl.append( ":sout-all" );
