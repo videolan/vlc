@@ -112,13 +112,13 @@ static void Close( vlc_object_t *p_this )
     dbus_connection_unref( p_sys->p_connection );
     free( p_sys );
 }
-
+#if 0
 static int GetAllDevices( device_probe_t *p_probe, device_t ***ppp_devices )
 {
     /// \todo : fill the dst array
     return p_probe->p_sys->i_devices;
 }
-
+#endif
 static void Update( device_probe_t * p_probe )
 {
     probe_sys_t *p_sys = p_probe->p_sys;
