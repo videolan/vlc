@@ -105,6 +105,7 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_filter, "out of memory" );
         return VLC_ENOMEM;
     }
+    aout_DateInit( &p_sys->end_date, p_filter->output.i_rate );
 
     p_filter->pf_do_work = DoWork;
 
@@ -282,6 +283,7 @@ static int OpenFilter( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ENOMEM;
     }
+    aout_DateInit( &p_sys->end_date, p_filter->fmt_in.audio.i_rate );
 
     p_filter->pf_audio_filter = Resample;
 
