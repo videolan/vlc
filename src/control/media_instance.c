@@ -35,7 +35,6 @@
 static void release_input_thread( libvlc_media_instance_t *p_mi )
 {
     input_thread_t *p_input_thread;
-    vlc_bool_t should_destroy;
 
     if( !p_mi || p_mi->i_input_id == -1 )
         return;
