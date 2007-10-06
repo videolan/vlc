@@ -24,21 +24,26 @@
 #ifndef _PODCAST_CONFIGURATION_DIALOG_H_
 #define _PODCAST_CONFIGURATION_DIALOG_H_
 
-#include "qt4.hpp"
+#include "util/qvlcframe.hpp"
 #include "ui/podcast_configuration.h"
 
-class PodcastConfigurationDialog : public QDialog
+class PodcastConfigDialog : public QVLCFrame
 {
     Q_OBJECT;
-
 public:
-    PodcastConfigurationDialog( intf_thread_t *p_intf );
+    static PodcastConfigDialog * getInstance( intf_thread_t *p_intf )
+    {
+        if( !instance)
+            instance = new PodcastConfigDialog( p_intf );
+        return instance;
+    }
+    virtual ~PodcastConfigDialog();
 
 private:
+    PodcastConfigDialog( intf_thread_t *);
+    static PodcastConfigDialog *instance;
     Ui::PodcastConfiguration ui;
-    intf_thread_t *p_intf;
-
-private slots:
+public slots:
     void accept();
     void add();
     void remove();

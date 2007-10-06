@@ -23,11 +23,14 @@
 
 #include "podcast_configuration.hpp"
 
-PodcastConfigurationDialog::PodcastConfigurationDialog( intf_thread_t *_p_intf )
-    :p_intf( _p_intf )
+PodcastConfigDialog *PodcastConfigDialog::instance = NULL;
+
+PodcastConfigDialog::PodcastConfigDialog( intf_thread_t *_p_intf)
+                : QVLCFrame( _p_intf )
+
 {
     ui.setupUi( this );
- 
+
     QPushButton *okButton = new QPushButton( qtr( "OK" ), this );
     QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ), this );
     ui.okCancel->addButton( okButton, QDialogButtonBox::AcceptRole );
@@ -51,7 +54,11 @@ PodcastConfigurationDialog::PodcastConfigurationDialog( intf_thread_t *_p_intf )
     }
 }
 
-void PodcastConfigurationDialog::accept()
+PodcastConfigDialog::~PodcastConfigDialog()
+{
+}
+
+void PodcastConfigDialog::accept()
 {
     QString urls = "";
     for( int i = 0; i < ui.podcastList->count(); i++ )
@@ -74,11 +81,9 @@ void PodcastConfigurationDialog::accept()
     {
         msg_Dbg( p_intf, "You will need to reload the podcast module to take into account deleted podcast urls" );
     }
-
-    QDialog::accept();
 }
 
-void PodcastConfigurationDialog::add()
+void PodcastConfigDialog::add()
 {
     if( ui.podcastURL->text() != QString( "" ) )
     {
@@ -87,7 +92,7 @@ void PodcastConfigurationDialog::add()
     }
 }
 
-void PodcastConfigurationDialog::remove()
+void PodcastConfigDialog::remove()
 {
     delete ui.podcastList->currentItem();
 }

@@ -110,7 +110,10 @@ void DialogsProvider::customEvent( QEvent *event )
                bookmarksDialog(); break;
             case INTF_DIALOG_EXTENDED:
                extendedDialog(); break;
-               /* We might want to make it better with custom functions */
+            case INTF_DIALOG_VLM:
+               vlmDialog(); break;
+            case INTF_DIALOG_INTERACTION:
+               doInteraction( de->p_arg ); break;
             case INTF_DIALOG_POPUPMENU:
                QVLCMenu::PopupMenu( p_intf, (de->i_arg != 0) ); break;
             case INTF_DIALOG_AUDIOPOPUPMENU:
@@ -119,10 +122,6 @@ void DialogsProvider::customEvent( QEvent *event )
                QVLCMenu::VideoPopupMenu( p_intf ); break;
             case INTF_DIALOG_MISCPOPUPMENU:
                QVLCMenu::MiscPopupMenu( p_intf ); break;
-            case INTF_DIALOG_INTERACTION:
-               doInteraction( de->p_arg ); break;
-            case INTF_DIALOG_VLM:
-               vlmDialog(); break;
             case INTF_DIALOG_WIZARD:
             case INTF_DIALOG_STREAMWIZARD:
             case INTF_DIALOG_UPDATEVLC:
@@ -190,6 +189,12 @@ void DialogsProvider::bookmarksDialog()
     /* FIXME - Implement me */
     /*  BookmarkDialog::getInstance( p_intf )->toggleVisible(); */
 }
+
+void DialogsProvider::podcastConfigureDialog()
+{
+    PodcastConfigDialog::getInstance( p_intf )->toggleVisible();
+}
+
 
 /****************************************************************************
  * All the open/add stuff
@@ -501,12 +506,6 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
         p_dialog->i_status = DESTROYED_DIALOG;
         break;
     }
-}
-
-void DialogsProvider::podcastConfigureDialog()
-{
-    PodcastConfigurationDialog c( p_intf );
-    c.exec();
 }
 
 void DialogsProvider::switchToSkins()
