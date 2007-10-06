@@ -24,7 +24,6 @@
  *****************************************************************************/
 
 #include "dialogs_provider.hpp"
-#include "qt4.hpp"
 #include "components/interface_widgets.hpp"
 #include "main_interface.hpp"
 #include "input_manager.hpp"

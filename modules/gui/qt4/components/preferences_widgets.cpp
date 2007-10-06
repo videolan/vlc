@@ -34,7 +34,6 @@
 
 #include "components/preferences_widgets.hpp"
 #include "util/customwidgets.hpp"
-#include "qt4.hpp"
 
 #include <vlc_keys.h>
 

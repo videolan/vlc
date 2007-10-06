@@ -25,7 +25,6 @@
 
 #include "components/simple_preferences.hpp"
 #include "components/preferences_widgets.hpp"
-#include "qt4.hpp"
 
 #include "ui/sprefs_audio.h"
 #include "ui/sprefs_input.h"

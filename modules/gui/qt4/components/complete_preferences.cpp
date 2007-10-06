@@ -39,7 +39,6 @@
 
 #include "components/complete_preferences.hpp"
 #include "components/preferences_widgets.hpp"
-#include "qt4.hpp"
 
 #include <vlc_config_cat.h>
 #include <vlc_intf_strings.h>

@@ -91,7 +91,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* Ugly hacks to get the good Widget */
     //This lineEdit is the normal line in the fileDialog.
-#if QT43
+#if HAS_QT43
     lineFileEdit = findChildren<QLineEdit*>()[2];
 #else
     lineFileEdit = findChildren<QLineEdit*>()[3];

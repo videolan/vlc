@@ -34,6 +34,7 @@
 #include <QPlastiqueStyle>
 #include <QPushButton>
 #include <QKeyEvent>
+
 #include "qt4.hpp"
 #include <vlc/vlc.h>
 #include <vlc_charset.h>
