@@ -24,7 +24,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
+
+#include <vlc/vlc.h>
+#include <vlc_vout.h>
+#include <vlc_interface.h>
+#include <vlc_playlist.h>
+#include <vlc_keys.h>
 
 #include <caca.h>
 
@@ -50,12 +55,6 @@
 #   define caca_refresh_display(x) caca_refresh()
 #   define caca_set_display_title(x,y) caca_set_window_title(y)
 #endif
-
-#include <vlc/vlc.h>
-#include <vlc_vout.h>
-#include <vlc_interface.h>
-#include <vlc_playlist.h>
-#include <vlc_keys.h>
 
 /*****************************************************************************
  * Local prototypes
