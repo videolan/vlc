@@ -21,10 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "qt4.hpp"
 #include "dialogs/extended.hpp"
 #include "dialogs_provider.hpp"
-#include "util/qvlcframe.hpp"
 #include "components/extended_panels.hpp"
 
 #include <QTabWidget>
@@ -41,11 +39,14 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     QGridLayout *layout = new QGridLayout( this );
 
     QTabWidget *tab = new QTabWidget( this );
-    Equalizer *foo = new Equalizer( p_intf, this );
-    tab->addTab( foo, qtr( "Graphic Equalizer" ) );
+    Equalizer *equal = new Equalizer( p_intf, this );
+    tab->addTab( equal, qtr( "Graphic Equalizer" ) );
 
-    ExtVideo *bar = new ExtVideo( p_intf, this );
-    tab->addTab( bar, qtr( "Video Adjustments and Effects" ) );
+    Spatializer *spatial = new Spatializer( p_intf, this );
+    tab->addTab( spatial, qtr( "Audio Effects" ) );
+
+    ExtVideo *videoEffect = new ExtVideo( p_intf, this );
+    tab->addTab( videoEffect, qtr( "Video Adjustments and Effects" ) );
 
     layout->addWidget( tab, 0, 0, 1, 5 );
 

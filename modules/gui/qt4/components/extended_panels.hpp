@@ -29,7 +29,6 @@
 
 #include "ui/equalizer.h"
 #include "ui/video_effects.h"
-#include "ui/spatializer.h"
 
 #define BANDS 10
 #define NUM_SP_CTRL 5
@@ -90,12 +89,13 @@ public:
     virtual ~Spatializer();
 
 private:
-    Ui::SpatializerWidget ui;
     QSlider *spatCtrl[NUM_SP_CTRL];
     QLabel *ctrl_texts[NUM_SP_CTRL];
     QLabel *ctrl_readout[NUM_SP_CTRL];
     float controlVars[5];
     float oldControlVars[5];
+
+    QCheckBox *enableCheck;
 
     void delCallbacks( aout_instance_t * );
     void addCallbacks( aout_instance_t * );
