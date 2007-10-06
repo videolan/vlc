@@ -25,8 +25,6 @@
 
 #include "dialogs_provider.hpp"
 #include "main_interface.hpp"
-#include "util/qvlcframe.hpp"
-#include "qt4.hpp"
 #include "input_manager.hpp"
 
 #include <QTabWidget>

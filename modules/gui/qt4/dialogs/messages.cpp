@@ -23,8 +23,7 @@
 
 #include "dialogs/messages.hpp"
 #include "dialogs_provider.hpp"
-#include "util/qvlcframe.hpp"
-#include "qt4.hpp"
+
 #include <QSpacerItem>
 #include <QSpinBox>
 #include <QLabel>

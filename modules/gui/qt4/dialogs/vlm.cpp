@@ -24,7 +24,6 @@
  *****************************************************************************/
 
 #include "dialogs/vlm.hpp"
-#include "qt4.hpp"
 #include <vlc_streaming.h>
 
 #include <iostream>

@@ -21,10 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "qt4.hpp"
 #include "dialogs/errors.hpp"
 #include "dialogs/interaction.hpp"
-#include "util/qvlcframe.hpp"
 
 #include <QLabel>
 #include <QLineEdit>

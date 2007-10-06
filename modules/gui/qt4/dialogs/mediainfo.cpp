@@ -23,11 +23,9 @@
  ******************************************************************************/
 
 #include "dialogs/mediainfo.hpp"
+#include "components/infopanels.hpp"
 #include "input_manager.hpp"
 #include "dialogs_provider.hpp"
-#include "util/qvlcframe.hpp"
-#include "components/infopanels.hpp"
-#include "qt4.hpp"
 
 #include <QTabWidget>
 #include <QGridLayout>

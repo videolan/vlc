@@ -28,7 +28,6 @@
 
 #include "components/complete_preferences.hpp"
 #include "components/simple_preferences.hpp"
-#include "qt4.hpp"
 
 #include <QHBoxLayout>
 #include <QGroupBox>

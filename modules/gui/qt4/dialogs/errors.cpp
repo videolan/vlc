@@ -22,7 +22,6 @@
  *****************************************************************************/
 
 #include "dialogs/errors.hpp"
-#include "qt4.hpp"
 
 #include <QTextCursor>
 #include <QTextEdit>

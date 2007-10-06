@@ -21,12 +21,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "dialogs/about.hpp"
 #include "dialogs/help.hpp"
+#include "dialogs/about.hpp"
 
 #include "dialogs_provider.hpp"
-#include "util/qvlcframe.hpp"
-#include "qt4.hpp"
 
 #include <QTextBrowser>
 #include <QTabWidget>
@@ -36,7 +34,7 @@
 
 HelpDialog *HelpDialog::instance = NULL;
 
-HelpDialog::HelpDialog( intf_thread_t *_p_intf) :  QVLCFrame( _p_intf )
+HelpDialog::HelpDialog( intf_thread_t *_p_intf) : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Help" ) );
     resize( 600, 560 );

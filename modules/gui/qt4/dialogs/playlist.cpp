@@ -23,9 +23,7 @@
 
 #include "dialogs/playlist.hpp"
 
-#include "qt4.hpp"
 #include "main_interface.hpp"
-#include "util/qvlcframe.hpp"
 #include "components/interface_widgets.hpp"
 #include "dialogs_provider.hpp"
 #include "menus.hpp"
