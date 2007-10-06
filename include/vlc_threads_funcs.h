@@ -566,10 +566,109 @@ static inline int __vlc_cond_timedwait( const char * psz_file, int i_line,
 #elif defined( ST_INIT_IN_ST_H )
 #   error Unimplemented
 #elif defined( UNDER_CE )
-#   error Unimplemented
+    mtime_t delay_ms = (deadline - mdate())/1000;
+
+    DWORD result;
+    if( delay_ms < 0 )
+	delay_ms = 0;
+
+    p_condvar->i_waiting_threads++;
+    LeaveCriticalSection( &p_mutex->csection );
+    result = WaitForSingleObject( p_condvar->event, delay_ms );
+    p_condvar->i_waiting_threads--;
+
+    /* Reacquire the mutex before returning. */
+    vlc_mutex_lock( p_mutex );
+
+    i_res = (int)result;
+
 #elif defined( WIN32 )
-    abort();
-#   warning Unimplemented FIXME FIXME
+    DWORD result;
+
+    mtime_t delay_ms = (deadline - mdate())/1000;
+    if( delay_ms < 0 )
+	delay_ms = 0;
+
+    if( !p_condvar->semaphore )
+    {
+        /* Increase our wait count */
+        p_condvar->i_waiting_threads++;
+
+        if( p_mutex->mutex )
+        {
+            /* It is only possible to atomically release the mutex and
+             * initiate the waiting on WinNT/2K/XP. Win9x doesn't have
+             * SignalObjectAndWait(). */
+            result = p_condvar->SignalObjectAndWait( p_mutex->mutex,
+                                            p_condvar->event,
+                                            delay_ms, FALSE );
+        }
+        else
+        {
+            LeaveCriticalSection( &p_mutex->csection );
+            result = WaitForSingleObject( p_condvar->event, delay_ms );
+        }
+
+        p_condvar->i_waiting_threads--;
+    }
+    else if( p_condvar->i_win9x_cv == 1 )
+    {
+        int i_waiting_threads;
+
+        /* Wait for the gate to be open */
+        result = WaitForSingleObject( p_condvar->event, delay_ms );
+
+        /* recaculate remaining delay */
+        delay_ms = (deadline - mdate())/1000;
+        if( delay_ms < 0 )
+            delay_ms = 0;
+
+        /* Increase our wait count */
+        p_condvar->i_waiting_threads++;
+
+        LeaveCriticalSection( &p_mutex->csection );
+	if( !result )
+	    result = WaitForSingleObject( p_condvar->semaphore, delay_ms );
+
+        /* Decrement and test must be atomic */
+        EnterCriticalSection( &p_condvar->csection );
+
+        /* Decrease our wait count */
+        i_waiting_threads = --p_condvar->i_waiting_threads;
+
+        LeaveCriticalSection( &p_condvar->csection );
+
+        /* Reopen the gate if we were the last waiting thread */
+        if( !i_waiting_threads )
+            SetEvent( p_condvar->event );
+    }
+    else
+    {
+        int i_waiting_threads;
+
+        /* Increase our wait count */
+        p_condvar->i_waiting_threads++;
+
+        LeaveCriticalSection( &p_mutex->csection );
+        result = WaitForSingleObject( p_condvar->semaphore, delay_ms );
+
+        /* Decrement and test must be atomic */
+        EnterCriticalSection( &p_condvar->csection );
+
+        /* Decrease our wait count */
+        i_waiting_threads = --p_condvar->i_waiting_threads;
+
+        LeaveCriticalSection( &p_condvar->csection );
+
+        /* Signal that the last waiting thread just went through */
+        if( !i_waiting_threads )
+            SetEvent( p_condvar->event );
+    }
+
+    /* Reacquire the mutex before returning. */
+    vlc_mutex_lock( p_mutex );
+
+    i_res = (int)result;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
 #   error Unimplemented
