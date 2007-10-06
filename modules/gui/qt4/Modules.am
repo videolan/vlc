@@ -45,7 +45,6 @@ nodist_SOURCES_qt4 = \
 		util/customwidgets.moc.cpp \
 		resources.cpp \
 		ui/equalizer.h \
-		ui/spatializer.h \
 		ui/video_effects.h \
 		ui/open_file.h \
 		ui/open_disk.h \
@@ -166,7 +165,6 @@ noinst_HEADERS = \
 EXTRA_DIST += \
 	res.qrc \
 	ui/equalizer.ui \
-	ui/spatializer.ui \
 	ui/video_effects.ui \
 	ui/open_file.ui \
 	ui/open_disk.ui \
