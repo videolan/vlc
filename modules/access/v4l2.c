@@ -1,8 +1,8 @@
 /*****************************************************************************
  * v4l2.c : Video4Linux2 input module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2004 the VideoLAN team
- * $Id: v4l2.c 16084 2006-07-19 09:45:02Z zorglub $
+ * Copyright (C) 2002-2007 the VideoLAN team
+ * $Id$
  *
  * Author: Benjamin Pracht <bigben at videolan dot org>
  *         Richard Hosking <richard at hovis dot net>
@@ -46,13 +46,8 @@
 
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/time.h>
 #include <sys/ioctl.h>
-#include <sys/errno.h>
 #include <sys/mman.h>
-
-#include <asm/types.h>          /* for videodev2.h */
 
 #include <linux/videodev2.h>
 
@@ -129,14 +124,14 @@ vlc_module_begin();
                 VLC_FALSE );
     add_integer( "v4l2-standard", 0, NULL, STANDARD_TEXT, STANDARD_LONGTEXT,
                 VLC_FALSE );
-    change_integer_list( i_standards_list, psz_standards_list_text, 0 );
+        change_integer_list( i_standards_list, psz_standards_list_text, 0 );
     add_string( "v4l2-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 VLC_TRUE );
     add_integer( "v4l2-input", 0, NULL, INPUT_TEXT, INPUT_LONGTEXT,
                 VLC_TRUE );
-    add_integer( "v4l2-io", IO_METHOD_MMAP, NULL, IOMETHOD_TEXT, IOMETHOD_LONGTEXT,
-                VLC_FALSE );
-    change_integer_list( i_iomethod_list, psz_iomethod_list_text, 0 );
+    add_integer( "v4l2-io", IO_METHOD_MMAP, NULL, IOMETHOD_TEXT,
+                 IOMETHOD_LONGTEXT, VLC_FALSE );
+        change_integer_list( i_iomethod_list, psz_iomethod_list_text, 0 );
     add_float( "v4l2-fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
     add_bool( "v4l2-stereo", VLC_TRUE, NULL, STEREO_TEXT, STEREO_LONGTEXT,
                 VLC_TRUE );
