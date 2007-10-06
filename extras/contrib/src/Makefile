@@ -809,7 +809,7 @@ flac-$(FLAC_VERSION).tar.gz:
 
 flac: flac-$(FLAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_CYGWIN
+ifdef HAVE_WIN32
 	patch -p0 < Patches/flac-win32.patch
 endif
 
@@ -2007,6 +2007,7 @@ dirac: dirac-$(DIRAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p0 <Patches/dirac-cross.patch
 ifdef HAVE_CYGWIN
+	# incorrect compile warning with cygwin compiler 3.4.4
 	patch -p0 <Patches/dirac-cygwin.patch
 endif
 	(cd $@; aclocal && autoconf && automake)
