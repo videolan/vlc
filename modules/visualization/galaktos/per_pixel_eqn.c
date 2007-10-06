@@ -22,6 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 #include "fatal.h"
@@ -50,7 +52,7 @@ extern int mesh_j;
 
 
 /* Evaluates a per pixel equation */
-inline void evalPerPixelEqn(per_pixel_eqn_t * per_pixel_eqn) {
+static inline void evalPerPixelEqn(per_pixel_eqn_t * per_pixel_eqn) {
 
   double ** param_matrix = NULL;
   gen_expr_t * eqn_ptr = NULL;
@@ -92,7 +94,7 @@ inline void evalPerPixelEqn(per_pixel_eqn_t * per_pixel_eqn) {
   per_pixel_eqn->param->matrix_flag = 1; 
 }
 
-inline void evalPerPixelEqns() {
+static inline void evalPerPixelEqns() {
 
   /* Evaluate all per pixel equations using splay traversal */
   splay_traverse(evalPerPixelEqn, active_preset->per_pixel_eqn_tree);
@@ -209,13 +211,13 @@ void free_per_pixel_eqn(per_pixel_eqn_t * per_pixel_eqn) {
 	return;
 }
 
-inline int isPerPixelEqn(int op) {
+static inline int isPerPixelEqn(int op) {
     
   return active_preset->per_pixel_flag[op];
 
 }
 
-inline int resetPerPixelEqnFlags(preset_t * preset) {
+static inline int resetPerPixelEqnFlags(preset_t * preset) {
   int i;
 
   for (i = 0; i < NUM_OPS;i++)

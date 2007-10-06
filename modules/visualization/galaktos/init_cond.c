@@ -26,6 +26,9 @@
 
 /* Library functions to manipulate initial condition values */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
 #include "fatal.h"

@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "common.h"
 #include "fatal.h"
@@ -54,7 +55,7 @@
 custom_shape_t * interface_shape = NULL;
 int cwave_interface_id = 0;
 extern preset_t * active_preset;
-inline void eval_custom_shape_init_conds(custom_shape_t * custom_shape);
+static inline void eval_custom_shape_init_conds(custom_shape_t * custom_shape);
 void load_unspec_init_cond_shape(param_t * param);
 
 void destroy_param_db_tree_shape(splaytree_t * tree);
@@ -518,12 +519,12 @@ custom_shape_t * find_custom_shape(int id, preset_t * preset, int create_flag) {
   return custom_shape;
 }
 
-inline void evalCustomShapeInitConditions() {
+static inline void evalCustomShapeInitConditions() {
   splay_traverse(eval_custom_shape_init_conds, active_preset->custom_shape_tree);
 
 }
 
-inline void eval_custom_shape_init_conds(custom_shape_t * custom_shape) {
+static inline void eval_custom_shape_init_conds(custom_shape_t * custom_shape) {
   splay_traverse(eval_init_cond, custom_shape->init_cond_tree);
   splay_traverse(eval_init_cond, custom_shape->per_frame_init_eqn_tree);
 }
@@ -587,7 +588,7 @@ void load_unspec_init_cond_shape(param_t * param) {
 
 /* Interface function. Makes another custom shape the current
    concern for per frame / point equations */
-inline custom_shape_t * nextCustomShape() {
+static inline custom_shape_t * nextCustomShape() {
 
   if ((interface_shape = splay_find(&cwave_interface_id, active_preset->custom_shape_tree)) == NULL) {
     cwave_interface_id = 0;

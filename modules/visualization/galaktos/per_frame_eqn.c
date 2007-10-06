@@ -24,9 +24,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "fatal.h"
 #include "common.h"
+#include "param.h"
 #include "per_frame_eqn_types.h"
 #include "per_frame_eqn.h"
 

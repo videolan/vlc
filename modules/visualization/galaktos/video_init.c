@@ -32,6 +32,7 @@
 //also able to handle resizing and fullscreening of windows
 //just call init_display again with differant variables
 
+#include <stdlib.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "video_init.h"

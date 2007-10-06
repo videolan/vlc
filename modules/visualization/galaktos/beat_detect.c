@@ -30,6 +30,8 @@
 //
 //Some stuff was taken from Frederic Patin's beat-detection article, you'll find it online
 
+#include <stdlib.h>
+#include <stdio.h>
 #include "engine_vars.h"
 
 double beat_buffer[32][80],beat_instant[32],beat_history[32];
