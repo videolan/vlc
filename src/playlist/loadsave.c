@@ -96,6 +96,12 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 {
     playlist_t *p_playlist = user_data;
     input_item_t *p_item = p_event->u.input_item_subitem_added.p_new_child;
+
+    /* The media library input has one and only one option: "meta-file"
+     * So we remove that unneeded option. */
+    free( p_item->ppsz_options[0] );
+    p_item->i_options = 0;
+
     playlist_AddInput( p_playlist, p_item, PLAYLIST_APPEND, PLAYLIST_END,
             VLC_FALSE, VLC_FALSE );
 }
@@ -135,6 +141,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     }
 
     const char *const psz_option = "meta-file";
+    /* that option has to be cleaned in input_item_subitem_added() */
     p_input = input_ItemNewExt( p_playlist, psz_uri,
                                 _("Media Library"), 1, &psz_option, -1 );
     if( p_input == NULL )
