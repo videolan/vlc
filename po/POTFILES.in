@@ -667,7 +667,6 @@ modules/gui/qt4/ui/open_net.ui
 modules/gui/qt4/ui/open.ui
 modules/gui/qt4/ui/podcast_configuration.ui
 modules/gui/qt4/ui/sout.ui
-modules/gui/qt4/ui/spatializer.ui
 modules/gui/qt4/ui/sprefs_audio.ui
 modules/gui/qt4/ui/sprefs_input.ui
 modules/gui/qt4/ui/sprefs_interface.ui
@@ -1187,6 +1186,7 @@ modules/visualization/galaktos/eval.h
 modules/visualization/galaktos/expr_types.h
 modules/visualization/galaktos/fatal.h
 modules/visualization/galaktos/fftsg.c
+modules/visualization/galaktos/fftsg.h
 modules/visualization/galaktos/func.c
 modules/visualization/galaktos/func.h
 modules/visualization/galaktos/func_types.h
