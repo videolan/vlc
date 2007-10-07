@@ -16,14 +16,23 @@ end
 
 -- Probe function.
 function probe()
-    return vlc.access == "http"
-        and string.match( vlc.path, "youtube.com" ) 
-        and (  string.match( vlc.path, "watch%?v=" ) -- the html page
+    if vlc.access ~= "http" then
+        return false
+    end
+    youtube_site = string.match( string.sub( vlc.path, 1, 8 ), "youtube" )
+    if not youtube_site then
+        -- FIXME we should be using a builtin list of known youtube websites
+        -- like "fr.youtube.com", "uk.youtube.com" etc..
+        youtube_site = string.find( vlc.path, ".youtube.com" )
+        if youtube_site == nil then
+            return false
+        end
+    end
+    return (  string.match( vlc.path, "watch%?v=" ) -- the html page
             or string.match( vlc.path, "watch_fullscreen%?video_id=" ) -- the fullscreen page
             or string.match( vlc.path, "p.swf" ) -- the (old?) player url
             or string.match( vlc.path, "jp.swf" ) -- the (new?) player url (as of 24/08/2007)
-            or string.match( vlc.path, "player2.swf" ) -- another player url
-            or ( string.match( vlc.path, "get_video%?video_id=" ) and not string.match( vlc.path, "t=" ) ) ) -- the video url without the t= parameter which is mandatory (since 24/08/2007)
+            or string.match( vlc.path, "player2.swf" ) ) -- another player url
 end
 
 -- Parse function.
@@ -49,7 +58,7 @@ function parse()
                     base_yt_url = string.gsub( line, ".*BASE_YT_URL:'([^']*)'.*", "%1" )
                 end
                 t = string.gsub( line, ".*t:'([^']*)'.*", "%1" )
-                vlc.msg_err( t )
+                -- vlc.msg_err( t )
                 -- video_id = string.gsub( line, ".*&video_id:'([^']*)'.*", "%1" )
             end
             if name and description and artist --[[and video_id]] then break end
