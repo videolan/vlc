@@ -28,7 +28,6 @@
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 #include <vlc_codec.h>
-#include <vlc_meta.h>
 #include <vlc_input.h>
 
 /*****************************************************************************
@@ -55,7 +54,6 @@ struct demux_sys_t
 {
     vlc_bool_t  b_start;
     es_out_id_t *p_es;
-    vlc_meta_t  *meta;
 
     decoder_t   *p_packetizer;
 
@@ -78,7 +76,6 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    module_t    *p_id3;
     const uint8_t *p_peek;
     int         b_forced = VLC_FALSE;
 
@@ -110,25 +107,6 @@ static int Open( vlc_object_t * p_this )
     es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
     LOAD_PACKETIZER_OR_FAIL( p_sys->p_packetizer, "mp4 audio" );
 
-    /* Parse possible id3 header */
-    if( !var_CreateGetBool( p_demux, "meta-preparsed" ) )
-    {
-        p_demux->p_private = malloc( sizeof( demux_meta_t ) );
-        if( !p_demux->p_private )
-            return VLC_ENOMEM;
-        if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
-        {
-            module_Unneed( p_demux, p_id3 );
-            demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
-            p_sys->meta = p_demux_meta->p_meta;
-            int i;
-            /* attachments not supported in this demuxer */
-            for( i = 0; i < p_demux_meta->i_attachments; i++ )
-                free( p_demux_meta->attachments[i] );
-            TAB_CLEAN( p_demux_meta->i_attachments, p_demux_meta->attachments );
-        }
-        free( p_demux->p_private );
-    }
     return VLC_SUCCESS;
 }
 
@@ -139,9 +117,6 @@ static void Close( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
-
-    var_Destroy( p_demux, "meta-preparsed" );
-    if( p_sys->meta ) vlc_meta_Delete( p_sys->meta );
 
     DESTROY_PACKETIZER( p_sys->p_packetizer );
 
@@ -176,8 +151,6 @@ static int Demux( demux_t *p_demux)
             if( p_sys->p_es == NULL )
             {
                 p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
-                vlc_audio_replay_gain_MergeFromMeta( &p_sys->p_packetizer->fmt_out.audio_replay_gain,
-                                                     p_sys->meta );
                 p_sys->p_es = es_out_Add( p_demux->out,
                                           &p_sys->p_packetizer->fmt_out);
             }
@@ -206,16 +179,15 @@ static int Demux( demux_t *p_demux)
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    vlc_meta_t *p_meta;
-
+    vlc_bool_t *pb_bool;
     int64_t *pi64;
     int i_ret;
 
     switch( i_query )
     {
-    case DEMUX_GET_META:
-        p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
-        vlc_meta_Merge( p_meta, p_sys->meta );
+    case DEMUX_HAS_UNSUPPORTED_META:
+        pb_bool = (vlc_bool_t *)va_arg( args, vlc_bool_t* );
+        *pb_bool = VLC_TRUE;
         return VLC_SUCCESS;
 
     case DEMUX_GET_TIME:
