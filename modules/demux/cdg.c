@@ -144,17 +144,8 @@ static void Close ( vlc_object_t * p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t *p_sys  = p_demux->p_sys;
-    int64_t *pi64;
-
     switch( i_query )
     {
-#if 0
-    case DEMUX_GET_TIME:
-        pi64 = (int64_t*)va_arg( args, int64_t * );
-        *pi64 = date_Get( &p_sys->pts );
-        return VLC_SUCCESS;
-#endif
     default:
         return demux2_vaControlHelper( p_demux->s, 0, -1,
                                        8*CDG_FRAME_SIZE*CDG_FRAME_RATE, CDG_FRAME_SIZE, i_query, args );
