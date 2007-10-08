@@ -142,7 +142,7 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="1" colspan="4" >
+      <item row="1" column="1" colspan="2" >
        <widget class="QCheckBox" name="dvdsimple" >
         <property name="toolTip" >
          <string>_("Disable DVD Menus (for compatibility)")</string>
