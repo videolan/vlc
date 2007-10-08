@@ -59,7 +59,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf, bool _mainInput,
     if( stats )
     {
         ISP = new InputStatsPanel( IT, p_intf );
-        IT->addTab( ISP, qtr( "&Stats" ) );
+        IT->addTab( ISP, qtr( "&Statistics" ) );
     }
 
     QGridLayout *layout = new QGridLayout( this );
