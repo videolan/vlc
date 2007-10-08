@@ -104,13 +104,6 @@ struct demux_sys_t
 
     /* bitrate */
     int     i_bitrate;
-
-    /* meta data */
-    vlc_meta_t *meta;
-
-    /* attachments */
-    int                i_attachments;
-    input_attachment_t **attachments;
 };
 
 /* OggDS headers for the new header format (used in ogm files) */
@@ -210,23 +203,6 @@ static int Open( vlc_object_t * p_this )
     /* Begnning of stream, tell the demux to look for elementary streams. */
     p_sys->i_eos = 0;
 
-    if( !var_CreateGetBool( p_demux, "meta-preparsed" ) )
-    {
-        p_demux->p_private = malloc( sizeof( demux_meta_t ) );
-        if( !p_demux->p_private )
-            return VLC_ENOMEM;
-        module_t *p_meta = module_Need( p_demux, "meta reader", NULL, 0 );
-        if( p_meta )
-        {
-            module_Unneed( p_demux, p_meta );
-            demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
-            p_sys->meta = p_demux_meta->p_meta;
-            p_sys->i_attachments = p_demux_meta->i_attachments;
-            p_sys->attachments = p_demux_meta->attachments;
-        }
-        free( p_demux->p_private );
-    }
-
     /* Initialize the Ogg physical bitstream parser */
     ogg_sync_init( &p_sys->oy );
 
@@ -245,14 +221,6 @@ static void Close( vlc_object_t *p_this )
     ogg_sync_clear( &p_sys->oy );
 
     Ogg_EndOfStream( p_demux );
-
-    var_Destroy( p_demux, "meta-preparsed" );
-    if( p_sys->meta ) vlc_meta_Delete( p_sys->meta );
-
-    int i;
-    for( i = 0; i < p_sys->i_attachments; i++ )
-        free( p_sys->attachments[i] );
-    TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
 
     free( p_sys );
 }
@@ -398,16 +366,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     int64_t *pi64;
+    vlc_bool_t *pb_bool;
     int i;
-    input_attachment_t ***ppp_attach;
-    int *pi_int;
-    vlc_meta_t *p_meta;
 
     switch( i_query )
     {
-        case DEMUX_GET_META:
-            p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
-            vlc_meta_Merge( p_meta, p_sys->meta );
+        case DEMUX_HAS_UNSUPPORTED_META:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_TRUE;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
@@ -430,20 +396,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 ogg_stream_reset( &p_stream->os );
             }
             ogg_sync_reset( &p_sys->oy );
-
-        case DEMUX_GET_ATTACHMENTS:
-            ppp_attach =
-                (input_attachment_t***)va_arg( args, input_attachment_t*** );
-            pi_int = (int*)va_arg( args, int * );
-
-            if( p_sys->i_attachments <= 0 )
-                return VLC_EGENERIC;
-
-            *pi_int = p_sys->i_attachments;
-            *ppp_attach = malloc( sizeof(input_attachment_t**) * p_sys->i_attachments );
-            for( i = 0; i < p_sys->i_attachments; i++ )
-                (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachments[i] );
-            return VLC_SUCCESS;
 
         default:
             return demux2_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
