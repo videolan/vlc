@@ -93,7 +93,6 @@ struct intf_sys_t
     time_t                  time_total_pauses;  /**< total time in pause    */
 
     vlc_bool_t              b_submit;           /**< do we have to submit ? */
-    vlc_bool_t              b_paused;           /**< is vlc paused ?        */
 
     vlc_bool_t              b_state_cb;         /**< if we registered the
                                                  * "state" callback         */
@@ -270,211 +269,191 @@ static void Main( intf_thread_t *p_intf )
     char                    *psz_submit, *psz_submit_song, *psz_submit_tmp;
     int                     i_net_ret;
     int                     i_song;
-    playlist_t              *p_playlist;
     uint8_t                 p_buffer[1024];
     char                    *p_buffer_pos;
     int                     i_post_socket;
+    vlc_bool_t              b_die;
 
     intf_sys_t *p_sys = p_intf->p_sys;
 
     /* main loop */
     while( !p_intf->b_die && !p_intf->p_libvlc->b_die )
     {
-        /* verify if there is data to submit
-         * and if waiting interval is elapsed */
-        if ( ( p_sys->i_songs > 0 ) &&
-            ( time( NULL ) >= p_sys->next_exchange ) )
+        /* waiting for data to submit, if waiting interval is elapsed */
+        vlc_object_lock( p_intf );
+        if( time( NULL ) < p_sys->next_exchange )
+            b_die = vlc_object_timedwait( p_intf, p_sys->next_exchange );
+        else
+            b_die = vlc_object_wait( p_intf );
+        vlc_object_unlock( p_intf );
+
+        if( b_die )
+            return;
+
+        /* handshake if needed */
+        if( p_sys->b_handshaked == VLC_FALSE )
         {
-            /* handshake if needed */
-            if( p_sys->b_handshaked == VLC_FALSE )
+            msg_Dbg( p_intf, "Handshaking with last.fm ..." );
+
+            switch( Handshake( p_intf ) )
             {
-                msg_Dbg( p_intf, "Handshaking with last.fm ..." );
+                case VLC_ENOMEM:
+                    Unload( p_intf );
+                    return;
 
-                switch( Handshake( p_intf ) )
-                {
-                    case VLC_ENOMEM:
-                        Unload( p_intf );
-                        return;
+                case VLC_ENOVAR:
+                    /* username not set */
+                    intf_UserFatal( p_intf, VLC_FALSE,
+                        _("Last.fm username not set"),
+                        _("Please set an username or disable "
+                        "audioscrobbler plugin, and then restart VLC.\n"
+                        "Visit https://www.last.fm/join/ to get an account")
+                    );
+                    Unload( p_intf );
+                    return;
 
-                    case VLC_ENOVAR:
-                        /* username not set */
-                        intf_UserFatal( p_intf, VLC_FALSE,
-                            _("Last.fm username not set"),
-                            _("Please set an username or disable "
-                            "audioscrobbler plugin, and then restart VLC.\n"
-                            "Visit https://www.last.fm/join/ to get an account")
-                        );
-                        Unload( p_intf );
-                        return;
+                case VLC_SUCCESS:
+                    msg_Dbg( p_intf, "Handshake successfull :)" );
+                    p_sys->b_handshaked = VLC_TRUE;
+                    p_sys->i_interval = 0;
+                    time( &p_sys->next_exchange );
+                    break;
 
-                    case VLC_SUCCESS:
-                        msg_Dbg( p_intf, "Handshake successfull :)" );
-                        vlc_mutex_lock ( &p_sys->lock );
-                        p_sys->b_handshaked = VLC_TRUE;
-                        p_sys->i_interval = 0;
-                        time( &p_sys->next_exchange );
-                        vlc_mutex_unlock ( &p_sys->lock );
-                        break;
+                case VLC_AUDIOSCROBBLER_EFATAL:
+                    msg_Warn( p_intf, "Unloading..." );
+                    Unload( p_intf );
+                    return;
 
-                    case VLC_AUDIOSCROBBLER_EFATAL:
-                        msg_Warn( p_intf, "Unloading..." );
-                        Unload( p_intf );
-                        return;
-
-                    case VLC_EGENERIC:
-                    default:
-                        /* protocol error : we'll try later */
-                        vlc_mutex_lock ( &p_sys->lock );
-                        HandleInterval( &p_sys->next_exchange,
-                                &p_sys->i_interval );
-                        vlc_mutex_unlock ( &p_sys->lock );
-                        break;
-                }
-                /* handshake is finished, let's restart the loop */
-                continue;
+                case VLC_EGENERIC:
+                default:
+                    /* protocol error : we'll try later */
+                    HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
+                    break;
             }
+            /* if handshake failed let's restart the loop */
+            if( p_sys->b_handshaked == VLC_FALSE )
+                continue;
+        }
 
-            msg_Dbg( p_intf, "Going to submit some data..." );
-            vlc_mutex_lock ( &p_sys->lock );
+        msg_Dbg( p_intf, "Going to submit some data..." );
 
-            if( !asprintf( &psz_submit, "s=%s", p_sys->psz_auth_token ) )
+        if( !asprintf( &psz_submit, "s=%s", p_sys->psz_auth_token ) )
+        {   /* Out of memory */
+            Unload( p_intf );
+            return;
+        }
+
+        /* forge the HTTP POST request */
+        vlc_mutex_lock( &p_sys->lock );
+        audioscrobbler_song_t *p_song;
+        for( i_song = 0 ; i_song < p_sys->i_songs ; i_song++ )
+        {
+            p_song = &p_sys->p_queue[i_song];
+            if( !asprintf( &psz_submit_song,
+                    "&a%%5B%d%%5D=%s&t%%5B%d%%5D=%s"
+                    "&i%%5B%d%%5D=%llu&o%%5B%d%%5D=P&r%%5B%d%%5D="
+                    "&l%%5B%d%%5D=%d&b%%5B%d%%5D=%s"
+                    "&n%%5B%d%%5D=%s&m%%5B%d%%5D=%s",
+                    i_song, p_song->psz_a,           i_song, p_song->psz_t,
+                    i_song, (uintmax_t)p_song->date, i_song, i_song,
+                    i_song, p_song->i_l,             i_song, p_song->psz_b,
+                    i_song, p_song->psz_n,           i_song, p_song->psz_m
+            ) )
             {   /* Out of memory */
                 vlc_mutex_unlock( &p_sys->lock );
                 Unload( p_intf );
                 return;
             }
-
-            /* forge the HTTP POST request */
-            audioscrobbler_song_t *p_song;
-            for( i_song = 0 ; i_song < p_sys->i_songs ; i_song++ )
-            {
-                p_song = &p_sys->p_queue[i_song];
-                if( !asprintf( &psz_submit_song,
-                        "&a%%5B%d%%5D=%s&t%%5B%d%%5D=%s"
-                        "&i%%5B%d%%5D=%llu&o%%5B%d%%5D=P&r%%5B%d%%5D="
-                        "&l%%5B%d%%5D=%d&b%%5B%d%%5D=%s"
-                        "&n%%5B%d%%5D=%s&m%%5B%d%%5D=%s",
-                        i_song, p_song->psz_a,           i_song, p_song->psz_t,
-                        i_song, (uintmax_t)p_song->date, i_song, i_song,
-                        i_song, p_song->i_l,             i_song, p_song->psz_b,
-                        i_song, p_song->psz_n,           i_song, p_song->psz_m
-                ) )
-                {   /* Out of memory */
-                    vlc_mutex_unlock( &p_sys->lock );
-                    Unload( p_intf );
-                    return;
-                }
-                psz_submit_tmp = psz_submit;
-                if( !asprintf( &psz_submit, "%s%s",
-                        psz_submit_tmp, psz_submit_song ) )
-                {   /* Out of memory */
-                    free( psz_submit_tmp );
-                    free( psz_submit_song );
-                    vlc_mutex_unlock( &p_sys->lock );
-                    Unload( p_intf );
-                    return;
-                }
-                free( psz_submit_song );
+            psz_submit_tmp = psz_submit;
+            if( !asprintf( &psz_submit, "%s%s",
+                    psz_submit_tmp, psz_submit_song ) )
+            {   /* Out of memory */
                 free( psz_submit_tmp );
-            }
-
-            i_post_socket = net_ConnectTCP( p_intf,
-                p_sys->psz_submit_host, p_sys->i_submit_port );
-
-            if ( i_post_socket == -1 )
-            {
-                /* If connection fails, we assume we must handshake again */
-                HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
-                p_sys->b_handshaked = VLC_FALSE;
+                free( psz_submit_song );
                 vlc_mutex_unlock( &p_sys->lock );
-                free( psz_submit );
-                continue;
+                Unload( p_intf );
+                return;
             }
-
-            /* we transmit the data */
-            i_net_ret = net_Printf(
-                VLC_OBJECT( p_intf ), i_post_socket, NULL,
-                POST_REQUEST, p_sys->psz_submit_file,
-                (unsigned)strlen( psz_submit ), p_sys->psz_submit_file,
-                VERSION, psz_submit
-            );
-
-            free( psz_submit );
-            if ( i_net_ret == -1 )
-            {
-                /* If connection fails, we assume we must handshake again */
-                HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
-                p_sys->b_handshaked = VLC_FALSE;
-                vlc_mutex_unlock( &p_sys->lock );
-                continue;
-            }
-
-            i_net_ret = net_Read( p_intf, i_post_socket, NULL,
-                        p_buffer, 1023, VLC_FALSE );
-            if ( i_net_ret <= 0 )
-            {
-                /* if we get no answer, something went wrong : try again */
-                vlc_mutex_unlock( &p_sys->lock );
-                continue;
-            }
-
-            net_Close( i_post_socket );
-            p_buffer[i_net_ret] = '\0';
-
-            p_buffer_pos = strstr( ( char * ) p_buffer, "FAILED" );
-            if ( p_buffer_pos )
-            {
-                msg_Warn( p_intf, "%s", p_buffer_pos );
-                HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
-                vlc_mutex_unlock ( &p_sys->lock );
-                continue;
-            }
-
-            p_buffer_pos = strstr( ( char * ) p_buffer, "BADSESSION" );
-            if ( p_buffer_pos )
-            {
-                msg_Dbg( p_intf, "Authentification failed, handshaking again" );
-                p_sys->b_handshaked = VLC_FALSE;
-                HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
-                vlc_mutex_unlock ( &p_sys->lock );
-                continue;
-            }
-
-            p_buffer_pos = strstr( ( char * ) p_buffer, "OK" );
-            if ( p_buffer_pos )
-            {
-                int i;
-                for( i = 0; i < p_sys->i_songs; i++ )
-                    DeleteSong( &p_sys->p_queue[i] );
-                p_sys->i_songs = 0;
-                p_sys->i_interval = 0;
-                time( &p_sys->next_exchange );
-                msg_Dbg( p_intf, "Submission successfull!" );
-            }
-            else
-            {
-                msg_Dbg( p_intf, "Authentification failed, handshaking again" );
-                p_sys->b_handshaked = VLC_FALSE;
-                HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
-                vlc_mutex_unlock ( &p_sys->lock );
-                continue;
-            }
-            vlc_mutex_unlock ( &p_sys->lock );
-        } /* data transmission finished or skipped */
-
-        msleep( INTF_IDLE_SLEEP );
-
-        p_playlist = pl_Yield( p_intf );
-        PL_LOCK;
-        if( p_playlist->request.i_status == PLAYLIST_STOPPED )
-        {
-            /* if we stopped, we won't submit playing song */
-            vlc_mutex_lock( &p_sys->lock );
-            p_sys->b_submit = VLC_FALSE;
-            vlc_mutex_unlock( &p_sys->lock );
+            free( psz_submit_song );
+            free( psz_submit_tmp );
         }
-        PL_UNLOCK;
-        pl_Release( p_playlist );
+        vlc_mutex_unlock( &p_sys->lock );
+
+        i_post_socket = net_ConnectTCP( p_intf,
+            p_sys->psz_submit_host, p_sys->i_submit_port );
+
+        if ( i_post_socket == -1 )
+        {
+            /* If connection fails, we assume we must handshake again */
+            HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
+            p_sys->b_handshaked = VLC_FALSE;
+            free( psz_submit );
+            continue;
+        }
+
+        /* we transmit the data */
+        i_net_ret = net_Printf(
+            VLC_OBJECT( p_intf ), i_post_socket, NULL,
+            POST_REQUEST, p_sys->psz_submit_file,
+            (unsigned)strlen( psz_submit ), p_sys->psz_submit_file,
+            VERSION, psz_submit
+        );
+
+        free( psz_submit );
+        if ( i_net_ret == -1 )
+        {
+            /* If connection fails, we assume we must handshake again */
+            HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
+            p_sys->b_handshaked = VLC_FALSE;
+            continue;
+        }
+
+        i_net_ret = net_Read( p_intf, i_post_socket, NULL,
+                    p_buffer, 1023, VLC_FALSE );
+        if ( i_net_ret <= 0 )
+        {
+            /* if we get no answer, something went wrong : try again */
+            continue;
+        }
+
+        net_Close( i_post_socket );
+        p_buffer[i_net_ret] = '\0';
+
+        p_buffer_pos = strstr( ( char * ) p_buffer, "FAILED" );
+        if ( p_buffer_pos )
+        {
+            msg_Warn( p_intf, "%s", p_buffer_pos );
+            HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
+            continue;
+        }
+
+        p_buffer_pos = strstr( ( char * ) p_buffer, "BADSESSION" );
+        if ( p_buffer_pos )
+        {
+            msg_Dbg( p_intf, "Authentification failed, handshaking again" );
+            p_sys->b_handshaked = VLC_FALSE;
+            HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
+            continue;
+        }
+
+        p_buffer_pos = strstr( ( char * ) p_buffer, "OK" );
+        if ( p_buffer_pos )
+        {
+            int i;
+            for( i = 0; i < p_sys->i_songs; i++ )
+                DeleteSong( &p_sys->p_queue[i] );
+            p_sys->i_songs = 0;
+            p_sys->i_interval = 0;
+            time( &p_sys->next_exchange );
+            msg_Dbg( p_intf, "Submission successfull!" );
+        }
+        else
+        {
+            msg_Dbg( p_intf, "Authentification failed, handshaking again" );
+            p_sys->b_handshaked = VLC_FALSE;
+            HandleInterval( &p_sys->next_exchange, &p_sys->i_interval );
+            continue;
+        }
     }
 }
 
@@ -492,21 +471,22 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    vlc_mutex_lock( &p_sys->lock );
-
-    if( oldval.i_int == PLAYING_S && newval.i_int == PAUSE_S )
+    if( newval.i_int == END_S || newval.i_int == ERROR_S )
     {
+        playlist_t *p_playlist = pl_Yield( p_intf );
+        PL_LOCK;
+        if( p_playlist->request.i_status == PLAYLIST_STOPPED )
+        {
+            /* if we stopped, we won't submit playing song */
+            p_sys->b_submit = VLC_FALSE;
+        }
+        PL_UNLOCK;
+        pl_Release( p_playlist );
+    }
+    else if( oldval.i_int == PLAYING_S && newval.i_int == PAUSE_S )
         time( &p_sys->time_pause );
-        p_sys->b_paused = VLC_TRUE;
-    }
-
     else if( oldval.i_int == PAUSE_S && newval.i_int == PLAYING_S )
-    {
         p_sys->time_total_pauses += time( NULL ) - p_sys->time_pause;
-        p_sys->b_paused = VLC_FALSE;
-    }
-
-    vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
 }
@@ -522,9 +502,7 @@ static int MetaPreparsed( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    vlc_mutex_lock( &p_intf->p_sys->lock );
     ReadMetaData( p_intf );
-    vlc_mutex_unlock( &p_intf->p_sys->lock );
     return VLC_SUCCESS;
 }
 
@@ -547,17 +525,12 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     if( p_intf->b_dead )
         return VLC_SUCCESS;
 
-    vlc_mutex_lock( &p_sys->lock );
-
     p_sys->b_preparsed_cb   = VLC_FALSE;
     p_sys->b_state_cb       = VLC_FALSE;
 
     /* We'll try to add the previously playing song in the queue */
     if( AddToQueue( p_intf ) == VLC_ENOMEM )
-    {
-        vlc_mutex_unlock( &p_sys->lock );
         return VLC_ENOMEM;
-    }
 
     p_playlist = pl_Yield( p_intf );
     PL_LOCK;
@@ -567,9 +540,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     {
         PL_UNLOCK;
         pl_Release( p_playlist );
-
         p_sys->b_submit = VLC_FALSE;
-        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
 
@@ -582,7 +553,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     {
         vlc_object_release( p_input );
         p_sys->b_submit = VLC_FALSE;
-        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
 
@@ -592,21 +562,19 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         msg_Dbg( p_this, "Not an audio local file, not submitting");
         vlc_object_release( p_input );
         p_sys->b_submit = VLC_FALSE;
-        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
-
-    var_AddCallback( p_input, "state", PlayingChange, p_intf );
-    p_sys->b_state_cb = VLC_TRUE;
 
     p_sys->b_submit = VLC_TRUE;
     p_sys->time_total_pauses = 0;
     time( &p_sys->p_current_song.date );
 
+    var_AddCallback( p_input, "state", PlayingChange, p_intf );
+    p_sys->b_state_cb = VLC_TRUE;
+
     if( input_item_IsPreparsed( p_item ) )
     {
         ReadMetaData( p_intf );
-        vlc_mutex_unlock( &p_sys->lock );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
@@ -615,7 +583,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         /* We'll read the meta data when it will be preparsed */
         var_AddCallback( p_input, "meta-preparsed", MetaPreparsed, p_intf );
         p_sys->b_preparsed_cb = VLC_TRUE;
-        vlc_mutex_unlock( &p_sys->lock );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
@@ -629,9 +596,11 @@ static int AddToQueue ( intf_thread_t *p_this )
     time_t                      played_time;
     intf_sys_t                  *p_sys = p_this->p_sys;
 
+    vlc_mutex_lock( &p_sys->lock );
     if( !p_sys->b_submit )
     {
         DeleteSong( &p_sys->p_current_song );
+        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
 
@@ -644,6 +613,7 @@ static int AddToQueue ( intf_thread_t *p_this )
     {
         msg_Dbg( p_this, "Song not listened long enough, not submitting" );
         DeleteSong( &p_sys->p_current_song );
+        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
 
@@ -651,6 +621,7 @@ static int AddToQueue ( intf_thread_t *p_this )
     {
         msg_Dbg( p_this, "Song too short (< 30s), not submitting" );
         DeleteSong( &p_sys->p_current_song );
+        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
 
@@ -659,6 +630,7 @@ static int AddToQueue ( intf_thread_t *p_this )
     {
         msg_Dbg( p_this, "Missing artist or title, not submitting" );
         DeleteSong( &p_sys->p_current_song );
+        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
 
@@ -666,6 +638,7 @@ static int AddToQueue ( intf_thread_t *p_this )
     {
         msg_Warn( p_this, "Submission queue is full, not submitting" );
         DeleteSong( &p_sys->p_current_song );
+        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
 
@@ -689,6 +662,13 @@ static int AddToQueue ( intf_thread_t *p_this )
 #undef QUEUE_COPY
 
     p_sys->i_songs++;
+
+    /* signal the main loop we have something to submit */
+    vlc_object_lock( p_this );
+    vlc_cond_signal( &p_this->object_wait );
+    vlc_object_unlock( p_this );
+
+    vlc_mutex_unlock( &p_sys->lock );
     return VLC_SUCCESS;
 }
 
@@ -820,8 +800,6 @@ static int Handshake( intf_thread_t *p_this )
     AddMD5( &p_struct_md5, ( uint8_t* ) psz_timestamp, strlen( psz_timestamp ));
     EndMD5( &p_struct_md5 );
 
-    vlc_mutex_lock ( &p_sys->lock );
-
     for ( i = 0; i < 4; i++ )
     {
         sprintf( &p_sys->psz_auth_token[8*i], "%02x%02x%02x%02x",
@@ -840,7 +818,6 @@ static int Handshake( intf_thread_t *p_this )
         p_sys->psz_auth_token ) )
     {
         free( psz_username );
-        vlc_mutex_unlock( &p_sys->lock );
         return VLC_ENOMEM;
     }
     free( psz_username );
@@ -850,17 +827,13 @@ static int Handshake( intf_thread_t *p_this )
     free( psz_handshake_url );
 
     if( !p_stream )
-    {
-        vlc_mutex_unlock ( &p_sys->lock );
         return VLC_EGENERIC;
-    }
 
     /* read answer */
     i_ret = stream_Read( p_stream, p_buffer, 1023 );
     if( i_ret == 0 )
     {
         stream_Delete( p_stream );
-        vlc_mutex_unlock( &p_sys->lock );
         return VLC_EGENERIC;
     }
     p_buffer[i_ret] = '\0';
@@ -871,7 +844,6 @@ static int Handshake( intf_thread_t *p_this )
     {
         /* handshake request failed, sorry */
         msg_Warn( p_this, "last.fm handshake failed: %s", p_buffer_pos + 7 );
-        vlc_mutex_unlock( &p_sys->lock );
         return VLC_EGENERIC;
     }
 
@@ -883,7 +855,6 @@ static int Handshake( intf_thread_t *p_this )
             _("last.fm: Authentication failed"),
             _("last.fm Username or Password is incorrect,"
               " please verify your settings and relaunch VLC." ) );
-        vlc_mutex_unlock( &p_sys->lock );
         return VLC_AUDIOSCROBBLER_EFATAL;
     }
 
@@ -962,16 +933,13 @@ static int Handshake( intf_thread_t *p_this )
             break;
     }
 
-    vlc_mutex_unlock ( &p_sys->lock );
     return VLC_SUCCESS;
 
 oom:
-    vlc_mutex_unlock( &p_sys->lock );
     return VLC_ENOMEM;
 
 proto:
     msg_Warn( p_intf, "Handshake: can't recognize server protocol" );
-    vlc_mutex_unlock( &p_sys->lock );
     return VLC_EGENERIC;
 }
 
@@ -1030,9 +998,12 @@ static int ReadMetaData( intf_thread_t *p_this )
         free( psz_meta ); \
     }
 
+    vlc_mutex_lock( &p_sys->lock );
+
     ALLOC_ITEM_META( p_sys->p_current_song.psz_a, Artist )
     else
     {
+        vlc_mutex_unlock( &p_sys->lock );
         msg_Dbg( p_this, "No artist.." );
         vlc_object_release( p_input );
         free( psz_meta );
@@ -1042,6 +1013,7 @@ static int ReadMetaData( intf_thread_t *p_this )
     ALLOC_ITEM_META( p_sys->p_current_song.psz_t, Title )
     else
     {
+        vlc_mutex_unlock( &p_sys->lock );
         msg_Dbg( p_this, "No track name.." );
         vlc_object_release( p_input );
         free( p_sys->p_current_song.psz_a );
@@ -1066,6 +1038,7 @@ static int ReadMetaData( intf_thread_t *p_this )
 
     msg_Dbg( p_this, "Meta data registered" );
 
+    vlc_mutex_unlock( &p_sys->lock );
     vlc_object_release( p_input );
     return VLC_SUCCESS;
 
