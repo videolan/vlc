@@ -27,7 +27,6 @@
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
-#include <vlc_meta.h>
 #include <vlc_codec.h>
 #include <math.h>
 
@@ -45,11 +44,6 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define REPLAYGAIN_TYPE_TEXT N_("Replay Gain type" )
-#define REPLAYGAIN_TYPE_LONGTEXT N_( "Musepack can have a title-specific " \
-              "replay gain (volume control) or an album-specific one. "  \
-              "Choose which type you want to use" )
-
 static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
 
@@ -80,7 +74,6 @@ struct demux_sys_t
     mpc_streaminfo info;
 
     /* */
-    vlc_meta_t     *p_meta;
     int64_t        i_position;
 };
 
@@ -99,7 +92,6 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_sys;
     es_format_t fmt;
     const uint8_t *p_peek;
-    module_t    *p_id3;
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
         return VLC_EGENERIC;
@@ -189,30 +181,6 @@ static int Open( vlc_object_t * p_this )
         fmt.audio_replay_gain.pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = (float)p_sys->info.gain_album / 100.0;
     }
 
-    /* Parse possible id3 header */
-    if( !var_CreateGetBool( p_demux, "meta-preparsed" ) )
-    {
-        p_demux->p_private = malloc( sizeof( demux_meta_t ) );
-        if( !p_demux->p_private )
-            return VLC_ENOMEM;
-        if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
-        {
-            module_Unneed( p_demux, p_id3 );
-            demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
-            p_sys->p_meta = p_demux_meta->p_meta;
-            int i;
-            for( i = 0; i < p_demux_meta->i_attachments; i++ )
-                free( p_demux_meta->attachments[i] );
-            TAB_CLEAN( p_demux_meta->i_attachments,
-                        p_demux_meta->attachments );
-        }
-        free( p_demux->p_private );
-    }
-
-    if( !p_sys->p_meta )
-        p_sys->p_meta = vlc_meta_New();
-
-    vlc_audio_replay_gain_MergeFromMeta( &fmt.audio_replay_gain, p_sys->p_meta );
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
     return VLC_SUCCESS;
@@ -275,16 +243,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     double   f, *pf;
     int64_t i64, *pi64;
-    vlc_meta_t *p_meta;
+    vlc_bool_t *pb_bool;
 
     switch( i_query )
     {
-        case DEMUX_GET_META:
-            p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
-            if( p_sys->p_meta )
-                vlc_meta_Merge( p_meta, p_sys->p_meta );
-            else
-                p_meta = NULL;
+        case DEMUX_HAS_UNSUPPORTED_META:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_TRUE;
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
