@@ -354,7 +354,7 @@
    <item row="2" column="1" >
     <widget class="QComboBox" name="profileBox" />
    </item>
-   <item row="4" column="0" colspan="2" >
+   <item row="3" column="0" colspan="2" >
     <widget class="QTabWidget" name="tabWidget" >
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
@@ -371,7 +371,7 @@
        <item row="0" column="1" >
         <widget class="QRadioButton" name="OggMux" >
          <property name="text" >
-          <string>Ogg</string>
+          <string>Ogg/Ogm</string>
          </property>
         </widget>
        </item>
@@ -766,7 +766,7 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="0" colspan="2" >
+   <item row="4" column="0" colspan="2" >
     <widget class="Line" name="line_2" >
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
