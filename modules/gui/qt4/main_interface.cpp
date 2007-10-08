@@ -385,7 +385,8 @@ void MainInterface::calculateInterfaceSize()
 
 void MainInterface::resizeEvent( QResizeEvent *e )
 {
-    videoWidget->widgetSize.setWidth(  e->size().width() - addSize.width() );
+    if( videoWidget )
+        videoWidget->widgetSize.setWidth( e->size().width() - addSize.width() );
     if( videoWidget && videoIsActive && videoWidget->widgetSize.height() > 1 )
     {
         SET_WH( videoWidget, e->size().width() - addSize.width(),
