@@ -805,11 +805,8 @@ void makect(int nc, int *ip, double *c)
 #define CDFT_4THREADS_BEGIN_N 524288
 #endif
 #include <windows.h>
-<<<<<<< .working
 #include <stdlib.h>
-=======
 #include <stdio.h>
->>>>>>> .merge-right.r21326
 #define cdft_thread_t HANDLE
 #define cdft_thread_create(thp,func,argp) { \
     DWORD thid; \

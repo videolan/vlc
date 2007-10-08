@@ -11,7 +11,7 @@ SOURCES_galaktos = plugin.c plugin.h \
                    eval.c eval.h \
                    init_cond.c init_cond.h init_cond_types.h \
                    PCM.c PCM.h \
-                   fftsg.c \
+                   fftsg.c fftsg.h \
                    per_frame_eqn.c per_frame_eqn.h per_frame_eqn_types.h \
                    splaytree.c splaytree.h splaytree_types.h \
                    custom_shape.c custom_shape.h custom_shape_types.h \
