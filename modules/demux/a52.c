@@ -245,11 +245,21 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     if( i_query == DEMUX_SET_TIME )
+    {
         return VLC_EGENERIC;
+    }
+    else if( i_query == DEMUX_HAS_UNSUPPORTED_META )
+    {
+        vlc_bool_t *pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+        *pb_bool = VLC_TRUE;
+        return VLC_SUCCESS;
+    }
     else
+    {
         return demux2_vaControlHelper( p_demux->s,
                                        0, -1,
                                        8*p_sys->i_mux_rate, 1, i_query, args );
+    }
 }
 
 /*****************************************************************************
