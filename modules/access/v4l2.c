@@ -22,14 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/* 
+/*
  * Sections based on the reference V4L2 capture example at
  * http://v4l2spec.bytesex.org/spec/capture-example.html
  */
- 
+
 /*
- * TODO: No mjpeg support yet. 
- * TODO: mmap untested. 
+ * TODO: No mjpeg support yet.
+ * TODO: mmap untested.
  * TODO: Tuner partial implementation.
  * TODO: Alsa input support?
  */
@@ -90,12 +90,12 @@ static void Close( vlc_object_t * );
     "Capture the audio stream in stereo." )
 #define SAMPLERATE_TEXT N_( "Samplerate" )
 #define SAMPLERATE_LONGTEXT N_( \
-    "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100, 48000)" )    
+    "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100, 48000)" )
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Caching value for V4L2 captures. This " \
     "value should be set in milliseconds." )
-    
+
 typedef enum {
     IO_METHOD_READ,
     IO_METHOD_MMAP,
@@ -106,7 +106,7 @@ static int i_standards_list[] =
     { V4L2_STD_UNKNOWN, V4L2_STD_SECAM, V4L2_STD_PAL, V4L2_STD_NTSC };
 static const char *psz_standards_list_text[] =
     { N_("Default"), N_("SECAM"), N_("PAL"),  N_("NTSC") };
-    
+
 static int i_iomethod_list[] =
     { IO_METHOD_READ, IO_METHOD_MMAP, IO_METHOD_USERPTR };
 static const char *psz_iomethod_list_text[] =
@@ -189,7 +189,7 @@ static struct
     { 0, 0 }
 };
 
-struct buffer_t 
+struct buffer_t
 {
     void *  start;
     size_t  length;
@@ -198,16 +198,16 @@ struct buffer_t
 struct demux_sys_t
 {
     char *psz_device;  /* Main device from MRL, can be video or audio */
-    
+
     char *psz_vdev;
     int  i_fd_video;
 
     char *psz_adev;
     int  i_fd_audio;
-    
+
     /* Video */
     io_method io;
-    
+
     int i_pts;
 
     struct v4l2_capability dev_cap;
@@ -215,7 +215,7 @@ struct demux_sys_t
     int i_input;
     struct v4l2_input *p_inputs;
     int i_selected_input;
-    
+
     int i_standard;
     struct v4l2_standard *p_standards;
     v4l2_std_id i_selected_standard_id;
@@ -229,21 +229,21 @@ struct demux_sys_t
 
     int i_codec;
     struct v4l2_fmtdesc *p_codecs;
-    
+
     struct buffer_t *p_buffers;
     unsigned int i_nbuffers;
-    
+
     int i_width;
     int i_height;
     float f_fps;            /* <= 0.0 mean to grab at full rate */
     mtime_t i_video_pts;    /* only used when f_fps > 0 */
     int i_fourcc;
-    
+
     picture_t pic;
     int i_video_frame_size;
-    
+
     es_out_id_t *p_es_video;
-    
+
     /* Audio */
     int i_sample_rate;
     vlc_bool_t b_stereo;
@@ -265,7 +265,7 @@ static int Open( vlc_object_t *p_this )
     demux_sys_t *p_sys;
     vlc_value_t val;
     char *psz;
-    
+
     /* Only when selected */
     if( *p_demux->psz_access == '\0' ) return VLC_EGENERIC;
 
@@ -276,32 +276,31 @@ static int Open( vlc_object_t *p_this )
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
 
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( p_sys == NULL ) return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
-    
+
     p_sys->i_video_pts = -1;
-    
+
     var_Create( p_demux, "v4l2-standard", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-standard", &val );
     p_sys->i_selected_standard_id = i_standards_list[val.i_int];
-    
+
     p_sys->i_selected_input = var_CreateGetInteger( p_demux, "v4l2-input" );
-    
+
     p_sys->io = var_CreateGetInteger( p_demux, "v4l2-io" );
-    
+
     var_Create( p_demux, "v4l2-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-fps", &val );
     p_sys->f_fps = val.f_float;
-              
+
     var_Create( p_demux, "v4l2-samplerate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-samplerate", &val );
     p_sys->i_sample_rate = val.i_int;
-    
+
     psz = var_CreateGetString( p_demux, "v4l2-chroma" );
     p_sys->i_fourcc = GetChromaFromFourcc( psz );
-    free( psz );    
-    
+    free( psz );
+
     var_Create( p_demux, "v4l2-stereo", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l2-stereo", &val );
     p_sys->b_stereo = val.b_bool;
@@ -311,12 +310,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_device = p_sys->psz_vdev = p_sys->psz_adev = NULL;
     p_sys->i_fd_video = -1;
     p_sys->i_fd_audio = -1;
-    
+
     p_sys->p_es_video = p_sys->p_es_audio = 0;
     p_sys->p_block_audio = 0;
 
     ParseMRL( p_demux );
-    
+
     /* Find main device (video or audio) */
     if( p_sys->psz_device && *p_sys->psz_device )
     {
@@ -327,7 +326,7 @@ static int Open( vlc_object_t *p_this )
         if( ProbeVideoDev( p_demux, p_sys->psz_device ) )
         {
             msg_Dbg( p_demux, "'%s' is a video device", p_sys->psz_device );
-            /* Device was a video device */            
+            /* Device was a video device */
             if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
             p_sys->psz_vdev = p_sys->psz_device;
             p_sys->psz_device = NULL;
@@ -335,12 +334,12 @@ static int Open( vlc_object_t *p_this )
             if( p_sys->i_fd_video < 0 )
             {
                 Close( p_this );
-                return VLC_EGENERIC;            
+                return VLC_EGENERIC;
             }
         }
         else
         {
-            /* Try to open as audio device */     
+            /* Try to open as audio device */
             msg_Dbg( p_demux, "trying device '%s' as audio", p_sys->psz_device );
             if( ProbeAudioDev( p_demux, p_sys->psz_device ) )
             {
@@ -353,7 +352,7 @@ static int Open( vlc_object_t *p_this )
                 if( p_sys->i_fd_audio < 0 )
                 {
                     Close( p_this );
-                    return VLC_EGENERIC;            
+                    return VLC_EGENERIC;
                 }
             }
         }
@@ -429,7 +428,7 @@ static void ParseMRL( demux_t *p_demux )
         for( ;; )
         {
             *psz_parser++ = '\0';
-            
+
             if( !strncmp( psz_parser, "adev=", strlen( "adev=" ) ) )
             {
                 int  i_len;
@@ -446,7 +445,7 @@ static void ParseMRL( demux_t *p_demux )
 
                 p_sys->psz_adev = strndup( psz_parser, i_len );
 
-                psz_parser += i_len; 
+                psz_parser += i_len;
             }
             else if( !strncmp( psz_parser, "standard=", strlen( "standard=" ) ) )
             {
@@ -492,15 +491,15 @@ static void ParseMRL( demux_t *p_demux )
 
                 char* chroma = strndup( psz_parser, i_len );
                 p_sys->i_fourcc = GetChromaFromFourcc( chroma );
-                free( chroma );                
+                free( chroma );
 
-                psz_parser += i_len; 
+                psz_parser += i_len;
             }
             else if( !strncmp( psz_parser, "input=", strlen( "input=" ) ) )
             {
                 p_sys->i_selected_input = strtol( psz_parser + strlen( "input=" ),
                                        &psz_parser, 0 );
-            }            
+            }
             else if( !strncmp( psz_parser, "fps=", strlen( "fps=" ) ) )
             {
                 p_sys->f_fps = strtof( psz_parser + strlen( "fps=" ),
@@ -582,23 +581,23 @@ static void ParseMRL( demux_t *p_demux )
 static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys   = p_demux->p_sys;    
+    demux_sys_t *p_sys   = p_demux->p_sys;
     struct v4l2_buffer buf;
     enum v4l2_buf_type buf_type;
     unsigned int i;
-    
+
     /* Stop video capture */
-    if( p_sys->i_fd_video >= 0 ) 
+    if( p_sys->i_fd_video >= 0 )
     {
         switch( p_sys->io )
         {
         case IO_METHOD_READ:
             /* Nothing to do */
             break;
-            
+
         case IO_METHOD_MMAP:
-        case IO_METHOD_USERPTR:    
-            /* Some drivers 'hang' internally if this is not done before streamoff */               
+        case IO_METHOD_USERPTR:
+            /* Some drivers 'hang' internally if this is not done before streamoff */
             for( unsigned int i = 0; i < p_sys->i_nbuffers; i++ )
             {
                 memset( &buf, 0, sizeof(buf) );
@@ -606,17 +605,17 @@ static void Close( vlc_object_t *p_this )
                 buf.memory = V4L2_MEMORY_USERPTR;
                 ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ); /* ignore result */
             }
-                
-            buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;                        
+
+            buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             if( ioctl( p_sys->i_fd_video, VIDIOC_STREAMOFF, &buf_type ) < 0 ) {
                 msg_Err( p_demux, "VIDIOC_STREAMOFF failed" );
-            }    
-            
-            break;        
+            }
+
+            break;
         }
     }
 
-    /* Close */    
+    /* Close */
     if( p_sys->i_fd_video >= 0 ) close( p_sys->i_fd_video );
     if( p_sys->i_fd_audio >= 0 ) close( p_sys->i_fd_audio );
 
@@ -627,23 +626,23 @@ static void Close( vlc_object_t *p_this )
         case IO_METHOD_READ:
             free( p_sys->p_buffers[0].start );
             break;
-            
+
         case IO_METHOD_MMAP:
-            for( i = 0; i < p_sys->i_nbuffers; ++i ) 
+            for( i = 0; i < p_sys->i_nbuffers; ++i )
             {
                 if( munmap( p_sys->p_buffers[i].start, p_sys->p_buffers[i].length ) )
                 {
                     msg_Err( p_demux, "munmap failed" );
                 }
-            }    
+            }
             break;
-            
-        case IO_METHOD_USERPTR:        
-            for( i = 0; i < p_sys->i_nbuffers; ++i ) 
+
+        case IO_METHOD_USERPTR:
+            for( i = 0; i < p_sys->i_nbuffers; ++i )
             {
                free( p_sys->p_buffers[i].start );
-            }        
-            break;        
+            }
+            break;
         }
         free( p_sys->p_buffers );
     }
@@ -703,9 +702,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-  	es_out_id_t *p_es = p_sys->p_es_audio;
+    es_out_id_t *p_es = p_sys->p_es_audio;
     block_t *p_block = NULL;
-      
+
     /* Try grabbing audio frames first */
     if( p_sys->i_fd_audio < 0 || !( p_block = GrabAudio( p_demux ) ) )
     {
@@ -713,7 +712,7 @@ static int Demux( demux_t *p_demux )
         p_es = p_sys->p_es_video;
         if( p_sys->i_fd_video > 0 ) p_block = GrabVideo( p_demux );
     }
-  
+
     if( !p_block )
     {
         /* Sleep so we do not consume all the cpu, 10ms seems
@@ -745,14 +744,14 @@ static block_t* GrabVideo( demux_t *p_demux )
         /* Did we wait long enough ? (frame rate reduction) */
         if( p_sys->i_video_pts + i_dur > mdate() ) return 0;
     }
-    
+
     /* Grab Video Frame */
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
         if( read( p_sys->i_fd_video, p_sys->p_buffers[0].start, p_sys->p_buffers[0].length ) )
         {
-            switch( errno ) 
+            switch( errno )
             {
             case EAGAIN:
                 return 0;
@@ -762,23 +761,23 @@ static block_t* GrabVideo( demux_t *p_demux )
             default:
                 msg_Err( p_demux, "Failed to read frame" );
                 return 0;
-           	}        
+               }
         }
-        
+
         p_block = ProcessVideoFrame( p_demux, (uint8_t*)p_sys->p_buffers[0].start );
         if( !p_block ) return 0;
-        
+
         break;
-        
+
     case IO_METHOD_MMAP:
         memset( &buf, 0, sizeof(buf) );
         buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buf.memory = V4L2_MEMORY_MMAP;
-        
+
         /* Wait for next frame */
         if (ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ) < 0 )
         {
-            switch( errno ) 
+            switch( errno )
             {
             case EAGAIN:
                 return 0;
@@ -788,35 +787,35 @@ static block_t* GrabVideo( demux_t *p_demux )
             default:
                 msg_Err( p_demux, "Failed to wait (VIDIOC_DQBUF)" );
                 return 0;
-           	}
+               }
         }
 
         if( buf.index >= p_sys->i_nbuffers ) {
             msg_Err( p_demux, "Failed capturing new frame as i>=nbuffers" );
             return 0;
         }
-        
+
         p_block = ProcessVideoFrame( p_demux, p_sys->p_buffers[buf.index].start );
         if( !p_block ) return 0;
 
-        /* Unlock */    
+        /* Unlock */
         if( ioctl( p_sys->i_fd_video, VIDIOC_QBUF, &buf ) < 0 )
         {
             msg_Err (p_demux, "Failed to unlock (VIDIOC_QBUF)");
-        	return 0;
+            return 0;
         }
-    
+
         break;
-        
-    case IO_METHOD_USERPTR:        
+
+    case IO_METHOD_USERPTR:
         memset( &buf, 0, sizeof(buf) );
         buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buf.memory = V4L2_MEMORY_USERPTR;
-        
+
         /* Wait for next frame */
         if (ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ) < 0 )
         {
-            switch( errno ) 
+            switch( errno )
             {
             case EAGAIN:
                 return 0;
@@ -826,14 +825,14 @@ static block_t* GrabVideo( demux_t *p_demux )
             default:
                 msg_Err( p_demux, "Failed to wait (VIDIOC_DQBUF)" );
                 return 0;
-           	}
+               }
         }
 
         /* Find frame? */
         unsigned int i;
         for( i = 0; i < p_sys->i_nbuffers; i++ )
         {
-            if( buf.m.userptr == (unsigned long)p_sys->p_buffers[i].start && 
+            if( buf.m.userptr == (unsigned long)p_sys->p_buffers[i].start &&
                 buf.length == p_sys->p_buffers[i].length ) break;
         }
 
@@ -841,24 +840,24 @@ static block_t* GrabVideo( demux_t *p_demux )
             msg_Err( p_demux, "Failed capturing new frame as i>=nbuffers" );
             return 0;
         }
-        
+
         p_block = ProcessVideoFrame( p_demux, (uint8_t*)buf.m.userptr );
         if( !p_block ) return 0;
 
-        /* Unlock */    
+        /* Unlock */
         if( ioctl( p_sys->i_fd_video, VIDIOC_QBUF, &buf ) < 0 )
         {
             msg_Err (p_demux, "Failed to unlock (VIDIOC_QBUF)");
             return 0;
         }
-        
+
         break;
-       
+
     }
-    
+
     /* Timestamp */
     p_sys->i_video_pts = p_block->i_pts = p_block->i_dts = mdate();
-    
+
     return p_block;
 }
 
@@ -872,7 +871,7 @@ static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame )
     block_t *p_block;
 
     if( !p_frame ) return 0;
-        	
+            
     /* New block */
     if( !( p_block = block_New( p_demux, p_sys->i_video_frame_size ) ) )
     {
@@ -882,7 +881,7 @@ static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame )
 
     /* Copy frame */
     memcpy( p_block->p_buffer, p_frame, p_sys->i_video_frame_size );
-    
+
     return p_block;
 }
 
@@ -895,7 +894,7 @@ static block_t* GrabAudio( demux_t *p_demux )
     struct audio_buf_info buf_info;
     int i_read, i_correct;
     block_t *p_block;
-    
+
     /* Copied from v4l.c */
 
     if( p_sys->p_block_audio ) p_block = p_sys->p_block_audio;
@@ -910,7 +909,7 @@ static block_t* GrabAudio( demux_t *p_demux )
     p_sys->p_block_audio = p_block;
 
     i_read = read( p_sys->i_fd_audio, p_block->p_buffer,
-                   p_sys->i_audio_max_frame_size );                  
+                   p_sys->i_audio_max_frame_size );
 
     if( i_read <= 0 ) return 0;
 
@@ -935,7 +934,7 @@ static block_t* GrabAudio( demux_t *p_demux )
 /*****************************************************************************
  * Helper function to initalise video IO using the Read method
  *****************************************************************************/
-static int InitRead( demux_t *p_demux, int i_fd, unsigned int i_buffer_size ) 
+static int InitRead( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -945,71 +944,71 @@ static int InitRead( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
         msg_Err( p_demux, "Out of memory" );
         goto open_failed;
     }
-    
+
     p_sys->p_buffers[0].length = i_buffer_size;
     p_sys->p_buffers[0].start = malloc( i_buffer_size );
     if( !p_sys->p_buffers[0].start )
     {
         msg_Err( p_demux, "Out of memory" );
         goto open_failed;
-    }    
+    }
 
     return VLC_SUCCESS;
-    
+
 open_failed:
     return VLC_EGENERIC;
-    
+
 }
 
 /*****************************************************************************
  * Helper function to initalise video IO using the mmap method
  *****************************************************************************/
-static int InitMmap( demux_t *p_demux, int i_fd ) 
+static int InitMmap( demux_t *p_demux, int i_fd )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     struct v4l2_requestbuffers req;
-    
+
     memset( &req, 0, sizeof(req) );
     req.count = 4;
     req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     req.memory = V4L2_MEMORY_MMAP;
-    
+
     if( ioctl( i_fd, VIDIOC_REQBUFS, &req ) < 0 )
     {
         msg_Err( p_demux, "device does not support mmap i/o" );
         goto open_failed;
     }
-                            
+
     if( req.count < 2 )
     {
         msg_Err( p_demux, "Insufficient buffer memory" );
         goto open_failed;
     }
-    
+
     p_sys->p_buffers = calloc( req.count, sizeof( *p_sys->p_buffers ) );
     if( !p_sys->p_buffers )
     {
         msg_Err( p_demux, "Out of memory" );
         goto open_failed;
     }
-    
+
     for( p_sys->i_nbuffers = 0; p_sys->i_nbuffers < req.count; ++p_sys->i_nbuffers )
     {
         struct v4l2_buffer buf;
-	
+    
         memset( &buf, 0, sizeof(buf) );
         buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buf.memory = V4L2_MEMORY_MMAP;
         buf.index = p_sys->i_nbuffers;
-        
+
         if( ioctl( i_fd, VIDIOC_QUERYBUF, &buf ) < 0 )
         {
             msg_Err( p_demux, "VIDIOC_QUERYBUF" );
             goto open_failed;
         }
-        
+
         p_sys->p_buffers[p_sys->i_nbuffers].length = buf.length;
-        p_sys->p_buffers[p_sys->i_nbuffers].start = 
+        p_sys->p_buffers[p_sys->i_nbuffers].start =
             mmap( NULL, buf.length, PROT_READ | PROT_WRITE, MAP_SHARED, p_sys->i_fd_video, buf.m.offset );
 
         if( p_sys->p_buffers[p_sys->i_nbuffers].start == MAP_FAILED )
@@ -1018,40 +1017,40 @@ static int InitMmap( demux_t *p_demux, int i_fd )
             goto open_failed;
         }
     }
- 
+
     return VLC_SUCCESS;
-    
+
 open_failed:
     return VLC_EGENERIC;
-    
+
 }
 
 /*****************************************************************************
  * Helper function to initalise video IO using the userbuf method
  *****************************************************************************/
-static int InitUserP( demux_t *p_demux, int i_fd, unsigned int i_buffer_size ) 
+static int InitUserP( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     struct v4l2_requestbuffers req;
-    
+
     memset( &req, 0, sizeof(req) );
     req.count = 4;
     req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     req.memory = V4L2_MEMORY_USERPTR;
-    
+
     if( ioctl( i_fd, VIDIOC_REQBUFS, &req ) < 0 )
     {
         msg_Err( p_demux, "device does not support user pointer i/o" );
         goto open_failed;
     }
-    
+
     p_sys->p_buffers = calloc( 4, sizeof( *p_sys->p_buffers ) );
     if( !p_sys->p_buffers )
     {
         msg_Err( p_demux, "Out of memory" );
         goto open_failed;
     }
-    
+
     for( p_sys->i_nbuffers = 0; p_sys->i_nbuffers < 4; ++p_sys->i_nbuffers )
     {
         p_sys->p_buffers[p_sys->i_nbuffers].length = i_buffer_size;
@@ -1065,10 +1064,10 @@ static int InitUserP( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
     }
 
     return VLC_SUCCESS;
-    
+
 open_failed:
     return VLC_EGENERIC;
-    
+
 }
 
 /*****************************************************************************
@@ -1089,12 +1088,12 @@ unsigned int GetChromaFromFourcc( char *psz_fourcc )
             }
         }
     }
-    
+
     return 0;
 }
 
 /*****************************************************************************
- * IsChromaSupported: returns true if the specified V4L2 chroma constant is 
+ * IsChromaSupported: returns true if the specified V4L2 chroma constant is
  * in the array of supported chromas returned by the driver
  *****************************************************************************/
 vlc_bool_t IsChromaSupported( demux_t *p_demux, unsigned int i_chroma )
@@ -1105,8 +1104,8 @@ vlc_bool_t IsChromaSupported( demux_t *p_demux, unsigned int i_chroma )
     {
         if( p_sys->p_codecs[i_index].pixelformat == i_chroma ) return VLC_TRUE;
     }
-    
-    return VLC_FALSE;            
+
+    return VLC_FALSE;
 }
 
 /*****************************************************************************
@@ -1121,7 +1120,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     struct v4l2_format fmt;
     unsigned int i_min;
     enum v4l2_buf_type buf_type;
-    
+
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
         msg_Err( p_demux, "cannot open device (%m)" );
@@ -1129,7 +1128,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     }
 
     /* Select standard */
-    
+
     if( p_sys->i_selected_standard_id != V4L2_STD_UNKNOWN )
     {
         if( ioctl( i_fd, VIDIOC_S_STD, &p_sys->i_selected_standard_id ) < 0 )
@@ -1141,7 +1140,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     }
 
     /* Select input */
-    
+
     if( p_sys->i_selected_input > p_sys->i_input )
     {
         msg_Warn( p_demux, "invalid input. Using the default one" );
@@ -1158,38 +1157,38 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
-        if( !(p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE) ) 
+        if( !(p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE) )
         {
             msg_Err( p_demux, "device does not support read i/o" );
-            goto open_failed;            
-        }    
-        break;
-        
-    case IO_METHOD_MMAP:
-    case IO_METHOD_USERPTR:
-        if( !(p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING) ) 
-        {
-            msg_Err( p_demux, "device does not support streaming i/o" );
-            goto open_failed;            
+            goto open_failed;
         }
         break;
-       
+
+    case IO_METHOD_MMAP:
+    case IO_METHOD_USERPTR:
+        if( !(p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING) )
+        {
+            msg_Err( p_demux, "device does not support streaming i/o" );
+            goto open_failed;
+        }
+        break;
+
     default:
         msg_Err( p_demux, "io method not supported" );
         goto open_failed;
     }
-        
+
     /* Reset Cropping */
     memset( &cropcap, 0, sizeof(cropcap) );
     cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if( ioctl( i_fd, VIDIOC_CROPCAP, &cropcap ) >= 0 )
-	{
+    {
         crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         crop.c = cropcap.defrect; /* reset to default */
         if( ioctl( i_fd, VIDIOC_S_CROP, &crop ) < 0 )
-		{
+        {
             switch( errno )
-			{
+            {
             case EINVAL:
                 /* Cropping not supported. */
                 break;
@@ -1199,34 +1198,34 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
             }
         }
     }
-  
+
     /* Try and find default resolution if not specified */
-    if( !p_sys->i_width && !p_sys->i_height ) {        
+    if( !p_sys->i_width && !p_sys->i_height ) {
         memset( &fmt, 0, sizeof(fmt) );
         fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        
-        if ( ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 ) 
+
+        if ( ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
         {
             msg_Err( p_demux, "Cannot get default width and height." );
             goto open_failed;
-        }    
-        
+        }
+
         p_sys->i_width = fmt.fmt.pix.width;
         p_sys->i_height = fmt.fmt.pix.height;
-        
+
         if( fmt.fmt.pix.field == V4L2_FIELD_ALTERNATE )
         {
             p_sys->i_height = p_sys->i_height * 2;
         }
     }
-        
-    fmt.fmt.pix.width = p_sys->i_width; 
-    fmt.fmt.pix.height = p_sys->i_height;    
+
+    fmt.fmt.pix.width = p_sys->i_width;
+    fmt.fmt.pix.height = p_sys->i_height;
     fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
-    
+
     /* Test and set Chroma */
     fmt.fmt.pix.pixelformat = 0;
-    if( p_sys->i_fourcc ) 
+    if( p_sys->i_fourcc )
     {
         /* User specified chroma */
         for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
@@ -1238,31 +1237,31 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
             }
         }
         /* Try and set user chroma */
-        if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ( fmt.fmt.pix.pixelformat && ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) ) 
+        if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ( fmt.fmt.pix.pixelformat && ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) )
         {
             msg_Warn( p_demux, "Driver is unable to use specified chroma.  Using defaults." );
             fmt.fmt.pix.pixelformat = 0;
         }
     }
-    
+
     /* If no user specified chroma, find best */
     if( !fmt.fmt.pix.pixelformat )
     {
         fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YVU420;
-        if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) 
+        if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
         {
             fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV422P;
-            if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) 
+            if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
             {
                 fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-                if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) 
+                if( !IsChromaSupported( p_demux, fmt.fmt.pix.pixelformat ) || ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
                 {
                     msg_Err( p_demux, "Could not select any of the default chromas!" );
-                    goto open_failed; 
-                }                  
-            }              
-        }    
-    }   
+                    goto open_failed;
+                }
+            }
+        }
+    }
 
     /* Reassign width, height and chroma incase driver override */
     p_sys->i_width = fmt.fmt.pix.width;
@@ -1278,15 +1277,15 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
             break;
         }
     }
-    
+
     /* Buggy driver paranoia */
     i_min = fmt.fmt.pix.width * 2;
     if( fmt.fmt.pix.bytesperline < i_min )
         fmt.fmt.pix.bytesperline = i_min;
     i_min = fmt.fmt.pix.bytesperline * fmt.fmt.pix.height;
     if( fmt.fmt.pix.sizeimage < i_min )
-        fmt.fmt.pix.sizeimage = i_min;        
-       
+        fmt.fmt.pix.sizeimage = i_min;
+
     /* Init vout Picture */
     vout_InitPicture( VLC_OBJECT(p_demux), &p_sys->pic, p_sys->i_fourcc,
         p_sys->i_width, p_sys->i_height, p_sys->i_width *
@@ -1300,31 +1299,31 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
     for( int i = 0; i < p_sys->pic.i_planes; i++ )
     {
          p_sys->i_video_frame_size += p_sys->pic.p[i].i_visible_lines * p_sys->pic.p[i].i_visible_pitch;
-    }       
-       
-    /* Init IO method */     
+    }
+
+    /* Init IO method */
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
         if( InitRead( p_demux, i_fd, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
         break;
-        
+
     case IO_METHOD_MMAP:
         if( InitMmap( p_demux, i_fd ) != VLC_SUCCESS ) goto open_failed;
         break;
-        
+
     case IO_METHOD_USERPTR:
         if( InitUserP( p_demux, i_fd, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
         break;
-       
+
     }
-       
-    /* Add */    
+
+    /* Add */
     es_format_t es_fmt;
     es_format_Init( &es_fmt, VIDEO_ES, p_sys->i_fourcc );
     es_fmt.video.i_width  = p_sys->i_width;
     es_fmt.video.i_height = p_sys->i_height;
-    es_fmt.video.i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;  
+    es_fmt.video.i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;
 
     /* Setup rgb mask for RGB formats */
     if( p_sys->i_fourcc == VLC_FOURCC( 'R','V','2','4' ) )
@@ -1339,14 +1338,14 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
         (char*)&es_fmt.i_codec, es_fmt.video.i_width, es_fmt.video.i_height );
     p_sys->p_es_video = es_out_Add( p_demux->out, &es_fmt );
 
-    /* Start Capture */    
-    
+    /* Start Capture */
+
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
         /* Nothing to do */
         break;
-        
+
     case IO_METHOD_MMAP:
         for (unsigned int i = 0; i < p_sys->i_nbuffers; ++i)
         {
@@ -1356,7 +1355,7 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
             buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             buf.memory = V4L2_MEMORY_MMAP;
             buf.index = i;
-            
+
             if( ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 ) {
                 msg_Err( p_demux, "VIDIOC_QBUF failed" );
                 goto open_failed;
@@ -1368,9 +1367,9 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
             msg_Err( p_demux, "VIDIOC_STREAMON failed" );
             goto open_failed;
         }
-    
+
         break;
-        
+
     case IO_METHOD_USERPTR:
         for( unsigned int i = 0; i < p_sys->i_nbuffers; ++i )
         {
@@ -1397,13 +1396,13 @@ int OpenVideoDev( demux_t *p_demux, char *psz_device )
 
         break;
     }
-    
+
     /* report fps */
     if( p_sys->f_fps >= 0.1 )
     {
         msg_Dbg( p_demux, "User set fps=%f", p_sys->f_fps );
     }
- 
+
     return i_fd;
 
 open_failed:
@@ -1454,7 +1453,7 @@ int OpenAudioDev( demux_t *p_demux, char *psz_device )
              p_sys->i_sample_rate );
 
     p_sys->i_audio_max_frame_size = 6 * 1024;
-        
+
     es_format_t fmt;
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC('a','r','a','w') );
 
@@ -1468,14 +1467,14 @@ int OpenAudioDev( demux_t *p_demux, char *psz_device )
       fmt.audio.i_channels, fmt.audio.i_rate );
 
     p_sys->p_es_audio = es_out_Add( p_demux->out, &fmt );
-    
+
     return i_fd;
 
  adev_fail:
 
     if( i_fd >= 0 ) close( i_fd );
-    return -1;    
-    
+    return -1;
+
 }
 
 /*****************************************************************************
@@ -1488,7 +1487,7 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
 
     int i_fd;
     demux_sys_t *p_sys = p_demux->p_sys;
-    
+
 /*    msg_Dbg( p_demux, "main device='%s'", p_sys->psz_device ); */
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
@@ -1538,9 +1537,8 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
             p_sys->i_input++;
         }
 
-        p_sys->p_inputs = malloc( p_sys->i_input * sizeof( struct v4l2_input ) );
+        p_sys->p_inputs = calloc( 1, p_sys->i_input * sizeof( struct v4l2_input ) );
         if( !p_sys->p_inputs ) goto open_failed;
-        memset( p_sys->p_inputs, 0, sizeof( struct v4l2_input ) );
 
         for( i_index = 0; i_index < p_sys->i_input; i_index++ )
         {
@@ -1560,7 +1558,7 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
                                         "External analog input" );
         }
     }
-    
+
     /* Probe video standards */
     if( p_sys->dev_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
     {
@@ -1572,9 +1570,8 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
             t_standards.index = p_sys->i_standard;
         }
 
-        p_sys->p_standards = malloc( p_sys->i_standard * sizeof( struct v4l2_standard ) );
+        p_sys->p_standards = calloc( 1, p_sys->i_standard * sizeof( struct v4l2_standard ) );
         if( !p_sys->p_standards ) goto open_failed;
-        memset( p_sys->p_standards, 0, sizeof( struct v4l2_standard ) );
 
         for( i_standard = 0; i_standard < p_sys->i_standard; i_standard++ )
         {
@@ -1632,9 +1629,8 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
             tuner.index = p_sys->i_tuner;
         }
 
-        p_sys->p_tuners = malloc( p_sys->i_tuner * sizeof( struct v4l2_tuner ) );
+        p_sys->p_tuners = calloc( 1, p_sys->i_tuner * sizeof( struct v4l2_tuner ) );
         if( !p_sys->p_tuners ) goto open_failed;
-        memset( p_sys->p_tuners, 0, sizeof( struct v4l2_tuner ) );
 
         for( i_index = 0; i_index < p_sys->i_tuner; i_index++ )
         {
@@ -1681,8 +1677,7 @@ vlc_bool_t ProbeVideoDev( demux_t *p_demux, char *psz_device )
 
         p_sys->i_codec = i_index;
 
-        p_sys->p_codecs = malloc( p_sys->i_codec * sizeof( struct v4l2_fmtdesc ) );
-        memset( p_sys->p_codecs, 0, p_sys->i_codec * sizeof( struct v4l2_fmtdesc ) );
+        p_sys->p_codecs = calloc( 1, p_sys->i_codec * sizeof( struct v4l2_fmtdesc ) );
 
         for( i_index = 0; i_index < p_sys->i_codec; i_index++ )
         {
@@ -1725,19 +1720,19 @@ vlc_bool_t ProbeAudioDev( demux_t *p_demux, char *psz_device )
         goto open_failed;
     }
 
-    /* this will fail if the device is video */    
+    /* this will fail if the device is video */
     if( ioctl( i_fd, SNDCTL_DSP_GETCAPS, &i_caps ) < 0 )
     {
         msg_Err( p_demux, "cannot get audio caps (%m)" );
         goto open_failed;
     }
-    
+
     if( i_fd ) close( i_fd );
     return VLC_TRUE;
 
 open_failed:
     if( i_fd ) close( i_fd );
     return VLC_FALSE;
-    
+
 }
 
