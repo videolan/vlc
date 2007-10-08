@@ -103,9 +103,7 @@ struct intf_sys_t
 static int  Open            ( vlc_object_t * );
 static void Close           ( vlc_object_t * );
 static void Unload          ( intf_thread_t * );
-
 static void Run             ( intf_thread_t * );
-static void Main            ( intf_thread_t * );
 
 static int ItemChange       ( vlc_object_t *, const char *, vlc_value_t,
                                 vlc_value_t, void * );
@@ -251,20 +249,10 @@ static void Unload( intf_thread_t *p_this )
     vlc_object_destroy( p_this );
 }
 
-
-/****************************************************************************
- * Run : create Main() thread
- * **************************************************************************/
-static void Run( intf_thread_t *p_intf )
-{
-    if( vlc_thread_create( p_intf, "Audioscrobbler", Main, 0, VLC_TRUE ) )
-        msg_Err( p_intf, "failed to create Audioscrobbler thread" );
-}
-
 /*****************************************************************************
- * Main : call Handshake() then submit songs
+ * Run : call Handshake() then submit songs
  *****************************************************************************/
-static void Main( intf_thread_t *p_intf )
+static void Run( intf_thread_t *p_intf )
 {
     char                    *psz_submit, *psz_submit_song, *psz_submit_tmp;
     int                     i_net_ret;
@@ -288,7 +276,10 @@ static void Main( intf_thread_t *p_intf )
         vlc_object_unlock( p_intf );
 
         if( b_die )
+        {
+            msg_Dbg( p_intf, "audioscrobbler is dying\n");
             return;
+        }
 
         /* handshake if needed */
         if( p_sys->b_handshaked == VLC_FALSE )
