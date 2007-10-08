@@ -334,6 +334,32 @@ static int Create( vlc_object_t *p_this )
 #endif
     }
 
+    i_error = FT_Init_FreeType( &p_sys->p_library );
+    if( i_error )
+    {
+        msg_Err( p_filter, "couldn't initialize freetype" );
+        goto error;
+    }
+    i_error = FT_New_Face( p_sys->p_library, psz_fontfile ? psz_fontfile : "",
+                           0, &p_sys->p_face );
+    if( i_error == FT_Err_Unknown_File_Format )
+    {
+        msg_Err( p_filter, "file %s have unknown format", psz_fontfile );
+        goto error;
+    }
+    else if( i_error )
+    {
+        msg_Err( p_filter, "failed to load font file %s", psz_fontfile );
+        goto error;
+    }
+
+    i_error = FT_Select_Charmap( p_sys->p_face, ft_encoding_unicode );
+    if( i_error )
+    {
+        msg_Err( p_filter, "font has no unicode translation table" );
+        goto error;
+    }
+
 #ifdef HAVE_FONTCONFIG
     vlc_mutex_init( p_filter, &p_sys->fontconfig_lock );
     p_sys->b_fontconfig_ok = VLC_FALSE;
@@ -366,31 +392,6 @@ static int Create( vlc_object_t *p_this )
                             "Font styling won't be available." );
     }
 #endif
-    i_error = FT_Init_FreeType( &p_sys->p_library );
-    if( i_error )
-    {
-        msg_Err( p_filter, "couldn't initialize freetype" );
-        goto error;
-    }
-    i_error = FT_New_Face( p_sys->p_library, psz_fontfile ? psz_fontfile : "",
-                           0, &p_sys->p_face );
-    if( i_error == FT_Err_Unknown_File_Format )
-    {
-        msg_Err( p_filter, "file %s have unknown format", psz_fontfile );
-        goto error;
-    }
-    else if( i_error )
-    {
-        msg_Err( p_filter, "failed to load font file %s", psz_fontfile );
-        goto error;
-    }
-
-    i_error = FT_Select_Charmap( p_sys->p_face, ft_encoding_unicode );
-    if( i_error )
-    {
-        msg_Err( p_filter, "font has no unicode translation table" );
-        goto error;
-    }
 
     p_sys->i_use_kerning = FT_HAS_KERNING( p_sys->p_face );
 
