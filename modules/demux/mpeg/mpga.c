@@ -28,7 +28,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc_demux.h>
-#include <vlc_meta.h>
 #include <vlc_codec.h>
 #include <vlc_input.h>
 
@@ -59,7 +58,6 @@ static int Control( demux_t *, int, va_list );
 struct demux_sys_t
 {
     es_out_id_t *p_es;
-    vlc_meta_t  *meta;
 
     vlc_bool_t  b_start;
     decoder_t   *p_packetizer;
@@ -75,9 +73,6 @@ struct demux_sys_t
     int i_xing_bitrate_avg;
     int i_xing_frame_samples;
     block_t *p_block_in, *p_block_out;
-
-    int                i_attachments;
-    input_attachment_t **attachments;
 };
 
 static int HeaderCheck( uint32_t h )
@@ -125,7 +120,6 @@ static int Open( vlc_object_t * p_this )
 
     uint32_t     header;
     const uint8_t     *p_peek;
-    module_t    *p_id3;
     block_t     *p_block_in, *p_block_out;
 
     if( demux2_IsPathExtension( p_demux, ".mp3" ) )
@@ -158,7 +152,6 @@ static int Open( vlc_object_t * p_this )
     memset( p_sys, 0, sizeof( demux_sys_t ) );
     p_sys->p_es = 0;
     p_sys->b_start = VLC_TRUE;
-    p_sys->meta = 0;
 
     /* Load the mpeg audio packetizer */
     INIT_APACKETIZER( p_sys->p_packetizer, 'm', 'p', 'g', 'a' );
@@ -255,26 +248,8 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_block_in = p_block_in;
     p_sys->p_block_out = p_block_out;
 
-    /* Parse possible id3 header */
-    if( !var_CreateGetBool( p_demux, "meta-preparsed" ) )
-    {
-        p_demux->p_private = malloc( sizeof( demux_meta_t ) );
-        if( !p_demux->p_private )
-            return VLC_ENOMEM;
-        if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
-        {
-            module_Unneed( p_demux, p_id3 );
-            demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
-            p_sys->meta = p_demux_meta->p_meta;
-            p_sys->i_attachments = p_demux_meta->i_attachments;
-            p_sys->attachments = p_demux_meta->attachments;
-        }
-        free( p_demux->p_private );
-    }
     /* */
     p_sys->p_packetizer->fmt_out.b_packetized = VLC_TRUE;
-    vlc_audio_replay_gain_MergeFromMeta( &p_sys->p_packetizer->fmt_out.audio_replay_gain,
-                                         p_sys->meta );
     p_sys->p_es = es_out_Add( p_demux->out,
                               &p_sys->p_packetizer->fmt_out);
     return VLC_SUCCESS;
@@ -345,16 +320,8 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    var_Destroy( p_demux, "meta-preparsed" );
-
     DESTROY_PACKETIZER( p_sys->p_packetizer );
-    if( p_sys->meta ) vlc_meta_Delete( p_sys->meta );
     if( p_sys->p_block_out ) block_Release( p_sys->p_block_out );
-
-    int i;
-    for( i = 0; i < p_sys->i_attachments; i++ )
-        free( p_sys->attachments[i] );
-    TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
 
     free( p_sys );
 }
@@ -366,31 +333,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     int64_t *pi64;
-    vlc_meta_t *p_meta;
+    vlc_bool_t *pb_bool;
     int i_ret;
-
-    input_attachment_t ***ppp_attach;
-    int *pi_int, i;
 
     switch( i_query )
     {
-        case DEMUX_GET_META:
-            p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
-            vlc_meta_Merge( p_meta, p_sys->meta );
-            return VLC_SUCCESS;
-
-        case DEMUX_GET_ATTACHMENTS:
-            ppp_attach =
-                (input_attachment_t***)va_arg( args, input_attachment_t*** );
-            pi_int = (int*)va_arg( args, int * );
-
-            if( p_sys->i_attachments <= 0 )
-                return VLC_EGENERIC;
-
-            *pi_int = p_sys->i_attachments;
-            *ppp_attach = malloc( sizeof(input_attachment_t**) * p_sys->i_attachments );
-            for( i = 0; i < p_sys->i_attachments; i++ )
-                (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachments[i] );
+        case DEMUX_HAS_UNSUPPORTED_META:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_TRUE;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
