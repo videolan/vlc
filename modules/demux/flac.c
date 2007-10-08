@@ -63,6 +63,7 @@ struct demux_sys_t
 
     /* Packetizer */
     decoder_t *p_packetizer;
+
     vlc_meta_t *p_meta;
     audio_replay_gain_t replay_gain;
 
@@ -93,7 +94,6 @@ struct demux_sys_t
 static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
-    module_t    *p_id3;
     demux_sys_t *p_sys;
     const byte_t *p_peek;
     uint8_t     *p_streaminfo;
@@ -154,37 +154,6 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    /* Parse possible id3 header */
-    if( !var_CreateGetBool( p_demux, "meta-preparsed" ) )
-    {
-        p_demux->p_private = malloc( sizeof( demux_meta_t ) );
-        if( !p_demux->p_private )
-            return VLC_ENOMEM;
-        if( ( p_id3 = module_Need( p_demux, "meta reader", NULL, 0 ) ) )
-        {
-            module_Unneed( p_demux, p_id3 );
-            demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
-            vlc_meta_t *p_meta = p_demux_meta->p_meta;
-
-            if( !p_sys->p_meta )
-            {
-                p_sys->p_meta = p_meta;
-            }
-            else if( p_meta )
-            {
-                vlc_meta_Merge( p_sys->p_meta, p_meta );
-                vlc_meta_Delete( p_meta );
-            }
-            int i;
-            for( i = 0; i < p_demux_meta->i_attachments; i++ )
-                TAB_APPEND_CAST( (input_attachment_t**),
-                    p_sys->i_attachments, p_sys->attachments,
-                    p_demux_meta->attachments[p_demux_meta->i_attachments] );
-            TAB_CLEAN( p_demux_meta->i_attachments, p_demux_meta->attachments );
-        }
-        free( p_demux->p_private );
-    }
-
     if( p_sys->i_cover_idx < p_sys->i_attachments )
     {
         char psz_url[128];
@@ -206,7 +175,6 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    var_Destroy( p_demux, "meta-preparsed" );
     TAB_CLEAN( p_sys->i_seekpoint, p_sys->seekpoint );
 
     int i;
@@ -373,6 +341,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
         if( p_demux->p_sys->p_meta )
             vlc_meta_Merge( p_meta, p_demux->p_sys->p_meta );
+        return VLC_SUCCESS;
+    }
+    else if( i_query == DEMUX_HAS_UNSUPPORTED_META )
+    {
+        vlc_bool_t *pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+        *pb_bool = VLC_TRUE;
         return VLC_SUCCESS;
     }
     else if( i_query == DEMUX_GET_LENGTH )
