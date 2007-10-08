@@ -636,7 +636,6 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, int i_data )
         {
             /* generic (PERFORMER/LICENSE/ORGANIZATION/LOCATION/CONTACT/ISRC,
              * undocumented tags and replay gain ) */
-            audio_replay_gain_t *r = &p_sys->replay_gain;
             char *p = strchr( psz, '=' );
             *p++ = '\0';
             vlc_meta_AddExtra( p_sys->p_meta, psz, p );
