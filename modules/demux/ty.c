@@ -163,8 +163,6 @@ static int TyOpen(vlc_object_t *p_this)
          U32_AT(&p_peek[8]) != CHUNK_SIZE )
     {
         /* doesn't look like a TY file... */
-        char *psz_ext = strrchr(p_demux->psz_path, '.');
-
         if( !p_demux->b_force && !demux2_IsPathExtension( p_demux, ".ty" ) )
             return VLC_EGENERIC;
         msg_Warn( p_demux, "this does not look like a TY file, "
