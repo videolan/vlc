@@ -1168,7 +1168,7 @@ static int FrontendSetOFDM( access_t * p_access )
     /* Now send it all to the frontend device */
     if( (ret = ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep )) < 0 )
     {
-        msg_Err( p_access, "DVB-T: setting frontend failed (%d): %s", ret );
+        msg_Err( p_access, "DVB-T: setting frontend failed (%d): %m", ret );
         return -1;
     }
 
@@ -1204,7 +1204,7 @@ static int FrontendSetATSC( access_t *p_access )
     /* Now send it all to the frontend device */
     if( (i_ret = ioctl( p_sys->i_frontend_handle, FE_SET_FRONTEND, &fep )) < 0 )
     {
-        msg_Err( p_access, "ATSC: setting frontend failed (%d): %s", i_ret );
+        msg_Err( p_access, "ATSC: setting frontend failed (%d): %m", i_ret );
         return VLC_EGENERIC;
     }
 
