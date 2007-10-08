@@ -118,6 +118,7 @@ enum demux_query_e
 
     /* Meta data */
     DEMUX_GET_META,             /* arg1= vlc_meta_t **  res=can fail    */
+    DEMUX_HAS_UNSUPPORTED_META, /* arg1= vlc_bool_t *   res can fail    */
 
     /* Attachments */
     DEMUX_GET_ATTACHMENTS,      /* arg1=input_attachment_t***, int* res=can fail */

@@ -267,6 +267,7 @@ int demux2_vaControlHelper( stream_t *s,
 
         case DEMUX_GET_FPS:
         case DEMUX_GET_META:
+        case DEMUX_HAS_UNSUPPORTED_META:
         case DEMUX_SET_NEXT_DEMUX_TIME:
         case DEMUX_GET_TITLE_INFO:
         case DEMUX_SET_GROUP:

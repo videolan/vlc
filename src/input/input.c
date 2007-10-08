@@ -75,7 +75,6 @@ static int  InputSourceInit( input_thread_t *, input_source_t *,
 static void InputSourceClean( input_source_t * );
 /* TODO */
 //static void InputGetAttachments( input_thread_t *, input_source_t * );
-
 static void SlaveDemux( input_thread_t *p_input );
 static void SlaveSeek( input_thread_t *p_input );
 
@@ -84,6 +83,10 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta );
 
 static sout_instance_t *SoutFind( vlc_object_t *p_parent, input_item_t *p_item, vlc_bool_t * );
 static void SoutKeep( sout_instance_t * );
+
+static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_demux );
+static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
+                              int i_new, input_attachment_t **pp_new );
 
 /*****************************************************************************
  * This function creates a new input, and returns a pointer
@@ -1163,7 +1166,7 @@ static int Init( input_thread_t * p_input )
     InputMetaUser( p_input, p_meta );
 
     /* Get meta data from master input */
-    demux2_Control( p_input->p->input.p_demux, DEMUX_GET_META, p_meta );
+    DemuxMeta( p_input, p_meta, p_input->p->input.p_demux );
 
     /* Access_file does not give any meta, and there are no slave */
     if( !p_input->b_preparsing )
@@ -1175,8 +1178,7 @@ static int Init( input_thread_t * p_input )
         /* Get meta data from slave input */
         for( i = 0; i < p_input->p->i_slave; i++ )
         {
-            demux2_Control( p_input->p->slave[i]->p_demux,
-                            DEMUX_GET_META, p_meta );
+            DemuxMeta( p_input, p_meta, p_input->p->slave[i]->p_demux );
             if( p_input->p->slave[i]->p_access )
             {
                 access2_Control( p_input->p->slave[i]->p_access,
@@ -2357,14 +2359,9 @@ static int InputSourceInit( input_thread_t *p_input,
         if( !demux2_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
                              &attachment, &i_attachment ) )
         {
-            int i;
             vlc_mutex_lock( &p_input->p->input.p_item->lock );
-            p_input->p->attachment = realloc( p_input->p->attachment,
-                    sizeof(input_attachment_t**) * ( p_input->p->i_attachment + i_attachment ) );
-            for( i = 0; i < i_attachment; i++ )
-                p_input->p->attachment[p_input->p->i_attachment++] = attachment[i];
-            if( attachment )
-                free( attachment );
+            AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
+                              i_attachment, attachment );
             vlc_mutex_unlock( &p_input->p->input.p_item->lock );
         }
     }
@@ -2627,6 +2624,63 @@ static inline vlc_bool_t IsValidAccess( const char *psz )
     }
     /* should not happen though */
     return VLC_FALSE;
+}
+
+static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
+                              int i_new, input_attachment_t **pp_new )
+{
+    int i_attachment = *pi_attachment;
+    input_attachment_t **attachment = *ppp_attachment;
+    int i;
+
+    attachment = realloc( attachment,
+                          sizeof(input_attachment_t**) * ( i_attachment + i_new ) );
+    for( i = 0; i < i_new; i++ )
+        attachment[i_attachment++] = pp_new[i];
+    if( pp_new )
+        free( pp_new );
+
+    /* */
+    *pi_attachment = i_attachment;
+    *ppp_attachment = attachment;
+}
+
+static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_demux )
+{
+    vlc_bool_t b_bool;
+    module_t *p_id3;
+
+    demux2_Control( p_demux, DEMUX_GET_META, p_meta );
+    if( demux2_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &b_bool ) )
+        return;
+    if( !b_bool )
+        return;
+
+    p_demux->p_private = malloc( sizeof( demux_meta_t ) );
+    if(! p_demux->p_private )
+        return;
+
+    p_id3 = module_Need( p_demux, "meta reader", NULL, 0 );
+    if( p_id3 )
+    {
+        demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
+
+        if( p_demux_meta->p_meta )
+        {
+            vlc_meta_Merge( p_meta, p_demux_meta->p_meta );
+            vlc_meta_Delete( p_demux_meta->p_meta );
+        }
+
+        if( p_demux_meta->i_attachments > 0 )
+        {
+            vlc_mutex_lock( &p_input->p->input.p_item->lock );
+            AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
+                              p_demux_meta->i_attachments, p_demux_meta->attachments );
+            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+        }
+        module_Unneed( p_demux, p_id3 );
+    }
+    free( p_demux->p_private );
 }
 
 
