@@ -117,7 +117,7 @@ private:
     QLabel              *timeLabel;
     QLabel              *speedLabel;
     QLabel              *nameLabel;
- 
+
     bool                 b_remainingTime;
 
     void customEvent( QEvent *);
@@ -136,8 +136,6 @@ private slots:
     void setVLCWindowsTitle( QString title = "" );
     void setDisplayPosition( float, int, int );
     void toggleTimeDisplay();
-    void setElapsedTime();
-    void setRemainTime();
 #if 0
     void visual();
 #endif
@@ -146,7 +144,6 @@ private slots:
     void updateSystrayTooltipName( QString );
     void updateSystrayTooltipStatus( int );
     void showSpeedMenu( QPoint );
-    void showTimeMenu( QPoint );
 };
 
 #endif

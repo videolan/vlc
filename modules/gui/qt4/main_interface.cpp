@@ -44,6 +44,8 @@
 #include <QLabel>
 #include <QSlider>
 #include <QWidgetAction>
+#include <QDockWidget>
+#include <QToolBar>
 
 #include <assert.h>
 #include <vlc_keys.h>
@@ -125,6 +127,17 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setVLCWindowsTitle();
     handleMainUi( settings );
 
+#if 0 /* dock part */
+    QDockWidget *dock = new QDockWidget( this );
+    PlaylistWidget *plw = new PlaylistWidget( p_intf );
+    dock->setWidget( plw );
+    addDockWidget( Qt::RightDockWidgetArea, dock );
+
+    QToolBar *tb = new QToolBar(this);
+    tb->addAction( "playlist", dock, SLOT( hide() ) );
+    addToolBar(Qt::RightToolBarArea, tb);
+#endif
+
     /* Menu Bar */
     QVLCMenu::createMenuBar( this, p_intf, playlistEmbeddedFlag,
                              visualSelectorEnabled );
@@ -148,10 +161,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
     timeLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
     CONNECT( timeLabel, timeLabelClicked(), this, toggleTimeDisplay() );
+    CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
     CONNECT( speedLabel, customContextMenuRequested( QPoint ),
              this, showSpeedMenu( QPoint ) );
     CONNECT( timeLabel, customContextMenuRequested( QPoint ),
-             this, showTimeMenu( QPoint ) );
+             this, toggleTimeDisplay() );
 
     /**********************
      * Systray Management *
@@ -407,14 +421,6 @@ void MainInterface::resizeEvent( QResizeEvent *e )
 void MainInterface::showSpeedMenu( QPoint pos )
 {
     speedControlMenu->exec( QCursor::pos() - pos + QPoint( 0, speedLabel->height() ) );
-}
-
-void MainInterface::showTimeMenu( QPoint pos )
-{
-    QMenu menu( this );
-    menu.addAction(  qtr("Elapsed Time") , this, SLOT( setElapsedTime() ) );
-    menu.addAction(  qtr("Remaining Time") , this, SLOT( setRemainTime() ) );
-    menu.exec( QCursor::pos() - pos +QPoint( 0, timeLabel->height() ) );
 }
 
 /****************************************************************************
@@ -675,11 +681,9 @@ void MainInterface::setDisplayPosition( float pos, int time, int length )
 
 void MainInterface::toggleTimeDisplay()
 {
+    msg_Dbg( p_intf, "Hello" );
     b_remainingTime = ( b_remainingTime ? false : true );
 }
-
-void MainInterface::setElapsedTime(){ b_remainingTime = false; }
-void MainInterface::setRemainTime(){ b_remainingTime = true; }
 
 void MainInterface::setName( QString name )
 {
