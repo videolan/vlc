@@ -35,12 +35,6 @@
 #include <QTimer>
 #include <QApplication>
 
-#define EXT_FILTER_MEDIA        0x01
-#define EXT_FILTER_VIDEO        0x02
-#define EXT_FILTER_AUDIO        0x04
-#define EXT_FILTER_PLAYLIST     0x08
-#define EXT_FILTER_SUBTITLE     0x10
-
 #define ADD_FILTER_MEDIA( string )   \
     string += qtr("Media Files");      \
     string += " ( ";                 \
@@ -70,15 +64,25 @@
     string += qtr("All Files");        \
     string += " (*.*)";
 
-#define OPEN_FILE_TAB           0x0
-#define OPEN_DISC_TAB           0x1
-#define OPEN_NETWORK_TAB        0x2
-#define OPEN_CAPTURE_TAB        0x3
+#define EXT_FILTER_MEDIA        0x01
+#define EXT_FILTER_VIDEO        0x02
+#define EXT_FILTER_AUDIO        0x04
+#define EXT_FILTER_PLAYLIST     0x08
+#define EXT_FILTER_SUBTITLE     0x10
 
-#define OPEN_AND_PLAY           0x0
-#define OPEN_AND_STREAM         0x1
-#define OPEN_AND_SAVE           0x2
-#define ENQUEUE                 0x4
+enum {
+    OPEN_FILE_TAB,
+    OPEN_DISC_TAB,
+    OPEN_NETWORK_TAB,
+    OPEN_CAPTURE_TAB
+};
+
+enum {
+    OPEN_AND_PLAY,
+    OPEN_AND_STREAM,
+    OPEN_AND_SAVE,
+    ENQUEUE
+};
 
 class QEvent;
 class QSignalMapper;
