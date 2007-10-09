@@ -224,7 +224,7 @@ mvar_t *E_(mvar_InputVarSetNew)( intf_thread_t *p_intf, char *name,
 /** This function creates a set variable representing the files of the psz_dir
  * directory */
 mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
-                             const char *psz_dir );
+                             char *psz_dir );
 /** This function creates a set variable representing the VLM streams */
 mvar_t *E_(mvar_VlmSetNew)( char *name, vlm_t *vlm );
 

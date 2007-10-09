@@ -506,7 +506,7 @@ mvar_t *E_(mvar_HttpdInfoSetNew)( char *name, httpd_t *p_httpd, int i_type )
 #endif
 
 mvar_t *E_(mvar_FileSetNew)( intf_thread_t *p_intf, char *name,
-                             const char *psz_dir )
+                             char *psz_dir )
 {
     mvar_t *s = E_(mvar_New)( name, "set" );
 #ifdef HAVE_SYS_STAT_H
