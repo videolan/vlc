@@ -181,15 +181,14 @@ EXTRA_DIST += \
 	ui/streampanel.ui \
 	ui/sout.ui \
 	ui/vlm.ui \
-	pixmaps/type_net.xpm \
-	pixmaps/type_playlist.xpm \
+	pixmaps/type_net.png \
+	pixmaps/type_playlist.png \
 	pixmaps/type_unknown.xpm \
-	pixmaps/type_file.xpm \
-	pixmaps/type_card.xpm \
-	pixmaps/type_disc.xpm \
-	pixmaps/type_cdda.xpm \
-	pixmaps/type_directory.xpm \
-	pixmaps/type_node.xpm \
+	pixmaps/type_file.png \
+	pixmaps/type_card.png \
+	pixmaps/cdda_16px.png \
+	pixmaps/type_directory.png \
+	pixmaps/type_node.png \
 	pixmaps/go-next.png \
 	pixmaps/next.png \
 	pixmaps/noart.png \
@@ -207,39 +206,39 @@ EXTRA_DIST += \
 	pixmaps/volume-high.png \
 	pixmaps/volume-low.png \
 	pixmaps/volume-muted.png \
-	pixmaps/vlc_help_16px.png \
-	pixmaps/vlc_stop_16px.png \
-	pixmaps/vlc_play_16px.png \
-	pixmaps/vlc_pause_16px.png \
-	pixmaps/vlc_messages_16px.png \
-	pixmaps/vlc_network_16px.png \
-	pixmaps/vlc_stream_16px.png \
-	pixmaps/vlc_quit_16px.png \
-	pixmaps/vlc_disc_16px.png \
-	pixmaps/vlc_network_16px.png \
-	pixmaps/vlc_capture-card_16px.png \
-	pixmaps/vlc_preferences_16px.png \
-	pixmaps/vlc_settings_16px.png \
-	pixmaps/vlc_playlist_16px.png \
-	pixmaps/vlc_folder-grey_16px.png \
-	pixmaps/vlc_folder-blue_16px.png \
-	pixmaps/vlc_tape_16px.png \
-	pixmaps/vlc_file-asym_16px.png \
-	pixmaps/vlc_file-wide_16px.png \
-	pixmaps/vlc_info_16px.png \
-	pixmaps/vlc_previous_16px.png \
-	pixmaps/vlc_next_16px.png \
-	pixmaps/vlc_record_16px.png \
-	pixmaps/vlc_playlist_add.png \
-	pixmaps/vlc_playlist_repeat_off.png \
-	pixmaps/vlc_playlist_repeat_all.png \
-	pixmaps/vlc_playlist_repeat_one.png \
-	pixmaps/vlc_playlist_shuffle_on.png \
-	pixmaps/vlc_playlist_shuffle_off.png \
-	pixmaps/vlc_advprefs_audio.png \
-	pixmaps/vlc_advprefs_video.png \
-	pixmaps/vlc_advprefs_intf.png \
-	pixmaps/vlc_advprefs_sout.png \
-	pixmaps/vlc_advprefs_codec.png \
-	pixmaps/vlc_advprefs_extended.png \
-	pixmaps/vlc_advprefs_playlist.png
+	pixmaps/menus_help_16px.png \
+	pixmaps/stop_16px.png \
+	pixmaps/play_16px.png \
+	pixmaps/pause_16px.png \
+	pixmaps/menus_messages_16px.png \
+	pixmaps/network_16px.png \
+	pixmaps/menus_stream_16px.png \
+	pixmaps/menus_quit_16px.png \
+	pixmaps/disc_16px.png \
+	pixmaps/network_16px.png \
+	pixmaps/capture-card_16px.png \
+	pixmaps/menus_preferences_16px.png \
+	pixmaps/menus_settings_16px.png \
+	pixmaps/playlist_16px.png \
+	pixmaps/folder-grey_16px.png \
+	pixmaps/folder-blue_16px.png \
+	pixmaps/tape_16px.png \
+	pixmaps/file-asym_16px.png \
+	pixmaps/file-wide_16px.png \
+	pixmaps/info_16px.png \
+	pixmaps/previous_16px.png \
+	pixmaps/next_16px.png \
+	pixmaps/record_16px.png \
+	pixmaps/playlist_add.png \
+	pixmaps/playlist_repeat_off.png \
+	pixmaps/playlist_repeat_all.png \
+	pixmaps/playlist_repeat_one.png \
+	pixmaps/playlist_shuffle_on.png \
+	pixmaps/playlist_shuffle_off.png \
+	pixmaps/advprefs_audio.png \
+	pixmaps/advprefs_video.png \
+	pixmaps/advprefs_intf.png \
+	pixmaps/advprefs_sout.png \
+	pixmaps/advprefs_codec.png \
+	pixmaps/advprefs_extended.png \
+	pixmaps/advprefs_playlist.png

@@ -190,25 +190,25 @@ QMenu *QVLCMenu::FileMenu()
     QMenu *menu = new QMenu();
 
     DP_SADD( menu, qtr( "Open &File..." ), "",
-            ":/pixmaps/vlc_file-asym_16px.png", openFileDialog(), "Ctrl+O" );
+            ":/pixmaps/file-asym_16px.png", openFileDialog(), "Ctrl+O" );
     DP_SADD( menu, qtr( I_OPEN_FOLDER ), "",
-            ":/pixmaps/vlc_folder-grey_16px.png", PLAppendDir(), "Ctrl+F" );
-    DP_SADD( menu, qtr( "Open &Disc..." ), "", ":/pixmaps/vlc_disc_16px.png",
+            ":/pixmaps/folder-grey_16px.png", PLAppendDir(), "Ctrl+F" );
+    DP_SADD( menu, qtr( "Open &Disc..." ), "", ":/pixmaps/disc_16px.png",
              openDiscDialog(), "Ctrl+D" );
     DP_SADD( menu, qtr( "Open &Network..." ), "",
-                ":/pixmaps/vlc_network_16px.png", openNetDialog(), "Ctrl+N" );
+                ":/pixmaps/network_16px.png", openNetDialog(), "Ctrl+N" );
     DP_SADD( menu, qtr( "Open &Capture Device..." ), "",
-            ":/pixmaps/vlc_capture-card_16px.png", openCaptureDialog(),
+            ":/pixmaps/capture-card_16px.png", openCaptureDialog(),
             "Ctrl+C" );
     menu->addSeparator();
 
-    DP_SADD( menu, qtr( "&Streaming..." ), "", ":/pixmaps/vlc_stream_16px.png",
+    DP_SADD( menu, qtr( "&Streaming..." ), "", ":/pixmaps/menus_stream_16px.png",
             openThenStreamingDialogs(), "Ctrl+S" );
     DP_SADD( menu, qtr( "Conve&rt / Save..." ), "", "",
             openThenTranscodingDialogs(), "Ctrl+R" );
 
     menu->addSeparator();
-    DP_SADD( menu, qtr( "&Quit" ) , "", ":/pixmaps/vlc_quit_16px.png", quit(),
+    DP_SADD( menu, qtr( "&Quit" ) , "", ":/pixmaps/menus_quit_16px.png", quit(),
             "Ctrl+Q" );
     return menu;
 }
@@ -218,7 +218,7 @@ QMenu *QVLCMenu::PlaylistMenu( MainInterface *mi, intf_thread_t *p_intf )
 {
     QMenu *menu = new QMenu();
     menu->addMenu( SDMenu( p_intf ) );
-    menu->addAction ( QIcon( ":/pixmaps/vlc_playlist_16px.png" ),
+    menu->addAction ( QIcon( ":/pixmaps/playlist_16px.png" ),
                       qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
     menu->addSeparator();
 
@@ -242,11 +242,11 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     QMenu *menu = new QMenu;
     if( mi )
     {
-        menu->addAction( QIcon( ":/pixmaps/vlc_playlist_16px.png" ),
+        menu->addAction( QIcon( ":/pixmaps/playlist_16px.png" ),
                          qtr( "Playlist..." ), mi, SLOT( togglePlaylist() ),
                          qtr( "Ctrl+L" ) );
     }
-    DP_SADD( menu, qtr( I_MENU_EXT ), "", ":/pixmaps/vlc_settings_16px.png",
+    DP_SADD( menu, qtr( I_MENU_EXT ), "", ":/pixmaps/menus_settings_16px.png",
                  extendedDialog() ,  "Ctrl+E" );
 
     menu->addSeparator();
@@ -282,10 +282,10 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
     menu->addSeparator();
 
 
-    DP_SADD( menu, qtr( I_MENU_MSG ), "", ":/pixmaps/vlc_messages_16px.png",
+    DP_SADD( menu, qtr( I_MENU_MSG ), "", ":/pixmaps/menus_messages_16px.png",
              messagesDialog(), "Ctrl+M" );
     DP_SADD( menu, qtr( I_MENU_INFO ) , "", "", mediaInfoDialog(), "Ctrl+I" );
-    DP_SADD( menu, qtr( I_MENU_CODECINFO ) , "", ":/pixmaps/vlc_info_16px.png",
+    DP_SADD( menu, qtr( I_MENU_CODECINFO ) , "", ":/pixmaps/menus_info_16px.png",
              mediaCodecDialog(), "Ctrl+J" );
 
 #if 0 /* Not Implemented yet */
@@ -295,7 +295,7 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf, MainInterface *mi,
 
 
     menu->addSeparator();
-       DP_SADD( menu, qtr( "Preferences..." ), "", ":/pixmaps/vlc_preferences_16px.png",
+       DP_SADD( menu, qtr( "Preferences..." ), "", ":/pixmaps/menus_preferences_16px.png",
              prefsDialog(), "Ctrl+P" );
     return menu;
 }
@@ -461,7 +461,7 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
 QMenu *QVLCMenu::HelpMenu()
 {
     QMenu *menu = new QMenu();
-    DP_SADD( menu, qtr( "Help..." ) , "", ":/pixmaps/vlc_help_16px.png",
+    DP_SADD( menu, qtr( "Help..." ) , "", ":/pixmaps/menus_help_16px.png",
              helpDialog(), "F1" );
     menu->addSeparator();
     DP_SADD( menu, qtr( I_MENU_ABOUT ), "", "", aboutDialog(), "Ctrl+F1" );
@@ -491,20 +491,20 @@ QMenu *QVLCMenu::HelpMenu()
         vlc_value_t val; \
         var_Get( p_input, "state", &val ); \
         if( val.i_int == PLAYING_S ) \
-            MIM_SADD( menu, qtr( "Pause" ), "", ":/pixmaps/vlc_pause_16px.png", \
+            MIM_SADD( menu, qtr( "Pause" ), "", ":/pixmaps/pause_16px.png", \
                     togglePlayPause() ) \
         else \
-            MIM_SADD( menu, qtr( "Play" ), "", ":/pixmaps/vlc_play_16px.png", \
+            MIM_SADD( menu, qtr( "Play" ), "", ":/pixmaps/play_16px.png", \
                     togglePlayPause() ) \
     } \
     else if( THEPL->items.i_size && THEPL->i_enabled ) \
-        MIM_SADD( menu, qtr( "Play" ), "", ":/pixmaps/vlc_play_16px.png", \
+        MIM_SADD( menu, qtr( "Play" ), "", ":/pixmaps/play_16px.png", \
                 togglePlayPause() ); \
     \
-    MIM_SADD( menu, qtr( "Stop" ), "", ":/pixmaps/vlc_stop_16px.png", stop() ); \
-    MIM_SADD( menu, qtr( "Previous" ), "", ":/pixmaps/vlc_previous_16px.png", \
+    MIM_SADD( menu, qtr( "Stop" ), "", ":/pixmaps/stop_16px.png", stop() ); \
+    MIM_SADD( menu, qtr( "Previous" ), "", ":/pixmaps/previous_16px.png", \
             prev() ); \
-    MIM_SADD( menu, qtr( "Next" ), "", ":/pixmaps/vlc_next_16px.png", next() );
+    MIM_SADD( menu, qtr( "Next" ), "", ":/pixmaps/next_16px.png", next() );
 
 #define POPUP_STATIC_ENTRIES( menu ) \
     QMenu *toolsmenu = ToolsMenu( p_intf, NULL, false, true ); \
@@ -693,8 +693,8 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
 
     sysMenu->addSeparator();
     DP_SADD( sysMenu, qtr( "&Open Media" ), "",
-            ":/pixmaps/vlc_file-wide_16px.png", openFileDialog(), "" );
-    DP_SADD( sysMenu, qtr( "&Quit" ) , "", ":/pixmaps/vlc_quit_16px.png",
+            ":/pixmaps/file-wide_16px.png", openFileDialog(), "" );
+    DP_SADD( sysMenu, qtr( "&Quit" ) , "", ":/pixmaps/quit_16px.png",
              quit(), "" );
 
     /* Set the menu */
