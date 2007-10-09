@@ -44,13 +44,16 @@
 #define setSpinBoxFreq( spinbox ){ spinbox->setRange ( 0, INT_MAX ); \
     spinbox->setAccelerated( true ); }
 
-#define V4L_DEVICE         0
-#define PVR_DEVICE         1
-#define DVB_DEVICE         2
-#define BDA_DEVICE         3
-#define DSHOW_DEVICE     4
-#define SCREEN_DEVICE      5
-#define JACK_DEVICE        6
+enum
+{
+    V4L_DEVICE,
+    PVR_DEVICE,
+    DVB_DEVICE,
+    BDA_DEVICE,
+    DSHOW_DEVICE,
+    SCREEN_DEVICE,
+    JACK_DEVICE
+};
 
 class QWidget;
 class QLineEdit;

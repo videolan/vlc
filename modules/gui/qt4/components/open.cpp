@@ -37,6 +37,7 @@
 #include <QLineEdit>
 #include <QStackedLayout>
 #include <QListView>
+#include <QCompleter>
 
 /**************************************************************************
  * Open Files and subtitles                                               *
@@ -96,6 +97,12 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 #else
     lineFileEdit = findChildren<QLineEdit*>()[3];
 #endif
+
+    QStringList fileCompleteList ;
+    QCompleter *fileCompleter = new QCompleter( fileCompleteList, this );
+
+    lineFileEdit->setCompleter( fileCompleter );
+
 //    lineFileEdit->hide();
 
     /* Make a list of QLabel inside the QFileDialog to access the good ones */
@@ -564,7 +571,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     jackDevLayout->addWidget( jackChannels, 1, 1 );
 
     /* Jack Props panel */
- 
+
     /* Selected ports */
     QLabel *jackPortsLabel = new QLabel( qtr( "Selected ports :" ) );
     jackPropLayout->addWidget( jackPortsLabel, 0 , 0 );
@@ -572,7 +579,7 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     jackPortsSelected = new QLineEdit( qtr( ".*") );
     jackPortsSelected->setAlignment( Qt::AlignRight );
     jackPropLayout->addWidget( jackPortsSelected, 0, 1 );
- 
+
     /* Caching */
     QLabel *jackCachingLabel = new QLabel( qtr( "Input caching :" ) );
     jackPropLayout->addWidget( jackCachingLabel, 1 , 0 );
@@ -582,15 +589,15 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     jackCaching->setValue(1000);
     jackCaching->setAlignment( Qt::AlignRight );
     jackPropLayout->addWidget( jackCaching, 1 , 1 );
- 
+
     /* Pace */
     jackPace = new QCheckBox(qtr( "Use VLC pace" ));
     jackPropLayout->addWidget( jackPace, 2, 1 );
- 
+
     /* Auto Connect */
     jackConnect = new QCheckBox( qtr( "Auto connnection" ));
     jackPropLayout->addWidget( jackConnect, 3, 1 );
- 
+
     /* Jack CONNECTs */
     CuMRL( jackChannels, valueChanged( int ) );
     CuMRL( jackCaching, valueChanged( int ) );
