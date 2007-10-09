@@ -6,6 +6,7 @@
   <file>pixmaps/stop.png</file>
   <file>pixmaps/previous.png</file>
   <file>pixmaps/next.png</file>
+  <file>pixmaps/playlist.png</file>
   <file>pixmaps/volume-low.png</file>
   <file>pixmaps/volume-high.png</file>
   <file>pixmaps/volume-muted.png</file>
@@ -14,33 +15,32 @@
   <file alias="vlc48.png">../../../share/vlc48x48.png</file>
   <file alias="vlc16.png">../../../share/vlc16x16.png</file>
   <file alias="noart.png">pixmaps/noart.png</file>
-  <file>pixmaps/playlist_icon.png</file>
-  <file>pixmaps/spref_cone_Audio_64.png</file>
-  <file>pixmaps/spref_cone_Video_64.png</file>
-  <file>pixmaps/spref_cone_Input_64.png</file>
-  <file>pixmaps/spref_cone_Hotkeys_64.png</file>
-  <file>pixmaps/spref_cone_Subtitles_64.png</file>
-  <file>pixmaps/spref_cone_Interface_64.png</file>
-  <file>pixmaps/help_16px.png</file>
-  <file>pixmaps/info_16px.png</file>
+  <file>pixmaps/menus_help_16px.png</file>
+  <file>pixmaps/menus_info_16px.png</file>
+  <file>pixmaps/menus_messages_16px.png</file>
+  <file>pixmaps/menus_quit_16px.png</file>
+  <file>pixmaps/menus_preferences_16px.png</file>
+  <file>pixmaps/menus_settings_16px.png</file>
+  <file>pixmaps/menus_stream_16px.png</file>
   <file>pixmaps/next_16px.png</file>
   <file>pixmaps/previous_16px.png</file>
   <file>pixmaps/stop_16px.png</file>
   <file>pixmaps/pause_16px.png</file>
-  <file>pixmaps/messages_16px.png</file>
   <file>pixmaps/play_16px.png</file>
   <file>pixmaps/network_16px.png</file>
-  <file>pixmaps/quit_16px.png</file>
   <file>pixmaps/disc_16px.png</file>
   <file>pixmaps/file-asym_16px.png</file>
   <file>pixmaps/file-wide_16px.png</file>
   <file>pixmaps/folder-grey_16px.png</file>
   <file>pixmaps/capture-card_16px.png</file>
-  <file>pixmaps/preferences_16px.png</file>
+  <file>pixmaps/cdda_16px.png</file>
   <file>pixmaps/record_16px.png</file>
+  <file>pixmaps/type_directory.png</file>
+  <file>pixmaps/type_file.png</file>
+  <file>pixmaps/type_net.png</file>
+  <file>pixmaps/type_node.png</file>
+  <file>pixmaps/type_playlist.png</file>
   <file>pixmaps/playlist_16px.png</file>
-  <file>pixmaps/settings_16px.png</file>
-  <file>pixmaps/stream_16px.png</file>
   <file>pixmaps/playlist_add.png</file>
   <file>pixmaps/playlist_repeat_all.png</file>
   <file>pixmaps/playlist_repeat_one.png</file>
@@ -54,5 +54,11 @@
   <file>pixmaps/advprefs_sout.png</file>
   <file>pixmaps/advprefs_extended.png</file>
   <file>pixmaps/advprefs_playlist.png</file>
+  <file>pixmaps/spref_cone_Audio_64.png</file>
+  <file>pixmaps/spref_cone_Video_64.png</file>
+  <file>pixmaps/spref_cone_Input_64.png</file>
+  <file>pixmaps/spref_cone_Hotkeys_64.png</file>
+  <file>pixmaps/spref_cone_Subtitles_64.png</file>
+  <file>pixmaps/spref_cone_Interface_64.png</file>
  </qresource>
 </RCC>
