@@ -499,6 +499,7 @@ modules/demux/pva.c
 modules/demux/rawdv.c
 modules/demux/rawvid.c
 modules/demux/real.c
+modules/demux/smf.c
 modules/demux/subtitle.c
 modules/demux/ts.c
 modules/demux/tta.c
