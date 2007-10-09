@@ -47,6 +47,7 @@
 enum
 {
     V4L_DEVICE,
+    V4L2_DEVICE,
     PVR_DEVICE,
     DVB_DEVICE,
     BDA_DEVICE,
@@ -154,8 +155,9 @@ private:
     QRadioButton *bdas, *bdat, *bdac;
     QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr;
     QLineEdit *v4lVideoDevice, *v4lAudioDevice;
+    QLineEdit *v4l2VideoDevice, *v4l2AudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
-    QComboBox *v4lNormBox, *pvrNormBox, *bdaBandBox;
+    QComboBox *v4lNormBox, *v4l2StdBox, *pvrNormBox, *bdaBandBox;
     QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
     QSpinBox *bdaCard, *bdaFreq, *bdaSrate;
     QSpinBox *jackChannels, *jackCaching;

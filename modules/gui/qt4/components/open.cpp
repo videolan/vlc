@@ -554,6 +554,37 @@ CaptureOpenPanel::CaptureOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CuMRL( v4lNormBox,  currentIndexChanged ( int ) );
 
     /*******
+     * V4L2*
+     *******/
+    addModuleAndLayouts( V4L2_DEVICE, v4l2, "Video for Linux 2" );
+
+    /* V4l Main panel */
+    QLabel *v4l2VideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
+    v4l2DevLayout->addWidget( v4l2VideoDeviceLabel, 0, 0 );
+
+    v4l2VideoDevice = new QLineEdit;
+    v4l2DevLayout->addWidget( v4l2VideoDevice, 0, 1 );
+
+    QLabel *v4l2AudioDeviceLabel = new QLabel( qtr( "Audio device name" ) );
+    v4l2DevLayout->addWidget( v4l2AudioDeviceLabel, 1, 0 );
+
+    v4l2AudioDevice = new QLineEdit;
+    v4l2DevLayout->addWidget( v4l2AudioDevice, 1, 1 );
+
+    /* v4l2 Props panel */
+    QLabel *v4l2StdLabel = new QLabel( qtr( "Standard" ) );
+    v4l2PropLayout->addWidget( v4l2StdLabel, 0 , 0 );
+
+    v4l2StdBox = new QComboBox;
+    setfillVLCConfigCombo( "v4l2-standard", p_intf, v4l2StdBox );
+    v4l2PropLayout->addWidget( v4l2StdBox, 0 , 1 );
+
+    /* v4l2 CONNECTs */
+    CuMRL( v4l2VideoDevice, textChanged( QString ) );
+    CuMRL( v4l2AudioDevice, textChanged( QString ) );
+    CuMRL( v4l2StdBox,  currentIndexChanged ( int ) );
+
+    /*******
      * JACK *
      *******/
     addModuleAndLayouts( JACK_DEVICE, jack, "JACK Audio Connection Kit" );
@@ -855,6 +886,12 @@ void CaptureOpenPanel::updateMRL()
         mrl += " :v4l-adev=" + v4lAudioDevice->text();
         mrl += " :v4l-norm=" + QString("%1").arg( v4lNormBox->currentIndex() );
         mrl += " :v4l-frequency=" + QString("%1").arg( v4lFreq->value() );
+        break;
+    case V4L2_DEVICE:
+        mrl = "v4l2://";
+        mrl += " :v4l2-dev=" + v4l2VideoDevice->text();
+        mrl += " :v4l2-adev=" + v4l2AudioDevice->text();
+        mrl += " :v4l2-standard=" + QString("%1").arg( v4l2StdBox->currentIndex() );
         break;
     case JACK_DEVICE:
         mrl = "jack://";
