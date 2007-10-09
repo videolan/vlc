@@ -447,6 +447,8 @@ static void Destroy( vlc_object_t *p_this )
     }
 
 #ifdef HAVE_FONTCONFIG
+    /* wait for the FontBuilder thread to terminate */
+    vlc_thread_join( p_this );
     vlc_mutex_destroy( &p_sys->fontconfig_lock );
 
     if( p_sys->p_fontconfig )
