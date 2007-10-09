@@ -73,8 +73,7 @@ OpenDialog::OpenDialog( QWidget *parent, intf_thread_t *_p_intf, bool modal,
     ui.slaveBrowseButton->hide();
 
     /* Buttons Creation */
-    QSizePolicy buttonSizePolicy( static_cast<QSizePolicy::Policy>(7),
-                                  static_cast<QSizePolicy::Policy>(1) );
+    QSizePolicy buttonSizePolicy( QSizePolicy::Expanding, QSizePolicy::GrowFlag );
     buttonSizePolicy.setHorizontalStretch(0);
     buttonSizePolicy.setVerticalStretch(0);
 
