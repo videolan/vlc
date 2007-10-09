@@ -141,7 +141,8 @@ static void resolve_callback(
 
         avahi_address_snprint(a, (sizeof(a)/sizeof(a[0]))-1, address);
         if( protocol == AVAHI_PROTO_INET6 )
-            asprintf( &psz_addr, "[%s]", a );
+            if( asprintf( &psz_addr, "[%s]", a ) == -1 )
+                return;
 
         if( txt != NULL )
             asl = avahi_string_list_find( txt, "path" );
@@ -153,8 +154,12 @@ static void resolve_callback(
             if( avahi_string_list_get_pair( asl, &key, &value, &size ) == 0 &&
                 value != NULL )
             {
-                asprintf( &psz_uri, "http://%s:%d%s",
-                          psz_addr != NULL ? psz_addr : a, port, value );
+                if( asprintf( &psz_uri, "http://%s:%d%s",
+                          psz_addr != NULL ? psz_addr : a, port, value ) == -1 )
+                {
+                    free( psz_addr );
+                    return;
+                }
             }
             if( key != NULL )
                 avahi_free( (void *)key );
@@ -163,8 +168,12 @@ static void resolve_callback(
         }
         else
         {
-            asprintf( &psz_uri, "http://%s:%d",
-                      psz_addr != NULL ? psz_addr : a, port );
+            if( asprintf( &psz_uri, "http://%s:%d",
+                      psz_addr != NULL ? psz_addr : a, port ) == -1 )
+            {
+                free( psz_addr );
+                return;
+            }
         }
 
         if( psz_addr != NULL )
@@ -204,7 +213,6 @@ static void browse_callback(
 {
     services_discovery_t *p_sd = ( services_discovery_t* )userdata;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
-
     if( event == AVAHI_BROWSER_NEW )
     {
         if( avahi_service_resolver_new( p_sys->client, interface, protocol,
@@ -218,7 +226,7 @@ static void browse_callback(
                      avahi_strerror( avahi_client_errno( p_sys->client ) ) );
         }
     }
-    else
+    else if( name )
     {
         /** \todo Store the input id and search it, rather than searching the items */
         input_item_t *p_item;
