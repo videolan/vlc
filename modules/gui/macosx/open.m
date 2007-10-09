@@ -170,7 +170,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_disc_title_lbl setStringValue: _NS("Title")];
     [o_disc_chapter_lbl setStringValue: _NS("Chapter")];
     [o_disc_videots_btn_browse setTitle: _NS("Browse...")];
-    [o_disc_dvd_menus setTitle: _NS("Use DVD menus")];
+    [o_disc_dvd_menus setTitle: _NS("No DVD menus")];
 
     [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS directory")];
     [[o_disc_type cellAtRow:1 column:0] setTitle: _NS("DVD")];
@@ -499,7 +499,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (IBAction)openDiscTypeChanged:(id)sender
 {
     NSString *o_type;
-    vlc_bool_t b_device, b_menus, b_title_chapter;
+    BOOL b_device, b_no_menus, b_title_chapter;
  
     [o_disc_device removeAllItems];
     b_title_chapter = ![o_disc_dvd_menus state];
@@ -508,34 +508,32 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     if ( [o_type isEqualToString: _NS("VIDEO_TS directory")] )
     {
-        b_device = 0; b_menus = 1;
+        b_device = NO; b_no_menus = YES;
     }
     else
     {
         NSArray *o_devices;
         NSString *o_disc;
         const char *psz_class = NULL;
-        b_device = 1;
+        b_device = YES;
 
         if ( [o_type isEqualToString: _NS("VCD")] )
         {
             psz_class = kIOCDMediaClass;
             o_disc = o_type;
-            b_menus = 0; b_title_chapter = 1;
-            [o_disc_dvd_menus setState: FALSE];
-        }
+            b_no_menus = NO; b_title_chapter = YES;
+		}
         else if ( [o_type isEqualToString: _NS("Audio CD")])
         {
             psz_class = kIOCDMediaClass;
             o_disc = o_type;
-            b_menus = 0; b_title_chapter = 0;
-            [o_disc_dvd_menus setState: FALSE];
+            b_no_menus = NO; b_title_chapter = NO;
         }
         else
         {
             psz_class = kIODVDMediaClass;
             o_disc = o_type;
-            b_menus = 1;
+            b_no_menus = YES;
         }
  
         o_devices = GetEjectableMediaOfClass( psz_class );
@@ -545,9 +543,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
  
             if ( i_devices )
             {
-                int i;
- 
-                for( i = 0; i < i_devices; i++ )
+				for( int i = 0; i < i_devices; i++ )
                 {
                     [o_disc_device
                         addItemWithObjectValue: [o_devices objectAtIndex: i]];
@@ -570,7 +566,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_disc_chapter_stp setEnabled: b_title_chapter];
     [o_disc_videots_folder setEnabled: !b_device];
     [o_disc_videots_btn_browse setEnabled: !b_device];
-    [o_disc_dvd_menus setEnabled: b_menus];
+    [o_disc_dvd_menus setEnabled: b_no_menus];
 
     [self openDiscInfoChanged: nil];
 }
@@ -598,14 +594,14 @@ static VLCOpen *_o_sharedMainInstance = nil;
     NSString *o_videots;
     NSString *o_mrl_string;
     int i_title, i_chapter;
-    vlc_bool_t b_menus;
+    BOOL b_no_menus;
 
     o_type = [[o_disc_type selectedCell] title];
     o_device = [o_disc_device stringValue];
     i_title = [o_disc_title intValue];
     i_chapter = [o_disc_chapter intValue];
     o_videots = [o_disc_videots_folder stringValue];
-    b_menus = [o_disc_dvd_menus state];
+    b_no_menus = [o_disc_dvd_menus state];
 
     if ( [o_type isEqualToString: _NS("VCD")] )
     {
@@ -628,21 +624,22 @@ static VLCOpen *_o_sharedMainInstance = nil;
         if ( [o_device isEqualToString:
                 [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
             o_device = @"";
-        if ( b_menus )
-            o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
-                            o_device];
-        else
+        if ( b_no_menus )
             o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i-",
                             o_device, i_title, i_chapter];
+        else
+			o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
+                            o_device];
+            
     }
     else /* VIDEO_TS folder */
     {
-        if ( b_menus )
-            o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
-                            o_videots];
-        else
+        if ( b_no_menus )
             o_mrl_string = [NSString stringWithFormat: @"dvdread://%@@%i:%i",
                             o_videots, i_title, i_chapter];
+        else
+			o_mrl_string = [NSString stringWithFormat: @"dvdnav://%@",
+                            o_videots];            
     }
 
     [o_mrl setStringValue: o_mrl_string];

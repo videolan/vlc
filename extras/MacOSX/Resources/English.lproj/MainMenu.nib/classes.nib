@@ -144,6 +144,8 @@
                 "o_description_txt" = id; 
                 "o_displayed_lbl" = id; 
                 "o_displayed_txt" = id; 
+                "o_fps_lbl" = id; 
+                "o_fps_txt" = id; 
                 "o_genre_lbl" = id; 
                 "o_genre_txt" = id; 
                 "o_info_window" = id; 
@@ -199,11 +201,9 @@
                 openDocumentation = id; 
                 openDonate = id; 
                 openForum = id; 
-                openLicense = id; 
                 openReadMe = id; 
                 openRecentItem = id; 
                 openWebsite = id; 
-                reportABug = id; 
                 showBookmarks = id; 
                 showExtended = id; 
                 showMessagesPanel = id; 
@@ -270,7 +270,6 @@
                 "o_mi_hide" = id; 
                 "o_mi_hide_others" = id; 
                 "o_mi_info" = id; 
-                "o_mi_license" = id; 
                 "o_mi_loop" = id; 
                 "o_mi_messages" = id; 
                 "o_mi_minimize" = id; 
@@ -293,7 +292,6 @@
                 "o_mi_random" = id; 
                 "o_mi_readme" = id; 
                 "o_mi_repeat" = id; 
-                "o_mi_reportabug" = id; 
                 "o_mi_screen" = id; 
                 "o_mi_select_all" = id; 
                 "o_mi_services" = id; 

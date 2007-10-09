@@ -95,6 +95,8 @@
     IBOutlet id o_video_box;
     IBOutlet id o_video_decoded_lbl;
     IBOutlet id o_video_decoded_txt;
+	IBOutlet id o_fps_lbl;
+	IBOutlet id o_fps_txt;
 
     playlist_item_t * p_item;
     NSTimer * o_statUpdateTimer;

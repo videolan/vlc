@@ -565,7 +565,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* messages panel */
     [o_msgs_panel setTitle: _NS("Messages")];
-    [o_msgs_btn_crashlog setTitle: _NS("Open CrashLog")];
+    [o_msgs_btn_crashlog setTitle: _NS("Open CrashLog...")];
 
     /* main menu */
     [o_mi_about setTitle: [_NS("About VLC media player") \
@@ -655,25 +655,23 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mu_window setTitle: _NS("Window")];
     [o_mi_minimize setTitle: _NS("Minimize Window")];
     [o_mi_close_window setTitle: _NS("Close Window")];
-    [o_mi_controller setTitle: _NS("Controller")];
-    [o_mi_equalizer setTitle: _NS("Equalizer")];
-    [o_mi_extended setTitle: _NS("Extended Controls")];
-    [o_mi_bookmarks setTitle: _NS("Bookmarks")];
-    [o_mi_playlist setTitle: _NS("Playlist")];
-    [o_mi_info setTitle: _NS("Information")];
-    [o_mi_messages setTitle: _NS("Messages")];
-    [o_mi_errorsAndWarnings setTitle: _NS("Errors and Warnings")];
+    [o_mi_controller setTitle: _NS("Controller...")];
+    [o_mi_equalizer setTitle: _NS("Equalizer...")];
+    [o_mi_extended setTitle: _NS("Extended Controls...")];
+    [o_mi_bookmarks setTitle: _NS("Bookmarks...")];
+    [o_mi_playlist setTitle: _NS("Playlist...")];
+    [o_mi_info setTitle: _NS("Media Information...")];
+    [o_mi_messages setTitle: _NS("Messages...")];
+    [o_mi_errorsAndWarnings setTitle: _NS("Errors and Warnings...")];
 
     [o_mi_bring_atf setTitle: _NS("Bring All to Front")];
 
     [o_mu_help setTitle: _NS("Help")];
-    [o_mi_readme setTitle: _NS("ReadMe...")];
-    [o_mi_documentation setTitle: _NS("Online Documentation")];
-    [o_mi_reportabug setTitle: _NS("Report a Bug")];
-    [o_mi_website setTitle: _NS("VideoLAN Website")];
-    [o_mi_license setTitle: _NS("License")];
-    [o_mi_donation setTitle: _NS("Make a donation")];
-    [o_mi_forum setTitle: _NS("Online Forum")];
+    [o_mi_readme setTitle: _NS("ReadMe / FAQ...")];
+    [o_mi_documentation setTitle: _NS("Online Documentation...")];
+    [o_mi_website setTitle: _NS("VideoLAN Website...")];
+    [o_mi_donation setTitle: _NS("Make a donation...")];
+    [o_mi_forum setTitle: _NS("Online Forum...")];
 
     /* dock menu */
     [o_dmi_play setTitle: _NS("Play")];
@@ -693,7 +691,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_vmi_fullscreen setTitle: _NS("Fullscreen")];
     [o_vmi_snapshot setTitle: _NS("Snapshot")];
 
-    [o_info_window setTitle: _NS("Information")];
+    [o_info_window setTitle: _NS("Media Information")];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification
@@ -1923,28 +1921,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     [[NSWorkspace sharedWorkspace] openURL: o_url];
 }
 
-- (IBAction)reportABug:(id)sender
-{
-    NSURL * o_url = [NSURL URLWithString:
-        @"http://www.videolan.org/support/bug-reporting.html"];
-
-    [[NSWorkspace sharedWorkspace] openURL: o_url];
-}
-
 - (IBAction)openWebsite:(id)sender
 {
     NSURL * o_url = [NSURL URLWithString: @"http://www.videolan.org/"];
 
     [[NSWorkspace sharedWorkspace] openURL: o_url];
-}
-
-- (IBAction)openLicense:(id)sender
-{
-    NSString * o_path = [[NSBundle mainBundle]
-        pathForResource: @"COPYING" ofType: nil];
-
-    [[NSWorkspace sharedWorkspace] openFile: o_path
-                                   withApplication: @"TextEdit"];
 }
 
 - (IBAction)openForum:(id)sender

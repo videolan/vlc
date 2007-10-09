@@ -87,6 +87,7 @@
     [o_video_decoded_lbl setStringValue: _NS("Decoded blocks")];
     [o_displayed_lbl setStringValue: _NS("Displayed frames")];
     [o_lost_frames_lbl setStringValue: _NS("Lost frames")];
+	[o_fps_lbl setStringValue: _NS("Frames per Second")];
  
     [o_sout_box setTitle: _NS("Streaming")];
     [o_sent_packets_lbl setStringValue: _NS("Sent packets")];

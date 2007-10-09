@@ -255,9 +255,7 @@ struct intf_sys_t
     IBOutlet id o_mu_help;
     IBOutlet id o_mi_readme;
     IBOutlet id o_mi_documentation;
-    IBOutlet id o_mi_reportabug;
     IBOutlet id o_mi_website;
-    IBOutlet id o_mi_license;
     IBOutlet id o_mi_donation;
     IBOutlet id o_mi_forum;
     IBOutlet id o_mi_errorsAndWarnings;
