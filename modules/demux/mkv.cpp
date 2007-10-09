@@ -3082,7 +3082,11 @@ void virtual_segment_c::PrepareChapters( )
         p_segment = linked_segments[i];
         // FIXME assume we have the same editions in all segments
         for (j=0; j<p_segment->stored_editions.size(); j++)
+        {
+            if( j >= p_editions->size() ) /* Protect against broken files (?) */
+                break;
             (*p_editions)[j]->Append( *p_segment->stored_editions[j] );
+        }
     }
 }
 
