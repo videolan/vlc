@@ -29,7 +29,6 @@
 
 /*
  * TODO: No mjpeg support yet.
- * TODO: mmap untested.
  * TODO: Tuner partial implementation.
  * TODO: Alsa input support?
  */
@@ -995,7 +994,7 @@ static int InitMmap( demux_t *p_demux, int i_fd )
     for( p_sys->i_nbuffers = 0; p_sys->i_nbuffers < req.count; ++p_sys->i_nbuffers )
     {
         struct v4l2_buffer buf;
-    
+
         memset( &buf, 0, sizeof(buf) );
         buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buf.memory = V4L2_MEMORY_MMAP;
@@ -1009,11 +1008,11 @@ static int InitMmap( demux_t *p_demux, int i_fd )
 
         p_sys->p_buffers[p_sys->i_nbuffers].length = buf.length;
         p_sys->p_buffers[p_sys->i_nbuffers].start =
-            mmap( NULL, buf.length, PROT_READ | PROT_WRITE, MAP_SHARED, p_sys->i_fd_video, buf.m.offset );
+            mmap( NULL, buf.length, PROT_READ | PROT_WRITE, MAP_SHARED, i_fd, buf.m.offset );
 
         if( p_sys->p_buffers[p_sys->i_nbuffers].start == MAP_FAILED )
         {
-            msg_Err( p_demux, "mmap failed" );
+            msg_Err( p_demux, "mmap failed (%m)" );
             goto open_failed;
         }
     }
