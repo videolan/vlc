@@ -93,6 +93,16 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     BUTTONACT( addButton, popupAdd() );
     buttons->addWidget( addButton );
 
+    randomButton = new QPushButton( this );
+    randomButton->setIcon( model->hasRandom() ?
+                            QIcon( ":/pixmaps/vlc_playlist_shuffle_on.png" ) :
+                            QIcon( ":/pixmaps/vlc_playlist_shuffle_off.png" ) );
+    BUTTONACT( randomButton, toggleRandom() );
+    buttons->addWidget( randomButton );
+
+    QSpacerItem *spacer = new QSpacerItem( 10, 20 );
+    buttons->addItem( spacer );
+
     repeatButton = new QPushButton( this );
     if( model->hasRepeat() ) repeatButton->setIcon(
                         QIcon( ":/pixmaps/vlc_playlist_repeat_one.png" ) );
@@ -103,15 +113,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     BUTTONACT( repeatButton, toggleRepeat() );
     buttons->addWidget( repeatButton );
 
-    randomButton = new QPushButton( this );
-    randomButton->setIcon( model->hasRandom() ?
-                            QIcon( ":/pixmaps/vlc_playlist_shuffle_on.png" ) :
-                            QIcon( ":/pixmaps/vlc_playlist_shuffle_off.png" ) );
-    BUTTONACT( randomButton, toggleRandom() );
-    buttons->addWidget( randomButton );
-
-    QSpacerItem *spacer = new QSpacerItem( 10, 20 );
-    buttons->addItem( spacer );
 
     QLabel *filter = new QLabel( qtr(I_PL_SEARCH) + " " );
     buttons->addWidget( filter );
