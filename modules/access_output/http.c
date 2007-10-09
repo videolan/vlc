@@ -278,9 +278,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_httpd_stream =
         httpd_StreamNew( p_sys->p_httpd_host, psz_file_name, psz_mime,
                          psz_user, psz_pwd, NULL );
-    if( psz_user ) free( psz_user );
-    if( psz_pwd ) free( psz_pwd );
-    if( psz_mime ) free( psz_mime );
+    free( psz_user );
+    free( psz_pwd );
+    free( psz_mime );
 
     if( p_sys->p_httpd_stream == NULL )
     {
@@ -304,19 +304,24 @@ static int Open( vlc_object_t *p_this )
         if( psz_name != NULL ) psz_name++;
         else psz_name = psz_newuri;
 
-        asprintf( &psz_txt, "path=%s", psz_name );
-
-        free( psz_uri );
+        if( psz_file_name &&
+            asprintf( &psz_txt, "path=%s", psz_file_name ) == -1 )
+            {
+                pl_Release( p_playlist );
+                free( psz_uri );
+                return VLC_ENOMEM;
+            }
 
         p_sys->p_bonjour = bonjour_start_service( (vlc_object_t *)p_access,
                                     strcmp( p_access->psz_access, "https" )
                                        ? "_vlc-http._tcp" : "_vlc-https._tcp",
                                              psz_name, i_bind_port, psz_txt );
+        free( psz_uri );
         free( (void *)psz_txt );
 
         if( p_sys->p_bonjour == NULL )
             msg_Err( p_access, "unable to start requested Bonjour announce" );
-        vlc_object_release( p_playlist );
+        pl_Release( p_playlist );
     }
     else
         p_sys->p_bonjour = NULL;
