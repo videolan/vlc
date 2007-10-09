@@ -1147,7 +1147,7 @@ static struct
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+0)
     /* Untested yet */
-    { VLC_FOURCC('A','V','D','n'), CODEC_ID_DNXHD,
+    { VLC_FOURCC('A','V','d','n'), CODEC_ID_DNXHD,
       VIDEO_ES, "DNxHD" },
 #endif
     { VLC_FOURCC('8','B','P','S'), CODEC_ID_8BPS,
