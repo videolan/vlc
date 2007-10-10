@@ -107,7 +107,8 @@ Stream output:
  * RTSP for TS-multiplexed broadcast streams
  * New RTP payload formats:
    * Speex voice audio codec
-   * ITU T.140 (for text, subtitles)
+   * ITU T.140 (for text, subtitles) output
+   * G.711 (both A-law and µ-law) output
  * UDP-Lite transport for RTP
  * DCCP transport for RTP
  * Lots of fixes for RTSP broadcasting
