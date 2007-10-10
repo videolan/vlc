@@ -267,7 +267,6 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
         return -1;
 
     event = (first & 0x80) ? first : tr->running_event;
-    msg_Dbg (p_demux, "MIDI event 0x%02X", event);
 
     switch (event & 0xf0)
     {
@@ -388,7 +387,6 @@ static int Demux (demux_t *p_demux)
 
     es_out_Control (p_demux->out, ES_OUT_SET_PCR, date_Get (&p_sys->pts));
 
-    msg_Dbg (p_demux, "pulse %llu", pulse);
     for (unsigned i = 0; i < p_sys->trackc; i++)
     {
         mtrk_t *track = p_sys->trackv + i;
