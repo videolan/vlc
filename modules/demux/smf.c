@@ -393,7 +393,6 @@ static int Demux (demux_t *p_demux)
 
         while (track->next == pulse)
         {
-            msg_Dbg (p_demux, "event on track %u", i);
             if (HandleMessage (p_demux, track)
              || ReadDeltaTime (s, track))
             {
