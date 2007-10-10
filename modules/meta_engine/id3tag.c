@@ -57,7 +57,7 @@ vlc_module_end();
 /*****************************************************************************
  * ParseID3Tag : parse an id3tag into the info structures
  *****************************************************************************/
-static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
+static void ParseID3Tag( demux_t *p_demux, const uint8_t *p_data, int i_size )
 {
     struct id3_tag   *p_id3_tag;
     struct id3_frame *p_frame;
@@ -262,13 +262,13 @@ static int GetAPEvXSize( const uint8_t *p_data, int i_data )
     /* it is the footer */
     return i_body + ( (flags&(1<<31)) ? APE_TAG_HEADERSIZE : 0 );
 }
-static void ParseAPEvXTag( demux_t *p_demux, uint8_t *p_data, int i_data )
+static void ParseAPEvXTag( demux_t *p_demux, const uint8_t *p_data, int i_data )
 {
     demux_meta_t     *p_demux_meta = (demux_meta_t*)p_demux->p_private;
     vlc_meta_t       *p_meta;
     vlc_bool_t b_start;
     vlc_bool_t b_end;
-    uint8_t *p_header = NULL;
+    const uint8_t *p_header = NULL;
     int i_entry;
 
     if( i_data < APE_TAG_HEADERSIZE )
@@ -372,8 +372,8 @@ static void CheckFooter( demux_t *p_demux )
 {
     const int64_t i_pos = stream_Size( p_demux->s );
     const int i_peek = 128+APE_TAG_HEADERSIZE;
-    uint8_t *p_peek;
-    uint8_t *p_peek_id3;
+    const uint8_t *p_peek;
+    const uint8_t *p_peek_id3;
     int64_t i_id3v2_pos = -1;
     int64_t i_apevx_pos = -1;
     int i_id3v2_size;
@@ -447,7 +447,7 @@ static void CheckFooter( demux_t *p_demux )
 }
 static void CheckHeader( demux_t *p_demux )
 {
-    uint8_t *p_peek;
+    const uint8_t *p_peek;
     int i_size;
 
     if( stream_Seek( p_demux->s, 0 ) )
