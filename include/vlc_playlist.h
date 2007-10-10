@@ -180,7 +180,10 @@ struct services_discovery_t
 struct playlist_t
 {
     VLC_COMMON_MEMBERS
-    struct playlist_internal_t * p_internal; /**< Internal members */
+
+    /* pp_sd & i_sd are for internal use ONLY. Understood ? it's PRIVATE ! */
+    services_discovery_t **pp_sd; /**< Loaded service discovery modules */
+    int                   i_sd;   /**< Number of service discovery modules */
 
     int                   i_enabled; /**< How many items are enabled ? */
 

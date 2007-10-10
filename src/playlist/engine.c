@@ -66,8 +66,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         return NULL;
     }
 
-    p_playlist->p_internal = malloc(sizeof(struct playlist_internal_t));
-    memset( p_playlist->p_internal, 0, sizeof(struct playlist_internal_t) );
+    TAB_INIT( p_playlist->i_sd, p_playlist->pp_sd );
 
     p_parent->p_libvlc->p_playlist = p_playlist;
 
@@ -178,7 +177,6 @@ void playlist_Destroy( playlist_t *p_playlist )
 
     vlc_mutex_destroy( &p_playlist->gc_lock );
     vlc_object_detach( p_playlist );
-    free( p_playlist->p_internal );
     vlc_object_destroy( p_playlist );
 }
 
@@ -439,10 +437,10 @@ void playlist_LastLoop( playlist_t *p_playlist )
         vout_Destroy( (vout_thread_t *)p_obj );
     }
 
-    while( p_playlist->p_internal->i_asds )
+    while( p_playlist->i_sd )
     {
         playlist_ServicesDiscoveryRemove( p_playlist,
-                                          p_playlist->p_internal->pp_asds[0]->p_sd->psz_module );
+                                          p_playlist->pp_sd[0]->psz_module );
     }
 
     playlist_MLDump( p_playlist );

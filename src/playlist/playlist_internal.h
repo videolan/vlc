@@ -58,19 +58,6 @@ struct playlist_fetcher_t
     DECL_ARRAY(playlist_album_t) albums;
 };
 
-typedef struct playlist_archived_services_discovery_t {
-        services_discovery_t * p_sd; /* The service discovery module */
-        playlist_item_t      * p_cat;/* Corresponding item in the category view */
-        playlist_item_t      * p_one;/* Corresponding item in the one level view */
-} playlist_archived_services_discovery_t;
-
-struct playlist_internal_t {
-    struct playlist_archived_services_discovery_t
-                **pp_asds; /**< Loaded service discovery modules */
-    int         i_asds;    /**< Number of service discovery modules */
-};
-
-
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
