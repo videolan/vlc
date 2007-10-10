@@ -524,6 +524,17 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         int pi_subpic_x[ SCALE_SIZE ];
         int k;
 
+        /* If the source video and subtitles stream agree on the size of
+         * the video then disregard all further references to the subtitle
+         * stream.
+         */
+        if( ( i_source_video_height == p_subpic->i_original_picture_height ) &&
+            ( i_source_video_width  == p_subpic->i_original_picture_width ) )
+        {
+            p_subpic->i_original_picture_height = 0;
+            p_subpic->i_original_picture_width = 0;
+        }
+
         for( k = 0; k < SCALE_SIZE ; k++ )
             pi_subpic_x[ k ] = p_subpic->i_x;
 
@@ -599,12 +610,25 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             if( p_text_region && 
                 ( ( p_text_region->i_align & SUBPICTURE_RENDERED ) == 0 ) )
             {
-                p_spu->p_text->fmt_out.video.i_width =
-                    p_spu->p_text->fmt_out.video.i_visible_width =
-                    p_fmt->i_width;
-                p_spu->p_text->fmt_out.video.i_height =
-                    p_spu->p_text->fmt_out.video.i_visible_height =
-                    p_fmt->i_height;
+                if( (p_subpic->i_original_picture_height > 0) &&
+                    (p_subpic->i_original_picture_width  > 0) )
+                {
+                    p_spu->p_text->fmt_out.video.i_width =
+                        p_spu->p_text->fmt_out.video.i_visible_width =
+                        p_subpic->i_original_picture_width;
+                    p_spu->p_text->fmt_out.video.i_height =
+                        p_spu->p_text->fmt_out.video.i_visible_height =
+                        p_subpic->i_original_picture_height;
+                }
+                else
+                {
+                    p_spu->p_text->fmt_out.video.i_width =
+                        p_spu->p_text->fmt_out.video.i_visible_width =
+                        p_fmt->i_width;
+                    p_spu->p_text->fmt_out.video.i_height =
+                        p_spu->p_text->fmt_out.video.i_visible_height =
+                        p_fmt->i_height;
+                }
             }
         }
 
@@ -618,18 +642,24 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             pi_scale_height[ SCALE_TEXT ]    = ( p_fmt->i_height * 1000 ) /
                                           p_spu->p_text->fmt_out.video.i_height;
         }
+        /* If we have an explicit size plane to render to, then turn off
+         * the fontsize rescaling.
+         */
+        if( (p_subpic->i_original_picture_height > 0) &&
+            (p_subpic->i_original_picture_width  > 0) )
+        {
+            i_scale_width_orig  = 1000;
+            i_scale_height_orig = 1000;
+        }
 
         for( k = 0; k < SCALE_SIZE ; k++ )
         {
+            /* Case of both width and height being specified has been dealt with
+             * above by instead rendering to an output pane of the explicit
+             * dimensions specified - we don't need to scale it.
+             */
             if( (p_subpic->i_original_picture_height > 0) &&
-                (p_subpic->i_original_picture_width  > 0) )
-            {
-                pi_scale_width[ k ]  = pi_scale_width[ k ]  * i_source_video_width /
-                                 p_subpic->i_original_picture_width;
-                pi_scale_height[ k ] = pi_scale_height[ k ] * i_source_video_height /
-                                 p_subpic->i_original_picture_height;
-            }
-            else if( p_subpic->i_original_picture_height > 0 )
+                (p_subpic->i_original_picture_width  <= 0) )
             {
                 pi_scale_height[ k ] = pi_scale_height[ k ] * i_source_video_height /
                                  p_subpic->i_original_picture_height;
@@ -637,6 +667,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                                  p_subpic->i_original_picture_height;
             }
         }
+
 
         /* Set default subpicture aspect ratio */
         if( p_region && p_region->fmt.i_aspect &&
